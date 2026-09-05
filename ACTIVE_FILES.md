@@ -1039,7 +1039,7 @@
 ### UI Utilities & Helpers
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|
-| `/shared_components/js/toast-notifications.js` | Toast notification system (success/error/info) | — | ✅ Active |
+| `/shared_components/js/toast-notifications.js` | **2026-09-05: self-styling (no stylesheet ever defined `.nwca-toast` — toasts rendered as bare text), message via textContent (was innerHTML), `role=alert` on errors, errors stay 8 s. Now loaded by art-request-detail, quote-view and invoice, whose 45 `alert()` calls became `ToastNotifications.error/success/info` (mockup-detail used its own `showToast`).** Toast notification system (success/error/info) | — | ✅ Active |
 | `/shared_components/js/elapsed-time-utils.js` | Elapsed-time badges with urgency tiers (Fresh / Waiting / Overdue) — used by all art/mockup dashboards | caspio-date-utils.js | ✅ Active |
 | `/shared_components/js/caspio-date-utils.js` | Single source of truth for parsing Caspio timestamps (Pacific server time → correct UTC instant, DST-aware). Use `window.CaspioDate.parse/formatDateTime/formatDate/formatAge` instead of any `+ 'Z'` append idiom. | — | ✅ Active |
 | `/shared_components/js/enhanced-loading-animations.js` | Enhanced loading animations (skeleton screens, spinners) | — | ✅ Active |

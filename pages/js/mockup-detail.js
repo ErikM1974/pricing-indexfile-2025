@@ -1001,7 +1001,7 @@
                 details.style.display = !isOn ? 'block' : 'none';
                 if (label) label.textContent = !isOn ? 'On Hold' : 'Put on Hold';
                 if (content) content.classList.toggle('pmd-content--on-hold', !isOn);
-                alert('Failed to update on-hold status: ' + err.message);
+                showToast('Failed to update on-hold status: ' + err.message, 'error');
             }
         });
 
@@ -1095,7 +1095,7 @@
                 renderRushToggle(mockup);
             })
             .catch(function (err) {
-                alert('Failed to update rush status: ' + err.message);
+                showToast('Failed to update rush status: ' + err.message, 'error');
                 clone.disabled = false;
                 renderRushToggle(mockup);
             });
@@ -6062,7 +6062,7 @@
 
     function pmdLinkOrder(orderNum) {
         if (!currentMockup || !currentMockup.ID) {
-            alert('Error: Cannot save — missing record ID');
+            showToast('Error: Cannot save — missing record ID', 'error');
             return;
         }
         if (!confirm('Link Order #' + orderNum + ' to this mockup?')) return;
@@ -6095,10 +6095,10 @@
             // Now run the ShopWorks Art Done check
             checkShopWorksArtDone(orderNum);
 
-            alert('Order #' + orderNum + ' linked successfully');
+            showToast('Order #' + orderNum + ' linked successfully', 'success');
         })
         .catch(function (err) {
-            alert('Failed to link order: ' + err.message);
+            showToast('Failed to link order: ' + err.message, 'error');
         });
     }
 
@@ -6135,7 +6135,7 @@
     // ── Customer PDF Download ──────────────────────────────────────────
     function generateCustomerPDF() {
         if (!window.jspdf) {
-            alert('PDF library not loaded. Please refresh and try again.');
+            showToast('PDF library not loaded. Please refresh and try again.', 'error');
             return;
         }
 
@@ -6339,7 +6339,7 @@
             btn.disabled = false;
         }).catch(function (err) {
             console.error('PDF generation error:', err);
-            alert('Error generating PDF. Please try again.');
+            showToast('Error generating PDF. Please try again.', 'error');
             btn.innerHTML = originalText;
             btn.disabled = false;
         });

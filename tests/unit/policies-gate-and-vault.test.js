@@ -17,7 +17,7 @@ const ROOT = path.join(__dirname, '..', '..');
 const read = (rel) => fs.readFileSync(path.join(ROOT, rel), 'utf8');
 
 describe('Policies pages: Caspio auth embed is on-demand', () => {
-    test.each(['pages/policies-hub.html', 'pages/policy-detail.html'])('%s has the placeholder, not the static script', (rel) => {
+    test.each(['pages/policies-hub.html', 'pages/policy-detail.html', 'pages/policy-questions.html'])('%s has the placeholder, not the static script', (rel) => {
         const html = read(rel);
         expect(html).not.toMatch(/<script[^>]*src="https:\/\/c3eku948\.caspio\.com\/dp\/[^"]*\/emb"/);
         expect(html).toMatch(/<div id="caspio-auth-embed" data-src="https:\/\/c3eku948\.caspio\.com\/dp\/[^"]+\/emb"><\/div>/);

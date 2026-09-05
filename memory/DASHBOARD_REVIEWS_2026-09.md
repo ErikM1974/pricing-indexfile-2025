@@ -212,6 +212,20 @@ Releases `v2026.09.04.1 → .9`. Detail here; MEMORY.md carries one line each.
 - Everything else loaded clean: no console errors, no error banners on 58 pages. Lock:
   `tests/unit/policies-gate-and-vault.test.js`.
 
+## Cross-page sweep 3 — alert() → toasts on the detail pages (2026-09-05, `v2026.09.05.10`)
+
+- 45 blocking `alert()` dialogs replaced: mockup-detail (7 → its own `showToast(msg, type)`),
+  art-request-detail (15), quote-view (18, customer-facing acceptance flow included), invoice
+  (5) → shared `ToastNotifications.error/success/info`. Tone chosen from the message text
+  (✓/"successfully"/"Deposit enabled" = success; "Skipped"/"deleted in ShopWorks" = info; else
+  error). `confirm()`/`prompt()` left alone — synchronous return values need per-site work.
+- 🔑 The shared toast module was UNSTYLED (no stylesheet defined `.nwca-toast`, so the Design
+  Vault's toasts were bare text at the page bottom) and used innerHTML for the message. Now
+  self-styling + textContent + `role=alert`. Any page that adds `toast-notifications.js`
+  gets a real toast.
+- Also in this release: policy-questions.html got the on-demand Caspio embed; favicons added to
+  garment-designer, price-audit-report, quick-reference-tips, box-labels.
+
 ## Verification gotchas learned today
 
 - Browser pane (`mcp__Claude_Browser`): screenshots of a SCROLLED page come back blank on

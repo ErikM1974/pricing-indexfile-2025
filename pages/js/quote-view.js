@@ -2157,7 +2157,7 @@ class QuoteViewPage {
         } catch (e) {
             console.error('[change-log] acknowledge failed:', e);
             if (btn) { btn.disabled = false; btn.textContent = 'Mark all as seen'; }
-            alert('Failed to acknowledge changes: ' + e.message);
+            ToastNotifications.error('Failed to acknowledge changes: ' + e.message);
         }
     }
 
@@ -2253,7 +2253,7 @@ class QuoteViewPage {
             // so the new "CANCELLED IN SHOPWORKS" banner renders in place.
             if (result.deleted) {
                 if (manual) {
-                    alert(`Order ${this.quoteId} was deleted in ShopWorks. This quote is now marked Cancelled and will be retained for 30 days.`);
+                    ToastNotifications.info(`Order ${this.quoteId} was deleted in ShopWorks. This quote is now marked Cancelled and will be retained for 30 days.`);
                 }
                 window.location.reload();
                 return;
@@ -2382,7 +2382,7 @@ class QuoteViewPage {
             const raw = (input.value || '').trim();
             const n = Number(raw);
             if (!Number.isInteger(n) || n <= 0 || n > 9999999) {
-                alert('Please enter a valid ShopWorks Order # (numeric, e.g. 141899)');
+                ToastNotifications.error('Please enter a valid ShopWorks Order # (numeric, e.g. 141899)');
                 input.focus();
                 return;
             }
@@ -2802,7 +2802,7 @@ class QuoteViewPage {
             );
         } catch (err) {
             console.error('[quote-view] sendToShipStation failed:', err);
-            alert(`Failed to send to ShipStation: ${err.message}`);
+            ToastNotifications.error(`Failed to send to ShipStation: ${err.message}`);
             btn.disabled = false;
             btn.innerHTML = originalHtml;
         }
@@ -3305,7 +3305,7 @@ class QuoteViewPage {
                         copyBtn.classList.remove('sw-action-btn--success');
                     }, 1800);
                 } catch (e) {
-                    alert('Copy failed — your browser blocked clipboard access. URL: ' + window.location.href);
+                    ToastNotifications.error('Copy failed — your browser blocked clipboard access. URL: ' + window.location.href);
                 }
             });
         }
@@ -3362,7 +3362,7 @@ class QuoteViewPage {
     async _openSendToSteve() {
         const order = this._currentSnapshot && this._currentSnapshot.order;
         if (!order || !order.id_Order) {
-            alert("This order isn't in ShopWorks yet. Sync the ShopWorks order first, then Send to Steve.");
+            ToastNotifications.error("This order isn't in ShopWorks yet. Sync the ShopWorks order first, then Send to Steve.");
             return;
         }
         const btn = document.getElementById('sw-action-send-steve');
@@ -3377,7 +3377,7 @@ class QuoteViewPage {
                 prefill: prefill,
                 onSubmitted: (designId) => {
                     if (modal) modal.style.display = 'none';
-                    alert(designId
+                    ToastNotifications.error(designId
                         ? ('Sent to Steve — art request #' + designId + ' created.')
                         : 'Sent to Steve.');
                 }
@@ -3385,7 +3385,7 @@ class QuoteViewPage {
             if (modal) modal.style.display = 'flex';
         } catch (err) {
             console.error('[quote-view] Send to Steve failed:', err);
-            alert("Couldn't open Steve's form: " + (err && err.message ? err.message : 'unknown error'));
+            ToastNotifications.error("Couldn't open Steve's form: " + (err && err.message ? err.message : 'unknown error'));
         } finally {
             if (btn) { btn.disabled = false; btn.innerHTML = orig; }
         }
@@ -4345,12 +4345,12 @@ class QuoteViewPage {
     // Modal Methods
     openAcceptModal() {
         if (this.isExpired()) {
-            alert('This quote has expired. Please contact us for updated pricing.');
+            ToastNotifications.error('This quote has expired. Please contact us for updated pricing.');
             return;
         }
 
         if (this.quoteData.Status === 'Accepted') {
-            alert('This quote has already been accepted.');
+            ToastNotifications.error('This quote has already been accepted.');
             return;
         }
 
@@ -4390,13 +4390,13 @@ class QuoteViewPage {
         // Validation
         if (!name) {
             nameInput.focus();
-            alert('Please enter your name');
+            ToastNotifications.error('Please enter your name');
             return;
         }
 
         if (!email || !this.isValidEmail(email)) {
             emailInput.focus();
-            alert('Please enter a valid email address');
+            ToastNotifications.error('Please enter a valid email address');
             return;
         }
 
@@ -4406,7 +4406,7 @@ class QuoteViewPage {
         const dmInput = document.querySelector('input[name="deliveryMethod"]:checked');
         const deliveryMethod = dmInput ? dmInput.value : null;
         if (!deliveryMethod) {
-            alert('Please choose pickup or shipping so we know how to get your order to you.');
+            ToastNotifications.error('Please choose pickup or shipping so we know how to get your order to you.');
             return;
         }
 
@@ -4474,7 +4474,7 @@ class QuoteViewPage {
 
         } catch (error) {
             console.error('Error accepting quote:', error);
-            alert('We couldn\'t record your acceptance just now. Please try again in a moment, or call us at (253) 922-5793 and we\'ll finish it for you.');
+            ToastNotifications.error('We couldn\'t record your acceptance just now. Please try again in a moment, or call us at (253) 922-5793 and we\'ll finish it for you.');
         } finally {
             // Reset button state
             acceptBtn.disabled = false;
@@ -4598,7 +4598,7 @@ class QuoteViewPage {
             window.location.href = data.url;
         } catch (e) {
             console.error('[quote-view] deposit checkout failed:', e);
-            alert((e.message || 'Could not start checkout.') + ' Please try again, or call (253) 922-5793 and we\'ll take it by phone.');
+            ToastNotifications.error((e.message || 'Could not start checkout.') + ' Please try again, or call (253) 922-5793 and we\'ll take it by phone.');
             btn.disabled = false;
             btn.textContent = original;
         }
@@ -4688,7 +4688,7 @@ class QuoteViewPage {
         const shipping = parseFloat(document.getElementById('qv-deposit-shipping').value);
         const taxRatePct = parseFloat(document.getElementById('qv-deposit-taxrate').value);
         if (!Number.isFinite(shipping) || !Number.isFinite(taxRatePct)) {
-            alert('Enter shipping dollars (0 for pickup) and the confirmed tax rate % (0 for out-of-state).');
+            ToastNotifications.error('Enter shipping dollars (0 for pickup) and the confirmed tax rate % (0 for out-of-state).');
             return;
         }
         btn.disabled = true;
@@ -4708,10 +4708,10 @@ class QuoteViewPage {
             this.renderDepositPanel(null);
             let copied = false;
             try { await navigator.clipboard.writeText(data.payUrl); copied = true; } catch (_) { /* clipboard blocked */ }
-            alert(`Deposit enabled: ${this.formatCurrency(data.deposit.depositAmount)} of ${this.formatCurrency(data.deposit.grandTotal)}.` +
+            ToastNotifications.error(`Deposit enabled: ${this.formatCurrency(data.deposit.depositAmount)} of ${this.formatCurrency(data.deposit.grandTotal)}.` +
                 (copied ? ' Pay link copied to clipboard.' : ' Share the quote link with the customer.'));
         } catch (e) {
-            alert('Enable deposit failed: ' + (e.message || 'unknown error'));
+            ToastNotifications.error('Enable deposit failed: ' + (e.message || 'unknown error'));
         } finally {
             btn.disabled = false;
         }

@@ -756,7 +756,7 @@
                 req.Is_Rush = !!turnOn;
                 renderRushToggle(req); // re-render
             } catch (err) {
-                alert('Failed to update rush status: ' + err.message);
+                ToastNotifications.error('Failed to update rush status: ' + err.message);
                 clone.disabled = false;
                 renderRushToggle(req);
             }
@@ -889,7 +889,7 @@
                 details.style.display = !isOn ? 'block' : 'none';
                 if (label) label.textContent = !isOn ? 'On Hold' : 'Put on Hold';
                 if (content) content.classList.toggle('ard-content--on-hold', !isOn);
-                alert('Failed to update on-hold status: ' + err.message);
+                ToastNotifications.error('Failed to update on-hold status: ' + err.message);
             }
         });
 
@@ -1439,7 +1439,7 @@
             btnSupa.addEventListener('click', function () {
                 var designNumber = req.Design_Number || req.DesignNumber || req.Design_Num_SW;
                 if (!designNumber) {
-                    alert('This art request has no Design Number — cannot locate Box files.');
+                    ToastNotifications.error('This art request has no Design Number — cannot locate Box files.');
                     return;
                 }
                 window.TransferActions.openSendModal({
@@ -2126,7 +2126,7 @@
 
     function setFinalMockup(url) {
         var pkId = currentRequest.PK_ID;
-        if (!pkId) { alert('Cannot update: missing PK_ID'); return; }
+        if (!pkId) { ToastNotifications.error('Cannot update: missing PK_ID'); return; }
 
         fetch(API_BASE + '/api/artrequests/' + pkId, {
             method: 'PUT',
@@ -2168,7 +2168,7 @@
                 showArdToast('Final mockup cleared');
             }
         }).catch(function (err) {
-            alert('Error: ' + err.message);
+            ToastNotifications.error('Error: ' + err.message);
         });
     }
 
@@ -2807,7 +2807,7 @@
                 if (!confirm('Remove this ' + removeLabel + ' (' + fieldLabel + ')?')) return;
 
                 var pkId = currentRequest.PK_ID;
-                if (!pkId) { alert('Cannot remove: missing PK_ID'); return; }
+                if (!pkId) { ToastNotifications.error('Cannot remove: missing PK_ID'); return; }
 
                 btn.disabled = true;
                 btn.textContent = '...';
@@ -2843,7 +2843,7 @@
                     loadVisionAnalysis(); // Refresh vision section
                     if (typeof refreshNotes === 'function') refreshNotes();
                 }).catch(function (err) {
-                    alert('Error removing mockup: ' + err.message);
+                    ToastNotifications.error('Error removing mockup: ' + err.message);
                     btn.disabled = false;
                     btn.textContent = '\u00d7';
                 });
@@ -2956,7 +2956,7 @@
             if (fromNoteKey) currentRequest[fromNoteKey] = fromNote;
             if (toNoteKey) currentRequest[toNoteKey] = toNote;
             renderMockupGallery(currentRequest);
-            alert('Could not reorder mockups: ' + err.message);
+            ToastNotifications.error('Could not reorder mockups: ' + err.message);
         }
     }
 
@@ -3084,7 +3084,7 @@
                     }
                 } catch (err) {
                     clearTimeout(deadlockTimeout); // H7 — error path
-                    alert('Error: ' + err.message);
+                    ToastNotifications.error('Error: ' + err.message);
                     boxConfirm.disabled = false;
                     boxConfirm.textContent = 'Select File';
                 }
@@ -3126,7 +3126,7 @@
 
     async function uploadFileToSlot(file, fieldKey) {
         if (file.size > 20 * 1024 * 1024) {
-            alert('File too large (max 20MB)');
+            ToastNotifications.error('File too large (max 20MB)');
             return;
         }
 
@@ -3226,7 +3226,7 @@
                 });
             }
         } catch (err) {
-            alert('Upload failed: ' + err.message);
+            ToastNotifications.error('Upload failed: ' + err.message);
             renderMockupGallery(currentRequest);
         } finally {
             // M11 — Always release the upload lock
@@ -3508,7 +3508,7 @@
                 // User can right-click → Save As in the new tab to save the image.
                 var opened = window.open(url, '_blank', 'noopener,noreferrer');
                 if (!opened) {
-                    alert(
+                    ToastNotifications.error(
                         'Your browser blocked opening the download in a new tab.\n\n' +
                         'Workarounds:\n' +
                         '  1) Allow popups for teamnwca.com in your browser settings, OR\n' +
@@ -3545,7 +3545,7 @@
             a.remove();
             setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
         } catch (err) {
-            alert('Download failed: ' + err.message);
+            ToastNotifications.error('Download failed: ' + err.message);
         } finally {
             if (dlBtn) dlBtn.disabled = false;
         }
@@ -4243,7 +4243,7 @@
      */
     function handleCustomerApproval(req) {
         if (!selectedMockupSlot) {
-            alert('Please select a mockup first.');
+            ToastNotifications.error('Please select a mockup first.');
             return;
         }
         if (!confirm('Approve the selected mockup? This will notify the team.')) return;
@@ -6009,7 +6009,7 @@
             loadFullInvoice(String(orderNum), artBilled, prelimCharges);
             showSuccessMessage('Order #' + orderNum + ' linked successfully');
         })
-        .catch(function (err) { alert('Failed to link order: ' + err.message); });
+        .catch(function (err) { ToastNotifications.error('Failed to link order: ' + err.message); });
     }
 
     // ── Audit Stat Boxes — 4-column comparison ────────────────────────
