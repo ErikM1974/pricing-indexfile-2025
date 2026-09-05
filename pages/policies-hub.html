@@ -23,7 +23,9 @@
         <div id="auth-lastname">[@authfield:Last_Name]</div>
         <div id="auth-email">[@authfield:Email]</div>
         <div id="auth-role">[@authfield:Role]</div>
-        <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e15000a0bb470ed2be4ec5943e/emb"></script>
+        <!-- Injected by policies-admin-gate.js ONLY when no SAML/session identity exists (2026-09-05):
+             as a static script it redirected signed-in staff to the Caspio portal login. -->
+        <div id="caspio-auth-embed" data-src="https://c3eku948.caspio.com/dp/a0e15000a0bb470ed2be4ec5943e/emb"></div>
     </div>
 
     <!-- Top bar -->
@@ -125,7 +127,7 @@
     </div>
 
     <!-- Scripts: admin gate first (sets window.IS_POLICIES_ADMIN), then API, then page controller -->
-    <script src="/shared_components/js/policies/policies-admin-gate.js?v=20260514-12"></script>
+    <script src="/shared_components/js/policies/policies-admin-gate.js?v=2026.09.05.9"></script>
     <script src="/shared_components/js/policies/policies-api.js?v=20260514-12"></script>
     <script src="/shared_components/js/policies/policy-ai-search.js?v=20260514-12"></script>
     <script src="/shared_components/js/policies/policies-hub.js?v=2026.05.29.11"></script>

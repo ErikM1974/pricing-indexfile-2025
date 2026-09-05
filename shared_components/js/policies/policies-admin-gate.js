@@ -104,6 +104,19 @@
         });
     }
 
+    // The page carries <div id="caspio-auth-embed" data-src="…/emb"> instead of the script
+    // tag; this turns it into the real embed script on demand.
+    function injectCaspioEmbed() {
+        const host = document.getElementById('caspio-auth-embed');
+        if (!host || host.dataset.loaded === '1' || !host.dataset.src) return;
+        host.dataset.loaded = '1';
+        const s = document.createElement('script');
+        s.type = 'text/javascript';
+        s.src = host.dataset.src;
+        host.appendChild(s);
+        log('Caspio auth embed injected (cold start)');
+    }
+
     async function resolve() {
         // 1) Existing Express session?
         let me = await fetchMe();
@@ -120,8 +133,13 @@
             }
         }
 
-        // 3) Still not authenticated → wait for Caspio embed (cold start)
+        // 3) Still not authenticated → load the Caspio auth embed (cold start ONLY).
+        //    The embed used to be a static <script> in the page, so it ran for everyone —
+        //    and for a SAML-signed-in staffer with no Caspio portal login it REDIRECTED
+        //    the whole page to the Caspio "Sign in to User Portal" screen (2026-09-05).
+        //    Now it is injected only when steps 1–2 found no session.
         if (!me?.authenticated && document.getElementById('auth-firstname')) {
+            injectCaspioEmbed();
             log('waiting for Caspio embed…');
             const cu = await waitForCaspio();
             if (cu) {

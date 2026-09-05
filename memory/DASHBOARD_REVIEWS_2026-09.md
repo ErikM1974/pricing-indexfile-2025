@@ -193,6 +193,25 @@ Releases `v2026.09.04.1 → .9`. Detail here; MEMORY.md carries one line each.
   digitized-designs (18 KB). Script: session scratchpad `extract-inline.js` (rebuild from this
   description if needed — ~70 lines).
 
+## Live crawl of ~60 dashboard pages (2026-09-05, Erik's Chrome) — 2 real defects, rest clean
+
+- Method: navigate each dashboard-linked page, wait 6–8 s, collect console errors + visible
+  `[role=alert]/.error/.dash-error-banner` text + first 160 chars. Cheap and it found what the
+  static audit could not.
+- 🔴 **Design Vault dead for 31 days**: `/api/design-search/index` sends `If-None-Match`; the
+  proxy's CORS `Access-Control-Allow-Headers` did not list it → preflight OK but the browser
+  dropped the GET ("Failed to fetch") → the page honestly showed the stale cached index. Fix:
+  proxy CORS allows `If-None-Match, If-Modified-Since, Range, Cache-Control, Pragma` and exposes
+  `ETag, Content-Length, Retry-After` (proxy `v2026.09.05.2`). 🔑 A CORS-blocked request never
+  reaches the server log — curl with `-H Origin` returns 200, so reproduce the PREFLIGHT
+  (`-X OPTIONS -H Access-Control-Request-Headers: <header>`) and read the allow list.
+- 🔴 **Policies Hub / Policy Detail redirected Erik to "Sign in to User Portal"**: the Caspio
+  auth embed was a static `<script>` that ran for everyone; for a SAML-only session it took the
+  page to the Caspio login. Now a `#caspio-auth-embed` placeholder that the gate injects only
+  when `/me` and sessionStorage found nothing (app `v2026.09.05.9`).
+- Everything else loaded clean: no console errors, no error banners on 58 pages. Lock:
+  `tests/unit/policies-gate-and-vault.test.js`.
+
 ## Verification gotchas learned today
 
 - Browser pane (`mcp__Claude_Browser`): screenshots of a SCROLLED page come back blank on
