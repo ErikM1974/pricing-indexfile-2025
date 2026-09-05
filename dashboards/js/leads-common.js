@@ -393,12 +393,12 @@
         head.className = 'ld-modal-head';
         var title = document.createElement('h2');
         title.className = 'ld-modal-title';
-        title.innerHTML = '<i class="fas fa-pen"></i> Edit lead';
+        title.innerHTML = '<i class="fas fa-pen" aria-hidden="true"></i> Edit lead';
         var closeBtn = document.createElement('button');
         closeBtn.type = 'button';
         closeBtn.className = 'ld-drawer-close';
         closeBtn.setAttribute('aria-label', 'Close');
-        closeBtn.innerHTML = '<i class="fas fa-times"></i>';
+        closeBtn.innerHTML = '<i class="fas fa-times" aria-hidden="true"></i>';
         head.appendChild(title);
         head.appendChild(closeBtn);
 
@@ -411,10 +411,12 @@
             var lab = document.createElement('label');
             lab.className = 'ld-control-label';
             lab.textContent = f.label;
+            lab.htmlFor = 'edit-lead-' + f.key;
             var input = f.type === 'textarea' ? document.createElement('textarea') : document.createElement('input');
             if (f.type !== 'textarea') input.type = f.type;
             else input.rows = 3;
             input.className = 'ld-select';
+            input.id = 'edit-lead-' + f.key;
             if (f.max) input.maxLength = f.max;
             input.value = lead[f.key] == null ? '' : String(lead[f.key]); // attacker-safe: value, not innerHTML
             inputs[f.key] = input;
@@ -423,8 +425,7 @@
             bodyEl.appendChild(ctrl);
         });
         var hint = document.createElement('div');
-        hint.className = 'ld-muted';
-        hint.style.fontSize = '0.78rem';
+        hint.className = 'ld-muted ld-hint-sm';
         hint.textContent = 'The “Submitted Details” panel keeps showing the customer’s original submission.';
         bodyEl.appendChild(hint);
 
@@ -433,9 +434,10 @@
         var saveBtn = document.createElement('button');
         saveBtn.type = 'button';
         saveBtn.className = 'ld-btn ld-btn--primary';
-        saveBtn.innerHTML = '<i class="fas fa-check"></i> Save changes';
+        saveBtn.innerHTML = '<i class="fas fa-check" aria-hidden="true"></i> Save changes';
         var statusEl = document.createElement('span');
         statusEl.className = 'ld-muted';
+        statusEl.setAttribute('role', 'status');
         actions.appendChild(saveBtn);
         actions.appendChild(statusEl);
         bodyEl.appendChild(actions);

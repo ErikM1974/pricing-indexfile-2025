@@ -28,6 +28,7 @@
         status: '',
         rep: '',
         search: '',
+        statusGroup: '',        // stat-tile filter: '' | 'new' | 'pipeline' | 'won'
         staffEmail: '',
         current: null,          // lead open in the drawer
         matchCache: {},         // email → contact | null (per page-load)
@@ -61,6 +62,19 @@
         chip.setAttribute('aria-pressed', mine && state.rep === mine ? 'true' : 'false');
     }
 
+    function syncStatTiles() {
+        Array.prototype.forEach.call(document.querySelectorAll('.ld-stat-btn'), function (b) {
+            b.setAttribute('aria-pressed', (b.getAttribute('data-group') || '') === state.statusGroup ? 'true' : 'false');
+        });
+    }
+
+    function setBoardMessage(html) {
+        var msg = document.getElementById('leads-board-msg');
+        if (!msg) return;
+        msg.innerHTML = html || '';
+        msg.hidden = !html;
+    }
+
     function syncViewToggle() {
         document.getElementById('view-board').setAttribute('aria-pressed', state.view === 'board' ? 'true' : 'false');
         document.getElementById('view-list').setAttribute('aria-pressed', state.view === 'list' ? 'true' : 'false');
@@ -77,7 +91,9 @@
         var board = document.getElementById('leads-board');
         var listWrap = document.getElementById('leads-list-wrap');
         if (state.view === 'board') { board.hidden = false; listWrap.hidden = true; renderBoard(); }
-        else { board.hidden = true; listWrap.hidden = false; renderTable(); }
+        else { board.hidden = true; listWrap.hidden = false; setBoardMessage(''); renderTable(); }
+        var name = state.current ? (state.current.Contact_Name || state.current.Company || state.current.Submission_ID) + ' · ' : '';
+        document.title = name + 'Leads - Northwest Custom Apparel';
     }
 
     // ---------- focus management (a11y) ----------
@@ -115,6 +131,9 @@
         bindFocusTrap(drawer, function () { return drawer.classList.contains('open'); });
         bindFocusTrap(document.getElementById('newlead-modal'), function () { return !document.getElementById('newlead-modal').hidden; });
         document.getElementById('btn-refresh').addEventListener('click', loadLeads);
+        document.getElementById('leads-tbody').addEventListener('click', function (e) {
+            if (e.target.closest('#btn-board-retry')) loadLeads();
+        });
         document.getElementById('btn-export').addEventListener('click', exportCurrentView);
         document.getElementById('filter-archived').addEventListener('change', function () {
             state.includeArchived = this.checked;
@@ -123,6 +142,7 @@
         [['filter-source', 'source'], ['filter-status', 'status'], ['filter-rep', 'rep']].forEach(function (pair) {
             document.getElementById(pair[0]).addEventListener('change', function () {
                 state[pair[1]] = this.value;
+                if (pair[1] === 'status' && this.value) { state.statusGroup = ''; syncStatTiles(); }
                 updateMineChip();
                 renderView();
             });
@@ -132,6 +152,19 @@
             renderView();
         });
         document.getElementById('view-board').addEventListener('click', function () { setView('board'); });
+        // Stat tiles filter by group (New / In Pipeline / Won); the status dropdown clears the group.
+        Array.prototype.forEach.call(document.querySelectorAll('.ld-stat-btn'), function (b) {
+            b.addEventListener('click', function () {
+                var g = b.getAttribute('data-group') || '';
+                state.statusGroup = (state.statusGroup === g) ? '' : g;
+                if (state.statusGroup) { state.status = ''; document.getElementById('filter-status').value = ''; }
+                syncStatTiles();
+                renderView();
+            });
+        });
+        document.getElementById('leads-board-msg').addEventListener('click', function (e) {
+            if (e.target.closest('#btn-board-retry')) loadLeads();
+        });
         document.getElementById('view-list').addEventListener('click', function () { setView('list'); });
         document.getElementById('filter-mine').addEventListener('click', function () {
             var mine = L.EMAIL_TO_REP[state.staffEmail];
@@ -258,6 +291,8 @@
         closeDrawer();
         var tbody = document.getElementById('leads-tbody');
         tbody.innerHTML = '<tr><td colspan="7" class="ld-empty dash-loading">Loading leads…</td></tr>';
+        // The board view was blank while loading (the message lived only in the hidden table).
+        if (state.view === 'board') { document.getElementById('leads-board').innerHTML = ''; setBoardMessage('<span class="dash-loading">Loading leads…</span>'); }
 
         // Fetch the full set (proxy hard-caps at 2000). ~1,066 non-archived +
         // ~700 archived both fit, so the board shows every lead and the count
@@ -301,8 +336,10 @@
         }).catch(function (err) {
             if (seq !== state.loadSeq) return;
             console.error('[leads] load failed:', err);
-            DashPage.showError('Unable to load leads (' + err.message + '). Refresh to retry.');
-            tbody.innerHTML = '<tr><td colspan="7" class="ld-empty"><i class="fas fa-triangle-exclamation"></i> Leads unavailable.</td></tr>';
+            DashPage.showError('Unable to load leads (' + err.message + ').');
+            var failHtml = '<i class="fas fa-triangle-exclamation" aria-hidden="true"></i> Leads unavailable. <button type="button" id="btn-board-retry" class="ld-btn"><i class="fas fa-rotate" aria-hidden="true"></i> Retry</button>';
+            tbody.innerHTML = '<tr><td colspan="7" class="ld-empty">' + failHtml + '</td></tr>';
+            if (state.view === 'board') { document.getElementById('leads-board').innerHTML = ''; setBoardMessage(failHtml); }
         });
     }
 
@@ -375,7 +412,16 @@
         state.rep = setOptions('filter-rep', state.rep, repOptions);
     }
 
+    function matchesGroup(l) {
+        if (!state.statusGroup) return true;
+        if (state.statusGroup === 'new') return l.Status === 'New';
+        if (state.statusGroup === 'pipeline') return L.PIPELINE_STATUSES.indexOf(l.Status) !== -1;
+        if (state.statusGroup === 'won') return L.WON_STATUSES.indexOf(l.Status) !== -1;
+        return true;
+    }
+
     function matchesFilters(l) {
+        if (!matchesGroup(l)) return false;
         if (state.source) {
             if (state.source.indexOf('jf:') === 0) {
                 if (l.Form_ID !== 'jotform-lead' || ('jf:' + (l.External_Source || 'jotform')) !== state.source) return false;
@@ -441,19 +487,20 @@
             tbody.innerHTML = '<tr><td colspan="7" class="ld-empty">No leads match the current filters.</td></tr>';
             return;
         }
+        setBoardMessage('');
         tbody.innerHTML = rows.map(function (l) {
             var meta = L.SOURCE_META[l.Form_ID] || { label: l.Form_ID, icon: 'fa-file' };
             var heat = L.leadHeat(l);
             var timer = L.responseTimer(l);
-            return '<tr data-id="' + esc(l.Submission_ID) + '" tabindex="0" role="button" aria-label="Open lead ' + esc(l.Contact_Name || l.Company || l.Submission_ID) + '">' +
+            return '<tr data-id="' + esc(l.Submission_ID) + '" tabindex="0" role="button" aria-label="Open lead ' + esc(l.Contact_Name || l.Company || l.Submission_ID) + (heat.length ? ', hot lead' : '') + '">' +
                 '<td class="ld-when">' + fmtWhen(l.Submitted_At) + '</td>' +
                 '<td class="ld-id">' + esc(l.Submission_ID) + '</td>' +
                 '<td><div class="ld-contact-name">' + esc(l.Contact_Name || '—') + '</div>' +
                     '<div class="ld-contact-email">' + esc(l.Email || '') + '</div></td>' +
-                '<td>' + (heat.length ? '<span class="ld-fire" title="Hot lead: ' + esc(heat.join(' · ')) + '">🔥</span> ' : '') +
+                '<td>' + (heat.length ? '<span class="ld-fire" role="img" title="Hot lead: ' + esc(heat.join(' · ')) + '" aria-label="Hot lead: ' + esc(heat.join(', ')) + '">🔥</span> ' : '') +
                     esc(l.Company || '—') + '</td>' +
                 '<td><span class="ld-badge ld-badge--' + esc(l.Form_ID) + '" title="' + esc(L.sourceTitleOf(l)) + '">' +
-                    '<i class="fas ' + esc(meta.icon) + '"></i> ' + esc(meta.label) + '</span></td>' +
+                    '<i class="fas ' + esc(meta.icon) + '" aria-hidden="true"></i> ' + esc(meta.label) + '</span></td>' +
                 '<td>' + esc(l.Sales_Rep || '—') + '</td>' +
                 '<td><span class="ld-status ' + L.statusCls(l.Status) + '">' + esc(l.Status || '—') + '</span>' +
                     (timer ? ' <span class="ld-timer ld-timer--' + timer.cls + '">' + esc(timer.label) + '</span>' : '') + '</td>' +
@@ -500,17 +547,17 @@
         var val = Number(l.Lead_Value);
         var heat = L.leadHeat(l);
         var timer = L.responseTimer(l);
-        return '<div class="ld-card" draggable="true" data-id="' + esc(l.Submission_ID) + '" tabindex="0" role="button" aria-label="Open lead ' + esc(l.Company || l.Contact_Name || l.Submission_ID) + '" title="' + esc(l.Status || '') + '">' +
+        return '<div class="ld-card" draggable="true" data-id="' + esc(l.Submission_ID) + '" tabindex="0" role="button" aria-label="Open lead ' + esc(l.Company || l.Contact_Name || l.Submission_ID) + ', ' + esc(l.Status || '') + (heat.length ? ', hot' : '') + (overdue ? ', follow-up overdue' : '') + '" title="' + esc(l.Status || '') + '">' +
             '<div class="ld-card-top"><span class="ld-card-company">' + esc(l.Company || '(no company)') + '</span>' +
-            (heat.length ? '<span class="ld-fire" title="Hot lead: ' + esc(heat.join(' · ')) + '">🔥</span>' : '') +
-            (overdue ? '<span class="ld-dot" title="Follow-up overdue (' + esc(l.Due_Date) + ')"></span>' : '') + '</div>' +
+            (heat.length ? '<span class="ld-fire" role="img" title="Hot lead: ' + esc(heat.join(' · ')) + '" aria-label="Hot lead: ' + esc(heat.join(', ')) + '">🔥</span>' : '') +
+            (overdue ? '<span class="ld-dot" role="img" title="Follow-up overdue (' + esc(l.Due_Date) + ')" aria-label="Follow-up overdue, was due ' + esc(l.Due_Date) + '"></span>' : '') + '</div>' +
             '<div class="ld-card-contact">' + esc(l.Contact_Name || '') + '</div>' +
             '<div class="ld-card-meta">' +
-            '<span class="ld-card-src" title="' + esc(L.sourceTitleOf(l)) + '"><i class="fas ' + esc(meta.icon) + '"></i></span>' +
+            '<span class="ld-card-src" role="img" title="' + esc(L.sourceTitleOf(l)) + '" aria-label="' + esc(L.sourceTitleOf(l)) + '"><i class="fas ' + esc(meta.icon) + '" aria-hidden="true"></i></span>' +
             (isFinite(val) && val > 0 ? '<span class="ld-card-val">$' + Math.round(val).toLocaleString('en-US') + '</span>' : '') +
             (timer ? '<span class="ld-timer ld-timer--' + timer.cls + '">' + esc(timer.label) + '</span>' : '') +
-            '<span class="ld-card-age">' + esc(ageDays(l.Submitted_At)) + '</span>' +
-            (l.Sales_Rep ? '<span class="ld-rep-chip" title="' + esc(l.Sales_Rep) + '">' + esc(repInitials(l.Sales_Rep)) + '</span>' : '') +
+            '<span class="ld-card-age" aria-label="received ' + esc(ageDays(l.Submitted_At)) + (ageDays(l.Submitted_At) === 'today' ? '' : ' ago') + '">' + esc(ageDays(l.Submitted_At)) + '</span>' +
+            (l.Sales_Rep ? '<span class="ld-rep-chip" role="img" title="' + esc(l.Sales_Rep) + '" aria-label="Assigned to ' + esc(l.Sales_Rep) + '">' + esc(repInitials(l.Sales_Rep)) + '</span>' : '') +
             '</div></div>';
     }
 
@@ -537,6 +584,7 @@
         byCol.new = hotNew.concat(coldNew);
 
         var board = document.getElementById('leads-board');
+        setBoardMessage(rows.length ? '' : (state.leads.length ? 'No leads match the current filters.' : ''));
         board.innerHTML = COLUMNS.map(function (c) {
             var items = byCol[c.key];
             var sum = items.reduce(function (acc, l) {
@@ -550,11 +598,11 @@
             var hiddenN = items.length - shown.length;
             var moreBtn = '';
             if (items.length > COL_CAP) {
-                moreBtn = '<button type="button" class="ld-col-more" data-col="' + esc(c.key) + '">' +
-                    (expanded ? '<i class="fas fa-chevron-up"></i> Show fewer'
-                              : '<i class="fas fa-chevron-down"></i> Show ' + hiddenN + ' more') + '</button>';
+                moreBtn = '<button type="button" class="ld-col-more" data-col="' + esc(c.key) + '" aria-expanded="' + (expanded ? 'true' : 'false') + '">' +
+                    (expanded ? '<i class="fas fa-chevron-up" aria-hidden="true"></i> Show fewer'
+                              : '<i class="fas fa-chevron-down" aria-hidden="true"></i> Show ' + hiddenN + ' more') + '</button>';
             }
-            return '<div class="ld-col ld-col--' + c.key + '" data-col="' + c.key + '">' +
+            return '<div class="ld-col ld-col--' + c.key + '" data-col="' + c.key + '" role="region" aria-label="' + c.label + ' (' + items.length + ')">' +
                 '<div class="ld-col-head"><span class="ld-col-title">' + c.label + '</span>' +
                 '<span class="ld-col-meta">' + items.length + (sum > 0 ? ' · $' + Math.round(sum).toLocaleString('en-US') : '') + '</span></div>' +
                 '<div class="ld-col-body">' +
@@ -641,6 +689,7 @@
             try { state.drawerReturnFocus.focus(); } catch (_) { /* element gone */ }
         }
         state.drawerReturnFocus = null;
+        if (wasOpen) document.title = 'Leads - Northwest Custom Apparel';
     }
 
     function openDrawer(lead) {
@@ -679,12 +728,12 @@
                     var label = a.name || (L.isJfUpload(a.url) ? L.fileBasename(a.url) : '') || ('Attachment ' + (i + 1));
                     return '<span class="ld-att">' +
                         '<a href="' + esc(L.viewUrl(a.url)) + '" target="_blank" rel="noopener">' +
-                        '<i class="fas fa-paperclip"></i> ' + esc(label) + '</a>' +
+                        '<i class="fas fa-paperclip" aria-hidden="true"></i> ' + esc(label) + '</a>' +
                         '<a class="ld-dl" href="' + esc(L.downloadUrl(a.url)) + '" title="Download ' + esc(label) + '" aria-label="Download ' + esc(label) + '">' +
-                        '<i class="fas fa-download"></i></a></span>';
+                        '<i class="fas fa-download" aria-hidden="true"></i></a></span>';
                 }).join('') +
                 (jfUrl ? '<a href="' + esc(jfUrl) + '" target="_blank" rel="noopener">' +
-                    '<i class="fas fa-arrow-up-right-from-square"></i> View in JotForm</a>' : '') +
+                    '<i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i> View in JotForm</a>' : '') +
                 '</div></div>';
         }
 
@@ -698,8 +747,8 @@
 
         document.getElementById('drawer-body').innerHTML =
             '<div class="ld-section ld-drawer-actions">' +
-                '<button type="button" id="drawer-edit" class="ld-btn"><i class="fas fa-pen"></i> Edit info</button>' +
-                (isAdmin() ? '<button type="button" id="drawer-delete" class="ld-btn ld-btn--danger"><i class="fas fa-trash"></i> Delete</button>' : '') +
+                '<button type="button" id="drawer-edit" class="ld-btn"><i class="fas fa-pen" aria-hidden="true"></i> Edit info</button>' +
+                (isAdmin() ? '<button type="button" id="drawer-delete" class="ld-btn ld-btn--danger"><i class="fas fa-trash" aria-hidden="true"></i> Delete</button>' : '') +
             '</div>' +
             '<div class="ld-section"><div class="ld-controls">' +
                 '<div class="ld-control"><label class="ld-control-label" for="drawer-status">Status</label>' +
@@ -732,7 +781,7 @@
         // /api/files/ keys can be PDFs) — no inline handlers, wired post-render.
         Array.prototype.forEach.call(document.querySelectorAll('#drawer-body img.ld-thumb'), function (img) {
             img.addEventListener('error', function () {
-                if (img.parentNode) img.parentNode.style.display = 'none';
+                if (img.parentNode) img.parentNode.hidden = true;
             });
         });
 
@@ -773,6 +822,7 @@
         document.getElementById('drawer-overlay').hidden = false;
         var closeBtn = document.getElementById('drawer-close');   // move focus into the drawer
         if (closeBtn) closeBtn.focus();
+        document.title = (lead.Contact_Name || lead.Company || lead.Submission_ID) + ' · Leads - Northwest Custom Apparel';
     }
 
     // Returns a promise resolving true on a confirmed save, false on failure —
@@ -824,11 +874,11 @@
         ].filter(function (p) { return p[1] != null && p[1] !== ''; });
         var alreadyLinked = String(lead.Matched_ID_Customer || '') === String(contact.id_Customer || '');
         return '<div class="ld-match ld-match--found">' +
-            '<div class="ld-match-head"><span class="ld-pill ld-pill--customer"><i class="fas fa-circle-check"></i> Existing customer</span>' +
+            '<div class="ld-match-head"><span class="ld-pill ld-pill--customer"><i class="fas fa-circle-check" aria-hidden="true"></i> Existing customer</span>' +
             (alreadyLinked
                 ? '<span class="ld-muted">Linked</span>'
                 : '<button type="button" class="ld-btn" data-link-customer="' + esc(contact.id_Customer) + '">' +
-                    '<i class="fas fa-link"></i> Link customer</button>') +
+                    '<i class="fas fa-link" aria-hidden="true"></i> Link customer</button>') +
             '</div><dl class="ld-kv">' +
             rows.map(function (p) { return '<dt>' + esc(p[0]) + '</dt><dd>' + esc(p[1]) + '</dd>'; }).join('') +
             '</dl></div>';
@@ -842,7 +892,7 @@
                     var custId = btn.getAttribute('data-link-customer');
                     var restore = btn.innerHTML;
                     btn.disabled = true;
-                    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Linking…';
+                    btn.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Linking…';
                     // Only log the link + flip the button + autoload orders AFTER the
                     // save is confirmed — otherwise a failed PUT leaves a false
                     // "Linked" timeline row and a green checkmark on an unlinked lead,
@@ -850,7 +900,7 @@
                     saveField(lead, 'Matched_ID_Customer', custId, null).then(function (ok) {
                         if (!ok) { btn.disabled = false; btn.innerHTML = restore; return; }
                         L.logActivity(lead.Submission_ID, 'system', 'Linked ShopWorks customer #' + custId, '', state.staffEmail);
-                        btn.innerHTML = '<i class="fas fa-check"></i> Linked';
+                        btn.innerHTML = '<i class="fas fa-check" aria-hidden="true"></i> Linked';
                         renderOrdersSection(lead, true); // lead.Matched_ID_Customer now set → autoload fires
                     });
                 });
@@ -861,7 +911,7 @@
     function searchBlockHtml(placeholder) {
         return '<div class="ld-match-search">' +
             '<input type="search" id="match-search-input" class="ld-search" placeholder="' + esc(placeholder) + '">' +
-            '<button type="button" id="match-search-btn" class="ld-btn"><i class="fas fa-magnifying-glass"></i> Search</button>' +
+            '<button type="button" id="match-search-btn" class="ld-btn"><i class="fas fa-magnifying-glass" aria-hidden="true"></i> Search</button>' +
             '</div><div class="ld-match-results" id="match-search-results"></div>';
     }
 
@@ -903,7 +953,7 @@
 
         function showProspect(note) {
             root.innerHTML = '<div class="ld-match">' +
-                '<div class="ld-match-head"><span class="ld-pill ld-pill--prospect"><i class="fas fa-user-plus"></i> New prospect</span></div>' +
+                '<div class="ld-match-head"><span class="ld-pill ld-pill--prospect"><i class="fas fa-user-plus" aria-hidden="true"></i> New prospect</span></div>' +
                 '<div class="ld-muted">' + esc(note) + '</div>' +
                 searchBlockHtml('Search ShopWorks by company or name…') +
                 '</div>';
@@ -912,7 +962,7 @@
 
         if (lead.Matched_ID_Customer) {
             root.innerHTML = '<div class="ld-match ld-match--found">' +
-                '<div class="ld-match-head"><span class="ld-pill ld-pill--customer"><i class="fas fa-circle-check"></i> Existing customer</span>' +
+                '<div class="ld-match-head"><span class="ld-pill ld-pill--customer"><i class="fas fa-circle-check" aria-hidden="true"></i> Existing customer</span>' +
                 '<span class="ld-muted">Customer #' + esc(lead.Matched_ID_Customer) + '</span></div>' +
                 '<div id="match-linked-detail" class="ld-muted">Loading customer…</div></div>';
             DashPage.fetchJson('/api/company-contacts/by-customer/' + encodeURIComponent(lead.Matched_ID_Customer))
@@ -974,11 +1024,11 @@
             return;
         }
         root.innerHTML = '<button type="button" id="btn-load-orders" class="ld-btn">' +
-            '<i class="fas fa-clock-rotate-left"></i> Load recent orders</button>';
+            '<i class="fas fa-clock-rotate-left" aria-hidden="true"></i> Load recent orders</button>';
         var btn = document.getElementById('btn-load-orders');
         var load = function () {
             btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading…';
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Loading…';
             var params = new URLSearchParams();
             params.set('q.where', 'id_Customer=' + custId);
             params.set('q.orderBy', 'date_OrderPlaced DESC');

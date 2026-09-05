@@ -492,3 +492,22 @@
 @media (max-width: 640px) {
     .dash-header-right { flex-wrap: wrap; justify-content: flex-end; row-gap: 6px; }
 }
+
+/* 2026-09-05 review: stat tiles are filter buttons; the board has its own loading/error/empty
+   message; indicators and hints carry classes instead of inline style. */
+.ld-stat-btn { font: inherit; text-align: left; cursor: pointer; width: 100%; }
+.ld-stat-btn:hover { border-color: var(--gray-400); }
+.ld-stat-btn[aria-pressed="true"] { outline: 2px solid var(--dash-theme, var(--gray-900)); outline-offset: -2px; }
+.ld-stat-btn:focus-visible { outline: 3px solid var(--gray-900); outline-offset: 2px; }
+.ld-stat-sub { font-weight: 400; text-transform: none; letter-spacing: 0; color: var(--gray-400); font-size: 0.9em; }
+.ld-board-msg { text-align: center; color: var(--gray-500); padding: 28px 10px; font-size: 0.9rem; }
+.ld-board-msg .ld-btn { margin-left: 8px; }
+.ld-hint-sm { font-size: 0.78rem; }
+.ld-refresh-btn:focus-visible, .ld-btn:focus-visible, .ld-toggle-btn:focus-visible, .ld-chip-btn:focus-visible,
+.ld-drawer-close:focus-visible, .ld-col-more:focus-visible { outline: 2px solid var(--gray-900); outline-offset: 2px; }
+@media (max-width: 640px) {
+    /* the header carries 5 actions — keep the icons, drop the words */
+    .dash-header-right .ld-refresh-btn { padding: 7px 9px; }
+    .dash-header-right .ld-refresh-btn .ld-btn-txt { display: none; }
+    .dash-stat-grid { grid-template-columns: 1fr 1fr; }
+}

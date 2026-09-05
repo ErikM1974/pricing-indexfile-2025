@@ -497,3 +497,34 @@ Left alone: `window.confirm` for destructive actions (fine on a staff console), 
 cdnjs (the staff-page consistency lock requires ONE build across staff pages — a move must be all
 pages at once), 5 action buttons per row.
 
+## Leads board — review, 10 items (2026-09-05, `v2026.09.05.32`)
+
+`dashboards/leads.html` + `leads.js` + shared `leads-common.js` (also used by `lead.html`). Already
+mature: focus traps, `inert` drawer, focus return, CSV formula hardening, attachment host allow-list,
+in-flight load guard, cap warning. Live: 1,136 leads, 0 console errors. Shipped:
+
+1. **Board went BLANK while loading and on failure** — the only message lived in the hidden list
+   `<tbody>`. New `#leads-board-msg` status region: loading, "Leads unavailable · Retry", and
+   "No leads match the current filters." (table failure cell gained Retry too).
+2. **Stat tiles filter** (Purchasing Portal pattern): Leads / New / In Pipeline / Won-all-time are
+   `aria-pressed` buttons over status GROUPS (`matchesGroup`); picking a status in the dropdown
+   clears the group and vice-versa. "Won" tile says "all time" (the board's Won column is 45 days).
+3. **86 icons** → `aria-hidden`; 🔥, overdue dot, source icon and rep initials are `role=img` with
+   names; card/row labels say "New, hot, follow-up overdue"; columns are `role=region "New (1)"`;
+   "Show N more" carries `aria-expanded`.
+4. **Drawer** is `role=dialog aria-modal aria-labelledby=drawer-title`; `document.title` names the
+   open lead and resets on close. "Full lead" link has a real href before a lead is chosen.
+5. **Rule 3** — thumb fallback `parentNode.style.display` → `hidden`; edit-modal hint
+   `style.fontSize` → `.ld-hint-sm`.
+6. **Edit-lead modal** inputs have `label/for` pairs; its status line is `role=status`; the
+   new-lead status too.
+7. **Phone ≤640** — header actions keep icons + `aria-label`, words hidden (`.ld-btn-txt`);
+   stat grid 2-up.
+8. Focus-visible rings on all `ld-*` buttons.
+9. Banner close is `type=button`; asset `?v=` bumped on all three files.
+10. Lock: `tests/unit/leads-page.test.js`.
+
+Left alone: drag-and-drop has no keyboard path (the drawer's Status select IS the keyboard path);
+the phone header is 155px (two rows) — acceptable for a desktop-first CRM; `lead.html` (the full
+workspace) is its own review.
+
