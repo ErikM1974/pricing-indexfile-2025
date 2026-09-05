@@ -348,7 +348,7 @@ manual-pricing de-inlined (12 `onchange` + an Enter-key `onkeypress`) with a rea
 Caspio-injected inline scripts on the design-archive pages (not ours), the JotForm iframe width on the
 Purchasing Request form (third-party embed).
 
-## Customer Portal + login — review, 7 items (2026-09-05, `v2026.09.05.20`)
+## Customer Portal + login — review, 7 items (2026-09-05, `v2026.09.05.20` + `.21` clamp tweak)
 
 Reviewed live via the staff mirror `/portal-admin/preview/1276` (Aaberg's Rentals) + phone pass on
 `static-dist` (the page's error states render without the API — every feed shows a red alert + Retry).
