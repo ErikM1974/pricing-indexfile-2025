@@ -1,3 +1,9 @@
+## v2026.09.05.27 (2026.09.05)
+
+- Memory: customer product page review recorded (v2026.09.05.24-.25)
+- Customer + vendor login review: 10 items — ?next= deep link carried through the magic link (safeLoginNext), email validation, 429/offline surfaced, in-place try again, alert/focus a11y, contrast, phone; lock test; LESSONS entry (oldest archived)
+- Deploy v2026.09.05.27: 2 files (customer-login.html,vendor-login.html) — login review cache-bust
+
 ## v2026.09.05.25 (2026.09.05)
 
 - Customer product page: document.title is plain text (esc() rendered &amp; in the tab)
