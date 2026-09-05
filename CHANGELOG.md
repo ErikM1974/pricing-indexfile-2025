@@ -1,3 +1,8 @@
+## v2026.09.05.4 (2026.09.05)
+
+- Quote Management: tighter cell padding so the table fits a 1,352px container without a scrollbar
+- Deploy v2026.09.05.4: 2 files (quote-management.html,test-inbound-print.html,...)
+
 ## v2026.09.05.3 (2026.09.05)
 
 - Quote Management: actions wrap into a compact block — one long line pushed the table to 1,650px and hid the column
