@@ -29,68 +29,67 @@ let currentUserEmail = null;
 // shipped + invoiced + paid in ShopWorks (derived from the snapshot).
 let currentTab = 'active';
 
+// 2026-09-05 review state
+let currentUserRole = null;      // 'admin' etc. from /api/crm-session/me
+let loadedWindow = null;         // '7' | '30' | '90' | 'all' — what the server was asked for
+let loadedAt = 0;
+let loading = false;
+let tileFilter = '';             // '' | active | accepted | expiring | cancelled | failed
+let searchWidened = false;       // a search found nothing in the window → page pulled All Time
+const REFRESH_INTERVAL_MS = 5 * 60 * 1000;
+
 // Initialize dashboard
 document.addEventListener('DOMContentLoaded', async function() {
-    console.log('[QuoteManagement] Initializing...');
+    // Identity FIRST — delete permissions and the header name depend on it.
+    await initIdentity();
 
-    // Get logged-in user info
-    initUserDisplay();
-
-    // Establish the Express session (httpOnly cookie) so the server-side
-    // delete gate can identify this user. The dashboard login already
-    // authenticated via Caspio (sessionStorage); this mirrors what
-    // staff-login.html does. Best-effort + awaited so the cookie is set
-    // before any delete; the page works regardless.
-    await establishCrmSession();
-
-    // Load quotes
-    await loadQuotes();
-
-    // Setup event listeners
     setupEventListeners();
 
-    console.log('[QuoteManagement] Ready');
+    // Load quotes for the selected window
+    await loadQuotes();
+
+    // Re-read every 5 minutes while the tab is visible (statuses change hourly
+    // from ShopWorks); catch up when a hidden tab comes back.
+    setInterval(function () {
+        if (document.visibilityState === 'visible' && !loading) loadQuotes({ silent: true });
+    }, REFRESH_INTERVAL_MS);
+    document.addEventListener('visibilitychange', function () {
+        if (document.visibilityState === 'visible' && !loading && Date.now() - loadedAt >= REFRESH_INTERVAL_MS) {
+            loadQuotes({ silent: true });
+        }
+    });
 });
 
-function initUserDisplay() {
+// Who is signed in. The SAML login (staff-dashboard) holds the identity in the
+// server session — /api/crm-session/me — and never fills the legacy Caspio
+// sessionStorage keys this page used to read. That left the header at "Guest"
+// and every delete button disabled ("only the owner or Erik can delete") for
+// everyone, Erik included (2026-09-05). The legacy keys stay as a fallback.
+async function initIdentity() {
     const userDisplay = document.getElementById('user-display');
-
-    if (typeof StaffAuthHelper !== 'undefined' && StaffAuthHelper.isLoggedIn()) {
-        const name = StaffAuthHelper.getLoggedInStaffName();
-        currentUserEmail = StaffAuthHelper.getLoggedInStaffEmail();
-        userDisplay.textContent = name || 'Staff User';
-    } else {
-        // Try sessionStorage directly
-        const name = sessionStorage.getItem('nwca_user_name');
-        currentUserEmail = sessionStorage.getItem('nwca_user_email');
-        userDisplay.textContent = name || 'Guest';
-    }
-}
-
-// Establish the server session used for server-side delete enforcement.
-// Same POST staff-login.html makes; idempotent. Non-CRM staff get a 403
-// (they just can't delete) — logged, never fatal. Identity is the
-// already-Caspio-authenticated sessionStorage name/email.
-async function establishCrmSession() {
-    const name = (typeof StaffAuthHelper !== 'undefined' && StaffAuthHelper.getLoggedInStaffName())
-        || sessionStorage.getItem('nwca_user_name');
-    const email = currentUserEmail || sessionStorage.getItem('nwca_user_email') || '';
-    if (!name) return; // not logged in — nothing to establish
     try {
-        const resp = await fetch('/api/crm-session', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            credentials: 'same-origin',
-            body: JSON.stringify({ name, email }),
-        });
+        const resp = await fetch('/api/crm-session/me', { credentials: 'same-origin' });
         if (resp.ok) {
-            console.log('[QuoteManagement] CRM session established for', name);
-        } else {
-            console.warn(`[QuoteManagement] CRM session not established (HTTP ${resp.status}) — server-side delete will require it`);
+            const me = await resp.json();
+            if (me && me.authenticated !== false && (me.email || me.name)) {
+                currentUserEmail = String(me.email || '').toLowerCase() || null;
+                currentUserRole = me.role || null;
+                userDisplay.textContent = me.firstName || me.name || me.email;
+                userDisplay.title = `${me.name || ''} · ${me.email || ''}${me.role ? ' · ' + me.role : ''}`;
+                return;
+            }
         }
-    } catch (e) {
-        console.warn('[QuoteManagement] CRM session establish failed:', e.message);
+    } catch (err) {
+        console.warn('[QuoteManagement] /api/crm-session/me unavailable:', err.message);
     }
+    // Legacy fallback (pre-SAML Caspio login)
+    if (typeof StaffAuthHelper !== 'undefined' && StaffAuthHelper.isLoggedIn()) {
+        currentUserEmail = StaffAuthHelper.getLoggedInStaffEmail();
+        userDisplay.textContent = StaffAuthHelper.getLoggedInStaffName() || 'Staff User';
+        return;
+    }
+    userDisplay.textContent = 'Not signed in';
+    userDisplay.title = 'No staff session — deletes are disabled. Sign in from the Staff Dashboard.';
 }
 
 function setupEventListeners() {
@@ -105,28 +104,168 @@ function setupEventListeners() {
     // needing to click Search again.
     searchEl.addEventListener('input', function(e) {
         if (e.target.value.trim() === '') {
+            searchWidened = false;
             applyFilters();
         }
     });
+    // The window is a SERVER question now — changing it re-fetches.
+    document.getElementById('filter-date').addEventListener('change', function () { loadQuotes(); });
+    document.getElementById('filter-status').addEventListener('change', function () { tileFilter = ''; applyFilters(); });
+    document.getElementById('select-all').addEventListener('change', toggleSelectAll);
+
+    // ONE click delegator for every data-action on the page (Rule 3 — no onclick=).
+    document.addEventListener('click', onDelegatedClick);
+    // Row-level change events (status dropdown, row checkboxes).
+    document.getElementById('quotes-tbody').addEventListener('change', function (e) {
+        if (e.target.classList.contains('status-dropdown')) updateQuoteStatus(e.target);
+        else if (e.target.classList.contains('quote-checkbox')) updateCheckboxSelection();
+    });
+    // Modal keyboard: Escape closes, Enter confirms.
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') { closeDeleteModal(); closeModal(null); }
+        if (e.key === 'Enter' && !document.getElementById('qm-modal').hidden && e.target.id === 'qm-modal-input') {
+            document.getElementById('qm-modal-confirm').click();
+        }
+    });
+    initTabs();
 }
 
-async function loadQuotes() {
-    showLoading(true);
+function onDelegatedClick(e) {
+    const actionEl = e.target.closest('[data-action]');
+    if (actionEl) {
+        const a = actionEl.dataset.action;
+        const q = actionEl.dataset.quoteId;
+        const pk = actionEl.dataset.pkId;
+        switch (a) {
+            case 'sync-sw': return syncFromShopWorks();
+            case 'refresh-inbound': return refreshInboundLive();
+            case 'inbound-today': return typeof openInboundTodayModal === 'function' ? openInboundTodayModal() : showToast('The inbound calendar did not load — refresh the page.', 'error');
+            case 'search': tileFilter = ''; searchWidened = false; return applyFilters();
+            case 'tab': return switchTab(actionEl.dataset.tab);
+            case 'bulk-delete': return bulkDelete();
+            case 'prev-page': return prevPage();
+            case 'next-page': return nextPage();
+            case 'delete-cancel': return closeDeleteModal();
+            case 'delete-confirm': return confirmDelete();
+            case 'modal-cancel': return closeModal(null);
+            case 'modal-confirm': return closeModal(document.getElementById('qm-modal-input').value);
+            case 'view': return viewQuote(q);
+            case 'edit': return editQuote(q);
+            case 'copy-link': return copyQuoteLink(q);
+            case 'duplicate': return duplicateQuote(q);
+            case 'resend': return resendQuoteEmail(Number(pk));
+            case 'audit': return viewAudit(q);
+            case 'shipstation': return sendToShipStation(q, Number(pk));
+            case 'delete': return deleteQuote(Number(pk), q, actionEl.dataset.status || 'Open');
+            default: return;
+        }
+    }
+    // Stat tile → filter
+    const tile = e.target.closest('.qm-tile[data-tile]');
+    if (tile) { setTileFilter(tile.dataset.tile === tileFilter ? '' : tile.dataset.tile); return; }
+    // Row click → view, unless the click landed on a control inside the row.
+    const row = e.target.closest('#quotes-tbody tr[data-quote-id]');
+    if (row && !e.target.closest('a, button, select, input, label, .inbound-cell')) viewQuote(row.dataset.quoteId);
+}
+
+// ── Tabs: real ARIA tabs (roles + aria-selected in the markup; roving tabindex + arrows here) ──
+function initTabs() {
+    const tabs = Array.from(document.querySelectorAll('.qm-tab[role="tab"]'));
+    tabs.forEach((t, i) => t.addEventListener('keydown', function (e) {
+        const keys = { ArrowRight: i + 1, ArrowLeft: i - 1, Home: 0, End: tabs.length - 1 };
+        if (!(e.key in keys)) return;
+        e.preventDefault();
+        const next = tabs[(keys[e.key] + tabs.length) % tabs.length];
+        next.focus();
+        switchTab(next.dataset.tab);
+    }));
+}
+
+// ── Stat tiles as filters ──
+const TILE_MATCH = {
+    active:    (q) => ['Open', 'Active', 'Processed', 'Pending Payment', 'Payment Confirmed'].includes(q.Status) && !isCompletedQuote(q),
+    accepted:  (q) => q.Status === 'Accepted',
+    expiring:  (q) => q.Status === 'Open' && !!q.ExpiresAt && new Date(q.ExpiresAt) <= new Date(Date.now() + 7 * 86400000),
+    cancelled: (q) => q.Status === 'Cancelled_in_ShopWorks',
+    failed:    (q) => q.Status === 'Processed - ShopWorks Failed' || q.Status === 'Payment Confirmed - ShopWorks Failed',
+};
+function setTileFilter(key) {
+    tileFilter = key || '';
+    if (tileFilter) document.getElementById('filter-status').value = '';
+    // Cancelled/accepted/failed rows usually live in the All view — do not hide them behind the Active tab.
+    if (tileFilter && tileFilter !== 'active' && tileFilter !== 'expiring' && currentTab === 'active') { currentTab = 'all'; paintTabs(); }
+    applyFilters();
+}
+function paintTiles() {
+    document.querySelectorAll('.qm-tile[data-tile]').forEach((t) => {
+        const on = t.dataset.tile === tileFilter;
+        t.classList.toggle('is-active', on);
+        t.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+}
+
+// ── Generic modal (replaces alert/confirm/prompt). Resolves the input value (or true) on confirm, null on cancel. ──
+let modalResolve = null;
+function openModal({ title, message, input, inputLabel, value, confirmLabel, danger } = {}) {
+    const modal = document.getElementById('qm-modal');
+    document.getElementById('qm-modal-title').textContent = title || '';
+    document.getElementById('qm-modal-message').textContent = message || '';
+    const field = document.getElementById('qm-modal-field');
+    const inputEl = document.getElementById('qm-modal-input');
+    field.hidden = !input;
+    document.getElementById('qm-modal-input-label').textContent = inputLabel || '';
+    inputEl.value = value || '';
+    inputEl.readOnly = input === 'readonly';
+    const confirm = document.getElementById('qm-modal-confirm');
+    confirm.textContent = confirmLabel || 'OK';
+    confirm.classList.toggle('btn-confirm-delete', !!danger);
+    confirm.classList.toggle('btn-confirm', !danger);
+    modal.hidden = false;
+    if (input) { inputEl.focus(); if (input === 'readonly') inputEl.select(); } else confirm.focus();
+    return new Promise((resolve) => { modalResolve = resolve; });
+}
+function closeModal(result) {
+    const modal = document.getElementById('qm-modal');
+    if (modal.hidden) return;
+    modal.hidden = true;
+    const r = modalResolve; modalResolve = null;
+    if (r) r(result === null ? null : (document.getElementById('qm-modal-field').hidden ? true : result));
+}
+
+// Local Pacific-safe "YYYY-MM-DD" N days back (never toISOString — that is the UTC day).
+function ymdDaysAgo(days) {
+    const d = new Date();
+    d.setDate(d.getDate() - days);
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+// Ask the SERVER for the window (2026-09-05). Until now every load pulled every
+// quote ever written and filtered client-side; the proxy's createdAfter filter
+// (the same one the Orders Inbox uses) scopes the read. `all` = no filter.
+// opts.silent: the 5-minute tick — no spinner, keep the page position.
+// opts.all: a search found nothing in the window → widen to All Time once.
+async function loadQuotes(opts = {}) {
+    if (loading) return;
+    loading = true;
+    const windowSel = opts.all ? 'all' : (document.getElementById('filter-date').value || '30');
+    if (!opts.silent) showLoading(true);
 
     try {
-        // Fetch quotes from API
-        const response = await fetch('/api/quote_sessions', { credentials: 'same-origin' });
+        const qs = windowSel === 'all' ? '' : `?createdAfter=${ymdDaysAgo(Number(windowSel))}`;
+        const response = await fetch(`/api/quote_sessions${qs}`, { credentials: 'same-origin' });
         if (!response.ok) {
             throw new Error(`API returned ${response.status}`);
         }
 
         const data = await response.json();
         allQuotes = data.Result || data || [];
-
-        console.log(`[QuoteManagement] Loaded ${allQuotes.length} quotes`);
+        loadedWindow = windowSel;
+        loadedAt = Date.now();
+        if (!opts.all) searchWidened = false;
 
         // Apply initial filters
         applyFilters();
+        stampLoaded();
 
         // One batched SanMar inbound-status lookup for all loaded WOs
         // (fire-and-forget; re-renders the table when it returns).
@@ -134,8 +273,26 @@ async function loadQuotes() {
 
     } catch (error) {
         console.error('[QuoteManagement] Error loading quotes:', error);
+        // Never leave the previous list looking current.
+        allQuotes = [];
         showError('Failed to load quotes. Please try refreshing.');
+        const stamp = document.getElementById('qm-updated');
+        if (stamp) stamp.textContent = `Load failed ${clockTime()}`;
+    } finally {
+        loading = false;
     }
+}
+
+function clockTime(at) {
+    return new Date(at || Date.now()).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+}
+
+function stampLoaded() {
+    const stamp = document.getElementById('qm-updated');
+    if (!stamp) return;
+    const win = loadedWindow === 'all' ? 'all time' : `last ${loadedWindow} days`;
+    stamp.textContent = `${allQuotes.length} in ${win} · loaded ${clockTime(loadedAt)}`;
+    stamp.title = 'Re-reads every 5 minutes while this tab is open. ShopWorks fields sync hourly — use Sync from ShopWorks for an immediate pull.';
 }
 
 // On-demand ShopWorks reconciliation (Erik 2026-06-15).
@@ -176,7 +333,7 @@ async function syncFromShopWorks() {
     } catch (err) {
         // Erik's #1 rule — surface the failure, never fail silently.
         console.error('[QuoteManagement] syncFromShopWorks failed:', err);
-        alert(`ShopWorks sync failed:\n${err.message}\n\nIf this keeps happening, check the pricing-index app logs (the same reconciliation also runs hourly via the caspio-pricing-proxy scheduler).`);
+        showToast(`ShopWorks sync failed: ${err.message}\nIf this keeps happening, check the pricing-index app logs (the same reconciliation also runs hourly via the caspio-pricing-proxy scheduler).`, 'error');
     } finally {
         btn.disabled = false;
         btn.innerHTML = original;
@@ -250,7 +407,7 @@ async function refreshInboundLive() {
     } catch (err) {
         // Erik's #1 rule — surface the failure, never fail silently.
         console.error('[QuoteManagement] refreshInboundLive failed:', err);
-        alert(`Inbound refresh failed:\n${err.message}`);
+        showToast(`Inbound refresh failed: ${err.message}`, 'error');
     } finally {
         btn.disabled = false;
         btn.innerHTML = original;
@@ -263,9 +420,11 @@ function applyFilters() {
     const dateFilter = document.getElementById('filter-date').value;
     const searchFilter = document.getElementById('filter-search').value.toLowerCase().trim();
 
-    // Calculate date cutoff
+    // Client-side date cutoff is a belt-and-braces check on the server window —
+    // skipped when a search widened the load to All Time (the old cutoff would
+    // hide exactly the older quote the search went looking for).
     let dateCutoff = null;
-    if (dateFilter !== 'all') {
+    if (dateFilter !== 'all' && !searchWidened) {
         dateCutoff = new Date();
         dateCutoff.setDate(dateCutoff.getDate() - parseInt(dateFilter));
     }
@@ -275,6 +434,10 @@ function applyFilters() {
     baseFilteredQuotes = allQuotes.filter(quote => {
         // Status filter
         if (statusFilter && quote.Status !== statusFilter) {
+            return false;
+        }
+        // Stat-tile filter (2026-09-05)
+        if (tileFilter && TILE_MATCH[tileFilter] && !TILE_MATCH[tileFilter](quote)) {
             return false;
         }
 
@@ -303,9 +466,29 @@ function applyFilters() {
         return true;
     });
 
+    // A search that finds nothing in the window widens to All Time ONCE — the
+    // old page searched every quote ever because it had downloaded every quote
+    // ever; this keeps "find that quote from March" working without that cost.
+    if (searchFilter && baseFilteredQuotes.length === 0 && loadedWindow && loadedWindow !== 'all' && !searchWidened && !loading) {
+        searchWidened = true;
+        loadQuotes({ all: true });   // re-enters applyFilters when the wider read lands
+        return;
+    }
+    const notice = document.getElementById('qm-notice');
+    if (notice) {
+        const show = searchWidened && !!searchFilter;
+        notice.hidden = !show;
+        if (show) {
+            const sel = document.getElementById('filter-date');
+            const label = sel && sel.options[sel.selectedIndex] ? sel.options[sel.selectedIndex].text : 'the window';
+            notice.innerHTML = `<i class="fas fa-circle-info" aria-hidden="true"></i> Nothing in <strong>${escapeHtml(label)}</strong> matched “${escapeHtml(searchFilter)}” — showing matches from all time.`;
+        }
+    }
+
     // Stats + tab counts from the pre-tab base.
     updateStats();
     updateTabCounts();
+    paintTiles();
 
     // Apply the Active/Completed/All tab to get the rendered set.
     filteredQuotes = baseFilteredQuotes.filter(quote => {
@@ -340,12 +523,24 @@ function updateTabCounts() {
 // dropdown updates visibly so it's not hidden magic).
 function switchTab(tab) {
     currentTab = tab;
-    document.querySelectorAll('.qm-tab').forEach(btn => {
-        btn.classList.toggle('qm-tab--active', btn.dataset.tab === tab);
-    });
+    paintTabs();
     const dateEl = document.getElementById('filter-date');
-    if (dateEl) dateEl.value = (tab === 'active') ? '30' : 'all';
+    const want = (tab === 'active') ? '30' : 'all';
+    if (dateEl && dateEl.value !== want) {
+        dateEl.value = want;
+        loadQuotes();          // the window is a server question — re-fetch
+        return;
+    }
     applyFilters();
+}
+
+function paintTabs() {
+    document.querySelectorAll('.qm-tab').forEach(btn => {
+        const on = btn.dataset.tab === currentTab;
+        btn.classList.toggle('qm-tab--active', on);
+        btn.setAttribute('aria-selected', on ? 'true' : 'false');
+        btn.tabIndex = on ? 0 : -1;
+    });
 }
 
 // Get the "effective" amount for a quote: SW cur_TotalInvoice when
@@ -545,7 +740,7 @@ function renderInboundIndicator(quote) {
     const safeTrackUrl = (info.shipped && /^https?:\/\//i.test(String(info.trackingUrl || '')))
         ? escapeHtml(info.trackingUrl) : '';
     const base = safeTrackUrl
-        ? `<a class="inbound-pill ${cls}" href="${safeTrackUrl}" target="_blank" rel="noopener" onclick="event.stopPropagation();" title="${escapeHtml(title)}">${icon}</a>`
+        ? `<a class="inbound-pill ${cls}" href="${safeTrackUrl}" target="_blank" rel="noopener" title="${escapeHtml(title)}">${icon}</a>`
         : `<span class="inbound-pill ${cls}" title="${escapeHtml(title)}">${icon}</span>`;
     // SanMar backorder / hold alert (from order-status issues). Erik 2026-06-24.
     let alert = '';
@@ -749,19 +944,15 @@ function renderShipStationButton(quote) {
     const s = getShipStationState(quote);
     if (s.state === 'hidden') return '';
     if (s.state === 'waiting') {
-        return `<button class="action-btn" disabled
-                        onclick="event.stopPropagation();"
-                        style="opacity:0.4;cursor:not-allowed;"
+        return `<button type="button" class="action-btn action-btn--waiting" disabled
                         title="Waiting for production (sts_Produced=${s.stsProduced ?? 'unknown'}). Enables once SW marks decoration complete.">
-                    <span style="font-size:14px;">🕐</span>
+                    <span class="action-emoji" aria-hidden="true">🕐</span>
                 </button>`;
     }
     if (s.state === 'sent') {
-        return `<button class="action-btn" disabled
-                        onclick="event.stopPropagation();"
-                        style="opacity:0.6;cursor:not-allowed;background:#f3f4f6;"
+        return `<button type="button" class="action-btn action-btn--sent" disabled
                         title="In ShipStation #${s.shipstationId}. Warehouse will buy the label in ShipStation; tracking will appear here once shipped.">
-                    <span style="font-size:14px;">✓</span>
+                    <span class="action-emoji" aria-hidden="true">✓</span>
                 </button>`;
     }
     if (s.state === 'shipped') {
@@ -770,31 +961,30 @@ function renderShipStationButton(quote) {
         const hasUrl = /^https?:\/\//i.test(String(s.trackingUrl || ''));
         const title = `Shipped via ${escapeHtml(s.carrier || 'carrier')} · Tracking: ${escapeHtml(s.trackingNumber || '')}`;
         return hasUrl
-            ? `<a class="action-btn" href="${escapeHtml(s.trackingUrl)}" target="_blank" rel="noopener"
-                   onclick="event.stopPropagation();"
-                   style="text-decoration:none;color:#166534;background:#dcfce7;"
-                   title="${title}">
-                    <span style="font-size:14px;">📦</span>
+            ? `<a class="action-btn action-btn--shipped" href="${escapeHtml(s.trackingUrl)}" target="_blank" rel="noopener" title="${title}" aria-label="${title}">
+                    <span class="action-emoji" aria-hidden="true">📦</span>
                 </a>`
-            : `<span class="action-btn"
-                   onclick="event.stopPropagation();"
-                   style="text-decoration:none;color:#166534;background:#dcfce7;cursor:default;"
-                   title="${title}">
-                    <span style="font-size:14px;">📦</span>
+            : `<span class="action-btn action-btn--shipped action-btn--shipped-static" title="${title}">
+                    <span class="action-emoji" aria-hidden="true">📦</span>
                 </span>`;
     }
     // ready
-    return `<button class="action-btn"
-                    onclick="event.stopPropagation(); sendToShipStation('${quote.QuoteID}', ${quote.PK_ID})"
-                    style="color:#0369a1;"
-                    title="Send to ShipStation. Warehouse will rate + buy the label there.">
-                <span style="font-size:14px;">🚢</span>
+    return `<button type="button" class="action-btn action-btn--ready" data-action="shipstation"
+                    data-quote-id="${escapeHtml(quote.QuoteID)}" data-pk-id="${quote.PK_ID}"
+                    title="Send to ShipStation. Warehouse will rate + buy the label there."
+                    aria-label="Send ${escapeHtml(quote.QuoteID)} to ShipStation">
+                <span class="action-emoji" aria-hidden="true">🚢</span>
             </button>`;
 }
 
 // Click handler — POST to send-to-shipstation, then refresh
 async function sendToShipStation(quoteId, pkId) {
-    if (!confirm(`Send ${quoteId} to ShipStation? Warehouse will rate + buy the label there.`)) return;
+    const ok = await openModal({
+        title: 'Send to ShipStation',
+        message: `Send ${quoteId} to ShipStation? The warehouse will rate and buy the label there.`,
+        confirmLabel: 'Send',
+    });
+    if (!ok) return;
     try {
         const resp = await fetch(`/api/quote-sessions/${encodeURIComponent(quoteId)}/send-to-shipstation`, {
             method: 'POST',
@@ -810,7 +1000,7 @@ async function sendToShipStation(quoteId, pkId) {
         await loadQuotes();
     } catch (err) {
         console.error('[QuoteManagement] sendToShipStation failed:', err);
-        alert(`Failed to send ${quoteId} to ShipStation:\n${err.message}`);
+        showToast(`Failed to send ${quoteId} to ShipStation: ${err.message}`, 'error');
     }
 }
 
@@ -867,11 +1057,14 @@ function updateStats() {
                     }
                 }
             }
+            // Pipeline dollars: active only (completed orders are booked, not pipeline).
+            if (!isCompletedQuote(quote)) totalValue += getEffectiveAmount(quote);
         } else if (quote.Status === 'Accepted') {
             acceptedCount++;
+            totalValue += getEffectiveAmount(quote);
         }
-
-        totalValue += getEffectiveAmount(quote);
+        // Lost / Expired add to nothing: the headline used to sum them in as
+        // "Total Value", which made a dead quote look like money (2026-09-05).
     });
 
     document.getElementById('stat-active').textContent = activeCount;
@@ -894,9 +1087,14 @@ function renderTable() {
     showLoading(false);
 
     if (filteredQuotes.length === 0) {
-        tableEl.style.display = 'none';
-        emptyEl.style.display = 'block';
-        paginationEl.style.display = 'none';
+        tableEl.hidden = true;
+        emptyEl.innerHTML = `
+            <i class="fas fa-file-invoice" aria-hidden="true"></i>
+            <h3>No quotes found</h3>
+            <p>${tileFilter ? 'No quotes match that tile in this window — click it again to clear.' : 'Try adjusting your filters or search terms'}</p>
+        `;
+        emptyEl.hidden = false;
+        paginationEl.hidden = true;
         countEl.textContent = '0 quotes';
         return;
     }
@@ -985,9 +1183,8 @@ function renderTable() {
         } else {
             statusCellHtml = `<select class="status-dropdown status-${(quote.Status || 'Open').toLowerCase()}"
                                       data-pk-id="${quote.PK_ID}"
-                                      data-quote-id="${quote.QuoteID}"
-                                      onclick="event.stopPropagation();"
-                                      onchange="updateQuoteStatus(this)">
+                                      data-quote-id="${escapeHtml(quote.QuoteID)}"
+                                      aria-label="Status of ${escapeHtml(quote.QuoteID)}">
                                   <option value="Open" ${quote.Status === 'Open' ? 'selected' : ''}>Open</option>
                                   <option value="Accepted" ${quote.Status === 'Accepted' ? 'selected' : ''} disabled title="Set automatically when the customer accepts the quote — not manually selectable">Accepted</option>
                                   <option value="Lost" ${quote.Status === 'Lost' ? 'selected' : ''}>Lost</option>
@@ -1009,40 +1206,41 @@ function renderTable() {
                 if (!cancelledDate || isNaN(cancelledDate.getTime())) return '';
                 const purgeMs = cancelledDate.getTime() + 30 * 24 * 60 * 60 * 1000;
                 const daysLeft = Math.max(0, Math.ceil((purgeMs - Date.now()) / 86400000));
-                return `<div class="date-relative" style="color:#b91c1c">Purges in ${daysLeft} day${daysLeft === 1 ? '' : 's'}</div>`;
+                return `<div class="date-relative qm-purge">Purges in ${daysLeft} day${daysLeft === 1 ? '' : 's'}</div>`;
               })()
             : '';
 
+        const qid = escapeHtml(quote.QuoteID || '');
         return `
-            <tr class="${isCancelled ? 'quote-row--cancelled' : ''}" onclick="viewQuote('${quote.QuoteID}')">
-                <td class="checkbox-col" onclick="event.stopPropagation();">
+            <tr class="${isCancelled ? 'quote-row--cancelled' : ''}" data-quote-id="${qid}">
+                <td class="checkbox-col">
                     <input type="checkbox" class="quote-checkbox"
                            data-pk-id="${quote.PK_ID}"
-                           data-quote-id="${quote.QuoteID}"
-                           data-status="${quote.Status || 'Open'}"
-                           ${userCanDelete ? '' : 'disabled title="You can only delete your own quotes"'}
-                           onchange="updateCheckboxSelection()">
+                           data-quote-id="${qid}"
+                           data-status="${escapeHtml(quote.Status || 'Open')}"
+                           aria-label="Select ${qid}"
+                           ${userCanDelete ? '' : 'disabled title="You can only delete your own quotes"'}>
                 </td>
                 <td>
-                    <span class="quote-id">${quote.QuoteID || '-'}</span>
+                    <span class="quote-id">${qid || '-'}</span>
                     ${renderShopWorksRef(quote)}
                 </td>
                 <td>
                     <div class="customer-name">${escapeHtml(quote.CustomerName || '-')}</div>
                     <div class="customer-email">${escapeHtml(quote.CustomerEmail || '')}</div>
                 </td>
-                <td class="salesperson-cell" title="${escapeHtml(salespersonInfo.tooltip)}">${salespersonInfo.html}</td>
-                <td>${quote.TotalQuantity || 0}</td>
+                <td class="salesperson-cell qm-col-phone-hide" title="${escapeHtml(salespersonInfo.tooltip)}">${salespersonInfo.html}</td>
+                <td class="qm-col-phone-hide">${quote.TotalQuantity || 0}</td>
                 <td class="quote-amount" title="${getAmountTooltip(quote)}">${formatCurrency(getEffectiveAmount(quote))}</td>
                 <td>${statusCellHtml}${renderDepositChip(quote)}</td>
-                <td>${renderMilestonePills(quote)}</td>
-                <td class="inbound-cell" onclick="event.stopPropagation();">${renderInboundIndicator(quote)}</td>
+                <td class="qm-col-phone-hide">${renderMilestonePills(quote)}</td>
+                <td class="inbound-cell qm-col-phone-hide">${renderInboundIndicator(quote)}</td>
                 <td class="due-cell">${renderDueCell(quote)}</td>
-                <td>
+                <td class="qm-col-phone-hide">
                     <div class="date-cell">${formatDate(quote.CreatedAt)}</div>
                     ${retentionInfo || (expiresInfo ? `<div class="date-relative">${expiresInfo}</div>` : '')}
                 </td>
-                <td>
+                <td class="actions-cell">
                     ${(() => {
                         // Phase 11.3.5 (Erik 2026-05-24): one-way sync rule —
                         // once a quote is in ShopWorks, ALL revisions happen
@@ -1062,34 +1260,34 @@ function renderTable() {
                         // but can leave Status='Open'. (2026-06-01)
                         const isEditLocked = lockedStatuses.has(quote.Status) || !!quote.PushedToShopWorks;
                         if (isEditLocked) {
-                            return `<button class="action-btn action-btn--locked"
+                            return `<button type="button" class="action-btn action-btn--locked"
                                             disabled
                                             title="In ShopWorks — edit there. Changes here would not sync back.">
-                                        <i class="fas fa-lock"></i>
+                                        <i class="fas fa-lock" aria-hidden="true"></i>
                                     </button>`;
                         }
-                        return `<button class="action-btn" onclick="event.stopPropagation(); editQuote('${quote.QuoteID}')" title="Edit Quote">
-                                    <i class="fas fa-edit"></i>
+                        return `<button type="button" class="action-btn" data-action="edit" data-quote-id="${qid}" title="Edit Quote" aria-label="Edit ${qid}">
+                                    <i class="fas fa-edit" aria-hidden="true"></i>
                                 </button>`;
                     })()}
-                    <button class="action-btn" onclick="event.stopPropagation(); viewQuote('${quote.QuoteID}')" title="View Quote">
-                        <i class="fas fa-eye"></i>
+                    <button type="button" class="action-btn" data-action="view" data-quote-id="${qid}" title="View Quote" aria-label="View ${qid}">
+                        <i class="fas fa-eye" aria-hidden="true"></i>
                     </button>
-                    <button class="action-btn" onclick="event.stopPropagation(); copyQuoteLink('${quote.QuoteID}')" title="Copy Link">
-                        <i class="fas fa-link"></i>
+                    <button type="button" class="action-btn" data-action="copy-link" data-quote-id="${qid}" title="Copy Link" aria-label="Copy the customer link for ${qid}">
+                        <i class="fas fa-link" aria-hidden="true"></i>
                     </button>
                     ${renderDuplicateButton(quote)}
                     ${renderResendEmailButton(quote)}
-                    <button class="action-btn action-audit" onclick="event.stopPropagation(); viewAudit('${quote.QuoteID}')" title="Pricing Audit">
-                        <i class="fas fa-chart-bar"></i>
+                    <button type="button" class="action-btn action-audit" data-action="audit" data-quote-id="${qid}" title="Pricing Audit" aria-label="Pricing audit for ${qid}">
+                        <i class="fas fa-chart-bar" aria-hidden="true"></i>
                     </button>
                     ${renderShipStationButton(quote)}
                     ${userCanDelete
-                        ? `<button class="action-btn action-delete" onclick="event.stopPropagation(); deleteQuote(${quote.PK_ID}, '${escapeJsAttr(quote.QuoteID)}', '${escapeJsAttr(quote.Status || 'Open')}')" title="Delete Quote">
-                        <i class="fas fa-trash"></i>
+                        ? `<button type="button" class="action-btn action-delete" data-action="delete" data-pk-id="${quote.PK_ID}" data-quote-id="${qid}" data-status="${escapeHtml(quote.Status || 'Open')}" title="Delete Quote" aria-label="Delete ${qid}">
+                        <i class="fas fa-trash" aria-hidden="true"></i>
                     </button>`
-                        : `<button class="action-btn action-btn--locked" disabled onclick="event.stopPropagation();" title="Only the quote owner or Erik can delete this quote">
-                        <i class="fas fa-trash"></i>
+                        : `<button type="button" class="action-btn action-btn--locked" disabled title="Only the quote owner or Erik can delete this quote">
+                        <i class="fas fa-trash" aria-hidden="true"></i>
                     </button>`}
                 </td>
             </tr>
@@ -1097,17 +1295,17 @@ function renderTable() {
     }).join('');
 
     // Show table
-    tableEl.style.display = 'table';
-    emptyEl.style.display = 'none';
+    tableEl.hidden = false;
+    emptyEl.hidden = true;
 
     // Update pagination
     if (totalPages > 1) {
-        paginationEl.style.display = 'flex';
+        paginationEl.hidden = false;
         document.getElementById('page-info').textContent = `Page ${currentPage} of ${totalPages}`;
         document.getElementById('btn-prev').disabled = currentPage === 1;
         document.getElementById('btn-next').disabled = currentPage === totalPages;
     } else {
-        paginationEl.style.display = 'none';
+        paginationEl.hidden = true;
     }
 }
 
@@ -1219,12 +1417,7 @@ function editQuote(quoteId) {
     ]);
     const quote = (allQuotes || []).find(q => q.QuoteID === quoteId);
     if (quote && (lockedStatuses.has(quote.Status) || quote.PushedToShopWorks)) {
-        alert(
-            `${quoteId} is in ShopWorks (status: ${quote.Status}).\n\n` +
-            `Per the one-way sync rule, edits must happen in ShopWorks. ` +
-            `Changes in this app would not sync back.\n\n` +
-            `Opening read-only quote view instead.`
-        );
+        showToast(`${quoteId} is in ShopWorks (${quote.Status}) — edits happen there and would not sync back. Opening the read-only view instead.`);
         viewQuote(quoteId);
         return;
     }
@@ -1291,10 +1484,11 @@ async function shareTokenFor(quoteId) {
 async function copyQuoteLink(quoteId) {
     const url = `${window.location.origin}/quote/${quoteId}${await shareTokenFor(quoteId)}`;
     navigator.clipboard.writeText(url).then(() => {
-        showToast('Link copied to clipboard!');
+        showToast('Link copied to clipboard!', 'success');
     }).catch(() => {
-        // Fallback
-        prompt('Copy this link:', url);
+        // Fallback — the clipboard API is unavailable (insecure context / permissions):
+        // show the link selected in a modal so it can be copied by hand.
+        openModal({ title: 'Copy this link', message: 'The clipboard is not available here. Select and copy the link:', input: 'readonly', value: url, confirmLabel: 'Done' });
     });
 }
 
@@ -1335,8 +1529,8 @@ function quoteIdPrefix(quoteId) {
 // (Open AND Processed/locked).
 function renderDuplicateButton(quote) {
     if (!DUPLICATE_BUILDERS[quoteIdPrefix(quote.QuoteID)]) return '';
-    return `<button class="action-btn" onclick="event.stopPropagation(); duplicateQuote('${escapeJsAttr(quote.QuoteID)}')" title="Start a new quote pre-filled from this one">
-                <i class="fas fa-copy"></i>
+    return `<button type="button" class="action-btn" data-action="duplicate" data-quote-id="${escapeHtml(quote.QuoteID)}" title="Start a new quote pre-filled from this one" aria-label="Duplicate ${escapeHtml(quote.QuoteID)}">
+                <i class="fas fa-copy" aria-hidden="true"></i>
             </button>`;
 }
 
@@ -1344,7 +1538,7 @@ function duplicateQuote(quoteId) {
     const builderUrl = DUPLICATE_BUILDERS[quoteIdPrefix(quoteId)];
     if (!builderUrl) {
         // Defensive — the button never renders for unsupported prefixes.
-        alert(`${quoteId} can't be duplicated yet — its builder doesn't support pre-filling from an existing quote.`);
+        showToast(`${quoteId} can't be duplicated yet — its builder doesn't support pre-filling from an existing quote.`, 'error');
         return;
     }
     window.open(`${builderUrl}?duplicate=${encodeURIComponent(quoteId)}`, '_blank');
@@ -1374,8 +1568,8 @@ function ensureEmailJs() {
 function renderResendEmailButton(quote) {
     const email = String(quote.CustomerEmail || '').trim();
     if (!email) return '';
-    return `<button class="action-btn" onclick="event.stopPropagation(); resendQuoteEmail(${quote.PK_ID})" title="Resend quote email to ${escapeHtml(email)}">
-                <i class="fas fa-paper-plane"></i>
+    return `<button type="button" class="action-btn" data-action="resend" data-pk-id="${quote.PK_ID}" title="Resend quote email to ${escapeHtml(email)}" aria-label="Resend ${escapeHtml(quote.QuoteID)} to ${escapeHtml(email)}">
+                <i class="fas fa-paper-plane" aria-hidden="true"></i>
             </button>`;
 }
 
@@ -1385,28 +1579,29 @@ const resendInFlight = new Set();
 async function resendQuoteEmail(pkId) {
     const quote = findQuoteByPk(pkId);
     if (!quote) {
-        alert('Quote not found — refresh the page and try again.');
+        showToast('Quote not found — refresh the page and try again.', 'error');
         return;
     }
     const quoteId = quote.QuoteID;
     if (resendInFlight.has(quoteId)) return; // double-click guard
     if (!ensureEmailJs()) {
         // Erik's #1 rule — a visible failure, never a silent no-op.
-        alert('Email service is unavailable (EmailJS SDK did not load).\nCheck your connection, refresh the page, and try again.');
+        showToast('Email service is unavailable (EmailJS SDK did not load). Check your connection, refresh the page, and try again.', 'error');
         return;
     }
 
-    // Confirm + allow editing the address in one step: prompt pre-filled
-    // with the on-file email. Cancel aborts; OK sends to whatever's typed.
+    // Confirm + allow editing the address in one step: modal pre-filled with the
+    // on-file email. Cancel aborts; Send goes to whatever is typed.
     const onFile = String(quote.CustomerEmail || '').trim();
-    const entered = prompt(
-        `Resend quote ${quoteId} to this email?\n\nEdit the address below if needed, then click OK to send.`,
-        onFile
-    );
+    const entered = await openModal({
+        title: `Resend quote ${quoteId}`,
+        message: 'Edit the address if needed, then click Send.',
+        input: 'text', inputLabel: 'Send to', value: onFile, confirmLabel: 'Send',
+    });
     if (entered === null) return; // cancelled
-    const toEmail = entered.trim();
+    const toEmail = String(entered).trim();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(toEmail)) {
-        alert(`"${toEmail}" doesn't look like a valid email address. Nothing was sent.`);
+        showToast(`"${toEmail}" doesn't look like a valid email address. Nothing was sent.`, 'error');
         return;
     }
 
@@ -1430,11 +1625,11 @@ async function resendQuoteEmail(pkId) {
             company_name: 'Northwest Custom Apparel',
             company_phone: '253-922-5793',
         });
-        showToast(`✓ Email resent to ${toEmail}`);
+        showToast(`✓ Email resent to ${toEmail}`, 'success');
     } catch (err) {
         // Erik's #1 rule — surface the failure, never fail silently.
         console.error('[QuoteManagement] resendQuoteEmail failed:', err);
-        alert(`Failed to resend quote email for ${quoteId}:\n${(err && (err.text || err.message)) || err}`);
+        showToast(`Failed to resend quote email for ${quoteId}: ${(err && (err.text || err.message)) || err}`, 'error');
     } finally {
         resendInFlight.delete(quoteId);
     }
@@ -1446,44 +1641,34 @@ function viewAudit(quoteId) {
 
 // Utilities
 function showLoading(show) {
-    document.getElementById('table-loading').style.display = show ? 'flex' : 'none';
+    document.getElementById('table-loading').hidden = !show;
     if (show) {
-        document.getElementById('quotes-table').style.display = 'none';
-        document.getElementById('table-empty').style.display = 'none';
+        document.getElementById('quotes-table').hidden = true;
+        document.getElementById('table-empty').hidden = true;
     }
 }
 
 function showError(message) {
     showLoading(false);
+    document.getElementById('quotes-table').hidden = true;
+    document.getElementById('pagination').hidden = true;
     document.getElementById('table-empty').innerHTML = `
-        <i class="fas fa-exclamation-triangle" style="color: #dc3545;"></i>
+        <i class="fas fa-exclamation-triangle qm-error-icon" aria-hidden="true"></i>
         <h3>Error Loading Quotes</h3>
-        <p>${message}</p>
+        <p>${escapeHtml(message)}</p>
     `;
-    document.getElementById('table-empty').style.display = 'block';
+    document.getElementById('table-empty').hidden = false;
 }
 
-function showToast(message) {
-    // Simple toast notification
+// Toast: tone 'info' (default) | 'success' | 'error'. Errors stay up longer.
+function showToast(message, tone) {
+    const host = document.getElementById('qm-toasts') || document.body;
     const toast = document.createElement('div');
-    toast.style.cssText = `
-        position: fixed;
-        bottom: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        background: #333;
-        color: white;
-        padding: 12px 24px;
-        border-radius: 4px;
-        z-index: 9999;
-        font-size: 14px;
-    `;
+    toast.className = 'qm-toast' + (tone === 'error' ? ' qm-toast--error' : tone === 'success' ? ' qm-toast--success' : '');
+    toast.setAttribute('role', tone === 'error' ? 'alert' : 'status');
     toast.textContent = message;
-    document.body.appendChild(toast);
-
-    setTimeout(() => {
-        toast.remove();
-    }, 3000);
+    host.appendChild(toast);
+    setTimeout(() => { toast.remove(); }, tone === 'error' ? 8000 : 3500);
 }
 
 function formatCurrency(amount) {
@@ -1608,7 +1793,9 @@ function updateBulkDeleteButton() {
 const MASTER_DELETE_EMAILS = new Set(['erik@nwcustomapparel.com']);
 
 function isMasterUser() {
-    return !!currentUserEmail && MASTER_DELETE_EMAILS.has(String(currentUserEmail).toLowerCase());
+    // Erik by email, or anyone the SAML session marks admin (Staff_App_Roles).
+    return (!!currentUserEmail && MASTER_DELETE_EMAILS.has(String(currentUserEmail).toLowerCase()))
+        || currentUserRole === 'admin';
 }
 
 // Map a staff display name ("Erik Mickelson") → email via the shared
@@ -1667,7 +1854,7 @@ function deleteQuote(pkId, quoteId, status) {
     const quote = findQuoteByPk(pkId);
     if (!canDeleteQuote(quote)) {
         const owner = quote ? getQuoteOwnerEmail(quote) : null;
-        alert(`You can only delete your own quotes.\n\n${quoteId} belongs to ${owner || 'another rep'}. Ask them — or Erik — to delete it.`);
+        showToast(`You can only delete your own quotes. ${quoteId} belongs to ${owner || 'another rep'} — ask them, or Erik, to delete it.`, 'error');
         return;
     }
 
@@ -1714,12 +1901,13 @@ function showDeleteModal(title, message, data, type) {
 
     document.getElementById('delete-modal-title').textContent = title;
     document.getElementById('delete-modal-message').innerHTML = message;
-    document.getElementById('delete-modal').style.display = 'flex';
+    document.getElementById('delete-modal').hidden = false;
+    document.querySelector('#delete-modal .btn-confirm-delete').focus();
 }
 
 // Close delete modal
 function closeDeleteModal() {
-    document.getElementById('delete-modal').style.display = 'none';
+    document.getElementById('delete-modal').hidden = true;
     pendingDeleteData = [];
     pendingDeleteType = null;
 }
@@ -1771,11 +1959,11 @@ async function confirmDelete() {
     // delete your own quotes") rather than failing silently.
     const detail = errorMessages.size ? ' — ' + [...errorMessages].join('; ') : '';
     if (failCount === 0) {
-        showToast(`Successfully deleted ${successCount} quote(s)`);
+        showToast(`Successfully deleted ${successCount} quote(s)`, 'success');
     } else if (successCount > 0) {
-        showToast(`Deleted ${successCount}, ${failCount} blocked${detail}`);
+        showToast(`Deleted ${successCount}, ${failCount} blocked${detail}`, 'error');
     } else {
-        alert(`Could not delete:\n\n${[...errorMessages].join('\n') || 'Please try again.'}`);
+        showToast(`Could not delete: ${[...errorMessages].join('; ') || 'Please try again.'}`, 'error');
     }
 
     // Re-apply filters to refresh table

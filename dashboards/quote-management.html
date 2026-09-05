@@ -7,8 +7,8 @@
     <title>Quote Management - Northwest Custom Apparel</title>
     <link rel="icon" href="/favicon.png" type="image/png">
 
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <!-- Font Awesome (6.4.0 — the same build every other staff page loads) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <!-- Phase 2f (2026-05-23): PNW palette tokens — must load BEFORE quote-management.css to uplift steel-blue header gradient to PNW forest -->
     <link rel="stylesheet" href="/shared_components/css/quote-builder-shell.css?v=2026.07.08.13">
@@ -19,6 +19,13 @@
     <link rel="stylesheet" href="/shared_components/css/box-label-print.css?v=2026.08.04.2">
 </head>
 <body>
+    <!--
+        2026-09-05 review: every click goes through data-action delegation in
+        quote-management.js (no onclick= attributes), visibility toggles use the
+        hidden attribute (no style= attributes), identity comes from the SAML
+        session (/api/crm-session/me), the stat tiles filter the table, and the
+        page carries a loaded-time stamp + a 5-minute visible-tab refresh.
+    -->
     <!-- Header -->
     <header class="dashboard-header">
         <a href="/staff-dashboard.html">
@@ -29,20 +36,20 @@
         <h1>Quote Management</h1>
         <div class="header-actions">
             <span class="user-info" id="user-display">Loading...</span>
-            <button id="btn-sync-sw" class="btn-header" onclick="syncFromShopWorks()"
+            <button id="btn-sync-sw" class="btn-header" type="button" data-action="sync-sw"
                     title="Pull live order #, status, production progress, and salesperson from ShopWorks for every processed quote in the window. Runs the same reconciliation as the hourly scheduler — use it if the dashboard looks stale.">
-                <i class="fas fa-sync"></i> Sync from ShopWorks
+                <i class="fas fa-sync"></i> <span class="btn-header__tx">Sync from ShopWorks</span>
             </button>
-            <button id="btn-refresh-inbound" class="btn-header" onclick="refreshInboundLive()"
+            <button id="btn-refresh-inbound" class="btn-header" type="button" data-action="refresh-inbound"
                     title="Manual SanMar sync. Two passes: (1) ingest orders that shipped & completed BETWEEN the nightly syncs and so never landed in the system at all, then (2) pull live tracking for in-table open orders. An order that just shipped flips to Shipped (with tracking) right now instead of waiting for the daily sync. Bounded — if it says orders are still pending, click again.">
-                <i class="fas fa-dolly"></i> Refresh Inbound
+                <i class="fas fa-dolly"></i> <span class="btn-header__tx">Refresh Inbound</span>
             </button>
-            <button id="btn-inbound-today" class="btn-header" onclick="openInboundTodayModal()"
+            <button id="btn-inbound-today" class="btn-header" type="button" data-action="inbound-today"
                     title="SanMar Inbound Calendar: pick any day to see its incoming SanMar boxes — each PO + work order, line items with color/size, pieces per box — and print box labels or a PDF for that day.">
-                <i class="fas fa-calendar-days"></i> SanMar Inbound Calendar
+                <i class="fas fa-calendar-days"></i> <span class="btn-header__tx">SanMar Inbound Calendar</span>
             </button>
             <a href="/staff-dashboard.html" class="btn-header">
-                <i class="fas fa-arrow-left"></i> Dashboard
+                <i class="fas fa-arrow-left"></i> <span class="btn-header__tx">Dashboard</span>
             </a>
         </div>
     </header>
@@ -51,7 +58,7 @@
         <!-- Filters Section -->
         <div class="filters-section">
             <div class="filter-group">
-                <label>Status</label>
+                <label for="filter-status">Status</label>
                 <select id="filter-status">
                     <option value="">All Statuses</option>
                     <option value="Open">Open</option>
@@ -68,7 +75,9 @@
             </div>
 
             <div class="filter-group">
-                <label>Date Range</label>
+                <label for="filter-date">Date Range</label>
+                <!-- The window is asked of the SERVER (createdAfter) since 2026-09-05 —
+                     the page used to download every quote ever and filter client-side. -->
                 <select id="filter-date">
                     <option value="7">Last 7 Days</option>
                     <option value="30" selected>Last 30 Days</option>
@@ -78,40 +87,41 @@
             </div>
 
             <div class="filter-group">
-                <label>Search</label>
+                <label for="filter-search">Search</label>
                 <input type="text" id="filter-search" placeholder="Customer, company, email, or Quote ID (e.g. DTG-12345)">
             </div>
 
-            <button class="btn-search" onclick="applyFilters()">
+            <button class="btn-search" type="button" data-action="search">
                 <i class="fas fa-search"></i> Search
             </button>
         </div>
 
-        <!-- Stats Cards -->
+        <!-- Stats Cards — BUTTONS that filter the table (2026-09-05). Click again to clear. -->
         <div class="stats-section">
-            <div class="stat-card active">
+            <button type="button" class="stat-card active qm-tile" data-tile="active" title="Show active quotes (open, awaiting payment, in ShopWorks and not yet complete)">
                 <div class="stat-value" id="stat-active">-</div>
                 <div class="stat-label">Active Quotes</div>
-            </div>
-            <div class="stat-card accepted">
+            </button>
+            <button type="button" class="stat-card accepted qm-tile" data-tile="accepted" title="Show accepted quotes">
                 <div class="stat-value" id="stat-accepted">-</div>
                 <div class="stat-label">Accepted</div>
-            </div>
-            <div class="stat-card expiring">
+            </button>
+            <button type="button" class="stat-card expiring qm-tile" data-tile="expiring" title="Show open quotes that expire within 7 days">
                 <div class="stat-value" id="stat-expiring">-</div>
                 <div class="stat-label">Expiring Soon</div>
-            </div>
-            <div class="stat-card cancelled">
+            </button>
+            <button type="button" class="stat-card cancelled qm-tile" data-tile="cancelled" title="Show quotes cancelled in ShopWorks">
                 <div class="stat-value" id="stat-cancelled">-</div>
                 <div class="stat-label">Cancelled</div>
-            </div>
-            <div class="stat-card failed" id="stat-card-failed">
+            </button>
+            <button type="button" class="stat-card failed qm-tile" id="stat-card-failed" data-tile="failed" title="Show quotes whose push to ShopWorks failed — these need a hand">
                 <div class="stat-value" id="stat-failed">-</div>
                 <div class="stat-label">Push Failed</div>
-            </div>
+            </button>
             <div class="stat-card total">
                 <div class="stat-value" id="stat-total">$0</div>
-                <div class="stat-label">Total Value</div>
+                <div class="stat-label">Pipeline Value</div>
+                <div class="stat-sub" id="stat-total-sub">active + accepted · lost, expired and cancelled excluded</div>
             </div>
         </div>
 
@@ -120,72 +130,77 @@
             <div class="table-header">
                 <h2>Quotes</h2>
                 <div class="table-actions">
-                    <button id="btn-bulk-delete" class="btn-bulk-delete" onclick="bulkDelete()" disabled>
+                    <button id="btn-bulk-delete" class="btn-bulk-delete" type="button" data-action="bulk-delete" disabled>
                         <i class="fas fa-trash"></i> Delete Selected (<span id="selected-count">0</span>)
                     </button>
                     <span class="table-count" id="table-count">Loading...</span>
+                    <span class="qm-updated" id="qm-updated" role="status"></span>
                 </div>
             </div>
 
             <!-- Active / Completed / All tabs (Erik 2026-06-15). Completed =
                  shipped + invoiced + paid in ShopWorks, so finished orders drop
-                 out of the default Active view. -->
-            <div class="qm-tabs" role="tablist">
-                <button type="button" class="qm-tab qm-tab--active" data-tab="active" onclick="switchTab('active')">
+                 out of the default Active view. Real ARIA tabs since 2026-09-05
+                 (roles, aria-selected, arrow keys) — wired in quote-management.js. -->
+            <div class="qm-tabs" role="tablist" aria-label="Quote views">
+                <button type="button" class="qm-tab qm-tab--active" role="tab" aria-selected="true" data-tab="active" data-action="tab">
                     Active <span class="qm-tab-count" id="tab-count-active"></span>
                 </button>
-                <button type="button" class="qm-tab" data-tab="completed" onclick="switchTab('completed')">
+                <button type="button" class="qm-tab" role="tab" aria-selected="false" tabindex="-1" data-tab="completed" data-action="tab">
                     Completed <span class="qm-tab-count" id="tab-count-completed"></span>
                 </button>
-                <button type="button" class="qm-tab" data-tab="all" onclick="switchTab('all')">
+                <button type="button" class="qm-tab" role="tab" aria-selected="false" tabindex="-1" data-tab="all" data-action="tab">
                     All <span class="qm-tab-count" id="tab-count-all"></span>
                 </button>
             </div>
 
-            <!-- Visible on FIRST PAINT (inline display:flex) so the spinner shows before
-                 any JS runs — no blank flash while quotes load. JS hides it via
-                 showLoading(false) at the end of the first renderTable(). Previously
-                 relied solely on the .loading-overlay CSS class being present. (2026-07-04) -->
-            <div id="table-loading" class="loading-overlay" style="display: flex;">
+            <!-- Shown when a search found nothing in the window and the page widened to All Time. -->
+            <div class="qm-notice" id="qm-notice" hidden></div>
+
+            <!-- Visible on FIRST PAINT (no hidden attribute) so the spinner shows before any JS
+                 runs. JS hides it via showLoading(false) at the end of the first renderTable(). -->
+            <div id="table-loading" class="loading-overlay">
                 <div class="loading-spinner"></div>
             </div>
 
-            <div id="table-empty" class="empty-state" style="display: none;">
+            <div id="table-empty" class="empty-state" hidden>
                 <i class="fas fa-file-invoice"></i>
                 <h3>No quotes found</h3>
                 <p>Try adjusting your filters or search terms</p>
             </div>
 
-            <table class="quotes-table" id="quotes-table" style="display: none;">
+            <div class="quotes-table-scroll">
+            <table class="quotes-table" id="quotes-table" hidden>
                 <thead>
                     <tr>
                         <th class="checkbox-col">
-                            <input type="checkbox" id="select-all" title="Select all" onclick="toggleSelectAll()">
+                            <input type="checkbox" id="select-all" title="Select all" aria-label="Select all quotes on this page">
                         </th>
                         <th>Quote ID</th>
                         <th>Customer</th>
-                        <th>Salesperson</th>
-                        <th>Items</th>
-                        <th style="text-align: right;">Amount</th>
+                        <th class="qm-col-phone-hide">Salesperson</th>
+                        <th class="qm-col-phone-hide">Items</th>
+                        <th class="th-right">Amount</th>
                         <th>Status</th>
-                        <th>Progress</th>
-                        <th title="Blank goods inbound from SanMar (vendor → us)">Inbound</th>
+                        <th class="qm-col-phone-hide">Progress</th>
+                        <th class="qm-col-phone-hide" title="Blank goods inbound from SanMar (vendor → us)">Inbound</th>
                         <th title="Requested ship date from ShopWorks. Amber = due within 3 days; red = overdue.">Due</th>
-                        <th>Created</th>
-                        <th>Actions</th>
+                        <th class="qm-col-phone-hide">Created</th>
+                        <th class="th-actions">Actions</th>
                     </tr>
                 </thead>
                 <tbody id="quotes-tbody">
                     <!-- Rows will be populated by JavaScript -->
                 </tbody>
             </table>
+            </div>
 
-            <div class="pagination" id="pagination" style="display: none;">
-                <button id="btn-prev" onclick="prevPage()" disabled>
+            <div class="pagination" id="pagination" hidden>
+                <button id="btn-prev" type="button" data-action="prev-page" disabled>
                     <i class="fas fa-chevron-left"></i> Previous
                 </button>
                 <span class="page-info" id="page-info">Page 1 of 1</span>
-                <button id="btn-next" onclick="nextPage()">
+                <button id="btn-next" type="button" data-action="next-page">
                     Next <i class="fas fa-chevron-right"></i>
                 </button>
             </div>
@@ -193,40 +208,58 @@
     </div>
 
     <!-- Delete Confirmation Modal -->
-    <div id="delete-modal" class="modal" style="display: none;">
+    <div id="delete-modal" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="delete-modal-title">
         <div class="modal-content">
             <h3 id="delete-modal-title">Confirm Delete</h3>
             <p id="delete-modal-message"></p>
             <div class="modal-actions">
-                <button class="btn-cancel" onclick="closeDeleteModal()">Cancel</button>
-                <button class="btn-confirm-delete" onclick="confirmDelete()">Delete</button>
+                <button class="btn-cancel" type="button" data-action="delete-cancel">Cancel</button>
+                <button class="btn-confirm-delete" type="button" data-action="delete-confirm">Delete</button>
             </div>
         </div>
     </div>
 
-    <!-- Staff Authentication Helper -->
+    <!-- Generic confirm / input modal (2026-09-05) — replaces the browser
+         alert / confirm / prompt dialogs: ShipStation send, resend-email address,
+         copy-link fallback. Driven by openModal() in quote-management.js. -->
+    <div id="qm-modal" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="qm-modal-title">
+        <div class="modal-content">
+            <h3 id="qm-modal-title"></h3>
+            <p id="qm-modal-message"></p>
+            <label class="qm-modal-field" id="qm-modal-field" hidden>
+                <span id="qm-modal-input-label"></span>
+                <input type="text" id="qm-modal-input" autocomplete="off">
+            </label>
+            <div class="modal-actions">
+                <button class="btn-cancel" type="button" data-action="modal-cancel">Cancel</button>
+                <button class="btn-confirm" type="button" id="qm-modal-confirm" data-action="modal-confirm">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toasts mount here (showToast) -->
+    <div id="qm-toasts" class="qm-toasts" aria-live="polite"></div>
+
+    <!-- Auth Helper -->
     <script src="/shared_components/js/staff-auth-helper.js?v=20260113"></script>
-    <!-- CaspioDate helper — parses naive Pacific timestamps correctly
-         (Caspio returns no TZ marker; default JS parse misinterprets as UTC,
-         which shifts dashboard countdowns 7–8 h off). Use CaspioDate.parse(). -->
+    <!-- Caspio timestamp parser (naive-Pacific → correct local Date). Needed by the
+         Cancelled (SW) purge countdown so it doesn't drift a day across DST. -->
     <script src="/shared_components/js/caspio-date-utils.js?v=2026.05.21.21"></script>
-    <!-- App config — single source of truth for the proxy API base URL
-         (Never-Break Rule #6: USE CONFIG for API URLs). -->
+    <!-- APP_CONFIG: canonical API base for the batched SanMar inbound-status lookup
+         (Never-Break Rule #6 — proxy URL from config, never hardcoded). -->
     <script src="/config/app.config.js?v=2026.09.03.11"></script>
-    <!-- SanMar Inbound Calendar — pick any day → that day's incoming boxes + box labels + PDF.
-         Self-contained, reads APP_CONFIG. Defines window.openInboundTodayModal() for the header button. -->
+    <!-- Shared box-label template (also used by the standalone Box Labels page) —
+         must load BEFORE sanmar-inbound-today.js. -->
     <script src="/shared_components/js/box-label-template.js?v=2026.08.04.2"></script>
-    <!-- Normalises stored absolute proxy Box urls onto this origin so the session-gated
-         forwarder authorises them (the inbound sheet's design thumbnails). -->
+    <!-- SanMar Inbound Calendar modal (Erik 2026-06-17). Self-contained;
+         exposes window.openInboundTodayModal for the header button. -->
     <script src="/shared_components/js/box-url.js?v=2026.08.06.1"></script>
     <script src="/dashboards/js/sanmar-inbound-today.js?v=2026.08.26.4"></script>
-    <!-- EmailJS browser SDK — same tag the quote builders load. Powers the
-         row-level "Resend quote email" action (service_jgrave3 /
-         template_quote_email, the builders' existing customer quote-link
-         template). If this CDN script fails, the action shows a visible
-         error — it never fails silently. -->
+    <!-- EmailJS browser SDK — same tag the quote builders load; used by
+         "Resend quote email" (row action). Loaded before the page script so
+         resendQuoteEmail() can init lazily on first use. -->
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-
+    <!-- Dashboard JS (extracted from inline script — Rule 3, 2026-07-05) -->
     <script src="/dashboards/js/quote-management.js?v=2026.09.03.11"></script>
 </body>
 </html>

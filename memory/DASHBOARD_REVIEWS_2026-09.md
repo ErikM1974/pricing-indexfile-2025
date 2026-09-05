@@ -122,6 +122,27 @@ Releases `v2026.09.04.1 → .9`. Detail here; MEMORY.md carries one line each.
   Check the wall clock before calling a timestamp stale.
 - Lock: `tests/unit/purchasing-portal-page.test.js`.
 
+## Quote Management — review, 10 items (2026-09-05, `v2026.09.05.2`)
+
+- 🔴 **Real defect**: identity came from the legacy Caspio `sessionStorage` keys the SAML
+  login never fills → header "Guest", `currentUserEmail` null, EVERY delete button disabled
+  for everyone (Erik included). Now `initIdentity()` reads `/api/crm-session/me` (admin role
+  = master delete). 🔑 Any staff page still reading `nwca_user_name`/`StaffAuthHelper` alone is
+  broken the same way — grep for it.
+- Rule 3 sweep: 78 `onclick=` + 23 `style=` → `onDelegatedClick()` on `[data-action]`,
+  `hidden` attribute, classes for the ShipStation button states. Row click = view unless the
+  click landed on `a, button, select, input, label, .inbound-cell`.
+- Server window: `/api/quote_sessions?createdAfter=YYYY-MM-DD` (proxy filter the Orders
+  Inbox already used) instead of downloading every quote ever; a search that finds nothing in
+  the window widens to All Time ONCE with a visible notice (`#qm-notice`).
+- Actions column on one line (rows were 167px, 6 icons stacked in 86px); IDs no longer wrap;
+  phone header wraps, 6 columns hidden ≤768px, table in a scroll wrapper.
+- alert/confirm/prompt (8) → `openModal()` (promise; confirm or input) + `showToast(msg,
+  tone)`. Tiles = filter buttons (`TILE_MATCH`). "Total Value" → "Pipeline Value" (active +
+  accepted; lost/expired/cancelled excluded). ARIA tabs (roles, aria-selected, arrows).
+  Loaded stamp + 5-min visible-tab refresh. FA 6.4.0 like every other staff page.
+- Lock: `tests/unit/quote-management-page.test.js`.
+
 ## Verification gotchas learned today
 
 - Browser pane (`mcp__Claude_Browser`): screenshots of a SCROLLED page come back blank on
