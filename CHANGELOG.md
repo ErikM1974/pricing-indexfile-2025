@@ -1,3 +1,8 @@
+## v2026.09.05.9 (2026.09.05)
+
+- Policies Hub / Detail: load the Caspio auth embed on demand — as a static script it redirected SAML-signed-in staff to the portal login
+- Deploy v2026.09.05.9: 3 files (policies-hub.html,policy-detail.html,policy-questions.html,...)
+
 ## v2026.09.05.8 (2026.09.05)
 
 - Rule 3 sweep: move inline <style>/<script> blocks on 15 staff pages into external files
