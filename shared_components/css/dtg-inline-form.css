@@ -1075,11 +1075,14 @@
 }
 .dtg-customer-pane .dcp-row {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    /* minmax(0, 1fr): a bare 1fr lets a long label or a date input's intrinsic width
+       blow the row past its column on phones (2026-09-05 builder review item 6). */
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     gap: 8px;
     margin-bottom: 8px;
 }
-.dtg-customer-pane .dcp-row input { margin-bottom: 0; }
+.dtg-customer-pane .dcp-row > div { min-width: 0; }
+.dtg-customer-pane .dcp-row input { margin-bottom: 0; min-width: 0; max-width: 100%; }
 .dtg-customer-pane .dcp-field-label {
     font-size: 10px;
     font-weight: 700;

@@ -686,3 +686,76 @@ body.qb-shell-body {
         scroll-behavior: auto !important;
     }
 }
+
+/* ============================================================
+   PHONE LAYOUT (≤640px) — shared by EMB / SCP / DTF (Rule 8).
+   2026-09-05 builder review, item 6. Before: the header stacked logo → title →
+   actions → method-switch to ~200px on a 375px phone, and the product table
+   pushed the whole layout viewport to 600–750px so every panel panned sideways.
+   After: two header rows (logo + title / actions + switch ≈ 100px) and the
+   table scrolls INSIDE its wrapper. DTG mirrors this block in dtg-quote-page.css
+   (it does not load the shell). Scoped with `body.qb-shell-body` so it beats the
+   per-builder 480px blocks and the Option C `overflow: visible` wrapper rules
+   that load after this file.
+   ============================================================ */
+@media (max-width: 640px) {
+    body.qb-shell-body .power-header {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 8px 10px;
+        padding: 8px 12px;
+        text-align: left;
+    }
+    body.qb-shell-body .power-header > a { display: flex; align-items: center; order: 0; margin: 0; }
+    body.qb-shell-body .power-header .logo { height: 32px; max-width: 80px; margin: 0; order: 0; }
+    body.qb-shell-body .power-header-center { flex: 1 1 120px; min-width: 0; text-align: left; order: 0; }
+    body.qb-shell-body .power-header-title {
+        font-size: 16px;
+        line-height: 1.2;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    body.qb-shell-body .power-header-subtitle { display: none; }
+    body.qb-shell-body .power-header .header-actions {
+        flex: 1 1 0;
+        min-width: 190px; /* + the 142px method-switch = one 351px row */
+        order: 2;
+        width: auto;
+        display: flex;
+        gap: 6px;
+        justify-content: stretch;
+        margin: 0;
+    }
+    body.qb-shell-body .power-header .btn-header {
+        flex: 1 1 0;
+        justify-content: center;
+        padding: 8px 6px;
+        font-size: 12px;
+        white-space: nowrap;
+    }
+    /* Method switch: icon + select only (the text label is hidden; the select
+       keeps its aria-label), sits beside the action buttons. */
+    body.qb-shell-body .power-header .method-switch {
+        order: 3;
+        flex: 0 1 auto;
+        margin-left: 0;
+        padding: 0;
+        gap: 4px;
+        font-size: 0;
+    }
+    body.qb-shell-body .power-header .method-switch .fa-exchange-alt { font-size: 14px; }
+    body.qb-shell-body .power-header .method-switch select { font-size: 12px; max-width: 120px; padding: 7px 4px; }
+
+    /* Content must never widen the page: the table scrolls inside its wrapper. */
+    body.qb-shell-body .power-main,
+    body.qb-shell-body .power-content { min-width: 0; max-width: 100%; }
+    body.qb-shell-body .product-table-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        max-width: 100%;
+    }
+    body.qb-shell-body .search-row { flex-wrap: wrap; }
+}
