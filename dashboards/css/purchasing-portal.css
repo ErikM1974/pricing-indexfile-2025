@@ -87,3 +87,79 @@
     white-space: nowrap;
 }
 .pp-invoice-btn:hover { background: var(--surface-hover); color: var(--gray-900); }
+
+/* =====================================================
+   2026-09-05 review additions
+   ===================================================== */
+
+/* Stat tiles are buttons that filter the table. Reset the UA button chrome so
+   they look exactly like the div tiles they replaced, then add the pressed state. */
+.pp-tiles { grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); }
+button.pp-tile {
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    color: inherit;
+}
+button.pp-tile:focus-visible { outline: 2px solid var(--dash-theme); outline-offset: 2px; }
+button.pp-tile.is-active {
+    border-color: var(--dash-theme);
+    box-shadow: 0 0 0 2px var(--dash-theme-bg), var(--shadow-sm);
+}
+.pp-tile--kpi { border-top: 3px solid var(--state-success); }
+.pp-stat-sub { margin-top: 4px; font-size: 0.75rem; color: var(--gray-500); min-height: 1em; }
+
+/* Filters row: finished toggle + "N of M shown" */
+.pp-toggle {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 0.85rem; color: var(--gray-700); cursor: pointer; white-space: nowrap;
+}
+.pp-toggle input { accent-color: var(--dash-theme); }
+.pp-toggle-n { color: var(--gray-500); }
+.pp-shown { margin-left: auto; font-size: 0.8rem; color: var(--gray-500); align-self: center; white-space: nowrap; }
+
+/* Truncation notice — the feed dropped requests past its cap. */
+.pp-trunc {
+    margin: 0 0 var(--space-3);
+    padding: 10px 12px;
+    border-radius: var(--radius-md);
+    background: var(--state-warning-bg);
+    color: var(--state-warning);
+    border: 1px solid color-mix(in srgb, var(--state-warning) 35%, transparent);
+    font-size: 0.85rem;
+}
+.pp-trunc i { margin-right: 6px; }
+
+/* Row actions: JotForm request link + SanMar invoice button */
+.pp-actions { white-space: nowrap; }
+.pp-req-link {
+    display: inline-block;
+    border: 1px solid var(--gray-300);
+    background: var(--surface-card);
+    color: var(--gray-600);
+    font-size: 0.75rem;
+    padding: 3px 10px;
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    margin-right: 6px;
+}
+.pp-req-link:hover { background: var(--surface-hover); color: var(--gray-900); }
+.pp-req-link i, .pp-invoice-btn i { font-size: 0.85em; margin-right: 3px; }
+
+/* Status chips on the shared state tokens (were hardcoded hex). */
+.pp-chip--sent     { background: var(--surface-inset); color: var(--gray-600); border: 1px solid var(--gray-300); }
+.pp-chip--ordered  { background: var(--state-info-bg);    color: var(--state-info);    border: 1px solid color-mix(in srgb, var(--state-info) 30%, transparent); }
+.pp-chip--partial  { background: var(--state-warning-bg); color: var(--state-warning); border: 1px solid color-mix(in srgb, var(--state-warning) 35%, transparent); }
+.pp-chip--received { background: var(--state-success-bg); color: var(--state-success); border: 1px solid color-mix(in srgb, var(--state-success) 30%, transparent); }
+.pp-chip--invoiced { background: var(--state-success-bg); color: var(--state-success); border: 1px solid color-mix(in srgb, var(--state-success) 30%, transparent); }
+.pp-chip--shipped  { background: var(--state-success);    color: #fff;                 border: 1px solid var(--state-success); }
+
+/* Phones: 11 columns is unusable at 375px — keep WO, company, sent, PO, vendors,
+   status and the actions; hide requester/type/ordered/received. */
+@media (max-width: 640px) {
+    .pp-col-phone-hide { display: none; }
+    .pp-shown { margin-left: 0; }
+    .pp-input[type="search"] { min-width: 0; flex-basis: 100%; }
+}

@@ -105,6 +105,23 @@ Releases `v2026.09.04.1 → .9`. Detail here; MEMORY.md carries one line each.
   payload's `today` is a date), 5-min visible-tab refresh. Site favicon.
 - Lock: `tests/unit/past-due-orders-page.test.js`.
 
+## Purchasing Portal — review, 10 items (2026-09-05, app `v2026.09.05.1` + proxy)
+
+- 🔴 **Real defect**: the feed caps at 250 submissions and reports `truncated: 25`; the page
+  ignored it — tile said 275, table held 250, nothing said so. Now `#pp-trunc` warns.
+- Open work is the default (161 of 261 rows were finished, one 12,000px page); "Show
+  finished" toggle; stat tiles are buttons that filter (`applyTile`); "N of M shown".
+- Each row links to its JotForm submission (`https://www.jotform.com/submission/{id}` —
+  `submissionId` is in the payload); invoice buttons carry aria-labels (253 said "View").
+- **Turnaround tile** from the rows: median request→PO 1.2 h, 255 of 261 same day (Bradley).
+- Refresh now bypasses the 15-min cache: client `?refresh=1` → server.js forwarder →
+  proxy `/purchasing-all` (proxy change, deployed first). `cleanVendors()` trims the
+  `"JDS Industries, Inc. \r"` style strings. Chips on `--state-*` tokens. Phone hides
+  requester/type/ordered/received. 5-min visible-tab refresh; "Feed built h:mm · loaded h:mm".
+- 🔑 False alarm avoided: "Updated 3:52 AM" looked 13 h stale — it was 3:54 AM Pacific.
+  Check the wall clock before calling a timestamp stale.
+- Lock: `tests/unit/purchasing-portal-page.test.js`.
+
 ## Verification gotchas learned today
 
 - Browser pane (`mcp__Claude_Browser`): screenshots of a SCROLLED page come back blank on
