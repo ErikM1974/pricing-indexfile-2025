@@ -1,3 +1,8 @@
+## v2026.09.05.15 (2026.09.05)
+
+- Staff-dashboard sweep batch 1: labels, named buttons, single h1s, phone widths, Dashboard links, noopener
+- Deploy v2026.09.05.15: cache-bust — staff-dashboard sweep batch 1 (labels, h1s, phone widths, Dashboard links)
+
 ## v2026.09.05.14 (2026.09.05)
 
 - Quote builders item 6: shared phone layout — header 200→100px, no sideways panning (table scrolls in its wrapper; DTG grid minmax(0,1fr))
