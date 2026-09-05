@@ -250,6 +250,9 @@ Releases `v2026.09.04.1 → .9`. Detail here; MEMORY.md carries one line each.
   a 0-byte probe log means "too slow", not "crashed" — probe at 45s. A `for` loop whose last
   statement is `[ $R -ne 0 ] && …` exits 1 on success and silently skips the `&& git commit`
   after it.
+- Chrome `navigate` to the SAME URL that differs only by `#hash` is a same-document navigation — nothing
+  reloads, so a post-deploy check reads the OLD CSS/JS. Add a throwaway `?r=N` query to force a fresh load
+  (cost me an unneeded `.21` on the portal review).
 - Local esbuild hashes differ from Heroku's for CRLF working copies — read the LIVE
   `/dist/asset-manifest.json` for the real names when verifying.
 
@@ -348,7 +351,7 @@ manual-pricing de-inlined (12 `onchange` + an Enter-key `onkeypress`) with a rea
 Caspio-injected inline scripts on the design-archive pages (not ours), the JotForm iframe width on the
 Purchasing Request form (third-party embed).
 
-## Customer Portal + login — review, 7 items (2026-09-05, `v2026.09.05.20` + `.21` clamp tweak)
+## Customer Portal + login — review, 7 items (2026-09-05, `v2026.09.05.20`–`.22`)
 
 Reviewed live via the staff mirror `/portal-admin/preview/1276` (Aaberg's Rentals) + phone pass on
 `static-dist` (the page's error states render without the API — every feed shows a red alert + Retry).
@@ -357,7 +360,9 @@ skeletons, zero-badges hidden, phone bottom nav + off-canvas menu, printable sta
 
 1. **Orders/Invoices tables overflowed even at 1500px** — `td{white-space:nowrap}` + long ShopWorks
    design names ("P1008, Aaberg's - Navy ,Black, Red, …") pushed Status/Actions off the edge. Design
-   cell now `td.cp-cell-design` (max-width 340px, ellipsis, `title` tooltip); invoice sub-line clamped too.
+   cell now `td.cp-cell-design` with the `max-width:0; width:34%` auto-layout trick (absorbs the leftover width,
+   ellipsis, `title` tooltip); invoice sub-line clamped too. 🔑 A px/vw clamp could not know the CARD width —
+   the portal column is centered inside a 2000px window, so `20vw` still overflowed by 16px.
 2. 🔴 **Reward ledger leaked the internal cost bands** ("… (12-mo program · band 40+, 20-39.99)") on the
    Account tab and in the redeem modal. Server `portalCustomerReason()` strips any parenthetical naming
    band / program / RWD- / already before `/api/portal/rewards` (and the preview mirror) return it. Rule
@@ -372,3 +377,32 @@ skeletons, zero-badges hidden, phone bottom nav + off-canvas menu, printable sta
 
 Left alone on purpose: `$0.00` zero-total orders (real ShopWorks records), the raw sign-in email in the
 Quotes empty state (it explains WHY nothing shows), the JotForm-style statement header wrap.
+
+## Customer product (re-order) page — review, 9 items (2026-09-05, `v2026.09.05.23`)
+
+`/portal/product/:style` (`pages/customer-product.html` + `customer-product.js`; shares `customer-portal.css`
+and the `portal-reorder-list.js` drawer). Reviewed live via `/portal-admin/preview/1276/product/PC54`;
+phone pass on `static-dist` (error state only — the page needs the API for the full render). Already
+strong: no onclick, every input labelled, swatches/upgrade table fit, 0 console errors. Shipped:
+
+1. **Header logo + favicon were a dead Box shared-static PNG** (the portal had already moved to the
+   Caspio CDN logo) — now the site logo + `/favicon.png`; alt is the company name.
+2. **Two h1s / wrong h1** — the header said "Your Account" in an `<h1>` and the product name was a div.
+   Header brand is now a div ("Northwest Custom Apparel / Customer portal", same as the portal) and
+   `.pp-title` is the page's `<h1>`.
+3. **`document.title` was static** — now `STYLE · Product name | Northwest Custom Apparel`
+   ("Product unavailable | …" on error).
+4. **Rule 3** — 8 template `onerror=` handlers + the reorder drawer's `style="display:none"` /
+   `.style.display` toggles → `data-onerror="hide|hide-parent|hide-thumb|noimg|remove"` + ONE
+   capture-phase `error` listener; loading/error/content/thumbs/fab/drawer all toggle with `hidden`.
+   🔑 `.rl-fab` had NO `display` in CSS (it came from the inline `inline-flex`) — added, or `hidden=false` shows nothing.
+5. **Failed load offers Retry** (calls `load()` again); "No product specified" stays retry-less.
+6. **Header back link** ("← Back to your account", "← Account" under 560px) so the phone user is not
+   scrolling to the body link. Header at 375px: 135px → 60px tall, link no longer clips off the edge.
+7. **Availability dots** carry `role=img aria-label` matching the tooltip.
+8. Reorder drawer shared fix also lands on the portal page (same `portal-reorder-list.js`).
+9. Lock: `tests/unit/customer-product-page.test.js`.
+
+Left alone: swatch grid "blank boxes" on first paint are lazy-load timing (82 unique colours, every
+image resolves); the size matrix legitimately scrolls inside its own wrapper on phones.
+
