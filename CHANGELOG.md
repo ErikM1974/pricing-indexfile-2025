@@ -1,3 +1,8 @@
+## v2026.09.05.1 (2026.09.05)
+
+- Purchasing Portal review: 10 items — truncation shown, open-work default, tile filters, JotForm links, turnaround, real Refresh
+- Deploy v2026.09.05.1: 2 files (purchasing-portal.html,test-purchasing-portal.html,...)
+
 ## v2026.09.04.12 (2026.09.04)
 
 - Past Due Orders review: 10 items — actionable board, phone header, freshness, totals
