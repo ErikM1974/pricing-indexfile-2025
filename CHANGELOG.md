@@ -1,3 +1,9 @@
+## v2026.09.05.22 (2026.09.05)
+
+- Memory: portal review tag note
+- Customer portal: design column absorbs leftover width (max-width:0 trick) so the orders table never outgrows its card
+- Deploy v2026.09.05.22: cache-bust — portal design column width
+
 ## v2026.09.05.21 (2026.09.05)
 
 - Customer portal: design column clamp scales with the viewport (table still overflowed by 16px at 1512px)
