@@ -1002,3 +1002,104 @@ a.inbound-pill:hover { filter: brightness(0.95); }
    like every other green page. Overrides the --pnw-forest hooks this page's header
    gradient reads (quote-builder-shell.css loads first). */
 :root { --pnw-forest: #2e4a62; --pnw-forest-deep: #1a2f42; --pnw-forest-mid: #3d6584; }
+
+/* =====================================================================
+   2026-09-05 review additions
+   ===================================================================== */
+
+/* Visibility toggles use the hidden attribute (no inline style=). */
+[hidden] { display: none !important; }
+
+/* Header: buttons wrap on phones instead of scrolling the page sideways
+   (the action row was 459px wide at 375px). */
+.header-actions { flex-wrap: wrap; justify-content: flex-end; }
+@media (max-width: 768px) {
+    .dashboard-header { flex-wrap: wrap; padding: 10px 12px; }
+    .header-actions { width: 100%; justify-content: flex-start; gap: 6px; }
+    .btn-header { padding: 6px 10px; font-size: 12px; }
+    .btn-header__tx { display: inline; }
+    .user-info { width: 100%; }
+}
+
+/* Table: room for the row, one line for the actions, no wrapped IDs.
+   Rows were 167px tall because six icon buttons stacked in an 86px cell. */
+.quotes-table-scroll { overflow-x: auto; }
+.quotes-table td.actions-cell { white-space: nowrap; }
+.th-actions, td.actions-cell { min-width: 250px; }
+.th-right { text-align: right; }
+.quote-id { white-space: nowrap; }
+.quotes-table td { vertical-align: middle; }
+.action-btn { display: inline-flex; align-items: center; justify-content: center; min-width: 28px; height: 28px; }
+.action-emoji { font-size: 14px; }
+/* ShipStation button states (were inline styles) */
+.action-btn--waiting, .action-btn--waiting:hover { opacity: 0.4; cursor: not-allowed; background: transparent; }
+.action-btn--sent, .action-btn--sent:hover { opacity: 0.6; cursor: not-allowed; background: #f3f4f6; }
+.action-btn--shipped, .action-btn--shipped:hover { text-decoration: none; color: #166534; background: #dcfce7; }
+.action-btn--shipped-static { cursor: default; }
+.action-btn--ready { color: #0369a1; }
+/* Cancelled-row purge countdown (was style="color:#b91c1c") */
+.date-relative.qm-purge { color: #b91c1c; }
+/* Error state icon (was style="color:#dc3545") */
+.empty-state .qm-error-icon { color: #dc3545; }
+
+/* Phone: hide the low-value columns; the rest stays readable. */
+@media (max-width: 768px) {
+    .qm-col-phone-hide { display: none; }
+    .th-actions, td.actions-cell { min-width: 0; }
+    .quotes-table { display: table; }   /* the scroll wrapper handles overflow now */
+}
+
+/* Stat tiles as buttons (filter the table). Reset UA button chrome. */
+button.stat-card {
+    font: inherit;
+    text-align: center;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    color: inherit;
+    width: 100%;
+}
+button.stat-card:focus-visible { outline: 2px solid var(--pnw-forest, #2e4a62); outline-offset: 2px; }
+button.stat-card.is-active { box-shadow: 0 0 0 3px rgba(46, 74, 98, 0.18); transform: translateY(-1px); }
+.stat-sub { margin-top: 4px; font-size: 11px; color: #94a3b8; }
+
+/* Loaded-time stamp next to the row count */
+.qm-updated { font-size: 12px; color: #94a3b8; white-space: nowrap; }
+.qm-updated:empty { display: none; }
+
+/* "Search widened to All Time" notice */
+.qm-notice {
+    margin: 0 0 12px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    background: #fffbeb;
+    color: #92400e;
+    border: 1px solid #fcd34d;
+    font-size: 13px;
+}
+.qm-notice i { margin-right: 6px; }
+
+/* Real tabs: focus ring for keyboard users */
+.qm-tab:focus-visible { outline: 2px solid var(--pnw-forest, #2e4a62); outline-offset: 2px; }
+
+/* Generic modal input */
+.qm-modal-field { display: block; margin: 12px 0 4px; font-size: 13px; color: #475569; }
+.qm-modal-field input {
+    display: block; width: 100%; margin-top: 6px; padding: 8px 10px;
+    border: 1px solid #cbd5e1; border-radius: 6px; font: inherit; font-size: 14px;
+}
+.modal .btn-confirm {
+    background: var(--pnw-forest, #2e4a62); color: #fff; border: none;
+    padding: 8px 16px; border-radius: 6px; font: inherit; cursor: pointer;
+}
+.modal .btn-confirm:hover { filter: brightness(1.1); }
+.modal .btn-confirm:disabled { opacity: 0.6; cursor: progress; }
+
+/* Toasts (were a cssText blob per toast) */
+.qm-toasts { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 8px; align-items: center; pointer-events: none; }
+.qm-toast {
+    background: #333; color: #fff; padding: 12px 24px; border-radius: 6px; font-size: 14px;
+    max-width: min(90vw, 640px); box-shadow: 0 6px 20px rgba(0,0,0,0.25); pointer-events: auto; white-space: pre-line;
+}
+.qm-toast--error { background: #991b1b; }
+.qm-toast--success { background: #14532d; }
