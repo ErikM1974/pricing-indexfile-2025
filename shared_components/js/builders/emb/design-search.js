@@ -195,14 +195,12 @@ function buildDesignSearchCompanyChips(designs) {
         return;
     }
 
-    let html = '<button class="design-search-company-chip active" data-company="all" onclick="filterDesignSearchByCompany(\'all\')">All <span class="chip-count">(' + designs.length + ')</span></button>';
+    let html = '<button type="button" class="design-search-company-chip active" data-company="all" data-call="filterDesignSearchByCompany" data-args=\'["all"]\'>All <span class="chip-count">(' + designs.length + ')</span></button>';
     companies.forEach(name => {
-        // JS-escape (' and \) THEN HTML-escape: the browser HTML-decodes the
-        // attribute before the JS string parses, so escapeHtml alone can't protect
-        // the JS literal and \' alone can't protect the "-delimited attr (1.4).
-        const escapedName = escapeHtml(name.replace(/\\/g, '\\\\').replace(/'/g, "\\'"));
-        html += '<button class="design-search-company-chip" data-company="' + escapeHtml(name) + '" '
-            + 'onclick="filterDesignSearchByCompany(\'' + escapedName + '\')" title="' + escapeHtml(name) + '">'
+        // The name rides as JSON in data-args (HTML-escaped as a whole), so a quote or
+        // backslash in a company name can neither break the attribute nor the argument.
+        html += '<button type="button" class="design-search-company-chip" data-company="' + escapeHtml(name) + '" '
+            + 'data-call="filterDesignSearchByCompany" data-args="' + escapeHtml(JSON.stringify([name])) + '" title="' + escapeHtml(name) + '">'
             + escapeHtml(name.length > 28 ? name.substring(0, 26) + '...' : name)
             + ' <span class="chip-count">(' + companyCounts[name] + ')</span></button>';
     });
@@ -364,7 +362,7 @@ async function applyDesignToCard(type, designNum, design) {
     // margin leak on every multi-color design).
     if (design.extraColors > 0 && design.extraColorSurcharge > 0) {
         badgeHtml += '<br><span style="font-size:11px;color:#d97706;font-weight:600;">⚠ +' + design.extraColors + ' extra colors (+$' + design.extraColorSurcharge.toFixed(2) + '/pc surcharge)</span>'
-            + ' <button type="button" class="btn-add-extra-colors" onclick="addExtraColorSurchargeRow(\'' + type + '\', ' + Number(design.extraColors) + ', ' + Number(design.extraColorSurcharge) + ')">Add to quote</button>';
+            + ' <button type="button" class="btn-add-extra-colors" data-call="addExtraColorSurchargeRow" data-args="' + escapeHtml(JSON.stringify([type, Number(design.extraColors), Number(design.extraColorSurcharge)])) + '">Add to quote</button>';
     }
 
     infoBadge.className = 'design-info-badge design-info-found';
@@ -820,7 +818,7 @@ function renderDesignSearchGrid(designs) {
     if (designs.length > DESIGN_SEARCH_INITIAL_RENDER) {
         const remaining = designs.length - DESIGN_SEARCH_INITIAL_RENDER;
         // eslint-disable-next-line no-unsanitized/property -- audited (1.4): card/chip/badge builders escapeHtml every API string (extraction #2 audit + the 1.4 chip attr fix); counts numeric
-        results.innerHTML += '<div class="design-search-show-more"><button onclick="showMoreDesignSearchResults()"><i class="fas fa-chevron-down"></i> Show all ' + designs.length + ' designs (' + remaining + ' more)</button></div>';
+        results.innerHTML += '<div class="design-search-show-more"><button type="button" data-call="showMoreDesignSearchResults"><i class="fas fa-chevron-down"></i> Show all ' + designs.length + ' designs (' + remaining + ' more)</button></div>';
     }
 
     // Lazy-load thumbnails for designs without images
@@ -855,7 +853,7 @@ function buildDesignSearchCardHtml(d) {
     // [C11] (audit 2026-06-06): pass the value via the data attribute instead of interpolating dn into a JS
     // string in the inline onclick (dn's HTML-attr escaping decodes before JS parses → a quoted design # could
     // break out). Alphanumeric today, but injection-safe now.
-    return '<div class="design-gallery-card" onclick="selectDesignFromSearch(this.dataset.designNumber)"'
+    return '<div class="design-gallery-card" data-call="selectDesignFromSearch" data-args=\'["$this.dataset.designNumber"]\''
         + ' data-design-number="' + escapeHtml(dn) + '" data-company="' + escapeHtml(company) + '">'
         + '<div class="design-gallery-thumb" id="gallery-thumb-' + dn + '">' + thumbHtml + '</div>'
         + '<div class="design-gallery-info">'

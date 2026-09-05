@@ -124,7 +124,6 @@ export class DtfAdapter {
                     ],
                     defaultPlacement: 'Left Chest',
                 });
-                console.log('[DTF] Artwork upload widget mounted (rich mode)');
             } catch (e) {
                 console.error('[DTF] Artwork widget mount failed:', e);
             }
@@ -144,8 +143,7 @@ export class DtfAdapter {
                             const n = parseInt(v, 10);
                             return Number.isFinite(n) && n > 0 ? n : null;
                         },
-                        onPick: (design) => {
-                            console.log('[DTF] Design picked:', design.idDesign, design.designName);
+                        onPick: (_design) => {
                         },
                     });
                     // Refresh combobox when customer number changes
@@ -155,7 +153,6 @@ export class DtfAdapter {
                             if (window._dtfDesignCombobox) window._dtfDesignCombobox.refresh();
                         });
                     }
-                    console.log('[DTF] Design combobox mounted');
                 }
             } catch (e) {
                 console.error('[DTF] Design combobox mount failed:', e);

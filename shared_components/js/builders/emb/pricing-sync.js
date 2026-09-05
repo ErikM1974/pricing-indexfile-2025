@@ -131,7 +131,7 @@ function renderPriceErrorRetries() {
         const rid = /** @type {HTMLElement} */ (row).dataset.rowId;
         const cell = document.getElementById(`row-price-${rid}`);
         if (!cell || cell.querySelector('.btn-retry-pricing')) return;
-        cell.innerHTML = '<button type="button" class="btn-retry-pricing" onclick="retryRowPricing()" title="Pricing failed to load — retry without refreshing the page"><i class="fas fa-rotate-right"></i> Retry</button>';
+        cell.innerHTML = '<button type="button" class="btn-retry-pricing" data-call="retryRowPricing" title="Pricing failed to load — retry without refreshing the page"><i class="fas fa-rotate-right"></i> Retry</button>';
     });
 }
 
@@ -593,7 +593,7 @@ function paintServiceRowCells(si) {
     if (siPriceCell) {
         if (siHasOverride) {
             siPriceCell.classList.add('price-overridden');
-            siPriceCell.innerHTML = `<span class="price-override-wrapper">$${escapeHtml(si.unitPrice.toFixed(2))}<button class="btn-clear-override" onclick="event.stopPropagation(); clearPriceOverride(${escapeHtml(String(si.rowId))})" title="Clear override">&times;</button></span>`;
+            siPriceCell.innerHTML = `<span class="price-override-wrapper">$${escapeHtml(si.unitPrice.toFixed(2))}<button class="btn-clear-override" data-stop="1" data-call="clearPriceOverride" data-args="[${escapeHtml(String(si.rowId))}]" title="Clear override">&times;</button></span>`;
         } else {
             siPriceCell.classList.remove('price-overridden');
             siPriceCell.textContent = `$${si.unitPrice.toFixed(2)}`;
@@ -754,10 +754,10 @@ function paintRowPrices(pricing, logoConfigs, ltmDisplayMode) {
                             // Non-SanMar: pencil icon, no clear button (price override IS the price)
                             priceCell.classList.remove('price-overridden');
                             priceCell.classList.remove('ns-price-zero');
-                            priceCell.innerHTML = `<span class="ns-price-display" onclick="enablePriceOverride(${escapeHtml(String(rowId))})" title="Click to edit price">$${escapeHtml(displayPrice.toFixed(2))} <i class="fas fa-pencil-alt"></i></span>`;
+                            priceCell.innerHTML = `<span class="ns-price-display" data-call="enablePriceOverride" data-args="[${escapeHtml(String(rowId))}]" title="Click to edit price">$${escapeHtml(displayPrice.toFixed(2))} <i class="fas fa-pencil-alt"></i></span>`;
                         } else if (hasOverride) {
                             priceCell.classList.add('price-overridden');
-                            priceCell.innerHTML = `<span class="price-override-wrapper">$${escapeHtml(displayPrice.toFixed(2))}<button class="btn-clear-override" onclick="event.stopPropagation(); clearPriceOverride(${escapeHtml(String(rowId))})" title="Clear override">&times;</button></span>`;
+                            priceCell.innerHTML = `<span class="price-override-wrapper">$${escapeHtml(displayPrice.toFixed(2))}<button class="btn-clear-override" data-stop="1" data-call="clearPriceOverride" data-args="[${escapeHtml(String(rowId))}]" title="Clear override">&times;</button></span>`;
                         } else {
                             priceCell.classList.remove('price-overridden');
                             priceCell.textContent = `$${displayPrice.toFixed(2)}`;
@@ -885,7 +885,7 @@ function applyChildOverrides() {
 
         // Override display
         childPriceCell.classList.add('price-overridden');
-        childPriceCell.innerHTML = `<span class="price-override-wrapper">$${escapeHtml(childOverride.toFixed(2))}<button class="btn-clear-override" onclick="event.stopPropagation(); clearPriceOverride(${escapeHtml(String(childRowId))})" title="Clear override">&times;</button></span>`;
+        childPriceCell.innerHTML = `<span class="price-override-wrapper">$${escapeHtml(childOverride.toFixed(2))}<button class="btn-clear-override" data-stop="1" data-call="clearPriceOverride" data-args="[${escapeHtml(String(childRowId))}]" title="Clear override">&times;</button></span>`;
 
         if (childTotalCell && qty > 0) {
             childTotalCell.textContent = `$${(childOverride * qty).toFixed(2)}`;

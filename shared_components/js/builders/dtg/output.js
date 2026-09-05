@@ -2,7 +2,7 @@
  * DTG inline form — output module (Batch 5, 2026-07-09). Moved VERBATIM from the
  * dtg-inline-form.js IIFE; lexical references became the imports below.
  */
-/* global alert,
+/* global showToast,
    emailQuote, markAsSaved, EmbroideryInvoiceGenerator */
 import { artFeeAddOns, artFeeTotals } from './fees.js';
 import { effectiveLocationCode, effectiveLocationLabel, isRowColorInvalid, updateSubmitEnabled } from './form-core.js';
@@ -149,22 +149,19 @@ export function confirmStockOverflow(issues) {
 export async function dtgPrintQuote() {
     try {
         if (typeof EmbroideryInvoiceGenerator === 'undefined') {
-            alert('Print is unavailable — invoice generator not loaded. Please refresh and try again.');
-            return;
+            showToast('Print is unavailable — invoice generator not loaded. Please refresh and try again.', 'error', 6000);            return;
         }
 
         // Collect line items from current state
         const cleanLines = state.rows.filter(r => r.style && r.color && Object.keys(r.sizes || {}).length > 0);
         if (cleanLines.length === 0) {
-            alert('Add at least one product with a size before printing.');
-            return;
+            showToast('Add at least one product with a size before printing.', 'error', 6000);            return;
         }
 
         // Trigger a fresh price calculation so the invoice reads current numbers
         const priceQuote = computePriceQuoteFromState();
         if (!priceQuote || !Array.isArray(priceQuote.lineItems) || priceQuote.lineItems.length === 0) {
-            alert('Could not compute pricing. Make sure all rows have a style + color + at least one filled size.');
-            return;
+            showToast('Could not compute pricing. Make sure all rows have a style + color + at least one filled size.', 'error', 6000);            return;
         }
 
         // Build invoice data structure (matches what EmbroideryInvoiceGenerator expects).
@@ -265,8 +262,7 @@ export async function dtgPrintQuote() {
         const invoiceHTML = generator.generateInvoiceHTML(pricingData, customerData);
         const printWindow = window.open('', '_blank');
         if (!printWindow) {
-            alert('Pop-up blocker stopped the print window. Allow pop-ups for this page and try again.');
-            return;
+            showToast('Pop-up blocker stopped the print window. Allow pop-ups for this page and try again.', 'error', 6000);            return;
         }
         // eslint-disable-next-line no-unsanitized/method -- audited (Batch 5 move): invoice HTML from the shared EmbroideryInvoiceGenerator (trusted, same pattern as the other 3 builders)
         printWindow.document.write(invoiceHTML);
@@ -278,8 +274,7 @@ export async function dtgPrintQuote() {
         }, 400);
     } catch (e) {
         console.error('[DTG Print] Error:', e);
-        alert('Print failed: ' + (e.message || 'unknown error'));
-    }
+        showToast('Print failed: ' + (e.message || 'unknown error'), 'error', 6000);    }
 }
 
 // ========================================================================
@@ -292,23 +287,20 @@ export async function dtgPrintQuote() {
 export async function dtgEmailQuote() {
     const savedId = (window.aiState && window.aiState.savedQuoteID) || null;
     if (!savedId) {
-        alert(
-            'Save the quote first before emailing.\n\n' +
-            'Open the chat panel (✨ Ask button) and click "Save & share link" — that gives the quote an ID. ' +
-            'Then come back here and click Email Quote.'
+        showToast(
+            'Save the quote first before emailing. Open the chat panel (✨ Ask) and click "Save & share link" to give the quote an ID, then click Email Quote.',
+            'warning', 8000
         );
         return;
     }
 
     const customerEmail = (state.customer?.email || '').trim();
     if (!customerEmail) {
-        alert('Customer email is required. Fill in the email field in the customer panel and try again.');
-        return;
+        showToast('Customer email is required. Fill in the email field in the customer panel and try again.', 'error', 6000);        return;
     }
 
     if (typeof emailQuote !== 'function') {
-        alert('Email helper not loaded. Please refresh and try again.');
-        return;
+        showToast('Email helper not loaded. Please refresh and try again.', 'error', 6000);        return;
     }
 
     const customerName =
@@ -693,7 +685,6 @@ export function renderRetryCard(setStatus, errorMsg) {
             showToastSafe('Payload copied — paste to support or stash for retry');
         } catch (e) {
             showToastSafe('Clipboard failed — payload in console');
-            console.log('[dtg-inline-form] retry payload:', state.lastSubmit.body);
         }
     });
 }

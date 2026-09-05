@@ -130,13 +130,13 @@ function showImportSummaryBanner(sanMarCount, nonSanMarItems) {
                 ? '<span class="ns-price-ok">&#10003;</span>'
                 : '<span class="ns-price-warn">&#9888;</span>';
             const priceStr = priceOk ? `$${item.price.toFixed(2)}` : '$0.00';
-            html += `<div class="banner-ns-item" data-row-id="${item.rowId}" onclick="scrollToProductRow(${item.rowId})">`;
+            html += `<div class="banner-ns-item" data-row-id="${item.rowId}" data-call="scrollToProductRow" data-args="[${item.rowId}]">`;
             html += `&nbsp;&nbsp;&#9656; ${escapeHtml(item.style)} (${escapeHtml(item.description)}) &mdash; ${priceStr} ${icon}`;
             html += `</div>`;
         }
     }
     html += `</div>`;
-    html += `<button class="btn-dismiss-banner" onclick="dismissImportBanner()" title="Dismiss">Dismiss</button>`;
+    html += `<button class="btn-dismiss-banner" data-call="dismissImportBanner" title="Dismiss">Dismiss</button>`;
 
     const banner = document.createElement('div');
     banner.id = 'import-summary-banner';
@@ -199,7 +199,7 @@ async function reImportNonSanmarRow(row, rowId, importData) {
                     data-color-name="${escapeHtml(importData.color)}"
                     data-catalog-color="${escapeHtml(importData.color)}"
                     data-swatch-url="" data-hex="#ccc" data-image-url=""
-                    onclick="selectNonSanmarColor(${rowId}, this)">
+                    data-call="selectNonSanmarColor" data-args='[${rowId}, "$this"]'>
                     <span class="color-swatch" style="background-color:#ccc"></span>
                     <span class="color-name">${escapeHtml(importData.color)}</span>
                 </div>`;

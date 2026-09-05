@@ -17,8 +17,8 @@
  *     ship:  { address, city, state, zip, method, fee, residential },          // selectors
  *     recap: { company, name, custNum, shippingDisplay, logos: () => [{text, thumbUrl, label}] },
  *     estimate: () => Promise|null,                     // re-estimate handler (optional)
- *     reestimateOnclick: 'reestimateShipFromCard()',    // Re-estimate button onclick
- *     editOnclick: 'openShippingModal()',               // omit to hide the Edit button
+ *     reestimateOnclick: 'reestimateShipFromCard()',    // Re-estimate button (bare "fn()" → rendered as data-call="fn")
+ *     editOnclick: 'openShippingModal()',               // omit to hide the Edit button (same rule)
  *   });
  *   QuoteOrderSummary.renderOrderRecap();   // also aliased to window.renderOrderRecap
  *
@@ -34,6 +34,8 @@
         });
     };
     function _el(sel) { try { return sel ? global.document.querySelector(sel) : null; } catch (_) { return null; } }
+    // 'openShippingModal()' → 'openShippingModal' (legacy onclick-string config → data-call name)
+    function callName(expr) { return String(expr || '').trim().replace(/\(\s*\)\s*;?\s*$/, ''); }
     function _val(sel) {
         var e = _el(sel);
         if (!e) return '';
@@ -213,11 +215,14 @@
         // Edit renders only when editOnclick is set. If neither, omit the .st-actions wrapper (no empty bar).
         var acts = '';
         if (typeof _cfg.estimate === 'function') {
-            var reestOnclick = _cfg.reestimateOnclick || 'reestimateShipFromCard()';
-            acts += '<button type="button" class="st-btn st-btn-reest" onclick="' + reestOnclick + '" title="Re-run the UPS estimate for this address + the current item weight"><i class="fas fa-rotate"></i> Re-estimate</button>';
+            // Rendered as data-call (no inline handlers — Rule 3); the shared delegator in
+            // quote-builder-utils.js resolves the global by name. Config keeps the legacy
+            // '*Onclick' keys: a bare "fn()" string is reduced to "fn" by callName().
+            var reestFn = callName(_cfg.reestimateOnclick || 'reestimateShipFromCard()');
+            acts += '<button type="button" class="st-btn st-btn-reest" data-call="' + esc(reestFn) + '" title="Re-run the UPS estimate for this address + the current item weight"><i class="fas fa-rotate"></i> Re-estimate</button>';
         }
         if (_cfg.editOnclick) {
-            acts += '<button type="button" class="st-btn st-btn-edit" onclick="' + _cfg.editOnclick + '" title="Edit the ship-to address / method / charge"><i class="fas fa-pen"></i> Edit</button>';
+            acts += '<button type="button" class="st-btn st-btn-edit" data-call="' + esc(callName(_cfg.editOnclick)) + '" title="Edit the ship-to address / method / charge"><i class="fas fa-pen"></i> Edit</button>';
         }
         var actions = acts ? '<div class="st-actions">' + acts + '</div>' : '';
         el.innerHTML = '<div class="st-title">Ship To</div>' + lines.join('') + actions;

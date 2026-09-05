@@ -30,6 +30,13 @@
       "runtimeArgs": ["-m", "http.server", "8099"],
       "port": 8099,
       "cwd": "."
+    },
+    {
+      "name": "static-dist",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["scripts/qa-static-server.js", ".", "8098"],
+      "port": 8098,
+      "cwd": "."
     }
   ]
 }

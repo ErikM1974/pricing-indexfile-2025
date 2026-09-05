@@ -1222,3 +1222,9 @@ body > .header::after,
     border-color: var(--pnw-forest) !important;
     color: var(--pnw-forest-deep) !important;
 }
+
+/* Toasts for quote-builder-utils showToast (2026-09-05) — same look as quote-builder-common.css */
+.toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 10000; pointer-events: none; }
+.toast { min-width: 250px; max-width: 350px; padding: 15px 20px; border-radius: 8px; color: #fff; font-weight: 500; box-shadow: 0 4px 12px rgba(0,0,0,.15); transform: translateX(400px); transition: transform .3s ease, opacity .3s ease; margin-top: 10px; display: flex; align-items: center; gap: 10px; pointer-events: all; background: #1f2937; }
+.toast.show { transform: translateX(0); }
+.toast-success { background: #16a34a; } .toast-error { background: #dc2626; } .toast-warning { background: #d97706; } .toast-info { background: #2563eb; }

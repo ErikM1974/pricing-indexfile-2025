@@ -208,7 +208,6 @@ export class ScpAdapter {
                     ],
                     defaultPlacement: 'Front',
                 });
-                console.log('[SCP] Artwork upload widget mounted (rich mode)');
             } catch (e) {
                 console.error('[SCP] Artwork widget mount failed:', e);
             }
@@ -228,8 +227,7 @@ export class ScpAdapter {
                             const n = parseInt(v, 10);
                             return Number.isFinite(n) && n > 0 ? n : null;
                         },
-                        onPick: (design) => {
-                            console.log('[SCP] Design picked:', design.idDesign, design.designName);
+                        onPick: (_design) => {
                         },
                     });
                     const custInput = document.getElementById('customer-number');
@@ -238,7 +236,6 @@ export class ScpAdapter {
                             if (window._scpDesignCombobox) window._scpDesignCombobox.refresh();
                         });
                     }
-                    console.log('[SCP] Design combobox mounted');
                 }
             } catch (e) {
                 console.error('[SCP] Design combobox mount failed:', e);

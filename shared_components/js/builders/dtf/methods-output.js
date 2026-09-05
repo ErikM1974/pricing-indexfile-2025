@@ -3,7 +3,7 @@
  * Batch 4.2 (2026-07-09): methods moved VERBATIM from quote-builder-class.js
  * (`this.` state intact — the class assembles via Object.assign(prototype, ...)).
  */
-/* global escapeHtml, alert, EmbroideryInvoiceGenerator, confirm, requestAnimationFrame */
+/* global escapeHtml, showToast, EmbroideryInvoiceGenerator, confirm, requestAnimationFrame */
 
 export const outputMethods = {
 
@@ -585,8 +585,7 @@ export const outputMethods = {
         } else {
             // Fallback to alert if no error banner element
             console.error('[DTFQuoteBuilder] Error:', message);
-            alert(message);
-        }
+            showToast(message, 'error', 6000);        }
     },
 
     hideError() {

@@ -2,7 +2,7 @@
  * DTG inline form — form-core module (Batch 5, 2026-07-09). Moved VERBATIM from the
  * dtg-inline-form.js IIFE; lexical references became the imports below.
  */
-/* global Node, QuoteOrderSummary, alert, clearQuickQuoteParams, getQuickQuotePrefill,
+/* global Node, QuoteOrderSummary, clearQuickQuoteParams, getQuickQuotePrefill,
    history, markAsUnsaved, setupBeforeUnloadGuard, showToast, takeMethodSwitchPrefill,
    */
 import { attachNewArtworkUpload } from './artwork.js';
@@ -239,7 +239,7 @@ export function render() {
                             Contact at this company
                             <span class="dcp-contact-count" id="dtgContactCount"></span>
                         </div>
-                        <select id="dtgContactPicker" class="dcp-contact-select">
+                        <select id="dtgContactPicker" aria-label="Contact" class="dcp-contact-select">
                             <option value="">— pick a contact —</option>
                         </select>
                     </div>
@@ -268,12 +268,12 @@ export function render() {
                             </div>
                             <div>
                                 <div class="dcp-field-label">Company ID (optional)</div>
-                                <input type="text" id="dtgCompanyId" autocomplete="off" placeholder="ShopWorks ID">
+                                <input type="text" id="dtgCompanyId" aria-label="ShopWorks customer ID" autocomplete="off" placeholder="ShopWorks ID">
                             </div>
                         </div>
                         <div class="dcp-field-wrap">
                             <div class="dcp-field-label">Customer PO # <span class="dcp-optional">(optional)</span></div>
-                            <input type="text" id="dtgPoNumber" autocomplete="off" placeholder="Customer's purchase order #">
+                            <input type="text" id="dtgPoNumber" aria-label="Customer PO number" autocomplete="off" placeholder="Customer's purchase order #">
                         </div>
                         <div class="dcp-row">
                             <div>
@@ -324,7 +324,7 @@ export function render() {
                                     Design name
                                     <span class="dcp-required">required</span>
                                 </div>
-                                <input type="text" id="dtgNewArtworkName"
+                                <input type="text" id="dtgNewArtworkName" aria-label="New artwork name"
                                     autocomplete="off"
                                     placeholder="e.g. Star Sportswear front logo 2026"
                                     value="${escapeHtml(state.newArtwork.designName || '')}">
@@ -337,7 +337,7 @@ export function render() {
                                 </div>
                                 <div class="dcp-newart-dropzone-sub">AI / EPS / PSD / PDF / PNG / JPG / TIFF · 20 MB max</div>
                             </div>
-                            <input type="file" id="dtgNewArtworkInput" class="dcp-newart-input"
+                            <input type="file" id="dtgNewArtworkInput" aria-label="Upload artwork file" class="dcp-newart-input"
                                 accept=".ai,.eps,.pdf,.png,.jpg,.jpeg,.tiff,.tif,.psd,.svg,.webp"
                                 multiple
                                 hidden>
@@ -414,24 +414,24 @@ export function render() {
                             </div>
                             <div class="dcp-field-wrap">
                                 <div class="dcp-field-label">Address line 1</div>
-                                <input type="text" id="dtgShipAddress1" autocomplete="off" value="${escapeHtml(state.shipping.address1 || '')}">
+                                <input type="text" id="dtgShipAddress1" aria-label="Ship-to address line 1" autocomplete="off" value="${escapeHtml(state.shipping.address1 || '')}">
                             </div>
                             <div class="dcp-field-wrap">
                                 <div class="dcp-field-label">Address line 2 <span class="dcp-optional">(optional)</span></div>
-                                <input type="text" id="dtgShipAddress2" autocomplete="off" value="${escapeHtml(state.shipping.address2 || '')}">
+                                <input type="text" id="dtgShipAddress2" aria-label="Ship-to address line 2" autocomplete="off" value="${escapeHtml(state.shipping.address2 || '')}">
                             </div>
                             <div class="dcp-row dcp-row-3">
                                 <div>
                                     <div class="dcp-field-label">City</div>
-                                    <input type="text" id="dtgShipCity" autocomplete="off" value="${escapeHtml(state.shipping.city || '')}">
+                                    <input type="text" id="dtgShipCity" aria-label="Ship-to city" autocomplete="off" value="${escapeHtml(state.shipping.city || '')}">
                                 </div>
                                 <div>
                                     <div class="dcp-field-label">State</div>
-                                    <input type="text" id="dtgShipState" autocomplete="off" maxlength="2" placeholder="WA" value="${escapeHtml(state.shipping.state || '')}">
+                                    <input type="text" id="dtgShipState" aria-label="Ship-to state" autocomplete="off" maxlength="2" placeholder="WA" value="${escapeHtml(state.shipping.state || '')}">
                                 </div>
                                 <div>
                                     <div class="dcp-field-label">ZIP</div>
-                                    <input type="text" id="dtgShipZip" autocomplete="off" maxlength="10" value="${escapeHtml(state.shipping.zip || '')}">
+                                    <input type="text" id="dtgShipZip" aria-label="Ship-to ZIP" autocomplete="off" maxlength="10" value="${escapeHtml(state.shipping.zip || '')}">
                                 </div>
                             </div>
                             <div class="dcp-tax-status" id="dtgTaxStatus"></div>
@@ -446,7 +446,7 @@ export function render() {
                                 <div class="dcp-shipfee-row">
                                     <span class="dcp-shipfee-prefix">$</span>
                                     <input type="number" id="dtgShipFee" step="0.01" min="0" inputmode="decimal" autocomplete="off" placeholder="0.00" value="${Number(state.shipping.fee) > 0 ? Number(state.shipping.fee).toFixed(2) : ''}">
-                                    <button type="button" id="dtgEstimateShipBtn" class="dcp-estimate-btn" onclick="estimateShipping()"><i class="fas fa-truck-fast"></i> Estimate UPS Ground</button>
+                                    <button type="button" id="dtgEstimateShipBtn" class="dcp-estimate-btn" data-call="estimateShipping"><i class="fas fa-truck-fast"></i> Estimate UPS Ground</button>
                                 </div>
                                 <div class="dcp-estimate-result" id="dtgEstimateShipResult"></div>
                             </div>
@@ -1183,8 +1183,7 @@ function wireActionButtons() {
         if (typeof window.dtgSaveQuote === 'function') {
             window.dtgSaveQuote();
         } else {
-            alert('Save is unavailable — please refresh and try again.');
-        }
+            showToast('Save is unavailable — please refresh and try again.', 'error', 6000);        }
     });
 
     // Phase 11.4 (2026-05-24): Print Quote — opens a PDF-quality invoice
