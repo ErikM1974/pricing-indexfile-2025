@@ -1,0 +1,97 @@
+/* api-test-runner.css — page styles (extracted from inline <style>, 2026.09.05.11) */
+
+/* ── moved from inline <style> in training/api-test-runner.html (Rule 3, 2026.09.05.11) ── */
+body {
+            font-family: 'Courier New', monospace;
+            background: #1a1a1a;
+            color: #00ff00;
+            padding: 20px;
+            margin: 0;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            color: #00ffff;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .controls {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        button {
+            background: #333;
+            color: #00ff00;
+            border: 2px solid #00ff00;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 16px;
+            margin: 0 10px;
+        }
+        
+        button:hover {
+            background: #00ff00;
+            color: #000;
+        }
+        
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .output {
+            background: #000;
+            border: 1px solid #333;
+            padding: 20px;
+            height: 500px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        
+        .status {
+            text-align: center;
+            font-size: 18px;
+            margin: 20px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        
+        .status.running {
+            background: #333300;
+            color: #ffff00;
+            border: 1px solid #ffff00;
+        }
+        
+        .status.success {
+            background: #003300;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+        }
+        
+        .status.error {
+            background: #330000;
+            color: #ff0000;
+            border: 1px solid #ff0000;
+        }
+        
+        .test-info {
+            background: #112233;
+            border-left: 4px solid #00ffff;
+            padding: 15px;
+            margin: 20px 0;
+            color: #ccc;
+        }
+        
+        .test-info h3 {
+            color: #00ffff;
+            margin-top: 0;
+        }
