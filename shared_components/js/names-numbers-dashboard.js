@@ -102,7 +102,7 @@ class NamesNumbersDashboard {
                 <td>${modified}</td>
                 <td class="actions" data-stop="1">
                     <a href="/pages/names-numbers.html?load=${r.ID_Roster}" class="btn-secondary btn-sm"><i class="fas fa-edit"></i></a>
-                    <button class="btn-danger btn-sm" aria-label="Delete roster" data-call="dashboard.deleteRoster" data-args="${this.esc(JSON.stringify([r.ID_Roster, r.RosterName || '']))}"><i class="fas fa-trash"></i></button>
+                    <button class="btn-danger btn-sm" aria-label="Delete roster" data-call="dashboard.deleteRoster" data-args="${JSON.stringify([r.ID_Roster, r.RosterName || '']).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;')}"><i class="fas fa-trash"></i></button>
                 </td>
             </tr>`;
         }).join('');
