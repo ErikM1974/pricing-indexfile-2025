@@ -1,0 +1,21 @@
+/* names-numbers-dashboard.css — page styles (extracted from inline <style>, 2026.09.05.7) */
+
+/* ── moved from inline <style> in dashboards/names-numbers-dashboard.html (Rule 3, 2026.09.05.7) ── */
+.kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+        .kpi-card {
+            background: var(--nn-card-bg); border: 1px solid var(--nn-border); border-radius: 0.75rem;
+            padding: 1rem 1.25rem; text-align: center;
+        }
+        .kpi-value { font-size: 1.75rem; font-weight: 700; color: var(--nn-primary); }
+        .kpi-label { font-size: 0.8rem; color: var(--nn-text-secondary); text-transform: uppercase; letter-spacing: 0.03em; margin-top: 0.25rem; }
+        .dashboard-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+        .dashboard-table thead th {
+            background: #f8fafc; padding: 0.6rem 0.75rem; text-align: left;
+            font-weight: 600; font-size: 0.8rem; color: var(--nn-text-secondary);
+            text-transform: uppercase; letter-spacing: 0.03em; border-bottom: 2px solid var(--nn-border);
+        }
+        .dashboard-table tbody td { padding: 0.6rem 0.75rem; border-bottom: 1px solid var(--nn-border); }
+        .dashboard-table tbody tr:hover { background: #f8fafc; cursor: pointer; }
+        .dashboard-table .actions { display: flex; gap: 0.4rem; }
+        .filter-bar { display: flex; gap: 0.75rem; margin-bottom: 1.5rem; flex-wrap: wrap; align-items: end; }
+        .filter-bar .form-group { min-width: 180px; }

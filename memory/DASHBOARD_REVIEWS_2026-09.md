@@ -180,6 +180,19 @@ Releases `v2026.09.04.1 → .9`. Detail here; MEMORY.md carries one line each.
   remaining Rule-3 debt — builders deliberately NOT swept autonomously (pricing-critical,
   Rule 8 sync ×4). Remaining backlog is in this file's next sections as they ship.
 
+## Cross-page sweep 2 — Rule 3 inline `<style>`/`<script>` extraction (2026-09-05, `v2026.09.05.7`)
+
+- 15 pages, 21 new files, every inline block moved VERBATIM to an external file linked at the
+  SAME position (cascade + execution order preserved). Rule of the extractor: never append to
+  an existing page script — the inline block ran at ITS position; use a sibling `-inline.js`
+  (`embroidery-pricing-all-inline.js` is the `?tab=` bootstrap that ran BEFORE the main file).
+  JSON-LD blocks are data and stay. Two `<style>` blocks on one page → one CSS file, one link.
+- Pages: art-hub-steve (2 style), art-hub-ruth, names-numbers-dashboard, 4 training pages
+  (1–19 KB inline scripts), purchasingform, taneisha/nika-crm (`REP_CONFIG`),
+  embroidery-pricing-all, screenprint-customer, commission-structure, price-audit-report,
+  digitized-designs (18 KB). Script: session scratchpad `extract-inline.js` (rebuild from this
+  description if needed — ~70 lines).
+
 ## Verification gotchas learned today
 
 - Browser pane (`mcp__Claude_Browser`): screenshots of a SCROLLED page come back blank on
