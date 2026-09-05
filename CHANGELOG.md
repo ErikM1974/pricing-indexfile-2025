@@ -1,3 +1,8 @@
+## v2026.09.05.29 (2026.09.05)
+
+- Vendor portal review: 12 items — [hidden] beats display:flex (error banner was visible on every load), vendored Font Awesome, retryable alert banner, pushState/Back, aria-pressed chips with counts, past-due flag, labels, Ctrl+Enter post, image fallbacks, phone block; lock test; LESSONS entry
+- Deploy v2026.09.05.29: 1 file (vendor-portal.html) — vendor portal review cache-bust
+
 ## v2026.09.05.27 (2026.09.05)
 
 - Memory: customer product page review recorded (v2026.09.05.24-.25)
