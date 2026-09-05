@@ -1,3 +1,8 @@
+## v2026.09.05.6 (2026.09.05)
+
+- Staff identity hydration: StaffAuthHelper.ready() fills the legacy session keys from the SAML session
+- Deploy v2026.09.05.6: 17 files (ae-mission-control.html,art-hub-steve.html,nika-crm.html,...)
+
 ## v2026.09.05.5 (2026.09.05)
 
 - Memory: Quote Management review release range
