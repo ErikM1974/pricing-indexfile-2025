@@ -447,14 +447,29 @@ class HouseAccountsController {
     async init() {
         this.cacheElements();
         this.bindEvents();
+        // Who is signed in — the assignment audit trail used to hardcode "Erik".
+        fetch('/api/crm-session/me', { credentials: 'same-origin' })
+            .then((r) => (r.ok ? r.json() : null))
+            .then((me) => { if (me && (me.firstName || me.email)) this.staffName = me.firstName || String(me.email).split('@')[0]; })
+            .catch(() => { /* keep the fallback */ });
+        await this.retryLoad();
+    }
 
+    /** (Re)load everything — first boot and the error banner's Retry. */
+    async retryLoad() {
+        this.hideError();
         try {
             await this.loadData();
             // Load sync status indicator
             await this.loadSyncStatus();
         } catch (error) {
-            this.showError('Unable to load House accounts. Please refresh the page or contact support.');
+            console.error('[HouseAccounts] load failed:', error);
+            this.showError('Unable to load House accounts (' + (error && error.message ? error.message : 'unknown error') + ').', true);
         }
+    }
+
+    hideError() {
+        if (this.elements.errorBanner) this.elements.errorBanner.classList.remove('show');
     }
 
     /**
@@ -465,6 +480,7 @@ class HouseAccountsController {
             // Error banner
             errorBanner: document.getElementById('error-banner'),
             errorMessage: document.getElementById('error-message'),
+            errorRetry: document.getElementById('error-retry'),
 
             // Stats
             statTotal: document.getElementById('stat-total'),
@@ -602,11 +618,11 @@ class HouseAccountsController {
         // ShopWorks To-Do button and modal
         if (this.elements.swTodoBtn) {
             this.elements.swTodoBtn.addEventListener('click', () => this.openShopWorksTodoModal());
-            if (this.elements.swTodoClose) this.elements.swTodoClose.addEventListener('click', () => { this.elements.swTodoOverlay.classList.remove('active'); });
+            if (this.elements.swTodoClose) this.elements.swTodoClose.addEventListener('click', () => this.closeShopWorksTodoModal());
             if (this.elements.swTodoCopy) this.elements.swTodoCopy.addEventListener('click', () => this.copyShopWorksTodo());
             if (this.elements.swTodoOverlay) {
                 this.elements.swTodoOverlay.addEventListener('click', (e) => {
-                    if (e.target === this.elements.swTodoOverlay) this.elements.swTodoOverlay.classList.remove('active');
+                    if (e.target === this.elements.swTodoOverlay) this.closeShopWorksTodoModal();
                 });
             }
             this.refreshShopWorksTodoCount();
@@ -628,16 +644,24 @@ class HouseAccountsController {
             });
         }
 
-        // Keyboard shortcuts
+        // Keyboard shortcuts — Esc closes whichever modal is open (incl. the to-do + assign modals).
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 this.closeReconcileModal();
                 this.closeConfirmModal();
                 this.closeGapReportModal();
+                this.closeShopWorksTodoModal();
+                this.closeAssignModal();
+                return;
+            }
+            // Expandable rows/headers are data-call click targets; give them a keyboard path.
+            if ((e.key === 'Enter' || e.key === ' ') && e.target && e.target.matches && e.target.matches('tr[data-call], .gap-rep-header[data-call]')) {
+                e.preventDefault();
+                e.target.click();
             }
         });
 
-        // Stat card click handlers for filtering
+        // Stat tile click handlers for filtering (data-assignee: '' = show all)
         document.querySelectorAll('.stat-card').forEach(card => {
             card.addEventListener('click', () => this.filterByStatCard(card));
         });
@@ -656,25 +680,31 @@ class HouseAccountsController {
      * @param {HTMLElement} card - The clicked stat card
      */
     filterByStatCard(card) {
-        const label = card.querySelector('.stat-label')?.textContent?.trim();
+        // Keyed by data-assignee, not the label text — the total tile's label is "YTD Sales", and
+        // matching on "Total" used to set the assignee filter to a value nobody has (empty grid).
+        const assignee = card.dataset.assignee || '';
+        const alreadyOn = this.service.filters.assignedTo === assignee && assignee !== '';
 
-        // Remove active state from all cards
-        document.querySelectorAll('.stat-card').forEach(c => c.classList.remove('active'));
-
-        if (label === 'Total') {
-            // Show all accounts
+        if (!assignee || alreadyOn) {
+            // Show all accounts (the total tile, or clicking the active tile again)
             this.clearFilters();
-        } else {
-            // Highlight clicked card
-            card.classList.add('active');
-
-            // Set assignee filter to match the label
-            if (this.elements.assigneeSelect) {
-                this.elements.assigneeSelect.value = label;
-            }
-            this.service.filters.assignedTo = label;
-            this.applyFilters();
+            return;
         }
+        this._syncStatTiles(assignee);
+        if (this.elements.assigneeSelect) {
+            this.elements.assigneeSelect.value = assignee;
+        }
+        this.service.filters.assignedTo = assignee;
+        this.applyFilters();
+    }
+
+    /** Highlight + aria-pressed on the tile whose data-assignee matches the active filter. */
+    _syncStatTiles(assignee) {
+        document.querySelectorAll('.stat-card').forEach(c => {
+            const on = (c.dataset.assignee || '') === (assignee || '') && assignee !== '';
+            c.classList.toggle('active', on);
+            c.setAttribute('aria-pressed', on ? 'true' : 'false');
+        });
     }
 
     /**
@@ -719,15 +749,8 @@ class HouseAccountsController {
         const selectedAssignee = this.elements.assigneeSelect?.value || '';
         this.service.filters.assignedTo = selectedAssignee;
 
-        // Sync stat card active state with dropdown
-        document.querySelectorAll('.stat-card').forEach(card => {
-            const label = card.querySelector('.stat-label')?.textContent?.trim();
-            if (selectedAssignee && label === selectedAssignee) {
-                card.classList.add('active');
-            } else {
-                card.classList.remove('active');
-            }
-        });
+        // Sync stat tile active state with dropdown
+        this._syncStatTiles(selectedAssignee);
 
         this.applyFilters();
     }
@@ -748,8 +771,8 @@ class HouseAccountsController {
         if (this.elements.searchInput) this.elements.searchInput.value = '';
         if (this.elements.assigneeSelect) this.elements.assigneeSelect.value = '';
 
-        // Remove active state from all stat cards
-        document.querySelectorAll('.stat-card').forEach(c => c.classList.remove('active'));
+        // Remove active state from all stat tiles
+        this._syncStatTiles('');
 
         this.service.filters = {
             search: '',
@@ -835,8 +858,8 @@ class HouseAccountsController {
 
         const line = document.createElement('div');
         line.id = 'houseDataSubline';
-        line.style.cssText = 'display:flex;align-items:center;gap:6px;color:#6b7280;font-size:11px;margin:6px 0 0;';
-        line.innerHTML = '<i class="fas fa-bolt" style="font-size:10px;"></i><span>Live YTD across ' +
+        line.className = 'house-data-subline';
+        line.innerHTML = '<i class="fas fa-bolt" aria-hidden="true"></i><span>Live YTD across ' +
             accounts + ' house account' + (accounts === 1 ? '' : 's') +
             ' · ' + orders + ' order' + (orders === 1 ? '' : 's') + '</span>';
         grid.insertAdjacentElement('afterend', line);
@@ -861,13 +884,13 @@ class HouseAccountsController {
         if (this.filteredAccounts.length === 0) {
             this.elements.accountsGrid.innerHTML = '';
             if (this.elements.emptyState) {
-                this.elements.emptyState.style.display = 'block';
+                this.elements.emptyState.hidden = false;
             }
             return;
         }
 
         if (this.elements.emptyState) {
-            this.elements.emptyState.style.display = 'none';
+            this.elements.emptyState.hidden = true;
         }
 
         this.elements.accountsGrid.innerHTML = this.filteredAccounts.map(account => {
@@ -885,16 +908,16 @@ class HouseAccountsController {
                                 <h3 class="company-name">${this.escapeHtml(account.CompanyName)}</h3>
                             </div>
                             <span class="current-assignee ${assigneeClass}">
-                                <i class="fas fa-user"></i>&nbsp;${this.escapeHtml(assignee)}
+                                <i class="fas fa-user" aria-hidden="true"></i>&nbsp;${this.escapeHtml(assignee)}
                             </span>
                         </div>
 
                         <div class="account-meta">
                             ${dateAdded ? `
-                                <span><i class="fas fa-calendar-plus"></i> Added: ${dateAdded}</span>
+                                <span><i class="fas fa-calendar-plus" aria-hidden="true"></i> Added: ${dateAdded}</span>
                             ` : ''}
                             ${account.ID_Customer ? `
-                                <span><i class="fas fa-hashtag"></i> ID: ${account.ID_Customer}</span>
+                                <span><i class="fas fa-hashtag" aria-hidden="true"></i> ID: ${account.ID_Customer}</span>
                             ` : ''}
                         </div>
                     </div>
@@ -929,30 +952,44 @@ class HouseAccountsController {
             this.elements.confirmAccountPreview.innerHTML = `
                 <h3 class="company-name">${this.escapeHtml(account.CompanyName)}</h3>
                 <span class="current-assignee">
-                    <i class="fas fa-user"></i>&nbsp;Currently: ${this.escapeHtml(account.Assigned_To || 'Unassigned')}
+                    <i class="fas fa-user" aria-hidden="true"></i>&nbsp;Currently: ${this.escapeHtml(account.Assigned_To || 'Unassigned')}
                 </span>
             `;
         }
 
         if (this.elements.confirmSubmit) {
             this.elements.confirmSubmit.className = `btn-save ${repName.toLowerCase()}`;
-            this.elements.confirmSubmit.innerHTML = `<i class="fas fa-check"></i> Assign to ${repName}`;
+            this.elements.confirmSubmit.innerHTML = `<i class="fas fa-check" aria-hidden="true"></i> Assign to ${repName}`;
         }
 
         // Show modal
-        if (this.elements.confirmModal) {
-            this.elements.confirmModal.classList.add('active');
-        }
+        this._openOverlay(this.elements.confirmModal, this.elements.confirmSubmit);
     }
 
     /**
      * Close confirmation modal
      */
     closeConfirmModal() {
-        if (this.elements.confirmModal) {
-            this.elements.confirmModal.classList.remove('active');
-        }
+        this._closeOverlay(this.elements.confirmModal);
         this.pendingAssignment = null;
+    }
+
+    /** Open a .modal-overlay: remember the opener, move focus in. */
+    _openOverlay(overlay, focusEl) {
+        if (!overlay) return;
+        if (!overlay.classList.contains('active')) overlay._returnFocus = document.activeElement;
+        overlay.classList.add('active');
+        const target = focusEl || overlay.querySelector('.modal-close, button, [tabindex]');
+        if (target && typeof target.focus === 'function') setTimeout(() => target.focus(), 30);
+    }
+
+    /** Close a .modal-overlay and return focus to what opened it (no-op when not open). */
+    _closeOverlay(overlay) {
+        if (!overlay || !overlay.classList.contains('active')) return;
+        overlay.classList.remove('active');
+        const back = overlay._returnFocus;
+        overlay._returnFocus = null;
+        if (back && document.body.contains(back) && typeof back.focus === 'function') back.focus();
     }
 
     /**
@@ -1015,9 +1052,10 @@ class HouseAccountsController {
     /**
      * Show error banner
      */
-    showError(message) {
+    showError(message, retryable) {
         if (this.elements.errorBanner && this.elements.errorMessage) {
             this.elements.errorMessage.textContent = message;
+            if (this.elements.errorRetry) this.elements.errorRetry.hidden = !retryable;
             this.elements.errorBanner.classList.add('show');
         }
     }
@@ -1242,10 +1280,10 @@ class HouseAccountsController {
 
         const getIcon = (status) => {
             switch (status) {
-                case 'fresh': return '<i class="fas fa-check"></i>';
-                case 'stale': return '<i class="fas fa-exclamation"></i>';
-                case 'critical': return '<i class="fas fa-times"></i>';
-                default: return '<i class="fas fa-question"></i>';
+                case 'fresh': return '<i class="fas fa-check" aria-hidden="true"></i>';
+                case 'stale': return '<i class="fas fa-exclamation" aria-hidden="true"></i>';
+                case 'critical': return '<i class="fas fa-times" aria-hidden="true"></i>';
+                default: return '<i class="fas fa-question" aria-hidden="true"></i>';
             }
         };
 
@@ -1287,18 +1325,16 @@ class HouseAccountsController {
      * Open reconcile modal and fetch unassigned customers
      */
     async openReconcileModal() {
-        if (this.elements.reconcileModalOverlay) {
-            this.elements.reconcileModalOverlay.classList.add('active');
-        }
+        this._openOverlay(this.elements.reconcileModalOverlay, this.elements.reconcileModalClose);
         if (this.elements.reconcileLoading) {
-            this.elements.reconcileLoading.style.display = 'flex';
+            this.elements.reconcileLoading.hidden = false;
             this.elements.reconcileLoading.innerHTML = '<span class="loading-spinner"></span> Loading unassigned customers...';
         }
         if (this.elements.reconcileResults) {
-            this.elements.reconcileResults.style.display = 'none';
+            this.elements.reconcileResults.hidden = true;
         }
         if (this.elements.reconcileFooter) {
-            this.elements.reconcileFooter.style.display = 'none';
+            this.elements.reconcileFooter.hidden = true;
         }
 
         try {
@@ -1347,9 +1383,7 @@ class HouseAccountsController {
      * Close reconcile modal
      */
     closeReconcileModal() {
-        if (this.elements.reconcileModalOverlay) {
-            this.elements.reconcileModalOverlay.classList.remove('active');
-        }
+        this._closeOverlay(this.elements.reconcileModalOverlay);
     }
 
     /**
@@ -1379,38 +1413,38 @@ class HouseAccountsController {
      */
     displayReconcileResults(result) {
         if (this.elements.reconcileLoading) {
-            this.elements.reconcileLoading.style.display = 'none';
+            this.elements.reconcileLoading.hidden = true;
         }
         if (this.elements.reconcileResults) {
-            this.elements.reconcileResults.style.display = 'block';
+            this.elements.reconcileResults.hidden = false;
         }
 
         const missingCustomers = result.missingCustomers || [];
 
         if (missingCustomers.length === 0) {
             if (this.elements.reconcileEmpty) {
-                this.elements.reconcileEmpty.style.display = 'block';
+                this.elements.reconcileEmpty.hidden = false;
             }
             if (this.elements.reconcileSummary) {
-                this.elements.reconcileSummary.style.display = 'none';
+                this.elements.reconcileSummary.hidden = true;
             }
             if (this.elements.reconcileTableBody) {
-                this.elements.reconcileTableBody.parentElement.parentElement.style.display = 'none';
+                this.elements.reconcileTableBody.parentElement.parentElement.hidden = true;
             }
             if (this.elements.reconcileFooter) {
-                this.elements.reconcileFooter.style.display = 'flex';
+                this.elements.reconcileFooter.hidden = false;
             }
             if (this.elements.reconcileAddAll) {
-                this.elements.reconcileAddAll.style.display = 'none';
+                this.elements.reconcileAddAll.hidden = true;
             }
             return;
         }
 
         if (this.elements.reconcileEmpty) {
-            this.elements.reconcileEmpty.style.display = 'none';
+            this.elements.reconcileEmpty.hidden = true;
         }
         if (this.elements.reconcileSummary) {
-            this.elements.reconcileSummary.style.display = 'flex';
+            this.elements.reconcileSummary.hidden = false;
         }
 
         if (this.elements.reconcileSummary) {
@@ -1434,7 +1468,7 @@ class HouseAccountsController {
         }
 
         if (this.elements.reconcileTableBody) {
-            this.elements.reconcileTableBody.parentElement.parentElement.style.display = 'block';
+            this.elements.reconcileTableBody.parentElement.parentElement.hidden = false;
             this.elements.reconcileTableBody.innerHTML = missingCustomers.map(customer => {
                 // Determine match status for indicators
                 const orderRep = (customer.rep || '').toLowerCase().trim();
@@ -1444,11 +1478,11 @@ class HouseAccountsController {
                 // Build ShopWorks Rep cell with status indicator
                 let swRepCell = '';
                 if (!customer.inShopWorks) {
-                    swRepCell = '<span class="sw-status sw-not-found"><i class="fas fa-exclamation-triangle"></i> Not in SW</span>';
+                    swRepCell = '<span class="sw-status sw-not-found"><i class="fas fa-exclamation-triangle" aria-hidden="true"></i> Not in SW</span>';
                 } else if (repsMatch) {
-                    swRepCell = `<span class="sw-status sw-match"><i class="fas fa-check"></i> ${this.escapeHtml(customer.shopWorksRep)}</span>`;
+                    swRepCell = `<span class="sw-status sw-match"><i class="fas fa-check" aria-hidden="true"></i> ${this.escapeHtml(customer.shopWorksRep)}</span>`;
                 } else {
-                    swRepCell = `<span class="sw-status sw-mismatch"><i class="fas fa-exchange-alt"></i> ${this.escapeHtml(customer.shopWorksRep || 'House')}</span>`;
+                    swRepCell = `<span class="sw-status sw-mismatch"><i class="fas fa-exchange-alt" aria-hidden="true"></i> ${this.escapeHtml(customer.shopWorksRep || 'House')}</span>`;
                 }
 
                 // Format tier display
@@ -1468,8 +1502,8 @@ class HouseAccountsController {
                     : '<div class="order-item">No order details available</div>';
 
                 return `
-                <tr class="customer-row" data-customer-id="${customer.ID_Customer}" data-company-name="${this.escapeHtml(customer.companyName || '')}" data-call="houseController.toggleOrderDetails" data-args='["$this", "$event"]'>
-                    <td class="expand-toggle"><i class="fas fa-chevron-right"></i></td>
+                <tr class="customer-row" data-customer-id="${customer.ID_Customer}" data-company-name="${this.escapeHtml(customer.companyName || '')}" data-call="houseController.toggleOrderDetails" data-args='["$this", "$event"]' tabindex="0" aria-expanded="false" aria-label="Show orders for ${this.escapeHtml(customer.companyName || ('ID ' + customer.ID_Customer))}">
+                    <td class="expand-toggle"><i class="fas fa-chevron-right" aria-hidden="true"></i></td>
                     <td class="company-name ${!customer.companyName || customer.companyName.startsWith('ID:') ? 'unknown-company' : ''}">
                         ${this.escapeHtml(customer.companyName || `ID: ${customer.ID_Customer}`)}
                         <div class="customer-id">(ID: ${customer.ID_Customer})</div>
@@ -1481,7 +1515,7 @@ class HouseAccountsController {
                     <td class="sales-amount">${this.formatCurrency(customer.totalSales || 0)}</td>
                     <td class="last-order">${this.formatDate(customer.lastOrderDate)}</td>
                     <td class="actions">
-                        <select class="assign-dropdown" onchange="window.houseController.quickAssign(${customer.ID_Customer}, this.value)" data-stop="1">
+                        <select class="assign-dropdown" aria-label="Assign ${this.escapeHtml(customer.companyName || ('ID ' + customer.ID_Customer))} to" data-change="houseController.quickAssignFromSelect" data-change-args='["$this"]' data-stop="1">
                             <option value="">Assign to...</option>
                             <option value="Taneisha Clark">Taneisha Clark</option>
                             <option value="Nika Lao">Nika Lao</option>
@@ -1492,7 +1526,7 @@ class HouseAccountsController {
                         </select>
                     </td>
                 </tr>
-                <tr class="order-details-row" style="display: none;">
+                <tr class="order-details-row" hidden>
                     <td colspan="9">
                         <div class="order-list">
                             <div class="order-list-header">Orders for this customer:</div>
@@ -1505,12 +1539,12 @@ class HouseAccountsController {
         }
 
         if (this.elements.reconcileFooter) {
-            this.elements.reconcileFooter.style.display = 'flex';
+            this.elements.reconcileFooter.hidden = false;
         }
         if (this.elements.reconcileAddAll) {
-            this.elements.reconcileAddAll.style.display = 'inline-flex';
+            this.elements.reconcileAddAll.hidden = false;
             this.elements.reconcileAddAll.disabled = false;
-            this.elements.reconcileAddAll.innerHTML = `<i class="fas fa-plus"></i> Add All ${missingCustomers.length} to House`;
+            this.elements.reconcileAddAll.innerHTML = `<i class="fas fa-plus" aria-hidden="true"></i> Add All ${missingCustomers.length} to House`;
         }
     }
 
@@ -1537,7 +1571,7 @@ class HouseAccountsController {
         } finally {
             if (this.elements.reconcileAddAll) {
                 this.elements.reconcileAddAll.disabled = false;
-                this.elements.reconcileAddAll.innerHTML = '<i class="fas fa-plus"></i> Add All to House';
+                this.elements.reconcileAddAll.innerHTML = '<i class="fas fa-plus" aria-hidden="true"></i> Add All to House';
             }
         }
     }
@@ -1573,8 +1607,12 @@ class HouseAccountsController {
         }
     }
 
+    closeShopWorksTodoModal() {
+        this._closeOverlay(this.elements.swTodoOverlay);
+    }
+
     async openShopWorksTodoModal() {
-        if (this.elements.swTodoOverlay) this.elements.swTodoOverlay.classList.add('active');
+        this._openOverlay(this.elements.swTodoOverlay, this.elements.swTodoClose);
         this.elements.swTodoBody.innerHTML = '<div class="loading-spinner"></div>';
         try {
             const todo = await this.fetchShopWorksTodo();
@@ -1583,7 +1621,7 @@ class HouseAccountsController {
             this.refreshShopWorksTodoCount();
         } catch (e) {
             this.elements.swTodoBody.innerHTML =
-                `<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><h3>Could not load the to-do list</h3><p>${this.escHtml(e.message)} — close and retry.</p></div>`;
+                `<div class="empty-state"><i class="fas fa-exclamation-triangle" aria-hidden="true"></i><h3>Could not load the to-do list</h3><p>${this.escHtml(e.message)} — close and retry.</p></div>`;
         }
     }
 
@@ -1592,21 +1630,21 @@ class HouseAccountsController {
         const reverted = todo.reverted || [];
         if (!pending.length && !reverted.length) {
             this.elements.swTodoBody.innerHTML =
-                '<div class="empty-state"><i class="fas fa-circle-check"></i><h3>All caught up</h3><p>Every dashboard assignment has been confirmed in ShopWorks.</p></div>';
+                '<div class="empty-state"><i class="fas fa-circle-check" aria-hidden="true"></i><h3>All caught up</h3><p>Every dashboard assignment has been confirmed in ShopWorks.</p></div>';
             return;
         }
         const esc = (v) => this.escHtml(v);
-        const fmtDay = (d) => { const x = new Date(d); return isNaN(x) ? '' : x.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }); };
+        const fmtDay = (d) => { const x = HouseAccountsController.parseCalendarDate(d); return x ? x.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : ''; };
         let html = '';
         if (reverted.length) {
-            html += '<h3 class="sw-todo-section sw-todo-section--warn"><i class="fas fa-triangle-exclamation"></i> ShopWorks disagreed — re-key or accept</h3>' +
+            html += '<h3 class="sw-todo-section sw-todo-section--warn"><i class="fas fa-triangle-exclamation" aria-hidden="true"></i> ShopWorks disagreed — re-key or accept</h3>' +
                 '<table class="sw-todo-table"><thead><tr><th>Cust #</th><th>Company</th><th>What happened</th><th></th></tr></thead><tbody>' +
                 reverted.map((r) => `<tr><td>${esc(r.customerId)}</td><td>${esc(r.customerName)}</td><td>${esc(r.notes)}</td>` +
                     `<td><button class="sync-btn sw-todo-dismiss" data-cid="${esc(r.customerId)}" data-cname="${esc(r.customerName)}" data-rep="${esc(r.newRep)}">Accept</button></td></tr>`).join('') +
                 '</tbody></table>';
         }
         if (pending.length) {
-            html += '<h3 class="sw-todo-section"><i class="fas fa-keyboard"></i> Key these into ShopWorks (Cust → Customer Service Rep)</h3>' +
+            html += '<h3 class="sw-todo-section"><i class="fas fa-keyboard" aria-hidden="true"></i> Key these into ShopWorks (Cust → Customer Service Rep)</h3>' +
                 '<table class="sw-todo-table"><thead><tr><th>Cust #</th><th>Company</th><th>Set rep to</th><th>Assigned</th><th></th></tr></thead><tbody>' +
                 pending.map((p) => `<tr><td>${esc(p.customerId)}</td><td>${esc(p.customerName)}</td><td><strong>${esc(p.newRep)}</strong></td><td>${fmtDay(p.actionDate)}</td>` +
                     `<td><button class="sync-btn sw-todo-dismiss" data-cid="${esc(p.customerId)}" data-cname="${esc(p.customerName)}" data-rep="${esc(p.newRep)}">Mark done</button></td></tr>`).join('') +
@@ -1633,7 +1671,7 @@ class HouseAccountsController {
                     previousRep: btn.dataset.rep,
                     newRep: btn.dataset.rep,
                     actionType: 'REASSIGNED',
-                    changedBy: 'Erik',
+                    changedBy: this.staffName || 'Erik',
                     changeSource: 'SYNC',
                     notes: 'Manually marked done on the house page',
                 }),
@@ -1664,14 +1702,12 @@ class HouseAccountsController {
      * Open gap report modal and fetch full reconciliation data
      */
     async openGapReportModal() {
-        if (this.elements.gapReportModalOverlay) {
-            this.elements.gapReportModalOverlay.classList.add('active');
-        }
+        this._openOverlay(this.elements.gapReportModalOverlay, this.elements.gapReportModalClose);
         if (this.elements.gapReportLoading) {
-            this.elements.gapReportLoading.style.display = 'flex';
+            this.elements.gapReportLoading.hidden = false;
         }
         if (this.elements.gapReportContent) {
-            this.elements.gapReportContent.style.display = 'none';
+            this.elements.gapReportContent.hidden = true;
         }
 
         try {
@@ -1688,9 +1724,7 @@ class HouseAccountsController {
      * Close gap report modal
      */
     closeGapReportModal() {
-        if (this.elements.gapReportModalOverlay) {
-            this.elements.gapReportModalOverlay.classList.remove('active');
-        }
+        this._closeOverlay(this.elements.gapReportModalOverlay);
     }
 
     /**
@@ -1718,10 +1752,10 @@ class HouseAccountsController {
      */
     displayGapReport(result) {
         if (this.elements.gapReportLoading) {
-            this.elements.gapReportLoading.style.display = 'none';
+            this.elements.gapReportLoading.hidden = true;
         }
         if (this.elements.gapReportContent) {
-            this.elements.gapReportContent.style.display = 'block';
+            this.elements.gapReportContent.hidden = false;
         }
 
         const reps = result.reps || [];
@@ -1731,7 +1765,7 @@ class HouseAccountsController {
         if (totalConflicts === 0) {
             this.elements.gapReportContent.innerHTML = `
                 <div class="gap-report-empty">
-                    <i class="fas fa-check-circle"></i>
+                    <i class="fas fa-check-circle" aria-hidden="true"></i>
                     <h3>No Authority Conflicts!</h3>
                     <p>All orders match their CRM owners. Great job keeping things in sync!</p>
                 </div>
@@ -1765,7 +1799,7 @@ class HouseAccountsController {
 
             html += `
                 <div class="gap-rep-section">
-                    <div class="gap-rep-header" data-call="houseController.toggleGapRepSection" data-args='["$this"]'>
+                    <div class="gap-rep-header" data-call="houseController.toggleGapRepSection" data-args='["$this"]' role="button" tabindex="0" aria-expanded="true">
                         <div class="gap-rep-info">
                             <span class="gap-rep-avatar">${repInitials}</span>
                             <span class="gap-rep-name">${this.escapeHtml(rep.rep)}</span>
@@ -1773,14 +1807,14 @@ class HouseAccountsController {
                         <div class="gap-rep-stats">
                             <span class="gap-conflict-count">${rep.conflictCount} conflicts</span>
                             <span class="gap-conflict-amount">${this.formatCurrency(rep.totalAmount)}</span>
-                            <i class="fas fa-chevron-down"></i>
+                            <i class="fas fa-chevron-down" aria-hidden="true"></i>
                         </div>
                     </div>
-                    <div class="gap-rep-conflicts" style="display: block;">
+                    <div class="gap-rep-conflicts">
                         ${rep.outboundCount > 0 ? `
                             <div class="gap-conflict-group">
                                 <div class="gap-group-header outbound">
-                                    <i class="fas fa-arrow-right"></i>
+                                    <i class="fas fa-arrow-right" aria-hidden="true"></i>
                                     Outbound: ${rep.outboundCount} customers (${this.formatCurrency(rep.outboundAmount)})
                                     <span class="gap-group-hint">Orders BY ${rep.rep.split(' ')[0]} for customers NOT in their CRM</span>
                                 </div>
@@ -1790,7 +1824,7 @@ class HouseAccountsController {
                         ${rep.inboundCount > 0 ? `
                             <div class="gap-conflict-group">
                                 <div class="gap-group-header inbound">
-                                    <i class="fas fa-arrow-left"></i>
+                                    <i class="fas fa-arrow-left" aria-hidden="true"></i>
                                     Inbound: ${rep.inboundCount} customers (${this.formatCurrency(rep.inboundAmount)})
                                     <span class="gap-group-hint">Orders by OTHER reps for customers IN ${rep.rep.split(' ')[0]}'s CRM</span>
                                 </div>
@@ -1804,7 +1838,7 @@ class HouseAccountsController {
 
         html += `
             <div class="gap-report-footer">
-                <i class="fas fa-info-circle"></i>
+                <i class="fas fa-info-circle" aria-hidden="true"></i>
                 To fix: Change order rep in ShopWorks OR add/move customer in CRM.
                 Report generated: ${new Date(result.generatedAt).toLocaleString()}
             </div>
@@ -1869,8 +1903,8 @@ class HouseAccountsController {
         `).join('');
 
         return `
-            <tr class="gap-conflict-row" data-call="houseController.toggleGapOrderDetails" data-args='["$this"]'>
-                <td class="expand-toggle"><i class="fas fa-chevron-right"></i></td>
+            <tr class="gap-conflict-row" data-call="houseController.toggleGapOrderDetails" data-args='["$this"]' tabindex="0" aria-expanded="false" aria-label="Show orders for ${this.escapeHtml(conflict.companyName || ('ID ' + conflict.ID_Customer))}">
+                <td class="expand-toggle"><i class="fas fa-chevron-right" aria-hidden="true"></i></td>
                 <td class="gap-company">
                     ${this.escapeHtml(conflict.companyName || `ID: ${conflict.ID_Customer}`)}
                     <div class="gap-customer-id">ID: ${conflict.ID_Customer}</div>
@@ -1881,7 +1915,7 @@ class HouseAccountsController {
                 <td class="gap-amount">${this.formatCurrency(conflict.totalSales || 0)}</td>
                 <td class="gap-fix">${fixInstruction}</td>
             </tr>
-            <tr class="gap-orders-row" style="display: none;">
+            <tr class="gap-orders-row" hidden>
                 <td colspan="7">
                     <div class="gap-order-list">
                         <div class="gap-order-list-header">Orders to fix:</div>
@@ -1900,8 +1934,9 @@ class HouseAccountsController {
         const icon = header.querySelector('.fa-chevron-down, .fa-chevron-up');
 
         if (conflictsDiv) {
-            const isHidden = conflictsDiv.style.display === 'none';
-            conflictsDiv.style.display = isHidden ? 'block' : 'none';
+            const isHidden = conflictsDiv.hidden;
+            conflictsDiv.hidden = !isHidden;
+            header.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
 
             if (icon) {
                 icon.classList.toggle('fa-chevron-down', !isHidden);
@@ -1918,8 +1953,9 @@ class HouseAccountsController {
         const icon = row.querySelector('.expand-toggle i');
 
         if (detailsRow && detailsRow.classList.contains('gap-orders-row')) {
-            const isHidden = detailsRow.style.display === 'none';
-            detailsRow.style.display = isHidden ? 'table-row' : 'none';
+            const isHidden = detailsRow.hidden;
+            detailsRow.hidden = !isHidden;
+            row.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
 
             if (icon) {
                 icon.classList.toggle('fa-chevron-right', !isHidden);
@@ -1953,11 +1989,11 @@ class HouseAccountsController {
         // Create and show modal
         const modalHtml = `
             <div class="modal-overlay active" id="assign-modal-overlay">
-                <div class="modal-content" style="max-width: 480px;">
+                <div class="modal-content modal-content--narrow" role="dialog" aria-modal="true" aria-labelledby="assign-modal-title">
                     <div class="modal-header">
-                        <h2>Assign Customer</h2>
-                        <button class="close-btn" data-call="houseController.closeAssignModal">
-                            <i class="fas fa-times"></i>
+                        <h2 id="assign-modal-title">Assign Customer</h2>
+                        <button type="button" class="close-btn" aria-label="Close" data-call="houseController.closeAssignModal">
+                            <i class="fas fa-times" aria-hidden="true"></i>
                         </button>
                     </div>
                     <div class="modal-body">
@@ -1984,14 +2020,14 @@ class HouseAccountsController {
                             </div>
 
                             <div class="assign-rep-buttons">
-                                <button class="btn-assign-rep taneisha" data-rep="Taneisha" data-call="houseController.selectAssignRep" data-args='["Taneisha"]'>
-                                    <i class="fas fa-user"></i> Taneisha
+                                <button type="button" class="btn-assign-rep taneisha" data-rep="Taneisha" aria-pressed="false" data-call="houseController.selectAssignRep" data-args='["Taneisha"]'>
+                                    <i class="fas fa-user" aria-hidden="true"></i> Taneisha
                                 </button>
-                                <button class="btn-assign-rep nika" data-rep="Nika" data-call="houseController.selectAssignRep" data-args='["Nika"]'>
-                                    <i class="fas fa-user"></i> Nika
+                                <button type="button" class="btn-assign-rep nika" data-rep="Nika" aria-pressed="false" data-call="houseController.selectAssignRep" data-args='["Nika"]'>
+                                    <i class="fas fa-user" aria-hidden="true"></i> Nika
                                 </button>
-                                <button class="btn-assign-rep house" data-rep="House" data-call="houseController.selectAssignRep" data-args='["House"]'>
-                                    <i class="fas fa-building"></i> House
+                                <button type="button" class="btn-assign-rep house" data-rep="House" aria-pressed="false" data-call="houseController.selectAssignRep" data-args='["House"]'>
+                                    <i class="fas fa-building" aria-hidden="true"></i> House
                                 </button>
                             </div>
 
@@ -2009,20 +2045,23 @@ class HouseAccountsController {
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button class="btn-cancel" data-call="houseController.closeAssignModal">Cancel</button>
-                        <button class="btn-save" id="confirm-assign-btn" data-call="houseController.confirmAssignFromReconcile">
-                            <i class="fas fa-check"></i> Assign
+                        <button type="button" class="btn-cancel" data-call="houseController.closeAssignModal">Cancel</button>
+                        <button type="button" class="btn-save" id="confirm-assign-btn" data-call="houseController.confirmAssignFromReconcile">
+                            <i class="fas fa-check" aria-hidden="true"></i> Assign
                         </button>
                     </div>
                 </div>
             </div>
         `;
 
-        // Add modal to page
+        // Add modal to page (remember the opener so Close returns focus)
+        this._assignReturnFocus = document.activeElement;
         const container = document.createElement('div');
         container.id = 'assign-modal-container';
         container.innerHTML = modalHtml;
         document.body.appendChild(container);
+        const firstRep = container.querySelector('.btn-assign-rep');
+        if (firstRep) setTimeout(() => firstRep.focus(), 30);
 
         // Pre-select rep based on ShopWorks or Order rep
         const suggestedRep = this.suggestRep(customer);
@@ -2046,8 +2085,9 @@ class HouseAccountsController {
         const icon = row.querySelector('.expand-toggle i');
 
         if (detailsRow && detailsRow.classList.contains('order-details-row')) {
-            const isHidden = detailsRow.style.display === 'none';
-            detailsRow.style.display = isHidden ? 'table-row' : 'none';
+            const isHidden = detailsRow.hidden;
+            detailsRow.hidden = !isHidden;
+            row.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
 
             if (icon) {
                 icon.classList.toggle('fa-chevron-right', !isHidden);
@@ -2061,6 +2101,14 @@ class HouseAccountsController {
      * @param {number} customerId - The customer ID to assign
      * @param {string} repName - The rep to assign to
      */
+    /** data-change target for the reconcile table's Assign dropdown (was an inline onchange). */
+    quickAssignFromSelect(select) {
+        const row = select.closest('tr');
+        const id = row ? Number(row.dataset.customerId) : NaN;
+        if (!isFinite(id)) return;
+        this.quickAssign(id, select.value);
+    }
+
     async quickAssign(customerId, repName) {
         if (!repName) return;
 
@@ -2142,7 +2190,7 @@ class HouseAccountsController {
                     previousRep: previousRep,
                     newRep: newRep,
                     actionType: previousRep === 'Unassigned' ? 'ASSIGNED' : 'REASSIGNED',
-                    changedBy: 'Erik',
+                    changedBy: this.staffName || 'Erik',
                     changeSource: changeSource,
                     relatedOrders: orderNumbers
                 })
@@ -2181,16 +2229,16 @@ class HouseAccountsController {
         // If no more customers, show empty state
         if (this.missingCustomersCache && this.missingCustomersCache.length === 0) {
             if (this.elements.reconcileEmpty) {
-                this.elements.reconcileEmpty.style.display = 'block';
+                this.elements.reconcileEmpty.hidden = false;
             }
             if (this.elements.reconcileSummary) {
-                this.elements.reconcileSummary.style.display = 'none';
+                this.elements.reconcileSummary.hidden = true;
             }
             if (this.elements.reconcileTableBody) {
-                this.elements.reconcileTableBody.parentElement.parentElement.style.display = 'none';
+                this.elements.reconcileTableBody.parentElement.parentElement.hidden = true;
             }
             if (this.elements.reconcileAddAll) {
-                this.elements.reconcileAddAll.style.display = 'none';
+                this.elements.reconcileAddAll.hidden = true;
             }
         }
     }
@@ -2222,7 +2270,7 @@ class HouseAccountsController {
 
         // Update "Add All" button count
         if (this.elements.reconcileAddAll && customers.length > 0) {
-            this.elements.reconcileAddAll.innerHTML = `<i class="fas fa-plus"></i> Add All ${customers.length} to House`;
+            this.elements.reconcileAddAll.innerHTML = `<i class="fas fa-plus" aria-hidden="true"></i> Add All ${customers.length} to House`;
         }
     }
 
@@ -2252,10 +2300,9 @@ class HouseAccountsController {
 
         // Update button states
         document.querySelectorAll('.btn-assign-rep').forEach(btn => {
-            btn.classList.remove('selected');
-            if (btn.dataset.rep === repName) {
-                btn.classList.add('selected');
-            }
+            const on = btn.dataset.rep === repName;
+            btn.classList.toggle('selected', on);
+            btn.setAttribute('aria-pressed', on ? 'true' : 'false');
         });
 
         // Update tier dropdown options
@@ -2294,11 +2341,13 @@ class HouseAccountsController {
      */
     closeAssignModal() {
         const container = document.getElementById('assign-modal-container');
-        if (container) {
-            container.remove();
-        }
+        if (!container) return;
+        container.remove();
         this.pendingReconcileAssignment = null;
         this.selectedAssignRep = null;
+        const back = this._assignReturnFocus;
+        this._assignReturnFocus = null;
+        if (back && document.body.contains(back) && typeof back.focus === 'function') back.focus();
     }
 
     /**
@@ -2400,7 +2449,7 @@ class HouseAccountsController {
         } finally {
             if (confirmBtn) {
                 confirmBtn.disabled = false;
-                confirmBtn.innerHTML = '<i class="fas fa-check"></i> Assign';
+                confirmBtn.innerHTML = '<i class="fas fa-check" aria-hidden="true"></i> Assign';
             }
         }
     }
@@ -2437,12 +2486,25 @@ class HouseAccountsController {
     formatDate(dateStr) {
         if (!dateStr) return '';
         try {
-            const date = new Date(dateStr);
-            if (isNaN(date.getTime())) return '';
+            const date = HouseAccountsController.parseCalendarDate(dateStr);
+            if (!date) return '';
             return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
         } catch {
             return '';
         }
+    }
+
+    /**
+     * Caspio date fields arrive as "YYYY-MM-DD" or "YYYY-MM-DDT00:00:00(.000)(Z)". `new Date()` reads
+     * those as UTC midnight = the previous evening in Pacific, so every date displayed a day early.
+     * Calendar-day shapes are built as LOCAL dates; anything else goes through Date as before.
+     */
+    static parseCalendarDate(value) {
+        const s = String(value == null ? '' : value).trim();
+        if (!s) return null;
+        const m = /^(\d{4})-(\d{2})-(\d{2})(?:T00:00:00(?:\.0+)?Z?)?$/.exec(s);
+        const d = m ? new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3])) : new Date(s);
+        return isNaN(d.getTime()) ? null : d;
     }
 
     /**
