@@ -537,7 +537,9 @@ img { max-width: 100%; }
 .cp-table .cp-cell-actions { text-align: right; }
 /* Long ShopWorks design names ("P1008, Aaberg's - Navy, Black, Red, …") used to push the
    Status/Actions columns off the right edge even on a 1500px desktop. Clamp + tooltip. */
-.cp-table td.cp-cell-design { max-width: clamp(160px, 20vw, 340px); overflow: hidden; text-overflow: ellipsis; }
+/* max-width:0 + a % width makes the design column absorb whatever is left after the fixed
+   columns (auto table layout), so the table never grows past its card. */
+.cp-table td.cp-cell-design { max-width: 0; width: 34%; overflow: hidden; text-overflow: ellipsis; }
 .cp-table td:first-child .cp-cell-sub { max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .cp-search-item.is-active, .cp-search-item[aria-selected="true"] { background: var(--cp-green-50); }
 .cp-table .cp-cell-actions .cp-btn + .cp-btn { margin-left: 6px; }
