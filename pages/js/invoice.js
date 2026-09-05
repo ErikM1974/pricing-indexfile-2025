@@ -1289,7 +1289,7 @@
         const result = await resp.json();
 
         if (result.skipped) {
-          alert(`Skipped: ${result.message || result.reason}`);
+          ToastNotifications.info(`Skipped: ${result.message || result.reason}`);
           this.updateShipStationButton();
           return;
         }
@@ -1305,13 +1305,13 @@
         this.updateShipStationButton();
 
         if (result.alreadySent) {
-          alert(`Already in ShipStation as #${result.shipstationOrderId}. No duplicate created.`);
+          ToastNotifications.success(`Already in ShipStation as #${result.shipstationOrderId}. No duplicate created.`);
         } else {
-          alert(`✓ Sent to ShipStation as #${result.shipstationOrderId}. The warehouse can now buy a label.`);
+          ToastNotifications.success(`✓ Sent to ShipStation as #${result.shipstationOrderId}. The warehouse can now buy a label.`);
         }
       } catch (err) {
         console.error('[invoice] sendToShipStation failed:', err);
-        alert('Failed to send to ShipStation:\n\n' + err.message);
+        ToastNotifications.error('Failed to send to ShipStation:\n\n' + err.message);
         this.updateShipStationButton();
       }
     }
@@ -1456,7 +1456,7 @@
       } catch (err) {
         console.error('[invoice] sync failed:', err);
         if (showSpinner) {
-          alert('Sync failed. Try again in a moment, or open the order in ShopWorks.');
+          ToastNotifications.error('Sync failed. Try again in a moment, or open the order in ShopWorks.');
         }
       } finally {
         if (showSpinner) {
