@@ -1,3 +1,8 @@
+## v2026.09.05.12 (2026.09.05)
+
+- Staff-page consistency sweep: 25 more pages extracted, one Font Awesome build, favicons everywhere, manual nav data-driven
+- Deploy v2026.09.05.12: 25 files (DrainPro-Bundle.html,bundle-orders-dashboard.html,staff-portal-simple.html,...)
+
 ## v2026.09.05.10 (2026.09.05)
 
 - Detail pages: 45 blocking alert() dialogs become toasts; shared toast module styled and XSS-safe
