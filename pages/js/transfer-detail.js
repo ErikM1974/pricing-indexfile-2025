@@ -1888,7 +1888,9 @@
         var crumbCurrent = $('bt-breadcrumb-current');
         if (crumbCurrent) crumbCurrent.textContent = state.transferId;
 
-        loadUser();
+        // Let the SAML identity hydrate the legacy keys first (fresh tab) so the
+        // "Who are you?" modal never asks a signed-in rep (2026-09-05).
+        (typeof StaffAuthHelper !== 'undefined' ? StaffAuthHelper.ready() : Promise.resolve()).then(loadUser);
 
         // Wire up close buttons on all modals
         document.querySelectorAll('[data-close]').forEach(function (btn) {

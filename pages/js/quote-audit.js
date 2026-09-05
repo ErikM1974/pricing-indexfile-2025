@@ -11,7 +11,9 @@ class QuoteAuditPage {
     }
 
     async init() {
-        // Staff gate
+        // Staff gate — hydrate from the SAML session first (a fresh tab has no
+        // sessionStorage, and the gate used to send signed-in staff to the login card).
+        if (typeof StaffAuthHelper !== 'undefined' && StaffAuthHelper.ready) await StaffAuthHelper.ready();
         if (typeof StaffAuthHelper === 'undefined' || !StaffAuthHelper.isLoggedIn()) {
             document.getElementById('loading-state').style.display = 'none';
             document.getElementById('auth-gate').style.display = 'flex';
