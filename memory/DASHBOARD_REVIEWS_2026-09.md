@@ -407,3 +407,28 @@ strong: no onclick, every input labelled, swatches/upgrade table fit, 0 console 
 Left alone: swatch grid "blank boxes" on first paint are lazy-load timing (82 unique colours, every
 image resolves); the size matrix legitimately scrolls inside its own wrapper on phones.
 
+## Customer login page (+ vendor twin) — review, 10 items (2026-09-05, `v2026.09.05.26`)
+
+`/customer/login` (`pages/customer-login.html/.js`, `customer-login.css`) — `pages/vendor-login.html/.js`
+share the markup and CSS, so every item landed on both. Reviewed live (expired state) + every
+state on `static-dist` with fetch stubbed (429 / rejected / 404). Shipped:
+
+1. 🔴 **Deep links were dropped** — `?next=` from the gate never reached the emailed link (see
+   LESSONS 2026-09-05). Now forwarded end-to-end through one `safeLoginNext()` allow-list.
+2. **Invalid email** — `novalidate` + `if (!email)` let "not-an-email" through to a fake "check your
+   email". Now a visible inline message + `aria-invalid` red border; clears on input.
+3. **Rate limiter / offline were hidden** — 429 and a rejected fetch showed the sent state (a lie
+   for the offline case). Both are now told to the user; every other response stays the SAME sent
+   state (no enumeration — a 429 does not reveal whether an email is on file).
+4. **"try again" reloaded the page** (losing `?next=`) — now returns to the form in place, resets the
+   button, focuses the field.
+5. **Notice a11y** — `role="alert"` on the notice; the sent heading is `tabindex=-1` and takes focus.
+6. **Field** — `autofocus autocapitalize=off spellcheck=false`; vendor page gained the sr label.
+7. **Contrast** — footer `#bbb` (1.9:1) → `#66736a`, hint `#999` → `#5f6b63`; footer link green.
+8. **Keyboard focus** visible on the button and links (`:focus-visible`).
+9. **Phone** — ≤420px card padding/logo trimmed; `noindex,nofollow` on the customer page too.
+10. Lock: `tests/unit/customer-login-page.test.js` (both pages + server).
+
+Not done: the login form is never SUBMITTED live (that emails a real link) — the sent path was
+proven locally with the POST 404ing and with fetch stubbed.
+

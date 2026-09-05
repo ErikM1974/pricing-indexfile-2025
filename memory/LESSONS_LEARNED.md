@@ -6,42 +6,7 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 ---
 
 ### Bonus hero dial + CTA wrap-hole (2026-09-01, ARCHIVED 2026-09-03): variable-width money never lives inside a fixed ring (ring holds the %, dollars beside it); flex-wrap breaks lines on MAX-CONTENT width, not post-shrink width — give the sibling `flex:1 1 0`. Full entry in archive.
-## First real custom-tees order: proforma hid data the session already had; ShopWorks dates were UTC days (2026-09-01)
-
-**Problem.** Real paid order DTG0831-2727 ($68.99 CC, ship Eugene OR): the pre-import
-proforma (`/invoice/:id`) showed Ship To "—", REQ SHIP DATE "—", Bill To with no street,
-and "2 @ $29.50 = $61.00" (doesn't foot). ShopWorks also recorded the order/payment as
-08/31 though the customer paid Sun 8/30 7:38 PM Pacific.
-
-**Root cause.** (1) invoice.js only read `pushed.ShippingAddresses` (exists post-import)
-or `originalSubmission.ship` (quote-builders only) — storefront orders keep the address in
-the flat `CustomerDataJSON`/`OrderSettingsJSON` session columns it never parsed. (2)
-Storefront quote_items store the BASE-size price in `FinalUnitPrice` with extended-size
-upcharges only in `LineTotal`, and `SizeBreakdown` was never rendered. (3) The push stamped
-`new Date().toISOString()` = the UTC day — every order after ~5 PM PT dates +1 in ShopWorks.
-Also: `″` (U+2033) in push notes → "?" (ManageOrders is cp1252); `requestedShipDate` was
-never sent though the proxy supports it and `shipPromise.iso` is stamped at checkout.
-
-**Solution.** invoice.js: lazy `storefrontCustomerData()/storefrontOrderSettings()` blob
-parsers feeding Ship-To/Bill-To/req-ship-date fallbacks; blended unit price when
-unit×qty ≠ LineTotal + render SizeBreakdown; `parseDateSafe()` so bare `YYYY-MM-DD` renders
-local, not UTC-shifted a day early. server.js push: `orderDate`/payment `date`/samples dates
-= `nowPacificNaiveIso().split('T')[0]`; send `requestedShipDate: shipPromise.iso`; `″`→" in".
-
-**Prevention.** A "blank" field on a pre-import surface is usually a READER gap, not missing
-data — check the session's JSON blob columns before touching the push. Any date written to
-ShopWorks/Caspio must be the PACIFIC day (`nowPacificNaiveIso()`), and any bare date STRING
-rendered in the browser must not go through `new Date('YYYY-MM-DD')`. Push text stays cp1252.
-
-**Post-import follow-ups (2026-09-01, hand-linked as WO 142999).** The session was stuck in
-`Payment Confirmed` because the webhook's Processed PUT failed on 8/30 — the hourly bulk-sync
-only touches PROCESSED quotes, so a stuck session NEVER self-links; the fix is a manual
-`POST sync-from-shopworks` with the WO#. Two invoice nits fixed the same day: `parseDateSafe()`
-treats ManageOrders' `T00:00:00.000Z` date-only shape as a calendar day (req-ship rendered Sep 3
-instead of Sep 4), and Bill To prefers the storefront checkout's CustomerDataJSON identity/billing
-over the catch-all-2791 record — Erik's rule: the invoice bills the BUYER even though storefront
-orders land on the catch-all customer.
-
+### First real custom-tees order: proforma hid data the session already had; ShopWorks dates were UTC days (2026-09-01, ARCHIVED 2026-09-05): a blank pre-import field is usually a READER gap (parse the session's JSON blob columns); every date written to ShopWorks/Caspio is the PACIFIC day (`nowPacificNaiveIso()`); a session stuck in `Payment Confirmed` NEVER self-links — manual `POST sync-from-shopworks` with the WO#. Full entry in archive.
 ### An audit reported a clean manifest as 26 missing POs (2026-08-26, ARCHIVED 2026-09-02): a check must distinguish "I looked and it isn't there" from "I never looked" and SAY WHICH — refresh the arrival span itself, compare mirror lastSync <= manifest date, and a failed fetch marks the run INCONCLUSIVE, never missing. Full entry in archive.
 ### curl from git-bash mangled em dashes into U+FFFD (2026-08-25, ARCHIVED 2026-09-01): non-ASCII Caspio writes go through Python `ensure_ascii=True`, never a git-bash curl body; verify stored text with `ascii()` on a re-read. Full entry in archive.
 ### A customer's real size request was shown to nobody (2026-08-19, ARCHIVED 2026-08-27): render every field you persist — a saved-but-unshown field is data loss with extra steps. Full entry in archive.
@@ -248,3 +213,28 @@ consolidation set is the only filter; add to it, never to the query.
 **Root cause:** that page's `esc()` is the `div.textContent → innerHTML` trick, which escapes `< > &` but NOT `"`, so the JSON's quotes ended the attribute early.
 **Solution:** escape for an attribute (`&amp; &quot; &lt;`) — `JSON.stringify(...).replace(/"/g,'&quot;')`; the quote-builder `escapeHtml()` and portal-directory `escapeAttr()` already do.
 **Prevention:** the delegator reports a bad `data-args` as a visible error (never silent); when writing JSON into a `data-*` attribute inside a template literal, check the page's escaper handles `"` first. Lock: `tests/unit/staff-pages-datacall.test.js`.
+
+## 2026-09-05 — Customer login dropped the deep link it was handed (`v2026.09.05.26`)
+
+**Problem.** A customer following a link to `/portal/product/PC54` (or any portal page) was bounced
+to `/customer/login?next=%2Fportal%2Fproduct%2FPC54`, signed in, and landed on the portal HOME.
+Same on the vendor twin.
+
+**Root cause.** Three parties each did half the job and nobody owned the hand-off: the gate
+(`requireCustomer`) put `?next=` on the login URL, `/auth/customer/verify` honoured `?next=` on the
+magic link — but the login page never read `?next=` and `request-link` never put it on the link it
+emailed. Both ends were "ready" and the middle was missing, so it looked wired in every code review.
+
+**Solution.** `customer-login.js`/`vendor-login.js` read `?next=`, keep it only under their own prefix,
+and post it with the email; both `request-link` routes append `&next=` to the emailed link; both
+`verify` routes and both request routes validate through ONE `safeLoginNext(raw, prefix)` (same-site
+path under the prefix, no `//`, no scheme, no whitespace/`<>`, ≤400 chars). Locked in
+`tests/unit/customer-login-page.test.js`.
+
+**Prevention.** A parameter that is *produced* on one route and *consumed* on another must have the
+carrying hop tested end-to-end — grep every place the name appears and make sure each one is a link
+in the same chain, not an island. Any redirect target that arrives from the client goes through a
+single allow-list helper, never an inline `startsWith`. 🔑 Verification trap: while the Browser pane
+is hidden, CSS transitions never advance, so `getComputedStyle` returns the START colour of a
+transitioned property — check `el.matches(selector)` / `getAnimations()` before calling a rule broken.
+
