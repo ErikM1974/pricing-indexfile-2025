@@ -58,7 +58,7 @@
 
 </head>
 <body class="scp-builder qb-shell-body">
-    <nav aria-label="Skip link"><a href="#" class="qb-skip-link" onclick="document.querySelector('[role=main]').focus(); return false;">Skip to quote builder</a></nav><!-- qb-shell-body: 2026 PNW shell (Inter + tabular numerals + birch ground) — built 2026-06, had ZERO adopters until 2026-07-07 (expert audit) --><!-- scoping hook for Option C page-flow overrides (2026-06-07) -->
+    <nav aria-label="Skip link"><a href="#" class="qb-skip-link" data-call="qbFocusMain" data-prevent="1">Skip to quote builder</a></nav><!-- qb-shell-body: 2026 PNW shell (Inter + tabular numerals + birch ground) — built 2026-06, had ZERO adopters until 2026-07-07 (expert audit) --><!-- scoping hook for Option C page-flow overrides (2026-06-07) -->
     <!-- Loading Overlay -->
     <div id="loading-overlay" class="loading-overlay">
         <div class="loading-spinner"></div>
@@ -78,10 +78,10 @@
             <div class="power-header-subtitle">Screen Printing</div>
         </div>
         <div class="header-actions">
-            <button class="btn-header btn-new-quote" onclick="confirmNewQuote()">
+            <button class="btn-header btn-new-quote" data-call="confirmNewQuote">
                 <i class="fas fa-plus"></i> New Quote
             </button>
-            <button class="btn-header" onclick="window.location.href='/staff-dashboard.html'">
+            <button class="btn-header" data-href="/staff-dashboard.html">
                 <i class="fas fa-arrow-left"></i> Dashboard
             </button>
         </div>
@@ -368,7 +368,7 @@
                 </div>
 
                 <!-- Add Row Button -->
-                <button class="add-row-btn" onclick="addNewRow()">
+                <button class="add-row-btn" data-call="addNewRow">
                     <i class="fas fa-plus"></i> Add Product (or press Tab from last cell)
                 </button>
 
@@ -385,21 +385,21 @@
                 </div>
 
                 <!-- Extended Size Picker Backdrop -->
-                <div id="size-popup-backdrop" class="size-popup-backdrop hidden" onclick="closeExtendedSizePopup()"></div>
+                <div id="size-popup-backdrop" class="size-popup-backdrop hidden" data-call="closeExtendedSizePopup"></div>
 
                 <!-- Extended Size Picker Popup (for Size06/Other sizes) -->
                 <div id="extended-size-popup" class="size-popup hidden">
                     <div class="size-popup-header">
                         <h4><i class="fas fa-ruler"></i> Extended Sizes (Size06)</h4>
-                        <button class="size-popup-close" onclick="closeExtendedSizePopup()">&times;</button>
+                        <button class="size-popup-close" data-call="closeExtendedSizePopup">&times;</button>
                     </div>
                     <p class="size-popup-hint">Enter quantities for extended sizes. These create separate line items.</p>
                     <div class="size-popup-grid" id="size-popup-grid">
                         <!-- Size inputs generated dynamically -->
                     </div>
                     <div class="size-popup-actions">
-                        <button class="size-popup-cancel" onclick="closeExtendedSizePopup()">Cancel</button>
-                        <button class="size-popup-apply" onclick="applyExtendedSizes()">
+                        <button class="size-popup-cancel" data-call="closeExtendedSizePopup">Cancel</button>
+                        <button class="size-popup-apply" data-call="applyExtendedSizes">
                             <i class="fas fa-check"></i> Apply Changes
                         </button>
                     </div>
@@ -411,7 +411,7 @@
                  Phase A (2026-07-07): default-COLLAPSED to calm the page — the badge stays visible in the
                  header, and autoExpandFeesOnFirstCharge() opens it once when a saved fee loads. -->
             <div class="additional-charges-panel" style="margin: 0 0 14px;">
-                <div class="charges-header" onclick="toggleFeesCharges()">
+                <div class="charges-header" data-call="toggleFeesCharges">
                     <div class="d-flex align-items-center gap-2">
                         <i class="fas fa-plus-circle"></i>
                         <span>More services &amp; fees</span>
@@ -451,7 +451,7 @@
                                 <input type="number" id="rush-fee" aria-label="Rush fee in dollars" class="quote-input"
                                        min="0" step="0.01" placeholder="0.00"
                                        onchange="updateAdditionalCharges()">
-                                <button type="button" class="btn-rush-percent" onclick="applyRushPercent()" title="Fill from the live rush rate (Caspio RUSH service code) as a % of the quote — re-click if the quote changes afterward"><i class="fas fa-bolt"></i> auto %</button>
+                                <button type="button" class="btn-rush-percent" data-call="applyRushPercent" title="Fill from the live rush rate (Caspio RUSH service code) as a % of the quote — re-click if the quote changes afterward"><i class="fas fa-bolt"></i> auto %</button>
                             </div>
                         </div>
                         <div class="charge-field qb-m0">
@@ -490,7 +490,7 @@
                     <!-- Shared UPS Ground estimator — reads the .os-ship-* fields + SanMar product weights, writes .os-shipping-fee -->
                     <div class="estimate-ship-row" id="spc-estimate-row" style="margin: 8px 0 0;">
                         <label><input type="checkbox" id="ship-residential"> Residential delivery (+ UPS surcharge)</label>
-                        <button type="button" id="estimate-ship-btn" class="estimate-ship-btn" onclick="estimateShipping()">
+                        <button type="button" id="estimate-ship-btn" class="estimate-ship-btn" data-call="estimateShipping">
                             <i class="fas fa-truck-fast"></i> Estimate UPS Ground
                         </button>
                         <div id="estimate-ship-result" class="estimate-ship-result"></div>
@@ -543,7 +543,7 @@
             <div class="sidebar-scroll-container">
             <!-- Customer Info (moved above Quote Summary 2026-03-23) -->
             <div class="customer-panel" style="padding: 12px 16px; border-bottom: 1px solid #e5e7eb; margin: -16px -16px 16px -16px;">
-                <div class="customer-panel-header qb-mb8" onclick="document.getElementById('spc-customer-fields').classList.toggle('hidden')" tabindex="0" role="button" aria-label="Toggle customer details" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">
+                <div class="customer-panel-header qb-mb8" data-toggle-hidden="spc-customer-fields" tabindex="0" role="button" aria-label="Toggle customer details" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">
                     <h4 style="display: flex; align-items: center; gap: 6px;"><i class="fas fa-user" style="color: #2e5827;"></i> Customer</h4>
                     <i class="fas fa-chevron-down" style="font-size: 12px; color: #999;"></i>
                 </div>
@@ -722,24 +722,24 @@
                      clicking it auto-SAVES first (scpPushToShopWorks → saveAndGetLink) then opens the review
                      preview. Push via /api/scp-push/push-quote; until Erik creates a dedicated SCP OnSite
                      integration these land under the EMB integration (caspio-pricing-proxy/config/manageorders-scp-config.js). -->
-                <button id="scp-push-shopworks-btn" class="btn-action btn-push-shopworks" onclick="scpPushToShopWorks()" disabled
+                <button id="scp-push-shopworks-btn" class="btn-action btn-push-shopworks" data-call="scpPushToShopWorks" disabled
                         title="Complete the Before-you-push checklist (Customer #, a product, name + email) to enable push">
                     <i class="fas fa-upload"></i> <span id="scp-push-shopworks-label">Push to ShopWorks</span>
                 </button>
                 <!-- Save & Get Shareable Link — always visible (flagship parity) -->
-                <button class="btn-action btn-secondary-action btn-share-link" onclick="saveAndGetLink()">
+                <button class="btn-action btn-secondary-action btn-share-link" data-call="saveAndGetLink">
                     <i class="fas fa-link"></i> Save & Get Shareable Link
                 </button>
-                <button class="btn-action btn-secondary-action" onclick="copyToClipboard()">
+                <button class="btn-action btn-secondary-action" data-call="copyToClipboard">
                     <i class="fas fa-copy"></i> Copy Quote to Clipboard
                 </button>
-                <button class="btn-action btn-secondary-action" onclick="printQuote()">
+                <button class="btn-action btn-secondary-action" data-call="printQuote">
                     <i class="fas fa-print"></i> Print Quote
                 </button>
-                <button class="btn-action btn-secondary-action" onclick="saveQuotePdf()" title="Opens the print window with a reminder to pick 'Save as PDF' as the destination — downloads the quote as a PDF file">
+                <button class="btn-action btn-secondary-action" data-call="saveQuotePdf" title="Opens the print window with a reminder to pick 'Save as PDF' as the destination — downloads the quote as a PDF file">
                     <i class="fas fa-file-pdf"></i> Save as PDF
                 </button>
-                <button class="btn-action btn-secondary-action btn-email-quote" onclick="spcEmailQuote()">
+                <button class="btn-action btn-secondary-action btn-email-quote" data-call="spcEmailQuote">
                     <i class="fas fa-envelope"></i> Email Quote
                 </button>
             </div>
@@ -754,15 +754,15 @@
         <div class="modal-content" style="width: 660px; max-width: 94%;">
             <div class="modal-header">
                 <h3><i class="fas fa-upload"></i> Push to ShopWorks — Review Order</h3>
-                <button class="modal-close" onclick="closeScpPushPreview()">&times;</button>
+                <button class="modal-close" data-call="closeScpPushPreview">&times;</button>
             </div>
             <div class="modal-body">
                 <div id="scp-push-status"></div>
                 <div id="scp-push-preview"></div>
             </div>
             <div class="modal-footer">
-                <button class="btn-action btn-secondary-action" onclick="closeScpPushPreview()" style="background: #6c757d;">Cancel</button>
-                <button id="scp-push-confirm" class="btn-action btn-primary-action" onclick="confirmScpPush()">
+                <button class="btn-action btn-secondary-action" data-call="closeScpPushPreview" style="background: #6c757d;">Cancel</button>
+                <button id="scp-push-confirm" class="btn-action btn-primary-action" data-call="confirmScpPush">
                     <i class="fas fa-upload"></i> Push to ShopWorks
                 </button>
             </div>

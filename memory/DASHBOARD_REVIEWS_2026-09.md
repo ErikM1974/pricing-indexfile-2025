@@ -252,3 +252,33 @@ Releases `v2026.09.04.1 → .9`. Detail here; MEMORY.md carries one line each.
   after it.
 - Local esbuild hashes differ from Heroku's for CRLF working copies — read the LIVE
   `/dist/asset-manifest.json` for the real names when verifying.
+
+## Quote builders review — all 4 (2026-09-05, `v2026.09.05.13`)
+
+Review scope was the shell, wiring, dialogs and labels — **pricing logic untouched** (parity
+84/84 + full unit 3,546 green before and after). Items shipped:
+
+1. **~150 inline `onclick=` → ONE data-call delegator** in `quote-builder-utils.js`
+   (`qbInstallCallDelegator`): `data-call="fn" data-args='[…]'`, `data-href`,
+   `data-toggle-hidden`, `data-stop`, `data-self-only`, `data-prevent`; `"$this"`/`"$event"`
+   arg tokens; dotted names resolve off `window`. A missing global shows a **toast** ("That
+   action isn't available (fn) — refresh…") instead of a silent dead click. Converted: the 4
+   pages (60/21/26/3), the rendered templates in emb/dtf/scp `product-rows`, emb
+   `pricing-sync`, `design-search`, `shopworks-import`, dtg `form-core`, plus the classic
+   shared scripts (`quote-builder-utils` thumbnail + order-shipping header,
+   `quote-order-summary` Re-estimate/Edit, `quote-extended-sizes` waist header).
+2. **`alert()` → `showToast(…, 'error'|'warning', 6–8s)`** in scp/dtf/dtg modules and the
+   utils locked-quote redirect (toast, then navigate after 2.5s). DTG page gained
+   `#toast-container` + toast CSS — `showToast` there was a silent console line.
+3. **`console.log` removed** from shipped scp/dtf/dtg modules (adapter, push, output).
+4. **aria-labels** on the 12 shared `.os-*` order-summary inputs and the DTG form inputs.
+5. **Lock**: `tests/unit/quote-builders-page.test.js` (jsdom behaviour test for the
+   delegator + repo scans); `quote-order-summary.test.js` updated to expect `data-call`.
+6. Phone header (152px) — NOT done; left for a later pass.
+
+🔑 Gotchas: `data-args` inside a JS template literal → `data-args="${escapeHtml(JSON.stringify([…]))}"`
+(never a raw `${rowId}` inside the JSON — it broke the SCP `clearExtendedSize` button once);
+`quote-order-summary` still accepts the legacy `editOnclick: 'openShippingModal()'` config —
+`callName()` strips the `()`. The builders are SAML-gated even locally, and the python static
+server serves the raw ESM entry (bundle never boots) → use the new `static-dist` launch entry
+(`scripts/qa-static-server.js`, manifest-rewritten HTML) after `node scripts/build.js`.

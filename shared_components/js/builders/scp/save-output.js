@@ -545,8 +545,7 @@ export async function saveAndGetLink(opts = {}) {
                 const message = scpState.editingQuoteId
                     ? `Quote updated!\n\nQuote ID: ${result.quoteID}\nRevision: ${scpState.editingRevision}\n\nShareable Link:\n${url}`
                     : `Quote saved!\n\nQuote ID: ${result.quoteID}\n\nShareable Link:\n${url}`;
-                alert(message);
-            }
+                showToast(message, 'error', 6000);            }
             // Return the freshly-saved ID so callers (Push) can confirm THIS save
             // succeeded — never rely on a persistent _scpPushQuoteId from an earlier
             // save, which would push a stale revision if this save just failed.

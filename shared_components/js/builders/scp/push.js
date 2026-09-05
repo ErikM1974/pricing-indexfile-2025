@@ -196,7 +196,6 @@ export async function confirmScpPush(directFallback) {
         if (mainLabel) mainLabel.textContent = `Pushed ✓ (${data.extOrderId})`;
         if (mainBtn) { mainBtn.style.background = '#28a745'; /** @type {HTMLInputElement} */ (mainBtn).disabled = true; mainBtn.dataset.pushed = '1'; }
         if (typeof showToast === 'function') showToast(`Pushed to ShopWorks as ${data.extOrderId}`, 'success');
-        console.log('[SCP Push] Success:', data);
         closeScpPushPreview();
 
     } catch (error) {

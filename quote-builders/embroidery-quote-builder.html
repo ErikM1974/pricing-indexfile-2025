@@ -64,7 +64,7 @@
 
 </head>
 <body class="emb-builder qb-shell-body">
-    <nav aria-label="Skip link"><a href="#" class="qb-skip-link" onclick="document.querySelector('[role=main]').focus(); return false;">Skip to quote builder</a></nav><!-- qb-shell-body: 2026 PNW shell (Inter + tabular numerals + birch ground) — built 2026-06, had ZERO adopters until 2026-07-07 (expert audit) --><!-- scoping hook: EMB-only re-skin overrides (indigo) target .emb-builder so they don't leak into DTF/SCP/DTG via shared CSS (review C33/C34) -->
+    <nav aria-label="Skip link"><a href="#" class="qb-skip-link" data-call="qbFocusMain" data-prevent="1">Skip to quote builder</a></nav><!-- qb-shell-body: 2026 PNW shell (Inter + tabular numerals + birch ground) — built 2026-06, had ZERO adopters until 2026-07-07 (expert audit) --><!-- scoping hook: EMB-only re-skin overrides (indigo) target .emb-builder so they don't leak into DTF/SCP/DTG via shared CSS (review C33/C34) -->
     <!-- Loading Overlay -->
     <div id="loading-overlay" class="loading-overlay" role="status" aria-live="polite">
         <div class="loading-spinner"></div>
@@ -85,10 +85,10 @@
             <div class="power-header-subtitle">Garments + Caps | Embroidery, 3D Puff & Laser Patches</div>
         </div>
         <div class="header-actions">
-            <button class="btn-header btn-new-quote" onclick="confirmNewQuote()">
+            <button class="btn-header btn-new-quote" data-call="confirmNewQuote">
                 <i class="fas fa-plus"></i> New Quote
             </button>
-            <button class="btn-header" onclick="window.location.href='/staff-dashboard.html'">
+            <button class="btn-header" data-href="/staff-dashboard.html">
                 <i class="fas fa-arrow-left"></i> Dashboard
             </button>
         </div>
@@ -104,7 +104,7 @@
                 <div class="logo-cards-column">
                     <!-- Primary Logo Card (Garments) - Hidden until garments added -->
                     <div class="logo-card" id="garment-logo-card" style="display: none;">
-                        <div class="logo-card-header" onclick="toggleLogoCard('garment-logo-card')" tabindex="0" role="button" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">
+                        <div class="logo-card-header" data-call="toggleLogoCard" data-args="[&quot;garment-logo-card&quot;]" tabindex="0" role="button" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">
                             <div class="logo-card-icon garment">
                                 <i class="fas fa-tshirt"></i>
                             </div>
@@ -119,18 +119,18 @@
                                     <input type="text" id="garment-design-number" aria-label="Garment design number" class="design-number-input"
                                            placeholder="Design #" maxlength="10"
                                            onkeydown="if(event.key==='Enter'){lookupDesignNumber('garment');}">
-                                    <button type="button" class="design-btn design-btn-lookup" onclick="lookupDesignNumber('garment')" title="Look up design number" aria-label="Look up design">
+                                    <button type="button" class="design-btn design-btn-lookup" data-call="lookupDesignNumber" data-args="[&quot;garment&quot;]" title="Look up design number" aria-label="Look up design">
                                         <i class="fas fa-search"></i>
                                     </button>
-                                    <button type="button" class="design-btn design-btn-search" onclick="openDesignSearchModal('garment')" title="Search by company or design #" aria-label="Search designs">
+                                    <button type="button" class="design-btn design-btn-search" data-call="openDesignSearchModal" data-args="[&quot;garment&quot;]" title="Search by company or design #" aria-label="Search designs">
                                         <i class="fas fa-database"></i>
                                     </button>
-                                    <button type="button" class="design-btn design-btn-clear" id="garment-design-clear" onclick="clearDesignNumber('garment')" title="Clear design" aria-label="Clear design" style="display:none;">
+                                    <button type="button" class="design-btn design-btn-clear" id="garment-design-clear" data-call="clearDesignNumber" data-args="[&quot;garment&quot;]" title="Clear design" aria-label="Clear design" style="display:none;">
                                         <i class="fas fa-times"></i>
                                     </button>
                                 </div>
                                 <div class="design-info-badge" id="garment-design-info" style="display:none;"></div>
-                                <div class="design-thumbnail-preview" id="garment-design-thumbnail" style="display:none;" onclick="openThumbnailFullSize(this)">
+                                <div class="design-thumbnail-preview" id="garment-design-thumbnail" style="display:none;" data-call="openThumbnailFullSize" data-args="[&quot;$this&quot;]">
                                     <img class="design-thumb-img" alt="Design preview" onerror="this.parentElement.style.display='none'">
                                 </div>
                             </div>
@@ -174,7 +174,7 @@
                                      unhide, so the $100 new-logo-setup decision was invisible at the moment the
                                      logo is configured — the classic new-CSR under-quote, and an imported quote's
                                      engine-set digitizing fee had no visible control to audit/uncheck. -->
-                                <div class="digitizing-checkbox" onclick="toggleDigitizingCheckbox(this, 'primary-digitizing')" tabindex="0" role="button" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">
+                                <div class="digitizing-checkbox" data-call="toggleDigitizingCheckbox" data-args="[&quot;$this&quot;,&quot;primary-digitizing&quot;]" tabindex="0" role="button" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">
                                     <input type="checkbox" id="primary-digitizing" aria-label="Primary logo needs digitizing">
                                     <div class="digitizing-checkbox-indicator">
                                         <i class="fas fa-check"></i>
@@ -186,7 +186,7 @@
                                 <div class="logo-form-divider"></div>
                                 <!-- AL Toggle (inline) — RETIRED 2026-06-03: Additional Logo now lives on the Services bar (Artwork ▾ → Additional Logo), live-priced from the API. Hidden so new quotes add AL there; the globalAL engine path stays intact for backward-compat loading of older saved quotes. -->
                                 <div class="al-inline-toggle" id="garment-al-inline" style="display:none;">
-                                    <div class="toggle-switch" id="garment-al-switch" onclick="toggleGlobalALNew('garment')">
+                                    <div class="toggle-switch" id="garment-al-switch" data-call="toggleGlobalALNew" data-args="[&quot;garment&quot;]">
                                         <div class="toggle-switch-handle"></div>
                                     </div>
                                     <span class="al-inline-label" id="garment-al-label">AL</span>
@@ -207,7 +207,7 @@
 
                     <!-- Cap Logo Card (hidden by default) -->
                     <div class="logo-card" id="cap-logo-card" style="display: none;">
-                        <div class="logo-card-header" onclick="toggleLogoCard('cap-logo-card')" tabindex="0" role="button" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">
+                        <div class="logo-card-header" data-call="toggleLogoCard" data-args="[&quot;cap-logo-card&quot;]" tabindex="0" role="button" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">
                             <div class="logo-card-icon cap">
                                 <i class="fas fa-hat-cowboy"></i>
                             </div>
@@ -222,18 +222,18 @@
                                     <input type="text" id="cap-design-number" aria-label="Cap design number" class="design-number-input"
                                            placeholder="Design #" maxlength="10"
                                            onkeydown="if(event.key==='Enter'){lookupDesignNumber('cap');}">
-                                    <button type="button" class="design-btn design-btn-lookup" onclick="lookupDesignNumber('cap')" title="Look up design number" aria-label="Look up design">
+                                    <button type="button" class="design-btn design-btn-lookup" data-call="lookupDesignNumber" data-args="[&quot;cap&quot;]" title="Look up design number" aria-label="Look up design">
                                         <i class="fas fa-search"></i>
                                     </button>
-                                    <button type="button" class="design-btn design-btn-search" onclick="openDesignSearchModal('cap')" title="Search by company or design #" aria-label="Search designs">
+                                    <button type="button" class="design-btn design-btn-search" data-call="openDesignSearchModal" data-args="[&quot;cap&quot;]" title="Search by company or design #" aria-label="Search designs">
                                         <i class="fas fa-database"></i>
                                     </button>
-                                    <button type="button" class="design-btn design-btn-clear" id="cap-design-clear" onclick="clearDesignNumber('cap')" title="Clear design" aria-label="Clear design" style="display:none;">
+                                    <button type="button" class="design-btn design-btn-clear" id="cap-design-clear" data-call="clearDesignNumber" data-args="[&quot;cap&quot;]" title="Clear design" aria-label="Clear design" style="display:none;">
                                         <i class="fas fa-times"></i>
                                     </button>
                                 </div>
                                 <div class="design-info-badge" id="cap-design-info" style="display:none;"></div>
-                                <div class="design-thumbnail-preview" id="cap-design-thumbnail" style="display:none;" onclick="openThumbnailFullSize(this)">
+                                <div class="design-thumbnail-preview" id="cap-design-thumbnail" style="display:none;" data-call="openThumbnailFullSize" data-args="[&quot;$this&quot;]">
                                     <img class="design-thumb-img" alt="Design preview" onerror="this.parentElement.style.display='none'">
                                 </div>
                             </div>
@@ -265,7 +265,7 @@
                                             <option value="18000">Large +$10/pc (15-25K)</option>
                                         </select>
                                     </div>
-                                    <div class="digitizing-checkbox" onclick="toggleDigitizingCheckbox(this, 'cap-primary-digitizing')" tabindex="0" role="button" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">
+                                    <div class="digitizing-checkbox" data-call="toggleDigitizingCheckbox" data-args="[&quot;$this&quot;,&quot;cap-primary-digitizing&quot;]" tabindex="0" role="button" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">
                                         <input type="checkbox" id="cap-primary-digitizing" aria-label="Cap logo needs digitizing">
                                         <div class="digitizing-checkbox-indicator">
                                             <i class="fas fa-check"></i>
@@ -277,7 +277,7 @@
                                     <div class="logo-form-divider"></div>
                                     <!-- Cap AL Toggle (inline) — RETIRED 2026-06-03: now on the Services bar (Artwork ▾ → Additional Logo → Cap), live-priced from the API. Hidden; globalAL engine path kept for backward-compat loading. -->
                                     <div class="al-inline-toggle" id="cap-al-inline" style="display:none;">
-                                        <div class="toggle-switch" id="cap-al-switch" onclick="toggleGlobalALNew('cap')">
+                                        <div class="toggle-switch" id="cap-al-switch" data-call="toggleGlobalALNew" data-args="[&quot;cap&quot;]">
                                             <div class="toggle-switch-handle"></div>
                                         </div>
                                         <span class="al-inline-label" id="cap-al-label">AL</span>
@@ -303,7 +303,7 @@
                                             <option value="CF" selected>Cap Front</option>
                                         </select>
                                     </div>
-                                    <div class="digitizing-checkbox checked" onclick="toggleDigitizingCheckbox(this, 'cap-patch-setup')" tabindex="0" role="button" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">
+                                    <div class="digitizing-checkbox checked" data-call="toggleDigitizingCheckbox" data-args="[&quot;$this&quot;,&quot;cap-patch-setup&quot;]" tabindex="0" role="button" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">
                                         <input type="checkbox" id="cap-patch-setup" aria-label="Cap patch setup fee" checked>
                                         <div class="digitizing-checkbox-indicator">
                                             <i class="fas fa-check"></i>
@@ -332,7 +332,7 @@
                                autocomplete="off">
                         <div id="search-suggestions" class="search-suggestions"></div>
                     </div>
-                    <button class="btn-import-shopworks" onclick="openShopWorksImportModal()" title="Import order from ShopWorks text">
+                    <button class="btn-import-shopworks" data-call="openShopWorksImportModal" title="Import order from ShopWorks text">
                         <i class="fas fa-paste"></i> Paste from ShopWorks
                     </button>
                 </div>
@@ -374,11 +374,11 @@
                                     <div style="font-size: 13px; color: #64748b; line-height: 1.8;">
                                         <span style="background:#eef2ff; padding:2px 8px; border-radius:4px; color:#4f46e5;">1</span> Type a style # above (e.g., PC54, G500, C112)
                                         &nbsp;&bull;&nbsp;
-                                        <span style="background:#f0fdf4; padding:2px 8px; border-radius:4px; color:#166534;">2</span> <a href="javascript:void(0)" onclick="openShopWorksImportModal()" style="color:#4f46e5; text-decoration:underline; cursor:pointer;">Paste from ShopWorks</a>
+                                        <span style="background:#f0fdf4; padding:2px 8px; border-radius:4px; color:#166534;">2</span> <a href="javascript:void(0)" data-call="openShopWorksImportModal" style="color:#4f46e5; text-decoration:underline; cursor:pointer;">Paste from ShopWorks</a>
                                         &nbsp;&bull;&nbsp;
                                         <span style="background:#fef3c7; padding:2px 8px; border-radius:4px; color:#92400e;">3</span> Use the <strong>Add to order</strong> bar below for Monogram, Additional Logo, Rush, etc.
                                         &nbsp;&bull;&nbsp;
-                                        <span style="background:#f5f3ff; padding:2px 8px; border-radius:4px; color:#5b21b6;">4</span> Customer bringing their own garments? Use <a href="javascript:void(0)" onclick="openServiceGroup('Customer-Supplied')" style="color:#4f46e5; text-decoration:underline; cursor:pointer;"><strong>Customer-Supplied</strong></a> in the bar below.
+                                        <span style="background:#f5f3ff; padding:2px 8px; border-radius:4px; color:#5b21b6;">4</span> Customer bringing their own garments? Use <a href="javascript:void(0)" data-call="openServiceGroup" data-args="[&quot;Customer-Supplied&quot;]" style="color:#4f46e5; text-decoration:underline; cursor:pointer;"><strong>Customer-Supplied</strong></a> in the bar below.
                                     </div>
                                 </td>
                             </tr>
@@ -530,7 +530,7 @@
 
                 <!-- Add Row Buttons -->
                 <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-                    <button class="add-row-btn" onclick="addNewRow()">
+                    <button class="add-row-btn" data-call="addNewRow">
                         <i class="fas fa-plus"></i> Add Product (or press Tab from last cell)
                     </button>
                 </div>
@@ -556,21 +556,21 @@
                 </div>
 
                 <!-- Extended Size Picker Backdrop -->
-                <div id="size-popup-backdrop" class="size-popup-backdrop hidden" onclick="closeExtendedSizePopup()"></div>
+                <div id="size-popup-backdrop" class="size-popup-backdrop hidden" data-call="closeExtendedSizePopup"></div>
 
                 <!-- Extended Size Picker Popup (for Size06/Other sizes) -->
                 <div id="extended-size-popup" class="size-popup hidden">
                     <div class="size-popup-header">
                         <h4><i class="fas fa-ruler"></i> Extended Sizes (Size06)</h4>
-                        <button class="size-popup-close" onclick="closeExtendedSizePopup()">&times;</button>
+                        <button class="size-popup-close" data-call="closeExtendedSizePopup">&times;</button>
                     </div>
                     <p class="size-popup-hint">Enter quantities for extended sizes. These create separate line items.</p>
                     <div class="size-popup-grid" id="size-popup-grid">
                         <!-- Size inputs generated dynamically -->
                     </div>
                     <div class="size-popup-actions">
-                        <button class="size-popup-cancel" onclick="closeExtendedSizePopup()">Cancel</button>
-                        <button class="size-popup-apply" onclick="applyExtendedSizes()">
+                        <button class="size-popup-cancel" data-call="closeExtendedSizePopup">Cancel</button>
+                        <button class="size-popup-apply" data-call="applyExtendedSizes">
                             <i class="fas fa-check"></i> Apply Changes
                         </button>
                     </div>
@@ -640,14 +640,14 @@
                         <div class="it-row it-shipping" id="it-shipping-row">
                             <span class="it-label">Shipping</span>
                             <button type="button" class="it-amt it-shipping-edit is-pickup" id="it-shipping-amt"
-                                    onclick="openShippingModal()" title="Change shipping method / address">Customer Pickup</button>
+                                    data-call="openShippingModal" title="Change shipping method / address">Customer Pickup</button>
                         </div>
                         <div class="it-row it-tax-row" id="tax-row">
                             <label class="it-tax-label">
                                 <input type="checkbox" id="include-tax" checked onchange="updateTaxCalculation()">
                                 <span id="tax-label">Sales Tax</span>
                                 <input type="number" id="tax-rate-input" value="10.2" min="0" max="20" step="0.1" aria-label="Sales tax rate (percent)"
-                                       class="it-tax-rate" onchange="updateTaxCalculation()" onclick="event.stopPropagation()">
+                                       class="it-tax-rate" onchange="updateTaxCalculation()" data-stop="1">
                                 <span>%</span>
                             </label>
                             <span class="it-amt" id="tax-amount">$0.00</span>
@@ -668,7 +668,7 @@
                     <!-- Special Notes — relocated from the sidebar into a full-width row under the footer (Erik 2026-06-07) -->
                     <div class="footer-notes-row" id="footer-notes-row">
                         <div class="notes-section collapsed in-footer" id="notes-section" style="margin-bottom: 0;">
-                            <div class="notes-header" onclick="toggleNotesSection()" tabindex="0" role="button" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">
+                            <div class="notes-header" data-call="toggleNotesSection" tabindex="0" role="button" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">
                                 <label style="font-size: 12px; color: #666; cursor: pointer; display: flex; align-items: center; gap: 6px; margin: 0;">
                                     <i class="fas fa-sticky-note" style="color: #f9a825;"></i> Special Notes
                                     <span id="notes-badge" class="notes-badge" style="display: none;">0</span>
@@ -694,7 +694,7 @@
 
                 <!-- Customer Info Section (always visible, top of sidebar) -->
                 <div class="customer-info-section" id="customer-info-section">
-                    <div class="section-header-compact" onclick="document.getElementById('emb-customer-body').classList.toggle('hidden')" style="cursor:pointer;" tabindex="0" role="button" aria-label="Toggle customer details" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">
+                    <div class="section-header-compact" data-toggle-hidden="emb-customer-body" style="cursor:pointer;" tabindex="0" role="button" aria-label="Toggle customer details" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">
                         <span class="flow-step-num">1</span>
                         <i class="fas fa-user"></i> Customer
                         <i class="fas fa-chevron-down" style="margin-left:auto; font-size:11px; color:#94a3b8;"></i>
@@ -939,25 +939,25 @@
                 <!-- Push to ShopWorks is the PRIMARY action — first + prominent. It now auto-SAVES the
                      quote first (pushToShopWorks), so the rep no longer has to hunt for "Save & Share".
                      Enabled once a Customer # is set. (Erik 2026-06-05) -->
-                <button class="btn-action" id="emb-push-shopworks-btn" onclick="pushToShopWorks()" disabled
+                <button class="btn-action" id="emb-push-shopworks-btn" data-call="pushToShopWorks" disabled
                     title="Enter the ShopWorks Customer # (top of the form) to enable push">
                     <i class="fas fa-upload"></i> <span id="emb-push-shopworks-label">Push to ShopWorks</span>
                 </button>
                 <!-- Get Shareable Link — secondary, directly under Push (moved out of the retired "Save & Share"
                      panel; renamed from "Save & Get Shareable Link" since Push + this both auto-save now). Erik 2026-06-05 -->
-                <button class="btn-action btn-secondary-action btn-share-link" onclick="saveAndGetLink()">
+                <button class="btn-action btn-secondary-action btn-share-link" data-call="saveAndGetLink">
                     <i class="fas fa-link"></i> Get Shareable Link
                 </button>
-                <button class="btn-action btn-secondary-action" onclick="copyToClipboard()">
+                <button class="btn-action btn-secondary-action" data-call="copyToClipboard">
                     <i class="fas fa-copy"></i> Copy Quote to Clipboard
                 </button>
-                <button class="btn-action btn-secondary-action" onclick="printQuote()">
+                <button class="btn-action btn-secondary-action" data-call="printQuote">
                     <i class="fas fa-print"></i> Print Quote
                 </button>
-                <button class="btn-action btn-secondary-action" onclick="saveQuotePdf()" title="Opens the print window with a reminder to pick 'Save as PDF' as the destination — downloads the quote as a PDF file">
+                <button class="btn-action btn-secondary-action" data-call="saveQuotePdf" title="Opens the print window with a reminder to pick 'Save as PDF' as the destination — downloads the quote as a PDF file">
                     <i class="fas fa-file-pdf"></i> Save as PDF
                 </button>
-                <button class="btn-action btn-secondary-action btn-email-quote" onclick="embEmailQuote()">
+                <button class="btn-action btn-secondary-action btn-email-quote" data-call="embEmailQuote">
                     <i class="fas fa-envelope"></i> Email Quote
                 </button>
             </div>
@@ -980,7 +980,7 @@
         <div class="shopworks-import-content" style="max-width: 760px;">
             <div class="shopworks-import-header">
                 <h3 id="emb-sw-push-title"><i class="fas fa-upload"></i> Push to ShopWorks</h3>
-                <button class="shopworks-import-close" onclick="closePushPreview()" aria-label="Close">
+                <button class="shopworks-import-close" data-call="closePushPreview" aria-label="Close">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
@@ -993,8 +993,8 @@
                 <div id="emb-sw-push-preview"></div>
             </div>
             <div class="shopworks-import-footer">
-                <button class="btn-cancel-import" onclick="closePushPreview()">Cancel</button>
-                <button class="btn-parse-import" id="emb-sw-push-confirm" onclick="confirmPushToShopWorks()" disabled>
+                <button class="btn-cancel-import" data-call="closePushPreview">Cancel</button>
+                <button class="btn-parse-import" id="emb-sw-push-confirm" data-call="confirmPushToShopWorks" disabled>
                     <i class="fas fa-upload"></i> Push to ShopWorks
                 </button>
             </div>
@@ -1018,7 +1018,7 @@
         <div class="shopworks-import-content">
             <div class="shopworks-import-header">
                 <h3 id="shopworks-import-modal-title"><i class="fas fa-file-import"></i> Import from ShopWorks</h3>
-                <button class="shopworks-import-close" onclick="closeShopWorksImportModal()" aria-label="Close">
+                <button class="shopworks-import-close" data-call="closeShopWorksImportModal" aria-label="Close">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
@@ -1051,11 +1051,11 @@ Company:Absher Construction Company
                 </div>
             </div>
             <div class="shopworks-import-footer">
-                <button class="btn-cancel-import" onclick="closeShopWorksImportModal()">Cancel</button>
-                <button class="btn-parse-import" id="btn-parse-import" onclick="parseAndPreviewShopWorks()">
+                <button class="btn-cancel-import" data-call="closeShopWorksImportModal">Cancel</button>
+                <button class="btn-parse-import" id="btn-parse-import" data-call="parseAndPreviewShopWorks">
                     <i class="fas fa-search"></i> Preview Import
                 </button>
-                <button class="btn-parse-import" id="btn-confirm-import" onclick="confirmShopWorksImport()" style="display: none;">
+                <button class="btn-parse-import" id="btn-confirm-import" data-call="confirmShopWorksImport" style="display: none;">
                     <i class="fas fa-check"></i> Import Items
                 </button>
             </div>
@@ -1069,7 +1069,7 @@ Company:Absher Construction Company
         <div class="shopworks-import-content" style="max-width: 800px;">
             <div class="shopworks-import-header" style="background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);">
                 <h3 id="service-pricing-review-modal-title"><i class="fas fa-tags"></i> Review Import Pricing</h3>
-                <button class="shopworks-import-close" onclick="cancelServicePricingReview()" aria-label="Close">
+                <button class="shopworks-import-close" data-call="cancelServicePricingReview" aria-label="Close">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
@@ -1188,8 +1188,8 @@ Company:Absher Construction Company
                 </div>
             </div>
             <div class="shopworks-import-footer">
-                <button class="btn-cancel-import" onclick="cancelServicePricingReview()">Cancel</button>
-                <button class="btn-parse-import" id="btn-apply-service-pricing" onclick="applyServicePricingReview()">
+                <button class="btn-cancel-import" data-call="cancelServicePricingReview">Cancel</button>
+                <button class="btn-parse-import" id="btn-apply-service-pricing" data-call="applyServicePricingReview">
                     <i class="fas fa-check"></i> Apply &amp; Import
                 </button>
             </div>
@@ -1203,7 +1203,7 @@ Company:Absher Construction Company
         <div class="shopworks-import-content design-search-content">
             <div class="shopworks-import-header" style="background: linear-gradient(135deg, #0ea5e9 0%, #0369a1 100%);">
                 <h3 id="design-search-modal-title"><i class="fas fa-database"></i> Find Existing Design</h3>
-                <button class="shopworks-import-close" onclick="closeDesignSearchModal()" aria-label="Close">
+                <button class="shopworks-import-close" data-call="closeDesignSearchModal" aria-label="Close">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
@@ -1221,7 +1221,7 @@ Company:Absher Construction Company
                            placeholder="Search by company name or design number..."
                            oninput="onDesignSearchInput()"
                            onkeydown="if(event.key==='Enter' && !this._galleryMode){runDesignSearch();}">
-                    <button type="button" class="design-btn design-btn-lookup" onclick="runDesignSearch()" id="design-search-go">
+                    <button type="button" class="design-btn design-btn-lookup" data-call="runDesignSearch" id="design-search-go">
                         <i class="fas fa-search"></i> Search
                     </button>
                 </div>
@@ -1231,11 +1231,11 @@ Company:Absher Construction Company
                 </div>
                 <!-- Tier filter chips -->
                 <div class="design-search-filters" id="design-search-filters" style="display:none;">
-                    <button class="design-search-chip active" data-tier="all" onclick="filterDesignSearchByTier('all')">All</button>
-                    <button class="design-search-chip" data-tier="Standard" onclick="filterDesignSearchByTier('Standard')">Standard</button>
-                    <button class="design-search-chip" data-tier="Mid" onclick="filterDesignSearchByTier('Mid')">Mid</button>
-                    <button class="design-search-chip" data-tier="Large" onclick="filterDesignSearchByTier('Large')">Large</button>
-                    <button class="design-search-chip" data-tier="Full Back" onclick="filterDesignSearchByTier('Full Back')">Full Back</button>
+                    <button class="design-search-chip active" data-tier="all" data-call="filterDesignSearchByTier" data-args="[&quot;all&quot;]">All</button>
+                    <button class="design-search-chip" data-tier="Standard" data-call="filterDesignSearchByTier" data-args="[&quot;Standard&quot;]">Standard</button>
+                    <button class="design-search-chip" data-tier="Mid" data-call="filterDesignSearchByTier" data-args="[&quot;Mid&quot;]">Mid</button>
+                    <button class="design-search-chip" data-tier="Large" data-call="filterDesignSearchByTier" data-args="[&quot;Large&quot;]">Large</button>
+                    <button class="design-search-chip" data-tier="Full Back" data-call="filterDesignSearchByTier" data-args="[&quot;Full Back&quot;]">Full Back</button>
                 </div>
                 <!-- Dynamic company filter chips -->
                 <div class="design-search-company-chips" id="design-search-company-chips" style="display:none;"></div>
@@ -1264,19 +1264,19 @@ Company:Absher Construction Company
          #ship-method / #ship-address / etc., so there are no duplicate
          IDs; the rest of the app reads/writes them as before.
          ============================================================ -->
-    <div class="ship-modal-overlay" id="shipping-modal" onclick="if(event.target===this)closeShippingModal()" role="dialog" aria-modal="true" aria-labelledby="shipping-modal-title">
+    <div class="ship-modal-overlay" id="shipping-modal" data-call="closeShippingModal" data-self-only="1" role="dialog" aria-modal="true" aria-labelledby="shipping-modal-title">
         <div class="ship-modal">
             <div class="ship-modal-head">
                 <span id="shipping-modal-title"><i class="fas fa-truck" style="margin-right:8px;"></i>Shipping</span>
-                <button type="button" class="ship-modal-close" onclick="closeShippingModal()" aria-label="Close">&times;</button>
+                <button type="button" class="ship-modal-close" data-call="closeShippingModal" aria-label="Close">&times;</button>
             </div>
             <div class="ship-modal-body">
                 <!-- Pickup vs Ship segmented toggle — drives the #ship-method value -->
                 <div class="ship-mode-toggle">
-                    <button type="button" class="ship-mode-btn active" id="ship-mode-pickup" onclick="setShipMode('pickup')">
+                    <button type="button" class="ship-mode-btn active" id="ship-mode-pickup" data-call="setShipMode" data-args="[&quot;pickup&quot;]">
                         <i class="fas fa-store"></i> Pickup
                     </button>
-                    <button type="button" class="ship-mode-btn" id="ship-mode-ship" onclick="setShipMode('ship')">
+                    <button type="button" class="ship-mode-btn" id="ship-mode-ship" data-call="setShipMode" data-args="[&quot;ship&quot;]">
                         <i class="fas fa-truck"></i> Ship it
                     </button>
                 </div>
@@ -1331,7 +1331,7 @@ Company:Absher Construction Company
                             <input type="text" id="ship-zip" aria-label="Shipping ZIP code" placeholder="ZIP" maxlength="10"
                                    onblur="onShipZipBlur()"
                                    style="width: 78px; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box;">
-                            <button type="button" id="lookup-tax-btn" onclick="lookupTaxRate()" title="Look up tax rate" aria-label="Look up tax rate"
+                            <button type="button" id="lookup-tax-btn" data-call="lookupTaxRate" title="Look up tax rate" aria-label="Look up tax rate"
                                     style="padding: 8px 12px; background: #0284c7; color: white; border: none; border-radius: 4px; font-size: 13px; cursor: pointer; white-space: nowrap;">
                                 <i class="fas fa-search"></i>
                             </button>
@@ -1352,7 +1352,7 @@ Company:Absher Construction Company
                             <input type="checkbox" id="ship-residential"> Residential delivery (+$6.50)
                         </label>
                         <!-- UPS Ground prepay estimate (real SanMar weights + case packs) -->
-                        <button type="button" id="estimate-ship-btn" class="estimate-ship-btn" onclick="estimateShipping()">
+                        <button type="button" id="estimate-ship-btn" class="estimate-ship-btn" data-call="estimateShipping">
                             <i class="fas fa-truck-fast"></i> Estimate UPS Ground
                         </button>
                         <div id="estimate-ship-result" style="font-size: 11px; color: #64748b; margin-top: 6px; min-height: 14px;"></div>
@@ -1363,7 +1363,7 @@ Company:Absher Construction Company
                 <div id="tax-lookup-status" style="font-size: 12px; margin-top: 10px; color: #64748b; min-height: 18px;"></div>
             </div>
             <div class="ship-modal-foot">
-                <button type="button" class="ship-modal-done" onclick="closeShippingModal()">
+                <button type="button" class="ship-modal-done" data-call="closeShippingModal">
                     <i class="fas fa-check"></i> Done
                 </button>
             </div>

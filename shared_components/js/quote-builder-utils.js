@@ -592,9 +592,13 @@ function updateProductThumbnail(rowId, imageUrl, productName, styleNumber, color
             <img src="${escapeHtml(imageUrl)}"
                  alt="${escapeHtml(productName || 'Product')}"
                  class="product-thumbnail"
-                 onerror="this.parentElement.innerHTML='<div class=\\'thumb-placeholder\\'><i class=\\'fas fa-image\\'></i></div>'"
-                 onclick="openThumbnailModal('${escapeHtml(imageUrl)}', '${escapeHtml(productName || '')}', '${escapeHtml(styleNumber || '')}', '${escapeHtml(colorName || '')}')">
+                 data-call="openThumbnailModal" data-args="${escapeHtml(JSON.stringify([imageUrl, productName || '', styleNumber || '', colorName || '']))}">
         `;
+        // Broken image → placeholder (was an inline onerror= handler; Rule 3).
+        const thumbImg = thumbContainer.querySelector('img.product-thumbnail');
+        if (thumbImg) thumbImg.addEventListener('error', () => {
+            thumbContainer.innerHTML = '<div class="thumb-placeholder"><i class="fas fa-image"></i></div>';
+        }, { once: true });
     } else {
         thumbContainer.innerHTML = '<div class="thumb-placeholder"><i class="fas fa-image"></i></div>';
     }
@@ -970,15 +974,14 @@ function assertQuoteEditable(session, opts = {}) {
 
     const quoteId = (session && session.QuoteID) || '(unknown)';
     const reason = lockedStatuses.has(status) ? `status: ${status}` : 'already pushed to ShopWorks';
-    alert(
-        `${quoteId} is in ShopWorks (${reason}).\n\n` +
-        `Per the one-way sync rule, edits must happen in ShopWorks. ` +
-        `Changes in this app would not sync back to the SW order.\n\n` +
-        `Opening read-only quote view instead.`
-    );
-    try {
-        window.location.href = `/quote/${encodeURIComponent(quoteId)}`;
-    } catch (_) { /* navigation failed — swallow */ }
+    // Toast, then hand off to the read-only view (the blocking alert() is gone, 2026-09-05;
+    // the short delay lets the message be read before the page changes).
+    showToast(`${quoteId} is in ShopWorks (${reason}) — edits happen there and would not sync back. Opening the read-only quote view.`, 'warning', 6000);
+    setTimeout(() => {
+        try {
+            window.location.href = `/quote/${encodeURIComponent(quoteId)}`;
+        } catch (_) { /* navigation failed — swallow */ }
+    }, 2500);
     return false;
 }
 
@@ -1302,7 +1305,7 @@ function renderOrderShippingFields(containerId) {
     // eslint-disable-next-line no-unsanitized/property -- audited (1.4): US_STATES internal const only
     container.innerHTML = `
         <div class="order-shipping-panel">
-            <div class="charges-header" onclick="toggleOrderShippingPanel('${containerId}')">
+            <div class="charges-header" data-call="toggleOrderShippingPanel" data-args="${escapeHtml(JSON.stringify([containerId]))}">
                 <div class="d-flex align-items-center gap-2">
                     <i class="fas fa-truck"></i>
                     <span>Order & Shipping</span>
@@ -1316,24 +1319,24 @@ function renderOrderShippingFields(containerId) {
                     <div class="d-flex gap-2">
                         <div class="customer-field" style="flex: 1;">
                             <label class="quote-label" style="font-size: 11px;">Phone</label>
-                            <input type="tel" class="os-phone quote-input" placeholder="(253) 555-1234" style="font-size: 12px; padding: 6px 8px;">
+                            <input type="tel" class="os-phone quote-input" aria-label="Customer phone" placeholder="(253) 555-1234" style="font-size: 12px; padding: 6px 8px;">
                         </div>
                         <div class="customer-field" style="flex: 1;">
                             <label class="quote-label" style="font-size: 11px;">Order #</label>
-                            <input type="text" class="os-order-number quote-input" placeholder="ShopWorks #" style="font-size: 12px; padding: 6px 8px;">
+                            <input type="text" class="os-order-number quote-input" aria-label="ShopWorks order number" placeholder="ShopWorks #" style="font-size: 12px; padding: 6px 8px;">
                         </div>
                     </div>
                     <!-- PO # + Shipping Fee -->
                     <div class="d-flex gap-2">
                         <div class="customer-field" style="flex: 1;">
                             <label class="quote-label" style="font-size: 11px;">PO #</label>
-                            <input type="text" class="os-po-number quote-input" placeholder="Purchase Order" style="font-size: 12px; padding: 6px 8px;">
+                            <input type="text" class="os-po-number quote-input" aria-label="Customer PO number" placeholder="Purchase Order" style="font-size: 12px; padding: 6px 8px;">
                         </div>
                         <div class="customer-field" style="flex: 1;">
                             <label class="quote-label" style="font-size: 11px;">Shipping Fee</label>
                             <div style="position: relative;">
                                 <span style="position: absolute; left: 8px; top: 50%; transform: translateY(-50%); color: #666; font-size: 12px;">$</span>
-                                <input type="number" class="os-shipping-fee quote-input" min="0" step="0.01" placeholder="0.00" value="0"
+                                <input type="number" class="os-shipping-fee quote-input" aria-label="Shipping fee" min="0" step="0.01" placeholder="0.00" value="0"
                                        style="font-size: 12px; padding: 6px 8px 6px 22px; width: 100%; box-sizing: border-box;">
                             </div>
                         </div>
@@ -1342,29 +1345,29 @@ function renderOrderShippingFields(containerId) {
                     <div class="d-flex gap-2">
                         <div class="customer-field" style="flex: 1;">
                             <label class="quote-label" style="font-size: 11px;">Ship Date</label>
-                            <input type="date" class="os-req-ship-date quote-input" style="font-size: 12px; padding: 6px 8px;">
+                            <input type="date" class="os-req-ship-date quote-input" aria-label="Requested ship date" style="font-size: 12px; padding: 6px 8px;">
                         </div>
                         <div class="customer-field" style="flex: 1;">
                             <label class="quote-label" style="font-size: 11px;">Drop Dead Date</label>
-                            <input type="date" class="os-drop-dead-date quote-input" style="font-size: 12px; padding: 6px 8px;">
+                            <input type="date" class="os-drop-dead-date quote-input" aria-label="Drop-dead date" style="font-size: 12px; padding: 6px 8px;">
                         </div>
                     </div>
                     <!-- Ship To Address -->
                     <div class="customer-field">
                         <label class="quote-label" style="font-size: 11px;">Ship To Address</label>
-                        <input type="text" class="os-ship-address quote-input" placeholder="Street address" style="font-size: 12px; padding: 6px 8px;">
+                        <input type="text" class="os-ship-address quote-input" aria-label="Ship-to street address" placeholder="Street address" style="font-size: 12px; padding: 6px 8px;">
                     </div>
                     <div class="d-flex gap-2">
                         <div class="customer-field" style="flex: 2;">
-                            <input type="text" class="os-ship-city quote-input" placeholder="City" style="font-size: 12px; padding: 6px 8px;">
+                            <input type="text" class="os-ship-city quote-input" aria-label="Ship-to city" placeholder="City" style="font-size: 12px; padding: 6px 8px;">
                         </div>
                         <div class="customer-field" style="flex: 0 0 60px;">
-                            <select class="os-ship-state quote-input" style="font-size: 12px; padding: 6px 4px;">
+                            <select class="os-ship-state quote-input" aria-label="Ship-to state" style="font-size: 12px; padding: 6px 4px;">
                                 ${stateOptions}
                             </select>
                         </div>
                         <div class="customer-field" style="flex: 0 0 80px;">
-                            <input type="text" class="os-ship-zip quote-input" placeholder="ZIP" maxlength="10"
+                            <input type="text" class="os-ship-zip quote-input" aria-label="Ship-to ZIP" placeholder="ZIP" maxlength="10"
                                    style="font-size: 12px; padding: 6px 8px;">
                         </div>
                         <button type="button" class="btn-tax-lookup" title="Look up tax rate">
@@ -1375,7 +1378,7 @@ function renderOrderShippingFields(containerId) {
                     <!-- Ship Method -->
                     <div class="customer-field">
                         <label class="quote-label" style="font-size: 11px;">Ship Method</label>
-                        <select class="os-ship-method quote-input" style="font-size: 12px; padding: 6px 8px;">
+                        <select class="os-ship-method quote-input" aria-label="Ship method" style="font-size: 12px; padding: 6px 8px;">
                             <option value="">Select...</option>
                             <option value="Ground">Ground</option>
                             <option value="2-Day">2-Day</option>
@@ -1387,7 +1390,7 @@ function renderOrderShippingFields(containerId) {
                     <!-- Notes -->
                     <div class="customer-field" style="margin-top: 4px;">
                         <label class="quote-label" style="font-size: 11px;"><i class="fas fa-sticky-note" style="color: #f9a825;"></i> Notes</label>
-                        <textarea class="os-notes quote-input" placeholder="Special instructions, employee names, etc."
+                        <textarea class="os-notes quote-input" aria-label="Order notes" placeholder="Special instructions, employee names, etc."
                                   style="font-size: 12px; padding: 6px 8px; min-height: 60px; resize: vertical; font-family: inherit;"></textarea>
                     </div>
                 </div>
@@ -2644,3 +2647,73 @@ if (typeof module !== 'undefined' && module.exports) {
 }
 
 // QuoteBuilderUtils v3.1.0 loaded
+
+/* =====================================================================
+   data-call click delegator (2026-09-05) — replaces the builders' onclick= attributes
+   (Rule 3; the builders' own rule file says external JS only).
+
+   <button data-call="fn" data-args='["x", 3, "$this"]'>   → window.fn("x", 3, element)
+   <button data-call="obj.method">                          → window.obj.method()
+   data-args tokens: "$this" = the element, "$event" = the click event,
+                     "$this.dataset.foo" = a property path read off the element.
+   data-stop="1"        → event.stopPropagation() first (row cells with their own click)
+   data-prevent="1"     → event.preventDefault()  (skip links, anchors used as buttons)
+   data-self-only="1"   → run only when the click landed on the element itself (overlays)
+   data-href="/x.html"  → navigate (buttons that used to set location.href)
+   data-toggle-hidden="id" → toggles the .hidden class on that element
+   A missing function is a visible toast, never a silent no-op (Rule 4).
+   ===================================================================== */
+function qbFocusMain() {
+    const main = document.querySelector('[role=main]');
+    if (main) { if (!main.hasAttribute('tabindex')) main.setAttribute('tabindex', '-1'); main.focus(); }
+}
+function qbOpenInputUrl(inputId) {
+    const url = document.getElementById(inputId)?.value;
+    if (url) window.open(url, '_blank', 'noopener');
+}
+function qbResolveArg(token, el, event) {
+    if (token === '$this') return el;
+    if (token === '$event') return event;
+    if (typeof token === 'string' && token.startsWith('$this.')) {
+        return token.slice(6).split('.').reduce((o, k) => (o == null ? o : o[k]), el);
+    }
+    return token;
+}
+function qbInstallCallDelegator() {
+    if (document.documentElement.dataset.qbDelegator === '1') return;
+    document.documentElement.dataset.qbDelegator = '1';
+    document.addEventListener('click', (event) => {
+        const el = event.target.closest('[data-call], [data-href], [data-toggle-hidden], [data-stop]');
+        if (!el) return;
+        if (el.dataset.selfOnly === '1' && event.target !== el) return;
+        if (el.dataset.stop === '1') event.stopPropagation();
+        if (el.dataset.prevent === '1') event.preventDefault();
+        if (el.dataset.toggleHidden) {
+            document.getElementById(el.dataset.toggleHidden)?.classList.toggle('hidden');
+        }
+        if (el.dataset.href) { window.location.href = el.dataset.href; return; }
+        const name = el.dataset.call;
+        if (!name) return;
+        const fn = name.split('.').reduce((o, k) => (o == null ? o : o[k]), window);
+        if (typeof fn !== 'function') {
+            console.error('[qb] data-call target is not a function:', name);
+            if (typeof showToast === 'function') showToast(`That action isn't available (${name}) — refresh the page and try again.`, 'error', 6000);
+            return;
+        }
+        let args = [];
+        if (el.dataset.args) {
+            try { args = JSON.parse(el.dataset.args); } catch (e) { console.error('[qb] bad data-args on', el, e); return; }
+        }
+        const thisObj = name.includes('.') ? name.split('.').slice(0, -1).reduce((o, k) => (o == null ? o : o[k]), window) : window;
+        fn.apply(thisObj, args.map((a) => qbResolveArg(a, el, event)));
+    });
+}
+if (typeof window !== 'undefined') {
+    window.qbFocusMain = qbFocusMain;
+    window.qbOpenInputUrl = qbOpenInputUrl;
+    window.qbInstallCallDelegator = qbInstallCallDelegator;
+    if (typeof document !== 'undefined') {
+        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', qbInstallCallDelegator, { once: true });
+        else qbInstallCallDelegator();
+    }
+}

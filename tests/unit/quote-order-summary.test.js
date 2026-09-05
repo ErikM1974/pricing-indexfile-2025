@@ -78,8 +78,11 @@ describe('Ship-To card', () => {
     expect(h).toContain('UPS Ground');
     expect(h).toContain('$30.00');
     expect(h).toContain('class="st-btn st-btn-reest"');
-    expect(h).toContain('onclick="reestimateShipFromCard()"');
-    expect(h).toContain('onclick="openShippingModal()"');
+    // 2026-09-05: rendered as data-call for the shared delegator (Rule 3 — no inline handlers);
+    // the legacy '*Onclick' config strings are reduced to a bare function name.
+    expect(h).toContain('data-call="reestimateShipFromCard"');
+    expect(h).toContain('data-call="openShippingModal"');
+    expect(h).not.toContain('onclick=');
   });
   test('appends boxes/zone ONLY when the estimate still equals the fee', () => {
     const w = setup();

@@ -204,7 +204,6 @@ export async function confirmDtfPush(directFallback) {
         if (mainLabel) mainLabel.textContent = `Pushed ✓ (${data.extOrderId})`;
         if (mainBtn) { mainBtn.style.background = '#28a745'; /** @type {HTMLInputElement} */ (mainBtn).disabled = true; mainBtn.dataset.pushed = '1'; }
         notifyToast(`Pushed to ShopWorks as ${data.extOrderId}`, 'success');
-        console.log('[DTF Push] Success:', data);
         closeDtfPushPreview();
 
     } catch (error) {

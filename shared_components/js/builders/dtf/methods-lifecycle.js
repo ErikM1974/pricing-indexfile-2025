@@ -8,7 +8,7 @@
    CustomerLookupService, updateTaxCalculation, showRecentCustomerOrders,
    removeRecentOrdersPanel, setupBeforeUnloadGuard, getServicePrice, updateAdditionalCharges,
    updateFeeTableRows, applyMethodSwitchCustomer, history, clearQuickQuoteParams,
-   assertQuoteEditable, setLtmControlState, getLtmControlState, alert, isValidEmail,
+   assertQuoteEditable, setLtmControlState, getLtmControlState, isValidEmail,
    QuoteShareModal, showSaveModal, confirm, showDtfPushButton, updateDtfPushButtonState */
 import { dtfState } from './state.js';
 
@@ -1133,8 +1133,7 @@ export const lifecycleMethods = {
             const message = this.editingQuoteId
                 ? `Quote updated!\n\nQuote ID: ${finalQuoteId}\nRevision: ${this.editingRevision}\n\nShareable Link:\n${url}`
                 : `Quote saved!\n\nQuote ID: ${finalQuoteId}\n\nShareable Link:\n${url}`;
-            alert(message);
-        }
+            showToast(message, 'error', 6000);        }
     },
 
     async saveAndGetLink(opts = {}) {
@@ -1204,8 +1203,7 @@ export const lifecycleMethods = {
             }
         } catch (error) {
             console.error('[DTFQuoteBuilder] Save error:', error);
-            alert('Error saving quote: ' + (error.message || 'Please try again.'));
-            return null; // signal failure to callers (Push must not proceed)
+            showToast('Error saving quote: ' + (error.message || 'Please try again.'), 'error', 6000);            return null; // signal failure to callers (Push must not proceed)
         } finally {
             // Restore button state
             if (saveBtn) {

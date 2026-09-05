@@ -21,6 +21,9 @@
     <link rel="stylesheet" href="/shared_components/css/dtg-catalog.css?v=2026.07.08.12">
 </head>
 <body>
+    <!-- Toasts (quote-builder-utils showToast) — DTG had no container, so every toast was a
+         silent console line (2026-09-05). Styled by dtg-quote-page.css. -->
+    <div id="toast-container" class="toast-container" aria-live="polite"></div>
     <!-- ========== Header (Phase 11.7 — unified chrome matching EMB/DTF/SCP) ========== -->
     <!-- Erik 2026-05-24: replaced DTG's custom breadcrumb header with the same
          power-header structure the other 3 builders use. Reps switching
@@ -38,16 +41,16 @@
             <div class="power-header-subtitle">Direct-to-Garment Printing · Kornit Storm Hexa</div>
         </div>
         <div class="header-actions">
-            <button class="btn-header btn-new-quote" onclick="dtgConfirmNewQuote()">
+            <button class="btn-header btn-new-quote" data-call="dtgConfirmNewQuote">
                 <i class="fas fa-plus"></i> New Quote
             </button>
             <!-- Persistent Save so DTG matches EMB/DTF/SCP (Rule 8). Previously the ONLY
                  save control lived inside the hidden AI chat panel, so reps thought DTG
                  quotes couldn't be saved. Calls the same handleSaveQuote path. -->
-            <button class="btn-header btn-save-quote" onclick="window.dtgSaveQuote && window.dtgSaveQuote()">
+            <button class="btn-header btn-save-quote" data-call="dtgSaveQuote">
                 <i class="fas fa-link"></i> Save &amp; Share Link
             </button>
-            <button class="btn-header" onclick="window.location.href='/staff-dashboard.html'">
+            <button class="btn-header" data-href="/staff-dashboard.html">
                 <i class="fas fa-arrow-left"></i> Dashboard
             </button>
         </div>

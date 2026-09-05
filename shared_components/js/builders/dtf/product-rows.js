@@ -68,7 +68,7 @@ export function addNewRow() {
         </td>
         <td>
             <div class="color-picker-wrapper" data-row-id="${rowId}">
-                <div class="color-picker-selected disabled" onclick="toggleColorPicker(${rowId})" tabindex="0" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-label="Garment color" onkeydown="handleColorPickerKeydown(event, ${rowId})">
+                <div class="color-picker-selected disabled" data-call="toggleColorPicker" data-args="[${rowId}]" tabindex="0" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-label="Garment color" onkeydown="handleColorPickerKeydown(event, ${rowId})">
                     <span class="color-swatch empty"></span>
                     <span class="color-name placeholder">Select color...</span>
                     <i class="fas fa-chevron-down picker-arrow"></i>
@@ -81,15 +81,15 @@ export function addNewRow() {
         <td><input type="number" class="cell-input size-input" data-size="L" min="0" value="" placeholder="0" onchange="onSizeChange(${rowId})" onkeydown="handleCellKeydown(event, this)" disabled aria-label="Quantity for size Large"></td>
         <td><input type="number" class="cell-input size-input" data-size="XL" min="0" value="" placeholder="0" onchange="onSizeChange(${rowId})" onkeydown="handleCellKeydown(event, this)" disabled aria-label="Quantity for size Extra Large"></td>
         <td><input type="number" class="cell-input size-input" data-size="2XL" min="0" value="" placeholder="0" onchange="onSizeChange(${rowId})" onkeydown="handleCellKeydown(event, this)" disabled aria-label="Quantity for size 2XL"></td>
-        <td><input type="text" class="cell-input size-input xxxl-picker-btn" data-size="3XL" value="" placeholder="+" readonly onclick="openExtendedSizePopup(${rowId})" onkeydown="if(event.key==='Enter'){openExtendedSizePopup(${rowId})}" disabled title="Click to add extended sizes (3XL, 4XL, 5XL, XS, etc.)" aria-label="Open extended sizes picker for 3XL and larger"></td>
+        <td><input type="text" class="cell-input size-input xxxl-picker-btn" data-size="3XL" value="" placeholder="+" readonly data-call="openExtendedSizePopup" data-args="[${rowId}]" onkeydown="if(event.key==='Enter'){openExtendedSizePopup(${rowId})}" disabled title="Click to add extended sizes (3XL, 4XL, 5XL, XS, etc.)" aria-label="Open extended sizes picker for 3XL and larger"></td>
         <td class="cell-qty" id="row-qty-${rowId}">0</td>
         <td class="cell-price" id="row-price-${rowId}">-</td>
         <td class="cell-total" id="row-total-${rowId}">-</td>
         <td class="cell-actions">
-            <button class="btn-duplicate-row" onclick="duplicateRowNewColor(${rowId})" title="Add another color of this style" aria-label="Duplicate row with a new color" disabled>
+            <button class="btn-duplicate-row" data-call="duplicateRowNewColor" data-args="[${rowId}]" title="Add another color of this style" aria-label="Duplicate row with a new color" disabled>
                 <i class="fas fa-copy"></i>
             </button>
-            <button class="btn-delete-row" onclick="deleteRow(${rowId})" title="Delete row" aria-label="Delete product row">
+            <button class="btn-delete-row" data-call="deleteRow" data-args="[${rowId}]" title="Delete row" aria-label="Delete product row">
                 <i class="fas fa-times"></i>
             </button>
         </td>
@@ -194,7 +194,7 @@ export async function onStyleChange(input, rowId) {
                          data-swatch-url="${escapeHtml(c.COLOR_SQUARE_IMAGE || '')}"
                          data-hex="${escapeHtml(c.HEX_CODE || '#ccc')}"
                          data-image-url="${escapeHtml(c.MAIN_IMAGE_URL || c.FRONT_MODEL || c.FRONT_FLAT || '')}"
-                         onclick="selectColor(${rowId}, this)">
+                         data-call="selectColor" data-args='[${rowId}, "$this"]'>
                         <span class="color-swatch" style="${getSwatchStyle(c)}"></span>
                         <span class="color-name">${escapeHtml(c.COLOR_NAME)}</span>
                     </div>
@@ -496,7 +496,7 @@ function buildChildColorOptionsHtml(parentColors, parentColor, childRowId, paren
              data-catalog-color="${escapeHtml(c.CATALOG_COLOR || c.COLOR_NAME)}"
              data-swatch-url="${escapeHtml(c.COLOR_SQUARE_IMAGE || '')}"
              data-hex="${escapeHtml(c.HEX_CODE || '#ccc')}"
-             onclick="selectChildColor(${childRowId}, ${parentRowId}, this)">
+             data-call="selectChildColor" data-args='[${childRowId}, ${parentRowId}, "$this"]'>
             <span class="color-swatch" style="${getSwatchStyle(c)}"></span>
             <span class="color-name">${escapeHtml(c.COLOR_NAME)}</span>
         </div>`
@@ -582,7 +582,7 @@ export function createChildRow(parentRowId, size, qty) {
         </td>
         <td>
             <div class="color-picker-wrapper child-color-picker" data-row-id="${childRowId}">
-                <div class="color-picker-selected" onclick="toggleColorPicker(${childRowId})" tabindex="0" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-label="Garment color" onkeydown="handleColorPickerKeydown(event, ${childRowId})">
+                <div class="color-picker-selected" data-call="toggleColorPicker" data-args="[${childRowId}]" tabindex="0" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-label="Garment color" onkeydown="handleColorPickerKeydown(event, ${childRowId})">
                     <span class="color-swatch" style="${currentSwatchStyle}"></span>
                     <span class="color-name">${escapeHtml(parentColor)}</span>
                     <i class="fas fa-chevron-down picker-arrow"></i>
@@ -604,7 +604,7 @@ export function createChildRow(parentRowId, size, qty) {
         <td class="cell-price" id="row-price-${childRowId}">-</td>
         <td class="cell-total" id="row-total-${childRowId}">-</td>
         <td class="cell-actions">
-            <button class="btn-delete-row" onclick="removeChildRow(${parentRowId}, '${size}')" title="Remove ${displaySize}" aria-label="Remove extended size ${displaySize}">
+            <button class="btn-delete-row" data-call="removeChildRow" data-args="${escapeHtml(JSON.stringify([parentRowId, size]))}" title="Remove ${displaySize}" aria-label="Remove extended size ${displaySize}">
                 <i class="fas fa-times"></i>
             </button>
         </td>

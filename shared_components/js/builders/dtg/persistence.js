@@ -2,7 +2,7 @@
  * DTG inline form — persistence module (Batch 5, 2026-07-09). Moved VERBATIM from the
  * dtg-inline-form.js IIFE; lexical references became the imports below.
  */
-/* global alert, assertQuoteEditable,
+/* global assertQuoteEditable,
    markAsUnsaved, markAsSaved, showToast,
    */
 import { fetchProductColors, fuzzyMatchColor, kickInventoryFetch } from './catalog-search.js';
@@ -503,12 +503,10 @@ export async function loadSavedDtgQuoteForEdit(quoteId, opts = {}) {
         res = await fetch(`/api/quote-sessions/${encodeURIComponent(quoteId)}/full`);
         data = await res.json();
     } catch (e) {
-        alert(`Failed to load ${quoteId}: ${e.message}`);
-        return;
+        showToast(`Failed to load ${quoteId}: ${e.message}`, 'error', 6000);        return;
     }
     if (!res.ok || !data || !data.sessionRaw) {
-        alert(`${quoteId} not found.`);
-        return;
+        showToast(`${quoteId} not found.`, 'error', 6000);        return;
     }
 
     const session = data.sessionRaw;

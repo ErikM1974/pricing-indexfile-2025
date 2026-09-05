@@ -301,7 +301,7 @@ function showSearchSuggestions(products) {
         // eslint-disable-next-line no-unsanitized/property -- audited (1.4): only escapeHtml(q) interpolations (nested-ternary shape the rule cannot parse)
         suggestions.innerHTML = `
             <div class="suggestion-item"><span>No SanMar products found${q ? ` for "${escapeHtml(q)}"` : ''}</span></div>
-            ${q ? `<div class="suggestion-item suggestion-add-nonsanmar" onclick="addNonSanmarFromSearch()" style="cursor:pointer; color:#16a34a; font-weight:600;"><span><i class="fas fa-plus-circle"></i> Enter "${escapeHtml(q)}" manually — type the cost we pay</span></div>` : ''}`;
+            ${q ? `<div class="suggestion-item suggestion-add-nonsanmar" data-call="addNonSanmarFromSearch" style="cursor:pointer; color:#16a34a; font-weight:600;"><span><i class="fas fa-plus-circle"></i> Enter "${escapeHtml(q)}" manually — type the cost we pay</span></div>` : ''}`;
         suggestions.classList.add('show');
         return;
     }
@@ -315,7 +315,7 @@ function showSearchSuggestions(products) {
         const vendorTag = product.source === 'non-sanmar'
             ? '<span class="suggestion-vendor-tag">Vendor</span>' : '';
         return `
-            <div class="suggestion-item" onclick="selectProduct('${escapeHtml(product.value)}')">
+            <div class="suggestion-item" data-call="selectProduct" data-args="${escapeHtml(JSON.stringify([product.value]))}">
                 <span class="style">${escapeHtml(product.value)}</span>
                 <span class="name">${escapeHtml(productName)}</span>
                 ${vendorTag}
@@ -413,7 +413,7 @@ export function addNewRow() {
         </td>
         <td>
             <div class="color-picker-wrapper" data-row-id="${rowId}">
-                <div class="color-picker-selected disabled" onclick="toggleColorPicker(${rowId})" tabindex="0" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-label="Garment color" onkeydown="handleColorPickerKeydown(event, ${rowId})">
+                <div class="color-picker-selected disabled" data-call="toggleColorPicker" data-args="[${rowId}]" tabindex="0" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-label="Garment color" onkeydown="handleColorPickerKeydown(event, ${rowId})">
                     <span class="color-swatch empty"></span>
                     <span class="color-name placeholder">Select color...</span>
                     <i class="fas fa-chevron-down picker-arrow"></i>
@@ -426,17 +426,17 @@ export function addNewRow() {
         <td><input type="number" class="cell-input size-input" data-size="L" aria-label="Quantity L" min="0" max="9999" value="" placeholder="0" onchange="onSizeChange(${rowId})" onkeydown="handleCellKeydown(event, this)" disabled></td>
         <td><input type="number" class="cell-input size-input" data-size="XL" aria-label="Quantity XL" min="0" max="9999" value="" placeholder="0" onchange="onSizeChange(${rowId})" onkeydown="handleCellKeydown(event, this)" disabled></td>
         <td><input type="number" class="cell-input size-input" data-size="2XL" aria-label="Quantity 2XL" min="0" max="9999" value="" placeholder="0" onchange="onSizeChange(${rowId})" onkeydown="handleCellKeydown(event, this)" disabled></td>
-        <td><input type="text" class="cell-input size-input xxxl-picker-btn" data-size="3XL" aria-label="Quantity 3XL" value="" placeholder="+" readonly onclick="openExtendedSizePopup(${rowId})" onkeydown="if(event.key==='Enter'){openExtendedSizePopup(${rowId})}" disabled title="Click to add extended sizes (3XL, 4XL, 5XL, XS, etc.)"></td>
+        <td><input type="text" class="cell-input size-input xxxl-picker-btn" data-size="3XL" aria-label="Quantity 3XL" value="" placeholder="+" readonly data-call="openExtendedSizePopup" data-args="[${rowId}]" onkeydown="if(event.key==='Enter'){openExtendedSizePopup(${rowId})}" disabled title="Click to add extended sizes (3XL, 4XL, 5XL, XS, etc.)"></td>
         <td class="cell-qty" id="row-qty-${rowId}">0</td>
         <td class="cell-price" id="row-price-${rowId}"
             ondblclick="enablePriceOverride(${rowId})"
             title="Double-click to override price">-</td>
         <td class="cell-total" id="row-total-${rowId}">-</td>
         <td class="cell-actions">
-            <button class="btn-duplicate-row" onclick="duplicateRowNewColor(${rowId})" title="Add another color of this style" disabled>
+            <button class="btn-duplicate-row" data-call="duplicateRowNewColor" data-args="[${rowId}]" title="Add another color of this style" disabled>
                 <i class="fas fa-copy"></i>
             </button>
-            <button class="btn-delete-row" onclick="deleteRow(${rowId})" title="Delete row">
+            <button class="btn-delete-row" data-call="deleteRow" data-args="[${rowId}]" title="Delete row">
                 <i class="fas fa-times"></i>
             </button>
         </td>
@@ -586,7 +586,7 @@ export function createServiceProductRow(serviceType, data) {
             <div class="desc-row">
                 <span class="service-description" style="font-size: 13px; color: #334155;">${escapeHtml(displayDescription)}</span>
                 ${isCap ? '<span class="cap-badge" style="display: inline-flex;"><i class="fas fa-hat-cowboy"></i> Cap</span>' : ''}
-                ${['DECG', 'DECC'].includes(serviceType) ? `<button type="button" class="btn-describe-cs" onclick="openCustomerSuppliedDialog(${rowId})" title="Describe the customer's goods"><i class="fas fa-pencil-alt"></i> Describe</button>` : ''}
+                ${['DECG', 'DECC'].includes(serviceType) ? `<button type="button" class="btn-describe-cs" data-call="openCustomerSuppliedDialog" data-args="[${rowId}]" title="Describe the customer's goods"><i class="fas fa-pencil-alt"></i> Describe</button>` : ''}
             </div>
         </td>
         <td>
@@ -604,7 +604,7 @@ export function createServiceProductRow(serviceType, data) {
             ${['DECG', 'DECC'].includes(serviceType) ? `ondblclick="enablePriceOverride(${rowId})" title="Double-click to override price"` : ''}>$${unitPrice.toFixed(2)}</td>
         <td class="cell-total" id="row-total-${rowId}">$${total.toFixed(2)}</td>
         <td class="cell-actions">
-            <button class="btn-delete-row" onclick="deleteServiceRow(${rowId})" title="Delete service">
+            <button class="btn-delete-row" data-call="deleteServiceRow" data-args="[${rowId}]" title="Delete service">
                 <i class="fas fa-times"></i>
             </button>
         </td>
@@ -1019,7 +1019,7 @@ export function onServiceQtyChange(rowId) {
         if (overridePrice > 0) {
             priceCell.classList.add('price-overridden');
             // eslint-disable-next-line no-unsanitized/property -- audited (1.4): numeric unit price + rowId only
-            priceCell.innerHTML = `<span class="price-override-wrapper">$${unitPrice.toFixed(2)}<button class="btn-clear-override" onclick="event.stopPropagation(); clearPriceOverride(${rowId})" title="Clear override">&times;</button></span>`;
+            priceCell.innerHTML = `<span class="price-override-wrapper">$${unitPrice.toFixed(2)}<button class="btn-clear-override" data-stop="1" data-call="clearPriceOverride" data-args="[${rowId}]" title="Clear override">&times;</button></span>`;
         } else {
             priceCell.classList.remove('price-overridden');
             priceCell.textContent = `$${unitPrice.toFixed(2)}`;
@@ -1231,7 +1231,7 @@ export async function onStyleChange(input, rowId) {
                          data-swatch-url="${escapeHtml(c.COLOR_SQUARE_IMAGE || '')}"
                          data-hex="${escapeHtml(c.HEX_CODE || '#ccc')}"
                          data-image-url="${escapeHtml(c.MAIN_IMAGE_URL || c.FRONT_MODEL || c.FRONT_FLAT || '')}"
-                         onclick="selectColor(${rowId}, this)">
+                         data-call="selectColor" data-args='[${rowId}, "$this"]'>
                         <span class="color-swatch" style="${getSwatchStyle(c)}"></span>
                         <span class="color-name">${escapeHtml(c.COLOR_NAME)}</span>
                     </div>
@@ -1518,7 +1518,7 @@ export function populateNonSanmarRow(row, rowId, product) {
                  data-swatch-url=""
                  data-hex="#ccc"
                  data-image-url=""
-                 onclick="selectNonSanmarColor(${rowId}, this)">
+                 data-call="selectNonSanmarColor" data-args='[${rowId}, "$this"]'>
                 <span class="color-swatch" style="background-color: #ccc;"></span>
                 <span class="color-name">${escapeHtml(color)}</span>
             </div>
@@ -1579,11 +1579,11 @@ export function updateNonSanmarPriceCell(row, rowId) {
     const sellPrice = parseFloat(row.dataset.sellPrice) || 0;
     if (sellPrice > 0) {
         // eslint-disable-next-line no-unsanitized/property -- audited (1.4): numeric price + rowId only
-        priceCell.innerHTML = `<span class="ns-price-display" onclick="enablePriceOverride(${rowId})" title="Click to edit price">$${sellPrice.toFixed(2)} <i class="fas fa-pencil-alt"></i></span>`;
+        priceCell.innerHTML = `<span class="ns-price-display" data-call="enablePriceOverride" data-args="[${rowId}]" title="Click to edit price">$${sellPrice.toFixed(2)} <i class="fas fa-pencil-alt"></i></span>`;
         priceCell.classList.remove('ns-price-zero');
     } else {
         // eslint-disable-next-line no-unsanitized/property -- audited (1.4): numeric price + rowId only
-        priceCell.innerHTML = `<span class="ns-price-display" onclick="enablePriceOverride(${rowId})" title="Click to set price">$0.00 &#9888; <i class="fas fa-pencil-alt"></i></span>`;
+        priceCell.innerHTML = `<span class="ns-price-display" data-call="enablePriceOverride" data-args="[${rowId}]" title="Click to set price">$0.00 &#9888; <i class="fas fa-pencil-alt"></i></span>`;
         priceCell.classList.add('ns-price-zero');
         row.classList.add('price-warning');
     }
@@ -3138,7 +3138,7 @@ export function createChildRow(parentRowId, size, qty) {
              data-catalog-color="${escapeHtml(c.CATALOG_COLOR || c.COLOR_NAME)}"
              data-swatch-url="${escapeHtml(c.COLOR_SQUARE_IMAGE || '')}"
              data-hex="${escapeHtml(c.HEX_CODE || '#ccc')}"
-             onclick="selectChildColor(${childRowId}, ${parentRowId}, this)">
+             data-call="selectChildColor" data-args='[${childRowId}, ${parentRowId}, "$this"]'>
             <span class="color-swatch" style="${getSwatchStyle(c)}"></span>
             <span class="color-name">${escapeHtml(c.COLOR_NAME)}</span>
         </div>`
@@ -3199,7 +3199,7 @@ export function createChildRow(parentRowId, size, qty) {
         </td>
         <td>
             <div class="color-picker-wrapper child-color-picker" data-row-id="${childRowId}">
-                <div class="color-picker-selected" onclick="toggleColorPicker(${childRowId})" tabindex="0" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-label="Garment color" onkeydown="handleColorPickerKeydown(event, ${childRowId})">
+                <div class="color-picker-selected" data-call="toggleColorPicker" data-args="[${childRowId}]" tabindex="0" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-label="Garment color" onkeydown="handleColorPickerKeydown(event, ${childRowId})">
                     <span class="color-swatch" style="${currentSwatchStyle}"></span>
                     <span class="color-name">${escapeHtml(parentColor)}</span>
                     <i class="fas fa-chevron-down picker-arrow"></i>
@@ -3221,7 +3221,7 @@ export function createChildRow(parentRowId, size, qty) {
             title="Double-click to override price">-</td>
         <td class="cell-total" id="row-total-${childRowId}">-</td>
         <td class="cell-actions">
-            <button class="btn-delete-row" onclick="clearExtendedSize(${parentRowId}, '${size}')" title="Remove ${displaySize}">
+            <button class="btn-delete-row" data-call="clearExtendedSize" data-args="${escapeHtml(JSON.stringify([parentRowId, size]))}" title="Remove ${displaySize}">
                 <i class="fas fa-times"></i>
             </button>
         </td>
