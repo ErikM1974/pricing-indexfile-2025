@@ -1,3 +1,8 @@
+## v2026.09.05.33 (2026.09.05)
+
+- Leads board review: 10 items — board never blank (loading/failure/empty + Retry), stat tiles filter by status group, named indicators + aria-hidden icons, drawer dialog semantics + title per lead, Rule 3 style toggles, edit-modal labels, phone icon-only header; lock test
+- Deploy v2026.09.05.33: 3 files (leads.html,test-leads.html,test-lead-workspace.html) — Leads review cache-bust
+
 ## v2026.09.05.31 (2026.09.05)
 
 - Customer Portals console review: 14 items — LastLogin is finally stamped on customer sign-in (touch-login), hidden + [hidden] rule (no inline style=), real tablist, aria-labelled icon actions, modal focus return + Esc, lookup combobox keyboard nav, Retry, honest delete toast, phone 2-up stats; lock test; LESSONS entry (oldest archived)
