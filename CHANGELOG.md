@@ -1,3 +1,8 @@
+## v2026.09.05.2 (2026.09.05)
+
+- Quote Management review: 10 items — SAML identity, Rule 3 sweep, server window, tiles, modal, freshness
+- Deploy v2026.09.05.2: 2 files (quote-management.html,test-inbound-print.html,...)
+
 ## v2026.09.05.1 (2026.09.05)
 
 - Purchasing Portal review: 10 items — truncation shown, open-work default, tile filters, JotForm links, turnaround, real Refresh
