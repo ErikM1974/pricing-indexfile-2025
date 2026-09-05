@@ -260,7 +260,7 @@
             var ship = (i.shipTo && i.shipTo.name) ? i.shipTo.name : '';
             var st = swStatus(i);
             var done = st.imported || st.paid;
-            var box = '<input type="checkbox" class="smp-row-check" data-idx="' + idx + '"' + (done ? '' : ' checked') + '>';
+            var box = '<input type="checkbox" class="smp-row-check" aria-label="Select invoice" data-idx="' + idx + '"' + (done ? '' : ' checked') + '>';
             return '<tr class="' + (neg ? 'smp-tr--credit' : '') + (done ? ' smp-tr--excluded' : '') + '">' +
                 '<td class="smp-check-cell">' + box + '</td>' +
                 '<td>' + fmtWhen(i.invoiceDate) + '</td>' +

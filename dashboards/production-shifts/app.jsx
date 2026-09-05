@@ -738,7 +738,7 @@ function App() {
           </div>
           <div>
             <div className="print-eyebrow">NW Custom Apparel</div>
-            <h1 className="print-title">Production Shifts</h1>
+            <div className="print-title">Production Shifts</div>
           </div>
         </div>
         <div className="print-meta">

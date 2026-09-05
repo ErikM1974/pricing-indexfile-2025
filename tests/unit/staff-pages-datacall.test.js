@@ -29,6 +29,8 @@ const PAGES = [
     'dashboards/taneisha-crm.html',
     'dashboards/house-accounts.html',
     'dashboards/portal-directory.html',
+    'dashboards/old-designs.html',
+    'calculators/christmas-bundles.html',
 ];
 const MODULES = [
     'admin/js/universal-records-admin.js',
@@ -39,6 +41,8 @@ const MODULES = [
     'dashboards/js/portal-directory.js',
     'dashboards/js/house-accounts.js',
     'shared_components/js/monogram-dashboard.js',
+    'shared_components/js/old-designs.js',
+    'calculators/js/christmas-bundles.js',
 ];
 
 describe('staff pages: onclick → data-call', () => {

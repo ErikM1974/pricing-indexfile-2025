@@ -32,3 +32,6 @@
         #steve-grid-view #steve-gallery-load-more { padding:10px 24px; font-size: 14px; }
         #steve-grid-view .sg-empty { grid-column:1/-1; text-align:center; padding: 60px 20px; color: var(--gray-500,#6b7280); font-size:15px; }
         #steve-grid-view .sg-error { padding:40px; text-align:center; color: var(--state-danger,#dc2626); }
+
+/* Screen-reader-only page heading (the visible title is the breadcrumb). */
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
