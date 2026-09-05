@@ -109,6 +109,20 @@
         }
     }
 
+    // Name → email via the shared StaffAuthHelper.STAFF_EMAIL_MAP (staff-auth-helper.js,
+    // loaded by the page). Accepts a full name or a first name ("Taneisha").
+    function repEmailFor(name) {
+        const n = String(name || '').trim().toLowerCase();
+        const map = (typeof StaffAuthHelper !== 'undefined' && StaffAuthHelper.STAFF_EMAIL_MAP) || {};
+        if (n) {
+            for (const full of Object.keys(map)) {
+                const f = full.toLowerCase();
+                if (f === n || f.split(/\s+/)[0] === n) return map[full];
+            }
+        }
+        return 'sales@nwcustomapparel.com';
+    }
+
     async function loadReps() {
         // Same-origin staff route (login-gated). Non-fatal: the field stays free text.
         try {
@@ -291,7 +305,10 @@
                 CompanyName: customer,
                 CustomerEmail: '',
                 SalesRepName: $('vq-rep').value.trim(),
-                SalesRepEmail: 'sales@nwcustomapparel.com',
+                // The rep's real email, not sales@ (2026-09-05): Mission Control's Pipeline tab
+                // attributes quotes by SalesRepEmail, so Taneisha's $30,959 Braun NW volume
+                // quote showed as "no quotes carry your name". Unknown names keep sales@.
+                SalesRepEmail: repEmailFor($('vq-rep').value),
                 TotalQuantity: r.qty,
                 SubtotalAmount: Math.round(r.orderVol * 100) / 100,
                 LTMFeeTotal: 0,

@@ -16,6 +16,7 @@
 
     var API_BASE = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) || '';
     var POLL_INTERVAL_MS = 45000;
+    var SUMMARY_REFRESH_MS = 5 * 60 * 1000;   // visible-tab re-read of the summary + inbound
 
     // Session email → rep CRM page (mirrors the role gates in server.js).
     var ACCOUNTS_PAGE = {
@@ -46,6 +47,7 @@
         rep: null,         // summary.rep {email, fullName, firstName}
         summary: null,
         lastNotifTime: Number(sessionStorage.getItem('aemcNotifLastSeen')) || Date.now(),
+        summaryLoadedAt: 0,   // last successful summary render — the visible-tab tick reads it
 
         // --- tabs / motion ---
         tab: 'today',      // mirror of tabs.current(); DashTabs owns the truth
@@ -91,6 +93,11 @@
         return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     }
     function el(id) { return document.getElementById(id); }
+    /** "1 day" / "3 days" — the action queue read "1 days past its ship date" (2026-09-05). */
+    function plural(n, word, pluralWord) {
+        var v = Number(n) || 0;
+        return v + ' ' + (v === 1 ? word : (pluralWord || word + 's'));
+    }
     function sameOriginJson(path, options) {
         return fetch(path, options).then(function (resp) {
             return resp.json().catch(function () { return {}; }).then(function (body) {
@@ -235,9 +242,9 @@
                 '<text x="60" y="74" text-anchor="middle" class="mc-clock-l">' + headLbl + '</text>' +
               '</svg>' +
               '<div class="mc-clock-key">' +
-                '<div><span class="mc-sw" style="background:#dc2626"></span><b>' + late + '</b> past due</div>' +
-                '<div><span class="mc-sw" style="background:#f59e0b"></span><b>' + risk + '</b> at risk</div>' +
-                '<div><span class="mc-sw" style="background:#4cb354"></span><b>' + ok + '</b> on track</div>' +
+                '<div><span class="mc-sw mc-sw--late"></span><b>' + late + '</b> past due</div>' +
+                '<div><span class="mc-sw mc-sw--risk"></span><b>' + risk + '</b> at risk</div>' +
+                '<div><span class="mc-sw mc-sw--ok"></span><b>' + ok + '</b> on track</div>' +
               '</div>' +
             '</div>';
         var sub = el('mc-clock-sub');
@@ -258,7 +265,7 @@
         if (!defs.length) { nav.hidden = true; return; }
         nav.innerHTML = '<span class="mc-chapters-label">Jump to</span>' + defs.map(function (c) {
             return '<a class="mc-chip ' + c.cls + '" href="#' + c.id + '">' +
-                (c.dot ? '<span class="mc-chip-dot" style="background:' + c.dot + '"></span>' : '') +
+                (c.dot ? '<span class="mc-chip-dot"></span>' : '') +   // colour from .is-fire / .is-art (CSS)
                 esc(c.label) + ' ' + c.n + '</a>';
         }).join('');
         nav.hidden = false;
@@ -487,7 +494,7 @@
             }).join('')
             + '</tbody></table><script>window.onload=function(){window.print()}<\/script></body></html>';
         var w = window.open('', '_blank');
-        if (!w) { alert('Your browser blocked the print window. Allow pop-ups for this page and try again.'); return; }
+        if (!w) { DashPage.showError('Your browser blocked the print window. Allow pop-ups for this page and try again.'); return; }
         w.document.write(html);
         w.document.close();
     }
@@ -558,6 +565,17 @@
             loadInbound();
             pollArtNotifications();
             setInterval(pollArtNotifications, POLL_INTERVAL_MS);
+            // A cockpit stays open all day. Re-read the summary + inbound every 5 minutes
+            // while the tab is visible (cache-honouring — Refresh is the forced pull), and
+            // catch up when a hidden tab comes back (2026-09-05).
+            setInterval(function () {
+                if (document.visibilityState === 'visible') { loadSummary(false); loadInbound(); }
+            }, SUMMARY_REFRESH_MS);
+            document.addEventListener('visibilitychange', function () {
+                if (document.visibilityState === 'visible' && Date.now() - state.summaryLoadedAt >= SUMMARY_REFRESH_MS) {
+                    loadSummary(false); loadInbound();
+                }
+            });
         }).catch(function (err) {
             DashPage.showError('Could not confirm your login: ' + err.message);
         });
@@ -760,6 +778,7 @@
             state.lastSeenFor = rep.email;
         }
         el('aemc-greeting').textContent = greetingWord() + ', ' + (rep.firstName || 'there') + ' — here’s your day.';
+        state.summaryLoadedAt = Date.now();
         var updatedBits = ['Updated ' + new Date(data.generatedAt).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })];
         if (data.cacheHit) updatedBits.push('cached');
         if (data.kpis && data.kpis.salesAsOf) updatedBits.push('sales archived through ' + fmtWhen(data.kpis.salesAsOf));
@@ -1296,7 +1315,7 @@
                 urgency: 3,
                 dollars: o.subtotal || 0,
                 title: 'WO #' + o.idOrder + (o.company ? ' — ' + o.company : '') + ' is ' +
-                       Math.abs(o.daysUntilDue) + ' days past its ship date',
+                       plural(Math.abs(o.daysUntilDue), 'day') + ' past its ship date',
                 why: 'Not shipped, and the requested date has passed' +
                      (o.blanks && o.blanks !== 'received' ? ' — the blanks still are not in house.' : '.') +
                      ' Chase this before the customer calls you about it.',
