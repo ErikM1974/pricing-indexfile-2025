@@ -1,3 +1,10 @@
+## v2026.09.05.24 (2026.09.05)
+
+- Memory: portal table-clamp lesson
+- Memory: hash-only navigate verification gotcha
+- Customer product page review: 9 items — site logo/favicon, product name is the h1, document.title, Rule 3 (data-onerror + hidden toggles incl. reorder drawer), Retry, phone header back-link, aria dots, lock test
+- Deploy v2026.09.05.24: 2 files (customer-product.html,customer-portal.html) — product page review cache-bust
+
 ## v2026.09.05.22 (2026.09.05)
 
 - Memory: portal review tag note
