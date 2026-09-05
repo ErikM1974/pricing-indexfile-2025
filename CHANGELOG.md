@@ -1,3 +1,9 @@
+## v2026.09.05.35 (2026.09.05)
+
+- Memory: v4 Swagger inspected live -- no cheaper read path, but a new primer
+- Lead workspace review: 9 items — header Refresh, Retry on lead/activity failures, h1 names the lead, art modal hidden (Rule 3), aria-hidden icons + named timeline icons, labelled controls, kit-modal focus trap, phone layout; lock test
+- Deploy v2026.09.05.35: 2 files (lead.html,test-lead-workspace.html) — Lead workspace review cache-bust
+
 ## v2026.09.05.33 (2026.09.05)
 
 - Leads board review: 10 items — board never blank (loading/failure/empty + Retry), stat tiles filter by status group, named indicators + aria-hidden icons, drawer dialog semantics + title per lead, Rule 3 style toggles, edit-modal labels, phone icon-only header; lock test
