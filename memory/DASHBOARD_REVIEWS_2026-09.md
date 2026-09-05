@@ -226,6 +226,18 @@ Releases `v2026.09.04.1 → .9`. Detail here; MEMORY.md carries one line each.
 - Also in this release: policy-questions.html got the on-demand Caspio embed; favicons added to
   garment-designer, price-audit-report, quick-reference-tips, box-labels.
 
+## Cross-page sweep 4 — consistency lock over EVERY staff page (2026-09-05, `v2026.09.05.11`)
+
+- `tests/unit/staff-pages-consistency.test.js` scans the directories, not a hand list, so new
+  pages are covered automatically: no inline `<style>`/`<script>` bodies, Font Awesome 6.4.0
+  only (was 6.0.0 / 6.0.0-beta3 / 6.5.1 / 6.6.0 across 54 pages), site-hosted favicon.
+- Widening the net found 25 more pages with inline code (Training Center sub-pages, the
+  DrainPro bundle storefront, bundle-orders, staff-portal-simple) → extracted the same way
+  (47 new files); 41 pages got a favicon. Sales Coordinator manual: 45 `onclick=` →
+  `data-chapter` + one delegator.
+- 🔑 Two pages keep a deliberate own icon (Design Vault, Finished Photos PWA) — the lock
+  accepts any site-hosted icon, rejects Caspio-CDN.
+
 ## Verification gotchas learned today
 
 - Browser pane (`mcp__Claude_Browser`): screenshots of a SCROLLED page come back blank on

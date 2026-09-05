@@ -1,0 +1,377 @@
+/* staff-portal-simple.css — page styles (extracted from inline <style>, 2026.09.05.11) */
+
+/* ── moved from inline <style> in dashboards/staff-portal-simple.html (Rule 3, 2026.09.05.11) ── */
+* {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-green: #3a7c52;
+            --primary-dark: #1a472a;
+            --bg-color: #f5f7fa;
+            --card-bg: #ffffff;
+            --border-color: #e5e7eb;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --hover-bg: #f3f4f6;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .header {
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .welcome-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo {
+            width: 40px;
+            height: 40px;
+            background: var(--primary-green);
+            color: white;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .welcome-text {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .sign-out {
+            background: none;
+            border: 1px solid var(--border-color);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .sign-out:hover {
+            background: var(--hover-bg);
+            color: var(--text-primary);
+        }
+
+        /* Main Container */
+        .main-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+        }
+
+        /* Left Column - Calculators */
+        .calculators-section {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .calculator-group {
+            margin-bottom: 2rem;
+        }
+
+        .group-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 1rem;
+        }
+
+        .calculator-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1rem;
+        }
+
+        .calculator-card {
+            background: var(--bg-color);
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            padding: 1.25rem;
+            text-decoration: none;
+            color: var(--text-primary);
+            text-align: center;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.75rem;
+            min-height: 120px;
+            justify-content: center;
+        }
+
+        .calculator-card:hover {
+            background: var(--primary-green);
+            color: white;
+            border-color: var(--primary-green);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(58, 124, 82, 0.2);
+        }
+
+        .calculator-icon {
+            font-size: 2rem;
+            opacity: 0.8;
+        }
+
+        .calculator-name {
+            font-weight: 600;
+            font-size: 0.875rem;
+            line-height: 1.2;
+        }
+
+        .new-badge {
+            background: #dc2626;
+            color: white;
+            font-size: 0.625rem;
+            font-weight: 700;
+            padding: 0.125rem 0.375rem;
+            border-radius: 4px;
+            text-transform: uppercase;
+            margin-top: 0.25rem;
+        }
+
+        /* Right Column */
+        .info-column {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        /* Production Schedule */
+        .production-widget {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .widget-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .production-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .production-item {
+            display: grid;
+            grid-template-columns: 120px 1fr;
+            align-items: center;
+            padding: 0.5rem;
+            background: var(--bg-color);
+            border-radius: 6px;
+            font-size: 0.875rem;
+        }
+
+        .production-method {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .production-date {
+            color: var(--text-secondary);
+        }
+
+        .production-item.rush {
+            background: #fef3c7;
+        }
+
+        .production-item.rush .production-method {
+            color: #92400e;
+        }
+
+        .capacity-status {
+            margin-top: 1rem;
+            padding: 0.75rem;
+            background: #fef3c7;
+            border: 1px solid #fbbf24;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 0.875rem;
+        }
+
+        .capacity-status strong {
+            color: #92400e;
+        }
+
+        /* Announcements */
+        .announcements-widget {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .announcement-item {
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.875rem;
+        }
+
+        .announcement-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .announcement-item strong {
+            color: var(--primary-green);
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+
+        /* Other Tools Section */
+        .other-tools {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+        }
+
+        .tool-card {
+            background: var(--bg-color);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            text-decoration: none;
+            color: var(--text-primary);
+            text-align: center;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .tool-card:hover {
+            background: var(--hover-bg);
+            border-color: var(--primary-green);
+        }
+
+        .tool-icon {
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+        }
+
+        .tool-name {
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        /* Caspio Embed Section */
+        .caspio-section {
+            background: #e5f3ff;
+            border: 1px solid #93c5fd;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            font-size: 0.875rem;
+            color: #1e40af;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header-container {
+                padding: 0 1rem;
+            }
+
+            .main-container {
+                padding: 0 1rem;
+                margin: 1rem auto;
+            }
+
+            .calculators-section {
+                padding: 1.5rem;
+            }
+
+            .calculator-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .welcome-text {
+                font-size: 1rem;
+            }
+
+            .sign-out span {
+                display: none;
+            }
+        }

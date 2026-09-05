@@ -1,0 +1,191 @@
+/* thank-you-card-guide.css — page styles (extracted from inline <style>, 2026.09.05.11) */
+
+/* ── moved from inline <style> in training/thank-you-card-guide.html (Rule 3, 2026.09.05.11) ── */
+body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .back-button {
+            position: fixed;
+            top: 25px;
+            left: 25px;
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            border-radius: 25px;
+            padding: 12px 20px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #333;
+            font-weight: 500;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .back-button:hover {
+            background: white;
+            transform: translateX(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .daily-report-link {
+            position: fixed;
+            top: 25px;
+            right: 25px;
+            background: rgba(255, 107, 157, 0.9);
+            border: none;
+            border-radius: 25px;
+            padding: 12px 20px;
+            cursor: pointer;
+            font-size: 14px;
+            color: white;
+            font-weight: 500;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            z-index: 1000;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .daily-report-link:hover {
+            background: rgba(255, 107, 157, 1);
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(255, 107, 157, 0.3);
+            color: white;
+            text-decoration: none;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            position: relative;
+        }
+        h1 {
+            text-align: center;
+            color: #ff6b6b;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            animation: fadeIn 1s ease-in;
+        }
+        h2 {
+            color: #4ecdc4;
+            border-bottom: 2px solid #45b7af;
+            padding-bottom: 10px;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        h2:hover { color: #ff6b6b; }
+        section { margin-bottom: 40px; }
+        .template {
+            position: relative;
+            width: 80%;
+            max-width: 400px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #fffaf0; /* Soft card background */
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1), inset 0 0 10px rgba(0,0,0,0.05); /* Subtle shadow for depth */
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .template:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+        .template::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(to right, transparent 0%, #ddd 50%, transparent 100%); /* Simulated fold line */
+            transform: translateX(-50%);
+        }
+        .template p {
+            font-family: 'Caveat', cursive; /* Handwritten font */
+            font-size: 1.2em;
+            color: #333;
+            margin: 0;
+            white-space: pre-wrap; /* Preserve line breaks */
+        }
+        .template h3 {
+            font-family: 'Poppins', sans-serif; /* Keep title clean */
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        .placeholder {
+            font-family: 'Poppins', sans-serif; /* Placeholders in typed font for clarity */
+            color: #888;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background: #4ecdc4;
+            color: white;
+        }
+        ol { padding-left: 20px; }
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 10px auto;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .intro-message {
+            position: relative;
+            width: 80%;
+            max-width: 500px;
+            margin: 20px auto 30px;
+            padding: 20px;
+            background: #fffaf0; /* Soft card background */
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1), inset 0 0 10px rgba(0,0,0,0.05); /* Subtle shadow for depth */
+            text-align: left;
+        }
+        .intro-message::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(to right, transparent 0%, #ddd 50%, transparent 100%); /* Simulated fold line */
+            transform: translateX(-50%);
+        }
+        .intro-message p {
+            font-family: 'Caveat', cursive; /* Handwritten font */
+            font-size: 1.3em;
+            color: #d62828;
+            margin: 0;
+            white-space: pre-wrap;
+        }
+        .accordion-content {
+            display: none;
+            animation: slideDown 0.5s ease;
+        }
+        .active + .accordion-content { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideDown { from { height: 0; opacity: 0; } to { height: auto; opacity: 1; } }
+        @media (max-width: 768px) { .container { margin: 20px; padding: 15px; } .template, .intro-message { width: 100%; } }

@@ -479,3 +479,18 @@
                 });
             });
         });
+
+// ── 2026-09-05: chapter navigation via data attributes (the 45 onclick= attributes are gone) ──
+document.addEventListener('click', function (e) {
+    var chapter = e.target.closest('[data-chapter]');
+    if (chapter) {
+        e.preventDefault();
+        if (typeof showChapter === 'function') showChapter(chapter.getAttribute('data-chapter'), e);
+        return;
+    }
+    var top = e.target.closest('[data-action="scroll-top"]');
+    if (top) {
+        e.preventDefault();
+        if (typeof scrollToTop === 'function') scrollToTop();
+    }
+});
