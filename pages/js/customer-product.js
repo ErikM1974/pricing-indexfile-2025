@@ -120,7 +120,7 @@
         document.getElementById('pp-body').innerHTML = h;
         document.getElementById('pp-loading').hidden = true;
         document.getElementById('pp-content').hidden = false;
-        document.title = esc(p.style) + ' · ' + esc(p.title) + ' | Northwest Custom Apparel';
+        document.title = String(p.style || '') + ' · ' + String(p.title || '') + ' | Northwest Custom Apparel'; // plain text — never esc() a title
 
         renderSwatches();
         selectColor(state.color);

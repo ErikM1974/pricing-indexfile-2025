@@ -31,7 +31,7 @@ describe('customer product page', () => {
         expect(html).not.toMatch(/<h1/);
         expect(html).toMatch(/<div class="cp-header-brand">Northwest Custom Apparel<\/div>/);
         expect(js).toMatch(/<h1 class="pp-title">/);
-        expect(js).toMatch(/document\.title = esc\(p\.style\) \+ ' · ' \+ esc\(p\.title\)/);
+        expect(js).toMatch(/document\.title = String\(p\.style \|\| ''\) \+ ' · ' \+ String\(p\.title \|\| ''\)/); // plain text: esc() here rendered '&amp;' in the tab
         expect(css).toMatch(/\.cp-header-brand \{/);
     });
     test('site logo + favicon, back link in the header and in the body', () => {
