@@ -1,3 +1,9 @@
+## v2026.09.05.20 (2026.09.05)
+
+- LESSONS_LEARNED: JSON-in-attribute quote escaping (sweep .17)
+- Customer portal review: 7 items — table clamp, reward ledger never shows cost bands, search keyboard nav, focus return on all dialogs, login label, design-name tidy, lock test
+- Deploy v2026.09.05.20: cache-bust — customer portal review (7 items)
+
 ## v2026.09.05.19 (2026.09.05)
 
 - Sweep batch 4: delegator handles data-change; manual-pricing de-inlined (12 onchange + Enter key), h1s on manual-pricing/screenprint-customer, status-select + notes labels, tips link noopener
