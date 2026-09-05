@@ -4849,6 +4849,5 @@ document.addEventListener('error', function (e) {
 document.addEventListener('DOMContentLoaded', function () {
     const logo = document.getElementById('logoFile');
     if (logo && typeof handleLogoUpload === 'function') logo.addEventListener('change', handleLogoUpload);
-    document.querySelectorAll('[data-change="toggleDeliveryFields"]').forEach(function (el) { el.addEventListener('change', function () { toggleDeliveryFields(); }); });
     document.querySelectorAll('form[data-nosubmit]').forEach(function (f) { f.addEventListener('submit', function (e) { e.preventDefault(); }); });
 });

@@ -38,9 +38,9 @@
         </header>
 
         <!-- Page Title -->
-        <div class="page-title">
+        <h1 class="page-title">
             <i class="fas fa-calculator"></i> Manual Pricing Calculator 2026
-        </div>
+        </h1>
         <p class="page-subtitle">Embroidered Garments, Embroidered Caps, Screen Print, DTG and DTF. Enter the blank cost from your supplier.</p>
 
         <!-- Input Section -->
@@ -57,7 +57,7 @@
                                min="0.01"
                                max="999.99"
                                placeholder="e.g. 6.25"
-                               onkeypress="if(event.key === 'Enter') document.getElementById('calculateBtn').click()">
+                               data-enter-clicks="calculateBtn">
                     </div>
                 </div>
 
@@ -101,22 +101,22 @@
                             DTG (Direct-to-Garment)
                         </h3>
                         <div class="method-card-controls">
-                            <select id="dtgLocation" aria-label="DTG print location" class="method-select" onchange="manualCalc.onDTGLocationChange()">
+                            <select id="dtgLocation" aria-label="DTG print location" class="method-select" data-change="manualCalc.onDTGLocationChange">
                                 <!-- Populated by JS: front locations only (LC, FF, JF) -->
                             </select>
                             <div class="ltm-qty-picker">
                                 <label for="dtgLtmQty">LTM qty:</label>
                                 <input type="number" id="dtgLtmQty" class="method-select ltm-qty-input"
                                        min="1" max="23" value="12"
-                                       onchange="manualCalc.onDTGLtmQtyChange()">
+                                       data-change="manualCalc.onDTGLtmQtyChange">
                             </div>
                             <div class="sp-extra-controls">
                                 <label class="sp-toggle-label">
-                                    <input type="checkbox" id="dtgSecondLocation" onchange="manualCalc.onDTGSecondLocationChange()">
+                                    <input type="checkbox" id="dtgSecondLocation" data-change="manualCalc.onDTGSecondLocationChange">
                                     + Back location:
                                 </label>
-                                <select id="dtgSecondLocationSelect" class="method-select" style="display:none"
-                                        onchange="manualCalc.onDTGSecondLocationSelectChange()">
+                                <select id="dtgSecondLocationSelect" class="method-select" aria-label="DTG second print location" style="display:none"
+                                        data-change="manualCalc.onDTGSecondLocationSelectChange">
                                     <!-- Populated by JS: back locations only (FB, JB) -->
                                 </select>
                             </div>
@@ -135,7 +135,7 @@
                             DTF (Direct-to-Film)
                         </h3>
                         <div class="method-card-controls">
-                            <select id="dtfTransferSize" aria-label="DTF transfer size" class="method-select" onchange="manualCalc.onDTFSizeChange()">
+                            <select id="dtfTransferSize" aria-label="DTF transfer size" class="method-select" data-change="manualCalc.onDTFSizeChange">
                                 <option value="small">Small (5" x 5")</option>
                                 <option value="medium" selected>Medium (9" x 12")</option>
                                 <option value="large">Large (12" x 16.5")</option>
@@ -144,15 +144,15 @@
                                 <label for="dtfLtmQty">LTM qty:</label>
                                 <input type="number" id="dtfLtmQty" class="method-select ltm-qty-input"
                                        min="10" max="23" value="12"
-                                       onchange="manualCalc.onDTFLtmQtyChange()">
+                                       data-change="manualCalc.onDTFLtmQtyChange">
                             </div>
                             <div class="sp-extra-controls">
                                 <label class="sp-toggle-label">
-                                    <input type="checkbox" id="dtfSecondLocation" onchange="manualCalc.onDTFSecondLocationChange()">
+                                    <input type="checkbox" id="dtfSecondLocation" data-change="manualCalc.onDTFSecondLocationChange">
                                     2nd location:
                                 </label>
-                                <select id="dtfSecondTransferSize" class="method-select" style="display:none"
-                                        onchange="manualCalc.onDTFSecondLocationChange()">
+                                <select id="dtfSecondTransferSize" class="method-select" aria-label="DTF second transfer size" style="display:none"
+                                        data-change="manualCalc.onDTFSecondLocationChange">
                                     <option value="small">Small (5" x 5")</option>
                                     <option value="medium" selected>Medium (9" x 12")</option>
                                     <option value="large">Large (12" x 16.5")</option>
@@ -175,7 +175,7 @@
                         <div class="method-card-controls">
                             <div class="ltm-qty-picker">
                                 <label for="embLtmQty">1-7 qty:</label>
-                                <select id="embLtmQty" class="method-select ltm-select" onchange="manualCalc.onEmbLTMQtyChange()">
+                                <select id="embLtmQty" class="method-select ltm-select" data-change="manualCalc.onEmbLTMQtyChange">
                                     <option value="1">1 pc</option>
                                     <option value="2">2 pcs</option>
                                     <option value="3" selected>3 pcs</option>
@@ -201,14 +201,14 @@
                             Screen Print
                         </h3>
                         <div class="method-card-controls">
-                            <select id="spColors" aria-label="Screen print colors" class="method-select" onchange="manualCalc.onSPColorChange()">
+                            <select id="spColors" aria-label="Screen print colors" class="method-select" data-change="manualCalc.onSPColorChange">
                                 <!-- Populated by JS with available color counts -->
                             </select>
                             <div class="ltm-qty-picker">
                                 <label for="spLtmQty">LTM qty:</label>
                                 <input type="number" id="spLtmQty" class="method-select ltm-qty-input"
                                        min="24" max="71" value="36"
-                                       onchange="manualCalc.onSPLtmQtyChange()">
+                                       data-change="manualCalc.onSPLtmQtyChange">
                             </div>
                         </div>
                     </div>
@@ -231,7 +231,7 @@
                         <div class="method-card-controls">
                             <div class="ltm-qty-picker">
                                 <label for="capEmbLtmQty">1-7 qty:</label>
-                                <select id="capEmbLtmQty" class="method-select ltm-select" onchange="manualCalc.onCapEmbLTMQtyChange()">
+                                <select id="capEmbLtmQty" class="method-select ltm-select" data-change="manualCalc.onCapEmbLTMQtyChange">
                                     <option value="1">1 pc</option>
                                     <option value="2">2 pcs</option>
                                     <option value="3" selected>3 pcs</option>
