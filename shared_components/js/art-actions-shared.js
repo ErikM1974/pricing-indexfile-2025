@@ -14,6 +14,30 @@
     var API_BASE = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL)
         || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
 
+    // ── Art hourly rate = Service_Codes GRT-75 (Erik's rule: prices come from Caspio, never a typed $) ──
+    // 75 is the FALLBACK only. Until the live rate lands (or if the API is unreachable) every cost
+    // display appends artRateNote() so a fallback price is never shown silently.
+    var _artRate = 75, _artRateLive = false, _artRateError = '';
+    function artRate() { return _artRate; }
+    function artRateNote() {
+        return _artRateLive ? '' : ' \u26a0 fallback $' + _artRate + '/h' + (_artRateError ? ' (' + _artRateError + ')' : ' (rate loading)');
+    }
+    function loadArtRate() {
+        return fetch(API_BASE + '/api/service-codes?code=GRT-75')
+            .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+            .then(function (j) {
+                var row = j && Array.isArray(j.data) ? j.data[0] : null;
+                var price = row ? parseFloat(row.SellPrice) : NaN;
+                if (!isFinite(price) || price <= 0) throw new Error('GRT-75 has no SellPrice');
+                _artRate = price; _artRateLive = true; _artRateError = '';
+            })
+            .catch(function (err) {
+                _artRateError = (err && err.message) || 'unreachable';
+                console.warn('[ArtActions] GRT-75 rate unavailable — fallback $75/h:', _artRateError);
+            });
+    }
+    loadArtRate();
+
     // Logged-in user identity (from staff portal session)
     function getLoggedInUser() {
         var name = sessionStorage.getItem('nwca_user_name') || '';
@@ -215,8 +239,8 @@
 
         var isWaived = options && options.waived;
         var newTotalMins = currentTotalMins + mins;
-        var cost = isWaived ? 0 : parseFloat((Math.ceil(mins / 15) * 0.25 * 75).toFixed(2));
-        var totalCost = isWaived ? 0 : parseFloat((Math.ceil(newTotalMins / 15) * 0.25 * 75).toFixed(2));
+        var cost = isWaived ? 0 : parseFloat((Math.ceil(mins / 15) * 0.25 * artRate()).toFixed(2));
+        var totalCost = isWaived ? 0 : parseFloat((Math.ceil(newTotalMins / 15) * 0.25 * artRate()).toFixed(2));
 
         fetch(API_BASE + '/api/art-charges', {
             method: 'POST',
@@ -322,7 +346,7 @@
             } else if (type === 'completed') {
                 var mins = data.artMinutes || 0;
                 var quarterHours = Math.ceil(mins / 15) * 0.25;
-                var cost = (quarterHours * 75).toFixed(2);
+                var cost = (quarterHours * artRate()).toFixed(2);
                 templateId = 'template_art_completed';
                 templateParams = {
                     to_email: repEmail,
@@ -339,7 +363,7 @@
             if (type === 'approval') {
                 var aMins = data.artMinutes || 0;
                 var aQh = Math.ceil(aMins / 15) * 0.25;
-                var aCost = (aQh * 75).toFixed(2);
+                var aCost = (aQh * artRate()).toFixed(2);
                 var urls = data.mockupUrls || [];
                 // L3 — Escape URLs and notes before interpolating into email HTML.
                 // A URL containing `"` or `>` (e.g. a Box shared link with a weird
@@ -493,7 +517,7 @@
         var sessionMins = parseInt(document.getElementById('approval-minutes').value) || 0;
         var totalMins = currentArtMins + sessionMins;
         var totalQh = Math.ceil(totalMins / 15) * 0.25;
-        var totalCost = (totalQh * 75).toFixed(2);
+        var totalCost = (totalQh * artRate()).toFixed(2);
         var el = document.getElementById('approval-new-total');
         if (el) el.textContent = 'New total: ' + totalMins + ' min (' + totalQh.toFixed(2) + ' hrs, $' + totalCost + ')';
     }
@@ -531,17 +555,21 @@
         var isAwaitingApproval = currentStatus.indexOf('awaitingapproval') !== -1;
 
         var prevHours = (Math.ceil(currentMins / 15) * 0.25).toFixed(2);
-        var prevCost = (parseFloat(prevHours) * 75).toFixed(2);
+        var prevCost = (parseFloat(prevHours) * artRate()).toFixed(2);
 
         var overlay = createOverlay();
         var modal = document.createElement('div');
         modal.id = 'art-time-modal';
         modal.className = 'art-modal art-modal--sm';
         modal.dataset.currentMins = currentMins;
+        modal.setAttribute('role', 'dialog');
+        modal.setAttribute('aria-modal', 'true');
+        modal.setAttribute('aria-labelledby', 'art-time-modal-title');
+        var atReturnFocus = document.activeElement;
 
         modal.innerHTML =
-            '<div class="art-modal-header art-modal-header--green">' +
-                'Mark Complete — #' + designId +
+            '<div class="art-modal-header art-modal-header--green" id="art-time-modal-title">' +
+                'Mark Complete — #' + escapeHtml(String(designId)) +
             '</div>' +
             '<div class="art-modal-body">' +
                 (isAwaitingApproval
@@ -552,11 +580,11 @@
                 '<div class="art-prev-time">' + (currentMins > 0
                     ? 'Previously logged: ' + currentMins + ' min ($' + prevCost + ')'
                     : 'No art time logged yet') + '</div>' +
-                '<label class="art-modal-label">Additional time:</label>' +
+                '<label class="art-modal-label" for="at-minutes">Additional time:</label>' +
                 '<div class="stepper-row">' +
-                    '<button id="at-minus" class="stepper-btn">-</button>' +
+                    '<button type="button" id="at-minus" class="stepper-btn" aria-label="Subtract 15 minutes">-</button>' +
                     '<input id="at-minutes" type="number" value="0" min="0" step="15" class="stepper-input" />' +
-                    '<button id="at-plus" class="stepper-btn">+</button>' +
+                    '<button type="button" id="at-plus" class="stepper-btn" aria-label="Add 15 minutes">+</button>' +
                 '</div>' +
                 '<div id="at-cost" class="art-cost-display">= $0.00</div>' +
                 '<div id="at-new-total" class="art-new-total"></div>' +
@@ -565,8 +593,8 @@
                     'Waive art fee <span style="color:#999;font-size:12px;">(no charge to customer)</span>' +
                 '</label>' +
                 '<div class="art-modal-actions">' +
-                    '<button id="at-cancel" class="art-modal-btn-cancel">Cancel</button>' +
-                    '<button id="at-submit" class="art-modal-btn-submit art-modal-btn-submit--green">Complete</button>' +
+                    '<button type="button" id="at-cancel" class="art-modal-btn-cancel">Cancel</button>' +
+                    '<button type="button" id="at-submit" class="art-modal-btn-submit art-modal-btn-submit--green">Complete</button>' +
                 '</div>' +
             '</div>';
 
@@ -574,6 +602,16 @@
         document.body.appendChild(modal);
 
         var minutesInput = modal.querySelector('#at-minutes');
+        setTimeout(function () { if (document.body.contains(minutesInput)) minutesInput.focus(); }, 30);
+        // Esc closes; focus returns to the card button that opened it. The listener detaches with the modal.
+        function atEsc(e) {
+            if (e.key !== 'Escape') return;
+            if (!document.getElementById('art-time-modal')) { document.removeEventListener('keydown', atEsc); return; }
+            removeModals();
+            document.removeEventListener('keydown', atEsc);
+            if (atReturnFocus && document.body.contains(atReturnFocus)) { try { atReturnFocus.focus(); } catch (err) { /* gone */ } }
+        }
+        document.addEventListener('keydown', atEsc);
         var costDiv = modal.querySelector('#at-cost');
         var newTotalDiv = modal.querySelector('#at-new-total');
         var waiveCheckbox = modal.querySelector('#at-waive');
@@ -589,9 +627,9 @@
                 costDiv.style.color = '#b45309';
                 newTotalDiv.textContent = 'Final total: ' + totalMins + ' min (' + totalQh.toFixed(2) + ' hrs, $0.00 \u2014 fee waived)';
             } else {
-                costDiv.textContent = '= $' + (qh * 75).toFixed(2);
+                costDiv.textContent = '= $' + (qh * artRate()).toFixed(2) + artRateNote();
                 costDiv.style.color = '';
-                newTotalDiv.textContent = 'Final total: ' + totalMins + ' min (' + totalQh.toFixed(2) + ' hrs, $' + (totalQh * 75).toFixed(2) + ')';
+                newTotalDiv.textContent = 'Final total: ' + totalMins + ' min (' + totalQh.toFixed(2) + ' hrs, $' + (totalQh * artRate()).toFixed(2) + ')';
             }
         }
         updateCost();
@@ -629,7 +667,7 @@
                 var completionNoteText = 'Marked as complete by Steve';
                 if (mins > 0) {
                     var qh = Math.ceil(mins / 15) * 0.25;
-                    var cost = isWaived ? '0.00' : (qh * 75).toFixed(2);
+                    var cost = isWaived ? '0.00' : (qh * artRate()).toFixed(2);
                     completionNoteText = isWaived
                         ? 'Marked as complete by Steve: ' + mins + ' additional minutes ($0.00 \u2014 fee waived)'
                         : 'Marked as complete by Steve: ' + mins + ' additional minutes ($' + cost + ')';
@@ -717,7 +755,7 @@
         if (!currentStatus) currentStatus = 'In Progress';
 
         var prevHours = (Math.ceil(currentMins / 15) * 0.25).toFixed(2);
-        var prevCost = (parseFloat(prevHours) * 75).toFixed(2);
+        var prevCost = (parseFloat(prevHours) * artRate()).toFixed(2);
 
         var overlay = createOverlay();
         var modal = document.createElement('div');
@@ -764,16 +802,16 @@
             if (clampedMins < 0) {
                 var removeMins = Math.abs(clampedMins);
                 var removeQh = Math.ceil(removeMins / 15) * 0.25;
-                costDiv.textContent = 'Removing $' + (removeQh * 75).toFixed(2);
+                costDiv.textContent = 'Removing $' + (removeQh * artRate()).toFixed(2);
                 costDiv.style.color = '#dc3545';
             } else {
                 var qh = Math.ceil(clampedMins / 15) * 0.25;
-                costDiv.textContent = '= $' + (qh * 75).toFixed(2);
+                costDiv.textContent = '= $' + (qh * artRate()).toFixed(2) + artRateNote();
                 costDiv.style.color = '';
             }
             var totalMins = currentMins + clampedMins;
             var totalQh = totalMins > 0 ? (Math.ceil(totalMins / 15) * 0.25) : 0;
-            newTotalDiv.textContent = 'New total: ' + totalMins + ' min (' + totalQh.toFixed(2) + ' hrs, $' + (totalQh * 75).toFixed(2) + ')';
+            newTotalDiv.textContent = 'New total: ' + totalMins + ' min (' + totalQh.toFixed(2) + ' hrs, $' + (totalQh * artRate()).toFixed(2) + ')';
         }
         updateLogTimeCost();
 
@@ -812,7 +850,7 @@
                 if (mins !== 0) {
                     var absMins = Math.abs(mins);
                     var qh = Math.ceil(absMins / 15) * 0.25;
-                    var cost = (qh * 75).toFixed(2);
+                    var cost = (qh * artRate()).toFixed(2);
                     var action = mins < 0 ? 'Removed' : 'Logged';
                     var noteBody = noteText
                         ? action + ' ' + absMins + ' minutes ($' + cost + ') — ' + noteText
@@ -895,7 +933,7 @@
             var latest = charges[0];
             var totalMins = latest.Running_Total_Minutes || 0;
             var totalHrs = totalMins > 0 ? (Math.ceil(totalMins / 15) * 0.25).toFixed(2) : '0.00';
-            var totalCost = totalMins > 0 ? (parseFloat(totalHrs) * 75).toFixed(2) : '0.00';
+            var totalCost = totalMins > 0 ? (parseFloat(totalHrs) * artRate()).toFixed(2) : '0.00';
 
             var html = '<div class="time-log-summary">Total: ' + totalMins + ' min &middot; ' + totalHrs + ' hrs &middot; $' + totalCost + '</div>';
 
@@ -984,11 +1022,14 @@
      * @param {string} designId
      * @param {string} companyName
      */
+    var _approvalReturnFocus = null;
     async function showSendForApprovalModal(designId, companyName, onSuccess) {
         _pendingApprovalOnSuccess = onSuccess || null;
         var overlay = document.getElementById('approval-overlay');
         var modal = document.getElementById('approval-modal');
         if (!overlay || !modal) return;
+        // Dialog behaviour: remember the trigger so closeApprovalModal() can hand focus back.
+        _approvalReturnFocus = document.activeElement;
 
         // Reset modal state
         document.getElementById('approval-message').value = '';
@@ -1013,6 +1054,7 @@
         overlay.style.display = 'block';
         modal.style.display = 'flex';
         document.body.style.overflow = 'hidden';
+        setTimeout(function () { var c = document.getElementById('approval-modal-close'); if (c) c.focus(); }, 30);
 
         // Fetch art request data
         var artReqData = null;
@@ -1066,7 +1108,7 @@
         var prevTimeEl = document.getElementById('approval-prev-time');
         if (currentArtMins > 0) {
             var prevQh = Math.ceil(currentArtMins / 15) * 0.25;
-            prevTimeEl.textContent = 'Previously logged: ' + currentArtMins + ' min ($' + (prevQh * 75).toFixed(2) + ')';
+            prevTimeEl.textContent = 'Previously logged: ' + currentArtMins + ' min ($' + (prevQh * artRate()).toFixed(2) + ')';
         } else {
             prevTimeEl.textContent = 'No art time logged yet';
         }
@@ -1276,9 +1318,12 @@
     function closeApprovalModal() {
         var overlay = document.getElementById('approval-overlay');
         var modal = document.getElementById('approval-modal');
+        var wasOpen = !!(modal && modal.style.display !== 'none');
         if (overlay) overlay.style.display = 'none';
         if (modal) modal.style.display = 'none';
         document.body.style.overflow = '';
+        if (wasOpen && _approvalReturnFocus && document.body.contains(_approvalReturnFocus)) { try { _approvalReturnFocus.focus(); } catch (e) { /* gone */ } }
+        _approvalReturnFocus = null;
     }
 
     async function submitSendForApproval() {
@@ -1481,7 +1526,7 @@
 
             if (mins > 0) {
                 var qh = Math.ceil(mins / 15) * 0.25;
-                var cost = (qh * 75).toFixed(2);
+                var cost = (qh * artRate()).toFixed(2);
                 await fetch(API_BASE + '/api/art-requests/' + designId + '/note', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -1594,7 +1639,7 @@
         function updateApprovalCost() {
             var mins = parseInt(minsInput.value) || 0;
             var qh = Math.ceil(mins / 15) * 0.25;
-            if (costEl) costEl.textContent = '= $' + (qh * 75).toFixed(2);
+            if (costEl) costEl.textContent = '= $' + (qh * artRate()).toFixed(2) + artRateNote();
             updateApprovalTotal();
         }
         minsInput.addEventListener('input', updateApprovalCost);
@@ -1741,6 +1786,9 @@
     }
 
     window.ArtActions = {
+        artRate: artRate,
+        artRateNote: artRateNote,
+        loadArtRate: loadArtRate,
         // Modal functions
         showArtTimeModal: showArtTimeModal,
         showLogTimeModal: showLogTimeModal,

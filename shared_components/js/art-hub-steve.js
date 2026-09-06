@@ -136,26 +136,31 @@
         // Reset form
         document.getElementById('note-type-select').value = '';
         document.getElementById('note-text').value = '';
-        document.getElementById('note-text').style.borderColor = '';
-        document.getElementById('note-type-select').style.borderColor = '';
+        document.getElementById('note-text').classList.remove('is-invalid');
+        document.getElementById('note-type-select').classList.remove('is-invalid');
         document.getElementById('note-notify-checkbox').checked = false;
         document.getElementById('note-submit-btn').disabled = false;
         document.getElementById('note-submit-btn').textContent = 'Add Note';
 
-        // Show panel
+        // Show panel (dialog: remember the trigger, focus the first control)
+        notesReturnFocus = document.activeElement;
         document.getElementById('notes-overlay').classList.add('active');
         document.getElementById('notes-panel').classList.add('open');
-        document.body.style.overflow = 'hidden';
+        document.body.classList.add('is-modal-open');
+        setTimeout(function () { var f = document.getElementById('note-type-select'); if (f) f.focus(); }, 30);
 
         // Fetch notes
         fetchNotes(designId);
     }
 
+    let notesReturnFocus = null;
     function closeNotesPanel() {
         document.getElementById('notes-panel').classList.remove('open');
         document.getElementById('notes-overlay').classList.remove('active');
-        document.body.style.overflow = '';
+        document.body.classList.remove('is-modal-open');
         currentNotesDesignId = null;
+        if (notesReturnFocus && document.body.contains(notesReturnFocus)) { try { notesReturnFocus.focus(); } catch (e) { /* gone */ } }
+        notesReturnFocus = null;
     }
 
     async function fetchNotes(designId) {
@@ -165,8 +170,8 @@
         const badge = document.getElementById('notes-count-badge');
 
         timeline.innerHTML = '';
-        loading.style.display = 'block';
-        empty.style.display = 'none';
+        loading.hidden = false;
+        empty.hidden = true;
         badge.textContent = '...';
 
         try {
@@ -175,10 +180,10 @@
             const data = await resp.json();
             const notes = data.Result || data || [];
 
-            loading.style.display = 'none';
+            loading.hidden = true;
 
             if (!Array.isArray(notes) || notes.length === 0) {
-                empty.style.display = 'block';
+                empty.hidden = false;
                 badge.textContent = '0';
                 return;
             }
@@ -187,11 +192,11 @@
             renderNotesTimeline(notes);
         } catch (err) {
             console.error('Failed to fetch notes:', err);
-            loading.style.display = 'none';
+            loading.hidden = true;
             timeline.innerHTML = `
-                <div class="notes-error">
-                    Unable to load notes. Please try again.
-                    <br><button data-call="notesRetryFromEmpty">Retry</button>
+                <div class="notes-error" role="alert">
+                    Unable to load notes (${escapeHtml(err.message || 'request failed')}).
+                    <br><button type="button" data-call="notesRetryFromEmpty">Retry</button>
                 </div>`;
             badge.textContent = '!';
         }
@@ -914,7 +919,7 @@
             if (gridView) {
                 var toggleDiv = document.createElement('div');
                 toggleDiv.style.cssText = 'text-align:right;margin-bottom:8px;';
-                toggleDiv.innerHTML = '<button id="archive-toggle-btn" data-call="toggleArchive" style="padding:6px 14px;font-size:12px;border:1px solid #ccc;border-radius:6px;background:#f9fafb;cursor:pointer;color:#666;">Show Archive</button>';
+                toggleDiv.innerHTML = '<button type="button" id="archive-toggle-btn" class="sg-btn" data-call="toggleArchive">Show Archive</button>';
                 gridView.parentNode.insertBefore(toggleDiv, gridView);
             }
         }
@@ -1853,10 +1858,20 @@
     }
 
     // Calculate due date badge text and CSS class from Due_Date string
+    // Caspio date fields arrive as "YYYY-MM-DD" / "YYYY-MM-DDT00:00:00" — `new Date()` reads that as UTC
+    // midnight (the previous evening in Pacific), so a due date could show a day early.
+    function parseCalendarDate(value) {
+        var str = String(value == null ? '' : value).trim();
+        if (!str) return null;
+        var m = /^(\d{4})-(\d{2})-(\d{2})(?:T00:00:00(?:\.0+)?Z?)?$/.exec(str);
+        var d = m ? new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3])) : new Date(str);
+        return isNaN(d.getTime()) ? null : d;
+    }
+
     function getDueBadge(dueDateStr) {
         if (!dueDateStr) return { text: '', cls: '' };
-        var due = new Date(dueDateStr);
-        if (isNaN(due.getTime())) return { text: '', cls: '' };
+        var due = parseCalendarDate(dueDateStr);
+        if (!due) return { text: '', cls: '' };
 
         var today = new Date();
         today.setHours(0, 0, 0, 0);
@@ -1884,15 +1899,17 @@
         localStorage.setItem('steveViewPreference', view);
 
         toggleBtns.forEach(function (btn) {
-            btn.classList.toggle('active', btn.dataset.view === view);
+            var on = btn.dataset.view === view;
+            btn.classList.toggle('active', on);
+            btn.setAttribute('aria-pressed', on ? 'true' : 'false');
         });
 
         if (kanbanActive) {
-            gridView.style.display = 'none';
+            gridView.hidden = true;
             boardView.classList.add('active');
             buildKanbanBoard();
         } else {
-            gridView.style.display = '';
+            gridView.hidden = false;
             boardView.classList.remove('active');
             // Grid view = JS-rendered gallery (replaced Caspio 2026-04-25).
             // SteveGallery.mount() is idempotent; refresh() re-fetches /api/artrequests.
@@ -1921,8 +1938,8 @@
         var signal = _kanbanAbortController.signal;
 
         // Show loading state
-        board.innerHTML = '<div style="text-align:center;padding:40px;color:#666;">'
-            + '<i class="fas fa-spinner fa-spin" style="font-size:24px;margin-bottom:8px;"></i>'
+        board.innerHTML = '<div class="kanban-loading" role="status">'
+            + '<i class="fas fa-spinner fa-spin kanban-loading-icon" aria-hidden="true"></i>'
             + '<div>Loading art requests...</div></div>';
 
         // Fetch from API with date cutoff
@@ -2167,9 +2184,7 @@
     window.kanbanShowAll = function (colId) {
         var col = document.querySelector('.kanban-column--' + colId);
         if (!col) return;
-        col.querySelectorAll('.kanban-card[style*="display: none"]').forEach(function (c) {
-            c.style.display = '';
-        });
+        col.querySelectorAll('.kanban-card[hidden]').forEach(function (c) { c.hidden = false; });
         var showAllEl = col.querySelector('.kanban-show-all');
         if (showAllEl) showAllEl.remove();
     };
@@ -2226,10 +2241,10 @@
             // Hidden cards (rendered but display:none)
             if (hiddenCount > 0) {
                 cardsHtml += colCards.slice(COMPLETED_SHOW_LIMIT).map(function (req) {
-                    return renderCardHtml(req).replace('class="kanban-card"', 'class="kanban-card" style="display: none"');
+                    return renderCardHtml(req).replace('class="kanban-card"', 'class="kanban-card" hidden');
                 }).join('');
                 // M5 — Data attribute instead of inline onclick
-                cardsHtml += '<div class="kanban-show-all" data-column-id="' + escapeHtml(col.id) + '">Show all ' + colCards.length + ' items</div>';
+                cardsHtml += '<button type="button" class="kanban-show-all" data-column-id="' + escapeHtml(col.id) + '">Show all ' + colCards.length + ' items</button>';
             }
 
             // Collapse chevron for completed column
@@ -2319,6 +2334,9 @@
                 imageModal.classList.remove('show');
             });
         }
+        document.addEventListener('keydown', function (event) {
+            if (event.key === 'Escape' && imageModal && imageModal.classList.contains('show')) imageModal.classList.remove('show');
+        });
 
         // Close image modal when clicking outside
         if (imageModal) {
@@ -2630,10 +2648,13 @@
         overlay.id = 'broken-mockups-modal';
         overlay.className = 'broken-mockups-overlay';
         overlay.innerHTML = bmlBuildModalHtml(brokenMockupsData);
+        overlay.__returnFocus = document.activeElement;
         document.body.appendChild(overlay);
-        document.body.style.overflow = 'hidden';
+        document.body.classList.add('is-modal-open');
 
         bmlWireEvents(overlay);
+        var firstBtn = overlay.querySelector('#broken-mockups-modal-close');
+        if (firstBtn) setTimeout(function () { firstBtn.focus(); }, 30);
     }
 
     function bmlBuildModalHtml(data) {
@@ -2643,9 +2664,9 @@
             : 'Auto-recover all ' + data.broken;
         var cachedNote = data.cached ? ' (10-min cache)' : '';
 
-        return '<div class="broken-mockups-modal">'
+        return '<div class="broken-mockups-modal" role="dialog" aria-modal="true" aria-labelledby="bml-title">'
             + '<div class="broken-mockups-modal-header">'
-            +   '<h3>\ud83d\udeab Broken Box Mockups (' + data.broken + ')</h3>'
+            +   '<h3 id="bml-title">\ud83d\udeab Broken Box Mockups (' + data.broken + ')</h3>'
             +   '<button type="button" class="broken-mockups-modal-close" id="broken-mockups-modal-close" aria-label="Close">&times;</button>'
             + '</div>'
             + '<div class="broken-mockups-modal-sub">'
@@ -2745,9 +2766,11 @@
 
     function bmlWireEvents(overlay) {
         function close() {
+            var back = overlay.__returnFocus;
             overlay.remove();
-            document.body.style.overflow = '';
+            document.body.classList.remove('is-modal-open');
             document.removeEventListener('keydown', escListener);
+            if (back && document.body.contains(back)) { try { back.focus(); } catch (e) { /* gone */ } }
         }
         function escListener(e) { if (e.key === 'Escape') close(); }
 
