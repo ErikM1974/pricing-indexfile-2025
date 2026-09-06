@@ -1,3 +1,10 @@
+## v2026.09.06.24 (2026.09.06)
+
+- LESSONS: quote-builders review entry
+- LESSONS: archive oldest resolved entry (300-line limit)
+- DTG builder runtime handlers: dtg-quote-page/dtg-catalog/quote-order-summary onerror/onclick to data-onerror modes (placeholder-src, hide-closest, parent-class) + qbReload; lock extended
+- Deploy v2026.09.06.24: DTG builder runtime handlers delegated
+
 ## v2026.09.06.22 (2026.09.06)
 
 - Builders: decorative icons in the 16 shared classic scripts the builders load (79 sites), consumer versions bumped, lock extended
