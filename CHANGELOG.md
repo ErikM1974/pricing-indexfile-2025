@@ -1,3 +1,8 @@
+## v2026.09.06.3 (2026.09.06)
+
+- Public pages review B4: content families — icons decorative across 12 webstore + golf + safety + laser pages, brands proxy host from APP_CONFIG + hidden toggles, contract pricing/fall-catalog listeners, resources+sale <style> extracted, laser hidden attr; lock public-content-pages.test.js
+- Deploy v2026.09.06.3: public batch B4 — content families hygiene, brands proxy host from APP_CONFIG, resources/sale extraction, laser hidden attr
+
 ## v2026.09.06.1 (2026.09.06)
 
 - Public pages review B3: lead forms + account pages — quote-view proxy host from APP_CONFIG + no inline handlers, portal visible account failure + local day, customer-invoice hidden attr, shared form assets versioned, icons decorative; lock public-forms-account-pages.test.js
