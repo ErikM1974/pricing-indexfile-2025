@@ -136,11 +136,11 @@ const StaffDashboardAnnouncements = (function() {
 
         container.innerHTML = `
             <div class="announcement-priority-badge ${typeConfig.class}">
-                <i class="fas ${typeConfig.icon}"></i>
+                <i class="fas ${typeConfig.icon}" aria-hidden="true"></i>
                 <span>${typeConfig.label}</span>
             </div>
             <div class="announcement-icon">
-                <i class="fas ${typeConfig.icon}"></i>
+                <i class="fas ${typeConfig.icon}" aria-hidden="true"></i>
             </div>
             <div class="announcement-content">
                 <div class="announcement-title">${escapeHtml(announcement.title)}</div>
@@ -148,10 +148,10 @@ const StaffDashboardAnnouncements = (function() {
             </div>
             <div class="announcement-controls">
                 <button class="btn-dismiss" onclick="StaffDashboardAnnouncements.dismiss('${announcement.id}')">
-                    <i class="fas fa-check"></i> Got it
+                    <i class="fas fa-check" aria-hidden="true"></i> Got it
                 </button>
                 <button class="btn-view-all" onclick="StaffDashboardAnnouncements.toggleList()">
-                    View All <i class="fas fa-chevron-down"></i>
+                    View All <i class="fas fa-chevron-down" aria-hidden="true"></i>
                 </button>
             </div>
         `;
@@ -170,7 +170,7 @@ const StaffDashboardAnnouncements = (function() {
             container.innerHTML = `
                 <div class="empty-state">
                     <div class="empty-state-icon">
-                        <i class="fas fa-check-circle"></i>
+                        <i class="fas fa-check-circle" aria-hidden="true"></i>
                     </div>
                     <div class="empty-state-title">All caught up!</div>
                     <div class="empty-state-message">No new announcements to show.</div>
@@ -189,7 +189,7 @@ const StaffDashboardAnnouncements = (function() {
                         <div class="announcement-item-date">${formatDate(announcement.date)}</div>
                     </div>
                     <button class="btn-dismiss-small" onclick="StaffDashboardAnnouncements.dismiss('${announcement.id}')" title="Dismiss">
-                        <i class="fas fa-times"></i>
+                        <i class="fas fa-times" aria-hidden="true"></i>
                     </button>
                 </div>
             `;

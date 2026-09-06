@@ -118,7 +118,7 @@ class CalculatorUtilities {
     static showCopyFeedback(button) {
         if (button) {
             const originalHTML = button.innerHTML;
-            button.innerHTML = '<i class="fas fa-check"></i> Copied!';
+            button.innerHTML = '<i class="fas fa-check" aria-hidden="true"></i> Copied!';
             setTimeout(() => {
                 button.innerHTML = originalHTML;
             }, 2000);

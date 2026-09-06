@@ -233,7 +233,7 @@
                         </span>
                     ` : ''}
                     <button class="qb-product-remove" title="Remove product" data-product-id="${product.id || ''}">
-                        <i class="fas fa-times"></i>
+                        <i class="fas fa-times" aria-hidden="true"></i>
                     </button>
                 </div>
                 <div class="qb-product-body">
@@ -325,7 +325,7 @@
 
             this.suggestionsDropdown.innerHTML = `
                 <div class="qb-suggestion-item" style="text-align: center; color: #6b7280;">
-                    <i class="fas fa-spinner fa-spin"></i> Searching...
+                    <i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Searching...
                 </div>
             `;
             this.suggestionsDropdown.classList.add('active');

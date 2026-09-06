@@ -446,7 +446,7 @@ class ShopWorksEDPGenerator {
             if (successful) {
                 // Show success feedback
                 const originalText = event.target.innerHTML;
-                event.target.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                event.target.innerHTML = '<i class="fas fa-check" aria-hidden="true"></i> Copied!';
                 event.target.classList.add('btn-success');
 
                 setTimeout(() => {

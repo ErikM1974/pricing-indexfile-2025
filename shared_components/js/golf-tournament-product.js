@@ -114,7 +114,7 @@
                     </p>
                     <div class="volume-pricing__table-wrap">
                         <div class="loading-state" style="padding:2rem;">
-                            <i class="fas fa-spinner fa-spin"></i>
+                            <i class="fas fa-spinner fa-spin" aria-hidden="true"></i>
                             <span>Loading volume pricing&hellip;</span>
                         </div>
                     </div>
@@ -207,7 +207,7 @@
                 <div>
                     <div class="product-info__price-label">Embroidered, qty 72+</div>
                     <div class="product-info__price-value" id="info-price-value">
-                        <i class="fas fa-spinner fa-spin" style="font-size:1.25rem;"></i>
+                        <i class="fas fa-spinner fa-spin" style="font-size:1.25rem;" aria-hidden="true"></i>
                     </div>
                     <div class="product-info__price-suffix">per piece</div>
                 </div>
@@ -223,7 +223,7 @@
             ${descBullets.length > 0 ? `
                 <div class="spec-section">
                     <div class="spec-section__title">
-                        <i class="fas fa-circle-info"></i>
+                        <i class="fas fa-circle-info" aria-hidden="true"></i>
                         Product Details
                     </div>
                     <ul style="margin:0; padding-left: 1.25rem; color: var(--gray-700); font-size: 0.875rem; line-height: 1.7;">
@@ -235,7 +235,7 @@
             ${colors.length > 0 ? `
                 <div class="spec-section">
                     <div class="spec-section__title">
-                        <i class="fas fa-palette"></i>
+                        <i class="fas fa-palette" aria-hidden="true"></i>
                         Available Colors
                         <span class="spec-section__count">(${colors.length})</span>
                     </div>
@@ -251,7 +251,7 @@
             ${sizes.length > 0 ? `
                 <div class="spec-section">
                     <div class="spec-section__title">
-                        <i class="fas fa-ruler"></i>
+                        <i class="fas fa-ruler" aria-hidden="true"></i>
                         Available Sizes
                         <span class="spec-section__count">(${sizes.length})</span>
                     </div>
@@ -263,11 +263,11 @@
 
             <div class="product-info__ctas">
                 <a href="golf-tournaments-2026.html?prefill=${encodeURIComponent(p.styleNumber)}#quote-form" class="btn-primary">
-                    <i class="fas fa-paper-plane"></i>
+                    <i class="fas fa-paper-plane" aria-hidden="true"></i>
                     Request Quote for This Style
                 </a>
                 <a href="golf-tournaments-2026.html#showcase" class="btn-secondary">
-                    <i class="fas fa-grip"></i>
+                    <i class="fas fa-grip" aria-hidden="true"></i>
                     See All Tournament Styles
                 </a>
             </div>
@@ -457,7 +457,7 @@
         if (tableWrap) {
             tableWrap.innerHTML = `
                 <div style="padding: 2rem; text-align: center; color: #6b7280;">
-                    <i class="fas fa-info-circle" style="font-size: 1.5rem; color: var(--primary); margin-bottom: 0.5rem;"></i>
+                    <i class="fas fa-info-circle" style="font-size: 1.5rem; color: var(--primary); margin-bottom: 0.5rem;" aria-hidden="true"></i>
                     <p>Volume pricing for this style is available on request. <a href="golf-tournaments-2026.html?prefill=${encodeURIComponent(state.styleNumber)}#quote-form" style="color: var(--primary-dark); font-weight: 700;">Request a quote</a> or call ${COMPANY_PHONE}.</p>
                 </div>
             `;
@@ -476,11 +476,11 @@
         if (!main) return;
         main.innerHTML = `
             <div class="product-error">
-                <div class="product-error__icon"><i class="fas fa-triangle-exclamation"></i></div>
+                <div class="product-error__icon"><i class="fas fa-triangle-exclamation" aria-hidden="true"></i></div>
                 <h2 class="product-error__title">We couldn't load this product</h2>
                 <p class="product-error__lead">${escapeHtml(message || 'Something went wrong fetching product data.')}</p>
                 <a href="golf-tournaments-2026.html" class="btn-primary" style="display:inline-flex;">
-                    <i class="fas fa-arrow-left"></i>
+                    <i class="fas fa-arrow-left" aria-hidden="true"></i>
                     Back to Tournament Apparel
                 </a>
             </div>

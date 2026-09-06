@@ -341,12 +341,12 @@
                 <div class="category ${collapsed}" data-category-tag="${escapeHtml(tag)}" data-category-name="${escapeHtml(group.name)}">
                     <div class="category__header" role="button" tabindex="0" aria-expanded="${isLeadCategory ? 'true' : 'false'}">
                         <h3>
-                            <i class="fas fa-flag"></i>
+                            <i class="fas fa-flag" aria-hidden="true"></i>
                             ${escapeHtml(group.name)}
                         </h3>
                         <div class="category__header-meta">
                             <span>${group.styles.length} style${group.styles.length === 1 ? '' : 's'}</span>
-                            <i class="fas fa-chevron-down category__chevron"></i>
+                            <i class="fas fa-chevron-down category__chevron" aria-hidden="true"></i>
                         </div>
                     </div>
                     <div class="category__grid">${cards}</div>
@@ -375,14 +375,14 @@
                     </a>
                     <div class="product-card__price-snapshot" data-price-snapshot>
                         <span class="product-card__price-pending">
-                            <i class="fas fa-spinner fa-spin"></i> Loading price&hellip;
+                            <i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Loading price&hellip;
                         </span>
                     </div>
                 </div>
                 <a href="${detailUrl}" class="product-card__detail-link">
-                    <i class="fas fa-palette"></i>
+                    <i class="fas fa-palette" aria-hidden="true"></i>
                     <span>See colors, sizes &amp; details</span>
-                    <i class="fas fa-arrow-right"></i>
+                    <i class="fas fa-arrow-right" aria-hidden="true"></i>
                 </a>
                 <button class="product-card__expand"
                         type="button"
@@ -390,7 +390,7 @@
                         aria-controls="pricing-${escapeHtml(sku)}"
                         data-expand-toggle>
                     <span>Quick view: volume pricing</span>
-                    <i class="fas fa-chevron-down"></i>
+                    <i class="fas fa-chevron-down" aria-hidden="true"></i>
                 </button>
                 <div class="product-card__pricing-table" id="pricing-${escapeHtml(sku)}" data-pricing-table>
                     <span class="product-card__price-pending">Loading&hellip;</span>
@@ -528,7 +528,7 @@
         if (!polo || !towel || polo.error || towel.error) {
             container.innerHTML = `
                 <div class="loading-state">
-                    <i class="fas fa-info-circle"></i>
+                    <i class="fas fa-info-circle" aria-hidden="true"></i>
                     <span>Sample package pricing available on request &mdash; submit the form below.</span>
                 </div>
             `;
@@ -606,7 +606,7 @@
             const submitBtn = document.getElementById('qf-submit');
             const originalBtn = submitBtn.innerHTML;
             submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending&hellip;';
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Sending&hellip;';
 
             try {
                 const formData = collectFormData();
@@ -866,7 +866,7 @@
             console.error('[golf-showcase] EmbroideryPricingService not loaded — pricing will not display.');
             const container = document.getElementById('product-categories');
             if (container) {
-                container.innerHTML = `<div class="loading-state"><i class="fas fa-triangle-exclamation"></i><span>Pricing service unavailable. Please reload the page or call ${COMPANY_PHONE}.</span></div>`;
+                container.innerHTML = `<div class="loading-state"><i class="fas fa-triangle-exclamation" aria-hidden="true"></i><span>Pricing service unavailable. Please reload the page or call ${COMPANY_PHONE}.</span></div>`;
             }
             bindForm();
             return;
@@ -884,7 +884,7 @@
             if (container) {
                 container.innerHTML = `
                     <div class="loading-state">
-                        <i class="fas fa-triangle-exclamation"></i>
+                        <i class="fas fa-triangle-exclamation" aria-hidden="true"></i>
                         <span>Apparel catalog couldn't load. Call ${COMPANY_PHONE} or use the form below to request a quote.</span>
                     </div>
                 `;

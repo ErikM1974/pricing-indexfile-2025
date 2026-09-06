@@ -422,7 +422,7 @@ const AI_ENDPOINT = '/api/contract-emblem-ai/chat';
         const chip = document.createElement('span');
         chip.className = 'tool-chip' + (toolName === 'quote_emblem_price' ? ' emblem-tool' : '');
         const iconClass = toolName === 'lookup_customer' ? 'fa-search' : 'fa-thread';
-        chip.innerHTML = `<i class="fas ${iconClass}"></i> ${escapeHtml(statusText)}`;
+        chip.innerHTML = `<i class="fas ${iconClass}" aria-hidden="true"></i> ${escapeHtml(statusText)}`;
         msg.appendChild(chip);
         container.appendChild(msg);
         container.scrollTop = container.scrollHeight;
@@ -610,11 +610,11 @@ const AI_ENDPOINT = '/api/contract-emblem-ai/chat';
         }
         if (saveBtn) {
             if (aiState.savedQuoteID) {
-                saveBtn.innerHTML = '<i class="fas fa-link"></i> Copy share link';
+                saveBtn.innerHTML = '<i class="fas fa-link" aria-hidden="true"></i> Copy share link';
                 saveBtn.disabled = false;
                 saveBtn.title = 'Copy the shareable /quote link';
             } else {
-                saveBtn.innerHTML = '<i class="fas fa-link"></i> Save &amp; share link';
+                saveBtn.innerHTML = '<i class="fas fa-link" aria-hidden="true"></i> Save &amp; share link';
                 const ready = hasDraft && hasQuote && hasCustomer;
                 saveBtn.disabled = !ready;
                 saveBtn.title = ready ? ''

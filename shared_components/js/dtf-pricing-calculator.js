@@ -346,10 +346,10 @@ class DTFPricingCalculator {
         if (this.container) {
             this.container.innerHTML = `
                 <div class="alert alert-danger">
-                    <h4><i class="fas fa-exclamation-triangle"></i> Error</h4>
+                    <h4><i class="fas fa-exclamation-triangle" aria-hidden="true"></i> Error</h4>
                     <p>${message}</p>
                     <button class="btn btn-primary" onclick="window.location.href='tel:+12539225793'">
-                        <i class="fas fa-phone"></i> Call Now
+                        <i class="fas fa-phone" aria-hidden="true"></i> Call Now
                     </button>
                 </div>
             `;
@@ -368,7 +368,7 @@ class DTFPricingCalculator {
                 <!-- Left Column: Print Locations -->
                 <div class="dtf-locations-column">
                     <div class="dtf-section-header">
-                        <i class="fas fa-layer-group dtf-section-icon"></i>
+                        <i class="fas fa-layer-group dtf-section-icon" aria-hidden="true"></i>
                         <div>
                             <h3 class="dtf-column-header">Print Locations</h3>
                             <p class="dtf-column-subtitle">Select a maximum of two locations.</p>
@@ -376,7 +376,7 @@ class DTFPricingCalculator {
                     </div>
                     <div id="dtf-location-toggles"></div>
                     <div class="dtf-info-box mt-4">
-                        <i class="fas fa-info-circle"></i>
+                        <i class="fas fa-info-circle" aria-hidden="true"></i>
                         Transfer sizes are automatically determined by location selection
                     </div>
                 </div>
@@ -384,7 +384,7 @@ class DTFPricingCalculator {
                 <!-- Right Column: Quantity Tiers -->
                 <div class="dtf-tiers-column">
                     <div class="dtf-section-header">
-                        <i class="fas fa-list-ol dtf-section-icon"></i>
+                        <i class="fas fa-list-ol dtf-section-icon" aria-hidden="true"></i>
                         <div>
                             <h3 class="dtf-column-header">Quantity Tiers</h3>
                             <p class="dtf-column-subtitle">Choose your order quantity.</p>
@@ -399,21 +399,21 @@ class DTFPricingCalculator {
                 <div class="dtf-price-label">Price per transfer</div>
                 <div class="dtf-price-amount">
                     $<span id="dtf-live-price">0.00</span>
-                    <i class="fas fa-info-circle dtf-upcharge-info-icon" id="dtf-upcharge-info-icon"></i>
-                    <i class="fas fa-palette setup-fee-badge" id="dtf-setup-fee-badge" style="font-size: 20px; color: white; opacity: 0.85; cursor: pointer;"></i>
+                    <i class="fas fa-info-circle dtf-upcharge-info-icon" id="dtf-upcharge-info-icon" aria-hidden="true"></i>
+                    <i class="fas fa-palette setup-fee-badge" id="dtf-setup-fee-badge" style="font-size: 20px; color: white; opacity: 0.85; cursor: pointer;" aria-hidden="true"></i>
                 </div>
                 <div class="dtf-price-details" id="dtf-price-details">
                     <span id="dtf-quantity-display">0</span> pieces + <span id="dtf-locations-display">0</span> location(s)
                 </div>
                 <div id="dtf-ltm-warning" class="dtf-ltm-warning" style="display: none;">
-                    <i class="fas fa-exclamation-triangle"></i>
+                    <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
                     Orders under 24 pieces include a <span id="dtf-ltm-warning-amount">setup</span> fee
                 </div>
 
                 <!-- Setup Fee Tooltip -->
                 <div id="dtf-setup-fee-tooltip" class="setup-fee-tooltip" style="display: none; position: absolute; bottom: calc(100% + 15px); left: 50%; transform: translateX(-50%); background: white; border: 2px solid #f59e0b; border-radius: 12px; box-shadow: 0 8px 24px rgba(245, 158, 11, 0.25); padding: 20px; min-width: 300px; z-index: 1000;">
                     <div style="font-size: 16px; font-weight: 700; color: #92400e; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 2px solid #fef3c7; display: flex; align-items: center; gap: 8px;">
-                        <i class="fas fa-palette"></i>
+                        <i class="fas fa-palette" aria-hidden="true"></i>
                         Art Setup Fee
                     </div>
                     <div style="font-size: 14px; color: #78350f; line-height: 1.6;">
@@ -425,11 +425,11 @@ class DTFPricingCalculator {
                             <li>Up to 2 rounds of revisions</li>
                         </ul>
                         <div style="font-size: 13px; color: #92400e; margin-top: 8px; padding-top: 8px; border-top: 1px solid #fef3c7;">
-                            <i class="fas fa-check-circle" style="color: #f59e0b;"></i>
+                            <i class="fas fa-check-circle" style="color: #f59e0b;" aria-hidden="true"></i>
                             One-time charge for new artwork
                         </div>
                         <div style="font-size: 13px; color: #92400e; margin-top: 4px;">
-                            <i class="fas fa-check-circle" style="color: #f59e0b;"></i>
+                            <i class="fas fa-check-circle" style="color: #f59e0b;" aria-hidden="true"></i>
                             Applies to all new logos or designs
                         </div>
                     </div>
@@ -455,7 +455,7 @@ class DTFPricingCalculator {
                         <h2 class="accordion-header">
                             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
                                     data-bs-target="#collapseGuide">
-                                <i class="fas fa-ruler"></i> Size Guide
+                                <i class="fas fa-ruler" aria-hidden="true"></i> Size Guide
                             </button>
                         </h2>
                         <div id="collapseGuide" class="accordion-collapse collapse">
@@ -571,12 +571,12 @@ class DTFPricingCalculator {
         html += `
             <div class="dtf-quantity-input-container universal-quantity-input-container ${showInput ? 'show' : ''}">
                 <label class="dtf-quantity-input-label universal-quantity-input-label">
-                    <i class="fas fa-calculator"></i> Enter Exact Quantity (10-23 pieces):
+                    <i class="fas fa-calculator" aria-hidden="true"></i> Enter Exact Quantity (10-23 pieces):
                 </label>
                 <input type="number" id="dtf-exact-quantity" class="dtf-quantity-input universal-quantity-input"
                        min="10" max="23" value="${currentQty}" placeholder="Enter 10-23" />
                 <small class="dtf-quantity-hint universal-quantity-hint">
-                    <i class="fas fa-info-circle"></i>
+                    <i class="fas fa-info-circle" aria-hidden="true"></i>
                     Required for accurate fee distribution:
                     <strong id="dtf-ltm-fee-calc">$${ltmFee.toFixed(0)} ÷ ${currentQty} = $${ltmFeePerPiece}/piece</strong>
                 </small>

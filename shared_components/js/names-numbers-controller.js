@@ -371,7 +371,7 @@ class NamesNumbersController {
                 <div class="garment-row-header">
                     <span class="garment-row-idx">Garment ${idx + 1}</span>
                     <button type="button" class="btn-sm btn-danger garment-delete-btn" title="Remove garment" ${group.garments.length === 1 ? 'disabled' : ''}>
-                        <i class="fas fa-times"></i>
+                        <i class="fas fa-times" aria-hidden="true"></i>
                     </button>
                 </div>
                 <div class="garment-row-fields">
@@ -459,7 +459,7 @@ class NamesNumbersController {
                 <div class="custom-col-row" data-col-id="${cc.id}">
                     <input type="text" class="cc-label" placeholder="Column label" value="${this.escapeAttr(cc.label || '')}">
                     <button type="button" class="btn-sm btn-danger cc-delete-btn" title="Remove column">
-                        <i class="fas fa-times"></i>
+                        <i class="fas fa-times" aria-hidden="true"></i>
                     </button>
                 </div>
             `).join('');
@@ -641,7 +641,7 @@ class NamesNumbersController {
                     ? `placeholder="${this.escapeAttr(group.defaults[d.key])}"` : '';
                 html += `<td class="col-${d.kind}${d.kind === 'garment' ? ' garment-band-' + (group.garments.findIndex(g => g.id === d.garmentId) % 4) : ''}"><input type="text" ${dataAttrs} value="${this.escapeAttr(val)}" ${placeholder}></td>`;
             });
-            html += `<td class="row-actions"><button type="button" class="row-delete-btn" data-idx="${idx}" title="Remove row"><i class="fas fa-times"></i></button></td>`;
+            html += `<td class="row-actions"><button type="button" class="row-delete-btn" data-idx="${idx}" title="Remove row"><i class="fas fa-times" aria-hidden="true"></i></button></td>`;
 
             tr.innerHTML = html;
             tbody.appendChild(tr);
@@ -957,7 +957,7 @@ class NamesNumbersController {
         const isPdf = file.type === 'application/pdf' || /\.pdf$/i.test(file.name);
         if (isPdf) {
             const sizeKb = Math.round(file.size / 1024);
-            preview.innerHTML = `<div class="ocr-pdf-chip"><i class="fas fa-file-pdf"></i><div><strong>${this.escapeHtml(file.name)}</strong><div class="ocr-pdf-meta">PDF · ${sizeKb} KB</div></div></div>`;
+            preview.innerHTML = `<div class="ocr-pdf-chip"><i class="fas fa-file-pdf" aria-hidden="true"></i><div><strong>${this.escapeHtml(file.name)}</strong><div class="ocr-pdf-meta">PDF · ${sizeKb} KB</div></div></div>`;
             preview.style.display = '';
         } else {
             const reader = new FileReader();
@@ -1016,7 +1016,7 @@ class NamesNumbersController {
                     <div class="ocr-garment-chip" data-idx="${i}">
                         <input type="text" class="ocr-garment-label" value="${this.escapeAttr(g.label)}" placeholder="Garment label">
                         <label><input type="checkbox" class="ocr-garment-backPrint" ${g.hasBackPrint ? 'checked' : ''}> Back Print</label>
-                        <button type="button" class="ocr-garment-remove" ${detectedGarments.length === 1 ? 'disabled' : ''} title="Remove"><i class="fas fa-times"></i></button>
+                        <button type="button" class="ocr-garment-remove" ${detectedGarments.length === 1 ? 'disabled' : ''} title="Remove"><i class="fas fa-times" aria-hidden="true"></i></button>
                     </div>
                 `).join('')}</div>
             </div>`;
@@ -1094,7 +1094,7 @@ class NamesNumbersController {
                 <div class="ocr-garment-chip" data-idx="${i}">
                     <input type="text" class="ocr-garment-label" value="${this.escapeAttr(g.label)}" placeholder="Garment label">
                     <label><input type="checkbox" class="ocr-garment-backPrint" ${g.hasBackPrint ? 'checked' : ''}> Back Print</label>
-                    <button type="button" class="ocr-garment-remove" ${garments.length === 1 ? 'disabled' : ''} title="Remove"><i class="fas fa-times"></i></button>
+                    <button type="button" class="ocr-garment-remove" ${garments.length === 1 ? 'disabled' : ''} title="Remove"><i class="fas fa-times" aria-hidden="true"></i></button>
                 </div>
             `).join('');
             list.querySelectorAll('.ocr-garment-label').forEach(input => {

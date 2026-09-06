@@ -622,7 +622,7 @@
                 '<div class="tas-modal-backdrop"></div>' +
                 '<div class="tas-modal-content tas-modal-content--paste">' +
                     '<div class="tas-modal-header">' +
-                        '<h3 id="tas-modal-title"><i class="fas fa-paper-plane"></i> Send to Supacolor</h3>' +
+                        '<h3 id="tas-modal-title"><i class="fas fa-paper-plane" aria-hidden="true"></i> Send to Supacolor</h3>' +
                         '<button type="button" class="tas-modal-close" aria-label="Close">&times;</button>' +
                     '</div>' +
                     '<div class="tas-modal-body">' +
@@ -635,11 +635,11 @@
                             '<div class="tas-checklist-title">Bradley needs both:</div>' +
                             '<div class="tas-checklist-items">' +
                                 '<div class="tas-checklist-item" data-key="transfer">' +
-                                    '<span class="tas-checklist-marker"><i class="fas fa-circle"></i></span>' +
+                                    '<span class="tas-checklist-marker"><i class="fas fa-circle" aria-hidden="true"></i></span>' +
                                     '<span class="tas-checklist-text"><strong>Working file</strong> &mdash; the actual transfer artwork (PNG / PDF / AI)</span>' +
                                 '</div>' +
                                 '<div class="tas-checklist-item" data-key="mockup">' +
-                                    '<span class="tas-checklist-marker"><i class="fas fa-circle"></i></span>' +
+                                    '<span class="tas-checklist-marker"><i class="fas fa-circle" aria-hidden="true"></i></span>' +
                                     '<span class="tas-checklist-text"><strong>Mockup</strong> &mdash; so AI vision can pre-fill sales rep, customer, garment for Bradley</span>' +
                                 '</div>' +
                             '</div>' +
@@ -648,7 +648,7 @@
                             // ── Picker: search box + folder/file results ──
                             '<div class="tas-picker">' +
                                 '<div class="tas-picker-search">' +
-                                    '<i class="fas fa-search tas-picker-search-icon"></i>' +
+                                    '<i class="fas fa-search tas-picker-search-icon" aria-hidden="true"></i>' +
                                     '<input type="text" id="tas-picker-search-input" class="tas-picker-search-input" placeholder="Search design # or company (e.g. 39721 or Asphalt Patch)" autocomplete="off">' +
                                     '<button type="button" id="tas-picker-clear" class="tas-picker-clear" style="display:none;" aria-label="Clear">&times;</button>' +
                                 '</div>' +
@@ -660,7 +660,7 @@
                                 '<summary>Or paste a Box link manually</summary>' +
                                 '<div id="tas-link-rows" class="tas-link-rows"></div>' +
                                 '<button type="button" id="tas-add-row" class="tas-add-row-btn">' +
-                                    '<i class="fas fa-plus"></i> Paste another link' +
+                                    '<i class="fas fa-plus" aria-hidden="true"></i> Paste another link' +
                                 '</button>' +
                             '</details>' +
                             '<div id="tas-mockup-summary" class="tas-mockup-summary" style="display:none;"></div>' +
@@ -693,13 +693,13 @@
                             // Soft warning when Steve has a transfer but no mockup —
                             // doesn't block submit, just makes the consequence visible.
                             '<div id="tas-mockup-warning" class="tas-mockup-warning" style="display:none;">' +
-                                '<i class="fas fa-exclamation-triangle"></i>' +
+                                '<i class="fas fa-exclamation-triangle" aria-hidden="true"></i>' +
                                 '<span>No mockup detected. Bradley will get the transfer file but <strong>won’t get auto-filled sales rep / customer / garment info</strong>. Add a mockup if you can.</span>' +
                             '</div>' +
                             '<div class="tas-form-actions">' +
                                 '<button type="button" class="tas-btn tas-btn--secondary tas-modal-cancel">Cancel</button>' +
                                 '<button type="submit" class="tas-btn tas-btn--primary" id="tas-submit-btn" disabled>' +
-                                    '<i class="fas fa-paper-plane"></i> Send to Bradley' +
+                                    '<i class="fas fa-paper-plane" aria-hidden="true"></i> Send to Bradley' +
                                 '</button>' +
                             '</div>' +
                         '</form>' +
@@ -815,7 +815,7 @@
             '<div class="tas-picker-recent-pills">' +
             list.map(function (f) {
                 return '<button type="button" class="tas-picker-pill" data-folder-id="' + escapeHtml(f.id) + '" data-folder-name="' + escapeHtml(f.name) + '">' +
-                    '<i class="fas fa-folder"></i> ' + escapeHtml(f.name) +
+                    '<i class="fas fa-folder" aria-hidden="true"></i> ' + escapeHtml(f.name) +
                     '</button>';
             }).join('') +
             '</div>';
@@ -863,7 +863,7 @@
         var results = $('#tas-picker-results');
         var recent = $('#tas-picker-recent');
         if (recent) recent.innerHTML = '';
-        results.innerHTML = '<div class="tas-picker-busy"><i class="fas fa-spinner fa-spin"></i> Searching Box...</div>';
+        results.innerHTML = '<div class="tas-picker-busy"><i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Searching Box...</div>';
         try {
             var data = await boxGetJson(
                 '/api/box/search?query=' + encodeURIComponent(query) + '&type=folder&limit=20',
@@ -871,7 +871,7 @@
             renderSearchResults(data.entries || []);
         } catch (err) {
             console.warn('[tas picker] search failed:', err);
-            results.innerHTML = '<div class="tas-picker-err"><i class="fas fa-exclamation-triangle"></i> ' + escapeHtml(err.message || 'Search failed') + '</div>';
+            results.innerHTML = '<div class="tas-picker-err"><i class="fas fa-exclamation-triangle" aria-hidden="true"></i> ' + escapeHtml(err.message || 'Search failed') + '</div>';
         }
     }
 
@@ -885,9 +885,9 @@
             '<div class="tas-picker-folder-list">' +
             entries.map(function (e) {
                 return '<button type="button" class="tas-picker-folder" data-folder-id="' + escapeHtml(e.id) + '" data-folder-name="' + escapeHtml(e.name) + '">' +
-                    '<i class="fas fa-folder"></i>' +
+                    '<i class="fas fa-folder" aria-hidden="true"></i>' +
                     '<span>' + escapeHtml(e.name) + '</span>' +
-                    '<i class="fas fa-chevron-right tas-picker-folder-arrow"></i>' +
+                    '<i class="fas fa-chevron-right tas-picker-folder-arrow" aria-hidden="true"></i>' +
                     '</button>';
             }).join('') +
             '</div>';
@@ -902,7 +902,7 @@
         var results = $('#tas-picker-results');
         var recent = $('#tas-picker-recent');
         if (recent) recent.innerHTML = '';
-        results.innerHTML = '<div class="tas-picker-busy"><i class="fas fa-spinner fa-spin"></i> Loading files...</div>';
+        results.innerHTML = '<div class="tas-picker-busy"><i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Loading files...</div>';
         recordRecentFolder({ id: folderId, name: folderName });
         try {
             var data = await boxGetJson(
@@ -911,7 +911,7 @@
             renderFileGrid(folderId, folderName, data.files || []);
         } catch (err) {
             console.warn('[tas picker] folder load failed:', err);
-            results.innerHTML = '<div class="tas-picker-err"><i class="fas fa-exclamation-triangle"></i> ' + escapeHtml(err.message || 'Load failed') + '</div>';
+            results.innerHTML = '<div class="tas-picker-err"><i class="fas fa-exclamation-triangle" aria-hidden="true"></i> ' + escapeHtml(err.message || 'Load failed') + '</div>';
         }
     }
 
@@ -933,8 +933,8 @@
 
         results.innerHTML =
             '<div class="tas-picker-folder-header">' +
-                '<button type="button" class="tas-picker-back" id="tas-picker-back-btn"><i class="fas fa-arrow-left"></i> Back</button>' +
-                '<span class="tas-picker-folder-title"><i class="fas fa-folder-open"></i> ' + escapeHtml(folderName) + '</span>' +
+                '<button type="button" class="tas-picker-back" id="tas-picker-back-btn"><i class="fas fa-arrow-left" aria-hidden="true"></i> Back</button>' +
+                '<span class="tas-picker-folder-title"><i class="fas fa-folder-open" aria-hidden="true"></i> ' + escapeHtml(folderName) + '</span>' +
             '</div>' +
             (sorted.length === 0
                 ? '<div class="tas-picker-empty">No files in this folder.</div>'
@@ -942,7 +942,7 @@
                     sorted.map(function (f) {
                         var thumb = f.thumbnailUrl
                             ? '<img src="' + escapeHtml(resolveBoxUrl(API_BASE + f.thumbnailUrl)) + '" alt="" class="tas-picker-file-thumb" onerror="this.style.display=\'none\'">'
-                            : '<div class="tas-picker-file-thumb tas-picker-file-thumb--placeholder"><i class="fas fa-file"></i></div>';
+                            : '<div class="tas-picker-file-thumb tas-picker-file-thumb--placeholder"><i class="fas fa-file" aria-hidden="true"></i></div>';
                         var ext = String(f.extension || '').toUpperCase();
                         var size = f.size ? formatBytes(f.size) : '';
                         var modified = f.modified_at ? new Date(f.modified_at).toLocaleDateString() : '';
@@ -952,7 +952,7 @@
                                 '<div class="tas-picker-file-name">' + escapeHtml(f.name) + '</div>' +
                                 '<div class="tas-picker-file-sub">' + escapeHtml(ext) + (size ? ' \u00b7 ' + size : '') + (modified ? ' \u00b7 ' + escapeHtml(modified) : '') + '</div>' +
                             '</div>' +
-                            '<i class="fas fa-plus-circle tas-picker-file-add"></i>' +
+                            '<i class="fas fa-plus-circle tas-picker-file-add" aria-hidden="true"></i>' +
                         '</button>';
                     }).join('') +
                 '</div>'
@@ -1076,9 +1076,9 @@
 
         var statusBlock = '';
         if (row.status === 'analyzing') {
-            statusBlock = '<div class="tas-row-status tas-row-status--busy"><i class="fas fa-spinner fa-spin"></i> Analyzing\u2026</div>';
+            statusBlock = '<div class="tas-row-status tas-row-status--busy"><i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Analyzing\u2026</div>';
         } else if (row.status === 'err') {
-            statusBlock = '<div class="tas-row-status tas-row-status--err"><i class="fas fa-exclamation-triangle"></i> ' + escapeHtml(row.error || 'Analysis failed') + '</div>';
+            statusBlock = '<div class="tas-row-status tas-row-status--err"><i class="fas fa-exclamation-triangle" aria-hidden="true"></i> ' + escapeHtml(row.error || 'Analysis failed') + '</div>';
         } else if (row.status === 'ok' && row.analysis) {
             statusBlock = renderAnalysisCard(row.analysis, row);
         }
@@ -1110,12 +1110,12 @@
 
         var placementLine = '';
         if (effective === 'working' && parsed.placementLabel) {
-            placementLine = '<div class="tas-row-place"><i class="fas fa-map-marker-alt"></i> ' + escapeHtml(parsed.placementLabel) + '</div>';
+            placementLine = '<div class="tas-row-place"><i class="fas fa-map-marker-alt" aria-hidden="true"></i> ' + escapeHtml(parsed.placementLabel) + '</div>';
         }
 
         var mismatchWarning = '';
         if (a.dimensionMismatch) {
-            mismatchWarning = '<div class="tas-row-warn"><i class="fas fa-exclamation-triangle"></i> ' +
+            mismatchWarning = '<div class="tas-row-warn"><i class="fas fa-exclamation-triangle" aria-hidden="true"></i> ' +
                 'Filename says ' + escapeHtml(a.dimensionMismatch.claimed) + ' but file is actually ' + escapeHtml(a.dimensionMismatch.actual) + '. Fix the filename or re-export before sending.' +
                 '</div>';
         }
@@ -1128,17 +1128,17 @@
             typeToggle =
                 '<div class="tas-row-type-toggle" role="group" aria-label="File type">' +
                     '<button type="button" class="tas-type-btn ' + (effective === 'working' ? 'tas-type-btn--active' : '') + '" data-action="set-type" data-row-id="' + rid + '" data-type="working">' +
-                        '<i class="fas fa-file-image"></i> Working' +
+                        '<i class="fas fa-file-image" aria-hidden="true"></i> Working' +
                     '</button>' +
                     '<button type="button" class="tas-type-btn ' + (effective === 'mockup' ? 'tas-type-btn--active' : '') + '" data-action="set-type" data-row-id="' + rid + '" data-type="mockup">' +
-                        '<i class="fas fa-image"></i> Mockup' +
+                        '<i class="fas fa-image" aria-hidden="true"></i> Mockup' +
                     '</button>' +
                 '</div>';
         }
 
         return '<div class="tas-row-card tas-row-card--' + escapeHtml(cardType) + '">' +
             '<div class="tas-row-head">' +
-                '<span class="tas-row-badge"><i class="fas fa-' + escapeHtml(badgeIcon) + '"></i> ' + escapeHtml(badgeLabel) + '</span>' +
+                '<span class="tas-row-badge"><i class="fas fa-' + escapeHtml(badgeIcon) + '" aria-hidden="true"></i> ' + escapeHtml(badgeLabel) + '</span>' +
                 '<span class="tas-row-filename">' + escapeHtml(a.fileName || '') + '</span>' +
                 typeToggle +
             '</div>' +
@@ -1166,7 +1166,7 @@
 
         if (mockupAnalysis.mockupVisionError) {
             container.style.display = '';
-            container.innerHTML = '<div class="tas-mockup-summary-head"><i class="fas fa-robot"></i> Mockup scan</div>' +
+            container.innerHTML = '<div class="tas-mockup-summary-head"><i class="fas fa-robot" aria-hidden="true"></i> Mockup scan</div>' +
                 '<div class="tas-row-warn">Couldn\'t auto-read this mockup. Bradley will still get the Box link but no pre-filled sales rep / garment info.</div>';
             return;
         }
@@ -1180,8 +1180,8 @@
         var rep = mockupAnalysis.salesRepMatch;
         var repLine = v.salesRep
             ? (rep
-                ? escapeHtml(v.salesRep) + ' <span class="tas-crm-check"><i class="fas fa-check-circle"></i> ' + escapeHtml(rep.email) + '</span>'
-                : escapeHtml(v.salesRep) + ' <span class="tas-crm-miss"><i class="fas fa-question-circle"></i> not in CRM</span>')
+                ? escapeHtml(v.salesRep) + ' <span class="tas-crm-check"><i class="fas fa-check-circle" aria-hidden="true"></i> ' + escapeHtml(rep.email) + '</span>'
+                : escapeHtml(v.salesRep) + ' <span class="tas-crm-miss"><i class="fas fa-question-circle" aria-hidden="true"></i> not in CRM</span>')
             : '<span class="tas-muted">(not detected)</span>';
 
         // Method-aware row set: Supacolor shows Transfer Type; Screen Print
@@ -1226,13 +1226,13 @@
                 '</tr>';
             }).join('');
             spChartHtml = '<div class="tas-sp-chart">' +
-                '<div class="tas-mockup-summary-head" style="margin-top:10px;"><i class="fas fa-print"></i> Print Specs</div>' +
+                '<div class="tas-mockup-summary-head" style="margin-top:10px;"><i class="fas fa-print" aria-hidden="true"></i> Print Specs</div>' +
                 '<table class="tas-mockup-summary-table tas-sp-chart-table">' + locRows + '</table>' +
                 '</div>';
         }
 
         container.style.display = '';
-        container.innerHTML = '<div class="tas-mockup-summary-head"><i class="fas fa-robot"></i> Extracted from mockup</div>' +
+        container.innerHTML = '<div class="tas-mockup-summary-head"><i class="fas fa-robot" aria-hidden="true"></i> Extracted from mockup</div>' +
             '<table class="tas-mockup-summary-table">' +
             rows.map(function (r) { return '<tr><td class="tas-label">' + r.label + '</td><td>' + r.value + '</td></tr>'; }).join('') +
             '</table>' +
@@ -1398,25 +1398,25 @@
         if (!warn) return;
         if (mockupCount > 1) {
             warn.style.display = '';
-            warn.innerHTML = '<i class="fas fa-exclamation-triangle"></i>' +
+            warn.innerHTML = '<i class="fas fa-exclamation-triangle" aria-hidden="true"></i>' +
                 '<span>Only <strong>one mockup</strong> is allowed per transfer. Toggle the extras to "Working" before sending.</span>';
             return;
         }
         if (workingCount > MAX_WORKING_FILES) {
             warn.style.display = '';
-            warn.innerHTML = '<i class="fas fa-exclamation-triangle"></i>' +
+            warn.innerHTML = '<i class="fas fa-exclamation-triangle" aria-hidden="true"></i>' +
                 '<span>Too many working files (' + workingCount + '). Max ' + MAX_WORKING_FILES + ' per transfer.</span>';
             return;
         }
         if (workingCount > SOFT_WARN_FILES) {
             warn.style.display = '';
-            warn.innerHTML = '<i class="fas fa-info-circle"></i>' +
+            warn.innerHTML = '<i class="fas fa-info-circle" aria-hidden="true"></i>' +
                 '<span>That’s a lot of working files (' + workingCount + '). Bradley will see them all on his queue card.</span>';
             return;
         }
         if (hasTransfer && !hasMockup) {
             warn.style.display = '';
-            warn.innerHTML = '<i class="fas fa-exclamation-triangle"></i>' +
+            warn.innerHTML = '<i class="fas fa-exclamation-triangle" aria-hidden="true"></i>' +
                 '<span>No mockup detected. Bradley will get the transfer file but <strong>won’t get auto-filled sales rep / customer / garment info</strong>. Add a mockup if you can.</span>';
             return;
         }
@@ -1460,7 +1460,7 @@
         var titleEl = $('#tas-modal-title');
         if (titleEl) {
             var titleIcon = modalState.method === 'Screen Print' ? 'print' : 'paper-plane';
-            titleEl.innerHTML = '<i class="fas fa-' + titleIcon + '"></i> ' + cfg.title;
+            titleEl.innerHTML = '<i class="fas fa-' + titleIcon + '" aria-hidden="true"></i> ' + cfg.title;
         }
         var introEl = document.querySelector('#tas-modal .tas-modal-intro');
         if (introEl) introEl.textContent = cfg.intro;
@@ -1469,7 +1469,7 @@
         var mockItem = document.querySelector('#tas-checklist .tas-checklist-item[data-key="mockup"] .tas-checklist-text');
         if (mockItem) mockItem.innerHTML = '<strong>Mockup</strong> &mdash; ' + cfg.mockupChecklist;
         var submitBtn = $('#tas-submit-btn');
-        if (submitBtn) submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> ' + cfg.submitLabel;
+        if (submitBtn) submitBtn.innerHTML = '<i class="fas fa-paper-plane" aria-hidden="true"></i> ' + cfg.submitLabel;
 
         // Toggle SP notes section visibility + reset its value
         var spNotesRow = $('#tas-sp-notes-row');
@@ -1556,7 +1556,7 @@
 
         var submitBtn = $('#tas-submit-btn');
         submitBtn.disabled = true;
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending\u2026';
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Sending\u2026';
 
         try {
             var primary = transfers[0];
@@ -1599,7 +1599,7 @@
                     manualDesignEl.focus();
                 }
                 submitBtn.disabled = false;
-                submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Send to Bradley';
+                submitBtn.innerHTML = '<i class="fas fa-paper-plane" aria-hidden="true"></i> Send to Bradley';
                 return;
             }
 
@@ -1742,7 +1742,7 @@
                 closeModal();
                 showToast('DRY RUN \u2014 payload logged to console.', 'info');
                 submitBtn.disabled = false;
-                submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Send to Bradley';
+                submitBtn.innerHTML = '<i class="fas fa-paper-plane" aria-hidden="true"></i> Send to Bradley';
                 return;
             }
 
@@ -1793,7 +1793,7 @@
             showToast('Failed: ' + err.message, 'error');
         } finally {
             submitBtn.disabled = false;
-            submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Send to Bradley';
+            submitBtn.innerHTML = '<i class="fas fa-paper-plane" aria-hidden="true"></i> Send to Bradley';
         }
     }
     // ── Read helpers (for status badge on mockup-detail etc.) ────────
@@ -1891,12 +1891,12 @@
             var carrierLabel = transfer.Carrier ? escapeHtml(transfer.Carrier) + ' ' : '';
             var trackTxt = carrierLabel + escapeHtml(transfer.Tracking_Number);
             trackingBlock = trackUrl
-                ? '<a class="tas-transfer-badge-track" href="' + escapeHtml(trackUrl) + '" target="_blank" rel="noopener" onclick="event.stopPropagation()"><i class="fas fa-truck"></i> ' + trackTxt + '</a>'
-                : '<span class="tas-transfer-badge-track"><i class="fas fa-truck"></i> ' + trackTxt + '</span>';
+                ? '<a class="tas-transfer-badge-track" href="' + escapeHtml(trackUrl) + '" target="_blank" rel="noopener" onclick="event.stopPropagation()"><i class="fas fa-truck" aria-hidden="true"></i> ' + trackTxt + '</a>'
+                : '<span class="tas-transfer-badge-track"><i class="fas fa-truck" aria-hidden="true"></i> ' + trackTxt + '</span>';
         }
         var detailLink = SITE_ORIGIN + '/pages/transfer-detail.html?id=' + encodeURIComponent(transfer.ID_Transfer || '');
         return '<a href="' + escapeHtml(detailLink) + '" class="tas-transfer-badge" style="--badge-color:' + meta.color + ';--badge-bg:' + meta.bg + ';" title="View transfer detail">' +
-            '<i class="fas fa-' + meta.icon + '"></i>' +
+            '<i class="fas fa-' + meta.icon + '" aria-hidden="true"></i>' +
             '<span class="tas-transfer-badge-id">' + escapeHtml(transfer.ID_Transfer || '') + '</span>' +
             '<span class="tas-transfer-badge-status">' + escapeHtml(meta.label) + '</span>' +
             trackingBlock +
