@@ -15,6 +15,8 @@
  * The quote row lookup uses ?quoteID= + .find(QuoteID===id) — never
  * sessions[0] (the 2026-06-01 wrong-quote lesson).
  */
+var P3DAYTEES_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
+var p3dayteesLog = P3DAYTEES_LOG_ON ? console.log.bind(console) : function () {}; // debug logging: localhost or ?debug=1 only (2026-09-06 console sweep)
 (function () {
     'use strict';
 
@@ -175,7 +177,7 @@
         // server-side and stamps emailsSentAt — browser send is only the
         // fallback for rows the webhook couldn't email (mirrors custom-tees).
         if (orderSettings && orderSettings.emailsSentAt) {
-            console.log('[3DT Success] Emails already sent server-side — skipping browser send.');
+            p3dayteesLog('[3DT Success] Emails already sent server-side — skipping browser send.');
             return;
         }
 
@@ -221,14 +223,14 @@
             to_email: customerData.email,
             to_name: base.customer_name,
         }, base)).then(
-            () => console.log('[3DT Success] Customer email sent'),
+            () => p3dayteesLog('[3DT Success] Customer email sent'),
             (e) => console.error('[3DT Success] Customer email failed:', e)
         );
         emailjs.send(EMAILJS_SERVICE, 'template_sample_sales', Object.assign({
             to_email: 'erik@nwcustomapparel.com',
             to_name: 'NWCA Sales',
         }, base)).then(
-            () => console.log('[3DT Success] Staff email sent'),
+            () => p3dayteesLog('[3DT Success] Staff email sent'),
             (e) => console.error('[3DT Success] Staff email failed:', e)
         );
     }

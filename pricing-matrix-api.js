@@ -1,5 +1,7 @@
 // pricing-matrix-api.js - Simple API for accessing pricing matrix data
-console.log("[PRICING-MATRIX-API:LOAD] Pricing matrix API loaded");
+var PRICMATRAPI_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
+var pricmatrapiLog = PRICMATRAPI_LOG_ON ? console.log.bind(console) : function () {}; // debug logging: localhost or ?debug=1 only (2026-09-06 console sweep)
+pricmatrapiLog("[PRICING-MATRIX-API:LOAD] Pricing matrix API loaded");
 
 (function() {
     "use strict";
@@ -12,17 +14,17 @@ console.log("[PRICING-MATRIX-API:LOAD] Pricing matrix API loaded");
     
     // Initialize the pricing matrix API
     function initialize() {
-        console.log("[PRICING-MATRIX-API:INIT] Initializing pricing matrix API");
+        pricmatrapiLog("[PRICING-MATRIX-API:INIT] Initializing pricing matrix API");
         
         // Check if PricingMatrixAPI already exists
         if (!window.PricingMatrixAPI) {
-            console.log("[PRICING-MATRIX-API:INIT] PricingMatrixAPI not found, creating it.");
+            pricmatrapiLog("[PRICING-MATRIX-API:INIT] PricingMatrixAPI not found, creating it.");
             window.PricingMatrixAPI = {
                 getPrice: getPrice, // Note: getPrice might need review based on new getPricingData logic
                 getPricingData: getPricingData
             };
         } else {
-             console.log("[PRICING-MATRIX-API:INIT] PricingMatrixAPI already exists.");
+             pricmatrapiLog("[PRICING-MATRIX-API:INIT] PricingMatrixAPI already exists.");
         }
 
         // Backward compatibility / alias (with warning)
@@ -43,17 +45,17 @@ console.log("[PRICING-MATRIX-API:LOAD] Pricing matrix API loaded");
         let apiData = null;
 
         try {
-            console.log(`[PRICING-MATRIX-API:GET] Getting pricing data for matrix ID: ${matrixId}`);
+            pricmatrapiLog(`[PRICING-MATRIX-API:GET] Getting pricing data for matrix ID: ${matrixId}`);
             
             // Construct the API URL with the specific matrix ID
             const apiUrl = `${API_BASE_URL}/pricing-matrix/${matrixId}`;
-            console.log(`[PRICING-MATRIX-API:FETCH] Requesting URL: ${apiUrl}`);
+            pricmatrapiLog(`[PRICING-MATRIX-API:FETCH] Requesting URL: ${apiUrl}`);
             
             const response = await fetch(apiUrl);
             
             if (response.ok) {
                 apiData = await response.json();
-                console.log(`[PRICING-MATRIX-API:GET] Received data for matrix ID ${matrixId}:`, apiData);
+                pricmatrapiLog(`[PRICING-MATRIX-API:GET] Received data for matrix ID ${matrixId}:`, apiData);
 
                 // Basic validation of received data
                 if (!apiData || !apiData.PriceMatrix || !apiData.SizeGroups) {
@@ -64,7 +66,7 @@ console.log("[PRICING-MATRIX-API:LOAD] Pricing matrix API loaded");
                     try {
                         // Ensure data is stringified before storing
                         localStorage.setItem(cacheKey, JSON.stringify(apiData));
-                        console.log(`[PRICING-MATRIX-API:CACHE] Cached data for matrix ID ${matrixId}`);
+                        pricmatrapiLog(`[PRICING-MATRIX-API:CACHE] Cached data for matrix ID ${matrixId}`);
                     } catch (cacheError) {
                         console.error(`[PRICING-MATRIX-API:CACHE-ERROR] Error caching data for matrix ID ${matrixId}:`, cacheError);
                     }
@@ -85,7 +87,7 @@ console.log("[PRICING-MATRIX-API:LOAD] Pricing matrix API loaded");
             try {
                 const localData = localStorage.getItem(cacheKey);
                 if (localData) {
-                    console.log(`[PRICING-MATRIX-API:GET] Found pricing data in localStorage for matrix ID ${matrixId} after API failure/error.`);
+                    pricmatrapiLog(`[PRICING-MATRIX-API:GET] Found pricing data in localStorage for matrix ID ${matrixId} after API failure/error.`);
                     // Ensure localStorage data is parsed
                     apiData = JSON.parse(localData);
                 } else {
@@ -153,7 +155,7 @@ console.log("[PRICING-MATRIX-API:LOAD] Pricing matrix API loaded");
                 capturedAt: apiData.CaptureDate,
                 matrixId: matrixId // Include the ID used
             };
-            console.log(`[PRICING-MATRIX-API:GET] Successfully formatted data for matrix ID ${matrixId}:`, formattedData);
+            pricmatrapiLog(`[PRICING-MATRIX-API:GET] Successfully formatted data for matrix ID ${matrixId}:`, formattedData);
             return formattedData;
 
         } catch (parseError) {
@@ -170,7 +172,7 @@ console.log("[PRICING-MATRIX-API:LOAD] Pricing matrix API loaded");
     async function getPrice(styleNumber, color, embType, size, quantity) {
         try {
             console.warn(`[PRICING-MATRIX-API:PRICE] The 'getPrice' function may be outdated. It needs a matrixId but is called with style/color/type.`);
-            console.log(`[PRICING-MATRIX-API:PRICE] Attempting to get price for ${styleNumber}, ${color}, ${embType}, ${size}, ${quantity} (will likely use default price without matrixId)`);
+            pricmatrapiLog(`[PRICING-MATRIX-API:PRICE] Attempting to get price for ${styleNumber}, ${color}, ${embType}, ${size}, ${quantity} (will likely use default price without matrixId)`);
             
             // --- THIS PART NEEDS REVISION ---
             // How do we get the matrixId here?
@@ -218,7 +220,7 @@ console.log("[PRICING-MATRIX-API:LOAD] Pricing matrix API loaded");
                 
                 // If no tier found, use the lowest tier (usually 1-23)
                 if (!tier && data.rows.length > 0) {
-                    console.log(`[PRICING-MATRIX-API:PRICE] No exact tier match found for quantity ${quantity}, using lowest tier`);
+                    pricmatrapiLog(`[PRICING-MATRIX-API:PRICE] No exact tier match found for quantity ${quantity}, using lowest tier`);
                     
                     // Find the tier with the lowest minimum quantity
                     let lowestMin = Number.MAX_SAFE_INTEGER;
@@ -243,13 +245,13 @@ console.log("[PRICING-MATRIX-API:LOAD] Pricing matrix API loaded");
                     }
                     
                     if (lowestTier) {
-                        console.log(`[PRICING-MATRIX-API:PRICE] Using lowest tier: ${lowestTier.tier}`);
+                        pricmatrapiLog(`[PRICING-MATRIX-API:PRICE] Using lowest tier: ${lowestTier.tier}`);
                         tier = lowestTier;
                     }
                 }
                 
                 if (tier) {
-                    console.log(`[PRICING-MATRIX-API:PRICE] Found tier:`, tier);
+                    pricmatrapiLog(`[PRICING-MATRIX-API:PRICE] Found tier:`, tier);
                     
                     // Find the price for this size
                     let sizeKey = size;
@@ -270,7 +272,7 @@ console.log("[PRICING-MATRIX-API:LOAD] Pricing matrix API loaded");
                                     if (startIdx !== -1 && endIdx !== -1 && 
                                         sizeIdx >= startIdx && sizeIdx <= endIdx) {
                                         sizeKey = key;
-                                        console.log(`[PRICING-MATRIX-API:PRICE] Size ${size} matches range ${key}`);
+                                        pricmatrapiLog(`[PRICING-MATRIX-API:PRICE] Size ${size} matches range ${key}`);
                                         break;
                                     }
                                 }
@@ -281,26 +283,26 @@ console.log("[PRICING-MATRIX-API:LOAD] Pricing matrix API loaded");
                     const price = tier.prices[sizeKey];
                     
                     if (price) {
-                        console.log(`[PRICING-MATRIX-API:PRICE] Found price for ${size} (using key ${sizeKey}): $${price}`);
+                        pricmatrapiLog(`[PRICING-MATRIX-API:PRICE] Found price for ${size} (using key ${sizeKey}): $${price}`);
                         return price;
                     } else {
-                        console.log(`[PRICING-MATRIX-API:PRICE] No price found for ${size} (tried key ${sizeKey})`);
+                        pricmatrapiLog(`[PRICING-MATRIX-API:PRICE] No price found for ${size} (tried key ${sizeKey})`);
                     }
                 } else {
-                    console.log(`[PRICING-MATRIX-API:PRICE] No tier found for quantity ${quantity}`);
+                    pricmatrapiLog(`[PRICING-MATRIX-API:PRICE] No tier found for quantity ${quantity}`);
                 }
             } else {
-                console.log(`[PRICING-MATRIX-API:PRICE] No pricing data found for ${styleNumber}, ${color}, ${embType}`);
+                pricmatrapiLog(`[PRICING-MATRIX-API:PRICE] No pricing data found for ${styleNumber}, ${color}, ${embType}`);
             }
             
             // Fallback to default pricing
             const defaultPrice = getDefaultPrice(size, quantity, embType);
-            console.log(`[PRICING-MATRIX-API:PRICE] Using default price: $${defaultPrice}`);
+            pricmatrapiLog(`[PRICING-MATRIX-API:PRICE] Using default price: $${defaultPrice}`);
             return defaultPrice;
         } catch (error) {
             console.error("[PRICING-MATRIX-API:PRICE-ERROR] Error getting price:", error);
             const defaultPrice = getDefaultPrice(size, quantity, embType);
-            console.log(`[PRICING-MATRIX-API:PRICE] Using default price after error: $${defaultPrice}`);
+            pricmatrapiLog(`[PRICING-MATRIX-API:PRICE] Using default price after error: $${defaultPrice}`);
             return defaultPrice;
         }
     }

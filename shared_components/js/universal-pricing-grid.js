@@ -2,6 +2,8 @@
  * Universal Pricing Grid Component
  * Displays size upcharges dynamically based on available sizes from API
  */
+var UNIVPRICGRID_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
+var univpricgridLog = UNIVPRICGRID_LOG_ON ? console.log.bind(console) : function () {}; // debug logging: localhost or ?debug=1 only (2026-09-06 console sweep)
 var UPG_API_BASE = (typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) || '';
 if (!UPG_API_BASE) console.error('[universal-pricing-grid] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
 
@@ -38,11 +40,11 @@ if (!UPG_API_BASE) console.error('[universal-pricing-grid] APP_CONFIG.API.BASE_U
             // Also listen for generic pricing updates
             document.addEventListener('pricingDataLoaded', (event) => this.handlePricingData(event.detail));
 
-            console.log('[UniversalPricingGrid] Initialized and listening for pricing data');
+            univpricgridLog('[UniversalPricingGrid] Initialized and listening for pricing data');
         }
 
         handlePricingData(data) {
-            console.log('[UniversalPricingGrid] Received pricing data:', data);
+            univpricgridLog('[UniversalPricingGrid] Received pricing data:', data);
 
             // Extract available sizes and upcharges from the data
             if (data && data.bundle) {
@@ -51,13 +53,13 @@ if (!UPG_API_BASE) console.error('[universal-pricing-grid] APP_CONFIG.API.BASE_U
                 // Get available sizes from the sizes array
                 if (bundle.sizes && Array.isArray(bundle.sizes)) {
                     this.availableSizes = bundle.sizes.map(sizeInfo => sizeInfo.size);
-                    console.log('[UniversalPricingGrid] Available sizes:', this.availableSizes);
+                    univpricgridLog('[UniversalPricingGrid] Available sizes:', this.availableSizes);
                 }
 
                 // Get upcharges
                 if (bundle.sellingPriceDisplayAddOns) {
                     this.upcharges = bundle.sellingPriceDisplayAddOns;
-                    console.log('[UniversalPricingGrid] All upcharges:', this.upcharges);
+                    univpricgridLog('[UniversalPricingGrid] All upcharges:', this.upcharges);
                 }
 
                 // Update the display
@@ -99,7 +101,7 @@ if (!UPG_API_BASE) console.error('[universal-pricing-grid] APP_CONFIG.API.BASE_U
             const html = this.generateUpchargeHTML(upchargeGroups);
             this.upchargeContainer.innerHTML = html;
 
-            console.log('[UniversalPricingGrid] Updated upcharge display with filtered sizes');
+            univpricgridLog('[UniversalPricingGrid] Updated upcharge display with filtered sizes');
         }
 
         filterUpchargesByAvailableSizes() {
@@ -112,7 +114,7 @@ if (!UPG_API_BASE) console.error('[universal-pricing-grid] APP_CONFIG.API.BASE_U
                 }
             });
 
-            console.log('[UniversalPricingGrid] Filtered upcharges:', filtered);
+            univpricgridLog('[UniversalPricingGrid] Filtered upcharges:', filtered);
             return filtered;
         }
 
@@ -185,7 +187,7 @@ if (!UPG_API_BASE) console.error('[universal-pricing-grid] APP_CONFIG.API.BASE_U
             if (!styleNumber) return;
 
             this.styleNumber = styleNumber;
-            console.log(`[UniversalPricingGrid] Loading size pricing for ${styleNumber}`);
+            univpricgridLog(`[UniversalPricingGrid] Loading size pricing for ${styleNumber}`);
 
             try {
                 const response = await fetch(`${UPG_API_BASE}/api/size-pricing?styleNumber=${styleNumber}`);
@@ -194,7 +196,7 @@ if (!UPG_API_BASE) console.error('[universal-pricing-grid] APP_CONFIG.API.BASE_U
                 }
 
                 const data = await response.json();
-                console.log('[UniversalPricingGrid] Size pricing data received:', data);
+                univpricgridLog('[UniversalPricingGrid] Size pricing data received:', data);
 
                 if (data && data.length > 0) {
                     // Use the first color's data (they should all have the same sizes and upcharges)
@@ -202,11 +204,11 @@ if (!UPG_API_BASE) console.error('[universal-pricing-grid] APP_CONFIG.API.BASE_U
 
                     // Extract available sizes from basePrices keys
                     this.availableSizes = Object.keys(firstColor.basePrices);
-                    console.log('[UniversalPricingGrid] Available sizes from API:', this.availableSizes);
+                    univpricgridLog('[UniversalPricingGrid] Available sizes from API:', this.availableSizes);
 
                     // Use the sizeUpcharges directly - it's already filtered!
                     this.upcharges = firstColor.sizeUpcharges || {};
-                    console.log('[UniversalPricingGrid] Size upcharges from API:', this.upcharges);
+                    univpricgridLog('[UniversalPricingGrid] Size upcharges from API:', this.upcharges);
 
                     // Update the display
                     this.updateUpchargeDisplay();
@@ -224,5 +226,5 @@ if (!UPG_API_BASE) console.error('[universal-pricing-grid] APP_CONFIG.API.BASE_U
     // Also expose the class for potential custom instances
     window.UniversalPricingGridClass = UniversalPricingGrid;
 
-    console.log('[UniversalPricingGrid] Component loaded and initialized');
+    univpricgridLog('[UniversalPricingGrid] Component loaded and initialized');
 })();

@@ -8,6 +8,8 @@
  * URL: /pages/supacolor-job-detail.html?id=<ID_Job>
  */
 
+var SUPAJOBDETA_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
+var supajobdetaLog = SUPAJOBDETA_LOG_ON ? console.log.bind(console) : function () {}; // debug logging: localhost or ?debug=1 only (2026-09-06 console sweep)
 (function () {
     'use strict';
 
@@ -572,7 +574,7 @@
         try {
             var result = await extractJobDetail(dataUri);
             var d = result.data || {};
-            console.log('[SupacolorJobDetail] Vision raw response:', d);
+            supajobdetaLog('[SupacolorJobDetail] Vision raw response:', d);
 
             // Sanity: if extracted job number doesn't match this job, warn
             var current = state.job.Supacolor_Job_Number;
@@ -709,11 +711,11 @@
                 if (jobPayload[k] === undefined) delete jobPayload[k];
             });
 
-            console.log('[SupacolorJobDetail] Extraction:', d);
-            console.log('[SupacolorJobDetail] Job upsert payload:', jobPayload);
+            supajobdetaLog('[SupacolorJobDetail] Extraction:', d);
+            supajobdetaLog('[SupacolorJobDetail] Job upsert payload:', jobPayload);
 
             var upsertResult = await upsertJob(jobPayload, force);
-            console.log('[SupacolorJobDetail] Upsert result:', upsertResult);
+            supajobdetaLog('[SupacolorJobDetail] Upsert result:', upsertResult);
             var jobAction = (upsertResult && upsertResult.action) || 'updated';
             var fieldsWritten = (upsertResult && upsertResult.updatedFields) ? upsertResult.updatedFields.length :
                                 (jobAction === 'inserted' ? Object.keys(jobPayload).length : 0);
@@ -734,9 +736,9 @@
                         Line_Total: l.lineTotal != null ? l.lineTotal : null
                     };
                 });
-                console.log('[SupacolorJobDetail] Joblines payload:', lines);
+                supajobdetaLog('[SupacolorJobDetail] Joblines payload:', lines);
                 var jlResult = await replaceJoblines(state.idJob, lines);
-                console.log('[SupacolorJobDetail] Joblines result:', jlResult);
+                supajobdetaLog('[SupacolorJobDetail] Joblines result:', jlResult);
                 joblinesWritten = (jlResult && jlResult.inserted) || lines.length;
             }
 
@@ -750,9 +752,9 @@
                         Event_At: h.eventAt || null
                     };
                 });
-                console.log('[SupacolorJobDetail] History payload:', events);
+                supajobdetaLog('[SupacolorJobDetail] History payload:', events);
                 var hResult = await replaceHistory(state.idJob, events);
-                console.log('[SupacolorJobDetail] History result:', hResult);
+                supajobdetaLog('[SupacolorJobDetail] History result:', hResult);
                 historyWritten = (hResult && hResult.inserted) || events.length;
             }
 

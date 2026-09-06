@@ -24,6 +24,8 @@
  *
  * Last synchronized: 2025-10-04
  */
+var SCREMANUPRIC_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
+var scremanupricLog = SCREMANUPRIC_LOG_ON ? console.log.bind(console) : function () {}; // debug logging: localhost or ?debug=1 only (2026-09-06 console sweep)
 var SP_MANUAL_API_BASE = (typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) || '';
 if (!SP_MANUAL_API_BASE) console.error('[screenprint-manual-pricing] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
 
@@ -88,12 +90,12 @@ class ScreenPrintManualPricing {
     }
 
     async init() {
-        console.log('[ScreenPrintV2] Initializing...');
+        scremanupricLog('[ScreenPrintV2] Initializing...');
 
         // Initialize pricing service
         if (typeof ScreenPrintPricingService !== 'undefined') {
             this.pricingService = new ScreenPrintPricingService();
-            console.log('[ScreenPrintV2] API service initialized');
+            scremanupricLog('[ScreenPrintV2] API service initialized');
         } else {
             console.error('[ScreenPrintV2] ScreenPrintPricingService not found!');
         }
@@ -105,7 +107,7 @@ class ScreenPrintManualPricing {
 
         // MANUAL MODE: Load raw API data (bypass service calculation that needs sizes)
         if (this.config.isManualMode) {
-            console.log('[Manual] Loading raw API pricing data...');
+            scremanupricLog('[Manual] Loading raw API pricing data...');
             try {
                 const response = await fetch(SP_MANUAL_API_BASE + '/api/pricing-bundle?method=ScreenPrint');
                 if (!response.ok) {
@@ -119,7 +121,7 @@ class ScreenPrintManualPricing {
                     throw new Error('Invalid API response - missing required fields');
                 }
 
-                console.log('[Manual] Raw API data loaded:', {
+                scremanupricLog('[Manual] Raw API data loaded:', {
                     tiers: rawData.tiersR?.length,
                     printCosts: rawData.allScreenprintCostsR?.length,
                     flashCharge: rawData.rulesR?.FlashCharge,
@@ -136,7 +138,7 @@ class ScreenPrintManualPricing {
                 // Make globally available
                 window.screenPrintPricingData = transformedData;
 
-                console.log('[Manual] Transformed data ready for calculations');
+                scremanupricLog('[Manual] Transformed data ready for calculations');
 
                 // Dispatch event for compatibility
                 window.dispatchEvent(new CustomEvent('screenPrintPricingLoaded', {
@@ -432,9 +434,9 @@ class ScreenPrintManualPricing {
         
         // Diagnostic: Check DOM after creation
         const frontColorOptions = document.querySelectorAll('#sp-front-colors option');
-        console.log('[ScreenPrintV2] Front color options in DOM:', frontColorOptions.length);
+        scremanupricLog('[ScreenPrintV2] Front color options in DOM:', frontColorOptions.length);
         frontColorOptions.forEach((opt, i) => {
-            console.log(`[ScreenPrintV2] Option ${i}: value="${opt.value}", text="${opt.text}"`);
+            scremanupricLog(`[ScreenPrintV2] Option ${i}: value="${opt.value}", text="${opt.text}"`);
         });
     }
 
@@ -444,7 +446,7 @@ class ScreenPrintManualPricing {
             const manualCostInput = document.getElementById('manual-base-cost');
             if (manualCostInput) {
                 manualCostInput.addEventListener('input', () => {
-                    console.log('[Manual] Base cost changed:', manualCostInput.value);
+                    scremanupricLog('[Manual] Base cost changed:', manualCostInput.value);
                     this.updateDisplay();
                 });
             }
@@ -633,7 +635,7 @@ class ScreenPrintManualPricing {
             // Load pricing data via API if in API mode
             if (this.pricingService) {
                 try {
-                    console.log(`[ScreenPrintV2] Loading pricing data via API for ${styleNumber}`);
+                    scremanupricLog(`[ScreenPrintV2] Loading pricing data via API for ${styleNumber}`);
                     const data = await this.pricingService.fetchPricingData(styleNumber);
 
                     if (data) {
@@ -656,7 +658,7 @@ class ScreenPrintManualPricing {
      * Handle color count toggle selection
      */
     selectColorCount(count) {
-        console.log(`[ScreenPrintV2] Color count selected: ${count}`);
+        scremanupricLog(`[ScreenPrintV2] Color count selected: ${count}`);
 
         // Update state
         this.state.frontColors = count;
@@ -676,7 +678,7 @@ class ScreenPrintManualPricing {
      * Handle quantity tier button selection
      */
     selectQuantityTier(tier, quantity) {
-        console.log(`[ScreenPrintV2] Tier selected: ${tier}, quantity: ${quantity}`);
+        scremanupricLog(`[ScreenPrintV2] Tier selected: ${tier}, quantity: ${quantity}`);
 
         // Update state - store tier only, NOT specific quantity
         // User has selected a RANGE (e.g., 73-144), not a specific number
@@ -709,7 +711,7 @@ class ScreenPrintManualPricing {
             toggle.classList.remove('active');
         }
 
-        console.log(`[ScreenPrintV2] Safety stripes: ${this.state.frontHasSafetyStripes}`);
+        scremanupricLog(`[ScreenPrintV2] Safety stripes: ${this.state.frontHasSafetyStripes}`);
 
         // Trigger pricing update
         this.updateFrontSafetyStripes(this.state.frontHasSafetyStripes);
@@ -735,14 +737,14 @@ class ScreenPrintManualPricing {
             section?.classList.remove('active');
         }
 
-        console.log(`[ScreenPrintV2] Dark garment: ${this.state.isDarkGarment}`);
+        scremanupricLog(`[ScreenPrintV2] Dark garment: ${this.state.isDarkGarment}`);
 
         // Auto-reset frontColors if exceeds new limit (6 → 5 when dark garment ON)
         // Dark garments use white underbase screen, limiting design colors to 5
         const maxColors = this.state.isDarkGarment ? 5 : 6;
         if (this.state.frontColors > maxColors) {
             this.state.frontColors = maxColors;
-            console.log(`[ScreenPrintV2] Auto-reset frontColors to ${maxColors} (dark garment limit)`);
+            scremanupricLog(`[ScreenPrintV2] Auto-reset frontColors to ${maxColors} (dark garment limit)`);
         }
 
         // Update color button states (will disable/enable 6-color based on dark garment)
@@ -761,7 +763,7 @@ class ScreenPrintManualPricing {
 
         section.classList.toggle('collapsed');
 
-        console.log(`[ScreenPrintV2] Additional locations section ${section.classList.contains('collapsed') ? 'collapsed' : 'expanded'}`);
+        scremanupricLog(`[ScreenPrintV2] Additional locations section ${section.classList.contains('collapsed') ? 'collapsed' : 'expanded'}`);
     }
 
     /**
@@ -815,7 +817,7 @@ class ScreenPrintManualPricing {
             toggleIcon?.classList.add('fa-chevron-down');
         }
 
-        console.log(`[ScreenPrintV2] Price breakdown ${isHidden ? 'expanded' : 'collapsed'}`);
+        scremanupricLog(`[ScreenPrintV2] Price breakdown ${isHidden ? 'expanded' : 'collapsed'}`);
     }
 
     // ==================== UI UPDATE METHODS (Phase 3) ====================
@@ -1008,7 +1010,7 @@ class ScreenPrintManualPricing {
         // Safeguard: Re-create Add Location button if it doesn't exist
         // (in case it somehow got deleted during initialization)
         if (!document.getElementById('sp-add-location')) {
-            console.log('[ScreenPrintV2] Recreating Add Location button');
+            scremanupricLog('[ScreenPrintV2] Recreating Add Location button');
             const button = document.createElement('button');
             button.type = 'button';
             button.id = 'sp-add-location';
@@ -1286,7 +1288,7 @@ class ScreenPrintManualPricing {
             hasSafetyStripes: false
         });
 
-        console.log(`[ScreenPrintV2] Added location. Total locations: ${this.state.additionalLocations.length}`);
+        scremanupricLog(`[ScreenPrintV2] Added location. Total locations: ${this.state.additionalLocations.length}`);
 
         // Update the UI to reflect new state
         this.updateAdditionalLocationsUI();
@@ -1298,7 +1300,7 @@ class ScreenPrintManualPricing {
         // Remove from state
         this.state.additionalLocations.splice(index, 1);
 
-        console.log(`[ScreenPrintV2] Removed location ${index}. Remaining locations: ${this.state.additionalLocations.length}`);
+        scremanupricLog(`[ScreenPrintV2] Removed location ${index}. Remaining locations: ${this.state.additionalLocations.length}`);
 
         // Update UI to reflect new state
         this.updateAdditionalLocationsUI();
@@ -1324,14 +1326,14 @@ class ScreenPrintManualPricing {
             }
         });
 
-        console.log('[ScreenPrintV2] Updated locations from UI:', this.state.additionalLocations);
+        scremanupricLog('[ScreenPrintV2] Updated locations from UI:', this.state.additionalLocations);
         this.updateDisplay();
     }
 
     reindexLocations() {
         // No longer needed with new state-driven UI
         // The updateAdditionalLocationsUI() method rebuilds from state
-        console.log('[ScreenPrintV2] Reindexing not needed - UI is state-driven');
+        scremanupricLog('[ScreenPrintV2] Reindexing not needed - UI is state-driven');
     }
 
     updateLocationButtonVisibility() {
@@ -1418,7 +1420,7 @@ class ScreenPrintManualPricing {
                 // Round using API rounding rule (HalfDollarCeil_Final)
                 pricing.basePrice = Math.ceil(subtotal * 2) / 2;
 
-                console.log('[Manual] Calculated:', {
+                scremanupricLog('[Manual] Calculated:', {
                     baseCost: manualBaseCost,
                     margin: tier.MarginDenominator,
                     garmentWithMargin: garmentWithMargin.toFixed(2),
@@ -1475,14 +1477,14 @@ class ScreenPrintManualPricing {
         let totalSetupForAdditionalLocations = 0;
 
         // Process additional locations
-        console.log('[Manual] Additional locations check:', {
+        scremanupricLog('[Manual] Additional locations check:', {
             additionalLocations: additionalLocations,
             length: additionalLocations?.length,
             isManualMode: this.config.isManualMode
         });
 
         if (additionalLocations && additionalLocations.length > 0) {
-            console.log('[Manual] Processing additional locations:', additionalLocations.length);
+            scremanupricLog('[Manual] Processing additional locations:', additionalLocations.length);
 
             additionalLocations.forEach(loc => {
                 let costPerPieceForThisLoc = 0;
@@ -1511,7 +1513,7 @@ class ScreenPrintManualPricing {
                             // Additional locations already have margin built in (use as-is)
                             costPerPieceForThisLoc = additionalPrintCost;
 
-                            console.log('[Manual] Additional Location:', {
+                            scremanupricLog('[Manual] Additional Location:', {
                                 location: loc.location,
                                 designColors: designColorsThisLoc,
                                 screens: screensForThisLoc,
@@ -1564,7 +1566,7 @@ class ScreenPrintManualPricing {
 
             if (currentTier && currentTier.LTM_Fee > 0) {
                 pricing.ltmFee = parseFloat(currentTier.LTM_Fee);
-                console.log(`[ScreenPrintV2] LTM Fee applied for tier ${currentTier.TierLabel}: $${pricing.ltmFee}`);
+                scremanupricLog(`[ScreenPrintV2] LTM Fee applied for tier ${currentTier.TierLabel}: $${pricing.ltmFee}`);
             }
         }
 
@@ -1667,7 +1669,7 @@ class ScreenPrintManualPricing {
         this.updateSetupBreakdown(pricing);
 
         // Debug: Log pricing breakdown
-        console.log('[Manual] Pricing breakdown:', {
+        scremanupricLog('[Manual] Pricing breakdown:', {
             additionalCost: pricing.additionalCost,
             locations: pricing.colorBreakdown.locations,
             locationsCount: pricing.colorBreakdown.locations.length
@@ -2237,7 +2239,7 @@ class ScreenPrintManualPricing {
 
     handleMasterBundle(data) {
         // Log the pricing data
-        console.log('[ScreenPrintV2] Received pricing data from API:', data);
+        scremanupricLog('[ScreenPrintV2] Received pricing data from API:', data);
 
         this.state.masterBundle = data;
         this.state.pricingData = data;
@@ -2251,10 +2253,10 @@ class ScreenPrintManualPricing {
         }));
 
         // Diagnostic: Check if 6-color pricing exists
-        console.log('[ScreenPrintV2] Available color counts from bundle:', data.availableColorCounts);
-        console.log('[ScreenPrintV2] Has 6-color pricing in finalPrices?',
+        scremanupricLog('[ScreenPrintV2] Available color counts from bundle:', data.availableColorCounts);
+        scremanupricLog('[ScreenPrintV2] Has 6-color pricing in finalPrices?',
             !!(data.finalPrices?.PrimaryLocation?.["37-71"]?.["6"]));
-        console.log('[ScreenPrintV2] Has 6-color pricing in primaryLocationPricing?',
+        scremanupricLog('[ScreenPrintV2] Has 6-color pricing in primaryLocationPricing?',
             !!(data.primaryLocationPricing?.["6"]));
 
         if (data.styleNumber) this.state.styleNumber = data.styleNumber;
@@ -2278,7 +2280,7 @@ class ScreenPrintManualPricing {
      * Calculator expects objects (tierData, primaryLocationPricing)
      */
     transformRawAPIData(rawData) {
-        console.log('[Manual] Transforming raw API data...');
+        scremanupricLog('[Manual] Transforming raw API data...');
 
         // Convert tiersR array to tierData object keyed by TierLabel
         const tierData = {};
@@ -2305,7 +2307,7 @@ class ScreenPrintManualPricing {
             primaryLocationPricing[count] = true;
         });
 
-        console.log('[Manual] Transformation complete:', {
+        scremanupricLog('[Manual] Transformation complete:', {
             tierCount: Object.keys(tierData).length,
             availableColors: availableColorCounts,
             maxColors: Math.max(...availableColorCounts)
@@ -2327,7 +2329,7 @@ class ScreenPrintManualPricing {
 
         for (const tier of tiers) {
             if (quantity >= tier.MinQuantity && quantity <= tier.MaxQuantity) {
-                console.log(`[Manual] Found tier for qty ${quantity}:`, tier.TierLabel);
+                scremanupricLog(`[Manual] Found tier for qty ${quantity}:`, tier.TierLabel);
                 return tier;
             }
         }
@@ -2351,7 +2353,7 @@ class ScreenPrintManualPricing {
         );
 
         if (cost) {
-            console.log(`[Manual] Print cost for ${tierLabel}, ${colorCount} colors, ${locationType}:`, cost.BasePrintCost);
+            scremanupricLog(`[Manual] Print cost for ${tierLabel}, ${colorCount} colors, ${locationType}:`, cost.BasePrintCost);
             return parseFloat(cost.BasePrintCost);
         } else {
             console.warn(`[Manual] No print cost found for ${tierLabel}, ${colorCount} colors, ${locationType}`);

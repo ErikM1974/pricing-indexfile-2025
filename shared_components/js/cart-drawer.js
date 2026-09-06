@@ -13,6 +13,8 @@
  * - Mobile responsive (full-screen on mobile)
  */
 
+var CARTDRAW_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
+var cartdrawLog = CARTDRAW_LOG_ON ? console.log.bind(console) : function () {}; // debug logging: localhost or ?debug=1 only (2026-09-06 console sweep)
 class CartDrawer {
     constructor() {
         this.isOpen = false;
@@ -20,7 +22,7 @@ class CartDrawer {
         this.selectedColor = null;
         this.selectedSize = null;
 
-        console.log('[CartDrawer] Initializing...');
+        cartdrawLog('[CartDrawer] Initializing...');
         this.init();
     }
 
@@ -31,13 +33,13 @@ class CartDrawer {
         // Attach event listeners
         this.attachEventListeners();
 
-        console.log('[CartDrawer] Initialized successfully');
+        cartdrawLog('[CartDrawer] Initialized successfully');
     }
 
     createDrawerHTML() {
         // Check if drawer already exists
         if (document.getElementById('cart-drawer')) {
-            console.log('[CartDrawer] Drawer already exists');
+            cartdrawLog('[CartDrawer] Drawer already exists');
             return;
         }
 
@@ -161,7 +163,7 @@ class CartDrawer {
     }
 
     close() {
-        console.log('[CartDrawer] Closing drawer');
+        cartdrawLog('[CartDrawer] Closing drawer');
 
         this.isOpen = false;
         this.currentProduct = null;
@@ -263,7 +265,7 @@ class CartDrawer {
             swatchUrl: color.swatchUrl
         };
 
-        console.log('[CartDrawer] Color selected:', this.selectedColor);
+        cartdrawLog('[CartDrawer] Color selected:', this.selectedColor);
         this.checkAddButtonState();
     }
 
@@ -276,7 +278,7 @@ class CartDrawer {
 
         this.selectedSize = size;
 
-        console.log('[CartDrawer] Size selected:', this.selectedSize);
+        cartdrawLog('[CartDrawer] Size selected:', this.selectedSize);
         this.checkAddButtonState();
     }
 
@@ -378,7 +380,7 @@ class CartDrawer {
     }
 
     removeItem(index) {
-        console.log('[CartDrawer] Removing item at index:', index);
+        cartdrawLog('[CartDrawer] Removing item at index:', index);
 
         if (window.sampleCart) {
             window.sampleCart.removeSample(index);
@@ -393,7 +395,7 @@ class CartDrawer {
             return;
         }
 
-        console.log('[CartDrawer] Proceeding to checkout');
+        cartdrawLog('[CartDrawer] Proceeding to checkout');
         window.location.href = '/pages/sample-cart.html';
     }
 
@@ -421,5 +423,5 @@ class CartDrawer {
 // Initialize drawer on page load
 document.addEventListener('DOMContentLoaded', () => {
     window.cartDrawer = new CartDrawer();
-    console.log('[CartDrawer] Available globally as window.cartDrawer');
+    cartdrawLog('[CartDrawer] Available globally as window.cartDrawer');
 });

@@ -6,6 +6,8 @@
 
 // Debug logging gate — customer-facing page, so console.log output (including the
 // pricing-internals audit dump) only prints on localhost. console.error/warn stay live.
+var QUOTVIEW_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
+var quotviewLog = QUOTVIEW_LOG_ON ? console.log.bind(console) : function () {}; // debug logging: localhost or ?debug=1 only (2026-09-06 console sweep)
 const QV_DEBUG = window.location.hostname === 'localhost';
 
 // Inline-SVG product placeholder (neutral gray garment glyph). The old
@@ -255,8 +257,8 @@ class QuoteViewPage {
             this.items = data.items || [];
 
             if (QV_DEBUG) {
-                console.log('[QuoteView] Loaded quote data:', this.quoteData);
-                console.log('[QuoteView] Loaded items:', this.items);
+                quotviewLog('[QuoteView] Loaded quote data:', this.quoteData);
+                quotviewLog('[QuoteView] Loaded items:', this.items);
             }
 
             // Read tax rate: prefer frozen TaxRate column, then TAX fee item, then default 10.2%
@@ -882,7 +884,7 @@ class QuoteViewPage {
             this.imageCache[cacheKey] = imageUrl;
 
             if (QV_DEBUG) {
-                console.log(`[QuoteView] Fetched image for ${styleNumber} ${colorName}: ${imageUrl ? 'Found' : 'Not found'}${match ? ` (matched: ${match.COLOR_NAME})` : ''}`);
+                quotviewLog(`[QuoteView] Fetched image for ${styleNumber} ${colorName}: ${imageUrl ? 'Found' : 'Not found'}${match ? ` (matched: ${match.COLOR_NAME})` : ''}`);
             }
             return imageUrl;
 
@@ -1784,7 +1786,7 @@ class QuoteViewPage {
             const dedupedItems = Array.from(seen.values());
             if (dedupedItems.length < group.items.length) {
                 if (QV_DEBUG) {
-                    console.log(`[QuoteView] Deduped ${group.styleNumber} ${group.color}: ${group.items.length} → ${dedupedItems.length} items`);
+                    quotviewLog(`[QuoteView] Deduped ${group.styleNumber} ${group.color}: ${group.items.length} → ${dedupedItems.length} items`);
                 }
                 group.items = dedupedItems;
             }
@@ -5011,9 +5013,9 @@ class QuoteViewPage {
         const subtotal = parseFloat(q?.SubtotalAmount) || 0;
         const ltmFee = parseFloat(q?.LTMFeeTotal) || 0;
         const totalAmount = parseFloat(q?.TotalAmount) || 0;
-        console.log('SubtotalAmount:', subtotal.toFixed(2));
-        console.log('LTMFeeTotal:', ltmFee.toFixed(2));
-        console.log('TotalAmount (grandTotal):', totalAmount.toFixed(2));
+        quotviewLog('SubtotalAmount:', subtotal.toFixed(2));
+        quotviewLog('LTMFeeTotal:', ltmFee.toFixed(2));
+        quotviewLog('TotalAmount (grandTotal):', totalAmount.toFixed(2));
         console.groupEnd();
 
         // 2. Setup fees
@@ -5021,9 +5023,9 @@ class QuoteViewPage {
         const garmentDigitizing = parseFloat(q?.GarmentDigitizing) || 0;
         const capDigitizing = parseFloat(q?.CapDigitizing) || 0;
         const totalSetup = garmentDigitizing + capDigitizing;
-        console.log('Garment Digitizing:', garmentDigitizing.toFixed(2));
-        console.log('Cap Digitizing:', capDigitizing.toFixed(2));
-        console.log('Total Setup:', totalSetup.toFixed(2));
+        quotviewLog('Garment Digitizing:', garmentDigitizing.toFixed(2));
+        quotviewLog('Cap Digitizing:', capDigitizing.toFixed(2));
+        quotviewLog('Total Setup:', totalSetup.toFixed(2));
         console.groupEnd();
 
         // 3. Additional Logo charges
@@ -5031,19 +5033,19 @@ class QuoteViewPage {
         const alGarment = parseFloat(q?.ALChargeGarment) || 0;
         const alCap = parseFloat(q?.ALChargeCap) || 0;
         const totalAL = alGarment + alCap;
-        console.log('AL Garment:', alGarment.toFixed(2));
-        console.log('AL Cap:', alCap.toFixed(2));
-        console.log('Total AL:', totalAL.toFixed(2));
+        quotviewLog('AL Garment:', alGarment.toFixed(2));
+        quotviewLog('AL Cap:', alCap.toFixed(2));
+        quotviewLog('Total AL:', totalAL.toFixed(2));
         console.groupEnd();
 
         // 4. Extra stitch charge (SEPARATE line item - added to total)
         console.group('4️⃣ Extra Stitches (SEPARATE LINE ITEM)');
         const addlStitch = parseFloat(q?.AdditionalStitchCharge) || 0;
         const stitchCount = parseFloat(q?.StitchCount) || 8000;
-        console.log('Stitch Count:', stitchCount);
-        console.log('Extra Stitch Amount:', addlStitch.toFixed(2));
-        console.log('✅ Extra stitches are a SEPARATE line item (shown as ADDL-STITCH)');
-        console.log('✅ This value IS added to the total');
+        quotviewLog('Stitch Count:', stitchCount);
+        quotviewLog('Extra Stitch Amount:', addlStitch.toFixed(2));
+        quotviewLog('✅ Extra stitches are a SEPARATE line item (shown as ADDL-STITCH)');
+        quotviewLog('✅ This value IS added to the total');
         console.groupEnd();
 
         // 5. Other fees
@@ -5052,10 +5054,10 @@ class QuoteViewPage {
         const rushFee = parseFloat(q?.RushFee) || 0;
         const sampleFee = parseFloat(q?.SampleFee) || 0;
         const discount = parseFloat(q?.Discount) || 0;
-        console.log('Art Charge:', artCharge.toFixed(2));
-        console.log('Rush Fee:', rushFee.toFixed(2));
-        console.log('Sample Fee:', sampleFee.toFixed(2));
-        console.log('Discount:', discount.toFixed(2));
+        quotviewLog('Art Charge:', artCharge.toFixed(2));
+        quotviewLog('Rush Fee:', rushFee.toFixed(2));
+        quotviewLog('Sample Fee:', sampleFee.toFixed(2));
+        quotviewLog('Discount:', discount.toFixed(2));
         console.groupEnd();
 
         // 6. Product items calculation
@@ -5064,9 +5066,9 @@ class QuoteViewPage {
         this.items.forEach((item, i) => {
             const lineTotal = parseFloat(item.LineTotal) || 0;
             itemsTotal += lineTotal;
-            console.log(`  Item ${i + 1}: ${item.ProductSKU} x ${item.Quantity} @ $${item.UnitPrice} = $${lineTotal.toFixed(2)}`);
+            quotviewLog(`  Item ${i + 1}: ${item.ProductSKU} x ${item.Quantity} @ $${item.UnitPrice} = $${lineTotal.toFixed(2)}`);
         });
-        console.log('Items Total:', itemsTotal.toFixed(2));
+        quotviewLog('Items Total:', itemsTotal.toFixed(2));
         console.groupEnd();
 
         // 7. Verification math
@@ -5076,22 +5078,22 @@ class QuoteViewPage {
         console.group('7️⃣ VERIFICATION');
         const displayLtm = (parseFloat(q?.LTM_Garment) || 0) + (parseFloat(q?.LTM_Cap) || 0);
         const expectedTotal = subtotal + displayLtm + totalSetup + totalAL + artCharge + rushFee + sampleFee - discount;
-        console.log('Formula: subtotal + LTM(display) + setup + AL + art + rush + sample - discount');
-        console.log(`         ${subtotal.toFixed(2)} + ${displayLtm.toFixed(2)} + ${totalSetup.toFixed(2)} + ${totalAL.toFixed(2)} + ${artCharge.toFixed(2)} + ${rushFee.toFixed(2)} + ${sampleFee.toFixed(2)} - ${discount.toFixed(2)}`);
-        console.log('Expected Total:', expectedTotal.toFixed(2));
-        console.log('Actual TotalAmount:', totalAmount.toFixed(2));
+        quotviewLog('Formula: subtotal + LTM(display) + setup + AL + art + rush + sample - discount');
+        quotviewLog(`         ${subtotal.toFixed(2)} + ${displayLtm.toFixed(2)} + ${totalSetup.toFixed(2)} + ${totalAL.toFixed(2)} + ${artCharge.toFixed(2)} + ${rushFee.toFixed(2)} + ${sampleFee.toFixed(2)} - ${discount.toFixed(2)}`);
+        quotviewLog('Expected Total:', expectedTotal.toFixed(2));
+        quotviewLog('Actual TotalAmount:', totalAmount.toFixed(2));
         const diff = Math.abs(expectedTotal - totalAmount);
         if (diff < 0.01) {
-            console.log('✅ PASS: Totals match!');
+            quotviewLog('✅ PASS: Totals match!');
         } else {
-            console.log('❌ FAIL: Difference of $' + diff.toFixed(2));
+            quotviewLog('❌ FAIL: Difference of $' + diff.toFixed(2));
         }
         console.groupEnd();
 
         // 8. Shipping
         console.group('8️⃣ Shipping');
         const shippingFee = this.getShippingFee();
-        console.log('Shipping Fee (SHIP item):', shippingFee.toFixed(2));
+        quotviewLog('Shipping Fee (SHIP item):', shippingFee.toFixed(2));
         console.groupEnd();
 
         // 9. Tax calculation (shipping is taxable in WA state)
@@ -5100,11 +5102,11 @@ class QuoteViewPage {
         const taxableAmount = totalAmount + shippingFee;
         const tax = Math.round(taxableAmount * taxRate * 100) / 100;
         const grandTotalWithTax = taxableAmount + tax;
-        console.log('Tax Rate:', (taxRate * 100).toFixed(1) + '%');
-        console.log('Taxable Amount (subtotal + shipping):', taxableAmount.toFixed(2));
-        console.log('Tax Amount:', tax.toFixed(2));
-        console.log('Shipping:', shippingFee.toFixed(2));
-        console.log('Grand Total (subtotal + shipping + tax):', grandTotalWithTax.toFixed(2));
+        quotviewLog('Tax Rate:', (taxRate * 100).toFixed(1) + '%');
+        quotviewLog('Taxable Amount (subtotal + shipping):', taxableAmount.toFixed(2));
+        quotviewLog('Tax Amount:', tax.toFixed(2));
+        quotviewLog('Shipping:', shippingFee.toFixed(2));
+        quotviewLog('Grand Total (subtotal + shipping + tax):', grandTotalWithTax.toFixed(2));
         console.groupEnd();
 
         console.groupEnd(); // End main group

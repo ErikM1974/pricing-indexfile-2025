@@ -11,6 +11,8 @@
  * @version 1.0.0
  */
 
+var SKUVALISERV_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
+var skuvaliservLog = SKUVALISERV_LOG_ON ? console.log.bind(console) : function () {}; // debug logging: localhost or ?debug=1 only (2026-09-06 console sweep)
 class SKUValidationService {
     constructor() {
         this.baseURL = (typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) || '';
@@ -332,7 +334,7 @@ class SKUValidationService {
         // Check cache first
         const cached = this.cache.get(cacheKey);
         if (this._isCacheValid(cached)) {
-            console.log('[SKUValidationService] Cache hit for', cacheKey);
+            skuvaliservLog('[SKUValidationService] Cache hit for', cacheKey);
             return cached.data;
         }
 
@@ -387,7 +389,7 @@ class SKUValidationService {
                 timestamp: Date.now()
             });
 
-            console.log('[SKUValidationService] Fetched valid sizes:', result);
+            skuvaliservLog('[SKUValidationService] Fetched valid sizes:', result);
             return result;
 
         } catch (error) {
@@ -507,7 +509,7 @@ class SKUValidationService {
      */
     clearCache() {
         this.cache.clear();
-        console.log('[SKUValidationService] Cache cleared');
+        skuvaliservLog('[SKUValidationService] Cache cleared');
     }
 
     /**

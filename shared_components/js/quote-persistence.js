@@ -4,6 +4,8 @@
  * Provides auto-save, compression, and cross-tab synchronization
  */
 
+var QUOTPERS_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
+var quotpersLog = QUOTPERS_LOG_ON ? console.log.bind(console) : function () {}; // debug logging: localhost or ?debug=1 only (2026-09-06 console sweep)
 class QuotePersistence {
     constructor(config = {}) {
         this.prefix = config.prefix || 'QUOTE';
@@ -374,7 +376,7 @@ class QuotePersistence {
      */
     log(...args) {
         if (this.debug) {
-            console.log(`[QuotePersistence:${this.prefix}]`, ...args);
+            quotpersLog(`[QuotePersistence:${this.prefix}]`, ...args);
         }
     }
     

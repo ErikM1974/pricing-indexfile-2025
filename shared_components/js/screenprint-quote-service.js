@@ -3,6 +3,8 @@
  * Handles database operations and quote management for screen print quotes
  */
 
+var SCREQUOTSERV_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
+var screquotservLog = SCREQUOTSERV_LOG_ON ? console.log.bind(console) : function () {}; // debug logging: localhost or ?debug=1 only (2026-09-06 console sweep)
 class ScreenPrintQuoteService {
     constructor() {
         // Same-origin since the 2026-08-26 quote-plane lockdown (SAML cookie
@@ -10,7 +12,7 @@ class ScreenPrintQuoteService {
         this.baseURL = '';
         this.quotePrefix = 'SP';
         this.taxRate = 0.102; // Milton WA 10.2% (2026-07-06) — fallback only when quoteData.taxRate is absent
-        console.log('[ScreenPrintQuoteService] Initialized');
+        screquotservLog('[ScreenPrintQuoteService] Initialized');
     }
 
     /**
@@ -56,7 +58,7 @@ class ScreenPrintQuoteService {
             const quoteID = await this.generateQuoteID();  // async now (server sequence)
             const sessionID = this.generateSessionID();
             
-            console.log('[ScreenPrintQuoteService] Saving quote:', quoteID);
+            screquotservLog('[ScreenPrintQuoteService] Saving quote:', quoteID);
             
             // Format expiration date (30 days from now)
             const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
@@ -205,7 +207,7 @@ class ScreenPrintQuoteService {
             }
             
             const sessionResult = await sessionResponse.json();
-            console.log('[ScreenPrintQuoteService] Session saved:', sessionResult);
+            screquotservLog('[ScreenPrintQuoteService] Session saved:', sessionResult);
             
             // Save line items
             const itemPromises = quoteData.items.map(async (item, index) => {
@@ -253,7 +255,7 @@ class ScreenPrintQuoteService {
             await this._saveShipFeeItem(quoteID, quoteData);  // [2026-06-08] P1: SHIP fee row so the saved mirror shows + taxes shipping
             const failedCount = itemResults.filter(r => !r).length;
 
-            console.log('[ScreenPrintQuoteService] Quote saved:', quoteID,
+            screquotservLog('[ScreenPrintQuoteService] Quote saved:', quoteID,
                 failedCount > 0 ? `(${failedCount} items failed)` : '');
 
             return {
@@ -384,7 +386,7 @@ class ScreenPrintQuoteService {
      */
     async updateQuote(quoteID, quoteData) {
         try {
-            console.log('[ScreenPrintQuoteService] Updating quote:', quoteID);
+            screquotservLog('[ScreenPrintQuoteService] Updating quote:', quoteID);
 
             // Get current session to find PK_ID and revision number
             const loadResult = await this.loadQuote(quoteID);
@@ -570,7 +572,7 @@ class ScreenPrintQuoteService {
             }
             await this._saveShipFeeItem(quoteID, quoteData);  // [2026-06-08] P1: SHIP fee row so the saved mirror shows + taxes shipping
 
-            console.log('[ScreenPrintQuoteService] Quote updated successfully:', quoteID, 'Rev', newRevision);
+            screquotservLog('[ScreenPrintQuoteService] Quote updated successfully:', quoteID, 'Rev', newRevision);
 
             return {
                 success: true,
@@ -620,7 +622,7 @@ class ScreenPrintQuoteService {
             throw new Error(`${failed} old line item(s) could not be removed — the quote would show duplicated lines. Try saving again.`);
         }
 
-        console.log('[ScreenPrintQuoteService] Deleted', items.length, 'existing items');
+        screquotservLog('[ScreenPrintQuoteService] Deleted', items.length, 'existing items');
     }
 
     /**

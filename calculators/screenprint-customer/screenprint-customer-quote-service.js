@@ -4,6 +4,8 @@
  * Extends BaseQuoteService for common functionality
  */
 
+var SCRECUSTQUOT_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
+var screcustquotLog = SCRECUSTQUOT_LOG_ON ? console.log.bind(console) : function () {}; // debug logging: localhost or ?debug=1 only (2026-09-06 console sweep)
 class CustomerScreenPrintQuoteService extends BaseQuoteService {
     constructor() {
         super({
@@ -37,7 +39,7 @@ class CustomerScreenPrintQuoteService extends BaseQuoteService {
             const quoteID = quoteData.quoteId;
             const sessionID = this.generateSessionID();
             
-            console.log('[CustomerScreenPrintQuoteService] Saving quote with ID:', quoteID);
+            screcustquotLog('[CustomerScreenPrintQuoteService] Saving quote with ID:', quoteID);
 
             // Step 1: Create quote session
             const expiresAtDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
@@ -59,7 +61,7 @@ class CustomerScreenPrintQuoteService extends BaseQuoteService {
                 Notes: quoteData.notes || ''
             };
 
-            console.log('[CustomerScreenPrintQuoteService] Session data:', sessionData);
+            screcustquotLog('[CustomerScreenPrintQuoteService] Session data:', sessionData);
 
             const sessionResponse = await fetch(`${this.baseURL}/api/quote_sessions`, {
                 method: 'POST',
@@ -71,8 +73,8 @@ class CustomerScreenPrintQuoteService extends BaseQuoteService {
 
             // Get response text first to see error details
             const responseText = await sessionResponse.text();
-            console.log('[CustomerScreenPrintQuoteService] Session response status:', sessionResponse.status);
-            console.log('[CustomerScreenPrintQuoteService] Session response text:', responseText);
+            screcustquotLog('[CustomerScreenPrintQuoteService] Session response status:', sessionResponse.status);
+            screcustquotLog('[CustomerScreenPrintQuoteService] Session response text:', responseText);
 
             if (!sessionResponse.ok) {
                 let errorMessage = `Session creation failed: ${sessionResponse.status}`;
@@ -94,7 +96,7 @@ class CustomerScreenPrintQuoteService extends BaseQuoteService {
                 sessionResult = { success: true, message: responseText };
             }
             
-            console.log('[CustomerScreenPrintQuoteService] Session created:', sessionResult);
+            screcustquotLog('[CustomerScreenPrintQuoteService] Session created:', sessionResult);
 
             // Step 2: Add item to quote
             const addedAt = new Date().toISOString().replace(/\.\d{3}Z$/, '');
@@ -140,7 +142,7 @@ class CustomerScreenPrintQuoteService extends BaseQuoteService {
                 AddedAt: addedAt
             };
 
-            console.log('[CustomerScreenPrintQuoteService] Item data:', itemData);
+            screcustquotLog('[CustomerScreenPrintQuoteService] Item data:', itemData);
 
             const itemResponse = await fetch(`${this.baseURL}/api/quote_items`, {
                 method: 'POST',
@@ -151,8 +153,8 @@ class CustomerScreenPrintQuoteService extends BaseQuoteService {
             });
 
             const itemResponseText = await itemResponse.text();
-            console.log('[CustomerScreenPrintQuoteService] Item response status:', itemResponse.status);
-            console.log('[CustomerScreenPrintQuoteService] Item response text:', itemResponseText);
+            screcustquotLog('[CustomerScreenPrintQuoteService] Item response status:', itemResponse.status);
+            screcustquotLog('[CustomerScreenPrintQuoteService] Item response text:', itemResponseText);
 
             if (!itemResponse.ok) {
                 let errorMessage = `Item creation failed: ${itemResponse.status}`;

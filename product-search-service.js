@@ -4,6 +4,8 @@
  * @version 1.0.0
  */
 
+var PRODSEARSERV_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
+var prodsearservLog = PRODSEARSERV_LOG_ON ? console.log.bind(console) : function () {}; // debug logging: localhost or ?debug=1 only (2026-09-06 console sweep)
 class ProductSearchService {
     constructor() {
         this.baseURL = ((typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) ? window.APP_CONFIG.API.BASE_URL + '/api' : '');
@@ -145,13 +147,13 @@ class ProductSearchService {
         // Check cache first
         const cached = this.cache.get(cacheKey);
         if (cached && this.isCacheValid(cached.timestamp)) {
-            console.log('[ProductSearch] Returning cached results');
+            prodsearservLog('[ProductSearch] Returning cached results');
             return cached.data;
         }
         
         // Check if request is already in flight
         if (this.requestCache.has(cacheKey)) {
-            console.log('[ProductSearch] Request already in flight, waiting...');
+            prodsearservLog('[ProductSearch] Request already in flight, waiting...');
             return this.requestCache.get(cacheKey);
         }
         
@@ -191,7 +193,7 @@ class ProductSearchService {
             const queryString = this.buildQueryString(finalParams);
             const url = `${this.baseURL}/products/search?${queryString}`;
             
-            console.log('[ProductSearch] Fetching:', url);
+            prodsearservLog('[ProductSearch] Fetching:', url);
             
             const response = await fetch(url);
             
@@ -367,7 +369,7 @@ class ProductSearchService {
         // Build cleaned query from remaining words
         const cleanedQuery = remainingWords.join(' ').trim();
 
-        console.log('[ProductSearch] Smart query parsed:', {
+        prodsearservLog('[ProductSearch] Smart query parsed:', {
             original: query,
             detectedBrand,
             detectedCategory,
@@ -426,7 +428,7 @@ class ProductSearchService {
 
         const isStyle = this.isStyleNumber(searchQuery);
 
-        console.log(`[ProductSearch] Smart search for "${trimmedQuery}"`, {
+        prodsearservLog(`[ProductSearch] Smart search for "${trimmedQuery}"`, {
             isStyle,
             detectedBrand: parsed.detectedBrand,
             detectedCategory: parsed.detectedCategory,
@@ -439,7 +441,7 @@ class ProductSearchService {
             // to only show exact style matches (e.g., "PC61" matches PC61, PC61LS, PC61M)
             // This gives us full product data (images, prices) unlike autocomplete API
             try {
-                console.log('[ProductSearch] Style search - fetching full product data for filtering');
+                prodsearservLog('[ProductSearch] Style search - fetching full product data for filtering');
 
                 // Use full product search to get complete data
                 let results = await this.searchProducts({
@@ -478,7 +480,7 @@ class ProductSearchService {
                     return styleLower === queryLower || styleLower.startsWith(queryLower);
                 });
 
-                console.log(`[ProductSearch] Filtered ${results.products.length} results to ${exactMatches.length} exact matches`);
+                prodsearservLog(`[ProductSearch] Filtered ${results.products.length} results to ${exactMatches.length} exact matches`);
 
                 // Style-shaped tokens that aren't styles ("2XL", "5oz") used
                 // to return an honest-looking ZERO here while the text search
@@ -532,7 +534,7 @@ class ProductSearchService {
     async searchByCategory(category, subcategory = null, additionalFilters = {}) {
         // First, try with both category and subcategory if provided
         if (subcategory) {
-            console.log(`[ProductSearch] Trying search with category="${category}" AND subcategory="${subcategory}"`);
+            prodsearservLog(`[ProductSearch] Trying search with category="${category}" AND subcategory="${subcategory}"`);
             
             const params = {
                 category: category,
@@ -544,7 +546,7 @@ class ProductSearchService {
             
             // If we got results, return them
             if (result.products && result.products.length > 0) {
-                console.log(`[ProductSearch] Found ${result.products.length} products with both category and subcategory`);
+                prodsearservLog(`[ProductSearch] Found ${result.products.length} products with both category and subcategory`);
                 // Add metadata about search strategy
                 if (!result.metadata) result.metadata = {};
                 result.metadata.searchStrategy = 'category-and-subcategory';
@@ -552,7 +554,7 @@ class ProductSearchService {
             }
             
             // No results with both - try just subcategory
-            console.log(`[ProductSearch] No results with both, trying subcategory="${subcategory}" only`);
+            prodsearservLog(`[ProductSearch] No results with both, trying subcategory="${subcategory}" only`);
             const subcatParams = {
                 subcategory: subcategory,
                 ...additionalFilters
@@ -561,7 +563,7 @@ class ProductSearchService {
             result = await this.searchWithFacets(subcatParams);
             
             if (result.products && result.products.length > 0) {
-                console.log(`[ProductSearch] Found ${result.products.length} products with subcategory only`);
+                prodsearservLog(`[ProductSearch] Found ${result.products.length} products with subcategory only`);
                 // Add metadata about search strategy
                 if (!result.metadata) result.metadata = {};
                 result.metadata.searchStrategy = 'subcategory-only';
@@ -569,7 +571,7 @@ class ProductSearchService {
             }
             
             // Still no results - fall back to category only
-            console.log(`[ProductSearch] No results with subcategory, falling back to category="${category}" only`);
+            prodsearservLog(`[ProductSearch] No results with subcategory, falling back to category="${category}" only`);
         }
         
         // Search with just category
@@ -579,7 +581,7 @@ class ProductSearchService {
         };
         
         const result = await this.searchWithFacets(categoryParams);
-        console.log(`[ProductSearch] Found ${result.products ? result.products.length : 0} products with category only`);
+        prodsearservLog(`[ProductSearch] Found ${result.products ? result.products.length : 0} products with category only`);
         
         // Add metadata about search strategy
         if (!result.metadata) result.metadata = {};
@@ -634,7 +636,7 @@ class ProductSearchService {
     clearCache() {
         this.cache.clear();
         this.requestCache.clear();
-        console.log('[ProductSearch] Cache cleared');
+        prodsearservLog('[ProductSearch] Cache cleared');
     }
 
     /**

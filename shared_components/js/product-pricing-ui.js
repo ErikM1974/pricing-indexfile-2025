@@ -4,6 +4,8 @@
  * Product Pricing UI Module for Northwest Custom Apparel
  * Handles dynamic interactions on product pricing pages like embroidery-pricing.html
  */
+var PRODPRICUI_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
+var prodpricuiLog = PRODPRICUI_LOG_ON ? console.log.bind(console) : function () {}; // debug logging: localhost or ?debug=1 only (2026-09-06 console sweep)
 const NWCAProductPricingUI = (function() {
     'use strict';
 
@@ -54,7 +56,7 @@ const NWCAProductPricingUI = (function() {
     };
 
     function debugProductUI(level, message, data = null) {
-        console.log(`[ProductPricingUI-${level}] ${message}`, data);
+        prodpricuiLog(`[ProductPricingUI-${level}] ${message}`, data);
     }
 
     /**

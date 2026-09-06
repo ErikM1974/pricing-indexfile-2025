@@ -4,6 +4,8 @@
  * Provides search, filtering, and pagination functionality
  */
 
+var PRODSEAR_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
+var prodsearLog = PRODSEAR_LOG_ON ? console.log.bind(console) : function () {}; // debug logging: localhost or ?debug=1 only (2026-09-06 console sweep)
 class ProductSearch {
     constructor() {
         this.baseURL = ((typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) ? window.APP_CONFIG.API.BASE_URL + '/api/products/search' : '');
@@ -121,7 +123,7 @@ class ProductSearch {
             
         } catch (error) {
             if (error.name === 'AbortError') {
-                console.log('Search request cancelled');
+                prodsearLog('Search request cancelled');
                 return null;
             }
             console.error('Search error:', error);

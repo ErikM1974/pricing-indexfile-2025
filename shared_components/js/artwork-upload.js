@@ -25,7 +25,7 @@
  *
  *   const widget = ArtworkUpload.attach({
  *     mountSelector: '#my-builder-artwork-mount',
- *     onChange: (files) => { console.log('files changed', files); },
+ *     onChange: (files) => { artwuploLog('files changed', files); },
  *   });
  *
  *   // Read uploaded files when saving:
@@ -60,6 +60,8 @@
  * Extended 2026-05-24 — Phase 11.3 (rich mode).
  */
 
+var ARTWUPLO_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
+var artwuploLog = ARTWUPLO_LOG_ON ? console.log.bind(console) : function () {}; // debug logging: localhost or ?debug=1 only (2026-09-06 console sweep)
 (function (global) {
     'use strict';
 

@@ -45,6 +45,8 @@
  * Dual environment: browser global (window.WebQuoteService) + module.exports
  * for jest (tests/unit/web-quote-service.test.js). No DOM access.
  */
+var WEBQUOTSERV_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
+var webquotservLog = WEBQUOTSERV_LOG_ON ? console.log.bind(console) : function () {}; // debug logging: localhost or ?debug=1 only (2026-09-06 console sweep)
 (function (global) {
     'use strict';
 
@@ -543,8 +545,8 @@
         // Dry-run: log + return payloads, POST nothing (used by preview
         // walk-throughs; the orchestrator does the single real E2E save).
         if (this.dryRun || p.dryRun) {
-            console.log('[WebQuoteService] DRY RUN — quote_sessions payload:', payloads.session);
-            console.log('[WebQuoteService] DRY RUN — quote_items payloads (' + payloads.items.length + '):', payloads.items);
+            webquotservLog('[WebQuoteService] DRY RUN — quote_sessions payload:', payloads.session);
+            webquotservLog('[WebQuoteService] DRY RUN — quote_items payloads (' + payloads.items.length + '):', payloads.items);
             return { success: true, dryRun: true, quoteId: idInfo.quoteId, shareUrl: shareUrl, sharePath: sharePath, idFallback: idInfo.usedFallback, result: fresh, payloads: payloads };
         }
 
@@ -610,7 +612,7 @@
         p = p || {};
         var out = { customerSent: false, salesSent: false, skipped: false };
         if (this.dryRun || p.dryRun) {
-            console.log('[WebQuoteService] DRY RUN — emails suppressed (would notify ' +
+            webquotservLog('[WebQuoteService] DRY RUN — emails suppressed (would notify ' +
                 ((p.customer && p.customer.email) || 'customer') + ' + sales@nwcustomapparel.com).');
             out.skipped = true;
             return out;

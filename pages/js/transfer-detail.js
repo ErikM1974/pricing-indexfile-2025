@@ -14,6 +14,8 @@
  * API: caspio-pricing-proxy /api/transfer-orders/:id (+ /status, /rush, etc.)
  */
 
+var TRANDETA_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
+var trandetaLog = TRANDETA_LOG_ON ? console.log.bind(console) : function () {}; // debug logging: localhost or ?debug=1 only (2026-09-06 console sweep)
 (function () {
     'use strict';
 
@@ -1251,7 +1253,7 @@
         if (Object.keys(extras).length === 0) return;
         try {
             await apiPut('/api/transfer-orders/' + encodeURIComponent(state.transferId), extras);
-            console.log('Saved extraction extras:', Object.keys(extras).join(', '));
+            trandetaLog('Saved extraction extras:', Object.keys(extras).join(', '));
         } catch (err) {
             console.warn('Failed to save extraction extras (non-blocking):', err);
         }
@@ -1296,7 +1298,7 @@
             });
             var data = await resp.json();
             if (resp.ok && data.success) {
-                console.log('Mirrored to Supacolor_Jobs (' + (data.action || 'ok') + '):', payload.Supacolor_Job_Number);
+                trandetaLog('Mirrored to Supacolor_Jobs (' + (data.action || 'ok') + '):', payload.Supacolor_Job_Number);
             } else {
                 console.warn('Supacolor_Jobs mirror non-ok:', data);
             }

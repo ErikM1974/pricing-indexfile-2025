@@ -24,6 +24,8 @@
 // ============================================================================
 // CONFIGURATION (Location mappings only - NO PRICING VALUES)
 // ============================================================================
+var DTFQUOTPRIC_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
+var dtfquotpricLog = DTFQUOTPRIC_LOG_ON ? console.log.bind(console) : function () {}; // debug logging: localhost or ?debug=1 only (2026-09-06 console sweep)
 
 const DTFConfig = {
     // Transfer size definitions (dimensions only - pricing comes from API)
@@ -121,15 +123,15 @@ class DTFQuotePricing {
         this.pricingData = null;
         this.isLoaded = false;
         this.productCache = new Map();
-        console.log('[DTFQuotePricing] Pricing calculator initialized');
+        dtfquotpricLog('[DTFQuotePricing] Pricing calculator initialized');
     }
 
     async loadPricingData(styleNumber = null) {
         try {
-            console.log('[DTFQuotePricing] Loading pricing data from API...');
+            dtfquotpricLog('[DTFQuotePricing] Loading pricing data from API...');
             this.pricingData = await this.pricingService.fetchPricingData(styleNumber);
             this.isLoaded = true;
-            console.log('[DTFQuotePricing] Pricing data loaded');
+            dtfquotpricLog('[DTFQuotePricing] Pricing data loaded');
             return this.pricingData;
         } catch (error) {
             console.error('[DTFQuotePricing] Failed to load pricing data:', error);

@@ -4,6 +4,8 @@
    Fetches real-time sales metrics from production system
    ===================================================== */
 
+var STAFDASHSERV_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
+var stafdashservLog = STAFDASHSERV_LOG_ON ? console.log.bind(console) : function () {}; // debug logging: localhost or ?debug=1 only (2026-09-06 console sweep)
 const StaffDashboardService = (function() {
     'use strict';
 
@@ -762,7 +764,7 @@ const StaffDashboardService = (function() {
                 fetchOrders(currentRange.start, currentRange.end),
                 fetchOrders(lastYearRange.start, lastYearRange.end)
             ]);
-            console.log(`[Service] fetched current+last-year in ${Math.round(performance.now() - t0)} ms`);
+            stafdashservLog(`[Service] fetched current+last-year in ${Math.round(performance.now() - t0)} ms`);
 
             let currentOrders = [];
             let lastYearOrders = [];
@@ -973,7 +975,7 @@ const StaffDashboardService = (function() {
         };
 
         _garmentTrackerConfig = cfg;
-        console.log(`[GarmentTracker] Config loaded: ${cfg.quarter}, ${cfg.premiumItemsList.length} premium items`);
+        stafdashservLog(`[GarmentTracker] Config loaded: ${cfg.quarter}, ${cfg.premiumItemsList.length} premium items`);
         return cfg;
     }
 
@@ -1073,7 +1075,7 @@ const StaffDashboardService = (function() {
             if (cached) {
                 const { data, timestamp } = JSON.parse(cached);
                 if (Date.now() - timestamp < cacheTTL) {
-                    console.log('[GarmentTracker] Using cached data');
+                    stafdashservLog('[GarmentTracker] Using cached data');
                     return data;
                 }
             }
@@ -1081,7 +1083,7 @@ const StaffDashboardService = (function() {
             console.warn('[GarmentTracker] Cache read error:', e);
         }
 
-        console.log(`[GarmentTracker] Fetching orders from ${dateRange.start} to ${dateRange.end}`);
+        stafdashservLog(`[GarmentTracker] Fetching orders from ${dateRange.start} to ${dateRange.end}`);
 
         // Step 1: Fetch all invoiced orders for 2026
         const allOrders = await fetchOrders(dateRange.start, dateRange.end);
@@ -1093,7 +1095,7 @@ const StaffDashboardService = (function() {
             !GARMENT_TRACKER_CONFIG.excludedCustomerIds.includes(order.id_Customer)
         );
 
-        console.log(`[GarmentTracker] Found ${repOrders.length} matching orders from ${allOrders.length} total`);
+        stafdashservLog(`[GarmentTracker] Found ${repOrders.length} matching orders from ${allOrders.length} total`);
 
         // Step 3: Initialize tracking structure
         const trackerData = {
@@ -1186,7 +1188,7 @@ const StaffDashboardService = (function() {
             }
         }
 
-        console.log(`[GarmentTracker] Processed ${trackerData.metadata.ordersProcessed}/${repOrders.length} orders`);
+        stafdashservLog(`[GarmentTracker] Processed ${trackerData.metadata.ordersProcessed}/${repOrders.length} orders`);
 
         // Cache results
         try {
@@ -1228,7 +1230,7 @@ const StaffDashboardService = (function() {
         const whereClause = encodeURIComponent(`DateInvoiced>='${dateRange.start}' AND DateInvoiced<='${dateRange.end} 23:59:59'`);
         const url = `${API_CONFIG.baseURL}/garment-tracker?q.where=${whereClause}`;
 
-        console.log(`[GarmentTracker] Loading from table for ${dateRange.start} to ${dateRange.end}`);
+        stafdashservLog(`[GarmentTracker] Loading from table for ${dateRange.start} to ${dateRange.end}`);
 
         const response = await fetchWithTimeout(url, {}, 20000);
         if (!response.ok) {
@@ -1240,7 +1242,7 @@ const StaffDashboardService = (function() {
             throw new Error(data.error || 'Failed to load garment tracker from table');
         }
 
-        console.log(`[GarmentTracker] Loaded ${data.count} records from table`);
+        stafdashservLog(`[GarmentTracker] Loaded ${data.count} records from table`);
 
         // Aggregate records into format widget expects
         return aggregateFromTable(data.records);
@@ -1348,10 +1350,10 @@ const StaffDashboardService = (function() {
         const existingKeys = new Set(
             existingRecords.map(r => `${r.OrderNumber}-${r.PartNumber}`)
         );
-        console.log(`[GarmentTracker] Found ${existingKeys.size} existing records`);
+        stafdashservLog(`[GarmentTracker] Found ${existingKeys.size} existing records`);
 
         progressCallback?.('Fetching orders...');
-        console.log(`[GarmentTracker] Syncing orders from ${dateRange.start} to ${dateRange.end}`);
+        stafdashservLog(`[GarmentTracker] Syncing orders from ${dateRange.start} to ${dateRange.end}`);
 
         // Get all invoiced orders for the year
         const allOrders = await fetchOrders(dateRange.start, dateRange.end);
@@ -1366,7 +1368,7 @@ const StaffDashboardService = (function() {
         );
 
         progressCallback?.(`Processing ${repOrders.length} orders...`);
-        console.log(`[GarmentTracker] Found ${repOrders.length} orders to sync`);
+        stafdashservLog(`[GarmentTracker] Found ${repOrders.length} orders to sync`);
 
         let synced = 0;
         let skipped = 0;
@@ -1460,7 +1462,7 @@ const StaffDashboardService = (function() {
             }
         }
 
-        console.log(`[GarmentTracker] Sync complete: ${synced} new, ${skipped} skipped`);
+        stafdashservLog(`[GarmentTracker] Sync complete: ${synced} new, ${skipped} skipped`);
         return synced;
     }
 

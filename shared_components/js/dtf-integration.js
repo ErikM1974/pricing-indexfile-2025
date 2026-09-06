@@ -2,6 +2,8 @@
  * DTF Integration Layer
  * Coordinates between DTF calculator, Caspio adapter, and external data
  */
+var DTFINTE_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
+var dtfinteLog = DTFINTE_LOG_ON ? console.log.bind(console) : function () {}; // debug logging: localhost or ?debug=1 only (2026-09-06 console sweep)
 class DTFIntegration {
     constructor() {
         this.calculator = null;
@@ -22,7 +24,7 @@ class DTFIntegration {
     }
 
     setupIntegration() {
-        console.log('DTF Integration: Initializing...');
+        dtfinteLog('DTF Integration: Initializing...');
 
         // Check if container exists
         const container = document.getElementById('dtf-calculator-container');
@@ -37,7 +39,7 @@ class DTFIntegration {
 
         // Make calculator globally accessible for compatibility
         window.dtfCalculator = this.calculator;
-        console.log('DTF Integration: Calculator exposed globally as window.dtfCalculator');
+        dtfinteLog('DTF Integration: Calculator exposed globally as window.dtfCalculator');
 
         // Listen for Caspio data events
         this.listenForCaspioData();
@@ -45,20 +47,20 @@ class DTFIntegration {
         // Listen for calculator events
         this.listenForCalculatorEvents();
 
-        console.log('DTF Integration: Setup complete');
+        dtfinteLog('DTF Integration: Setup complete');
     }
 
     listenForCaspioData() {
         // Listen for DTF adapter events
         window.addEventListener('dtfAdapterDataReceived', (event) => {
-            console.log('DTF Integration: Received adapter data', event.detail);
+            dtfinteLog('DTF Integration: Received adapter data', event.detail);
             this.handleCaspioData(event.detail);
         });
 
         // Also listen for generic Caspio data events (backward compatibility)
         window.addEventListener('caspioDataReceived', (event) => {
             if (event.detail && event.detail.type === 'dtf') {
-                console.log('DTF Integration: Received Caspio data', event.detail);
+                dtfinteLog('DTF Integration: Received Caspio data', event.detail);
                 this.handleCaspioData(event.detail);
             }
         });
@@ -80,11 +82,11 @@ class DTFIntegration {
         const urlParams = new URLSearchParams(window.location.search);
         const manualCost = urlParams.get('manualCost');
         if (manualCost) {
-            console.log('DTF Integration: Manual pricing mode active, ignoring adapter data');
+            dtfinteLog('DTF Integration: Manual pricing mode active, ignoring adapter data');
             return;
         }
 
-        console.log('DTF Integration: Processing data:', data);
+        dtfinteLog('DTF Integration: Processing data:', data);
 
         // Track if this is a style/product change
         const isStyleChange = data.productInfo && data.productInfo.sku &&
@@ -92,7 +94,7 @@ class DTFIntegration {
 
         // Update garment cost - this will trigger transfer recalculation automatically
         if (data.garmentCost !== undefined) {
-            console.log('DTF Integration: Updating garment cost to:', data.garmentCost);
+            dtfinteLog('DTF Integration: Updating garment cost to:', data.garmentCost);
             this.calculator.updateGarmentCost(data.garmentCost);
         }
 
@@ -118,7 +120,7 @@ class DTFIntegration {
 
         // Force a complete refresh if this is a style change
         if (isStyleChange && this.calculator.refreshTransferPricing) {
-            console.log('DTF Integration: Style changed, forcing complete pricing refresh');
+            dtfinteLog('DTF Integration: Style changed, forcing complete pricing refresh');
             setTimeout(() => {
                 this.calculator.refreshTransferPricing();
             }, 50); // Small delay to ensure all data is updated
@@ -131,7 +133,7 @@ class DTFIntegration {
 
         // Listen for pricing updates from calculator
         container.addEventListener('dtfPricingUpdated', (event) => {
-            console.log('DTF Integration: Pricing updated', event.detail);
+            dtfinteLog('DTF Integration: Pricing updated', event.detail);
             
             // Dispatch global event that other components can listen to
             window.dispatchEvent(new CustomEvent('dtfPricingCalculated', {

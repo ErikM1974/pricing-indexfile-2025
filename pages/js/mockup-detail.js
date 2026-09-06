@@ -6,6 +6,8 @@
  *
  * Depends on: mockup-detail.css, app-config.js
  */
+var MOCKDETA_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
+var mockdetaLog = MOCKDETA_LOG_ON ? console.log.bind(console) : function () {}; // debug logging: localhost or ?debug=1 only (2026-09-06 console sweep)
 (function () {
     'use strict';
 
@@ -3181,7 +3183,7 @@
                         if (!resp.ok) throw new Error('Caspio update failed');
                         return resp.json();
                     }).then(function (result) {
-                        console.log('EMB record updated in Caspio, ID:', existingPrimary.ID);
+                        mockdetaLog('EMB record updated in Caspio, ID:', existingPrimary.ID);
                         showToast('EMB data updated in database', 'success');
                         loadStoredEmbData(mockupIdVal);
                     });
@@ -3196,7 +3198,7 @@
                         return resp.json();
                     }).then(function (result) {
                         if (result.success) {
-                            console.log('EMB record saved to Caspio, ID:', result.record.ID);
+                            mockdetaLog('EMB record saved to Caspio, ID:', result.record.ID);
                             showToast('EMB data saved to database', 'success');
                             loadStoredEmbData(mockupIdVal);
                         }
@@ -5371,7 +5373,7 @@
     function sendMockupNotification(params) {
         if (typeof emailjs === 'undefined') { console.warn('EmailJS not loaded — skipping notification to', params.to_email); return; }
         try {
-            console.log('Sending mockup notification to', params.to_email, '—', params.note_type);
+            mockdetaLog('Sending mockup notification to', params.to_email, '—', params.note_type);
             emailjs.init(EMAILJS_PUBLIC_KEY);
             emailjs.send(EMAILJS_SERVICE_ID, 'template_art_note_added', {
                 to_email: params.to_email,
@@ -5385,7 +5387,7 @@
                 detail_link: params.detail_link,
                 from_name: params.from_name || 'Mockup System'
             }).then(function () {
-                console.log('Mockup notification sent to', params.to_email);
+                mockdetaLog('Mockup notification sent to', params.to_email);
             }).catch(function (err) {
                 console.error('Mockup notification FAILED to', params.to_email, ':', err);
             });

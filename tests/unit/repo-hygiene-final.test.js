@@ -44,6 +44,13 @@ const DELETED_2026_09_06 = [
     'art-tools/art-approval.html', 'art-tools/ae-art-dashboard.html', 'art-tools/ae-submit-art.html', 'tests/order-service-test-harness.html',
 ];
 const DELETED = new Set(DELETED_2026_09_06);
+// Stale root-level copies found by the path-aware referrer check (2026-09-06, second pass): nothing loads them —
+// the pages load the shared_components/js twins (dp5-helper is an older 632-line version, pricing-matrix-api is
+// byte-identical, utils.js diverged in 2025-07) and no page ever requested /app-new.js. Removal is Erik's `git rm`
+// (memory/DEAD_FILES_2026-09-06.md § root duplicates); until then they are skipped below and must stay unreferenced.
+const PENDING_DELETION = ['pricing-matrix-api.js', 'dp5-helper.js', 'utils.js', 'app-new.js',
+    'shared_components/js/quote-builder-base.js']; // a comment-only tombstone since 2026-07-08 — the real base is builders/shared/quote-builder-base.js
+const PENDING = new Set(PENDING_DELETION);
 
 // Not served pages: build output, tests, Node-side code, documentation, email/HTML templates, archives, vendored code.
 const HTML_SKIP = /^(dist|tests|node_modules|memory|docs|scripts|templates|reference|email-templates|richardson-caps)\/|\/archive\/|archive-working-files\/|\/vendor\//;
@@ -74,10 +81,29 @@ const BROWSER_JS = tracked.filter((f) => f.endsWith('.js') && !JS_SKIP.test(f));
 // Referrers that count: served pages, browser scripts, server.js and the build. Not: tests, one-off Node scripts, archives.
 const CORPUS = tracked.filter((f) => (f.endsWith('.html') || f.endsWith('.js') || f.endsWith('.jsx')) && !/^(dist|node_modules|tests)\/|\/archive\/|archive-working-files\//.test(f) && (!f.startsWith('scripts/') || f === 'scripts/build.js'));
 const TEXT = new Map(CORPUS.map((f) => [f, read(f)]));
+// A basename shared by two tracked scripts (utils.js, dp5-helper.js, pricing-matrix-api.js…) hid stale root-level
+// copies from the first census: for those, a referrer must name the file by its directory ("shared_components/js/utils.js")
+// or, for a root-level file, as a quoted "/name.js" / "name.js" — a bare basename anywhere no longer counts.
+const baseCount = new Map();
+for (const f of BROWSER_JS) { const b = path.basename(f); baseCount.set(b, (baseCount.get(b) || 0) + 1); }
 function referrers(rel) {
     const base = path.basename(rel);
+    const dup = (baseCount.get(base) || 0) > 1;
+    const esc = base.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const needle = !dup ? null : (rel.includes('/') ? rel.split('/').slice(-2).join('/') : null);
+    // root-level duplicate: an absolute "/name.js" counts from anywhere; a bare "name.js" / "./name.js" only from another root file
+    const rootAbs = dup && !needle ? new RegExp(`["'\`]/${esc}["'\`?]`) : null;
+    const rootRel = dup && !needle ? new RegExp(`["'\`](\\./)?${esc}["'\`?]`) : null;
+    const rootRe = rootAbs ? { test: (t, f) => rootAbs.test(t) || (path.posix.dirname(f) === '.' && rootRel.test(t)) } : null;
     const out = [];
-    for (const [f, t] of TEXT) if (f !== rel && !DELETED.has(f) && t.includes(base)) out.push(f);
+    const dir = path.posix.dirname(rel);
+    for (const [f, t] of TEXT) {
+        if (f === rel || DELETED.has(f)) continue;
+        // a sibling module importing `./base` (the builders' ES modules) is a real reference too
+        const sibling = dup && needle && path.posix.dirname(f) === dir && t.includes('./' + base);
+        const hit = rootRe ? rootRe.test(t, f) : (t.includes(needle || base) || sibling);
+        if (hit) out.push(f);
+    }
     return out;
 }
 
@@ -112,11 +138,22 @@ describe('every served HTML page names its controls (static accessibility)', () 
     });
 });
 
+describe('no bare console.log in a served script (CLAUDE.md pre-commit rule; 2026-09-06 sweep gated ~700 behind localhost / ?debug=1)', () => {
+    test('every browser script is free of console.log(', () => {
+        const offenders = BROWSER_JS.filter((f) => /(?<![\w.$])console\.log\(/.test(read(f)));
+        expect(offenders).toEqual([]);
+    });
+});
+
 describe('no orphan browser script', () => {
     test('script list resolves', () => { expect(BROWSER_JS.length).toBeGreaterThan(300); });
     test('every browser script outside DELETED_2026_09_06 is referenced by a page, script, route or the build', () => {
-        const orphans = BROWSER_JS.filter((f) => !DELETED.has(f) && referrers(f).length === 0);
+        const orphans = BROWSER_JS.filter((f) => !DELETED.has(f) && !PENDING.has(f) && referrers(f).length === 0);
         expect(orphans).toEqual([]);
+    });
+    test('the root-level duplicates pending deletion stay unreferenced (and disappear once removed)', () => {
+        const revived = PENDING_DELETION.filter((f) => exists(f) && referrers(f).length > 0).map((f) => ({ file: f, referrers: referrers(f) }));
+        expect(revived).toEqual([]);
     });
     test('the 69 files deleted on 2026-09-06 stay deleted', () => {
         expect(DELETED_2026_09_06.length).toBe(69);

@@ -24,6 +24,8 @@
  *   searchInput.addEventListener('keydown', (e) => searcher.handleKeyDown(e));
  */
 
+var EXACMATCSEAR_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
+var exacmatcsearLog = EXACMATCSEAR_LOG_ON ? console.log.bind(console) : function () {}; // debug logging: localhost or ?debug=1 only (2026-09-06 console sweep)
 class ExactMatchSearch {
     constructor(config = {}) {
         this.apiBase = config.apiBase || '';
@@ -51,7 +53,7 @@ class ExactMatchSearch {
         this.debounceMs = config.debounceMs || 300;
         this.debounceTimer = null;
 
-        console.log('[ExactMatchSearch] Initialized with keyboard navigation');
+        exacmatcsearLog('[ExactMatchSearch] Initialized with keyboard navigation');
     }
 
     /**
@@ -99,12 +101,12 @@ class ExactMatchSearch {
      */
     async executeSearch(query) {
         try {
-            console.log('[ExactMatchSearch] Searching for:', query);
+            exacmatcsearLog('[ExactMatchSearch] Searching for:', query);
 
             // Check cache first
             const cached = this.getCached(query);
             if (cached) {
-                console.log('[ExactMatchSearch] Using cached results');
+                exacmatcsearLog('[ExactMatchSearch] Using cached results');
                 this.processResults(cached, query);
                 return;
             }
@@ -126,7 +128,7 @@ class ExactMatchSearch {
 
             // Notify about filtered items BEFORE showing dropdown
             if (this.onFilteredOut && filteredOutItems.length > 0 && filteredResults.length === 0) {
-                console.log('[ExactMatchSearch] Calling onFilteredOut with', filteredOutItems.length, 'filtered items');
+                exacmatcsearLog('[ExactMatchSearch] Calling onFilteredOut with', filteredOutItems.length, 'filtered items');
                 this.onFilteredOut(filteredOutItems, query);
             }
 
@@ -179,7 +181,7 @@ class ExactMatchSearch {
         });
 
         if (exactMatch) {
-            console.log('[ExactMatchSearch] Exact match found:', exactMatch.value);
+            exacmatcsearLog('[ExactMatchSearch] Exact match found:', exactMatch.value);
             this.currentResults = [];
 
             // Call exact match callback (auto-load product)
@@ -204,7 +206,7 @@ class ExactMatchSearch {
         // Store for keyboard navigation
         this.currentResults = topResults;
 
-        console.log('[ExactMatchSearch] Showing', topResults.length, 'suggestions');
+        exacmatcsearLog('[ExactMatchSearch] Showing', topResults.length, 'suggestions');
 
         if (this.onSuggestions) {
             this.onSuggestions(topResults);
@@ -297,7 +299,7 @@ class ExactMatchSearch {
      */
     clearCache() {
         this.cache.clear();
-        console.log('[ExactMatchSearch] Cache cleared');
+        exacmatcsearLog('[ExactMatchSearch] Cache cleared');
     }
 
     /**
@@ -404,7 +406,7 @@ class ExactMatchSearch {
         }
 
         const selectedProduct = this.currentResults[this.selectedIndex];
-        console.log('[ExactMatchSearch] Selected via keyboard:', selectedProduct.value);
+        exacmatcsearLog('[ExactMatchSearch] Selected via keyboard:', selectedProduct.value);
 
         // Clear state
         this.currentResults = [];

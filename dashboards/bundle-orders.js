@@ -1,3 +1,5 @@
+var BUNDORDE_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
+var bundordeLog = BUNDORDE_LOG_ON ? console.log.bind(console) : function () {}; // debug logging: localhost or ?debug=1 only (2026-09-06 console sweep)
 var BUNDLE_API_BASE = (typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) || '';
 if (!BUNDLE_API_BASE) console.error('[bundle-orders] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
 // Bundle Orders Dashboard JavaScript
@@ -27,7 +29,7 @@ const sizeUpchargeCache = {};
 async function fetchSizeUpcharges(styleNumber) {
     // Check cache first
     if (sizeUpchargeCache[styleNumber]) {
-        console.log(`[Size Upcharges] Using cached data for ${styleNumber}`);
+        bundordeLog(`[Size Upcharges] Using cached data for ${styleNumber}`);
         return sizeUpchargeCache[styleNumber];
     }
 
@@ -44,7 +46,7 @@ async function fetchSizeUpcharges(styleNumber) {
         if (data && data.length > 0) {
             // Extract upcharges from first color (all colors have same upcharges)
             const upcharges = data[0].sizeUpcharges || {};
-            console.log(`[Size Upcharges] Fetched for ${styleNumber}:`, upcharges);
+            bundordeLog(`[Size Upcharges] Fetched for ${styleNumber}:`, upcharges);
 
             // Cache the result
             sizeUpchargeCache[styleNumber] = upcharges;
@@ -159,7 +161,7 @@ async function loadSampleRequests() {
                         }
                     }
                 } catch (e) {
-                    console.log('Could not fetch items for', request.QuoteID);
+                    bundordeLog('Could not fetch items for', request.QuoteID);
                 }
             }
         }
@@ -317,9 +319,9 @@ async function viewSampleDetails(quoteID) {
                 // Fetch upcharges for all styles
                 const upchargePromises = stylesToFetch.map(style => fetchSizeUpcharges(style));
                 await Promise.all(upchargePromises);
-                console.log('[Modal] Size upcharges fetched for Christmas bundle:', sizeUpchargeCache);
+                bundordeLog('[Modal] Size upcharges fetched for Christmas bundle:', sizeUpchargeCache);
             } catch (e) {
-                console.log('Error fetching upcharges for bundle:', e);
+                bundordeLog('Error fetching upcharges for bundle:', e);
             }
         }
         
@@ -698,7 +700,7 @@ async function viewSampleDetails(quoteID) {
                             bundleConfig = JSON.parse(items[0].BundleConfiguration);
                         }
                     } catch (e) {
-                        console.log('Error parsing BundleConfiguration for value calculation:', e);
+                        bundordeLog('Error parsing BundleConfiguration for value calculation:', e);
                     }
 
                     // Add jacket value with upcharge
@@ -872,7 +874,7 @@ async function viewSampleDetails(quoteID) {
                                             bundleConfig = JSON.parse(items[0].BundleConfiguration);
                                         }
                                     } catch (e) {
-                                        console.log('Error parsing BundleConfiguration:', e);
+                                        bundordeLog('Error parsing BundleConfiguration:', e);
                                     }
 
                                     let rows = '';
@@ -1041,7 +1043,7 @@ async function viewSampleDetails(quoteID) {
                                     try {
                                         sizeBreakdown = JSON.parse(items[0].SizeBreakdown || '{}');
                                     } catch (e) {
-                                        console.log('Error parsing BCA size breakdown:', e);
+                                        bundordeLog('Error parsing BCA size breakdown:', e);
                                     }
 
                                     // Display aggregated view for BCA bundles
@@ -1227,7 +1229,7 @@ function generateShopWorksText(item, request) {
             bundleConfig = JSON.parse(item.BundleConfiguration);
         }
     } catch (e) {
-        console.log('Error parsing BundleConfiguration for ShopWorks text:', e);
+        bundordeLog('Error parsing BundleConfiguration for ShopWorks text:', e);
     }
 
     text += 'BUNDLE ITEMS:\n';
@@ -1523,7 +1525,7 @@ async function generateChristmasBundlePDF(request, items) {
                     }
                 }
             } catch (e) {
-                console.log('Error parsing BundleConfiguration:', e);
+                bundordeLog('Error parsing BundleConfiguration:', e);
             }
         }
 

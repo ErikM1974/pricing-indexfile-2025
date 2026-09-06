@@ -3,6 +3,8 @@
    Main entry point for dashboard functionality
    ===================================================== */
 
+var STAFDASHINIT_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
+var stafdashinitLog = STAFDASHINIT_LOG_ON ? console.log.bind(console) : function () {}; // debug logging: localhost or ?debug=1 only (2026-09-06 console sweep)
 const StaffDashboardInit = (function() {
     'use strict';
 
@@ -25,7 +27,7 @@ const StaffDashboardInit = (function() {
      * Initialize the dashboard
      */
     async function init() {
-        console.log('Initializing Staff Dashboard...');
+        stafdashinitLog('Initializing Staff Dashboard...');
 
         // Initialize widgets
         initWidgetToggles();
@@ -51,7 +53,7 @@ const StaffDashboardInit = (function() {
         // Set up auto-refresh
         startAutoRefresh();
 
-        console.log('Staff Dashboard initialized');
+        stafdashinitLog('Staff Dashboard initialized');
     }
 
     // =====================================================
@@ -750,7 +752,7 @@ const StaffDashboardInit = (function() {
                 const archive = await StaffDashboardService.fetchYTDPerRepFromArchive(year);
                 ytdRevenue += archive.totalRevenue || 0;
                 lastArchivedDate = archive.lastArchivedDate || null;
-                console.log(`YTD Archive (per-rep, through ${lastArchivedDate}): $${(archive.totalRevenue || 0).toFixed(2)}`);
+                stafdashinitLog(`YTD Archive (per-rep, through ${lastArchivedDate}): $${(archive.totalRevenue || 0).toFixed(2)}`);
             } catch (e) {
                 console.warn('Could not fetch per-rep YTD archive:', e.message);
             }
@@ -767,7 +769,7 @@ const StaffDashboardInit = (function() {
                     const liveRevenue = liveOrders.reduce((sum, o) =>
                         sum + (parseFloat(o.cur_SubTotal) || 0), 0);
                     ytdRevenue += liveRevenue;
-                    console.log(`YTD Live (${liveStart} to ${todayStr}): $${liveRevenue.toFixed(2)} from ${liveOrders.length} orders`);
+                    stafdashinitLog(`YTD Live (${liveStart} to ${todayStr}): $${liveRevenue.toFixed(2)} from ${liveOrders.length} orders`);
                 } catch (e) {
                     console.error('Could not fetch live top-up data:', e.message);
                 }
@@ -780,7 +782,7 @@ const StaffDashboardInit = (function() {
                 console.warn('Background archiving failed:', e.message)
             );
 
-            console.log(`YTD Total: $${ytdRevenue.toFixed(2)}`);
+            stafdashinitLog(`YTD Total: $${ytdRevenue.toFixed(2)}`);
             updateSalesGoal(ytdRevenue);
         } catch (error) {
             console.error('Failed to load YTD for sales goal:', error);
@@ -834,7 +836,7 @@ const StaffDashboardInit = (function() {
         }
 
         if (perRepArchived > 0) {
-            console.log(`Archived ${perRepArchived} per-rep days (55-60 days ago) to Caspio`);
+            stafdashinitLog(`Archived ${perRepArchived} per-rep days (55-60 days ago) to Caspio`);
         }
     }
 
@@ -860,7 +862,7 @@ const StaffDashboardInit = (function() {
                 nextDay.setDate(nextDay.getDate() + 1);
                 const startDate = nextDay.toISOString().split('T')[0];
 
-                console.log(`[TeamPerformance] Hybrid load: archived through ${lastArchived}, fetching live ${startDate} to ${today}`);
+                stafdashinitLog(`[TeamPerformance] Hybrid load: archived through ${lastArchived}, fetching live ${startDate} to ${today}`);
 
                 const liveOrders = await StaffDashboardService.fetchOrders(startDate, today);
 
@@ -930,7 +932,7 @@ const StaffDashboardInit = (function() {
                 rep.percentage = Math.round((rep.revenue / maxRevenue) * 100);
             });
 
-            console.log(`[TeamPerformance] Hybrid load complete: ${reps.length} reps, archived=${archived.reps?.length || 0}, live=${Object.keys(liveRepTotals).length}`);
+            stafdashinitLog(`[TeamPerformance] Hybrid load complete: ${reps.length} reps, archived=${archived.reps?.length || 0}, live=${Object.keys(liveRepTotals).length}`);
 
             return {
                 reps,
@@ -971,7 +973,7 @@ const StaffDashboardInit = (function() {
         try {
             // Try fast table-based load first
             const data = await StaffDashboardService.loadGarmentTrackerFromTable();
-            console.log('[GarmentTracker] Loaded from table');
+            stafdashinitLog('[GarmentTracker] Loaded from table');
             renderGarmentTracker(data);
             // Note: archive-from-live used to fire here on every page load. Removed —
             // Heroku Scheduler runs `archive-from-live` daily (6 AM PT) which is
@@ -1253,7 +1255,7 @@ const StaffDashboardInit = (function() {
             });
 
             if (statusEl) statusEl.textContent = `Synced ${count} items`;
-            console.log(`[GarmentTracker] Sync complete: ${count} items`);
+            stafdashinitLog(`[GarmentTracker] Sync complete: ${count} items`);
 
             // Reload from table
             await loadGarmentTracker();

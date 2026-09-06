@@ -18,6 +18,8 @@
  * JS is parsed — which is exactly why the old `escapedBrand` (quote-slashing for
  * an onclick) was not a fix. Filter chips now use data-* + a delegated listener.
  */
+var CATASEAR_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
+var catasearLog = CATASEAR_LOG_ON ? console.log.bind(console) : function () {}; // debug logging: localhost or ?debug=1 only (2026-09-06 console sweep)
 function escapeHtml(value) {
     if (value === null || value === undefined) return '';
     return String(value)
@@ -54,7 +56,7 @@ class CatalogSearch {
     }
 
     init() {
-        console.log('[CatalogSearch] Initializing...');
+        catasearLog('[CatalogSearch] Initializing...');
 
         // Set up event listeners
         this.setupSearchInput();
@@ -95,7 +97,7 @@ class CatalogSearch {
         if (params.has('brand')) {
             const brandName = params.get('brand');
             this.currentFilters.brand = [brandName];
-            console.log('[CatalogSearch] Brand filter from URL:', brandName);
+            catasearLog('[CatalogSearch] Brand filter from URL:', brandName);
             hasFilters = true;
         }
 
@@ -126,7 +128,7 @@ class CatalogSearch {
                 window.location.replace('/catalog?' + fwd.toString());
                 return;
             }
-            console.log('[CatalogSearch] Filters found in URL, performing search:', this.currentFilters);
+            catasearLog('[CatalogSearch] Filters found in URL, performing search:', this.currentFilters);
             this.performSearch();
         }
     }
@@ -251,7 +253,7 @@ class CatalogSearch {
             
             // If we have a search query, use smart search
             if (this.currentFilters.q) {
-                console.log('[CatalogSearch] Using smart search for query:', this.currentFilters.q);
+                catasearLog('[CatalogSearch] Using smart search for query:', this.currentFilters.q);
                 
                 // Extract other filters for additional params
                 const { q, category, subcategory, ...otherFilters } = this.currentFilters;
@@ -261,7 +263,7 @@ class CatalogSearch {
                 
             } else if (this.currentFilters.category) {
                 // If we have category/subcategory, use category search
-                console.log('[CatalogSearch] Using smart category search');
+                catasearLog('[CatalogSearch] Using smart category search');
                 
                 // Extract other filters
                 const { category, subcategory, ...otherFilters } = this.currentFilters;
@@ -284,11 +286,11 @@ class CatalogSearch {
             } else {
                 // Regular search (by other filters)
                 const params = this.buildSearchParams();
-                console.log('[CatalogSearch] Searching with params:', params);
+                catasearLog('[CatalogSearch] Searching with params:', params);
                 results = await this.searchService.searchWithFacets(params);
             }
             
-            console.log('[CatalogSearch] Search results:', results);
+            catasearLog('[CatalogSearch] Search results:', results);
 
             // Fetch Richardson decorated prices if viewing Richardson brand
             if (this.currentFilters.brand?.includes('Richardson') && !this.richardsonPrices) {
@@ -510,7 +512,7 @@ class CatalogSearch {
                 clientSide: true // Flag to indicate this is client-side tracking
             };
 
-            console.log('[CatalogSearch] Client-side pagination:', {
+            catasearLog('[CatalogSearch] Client-side pagination:', {
                 page: this.currentResults.pagination.page,
                 productsReturned: results.products.length,
                 hasMore: hasMore
@@ -732,7 +734,7 @@ class CatalogSearch {
      * Handle brand filter checkbox change
      */
     handleBrandFilterChange(brandValue, isChecked) {
-        console.log('[CatalogSearch] Brand filter changed:', brandValue, isChecked);
+        catasearLog('[CatalogSearch] Brand filter changed:', brandValue, isChecked);
 
         // Initialize brand filter array if needed
         if (!this.currentFilters.brand) {
@@ -978,7 +980,7 @@ class CatalogSearch {
      * Clear all active filters
      */
     clearAllFilters() {
-        console.log('[CatalogSearch] Clearing all filters');
+        catasearLog('[CatalogSearch] Clearing all filters');
 
         // Reset filter arrays
         this.currentFilters.brand = [];
@@ -1096,7 +1098,7 @@ class CatalogSearch {
      * Search by brand name
      */
     async searchByBrand(brandName) {
-        console.log('[CatalogSearch] Searching by brand:', brandName);
+        catasearLog('[CatalogSearch] Searching by brand:', brandName);
         
         // Hide homepage sections
         document.querySelector('.hero-section').style.display = 'none';

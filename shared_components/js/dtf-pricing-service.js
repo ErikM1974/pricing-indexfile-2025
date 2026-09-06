@@ -7,6 +7,8 @@
  * This prevents wrong pricing from being shown to users.
  */
 
+var DTFPRICSERV_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
+var dtfpricservLog = DTFPRICSERV_LOG_ON ? console.log.bind(console) : function () {}; // debug logging: localhost or ?debug=1 only (2026-09-06 console sweep)
 class DTFPricingService {
     constructor() {
         this.baseURL = (typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) || '';
@@ -14,7 +16,7 @@ class DTFPricingService {
         this.cachePrefix = 'dtfPricingData';
         this.cacheDuration = 5 * 60 * 1000; // 5 minutes
         this.apiData = null;
-        console.log('[DTFPricingService] Initialized');
+        dtfpricservLog('[DTFPricingService] Initialized');
     }
 
     /**
@@ -34,7 +36,7 @@ class DTFPricingService {
         const urlCost = urlParams.get('manualCost') || urlParams.get('cost');
         if (urlCost && !isNaN(parseFloat(urlCost))) {
             const cost = parseFloat(urlCost);
-            console.log('[DTFPricingService] Manual cost from URL:', cost);
+            dtfpricservLog('[DTFPricingService] Manual cost from URL:', cost);
             sessionStorage.setItem('manualCostOverride', cost.toString());
             return cost;
         }
@@ -42,7 +44,7 @@ class DTFPricingService {
         const storedCost = sessionStorage.getItem('manualCostOverride');
         if (storedCost && !isNaN(parseFloat(storedCost))) {
             const cost = parseFloat(storedCost);
-            console.log('[DTFPricingService] Manual cost from storage:', cost);
+            dtfpricservLog('[DTFPricingService] Manual cost from storage:', cost);
             return cost;
         }
 
@@ -54,7 +56,7 @@ class DTFPricingService {
      */
     clearManualCostOverride() {
         sessionStorage.removeItem('manualCostOverride');
-        console.log('[DTFPricingService] Manual cost override cleared');
+        dtfpricservLog('[DTFPricingService] Manual cost override cleared');
     }
 
     /**
@@ -64,7 +66,7 @@ class DTFPricingService {
      */
     async fetchPricingBundle() {
         const url = `${this.baseURL}/api/pricing-bundle?method=DTF&styleNumber=PC61`;
-        console.log('[DTFPricingService] Fetching complete pricing bundle from API...');
+        dtfpricservLog('[DTFPricingService] Fetching complete pricing bundle from API...');
 
         const response = await fetch(url);
         if (!response.ok) {
@@ -78,7 +80,7 @@ class DTFPricingService {
             throw new Error('Invalid API response: missing required DTF pricing data');
         }
 
-        console.log('[DTFPricingService] Successfully fetched complete pricing bundle from API');
+        dtfpricservLog('[DTFPricingService] Successfully fetched complete pricing bundle from API');
         return data;
     }
 
@@ -90,7 +92,7 @@ class DTFPricingService {
      * @returns {Object} Pricing data with API rules + manual garment cost
      */
     async generateManualPricingData(manualCost) {
-        console.log('[DTFPricingService] Generating manual pricing data with base cost:', manualCost);
+        dtfpricservLog('[DTFPricingService] Generating manual pricing data with base cost:', manualCost);
 
         // Fetch complete pricing bundle from API (throws error if fails - no fallback)
         const apiBundle = await this.fetchPricingBundle();
@@ -125,19 +127,19 @@ class DTFPricingService {
         // FIRST: Check for manual cost override
         const manualCost = this.getManualCostOverride();
         if (manualCost !== null) {
-            console.log('[DTFPricingService] 🔧 MANUAL PRICING MODE - Base cost:', manualCost);
+            dtfpricservLog('[DTFPricingService] 🔧 MANUAL PRICING MODE - Base cost:', manualCost);
             const manualData = await this.generateManualPricingData(manualCost);
             this.apiData = manualData;
             return manualData;
         }
 
-        console.log('[DTFPricingService] Fetching DTF pricing data', styleNumber ? `for style: ${styleNumber}` : '(generic)');
+        dtfpricservLog('[DTFPricingService] Fetching DTF pricing data', styleNumber ? `for style: ${styleNumber}` : '(generic)');
 
         // Build cache key based on style number
         const cacheKey = styleNumber ? `${this.cachePrefix}-${styleNumber}` : `${this.cachePrefix}-bundle`;
         const cached = this.getFromCache(cacheKey);
         if (cached && !options.forceRefresh) {
-            console.log('[DTFPricingService] Returning cached data');
+            dtfpricservLog('[DTFPricingService] Returning cached data');
             this.apiData = cached;
             return cached;
         }
@@ -157,7 +159,7 @@ class DTFPricingService {
             }
 
             const data = await response.json();
-            console.log('[DTFPricingService] API data received:', data);
+            dtfpricservLog('[DTFPricingService] API data received:', data);
 
             // Validate required fields
             if (!data.tiersR || !data.allDtfCostsR || !data.freightR) {
@@ -182,7 +184,7 @@ class DTFPricingService {
      * Transform API data to match existing DTFConfig structure
      */
     transformApiData(apiData) {
-        console.log('[DTFPricingService] Transforming API data');
+        dtfpricservLog('[DTFPricingService] Transforming API data');
         
         // Group transfer costs by size
         const transferSizes = this.buildTransferSizes(apiData.allDtfCostsR);
@@ -618,7 +620,7 @@ class DTFPricingService {
                 sessionStorage.removeItem(key);
             }
         });
-        console.log('[DTFPricingService] Cache cleared');
+        dtfpricservLog('[DTFPricingService] Cache cleared');
     }
 
     /**

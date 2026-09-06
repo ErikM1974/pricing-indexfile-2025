@@ -1,7 +1,9 @@
 // pricing-calculator.js - Calculates product prices based on quantity, tiers, and LTM fees.
 // Version 2.0 - Standardized to use pricingData.prices and pricingData.tierData
+var PRICCALC_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
+var priccalcLog = PRICCALC_LOG_ON ? console.log.bind(console) : function () {}; // debug logging: localhost or ?debug=1 only (2026-09-06 console sweep)
 
-console.log("[PRICING-CALC:LOAD] Pricing calculator module loaded (v2.0 - Standardized).");
+priccalcLog("[PRICING-CALC:LOAD] Pricing calculator module loaded (v2.0 - Standardized).");
 
 (function() {
     "use strict";
@@ -23,27 +25,27 @@ console.log("[PRICING-CALC:LOAD] Pricing calculator module loaded (v2.0 - Standa
      * @returns {Object|null} An object containing calculated pricing details, or null if calculation fails.
      */
     function calculatePricing(sizeQuantities, existingCartQuantity, pricingData) {
-        console.log("[PRICING-CALC:CALC] Calculating pricing (v2.0)...");
-        console.log("[PRICING-CALC:INPUT] Size Quantities:", JSON.parse(JSON.stringify(sizeQuantities || {})));
-        console.log("[PRICING-CALC:INPUT] Existing Cart Qty:", existingCartQuantity);
+        priccalcLog("[PRICING-CALC:CALC] Calculating pricing (v2.0)...");
+        priccalcLog("[PRICING-CALC:INPUT] Size Quantities:", JSON.parse(JSON.stringify(sizeQuantities || {})));
+        priccalcLog("[PRICING-CALC:INPUT] Existing Cart Qty:", existingCartQuantity);
 
         // Detailed debugging for pricingData
-        console.log("[PRICING-CALC:DEBUG] Raw pricingData object received:", pricingData);
+        priccalcLog("[PRICING-CALC:DEBUG] Raw pricingData object received:", pricingData);
         if (typeof pricingData === 'object' && pricingData !== null) {
-            console.log("[PRICING-CALC:DEBUG] pricingData is an object.");
-            console.log("[PRICING-CALC:DEBUG] Keys in pricingData:", Object.keys(pricingData));
-            console.log("[PRICING-CALC:DEBUG] pricingData.prices exists:", pricingData.hasOwnProperty('prices'));
-            console.log("[PRICING-CALC:DEBUG] pricingData.tierData exists:", pricingData.hasOwnProperty('tierData'));
+            priccalcLog("[PRICING-CALC:DEBUG] pricingData is an object.");
+            priccalcLog("[PRICING-CALC:DEBUG] Keys in pricingData:", Object.keys(pricingData));
+            priccalcLog("[PRICING-CALC:DEBUG] pricingData.prices exists:", pricingData.hasOwnProperty('prices'));
+            priccalcLog("[PRICING-CALC:DEBUG] pricingData.tierData exists:", pricingData.hasOwnProperty('tierData'));
             if (pricingData.hasOwnProperty('prices')) {
-                console.log("[PRICING-CALC:DEBUG] typeof pricingData.prices:", typeof pricingData.prices, "Is Array:", Array.isArray(pricingData.prices));
-                console.log("[PRICING-CALC:DEBUG] pricingData.prices content (first few keys):", pricingData.prices ? JSON.stringify(Object.keys(pricingData.prices).slice(0,5)) : 'null/undefined');
+                priccalcLog("[PRICING-CALC:DEBUG] typeof pricingData.prices:", typeof pricingData.prices, "Is Array:", Array.isArray(pricingData.prices));
+                priccalcLog("[PRICING-CALC:DEBUG] pricingData.prices content (first few keys):", pricingData.prices ? JSON.stringify(Object.keys(pricingData.prices).slice(0,5)) : 'null/undefined');
             }
             if (pricingData.hasOwnProperty('tierData')) {
-                console.log("[PRICING-CALC:DEBUG] typeof pricingData.tierData:", typeof pricingData.tierData, "Is Array:", Array.isArray(pricingData.tierData));
-                console.log("[PRICING-CALC:DEBUG] pricingData.tierData content (first few keys):", pricingData.tierData ? JSON.stringify(Object.keys(pricingData.tierData).slice(0,5)) : 'null/undefined');
+                priccalcLog("[PRICING-CALC:DEBUG] typeof pricingData.tierData:", typeof pricingData.tierData, "Is Array:", Array.isArray(pricingData.tierData));
+                priccalcLog("[PRICING-CALC:DEBUG] pricingData.tierData content (first few keys):", pricingData.tierData ? JSON.stringify(Object.keys(pricingData.tierData).slice(0,5)) : 'null/undefined');
             }
         } else {
-            console.log("[PRICING-CALC:DEBUG] pricingData is NOT a valid object or is null/undefined. Type:", typeof pricingData);
+            priccalcLog("[PRICING-CALC:DEBUG] pricingData is NOT a valid object or is null/undefined. Type:", typeof pricingData);
         }
 
         if (!pricingData || typeof pricingData.prices !== 'object' || Array.isArray(pricingData.prices) || typeof pricingData.tierData !== 'object' || Array.isArray(pricingData.tierData)) {
@@ -55,7 +57,7 @@ console.log("[PRICING-CALC:LOAD] Pricing calculator module loaded (v2.0 - Standa
         const newQuantity = Object.values(sizeQuantities).reduce((sum, qty) => sum + (parseInt(qty) || 0), 0);
         const combinedQuantity = newQuantity + (parseInt(existingCartQuantity) || 0);
 
-        console.log(`[PRICING-CALC:QTY] New: ${newQuantity}, Existing: ${existingCartQuantity}, Combined: ${combinedQuantity}`);
+        priccalcLog(`[PRICING-CALC:QTY] New: ${newQuantity}, Existing: ${existingCartQuantity}, Combined: ${combinedQuantity}`);
 
         let tierKey = '';
         let currentTierObject = null;
@@ -100,7 +102,7 @@ console.log("[PRICING-CALC:LOAD] Pricing calculator module loaded (v2.0 - Standa
             console.error("[PRICING-CALC:ERROR] Could not determine pricing tier for quantity:", combinedQuantity);
             return null;
         }
-        console.log(`[PRICING-CALC:TIER] Determined Tier: ${tierKey}`, currentTierObject);
+        priccalcLog(`[PRICING-CALC:TIER] Determined Tier: ${tierKey}`, currentTierObject);
 
         const ltmThresholdForProduct = currentTierObject.LTM_Threshold || LTM_THRESHOLD; // Tier specific or default
         const ltmFeeApplies = combinedQuantity > 0 && combinedQuantity < ltmThresholdForProduct;
@@ -116,7 +118,7 @@ console.log("[PRICING-CALC:LOAD] Pricing calculator module loaded (v2.0 - Standa
             return (td.MinQuantity || 0) <= ltmThresholdForProduct && (td.MaxQuantity === undefined || td.MaxQuantity >= ltmThresholdForProduct);
         }) || tierKey; // Fallback to current tier if threshold tier not found
  
-        console.log(`[PRICING-CALC:LTM] LTM Applies: ${ltmFeeApplies}, Fee: $${ltmFeeTotal.toFixed(2)}, Per Item: $${ltmFeePerItem.toFixed(2)}, Base Tier for LTM Price: ${ltmReferenceTierKey}`);
+        priccalcLog(`[PRICING-CALC:LTM] LTM Applies: ${ltmFeeApplies}, Fee: $${ltmFeeTotal.toFixed(2)}, Per Item: $${ltmFeePerItem.toFixed(2)}, Base Tier for LTM Price: ${ltmReferenceTierKey}`);
  
         const calculatedItems = {};
         let overallTotalPrice = 0;
@@ -126,7 +128,7 @@ console.log("[PRICING-CALC:LOAD] Pricing calculator module loaded (v2.0 - Standa
         const flashChargePerItem = (pricingData.fees && typeof pricingData.fees.flash === 'number') ? pricingData.fees.flash : 0;
         let totalFlashChargeForOrder = 0;
 
-        console.log(`[PRICING-CALC:FEES] Setup Fee (overall): $${setupFee.toFixed(2)}, Flash Charge (per item): $${flashChargePerItem.toFixed(2)}`);
+        priccalcLog(`[PRICING-CALC:FEES] Setup Fee (overall): $${setupFee.toFixed(2)}, Flash Charge (per item): $${flashChargePerItem.toFixed(2)}`);
 
         for (const size in sizeQuantities) {
             const quantity = parseInt(sizeQuantities[size]) || 0;
@@ -151,7 +153,7 @@ console.log("[PRICING-CALC:LOAD] Pricing calculator module loaded (v2.0 - Standa
             let backLogoPerItem = 0;
             if (pricingData.embellishmentType === 'cap-embroidery' && window.CapEmbroideryBackLogo && window.CapEmbroideryBackLogo.isEnabled()) {
                 backLogoPerItem = window.CapEmbroideryBackLogo.getPrice();
-                console.log(`[PRICING-CALC:BACK-LOGO] Back logo enabled, adding $${backLogoPerItem} per item`);
+                priccalcLog(`[PRICING-CALC:BACK-LOGO] Back logo enabled, adding $${backLogoPerItem} per item`);
             }
             
             // Display unit price includes per-item LTM, per-item flash charge, and back logo
@@ -201,7 +203,7 @@ console.log("[PRICING-CALC:LOAD] Pricing calculator module loaded (v2.0 - Standa
             result.baseUnitPrices[size] = isNaN(basePrice) ? 0 : basePrice;
         });
  
-        console.log("[PRICING-CALC:RESULT] (v2.0)", result);
+        priccalcLog("[PRICING-CALC:RESULT] (v2.0)", result);
         return result;
     }
  

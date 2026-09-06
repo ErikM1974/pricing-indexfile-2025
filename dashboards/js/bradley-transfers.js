@@ -7,6 +7,8 @@
  * API:        caspio-pricing-proxy /api/transfer-orders (see src/routes/transfer-orders.js)
  */
 
+var BRADTRAN_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
+var bradtranLog = BRADTRAN_LOG_ON ? console.log.bind(console) : function () {}; // debug logging: localhost or ?debug=1 only (2026-09-06 console sweep)
 (function () {
     'use strict';
 
@@ -841,7 +843,7 @@
                 requestedBy: { email: 'art@nwcustomapparel.com', name: 'Steve Deland' },
                 enableLines: true,
                 onSuccess: function (record) {
-                    console.log('[?view=steve] transfer created:', record.ID_Transfer);
+                    bradtranLog('[?view=steve] transfer created:', record.ID_Transfer);
                     refresh();
                 }
             });
