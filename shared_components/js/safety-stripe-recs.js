@@ -111,7 +111,7 @@
     var action = isCatalog
       ? '' // catalog cards are whole-card links (built below)
       : '<button type="button" class="ssr-add" data-style="' + esc(style.style) + '">'
-          + '<i class="fas fa-plus"></i> ' + esc(opts.addLabel || 'Add to quote') + '</button>';
+          + '<i class="fas fa-plus" aria-hidden="true"></i> ' + esc(opts.addLabel || 'Add to quote') + '</button>';
 
     var inner =
       '<div class="ssr-photo">' + photo + rankBadge + '</div>'
@@ -167,7 +167,7 @@
         try { opts.onAdd(style, color, rec); } catch (e) { console.error('[SafetyStripeRecs] onAdd error:', e); }
         // brief affordance
         var orig = addBtn.innerHTML;
-        addBtn.innerHTML = '<i class="fas fa-check"></i> Added';
+        addBtn.innerHTML = '<i class="fas fa-check" aria-hidden="true"></i> Added';
         addBtn.classList.add('is-added');
         setTimeout(function () { addBtn.innerHTML = orig; addBtn.classList.remove('is-added'); }, 1400);
       }

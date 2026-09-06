@@ -395,12 +395,12 @@ class DTFQuoteProducts {
                     <div class="product-card-image">
                         ${product.imageUrl ?
                             `<img src="${product.imageUrl}" alt="${display.title}">` :
-                            `<div class="no-image"><i class="fas fa-tshirt"></i></div>`
+                            `<div class="no-image"><i class="fas fa-tshirt" aria-hidden="true"></i></div>`
                         }
                     </div>
                     <div class="product-card-info">
                         <h4>${display.title}</h4>
-                        <p class="product-color"><i class="fas fa-palette"></i> ${display.color}</p>
+                        <p class="product-color"><i class="fas fa-palette" aria-hidden="true"></i> ${display.color}</p>
                     </div>
                 </div>
 
@@ -426,7 +426,7 @@ class DTFQuoteProducts {
 
                 <div class="product-card-actions">
                     <button class="btn-remove" onclick="window.dtfQuoteBuilder?.removeProduct(${product.id})">
-                        <i class="fas fa-trash"></i> Remove
+                        <i class="fas fa-trash" aria-hidden="true"></i> Remove
                     </button>
                 </div>
             </div>

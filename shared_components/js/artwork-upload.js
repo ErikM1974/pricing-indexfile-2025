@@ -164,7 +164,7 @@
             psd: 'fa-layer-group', tiff: 'fa-image', tif: 'fa-image',
         };
         const icon = iconMap[ext] || 'fa-file';
-        return `<div class="artwork-thumb-icon"><i class="fas ${icon}"></i><div class="artwork-thumb-ext">${escapeHtml(ext.toUpperCase())}</div></div>`;
+        return `<div class="artwork-thumb-icon"><i class="fas ${icon}" aria-hidden="true"></i><div class="artwork-thumb-ext">${escapeHtml(ext.toUpperCase())}</div></div>`;
     }
 
     function attach(opts) {
@@ -226,13 +226,13 @@
         mount.innerHTML = `
             <div class="artwork-upload-widget${richDesignName || richPlacements ? ' artwork-upload-widget--rich' : ''}">
                 <div class="artwork-upload-head">
-                    <i class="fas fa-paint-brush"></i>
+                    <i class="fas fa-paint-brush" aria-hidden="true"></i>
                     <span class="artwork-upload-title">${escapeHtml(opts2.title)}</span>
                 </div>
                 <div class="artwork-upload-sub">${escapeHtml(opts2.subtitle)}</div>
                 ${designNameHtml}
                 <div class="artwork-dropzone" id="${dropzoneId}" tabindex="0" role="button" aria-label="Upload artwork file">
-                    <i class="fas fa-cloud-upload-alt"></i>
+                    <i class="fas fa-cloud-upload-alt" aria-hidden="true"></i>
                     <div class="artwork-dropzone-msg">
                         <strong>Drop files here</strong> or <span class="artwork-dropzone-browse">click to browse</span>
                     </div>
@@ -298,7 +298,7 @@
                         ${renderPlacementSelect(idx, f.placement || defaultPlacement)}
                     </div>
                     <button type="button" class="artwork-file-remove" data-idx="${idx}" title="Remove" aria-label="Remove ${escapeHtml(f.fileName)}">
-                        <i class="fas fa-times"></i>
+                        <i class="fas fa-times" aria-hidden="true"></i>
                     </button>
                 </div>
             `).join('');

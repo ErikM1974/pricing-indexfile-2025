@@ -67,7 +67,7 @@
   }
 
   function itemHtml(it) {
-    const icon = `<i class="fas ${it.icon || 'fa-plus'}"></i>`;
+    const icon = `<i class="fas ${it.icon || 'fa-plus'}" aria-hidden="true"></i>`;
     // Picker item: inline fields (selects / number+presets) → Add → onAdd(code, {fields})
     if (Array.isArray(it.fields) && it.fields.length) {
       const fieldsHtml = it.fields.map(fieldHtml).join('');
@@ -102,11 +102,11 @@
       : [{ group: 'Add', icon: 'fa-plus', items: catalog }];
 
     mount.innerHTML =
-      '<span class="service-bar-label"><i class="fas fa-plus-circle"></i> Add to order:</span>' +
+      '<span class="service-bar-label"><i class="fas fa-plus-circle" aria-hidden="true"></i> Add to order:</span>' +
       groups.map((g) => `
         <div class="service-cat">
           <button type="button" class="service-cat-btn" aria-haspopup="true" aria-expanded="false">
-            <i class="fas ${g.icon || 'fa-plus'}"></i> ${g.group} <i class="fas fa-caret-down service-cat-caret"></i>
+            <i class="fas ${g.icon || 'fa-plus'}" aria-hidden="true"></i> ${g.group} <i class="fas fa-caret-down service-cat-caret" aria-hidden="true"></i>
           </button>
           <div class="service-cat-menu" hidden>${g.items.map(itemHtml).join('')}</div>
         </div>`).join('');

@@ -1028,10 +1028,10 @@ class MonogramFormController {
 
         // Set icon based on type
         const icons = {
-            loading: '<i class="fas fa-spinner fa-spin"></i>',
-            success: '<i class="fas fa-check-circle"></i>',
-            warning: '<i class="fas fa-exclamation-triangle"></i>',
-            error: '<i class="fas fa-times-circle"></i>'
+            loading: '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i>',
+            success: '<i class="fas fa-check-circle" aria-hidden="true"></i>',
+            warning: '<i class="fas fa-exclamation-triangle" aria-hidden="true"></i>',
+            error: '<i class="fas fa-times-circle" aria-hidden="true"></i>'
         };
 
         badgeEl.innerHTML = `${icons[type] || ''} <span>${message}</span>`;
@@ -1166,7 +1166,7 @@ class MonogramFormController {
             </td>
             <td>
                 <button type="button" class="btn-delete-row" title="Delete row">
-                    <i class="fas fa-times"></i>
+                    <i class="fas fa-times" aria-hidden="true"></i>
                 </button>
             </td>
         `;
@@ -1221,7 +1221,7 @@ class MonogramFormController {
             </td>
             <td>
                 <button type="button" class="btn-delete-row" title="Delete row">
-                    <i class="fas fa-times"></i>
+                    <i class="fas fa-times" aria-hidden="true"></i>
                 </button>
             </td>
         `;
@@ -1806,7 +1806,7 @@ class MonogramFormController {
             color: #92400e;
         `;
         banner.innerHTML = `
-            <i class="fas fa-exclamation-triangle" style="font-size: 1.25rem;"></i>
+            <i class="fas fa-exclamation-triangle" aria-hidden="true" style="font-size: 1.25rem;"></i>
             <div>
                 <strong>Warning:</strong> ${this.escapeHTML(message)}
                 <button onclick="this.parentElement.parentElement.remove()"
@@ -1937,7 +1937,7 @@ class MonogramFormController {
                         <div class="search-result-actions">
                             <button type="button" class="btn-secondary btn-sm btn-load-result"
                                     data-order="${orderNo}">
-                                <i class="fas fa-edit"></i> Edit
+                                <i class="fas fa-edit" aria-hidden="true"></i> Edit
                             </button>
                         </div>
                     </div>
@@ -2087,7 +2087,7 @@ class MonogramFormController {
         const icons = { error: 'fa-times-circle', warn: 'fa-exclamation-triangle', info: 'fa-info-circle' };
         listEl.innerHTML = findings.map((f, i) => `
             <li class="stitch-finding severity-${f.severity}" data-finding="${i}" title="Click to highlight the row(s)">
-                <span class="finding-icon"><i class="fas ${icons[f.severity] || icons.info}"></i></span>
+                <span class="finding-icon"><i class="fas ${icons[f.severity] || icons.info}" aria-hidden="true"></i></span>
                 <span class="finding-message">${this.escapeHTML(f.message)}</span>
                 ${f.fixable ? '<button type="button" class="btn-fix-finding">Fix</button>' : ''}
             </li>
@@ -2456,7 +2456,7 @@ class MonogramFormController {
         // Messages can carry API/error text (e.g. a proxy HTML error page in a
         // JSON parse error) — escape before it reaches innerHTML
         toast.innerHTML = `
-            <span class="toast-icon"><i class="fas ${icons[type] || icons.info}"></i></span>
+            <span class="toast-icon"><i class="fas ${icons[type] || icons.info}" aria-hidden="true"></i></span>
             <span class="toast-message">${this.escapeHTML(String(message))}</span>
             <button type="button" class="toast-close">&times;</button>
         `;

@@ -78,7 +78,7 @@ class ProductThumbnailModal {
                     <a id="modal-product-download"
                        class="product-image-modal-download"
                        target="_blank"
-                       rel="noopener"><i class="fas fa-download"></i> Download</a>
+                       rel="noopener"><i class="fas fa-download" aria-hidden="true"></i> Download</a>
                 </div>
             </div>
         `;

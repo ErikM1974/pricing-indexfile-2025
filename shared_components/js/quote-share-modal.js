@@ -141,13 +141,13 @@ const QuoteShareModal = {
         // Reset button states
         const copyBtn = document.getElementById('quote-share-copy-btn');
         if (copyBtn) {
-            copyBtn.innerHTML = '<i class="fas fa-copy"></i> Copy';
+            copyBtn.innerHTML = '<i class="fas fa-copy" aria-hidden="true"></i> Copy';
             copyBtn.classList.remove('copied');
         }
         const emailBtn = document.getElementById('quote-share-email-btn');
         if (emailBtn) {
             emailBtn.disabled = false;
-            emailBtn.innerHTML = '<i class="fas fa-envelope"></i> Email to customer';
+            emailBtn.innerHTML = '<i class="fas fa-envelope" aria-hidden="true"></i> Email to customer';
             // Only offer Email when the shared helper is loaded and an address is reachable
             const hasEmail = !!(this._customerEmail || document.getElementById('customer-email')?.value?.trim());
             emailBtn.style.display = (typeof emailQuote === 'function' && hasEmail) ? '' : 'none';
@@ -167,7 +167,7 @@ const QuoteShareModal = {
         const customerEmail = this._customerEmail || document.getElementById('customer-email')?.value?.trim();
         const customerName = this._customerName || document.getElementById('customer-name')?.value?.trim();
         const salesRepEmail = this._salesRepEmail || document.getElementById('sales-rep')?.value;
-        if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending…'; }
+        if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Sending…'; }
         let ok = false;
         try {
             ok = await emailQuote({ quoteId, customerEmail, customerName, salesRepEmail });
@@ -175,9 +175,9 @@ const QuoteShareModal = {
             if (btn) {
                 btn.disabled = false;
                 btn.innerHTML = ok
-                    ? '<i class="fas fa-check"></i> Emailed!'
-                    : '<i class="fas fa-envelope"></i> Email to customer';
-                if (ok) setTimeout(() => { btn.innerHTML = '<i class="fas fa-envelope"></i> Email to customer'; }, 2500);
+                    ? '<i class="fas fa-check" aria-hidden="true"></i> Emailed!'
+                    : '<i class="fas fa-envelope" aria-hidden="true"></i> Email to customer';
+                if (ok) setTimeout(() => { btn.innerHTML = '<i class="fas fa-envelope" aria-hidden="true"></i> Email to customer'; }, 2500);
             }
         }
     },
@@ -230,7 +230,7 @@ const QuoteShareModal = {
      */
     showCopySuccess(btn) {
         const originalHTML = btn.innerHTML;
-        btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+        btn.innerHTML = '<i class="fas fa-check" aria-hidden="true"></i> Copied!';
         btn.classList.add('copied');
 
         setTimeout(() => {

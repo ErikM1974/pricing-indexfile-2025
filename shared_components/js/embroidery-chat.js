@@ -373,7 +373,7 @@ const AI_ENDPOINT = '/api/emb-quote-ai/chat';
         if (toolName === 'lookup_customer')             iconClass = 'fa-search';
         else if (toolName === 'recommend_top_sellers_emb') iconClass = 'fa-star';
         else if (toolName === 'lookup_product_details')    iconClass = 'fa-palette';
-        chip.innerHTML = `<i class="fas ${iconClass}"></i> ${escapeHtml(statusText)}`;
+        chip.innerHTML = `<i class="fas ${iconClass}" aria-hidden="true"></i> ${escapeHtml(statusText)}`;
         msg.appendChild(chip);
         container.appendChild(msg);
         scrollChatBottom();

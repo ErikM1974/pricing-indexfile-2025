@@ -651,7 +651,7 @@ class EmbroideryInvoiceGenerator {
         let specsHTML = `
             <div class="method-specs" style="margin: 10px 0; padding: 10px; background: #e3f2fd; border: 1px solid #2196f3; border-radius: 5px;">
                 <div style="font-size: 12px; font-weight: bold; color: #1976d2; margin-bottom: 8px;">
-                    <i class="fas fa-tshirt" style="margin-right: 5px;"></i>DTG PRINT LOCATIONS:
+                    <i class="fas fa-tshirt" aria-hidden="true" style="margin-right: 5px;"></i>DTG PRINT LOCATIONS:
                 </div>
         `;
 
@@ -689,7 +689,7 @@ class EmbroideryInvoiceGenerator {
         let specsHTML = `
             <div class="method-specs" style="margin: 10px 0; padding: 10px; background: #fff3e0; border: 1px solid #ff9800; border-radius: 5px;">
                 <div style="font-size: 12px; font-weight: bold; color: #e65100; margin-bottom: 8px;">
-                    <i class="fas fa-palette" style="margin-right: 5px;"></i>SCREEN PRINT CONFIGURATION:
+                    <i class="fas fa-palette" aria-hidden="true" style="margin-right: 5px;"></i>SCREEN PRINT CONFIGURATION:
                 </div>
         `;
 
@@ -774,7 +774,7 @@ class EmbroideryInvoiceGenerator {
         let specsHTML = `
             <div class="method-specs" style="margin: 10px 0; padding: 10px; background: #f3e5f5; border: 1px solid #9c27b0; border-radius: 5px;">
                 <div style="font-size: 12px; font-weight: bold; color: #7b1fa2; margin-bottom: 8px;">
-                    <i class="fas fa-layer-group" style="margin-right: 5px;"></i>DTF TRANSFER LOCATIONS:
+                    <i class="fas fa-layer-group" aria-hidden="true" style="margin-right: 5px;"></i>DTF TRANSFER LOCATIONS:
                 </div>
         `;
 

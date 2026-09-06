@@ -331,8 +331,8 @@ class QuoteSession {
         dropdown.className = 'recent-quotes-dropdown';
         dropdown.innerHTML = `
             <button class="recent-quotes-toggle" type="button">
-                <i class="fas fa-history"></i> Recent Quotes
-                <i class="fas fa-chevron-down"></i>
+                <i class="fas fa-history" aria-hidden="true"></i> Recent Quotes
+                <i class="fas fa-chevron-down" aria-hidden="true"></i>
             </button>
             <div class="recent-quotes-menu" style="display: none;">
                 ${recent.map(quote => `
