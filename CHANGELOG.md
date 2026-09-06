@@ -1,3 +1,8 @@
+## v2026.09.06.31 (2026.09.06)
+
+- Rule 6 sweep S3: every browser-side proxy-host fallback now reads APP_CONFIG (222 → 42 literals)
+- Deploy v2026.09.06.31: Rule 6 sweep S3 — proxy host from APP_CONFIG everywhere (222 → 42 literals)
+
 ## v2026.09.06.30 (2026.09.06)
 
 - LESSONS: staff live-pass entry (oldest entry archived)
