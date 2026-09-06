@@ -264,6 +264,7 @@ function dtgInlineAlert(message) {
 
                 // Store data globally
                 pricingData = data;
+                renderTierButtons(); // tier strip from the API tiers (2026-09-06)
 
                 // Merge product details with bundle data
                 const completeProduct = {
@@ -371,6 +372,7 @@ function dtgInlineAlert(message) {
 
                 // Store data globally
                 pricingData = manualData;
+                renderTierButtons();
 
                 // Update page title for manual mode
                 document.getElementById('productTitle').textContent = `DTG Manual Pricing ($${manualCost.toFixed(2)} Base Cost)`;
@@ -577,30 +579,66 @@ function dtgInlineAlert(message) {
                 throw new Error('Pricing data not loaded. Please refresh the page.');
             }
 
-            // Map LTM tier (1-23) to actual API tier (24-47)
-            // For quantities under 24, we use 24-47 tier pricing + $50 LTM fee
-            const apiTierLabel = tierLabel === '1-23' ? '24-47' : tierLabel;
-
-            // Check if it's a combo location
-            const isCombo = locationCode.includes('_');
-
-            // Get tier data for margin calculation using API tier label
-            const tier = pricingData.pricing.tiers?.find(t => t.TierLabel === apiTierLabel);
+            // The tier label IS the API row (2026-09-06). Caspio now carries its own sub-24 rows
+            // (today 1-11 with the LTM fee, 12-23 without) and the shared engine prices by that row —
+            // the old "1-23 → 24-47 prices + $50" branch made this page disagree with Quick Quote
+            // and the quote builders for every order under 24.
+            const tier = pricingData.pricing.tiers?.find(t => t.TierLabel === tierLabel);
             if (!tier) {
-                console.error(`❌ Tier not found: ${apiTierLabel}`);
-                throw new Error(`Tier data not available for ${apiTierLabel}`);
+                console.error(`❌ Tier not found: ${tierLabel}`);
+                throw new Error(`Tier data not available for ${tierLabel}`);
             }
 
-            if (isCombo) {
-                // For combo locations, calculate using API data
-                return getDTGPriceForComboLocation(locationCode, apiTierLabel);
+            if (Number(tier.LTM_Fee) > 0) {
+                // An LTM row may have no DTG_Costs rows of its own; the canonical engine resolves
+                // the print cost the same way the builders do (lowest non-LTM tier's costs).
+                const r = window.DTGCanonicalPricing.priceForLocationCombo({ bundle: pricingData, locationCode, tierLabel });
+                if (r.error) throw new Error(`Unable to price ${locationCode} at tier ${tierLabel}: ${r.error}`);
+                return r.baseUnit;
             }
 
-            // Single location - calculate price using API data
-            return getDTGPriceForSingleLocation(locationCode, apiTierLabel);
+            // Non-LTM tiers keep the service's strict path (a missing cost row must throw, never price low)
+            return locationCode.includes('_')
+                ? getDTGPriceForComboLocation(locationCode, tierLabel)
+                : getDTGPriceForSingleLocation(locationCode, tierLabel);
         }
 
-        // Helper function for combo location pricing — delegates to shared service
+        // ==================== API-DRIVEN TIER STRIP (2026-09-06) ====================
+        // Erik's rule: every range and dollar a customer reads comes from Caspio. The strip used to be typed
+        // (a sub-24 button with a typed $50 fee note, then 24-47, 48-71, 72+) while Pricing_Tiers had changed.
+        function apiTiers() {
+            const raw = (pricingData && pricingData.pricing && pricingData.pricing.tiers) || [];
+            return raw.filter(t => t && Number.isFinite(Number(t.MinQuantity)))
+                .map(t => ({ ...t, MinQuantity: Number(t.MinQuantity), MaxQuantity: Number(t.MaxQuantity), LTM_Fee: parseFloat(t.LTM_Fee) || 0 }))
+                .sort((a, b) => a.MinQuantity - b.MinQuantity);
+        }
+        function tierByLabel(label) { return apiTiers().find(t => t.TierLabel === label) || null; }
+        function tierRangeText(t) { return t.MaxQuantity >= 99999 || /\+$/.test(String(t.TierLabel)) ? `${t.MinQuantity}+ pieces` : `${t.MinQuantity}-${t.MaxQuantity} pieces`; }
+        function fmtFee(fee) { return Number.isInteger(fee) ? String(fee) : fee.toFixed(2); }
+        function renderTierButtons() {
+            const list = document.getElementById('dtg-tier-list');
+            const tiers = apiTiers();
+            if (!list || !tiers.length) return;
+            const esc = (v) => String(v).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+            list.innerHTML = tiers.map(t => `<button type="button" class="tier-button universal-tier-button" id="tier-${esc(t.TierLabel)}" data-tier="${esc(t.TierLabel)}">${tierRangeText(t)}` +
+                (t.LTM_Fee > 0 ? `<br><small class="tier-fee-note">+ $${fmtFee(t.LTM_Fee)} Small Batch Fee</small>` : '') + `</button>`).join('');
+            tiers.forEach(t => document.getElementById(`tier-${t.TierLabel}`)?.addEventListener('click', () => selectTier(t.TierLabel)));
+            const current = tierByLabel(toggleState.selectedTier) ? toggleState.selectedTier : (tiers.find(t => t.LTM_Fee === 0) || tiers[0]).TierLabel;
+            selectTier(current);
+        }
+        // The exact quantity behind the price: the input for an LTM tier, the tier minimum otherwise.
+        function currentQuantity() {
+            const tier = tierByLabel(toggleState.selectedTier);
+            if (!tier) return 0;
+            if (tier.LTM_Fee > 0) {
+                const input = document.getElementById('dtg-ltm-quantity-input');
+                const v = parseInt(input && input.value, 10);
+                return Math.max(tier.MinQuantity, Math.min(tier.MaxQuantity, Number.isFinite(v) ? v : tier.MaxQuantity));
+            }
+            return tier.MinQuantity;
+        }
+
+        // Helper function for combo location pricing — delegates to shared service (strict: missing cost row throws)
         function getDTGPriceForComboLocation(locationCode, tierLabel) {
             return dtgCalcHelper.calculatePriceFromRawData(pricingData.pricing, locationCode, tierLabel);
         }
@@ -936,16 +974,22 @@ function dtgInlineAlert(message) {
             const container = document.getElementById('dtg-ltm-quantity-container');
             if (!container) return;
 
-            if (tierLabel === '1-23') {
-                // Show the input container
+            const tier = tierByLabel(tierLabel);
+            if (tier && tier.LTM_Fee > 0) {
+                // Show the input container, bounded by THIS tier's range
                 container.style.display = 'flex';
                 container.classList.add('show');
-
-                // Update the fee calculation display
                 const input = document.getElementById('dtg-ltm-quantity-input');
                 if (input) {
-                    updateLTMFeeDisplay(parseInt(input.value) || 12);
+                    input.min = tier.MinQuantity; input.max = tier.MaxQuantity;
+                    input.placeholder = `Enter ${tier.MinQuantity}-${tier.MaxQuantity}`;
+                    input.value = currentQuantity();
                 }
+                const range = document.getElementById('dtg-ltm-range');
+                if (range) range.textContent = `${tier.MinQuantity}-${tier.MaxQuantity}`;
+                const amount = document.getElementById('dtg-ltm-fee-amount');
+                if (amount) amount.textContent = `$${fmtFee(tier.LTM_Fee)}`;
+                updateLTMFeeDisplay(currentQuantity());
 
                 dtgLog('✅ LTM quantity input shown');
             } else {
@@ -957,12 +1001,10 @@ function dtgInlineAlert(message) {
             }
         }
 
-        // Read the LTM fee from the Caspio Pricing_Tiers row for the LTM tier.
-        // Falls back to 50 only if the bundle didn't load yet (defensive).
+        // The LTM fee is the SELECTED tier's LTM_Fee (Caspio Pricing_Tiers) — 0 when that tier carries none.
         function getLTMFeeFromBundle() {
-            const tiers = (pricingData && pricingData.pricing && pricingData.pricing.tiers) || [];
-            const ltmTier = tiers.find(t => Number(t.LTM_Fee || 0) > 0);
-            return ltmTier ? Number(ltmTier.LTM_Fee) : 50.00;
+            const tier = tierByLabel(toggleState.selectedTier);
+            return tier ? tier.LTM_Fee : 0;
         }
 
         // Update the LTM fee calculation display
@@ -971,6 +1013,7 @@ function dtgInlineAlert(message) {
             if (!feeCalc) return;
 
             const ltmFee = getLTMFeeFromBundle();
+            if (!(ltmFee > 0) || !(quantity > 0)) { feeCalc.textContent = '—'; return; }
             const feePerShirt = Math.floor((ltmFee / quantity) * 100) / 100;
 
             feeCalc.innerHTML = `$${ltmFee.toFixed(2)} ÷ ${quantity} = <span style="color: #4cb354;">$${feePerShirt.toFixed(2)}/shirt</span>`;
@@ -982,7 +1025,8 @@ function dtgInlineAlert(message) {
         function handleLTMQuantityInput(e) {
             const value = parseInt(e.target.value);
 
-            if (!isNaN(value) && value >= 1 && value <= 23) {
+            const tier = tierByLabel(toggleState.selectedTier);
+            if (tier && !isNaN(value) && value >= tier.MinQuantity && value <= tier.MaxQuantity) {
                 updateLTMFeeDisplay(value);
                 // Update the live price display to include LTM fee
                 updateLivePriceDisplay();
@@ -993,11 +1037,13 @@ function dtgInlineAlert(message) {
         function validateLTMQuantityInput(e) {
             let value = parseInt(e.target.value);
 
-            // Enforce min/max bounds
-            if (isNaN(value) || value < 1) {
-                value = 1;
-            } else if (value > 23) {
-                value = 23;
+            // Enforce the selected tier's bounds
+            const tier = tierByLabel(toggleState.selectedTier);
+            const lo = tier ? tier.MinQuantity : 1, hi = tier ? tier.MaxQuantity : 23;
+            if (isNaN(value) || value < lo) {
+                value = lo;
+            } else if (value > hi) {
+                value = hi;
             }
 
             e.target.value = value;
@@ -1035,7 +1081,8 @@ function dtgInlineAlert(message) {
                 const pricingLocations = toggleState.selectedLocations.map(loc => loc === 'BON' ? 'LC' : loc);
 
                 // Format tier display text
-                const displayTier = toggleState.selectedTier === '1-23' ? 'Less than 24' : toggleState.selectedTier;
+                const selectedTierRow = tierByLabel(toggleState.selectedTier);
+                const displayTier = selectedTierRow ? tierRangeText(selectedTierRow).replace(' pieces', '') : toggleState.selectedTier;
 
                 if (toggleState.selectedLocations.length === 1) {
                     // Single location: Use standard pricing
@@ -1055,21 +1102,13 @@ function dtgInlineAlert(message) {
                     priceDetailElement.textContent = `${loc1Name} + ${loc2Name} • ${displayTier} pieces`;
                 }
 
-                // Add LTM fee to price if tier is under 24 pieces.
-                // LTM fee value comes from Caspio's Pricing_Tiers row for
-                // the LTM tier (today: 1-23 row, LTM_Fee = 50). No hardcoding.
-                if (toggleState.selectedTier === '1-23') {
-                    const ltmQuantityInput = document.getElementById('dtg-ltm-quantity-input');
-                    const quantity = ltmQuantityInput ? parseInt(ltmQuantityInput.value) || 12 : 12;
-
-                    const ltmFee = getLTMFeeFromBundle();
-                    // Math.floor((fee/qty)*100)/100 — DTG LTM convention,
-                    // floor (not round) to prevent overcharge per MEMORY.md.
-                    const ltmFeePerShirt = Math.floor((ltmFee / quantity) * 100) / 100;
-
+                // LTM: the selected tier's LTM_Fee spread over the exact quantity, floored to cents —
+                // the canonical engine's ltmPerUnit, identical to the builders and Quick Quote.
+                if (selectedTierRow && selectedTierRow.LTM_Fee > 0) {
+                    const quantity = currentQuantity();
+                    const ltmFeePerShirt = window.DTGCanonicalPricing.ltmPerUnit(selectedTierRow, quantity);
                     finalPrice += ltmFeePerShirt;
-
-                    dtgLog(`💰 LTM fee per shirt: $${ltmFeePerShirt.toFixed(2)} (${quantity} pieces, Caspio LTM_Fee = $${ltmFee})`);
+                    dtgLog(`💰 LTM fee per shirt: $${ltmFeePerShirt.toFixed(2)} (${quantity} pieces, Caspio LTM_Fee = $${selectedTierRow.LTM_Fee})`);
                 }
 
                 // Update price display

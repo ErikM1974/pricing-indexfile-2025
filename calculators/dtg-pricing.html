@@ -268,39 +268,25 @@
                         Quantity Tiers
                     </div>
 
-                    <button class="tier-button universal-tier-button" id="tier-ltm" data-tier="1-23">
-                        Less than 24 pieces<br>
-                        <small style="font-size: 11px; opacity: 0.9;">+ $50 Small Batch Fee</small>
-                    </button>
+                    <!-- Tier buttons are rendered from the API tiers (renderTierButtons in dtg-pricing-page.js). -->
+                    <div id="dtg-tier-list" class="dtg-tier-list"></div>
 
-                    <button class="tier-button universal-tier-button selected" id="tier-24-47" data-tier="24-47">
-                        24-47 pieces
-                    </button>
-
-                    <button class="tier-button universal-tier-button" id="tier-48-71" data-tier="48-71">
-                        48-71 pieces
-                    </button>
-
-                    <button class="tier-button universal-tier-button" id="tier-72" data-tier="72+">
-                        72+ pieces
-                    </button>
-
-                    <!-- DTG Quantity Input for LTM Tier (1-23 pieces) -->
+                    <!-- Exact-quantity input for the selected LTM tier (range + fee come from the API tier) -->
                     <div class="dtg-quantity-input-container" id="dtg-ltm-quantity-container" style="display: none;">
                         <label for="dtg-ltm-quantity-input" class="dtg-quantity-input-label">
-                            <i class="fas fa-calculator" aria-hidden="true"></i> Enter Exact Quantity (1-23 pieces):
+                            <i class="fas fa-calculator" aria-hidden="true"></i> Enter Exact Quantity (<span id="dtg-ltm-range">1-23</span> pieces):
                         </label>
                         <input type="number"
                                id="dtg-ltm-quantity-input"
                                class="dtg-quantity-input"
                                min="1"
                                max="23"
-                               value="12"
-                               placeholder="Enter 1-23">
+                               value="11"
+                               placeholder="Enter quantity">
                         <small class="dtg-quantity-hint">
                             <i class="fas fa-info-circle" aria-hidden="true"></i>
-                            Required for accurate $50 fee distribution:
-                            <strong id="dtg-ltm-fee-calc">$50 ÷ 12 = $4.17/shirt</strong>
+                            Required for accurate <span id="dtg-ltm-fee-amount">$50</span> fee distribution:
+                            <strong id="dtg-ltm-fee-calc">—</strong>
                         </small>
                     </div>
                 </div>
