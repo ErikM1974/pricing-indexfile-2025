@@ -84,7 +84,7 @@
             await Promise.all([loadCategories(), loadStyles()]);
         } catch (err) {
             console.error('[dtg-catalog] init failed:', err);
-            grid.innerHTML = `<div class="dtg-catalog-error">Couldn't load catalog. <button type="button" onclick="location.reload()">Retry</button></div>`;
+            grid.innerHTML = `<div class="dtg-catalog-error">Couldn't load catalog. <button type="button" data-call="qbReload">Retry</button></div>`;
         }
     }
 
@@ -302,7 +302,7 @@
                     alt="${escapeHtml(s.style)} ${escapeHtml(defaultColor ? defaultColor.color_name : (s.top_color || ''))}"
                     data-default-src="${escapeHtml(heroSrc)}"
                     loading="lazy"
-                    onerror="this.style.display='none';this.parentElement.classList.add('dtg-cc-hero-missing');">`
+                    data-onerror="hide" data-onerror-parent-class="dtg-cc-hero-missing">`
             : '<div class="dtg-cc-hero-placeholder"><i class="fas fa-tshirt" aria-hidden="true"></i></div>';
 
         // Inline color swatches (top 4-6 from server). The defaultIdx-th

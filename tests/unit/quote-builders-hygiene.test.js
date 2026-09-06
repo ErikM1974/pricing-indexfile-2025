@@ -44,6 +44,9 @@ describe('no inline handlers anywhere', () => {
         expect(js).not.toMatch(BARE);
         expect(js).not.toMatch(/<i class="fas (?:fa-)?\$\{[^}]+\}[^"]*"><\/i>/);
     });
+    test.each(['dtg-quote-page', 'dtg-catalog', 'quote-order-summary', 'quote-builder-utils'])('classic script %s renders no inline handlers', (f) => {
+        expect(stripJs(read(`shared_components/js/${f}.js`))).not.toMatch(HANDLER);
+    });
     test('utils renders no bare icons and documents the new contract', () => {
         expect(utils).not.toMatch(BARE);
         expect(utils).toMatch(/data-keyclick="1"/);
@@ -68,7 +71,10 @@ describe('delegator events (jsdom)', () => {
             <input id="e2" data-enter="onEnter2" data-enter-unless="_galleryMode">
             <input id="kd" data-keydown="onKey" data-keydown-args='["$event", "$this"]'>
             <div id="p1"><img id="im1" data-onerror="hide-parent"></div>
-            <div id="p2"><img id="im2" data-onerror="placeholder-icon"></div>`;
+            <div id="p2"><img id="im2" data-onerror="placeholder-icon"></div>
+            <img id="im3" src="x.png" data-onerror="placeholder-src">
+            <figure class="or-thumb" id="f4"><img id="im4" data-onerror="hide-closest" data-onerror-closest=".or-thumb"></figure>
+            <div id="p5"><img id="im5" data-onerror="hide" data-onerror-parent-class="hero-missing"></div>`;
         const calls = [];
         window.a = () => calls.push('a'); window.b = () => calls.push('b');
         window.withArgs = (el, n, s) => calls.push(['withArgs', el.id, n, s]);
@@ -89,9 +95,15 @@ describe('delegator events (jsdom)', () => {
         document.getElementById('kd').dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', bubbles: true }));
         document.getElementById('im1').dispatchEvent(new Event('error'));
         document.getElementById('im2').dispatchEvent(new Event('error'));
+        ['im3', 'im4', 'im5'].forEach((id) => document.getElementById(id).dispatchEvent(new Event('error')));
         expect(calls).toEqual(['a', 'b', ['withArgs', 'i1', 7, 'x'], 'blur', 'clicked', ['enter', 'garment'], 'enter2', ['key', 'Tab', 'kd']]);
         expect(document.getElementById('p1').hidden).toBe(true);
         expect(document.getElementById('p2').innerHTML).toBe('<i class="fas fa-image" aria-hidden="true"></i>');
+        expect(document.getElementById('im3').classList.contains('placeholder')).toBe(true);
+        expect(document.getElementById('im3').hasAttribute('src')).toBe(false);
+        expect(document.getElementById('f4').hidden).toBe(true);
+        expect(document.getElementById('im5').hidden).toBe(true);
+        expect(document.getElementById('p5').classList.contains('hero-missing')).toBe(true);
     });
 });
 

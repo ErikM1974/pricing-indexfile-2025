@@ -463,7 +463,7 @@ const AI_ENDPOINT = '/api/dtg-quote-ai/chat';
                             data-catalog-color="${escapeHtml(c.catalogColor)}"
                             title="${escapeHtml(c.name)} — ${c.units.toLocaleString()} units sold">
                         ${c.swatchUrl
-                            ? `<img class="pd-top-pick-swatch" src="${escapeHtml(c.swatchUrl)}" alt="" loading="lazy" onerror="this.classList.add('placeholder');this.removeAttribute('src');">`
+                            ? `<img class="pd-top-pick-swatch" src="${escapeHtml(c.swatchUrl)}" alt="" loading="lazy" data-onerror="placeholder-src">`
                             : `<div class="pd-top-pick-swatch placeholder"></div>`}
                         <span class="pd-top-pick-name">${escapeHtml(c.name)}</span>
                     </button>
@@ -607,7 +607,7 @@ const AI_ENDPOINT = '/api/dtg-quote-ai/chat';
                          alt="${escapeHtml(data.styleNumber)} in ${escapeHtml(hero.name)}"
                          data-default-src="${escapeHtml(hero.mainImageUrl)}"
                          data-default-color="${escapeHtml(hero.name)}"
-                         onerror="this.style.display='none';">
+                         data-onerror="hide">
                     <div class="pd-hero-caption" data-default-color="${escapeHtml(hero.name)}">${isConfirmed ? '<i class="fas fa-check" aria-hidden="true"></i> ' : ''}${escapeHtml(hero.name)}</div>
                 </div>`;
         }
@@ -632,7 +632,7 @@ const AI_ENDPOINT = '/api/dtg-quote-ai/chat';
                 const warn = avoidColorMatch(c.name);
                 const isHero = isConfirmed && preselectedColorObj && c.name === preselectedColorObj.name;
                 const imgHtml = c.swatchImageUrl
-                    ? `<img class="cs-img" src="${escapeHtml(c.swatchImageUrl)}" alt="${escapeHtml(c.name)}" loading="lazy" onerror="this.classList.add('placeholder');this.removeAttribute('src');">`
+                    ? `<img class="cs-img" src="${escapeHtml(c.swatchImageUrl)}" alt="${escapeHtml(c.name)}" loading="lazy" data-onerror="placeholder-src">`
                     : `<div class="cs-img placeholder"></div>`;
                 html += `
                     <button type="button" class="color-swatch${warn ? ' warning' : ''}${isHero ? ' picked' : ''}"
@@ -924,7 +924,7 @@ const AI_ENDPOINT = '/api/dtg-quote-ai/chat';
                 </span>`).join('');
             const warnings = (p.warnings || []).map(w => `<div class="ts-warning">⚠ ${escapeHtml(w)}</div>`).join('');
             const thumbHtml = p.mainImageUrl
-                ? `<div class="ts-thumb"><img src="${escapeHtml(p.mainImageUrl)}" alt="${escapeHtml(p.styleNumber)}" loading="lazy" onerror="this.parentElement.style.display='none';"></div>`
+                ? `<div class="ts-thumb"><img src="${escapeHtml(p.mainImageUrl)}" alt="${escapeHtml(p.styleNumber)}" loading="lazy" data-onerror="hide-parent"></div>`
                 : '';
             html += `
                 <div class="top-seller-card${thumbHtml ? ' has-thumb' : ''}">
