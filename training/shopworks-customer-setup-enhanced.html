@@ -5,10 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="/favicon.png" type="image/png">
     <title>Shopworks Customer Setup Training - Enhanced</title>
-    <link rel="stylesheet" href="/training/css/shopworks-customer-setup-enhanced.css?v=2026.09.05.12">
+    <link rel="stylesheet" href="/training/css/shopworks-customer-setup-enhanced.css?v=2026.09.06.30">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
+    <h1 class="sr-only">ShopWorks Customer Setup Training</h1>
     <!-- Shopworks Navigation Bar -->
     <div class="shopworks-nav">
         <div class="nav-modules">
@@ -182,7 +183,7 @@
                                         <input type="text" class="tax-desc" id="taxDesc1" value="Washington State Sales Tax" readonly>
                                     </div>
                                     <div class="tax-cell" style="text-align: center;">
-                                        <span class="search-icon" onclick="searchTaxCode(1)"></span>
+                                        <span class="search-icon" data-call="searchTaxCode" data-args='[1]'></span>
                                     </div>
                                     <div class="tax-cell" style="text-align: center;">
                                         <span class="tax-indicator active" id="payTax1"></span>
@@ -200,7 +201,7 @@
                                         <input type="text" class="tax-desc" id="taxDesc2" readonly>
                                     </div>
                                     <div class="tax-cell" style="text-align: center;">
-                                        <span class="search-icon" onclick="searchTaxCode(2)"></span>
+                                        <span class="search-icon" data-call="searchTaxCode" data-args='[2]'></span>
                                     </div>
                                     <div class="tax-cell" style="text-align: center;">
                                         <span class="tax-indicator inactive" id="payTax2"></span>
@@ -218,7 +219,7 @@
                                         <input type="text" class="tax-desc" id="taxDesc3" readonly>
                                     </div>
                                     <div class="tax-cell" style="text-align: center;">
-                                        <span class="search-icon" onclick="searchTaxCode(3)"></span>
+                                        <span class="search-icon" data-call="searchTaxCode" data-args='[3]'></span>
                                     </div>
                                     <div class="tax-cell" style="text-align: center;">
                                         <span class="tax-indicator inactive" id="payTax3"></span>
@@ -236,7 +237,7 @@
                                         <input type="text" class="tax-desc" id="taxDesc4" readonly>
                                     </div>
                                     <div class="tax-cell" style="text-align: center;">
-                                        <span class="search-icon" onclick="searchTaxCode(4)"></span>
+                                        <span class="search-icon" data-call="searchTaxCode" data-args='[4]'></span>
                                     </div>
                                     <div class="tax-cell" style="text-align: center;">
                                         <span class="tax-indicator inactive" id="payTax4"></span>
@@ -247,7 +248,7 @@
                                 </div>
                             </div>
                             <div class="tax-exempt-section">
-                                <span class="tax-exempt-toggle inactive" id="taxExemptToggle" onclick="toggleTaxExempt()"></span>
+                                <span class="tax-exempt-toggle inactive" id="taxExemptToggle" data-call="toggleTaxExempt"></span>
                                 <label style="font-size: 11px; margin-right: 10px;">Tax Exempt #</label>
                                 <input type="text" class="tax-exempt-input" id="taxExempt" placeholder="" disabled>
                                 <label style="font-size: 11px; margin: 0 10px;">Expiration Date</label>
@@ -370,16 +371,16 @@
     <div class="training-overlay" id="trainingOverlay">
         <h3>Training Mode</h3>
         <div class="mode-selector">
-            <button class="mode-btn" onclick="startFieldExplorer()">
+            <button class="mode-btn" data-call="startFieldExplorer">
                 <i class="fas fa-search" aria-hidden="true"></i> Field Explorer
             </button>
-            <button class="mode-btn" onclick="startSetupSimulator()">
+            <button class="mode-btn" data-call="startSetupSimulator">
                 <i class="fas fa-user-plus" aria-hidden="true"></i> Setup Simulator
             </button>
-            <button class="mode-btn" onclick="startFieldDetective()">
+            <button class="mode-btn" data-call="startFieldDetective">
                 <i class="fas fa-user-secret" aria-hidden="true"></i> Field Detective
             </button>
-            <button class="mode-btn" onclick="startSpeedChallenge()">
+            <button class="mode-btn" data-call="startSpeedChallenge">
                 <i class="fas fa-tachometer-alt" aria-hidden="true"></i> Speed Challenge
             </button>
         </div>
@@ -406,6 +407,7 @@
         </div>
     </div>
 
+    <script src="/shared_components/js/data-call-delegator.js?v=2026.09.06.29"></script>
     <script src="/training/js/shopworks-customer-setup-enhanced.js?v=2026.09.06.27"></script>
 </body>
 </html>

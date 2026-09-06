@@ -25,7 +25,9 @@ const STAFF_HTML = ['access-admin', 'ae-mission-control', 'api-usage', 'art-hub-
     'dashboards/reports/price-audit-report.html', 'admin/universal-records-admin.html', 'employee-bundles/streich-bros-bundle.html', 'employee-bundles/wcttr-bundle.html', 'staff-dashboard-v3/index.html',
     'pages/data-entry-guide.html', 'pages/dst-viewer.html', 'pages/garment-designer.html', 'pages/mockup-library.html', 'pages/policies-hub.html', 'pages/policy-detail.html', 'pages/box-labels.html', 'pages/jds-mockup-creator.html', 'tools/custom-tees-calibrate.html',
     'training/index.html', 'training/customer-service.html', 'training/quick-reference-tips.html', 'training/sales-coordinator-manual.html', 'training/sanmar-purchasing-guide.html', 'training/shipping-receiving-guide.html', 'training/training-games-hub.html',
-    'calculators/dtg-contract/index.html', 'calculators/embroidered-emblem/index.html', 'calculators/embroidery-contract/index.html', 'calculators/embroidery-pricing-all/index.html', 'calculators/screenprint-customer/index.html']).filter(exists); // the dashboard-linked set (2026-09-06 live census)
+    'calculators/dtg-contract/index.html', 'calculators/embroidered-emblem/index.html', 'calculators/embroidery-contract/index.html', 'calculators/embroidery-pricing-all/index.html', 'calculators/screenprint-customer/index.html',
+    // second-hop / unlinked staff pages (2026-09-06 backlog batch): every remaining page under these directories
+    ...['dashboards', 'admin', 'training', 'tools', 'employee-bundles'].flatMap((d) => (exists(d) ? fs.readdirSync(path.join(ROOT, d)).filter((f) => f.endsWith('.html')).map((f) => `${d}/${f}`) : []))]).filter(exists); // the dashboard-linked set (2026-09-06 live census) + the unlinked backlog
 const RENDERERS = ['shared_components/js/mockup-ae.js', 'shared_components/js/art-ae.js', 'shared_components/js/ae-dashboard.js', 'shared_components/js/garment-submit-form.js', 'shared_components/js/mockup-submit-form.js',
     'shared_components/js/sticker-banner-submit-form.js', 'shared_components/js/jds-submit-form.js', 'pages/js/garment-designer.js', 'dashboards/js/DrainPro-Bundle.js',
     'shared_components/js/staff-dashboard/controllers/pride-wall-controller.js', 'shared_components/js/policies/policy-detail.js', 'shared_components/js/policies/policies-hub.js',
@@ -48,6 +50,7 @@ describe('staff pages (static surface)', () => {
         expect(html).not.toMatch(HANDLER);
         expect(html).not.toMatch(BARE);
         expect(html).not.toMatch(/<style[\s>]/);
+        expect(html).not.toMatch(/<script>\s*[^\s<]/); // no inline script with content
         expect(html).not.toMatch(/(href|src)="\/(?!config\/app\.config\.js)(?!shared_components\/vendor\/)[^"?]+\.(css|js)"/);
     });
 });

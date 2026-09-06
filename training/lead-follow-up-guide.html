@@ -29,7 +29,7 @@
                     <i class="fas fa-envelope" aria-hidden="true"></i>
                     <span>Email Templates</span>
                 </a>
-                <button class="nav-btn" onclick="window.print()">
+                <button class="nav-btn" data-call="print">
                     <i class="fas fa-print" aria-hidden="true"></i>
                     <span>Print Guide</span>
                 </button>
@@ -277,7 +277,7 @@
 
             <div class="accordion">
                 <div class="accordion-item">
-                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <div class="accordion-header" data-call="toggleAccordion" data-args='["$this"]'>
                         <span>📧 Email Channel</span>
                         <i class="fas fa-chevron-down accordion-icon" aria-hidden="true"></i>
                     </div>
@@ -295,7 +295,7 @@
                 </div>
 
                 <div class="accordion-item">
-                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <div class="accordion-header" data-call="toggleAccordion" data-args='["$this"]'>
                         <span>📞 Phone Channel</span>
                         <i class="fas fa-chevron-down accordion-icon" aria-hidden="true"></i>
                     </div>
@@ -313,7 +313,7 @@
                 </div>
 
                 <div class="accordion-item">
-                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <div class="accordion-header" data-call="toggleAccordion" data-args='["$this"]'>
                         <span>💬 SMS/Text Channel</span>
                         <i class="fas fa-chevron-down accordion-icon" aria-hidden="true"></i>
                     </div>
@@ -331,7 +331,7 @@
                 </div>
 
                 <div class="accordion-item">
-                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                    <div class="accordion-header" data-call="toggleAccordion" data-args='["$this"]'>
                         <span>💼 LinkedIn/Social Channel</span>
                         <i class="fas fa-chevron-down accordion-icon" aria-hidden="true"></i>
                     </div>
@@ -360,7 +360,7 @@
             <div class="template-example">
                 <div class="template-header">
                     <span class="template-title">Initial Response (12-24 hours)</span>
-                    <button class="copy-btn" onclick="copyTemplate('initial')">Copy Template</button>
+                    <button class="copy-btn" data-call="copyTemplate" data-args='["initial"]'>Copy Template</button>
                 </div>
                 <div class="template-content" id="template-initial">Subject: Re: Your Custom [Embroidery/Screen Print] Request - [Company Name]
 
@@ -386,7 +386,7 @@ Best regards,
             <div class="template-example">
                 <div class="template-header">
                     <span class="template-title">Mock-up Ready (Day 2-3)</span>
-                    <button class="copy-btn" onclick="copyTemplate('mockup')">Copy Template</button>
+                    <button class="copy-btn" data-call="copyTemplate" data-args='["mockup"]'>Copy Template</button>
                 </div>
                 <div class="template-content" id="template-mockup">Subject: Your Custom Design is Ready! - [Company Name]
 
@@ -417,7 +417,7 @@ P.S. We're running a special this month: Free shipping on orders over $500!</div
             <div class="template-example">
                 <div class="template-header">
                     <span class="template-title">Value Nurture (Day 3-5)</span>
-                    <button class="copy-btn" onclick="copyTemplate('nurture')">Copy Template</button>
+                    <button class="copy-btn" data-call="copyTemplate" data-args='["nurture"]'>Copy Template</button>
                 </div>
                 <div class="template-content" id="template-nurture">Subject: 3 Tips for Perfect Company Apparel - [Company Name]
 
@@ -449,7 +449,7 @@ Still happy to discuss your [specific request] whenever you're ready!
             <div class="template-example">
                 <div class="template-header">
                     <span class="template-title">Incentive Offer (Day 7-10)</span>
-                    <button class="copy-btn" onclick="copyTemplate('incentive')">Copy Template</button>
+                    <button class="copy-btn" data-call="copyTemplate" data-args='["incentive"]'>Copy Template</button>
                 </div>
                 <div class="template-content" id="template-incentive">Subject: 🎁 Special Offer Expires Friday - [Company Name]
 
@@ -478,7 +478,7 @@ P.S. This offer is exclusive to new customers and expires Friday at 5 PM.</div>
             <div class="template-example">
                 <div class="template-header">
                     <span class="template-title">Break-up Email (After 2 weeks)</span>
-                    <button class="copy-btn" onclick="copyTemplate('breakup')">Copy Template</button>
+                    <button class="copy-btn" data-call="copyTemplate" data-args='["breakup"]'>Copy Template</button>
                 </div>
                 <div class="template-content" id="template-breakup">Subject: Should I close your file? - [Company Name]
 
@@ -729,6 +729,7 @@ P.S. Your mock-up and quote will remain valid for 30 days.</div>
         </div>
     </div>
 
+    <script src="/shared_components/js/data-call-delegator.js?v=2026.09.06.29"></script>
     <script src="/training/js/lead-follow-up-guide.js?v=2026.09.05.12"></script>
 </body>
 </html>

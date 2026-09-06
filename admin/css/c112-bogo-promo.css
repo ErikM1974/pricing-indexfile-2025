@@ -1,0 +1,1325 @@
+/* c112-bogo-promo.css — extracted 2026-09-06 from 8 inline <style> block(s) in admin/c112-bogo-promo.html (Rule 3). */
+/* Navigation menu styles */
+.top-nav {
+    background-color: #333;
+    color: white;
+    padding: 10px 0;
+    font-size: 0.9em;
+    margin-bottom: 15px;
+    border-radius: var(--radius-md, 8px);
+}
+.top-nav-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+.top-nav-links {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+.top-nav-contact {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+.top-nav a {
+    color: white;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+.top-nav a:hover {
+    color: var(--accent-color, #ffc107);
+    text-decoration: underline;
+}
+.top-nav .contact-item {
+    display: flex;
+    align-items: center;
+}
+.top-nav .contact-item i {
+    margin-right: 5px;
+}
+
+/* Page-specific adjustments if needed, complementing shared-pricing-styles.css */
+body {
+    background-color: var(--background-global, #f0f2f5); /* Consistent global background */
+}
+.container { /* Override default container from shared if it's too narrow or has wrong padding */
+    max-width: 1200px; /* Wider for two-column layout */
+    margin: 20px auto;
+    padding: 20px; /* Standard padding */
+}
+
+/* BOGO Deal Header - Enhanced */
+.bogo-deal-header {
+    /* Using a subtle gradient - adjust colors/angle as needed. Assumes --primary-color is your green. */
+    background: linear-gradient(135deg, var(--primary-color) 0%, color-mix(in srgb, var(--primary-color) 85%, black) 100%);
+    color: white;
+    padding: 25px 20px; /* Slightly more padding */
+    text-align: center;
+    border-radius: var(--radius-md, 8px) var(--radius-md, 8px) 0 0; /* Ensure fallback for radius */
+    margin-bottom: 0;
+    position: relative;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15); /* Softer, more modern shadow */
+}
+.bogo-deal-header .nwca-logo {
+    max-height: 55px; /* Slightly adjusted */
+    margin-bottom: 15px;
+}
+.bogo-deal-header h1 {
+    margin: 0 0 8px 0; /* More space below h1 */
+    font-size: 2.2em; /* Slightly larger */
+    font-weight: 700; /* Bolder */
+    letter-spacing: 0.5px;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.2); /* Subtle text shadow */
+}
+.bogo-deal-header h2 {
+    margin: 0 0 10px 0; /* Space below h2 */
+    font-size: 1.5em; /* Slightly larger */
+    font-weight: 500; /* Adjusted weight */
+    color: var(--accent-color, #ffc107);
+    text-shadow: 1px 1px 1px rgba(0,0,0,0.1);
+}
+.bogo-deal-header .deal-terms {
+    font-size: 0.9em;
+    margin-top: 10px;
+    opacity: 0.9;
+}
+
+/* Ensure columns have some background and padding */
+/* Custom styles for two-column layout in c112-bogo-promo.html */
+.product-page-columns-container {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+}
+
+.product-context-column {
+    flex: 1; /* Allow left column to grow */
+    background-color: var(--white, #fff);
+    padding: 20px;
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-sm);
+}
+.product-interactive-column { /* Specific for this page's right side */
+    flex: 1; /* Allow right column to grow */
+    max-width: 500px; /* Constrain the width of the right column */
+    min-width: 320px; /* Ensure a minimum width for smaller screens */
+    background-color: var(--white, #fff);
+    padding: 20px;
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    flex-direction: column;
+}
+
+/* Responsive adjustments for the two-column layout */
+@media (max-width: 1024px) { /* Adjust this breakpoint as needed */
+    .product-page-columns-container {
+        flex-direction: column;
+    }
+    .product-context-column,
+    .product-interactive-column {
+        flex: 0 0 auto; /* Reset flex basis for stacked layout */
+        max-width: 100%; /* Allow full width when stacked */
+        min-width: 100%; /* Ensure full width on mobile */
+    }
+}
+
+/* Styling for the selected items list in the right column */
+#bogoSelectedItemsContainer .item-entry {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px dotted var(--border-light, #eee);
+}
+#bogoSelectedItemsContainer .item-entry:last-child {
+    border-bottom: none;
+}
+#bogoSelectedItemsContainer .item-info img {
+    width: 40px; height: 40px; object-fit: cover; border-radius: 4px; margin-right: 10px; vertical-align: middle;
+}
+#bogoSelectedItemsContainer input[type="number"] {
+    width: 60px; padding: 8px; text-align: center; border: 1px solid var(--border-color); border-radius: var(--radius-xs);
+    -webkit-appearance: none; appearance: none; /* Remove browser default styling */
+}
+#bogoSelectedItemsContainer .remove-item-btn {
+    background: var(--danger-color, #dc3545); color: white; border: none; padding: 8px 12px; cursor: pointer; font-size: 0.9em; border-radius: var(--radius-xs); margin-left: 10px;
+}
+#bogoSelectedItemsContainer .remove-item-btn:hover {
+    background: var(--danger-dark, #c82333);
+}
+
+/* Totals section for BOGO */
+.bogo-totals {
+    margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border-color); text-align: right; font-size: 1.1em;
+}
+.bogo-totals p { margin: 8px 0; }
+.bogo-totals strong { color: var(--primary-color); }
+.bogo-min-order-notice { color: var(--danger-color, #dc3545); font-weight: bold; }
+.bogo-min-order-notice.met { color: var(--success-color, #28a745); }
+
+/* Actions for BOGO */
+.bogo-actions button {
+    background-color: var(--success-color, #28a745); color: white; padding: 12px 25px; border: none; border-radius: var(--radius-sm); font-size: 1.1em; cursor: pointer; transition: background-color 0.3s ease; width: 100%; margin-top: 10px;
+}
+.bogo-actions button:hover:not(:disabled) { background-color: var(--success-dark, #218838); }
+.bogo-actions button:disabled { background-color: #ccc; cursor: not-allowed; }
+#bogoEmailInstructions { margin-top: 15px; padding: 10px; background-color: var(--info-light, #e9f5ff); border: 1px solid var(--info-border, #b3d7ff); border-radius: var(--radius-xs); }
+
+/* Make sure product image in left column is responsive */
+.product-image-container-context img { width: 100%; height: auto; }
+
+/* Adjustments for .color-swatches-container.compact if needed */
+.color-swatches-container.compact .color-swatches {
+     max-height: 400px; /* More space for swatches if desired */
+     overflow-y: auto;  /* Enable vertical scrolling */
+     display: flex;       /* Ensure flex layout for swatches */
+     flex-wrap: wrap;     /* Allow swatches to wrap to next line */
+     justify-content: flex-start; /* Align swatches to the start */
+     padding: 10px 5px; /* Add some padding inside the scrollable area */
+     border: 1px solid var(--border-light, #eee); /* Optional: border for the scroll area */
+     border-radius: var(--radius-xs);
+}
+.section-title { /* General section title from shared styles, ensure it's applied */
+    font-size: 1.3em;
+    color: var(--primary-color);
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border-light);
+}
+.product-interactive-column .section-title {
+    margin-top: 0; /* First title in right column might not need top margin */
+}
+ /* Override for product title in left column to match cap-embroidery page */
+.product-context-column .product-header .product-title-area h2 {
+    color: var(--primary-color); /* Ensure it uses primary color */
+    font-size: 1.5em; /* Match size */
+}
+.product-context-column .product-header {
+    background-color: var(--background-light, #f8f9fa);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    margin-bottom: 15px;
+    padding: 15px 20px;
+}
+.product-meta {
+    font-size: 0.9em;
+    color: var(--text-muted);
+}
+.static-product-info {
+     padding:15px; background-color: var(--background-ultralight); border-radius: var(--radius-sm); margin-top:15px; font-size: 0.9em;
+}
+
+/* Swatch Styles from cap-embroidery-pricing.html */
+/* Simplified Swatch Styles */
+.swatch-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 70px; /* Adjust as needed */
+    min-height: 75px; /* Ensure enough space for swatch + name */
+    margin: 5px;
+    cursor: pointer;
+    justify-content: flex-start; /* Align items to the top */
+}
+
+.color-swatch { /* This class will be on the div that gets the background image */
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: 2px solid var(--border-color);
+    margin-bottom: 4px;
+    background-size: cover;
+    background-position: center;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.color-swatch:hover {
+    border-color: var(--primary-color);
+}
+
+.color-swatch.active { /* JS will add 'active' to the .color-swatch div */
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px var(--primary-light);
+}
+
+.color-name {
+    font-size: 0.75em;
+    text-align: center;
+    color: var(--text-color);
+    width: 100%; /* Take full width of wrapper */
+    line-height: normal; /* Use default line height */
+    padding: 0 2px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    display: block; /* Ensure it's a block element */
+}
+
+/* Pulse animation for highlighting a swatch (optional, can be triggered by JS) */
+@keyframes pulse-highlight {
+    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 128, 0, 0.7); }
+    50% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(0, 128, 0, 0); }
+    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 128, 0, 0); }
+}
+
+.color-swatch.pulse-highlight {
+    animation: pulse-highlight 1s ease; /* Run once */
+    border-color: var(--primary-color);
+}
+/* End Swatch Styles */
+
+/* Force header text to be white & re-apply subtle shadows */
+.bogo-deal-header h1 {
+    color: #ffffff !important;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.25) !important; /* Subtle dark shadow for H1 */
+}
+.bogo-deal-header h2 {
+    color: #ffffff !important;
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.2) !important; /* Subtle dark shadow for H2 */
+}
+.bogo-deal-header p.deal-terms {
+    color: #ffffff !important;
+    text-shadow: none !important; /* No shadow for smaller text usually better */
+}
+
+/* Thumbnail Gallery Styles */
+.thumbnail-gallery-container {
+    margin-top: 15px; /* Space above the gallery */
+    padding-top: 10px; /* Optional padding if a border is added */
+    border-top: 1px solid var(--border-light, #eee); /* Optional separator */
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px; /* Space between thumbnails */
+    justify-content: flex-start; /* Align thumbnails to the start */
+}
+.gallery-thumbnail {
+    width: 65px;
+    height: 65px;
+    object-fit: cover;
+    border: 2px solid var(--border-color, #ddd);
+    border-radius: var(--radius-xs, 4px);
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    background-color: #f9f9f9; /* Fallback bg for broken images */
+}
+.gallery-thumbnail:hover {
+    border-color: var(--primary-color);
+    transform: scale(1.08);
+}
+.gallery-thumbnail.active-thumbnail {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 6px rgba(var(--primary-color-rgb, 0,76,151), 0.7); /* Use RGB version of primary if available */
+    transform: scale(1.08);
+}
+/* End Thumbnail Gallery Styles */
+
+/* Price Tiers Display Styles */
+.price-tiers-section {
+    margin-top: 20px;
+    margin-bottom: 15px; /* Space before the dynamic price guidance */
+    padding: 15px;
+    background-color: var(--background-light, #f8f9fa);
+    border: 1px solid var(--border-color, #dee2e6);
+    border-radius: var(--radius-sm, 0.25rem);
+    font-size: 0.9em;
+}
+.price-tiers-section h4 { /* Optional heading for the section */
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 1.1em;
+    color: var(--text-color-strong, #333);
+}
+.price-tier-item {
+    padding: 5px 0;
+    border-bottom: 1px dashed var(--border-light, #eee);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+.price-tier-item:last-child {
+    border-bottom: none;
+}
+.price-tier-item.active-tier {
+    background-color: var(--primary-ultralight, #e6f2ff); /* A very light version of primary color */
+    color: var(--primary-color, #007bff);
+    font-weight: bold;
+    padding-left: 10px; /* Indent active tier slightly */
+    margin-left: -10px; /* Counteract padding for full background effect if parent has padding */
+    border-radius: var(--radius-xs);
+}
+.bogo-breakdown-details { /* Style for the new BOGO breakdown section */
+    font-size: 0.9em;
+    color: var(--text-muted, #6c757d);
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px dashed var(--border-light, #eee);
+    text-align: left; /* Align breakdown text to the left */
+}
+.bogo-breakdown-details p {
+    margin: 3px 0;
+}
+/* End Price Tiers Display Styles */
+
+/* Customer Info Form Styles */
+#customerInfoFormContainer {
+    margin-top: 25px;
+    padding: 20px;
+    background-color: var(--background-ultralight, #fcfdff);
+    border: 1px solid var(--border-color, #dee2e6);
+    border-radius: var(--radius-md, 8px);
+}
+.form-group {
+    margin-bottom: 15px;
+}
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+    font-size: 0.9em;
+    color: var(--text-color-strong);
+}
+.form-group input[type="text"],
+.form-group input[type="email"],
+.form-group input[type="tel"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-xs);
+    box-sizing: border-box; /* Ensures padding doesn't add to width */
+    font-size: 0.95em;
+}
+.form-group input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(var(--primary-color-rgb, 0, 123, 255), 0.25); /* Use RGB for primary color if available */
+}
+.form-group .required-indicator {
+    color: var(--danger-color, #dc3545);
+    margin-left: 3px;
+}
+.api-feedback { /* For success/error messages from API calls */
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: var(--radius-xs);
+    font-size: 0.9em;
+}
+.api-feedback.success {
+    background-color: var(--success-ultralight, #e6ffed);
+    border: 1px solid var(--success-border, #b3e6c3);
+    color: var(--success-dark, #155724);
+}
+.api-feedback.error {
+    background-color: var(--danger-ultralight, #ffe6e6);
+    border: 1px solid var(--danger-border, #e6b3b3);
+    color: var(--danger-dark, #721c24);
+}
+/* End Customer Info Form Styles */
+
+/* Responsive Video Container Styles */
+.embroidery-video-container {
+    margin-top: 25px;
+    margin-bottom: 20px;
+}
+.responsive-video-wrapper {
+    position: relative;
+    padding-bottom: 56.25%; /* 16:9 aspect ratio */
+    height: 0;
+    overflow: hidden;
+    max-width: 100%;
+    background-color: #f0f0f0; /* Light background while video loads */
+    border-radius: var(--radius-sm, 4px);
+    box-shadow: var(--shadow-sm, 0 2px 4px rgba(0,0,0,0.1));
+}
+.responsive-video-wrapper iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: var(--radius-sm, 4px);
+}
+/* End Responsive Video Container Styles */
+
+/* Call-to-Action Headline Styles */
+.cta-headline-section {
+    background: linear-gradient(135deg, var(--primary-color) 0%, color-mix(in srgb, var(--primary-color) 85%, black) 100%);
+    color: white;
+    text-align: center;
+    padding: 25px 20px;
+    margin: 30px 0;
+    border-radius: var(--radius-md, 8px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.cta-headline-section:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+}
+
+.cta-headline {
+    font-size: 2.2em;
+    font-weight: 700;
+    margin: 0;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+    position: relative;
+    z-index: 2;
+}
+
+.cta-arrow {
+    display: inline-block;
+    margin-left: 10px;
+    font-size: 1.2em;
+    animation: bounce 1.5s infinite;
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+    40% {transform: translateY(-10px);}
+    60% {transform: translateY(-5px);}
+}
+
+/* Decorative elements */
+.cta-headline-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='rgba(255,255,255,.05)' fill-rule='evenodd'/%3E%3C/svg%3E");
+    opacity: 0.3;
+    z-index: 1;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .cta-headline {
+        font-size: 1.8em;
+    }
+}
+
+@media (max-width: 480px) {
+    .cta-headline {
+        font-size: 1.5em;
+    }
+}
+
+/* Visit Our Showroom Section */
+.showroom-section {
+    margin: 30px 0;
+    background: linear-gradient(135deg, var(--white) 0%, var(--background-light, #f8f9fa) 100%);
+    border: 1px solid var(--border-color);
+    border-left: 4px solid var(--primary-color);
+    border-radius: var(--radius-md, 8px);
+    box-shadow: var(--shadow-sm, 0 2px 4px rgba(0,0,0,0.1));
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.showroom-section:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-md, 0 4px 8px rgba(0,0,0,0.15));
+}
+
+.showroom-container {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+}
+
+.showroom-image {
+    flex: 1;
+    min-width: 300px;
+    max-width: 500px;
+    overflow: hidden;
+}
+
+.showroom-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.showroom-img:hover {
+    transform: scale(1.03);
+}
+
+.showroom-content {
+    flex: 1;
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.showroom-content h2 {
+    color: var(--primary-color);
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 1.8em;
+    font-weight: 700;
+}
+
+.showroom-content p {
+    margin-bottom: 15px;
+    font-size: 1.05em;
+    line-height: 1.5;
+}
+
+.showroom-hours {
+    background-color: var(--primary-ultralight, #e6f2ff);
+    padding: 10px 15px;
+    border-radius: var(--radius-sm, 4px);
+    display: inline-block;
+    margin-top: 5px;
+}
+
+.showroom-cta {
+    font-weight: 600;
+    font-size: 1.1em !important;
+    color: var(--primary-dark);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .showroom-container {
+        flex-direction: column;
+    }
+
+    .showroom-image {
+        max-width: 100%;
+        min-width: 100%;
+    }
+
+    .showroom-img {
+        max-height: 300px;
+    }
+
+    .showroom-content {
+        padding: 20px;
+    }
+
+    .showroom-content h2 {
+        font-size: 1.5em;
+    }
+}
+
+/* Modal/Lightbox Styles */
+.image-modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: rgba(0, 0, 0, 0.85);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.image-modal.active {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 1;
+}
+
+.modal-content {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 90%;
+    height: 90%;
+    max-width: 1200px;
+}
+
+.modal-image {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    border-radius: var(--radius-sm, 4px);
+}
+
+.modal-close {
+    position: absolute;
+    top: -40px;
+    right: 0;
+    color: white;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    background: rgba(0, 0, 0, 0.5);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background-color 0.2s ease;
+}
+
+.modal-close:hover {
+    background-color: rgba(255, 0, 0, 0.7);
+}
+
+.modal-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    color: white;
+    font-size: 36px;
+    font-weight: bold;
+    cursor: pointer;
+    background: rgba(0, 0, 0, 0.5);
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background-color 0.2s ease;
+    user-select: none;
+}
+
+.modal-nav:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+.modal-prev {
+    left: 10px;
+}
+
+.modal-next {
+    right: 10px;
+}
+
+/* Add a pointer cursor to images that can be clicked to open the modal */
+.product-image-container-context img,
+.gallery-thumbnail {
+    cursor: pointer;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .modal-content {
+        width: 95%;
+        height: 95%;
+    }
+
+    .modal-nav {
+        width: 40px;
+        height: 40px;
+        font-size: 24px;
+    }
+
+    .modal-close {
+        top: -30px;
+        width: 30px;
+        height: 30px;
+        font-size: 20px;
+    }
+}
+
+/* Quantity Pricing Section Styles */
+.pricing-section {
+    background-color: var(--white);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    padding: 20px;
+    margin: 20px 0;
+    border: 1px solid var(--border-color);
+    border-left: 4px solid var(--primary-color);
+}
+
+.quantity-pricing-container {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.price-tier-card {
+    flex: 1;
+    min-width: 80px;
+    background-color: var(--background-light, #f8f9fa);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    padding: 12px;
+    text-align: center;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.price-tier-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--primary-color);
+}
+
+.price-tier-header {
+    font-weight: bold;
+    color: var(--primary-dark);
+    margin-bottom: 8px;
+    font-size: 0.95em;
+    padding-bottom: 5px;
+    border-bottom: 1px dashed var(--border-light, #eee);
+}
+
+.price-tier-price {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: var(--primary-color);
+    margin: 5px 0;
+}
+
+.price-tier-label {
+    font-size: 0.8em;
+    color: var(--text-muted, #6c757d);
+}
+
+.pricing-note {
+    background-color: var(--primary-light);
+    border-radius: var(--radius-sm);
+    padding: 12px;
+    font-size: 0.9em;
+    margin-top: 10px;
+}
+
+.pricing-note p {
+    margin: 5px 0;
+}
+
+.pricing-note strong {
+    color: var(--primary-color);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .quantity-pricing-container {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .price-tier-card {
+        width: 100%;
+    }
+}
+
+.back-to-top {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 50px;
+    height: 50px;
+    background-color: var(--primary-color, #0056b3);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(20px);
+    transition: all 0.3s ease;
+    z-index: 1000;
+    cursor: pointer;
+    font-size: 24px;
+}
+
+.back-to-top.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.back-to-top:hover {
+    background-color: color-mix(in srgb, var(--primary-color, #0056b3) 85%, black);
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.back-to-top:active {
+    transform: translateY(0);
+}
+
+@media (max-width: 768px) {
+    .back-to-top {
+        bottom: 20px;
+        right: 20px;
+        width: 45px;
+        height: 45px;
+        font-size: 20px;
+    }
+}
+
+/* Button Base Styles */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    font-size: 1rem;
+    line-height: 1.5;
+    text-align: center;
+    text-decoration: none;
+    border: none;
+    border-radius: var(--radius-sm, 4px);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    outline: none;
+}
+
+/* Button Types */
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary-color) 0%, color-mix(in srgb, var(--primary-color) 85%, black) 100%);
+    color: white;
+}
+
+.btn-secondary {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    color: var(--primary-dark);
+    border: 1px solid var(--border-color);
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, var(--danger-color, #dc3545) 0%, color-mix(in srgb, var(--danger-color, #dc3545) 85%, black) 100%);
+    color: white;
+}
+
+/* Button Sizes */
+.btn-sm {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.875rem;
+}
+
+.btn-lg {
+    padding: 1rem 2rem;
+    font-size: 1.125rem;
+}
+
+/* Button States */
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.btn:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.btn:focus {
+    box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb, 47, 102, 30), 0.25);
+}
+
+.btn:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Button Type States */
+.btn-primary:hover {
+    background: linear-gradient(135deg, color-mix(in srgb, var(--primary-color) 90%, black) 0%, color-mix(in srgb, var(--primary-color) 75%, black) 100%);
+}
+
+.btn-secondary:hover {
+    background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
+    color: var(--primary-color);
+}
+
+.btn-danger:hover {
+    background: linear-gradient(135deg, color-mix(in srgb, var(--danger-color, #dc3545) 90%, black) 0%, color-mix(in srgb, var(--danger-color, #dc3545) 75%, black) 100%);
+}
+
+/* Button with Icon */
+.btn-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-icon i,
+.btn-icon span {
+    margin-right: 0.5rem;
+}
+
+/* Apply to specific buttons */
+#bogoGeneratePdfButton {
+    width: 100%;
+    margin-top: 10px;
+    font-size: 1.1rem;
+    background: linear-gradient(135deg, var(--success-color, #28a745) 0%, color-mix(in srgb, var(--success-color, #28a745) 85%, black) 100%);
+    color: white;
+    border-radius: var(--radius-sm);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+#bogoGeneratePdfButton:hover:not(:disabled) {
+    background: linear-gradient(135deg, color-mix(in srgb, var(--success-color, #28a745) 90%, black) 0%, color-mix(in srgb, var(--success-color, #28a745) 75%, black) 100%);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+#bogoGeneratePdfButton:active:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+}
+
+#bogoGeneratePdfButton:disabled {
+    background: linear-gradient(135deg, #adb5bd 0%, #868e96 100%);
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Remove Item Button */
+.remove-item-btn {
+    background: linear-gradient(135deg, var(--danger-color, #dc3545) 0%, color-mix(in srgb, var(--danger-color, #dc3545) 85%, black) 100%);
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 0.9em;
+    border-radius: var(--radius-sm);
+    margin-left: 10px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.remove-item-btn:hover {
+    background: linear-gradient(135deg, color-mix(in srgb, var(--danger-color, #dc3545) 90%, black) 0%, color-mix(in srgb, var(--danger-color, #dc3545) 75%, black) 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.remove-item-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Collapsible Toggle Styling */
+.collapsible-header {
+    position: relative;
+    padding: 15px;
+    background: linear-gradient(135deg, var(--white) 0%, var(--background-light, #f8f9fa) 100%);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    margin-bottom: 10px;
+    font-weight: 600;
+    color: var(--primary-color);
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.collapsible-header:hover {
+    background: linear-gradient(135deg, var(--primary-light) 0%, var(--white) 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.collapsible-header:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.collapsible-header .toggle-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    background-color: var(--primary-color);
+    color: white;
+    border-radius: 50%;
+    transition: transform 0.3s ease, background-color 0.3s ease;
+    font-size: 0.8em;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.collapsible-header:hover .toggle-icon {
+    background-color: var(--primary-dark);
+    transform: scale(1.1);
+}
+
+.collapsible-header.active .toggle-icon {
+    transform: rotate(90deg);
+}
+
+/* Back to Top Button */
+.back-to-top {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, var(--primary-color, #2f661e) 0%, color-mix(in srgb, var(--primary-color, #2f661e) 85%, black) 100%);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(20px);
+    transition: all 0.3s ease;
+    z-index: 1000;
+    cursor: pointer;
+    font-size: 24px;
+}
+
+.back-to-top.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.back-to-top:hover {
+    background: linear-gradient(135deg, color-mix(in srgb, var(--primary-color, #2f661e) 90%, black) 0%, color-mix(in srgb, var(--primary-color, #2f661e) 75%, black) 100%);
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+}
+
+.back-to-top:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .btn {
+        padding: 0.6rem 1.2rem;
+        font-size: 0.95rem;
+    }
+
+    .btn-sm {
+        padding: 0.35rem 0.7rem;
+        font-size: 0.8rem;
+    }
+
+    .btn-lg {
+        padding: 0.8rem 1.6rem;
+        font-size: 1.05rem;
+    }
+
+    #bogoGeneratePdfButton {
+        font-size: 1rem;
+        padding: 15px 20px; /* Larger touch target */
+    }
+
+    .remove-item-btn {
+        padding: 6px 10px;
+        font-size: 0.85em;
+        margin-left: 5px;
+    }
+
+    .collapsible-header {
+        padding: 12px;
+    }
+
+    .collapsible-header .toggle-icon {
+        width: 20px;
+        height: 20px;
+    }
+
+    .back-to-top {
+        width: 45px;
+        height: 45px;
+        bottom: 20px;
+        right: 20px;
+        font-size: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+    }
+
+    .btn-sm {
+        padding: 0.3rem 0.6rem;
+        font-size: 0.75rem;
+    }
+
+    .btn-lg {
+        padding: 0.7rem 1.4rem;
+        font-size: 1rem;
+    }
+
+    .remove-item-btn {
+        padding: 5px 8px;
+        font-size: 0.8em;
+    }
+
+    .collapsible-header {
+        padding: 10px;
+        font-size: 0.95em;
+    }
+
+    .collapsible-header .toggle-icon {
+        width: 18px;
+        height: 18px;
+        font-size: 0.75em;
+    }
+}
+
+/* Enhanced mobile responsiveness styles */
+@media (max-width: 768px) {
+    /* Improved color swatches for touch */
+    .swatch-wrapper {
+        width: 80px;
+        min-height: 85px;
+        margin: 8px;
+    }
+
+    .color-swatch {
+        width: 60px;
+        height: 60px;
+        border-width: 3px; /* Thicker border for better visibility */
+    }
+
+    /* Improved form inputs for mobile */
+    .form-group input[type="text"],
+    .form-group input[type="email"],
+    .form-group input[type="tel"] {
+        padding: 12px;
+        font-size: 16px; /* Prevents iOS zoom on focus */
+        height: 44px; /* Minimum touch target size */
+    }
+
+    /* Improved quantity inputs */
+    #bogoSelectedItemsContainer input[type="number"] {
+        width: 70px;
+        padding: 10px;
+        font-size: 16px;
+        height: 44px; /* Minimum touch target size */
+    }
+
+    /* Improved buttons */
+    .remove-item-btn {
+        padding: 10px 15px;
+        min-height: 44px; /* Minimum touch target size */
+        min-width: 44px;
+    }
+
+    /* Improved gallery thumbnails */
+    .gallery-thumbnail {
+        width: 75px;
+        height: 75px;
+    }
+
+    /* Improved spacing */
+    .product-context-column,
+    .product-interactive-column {
+        padding: 15px;
+    }
+
+    /* Ensure PDF button is large enough */
+    #bogoGeneratePdfButton {
+        padding: 15px;
+        min-height: 50px;
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    /* Even larger touch targets for very small screens */
+    .color-swatch {
+        width: 65px;
+        height: 65px;
+    }
+
+    /* Adjust container padding */
+    .container {
+        padding: 10px;
+    }
+
+    /* Ensure form elements are large enough */
+    .form-group label {
+        font-size: 16px;
+        margin-bottom: 8px;
+    }
+
+    /* Ensure PDF button is prominent */
+    #bogoGeneratePdfButton {
+        padding: 16px;
+        min-height: 54px;
+        font-size: 18px;
+    }
+
+    /* Adjust spacing between sections */
+    .section-title {
+        margin-top: 25px;
+    }
+
+    /* Ensure color swatches container scrolls horizontally if needed */
+    .color-swatches {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        max-width: 100%;
+        overflow-x: auto;
+        padding-bottom: 10px;
+    }
+}
+
+/* Ensure proper input types for mobile */
+input[type="email"] {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+input[type="tel"] {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+input[type="number"] {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+/* Fix for iOS zoom on input focus */
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+    select,
+    textarea,
+    input[type="text"],
+    input[type="password"],
+    input[type="number"],
+    input[type="email"],
+    input[type="tel"] {
+        font-size: 16px !important;
+    }
+}
+
+[hidden] { display: none !important; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }

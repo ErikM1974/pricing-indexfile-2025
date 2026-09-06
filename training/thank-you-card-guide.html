@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="/training/css/thank-you-card-guide.css?v=2026.09.05.12">
 </head>
 <body>
-    <button class="back-button" onclick="goToDashboard()">
+    <button class="back-button" data-call="goToDashboard">
         <i class="fas fa-arrow-left" aria-hidden="true"></i>
         Back to Dashboard
     </button>
@@ -24,7 +24,7 @@ This is Erik here—I've put this guide together to kick off our thank-you card 
         <p style="text-align: center; font-size: 1.2em;">Hey Adriyella! Let's make customers smile with these cards. Follow the guide, log in Shopworks, and track your wins. You've got this! 🌟</p>
 
         <section>
-            <h2 onclick="toggleAccordion(this)"><i class="fas fa-list-ol" aria-hidden="true"></i> Daily Process for Thank-You Cards</h2>
+            <h2 data-call="toggleAccordion" data-args='["$this"]'><i class="fas fa-list-ol" aria-hidden="true"></i> Daily Process for Thank-You Cards</h2>
             <div class="accordion-content">
                 <ol>
                     <li><strong>Late Afternoon (Around 4 PM):</strong> Grab the stack of completed invoices from Bradley. Scan and sort them quickly (e.g., by type). Prep for tomorrow—no writing yet!</li>
@@ -40,7 +40,7 @@ This is Erik here—I've put this guide together to kick off our thank-you card 
         </section>
 
         <section>
-            <h2 onclick="toggleAccordion(this)"><i class="fas fa-ruler" aria-hidden="true"></i> Rules for Who Gets a Card</h2>
+            <h2 data-call="toggleAccordion" data-args='["$this"]'><i class="fas fa-ruler" aria-hidden="true"></i> Rules for Who Gets a Card</h2>
             <div class="accordion-content">
                 <p>Send to most everyone—except individual webstore employee orders (main contact only for milestones). When in doubt, send!</p>
                 <table>
@@ -56,7 +56,7 @@ This is Erik here—I've put this guide together to kick off our thank-you card 
         </section>
 
         <section>
-            <h2 onclick="toggleAccordion(this)"><i class="fas fa-signature" aria-hidden="true"></i> Signature Guidelines</h2>
+            <h2 data-call="toggleAccordion" data-args='["$this"]'><i class="fas fa-signature" aria-hidden="true"></i> Signature Guidelines</h2>
             <div class="accordion-content">
                 <table>
                     <tr><th>Scenario</th><th>Who Signs?</th><th>Why?</th></tr>
@@ -69,7 +69,7 @@ This is Erik here—I've put this guide together to kick off our thank-you card 
         </section>
 
         <section>
-            <h2 onclick="toggleAccordion(this)"><i class="fas fa-envelope-open-text" aria-hidden="true"></i> Card Templates</h2>
+            <h2 data-call="toggleAccordion" data-args='["$this"]'><i class="fas fa-envelope-open-text" aria-hidden="true"></i> Card Templates</h2>
             <div class="accordion-content">
                 <p>Handwrite & personalize! Vary for repeats. Add review nudge: "If thrilled, share a Google review!"</p>
                 
@@ -130,7 +130,7 @@ This is Erik here—I've put this guide together to kick off our thank-you card 
         </section>
 
         <section>
-            <h2 onclick="toggleAccordion(this)"><i class="fas fa-desktop" aria-hidden="true"></i> How to Add an Activity in Shopworks</h2>
+            <h2 data-call="toggleAccordion" data-args='["$this"]'><i class="fas fa-desktop" aria-hidden="true"></i> How to Add an Activity in Shopworks</h2>
             <div class="accordion-content">
                 <p>Follow these steps to log activities like "Thank You Sent" or "Order Notification". Use the Quick Add from the customer screen for fast entry!</p>
                 <h3>Step 1: Quick Add from Customer Screen</h3>
@@ -143,6 +143,7 @@ This is Erik here—I've put this guide together to kick off our thank-you card 
         </section>
     </div>
 
+    <script src="/shared_components/js/data-call-delegator.js?v=2026.09.06.29"></script>
     <script src="/training/js/thank-you-card-guide.js?v=2026.09.05.12"></script>
 </body>
 </html>

@@ -262,8 +262,8 @@
                 <p>A customer just called to check on their order status. You told them it will be ready Friday. Where do you put this note and what do you write?</p>
                 <textarea id="practice1" placeholder="Type your note here..."></textarea>
                 <div class="button-group">
-                    <button onclick="checkAnswer(1)">Check Answer</button>
-                    <button class="secondary" onclick="showExample(1)">Show Example</button>
+                    <button data-call="checkAnswer" data-args='[1]'>Check Answer</button>
+                    <button class="secondary" data-call="showExample" data-args='[1]'>Show Example</button>
                 </div>
                 <div id="feedback1" class="feedback"></div>
             </div>
@@ -273,8 +273,8 @@
                 <p>Customer wants their company logo in white on navy blue shirts, 3 inches wide, centered on the left chest. Write the production note.</p>
                 <textarea id="practice2" placeholder="Type your note here..."></textarea>
                 <div class="button-group">
-                    <button onclick="checkAnswer(2)">Check Answer</button>
-                    <button class="secondary" onclick="showExample(2)">Show Example</button>
+                    <button data-call="checkAnswer" data-args='[2]'>Check Answer</button>
+                    <button class="secondary" data-call="showExample" data-args='[2]'>Show Example</button>
                 </div>
                 <div id="feedback2" class="feedback"></div>
             </div>
@@ -284,8 +284,8 @@
                 <p>Customer wants to use their own FedEx account #445566 for shipping. Write the appropriate note.</p>
                 <textarea id="practice3" placeholder="Type your note here..."></textarea>
                 <div class="button-group">
-                    <button onclick="checkAnswer(3)">Check Answer</button>
-                    <button class="secondary" onclick="showExample(3)">Show Example</button>
+                    <button data-call="checkAnswer" data-args='[3]'>Check Answer</button>
+                    <button class="secondary" data-call="showExample" data-args='[3]'>Show Example</button>
                 </div>
                 <div id="feedback3" class="feedback"></div>
             </div>
@@ -295,8 +295,8 @@
                 <p>You just sent a purchase order to Sanmar for 50 navy blue t-shirts, PO #12345. How do you write this note? (This scenario addresses RL's most common vague note)</p>
                 <textarea id="practice4" placeholder="Type your note here..."></textarea>
                 <div class="button-group">
-                    <button onclick="checkAnswer(4)">Check Answer</button>
-                    <button class="secondary" onclick="showExample(4)">Show Example</button>
+                    <button data-call="checkAnswer" data-args='[4]'>Check Answer</button>
+                    <button class="secondary" data-call="showExample" data-args='[4]'>Show Example</button>
                 </div>
                 <div id="feedback4" class="feedback"></div>
             </div>
@@ -306,8 +306,8 @@
                 <p>Customer emailed their new logo file for embroidery approval. You attached it to the order. Write the note. (This addresses TH's most common issue)</p>
                 <textarea id="practice5" placeholder="Type your note here..."></textarea>
                 <div class="button-group">
-                    <button onclick="checkAnswer(5)">Check Answer</button>
-                    <button class="secondary" onclick="showExample(5)">Show Example</button>
+                    <button data-call="checkAnswer" data-args='[5]'>Check Answer</button>
+                    <button class="secondary" data-call="showExample" data-args='[5]'>Show Example</button>
                 </div>
                 <div id="feedback5" class="feedback"></div>
             </div>
@@ -362,6 +362,7 @@
         </div>
     </div>
 
+    <script src="/shared_components/js/data-call-delegator.js?v=2026.09.06.29"></script>
     <script src="/training/js/shopworks-notes.js?v=2026.09.05.12"></script>
 </body>
 </html>

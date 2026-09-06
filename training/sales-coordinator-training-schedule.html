@@ -8,9 +8,10 @@
     <link rel="icon" href="/favicon.png" type="image/png">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="/training/css/sales-coordinator-training-schedule.css?v=2026.09.05.12">
+    <link rel="stylesheet" href="/training/css/sales-coordinator-training-schedule.css?v=2026.09.06.30">
 </head>
 <body>
+    <h1 class="sr-only">Sales Coordinator Training Schedule</h1>
     <!-- Header -->
     <header class="header">
         <div class="header-container">
@@ -35,18 +36,18 @@
             <h2>Training Schedule</h2>
             <nav>
                 <ul>
-                    <li><a href="#day1" class="active" onclick="showSection('day1', this)">Day 1: Welcome, Orientation & Setup</a></li>
-                    <li><a href="#day2" onclick="showSection('day2', this)">Day 2: Workstation Setup</a></li>
-                    <li><a href="#day3" onclick="showSection('day3', this)">Day 3: Shopworks Fundamentals</a></li>
-                    <li><a href="#day4" onclick="showSection('day4', this)">Day 4: Practical Shopworks</a></li>
-                    <li><a href="#day5" onclick="showSection('day5', this)">Day 5: Advanced Shopworks</a></li>
-                    <li><a href="#day6" onclick="showSection('day6', this)">Day 6: Order Entry Efficiency</a></li>
-                    <li><a href="#day7" onclick="showSection('day7', this)">Day 7: Factory Training/Artwork</a></li>
-                    <li><a href="#day8" onclick="showSection('day8', this)">Day 8: Job Shadow Nika Day 1</a></li>
-                    <li><a href="#day9" onclick="showSection('day9', this)">Day 9: Job Shadow Nika Day 2</a></li>
-                    <li><a href="#day10" onclick="showSection('day10', this)">Day 10: Full Work Day (8-25-25)</a></li>
-                    <li><a href="#notes-game" onclick="showSection('notes-game', this)">Notes Training Game</a></li>
-                    <li><a href="#log" onclick="showSection('log', this)">Training Log & Action Items</a></li>
+                    <li><a href="#day1" class="active" data-call="showSection" data-args='["day1", "$this"]'>Day 1: Welcome, Orientation & Setup</a></li>
+                    <li><a href="#day2" data-call="showSection" data-args='["day2", "$this"]'>Day 2: Workstation Setup</a></li>
+                    <li><a href="#day3" data-call="showSection" data-args='["day3", "$this"]'>Day 3: Shopworks Fundamentals</a></li>
+                    <li><a href="#day4" data-call="showSection" data-args='["day4", "$this"]'>Day 4: Practical Shopworks</a></li>
+                    <li><a href="#day5" data-call="showSection" data-args='["day5", "$this"]'>Day 5: Advanced Shopworks</a></li>
+                    <li><a href="#day6" data-call="showSection" data-args='["day6", "$this"]'>Day 6: Order Entry Efficiency</a></li>
+                    <li><a href="#day7" data-call="showSection" data-args='["day7", "$this"]'>Day 7: Factory Training/Artwork</a></li>
+                    <li><a href="#day8" data-call="showSection" data-args='["day8", "$this"]'>Day 8: Job Shadow Nika Day 1</a></li>
+                    <li><a href="#day9" data-call="showSection" data-args='["day9", "$this"]'>Day 9: Job Shadow Nika Day 2</a></li>
+                    <li><a href="#day10" data-call="showSection" data-args='["day10", "$this"]'>Day 10: Full Work Day (8-25-25)</a></li>
+                    <li><a href="#notes-game" data-call="showSection" data-args='["notes-game", "$this"]'>Notes Training Game</a></li>
+                    <li><a href="#log" data-call="showSection" data-args='["log", "$this"]'>Training Log & Action Items</a></li>
                 </ul>
             </nav>
             <div style="margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--border-color); font-size: 0.75rem; color: var(--text-secondary); text-align: center;">
@@ -59,7 +60,7 @@
             
             <!-- Day 1 Section -->
             <section id="day1" class="content-section active">
-                <h1>Day 1: Welcome, Orientation & Setup</h1>
+                <h2>Day 1: Welcome, Orientation & Setup</h2>
                 
                 <!-- Employee Onboarding & Paperwork Setup - NEW SECTION -->
                 <div class="card">
@@ -284,7 +285,7 @@
 
             <!-- Day 2 Section -->
             <section id="day2" class="content-section">
-                <h1>Day 2: Workstation Setup</h1>
+                <h2>Day 2: Workstation Setup</h2>
                 <div class="card">
                     <h2>Getting the Sales Coordinator Set Up</h2>
                     <details>
@@ -583,7 +584,7 @@
 
             <!-- Day 3 Section -->
             <section id="day3" class="content-section">
-                 <h1 >Day 3: Shopworks Fundamentals</h1>
+                 <h2 >Day 3: Shopworks Fundamentals</h2>
                  <div class="card">
                     <h2 >Our Training Method: "I Do, We Do, You Do"</h2>
                     <div class="details-content">
@@ -663,7 +664,7 @@
             
             <!-- Day 4 Section -->
             <section id="day4" class="content-section">
-                <h1 >Day 4: Practical Shopworks: Order Creation</h1>
+                <h2 >Day 4: Practical Shopworks: Order Creation</h2>
                 <div class="card">
                     <h2 >Today's Shopworks Training Plan</h2>
                      <details>
@@ -765,7 +766,7 @@
             
             <!-- Day 5 Section -->
             <section id="day5" class="content-section">
-                <h1 >Day 5: Advanced Shopworks</h1>
+                <h2 >Day 5: Advanced Shopworks</h2>
                  <div class="card">
                     <h2 >Revisiting Our Core Values</h2>
                     <div class="details-content">
@@ -831,7 +832,7 @@
 
             <!-- Training Log Section -->
             <section id="log" class="content-section">
-                <h1 >Training Log & Action Items</h1>
+                <h2 >Training Log & Action Items</h2>
                 <div class="card">
                     <h2 >Our Training "Parking Lot"</h2>
                     <div class="details-content">
@@ -914,7 +915,7 @@
             
             <!-- Day 6 Section -->
             <section id="day6" class="content-section">
-                <h1>Day 6: Order Entry Efficiency & Workflow</h1>
+                <h2>Day 6: Order Entry Efficiency & Workflow</h2>
                 <div class="card">
                     <h2>Today's Training Videos</h2>
                     <details>
@@ -949,7 +950,7 @@
 
             <!-- Day 7 Section -->
             <section id="day7" class="content-section">
-                <h1>Day 7: Factory Training/Artwork</h1>
+                <h2>Day 7: Factory Training/Artwork</h2>
                 <div class="card">
                     <h2>Shopworks Training: Designs (ID #1311)</h2>
                     <details>
@@ -1158,7 +1159,7 @@
 
             <!-- Day 8 Section -->
             <section id="day8" class="content-section">
-                <h1>Day 8: Job Shadow Nika Day 1</h1>
+                <h2>Day 8: Job Shadow Nika Day 1</h2>
                 <div class="card">
                     <h2>Financial Training with Bradley</h2>
                     <div class="details-content">
@@ -1249,7 +1250,7 @@
 
             <!-- Day 9 Section -->
             <section id="day9" class="content-section">
-                <h1>Day 9: Job Shadow Nika Day 2</h1>
+                <h2>Day 9: Job Shadow Nika Day 2</h2>
                 <div class="card">
                     <h2>Advanced Sales Techniques</h2>
                     <p>Today you'll continue shadowing Nika with a focus on more complex scenarios:</p>
@@ -1279,7 +1280,7 @@
 
             <!-- Day 10 Section -->
             <section id="day10" class="content-section">
-                <h1>Day 10: Full Work Day</h1>
+                <h2>Day 10: Full Work Day</h2>
                 <div class="card">
                     <h2>Your First Solo Day</h2>
                     <p>Today you'll handle real work independently, with support available when needed.</p>
@@ -1339,7 +1340,7 @@
                     <div class="notes-game-container">
                         <!-- Header -->
                         <div class="notes-game-header">
-                            <h1>📝 Shopworks Notes Training</h1>
+                            <h2>📝 Shopworks Notes Training</h2>
                             <p>Learn how to write effective notes that help the entire team deliver excellent service</p>
                         </div>
 
@@ -1566,8 +1567,8 @@
                                 <p>A customer just called to check on their order status. You told them it will be ready Friday. Where do you put this note and what do you write?</p>
                                 <textarea id="practice1" placeholder="Type your note here..."></textarea>
                                 <div class="button-group">
-                                    <button class="game-button" onclick="checkAnswer(1)">Check Answer</button>
-                                    <button class="game-button secondary" onclick="showExample(1)">Show Example</button>
+                                    <button class="game-button" data-call="checkAnswer" data-args='[1]'>Check Answer</button>
+                                    <button class="game-button secondary" data-call="showExample" data-args='[1]'>Show Example</button>
                                 </div>
                                 <div id="feedback1" class="feedback"></div>
                             </div>
@@ -1577,8 +1578,8 @@
                                 <p>Customer wants their company logo in white on navy blue shirts, 3 inches wide, centered on the left chest. Write the production note.</p>
                                 <textarea id="practice2" placeholder="Type your note here..."></textarea>
                                 <div class="button-group">
-                                    <button class="game-button" onclick="checkAnswer(2)">Check Answer</button>
-                                    <button class="game-button secondary" onclick="showExample(2)">Show Example</button>
+                                    <button class="game-button" data-call="checkAnswer" data-args='[2]'>Check Answer</button>
+                                    <button class="game-button secondary" data-call="showExample" data-args='[2]'>Show Example</button>
                                 </div>
                                 <div id="feedback2" class="feedback"></div>
                             </div>
@@ -1588,8 +1589,8 @@
                                 <p>Customer wants to use their own FedEx account #445566 for shipping. Write the appropriate note.</p>
                                 <textarea id="practice3" placeholder="Type your note here..."></textarea>
                                 <div class="button-group">
-                                    <button class="game-button" onclick="checkAnswer(3)">Check Answer</button>
-                                    <button class="game-button secondary" onclick="showExample(3)">Show Example</button>
+                                    <button class="game-button" data-call="checkAnswer" data-args='[3]'>Check Answer</button>
+                                    <button class="game-button secondary" data-call="showExample" data-args='[3]'>Show Example</button>
                                 </div>
                                 <div id="feedback3" class="feedback"></div>
                             </div>
@@ -1649,6 +1650,7 @@
         </main>
     </div>
 
+    <script src="/shared_components/js/data-call-delegator.js?v=2026.09.06.29"></script>
     <script src="/training/js/sales-coordinator-training-schedule.js?v=2026.09.05.12"></script>
 </body>
 </html>
