@@ -1904,12 +1904,12 @@
 
             extraToggle = document.createElement('button');
             extraToggle.className = 'pmd-extra-slots-toggle';
-            extraToggle.innerHTML = (extraSlotsExpanded ? '<i class="fas fa-chevron-up"></i> Hide Extra Mockups' : '<i class="fas fa-chevron-down"></i> More Mockups (4-6)');
+            extraToggle.innerHTML = (extraSlotsExpanded ? '<i class="fas fa-chevron-up" aria-hidden="true"></i> Hide Extra Mockups' : '<i class="fas fa-chevron-down" aria-hidden="true"></i> More Mockups (4-6)');
             extraToggle.style.cssText = 'width:100%;padding:0.5rem;margin-top:0.5rem;border:1px dashed #ccc;border-radius:6px;background:#f9f9f9;cursor:pointer;color:#666;font-size:0.85rem;display:flex;align-items:center;justify-content:center;gap:0.4rem;';
             extraToggle.addEventListener('click', function () {
                 extraSlotsExpanded = !extraSlotsExpanded;
                 extraContainer.style.display = extraSlotsExpanded ? '' : 'none';
-                extraToggle.innerHTML = extraSlotsExpanded ? '<i class="fas fa-chevron-up"></i> Hide Extra Mockups' : '<i class="fas fa-chevron-down"></i> More Mockups (4-6)';
+                extraToggle.innerHTML = extraSlotsExpanded ? '<i class="fas fa-chevron-up" aria-hidden="true"></i> Hide Extra Mockups' : '<i class="fas fa-chevron-down" aria-hidden="true"></i> More Mockups (4-6)';
             });
         }
 
@@ -4671,7 +4671,7 @@
         reviseAttachedFiles.forEach(function (f, idx) {
             var chip = document.createElement('span');
             chip.className = 'pmd-revise-file-chip';
-            chip.innerHTML = '<i class="fas fa-paperclip"></i> ' + escapeHtml(f.name)
+            chip.innerHTML = '<i class="fas fa-paperclip" aria-hidden="true"></i> ' + escapeHtml(f.name)
                 + ' <span class="pmd-revise-file-chip-remove" data-idx="' + idx + '">&times;</span>';
             chip.querySelector('.pmd-revise-file-chip-remove').onclick = function () {
                 reviseAttachedFiles.splice(idx, 1);

@@ -83,7 +83,7 @@ var MockupAeGallery = (function () {
                     container.innerHTML = '<div style="text-align:center;padding:40px;color:#b91c1c;">'
                         + '<div style="font-size:15px;font-weight:600;">Couldn\'t load Ruth\'s mockups.</div>'
                         + '<div style="font-size:13px;color:#6b7280;margin:6px 0 12px;">The server said: ' + escapeHtml(err.message) + '. Nothing is lost — try again in a moment.</div>'
-                        + '<button onclick="MockupAeGallery.init(\'' + containerId + '\')" '
+                        + '<button data-call="MockupAeGallery.init" data-args="[&quot;' + containerId + '&quot;]" '
                         + 'style="padding:9px 18px;border:none;border-radius:8px;background:var(--art-theme, #6B46C1);color:white;cursor:pointer;font-weight:600;font-family:inherit;">Try again</button>'
                         + '</div>';
                 }
@@ -458,7 +458,7 @@ var MockupAeGallery = (function () {
             thumbHtml = '<div class="card-thumb">'
                 + '<img src="' + escapeHtml(thumbDisplayUrl) + '" alt="Mockup preview" loading="lazy"'
                 + ' data-original-src="' + escapeHtml(thumbDisplayUrl) + '"'
-                + ' onerror="if(window.ArtActions&&window.ArtActions.handleBoxImageError){window.ArtActions.handleBoxImageError(this);}else{this.parentElement.style.display=\'none\';}">'
+                + ' data-onerror="call:ArtActions.handleBoxImageError" data-onerror-else="hide-parent">'
                 + '</div>';
         }
 
@@ -626,7 +626,7 @@ var MockupAeGallery = (function () {
         var thumbHtml = '';
         if (m.Box_Mockup_1) {
             var kanbanThumbUrl = resolveBoxUrl(m.Box_Mockup_1);
-            thumbHtml = '<img class="kanban-card-thumb" src="' + escapeHtml(kanbanThumbUrl) + '" loading="lazy" data-original-src="' + escapeHtml(kanbanThumbUrl) + '" onerror="if(window.ArtActions&&window.ArtActions.handleBoxImageError){window.ArtActions.handleBoxImageError(this);}else{this.style.display=\'none\';}" alt="">';
+            thumbHtml = '<img class="kanban-card-thumb" src="' + escapeHtml(kanbanThumbUrl) + '" loading="lazy" data-original-src="' + escapeHtml(kanbanThumbUrl) + '" data-onerror="call:ArtActions.handleBoxImageError" data-onerror-else="hide" alt="">';
         }
 
         var kanbanElapsed = (typeof ElapsedTimeUtils !== 'undefined')
@@ -634,7 +634,7 @@ var MockupAeGallery = (function () {
             : '';
 
         var hiddenStyle = hidden ? ' style="display: none"' : '';
-        return '<div class="kanban-card" data-mockup-id="' + id + '"' + hiddenStyle + ' onclick="window.open(\'/mockup/' + id + '?view=ae\', \'_blank\')">'
+        return '<div class="kanban-card" data-mockup-id="' + id + '"' + hiddenStyle + ' data-open="/mockup/' + id + '?view=ae">'
             + '<div class="kanban-card-company">' + company + kanbanElapsed + '</div>'
             + (designNum ? '<div class="kanban-card-design">#' + designNum + '</div>' : '')
             + '<div class="kanban-card-meta">'
@@ -719,14 +719,14 @@ var MockupAeGallery = (function () {
             if (isCompleted && colCards.length > COMPLETED_SHOW_LIMIT) {
                 cardsHtml = colCards.slice(0, COMPLETED_SHOW_LIMIT).map(function (m) { return renderMockupKanbanCard(m, false); }).join('');
                 cardsHtml += colCards.slice(COMPLETED_SHOW_LIMIT).map(function (m) { return renderMockupKanbanCard(m, true); }).join('');
-                cardsHtml += '<div class="kanban-show-all" onclick="event.stopPropagation(); window.kanbanShowAll(\'' + col.id + '\')">Show all ' + colCards.length + ' items</div>';
+                cardsHtml += '<div class="kanban-show-all" data-call="kanbanShowAll" data-args="[&quot;' + col.id + '&quot;]" data-stop="1">Show all ' + colCards.length + ' items</div>';
             } else {
                 cardsHtml = colCards.map(function (m) { return renderMockupKanbanCard(m, false); }).join('');
             }
 
             var chevron = isCompleted ? '<span class="kanban-collapse-chevron">&#9660;</span>' : '';
             var collapseClass = (isCompleted && completedCollapsed) ? ' kanban-column--collapsed' : '';
-            var clickHandler = isCompleted ? ' onclick="window.toggleKanbanCollapse(\'' + col.id + '\', \'ruthAeKanbanCompletedCollapsed\')"' : '';
+            var clickHandler = isCompleted ? ' data-call="toggleKanbanCollapse" data-args="[&quot;' + col.id + '&quot;, &quot;ruthAeKanbanCompletedCollapsed&quot;]"' : '';
 
             return '<div class="kanban-column kanban-column--' + col.id + collapseClass + '">'
                 + '<div class="kanban-column-header"' + clickHandler + '>'

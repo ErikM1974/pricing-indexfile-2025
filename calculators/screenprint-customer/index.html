@@ -10,29 +10,29 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     
     <!-- Shared Calculator Styles -->
-    <link href="/shared_components/css/calculator-base.css" rel="stylesheet">
+    <link href="/shared_components/css/calculator-base.css?v=2026.09.06.26" rel="stylesheet">
     <!-- Screen Print Customer-Specific Styles -->
-    <link href="/calculators/screenprint-customer/screenprint-customer-styles.css" rel="stylesheet">
+    <link href="/calculators/screenprint-customer/screenprint-customer-styles.css?v=2026.09.06.26" rel="stylesheet">
     <!-- Screen Print Customer Fix CSS - Professional styling with NWCA green theme -->
-    <link href="/calculators/screenprint-customer/screenprint-customer-fix.css" rel="stylesheet">
+    <link href="/calculators/screenprint-customer/screenprint-customer-fix.css?v=2026.09.06.26" rel="stylesheet">
     
     <!-- EmailJS SDK -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     
     <!-- Base Quote Service -->
-    <script src="/shared_components/js/base-quote-service.js"></script>
+    <script src="/shared_components/js/base-quote-service.js?v=2026.09.06.26"></script>
     <!-- Calculator Utilities -->
-    <script src="/shared_components/js/calculator-utilities.js"></script>
+    <script src="/shared_components/js/calculator-utilities.js?v=2026.09.06.26"></script>
     <!-- Live Screen Print pricing authority (Caspio-backed) — SAME service Quick Quote
          and the staff Screen Print Quote Builder use. Pricing = API, never hardcoded. -->
-    <script src="/shared_components/js/screenprint-pricing-service.js"></script>
+    <script src="/shared_components/js/screenprint-pricing-service.js?v=2026.09.06.27"></script>
     <!-- Shared pricing engine (screens/stripes/LTM/tier logic) — one engine, 3+ surfaces -->
-    <script src="/shared_components/js/quote-cart-engine.js"></script>
+    <script src="/shared_components/js/quote-cart-engine.js?v=2026.09.06.26"></script>
     <!-- Customer Screen Print Quote Service -->
-    <script src="/shared_components/js/data-call-delegator.js"></script>
-    <script src="/calculators/screenprint-customer/screenprint-customer-quote-service.js"></script>
+    <script src="/shared_components/js/data-call-delegator.js?v=2026.09.06.27"></script>
+    <script src="/calculators/screenprint-customer/screenprint-customer-quote-service.js?v=2026.09.06.26"></script>
     <!-- Screen Print Calculator Class -->
-    <script src="/calculators/screenprint-customer/screenprint-customer-calculator.js"></script>
+    <script src="/calculators/screenprint-customer/screenprint-customer-calculator.js?v=2026.09.06.27"></script>
 </head>
 <body>
     <!-- Header -->
@@ -64,7 +64,7 @@
                              title="Professional Screen Printing on Your Garments">
                     </div>
                     <div class="product-showcase-content">
-                        <h3><i class="fas fa-star"></i> Screen Printing on Your Items</h3>
+                        <h3><i class="fas fa-star" aria-hidden="true"></i> Screen Printing on Your Items</h3>
                         <p style="color: var(--text-secondary); margin-bottom: 1rem;">
                             Bring us your garments and we'll apply professional screen printing that makes your brand pop. 
                             Perfect for teams with existing apparel, special events, or when you need to match specific 
@@ -72,19 +72,19 @@
                         </p>
                         <div class="product-features">
                             <div class="feature-item">
-                                <i class="fas fa-check-circle"></i>
+                                <i class="fas fa-check-circle" aria-hidden="true"></i>
                                 <span>Up to 6 colors</span>
                             </div>
                             <div class="feature-item">
-                                <i class="fas fa-check-circle"></i>
+                                <i class="fas fa-check-circle" aria-hidden="true"></i>
                                 <span>Safety stripes available</span>
                             </div>
                             <div class="feature-item">
-                                <i class="fas fa-check-circle"></i>
+                                <i class="fas fa-check-circle" aria-hidden="true"></i>
                                 <span>Dark garment printing</span>
                             </div>
                             <div class="feature-item">
-                                <i class="fas fa-check-circle"></i>
+                                <i class="fas fa-check-circle" aria-hidden="true"></i>
                                 <span>Bulk discounts</span>
                             </div>
                         </div>
@@ -156,11 +156,11 @@
                     <div class="tier-ladder" id="tierLadder" style="display:none;"></div>
                     <div class="quote-actions" id="quoteActions" style="display: none;">
                         <button type="button" class="btn btn-secondary" data-call="printQuote">
-                            <i class="fas fa-print"></i>
+                            <i class="fas fa-print" aria-hidden="true"></i>
                             Print Quote
                         </button>
                         <button type="button" class="btn btn-primary" id="sendQuoteBtn">
-                            <i class="fas fa-paper-plane"></i>
+                            <i class="fas fa-paper-plane" aria-hidden="true"></i>
                             Send Quote
                         </button>
                     </div>
@@ -240,7 +240,7 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-call="closeQuoteModal">Cancel</button>
                 <button type="submit" form="quoteForm" class="btn btn-primary" id="submitQuoteBtn">
-                    <i class="fas fa-paper-plane"></i>
+                    <i class="fas fa-paper-plane" aria-hidden="true"></i>
                     Send Quote
                 </button>
             </div>
@@ -251,7 +251,7 @@
     <div class="modal-overlay" id="successModal">
         <div class="modal-content">
             <div class="modal-header success">
-                <i class="fas fa-check-circle success-icon"></i>
+                <i class="fas fa-check-circle success-icon" aria-hidden="true"></i>
                 <h2 style="color: var(--success-text); margin-top: 1rem;">Quote Sent Successfully!</h2>
             </div>
             <div class="modal-body">
@@ -276,18 +276,18 @@
                 
                 <div style="text-align: center;">
                     <button type="button" class="btn btn-secondary" data-call="copyQuoteId">
-                        <i class="fas fa-copy"></i>
+                        <i class="fas fa-copy" aria-hidden="true"></i>
                         Copy Quote ID
                     </button>
                 </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-call="printQuote">
-                    <i class="fas fa-print"></i>
+                    <i class="fas fa-print" aria-hidden="true"></i>
                     Print Quote
                 </button>
                 <button type="button" class="btn btn-primary" data-call="closeSuccessModal">
-                    <i class="fas fa-check"></i>
+                    <i class="fas fa-check" aria-hidden="true"></i>
                     Done
                 </button>
             </div>

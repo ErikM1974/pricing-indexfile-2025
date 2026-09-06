@@ -187,7 +187,7 @@
                     const wrap = document.createElement('div');
                     wrap.className = 'tt-mermaid-block';
                     wrap.innerHTML = `
-                        <div class="tt-mermaid-label"><i class="fas fa-diagram-project"></i> Mermaid diagram</div>
+                        <div class="tt-mermaid-label"><i class="fas fa-diagram-project" aria-hidden="true"></i> Mermaid diagram</div>
                         <pre class="tt-mermaid-source">${node.attrs.source.replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]))}</pre>
                         <button type="button" class="tt-mermaid-edit-btn">Edit diagram</button>
                     `;
@@ -323,47 +323,47 @@
     function buildToolbarHtml() {
         return `
             <div class="tt-toolbar" role="toolbar" aria-label="Formatting">
-                <button type="button" data-cmd="bold" title="Bold (Ctrl+B)"><i class="fas fa-bold"></i></button>
-                <button type="button" data-cmd="italic" title="Italic (Ctrl+I)"><i class="fas fa-italic"></i></button>
-                <button type="button" data-cmd="strike" title="Strikethrough"><i class="fas fa-strikethrough"></i></button>
-                <button type="button" data-cmd="code" title="Inline code"><i class="fas fa-code"></i></button>
+                <button type="button" data-cmd="bold" title="Bold (Ctrl+B)"><i class="fas fa-bold" aria-hidden="true"></i></button>
+                <button type="button" data-cmd="italic" title="Italic (Ctrl+I)"><i class="fas fa-italic" aria-hidden="true"></i></button>
+                <button type="button" data-cmd="strike" title="Strikethrough"><i class="fas fa-strikethrough" aria-hidden="true"></i></button>
+                <button type="button" data-cmd="code" title="Inline code"><i class="fas fa-code" aria-hidden="true"></i></button>
                 <span class="tt-sep"></span>
                 <button type="button" data-cmd="h1" title="Heading 1">H1</button>
                 <button type="button" data-cmd="h2" title="Heading 2">H2</button>
                 <button type="button" data-cmd="h3" title="Heading 3">H3</button>
                 <span class="tt-sep"></span>
-                <button type="button" data-cmd="bulletList" title="Bullet list"><i class="fas fa-list-ul"></i></button>
-                <button type="button" data-cmd="orderedList" title="Numbered list"><i class="fas fa-list-ol"></i></button>
-                <button type="button" data-cmd="blockquote" title="Quote"><i class="fas fa-quote-right"></i></button>
-                <button type="button" data-cmd="codeBlock" title="Code block"><i class="fas fa-file-code"></i></button>
+                <button type="button" data-cmd="bulletList" title="Bullet list"><i class="fas fa-list-ul" aria-hidden="true"></i></button>
+                <button type="button" data-cmd="orderedList" title="Numbered list"><i class="fas fa-list-ol" aria-hidden="true"></i></button>
+                <button type="button" data-cmd="blockquote" title="Quote"><i class="fas fa-quote-right" aria-hidden="true"></i></button>
+                <button type="button" data-cmd="codeBlock" title="Code block"><i class="fas fa-file-code" aria-hidden="true"></i></button>
                 <span class="tt-sep"></span>
-                <button type="button" data-cmd="link" title="Add link"><i class="fas fa-link"></i></button>
-                <button type="button" data-cmd="imageUpload" title="Upload image"><i class="fas fa-image"></i></button>
-                <button type="button" data-cmd="videoEmbed" title="Embed YouTube / Loom / Vimeo video"><i class="fas fa-video"></i></button>
-                <button type="button" data-cmd="mermaidDiagram" title="Insert a flowchart / diagram (Mermaid)"><i class="fas fa-diagram-project"></i></button>
+                <button type="button" data-cmd="link" title="Add link"><i class="fas fa-link" aria-hidden="true"></i></button>
+                <button type="button" data-cmd="imageUpload" title="Upload image"><i class="fas fa-image" aria-hidden="true"></i></button>
+                <button type="button" data-cmd="videoEmbed" title="Embed YouTube / Loom / Vimeo video"><i class="fas fa-video" aria-hidden="true"></i></button>
+                <button type="button" data-cmd="mermaidDiagram" title="Insert a flowchart / diagram (Mermaid)"><i class="fas fa-diagram-project" aria-hidden="true"></i></button>
                 <span class="tt-dropdown" data-dropdown="callout">
                     <button type="button" class="tt-dropdown-trigger" title="Insert callout box (Tip / Warning / Important / Note)">
-                        <i class="fas fa-comment-dots"></i> <i class="fas fa-caret-down tt-dropdown-caret"></i>
+                        <i class="fas fa-comment-dots" aria-hidden="true"></i> <i class="fas fa-caret-down tt-dropdown-caret" aria-hidden="true"></i>
                     </button>
                     <div class="tt-dropdown-menu" role="menu">
-                        <button type="button" data-cmd="callout-tip"><i class="fas fa-lightbulb"></i> Tip</button>
-                        <button type="button" data-cmd="callout-warning"><i class="fas fa-triangle-exclamation"></i> Warning</button>
-                        <button type="button" data-cmd="callout-important"><i class="fas fa-bullhorn"></i> Important</button>
-                        <button type="button" data-cmd="callout-info"><i class="fas fa-circle-info"></i> Note</button>
+                        <button type="button" data-cmd="callout-tip"><i class="fas fa-lightbulb" aria-hidden="true"></i> Tip</button>
+                        <button type="button" data-cmd="callout-warning"><i class="fas fa-triangle-exclamation" aria-hidden="true"></i> Warning</button>
+                        <button type="button" data-cmd="callout-important"><i class="fas fa-bullhorn" aria-hidden="true"></i> Important</button>
+                        <button type="button" data-cmd="callout-info"><i class="fas fa-circle-info" aria-hidden="true"></i> Note</button>
                     </div>
                 </span>
-                <button type="button" data-cmd="table" title="Insert table"><i class="fas fa-table"></i></button>
+                <button type="button" data-cmd="table" title="Insert table"><i class="fas fa-table" aria-hidden="true"></i></button>
                 <span class="tt-sep"></span>
-                <button type="button" data-cmd="hr" title="Horizontal rule"><i class="fas fa-minus"></i></button>
-                <button type="button" data-cmd="undo" title="Undo (Ctrl+Z)"><i class="fas fa-undo"></i></button>
-                <button type="button" data-cmd="redo" title="Redo (Ctrl+Shift+Z)"><i class="fas fa-redo"></i></button>
+                <button type="button" data-cmd="hr" title="Horizontal rule"><i class="fas fa-minus" aria-hidden="true"></i></button>
+                <button type="button" data-cmd="undo" title="Undo (Ctrl+Z)"><i class="fas fa-undo" aria-hidden="true"></i></button>
+                <button type="button" data-cmd="redo" title="Redo (Ctrl+Shift+Z)"><i class="fas fa-redo" aria-hidden="true"></i></button>
                 <span class="tt-sep"></span>
                 <button type="button" data-cmd="source" class="tt-source-btn" title="View / edit raw HTML source — needed when pasting NWCA-styled docs (.nwca-doc) so custom classes survive">
-                    <i class="fas fa-code"></i> <span class="tt-source-label">Source</span>
+                    <i class="fas fa-code" aria-hidden="true"></i> <span class="tt-source-label">Source</span>
                 </button>
                 <span class="tt-sep"></span>
                 <button type="button" data-cmd="aiAssist" class="tt-ai-btn" title="AI Assist — let Claude help you write or polish">
-                    <i class="fas fa-sparkles"></i> <span class="tt-ai-label">AI</span>
+                    <i class="fas fa-sparkles" aria-hidden="true"></i> <span class="tt-ai-label">AI</span>
                 </button>
                 <input type="file" accept="image/*" class="tt-file-input" hidden>
             </div>
@@ -674,7 +674,7 @@
             <div class="tt-editor"></div>
             <div class="tt-source-host" style="display:none;">
                 <div class="tt-source-banner">
-                    <i class="fas fa-code"></i>
+                    <i class="fas fa-code" aria-hidden="true"></i>
                     <span><strong>Source mode</strong> — raw HTML. Custom classes (e.g. <code>.nwca-doc</code>) and semantic tags survive save in this mode. Click <strong>Source</strong> again to return to WYSIWYG (will strip custom classes).</span>
                 </div>
                 <textarea class="tt-source" spellcheck="false" autocomplete="off" placeholder="<div class='nwca-doc'>&#10;  <header class='masthead'>...</header>&#10;  ...&#10;</div>"></textarea>

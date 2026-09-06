@@ -182,7 +182,7 @@ async function loadCart() {
         // Show loading indicator
         container.innerHTML = `
             <div style="text-align: center; padding: 3rem;">
-                <i class="fas fa-circle-notch fa-spin" style="font-size: 2rem; color: var(--primary-color);"></i>
+                <i class="fas fa-circle-notch fa-spin" style="font-size: 2rem; color: var(--primary-color);" aria-hidden="true"></i>
                 <p style="margin-top: 1rem; color: var(--text-secondary);">Checking inventory...</p>
             </div>
         `;

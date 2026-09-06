@@ -1,0 +1,7 @@
+/* elapsed-time-utils.css — extracted 2026-09-06 from the <style> block(s) elapsed-time-utils.js used to inject (Rule 3). */
+.elapsed-badge { display: inline-block; font-size: 12px; padding: 2px 8px; border-radius: 10px; margin-top: 4px; }
+.elapsed--fresh { color: #16a34a; background: #f0fdf4; }
+.elapsed--waiting { color: #d97706; background: #fffbeb; }
+.elapsed--overdue { color: #dc2626; background: #fef2f2; font-weight: 600; }
+.kanban-elapsed { display: inline-block; font-size: 10px; padding: 1px 5px; border-radius: 8px; margin-left: 6px; font-weight: 600; }
+\n

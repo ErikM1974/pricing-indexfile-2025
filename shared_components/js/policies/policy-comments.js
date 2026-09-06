@@ -65,13 +65,13 @@
         host.style.display = '';
         host.innerHTML = `
             <h2 class="comments-title">
-                <i class="fas fa-comments"></i> Discussion
+                <i class="fas fa-comments" aria-hidden="true"></i> Discussion
                 <span class="comments-count" id="commentsCount"></span>
             </h2>
             <p class="comments-intro">Ask questions, share examples, or comment on this policy. ${isAdmin ? '<strong>You can resolve and hide comments as admin.</strong>' : ''}</p>
 
             <div class="comments-thread" id="commentsThread">
-                <div class="comments-loading"><i class="fas fa-circle-notch fa-spin"></i> Loading discussion…</div>
+                <div class="comments-loading"><i class="fas fa-circle-notch fa-spin" aria-hidden="true"></i> Loading discussion…</div>
             </div>
 
             ${authorName ? `
@@ -94,17 +94,17 @@
                     ></textarea>
                     <div class="comments-form-actions">
                         <button type="button" class="comments-polish-btn" id="commentsPolish" title="Let Claude polish your comment before posting">
-                            <i class="fas fa-sparkles"></i> Polish with AI
+                            <i class="fas fa-sparkles" aria-hidden="true"></i> Polish with AI
                         </button>
                         <span class="comments-form-status" id="commentsFormStatus"></span>
                         <button type="submit" class="btn btn-primary" id="commentsSubmit">
-                            <i class="fas fa-paper-plane"></i> Post
+                            <i class="fas fa-paper-plane" aria-hidden="true"></i> Post
                         </button>
                     </div>
                 </form>
             ` : `
                 <div class="comments-locked">
-                    <i class="fas fa-lock"></i> Log in via the staff dashboard to post a comment.
+                    <i class="fas fa-lock" aria-hidden="true"></i> Log in via the staff dashboard to post a comment.
                 </div>
             `}
         `;
@@ -159,14 +159,14 @@
             renderThread(state);
         } catch (e) {
             console.error('[comments] load error:', e);
-            thread.innerHTML = `<div class="comments-empty"><i class="fas fa-triangle-exclamation"></i> Could not load discussion: ${escapeHtml(e.message)}</div>`;
+            thread.innerHTML = `<div class="comments-empty"><i class="fas fa-triangle-exclamation" aria-hidden="true"></i> Could not load discussion: ${escapeHtml(e.message)}</div>`;
         }
     }
 
     function renderThread(state) {
         const thread = document.getElementById('commentsThread');
         if (state.comments.length === 0) {
-            thread.innerHTML = `<div class="comments-empty"><i class="fas fa-comment-slash"></i> No discussion yet. Start the conversation below.</div>`;
+            thread.innerHTML = `<div class="comments-empty"><i class="fas fa-comment-slash" aria-hidden="true"></i> No discussion yet. Start the conversation below.</div>`;
             return;
         }
 
@@ -199,14 +199,14 @@
         const isResolved = c.Status === 'Resolved';
         const adminActions = state.isAdmin ? `
             <div class="comment-admin-actions">
-                ${isQuestion && !isResolved ? `<button type="button" class="comment-action-btn" data-action="resolve" data-id="${escapeHtml(c.Comment_ID)}"><i class="fas fa-check"></i> Mark resolved</button>` : ''}
-                <button type="button" class="comment-action-btn" data-action="hide" data-id="${escapeHtml(c.Comment_ID)}"><i class="fas fa-eye-slash"></i> Hide</button>
+                ${isQuestion && !isResolved ? `<button type="button" class="comment-action-btn" data-action="resolve" data-id="${escapeHtml(c.Comment_ID)}"><i class="fas fa-check" aria-hidden="true"></i> Mark resolved</button>` : ''}
+                <button type="button" class="comment-action-btn" data-action="hide" data-id="${escapeHtml(c.Comment_ID)}"><i class="fas fa-eye-slash" aria-hidden="true"></i> Hide</button>
             </div>
         ` : '';
 
         const replyBtn = state.authorName && !isReply ? `
             <button type="button" class="comment-action-btn comment-reply-btn" data-action="reply" data-id="${escapeHtml(c.Comment_ID)}" data-author="${escapeHtml(c.Author_Name)}">
-                <i class="fas fa-reply"></i> Reply
+                <i class="fas fa-reply" aria-hidden="true"></i> Reply
             </button>
         ` : '';
 
@@ -219,8 +219,8 @@
                 <div class="comment-body">
                     <div class="comment-meta">
                         <span class="comment-author">${escapeHtml(c.Author_Name || 'Anonymous')}</span>
-                        ${isQuestion ? '<span class="comment-tag comment-tag-question"><i class="fas fa-question-circle"></i> Question</span>' : ''}
-                        ${isResolved ? '<span class="comment-tag comment-tag-resolved"><i class="fas fa-check-circle"></i> Resolved</span>' : ''}
+                        ${isQuestion ? '<span class="comment-tag comment-tag-question"><i class="fas fa-question-circle" aria-hidden="true"></i> Question</span>' : ''}
+                        ${isResolved ? '<span class="comment-tag comment-tag-resolved"><i class="fas fa-check-circle" aria-hidden="true"></i> Resolved</span>' : ''}
                         <span class="comment-date" title="${escapeHtml(c.Created_At || '')}">${escapeHtml(relativeTime(c.Created_At))}</span>
                     </div>
                     <div class="comment-text">${bodyHtml}</div>
@@ -281,7 +281,7 @@
         if (!body) return;
         body.focus();
         if (status) {
-            status.innerHTML = `<i class="fas fa-reply"></i> Replying to <strong>${escapeHtml(authorName)}</strong> · <button type="button" class="comments-cancel-reply" id="commentsCancelReply">cancel</button>`;
+            status.innerHTML = `<i class="fas fa-reply" aria-hidden="true"></i> Replying to <strong>${escapeHtml(authorName)}</strong> · <button type="button" class="comments-cancel-reply" id="commentsCancelReply">cancel</button>`;
             document.getElementById('commentsCancelReply').addEventListener('click', () => {
                 state.replyingTo = null;
                 status.innerHTML = '';
@@ -307,13 +307,13 @@
             e.preventDefault();
             const text = (bodyInput.value || '').trim();
             if (!text) {
-                statusEl.innerHTML = `<i class="fas fa-circle-info"></i> Add a comment first.`;
+                statusEl.innerHTML = `<i class="fas fa-circle-info" aria-hidden="true"></i> Add a comment first.`;
                 return;
             }
 
             submitBtn.disabled = true;
             const originalLabel = submitBtn.innerHTML;
-            submitBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Posting…';
+            submitBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin" aria-hidden="true"></i> Posting…';
             statusEl.innerHTML = '';
 
             try {
@@ -337,11 +337,11 @@
                 bodyInput.value = '';
                 if (isQuestionCb) isQuestionCb.checked = false;
                 state.replyingTo = null;
-                statusEl.innerHTML = `<i class="fas fa-check-circle"></i> Posted`;
+                statusEl.innerHTML = `<i class="fas fa-check-circle" aria-hidden="true"></i> Posted`;
                 setTimeout(() => { if (statusEl.innerHTML.includes('Posted')) statusEl.innerHTML = ''; }, 2500);
                 await loadComments(state);
             } catch (err) {
-                statusEl.innerHTML = `<i class="fas fa-triangle-exclamation"></i> ${escapeHtml(err.message)}`;
+                statusEl.innerHTML = `<i class="fas fa-triangle-exclamation" aria-hidden="true"></i> ${escapeHtml(err.message)}`;
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = originalLabel;
@@ -356,19 +356,19 @@
                 polishBtn.addEventListener('click', async () => {
                     const draft = (bodyInput.value || '').trim();
                     if (!draft) {
-                        statusEl.innerHTML = `<i class="fas fa-circle-info"></i> Write a draft first, then Claude can polish it.`;
+                        statusEl.innerHTML = `<i class="fas fa-circle-info" aria-hidden="true"></i> Write a draft first, then Claude can polish it.`;
                         return;
                     }
                     polishBtn.disabled = true;
                     const orig = polishBtn.innerHTML;
-                    polishBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i>';
+                    polishBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin" aria-hidden="true"></i>';
                     statusEl.innerHTML = '';
                     try {
                         const polished = await polishComment(draft);
                         bodyInput.value = polished;
-                        statusEl.innerHTML = `<i class="fas fa-check-circle"></i> Polished — review and tweak before posting`;
+                        statusEl.innerHTML = `<i class="fas fa-check-circle" aria-hidden="true"></i> Polished — review and tweak before posting`;
                     } catch (e) {
-                        statusEl.innerHTML = `<i class="fas fa-triangle-exclamation"></i> ${escapeHtml(e.message)}`;
+                        statusEl.innerHTML = `<i class="fas fa-triangle-exclamation" aria-hidden="true"></i> ${escapeHtml(e.message)}`;
                     } finally {
                         polishBtn.disabled = false;
                         polishBtn.innerHTML = orig;

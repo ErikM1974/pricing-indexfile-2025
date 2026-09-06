@@ -321,7 +321,7 @@
                   ' alt="" title="Click to view larger"' +
                   ' onerror="this.style.display=\'none\'">'
                 : '<div class="sjd-line-thumb sjd-line-thumb--placeholder">' +
-                    '<i class="fas fa-' + (line.Line_Type === 'SHIPPING' ? 'truck' : line.Line_Type === 'FEE' ? 'tag' : 'image') + '"></i>' +
+                    '<i class="fas fa-' + (line.Line_Type === 'SHIPPING' ? 'truck' : line.Line_Type === 'FEE' ? 'tag' : 'image') + '" aria-hidden="true"></i>' +
                   '</div>';
 
             var qtyPrice = (line.Quantity != null && line.Unit_Price != null)
@@ -451,7 +451,7 @@
             $('sjd-linked-card').style.display = '';
             $('sjd-linked-list').innerHTML =
                 '<div class="sjd-linked-item" role="alert">' +
-                    '<i class="fas fa-triangle-exclamation" style="color:#c0392b;"></i>' +
+                    '<i class="fas fa-triangle-exclamation" style="color:#c0392b;" aria-hidden="true"></i>' +
                     '<div class="sjd-linked-info">' +
                         '<div class="sjd-linked-design">Couldn’t load linked transfers</div>' +
                         '<div class="sjd-linked-company">' + escapeHtml(state.linkedTransfersError) +
@@ -476,7 +476,7 @@
                 '<div class="sjd-linked-status">' +
                     '<span class="sc-status-badge">' + escapeHtml(t.Status || '') + '</span>' +
                 '</div>' +
-                '<i class="fas fa-chevron-right" style="color:#adb5bd;"></i>' +
+                '<i class="fas fa-chevron-right" style="color:#adb5bd;" aria-hidden="true"></i>' +
             '</a>';
         }).join('');
     }
@@ -508,7 +508,7 @@
             else if (et.indexOf('cancel') !== -1) iconClass = 'fa-times-circle';
 
             return '<div class="sjd-history-item">' +
-                '<div class="sjd-history-icon"><i class="fas ' + iconClass + '"></i></div>' +
+                '<div class="sjd-history-icon"><i class="fas ' + iconClass + '" aria-hidden="true"></i></div>' +
                 '<div class="sjd-history-body">' +
                     '<div class="sjd-history-type">' + escapeHtml(ev.Event_Type || '') + '</div>' +
                     (ev.Event_Detail ? '<div class="sjd-history-detail">' + escapeHtml(ev.Event_Detail) + '</div>' : '') +
@@ -566,7 +566,7 @@
         $('sjd-paste-preview').style.display = '';
         $('sjd-paste-apply').disabled = true;
 
-        showExtractStatus('<i class="fas fa-spinner fa-spin"></i> Reading screenshot with Claude Vision…', 'info');
+        showExtractStatus('<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Reading screenshot with Claude Vision…', 'info');
 
         try {
             var result = await extractJobDetail(dataUri);
@@ -577,7 +577,7 @@
             var current = state.job.Supacolor_Job_Number;
             if (d.supacolorJobNumber && current && String(d.supacolorJobNumber) !== String(current)) {
                 showExtractStatus(
-                    '<i class="fas fa-exclamation-triangle"></i> Extracted job number <strong>#' +
+                    '<i class="fas fa-exclamation-triangle" aria-hidden="true"></i> Extracted job number <strong>#' +
                     escapeHtml(d.supacolorJobNumber) + '</strong> does not match this job (#' + escapeHtml(current) + '). ' +
                     'Apply anyway only if you know what you\'re doing.',
                     'error'
@@ -594,14 +594,14 @@
 
                 if (thinExtraction) {
                     showExtractStatus(
-                        '<i class="fas fa-exclamation-triangle"></i> Vision extracted ' + (result.duration || 0) + 'ms — ' +
+                        '<i class="fas fa-exclamation-triangle" aria-hidden="true"></i> Vision extracted ' + (result.duration || 0) + 'ms — ' +
                         '<strong>but found 0 joblines and 0 history events.</strong> ' +
                         'The screenshot may be too small or cropped. Try a fresh full-page screenshot of the entire job detail page.',
                         'error'
                     );
                 } else {
                     showExtractStatus(
-                        '<i class="fas fa-check-circle"></i> Extracted in ' + (result.duration || 0) + 'ms · ' +
+                        '<i class="fas fa-check-circle" aria-hidden="true"></i> Extracted in ' + (result.duration || 0) + 'ms · ' +
                         summary.join(' · '),
                         'success'
                     );
@@ -620,7 +620,7 @@
         } catch (err) {
             console.error('[SupacolorJobDetail] Extraction failed:', err);
             showExtractStatus(
-                '<i class="fas fa-exclamation-triangle"></i> ' + escapeHtml(err.message || 'Extraction failed'),
+                '<i class="fas fa-exclamation-triangle" aria-hidden="true"></i> ' + escapeHtml(err.message || 'Extraction failed'),
                 'error'
             );
         }
@@ -675,7 +675,7 @@
         var btn = $('sjd-paste-apply');
         var orig = btn.innerHTML;
         btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving…';
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Saving…';
 
         try {
             // 1. Upsert top-level job fields
@@ -791,7 +791,7 @@
         t.className = 'bt-toast bt-toast--' + (kind || 'info');
         t.innerHTML = '<i class="fas fa-' + (kind === 'error' ? 'exclamation-triangle' :
                                               kind === 'success' ? 'check-circle' : 'info-circle') +
-                      '"></i> ' + escapeHtml(message);
+                      '" aria-hidden="true"></i> ' + escapeHtml(message);
         c.appendChild(t);
         setTimeout(function () { t.classList.add('bt-toast--show'); }, 10);
         setTimeout(function () {
@@ -837,7 +837,7 @@
         var btn = $('sjd-status-save');
         var orig = btn.innerHTML;
         btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving…';
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Saving…';
         try {
             await updateJobStatus(state.idJob, newStatus);
             showToast('Status changed to ' + newStatus, 'success');
@@ -888,7 +888,7 @@
         var btn = $('sjd-delete-confirm');
         var orig = btn.innerHTML;
         btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting…';
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Deleting…';
         try {
             await deleteJob(state.idJob);
             showToast('Job deleted', 'success');
@@ -909,7 +909,7 @@
         var params = new URLSearchParams(window.location.search);
         state.idJob = params.get('id');
         if (!state.idJob) {
-            $('sjd-loading').innerHTML = '<i class="fas fa-exclamation-triangle"></i> Missing ?id=&lt;ID_Job&gt; in URL.';
+            $('sjd-loading').innerHTML = '<i class="fas fa-exclamation-triangle" aria-hidden="true"></i> Missing ?id=&lt;ID_Job&gt; in URL.';
             return;
         }
 
@@ -922,7 +922,7 @@
             var btn = $('sjd-api-refresh-btn');
             var orig = btn.innerHTML;
             btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Refreshing…';
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Refreshing…';
             try {
                 var result = await syncJobFromSupacolorApi(state.job.Supacolor_Job_Number);
                 showToast(
@@ -1026,7 +1026,7 @@
             });
         } catch (err) {
             console.error('Load failed:', err);
-            $('sjd-loading').innerHTML = '<i class="fas fa-exclamation-triangle"></i> ' + escapeHtml(err.message || 'Failed to load job');
+            $('sjd-loading').innerHTML = '<i class="fas fa-exclamation-triangle" aria-hidden="true"></i> ' + escapeHtml(err.message || 'Failed to load job');
         }
     }
 

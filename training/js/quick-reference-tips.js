@@ -14,7 +14,7 @@ let allTips = [];
                 console.error('Error loading tips:', error);
                 document.getElementById('tipsContainer').innerHTML = `
                     <div class="no-tips">
-                        <i class="fas fa-exclamation-triangle"></i>
+                        <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
                         <p>Unable to load tips. Please refresh the page.</p>
                     </div>
                 `;
@@ -27,7 +27,7 @@ let allTips = [];
             if (tips.length === 0) {
                 container.innerHTML = `
                     <div class="no-tips">
-                        <i class="fas fa-inbox"></i>
+                        <i class="fas fa-inbox" aria-hidden="true"></i>
                         <p>No tips found</p>
                     </div>
                 `;

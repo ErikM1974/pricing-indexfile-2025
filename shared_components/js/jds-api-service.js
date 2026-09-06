@@ -7,6 +7,9 @@
  * Rate Limit: 60 requests per minute per IP
  */
 
+/* Logging gate (2026-09-06): jds-api-service.js chatter only on localhost or ?debug=1; console.error/warn stay live. */
+var JDS_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
+var jdsLog = JDS_LOG_ON ? console.log.bind(console) : function () {};
 class JDSApiService {
     constructor() {
         this.proxyBase = window.APP_CONFIG?.API?.BASE_URL || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
@@ -29,7 +32,7 @@ class JDSApiService {
         // Callers that price products should `await jdsService.ready` first.
         this.ready = this.loadServicePrices();
 
-        console.log('[JDSApiService] Initialized');
+        jdsLog('[JDSApiService] Initialized');
     }
 
     /**
@@ -78,13 +81,13 @@ class JDSApiService {
         if (!forceRefresh && this.cache.has(cacheKey)) {
             const cached = this.cache.get(cacheKey);
             if (Date.now() - cached.timestamp < this.cacheDuration) {
-                console.log(`[JDSApiService] Using cached data for ${sku}`);
+                jdsLog(`[JDSApiService] Using cached data for ${sku}`);
                 return cached.data;
             }
         }
 
         try {
-            console.log(`[JDSApiService] Fetching product ${sku} from API`);
+            jdsLog(`[JDSApiService] Fetching product ${sku} from API`);
             const url = `${this.baseURL}/products/${sku}${forceRefresh ? '?refresh=true' : ''}`;
             const response = await fetch(url);
 
@@ -101,7 +104,7 @@ class JDSApiService {
                 timestamp: Date.now()
             });
 
-            console.log(`[JDSApiService] ✓ Product ${sku} fetched successfully`);
+            jdsLog(`[JDSApiService] ✓ Product ${sku} fetched successfully`);
             return product;
 
         } catch (error) {
@@ -117,7 +120,7 @@ class JDSApiService {
      */
     async getInventory(sku) {
         try {
-            console.log(`[JDSApiService] Fetching inventory for ${sku}`);
+            jdsLog(`[JDSApiService] Fetching inventory for ${sku}`);
             const url = `${this.baseURL}/inventory/${sku}`;
             const response = await fetch(url);
 
@@ -148,7 +151,7 @@ class JDSApiService {
         // Add engraving labor/overhead
         const finalPrice = garmentWithMargin + this.ENGRAVING_LABOR_COST;
 
-        console.log(`[JDSApiService] Price calculation:
+        jdsLog(`[JDSApiService] Price calculation:
             JDS Wholesale: $${jdsWholesale.toFixed(2)}
             ÷ ${this.MARGIN_DENOMINATOR} (margin denominator) = $${garmentWithMargin.toFixed(2)}
             + $${this.ENGRAVING_LABOR_COST.toFixed(2)} (engraving) = $${finalPrice.toFixed(2)}`);
@@ -270,7 +273,7 @@ class JDSApiService {
      */
     clearCache() {
         this.cache.clear();
-        console.log('[JDSApiService] Cache cleared');
+        jdsLog('[JDSApiService] Cache cleared');
     }
 
     /**

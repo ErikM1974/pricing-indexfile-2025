@@ -56,6 +56,9 @@
  * - Verify prices match exactly: $29.85/piece
  */
 
+/* Logging gate (2026-09-06): screenprint-pricing-service.js chatter only on localhost or ?debug=1; console.error/warn stay live. */
+var SPS_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
+var spsLog = SPS_LOG_ON ? console.log.bind(console) : function () {};
 const SCREEN_SETUP_FEE_PER_SCREEN = 30; // $30 per screen — single source of truth
 
 class ScreenPrintPricingService {
@@ -63,7 +66,7 @@ class ScreenPrintPricingService {
         this.baseURL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
         this.cachePrefix = 'screenprintPricingData';
         this.cacheDuration = 5 * 60 * 1000; // 5 minutes
-        console.log('[ScreenPrintPricingService] Initialized');
+        spsLog('[ScreenPrintPricingService] Initialized');
     }
 
     /**
@@ -84,7 +87,7 @@ class ScreenPrintPricingService {
         const urlCost = urlParams.get('manualCost') || urlParams.get('cost');
         if (urlCost && !isNaN(parseFloat(urlCost))) {
             const cost = parseFloat(urlCost);
-            console.log('[ScreenPrintPricingService] Manual cost from URL:', cost);
+            spsLog('[ScreenPrintPricingService] Manual cost from URL:', cost);
             sessionStorage.setItem('manualCostOverride', cost.toString());
             return cost;
         }
@@ -92,7 +95,7 @@ class ScreenPrintPricingService {
         const storedCost = sessionStorage.getItem('manualCostOverride');
         if (storedCost && !isNaN(parseFloat(storedCost))) {
             const cost = parseFloat(storedCost);
-            console.log('[ScreenPrintPricingService] Manual cost from storage:', cost);
+            spsLog('[ScreenPrintPricingService] Manual cost from storage:', cost);
             return cost;
         }
 
@@ -104,7 +107,7 @@ class ScreenPrintPricingService {
      */
     clearManualCostOverride() {
         sessionStorage.removeItem('manualCostOverride');
-        console.log('[ScreenPrintPricingService] Manual cost override cleared');
+        spsLog('[ScreenPrintPricingService] Manual cost override cleared');
     }
 
     /**
@@ -114,11 +117,11 @@ class ScreenPrintPricingService {
      */
     async fetchPricingBundle() {
         const url = `${this.baseURL}/api/pricing-bundle?method=ScreenPrint&styleNumber=PC61`;
-        console.log('[ScreenPrintPricingService] 📡 Fetching complete pricing bundle from API...');
-        console.log('[ScreenPrintPricingService] 🔗 URL:', url);
+        spsLog('[ScreenPrintPricingService] 📡 Fetching complete pricing bundle from API...');
+        spsLog('[ScreenPrintPricingService] 🔗 URL:', url);
 
         const response = await fetch(url);
-        console.log('[ScreenPrintPricingService] 📊 API Response Status:', response.status, response.statusText);
+        spsLog('[ScreenPrintPricingService] 📊 API Response Status:', response.status, response.statusText);
 
         if (!response.ok) {
             const errorText = await response.text();
@@ -127,7 +130,7 @@ class ScreenPrintPricingService {
         }
 
         const data = await response.json();
-        console.log('[ScreenPrintPricingService] 📦 API Data Structure:', {
+        spsLog('[ScreenPrintPricingService] 📦 API Data Structure:', {
             totalTiers: data.tiersR?.length,
             totalCosts: data.allScreenprintCostsR?.length,
             hasSizes: !!data.sizes,
@@ -145,13 +148,13 @@ class ScreenPrintPricingService {
 
         // Log sample tier and cost data for debugging
         if (data.tiersR && data.tiersR.length > 0) {
-            console.log('[ScreenPrintPricingService] 📊 Sample Tier:', data.tiersR[0]);
+            spsLog('[ScreenPrintPricingService] 📊 Sample Tier:', data.tiersR[0]);
         }
         if (data.allScreenprintCostsR && data.allScreenprintCostsR.length > 0) {
-            console.log('[ScreenPrintPricingService] 💰 Sample Cost:', data.allScreenprintCostsR[0]);
+            spsLog('[ScreenPrintPricingService] 💰 Sample Cost:', data.allScreenprintCostsR[0]);
         }
 
-        console.log('[ScreenPrintPricingService] ✅ Successfully fetched complete pricing bundle from API');
+        spsLog('[ScreenPrintPricingService] ✅ Successfully fetched complete pricing bundle from API');
         return data;
     }
 
@@ -162,12 +165,12 @@ class ScreenPrintPricingService {
      * @returns {Object} Pricing data with API rules + manual garment cost
      */
     async generateManualPricingData(manualCost) {
-        console.log('[ScreenPrintPricingService] 🔧 Generating manual pricing data with base cost:', manualCost);
+        spsLog('[ScreenPrintPricingService] 🔧 Generating manual pricing data with base cost:', manualCost);
 
         // Fetch complete pricing bundle from API (throws error if fails - no fallback)
-        console.log('[ScreenPrintPricingService] 📡 Fetching pricing rules from API...');
+        spsLog('[ScreenPrintPricingService] 📡 Fetching pricing rules from API...');
         const apiBundle = await this.fetchPricingBundle();
-        console.log('[ScreenPrintPricingService] ✅ API bundle received, building manual pricing data...');
+        spsLog('[ScreenPrintPricingService] ✅ API bundle received, building manual pricing data...');
 
         // Build sizes array using manual cost
         const manualSizes = [
@@ -203,7 +206,7 @@ class ScreenPrintPricingService {
         transformedData.manualCost = manualCost;
         transformedData.source = 'manual';
 
-        console.log('[ScreenPrintPricingService] ✅ Manual pricing data generated:', {
+        spsLog('[ScreenPrintPricingService] ✅ Manual pricing data generated:', {
             tierCount: Object.keys(transformedData.tierData || {}).length,
             locationCount: transformedData.printLocationMeta?.length || 0,
             colorCounts: transformedData.availableColorCounts || [],
@@ -222,17 +225,17 @@ class ScreenPrintPricingService {
         // FIRST: Check for manual cost override
         const manualCost = this.getManualCostOverride();
         if (manualCost !== null) {
-            console.log('[ScreenPrintPricingService] 🔧 MANUAL PRICING MODE - Base cost:', manualCost);
+            spsLog('[ScreenPrintPricingService] 🔧 MANUAL PRICING MODE - Base cost:', manualCost);
             return await this.generateManualPricingData(manualCost);
         }
 
-        console.log(`[ScreenPrintPricingService] Fetching pricing data for ${styleNumber}`);
+        spsLog(`[ScreenPrintPricingService] Fetching pricing data for ${styleNumber}`);
 
         // Check cache first
         const cacheKey = `${this.cachePrefix}-${styleNumber}`;
         const cached = this.getFromCache(cacheKey);
         if (cached && !options.forceRefresh) {
-            console.log('[ScreenPrintPricingService] Returning cached data');
+            spsLog('[ScreenPrintPricingService] Returning cached data');
             return cached;
         }
 
@@ -262,7 +265,7 @@ class ScreenPrintPricingService {
      */
     async fetchFromAPI(styleNumber) {
         const url = `${this.baseURL}/api/pricing-bundle?method=ScreenPrint&styleNumber=${styleNumber}`;
-        console.log(`[ScreenPrintPricingService] Fetching from: ${url}`);
+        spsLog(`[ScreenPrintPricingService] Fetching from: ${url}`);
         
         const response = await fetch(url);
         if (!response.ok) {
@@ -270,7 +273,7 @@ class ScreenPrintPricingService {
         }
         
         const data = await response.json();
-        console.log('[ScreenPrintPricingService] API data received:', data);
+        spsLog('[ScreenPrintPricingService] API data received:', data);
         
         // Validate required fields
         if (!data.tiersR || !data.allScreenprintCostsR || !data.sizes) {
@@ -284,7 +287,7 @@ class ScreenPrintPricingService {
      * Calculate pricing using exact logic from specifications
      */
     calculatePricing(apiData) {
-        console.log('[ScreenPrintPricingService] Starting price calculations...');
+        spsLog('[ScreenPrintPricingService] Starting price calculations...');
         
         const tiersR = apiData.tiersR;
         const rulesData = apiData.rulesR || apiData.rulesData;
@@ -312,7 +315,7 @@ class ScreenPrintPricingService {
         if (!standardGarment) throw new Error("No sizes found to determine standard garment cost.");
         
         const standardGarmentCost = parseFloat(standardGarment.price);
-        console.log('[ScreenPrintPricingService] Standard garment cost:', standardGarmentCost);
+        spsLog('[ScreenPrintPricingService] Standard garment cost:', standardGarmentCost);
         
         const garmentSellingPrices = {};
         
@@ -341,7 +344,7 @@ class ScreenPrintPricingService {
         // Formula: flashCharge × colorCount
         // Example: 3 colors × $0.35 = $1.05 flash charge
         const flashChargePerColor = rulesData.FlashCharge ? parseFloat(rulesData.FlashCharge) : 0;
-        console.log('[ScreenPrintPricingService] Flash charge per color:', flashChargePerColor);
+        spsLog('[ScreenPrintPricingService] Flash charge per color:', flashChargePerColor);
 
         const printCosts = { PrimaryLocation: {}, AdditionalLocation: {} };
 
@@ -413,7 +416,7 @@ class ScreenPrintPricingService {
             });
         });
         
-        console.log('[ScreenPrintPricingService] All pricing components calculated successfully.');
+        spsLog('[ScreenPrintPricingService] All pricing components calculated successfully.');
         
         return {
             garmentSellingPrices,
@@ -545,7 +548,7 @@ class ScreenPrintPricingService {
             }
         };
 
-        console.log('[ScreenPrintPricingService] Bundle transformed for compatibility');
+        spsLog('[ScreenPrintPricingService] Bundle transformed for compatibility');
         return bundle;
     }
 
@@ -588,7 +591,7 @@ class ScreenPrintPricingService {
                 sessionStorage.removeItem(key);
             }
         });
-        console.log('[ScreenPrintPricingService] Cache cleared');
+        spsLog('[ScreenPrintPricingService] Cache cleared');
     }
 
     /**
@@ -607,7 +610,7 @@ class ScreenPrintPricingService {
             const tier = data.tierData[tierKey];
             if (quantity >= tier.MinQuantity && 
                 (!tier.MaxQuantity || quantity <= tier.MaxQuantity)) {
-                console.log(`[ScreenPrintPricingService] Found tier for qty ${quantity}: ${tierKey}, LTM Fee: $${tier.LTM_Fee || 0}`);
+                spsLog(`[ScreenPrintPricingService] Found tier for qty ${quantity}: ${tierKey}, LTM Fee: $${tier.LTM_Fee || 0}`);
                 return tier;
             }
         }

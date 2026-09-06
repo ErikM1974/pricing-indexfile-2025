@@ -69,7 +69,7 @@ function setupSearch() {
         }
 
         // Show loading state
-        resultsContainer.innerHTML = '<div class="search-loading"><i class="fas fa-spinner fa-spin"></i> Searching...</div>';
+        resultsContainer.innerHTML = '<div class="search-loading"><i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Searching...</div>';
         resultsContainer.classList.add('active');
 
         try {
@@ -101,7 +101,7 @@ function setupSearch() {
                 // Only caps were found
                 resultsContainer.innerHTML = `
                     <div class="search-no-results" style="padding: 15px; color: #92400e;">
-                        <i class="fas fa-info-circle" style="margin-right: 8px;"></i>
+                        <i class="fas fa-info-circle" style="margin-right: 8px;" aria-hidden="true"></i>
                         Found ${capResults.length} cap item(s). Please use the 
                         <a href="/pricing/cap-embroidery" style="color: #4cb354; font-weight: 600;">Cap Embroidery Pricing</a> 
                         page for structured caps.
@@ -118,7 +118,7 @@ function setupSearch() {
                 if (capResults.length > 0) {
                     resultsHTML = `
                         <div style="padding: 10px; background: #fef3c7; border-bottom: 1px solid #fbbf24; color: #92400e; font-size: 13px;">
-                            <i class="fas fa-info-circle" style="margin-right: 5px;"></i>
+                            <i class="fas fa-info-circle" style="margin-right: 5px;" aria-hidden="true"></i>
                             Found ${capResults.length} cap item(s). Please use the 
                             <a href="/pricing/cap-embroidery" style="color: #4cb354; font-weight: 600;">Cap Embroidery Pricing</a> 
                             page for structured caps.
@@ -367,7 +367,7 @@ function showProductMismatchOverlay(styleNumber, productName, reason) {
             <div id="productMismatchOverlay" class="product-mismatch-overlay">
                 <div class="product-mismatch-modal">
                     <div class="product-mismatch-icon">
-                        <i class="fas fa-exclamation-triangle"></i>
+                        <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
                     </div>
                     <h2 class="product-mismatch-title">Wrong Pricing Calculator</h2>
                     <p class="product-mismatch-message" id="mismatchMessage"></p>
@@ -736,7 +736,7 @@ function updatePricing(pricingData) {
         tbody.innerHTML = `
             <tr>
                 <td colspan="6" style="text-align: center; padding: 30px; color: #666;">
-                    <i class="fas fa-exclamation-triangle" style="color: #fbbf24; margin-right: 8px;"></i>
+                    <i class="fas fa-exclamation-triangle" style="color: #fbbf24; margin-right: 8px;" aria-hidden="true"></i>
                     Pricing currently unavailable. Please contact sales for a quote.
                 </td>
             </tr>

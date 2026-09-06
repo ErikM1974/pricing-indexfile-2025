@@ -30,6 +30,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Bebas+Neue&family=Archivo+Black&family=Alfa+Slab+One&family=Russo+One&family=Staatliches&family=Graduate&family=Black+Ops+One&family=Bungee&family=Pacifico&family=Great+Vibes&family=Lobster&family=Satisfy&family=Shadows+Into+Light&family=Permanent+Marker&family=Bangers&family=Oswald:wght@400;700&family=Montserrat:wght@400;700&family=Roboto+Slab:wght@400;700&family=Playfair+Display:wght@400;700&family=Merriweather:wght@400;700&family=Dancing+Script:wght@400;700&family=Caveat:wght@400;700&family=Fredoka:wght@400;700&display=swap">
+    <link rel="stylesheet" href="/shared_components/css/company-contact-picker.css?v=2026.09.06.27">
 </head>
 <body class="customer-easy clean-layout left-controls-layout">
 
@@ -49,7 +50,7 @@
   <aside id="sidebar">
     <div class="side-head">
       <span>Artwork</span>
-      <button class="tbtn" style="padding:3px 8px;font-size:11px;" onclick="pickFiles()">+ Add</button>
+      <button class="tbtn" style="padding:3px 8px;font-size:11px;" data-call="pickFiles">+ Add</button>
     </div>
     <div id="fileList"></div>
     <div id="leftControlsMount">
@@ -63,31 +64,31 @@
     <div id="toolbar" class="visible">
       <!-- ADD — always visible -->
       <div class="tb-group" data-label="Add">
-        <button class="easy-main-btn primary" onclick="pickSide('front')">⬆ Add Front Logo</button>
-        <button class="easy-main-btn primary" onclick="pickSide('back')">⬆ Add Back Logo</button>
+        <button class="easy-main-btn primary" data-call="pickSide" data-args='["front"]'>⬆ Add Front Logo</button>
+        <button class="easy-main-btn primary" data-call="pickSide" data-args='["back"]'>⬆ Add Back Logo</button>
         <button class="easy-main-btn" id="addTextBtn" title="Add editable text to the mockup">➕ Add Text</button>
       </div>
       <!-- SHIRT — always visible -->
       <div class="tb-group" data-label="Shirt">
-        <button class="easy-main-btn" id="palBtn" onclick="toggleColorDrawer()" title="Pick shirt color">🎨 Shirt Color</button>
+        <button class="easy-main-btn" id="palBtn" data-call="toggleColorDrawer" title="Pick shirt color">🎨 Shirt Color</button>
         <select class="fabric-select" id="garmentStyleSelect" title="Garment style shown in the mockup" aria-label="Garment style"></select>
       </div>
       <!-- ARTWORK TOOLS — appear once art exists (body.has-art) -->
       <div class="tb-group needs-art" data-label="Artwork">
-        <button class="easy-main-btn" id="removeBgBtn" onclick="removeBgClick()" aria-pressed="false" title="Remove the white background from the logo">⬜ Remove White BG</button>
-        <button class="details-btn" id="artDetailsBtn" onclick="openArtDetails()" title="View file and ink color details">ℹ️ Art Details</button>
-        <button class="details-btn" id="threadColorsBtn" onclick="openThreadColors()" title="Choose Robison-Anton Poly thread colors for DST files">🧵 Thread Colors</button>
+        <button class="easy-main-btn" id="removeBgBtn" data-call="removeBgClick" aria-pressed="false" title="Remove the white background from the logo">⬜ Remove White BG</button>
+        <button class="details-btn" id="artDetailsBtn" data-call="openArtDetails" title="View file and ink color details">ℹ️ Art Details</button>
+        <button class="details-btn" id="threadColorsBtn" data-call="openThreadColors" title="Choose Robison-Anton Poly thread colors for DST files">🧵 Thread Colors</button>
       </div>
       <!-- REVIEW — appear once art exists -->
       <div class="tb-group needs-art" data-label="Review">
-        <button class="easy-main-btn" id="modelViewBtn" onclick="forceModelView()" title="Return to the shirt model view">👕 Model View</button>
-        <button class="easy-main-btn" id="spinBtn" onclick="toggleSpinPreview()" title="Spin the finished design">🔄 Spin</button>
-        <button class="easy-main-btn gold" id="proofBtn" onclick="printProofSheet()" title="Print or save customer proof">🖨 Customer Proof</button>
+        <button class="easy-main-btn" id="modelViewBtn" data-call="forceModelView" title="Return to the shirt model view">👕 Model View</button>
+        <button class="easy-main-btn" id="spinBtn" data-call="toggleSpinPreview" title="Spin the finished design">🔄 Spin</button>
+        <button class="easy-main-btn gold" id="proofBtn" data-call="printProofSheet" title="Print or save customer proof">🖨 Customer Proof</button>
       </div>
       <!-- SEND — appear once art exists -->
       <div class="tb-group needs-art" data-label="Send">
-        <button class="easy-main-btn download" id="dlBtn" onclick="downloadPNG()">⬇ Download PNG</button>
-        <button class="easy-main-btn save-req" id="saveReqBtn" onclick="saveToArtRequest()" title="Attach this mockup to the art request as a reference for Steve" style="display:none;">💾 Save to Art Request</button>
+        <button class="easy-main-btn download" id="dlBtn" data-call="downloadPNG">⬇ Download PNG</button>
+        <button class="easy-main-btn save-req" id="saveReqBtn" data-call="saveToArtRequest" title="Attach this mockup to the art request as a reference for Steve" style="display:none;">💾 Save to Art Request</button>
         <button class="easy-main-btn send-steve" id="sendSteveBtn" title="Forward this mockup to Steve and complete the art-submission form">🧵 Send to Steve</button>
         <button class="easy-main-btn send-customer" id="sendCustomerBtn" title="Email this mockup to the customer for approval">📧 Send to Customer</button>
       </div>
@@ -95,29 +96,29 @@
       <div class="easy-status"><span class="easy-dot"></span><span>Start by adding front or back artwork — or drag a file anywhere on the page</span></div>
 
       <div class="easy-hidden-tools" aria-hidden="true">
-        <button class="tbtn" onclick="pickFiles()">📂 Open files</button>
-        <button class="tbtn" onclick="zoomBy(0.8)">−</button>
+        <button class="tbtn" data-call="pickFiles">📂 Open files</button>
+        <button class="tbtn" data-call="zoomBy" data-args='[0.8]'>−</button>
         <span id="zoomLabel">100%</span>
-        <button class="tbtn" onclick="zoomBy(1.25)">+</button>
-        <button class="tbtn" onclick="zoom100()">1:1</button>
-        <button class="tbtn" id="flipBtn" onclick="toggleFlip()">⇄</button>
-        <button class="tbtn" id="knockBtn" onclick="toggleKnockout()">⬜ White BG</button>
-        <button class="tbtn" id="eraseBtn" onclick="toggleEraser()">🧽 Erase white</button>
-        <button class="tbtn" id="eraseAllBtn" onclick="eraseAllWhite()" style="display:none">Erase ALL white</button>
+        <button class="tbtn" data-call="zoomBy" data-args='[1.25]'>+</button>
+        <button class="tbtn" data-call="zoom100">1:1</button>
+        <button class="tbtn" id="flipBtn" data-call="toggleFlip">⇄</button>
+        <button class="tbtn" id="knockBtn" data-call="toggleKnockout">⬜ White BG</button>
+        <button class="tbtn" id="eraseBtn" data-call="toggleEraser">🧽 Erase white</button>
+        <button class="tbtn" id="eraseAllBtn" data-call="eraseAllWhite" style="display:none">Erase ALL white</button>
         <span class="bgswatches" id="bgSwatches"><span class="lbl">BG:</span></span>
         <input type="color" id="bgCustom" aria-label="Custom background color" value="#3a6ea5">
-        <button class="tbtn" id="eyeBtn" onclick="toggleEyedrop()">💧</button>
+        <button class="tbtn" id="eyeBtn" data-call="toggleEyedrop">💧</button>
         <span id="eyeChip"><span class="dot" id="eyeDot"></span><span id="eyeHex"></span></span>
-        <button class="tbtn" id="mockBtn" onclick="toggleMockup()">👕 Mockup</button>
-        <button class="tbtn" id="sideFrontBtn" onclick="setPrintSide('front')">Front</button>
-        <button class="tbtn" id="sideBackBtn" onclick="setPrintSide('back')">Back</button>
-        <button class="tbtn" id="sideBothBtn" onclick="setPrintSide('both')">Both</button>
-        <button class="tbtn" id="viewFlipBtn" onclick="flipView()">◫ Both sides</button>
-        <button class="tbtn" id="photoBtn" onclick="pickShirtPhoto()">📷 Shirt photo</button>
-        <button class="tbtn" id="specBtn" onclick="printSpecSheet()">📋 Spec sheet</button>
-        <button class="tbtn" id="fsBtn" onclick="toggleFullscreen()">⛶</button>
-        <button class="tbtn" id="infoToggle" onclick="toggleInfo()">ℹ️ Info</button>
-        <button class="tbtn" id="emailBtn" onclick="emailUs()">✉ Email us</button>
+        <button class="tbtn" id="mockBtn" data-call="toggleMockup">👕 Mockup</button>
+        <button class="tbtn" id="sideFrontBtn" data-call="setPrintSide" data-args='["front"]'>Front</button>
+        <button class="tbtn" id="sideBackBtn" data-call="setPrintSide" data-args='["back"]'>Back</button>
+        <button class="tbtn" id="sideBothBtn" data-call="setPrintSide" data-args='["both"]'>Both</button>
+        <button class="tbtn" id="viewFlipBtn" data-call="flipView">◫ Both sides</button>
+        <button class="tbtn" id="photoBtn" data-call="pickShirtPhoto">📷 Shirt photo</button>
+        <button class="tbtn" id="specBtn" data-call="printSpecSheet">📋 Spec sheet</button>
+        <button class="tbtn" id="fsBtn" data-call="toggleFullscreen">⛶</button>
+        <button class="tbtn" id="infoToggle" data-call="toggleInfo">ℹ️ Info</button>
+        <button class="tbtn" id="emailBtn" data-call="emailUs">✉ Email us</button>
       </div>
     </div>
 
@@ -125,7 +126,7 @@
     <div id="stageWrap">
       <div id="stage">
         <div id="canvasHolder" role="img" aria-label="T-shirt mockup preview — use the controls to change shirt color, placement, and artwork"></div>
-        <div id="pageNav" class="stage-pagenav"><button class="tbtn" id="prevPage" onclick="changePage(-1)">‹</button><span id="pageLabel">Page 1 / 1</span><button class="tbtn" id="nextPage" onclick="changePage(1)">›</button></div>
+        <div id="pageNav" class="stage-pagenav"><button class="tbtn" id="prevPage" data-call="changePage" data-args='[-1]'>‹</button><span id="pageLabel">Page 1 / 1</span><button class="tbtn" id="nextPage" data-call="changePage" data-args='[1]'>›</button></div>
         <div class="stage-empty-note" id="stageEmptyNote">Use <b>Add Front Logo</b> or <b>Add Back Logo</b>. Artwork will stay on the shirt model automatically.</div>
         <div id="stageMsg">
           <div class="spinner" id="msgSpinner"></div>
@@ -144,16 +145,16 @@
               <h2>Add your artwork</h2>
               <p class="lead">Pick a side — the art snaps to a recommended placement. Drag, resize, and fine-tune after.</p>
               <div class="easy-upload-grid">
-                <button type="button" class="easy-upload-card" onclick="pickSide('front')">
+                <button type="button" class="easy-upload-card" data-call="pickSide" data-args='["front"]'>
                   <strong>⬆ Front artwork</strong>
                   <span>Left chest, full front, or center chest.</span>
                 </button>
-                <button type="button" class="easy-upload-card" onclick="pickSide('back')">
+                <button type="button" class="easy-upload-card" data-call="pickSide" data-args='["back"]'>
                   <strong>⬆ Back artwork</strong>
                   <span>Full back, upper back, or event graphics.</span>
                 </button>
               </div>
-              <button type="button" class="easy-text-start" onclick="addTextEntry()">➕ No art file yet? Start with text</button>
+              <button type="button" class="easy-text-start" data-call="addTextEntry">➕ No art file yet? Start with text</button>
               <p class="easy-formats">Or drag &amp; drop a file anywhere on this page.<br>PNG · JPG · SVG · WEBP · AI · PSD · CDR · PDF · EPS · DST — files are read in your browser and upload only when you save or send.</p>
             </div>
           </div>
@@ -178,7 +179,7 @@
           </div>
           <div class="advisor-fabric-row">
             <label for="fabricSelect">Garment fabric</label>
-            <select class="fabric-select" id="fabricSelect" onchange="setFabricType(this.value)" title="Garment fabric affects the best print method">
+            <select class="fabric-select" id="fabricSelect" data-change="setFabricType" data-change-args='["$this.value"]' title="Garment fabric affects the best print method">
               <option value="cotton" selected>Cotton shirt</option>
               <option value="blend">Cotton/poly blend</option>
               <option value="polyester">Polyester</option>
@@ -187,8 +188,8 @@
             </select>
           </div>
           <div class="advisor-actions">
-            <button onclick="openArtDetails()">Art Details</button>
-            <button onclick="printProofSheet()">Proof</button>
+            <button data-call="openArtDetails">Art Details</button>
+            <button data-call="printProofSheet">Proof</button>
           </div>
         </div>
         <div class="emb-card" id="embroideryAdvisorCard">
@@ -216,16 +217,16 @@
             <div class="mini-chip" id="pcStatusChip">No art selected</div>
           </div>
           <div class="side-grid">
-            <button class="place-btn" id="pcFrontBtn" onclick="designerSetSide('front')">Front</button>
-            <button class="place-btn" id="pcBackBtn" onclick="designerSetSide('back')">Back</button>
-            <button class="place-btn" id="pcBothBtn" onclick="designerSetSide('both')">Both</button>
+            <button class="place-btn" id="pcFrontBtn" data-call="designerSetSide" data-args='["front"]'>Front</button>
+            <button class="place-btn" id="pcBackBtn" data-call="designerSetSide" data-args='["back"]'>Back</button>
+            <button class="place-btn" id="pcBothBtn" data-call="designerSetSide" data-args='["both"]'>Both</button>
           </div>
           <div class="preset-grid">
-            <button class="place-btn soft" id="pcLeftChestBtn" onclick="designerSetPreset('Left Chest')">Left Chest</button>
-            <button class="place-btn soft" id="pcFullFrontBtn" onclick="designerSetPreset('Full Front')">Full Front</button>
-            <button class="place-btn soft" id="pcUpperBackBtn" onclick="designerSetPreset('Upper Back')">Upper Back</button>
-            <button class="place-btn soft" id="pcFullBackBtn" onclick="designerSetPreset('Full Back')">Full Back</button>
-            <button class="place-btn soft" id="pcCenterBtn" onclick="designerCenterPlacement()">Center Art</button>
+            <button class="place-btn soft" id="pcLeftChestBtn" data-call="designerSetPreset" data-args='["Left Chest"]'>Left Chest</button>
+            <button class="place-btn soft" id="pcFullFrontBtn" data-call="designerSetPreset" data-args='["Full Front"]'>Full Front</button>
+            <button class="place-btn soft" id="pcUpperBackBtn" data-call="designerSetPreset" data-args='["Upper Back"]'>Upper Back</button>
+            <button class="place-btn soft" id="pcFullBackBtn" data-call="designerSetPreset" data-args='["Full Back"]'>Full Back</button>
+            <button class="place-btn soft" id="pcCenterBtn" data-call="designerCenterPlacement">Center Art</button>
           </div>
           <div class="ctrl-row">
             <div class="ctrl-head"><label for="pcWidthRange">Print width</label><span id="pcWidthLabel">12 in</span></div>
@@ -242,12 +243,12 @@
             </div>
           </div>
           <div class="nudge-grid">
-            <button class="place-btn soft" onclick="designerNudge(-5,0)">← Nudge</button>
-            <button class="place-btn soft" onclick="designerNudge(0,-5)">↑ Nudge</button>
-            <button class="place-btn soft" onclick="designerNudge(5,0)">Nudge →</button>
-            <button class="place-btn soft" onclick="designerNudge(0,5)">↓ Nudge</button>
-            <button class="place-btn soft" onclick="designerResetPlacement()">Reset</button>
-            <button class="place-btn soft" onclick="designerToggleVisible()">On / Off</button>
+            <button class="place-btn soft" data-call="designerNudge" data-args='[-5, 0]'>← Nudge</button>
+            <button class="place-btn soft" data-call="designerNudge" data-args='[0, -5]'>↑ Nudge</button>
+            <button class="place-btn soft" data-call="designerNudge" data-args='[5, 0]'>Nudge →</button>
+            <button class="place-btn soft" data-call="designerNudge" data-args='[0, 5]'>↓ Nudge</button>
+            <button class="place-btn soft" data-call="designerResetPlacement">Reset</button>
+            <button class="place-btn soft" data-call="designerToggleVisible">On / Off</button>
           </div>
           <div class="pc-hint">Tip: use <b>Left Chest</b> for small logos, <b>Full Front</b> for centered prints, and <b>Full Back</b> for back graphics. Transparent padding is auto-trimmed so the visible logo sizes correctly. Use Left Chest, Full Front, Upper Back, or Full Back to snap the art into place, then fine-tune if needed.</div>
         </div>
@@ -271,7 +272,7 @@
 </div>
 
 
-<div id="placementChooser" class="chooser-overlay" onclick="if(event.target===this) closePlacementChooser()">
+<div id="placementChooser" class="chooser-overlay" data-call="closePlacementChooser" data-self-only="1">
   <div class="chooser-card" role="dialog" aria-modal="true" aria-labelledby="chooserTitle">
     <div class="chooser-head">
       <h3 id="chooserTitle">Choose a recommended placement</h3>
@@ -279,17 +280,17 @@
     </div>
     <div class="chooser-body" id="chooserBody"></div>
     <div class="chooser-foot">
-      <button class="chooser-cancel" onclick="closePlacementChooser()">Cancel</button>
+      <button class="chooser-cancel" data-call="closePlacementChooser">Cancel</button>
     </div>
   </div>
 </div>
 
 
-<div id="artDetailsModal" class="art-details-overlay" onclick="if(event.target===this) closeArtDetails()">
+<div id="artDetailsModal" class="art-details-overlay" data-call="closeArtDetails" data-self-only="1">
   <div class="art-details-card" role="dialog" aria-modal="true">
     <div class="art-details-head">
       <h3>Artwork Details</h3>
-      <button class="art-details-close" onclick="closeArtDetails()">Close</button>
+      <button class="art-details-close" data-call="closeArtDetails">Close</button>
     </div>
     <div class="art-details-body" id="artDetailsBody">
       <div class="art-details-section">
@@ -302,21 +303,21 @@
       </div>
     </div>
     <div class="art-details-foot">
-      <button onclick="printSpecSheet()">Print Spec Sheet</button>
-      <button onclick="closeArtDetails()">Done</button>
+      <button data-call="printSpecSheet">Print Spec Sheet</button>
+      <button data-call="closeArtDetails">Done</button>
     </div>
   </div>
 </div>
 
 
-<div id="threadColorsModal" class="thread-modal-overlay" onclick="if(event.target===this) closeThreadColors()">
+<div id="threadColorsModal" class="thread-modal-overlay" data-call="closeThreadColors" data-self-only="1">
   <div class="thread-modal-card" role="dialog" aria-modal="true">
     <div class="thread-modal-head">
       <div>
         <h3>DST Thread Colors</h3>
         <p>Choose Robison-Anton Poly thread colors for each DST color stop.</p>
       </div>
-      <button class="thread-modal-close" onclick="closeThreadColors()">Close</button>
+      <button class="thread-modal-close" data-call="closeThreadColors">Close</button>
     </div>
     <div class="thread-modal-summary" id="threadColorsSummary"></div>
     <div class="thread-modal-body">
@@ -328,9 +329,9 @@
       <div class="thread-selected-list" id="threadColorsSelected"></div>
     </div>
     <div class="thread-modal-foot">
-      <button onclick="openArtDetails()">Art Details</button>
-      <button onclick="printProofSheet()">Customer Proof</button>
-      <button onclick="closeThreadColors()">Done</button>
+      <button data-call="openArtDetails">Art Details</button>
+      <button data-call="printProofSheet">Customer Proof</button>
+      <button data-call="closeThreadColors">Done</button>
     </div>
   </div>
 </div>
@@ -429,14 +430,15 @@
      mismatch and BLOCK this script. To add integrity, pin an EXACT version (e.g.
      @emailjs/browser@4.4.1) then hash that exact file. crossorigin added now. -->
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js" crossorigin="anonymous"></script>
-<script src="/shared_components/js/customer-lookup-service.js"></script>
-<script src="/shared_components/js/company-contact-picker.js?v=2"></script>
+<script src="/shared_components/js/customer-lookup-service.js?v=2026.09.06.26"></script>
+<script src="/shared_components/js/company-contact-picker.js?v=2026.09.06.27"></script>
 <script src="/shared_components/js/nwca-date-utils.js?v=1"></script>
 <script src="/shared_components/js/design-name-picker.js?v=3"></script>
 <script src="/shared_components/js/work-order-picker.js?v=2026.07.04.5"></script>
-<script src="/shared_components/js/staff-auth-helper.js"></script>
-<script src="/shared_components/js/garment-submit-form.js?v=2026.09.04.9"></script>
+<script src="/shared_components/js/staff-auth-helper.js?v=2026.09.06.26"></script>
+<script src="/shared_components/js/garment-submit-form.js?v=2026.09.06.27"></script>
 <script src="/shared_components/js/garment-text-engine.js?v=2026.06.20.13"></script>
-<script src="/pages/js/garment-designer.js?v=2026.08.04.5"></script>
+    <script src="/shared_components/js/data-call-delegator.js?v=2026.09.06.27"></script>
+<script src="/pages/js/garment-designer.js?v=2026.09.06.27"></script>
 </body>
 </html>

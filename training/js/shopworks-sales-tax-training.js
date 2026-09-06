@@ -176,7 +176,7 @@
                     </div>
                     
                     <button class="submit-btn" onclick="submitAnswer()" disabled id="submitBtn">
-                        <i class="fas fa-check"></i> Submit Answer
+                        <i class="fas fa-check" aria-hidden="true"></i> Submit Answer
                     </button>
                 </div>
 
@@ -229,14 +229,14 @@
                 feedback.className = 'feedback success';
                 feedback.style.display = 'block';
                 feedback.innerHTML = `
-                    <strong><i class="fas fa-check-circle"></i> Correct!</strong><br>
+                    <strong><i class="fas fa-check-circle" aria-hidden="true"></i> Correct!</strong><br>
                     ${scenario.explanation}
                 `;
             } else {
                 feedback.className = 'feedback error';
                 feedback.style.display = 'block';
                 feedback.innerHTML = `
-                    <strong><i class="fas fa-times-circle"></i> Incorrect.</strong><br>
+                    <strong><i class="fas fa-times-circle" aria-hidden="true"></i> Incorrect.</strong><br>
                     The correct answer is <strong>${scenario.expectedTaxCode}</strong>.<br>
                     ${scenario.explanation}
                 `;
@@ -252,7 +252,7 @@
                 if (currentScenarioIndex < taxScenarios.length - 1) {
                     feedback.innerHTML += `
                         <button class="next-scenario-btn" onclick="nextScenario()">
-                            <i class="fas fa-arrow-right"></i> Next Scenario
+                            <i class="fas fa-arrow-right" aria-hidden="true"></i> Next Scenario
                         </button>
                     `;
                 } else {

@@ -447,7 +447,7 @@
             if (hasPicker) {
                 var editIcon = document.createElement('span');
                 editIcon.className = 'thread-edit';
-                editIcon.innerHTML = '<i class="fas fa-pen"></i>';
+                editIcon.innerHTML = '<i class="fas fa-pen" aria-hidden="true"></i>';
                 row.appendChild(editIcon);
 
                 row.addEventListener('click', function() {
@@ -565,7 +565,7 @@
                 '<td>' + pdfSwatch + escapeHtml(pdf ? pdf.name : '-') + '</td>' +
                 '<td style="font-family:monospace;color:var(--text-dim)">' + escapeHtml(pdf ? pdf.catalog : '-') + '</td>' +
                 '<td><span class="match-icon ' + (isMismatch ? 'no' : 'yes') + '">' +
-                    '<i class="fas fa-' + (isMismatch ? 'times-circle' : 'check-circle') + '"></i>' +
+                    '<i class="fas fa-' + (isMismatch ? 'times-circle' : 'check-circle') + '" aria-hidden="true"></i>' +
                 '</span></td>';
 
             body.appendChild(tr);

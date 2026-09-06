@@ -1086,7 +1086,7 @@ function initSurchargeModal() {
     });
 
     // Update button text with actual count
-    openBtn.innerHTML = '<i class="fas fa-list"></i> View All ' + SURCHARGE_CUSTOMERS.length + ' Surcharge Accounts';
+    openBtn.innerHTML = '<i class="fas fa-list" aria-hidden="true"></i> View All ' + SURCHARGE_CUSTOMERS.length + ' Surcharge Accounts';
 }
 
 
@@ -1687,7 +1687,7 @@ function copyShareableLink() {
         // Visual feedback
         const btn = document.querySelector('.share-link-btn');
         const originalHTML = btn.innerHTML;
-        btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+        btn.innerHTML = '<i class="fas fa-check" aria-hidden="true"></i> Copied!';
         btn.classList.add('copied');
 
         setTimeout(() => {

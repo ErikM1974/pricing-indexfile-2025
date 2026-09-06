@@ -90,7 +90,7 @@ var ThreadColorPicker = (function() {
         title.textContent = 'Choose Thread Color';
         var closeBtn = document.createElement('button');
         closeBtn.className = 'tcp-close';
-        closeBtn.innerHTML = '<i class="fas fa-times"></i>';
+        closeBtn.innerHTML = '<i class="fas fa-times" aria-hidden="true"></i>';
         closeBtn.addEventListener('click', close);
         header.appendChild(title);
         header.appendChild(closeBtn);

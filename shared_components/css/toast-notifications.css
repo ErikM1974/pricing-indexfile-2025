@@ -1,0 +1,6 @@
+/* toast-notifications.css — extracted 2026-09-06 from the <style> block(s) toast-notifications.js used to inject (Rule 3). */
+#nwca-toast-container{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);z-index:99999;display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none;max-width:min(92vw,640px)}
+.nwca-toast{display:flex;align-items:flex-start;gap:10px;padding:12px 18px;border-radius:8px;background:#1f2937;color:#fff;font:14px/1.4 Inter,-apple-system,"Segoe UI",sans-serif;box-shadow:0 8px 24px rgba(0,0,0,.28);opacity:0;transform:translateY(8px);transition:opacity .2s ease,transform .2s ease;pointer-events:auto;white-space:pre-line;word-break:break-word}
+.nwca-toast.show{opacity:1;transform:translateY(0)}
+.nwca-toast-success{background:#14532d}.nwca-toast-error{background:#991b1b}.nwca-toast-warning{background:#92400e}.nwca-toast-info{background:#1e3a5f}
+.nwca-toast-icon{margin-top:2px;flex:none}

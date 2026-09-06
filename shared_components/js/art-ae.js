@@ -114,7 +114,7 @@ var ArtAeGallery = (function () {
                     container.innerHTML = '<div style="text-align:center;padding:40px;color:#b91c1c;">'
                         + '<div style="font-size:15px;font-weight:600;">Couldn\'t load Steve\'s art requests.</div>'
                         + '<div style="font-size:13px;color:#6b7280;margin:6px 0 12px;">The server said: ' + escapeHtml(err.message) + '. Nothing is lost — try again in a moment.</div>'
-                        + '<button onclick="ArtAeGallery.init(\'' + containerId + '\')" '
+                        + '<button data-call="ArtAeGallery.init" data-args="[&quot;' + containerId + '&quot;]" '
                         + 'style="padding:9px 18px;border:none;border-radius:8px;background:var(--art-theme, #981e32);color:white;cursor:pointer;font-weight:600;font-family:inherit;">Try again</button>'
                         + '</div>';
                 }
@@ -259,12 +259,12 @@ var ArtAeGallery = (function () {
         html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;">';
         if (showArchive) {
             html += '<span style="font-size:13px;color:#6b7280;">Showing all requests including archive (' + allRequests.length + ')</span>'
-                + '<button onclick="ArtAeGallery.toggleArchive()" '
+                + '<button data-call="ArtAeGallery.toggleArchive" '
                 + 'style="padding:4px 12px;border:1px solid var(--art-theme, #981e32);border-radius:4px;background:var(--art-theme-bg, #fef2f2);cursor:pointer;font-size:13px;font-family:inherit;color:var(--art-theme, #981e32);font-weight:600;">'
                 + 'Hide Archive</button>';
         } else {
             html += '<span style="font-size:13px;color:#6b7280;">Showing current requests (' + allRequests.length + ')</span>'
-                + '<button onclick="ArtAeGallery.toggleArchive()" '
+                + '<button data-call="ArtAeGallery.toggleArchive" '
                 + 'style="padding:4px 12px;border:1px solid #d1d5db;border-radius:4px;background:white;cursor:pointer;font-size:13px;font-family:inherit;color:#666;">'
                 + 'Show Archive</button>';
         }
@@ -409,7 +409,7 @@ var ArtAeGallery = (function () {
 
     function statusPill(count, label, filterValue, modifier) {
         var clickAttr = filterValue
-            ? ' onclick="ArtAeGallery.filterByStatus(\'' + filterValue + '\')"'
+            ? ' data-call="ArtAeGallery.filterByStatus" data-args="[&quot;' + filterValue + '&quot;]"'
             : '';
         return '<div class="status-stat status-stat--' + modifier + '" title="' + label + '"' + clickAttr + '>'
             + '<span class="status-stat-count">' + count + '</span>'
@@ -509,7 +509,7 @@ var ArtAeGallery = (function () {
             thumbHtml = '<div class="card-thumb">'
                 + '<img src="' + escapeHtml(thumbDisplayUrl) + '" alt="Mockup" loading="lazy"'
                 + ' data-original-src="' + escapeHtml(thumbDisplayUrl) + '"'
-                + ' onerror="if(window.ArtActions&&window.ArtActions.handleBoxImageError){window.ArtActions.handleBoxImageError(this);}else{this.parentElement.style.display=\'none\';}">'
+                + ' data-onerror="call:ArtActions.handleBoxImageError" data-onerror-else="hide-parent">'
                 + '</div>';
         }
 
@@ -743,7 +743,7 @@ var ArtAeGallery = (function () {
             ? ElapsedTimeUtils.getKanbanElapsedBadge(req.Status || '', req, 'art')
             : '';
 
-        return '<div class="kanban-card" data-design-id="' + designId + '" onclick="window.open(\'/art-request/' + designId + '?view=ae\', \'_blank\')">'
+        return '<div class="kanban-card" data-design-id="' + designId + '" data-open="/art-request/' + designId + '?view=ae">'
             + '<div class="kanban-card-company">' + company + kanbanElapsed + '</div>'
             + (designNum ? '<div class="kanban-card-design">#' + escapeHtml(designNum) + '</div>' : '')
             + '<div class="kanban-card-meta">'
@@ -830,14 +830,14 @@ var ArtAeGallery = (function () {
                 cardsHtml += colCards.slice(COMPLETED_SHOW_LIMIT).map(function (r) {
                     return renderAeKanbanCard(r).replace('class="kanban-card"', 'class="kanban-card" style="display: none"');
                 }).join('');
-                cardsHtml += '<div class="kanban-show-all" onclick="event.stopPropagation(); window.kanbanShowAll(\'' + col.id + '\')">Show all ' + colCards.length + ' items</div>';
+                cardsHtml += '<div class="kanban-show-all" data-call="kanbanShowAll" data-args="[&quot;' + col.id + '&quot;]" data-stop="1">Show all ' + colCards.length + ' items</div>';
             } else {
                 cardsHtml = colCards.map(function (r) { return renderAeKanbanCard(r); }).join('');
             }
 
             var chevron = isCompleted ? '<span class="kanban-collapse-chevron">&#9660;</span>' : '';
             var collapseClass = (isCompleted && completedCollapsed) ? ' kanban-column--collapsed' : '';
-            var clickHandler = isCompleted ? ' onclick="window.toggleKanbanCollapse(\'' + col.id + '\', \'aeKanbanCompletedCollapsed\')"' : '';
+            var clickHandler = isCompleted ? ' data-call="toggleKanbanCollapse" data-args="[&quot;' + col.id + '&quot;, &quot;aeKanbanCompletedCollapsed&quot;]"' : '';
 
             return '<div class="kanban-column kanban-column--' + col.id + collapseClass + '">'
                 + '<div class="kanban-column-header"' + clickHandler + '>'

@@ -27,11 +27,11 @@
                 <div class="ai-modal ai-search-modal" role="dialog" aria-labelledby="aiSearchTitle">
                     <div class="ai-modal-header">
                         <h2 id="aiSearchTitle">
-                            <i class="fas fa-wand-magic-sparkles"></i>
+                            <i class="fas fa-wand-magic-sparkles" aria-hidden="true"></i>
                             Ask Claude to find a policy
                         </h2>
                         <button type="button" class="ai-modal-close" aria-label="Close">
-                            <i class="fas fa-xmark"></i>
+                            <i class="fas fa-xmark" aria-hidden="true"></i>
                         </button>
                     </div>
 
@@ -55,7 +55,7 @@
                                 autocomplete="off"
                             >
                             <button type="submit" class="btn btn-primary" id="aiSearchSubmit">
-                                <i class="fas fa-sparkles"></i> Search
+                                <i class="fas fa-sparkles" aria-hidden="true"></i> Search
                             </button>
                         </form>
 
@@ -104,7 +104,7 @@
             if (!query) return;
 
             submit.disabled = true;
-            submit.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Asking Claude…';
+            submit.innerHTML = '<i class="fas fa-circle-notch fa-spin" aria-hidden="true"></i> Asking Claude…';
             statusEl.innerHTML = '';
             resultsEl.innerHTML = '';
 
@@ -119,18 +119,18 @@
                 try { data = await res.json(); } catch { data = {}; }
 
                 if (!res.ok) {
-                    statusEl.innerHTML = `<i class="fas fa-triangle-exclamation"></i> ${escapeHtml(data.error || `Search failed (HTTP ${res.status})`)}`;
+                    statusEl.innerHTML = `<i class="fas fa-triangle-exclamation" aria-hidden="true"></i> ${escapeHtml(data.error || `Search failed (HTTP ${res.status})`)}`;
                     statusEl.classList.add('error');
                     return;
                 }
 
                 renderResults(resultsEl, statusEl, data);
             } catch (err) {
-                statusEl.innerHTML = `<i class="fas fa-triangle-exclamation"></i> ${escapeHtml(err.message)}`;
+                statusEl.innerHTML = `<i class="fas fa-triangle-exclamation" aria-hidden="true"></i> ${escapeHtml(err.message)}`;
                 statusEl.classList.add('error');
             } finally {
                 submit.disabled = false;
-                submit.innerHTML = '<i class="fas fa-sparkles"></i> Search again';
+                submit.innerHTML = '<i class="fas fa-sparkles" aria-hidden="true"></i> Search again';
             }
         });
 
@@ -143,11 +143,11 @@
         const searched = data.policies_searched || 0;
 
         if (results.length === 0) {
-            statusEl.innerHTML = `<i class="fas fa-circle-info"></i> No relevant policies found. Try rephrasing, or ask Erik to write a policy on this topic.`;
+            statusEl.innerHTML = `<i class="fas fa-circle-info" aria-hidden="true"></i> No relevant policies found. Try rephrasing, or ask Erik to write a policy on this topic.`;
             return;
         }
 
-        statusEl.innerHTML = `<i class="fas fa-check-circle"></i> Found ${results.length} relevant ${results.length === 1 ? 'policy' : 'policies'} (searched ${searched})`;
+        statusEl.innerHTML = `<i class="fas fa-check-circle" aria-hidden="true"></i> Found ${results.length} relevant ${results.length === 1 ? 'policy' : 'policies'} (searched ${searched})`;
 
         resultsEl.innerHTML = results.map(r => {
             const conf = r.confidence || 'medium';
@@ -156,8 +156,8 @@
                 <a href="${href}" class="ai-search-result ai-search-result-${escapeHtml(conf)}">
                     <div class="ai-search-result-conf"><span class="ai-search-conf-dot"></span> ${escapeHtml(conf)} match</div>
                     <div class="ai-search-result-title">${escapeHtml(r.Title || r.policy_id)}</div>
-                    <div class="ai-search-result-category"><i class="fas fa-folder"></i> ${escapeHtml(r.Category || '')}</div>
-                    <div class="ai-search-result-why"><i class="fas fa-quote-left"></i> ${escapeHtml(r.why || '')}</div>
+                    <div class="ai-search-result-category"><i class="fas fa-folder" aria-hidden="true"></i> ${escapeHtml(r.Category || '')}</div>
+                    <div class="ai-search-result-why"><i class="fas fa-quote-left" aria-hidden="true"></i> ${escapeHtml(r.why || '')}</div>
                 </a>
             `;
         }).join('');

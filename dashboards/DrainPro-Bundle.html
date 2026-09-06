@@ -11,7 +11,7 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <link rel="stylesheet" href="/dashboards/css/DrainPro-Bundle.css?v=2026.09.05.12">
+    <link rel="stylesheet" href="/dashboards/css/DrainPro-Bundle.css?v=2026.09.06.27">
 </head>
 <body>
     <!-- Fire Engine Red Header -->
@@ -29,12 +29,12 @@
         <div class="content-card">
             <!-- Tab Navigation -->
             <div class="tab-navigation">
-                <button class="tab-button active" onclick="switchTab('labels')">
-                    <i class="fas fa-tags"></i>
+                <button class="tab-button active" data-call="switchTab" data-args='["labels"]'>
+                    <i class="fas fa-tags" aria-hidden="true"></i>
                     <span>Avery 5960 (2.5" x 1") Box Labels</span>
                 </button>
-                <button class="tab-button" onclick="switchTab('employees')">
-                    <i class="fas fa-users"></i>
+                <button class="tab-button" data-call="switchTab" data-args='["employees"]'>
+                    <i class="fas fa-users" aria-hidden="true"></i>
                     <span>Bundle Details</span>
                 </button>
             </div>
@@ -42,13 +42,13 @@
             <!-- Tab Content: Box Labels -->
             <div id="labels-tab" class="tab-content active">
                 <h2 class="section-header">
-                    <i class="fas fa-tags"></i>
+                    <i class="fas fa-tags" aria-hidden="true"></i>
                     <span>Drain-Pro Box Labels</span>
                 </h2>
 
                 <!-- Approval Note -->
                 <div class="info-banner">
-                    <i class="fas fa-exclamation-circle"></i>
+                    <i class="fas fa-exclamation-circle" aria-hidden="true"></i>
                     <div class="info-banner-content">
                         <strong>Important:</strong> Account Executives must mark each employee name as 'Approved' in the table below to ensure the customer's spreadsheet matches this data.
                     </div>
@@ -57,7 +57,7 @@
                 <!-- Instructions Box -->
                 <div class="instructions-box">
                     <div class="instructions-title">
-                        <i class="fas fa-clipboard-list"></i>
+                        <i class="fas fa-clipboard-list" aria-hidden="true"></i>
                         <span>How to Print Labels</span>
                     </div>
                     <ol class="instructions-list">
@@ -84,7 +84,7 @@
             <!-- Tab Content: Bundle Details -->
             <div id="employees-tab" class="tab-content">
                 <h2 class="section-header">
-                    <i class="fas fa-users"></i>
+                    <i class="fas fa-users" aria-hidden="true"></i>
                     <span>Bundle Details</span>
                 </h2>
 
@@ -96,7 +96,7 @@
             <!-- Navigation Buttons -->
             <div class="nav-buttons">
                 <a href="/staff-dashboard.html" class="btn btn-primary">
-                    <i class="fas fa-arrow-left"></i>
+                    <i class="fas fa-arrow-left" aria-hidden="true"></i>
                     <span>Back to Dashboard</span>
                 </a>
             </div>
@@ -104,12 +104,13 @@
     </div>
 
     <!-- Footer -->
-    <div style="text-align: center; padding: 2rem; color: #6b7280; font-size: 0.875rem;">
+    <div class="dp-footnote">
         <p>Northwest Custom Apparel &bull; (253) 922-5793 &bull; sales@nwcustomapparel.com</p>
-        <p style="margin-top: 0.5rem;">Serving the Pacific Northwest since 1977</p>
+        <p class="dp-footnote-sub">Serving the Pacific Northwest since 1977</p>
     </div>
 
     <!-- Tab Switching JavaScript -->
+    <script src="/shared_components/js/data-call-delegator.js?v=2026.09.06.27"></script>
     <script src="/dashboards/js/DrainPro-Bundle.js?v=2026.09.05.12"></script>
 </body>
 </html>

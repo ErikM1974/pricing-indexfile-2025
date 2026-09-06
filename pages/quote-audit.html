@@ -16,7 +16,7 @@
     <!-- Staff Auth Gate -->
     <div id="auth-gate" class="auth-gate" style="display: none;">
         <div class="auth-gate-card">
-            <i class="fas fa-lock"></i>
+            <i class="fas fa-lock" aria-hidden="true"></i>
             <h2>Staff Login Required</h2>
             <p>You must be logged in via the staff dashboard to view pricing audits.</p>
             <a href="/staff-dashboard.html" class="btn btn-primary">Go to Staff Dashboard</a>
@@ -31,7 +31,7 @@
 
     <!-- Error State -->
     <div id="error-state" class="error-state" style="display: none;">
-        <i class="fas fa-exclamation-triangle"></i>
+        <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
         <h2 id="error-title">Error</h2>
         <p id="error-message">Something went wrong.</p>
     </div>
@@ -128,18 +128,18 @@
         <!-- Actions -->
         <section class="audit-actions no-print">
             <a id="view-customer-quote" href="#" target="_blank" class="btn btn-secondary">
-                <i class="fas fa-eye"></i> View Customer Quote
+                <i class="fas fa-eye" aria-hidden="true"></i> View Customer Quote
             </a>
             <button class="btn btn-secondary" onclick="window.print()">
-                <i class="fas fa-print"></i> Print Audit
+                <i class="fas fa-print" aria-hidden="true"></i> Print Audit
             </button>
             <a href="/dashboards/quote-management.html" class="btn btn-outline">
-                <i class="fas fa-arrow-left"></i> Back to Quotes
+                <i class="fas fa-arrow-left" aria-hidden="true"></i> Back to Quotes
             </a>
         </section>
     </div>
 
-    <script src="/shared_components/js/staff-auth-helper.js"></script>
+    <script src="/shared_components/js/staff-auth-helper.js?v=2026.09.06.26"></script>
     <script src="/pages/js/quote-audit.js?v=2026.09.05.6"></script>
 </body>
 </html>

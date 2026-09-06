@@ -14,6 +14,7 @@
     <!-- Phase 11 (2026-05-14): jsPDF + html2canvas removed. PDF generation
          now uses native window.print() + the @media print styles in
          quote-print.css. Vector text, selectable, single-page. -->
+    <link rel="stylesheet" href="/shared_components/css/toast-notifications.css?v=2026.09.06.27">
 </head>
 <body>
     <div class="quote-page">
@@ -384,7 +385,7 @@
             <!-- Special Notes (shown when plain-text notes exist) -->
             <section id="special-notes-section" class="special-notes-section" style="display: none;">
                 <div class="special-notes-card">
-                    <h3><i class="fas fa-sticky-note" style="color: #f9a825; margin-right: 6px;"></i>Special Notes</h3>
+                    <h3><i class="fas fa-sticky-note" style="color: #f9a825; margin-right: 6px;" aria-hidden="true"></i>Special Notes</h3>
                     <pre id="special-notes-content" class="special-notes-content"></pre>
                 </div>
             </section>
@@ -672,7 +673,7 @@
     <!-- Same-origin rewrite for gated /api/box/* image URLs (design thumbnails) -->
     <script src="/shared_components/js/box-url.js?v=2026.08.06.1"></script>
     <!-- Shared toasts replace the page's browser alert() calls (2026-09-05) -->
-    <script src="/shared_components/js/toast-notifications.js?v=2026.09.05.10"></script>
+    <script src="/shared_components/js/toast-notifications.js?v=2026.09.06.27"></script>
     <!-- Proxy host for product-image lookups (Rule 6) -->
     <script src="/config/app.config.js"></script>
     <script src="/pages/js/quote-view.js?v=2026.09.06.1"></script>

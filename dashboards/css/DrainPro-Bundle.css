@@ -388,3 +388,7 @@
                 display: block !important;
             }
         }
+
+/* 2026-09-06 review */
+.dp-footnote { text-align: center; padding: 2rem; color: #6b7280; font-size: 0.875rem; }
+.dp-footnote-sub { margin-top: 0.5rem; }

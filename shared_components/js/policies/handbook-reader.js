@@ -174,9 +174,9 @@
                 <header class="handbook-chapter-header">
                     <h1 class="handbook-chapter-title">${title}</h1>
                     <div class="handbook-chapter-meta">
-                        ${updated ? `<span><i class="far fa-clock"></i> Updated ${escapeHTML(updated)}</span>` : ''}
-                        ${owner ? `<span><i class="far fa-user"></i> ${owner}</span>` : ''}
-                        <span><a href="${detailUrl}" title="Open this chapter on its own page (with edit access for admins)"><i class="fas fa-external-link-alt"></i> Open in editor</a></span>
+                        ${updated ? `<span><i class="far fa-clock" aria-hidden="true"></i> Updated ${escapeHTML(updated)}</span>` : ''}
+                        ${owner ? `<span><i class="far fa-user" aria-hidden="true"></i> ${owner}</span>` : ''}
+                        <span><a href="${detailUrl}" title="Open this chapter on its own page (with edit access for admins)"><i class="fas fa-external-link-alt" aria-hidden="true"></i> Open in editor</a></span>
                     </div>
                 </header>
                 <div class="handbook-chapter-body">${body}</div>
@@ -224,7 +224,7 @@
     function setupBackToTop() {
         const btn = document.createElement('button');
         btn.className = 'handbook-back-top';
-        btn.innerHTML = '<i class="fas fa-arrow-up"></i>';
+        btn.innerHTML = '<i class="fas fa-arrow-up" aria-hidden="true"></i>';
         btn.title = 'Back to top';
         btn.setAttribute('aria-label', 'Back to top');
         btn.addEventListener('click', () => {

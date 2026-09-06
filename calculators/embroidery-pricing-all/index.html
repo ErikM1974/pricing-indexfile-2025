@@ -18,13 +18,13 @@
          standalone page. Redirect old ?tab=contract bookmarks BEFORE the
          page paints so reps with saved links land on the new page.
          Inline + synchronous = no flash of the old corporate page. -->
-    <script src="/shared_components/js/data-call-delegator.js"></script>
+    <script src="/shared_components/js/data-call-delegator.js?v=2026.09.06.27"></script>
     <script src="/calculators/embroidery-pricing-all/embroidery-pricing-all-inline.js?v=2026.09.05.8"></script>
 </head>
 <body>
     <!-- Error Banner (hidden by default) -->
     <div id="apiErrorBanner" class="api-error-banner hidden">
-        <i class="fas fa-exclamation-triangle"></i>
+        <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
         <span id="apiErrorMessage">Unable to load pricing data. Please refresh the page.</span>
     </div>
 
@@ -37,7 +37,7 @@
                     <span class="separator">/</span>
                     <span>Embroidery Pricing</span>
                 </div>
-                <h1><i class="fas fa-tshirt"></i> Embroidery Pricing 2026</h1>
+                <h1><i class="fas fa-tshirt" aria-hidden="true"></i> Embroidery Pricing 2026</h1>
                 <p class="subtitle">Corporate embroidery — Additional Logo / Customer Supplied Garments + Additional Stitches + Full Back Embroidery. <a href="/calculators/embroidery-contract/" class="contract-link">Looking for Contract Embroidery? →</a></p>
                 <p class="version-info">Updated February 2026</p>
             </div>
@@ -63,23 +63,23 @@
         </div>
         <div class="tab-navigation">
             <button class="tab-btn active" data-tab="al-retail" data-call="switchTab" data-args='["al-retail"]'>
-                <i class="fas fa-tag"></i>
+                <i class="fas fa-tag" aria-hidden="true"></i>
                 Additional Logo
                 <span class="tab-subtitle">We supply garment</span>
             </button>
             <button class="tab-btn" data-tab="decg-retail" data-call="switchTab" data-args='["decg-retail"]'>
-                <i class="fas fa-box-open"></i>
+                <i class="fas fa-box-open" aria-hidden="true"></i>
                 Customer Supplied Garments
                 <span class="tab-subtitle">Retail · they bring blanks</span>
             </button>
             <span class="tab-divider" aria-hidden="true"></span>
             <button class="tab-btn tab-btn--modifier" data-tab="stitch-charges" data-call="switchTab" data-args='["stitch-charges"]'>
-                <i class="fas fa-layer-group"></i>
+                <i class="fas fa-layer-group" aria-hidden="true"></i>
                 Additional Stitches
                 <span class="tab-subtitle">+ adds to any tier · &gt; 10K stitches</span>
             </button>
             <button class="tab-btn tab-btn--modifier" data-tab="fullback" data-call="switchTab" data-args='["fullback"]'>
-                <i class="fas fa-expand"></i>
+                <i class="fas fa-expand" aria-hidden="true"></i>
                 Full Back Embroidery
                 <span class="tab-subtitle">Jacket-back &amp; 25K+ designs</span>
             </button>
@@ -97,7 +97,7 @@
             <!-- Collapsible: Pricing Decision Guide -->
             <details class="info-disclosure">
                 <summary>
-                    <i class="fas fa-question-circle"></i>
+                    <i class="fas fa-question-circle" aria-hidden="true"></i>
                     Which Tab Should I Use?
                     <span class="disclosure-hint">Click to expand</span>
                 </summary>
@@ -106,21 +106,21 @@
                         <div class="decision-step">
                             <span class="decision-question">Is customer buying garments FROM US in this order?</span>
                             <div class="decision-answers">
-                                <span class="decision-yes"><i class="fas fa-check-circle"></i> YES → Use <strong>Add Logo</strong> pricing</span>
-                                <span class="decision-no"><i class="fas fa-times-circle"></i> NO → Continue below</span>
+                                <span class="decision-yes"><i class="fas fa-check-circle" aria-hidden="true"></i> YES → Use <strong>Add Logo</strong> pricing</span>
+                                <span class="decision-no"><i class="fas fa-times-circle" aria-hidden="true"></i> NO → Continue below</span>
                             </div>
                         </div>
                         <div class="decision-step">
                             <span class="decision-question">Is customer bringing their own garments/caps?</span>
                             <div class="decision-answers">
-                                <span class="decision-yes"><i class="fas fa-check-circle"></i> YES → Use <strong>Customer-Supplied</strong> tab</span>
-                                <span class="decision-no"><i class="fas fa-times-circle"></i> NO → Is this a wholesale partner?</span>
+                                <span class="decision-yes"><i class="fas fa-check-circle" aria-hidden="true"></i> YES → Use <strong>Customer-Supplied</strong> tab</span>
+                                <span class="decision-no"><i class="fas fa-times-circle" aria-hidden="true"></i> NO → Is this a wholesale partner?</span>
                             </div>
                         </div>
                         <div class="decision-step">
                             <span class="decision-question">Is this a wholesale/ad-specialty partner with their own blanks?</span>
                             <div class="decision-answers">
-                                <span class="decision-yes"><i class="fas fa-check-circle"></i> YES → Use <strong>Contract-Ruthie</strong> tab</span>
+                                <span class="decision-yes"><i class="fas fa-check-circle" aria-hidden="true"></i> YES → Use <strong>Contract-Ruthie</strong> tab</span>
                             </div>
                         </div>
                     </div>
@@ -130,7 +130,7 @@
             <!-- Collapsible: Add Logo Info + Eligibility (combined) -->
             <details class="info-disclosure">
                 <summary>
-                    <i class="fas fa-exclamation-triangle"></i>
+                    <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
                     Add Logo Eligibility & Pricing Info
                     <span class="disclosure-hint">Click to expand</span>
                 </summary>
@@ -151,13 +151,13 @@
 
             <!-- LTM Banner -->
             <div class="ltm-banner">
-                <i class="fas fa-exclamation-circle"></i>
+                <i class="fas fa-exclamation-circle" aria-hidden="true"></i>
                 <span><strong>LTM Fee:</strong> Orders of 1-7 pieces incur a $50 Less Than Minimum fee</span>
             </div>
 
             <!-- Quick Calculator -->
             <div class="calculator-card compact">
-                <h3><i class="fas fa-calculator"></i> Quick Price Calculator</h3>
+                <h3><i class="fas fa-calculator" aria-hidden="true"></i> Quick Price Calculator</h3>
                 <div class="calc-form">
                     <div class="form-row">
                         <div class="form-group">
@@ -201,7 +201,7 @@
 
             <!-- ShopWorks Part Numbers Reference Card -->
             <div class="shopworks-ref-card">
-                <span class="ref-title"><i class="fas fa-tag"></i> ShopWorks Parts:</span>
+                <span class="ref-title"><i class="fas fa-tag" aria-hidden="true"></i> ShopWorks Parts:</span>
                 <span class="ref-item"><span class="ref-code">LTM</span> Less Than Minimum Fee</span>
                 <span class="ref-item"><span class="ref-code">AL</span> Garments</span>
                 <span class="ref-item"><span class="ref-code">AL-CAP</span> Caps</span>
@@ -217,7 +217,7 @@
                 <!-- Garment AL -->
                 <div class="matrix-card">
                     <div class="matrix-header">
-                        <h3><i class="fas fa-tshirt"></i> Garment Additional Logo <span class="part-number-badge">AL</span></h3>
+                        <h3><i class="fas fa-tshirt" aria-hidden="true"></i> Garment Additional Logo <span class="part-number-badge">AL</span></h3>
                         <div class="matrix-meta">Base 8K stitches</div>
                     </div>
                     <table id="alRetailGarmentsMatrix" class="pricing-matrix simple">
@@ -237,7 +237,7 @@
                 <!-- Cap AL -->
                 <div class="matrix-card">
                     <div class="matrix-header">
-                        <h3><i class="fas fa-hat-cowboy"></i> Cap Additional Logo <span class="part-number-badge">AL-CAP</span></h3>
+                        <h3><i class="fas fa-hat-cowboy" aria-hidden="true"></i> Cap Additional Logo <span class="part-number-badge">AL-CAP</span></h3>
                         <div class="matrix-meta">Base 5K stitches</div>
                     </div>
                     <table id="alRetailCapsMatrix" class="pricing-matrix simple">
@@ -266,7 +266,7 @@
 
             <!-- Sales Script Example -->
             <div class="script-card">
-                <h3><i class="fas fa-comments"></i> Quick Quote Example</h3>
+                <h3><i class="fas fa-comments" aria-hidden="true"></i> Quick Quote Example</h3>
                 <div class="script-example">
                     <p><strong>Customer:</strong> "I want Richardson 112 caps with front and back logos"</p>
                     <p><strong>Sales Rep:</strong> "At 24 pieces, that's $22 per cap for the front logo. Adding a back logo is $5.75 each. Total: $27.75 per cap, $666 for 24 caps."</p>
@@ -339,7 +339,7 @@
                 </div>
 
                 <button class="es-view-all-btn" id="openSurchargeModal">
-                    <i class="fas fa-users"></i> View All Surcharge Accounts
+                    <i class="fas fa-users" aria-hidden="true"></i> View All Surcharge Accounts
                     <span class="es-view-all-count" id="scBtnCount">227</span>
                 </button>
 
@@ -360,7 +360,7 @@
             <!-- Collapsible: Customer-Supplied Info (combined) -->
             <details class="info-disclosure">
                 <summary>
-                    <i class="fas fa-info-circle"></i>
+                    <i class="fas fa-info-circle" aria-hidden="true"></i>
                     Customer-Supplied Pricing Info
                     <span class="disclosure-hint">Click to expand</span>
                 </summary>
@@ -369,7 +369,7 @@
                         <strong>Customer-Supplied Pricing:</strong> Customer brings their OWN garments/caps for embroidery. Higher price because we have no garment margin and assume more risk.
                     </div>
                     <div class="disclosure-section">
-                        <strong><i class="fas fa-question-circle"></i> Why is this 4x wholesale pricing?</strong>
+                        <strong><i class="fas fa-question-circle" aria-hidden="true"></i> Why is this 4x wholesale pricing?</strong>
                         <ul>
                             <li>No garment margin cushion - embroidery must carry full profit</li>
                             <li>Higher defect risk - can't replace customer's items</li>
@@ -382,13 +382,13 @@
 
             <!-- LTM Banner -->
             <div class="ltm-banner">
-                <i class="fas fa-exclamation-circle"></i>
+                <i class="fas fa-exclamation-circle" aria-hidden="true"></i>
                 <span><strong>LTM Fee:</strong> Orders of 1-7 pieces incur a $50 Less Than Minimum fee</span>
             </div>
 
             <!-- Quick Calculator (moved to top) -->
             <div class="calculator-card compact">
-                <h3><i class="fas fa-calculator"></i> Quick Price Calculator</h3>
+                <h3><i class="fas fa-calculator" aria-hidden="true"></i> Quick Price Calculator</h3>
                 <div class="calc-form">
                     <div class="form-row">
                         <div class="form-group">
@@ -445,7 +445,7 @@
 
             <!-- ShopWorks Part Numbers Reference Card -->
             <div class="shopworks-ref-card">
-                <span class="ref-title"><i class="fas fa-tag"></i> ShopWorks Parts:</span>
+                <span class="ref-title"><i class="fas fa-tag" aria-hidden="true"></i> ShopWorks Parts:</span>
                 <span class="ref-item"><span class="ref-code">LTM</span> Less Than Minimum Fee</span>
                 <span class="ref-item"><span class="ref-code">DECG</span> Garments</span>
                 <span class="ref-item"><span class="ref-code">DECC</span> Caps</span>
@@ -461,7 +461,7 @@
                 <!-- DECG Garments -->
                 <div class="matrix-card">
                     <div class="matrix-header">
-                        <h3><i class="fas fa-tshirt"></i> DECG Garments <span class="part-number-badge">DECG</span></h3>
+                        <h3><i class="fas fa-tshirt" aria-hidden="true"></i> DECG Garments <span class="part-number-badge">DECG</span></h3>
                         <div class="matrix-meta">Base 8K stitches</div>
                     </div>
                     <table id="decgRetailGarmentsMatrix" class="pricing-matrix simple">
@@ -481,7 +481,7 @@
                 <!-- DECG Caps -->
                 <div class="matrix-card">
                     <div class="matrix-header">
-                        <h3><i class="fas fa-hat-cowboy"></i> DECG Caps <span class="part-number-badge">DECC</span></h3>
+                        <h3><i class="fas fa-hat-cowboy" aria-hidden="true"></i> DECG Caps <span class="part-number-badge">DECC</span></h3>
                         <div class="matrix-meta">Base 8K stitches</div>
                     </div>
                     <table id="decgRetailCapsMatrix" class="pricing-matrix simple">
@@ -501,7 +501,7 @@
 
             <!-- Heavyweight Surcharge Notice -->
             <div class="surcharge-card">
-                <h3><i class="fas fa-weight-hanging"></i> Heavyweight Surcharge</h3>
+                <h3><i class="fas fa-weight-hanging" aria-hidden="true"></i> Heavyweight Surcharge</h3>
                 <p>Add <strong>$10.00/piece</strong> for heavyweight items: Carhartt jackets, bags, canvas, leather</p>
             </div>
 
@@ -529,12 +529,12 @@
              init) populates this table without any JS change. -->
         <div id="tab-fullback" class="tab-content">
             <div class="use-case-banner">
-                <i class="fas fa-info-circle"></i>
+                <i class="fas fa-info-circle" aria-hidden="true"></i>
                 <div>
                     <strong>Full Back Embroidery (DECG-FB):</strong> Priced per 1,000 stitches for designs 25K and up — typically jacket-back logos, school-spirit backs, full-coverage embroidery. One rate for every full back — wholesale (Contract), NWCA-supplied (Add Logo) or customer-supplied all price from this table, and it is the same table the quote builder charges from.
                 </div>
                 <button class="share-link-btn" data-call="copyShareableLink">
-                    <i class="fas fa-link"></i> Copy Link
+                    <i class="fas fa-link" aria-hidden="true"></i> Copy Link
                 </button>
             </div>
 
@@ -678,7 +678,7 @@
             </div>
             <div class="sc-modal-controls">
                 <div class="sc-search-wrap">
-                    <i class="fas fa-search sc-search-icon"></i>
+                    <i class="fas fa-search sc-search-icon" aria-hidden="true"></i>
                     <input class="sc-search-input" id="scSearch" aria-label="Search service codes" type="text" placeholder="Search company, contact, or email...">
                 </div>
                 <span class="sc-filter-label">Tier</span>
@@ -719,6 +719,6 @@
         </div>
     </div>
 
-    <script src="/calculators/embroidery-pricing-all/embroidery-pricing-all.js?v=2026.09.05.16"></script>
+    <script src="/calculators/embroidery-pricing-all/embroidery-pricing-all.js?v=2026.09.06.27"></script>
 </body>
 </html>

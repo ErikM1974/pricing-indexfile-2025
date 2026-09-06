@@ -48,7 +48,7 @@
         }
         slot.innerHTML = '<div class="checkout-validation-alert" style="' +
             (kind === 'error' ? '' : 'border-color:#2d5f3f;') + 'margin:1rem 0;">' +
-            '<i class="fas ' + (kind === 'error' ? 'fa-exclamation-triangle' : 'fa-info-circle') + '"></i>' +
+            '<i class="fas ' + (kind === 'error' ? 'fa-exclamation-triangle' : 'fa-info-circle') + '" aria-hidden="true"></i>' +
             '<div class="alert-content">' + html + '</div></div>';
         slot.scrollIntoView({ block: 'center' });
     }
@@ -65,7 +65,7 @@
         var original = submitBtn && submitBtn.innerHTML;
         if (submitBtn) {
             submitBtn.disabled = true;
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Preparing secure checkout…';
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Preparing secure checkout…';
         }
         try {
             // One entry per sample: single size (the drawer-add contract)
@@ -114,7 +114,7 @@
 
         var btn = document.querySelector('#sampleRequestForm [type="submit"]');
         if (btn && paid) {
-            btn.innerHTML = '<i class="fas fa-lock"></i> Continue to secure payment';
+            btn.innerHTML = '<i class="fas fa-lock" aria-hidden="true"></i> Continue to secure payment';
         }
         // 2026 reskin: the credit note is static markup in the summary band
         // (styled by pages/css/sample-cart.css) — reveal it for paid carts

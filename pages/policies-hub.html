@@ -31,26 +31,26 @@
     <!-- Top bar -->
     <header class="hub-topbar">
         <a href="/staff-dashboard.html" class="hub-topbar-back" aria-label="Back to staff dashboard">
-            <i class="fas fa-arrow-left"></i> Dashboard
+            <i class="fas fa-arrow-left" aria-hidden="true"></i> Dashboard
         </a>
         <div class="hub-topbar-title">
-            <i class="fas fa-book-open"></i>
+            <i class="fas fa-book-open" aria-hidden="true"></i>
             Company Policies Hub
         </div>
         <div class="hub-search-wrap">
-            <i class="fas fa-search"></i>
+            <i class="fas fa-search" aria-hidden="true"></i>
             <input type="text" id="hubSearch" aria-label="Search policies" placeholder="Search policies — title, summary, body…">
         </div>
         <button id="aiSearchBtn" class="btn btn-ai" title="Ask Claude to find a policy in plain English">
-            <i class="fas fa-sparkles"></i> <span class="ai-search-btn-label">Ask Claude</span>
+            <i class="fas fa-sparkles" aria-hidden="true"></i> <span class="ai-search-btn-label">Ask Claude</span>
         </button>
         <a id="questionsBadge" href="/pages/policy-questions.html" class="btn-questions-badge" style="display:none" title="View open questions across all policies">
-            <i class="fas fa-comments-question"></i>
+            <i class="fas fa-comments-question" aria-hidden="true"></i>
             <span class="badge-label">Questions</span>
             <span class="badge-count" id="questionsBadgeCount">0</span>
         </a>
         <button id="newPolicyBtn" class="btn btn-primary" style="display:none">
-            <i class="fas fa-plus"></i> New Policy
+            <i class="fas fa-plus" aria-hidden="true"></i> New Policy
         </button>
     </header>
 
@@ -75,7 +75,7 @@
             <!-- Employee Handbook hero tile -->
             <section class="handbook-hero-tile" aria-label="Employee Handbook">
                 <div class="handbook-hero-tile-icon">
-                    <i class="fas fa-book-open"></i>
+                    <i class="fas fa-book-open" aria-hidden="true"></i>
                 </div>
                 <div class="handbook-hero-tile-body">
                     <div class="handbook-hero-tile-label">Living Document &middot; 2026 Edition</div>
@@ -84,10 +84,10 @@
                 </div>
                 <div class="handbook-hero-tile-actions">
                     <a href="/pages/handbook.html" class="btn btn-handbook-primary">
-                        <i class="fas fa-book-reader"></i> Read Online
+                        <i class="fas fa-book-reader" aria-hidden="true"></i> Read Online
                     </a>
                     <a href="/forms/Employee-Handbook-Latest.pdf" target="_blank" rel="noopener" class="btn btn-handbook-secondary">
-                        <i class="fas fa-file-pdf"></i> Download PDF
+                        <i class="fas fa-file-pdf" aria-hidden="true"></i> Download PDF
                     </a>
                 </div>
             </section>
@@ -99,14 +99,14 @@
             <div class="hub-toolbar-row">
                 <label class="archived-toggle" id="archivedToggleWrap" title="Show archived policies (admin only)">
                     <input type="checkbox" id="archivedToggle">
-                    <i class="fas fa-box-archive"></i> Show archived
+                    <i class="fas fa-box-archive" aria-hidden="true"></i> Show archived
                 </label>
                 <div class="view-toggle" role="tablist" aria-label="View mode">
                     <button class="view-toggle-btn active" data-view="grid" title="Grid view" aria-label="Grid view">
-                        <i class="fas fa-th-large"></i>
+                        <i class="fas fa-th-large" aria-hidden="true"></i>
                     </button>
                     <button class="view-toggle-btn" data-view="list" title="List view" aria-label="List view">
-                        <i class="fas fa-list"></i>
+                        <i class="fas fa-list" aria-hidden="true"></i>
                     </button>
                 </div>
             </div>
@@ -114,7 +114,7 @@
             <!-- Recently updated -->
             <section class="recently-updated">
                 <div class="recently-updated-header">
-                    <i class="far fa-clock"></i> Recently Updated
+                    <i class="far fa-clock" aria-hidden="true"></i> Recently Updated
                 </div>
                 <div id="recentItems" class="recent-items"></div>
             </section>
@@ -129,7 +129,7 @@
     <!-- Scripts: admin gate first (sets window.IS_POLICIES_ADMIN), then API, then page controller -->
     <script src="/shared_components/js/policies/policies-admin-gate.js?v=2026.09.05.9"></script>
     <script src="/shared_components/js/policies/policies-api.js?v=20260514-12"></script>
-    <script src="/shared_components/js/policies/policy-ai-search.js?v=20260514-12"></script>
-    <script src="/shared_components/js/policies/policies-hub.js?v=2026.05.29.11"></script>
+    <script src="/shared_components/js/policies/policy-ai-search.js?v=2026.09.06.27"></script>
+    <script src="/shared_components/js/policies/policies-hub.js?v=2026.09.06.27"></script>
 </body>
 </html>

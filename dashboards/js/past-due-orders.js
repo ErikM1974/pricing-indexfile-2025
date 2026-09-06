@@ -168,7 +168,7 @@
         root.className = '';
 
         if (!reps.length) {
-            root.innerHTML = '<p class="pdo-none"><i class="fas fa-check-circle"></i> '
+            root.innerHTML = '<p class="pdo-none"><i class="fas fa-check-circle" aria-hidden="true"></i> '
                 + 'Nothing past due or at risk in the last ' + esc(d.lookbackDays) + ' days.</p>';
             return;
         }

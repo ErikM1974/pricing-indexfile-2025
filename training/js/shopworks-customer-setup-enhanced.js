@@ -554,7 +554,7 @@
                     </div>
                 </div>
                 <button class="action-btn primary" onclick="checkSetupAnswers()" style="width: 100%;">
-                    <i class="fas fa-check"></i> Submit Setup
+                    <i class="fas fa-check" aria-hidden="true"></i> Submit Setup
                 </button>
                 <div id="setupFeedback" style="margin-top: 10px;"></div>
             `;
@@ -714,7 +714,7 @@
                     </span>
                 </div>
                 <button class="action-btn primary" onclick="checkDetectiveAnswers()" style="width: 100%;">
-                    <i class="fas fa-search"></i> Check for Errors
+                    <i class="fas fa-search" aria-hidden="true"></i> Check for Errors
                 </button>
                 <div id="detectiveFeedback" style="margin-top: 10px;"></div>
             `;
@@ -820,7 +820,7 @@
                 <div id="speedTimer" style="font-size: 24px; text-align: center; color: #dc3545;">60</div>
                 <div id="speedScenario" style="margin-top: 10px;"></div>
                 <button class="action-btn primary" onclick="submitSpeedAnswer()" style="width: 100%; margin-top: 10px;">
-                    <i class="fas fa-bolt"></i> Submit
+                    <i class="fas fa-bolt" aria-hidden="true"></i> Submit
                 </button>
             `;
             

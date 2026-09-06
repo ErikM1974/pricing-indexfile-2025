@@ -14,8 +14,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <!-- 2026 design tokens (must load before dash-shell.css) -->
-    <link rel="stylesheet" href="/shared_components/css/art-hub.css">
-    <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
+    <link rel="stylesheet" href="/shared_components/css/art-hub.css?v=2026.09.06.26">
+    <link rel="stylesheet" href="/shared_components/css/dash-shell.css?v=2026.09.06.26">
     <link rel="stylesheet" href="/shared_components/css/sanmar-invoice-viewer.css?v=2026.07.19.17">
     <link rel="stylesheet" href="/dashboards/css/ae-mission-control.css?v=2026.09.05.75">
     <!-- SanMar Inbound modal + its printable reports/box labels (window.openInboundTodayModal) -->
@@ -657,11 +657,11 @@
 
     <!-- Load order matters: APP_CONFIG → fetch-timeout → DashPage → inbound modal → page controller -->
     <script src="/config/app.config.js"></script>
-    <script src="/shared_components/js/fetch-timeout.js"></script>
-    <script src="/shared_components/js/dash-page-helpers.js"></script>
+    <script src="/shared_components/js/fetch-timeout.js?v=2026.09.06.26"></script>
+    <script src="/shared_components/js/dash-page-helpers.js?v=2026.09.06.26"></script>
     <!-- Shared accessible tab router (ARIA APG tablist + hash sync). Must load before the page controller. -->
     <!-- Confetti: fired ONLY on a genuinely new rung/win-back, once, and never under reduced motion. -->
-    <script src="/shared_components/js/confetti.js"></script>
+    <script src="/shared_components/js/confetti.js?v=2026.09.06.26"></script>
     <script src="/shared_components/js/dash-tabs.js?v=2026.07.26.6"></script>
     <script src="/shared_components/js/box-label-template.js?v=2026.09.05.71"></script>
     <!-- Normalises stored absolute proxy Box urls onto this origin so the session-gated

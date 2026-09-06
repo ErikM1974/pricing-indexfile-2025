@@ -263,7 +263,7 @@
                     tbody.innerHTML = `
                         <tr>
                             <td colspan="8" style="text-align: center; padding: 2rem; color: var(--text-secondary);">
-                                <i class="fas fa-search" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
+                                <i class="fas fa-search" style="font-size: 2rem; margin-bottom: 1rem; display: block;" aria-hidden="true"></i>
                                 No records found matching your criteria
                             </td>
                         </tr>
@@ -316,19 +316,19 @@
                         <td>
                             <div style="display: flex; gap: 0.25rem;">
                                 <button class="btn btn-sm btn-secondary" data-action="view" data-quote-id="${escapeHtml(quote.QuoteID)}" title="View Details">
-                                    <i class="fas fa-eye"></i>
+                                    <i class="fas fa-eye" aria-hidden="true"></i>
                                 </button>
                                 <button class="btn btn-sm btn-primary" data-action="edit" data-quote-id="${escapeHtml(quote.QuoteID)}" data-pk-id="${escapeHtml(quote.PK_ID)}" title="Edit">
-                                    <i class="fas fa-edit"></i>
+                                    <i class="fas fa-edit" aria-hidden="true"></i>
                                 </button>
                                 <button class="btn btn-sm btn-secondary" data-action="duplicate" data-quote-id="${escapeHtml(quote.QuoteID)}" title="Duplicate">
-                                    <i class="fas fa-copy"></i>
+                                    <i class="fas fa-copy" aria-hidden="true"></i>
                                 </button>
                                 <button class="btn btn-sm btn-secondary" data-action="export" data-quote-id="${escapeHtml(quote.QuoteID)}" title="Export">
-                                    <i class="fas fa-download"></i>
+                                    <i class="fas fa-download" aria-hidden="true"></i>
                                 </button>
                                 <button class="btn btn-sm btn-secondary" style="background: #fee2e2; color: #991b1b; border-color: #fecaca;" data-action="delete" data-quote-id="${escapeHtml(quote.QuoteID)}" data-pk-id="${escapeHtml(quote.PK_ID)}" title="Delete">
-                                    <i class="fas fa-trash"></i>
+                                    <i class="fas fa-trash" aria-hidden="true"></i>
                                 </button>
                             </div>
                         </td>
@@ -564,7 +564,7 @@
             const toast = document.createElement('div');
             toast.className = `toast toast-${type}`;
             toast.innerHTML = `
-                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}" aria-hidden="true"></i>
                 <span>${escapeHtml(message)}</span>
             `;
             
@@ -573,52 +573,7 @@
             
             // Add styles if not already present
             if (!document.getElementById('toast-styles')) {
-                const style = document.createElement('style');
-                style.id = 'toast-styles';
-                style.textContent = `
-                    .toast {
-                        position: fixed;
-                        bottom: 2rem;
-                        right: 2rem;
-                        background: var(--card-bg);
-                        padding: 1rem 1.5rem;
-                        border-radius: 8px;
-                        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-                        display: flex;
-                        align-items: center;
-                        gap: 0.75rem;
-                        font-size: 0.875rem;
-                        z-index: 1000;
-                        animation: slideIn 0.3s ease-out;
-                    }
-                    
-                    .toast-success {
-                        border-left: 4px solid var(--success-color);
-                        color: var(--success-text);
-                    }
-                    
-                    .toast-error {
-                        border-left: 4px solid var(--error-color);
-                        color: var(--error-text);
-                    }
-                    
-                    .toast-info {
-                        border-left: 4px solid var(--info-color);
-                        color: var(--info-text);
-                    }
-                    
-                    @keyframes slideIn {
-                        from {
-                            transform: translateX(100%);
-                            opacity: 0;
-                        }
-                        to {
-                            transform: translateX(0);
-                            opacity: 1;
-                        }
-                    }
-                `;
-                document.head.appendChild(style);
+                // (2026-09-06) styles live in /admin/css/universal-records-admin-injected.css — linked by every consumer page, nothing injected.
             }
             
             // Remove after 3 seconds
@@ -706,10 +661,10 @@
                             </div>
                             <div class="modal-footer">
                                 <button class="btn btn-secondary" data-action="export" data-quote-id="${escapeHtml(quoteID)}">
-                                    <i class="fas fa-download"></i> Export
+                                    <i class="fas fa-download" aria-hidden="true"></i> Export
                                 </button>
                                 <button class="btn btn-primary" data-action="duplicate" data-quote-id="${escapeHtml(quoteID)}">
-                                    <i class="fas fa-copy"></i> Duplicate
+                                    <i class="fas fa-copy" aria-hidden="true"></i> Duplicate
                                 </button>
                                 <button class="btn" data-call="uraCloseModal" data-args='[".quote-view-modal"]'>Close</button>
                             </div>
@@ -719,116 +674,7 @@
 
                 // Add styles
                 if (!document.querySelector('#quote-modal-styles')) {
-                    const style = document.createElement('style');
-                    style.id = 'quote-modal-styles';
-                    style.textContent = `
-                        .quote-view-modal {
-                            position: fixed;
-                            top: 0;
-                            left: 0;
-                            right: 0;
-                            bottom: 0;
-                            z-index: 1000;
-                        }
-                        
-                        .modal-overlay {
-                            width: 100%;
-                            height: 100%;
-                            background: rgba(0, 0, 0, 0.5);
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                        }
-                        
-                        .modal-content {
-                            background: white;
-                            border-radius: 8px;
-                            width: 90%;
-                            max-width: 800px;
-                            max-height: 90vh;
-                            overflow: hidden;
-                            display: flex;
-                            flex-direction: column;
-                        }
-                        
-                        .modal-header {
-                            padding: 1.5rem;
-                            border-bottom: 1px solid #e5e7eb;
-                            display: flex;
-                            justify-content: space-between;
-                            align-items: center;
-                        }
-                        
-                        .modal-header h2 {
-                            margin: 0;
-                            color: #1f2937;
-                        }
-                        
-                        .close-btn {
-                            background: none;
-                            border: none;
-                            font-size: 1.5rem;
-                            cursor: pointer;
-                            color: #6b7280;
-                        }
-                        
-                        .modal-body {
-                            padding: 1.5rem;
-                            overflow-y: auto;
-                            flex: 1;
-                        }
-                        
-                        .quote-info-grid {
-                            display: grid;
-                            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-                            gap: 2rem;
-                            margin-bottom: 2rem;
-                        }
-                        
-                        .info-section h3 {
-                            margin: 0 0 1rem 0;
-                            color: #374151;
-                            font-size: 1.125rem;
-                        }
-                        
-                        .info-section p {
-                            margin: 0.5rem 0;
-                        }
-                        
-                        .notes-section {
-                            background: #f9fafb;
-                            padding: 1rem;
-                            border-radius: 6px;
-                            margin-bottom: 2rem;
-                        }
-                        
-                        .items-table {
-                            width: 100%;
-                            border-collapse: collapse;
-                        }
-                        
-                        .items-table th,
-                        .items-table td {
-                            padding: 0.75rem;
-                            text-align: left;
-                            border-bottom: 1px solid #e5e7eb;
-                        }
-                        
-                        .items-table th {
-                            background: #f9fafb;
-                            font-weight: 600;
-                            color: #374151;
-                        }
-                        
-                        .modal-footer {
-                            padding: 1.5rem;
-                            border-top: 1px solid #e5e7eb;
-                            display: flex;
-                            gap: 1rem;
-                            justify-content: flex-end;
-                        }
-                    `;
-                    document.head.appendChild(style);
+                    // (2026-09-06) styles live in /admin/css/universal-records-admin-injected.css — linked by every consumer page, nothing injected.
                 }
                 
                 // Footer actions are bound here rather than as inline onclick:
@@ -1063,7 +909,7 @@
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-call="uraCloseModal" data-args='[".quote-edit-modal"]'>Cancel</button>
                                     <button type="submit" class="btn btn-primary">
-                                        <i class="fas fa-save"></i> Save Changes
+                                        <i class="fas fa-save" aria-hidden="true"></i> Save Changes
                                     </button>
                                 </div>
                             </form>
@@ -1073,114 +919,7 @@
 
                 // Add styles if not already present
                 if (!document.querySelector('#edit-modal-styles')) {
-                    const style = document.createElement('style');
-                    style.id = 'edit-modal-styles';
-                    style.textContent = `
-                        .quote-edit-modal {
-                            position: fixed;
-                            top: 0;
-                            left: 0;
-                            right: 0;
-                            bottom: 0;
-                            z-index: 1000;
-                        }
-                        
-                        .quote-edit-modal .modal-overlay {
-                            width: 100%;
-                            height: 100%;
-                            background: rgba(0, 0, 0, 0.5);
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                        }
-                        
-                        .quote-edit-modal .modal-content {
-                            background: white;
-                            border-radius: 8px;
-                            width: 90%;
-                            max-width: 800px;
-                            max-height: 90vh;
-                            overflow: hidden;
-                            display: flex;
-                            flex-direction: column;
-                        }
-                        
-                        .quote-edit-modal .modal-header {
-                            padding: 1.5rem;
-                            border-bottom: 1px solid #e5e7eb;
-                            display: flex;
-                            justify-content: space-between;
-                            align-items: center;
-                        }
-                        
-                        .quote-edit-modal .modal-header h2 {
-                            margin: 0;
-                            color: #1f2937;
-                        }
-                        
-                        .quote-edit-modal .close-btn {
-                            background: none;
-                            border: none;
-                            font-size: 1.5rem;
-                            cursor: pointer;
-                            color: #6b7280;
-                        }
-                        
-                        .quote-edit-modal .modal-body {
-                            padding: 1.5rem;
-                            overflow-y: auto;
-                            flex: 1;
-                        }
-                        
-                        .quote-edit-modal .form-grid {
-                            display: grid;
-                            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-                            gap: 1rem;
-                        }
-                        
-                        .quote-edit-modal .form-group {
-                            margin-bottom: 1rem;
-                        }
-                        
-                        .quote-edit-modal .form-group.full-width {
-                            grid-column: 1 / -1;
-                        }
-                        
-                        .quote-edit-modal .form-group label {
-                            display: block;
-                            margin-bottom: 0.5rem;
-                            font-weight: 500;
-                            color: #374151;
-                        }
-                        
-                        .quote-edit-modal .form-control {
-                            width: 100%;
-                            padding: 0.5rem 0.75rem;
-                            border: 1px solid #e5e7eb;
-                            border-radius: 6px;
-                            font-size: 0.875rem;
-                            background: white;
-                        }
-                        
-                        .quote-edit-modal .form-control:focus {
-                            outline: none;
-                            border-color: #4cb354;
-                            box-shadow: 0 0 0 0.25rem rgba(76, 179, 84, 0.25);
-                        }
-                        
-                        .quote-edit-modal textarea.form-control {
-                            resize: vertical;
-                        }
-                        
-                        .quote-edit-modal .modal-footer {
-                            padding: 1.5rem;
-                            border-top: 1px solid #e5e7eb;
-                            display: flex;
-                            gap: 1rem;
-                            justify-content: flex-end;
-                        }
-                    `;
-                    document.head.appendChild(style);
+                    // (2026-09-06) styles live in /admin/css/universal-records-admin-injected.css — linked by every consumer page, nothing injected.
                 }
                 
                 // Bound here rather than as an inline onsubmit: quoteID/pkID are
