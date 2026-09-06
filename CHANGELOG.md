@@ -1,3 +1,8 @@
+## v2026.09.06.1 (2026.09.06)
+
+- Public pages review B3: lead forms + account pages — quote-view proxy host from APP_CONFIG + no inline handlers, portal visible account failure + local day, customer-invoice hidden attr, shared form assets versioned, icons decorative; lock public-forms-account-pages.test.js
+- Deploy v2026.09.06.1: public batch B3 — lead forms + account pages hygiene, quote-view proxy host from APP_CONFIG
+
 ## v2026.09.05.79 (2026.09.05)
 
 - Public pages review B2: storefronts + success pages — no silent proxy fallback (Rule 6), icons decorative, file inputs named, optional-hint class, scroll lock class; inventory-details colour selection order fix; lock public-storefront-pages.test.js
