@@ -1292,3 +1292,18 @@ Lock: `tests/unit/screen-print-pricing-page.test.js`. Erik: "fix the inline scri
 
 **Not a regression, pre-existing:** `#sp-size-upcharges-container` is empty/hidden on LIVE too (the v2 calculator renders its own upcharge info) — the panel code is effectively dormant. **Left alone (next batch):** the remaining 22 bare icons / 19 inline styles / 2 injected `<style>` blocks on this page come from SHARED components — `screenprint-pricing-v2.js`, `calculator-inventory.js` (whose inventory IIFE is ALSO duplicated inside `pricing-pages.js` — two identical `<style>` injections), `universal-header-component.js`.
 
+## The other 7 inline-code calculators — Rule 3 extraction, 8 items (2026-09-06, `v2026.09.06.11`)
+
+Lock: `tests/unit/calculator-pages-rule3.test.js`. dtf (805-line script, 2 style blocks) · dtg (1,416-line script, 1,250-line style) · embroidery (967 + 2 styles) · cap-embroidery-integrated (893) · digitizingform · monogramform · laser-manual (style only).
+
+1. **Extraction, verbatim** — one `calculators/css/<page>.css` per page (+ `[hidden]` guard), one `calculators/js/<page>-page.js` per page at the same script position. Scripts stay at GLOBAL scope on purpose: `showLoading`, `loadProduct`, `fetchProductDetails`, `getTierForQuantity`… are called by name from the shared calculator scripts, so an IIFE would have changed behaviour.
+2. 🔴 **Hardcoded proxy host** in dtf (1), dtg (5), embroidery (4), cap (4) → `<PFX>_API_BASE` from `APP_CONFIG` (pages now load `/config/app.config.js`; missing config → console.error, no guessed host).
+3. **`console.log`** (69 dtf, 54 dtg, 1 + 1) → gated `<pfx>Log` (localhost / `?debug=1`). 🔑 The flag is `<PFX>_LOG_ON`, not `_DEBUG` — dtg already owns `window.DTG_DEBUG` (its console helper object) and the first name collided.
+4. **Embroidery cascade** — a shared stylesheet (`additional-logo-pricing-table.css`) sat BETWEEN its two inline style blocks, so the second block is its own file linked at the original position (order locked).
+5. **digitizingform** `<iframe onload="hideLoading()">` → id + `load` listener (the existing 10 s timeout fallback covers an early load).
+6. **`alert()`** → inline `role=alert` cards (dtf manual-mode failure, dtg API error).
+7. **Icons** decorative (10 + 14 + 17 + 18 + 8 + 5 + 8); remaining unversioned assets → `?v=`.
+8. Verified on static-dist: dtf/dtg/embroidery/cap render 82/82/82/54 swatches with prices ($40.67/$24/$20 emb, $40.17/$23.50/$19.50 cap), digitizing iframe present + overlay hidden, monogram/laser-manual styled from the extracted CSS, no console errors.
+
+**Left alone** — inline `style="display:none"` attributes + their `.style.display` JS toggles inside these page scripts (they are consistent with each other; a `hidden` migration is a per-page job); `laser-manual-pricing` shows 4 bare icons rendered by its shared script; 🔍 `calculators/js/christmas-bundles.js` fails to PARSE under eslint ("Identifier 'resetForm' has already been declared", two `function resetForm()` in one scope, lines 1417/4198) — legal in a sloppy classic script (later wins) but verify the page live; shared calculator components (`screenprint-pricing-v2.js`, `calculator-inventory.js`, `manual-mode-indicator.js`, `pricing-pages.js` with its duplicated inventory IIFE, `dp5-helper.js`, `dtg-page-setup.js`) still carry hosts / injected `<style>` / bare icons — next batch.
+
