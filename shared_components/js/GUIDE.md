@@ -71,24 +71,17 @@
 | `delivery-promise.js` | **Delivery-promise chips (BAW adoption #1, 2026-07-06)** — `window.DeliveryPromise.render(el, method)` fills "🚚 Order today — estimated to ship by {date}"; lead days from Service_Codes `LEAD-DAYS-*` (business days, Erik-tunable, one category fetch + 5-min cache), weekend-skip date math. FAIL-SOFT: missing row/fetch error hides the chip. Consumers: pdp-configurator renderTotalCard + quote-cart-page group cards |
 | `quote-deposit-math.js` | **Online deposit money math (Storefront Checkout Phase 1, 2026-07-05)** — `computeDepositTerms({subtotal, shipping, taxRatePct, depositPct})`: WA tax on subtotal+shipping (cents-rounded before summing), grand total, deposit split, balance foots exactly. PURE dual browser/Node; the SERVER (enable-deposit endpoint) is authoritative — quote-view.js uses it only for the staff preview (depositPct:100 → grand total). depositPct comes from Service_Codes DEPOSIT-PCT, never hardcoded. Fail-closed on bad input. Locked by tests/unit/quote-deposit-math.test.js |
 | `quote-services-bar.js` | Persistent catalog-driven services bar; `render(mountId, catalog, onAdd)` → one-click chips that add services as line items (EMB/SCP/DTG/DTF, each with its own catalog) |
-| `quote-builder-step2-modern.js` | Modern Step 2 UI (embroidery/cap builders) |
 | `quote-formatter.js` | Quote formatting for display/print |
 | `quote-persistence.js` | Save/load quote drafts |
 | `quote-session.js` | Session management for quotes |
-| `quote-validation.js` | Input validation for quote builders |
-| `quote-ui-feedback.js` | User feedback (loading states, errors) |
 | `quote-share-modal.js` | Shareable URL success modal |
-| `quote-indicator-manager.js` | Quote status indicators |
-| `color-picker-component.js` | Shared color picker module |
 | `extended-sizes-config.js` | Extended size definitions (2XL→6XL, OSFA, etc.) |
 | `quote-extended-sizes.js` | Extended size popup functions (open/close/apply/child rows) — shared by EMB, DTG, SP |
-| `pricing-sidebar-component.js` | Unified pricing sidebar |
 | `customer-lookup-service.js` | Customer autocomplete from Caspio |
 | `product-thumbnail-modal.js` | Product image thumbnail + click-to-enlarge |
 | `exact-match-search.js` | Exact product style search |
 | `sidebar-resize.js` | Resizable sidebar with drag handle |
 | `shopworks-import-parser.js` | ShopWorks order text parser |
-| `shopworks-guide-generator.js` | ShopWorks data entry guide generator |
 | `staff-auth-helper.js` | Staff authentication helper |
 | `fetch-timeout.js` | Global fetch() wrapper with 15s timeout |
 | `dash-page-helpers.js` | Canonical helpers for staff-dashboard child pages — `DashPage.showError/hideError/apiUrl/fetchJson`. Loaded by every page scaffolded via the `/dash-page` skill. Wraps APP_CONFIG + fetch-timeout, enforces CLAUDE.md API-error rule (no silent fallback). |
@@ -100,15 +93,9 @@
 | File | Purpose |
 |------|---------|
 | `dtg-adapter.js` | Caspio pricing data adapter |
-| `dtg-config.js` | DTG configuration |
-| `dtg-integration.js` | Coordinates calculator, adapter, events |
 | `dtg-page-setup.js` | DTG calculator page initialization |
 | `dtg-pricing-service.js` | DTG pricing API service |
 | ~~`dtg-quote-pricing.js`~~ | **DELETED 2026-06-09** — dead legacy DTG quote pricing engine (no HTML loaded it) |
-| `dtg-quote-products.js` | DTG quote product manager (⚠️ legacy — dead-code candidate; refs deleted DTGQuotePricing) |
-| `dtg-quote-system.js` | DTG quote system orchestrator |
-| `dtg-product-recommendations.js` | Product recommendations for DTG |
-| `dtg-product-recommendations-modal.js` | Recommendations modal UI |
 | `dtg-pricing-calculator.js` | DTG calculator UI logic |
 
 ## DTF System
@@ -131,7 +118,6 @@
 | File | Purpose |
 |------|---------|
 | `embroidery-pricing-service.js` | Embroidery pricing adapter (Caspio API) |
-| `embroidery-quote-adapter.js` | Embroidery data adapter for pricing engine |
 | `embroidery-quote-invoice.js` | **THE shared invoice/print engine for ALL 4 builders** (EMB/SCP/DTF/DTG — Rule 8; name is historical). Rate labels derive from CHARGED totals (always foot); underivable → Service_Codes `DD` via window.getServicePrice → $100 literal + console warning (Batch 7). Any change = 4-builder change |
 | `embroidery-quote-pricing.js` | Pricing engine (tiers, LTM, stitch, FB) |
 | `embroidery-quote-service.js` | Quote save/update/email service |
@@ -157,7 +143,6 @@
 | `screenprint-pricing-service.js` | Pricing data adapter (Caspio API) |
 | `screenprint-pricing-v2.js` | Main calculator logic (v2 = current active) |
 | `screenprint-manual-pricing.js` | Manual pricing calculator logic |
-| `screenprint-quote-products.js` | Quote product manager |
 | `screenprint-quote-service.js` | Quote save/email service |
 | `screenprint-fast-quote-service.js` | Fast quote (60 sec) service |
 
@@ -170,7 +155,6 @@
 | `product-grid.js` | Product grid display |
 | `product-filters.js` | Product filtering |
 | `product-category-filter.js` | Category-based filtering |
-| `product-recommendations.js` | Product recommendations |
 | `product-pricing-ui.js` | Product pricing display |
 | `universal-product-display.js` | Universal product display component |
 | `universal-image-gallery.js` | Image gallery component |
@@ -191,9 +175,7 @@
 | `laser-tumbler-mockup.js` | Customer-facing logo mockup + instant quote on the laser tumbler page — reuses `jds-tumbler-template.js` engraving pipeline (page's 4 colors only), logo upload with customer-worded artwork warnings, drag/size canvas preview, PNG download, qty→price quote via `jds-api-service.js` formula pricing (no hardcoded prices). Hooked from `laser-tumbler-simple.js` (`onPageReady`/`onColorChanged`, optional-chained). |
 | `design-thumbnail-service.js` | Design thumbnail resolution service |
 | `custom-decal-pricing-page.js` | Oversize/custom decal calculator (`/api/custom-decal-pricing`) — the only surface that can price a decal the 2×2–6×6 sticker grid can't. `computeDecalQuote()` is pure and DOM-free behind a `module.exports` seam; `tests/unit/custom-decal-pricing.test.js` locks it. **Sq ft is summed across ALL lines before the tier is chosen** — pricing each line in its own tier is the classic wrong answer here. Later tiers carry a floor so a bigger order can never cost less than a smaller one. |
-| `sticker-pricing-service.js` | 🔻 **Dead — and it hardcodes all 50 sticker prices** with no visible-warning path (Rule 4 hazard). Nothing loads it. Don't reuse it; delete it or give it a warning banner. |
 | `sticker-pricing-page.js` | 🔻 **Dead (2026-07-29)** — its page was retired. Sticker and banner pricing now live on the public `/custom-stickers` and `/custom-banners` pages (same Caspio grid), the decal calculator moved to `custom-decal-pricing-page.js`, and the AI drawer + STK save were dropped. Still the reference implementation for the AI-chat pattern the emblem/webstore/DTG pages copy, which is why it's kept rather than deleted. |
-| `emblem-pricing-service.js` | Embroidered emblem pricing fetcher (`/api/emblem-pricing`). |
 | `emblem-pricing-page.js` | Embroidered emblem patch quote page logic — renders 16×10 pricing grid (`/api/emblem-pricing`); drives AI chat (SSE to `/api/contract-emblem-ai/chat`); parses PRICE_QUOTE/CUSTOMER_FINAL/EMAIL DRAFT blocks; highlights pricing-grid cells on AI quote; renders inline emblem-quote card with order total + LTM note; saves to `quote_sessions` with PATCH prefix. Mirrors sticker-pricing-page.js exactly — single product line, single quote tool. |
 | `webstore-pricing-page.js` | Custom-webstore page logic — drives AI chat (SSE to `/api/contract-webstore-ai/chat`). **DUAL-MODE**: parses PRICE_QUOTE with `productType: "webstore-setup"` (renders cream/navy store-quote card) OR `"fundraiser-item"` (renders deep-purple sell-price card with breakdown + 1099-NEC warning). Renders `web_search` tool results inline as a list of linked sources (Tavily-backed). Saves to `quote_sessions` with WEB prefix. Mirrors sticker pattern (2 product lines / 1 chat). |
 | `dtg-quote-page.js` | DTG quote-builder page logic — drives AI chat (SSE to `/api/dtg-quote-ai/chat`). Renders deep-green `.dtg-quote-card` for the live DTG price, `.top-seller-card` recommendation cards inline when bot calls recommend_top_sellers, web-search result cards (Tavily). **First bot with a frontend "Submit to ShopWorks" button** that POSTs to `/api/submit-order-form` (payload shape inherited from the retired Order Form's client). Bot collects designNumber during intake; push button gates on it. Saves with DTG prefix. |
@@ -237,8 +219,6 @@
 | `observability.js` | **1.10 (2026-07-08)** Browser Sentry init (4 builders): early-error buffer + /api/version config (no DSN → OFF) + release/tenant/method tags + inline PII scrub (twin of lib/sentry-scrub.js). Loads right after vendor/sentry/bundle.min.js in `<head>`; never load-bearing |
 | `sample-inventory-service.js` | Sample inventory tracking |
 | `sample-order-service.js` | Sample order management |
-| `edp-generator-service.js` | EDP (Electronic Data Processing) service |
-| `shopworks-edp-generator.js` | ShopWorks EDP generator |
 | `jds-api-service.js` | JDS supplier API service |
 | `monogram-form-service.js` | Monogram form API service |
 | `monogram-form-controller.js` | Monogram form UI controller |
@@ -257,8 +237,6 @@
 | `universal-cart-header.js` | Cart header component |
 | `cart-drawer.js` | Slide-out cart drawer |
 | `toast-notifications.js` | Toast notification system |
-| `enhanced-loading-animations.js` | Loading animation components |
-| `header-button-functions.js` | Header button event handlers |
 | `dp5-helper.js` | DataPage 5 (Caspio) helper |
 | `box-label-template.js` | THE 8.5×11 box-label renderer (`window.BoxLabelTemplate`) + rush/follow-on wording — shared by the SanMar Inbound modal and the repack station (pages/box-labels.html) so labels can't drift. Pair with `../css/box-label-print.css`. NEW 2026-08-04 |
 
@@ -266,8 +244,6 @@
 
 | File | Purpose |
 |------|---------|
-| `order-service-test-extended.js` | Extended order service tests |
-| `order-service-test-utilities.js` | Order service test helpers |
 
 ## Previously Orphaned (removed 2026-02-27)
 

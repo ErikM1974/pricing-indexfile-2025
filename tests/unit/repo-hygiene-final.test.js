@@ -7,8 +7,7 @@
  *   2. No orphan browser script: every JS file outside the Node-side dirs is referenced by name from at least
  *      one page, script, server.js or the build. The 2026-09-06 census found 35 unreferenced scripts (the
  *      oldest untouched since 2025-06); a script nobody loads is dead weight that still gets "fixed" in sweeps.
- *   3. The files the census verified dead stay out: if one is still present it must stay unreferenced
- *      (never resurrected by a link), and once deleted it must not come back.
+ *   3. The 69 files the census verified dead (deleted 2026-09-06 on Erik's instruction) stay deleted.
  */
 const fs = require('fs');
 const path = require('path');
@@ -18,9 +17,11 @@ const read = (rel) => fs.readFileSync(path.join(ROOT, rel), 'utf8');
 const exists = (rel) => fs.existsSync(path.join(ROOT, rel));
 const tracked = execSync('git ls-files', { cwd: ROOT, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 }).split(/\r?\n/).filter(Boolean).map((f) => f.replace(/\\/g, '/'));
 
-// Dead files verified by the 2026-09-06 census (zero references from any page, script, route or build).
-// Their removal is a separate, human-run `git rm` — until then they are skipped by lock 1 and must stay unreferenced.
-const PENDING_DELETION = [
+// Dead files verified by the 2026-09-06 census (zero references from any page, script, route or build) were
+// removed on Erik's instruction the same day (69 files — `memory/DEAD_FILES_2026-09-06.md`). This list is the
+// record of what must stay gone: a file here that reappears fails the lock below. Add to it only with the same
+// evidence (a referrer census), never to park a file you merely suspect is dead.
+const DELETED_2026_09_06 = [
     'shared_components/js/header-button-functions.js', 'shared_components/js/enhanced-loading-animations.js', 'shared_components/js/dtg-product-recommendations.js',
     'shared_components/js/dtg-integration.js', 'training/training-engine-base.js', 'calculators/leatherette-patch-quote-service.js', 'calculators/webstores-quote-service.js',
     'calculators/webstores-fundraiser.js', 'calculators/webstores-calculator.js', 'richardson-caps/scripts/richardson-combination-caps-manual.js', 'shared_components/js/edp-generator-service.js',
@@ -42,11 +43,11 @@ const PENDING_DELETION = [
     'pages/policies-hub-legacy.html', 'pages/policies/dtg-artwork-checklist.html', 'richardson-caps/view-combination-caps.html',
     'art-tools/art-approval.html', 'art-tools/ae-art-dashboard.html', 'art-tools/ae-submit-art.html', 'tests/order-service-test-harness.html',
 ];
-const PENDING = new Set(PENDING_DELETION);
+const DELETED = new Set(DELETED_2026_09_06);
 
 // Not served pages: build output, tests, Node-side code, documentation, email/HTML templates, archives, vendored code.
 const HTML_SKIP = /^(dist|tests|node_modules|memory|docs|scripts|templates|reference|email-templates|richardson-caps)\/|\/archive\/|archive-working-files\/|\/vendor\//;
-const PAGES = tracked.filter((f) => f.endsWith('.html') && !HTML_SKIP.test(f) && !PENDING.has(f));
+const PAGES = tracked.filter((f) => f.endsWith('.html') && !HTML_SKIP.test(f) && !DELETED.has(f));
 
 const strip = (h) => h.replace(/<!--[\s\S]*?-->/g, '').replace(/<script type="application\/ld\+json">[\s\S]*?<\/script>/g, '');
 const BARE_ICON = /<i\b(?![^>]*aria-hidden)(?![^>]*aria-label)[^>]*\bclass="(?:fa[sr]|fab|fa-solid|fa-regular) [^"]*"[^>]*><\/i>/;
@@ -76,21 +77,18 @@ const TEXT = new Map(CORPUS.map((f) => [f, read(f)]));
 function referrers(rel) {
     const base = path.basename(rel);
     const out = [];
-    for (const [f, t] of TEXT) if (f !== rel && !PENDING.has(f) && t.includes(base)) out.push(f);
+    for (const [f, t] of TEXT) if (f !== rel && !DELETED.has(f) && t.includes(base)) out.push(f);
     return out;
 }
 
 describe('no orphan browser script', () => {
     test('script list resolves', () => { expect(BROWSER_JS.length).toBeGreaterThan(300); });
-    test('every browser script outside PENDING_DELETION is referenced by a page, script, route or the build', () => {
-        const orphans = BROWSER_JS.filter((f) => !PENDING.has(f) && referrers(f).length === 0);
+    test('every browser script outside DELETED_2026_09_06 is referenced by a page, script, route or the build', () => {
+        const orphans = BROWSER_JS.filter((f) => !DELETED.has(f) && referrers(f).length === 0);
         expect(orphans).toEqual([]);
     });
-    test('a file verified dead is never resurrected by a new reference', () => {
-        // server.js names the two art-tools stubs only inside their 301 route, and the C112 files inside the 410 route
-        // that retired the promo — neither is a load.
-        const real = (f) => referrers(f).filter((r) => !(r === 'server.js' && /^(art-tools\/|admin\/c112-bogo-promo|c112-bogo-promo)/.test(f)));
-        const revived = PENDING_DELETION.filter((f) => exists(f) && real(f).length > 0).map((f) => ({ file: f, referrers: real(f) }));
-        expect(revived).toEqual([]);
+    test('the 69 files deleted on 2026-09-06 stay deleted', () => {
+        expect(DELETED_2026_09_06.length).toBe(69);
+        expect(DELETED_2026_09_06.filter(exists)).toEqual([]);
     });
 });

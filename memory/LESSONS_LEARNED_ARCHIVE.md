@@ -6,6 +6,32 @@ Resolved entries aged out of `LESSONS_LEARNED.md` (300-line cap). Newest first. 
 
 ## Archived 2026-09-06
 
+## Customer login dropped the deep link it was handed (`v2026.09.05.26`)
+
+**Problem.** A customer following a link to `/portal/product/PC54` (or any portal page) was bounced
+to `/customer/login?next=%2Fportal%2Fproduct%2FPC54`, signed in, and landed on the portal HOME.
+Same on the vendor twin.
+
+**Root cause.** Three parties each did half the job and nobody owned the hand-off: the gate
+(`requireCustomer`) put `?next=` on the login URL, `/auth/customer/verify` honoured `?next=` on the
+magic link — but the login page never read `?next=` and `request-link` never put it on the link it
+emailed. Both ends were "ready" and the middle was missing, so it looked wired in every code review.
+
+**Solution.** `customer-login.js`/`vendor-login.js` read `?next=`, keep it only under their own prefix,
+and post it with the email; both `request-link` routes append `&next=` to the emailed link; both
+`verify` routes and both request routes validate through ONE `safeLoginNext(raw, prefix)` (same-site
+path under the prefix, no `//`, no scheme, no whitespace/`<>`, ≤400 chars). Locked in
+`tests/unit/customer-login-page.test.js`.
+
+**Prevention.** A parameter that is *produced* on one route and *consumed* on another must have the
+carrying hop tested end-to-end — grep every place the name appears and make sure each one is a link
+in the same chain, not an island. Any redirect target that arrives from the client goes through a
+single allow-list helper, never an inline `startsWith`. 🔑 Verification trap: while the Browser pane
+is hidden, CSS transitions never advance, so `getComputedStyle` returns the START colour of a
+transitioned property — check `el.matches(selector)` / `getAnimations()` before calling a rule broken. (2026-09-05)
+
+---
+
 ## Company Numbers review: a date a day early, a refresh that wasn't, a goal nobody could change
 
 **Problem.** The revenue card said "Jun 5 - Sep 3" for a fetch that ran Jun 6 → Sep 4; the header
