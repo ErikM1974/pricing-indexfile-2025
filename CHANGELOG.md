@@ -1,3 +1,8 @@
+## v2026.09.06.5 (2026.09.06)
+
+- Public pages review B5: universal cart header <style> → stylesheet + link indicator, sample-cart APP_CONFIG host + hidden toggles + delegated controls + escaping, quote-cart no fallback host, PDP modules (print listener, --swatch, drawer close named); lock public-cart-header-pages.test.js
+- Deploy v2026.09.06.5: public batch B5 — universal cart header stylesheet, sample/quote cart hygiene, PDP modules
+
 ## v2026.09.06.3 (2026.09.06)
 
 - Public pages review B4: content families — icons decorative across 12 webstore + golf + safety + laser pages, brands proxy host from APP_CONFIG + hidden toggles, contract pricing/fall-catalog listeners, resources+sale <style> extracted, laser hidden attr; lock public-content-pages.test.js
