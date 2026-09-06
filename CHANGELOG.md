@@ -1,3 +1,8 @@
+## v2026.09.05.51 (2026.09.05)
+
+- Production Shifts + Roland Supplies review: 9 items — production React builds (dev builds shipped since launch), keyboard row buttons, aria-pressed chips/cards, detail panel dialog (focus/Esc/return, stable onClose), type=button everywhere, Roland icons decorative
+- Deploy v2026.09.05.51: Production Shifts + Roland Supplies review (9 items); remove stray x.js
+
 ## v2026.09.05.49 (2026.09.05)
 
 - Finished Photos capture + Library review: 14 items — honest failures + Retry (search/designs/manage/publish/delete), Rule 3 onerror, tablist keys, keyboard file labels, labelled dialogs + Esc + focus return, zoom allowed, back arrow without FA, calendar dates
