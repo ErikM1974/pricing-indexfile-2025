@@ -683,7 +683,7 @@
             quotePrefix: '{{QUOTE_PREFIX}}', // e.g., 'DTG', 'RICH', 'EMB'
             emailTemplateId: '{{EMAIL_TEMPLATE_ID}}',
             emailServiceId: 'service_1c4k67j', // Standard NWCA service
-            emailPublicKey: '4qSbDO-SQs19TbP80' // Standard NWCA key
+            emailPublicKey: APP_CONFIG.EMAIL.PUBLIC_KEY // from config/app.config.js (tenant email config) — never a literal
         };
 
         /* ==========================================

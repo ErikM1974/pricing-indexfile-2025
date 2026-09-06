@@ -81,6 +81,37 @@ function referrers(rel) {
     return out;
 }
 
+// ── Static accessibility (2026-09-06 census: 118 unlabelled controls, 5 unnamed buttons, 3 unnamed links, 4 alt-less
+//    images, 12 SEO pages that were bare fragments with no <html lang>) ──
+const innerText = (frag) => frag.replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').trim();
+const NAMED = /aria-label|aria-labelledby|\btitle=/;
+const A11Y_SKIP = /emailjs-template/; // email bodies, not pages
+function a11yFindings(html) {
+    const h = html.replace(/<!--[\s\S]*?-->/g, '');
+    const out = [];
+    for (const m of h.matchAll(/<img\b[^>]*>/g)) if (!/\balt=/.test(m[0])) out.push('img without alt: ' + m[0].slice(0, 80));
+    for (const m of h.matchAll(/<button\b([^>]*)>([\s\S]*?)<\/button>/g)) if (!innerText(m[2]) && !NAMED.test(m[1])) out.push('unnamed button: ' + m[0].slice(0, 80));
+    for (const m of h.matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a>/g)) if (!innerText(m[2]) && !NAMED.test(m[1]) && !/<img[^>]*\balt="[^"]+"/.test(m[2])) out.push('unnamed link: ' + m[0].slice(0, 80));
+    const labelsFor = new Set([...h.matchAll(/<label\b[^>]*\bfor="([^"]+)"/g)].map((m) => m[1]));
+    for (const m of h.matchAll(/<(input|select|textarea)\b([^>]*)>/g)) {
+        const attrs = m[2];
+        if (/type="(hidden|submit|button|reset|image)"/.test(attrs) || NAMED.test(attrs)) continue;
+        const id = (attrs.match(/\bid="([^"]+)"/) || [])[1];
+        if (id && labelsFor.has(id)) continue;
+        const before = h.slice(Math.max(0, m.index - 300), m.index);
+        if (before.lastIndexOf('<label') > before.lastIndexOf('</label>')) continue; // wrapped in its label
+        out.push('unlabelled control: ' + m[0].slice(0, 80));
+    }
+    if (!/<html\b[^>]*\blang=/.test(h)) out.push('no <html lang>');
+    if (!/<title>/.test(h)) out.push('no <title>');
+    return out;
+}
+describe('every served HTML page names its controls (static accessibility)', () => {
+    test.each(PAGES.filter((p) => !A11Y_SKIP.test(p)))('%s', (rel) => {
+        expect({ file: rel, findings: a11yFindings(read(rel)) }).toEqual({ file: rel, findings: [] });
+    });
+});
+
 describe('no orphan browser script', () => {
     test('script list resolves', () => { expect(BROWSER_JS.length).toBeGreaterThan(300); });
     test('every browser script outside DELETED_2026_09_06 is referenced by a page, script, route or the build', () => {

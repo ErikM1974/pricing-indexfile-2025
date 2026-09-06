@@ -256,8 +256,10 @@
     }
 
     // ── EmailJS Config ──────────────────────────────────────────────────
-    var EMAILJS_SERVICE_ID = 'service_jgrave3';
-    var EMAILJS_PUBLIC_KEY = '4qSbDO-SQs19TbP80';
+    var EMAILJS_SERVICE_ID = ((typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.EMAIL && window.APP_CONFIG.EMAIL.SERVICE_ID) || '');
+    if (!EMAILJS_SERVICE_ID) console.error('[mockup-detail] APP_CONFIG.EMAIL.SERVICE_ID missing — EmailJS is not configured');
+    var EMAILJS_PUBLIC_KEY = ((typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.EMAIL && window.APP_CONFIG.EMAIL.PUBLIC_KEY) || '');
+    if (!EMAILJS_PUBLIC_KEY) console.error('[mockup-detail] APP_CONFIG.EMAIL.PUBLIC_KEY missing — EmailJS is not configured');
     var HEROKU_ORIGIN = 'https://www.teamnwca.com';
     var RUTH_EMAIL = 'ruth@nwcustomapparel.com';
 

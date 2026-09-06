@@ -9,7 +9,7 @@ var CB_API_BASE = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONF
 if (!CB_API_BASE) console.error('[christmas-bundles] APP_CONFIG.API.BASE_URL missing — pricing cannot load');
 (function() {
             // Initialize EmailJS with your public key
-            emailjs.init("4qSbDO-SQs19TbP80");
+            emailjs.init(((typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.EMAIL && window.APP_CONFIG.EMAIL.PUBLIC_KEY) || ''));
         })();
 
         // Christmas Countdown Timer

@@ -127,7 +127,7 @@
                         </div>
                         <div class="td-card-body">
                             <div class="td-comment-form">
-                                <textarea id="td-comment-input" placeholder="Add a comment..." rows="2"></textarea>
+                                <textarea id="td-comment-input" placeholder="Add a comment..." rows="2" aria-label="Add a comment"></textarea>
                                 <button class="bt-btn bt-btn--primary bt-btn--small" id="td-add-comment-btn">
                                     <i class="fas fa-paper-plane" aria-hidden="true"></i> Post
                                 </button>
@@ -156,14 +156,14 @@
                 <form id="td-user-form" class="bt-form">
                     <div class="bt-form-row" style="grid-template-columns:1fr;">
                         <div class="bt-form-field">
-                            <label>Your Name *</label>
-                            <input type="text" name="userName" required placeholder="e.g. Bradley">
+                            <label for="username">Your Name *</label>
+                            <input type="text" name="userName" required placeholder="e.g. Bradley" id="username">
                         </div>
                     </div>
                     <div class="bt-form-row" style="grid-template-columns:1fr;">
                         <div class="bt-form-field">
-                            <label>Your Email *</label>
-                            <input type="email" name="userEmail" required placeholder="you@nwcustomapparel.com">
+                            <label for="useremail">Your Email *</label>
+                            <input type="email" name="userEmail" required placeholder="you@nwcustomapparel.com" id="useremail">
                         </div>
                     </div>
                     <div class="bt-form-actions">
@@ -199,26 +199,26 @@
                 <form id="td-ordered-form" class="bt-form">
                     <div class="bt-form-row" style="grid-template-columns:1fr;">
                         <div class="bt-form-field">
-                            <label>Supacolor Order # *</label>
-                            <input type="text" name="supacolorOrderNumber" required placeholder="e.g. 637713">
+                            <label for="supacolorordernumber">Supacolor Order # *</label>
+                            <input type="text" name="supacolorOrderNumber" required placeholder="e.g. 637713" id="supacolorordernumber">
                         </div>
                     </div>
                     <div class="bt-form-row" style="grid-template-columns:1fr;">
                         <div class="bt-form-field">
-                            <label>Supacolor Order URL (optional)</label>
-                            <input type="url" name="supacolorOrderUrl" placeholder="https://supacolor.com/...">
+                            <label for="supacolororderurl">Supacolor Order URL (optional)</label>
+                            <input type="url" name="supacolorOrderUrl" placeholder="https://supacolor.com/..." id="supacolororderurl">
                         </div>
                     </div>
                     <div class="bt-form-row" style="grid-template-columns:1fr;">
                         <div class="bt-form-field">
-                            <label>Estimated Ship Date (optional)</label>
-                            <input type="date" name="estimatedShipDate">
+                            <label for="estimatedshipdate">Estimated Ship Date (optional)</label>
+                            <input type="date" name="estimatedShipDate" id="estimatedshipdate">
                         </div>
                     </div>
                     <div class="bt-form-row" style="grid-template-columns:1fr;">
                         <div class="bt-form-field">
-                            <label>Notes (optional)</label>
-                            <textarea name="notes" rows="2" placeholder="Any extra context..."></textarea>
+                            <label for="notes">Notes (optional)</label>
+                            <textarea name="notes" rows="2" placeholder="Any extra context..." id="notes"></textarea>
                         </div>
                     </div>
                     <div class="bt-form-actions">
@@ -244,14 +244,14 @@
                 <form id="td-po-form" class="bt-form">
                     <div class="bt-form-row" style="grid-template-columns:1fr;">
                         <div class="bt-form-field">
-                            <label>ShopWorks PO # *</label>
-                            <input type="text" name="shopworksPO" required placeholder="e.g. 41000">
+                            <label for="shopworkspo">ShopWorks PO # *</label>
+                            <input type="text" name="shopworksPO" required placeholder="e.g. 41000" id="shopworkspo">
                         </div>
                     </div>
                     <div class="bt-form-row" style="grid-template-columns:1fr;">
                         <div class="bt-form-field">
-                            <label>Notes (optional)</label>
-                            <textarea name="notes" rows="2"></textarea>
+                            <label for="notes-2">Notes (optional)</label>
+                            <textarea name="notes" rows="2" id="notes-2"></textarea>
                         </div>
                     </div>
                     <div class="bt-form-actions">
@@ -284,20 +284,20 @@
                 <form id="td-shipped-form" class="bt-form">
                     <div class="bt-form-row" style="grid-template-columns:1fr;">
                         <div class="bt-form-field">
-                            <label>Tracking Number (optional)</label>
-                            <input type="text" name="trackingNumber" placeholder="UPS / FedEx / USPS tracking">
+                            <label for="trackingnumber">Tracking Number (optional)</label>
+                            <input type="text" name="trackingNumber" placeholder="UPS / FedEx / USPS tracking" id="trackingnumber">
                         </div>
                     </div>
                     <div class="bt-form-row" style="grid-template-columns:1fr;">
                         <div class="bt-form-field">
-                            <label>Estimated Delivery (optional)</label>
-                            <input type="date" name="estimatedShipDate">
+                            <label for="estimatedshipdate-2">Estimated Delivery (optional)</label>
+                            <input type="date" name="estimatedShipDate" id="estimatedshipdate-2">
                         </div>
                     </div>
                     <div class="bt-form-row" style="grid-template-columns:1fr;">
                         <div class="bt-form-field">
-                            <label>Notes (optional)</label>
-                            <textarea name="notes" rows="2"></textarea>
+                            <label for="notes-3">Notes (optional)</label>
+                            <textarea name="notes" rows="2" id="notes-3"></textarea>
                         </div>
                     </div>
                     <div class="bt-form-actions">
@@ -323,8 +323,8 @@
                 <form id="td-cancel-form" class="bt-form">
                     <div class="bt-form-row" style="grid-template-columns:1fr;">
                         <div class="bt-form-field">
-                            <label>Cancel Reason *</label>
-                            <textarea name="reason" rows="3" required placeholder="Why is this being cancelled?"></textarea>
+                            <label for="reason">Cancel Reason *</label>
+                            <textarea name="reason" rows="3" required placeholder="Why is this being cancelled?" id="reason"></textarea>
                         </div>
                     </div>
                     <div class="bt-form-actions">
@@ -350,8 +350,8 @@
                 <form id="td-delete-form" class="bt-form">
                     <div class="bt-form-row" style="grid-template-columns:1fr;">
                         <div class="bt-form-field">
-                            <label>Reason (for your records) *</label>
-                            <textarea name="reason" rows="2" required placeholder="e.g. duplicate, wrong design, test entry..."></textarea>
+                            <label for="reason-2">Reason (for your records) *</label>
+                            <textarea name="reason" rows="2" required placeholder="e.g. duplicate, wrong design, test entry..." id="reason-2"></textarea>
                         </div>
                     </div>
                     <div class="bt-form-row" style="grid-template-columns:1fr;">
@@ -382,8 +382,8 @@
                 <form id="td-rush-form" class="bt-form">
                     <div class="bt-form-row" style="grid-template-columns:1fr;" id="td-rush-reason-row">
                         <div class="bt-form-field">
-                            <label>Reason for rush *</label>
-                            <textarea name="reason" rows="2" placeholder="Customer deadline, event date, etc."></textarea>
+                            <label for="reason-3">Reason for rush *</label>
+                            <textarea name="reason" rows="2" placeholder="Customer deadline, event date, etc." id="reason-3"></textarea>
                         </div>
                     </div>
                     <div class="bt-form-actions">
@@ -406,39 +406,39 @@
                 <form id="td-specs-form" class="bt-form">
                     <div class="bt-form-row">
                         <div class="bt-form-field">
-                            <label>Quantity</label>
-                            <input type="number" name="Quantity" min="1">
+                            <label for="quantity">Quantity</label>
+                            <input type="number" name="Quantity" min="1" id="quantity">
                         </div>
                         <div class="bt-form-field">
-                            <label>Transfer Size</label>
-                            <input type="text" name="Transfer_Size" placeholder="e.g. 11x14">
+                            <label for="transfer-size">Transfer Size</label>
+                            <input type="text" name="Transfer_Size" placeholder="e.g. 11x14" id="transfer-size">
                         </div>
                         <div class="bt-form-field">
-                            <label>Press Count</label>
-                            <input type="number" name="Press_Count" min="1">
-                        </div>
-                    </div>
-                    <div class="bt-form-row">
-                        <div class="bt-form-field">
-                            <label>Width (in)</label>
-                            <input type="number" name="Transfer_Width_In" step="0.25">
-                        </div>
-                        <div class="bt-form-field">
-                            <label>Height (in)</label>
-                            <input type="number" name="Transfer_Height_In" step="0.25">
+                            <label for="press-count">Press Count</label>
+                            <input type="number" name="Press_Count" min="1" id="press-count">
                         </div>
                     </div>
                     <div class="bt-form-row">
                         <div class="bt-form-field">
-                            <label>Needed By</label>
-                            <input type="date" name="Needed_By_Date">
+                            <label for="transfer-width-in">Width (in)</label>
+                            <input type="number" name="Transfer_Width_In" step="0.25" id="transfer-width-in">
+                        </div>
+                        <div class="bt-form-field">
+                            <label for="transfer-height-in">Height (in)</label>
+                            <input type="number" name="Transfer_Height_In" step="0.25" id="transfer-height-in">
+                        </div>
+                    </div>
+                    <div class="bt-form-row">
+                        <div class="bt-form-field">
+                            <label for="needed-by-date">Needed By</label>
+                            <input type="date" name="Needed_By_Date" id="needed-by-date">
                         </div>
                     </div>
                     <!-- Print Specs (Supacolor-aligned structured fields) -->
                     <div class="bt-form-row" style="grid-template-columns: 1fr 1fr 1fr;">
                         <div class="bt-form-field">
-                            <label>Transfer Type</label>
-                            <select name="Transfer_Type">
+                            <label for="transfer-type">Transfer Type</label>
+                            <select name="Transfer_Type" id="transfer-type">
                                 <option value="">—</option>
                                 <option value="Supa-Classic">Supa-Classic</option>
                                 <option value="Full Color Gang Sheet">Full Color Gang Sheet</option>
@@ -451,8 +451,8 @@
                             </select>
                         </div>
                         <div class="bt-form-field">
-                            <label>Fabric Target</label>
-                            <select name="Fabric_Target">
+                            <label for="fabric-target">Fabric Target</label>
+                            <select name="Fabric_Target" id="fabric-target">
                                 <option value="">—</option>
                                 <option value="Dark">Dark</option>
                                 <option value="Light">Light</option>
@@ -460,32 +460,32 @@
                             </select>
                         </div>
                         <div class="bt-form-field">
-                            <label># of Colors</label>
-                            <input type="number" name="Color_Count" min="1" max="8">
+                            <label for="color-count"># of Colors</label>
+                            <input type="number" name="Color_Count" min="1" max="8" id="color-count">
                         </div>
                     </div>
                     <div class="bt-form-row">
                         <div class="bt-form-field bt-form-field--full">
-                            <label>Primary Color / PMS</label>
-                            <input type="text" name="Primary_Color" placeholder="e.g. PMS 186C, Rich Black, Safety Yellow">
+                            <label for="primary-color">Primary Color / PMS</label>
+                            <input type="text" name="Primary_Color" placeholder="e.g. PMS 186C, Rich Black, Safety Yellow" id="primary-color">
                         </div>
                     </div>
                     <div class="bt-form-row">
                         <div class="bt-form-field bt-form-field--full">
-                            <label>Additional Colors (one per line)</label>
-                            <textarea name="Additional_Colors" rows="2"></textarea>
+                            <label for="additional-colors">Additional Colors (one per line)</label>
+                            <textarea name="Additional_Colors" rows="2" id="additional-colors"></textarea>
                         </div>
                     </div>
                     <div class="bt-form-row">
                         <div class="bt-form-field bt-form-field--full">
-                            <label>File Notes</label>
-                            <textarea name="File_Notes" rows="2"></textarea>
+                            <label for="file-notes">File Notes</label>
+                            <textarea name="File_Notes" rows="2" id="file-notes"></textarea>
                         </div>
                     </div>
                     <div class="bt-form-row">
                         <div class="bt-form-field bt-form-field--full">
-                            <label>Special Instructions</label>
-                            <textarea name="Special_Instructions" rows="2"></textarea>
+                            <label for="special-instructions">Special Instructions</label>
+                            <textarea name="Special_Instructions" rows="2" id="special-instructions"></textarea>
                         </div>
                     </div>
                     <div class="bt-form-actions">
@@ -505,7 +505,7 @@
          so the session-gated forwarder authorises them. Must load first — the Send
          Mockup picker in transfer-actions-shared.js calls boxUrl() too. -->
     <script src="/shared_components/js/box-url.js?v=2026.08.05.23"></script>
-    <script src="/shared_components/js/transfer-actions-shared.js?v=2026.09.06.31"></script>
+    <script src="/shared_components/js/transfer-actions-shared.js?v=2026.09.06.36"></script>
     <script src="/shared_components/js/product-thumbnail-modal.js?v=2026.09.06.22"></script>
     <script src="/shared_components/js/caspio-date-utils.js?v=1"></script>
     <!-- SAML identity → legacy nwca_user_* keys (StaffAuthHelper.ready(), 2026-09-05) -->

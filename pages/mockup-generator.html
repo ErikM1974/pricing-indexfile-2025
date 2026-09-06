@@ -35,7 +35,7 @@
                 <p>Stitch data (required)</p>
                 <span class="ext-badge">.DST</span>
                 <div class="file-name" id="dstFileName"></div>
-                <input type="file" id="dstInput" accept=".dst" style="display:none">
+                <input type="file" id="dstInput" accept=".dst" style="display:none" aria-label="Choose a file">
             </div>
 
             <div class="upload-zone" id="embZone">
@@ -44,7 +44,7 @@
                 <p>Wilcom file with thread colors</p>
                 <span class="ext-badge">.EMB</span>
                 <div class="file-name" id="embFileName"></div>
-                <input type="file" id="embInput" accept=".emb,.EMB" style="display:none">
+                <input type="file" id="embInput" accept=".emb,.EMB" style="display:none" aria-label="Choose a file">
             </div>
 
             <div class="upload-zone" id="pdfZone">
@@ -53,7 +53,7 @@
                 <p>ShopWorks thread color sheet</p>
                 <span class="ext-badge">.PDF</span>
                 <div class="file-name" id="pdfFileName"></div>
-                <input type="file" id="pdfInput" accept=".pdf" style="display:none">
+                <input type="file" id="pdfInput" accept=".pdf" style="display:none" aria-label="Choose a file">
             </div>
         </div>
 
@@ -71,7 +71,7 @@
                 <i class="fas fa-rotate-left" aria-hidden="true"></i> Reset
             </button>
             <div class="color-source-toggle" id="sourceToggle" style="display:none">
-                <label>Color source:</label>
+                <label for="colorSource">Color source:</label>
                 <select id="colorSource">
                     <option value="emb">EMB File</option>
                     <option value="pdf">PDF File</option>

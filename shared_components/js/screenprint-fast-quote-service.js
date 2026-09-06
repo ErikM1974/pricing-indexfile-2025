@@ -6,8 +6,10 @@ class ScreenPrintFastQuoteService {
     constructor() {
         this.baseURL = ''; // same-origin since the 2026-08-26 quote-plane lockdown (staff session auth)
         this.quotePrefix = 'SPC';  // Screen Print Contract
-        this.emailjsServiceId = 'service_jgrave3';
-        this.emailjsPublicKey = '4qSbDO-SQs19TbP80';
+        this.emailjsServiceId = ((typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.EMAIL && window.APP_CONFIG.EMAIL.SERVICE_ID) || '');
+        if (!this.emailjsServiceId) console.error('[screenprint-fast-quote-service] APP_CONFIG.EMAIL.SERVICE_ID missing — EmailJS is not configured');
+        this.emailjsPublicKey = ((typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.EMAIL && window.APP_CONFIG.EMAIL.PUBLIC_KEY) || '');
+        if (!this.emailjsPublicKey) console.error('[screenprint-fast-quote-service] APP_CONFIG.EMAIL.PUBLIC_KEY missing — EmailJS is not configured');
 
         // Initialize EmailJS if not already done
         if (typeof emailjs !== 'undefined') {

@@ -9,7 +9,7 @@
  * delegated to pages/js/sample-checkout.js (Stripe) before the free flow.
  */
 // Initialize EmailJS (free-flow notification email)
-emailjs.init('4qSbDO-SQs19TbP80');
+emailjs.init(((typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.EMAIL && window.APP_CONFIG.EMAIL.PUBLIC_KEY) || ''));
 
 
 // ==============================================

@@ -51,7 +51,7 @@
             </div>
             <div class="search-bar">
                 <i class="fas fa-search" aria-hidden="true"></i>
-                <input type="text" placeholder="Search templates..." data-input="searchTemplates" data-input-args='["$this.value"]'>
+                <input type="text" placeholder="Search templates..." data-input="searchTemplates" data-input-args='["$this.value"]' aria-label="Search templates">
             </div>
         </div>
 
@@ -598,12 +598,12 @@ Which option works best for you?
             
             <form id="templateForm">
                 <div class="form-group">
-                    <label class="form-label">Template Name</label>
+                    <label for="templateName" class="form-label">Template Name</label>
                     <input type="text" class="form-input" id="templateName" placeholder="e.g., Welcome Email for Construction Companies">
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Category</label>
+                    <label for="templateCategory" class="form-label">Category</label>
                     <select class="form-input" id="templateCategory">
                         <option value="initial">Initial Contact</option>
                         <option value="followup">Follow-Up</option>
@@ -614,7 +614,7 @@ Which option works best for you?
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Subject Line</label>
+                    <label for="templateSubject" class="form-label">Subject Line</label>
                     <input type="text" class="form-input" id="templateSubject" placeholder="e.g., Re: Your Custom Apparel Request">
                 </div>
 
@@ -631,7 +631,7 @@ Which option works best for you?
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Email Body</label>
+                    <label for="templateBody" class="form-label">Email Body</label>
                     <textarea class="form-textarea" id="templateBody" placeholder="Type your email template here..."></textarea>
                 </div>
 

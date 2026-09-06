@@ -767,8 +767,10 @@
 
     // EmailJS constants still needed for the 'template_art_in_progress'
     // status-change email below (note-added email moved to the backend).
-    const EMAILJS_SERVICE_ID = 'service_jgrave3';
-    const EMAILJS_PUBLIC_KEY = '4qSbDO-SQs19TbP80';
+    const EMAILJS_SERVICE_ID = ((typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.EMAIL && window.APP_CONFIG.EMAIL.SERVICE_ID) || '');
+    if (!EMAILJS_SERVICE_ID) console.error('[art-hub-steve] APP_CONFIG.EMAIL.SERVICE_ID missing — EmailJS is not configured');
+    const EMAILJS_PUBLIC_KEY = ((typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.EMAIL && window.APP_CONFIG.EMAIL.PUBLIC_KEY) || '');
+    if (!EMAILJS_PUBLIC_KEY) console.error('[art-hub-steve] APP_CONFIG.EMAIL.PUBLIC_KEY missing — EmailJS is not configured');
     const SITE_ORIGIN = 'https://www.teamnwca.com';
 
     // ── In-Place Card Refresh (no page reload) ─────────────────────────

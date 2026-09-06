@@ -104,7 +104,7 @@
                         <div class="pmd-notes-list" id="pmd-notes-list"></div>
                         <div class="pmd-add-note" id="pmd-add-note">
                             <div class="pmd-posting-as" id="pmd-posting-as"></div>
-                            <textarea id="pmd-note-input" placeholder="Add a note..."></textarea>
+                            <textarea id="pmd-note-input" placeholder="Add a note..." aria-label="Add a note"></textarea>
                             <div class="pmd-add-note-footer">
                                 <label class="pmd-note-notify-label" for="pmd-note-notify">
                                     <input type="checkbox" id="pmd-note-notify" checked> Notify the other party (email + Slack)
@@ -155,7 +155,7 @@
     </div>
 
     <!-- Hidden file input for uploads -->
-    <input type="file" id="pmd-slot-file-input" style="display:none;" accept="image/*,.pdf,.dst,.emb,.eps,.ai,.svg">
+    <input type="file" id="pmd-slot-file-input" style="display:none;" accept="image/*,.pdf,.dst,.emb,.eps,.ai,.svg" aria-label="Choose a file">
 
     <!-- Lightbox -->
     <div class="pmd-lightbox" id="pmd-lightbox">
@@ -201,7 +201,7 @@
                 <label for="pmd-revise-notes">General notes (optional)</label>
                 <textarea id="pmd-revise-notes" placeholder="Any overall feedback..."></textarea>
                 <div class="pmd-revise-upload-section">
-                    <label class="pmd-revise-upload-label">Attach reference file (optional)</label>
+                    <label for="pmd-revise-file-input" class="pmd-revise-upload-label">Attach reference file (optional)</label>
                     <div class="pmd-revise-dropzone" id="pmd-revise-dropzone">
                         <i class="fas fa-cloud-upload-alt pmd-revise-dropzone-icon" aria-hidden="true"></i>
                         <span class="pmd-revise-dropzone-text">Click or drag file here (max 20MB)</span>
@@ -303,7 +303,7 @@
         <div class="pmd-fo-manual">
             <div class="pmd-fo-manual-label">Or enter order number manually:</div>
             <div class="pmd-fo-manual-row">
-                <input type="text" id="pmd-fo-manual-input" placeholder="Order #" class="pmd-fo-manual-input">
+                <input type="text" id="pmd-fo-manual-input" placeholder="Order #" class="pmd-fo-manual-input" aria-label="Or enter order number manually">
                 <button type="button" id="pmd-fo-manual-btn" class="pmd-fo-manual-btn">Search</button>
             </div>
             <div class="pmd-fo-manual-note">Note: ShopWorks data is only available for the last 60 days.</div>
@@ -380,12 +380,12 @@
     <script src="/pages/js/thread-color-picker.js?v=2026.09.06.27"></script>
     <script src="/shared_components/js/confetti.js?v=1"></script>
     <script src="/shared_components/js/box-url.js?v=2026.08.05.23"></script>
-    <script src="/shared_components/js/art-actions-shared.js?v=2026.09.06.31"></script>
-    <script src="/shared_components/js/transfer-actions-shared.js?v=2026.09.06.31"></script>
+    <script src="/shared_components/js/art-actions-shared.js?v=2026.09.06.36"></script>
+    <script src="/shared_components/js/transfer-actions-shared.js?v=2026.09.06.36"></script>
     <script src="/shared_components/js/caspio-date-utils.js?v=1"></script>
     <script src="/shared_components/js/elapsed-time-utils.js?v=2026.09.06.27"></script>
     <!-- SAML identity → legacy nwca_user_* keys (StaffAuthHelper.ready(), 2026-09-05) -->
     <script src="/shared_components/js/staff-auth-helper.js?v=2026.09.05.6"></script>
-    <script src="/pages/js/mockup-detail.js?v=2026.09.06.31"></script>
+    <script src="/pages/js/mockup-detail.js?v=2026.09.06.36"></script>
 </body>
 </html>

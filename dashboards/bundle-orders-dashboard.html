@@ -93,8 +93,8 @@
             <!-- Filters -->
             <div class="filters-section">
                 <div class="filters-grid">
-                    <input type="text" id="sampleSearchInput" placeholder="Search by name, email, or ID..." class="filter-input">
-                    <select id="sampleStatusFilter" data-change="filterSampleRequests" class="filter-input">
+                    <input type="text" id="sampleSearchInput" placeholder="Search by name, email, or ID..." class="filter-input" aria-label="Search by name, email, or ID">
+                    <select id="sampleStatusFilter" data-change="filterSampleRequests" class="filter-input" aria-label="Sample status filter">
                         <option value="">Active (No Archived)</option>
                         <option value="ALL">All (Including Archived)</option>
                         <option value="XMAS">Christmas Bundles Only</option>
@@ -113,8 +113,8 @@
                         <option value="Ruth">Ruth</option>
                         <option value="Erik">Erik</option>
                     </select>
-                    <input type="date" id="sampleDateFrom" data-change="filterSampleRequests" class="filter-input">
-                    <input type="date" id="sampleDateTo" data-change="filterSampleRequests" class="filter-input">
+                    <input type="date" id="sampleDateFrom" data-change="filterSampleRequests" class="filter-input" aria-label="Sample date from">
+                    <input type="date" id="sampleDateTo" data-change="filterSampleRequests" class="filter-input" aria-label="Sample date to">
                 </div>
 
                 <!-- Icon Legend -->
@@ -164,7 +164,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h3>Bundle Order Details</h3>
-                <button data-call="closeSampleDetails" class="modal-close">
+                <button data-call="closeSampleDetails" class="modal-close" aria-label="Close">
                     <i class="fas fa-times" aria-hidden="true"></i>
                 </button>
             </div>

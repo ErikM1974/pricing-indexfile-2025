@@ -4,9 +4,11 @@
 class ChristmasBundleQuoteService {
     constructor() {
         this.apiBase = '/api';
-        this.emailjsServiceId = 'service_jgrave3';
+        this.emailjsServiceId = ((typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.EMAIL && window.APP_CONFIG.EMAIL.SERVICE_ID) || '');
+        if (!this.emailjsServiceId) console.error('[christmas-bundle-service] APP_CONFIG.EMAIL.SERVICE_ID missing — EmailJS is not configured');
         this.emailjsTemplateId = 'template_christmas_bundle';
-        this.emailjsPublicKey = '4qSbDO-SQs19TbP80';
+        this.emailjsPublicKey = ((typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.EMAIL && window.APP_CONFIG.EMAIL.PUBLIC_KEY) || '');
+        if (!this.emailjsPublicKey) console.error('[christmas-bundle-service] APP_CONFIG.EMAIL.PUBLIC_KEY missing — EmailJS is not configured');
         this.quotePrefix = 'XMAS';
     }
 
