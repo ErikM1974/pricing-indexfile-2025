@@ -156,3 +156,6 @@
     .pm-span-2 { grid-column: span 1; }
     .pm-header-actions { flex-wrap: wrap; }
 }
+
+/* 2026-09-05 review */
+[hidden] { display: none !important; }

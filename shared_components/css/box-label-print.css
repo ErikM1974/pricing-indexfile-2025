@@ -104,3 +104,8 @@
         border-color: #000 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact;
     }
 }
+
+/* 2026-09-05 review — method colour via a custom property (no inline style=) */
+.sl-type { border-left-color: var(--m, #555); }
+.sl-type-name { color: var(--m, #444); }
+.sl-fill--wide { flex: 1.7; }

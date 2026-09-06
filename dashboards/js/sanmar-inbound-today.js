@@ -66,7 +66,7 @@
     return new Date(y, (m || 1) - 1, day || 1).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
   }
   function methodChip(m) {
-    return `<span class="sit-chip" style="background:${METHOD_COLORS[m] || '#9ca3af'}">${esc(m)}</span>`;
+    return `<span class="sit-chip" style="--c:${METHOD_COLORS[m] || '#9ca3af'}">${esc(m)}</span>`;
   }
   // SanMar backorder / hold / urgent, from deriveIssueFlags on the order-status feed.
   //
@@ -237,7 +237,7 @@
   // AND in the glyph, because the printed sheet has no tooltips.
   function logoTile(o) {
     if (o.logoUrl) {
-      return `<img class="sit-logo" src="${esc(o.logoUrl)}" alt="Design ${esc(o.designNumber || '')} artwork" loading="lazy" onerror="this.outerHTML='<div class=\\'sit-logo sit-logo--off\\' title=\\'Artwork unavailable\\'>🎨</div>';">`;
+      return `<img class="sit-logo" src="${esc(o.logoUrl)}" alt="Design ${esc(o.designNumber || '')} artwork" loading="lazy" data-onerror="sit-logo">`;
     }
     const design = String(o.designNumber || '').trim();
     return design
@@ -413,12 +413,12 @@
       ? o.boxDetail.map(b => `
         <div class="sit-ps-box">Box ${fmtNum(b.boxNumber)} · ${esc(b.carrier)} ${esc(b.trackingNumber)} · ${fmtNum(b.pieces)} pcs${showCost && b.cost ? ' · ' + fmtMoney(b.cost) : ''}</div>
         <table class="sit-ps-tbl">
-          <thead><tr><th>Style</th><th>Description</th><th>Color</th><th>Size</th><th style="text-align:right">Qty</th>${showCost ? '<th style="text-align:right">Cost</th>' : ''}</tr></thead>
-          <tbody>${(b.items || []).map(it => `<tr><td>${esc(it.style)}</td><td>${esc(it.title || '')}</td><td>${esc(it.color || '—')}</td><td>${esc(it.size)}</td><td style="text-align:right">${fmtNum(it.qty)}</td>${showCost ? `<td style="text-align:right">${it.lineCost ? fmtMoney(it.lineCost) : '—'}</td>` : ''}</tr>`).join('')}</tbody>
+          <thead><tr><th>Style</th><th>Description</th><th>Color</th><th>Size</th><th class="sit-r">Qty</th>${showCost ? '<th class="sit-r">Cost</th>' : ''}</tr></thead>
+          <tbody>${(b.items || []).map(it => `<tr><td>${esc(it.style)}</td><td>${esc(it.title || '')}</td><td>${esc(it.color || '—')}</td><td>${esc(it.size)}</td><td class="sit-r">${fmtNum(it.qty)}</td>${showCost ? `<td class="sit-r">${it.lineCost ? fmtMoney(it.lineCost) : '—'}</td>` : ''}</tr>`).join('')}</tbody>
         </table>`).join('')
       : `<table class="sit-ps-tbl">
-          <thead><tr><th>Style</th><th>Description</th><th>Color</th><th>Size</th><th style="text-align:right">Ord</th><th style="text-align:right">Ship</th><th>Status</th>${showCost ? '<th style="text-align:right">Cost</th>' : ''}</tr></thead>
-          <tbody>${(o.lines || []).map(l => `<tr><td>${esc(l.style)}</td><td>${esc(l.title || '')}</td><td>${esc(l.color || '—')}</td><td>${esc(l.size)}</td><td style="text-align:right">${fmtNum(l.qtyOrdered)}</td><td style="text-align:right">${fmtNum(l.qtyShipped)}</td><td>${esc(l.status)}</td>${showCost ? `<td style="text-align:right">${l.lineCost ? fmtMoney(l.lineCost) : '—'}</td>` : ''}</tr>`).join('')}</tbody>
+          <thead><tr><th>Style</th><th>Description</th><th>Color</th><th>Size</th><th class="sit-r">Ord</th><th class="sit-r">Ship</th><th>Status</th>${showCost ? '<th class="sit-r">Cost</th>' : ''}</tr></thead>
+          <tbody>${(o.lines || []).map(l => `<tr><td>${esc(l.style)}</td><td>${esc(l.title || '')}</td><td>${esc(l.color || '—')}</td><td>${esc(l.size)}</td><td class="sit-r">${fmtNum(l.qtyOrdered)}</td><td class="sit-r">${fmtNum(l.qtyShipped)}</td><td>${esc(l.status)}</td>${showCost ? `<td class="sit-r">${l.lineCost ? fmtMoney(l.lineCost) : '—'}</td>` : ''}</tr>`).join('')}</tbody>
         </table>`;
     // Same three states as the screen tile (logoTile), but spelled for PAPER.
     // These sheets go to a mono laser, so the distinction cannot ride on colour —
@@ -427,7 +427,7 @@
     // (nothing missing). Before this, both rendered as empty space, which also
     // made a failed image indistinguishable from "there was never any artwork".
     const psLogo = o.logoUrl
-      ? `<img class="sit-ps-logo" src="${esc(o.logoUrl)}" alt="" onerror="this.style.display='none'">`
+      ? `<img class="sit-ps-logo" src="${esc(o.logoUrl)}" alt="" data-onerror="hide">`
       : (String(o.designNumber || '').trim()
         ? `<div class="sit-ps-logo sit-ps-logo--off">NO ART</div>`
         : `<div class="sit-ps-logo sit-ps-logo--blank">BLANKS</div>`);
@@ -604,7 +604,7 @@
         <td class="sit-rt-c">${fmtNum(o.piecesShipped)}</td>
         <td>${esc(initials(o.salesRep))}</td>
       </tr>`).join('');
-      return `<div class="sit-rt-method" style="border-left-color:${window.BoxLabelTemplate.METHOD_DARK[m] || '#444'}">${esc(m)} <span class="sit-rt-method-sub">${list.length} order${list.length === 1 ? '' : 's'} · ${fmtNum(pcs)} pcs</span></div>
+      return `<div class="sit-rt-method" style="--c:${window.BoxLabelTemplate.METHOD_DARK[m] || '#444'}">${esc(m)} <span class="sit-rt-method-sub">${list.length} order${list.length === 1 ? '' : 's'} · ${fmtNum(pcs)} pcs</span></div>
         <table class="sit-rt-tbl"><thead><tr><th>Due</th><th>Company</th><th>WO</th><th>Design</th><th class="sit-rt-c">Pcs</th><th>Rep</th></tr></thead><tbody>${rows}</tbody></table>`;
     }).join('');
     const s = sumOrders(orders);
@@ -769,7 +769,7 @@
   function showBanner(msg) {
     const b = modalEl && modalEl.querySelector('#sit-banner');
     if (!b) return;
-    b.innerHTML = `<i class="fas fa-triangle-exclamation"></i> <span>${esc(msg)}</span>`;
+    b.innerHTML = `<i class="fas fa-triangle-exclamation" aria-hidden="true"></i> <span>${esc(msg)}</span>`;
     b.hidden = false;
   }
   function hideBanner() {
@@ -851,7 +851,7 @@
       if (c && (c.orders || c.pieces)) {
         const a = 0.14 + 0.74 * Math.min(1, (c.pieces || 0) / max);
         cls.push('sit-cal-has'); if (a > 0.5) cls.push('sit-cal-hot');
-        style = `background:rgba(46,111,64,${a.toFixed(3)})`;
+        style = `--bg:rgba(46,111,64,${a.toFixed(3)})`;
         chip = `<span class="sit-cal-chip">${fmtNum(c.orders)} PO</span>`;
         if (c.cost) cost = `<span class="sit-cal-cost">${fmtMoney0(c.cost)}</span>`;
         title = `${fmtNum(c.orders)} POs · ${fmtNum(c.boxes)} boxes · ${fmtNum(c.pieces)} pcs · ${fmtMoney(c.cost)} blanks`;
@@ -862,22 +862,22 @@
     }
     return `<div class="sit-cal">
       <div class="sit-cal-head">
-        <button class="sit-cal-nav" data-cal="prev" aria-label="Previous month"><i class="fas fa-chevron-left"></i></button>
+        <button class="sit-cal-nav" data-cal="prev" aria-label="Previous month"><i class="fas fa-chevron-left" aria-hidden="true"></i></button>
         <div class="sit-cal-title">${esc(mm.label)}</div>
-        <button class="sit-cal-nav" data-cal="next" aria-label="Next month"><i class="fas fa-chevron-right"></i></button>
+        <button class="sit-cal-nav" data-cal="next" aria-label="Next month"><i class="fas fa-chevron-right" aria-hidden="true"></i></button>
         <button class="sit-cal-todaybtn" data-cal="today">This month</button>
       </div>
       <div class="sit-cal-grid">
         ${['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(w => `<div class="sit-cal-wd">${w}</div>`).join('')}
         ${cells}
       </div>
-      <div class="sit-cal-legend"><i class="fas fa-hand-pointer"></i> Click a day to view its inbound &amp; print box labels &nbsp;·&nbsp; shade = pieces arriving (darker = busier) &nbsp;·&nbsp; $ = wholesale blank cost</div>
+      <div class="sit-cal-legend"><i class="fas fa-hand-pointer" aria-hidden="true"></i> Click a day to view its inbound &amp; print box labels &nbsp;·&nbsp; shade = pieces arriving (darker = busier) &nbsp;·&nbsp; $ = wholesale blank cost</div>
     </div>`;
   }
   async function showCalendar(ym) {
     calOpen = true;
     calMonth = ym || (viewDate || todayISO()).slice(0, 7);
-    setContent('<div class="sit-loading"><i class="fas fa-spinner fa-spin"></i> Loading calendar…</div>');
+    setContent('<div class="sit-loading"><i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Loading calendar…</div>');
     let counts;
     try {
       counts = await fetchMonthCounts(calMonth);
@@ -886,7 +886,7 @@
       // Mirror the day-view error path (load()): visible error + Retry, never a
       // silent blank month that looks like "nothing inbound".
       console.error('[SanMarInbound] Calendar month counts failed:', err);
-      setContent(`<div class="sit-error"><i class="fas fa-triangle-exclamation"></i>
+      setContent(`<div class="sit-error"><i class="fas fa-triangle-exclamation" aria-hidden="true"></i>
         Couldn't load the calendar.<br><small>${esc(err.message)}</small><br>
         <button class="btn-cancel" id="sit-cal-retry">Retry</button></div>`);
       const retry = modalEl && modalEl.querySelector('#sit-cal-retry');
@@ -939,7 +939,7 @@
   async function syncBeforeOutput(btn) {
     if (lastData && dataAgeMs() < OUTPUT_FRESH_MS) return true;
     const restore = btn ? btn.innerHTML : '';
-    if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-rotate fa-spin"></i> Re-checking SanMar…'; }
+    if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-rotate fa-spin" aria-hidden="true"></i> Re-checking SanMar…'; }
     try {
       const data = await fetchInbound(true, viewDate);
       lastData = data;
@@ -964,7 +964,7 @@
     lastData = null;
     calOpen = false;
     hideBanner();
-    setContent('<div class="sit-loading"><i class="fas fa-spinner fa-spin"></i> Loading inbound…</div>');
+    setContent('<div class="sit-loading"><i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Loading inbound…</div>');
     try {
       const data = await fetchInbound(refresh, dateStr);
       lastData = data;
@@ -973,7 +973,7 @@
       setContent(renderBody(data));
     } catch (err) {
       // Never-Break Rule #4 — show the error, never fake data.
-      setContent(`<div class="sit-error"><i class="fas fa-triangle-exclamation"></i>
+      setContent(`<div class="sit-error"><i class="fas fa-triangle-exclamation" aria-hidden="true"></i>
         Couldn't load inbound.<br><small>${esc(err.message)}</small><br>
         <button class="btn-cancel" id="sit-retry">Retry</button></div>`);
       const retry = modalEl.querySelector('#sit-retry');
@@ -994,14 +994,14 @@
       </button>`).join('');
     return `
       <div class="sit-pm-group">Everyone · full day</div>
-      <button class="sit-pm-item" role="menuitem" data-print="full"><i class="fas fa-users"></i> <span class="sit-pm-txt">Full report <span class="sit-pm-hint">— all reps</span></span></button>
+      <button class="sit-pm-item" role="menuitem" data-print="full"><i class="fas fa-users" aria-hidden="true"></i> <span class="sit-pm-txt">Full report <span class="sit-pm-hint">— all reps</span></span></button>
       <div class="sit-pm-group">AE personal sheets · their orders only</div>
       ${aeItems || '<div class="sit-pm-empty">No AE-assigned POs today.</div>'}
-      <button class="sit-pm-item sit-pm-strong" role="menuitem" data-print="allAe"><i class="fas fa-layer-group"></i> <span class="sit-pm-txt">All AE sheets <span class="sit-pm-hint">— one per page</span></span></button>
+      <button class="sit-pm-item sit-pm-strong" role="menuitem" data-print="allAe"><i class="fas fa-layer-group" aria-hidden="true"></i> <span class="sit-pm-txt">All AE sheets <span class="sit-pm-hint">— one per page</span></span></button>
       <div class="sit-pm-group">Role sheets · full day, tailored</div>
-      <button class="sit-pm-item" role="menuitem" data-print="receiving"><i class="fas fa-box"></i> <span class="sit-pm-txt">Receiving checklist <span class="sit-pm-hint">· Mikalah</span></span></button>
-      <button class="sit-pm-item" role="menuitem" data-print="production"><i class="fas fa-industry"></i> <span class="sit-pm-txt">Production plan <span class="sit-pm-hint">· Ruthie · by due date</span></span></button>
-      <button class="sit-pm-item" role="menuitem" data-print="purchasing"><i class="fas fa-file-invoice-dollar"></i> <span class="sit-pm-txt">Purchasing / PO reconcile <span class="sit-pm-hint">· Bradley</span></span></button>`;
+      <button class="sit-pm-item" role="menuitem" data-print="receiving"><i class="fas fa-box" aria-hidden="true"></i> <span class="sit-pm-txt">Receiving checklist <span class="sit-pm-hint">· Mikalah</span></span></button>
+      <button class="sit-pm-item" role="menuitem" data-print="production"><i class="fas fa-industry" aria-hidden="true"></i> <span class="sit-pm-txt">Production plan <span class="sit-pm-hint">· Ruthie · by due date</span></span></button>
+      <button class="sit-pm-item" role="menuitem" data-print="purchasing"><i class="fas fa-file-invoice-dollar" aria-hidden="true"></i> <span class="sit-pm-txt">Purchasing / PO reconcile <span class="sit-pm-hint">· Bradley</span></span></button>`;
   }
   function togglePrintMenu(show) {
     const menu = modalEl && modalEl.querySelector('#sit-printmenu');
@@ -1021,26 +1021,41 @@
   function build() {
     modalEl = document.createElement('div');
     modalEl.className = 'modal sit-modal';
-    modalEl.style.display = 'none';
+    modalEl.hidden = true;
+    modalEl.setAttribute('role', 'dialog');
+    modalEl.setAttribute('aria-modal', 'true');
+    modalEl.setAttribute('aria-label', 'SanMar Inbound Calendar');
+    // Broken artwork thumbnails (Rule 3 — were inline onerror=): `error` does not bubble → capture phase
+    document.addEventListener('error', (e) => {
+      const img = e.target;
+      if (!img || img.tagName !== 'IMG' || !img.dataset || !img.dataset.onerror) return;
+      if (img.dataset.onerror === 'sit-logo') {
+        const off = document.createElement('div');
+        off.className = 'sit-logo sit-logo--off'; off.title = 'Artwork unavailable'; off.textContent = '🎨';
+        img.replaceWith(off);
+      } else if (img.dataset.onerror === 'hide') {
+        img.hidden = true;
+      }
+    }, true);
     modalEl.innerHTML = `
       <div class="modal-content sit-modal-content">
         <div class="sit-header">
           <div>
-            <h3><i class="fas fa-clipboard-list"></i> SanMar Inbound</h3>
+            <h3><i class="fas fa-clipboard-list" aria-hidden="true"></i> SanMar Inbound</h3>
             <div class="sit-datenav">
-              <button class="sit-daystep" id="sit-prevday" aria-label="Previous day" title="Previous day"><i class="fas fa-chevron-left"></i></button>
-              <button class="sit-datebtn" id="sit-datebtn" title="Pick a day from the calendar"><i class="fas fa-calendar-day"></i> <span class="sit-date-line" id="sit-date"></span> <i class="fas fa-caret-down sit-cal-caret"></i></button>
-              <button class="sit-daystep" id="sit-nextday" aria-label="Next day" title="Next day"><i class="fas fa-chevron-right"></i></button>
+              <button class="sit-daystep" id="sit-prevday" aria-label="Previous day" title="Previous day"><i class="fas fa-chevron-left" aria-hidden="true"></i></button>
+              <button class="sit-datebtn" id="sit-datebtn" title="Pick a day from the calendar"><i class="fas fa-calendar-day" aria-hidden="true"></i> <span class="sit-date-line" id="sit-date"></span> <i class="fas fa-caret-down sit-cal-caret" aria-hidden="true"></i></button>
+              <button class="sit-daystep" id="sit-nextday" aria-label="Next day" title="Next day"><i class="fas fa-chevron-right" aria-hidden="true"></i></button>
               <button class="sit-todaybtn" id="sit-todaybtn" title="Jump to today’s inbound">Today</button>
             </div>
           </div>
           <div class="sit-header-actions">
-            <button class="btn-cancel" id="sit-labels" title="Print a receiving label for every box today (8.5×11, one per page)"><i class="fas fa-tags"></i> Box Labels</button>
+            <button class="btn-cancel" id="sit-labels" title="Print a receiving label for every box today (8.5×11, one per page)"><i class="fas fa-tags" aria-hidden="true"></i> Box Labels</button>
             <div class="sit-printmenu-wrap">
-              <button class="btn-cancel" id="sit-print" aria-haspopup="true" aria-expanded="false" title="Print a report tailored to each person — AEs get only their orders, support staff get the full day"><i class="fas fa-print"></i> Print for… <i class="fas fa-caret-down sit-print-caret"></i></button>
+              <button class="btn-cancel" id="sit-print" aria-haspopup="true" aria-expanded="false" title="Print a report tailored to each person — AEs get only their orders, support staff get the full day"><i class="fas fa-print" aria-hidden="true"></i> Print for… <i class="fas fa-caret-down sit-print-caret" aria-hidden="true"></i></button>
               <div class="sit-printmenu" id="sit-printmenu" role="menu" hidden></div>
             </div>
-            <button class="btn-cancel" id="sit-refresh" title="Re-pull from SanMar synced data"><i class="fas fa-rotate"></i> Refresh</button>
+            <button class="btn-cancel" id="sit-refresh" title="Re-pull from SanMar synced data"><i class="fas fa-rotate" aria-hidden="true"></i> Refresh</button>
             <button class="sit-close" id="sit-close" aria-label="Close">&times;</button>
           </div>
         </div>
@@ -1094,22 +1109,30 @@
       });
     });
     document.addEventListener('keydown', (e) => {
-      if (e.key !== 'Escape' || !modalEl || modalEl.style.display === 'none') return;
+      if (e.key !== 'Escape' || !modalEl || modalEl.hidden) return;
       const menu = modalEl.querySelector('#sit-printmenu');
       if (menu && !menu.hidden) { togglePrintMenu(false); return; } // Esc closes the print menu first
       close();
     });
   }
 
-  function close() { togglePrintMenu(false); if (modalEl) modalEl.style.display = 'none'; }
+  let returnFocus = null;
+  function close() {
+    togglePrintMenu(false);
+    if (modalEl) modalEl.hidden = true;
+    if (returnFocus && document.body.contains(returnFocus)) { try { returnFocus.focus(); } catch (e) { /* gone */ } }
+    returnFocus = null;
+  }
 
   window.openInboundTodayModal = function () {
     if (!modalEl) build();
-    modalEl.style.display = 'flex';
+    returnFocus = document.activeElement;
+    modalEl.hidden = false;
+    setTimeout(() => { const c = modalEl.querySelector('.btn-cancel, [data-close], button'); if (c) c.focus(); }, 30);
     if (!window.BoxLabelTemplate) {
       // The shared label renderer didn't load — refuse to run rather than render sheets
       // with blank rush badges and a dead Box Labels button (Never-Break Rule #4).
-      setContent(`<div class="sit-error"><i class="fas fa-triangle-exclamation"></i>
+      setContent(`<div class="sit-error"><i class="fas fa-triangle-exclamation" aria-hidden="true"></i>
         box-label-template.js didn't load — refresh the page.<br>
         <small>Rush badges and box labels can't render without it, so nothing was loaded.</small></div>`);
       return;

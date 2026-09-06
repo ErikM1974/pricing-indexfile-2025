@@ -50,6 +50,17 @@
   }
 
   // Dark, print-legible color per method for the order-type band.
+  if (typeof document !== 'undefined' && !window.__slLogoErrWired) {
+    window.__slLogoErrWired = true;
+    document.addEventListener('error', (e) => {
+      const img = e.target;
+      if (img && img.tagName === 'IMG' && img.dataset && img.dataset.onerror === 'sl-logo') {
+        const span = document.createElement('span');
+        span.className = 'sl-logo-none'; span.textContent = 'artwork unavailable';
+        img.replaceWith(span);
+      }
+    }, true);
+  }
   const METHOD_DARK = { 'Embroidery': '#2e6f40', 'Screen Print': '#185fa5', 'DTG': '#854f0b', 'DTF': '#534ab7', 'Sticker': '#993556', 'Emblem': '#0f6e56', 'Online Store': '#444', 'Inksoft': '#b23b0e', 'Other': '#444' };
 
   // RUSH badge wording (Erik 2026-08-04). Three or fewer WORKING days between these blanks
@@ -103,7 +114,7 @@
     const grand = colTot.reduce((a, b) => a + b, 0);
     const totalRow = `<tr class="sl-tot"><td colspan="3">TOTAL</td>${colTot.map(t => `<td class="sl-c">${fmtNum(t)}</td>`).join('')}<td class="sl-c">${fmtNum(grand)}</td></tr>`;
     const logo = order.logoUrl
-      ? `<img class="sl-logo-img" src="${esc(order.logoUrl)}" alt="Design ${esc(order.designNumber || '')} artwork" onerror="this.outerHTML='<span class=\\'sl-logo-none\\'>artwork unavailable</span>';">`
+      ? `<img class="sl-logo-img" src="${esc(order.logoUrl)}" alt="Design ${esc(order.designNumber || '')} artwork" data-onerror="sl-logo">`
       : `<span class="sl-logo-none">No artwork on file</span>`;
     const qr = opts.qr && opts.qr.dataUrl
       ? `<div class="sl-qr"><img src="${esc(opts.qr.dataUrl)}" alt="QR">${opts.qr.hint ? `<span>${esc(opts.qr.hint)}</span>` : ''}</div>`
@@ -113,7 +124,7 @@
       : 'Received by __________';
     return `<div class="sit-label">
       <div class="sl-top">
-        <div class="sl-type" style="border-left-color:${mColor}"><span class="sl-type-l">ORDER TYPE</span><span class="sl-type-name" style="color:${mColor}">${esc(method.toUpperCase())}</span></div>
+        <div class="sl-type" style="--m:${mColor}"><span class="sl-type-l">ORDER TYPE</span><span class="sl-type-name">${esc(method.toUpperCase())}</span></div>
         ${qr}
         <div class="sl-woblock">
           <div class="sl-wolabel">WORK ORDER</div>
@@ -135,7 +146,7 @@
         <div class="sl-mb sl-mb--ctr"><span class="sl-l">BOX</span><span class="sl-v">${fmtNum(boxNo)} of ${fmtNum(boxTotal)}</span></div>
       </div>
       <div class="sl-meta sl-meta--manual">
-        <div class="sl-mb sl-fill" style="flex:1.7">
+        <div class="sl-mb sl-fill sl-fill--wide">
           <span class="sl-l">SHIP METHOD <span class="sl-hint">— circle one</span></span>
           <span class="sl-ship"><b>PICKUP</b><b>SHIP</b><span class="sl-other">Other ______</span></span>
           ${order.terms ? `<span class="sl-terms">Terms: ${esc(order.terms)}</span>` : ''}

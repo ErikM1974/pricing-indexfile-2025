@@ -16,7 +16,7 @@
     <!-- 2026 design tokens (must load before dash-shell.css) -->
     <link rel="stylesheet" href="/shared_components/css/art-hub.css">
     <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
-    <link rel="stylesheet" href="/shared_components/css/sanmar-invoice-viewer.css?v=2026.07.19.17">
+    <link rel="stylesheet" href="/shared_components/css/sanmar-invoice-viewer.css?v=2026.09.05.70">
     <link rel="stylesheet" href="/dashboards/css/purchasing-portal.css?v=2026.09.05.1">
 </head>
 <body>
@@ -31,15 +31,15 @@
             </div>
             <div class="dash-header-right">
                 <a href="https://www.jotform.com/inbox/241646601815152" target="_blank" rel="noopener" class="dash-btn" title="The JotForm inbox Bradley works from">
-                    <i class="fas fa-inbox"></i>
+                    <i class="fas fa-inbox" aria-hidden="true"></i>
                     Form inbox
                 </a>
                 <button type="button" id="pp-refresh" class="dash-btn" title="Reload the feed">
-                    <i class="fas fa-rotate"></i>
+                    <i class="fas fa-rotate" aria-hidden="true"></i>
                     Refresh
                 </button>
                 <a href="/staff-dashboard.html" class="dash-back-link">
-                    <i class="fas fa-arrow-left"></i>
+                    <i class="fas fa-arrow-left" aria-hidden="true"></i>
                     Dashboard
                 </a>
             </div>
@@ -47,10 +47,10 @@
 
         <main class="dash-content">
             <div class="dash-error-banner" role="alert">
-                <i class="fas fa-exclamation-triangle"></i>
+                <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
                 <span class="dash-error-banner-message"></span>
-                <button class="dash-error-banner-close" aria-label="Dismiss">
-                    <i class="fas fa-times"></i>
+                <button type="button" class="dash-error-banner-close" aria-label="Dismiss">
+                    <i class="fas fa-times" aria-hidden="true"></i>
                 </button>
             </div>
 
@@ -92,7 +92,7 @@
 
             <div class="dash-card">
                 <div class="dash-card-header pp-toolbar">
-                    <h2 class="dash-card-title"><i class="fas fa-cart-flatbed"></i> Purchase Requests to Bradley</h2>
+                    <h2 class="dash-card-title"><i class="fas fa-cart-flatbed" aria-hidden="true"></i> Purchase Requests to Bradley</h2>
                     <span class="pp-updated" id="pp-updated"></span>
                 </div>
                 <div class="pp-filters">
@@ -151,6 +151,6 @@
     <script src="/shared_components/js/fetch-timeout.js"></script>
     <script src="/shared_components/js/dash-page-helpers.js"></script>
     <script src="/shared_components/js/sanmar-invoice-viewer.js?v=2026.09.05.63"></script>
-    <script src="/dashboards/js/purchasing-portal.js?v=2026.09.05.1"></script>
+    <script src="/dashboards/js/purchasing-portal.js?v=2026.09.05.70"></script>
 </body>
 </html>

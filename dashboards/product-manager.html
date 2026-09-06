@@ -16,7 +16,7 @@
     <!-- 2026 design tokens (must load before dash-shell.css) -->
     <link rel="stylesheet" href="/shared_components/css/art-hub.css">
     <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
-    <link rel="stylesheet" href="/dashboards/css/product-manager.css?v=2026.07.06.11">
+    <link rel="stylesheet" href="/dashboards/css/product-manager.css?v=2026.09.05.70">
 </head>
 <body>
     <div class="dash-shell">
@@ -30,7 +30,7 @@
             </div>
             <div class="dash-header-right">
                 <a href="/staff-dashboard.html" class="dash-back-link">
-                    <i class="fas fa-arrow-left"></i>
+                    <i class="fas fa-arrow-left" aria-hidden="true"></i>
                     Dashboard
                 </a>
             </div>
@@ -38,10 +38,10 @@
 
         <main class="dash-content">
             <div class="dash-error-banner" role="alert">
-                <i class="fas fa-exclamation-triangle"></i>
+                <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
                 <span class="dash-error-banner-message"></span>
-                <button class="dash-error-banner-close" aria-label="Dismiss">
-                    <i class="fas fa-times"></i>
+                <button type="button" class="dash-error-banner-close" aria-label="Dismiss">
+                    <i class="fas fa-times" aria-hidden="true"></i>
                 </button>
             </div>
 
@@ -66,7 +66,7 @@
                     <div class="pm-header-actions">
                         <input type="search" id="pmFilter" class="pm-filter" placeholder="Filter by style, name, brand…" aria-label="Filter products">
                         <button type="button" class="pm-btn pm-btn-primary" id="pmAddBtn">
-                            <i class="fas fa-plus"></i> Add product
+                            <i class="fas fa-plus" aria-hidden="true"></i> Add product
                         </button>
                     </div>
                 </div>
@@ -76,14 +76,14 @@
                     decorated "from $X with logo" price with the same margin machinery as SanMar items
                     (fixed-price mode is for special cases only). Changes go live within 5 minutes, no deploy.
                 </p>
-                <div id="content-root" class="dash-loading">Loading products…</div>
+                <div id="content-root" class="dash-loading" role="status">Loading products…</div>
             </div>
 
             <!-- Add / Edit form -->
             <div class="dash-card pm-form-card" id="pmFormCard" hidden>
                 <div class="dash-card-header">
                     <h2 class="dash-card-title" id="pmFormTitle">Add product</h2>
-                    <button type="button" class="pm-btn pm-btn-ghost" id="pmFormClose"><i class="fas fa-times"></i> Close</button>
+                    <button type="button" class="pm-btn pm-btn-ghost" id="pmFormClose"><i class="fas fa-times" aria-hidden="true"></i> Close</button>
                 </div>
                 <form id="pmForm">
                     <input type="hidden" id="fId">
@@ -168,7 +168,7 @@
                     </div>
                     <div class="pm-form-actions">
                         <button type="submit" class="pm-btn pm-btn-primary" id="pmSaveBtn">
-                            <i class="fas fa-floppy-disk"></i> Save product
+                            <i class="fas fa-floppy-disk" aria-hidden="true"></i> Save product
                         </button>
                         <label class="pm-active-toggle">
                             <input type="checkbox" id="fActive" checked>
@@ -184,6 +184,6 @@
     <script src="/config/app.config.js"></script>
     <script src="/shared_components/js/fetch-timeout.js"></script>
     <script src="/shared_components/js/dash-page-helpers.js"></script>
-    <script src="/dashboards/js/product-manager.js?v=2026.08.15.1"></script>
+    <script src="/dashboards/js/product-manager.js?v=2026.09.05.70"></script>
 </body>
 </html>
