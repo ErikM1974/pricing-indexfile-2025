@@ -644,3 +644,35 @@ active tab, `document.title` per tab); 🔴 **the rescan SUCCESS message was dis
 banner** (`DashPage.showError(msg, 'info')` — the helper has no info mode) → a green `#uq-status`
 line; spam note toggles with `hidden`; failure row gains Retry.
 
+## Bradley's Transfer Queue — review, 11 items (2026-09-05, `v2026.09.05.43`)
+
+`dashboards/bradley-transfers.html` + `js/bradley-transfers.js` + `css/bradley-transfers.css`. Live: 60
+transfers, 0 console errors. Shipped:
+
+1. 🔴 **Rule 6** — `API_BASE` was a hardcoded Heroku host and the page never loaded `app.config.js`.
+   Now `config/app.config.js` is loaded first and the controller reads `APP_CONFIG.API.BASE_URL`.
+2. **First-load failure left the spinner up forever** (only a toast) → `renderLoadError()` renders an
+   error card with the message + Retry; later poll failures still toast without wiping the grid.
+3. **Stat chips** were clickable divs and the CSS `.active` style was never applied → `<button
+   aria-pressed>`, kept in sync with the Status dropdown, Rush checkbox and Clear (`syncChips()`);
+   clicking the active chip clears the filter; Clear keeps the `?view=steve` requester slice.
+4. **Rule 3** — 50 inline `onerror=` on thumbnails → `data-onerror="thumb"` + one capture listener;
+   13 inline `style=` (h1, icon colour, modal, form rows, checkbox label) → classes; toast fade via
+   `.is-leaving`; delete modal via `hidden` (+ `[hidden]` rule).
+5. **Cards keyboard-openable** — `role=link tabindex=0` with "Open transfer ST-…, Company";
+   Enter/Space opens the detail page (inner buttons keep their own handlers).
+6. **Delete modal** is `role=dialog aria-modal aria-labelledby`, focuses the Reason field, returns
+   focus, closes on Esc; Reason has a real label; close button named.
+7. **Link-Supacolor modal** leaked a document keydown listener on every non-Esc close → removed in
+   `close()`; focus returns to the chip that opened it.
+8. **Delete audit identity** defaulted to Bradley for everyone → the signed-in staffer from
+   `/api/crm-session/me`, then the transfer-detail stash, then Bradley.
+9. **270 icons `aria-hidden`**; filter labels have `for`; result count / toasts are status regions;
+   the active fake-tab carries `aria-current=page`.
+10. **Phone ≤600** — chips 2-up, filter groups full width; 0 overflow at 375px.
+11. Lock: `tests/unit/bradley-transfers-page.test.js`.
+
+Left alone: the 60-second poll (paused while the tab is hidden) — Bradley's queue is meant to update
+itself; the Caspio quota is tracked separately. 🔑 Local smoke: this page reaches the PUBLIC proxy, so
+`static-dist` loads REAL data — the first-load failure path is covered by the jest lock, not the pane.
+

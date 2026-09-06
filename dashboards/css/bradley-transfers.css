@@ -811,3 +811,28 @@ button.bt-card-po--empty:focus {
     .bt-breadcrumb a, .bt-breadcrumb-current { padding: 3px 6px; }
     .bt-breadcrumb-current { max-width: 140px; }
 }
+
+/* ── 2026-09-05 review ────────────────────────────────────────────────────── */
+[hidden] { display: none !important; }
+.bt-title { margin-bottom: 4px; }
+.bt-title-icon { color: #4a6fa5; }
+/* Stat chips are real <button>s now (keyboard + aria-pressed); reset the UA button look. */
+.bt-stat-chip { font: inherit; color: inherit; text-align: left; }
+.bt-stat-chip[aria-pressed="true"] { background: #f0f4fa; border-color: #4a6fa5; box-shadow: 0 0 0 2px rgba(74, 111, 165, 0.25); }
+.bt-stat-chip:focus-visible, .bt-btn:focus-visible, .bt-filter-input:focus-visible, .bt-card:focus-visible,
+.bt-card-sc-link:focus-visible, .bt-card-po--empty:focus-visible, .bt-modal-close:focus-visible, .tab-button-link:focus-visible {
+    outline: 2px solid #4a6fa5; outline-offset: 2px;
+}
+.bt-modal-content--narrow { max-width: 480px; }
+.bt-modal-intro--danger { background: #fee2e2; border-left-color: #dc2626; color: #991b1b; }
+.bt-form-row--single { grid-template-columns: 1fr; }
+.bt-checkline { font-weight: normal; display: flex; align-items: flex-start; gap: 8px; cursor: pointer; }
+.bt-checkline input { margin-top: 3px; }
+.bt-toast.is-leaving { opacity: 0; transition: opacity .3s; }
+.bt-error { grid-column: 1 / -1; text-align: center; padding: 40px 20px; color: #991b1b; background: #fee2e2; border: 1px solid #fecaca; border-radius: 8px; }
+.bt-error .bt-btn { margin-top: 12px; }
+@media (max-width: 600px) {
+    .bt-stat-chip { min-width: 0; flex: 1 1 45%; }
+    .bt-filter-bar { flex-wrap: wrap; }
+    .bt-filter-group { flex: 1 1 100%; }
+}

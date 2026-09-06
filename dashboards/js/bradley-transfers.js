@@ -11,13 +11,16 @@
     'use strict';
 
     // ── Config ───────────────────────────────────────────────────────
-    var API_BASE = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+    // Rule 6: the proxy base comes from APP_CONFIG (config/app.config.js), never a hardcoded host.
+    var API_BASE = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL)
+        || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
     var POLL_INTERVAL_MS = 60 * 1000;
     var AGE_WARN_HOURS = 24;      // yellow after 1 day
     var AGE_CRITICAL_HOURS = 72;  // red after 3 days
 
     // ── State ────────────────────────────────────────────────────────
     var state = {
+        loadedOnce: false,
         allTransfers: [],
         filteredTransfers: [],
         stats: {},
@@ -67,12 +70,29 @@
             var data = await resp.json();
             if (!data.success) throw new Error(data.error || 'API returned success=false');
             state.allTransfers = data.records || [];
+            state.loadedOnce = true;
             return state.allTransfers;
         } catch (err) {
             console.error('Failed to fetch transfers:', err);
-            showToast('Unable to load transfers. Please refresh.', 'error');
+            showToast('Unable to load transfers: ' + err.message, 'error');
+            // First load failing left the spinner up forever — show a real error state with Retry.
+            if (!state.loadedOnce) renderLoadError(err);
             throw err;
         }
+    }
+
+    function renderLoadError(err) {
+        var grid = $('bt-grid');
+        if (!grid) return;
+        grid.innerHTML = '<div class="bt-error" role="alert">' +
+            '<i class="fas fa-triangle-exclamation" aria-hidden="true"></i> Unable to load transfers (' + escapeHtml(err && err.message ? err.message : 'unknown error') + ').' +
+            '<br><button type="button" class="bt-btn bt-btn--secondary" id="bt-load-retry"><i class="fas fa-sync-alt" aria-hidden="true"></i> Retry</button></div>';
+        var rc = $('bt-result-count'); if (rc) rc.textContent = 'Not loaded';
+        var rb = document.getElementById('bt-load-retry');
+        if (rb) rb.addEventListener('click', function () {
+            grid.innerHTML = '<div class="bt-loading" role="status"><i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Loading transfers...</div>';
+            refresh();
+        });
     }
 
     async function fetchStats() {
@@ -107,6 +127,15 @@
         }
         return data;
     }
+
+    // Broken mockup thumbnails (was an inline onerror= — Rule 3). `error` doesn't bubble → capture phase.
+    document.addEventListener('error', function (e) {
+        var img = e.target;
+        if (img && img.tagName === 'IMG' && img.dataset && img.dataset.onerror === 'thumb') {
+            img.classList.add('bt-card-thumb--err');
+            img.removeAttribute('src');
+        }
+    }, true);
 
     // ── Rendering ────────────────────────────────────────────────────
     function renderStats() {
@@ -204,9 +233,9 @@
     function renderCard(t) {
         var ageHours = getAgeHours(t.Requested_At);
         var rushClass = isRush(t) ? ' bt-card--rush' : '';
-        var rushBadge = isRush(t) ? '<span class="bt-badge bt-badge--rush"><i class="fas fa-bolt"></i> RUSH</span>' : '';
+        var rushBadge = isRush(t) ? '<span class="bt-badge bt-badge--rush"><i class="fas fa-bolt" aria-hidden="true"></i> RUSH</span>' : '';
         var lineCountPill = (t.line_count && t.line_count > 1)
-            ? '<span class="tas-line-count-pill"><i class="fas fa-list-ol"></i> ' + t.line_count + ' transfers</span>'
+            ? '<span class="tas-line-count-pill"><i class="fas fa-list-ol" aria-hidden="true"></i> ' + t.line_count + ' transfers</span>'
             : '';
         // File-count pill — shown when ≥2 files are attached. Single source of
         // truth: t.file_count from the backend list endpoint with
@@ -214,7 +243,7 @@
         // synthesizes from legacy flat columns server-side, so the count is
         // always accurate without client-side fallback.
         var fileCountPill = (t.file_count && t.file_count > 1)
-            ? '<span class="bt-pill bt-pill--files"><i class="fas fa-paperclip"></i> ' + t.file_count + ' files</span>'
+            ? '<span class="bt-pill bt-pill--files"><i class="fas fa-paperclip" aria-hidden="true"></i> ' + t.file_count + ' files</span>'
             : '';
 
         // Mockup thumbnail — left-aligned hero on the card.
@@ -225,9 +254,9 @@
             // Those proxy urls are stored ABSOLUTE and 401 cross-origin since the Box
             // surface was session-gated; boxUrl() returns them to this origin.
             thumb = '<img class="bt-card-thumb" src="' + escapeHtml(resolveBoxUrl(t.mockup_thumbnail_url)) +
-                '" alt="" loading="lazy" onerror="this.classList.add(\'bt-card-thumb--err\');this.removeAttribute(\'src\');">';
+                '" alt="" loading="lazy" data-onerror="thumb">';
         } else {
-            thumb = '<div class="bt-card-thumb bt-card-thumb--placeholder"><i class="fas fa-image"></i></div>';
+            thumb = '<div class="bt-card-thumb bt-card-thumb--placeholder"><i class="fas fa-image" aria-hidden="true"></i></div>';
         }
 
         // Delete menu only pre-Supacolor (before order placed). Post-order
@@ -235,13 +264,13 @@
         var canDelete = t.Status === 'Requested' || t.Status === 'On_Hold';
         var deleteMenu = canDelete ?
             '<button class="bt-card-menu-btn" data-action="delete" title="Delete (mistake)" aria-label="Delete transfer">' +
-                '<i class="fas fa-trash"></i>' +
+                '<i class="fas fa-trash" aria-hidden="true"></i>' +
             '</button>' : '';
 
         // Subtitle with Steve-provided info: Sales Rep + Transfer Type
         var subtitleParts = [];
         if (t.Sales_Rep_Name || t.Sales_Rep_Email) {
-            subtitleParts.push('<i class="fas fa-user"></i> ' + escapeHtml(t.Sales_Rep_Name || t.Sales_Rep_Email));
+            subtitleParts.push('<i class="fas fa-user" aria-hidden="true"></i> ' + escapeHtml(t.Sales_Rep_Name || t.Sales_Rep_Email));
         }
         if (t.Transfer_Type) {
             subtitleParts.push('<strong>' + escapeHtml(t.Transfer_Type) + '</strong>');
@@ -263,7 +292,7 @@
                 '<div class="bt-card-po">' +
                     '<span class="bt-card-po-label">PO</span>' +
                     '<span class="bt-card-po-number">' + poDigits + ' BW</span>' +
-                    (linkPending ? '<span class="bt-card-po-pending"><i class="fas fa-circle-notch fa-spin"></i> Linking…</span>' : '') +
+                    (linkPending ? '<span class="bt-card-po-pending"><i class="fas fa-circle-notch fa-spin" aria-hidden="true"></i> Linking…</span>' : '') +
                 '</div>';
         } else if (t.Status === 'Requested' || t.Status === 'On_Hold') {
             poRow =
@@ -271,7 +300,7 @@
                     ' data-action="enter-po"' +
                     ' data-id-transfer="' + escapeHtml(t.ID_Transfer) + '"' +
                     ' title="Enter the ShopWorks PO# to mark this as Ordered and auto-link the Supacolor job">' +
-                    '<i class="fas fa-keyboard"></i> Enter PO# to order' +
+                    '<i class="fas fa-keyboard" aria-hidden="true"></i> Enter PO# to order' +
                 '</button>';
         } else {
             poRow = '';
@@ -301,14 +330,14 @@
                     ? 'Supacolor job was cancelled — click to re-link'
                     : 'Supacolor job missing from local mirror — click to re-link')
                 : 'Open Supacolor job';
-            var staleIcon = isStale ? '<i class="fas fa-exclamation-triangle"></i> ' : '';
+            var staleIcon = isStale ? '<i class="fas fa-exclamation-triangle" aria-hidden="true"></i> ' : '';
             scLink = '<button type="button" class="bt-card-sc-link' + staleClass + '"' +
                 ' data-sc-number="' + escapeHtml(t.Supacolor_Order_Number) + '"' +
                 ' data-sc-stale="' + (isStale ? '1' : '0') + '"' +
                 ' data-id-transfer="' + escapeHtml(t.ID_Transfer) + '"' +
                 ' title="' + escapeHtml(staleTitle) + '">' +
                 staleIcon + 'Supacolor #' + escapeHtml(t.Supacolor_Order_Number) +
-                ' <i class="fas fa-external-link-alt"></i>' +
+                ' <i class="fas fa-external-link-alt" aria-hidden="true"></i>' +
                 '</button>';
         } else if (t.Status === 'Requested' || t.Status === 'Ordered' || t.Status === 'On_Hold') {
             // Only offer manual linking on non-terminal statuses. Cancelled/Received
@@ -317,13 +346,13 @@
                 ' data-action="link-supacolor"' +
                 ' data-id-transfer="' + escapeHtml(t.ID_Transfer) + '"' +
                 ' title="Link this transfer to a Supacolor job number">' +
-                '<i class="fas fa-link"></i> Link to Supacolor #…' +
+                '<i class="fas fa-link" aria-hidden="true"></i> Link to Supacolor #…' +
                 '</button>';
         } else {
             scLink = '';
         }
 
-        return '<div class="bt-card' + rushClass + '" data-id="' + escapeHtml(t.ID_Transfer) + '">' +
+        return '<div class="bt-card' + rushClass + '" data-id="' + escapeHtml(t.ID_Transfer) + '" role="link" tabindex="0" aria-label="Open transfer ' + escapeHtml(t.ID_Transfer || '') + (t.Company_Name ? ', ' + escapeHtml(t.Company_Name) : '') + '">' +
             '<div class="bt-card-header">' +
                 '<span class="bt-card-id">' + escapeHtml(t.ID_Transfer || '') + '</span>' +
                 '<div class="bt-card-header-right">' +
@@ -359,7 +388,7 @@
 
         if (list.length === 0) {
             grid.innerHTML = '<div class="bt-empty">' +
-                '<i class="fas fa-inbox"></i>' +
+                '<i class="fas fa-inbox" aria-hidden="true"></i>' +
                 '<div>No transfers match your filters.</div>' +
                 '</div>';
             $('bt-result-count').textContent = '0 transfers';
@@ -418,6 +447,14 @@
                 var id = card.getAttribute('data-id');
                 window.location.href = '/pages/transfer-detail.html?id=' + encodeURIComponent(id);
             });
+            // Keyboard: Enter/Space on the card itself opens the detail page (inner buttons keep their own).
+            card.addEventListener('keydown', function (e) {
+                if (e.target !== card) return;
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    window.location.href = '/pages/transfer-detail.html?id=' + encodeURIComponent(card.getAttribute('data-id'));
+                }
+            });
         });
     }
 
@@ -466,19 +503,20 @@
         var saveBtn = modal.querySelector('[data-action="save"]');
         var feedback = modal.querySelector('#bt-link-sc-feedback');
 
-        function close() { modal.remove(); }
+        var linkReturnFocus = document.activeElement;
+        function escHandler(ev) { if (ev.key === 'Escape') close(); }
+        function close() {
+            document.removeEventListener('keydown', escHandler);   // was only removed on Esc — every other close leaked a listener
+            modal.remove();
+            if (linkReturnFocus && document.body.contains(linkReturnFocus) && typeof linkReturnFocus.focus === 'function') linkReturnFocus.focus();
+        }
         modal.querySelectorAll('[data-action="close"]').forEach(function (btn) {
             btn.addEventListener('click', close);
         });
         modal.addEventListener('click', function (e) {
             if (e.target === modal) close();
         });
-        document.addEventListener('keydown', function escHandler(ev) {
-            if (ev.key === 'Escape') {
-                close();
-                document.removeEventListener('keydown', escHandler);
-            }
-        });
+        document.addEventListener('keydown', escHandler);
 
         var validateTimer = null;
         var lastValidatedNumber = null;
@@ -506,12 +544,12 @@
                     var job = res.data && (res.data.job || res.data.record);
                     if (res.ok && res.data && res.data.success && job) {
                         var customerHint = job.Description ? ' &middot; ' + escapeHtml(job.Description) : '';
-                        feedback.innerHTML = '<i class="fas fa-check-circle"></i> Found in mirror &middot; Status: <strong>' +
+                        feedback.innerHTML = '<i class="fas fa-check-circle" aria-hidden="true"></i> Found in mirror &middot; Status: <strong>' +
                             escapeHtml(job.Status || 'Open') + '</strong>' + customerHint;
                         feedback.className = 'bt-lscm-feedback bt-lscm-feedback--ok';
                         saveBtn.disabled = false;
                     } else if (res.status === 404) {
-                        feedback.innerHTML = '<i class="fas fa-exclamation-circle"></i> Job #' + escapeHtml(num) +
+                        feedback.innerHTML = '<i class="fas fa-exclamation-circle" aria-hidden="true"></i> Job #' + escapeHtml(num) +
                             ' not found in our mirror. Try refreshing the Supacolor dashboard first, or save anyway if you\'re sure.';
                         feedback.className = 'bt-lscm-feedback bt-lscm-feedback--warn';
                         saveBtn.disabled = false;
@@ -575,7 +613,7 @@
     async function navigateToSupacolorJob(btnEl, jobNumber) {
         if (!jobNumber) return;
         var origLabel = btnEl.innerHTML;
-        btnEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ' + escapeHtml(jobNumber);
+        btnEl.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> ' + escapeHtml(jobNumber);
         btnEl.disabled = true;
         try {
             var resp = await fetch(API_BASE + '/api/supacolor-jobs/by-number/' + encodeURIComponent(jobNumber));
@@ -685,8 +723,7 @@
         toast.textContent = msg;
         container.appendChild(toast);
         setTimeout(function () {
-            toast.style.opacity = '0';
-            toast.style.transition = 'opacity .3s';
+            toast.classList.add('is-leaving');
             setTimeout(function () { toast.remove(); }, 300);
         }, 4000);
     }
@@ -694,16 +731,24 @@
     // ── Delete modal ─────────────────────────────────────────────────
     var deleteTargetId = null;
 
+    var deleteReturnFocus = null;
     function openDeleteModal(idTransfer) {
         deleteTargetId = idTransfer;
+        deleteReturnFocus = document.activeElement;
         $('bt-delete-modal-target').textContent = idTransfer || 'This transfer';
         $('bt-delete-form').reset();
-        $('bt-delete-modal').style.display = 'flex';
+        $('bt-delete-modal').hidden = false;
+        var reason = document.getElementById('bt-delete-reason');
+        if (reason) setTimeout(function () { reason.focus(); }, 30);
     }
 
     function closeDeleteModal() {
+        var m = $('bt-delete-modal');
+        if (m.hidden) return;
         deleteTargetId = null;
-        $('bt-delete-modal').style.display = 'none';
+        m.hidden = true;
+        if (deleteReturnFocus && document.body.contains(deleteReturnFocus) && typeof deleteReturnFocus.focus === 'function') deleteReturnFocus.focus();
+        deleteReturnFocus = null;
     }
 
     async function handleDeleteSubmit(e) {
@@ -714,9 +759,9 @@
             showToast('Please check the confirmation box.', 'error');
             return;
         }
-        // Reuse identity set by transfer-detail.html, else default to Bradley (this is his queue)
-        var email = localStorage.getItem('transfer_user_email') || 'bradley@nwcustomapparel.com';
-        var name = localStorage.getItem('transfer_user_name') || 'Bradley Wright';
+        // Identity: the signed-in staffer (session), else what transfer-detail stashed, else Bradley (his queue).
+        var email = (state.me && state.me.email) || localStorage.getItem('transfer_user_email') || 'bradley@nwcustomapparel.com';
+        var name = (state.me && state.me.name) || localStorage.getItem('transfer_user_name') || 'Bradley Wright';
         var idToDelete = deleteTargetId;
         try {
             await hardDeleteTransfer(idToDelete, {
@@ -759,7 +804,7 @@
 
                 // Retitle the queue section + tab button
                 var titleEl = document.querySelector('.tab-title');
-                if (titleEl) titleEl.innerHTML = '<i class="fas fa-paint-brush" style="color:#4a6fa5;"></i> Steve\u2019s Transfer Submissions';
+                if (titleEl) titleEl.innerHTML = '<i class="fas fa-paint-brush bt-title-icon" aria-hidden="true"></i> Steve\u2019s Transfer Submissions';
                 var subtitleEl = document.querySelector('.bt-subtitle');
                 if (subtitleEl) subtitleEl.textContent = 'Transfers Steve sent to Bradley — follow them through to shipment';
                 var tabActive = document.querySelector('.tab-button.active');
@@ -785,7 +830,7 @@
         btn.id = 'bt-send-another-btn';
         btn.className = 'bt-btn bt-btn--primary';
         btn.title = 'Open the Send-to-Supacolor modal to fire another transfer';
-        btn.innerHTML = '<i class="fas fa-paper-plane"></i> Send Another to Bradley';
+        btn.innerHTML = '<i class="fas fa-paper-plane" aria-hidden="true"></i> Send Another to Bradley';
         btn.addEventListener('click', function () {
             if (!window.TransferActions || typeof window.TransferActions.openSendModal !== 'function') {
                 showToast('Send modal isn\'t loaded — refresh the page.', 'error');
@@ -804,12 +849,32 @@
         actionsRow.insertBefore(btn, actionsRow.firstChild);
     }
 
+    // Chip pressed-state mirrors the Status dropdown + Rush checkbox (single source: state.filters).
+    function syncChips() {
+        document.querySelectorAll('.bt-stat-chip[data-status]').forEach(function (chip) {
+            var on = chip.getAttribute('data-status') === state.filters.status;
+            chip.classList.toggle('active', on);
+            chip.setAttribute('aria-pressed', on ? 'true' : 'false');
+        });
+        var rushChip = $('bt-stat-rush-chip');
+        if (rushChip) {
+            rushChip.classList.toggle('active', !!state.filters.rushOnly);
+            rushChip.setAttribute('aria-pressed', state.filters.rushOnly ? 'true' : 'false');
+        }
+    }
+
     // ── Wire Up ──────────────────────────────────────────────────────
     function init() {
         applyViewModeFromUrl();
+        // Who is signed in (for the delete audit trail) — best effort.
+        fetch('/api/crm-session/me', { credentials: 'same-origin' })
+            .then(function (r) { return r.ok ? r.json() : null; })
+            .then(function (me) { if (me && me.email) state.me = { email: me.email, name: [me.firstName, me.lastName].filter(Boolean).join(' ') || me.email }; })
+            .catch(function () { /* keep the fallbacks */ });
         // Filter inputs
         $('bt-filter-status').addEventListener('change', function (e) {
             state.filters.status = e.target.value;
+            syncChips();
             applyFilters();
         });
         $('bt-filter-search').addEventListener('input', function (e) {
@@ -819,28 +884,34 @@
         // Rep dropdown removed in v3.1 — search-by-text covers rep names
         $('bt-filter-rush-only').addEventListener('change', function (e) {
             state.filters.rushOnly = e.target.checked;
+            syncChips();
             applyFilters();
         });
         $('bt-filter-clear').addEventListener('click', function () {
-            state.filters = { status: '', search: '', rep: '', rushOnly: false };
+            // Keep the ?view= requester slice — Clear resets the user's filters, not the page mode.
+            var keepReq = state.filters.requesterEmails;
+            state.filters = { status: '', search: '', rep: '', rushOnly: false, requesterEmails: keepReq };
             $('bt-filter-status').value = '';
             $('bt-filter-search').value = '';
             $('bt-filter-rush-only').checked = false;
+            syncChips();
             applyFilters();
         });
 
-        // Stats chip clicks → quick-filter by status
+        // Stats chip clicks → quick-filter by status (click the active chip again to clear)
         document.querySelectorAll('.bt-stat-chip[data-status]').forEach(function (chip) {
             chip.addEventListener('click', function () {
                 var status = chip.getAttribute('data-status');
-                state.filters.status = status;
-                $('bt-filter-status').value = status;
+                state.filters.status = (state.filters.status === status) ? '' : status;
+                $('bt-filter-status').value = state.filters.status;
+                syncChips();
                 applyFilters();
             });
         });
         $('bt-stat-rush-chip').addEventListener('click', function () {
             state.filters.rushOnly = !state.filters.rushOnly;
             $('bt-filter-rush-only').checked = state.filters.rushOnly;
+            syncChips();
             applyFilters();
         });
 
@@ -857,6 +928,7 @@
             if (e.target === $('bt-delete-modal')) closeDeleteModal();
         });
         $('bt-delete-form').addEventListener('submit', handleDeleteSubmit);
+        document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeDeleteModal(); });
 
         // Catch any flash toast stashed by transfer-detail before redirect (e.g., "deleted")
         readFlashToast();
