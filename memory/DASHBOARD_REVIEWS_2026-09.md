@@ -676,3 +676,29 @@ Left alone: the 60-second poll (paused while the tab is hidden) — Bradley's qu
 itself; the Caspio quota is tracked separately. 🔑 Local smoke: this page reaches the PUBLIC proxy, so
 `static-dist` loads REAL data — the first-load failure path is covered by the jest lock, not the pane.
 
+## Supacolor API Orders — review, 10 items (2026-09-05, `v2026.09.05.45`)
+
+`dashboards/supacolor-orders.html` + `js/supacolor-orders.js` + `css/supacolor-orders.css` (shares
+`bradley-transfers.css`). Live: 6 active / 1,064 closed. Shipped:
+
+1. 🔴 **Rule 6** — hardcoded proxy host, no `app.config.js` → loaded first, `APP_CONFIG.API.BASE_URL`.
+2. **First-load failure was a dead "Failed to load." panel** → error card with the message + Retry
+   (`renderLoadError()`); later polls still toast without wiping the table.
+3. **View chips** were `role=button` divs with a `.selected` class → `<button aria-pressed>`; the
+   existing Enter/Space keydown path kept.
+4. **Rule 3** — h1/logo inline styles → `.sc-title*` classes; pagination, backfill modal, paste
+   preview, file input, extract status/results `style="display:none"` → `hidden` (+ `[hidden]` rule);
+   15 `.style.display` toggles → `hidden`; preview-note inline style → class.
+5. **Backfill modal** is `role=dialog aria-modal aria-labelledby`; focus lands on the paste zone,
+   returns to the trigger; Esc closes; the paste-zone is `role=button` with a name and Enter/Space
+   opens the file picker; the document `paste` guard reads `.hidden` (was `style.display`).
+6. **Pagination** is a `<nav aria-label>` with `type=button` controls and a status page-info.
+7. **Labels** — Status/Search `for`; hidden file input renamed "Screenshot file".
+8. **Icons `aria-hidden`** (incl. the dynamic risk / toast icons); toast container is a live region;
+   the fake active tab carries `aria-current`.
+9. **Phone ≤600** — chips 2-up, filter groups full width, title wraps; 0 overflow at 375px.
+10. Lock: `tests/unit/supacolor-orders-page.test.js`.
+
+Left alone: dates append `Z` on purpose (Supacolor_Jobs stores UTC — the opposite convention from
+Transfer_Orders, which `CaspioDate.parse` treats as Pacific); the 60-second poll.
+

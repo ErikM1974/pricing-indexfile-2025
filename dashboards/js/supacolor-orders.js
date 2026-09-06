@@ -12,7 +12,9 @@
 (function () {
     'use strict';
 
-    var API_BASE = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+    // Rule 6: the proxy base comes from APP_CONFIG (config/app.config.js), never a hardcoded host.
+    var API_BASE = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL)
+        || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
     var POLL_INTERVAL_MS = 60 * 1000;
     var PAGE_SIZE = 25;
 
@@ -222,7 +224,7 @@
         if (shipped && !j.Date_Received) {
             var expected = addBusinessDays(shipped, EXPECTED_TRANSIT_DAYS);
             expectedHtml = '<div class="sc-ship-expected">' +
-                '<i class="fas fa-clock"></i> Expected ' + escapeHtml(formatDate(expected.toISOString())) +
+                '<i class="fas fa-clock" aria-hidden="true"></i> Expected ' + escapeHtml(formatDate(expected.toISOString())) +
             '</div>';
         }
 
@@ -240,7 +242,7 @@
             : '';
         return dateHtml +
             '<span class="' + pillClass + '"' + pillAttrs + '>' +
-                '<i class="fas fa-truck"></i> ' +
+                '<i class="fas fa-truck" aria-hidden="true"></i> ' +
                 carrierLabel + ' ' +    // already escaped above
                 escapeHtml(j.Tracking_Number) +
             '</span>' +
@@ -259,7 +261,7 @@
             return state.allJobs;
         } catch (err) {
             console.error('Failed to fetch Supacolor jobs:', err);
-            showToast('Unable to load jobs. Please refresh.', 'error');
+            showToast('Unable to load jobs: ' + err.message, 'error');
             throw err;
         }
     }
@@ -419,9 +421,9 @@
         var totalCount = jobs.length;
 
         if (totalCount === 0) {
-            wrap.innerHTML = '<div class="bt-empty"><i class="fas fa-inbox"></i><p>No jobs match your filters.</p></div>';
+            wrap.innerHTML = '<div class="bt-empty"><i class="fas fa-inbox" aria-hidden="true"></i><p>No jobs match your filters.</p></div>';
             $('sc-result-count').textContent = '0 jobs';
-            $('sc-pagination').style.display = 'none';
+            $('sc-pagination').hidden = true;
             return;
         }
 
@@ -451,7 +453,7 @@
                 :                             'fa-triangle-exclamation';
             var riskHtml = risk
                 ? '<div class="sc-due-risk sc-due-risk--' + risk.level + '">' +
-                      '<i class="fas ' + riskIcon + '"></i> ' +
+                      '<i class="fas ' + riskIcon + '" aria-hidden="true"></i> ' +
                       escapeHtml(risk.text) +
                   '</div>'
                 : '';
@@ -492,7 +494,7 @@
                 '</div>' +
                 '<div class="sc-cell sc-cell--received">' +
                     (j.Date_Received
-                        ? '<i class="fas fa-check sc-received-check"></i> ' + escapeHtml(formatDate(j.Date_Received))
+                        ? '<i class="fas fa-check sc-received-check" aria-hidden="true"></i> ' + escapeHtml(formatDate(j.Date_Received))
                         : '') +
                 '</div>' +
                 '<div class="sc-cell sc-cell--status">' +
@@ -501,7 +503,7 @@
                     '</span>' +
                 '</div>' +
                 '<div class="' + shippedCellClass + '"' + shippedCellAttrs + '>' + shippedCellHtml(j) + '</div>' +
-                '<div class="sc-cell sc-cell--chevron"><i class="fas fa-chevron-right"></i></div>' +
+                '<div class="sc-cell sc-cell--chevron"><i class="fas fa-chevron-right" aria-hidden="true"></i></div>' +
             '</a>';
         }).join('');
 
@@ -541,36 +543,42 @@
         $('sc-result-count').textContent = showStart + '–' + showEnd + ' of ' + totalCount + ' jobs';
 
         if (totalPages > 1) {
-            $('sc-pagination').style.display = '';
+            $('sc-pagination').hidden = false;
             $('sc-page-info').textContent = 'Page ' + state.currentPage + ' of ' + totalPages;
             $('sc-page-prev').disabled = state.currentPage <= 1;
             $('sc-page-next').disabled = state.currentPage >= totalPages;
         } else {
-            $('sc-pagination').style.display = 'none';
+            $('sc-pagination').hidden = true;
         }
     }
 
     // ── Backfill modal ─────────────────────────────────────────────────
+    var backfillReturnFocus = null;
     function openBackfillModal() {
-        $('sc-backfill-modal').style.display = 'flex';
+        backfillReturnFocus = document.activeElement;
+        $('sc-backfill-modal').hidden = false;
         resetBackfillModal();
         // Focus the paste zone so Ctrl+V works immediately
         setTimeout(function () { $('sc-paste-zone').focus(); }, 50);
     }
 
     function closeBackfillModal() {
-        $('sc-backfill-modal').style.display = 'none';
+        var m = $('sc-backfill-modal');
+        if (m.hidden) return;
+        m.hidden = true;
         state.pendingBackfill = null;
         state.pendingSingleJob = null;
+        if (backfillReturnFocus && document.body.contains(backfillReturnFocus) && typeof backfillReturnFocus.focus === 'function') backfillReturnFocus.focus();
+        backfillReturnFocus = null;
     }
 
     function resetBackfillModal() {
-        $('sc-paste-empty').style.display = '';
-        $('sc-paste-preview').style.display = 'none';
+        $('sc-paste-empty').hidden = false;
+        $('sc-paste-preview').hidden = true;
         $('sc-paste-preview').src = '';
-        $('sc-extract-status').style.display = 'none';
+        $('sc-extract-status').hidden = true;
         $('sc-extract-status').innerHTML = '';
-        $('sc-extract-results').style.display = 'none';
+        $('sc-extract-results').hidden = true;
         $('sc-extract-results').innerHTML = '';
         $('sc-backfill-import').disabled = true;
         state.pendingBackfill = null;
@@ -579,7 +587,7 @@
 
     function showExtractStatus(html, kind) {
         var el = $('sc-extract-status');
-        el.style.display = '';
+        el.hidden = false;
         el.className = 'sc-extract-status sc-extract-status--' + (kind || 'info');
         el.innerHTML = html;
     }
@@ -599,9 +607,9 @@
         });
 
         // Show preview
-        $('sc-paste-empty').style.display = 'none';
+        $('sc-paste-empty').hidden = true;
         $('sc-paste-preview').src = dataUri;
-        $('sc-paste-preview').style.display = '';
+        $('sc-paste-preview').hidden = false;
         $('sc-backfill-import').disabled = true;
 
         // Run BOTH extractors in parallel — same image. If the user pasted a
@@ -609,7 +617,7 @@
         // (joblines, history, shipping, etc). If they pasted a multi-row list,
         // the detail extractor returns error/empty and we fall through to the
         // existing list-backfill flow.
-        showExtractStatus('<i class="fas fa-spinner fa-spin"></i> Reading screenshot with Claude Vision…', 'info');
+        showExtractStatus('<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Reading screenshot with Claude Vision…', 'info');
         try {
             var both = await Promise.all([
                 extractJobsList(dataUri),
@@ -643,14 +651,14 @@
                 });
 
                 showExtractStatus(
-                    '<i class="fas fa-check-circle"></i> Single job detected: <strong>#' +
+                    '<i class="fas fa-check-circle" aria-hidden="true"></i> Single job detected: <strong>#' +
                     escapeHtml(detail.supacolorJobNumber) + '</strong> — ' +
                     fieldCount + ' fields, ' + jlCount + ' joblines, ' + histCount + ' history events. ' +
                     'Review below and click Import.',
                     'success'
                 );
 
-                $('sc-extract-results').style.display = '';
+                $('sc-extract-results').hidden = false;
                 $('sc-extract-results').innerHTML =
                     '<div class="sc-preview-table">' +
                         '<div class="sc-preview-row sc-preview-row--header">' +
@@ -664,7 +672,7 @@
                             '<div>' + escapeHtml(formatDate(detail.dateShipped)) + '</div>' +
                         '</div>' +
                     '</div>' +
-                    '<div style="margin-top:12px;font-size:13px;color:#475569;">' +
+                    '<div class="sc-preview-note">' +
                         '<strong>Will also import:</strong> ' +
                         jlCount + ' joblines, ' + histCount + ' history events, plus shipping/payment details.' +
                     '</div>';
@@ -690,12 +698,12 @@
             state.pendingSingleJob = null;
 
             showExtractStatus(
-                '<i class="fas fa-check-circle"></i> Extracted <strong>' + mapped.length +
+                '<i class="fas fa-check-circle" aria-hidden="true"></i> Extracted <strong>' + mapped.length +
                 '</strong> job rows in ' + (listResult.duration || 0) + 'ms. Review below and click Import.',
                 'success'
             );
 
-            $('sc-extract-results').style.display = '';
+            $('sc-extract-results').hidden = false;
             $('sc-extract-results').innerHTML =
                 '<div class="sc-preview-table">' +
                     '<div class="sc-preview-row sc-preview-row--header">' +
@@ -717,7 +725,7 @@
         } catch (err) {
             console.error('Extraction failed:', err);
             showExtractStatus(
-                '<i class="fas fa-exclamation-triangle"></i> ' + escapeHtml(err.message || 'Extraction failed'),
+                '<i class="fas fa-exclamation-triangle" aria-hidden="true"></i> ' + escapeHtml(err.message || 'Extraction failed'),
                 'error'
             );
         }
@@ -731,7 +739,7 @@
         var btn = $('sc-backfill-import');
         btn.disabled = true;
         var origHtml = btn.innerHTML;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Importing…';
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Importing…';
 
         try {
             if (hasSingle) {
@@ -834,7 +842,7 @@
         t.className = 'bt-toast bt-toast--' + (kind || 'info');
         t.innerHTML = '<i class="fas fa-' + (kind === 'error' ? 'exclamation-triangle' :
                                               kind === 'success' ? 'check-circle' : 'info-circle') +
-                      '"></i> ' + escapeHtml(message);
+                      '" aria-hidden="true"></i> ' + escapeHtml(message);
         c.appendChild(t);
         setTimeout(function () { t.classList.add('bt-toast--show'); }, 10);
         setTimeout(function () {
@@ -878,7 +886,9 @@
         function selectViewChip(view) {
             state.filters.view = view;
             statsRow.querySelectorAll('.bt-stat-chip--clickable').forEach(function (c) {
-                c.classList.toggle('selected', c.dataset.view === view);
+                var on = c.dataset.view === view;
+                c.classList.toggle('selected', on);
+                c.setAttribute('aria-pressed', on ? 'true' : 'false');
             });
             applyFilters();
         }
@@ -921,9 +931,14 @@
         $('sc-backfill-cancel').addEventListener('click', closeBackfillModal);
         $('sc-backfill-import').addEventListener('click', importPendingBackfill);
 
-        // Click backdrop to close
+        // Click backdrop / Esc to close
         $('sc-backfill-modal').addEventListener('click', function (e) {
             if (e.target === $('sc-backfill-modal')) closeBackfillModal();
+        });
+        document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeBackfillModal(); });
+        // Paste zone: Enter/Space = choose a file (mouse users click the empty state)
+        $('sc-paste-zone').addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); $('sc-paste-file').click(); }
         });
 
         // Paste zone — Ctrl+V handler. Listener on document (not the zone)
@@ -933,7 +948,7 @@
         var pasteZone = $('sc-paste-zone');
         var backfillModal = $('sc-backfill-modal');
         document.addEventListener('paste', function (e) {
-            if (backfillModal.style.display === 'none') return;
+            if (backfillModal.hidden) return;
             var items = (e.clipboardData || window.clipboardData || {}).items;
             if (!items) return;
             for (var i = 0; i < items.length; i++) {
@@ -976,14 +991,28 @@
             await Promise.all([fetchJobs(), fetchStats()]);
             applyFilters();
         } catch (err) {
-            $('sc-table-wrap').innerHTML = '<div class="bt-empty bt-empty--error">' +
-                '<i class="fas fa-exclamation-triangle"></i><p>Failed to load. ' +
-                escapeHtml(err.message || '') + '</p></div>';
+            renderLoadError(err);
         }
 
         // Poll every 60s — paused while the tab is hidden (save API calls;
         // bradley-transfers pattern), immediate refresh on refocus.
         state.pollTimer = setInterval(pollOnce, POLL_INTERVAL_MS);
+    }
+
+    function renderLoadError(err) {
+        var wrap = $('sc-table-wrap');
+        wrap.innerHTML = '<div class="sc-error" role="alert">' +
+            '<i class="fas fa-exclamation-triangle" aria-hidden="true"></i> Failed to load Supacolor jobs (' + escapeHtml(err && err.message ? err.message : 'unknown error') + ').' +
+            '<br><button type="button" class="bt-btn bt-btn--secondary" id="sc-load-retry"><i class="fas fa-sync-alt" aria-hidden="true"></i> Retry</button></div>';
+        $('sc-result-count').textContent = 'Not loaded';
+        var rb = document.getElementById('sc-load-retry');
+        if (rb) rb.addEventListener('click', async function () {
+            wrap.innerHTML = '<div class="bt-loading" role="status"><i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Loading Supacolor jobs...</div>';
+            try {
+                await Promise.all([fetchJobs(), fetchStats()]);
+                applyFilters();
+            } catch (e) { renderLoadError(e); }
+        });
     }
 
     async function pollOnce() {

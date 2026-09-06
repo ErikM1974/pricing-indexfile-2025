@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/shared_components/css/art-hub.css?v=2026.08.03.1">
     <link rel="stylesheet" href="/dashboards/css/bradley-transfers.css?v=2026.09.05.43">
-    <link rel="stylesheet" href="/dashboards/css/supacolor-orders.css?v=11">
+    <link rel="stylesheet" href="/dashboards/css/supacolor-orders.css?v=2026.09.05.44">
 </head>
 <body>
     <div class="minimal-header">
@@ -24,7 +24,7 @@
 
     <div class="tab-container">
         <div class="tab-buttons">
-            <button class="tab-button active">Supacolor API Orders</button>
+            <button type="button" class="tab-button active" aria-current="page">Supacolor API Orders</button>
             <a class="tab-button tab-button-link" href="/dashboards/bradley-transfers.html">Bradley's Transfer Queue</a>
             <a class="tab-button tab-button-link" href="/dashboards/bradley-screenprint.html">Screen Print Queue</a>
             <a class="tab-button tab-button-link" href="/dashboards/art-hub-steve.html">Steve's Queue</a>
@@ -36,23 +36,22 @@
                 <!-- Header row -->
                 <div class="bt-header-row">
                     <div>
-                        <h1 class="tab-title" style="margin-bottom:4px; display:flex; align-items:center; gap:12px;">
-                            <span style="display:inline-flex; align-items:center; background:#1e293b; padding:8px 14px; border-radius:8px;">
+                        <h1 class="tab-title sc-title">
+                            <span class="sc-title-mark">
                                 <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/supacolor-mark.png?ver=1"
-                                     alt="Supacolor"
-                                     style="height:28px; width:auto; display:block;">
+                                     alt="Supacolor" class="sc-title-logo">
                             </span>
-                            <span style="font-size:inherit; color:inherit;">API Orders</span>
+                            <span>API Orders</span>
                         </h1>
                         <div class="bt-subtitle">Live mirror of our Supacolor heat-transfer jobs &middot; Synced every 10 min from supacolor.com <span id="sc-avg-transit" class="sc-subtitle-meta"></span></div>
                     </div>
                     <div class="bt-header-actions">
-                        <button id="sc-refresh-btn" class="bt-btn bt-btn--primary" title="Reload the jobs list">
-                            <i class="fas fa-sync-alt"></i> Refresh
+                        <button type="button" id="sc-refresh-btn" class="bt-btn bt-btn--primary" title="Reload the jobs list">
+                            <i class="fas fa-sync-alt" aria-hidden="true"></i> Refresh
                         </button>
                         <div class="sc-fallback-group" title="Fallback: paste a screenshot if Supacolor's API is down">
-                            <button id="sc-backfill-btn" class="sc-fallback-btn">
-                                <i class="fas fa-paste"></i> Paste screenshot
+                            <button type="button" id="sc-backfill-btn" class="sc-fallback-btn">
+                                <i class="fas fa-paste" aria-hidden="true"></i> Paste screenshot
                             </button>
                             <span class="sc-fallback-note">backup if API fails</span>
                         </div>
@@ -63,34 +62,34 @@
                 </div>
 
                 <!-- Stats Chips (clickable = view filter) -->
-                <div id="sc-stats-row" class="bt-stats-row">
-                    <div class="bt-stat-chip bt-stat-chip--ordered bt-stat-chip--clickable selected" data-view="active" role="button" tabindex="0" title="Show active jobs">
+                <div id="sc-stats-row" class="bt-stats-row" role="group" aria-label="Job views — click a chip to filter">
+                    <button type="button" class="bt-stat-chip bt-stat-chip--ordered bt-stat-chip--clickable selected" data-view="active" aria-pressed="true" title="Show active jobs">
                         <span class="bt-stat-count" id="sc-stat-open">&mdash;</span>
                         <span class="bt-stat-label">Active</span>
-                    </div>
-                    <div class="bt-stat-chip bt-stat-chip--arriving bt-stat-chip--clickable" data-view="arriving" role="button" tabindex="0" title="Shipped from Supacolor, expected today or earlier, not yet received">
+                    </button>
+                    <button type="button" class="bt-stat-chip bt-stat-chip--arriving bt-stat-chip--clickable" data-view="arriving" aria-pressed="false" title="Shipped from Supacolor, expected today or earlier, not yet received">
                         <span class="bt-stat-count" id="sc-stat-arriving">&mdash;</span>
                         <span class="bt-stat-label">Arriving Today</span>
-                    </div>
-                    <div class="bt-stat-chip bt-stat-chip--received bt-stat-chip--clickable" data-view="closed" role="button" tabindex="0" title="Show closed jobs">
+                    </button>
+                    <button type="button" class="bt-stat-chip bt-stat-chip--received bt-stat-chip--clickable" data-view="closed" aria-pressed="false" title="Show closed jobs">
                         <span class="bt-stat-count" id="sc-stat-closed">&mdash;</span>
                         <span class="bt-stat-label">Closed</span>
-                    </div>
-                    <div class="bt-stat-chip bt-stat-chip--cancelled bt-stat-chip--clickable" data-view="cancelled" role="button" tabindex="0" title="Show cancelled jobs">
+                    </button>
+                    <button type="button" class="bt-stat-chip bt-stat-chip--cancelled bt-stat-chip--clickable" data-view="cancelled" aria-pressed="false" title="Show cancelled jobs">
                         <span class="bt-stat-count" id="sc-stat-cancelled">&mdash;</span>
                         <span class="bt-stat-label">Cancelled</span>
-                    </div>
-                    <div class="bt-stat-chip bt-stat-chip--total bt-stat-chip--clickable" id="sc-stat-total-chip" data-view="all" role="button" tabindex="0" title="Show all jobs">
+                    </button>
+                    <button type="button" class="bt-stat-chip bt-stat-chip--total bt-stat-chip--clickable" id="sc-stat-total-chip" data-view="all" aria-pressed="false" title="Show all jobs">
                         <span class="bt-stat-count" id="sc-stat-total">&mdash;</span>
                         <span class="bt-stat-label">Total</span>
-                    </div>
+                    </button>
                 </div>
 
                 <!-- Filter Bar -->
                 <div class="bt-filter-bar">
                     <div class="bt-filter-group">
-                        <label class="bt-filter-label">
-                            <i class="fas fa-filter"></i> Status:
+                        <label class="bt-filter-label" for="sc-filter-status">
+                            <i class="fas fa-filter" aria-hidden="true"></i> Status:
                         </label>
                         <select id="sc-filter-status" aria-label="Filter by status" class="bt-filter-input">
                             <option value="">All Statuses</option>
@@ -100,43 +99,43 @@
                         </select>
                     </div>
                     <div class="bt-filter-group bt-filter-group--grow">
-                        <label class="bt-filter-label">
-                            <i class="fas fa-search"></i> Search:
+                        <label class="bt-filter-label" for="sc-filter-search">
+                            <i class="fas fa-search" aria-hidden="true"></i> Search:
                         </label>
                         <input type="text" id="sc-filter-search" aria-label="Search orders" class="bt-filter-input"
                                placeholder="Search by job #, PO, or description...">
                     </div>
-                    <button id="sc-filter-clear" class="bt-btn bt-btn--link">Clear</button>
-                    <div class="bt-filter-meta" id="sc-result-count">Loading...</div>
+                    <button type="button" id="sc-filter-clear" class="bt-btn bt-btn--link">Clear</button>
+                    <div class="bt-filter-meta" id="sc-result-count" role="status">Loading...</div>
                 </div>
 
                 <!-- Jobs Table -->
                 <div id="sc-table-wrap" class="sc-table-wrap">
-                    <div class="bt-loading">
-                        <i class="fas fa-spinner fa-spin"></i> Loading Supacolor jobs...
+                    <div class="bt-loading" role="status">
+                        <i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Loading Supacolor jobs...
                     </div>
                 </div>
 
                 <!-- Pagination -->
-                <div id="sc-pagination" class="sc-pagination" style="display:none;">
-                    <button class="sc-page-btn" id="sc-page-prev">
-                        <i class="fas fa-chevron-left"></i> Prev
+                <nav id="sc-pagination" class="sc-pagination" aria-label="Pagination" hidden>
+                    <button type="button" class="sc-page-btn" id="sc-page-prev">
+                        <i class="fas fa-chevron-left" aria-hidden="true"></i> Prev
                     </button>
-                    <span class="sc-page-info" id="sc-page-info">Page 1 of 1</span>
-                    <button class="sc-page-btn" id="sc-page-next">
-                        Next <i class="fas fa-chevron-right"></i>
+                    <span class="sc-page-info" id="sc-page-info" role="status">Page 1 of 1</span>
+                    <button type="button" class="sc-page-btn" id="sc-page-next">
+                        Next <i class="fas fa-chevron-right" aria-hidden="true"></i>
                     </button>
-                </div>
+                </nav>
             </div>
         </div>
     </div>
 
     <!-- Backfill Modal: paste jobs list screenshot -->
-    <div id="sc-backfill-modal" class="bt-modal" style="display:none;">
-        <div class="bt-modal-content">
+    <div id="sc-backfill-modal" class="bt-modal" hidden>
+        <div class="bt-modal-content" role="dialog" aria-modal="true" aria-labelledby="sc-backfill-title">
             <div class="bt-modal-header">
-                <h3><i class="fas fa-paste"></i> Backfill from Screenshot</h3>
-                <button class="bt-modal-close" id="sc-backfill-modal-close">&times;</button>
+                <h3 id="sc-backfill-title"><i class="fas fa-paste" aria-hidden="true"></i> Backfill from Screenshot</h3>
+                <button type="button" class="bt-modal-close" id="sc-backfill-modal-close" aria-label="Close">&times;</button>
             </div>
             <div class="bt-modal-body">
                 <div class="bt-modal-intro">
@@ -144,24 +143,24 @@
                     Each row will be extracted and added to your local mirror. Existing jobs (matched by job #) won't be duplicated.
                 </div>
 
-                <div class="sc-paste-zone" id="sc-paste-zone" tabindex="0">
+                <div class="sc-paste-zone" id="sc-paste-zone" tabindex="0" role="button" aria-label="Paste a screenshot with Ctrl+V, drop an image here, or press Enter to choose a file">
                     <div class="sc-paste-empty" id="sc-paste-empty">
-                        <i class="fas fa-image"></i>
+                        <i class="fas fa-image" aria-hidden="true"></i>
                         <p><strong>Click here, then press Ctrl+V</strong> to paste your screenshot</p>
                         <p class="sc-paste-hint">Or drag & drop an image file</p>
                     </div>
-                    <img id="sc-paste-preview" class="sc-paste-preview" style="display:none;" alt="Pasted screenshot preview">
-                    <input type="file" id="sc-paste-file" aria-label="Order file" accept="image/*" style="display:none;">
+                    <img id="sc-paste-preview" class="sc-paste-preview" hidden alt="Pasted screenshot preview">
+                    <input type="file" id="sc-paste-file" aria-label="Screenshot file" accept="image/*" hidden>
                 </div>
 
-                <div id="sc-extract-status" class="sc-extract-status" style="display:none;"></div>
+                <div id="sc-extract-status" class="sc-extract-status" role="status" hidden></div>
 
-                <div id="sc-extract-results" class="sc-extract-results" style="display:none;"></div>
+                <div id="sc-extract-results" class="sc-extract-results" hidden></div>
 
                 <div class="bt-form-actions">
                     <button type="button" class="bt-btn bt-btn--secondary" id="sc-backfill-cancel">Cancel</button>
                     <button type="button" class="bt-btn bt-btn--primary" id="sc-backfill-import" disabled>
-                        <i class="fas fa-cloud-upload-alt"></i> Import Jobs
+                        <i class="fas fa-cloud-upload-alt" aria-hidden="true"></i> Import Jobs
                     </button>
                 </div>
             </div>
@@ -169,8 +168,9 @@
     </div>
 
     <!-- Toast container -->
-    <div id="sc-toast-container" class="bt-toast-container"></div>
+    <div id="sc-toast-container" class="bt-toast-container" role="status" aria-live="polite"></div>
 
-    <script src="/dashboards/js/supacolor-orders.js?v=2026.07.18.2"></script>
+    <script src="/config/app.config.js"></script>
+    <script src="/dashboards/js/supacolor-orders.js?v=2026.09.05.44"></script>
 </body>
 </html>
