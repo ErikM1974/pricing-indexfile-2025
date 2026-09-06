@@ -172,7 +172,7 @@ var MockupSubmitForm = (function () {
             + '        </div>'
             + '        <span class="msf-error-msg" id="msf-company-error">Company name is required</span>'
             + '        <span class="msf-warning-msg" id="msf-customer-id-warning" style="display:none;color:#b45309;font-size:0.82rem;margin-top:4px;">'
-            + '          <i class="fas fa-exclamation-triangle"></i> No customer ID found &mdash; portal link won\'t work for this company</span>'
+            + '          <i class="fas fa-exclamation-triangle" aria-hidden="true"></i> No customer ID found &mdash; portal link won\'t work for this company</span>'
             + '      </div>'
             + '      <div class="msf-field">'
             + '        <label class="msf-field-label">Sales Rep</label>'

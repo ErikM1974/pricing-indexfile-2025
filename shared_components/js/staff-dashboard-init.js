@@ -303,7 +303,7 @@ const StaffDashboardInit = (function() {
             teamList.innerHTML = `
                 <div class="error-state">
                     <div class="error-state-icon">
-                        <i class="fas fa-exclamation-triangle"></i>
+                        <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
                     </div>
                     <div class="error-state-content">
                         <div class="error-state-title">Unable to load metrics</div>
@@ -325,7 +325,7 @@ const StaffDashboardInit = (function() {
         if (container) {
             container.innerHTML = `
                 <div class="partial-data-notice">
-                    <i class="fas fa-info-circle"></i>
+                    <i class="fas fa-info-circle" aria-hidden="true"></i>
                     <span>Some metrics could not be loaded. Showing available data.</span>
                 </div>
             `;
@@ -401,7 +401,7 @@ const StaffDashboardInit = (function() {
                 const diffSign = diff >= 0 ? '+' : '-';
                 growthBadge.className = `metrics-comparison-badge ${isPositive ? 'positive' : 'negative'}`;
                 growthBadge.innerHTML = `
-                    <i class="fas fa-arrow-${isPositive ? 'up' : 'down'}"></i>
+                    <i class="fas fa-arrow-${isPositive ? 'up' : 'down'}" aria-hidden="true"></i>
                     ${StaffDashboardService.formatPercentage(growth)} (${diffSign}${diffFormatted})
                 `;
                 // Show comparison dates
@@ -436,7 +436,7 @@ const StaffDashboardInit = (function() {
             container.innerHTML = `
                 <div class="empty-state">
                     <div class="empty-state-icon">
-                        <i class="fas fa-exclamation-circle"></i>
+                        <i class="fas fa-exclamation-circle" aria-hidden="true"></i>
                     </div>
                     <div class="empty-state-title">Unable to load team data</div>
                     <div class="empty-state-message">Please try refreshing the page.</div>
@@ -449,7 +449,7 @@ const StaffDashboardInit = (function() {
             container.innerHTML = `
                 <div class="empty-state">
                     <div class="empty-state-icon">
-                        <i class="fas fa-users"></i>
+                        <i class="fas fa-users" aria-hidden="true"></i>
                     </div>
                     <div class="empty-state-title">No sales data</div>
                     <div class="empty-state-message">No orders found for this period.</div>
@@ -514,7 +514,7 @@ const StaffDashboardInit = (function() {
 
         // Update title to show 2026 YTD
         if (titleEl) {
-            titleEl.innerHTML = '<i class="fas fa-users"></i> Team Performance: 2026 YTD';
+            titleEl.innerHTML = '<i class="fas fa-users" aria-hidden="true"></i> Team Performance: 2026 YTD';
         }
         if (dateRangeEl && teamData && teamData.dateRange) {
             dateRangeEl.textContent = `${teamData.dateRange.startFormatted} - ${teamData.dateRange.endFormatted}`;
@@ -529,7 +529,7 @@ const StaffDashboardInit = (function() {
             const archived = StaffDashboardService.formatDateForDisplay(teamData.lastArchivedDate);
             titleEl.insertAdjacentHTML('afterend',
                 '<div id="teamArchiveHint" style="display:flex;align-items:center;gap:6px;padding:2px 0;color:#6b7280;font-size:11px;margin:2px 0 6px;">' +
-                '<i class="fas fa-database" style="font-size:10px;"></i>' +
+                '<i class="fas fa-database" style="font-size:10px;" aria-hidden="true"></i>' +
                 `<span>Archive through ${escapeHtml(archived)} \u00b7 live data: today</span></div>`
             );
         }
@@ -541,7 +541,7 @@ const StaffDashboardInit = (function() {
             container.innerHTML = `
                 <div class="empty-state">
                     <div class="empty-state-icon">
-                        <i class="fas fa-exclamation-circle"></i>
+                        <i class="fas fa-exclamation-circle" aria-hidden="true"></i>
                     </div>
                     <div class="empty-state-title">Unable to load team data</div>
                     <div class="empty-state-message">Please try refreshing the page.</div>
@@ -554,7 +554,7 @@ const StaffDashboardInit = (function() {
             container.innerHTML = `
                 <div class="empty-state">
                     <div class="empty-state-icon">
-                        <i class="fas fa-users"></i>
+                        <i class="fas fa-users" aria-hidden="true"></i>
                     </div>
                     <div class="empty-state-title">No sales data</div>
                     <div class="empty-state-message">No orders found for 2026 yet.</div>
@@ -600,7 +600,7 @@ const StaffDashboardInit = (function() {
         if (badge) {
             badge.className = `data-source-badge${hasPartialData ? ' partial' : ''}`;
             badge.innerHTML = `
-                <i class="fas fa-database"></i>
+                <i class="fas fa-database" aria-hidden="true"></i>
                 <span>ShopWorks Live${hasPartialData ? ' (Partial)' : ''}</span>
             `;
         }
@@ -982,12 +982,12 @@ const StaffDashboardInit = (function() {
             console.warn('[GarmentTracker] Table load failed, showing sync prompt:', error.message);
             container.innerHTML = `
                 <div class="error-state">
-                    <div class="error-state-icon"><i class="fas fa-cloud-download-alt"></i></div>
+                    <div class="error-state-icon"><i class="fas fa-cloud-download-alt" aria-hidden="true"></i></div>
                     <div class="error-state-content">
                         <div class="error-state-title">No data synced yet</div>
                         <div class="error-state-message">Click the Sync button to populate from orders</div>
                         <button class="error-state-retry" onclick="StaffDashboardInit.syncGarmentTracker()">
-                            <i class="fas fa-cloud-download-alt"></i> Sync Now
+                            <i class="fas fa-cloud-download-alt" aria-hidden="true"></i> Sync Now
                         </button>
                     </div>
                 </div>
@@ -1058,7 +1058,7 @@ const StaffDashboardInit = (function() {
                     <tr class="garment-group-row ${hasData ? '' : 'no-data'}" data-group-idx="${groupIdx}" title="$${group.bonus.toFixed(2)} per item — click to expand">
                         <td class="garment-name-col">
                             <div class="garment-info">
-                                <span class="garment-style"><i class="fas fa-chevron-right garment-group-toggle"></i></span>
+                                <span class="garment-style"><i class="fas fa-chevron-right garment-group-toggle" aria-hidden="true"></i></span>
                                 <span class="garment-name">${escapeHtml(group.name)}</span>
                             </div>
                         </td>
@@ -1169,7 +1169,7 @@ const StaffDashboardInit = (function() {
         const recordCount = meta.ordersProcessed || 0;
         const syncLabel = meta.lastSync
             ? `Last synced: ${formatRelativeTime(meta.lastSync)}`
-            : `Never synced this quarter — click <i class="fas fa-cloud-download-alt"></i> to populate`;
+            : `Never synced this quarter — click <i class="fas fa-cloud-download-alt" aria-hidden="true"></i> to populate`;
         const countLabel = recordCount > 0
             ? `${recordCount} record${recordCount === 1 ? '' : 's'}`
             : 'No qualifying orders yet';
@@ -1263,7 +1263,7 @@ const StaffDashboardInit = (function() {
             if (container) {
                 container.innerHTML = `
                     <div class="error-state">
-                        <div class="error-state-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                        <div class="error-state-icon"><i class="fas fa-exclamation-triangle" aria-hidden="true"></i></div>
                         <div class="error-state-content">
                             <div class="error-state-title">Sync failed</div>
                             <div class="error-state-message">${escapeHtml(error.message)}</div>
@@ -1339,7 +1339,7 @@ const StaffDashboardInit = (function() {
             html += `
                 <div class="production-card" title="Typically ${pred.range} days (${pred.samples} samples)">
                     <div class="production-card-header">
-                        <i class="fas ${service.icon}"></i>
+                        <i class="fas ${service.icon}" aria-hidden="true"></i>
                         <span class="production-service-name">${name}</span>
                     </div>
                     <div class="production-days">
@@ -1386,9 +1386,9 @@ const StaffDashboardInit = (function() {
             modal.innerHTML = `
                 <div class="gap-report-modal">
                     <div class="gap-report-header">
-                        <h2 id="gapReportTitle"><i class="fas fa-info-circle"></i> Gap Details</h2>
+                        <h2 id="gapReportTitle"><i class="fas fa-info-circle" aria-hidden="true"></i> Gap Details</h2>
                         <button class="gap-report-close" onclick="closeGapReport()">
-                            <i class="fas fa-times"></i>
+                            <i class="fas fa-times" aria-hidden="true"></i>
                         </button>
                     </div>
                     <div class="gap-report-body" id="gapReportBody">
@@ -1429,8 +1429,8 @@ const StaffDashboardInit = (function() {
 
         // Update title based on gap type
         title.innerHTML = isInbound
-            ? `<i class="fas fa-arrow-left"></i> Orders From Other Reps`
-            : `<i class="fas fa-arrow-right"></i> Orders to Non-CRM Customers`;
+            ? `<i class="fas fa-arrow-left" aria-hidden="true"></i> Orders From Other Reps`
+            : `<i class="fas fa-arrow-right" aria-hidden="true"></i> Orders to Non-CRM Customers`;
 
         try {
             const response = await fetch(endpoint, { credentials: 'same-origin' });
@@ -1447,7 +1447,7 @@ const StaffDashboardInit = (function() {
             if (data.customers.length === 0) {
                 body.innerHTML = `
                     <div class="gap-report-empty">
-                        <i class="fas fa-check-circle"></i>
+                        <i class="fas fa-check-circle" aria-hidden="true"></i>
                         <h3>No Gap!</h3>
                         <p>${isInbound
                             ? `No orders by other reps for ${escapeHtml(repName)}'s customers.`
@@ -1508,7 +1508,7 @@ const StaffDashboardInit = (function() {
                         <tbody>
                             ${data.customers.map(cust => `
                                 <tr class="gap-customer-row" onclick="toggleGapOrders(this)">
-                                    <td class="expand-toggle"><i class="fas fa-chevron-right"></i></td>
+                                    <td class="expand-toggle"><i class="fas fa-chevron-right" aria-hidden="true"></i></td>
                                     <td>
                                         <div class="gap-company-name">${escapeHtml(cust.companyName)}</div>
                                         <div class="gap-customer-id">ID: ${cust.ID_Customer}</div>
@@ -1529,14 +1529,14 @@ const StaffDashboardInit = (function() {
                     </table>
                 </div>
                 <div class="gap-report-footer">
-                    <p><i class="fas fa-info-circle"></i> ${footerText}</p>
+                    <p><i class="fas fa-info-circle" aria-hidden="true"></i> ${footerText}</p>
                 </div>
             `;
         } catch (error) {
             console.error('Gap report error:', error);
             body.innerHTML = `
                 <div class="gap-report-error">
-                    <i class="fas fa-exclamation-triangle"></i>
+                    <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
                     <p>Failed to load gap report: ${escapeHtml(error.message)}</p>
                 </div>
             `;

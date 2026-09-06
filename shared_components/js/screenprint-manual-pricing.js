@@ -199,7 +199,7 @@ class ScreenPrintManualPricing {
                     <div class="sp-dark-garment-toggle${this.state.isDarkGarment ? ' active' : ''}" id="sp-dark-garment-toggle">
                         <div class="sp-dark-garment-label">
                             <span>Printing on dark garment?</span>
-                            <i class="fas fa-info-circle sp-dark-info-icon" id="sp-dark-info-icon"></i>
+                            <i class="fas fa-info-circle sp-dark-info-icon" id="sp-dark-info-icon" aria-hidden="true"></i>
                             <span class="sp-dark-garment-info">(White underbase required)</span>
                         </div>
                         <div class="sp-toggle-switch">
@@ -211,7 +211,7 @@ class ScreenPrintManualPricing {
                     <div id="sp-dark-tooltip" class="sp-dark-tooltip" style="display: none;">
                         <div class="sp-dark-tooltip-content">
                             <div class="sp-dark-tooltip-header">
-                                <i class="fas fa-tshirt"></i> Why Dark Garments Add a Setup Screen
+                                <i class="fas fa-tshirt" aria-hidden="true"></i> Why Dark Garments Add a Setup Screen
                             </div>
                             <div class="sp-dark-tooltip-body">
                                 When printing on black or dark-colored shirts, we must print a <strong>white underbase layer first</strong> so your ink colors appear vibrant and true to their intended shade.
@@ -232,7 +232,7 @@ class ScreenPrintManualPricing {
                     <div class="sp-toggle-section">
                         <div class="sp-workflow-step-label">Step 1: Select Colors</div>
                         <div class="sp-toggle-section-title">
-                            <i class="fas fa-palette"></i>
+                            <i class="fas fa-palette" aria-hidden="true"></i>
                             Front Location Ink Colors
                         </div>
                         <div class="sp-toggle-section-subtitle">
@@ -270,7 +270,7 @@ class ScreenPrintManualPricing {
                     <div class="sp-toggle-section">
                         <div class="sp-workflow-step-label">Step 2: Select Quantity</div>
                         <div class="sp-toggle-section-title">
-                            <i class="fas fa-chart-bar"></i>
+                            <i class="fas fa-chart-bar" aria-hidden="true"></i>
                             Quantity Tiers
                         </div>
 
@@ -298,7 +298,7 @@ class ScreenPrintManualPricing {
                 <div class="sp-additional-locations-section" id="sp-additional-locations-section">
                     <div class="sp-additional-locations-header" id="sp-additional-locations-header">
                         <div class="sp-additional-locations-title">
-                            <i class="fas fa-chevron-down"></i>
+                            <i class="fas fa-chevron-down" aria-hidden="true"></i>
                             Additional Print Locations
                         </div>
                         <div class="sp-additional-locations-subtitle">Add up to 3 additional locations</div>
@@ -308,7 +308,7 @@ class ScreenPrintManualPricing {
                     </div>
                     <!-- Add Location button (moved outside container to prevent deletion) -->
                     <button type="button" id="sp-add-location" class="sp-add-location-button">
-                        <i class="fas fa-plus"></i>
+                        <i class="fas fa-plus" aria-hidden="true"></i>
                         Add Location
                     </button>
                 </div>
@@ -319,7 +319,7 @@ class ScreenPrintManualPricing {
 
                     <!-- Pricing Tier Display -->
                     <div class="sp-pricing-tier-display" id="sp-pricing-tier-display" style="display: none;">
-                        <i class="fas fa-layer-group"></i>
+                        <i class="fas fa-layer-group" aria-hidden="true"></i>
                         <span>Pricing Tier: <strong id="sp-pricing-tier-label">—</strong></span>
                     </div>
 
@@ -329,7 +329,7 @@ class ScreenPrintManualPricing {
                             <span class="sp-price-label">Price per shirt</span>
                             <div class="sp-price-amount-wrapper">
                                 <span class="sp-live-price-amount" id="sp-live-price-amount">$0.00</span>
-                                <i class="fas fa-info-circle sp-upcharge-info-icon" id="sp-upcharge-info-icon"></i>
+                                <i class="fas fa-info-circle sp-upcharge-info-icon" id="sp-upcharge-info-icon" aria-hidden="true"></i>
 
                                 <!-- Upcharge Tooltip - positioned relative to icon -->
                                 <div id="sp-upcharge-tooltip" class="sp-upcharge-tooltip">
@@ -345,7 +345,7 @@ class ScreenPrintManualPricing {
 
                         <div class="sp-price-row sp-price-quantity-calc" id="sp-price-quantity-calc" style="display: none;">
                             <span class="sp-price-calc-text">
-                                <i class="fas fa-times"></i> <span id="sp-calc-quantity">37</span> pieces
+                                <i class="fas fa-times" aria-hidden="true"></i> <span id="sp-calc-quantity">37</span> pieces
                             </span>
                             <span class="sp-price-calc-result" id="sp-calc-subtotal">$0.00</span>
                         </div>
@@ -354,7 +354,7 @@ class ScreenPrintManualPricing {
                     <!-- Setup Fees Section -->
                     <div class="sp-pricing-setup" id="sp-pricing-setup" style="display: none;">
                         <div class="sp-setup-header">
-                            <i class="fas fa-palette"></i> Setup Fees
+                            <i class="fas fa-palette" aria-hidden="true"></i> Setup Fees
                         </div>
                         <div class="sp-setup-breakdown" id="sp-setup-breakdown-live">
                             <!-- Populated by JavaScript -->
@@ -369,7 +369,7 @@ class ScreenPrintManualPricing {
                     <div class="sp-pricing-ltm" id="sp-pricing-ltm" style="display: none;">
                         <div class="sp-price-row sp-ltm-fee">
                             <span class="sp-price-label">
-                                <i class="fas fa-exclamation-triangle"></i> Small Batch Fee
+                                <i class="fas fa-exclamation-triangle" aria-hidden="true"></i> Small Batch Fee
                             </span>
                             <span class="sp-price-amount" id="sp-ltm-fee-amount">$0.00</span>
                         </div>
@@ -389,7 +389,7 @@ class ScreenPrintManualPricing {
                     <!-- Toggle Breakdown -->
                     <div class="sp-breakdown-toggle" id="sp-breakdown-toggle" style="display: none;">
                         <button type="button" class="sp-toggle-breakdown-btn" id="sp-toggle-breakdown-btn">
-                            <i class="fas fa-chevron-down"></i>
+                            <i class="fas fa-chevron-down" aria-hidden="true"></i>
                             <span id="sp-toggle-breakdown-text">Show Details</span>
                         </button>
                     </div>
@@ -996,7 +996,7 @@ class ScreenPrintManualPricing {
 
                 <!-- Remove Button -->
                 <button type="button" class="sp-location-slot-remove" data-index="${index}">
-                    <i class="fas fa-times"></i>
+                    <i class="fas fa-times" aria-hidden="true"></i>
                 </button>
             `;
 
@@ -1011,7 +1011,7 @@ class ScreenPrintManualPricing {
             button.type = 'button';
             button.id = 'sp-add-location';
             button.className = 'sp-add-location-button';
-            button.innerHTML = '<i class="fas fa-plus"></i> Add Location';
+            button.innerHTML = '<i class="fas fa-plus" aria-hidden="true"></i> Add Location';
             button.addEventListener('click', () => this.addLocation());
 
             // Insert button after container

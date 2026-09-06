@@ -300,7 +300,7 @@ const AI_ENDPOINT = '/api/contract-webstore-ai/chat';
         else if (toolName === 'web_search') iconClass = 'fa-globe';
         else if (toolName === 'quote_webstore_setup') iconClass = 'fa-store';
         else if (toolName === 'quote_fundraiser_pricing') iconClass = 'fa-hand-holding-dollar';
-        chip.innerHTML = `<i class="fas ${iconClass}"></i> ${escapeHtml(statusText)}`;
+        chip.innerHTML = `<i class="fas ${iconClass}" aria-hidden="true"></i> ${escapeHtml(statusText)}`;
         msg.appendChild(chip);
         if (opts.searchResults) {
             msg.appendChild(buildWebSearchResultsEl(opts.searchResults));
@@ -531,7 +531,7 @@ const AI_ENDPOINT = '/api/contract-webstore-ai/chat';
         if (copyBtn) copyBtn.disabled = !hasDraft;
         if (saveBtn) saveBtn.disabled = !(hasDraft && hasQuote && aiState.currentCustomerFinal);
         if (aiState.savedQuoteID && saveBtn) {
-            saveBtn.innerHTML = `<i class="fas fa-link"></i> Copy share link`;
+            saveBtn.innerHTML = `<i class="fas fa-link" aria-hidden="true"></i> Copy share link`;
             saveBtn.disabled = false;
         }
     }

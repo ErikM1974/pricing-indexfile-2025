@@ -375,7 +375,7 @@ class DTGQuoteProducts {
                 <div class="product-card-image">
                     ${product.imageUrl ? 
                         `<img src="${product.imageUrl}" alt="${display.title}">` :
-                        `<div class="no-image"><i class="fas fa-tshirt"></i></div>`
+                        `<div class="no-image"><i class="fas fa-tshirt" aria-hidden="true"></i></div>`
                     }
                 </div>
                 <div class="product-card-details">
@@ -386,7 +386,7 @@ class DTGQuoteProducts {
                 </div>
                 <div class="product-card-actions">
                     <button class="btn-remove" onclick="removeProductFromQuote(${product.id})">
-                        <i class="fas fa-trash"></i> Remove
+                        <i class="fas fa-trash" aria-hidden="true"></i> Remove
                     </button>
                 </div>
             </div>

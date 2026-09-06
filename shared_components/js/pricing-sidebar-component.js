@@ -81,7 +81,7 @@ class PricingSidebarComponent {
 
                 <div class="pricing-panel">
                     <div class="pricing-title">
-                        <i class="fas fa-calculator"></i>
+                        <i class="fas fa-calculator" aria-hidden="true"></i>
                         <span>Quote Summary</span>
                     </div>
 
@@ -117,7 +117,7 @@ class PricingSidebarComponent {
                         <span class="label">LTM Fee:</span>
                         <span class="ltm-value-group">
                             <button class="ltm-toggle-btn" id="sidebar-ltm-toggle" title="Toggle LTM display">
-                                <i class="fas fa-eye-slash"></i>
+                                <i class="fas fa-eye-slash" aria-hidden="true"></i>
                             </button>
                             <span class="value" id="sidebar-ltm-fee">$50.00</span>
                         </span>
@@ -134,7 +134,7 @@ class PricingSidebarComponent {
                 <!-- Action Buttons -->
                 <div class="action-panel">
                     <button class="btn-action btn-copy" id="sidebar-copy-btn">
-                        <i class="fas fa-copy"></i> Copy Quote
+                        <i class="fas fa-copy" aria-hidden="true"></i> Copy Quote
                     </button>
                 </div>
             </div>
@@ -148,7 +148,7 @@ class PricingSidebarComponent {
         return `
             <div class="sidebar-panel locations-panel" id="sidebar-locations-panel">
                 <div class="panel-title">
-                    <i class="fas fa-map-marker-alt"></i>
+                    <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
                     <span>Selected Locations</span>
                 </div>
                 <div class="locations-list" id="sidebar-locations-list">
@@ -194,11 +194,11 @@ class PricingSidebarComponent {
     buildQuantityBreakdown() {
         return `
             <div class="pricing-row sub-breakdown" id="sidebar-garment-qty-row" style="display: none;">
-                <span class="label"><i class="fas fa-tshirt"></i> Garments:</span>
+                <span class="label"><i class="fas fa-tshirt" aria-hidden="true"></i> Garments:</span>
                 <span class="value sub-value" id="sidebar-garment-qty">0</span>
             </div>
             <div class="pricing-row sub-breakdown" id="sidebar-cap-qty-row" style="display: none;">
-                <span class="label"><i class="fas fa-hat-cowboy"></i> Caps:</span>
+                <span class="label"><i class="fas fa-hat-cowboy" aria-hidden="true"></i> Caps:</span>
                 <span class="value sub-value" id="sidebar-cap-qty">0</span>
             </div>
         `;
@@ -210,11 +210,11 @@ class PricingSidebarComponent {
     buildTierBreakdown() {
         return `
             <div class="pricing-row sub-breakdown" id="sidebar-garment-tier-row" style="display: none;">
-                <span class="label"><i class="fas fa-tshirt"></i> Garment Tier:</span>
+                <span class="label"><i class="fas fa-tshirt" aria-hidden="true"></i> Garment Tier:</span>
                 <span class="tier-badge small" id="sidebar-garment-tier">-</span>
             </div>
             <div class="pricing-row sub-breakdown" id="sidebar-cap-tier-row" style="display: none;">
-                <span class="label"><i class="fas fa-hat-cowboy"></i> Cap Tier:</span>
+                <span class="label"><i class="fas fa-hat-cowboy" aria-hidden="true"></i> Cap Tier:</span>
                 <span class="tier-badge small" id="sidebar-cap-tier">-</span>
             </div>
         `;
@@ -248,11 +248,11 @@ class PricingSidebarComponent {
     buildSubtotalBreakdown() {
         return `
             <div class="pricing-row sub-breakdown" id="sidebar-garment-subtotal-row" style="display: none;">
-                <span class="label"><i class="fas fa-tshirt"></i> Garments:</span>
+                <span class="label"><i class="fas fa-tshirt" aria-hidden="true"></i> Garments:</span>
                 <span class="value sub-value" id="sidebar-garment-subtotal">$0.00</span>
             </div>
             <div class="pricing-row sub-breakdown" id="sidebar-cap-subtotal-row" style="display: none;">
-                <span class="label"><i class="fas fa-hat-cowboy"></i> Caps:</span>
+                <span class="label"><i class="fas fa-hat-cowboy" aria-hidden="true"></i> Caps:</span>
                 <span class="value sub-value" id="sidebar-cap-subtotal">$0.00</span>
             </div>
         `;
@@ -276,11 +276,11 @@ class PricingSidebarComponent {
     buildLTMBreakdown() {
         return `
             <div class="pricing-row sub-breakdown" id="sidebar-garment-ltm-row" style="display: none;">
-                <span class="label"><i class="fas fa-tshirt"></i> Garment LTM:</span>
+                <span class="label"><i class="fas fa-tshirt" aria-hidden="true"></i> Garment LTM:</span>
                 <span class="value sub-value" id="sidebar-garment-ltm">$0.00</span>
             </div>
             <div class="pricing-row sub-breakdown" id="sidebar-cap-ltm-row" style="display: none;">
-                <span class="label"><i class="fas fa-hat-cowboy"></i> Cap LTM:</span>
+                <span class="label"><i class="fas fa-hat-cowboy" aria-hidden="true"></i> Cap LTM:</span>
                 <span class="value sub-value" id="sidebar-cap-ltm">$0.00</span>
             </div>
         `;
@@ -385,8 +385,8 @@ class PricingSidebarComponent {
             const toggleBtn = document.getElementById('sidebar-ltm-toggle');
             if (toggleBtn) {
                 toggleBtn.innerHTML = this.ltmDistributed
-                    ? '<i class="fas fa-eye"></i>'
-                    : '<i class="fas fa-eye-slash"></i>';
+                    ? '<i class="fas fa-eye" aria-hidden="true"></i>'
+                    : '<i class="fas fa-eye-slash" aria-hidden="true"></i>';
                 toggleBtn.title = this.ltmDistributed
                     ? 'Show LTM separately'
                     : 'Distribute LTM into unit prices';
@@ -522,7 +522,7 @@ class PricingSidebarComponent {
         } else {
             list.innerHTML = locations.map(loc => `
                 <div class="location-item">
-                    <i class="fas fa-check-circle"></i>
+                    <i class="fas fa-check-circle" aria-hidden="true"></i>
                     <span>${loc.name || loc}</span>
                 </div>
             `).join('');

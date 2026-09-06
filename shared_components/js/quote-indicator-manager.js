@@ -77,12 +77,12 @@ class QuoteIndicatorManager {
             <!-- Widget Header (Always Visible) -->
             <div class="quote-widget-header" id="quote-widget-header">
                 <div class="quote-widget-title">
-                    <i class="fas fa-shopping-cart"></i>
+                    <i class="fas fa-shopping-cart" aria-hidden="true"></i>
                     <span>Quote Summary</span>
                     <span class="quote-count-badge" id="quote-count-badge">0</span>
                 </div>
                 <div class="quote-widget-toggle">
-                    <i class="fas fa-chevron-up"></i>
+                    <i class="fas fa-chevron-up" aria-hidden="true"></i>
                 </div>
             </div>
 
@@ -95,7 +95,7 @@ class QuoteIndicatorManager {
                 <!-- Empty State -->
                 <div class="quote-empty-state" id="quote-empty-state" style="display: none;">
                     <div class="quote-empty-icon">
-                        <i class="far fa-clipboard"></i>
+                        <i class="far fa-clipboard" aria-hidden="true"></i>
                     </div>
                     <div>No products in quote yet</div>
                 </div>
@@ -294,7 +294,7 @@ class QuoteIndicatorManager {
                         </div>
                     </div>
                     <button class="quote-remove-btn" onclick="window.quoteIndicator.removeProduct(${index})" title="Remove">
-                        <i class="fas fa-times"></i>
+                        <i class="fas fa-times" aria-hidden="true"></i>
                     </button>
                 </div>
             `;

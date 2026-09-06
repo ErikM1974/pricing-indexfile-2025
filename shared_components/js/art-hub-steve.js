@@ -1634,7 +1634,7 @@
                     dl.href = img.src;
                     dl.target = '_blank';
                     dl.className = 'detail-file-download';
-                    dl.innerHTML = '<i class="fas fa-download"></i> Download';
+                    dl.innerHTML = '<i class="fas fa-download" aria-hidden="true"></i> Download';
                     card.appendChild(dl);
 
                     // Remove checkbox (keep functional, restyle)

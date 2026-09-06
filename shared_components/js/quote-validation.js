@@ -223,8 +223,8 @@ class QuoteValidation {
         const icon = document.createElement('span');
         icon.className = `validation-icon validation-icon-${state}`;
         icon.innerHTML = state === 'valid' 
-            ? '<i class="fas fa-check-circle"></i>' 
-            : '<i class="fas fa-exclamation-circle"></i>';
+            ? '<i class="fas fa-check-circle" aria-hidden="true"></i>' 
+            : '<i class="fas fa-exclamation-circle" aria-hidden="true"></i>';
         
         // Position icon
         icon.style.position = 'absolute';
@@ -251,7 +251,7 @@ class QuoteValidation {
             indicator = document.createElement('div');
             indicator.id = 'unsaved-indicator';
             indicator.className = 'unsaved-indicator';
-            indicator.innerHTML = '<i class="fas fa-circle"></i> Unsaved changes';
+            indicator.innerHTML = '<i class="fas fa-circle" aria-hidden="true"></i> Unsaved changes';
             document.body.appendChild(indicator);
         }
         indicator.classList.add('show');

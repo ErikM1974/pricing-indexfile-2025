@@ -268,7 +268,7 @@
         });
 
         warnEl.innerHTML = q.warnings.map(w =>
-            `<div class="decal-warn"><i class="fas fa-triangle-exclamation"></i> ${escapeHtml(w)}</div>`
+            `<div class="decal-warn"><i class="fas fa-triangle-exclamation" aria-hidden="true"></i> ${escapeHtml(w)}</div>`
         ).join('');
 
         out.innerHTML = `

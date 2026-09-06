@@ -169,7 +169,7 @@
         errorDiv.className = 'additional-logo-error';
         errorDiv.innerHTML = `
             <p>
-                <i class="fas fa-exclamation-triangle"></i>
+                <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
                 <strong>Note:</strong> Using cached pricing. Live pricing temporarily unavailable.
             </p>
         `;

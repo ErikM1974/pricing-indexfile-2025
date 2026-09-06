@@ -17,7 +17,7 @@ const read = (rel) => fs.readFileSync(path.join(ROOT, rel), 'utf8');
 const strip = (s) => s.replace(/<!--[\s\S]*?-->/g, '');
 const stripJs = (s) => s.replace(/\/\/[^\n]*/g, '').replace(/\/\*[\s\S]*?\*\//g, '');
 const HANDLER = /\son(change|input|blur|keydown|keyup|keypress|error|click|submit)=/;
-const BARE = /<i class="(?:fa[sr]|fab|fa-solid|fa-regular) [^"]*"(?![^>]*aria-hidden)[^>]*><\/i>/;
+const BARE = /<i(?![^>]*aria-hidden)[^>]*class="(?:fa[sr]|fab|fa-solid|fa-regular) [^"]*"[^>]*><\/i>/; // any attribute order
 const PAGES = fs.readdirSync(path.join(ROOT, 'quote-builders')).filter((f) => f.endsWith('.html')).map((f) => 'quote-builders/' + f);
 const MODULES = ['dtf', 'dtg', 'emb', 'scp', 'shared'].flatMap((d) => fs.readdirSync(path.join(ROOT, 'shared_components/js/builders', d)).filter((f) => f.endsWith('.js')).map((f) => `shared_components/js/builders/${d}/${f}`));
 const utils = read('shared_components/js/quote-builder-utils.js');

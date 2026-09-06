@@ -185,7 +185,7 @@ class QuoteUIFeedback {
                 <span class="toast-icon">${icon}</span>
                 <span class="toast-message">${this.escapeHtml(message)}</span>
                 <button class="toast-close" aria-label="Close">
-                    <i class="fas fa-times"></i>
+                    <i class="fas fa-times" aria-hidden="true"></i>
                 </button>
             </div>
         `;
@@ -233,10 +233,10 @@ class QuoteUIFeedback {
      */
     getToastIcon(type) {
         const icons = {
-            success: '<i class="fas fa-check-circle"></i>',
-            error: '<i class="fas fa-exclamation-circle"></i>',
-            warning: '<i class="fas fa-exclamation-triangle"></i>',
-            info: '<i class="fas fa-info-circle"></i>'
+            success: '<i class="fas fa-check-circle" aria-hidden="true"></i>',
+            error: '<i class="fas fa-exclamation-circle" aria-hidden="true"></i>',
+            warning: '<i class="fas fa-exclamation-triangle" aria-hidden="true"></i>',
+            info: '<i class="fas fa-info-circle" aria-hidden="true"></i>'
         };
         return icons[type] || icons.info;
     }
@@ -373,7 +373,7 @@ class QuoteUIFeedback {
         const error = document.createElement('div');
         error.className = 'inline-error';
         error.innerHTML = `
-            <i class="fas fa-exclamation-triangle"></i>
+            <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
             <span>${this.escapeHtml(message)}</span>
         `;
         
@@ -405,7 +405,7 @@ class QuoteUIFeedback {
         const success = document.createElement('div');
         success.className = 'inline-success';
         success.innerHTML = `
-            <i class="fas fa-check-circle"></i>
+            <i class="fas fa-check-circle" aria-hidden="true"></i>
             <span>${this.escapeHtml(message)}</span>
         `;
         

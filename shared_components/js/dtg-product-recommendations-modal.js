@@ -140,11 +140,11 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h2>
-                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star" aria-hidden="true"></i>
                             DTG Product Recommendations
                         </h2>
                         <button class="modal-close">
-                            <i class="fas fa-times"></i>
+                            <i class="fas fa-times" aria-hidden="true"></i>
                         </button>
                     </div>
                     

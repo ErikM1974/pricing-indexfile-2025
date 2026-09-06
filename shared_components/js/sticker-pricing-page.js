@@ -177,7 +177,7 @@
             return `
                 <section class="pricing-section" data-size="${escapeHtml(size)}">
                     <h2 class="size-title">
-                        <i class="fas fa-square"></i> ${escapeHtml(dim)} Stickers
+                        <i class="fas fa-square" aria-hidden="true"></i> ${escapeHtml(dim)} Stickers
                         <span class="pn-prefix">${escapeHtml(skuPrefix)}-*</span>
                     </h2>
                     <table class="pricing-table">
@@ -423,7 +423,7 @@
             warnings.unshift(`Tier minimum applied: ${fmtMoney(round2(totalSqFt))} sq ft × $${fmtMoney(rate)} = $${fmtMoney(rawMaterial)}, raised to the $${fmtMoney(floor)} tier minimum (volume-break cliff protection).`);
         }
         warnEl.innerHTML = warnings.map(w =>
-            `<div class="decal-warn"><i class="fas fa-triangle-exclamation"></i> ${escapeHtml(w)}</div>`
+            `<div class="decal-warn"><i class="fas fa-triangle-exclamation" aria-hidden="true"></i> ${escapeHtml(w)}</div>`
         ).join('');
 
         out.innerHTML = `
@@ -735,7 +735,7 @@
         const chip = document.createElement('span');
         chip.className = 'tool-chip';
         const iconClass = toolName === 'lookup_customer' ? 'fa-search' : 'fa-calculator';
-        chip.innerHTML = `<i class="fas ${iconClass}"></i> ${escapeHtml(statusText)}`;
+        chip.innerHTML = `<i class="fas ${iconClass}" aria-hidden="true"></i> ${escapeHtml(statusText)}`;
         msg.appendChild(chip);
         container.appendChild(msg);
         container.scrollTop = container.scrollHeight;
@@ -925,7 +925,7 @@
         if (copyBtn) copyBtn.disabled = !hasDraft;
         if (saveBtn) saveBtn.disabled = !(hasDraft && hasQuote && aiState.currentCustomerFinal);
         if (aiState.savedQuoteID && saveBtn) {
-            saveBtn.innerHTML = `<i class="fas fa-link"></i> Copy share link`;
+            saveBtn.innerHTML = `<i class="fas fa-link" aria-hidden="true"></i> Copy share link`;
             saveBtn.disabled = false;
         }
     }
