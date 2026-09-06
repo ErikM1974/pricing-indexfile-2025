@@ -19,26 +19,6 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 ### 2-minute proxy outage: the commit shipped half the change, and the boot probe tested the other half (2026-08-27, ARCHIVED 2026-09-05): stage the WHOLE change (a `require` and the file it names land in one commit); the boot probe must exercise the route table, not just `listen`; a 2-minute outage is a half-shipped commit until proven otherwise. Full entry in archive.
 ### Top Sellers "flickers blank, refresh fixes it" (2026-08-26, ARCHIVED 2026-09-02): "works after refresh" = a cold query behind a response cache — time the UNCACHED path first; variant-heavy `limit=48` pages hydrate 10k rows, so partition STYLE IN chunks in parallel; `?isTopSeller=1` is silently ignored (route wants `true`) — validate the result set before trusting a timing. Full entry in archive.
 ### Customer portal redesign + reward-dollar accrual (2026-09-01, ARCHIVED 2026-09-05): reward money is never computed silently — every ledger line names its source and the 8 `REWARD` Service_Codes rows ARE the program; never claw back automatically. Full entry in archive.
-## Contract fee was "Caspio-driven" on paper and hardcoded in practice (2026-09-02)
-
-**Problem.** Raising the contract small-order fee in Caspio (Embroidery_Costs.LTM 50 → 100) would
-have changed nothing on the calculator; and the full-back fee read $50 in the API, $100 on the page
-and $100 in the AI prompt at the same time.
-**Root cause.** `fetchContractPricing()` mapped `ltmFee: data.ltmFee || 50` — the proxy sends the
-fee nested per product (`garments.ltmFee`), never top-level, so the fallback ALWAYS won. Its
-`fullBack` mapping copied only the rates and `minStitches`, dropping `ltmFee`/`ltmThreshold`, so
-`ltmFeeForProduct('fullback')` returned 0 — 4-piece full-back orders were quoted with NO fee. The page
-"facts" strip and the AI prompt carried the same numbers as static text.
-**Solution.** Per-product fee from the payload; page facts, hero terms and the order minimum are
-filled from the API; prompt told to trust CALC_CONTEXT only; the $150 minimum applied once on the
-single pricing path (`applyOrderMinimum` after `combineLines`) so hero/total/copy/AI agree.
-**Prevention.** 🔑 `x || DEFAULT` on a field the API does not send is a hardcoded price with extra
-steps — grep the payload shape before trusting a fallback. 🔑 A number that appears in copy, a
-prompt and an API is three prices; only the API may hold it. 🔑 Test a Caspio-driven value by
-CHANGING it in Caspio and watching the page, not by reading the code. 🔑 One rule beats two: a
-fee PLUS a minimum produced a price cliff (23 pcs $302, 24 pcs $192) — a single order minimum is
-monotonic and explainable; reach for the minimum first.
-
 ## 2026-09-03 — Staff dashboard Workspaces: three traps the harness caught before anyone did
 
 **Problem.** The role-based tab layout (`workspace-controller.js`) landed Erik on the Office tab
@@ -284,4 +264,33 @@ every new path) + the parity suites untouched and green.
   runtime (`i.fas:not([aria-hidden])`) after the static pass.
 - 🔑 Builders are staff-gated: an expired Chrome session redirects to the Caspio login silently (the probe
   returns empty counts). Verify wiring on static-dist (no auth) and ask Erik to sign in for the live pass.
+
+## 2026-09-06 — Staff pages, the LIVE pass: what a signed-in runtime walk found that 80 static locks had not (`v2026.09.06.26`–`.28`)
+
+**Problem.** Every dashboard-linked page had a static jest lock from the 09-05 sweep, yet a signed-in walk of
+the RUNTIME DOM on teamnwca.com found: 64 inline `onclick`s on the garment designer, 15 handlers rendered by
+the AE dashboard's scripts, `onerror` on every Pride Wall tile, seven shared scripts injecting `<style>` blocks
+on every render, two employee-bundle pages with 230-line inline `<style>`, ~100 undecorated icons in scripts
+whose `class=` was not the first attribute, unversioned shared assets on 20 pages, seven unlabeled AE controls.
+
+**Root cause.** The static locks matched the page HTML and one icon regex shape; anything a script rendered
+after load, any `<i id=… class=…>` ordering, and any JS-injected stylesheet was invisible to them.
+
+**Solution.** One generic runtime probe per page (handlers / bare icons / injected styles / unversioned /
+unnamed buttons / unlabeled inputs / h1), traced to source; `data-call-delegator.js` grew `data-input`,
+`data-open` and `<img data-onerror|data-onload>` modes; injected styles became real stylesheets linked by every
+consumer; lock `staff-live-hygiene.test.js` checks the SCRIPTS that render into pages, not only the pages.
+
+**Prevention.**
+- 🔴 A page lock must also cover the scripts that render into it (`RENDERERS` list) — that is where the
+  handlers and icons live. Grep `<i(?![^>]*aria-hidden)[^>]*class="fa…"` (any attribute order).
+- 🔴 Runtime "bare icon" counts must exclude icons with `aria-label` — the Design Vault's 110 source badges
+  are deliberate, labelled icons, not defects.
+- 🔑 `<style>` elements at runtime on a page that ships none are usually Caspio DataPage embeds (DrainPro,
+  employee bundles, digitized/old designs) or a browser extension (glasp) — check `textContent` before chasing.
+- 🔑 A JS-created control (`document.createElement('input')`) needs its `aria-label` set in code; the template
+  scan will never see it.
+- 🔑 The Mission Control harness drifts whenever its page changes — `node scripts/sync-test-harness.js`.
+- 🔑 The esbuild-hashed dashboard bundle (`dashboard-app.XXXXXXXX.js`, 8 chars) is versioned; a "10-hex"
+  hash regex flags it falsely.
 
