@@ -916,3 +916,40 @@ Smoke on static-dist: DQ tile → 3 rows + chip synced, chip Skip → tile synce
 Monogram (real proxy data): typing "zzzz" → "No monogram orders match these filters", future From date → No
 results; 0 handlers / inline styles / bare icons / untyped buttons. N&N: Submitted tile → select=Submitted,
 5 rows; Draft → empty message; Clear → Total pressed; row role=link with name.
+
+## Digitized Designs + Old Designs (Caspio DataPage embeds) — review, 14 items (2026-09-05, `v2026.09.05.58`)
+
+`dashboards/digitized-designs.html` + `js/digitized-designs.js` (restructures Caspio result rows into cards +
+an "AL Pricing" modal) and `old-designs.html` + `shared_components/js/old-designs.js` (Megafile archive search).
+
+1. 🔴 **AL pricing tables were hardcoded** in the Digitized page's JS (garment 10/9/8/7.50/7, cap
+   6.50/5.50/4.75/4.50/4.25, $1.25/$1.00 per 1K, $50 LTM, Full Back $100 LTM). Now `/api/al-pricing`
+   (Caspio Embroidery_Costs — the same feed `calculateALPrice` uses in the quote builder); the tables are
+   the FALLBACK only and `#al-source-note` says "Prices live from Caspio…" or "⚠ Showing reference prices —
+   Caspio pricing unavailable (…)". Base stitches / per-1K rates / footnotes / LTM tags all render from the data.
+2. 🔑 **Caspio rows with a BLANK Design Number** — the unfiltered search returns ~24 records whose Design
+   Number, Company and Cust_ID are empty (cards read "#"). The DST filename (`26664.dst`) carries the
+   number, so the card now shows "#26664 (from DST file)" with a tooltip; a truly blank row says "no design
+   number". This is a Caspio data-quality issue, surfaced rather than hidden.
+3. **Rule 3** — inline `onerror="this.style.display='none'"` on card images → `data-onerror="hide"` +
+   capture listener; overage columns / DST dd / nav buttons / counters use `hidden` (`[hidden]` guard in
+   both CSS files); fallback-copy textarea → `.sr-copy` class.
+4. Thumbnails: Digitized wraps them in `<button class="img-btn" aria-label="Enlarge …">`; Old Designs makes
+   Caspio's own `<img>` `role=button tabindex=0` — Enter/Space opens the preview on both.
+5. Image modals `role=dialog aria-modal aria-label` + a real Close button; focus → Close, returns to the
+   thumbnail; Esc closes. AL modal `aria-labelledby` its title, Close named, focus in/return.
+6. Details toggle `aria-expanded` + `aria-controls`; AL button named per design; mockup links `rel=noopener`.
+7. **Caspio watchdog** (both pages): 15 s with no form / row / error element → visible "The Caspio list
+   did not load" + Reload button (a dead DataPage used to leave a silent blank card).
+8. Old Designs: injected Copy / Share buttons `type=button` + `aria-label` (title-only before); hover-only
+   `.card-actions` also reveal on `:focus-within`; result badge / spinner / empty state `role=status`;
+   toast `role=status|alert`; modal chevrons `aria-hidden`; sticky "Edit Search" typed.
+9. `?v=` added to both pages' CSS/JS links (were unversioned).
+10. Lock: `tests/unit/caspio-design-pages.test.js`.
+11. Smoke on static-dist (Caspio embeds load there): Digitized company search → "#27141 109-15 Divers
+    Institute", AL modal open → focus Close, note "Prices live from Caspio Embroidery_Costs.", tiers
+    1-7 +$50.00 LTM $10.00 / cap $6.50, Esc → focus back on the AL button; img-btn Enter → preview,
+    Esc → back. Old Designs blank search → 24 rows, 48 typed+named actions, 24 keyboard thumbnails,
+    "~23,544 designs found" badge role=status, Enter on a thumbnail → dialog with focus on Close, Esc → back.
+12. Left alone: Caspio form labels/inputs (Caspio-rendered, already labelled); the 24-per-page estimate
+    in the badge (Caspio's own paging); no server-side design-number backfill (Erik's call in Caspio).

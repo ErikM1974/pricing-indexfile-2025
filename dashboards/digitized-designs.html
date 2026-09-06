@@ -6,7 +6,7 @@
     <meta name="robots" content="noindex, nofollow">
     <title>Digitized Design Master List 2026 - Northwest Custom Apparel</title>
     <link rel="icon" href="/favicon.png" type="image/png">
-    <link rel="stylesheet" href="/dashboards/css/digitized-designs.css">
+    <link rel="stylesheet" href="/dashboards/css/digitized-designs.css?v=2026.09.05.59">
 </head>
 <body>
     <div class="minimal-header">
@@ -20,36 +20,38 @@
             <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e1500091d2864405df4b1db655/emb"></script>
         </div>
     </div>
-    <div class="image-modal-overlay" id="image-modal">
+    <div class="image-modal-overlay" id="image-modal" role="dialog" aria-modal="true" aria-label="Design preview, full size" tabindex="-1">
         <img alt="Design preview">
+        <button type="button" class="image-modal-close" id="image-modal-close" aria-label="Close preview">&times;</button>
     </div>
 
     <div class="al-modal-overlay" id="al-modal">
-        <div class="al-modal-content">
-            <button class="al-modal-close" type="button">&times;</button>
-            <h2 class="al-modal-title">Additional Logo Pricing &mdash; <span id="al-design-label">#00000</span></h2>
+        <div class="al-modal-content" role="dialog" aria-modal="true" aria-labelledby="al-modal-title">
+            <button class="al-modal-close" type="button" aria-label="Close pricing">&times;</button>
+            <h2 class="al-modal-title" id="al-modal-title">Additional Logo Pricing &mdash; <span id="al-design-label">#00000</span></h2>
+            <p class="al-source-note" id="al-source-note" role="status"></p>
             <div class="al-stitch-info" id="al-stitch-info"></div>
             <div class="al-tables">
                 <div class="al-table-section">
-                    <h3 class="al-table-heading">Garment AL <span class="al-badge">AL</span> <span class="al-base">Base 8K stitches</span></h3>
+                    <h3 class="al-table-heading">Garment AL <span class="al-badge">AL</span> <span class="al-base" id="al-garment-base">Base 8K stitches</span></h3>
                     <table class="al-table" id="al-garment-table">
                         <thead><tr><th>Quantity</th><th>Base Price</th><th class="al-total-col">w/ Overage</th></tr></thead>
                         <tbody></tbody>
                     </table>
-                    <p class="al-footnote">Logos up to 8,000 stitches. Larger logos add $1.25/1K.</p>
+                    <p class="al-footnote" id="al-garment-footnote">Logos up to 8,000 stitches. Larger logos add $1.25/1K.</p>
                 </div>
                 <div class="al-table-section">
-                    <h3 class="al-table-heading">Cap AL <span class="al-badge al-badge-cap">AL-CAP</span> <span class="al-base">Base 5K stitches</span></h3>
+                    <h3 class="al-table-heading">Cap AL <span class="al-badge al-badge-cap">AL-CAP</span> <span class="al-base" id="al-cap-base">Base 5K stitches</span></h3>
                     <table class="al-table" id="al-cap-table">
                         <thead><tr><th>Quantity</th><th>Base Price</th><th class="al-total-col">w/ Overage</th></tr></thead>
                         <tbody></tbody>
                     </table>
-                    <p class="al-footnote">Logos up to 5,000 stitches. Larger logos add $1.00/1K.</p>
+                    <p class="al-footnote" id="al-cap-footnote">Logos up to 5,000 stitches. Larger logos add $1.00/1K.</p>
                 </div>
             </div>
         </div>
     </div>
 
-    <script src="/dashboards/js/digitized-designs.js?v=2026.09.05.8"></script>
+    <script src="/dashboards/js/digitized-designs.js?v=2026.09.05.59"></script>
 </body>
 </html>
