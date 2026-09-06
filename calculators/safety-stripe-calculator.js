@@ -73,7 +73,7 @@ let currentDesign = {
 };
 
 // Initialize EmailJS
-emailjs.init('4qSbDO-SQs19TbP80');
+emailjs.init(((typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.EMAIL && window.APP_CONFIG.EMAIL.PUBLIC_KEY) || ''));
 
 // Initialize quote service
 const quoteService = new SafetyStripeQuoteService();

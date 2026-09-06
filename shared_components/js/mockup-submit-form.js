@@ -1139,8 +1139,8 @@ var MockupSubmitForm = (function () {
                 // Step 5: Notify Ruth via EmailJS
                 if (typeof emailjs !== 'undefined') {
                     try {
-                        emailjs.init('4qSbDO-SQs19TbP80');
-                        emailjs.send('service_jgrave3', 'template_art_note_added', {
+                        emailjs.init(((typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.EMAIL && window.APP_CONFIG.EMAIL.PUBLIC_KEY) || ''));
+                        emailjs.send(((typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.EMAIL && window.APP_CONFIG.EMAIL.SERVICE_ID) || ''), 'template_art_note_added', {
                             to_email: 'ruth@nwcustomapparel.com',
                             to_name: 'Ruth',
                             design_id: designNumber || 'NEW',
@@ -1157,7 +1157,7 @@ var MockupSubmitForm = (function () {
                         var submitterEmail = getSubmitterEmail();
                         var submitterName = getSubmitterName();
                         if (submitterEmail && submitterEmail !== 'ruth@nwcustomapparel.com') {
-                            emailjs.send('service_jgrave3', 'template_art_note_added', {
+                            emailjs.send(((typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.EMAIL && window.APP_CONFIG.EMAIL.SERVICE_ID) || ''), 'template_art_note_added', {
                                 to_email: submitterEmail,
                                 to_name: submitterName,
                                 design_id: designNumber || 'NEW',

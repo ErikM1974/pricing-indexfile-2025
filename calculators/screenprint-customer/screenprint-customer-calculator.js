@@ -22,9 +22,9 @@ class CustomerScreenPrintCalculator {
         this.initializeElements();
 
         // Initialize EmailJS
-        emailjs.init('4qSbDO-SQs19TbP80');
+        emailjs.init(((typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.EMAIL && window.APP_CONFIG.EMAIL.PUBLIC_KEY) || ''));
         this.emailConfig = {
-            serviceId: 'service_jgrave3',
+            serviceId: ((typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.EMAIL && window.APP_CONFIG.EMAIL.SERVICE_ID) || ''),
             templateId: 'template_igd6jtm'
         };
 

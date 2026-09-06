@@ -1733,9 +1733,9 @@ var GarmentSubmitForm = (function () {
             return;
         }
         try {
-            emailjs.init('4qSbDO-SQs19TbP80');
+            emailjs.init(((typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.EMAIL && window.APP_CONFIG.EMAIL.PUBLIC_KEY) || ''));
             var detailLink = SITE_ORIGIN + '/art-request/' + (designId || '');
-            emailjs.send('service_jgrave3', 'template_art_note_added', {
+            emailjs.send(((typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.EMAIL && window.APP_CONFIG.EMAIL.SERVICE_ID) || ''), 'template_art_note_added', {
                 to_email: STEVE_EMAIL,
                 to_name: 'Steve',
                 design_id: designId || 'NEW',
@@ -1752,7 +1752,7 @@ var GarmentSubmitForm = (function () {
             });
 
             if (aeEmail && aeEmail !== STEVE_EMAIL) {
-                emailjs.send('service_jgrave3', 'template_art_note_added', {
+                emailjs.send(((typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.EMAIL && window.APP_CONFIG.EMAIL.SERVICE_ID) || ''), 'template_art_note_added', {
                     to_email: aeEmail,
                     to_name: aeName,
                     design_id: designId || 'NEW',
@@ -1767,7 +1767,7 @@ var GarmentSubmitForm = (function () {
             }
 
             if (salesRepEmail && salesRepEmail !== STEVE_EMAIL && salesRepEmail !== aeEmail) {
-                emailjs.send('service_jgrave3', 'template_art_note_added', {
+                emailjs.send(((typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.EMAIL && window.APP_CONFIG.EMAIL.SERVICE_ID) || ''), 'template_art_note_added', {
                     to_email: salesRepEmail,
                     to_name: salesRepName || 'Sales Rep',
                     design_id: designId || 'NEW',

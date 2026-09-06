@@ -80,12 +80,12 @@
     <div class="main-container">
         <!-- Customer Header -->
         <div class="customer-header">
-            <label>Company:</label>
+            <label for="customerId">Company:</label>
             <input type="text" class="customer-id" id="customerId" placeholder="ID">
-            <input type="text" class="company-name" id="companyName" placeholder="Company Name">
-            <label>Website:</label>
+            <input type="text" class="company-name" id="companyName" placeholder="Company Name" aria-label="Company Name">
+            <label for="website">Website:</label>
             <input type="text" class="website-field" id="website" placeholder="website.com">
-            <label>Main Email:</label>
+            <label for="mainEmail">Main Email:</label>
             <input type="text" class="email-field" id="mainEmail" placeholder="email@domain.com">
             <div class="action-buttons">
                 <button class="action-btn"><i class="fas fa-print" aria-hidden="true"></i> Print</button>
@@ -125,7 +125,7 @@
                         <table class="contacts-grid">
                             <thead>
                                 <tr>
-                                    <th style="width: 30px;"><input type="checkbox" class="grid-checkbox"></th>
+                                    <th style="width: 30px;"><input type="checkbox" class="grid-checkbox" aria-label="Select"></th>
                                     <th>First Name <span class="sort-arrow">▼</span></th>
                                     <th>Last Name <span class="sort-arrow">▲</span></th>
                                     <th>Title</th>
@@ -175,12 +175,12 @@
                                     <div class="tax-header" style="width: 120px; text-align: center;">Shipping Taxable</div>
                                 </div>
                                 <div class="tax-row">
-                                    <div class="tax-cell"><label>Account #1</label></div>
+                                    <div class="tax-cell"><label for="taxCode1">Account #1</label></div>
                                     <div class="tax-cell">
                                         <input type="text" class="tax-code" id="taxCode1" value="2200">
                                     </div>
                                     <div class="tax-cell">
-                                        <input type="text" class="tax-desc" id="taxDesc1" value="Washington State Sales Tax" readonly>
+                                        <input type="text" class="tax-desc" id="taxDesc1" value="Washington State Sales Tax" readonly aria-label="Tax desc1">
                                     </div>
                                     <div class="tax-cell" style="text-align: center;">
                                         <span class="search-icon" data-call="searchTaxCode" data-args='[1]'></span>
@@ -193,12 +193,12 @@
                                     </div>
                                 </div>
                                 <div class="tax-row">
-                                    <div class="tax-cell"><label>Account #2</label></div>
+                                    <div class="tax-cell"><label for="taxCode2">Account #2</label></div>
                                     <div class="tax-cell">
                                         <input type="text" class="tax-code" id="taxCode2">
                                     </div>
                                     <div class="tax-cell">
-                                        <input type="text" class="tax-desc" id="taxDesc2" readonly>
+                                        <input type="text" class="tax-desc" id="taxDesc2" readonly aria-label="Tax desc2">
                                     </div>
                                     <div class="tax-cell" style="text-align: center;">
                                         <span class="search-icon" data-call="searchTaxCode" data-args='[2]'></span>
@@ -211,12 +211,12 @@
                                     </div>
                                 </div>
                                 <div class="tax-row">
-                                    <div class="tax-cell"><label>Account #3</label></div>
+                                    <div class="tax-cell"><label for="taxCode3">Account #3</label></div>
                                     <div class="tax-cell">
                                         <input type="text" class="tax-code" id="taxCode3">
                                     </div>
                                     <div class="tax-cell">
-                                        <input type="text" class="tax-desc" id="taxDesc3" readonly>
+                                        <input type="text" class="tax-desc" id="taxDesc3" readonly aria-label="Tax desc3">
                                     </div>
                                     <div class="tax-cell" style="text-align: center;">
                                         <span class="search-icon" data-call="searchTaxCode" data-args='[3]'></span>
@@ -229,12 +229,12 @@
                                     </div>
                                 </div>
                                 <div class="tax-row">
-                                    <div class="tax-cell"><label>Account #4</label></div>
+                                    <div class="tax-cell"><label for="taxCode4">Account #4</label></div>
                                     <div class="tax-cell">
                                         <input type="text" class="tax-code" id="taxCode4">
                                     </div>
                                     <div class="tax-cell">
-                                        <input type="text" class="tax-desc" id="taxDesc4" readonly>
+                                        <input type="text" class="tax-desc" id="taxDesc4" readonly aria-label="Tax desc4">
                                     </div>
                                     <div class="tax-cell" style="text-align: center;">
                                         <span class="search-icon" data-call="searchTaxCode" data-args='[4]'></span>
@@ -249,9 +249,9 @@
                             </div>
                             <div class="tax-exempt-section">
                                 <span class="tax-exempt-toggle inactive" id="taxExemptToggle" data-call="toggleTaxExempt"></span>
-                                <label style="font-size: 11px; margin-right: 10px;">Tax Exempt #</label>
+                                <label for="taxExempt" style="font-size: 11px; margin-right: 10px;">Tax Exempt #</label>
                                 <input type="text" class="tax-exempt-input" id="taxExempt" placeholder="" disabled>
-                                <label style="font-size: 11px; margin: 0 10px;">Expiration Date</label>
+                                <label for="expirationDate" style="font-size: 11px; margin: 0 10px;">Expiration Date</label>
                                 <input type="text" class="expiration-input" id="expirationDate" placeholder="" disabled>
                                 <span class="calendar-icon"></span>
                             </div>
@@ -269,12 +269,12 @@
                 </div>
                 
                 <div class="profile-field">
-                    <label>Ext. Cust ID:</label>
+                    <label for="extCustId">Ext. Cust ID:</label>
                     <input type="text" id="extCustId" value="big" style="background: #ffe8e8; color: red;">
                 </div>
                 
                 <div class="profile-field">
-                    <label>Salesperson:</label>
+                    <label for="salesperson">Salesperson:</label>
                     <select id="salesperson">
                         <option value="">Select...</option>
                         <option value="Nika Lao">Nika Lao</option>
@@ -288,12 +288,12 @@
                 </div>
                 
                 <div class="profile-field">
-                    <label>Sales Group:</label>
+                    <label for="salesGroup">Sales Group:</label>
                     <input type="text" id="salesGroup">
                 </div>
                 
                 <div class="profile-field">
-                    <label>Type:</label>
+                    <label for="customerType">Type:</label>
                     <select id="customerType">
                         <option value="">Select...</option>
                         <option value="Corporate">Corporate</option>
@@ -311,7 +311,7 @@
                 </div>
                 
                 <div class="profile-field">
-                    <label>Source:</label>
+                    <label for="source">Source:</label>
                     <select id="source">
                         <option value="">Select...</option>
                         <option value="Google Search">Google Search</option>
@@ -326,29 +326,29 @@
                 </div>
                 
                 <div class="profile-field">
-                    <label>Reference:</label>
+                    <label for="reference">Reference:</label>
                     <input type="text" id="reference">
                 </div>
                 
                 <div class="profile-field">
-                    <label>SIC Code:</label>
+                    <label for="sicCode">SIC Code:</label>
                     <input type="text" id="sicCode">
                 </div>
                 
                 <div class="profile-field">
-                    <label>SIC Desc.:</label>
+                    <label for="sicDesc">SIC Desc.:</label>
                     <input type="text" id="sicDesc">
                 </div>
                 
                 <div class="profile-field">
-                    <label># Of Emp.:</label>
+                    <label for="numEmployees"># Of Emp.:</label>
                     <input type="number" id="numEmployees">
                 </div>
 
                 <div class="custom-fields">
                     <h4>Custom Fields</h4>
                     <div class="profile-field">
-                        <label>Account Tier:</label>
+                        <label for="accountTier">Account Tier:</label>
                         <select id="accountTier">
                             <option value="">Select...</option>
                             <option value="Gold">Gold</option>

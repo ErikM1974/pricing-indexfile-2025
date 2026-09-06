@@ -12,8 +12,10 @@ class SampleOrderService {
     constructor() {
         this.apiBase = (typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) || '';
         if (!this.apiBase) console.error('[sample-order-service] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
-        this.emailServiceId = 'service_jgrave3';
-        this.emailPublicKey = '4qSbDO-SQs19TbP80';
+        this.emailServiceId = ((typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.EMAIL && window.APP_CONFIG.EMAIL.SERVICE_ID) || '');
+        if (!this.emailServiceId) console.error('[sample-order-service] APP_CONFIG.EMAIL.SERVICE_ID missing — EmailJS is not configured');
+        this.emailPublicKey = ((typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.EMAIL && window.APP_CONFIG.EMAIL.PUBLIC_KEY) || '');
+        if (!this.emailPublicKey) console.error('[sample-order-service] APP_CONFIG.EMAIL.PUBLIC_KEY missing — EmailJS is not configured');
 
         // Initialize EmailJS if available
         if (typeof emailjs !== 'undefined') {

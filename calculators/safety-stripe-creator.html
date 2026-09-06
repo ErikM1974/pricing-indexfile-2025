@@ -10,6 +10,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     
     <!-- EmailJS SDK -->
+    <script src="/config/app.config.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     
     <!-- Base Quote Service -->
@@ -118,28 +119,28 @@
                 <form id="sendForm">
                     <div class="form-grid">
                         <div class="form-group">
-                            <label>Customer Name <span class="req" aria-hidden="true">*</span></label>
+                            <label for="customerName">Customer Name <span class="req" aria-hidden="true">*</span></label>
                             <input type="text" id="customerName" required>
                         </div>
                         
                         <div class="form-group">
-                            <label>Customer Email <span class="req" aria-hidden="true">*</span></label>
+                            <label for="customerEmail">Customer Email <span class="req" aria-hidden="true">*</span></label>
                             <input type="email" id="customerEmail" required>
                         </div>
                         
                         <div class="form-group">
-                            <label>Phone (Optional)</label>
+                            <label for="customerPhone">Phone (Optional)</label>
                             <input type="tel" id="customerPhone" placeholder="(555) 123-4567">
                         </div>
                         
                         <div class="form-group">
-                            <label>Company (Optional)</label>
+                            <label for="companyName">Company (Optional)</label>
                             <input type="text" id="companyName">
                         </div>
                     </div>
                     
                     <div class="form-group">
-                        <label>Sales Representative <span class="req" aria-hidden="true">*</span></label>
+                        <label for="salesRep">Sales Representative <span class="req" aria-hidden="true">*</span></label>
                         <select id="salesRep" required>
                             <option value="">Select Sales Rep</option>
                             <option value="ruth@nwcustomapparel.com">Ruth Nhong</option>
@@ -153,7 +154,7 @@
                     </div>
                     
                     <div class="form-group">
-                        <label>Message (Optional)</label>
+                        <label for="customMessage">Message (Optional)</label>
                         <textarea id="customMessage" rows="3" placeholder="Add a personal note to the customer..."></textarea>
                     </div>
                     

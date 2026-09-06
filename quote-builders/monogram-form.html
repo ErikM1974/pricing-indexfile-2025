@@ -64,11 +64,11 @@
             <div class="search-panel-body">
                 <div class="search-inputs">
                     <div class="search-field">
-                        <label>Order Number</label>
+                        <label for="searchOrderNumber">Order Number</label>
                         <input type="text" id="searchOrderNumber" placeholder="e.g., 139465">
                     </div>
                     <div class="search-field">
-                        <label>Company Name</label>
+                        <label for="searchCompanyName">Company Name</label>
                         <input type="text" id="searchCompanyName" placeholder="e.g., Puyallup">
                     </div>
                     <button type="button" class="btn-primary" id="doSearchBtn">
@@ -143,7 +143,7 @@
                             </button>
                             <div id="threadColorDropdown" class="thread-color-dropdown" hidden>
                                 <div class="thread-color-search">
-                                    <input type="text" id="threadColorSearch" placeholder="Search colors...">
+                                    <input type="text" id="threadColorSearch" placeholder="Search colors..." aria-label="Search colors">
                                 </div>
                                 <div class="thread-color-list" id="threadColorList">
                                     <!-- Populated dynamically -->
@@ -169,7 +169,7 @@
                                     <!-- Populated with checkboxes -->
                                 </div>
                                 <div class="location-other-input" id="locationOtherInput" style="display: none;">
-                                    <input type="text" id="locationOtherText" placeholder="Specify custom location...">
+                                    <input type="text" id="locationOtherText" placeholder="Specify custom location..." aria-label="Specify custom location">
                                 </div>
                                 <div class="location-actions">
                                     <button type="button" id="locationDoneBtn" class="btn-primary btn-sm">Done</button>
@@ -182,7 +182,7 @@
                     </div>
                 </div>
                 <div class="form-group paste-names-group full-width">
-                    <label>Bulk Name Import</label>
+                    <label for="pasteNamesInput">Bulk Name Import</label>
                     <div class="paste-names-container">
                         <textarea id="pasteNamesInput" class="paste-names-textarea"
                                   placeholder="Paste names here (one per line)...&#10;Example:&#10;Jim Mickelson&#10;Erik Mickelson&#10;Ruthie Nhoung"

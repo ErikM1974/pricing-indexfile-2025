@@ -39,8 +39,8 @@ window.safeTextNode = safeTextNode;
 // Common Configuration
 const NWCA_CONFIG = {
     emailjs: {
-        publicKey: '4qSbDO-SQs19TbP80',
-        serviceId: 'service_jgrave3'
+        publicKey: ((typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.EMAIL && window.APP_CONFIG.EMAIL.PUBLIC_KEY) || ''),
+        serviceId: ((typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.EMAIL && window.APP_CONFIG.EMAIL.SERVICE_ID) || '')
     },
     company: {
         name: 'Northwest Custom Apparel',

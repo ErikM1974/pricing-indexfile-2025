@@ -58,8 +58,10 @@
     // emailQuote + embroidery-quote-service.js init key). template_quote_email
     // is the existing generic customer quote-link template — REUSED, never an
     // invented ID.
-    var EMAILJS_PUBLIC_KEY = '4qSbDO-SQs19TbP80';
-    var EMAILJS_SERVICE_ID = 'service_jgrave3';
+    var EMAILJS_PUBLIC_KEY = ((typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.EMAIL && window.APP_CONFIG.EMAIL.PUBLIC_KEY) || '');
+    if (!EMAILJS_PUBLIC_KEY) console.error('[web-quote-service] APP_CONFIG.EMAIL.PUBLIC_KEY missing — EmailJS is not configured');
+    var EMAILJS_SERVICE_ID = ((typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.EMAIL && window.APP_CONFIG.EMAIL.SERVICE_ID) || '');
+    if (!EMAILJS_SERVICE_ID) console.error('[web-quote-service] APP_CONFIG.EMAIL.SERVICE_ID missing — EmailJS is not configured');
     var EMAILJS_TEMPLATE_QUOTE = 'template_quote_email';
 
     // Engine method → quote_items.EmbellishmentType (cross-builder canonical

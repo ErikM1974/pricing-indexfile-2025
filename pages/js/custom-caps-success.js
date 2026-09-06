@@ -39,7 +39,8 @@
     }
     // Same EmailJS service the tee storefront confirmations use — the
     // 'custom-caps' registry entry reuses the tee templates (decision #15).
-    const EMAILJS_PUBLIC_KEY = '4qSbDO-SQs19TbP80';
+    const EMAILJS_PUBLIC_KEY = ((typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.EMAIL && window.APP_CONFIG.EMAIL.PUBLIC_KEY) || '');
+    if (!EMAILJS_PUBLIC_KEY) console.error('[custom-caps-success] APP_CONFIG.EMAIL.PUBLIC_KEY missing — EmailJS is not configured');
     const EMAILJS_SERVICE = 'service_1c4k67j';
     const POLL_MS = 3000;
     const MAX_POLLS = 25;

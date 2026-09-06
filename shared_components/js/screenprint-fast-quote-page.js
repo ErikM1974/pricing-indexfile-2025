@@ -2,7 +2,7 @@
  * 2026-09-06 from its inline <script> (Rule 3). Global scope kept: the page's data-call attributes resolve
  * window.nextStep / prevStep / submitQuote through data-call-delegator.js. */
 // Initialize EmailJS
-emailjs.init('4qSbDO-SQs19TbP80');
+emailjs.init(((typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.EMAIL && window.APP_CONFIG.EMAIL.PUBLIC_KEY) || ''));
 
 let currentStep = 1;
 const formData = {

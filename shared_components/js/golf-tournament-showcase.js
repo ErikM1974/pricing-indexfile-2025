@@ -23,7 +23,8 @@
 
     // EmailJS — service & template IDs.
     // Public key + service ID per CLAUDE.md; templates must be created in EmailJS dashboard.
-    const EMAILJS_PUBLIC_KEY = '4qSbDO-SQs19TbP80';
+    const EMAILJS_PUBLIC_KEY = ((typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.EMAIL && window.APP_CONFIG.EMAIL.PUBLIC_KEY) || '');
+    if (!EMAILJS_PUBLIC_KEY) console.error('[golf-tournament-showcase] APP_CONFIG.EMAIL.PUBLIC_KEY missing — EmailJS is not configured');
     const EMAILJS_SERVICE_ID = 'service_1c4k67j';
     const EMAILJS_CUSTOMER_TEMPLATE = 'template_golf_customer';
     const EMAILJS_LEAD_TEMPLATE = 'template_golf_lead';

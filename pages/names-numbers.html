@@ -59,9 +59,9 @@
         <!-- Search Panel (hidden by default) -->
         <div class="search-panel" id="searchPanel" style="display: none;">
             <div class="search-row">
-                <input type="text" id="searchInput" placeholder="Search by roster name, company, or order #...">
+                <input type="text" id="searchInput" placeholder="Search by roster name, company, or order #..." aria-label="Search by roster name, company, or order #">
                 <button type="button" class="btn-primary" id="searchGoBtn"><i class="fas fa-search" aria-hidden="true"></i> Search</button>
-                <button type="button" class="btn-secondary" id="searchCloseBtn"><i class="fas fa-times" aria-hidden="true"></i></button>
+                <button type="button" class="btn-secondary" id="searchCloseBtn" aria-label="Close search"><i class="fas fa-times" aria-hidden="true"></i></button>
             </div>
             <div id="searchResults" style="margin-top: 1rem;"></div>
         </div>
@@ -117,8 +117,8 @@
             <button type="button" class="btn-secondary" id="pasteNamesBtn">
                 <i class="fas fa-paste" aria-hidden="true"></i> Paste Names
             </button>
-            <input type="file" id="excelFileInput" accept=".xlsx,.xls" style="display:none;">
-            <input type="file" id="ocrFileInput" accept="image/jpeg,image/png,image/gif,image/webp,application/pdf" style="display:none;">
+            <input type="file" id="excelFileInput" accept=".xlsx,.xls" style="display:none;" aria-label="Choose a file">
+            <input type="file" id="ocrFileInput" accept="image/jpeg,image/png,image/gif,image/webp,application/pdf" style="display:none;" aria-label="Choose a file">
         </div>
 
         <!-- Tab Bar -->
@@ -134,7 +134,7 @@
             <div class="group-config-header">
                 <span class="group-config-title" id="groupConfigTitle">Group Settings</span>
                 <div style="display: flex; gap: 0.5rem;">
-                    <button type="button" class="btn-sm btn-secondary" id="toggleConfigBtn">
+                    <button type="button" class="btn-sm btn-secondary" id="toggleConfigBtn" aria-label="Show or hide configuration">
                         <i class="fas fa-chevron-up" aria-hidden="true"></i>
                     </button>
                     <button type="button" class="btn-sm btn-danger" id="deleteGroupBtn" title="Delete this group">
@@ -251,7 +251,7 @@
                     Paste one name per line. Optionally include number and size separated by commas or tabs.<br>
                     <strong>Examples:</strong> <code>Smith, 6, L</code> or <code>Smith&lt;tab&gt;6&lt;tab&gt;L</code>
                 </p>
-                <textarea id="pasteTextarea" placeholder="Smith, 6, L&#10;Johnson, 12, XL&#10;Williams, 3, M"></textarea>
+                <textarea id="pasteTextarea" placeholder="Smith, 6, L&#10;Johnson, 12, XL&#10;Williams, 3, M" aria-label="Paste names, quantities and sizes, one per line"></textarea>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn-secondary" id="pasteCancelBtn">Cancel</button>
@@ -298,16 +298,16 @@
             </div>
             <div class="modal-body">
                 <div class="form-group" style="margin-bottom: 1rem;">
-                    <label>Group Name</label>
+                    <label for="newGroupName">Group Name</label>
                     <input type="text" id="newGroupName" placeholder="e.g. Player Hoodies, Coach Jackets">
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label>First Garment — Style (optional)</label>
+                        <label for="newGroupStyle">First Garment — Style (optional)</label>
                         <input type="text" id="newGroupStyle" placeholder="e.g. PC54, ST254">
                     </div>
                     <div class="form-group">
-                        <label>First Garment — Color (optional)</label>
+                        <label for="newGroupColor">First Garment — Color (optional)</label>
                         <input type="text" id="newGroupColor" placeholder="e.g. Navy, Black">
                     </div>
                 </div>

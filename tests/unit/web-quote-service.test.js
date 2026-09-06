@@ -18,7 +18,11 @@
  * ALL network access is mocked — no Caspio rows are ever created here.
  */
 
+// The service reads its EmailJS ids from APP_CONFIG.EMAIL at load (Rule 6, 2026-09-06) — give it the NWCA
+// tenant values for the duration of the require, then restore the node-project convention (window undefined).
+global.window = { APP_CONFIG: { EMAIL: { SERVICE_ID: 'service_jgrave3', PUBLIC_KEY: 'test-public-key' } } };
 const WebQuoteService = require('../../shared_components/js/web-quote-service.js');
+global.window = undefined;
 
 // ---------------------------------------------------------------------------
 // Engine-result fixtures — shapes copied from quote-cart-engine.js adapters,

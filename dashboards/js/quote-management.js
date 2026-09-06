@@ -1544,12 +1544,14 @@ function duplicateQuote(quoteId) {
 
 // ── Resend quote email (#14, 2026-07-05) ─────────────────────────────
 // Re-sends the SAME customer quote-link email the builders send
-// (quote-builder-utils.js emailQuote(): EmailJS service_jgrave3 /
+// (quote-builder-utils.js emailQuote(): EmailJS APP_CONFIG.EMAIL.SERVICE_ID /
 // template_quote_email — existing template, never an invented ID). The
 // EmailJS browser SDK is loaded by quote-management.html with the same
 // <script> tag the builders use; init uses the builders' public key.
-const EMAILJS_PUBLIC_KEY = '4qSbDO-SQs19TbP80';
-const EMAILJS_SERVICE_ID = 'service_jgrave3';
+const EMAILJS_PUBLIC_KEY = ((typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.EMAIL && window.APP_CONFIG.EMAIL.PUBLIC_KEY) || '');
+if (!EMAILJS_PUBLIC_KEY) console.error('[quote-management] APP_CONFIG.EMAIL.PUBLIC_KEY missing — EmailJS is not configured');
+const EMAILJS_SERVICE_ID = ((typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.EMAIL && window.APP_CONFIG.EMAIL.SERVICE_ID) || '');
+if (!EMAILJS_SERVICE_ID) console.error('[quote-management] APP_CONFIG.EMAIL.SERVICE_ID missing — EmailJS is not configured');
 const EMAILJS_TEMPLATE_QUOTE = 'template_quote_email';
 let emailJsInited = false;
 

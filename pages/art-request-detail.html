@@ -369,7 +369,7 @@
                 <!-- Hidden file input for empty-slot upload -->
                 <input type="file" id="ard-slot-file-input"
                        accept="image/jpeg,image/png,image/gif,image/webp,application/pdf,.eps,.ai,.psd,.cdr"
-                       class="ard-file-hidden" style="display:none;">
+                       class="ard-file-hidden" style="display:none;" aria-label="Choose a file">
 
                 <!-- Slot upload popover (positioned by JS) -->
                 <div class="ard-slot-popover" id="ard-slot-popover" style="display:none;">
@@ -394,7 +394,7 @@
                             <span>Loading Box folders...</span>
                         </div>
                         <div id="ard-box-folders-view" style="display:none;">
-                            <input type="text" id="ard-box-search" class="ard-box-search" placeholder="Search folders..." autocomplete="off">
+                            <input type="text" id="ard-box-search" class="ard-box-search" placeholder="Search folders..." autocomplete="off" aria-label="Search folders">
                             <div class="ard-box-folder-list" id="ard-box-folder-list"></div>
                         </div>
                         <div id="ard-box-files-view" style="display:none;">
@@ -446,14 +446,14 @@
                     </div>
                     <div class="ard-add-note-form" id="ard-add-note-form">
                         <div class="ard-posting-as" id="ard-posting-as"></div>
-                        <select id="ard-note-type">
+                        <select id="ard-note-type" aria-label="Note type">
                             <option value="">-- select type --</option>
                             <option value="Status Update">Status Update</option>
                             <option value="Design Update">Design Update</option>
                             <option value="Customer Feedback">Customer Feedback</option>
                             <option value="Internal Note">Internal Note</option>
                         </select>
-                        <textarea id="ard-note-text" rows="3" placeholder="Write a note..."></textarea>
+                        <textarea id="ard-note-text" rows="3" placeholder="Write a note..." aria-label="Write a note"></textarea>
                         <div class="ard-add-note-footer">
                             <label class="ard-note-notify-label">
                                 <input type="checkbox" id="ard-note-notify" checked> Notify the other party (email + Slack)
@@ -506,7 +506,7 @@
         <div class="ard-fo-manual">
             <div class="ard-fo-manual-label">Or enter order number manually:</div>
             <div class="ard-fo-manual-row">
-                <input type="text" id="ard-fo-manual-input" placeholder="Order #" class="ard-fo-manual-input">
+                <input type="text" id="ard-fo-manual-input" placeholder="Order #" class="ard-fo-manual-input" aria-label="Or enter order number manually">
                 <button type="button" id="ard-fo-manual-btn" class="ard-fo-manual-btn">Search</button>
             </div>
             <div class="ard-fo-manual-note">Note: ShopWorks data is only available for the last 60 days.</div>
@@ -537,10 +537,10 @@
         <div class="ard-changes-header">Request Changes</div>
         <div class="ard-changes-body">
             <div id="ard-changes-slots"></div>
-            <label class="ard-changes-label">General notes (optional)</label>
+            <label for="ard-changes-notes" class="ard-changes-label">General notes (optional)</label>
             <textarea id="ard-changes-notes" rows="3" placeholder="Any overall feedback..." class="ard-changes-textarea"></textarea>
             <div class="ard-changes-upload-section">
-                <label class="ard-changes-upload-label">Attach art files (optional, up to 2)</label>
+                <label for="ard-changes-file-input" class="ard-changes-upload-label">Attach art files (optional, up to 2)</label>
                 <div class="ard-changes-dropzone" id="ard-changes-dropzone">
                     <i class="fas fa-cloud-upload-alt ard-changes-dropzone-icon" aria-hidden="true"></i>
                     <span class="ard-changes-dropzone-text">Click or drag files here (max 20MB each)</span>
