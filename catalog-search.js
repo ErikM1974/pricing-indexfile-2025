@@ -1651,7 +1651,7 @@ class CatalogSearch {
      */
     async fetchCapEmbroideryPricing(styleNumber) {
         try {
-            const url = ((typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) ? window.APP_CONFIG.API.BASE_URL + '/api/pricing-bundle?method=CAP&styleNumber=${styleNumber}' : '');
+            const url = ((typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) ? window.APP_CONFIG.API.BASE_URL + `/api/pricing-bundle?method=CAP&styleNumber=${styleNumber}` : '');
             if (!url) console.error('[catalog-search] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
             const response = await fetch(url);
             if (!response.ok) throw new Error('Failed to fetch pricing');
@@ -1668,7 +1668,7 @@ class CatalogSearch {
      */
     async fetchDecoratedCapPrices(brand) {
         try {
-            const url = ((typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) ? window.APP_CONFIG.API.BASE_URL + '/api/decorated-cap-prices?brand=${encodeURIComponent(brand)}' : '');
+            const url = ((typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) ? window.APP_CONFIG.API.BASE_URL + `/api/decorated-cap-prices?brand=${encodeURIComponent(brand)}` : '');
             if (!url) console.error('[catalog-search] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
             const response = await fetch(url);
             if (!response.ok) throw new Error('Failed to fetch decorated prices');

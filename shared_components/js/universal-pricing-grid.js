@@ -69,7 +69,7 @@ if (!UPG_API_BASE) console.error('[universal-pricing-grid] APP_CONFIG.API.BASE_U
 
         updateUpchargeDisplay() {
             if (!this.upchargeContainer) {
-                console.warn('[UniversalPricingGrid] Upcharge container not found');
+                univpricgridLog('[UniversalPricingGrid] No .upcharge-info on this page (the DTG page shows size pricing in its tooltip).');
                 return;
             }
 

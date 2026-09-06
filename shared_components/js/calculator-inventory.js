@@ -163,8 +163,13 @@
             })
             .catch(function(err) {
                 if (requestId === currentRequestId) {
+                    // 400/404 = the proxy has no SanMar record for this style (Richardson caps, JDS, etc.) —
+                    // a retry cannot help, so say what it is instead of "try again" (2026-09-06, C112).
+                    var notSanmar = /HTTP 40[04]/.test(err && err.message ? err.message : '');
                     container.innerHTML = renderBarHtml(colorName, swatchUrl, 0) +
-                        '<div class="calc-inv-error">Unable to load inventory. Please try again.</div>';
+                        '<div class="calc-inv-error">' + (notSanmar
+                            ? 'Live inventory is not available for this style (not a SanMar item).'
+                            : 'Unable to load inventory. Please try again.') + '</div>';
                 }
             });
     };

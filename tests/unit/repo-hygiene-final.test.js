@@ -138,6 +138,16 @@ describe('every served HTML page names its controls (static accessibility)', () 
     });
 });
 
+describe('no URL string with an unexpanded template expression (2026-09-06: the S3 host rewrite turned 7 template literals into quoted strings)', () => {
+    test('every browser script builds ${…} URLs inside backticks', () => {
+        // a COMPLETE single/double-quoted string that contains both /api/ and ${ — backtick strings are fine
+        // (an HTML attribute inside a template literal — src="${base}/api/…" — has no space before its quote and is fine)
+        const BAD = /(?<!=)(['"])(?:(?!\1)[^\n\\`])*\/api\/(?:(?!\1)[^\n\\`])*\$\{(?:(?!\1)[^\n\\`])*\1/;
+        const offenders = BROWSER_JS.filter((f) => BAD.test(read(f)));
+        expect(offenders).toEqual([]);
+    });
+});
+
 describe('no bare console.log in a served script (CLAUDE.md pre-commit rule; 2026-09-06 sweep gated ~700 behind localhost / ?debug=1)', () => {
     test('every browser script is free of console.log(', () => {
         const offenders = BROWSER_JS.filter((f) => /(?<![\w.$])console\.log\(/.test(read(f)));
