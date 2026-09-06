@@ -1,8 +1,9 @@
 /**
  * Every calculator page — hygiene lock (2026-09-06, the end of the calculator sweep).
  *   No bare icons, no inline handlers, no unversioned assets, no proxy host in HTML; the page scripts carry no
- *   host, no bare icons and no console.log (christmas-bundles' 185 are gated). compare-pricing and
- *   safety-stripe-creator route their former inline handlers through data-call-delegator.js.
+ *   host, no bare icons and no console.log (christmas-bundles' 185 are gated). safety-stripe-creator routes
+ *   its former inline handlers through data-call-delegator.js. (compare-pricing was deleted 2026-09-06 — retired
+ *   since 2026-08-05, the server 302s it to Quick Quote.)
  */
 const fs = require('fs');
 const path = require('path');
@@ -12,7 +13,7 @@ const strip = (h) => h.replace(/<!--[\s\S]*?-->/g, '').replace(/<script type="ap
 const BARE = /<i class="(?:fa[sr]|fab|fa-solid|fa-regular) [^"]*"(?![^>]*aria-hidden)[^>]*><\/i>/;
 const HOST = /caspio-pricing-proxy-ab30/;
 const PAGES = fs.readdirSync(path.join(ROOT, 'calculators')).filter((f) => f.endsWith('.html') && !/emailjs-template/.test(f)).map((f) => 'calculators/' + f);
-const SCRIPTS = ['calculators/compare-pricing.js', 'calculators/manual-pricing.js', 'calculators/safety-stripe-calculator.js', 'calculators/webstores-calculator.js',
+const SCRIPTS = ['calculators/manual-pricing.js', 'calculators/safety-stripe-calculator.js', 'calculators/webstores-calculator.js',
     'calculators/js/christmas-bundles.js', 'calculators/js/purchasingform.js', 'calculators/service-price-cheat-sheet.js'];
 
 describe('calculator pages', () => {
@@ -44,15 +45,6 @@ describe('calculator page scripts', () => {
 });
 
 describe('delegated handlers', () => {
-    test('compare-pricing: data-change/data-call + delegator + Enter listener + h1', () => {
-        const html = read('calculators/compare-pricing.html');
-        expect((html.match(/data-change="compareCalc\./g) || []).length).toBe(17);
-        expect(html).toMatch(/data-call="compareCalc\.lookUp"/);
-        expect(html).toMatch(/data-call-delegator\.js\?v=/);
-        expect(html).toMatch(/<h1 class="page-title">/);
-        expect(read('calculators/compare-pricing.js')).toMatch(/getElementById\('styleInput'\)/);
-        expect(read('calculators/compare-pricing.js')).toMatch(/window\.compareCalc = compareCalc;/);
-    });
     test('safety-stripe-creator: tiles are keyboard buttons through the delegator', () => {
         const html = read('calculators/safety-stripe-creator.html');
         expect((html.match(/data-call="selectStripeStyle" data-args='\["\w+"\]' role="button" tabindex="0"/g) || []).length).toBe(4);
