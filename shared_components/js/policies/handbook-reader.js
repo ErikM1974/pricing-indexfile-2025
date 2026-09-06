@@ -131,7 +131,7 @@
         const updated = parent.Updated_At ? fmtDate(parent.Updated_At) : '';
         return `
             <section class="handbook-hero">
-                <h1>${title}</h1>
+                <h2 class="handbook-doc-title">${title}</h2>
                 <p class="handbook-hero-subtitle">Northwest Custom Apparel</p>
                 <div class="handbook-hero-meta">
                     Effective May 26, 2026 ${updated ? `&middot; Last refreshed ${escapeHTML(updated)}` : ''}
@@ -173,7 +173,7 @@
         return `
             <section class="handbook-chapter" id="${anchorId}" data-policy-id="${escapeHTML(ch.Policy_ID || '')}">
                 <header class="handbook-chapter-header">
-                    <h1 class="handbook-chapter-title">${title}</h1>
+                    <h2 class="handbook-chapter-title">${title}</h2>
                     <div class="handbook-chapter-meta">
                         ${updated ? `<span><i class="far fa-clock" aria-hidden="true"></i> Updated ${escapeHTML(updated)}</span>` : ''}
                         ${owner ? `<span><i class="far fa-user" aria-hidden="true"></i> ${owner}</span>` : ''}

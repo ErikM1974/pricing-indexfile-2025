@@ -5175,7 +5175,6 @@ app.use('/quote-builders', express.static(path.join(__dirname, 'quote-builders')
 // sibling static mounts can't be used to bypass the root-route gate.
 app.use('/vendor-portals', gateStaffHtml);
 app.use('/vendor-portals', express.static(path.join(__dirname, 'vendor-portals'), staticOptions));
-app.use('/art-tools', express.static(path.join(__dirname, 'art-tools'), staticOptions));
 app.use('/tools', gateStaffHtml);
 // Same gate-then-rewrite-then-static ordering as /dashboards above.
 app.get('/tools/:page', serveHashedStaffPage('tools'));
@@ -5573,12 +5572,9 @@ app.get('/screenprint-quote-builder.html', gateStaffPage, (req, res) => {
   res.sendFile(path.join(__dirname, 'quote-builders', 'screenprint-quote-builder.html'));
 });
 
-app.get('/ae-art-dashboard.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'art-tools', 'ae-art-dashboard.html'));
-});
-
-app.get('/ae-submit-art.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'art-tools', 'ae-submit-art.html'));
+// 2026-09-06: the two art-tools/ redirect stubs (a JS redirect and a meta refresh) are now real 301s.
+app.get(['/ae-art-dashboard.html', '/ae-submit-art.html'], (req, res) => {
+  res.redirect(301, '/ae-dashboard.html');
 });
 
 app.get('/ae-dashboard.html', gateStaffPage, (req, res) => {

@@ -45,6 +45,7 @@ body.handbook-body {
     color: var(--ph-accent, #2e5b3e);
 }
 .handbook-topbar-title {
+    margin: 0; /* 2026-09-06: now the page's <h1> — keep the topbar look */
     font-size: 1.05rem;
     font-weight: 600;
     color: var(--ph-text, #111827);

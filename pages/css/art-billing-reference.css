@@ -1,0 +1,27 @@
+/* art-billing-reference.css — extracted 2026-09-06 from the two inline <style> blocks in pages/art-billing-reference.html (Rule 3). */
+:root { --art-theme: #009900; --art-theme-dark: #006600; --art-theme-light: #f0f9f0; --art-theme-hover: #009900; --art-theme-bg: #f0f9f0; --art-theme-bg-hover: #e6f7e6; --art-theme-bg-selected: #e0f5e0; --art-theme-rgba-15: rgba(0,153,0,0.15); --art-theme-rgba-10: rgba(0,153,0,0.1); }
+
+/* Standalone page wrapper. Reuses art-hub.css for the actual reference
+   content (.billing-code-card, .file-req-card, .file-def-card, .fee-card-*) —
+   those styles already exist; we just need a page chrome around them. */
+body { background: #f8fafc; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; margin: 0; }
+main.art-billing-reference {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 28px 20px 60px;
+}
+.art-billing-reference > h1 {
+    font-size: 28px;
+    margin: 0 0 8px;
+    color: #111827;
+    font-weight: 700;
+}
+.art-billing-reference .page-intro {
+    font-size: 14px;
+    color: #4b5563;
+    margin: 0 0 28px;
+    line-height: 1.55;
+    max-width: 760px;
+}
+
+html { scroll-behavior: smooth; } /* the quick-nav links replaced scrollIntoView({behavior:"smooth"}) handlers */

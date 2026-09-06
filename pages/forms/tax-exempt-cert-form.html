@@ -8,20 +8,20 @@
     <link rel="icon" href="/favicon.png" type="image/png">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="/pages/forms/nwca-form-shared.css">
-    <link rel="stylesheet" href="/pages/forms/tax-exempt-cert-form.css">
+    <link rel="stylesheet" href="/pages/forms/nwca-form-shared.css?v=2026.09.06.32">
+    <link rel="stylesheet" href="/pages/forms/tax-exempt-cert-form.css?v=2026.09.06.32">
 </head>
 <body>
     <div class="form-toolbar no-print">
         <a href="/dashboards/forms-library.html" class="toolbar-link">
-            <i class="fas fa-arrow-left"></i> Forms Library
+            <i class="fas fa-arrow-left" aria-hidden="true"></i> Forms Library
         </a>
         <div class="toolbar-actions">
             <button type="button" id="clearFormBtn" class="toolbar-btn toolbar-btn--ghost">
-                <i class="fas fa-eraser"></i> Clear
+                <i class="fas fa-eraser" aria-hidden="true"></i> Clear
             </button>
             <button type="button" id="printFormBtn" class="toolbar-btn toolbar-btn--primary">
-                <i class="fas fa-print"></i> Print / Save as PDF
+                <i class="fas fa-print" aria-hidden="true"></i> Print / Save as PDF
             </button>
         </div>
     </div>
@@ -96,7 +96,7 @@
                     <input type="text" id="fldCertFile">
                 </div>
             </div>
-            <p class="assist-hint"><i class="fas fa-circle-info"></i>
+            <p class="assist-hint"><i class="fas fa-circle-info" aria-hidden="true"></i>
                 A WA reseller permit is verifiable at dor.wa.gov &rarr; "Look up a business". Verify before marking the account exempt.</p>
         </section>
 
@@ -127,7 +127,7 @@
 
         <section class="form-section no-print">
             <div class="section-bar">Office Use — After Saving</div>
-            <p class="assist-hint"><i class="fas fa-list-check"></i>
+            <p class="assist-hint"><i class="fas fa-list-check" aria-hidden="true"></i>
                 1) Verify the permit at DOR, 2) mark the customer tax-exempt in ShopWorks + Caspio, 3) set the Inbox
                 status to <strong>Verified</strong>. The Inbox will flag this submission as "due" when the certificate
                 is 7 days from expiring — collect the renewal before it lapses.</p>
@@ -135,10 +135,10 @@
     </div>
 
     <script src="/config/app.config.js"></script>
-    <script src="/pages/forms/nwca-form-shared.js"></script>
-    <script src="/pages/forms/nwca-form-dates.js"></script>
-    <script src="/pages/forms/nwca-form-contacts.js"></script>
-    <script src="/pages/forms/nwca-form-save.js"></script>
-    <script src="/pages/forms/tax-exempt-cert-form.js"></script>
+    <script src="/pages/forms/nwca-form-shared.js?v=2026.09.06.32"></script>
+    <script src="/pages/forms/nwca-form-dates.js?v=2026.09.06.32"></script>
+    <script src="/pages/forms/nwca-form-contacts.js?v=2026.09.06.32"></script>
+    <script src="/pages/forms/nwca-form-save.js?v=2026.09.06.32"></script>
+    <script src="/pages/forms/tax-exempt-cert-form.js?v=2026.09.06.32"></script>
 </body>
 </html>
