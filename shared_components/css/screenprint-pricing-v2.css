@@ -1,0 +1,9 @@
+/* screenprint-pricing-v2.css — styles the Screen Print V2 calculator used to inject / inline (2026-09-06). */
+@keyframes spin { to { transform: rotate(360deg); } }
+.sp-loading-inner { text-align: center; }
+.sp-loading-spinner { width: 40px; height: 40px; border: 4px solid #e5e7eb; border-top-color: #3a7c52; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto; }
+.sp-loading-text { margin-top: 1rem; color: #666; }
+.sp-error-dismiss { margin-left: auto; background: none; border: none; color: #991b1b; cursor: pointer; font-size: 1.25rem; }
+.sp-fee-note { font-size: 11px; opacity: 0.9; margin-top: 4px; font-weight: 600; }
+.sp-tooltip-list { margin: 8px 0; padding-left: 20px; }
+.sp-mt-8 { margin-top: 8px; }
