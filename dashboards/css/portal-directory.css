@@ -403,3 +403,9 @@ body {
     .pd-stats { margin-left: 0; text-align: center; }
     .pd-grid { grid-template-columns: 1fr; }
 }
+
+/* ── 2026-09-05 review ────────────────────────────────────────────────────── */
+[hidden] { display: none !important; }
+.pd-btn-open.is-disabled { opacity: 0.4; pointer-events: none; }
+.pd-btn-retry { display: inline-flex; flex: none; margin-top: 16px; }
+.pd-search:focus-visible, .pd-sort:focus-visible, .pd-btn-copy:focus-visible, .pd-btn-open:focus-visible, .pd-back-btn:focus-visible { outline: 2px solid var(--pd-blue, #3b82f6); outline-offset: 2px; }

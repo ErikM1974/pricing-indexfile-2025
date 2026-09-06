@@ -51,7 +51,12 @@
         document.getElementById('sc-apply').addEventListener('click', function () {
             state.since = document.getElementById('sc-since').value;
             state.until = document.getElementById('sc-until').value;
+            // A custom range is none of the presets — clear their pressed state.
+            Array.prototype.forEach.call(document.querySelectorAll('.sc-preset'), function (b) { b.classList.remove('is-active'); b.setAttribute('aria-pressed', 'false'); });
             load();
+        });
+        document.getElementById('rep-tbody').addEventListener('click', function (e) {
+            if (e.target.closest('#sc-retry')) load();
         });
         Array.prototype.forEach.call(document.querySelectorAll('.sc-preset'), function (b) {
             b.addEventListener('click', function () { applyPreset(b.getAttribute('data-preset')); });
@@ -72,7 +77,9 @@
         document.getElementById('sc-since').value = since;
         document.getElementById('sc-until').value = until;
         Array.prototype.forEach.call(document.querySelectorAll('.sc-preset'), function (b) {
-            b.classList.toggle('is-active', b.getAttribute('data-preset') === preset);
+            var on = b.getAttribute('data-preset') === preset;
+            b.classList.toggle('is-active', on);
+            b.setAttribute('aria-pressed', on ? 'true' : 'false');
         });
         load();
     }
@@ -93,8 +100,10 @@
             render();
         }).catch(function (err) {
             console.error('[scorecard] load failed:', err);
-            DashPage.showError('Unable to load the scorecard (' + err.message + '). Refresh to retry.');
-            document.getElementById('rep-tbody').innerHTML = '<tr><td colspan="4" class="sc-empty"><i class="fas fa-triangle-exclamation"></i> Unavailable.</td></tr>';
+            DashPage.showError('Unable to load the scorecard (' + err.message + ').');
+            document.getElementById('rep-tbody').innerHTML = '<tr><td colspan="4" class="sc-empty"><i class="fas fa-triangle-exclamation" aria-hidden="true"></i> Unavailable. <button type="button" id="sc-retry" class="sc-btn sc-retry"><i class="fas fa-rotate" aria-hidden="true"></i> Retry</button></td></tr>';
+            document.getElementById('leads-tbody').innerHTML = '<tr><td colspan="6" class="sc-empty">—</td></tr>';
+            document.getElementById('leads-count').textContent = '';
         });
     }
 
@@ -116,7 +125,7 @@
             repBody.innerHTML = reps.map(function (r) {
                 var pct = Math.max(2, Math.round((r.attributedSales / max) * 100));
                 return '<tr>' +
-                    '<td><span class="sc-bar" style="width:' + pct + '%"></span><span class="sc-rep-name">' + esc(r.rep) + '</span></td>' +
+                    '<td><span class="sc-bar" style="--w:' + pct + '%" aria-hidden="true"></span><span class="sc-rep-name">' + esc(r.rep) + '</span></td>' +
                     '<td class="sc-num">' + r.leadsClosed + '</td>' +
                     '<td class="sc-num sc-strong">' + money(r.attributedSales) + '</td>' +
                     '<td class="sc-num sc-muted">' + money(r.lifetimeSales) + '</td>' +

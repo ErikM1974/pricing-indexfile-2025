@@ -71,3 +71,12 @@
     .uq-input { min-width: 0; width: 100%; margin: 8px 0 0; }
     .dash-card-header { flex-wrap: wrap; }
 }
+
+/* 2026-09-05 review */
+[hidden] { display: none !important; }
+.uq-status {
+    font-size: 0.86rem; color: var(--state-success-text, var(--gray-800)); background: var(--state-success-bg, var(--gray-50));
+    border: 1px solid var(--gray-200); border-radius: var(--radius-md); padding: 10px 14px; margin: 0 0 14px;
+}
+.uq-tab:focus-visible, .uq-btn:focus-visible, .uq-input:focus-visible { outline: 2px solid var(--gray-900); outline-offset: 2px; }
+.uq-retry { margin-left: 8px; }

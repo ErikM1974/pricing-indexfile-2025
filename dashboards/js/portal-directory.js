@@ -14,8 +14,19 @@
     var allCompanies = [];
     var searchTimeout = null;
 
+    // Image fallback for the header logo (was an inline onerror= — Rule 3). `error` does not bubble → capture.
+    document.addEventListener('error', function (e) {
+        var img = e.target;
+        if (img && img.tagName === 'IMG' && img.dataset && img.dataset.onerror === 'hide') img.hidden = true;
+    }, true);
+
     // ── Load on ready ──
     loadDirectory();
+    window._pdRetry = function () {
+        document.getElementById('pd-error').hidden = true;
+        document.getElementById('pd-loading').hidden = false;
+        loadDirectory();
+    };
 
     // ── Bind events ──
     document.getElementById('pd-search').addEventListener('input', function () {
@@ -60,24 +71,26 @@
             .then(function () {
                 sortCompanies('lastUpdated');
 
-                document.getElementById('pd-loading').style.display = 'none';
-                document.getElementById('pd-toolbar').style.display = 'flex';
+                document.getElementById('pd-loading').hidden = true;
+                document.getElementById('pd-toolbar').hidden = false;
 
                 if (allCompanies.length === 0) {
-                    document.getElementById('pd-empty').style.display = 'block';
+                    document.getElementById('pd-empty').hidden = false;
                 } else {
-                    document.getElementById('pd-grid').style.display = 'grid';
+                    document.getElementById('pd-grid').hidden = false;
                     renderCards(allCompanies);
                     updateStats(allCompanies.length, allCompanies.length);
                 }
             })
             .catch(function (err) {
                 console.error('Portal directory load error:', err);
-                showError('Unable to Load', 'Something went wrong loading the directory. Please refresh the page.');
+                showError('Unable to Load', 'Something went wrong loading the directory (' + (err && err.message ? err.message : 'unknown error') + ').');
             });
     }
 
     // ── Fetch mockups (2026+ with images) ──
+    // A failed feed used to resolve to [] and the page rendered as if that source were simply empty
+    // (a silent half-directory). Now it throws so the error panel + Retry show (Erik's #1 rule).
     function fetchMockups() {
         return fetch('/api/mockups?dateFrom=' + encodeURIComponent(DATE_CUTOFF) + '&pageSize=1000')
             .then(function (r) {
@@ -89,10 +102,6 @@
                 return records.filter(function (m) {
                     return m.Box_Mockup_1 || m.Box_Mockup_2 || m.Box_Mockup_3;
                 });
-            })
-            .catch(function (err) {
-                console.error('Mockups fetch error:', err);
-                return [];
             });
     }
 
@@ -108,10 +117,6 @@
                 return records.filter(function (ar) {
                     return ar.MAIN_IMAGE_URL_1 || ar.MAIN_IMAGE_URL_2 || ar.MAIN_IMAGE_URL_3 || ar.MAIN_IMAGE_URL_4;
                 });
-            })
-            .catch(function (err) {
-                console.error('Art requests fetch error:', err);
-                return [];
             });
     }
 
@@ -230,19 +235,22 @@
             var dotClass = getActivityDotClass(c.lastActivity, now);
             var dotTitle = c.lastActivity ? formatDate(c.lastActivity) : 'No activity';
             var hasId = c.customerId && c.customerId > 0;
-            var portalUrl = hasId ? (SITE_ORIGIN + '/portal/' + c.customerId) : '';
+            // Customers open /portal (their session decides the account). Staff cannot see a customer's
+            // portal that way — /portal/:id just bounces to /portal — so "Open" goes to the read-only
+            // staff mirror instead. "Copy Link" stays the customer-facing URL.
+            var previewUrl = hasId ? ('/portal-admin/preview/' + c.customerId) : '';
             var totalItems = c.mockupCount + c.artCount;
 
             html += '<div class="pd-card" data-company="' + escapeAttr(c.displayName.toLowerCase()) + '">'
                 + '<div class="pd-card-header">'
                 + '<h3 class="pd-card-company">' + escapeHtml(c.displayName) + '</h3>'
-                + '<span class="pd-dot ' + dotClass + '" title="' + escapeAttr(dotTitle) + '"></span>'
+                + '<span class="pd-dot ' + dotClass + '" role="img" title="' + escapeAttr(dotTitle) + '" aria-label="Last activity ' + escapeAttr(dotTitle) + '"></span>'
                 + '</div>'
 
                 + '<div class="pd-card-stats">'
-                + '<span class="pd-stat"><i class="fas fa-image"></i> ' + c.mockupCount + ' mockup' + (c.mockupCount !== 1 ? 's' : '') + '</span>'
+                + '<span class="pd-stat"><i class="fas fa-image" aria-hidden="true"></i> ' + c.mockupCount + ' mockup' + (c.mockupCount !== 1 ? 's' : '') + '</span>'
                 + '<span class="pd-stat-divider">&middot;</span>'
-                + '<span class="pd-stat"><i class="fas fa-palette"></i> ' + c.artCount + ' art</span>'
+                + '<span class="pd-stat"><i class="fas fa-palette" aria-hidden="true"></i> ' + c.artCount + ' art request' + (c.artCount !== 1 ? 's' : '') + '</span>'
                 + '</div>'
 
                 + '<div class="pd-card-meta">'
@@ -253,15 +261,15 @@
                 + '<div class="pd-card-actions">';
 
             if (hasId) {
-                html += '<button class="pd-btn-copy" data-call="_pdCopy" data-args="' + escapeAttr(JSON.stringify([c.customerId, '$this'])) + '" title="Copy portal link">'
-                    + '<i class="fas fa-copy"></i> Copy Link</button>'
-                    + '<a class="pd-btn-open" href="' + escapeAttr(portalUrl) + '" target="_blank" rel="noopener" title="Open portal">'
-                    + '<i class="fas fa-external-link-alt"></i> Open</a>';
+                html += '<button type="button" class="pd-btn-copy" data-call="_pdCopy" data-args="' + escapeAttr(JSON.stringify([c.customerId, '$this'])) + '" title="Copy the customer-facing portal link" aria-label="Copy portal link for ' + escapeAttr(c.displayName) + '">'
+                    + '<i class="fas fa-copy" aria-hidden="true"></i> Copy Link</button>'
+                    + '<a class="pd-btn-open" href="' + escapeAttr(previewUrl) + '" target="_blank" rel="noopener" title="Preview their portal (read-only staff view)" aria-label="Preview portal for ' + escapeAttr(c.displayName) + '">'
+                    + '<i class="fas fa-eye" aria-hidden="true"></i> Preview</a>';
             } else {
-                html += '<button class="pd-btn-copy" disabled title="No customer ID on file">'
-                    + '<i class="fas fa-copy"></i> No ID</button>'
-                    + '<span class="pd-btn-open" style="opacity:0.4;pointer-events:none;">'
-                    + '<i class="fas fa-external-link-alt"></i> Open</span>';
+                html += '<button type="button" class="pd-btn-copy" disabled title="No customer ID on file">'
+                    + '<i class="fas fa-copy" aria-hidden="true"></i> No ID</button>'
+                    + '<span class="pd-btn-open is-disabled" aria-disabled="true">'
+                    + '<i class="fas fa-eye" aria-hidden="true"></i> Preview</span>';
             }
 
             html += '</div></div>';
@@ -279,42 +287,39 @@
         return 'pd-dot--red';
     }
 
-    // ── Copy link (exposed globally for onclick) ──
+    // ── Copy link (data-call target) ──
     window._pdCopy = function (customerId, btnEl) {
         var url = SITE_ORIGIN + '/portal/' + customerId;
         navigator.clipboard.writeText(url).then(function () {
-            // Visual feedback
-            var icon = btnEl.querySelector('i');
-            icon.className = 'fas fa-check';
             btnEl.classList.add('pd-copied');
-            btnEl.innerHTML = '<i class="fas fa-check"></i> Copied!';
-
+            btnEl.innerHTML = '<i class="fas fa-check" aria-hidden="true"></i> Copied!';
             showToast('Portal link copied!');
-
             setTimeout(function () {
-                btnEl.innerHTML = '<i class="fas fa-copy"></i> Copy Link';
+                btnEl.innerHTML = '<i class="fas fa-copy" aria-hidden="true"></i> Copy Link';
                 btnEl.classList.remove('pd-copied');
             }, 2000);
         }).catch(function () {
-            // Fallback: select text
-            prompt('Copy this link:', url);
+            // Clipboard blocked (http, permissions) — show the link so it can be selected by hand.
+            showToast('Copy blocked by the browser — link: ' + url, 6000);
         });
     };
 
     // ── Toast ──
-    function showToast(msg) {
+    var toastTimer = null;
+    function showToast(msg, ms) {
         var toast = document.getElementById('pd-toast');
         toast.textContent = msg;
         toast.classList.add('pd-toast--show');
-        setTimeout(function () {
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(function () {
             toast.classList.remove('pd-toast--show');
-        }, 2500);
+        }, ms || 2500);
     }
 
     // ── Error ──
     function showError(title, message) {
-        document.getElementById('pd-loading').style.display = 'none';
-        document.getElementById('pd-error').style.display = 'block';
+        document.getElementById('pd-loading').hidden = true;
+        document.getElementById('pd-error').hidden = false;
         document.getElementById('pd-error-title').textContent = title;
         document.getElementById('pd-error-message').textContent = message;
     }
