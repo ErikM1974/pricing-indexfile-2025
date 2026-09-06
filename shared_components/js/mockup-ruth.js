@@ -16,6 +16,13 @@
     let allMockups = [];
     let currentFilter = 'queue'; // 'queue' | 'completed' | 'all'
     let lastNotificationPoll = Date.now();
+    let queueStatusFilter = '';  // '' | 'Submitted' | 'In Progress' | 'Awaiting Approval' | 'Revision Requested'
+    // Who is acting — from the SAML session; Ruth is the fallback because this is her page.
+    let me = { email: 'ruth@nwcustomapparel.com', name: 'Ruth' };
+    fetch('/api/crm-session/me', { credentials: 'same-origin' })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (u) { if (u && u.email) me = { email: u.email, name: [u.firstName, u.lastName].filter(Boolean).join(' ') || u.email }; })
+        .catch(function () { /* keep the fallback */ });
 
     // ── Rush flag normalizer — handles Y / Yes / true / True / 1 ─────────
     function isRush(v) {
@@ -50,32 +57,46 @@
     // script tag degrades instead of throwing.
     function resolveBoxUrl(u) { return (typeof boxUrl === 'function') ? boxUrl(u) : u; }
 
+    // Caspio date fields arrive as "YYYY-MM-DD" / "YYYY-MM-DDT00:00:00" — `new Date()` reads that as UTC
+    // midnight (5 PM the previous day in Pacific). Before this, a mockup due TODAY showed "OVERDUE" all day
+    // and dates rendered a day early.
+    function parseCalendarDate(value) {
+        const str = String(value == null ? '' : value).trim();
+        if (!str) return null;
+        const m = /^(\d{4})-(\d{2})-(\d{2})(?:T00:00:00(?:\.0+)?Z?)?$/.exec(str);
+        const d = m ? new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3])) : new Date(str);
+        return isNaN(d.getTime()) ? null : d;
+    }
+    function daysFromToday(dateStr) {
+        const d = parseCalendarDate(dateStr);
+        if (!d) return null;
+        const today = new Date(); today.setHours(0, 0, 0, 0);
+        d.setHours(0, 0, 0, 0);
+        return Math.round((d - today) / 86400000);
+    }
+
     function formatDate(dateStr) {
         if (!dateStr) return '';
-        const d = new Date(dateStr);
-        if (isNaN(d.getTime())) return dateStr;
+        const d = parseCalendarDate(dateStr);
+        if (!d) return dateStr;
         return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
     }
 
     function formatDateShort(dateStr) {
         if (!dateStr) return '';
-        const d = new Date(dateStr);
-        if (isNaN(d.getTime())) return dateStr;
+        const d = parseCalendarDate(dateStr);
+        if (!d) return dateStr;
         return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     }
 
     function isDueSoon(dueDate) {
-        if (!dueDate) return false;
-        const due = new Date(dueDate);
-        const now = new Date();
-        const diffDays = (due - now) / (1000 * 60 * 60 * 24);
-        return diffDays >= 0 && diffDays <= 2;
+        const n = daysFromToday(dueDate);
+        return n !== null && n >= 0 && n <= 2;
     }
 
     function isOverdue(dueDate) {
-        if (!dueDate) return false;
-        const due = new Date(dueDate);
-        return due < new Date();
+        const n = daysFromToday(dueDate);
+        return n !== null && n < 0;
     }
 
     function getElapsedText(date) {
@@ -112,23 +133,16 @@
     }
 
     // ── Tab Navigation ───────────────────────────────────────────────────
+    const TAB_ORDER = ['queue', 'completed', 'on-hold', 'billing'];
     function showTab(tabName) {
-        document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
-        document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
-
-        const tabMap = {
-            'queue':     { index: 0, pane: 'queue-tab' },
-            'completed': { index: 1, pane: 'completed-tab' },
-            'on-hold':   { index: 2, pane: 'on-hold-tab' },
-            'billing':   { index: 3, pane: 'billing-tab' }
-        };
-
-        const tab = tabMap[tabName];
-        if (tab) {
-            document.querySelectorAll('.tab-button')[tab.index].classList.add('active');
-            const pane = document.getElementById(tab.pane);
-            if (pane) pane.classList.add('active');
-        }
+        if (TAB_ORDER.indexOf(tabName) === -1) tabName = 'queue';
+        document.querySelectorAll('[role="tab"].tab-button').forEach(btn => {
+            const on = btn.id === 'tab-' + tabName;
+            btn.classList.toggle('active', on);
+            btn.setAttribute('aria-selected', on ? 'true' : 'false');
+            btn.tabIndex = on ? 0 : -1;
+        });
+        document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.toggle('active', pane.id === tabName + '-tab'));
 
         currentFilter = tabName;
         if (tabName !== 'billing') {
@@ -154,7 +168,7 @@
             if (kanbanActive) buildKanbanBoard();
         } catch (err) {
             console.error('Failed to fetch mockups:', err);
-            showError('Unable to load mockups. Please refresh the page.');
+            showError('Unable to load mockups (' + (err.message || 'request failed') + ').');
         } finally {
             showLoading(false);
         }
@@ -197,33 +211,26 @@
         if (completedBadge) completedBadge.textContent = counts.approved;
         if (onHoldBadge) onHoldBadge.textContent = counts.onHold;
 
-        // Update status summary bar — adds an "On Hold" stat tile alongside
-        // the workflow status counts. Display only (not interactive); on-hold
-        // mockups are visible on the All tab with their muted card styling.
+        // Status summary bar — the chips FILTER the queue (click again to clear); the On Hold
+        // chip jumps to the On Hold tab. They were display-only divs until 2026-09-05.
         const summaryEl = document.getElementById('status-summary');
         if (summaryEl) {
-            summaryEl.innerHTML = `
-                <div class="status-stat status-stat--submitted" title="Submitted">
-                    <span class="status-stat-count" data-stat="submitted">${counts.submitted}</span>
-                    <span class="status-stat-label">Submitted</span>
-                </div>
-                <div class="status-stat status-stat--in-progress" title="In Progress">
-                    <span class="status-stat-count" data-stat="inProgress">${counts.inProgress}</span>
-                    <span class="status-stat-label">In Progress</span>
-                </div>
-                <div class="status-stat status-stat--awaiting-approval" title="Awaiting Approval">
-                    <span class="status-stat-count" data-stat="awaitingApproval">${counts.awaitingApproval}</span>
-                    <span class="status-stat-label">Awaiting Approval</span>
-                </div>
-                <div class="status-stat status-stat--revision-requested" title="Revision Requested">
-                    <span class="status-stat-count" data-stat="revisionRequested">${counts.revisionRequested}</span>
-                    <span class="status-stat-label">Revisions</span>
-                </div>
-                <div class="status-stat status-stat--on-hold" title="On Hold (customer paused)">
+            const chip = (mod, stat, status, label, n) => {
+                const on = status && queueStatusFilter === status;
+                return `<button type="button" class="status-stat status-stat--${mod}${on ? ' active' : ''}" data-status="${escapeHtml(status)}" aria-pressed="${on ? 'true' : 'false'}" title="${escapeHtml(label)}">
+                    <span class="status-stat-count" data-stat="${stat}">${n}</span>
+                    <span class="status-stat-label">${label}</span>
+                </button>`;
+            };
+            summaryEl.innerHTML =
+                chip('submitted', 'submitted', 'Submitted', 'Submitted', counts.submitted) +
+                chip('in-progress', 'inProgress', 'In Progress', 'In Progress', counts.inProgress) +
+                chip('awaiting-approval', 'awaitingApproval', 'Awaiting Approval', 'Awaiting Approval', counts.awaitingApproval) +
+                chip('revision-requested', 'revisionRequested', 'Revision Requested', 'Revisions', counts.revisionRequested) +
+                `<button type="button" class="status-stat status-stat--on-hold" data-tab="on-hold" aria-pressed="false" title="Open the On Hold tab">
                     <span class="status-stat-count" data-stat="onHold">${counts.onHold}</span>
                     <span class="status-stat-label">On Hold</span>
-                </div>
-            `;
+                </button>`;
             popChangedCounts(counts);
         }
     }
@@ -256,18 +263,20 @@
 
         const bar = document.createElement('div');
         bar.id = 'ruth-search-bar';
-        bar.style.cssText = 'display:flex;align-items:center;gap:10px;padding:10px 16px;margin:0 0 12px;background:#fff;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.08);';
+        bar.className = 'rq-search-bar';
 
         const input = document.createElement('input');
-        input.type = 'text';
+        input.type = 'search';
         input.id = 'ruth-search-input';
+        input.className = 'rq-search-input';
         input.setAttribute('aria-label', 'Search mockups');
+        input.setAttribute('autocomplete', 'off');
         input.placeholder = 'Search company, design #, rep, or ID...';
-        input.style.cssText = 'padding:6px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;font-family:inherit;color:#1e293b;width:260px;';
 
         const countSpan = document.createElement('span');
         countSpan.id = 'ruth-search-count';
-        countSpan.style.cssText = 'font-size:12px;color:#94a3b8;margin-left:auto;';
+        countSpan.className = 'rq-search-count';
+        countSpan.setAttribute('role', 'status');
 
         let timer = null;
         input.addEventListener('input', function () {
@@ -300,6 +309,7 @@
         // so Ruth can see paused work when she wants to without it cluttering
         // her active backlog.
         let queueMockups = allMockups.filter(m => !m.Is_On_Hold && QUEUE_STATUSES.includes(m.Status));
+        if (queueStatusFilter) queueMockups = queueMockups.filter(m => m.Status === queueStatusFilter);
         let completedMockups = allMockups.filter(m => !m.Is_On_Hold && COMPLETED_STATUSES.includes(m.Status));
         let onHoldMockups = allMockups.filter(m => !!m.Is_On_Hold);
 
@@ -329,10 +339,12 @@
 
         // Render queue
         if (queueMockups.length === 0) {
+            const why = queueStatusFilter ? `No “${escapeHtml(queueStatusFilter)}” mockups${ruthSearchText ? ' match your search' : ''}. <button type="button" class="rq-link" data-call="ruthClearStatusFilter">Show all</button>`
+                : (ruthSearchText ? `No mockups match “${escapeHtml(ruthSearchText)}”.` : `No pending mockups - you're all caught up!`);
             queueGrid.innerHTML = `
-                <div class="mockup-empty" style="grid-column: 1 / -1;">
-                    <div class="mockup-empty-icon">&#9745;</div>
-                    <div class="mockup-empty-text">No pending mockups - you're all caught up!</div>
+                <div class="mockup-empty mockup-span">
+                    <div class="mockup-empty-icon" aria-hidden="true">&#9745;</div>
+                    <div class="mockup-empty-text">${why}</div>
                 </div>`;
         } else {
             queueGrid.innerHTML = queueMockups.map(m => buildCard(m, true)).join('');
@@ -341,8 +353,8 @@
         // Render completed
         if (completedMockups.length === 0) {
             completedGrid.innerHTML = `
-                <div class="mockup-empty" style="grid-column: 1 / -1;">
-                    <div class="mockup-empty-icon">&#128194;</div>
+                <div class="mockup-empty mockup-span">
+                    <div class="mockup-empty-icon" aria-hidden="true">&#128194;</div>
                     <div class="mockup-empty-text">No completed mockups yet</div>
                 </div>`;
         } else {
@@ -353,8 +365,8 @@
         if (onHoldGrid) {
             if (onHoldMockups.length === 0) {
                 onHoldGrid.innerHTML = `
-                    <div class="mockup-empty" style="grid-column: 1 / -1;">
-                        <div class="mockup-empty-icon">&#9989;</div>
+                    <div class="mockup-empty mockup-span">
+                        <div class="mockup-empty-icon" aria-hidden="true">&#9989;</div>
                         <div class="mockup-empty-text">No mockups currently on hold.</div>
                     </div>`;
             } else {
@@ -366,7 +378,7 @@
 
         // Stagger card entry animations
         document.querySelectorAll('.mockup-card').forEach((card, idx) => {
-            card.style.animationDelay = (idx * 0.05) + 's';
+            card.style.setProperty('--delay', (Math.min(idx, 12) * 0.05) + 's');
         });
 
         // Attach event listeners to cards
@@ -419,13 +431,13 @@
             if (statusLower === 'submitted') {
                 actionsHtml = `
                     <div class="card-actions">
-                        <button class="card-action-btn card-action-btn--start" data-id="${id}" data-action="start">Start Working</button>
+                        <button type="button" class="card-action-btn card-action-btn--start" data-id="${id}" data-action="start" aria-label="Start working on ${company}">Start Working</button>
                         ${elapsedBadge}
                     </div>`;
             } else if (statusLower === 'in progress' || statusLower === 'revision requested') {
                 actionsHtml = `
                     <div class="card-actions">
-                        <button class="card-action-btn card-action-btn--send" data-id="${id}" data-action="send-approval">Send for Approval</button>
+                        <button type="button" class="card-action-btn card-action-btn--send" data-id="${id}" data-action="send-approval" aria-label="Send ${company} for approval">Send for Approval</button>
                         ${elapsedBadge}
                     </div>`;
             } else if (statusLower === 'awaiting approval') {
@@ -453,7 +465,7 @@
 
         const thumbUrl = mockup.Box_Mockup_1 || '';
         const thumbHtml = thumbUrl
-            ? `<div class="card-thumb"><img src="${escapeHtml(resolveBoxUrl(thumbUrl))}" alt="Mockup preview" loading="lazy" data-original-src="${escapeHtml(resolveBoxUrl(thumbUrl))}" onerror="if(window.ArtActions&&window.ArtActions.handleBoxImageError){window.ArtActions.handleBoxImageError(this);}else{this.parentElement.style.display='none';}"></div>`
+            ? `<div class="card-thumb"><img src="${escapeHtml(resolveBoxUrl(thumbUrl))}" alt="${company} mockup preview" loading="lazy" data-original-src="${escapeHtml(resolveBoxUrl(thumbUrl))}" data-onerror="box-parent"></div>`
             : '';
 
         const workOrder = escapeHtml(mockup.Work_Order_Number || '');
@@ -509,7 +521,7 @@
             <div class="card-header">
                 <div class="card-header-left">
                     <div class="card-company">${company}</div>
-                    <div class="card-design-number">#${designNum}${aeDisplay ? `<span class="card-rep-name" data-action="filter-rep" data-rep="${escapeHtml(aeDisplay)}" title="Click to filter by ${escapeHtml(aeDisplay)}">${escapeHtml(aeDisplay)}</span>` : ''}</div>
+                    <div class="card-design-number">#${designNum}${aeDisplay ? `<button type="button" class="card-rep-name" data-action="filter-rep" data-rep="${escapeHtml(aeDisplay)}" aria-label="Filter by ${escapeHtml(aeDisplay)}" title="Click to filter by ${escapeHtml(aeDisplay)}">${escapeHtml(aeDisplay)}</button>` : ''}</div>
                 </div>
                 <div class="card-header-right">
                     ${onHoldPillHtml}<span class="status-pill ${statusClass}">${escapeHtml(status)}</span>
@@ -529,7 +541,7 @@
             </div>
             <div class="card-footer">
                 <span class="card-date">${submittedDate}</span>
-                <a href="/mockup/${id}" class="card-action-link" data-stop="1">View Details &rarr;</a>
+                <a href="/mockup/${id}" class="card-action-link" data-stop="1" aria-label="View details for ${company}">View Details &rarr;</a>
             </div>
             ${actionsHtml}
         </div>`;
@@ -540,11 +552,7 @@
         // Whole card click → detail page
         document.querySelectorAll('.mockup-card').forEach(card => {
             card.addEventListener('click', function (e) {
-                // Don't navigate if clicking a button or link
-                if (e.target.closest('button') || e.target.closest('a')) return;
-                // Click rep name → fill search box, filter to that AE. Search
-                // already matches Submitted_By (lines 275, 691) so no filter
-                // logic change needed — just populating the input is enough.
+                // Rep name (a real <button> now) → fill the search box with that AE; click again to clear.
                 const repBtn = e.target.closest('.card-rep-name[data-action="filter-rep"]');
                 if (repBtn) {
                     e.preventDefault();
@@ -559,6 +567,8 @@
                     }
                     return;
                 }
+                // Don't navigate if clicking a button or link (the footer link is the keyboard path)
+                if (e.target.closest('button') || e.target.closest('a')) return;
                 const id = this.dataset.mockupId;
                 if (id) window.location.href = `/mockup/${id}`;
             });
@@ -596,8 +606,8 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     status: newStatus,
-                    author: 'ruth@nwcustomapparel.com',
-                    authorName: 'Ruth'
+                    author: me.email,
+                    authorName: me.name
                 })
             });
 
@@ -618,7 +628,7 @@
 
         } catch (err) {
             console.error('Quick action error:', err);
-            showToast('Failed to update mockup. Please try again.', 'error');
+            showToast('Failed to update mockup (' + (err.message || 'request failed') + '). Please try again.', 'error');
             btnEl.disabled = false;
             btnEl.textContent = originalText;
         }
@@ -627,19 +637,21 @@
     // ── Loading / Error States ───────────────────────────────────────────
     function showLoading(show) {
         const el = document.getElementById('mockup-loading');
-        if (el) el.style.display = show ? 'block' : 'none';
+        if (el) el.hidden = !show;
     }
 
     function showError(message) {
         const queueGrid = document.getElementById('queue-grid');
         if (queueGrid) {
             queueGrid.innerHTML = `
-                <div class="mockup-error" style="grid-column: 1 / -1;">
+                <div class="mockup-error mockup-span" role="alert">
                     <strong>Error:</strong> ${escapeHtml(message)}
-                    <br><button data-call="location.reload" style="margin-top:10px;padding:8px 16px;border:none;border-radius:4px;background:#6B46C1;color:white;cursor:pointer;">Refresh Page</button>
+                    <br><button type="button" class="rq-retry-btn" data-call="ruthRetryFetch">Retry</button>
                 </div>`;
         }
     }
+    window.ruthRetryFetch = function () { fetchMockups(); };
+    window.ruthClearStatusFilter = function () { queueStatusFilter = ''; updateStatusCounts(); renderCards(); };
 
     // ── Toast Notification ───────────────────────────────────────────────
     function showToast(message, type) {
@@ -649,6 +661,7 @@
 
         const toast = document.createElement('div');
         toast.className = `mockup-toast mockup-toast--${type}`;
+        toast.setAttribute('role', type === 'error' ? 'alert' : 'status');
         toast.textContent = message;
         document.body.appendChild(toast);
 
@@ -747,15 +760,17 @@
         localStorage.setItem('ruthViewPreference', view);
 
         toggleBtns.forEach(function (btn) {
-            btn.classList.toggle('active', btn.dataset.view === view);
+            var on = btn.dataset.view === view;
+            btn.classList.toggle('active', on);
+            btn.setAttribute('aria-pressed', on ? 'true' : 'false');
         });
 
         if (kanbanActive) {
-            gridView.style.display = 'none';
+            gridView.hidden = true;
             boardView.classList.add('active');
             buildKanbanBoard();
         } else {
-            gridView.style.display = '';
+            gridView.hidden = false;
             boardView.classList.remove('active');
         }
     };
@@ -792,7 +807,7 @@
         window.kanbanShowAll = window.kanbanShowAll || function (colId) {
             var col = document.querySelector('.kanban-column--' + colId);
             if (!col) return;
-            col.querySelectorAll('.kanban-card[style*="display: none"]').forEach(function (c) { c.style.display = ''; });
+            col.querySelectorAll('.kanban-card[hidden]').forEach(function (c) { c.hidden = false; });
             var link = col.querySelector('.kanban-show-all');
             if (link) link.remove();
         };
@@ -857,16 +872,16 @@
 
                 var thumbHtml = '';
                 if (m.Box_Mockup_1) {
-                    thumbHtml = '<img class="kanban-card-thumb" src="' + escapeHtml(resolveBoxUrl(m.Box_Mockup_1)) + '" loading="lazy" data-original-src="' + escapeHtml(resolveBoxUrl(m.Box_Mockup_1)) + '" onerror="if(window.ArtActions&&window.ArtActions.handleBoxImageError){window.ArtActions.handleBoxImageError(this);}else{this.style.display=\'none\';}" alt="">';
+                    thumbHtml = '<img class="kanban-card-thumb" src="' + escapeHtml(resolveBoxUrl(m.Box_Mockup_1)) + '" loading="lazy" data-original-src="' + escapeHtml(resolveBoxUrl(m.Box_Mockup_1)) + '" data-onerror="box-self" alt="">';
                 }
 
                 var kanbanElapsed = (typeof ElapsedTimeUtils !== 'undefined')
                     ? ElapsedTimeUtils.getKanbanElapsedBadge(col.id, m, 'mockup')
                     : '';
 
-                var hiddenStyle = hidden ? ' style="display: none"' : '';
+                var hiddenAttr = hidden ? ' hidden' : '';
                 var rushCls = isRushM ? ' kanban-card--rush' : '';
-                return '<div class="kanban-card' + rushCls + '" data-mockup-id="' + id + '"' + hiddenStyle + ' data-href="/mockup/' + id + '">'
+                return '<div class="kanban-card' + rushCls + '" data-mockup-id="' + id + '"' + hiddenAttr + ' data-href="/mockup/' + id + '" role="link" tabindex="0" aria-label="Open ' + company + '">'
                     + '<div class="kanban-card-company">' + company + kanbanElapsed + '</div>'
                     + (designNum ? '<div class="kanban-card-design">#' + designNum + '</div>' : '')
                     + '<div class="kanban-card-meta">'
@@ -883,7 +898,7 @@
             if (isCompleted && colCards.length > COMPLETED_SHOW_LIMIT) {
                 cardsHtml = colCards.slice(0, COMPLETED_SHOW_LIMIT).map(function (m) { return renderCard(m, false); }).join('');
                 cardsHtml += colCards.slice(COMPLETED_SHOW_LIMIT).map(function (m) { return renderCard(m, true); }).join('');
-                cardsHtml += '<div class="kanban-show-all" data-stop="1" data-call="kanbanShowAll" data-args="' + JSON.stringify([col.id]).replace(/"/g, '&quot;') + '">Show all ' + colCards.length + ' items</div>';
+                cardsHtml += '<button type="button" class="kanban-show-all" data-stop="1" data-call="kanbanShowAll" data-args="' + JSON.stringify([col.id]).replace(/"/g, '&quot;') + '">Show all ' + colCards.length + ' items</button>';
             } else {
                 cardsHtml = colCards.map(function (m) { return renderCard(m, false); }).join('');
             }
@@ -973,7 +988,7 @@
         var widget = document.getElementById('ruth-broken-mockups-widget');
         if (!widget) return;
 
-        widget.style.display = '';
+        widget.hidden = false;
         widget.innerHTML = '<div class="broken-mockups-loading">'
             + '<span class="broken-mockups-spinner"></span>'
             + 'Checking mockup files in Box...'
@@ -994,7 +1009,7 @@
             })
             .catch(function (err) {
                 console.warn('[Ruth broken-mockups] check failed:', err.message);
-                widget.style.display = 'none';
+                widget.hidden = true;
             });
     }
 
@@ -1003,10 +1018,10 @@
         if (!widget) return;
         if (!data || data.broken === 0) {
             widget.innerHTML = '';
-            widget.style.display = 'none';
+            widget.hidden = true;
             return;
         }
-        widget.style.display = '';
+        widget.hidden = false;
         var label = data.broken === 1 ? 'broken Box mockup' : 'broken Box mockups';
         widget.innerHTML = '<button type="button" class="broken-mockups-pill" id="ruth-broken-pill"'
             + ' aria-label="Review broken Box mockups">'
@@ -1031,10 +1046,13 @@
         overlay.id = 'broken-mockups-modal';
         overlay.className = 'broken-mockups-overlay';
         overlay.innerHTML = bmlBuildModalHtml(brokenMockupsData, rows);
+        overlay.__returnFocus = document.activeElement;
         document.body.appendChild(overlay);
-        document.body.style.overflow = 'hidden';
+        document.body.classList.add('is-modal-open');
 
         bmlWireEvents(overlay);
+        var firstBtn = overlay.querySelector('#broken-mockups-modal-close');
+        if (firstBtn) setTimeout(function () { firstBtn.focus(); }, 30);
     }
 
     function bmlBuildModalHtml(data, rows) {
@@ -1042,9 +1060,9 @@
         var bulkLabel = rows.length === 1
             ? 'Auto-recover this 1'
             : 'Auto-recover all ' + rows.length;
-        return '<div class="broken-mockups-modal">'
+        return '<div class="broken-mockups-modal" role="dialog" aria-modal="true" aria-labelledby="bml-title">'
             + '<div class="broken-mockups-modal-header">'
-            +   '<h3>🚫 Broken Box Mockups (' + rows.length + ')</h3>'
+            +   '<h3 id="bml-title">🚫 Broken Box Mockups (' + rows.length + ')</h3>'
             +   '<button type="button" class="broken-mockups-modal-close" id="broken-mockups-modal-close" aria-label="Close">&times;</button>'
             + '</div>'
             + '<div class="broken-mockups-modal-sub">'
@@ -1119,9 +1137,11 @@
 
     function bmlWireEvents(overlay) {
         function close() {
+            var back = overlay.__returnFocus;
             overlay.remove();
-            document.body.style.overflow = '';
+            document.body.classList.remove('is-modal-open');
             document.removeEventListener('keydown', escListener);
+            if (back && document.body.contains(back)) { try { back.focus(); } catch (e) { /* gone */ } }
         }
         function escListener(e) { if (e.key === 'Escape') close(); }
 
@@ -1444,11 +1464,87 @@
     }
 
     // ── Init ─────────────────────────────────────────────────────────────
+    // Billing Codes tab: the reference prices come from Caspio Service_Codes (Erik's rule — never a typed $
+    // as the source of truth). The markup values are the fallback; the note says so when the API fails.
+    function loadBillingRates() {
+        var note = document.getElementById('billing-rate-note');
+        var money = function (n) { return '$' + Number(n).toFixed(2).replace(/\.00$/, ''); };
+        Promise.all(['GRT-50', 'GRT-75'].map(function (code) {
+            return fetch(API_BASE + '/api/service-codes?code=' + encodeURIComponent(code))
+                .then(function (r) { if (!r.ok) throw new Error(code + ' HTTP ' + r.status); return r.json(); })
+                .then(function (j) {
+                    var row = j && Array.isArray(j.data) ? j.data[0] : null;
+                    var price = row ? parseFloat(row.SellPrice) : NaN;
+                    if (!isFinite(price) || price <= 0) throw new Error(code + ' has no SellPrice');
+                    return price;
+                });
+        })).then(function (prices) {
+            var setup = prices[0], hourly = prices[1];
+            var set = function (id, text) { var el = document.getElementById(id); if (el) el.textContent = text; };
+            set('bill-grt50', money(setup));
+            set('bill-grt75', money(hourly) + '/hr');
+            [15, 30, 45, 60].forEach(function (mins) { set('bill-inc-' + mins, '$' + (hourly * mins / 60).toFixed(2)); });
+            if (note) { note.textContent = 'Prices live from Caspio Service_Codes (GRT-50 / GRT-75).'; note.hidden = false; }
+        }).catch(function (err) {
+            console.warn('[mockup-ruth] billing rates unavailable:', err && err.message);
+            if (note) { note.textContent = '\u26a0 Could not verify these prices against Caspio (' + ((err && err.message) || 'unreachable') + ') — showing the reference values.'; note.hidden = false; }
+        });
+    }
+
     function init() {
         setCurrentDate();
         showSkeletonCards();
         fetchMockups();
         loadBrokenMockupsWidget(); // Health check: surface mockups whose Box files are gone
+        loadBillingRates();
+
+        // Status chips filter the queue (delegated — the bar re-renders on every fetch)
+        var summary = document.getElementById('status-summary');
+        if (summary) summary.addEventListener('click', function (e) {
+            var chip = e.target.closest('.status-stat');
+            if (!chip) return;
+            if (chip.dataset.tab) { showTab(chip.dataset.tab); return; }
+            var status = chip.dataset.status || '';
+            queueStatusFilter = (queueStatusFilter === status) ? '' : status;
+            if (currentFilter !== 'queue') showTab('queue'); else renderCards();
+            updateStatusCounts();
+        });
+
+        // WAI-ARIA tabs: arrow keys move between Queue / Completed / On Hold / Billing
+        var tablist = document.querySelector('[role="tablist"]');
+        if (tablist) tablist.addEventListener('keydown', function (e) {
+            if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft' && e.key !== 'Home' && e.key !== 'End') return;
+            var i = TAB_ORDER.indexOf(currentFilter); if (i < 0) i = 0;
+            var n = e.key === 'ArrowRight' ? (i + 1) % TAB_ORDER.length
+                : e.key === 'ArrowLeft' ? (i + TAB_ORDER.length - 1) % TAB_ORDER.length
+                : e.key === 'Home' ? 0 : TAB_ORDER.length - 1;
+            e.preventDefault();
+            showTab(TAB_ORDER[n]);
+            var btn = document.getElementById('tab-' + TAB_ORDER[n]); if (btn) btn.focus();
+        });
+
+        // Kanban cards: click is handled by data-call-delegator's `data-href`; this adds the keyboard
+        // path (cards are role=link tabindex=0 now). Show-all / column-header controls are excluded.
+        var board = document.getElementById('ruth-kanban-board');
+        function openKanbanCard(e) {
+            if (e.target.closest && e.target.closest('.kanban-show-all, .kanban-column-header, a, button')) return;
+            var card = e.target.closest && e.target.closest('.kanban-card[data-href]');
+            if (!card) return;
+            e.preventDefault();
+            window.location.href = card.dataset.href;
+        }
+        if (board) board.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' || e.key === ' ') openKanbanCard(e);
+        });
+
+        // Broken Box thumbnails (Rule 3 — were inline onerror=): `error` does not bubble → capture phase.
+        document.addEventListener('error', function (e) {
+            var img = e.target;
+            if (!img || img.tagName !== 'IMG' || !img.dataset || !img.dataset.onerror) return;
+            if (window.ArtActions && typeof window.ArtActions.handleBoxImageError === 'function') { window.ArtActions.handleBoxImageError(img); return; }
+            if (img.dataset.onerror === 'box-parent' && img.parentElement) img.parentElement.hidden = true;
+            else img.hidden = true;
+        }, true);
 
         // Always default to Grid view on page load
 

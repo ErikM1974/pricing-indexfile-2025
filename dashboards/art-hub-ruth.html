@@ -6,7 +6,7 @@
     <meta name="robots" content="noindex, nofollow">
     <title>Digitizing Mockup Dashboard - Northwest Custom Apparel</title>
     <link rel="icon" href="/favicon.png" type="image/png">
-    <link rel="stylesheet" href="/dashboards/css/art-hub-ruth.css?v=2026.09.05.8">
+    <link rel="stylesheet" href="/dashboards/css/art-hub-ruth.css?v=2026.09.05.55">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
@@ -28,54 +28,59 @@
             <span class="bt-breadcrumb-sep">&rsaquo;</span>
             <span class="bt-breadcrumb-current">Ruth's Queue</span>
         </nav>
+        <h1 class="sr-only">Ruth's Queue &mdash; Digitizing Mockup Dashboard</h1>
     </div>
 
     <!-- Tab Container -->
     <div class="tab-container">
         <!-- Tab Buttons -->
         <div class="tab-buttons">
-            <button class="tab-button active" data-call="showTab" data-args='["queue"]'>
-                Mockup Queue <span id="queue-count" class="tab-badge">0</span>
-            </button>
-            <button class="tab-button" data-call="showTab" data-args='["completed"]'>
-                Completed <span id="completed-count" class="tab-badge">0</span>
-            </button>
-            <button class="tab-button" data-call="showTab" data-args='["on-hold"]'>
-                On Hold <span id="on-hold-count" class="tab-badge">0</span>
-            </button>
-            <button class="tab-button" data-call="showTab" data-args='["billing"]'>Billing Codes</button>
-            <a class="tab-button tab-button-link tab-button-link--first-external" href="/dashboards/supacolor-orders.html">Supacolor API Orders</a>
-            <a class="tab-button tab-button-link" href="/dashboards/names-numbers-dashboard.html">Names &amp; Numbers</a>
-            <a class="tab-button tab-button-link" href="/dashboards/monogram-dashboard.html">Monogram Dashboard</a>
-            <a class="tab-button tab-button-link" href="/pages/jds-mockup-creator.html">JDS Mockup</a>
+            <div class="tab-group" role="tablist" aria-label="Mockup views">
+                <button type="button" class="tab-button active" id="tab-queue" role="tab" aria-selected="true" aria-controls="queue-tab" data-call="showTab" data-args='["queue"]'>
+                    Mockup Queue <span id="queue-count" class="tab-badge">0</span>
+                </button>
+                <button type="button" class="tab-button" id="tab-completed" role="tab" aria-selected="false" tabindex="-1" aria-controls="completed-tab" data-call="showTab" data-args='["completed"]'>
+                    Completed <span id="completed-count" class="tab-badge">0</span>
+                </button>
+                <button type="button" class="tab-button" id="tab-on-hold" role="tab" aria-selected="false" tabindex="-1" aria-controls="on-hold-tab" data-call="showTab" data-args='["on-hold"]'>
+                    On Hold <span id="on-hold-count" class="tab-badge">0</span>
+                </button>
+                <button type="button" class="tab-button" id="tab-billing" role="tab" aria-selected="false" tabindex="-1" aria-controls="billing-tab" data-call="showTab" data-args='["billing"]'>Billing Codes</button>
+            </div>
+            <nav class="tab-group" aria-label="Other tools">
+                <a class="tab-button tab-button-link tab-button-link--first-external" href="/dashboards/supacolor-orders.html">Supacolor API Orders</a>
+                <a class="tab-button tab-button-link" href="/dashboards/names-numbers-dashboard.html">Names &amp; Numbers</a>
+                <a class="tab-button tab-button-link" href="/dashboards/monogram-dashboard.html">Monogram Dashboard</a>
+                <a class="tab-button tab-button-link" href="/pages/jds-mockup-creator.html">JDS Mockup</a>
+            </nav>
         </div>
 
         <!-- Tab Content -->
         <div class="tab-content">
 
             <!-- Queue Tab -->
-            <div id="queue-tab" class="tab-pane active">
-                <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
-                    <h2 class="tab-title" style="margin-bottom:0;">Mockup Queue</h2>
-                    <div class="view-toggle" id="ruth-view-toggle">
-                        <button class="view-toggle-btn active" data-view="grid" data-call="toggleKanbanView" data-args='["grid"]'>
-                            <span class="view-toggle-icon">&#9638;</span> Grid
+            <div id="queue-tab" class="tab-pane active" role="tabpanel" aria-labelledby="tab-queue">
+                <div class="rq-head">
+                    <h2 class="tab-title">Mockup Queue</h2>
+                    <div class="view-toggle" id="ruth-view-toggle" role="group" aria-label="Queue layout">
+                        <button type="button" class="view-toggle-btn active" data-view="grid" aria-pressed="true" data-call="toggleKanbanView" data-args='["grid"]'>
+                            <span class="view-toggle-icon" aria-hidden="true">&#9638;</span> Grid
                         </button>
-                        <button class="view-toggle-btn" data-view="board" data-call="toggleKanbanView" data-args='["board"]'>
-                            <span class="view-toggle-icon">&#9783;</span> Board
+                        <button type="button" class="view-toggle-btn" data-view="board" aria-pressed="false" data-call="toggleKanbanView" data-args='["board"]'>
+                            <span class="view-toggle-icon" aria-hidden="true">&#9783;</span> Board
                         </button>
                     </div>
                 </div>
 
                 <!-- Broken Box Mockups widget — pulsing pill that opens a per-row recovery modal.
                      Hidden until the /api/mockups/broken-mockups scan finds at least one. -->
-                <div id="ruth-broken-mockups-widget" style="display:none;"></div>
+                <div id="ruth-broken-mockups-widget" hidden></div>
 
-                <!-- Status Summary Bar -->
-                <div id="status-summary" class="status-summary"></div>
+                <!-- Status Summary Bar — chips filter the queue (click the active chip to clear) -->
+                <div id="status-summary" class="status-summary" role="group" aria-label="Filter the queue by status"></div>
 
                 <!-- Loading State -->
-                <div id="mockup-loading" class="mockup-loading">
+                <div id="mockup-loading" class="mockup-loading" role="status">
                     <div class="mockup-loading-spinner"></div>
                     Loading mockups...
                 </div>
@@ -89,28 +94,31 @@
             </div>
 
             <!-- Completed Tab -->
-            <div id="completed-tab" class="tab-pane">
+            <div id="completed-tab" class="tab-pane" role="tabpanel" aria-labelledby="tab-completed">
                 <h2 class="tab-title">Completed Mockups</h2>
                 <div id="completed-grid" class="mockup-grid"></div>
             </div>
 
             <!-- On Hold Tab — customer-paused mockups (AE-managed) -->
-            <div id="on-hold-tab" class="tab-pane">
-                <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
-                    <h2 class="tab-title" style="margin-bottom:0;">On Hold</h2>
-                    <div style="font-size:13px;color:#6b7280;font-style:italic;">Customer-paused mockups. Reach out to the AE if anything here should resume.</div>
+            <div id="on-hold-tab" class="tab-pane" role="tabpanel" aria-labelledby="tab-on-hold">
+                <div class="rq-head">
+                    <h2 class="tab-title">On Hold</h2>
+                    <p class="rq-head-note">Customer-paused mockups. Reach out to the AE if anything here should resume.</p>
                 </div>
                 <div id="on-hold-grid" class="mockup-grid"></div>
             </div>
 
             <!-- Billing Codes Tab -->
-            <div id="billing-tab" class="tab-pane">
+            <div id="billing-tab" class="tab-pane" role="tabpanel" aria-labelledby="tab-billing">
                 <h2 class="tab-title">ShopWorks Billing Codes</h2>
+                <!-- Prices below are filled from Caspio Service_Codes (GRT-50 / GRT-75) by loadBillingRates();
+                     the markup values are the fallback and #billing-rate-note says so if the API is unreachable. -->
+                <p id="billing-rate-note" class="rq-rate-note" role="status" hidden></p>
 
                 <div class="billing-codes-section">
                     <div class="billing-codes-header">
                         <div class="billing-codes-icon">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                 <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
                                 <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
                             </svg>
@@ -126,7 +134,7 @@
                                     <div class="billing-card-pn">GRT-50</div>
                                     <div class="billing-card-subtitle">Part Number for Base Art Fee</div>
                                 </div>
-                                <div class="billing-card-price">$50</div>
+                                <div class="billing-card-price" id="bill-grt50">$50</div>
                             </div>
                             <div class="billing-card-body">
                                 <div class="billing-card-body-title">Logo Mockup & Print Review</div>
@@ -151,7 +159,7 @@
                                     <div class="billing-card-pn">GRT-75</div>
                                     <div class="billing-card-subtitle">Part Number for Hourly Design</div>
                                 </div>
-                                <div class="billing-card-price">$75/hr</div>
+                                <div class="billing-card-price" id="bill-grt75">$75/hr</div>
                             </div>
                             <div class="billing-card-body">
                                 <div class="billing-card-body-title">Graphic Design Services</div>
@@ -161,10 +169,10 @@
                                 <div class="billing-callout billing-callout--amber">
                                     <div class="billing-callout-label billing-callout-label--amber">Billing Increments:</div>
                                     <div class="billing-increments-grid">
-                                        <span>15 minutes:</span><span class="amount">$18.75</span>
-                                        <span>30 minutes:</span><span class="amount">$37.50</span>
-                                        <span>45 minutes:</span><span class="amount">$56.25</span>
-                                        <span>60 minutes:</span><span class="amount">$75.00</span>
+                                        <span>15 minutes:</span><span class="amount" id="bill-inc-15">$18.75</span>
+                                        <span>30 minutes:</span><span class="amount" id="bill-inc-30">$37.50</span>
+                                        <span>45 minutes:</span><span class="amount" id="bill-inc-45">$56.25</span>
+                                        <span>60 minutes:</span><span class="amount" id="bill-inc-60">$75.00</span>
                                     </div>
                                 </div>
                             </div>
@@ -173,7 +181,7 @@
 
                     <div class="billing-pro-tip">
                         <div class="billing-pro-tip-inner">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6B46C1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6B46C1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                 <path d="M9 11l3 3L22 4"></path>
                                 <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"></path>
                             </svg>
@@ -195,6 +203,6 @@
     <script src="/shared_components/js/elapsed-time-utils.js?v=2"></script>
     <script src="/shared_components/js/box-url.js?v=2026.08.05.23"></script>
     <script src="/shared_components/js/data-call-delegator.js"></script>
-    <script src="/shared_components/js/mockup-ruth.js?v=2026.09.05.16"></script>
+    <script src="/shared_components/js/mockup-ruth.js?v=2026.09.05.55"></script>
 </body>
 </html>
