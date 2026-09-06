@@ -197,7 +197,7 @@ class ScreenPrintPricing {
                     <div class="sp-dark-garment-toggle${this.state.isDarkGarment ? ' active' : ''}" id="sp-dark-garment-toggle">
                         <div class="sp-dark-garment-label">
                             <span>Printing on dark garment?</span>
-                            <i class="fas fa-info-circle sp-dark-info-icon" id="sp-dark-info-icon"></i>
+                            <i class="fas fa-info-circle sp-dark-info-icon" aria-hidden="true" id="sp-dark-info-icon"></i>
                             <span class="sp-dark-garment-info">(White underbase required)</span>
                         </div>
                         <div class="sp-toggle-switch">
@@ -355,8 +355,8 @@ class ScreenPrintPricing {
                             <span class="sp-price-label">Price per shirt</span>
                             <div class="sp-price-amount-wrapper">
                                 <span class="sp-live-price-amount" id="sp-live-price-amount">$0.00</span>
-                                <i class="fas fa-info-circle sp-upcharge-info-icon" id="sp-upcharge-info-icon"></i>
-                                <i class="fas fa-palette sp-setup-fee-badge" id="sp-setup-fee-badge"></i>
+                                <i class="fas fa-info-circle sp-upcharge-info-icon" aria-hidden="true" id="sp-upcharge-info-icon"></i>
+                                <i class="fas fa-palette sp-setup-fee-badge" aria-hidden="true" id="sp-setup-fee-badge"></i>
 
                                 <!-- Upcharge Tooltip - positioned relative to icon -->
                                 <div id="sp-upcharge-tooltip" class="sp-upcharge-tooltip">

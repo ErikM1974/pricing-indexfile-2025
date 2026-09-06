@@ -46,4 +46,3 @@
         });
 
         // Log page load for analytics
-        console.log('Purchasing Request Form loaded successfully');

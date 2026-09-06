@@ -121,3 +121,9 @@
 
 /* 2026-09-06 review: the hidden attribute must beat any display rule */
 [hidden] { display: none !important; }
+
+/* 2026-09-06 review */
+.lm-intro { color: var(--text-secondary); margin-bottom: 1rem; }
+.lm-icon-primary { color: var(--primary-color); }
+.lm-icon-muted { color: var(--border-color); }
+.lm-plain-list { list-style: none; padding: 0; margin-top: 1rem; }

@@ -585,3 +585,7 @@ button:focus-visible {
 .modal-content::-webkit-scrollbar-thumb:hover {
     background: var(--safety-orange-dark);
 }
+
+/* 2026-09-06 review */
+.req { color: #dc2626; }
+.stripe-option:focus-visible { outline: 3px solid #2e6f40; outline-offset: 2px; }

@@ -13,14 +13,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- Base calculator styles + shared method card styles + page-specific styles -->
-    <link rel="stylesheet" href="/calculators/manual-calculator-styles.css">
-    <link rel="stylesheet" href="/calculators/manual-pricing.css">
-    <link rel="stylesheet" href="/calculators/compare-pricing.css">
+    <link rel="stylesheet" href="/calculators/manual-calculator-styles.css?v=2026.09.06.15">
+    <link rel="stylesheet" href="/calculators/manual-pricing.css?v=2026.09.06.15">
+    <link rel="stylesheet" href="/calculators/compare-pricing.css?v=2026.09.06.15">
 </head>
 <body>
     <!-- Global Error Banner -->
     <div id="apiErrorBanner" class="api-error-banner hidden">
-        <i class="fas fa-exclamation-triangle"></i>
+        <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
         <span id="apiErrorMessage">Unable to load pricing data. Please refresh the page.</span>
     </div>
 
@@ -39,37 +39,36 @@
         </header>
 
         <!-- Page Title -->
-        <div class="page-title">
-            <i class="fas fa-magnifying-glass-chart"></i> Compare Pricing by Style 2026
-        </div>
+        <h1 class="page-title">
+            <i class="fas fa-magnifying-glass-chart" aria-hidden="true"></i> Compare Pricing by Style 2026
+        </h1>
         <p class="page-subtitle">Look up any SanMar product to see decorated sell prices for Embroidery, Cap Embroidery, Screen Print, DTG and DTF.</p>
 
         <!-- Input Section -->
         <div class="input-section">
             <div class="input-row">
-                <div class="cost-input-group" style="flex: 0 0 280px;">
+                <div class="cost-input-group cost-input-group--wide">
                     <label for="styleInput">SanMar Style Number</label>
                     <div class="cost-input-wrapper">
-                        <span class="dollar-sign" style="font-size: 0.9rem;"><i class="fas fa-tag"></i></span>
+                        <span class="dollar-sign dollar-sign--sm"><i class="fas fa-tag" aria-hidden="true"></i></span>
                         <input type="text"
                                id="styleInput"
                                class="cost-input"
                                placeholder="e.g. PC54, C112, ST850"
-                               autocomplete="off"
-                               onkeypress="if(event.key === 'Enter') document.getElementById('lookUpBtn').click()">
+                               autocomplete="off">
                     </div>
                 </div>
 
                 <div class="calculate-group">
                     <label>&nbsp;</label>
-                    <button id="lookUpBtn" class="btn-calculate" onclick="compareCalc.lookUp()">
-                        <i class="fas fa-search"></i> Look Up
+                    <button id="lookUpBtn" class="btn-calculate" data-call="compareCalc.lookUp">
+                        <i class="fas fa-search" aria-hidden="true"></i> Look Up
                     </button>
                 </div>
             </div>
             <p class="input-hint">Enter a SanMar style number to look up pricing across all decoration methods</p>
             <div id="inputError" class="input-error">
-                <i class="fas fa-exclamation-circle"></i>
+                <i class="fas fa-exclamation-circle" aria-hidden="true"></i>
                 <span id="inputErrorText"></span>
             </div>
         </div>
@@ -83,9 +82,9 @@
                         <span id="itemTypeBadge" class="item-type-badge"></span>
                     </div>
                     <div class="product-info-meta">
-                        <span id="productBrand" class="product-meta-item"><i class="fas fa-tag"></i> </span>
-                        <span id="productCategory" class="product-meta-item"><i class="fas fa-folder"></i> </span>
-                        <span id="productBasePrice" class="product-meta-item"><i class="fas fa-dollar-sign"></i> </span>
+                        <span id="productBrand" class="product-meta-item"><i class="fas fa-tag" aria-hidden="true"></i> </span>
+                        <span id="productCategory" class="product-meta-item"><i class="fas fa-folder" aria-hidden="true"></i> </span>
+                        <span id="productBasePrice" class="product-meta-item"><i class="fas fa-dollar-sign" aria-hidden="true"></i> </span>
                     </div>
                 </div>
             </div>
@@ -101,13 +100,13 @@
                 <div class="method-card" id="embCard">
                     <div class="method-card-header">
                         <h3 class="method-card-title">
-                            <span class="method-icon emb"><i class="fas fa-needle"></i></span>
+                            <span class="method-icon emb"><i class="fas fa-needle" aria-hidden="true"></i></span>
                             Embroidery
                         </h3>
                         <div class="method-card-controls">
                             <div class="ltm-qty-picker">
                                 <label for="embLtmQty">1-7 qty:</label>
-                                <select id="embLtmQty" class="method-select ltm-select" onchange="compareCalc.onEmbLTMQtyChange()">
+                                <select id="embLtmQty" class="method-select ltm-select" data-change="compareCalc.onEmbLTMQtyChange">
                                     <option value="1">1 pc</option>
                                     <option value="2">2 pcs</option>
                                     <option value="3" selected>3 pcs</option>
@@ -116,7 +115,7 @@
                                     <option value="6">6 pcs</option>
                                     <option value="7">7 pcs</option>
                                 </select>
-                                <select id="embStitchTier" class="method-select" onchange="compareCalc.onEmbStitchTierChange()">
+                                <select id="embStitchTier" class="method-select" data-change="compareCalc.onEmbStitchTierChange">
                                     <option value="0">Standard (8K)</option>
                                     <option value="4">Mid (+$4/pc, 15K)</option>
                                     <option value="10">Large (+$10/pc, 25K)</option>
@@ -133,26 +132,26 @@
                 <div class="method-card" id="dtgCard">
                     <div class="method-card-header">
                         <h3 class="method-card-title">
-                            <span class="method-icon dtg"><i class="fas fa-print"></i></span>
+                            <span class="method-icon dtg"><i class="fas fa-print" aria-hidden="true"></i></span>
                             DTG (Direct-to-Garment)
                         </h3>
                         <div class="method-card-controls">
-                            <select id="dtgLocation" aria-label="DTG print location" class="method-select" onchange="compareCalc.onDTGLocationChange()">
+                            <select id="dtgLocation" aria-label="DTG print location" class="method-select" data-change="compareCalc.onDTGLocationChange">
                                 <!-- Populated by JS: front locations only (LC, FF, JF) -->
                             </select>
                             <div class="ltm-qty-picker">
                                 <label for="dtgLtmQty">LTM qty:</label>
                                 <input type="number" id="dtgLtmQty" class="method-select ltm-qty-input"
                                        min="1" max="23" value="12"
-                                       onchange="compareCalc.onDTGLtmQtyChange()">
+                                       data-change="compareCalc.onDTGLtmQtyChange">
                             </div>
                             <div class="sp-extra-controls">
                                 <label class="sp-toggle-label">
-                                    <input type="checkbox" id="dtgSecondLocation" onchange="compareCalc.onDTGSecondLocationChange()">
+                                    <input type="checkbox" id="dtgSecondLocation" data-change="compareCalc.onDTGSecondLocationChange">
                                     + Back location:
                                 </label>
                                 <select id="dtgSecondLocationSelect" class="method-select" style="display:none"
-                                        onchange="compareCalc.onDTGSecondLocationSelectChange()">
+                                        data-change="compareCalc.onDTGSecondLocationSelectChange">
                                     <!-- Populated by JS: back locations only (FB, JB) -->
                                 </select>
                             </div>
@@ -167,11 +166,11 @@
                 <div class="method-card" id="dtfCard">
                     <div class="method-card-header">
                         <h3 class="method-card-title">
-                            <span class="method-icon dtf"><i class="fas fa-film"></i></span>
+                            <span class="method-icon dtf"><i class="fas fa-film" aria-hidden="true"></i></span>
                             DTF (Direct-to-Film)
                         </h3>
                         <div class="method-card-controls">
-                            <select id="dtfTransferSize" aria-label="DTF transfer size" class="method-select" onchange="compareCalc.onDTFSizeChange()">
+                            <select id="dtfTransferSize" aria-label="DTF transfer size" class="method-select" data-change="compareCalc.onDTFSizeChange">
                                 <option value="small">Small (5" x 5")</option>
                                 <option value="medium" selected>Medium (9" x 12")</option>
                                 <option value="large">Large (12" x 16.5")</option>
@@ -180,15 +179,15 @@
                                 <label for="dtfLtmQty">LTM qty:</label>
                                 <input type="number" id="dtfLtmQty" class="method-select ltm-qty-input"
                                        min="10" max="23" value="12"
-                                       onchange="compareCalc.onDTFLtmQtyChange()">
+                                       data-change="compareCalc.onDTFLtmQtyChange">
                             </div>
                             <div class="sp-extra-controls">
                                 <label class="sp-toggle-label">
-                                    <input type="checkbox" id="dtfSecondLocation" onchange="compareCalc.onDTFSecondLocationChange()">
+                                    <input type="checkbox" id="dtfSecondLocation" data-change="compareCalc.onDTFSecondLocationChange">
                                     2nd location:
                                 </label>
                                 <select id="dtfSecondTransferSize" class="method-select" style="display:none"
-                                        onchange="compareCalc.onDTFSecondLocationChange()">
+                                        data-change="compareCalc.onDTFSecondLocationChange">
                                     <option value="small">Small (5" x 5")</option>
                                     <option value="medium" selected>Medium (9" x 12")</option>
                                     <option value="large">Large (12" x 16.5")</option>
@@ -205,30 +204,30 @@
                 <div class="method-card" id="spCard">
                     <div class="method-card-header">
                         <h3 class="method-card-title">
-                            <span class="method-icon sp"><i class="fas fa-palette"></i></span>
+                            <span class="method-icon sp"><i class="fas fa-palette" aria-hidden="true"></i></span>
                             Screen Print
                         </h3>
                         <div class="method-card-controls">
-                            <select id="spColors" aria-label="Screen print colors" class="method-select" onchange="compareCalc.onSPColorChange()">
+                            <select id="spColors" aria-label="Screen print colors" class="method-select" data-change="compareCalc.onSPColorChange">
                                 <!-- Populated by JS with available color counts -->
                             </select>
                             <div class="ltm-qty-picker">
                                 <label for="spLtmQty">LTM qty:</label>
                                 <input type="number" id="spLtmQty" class="method-select ltm-qty-input"
                                        min="24" max="71" value="36"
-                                       onchange="compareCalc.onSPLtmQtyChange()">
+                                       data-change="compareCalc.onSPLtmQtyChange">
                             </div>
                             <div class="sp-extra-controls">
                                 <label class="sp-toggle-label">
-                                    <input type="checkbox" id="spDarkGarment" onchange="compareCalc.onSPDarkGarmentChange()">
+                                    <input type="checkbox" id="spDarkGarment" data-change="compareCalc.onSPDarkGarmentChange">
                                     Dark garment
                                 </label>
                                 <label class="sp-toggle-label">
-                                    <input type="checkbox" id="spSecondLocation" onchange="compareCalc.onSPSecondLocationChange()">
+                                    <input type="checkbox" id="spSecondLocation" data-change="compareCalc.onSPSecondLocationChange">
                                     2nd location:
                                 </label>
                                 <select id="spSecondColors" class="method-select" style="display:none"
-                                        onchange="compareCalc.onSPSecondLocationColorsChange()">
+                                        data-change="compareCalc.onSPSecondLocationColorsChange">
                                     <!-- Populated by JS (same options as spColors) -->
                                 </select>
                             </div>
@@ -247,13 +246,13 @@
                 <div class="method-card" id="capEmbCard">
                     <div class="method-card-header">
                         <h3 class="method-card-title">
-                            <span class="method-icon cap"><i class="fas fa-hat-cowboy"></i></span>
+                            <span class="method-icon cap"><i class="fas fa-hat-cowboy" aria-hidden="true"></i></span>
                             Cap Embroidery
                         </h3>
                         <div class="method-card-controls">
                             <div class="ltm-qty-picker">
                                 <label for="capEmbLtmQty">1-7 qty:</label>
-                                <select id="capEmbLtmQty" class="method-select ltm-select" onchange="compareCalc.onCapEmbLTMQtyChange()">
+                                <select id="capEmbLtmQty" class="method-select ltm-select" data-change="compareCalc.onCapEmbLTMQtyChange">
                                     <option value="1">1 pc</option>
                                     <option value="2">2 pcs</option>
                                     <option value="3" selected>3 pcs</option>
@@ -262,7 +261,7 @@
                                     <option value="6">6 pcs</option>
                                     <option value="7">7 pcs</option>
                                 </select>
-                                <select id="capEmbStitchTier" class="method-select" onchange="compareCalc.onCapEmbStitchTierChange()">
+                                <select id="capEmbStitchTier" class="method-select" data-change="compareCalc.onCapEmbStitchTierChange">
                                     <option value="0">Standard (8K)</option>
                                     <option value="4">Mid (+$4/pc, 15K)</option>
                                     <option value="10">Large (+$10/pc, 25K)</option>
@@ -279,18 +278,19 @@
     </div>
 
     <!-- Shared utilities -->
-    <script src="/shared_components/js/product-category-filter.js"></script>
+    <script src="/shared_components/js/product-category-filter.js?v=2026.09.06.15"></script>
 
     <!-- Pricing Service Dependencies -->
     <!-- Canonical DTG engine (Batch 6) - MUST precede dtg-pricing-service.js -->
     <script src="/shared_components/js/dtg-canonical-pricing.js?v=2026.07.11.6"></script>
-    <script src="/shared_components/js/dtg-pricing-service.js"></script>
-    <script src="/shared_components/js/dtf-pricing-service.js"></script>
-    <script src="/shared_components/js/embroidery-pricing-service.js"></script>
-    <script src="/shared_components/js/cap-embroidery-pricing-service.js"></script>
-    <script src="/shared_components/js/screenprint-pricing-service.js"></script>
+    <script src="/shared_components/js/dtg-pricing-service.js?v=2026.09.06.15"></script>
+    <script src="/shared_components/js/dtf-pricing-service.js?v=2026.09.06.15"></script>
+    <script src="/shared_components/js/embroidery-pricing-service.js?v=2026.09.06.15"></script>
+    <script src="/shared_components/js/cap-embroidery-pricing-service.js?v=2026.09.06.15"></script>
+    <script src="/shared_components/js/screenprint-pricing-service.js?v=2026.09.06.15"></script>
 
     <!-- Page Logic -->
-    <script src="/calculators/compare-pricing.js"></script>
+    <script src="/shared_components/js/data-call-delegator.js?v=2026.09.06.15"></script>
+    <script src="/calculators/compare-pricing.js?v=2026.09.06.15"></script>
 </body>
 </html>

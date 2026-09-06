@@ -17,14 +17,14 @@
 <body class="view-rep">
     <!-- Staff bar: never prints -->
     <header class="topbar">
-        <a href="/staff-dashboard.html" class="topbar-link"><i class="fas fa-arrow-left"></i> Staff Dashboard</a>
+        <a href="/staff-dashboard.html" class="topbar-link"><i class="fas fa-arrow-left" aria-hidden="true"></i> Staff Dashboard</a>
         <div class="topbar-spacer"></div>
         <div class="view-toggle" role="group" aria-label="Menu view">
             <button type="button" class="view-btn is-active" data-view="rep" aria-pressed="true">Rep view <small>codes &amp; book times</small></button>
             <button type="button" class="view-btn" data-view="customer" aria-pressed="false">Customer view <small>prices only</small></button>
         </div>
-        <button type="button" class="topbar-link topbar-link--solid" id="printCustomerBtn" title="Prints the customer copy: prices only, no codes or book times"><i class="fas fa-print"></i> Print customer menu</button>
-        <button type="button" class="topbar-link" id="printRepBtn" title="Prints the rep copy with ShopWorks codes and book times"><i class="fas fa-print"></i> Print rep copy</button>
+        <button type="button" class="topbar-link topbar-link--solid" id="printCustomerBtn" title="Prints the customer copy: prices only, no codes or book times"><i class="fas fa-print" aria-hidden="true"></i> Print customer menu</button>
+        <button type="button" class="topbar-link" id="printRepBtn" title="Prints the rep copy with ShopWorks codes and book times"><i class="fas fa-print" aria-hidden="true"></i> Print rep copy</button>
     </header>
 
     <div id="errorBanner" class="error-banner" role="alert"></div>
@@ -52,7 +52,7 @@
         </section>
 
         <div class="courses" id="courses">
-            <p class="loading"><i class="fas fa-spinner fa-spin"></i> Setting the table&hellip;</p>
+            <p class="loading"><i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Setting the table&hellip;</p>
         </div>
 
         <footer class="colophon">
@@ -62,7 +62,7 @@
         </footer>
     </main>
 
-    <script src="/shared_components/js/app-config.js"></script>
+    <script src="/shared_components/js/app-config.js?v=2026.09.06.15"></script>
     <script src="/calculators/service-price-cheat-sheet.js?v=2026.09.03.11"></script>
 </body>
 </html>

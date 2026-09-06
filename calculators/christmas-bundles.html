@@ -9,6 +9,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
     <link rel="stylesheet" href="/calculators/css/christmas-bundles.css?v=2026.09.05.18">
+    <script src="/config/app.config.js"></script>
 </head>
 <body>
     <!-- Loading Overlay for Submission -->
@@ -42,12 +43,12 @@
     <!-- Floating Continue Button -->
     <button class="floating-continue-btn" id="floatingContinue" data-call="clickActiveContinueButton">
         Continue to Next Step
-        <i class="fas fa-arrow-right"></i>
+        <i class="fas fa-arrow-right" aria-hidden="true"></i>
     </button>
 
     <!-- Helper Text -->
     <div class="selection-helper" id="selectionHelper">
-        <i class="fas fa-check-circle"></i>
+        <i class="fas fa-check-circle" aria-hidden="true"></i>
         <span>Product selected! Continue button is at the bottom</span>
     </div>
 
@@ -55,7 +56,7 @@
     <div class="scroll-indicator" id="scrollIndicator">
         <div class="scroll-indicator-text">Continue button below</div>
         <div class="scroll-indicator-arrow">
-            <i class="fas fa-chevron-down"></i>
+            <i class="fas fa-chevron-down" aria-hidden="true"></i>
         </div>
     </div>
 
@@ -75,11 +76,11 @@
     <div class="contact-bar">
         <div class="contact-bar-content">
             <div class="contact-item">
-                <i class="fas fa-phone"></i>
+                <i class="fas fa-phone" aria-hidden="true"></i>
                 <a href="tel:253-922-5793">253-922-5793</a>
             </div>
             <div class="contact-item">
-                <i class="fas fa-envelope"></i>
+                <i class="fas fa-envelope" aria-hidden="true"></i>
                 <a href="mailto:sales@nwcustomapparel.com">sales@nwcustomapparel.com</a>
             </div>
         </div>
@@ -176,7 +177,7 @@
             <span class="pricing-bar-text">
                 🎄 Christmas Bundle Pricing 2025
             </span>
-            <i class="fas fa-chevron-right pricing-arrow" id="pricingArrow"></i>
+            <i class="fas fa-chevron-right pricing-arrow" aria-hidden="true" id="pricingArrow"></i>
         </div>
         <div class="pricing-details" id="pricingDetails">
             <div class="pricing-simple">
@@ -237,7 +238,7 @@
             <div class="section active" id="step1">
                 <div class="section-header">
                     <h2 class="section-title">
-                        <i class="fas fa-tshirt"></i>
+                        <i class="fas fa-tshirt" aria-hidden="true"></i>
                         Choose Your Jacket
                     </h2>
                     <p class="section-subtitle">Select from our premium Carhartt jacket collection</p>
@@ -250,7 +251,7 @@
                 <div class="navigation">
                     <button class="nav-btn primary" data-call="nextStep" id="jacketNext" disabled>
                         Continue
-                        <i class="fas fa-arrow-right"></i>
+                        <i class="fas fa-arrow-right" aria-hidden="true"></i>
                     </button>
                 </div>
             </div>
@@ -259,7 +260,7 @@
             <div class="section" id="step2">
                 <div class="section-header">
                     <h2 class="section-title">
-                        <i class="fas fa-hoodie"></i>
+                        <i class="fas fa-hoodie" aria-hidden="true"></i>
                         Choose Your Hoodie
                     </h2>
                     <p class="section-subtitle">Select from our comfortable hoodie collection</p>
@@ -271,12 +272,12 @@
 
                 <div class="navigation">
                     <button class="nav-btn" data-call="previousStep">
-                        <i class="fas fa-arrow-left"></i>
+                        <i class="fas fa-arrow-left" aria-hidden="true"></i>
                         Back
                     </button>
                     <button class="nav-btn primary" data-call="nextStep" id="hoodieNext" disabled>
                         Continue
-                        <i class="fas fa-arrow-right"></i>
+                        <i class="fas fa-arrow-right" aria-hidden="true"></i>
                     </button>
                 </div>
             </div>
@@ -285,7 +286,7 @@
             <div class="section" id="step3">
                 <div class="section-header">
                     <h2 class="section-title">
-                        <i class="fas fa-hat-winter"></i>
+                        <i class="fas fa-hat-winter" aria-hidden="true"></i>
                         Choose Your Beanie
                     </h2>
                     <p class="section-subtitle">Select your winter beanie</p>
@@ -297,12 +298,12 @@
 
                 <div class="navigation">
                     <button class="nav-btn" data-call="previousStep">
-                        <i class="fas fa-arrow-left"></i>
+                        <i class="fas fa-arrow-left" aria-hidden="true"></i>
                         Back
                     </button>
                     <button class="nav-btn primary" data-call="nextStep" id="beanieNext" disabled>
                         Continue
-                        <i class="fas fa-arrow-right"></i>
+                        <i class="fas fa-arrow-right" aria-hidden="true"></i>
                     </button>
                 </div>
             </div>
@@ -311,7 +312,7 @@
             <div class="section" id="step4">
                 <div class="section-header">
                     <h2 class="section-title">
-                        <i class="fas fa-mitten"></i>
+                        <i class="fas fa-mitten" aria-hidden="true"></i>
                         Choose Your Gloves
                     </h2>
                     <p class="section-subtitle">Select from our premium Carhartt work gloves</p>
@@ -323,12 +324,12 @@
 
                 <div class="navigation">
                     <button class="nav-btn" data-call="previousStep">
-                        <i class="fas fa-arrow-left"></i>
+                        <i class="fas fa-arrow-left" aria-hidden="true"></i>
                         Back
                     </button>
                     <button class="nav-btn primary" data-call="nextStep" id="glovesNext" disabled>
                         Continue
-                        <i class="fas fa-arrow-right"></i>
+                        <i class="fas fa-arrow-right" aria-hidden="true"></i>
                     </button>
                 </div>
             </div>
@@ -375,13 +376,13 @@
 
                         <div style="display: flex; justify-content: center; gap: 25px; margin-top: 25px; padding-top: 20px; border-top: 1px dashed #fca5a5;">
                             <span style="font-size: 13px; color: #14532d; font-weight: 500;">
-                                <i class="fas fa-check" style="margin-right: 5px; color: #16a34a;"></i>Custom made
+                                <i class="fas fa-check" aria-hidden="true" style="margin-right: 5px; color: #16a34a;"></i>Custom made
                             </span>
                             <span style="font-size: 13px; color: #14532d; font-weight: 500;">
-                                <i class="fas fa-check" style="margin-right: 5px; color: #16a34a;"></i>Your logo
+                                <i class="fas fa-check" aria-hidden="true" style="margin-right: 5px; color: #16a34a;"></i>Your logo
                             </span>
                             <span style="font-size: 13px; color: #14532d; font-weight: 500;">
-                                <i class="fas fa-check" style="margin-right: 5px; color: #16a34a;"></i>Ready to use
+                                <i class="fas fa-check" aria-hidden="true" style="margin-right: 5px; color: #16a34a;"></i>Ready to use
                             </span>
                         </div>
                     </div>
@@ -394,7 +395,7 @@
                 <div class="navigation" style="margin-top: 35px;">
                     <button class="nav-btn primary" data-call="proceedFromBonus" style="background: #16a34a; border: 2px solid #15803d; padding: 14px 40px; font-size: 16px; font-weight: 600; border-radius: 8px; box-shadow: 0 4px 12px rgba(22, 163, 74, 0.2);">
                         Continue to Customize
-                        <i class="fas fa-arrow-right" style="margin-left: 8px;"></i>
+                        <i class="fas fa-arrow-right" aria-hidden="true" style="margin-left: 8px;"></i>
                     </button>
                 </div>
             </div>
@@ -403,7 +404,7 @@
             <div class="section" id="step5">
                 <div class="section-header">
                     <h2 class="section-title">
-                        <i class="fas fa-palette"></i>
+                        <i class="fas fa-palette" aria-hidden="true"></i>
                         Customize Your Gift Box
                     </h2>
                     <p class="section-subtitle">Upload Your Official Company or Organization Logo</p>
@@ -415,7 +416,7 @@
                 <div class="upload-area" id="uploadArea" data-call="openLogoPicker">
                     <input type="file" id="logoFile" aria-label="Logo file" accept="image/*,.pdf" style="display: none;">
                     <div class="upload-icon">
-                        <i class="fas fa-cloud-upload-alt"></i>
+                        <i class="fas fa-cloud-upload-alt" aria-hidden="true"></i>
                     </div>
                     <div class="upload-text">Click to upload your company logo</div>
                     <div class="upload-hint">Official business logos only (JPG, PNG, PDF)</div>
@@ -449,9 +450,9 @@
                     </div>
                     <div class="form-group">
                         <div class="form-label" style="color: #666; font-size: 14px;">
-                            <i class="fas fa-info-circle"></i>
+                            <i class="fas fa-info-circle" aria-hidden="true"></i>
                             Note: Beanies will have front center embroidery<br>
-                            <i class="fas fa-info-circle"></i>
+                            <i class="fas fa-info-circle" aria-hidden="true"></i>
                             Note: Gloves do not receive embroidery
                         </div>
                     </div>
@@ -464,12 +465,12 @@
 
                 <div class="navigation">
                     <button class="nav-btn" data-call="previousStep">
-                        <i class="fas fa-arrow-left"></i>
+                        <i class="fas fa-arrow-left" aria-hidden="true"></i>
                         Back
                     </button>
                     <button class="nav-btn primary" data-call="nextStep">
                         Continue
-                        <i class="fas fa-arrow-right"></i>
+                        <i class="fas fa-arrow-right" aria-hidden="true"></i>
                     </button>
                 </div>
             </div>
@@ -478,7 +479,7 @@
             <div class="section" id="step6">
                 <div class="section-header">
                     <h2 class="section-title">
-                        <i class="fas fa-shipping-fast"></i>
+                        <i class="fas fa-shipping-fast" aria-hidden="true"></i>
                         Delivery Information
                     </h2>
                     <p class="section-subtitle">Tell us where to send your free gift box</p>
@@ -538,14 +539,14 @@
                             <label class="delivery-option">
                                 <input type="radio" name="deliveryMethod" value="Ship" checked data-change="toggleDeliveryFields">
                                 <span class="option-content">
-                                    <i class="fas fa-shipping-fast"></i>
+                                    <i class="fas fa-shipping-fast" aria-hidden="true"></i>
                                     <span>Ship to Address</span>
                                 </span>
                             </label>
                             <label class="delivery-option">
                                 <input type="radio" name="deliveryMethod" value="Pickup" data-change="toggleDeliveryFields">
                                 <span class="option-content">
-                                    <i class="fas fa-warehouse"></i>
+                                    <i class="fas fa-warehouse" aria-hidden="true"></i>
                                     <span>Factory Pickup</span>
                                 </span>
                             </label>
@@ -554,14 +555,14 @@
 
                     <!-- Factory Pickup Information -->
                     <div id="pickupInfo" class="pickup-info-box" style="display: none;">
-                        <h4><i class="fas fa-map-marker-alt"></i> Pickup Location</h4>
+                        <h4><i class="fas fa-map-marker-alt" aria-hidden="true"></i> Pickup Location</h4>
                         <p><strong>Northwest Custom Apparel</strong><br>
                         2025 Freeman Road East<br>
                         Milton, WA 98354</p>
-                        <p><i class="fas fa-clock"></i> <strong>Pickup Hours:</strong><br>
+                        <p><i class="fas fa-clock" aria-hidden="true"></i> <strong>Pickup Hours:</strong><br>
                         Monday - Friday: 8:30 AM - 4:45 PM</p>
                         <p class="info-note">
-                            <i class="fas fa-info-circle"></i>
+                            <i class="fas fa-info-circle" aria-hidden="true"></i>
                             You'll receive an email when your gift box is ready for pickup.
                         </p>
                     </div>
@@ -621,12 +622,12 @@
 
                 <div class="navigation">
                     <button class="nav-btn" data-call="previousStep">
-                        <i class="fas fa-arrow-left"></i>
+                        <i class="fas fa-arrow-left" aria-hidden="true"></i>
                         Back
                     </button>
                     <button id="reviewBtn" class="nav-btn nav-btn-primary" data-call="nextStep" style="background: linear-gradient(135deg, #16a34a, #059669); padding: 20px 40px; font-size: 20px; font-weight: 700;">
                         Review Order
-                        <i class="fas fa-arrow-right"></i>
+                        <i class="fas fa-arrow-right" aria-hidden="true"></i>
                     </button>
                 </div>
             </div>
@@ -635,7 +636,7 @@
             <div class="section" id="step7">
                 <div class="section-header">
                     <h2 class="section-title">
-                        <i class="fas fa-clipboard-check"></i>
+                        <i class="fas fa-clipboard-check" aria-hidden="true"></i>
                         Review Your Christmas Bundle Order
                     </h2>
                     <p class="section-subtitle">Please review all details before submitting</p>
@@ -648,7 +649,7 @@
                         <!-- Selected Items Card -->
                         <div class="confirmation-card">
                             <h3 class="confirmation-card-title">
-                                <i class="fas fa-gift" style="color: #10b981;"></i>
+                                <i class="fas fa-gift" aria-hidden="true" style="color: #10b981;"></i>
                                 Your Gift Box Items
                             </h3>
                             <div id="reviewItems">
@@ -659,7 +660,7 @@
                         <!-- Customization Card -->
                         <div class="confirmation-card">
                             <h3 class="confirmation-card-title">
-                                <i class="fas fa-palette" style="color: #0284c7;"></i>
+                                <i class="fas fa-palette" aria-hidden="true" style="color: #0284c7;"></i>
                                 Customization Details
                             </h3>
                             <div id="reviewCustomization">
@@ -670,7 +671,7 @@
                         <!-- Delivery Information Card -->
                         <div class="confirmation-card">
                             <h3 class="confirmation-card-title">
-                                <i class="fas fa-truck" style="color: #dc2626;"></i>
+                                <i class="fas fa-truck" aria-hidden="true" style="color: #dc2626;"></i>
                                 Delivery Information
                             </h3>
                             <div id="reviewDelivery">
@@ -684,7 +685,7 @@
                         <!-- Order Summary Card -->
                         <div class="summary-total-card">
                             <h4 style="color: #075985; margin: 0 0 15px 0; font-size: 18px; font-weight: 600;">
-                                <i class="fas fa-tags"></i> Order Summary
+                                <i class="fas fa-tags" aria-hidden="true"></i> Order Summary
                             </h4>
                             <div class="summary-row">
                                 <span class="summary-label">Retail Value:</span>
@@ -696,7 +697,7 @@
                             </div>
                             <div class="summary-row" style="background: linear-gradient(90deg, #fef3c7, #fffbeb); padding: 8px 12px; border-radius: 6px; margin: 10px 0;">
                                 <span class="summary-label" style="color: #92400e; font-weight: 500;">
-                                    <i class="fas fa-gift" style="color: #dc2626;"></i> Santa's Bonus:
+                                    <i class="fas fa-gift" aria-hidden="true" style="color: #dc2626;"></i> Santa's Bonus:
                                 </span>
                                 <span class="summary-value" style="color: #10b981; font-weight: bold;">FREE!</span>
                             </div>
@@ -708,12 +709,12 @@
 
                         <!-- Submit Button -->
                         <button id="submitBtn" class="submit-btn" style="width: 100%; font-size: 18px; padding: 16px; background: linear-gradient(135deg, #16a34a, #15803d);">
-                            <i class="fas fa-paper-plane"></i> Submit Order
+                            <i class="fas fa-paper-plane" aria-hidden="true"></i> Submit Order
                         </button>
 
                         <!-- Previous Button -->
                         <button class="nav-btn" data-call="previousStep" style="width: 100%; margin-top: 10px;">
-                            <i class="fas fa-arrow-left"></i> Previous Step
+                            <i class="fas fa-arrow-left" aria-hidden="true"></i> Previous Step
                         </button>
                     </div>
                 </div>
@@ -724,18 +725,18 @@
         <div class="order-summary">
             <div class="summary-card">
                 <h3 class="summary-header">
-                    <i class="fas fa-gift holly"></i> Your Gift Box
+                    <i class="fas fa-gift holly" aria-hidden="true"></i> Your Gift Box
                 </h3>
 
                 <div class="summary-note">
-                    <i class="fas fa-info-circle summary-note-icon"></i>
+                    <i class="fas fa-info-circle summary-note-icon" aria-hidden="true"></i>
                     <span class="summary-note-text">This is a FREE promotional gift box!</span>
                 </div>
 
                 <div class="summary-items" id="summaryItems">
                     <div class="summary-empty">
                         <div class="summary-empty-icon">
-                            <i class="fas fa-box-open"></i>
+                            <i class="fas fa-box-open" aria-hidden="true"></i>
                         </div>
                         <div>Start building your gift box</div>
                     </div>
@@ -751,11 +752,11 @@
         <div class="modal-content">
             <!-- Close button -->
             <button class="modal-close-btn" data-call="closeModal" aria-label="Close">
-                <i class="fas fa-times"></i>
+                <i class="fas fa-times" aria-hidden="true"></i>
             </button>
 
             <div class="success-icon">
-                <i class="fas fa-check-circle"></i>
+                <i class="fas fa-check-circle" aria-hidden="true"></i>
             </div>
             <h2 class="success-title">🎉 Order Submitted!</h2>
             <p class="success-message">
@@ -775,19 +776,19 @@
 
             <!-- Email reminder -->
             <p style="color: #6b7280; font-size: 14px; margin: 15px 0;">
-                <i class="fas fa-envelope"></i> Check your email for full order details
+                <i class="fas fa-envelope" aria-hidden="true"></i> Check your email for full order details
             </p>
 
             <!-- Done button -->
             <button class="nav-btn primary" data-call="closeModal" style="width: 100%; font-size: 16px; padding: 14px;">
-                <i class="fas fa-check"></i> Done
+                <i class="fas fa-check" aria-hidden="true"></i> Done
             </button>
         </div>
     </div>
 
     <!-- Include EmailJS -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-    <script src="/shared_components/js/data-call-delegator.js"></script>
+    <script src="/shared_components/js/data-call-delegator.js?v=2026.09.06.15"></script>
     <script src="/calculators/js/christmas-bundles.js?v=2026.09.06.14"></script>
 
     <!-- Include Quote Service -->

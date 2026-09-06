@@ -356,7 +356,7 @@ function copyQuoteID() {
     navigator.clipboard.writeText(quoteID).then(() => {
         const copyBtn = event.target.closest('button');
         const originalHTML = copyBtn.innerHTML;
-        copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+        copyBtn.innerHTML = '<i class="fas fa-check" aria-hidden="true"></i> Copied!';
         setTimeout(() => {
             copyBtn.innerHTML = originalHTML;
         }, 2000);
@@ -513,3 +513,9 @@ function printQuote() {
         };
     };
 }
+
+// Hero image fallback (was an inline onerror=; Rule 3)
+document.addEventListener('error', function (e) {
+    var img = e.target;
+    if (img && img.tagName === 'IMG' && img.dataset && img.dataset.onerror === 'hide') img.hidden = true;
+}, true);

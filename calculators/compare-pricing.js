@@ -32,7 +32,6 @@ class ComparePricingCalculator {
         };
 
         this.checkUrlParams();
-        console.log('[ComparePricing] Calculator initialized');
     }
 
     // =========================================================
@@ -70,7 +69,6 @@ class ComparePricingCalculator {
         const apiBase = this.services.dtg.apiBase;
         const url = `${apiBase}/dtg/product-bundle?styleNumber=${encodeURIComponent(styleNumber)}`;
 
-        console.log('[ComparePricing] Fetching product info:', url);
 
         const response = await fetch(url);
         if (!response.ok) {
@@ -124,11 +122,11 @@ class ComparePricingCalculator {
         badge.className = 'item-type-badge ' + (info.isCap ? 'cap' : 'garment');
 
         document.getElementById('productBrand').innerHTML =
-            `<i class="fas fa-tag"></i> ${escapeHtml(info.brand)}`;
+            `<i class="fas fa-tag" aria-hidden="true"></i> ${escapeHtml(info.brand)}`;
         document.getElementById('productCategory').innerHTML =
-            `<i class="fas fa-folder"></i> ${escapeHtml(info.category)}`;
+            `<i class="fas fa-folder" aria-hidden="true"></i> ${escapeHtml(info.category)}`;
         document.getElementById('productBasePrice').innerHTML =
-            `<i class="fas fa-dollar-sign"></i> Base cost: $${info.baseCost.toFixed(2)}`;
+            `<i class="fas fa-dollar-sign" aria-hidden="true"></i> Base cost: $${info.baseCost.toFixed(2)}`;
 
         banner.style.display = 'block';
     }
@@ -707,7 +705,7 @@ class ComparePricingCalculator {
         if (!body) return;
 
         if (rows.length === 0) {
-            body.innerHTML = '<div class="card-error"><i class="fas fa-exclamation-circle"></i> No pricing data available</div>';
+            body.innerHTML = '<div class="card-error"><i class="fas fa-exclamation-circle" aria-hidden="true"></i> No pricing data available</div>';
             return;
         }
 
@@ -758,12 +756,12 @@ class ComparePricingCalculator {
 
         // LTM note
         if (hasLTM && options.ltmNote) {
-            html += `<div class="ltm-note"><i class="fas fa-info-circle"></i> ${escapeHtml(options.ltmNote)}</div>`;
+            html += `<div class="ltm-note"><i class="fas fa-info-circle" aria-hidden="true"></i> ${escapeHtml(options.ltmNote)}</div>`;
         }
 
         // Setup fee note (dark garment / second location)
         if (options?.setupNote) {
-            html += `<p class="pricing-note setup-fee-note"><i class="fas fa-layer-group"></i> ${escapeHtml(options.setupNote)}</p>`;
+            html += `<p class="pricing-note setup-fee-note"><i class="fas fa-layer-group" aria-hidden="true"></i> ${escapeHtml(options.setupNote)}</p>`;
         }
 
         body.innerHTML = html;
@@ -788,7 +786,7 @@ class ComparePricingCalculator {
     showCardError(bodyId, message) {
         const el = document.getElementById(bodyId);
         if (el) {
-            el.innerHTML = `<div class="card-error"><i class="fas fa-exclamation-circle"></i> ${escapeHtml(message)}</div>`;
+            el.innerHTML = `<div class="card-error"><i class="fas fa-exclamation-circle" aria-hidden="true"></i> ${escapeHtml(message)}</div>`;
         }
     }
 
@@ -817,4 +815,13 @@ function escapeHtml(str) {
 let compareCalc;
 document.addEventListener('DOMContentLoaded', () => {
     compareCalc = new ComparePricingCalculator();
+    window.compareCalc = compareCalc; // the data-call delegator resolves window.*; a top-level let is not a window property
+});
+
+// Enter in the style box triggers Look Up (was an inline onkeypress= on the input; Rule 3)
+document.addEventListener('DOMContentLoaded', function () {
+    var el = document.getElementById('styleInput');
+    if (el) el.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') { e.preventDefault(); var b = document.getElementById('lookUpBtn'); if (b) b.click(); }
+    });
 });

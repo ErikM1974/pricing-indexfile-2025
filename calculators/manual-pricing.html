@@ -13,13 +13,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- Base calculator styles + page-specific styles -->
-    <link rel="stylesheet" href="/calculators/manual-calculator-styles.css">
-    <link rel="stylesheet" href="/calculators/manual-pricing.css">
+    <link rel="stylesheet" href="/calculators/manual-calculator-styles.css?v=2026.09.06.15">
+    <link rel="stylesheet" href="/calculators/manual-pricing.css?v=2026.09.06.15">
 </head>
 <body>
     <!-- Global Error Banner -->
     <div id="apiErrorBanner" class="api-error-banner hidden">
-        <i class="fas fa-exclamation-triangle"></i>
+        <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
         <span id="apiErrorMessage">Unable to load pricing data. Please refresh the page.</span>
     </div>
 
@@ -39,7 +39,7 @@
 
         <!-- Page Title -->
         <h1 class="page-title">
-            <i class="fas fa-calculator"></i> Manual Pricing Calculator 2026
+            <i class="fas fa-calculator" aria-hidden="true"></i> Manual Pricing Calculator 2026
         </h1>
         <p class="page-subtitle">Embroidered Garments, Embroidered Caps, Screen Print, DTG and DTF. Enter the blank cost from your supplier.</p>
 
@@ -65,10 +65,10 @@
                     <label>Item Type</label>
                     <div class="toggle-buttons">
                         <button class="toggle-btn active" data-type="garment" data-call="manualCalc.setItemType" data-args='["garment"]'>
-                            <i class="fas fa-tshirt"></i> Garment
+                            <i class="fas fa-tshirt" aria-hidden="true"></i> Garment
                         </button>
                         <button class="toggle-btn" data-type="cap" data-call="manualCalc.setItemType" data-args='["cap"]'>
-                            <i class="fas fa-hat-cowboy"></i> Cap
+                            <i class="fas fa-hat-cowboy" aria-hidden="true"></i> Cap
                         </button>
                     </div>
                 </div>
@@ -76,13 +76,13 @@
                 <div class="calculate-group">
                     <label>&nbsp;</label>
                     <button id="calculateBtn" class="btn-calculate" data-call="manualCalc.calculate">
-                        <i class="fas fa-calculator"></i> Calculate
+                        <i class="fas fa-calculator" aria-hidden="true"></i> Calculate
                     </button>
                 </div>
             </div>
             <p class="input-hint">Enter the blank garment/cap cost from your supplier (S&S Active Wear, etc.)</p>
             <div id="inputError" class="input-error">
-                <i class="fas fa-exclamation-circle"></i>
+                <i class="fas fa-exclamation-circle" aria-hidden="true"></i>
                 <span id="inputErrorText"></span>
             </div>
         </div>
@@ -97,7 +97,7 @@
                 <div class="method-card" id="dtgCard">
                     <div class="method-card-header">
                         <h3 class="method-card-title">
-                            <span class="method-icon dtg"><i class="fas fa-print"></i></span>
+                            <span class="method-icon dtg"><i class="fas fa-print" aria-hidden="true"></i></span>
                             DTG (Direct-to-Garment)
                         </h3>
                         <div class="method-card-controls">
@@ -131,7 +131,7 @@
                 <div class="method-card" id="dtfCard">
                     <div class="method-card-header">
                         <h3 class="method-card-title">
-                            <span class="method-icon dtf"><i class="fas fa-film"></i></span>
+                            <span class="method-icon dtf"><i class="fas fa-film" aria-hidden="true"></i></span>
                             DTF (Direct-to-Film)
                         </h3>
                         <div class="method-card-controls">
@@ -169,7 +169,7 @@
                 <div class="method-card" id="embCard">
                     <div class="method-card-header">
                         <h3 class="method-card-title">
-                            <span class="method-icon emb"><i class="fas fa-needle"></i></span>
+                            <span class="method-icon emb"><i class="fas fa-needle" aria-hidden="true"></i></span>
                             Embroidery
                         </h3>
                         <div class="method-card-controls">
@@ -184,7 +184,7 @@
                                     <option value="6">6 pcs</option>
                                     <option value="7">7 pcs</option>
                                 </select>
-                                <span class="text-muted" style="font-size: 0.75rem; margin-left: 0.5rem;">8K stitches</span>
+                                <span class="text-muted stitch-note">8K stitches</span>
                             </div>
                         </div>
                     </div>
@@ -197,7 +197,7 @@
                 <div class="method-card" id="spCard">
                     <div class="method-card-header">
                         <h3 class="method-card-title">
-                            <span class="method-icon sp"><i class="fas fa-palette"></i></span>
+                            <span class="method-icon sp"><i class="fas fa-palette" aria-hidden="true"></i></span>
                             Screen Print
                         </h3>
                         <div class="method-card-controls">
@@ -225,7 +225,7 @@
                 <div class="method-card" id="capEmbCard">
                     <div class="method-card-header">
                         <h3 class="method-card-title">
-                            <span class="method-icon cap"><i class="fas fa-hat-cowboy"></i></span>
+                            <span class="method-icon cap"><i class="fas fa-hat-cowboy" aria-hidden="true"></i></span>
                             Cap Embroidery
                         </h3>
                         <div class="method-card-controls">
@@ -240,7 +240,7 @@
                                     <option value="6">6 pcs</option>
                                     <option value="7">7 pcs</option>
                                 </select>
-                                <span class="text-muted" style="font-size: 0.75rem; margin-left: 0.5rem;">8K stitches</span>
+                                <span class="text-muted stitch-note">8K stitches</span>
                             </div>
                         </div>
                     </div>
@@ -255,14 +255,14 @@
     <!-- Pricing Service Dependencies -->
     <!-- Canonical DTG engine (Batch 6) - MUST precede dtg-pricing-service.js -->
     <script src="/shared_components/js/dtg-canonical-pricing.js?v=2026.07.11.6"></script>
-    <script src="/shared_components/js/dtg-pricing-service.js"></script>
-    <script src="/shared_components/js/dtf-pricing-service.js"></script>
-    <script src="/shared_components/js/embroidery-pricing-service.js"></script>
-    <script src="/shared_components/js/data-call-delegator.js"></script>
-    <script src="/shared_components/js/cap-embroidery-pricing-service.js"></script>
-    <script src="/shared_components/js/screenprint-pricing-service.js"></script>
+    <script src="/shared_components/js/dtg-pricing-service.js?v=2026.09.06.15"></script>
+    <script src="/shared_components/js/dtf-pricing-service.js?v=2026.09.06.15"></script>
+    <script src="/shared_components/js/embroidery-pricing-service.js?v=2026.09.06.15"></script>
+    <script src="/shared_components/js/data-call-delegator.js?v=2026.09.06.15"></script>
+    <script src="/shared_components/js/cap-embroidery-pricing-service.js?v=2026.09.06.15"></script>
+    <script src="/shared_components/js/screenprint-pricing-service.js?v=2026.09.06.15"></script>
 
     <!-- Page Logic -->
-    <script src="/calculators/manual-pricing.js"></script>
+    <script src="/calculators/manual-pricing.js?v=2026.09.06.15"></script>
 </body>
 </html>

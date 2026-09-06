@@ -308,7 +308,7 @@ function copyQuoteId() {
     navigator.clipboard.writeText(quoteId).then(() => {
         const btn = event.target.closest('button');
         const originalText = btn.innerHTML;
-        btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+        btn.innerHTML = '<i class="fas fa-check" aria-hidden="true"></i> Copied!';
         setTimeout(() => {
             btn.innerHTML = originalText;
         }, 2000);
@@ -337,3 +337,10 @@ function startNewDesign() {
     closeSuccessModal();
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
+
+// Stripe tiles are role=button (were inline onclick= divs); Enter/Space selects like a click
+document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    var tile = e.target && e.target.closest && e.target.closest('.stripe-option[data-style]');
+    if (tile) { e.preventDefault(); selectStripeStyle(tile.dataset.style); }
+});

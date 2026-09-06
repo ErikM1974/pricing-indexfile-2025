@@ -1,6 +1,12 @@
 /* christmas-bundles.js — page script (extracted from inline <script>, 2026.09.05.11) */
 
 // ── moved from inline <script> in calculators/christmas-bundles.html (Rule 3, 2026.09.05.11) ──
+/* Logging gate (2026-09-06): christmas-bundles chatter only on localhost or ?debug=1; console.error/warn stay live. */
+var CB_LOG_ON = window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug');
+var cbLog = CB_LOG_ON ? console.log.bind(console) : function () {};
+// Proxy host from /config/app.config.js (Rule 6) — never guess a backend.
+var CB_API_BASE = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) || '';
+if (!CB_API_BASE) console.error('[christmas-bundles] APP_CONFIG.API.BASE_URL missing — pricing cannot load');
 (function() {
             // Initialize EmailJS with your public key
             emailjs.init("4qSbDO-SQs19TbP80");
@@ -162,7 +168,7 @@
                     emailParams
                 );
 
-                console.log('Email sent successfully:', response);
+                cbLog('Email sent successfully:', response);
 
                 // Send sales team notification
                 try {
@@ -191,7 +197,7 @@
                         'template_sales_xmas', // Template ID for sales team notification
                         salesEmailParams
                     );
-                    console.log('Sales team notified of order:', quoteID);
+                    cbLog('Sales team notified of order:', quoteID);
                 } catch (salesError) {
                     console.error('Failed to notify sales team:', salesError);
                     // Don't block order - sales notification is not critical
@@ -326,7 +332,7 @@
         }
 
         // API Configuration
-        const API_BASE = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api';
+        const API_BASE = CB_API_BASE + '/api';
 
         // Product Data (will be populated from API)
         const products = {
@@ -407,12 +413,12 @@
         async function fetchSizeUpcharges(styleNumber) {
             // Check cache first
             if (sizeUpchargeCache[styleNumber]) {
-                console.log(`[Size Upcharges] Using cached data for ${styleNumber}`);
+                cbLog(`[Size Upcharges] Using cached data for ${styleNumber}`);
                 return sizeUpchargeCache[styleNumber];
             }
 
             try {
-                const response = await fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/size-pricing?styleNumber=${styleNumber}`);
+                const response = await fetch(`${CB_API_BASE}/api/size-pricing?styleNumber=${styleNumber}`);
 
                 if (!response.ok) {
                     console.warn(`[Size Upcharges] Failed to fetch for ${styleNumber}:`, response.status);
@@ -424,7 +430,7 @@
                 if (data && data.length > 0) {
                     // Extract upcharges from first color (all colors have same upcharges)
                     const upcharges = data[0].sizeUpcharges || {};
-                    console.log(`[Size Upcharges] Fetched for ${styleNumber}:`, upcharges);
+                    cbLog(`[Size Upcharges] Fetched for ${styleNumber}:`, upcharges);
 
                     // Cache the result
                     sizeUpchargeCache[styleNumber] = upcharges;
@@ -589,17 +595,17 @@
                     };
 
                     // Log bundle configuration for debugging
-                    console.log('Bundle configuration being saved:', bundleConfig);
-                    console.log('Beanie data from quoteData:', {
+                    cbLog('Bundle configuration being saved:', bundleConfig);
+                    cbLog('Beanie data from quoteData:', {
                         style: quoteData.beanieStyle,
                         color: quoteData.beanieColor
                     });
-                    console.log('Gloves data from quoteData:', {
+                    cbLog('Gloves data from quoteData:', {
                         style: quoteData.glovesStyle,
                         size: quoteData.glovesSize,
                         color: quoteData.glovesColor
                     });
-                    console.log('JSON stringified:', JSON.stringify(bundleConfig));
+                    cbLog('JSON stringified:', JSON.stringify(bundleConfig));
 
                     // Create quote item with all fields
                     const itemData = {
@@ -649,8 +655,8 @@
                     };
 
                     // Log the item data being sent
-                    console.log('Sending item data to API:', itemData);
-                    console.log('BundleConfiguration field:', itemData.BundleConfiguration);
+                    cbLog('Sending item data to API:', itemData);
+                    cbLog('BundleConfiguration field:', itemData.BundleConfiguration);
 
                     // Create item with 10-second timeout
                     const itemController = new AbortController();
@@ -674,7 +680,7 @@
                         return { success: true, quoteID, warning: 'Item creation failed but quote was created' };
                     } else {
                         const itemResult = await itemResponse.json();
-                        console.log('Item created successfully:', itemResult);
+                        cbLog('Item created successfully:', itemResult);
                     }
 
                     return { success: true, quoteID };
@@ -749,9 +755,9 @@
             let originalButtonHTML;
             function finalizeSubmission() {
                 if (window.submissionFlowDebug) {
-                    console.log('🚀 finalizeSubmission called');
-                    console.log('  - submitBtn value:', submitBtn);
-                    console.log('  - originalButtonHTML:', originalButtonHTML);
+                    cbLog('🚀 finalizeSubmission called');
+                    cbLog('  - submitBtn value:', submitBtn);
+                    cbLog('  - originalButtonHTML:', originalButtonHTML);
                 }
                 try {
                     const overlayEl = document.getElementById('submissionOverlay');
@@ -773,14 +779,14 @@
                     const btn = submitBtn || document.getElementById('submitBtn');
                     if (btn) {
                         if (window.submissionFlowDebug) {
-                            console.log('📍 finalizeSubmission: Re-enabling button');
-                            console.log('  - Button was disabled:', btn.disabled);
+                            cbLog('📍 finalizeSubmission: Re-enabling button');
+                            cbLog('  - Button was disabled:', btn.disabled);
                         }
                         btn.disabled = false;  // CRITICAL: Re-enable the button
                         btn.classList.remove('processing');
-                        btn.innerHTML = originalButtonHTML || '<i class="fas fa-paper-plane"></i> Submit Order';
+                        btn.innerHTML = originalButtonHTML || '<i class="fas fa-paper-plane" aria-hidden="true"></i> Submit Order';
                         if (window.submissionFlowDebug) {
-                            console.log('  - Button now disabled:', btn.disabled);
+                            cbLog('  - Button now disabled:', btn.disabled);
                         }
                     } else {
                         console.warn('[Submit] No button found to finalize!');
@@ -792,7 +798,7 @@
 
             // Prevent double submissions
             if (window.isSubmitting) {
-                console.log('Already submitting, ignoring duplicate click');
+                cbLog('Already submitting, ignoring duplicate click');
                 return;
             }
 
@@ -849,14 +855,14 @@
                 submitBtn = button || document.getElementById('submitBtn');
                 originalButtonHTML = submitBtn ? submitBtn.innerHTML : '';
                 if (window.submissionFlowDebug) {
-                    console.log('📌 submitBtn assigned:', submitBtn);
-                    console.log('  - button parameter:', button);
-                    console.log('  - submitBtn element:', submitBtn);
-                    console.log('  - originalButtonHTML:', originalButtonHTML);
+                    cbLog('📌 submitBtn assigned:', submitBtn);
+                    cbLog('  - button parameter:', button);
+                    cbLog('  - submitBtn element:', submitBtn);
+                    cbLog('  - originalButtonHTML:', originalButtonHTML);
                 }
                 if (submitBtn) {
                     submitBtn.classList.add('processing');
-                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Processing...';
                 }
 
                 // Upload logo if present - with timeout and error handling
@@ -951,16 +957,16 @@
             };
 
             // Log the quote data before submission
-            console.log('Complete quote data being submitted:', quoteData);
-            console.log('Selected items:', selectedItems);
-            console.log('Selected items - beanie specifically:', {
+            cbLog('Complete quote data being submitted:', quoteData);
+            cbLog('Selected items:', selectedItems);
+            cbLog('Selected items - beanie specifically:', {
                 full: selectedItems.beanie,
                 id: selectedItems.beanie?.id,
                 color: selectedItems.beanie?.selectedColor
             });
 
             // Log shipping details specifically
-            console.log('Shipping details being submitted:', {
+            cbLog('Shipping details being submitted:', {
                 deliveryMethod: quoteData.deliveryMethod,
                 address: quoteData.shippingAddress,
                 city: quoteData.shippingCity,
@@ -1017,7 +1023,7 @@
                 // Schedule cleanup FIRST so it happens even if the modal throws
                 setTimeout(() => {
                     if (window.submissionFlowDebug) {
-                        console.log('⏰ 3-second timer fired, calling finalizeSubmission');
+                        cbLog('⏰ 3-second timer fired, calling finalizeSubmission');
                     }
                     try { resetForm(); } catch (e) { console.error('[Submit] resetForm error:', e); }
                     finalizeSubmission();
@@ -1032,7 +1038,7 @@
                 }
             } else {
                 if (window.submissionFlowDebug) {
-                    console.log('❌ API error - calling finalizeSubmission immediately');
+                    cbLog('❌ API error - calling finalizeSubmission immediately');
                 }
                 alert('There was an error submitting your order. Please try again.');
                 finalizeSubmission();
@@ -1053,7 +1059,7 @@
 
                 alert(errorMessage);
                 if (window.submissionFlowDebug) {
-                    console.log('🔥 Exception caught - calling finalizeSubmission immediately');
+                    cbLog('🔥 Exception caught - calling finalizeSubmission immediately');
                 }
                 finalizeSubmission();
             }
@@ -1287,7 +1293,7 @@
             deliveryHTML += `
                 <div class="delivery-info-item">
                     <div class="delivery-info-icon">
-                        <i class="fas fa-user"></i> Contact
+                        <i class="fas fa-user" aria-hidden="true"></i> Contact
                     </div>
                     <div class="delivery-info-value">${firstName} ${lastName}</div>
                     ${company ? `<div class="delivery-info-value" style="font-size: 13px; font-weight: 400; color: #6b7280;">${company}</div>` : ''}
@@ -1298,7 +1304,7 @@
             deliveryHTML += `
                 <div class="delivery-info-item">
                     <div class="delivery-info-icon">
-                        <i class="fas fa-envelope"></i> Communication
+                        <i class="fas fa-envelope" aria-hidden="true"></i> Communication
                     </div>
                     <div class="delivery-info-value">${email}</div>
                     <div class="delivery-info-value" style="font-size: 13px; font-weight: 400; color: #6b7280;">${phone}</div>
@@ -1309,7 +1315,7 @@
             deliveryHTML += `
                 <div class="delivery-info-item">
                     <div class="delivery-info-icon">
-                        <i class="fas fa-${deliveryMethod === 'Ship' ? 'truck' : 'building'}"></i> Delivery
+                        <i class="fas fa-${deliveryMethod === 'Ship' ? 'truck' : 'building'}" aria-hidden="true"></i> Delivery
                     </div>
                     <div class="delivery-info-value">${deliveryMethod}</div>
                     ${deliveryDate !== 'Not specified' ? `<div class="delivery-info-value" style="font-size: 13px; font-weight: 400; color: #6b7280;">By: ${new Date(deliveryDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</div>` : ''}
@@ -1330,7 +1336,7 @@
                     deliveryHTML += `
                         <div style="margin-top: 15px; padding: 12px; background: #f9fafb; border-radius: 8px; border-left: 3px solid #dc2626;">
                             <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px; color: #6b7280; font-size: 14px;">
-                                <i class="fas fa-map-marker-alt" style="color: #dc2626;"></i>
+                                <i class="fas fa-map-marker-alt" aria-hidden="true" style="color: #dc2626;"></i>
                                 <span style="font-weight: 600;">Shipping Address</span>
                             </div>
                             <div style="font-size: 14px; color: #1f2937; line-height: 1.5;">
@@ -1347,7 +1353,7 @@
         }
 
         function showSuccessModal(quoteID) {
-            console.log("🎉 showSuccessModal called with quote ID:", quoteID);
+            cbLog("🎉 showSuccessModal called with quote ID:", quoteID);
             const modal = document.getElementById('successModal');
             const referenceNumber = document.getElementById('referenceNumber');
             // CRITICAL: Check if elements exist
@@ -1410,7 +1416,7 @@ You will receive a confirmation email shortly.`);
             modal.style.display = "flex";
             modal.style.opacity = "1";
             modal.style.visibility = "visible";
-            console.log("✅ SUCCESS MODAL DISPLAYED - quoteID:", quoteID);
+            cbLog("✅ SUCCESS MODAL DISPLAYED - quoteID:", quoteID);
             modal.classList.add('active');
         }
 
@@ -1438,7 +1444,7 @@ You will receive a confirmation email shortly.`);
 
             // Check if handlers are already attached
             if (submitBtn.hasAttribute('data-handlers-attached')) {
-                console.log('Submit handlers already attached, skipping');
+                cbLog('Submit handlers already attached, skipping');
                 return;
             }
 
@@ -1473,7 +1479,7 @@ You will receive a confirmation email shortly.`);
             // CRITICAL FIX: Force enable button - user has completed all steps to reach Step 7
             // The submitOrder function itself validates all required fields before submission
             submitBtn.disabled = false;
-            console.log("Submit button handlers attached successfully, button enabled");
+            cbLog("Submit button handlers attached successfully, button enabled");
         }
 
         // Phone number formatting function
@@ -1592,14 +1598,14 @@ You will receive a confirmation email shortly.`);
             // Track user interaction - add listeners for actual user events
             document.addEventListener('click', function() {
                 if (!userHasInteracted) {
-                    console.log('User interaction detected');
+                    cbLog('User interaction detected');
                     userHasInteracted = true;
                 }
             }, { once: true });
 
             document.addEventListener('touchstart', function() {
                 if (!userHasInteracted) {
-                    console.log('User touch interaction detected');
+                    cbLog('User touch interaction detected');
                     userHasInteracted = true;
                 }
             }, { once: true });
@@ -1978,7 +1984,7 @@ You will receive a confirmation email shortly.`);
                 const allStyles = Object.values(PRODUCT_STYLES).flat();
                 const upchargePromises = allStyles.map(style => fetchSizeUpcharges(style));
                 await Promise.all(upchargePromises);
-                console.log('[Size Upcharges] All upcharges fetched:', sizeUpchargeCache);
+                cbLog('[Size Upcharges] All upcharges fetched:', sizeUpchargeCache);
 
                 for (const [category, styles] of Object.entries(PRODUCT_STYLES)) {
                     const categoryProducts = [];
@@ -2014,7 +2020,7 @@ You will receive a confirmation email shortly.`);
                                         );
 
                                         if (isExcluded) {
-                                            console.log(`Excluding ${colorName} for ${style} - known zero inventory`);
+                                            cbLog(`Excluding ${colorName} for ${style} - known zero inventory`);
                                         }
 
                                         return !isExcluded;
@@ -2266,10 +2272,10 @@ You will receive a confirmation email shortly.`);
                 <div class="product-image" ${product.image ? `data-call="openZoomModal" data-args="${JSON.stringify([product.image]).replace(/"/g, '&quot;')}"` : ''}>
                     ${product.image ?
                         `<img src="${product.image}" alt="${product.name}" loading="lazy" data-fallback-src="/placeholder.jpg">` :
-                        `<div class="placeholder"><i class="fas fa-${type === 'jacket' ? 'tshirt' : type === 'hoodie' ? 'hoodie' : 'hat-winter'}"></i></div>`
+                        `<div class="placeholder"><i class="fas fa-${type === 'jacket' ? 'tshirt' : type === 'hoodie' ? 'hoodie' : 'hat-winter'}" aria-hidden="true"></i></div>`
                     }
                     <div class="selected-badge">
-                        <i class="fas fa-check"></i>
+                        <i class="fas fa-check" aria-hidden="true"></i>
                     </div>
                 </div>
                 <div class="product-info">
@@ -2314,7 +2320,7 @@ You will receive a confirmation email shortly.`);
                 setTimeout(() => {
                     const osfaBtn = card.querySelector('.size-btn[data-size="OSFA"]');
                     if (osfaBtn && !card.querySelector('.size-btn.selected')) {
-                        console.log('Auto-selecting OSFA for beanie');
+                        cbLog('Auto-selecting OSFA for beanie');
                         osfaBtn.click();
                     }
                 }, 100);
@@ -2433,7 +2439,7 @@ You will receive a confirmation email shortly.`);
                 // Mark as selected
                 singleSizeBtn.classList.add('selected');
 
-                console.log(`[Auto-Select] ${productType} ${productId}: Auto-selected single size option '${size}'`);
+                cbLog(`[Auto-Select] ${productType} ${productId}: Auto-selected single size option '${size}'`);
 
                 // For beanies with OSFA, we could optionally add visual indicator
                 if (size === 'One Size' || size === 'OSFA') {
@@ -2452,7 +2458,7 @@ You will receive a confirmation email shortly.`);
                 // Mark as selected
                 singleColorSwatch.classList.add('selected');
 
-                console.log(`[Auto-Select] ${productType} ${productId}: Auto-selected single color option '${colorName}'`);
+                cbLog(`[Auto-Select] ${productType} ${productId}: Auto-selected single color option '${colorName}'`);
 
                 // For gloves with only Black Barley
                 if (productType === 'gloves') {
@@ -2467,7 +2473,7 @@ You will receive a confirmation email shortly.`);
                 const selectBtn = card.querySelector('.select-btn');
                 if (selectBtn) {
                     selectBtn.disabled = false;
-                    console.log(`[Auto-Select] ${productType} ${productId}: Product ready for selection with auto-selected options`);
+                    cbLog(`[Auto-Select] ${productType} ${productId}: Product ready for selection with auto-selected options`);
                 }
             }
         }
@@ -2537,7 +2543,7 @@ You will receive a confirmation email shortly.`);
                     }
                 }
 
-                console.log(`[Value Update] ${type} ${product.id} size ${selectedSize}: $${basePrice} + $${upcharge} = $${totalValue}`);
+                cbLog(`[Value Update] ${type} ${product.id} size ${selectedSize}: $${basePrice} + $${upcharge} = $${totalValue}`);
             }
 
             // If this product is already selected, update the saved selection
@@ -2797,9 +2803,9 @@ You will receive a confirmation email shortly.`);
                         const sizeBtn = sizeGrid.querySelector(`.size-btn[data-size="${previouslySelectedSize}"]:not(:disabled)`);
                         if (sizeBtn) {
                             sizeBtn.classList.add('selected');
-                            console.log('Size preserved:', previouslySelectedSize); // Debug log
+                            cbLog('Size preserved:', previouslySelectedSize); // Debug log
                         } else {
-                            console.log('Size not available in new color:', previouslySelectedSize); // Debug log
+                            cbLog('Size not available in new color:', previouslySelectedSize); // Debug log
                         }
 
                         // Update the Select button state after color and size selections
@@ -2836,7 +2842,7 @@ You will receive a confirmation email shortly.`);
 
         // Select Product
         function selectProduct(productId, type) {
-            console.log(`selectProduct called for ${type}: ${productId}`);
+            cbLog(`selectProduct called for ${type}: ${productId}`);
             const card = document.querySelector(`[data-product-id="${productId}"]`);
 
             // For gloves, ensure single color is selected
@@ -2859,7 +2865,7 @@ You will receive a confirmation email shortly.`);
 
             // Check for missing selections
             if ((hasColorOptions && !selectedColor) || (hasSizeOptions && !selectedSize)) {
-                console.log(`${type} validation failed - missing required fields`);
+                cbLog(`${type} validation failed - missing required fields`);
 
                 // Determine specific error message
                 let errorMessage = '';
@@ -2949,7 +2955,7 @@ You will receive a confirmation email shortly.`);
                 const upcharge = upcharges[selectedSize] || 0;
                 itemRetailPrice += upcharge;
 
-                console.log(`[Value Calc] ${type} ${product.id} size ${selectedSize}: base $${itemRetailPrice - upcharge} + upcharge $${upcharge} = $${itemRetailPrice}`);
+                cbLog(`[Value Calc] ${type} ${product.id} size ${selectedSize}: base $${itemRetailPrice - upcharge} + upcharge $${upcharge} = $${itemRetailPrice}`);
             }
 
             // Save selection with full product data
@@ -2962,7 +2968,7 @@ You will receive a confirmation email shortly.`);
                 retailPrice: itemRetailPrice // Store calculated retail price with upcharge
             };
 
-            console.log(`${type} saved successfully:`, selectedItems[type]);
+            cbLog(`${type} saved successfully:`, selectedItems[type]);
 
             // Update button text on all cards of this type
             document.querySelectorAll(`[data-product-type="${type}"] .select-btn`).forEach(btn => {
@@ -3089,12 +3095,12 @@ You will receive a confirmation email shortly.`);
             if (colorSelected && sizeSelected && !isAlreadySelected) {
                 // Check if enough time has passed since page load (3 seconds)
                 if (window.pageLoadTime && Date.now() - window.pageLoadTime > 3000) {
-                    console.log(`Auto-selecting ${productType} since all options are selected`);
+                    cbLog(`Auto-selecting ${productType} since all options are selected`);
                     selectProduct(productId, productType);
                     return; // Exit early since selectProduct will update everything
                 } else {
                     // Don't auto-select during initial page load
-                    console.log(`Skipping auto-select for ${productType} - too soon after page load`);
+                    cbLog(`Skipping auto-select for ${productType} - too soon after page load`);
                 }
             }
 
@@ -3103,12 +3109,12 @@ You will receive a confirmation email shortly.`);
                 selectBtn.disabled = false;
                 selectBtn.classList.remove('disabled-btn');
                 selectBtn.classList.add('select-btn', 'selected');
-                selectBtn.innerHTML = '<i class="fas fa-check-circle"></i> Product Selected';
+                selectBtn.innerHTML = '<i class="fas fa-check-circle" aria-hidden="true"></i> Product Selected';
             } else if (colorSelected && sizeSelected) {
                 selectBtn.disabled = false;
                 selectBtn.classList.remove('disabled-btn');
                 selectBtn.classList.add('select-btn');
-                selectBtn.innerHTML = '<i class="fas fa-check"></i> Select This ' +
+                selectBtn.innerHTML = '<i class="fas fa-check" aria-hidden="true"></i> Select This ' +
                     productType.charAt(0).toUpperCase() + productType.slice(1);
             } else {
                 selectBtn.disabled = true;
@@ -3117,11 +3123,11 @@ You will receive a confirmation email shortly.`);
 
                 // Show what's missing
                 if (!colorSelected && !sizeSelected) {
-                    selectBtn.innerHTML = '<i class="fas fa-exclamation-circle"></i> Select Color & Size First';
+                    selectBtn.innerHTML = '<i class="fas fa-exclamation-circle" aria-hidden="true"></i> Select Color & Size First';
                 } else if (!colorSelected) {
-                    selectBtn.innerHTML = '<i class="fas fa-exclamation-circle"></i> Select Color First';
+                    selectBtn.innerHTML = '<i class="fas fa-exclamation-circle" aria-hidden="true"></i> Select Color First';
                 } else if (!sizeSelected) {
-                    selectBtn.innerHTML = '<i class="fas fa-exclamation-circle"></i> Select Size First';
+                    selectBtn.innerHTML = '<i class="fas fa-exclamation-circle" aria-hidden="true"></i> Select Size First';
                 }
             }
         }
@@ -3177,7 +3183,7 @@ You will receive a confirmation email shortly.`);
                 box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3);
             `;
             errorDiv.innerHTML = `
-                <i class="fas fa-exclamation-circle"></i> ${message}
+                <i class="fas fa-exclamation-circle" aria-hidden="true"></i> ${message}
             `;
 
             // Add to page
@@ -3433,7 +3439,7 @@ You will receive a confirmation email shortly.`);
                 }
 
                 // Log for debugging
-                console.log('Validation failed:', {
+                cbLog('Validation failed:', {
                     step: currentStep,
                     product: productName,
                     hasInteraction: missing.hasInteraction,
@@ -3696,7 +3702,7 @@ You will receive a confirmation email shortly.`);
                 // For PDFs, just show filename
                 document.getElementById('logoPreview').innerHTML = `
                     <div class="pdf-preview">
-                        <i class="fas fa-file-pdf" style="font-size: 3rem; color: #dc2626;"></i>
+                        <i class="fas fa-file-pdf" aria-hidden="true" style="font-size: 3rem; color: #dc2626;"></i>
                         <p>${file.name}</p>
                         <button type="button" data-call="removeLogo" class="btn btn-sm">Remove</button>
                     </div>
@@ -3723,7 +3729,7 @@ You will receive a confirmation email shortly.`);
                 const formData = new FormData();
                 formData.append('file', uniqueFile);
 
-                const response = await fetch('https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/files/upload', {
+                const response = await fetch(CB_API_BASE + '/api/files/upload', {
                     method: 'POST',
                     body: formData
                 });
@@ -3733,7 +3739,7 @@ You will receive a confirmation email shortly.`);
                 }
 
                 const result = await response.json();
-                console.log('File uploaded successfully:', result);
+                cbLog('File uploaded successfully:', result);
 
                 // Return the ExternalKey for storing in the database
                 return result.ExternalKey || result.externalKey || result.id;
@@ -3842,7 +3848,7 @@ You will receive a confirmation email shortly.`);
                 summaryItems.innerHTML = `
                     <div class="summary-empty">
                         <div class="summary-empty-icon">
-                            <i class="fas fa-box-open"></i>
+                            <i class="fas fa-box-open" aria-hidden="true"></i>
                         </div>
                         <div>Start building your gift box</div>
                     </div>
@@ -3882,7 +3888,7 @@ You will receive a confirmation email shortly.`);
                                  alt="Carhartt Work Gloves - ${selectedItems.gloves.selectedColor}"
                                  data-error-id="${gloveImageId}" data-error-icon="fa-mitten">
                             <div class="image-fallback">
-                                <i class="fas fa-mitten"></i>
+                                <i class="fas fa-mitten" aria-hidden="true"></i>
                             </div>
                         </div>
                         <div class="summary-item-details">
@@ -3902,7 +3908,7 @@ You will receive a confirmation email shortly.`);
                                  alt="Carhartt Work Gloves"
                                  data-error-id="${gloveImageId}" data-error-icon="fa-mitten">
                             <div class="image-fallback">
-                                <i class="fas fa-mitten"></i>
+                                <i class="fas fa-mitten" aria-hidden="true"></i>
                             </div>
                         </div>
                         <div class="summary-item-details">
@@ -3955,9 +3961,9 @@ You will receive a confirmation email shortly.`);
                         alt="${item.name} - ${item.selectedColor}"
                         data-error-id="${imageId}" data-error-icon="${fallbackIcon}">
                    <div class="image-fallback">
-                        <i class="fas ${fallbackIcon}"></i>
+                        <i class="fas ${fallbackIcon}" aria-hidden="true"></i>
                    </div>`
-                : `<i class="fas ${fallbackIcon}"></i>`;
+                : `<i class="fas ${fallbackIcon}" aria-hidden="true"></i>`;
 
             return `
                 <div class="summary-item">
@@ -3969,7 +3975,7 @@ You will receive a confirmation email shortly.`);
                         <div class="summary-item-specs">${item.id} • ${type === 'beanie' ? 'OSFA' : (item.selectedSize || 'Size not selected')} • ${item.selectedColor || 'Color not selected'}</div>
                     </div>
                     <div class="summary-item-remove" data-call="removeItem" data-args="${JSON.stringify([type]).replace(/"/g, '&quot;')}">
-                        <i class="fas fa-times"></i>
+                        <i class="fas fa-times" aria-hidden="true"></i>
                     </div>
                 </div>
             `;
@@ -3982,30 +3988,30 @@ You will receive a confirmation email shortly.`);
                 container.classList.add('fallback-active');
             }
             // Log for debugging
-            console.log(`Image failed to load for ${imageId}, showing fallback icon`);
+            cbLog(`Image failed to load for ${imageId}, showing fallback icon`);
         }
 
         // Debug function to verify image selection
         function debugGiftBoxImages() {
-            console.log('=== Gift Box Image Debug ===');
+            cbLog('=== Gift Box Image Debug ===');
             ['jacket', 'hoodie', 'beanie'].forEach(type => {
                 const item = selectedItems[type];
                 if (item) {
-                    console.log(`\n${type.toUpperCase()}:`);
-                    console.log(`  Product: ${item.name} (${item.id})`);
-                    console.log(`  Selected Color: ${item.selectedColor}`);
+                    cbLog(`\n${type.toUpperCase()}:`);
+                    cbLog(`  Product: ${item.name} (${item.id})`);
+                    cbLog(`  Selected Color: ${item.selectedColor}`);
                     if (item.selectedColorData) {
-                        console.log(`  Color Data Available: Yes`);
-                        console.log(`  MAIN_IMAGE_URL: ${item.selectedColorData.MAIN_IMAGE_URL || 'Not available'}`);
-                        console.log(`  FRONT_FLAT: ${item.selectedColorData.FRONT_FLAT || 'Not available'}`);
-                        console.log(`  FRONT_MODEL: ${item.selectedColorData.FRONT_MODEL || 'Not available'}`);
+                        cbLog(`  Color Data Available: Yes`);
+                        cbLog(`  MAIN_IMAGE_URL: ${item.selectedColorData.MAIN_IMAGE_URL || 'Not available'}`);
+                        cbLog(`  FRONT_FLAT: ${item.selectedColorData.FRONT_FLAT || 'Not available'}`);
+                        cbLog(`  FRONT_MODEL: ${item.selectedColorData.FRONT_MODEL || 'Not available'}`);
                     } else {
-                        console.log(`  Color Data Available: No`);
-                        console.log(`  Fallback Image: ${item.image || 'None'}`);
+                        cbLog(`  Color Data Available: No`);
+                        cbLog(`  Fallback Image: ${item.image || 'None'}`);
                     }
                 }
             });
-            console.log('\n=== End Debug ===');
+            cbLog('\n=== End Debug ===');
         }
 
         // Add debug command to window for testing
@@ -4142,7 +4148,7 @@ You will receive a confirmation email shortly.`);
             document.getElementById('referenceNumber').textContent = referenceNumber;
 
             // Here you would normally send this data to your server
-            console.log('Submitting gift box request:', formData);
+            cbLog('Submitting gift box request:', formData);
 
             // Show success modal
             document.getElementById('successModal').classList.add('active');
@@ -4220,7 +4226,7 @@ You will receive a confirmation email shortly.`);
 
         // Programmatically submit a test order with all fields filled
         window.debugSubmitTestOrder = async function() {
-            console.log('=== STARTING AUTOMATED TEST ORDER SUBMISSION ===');
+            cbLog('=== STARTING AUTOMATED TEST ORDER SUBMISSION ===');
 
             // Reset form first
             resetForm();
@@ -4287,7 +4293,7 @@ You will receive a confirmation email shortly.`);
                 }
             };
 
-            console.log('Test order data prepared:', {
+            cbLog('Test order data prepared:', {
                 contact: {
                     name: document.getElementById('firstName').value + ' ' + document.getElementById('lastName').value,
                     email: document.getElementById('email').value,
@@ -4307,8 +4313,8 @@ You will receive a confirmation email shortly.`);
             // Submit the order
             try {
                 await submitOrder();
-                console.log('=== TEST ORDER SUBMITTED SUCCESSFULLY ===');
-                console.log('Quote ID:', window.lastSubmittedQuoteID);
+                cbLog('=== TEST ORDER SUBMITTED SUCCESSFULLY ===');
+                cbLog('Quote ID:', window.lastSubmittedQuoteID);
                 return window.lastSubmittedQuoteID;
             } catch (error) {
                 console.error('Test order submission failed:', error);
@@ -4323,7 +4329,7 @@ You will receive a confirmation email shortly.`);
                 return;
             }
 
-            console.log(`=== CHECKING DATABASE FOR ORDER ${quoteID} ===`);
+            cbLog(`=== CHECKING DATABASE FOR ORDER ${quoteID} ===`);
 
             try {
                 // Query quote_sessions — scoped to the quoteID (anonymous
@@ -4336,32 +4342,32 @@ You will receive a confirmation email shortly.`);
                 const itemsResponse = await fetch(`/api/quote_items?quoteID=${encodeURIComponent(quoteID)}`);
                 const items = await itemsResponse.json();
 
-                console.log('=== DATABASE CHECK RESULTS ===');
-                console.log('Session found:', session ? 'Yes' : 'No');
+                cbLog('=== DATABASE CHECK RESULTS ===');
+                cbLog('Session found:', session ? 'Yes' : 'No');
                 if (session) {
-                    console.log('Session DeliveryDate:', session.DeliveryDate);
-                    console.log('Session DeliveryMethod:', session.DeliveryMethod);
-                    console.log('Session Status:', session.Status);
+                    cbLog('Session DeliveryDate:', session.DeliveryDate);
+                    cbLog('Session DeliveryMethod:', session.DeliveryMethod);
+                    cbLog('Session Status:', session.Status);
                 }
 
-                console.log('Items found:', items.length);
+                cbLog('Items found:', items.length);
                 if (items.length > 0) {
-                    console.log('Item[0] DeliveryDate:', items[0].DeliveryDate);
-                    console.log('Item[0] DeliveryMethod:', items[0].DeliveryMethod);
-                    console.log('Item[0] Shipping_Zip:', items[0].Shipping_Zip);
-                    console.log('Item[0] Shipping_Address:', items[0].Shipping_Address);
-                    console.log('Item[0] Shipping_City:', items[0].Shipping_City);
-                    console.log('Item[0] Shipping_State:', items[0].Shipping_State);
-                    console.log('Item[0] RushOrder:', items[0].RushOrder);
+                    cbLog('Item[0] DeliveryDate:', items[0].DeliveryDate);
+                    cbLog('Item[0] DeliveryMethod:', items[0].DeliveryMethod);
+                    cbLog('Item[0] Shipping_Zip:', items[0].Shipping_Zip);
+                    cbLog('Item[0] Shipping_Address:', items[0].Shipping_Address);
+                    cbLog('Item[0] Shipping_City:', items[0].Shipping_City);
+                    cbLog('Item[0] Shipping_State:', items[0].Shipping_State);
+                    cbLog('Item[0] RushOrder:', items[0].RushOrder);
 
                     // Parse and check bundle configuration
                     try {
                         const bundleConfig = JSON.parse(items[0].BundleConfiguration);
-                        console.log('Bundle Configuration:', bundleConfig);
-                        console.log('- Jacket:', bundleConfig.jacket);
-                        console.log('- Hoodie:', bundleConfig.hoodie);
-                        console.log('- Beanie:', bundleConfig.beanie);
-                        console.log('- Gloves:', bundleConfig.gloves);
+                        cbLog('Bundle Configuration:', bundleConfig);
+                        cbLog('- Jacket:', bundleConfig.jacket);
+                        cbLog('- Hoodie:', bundleConfig.hoodie);
+                        cbLog('- Beanie:', bundleConfig.beanie);
+                        cbLog('- Gloves:', bundleConfig.gloves);
                     } catch (e) {
                         console.error('Could not parse BundleConfiguration');
                     }
@@ -4376,20 +4382,20 @@ You will receive a confirmation email shortly.`);
 
         // Run full test and check
         window.debugFullTest = async function() {
-            console.log('=== RUNNING FULL DEBUG TEST ===');
-            console.log('1. Submitting test order...');
+            cbLog('=== RUNNING FULL DEBUG TEST ===');
+            cbLog('1. Submitting test order...');
 
             const quoteID = await window.debugSubmitTestOrder();
 
             if (quoteID) {
-                console.log('2. Waiting 2 seconds for database...');
+                cbLog('2. Waiting 2 seconds for database...');
                 await new Promise(resolve => setTimeout(resolve, 2000));
 
-                console.log('3. Checking database...');
+                cbLog('3. Checking database...');
                 const dbData = await window.debugCheckOrder(quoteID);
 
-                console.log('4. Test complete. Check the staff dashboard for:', quoteID);
-                console.log('Dashboard URL: /staff-dashboard.html');
+                cbLog('4. Test complete. Check the staff dashboard for:', quoteID);
+                cbLog('Dashboard URL: /staff-dashboard.html');
 
                 return { quoteID, dbData };
             } else {
@@ -4418,52 +4424,52 @@ You will receive a confirmation email shortly.`);
             const submitBtn = document.getElementById('submitBtn');
             const modal = document.getElementById('successModal');
 
-            console.log('=== SPINNER DEBUG INFO ===');
-            console.log('Overlay element exists:', !!overlay);
-            console.log('Overlay has "active" class:', overlay?.classList.contains('active'));
-            console.log('Overlay display style:', overlay?.style.display);
-            console.log('Overlay computed display:', overlay ? window.getComputedStyle(overlay).display : 'N/A');
-            console.log('');
-            console.log('Submission state (isSubmitting):', window.isSubmitting);
-            console.log('Current step:', currentStep);
-            console.log('User has interacted:', userHasInteracted);
-            console.log('');
-            console.log('Submit button exists:', !!submitBtn);
-            console.log('Submit button disabled:', submitBtn?.disabled);
-            console.log('Submit button HTML:', submitBtn?.innerHTML);
-            console.log('Submit button has handlers:', submitBtn?.hasAttribute('data-handlers-attached'));
-            console.log('');
-            console.log('Success modal exists:', !!modal);
-            console.log('Success modal has "active" class:', modal?.classList.contains('active'));
+            cbLog('=== SPINNER DEBUG INFO ===');
+            cbLog('Overlay element exists:', !!overlay);
+            cbLog('Overlay has "active" class:', overlay?.classList.contains('active'));
+            cbLog('Overlay display style:', overlay?.style.display);
+            cbLog('Overlay computed display:', overlay ? window.getComputedStyle(overlay).display : 'N/A');
+            cbLog('');
+            cbLog('Submission state (isSubmitting):', window.isSubmitting);
+            cbLog('Current step:', currentStep);
+            cbLog('User has interacted:', userHasInteracted);
+            cbLog('');
+            cbLog('Submit button exists:', !!submitBtn);
+            cbLog('Submit button disabled:', submitBtn?.disabled);
+            cbLog('Submit button HTML:', submitBtn?.innerHTML);
+            cbLog('Submit button has handlers:', submitBtn?.hasAttribute('data-handlers-attached'));
+            cbLog('');
+            cbLog('Success modal exists:', !!modal);
+            cbLog('Success modal has "active" class:', modal?.classList.contains('active'));
 
             return 'Debug info logged above';
         };
 
         // Force remove spinner
         window.clearSpinner = function() {
-            console.log('=== FORCE CLEARING SPINNER ===');
+            cbLog('=== FORCE CLEARING SPINNER ===');
 
             const overlay = document.getElementById('submissionOverlay');
             if (overlay) {
                 overlay.classList.remove('active');
                 overlay.style.display = 'none';
-                console.log('✓ Overlay "active" class removed');
-                console.log('✓ Overlay display set to "none"');
+                cbLog('✓ Overlay "active" class removed');
+                cbLog('✓ Overlay display set to "none"');
             } else {
-                console.log('✗ Overlay element not found!');
+                cbLog('✗ Overlay element not found!');
             }
 
             window.isSubmitting = false;
-            console.log('✓ isSubmitting set to false');
+            cbLog('✓ isSubmitting set to false');
 
             const submitBtn = document.getElementById('submitBtn');
             if (submitBtn) {
                 submitBtn.disabled = false;
                 submitBtn.classList.remove('processing');
-                submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Order';
-                console.log('✓ Submit button reset');
+                submitBtn.innerHTML = '<i class="fas fa-paper-plane" aria-hidden="true"></i> Submit Order';
+                cbLog('✓ Submit button reset');
             } else {
-                console.log('✗ Submit button not found!');
+                cbLog('✗ Submit button not found!');
             }
 
             return 'Spinner cleared - try submitting again';
@@ -4471,19 +4477,19 @@ You will receive a confirmation email shortly.`);
 
         // Enable detailed submission flow logging
         window.debugSubmissionFlow = function() {
-            console.log('=== ENABLING SUBMISSION FLOW DEBUG ===');
+            cbLog('=== ENABLING SUBMISSION FLOW DEBUG ===');
 
             // Monkey-patch submitOrder to add logging
             const originalSubmitOrder = window.submitOrder;
             window.submitOrder = async function(button) {
-                console.log('📍 submitOrder called');
-                console.log('  - currentStep:', currentStep);
-                console.log('  - isSubmitting:', window.isSubmitting);
-                console.log('  - userHasInteracted:', userHasInteracted);
+                cbLog('📍 submitOrder called');
+                cbLog('  - currentStep:', currentStep);
+                cbLog('  - isSubmitting:', window.isSubmitting);
+                cbLog('  - userHasInteracted:', userHasInteracted);
 
                 try {
                     const result = await originalSubmitOrder.call(this, button);
-                    console.log('📍 submitOrder completed successfully');
+                    cbLog('📍 submitOrder completed successfully');
                     return result;
                 } catch (error) {
                     console.error('📍 submitOrder failed:', error);
@@ -4494,7 +4500,7 @@ You will receive a confirmation email shortly.`);
             // Monkey-patch showSuccessModal to add logging
             const originalShowSuccess = showSuccessModal;
             window.showSuccessModal = function(quoteID) {
-                console.log('📍 showSuccessModal called with quote ID:', quoteID);
+                cbLog('📍 showSuccessModal called with quote ID:', quoteID);
 
                 const modal = document.getElementById('successModal');
                 if (!modal) {
@@ -4504,7 +4510,7 @@ You will receive a confirmation email shortly.`);
 
                 try {
                     originalShowSuccess(quoteID);
-                    console.log('✓ Success modal shown');
+                    cbLog('✓ Success modal shown');
                 } catch (error) {
                     console.error('❌ Error showing success modal:', error);
                 }
@@ -4515,7 +4521,7 @@ You will receive a confirmation email shortly.`);
 
         // Test success modal directly
         window.testSuccessModal = function() {
-            console.log('=== TESTING SUCCESS MODAL ===');
+            cbLog('=== TESTING SUCCESS MODAL ===');
 
             const modal = document.getElementById('successModal');
             if (!modal) {
@@ -4535,17 +4541,17 @@ You will receive a confirmation email shortly.`);
                 return 'Order details element missing';
             }
 
-            console.log('✓ All modal elements found');
+            cbLog('✓ All modal elements found');
 
             // Try to show it with test data
             try {
                 showSuccessModal('TEST-123');
-                console.log('✓ Modal shown with test data');
+                cbLog('✓ Modal shown with test data');
 
                 // Hide it after 3 seconds
                 setTimeout(() => {
                     modal.classList.remove('active');
-                    console.log('✓ Modal hidden');
+                    cbLog('✓ Modal hidden');
                 }, 3000);
 
                 return 'Modal test successful - should be visible now';
@@ -4557,7 +4563,7 @@ You will receive a confirmation email shortly.`);
 
         // Monitor overlay changes
         window.monitorOverlay = function() {
-            console.log('=== MONITORING OVERLAY CHANGES ===');
+            cbLog('=== MONITORING OVERLAY CHANGES ===');
 
             const overlay = document.getElementById('submissionOverlay');
             if (!overlay) {
@@ -4569,11 +4575,11 @@ You will receive a confirmation email shortly.`);
             const observer = new MutationObserver((mutations) => {
                 mutations.forEach((mutation) => {
                     if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
-                        console.log('📍 Overlay class changed:', overlay.className);
-                        console.log('  - Has "active":', overlay.classList.contains('active'));
+                        cbLog('📍 Overlay class changed:', overlay.className);
+                        cbLog('  - Has "active":', overlay.classList.contains('active'));
                     }
                     if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
-                        console.log('📍 Overlay style changed:', overlay.style.cssText);
+                        cbLog('📍 Overlay style changed:', overlay.style.cssText);
                     }
                 });
             });
@@ -4583,9 +4589,9 @@ You will receive a confirmation email shortly.`);
                 attributeFilter: ['class', 'style']
             });
 
-            console.log('✓ Now monitoring overlay changes');
-            console.log('  - Current classes:', overlay.className);
-            console.log('  - Current style:', overlay.style.cssText);
+            cbLog('✓ Now monitoring overlay changes');
+            cbLog('  - Current classes:', overlay.className);
+            cbLog('  - Current style:', overlay.style.cssText);
 
             // Store observer so it can be disconnected
             window.overlayObserver = observer;
@@ -4593,25 +4599,25 @@ You will receive a confirmation email shortly.`);
             return 'Monitoring started - submit an order to see overlay changes';
         };
 
-        console.log('Debug functions loaded. Available commands:');
-        console.log('- window.debugSubmitTestOrder() - Submit a test order');
-        console.log('- window.debugCheckOrder("XMAS####-###") - Check database for an order');
-        console.log('- window.debugFullTest() - Run full test and check');
-        console.log('');
-        console.log('🔍 SPINNER DEBUG COMMANDS:');
-        console.log('- window.debugSpinner() - Check spinner and submission state');
-        console.log('- window.clearSpinner() - Force remove the spinner');
-        console.log('- window.debugSubmissionFlow() - Enable detailed submission logging');
-        console.log('- window.testSuccessModal() - Test if success modal works');
-        console.log('- window.monitorOverlay() - Monitor overlay changes in real-time');
-        console.log('');
-        console.log('🧪 SPINNER FIX TEST COMMANDS:');
-        console.log('- window.testSpinnerFix() - Run comprehensive test suite for the fix');
-        console.log('- window.testExactBugScenario() - Test the exact bug scenario');
+        cbLog('Debug functions loaded. Available commands:');
+        cbLog('- window.debugSubmitTestOrder() - Submit a test order');
+        cbLog('- window.debugCheckOrder("XMAS####-###") - Check database for an order');
+        cbLog('- window.debugFullTest() - Run full test and check');
+        cbLog('');
+        cbLog('🔍 SPINNER DEBUG COMMANDS:');
+        cbLog('- window.debugSpinner() - Check spinner and submission state');
+        cbLog('- window.clearSpinner() - Force remove the spinner');
+        cbLog('- window.debugSubmissionFlow() - Enable detailed submission logging');
+        cbLog('- window.testSuccessModal() - Test if success modal works');
+        cbLog('- window.monitorOverlay() - Monitor overlay changes in real-time');
+        cbLog('');
+        cbLog('🧪 SPINNER FIX TEST COMMANDS:');
+        cbLog('- window.testSpinnerFix() - Run comprehensive test suite for the fix');
+        cbLog('- window.testExactBugScenario() - Test the exact bug scenario');
 
         // Comprehensive test suite for spinner/button fix
         window.testSpinnerFix = function() {
-            console.log('=== RUNNING COMPREHENSIVE SPINNER FIX TESTS ===');
+            cbLog('=== RUNNING COMPREHENSIVE SPINNER FIX TESTS ===');
 
             const results = {
                 passed: [],
@@ -4627,7 +4633,7 @@ You will receive a confirmation email shortly.`);
                 // Simulate the bug condition
                 btn.disabled = true;  // Form validation disables it
                 btn.classList.add('processing');
-                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Processing...';
 
                 // Simulate the fixed finalizeSubmission logic
                 const testFinalize = function() {
@@ -4643,7 +4649,7 @@ You will receive a confirmation email shortly.`);
                         if (btn) {
                             btn.disabled = false;  // THE FIX
                             btn.classList.remove('processing');
-                            btn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Order';
+                            btn.innerHTML = '<i class="fas fa-paper-plane" aria-hidden="true"></i> Submit Order';
                         }
                     } catch (e) {}
                 };
@@ -4696,7 +4702,7 @@ You will receive a confirmation email shortly.`);
 
             // Test 3: Simulate full submission flow with disabled button
             try {
-                console.log('\n--- Test 3: Full submission simulation ---');
+                cbLog('\n--- Test 3: Full submission simulation ---');
                 const btn = document.getElementById('submitBtn');
                 const overlay = document.getElementById('submissionOverlay');
 
@@ -4705,8 +4711,8 @@ You will receive a confirmation email shortly.`);
                 overlay.classList.add('active');  // Spinner showing
                 window.isSubmitting = true;
 
-                console.log('Initial state: button disabled =', btn.disabled);
-                console.log('Initial state: overlay active =', overlay.classList.contains('active'));
+                cbLog('Initial state: button disabled =', btn.disabled);
+                cbLog('Initial state: overlay active =', overlay.classList.contains('active'));
 
                 // Simulate what happens after successful submission
                 overlay.classList.remove('active');
@@ -4714,12 +4720,12 @@ You will receive a confirmation email shortly.`);
                 // Simulate the fixed finalizeSubmission
                 btn.disabled = false;  // THE FIX
                 btn.classList.remove('processing');
-                btn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Order';
+                btn.innerHTML = '<i class="fas fa-paper-plane" aria-hidden="true"></i> Submit Order';
                 window.isSubmitting = false;
 
                 // Verify final state
-                console.log('Final state: button disabled =', btn.disabled);
-                console.log('Final state: overlay active =', overlay.classList.contains('active'));
+                cbLog('Final state: button disabled =', btn.disabled);
+                cbLog('Final state: overlay active =', overlay.classList.contains('active'));
 
                 if (!btn.disabled && !overlay.classList.contains('active')) {
                     results.passed.push('✅ Test 3: Full flow correctly resets button and overlay');
@@ -4746,20 +4752,20 @@ You will receive a confirmation email shortly.`);
 
             // Print results
             setTimeout(() => {
-                console.log('\n=== TEST RESULTS ===');
-                results.passed.forEach(msg => console.log(msg));
-                results.warnings.forEach(msg => console.log(msg));
-                results.failed.forEach(msg => console.log(msg));
+                cbLog('\n=== TEST RESULTS ===');
+                results.passed.forEach(msg => cbLog(msg));
+                results.warnings.forEach(msg => cbLog(msg));
+                results.failed.forEach(msg => cbLog(msg));
 
-                console.log('\nSummary:');
-                console.log(`Passed: ${results.passed.length}`);
-                console.log(`Warnings: ${results.warnings.length}`);
-                console.log(`Failed: ${results.failed.length}`);
+                cbLog('\nSummary:');
+                cbLog(`Passed: ${results.passed.length}`);
+                cbLog(`Warnings: ${results.warnings.length}`);
+                cbLog(`Failed: ${results.failed.length}`);
 
                 if (results.failed.length === 0) {
-                    console.log('\n🎉 All critical tests passed! The fix should work.');
+                    cbLog('\n🎉 All critical tests passed! The fix should work.');
                 } else {
-                    console.log('\n⚠️ Some tests failed. Review the issues above.');
+                    cbLog('\n⚠️ Some tests failed. Review the issues above.');
                 }
             }, 200);
 
@@ -4768,44 +4774,44 @@ You will receive a confirmation email shortly.`);
 
         // Test to verify the exact bug scenario from the console
         window.testExactBugScenario = function() {
-            console.log('=== TESTING EXACT BUG SCENARIO ===');
+            cbLog('=== TESTING EXACT BUG SCENARIO ===');
 
             const btn = document.getElementById('submitBtn');
             const overlay = document.getElementById('submissionOverlay');
 
-            console.log('1. Initial state:');
-            console.log('   - Button disabled:', btn.disabled);
-            console.log('   - Overlay active:', overlay.classList.contains('active'));
+            cbLog('1. Initial state:');
+            cbLog('   - Button disabled:', btn.disabled);
+            cbLog('   - Overlay active:', overlay.classList.contains('active'));
 
-            console.log('\n2. Simulating bug condition (validateForm disables button):');
+            cbLog('\n2. Simulating bug condition (validateForm disables button):');
             btn.disabled = true;  // This is what validateForm does
-            console.log('   - Button disabled:', btn.disabled);
+            cbLog('   - Button disabled:', btn.disabled);
 
-            console.log('\n3. User clicks submit (overlay shows):');
+            cbLog('\n3. User clicks submit (overlay shows):');
             overlay.classList.add('active');
             window.isSubmitting = true;
-            console.log('   - Overlay active:', overlay.classList.contains('active'));
-            console.log('   - isSubmitting:', window.isSubmitting);
+            cbLog('   - Overlay active:', overlay.classList.contains('active'));
+            cbLog('   - isSubmitting:', window.isSubmitting);
 
-            console.log('\n4. Order completes, cleanup runs:');
+            cbLog('\n4. Order completes, cleanup runs:');
             // This is what happens in the success path
             overlay.classList.remove('active');
 
             // THE FIX: finalizeSubmission now includes btn.disabled = false
             btn.disabled = false;  // THIS IS THE NEW LINE THAT FIXES IT
             btn.classList.remove('processing');
-            btn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Order';
+            btn.innerHTML = '<i class="fas fa-paper-plane" aria-hidden="true"></i> Submit Order';
             window.isSubmitting = false;
 
-            console.log('   - Button disabled:', btn.disabled);
-            console.log('   - Overlay active:', overlay.classList.contains('active'));
-            console.log('   - isSubmitting:', window.isSubmitting);
+            cbLog('   - Button disabled:', btn.disabled);
+            cbLog('   - Overlay active:', overlay.classList.contains('active'));
+            cbLog('   - isSubmitting:', window.isSubmitting);
 
             if (!btn.disabled && !overlay.classList.contains('active') && !window.isSubmitting) {
-                console.log('\n✅ SUCCESS: Button is now enabled and ready for next submission!');
+                cbLog('\n✅ SUCCESS: Button is now enabled and ready for next submission!');
                 return true;
             } else {
-                console.log('\n❌ FAILURE: Button still disabled or state incorrect');
+                cbLog('\n❌ FAILURE: Button still disabled or state incorrect');
                 return false;
             }
         };
