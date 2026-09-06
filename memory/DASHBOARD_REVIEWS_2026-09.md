@@ -1050,3 +1050,29 @@ lightbox, Retry on every fetch, honest "locked" metrics). Fixes are hygiene:
     Samples tab focused; detail → focus Close, Esc → back on View. Library live data (proxy): 6 categories,
     29 rows, named links.
 12. Left alone: `window.prompt` for the return condition (staff pattern); `window.confirm` before an art push.
+
+## Jim's Mailing List + Commission Structure — review, 11 items (2026-09-05, `v2026.09.05.66`)
+
+**Jim's Mailing List** (`dashboards/jim-mailing-list.html` + `js/jim-mailing-list.js`) — Jim's page; big type, one job.
+1. 🔴 **Empty screenshot placeholder + "Remove" button visible on every load** — `.jml-ai-thumb-wrap`,
+   `.jml-welcome`, `.jml-filterbar`, `.jml-list-actions` are `display:flex`, which beats the UA `[hidden]`
+   rule; the page had no `[hidden]` guard. One CSS line fixes all four (the welcome row would also have shown
+   an empty portrait when the session lookup failed).
+2. "Your companies / All companies" + the group chips carry `aria-pressed`; list count `role=status`.
+3. Load failure shows the reason + **Try again** (was "Your list could not load."); portrait `error` → `hidden`.
+4. "Choose a screenshot" `<label>` wrapped a hidden file input (unreachable by keyboard) → `for=` + `role=button
+   tabindex=0` + Enter/Space, input visually hidden with a name; icons decorative; banner close typed; `?v=`.
+
+**Commission Structure** (`dashboards/commission-structure.html`, static reference)
+5. **22 inline `style=`** → classes in `commission-structure.css` (`.cs-lead`, `.cs-h3`, `.detail-table .num`,
+   `.cs-mt*`, `.cs-legacy/.cs-new`, `.scenario-icon--danger/ok/warn`).
+6. **Accordion headers were click-only `<div>`s** → `<button type=button aria-expanded aria-controls>`;
+   `toggleAccordion()` keeps `aria-expanded` in step; contents carry ids; button chrome reset in CSS.
+7. 28 icons `aria-hidden`; scenario icon tiles `aria-hidden`; CSS `?v=` (was unversioned); `[hidden]` guard.
+8. Lock: `tests/unit/office-misc-pages.test.js`.
+9. Smoke on static-dist: Jim thumb-wrap `display:none` while hidden (was flex), welcome hidden, 404 → reason +
+   Try again, stubbed → view All pressed + filter bar flex, Mine → filter bar/actions none; Commission 0 inline
+   styles, 3 accordion BUTTONs, click → `aria-expanded` false,true,false, th.num right-aligned.
+10. Left alone: `window.confirm` before delete / Mailchimp sync (deliberate friction).
+11. ⏭️ Next: Volume Quote, Blog Editor, SEO Strategy, then Quote Management + Purchasing Portal + Product
+    Manager + the reference/admin pages.

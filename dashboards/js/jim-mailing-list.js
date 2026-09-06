@@ -86,9 +86,13 @@
         el('jml-mc-sync-engaged').addEventListener('click', mcSyncEngaged);
         el('jml-mc-refresh').addEventListener('click', mcRefresh);
         el('jml-view-mine').addEventListener('click', function () { setView('mine'); });
+        var imgLabel = document.querySelector('.jml-ai-imgbtn');
+        if (imgLabel) imgLabel.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); el('jml-ai-file').click(); }
+        });
         el('jml-view-all').addEventListener('click', function () { setView('all'); });
         var portrait = el('jml-portrait');
-        if (portrait) portrait.addEventListener('error', function () { portrait.style.display = 'none'; });
+        if (portrait) portrait.addEventListener('error', function () { portrait.hidden = true; });
         wireAi();
         loadMe();
         load();
@@ -442,7 +446,8 @@
                 render();
             })
             .catch(function (err) {
-                el('jml-list').innerHTML = '<div class="jml-empty">Your list could not load.</div>';
+                el('jml-list').innerHTML = '<div class="jml-empty" role="alert">Your list could not load (' + esc(err.message || 'request failed') + '). ' +
+                    '<button type="button" class="jml-linkbtn" data-act="retry">Try again</button></div>';
                 DashPage.showError('Could not load the mailing list: ' + err.message + ' — press Refresh or try again.');
             });
     }
@@ -546,6 +551,7 @@
             state.category = ''; state.search = ''; el('jml-search').value = '';
             state.renderLimit = RENDER_STEP; render(); return;
         }
+        if (act === 'retry') { load(); return; }
         if (act === 'viewall') { setView('all'); return; }
         var id = btn.getAttribute('data-id');
         if (act === 'edit') startEdit(id);
@@ -612,6 +618,8 @@
         el('jml-all-count').textContent = '(' + total + ')';
         el('jml-view-mine').classList.toggle('is-active', !isAll);
         el('jml-view-all').classList.toggle('is-active', isAll);
+        el('jml-view-mine').setAttribute('aria-pressed', !isAll ? 'true' : 'false');
+        el('jml-view-all').setAttribute('aria-pressed', isAll ? 'true' : 'false');
         el('jml-list-title-text').textContent = isAll ? 'All companies' : 'Your companies';
         el('jml-list-actions').hidden = !isAll;   // export / labels — full list only
         el('jml-filterbar').hidden = !isAll;       // segment chips + sort — full list only
@@ -662,7 +670,7 @@
 
         el('jml-chips').innerHTML = chips.map(function (c) {
             var active = (state.category || '') === c.cat;
-            return '<button type="button" class="jml-chip' + (active ? ' is-active' : '') + '" data-cat="' + esc(c.cat) + '">' +
+            return '<button type="button" class="jml-chip' + (active ? ' is-active' : '') + '" data-cat="' + esc(c.cat) + '" aria-pressed="' + (active ? 'true' : 'false') + '">' +
                 esc(c.label) + '<span class="jml-chip-n">' + c.n + '</span></button>';
         }).join('');
     }

@@ -15,7 +15,7 @@
     <!-- 2026 design tokens (must load before dash-shell.css) -->
     <link rel="stylesheet" href="/shared_components/css/art-hub.css">
     <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
-    <link rel="stylesheet" href="/dashboards/css/jim-mailing-list.css?v=2026.07.22.7">
+    <link rel="stylesheet" href="/dashboards/css/jim-mailing-list.css?v=2026.09.05.66">
 </head>
 <body>
     <div class="dash-shell">
@@ -29,7 +29,7 @@
             </div>
             <div class="dash-header-right">
                 <a href="/staff-dashboard.html" class="dash-back-link">
-                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                    <i class="fas fa-arrow-left" aria-hidden="true"></i> Back to Dashboard
                 </a>
             </div>
         </header>
@@ -37,14 +37,14 @@
         <main class="dash-content">
             <!-- Visible error (Erik's #1 rule — never a silent failure) -->
             <div class="dash-error-banner" role="alert">
-                <i class="fas fa-exclamation-triangle"></i>
+                <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
                 <span class="dash-error-banner-message"></span>
-                <button class="dash-error-banner-close" aria-label="Dismiss"><i class="fas fa-times"></i></button>
+                <button type="button" class="dash-error-banner-close" aria-label="Dismiss"><i class="fas fa-times" aria-hidden="true"></i></button>
             </div>
 
             <!-- Green "saved!" confirmation -->
             <div class="jml-ok" id="jml-ok" role="status" aria-live="polite" hidden>
-                <i class="fas fa-check-circle"></i> <span id="jml-ok-text">Saved!</span>
+                <i class="fas fa-check-circle" aria-hidden="true"></i> <span id="jml-ok-text">Saved!</span>
             </div>
 
             <div class="jml-welcome" id="jml-welcome" hidden>
@@ -71,10 +71,10 @@
                 <textarea id="jml-ai-text" rows="4" placeholder="Paste the company name, address, phone, email…"></textarea>
 
                 <div class="jml-ai-image-row">
-                    <label class="jml-ai-imgbtn">
+                    <label class="jml-ai-imgbtn" for="jml-ai-file" role="button" tabindex="0">
                         <i class="fas fa-image" aria-hidden="true"></i> Choose a screenshot
-                        <input type="file" id="jml-ai-file" accept="image/*" hidden>
                     </label>
+                    <input type="file" id="jml-ai-file" accept="image/*" class="jml-visually-hidden" aria-label="Choose a screenshot">
                     <span class="jml-ai-orpaste">…or press <kbd>Ctrl</kbd> + <kbd>V</kbd> to paste a screenshot</span>
                 </div>
                 <div id="jml-ai-thumb-wrap" class="jml-ai-thumb-wrap" hidden>
@@ -181,11 +181,11 @@
             <!-- THE LIST -->
             <section class="jml-list-section">
                 <div class="jml-viewtoggle" role="group" aria-label="Which companies to show">
-                    <button type="button" class="jml-viewbtn" id="jml-view-mine" data-view="mine">Your companies <span class="jml-view-n" id="jml-mine-count"></span></button>
-                    <button type="button" class="jml-viewbtn" id="jml-view-all" data-view="all">All companies <span class="jml-view-n" id="jml-all-count"></span></button>
+                    <button type="button" class="jml-viewbtn" id="jml-view-mine" data-view="mine" aria-pressed="false">Your companies <span class="jml-view-n" id="jml-mine-count"></span></button>
+                    <button type="button" class="jml-viewbtn" id="jml-view-all" data-view="all" aria-pressed="false">All companies <span class="jml-view-n" id="jml-all-count"></span></button>
                 </div>
                 <div class="jml-list-head">
-                    <h2 class="jml-list-title"><span id="jml-list-title-text">Your companies</span> <span class="jml-count" id="jml-count"></span></h2>
+                    <h2 class="jml-list-title"><span id="jml-list-title-text">Your companies</span> <span class="jml-count" id="jml-count" role="status"></span></h2>
                     <div class="jml-search-wrap">
                         <i class="fas fa-search" aria-hidden="true"></i>
                         <input type="search" id="jml-search" placeholder="Search" aria-label="Search the list">
@@ -235,6 +235,6 @@
     <script src="/config/app.config.js"></script>
     <script src="/shared_components/js/fetch-timeout.js"></script>
     <script src="/shared_components/js/dash-page-helpers.js"></script>
-    <script src="/dashboards/js/jim-mailing-list.js?v=2026.07.22.7"></script>
+    <script src="/dashboards/js/jim-mailing-list.js?v=2026.09.05.66"></script>
 </body>
 </html>

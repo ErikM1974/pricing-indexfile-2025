@@ -774,3 +774,23 @@
         display: block;
     }
 }
+
+/* 2026-09-05 review — inline style= moved here (Rule 3) */
+[hidden] { display: none !important; }
+.cs-lead { margin: 0 0 18px; color: var(--text-muted, #64748b); line-height: 1.6; }
+.cs-lead--tight { margin-bottom: 14px; }
+.cs-h3 { margin: 26px 0 10px; font-size: 1.05rem; }
+.table-wrapper { overflow-x: auto; }
+.detail-table { width: 100%; border-collapse: collapse; }
+.detail-table th, .detail-table td { padding: 8px; text-align: left; }
+.detail-table .num { text-align: right; }
+.cs-mt-16 { margin-top: 16px; }
+.cs-mt { margin-top: 1.25rem; }
+.cs-mt-lg { margin-top: 1.5rem; }
+.cs-legacy { color: #981e32; }
+.cs-new { color: #10b981; }
+.scenario-icon--danger { background: #fee2e2; color: #991b1b; }
+.scenario-icon--ok { background: #d1fae5; color: #065f46; }
+.scenario-icon--warn { background: #fef3c7; color: #92400e; }
+button.accordion-header { width: 100%; font: inherit; color: inherit; text-align: left; }
+.accordion-header:focus-visible { outline: 2px solid var(--art-theme, #981e32); outline-offset: 2px; }
