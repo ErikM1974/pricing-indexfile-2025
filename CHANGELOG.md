@@ -1,3 +1,9 @@
+## v2026.09.06.40 (2026.09.06)
+
+- Memory: calculator console + CSP batch recorded (v2026.09.06.39)
+- Fix 7 API URLs whose template literal was lost in the S3 host rewrite (DTF calculator 404s), inventory widget message for non-SanMar styles, DTG grid note
+- Deploy v2026.09.06.40: DTF calculator URLs restored, inventory message for non-SanMar styles
+
 ## v2026.09.06.39 (2026.09.06)
 
 - Memory: console sweep + root-duplicate findings recorded (v2026.09.06.37); Names & Numbers LESSONS entry archived
