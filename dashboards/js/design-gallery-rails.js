@@ -38,13 +38,13 @@
         opts = opts || {};
         var nav = opts.nav === false ? '' :
             '<div class="dg-rail-nav">'
-            + '<button type="button" class="dg-rail-btn" data-rail-scroll="-1" data-rail="' + id + '" aria-label="Scroll left"><i class="fas fa-chevron-left"></i></button>'
-            + '<button type="button" class="dg-rail-btn" data-rail-scroll="1" data-rail="' + id + '" aria-label="Scroll right"><i class="fas fa-chevron-right"></i></button>'
+            + '<button type="button" class="dg-rail-btn" data-rail-scroll="-1" data-rail="' + id + '" aria-label="Scroll left"><i class="fas fa-chevron-left" aria-hidden="true"></i></button>'
+            + '<button type="button" class="dg-rail-btn" data-rail-scroll="1" data-rail="' + id + '" aria-label="Scroll right"><i class="fas fa-chevron-right" aria-hidden="true"></i></button>'
             + '</div>';
         var extra = opts.action || '';
         return '<section class="dg-rail" data-rail-section="' + id + '">'
             + '<div class="dg-rail-head">'
-            + '<h2><i class="fas ' + icon + '"></i> ' + DG.esc(title) + '</h2>'
+            + '<h2><i aria-hidden="true" class="fas ' + icon + '"></i> ' + DG.esc(title) + '</h2>'
             + (sub ? '<span class="dg-rail-sub">' + DG.esc(sub) + '</span>' : '')
             + extra + nav
             + '</div>'
@@ -150,7 +150,7 @@
     function wallSection() {
         return railHTML('wall', 'fa-shapes', "Today's wall", WALL_COUNT + ' designs, reshuffled every morning', wallHTML(), {
             nav: false,
-            action: '<button type="button" class="dash-btn dg-rail-shuffle" data-shuffle="1"><i class="fas fa-shuffle"></i> Shuffle</button>'
+            action: '<button type="button" class="dash-btn dg-rail-shuffle" data-shuffle="1"><i class="fas fa-shuffle" aria-hidden="true"></i> Shuffle</button>'
         });
     }
 

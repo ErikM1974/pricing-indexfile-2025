@@ -1689,3 +1689,10 @@ mark.dg-mark {
     width: 100%;
     border-radius: var(--radius-sm);
 }
+
+/* 2026-09-05 review — layout values via custom properties (no inline style=), pressed-state chrome */
+.dg-boot-bar { width: var(--w, 8%); }
+.dg-spacer { height: var(--h, 0px); }
+.dg-grid-viewport { overflow-anchor: none; }
+.dg-grid img.is-blank { visibility: hidden; }
+.dg-pill:focus-visible, .dg-chip:focus-visible, .dg-density-btn:focus-visible, .dg-customer-btn:focus-visible, .dg-freshness:focus-visible { outline: 2px solid var(--dash-theme, #0a8a1f); outline-offset: 2px; }

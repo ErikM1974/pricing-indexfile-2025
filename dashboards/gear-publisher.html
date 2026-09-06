@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
     <link rel="stylesheet" href="/shared_components/css/art-hub.css?v=2026.08.08.1">
     <link rel="stylesheet" href="/shared_components/css/dash-shell.css?v=2026.08.13.2">
-    <link rel="stylesheet" href="/dashboards/css/gear-publisher.css?v=2026.08.07.1">
+    <link rel="stylesheet" href="/dashboards/css/gear-publisher.css?v=2026.09.05.61">
 </head>
 <body>
 <div class="dash-shell">
@@ -35,7 +35,7 @@
 
     <main class="dash-content">
         <ol class="gp-rail" aria-label="Steps">
-            <li data-step="identity">1 Design</li>
+            <li data-step="identity" aria-current="step">1 Design</li>
             <li data-step="products">2 Garments</li>
             <li data-step="photos">3 Photos</li>
             <li data-step="story">4 Story</li>
@@ -57,13 +57,13 @@
                 <span>Paste or choose a ShopWorks screenshot</span>
                 <input type="file" id="gp-screenshot" accept="image/*">
             </label>
-            <p id="gp-ocr-status" class="gp-muted"></p>
+            <p id="gp-ocr-status" role="status" class="gp-muted"></p>
 
             <label class="gp-field">
                 <span>ShopWorks design number <em>(required)</em></span>
                 <input type="text" id="gp-designNumber" inputmode="numeric" placeholder="34293" maxlength="6">
             </label>
-            <p id="gp-dup-status" class="gp-muted"></p>
+            <p id="gp-dup-status" role="status" class="gp-muted"></p>
 
             <label class="gp-field">
                 <span>Design name <em>(required)</em></span>
@@ -90,7 +90,7 @@
             <div id="gp-color-list" class="gp-check-grid"></div>
             <h3>Sizes</h3>
             <div id="gp-size-list" class="gp-check-grid"></div>
-            <p id="gp-counter" class="gp-counter"></p>
+            <p id="gp-counter" role="status" class="gp-counter"></p>
         </section>
 
         <!-- Step 3 — the photo grid IS the variant-to-image binding surface. -->
@@ -114,7 +114,7 @@
                     Refresh collection rules
                 </button>
             </div>
-            <div id="gp-classify-result"></div>
+            <div id="gp-classify-result" role="status"></div>
         </section>
 
         <!-- Step 4 — copy. Hook and body are separate so a rewrite can't lose the hook. -->
@@ -134,12 +134,12 @@
                 <label class="gp-field gp-field--sm"><span>Sources</span><input type="text" id="gp-fact-sources"></label>
             </div>
             <button type="button" id="gp-draft-btn" class="dash-btn">Draft the description</button>
-            <p id="gp-copy-status" class="gp-muted"></p>
+            <p id="gp-copy-status" role="status" class="gp-muted"></p>
 
             <label class="gp-field"><span>Hook — one line, shown under the price</span>
                 <input type="text" id="gp-hook"></label>
             <label class="gp-field"><span>Body</span><textarea id="gp-body" rows="12"></textarea></label>
-            <p id="gp-wordcount" class="gp-muted">0 / 200 words</p>
+            <p id="gp-wordcount" role="status" class="gp-muted">0 / 200 words</p>
         </section>
 
         <!-- Step 5 — build the draft, then the audit decides whether Publish lights up. -->
@@ -153,12 +153,12 @@
 
             <div id="gp-job-panel" class="gp-job" hidden>
                 <h3>Build progress</h3>
-                <div id="gp-job-body"></div>
+                <div id="gp-job-body" role="status" aria-live="polite"></div>
                 <div class="gp-row">
                     <button type="button" id="gp-publish-btn" class="dash-btn dash-btn--primary" disabled>
                         Publish to 253gear
                     </button>
-                    <span id="gp-publish-reason" class="gp-muted"></span>
+                    <span id="gp-publish-reason" role="status" class="gp-muted"></span>
                 </div>
             </div>
         </section>
@@ -168,7 +168,7 @@
             <div id="gp-live" hidden><div id="gp-live-body"></div></div>
         </section>
 
-        <div id="gp-blockers" class="gp-blockers"></div>
+        <div id="gp-blockers" class="gp-blockers" role="status" aria-live="polite"></div>
         <div class="gp-nav">
             <button type="button" id="gp-back-btn" class="dash-btn dash-btn--ghost">Back</button>
             <button type="button" id="gp-next-btn" class="dash-btn">Next</button>
@@ -179,8 +179,8 @@
 <script src="/config/app.config.js?v=2026.09.03.11"></script>
 <script src="/shared_components/js/fetch-timeout.js?v=2026.08.08.1"></script>
 <script src="/shared_components/js/dash-page-helpers.js?v=2026.08.08.1"></script>
-<script src="/dashboards/js/gear-publisher-store.js?v=2026.08.07.1"></script>
-<script src="/dashboards/js/gear-publisher-images.js?v=2026.08.07.1"></script>
-<script src="/dashboards/js/gear-publisher.js?v=2026.08.07.1"></script>
+<script src="/dashboards/js/gear-publisher-store.js?v=2026.09.05.60"></script>
+<script src="/dashboards/js/gear-publisher-images.js?v=2026.09.05.61"></script>
+<script src="/dashboards/js/gear-publisher.js?v=2026.09.05.61"></script>
 </body>
 </html>
