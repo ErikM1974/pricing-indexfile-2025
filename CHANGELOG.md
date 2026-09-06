@@ -1,3 +1,8 @@
+## v2026.09.05.53 (2026.09.05)
+
+- Steve's Queue review: 16 items — art rate from Service_Codes GRT-75 (18 hardcoded $75 sites, visible fallback), Rule 3 onerror/style cleanup, aria-pressed chips (active toggles to All), card keyboard paths, labelled dialogs with focus return + Esc (notes/approval/image/broken-mockups/art-time), hidden-attr states, calendar due dates
+- Deploy v2026.09.05.53: Steve's Queue review (16 items)
+
 ## v2026.09.05.51 (2026.09.05)
 
 - Production Shifts + Roland Supplies review: 9 items — production React builds (dev builds shipped since launch), keyboard row buttons, aria-pressed chips/cards, detail panel dialog (focus/Esc/return, stable onClose), type=button everywhere, Roland icons decorative
