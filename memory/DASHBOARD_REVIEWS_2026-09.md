@@ -980,3 +980,41 @@ lightbox, Retry on every fetch, honest "locked" metrics). Fixes are hygiene:
 
 **Art workspace done (2026-09-05):** Steve `.53`, Ruth `.55`, Design Queue + Monogram + Names & Numbers
 `.57`, Digitized + Old Designs `.59`, Vault + Publisher `.60`. Next: Office workspace.
+
+## SanMar Payables — review, 14 items (2026-09-05, `v2026.09.05.62`) — Office workspace begins
+
+`dashboards/sanmar-payables.html` + `js/sanmar-payables.js` (586) + the SHARED `sanmar-invoice-viewer.js`
+(also loaded by purchasing-portal + ae-mission-control).
+
+1. 🔴 **UTC "today"** — `todayIso()` / `isoDaysAgo()` used `toISOString().slice(0,10)`. After 5 PM Pacific
+   that is tomorrow: the default To-date, the 90-day From-date and the **import-stamp date** written when
+   Erik clicks "Mark imported" were all a day ahead every evening. Confirmed on static-dist at 8 PM:
+   UTC said 2026-09-06, the page now says 2026-09-05. → `localIso()`.
+2. 🔴 **Imported cross-reference failure was silent** — `loadImports().catch(() => { importsLoaded = true; render })`:
+   if `/api/staff/sanmar-invoices/imports` failed, every open invoice rendered **NOT IMPORTED** and looked
+   like fresh work to re-import. Now the status line says "⚠ Imported status unavailable (HTTP …) — every row
+   shows as not imported" with a Retry (Erik's #1 rule).
+3. 🐛 **Load-error row was overwritten** — the invoices error row was replaced by "No open SanMar payables in
+   this date range" as soon as the imports/ShopWorks feeds landed and re-rendered the table (found during
+   smoke). `state.loadError` now keeps the error + Retry row until a load succeeds.
+4. Retry on both tabs' failures (messages said "refresh to retry"); banner text without the refresh advice.
+5. Tabs = real tablist: `aria-selected`, roving tabindex, `aria-controls`, ArrowLeft/Right; panels `aria-labelledby`.
+6. "Open payables" / "Not imported yet" tiles → filter buttons synced with the Show select (`aria-pressed`);
+   click the active one → back to "Not imported & unpaid"; disabled until the cross-reference has loaded.
+7. Upload `<label for=file>` → `role=button tabindex=0` + Enter/Space; View buttons named per invoice
+   ("View SanMar invoice 161194119").
+8. Status regions: sw-status, updated, older-hint, mkt-updated, projnote, selected count; marketing bar is a
+   `role=progressbar` with live `aria-valuenow`; bar + month bars via `--w` (no `.style.width`).
+9. 32 icons `aria-hidden`; banner close `type=button`; `[hidden]` guard; `?v=` on css/js/viewer.
+10. **Shared viewer**: title said **"SanMar Invoice — WO #undefined"** whenever a page opened it by PO only
+    (Payables always does) → "PO 114323" when there is no WO; `aria-labelledby`; focus → Close, returns to the
+    View button (`returnFocus` option); Esc only when open; icons decorative. All three consumers now load
+    the same `?v=` (they were on two different versions).
+11. Lock: `tests/unit/sanmar-payables-page.test.js`.
+12. Smoke on static-dist: 404 → error row + Retry AND the imports warning + Retry; stubbed data → 2 rows,
+    "1 marked imported (your log)", CR-005820956 matched via zero-strip, "Open payables" tile → filter open /
+    2 rows, again → needimport / 1 row; viewer title "PO 114323", focus Close, Esc → back on View; ArrowRight →
+    Marketing tab selected/focused, bar `--w` 4.3% + valuenow 4, month bar `--w`.
+13. Left alone: the 2026 marketing allotment default ($35,110.95) typed in JS — it is editable on the tab and
+    is an allotment, not a price; the 15-min ODBC feed silence when empty (documented "optional" by design).
+14. ⏭️ Purchasing Portal + AE Mission Control carry the viewer change — smoke both when their turn comes.
