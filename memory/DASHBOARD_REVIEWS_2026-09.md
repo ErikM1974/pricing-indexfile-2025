@@ -1272,3 +1272,23 @@ Lock: `tests/unit/public-cart-header-pages.test.js`.
 
 **Left alone** — `sample-cart-page.js` keeps 8 inline `style=` in item templates (spacing/colour only); `product/js/decoration-selector.js` is an ORPHAN (already flagged 2026-06-11, 9 bare icons + injected styles — delete, don't fix); `cart.js` is flagged dead since 2026-06-11 but is still loaded by `dtg-compatible-products.html` (the universal header reads the sample-cart localStorage itself) — candidate for removal from that page; quote-cart `r.ok ? json : null` on the size lookup falls back to the item's own sizes (no wrong data).
 
+---
+
+# CALCULATORS (staff) — Rule 3 extraction sweep, begins 2026-09-06
+
+## Screen Print Pricing calculator — 9 items (2026-09-06, `v2026.09.06.9`)
+
+Lock: `tests/unit/screen-print-pricing-page.test.js`. Erik: "fix the inline scripts on screen-print-pricing too … keep going until you are 100 percent satisfied."
+
+1. **Rule 3** — 1,100-line inline `<style>` → `calculators/css/screen-print-pricing.css`; two inline `<script>` blocks (447 + 410 lines) → `calculators/js/screen-print-pricing-product.js` (before `pricing-pages.js`, order locked) and `…-page.js` (after `screenprint-pricing-v2.js`). Both wrapped in IIFEs; nothing outside used their functions (checked).
+2. 🔴 **Proxy host hardcoded** in the product-details fetch → `APP_CONFIG.API.BASE_URL` (page now loads `/config/app.config.js` first; missing config → console.error, no guessed host).
+3. **67 `console.log` lines** → `spLog`, gated to localhost / `?debug=1` (the `SCREENPRINT_API_TEST` / `SCREENPRINT_DEBUG` console helpers survive, gated).
+4. **Six `style="display:none"` regions** → `hidden` + guard; 14 `.style.display` toggles → `.hidden`; the size-upcharge panel's 7-property "force visibility" hack (visibility/opacity/zIndex/…) removed.
+5. **Swatch colours** via `--swatch` (was 3 inline background props per swatch ×82).
+6. `alert('Failed to load manual pricing mode')` → inline `role=alert` card with the reason.
+7. Template inline styles/icons → classes (`.sp-placeholder-icon`, `.sp-upcharge-icon`, `.sp-upcharge-empty`); 9 icons decorative.
+8. **22 unversioned shared CSS/JS assets** → `?v=`.
+9. Verified on static-dist: hero, product image, 2 thumbnails, 82 swatches with computed `--swatch` backgrounds, prices ($2.00/$75/$50), calculator + debug objects present, no console errors.
+
+**Not a regression, pre-existing:** `#sp-size-upcharges-container` is empty/hidden on LIVE too (the v2 calculator renders its own upcharge info) — the panel code is effectively dormant. **Left alone (next batch):** the remaining 22 bare icons / 19 inline styles / 2 injected `<style>` blocks on this page come from SHARED components — `screenprint-pricing-v2.js`, `calculator-inventory.js` (whose inventory IIFE is ALSO duplicated inside `pricing-pages.js` — two identical `<style>` injections), `universal-header-component.js`.
+
