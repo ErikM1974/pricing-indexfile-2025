@@ -1,3 +1,9 @@
+## v2026.09.06.6 (2026.09.06)
+
+- LESSONS: customer-facing sweep 2026-09-06 entry
+- Delete dead public files: pages/webstore-info.html (+ extracted css/js; every route 301s to /company-webstores) and orphan product/js/decoration-selector.js; correct the cart.js ACTIVE_FILES row (runtime-loaded by pricing-pages.js, not dead)
+- Deploy v2026.09.06.6: delete dead public files (webstore-info trio, decoration-selector) — no cache-bust changes
+
 ## v2026.09.06.5 (2026.09.06)
 
 - Public pages review B5: universal cart header <style> → stylesheet + link indicator, sample-cart APP_CONFIG host + hidden toggles + delegated controls + escaping, quote-cart no fallback host, PDP modules (print listener, --swatch, drawer close named); lock public-cart-header-pages.test.js
