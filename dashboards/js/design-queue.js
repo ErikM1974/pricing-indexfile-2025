@@ -33,15 +33,41 @@
     var state = { data: null, filter: 'all' };
 
     document.addEventListener('DOMContentLoaded', function () {
+        boot();
+        // The verdict tiles filter the queue, same as the chips.
+        document.querySelectorAll('.dq-stat-btn').forEach(function (b) {
+            b.addEventListener('click', function () {
+                var key = b.dataset.filter;
+                state.filter = (state.filter === key) ? 'all' : key;
+                renderFilters();
+                renderQueue();
+                var card = document.getElementById('queue-root');
+                if (card && state.filter !== 'all') card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+        });
+    });
+
+    function boot() {
         load().catch(function (err) {
             console.error('[design-queue] load failed:', err);
             // Never fall back to stale or invented rows — a wrong queue sends Steve
             // to draw the wrong thing, which costs a day.
-            DashPage.showError('Unable to load the design queue. Refresh, and if it persists the data file may not have deployed.');
-            setText('queue-root', '');
-            setText('catalogue-root', '');
+            DashPage.showError('Unable to load the design queue (' + (err.message || err) + '). If it persists the data file may not have deployed.');
+            ['queue-root', 'catalogue-root'].forEach(function (id) {
+                var n = document.getElementById(id);
+                if (!n) return;
+                n.classList.remove('dash-loading');
+                n.innerHTML = '';
+                var wrap = el('div', 'dq-empty');
+                wrap.appendChild(document.createTextNode('Could not load the queue (' + (err.message || err) + '). '));
+                var retry = el('button', 'dq-refresh', 'Retry');
+                retry.type = 'button';
+                retry.addEventListener('click', function () { DashPage.hideError(); boot(); });
+                wrap.appendChild(retry);
+                n.appendChild(wrap);
+            });
         });
-    });
+    }
 
     async function load() {
         var res = await fetch(DATA_URL + '?v=' + Date.now(), { cache: 'no-store' });
@@ -124,6 +150,10 @@
                 renderQueue();
             });
             root.appendChild(b);
+        });
+        // Keep the verdict tiles in step with the chips.
+        document.querySelectorAll('.dq-stat-btn').forEach(function (t) {
+            t.setAttribute('aria-pressed', String(state.filter === t.dataset.filter));
         });
     }
 
@@ -224,21 +254,6 @@
         d.appendChild(a);
 
         return d;
-    }
-
-    function heldBy(r) {
-        var map = {
-            nothing: 'Nothing indexable about this at all — the seat is completely empty.',
-            'social-post': 'The best result is a social post. Nobody has written the page.',
-            forum: 'A forum thread is the best that exists.',
-            'local-blog-or-archive': 'A local blog or archive got there first. Winnable only with something they do not have.',
-            news: 'A news outlet already told this story.',
-            wikipedia: 'An encyclopedia owns the subject.',
-            marketplace: 'Etsy, Redbubble or Amazon own this term. We lose on their turf.',
-            'national-brand': 'A national brand owns the name.',
-            'unrelated-collision': 'The name collides with something bigger — it cannot rank whatever we do.'
-        };
-        return map[r.competitorType] || '';
     }
 
     function renderCatalogue(data) {

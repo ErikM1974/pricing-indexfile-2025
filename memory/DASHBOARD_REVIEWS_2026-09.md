@@ -877,3 +877,42 @@ tablist semantics, cards showed **OVERDUE on the due date itself**.
 15. Left alone: kanban column-header collapse is a click-only div (same on Steve's board — kanban.css
     shared; a future kanban pass); `pollNotifications` still polls as Ruth (`user=ruth@…`) — the
     notifications ARE for Ruth's queue regardless of who is looking.
+
+## Design Queue + Monogram Dashboard + Names & Numbers Dashboard — review, 22 items (2026-09-05, `v2026.09.05.56`)
+
+Three small Art-workspace pages shipped in one deploy.
+
+**Design Queue** (`dashboards/design-queue.html` + `js/design-queue{,-briefs,-metrics}.js`) — already the
+best-built page in the workspace (createElement only, `aria-pressed` chips, honest "locked" metrics blocks).
+1. Verdict tiles (Ready to draw / Research first / Skip) → filter **buttons** synced two-way with the chips;
+   click the active tile to clear; scrolls to the queue.
+2. Every load failure now carries a **Retry**: queue (`boot()` re-runs `load()` + hides the banner), briefs
+   (`load(root)`), store metrics (`load(true)`). Messages include the reason.
+3. Icons `aria-hidden` (5 bare), banner close `type=button`, loading roots `role=status`, dead `heldBy()` removed,
+   `[hidden]` guard. Lock: `tests/unit/design-queue-page.test.js`.
+
+**Monogram Dashboard** (`dashboards/monogram-dashboard.html` + `shared_components/js/monogram-dashboard.js`)
+4. 🔴 **5 inline `onkeyup=`/`onchange=` handlers** (Rule 3) → `input` (debounced) / `change` listeners.
+5. 🔴 **Date filter compared UTC days** — `new Date(CreatedAt).toISOString().split('T')[0]`: an order created
+   at 6 PM Pacific fell on the NEXT day's From/To filter. Now `localYmd()` (local calendar day).
+6. `response.ok` checked before `.json()` on load / mark-printed / delete (a 500 used to surface as a JSON
+   parse error); failure toasts + the load error carry the reason; load error has Retry (no inline style).
+7. **Contact bar showed `orders@prior2.com`** — a foreign template leftover on an NWCA staff page → `sales@nwcustomapparel.com`.
+8. Labels `for=` (5), `type=search`, icon-only action buttons named per order ("Delete order 140458"),
+   `type=button` on all 7 buttons, `resultCount` `role=status` + table `aria-describedby`, breadcrumb labelled,
+   `robots noindex` (was missing), inline `style=` → `.td-center` / `.breadcrumb-sep` / `.retry-btn`,
+   `btn.style.opacity` → `:disabled` CSS, toasts announce.
+
+**Names & Numbers Dashboard** (`dashboards/names-numbers-dashboard.html` + `shared_components/js/names-numbers-dashboard.js`)
+9. KPI tiles → **status filter buttons** (`aria-pressed`, synced with the Status select; Total or the active tile clears).
+10. **Filter as you type** (search + rep, debounced) and on Status change — the Filter button stays.
+11. Rows `role=link tabindex=0 aria-label="Open roster …"` + Enter/Space (click = delegator `data-href`).
+12. Load failure → reason + **Retry** (`data-call="dashboard.loadAll"`); result count `role=status`.
+13. Edit link / Delete button named per roster (were icon-only); labels `for=`; inline `style=` → CSS;
+    icons `aria-hidden`; `OrderNumber` escaped; toast `role=status aria-live`.
+14. Lock for both: `tests/unit/art-small-pages.test.js`.
+
+Smoke on static-dist: DQ tile → 3 rows + chip synced, chip Skip → tile synced; metrics 404 → notice + Retry.
+Monogram (real proxy data): typing "zzzz" → "No monogram orders match these filters", future From date → No
+results; 0 handlers / inline styles / bare icons / untyped buttons. N&N: Submitted tile → select=Submitted,
+5 rows; Draft → empty message; Clear → Total pressed; row role=link with name.

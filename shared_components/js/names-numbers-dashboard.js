@@ -22,8 +22,34 @@ class NamesNumbersDashboard {
     bindEvents() {
         document.getElementById('filterBtn').addEventListener('click', () => this.applyFilters());
         document.getElementById('clearFilterBtn').addEventListener('click', () => this.clearFilters());
-        document.getElementById('filterSearch').addEventListener('keydown', e => {
-            if (e.key === 'Enter') this.applyFilters();
+        // Filter as you type / change — the Filter button stays for people who expect it.
+        let timer = null;
+        ['filterSearch', 'filterRep'].forEach(id => {
+            document.getElementById(id).addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(() => this.applyFilters(), 150); });
+        });
+        document.getElementById('filterStatus').addEventListener('change', () => this.applyFilters());
+        // KPI tiles set the Status filter (click the active one, or Total, to clear)
+        document.querySelectorAll('.kpi-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const sel = document.getElementById('filterStatus');
+                const status = btn.dataset.status || '';
+                sel.value = (sel.value === status) ? '' : status;
+                this.applyFilters();
+            });
+        });
+        // Rows are role=link (click is the delegator's data-href) — Enter/Space open them too
+        document.getElementById('dashboardBody').addEventListener('keydown', e => {
+            if (e.key !== 'Enter' && e.key !== ' ') return;
+            if (e.target.closest('a, button')) return;
+            const row = e.target.closest('tr[data-href]');
+            if (row) { e.preventDefault(); window.location.href = row.dataset.href; }
+        });
+    }
+
+    syncKpis() {
+        const status = document.getElementById('filterStatus').value;
+        document.querySelectorAll('.kpi-btn').forEach(btn => {
+            btn.setAttribute('aria-pressed', String((btn.dataset.status || '') === status));
         });
     }
 
@@ -36,7 +62,8 @@ class NamesNumbersDashboard {
         } catch (err) {
             this.showToast('Failed to load rosters: ' + err.message, 'error');
             document.getElementById('dashboardBody').innerHTML =
-                '<tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--nn-error-text);">Failed to load rosters</td></tr>';
+                '<tr><td colspan="8" class="nn-table-msg nn-table-msg--error" role="alert">Failed to load rosters (' + this.esc(err.message || 'request failed') + '). '
+                + '<button type="button" class="btn-secondary btn-sm" data-call="dashboard.loadAll">Retry</button></td></tr>';
         }
     }
 
@@ -70,6 +97,7 @@ class NamesNumbersDashboard {
             filtered = filtered.filter(r => (r.SalesRep || '').toLowerCase().includes(rep));
         }
 
+        this.syncKpis();
         this.renderTable(filtered);
     }
 
@@ -77,14 +105,17 @@ class NamesNumbersDashboard {
         document.getElementById('filterSearch').value = '';
         document.getElementById('filterStatus').value = '';
         document.getElementById('filterRep').value = '';
+        this.syncKpis();
         this.renderTable(this.allRosters);
     }
 
     renderTable(rosters) {
         const tbody = document.getElementById('dashboardBody');
+        const count = document.getElementById('nnResultCount');
+        if (count) count.textContent = (rosters ? rosters.length : 0) + ' of ' + this.allRosters.length + ' rosters';
 
         if (!rosters || rosters.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--nn-text-secondary);">No rosters found</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="8" class="nn-table-msg">No rosters match these filters</td></tr>';
             return;
         }
 
@@ -92,17 +123,18 @@ class NamesNumbersDashboard {
             const statusCls = (r.Status || 'draft').toLowerCase().replace(/\s+/g, '-');
             // Caspio naive timestamps are Pacific wall-clock — resolve via CaspioDate.
             const modified = window.CaspioDate ? (window.CaspioDate.formatDate(r.ModifiedAt, { fallback: '-' })) : (r.ModifiedAt ? new Date(r.ModifiedAt).toLocaleDateString() : '-');
-            return `<tr data-href="/pages/names-numbers.html?load=${r.ID_Roster}">
-                <td><strong>${this.esc(r.RosterName || 'Untitled')}</strong></td>
+            const name = this.esc(r.RosterName || 'Untitled');
+            return `<tr data-href="/pages/names-numbers.html?load=${encodeURIComponent(r.ID_Roster)}" role="link" tabindex="0" aria-label="Open roster ${name}">
+                <td><strong>${name}</strong></td>
                 <td>${this.esc(r.CompanyName || '')}</td>
-                <td>${r.OrderNumber || '-'}</td>
-                <td>${r.TotalPersons || 0}</td>
+                <td>${this.esc(String(r.OrderNumber || '-'))}</td>
+                <td>${Number(r.TotalPersons) || 0}</td>
                 <td>${this.esc(r.SalesRep || '')}</td>
                 <td><span class="status-badge status-${statusCls}">${this.esc(r.Status || 'Draft')}</span></td>
                 <td>${modified}</td>
                 <td class="actions" data-stop="1">
-                    <a href="/pages/names-numbers.html?load=${r.ID_Roster}" class="btn-secondary btn-sm"><i class="fas fa-edit"></i></a>
-                    <button class="btn-danger btn-sm" aria-label="Delete roster" data-call="dashboard.deleteRoster" data-args="${JSON.stringify([r.ID_Roster, r.RosterName || '']).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;')}"><i class="fas fa-trash"></i></button>
+                    <a href="/pages/names-numbers.html?load=${encodeURIComponent(r.ID_Roster)}" class="btn-secondary btn-sm" aria-label="Edit roster ${name}"><i class="fas fa-edit" aria-hidden="true"></i></a>
+                    <button type="button" class="btn-danger btn-sm" aria-label="Delete roster ${name}" data-call="dashboard.deleteRoster" data-args="${JSON.stringify([r.ID_Roster, r.RosterName || '']).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;')}"><i class="fas fa-trash" aria-hidden="true"></i></button>
                 </td>
             </tr>`;
         }).join('');
@@ -121,6 +153,7 @@ class NamesNumbersDashboard {
 
     showToast(message, type) {
         const toast = document.getElementById('toast');
+        toast.setAttribute('role', type === 'error' ? 'alert' : 'status');
         toast.textContent = message;
         toast.className = 'toast show' + (type ? ' ' + type : '');
         setTimeout(() => { toast.className = 'toast'; }, 3000);

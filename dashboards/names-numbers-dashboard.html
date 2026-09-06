@@ -9,22 +9,22 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="/shared_components/css/names-numbers.css?v=2026.09.05.15" rel="stylesheet">
-    <link rel="stylesheet" href="/dashboards/css/names-numbers-dashboard.css?v=2026.09.05.8">
+    <link rel="stylesheet" href="/dashboards/css/names-numbers-dashboard.css?v=2026.09.05.57">
 </head>
 <body>
     <header class="header">
         <div class="header-container">
             <div class="header-left">
                 <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" alt="NWCA" class="logo">
-                <nav class="breadcrumb">
+                <nav class="breadcrumb" aria-label="Breadcrumb">
                     <a href="/staff-dashboard.html">Staff Dashboard</a>
                     <span>/</span>
                     <span>Names & Numbers Dashboard</span>
                 </nav>
             </div>
             <div class="header-right">
-                <a href="/pages/names-numbers.html" class="btn-primary"><i class="fas fa-plus"></i> New Roster</a>
-                <a href="/staff-dashboard.html" class="btn-secondary"><i class="fas fa-arrow-left"></i> Back</a>
+                <a href="/pages/names-numbers.html" class="btn-primary"><i class="fas fa-plus" aria-hidden="true"></i> New Roster</a>
+                <a href="/staff-dashboard.html" class="btn-secondary"><i class="fas fa-arrow-left" aria-hidden="true"></i> Back</a>
             </div>
         </div>
     </header>
@@ -32,29 +32,30 @@
     <main class="main-container">
         <div class="page-header">
             <div>
-                <h1 class="page-title"><i class="fas fa-users"></i> Names & Numbers Dashboard</h1>
+                <h1 class="page-title"><i class="fas fa-users" aria-hidden="true"></i> Names & Numbers Dashboard</h1>
                 <p class="page-subtitle">Manage all team rosters</p>
             </div>
         </div>
 
         <!-- KPIs -->
-        <div class="kpi-row" id="kpiRow">
-            <div class="kpi-card"><div class="kpi-value" id="kpiTotal">-</div><div class="kpi-label">Total Rosters</div></div>
-            <div class="kpi-card"><div class="kpi-value" id="kpiDraft">-</div><div class="kpi-label">Draft</div></div>
-            <div class="kpi-card"><div class="kpi-value" id="kpiSubmitted">-</div><div class="kpi-label">Submitted</div></div>
-            <div class="kpi-card"><div class="kpi-value" id="kpiInProd">-</div><div class="kpi-label">In Production</div></div>
-            <div class="kpi-card"><div class="kpi-value" id="kpiCompleted">-</div><div class="kpi-label">Completed</div></div>
+        <!-- KPI tiles are status filters (synced with the Status select; click the active one to clear) -->
+        <div class="kpi-row" id="kpiRow" role="group" aria-label="Rosters by status">
+            <button type="button" class="kpi-card kpi-btn" data-status="" aria-pressed="true"><div class="kpi-value" id="kpiTotal">-</div><div class="kpi-label">Total Rosters</div></button>
+            <button type="button" class="kpi-card kpi-btn" data-status="Draft" aria-pressed="false"><div class="kpi-value" id="kpiDraft">-</div><div class="kpi-label">Draft</div></button>
+            <button type="button" class="kpi-card kpi-btn" data-status="Submitted" aria-pressed="false"><div class="kpi-value" id="kpiSubmitted">-</div><div class="kpi-label">Submitted</div></button>
+            <button type="button" class="kpi-card kpi-btn" data-status="In Production" aria-pressed="false"><div class="kpi-value" id="kpiInProd">-</div><div class="kpi-label">In Production</div></button>
+            <button type="button" class="kpi-card kpi-btn" data-status="Completed" aria-pressed="false"><div class="kpi-value" id="kpiCompleted">-</div><div class="kpi-label">Completed</div></button>
         </div>
 
         <!-- Filters -->
         <div class="filter-bar">
             <div class="form-group">
-                <label>Search</label>
-                <input type="text" id="filterSearch" aria-label="Search rosters" placeholder="Roster name or company...">
+                <label for="filterSearch">Search</label>
+                <input type="search" id="filterSearch" autocomplete="off" placeholder="Roster name or company...">
             </div>
             <div class="form-group">
-                <label>Status</label>
-                <select id="filterStatus" aria-label="Status">
+                <label for="filterStatus">Status</label>
+                <select id="filterStatus">
                     <option value="">All</option>
                     <option value="Draft">Draft</option>
                     <option value="Submitted">Submitted</option>
@@ -63,11 +64,12 @@
                 </select>
             </div>
             <div class="form-group">
-                <label>Sales Rep</label>
-                <input type="text" id="filterRep" aria-label="Sales rep" placeholder="Rep name...">
+                <label for="filterRep">Sales Rep</label>
+                <input type="text" id="filterRep" autocomplete="off" placeholder="Rep name...">
             </div>
-            <button type="button" class="btn-primary" id="filterBtn" style="align-self: end;"><i class="fas fa-search"></i> Filter</button>
-            <button type="button" class="btn-secondary" id="clearFilterBtn" style="align-self: end;">Clear</button>
+            <button type="button" class="btn-primary" id="filterBtn"><i class="fas fa-search" aria-hidden="true"></i> Filter</button>
+            <button type="button" class="btn-secondary" id="clearFilterBtn">Clear</button>
+            <span class="nn-result-count" id="nnResultCount" role="status"></span>
         </div>
 
         <!-- Results Table -->
@@ -87,18 +89,18 @@
                         </tr>
                     </thead>
                     <tbody id="dashboardBody">
-                        <tr><td colspan="8" style="text-align:center; padding:2rem; color:var(--nn-text-secondary);">Loading...</td></tr>
+                        <tr><td colspan="8" class="nn-table-msg" role="status">Loading...</td></tr>
                     </tbody>
                 </table>
             </div>
         </div>
     </main>
 
-    <div class="toast" id="toast"></div>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
     <script src="/shared_components/js/names-numbers-service.js?v=2026.04.17.1"></script>
     <script src="/shared_components/js/caspio-date-utils.js?v=1"></script>
     <script src="/shared_components/js/data-call-delegator.js"></script>
-    <script src="/shared_components/js/names-numbers-dashboard.js?v=2026.09.05.17"></script>
+    <script src="/shared_components/js/names-numbers-dashboard.js?v=2026.09.05.57"></script>
 </body>
 </html>
