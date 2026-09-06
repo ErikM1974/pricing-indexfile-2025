@@ -1,3 +1,8 @@
+## v2026.09.05.55 (2026.09.05)
+
+- Ruth's Queue review: 15 items — due-today no longer OVERDUE (calendar dates), h1, real tablist + arrows, status chips filter the queue (aria-pressed), Rule 3 onerror/style cleanup, session identity for quick actions, Billing Codes from Service_Codes with visible fallback, Retry instead of reload, kanban keyboard path, dialog focus return
+- Deploy v2026.09.05.55: Ruth's Queue review (15 items)
+
 ## v2026.09.05.53 (2026.09.05)
 
 - Steve's Queue review: 16 items — art rate from Service_Codes GRT-75 (18 hardcoded $75 sites, visible fallback), Rule 3 onerror/style cleanup, aria-pressed chips (active toggles to All), card keyboard paths, labelled dialogs with focus return + Esc (notes/approval/image/broken-mockups/art-time), hidden-attr states, calendar due dates
