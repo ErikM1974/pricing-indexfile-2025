@@ -66,13 +66,13 @@
             // For pants, use the sizes stored from analyzeSizeCategory
             availableSizes = JSON.parse(parentRow.dataset.pantsSizes);
             // Update popup header for pants
-            popup.querySelector('.size-popup-header h4').innerHTML = '<i class="fas fa-ruler"></i> Waist/Inseam Sizes';
+            popup.querySelector('.size-popup-header h4').innerHTML = '<i class="fas fa-ruler" aria-hidden="true"></i> Waist/Inseam Sizes';
             popup.querySelector('.size-popup-hint').textContent = 'Enter quantities for each waist/inseam combination. These create separate line items.';
         } else if (isShorts && parentRow.dataset.shortsSizes) {
             // For shorts (waist-only), use the sizes stored from analyzeSizeCategory
             availableSizes = JSON.parse(parentRow.dataset.shortsSizes);
             // Update popup header for shorts
-            popup.querySelector('.size-popup-header h4').innerHTML = '<i class="fas fa-ruler"></i> Waist Sizes';
+            popup.querySelector('.size-popup-header h4').innerHTML = '<i class="fas fa-ruler" aria-hidden="true"></i> Waist Sizes';
             popup.querySelector('.size-popup-hint').textContent = 'Enter quantities for each waist size. These create separate line items.';
         } else {
             // Show loading spinner for non-pants
@@ -85,7 +85,7 @@
             // Fetch available sizes from API
             availableSizes = await getAvailableExtendedSizes(styleNumber, catalogColor);
             // Reset header for non-pants
-            popup.querySelector('.size-popup-header h4').innerHTML = '<i class="fas fa-ruler"></i> Extended Sizes (Size06)';
+            popup.querySelector('.size-popup-header h4').innerHTML = '<i class="fas fa-ruler" aria-hidden="true"></i> Extended Sizes (Size06)';
             popup.querySelector('.size-popup-hint').textContent = 'Enter quantities for extended sizes. These create separate line items.';
         }
 
@@ -94,7 +94,7 @@
             const sizeType = isPants ? 'waist/inseam' : (isShorts ? 'waist' : 'extended');
             grid.innerHTML = `
                 <div class="size-popup-empty" style="grid-column: 1 / -1;">
-                    <i class="fas fa-info-circle"></i><br>
+                    <i class="fas fa-info-circle" aria-hidden="true"></i><br>
                     No ${sizeType} sizes available for ${escapeHtml(styleNumber)}.
                 </div>
             `;

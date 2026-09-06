@@ -156,7 +156,7 @@
                     <div class="dtg-catalog-empty dtg-fullcat-prompt">
                         <div class="dtg-fullcat-prompt-line">Not one of our 20 DTG-tested styles — no match for "${escapeHtml(fcQuery)}".</div>
                         <button type="button" class="dtg-fullcat-trigger" id="dtgFullCatTrigger">
-                            <i class="fas fa-magnifying-glass-plus"></i>
+                            <i class="fas fa-magnifying-glass-plus" aria-hidden="true"></i>
                             Search the full SanMar catalog for "${escapeHtml(fcQuery)}"
                         </button>
                         <div class="dtg-fullcat-prompt-hint">Any SanMar style can be priced for DTG — these just aren't on our proven-print list.</div>
@@ -303,7 +303,7 @@
                     data-default-src="${escapeHtml(heroSrc)}"
                     loading="lazy"
                     onerror="this.style.display='none';this.parentElement.classList.add('dtg-cc-hero-missing');">`
-            : '<div class="dtg-cc-hero-placeholder"><i class="fas fa-tshirt"></i></div>';
+            : '<div class="dtg-cc-hero-placeholder"><i class="fas fa-tshirt" aria-hidden="true"></i></div>';
 
         // Inline color swatches (top 4-6 from server). The defaultIdx-th
         // swatch starts selected. Click another → swap the selected state.
@@ -322,7 +322,7 @@
                     ${c.swatch_image_url
                         ? `<img src="${escapeHtml(c.swatch_image_url)}" alt="" loading="lazy">`
                         : `<span class="dtg-cc-swatch-placeholder"></span>`}
-                    <span class="dtg-cc-swatch-check" aria-hidden="true"><i class="fas fa-check"></i></span>
+                    <span class="dtg-cc-swatch-check" aria-hidden="true"><i class="fas fa-check" aria-hidden="true"></i></span>
                 </button>`).join('')}
                 ${s.color_count > 6 ? `<button type="button" class="dtg-cc-more" title="See all ${s.color_count} colors with size data">+${s.color_count - 6}</button>` : ''}
               </div>`
@@ -373,10 +373,10 @@
                 ${selectedColorStatHtml}
                 <div class="dtg-cc-actions">
                     <button type="button" class="dtg-cc-add-default" title="Add the selected color to your quote">
-                        <i class="fas fa-plus"></i> Add <span class="dtg-cc-selected-color-label">${escapeHtml(ctaColorName)}</span>
+                        <i class="fas fa-plus" aria-hidden="true"></i> Add <span class="dtg-cc-selected-color-label">${escapeHtml(ctaColorName)}</span>
                     </button>
                     <button type="button" class="dtg-cc-view-all" title="See all ${s.color_count} colors with size data">
-                        <i class="fas fa-eye"></i> All ${fmtInt(s.color_count)}
+                        <i class="fas fa-eye" aria-hidden="true"></i> All ${fmtInt(s.color_count)}
                     </button>
                 </div>
             </article>
@@ -461,14 +461,14 @@
     async function runFullCatalogSearch(q) {
         const grid = document.getElementById('dtgCatalogGrid');
         if (!grid) return;
-        grid.innerHTML = `<div class="dtg-catalog-loading"><i class="fas fa-circle-notch fa-spin"></i> Searching the full SanMar catalog for "${escapeHtml(q)}"…</div>`;
+        grid.innerHTML = `<div class="dtg-catalog-loading"><i class="fas fa-circle-notch fa-spin" aria-hidden="true"></i> Searching the full SanMar catalog for "${escapeHtml(q)}"…</div>`;
         let results = [];
         try {
             const data = await fetchJSON(`${API_BASE}/api/stylesearch?term=${encodeURIComponent(q)}`);
             results = Array.isArray(data) ? data : (data.results || []);
         } catch (err) {
             console.error('[dtg-catalog] full-catalog search failed:', err);
-            grid.innerHTML = `<div class="dtg-catalog-error"><i class="fas fa-triangle-exclamation"></i> Couldn't reach the SanMar catalog. <button type="button" id="dtgFullCatRetry">Retry</button></div>`;
+            grid.innerHTML = `<div class="dtg-catalog-error"><i class="fas fa-triangle-exclamation" aria-hidden="true"></i> Couldn't reach the SanMar catalog. <button type="button" id="dtgFullCatRetry">Retry</button></div>`;
             const retry = document.getElementById('dtgFullCatRetry');
             if (retry) retry.addEventListener('click', () => runFullCatalogSearch(q));
             return;
@@ -483,11 +483,11 @@
         const header = `
             <div class="dtg-fullcat-head">
                 <button type="button" class="dtg-fullcat-back" id="dtgFullCatBack">
-                    <i class="fas fa-arrow-left"></i> Back to DTG-tested catalog
+                    <i class="fas fa-arrow-left" aria-hidden="true"></i> Back to DTG-tested catalog
                 </button>
                 <div class="dtg-fullcat-head-text">
                     <strong>Full SanMar catalog</strong> · ${lastFullCatalogResults.length} match${lastFullCatalogResults.length === 1 ? '' : 'es'} for "${escapeHtml(q)}"
-                    <span class="dtg-fullcat-head-warn"><i class="fas fa-flask"></i> Outside our 20 DTG-tested styles — confirm the garment prints well before quoting.</span>
+                    <span class="dtg-fullcat-head-warn"><i class="fas fa-flask" aria-hidden="true"></i> Outside our 20 DTG-tested styles — confirm the garment prints well before quoting.</span>
                 </div>
             </div>`;
         if (!lastFullCatalogResults.length) {
@@ -508,10 +508,10 @@
                     <div class="dtg-fullcat-card-main">
                         <div class="dtg-fullcat-card-style">${escapeHtml(style)}</div>
                         <div class="dtg-fullcat-card-title">${escapeHtml(title)}</div>
-                        ${warn ? `<div class="dtg-fullcat-card-warn"><i class="fas fa-triangle-exclamation"></i> ${escapeHtml(warn)}</div>` : ''}
+                        ${warn ? `<div class="dtg-fullcat-card-warn"><i class="fas fa-triangle-exclamation" aria-hidden="true"></i> ${escapeHtml(warn)}</div>` : ''}
                     </div>
                     <button type="button" class="dtg-fullcat-add" data-idx="${i}">
-                        <i class="fas fa-plus"></i> Add to quote
+                        <i class="fas fa-plus" aria-hidden="true"></i> Add to quote
                     </button>
                 </article>`;
         }).join('');
@@ -550,7 +550,7 @@
         const style = String(m.value || m.style || m.styleNumber || '').toUpperCase();
         if (!style) return;
         const label = String(m.label || '');
-        if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Adding…'; }
+        if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-circle-notch fa-spin" aria-hidden="true"></i> Adding…'; }
         let colors = [];
         let productTitle = '';
         try {
@@ -570,10 +570,10 @@
             });
             const formMount = document.getElementById('dtgInlineFormMount');
             if (formMount) formMount.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            if (btn) { btn.innerHTML = '<i class="fas fa-check"></i> Added'; btn.classList.add('dtg-fullcat-add--done'); }
+            if (btn) { btn.innerHTML = '<i class="fas fa-check" aria-hidden="true"></i> Added'; btn.classList.add('dtg-fullcat-add--done'); }
         } catch (err) {
             console.error('[dtg-catalog] addFullCatalogStyle failed:', err);
-            if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-plus"></i> Add to quote'; }
+            if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-plus" aria-hidden="true"></i> Add to quote'; }
         }
     }
 
@@ -583,7 +583,7 @@
         const backdrop = document.getElementById('dtgCatalogModalBackdrop');
         const body = document.getElementById('dtgCatalogModalBody');
         if (!modal || !backdrop || !body) return;
-        body.innerHTML = `<div class="dtg-catalog-modal-loading"><i class="fas fa-circle-notch fa-spin"></i> Loading ${escapeHtml(style)}…</div>`;
+        body.innerHTML = `<div class="dtg-catalog-modal-loading"><i class="fas fa-circle-notch fa-spin" aria-hidden="true"></i> Loading ${escapeHtml(style)}…</div>`;
         modal.hidden = false;
         backdrop.hidden = false;
         document.body.classList.add('dtg-catalog-modal-open');
@@ -653,7 +653,7 @@
                         ${topSizes ? `<div class="dtg-mc-color-sizes">Most popular: ${escapeHtml(topSizes)}</div>` : ''}
                     </div>
                     <button type="button" class="dtg-mc-add-btn">
-                        <i class="fas fa-plus"></i> Add
+                        <i class="fas fa-plus" aria-hidden="true"></i> Add
                     </button>
                 </div>
             `;
@@ -699,7 +699,7 @@
             // 2. Visual confirmation on the card
             cardEl.classList.add('dtg-mc-color-card-added');
             const btn = cardEl.querySelector('.dtg-mc-add-btn');
-            btn.innerHTML = '<i class="fas fa-check"></i> Added';
+            btn.innerHTML = '<i class="fas fa-check" aria-hidden="true"></i> Added';
             btn.disabled = true;
             // 3. Close modal after a beat and scroll form into view
             setTimeout(() => {

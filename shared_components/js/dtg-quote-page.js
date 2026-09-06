@@ -373,7 +373,7 @@ const AI_ENDPOINT = '/api/dtg-quote-ai/chat';
         else if (toolName === 'quote_dtg_pricing') iconClass = 'fa-print';
         else if (toolName === 'recommend_top_sellers') iconClass = 'fa-star';
         else if (toolName === 'lookup_product_details') iconClass = 'fa-palette';
-        chip.innerHTML = `<i class="fas ${iconClass}"></i> ${escapeHtml(statusText)}`;
+        chip.innerHTML = `<i class="fas ${iconClass}" aria-hidden="true"></i> ${escapeHtml(statusText)}`;
         msg.appendChild(chip);
         if (opts.searchResults) msg.appendChild(buildWebSearchResultsEl(opts.searchResults));
         if (opts.topSellers) msg.appendChild(buildTopSellersEl(opts.topSellers));
@@ -452,7 +452,7 @@ const AI_ENDPOINT = '/api/dtg-quote-ai/chat';
 
         wrap.innerHTML = `
             <div class="pd-top-picks-label">
-                <i class="fas fa-star"></i>
+                <i class="fas fa-star" aria-hidden="true"></i>
                 NWCA top picks for ${escapeHtml(styleNumber)}
                 <span class="pd-top-picks-hint">— our best-selling colors</span>
             </div>
@@ -608,7 +608,7 @@ const AI_ENDPOINT = '/api/dtg-quote-ai/chat';
                          data-default-src="${escapeHtml(hero.mainImageUrl)}"
                          data-default-color="${escapeHtml(hero.name)}"
                          onerror="this.style.display='none';">
-                    <div class="pd-hero-caption" data-default-color="${escapeHtml(hero.name)}">${isConfirmed ? '<i class="fas fa-check"></i> ' : ''}${escapeHtml(hero.name)}</div>
+                    <div class="pd-hero-caption" data-default-color="${escapeHtml(hero.name)}">${isConfirmed ? '<i class="fas fa-check" aria-hidden="true"></i> ' : ''}${escapeHtml(hero.name)}</div>
                 </div>`;
         }
 
@@ -622,7 +622,7 @@ const AI_ENDPOINT = '/api/dtg-quote-ai/chat';
             if (isConfirmed) {
                 // Color already known — collapse swatches behind an expander so
                 // the card reads as a confirmation, not an interrogation.
-                html += `<button type="button" class="pd-swatch-expander" aria-expanded="false">Pick a different color (${fmtInt(colors.length)} available) <i class="fas fa-chevron-down"></i></button>`;
+                html += `<button type="button" class="pd-swatch-expander" aria-expanded="false">Pick a different color (${fmtInt(colors.length)} available) <i class="fas fa-chevron-down" aria-hidden="true"></i></button>`;
                 html += `<div class="color-swatch-grid pd-collapsed" hidden>`;
             } else {
                 html += `<div class="pd-section-label">Hover to preview · click to pick</div>`;
@@ -677,7 +677,7 @@ const AI_ENDPOINT = '/api/dtg-quote-ai/chat';
                 <div class="pd-size-matrix-actions">
                     <span class="pd-sm-total">0 pcs</span>
                     <button type="button" class="pd-sm-add" disabled>
-                        Add to quote <i class="fas fa-arrow-right"></i>
+                        Add to quote <i class="fas fa-arrow-right" aria-hidden="true"></i>
                     </button>
                 </div>`;
             html += `</div>`;
@@ -772,7 +772,7 @@ const AI_ENDPOINT = '/api/dtg-quote-ai/chat';
                 // Disable the matrix after submit so the rep can't double-submit
                 inputs.forEach((inp) => { inp.disabled = true; });
                 addBtn.disabled = true;
-                addBtn.innerHTML = '<i class="fas fa-check"></i> Sent';
+                addBtn.innerHTML = '<i class="fas fa-check" aria-hidden="true"></i> Sent';
                 matrix.classList.add('pd-size-matrix-sent');
 
                 // After submit, show explicit follow-up actions so the rep
@@ -785,7 +785,7 @@ const AI_ENDPOINT = '/api/dtg-quote-ai/chat';
                     followup.className = 'pd-size-matrix-followup';
                     followup.innerHTML = `
                         <button type="button" class="pd-sm-add-color">
-                            <i class="fas fa-plus"></i> Another color of ${escapeHtml(style)}
+                            <i class="fas fa-plus" aria-hidden="true"></i> Another color of ${escapeHtml(style)}
                         </button>
                         <span class="pd-sm-divider">— or type a new style in chat below</span>
                     `;
@@ -820,7 +820,7 @@ const AI_ENDPOINT = '/api/dtg-quote-ai/chat';
                 if (isHidden) {
                     grid.removeAttribute('hidden');
                     expander.setAttribute('aria-expanded', 'true');
-                    expander.innerHTML = `Hide colors <i class="fas fa-chevron-up"></i>`;
+                    expander.innerHTML = `Hide colors <i class="fas fa-chevron-up" aria-hidden="true"></i>`;
                     // Unlock the hero so hovering a swatch previews the new
                     // color. The first click commits + re-locks via the
                     // standard swatch click handler below.
@@ -828,7 +828,7 @@ const AI_ENDPOINT = '/api/dtg-quote-ai/chat';
                 } else {
                     grid.setAttribute('hidden', '');
                     expander.setAttribute('aria-expanded', 'false');
-                    expander.innerHTML = `Pick a different color (${fmtInt(colors.length)} available) <i class="fas fa-chevron-down"></i>`;
+                    expander.innerHTML = `Pick a different color (${fmtInt(colors.length)} available) <i class="fas fa-chevron-down" aria-hidden="true"></i>`;
                     // Restore the original confirmed-color lock
                     wrap.dataset.locked = 'true';
                 }
@@ -1135,7 +1135,7 @@ const AI_ENDPOINT = '/api/dtg-quote-ai/chat';
         if (copyBtn) copyBtn.disabled = !hasDraft;
         if (saveBtn) saveBtn.disabled = !(hasDraft && hasQuote && hasCustomer);
         if (aiState.savedQuoteID && saveBtn) {
-            saveBtn.innerHTML = `<i class="fas fa-link"></i> Copy share link`;
+            saveBtn.innerHTML = `<i class="fas fa-link" aria-hidden="true"></i> Copy share link`;
             saveBtn.disabled = false;
         }
     }

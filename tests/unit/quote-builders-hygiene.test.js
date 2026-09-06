@@ -39,6 +39,11 @@ describe('no inline handlers anywhere', () => {
         expect(js).not.toMatch(BARE);
         expect(js).not.toMatch(/<i class="fas (?:fa-)?\$\{[^}]+\}[^"]*"><\/i>/);
     });
+    test.each(['artwork-upload', 'dtf-quote-products', 'dtg-catalog', 'dtg-quote-page', 'embroidery-chat', 'embroidery-quote-invoice', 'monogram-form-controller', 'product-thumbnail-modal', 'quote-builder-guided', 'quote-extended-sizes', 'quote-order-summary', 'quote-services-bar', 'quote-session', 'quote-share-modal', 'safety-stripe-recs', 'screenprint-fast-quote-page'])('shared script %s renders decorative icons only', (f) => {
+        const js = stripJs(read(`shared_components/js/${f}.js`));
+        expect(js).not.toMatch(BARE);
+        expect(js).not.toMatch(/<i class="fas (?:fa-)?\$\{[^}]+\}[^"]*"><\/i>/);
+    });
     test('utils renders no bare icons and documents the new contract', () => {
         expect(utils).not.toMatch(BARE);
         expect(utils).toMatch(/data-keyclick="1"/);

@@ -113,7 +113,7 @@
         if (products.length === 0) return setMsg('Add products first.', '#dc2626');
         var API_BASE = _apiBase();
 
-        if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Estimating…'; }
+        if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Estimating…'; }
         try {
             if (!window._boxDensity) {
                 try { const dr = await fetch(`${API_BASE}/api/shipping/box-density`); if (dr.ok) window._boxDensity = (await dr.json()).density || {}; } catch (e) { window._boxDensity = {}; }
@@ -174,7 +174,7 @@
             console.error('[estimateShipping]', e);
             setMsg('Could not estimate shipping — enter it manually.', '#dc2626');
         } finally {
-            if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-truck-fast"></i> Estimate UPS Ground'; }
+            if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-truck-fast" aria-hidden="true"></i> Estimate UPS Ground'; }
         }
     }
 
@@ -219,10 +219,10 @@
             // quote-builder-utils.js resolves the global by name. Config keeps the legacy
             // '*Onclick' keys: a bare "fn()" string is reduced to "fn" by callName().
             var reestFn = callName(_cfg.reestimateOnclick || 'reestimateShipFromCard()');
-            acts += '<button type="button" class="st-btn st-btn-reest" data-call="' + esc(reestFn) + '" title="Re-run the UPS estimate for this address + the current item weight"><i class="fas fa-rotate"></i> Re-estimate</button>';
+            acts += '<button type="button" class="st-btn st-btn-reest" data-call="' + esc(reestFn) + '" title="Re-run the UPS estimate for this address + the current item weight"><i class="fas fa-rotate" aria-hidden="true"></i> Re-estimate</button>';
         }
         if (_cfg.editOnclick) {
-            acts += '<button type="button" class="st-btn st-btn-edit" data-call="' + esc(callName(_cfg.editOnclick)) + '" title="Edit the ship-to address / method / charge"><i class="fas fa-pen"></i> Edit</button>';
+            acts += '<button type="button" class="st-btn st-btn-edit" data-call="' + esc(callName(_cfg.editOnclick)) + '" title="Edit the ship-to address / method / charge"><i class="fas fa-pen" aria-hidden="true"></i> Edit</button>';
         }
         var actions = acts ? '<div class="st-actions">' + acts + '</div>' : '';
         el.innerHTML = '<div class="st-title">Ship To</div>' + lines.join('') + actions;
@@ -233,7 +233,7 @@
     function reestimateShipFromCard() {
         var card = _el((_cfg && _cfg.shipToCard) || '#ship-to-card');
         var btn = card ? card.querySelector('.st-btn-reest') : null;
-        if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Estimating…'; }
+        if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Estimating…'; }
         var done = function () { renderShipToCard(); };
         try {
             var p = (_cfg && typeof _cfg.estimate === 'function') ? _cfg.estimate() : null;

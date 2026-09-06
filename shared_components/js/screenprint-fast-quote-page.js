@@ -146,7 +146,7 @@ async function submitQuote() {
     // Disable submit button
     const submitBtn = event.target;
     submitBtn.disabled = true;
-    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Submitting...';
 
     try {
         // Use the service to submit
@@ -168,6 +168,6 @@ async function submitQuote() {
         console.error('Submit error:', error);
         alert('There was an error submitting your quote. Please try again or call us at (253) 922-5793.');
         submitBtn.disabled = false;
-        submitBtn.innerHTML = 'Get My Quote <i class="fas fa-check"></i>';
+        submitBtn.innerHTML = 'Get My Quote <i class="fas fa-check" aria-hidden="true"></i>';
     }
 }
