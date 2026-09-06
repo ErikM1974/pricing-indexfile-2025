@@ -6,6 +6,15 @@ Resolved entries aged out of `LESSONS_LEARNED.md` (300-line cap). Newest first. 
 
 ## Archived 2026-09-06
 
+## JSON-in-attribute broke on the first quote (Names & Numbers delete button, `v2026.09.05.17`)
+**Problem:** after converting `onclick="dashboard.deleteRoster(${id}, '${esc(name)}')"` to `data-args="${esc(JSON.stringify([id, name]))}"`, the attribute read `[10,` — the delete button silently did nothing.
+**Root cause:** that page's `esc()` is the `div.textContent → innerHTML` trick, which escapes `< > &` but NOT `"`, so the JSON's quotes ended the attribute early.
+**Solution:** escape for an attribute (`&amp; &quot; &lt;`) — `JSON.stringify(...).replace(/"/g,'&quot;')`; the quote-builder `escapeHtml()` and portal-directory `escapeAttr()` already do.
+**Prevention:** the delegator reports a bad `data-args` as a visible error (never silent); when writing JSON into a `data-*` attribute inside a template literal, check the page's escaper handles `"` first. Lock: `tests/unit/staff-pages-datacall.test.js`.
+### Vendor portal showed "Unable to load jobs" on EVERY load since launch (2026-09-05, ARCHIVED 2026-09-06, `v2026.09.05.28`): a page that fails identically on every load has never worked — check the FIRST request's status, not the retry path; a launch is not verified until a real user's session has loaded real data. Full entry in archive. (2026-09-05)
+
+---
+
 ## Vendor portal showed "Unable to load jobs" on EVERY load since launch (`v2026.09.05.28`)
 
 **Problem.** The red error banner on `/vendor` was visible all the time — including when jobs loaded
