@@ -26,7 +26,7 @@
     <div class="tab-container">
         <!-- Tab Buttons (cross-links to other art dashboards) -->
         <div class="tab-buttons">
-            <button class="tab-button active">Bradley's Screen Print Queue</button>
+            <button type="button" class="tab-button active" aria-current="page">Bradley's Screen Print Queue</button>
             <a class="tab-button tab-button-link" href="/dashboards/bradley-transfers.html">Supacolor Transfers</a>
             <a class="tab-button tab-button-link" href="/dashboards/supacolor-orders.html">Supacolor API Orders</a>
             <a class="tab-button tab-button-link" href="/dashboards/art-hub-steve.html">Steve's Queue</a>
@@ -38,42 +38,42 @@
                 <!-- Header row: title + action buttons -->
                 <div class="bt-header-row">
                     <div>
-                        <h2 class="tab-title" style="margin-bottom:4px;">
-                            <i class="fas fa-print" style="color:#4a6fa5;"></i> Bradley's Screen Print Queue
-                        </h2>
+                        <h1 class="tab-title bt-title">
+                            <i class="fas fa-print bt-title-icon" aria-hidden="true"></i> Bradley's Screen Print Queue
+                        </h1>
                         <div class="bt-subtitle">Screen-print artwork from Steve &middot; relay to L&amp;P Printing</div>
                     </div>
                     <div class="bt-header-actions">
-                        <button id="bt-refresh-btn" class="bt-btn bt-btn--secondary" title="Refresh now">
-                            <i class="fas fa-sync-alt"></i> Refresh
+                        <button type="button" id="bt-refresh-btn" class="bt-btn bt-btn--secondary" title="Refresh now">
+                            <i class="fas fa-sync-alt" aria-hidden="true"></i> Refresh
                         </button>
                     </div>
                 </div>
 
                 <!-- Status Stats Chips -->
-                <div id="bt-stats-row" class="bt-stats-row">
-                    <div class="bt-stat-chip bt-stat-chip--requested" data-status="Requested">
+                <div id="bt-stats-row" class="bt-stats-row" role="group" aria-label="Queue counts — click a chip to filter">
+                    <button type="button" class="bt-stat-chip bt-stat-chip--requested" data-status="Requested" aria-pressed="false" title="Only Requested orders (click again to clear)">
                         <span class="bt-stat-count" id="bt-stat-requested">&mdash;</span>
                         <span class="bt-stat-label">Requested</span>
-                    </div>
-                    <div class="bt-stat-chip bt-stat-chip--ordered" data-status="Ordered">
+                    </button>
+                    <button type="button" class="bt-stat-chip bt-stat-chip--ordered" data-status="Ordered" aria-pressed="false" title="Only Ordered orders (click again to clear)">
                         <span class="bt-stat-count" id="bt-stat-ordered">&mdash;</span>
                         <span class="bt-stat-label">Ordered</span>
-                    </div>
-                    <div class="bt-stat-chip bt-stat-chip--shipped" data-status="Shipped">
+                    </button>
+                    <button type="button" class="bt-stat-chip bt-stat-chip--shipped" data-status="Shipped" aria-pressed="false" title="Only Shipped orders (click again to clear)">
                         <span class="bt-stat-count" id="bt-stat-shipped">&mdash;</span>
                         <span class="bt-stat-label">Shipped</span>
-                    </div>
-                    <div class="bt-stat-chip bt-stat-chip--rush" id="bt-stat-rush-chip" data-rush="true">
+                    </button>
+                    <button type="button" class="bt-stat-chip bt-stat-chip--rush" id="bt-stat-rush-chip" data-rush="true" aria-pressed="false" title="Rush orders only">
                         <span class="bt-stat-count" id="bt-stat-rush">&mdash;</span>
                         <span class="bt-stat-label">Rush</span>
-                    </div>
+                    </button>
                 </div>
 
                 <!-- Filter Bar -->
                 <div class="bt-filter-bar">
                     <div class="bt-filter-group">
-                        <label class="bt-filter-label">Status:</label>
+                        <label class="bt-filter-label" for="bt-filter-status">Status:</label>
                         <select id="bt-filter-status" aria-label="Filter by status" class="bt-filter-input">
                             <option value="">All Active</option>
                             <option value="Requested">Requested</option>
@@ -85,7 +85,7 @@
                         </select>
                     </div>
                     <div class="bt-filter-group">
-                        <label class="bt-filter-label">Search:</label>
+                        <label class="bt-filter-label" for="bt-filter-search">Search:</label>
                         <input type="text" id="bt-filter-search" aria-label="Search jobs" class="bt-filter-input" placeholder="Company, design #, rep, transfer ID...">
                     </div>
                     <div class="bt-filter-group bt-filter-toggle">
@@ -93,14 +93,14 @@
                             <input type="checkbox" id="bt-filter-rush-only"> Rush only
                         </label>
                     </div>
-                    <button id="bt-filter-clear" class="bt-btn bt-btn--link">Clear</button>
-                    <div class="bt-filter-meta" id="bt-result-count">Loading...</div>
+                    <button type="button" id="bt-filter-clear" class="bt-btn bt-btn--link">Clear</button>
+                    <div class="bt-filter-meta" id="bt-result-count" role="status">Loading...</div>
                 </div>
 
                 <!-- Grid View -->
                 <div id="bt-grid" class="bt-grid">
-                    <div class="bt-loading">
-                        <i class="fas fa-spinner fa-spin"></i> Loading screen-print orders...
+                    <div class="bt-loading" role="status">
+                        <i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Loading screen-print orders...
                     </div>
                 </div>
             </div>
@@ -108,27 +108,27 @@
     </div>
 
     <!-- Delete confirmation modal (hard-delete, for mistakes) -->
-    <div id="bt-delete-modal" class="bt-modal" style="display:none;">
-        <div class="bt-modal-content" style="max-width:480px;">
+    <div id="bt-delete-modal" class="bt-modal" hidden>
+        <div class="bt-modal-content bt-modal-content--narrow" role="dialog" aria-modal="true" aria-labelledby="bt-delete-modal-title">
             <div class="bt-modal-header">
-                <h3><i class="fas fa-trash"></i> Permanently Delete Screen Print Order</h3>
-                <button class="bt-modal-close" id="bt-delete-modal-close">&times;</button>
+                <h3 id="bt-delete-modal-title"><i class="fas fa-trash" aria-hidden="true"></i> Permanently Delete Screen Print Order</h3>
+                <button type="button" class="bt-modal-close" id="bt-delete-modal-close" aria-label="Close">&times;</button>
             </div>
             <div class="bt-modal-body">
-                <div class="bt-modal-intro" style="background:#fee2e2; border-left-color:#dc2626; color:#991b1b;">
+                <div class="bt-modal-intro bt-modal-intro--danger">
                     <strong id="bt-delete-modal-target">This order</strong> will be <strong>removed entirely</strong>. No audit trail is kept. Use this only for test entries, duplicates, or mistakes. For real cancellations, open the order and use "Cancel" instead.
                 </div>
                 <form id="bt-delete-form" class="bt-form">
-                    <div class="bt-form-row" style="grid-template-columns:1fr;">
+                    <div class="bt-form-row bt-form-row--single">
                         <div class="bt-form-field">
-                            <label>Reason (for your records) *</label>
-                            <textarea name="reason" rows="2" required placeholder="e.g. duplicate, wrong design, test entry..."></textarea>
+                            <label for="bt-delete-reason">Reason (for your records) *</label>
+                            <textarea id="bt-delete-reason" name="reason" rows="2" required placeholder="e.g. duplicate, wrong design, test entry..."></textarea>
                         </div>
                     </div>
-                    <div class="bt-form-row" style="grid-template-columns:1fr;">
+                    <div class="bt-form-row bt-form-row--single">
                         <div class="bt-form-field">
-                            <label style="font-weight:normal; display:flex; align-items:flex-start; gap:8px; cursor:pointer;">
-                                <input type="checkbox" name="confirm" required style="margin-top:3px;">
+                            <label class="bt-checkline">
+                                <input type="checkbox" name="confirm" required>
                                 <span>I understand this <strong>cannot be recovered</strong>.</span>
                             </label>
                         </div>
@@ -143,7 +143,7 @@
     </div>
 
     <!-- Toast container -->
-    <div id="bt-toast-container" class="bt-toast-container"></div>
+    <div id="bt-toast-container" class="bt-toast-container" role="status" aria-live="polite"></div>
 
     <!-- EmailJS + TransferActions shared module — provide openSendModal() for
          the "+ Send Another" button injected by ?view=steve. EmailJS is
@@ -151,9 +151,10 @@
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <!-- Normalises stored absolute proxy Box urls onto this origin so the session-gated
          forwarder authorises them. Must precede both consumers below. -->
+    <script src="/config/app.config.js"></script>
     <script src="/shared_components/js/box-url.js?v=2026.08.06.1"></script>
     <script src="/shared_components/js/transfer-actions-shared.js?v=2026.08.12.1"></script>
     <script src="/shared_components/js/caspio-date-utils.js?v=1"></script>
-    <script src="/dashboards/js/bradley-screenprint.js?v=2026.08.06.2"></script>
+    <script src="/dashboards/js/bradley-screenprint.js?v=2026.09.05.46"></script>
 </body>
 </html>

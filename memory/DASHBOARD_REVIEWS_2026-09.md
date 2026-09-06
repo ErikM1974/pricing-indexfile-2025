@@ -702,3 +702,14 @@ itself; the Caspio quota is tracked separately. 🔑 Local smoke: this page reac
 Left alone: dates append `Z` on purpose (Supacolor_Jobs stores UTC — the opposite convention from
 Transfer_Orders, which `CaspioDate.parse` treats as Pacific); the 60-second poll.
 
+## Bradley's Screen Print Queue — review, 11 items (2026-09-05, `v2026.09.05.47`)
+
+`dashboards/bradley-screenprint.html` + `js/bradley-screenprint.js` — a stripped twin of the transfers
+queue, so it carried the same defects and got the same fixes (see the transfers section): APP_CONFIG
+base (Rule 6), first-load error + Retry, synced `aria-pressed` chips (click again to clear), 50
+inline `onerror=` → `data-onerror`, inline `style=` → classes, keyboard cards, labelled delete dialog
+with focus return + Esc, session identity for the delete audit, icons `aria-hidden`, labels `for`.
+**Unique to this page: it had NO h1** — the title was an `<h2>`; now the page's `<h1>`.
+Lock: `tests/unit/bradley-screenprint-page.test.js`. Live: 0 active orders today (all terminal) —
+the empty state renders; card interactions are covered by the lock + the transfers twin's smoke.
+

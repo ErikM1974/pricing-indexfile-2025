@@ -16,7 +16,9 @@
     'use strict';
 
     // ── Config ───────────────────────────────────────────────────────
-    var API_BASE = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+    // Rule 6: the proxy base comes from APP_CONFIG (config/app.config.js), never a hardcoded host.
+    var API_BASE = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL)
+        || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
     var POLL_INTERVAL_MS = 60 * 1000;
     var AGE_WARN_HOURS = 24;
     var AGE_CRITICAL_HOURS = 72;
@@ -24,6 +26,7 @@
 
     // ── State ────────────────────────────────────────────────────────
     var state = {
+        loadedOnce: false,
         allTransfers: [],
         filteredTransfers: [],
         stats: {},
@@ -81,13 +84,39 @@
                 return t.Method === 'Screen Print';
             });
             state.allTransfers = rows;
+            state.loadedOnce = true;
             return rows;
         } catch (err) {
             console.error('Failed to fetch screen-print orders:', err);
-            showToast('Unable to load screen-print queue. Please refresh.', 'error');
+            showToast('Unable to load screen-print queue: ' + err.message, 'error');
+            // First load failing left the spinner up forever — show a real error state with Retry.
+            if (!state.loadedOnce) renderLoadError(err);
             throw err;
         }
     }
+
+    function renderLoadError(err) {
+        var grid = $('bt-grid');
+        if (!grid) return;
+        grid.innerHTML = '<div class="bt-error" role="alert">' +
+            '<i class="fas fa-triangle-exclamation" aria-hidden="true"></i> Unable to load the screen-print queue (' + escapeHtml(err && err.message ? err.message : 'unknown error') + ').' +
+            '<br><button type="button" class="bt-btn bt-btn--secondary" id="bt-load-retry"><i class="fas fa-sync-alt" aria-hidden="true"></i> Retry</button></div>';
+        var rc = $('bt-result-count'); if (rc) rc.textContent = 'Not loaded';
+        var rb = document.getElementById('bt-load-retry');
+        if (rb) rb.addEventListener('click', function () {
+            grid.innerHTML = '<div class="bt-loading" role="status"><i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Loading screen-print orders...</div>';
+            refresh();
+        });
+    }
+
+    // Broken mockup thumbnails (was an inline handler — Rule 3). `error` doesn't bubble → capture phase.
+    document.addEventListener('error', function (e) {
+        var img = e.target;
+        if (img && img.tagName === 'IMG' && img.dataset && img.dataset.onerror === 'thumb') {
+            img.classList.add('bt-card-thumb--err');
+            img.removeAttribute('src');
+        }
+    }, true);
 
     async function hardDeleteTransfer(idTransfer, body) {
         var resp = await fetch(
@@ -189,12 +218,12 @@
     function renderCard(t) {
         var ageHours = getAgeHours(t.Requested_At);
         var rushClass = isRush(t) ? ' bt-card--rush' : '';
-        var rushBadge = isRush(t) ? '<span class="bt-badge bt-badge--rush"><i class="fas fa-bolt"></i> RUSH</span>' : '';
+        var rushBadge = isRush(t) ? '<span class="bt-badge bt-badge--rush"><i class="fas fa-bolt" aria-hidden="true"></i> RUSH</span>' : '';
         var lineCountPill = (t.line_count && t.line_count > 1)
-            ? '<span class="tas-line-count-pill"><i class="fas fa-list-ol"></i> ' + t.line_count + ' lines</span>'
+            ? '<span class="tas-line-count-pill"><i class="fas fa-list-ol" aria-hidden="true"></i> ' + t.line_count + ' lines</span>'
             : '';
         var fileCountPill = (t.file_count && t.file_count > 1)
-            ? '<span class="bt-pill bt-pill--files"><i class="fas fa-paperclip"></i> ' + t.file_count + ' files</span>'
+            ? '<span class="bt-pill bt-pill--files"><i class="fas fa-paperclip" aria-hidden="true"></i> ' + t.file_count + ' files</span>'
             : '';
 
         var thumb;
@@ -202,22 +231,22 @@
             // Stored ABSOLUTE proxy url — 401s cross-origin since the Box surface was
             // session-gated; boxUrl() returns it to this origin.
             thumb = '<img class="bt-card-thumb" src="' + escapeHtml(resolveBoxUrl(t.mockup_thumbnail_url)) +
-                '" alt="" loading="lazy" onerror="this.classList.add(\'bt-card-thumb--err\');this.removeAttribute(\'src\');">';
+                '" alt="" loading="lazy" data-onerror="thumb">';
         } else {
-            thumb = '<div class="bt-card-thumb bt-card-thumb--placeholder"><i class="fas fa-image"></i></div>';
+            thumb = '<div class="bt-card-thumb bt-card-thumb--placeholder"><i class="fas fa-image" aria-hidden="true"></i></div>';
         }
 
         var canDelete = t.Status === 'Requested' || t.Status === 'On_Hold';
         var deleteMenu = canDelete ?
             '<button class="bt-card-menu-btn" data-action="delete" title="Delete (mistake)" aria-label="Delete order">' +
-                '<i class="fas fa-trash"></i>' +
+                '<i class="fas fa-trash" aria-hidden="true"></i>' +
             '</button>' : '';
 
         // Subtitle: Sales Rep + vendor (always L&P today, but read from row for future-proofing)
         var vendorLabel = t.SP_Vendor || 'L&P Printing';
         var subtitleParts = [];
         if (t.Sales_Rep_Name || t.Sales_Rep_Email) {
-            subtitleParts.push('<i class="fas fa-user"></i> ' + escapeHtml(t.Sales_Rep_Name || t.Sales_Rep_Email));
+            subtitleParts.push('<i class="fas fa-user" aria-hidden="true"></i> ' + escapeHtml(t.Sales_Rep_Name || t.Sales_Rep_Email));
         }
         subtitleParts.push('<strong>' + escapeHtml(vendorLabel) + '</strong>');
         var subtitle = '<div class="bt-card-subtitle">' + subtitleParts.join(' &middot; ') + '</div>';
@@ -238,7 +267,7 @@
                     ' data-action="enter-po"' +
                     ' data-id-transfer="' + escapeHtml(t.ID_Transfer) + '"' +
                     ' title="Enter the ShopWorks PO# to mark this as Ordered">' +
-                    '<i class="fas fa-keyboard"></i> Enter PO# to order' +
+                    '<i class="fas fa-keyboard" aria-hidden="true"></i> Enter PO# to order' +
                 '</button>';
         } else {
             poRow = '';
@@ -251,10 +280,10 @@
             var snippet = String(t.SP_Notes).trim().slice(0, 80);
             if (String(t.SP_Notes).length > 80) snippet += '…';
             spNotesPill = '<span class="bt-pill bt-pill--sp-notes" title="' + escapeHtml(t.SP_Notes) + '">' +
-                '<i class="fas fa-sticky-note"></i> ' + escapeHtml(snippet) + '</span>';
+                '<i class="fas fa-sticky-note" aria-hidden="true"></i> ' + escapeHtml(snippet) + '</span>';
         }
 
-        return '<div class="bt-card' + rushClass + '" data-id="' + escapeHtml(t.ID_Transfer) + '">' +
+        return '<div class="bt-card' + rushClass + '" data-id="' + escapeHtml(t.ID_Transfer) + '" role="link" tabindex="0" aria-label="Open order ' + escapeHtml(t.ID_Transfer || '') + (t.Company_Name ? ', ' + escapeHtml(t.Company_Name) : '') + '">' +
             '<div class="bt-card-header">' +
                 '<span class="bt-card-id">' + escapeHtml(t.ID_Transfer || '') + '</span>' +
                 '<div class="bt-card-header-right">' +
@@ -290,7 +319,7 @@
 
         if (list.length === 0) {
             grid.innerHTML = '<div class="bt-empty">' +
-                '<i class="fas fa-inbox"></i>' +
+                '<i class="fas fa-inbox" aria-hidden="true"></i>' +
                 '<div>No screen-print orders match your filters.</div>' +
                 '</div>';
             $('bt-result-count').textContent = '0 orders';
@@ -322,6 +351,13 @@
                 }
                 var id = card.getAttribute('data-id');
                 window.location.href = '/pages/transfer-detail.html?id=' + encodeURIComponent(id);
+            });
+            card.addEventListener('keydown', function (e) {
+                if (e.target !== card) return;
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    window.location.href = '/pages/transfer-detail.html?id=' + encodeURIComponent(card.getAttribute('data-id'));
+                }
             });
         });
     }
@@ -401,8 +437,7 @@
         toast.textContent = msg;
         container.appendChild(toast);
         setTimeout(function () {
-            toast.style.opacity = '0';
-            toast.style.transition = 'opacity .3s';
+            toast.classList.add('is-leaving');
             setTimeout(function () { toast.remove(); }, 300);
         }, 4000);
     }
@@ -410,16 +445,24 @@
     // ── Delete modal ─────────────────────────────────────────────────
     var deleteTargetId = null;
 
+    var deleteReturnFocus = null;
     function openDeleteModal(idTransfer) {
         deleteTargetId = idTransfer;
+        deleteReturnFocus = document.activeElement;
         $('bt-delete-modal-target').textContent = idTransfer || 'This order';
         $('bt-delete-form').reset();
-        $('bt-delete-modal').style.display = 'flex';
+        $('bt-delete-modal').hidden = false;
+        var reason = document.getElementById('bt-delete-reason');
+        if (reason) setTimeout(function () { reason.focus(); }, 30);
     }
 
     function closeDeleteModal() {
+        var m = $('bt-delete-modal');
+        if (m.hidden) return;
         deleteTargetId = null;
-        $('bt-delete-modal').style.display = 'none';
+        m.hidden = true;
+        if (deleteReturnFocus && document.body.contains(deleteReturnFocus) && typeof deleteReturnFocus.focus === 'function') deleteReturnFocus.focus();
+        deleteReturnFocus = null;
     }
 
     async function handleDeleteSubmit(e) {
@@ -430,8 +473,9 @@
             showToast('Please check the confirmation box.', 'error');
             return;
         }
-        var email = localStorage.getItem('transfer_user_email') || 'bradley@nwcustomapparel.com';
-        var name = localStorage.getItem('transfer_user_name') || 'Bradley Wright';
+        // Identity: the signed-in staffer (session), else what transfer-detail stashed, else Bradley (his queue).
+        var email = (state.me && state.me.email) || localStorage.getItem('transfer_user_email') || 'bradley@nwcustomapparel.com';
+        var name = (state.me && state.me.name) || localStorage.getItem('transfer_user_name') || 'Bradley Wright';
         var idToDelete = deleteTargetId;
         try {
             await hardDeleteTransfer(idToDelete, {
@@ -468,7 +512,7 @@
                 state.filters.requesterEmails = ['art@nwcustomapparel.com'];
 
                 var titleEl = document.querySelector('.tab-title');
-                if (titleEl) titleEl.innerHTML = '<i class="fas fa-paint-brush" style="color:#4a6fa5;"></i> Steve’s Screen Print Submissions';
+                if (titleEl) titleEl.innerHTML = '<i class="fas fa-paint-brush bt-title-icon" aria-hidden="true"></i> Steve’s Screen Print Submissions';
                 var subtitleEl = document.querySelector('.bt-subtitle');
                 if (subtitleEl) subtitleEl.textContent = 'Screen-print orders Steve sent to Bradley for L&P Printing';
                 var tabActive = document.querySelector('.tab-button.active');
@@ -488,7 +532,7 @@
         btn.id = 'bt-send-another-btn';
         btn.className = 'bt-btn bt-btn--primary';
         btn.title = 'Open the Send-to-Screen-Print modal to fire another order';
-        btn.innerHTML = '<i class="fas fa-print"></i> Send Another to Bradley';
+        btn.innerHTML = '<i class="fas fa-print" aria-hidden="true"></i> Send Another to Bradley';
         btn.addEventListener('click', function () {
             if (!window.TransferActions || typeof window.TransferActions.openSendModal !== 'function') {
                 showToast('Send modal isn\'t loaded — refresh the page.', 'error');
@@ -507,11 +551,31 @@
         actionsRow.insertBefore(btn, actionsRow.firstChild);
     }
 
+    // Chip pressed-state mirrors the Status dropdown + Rush checkbox (single source: state.filters).
+    function syncChips() {
+        document.querySelectorAll('.bt-stat-chip[data-status]').forEach(function (chip) {
+            var on = chip.getAttribute('data-status') === state.filters.status;
+            chip.classList.toggle('active', on);
+            chip.setAttribute('aria-pressed', on ? 'true' : 'false');
+        });
+        var rushChip = $('bt-stat-rush-chip');
+        if (rushChip) {
+            rushChip.classList.toggle('active', !!state.filters.rushOnly);
+            rushChip.setAttribute('aria-pressed', state.filters.rushOnly ? 'true' : 'false');
+        }
+    }
+
     // ── Wire Up ──────────────────────────────────────────────────────
     function init() {
         applyViewModeFromUrl();
+        // Who is signed in (for the delete audit trail) — best effort.
+        fetch('/api/crm-session/me', { credentials: 'same-origin' })
+            .then(function (r) { return r.ok ? r.json() : null; })
+            .then(function (me) { if (me && me.email) state.me = { email: me.email, name: [me.firstName, me.lastName].filter(Boolean).join(' ') || me.email }; })
+            .catch(function () { /* keep the fallbacks */ });
         $('bt-filter-status').addEventListener('change', function (e) {
             state.filters.status = e.target.value;
+            syncChips();
             applyFilters();
         });
         $('bt-filter-search').addEventListener('input', function (e) {
@@ -520,6 +584,7 @@
         });
         $('bt-filter-rush-only').addEventListener('change', function (e) {
             state.filters.rushOnly = e.target.checked;
+            syncChips();
             applyFilters();
         });
         $('bt-filter-clear').addEventListener('click', function () {
@@ -527,20 +592,24 @@
             $('bt-filter-status').value = '';
             $('bt-filter-search').value = '';
             $('bt-filter-rush-only').checked = false;
+            syncChips();
             applyFilters();
         });
 
+        // Stats chip clicks → quick-filter by status (click the active chip again to clear)
         document.querySelectorAll('.bt-stat-chip[data-status]').forEach(function (chip) {
             chip.addEventListener('click', function () {
                 var status = chip.getAttribute('data-status');
-                state.filters.status = status;
-                $('bt-filter-status').value = status;
+                state.filters.status = (state.filters.status === status) ? '' : status;
+                $('bt-filter-status').value = state.filters.status;
+                syncChips();
                 applyFilters();
             });
         });
         $('bt-stat-rush-chip').addEventListener('click', function () {
             state.filters.rushOnly = !state.filters.rushOnly;
             $('bt-filter-rush-only').checked = state.filters.rushOnly;
+            syncChips();
             applyFilters();
         });
 
@@ -555,6 +624,7 @@
             if (e.target === $('bt-delete-modal')) closeDeleteModal();
         });
         $('bt-delete-form').addEventListener('submit', handleDeleteSubmit);
+        document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeDeleteModal(); });
 
         readFlashToast();
 
