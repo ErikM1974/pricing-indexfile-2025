@@ -34,6 +34,9 @@
         'credit-card-auth': { label: 'Card Auth', icon: 'fa-credit-card', cls: 'badge--cca' },
         'quote-request': { label: 'Quote Lead', icon: 'fa-bullhorn', cls: 'badge--qrq' },
         'sample-request': { label: 'Sample Request', icon: 'fa-shirt', cls: 'badge--srq' },
+        // Leads typed in by staff on the Leads board (leads-common.js) — without this row the badge read
+        // the raw id "manual-lead" with a generic file icon on every one of them.
+        'manual-lead': { label: 'Manual Lead', icon: 'fa-user-pen', cls: 'badge--qrq' },
     };
 
     var STATUS_CLS = {
@@ -136,10 +139,15 @@
     }
 
     function loadAll() {
+        var root = document.getElementById('submissionsRoot');
+        var sroot = document.getElementById('samplesRoot');
+        root.classList.add('dash-loading'); root.textContent = 'Loading submissions…';
+        sroot.classList.add('dash-loading'); sroot.textContent = 'Loading open samples…';
         Promise.all([
             inboxFetch(''),
             inboxFetch('/items/open'),
         ]).then(function (results) {
+            DashPage.hideError();
             state.submissions = withoutJotformLeads(results[0].submissions);
             state.openItems = results[1].items || [];
             renderStats();
@@ -147,40 +155,78 @@
             renderSamples();
         }).catch(function (err) {
             console.error('[forms-inbox] load failed:', err);
-            DashPage.showError('Unable to load submissions (' + err.message + '). Refresh to retry.');
-            var root = document.getElementById('submissionsRoot');
+            DashPage.showError('Unable to load submissions (' + err.message + ').');
+            var retry = '<button type="button" class="dash-btn dash-btn--sm inbox-retry" data-retry="1">Retry</button>';
             root.classList.remove('dash-loading');
-            root.innerHTML = '<div class="inbox-empty"><i class="fas fa-triangle-exclamation"></i> Submissions unavailable.</div>';
-            var sroot = document.getElementById('samplesRoot');
+            root.innerHTML = '<div class="inbox-empty" role="alert"><i class="fas fa-triangle-exclamation" aria-hidden="true"></i> Submissions unavailable (' + esc(err.message) + '). ' + retry + '</div>';
             sroot.classList.remove('dash-loading');
-            sroot.innerHTML = '<div class="inbox-empty"><i class="fas fa-triangle-exclamation"></i> Samples unavailable.</div>';
+            sroot.innerHTML = '<div class="inbox-empty" role="alert"><i class="fas fa-triangle-exclamation" aria-hidden="true"></i> Samples unavailable (' + esc(err.message) + '). ' + retry + '</div>';
+            document.querySelectorAll('[data-retry]').forEach(function (b) { b.addEventListener('click', loadAll); });
         });
     }
 
     // ---------- chrome ----------
 
+    var tabs = [];
+    function showView(view) {
+        tabs.forEach(function (t) {
+            var on = t.dataset.view === view;
+            t.classList.toggle('is-active', on);
+            t.setAttribute('aria-selected', on ? 'true' : 'false');
+            t.tabIndex = on ? 0 : -1;
+        });
+        document.getElementById('viewSubmissions').hidden = view !== 'submissions';
+        document.getElementById('viewSamples').hidden = view !== 'samples';
+    }
+
+    function setFormFilter(value) {
+        state.formFilter = value || '';
+        document.querySelectorAll('#formChips .inbox-chip').forEach(function (c) {
+            var on = (c.dataset.form || '') === state.formFilter;
+            c.classList.toggle('is-active', on);
+            c.setAttribute('aria-pressed', on ? 'true' : 'false');
+        });
+    }
+
     function wireChrome() {
-        document.querySelectorAll('.inbox-tab').forEach(function (tab) {
-            tab.addEventListener('click', function () {
-                document.querySelectorAll('.inbox-tab').forEach(function (t) { t.classList.remove('is-active'); });
-                tab.classList.add('is-active');
-                var view = tab.dataset.view;
-                document.getElementById('viewSubmissions').hidden = view !== 'submissions';
-                document.getElementById('viewSamples').hidden = view !== 'samples';
+        tabs = Array.prototype.slice.call(document.querySelectorAll('.inbox-tab'));
+        tabs.forEach(function (tab, i) {
+            tab.addEventListener('click', function () { showView(tab.dataset.view); });
+            // WAI-ARIA tabs: arrow keys move between the two views
+            tab.addEventListener('keydown', function (e) {
+                if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+                var n = tabs[(i + (e.key === 'ArrowRight' ? 1 : tabs.length - 1)) % tabs.length];
+                n.focus(); showView(n.dataset.view);
             });
         });
 
         document.querySelectorAll('#formChips .inbox-chip').forEach(function (chip) {
             chip.addEventListener('click', function () {
-                document.querySelectorAll('#formChips .inbox-chip').forEach(function (c) { c.classList.remove('is-active'); });
-                chip.classList.add('is-active');
-                state.formFilter = chip.dataset.form;
+                setFormFilter(chip.dataset.form);
                 renderSubmissions();
             });
         });
 
+        // Stat tiles: "New this week" toggles the status filter to New; the sample tiles open the tracker.
+        document.querySelectorAll('.inbox-stat-btn').forEach(function (tile) {
+            tile.addEventListener('click', function () {
+                if (tile.dataset.tile === 'samples') { showView('samples'); document.getElementById('tab-samples').focus(); return; }
+                var sel = document.getElementById('statusFilter');
+                var on = sel.value !== 'New';
+                sel.value = on ? 'New' : '';
+                state.statusFilter = sel.value;
+                tile.setAttribute('aria-pressed', on ? 'true' : 'false');
+                showView('submissions');
+                renderSubmissions();
+            });
+        });
+        var refreshBtn = document.getElementById('inboxRefresh');
+        if (refreshBtn) refreshBtn.addEventListener('click', loadAll);
+
         document.getElementById('statusFilter').addEventListener('change', function (e) {
             state.statusFilter = e.target.value;
+            var newTile = document.querySelector('.inbox-stat-btn[data-tile="new"]');
+            if (newTile) newTile.setAttribute('aria-pressed', state.statusFilter === 'New' ? 'true' : 'false');
             renderSubmissions();
         });
 
@@ -199,7 +245,7 @@
         });
         document.getElementById('printDetailBtn').addEventListener('click', function () { window.print(); });
         document.addEventListener('keydown', function (e) {
-            if (e.key === 'Escape') closeDetail();
+            if (e.key === 'Escape' && !document.getElementById('detailOverlay').hidden) closeDetail();
         });
     }
 
@@ -213,6 +259,11 @@
     function today0() {
         var d = new Date();
         return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    }
+
+    function localToday() {
+        var d = new Date();
+        return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
     }
 
     function daysBetween(a, b) { return Math.round((b - a) / 86400000); }
@@ -263,7 +314,8 @@
 
     function visibleSubmissions() {
         return state.submissions.filter(function (s) {
-            if (state.formFilter && s.Form_ID !== state.formFilter) return false;
+            // a chip may cover several form ids ("Leads" = quote-request,sample-request,manual-lead)
+            if (state.formFilter && state.formFilter.split(',').indexOf(s.Form_ID) === -1) return false;
             if (state.statusFilter && s.Status !== state.statusFilter) return false;
             if (state.search) {
                 var hay = (s.Company + ' ' + s.Contact_Name + ' ' + s.Submission_ID + ' ' + s.Summary).toLowerCase();
@@ -288,7 +340,7 @@
             var overdue = isOverdueSub(s);
             return '<tr data-id="' + esc(s.Submission_ID) + '" class="' + (overdue ? 'row--overdue' : '') + '">' +
                 '<td class="col-date">' + esc(fmtStamp(s.Submitted_At)) + '</td>' +
-                '<td><span class="inbox-badge ' + meta.cls + '"><i class="fas ' + meta.icon + '"></i> ' + esc(meta.label) + '</span></td>' +
+                '<td><span class="inbox-badge ' + meta.cls + '"><i aria-hidden="true" class="fas ' + meta.icon + '"></i> ' + esc(meta.label) + '</span></td>' +
                 '<td class="col-company"><strong>' + esc(s.Company) + '</strong>' +
                     (s.Contact_Name ? '<span class="inbox-muted">' + esc(s.Contact_Name) + '</span>' : '') + '</td>' +
                 '<td class="col-summary">' + esc(s.Summary) + '</td>' +
@@ -311,11 +363,14 @@
 
     // ---------- detail modal ----------
 
+    var detailReturnFocus = null;
     function openDetail(submissionId) {
         var body = document.getElementById('detailBody');
         body.innerHTML = '<div class="dash-loading">Loading…</div>';
+        detailReturnFocus = document.activeElement;
         document.getElementById('detailOverlay').hidden = false;
         document.body.classList.add('inbox-modal-open');
+        setTimeout(function () { var c = document.getElementById('closeDetailBtn'); if (c) c.focus(); }, 30);
 
         inboxFetch('/' + encodeURIComponent(submissionId))
             .then(function (data) {
@@ -323,21 +378,24 @@
                 renderDetail(data.submission, data.items || []);
             })
             .catch(function (err) {
-                body.innerHTML = '<div class="inbox-empty"><i class="fas fa-triangle-exclamation"></i> ' + esc(err.message) + '</div>';
+                body.innerHTML = '<div class="inbox-empty"><i class="fas fa-triangle-exclamation" aria-hidden="true"></i> ' + esc(err.message) + '</div>';
             });
     }
 
     function closeDetail() {
+        var wasOpen = !document.getElementById('detailOverlay').hidden;
         document.getElementById('detailOverlay').hidden = true;
         document.body.classList.remove('inbox-modal-open');
         state.detail = null;
+        if (wasOpen && detailReturnFocus && document.body.contains(detailReturnFocus)) { try { detailReturnFocus.focus(); } catch (e) { /* gone */ } }
+        detailReturnFocus = null;
     }
 
     function renderDetail(sub, items) {
         var meta = FORM_META[sub.Form_ID] || { label: sub.Form_ID, icon: 'fa-file', cls: '' };
         document.getElementById('detailTitle').innerHTML =
-            '<span class="inbox-badge ' + meta.cls + '"><i class="fas ' + meta.icon + '"></i> ' + esc(meta.label) + '</span> ' +
-            '<button type="button" class="copy-id" title="Copy id" data-copy="' + esc(sub.Submission_ID) + '">' + esc(sub.Submission_ID) + ' <i class="far fa-copy"></i></button>' +
+            '<span class="inbox-badge ' + meta.cls + '"><i aria-hidden="true" class="fas ' + meta.icon + '"></i> ' + esc(meta.label) + '</span> ' +
+            '<button type="button" class="copy-id" title="Copy id" aria-label="Copy id ' + esc(sub.Submission_ID) + '" data-copy="' + esc(sub.Submission_ID) + '">' + esc(sub.Submission_ID) + ' <i class="far fa-copy" aria-hidden="true"></i></button>' +
             ' <span class="inbox-muted">saved ' + esc(fmtStamp(sub.Submitted_At)) + '</span>';
         var copyBtn = document.querySelector('#detailTitle .copy-id');
         copyBtn.addEventListener('click', function () {
@@ -358,16 +416,16 @@
             '<label>Status <select id="detailStatus">' + choices.map(function (c) {
                 return '<option' + (c === sub.Status ? ' selected' : '') + '>' + esc(c) + '</option>';
             }).join('') + '</select></label>' +
-            '<button type="button" class="dash-btn dash-btn--primary" id="saveStatusBtn"><i class="fas fa-check"></i> Save Status</button>';
+            '<button type="button" class="dash-btn dash-btn--primary" id="saveStatusBtn"><i class="fas fa-check" aria-hidden="true"></i> Save Status</button>';
         if (sub.Form_ID === 'artwork-request') {
             html += sub.Art_Request_ID
-                ? '<span class="inbox-status status--art"><i class="fas fa-palette"></i> Art Request #' + esc(sub.Art_Request_ID) + '</span>'
-                : '<button type="button" class="dash-btn" id="artPushBtn"><i class="fas fa-palette"></i> Create Art Request</button>';
+                ? '<span class="inbox-status status--art"><i class="fas fa-palette" aria-hidden="true"></i> Art Request #' + esc(sub.Art_Request_ID) + '</span>'
+                : '<button type="button" class="dash-btn" id="artPushBtn"><i class="fas fa-palette" aria-hidden="true"></i> Create Art Request</button>';
         }
         if (sub.Form_ID === 'ae-order-intake') {
             html += sub.Pushed_To_ShopWorks === 'Yes'
-                ? '<span class="inbox-status status--done"><i class="fas fa-industry"></i> ShopWorks: ' + esc(sub.ShopWorks_Order_ID || 'pushed') + '</span>'
-                : '<button type="button" class="dash-btn" id="swPushBtn"><i class="fas fa-industry"></i> Push to ShopWorks…</button>';
+                ? '<span class="inbox-status status--done"><i class="fas fa-industry" aria-hidden="true"></i> ShopWorks: ' + esc(sub.ShopWorks_Order_ID || 'pushed') + '</span>'
+                : '<button type="button" class="dash-btn" id="swPushBtn"><i class="fas fa-industry" aria-hidden="true"></i> Push to ShopWorks…</button>';
         }
         html += '<span class="inbox-muted" id="detailActionMsg"></span></div>';
 
@@ -382,7 +440,7 @@
         // checks
         if (payload.checks && payload.checks.length) {
             html += '<div class="detail-checks">' + payload.checks.map(function (c) {
-                return '<span class="inbox-badge badge--check"><i class="fas fa-check"></i> ' + esc(c) + '</span>';
+                return '<span class="inbox-badge badge--check"><i class="fas fa-check" aria-hidden="true"></i> ' + esc(c) + '</span>';
             }).join('') + '</div>';
         }
 
@@ -442,7 +500,7 @@
 
     function detailMsg(text, isError) {
         var el = document.getElementById('detailActionMsg');
-        if (el) { el.textContent = text; el.classList.toggle('inbox-late', !!isError); }
+        if (el) { el.textContent = text; el.classList.toggle('inbox-late', !!isError); el.setAttribute('role', isError ? 'alert' : 'status'); }
     }
 
     function updateSubmission(submissionId, fields) {
@@ -473,7 +531,8 @@
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 Item_Status: newStatus,
-                Date_Returned: newStatus === 'Returned' ? new Date().toISOString().slice(0, 10) : '',
+                // LOCAL day — toISOString() is UTC and after 5 PM Pacific would record tomorrow's date in Caspio
+                Date_Returned: newStatus === 'Returned' ? localToday() : '',
                 Condition: condition,
                 Checked_In_By: state.staffEmail,
             }),
@@ -630,8 +689,8 @@
         if (existing) existing.remove();
 
         var c = classifyOrderRows(payload);
-        var html = '<div class="detail-actionbar sw-preview" id="swPreview"><div style="width:100%">' +
-            '<strong><i class="fas fa-industry"></i> Push preview — creates a REAL ShopWorks order</strong><br>' +
+        var html = '<div class="detail-actionbar sw-preview" id="swPreview"><div class="sw-preview-body">' +
+            '<strong><i class="fas fa-industry" aria-hidden="true"></i> Push preview — creates a REAL ShopWorks order</strong><br>' +
             'Customer: <strong>' + esc(sub.Company) + '</strong>' +
             (sub.Customer_Number ? ' (#' + esc(sub.Customer_Number) + ')' : ' — <span class="inbox-late">no customer #: lands on the catch-all, re-assign in SW</span>') +
             '<br>';
@@ -647,7 +706,7 @@
         html += '<span class="inbox-muted">Tax is NOT pushed (apply the SW tax dropdown). Money summary, decoration and fulfillment ride in Notes On Order. No design is linked.</span><br>';
 
         if (c.verified.length) {
-            html += '<button type="button" class="dash-btn dash-btn--primary" id="swConfirmBtn"><i class="fas fa-check"></i> Confirm push</button> ';
+            html += '<button type="button" class="dash-btn dash-btn--primary" id="swConfirmBtn"><i class="fas fa-check" aria-hidden="true"></i> Confirm push</button> ';
         } else {
             html += '<span class="inbox-late">Nothing pushable — every row is unverified. Fix rows or enter by hand.</span> ';
         }
@@ -660,7 +719,7 @@
         var confirmBtn = document.getElementById('swConfirmBtn');
         if (confirmBtn) confirmBtn.addEventListener('click', function () {
             confirmBtn.disabled = true;
-            confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Pushing…';
+            confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Pushing…';
             inboxFetch('/' + encodeURIComponent(sub.Submission_ID) + '/push-to-shopworks', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -671,7 +730,7 @@
             }).catch(function (err) {
                 console.error('[forms-inbox] SW push failed:', err);
                 confirmBtn.disabled = false;
-                confirmBtn.innerHTML = '<i class="fas fa-check"></i> Confirm push';
+                confirmBtn.innerHTML = '<i class="fas fa-check" aria-hidden="true"></i> Confirm push';
                 detailMsg('ShopWorks push FAILED: ' + err.message, true);
             });
         });
@@ -684,7 +743,7 @@
         root.classList.remove('dash-loading');
 
         if (!state.openItems.length) {
-            root.innerHTML = '<div class="inbox-empty"><i class="fas fa-circle-check"></i> Nothing is checked out — all samples are home.</div>';
+            root.innerHTML = '<div class="inbox-empty"><i class="fas fa-circle-check" aria-hidden="true"></i> Nothing is checked out — all samples are home.</div>';
             return;
         }
 

@@ -62,6 +62,12 @@
   }
 
   function day(s) { return String(s || '').slice(0, 10); }
+  // LOCAL calendar day — toISOString() is UTC, which after 5 PM Pacific is already tomorrow. That made
+  // "accrues <date>" pills and the printed slip run date a day ahead every evening.
+  function todayLocal() {
+    var d = new Date();
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
 
   async function api(path, opts) {
     var r = await fetch(API + path, Object.assign({
@@ -81,16 +87,27 @@
 
   // --- tabs ----------------------------------------------------------------
 
-  Array.prototype.forEach.call(document.querySelectorAll('.pr-tab'), function (tab) {
-    tab.addEventListener('click', function () {
-      Array.prototype.forEach.call(document.querySelectorAll('.pr-tab'), function (t) {
-        t.classList.toggle('is-active', t === tab);
-      });
-      var name = tab.getAttribute('data-panel');
-      Array.prototype.forEach.call(document.querySelectorAll('.pr-panel'), function (p) {
-        p.classList.toggle('is-active', p.id === 'panel-' + name);
-      });
-      setStatus('');
+  var tabButtons = Array.prototype.slice.call(document.querySelectorAll('.pr-tab'));
+  function showTab(tab) {
+    tabButtons.forEach(function (t) {
+      var on = t === tab;
+      t.classList.toggle('is-active', on);
+      t.setAttribute('aria-selected', on ? 'true' : 'false');
+      t.tabIndex = on ? 0 : -1;
+    });
+    var name = tab.getAttribute('data-panel');
+    Array.prototype.forEach.call(document.querySelectorAll('.pr-panel'), function (p) {
+      p.classList.toggle('is-active', p.id === 'panel-' + name);
+    });
+    setStatus('');
+  }
+  tabButtons.forEach(function (tab, i) {
+    tab.addEventListener('click', function () { showTab(tab); });
+    // WAI-ARIA tabs: arrow keys move between the three panels
+    tab.addEventListener('keydown', function (e) {
+      if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+      var n = tabButtons[(i + (e.key === 'ArrowRight' ? 1 : tabButtons.length - 1)) % tabButtons.length];
+      n.focus(); showTab(n);
     });
   });
 
@@ -120,7 +137,7 @@
       // instead of letting it read as a data error.
       var eligible = day(e.Vacation_Eligible_Date);
       var pills = '';
-      if (eligible && eligible > new Date().toISOString().slice(0, 10)) {
+      if (eligible && eligible > todayLocal()) {
         pills += '<span class="pr-pill pr-pill-wait">accrues ' + esc(eligible) + '</span>';
       }
       if (f && !f.printable) pills += '<span class="pr-pill pr-pill-flag">no slip</span>';
@@ -195,7 +212,7 @@
       var asOf = rosterAsOf();
       slipFigures = new Map();
       allEmployees.forEach(function (e) {
-        slipFigures.set(e, VC.buildSlipFigures(e, { fallbackAsOf: asOf || undefined }));
+        slipFigures.set(e, VC.buildSlipFigures(e, { fallbackAsOf: asOf || undefined, today: todayLocal() }));
       });
 
       renderLeave(allEmployees);
@@ -205,7 +222,9 @@
         : 'No packet imported yet';
     } catch (e) {
       document.getElementById('leave-body').innerHTML =
-        '<tr><td colspan="10" class="pr-loading">Could not load balances.</td></tr>';
+        '<tr><td colspan="10" class="pr-loading" role="alert">Could not load balances (' + esc(e.message) + '). '
+        + '<button type="button" class="pr-btn pr-retry" id="leave-retry">Retry</button></td></tr>';
+      var rb = document.getElementById('leave-retry'); if (rb) rb.addEventListener('click', loadLeave);
       setStatus('Unable to load leave balances: ' + e.message, 'error');
     }
   }
@@ -228,6 +247,12 @@
       }).join('');
       loadRegister(periods[0].checkDate);
     } catch (e) {
+      var sel2 = document.getElementById('period-select');
+      sel2.innerHTML = '<option value="">Pay periods did not load</option>';
+      document.getElementById('period-body').innerHTML =
+        '<tr><td colspan="8" class="pr-loading" role="alert">Could not load pay periods (' + esc(e.message) + '). '
+        + '<button type="button" class="pr-btn pr-retry" id="periods-retry">Retry</button></td></tr>';
+      var rb2 = document.getElementById('periods-retry'); if (rb2) rb2.addEventListener('click', loadPeriods);
       setStatus('Unable to load pay periods: ' + e.message, 'error');
     }
   }
@@ -256,7 +281,9 @@
           + '</tr>';
       }).join('');
     } catch (e) {
-      body.innerHTML = '<tr><td colspan="8" class="pr-loading">Could not load this period.</td></tr>';
+      body.innerHTML = '<tr><td colspan="8" class="pr-loading" role="alert">Could not load this period (' + esc(e.message) + '). '
+        + '<button type="button" class="pr-btn pr-retry" id="register-retry">Retry</button></td></tr>';
+      var rb3 = document.getElementById('register-retry'); if (rb3) rb3.addEventListener('click', function () { loadRegister(checkDate); });
       setStatus('Unable to load period: ' + e.message, 'error');
     }
   }
@@ -695,7 +722,7 @@
     var rows = currentLeaveRows();
     if (!rows.length) return setStatus('Nothing to print — no employees match the filter.', 'error');
 
-    var runDate = new Date().toISOString().slice(0, 10);
+    var runDate = todayLocal();
 
     // §7.1/§7.2 — a record whose figures don't reconcile, or that has no entitlement set,
     // does NOT go on paper. It still goes in the audit CSV, marked not-printed, so a

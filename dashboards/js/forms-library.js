@@ -21,17 +21,22 @@
     };
     var DEFAULT_ICON = 'fa-file-lines';
 
-    document.addEventListener('DOMContentLoaded', function () {
-        loadForms().catch(function (err) {
+    document.addEventListener('DOMContentLoaded', boot);
+
+    function boot() {
+        var root = document.getElementById('formsRoot');
+        if (root) { root.classList.add('dash-loading'); root.textContent = 'Loading forms…'; }
+        loadForms().then(function () { DashPage.hideError(); }).catch(function (err) {
             console.error('[forms-library] load failed:', err);
-            DashPage.showError('Unable to load the forms list. Please refresh — or check the console.');
-            var root = document.getElementById('formsRoot');
+            DashPage.showError('Unable to load the forms list (' + (err.message || 'request failed') + ').');
             if (root) {
                 root.classList.remove('dash-loading');
-                root.innerHTML = '<div class="forms-load-failed"><i class="fas fa-triangle-exclamation"></i> Forms list unavailable.</div>';
+                root.innerHTML = '<div class="forms-load-failed" role="alert"><i class="fas fa-triangle-exclamation" aria-hidden="true"></i> Forms list unavailable (' + escapeHtml(err.message || 'request failed') + '). ' +
+                    '<button type="button" class="dash-btn dash-btn--sm" id="forms-retry">Retry</button></div>';
+                var rb = document.getElementById('forms-retry'); if (rb) rb.addEventListener('click', boot);
             }
         });
-    });
+    }
 
     function escapeHtml(value) {
         return String(value == null ? '' : value)
@@ -85,7 +90,7 @@
             return (
                 '<section class="dash-card forms-category">' +
                     '<div class="dash-card-header">' +
-                        '<h2 class="dash-card-title"><i class="fas ' + icon + '"></i> ' + escapeHtml(cat) + '</h2>' +
+                        '<h2 class="dash-card-title"><i aria-hidden="true" class="fas ' + icon + '"></i> ' + escapeHtml(cat) + '</h2>' +
                     '</div>' +
                     '<div class="forms-rows">' + rows + '</div>' +
                 '</section>'
@@ -102,14 +107,14 @@
         var actions = '';
         if (fillUrl) {
             actions +=
-                '<a class="dash-btn dash-btn--primary" href="' + escapeHtml(fillUrl) + '">' +
-                    '<i class="fas fa-pen-to-square"></i> Fill Out Online' +
+                '<a class="dash-btn dash-btn--primary" href="' + escapeHtml(fillUrl) + '" aria-label="Fill out ' + escapeHtml(form.Form_Name) + ' online">' +
+                    '<i class="fas fa-pen-to-square" aria-hidden="true"></i> Fill Out Online' +
                 '</a>';
         }
         if (pdfUrl) {
             actions +=
-                '<a class="dash-btn" href="' + escapeHtml(pdfUrl) + '" target="_blank" rel="noopener">' +
-                    '<i class="fas fa-file-pdf"></i> Download / Print PDF' +
+                '<a class="dash-btn" href="' + escapeHtml(pdfUrl) + '" target="_blank" rel="noopener" aria-label="Download or print ' + escapeHtml(form.Form_Name) + ' (PDF, opens in a new tab)">' +
+                    '<i class="fas fa-file-pdf" aria-hidden="true"></i> Download / Print PDF' +
                 '</a>';
         }
 

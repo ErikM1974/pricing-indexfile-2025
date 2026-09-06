@@ -16,7 +16,7 @@
     <!-- 2026 design tokens (must load before dash-shell.css) -->
     <link rel="stylesheet" href="/shared_components/css/art-hub.css">
     <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
-    <link rel="stylesheet" href="/dashboards/css/form-submissions.css?v=2026.08.10.7">
+    <link rel="stylesheet" href="/dashboards/css/form-submissions.css?v=2026.09.05.64">
 </head>
 <body>
     <div class="dash-shell">
@@ -30,11 +30,11 @@
             </div>
             <div class="dash-header-right">
                 <a href="/dashboards/forms-library.html" class="dash-back-link">
-                    <i class="fas fa-file-lines"></i>
+                    <i class="fas fa-file-lines" aria-hidden="true"></i>
                     Forms Library
                 </a>
                 <a href="/staff-dashboard.html" class="dash-back-link">
-                    <i class="fas fa-arrow-left"></i>
+                    <i class="fas fa-arrow-left" aria-hidden="true"></i>
                     Dashboard
                 </a>
             </div>
@@ -42,54 +42,56 @@
 
         <main class="dash-content">
             <div class="dash-error-banner" role="alert">
-                <i class="fas fa-exclamation-triangle"></i>
+                <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
                 <span class="dash-error-banner-message"></span>
-                <button class="dash-error-banner-close" aria-label="Dismiss">
-                    <i class="fas fa-times"></i>
+                <button type="button" class="dash-error-banner-close" aria-label="Dismiss">
+                    <i class="fas fa-times" aria-hidden="true"></i>
                 </button>
             </div>
 
-            <div class="dash-stat-grid">
-                <div class="dash-stat-card">
+            <!-- Tiles act: "New this week" filters the list to New; the two sample tiles open the Samples Tracker -->
+            <div class="dash-stat-grid" role="group" aria-label="Inbox summary">
+                <button type="button" class="dash-stat-card inbox-stat-btn" data-tile="new" aria-pressed="false">
                     <div class="dash-stat-value" id="statNew">—</div>
                     <div class="dash-stat-label">New this week</div>
-                </div>
-                <div class="dash-stat-card">
+                </button>
+                <button type="button" class="dash-stat-card inbox-stat-btn" data-tile="samples">
                     <div class="dash-stat-value" id="statOut">—</div>
                     <div class="dash-stat-label">Sample items out</div>
-                </div>
-                <div class="dash-stat-card inbox-stat--overdue">
+                </button>
+                <button type="button" class="dash-stat-card inbox-stat--overdue inbox-stat-btn" data-tile="samples">
                     <div class="dash-stat-value" id="statOverdue">—</div>
                     <div class="dash-stat-label">Overdue samples</div>
-                </div>
+                </button>
                 <div class="dash-stat-card dash-stat-card--accent">
                     <div class="dash-stat-value" id="statDueSoon">—</div>
                     <div class="dash-stat-label">Due in 7 days</div>
                 </div>
             </div>
 
-            <div class="inbox-tabs no-print">
-                <button type="button" class="inbox-tab is-active" data-view="submissions">
-                    <i class="fas fa-inbox"></i> All Submissions
+            <div class="inbox-tabs no-print" role="tablist" aria-label="Inbox views">
+                <button type="button" class="inbox-tab is-active" id="tab-submissions" data-view="submissions" role="tab" aria-selected="true" aria-controls="viewSubmissions">
+                    <i class="fas fa-inbox" aria-hidden="true"></i> All Submissions
                 </button>
-                <button type="button" class="inbox-tab" data-view="samples">
-                    <i class="fas fa-shirt"></i> Samples Tracker
+                <button type="button" class="inbox-tab" id="tab-samples" data-view="samples" role="tab" aria-selected="false" tabindex="-1" aria-controls="viewSamples">
+                    <i class="fas fa-shirt" aria-hidden="true"></i> Samples Tracker
                 </button>
             </div>
 
             <!-- ============ View 1: submissions list ============ -->
-            <section id="viewSubmissions" class="dash-card">
+            <section id="viewSubmissions" class="dash-card" role="tabpanel" aria-labelledby="tab-submissions">
                 <div class="inbox-filterbar no-print">
-                    <div class="inbox-chips" id="formChips">
-                        <button type="button" class="inbox-chip is-active" data-form="">All</button>
-                        <button type="button" class="inbox-chip" data-form="garment-drop-off">Drop-Offs</button>
-                        <button type="button" class="inbox-chip" data-form="artwork-request">Artwork</button>
-                        <button type="button" class="inbox-chip" data-form="name-personalization">Name Lists</button>
-                        <button type="button" class="inbox-chip" data-form="sample-checkout">Samples</button>
-                        <button type="button" class="inbox-chip" data-form="ae-order-intake">Order Intake</button>
-                        <button type="button" class="inbox-chip" data-form="final-qc-checklist">Final QC</button>
-                        <button type="button" class="inbox-chip" data-form="spoilage-report">Spoilage</button>
-                        <button type="button" class="inbox-chip" data-form="maintenance-log">Maintenance</button>
+                    <div class="inbox-chips" id="formChips" role="group" aria-label="Filter by form">
+                        <button type="button" class="inbox-chip is-active" data-form="" aria-pressed="true">All</button>
+                        <button type="button" class="inbox-chip" data-form="quote-request,sample-request,manual-lead" aria-pressed="false">Leads</button>
+                        <button type="button" class="inbox-chip" data-form="garment-drop-off" aria-pressed="false">Drop-Offs</button>
+                        <button type="button" class="inbox-chip" data-form="artwork-request" aria-pressed="false">Artwork</button>
+                        <button type="button" class="inbox-chip" data-form="name-personalization" aria-pressed="false">Name Lists</button>
+                        <button type="button" class="inbox-chip" data-form="sample-checkout" aria-pressed="false">Samples</button>
+                        <button type="button" class="inbox-chip" data-form="ae-order-intake" aria-pressed="false">Order Intake</button>
+                        <button type="button" class="inbox-chip" data-form="final-qc-checklist" aria-pressed="false">Final QC</button>
+                        <button type="button" class="inbox-chip" data-form="spoilage-report" aria-pressed="false">Spoilage</button>
+                        <button type="button" class="inbox-chip" data-form="maintenance-log" aria-pressed="false">Maintenance</button>
                     </div>
                     <select id="statusFilter" class="inbox-select" aria-label="Filter by status">
                         <option value="">Any status</option>
@@ -104,16 +106,17 @@
                     </select>
                     <input type="search" id="searchBox" class="inbox-search" placeholder="Search company / contact / ID…" aria-label="Search submissions">
                 </div>
-                <div id="submissionsRoot" class="dash-loading">Loading submissions…</div>
+                <div id="submissionsRoot" class="dash-loading" role="status">Loading submissions…</div>
             </section>
 
             <!-- ============ View 2: samples tracker ============ -->
-            <section id="viewSamples" class="dash-card" hidden>
+            <section id="viewSamples" class="dash-card" role="tabpanel" aria-labelledby="tab-samples" hidden>
                 <div class="dash-card-header">
-                    <h2 class="dash-card-title"><i class="fas fa-rotate-left"></i> Checked-Out Samples</h2>
+                    <h2 class="dash-card-title"><i class="fas fa-rotate-left" aria-hidden="true"></i> Checked-Out Samples</h2>
                     <span class="inbox-muted">75% of retail is charged for items not returned by the grace deadline.</span>
+                    <button type="button" id="inboxRefresh" class="dash-btn dash-btn--sm"><i class="fas fa-rotate" aria-hidden="true"></i> Refresh</button>
                 </div>
-                <div id="samplesRoot" class="dash-loading">Loading open samples…</div>
+                <div id="samplesRoot" class="dash-loading" role="status">Loading open samples…</div>
             </section>
         </main>
     </div>
@@ -124,8 +127,8 @@
             <div class="inbox-modal-head no-print">
                 <h2 id="detailTitle">Submission</h2>
                 <div class="inbox-modal-actions">
-                    <button type="button" id="printDetailBtn" class="dash-btn"><i class="fas fa-print"></i> Print</button>
-                    <button type="button" id="closeDetailBtn" class="dash-btn" aria-label="Close"><i class="fas fa-times"></i></button>
+                    <button type="button" id="printDetailBtn" class="dash-btn"><i class="fas fa-print" aria-hidden="true"></i> Print</button>
+                    <button type="button" id="closeDetailBtn" class="dash-btn" aria-label="Close"><i class="fas fa-times" aria-hidden="true"></i></button>
                 </div>
             </div>
             <div id="detailBody" class="inbox-modal-body"></div>
@@ -136,6 +139,6 @@
     <script src="/config/app.config.js"></script>
     <script src="/shared_components/js/fetch-timeout.js"></script>
     <script src="/shared_components/js/dash-page-helpers.js"></script>
-    <script src="/dashboards/js/form-submissions.js?v=2026.08.10.7"></script>
+    <script src="/dashboards/js/form-submissions.js?v=2026.09.05.64"></script>
 </body>
 </html>

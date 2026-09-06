@@ -1018,3 +1018,35 @@ lightbox, Retry on every fetch, honest "locked" metrics). Fixes are hygiene:
 13. Left alone: the 2026 marketing allotment default ($35,110.95) typed in JS — it is editable on the tab and
     is an allotment, not a price; the 15-min ODBC feed silence when empty (documented "optional" by design).
 14. ⏭️ Purchasing Portal + AE Mission Control carry the viewer change — smoke both when their turn comes.
+
+## Payroll + Forms Inbox + Forms Library — review, 18 items (2026-09-05, `v2026.09.05.64`)
+
+**Payroll** (`dashboards/payroll.html` + `js/payroll.js`, admin-only)
+1. 🔴 UTC "today" ×3: the "accrues <date>" pill (`eligible > toISOString()`), `VC.buildSlipFigures` default
+   `today`, and the **printed slip run date + audit CSV** were a day ahead after 5 PM Pacific → `todayLocal()`
+   (also passed explicitly as `today:` to the carryover module; its unit tests already pass `today`).
+2. Tabs → tablist (`aria-selected`, roving tabindex, `aria-controls`, arrows); panels `role=tabpanel`.
+3. Retry on all three loads (leave balances / pay periods / register) with the reason; `[hidden]` guard; `?v=`.
+
+**Forms Inbox** (`dashboards/form-submissions.html` + `js/form-submissions.js`)
+4. 🔴 **`manual-lead` rows rendered the raw id** "manual-lead" with a generic file icon (every lead typed on the
+   Leads board) — no `FORM_META` entry. Now "Manual Lead". A **"Leads" chip** (quote-request, sample-request,
+   manual-lead — `data-form` accepts a comma list) joins the filter row; the lead types had no chip at all.
+5. 🔴 `Date_Returned` written to Caspio as `toISOString().slice(0,10)` (UTC) when marking a sample returned →
+   tomorrow's date after 5 PM → `localToday()`.
+6. Tiles: "New this week" toggles the status filter to New (`aria-pressed`, synced with the select); the two
+   sample tiles open the Samples Tracker. Chips `aria-pressed`; tabs → tablist + arrows; panels labelled.
+7. Load failure → reason + Retry in both roots (was "Refresh to retry"); a Refresh button on the Samples card.
+8. Detail dialog: focus → Close, returns to the row's View button; Esc only when open; copy-id button named;
+   action message `role=status|alert`; inline `style="width:100%"` → `.sw-preview-body`; 41 icons `aria-hidden`.
+
+**Forms Library** (`dashboards/forms-library.html` + `js/forms-library.js`)
+9. Load failure → reason + Retry (`boot()`); action links named per form ("Download or print X (PDF, opens in
+   a new tab)"); 54 icons `aria-hidden`; banner close typed; `?v=` (assets were unversioned).
+10. Lock for all three: `tests/unit/office-forms-pages.test.js`.
+11. Smoke on static-dist: Payroll 404 → 3 Retry rows; stubbed → "accrues 2026-09-06" for an eligible-tomorrow
+    employee (UTC today was already 09-06); ArrowRight → Pay Periods selected/focused. Inbox 404 → 2 Retry
+    buttons; stubbed → "Manual Lead" badge, Leads chip → 2 rows, New tile → status New / pressed, sample tile →
+    Samples tab focused; detail → focus Close, Esc → back on View. Library live data (proxy): 6 categories,
+    29 rows, named links.
+12. Left alone: `window.prompt` for the return condition (staff pattern); `window.confirm` before an art push.

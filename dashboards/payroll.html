@@ -6,7 +6,7 @@
   <meta name="robots" content="noindex, nofollow">
   <title>Payroll — Northwest Custom Apparel</title>
   <link rel="icon" href="/favicon.png" type="image/png">
-  <link href="/dashboards/css/payroll.css?v=2026.08.10.9" rel="stylesheet">
+  <link href="/dashboards/css/payroll.css?v=2026.09.05.64" rel="stylesheet">
 </head>
 <body>
   <div class="pr-wrap">
@@ -20,14 +20,14 @@
 
     <div id="pr-status" class="pr-status" role="status" aria-live="polite"></div>
 
-    <nav class="pr-tabs">
-      <button class="pr-tab is-active" data-panel="leave" type="button">Leave Balances</button>
-      <button class="pr-tab" data-panel="periods" type="button">Pay Periods</button>
-      <button class="pr-tab" data-panel="upload" type="button">Upload Packet</button>
-    </nav>
+    <div class="pr-tabs" role="tablist" aria-label="Payroll views">
+      <button class="pr-tab is-active" id="tab-leave" data-panel="leave" type="button" role="tab" aria-selected="true" aria-controls="panel-leave">Leave Balances</button>
+      <button class="pr-tab" id="tab-periods" data-panel="periods" type="button" role="tab" aria-selected="false" tabindex="-1" aria-controls="panel-periods">Pay Periods</button>
+      <button class="pr-tab" id="tab-upload" data-panel="upload" type="button" role="tab" aria-selected="false" tabindex="-1" aria-controls="panel-upload">Upload Packet</button>
+    </div>
 
     <!-- LEAVE BALANCES -->
-    <section id="panel-leave" class="pr-panel is-active">
+    <section id="panel-leave" class="pr-panel is-active" role="tabpanel" aria-labelledby="tab-leave">
       <div class="pr-panel-head">
         <h2>Leave Balances</h2>
         <p>Current vacation and sick hours for active employees, refreshed from the last payroll packet.
@@ -43,7 +43,7 @@
       <div class="pr-toolbar">
         <input id="leave-search" aria-label="Search employees" class="pr-search" type="search" placeholder="Filter by name or department…" autocomplete="off">
         <button id="print-slips" class="pr-btn" type="button">🖨️ Print slips to hand out</button>
-        <span id="leave-asof" class="pr-asof"></span>
+        <span id="leave-asof" class="pr-asof" role="status"></span>
       </div>
       <div id="leave-flags" class="pr-flags" hidden></div>
       <div class="pr-tablewrap">
@@ -68,7 +68,7 @@
     </section>
 
     <!-- PAY PERIODS -->
-    <section id="panel-periods" class="pr-panel">
+    <section id="panel-periods" class="pr-panel" role="tabpanel" aria-labelledby="tab-periods">
       <div class="pr-panel-head">
         <h2>Pay Periods</h2>
         <p>Hours recorded for each pay date. Select a period to see the per-employee breakdown.</p>
@@ -92,7 +92,7 @@
     </section>
 
     <!-- UPLOAD -->
-    <section id="panel-upload" class="pr-panel">
+    <section id="panel-upload" class="pr-panel" role="tabpanel" aria-labelledby="tab-upload">
       <div class="pr-panel-head">
         <h2>Upload from NW Regional Accounting</h2>
         <p>Upload the PDF. Everything read from it is checked against the document's own printed
@@ -107,7 +107,7 @@
         </select>
         <input id="packet-file" aria-label="Payroll packet PDF" class="pr-file" type="file" accept="application/pdf">
         <button id="packet-parse" class="pr-btn" type="button" disabled>Read packet</button>
-        <span id="packet-note" class="pr-note"></span>
+        <span id="packet-note" class="pr-note" role="status"></span>
         <!-- Busy indicator lives NEXT TO THE BUTTON, where the eye already is after a click.
              aria-hidden because #pr-status is a polite live region and a per-second counter
              in it would re-announce forever; the status line says the sentence once. -->
@@ -150,6 +150,6 @@
   <!-- The carryover transform is a separate file so it can be unit-tested in Node
        (tests/unit/vacation-carryover.test.js). It must load before payroll.js. -->
   <script src="/dashboards/js/vacation-carryover.js?v=2026.08.10.7"></script>
-  <script src="/dashboards/js/payroll.js?v=2026.08.10.9"></script>
+  <script src="/dashboards/js/payroll.js?v=2026.09.05.64"></script>
 </body>
 </html>
