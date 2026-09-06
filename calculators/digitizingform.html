@@ -9,404 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     
-    <style>
-        /* Root variables - Consistent Green Theme */
-        :root {
-            --primary-color: #3a7c52; /* Standardized NWCA Green */
-            --primary-dark: #2d5f3f;
-            --primary-light: #4cb861;
-            --bg-color: #f5f7fa;
-            --card-bg: #ffffff;
-            --border-color: #e5e7eb;
-            --text-primary: #1f2937;
-            --text-secondary: #6b7280;
-            --hover-bg: #f3f4f6;
-            --success-bg: #d1fae5;
-            --success-text: #065f46;
-            --warning-bg: #fef3c7;
-            --warning-text: #92400e;
-            --focus-shadow: 0 0 0 0.25rem rgba(58, 124, 82, 0.25);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background: var(--bg-color);
-            color: var(--text-primary);
-            line-height: 1.6;
-        }
-
-        /* Header */
-        .header {
-            background: var(--card-bg);
-            border-bottom: 1px solid var(--border-color);
-            padding: 1rem 0;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
-
-        .header-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 2rem;
-        }
-
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 1.5rem;
-        }
-
-        .logo {
-            height: 40px;
-            width: auto;
-        }
-
-        .breadcrumb {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: var(--text-secondary);
-            font-size: 0.875rem;
-        }
-
-        .breadcrumb a {
-            color: var(--primary-color);
-            text-decoration: none;
-            font-weight: 500;
-            transition: color 0.2s;
-        }
-
-        .breadcrumb a:hover {
-            color: var(--primary-dark);
-        }
-
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .help-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem 1rem;
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 0.375rem;
-            font-size: 0.875rem;
-            font-weight: 500;
-            text-decoration: none;
-            transition: all 0.2s;
-            cursor: pointer;
-        }
-
-        .help-btn:hover {
-            background: var(--primary-dark);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 8px rgba(58, 124, 82, 0.3);
-        }
-
-        /* Main Content */
-        .main-container {
-            max-width: 1400px;
-            margin: 2rem auto;
-            padding: 0 2rem;
-        }
-
-        .page-header {
-            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
-            color: white;
-            padding: 2rem;
-            border-radius: 0.75rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 4px 12px rgba(58, 124, 82, 0.3);
-        }
-
-        .page-title {
-            font-size: 1.875rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .page-subtitle {
-            font-size: 1rem;
-            opacity: 0.9;
-            font-weight: 400;
-        }
-
-        /* Form Container */
-        .form-container {
-            background: var(--card-bg);
-            border-radius: 0.75rem;
-            padding: 2rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-            border: 1px solid var(--border-color);
-            margin-bottom: 2rem;
-        }
-
-        .form-intro {
-            text-align: center;
-            margin-bottom: 2rem;
-            padding-bottom: 1.5rem;
-            border-bottom: 2px solid var(--border-color);
-        }
-
-        .form-intro h2 {
-            color: var(--text-primary);
-            margin-bottom: 0.5rem;
-            font-size: 1.25rem;
-            font-weight: 600;
-        }
-
-        .form-intro p {
-            color: var(--text-secondary);
-            font-size: 0.875rem;
-        }
-
-        /* JotForm Iframe */
-        .jotform-container {
-            position: relative;
-            width: 100%;
-            overflow: hidden;
-            border-radius: 0.5rem;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .jotform-iframe {
-            width: 100%;
-            height: 1200px;
-            border: none;
-            background: white;
-        }
-
-        /* Loading State */
-        .loading-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(255, 255, 255, 0.9);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            gap: 1rem;
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-        }
-
-        .loading-spinner {
-            width: 2rem;
-            height: 2rem;
-            border: 3px solid var(--border-color);
-            border-top-color: var(--primary-color);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-        /* Information Cards */
-        .info-cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        .info-card {
-            background: linear-gradient(135deg, var(--success-bg), #f0f9ff);
-            border: 1px solid #a7f3d0;
-            border-radius: 0.5rem;
-            padding: 1.5rem;
-            text-align: center;
-        }
-
-        .info-card-icon {
-            font-size: 2rem;
-            color: var(--primary-color);
-            margin-bottom: 1rem;
-        }
-
-        .info-card-title {
-            font-size: 1rem;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 0.5rem;
-        }
-
-        .info-card-text {
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-        }
-
-        /* Digitizer Spotlight Section */
-        .digitizer-spotlight {
-            background: var(--card-bg);
-            border-radius: 12px;
-            padding: 2rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.08);
-            display: flex;
-            align-items: center;
-            gap: 2rem;
-            border: 2px solid var(--primary-light);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .digitizer-spotlight::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
-        }
-
-        .digitizer-image {
-            flex-shrink: 0;
-        }
-
-        .digitizer-image img {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 4px solid var(--primary-color);
-            box-shadow: 0 4px 12px rgba(58, 124, 82, 0.2);
-        }
-
-        .digitizer-content {
-            flex: 1;
-        }
-
-        .digitizer-content h3 {
-            color: var(--primary-color);
-            font-size: 0.875rem;
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 0.5rem;
-        }
-
-        .digitizer-content h4 {
-            color: var(--text-primary);
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 0.25rem;
-        }
-
-        .digitizer-title {
-            color: var(--primary-dark);
-            font-weight: 600;
-            margin-bottom: 1rem;
-            font-size: 1rem;
-        }
-
-        .digitizer-content p {
-            color: var(--text-secondary);
-            line-height: 1.6;
-            margin-bottom: 1rem;
-        }
-
-        .digitizer-features {
-            display: flex;
-            gap: 2rem;
-            margin-top: 1rem;
-        }
-
-        .digitizer-stat {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 0.875rem;
-        }
-
-        .digitizer-stat i {
-            color: var(--primary-color);
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .main-container {
-                padding: 0 1rem;
-                margin: 1rem auto;
-            }
-
-            .form-container {
-                padding: 1.5rem;
-            }
-
-            .page-header {
-                padding: 1.5rem;
-            }
-
-            .page-title {
-                font-size: 1.5rem;
-            }
-
-            .jotform-iframe {
-                height: 1400px; /* Slightly taller on mobile for better form visibility */
-            }
-
-            .info-cards {
-                grid-template-columns: 1fr;
-            }
-
-            .digitizer-spotlight {
-                flex-direction: column;
-                text-align: center;
-                padding: 1.5rem;
-            }
-
-            .digitizer-image img {
-                width: 120px;
-                height: 120px;
-            }
-
-            .digitizer-features {
-                flex-direction: column;
-                gap: 0.5rem;
-            }
-        }
-
-        /* Print Styles */
-        @media print {
-            .header, .info-cards {
-                display: none;
-            }
-            
-            .main-container {
-                max-width: none;
-                margin: 0;
-                padding: 0;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="/calculators/css/digitizingform.css?v=2026.09.06.12">
 </head>
 <body>
     <!-- Header -->
@@ -425,7 +28,7 @@
             </div>
             <div class="header-right">
                 <a href="/staff-dashboard.html" class="help-btn">
-                    <i class="fas fa-arrow-left"></i>
+                    <i class="fas fa-arrow-left" aria-hidden="true"></i>
                     Back to Dashboard
                 </a>
             </div>
@@ -437,7 +40,7 @@
         <!-- Page Header -->
         <div class="page-header">
             <h1 class="page-title">
-                <i class="fas fa-edit"></i>
+                <i class="fas fa-edit" aria-hidden="true"></i>
                 Embroidery Digitizing Order Form
             </h1>
             <p class="page-subtitle">Submit digitizing requests to Ruthie for embroidery design conversion</p>
@@ -457,15 +60,15 @@
                 <p>With years of experience in embroidery digitizing, Ruth personally handles all digitizing requests to ensure the highest quality results. She specializes in converting your artwork into beautiful embroidered designs that bring your vision to life.</p>
                 <div class="digitizer-features">
                     <div class="digitizer-stat">
-                        <i class="fas fa-clock"></i>
+                        <i class="fas fa-clock" aria-hidden="true"></i>
                         <span>24-48 hour turnaround</span>
                     </div>
                     <div class="digitizer-stat">
-                        <i class="fas fa-check-circle"></i>
+                        <i class="fas fa-check-circle" aria-hidden="true"></i>
                         <span>Expert quality assurance</span>
                     </div>
                     <div class="digitizer-stat">
-                        <i class="fas fa-envelope"></i>
+                        <i class="fas fa-envelope" aria-hidden="true"></i>
                         <span>Direct communication</span>
                     </div>
                 </div>
@@ -476,7 +79,7 @@
         <div class="info-cards">
             <div class="info-card">
                 <div class="info-card-icon">
-                    <i class="fas fa-clock"></i>
+                    <i class="fas fa-clock" aria-hidden="true"></i>
                 </div>
                 <h3 class="info-card-title">Processing Time</h3>
                 <p class="info-card-text">Standard turnaround is 24-48 hours for most digitizing requests</p>
@@ -484,7 +87,7 @@
             
             <div class="info-card">
                 <div class="info-card-icon">
-                    <i class="fas fa-file-image"></i>
+                    <i class="fas fa-file-image" aria-hidden="true"></i>
                 </div>
                 <h3 class="info-card-title">File Requirements</h3>
                 <p class="info-card-text">Please provide high-resolution images (JPG, PNG, PDF) for best results</p>
@@ -492,7 +95,7 @@
             
             <div class="info-card">
                 <div class="info-card-icon">
-                    <i class="fas fa-check-circle"></i>
+                    <i class="fas fa-check-circle" aria-hidden="true"></i>
                 </div>
                 <h3 class="info-card-title">Quality Guarantee</h3>
                 <p class="info-card-text">We ensure all designs are optimized for clean, professional embroidery results</p>
@@ -518,43 +121,13 @@
                     title="Ruthie Forms" 
                     allow="geolocation; microphone; camera" 
                     src="https://www.jotform.com/app/241687786443168?appEmbedded=1" 
-                    class="jotform-iframe"
-                    onload="hideLoading()">
+                    class="jotform-iframe">
                 </iframe>
             </div>
         </div>
     </main>
 
-    <script>
-        // Hide loading overlay when iframe loads
-        function hideLoading() {
-            const overlay = document.getElementById('loadingOverlay');
-            if (overlay) {
-                overlay.style.display = 'none';
-            }
-        }
-
-        // Handle iframe loading timeout
-        setTimeout(() => {
-            hideLoading();
-        }, 10000); // Hide loading after 10 seconds regardless
-
-        // Add smooth scrolling for navigation links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                }
-            });
-        });
-
-        // Log page load for analytics
-        console.log('Digitizing Order Form loaded successfully');
-    </script>
+    <script src="/config/app.config.js"></script>
+    <script src="/calculators/js/digitizingform-page.js?v=2026.09.06.12"></script>
 </body>
 </html>

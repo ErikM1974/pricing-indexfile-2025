@@ -1,0 +1,123 @@
+/* laser-manual-pricing.css — extracted 2026-09-06 from 1 inline <style> block(s) in laser-manual-pricing.html (Rule 3). */
+/* Laser-specific styles */
+/* Product Showcase Section */
+.product-showcase {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    margin-top: 1.5rem;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.08);
+    position: relative;
+    overflow: hidden;
+}
+
+.product-showcase::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-color), var(--primary-dark));
+}
+
+.product-showcase-inner {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 2rem;
+    align-items: center;
+}
+
+.product-showcase-image {
+    text-align: center;
+}
+
+.product-showcase-image img {
+    width: 100%;
+    max-width: 300px;
+    height: auto;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    transition: all 0.3s ease;
+}
+
+.product-showcase-image img:hover {
+    transform: scale(1.02) rotate(1deg);
+    box-shadow: 0 12px 32px rgba(76, 179, 84, 0.3);
+}
+
+.product-showcase-content h3 {
+    color: var(--primary-color);
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.product-features {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+
+.feature-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.feature-item i {
+    color: var(--primary-color);
+    font-size: 0.8rem;
+}
+
+@media (max-width: 768px) {
+    .product-showcase-inner {
+        grid-template-columns: 1fr;
+    }
+
+    .product-features {
+        grid-template-columns: 1fr;
+    }
+}
+
+.coming-soon {
+    text-align: center;
+    padding: 3rem;
+    background: var(--primary-lighter);
+    border-radius: 12px;
+    margin: 2rem 0;
+}
+
+.coming-soon-icon {
+    font-size: 4rem;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+
+.coming-soon h2 {
+    color: var(--primary-dark);
+    margin-bottom: 1rem;
+}
+
+.coming-soon p {
+    color: var(--text-secondary);
+    font-size: 1.125rem;
+}
+
+.placeholder-section {
+    background: var(--bg-color);
+    border: 2px dashed var(--border-color);
+    border-radius: 8px;
+    padding: 2rem;
+    text-align: center;
+    color: var(--text-secondary);
+}
+
+/* 2026-09-06 review: the hidden attribute must beat any display rule */
+[hidden] { display: none !important; }
