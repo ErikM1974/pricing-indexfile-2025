@@ -1,3 +1,8 @@
+## v2026.09.06.12 (2026.09.06)
+
+- Calculators: Rule 3 extraction on dtf, dtg, embroidery, cap-embroidery-integrated, digitizingform, monogramform, laser-manual (inline <style>/<script> → calculators/css + calculators/js, APP_CONFIG host, gated logging, inline alerts, iframe listener, icons, versions); lock calculator-pages-rule3.test.js
+- Deploy v2026.09.06.12: seven calculators Rule 3 extraction
+
 ## v2026.09.06.10 (2026.09.06)
 
 - Screen Print calculator: Rule 3 extraction (1,100-line <style> + two inline scripts → calculators/css + calculators/js), APP_CONFIG proxy host, gated logging, hidden regions, --swatch, versioned assets; lock screen-print-pricing-page.test.js
