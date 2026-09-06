@@ -561,3 +561,6 @@ body { --stk-bar-h: 62px; }
     .stk-trust-line { margin-bottom: 16px; }
     .stk-hero-copy h1 { font-size: 27px; }
 }
+
+/* 2026-09-05 review: "(optional)" hint next to a field label (was an inline style on both pages) */
+.stk-optional { font-weight: 400; }

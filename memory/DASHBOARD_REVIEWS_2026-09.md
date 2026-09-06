@@ -1215,3 +1215,19 @@ Lock: `tests/unit/public-legacy-pages.test.js`. Four of these PUBLIC pages still
 
 **Left alone** — the universal header component injects its own `<style>` + 3 bare icons + 2 inline styles on every public page (shared component, separate batch); `pages/inventory-details.html` still has no visible product image (by design); `design-view` fetch error copy unchanged.
 
+## Public batch B2 — storefronts (custom-tees · custom-caps · custom-stickers · custom-banners · 2 success pages), 9 items (2026-09-05, `v2026.09.05.78`)
+
+Lock: `tests/unit/public-storefront-pages.test.js`. These pages were already Rule-3 clean (external CSS/JS, no handlers); the work was hygiene + one rule violation.
+
+1. 🔴 **Silent hardcoded proxy fallback removed** in all 4 storefront scripts (`custom-tees-app`, `custom-caps-app`, both success scripts): `API_BASE` was `APP_CONFIG… || 'https://caspio-pricing-proxy-…'`. Rule 6 + Erik's #1 rule — a missing config now shows a `role=alert` toast ("Pricing is unavailable right now… call 253-922-5793") on the studios and flips the success page to its error panel, instead of guessing a backend.
+2. **Icons decorative** — 36 (tees) + 34 (caps) + 6 + 6 (success) in HTML, plus the JS templates including the dynamic `<i class="fas ${…}">` ones.
+3. **Hidden file inputs named** (`art-input`, `front-input`, `back-input` had no accessible name — the visible "Upload" button is a sibling).
+4. **"(optional)" hints** on stickers/banners were `style="font-weight:400"` ×6 → `.stk-optional` in the shared `instant-quote.css`.
+5. **Tees zoom lightbox** scroll lock via `body.is-modal-open` (was `body.style.overflow`).
+6. **Success pages**: `console.log` ×3 each removed (webhook-skip line kept as `console.info`).
+7. **Versions** bumped on every touched asset.
+8. **inventory-details follow-up** (B1 live find): colours were rendered BEFORE the fallback colour was resolved, so with no `COLOR` in the URL no swatch showed as selected → populate after resolution.
+9. Verified: static-dist smoke of all 6 pages (prices render via the proxy: stickers $87/$98/$153, banners $10/sqft, 138 tee tiles, 9 caps; success page lands on its error panel with no session, one visible h1).
+
+**Left alone** — success pages keep 4 `<h1>` inside mutually-exclusive `hidden` state panels (one visible at a time; AT sees one); `thumb.style.backgroundImage` for uploaded-art previews (data URLs — legitimately dynamic); `rightsAck.ts = toISOString()` is a real timestamp, not a calendar day; the universal header's own inline styles/icons (shared component, separate batch); 🔍 the AI-artwork band's 5 `loading="lazy"` images reported not loaded in the hidden preview — re-check live in a visible tab.
+

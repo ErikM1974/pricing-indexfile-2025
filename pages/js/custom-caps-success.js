@@ -26,8 +26,17 @@
 (function () {
     'use strict';
 
-    const API_BASE = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL)
-        || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+    const API_BASE = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) || '';
+    if (!API_BASE) {
+        // Rule 6: the proxy host comes from /config/app.config.js — never guess a backend silently.
+        console.error('[success] APP_CONFIG.API.BASE_URL missing — order lookup cannot run');
+        document.addEventListener('DOMContentLoaded', () => {
+            const err = document.getElementById('s-error');
+            const working = document.getElementById('s-working');
+            if (working) working.hidden = true;
+            if (err) err.hidden = false;
+        });
+    }
     // Same EmailJS service the tee storefront confirmations use — the
     // 'custom-caps' registry entry reuses the tee templates (decision #15).
     const EMAILJS_PUBLIC_KEY = '4qSbDO-SQs19TbP80';
@@ -115,7 +124,7 @@
         const sp = orderSettings.shipPromise || {};
         const windowLabel = sp.rangeLabel || sp.label || '7–10 business days';
         $('s-ship-line').innerHTML =
-            `<i class="fas ${isPickup ? 'fa-store' : 'fa-truck-fast'}"></i> ` +
+            `<i class="fas ${isPickup ? 'fa-store' : 'fa-truck-fast'}" aria-hidden="true"></i> ` +
             (isPickup ? 'Ready for pickup ' : 'Ships ') +
             escapeHTML(windowLabel) +
             ' — clock starts when you approve your digital proof';
@@ -163,7 +172,7 @@
             },
         ];
         $('s-timeline').innerHTML = steps.map((s) =>
-            `<div class="success-step ${s.done ? '' : 'is-pending'}"><i class="fas ${s.icon}"></i>` +
+            `<div class="success-step ${s.done ? '' : 'is-pending'}"><i class="fas ${s.icon}" aria-hidden="true"></i>` +
             `<span><strong>${escapeHTML(s.title)}</strong><small>${escapeHTML(s.sub)}</small></span></div>`).join('');
 
         if (status.indexOf('ShopWorks Failed') !== -1) {
@@ -201,7 +210,7 @@
 
         // Webhook stamp present → the server already sent both emails.
         if (orderSettings.emailsSentAt) {
-            console.log('[Caps Success] Emails already sent by webhook at', orderSettings.emailsSentAt, '— skipping browser sends');
+            console.info('[Caps Success] Emails already sent by webhook at', orderSettings.emailsSentAt, '— skipping browser sends');
             return;
         }
         if (!customerData.email) return;
@@ -297,14 +306,14 @@
             to_email: customerData.email,
             to_name: base.customer_name,
         }, base)).then(
-            () => console.log('[Caps Success] Customer email sent'),
+            () => undefined,
             (e) => console.error('[Caps Success] Customer email failed:', e)
         );
         emailjs.send(EMAILJS_SERVICE, 'template_sample_sales', Object.assign({
             to_email: 'erik@nwcustomapparel.com',
             to_name: 'NWCA Sales',
         }, base)).then(
-            () => console.log('[Caps Success] Staff email sent'),
+            () => undefined,
             (e) => console.error('[Caps Success] Staff email failed:', e)
         );
     }

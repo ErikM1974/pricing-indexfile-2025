@@ -1016,3 +1016,5 @@ input[type="range"] { width: 100%; accent-color: var(--green-700); min-height: 3
 .checkout-review footer a { color: inherit; font-weight: 600; text-decoration: none; }
 .checkout-review footer a:hover { text-decoration: underline; }
 
+/* 2026-09-05 review: zoom lightbox scroll lock via a class (was body.style.overflow) */
+body.is-modal-open { overflow: hidden; }

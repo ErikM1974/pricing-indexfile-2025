@@ -23,7 +23,7 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/shared_components/css/nwca-2026-core.css?v=2026.08.25.4">
-    <link rel="stylesheet" href="/pages/css/instant-quote.css?v=2026.07.25.1">
+    <link rel="stylesheet" href="/pages/css/instant-quote.css?v=2026.09.05.78">
     <!-- 🔴 Do NOT add sticker-pricing-page.css or nwca-form-shared.css here.
          Both declare :root tokens that collide with core and would repaint the
          masthead and footer. See the header note in instant-quote.css. -->
@@ -341,9 +341,9 @@
                         <div class="stk-lead-grid">
                             <div><label for="stkName">Your name</label><input type="text" id="stkName" autocomplete="name"></div>
                             <div><label for="stkEmail">Email</label><input type="email" id="stkEmail" autocomplete="email"></div>
-                            <div><label for="stkPhone">Phone <span style="font-weight:400">(optional)</span></label><input type="tel" id="stkPhone" autocomplete="tel"></div>
-                            <div><label for="stkCompany">Company <span style="font-weight:400">(optional)</span></label><input type="text" id="stkCompany" autocomplete="organization"></div>
-                            <div><label for="stkMessage">Instructions for your proof <span style="font-weight:400">(optional)</span></label><textarea id="stkMessage" rows="2" placeholder="Anything we should know before we prepare your proof — colours to match, how it will be used, a deadline."></textarea></div>
+                            <div><label for="stkPhone">Phone <span class="stk-optional">(optional)</span></label><input type="tel" id="stkPhone" autocomplete="tel"></div>
+                            <div><label for="stkCompany">Company <span class="stk-optional">(optional)</span></label><input type="text" id="stkCompany" autocomplete="organization"></div>
+                            <div><label for="stkMessage">Instructions for your proof <span class="stk-optional">(optional)</span></label><textarea id="stkMessage" rows="2" placeholder="Anything we should know before we prepare your proof — colours to match, how it will be used, a deadline."></textarea></div>
                             <div class="stk-hp"><label for="hpWebsite">Website</label><input type="text" id="hpWebsite" tabindex="-1" autocomplete="off"></div>
                         </div>
                         <p class="stk-inline-note is-error" id="stkLeadError" hidden></p>

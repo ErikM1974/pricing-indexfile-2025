@@ -22,8 +22,17 @@
 (function () {
     'use strict';
 
-    const API_BASE = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL)
-        || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+    const API_BASE = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) || '';
+    if (!API_BASE) {
+        // Rule 6: the proxy host comes from /config/app.config.js — never guess a backend silently.
+        console.error('[success] APP_CONFIG.API.BASE_URL missing — order lookup cannot run');
+        document.addEventListener('DOMContentLoaded', () => {
+            const err = document.getElementById('s-error');
+            const working = document.getElementById('s-working');
+            if (working) working.hidden = true;
+            if (err) err.hidden = false;
+        });
+    }
     const EMAILJS_PUBLIC_KEY = '4qSbDO-SQs19TbP80';
     const EMAILJS_SERVICE = 'service_1c4k67j';
     const POLL_MS = 3000;
@@ -117,9 +126,9 @@
         // single binding date. Both come from the server stamp — never recomputed.
         $('s-ship-line').innerHTML = promise
             ? (isStandard && sp.rangeLabel
-                ? `<i class="fas fa-truck-fast"></i> Ships ${escapeHTML(sp.rangeLabel)} (7–10 business days) from Milton, WA`
-                : `<i class="fas fa-truck-fast"></i> Ships ${escapeHTML(promise)} from Milton, WA`)
-            : '<i class="fas fa-truck-fast"></i> Ships from Milton, WA';
+                ? `<i class="fas fa-truck-fast" aria-hidden="true"></i> Ships ${escapeHTML(sp.rangeLabel)} (7–10 business days) from Milton, WA`
+                : `<i class="fas fa-truck-fast" aria-hidden="true"></i> Ships ${escapeHTML(promise)} from Milton, WA`)
+            : '<i class="fas fa-truck-fast" aria-hidden="true"></i> Ships from Milton, WA';
 
         // Mockups straight from the saved order
         const mocks = (orderSettings.mockups || []).slice(0, 6);
@@ -160,7 +169,7 @@
             done: false,
         });
         $('s-timeline').innerHTML = steps.map((s) =>
-            `<div class="success-step ${s.done ? '' : 'is-pending'}"><i class="fas ${s.icon}"></i>` +
+            `<div class="success-step ${s.done ? '' : 'is-pending'}"><i class="fas ${s.icon}" aria-hidden="true"></i>` +
             `<span><strong>${escapeHTML(s.title)}</strong><small>${escapeHTML(s.sub)}</small></span></div>`).join('');
 
         if (status.indexOf('ShopWorks Failed') !== -1) {
@@ -207,7 +216,7 @@
         // OrderSettingsJSON before flipping the status. Stamp present →
         // nothing to do here; absent → browser fallback sends as before.
         if (orderSettings.emailsSentAt) {
-            console.log('[CTS Success] Emails already sent by webhook at', orderSettings.emailsSentAt, '— skipping browser sends');
+            console.info('[CTS Success] Emails already sent by webhook at', orderSettings.emailsSentAt, '— skipping browser sends');
             return;
         }
 
@@ -311,14 +320,14 @@
             to_email: customerData.email,
             to_name: base.customer_name,
         }, base)).then(
-            () => console.log('[CTS Success] Customer email sent'),
+            () => undefined,
             (e) => console.error('[CTS Success] Customer email failed:', e)
         );
         emailjs.send(EMAILJS_SERVICE, 'template_sample_sales', Object.assign({
             to_email: 'erik@nwcustomapparel.com',
             to_name: 'NWCA Sales',
         }, base)).then(
-            () => console.log('[CTS Success] Staff email sent'),
+            () => undefined,
             (e) => console.error('[CTS Success] Staff email failed:', e)
         );
     }

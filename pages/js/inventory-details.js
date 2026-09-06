@@ -37,10 +37,8 @@ async function loadProduct() {
         const productName = productData.title || productData.productTitle || productData.PRODUCT_TITLE || styleNumber;
         document.getElementById('header-product-name').textContent = `${productName} (${styleNumber})`;
 
-        // Populate color options
-        populateColors(productData.colors);
-
-        // Find and set initial product image
+        // Resolve the selected colour FIRST, then render the options — rendering before the
+        // fallback ran left no swatch marked "selected" when the URL carried no COLOR.
         if (productData.colors && productData.colors.length > 0) {
             let selectedColorData = null;
             if (selectedColor) {
@@ -55,6 +53,7 @@ async function loadProduct() {
             }
             updateProductImage(selectedColorData);
         }
+        populateColors(productData.colors || []);
 
         // Load inventory for selected color
         if (selectedColor) {

@@ -26,8 +26,21 @@
     'use strict';
 
     // ── Config ──────────────────────────────────────────────────────
-    const API_BASE = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL)
-        || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+    const API_BASE = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) || '';
+    if (!API_BASE) {
+        // Rule 6: the proxy host comes from /config/app.config.js — never guess a backend silently.
+        console.error('[storefront] APP_CONFIG.API.BASE_URL missing — pricing cannot load');
+        document.addEventListener('DOMContentLoaded', () => {
+            const wrap = document.getElementById('tdt-toasts');
+            if (wrap) {
+                const el = document.createElement('div');
+                el.className = 'tdt-toast is-error';
+                el.setAttribute('role', 'alert');
+                el.textContent = 'Pricing is unavailable right now (site configuration did not load). Please refresh, or call 253-922-5793.';
+                wrap.appendChild(el);
+            }
+        });
+    }
     // Styles eligible for the 3-Day Rush upgrade. Eligibility is config;
     // the rush % itself still comes from Caspio 3DT-RUSH via /api/service-codes.
     window.CTS_RUSH_ELIGIBLE = ['PC54'];
@@ -1606,7 +1619,7 @@
                     <span class="chip-swatch" style="background-image:url('${escapeHTML(c.swatchImage)}')"></span>
                     <strong>${escapeHTML(c.colorName)}</strong>
                     ${copyLink}
-                    <button type="button" class="color-card-remove" data-remove="${escapeHTML(line.catalogColor)}" aria-label="Remove ${escapeHTML(c.colorName)}"><i class="fas fa-times"></i></button>
+                    <button type="button" class="color-card-remove" data-remove="${escapeHTML(line.catalogColor)}" aria-label="Remove ${escapeHTML(c.colorName)}"><i class="fas fa-times" aria-hidden="true"></i></button>
                 </div>
                 <div class="size-grid">${cells}</div>
                 <div class="color-card-foot"><span>${count} piece${count === 1 ? '' : 's'}</span></div>`;
@@ -1790,7 +1803,7 @@
             ? ' — 2025 Freeman Rd E, Milton, WA 98354'
             : ' from Milton, WA';
         $('review-promise').innerHTML =
-            `<i class="fas ${S.delivery.method === 'pickup' ? 'fa-store' : 'fa-truck-fast'}"></i> `
+            `<i class="fas ${S.delivery.method === 'pickup' ? 'fa-store' : 'fa-truck-fast'}" aria-hidden="true"></i> `
             + escapeHTML(sp.long + placeSuffix)
             + (needsArtReview() ? ' <small>(after proof approval)</small>' : '');
 
@@ -2525,13 +2538,13 @@
                 (slot && slot.placement ? ` · art ${slot.placement.wIn}″ wide` : ' · no artwork placed yet') +
                 ' · placement preview is approximate';
             $('zoom-lightbox').hidden = false;
-            document.body.style.overflow = 'hidden';
+            document.body.classList.add('is-modal-open');
             $('zoom-lightbox-close').focus();
         }
         function closeZoomLightbox() {
             $('zoom-lightbox').hidden = true;
             $('zoom-lightbox-img').src = '';
-            document.body.style.overflow = '';
+            document.body.classList.remove('is-modal-open');
         }
         $('canvas-zoom-btn').addEventListener('click', openZoomLightbox);
         $('zoom-lightbox-close').addEventListener('click', closeZoomLightbox);

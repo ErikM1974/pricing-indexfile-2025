@@ -24,7 +24,7 @@
 
     <!-- Absolute asset paths: this page serves from BOTH /custom-tees (clean
          URL) and /pages/custom-tees.html — relative paths break on the former. -->
-    <link rel="stylesheet" href="/pages/css/custom-tees.css?v=2026.06.12.7">
+    <link rel="stylesheet" href="/pages/css/custom-tees.css?v=2026.09.05.78">
 </head>
 <body>
     <a class="skip-link" href="#stage-gallery">Skip to the catalog</a>
@@ -34,10 +34,10 @@
     <!-- Fatal boot error (pricing/config unavailable) -->
     <div id="tdt-fatal" class="tdt-fatal" hidden>
         <div class="tdt-fatal-card">
-            <i class="fas fa-triangle-exclamation"></i>
+            <i class="fas fa-triangle-exclamation" aria-hidden="true"></i>
             <h2>We can’t load live pricing right now</h2>
             <p id="tdt-fatal-msg">Please refresh the page — or call us and we’ll take your order by phone.</p>
-            <p class="tdt-fatal-phone"><a href="tel:253-922-5793"><i class="fas fa-phone"></i> 253-922-5793</a></p>
+            <p class="tdt-fatal-phone"><a href="tel:253-922-5793"><i class="fas fa-phone" aria-hidden="true"></i> 253-922-5793</a></p>
             <button type="button" class="btn btn-primary" id="tdt-fatal-retry">Try again</button>
         </div>
     </div>
@@ -53,9 +53,9 @@
                 </span>
             </a>
             <div class="head-contact">
-                <span><i class="fas fa-location-dot"></i> Ships from Milton, WA</span>
-                <a href="tel:253-922-5793"><i class="fas fa-phone"></i> 253-922-5793</a>
-                <a href="mailto:sales@nwcustomapparel.com"><i class="fas fa-envelope"></i> sales@nwcustomapparel.com</a>
+                <span><i class="fas fa-location-dot" aria-hidden="true"></i> Ships from Milton, WA</span>
+                <a href="tel:253-922-5793"><i class="fas fa-phone" aria-hidden="true"></i> 253-922-5793</a>
+                <a href="mailto:sales@nwcustomapparel.com"><i class="fas fa-envelope" aria-hidden="true"></i> sales@nwcustomapparel.com</a>
             </div>
         </div>
     </header>
@@ -63,7 +63,7 @@
     <!-- ── Promise banner (rush tag) ──────────────────────────────── -->
     <div class="promise-banner" id="promise-banner">
         <div class="promise-tag">
-            <i class="fas fa-truck-fast"></i>
+            <i class="fas fa-truck-fast" aria-hidden="true"></i>
             <div class="promise-copy">
                 <strong id="promise-main">Ships in 7–10 business days</strong>
                 <span id="promise-sub">Full-color DTG · printed in Milton, WA</span>
@@ -78,11 +78,11 @@
                 <h1>Custom T-shirts, printed in <span class="hero-underline">full color</span> — shipped in 7–10 business days.</h1>
                 <p class="hero-sub">Pick from our 20 print-tested styles, upload your art, see it on a real shirt, and check out in minutes. Full-color DTG printing. No setup fees. No minimums.</p>
                 <button type="button" class="btn btn-hero" id="hero-cta">
-                    <i class="fas fa-shirt"></i> Pick your shirt — see your art on it
+                    <i class="fas fa-shirt" aria-hidden="true"></i> Pick your shirt — see your art on it
                 </button>
                 <div class="hero-trust">
-                    <span><i class="fas fa-lock"></i> Stripe secure checkout</span>
-                    <span><i class="fas fa-house-flag"></i> Family-owned, Milton WA — since 1977</span>
+                    <span><i class="fas fa-lock" aria-hidden="true"></i> Stripe secure checkout</span>
+                    <span><i class="fas fa-house-flag" aria-hidden="true"></i> Family-owned, Milton WA — since 1977</span>
                 </div>
             </div>
             <div class="hero-visual">
@@ -174,7 +174,7 @@
                 </select>
             </div>
             <p class="gallery-price-note">Card prices include a full-front print, per shirt — shipping &amp; tax are calculated at checkout.</p>
-            <div class="gallery-loading" id="gallery-loading"><i class="fas fa-spinner fa-spin"></i> Loading the catalog…</div>
+            <div class="gallery-loading" id="gallery-loading"><i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Loading the catalog…</div>
             <div class="gallery-grid" id="gallery-grid"></div>
             <p class="gallery-empty" id="gallery-empty" hidden>No styles match — try a different search or category.</p>
         </div>
@@ -196,7 +196,7 @@
                         <strong id="current-product-name">—</strong>
                         <small id="current-product-style"></small>
                     </span>
-                    <button type="button" class="chip-btn" id="change-product"><i class="fas fa-rotate-left"></i> Change product</button>
+                    <button type="button" class="chip-btn" id="change-product"><i class="fas fa-rotate-left" aria-hidden="true"></i> Change product</button>
                 </div>
 
                 <!-- SanMar product detail (lead + spec bullets, parsed from the
@@ -221,9 +221,9 @@
                         <canvas id="tdt-canvas" tabindex="0" role="application"
                                 aria-label="T-shirt designer. Drag your artwork to position it. Arrow keys nudge, plus and minus resize, C centers."></canvas>
                         <div class="canvas-note" id="canvas-note" hidden></div>
-                        <div class="canvas-loading" id="canvas-loading"><i class="fas fa-spinner fa-spin"></i></div>
+                        <div class="canvas-loading" id="canvas-loading"><i class="fas fa-spinner fa-spin" aria-hidden="true"></i></div>
                         <button type="button" class="canvas-zoom-btn" id="canvas-zoom-btn" title="Zoom in on your design" aria-label="Zoom in on your design" hidden>
-                            <i class="fas fa-magnifying-glass-plus"></i> Zoom
+                            <i class="fas fa-magnifying-glass-plus" aria-hidden="true"></i> Zoom
                         </button>
                     </div>
                     <p class="canvas-hint" id="canvas-hint">Tap inside the dashed area to add your artwork</p>
@@ -252,19 +252,19 @@
                     <div class="control-block">
                         <label class="control-label" id="drop-label">Front artwork</label>
                         <div class="art-drop" id="art-drop" tabindex="0" role="button" aria-describedby="drop-formats">
-                            <i class="fas fa-cloud-arrow-up"></i>
+                            <i class="fas fa-cloud-arrow-up" aria-hidden="true"></i>
                             <strong>Drop your art here</strong> <span>or click to browse</span>
                             <small id="drop-formats">PNG · JPG · WEBP · SVG · AI · EPS · PDF · PSD · TIFF — 20 MB max</small>
                             <small class="drop-quality">150+ DPI recommended · transparent PNG prints best</small>
                         </div>
-                        <input type="file" id="art-input" accept=".png,.jpg,.jpeg,.webp,.svg,.ai,.eps,.pdf,.psd,.tif,.tiff" hidden>
+                        <input type="file" id="art-input" accept=".png,.jpg,.jpeg,.webp,.svg,.ai,.eps,.pdf,.psd,.tif,.tiff" hidden aria-label="Choose an artwork file">
                         <div class="art-file" id="art-file" hidden>
                             <span class="art-file-thumb" id="art-file-thumb"></span>
                             <span class="art-file-meta">
                                 <strong id="art-file-name"></strong>
                                 <small id="art-file-size"></small>
                             </span>
-                            <button type="button" class="art-file-remove" id="art-remove" aria-label="Remove artwork"><i class="fas fa-times"></i></button>
+                            <button type="button" class="art-file-remove" id="art-remove" aria-label="Remove artwork"><i class="fas fa-times" aria-hidden="true"></i></button>
                         </div>
                         <div class="art-warning" id="art-warning" hidden></div>
                     </div>
@@ -274,9 +274,9 @@
                         <label class="control-label" for="art-size">Artwork width — <strong id="art-size-label">3.2″</strong></label>
                         <input type="range" id="art-size" min="0.5" max="16" step="0.1" value="3.2">
                         <div class="art-actions">
-                            <button type="button" class="chip-btn" id="art-center"><i class="fas fa-arrows-left-right-to-line"></i> Center</button>
-                            <button type="button" class="chip-btn" id="art-fit"><i class="fas fa-maximize"></i> Fit width</button>
-                            <button type="button" class="chip-btn" id="art-reset"><i class="fas fa-rotate-left"></i> Reset</button>
+                            <button type="button" class="chip-btn" id="art-center"><i class="fas fa-arrows-left-right-to-line" aria-hidden="true"></i> Center</button>
+                            <button type="button" class="chip-btn" id="art-fit"><i class="fas fa-maximize" aria-hidden="true"></i> Fit width</button>
+                            <button type="button" class="chip-btn" id="art-reset"><i class="fas fa-rotate-left" aria-hidden="true"></i> Reset</button>
                         </div>
                         <div class="dpi-meter" id="dpi-meter" hidden>
                             <span class="dpi-dot" id="dpi-dot"></span>
@@ -308,7 +308,7 @@
                     </div>
                     <p class="inventory-stamp" id="inventory-stamp"></p>
                     <div class="inventory-error" id="inventory-error" hidden>
-                        <i class="fas fa-triangle-exclamation"></i> Live stock is unavailable right now — quantities are locked so we never oversell. <button type="button" class="link-btn" id="inventory-retry">Retry</button>
+                        <i class="fas fa-triangle-exclamation" aria-hidden="true"></i> Live stock is unavailable right now — quantities are locked so we never oversell. <button type="button" class="link-btn" id="inventory-retry">Retry</button>
                     </div>
                 </section>
 
@@ -320,7 +320,7 @@
                     </div>
 
                     <div class="form-card">
-                        <h3><i class="fas fa-user"></i> Contact</h3>
+                        <h3><i class="fas fa-user" aria-hidden="true"></i> Contact</h3>
                         <div class="form-grid">
                             <div class="form-field">
                                 <label for="f-first">First name *</label>
@@ -346,7 +346,7 @@
                     </div>
 
                     <div class="form-card" id="turnaround-card" hidden>
-                        <h3><i class="fas fa-bolt"></i> Turnaround</h3>
+                        <h3><i class="fas fa-bolt" aria-hidden="true"></i> Turnaround</h3>
                         <label class="toggle-row" for="rush-toggle">
                             <input type="checkbox" id="rush-toggle">
                             <span class="toggle-pill" aria-hidden="true"></span>
@@ -355,12 +355,12 @@
                     </div>
 
                     <div class="form-card">
-                        <h3><i class="fas fa-truck-fast"></i> Delivery</h3>
+                        <h3><i class="fas fa-truck-fast" aria-hidden="true"></i> Delivery</h3>
                         <div class="delivery-cards">
                             <label class="delivery-card">
                                 <input type="radio" name="delivery" id="d-ship" value="ship" checked>
                                 <span class="delivery-card-body">
-                                    <i class="fas fa-truck"></i>
+                                    <i class="fas fa-truck" aria-hidden="true"></i>
                                     <strong>Ship it</strong>
                                     <!-- Static default = the empty-cart state; renderAll() replaces
                                          it with live Caspio values on first render. -->
@@ -370,7 +370,7 @@
                             <label class="delivery-card">
                                 <input type="radio" name="delivery" id="d-pickup" value="pickup">
                                 <span class="delivery-card-body">
-                                    <i class="fas fa-store"></i>
+                                    <i class="fas fa-store" aria-hidden="true"></i>
                                     <strong>Pick up free</strong>
                                     <small>Milton, WA</small>
                                 </span>
@@ -379,7 +379,7 @@
                         <p class="free-ship-nudge" id="ship-nudge" hidden></p>
 
                         <div id="pickup-card" class="pickup-card" hidden>
-                            <i class="fas fa-store"></i>
+                            <i class="fas fa-store" aria-hidden="true"></i>
                             <div>
                                 <strong>NW Custom Apparel — 2025 Freeman Rd E, Milton, WA 98354</strong>
                                 <p>We’ll call you the moment your order is ready. For pickup orders, sales tax is calculated for our Milton, WA location.</p>
@@ -407,7 +407,7 @@
                             </div>
                             <p class="tax-stamp" id="tax-stamp"></p>
                             <div class="tax-error" id="tax-error" hidden>
-                                <i class="fas fa-triangle-exclamation"></i> We couldn’t look up the sales-tax rate for this address. <button type="button" class="link-btn" id="tax-retry">Retry</button>
+                                <i class="fas fa-triangle-exclamation" aria-hidden="true"></i> We couldn’t look up the sales-tax rate for this address. <button type="button" class="link-btn" id="tax-retry">Retry</button>
                             </div>
                         </div>
 
@@ -419,7 +419,7 @@
 
                     <!-- Review -->
                     <div class="form-card review-card" id="review-card">
-                        <h3><i class="fas fa-clipboard-check"></i> Review your order</h3>
+                        <h3><i class="fas fa-clipboard-check" aria-hidden="true"></i> Review your order</h3>
                         <div class="review-mockups" id="review-mockups"></div>
                         <div class="review-lines" id="review-lines"></div>
                         <div class="review-totals" id="review-totals"></div>
@@ -432,9 +432,9 @@
 
                         <div class="pay-reasons" id="pay-reasons"></div>
                         <button type="button" class="btn btn-pay" id="pay-btn" disabled>
-                            <i class="fas fa-lock"></i> <span id="pay-btn-label">Pay</span>
+                            <i class="fas fa-lock" aria-hidden="true"></i> <span id="pay-btn-label">Pay</span>
                         </button>
-                        <p class="stripe-note"><i class="fab fa-stripe"></i> You’ll be redirected to Stripe — we never see your card number.</p>
+                        <p class="stripe-note"><i class="fab fa-stripe" aria-hidden="true"></i> You’ll be redirected to Stripe — we never see your card number.</p>
                         <blockquote class="checkout-review">
                             <p>&ldquo;Great communication, excellent quality, and easy location to find. We will be using them again for sure soon.&rdquo;</p>
                             <footer><strong>Robyn Readwin</strong> &middot; <a href="https://maps.google.com/?cid=4107380119454186786" target="_blank" rel="noopener">★★★★★ Google review &middot; 4.9 from 185+</a></footer>
@@ -478,7 +478,7 @@
 
     <section class="band band-guarantee">
         <div class="guarantee-tag">
-            <i class="fas fa-handshake"></i>
+            <i class="fas fa-handshake" aria-hidden="true"></i>
             <div>
                 <strong>If we miss the ship date, shipping’s on us.</strong>
                 <p>We’ve been printing in Milton, Washington since 1977. Call us at <a href="tel:253-922-5793">253-922-5793</a> — a human answers.</p>
@@ -516,10 +516,10 @@
         <div class="pipeline-modal" role="dialog" aria-label="Placing your order">
             <h3>Placing your order…</h3>
             <ol class="pipeline-steps">
-                <li id="pl-step-1"><i class="far fa-circle"></i> Confirming stock</li>
-                <li id="pl-step-2"><i class="far fa-circle"></i> Uploading your artwork &amp; mockups</li>
-                <li id="pl-step-3"><i class="far fa-circle"></i> Saving your order</li>
-                <li id="pl-step-4"><i class="far fa-circle"></i> Opening secure checkout</li>
+                <li id="pl-step-1"><i class="far fa-circle" aria-hidden="true"></i> Confirming stock</li>
+                <li id="pl-step-2"><i class="far fa-circle" aria-hidden="true"></i> Uploading your artwork &amp; mockups</li>
+                <li id="pl-step-3"><i class="far fa-circle" aria-hidden="true"></i> Saving your order</li>
+                <li id="pl-step-4"><i class="far fa-circle" aria-hidden="true"></i> Opening secure checkout</li>
             </ol>
             <div class="pipeline-error" id="pipeline-error" hidden></div>
             <button type="button" class="btn btn-ghost" id="pipeline-cancel">Cancel</button>
@@ -529,7 +529,7 @@
     <!-- ── Stock conflict modal ───────────────────────────────────── -->
     <div class="modal-backdrop" id="conflict-backdrop" hidden>
         <div class="pipeline-modal" role="dialog" aria-label="Stock changed">
-            <h3><i class="fas fa-triangle-exclamation"></i> Stock changed while you were designing</h3>
+            <h3><i class="fas fa-triangle-exclamation" aria-hidden="true"></i> Stock changed while you were designing</h3>
             <div id="conflict-list"></div>
             <button type="button" class="btn btn-primary" id="conflict-apply">Apply fixes &amp; continue</button>
             <button type="button" class="btn btn-ghost" id="conflict-close">Back to my order</button>
@@ -542,7 +542,7 @@
             <img id="zoom-lightbox-img" alt="Close-up of your design on the shirt">
             <p class="zoom-lightbox-caption" id="zoom-lightbox-caption"></p>
             <button type="button" class="zoom-lightbox-close" id="zoom-lightbox-close" aria-label="Close close-up">
-                <i class="fas fa-xmark"></i>
+                <i class="fas fa-xmark" aria-hidden="true"></i>
             </button>
         </div>
     </div>
@@ -554,6 +554,6 @@
     <script src="/pages/js/custom-tees-calibration.js?v=2026.06.10.13"></script>
     <script src="/pages/js/cts-gallery-merch.js?v=2026.06.12.7"></script>
     <script src="/pages/js/custom-tees-designer.js?v=2026.06.10.13"></script>
-    <script src="/pages/js/custom-tees-app.js?v=2026.08.25.3"></script>
+    <script src="/pages/js/custom-tees-app.js?v=2026.09.05.78"></script>
 </body>
 </html>

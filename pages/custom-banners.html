@@ -23,7 +23,7 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/shared_components/css/nwca-2026-core.css?v=2026.08.25.4">
-    <link rel="stylesheet" href="/pages/css/instant-quote.css?v=2026.07.25.1">
+    <link rel="stylesheet" href="/pages/css/instant-quote.css?v=2026.09.05.78">
     <link rel="stylesheet" href="/pages/css/custom-banners.css?v=2026.07.24.5">
     <!-- Do NOT add sticker-pricing-page.css or nwca-form-shared.css - both
          declare :root tokens that collide with core. See instant-quote.css. -->
@@ -298,9 +298,9 @@
                         <div class="stk-lead-grid">
                             <div><label for="bnName">Your name</label><input type="text" id="bnName" autocomplete="name"></div>
                             <div><label for="bnEmail">Email</label><input type="email" id="bnEmail" autocomplete="email"></div>
-                            <div><label for="bnPhone">Phone <span style="font-weight:400">(optional)</span></label><input type="tel" id="bnPhone" autocomplete="tel"></div>
-                            <div><label for="bnCompany">Company <span style="font-weight:400">(optional)</span></label><input type="text" id="bnCompany" autocomplete="organization"></div>
-                            <div><label for="bnMessage">Instructions for your proof <span style="font-weight:400">(optional)</span></label><textarea id="bnMessage" rows="2" placeholder="Anything we should know before we prepare your proof — where it's hanging, colours to match, a deadline."></textarea></div>
+                            <div><label for="bnPhone">Phone <span class="stk-optional">(optional)</span></label><input type="tel" id="bnPhone" autocomplete="tel"></div>
+                            <div><label for="bnCompany">Company <span class="stk-optional">(optional)</span></label><input type="text" id="bnCompany" autocomplete="organization"></div>
+                            <div><label for="bnMessage">Instructions for your proof <span class="stk-optional">(optional)</span></label><textarea id="bnMessage" rows="2" placeholder="Anything we should know before we prepare your proof — where it's hanging, colours to match, a deadline."></textarea></div>
                             <div class="stk-hp"><label for="bnHp">Website</label><input type="text" id="bnHp" tabindex="-1" autocomplete="off"></div>
                         </div>
                         <p class="stk-inline-note is-error" id="bnLeadError" hidden></p>
