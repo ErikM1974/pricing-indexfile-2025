@@ -782,3 +782,52 @@ in-browser by Babel standalone — the only React page in the repo) and `roland-
 
 Left alone: in-browser Babel (see 1); the timeline segments' `title` tooltips (mouse-only, duplicates
 the detail panel); JotForm embed on Roland (third-party, not ours to fix).
+
+## Steve's Queue (art-hub-steve) — review, 16 items (2026-09-05, `v2026.09.05.52`)
+
+`dashboards/art-hub-steve.html` + `shared_components/js/art-hub-steve.js` (3.2K lines, kanban + notes +
+broken-mockups) + `art-hub-steve-gallery.js` (1.1K, the grid) + the SHARED `art-actions-shared.js`
+(1.8K — Send Mockup / Log Time modals, also loaded by ae-dashboard, art-request-detail, mockup-detail).
+Live probe before: 21 inline `style=`, 31 inline `onerror=`, chips were click-only divs, no dialog
+had a role, 6 bare icons.
+
+1. 🔴 **Art hourly rate was `* 75` hardcoded in 18 places** in the shared module — including the
+   `Cost:` written to Caspio `Art_Charges` by `logArtCharge()`. Now `artRate()` from Service_Codes
+   **`GRT-75`** (`SellPrice` 75 today, so no behaviour change), loaded once at boot; until it lands or
+   if the API fails every cost display appends `artRateNote()` — "⚠ fallback $75/h (…)" — never a
+   silent fallback price (Erik's rule 2026-06-03). Lock forbids `* 75)` in the file.
+2. **Rule 3** — 4 inline `onerror=` templates → `data-onerror="thumb|hide|hide-parent"` + ONE
+   capture-phase `error` listener (guarded by `window.__sgThumbErrorsWired`); all page/gallery/kanban
+   inline `style=` → classes in `art-hub-steve.css` (`.sg-head`, `.sg-bulkbar`, `.sg-card-selectbox`,
+   `.is-selectable/.is-selected`, `.kanban-loading`, `.tool-btn-mark`); `[hidden]` guard added.
+   **Left:** the approval modal's 10 `style="display:none"` internals — the shared module toggles
+   them with `.style.display` on 4 pages; converting is a shared-module refactor for its own review.
+3. **Status chips → `<button aria-pressed>`** inside `role=group`; clicking the ACTIVE chip returns to
+   All (was a dead click). Select / Show Archive / Grid-Board carry `aria-pressed`.
+4. **Cards had no keyboard path** (card click → `window.open`). The company title is now a real
+   `<a class="card-open" target=_blank>` (the delegated handler lets it navigate itself — no double
+   open); the rep name is a `<button aria-label="Filter by Nika">`.
+5. **Dialogs**: notes panel (`role=dialog`, focus → type select, returns), approval modal (labelled
+   by its title, focus → Close, returns — in the shared module so all 4 pages gain it), image modal
+   (`<span class="close">` → `<button>`, Esc), broken-mockups modal (labelled, focus in/return), art-time
+   modal (`role=dialog aria-labelledby`, focus → minutes, **Esc closes + returns focus**, `type=button`
+   on every control, `for=` on the minutes label, stepper buttons named).
+6. Tab strip = `<nav aria-label="Steve's tools">` with `aria-current=page` on Gallery; the Transfer
+   Workflow strip is `role=group`; icons `aria-hidden`.
+7. Load-more / bulk bar / kanban hidden cards / grid view use `hidden` (kanban "Show all" is a
+   `<button>`; it used to select `[style*="display: none"]`).
+8. `getDueBadge` (both files) → `parseCalendarDate` — Due_Date was UTC-parsed (day early).
+9. Notes fetch error shows the reason + `type=button` Retry; loading/empty states use `hidden`.
+10. `sg-count`, bulk count, notes badge = `role=status`.
+11. Legacy Caspio-era `processCards()` archive toggle de-inlined (dead path but lint-clean).
+12. Shared-module `?v=` bumped in all 4 consumer pages (lock checks they agree).
+13. Lock: `tests/unit/art-hub-steve-page.test.js`. Smoke on static-dist (real proxy data, 312 requests):
+    Submitted chip → "7 of 312", click again → 312; Select → bar visible (display flex via class, not
+    inline), 30 checkboxes, Done → hidden; Log Time → dialog, focus on minutes, Esc → focus back on the
+    card button; Send Mockup → dialog, focus Close, Esc → back on the card button, body scroll restored;
+    Board → grid hidden, 236 kanban cards hidden, Show all → 0 hidden; rate live = 75, note ''.
+14. 🔑 Static-dist has no backend: the Box picker 404s inside the Send Mockup modal — the modal
+    shows "Box picker error" visibly (correct behaviour, not a regression).
+15. Left alone: `confirm()`/`alert()` on Complete / bulk Complete (staff page pattern, consistent with
+    earlier decisions); `refresh()` after every action re-fetches 200 rows (fine at this size).
+16. ⏭️ Ruth's page (`mockup-ruth.js`, 1.5K) shares the same shared module — review next.

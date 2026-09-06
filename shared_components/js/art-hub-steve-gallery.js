@@ -89,10 +89,20 @@
         return s === 'yes' || s === 'y' || s === 'true' || s === '1';
     }
 
+    // Caspio Due_Date arrives as "YYYY-MM-DD" / "YYYY-MM-DDT00:00:00" — `new Date()` reads that as UTC
+    // midnight, which is the previous evening in Pacific: a due date showed a day early / "Overdue" a day soon.
+    function parseCalendarDate(value) {
+        var str = String(value == null ? '' : value).trim();
+        if (!str) return null;
+        var m = /^(\d{4})-(\d{2})-(\d{2})(?:T00:00:00(?:\.0+)?Z?)?$/.exec(str);
+        var d = m ? new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3])) : new Date(str);
+        return isNaN(d.getTime()) ? null : d;
+    }
+
     function getDueBadge(dueDateStr) {
         if (!dueDateStr) return { text: '', cls: '' };
-        var due = new Date(dueDateStr);
-        if (isNaN(due.getTime())) return { text: '', cls: '' };
+        var due = parseCalendarDate(dueDateStr);
+        if (!due) return { text: '', cls: '' };
         var today = new Date(); today.setHours(0,0,0,0);
         due.setHours(0,0,0,0);
         var diffDays = Math.round((due - today) / 86400000);
@@ -289,14 +299,16 @@
             // Hide zero-count chips except 'all'
             if (p.key !== 'all' && n === 0) return;
             var isActive = currentStatus === p.key;
-            html += '<div class="status-stat status-stat--' + p.modifier + (isActive ? ' active' : '') +
-                '" data-status-key="' + p.key + '" title="' + escapeHtml(p.label) + '">' +
+            html += '<button type="button" class="status-stat status-stat--' + p.modifier + (isActive ? ' active' : '') +
+                '" data-status-key="' + p.key + '" aria-pressed="' + (isActive ? 'true' : 'false') + '" title="' + escapeHtml(p.label) + '">' +
                 '<span class="status-stat-count">' + n + '</span>' +
-                '<span class="status-stat-label">' + escapeHtml(p.label) + '</span></div>';
+                '<span class="status-stat-label">' + escapeHtml(p.label) + '</span></button>';
         });
 
         var wrap = document.getElementById('steve-gallery-status');
         if (wrap) wrap.innerHTML = html;
+        // The status chip is a toggle: clicking the active chip returns to All.
+        // (Handled in the delegated click in mount(); this comment documents the contract.)
     }
 
     // ── Broken-mockups fetch (powers the Link Broken chip) ─────────────────
@@ -427,7 +439,7 @@
                 : '/api/box/shared-image?url=' + encodeURIComponent(mockupUrl);
             thumbHtml = '<img src="' + src + '"' +
                 ' alt="' + company + ' mockup" loading="lazy"' +
-                ' onerror="window.SteveGallery.handleThumbError(this)">';
+                ' data-onerror="thumb">';
         } else {
             // No mockup yet — for JDS items, prefer the JDS catalog/live thumbnail
             // (Steve sees the actual product Erik picked) before falling back to
@@ -445,12 +457,12 @@
             var aeUrls = getAeArtworkUrls(req);
             if (jdsThumb) {
                 thumbHtml = '<div class="card-thumb-jds">'
-                    + '<img src="' + escapeHtml(jdsThumb) + '" alt="' + company + ' JDS product" loading="lazy" onerror="this.parentNode.style.display=\'none\'">'
+                    + '<img src="' + escapeHtml(jdsThumb) + '" alt="' + company + ' JDS product" loading="lazy" data-onerror="hide-parent">'
                     + '<div class="card-thumb-jds-label">JDS · ' + escapeHtml(req.JDS_SKU) + '</div>'
                     + '</div>';
             } else if (aeUrls.length > 0) {
                 var imgs = aeUrls.map(function (u) {
-                    return '<img src="' + escapeHtml(u) + '" alt="AE artwork" loading="lazy" onerror="this.style.display=\'none\'">';
+                    return '<img src="' + escapeHtml(u) + '" alt="AE artwork" loading="lazy" data-onerror="hide">';
                 }).join('');
                 thumbHtml =
                     '<div class="card-thumb-ae card-thumb-ae--' + aeUrls.length + '">' +
@@ -499,20 +511,18 @@
         var isSelected = selectMode && selectedIds.has(designId);
         var selectBoxHtml = '';
         if (selectMode) {
-            selectBoxHtml = '<label class="sg-card-selectbox" style="position:absolute;top:8px;left:8px;z-index:6;background:rgba(255,255,255,.92);border-radius:6px;padding:5px;line-height:0;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.3);">' +
-                '<input type="checkbox" data-action="bulk-select"' + (isSelected ? ' checked' : '') +
-                ' style="width:18px;height:18px;cursor:pointer;margin:0;" aria-label="Select ' + company + '">' +
+            selectBoxHtml = '<label class="sg-card-selectbox">' +
+                '<input type="checkbox" class="sg-card-selectbox-input" data-action="bulk-select"' + (isSelected ? ' checked' : '') +
+                ' aria-label="Select ' + company + '">' +
             '</label>';
         }
-        var selectStyle = selectMode
-            ? ' style="position:relative;' + (isSelected ? 'outline:2px solid #4f46e5;outline-offset:2px;' : '') + '"'
-            : '';
+        var selectCls = selectMode ? ' is-selectable' + (isSelected ? ' is-selected' : '') : '';
 
-        return '<article class="mockup-card mockup-card--' + sKey + rushCls + onHoldCls + '" data-design-id="' + escapeHtml(designId) + '" data-status="' + sKey + '"' + selectStyle + '>' +
+        return '<article class="mockup-card mockup-card--' + sKey + rushCls + onHoldCls + selectCls + '" data-design-id="' + escapeHtml(designId) + '" data-status="' + sKey + '">' +
             selectBoxHtml +
             '<div class="card-header">' +
                 '<div class="card-header-left">' +
-                    '<div class="card-company">' + company + '</div>' +
+                    '<div class="card-company"><a class="card-open" href="/art-request/' + encodeURIComponent(designId) + '" target="_blank" rel="noopener" aria-label="Open ' + company + ' (#' + escapeHtml(designId) + ') in a new tab">' + company + '</a></div>' +
                     // Rep first name appended to the design# line via inline span
                     // with a faint dot separator (see .card-rep-name in art-hub.css).
                     // Keeps the header 2 lines tall and gives Steve "which job + whose
@@ -524,10 +534,10 @@
                     // mount() for the click + getFiltered() for the search match.
                     (designNum
                         ? '<div class="card-design-number">#' + designNum +
-                            (repFirstName ? '<span class="card-rep-name" data-action="filter-rep" data-rep="' + repFirstName + '" title="Click to filter by ' + repFirstName + '">' + repFirstName + '</span>' : '') +
+                            (repFirstName ? '<button type="button" class="card-rep-name" data-action="filter-rep" data-rep="' + repFirstName + '" aria-label="Filter by ' + repFirstName + '" title="Click to filter by ' + repFirstName + '">' + repFirstName + '</button>' : '') +
                           '</div>'
                         : (repFirstName
-                            ? '<div class="card-design-number"><span class="card-rep-name card-rep-name--standalone" data-action="filter-rep" data-rep="' + repFirstName + '" title="Click to filter by ' + repFirstName + '">' + repFirstName + '</span></div>'
+                            ? '<div class="card-design-number"><button type="button" class="card-rep-name card-rep-name--standalone" data-action="filter-rep" data-rep="' + repFirstName + '" aria-label="Filter by ' + repFirstName + '" title="Click to filter by ' + repFirstName + '">' + repFirstName + '</button></div>'
                             : '')
                     ) +
                 '</div>' +
@@ -613,12 +623,8 @@
         var loadMore = document.getElementById('steve-gallery-load-more');
         if (loadMore) {
             var hidden = filtered.length - slice.length;
-            if (hidden > 0) {
-                loadMore.style.display = '';
-                loadMore.textContent = 'Load ' + Math.min(DISPLAY_INCREMENT, hidden) + ' more (' + hidden + ' hidden)';
-            } else {
-                loadMore.style.display = 'none';
-            }
+            loadMore.hidden = hidden <= 0;
+            if (hidden > 0) loadMore.textContent = 'Load ' + Math.min(DISPLAY_INCREMENT, hidden) + ' more (' + hidden + ' hidden)';
         }
 
         // Result count
@@ -668,6 +674,7 @@
         if (btn) {
             btn.textContent = selectMode ? 'Cancel selection' : 'Select';
             btn.classList.toggle('sg-btn--active', selectMode);
+            btn.setAttribute('aria-pressed', selectMode ? 'true' : 'false');
         }
         renderGrid();
         updateBulkBar();
@@ -684,8 +691,8 @@
     function updateBulkBar() {
         var bar = document.getElementById('steve-gallery-bulkbar');
         if (!bar) return;
-        if (!selectMode) { bar.style.display = 'none'; return; }
-        bar.style.display = 'flex';
+        bar.hidden = !selectMode;
+        if (!selectMode) return;
         var n = selectedIds.size;
         var countEl = document.getElementById('steve-gallery-bulk-count');
         if (countEl) countEl.textContent = n === 0 ? 'Tap cards to select' : n + ' selected';
@@ -837,9 +844,9 @@
                     // Mutate the in-memory record's SAME slot so a re-render keeps the URL.
                     req[slotField] = resp.body.newUrl;
                     // Swap the broken card for a fresh image without touching the rest of the card.
-                    thumb.innerHTML = '<img src="' + resolveBoxUrl(resp.body.newUrl) + '"' +
-                        ' alt="' + (req.CompanyName || 'mockup') + '" loading="lazy"' +
-                        ' onerror="window.SteveGallery.handleThumbError(this)">';
+                    thumb.innerHTML = '<img src="' + escapeHtml(resolveBoxUrl(resp.body.newUrl)) + '"' +
+                        ' alt="' + escapeHtml(req.CompanyName || 'mockup') + '" loading="lazy"' +
+                        ' data-onerror="thumb">';
                 }
             })
             .catch(function () { /* silent — broken state already shown */ });
@@ -905,7 +912,7 @@
                 retry.type = 'button';
                 retry.className = 'sg-btn';
                 retry.textContent = 'Retry';
-                retry.style.marginTop = '12px';
+                retry.className = 'sg-btn sg-retry';
                 retry.addEventListener('click', refresh);
                 wrap.appendChild(retry);
                 grid.appendChild(wrap);
@@ -932,22 +939,35 @@
         host.innerHTML =
             '<div class="sg-toolbar">' +
                 '<input type="search" id="steve-gallery-search" aria-label="Search gallery" placeholder="Search company, design #, rep, or ID..." autocomplete="off">' +
-                '<button type="button" id="steve-gallery-select" class="sg-btn" title="Select multiple cards for a bulk action">Select</button>' +
-                '<button type="button" id="steve-gallery-archive" class="sg-btn">Show Archive</button>' +
-                '<span id="steve-gallery-count" class="sg-count"></span>' +
+                '<button type="button" id="steve-gallery-select" class="sg-btn" aria-pressed="false" title="Select multiple cards for a bulk action">Select</button>' +
+                '<button type="button" id="steve-gallery-archive" class="sg-btn" aria-pressed="false">Show Archive</button>' +
+                '<span id="steve-gallery-count" class="sg-count" role="status"></span>' +
             '</div>' +
-            '<div id="steve-gallery-status" class="status-summary"></div>' +
+            '<div id="steve-gallery-status" class="status-summary" role="group" aria-label="Filter by status"></div>' +
             '<div id="steve-gallery-grid" class="mockup-grid"></div>' +
             '<div class="sg-load-more-wrap">' +
-                '<button type="button" id="steve-gallery-load-more" class="sg-btn" style="display:none;"></button>' +
+                '<button type="button" id="steve-gallery-load-more" class="sg-btn" hidden></button>' +
             '</div>' +
-            // Bulk-action bar — sticky at the viewport bottom while select mode
-            // is on. Inline styles keep the module standalone (no CSS edit).
-            '<div id="steve-gallery-bulkbar" style="display:none;position:sticky;bottom:12px;z-index:40;margin-top:12px;padding:10px 16px;border-radius:10px;background:#1f2937;color:#f9fafb;box-shadow:0 4px 16px rgba(0,0,0,.35);align-items:center;gap:14px;">' +
-                '<span id="steve-gallery-bulk-count" style="font-weight:600;">Tap cards to select</span>' +
+            // Bulk-action bar — sticky at the viewport bottom while select mode is on
+            // (styles: .sg-bulkbar in dashboards/css/art-hub-steve.css).
+            '<div id="steve-gallery-bulkbar" class="sg-bulkbar" role="region" aria-label="Bulk actions" hidden>' +
+                '<span id="steve-gallery-bulk-count" class="sg-bulk-count" role="status">Tap cards to select</span>' +
                 '<button type="button" id="steve-gallery-bulk-complete" class="sg-btn sg-btn--success" disabled>Mark Complete</button>' +
-                '<button type="button" id="steve-gallery-bulk-cancel" class="sg-btn" style="margin-left:auto;">Done</button>' +
+                '<button type="button" id="steve-gallery-bulk-cancel" class="sg-btn sg-bulk-cancel">Done</button>' +
             '</div>';
+
+        // Image fallbacks (Rule 3 — were inline onerror=): `error` does not bubble → capture phase, once.
+        if (!window.__sgThumbErrorsWired) {
+            window.__sgThumbErrorsWired = true;
+            document.addEventListener('error', function (e) {
+                var img = e.target;
+                if (!img || img.tagName !== 'IMG' || !img.dataset) return;
+                var mode = img.dataset.onerror;
+                if (mode === 'thumb') handleThumbError(img);
+                else if (mode === 'hide') img.hidden = true;
+                else if (mode === 'hide-parent' && img.parentNode) img.parentNode.hidden = true;
+            }, true);
+        }
 
         // Search input — debounced 120ms
         var searchEl = document.getElementById('steve-gallery-search');
@@ -964,6 +984,7 @@
             archiveActive = !archiveActive;
             archiveBtn.textContent = archiveActive ? 'Hide Archive' : 'Show Archive';
             archiveBtn.classList.toggle('sg-btn--active', archiveActive);
+            archiveBtn.setAttribute('aria-pressed', archiveActive ? 'true' : 'false');
             displayCount = INITIAL_DISPLAY;
             refresh();
         });
@@ -972,7 +993,8 @@
         document.getElementById('steve-gallery-status').addEventListener('click', function (e) {
             var chip = e.target.closest('.status-stat');
             if (!chip) return;
-            applyStatus(chip.dataset.statusKey);
+            var key = chip.dataset.statusKey;
+            applyStatus(key === currentStatus && key !== 'all' ? 'all' : key);
         });
 
         // Bulk select controls
@@ -1003,6 +1025,13 @@
             }
             // Click rep name → fill search box with the rep first name. Filter
             // happens automatically via the search input's debounced listener.
+            var openLink = e.target.closest('a.card-open');
+            if (openLink) {
+                // The anchor opens the detail page itself — only remember where to come back to.
+                try { sessionStorage.setItem('artHubReturnTo', '/dashboards/art-hub-steve.html'); } catch (err) { /* storage blocked */ }
+                e.stopPropagation();
+                return;
+            }
             var repBtn = e.target.closest('.card-rep-name[data-action="filter-rep"]');
             if (repBtn) {
                 e.preventDefault();

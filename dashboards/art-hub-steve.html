@@ -21,7 +21,7 @@
          Art Request Detail page, the Steve panes of the AE dashboard, and the Art Queue /
          Design Queue tiles on the staff dashboard (.f-steve). Ruth = purple; the AE
          dashboard itself stays maroon and carries both colours inside it. -->
-    <link rel="stylesheet" href="/dashboards/css/art-hub-steve.css?v=2026.09.05.18">
+    <link rel="stylesheet" href="/dashboards/css/art-hub-steve.css?v=2026.09.05.52">
     <!-- Steve gallery layout (toolbar + status row + grid + load more) -->
     </head>
 <body>
@@ -40,21 +40,21 @@
     <div class="tab-container">
         <!-- Transfer Workflow strip lives ABOVE the tab row so it's
              visible on every inner tab, not just Gallery. -->
-        <div class="tool-workflow" aria-label="Transfer workflow">
+        <div class="tool-workflow" role="group" aria-label="Transfer workflow">
             <div class="tool-workflow-label">
-                <i class="fas fa-route"></i> Transfer Workflow
+                <i class="fas fa-route" aria-hidden="true"></i> Transfer Workflow
             </div>
             <div class="tool-workflow-row">
                 <button type="button" id="steve-send-supacolor-btn" class="tool-btn" title="Pick files from your Box folder and send to Bradley for Supacolor">
-                    <i class="fas fa-paper-plane"></i> Send to Supacolor
+                    <i class="fas fa-paper-plane" aria-hidden="true"></i> Send to Supacolor
                 </button>
                 <button type="button" id="steve-send-screenprint-btn" class="tool-btn" title="Pick files from your Box folder and send screen print artwork to Bradley for L&amp;P Printing">
-                    <i class="fas fa-print"></i> Send to Screen Print
+                    <i class="fas fa-print" aria-hidden="true"></i> Send to Screen Print
                 </button>
-                <span class="tool-workflow-arrow" aria-hidden="true"><i class="fas fa-arrow-right"></i></span>
-                <a href="/dashboards/bradley-transfers.html?view=steve" class="tool-btn"><i class="fas fa-truck"></i> My Transfer Queue</a>
-                <span class="tool-workflow-arrow" aria-hidden="true"><i class="fas fa-arrow-right"></i></span>
-                <a href="/dashboards/supacolor-orders.html" class="tool-btn"><img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/supacolor-mark.png?ver=1" alt="Supacolor" style="height:14px;width:auto;vertical-align:middle;margin-right:2px;"> API Orders</a>
+                <span class="tool-workflow-arrow" aria-hidden="true"><i class="fas fa-arrow-right" aria-hidden="true"></i></span>
+                <a href="/dashboards/bradley-transfers.html?view=steve" class="tool-btn"><i class="fas fa-truck" aria-hidden="true"></i> My Transfer Queue</a>
+                <span class="tool-workflow-arrow" aria-hidden="true"><i class="fas fa-arrow-right" aria-hidden="true"></i></span>
+                <a href="/dashboards/supacolor-orders.html" class="tool-btn"><img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/supacolor-mark.png?ver=1" alt="Supacolor" class="tool-btn-mark"> API Orders</a>
             </div>
         </div>
 
@@ -62,8 +62,8 @@
              remaining tabs marked with .tab-button-link--external open
              other dashboards. The first external tab gets a small visual
              divider via .tab-button-link--first-external. -->
-        <div class="tab-buttons">
-            <button class="tab-button active" data-call="showTab" data-args='["gallery", "$event"]'>Gallery View</button>
+        <nav class="tab-buttons" aria-label="Steve's tools">
+            <button type="button" class="tab-button active" aria-current="page" data-call="showTab" data-args='["gallery", "$event"]'>Gallery View</button>
             <!-- "Express Submit Form" tab DELETED 2026-08-01. Its Caspio DataPage
                  (a0e1500073092d827fb74d968d9d) wrote straight into ArtRequests,
                  skipping POST /api/artrequests where both submission notifications
@@ -85,28 +85,28 @@
                  not a pane, so showTab()'s index-based tabMap is untouched. Answers the
                  question the publisher does not — WHICH subject to draw next. -->
             <a class="tab-button tab-button-link" href="/dashboards/design-queue.html">Design Queue</a>
-        </div>
+        </nav>
 
         <!-- Tab Content -->
         <div class="tab-content">
             <!-- Gallery Tab -->
             <div id="gallery-tab" class="tab-pane active">
                 <!-- Broken Mockups Health Check Widget (populated by art-hub-steve.js) -->
-                <div id="steve-broken-mockups-widget" style="display:none;"></div>
-                <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
-                    <h2 class="tab-title" style="margin-bottom:0;">Art Request Gallery</h2>
-                    <div style="display:flex; align-items:center; gap:10px;">
+                <div id="steve-broken-mockups-widget" hidden></div>
+                <div class="sg-head">
+                    <h2 class="tab-title">Art Request Gallery</h2>
+                    <div class="sg-head-right">
                         <a href="/pages/art-billing-reference.html" target="_blank" rel="noopener"
                            class="sg-reference-link"
                            title="Billing codes (GRT-50/GRT-75), file format requirements, file definitions">
                             &#128218; Reference &#x2197;
                         </a>
-                        <div class="view-toggle" id="steve-view-toggle">
-                            <button class="view-toggle-btn active" data-view="grid" data-call="toggleKanbanView" data-args='["grid"]'>
-                                <span class="view-toggle-icon">&#9638;</span> Grid
+                        <div class="view-toggle" id="steve-view-toggle" role="group" aria-label="Gallery layout">
+                            <button type="button" class="view-toggle-btn active" data-view="grid" aria-pressed="true" data-call="toggleKanbanView" data-args='["grid"]'>
+                                <span class="view-toggle-icon" aria-hidden="true">&#9638;</span> Grid
                             </button>
-                            <button class="view-toggle-btn" data-view="board" data-call="toggleKanbanView" data-args='["board"]'>
-                                <span class="view-toggle-icon">&#9783;</span> Board
+                            <button type="button" class="view-toggle-btn" data-view="board" aria-pressed="false" data-call="toggleKanbanView" data-args='["board"]'>
+                                <span class="view-toggle-icon" aria-hidden="true">&#9783;</span> Board
                             </button>
                         </div>
                     </div>
@@ -130,13 +130,13 @@
 
     <!-- Notes Slide-Out Panel -->
     <div id="notes-overlay" class="notes-overlay"></div>
-    <div id="notes-panel" class="notes-panel">
+    <div id="notes-panel" class="notes-panel" role="dialog" aria-modal="true" aria-labelledby="notes-panel-company">
         <div class="notes-panel-header">
             <div class="notes-panel-header-info">
                 <span id="notes-panel-company"></span>
                 <span id="notes-panel-id"></span>
             </div>
-            <button class="notes-panel-close" id="notes-panel-close">&times;</button>
+            <button type="button" class="notes-panel-close" id="notes-panel-close" aria-label="Close notes">&times;</button>
         </div>
         <div class="notes-panel-form">
             <h4 class="notes-panel-form-title">Add Note</h4>
@@ -152,27 +152,27 @@
                 <input type="checkbox" id="note-notify-checkbox" checked>
                 Notify the other party (email + Slack)
             </label>
-            <button id="note-submit-btn">Add Note</button>
+            <button type="button" id="note-submit-btn">Add Note</button>
         </div>
         <div class="notes-panel-divider"></div>
         <div class="notes-panel-timeline-header">
             <span>Notes</span>
-            <span id="notes-count-badge" class="notes-count-badge">0</span>
+            <span id="notes-count-badge" class="notes-count-badge" role="status" aria-label="Note count">0</span>
         </div>
-        <div id="notes-loading" class="notes-loading" style="display:none;">Loading notes...</div>
-        <div id="notes-empty" class="notes-empty" style="display:none;">No notes yet for this request.</div>
+        <div id="notes-loading" class="notes-loading" role="status" hidden>Loading notes...</div>
+        <div id="notes-empty" class="notes-empty" hidden>No notes yet for this request.</div>
         <div id="notes-timeline" class="notes-panel-timeline"></div>
     </div>
 
     <!-- Send Mockup Modal -->
     <div id="approval-overlay" class="art-modal-overlay" style="display:none;"></div>
-    <div id="approval-modal" class="approval-modal" style="display:none;">
+    <div id="approval-modal" class="approval-modal" role="dialog" aria-modal="true" aria-labelledby="approval-modal-title" style="display:none;">
         <div class="approval-modal-header">
             <div class="approval-modal-header-info">
-                <span>Send Mockup</span>
+                <span id="approval-modal-title">Send Mockup</span>
                 <span id="approval-modal-rev" class="approval-rev-badge"></span>
             </div>
-            <button class="approval-modal-close" id="approval-modal-close">&times;</button>
+            <button type="button" class="approval-modal-close" id="approval-modal-close" aria-label="Close">&times;</button>
         </div>
         <div class="approval-modal-body">
             <div id="approval-company" class="approval-company"></div>
@@ -212,11 +212,11 @@
                 <div class="approval-section-label">Art Time</div>
                 <div id="approval-prev-time" class="approval-prev-time"></div>
                 <div class="approval-session-row">
-                    <label>This session:</label>
+                    <label for="approval-minutes">This session:</label>
                     <div class="stepper-row stepper-row--inline">
-                        <button type="button" id="approval-minus" class="stepper-btn">-</button>
+                        <button type="button" id="approval-minus" class="stepper-btn" aria-label="Subtract 15 minutes">-</button>
                         <input type="number" id="approval-minutes" aria-label="Minutes to bill" value="15" min="0" step="15" class="stepper-input stepper-input--sm">
-                        <button type="button" id="approval-plus" class="stepper-btn">+</button>
+                        <button type="button" id="approval-plus" class="stepper-btn" aria-label="Add 15 minutes">+</button>
                     </div>
                     <span id="approval-cost" class="approval-cost">= $18.75</span>
                 </div>
@@ -224,15 +224,15 @@
             </div>
         </div>
         <div class="approval-modal-footer">
-            <span id="approval-selected-count" class="approval-count">0 of 6 selected</span>
-            <button id="approval-cancel" class="approval-btn-cancel">Cancel</button>
-            <button id="approval-submit" class="approval-btn-submit">Send Mockup</button>
+            <span id="approval-selected-count" class="approval-count" role="status">0 of 6 selected</span>
+            <button type="button" id="approval-cancel" class="approval-btn-cancel">Cancel</button>
+            <button type="button" id="approval-submit" class="approval-btn-submit">Send Mockup</button>
         </div>
     </div>
 
     <!-- Image Modal (for gallery card image pop-up) -->
-    <div id="imageModal" class="modal">
-        <span class="close" id="imageModalClose">&times;</span>
+    <div id="imageModal" class="modal" role="dialog" aria-modal="true" aria-label="Enlarged artwork">
+        <button type="button" class="close" id="imageModalClose" aria-label="Close">&times;</button>
         <img class="modal-content" id="modalImage" alt="Enlarged artwork">
     </div>
 
@@ -240,16 +240,16 @@
     <script src="/shared_components/js/mo-fetch.js?v=2026.08.10.4"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <script src="/shared_components/js/box-url.js?v=2026.08.05.23"></script>
-    <script src="/shared_components/js/art-actions-shared.js?v=2026.08.05.23"></script>
+    <script src="/shared_components/js/art-actions-shared.js?v=2026.09.05.52"></script>
     <script src="/shared_components/js/transfer-actions-shared.js?v=2026.08.12.1"></script>
     <script src="/shared_components/js/confetti.js?v=1"></script>
     <script src="/shared_components/js/caspio-date-utils.js?v=1"></script>
     <script src="/shared_components/js/elapsed-time-utils.js?v=2"></script>
     <!-- SAML identity → legacy nwca_user_* keys (StaffAuthHelper.ready(), 2026-09-05) -->
     <script src="/shared_components/js/staff-auth-helper.js?v=2026.09.05.6"></script>
-    <script src="/shared_components/js/art-hub-steve.js?v=2026.09.05.16"></script>
+    <script src="/shared_components/js/art-hub-steve.js?v=2026.09.05.52"></script>
     <script src="/shared_components/js/data-call-delegator.js"></script>
-    <script src="/shared_components/js/art-hub-steve-gallery.js?v=2026.09.05.15"></script>
+    <script src="/shared_components/js/art-hub-steve-gallery.js?v=2026.09.05.52"></script>
     <script src="/dashboards/js/steve-send-supacolor.js?v=5"></script>
     <script src="/dashboards/js/steve-send-screenprint.js?v=2"></script>
 </body>
