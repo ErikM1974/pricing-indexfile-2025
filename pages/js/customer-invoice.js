@@ -17,8 +17,8 @@
   var SIZE_LABELS = ['S', 'M', 'L', 'XL', '2XL', '3XL'];
 
   function fail() {
-    document.getElementById('ci-loading').style.display = 'none';
-    document.getElementById('ci-error').style.display = 'block';
+    document.getElementById('ci-loading').hidden = true;
+    document.getElementById('ci-error').hidden = false;
   }
 
   if (!/^\d+$/.test(orderNo)) { fail(); return; }
@@ -89,8 +89,8 @@
 
     var paper = document.getElementById('ci-paper');
     paper.innerHTML = html;
-    document.getElementById('ci-loading').style.display = 'none';
-    paper.style.display = 'block';
+    document.getElementById('ci-loading').hidden = true;
+    paper.hidden = false;
     document.title = 'Invoice #' + d.invoiceNumber + ' — NWCA';
 
     document.getElementById('ci-download').addEventListener('click', function () {

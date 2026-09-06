@@ -82,8 +82,22 @@ class QuoteViewPage {
         // Cache for product images
         this.imageCache = {};
 
-        // API base URL for product details
-        this.apiBaseUrl = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        // API base URL for product-image lookups — from /config/app.config.js (Rule 6).
+        // Only images depend on it: a missing config logs loudly and the placeholder glyph shows.
+        this.apiBaseUrl = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) || '';
+        if (!this.apiBaseUrl) console.error('[QuoteView] APP_CONFIG.API.BASE_URL missing — product images will not load');
+
+        // Product modal + style-cell wiring (was inline handlers in the rendered HTML)
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('[data-qv-close-modal]')) { this.closeProductModal(); return; }
+            const cell = e.target.closest('[data-qv-group]');
+            if (cell) this.openProductModal(Number(cell.dataset.qvGroup));
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key !== 'Enter' && e.key !== ' ') return;
+            const cell = e.target && e.target.closest && e.target.closest('[data-qv-group]');
+            if (cell) { e.preventDefault(); this.openProductModal(Number(cell.dataset.qvGroup)); }
+        });
 
         this.init();
     }
@@ -980,9 +994,9 @@ class QuoteViewPage {
         // Add product detail modal container
         html += `
             <div id="product-modal" class="product-modal hidden">
-                <div class="product-modal-backdrop" onclick="window.quoteViewPage.closeProductModal()"></div>
+                <div class="product-modal-backdrop" data-qv-close-modal></div>
                 <div class="product-modal-content">
-                    <button class="product-modal-close" onclick="window.quoteViewPage.closeProductModal()">&times;</button>
+                    <button type="button" class="product-modal-close" data-qv-close-modal aria-label="Close">&times;</button>
                     <div class="product-modal-body">
                         <img id="modal-product-image" class="product-modal-image" src="" alt="">
                         <div class="product-modal-details">
@@ -1678,7 +1692,7 @@ class QuoteViewPage {
         let styleCell;
         if (isFirstRow) {
             styleCell = `
-                <td class="style-col clickable" onclick="window.quoteViewPage.openProductModal(${groupIndex})">
+                <td class="style-col clickable" data-qv-group="${groupIndex}" role="button" tabindex="0" aria-label="Show product details">
                     <div class="style-with-image">
                         <img id="product-image-${groupIndex}" class="product-thumb" src="${QV_PLACEHOLDER_IMG}" alt="${this.escapeHtml(row.style)}">
                         <span>${this.escapeHtml(row.style)} - ${this.escapeHtml(row.description || '')}</span>
@@ -3837,7 +3851,7 @@ class QuoteViewPage {
                             <div class="sw-designs-artwork-thumb">
                                 ${isImg
                                     ? `<img src="${this.escapeHtml(url)}" alt="${this.escapeHtml(L.Location || '')}" loading="lazy">`
-                                    : `<div class="sw-designs-artwork-thumb-icon"><i class="fas fa-file"></i></div>`}
+                                    : `<div class="sw-designs-artwork-thumb-icon"><i class="fas fa-file" aria-hidden="true"></i></div>`}
                             </div>
                             <div class="sw-designs-artwork-meta">
                                 <div class="sw-designs-artwork-location">${this.escapeHtml(L.Location || code)}</div>
@@ -3912,8 +3926,8 @@ class QuoteViewPage {
                 const thumb = isImageName(logo.fileName)
                     ? `<img src="${url}" alt="${label}" loading="lazy"
                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                       <div class="cust-art-thumb-icon" style="display:none;"><i class="fas fa-file"></i></div>`
-                    : `<div class="cust-art-thumb-icon"><i class="fas fa-file"></i></div>`;
+                       <div class="cust-art-thumb-icon" style="display:none;"><i class="fas fa-file" aria-hidden="true"></i></div>`
+                    : `<div class="cust-art-thumb-icon"><i class="fas fa-file" aria-hidden="true"></i></div>`;
                 return `
                     <div class="cust-art-card">
                         <a class="cust-art-thumb" href="${url}" target="_blank" rel="noopener" title="Open full size in a new tab">
@@ -3923,7 +3937,7 @@ class QuoteViewPage {
                             <div class="cust-art-label">${label}</div>
                             <div class="cust-art-filename" title="${name}">${name}</div>
                             <a class="cust-art-download" href="${url}" download="${name}" target="_blank" rel="noopener">
-                                <i class="fas fa-download"></i> Download
+                                <i class="fas fa-download" aria-hidden="true"></i> Download
                             </a>
                         </div>
                     </div>
@@ -3944,12 +3958,12 @@ class QuoteViewPage {
                         <a class="cust-art-thumb" href="${url}" target="_blank" rel="noopener" title="Open full size in a new tab">
                             <img src="${url}" alt="${label}" loading="lazy"
                                  onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                            <div class="cust-art-thumb-icon" style="display:none;"><i class="fas fa-file-image"></i></div>
+                            <div class="cust-art-thumb-icon" style="display:none;"><i class="fas fa-file-image" aria-hidden="true"></i></div>
                         </a>
                         <div class="cust-art-meta">
                             <div class="cust-art-label">${label}</div>
                             <a class="cust-art-download" href="${url}" download="${dlName}" target="_blank" rel="noopener">
-                                <i class="fas fa-download"></i> Download
+                                <i class="fas fa-download" aria-hidden="true"></i> Download
                             </a>
                         </div>
                     </div>

@@ -56,7 +56,7 @@
 
         $('st-order-num').textContent = order.quoteID;
         $('st-style').innerHTML = escapeHTML(order.styleName || '')
-            + (order.rush ? ' <span class="status-rush"><i class="fas fa-bolt"></i> 3-Day Rush</span>' : '');
+            + (order.rush ? ' <span class="status-rush"><i class="fas fa-bolt" aria-hidden="true"></i> 3-Day Rush</span>' : '');
         if (order.orderDate) {
             const d = new Date(order.orderDate);
             if (!isNaN(d)) {
@@ -67,8 +67,8 @@
         // Promised date — prominent pill (server-stamped, never recomputed)
         if (promise) {
             $('st-promise').innerHTML = isPickup
-                ? `<i class="fas fa-store"></i> Promised ready for pickup: <strong>${escapeHTML(promise)}</strong>`
-                : `<i class="fas fa-truck-fast"></i> Ships from Milton, WA: <strong>${escapeHTML(promise)}</strong>`;
+                ? `<i class="fas fa-store" aria-hidden="true"></i> Promised ready for pickup: <strong>${escapeHTML(promise)}</strong>`
+                : `<i class="fas fa-truck-fast" aria-hidden="true"></i> Ships from Milton, WA: <strong>${escapeHTML(promise)}</strong>`;
             $('st-promise').hidden = false;
         }
 
@@ -78,7 +78,7 @@
             $('st-tracking').innerHTML =
                 `<a class="btn btn-primary" target="_blank" rel="noopener" ` +
                 `href="https://www.ups.com/track?tracknum=${encodeURIComponent(tn)}">` +
-                `<i class="fas fa-truck-fast"></i> Track with UPS — ${escapeHTML(tn)}</a>`;
+                `<i class="fas fa-truck-fast" aria-hidden="true"></i> Track with UPS — ${escapeHTML(tn)}</a>`;
             $('st-tracking').hidden = false;
         }
 
@@ -109,7 +109,7 @@
         $('st-timeline').innerHTML = steps.map((s, i) => {
             const state = i < current ? 'is-done' : (i === current ? 'is-current' : 'is-pending');
             return `<div class="status-step ${state}">` +
-                `<span class="status-step-dot"><i class="fas ${i < current ? 'fa-check' : s.icon}"></i></span>` +
+                `<span class="status-step-dot"><i class="fas ${i < current ? 'fa-check' : s.icon}" aria-hidden="true"></i></span>` +
                 `<span class="status-step-body"><strong>${escapeHTML(s.title)}</strong><small>${escapeHTML(s.sub)}</small></span></div>`;
         }).join('');
 

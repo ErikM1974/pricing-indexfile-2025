@@ -418,16 +418,20 @@
 
     function loadMe() {
         fetch(ME_URL, { credentials: 'same-origin' })
-            .then(function (r) { return r.ok ? r.json() : null; })
+            .then(function (r) { if (!r.ok) throw new Error('me ' + r.status); return r.json(); })
             .then(function (d) {
-                if (!d) return;
+                if (!d) throw new Error('me empty');
                 S.me = d;
                 if (d.customerId && !S.custId) S.custId = String(d.customerId);
                 if (!S.companyName && d.companyName) setCompany(d.companyName);
                 setText('cp-acct-email', d.email || '—');
                 setText('cp-quotes-email', d.email || 'your sign-in email');
             })
-            .catch(function () { /* the account panel just shows a dash */ });
+            .catch(function (e) {
+                // Visible, not a silent dash (Erik's #1 rule)
+                console.error('[portal] account lookup failed:', e);
+                setText('cp-acct-email', 'Unavailable — refresh to retry');
+            });
     }
 
     function loadOrders() {
@@ -1671,7 +1675,8 @@
         }
         if (PREVIEW) { showToast('Staff preview — the customer would redeem their rewards here.'); return; }
         var progR = S.rewardProgram || {};
-        var todayIso = new Date().toISOString().slice(0, 10);
+        var _t = new Date();
+        var todayIso = _t.getFullYear() + '-' + String(_t.getMonth() + 1).padStart(2, '0') + '-' + String(_t.getDate()).padStart(2, '0'); // local calendar day, not UTC
         if (progR.spendFrom && todayIso < progR.spendFrom) { showToast(escapeHtml(progR.name || 'Reward dollars') + ' can be redeemed starting ' + escapeHtml(formatDate(progR.spendFrom)) + '.'); return; }
         if (progR.spendBy && todayIso > progR.spendBy) { showToast(escapeHtml(progR.name || 'Reward dollars') + ' expired on ' + escapeHtml(formatDate(progR.spendBy)) + '.'); return; }
         setText('cp-redeem-avail', money(S.rewardBalance));

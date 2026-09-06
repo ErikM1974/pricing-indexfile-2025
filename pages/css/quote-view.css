@@ -3181,3 +3181,6 @@ body {
 }
 .qv-delivery-option input { margin-top: 3px; }
 .qv-delivery-option small { color: #64748b; }
+
+/* 2026-09-05 review: the hidden attribute must beat any display rule */
+[hidden] { display: none !important; }
