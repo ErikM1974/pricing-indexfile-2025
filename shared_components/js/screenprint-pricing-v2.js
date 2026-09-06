@@ -77,7 +77,7 @@ class ScreenPrintPricing {
 
         // State - single source of truth
         this.state = {
-            quantity: 37, // Default to tier 2 (37-71 pieces)
+            quantity: 37, // pricing quantity until a tier is picked; the strip itself comes from the API tiers
             frontColors: 1,
             frontHasSafetyStripes: false,
             additionalLocations: [], // [{location: 'back', colors: 2, hasSafetyStripes: false}, ...]
@@ -88,7 +88,7 @@ class ScreenPrintPricing {
             pricingData: null,
             masterBundle: null,
             safetyStripeSurcharge: 2.00,
-            expandedLTMTier: null  // Track which LTM tier is expanded ('24-36' or '37-71')
+            expandedLTMTier: null  // TierLabel of the LTM tier whose exact-quantity input is open
         };
 
         // DOM elements cache
@@ -149,6 +149,9 @@ class ScreenPrintPricing {
             const stripe = parseFloat(map['SP-STRIPE'] && map['SP-STRIPE'].SellPrice);
             if (Number.isFinite(spsu) && spsu > 0) this.config.setupFeePerColor = spsu;
             if (Number.isFinite(stripe) && stripe > 0) this.state.safetyStripeSurcharge = stripe;
+            // Art setup tooltip amount (GRT-50) — the typed "$50.00" is only the pre-API placeholder.
+            const grt50 = parseFloat(map['GRT-50'] && map['GRT-50'].SellPrice);
+            if (Number.isFinite(grt50) && grt50 > 0) { this.state.artSetupFee = grt50; this.renderArtSetupFee(); }
         } catch (e) {
             console.warn('[ScreenPrintV2] Service_Codes fetch failed — using default setup/stripe fees:', e.message);
         }
@@ -272,51 +275,8 @@ class ScreenPrintPricing {
                             Quantity Tiers
                         </div>
 
-                        <button class="sp-tier-button universal-tier-button" id="sp-tier-24-36" data-tier="24-36">
-                            24-36 pieces
-                            <br><small class="sp-fee-note">+ $75 Small Batch Fee</small>
-                        </button>
-
-                        <!-- Separate input container for 24-36 tier -->
-                        <div class="sp-quantity-input-container-1 universal-quantity-input-container">
-                            <label for="sp-qty-tier-1" class="sp-quantity-input-label universal-quantity-input-label">
-                                <i class="fas fa-calculator" aria-hidden="true"></i> Enter Exact Quantity (24-36 pieces):
-                            </label>
-                            <input type="number" id="sp-qty-tier-1" class="sp-quantity-input universal-quantity-input"
-                                   min="24" max="36" value="24" placeholder="Enter 24-36">
-                            <small class="sp-quantity-hint universal-quantity-hint">
-                                <i class="fas fa-info-circle" aria-hidden="true"></i>
-                                Required for accurate $75 fee distribution:
-                                <strong id="sp-ltm-calc-1">$75 ÷ 24 = $3.13/piece</strong>
-                            </small>
-                        </div>
-
-                        <button class="sp-tier-button universal-tier-button selected" id="sp-tier-37-71" data-tier="37-71">
-                            37-71 pieces
-                            <br><small class="sp-fee-note">+ $50 Small Batch Fee</small>
-                        </button>
-
-                        <!-- Separate input container for 37-71 tier -->
-                        <div class="sp-quantity-input-container-2 universal-quantity-input-container show">
-                            <label for="sp-qty-tier-2" class="sp-quantity-input-label universal-quantity-input-label">
-                                <i class="fas fa-calculator" aria-hidden="true"></i> Enter Exact Quantity (37-71 pieces):
-                            </label>
-                            <input type="number" id="sp-qty-tier-2" class="sp-quantity-input universal-quantity-input"
-                                   min="37" max="71" value="37" placeholder="Enter 37-71">
-                            <small class="sp-quantity-hint universal-quantity-hint">
-                                <i class="fas fa-info-circle" aria-hidden="true"></i>
-                                Required for accurate $50 fee distribution:
-                                <strong id="sp-ltm-calc-2">$50 ÷ 37 = $1.35/piece</strong>
-                            </small>
-                        </div>
-
-                        <button class="sp-tier-button universal-tier-button" id="sp-tier-72-144" data-tier="72-144">
-                            72-144 pieces
-                        </button>
-
-                        <button class="sp-tier-button universal-tier-button" id="sp-tier-145-576" data-tier="145-576">
-                            145-576 pieces
-                        </button>
+                        <!-- Tier buttons + exact-quantity inputs are rendered from the API tiers (renderTierButtons). -->
+                        <div id="sp-tier-list" class="sp-tier-list"></div>
                     </div>
                 </div>
 
@@ -474,81 +434,7 @@ class ScreenPrintPricing {
             });
         }
 
-        // NEW: Tier Buttons (Ed Lacey's structure)
-        const tierButtons = [
-            { id: 'sp-tier-24-36', tier: '24-36', qty: 24 },
-            { id: 'sp-tier-37-71', tier: '37-71', qty: 37 },
-            { id: 'sp-tier-72-144', tier: '72-144', qty: 72 },
-            { id: 'sp-tier-145-576', tier: '145-576', qty: 145 }
-        ];
-
-        tierButtons.forEach(({id, tier, qty}) => {
-            document.getElementById(id)?.addEventListener('click', (e) => {
-                // Don't re-trigger if clicking inside input field
-                if (e.target.tagName === 'INPUT') return;
-
-                // Collapse other LTM tiers first
-                this.collapseLTMTiers();
-
-                // Select this tier
-                this.selectQuantityTier(tier, qty);
-
-                // Expand if it's an LTM tier
-                if (tier === '24-36' || tier === '37-71') {
-                    this.expandLTMTier(tier, qty);
-                }
-            });
-        });
-
-        // NEW: Quantity input handlers for LTM tiers
-        const qtyInput1 = document.getElementById('sp-qty-tier-1');
-        const qtyInput2 = document.getElementById('sp-qty-tier-2');
-
-        if (qtyInput1) {
-            qtyInput1.addEventListener('input', (e) => {
-                const value = parseInt(e.target.value) || 24;
-                const clamped = Math.max(24, Math.min(36, value));
-                if (value !== clamped) {
-                    e.target.value = clamped;
-                }
-                // Update LTM calculation display
-                const ltmPerShirt = (75 / clamped).toFixed(2);
-                document.getElementById('sp-ltm-calc-1').textContent = `$75 ÷ ${clamped} = $${ltmPerShirt}/piece`;
-
-                // Update state and recalculate
-                this.state.quantity = clamped;
-                this.updateDisplay();
-            });
-
-            qtyInput1.addEventListener('change', (e) => {
-                const value = parseInt(e.target.value) || 24;
-                const clamped = Math.max(24, Math.min(36, value));
-                e.target.value = clamped;
-            });
-        }
-
-        if (qtyInput2) {
-            qtyInput2.addEventListener('input', (e) => {
-                const value = parseInt(e.target.value) || 37;
-                const clamped = Math.max(37, Math.min(71, value));
-                if (value !== clamped) {
-                    e.target.value = clamped;
-                }
-                // Update LTM calculation display
-                const ltmPerShirt = (50 / clamped).toFixed(2);
-                document.getElementById('sp-ltm-calc-2').textContent = `$50 ÷ ${clamped} = $${ltmPerShirt}/piece`;
-
-                // Update state and recalculate
-                this.state.quantity = clamped;
-                this.updateDisplay();
-            });
-
-            qtyInput2.addEventListener('change', (e) => {
-                const value = parseInt(e.target.value) || 37;
-                const clamped = Math.max(37, Math.min(71, value));
-                e.target.value = clamped;
-            });
-        }
+        // Tier buttons + exact-quantity inputs: wired in renderTierButtons() once the API tiers arrive.
 
         // NEW: Safety Stripes Toggle
         document.getElementById('sp-safety-stripes-toggle')?.addEventListener('click', () => {
@@ -879,67 +765,20 @@ class ScreenPrintPricing {
      * Collapse all LTM tier input fields
      */
     collapseLTMTiers() {
-        // Hide container 1 (24-36 tier)
-        const container1 = document.querySelector('.sp-quantity-input-container-1');
-        if (container1) {
-            container1.classList.remove('show');
-        }
-
-        // Hide container 2 (37-72 tier)
-        const container2 = document.querySelector('.sp-quantity-input-container-2');
-        if (container2) {
-            container2.classList.remove('show');
-        }
-
+        document.querySelectorAll('[data-tier-container]').forEach((c) => c.classList.remove('show'));
         this.state.expandedLTMTier = null;
     }
 
     /**
-     * Expand a specific LTM tier to show quantity input
+     * Expand the exact-quantity input of an LTM tier (rendered by renderTierButtons)
      */
     expandLTMTier(tier, defaultQty) {
-        // Show the appropriate container based on tier
-        if (tier === '24-36') {
-            const container1 = document.querySelector('.sp-quantity-input-container-1');
-            if (container1) {
-                container1.classList.add('show');
-
-                // Update the input value
-                const input = document.getElementById('sp-qty-tier-1');
-                if (input && !input.value) {
-                    input.value = defaultQty;
-                }
-
-                // Focus and select the input for immediate editing
-                setTimeout(() => {
-                    if (input) {
-                        input.focus();
-                        input.select();
-                    }
-                }, 100);
-            }
-        } else if (tier === '37-72') {
-            const container2 = document.querySelector('.sp-quantity-input-container-2');
-            if (container2) {
-                container2.classList.add('show');
-
-                // Update the input value
-                const input = document.getElementById('sp-qty-tier-2');
-                if (input && !input.value) {
-                    input.value = defaultQty;
-                }
-
-                // Focus and select the input for immediate editing
-                setTimeout(() => {
-                    if (input) {
-                        input.focus();
-                        input.select();
-                    }
-                }, 100);
-            }
-        }
-
-        // Track expanded state
+        const container = document.querySelector(`[data-tier-container="${tier}"]`);
+        if (!container) return;
+        container.classList.add('show');
+        const input = document.getElementById(`sp-qty-${tier}`);
+        if (input && !input.value) input.value = defaultQty;
+        setTimeout(() => { if (input) { input.focus(); input.select(); } }, 100);
         this.state.expandedLTMTier = tier;
     }
 
@@ -1062,18 +901,103 @@ class ScreenPrintPricing {
     /**
      * Determine which tier a quantity falls into
      * @param {number} quantity - The quantity to check
-     * @returns {string|null} Tier identifier (e.g., '24-36', '37-72') or null
+     * @returns {string|null} API TierLabel (e.g. '24-47') or null
      */
     isQuantityInTier(quantity) {
-        const tiers = [
-            { id: '24-36', min: 24, max: 36 },
-            { id: '37-71', min: 37, max: 71 },
-            { id: '72-144', min: 72, max: 144 },
-            { id: '145-576', min: 145, max: 576 }
-        ];
+        const tier = this.apiTiers().find(t => quantity >= t.MinQuantity && quantity <= t.MaxQuantity);
+        return tier ? tier.TierLabel : null;
+    }
 
-        const tier = tiers.find(t => quantity >= t.min && quantity <= t.max);
-        return tier ? tier.id : null;
+    /** API tiers (masterBundle.tierData | tiersR | tiers) as a sorted array — the ONLY tier structure this UI knows. */
+    apiTiers() {
+        const bundle = this.state.masterBundle || {};
+        const raw = bundle.tierData || bundle.tiersR || bundle.tiers;
+        if (!raw) return [];
+        const arr = Array.isArray(raw) ? raw : Object.values(raw);
+        return arr.filter(t => t && Number.isFinite(Number(t.MinQuantity)))
+            .map(t => ({ ...t, MinQuantity: Number(t.MinQuantity), MaxQuantity: Number(t.MaxQuantity), LTM_Fee: parseFloat(t.LTM_Fee) || 0 }))
+            .sort((a, b) => a.MinQuantity - b.MinQuantity);
+    }
+    isLtmTier(label) { const t = this.apiTiers().find(x => x.TierLabel === label); return !!(t && t.LTM_Fee > 0); }
+    fmtFee(fee) { return Number.isInteger(fee) ? String(fee) : fee.toFixed(2); }
+
+    /**
+     * Render the tier strip from the API tiers (2026-09-06). Erik's rule: every dollar amount a customer sees
+     * comes from Caspio. The strip used to be typed as 24-36 (+$75) / 37-71 (+$50) while Caspio had moved to
+     * 24-47 (+$50) / 48-71 ($0) — the price was right and the labels were wrong.
+     */
+    renderTierButtons() {
+        const list = document.getElementById('sp-tier-list');
+        const tiers = this.apiTiers();
+        if (!list || !tiers.length) return;
+        const esc = (v) => String(v).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        list.innerHTML = tiers.map((t) => {
+            const label = esc(t.TierLabel);
+            const range = t.MaxQuantity >= 576 ? `${t.MinQuantity}+ pieces` : `${t.MinQuantity}-${t.MaxQuantity} pieces`;
+            const fee = t.LTM_Fee;
+            let html = `<button type="button" class="sp-tier-button universal-tier-button" id="sp-tier-${label}" data-tier="${label}">${range}` +
+                (fee > 0 ? `<br><small class="sp-fee-note">+ $${this.fmtFee(fee)} Small Batch Fee</small>` : '') + `</button>`;
+            if (fee > 0) {
+                html += `<div class="sp-quantity-input-container universal-quantity-input-container" data-tier-container="${label}">
+                    <label for="sp-qty-${label}" class="sp-quantity-input-label universal-quantity-input-label">
+                        <i class="fas fa-calculator" aria-hidden="true"></i> Enter Exact Quantity (${t.MinQuantity}-${t.MaxQuantity} pieces):
+                    </label>
+                    <input type="number" id="sp-qty-${label}" class="sp-quantity-input universal-quantity-input"
+                           min="${t.MinQuantity}" max="${t.MaxQuantity}" value="${t.MinQuantity}" placeholder="Enter ${t.MinQuantity}-${t.MaxQuantity}">
+                    <small class="sp-quantity-hint universal-quantity-hint">
+                        <i class="fas fa-info-circle" aria-hidden="true"></i>
+                        Required for accurate $${this.fmtFee(fee)} fee distribution:
+                        <strong id="sp-ltm-calc-${label}">$${this.fmtFee(fee)} ÷ ${t.MinQuantity} = $${(fee / t.MinQuantity).toFixed(2)}/piece</strong>
+                    </small>
+                </div>`;
+            }
+            return html;
+        }).join('');
+
+        tiers.forEach((t) => {
+            const btn = document.getElementById(`sp-tier-${t.TierLabel}`);
+            btn?.addEventListener('click', (e) => {
+                if (e.target.tagName === 'INPUT') return;
+                this.collapseLTMTiers();
+                this.selectQuantityTier(t.TierLabel, t.MinQuantity);
+                if (t.LTM_Fee > 0) this.expandLTMTier(t.TierLabel, t.MinQuantity);
+            });
+            const input = document.getElementById(`sp-qty-${t.TierLabel}`);
+            if (!input) return;
+            const clampTo = (v) => Math.max(t.MinQuantity, Math.min(t.MaxQuantity, parseInt(v, 10) || t.MinQuantity));
+            input.addEventListener('input', (e) => {
+                const clamped = clampTo(e.target.value);
+                if (String(clamped) !== e.target.value) e.target.value = clamped;
+                this.renderLtmCalc(t.TierLabel, clamped, t.LTM_Fee);
+                this.state.quantity = clamped;
+                this.updateDisplay();
+            });
+            input.addEventListener('change', (e) => { e.target.value = clampTo(e.target.value); });
+        });
+
+        // keep the current selection coherent with the new strip
+        const current = this.isQuantityInTier(this.state.quantity) || tiers[0].TierLabel;
+        const tier = tiers.find(x => x.TierLabel === current);
+        this.state.selectedTier = current;
+        this.updateTierButtons();
+        if (tier && tier.LTM_Fee > 0) {
+            this.expandLTMTier(current, tier.MinQuantity);
+            const input = document.getElementById(`sp-qty-${current}`);
+            if (input) { input.value = this.state.quantity; this.renderLtmCalc(current, this.state.quantity, tier.LTM_Fee); }
+        }
+        this.renderArtSetupFee();
+    }
+
+    renderLtmCalc(label, qty, fee) {
+        const el = document.getElementById(`sp-ltm-calc-${label}`);
+        if (!el || !(fee > 0) || !(qty > 0)) return;
+        el.textContent = `$${this.fmtFee(fee)} ÷ ${qty} = $${(fee / qty).toFixed(2)}/piece`;
+    }
+
+    renderArtSetupFee() {
+        const el = document.querySelector('.sp-setup-fee-amount');
+        const fee = this.state.artSetupFee;
+        if (el && fee > 0) el.textContent = `$${fee.toFixed(2)} (GRT-50)`;
     }
 
     /**
@@ -1245,13 +1169,13 @@ class ScreenPrintPricing {
         const tierLabel = document.getElementById('sp-pricing-tier-label');
 
         if (this.state.selectedTier && tierDisplay && tierLabel) {
-            // selectedTier is a STRING like "24-36", "37-72", "73-144", "145-576"
+            // selectedTier is the API TierLabel, e.g. "24-47", "48-71", "72-144", "145-576"
             // Parse to get min and max values
             const [min, max] = this.state.selectedTier.split('-').map(Number);
 
             // For LTM tiers with quantity input, show exact quantity
             let tierText;
-            if (this.state.selectedTier === '24-36' || this.state.selectedTier === '37-71') {
+            if (this.isLtmTier(this.state.selectedTier)) {
                 tierText = `${this.state.selectedTier} pieces (${this.state.quantity} selected)`;
             } else {
                 tierText = max >= 576
@@ -2362,9 +2286,7 @@ class ScreenPrintPricing {
         this.elements.additionalLocationGuideContent.innerHTML = html;
     }
 
-    showError(message) {
-        alert(message);
-    }
+    // (a second showError(message) — alert() — used to sit here; the later banner version always won. Removed 2026-09-06.)
 
     updateHeaderPricing(quantity, unitPrice) {
         const headerQty = document.getElementById('header-quantity');
@@ -2385,6 +2307,7 @@ class ScreenPrintPricing {
 
     handleMasterBundle(data) {
         this.state.masterBundle = data;
+        this.renderTierButtons(); // the tier strip is API-driven (2026-09-06)
         this.state.pricingData = data;
 
         // Store pricing data globally for size upcharges display
