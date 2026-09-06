@@ -1,3 +1,9 @@
+## v2026.09.06.30 (2026.09.06)
+
+- LESSONS: staff live-pass entry (oldest entry archived)
+- Unlinked staff pages (42): inline <style>/<script> extracted on 12 (admin announcements, c112 promo, staff-login, staff-portal-final, 5 tools), 227 inline handlers → data-call/data-change/data-input via the delegator on 27 training/dashboard/tools pages, h1 hygiene (schedule page had 12), icons/versions; lock widened to every page under dashboards/admin/training/tools/employee-bundles
+- Deploy v2026.09.06.30: unlinked staff pages Rule 3 batch
+
 ## v2026.09.06.28 (2026.09.06)
 
 - AE dashboard: name the search box, rep filter, hidden file inputs and the dynamic style/colour controls
