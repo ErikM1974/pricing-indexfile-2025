@@ -6,6 +6,28 @@ Resolved entries aged out of `LESSONS_LEARNED.md` (300-line cap). Newest first. 
 
 ## Archived 2026-09-06
 
+## Vendor portal showed "Unable to load jobs" on EVERY load since launch (`v2026.09.05.28`)
+
+**Problem.** The red error banner on `/vendor` was visible all the time — including when jobs loaded
+fine — since the portal shipped (2026-07-19). Nobody reported it; Ed presumably read past it.
+
+**Root cause.** `<div id="vp-error" class="vp-error" hidden>` relied on the browser's default
+`[hidden] { display: none }`, but `.vp-error { display: flex }` is an AUTHOR rule, and any author
+rule beats the UA stylesheet regardless of specificity. Same for the `.vp-btn { display: inline-flex }`
+Retry button. The controller dutifully toggled `.hidden` and it changed nothing visible. The
+customer portal never hit this because its CSS declares `[hidden] { display: none !important; }`.
+
+**Solution.** `[hidden] { display: none !important; }` at the top of `vendor-portal.css`; lock in
+`tests/unit/vendor-portal-page.test.js` (rule present AND before the first `.vp-*` display rule).
+
+**Prevention.** Every page-level stylesheet that toggles visibility with the `hidden` attribute MUST
+declare `[hidden] { display: none !important; }` itself — the moment any hidden-able element gets a
+class with `display: flex/grid/inline-flex`, the attribute silently stops working. When auditing a
+page, read `getComputedStyle(el).display` on a `hidden` element at least once; `el.hidden === true`
+proves nothing. 🔑 Verification: a JS probe of `.hidden` is a probe of INTENT, not of the pixels. (2026-09-05)
+
+---
+
 ## Customer login dropped the deep link it was handed (`v2026.09.05.26`)
 
 **Problem.** A customer following a link to `/portal/product/PC54` (or any portal page) was bounced
