@@ -1,3 +1,8 @@
+## v2026.09.06.14 (2026.09.06)
+
+- Shared calculator components: APP_CONFIG hosts (5 scripts, unused backup host removed), injected <style> → 3 stylesheets, duplicate inventory IIFE + dead cart toast removed from pricing-pages, delegated handlers, gated logging, icons; config script moved to <head> on all 5 calculators; christmas-bundles duplicate resetForm removed; lock calculator-shared-components.test.js
+- Deploy v2026.09.06.14: shared calculator components hygiene
+
 ## v2026.09.06.12 (2026.09.06)
 
 - Calculators: Rule 3 extraction on dtf, dtg, embroidery, cap-embroidery-integrated, digitizingform, monogramform, laser-manual (inline <style>/<script> → calculators/css + calculators/js, APP_CONFIG host, gated logging, inline alerts, iframe listener, icons, versions); lock calculator-pages-rule3.test.js
