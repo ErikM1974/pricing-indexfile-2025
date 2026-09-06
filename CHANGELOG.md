@@ -1,3 +1,8 @@
+## v2026.09.05.75 (2026.09.05)
+
+- AE Mission Control hygiene + Pricing Analysis (regenerated via its Python) + Price Audit Report: custom-property bars/markers, Reload-to-retry controls, decorative icons, typed banner, versioned assets; harness re-synced
+- Deploy v2026.09.05.75: AE Mission Control hygiene + Pricing Analysis + Price Audit Report — staff-dashboard sweep complete
+
 ## v2026.09.05.73 (2026.09.05)
 
 - Admin + reference pages hygiene sweep (13 pages): decorative icons, typed banner close, [hidden] guards, versioned assets; api-usage meters via custom properties, converter uses hidden, Retry on drive-access / policy-migration / ODBC reference
