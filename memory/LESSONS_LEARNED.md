@@ -285,3 +285,20 @@ backtick literals); grep the diff for `'…${` before committing. 🔑 After any
 fetch URLs, read the live console AND the failed-request list on the pages that use them —
 a green suite proves nothing about a URL no test builds. 🔑 Read `performance.getEntriesByType('resource')`
 for `responseStatus >= 400`: it shows the literal URL that went out.
+
+## 2026-09-06 — The screen-print tier buttons promised a fee Caspio no longer charges (`v2026.09.06.42`)
+
+**Problem.** Erik moved the ScreenPrint tiers in Caspio (24-47 with a $50 LTM, 48-71 with none).
+The calculator's ENGINE followed (it reads `LTM_Fee` off the matched API tier) but its tier strip
+was typed in the template: "24-36 + $75 Small Batch Fee", "37-71 + $50", with `(75 / clamped)` and
+`(50 / clamped)` in the input handlers. At 50 pieces the page showed a $50 fee it did not charge.
+**Root cause.** "Pricing from the API" was applied to the numbers that reach the total and not to
+the numbers the customer READS; the strip was built once for a tier layout and never re-derived.
+**Solution.** The strip, its inputs, clamps and hints are rendered from the API tiers when the
+bundle lands; the art-setup tooltip reads GRT-50; a lock forbids typed tier ids/fees in v2.
+**Prevention.** 🔑 Every dollar or range a customer can read is pricing — grep templates for
+`$\d` and `\d+-\d+ pieces`, not just the math. 🔑 Compare the UI's tier labels with
+`GET /api/pricing-bundle` tiers on each calculator after ANY Caspio tier change. 🔑 A
+marker-based `cut()` in a refactor script must assert the method count before/after (117
+unrelated lines vanished here and only a runtime probe caught it). 🔑 The dev server serves
+`/dist` hashed assets — `node scripts/build.js` before a local probe, or you test the old file.
