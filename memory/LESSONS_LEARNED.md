@@ -19,21 +19,6 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 ### 2-minute proxy outage: the commit shipped half the change, and the boot probe tested the other half (2026-08-27, ARCHIVED 2026-09-05): stage the WHOLE change (a `require` and the file it names land in one commit); the boot probe must exercise the route table, not just `listen`; a 2-minute outage is a half-shipped commit until proven otherwise. Full entry in archive.
 ### Top Sellers "flickers blank, refresh fixes it" (2026-08-26, ARCHIVED 2026-09-02): "works after refresh" = a cold query behind a response cache — time the UNCACHED path first; variant-heavy `limit=48` pages hydrate 10k rows, so partition STYLE IN chunks in parallel; `?isTopSeller=1` is silently ignored (route wants `true`) — validate the result set before trusting a timing. Full entry in archive.
 ### Customer portal redesign + reward-dollar accrual (2026-09-01, ARCHIVED 2026-09-05): reward money is never computed silently — every ledger line names its source and the 8 `REWARD` Service_Codes rows ARE the program; never claw back automatically. Full entry in archive.
-## Volume Quote page: re-rendering a list wiped what the user was typing in another row (2026-09-02)
-
-**Problem.** Building `/dashboards/volume-quote.html`: entering three styles in a row only ever
-produced ONE loaded garment line.
-**Root cause.** `renderLines()` rebuilt every row's `innerHTML` whenever ANY row changed state
-(loading → loaded → stock checked). The rows whose inputs the user was still typing in were
-replaced by fresh elements, so their values and pending events went to detached nodes.
-**Solution.** Rows are created once and updated in place: find the row by `data-id`, refresh only
-the three info cells, remove rows no longer in state. Inputs are never re-created.
-**Prevention.** 🔑 In a list where the user types while async loads land, never rebuild the whole
-list from state — patch the cells that changed. 🔑 The first-render bug beside it (`addLine()`
-without a render) was invisible because the add BUTTON rendered; test the initial state, not only
-the interaction. 🔑 Cost-model constants for a staff page live in Caspio (`Service_Codes`
-`VOL-*`), never in the page's `.js` — `/dashboards` gates `.html` only, the `.js` is public.
-
 ## Contract fee was "Caspio-driven" on paper and hardcoded in practice (2026-09-02)
 
 **Problem.** Raising the contract small-order fee in Caspio (Embroidery_Costs.LTM 50 → 100) would
@@ -274,4 +259,29 @@ same script position, global scope preserved because shared scripts call page fu
 - 🔑 The icon-hiding regex must tolerate extra attributes (`id=`) after `class=` and the `fa-${…}` dynamic form.
 - 🔑 A page that 301s live (compare-pricing → quick-quote, webstore-info → company-webstores) still passes every
   static-dist smoke — check the live URL before trusting a smoke on a retired page.
+
+## 2026-09-06 — Quote builders: finishing Rule 3 meant teaching the shared delegator four more events (`v2026.09.06.19`–`.22`)
+
+**Problem.** The 2026-09-05 review had converted the builders' `onclick=` to `data-call`, but 185 `onchange=` /
+`oninput=` / `onblur=` / `onkeydown=` / `onerror=` handlers remained across the three builder pages and their
+row templates, plus a 540-line inline style/script pair on the fast-quote page and 79 bare icons in the shared
+classic scripts every builder loads.
+
+**Solution.** ONE change to `quote-builder-utils.js` (Rule 8: shared, not four copies): `data-change` /
+`data-input` / `data-blur` (focusout) / `data-keydown` with comma lists, `?optional` names, `data-*-args`
+(`$this`/`$event`), `data-keyclick`, `data-enter` (+`-args`, `-unless`), `<img data-onerror>`; a parser rewrote
+every inline form mechanically (dry run reviewed first). Locks: `quote-builders-hygiene.test.js` (jsdom exercises
+every new path) + the parity suites untouched and green.
+
+**Prevention.**
+- 🔴 **Do not add an `sr-only` h1 to the four builders** — axe `heading-order` + `region` baselines
+  (`tests/a11y/builders.a11y.test.js`) fail; they carry no h1 by design.
+- 🔴 A top-of-file `window.location.hostname` read breaks any test that evals the file without a window
+  (`scp-dark-garment-parity`) — gate with `typeof window !== 'undefined' && !!window.location`.
+- 🔑 The old inline guard `if(window.x)x()` is the delegator's `?x` — keep it for functions a page may not define
+  (`renderOrderRecap`, the push-button state updaters).
+- 🔑 Icon regexes must also catch `class="fas ' + var + '"` (concatenation) and `fa-${expr}` forms; grep at
+  runtime (`i.fas:not([aria-hidden])`) after the static pass.
+- 🔑 Builders are staff-gated: an expired Chrome session redirects to the Caspio login silently (the probe
+  returns empty counts). Verify wiring on static-dist (no auth) and ask Erik to sign in for the live pass.
 

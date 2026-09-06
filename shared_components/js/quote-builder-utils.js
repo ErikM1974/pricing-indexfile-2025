@@ -1311,7 +1311,7 @@ function renderOrderShippingFields(containerId) {
                     <span>Order & Shipping</span>
                     <span class="order-shipping-badge charges-badge hidden">!</span>
                 </div>
-                <i class="order-shipping-chevron fas fa-chevron-down collapsible-chevron"></i>
+                <i class="order-shipping-chevron fas fa-chevron-down collapsible-chevron" aria-hidden="true"></i>
             </div>
             <div class="order-shipping-content charges-content hidden">
                 <div class="d-flex flex-column gap-2" style="padding: 8px 0;">
@@ -2667,6 +2667,7 @@ function qbFocusMain() {
     const main = document.querySelector('[role=main]');
     if (main) { if (!main.hasAttribute('tabindex')) main.setAttribute('tabindex', '-1'); main.focus(); }
 }
+function qbReload() { window.location.reload(); }
 function qbOpenInputUrl(inputId) {
     const url = document.getElementById(inputId)?.value;
     if (url) window.open(url, '_blank', 'noopener');
@@ -2770,11 +2771,15 @@ function qbInstallCallDelegator() {
         else if (mode === 'hide-parent' && img.parentElement) img.parentElement.hidden = true;
         else if (mode === 'no-image' && img.parentElement) { img.parentElement.classList.add('no-image'); img.hidden = true; }
         else if (mode === 'placeholder-icon' && img.parentElement) img.parentElement.innerHTML = '<i class="fas fa-image" aria-hidden="true"></i>';
+        else if (mode === 'placeholder-src') { img.classList.add('placeholder'); img.removeAttribute('src'); }
+        else if (mode === 'hide-closest') { const t = img.dataset.onerrorClosest && img.closest(img.dataset.onerrorClosest); if (t) t.hidden = true; }
+        if (img.dataset.onerrorParentClass && img.parentElement) img.parentElement.classList.add(img.dataset.onerrorParentClass);
     }, true);
 }
 if (typeof window !== 'undefined') {
     window.qbFocusMain = qbFocusMain;
     window.qbOpenInputUrl = qbOpenInputUrl;
+    window.qbReload = qbReload;
     window.qbInstallCallDelegator = qbInstallCallDelegator;
     if (typeof document !== 'undefined') {
         if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', qbInstallCallDelegator, { once: true });

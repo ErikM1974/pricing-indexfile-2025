@@ -270,7 +270,7 @@
         if (ship) rows.push('<div class="or-row"><span class="or-label">Shipping</span><span class="or-val">' + esc(ship) + '</span></div>');  // #it-shipping-amt is a charge/method, not a destination
         if (logos.length) rows.push('<div class="or-row"><span class="or-label">Logo' + (logos.length > 1 ? 's' : '') + '</span><span class="or-val">' + esc(logos.join('   ·   ')) + '</span></div>');
         if (thumbs.length) rows.push('<div class="or-thumbs">' + thumbs.map(function (t) {
-            return '<figure class="or-thumb"><img src="' + esc(t.url) + '" alt="' + esc(t.label) + '" loading="lazy" onerror="this.closest(\'.or-thumb\').style.display=\'none\'"><figcaption>' + esc(t.label) + '</figcaption></figure>';
+            return '<figure class="or-thumb"><img src="' + esc(t.url) + '" alt="' + esc(t.label) + '" loading="lazy" data-onerror="hide-closest" data-onerror-closest=".or-thumb"><figcaption>' + esc(t.label) + '</figcaption></figure>';
         }).join('') + '</div>');
         el.innerHTML = rows.length ? '<div class="or-title">Order at a glance</div>' + rows.join('') : '';
         renderShipToCard();  // keep the ship-to card in sync with the glance panel
