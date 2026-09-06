@@ -1,3 +1,8 @@
+## v2026.09.05.79 (2026.09.05)
+
+- Public pages review B2: storefronts + success pages — no silent proxy fallback (Rule 6), icons decorative, file inputs named, optional-hint class, scroll lock class; inventory-details colour selection order fix; lock public-storefront-pages.test.js
+- Deploy v2026.09.05.79: public batch B2 — storefronts + success pages hygiene, no silent proxy fallback; inventory-details colour selection
+
 ## v2026.09.05.77 (2026.09.05)
 
 - LESSONS_LEARNED: archive the 2026-09-01 customer-portal entry; add the 2026-09-05 whole-dashboard sweep entry (six recurring defect classes + prevention)
