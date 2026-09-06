@@ -1,3 +1,8 @@
+## v2026.09.05.45 (2026.09.05)
+
+- Supacolor Orders review: 10 items — API base from APP_CONFIG (Rule 6), first-load error + Retry, view chips as aria-pressed buttons, inline style/display toggles removed (Rule 3), labelled backfill dialog with focus return + Esc + keyboard paste zone, pagination nav, aria-hidden icons, phone layout; lock test
+- Deploy v2026.09.05.45: 2 files (supacolor-orders.html,supacolor-job-detail.html) — Supacolor Orders review cache-bust
+
 ## v2026.09.05.43 (2026.09.05)
 
 - Bradley Transfers review: 11 items — API base from APP_CONFIG (Rule 6), first-load error + Retry, stat chips as synced aria-pressed buttons (.active was never set), inline onerror/style removed (Rule 3), keyboard cards, labelled delete dialog with focus return + Esc, link-modal listener leak fixed, session identity for delete audit; lock test
