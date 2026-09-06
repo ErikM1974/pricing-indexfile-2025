@@ -1,3 +1,8 @@
+## v2026.09.05.73 (2026.09.05)
+
+- Admin + reference pages hygiene sweep (13 pages): decorative icons, typed banner close, [hidden] guards, versioned assets; api-usage meters via custom properties, converter uses hidden, Retry on drive-access / policy-migration / ODBC reference
+- Deploy v2026.09.05.73: admin + reference pages hygiene sweep (13 pages)
+
 ## v2026.09.05.71 (2026.09.05)
 
 - Quote Management + Inbound Calendar + box labels + Purchasing Portal + Product Manager: 12 items — inbound modal without inline style/onerror (custom properties, capture listener), hidden attr + dialog + focus return; label template colours via --m; PM load Retry, named actions, form focus; icons decorative, titled buttons named, assets versioned
