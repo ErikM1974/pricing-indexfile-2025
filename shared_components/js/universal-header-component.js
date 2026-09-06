@@ -4,6 +4,9 @@
  * Handles navigation, breadcrumbs, and dynamic product context
  */
 
+/* Logging gate (2026-09-06): universal-header-component.js chatter only on localhost or ?debug=1; console.error/warn stay live. */
+var UHC_LOG_ON = window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug');
+var uhcLog = UHC_LOG_ON ? console.log.bind(console) : function () {};
 const UniversalHeaderComponent = {
     // Default configuration
     defaultConfig: {
@@ -48,19 +51,19 @@ const UniversalHeaderComponent = {
      * Initialize the header component
      */
     init() {
-        console.log('[Universal Header] Initializing...');
+        uhcLog('[Universal Header] Initializing...');
         
         // Find container
         const container = document.getElementById('universal-header-container');
         if (!container) {
-            console.log('[Universal Header] Container not found. This component may not be needed for this page.');
+            uhcLog('[Universal Header] Container not found. This component may not be needed for this page.');
             // Not all pages need this component, so just exit quietly
             return;
         }
 
         // Detect page type
         const pageType = this.detectPageType();
-        console.log('[Universal Header] Detected page type:', pageType);
+        uhcLog('[Universal Header] Detected page type:', pageType);
 
         // Get configuration
         const config = this.buildConfig(pageType, container);
@@ -71,7 +74,7 @@ const UniversalHeaderComponent = {
         // Setup dynamic updates
         this.setupDynamicUpdates();
         
-        console.log('[Universal Header] Initialization complete');
+        uhcLog('[Universal Header] Initialization complete');
     },
 
     /**

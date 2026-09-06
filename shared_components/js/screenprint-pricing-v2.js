@@ -43,6 +43,9 @@
  * Last synchronized: 2025-10-04
  */
 
+/* Logging gate (2026-09-06): screenprint-pricing-v2 chatter only on localhost or ?debug=1; console.error/warn stay live. */
+var SPV2_LOG_ON = window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug');
+var spv2Log = SPV2_LOG_ON ? console.log.bind(console) : function () {};
 class ScreenPrintPricing {
     constructor() {
         // Configuration
@@ -135,8 +138,8 @@ class ScreenPrintPricing {
     // Leaves the hardcoded defaults in place as a warned fallback on failure.
     async loadServiceFees() {
         try {
-            const base = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL)
-                || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+            const base = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) || '';
+            if (!base) console.error('[ScreenPrintV2] APP_CONFIG.API.BASE_URL missing — service codes cannot load');
             const resp = await fetch(`${base}/api/service-codes`);
             if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
             const json = await resp.json();
@@ -206,7 +209,7 @@ class ScreenPrintPricing {
                     <div id="sp-dark-tooltip" class="sp-dark-tooltip" style="display: none;">
                         <div class="sp-dark-tooltip-content">
                             <div class="sp-dark-tooltip-header">
-                                <i class="fas fa-tshirt"></i> Why Dark Garments Add a Setup Screen
+                                <i class="fas fa-tshirt" aria-hidden="true"></i> Why Dark Garments Add a Setup Screen
                             </div>
                             <div class="sp-dark-tooltip-body">
                                 When printing on black or dark-colored shirts, we must print a <strong>white underbase layer first</strong> so your ink colors appear vibrant and true to their intended shade.
@@ -227,7 +230,7 @@ class ScreenPrintPricing {
                     <div class="sp-toggle-section">
                         <div class="sp-workflow-step-label">Step 1: Select Colors</div>
                         <div class="sp-toggle-section-title">
-                            <i class="fas fa-palette"></i>
+                            <i class="fas fa-palette" aria-hidden="true"></i>
                             Front Location Ink Colors
                         </div>
                         <div class="sp-toggle-section-subtitle">
@@ -265,24 +268,24 @@ class ScreenPrintPricing {
                     <div class="sp-toggle-section">
                         <div class="sp-workflow-step-label">Step 2: Select Quantity</div>
                         <div class="sp-toggle-section-title">
-                            <i class="fas fa-chart-bar"></i>
+                            <i class="fas fa-chart-bar" aria-hidden="true"></i>
                             Quantity Tiers
                         </div>
 
                         <button class="sp-tier-button universal-tier-button" id="sp-tier-24-36" data-tier="24-36">
                             24-36 pieces
-                            <br><small style="font-size: 11px; opacity: 0.9; margin-top: 4px; font-weight: 600;">+ $75 Small Batch Fee</small>
+                            <br><small class="sp-fee-note">+ $75 Small Batch Fee</small>
                         </button>
 
                         <!-- Separate input container for 24-36 tier -->
                         <div class="sp-quantity-input-container-1 universal-quantity-input-container">
                             <label class="sp-quantity-input-label universal-quantity-input-label">
-                                <i class="fas fa-calculator"></i> Enter Exact Quantity (24-36 pieces):
+                                <i class="fas fa-calculator" aria-hidden="true"></i> Enter Exact Quantity (24-36 pieces):
                             </label>
                             <input type="number" id="sp-qty-tier-1" class="sp-quantity-input universal-quantity-input"
                                    min="24" max="36" value="24" placeholder="Enter 24-36">
                             <small class="sp-quantity-hint universal-quantity-hint">
-                                <i class="fas fa-info-circle"></i>
+                                <i class="fas fa-info-circle" aria-hidden="true"></i>
                                 Required for accurate $75 fee distribution:
                                 <strong id="sp-ltm-calc-1">$75 ÷ 24 = $3.13/piece</strong>
                             </small>
@@ -290,18 +293,18 @@ class ScreenPrintPricing {
 
                         <button class="sp-tier-button universal-tier-button selected" id="sp-tier-37-71" data-tier="37-71">
                             37-71 pieces
-                            <br><small style="font-size: 11px; opacity: 0.9; margin-top: 4px; font-weight: 600;">+ $50 Small Batch Fee</small>
+                            <br><small class="sp-fee-note">+ $50 Small Batch Fee</small>
                         </button>
 
                         <!-- Separate input container for 37-71 tier -->
                         <div class="sp-quantity-input-container-2 universal-quantity-input-container show">
                             <label class="sp-quantity-input-label universal-quantity-input-label">
-                                <i class="fas fa-calculator"></i> Enter Exact Quantity (37-71 pieces):
+                                <i class="fas fa-calculator" aria-hidden="true"></i> Enter Exact Quantity (37-71 pieces):
                             </label>
                             <input type="number" id="sp-qty-tier-2" class="sp-quantity-input universal-quantity-input"
                                    min="37" max="71" value="37" placeholder="Enter 37-71">
                             <small class="sp-quantity-hint universal-quantity-hint">
-                                <i class="fas fa-info-circle"></i>
+                                <i class="fas fa-info-circle" aria-hidden="true"></i>
                                 Required for accurate $50 fee distribution:
                                 <strong id="sp-ltm-calc-2">$50 ÷ 37 = $1.35/piece</strong>
                             </small>
@@ -321,7 +324,7 @@ class ScreenPrintPricing {
                 <div class="sp-additional-locations-section" id="sp-additional-locations-section">
                     <div class="sp-additional-locations-header" id="sp-additional-locations-header">
                         <div class="sp-additional-locations-title">
-                            <i class="fas fa-chevron-down"></i>
+                            <i class="fas fa-chevron-down" aria-hidden="true"></i>
                             Additional Print Locations
                         </div>
                         <div class="sp-additional-locations-subtitle">Add up to 3 additional locations</div>
@@ -331,7 +334,7 @@ class ScreenPrintPricing {
                     </div>
                     <!-- Add Location button (moved outside container to prevent deletion) -->
                     <button type="button" id="sp-add-location" class="sp-add-location-button">
-                        <i class="fas fa-plus-circle"></i>
+                        <i class="fas fa-plus-circle" aria-hidden="true"></i>
                         Add Location
                     </button>
                 </div>
@@ -342,7 +345,7 @@ class ScreenPrintPricing {
 
                     <!-- Pricing Tier Display -->
                     <div class="sp-pricing-tier-display" id="sp-pricing-tier-display" style="display: none;">
-                        <i class="fas fa-layer-group"></i>
+                        <i class="fas fa-layer-group" aria-hidden="true"></i>
                         <span>Pricing Tier: <strong id="sp-pricing-tier-label">—</strong></span>
                     </div>
 
@@ -369,23 +372,23 @@ class ScreenPrintPricing {
                                 <div id="sp-setup-fee-tooltip" class="sp-setup-fee-tooltip" style="display: none;">
                                     <div class="sp-setup-fee-tooltip-content">
                                         <div class="sp-setup-fee-tooltip-header">
-                                            <i class="fas fa-palette"></i>
+                                            <i class="fas fa-palette" aria-hidden="true"></i>
                                             Art Setup Fee
                                         </div>
                                         <div class="sp-setup-fee-tooltip-body">
                                             <div class="sp-setup-fee-amount">$50.00 (GRT-50)</div>
                                             <p><strong>This one-time fee covers:</strong></p>
-                                            <ul style="margin: 8px 0; padding-left: 20px;">
+                                            <ul class="sp-tooltip-list">
                                                 <li>Custom logo mockup on your products</li>
                                                 <li>Print readiness check for clarity & sizing</li>
                                                 <li>Up to 2 rounds of revisions</li>
                                             </ul>
                                             <div class="sp-setup-fee-details">
-                                                <i class="fas fa-check-circle"></i>
+                                                <i class="fas fa-check-circle" aria-hidden="true"></i>
                                                 One-time charge for new artwork
                                             </div>
                                             <div class="sp-setup-fee-details">
-                                                <i class="fas fa-check-circle"></i>
+                                                <i class="fas fa-check-circle" aria-hidden="true"></i>
                                                 Applies to all new logos or designs
                                             </div>
                                         </div>
@@ -396,7 +399,7 @@ class ScreenPrintPricing {
 
                         <div class="sp-price-row sp-price-quantity-calc" id="sp-price-quantity-calc" style="display: none;">
                             <span class="sp-price-calc-text">
-                                <i class="fas fa-times"></i> <span id="sp-calc-quantity">37</span> pieces
+                                <i class="fas fa-times" aria-hidden="true"></i> <span id="sp-calc-quantity">37</span> pieces
                             </span>
                             <span class="sp-price-calc-result" id="sp-calc-subtotal">$0.00</span>
                         </div>
@@ -419,7 +422,7 @@ class ScreenPrintPricing {
                     <!-- Toggle Breakdown -->
                     <div class="sp-breakdown-toggle" id="sp-breakdown-toggle" style="display: none;">
                         <button type="button" class="sp-toggle-breakdown-btn" id="sp-toggle-breakdown-btn">
-                            <i class="fas fa-chevron-down"></i>
+                            <i class="fas fa-chevron-down" aria-hidden="true"></i>
                             <span id="sp-toggle-breakdown-text">View Detailed Breakdown</span>
                         </button>
                     </div>
@@ -650,7 +653,7 @@ class ScreenPrintPricing {
         const setupFeeTooltip = document.getElementById('sp-setup-fee-tooltip');
 
         if (setupFeeBadge && setupFeeTooltip) {
-            console.log('✅ Initializing setup fee tooltip for Screen Print');
+            spv2Log('✅ Initializing setup fee tooltip for Screen Print');
 
             // Desktop: Show on hover
             setupFeeBadge.addEventListener('mouseenter', () => {
@@ -1202,7 +1205,7 @@ class ScreenPrintPricing {
 
                 <!-- Remove Button -->
                 <button type="button" class="sp-location-slot-remove" data-index="${index}">
-                    <i class="fas fa-times"></i>
+                    <i class="fas fa-times" aria-hidden="true"></i>
                 </button>
             `;
 
@@ -1216,7 +1219,7 @@ class ScreenPrintPricing {
             button.type = 'button';
             button.id = 'sp-add-location';
             button.className = 'sp-add-location-button';
-            button.innerHTML = '<i class="fas fa-plus-circle"></i> Add Location';
+            button.innerHTML = '<i class="fas fa-plus-circle" aria-hidden="true"></i> Add Location';
             button.addEventListener('click', () => this.addLocation());
 
             // Insert button after container
@@ -2044,7 +2047,7 @@ class ScreenPrintPricing {
 
             // Note
             html += `<div class="sp-breakdown-note">`;
-            html += `<i class="fas fa-info-circle"></i> Setup fees are charged once per order, not per shirt`;
+            html += `<i class="fas fa-info-circle" aria-hidden="true"></i> Setup fees are charged once per order, not per shirt`;
             html += `</div>`;
 
             html += '</div>';
@@ -2064,7 +2067,7 @@ class ScreenPrintPricing {
             html += `<span>Fee per Shirt:</span><span>$${pricing.ltmImpactPerShirt.toFixed(2)}</span>`;
             html += `</div>`;
             html += `<div class="sp-breakdown-note">`;
-            html += `<i class="fas fa-info-circle"></i> The $${pricing.ltmFee.toFixed(2)} small batch fee is divided across all ${pricing.quantity} shirts`;
+            html += `<i class="fas fa-info-circle" aria-hidden="true"></i> The $${pricing.ltmFee.toFixed(2)} small batch fee is divided across all ${pricing.quantity} shirts`;
             html += `</div>`;
             html += '</div>';
         }
@@ -2170,7 +2173,7 @@ class ScreenPrintPricing {
             }
         }
         html += `<p class="sp-tiers-note">${noteText}</p>`;
-        html += '<p class="sp-tiers-note" style="margin-top: 8px;">Minimum order quantity: 24 pieces</p>';
+        html += '<p class="sp-tiers-note sp-mt-8">Minimum order quantity: 24 pieces</p>';
         
         // Add mobile card view for small screens
         html += '<div class="sp-tiers-table-mobile" style="display: none;">';
@@ -2354,7 +2357,7 @@ class ScreenPrintPricing {
                 </table>
             </div>
             <p class="sp-tiers-note">Setup fee per screen, per additional location: $${this.config.setupFeePerColor.toFixed(2)}. Dark garments add one white underbase screen per location (setup only — the per-piece price is unchanged).</p>
-            <p class="sp-tiers-note" style="margin-top: 8px;">Minimum order quantity: 24 pieces</p>
+            <p class="sp-tiers-note sp-mt-8">Minimum order quantity: 24 pieces</p>
         `;
         this.elements.additionalLocationGuideContent.innerHTML = html;
     }
@@ -2454,21 +2457,13 @@ class ScreenPrintPricing {
                 z-index: 1000;
             `;
             loadingOverlay.innerHTML = `
-                <div style="text-align: center;">
-                    <div style="width: 40px; height: 40px; border: 4px solid #e5e7eb; border-top-color: #3a7c52; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto;"></div>
-                    <p style="margin-top: 1rem; color: #666;">Loading pricing data...</p>
+                <div class="sp-loading-inner">
+                    <div class="sp-loading-spinner"></div>
+                    <p class="sp-loading-text">Loading pricing data...</p>
                 </div>
             `;
             container.style.position = 'relative';
             container.appendChild(loadingOverlay);
-
-            // Add CSS animation
-            if (!document.getElementById('sp-loading-styles')) {
-                const style = document.createElement('style');
-                style.id = 'sp-loading-styles';
-                style.textContent = '@keyframes spin { to { transform: rotate(360deg); } }';
-                document.head.appendChild(style);
-            }
         }
         loadingOverlay.style.display = 'flex';
     }
@@ -2509,11 +2504,13 @@ class ScreenPrintPricing {
             container.insertBefore(errorBanner, container.firstChild);
         }
         errorBanner.innerHTML = `
-            <i class="fas fa-exclamation-triangle"></i>
+            <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
             <span>${message}</span>
-            <button onclick="document.getElementById('sp-error-banner').remove()" style="margin-left: auto; background: none; border: none; color: #991b1b; cursor: pointer; font-size: 1.25rem;">&times;</button>
+            <button type="button" class="sp-error-dismiss" aria-label="Dismiss">&times;</button>
         `;
         errorBanner.style.display = 'flex';
+        const dismiss = errorBanner.querySelector('.sp-error-dismiss');
+        if (dismiss) dismiss.addEventListener('click', () => errorBanner.remove());
 
         // Auto-hide after 10 seconds
         setTimeout(() => {

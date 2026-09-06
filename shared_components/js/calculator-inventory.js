@@ -7,7 +7,10 @@
 (function() {
     'use strict';
 
-    var SANMAR_API = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/sanmar';
+    // Proxy host from /config/app.config.js (Rule 6) — never guess a backend.
+    var CALC_INV_BASE = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) || '';
+    if (!CALC_INV_BASE) console.error('[calculator-inventory] APP_CONFIG.API.BASE_URL missing — inventory cannot load');
+    var SANMAR_API = CALC_INV_BASE + '/api/sanmar';
     var invCache = {};
     var INV_CACHE_TTL = 5 * 60 * 1000;
     var isExpanded = false;
@@ -23,7 +26,7 @@
             return callback(mapped);
         }
         // Fetch color swatches to build the mapping
-        fetch('https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/color-swatches?styleNumber=' + encodeURIComponent(styleNumber))
+        fetch(CALC_INV_BASE + '/api/color-swatches?styleNumber=' + encodeURIComponent(styleNumber))
             .then(function(r) { return r.json(); })
             .then(function(colors) {
                 var map = {};
@@ -41,36 +44,7 @@
             .catch(function() { callback(colorName); });
     }
 
-    // Inject CSS
-    var style = document.createElement('style');
-    style.textContent = [
-        '.calc-inventory-section { max-width: 960px; margin: 1.5rem auto; font-family: inherit; }',
-        '.calc-inv-bar { display: flex; align-items: center; justify-content: space-between; padding: 0.65rem 1rem; background: linear-gradient(135deg, #2f661e 0%, #3a9940 100%); color: white; border-radius: 8px; cursor: pointer; user-select: none; transition: border-radius 0.2s; }',
-        '.calc-inv-bar.expanded { border-radius: 8px 8px 0 0; }',
-        '.calc-inv-bar-left { display: flex; align-items: center; gap: 0.6rem; }',
-        '.calc-inv-swatch { width: 28px; height: 28px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.5); object-fit: cover; }',
-        '.calc-inv-color-name { font-weight: 700; font-size: 0.95rem; color: #fff; }',
-        '.calc-inv-label { font-size: 0.8rem; opacity: 0.85; margin-left: 0.5rem; }',
-        '.calc-inv-right { display: flex; align-items: center; gap: 0.75rem; }',
-        '.calc-inv-total { font-size: 0.75rem; background: rgba(255,255,255,0.2); padding: 0.2rem 0.6rem; border-radius: 12px; font-weight: 600; }',
-        '.calc-inv-chevron { transition: transform 0.3s; font-size: 0.85rem; }',
-        '.calc-inv-chevron.open { transform: rotate(180deg); }',
-        '.calc-inv-body { display: none; border: 1px solid #e0e0e0; border-top: none; border-radius: 0 0 8px 8px; background: #fafafa; overflow-x: auto; }',
-        '.calc-inv-body.show { display: block; }',
-        '.calc-inv-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; white-space: nowrap; }',
-        '.calc-inv-table th { background: #f5f5f5; color: #333; font-weight: 600; padding: 0.45rem 0.5rem; text-align: center; border-bottom: 2px solid #ddd; }',
-        '.calc-inv-table th:first-child { text-align: left; min-width: 95px; }',
-        '.calc-inv-table td { padding: 0.35rem 0.5rem; text-align: center; border-bottom: 1px solid #eee; font-variant-numeric: tabular-nums; }',
-        '.calc-inv-table td:first-child { text-align: left; font-weight: 500; color: #555; font-size: 0.73rem; }',
-        '.calc-inv-good { background: #e8f5e9; color: #2e7d32; }',
-        '.calc-inv-low { background: #fff8e1; color: #f57f17; font-weight: 600; }',
-        '.calc-inv-out { background: #ffebee; color: #c62828; }',
-        '.calc-inv-total-row td { font-weight: 700; border-top: 2px solid #ccc; background: #f0f0f0; }',
-        '.calc-inv-loading { padding: 1rem; text-align: center; color: #888; font-size: 0.8rem; }',
-        '.calc-inv-error { padding: 0.75rem; text-align: center; color: #c62828; font-size: 0.8rem; background: #ffebee; border-radius: 0 0 8px 8px; border: 1px solid #e0e0e0; border-top: none; }',
-        '@media (max-width: 768px) { .calc-inv-table { font-size: 0.68rem; } .calc-inv-table td, .calc-inv-table th { padding: 0.25rem 0.35rem; } .calc-inv-label { display: none; } }'
-    ].join('\n');
-    document.head.appendChild(style);
+    // Styles: /shared_components/css/calculator-inventory.css (linked by every calculator page) — nothing injected.
 
     // Auto-detect color swatch clicks via event delegation
     document.addEventListener('click', function(e) {
@@ -196,6 +170,13 @@
     };
 
     // Global toggle function (avoids addEventListener leak on re-renders)
+    // Bar click / Enter toggles (was an inline handler)
+    document.addEventListener('click', function (e) {
+        if (e.target.closest && e.target.closest('[data-calc-inv-toggle]')) window._toggleCalcInventory();
+    });
+    document.addEventListener('keydown', function (e) {
+        if ((e.key === 'Enter' || e.key === ' ') && e.target.closest && e.target.closest('[data-calc-inv-toggle]')) { e.preventDefault(); window._toggleCalcInventory(); }
+    });
     window._toggleCalcInventory = function() {
         isExpanded = !isExpanded;
         var container = document.getElementById('calculator-inventory-section');
@@ -211,7 +192,7 @@
     function renderBar(container, colorName, swatchUrl, data) {
         var total = (data && typeof data.grandTotal === 'number') ? data.grandTotal : 0;
         var barHtml = renderBarHtml(colorName, swatchUrl, total);
-        var bodyHtml = data ? renderTable(data) : '<div class="calc-inv-loading"><i class="fas fa-spinner fa-spin"></i> Loading inventory...</div>';
+        var bodyHtml = data ? renderTable(data) : '<div class="calc-inv-loading"><i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Loading inventory...</div>';
 
         container.innerHTML = barHtml +
             '<div class="calc-inv-body' + (isExpanded ? ' show' : '') + '">' + bodyHtml + '</div>';
@@ -219,15 +200,15 @@
 
     function renderBarHtml(colorName, swatchUrl, total) {
         var swatchImg = swatchUrl ? '<img src="' + swatchUrl + '" alt="" class="calc-inv-swatch">' : '';
-        return '<div class="calc-inv-bar' + (isExpanded ? ' expanded' : '') + '" onclick="window._toggleCalcInventory()">' +
+        return '<div class="calc-inv-bar' + (isExpanded ? ' expanded' : '') + '" data-calc-inv-toggle role="button" tabindex="0">' +
             '<div class="calc-inv-bar-left">' +
             swatchImg +
             '<span class="calc-inv-color-name">' + escHtml(colorName || '') + '</span>' +
-            '<span class="calc-inv-label"><i class="fas fa-warehouse"></i> Warehouse Inventory</span>' +
+            '<span class="calc-inv-label"><i class="fas fa-warehouse" aria-hidden="true"></i> Warehouse Inventory</span>' +
             '</div>' +
             '<div class="calc-inv-right">' +
             (total ? '<span class="calc-inv-total">' + total.toLocaleString() + ' units</span>' : '') +
-            '<i class="fas fa-chevron-down calc-inv-chevron' + (isExpanded ? ' open' : '') + '"></i>' +
+            '<i class="fas fa-chevron-down calc-inv-chevron' + (isExpanded ? ' open' : '') + '" aria-hidden="true"></i>' +
             '</div>' +
             '</div>';
     }

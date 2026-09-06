@@ -1307,3 +1307,19 @@ Lock: `tests/unit/calculator-pages-rule3.test.js`. dtf (805-line script, 2 style
 
 **Left alone** — inline `style="display:none"` attributes + their `.style.display` JS toggles inside these page scripts (they are consistent with each other; a `hidden` migration is a per-page job); `laser-manual-pricing` shows 4 bare icons rendered by its shared script; 🔍 `calculators/js/christmas-bundles.js` fails to PARSE under eslint ("Identifier 'resetForm' has already been declared", two `function resetForm()` in one scope, lines 1417/4198) — legal in a sloppy classic script (later wins) but verify the page live; shared calculator components (`screenprint-pricing-v2.js`, `calculator-inventory.js`, `manual-mode-indicator.js`, `pricing-pages.js` with its duplicated inventory IIFE, `dp5-helper.js`, `dtg-page-setup.js`) still carry hosts / injected `<style>` / bare icons — next batch.
 
+## Shared calculator components — 9 items (2026-09-06, `v2026.09.06.13`)
+
+Lock: `tests/unit/calculator-shared-components.test.js`. The scripts every calculator page shares: `screenprint-pricing-v2`, `calculator-inventory`, `manual-mode-indicator`, `pricing-pages`, `dp5-helper`, `dtg-page-setup`, `universal-image-gallery`, `universal-header-component`.
+
+1. 🔴 **Hardcoded proxy host** in five of them (v2's `|| 'https://…'` fallback, calculator-inventory ×2, pricing-pages, dp5-helper's `window.API_PROXY_BASE_URL` default, dtg-page-setup) → `APP_CONFIG.API.BASE_URL` with a console.error when missing. pricing-pages also carried an UNUSED `FALLBACK_API_BASE_URL = 'https://caspio-pricing-proxy-backup…'` + `usingFallbackApi` — a would-be silent host switch — deleted.
+2. 🔴 **`app.config.js` was loaded AFTER `pricing-pages.js`/`dp5-helper.js` on dtf (and after `manual-mode-indicator.js` on dtg/emb/cap)** — a module-level `const` host read at parse time would have been empty. Now ONE config tag in `<head>` on all 5 pages, order locked.
+3. **Injected `<style>` blocks** → real stylesheets: `calculator-inventory.css` (26 rules), `manual-mode-indicator.css` (111 lines), `screenprint-pricing-v2.css` (spin keyframes + loading/error/fee classes). Zero `<style>` elements on any calculator page now (was 2–3 each).
+4. **`pricing-pages.js` carried a FULL DUPLICATE of `calculator-inventory.js`** (the second IIFE, 170 lines, injecting the same CSS twice) — deleted; every consumer loads the real file after it, so the later definition already won. Also its cart-era "View Cart" success toast (dead, injected a third style block) — deleted. 1,292 → 1,127 lines.
+5. **Inline handlers** → delegated listeners: inventory bar (`data-calc-inv-toggle`, now `role=button tabindex=0` + Enter/Space), manual-mode exit button, v2 error-banner dismiss (`type=button aria-label="Dismiss"`).
+6. **`console.log`**: pricing-pages 64, dp5-helper 33, dtg-page-setup 15, gallery 6, header 4, manual-mode 3, v2 1 → gated `<x>Log` (localhost / `?debug=1`).
+7. **Icons** decorative (v2 20, inventory 3, manual-mode 3, pricing-pages 3); v2 cosmetic inline styles (fee note, tooltip list, tiers note, loading spinner, dismiss button) → classes.
+8. `calculators/js/christmas-bundles.js` had TWO `function resetForm()` in one scope (the first, lines 1417–1441, was dead — the later one wins) and eslint could not parse the file → first removed; the file lints again.
+9. Verified on static-dist (5 pages): `<style>` count 0 everywhere, config precedes pricing-pages, inventory bar renders from the linked CSS (flex, role=button) and expands to 11 rows on click, prices and swatches unchanged (82/82/82/82/54).
+
+**Left alone** — v2's `style="display:none"` regions + their `.style.display` toggles (consistent pair, 2,525-line file); pricing-pages' 26 inline styles in the legacy price-card templates; `shared_components/js/dtg-config.js` (orphan, still has a host fallback — no consumer); `calculators/archive/*` pages (archived).
+

@@ -3,20 +3,24 @@
  * Provides only the essential functions needed for DTG without legacy cart conflicts
  */
 
+/* Logging gate (2026-09-06): dtg-page-setup chatter only on localhost or ?debug=1; console.error/warn stay live. */
+var DPS_LOG_ON = window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug');
+var dpsLog = DPS_LOG_ON ? console.log.bind(console) : function () {};
 (function() {
     "use strict";
 
     // Exit early if not on a DTG page
     const currentPath = window.location.pathname.toLowerCase();
     if (!currentPath.includes('dtg')) {
-        console.log("DTG-PAGE-SETUP: Not a DTG page, skipping initialization");
+        dpsLog("DTG-PAGE-SETUP: Not a DTG page, skipping initialization");
         return;
     }
 
-    console.log("DTG-PAGE-SETUP: Initializing DTG page setup...");
+    dpsLog("DTG-PAGE-SETUP: Initializing DTG page setup...");
 
     // Configuration
-    const API_PROXY_BASE_URL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+    const API_PROXY_BASE_URL = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) || '';
+    if (!API_PROXY_BASE_URL) console.error('[dtg-page-setup] APP_CONFIG.API.BASE_URL missing');
     
     // Global state
     window.selectedStyleNumber = null;
@@ -31,7 +35,7 @@
     }
 
     function initializeDTGPage() {
-        console.log("DTG-PAGE-SETUP: DOM ready, initializing...");
+        dpsLog("DTG-PAGE-SETUP: DOM ready, initializing...");
         updateProductContext();
         setupBackButton();
         setupImageZoom();
@@ -48,7 +52,7 @@
             return;
         }
 
-        console.log(`DTG-PAGE-SETUP: Product Context: StyleNumber=${styleNumber}, COLOR=${colorFromUrl}`);
+        dpsLog(`DTG-PAGE-SETUP: Product Context: StyleNumber=${styleNumber}, COLOR=${colorFromUrl}`);
 
         // Update global state
         window.selectedStyleNumber = styleNumber;
@@ -77,14 +81,14 @@
         if (backLink && styleNumber) {
             // Set the back button to return to product page with current parameters
             backLink.href = `/product.html?StyleNumber=${encodeURIComponent(styleNumber)}&COLOR=${encodeURIComponent(colorFromUrl || '')}`;
-            console.log("DTG-PAGE-SETUP: Back button configured:", backLink.href);
+            dpsLog("DTG-PAGE-SETUP: Back button configured:", backLink.href);
         } else if (backLink) {
             backLink.href = '/product.html';
         }
     }
 
     async function fetchProductDetails(styleNumber) {
-        console.log(`DTG-PAGE-SETUP: Fetching product details for ${styleNumber}`);
+        dpsLog(`DTG-PAGE-SETUP: Fetching product details for ${styleNumber}`);
         
         try {
             const apiUrl = `${API_PROXY_BASE_URL}/api/product-colors?styleNumber=${encodeURIComponent(styleNumber)}`;
@@ -95,7 +99,7 @@
             }
             
             const productData = await response.json();
-            console.log("DTG-PAGE-SETUP: Product data received:", productData);
+            dpsLog("DTG-PAGE-SETUP: Product data received:", productData);
             
             if (!productData || !productData.colors || productData.colors.length === 0) {
                 throw new Error('No product data or colors available');
@@ -135,7 +139,7 @@
             }
 
             // Dispatch productColorsReady event for Universal Product Display
-            console.log("DTG-PAGE-SETUP: Dispatching productColorsReady event");
+            dpsLog("DTG-PAGE-SETUP: Dispatching productColorsReady event");
             window.dispatchEvent(new CustomEvent('productColorsReady', {
                 detail: {
                     colors: productData.colors,
@@ -192,7 +196,7 @@
                 if (attempts >= maxAttempts) {
                     console.warn('DTG-PAGE-SETUP: Timeout waiting for Universal Product Display elements');
                 } else {
-                    console.log('DTG-PAGE-SETUP: Universal Product Display elements found, proceeding');
+                    dpsLog('DTG-PAGE-SETUP: Universal Product Display elements found, proceeding');
                 }
                 callback();
             }
@@ -208,7 +212,7 @@
             return;
         }
 
-        console.log(`DTG-PAGE-SETUP: Populating ${colors.length} color swatches`);
+        dpsLog(`DTG-PAGE-SETUP: Populating ${colors.length} color swatches`);
 
         // Populate main swatches container (visible in left column)
         if (swatchesContainer) {
@@ -286,7 +290,7 @@
     }
 
     function handleColorSwatchClick(colorData) {
-        console.log("DTG-PAGE-SETUP: Color swatch clicked:", colorData.COLOR_NAME);
+        dpsLog("DTG-PAGE-SETUP: Color swatch clicked:", colorData.COLOR_NAME);
         
         if (!colorData || !colorData.COLOR_NAME) {
             console.error("DTG-PAGE-SETUP: Invalid color data");
@@ -325,7 +329,7 @@
 
         // Trigger pricing updates if DTG adapter is loaded
         if (window.nwcaPricingData && typeof window.updateCustomPricingGrid === 'function') {
-            console.log("DTG-PAGE-SETUP: Triggering pricing update for new color");
+            dpsLog("DTG-PAGE-SETUP: Triggering pricing update for new color");
             // Update pricing data with new color
             window.nwcaPricingData.color = colorData.CATALOG_COLOR;
             window.updateCustomPricingGrid(window.nwcaPricingData);
@@ -353,7 +357,7 @@
     }
 
     function updateProductImage(colorData) {
-        console.log("DTG-PAGE-SETUP: Updating product image with color data:", colorData);
+        dpsLog("DTG-PAGE-SETUP: Updating product image with color data:", colorData);
         
         // Get the main product image elements (try both IDs for compatibility)
         const mainImage = document.getElementById('product-image-main') || document.getElementById('main-product-image-dp2');
@@ -367,7 +371,7 @@
                            colorData.FRONT_FLAT || '';
             
             if (imageUrl) {
-                console.log("DTG-PAGE-SETUP: Setting image URL:", imageUrl);
+                dpsLog("DTG-PAGE-SETUP: Setting image URL:", imageUrl);
                 
                 // Add loading state
                 if (mainImageContainer) {
@@ -375,7 +379,7 @@
                 }
                 
                 mainImage.onload = function() {
-                    console.log("DTG-PAGE-SETUP: Image loaded successfully");
+                    dpsLog("DTG-PAGE-SETUP: Image loaded successfully");
                     if (mainImageContainer) {
                         mainImageContainer.classList.remove('loading');
                     }

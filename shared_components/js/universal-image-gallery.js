@@ -4,10 +4,13 @@
  * Features: thumbnail navigation, zoom modal, loading states, responsive design
  */
 
+/* Logging gate (2026-09-06): universal-image-gallery.js chatter only on localhost or ?debug=1; console.error/warn stay live. */
+var UIG_LOG_ON = window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug');
+var uigLog = UIG_LOG_ON ? console.log.bind(console) : function () {};
 (function() {
     'use strict';
 
-    console.log('[UNIVERSAL-GALLERY] Loading universal image gallery component...');
+    uigLog('[UNIVERSAL-GALLERY] Loading universal image gallery component...');
 
     // Gallery configuration
     const GALLERY_CONFIG = {
@@ -41,7 +44,7 @@
         }
 
         init() {
-            console.log('[UNIVERSAL-GALLERY] Initializing gallery for:', this.containerId);
+            uigLog('[UNIVERSAL-GALLERY] Initializing gallery for:', this.containerId);
             this.setupGalleryStructure();
             this.bindEvents();
             this.initialized = true;
@@ -122,7 +125,7 @@
 
         // Load images into the gallery
         loadImages(imageArray) {
-            console.log('[UNIVERSAL-GALLERY] Loading images:', imageArray.length);
+            uigLog('[UNIVERSAL-GALLERY] Loading images:', imageArray.length);
             this.images = imageArray || [];
             
             if (this.images.length > 0) {
@@ -216,7 +219,7 @@
 
         // Handle successful image load
         onImageLoad() {
-            console.log('[UNIVERSAL-GALLERY] Image loaded successfully');
+            uigLog('[UNIVERSAL-GALLERY] Image loaded successfully');
             this.hideLoading();
         }
 
@@ -362,11 +365,11 @@
     document.addEventListener('DOMContentLoaded', function() {
         const galleryElements = document.querySelectorAll('[data-gallery="auto"]');
         galleryElements.forEach(element => {
-            console.log('[UNIVERSAL-GALLERY] Auto-initializing gallery:', element.id);
+            uigLog('[UNIVERSAL-GALLERY] Auto-initializing gallery:', element.id);
             new UniversalImageGallery(element.id);
         });
     });
 
-    console.log('[UNIVERSAL-GALLERY] Universal image gallery component loaded successfully');
+    uigLog('[UNIVERSAL-GALLERY] Universal image gallery component loaded successfully');
 
 })();

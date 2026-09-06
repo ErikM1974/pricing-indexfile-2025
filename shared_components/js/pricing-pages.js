@@ -3,15 +3,19 @@
  * Handles URL parameters, navigation, Caspio loading, and general UI updates.
  */
 
-console.log("PricingPages: Shared pricing page script loaded (v4).");
+/* Logging gate (2026-09-06): pricing-pages chatter only on localhost or ?debug=1; console.error/warn stay live. */
+var PP_LOG_ON = window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug');
+var ppLog = PP_LOG_ON ? console.log.bind(console) : function () {};
+ppLog("PricingPages: Shared pricing page script loaded (v4).");
 
 (function() {
     "use strict";
 
     // --- Configuration ---
-    const API_PROXY_BASE_URL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
-    const FALLBACK_API_BASE_URL = 'https://caspio-pricing-proxy-backup.herokuapp.com';
-    let usingFallbackApi = false;
+    // Proxy host from /config/app.config.js (Rule 6) — never guess a backend. (The unused "backup host"
+    // constants that lived here since 2025 are gone — a silent switch to another host would be a Rule 4 hole.)
+    const API_PROXY_BASE_URL = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) || '';
+    if (!API_PROXY_BASE_URL) console.error('[PricingPages] APP_CONFIG.API.BASE_URL missing — product data cannot load');
 
     // --- Global State ---
     window.selectedStyleNumber = null;
@@ -20,10 +24,10 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
     window.inventoryData = null;
 
     // --- Global Functions Called by Caspio ---
-    window.initDp5ApiFetch = function() { console.log("PricingPages: initDp5ApiFetch called (DP5)."); return true; };
-    window.initDp7ApiFetch = function() { console.log("PricingPages: initDp7ApiFetch called (DP7)."); return true; };
-    window.initDp6ApiFetch = function() { console.log("PricingPages: initDp6ApiFetch called (DP6?)."); return true; };
-    window.initDp8ApiFetch = function() { console.log("PricingPages: initDp8ApiFetch called (DP8?)."); return true; };
+    window.initDp5ApiFetch = function() { ppLog("PricingPages: initDp5ApiFetch called (DP5)."); return true; };
+    window.initDp7ApiFetch = function() { ppLog("PricingPages: initDp7ApiFetch called (DP7)."); return true; };
+    window.initDp6ApiFetch = function() { ppLog("PricingPages: initDp6ApiFetch called (DP6?)."); return true; };
+    window.initDp8ApiFetch = function() { ppLog("PricingPages: initDp8ApiFetch called (DP8?)."); return true; };
 
 
     // --- Helper Functions ---
@@ -49,7 +53,7 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
         const manualCost = urlParams.get('manualCost') || urlParams.get('cost');
 
         if (manualCost && !isNaN(parseFloat(manualCost))) {
-            console.log('PricingPages: 🔧 Manual pricing mode detected, skipping product context validation');
+            ppLog('PricingPages: 🔧 Manual pricing mode detected, skipping product context validation');
             return; // Exit early, let page-specific manual handler take over
         }
 
@@ -66,7 +70,7 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
         }
         // --- End Diagnosis Check ---
 
-        console.log(`PricingPages: Product Context: StyleNumber=${styleNumber}, COLOR=${colorFromUrl}`);
+        ppLog(`PricingPages: Product Context: StyleNumber=${styleNumber}, COLOR=${colorFromUrl}`);
 
         window.selectedStyleNumber = styleNumber;
         window.selectedColorName = colorFromUrl ? decodeURIComponent(colorFromUrl.replace(/\+/g, ' ')) : null;
@@ -109,18 +113,18 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
     // Fetches details for the initially selected color to display title, image etc.
     // Relies on dp5-helper.js to fetch and populate the actual color swatches.
     async function fetchProductDetails(styleNumber) {
-        console.log(`[fetchProductDetails] Fetching product colors for Style: ${styleNumber} using /api/product-colors`);
+        ppLog(`[fetchProductDetails] Fetching product colors for Style: ${styleNumber} using /api/product-colors`);
 
         try {
             const apiUrl = `${API_PROXY_BASE_URL}/api/product-colors?styleNumber=${encodeURIComponent(styleNumber)}`;
-            console.log(`[fetchProductDetails] Fetching from: ${apiUrl}`);
+            ppLog(`[fetchProductDetails] Fetching from: ${apiUrl}`);
             const response = await fetch(apiUrl);
 
             if (!response.ok) {
                 throw new Error(`API Error (Product Colors): ${response.status} ${response.statusText}`);
             }
             const productData = await response.json();
-            console.log("[fetchProductDetails] Received product colors data:", JSON.stringify(productData, null, 2));
+            ppLog("[fetchProductDetails] Received product colors data:", JSON.stringify(productData, null, 2));
 
             if (!productData || !productData.colors || productData.colors.length === 0) {
                 console.warn("[fetchProductDetails] No colors found in API response for style:", styleNumber);
@@ -154,7 +158,7 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
                     (color.COLOR_NAME && NWCAUtils.normalizeColorName(color.COLOR_NAME) === NWCAUtils.normalizeColorName(decodedUrlColor))
                 );
                 if (selectedColorObject) {
-                    console.log(`[fetchProductDetails] Matched URL color "${decodedUrlColor}" to:`, selectedColorObject);
+                    ppLog(`[fetchProductDetails] Matched URL color "${decodedUrlColor}" to:`, selectedColorObject);
                 } else {
                     console.warn(`[fetchProductDetails] URL color "${decodedUrlColor}" not found in API response. Defaulting to first color.`);
                 }
@@ -162,13 +166,13 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
 
             if (!selectedColorObject) {
                 selectedColorObject = productData.colors[0];
-                console.log("[fetchProductDetails] Defaulting to first color:", selectedColorObject);
+                ppLog("[fetchProductDetails] Defaulting to first color:", selectedColorObject);
             }
 
             // --- Update Global State with selected color ---
             window.selectedColorName = selectedColorObject.COLOR_NAME;
             window.selectedCatalogColor = selectedColorObject.CATALOG_COLOR || selectedColorObject.COLOR_NAME; // Fallback for catalog color
-            console.log(`[fetchProductDetails] Globals Set: selectedColorName=${window.selectedColorName}, selectedCatalogColor=${window.selectedCatalogColor}`);
+            ppLog(`[fetchProductDetails] Globals Set: selectedColorName=${window.selectedColorName}, selectedCatalogColor=${window.selectedCatalogColor}`);
 
             // --- Update Main Product Image ---
             // Check for new gallery structure first
@@ -179,14 +183,14 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
             
             if (mainImageEl) {
                 // Use new gallery structure
-                console.log(`[fetchProductDetails] Using new gallery structure with product-image-main`);
+                ppLog(`[fetchProductDetails] Using new gallery structure with product-image-main`);
                 updateProductImageGallery(selectedColorObject);
             } else if (imageElContext) {
                 // Fallback to old structure
                 if (mainImageUrl) {
                     imageElContext.src = mainImageUrl;
                     imageElContext.alt = `${productData.productTitle || styleNumber} - ${selectedColorObject.COLOR_NAME}`;
-                    console.log(`[fetchProductDetails] Set main image to: ${mainImageUrl}`);
+                    ppLog(`[fetchProductDetails] Set main image to: ${mainImageUrl}`);
                 } else {
                     imageElContext.src = ''; // Clear image if no URL
                     imageElContext.alt = `${productData.productTitle || styleNumber} - ${selectedColorObject.COLOR_NAME}`;
@@ -236,7 +240,7 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
 
 
             // --- Dispatch event or call function in dp5-helper.js ---
-            console.log("[fetchProductDetails] Dispatching productColorsReady event.");
+            ppLog("[fetchProductDetails] Dispatching productColorsReady event.");
             const eventDetail = {
                 productTitle: productData.productTitle,
                 productDescription: productData.PRODUCT_DESCRIPTION,
@@ -249,7 +253,7 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
 
             // If dp5-helper.js has an init function that accepts this data directly:
             if (window.DP5Helper && typeof window.DP5Helper.initializeWithColorData === 'function') {
-                console.log("[fetchProductDetails] Calling DP5Helper.initializeWithColorData directly.");
+                ppLog("[fetchProductDetails] Calling DP5Helper.initializeWithColorData directly.");
                 window.DP5Helper.initializeWithColorData(productData.colors, selectedColorObject);
             }
 
@@ -305,18 +309,18 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
 
     // Fetches details for a specific color and updates the UI accordingly
     async function fetchAndApplyColorSpecificDetails(styleNumber, colorIdentifier) {
-         console.log(`[DEBUG] fetchAndApplyColorSpecificDetails called for Style: ${styleNumber}, Color: ${colorIdentifier}`);
+         ppLog(`[DEBUG] fetchAndApplyColorSpecificDetails called for Style: ${styleNumber}, Color: ${colorIdentifier}`);
          if (!styleNumber || !colorIdentifier) {
               console.error("[DEBUG] Missing styleNumber or colorIdentifier for fetchAndApplyColorSpecificDetails");
               return;
          }
          try {
               const detailApiUrl = `${API_PROXY_BASE_URL}/api/product-details?styleNumber=${encodeURIComponent(styleNumber)}&color=${encodeURIComponent(colorIdentifier)}`;
-              console.log(`[DEBUG] Fetching specific color details from: ${detailApiUrl}`);
+              ppLog(`[DEBUG] Fetching specific color details from: ${detailApiUrl}`);
               const response = await fetch(detailApiUrl);
               if (!response.ok) throw new Error(`API Error (Specific Color): ${response.status}`);
               const details = await response.json();
-              console.log("[DEBUG] Received specific color details:", JSON.stringify(details, null, 2));
+              ppLog("[DEBUG] Received specific color details:", JSON.stringify(details, null, 2));
 
               // Update main image using the URL from this specific response
               updateMainProductImage(details.MAIN_IMAGE_URL || details.FRONT_MODEL || details.FRONT_FLAT || '');
@@ -331,7 +335,7 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
     }
 
     function handleColorSwatchClick(colorData) {
-        console.log("[handleColorSwatchClick] Clicked color data:", JSON.stringify(colorData, null, 2));
+        ppLog("[handleColorSwatchClick] Clicked color data:", JSON.stringify(colorData, null, 2));
         if (!colorData || !colorData.COLOR_NAME) {
             console.error("[handleColorSwatchClick] Invalid colorData.");
             return;
@@ -343,7 +347,7 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
         // --- Step 1: Update Global State ---
         window.selectedColorName = newColorName;
         window.selectedCatalogColor = newCatalogColor;
-        console.log(`[handleColorSwatchClick] Globals updated: selectedColorName=${window.selectedColorName}, selectedCatalogColor=${window.selectedCatalogColor}`);
+        ppLog(`[handleColorSwatchClick] Globals updated: selectedColorName=${window.selectedColorName}, selectedCatalogColor=${window.selectedCatalogColor}`);
 
         // --- Step 2: Update Main Product Image ---
         // Check if we have the new gallery structure
@@ -397,7 +401,7 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
             const colorForUrl = newCatalogColor || newColorName;
             const newUrl = `${window.location.pathname}?StyleNumber=${encodeURIComponent(styleNumber)}&COLOR=${encodeURIComponent(colorForUrl)}`;
             history.pushState({ path: newUrl }, '', newUrl);
-            console.log(`[handleColorSwatchClick] URL updated to: ${newUrl} (using ${colorForUrl})`);
+            ppLog(`[handleColorSwatchClick] URL updated to: ${newUrl} (using ${colorForUrl})`);
         } else {
             console.warn("[handleColorSwatchClick] history.pushState not supported, URL not updated dynamically.");
         }
@@ -406,7 +410,7 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
         const pricingContainerId = CONTAINER_IDS[embType] || 'pricing-calculator';
         const appKeys = CASPIO_APP_KEYS[embType] || [];
         if (styleNumber && appKeys.length > 0) {
-             console.log("PricingPages: Reloading Caspio embed for new color...");
+             ppLog("PricingPages: Reloading Caspio embed for new color...");
              const pricingContainer = document.getElementById(pricingContainerId);
              if (pricingContainer) {
                  pricingContainer.innerHTML = ''; // Clear first
@@ -424,18 +428,18 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
     }
 
     function updateMainProductImage(imageUrl) {
-        console.log(`[DEBUG] updateMainProductImage called with URL: ${imageUrl}`);
+        ppLog(`[DEBUG] updateMainProductImage called with URL: ${imageUrl}`);
         const imageElContext = document.getElementById('product-image-context');
         const imageElOld = document.getElementById('product-image'); // Fallback
 
         if (imageUrl) {
             if (imageElContext) {
                 imageElContext.src = imageUrl;
-                console.log(`[DEBUG] Set #product-image-context src to: ${imageUrl}`);
+                ppLog(`[DEBUG] Set #product-image-context src to: ${imageUrl}`);
             }
             if (imageElOld) { // Fallback
                 imageElOld.src = imageUrl;
-                console.log(`[DEBUG] Set #product-image (fallback) src to: ${imageUrl}`);
+                ppLog(`[DEBUG] Set #product-image (fallback) src to: ${imageUrl}`);
             }
         } else {
             if (imageElContext) imageElContext.src = '';
@@ -449,7 +453,7 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
     
     // New function to update product image gallery with all available images
     function updateProductImageGallery(colorData) {
-        console.log('[updateProductImageGallery] Updating image gallery with color data:', colorData);
+        ppLog('[updateProductImageGallery] Updating image gallery with color data:', colorData);
         
         // Check if we have the new gallery structure
         const mainImageEl = document.getElementById('product-image-main');
@@ -496,13 +500,13 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
             }
         });
         
-        console.log('[updateProductImageGallery] Found images:', images);
+        ppLog('[updateProductImageGallery] Found images:', images);
         
         // Set the main image
         if (images.length > 0) {
             mainImageEl.src = images[0].url;
             mainImageEl.alt = `${window.selectedStyleNumber || 'Product'} - ${window.selectedColorName || ''}`;
-            console.log(`[updateProductImageGallery] Set main image src to: ${images[0].url}`);
+            ppLog(`[updateProductImageGallery] Set main image src to: ${images[0].url}`);
             
             // Clear and populate thumbnails
             thumbnailsContainer.innerHTML = '';
@@ -631,7 +635,7 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
         if (!container) { console.error(`PricingPages: Container #${containerId} not found.`); return; }
         if (!styleNumber) { console.error(`PricingPages: Style number missing for Caspio load.`); container.innerHTML = '<div class="error-message">Error: Style number missing.</div>'; container.dataset.loadFailed = 'true'; container.classList.add('pricing-unavailable'); return; }
         const colorForCaspio = window.selectedCatalogColor || window.selectedColorName || '';
-        console.log(`PricingPages: Using color for Caspio embed: '${colorForCaspio}'`);
+        ppLog(`PricingPages: Using color for Caspio embed: '${colorForCaspio}'`);
         container.innerHTML = '<div class="loading-message">Loading pricing data...</div>';
         container.classList.add('loading'); container.classList.remove('pricing-unavailable'); delete container.dataset.loadFailed;
         const params = new URLSearchParams(); params.append('StyleNumber', styleNumber); if (colorForCaspio) { params.append('COLOR', colorForCaspio); }
@@ -642,24 +646,24 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
             const parentLocationDropdown = document.getElementById('parent-dtg-location-select');
             if (parentLocationDropdown && parentLocationDropdown.value) {
                 params.append('PRINT_LOCATION', parentLocationDropdown.value);
-                console.log(`PricingPages: Adding PRINT_LOCATION from parent dropdown for initial load: ${parentLocationDropdown.value}`);
+                ppLog(`PricingPages: Adding PRINT_LOCATION from parent dropdown for initial load: ${parentLocationDropdown.value}`);
             } else if (window.currentSelectedPrintLocation) {
                 // Fallback to global state if dropdown not found/empty, set by dtg-adapter.js
                 params.append('PRINT_LOCATION', window.currentSelectedPrintLocation);
-                console.log(`PricingPages: Adding PRINT_LOCATION from global state for initial load: ${window.currentSelectedPrintLocation}`);
+                ppLog(`PricingPages: Adding PRINT_LOCATION from global state for initial load: ${window.currentSelectedPrintLocation}`);
             }
         }
         
         const fullUrl = `https://c3eku948.caspio.com/dp/${caspioAppKey}/emb?${params.toString()}`;
-        console.log(`PricingPages: Loading Caspio embed from URL: ${fullUrl}`);
+        ppLog(`PricingPages: Loading Caspio embed from URL: ${fullUrl}`);
         const script = document.createElement('script'); script.type = 'text/javascript'; script.src = fullUrl; script.async = true;
         script.onload = function() { 
-            console.log(`PricingPages: Caspio script ${caspioAppKey} loaded from ${fullUrl}`); 
+            ppLog(`PricingPages: Caspio script ${caspioAppKey} loaded from ${fullUrl}`); 
             container.classList.remove('loading'); 
             
             // Skip render check for embroidery master bundle - it uses postMessage instead of visible tables
             if (embType === 'embroidery' && caspioAppKey === 'a0e150001c7143d027a54c439c01') {
-                console.log('PricingPages: Skipping render check for embroidery master bundle (uses postMessage)');
+                ppLog('PricingPages: Skipping render check for embroidery master bundle (uses postMessage)');
                 return;
             }
             
@@ -671,29 +675,29 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
     }
 
     function checkCaspioRender(container, caspioAppKey) {
-         console.log(`PricingPages: Performing check for ${caspioAppKey} after delay...`);
+         ppLog(`PricingPages: Performing check for ${caspioAppKey} after delay...`);
          const hasExplicitError = /Error:|Failed to load|Unable to load|Initializing script \(1\) not found/i.test(container.innerText);
          const noRecordsFound = container.innerText.includes('No records found');
          const hasTableContent = !!container.querySelector('table tbody tr') || !!container.querySelector('.cbResultSetTable') || !!container.querySelector('.matrix-price-table');
          const isLoadingMessageStillPresent = !!container.querySelector('.loading-message');
-         console.log(`PricingPages: Check details - hasExplicitError: ${hasExplicitError}, noRecordsFound: ${noRecordsFound}, hasTableContent: ${hasTableContent}, isLoadingMessageStillPresent: ${isLoadingMessageStillPresent}`);
-         if (noRecordsFound) { console.log(`PricingPages: Caspio loaded for ${caspioAppKey}, but no records found. Displaying contact message.`); container.dataset.loadFailed = 'true'; container.classList.add('pricing-unavailable'); displayContactMessage(container, getEmbellishmentTypeFromUrl()); initializeFallbackPricingData(getEmbellishmentTypeFromUrl()); }
+         ppLog(`PricingPages: Check details - hasExplicitError: ${hasExplicitError}, noRecordsFound: ${noRecordsFound}, hasTableContent: ${hasTableContent}, isLoadingMessageStillPresent: ${isLoadingMessageStillPresent}`);
+         if (noRecordsFound) { ppLog(`PricingPages: Caspio loaded for ${caspioAppKey}, but no records found. Displaying contact message.`); container.dataset.loadFailed = 'true'; container.classList.add('pricing-unavailable'); displayContactMessage(container, getEmbellishmentTypeFromUrl()); initializeFallbackPricingData(getEmbellishmentTypeFromUrl()); }
          else if (hasExplicitError || (!hasTableContent && isLoadingMessageStillPresent)) { console.warn(`PricingPages: Caspio check FAILED for ${caspioAppKey}.`); container.dataset.loadFailed = 'true'; container.classList.add('pricing-unavailable'); }
-         else if (hasTableContent) { console.log(`PricingPages: Caspio check PASSED for ${caspioAppKey}. Table content found.`); container.classList.remove('pricing-unavailable'); container.dataset.loadFailed = 'false'; ensureHiddenCartElements(container); console.log(`PricingPages: Caspio content detected, pricing-matrix-capture.js should handle data extraction.`); const loadingMsg = container.querySelector('.loading-message'); if (loadingMsg) loadingMsg.style.display = 'none'; }
+         else if (hasTableContent) { ppLog(`PricingPages: Caspio check PASSED for ${caspioAppKey}. Table content found.`); container.classList.remove('pricing-unavailable'); container.dataset.loadFailed = 'false'; ensureHiddenCartElements(container); ppLog(`PricingPages: Caspio content detected, pricing-matrix-capture.js should handle data extraction.`); const loadingMsg = container.querySelector('.loading-message'); if (loadingMsg) loadingMsg.style.display = 'none'; }
          else { console.warn(`PricingPages: Caspio check AMBIGUOUS for ${caspioAppKey}. Treating as 'No Records'.`); container.dataset.loadFailed = 'true'; container.classList.add('pricing-unavailable'); displayContactMessage(container, getEmbellishmentTypeFromUrl()); initializeFallbackPricingData(getEmbellishmentTypeFromUrl()); }
     }
 
     async function tryLoadCaspioSequentially(container, appKeys, styleNumber, embType) {
-        console.log(`PricingPages: Starting sequential load for ${embType} with keys:`, appKeys);
+        ppLog(`PricingPages: Starting sequential load for ${embType} with keys:`, appKeys);
         let loadedSuccessfully = false;
         for (let i = 0; i < appKeys.length; i++) {
             const currentKey = appKeys[i];
-            console.log(`PricingPages: Attempting load for ${embType} with key #${i + 1}: ${currentKey}`);
+            ppLog(`PricingPages: Attempting load for ${embType} with key #${i + 1}: ${currentKey}`);
             loadCaspioEmbed(container.id, currentKey, styleNumber);
             await new Promise(resolve => setTimeout(resolve, 6000));
             const loadFailed = container.dataset.loadFailed === 'true';
-            if (!loadFailed) { console.log(`PricingPages: Successfully loaded ${embType} pricing with key: ${currentKey}`); loadedSuccessfully = true; break; }
-            else { console.warn(`PricingPages: Failed to load ${embType} pricing with key: ${currentKey}.`); if (i < appKeys.length - 1) console.log("PricingPages: Trying next key..."); }
+            if (!loadFailed) { ppLog(`PricingPages: Successfully loaded ${embType} pricing with key: ${currentKey}`); loadedSuccessfully = true; break; }
+            else { console.warn(`PricingPages: Failed to load ${embType} pricing with key: ${currentKey}.`); if (i < appKeys.length - 1) ppLog("PricingPages: Trying next key..."); }
         }
         if (!loadedSuccessfully) { console.error(`PricingPages: All attempts to load ${embType} pricing failed.`); displayContactMessage(container, embType); initializeFallbackPricingData(embType); }
     }
@@ -711,7 +715,7 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
     // --- UI Update Functions (Consolidated) ---
 
     function updatePriceDisplayForSize(size, quantity, unitPrice, displayPrice, itemTotal, ltmFeeApplies, ltmFeePerItem, combinedQuantity, ltmFee, hasBackLogo, backLogoPerItem, frontStitchCount) {
-        // console.log(`[DEBUG_LTM] updatePriceDisplayForSize PARAMS for ${size}:`, {
+        // ppLog(`[DEBUG_LTM] updatePriceDisplayForSize PARAMS for ${size}:`, {
         //     size, quantity, unitPrice, displayPrice, itemTotal, ltmFeeApplies, ltmFeePerItem, combinedQuantity, ltmFee, hasBackLogo, backLogoPerItem, frontStitchCount
         // });
         // Try multiple selectors to find the correct price display cell for this size
@@ -729,7 +733,7 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
             matrixPriceDisplay = document.querySelector(`[data-size="${size}"].price-display`);
         }
         
-        console.log(`[updatePriceDisplayForSize] Looking for price display for size: ${size}, found:`, matrixPriceDisplay);
+        ppLog(`[updatePriceDisplayForSize] Looking for price display for size: ${size}, found:`, matrixPriceDisplay);
         const formattedFrontStitchCount = frontStitchCount ? ` (${parseInt(frontStitchCount).toLocaleString()} st)` : '';
 
         if (matrixPriceDisplay) {
@@ -744,7 +748,7 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
                 }
             }
             
-            console.log(`[updatePriceDisplayForSize] Size: ${size}, hasBackLogo: ${hasBackLogo}, backLogoPerItem: ${backLogoPerItem}, frontStitches: ${frontStitchCount}`);
+            ppLog(`[updatePriceDisplayForSize] Size: ${size}, hasBackLogo: ${hasBackLogo}, backLogoPerItem: ${backLogoPerItem}, frontStitches: ${frontStitchCount}`);
             
             const actualDisplayPrice = displayPrice; // displayPrice from calculator already includes backLogoPerItem
             matrixPriceDisplay.dataset.unitPrice = unitPrice.toFixed(2);
@@ -809,7 +813,7 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
                             </div>
                         </div>`;
                 }
-                // console.log(`[DEBUG_LTM] updatePriceDisplayForSize - Generated cardHtml for ${size} (Qty: ${quantity}):\n`, cardHtml);
+                // ppLog(`[DEBUG_LTM] updatePriceDisplayForSize - Generated cardHtml for ${size} (Qty: ${quantity}):\n`, cardHtml);
                 matrixPriceDisplay.innerHTML = cardHtml;
                 matrixPriceDisplay.className = 'price-display has-breakdown';
                 matrixPriceDisplay.style.backgroundColor = '';
@@ -894,26 +898,25 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
         }
     }
 
-    function showSuccessWithViewCartButton(productData) {
-        const existingContainer = document.getElementById('cart-notification-container'); if (existingContainer) document.body.removeChild(existingContainer); const notificationContainer = document.createElement('div'); notificationContainer.id = 'cart-notification-container'; notificationContainer.style.position = 'fixed'; notificationContainer.style.top = '20px'; notificationContainer.style.right = '20px'; notificationContainer.style.zIndex = '9999'; notificationContainer.style.width = '300px'; notificationContainer.style.maxWidth = '90%'; const ltmFeeApplied = productData?.pricingInfo?.ltmFeeApplied || false; if (ltmFeeApplied) { const ltmInfoBadge = document.createElement('div'); ltmInfoBadge.className = 'ltm-info-badge'; ltmInfoBadge.style.position = 'absolute'; ltmInfoBadge.style.top = '-15px'; ltmInfoBadge.style.right = '10px'; ltmInfoBadge.style.backgroundColor = '#ffc107'; ltmInfoBadge.style.color = '#212529'; ltmInfoBadge.style.padding = '3px 10px'; ltmInfoBadge.style.borderRadius = '15px'; ltmInfoBadge.style.fontSize = '0.75em'; ltmInfoBadge.style.fontWeight = 'bold'; ltmInfoBadge.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)'; ltmInfoBadge.textContent = '⚠️ LTM Fee Applied'; notificationContainer.appendChild(ltmInfoBadge); } document.body.appendChild(notificationContainer); const notification = document.createElement('div'); notification.className = 'cart-notification'; notification.style.backgroundColor = '#fff'; notification.style.borderRadius = '8px'; notification.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)'; notification.style.marginBottom = '10px'; notification.style.overflow = 'hidden'; notification.style.animation = 'slideIn 0.3s ease-out forwards'; if (!document.getElementById('cart-notification-styles')) { const styleEl = document.createElement('style'); styleEl.id = 'cart-notification-styles'; styleEl.textContent = `@keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } } @keyframes fadeOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } } .cart-notification.removing { animation: fadeOut 0.3s ease-in forwards; } .ltm-fee-notification { box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3); border: 1px solid #ffc107; } .ltm-info-badge { animation: pulse 2s infinite; } @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }`; document.head.appendChild(styleEl); } const styleNumber = productData?.styleNumber || 'N/A'; const colorCode = productData?.color || 'N/A'; const embType = productData?.embellishmentType || 'N/A'; const totalQuantity = productData?.totalQuantity || 0; const sizes = productData?.sizes || []; const sizeText = sizes.map(size => `${size.size}: ${size.quantity}`).join(', '); const totalPrice = sizes.reduce((sum, size) => sum + (size.totalPrice || 0), 0); let statusBgColor = '#28a745'; let statusIcon = '✓'; let statusMessage = 'Added to Cart'; let textColor = 'white'; if (ltmFeeApplied) { statusBgColor = '#ffc107'; statusIcon = '⚠️'; statusMessage = 'Added with LTM Fee'; textColor = '#212529'; notification.classList.add('ltm-fee-notification'); } notification.innerHTML = `<div style="background-color:${statusBgColor};color:${textColor};padding:10px;display:flex;justify-content:space-between;align-items:center;"><div style="display:flex;align-items:center;"><span style="font-size:16px;margin-right:8px;">${statusIcon}</span><span style="font-weight:bold;">${statusMessage}</span></div><button class="close-notification" style="background:none;border:none;color:${textColor};font-size:18px;cursor:pointer;padding:0;line-height:1;">×</button></div><div style="padding:15px;"><div style="margin-bottom:10px;font-weight:bold;font-size:16px;">Item Added</div><div style="display:flex;margin-bottom:12px;"><div style="flex:0 0 80px;height:80px;margin-right:10px;border:1px solid #e9ecef;overflow:hidden;display:flex;align-items:center;justify-content:center;background-color:#f8f9fa;">${productData.imageUrl ? `<img src="${productData.imageUrl}" alt="${styleNumber} ${colorCode}" style="max-width:100%;max-height:100%;object-fit:contain;">` : `<div style="display:flex;align-items:center;justify-content:center;font-size:11px;text-align:center;color:#6c757d;flex-direction:column;"><span>${styleNumber}</span><span>${colorCode}</span></div>`}</div><div style="flex:1;"><div style="margin-bottom:4px;font-weight:bold;">Style #${styleNumber}</div><div style="margin-bottom:4px;color:#6c757d;">Color: ${colorCode}</div><div style="margin-bottom:4px;color:#6c757d; text-transform: capitalize;">${embType.replace('-', ' ')}</div></div></div><div style="background-color:${ltmFeeApplied ? '#fff3cd' : '#f8f9fa'};padding:8px;border-radius:4px;margin-bottom:12px;border:${ltmFeeApplied ? '1px solid #ffc107' : '1px solid #eee'};"><div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span>Quantity:</span><span>${totalQuantity}</span></div><div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span>Sizes:</span><span style="text-align:right;max-width:70%;">${sizeText || 'N/A'}</span></div><div style="display:flex;justify-content:space-between;font-weight:bold;"><span>Total:</span><span>$${totalPrice.toFixed(2)}</span></div></div><div style="display:flex;justify-content:center;"><button class="continue-shopping" style="padding:8px 16px;background-color:#f8f9fa;border:1px solid #dee2e6;border-radius:4px;cursor:pointer;width:100%;">Continue Shopping</button></div></div>`; function removeNotification(notif) { if (!notif || !notif.parentNode || notif.classList.contains('removing')) return; notif.classList.add('removing'); notif.addEventListener('animationend', function() { if (notif.parentNode) { notif.parentNode.removeChild(notif); if (notificationContainer.children.length === 0 && notificationContainer.parentNode) { notificationContainer.parentNode.removeChild(notificationContainer); } } }); setTimeout(() => { if (notif.parentNode) { notif.parentNode.removeChild(notif); if (notificationContainer.children.length === 0 && notificationContainer.parentNode) { notificationContainer.parentNode.removeChild(notificationContainer); } } }, 500); } notification.querySelector('.close-notification').addEventListener('click', () => removeNotification(notification)); notification.querySelector('.continue-shopping').addEventListener('click', () => removeNotification(notification)); notificationContainer.appendChild(notification); setTimeout(() => removeNotification(notification), 6000);
-    }
+    // (2026-09-06) The cart-era "View Cart" success toast (with its injected style block) was removed here; nothing called it.
+
 
     function handleMobileAdjustments() {
-        const isMobile = window.innerWidth <= 768; const isSmallMobile = window.innerWidth <= 480; const useGrid = window.ProductQuantityUI ? determineLayoutPreference() : false; console.log(`PricingPages: Handling mobile adjustments. isMobile: ${isMobile}, isSmallMobile: ${isSmallMobile}, useGridPreference: ${useGrid}`); const colorSwatches = document.querySelectorAll('.color-swatch'); colorSwatches.forEach(swatch => { const size = isSmallMobile ? '45px' : (isMobile ? '50px' : '60px'); swatch.style.width = size; swatch.style.height = size; }); const pricingGrid = document.getElementById('custom-pricing-grid'); if (pricingGrid) { pricingGrid.classList.toggle('mobile-view', isMobile); pricingGrid.style.fontSize = isSmallMobile ? '0.8em' : (isMobile ? '0.9em' : ''); const pricingGridContainer = document.querySelector('.pricing-grid-container'); if (pricingGridContainer) { pricingGridContainer.style.overflowX = isMobile ? 'auto' : ''; pricingGridContainer.style.WebkitOverflowScrolling = isMobile ? 'touch' : ''; } } const productContext = document.querySelector('.product-context'); if (productContext) { productContext.style.flexDirection = isMobile ? 'column' : ''; productContext.style.textAlign = isMobile ? 'center' : ''; } const quantityMatrixContainer = document.getElementById('quantity-matrix'); const sizeQuantityGridContainer = document.getElementById('size-quantity-grid-container'); if (quantityMatrixContainer) { quantityMatrixContainer.style.display = (!useGrid && !isSmallMobile) ? 'block' : 'none'; if (!useGrid && !isSmallMobile) { const matrixTable = quantityMatrixContainer.querySelector('.quantity-input-table'); if (matrixTable) matrixTable.classList.toggle('mobile-view', isMobile); } } if (sizeQuantityGridContainer) { sizeQuantityGridContainer.style.display = (useGrid || isSmallMobile) ? 'grid' : 'none'; if (useGrid || isSmallMobile) { sizeQuantityGridContainer.style.gridTemplateColumns = isSmallMobile ? '1fr' : (isMobile ? 'repeat(2, 1fr)' : 'repeat(auto-fit, minmax(200px, 1fr))'); } } const visibleContainerSelector = (useGrid || isSmallMobile) ? '#size-quantity-grid-container' : '#quantity-matrix'; const visibleContainer = document.querySelector(visibleContainerSelector); if (visibleContainer) { visibleContainer.querySelectorAll('.quantity-btn').forEach(btn => { const size = isSmallMobile ? '22px' : (isMobile ? '24px' : '26px'); const fontSize = isSmallMobile ? '0.8em' : (isMobile ? '0.9em' : '1em'); btn.style.width = size; btn.style.height = size; btn.style.fontSize = fontSize; }); visibleContainer.querySelectorAll('.quantity-input').forEach(input => { const width = isSmallMobile ? '30px' : (isMobile ? '35px' : '40px'); const height = isSmallMobile ? '22px' : (isMobile ? '24px' : '26px'); const fontSize = isSmallMobile ? '0.8em' : (isMobile ? '0.9em' : '1em'); input.style.width = width; input.style.height = height; input.style.fontSize = fontSize; }); if (visibleContainerSelector === '#size-quantity-grid-container') { visibleContainer.querySelectorAll('.size-quantity-item').forEach(item => { item.style.padding = isSmallMobile ? '8px' : '10px'; }); } else if (visibleContainerSelector === '#quantity-matrix') { visibleContainer.querySelectorAll('th, td').forEach(cell => { cell.style.padding = isSmallMobile ? '4px' : (isMobile ? '6px' : '8px'); }); } } const cartSummary = document.querySelector('.cart-summary'); if (cartSummary) { cartSummary.style.padding = isMobile ? '15px' : '20px'; const addToCartButton = cartSummary.querySelector('#add-to-cart-button'); if (addToCartButton) { addToCartButton.style.padding = isSmallMobile ? '8px 16px' : '12px 24px'; addToCartButton.style.fontSize = isSmallMobile ? '1em' : '1.1em'; } const tierInfoDisplayInSummary = cartSummary.querySelector('.pricing-tier-info'); if (tierInfoDisplayInSummary) { tierInfoDisplayInSummary.style.padding = isSmallMobile ? '8px' : '10px'; tierInfoDisplayInSummary.style.fontSize = isSmallMobile ? '0.85em' : '0.9em'; const progressBar = tierInfoDisplayInSummary.querySelector('.tier-progress'); if(progressBar) { /* Optional: progressBar.style.height = isSmallMobile ? '6px' : '8px'; */ } const progressBarFill = tierInfoDisplayInSummary.querySelector('.tier-progress-fill'); if(progressBarFill) { /* Optional: progressBarFill.style.height = isSmallMobile ? '6px' : '8px'; */ } } } const mainPricingTierInfo = document.querySelector('.product-interactive-column .pricing-tier-info'); if (mainPricingTierInfo && mainPricingTierInfo !== cartSummary?.querySelector('.pricing-tier-info')) { mainPricingTierInfo.style.padding = isMobile ? '10px' : '15px'; mainPricingTierInfo.style.fontSize = isSmallMobile ? '0.85em' : '0.9em'; } setupShowMoreColorsButton();
+        const isMobile = window.innerWidth <= 768; const isSmallMobile = window.innerWidth <= 480; const useGrid = window.ProductQuantityUI ? determineLayoutPreference() : false; ppLog(`PricingPages: Handling mobile adjustments. isMobile: ${isMobile}, isSmallMobile: ${isSmallMobile}, useGridPreference: ${useGrid}`); const colorSwatches = document.querySelectorAll('.color-swatch'); colorSwatches.forEach(swatch => { const size = isSmallMobile ? '45px' : (isMobile ? '50px' : '60px'); swatch.style.width = size; swatch.style.height = size; }); const pricingGrid = document.getElementById('custom-pricing-grid'); if (pricingGrid) { pricingGrid.classList.toggle('mobile-view', isMobile); pricingGrid.style.fontSize = isSmallMobile ? '0.8em' : (isMobile ? '0.9em' : ''); const pricingGridContainer = document.querySelector('.pricing-grid-container'); if (pricingGridContainer) { pricingGridContainer.style.overflowX = isMobile ? 'auto' : ''; pricingGridContainer.style.WebkitOverflowScrolling = isMobile ? 'touch' : ''; } } const productContext = document.querySelector('.product-context'); if (productContext) { productContext.style.flexDirection = isMobile ? 'column' : ''; productContext.style.textAlign = isMobile ? 'center' : ''; } const quantityMatrixContainer = document.getElementById('quantity-matrix'); const sizeQuantityGridContainer = document.getElementById('size-quantity-grid-container'); if (quantityMatrixContainer) { quantityMatrixContainer.style.display = (!useGrid && !isSmallMobile) ? 'block' : 'none'; if (!useGrid && !isSmallMobile) { const matrixTable = quantityMatrixContainer.querySelector('.quantity-input-table'); if (matrixTable) matrixTable.classList.toggle('mobile-view', isMobile); } } if (sizeQuantityGridContainer) { sizeQuantityGridContainer.style.display = (useGrid || isSmallMobile) ? 'grid' : 'none'; if (useGrid || isSmallMobile) { sizeQuantityGridContainer.style.gridTemplateColumns = isSmallMobile ? '1fr' : (isMobile ? 'repeat(2, 1fr)' : 'repeat(auto-fit, minmax(200px, 1fr))'); } } const visibleContainerSelector = (useGrid || isSmallMobile) ? '#size-quantity-grid-container' : '#quantity-matrix'; const visibleContainer = document.querySelector(visibleContainerSelector); if (visibleContainer) { visibleContainer.querySelectorAll('.quantity-btn').forEach(btn => { const size = isSmallMobile ? '22px' : (isMobile ? '24px' : '26px'); const fontSize = isSmallMobile ? '0.8em' : (isMobile ? '0.9em' : '1em'); btn.style.width = size; btn.style.height = size; btn.style.fontSize = fontSize; }); visibleContainer.querySelectorAll('.quantity-input').forEach(input => { const width = isSmallMobile ? '30px' : (isMobile ? '35px' : '40px'); const height = isSmallMobile ? '22px' : (isMobile ? '24px' : '26px'); const fontSize = isSmallMobile ? '0.8em' : (isMobile ? '0.9em' : '1em'); input.style.width = width; input.style.height = height; input.style.fontSize = fontSize; }); if (visibleContainerSelector === '#size-quantity-grid-container') { visibleContainer.querySelectorAll('.size-quantity-item').forEach(item => { item.style.padding = isSmallMobile ? '8px' : '10px'; }); } else if (visibleContainerSelector === '#quantity-matrix') { visibleContainer.querySelectorAll('th, td').forEach(cell => { cell.style.padding = isSmallMobile ? '4px' : (isMobile ? '6px' : '8px'); }); } } const cartSummary = document.querySelector('.cart-summary'); if (cartSummary) { cartSummary.style.padding = isMobile ? '15px' : '20px'; const addToCartButton = cartSummary.querySelector('#add-to-cart-button'); if (addToCartButton) { addToCartButton.style.padding = isSmallMobile ? '8px 16px' : '12px 24px'; addToCartButton.style.fontSize = isSmallMobile ? '1em' : '1.1em'; } const tierInfoDisplayInSummary = cartSummary.querySelector('.pricing-tier-info'); if (tierInfoDisplayInSummary) { tierInfoDisplayInSummary.style.padding = isSmallMobile ? '8px' : '10px'; tierInfoDisplayInSummary.style.fontSize = isSmallMobile ? '0.85em' : '0.9em'; const progressBar = tierInfoDisplayInSummary.querySelector('.tier-progress'); if(progressBar) { /* Optional: progressBar.style.height = isSmallMobile ? '6px' : '8px'; */ } const progressBarFill = tierInfoDisplayInSummary.querySelector('.tier-progress-fill'); if(progressBarFill) { /* Optional: progressBarFill.style.height = isSmallMobile ? '6px' : '8px'; */ } } } const mainPricingTierInfo = document.querySelector('.product-interactive-column .pricing-tier-info'); if (mainPricingTierInfo && mainPricingTierInfo !== cartSummary?.querySelector('.pricing-tier-info')) { mainPricingTierInfo.style.padding = isMobile ? '10px' : '15px'; mainPricingTierInfo.style.fontSize = isSmallMobile ? '0.85em' : '0.9em'; } setupShowMoreColorsButton();
     }
 
     // --- UI Initialization Functions (Moved from inline scripts) ---
 
     function setupTabs() {
-        const tabHeaders = document.querySelectorAll('.tab-header'); const tabPanes = document.querySelectorAll('.tab-pane'); if (!tabHeaders.length || !tabPanes.length) return; tabHeaders.forEach(header => { header.addEventListener('click', function() { tabHeaders.forEach(h => h.classList.remove('active')); tabPanes.forEach(p => p.classList.remove('active')); this.classList.add('active'); const tabId = this.getAttribute('data-tab'); const targetPane = document.getElementById(tabId); if (targetPane) targetPane.classList.add('active'); }); }); console.log("PricingPages: Tab functionality initialized.");
+        const tabHeaders = document.querySelectorAll('.tab-header'); const tabPanes = document.querySelectorAll('.tab-pane'); if (!tabHeaders.length || !tabPanes.length) return; tabHeaders.forEach(header => { header.addEventListener('click', function() { tabHeaders.forEach(h => h.classList.remove('active')); tabPanes.forEach(p => p.classList.remove('active')); this.classList.add('active'); const tabId = this.getAttribute('data-tab'); const targetPane = document.getElementById(tabId); if (targetPane) targetPane.classList.add('active'); }); }); ppLog("PricingPages: Tab functionality initialized.");
     }
 
     function setupInventoryLegend() {
-        const hasLowInventory = window.inventoryData && window.inventoryData.sizeTotals && window.inventoryData.sizeTotals.some(qty => qty > 0 && qty < 10); const legend = document.querySelector('.inventory-indicator-legend'); if (legend) { legend.style.display = hasLowInventory ? 'block' : 'none'; console.log(`PricingPages: Inventory legend display set to ${hasLowInventory ? 'block' : 'none'}.`); }
+        const hasLowInventory = window.inventoryData && window.inventoryData.sizeTotals && window.inventoryData.sizeTotals.some(qty => qty > 0 && qty < 10); const legend = document.querySelector('.inventory-indicator-legend'); if (legend) { legend.style.display = hasLowInventory ? 'block' : 'none'; ppLog(`PricingPages: Inventory legend display set to ${hasLowInventory ? 'block' : 'none'}.`); }
     }
 
     function setupImageZoom() {
-        const imageContainer = document.querySelector('.product-image-container'); const image = document.getElementById('product-image'); const zoomOverlay = document.querySelector('.image-zoom-overlay'); if (!imageContainer || !image || !zoomOverlay) return; if (document.querySelector('.image-zoom-modal')) return; const modal = document.createElement('div'); modal.className = 'image-zoom-modal'; modal.style.cssText = 'display:none; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; background-color:rgba(0,0,0,0.9); overflow:auto;'; const modalContent = document.createElement('img'); modalContent.className = 'image-zoom-modal-content'; modalContent.style.cssText = 'margin:auto; display:block; max-width:90%; max-height:90%; position:absolute; top:50%; left:50%; transform:translate(-50%, -50%);'; const closeButton = document.createElement('span'); closeButton.className = 'image-zoom-close'; closeButton.innerHTML = '&times;'; closeButton.style.cssText = 'position:absolute; top:15px; right:35px; color:#f1f1f1; font-size:40px; font-weight:bold; cursor:pointer;'; modal.appendChild(modalContent); modal.appendChild(closeButton); document.body.appendChild(modal); zoomOverlay.addEventListener('click', () => { modal.style.display = 'block'; modalContent.src = image.src; }); closeButton.addEventListener('click', () => { modal.style.display = 'none'; }); modal.addEventListener('click', (event) => { if (event.target === modal) modal.style.display = 'none'; }); console.log("PricingPages: Image zoom functionality initialized.");
+        const imageContainer = document.querySelector('.product-image-container'); const image = document.getElementById('product-image'); const zoomOverlay = document.querySelector('.image-zoom-overlay'); if (!imageContainer || !image || !zoomOverlay) return; if (document.querySelector('.image-zoom-modal')) return; const modal = document.createElement('div'); modal.className = 'image-zoom-modal'; modal.style.cssText = 'display:none; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; background-color:rgba(0,0,0,0.9); overflow:auto;'; const modalContent = document.createElement('img'); modalContent.className = 'image-zoom-modal-content'; modalContent.style.cssText = 'margin:auto; display:block; max-width:90%; max-height:90%; position:absolute; top:50%; left:50%; transform:translate(-50%, -50%);'; const closeButton = document.createElement('span'); closeButton.className = 'image-zoom-close'; closeButton.innerHTML = '&times;'; closeButton.style.cssText = 'position:absolute; top:15px; right:35px; color:#f1f1f1; font-size:40px; font-weight:bold; cursor:pointer;'; modal.appendChild(modalContent); modal.appendChild(closeButton); document.body.appendChild(modal); zoomOverlay.addEventListener('click', () => { modal.style.display = 'block'; modalContent.src = image.src; }); closeButton.addEventListener('click', () => { modal.style.display = 'none'; }); modal.addEventListener('click', (event) => { if (event.target === modal) modal.style.display = 'none'; }); ppLog("PricingPages: Image zoom functionality initialized.");
     }
 
     function setupShowMoreColorsButton() {
@@ -930,7 +933,7 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
             return; 
         } 
         
-        console.log(`PricingPages: Updating mini swatch for color: ${mainColorName}`); 
+        ppLog(`PricingPages: Updating mini swatch for color: ${mainColorName}`); 
         pricingColorNameEl.textContent = mainColorName; 
         
         const allSwatches = document.querySelectorAll('.color-swatch'); 
@@ -959,7 +962,7 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
                 // Test if image loads
                 const testImg = new Image();
                 testImg.onload = function() {
-                    console.log("PricingPages: Mini swatch image loaded successfully");
+                    ppLog("PricingPages: Mini swatch image loaded successfully");
                 };
                 testImg.onerror = function() {
                     console.warn("PricingPages: Mini swatch image failed to load, using fallback");
@@ -974,7 +977,7 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
             }
             
             miniColorSwatchEl.classList.add('active-swatch'); 
-            console.log("PricingPages: Applied style from matched swatch."); 
+            ppLog("PricingPages: Applied style from matched swatch."); 
         } else { 
             // Enhanced fallback with better color detection
             miniColorSwatchEl.style.backgroundColor = getColorFallback(mainColorName);
@@ -1031,7 +1034,7 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
     // --- Main Initialization ---
 
     async function initPricingPage() {
-        console.log("PricingPages: Initializing pricing page (v4)...");
+        ppLog("PricingPages: Initializing pricing page (v4)...");
         updateProductContext();
         updateTabNavigation();
 
@@ -1041,7 +1044,7 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
 
         // Modern pages (DTF) skip legacy script loading - they have their own systems
         if (isDTF) {
-            console.log("PricingPages: DTF page detected - skipping legacy script loading (uses DTF V2 system)");
+            ppLog("PricingPages: DTF page detected - skipping legacy script loading (uses DTF V2 system)");
             // DTF pages only need product context initialization (already done above)
             // They handle their own calculator, adapter, and integration scripts
             return;
@@ -1063,14 +1066,14 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
         if (!pricingContainer) { 
             // Screen print has its own pricing system, not using the standard container
             if (embType === 'screenprint') {
-                console.log(`PricingPages: Screen print uses custom pricing, skipping container check.`);
+                ppLog(`PricingPages: Screen print uses custom pricing, skipping container check.`);
                 return;
             }
             console.error(`PricingPages: Pricing container #${pricingContainerId} not found.`); 
             return; 
         }
         if (embType === 'unknown' || (embType !== 'dtf' && appKeys.length === 0)) { console.error(`PricingPages: Unknown page type or no AppKeys for ${embType}.`); displayContactMessage(pricingContainer, embType); return; }
-        if (embType === 'dtf') { console.log("PricingPages: Handling DTF page (coming soon)."); displayContactMessage(pricingContainer, embType); initializeFallbackPricingData(embType); return; }
+        if (embType === 'dtf') { ppLog("PricingPages: Handling DTF page (coming soon)."); displayContactMessage(pricingContainer, embType); initializeFallbackPricingData(embType); return; }
 
         // Try loading Caspio
         await tryLoadCaspioSequentially(pricingContainer, appKeys, styleNumber, embType);
@@ -1079,18 +1082,18 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
         setupInventoryLegend();
         updateMiniColorSwatch();
 
-        console.log("PricingPages: Initialization sequence complete.");
+        ppLog("PricingPages: Initialization sequence complete.");
     }
 
     // --- Fallback Mechanisms ---
 
     function initializeFallbackPricingData(embType) {
         if (window.nwcaPricingData) return; // Don't overwrite if data was somehow captured
-        console.warn(`PricingPages: Initializing FALLBACK pricing data for ${embType}.`); let headers = ['S-XL', '2XL', '3XL']; let prices = { 'S-XL': { 'Tier1': 20.00, 'Tier2': 19.00, 'Tier3': 18.00, 'Tier4': 17.00 }, '2XL': { 'Tier1': 22.00, 'Tier2': 21.00, 'Tier3': 20.00, 'Tier4': 19.00 }, '3XL': { 'Tier1': 23.00, 'Tier2': 22.00, 'Tier3': 21.00, 'Tier4': 20.00 }, }; let tiers = { 'Tier1': { 'MinQuantity': 1, 'MaxQuantity': 11, LTM_Fee: 50 }, 'Tier2': { 'MinQuantity': 12, 'MaxQuantity': 23, LTM_Fee: 25 }, 'Tier3': { 'MinQuantity': 24, 'MaxQuantity': 47 }, 'Tier4': { 'MinQuantity': 48, 'MaxQuantity': 71 }, 'Tier5': { 'MinQuantity': 72, 'MaxQuantity': 10000 }, }; let uniqueSizes = ['S', 'M', 'L', 'XL', '2XL', '3XL']; if (embType === 'cap-embroidery') { headers = ['One Size']; prices = { 'One Size': { 'Tier1': 22.99, 'Tier2': 21.99, 'Tier3': 20.99, 'Tier4': 19.99, 'Tier5': 18.99 } }; uniqueSizes = ['OS']; } window.nwcaPricingData = { styleNumber: window.selectedStyleNumber || 'FALLBACK', color: window.selectedColorName || 'FALLBACK', embellishmentType: embType, headers: headers, prices: prices, tierData: tiers, uniqueSizes: uniqueSizes, capturedAt: new Date().toISOString(), isFallback: true }; window.availableSizesFromTable = headers; console.log('PricingPages: Fallback pricing global variables initialized.', window.nwcaPricingData); window.dispatchEvent(new CustomEvent('pricingDataLoaded', { detail: window.nwcaPricingData }));
+        console.warn(`PricingPages: Initializing FALLBACK pricing data for ${embType}.`); let headers = ['S-XL', '2XL', '3XL']; let prices = { 'S-XL': { 'Tier1': 20.00, 'Tier2': 19.00, 'Tier3': 18.00, 'Tier4': 17.00 }, '2XL': { 'Tier1': 22.00, 'Tier2': 21.00, 'Tier3': 20.00, 'Tier4': 19.00 }, '3XL': { 'Tier1': 23.00, 'Tier2': 22.00, 'Tier3': 21.00, 'Tier4': 20.00 }, }; let tiers = { 'Tier1': { 'MinQuantity': 1, 'MaxQuantity': 11, LTM_Fee: 50 }, 'Tier2': { 'MinQuantity': 12, 'MaxQuantity': 23, LTM_Fee: 25 }, 'Tier3': { 'MinQuantity': 24, 'MaxQuantity': 47 }, 'Tier4': { 'MinQuantity': 48, 'MaxQuantity': 71 }, 'Tier5': { 'MinQuantity': 72, 'MaxQuantity': 10000 }, }; let uniqueSizes = ['S', 'M', 'L', 'XL', '2XL', '3XL']; if (embType === 'cap-embroidery') { headers = ['One Size']; prices = { 'One Size': { 'Tier1': 22.99, 'Tier2': 21.99, 'Tier3': 20.99, 'Tier4': 19.99, 'Tier5': 18.99 } }; uniqueSizes = ['OS']; } window.nwcaPricingData = { styleNumber: window.selectedStyleNumber || 'FALLBACK', color: window.selectedColorName || 'FALLBACK', embellishmentType: embType, headers: headers, prices: prices, tierData: tiers, uniqueSizes: uniqueSizes, capturedAt: new Date().toISOString(), isFallback: true }; window.availableSizesFromTable = headers; ppLog('PricingPages: Fallback pricing global variables initialized.', window.nwcaPricingData); window.dispatchEvent(new CustomEvent('pricingDataLoaded', { detail: window.nwcaPricingData }));
     }
 
     function displayContactMessage(container, embType) {
-        if (!container) return; console.log(`PricingPages: Displaying contact message for ${embType} in #${container.id}`); container.innerHTML = ''; container.classList.remove('loading'); container.classList.add('pricing-unavailable'); ensureHiddenCartElements(container); const messageElement = document.createElement('div'); messageElement.style.textAlign = 'center'; messageElement.style.padding = '30px 20px'; messageElement.style.backgroundColor = '#f8f9fa'; messageElement.style.borderRadius = '8px'; messageElement.style.border = '1px solid #dee2e6'; messageElement.style.margin = '20px 0'; messageElement.innerHTML = `<h3 style="color: #0056b3; margin-bottom: 15px;">Pricing Currently Unavailable</h3><p style="font-size: 16px; color: #495057; margin-bottom: 20px;">We apologize, but the pricing details for this item are currently unavailable.</p><p style="font-size: 16px; color: #495057; margin-bottom: 20px;">Please call <strong style="color: #0056b3; font-size: 18px;">253-922-5793</strong> for an accurate quote.</p><p style="font-size: 14px; color: #6c757d;">Our team is ready to assist you.</p>`; container.appendChild(messageElement);
+        if (!container) return; ppLog(`PricingPages: Displaying contact message for ${embType} in #${container.id}`); container.innerHTML = ''; container.classList.remove('loading'); container.classList.add('pricing-unavailable'); ensureHiddenCartElements(container); const messageElement = document.createElement('div'); messageElement.style.textAlign = 'center'; messageElement.style.padding = '30px 20px'; messageElement.style.backgroundColor = '#f8f9fa'; messageElement.style.borderRadius = '8px'; messageElement.style.border = '1px solid #dee2e6'; messageElement.style.margin = '20px 0'; messageElement.innerHTML = `<h3 style="color: #0056b3; margin-bottom: 15px;">Pricing Currently Unavailable</h3><p style="font-size: 16px; color: #495057; margin-bottom: 20px;">We apologize, but the pricing details for this item are currently unavailable.</p><p style="font-size: 16px; color: #495057; margin-bottom: 20px;">Please call <strong style="color: #0056b3; font-size: 18px;">253-922-5793</strong> for an accurate quote.</p><p style="font-size: 14px; color: #6c757d;">Our team is ready to assist you.</p>`; container.appendChild(messageElement);
     }
 
     // --- Global UI Object ---
@@ -1098,7 +1101,6 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
         updatePriceDisplayForSize: updatePriceDisplayForSize,
         // updateCartInfoDisplay and updateTierInfoDisplay are removed as their functionality
         // is now integrated into product-pricing-ui.js (updateComprehensiveTierInfo)
-        showSuccessNotification: showSuccessWithViewCartButton,
         handleMobileAdjustments: handleMobileAdjustments,
         updateMiniColorSwatch: updateMiniColorSwatch,
         determineLayoutPreference: determineLayoutPreference
@@ -1106,9 +1108,9 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
 
 
     // Dispatch event after UI object is assigned
-    console.log("PricingPages: PricingPageUI object created.");
+    ppLog("PricingPages: PricingPageUI object created.");
     window.dispatchEvent(new CustomEvent('pricingPageUIReady'));
-    console.log("PricingPages: Dispatched 'pricingPageUIReady' event.");
+    ppLog("PricingPages: Dispatched 'pricingPageUIReady' event.");
 
     // --- Event Listeners ---
     document.addEventListener('DOMContentLoaded', initPricingPage);
@@ -1119,175 +1121,5 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
 
 })(); // End of IIFE
 
-// ══════════════════════════════════════════════════════════════
-// Calculator Inventory — Collapsible warehouse inventory grid
-// Shared across all pricing calculators. Call on color selection.
-// ══════════════════════════════════════════════════════════════
-(function() {
-    var SANMAR_API = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/sanmar';
-    var invCache = {};
-    var INV_CACHE_TTL = 5 * 60 * 1000;
-    var isExpanded = false;
-
-    // Inject CSS once
-    var style = document.createElement('style');
-    style.textContent = [
-        '.calc-inventory-section { max-width: 960px; margin: 1.5rem auto; font-family: inherit; }',
-        '.calc-inv-bar { display: flex; align-items: center; justify-content: space-between; padding: 0.65rem 1rem; background: linear-gradient(135deg, #2f661e 0%, #3a9940 100%); color: white; border-radius: 8px; cursor: pointer; user-select: none; transition: border-radius 0.2s; }',
-        '.calc-inv-bar.expanded { border-radius: 8px 8px 0 0; }',
-        '.calc-inv-bar-left { display: flex; align-items: center; gap: 0.6rem; }',
-        '.calc-inv-swatch { width: 28px; height: 28px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.5); object-fit: cover; }',
-        '.calc-inv-color-name { font-weight: 700; font-size: 0.95rem; }',
-        '.calc-inv-label { font-size: 0.8rem; opacity: 0.85; margin-left: 0.5rem; }',
-        '.calc-inv-right { display: flex; align-items: center; gap: 0.75rem; }',
-        '.calc-inv-total { font-size: 0.75rem; background: rgba(255,255,255,0.2); padding: 0.2rem 0.6rem; border-radius: 12px; font-weight: 600; }',
-        '.calc-inv-chevron { transition: transform 0.3s; font-size: 0.85rem; }',
-        '.calc-inv-chevron.open { transform: rotate(180deg); }',
-        '.calc-inv-body { display: none; border: 1px solid #e0e0e0; border-top: none; border-radius: 0 0 8px 8px; background: #fafafa; overflow-x: auto; }',
-        '.calc-inv-body.show { display: block; }',
-        '.calc-inv-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; white-space: nowrap; }',
-        '.calc-inv-table th { background: #f5f5f5; color: #333; font-weight: 600; padding: 0.45rem 0.5rem; text-align: center; border-bottom: 2px solid #ddd; }',
-        '.calc-inv-table th:first-child { text-align: left; min-width: 95px; }',
-        '.calc-inv-table td { padding: 0.35rem 0.5rem; text-align: center; border-bottom: 1px solid #eee; font-variant-numeric: tabular-nums; }',
-        '.calc-inv-table td:first-child { text-align: left; font-weight: 500; color: #555; font-size: 0.73rem; }',
-        '.calc-inv-good { background: #e8f5e9; color: #2e7d32; }',
-        '.calc-inv-low { background: #fff8e1; color: #f57f17; font-weight: 600; }',
-        '.calc-inv-out { background: #ffebee; color: #c62828; }',
-        '.calc-inv-total-row td { font-weight: 700; border-top: 2px solid #ccc; background: #f0f0f0; }',
-        '.calc-inv-loading { padding: 1rem; text-align: center; color: #888; font-size: 0.8rem; }',
-        '.calc-inv-error { padding: 0.75rem; text-align: center; color: #c62828; font-size: 0.8rem; background: #ffebee; border-radius: 0 0 8px 8px; border: 1px solid #e0e0e0; border-top: none; }',
-        '@media (max-width: 768px) { .calc-inv-table { font-size: 0.68rem; } .calc-inv-table td, .calc-inv-table th { padding: 0.25rem 0.35rem; } .calc-inv-label { display: none; } }'
-    ].join('\n');
-    document.head.appendChild(style);
-
-    // Auto-detect color clicks via event delegation on .color-swatch elements
-    // Works across ALL calculators without per-page code changes
-    document.addEventListener('click', function(e) {
-        var swatch = e.target.closest('.color-swatch');
-        if (!swatch) return;
-
-        // Small delay to let the calculator's own click handler set state first
-        setTimeout(function() {
-            // Get style number from various global sources
-            var style = window.currentStyleNumber || window.selectedStyleNumber ||
-                        (window.currentProduct && window.currentProduct.STYLE) || '';
-            if (!style) return;
-
-            // Get color info from the swatch's data or from the global selectedColor
-            var colorObj = window.selectedColor || {};
-            var catalogColor = colorObj.CATALOG_COLOR || colorObj.catalogColor || '';
-            var colorName = colorObj.COLOR_NAME || colorObj.colorName ||
-                            (document.getElementById('currentColor') ? document.getElementById('currentColor').textContent : '') || '';
-            var swatchImg = colorObj.COLOR_SQUARE_IMAGE || colorObj.swatchUrl || colorObj.colorSwatchImage || '';
-
-            // Fallback: extract from swatch element
-            if (!catalogColor && swatch.title) {
-                catalogColor = swatch.title;
-                colorName = colorName || swatch.title;
-            }
-
-            if (catalogColor || colorName) {
-                loadCalculatorInventory(style, catalogColor || colorName, colorName, swatchImg);
-            }
-        }, 100);
-    });
-
-    window.loadCalculatorInventory = function(styleNumber, catalogColor, colorName, swatchUrl) {
-        var container = document.getElementById('calculator-inventory-section');
-        if (!container) return;
-        if (!styleNumber || !catalogColor) {
-            container.innerHTML = '';
-            return;
-        }
-
-        var cacheKey = styleNumber + '-' + catalogColor;
-        var cached = invCache[cacheKey];
-
-        // Render the collapsed bar immediately
-        renderBar(container, colorName, swatchUrl, null);
-
-        if (cached && (Date.now() - cached.ts < INV_CACHE_TTL)) {
-            renderBar(container, colorName, swatchUrl, cached.data);
-            return;
-        }
-
-        // Fetch
-        fetch(SANMAR_API + '/inventory/' + encodeURIComponent(styleNumber) + '?color=' + encodeURIComponent(catalogColor))
-            .then(function(r) { if (!r.ok) throw new Error('fail'); return r.json(); })
-            .then(function(data) {
-                invCache[cacheKey] = { data: data, ts: Date.now() };
-                renderBar(container, colorName, swatchUrl, data);
-            })
-            .catch(function() {
-                container.innerHTML = renderBarHtml(colorName, swatchUrl, 0) +
-                    '<div class="calc-inv-error">Unable to load inventory</div>';
-            });
-    };
-
-    function renderBar(container, colorName, swatchUrl, data) {
-        var total = data ? data.grandTotal : 0;
-        var barHtml = renderBarHtml(colorName, swatchUrl, total);
-        var bodyHtml = data ? renderTable(data) : '<div class="calc-inv-loading"><i class="fas fa-spinner fa-spin"></i> Loading...</div>';
-
-        container.innerHTML = barHtml +
-            '<div class="calc-inv-body' + (isExpanded ? ' show' : '') + '">' + bodyHtml + '</div>';
-
-        var bar = container.querySelector('.calc-inv-bar');
-        var body = container.querySelector('.calc-inv-body');
-        var chevron = container.querySelector('.calc-inv-chevron');
-        if (bar) {
-            bar.addEventListener('click', function() {
-                isExpanded = !isExpanded;
-                body.classList.toggle('show');
-                bar.classList.toggle('expanded');
-                chevron.classList.toggle('open');
-            });
-            if (isExpanded) {
-                bar.classList.add('expanded');
-            }
-        }
-    }
-
-    function renderBarHtml(colorName, swatchUrl, total) {
-        var swatchImg = swatchUrl ? '<img src="' + swatchUrl + '" alt="" class="calc-inv-swatch">' : '';
-        return '<div class="calc-inv-bar' + (isExpanded ? ' expanded' : '') + '">' +
-            '<div class="calc-inv-bar-left">' +
-            swatchImg +
-            '<span class="calc-inv-color-name">' + (colorName || '') + '</span>' +
-            '<span class="calc-inv-label"><i class="fas fa-warehouse"></i> Warehouse Inventory</span>' +
-            '</div>' +
-            '<div class="calc-inv-right">' +
-            (total ? '<span class="calc-inv-total">' + total.toLocaleString() + ' units</span>' : '') +
-            '<i class="fas fa-chevron-down calc-inv-chevron' + (isExpanded ? ' open' : '') + '"></i>' +
-            '</div>' +
-            '</div>';
-    }
-
-    function renderTable(data) {
-        if (!data || !data.inventory || data.inventory.length === 0) return '<div class="calc-inv-loading">No inventory data</div>';
-        var inv = data.inventory;
-        var warehouses = inv[0].warehouses || [];
-
-        var sizeHeaders = inv.map(function(item) { return '<th>' + item.size + '</th>'; }).join('');
-        var whRows = warehouses.map(function(wh) {
-            var cells = inv.map(function(item) {
-                var w = item.warehouses.find(function(x) { return x.id === wh.id; });
-                var qty = w ? w.qty : 0;
-                var cls = qty === 0 ? 'calc-inv-out' : qty < 50 ? 'calc-inv-low' : 'calc-inv-good';
-                return '<td class="' + cls + '">' + qty.toLocaleString() + '</td>';
-            }).join('');
-            return '<tr><td>' + wh.name + '</td>' + cells + '</tr>';
-        }).join('');
-
-        var totalCells = inv.map(function(item) {
-            var cls = item.totalQty === 0 ? 'calc-inv-out' : item.totalQty < 50 ? 'calc-inv-low' : 'calc-inv-good';
-            return '<td class="' + cls + '">' + item.totalQty.toLocaleString() + '</td>';
-        }).join('');
-
-        return '<table class="calc-inv-table">' +
-            '<thead><tr><th>Warehouse</th>' + sizeHeaders + '</tr></thead>' +
-            '<tbody>' + whRows + '</tbody>' +
-            '<tfoot><tr class="calc-inv-total-row"><td>TOTAL</td>' + totalCells + '</tr></tfoot>' +
-            '</table>';
-    }
-})();
+// (2026-09-06) The duplicate "Calculator Inventory" IIFE that used to sit here (a full copy of
+// shared_components/js/calculator-inventory.js) is gone — every consumer page loads the real file after this one.

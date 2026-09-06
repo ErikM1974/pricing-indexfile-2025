@@ -1414,32 +1414,6 @@ You will receive a confirmation email shortly.`);
             modal.classList.add('active');
         }
 
-        function resetForm() {
-            // Reset to step 1
-            currentStep = 1;
-            highestStepReached = 1;
-            selectedItems = { jacket: null, hoodie: null, beanie: null, gloves: null, logo: null };
-
-            // Clear form fields
-            document.querySelectorAll('.form-input').forEach(input => {
-                if (input.type === 'checkbox') {
-                    input.checked = false;
-                } else {
-                    input.value = '';
-                }
-            });
-
-            // Reset file upload
-            window.selectedLogoFile = null;
-            document.getElementById('logoFile').value = '';
-            document.getElementById('logoPreview').classList.remove('active');
-
-            // Update display
-            updateProgress();
-            updateSummary();
-
-        }
-
         // Function to attach submit button handlers (called when Step 7 loads)
         function attachSubmitHandlers() {
             // CRITICAL: Verify we're actually on Step 7 before attaching handlers
