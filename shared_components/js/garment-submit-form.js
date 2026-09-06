@@ -577,7 +577,7 @@ var GarmentSubmitForm = (function () {
             + '    </div>'
             + '  </div>'
             + '  <div class="gsf-file-drop-types">.AI, .EPS, .PDF, .PNG, .JPG, .SVG · 20MB each. Larger? Upload to Box and paste the link in notes.</div>'
-            + '  <input type="file" id="gsf-file-input" style="display:none;" accept="image/*,.pdf,.eps,.ai,.svg" multiple>'
+            + '  <input type="file" id="gsf-file-input" aria-label="Choose artwork files" style="display:none;" accept="image/*,.pdf,.eps,.ai,.svg" multiple>'
             + '  <div id="gsf-carried-art-status" class="gsf-carried-status" style="display:none;"></div>'
             + '  <div id="gsf-file-preview-area"></div>'
             + '</div>'
