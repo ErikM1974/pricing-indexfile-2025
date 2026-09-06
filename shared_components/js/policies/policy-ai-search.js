@@ -13,7 +13,8 @@
 (function () {
     'use strict';
 
-    const ENDPOINT = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/policies-ai-search';
+    const ENDPOINT = ((typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) ? window.APP_CONFIG.API.BASE_URL + '/api/policies-ai-search' : '');
+    if (!ENDPOINT) console.error('[policy-ai-search] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
 
     function escapeHtml(s) {
         return String(s == null ? '' : s)

@@ -5,7 +5,8 @@
 class NamesNumbersService {
     constructor() {
         this.API_BASE = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL)
-            || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+            || '';
+        if (!this.API_BASE) console.error('[names-numbers-service] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
     }
 
     // Fetch with a single 500ms-delayed retry for transient failures

@@ -54,7 +54,8 @@ if (!FEATURED_BRANDS.length) {
 
 class BrandsFlyout {
     constructor() {
-        this.apiBase = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        this.apiBase = (typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) || '';
+        if (!this.apiBase) console.error('[brands-flyout] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
         this.brandsContainer = document.getElementById('navBrandsGrid');
         this.allBrands = [];
         this.maxBrandsToShow = 30;   // cap on filter results

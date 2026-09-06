@@ -48,7 +48,8 @@
 (function (global) {
     'use strict';
 
-    var DEFAULT_API_BASE = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+    var DEFAULT_API_BASE = (typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) || '';
+    if (!DEFAULT_API_BASE) console.error('[web-quote-service] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
     var QUOTE_PREFIX = 'WQ';
     var PARITY_TOLERANCE = 0.01;   // pre-save reprice gate (per group + grand)
     var FOOTING_TOLERANCE = 0.02;  // EMB builder's LTM penny-drift tolerance

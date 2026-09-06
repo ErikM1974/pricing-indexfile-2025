@@ -29,7 +29,8 @@
 // switching back-and-forth between two colors doesn't re-hit the API.
 
 (function () {
-  const BASE_URL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+  const BASE_URL = (typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) || '';
+  if (!BASE_URL) console.error('[sanmar-inventory-check] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
   const CACHE_TTL_MS = 5 * 60 * 1000;
   const cache = new Map();
 

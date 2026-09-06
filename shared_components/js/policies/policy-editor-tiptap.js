@@ -23,8 +23,10 @@
     'use strict';
 
     const TT_VERSION = '2.10.4';
-    const UPLOAD_URL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/files/upload';
-    const FILE_BASE_URL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/files';
+    const UPLOAD_URL = ((typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) ? window.APP_CONFIG.API.BASE_URL + '/api/files/upload' : '');
+    if (!UPLOAD_URL) console.error('[policy-editor-tiptap] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
+    const FILE_BASE_URL = ((typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) ? window.APP_CONFIG.API.BASE_URL + '/api/files' : '');
+    if (!FILE_BASE_URL) console.error('[policy-editor-tiptap] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
 
     let cachedModules = null;
 

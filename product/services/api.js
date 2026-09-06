@@ -6,7 +6,8 @@
 export class API {
     constructor() {
         this.baseUrl = '/api'; // Use local server proxy
-        this.caspioUrl = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api'; // Direct Caspio URL for new endpoints
+        this.caspioUrl = ((typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) ? window.APP_CONFIG.API.BASE_URL + '/api' : '');
+        if (!this.caspioUrl) console.error('[api] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
         this.cache = new Map();
         this.cacheTimeout = 5 * 60 * 1000; // 5 minutes
     }

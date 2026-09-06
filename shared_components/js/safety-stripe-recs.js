@@ -24,7 +24,8 @@
   'use strict';
 
   var API_BASE = (global.APP_CONFIG && global.APP_CONFIG.API && global.APP_CONFIG.API.BASE_URL)
-    || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+    || '';
+  if (!API_BASE) console.error('[safety-stripe-recs] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
   var ENDPOINT = API_BASE + '/api/safety-stripes/top-sellers/styles';
   var CACHE_KEY = 'safetyStripeRecs.v1';
   var CACHE_TTL = 5 * 60 * 1000;

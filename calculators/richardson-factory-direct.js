@@ -3,7 +3,8 @@
 // Simple real-time pricing lookup (no quote building)
 // ============================================================================
 
-const RICHARDSON_API_BASE = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+const RICHARDSON_API_BASE = (typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) || '';
+if (!RICHARDSON_API_BASE) console.error('[richardson-factory-direct] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
 
 // Data initialization status
 let richardsonDataInitialized = false;

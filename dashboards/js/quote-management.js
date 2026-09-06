@@ -13,7 +13,8 @@
 // Never-Break Rule #6 — proxy URL comes from APP_CONFIG, not a hardcode.
 // Guarded fallback keeps the dashboard working if app.config.js fails to load.
 const API_BASE = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL)
-    || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+    || '';
+if (!API_BASE) console.error('[quote-management] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
 
 // State
 let allQuotes = [];

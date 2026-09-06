@@ -77,7 +77,8 @@
         if (typeof window !== 'undefined' && window.APP_CONFIG?.API?.BASE_URL) {
             return window.APP_CONFIG.API.BASE_URL;
         }
-        return 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        console.error('[artwork-upload] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
+        return '';
     }
 
     function validateFile(file) {

@@ -22,7 +22,8 @@
 
 class DTGPricingService {
     constructor() {
-        this.apiBase = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api';
+        this.apiBase = ((typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) ? window.APP_CONFIG.API.BASE_URL + '/api' : '');
+        if (!this.apiBase) console.error('[dtg-pricing-service] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
         this.cache = new Map();
         this.cacheTimeout = 5 * 60 * 1000; // 5 minutes
         

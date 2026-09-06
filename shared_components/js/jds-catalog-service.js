@@ -20,7 +20,8 @@
 class JDSCatalogService {
     constructor() {
         var apiBase = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL)
-            || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+            || '';
+        if (!apiBase) console.error('[jds-catalog-service] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
         this.baseURL = apiBase + '/api/jds-catalog';
         this.cacheTtlMs = 5 * 60 * 1000;
         this.cachePrefix = 'jdsCatalog::';

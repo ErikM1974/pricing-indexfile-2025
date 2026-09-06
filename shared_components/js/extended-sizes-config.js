@@ -361,7 +361,8 @@ function extractExtendedSizesFromData(data) {
 }
 
 async function getAvailableExtendedSizes(styleNumber, color = '') {
-    const API_BASE = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+    const API_BASE = (typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) || '';
+    if (!API_BASE) console.error('[extended-sizes-config] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
     const cacheKey = `${styleNumber}-${color || ''}`;
 
     // Return cached result if available (prevents rate limiting)

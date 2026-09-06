@@ -17,7 +17,8 @@
 (function () {
     'use strict';
 
-    const PUBLIC_BASE = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/policy-comments-public';
+    const PUBLIC_BASE = ((typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) ? window.APP_CONFIG.API.BASE_URL + '/api/policy-comments-public' : '');
+    if (!PUBLIC_BASE) console.error('[policy-comments] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
     const ADMIN_BASE = '/api/crm-proxy/policy-comments';
 
     function escapeHtml(s) {

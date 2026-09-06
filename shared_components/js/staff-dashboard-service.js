@@ -9,7 +9,7 @@ const StaffDashboardService = (function() {
 
     // API Configuration
     const API_CONFIG = {
-        baseURL: 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api',
+        baseURL: (typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) ? window.APP_CONFIG.API.BASE_URL + '/api' : '',
         endpoints: {
             orders: '/manageorders/orders',
             customers: '/manageorders/customers',
@@ -18,6 +18,7 @@ const StaffDashboardService = (function() {
         refreshInterval: 5 * 60 * 1000, // 5 minutes
         cacheKey: 'staffDashboard_metricsCache'
     };
+    if (!API_CONFIG.baseURL) console.error('[staff-dashboard-service] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
 
     // State
     let lastFetchTime = null;

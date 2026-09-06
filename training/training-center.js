@@ -125,7 +125,9 @@
 
     async function loadHubTraining() {
         // Public hub reads live on the proxy (no auth needed for Published policies).
-        var resp = await fetch('https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/policies-public/?category=Training', { cache: 'no-store' });
+        var base = (typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) || '';
+        if (!base) throw new Error('APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
+        var resp = await fetch(base + '/api/policies-public/?category=Training', { cache: 'no-store' });
         if (!resp.ok) throw new Error('HTTP ' + resp.status);
         var data = await resp.json();
         var pols = (data.policies || []).filter(function (p) { return p.Status === 'Published'; });

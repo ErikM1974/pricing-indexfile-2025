@@ -25,7 +25,8 @@
     'use strict';
 
     const API_BASE = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL)
-        || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        || '';
+    if (!API_BASE) console.error('[product-2026] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
     const SALES_EMAIL = 'sales@nwcustomapparel.com';
     const LOW_STOCK_QTY = 24; // below one standard order tier = "low stock"
     const SANMAR_CDN_FALLBACK = 'https://cdnm.sanmar.com/catalog/images/';

@@ -26,7 +26,8 @@
     'use strict';
 
     var DEFAULT_BASE_URL = (global.APP_CONFIG && global.APP_CONFIG.API && global.APP_CONFIG.API.BASE_URL)
-        || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        || '';
+    if (!DEFAULT_BASE_URL) console.error('[work-order-picker] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
     var BROWSE_DISPLAY_CAP = 25;
     var DEBOUNCE_MS = 200;
     var CACHE_TTL = 5 * 60 * 1000;

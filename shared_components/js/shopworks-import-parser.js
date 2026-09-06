@@ -17,7 +17,8 @@ class ShopWorksImportParser {
         // API endpoint for service codes
         this.API_BASE_URL = (typeof APP_CONFIG !== 'undefined' && APP_CONFIG.API?.BASE_URL)
             ? APP_CONFIG.API.BASE_URL
-            : 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+            : '';
+        if (!this.API_BASE_URL) console.error('[shopworks-import-parser] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
 
         // Track if service codes have been loaded from API
         this.serviceCodesLoaded = false;

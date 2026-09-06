@@ -17,7 +17,8 @@
         if (initialized) return;
         console.log("[DP5-HELPER] Initializing DP5 Helper");
         
-        window.API_PROXY_BASE_URL = window.API_PROXY_BASE_URL || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        window.API_PROXY_BASE_URL = window.API_PROXY_BASE_URL || (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) || '';
+        if (!window.API_PROXY_BASE_URL) console.error('[dp5-helper] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
         
         // Listen for pricing data loaded event - This is the primary trigger.
         window.addEventListener('pricingDataLoaded', function(event) {

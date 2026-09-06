@@ -1,3 +1,5 @@
+var BUNDLE_API_BASE = (typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) || '';
+if (!BUNDLE_API_BASE) console.error('[bundle-orders] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
 // Bundle Orders Dashboard JavaScript
 // All functionality for managing Christmas & BCA bundle orders
 
@@ -30,7 +32,7 @@ async function fetchSizeUpcharges(styleNumber) {
     }
 
     try {
-        const response = await fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/size-pricing?styleNumber=${styleNumber}`);
+        const response = await fetch(`${BUNDLE_API_BASE}/api/size-pricing?styleNumber=${styleNumber}`);
 
         if (!response.ok) {
             console.warn(`[Size Upcharges] Failed to fetch for ${styleNumber}:`, response.status);
@@ -110,7 +112,8 @@ function cleanNotesDisplay(notes) {
 
 // Download logo function
 function downloadLogo(externalKey, quoteID) {
-    const url = `https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/files/${externalKey}`;
+    const url = ((typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) ? window.APP_CONFIG.API.BASE_URL + '/api/files/${externalKey}' : '');
+    if (!url) console.error('[bundle-orders] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
     const link = document.createElement('a');
     link.href = url;
     link.download = `logo-${quoteID}.png`;
@@ -121,7 +124,8 @@ function downloadLogo(externalKey, quoteID) {
 
 // View logo full size in new tab
 function viewLogoFullSize(externalKey) {
-    const url = `https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/files/${externalKey}`;
+    const url = ((typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) ? window.APP_CONFIG.API.BASE_URL + '/api/files/${externalKey}' : '');
+    if (!url) console.error('[bundle-orders] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
     window.open(url, '_blank');
 }
 
@@ -541,7 +545,7 @@ async function viewSampleDetails(quoteID) {
                             </h4>
                             <div style="display: flex; align-items: center; gap: 1.5rem;">
                                 <div style="border: 2px solid #fbbcdc; border-radius: 8px; padding: 0.5rem; background: white;">
-                                    <img src="https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/files/${items[0].Image_Upload}"
+                                    <img src="${BUNDLE_API_BASE}/api/files/${items[0].Image_Upload}"
                                          alt="Customer Logo"
                                          style="max-width: 200px; max-height: 200px; display: block;"
                                          onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect width=%22200%22 height=%22200%22 fill=%22%23f3f4f6%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%239ca3af%22 font-family=%22sans-serif%22%3EImage Not Found%3C/text%3E%3C/svg%3E';">
@@ -625,7 +629,7 @@ async function viewSampleDetails(quoteID) {
                     </h4>
                     <div style="display: flex; align-items: center; gap: 1.5rem;">
                         <div style="border: 2px solid #e5e7eb; border-radius: 8px; padding: 0.5rem; background: white;">
-                            <img src="https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/files/${items[0].Image_Upload}"
+                            <img src="${BUNDLE_API_BASE}/api/files/${items[0].Image_Upload}"
                                  alt="Customer Logo"
                                  style="max-width: 200px; max-height: 200px; display: block;"
                                  onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect width=%22200%22 height=%22200%22 fill=%22%23f3f4f6%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%239ca3af%22 font-family=%22sans-serif%22%3EImage Not Found%3C/text%3E%3C/svg%3E';">
@@ -1641,73 +1645,6 @@ async function generateChristmasBundlePDF(request, items) {
 
     return doc;
 }
-
-// Download Order as PDF
-async function downloadOrderPDF() {
-    if (!currentRequestID) {
-        alert('No order selected');
-        return;
-    }
-
-    try {
-        // Find the current request
-        const request = currentSampleRequests.find(r => r.QuoteID === currentRequestID);
-        if (!request) {
-            alert('Order not found');
-            return;
-        }
-
-        // Fetch the items
-        const itemsResponse = await fetch(`/api/quote_items?quoteID=${encodeURIComponent(currentRequestID)}`);
-        const items = await itemsResponse.json();
-
-        let doc;
-        let filename;
-
-        if (request.QuoteID && request.QuoteID.startsWith('XMAS')) {
-            // Generate Christmas Bundle PDF
-            doc = await generateChristmasBundlePDF(request, items);
-            filename = `ChristmasBundle_${request.QuoteID}_${new Date().toISOString().split('T')[0]}.pdf`;
-        } else {
-            // For regular sample requests, create a simpler PDF
-            const { jsPDF } = window.jspdf;
-            doc = new jsPDF();
-
-            // Basic header
-            doc.setFontSize(16);
-            doc.text('Sample Request Order', 105, 20, { align: 'center' });
-            doc.setFontSize(12);
-            doc.text(`Order ID: ${request.QuoteID}`, 105, 30, { align: 'center' });
-
-            // Add basic details
-            let yPos = 50;
-            doc.setFontSize(10);
-            doc.text(`Customer: ${request.CustomerName || 'N/A'}`, 20, yPos);
-            yPos += 10;
-            doc.text(`Email: ${request.CustomerEmail || 'N/A'}`, 20, yPos);
-            yPos += 10;
-            doc.text(`Date: ${new Date(request.CreatedAt).toLocaleDateString()}`, 20, yPos);
-
-            filename = `SampleRequest_${request.QuoteID}_${new Date().toISOString().split('T')[0]}.pdf`;
-        }
-
-        // Save the PDF
-        doc.save(filename);
-
-        // Show success message
-        const msg = document.createElement('div');
-        msg.textContent = '✅ PDF Downloaded Successfully!';
-        msg.style.cssText = 'position: fixed; top: 20px; right: 20px; background: #10b981; color: white; padding: 10px 20px; border-radius: 6px; z-index: 10000;';
-        document.body.appendChild(msg);
-        setTimeout(() => msg.remove(), 3000);
-
-    } catch (error) {
-        console.error('Error generating PDF:', error);
-        alert('Failed to generate PDF. Please try again.');
-    }
-}
-
-
 
 // Close details modal
 function closeSampleDetails() {

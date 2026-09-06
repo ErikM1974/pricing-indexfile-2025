@@ -10,7 +10,8 @@
  */
 class SampleOrderService {
     constructor() {
-        this.apiBase = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        this.apiBase = (typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) || '';
+        if (!this.apiBase) console.error('[sample-order-service] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
         this.emailServiceId = 'service_jgrave3';
         this.emailPublicKey = '4qSbDO-SQs19TbP80';
 

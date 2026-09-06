@@ -10,7 +10,8 @@
     'use strict';
 
     var API_BASE = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL)
-        || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        || '';
+    if (!API_BASE) console.error('[mockup-detail] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
 
     var IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'tiff'];
     var INKSOFT_API = 'https://inksoft-transform-8a3dc4e38097.herokuapp.com';

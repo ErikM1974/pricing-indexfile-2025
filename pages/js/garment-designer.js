@@ -5433,7 +5433,8 @@ function renderSeedBanner(seed) {
 // Per Never-Break Rule 6: take the proxy host from APP_CONFIG (config/app.config.js,
 // loaded in the page <head>); the literal is only a fallback if config is absent.
 const ART_PROXY_BASE = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL)
-  || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+  || '';
+if (!ART_PROXY_BASE) console.error('[garment-designer] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
 
 async function saveToArtRequest() {
   const seed = window.__artRequestSeed;

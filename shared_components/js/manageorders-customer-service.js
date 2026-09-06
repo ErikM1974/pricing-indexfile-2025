@@ -19,7 +19,8 @@
 
 class ManageOrdersCustomerService {
     constructor() {
-        this.baseURL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        this.baseURL = (typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) || '';
+        if (!this.baseURL) console.error('[manageorders-customer-service] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
         this.customers = [];
         this.cacheKey = 'manageorders_customers_cache';
         this.cacheDuration = 24 * 60 * 60 * 1000; // 1 day in milliseconds

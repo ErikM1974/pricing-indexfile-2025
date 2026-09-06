@@ -34,7 +34,8 @@
     // loaded just before this script). Literal fallback kept only so the page
     // still works if that config script ever fails to load.
     var API_BASE_URL = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL)
-        || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        || '';
+    if (!API_BASE_URL) console.error('[embroidery-contract] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
 
     /* ---------------------- Constants ---------------------- */
 

@@ -16,7 +16,8 @@
  * All pricing data fetched from Caspio via API
  */
 
-const API_BASE_URL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+const API_BASE_URL = (typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) || '';
+if (!API_BASE_URL) console.error('[embroidery-pricing-all] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
 
 // ============================================
 // PRICING DATA (loaded from API)

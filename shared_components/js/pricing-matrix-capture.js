@@ -13,7 +13,8 @@ console.log("[PRICING-MATRIX:LOAD] Pricing matrix capture system loaded (v4 Resi
     let captureCompleted = false; // Flag to prevent multiple captures/event dispatches
 // --- Configuration ---
     // Use the same base URL as other scripts for consistency
-    const API_BASE_URL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api';
+    const API_BASE_URL = ((typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) ? window.APP_CONFIG.API.BASE_URL + '/api' : '');
+    if (!API_BASE_URL) console.error('[pricing-matrix-capture] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
 
     // --- Helper Function to Save Matrix ---
     async function savePricingMatrixToServer(capturedData) {

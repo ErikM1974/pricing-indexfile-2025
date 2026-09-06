@@ -63,7 +63,8 @@ const SCREEN_SETUP_FEE_PER_SCREEN = 30; // $30 per screen — single source of t
 
 class ScreenPrintPricingService {
     constructor() {
-        this.baseURL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        this.baseURL = (typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) || '';
+        if (!this.baseURL) console.error('[screenprint-pricing-service] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
         this.cachePrefix = 'screenprintPricingData';
         this.cacheDuration = 5 * 60 * 1000; // 5 minutes
         spsLog('[ScreenPrintPricingService] Initialized');

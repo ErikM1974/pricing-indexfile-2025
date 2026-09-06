@@ -6,7 +6,8 @@
 
 class CapEmbroideryPricingService {
     constructor() {
-        this.baseURL = window.APP_CONFIG?.API?.BASE_URL || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        this.baseURL = window.APP_CONFIG?.API?.BASE_URL || '';
+        if (!this.baseURL) console.error('[cap-embroidery-pricing-service] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
         this.cachePrefix = 'capEmbroideryPricingData';
         this.cacheDuration = 5 * 60 * 1000; // 5 minutes
     }

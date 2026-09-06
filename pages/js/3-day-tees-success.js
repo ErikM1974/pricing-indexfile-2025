@@ -19,7 +19,8 @@
     'use strict';
 
     const API_BASE = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL)
-        || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        || '';
+    if (!API_BASE) console.error('[3-day-tees-success] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
     const EMAILJS_PUBLIC_KEY = '4qSbDO-SQs19TbP80';
     const EMAILJS_SERVICE = 'service_1c4k67j';
     const POLL_MS = 3000;

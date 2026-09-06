@@ -9,7 +9,8 @@
 
 // CLAUDE.md rule 6: the proxy host comes from config/app.config.js (loaded by the page); the
 // literal is the offline fallback only.
-const API_BASE_URL = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+const API_BASE_URL = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) || '';
+if (!API_BASE_URL) console.error('[embroidery-contract-pricing] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
 
 // Contract garments and caps bill a minimum of 8,000 stitches (Embroidery_Costs BaseStitchCount on
 // the CTR rows; the calculator clamps to it), so the printed list starts at 8K — rows below the

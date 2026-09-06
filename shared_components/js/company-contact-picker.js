@@ -104,7 +104,8 @@
         options = options || {};
         this.baseURL = options.baseURL
             || (global.APP_CONFIG && global.APP_CONFIG.API && global.APP_CONFIG.API.BASE_URL)
-            || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+            || '';
+        if (!this.baseURL) console.error('[company-contact-picker] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
         this.minSearchLength = options.minSearchLength || 3;
         this.debounceMs = options.debounceMs || 250;
         this.maxResults = options.maxResults || 25; // contacts per /search call

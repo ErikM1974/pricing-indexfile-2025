@@ -75,9 +75,11 @@
     // parameterized so EMB/DTF/SCP share ONE estimator.
     // ============================================================
     function _apiBase() {
-        return (_cfg && _cfg.apiBase)
+        const base = (_cfg && _cfg.apiBase)
             || (global.APP_CONFIG && global.APP_CONFIG.API && global.APP_CONFIG.API.BASE_URL)
-            || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+            || '';
+        if (!base) console.error('[quote-order-summary] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
+        return base;
     }
     function _hasEstimator() { return !!(_cfg && _cfg.estimateHooks); }
 

@@ -21,7 +21,8 @@
     'use strict';
 
     var API_BASE = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL)
-        || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        || '';
+    if (!API_BASE) console.error('[ae-dashboard-init] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
 
     // ── 1. Galleries + Ruth's form ──────────────────────────────────────
     if (typeof ArtAeGallery !== 'undefined') ArtAeGallery.init('art-ae-gallery');

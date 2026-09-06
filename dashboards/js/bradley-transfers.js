@@ -13,7 +13,8 @@
     // ── Config ───────────────────────────────────────────────────────
     // Rule 6: the proxy base comes from APP_CONFIG (config/app.config.js), never a hardcoded host.
     var API_BASE = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL)
-        || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        || '';
+    if (!API_BASE) console.error('[bradley-transfers] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
     var POLL_INTERVAL_MS = 60 * 1000;
     var AGE_WARN_HOURS = 24;      // yellow after 1 day
     var AGE_CRITICAL_HOURS = 72;  // red after 3 days

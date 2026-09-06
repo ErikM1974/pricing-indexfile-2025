@@ -13,7 +13,7 @@
 const Calc = require('../../shared_components/js/embroidery-quote-pricing.js');
 
 function makeCalc() {
-  const c = new Calc();
+  const c = new Calc({ skipInit: true }); // never hit the live proxy from a unit test (2026-09-06: the host fallback is gone, so a bare Calc() would fetch a relative URL)
   c.roundingMethod = 'CeilDollar';
   c.marginDenominator = 0.55;    // global garment fallback (tiersR[0] = 1-7)
   c.capMarginDenominator = 0.53; // global cap fallback (capTiersR[0] = 24-47)

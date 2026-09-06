@@ -27,7 +27,8 @@
     // is a codebase-wide change — define a shared APP_CONFIG and load it on every
     // calculator page — tracked separately.
     const API_BASE_URL = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL)
-        || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        || '';
+    if (!API_BASE_URL) console.error('[emblem-pricing-page] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
         // SAME-ORIGIN, deliberately (2026-07-29). This chat can reach a
     // lookup_customer tool that returns customer email, phone, address, sales
     // rep and payment terms, so it goes through the app's session-gated

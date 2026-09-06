@@ -16,7 +16,8 @@
     // ============================================================
     // CONFIG
     // ============================================================
-    const API_BASE = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+    const API_BASE = (typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) || '';
+    if (!API_BASE) console.error('[golf-tournament-showcase] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
     const STITCH_COUNT = 8000;
     const QTY_TIERS = [24, 48, 72, 144];
 

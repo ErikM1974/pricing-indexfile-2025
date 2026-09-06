@@ -6,13 +6,14 @@
 
     // Configuration - Updated to match your exact API base URL
     const config = {
-        apiBaseUrl: 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api',
+        apiBaseUrl: (typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) ? window.APP_CONFIG.API.BASE_URL + '/api' : '',
         ltmThreshold: 24,
         ltmFee: 50.00,
         sessionKey: 'nwca_quote_session',
         quoteKey: 'nwca_current_quote',
         brandColor: '#2e5827' // NWCA Green
     };
+    if (!config.apiBaseUrl) console.error('[dtg-quote-system] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
 
     // Quote Manager
     window.DTGQuoteManager = {
