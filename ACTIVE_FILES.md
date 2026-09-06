@@ -23,12 +23,9 @@
 | `brands-flyout.js` | Brands flyout/dropdown menu (header nav) — static featured tier (never renders empty) + type-to-filter over all catalog brands; featured tier + landing pages from `brands-registry.js` | index.html, multiple, brands-registry.js | Move to shared_components |
 | `shared_components/js/nav-dropdown.js` | CLICK-to-open disclosure for the Products/Brands mega dropdowns — toggles `.nav-open`, closes on outside-click/Escape/other-trigger, one open at a time, `aria-expanded`. Replaced hover-open (finicky on desktop, absent on touch); CSS has NO `:hover` open rule | index.html, pages/catalog.html; CSS `.nav-item.nav-open` in nwca-2026-core.css | ✅ Active (NEW 2026-07-13) |
 | `c112-bogo-promo.js` | BOGO promotion logic (swatches, BOGO math, PDF quote) | NONE — `admin/c112-bogo-promo.html` retired 2026-08-17 (Erik: promo no longer offered); page 410s via a tombstone in server.js. Was ALREADY broken: the page loaded it relatively so it 404'd in prod | 🚩 Dead — flagged for deletion |
-| `cart.js` | Legacy cart module — **NOT dead**: `shared_components/js/pricing-pages.js` `loadScript('/cart.js')` at runtime on `calculators/screen-print-pricing.html` (verified 2026-09-06; the 2026-06-11 "dead" flag was wrong — the reference is a runtime string, not a `<script>` tag) | pricing-pages.js → screen-print-pricing.html | ✅ Active (legacy) |
-| `cart-price-recalculator.js` | Price recalculation | NONE (cart.html retired 2026-06-11) | 🚩 Dead — flagged for deletion |
 | `catalog-search.js` | Catalog search | index.html | Move to shared_components |
 | `home-2026.js` | Homepage chrome glue (drawer close/Escape/scroll-lock, All-categories tile) — 2026 redesign | index.html | ✅ Active (NEW 2026-06-11) |
 | `dp5-helper.js` | Helper functions (root copy — see also `/shared_components/js/dp5-helper.js`) | Unknown | Verify if needed |
-| `order-form-pdf.js` | PDF generation | NONE (cart.html retired 2026-06-11) | 🚩 Dead — flagged for deletion |
 | `pricing-matrix-api.js` | Pricing API (root copy — see also `/shared_components/js/pricing-matrix-api.js`) | NONE (cart.html retired 2026-06-11; calculators use the shared_components copy) | 🚩 Dead — flagged for deletion |
 | `product-search-service.js` | Product search — `BRAND_KEYWORDS` now comes from `brands-registry.js` (was a hand-maintained local copy that drifted from the catalog's real brand spellings) | index.html, multiple, brands-registry.js | Move to shared_components |
 | `utils.js` | Utility functions | Multiple pages | Move to shared_components |
@@ -1074,7 +1071,7 @@
 | `/shared_components/js/pricing-calculator.js` | Generic pricing calculator helper | — | ✅ Active |
 | `/shared_components/js/pricing-matrix-api.js` | Pricing matrix API client (shared_components copy) | Caspio API | ✅ Active |
 | `/shared_components/js/pricing-matrix-capture.js` | Captures pricing matrix from hidden Caspio iframe | Caspio datapage | ✅ Active |
-| `/shared_components/js/pricing-pages.js` | Shared logic for pricing pages (legacy) | — | ✅ Active |
+| `/shared_components/js/pricing-pages.js` | Shared logic for the legacy calculator pages (product context → `productColorsReady`, tabs, image zoom, Caspio DP loading). **2026-09-06: the runtime script loader (`loadScript` chain for cart.js etc.) was REMOVED** — calculators load their own scripts. | calculators/screen-print-pricing.html, calculators/dtf-pricing.html | ✅ Active (legacy) |
 | `/shared_components/js/calculator-inventory.js` | Collapsible warehouse inventory grid (auto-attaches to color swatches) | /api/sanmar/inventory | ✅ Active |
 | `/shared_components/js/sku-validation-service.js` | SanMar→ShopWorks SKU validation + 2XL→`_2X` translation | — | ✅ Active |
 
@@ -1125,6 +1122,8 @@
 | `/product/components/inventory.js` | Product inventory display (per size/color) — used by pages/inventory-details.html | services/api.js | ✅ Active |
 | `/product/services/api.js` | Product API service (fetch product, inventory, pricing) — used by pages/inventory-details.html | Caspio API | ✅ Active |
 | `/product/styles/product.css` | Inventory-details page styles (linked by pages/inventory-details.html) | — | ✅ Active |
+
+> 🗑️ **2026-09-06 (Erik: "remove the legacy loader and cart.js too"):** `cart.js`, `order-form-pdf.js` (only ever loaded by that loader, and required `NWCACart`, which the loader itself force-skipped) and `cart-price-recalculator.js` (flagged dead since 2026-06-11, no consumer) deleted; the `loadScript` chain in `pricing-pages.js` removed. Lock: `tests/unit/pricing-pages-no-legacy-loader.test.js`.
 
 > 🗑️ **2026-09-06 deleted (Erik's call after the customer-facing sweep):** `pages/webstore-info.html` + `pages/css/webstore-info.css` + `pages/js/webstore-info.js` (every route 301s to `/company-webstores`; `chrome-drift.test.js` asserts nothing links it) and `product/js/decoration-selector.js` (orphan since 2026-06-11).
 

@@ -703,46 +703,10 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
         if (!container.querySelector('#matrix-note')) { const noteElement = document.createElement('div'); noteElement.id = 'matrix-note'; noteElement.style.display = 'none'; const caspioNote = container.querySelector('.cbResultSetInstructions, .cbResultSetMessage'); noteElement.innerHTML = caspioNote ? caspioNote.innerHTML : ''; container.appendChild(noteElement); }
     }
 
-    // --- Script Loading Helper ---
-
-    async function loadScript(src) {
-        return new Promise((resolve, reject) => {
-            let alreadyLoaded = false;
-            // Check based on known global objects/flags
-            if (src.includes('cart.js') && window.NWCACart) alreadyLoaded = true;
-            else if (src.includes('cart-integration.js') && window.cartIntegrationInitialized) alreadyLoaded = true;
-            else if (src.includes('pricing-matrix-capture.js') && window.PricingMatrixCapture) alreadyLoaded = true;
-            else if (src.includes('pricing-calculator.js') && window.NWCAPricingCalculator) alreadyLoaded = true;
-            // product-quantity-ui.js removed - file doesn't exist
-            else if (src.includes('add-to-cart.js') && window.addToCartInitialized) alreadyLoaded = true;
-            else if (src.includes('order-form-pdf.js') && window.NWCAOrderFormPDF) alreadyLoaded = true;
-
-            if (alreadyLoaded) {
-                console.log(`PricingPages: Script ${src} already loaded.`);
-                resolve(); return;
-            }
-
-            // Skip cart-related scripts
-            if (src.includes('cart.js') || src.includes('cart-integration.js')) {
-                console.log(`PricingPages: Skipping ${src} - cart functionality disabled`);
-                resolve();
-                return;
-            }
-
-            console.log(`PricingPages: Loading script ${src}...`);
-            const script = document.createElement('script');
-            script.src = src;
-            script.async = false; // Ensure sequential execution relative to other scripts added this way
-
-            script.onload = () => {
-                console.log(`PricingPages: Script ${src} loaded successfully.`);
-                resolve();
-            };
-            script.onerror = () => { console.error(`PricingPages: Error loading script ${src}.`); reject(new Error(`Failed to load script ${src}`)); };
-            document.body.appendChild(script); // Append to body to ensure execution order after HTML
-        });
-    }
-
+    // (2026-09-06) The legacy runtime script loader that lived here — cart.js / cart-integration.js /
+    // pricing-matrix-capture.js / pricing-calculator.js / add-to-cart.js / order-form-pdf.js — is gone.
+    // cart.js had been force-skipped ("cart functionality disabled") for months and three of the six
+    // files no longer existed; every calculator loads what it needs with its own <script> tags.
 
     // --- UI Update Functions (Consolidated) ---
 
@@ -1074,7 +1038,6 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
         // Detect modern calculator pages (DTF) that have their own script systems
         const currentPage = window.location.pathname.toLowerCase();
         const isDTF = currentPage.includes('dtf');
-        const isScreenPrint = currentPage.includes('screen-print');
 
         // Modern pages (DTF) skip legacy script loading - they have their own systems
         if (isDTF) {
@@ -1082,30 +1045,6 @@ console.log("PricingPages: Shared pricing page script loaded (v4).");
             // DTF pages only need product context initialization (already done above)
             // They handle their own calculator, adapter, and integration scripts
             return;
-        }
-
-        // Load dependent scripts sequentially for legacy pages
-        try {
-            await loadScript('/cart.js');
-            await loadScript('/cart-integration.js');
-
-            // Skip pricing-matrix-capture for screen print pages (they use master bundle)
-            if (!isScreenPrint) {
-                await loadScript('/pricing-matrix-capture.js');
-            } else {
-                console.log("PricingPages: Skipping pricing-matrix-capture.js for screen print page");
-            }
-
-            await loadScript('/pricing-calculator.js');
-            // product-quantity-ui.js removed - file doesn't exist and isn't needed
-            await loadScript('/add-to-cart.js');
-            await loadScript('/order-form-pdf.js'); // Load PDF script too
-            console.log("PricingPages: Core scripts loaded sequentially.");
-        } catch (error) {
-            console.error('PricingPages: Critical error loading core scripts:', error);
-            const body = document.querySelector('body');
-            if (body) body.insertAdjacentHTML('afterbegin', '<div style="background-color:red;color:white;padding:10px;text-align:center;font-weight:bold;">Error loading essential page components. Please refresh.</div>');
-            return; // Stop initialization if core scripts fail
         }
 
         // Setup UI elements
