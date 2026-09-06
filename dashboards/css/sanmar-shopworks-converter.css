@@ -74,3 +74,6 @@
     font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 0.82em; background: var(--surface-card); color: var(--gray-800);
     padding: 1px 5px; border-radius: var(--radius-sm); overflow-wrap: anywhere;
 }
+
+/* 2026-09-05 review */
+[hidden] { display: none !important; }

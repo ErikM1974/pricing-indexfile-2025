@@ -143,7 +143,7 @@
         if (!fill || !caption) return;
 
         if (p.percentOfLimit == null) {
-            fill.style.width = '0%';
+            fill.style.setProperty('--w', '0%');
             fill.className = 'au-meter-fill';
             caption.textContent = p.note || 'Not enough data to project a period total yet.';
             return;
@@ -152,7 +152,7 @@
         var pct = p.percentOfLimit;
         // Cap the visual at 110% so an extreme projection doesn't blow the layout;
         // the caption always states the true number.
-        fill.style.width = Math.min(pct, 110) + '%';
+        fill.style.setProperty('--w', Math.min(pct, 110) + '%');
         fill.className = 'au-meter-fill' +
             (pct >= 100 ? ' au-meter-fill--over' : pct >= 90 ? ' au-meter-fill--warn' : '');
 
@@ -186,7 +186,7 @@
             return '<div class="au-row' + hot + '">' +
                 '<span class="au-row-label" title="' + esc(label) + '">' + esc(label) + '</span>' +
                 '<span class="au-row-count">' + num(r.count) + ' <small>(' + share + '%)</small></span>' +
-                '<span class="au-row-share"><span style="width:' + Math.round((r.count / max) * 100) + '%"></span></span>' +
+                '<span class="au-row-share"><span style="--w:' + Math.round((r.count / max) * 100) + '%"></span></span>' +
             '</div>';
         }).join('') + '</div>';
     }
@@ -254,7 +254,7 @@
                     (stale ? ' au-bar--untrusted' : '');
                 var tip = esc(d) + ': ' + num(v) + ' calls' +
                     (stale ? ' — pre-repair meter, not comparable with Caspio' : '');
-                return '<div class="' + cls + '" style="height:' + h + '%" title="' + tip + '"></div>';
+                return '<div class="' + cls + '" style="--h:' + h + '%" title="' + tip + '"></div>';
             }).join('') + '</div>' +
             '<div class="au-trend-axis"><span>' + esc(days[0]) + '</span><span>' + esc(days[days.length - 1]) + '</span></div>';
     }
@@ -278,7 +278,7 @@
             if (el) { el.classList.remove('dash-loading'); el.innerHTML = '<p class="au-empty">Unavailable — see the error above.</p>'; }
         });
         var fill = document.getElementById('au-meter-fill');
-        if (fill) { fill.style.width = '0%'; fill.className = 'au-meter-fill'; }
+        if (fill) { fill.style.setProperty('--w', '0%'); fill.className = 'au-meter-fill'; }
         text('au-meter-caption', 'Unavailable.');
     }
 

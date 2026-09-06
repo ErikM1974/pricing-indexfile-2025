@@ -54,3 +54,6 @@ body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Ro
   .aa-header { flex-direction: column; }
   .aa-table-pages { display: block; overflow-x: auto; }
 }
+
+/* 2026-09-05 review */
+[hidden] { display: none !important; }

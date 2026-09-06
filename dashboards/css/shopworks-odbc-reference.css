@@ -105,3 +105,6 @@ mark.swo-hit { background: var(--state-warning-bg); color: var(--state-warning);
 .swo-foot { margin-top: var(--space-6); padding-top: var(--space-4); border-top: 1px solid var(--gray-200); color: var(--gray-500); font-size: 0.8rem; line-height: 1.6; }
 
 @media (max-width: 700px) { .swo-gaps td:first-child { white-space: normal; } }
+
+/* 2026-09-05 review */
+[hidden] { display: none !important; }

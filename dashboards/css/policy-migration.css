@@ -157,3 +157,6 @@
 @media (max-width: 640px) {
     .dash-card-header { flex-wrap: wrap; row-gap: 6px; }
 }
+
+/* 2026-09-05 review */
+[hidden] { display: none !important; }

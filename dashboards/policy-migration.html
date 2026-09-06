@@ -16,7 +16,7 @@
     <!-- 2026 design tokens (must load before dash-shell.css) -->
     <link rel="stylesheet" href="/shared_components/css/art-hub.css">
     <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
-    <link rel="stylesheet" href="/dashboards/css/policy-migration.css">
+    <link rel="stylesheet" href="/dashboards/css/policy-migration.css?v=2026.09.05.73">
 </head>
 <body>
     <div class="dash-shell">
@@ -30,11 +30,11 @@
             </div>
             <div class="dash-header-right">
                 <a href="/pages/policies-hub.html" class="dash-back-link">
-                    <i class="fas fa-book-open"></i>
+                    <i class="fas fa-book-open" aria-hidden="true"></i>
                     Policies Hub
                 </a>
                 <a href="/staff-dashboard.html" class="dash-back-link">
-                    <i class="fas fa-arrow-left"></i>
+                    <i class="fas fa-arrow-left" aria-hidden="true"></i>
                     Dashboard
                 </a>
             </div>
@@ -42,10 +42,10 @@
 
         <main class="dash-content">
             <div class="dash-error-banner" role="alert">
-                <i class="fas fa-exclamation-triangle"></i>
+                <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
                 <span class="dash-error-banner-message"></span>
-                <button class="dash-error-banner-close" aria-label="Dismiss">
-                    <i class="fas fa-times"></i>
+                <button type="button" class="dash-error-banner-close" aria-label="Dismiss">
+                    <i class="fas fa-times" aria-hidden="true"></i>
                 </button>
             </div>
 
@@ -74,7 +74,7 @@
 
             <div class="dash-card pm-questions" id="questions-card">
                 <div class="dash-card-header">
-                    <h2 class="dash-card-title"><i class="fas fa-circle-question"></i> Questions only Erik can answer</h2>
+                    <h2 class="dash-card-title"><i class="fas fa-circle-question" aria-hidden="true"></i> Questions only Erik can answer</h2>
                 </div>
                 <ul id="questions-list" class="pm-questions-list"></ul>
                 <p class="pm-hint">Answer any of these in a Claude session ("no more Jive", "MBF is dead") — each answer clears documents and fixes live policies automatically.</p>
@@ -82,14 +82,14 @@
 
             <div class="dash-card">
                 <div class="dash-card-header">
-                    <h2 class="dash-card-title"><i class="fas fa-rocket"></i> Shipped</h2>
+                    <h2 class="dash-card-title"><i class="fas fa-rocket" aria-hidden="true"></i> Shipped</h2>
                 </div>
                 <ul id="wave-log" class="pm-wave-log"></ul>
             </div>
 
             <div class="dash-card">
                 <div class="dash-card-header">
-                    <h2 class="dash-card-title"><i class="fas fa-list-check"></i> Document tracker</h2>
+                    <h2 class="dash-card-title"><i class="fas fa-list-check" aria-hidden="true"></i> Document tracker</h2>
                     <div class="pm-controls">
                         <input type="search" id="pm-search" placeholder="Search documents…" aria-label="Search documents">
                         <div class="pm-chiprow" id="tier-chips"></div>
@@ -109,6 +109,6 @@
     <script src="/config/app.config.js"></script>
     <script src="/shared_components/js/fetch-timeout.js"></script>
     <script src="/shared_components/js/dash-page-helpers.js"></script>
-    <script src="/dashboards/js/policy-migration.js"></script>
+    <script src="/dashboards/js/policy-migration.js?v=2026.09.05.73"></script>
 </body>
 </html>

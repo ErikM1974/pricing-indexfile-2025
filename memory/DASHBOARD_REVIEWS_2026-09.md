@@ -1144,3 +1144,26 @@ is what those left: icons, the shared Inbound Calendar modal they open, and the 
     contract-break-even, policy-migration, table-usage-audit, sanmar-ftp-integration, sanmar-shopworks-converter,
     the 4 API reference pages), then AE Mission Control, pricing-analysis (GENERATED — edit Python, not HTML)
     and price-audit-report.
+
+## 13 admin + reference pages — hygiene sweep, 9 items (2026-09-05, `v2026.09.05.72`)
+
+api-usage · access-admin · drive-access · bandit-integration · contract-break-even · policy-migration ·
+table-usage-audit · sanmar-ftp-integration · sanmar-shopworks-converter · caspio-api-reference ·
+manageorders-api-reference · sanmar-api-reference · shopworks-odbc-reference. All small, all already
+Rule-3 clean; the sweep is what the earlier passes left.
+1. ~90 bare icons `aria-hidden` across HTML + JS templates; every `title`-only button also named.
+2. Banner close `type=button` on the 4 pages that lacked it; `[hidden]` guard added to all 13 page CSS files.
+3. Every page asset now carries `?v=` (5 pages had unversioned CSS/JS links, incl. the converter's vendor
+   PapaParse/xlsx scripts) and all page-asset versions bumped so the guards ship.
+4. **api-usage**: meter fill / row share / trend bars via `--w`/`--h` custom properties (no `.style.width`,
+   no inline width/height).
+5. **table-usage-audit**: inline `style="color:…"` placeholder → `.tua-none`.
+6. **sanmar-shopworks-converter**: three `style="display:none"` nodes → `hidden` (+ `role=status`/`alert`);
+   the `show()` helper toggles `hidden`.
+7. **Retry instead of "please refresh"**: drive-access `fail()` appends a "Try again" button (+ `role=alert`);
+   policy-migration `boot()` renders Retry in the content root; ODBC reference renders Retry under the
+   catalog and its banner carries the reason.
+8. Lock: `tests/unit/admin-reference-pages.test.js` (13 parametrised page checks + specifics).
+9. Smoke on static-dist: api-usage meter `--w` computed width, bars `--h`; converter status/results
+   `display:none` via `hidden`; drive-access 404 → "Try again" + `role=alert`; policy-migration 404 → Retry;
+   ODBC reference schema (static JSON) renders with 0 bare icons; bandit page 0 bare icons.

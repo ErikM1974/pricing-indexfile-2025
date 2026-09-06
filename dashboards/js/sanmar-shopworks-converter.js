@@ -20,7 +20,7 @@
   var converted = null; // {rows, cols}
 
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
-  function show(node, on) { if (node) node.style.display = on ? '' : 'none'; }
+  function show(node, on) { if (node) node.hidden = !on; }
   function setStatus(html) { statusEl.innerHTML = html || ''; }
   function fail(msg) { show(statusEl, false); errEl.textContent = msg; show(errEl, true); btnConvert.disabled = false; }
 
@@ -37,7 +37,7 @@
     if (!fileInput.files.length) return;
     var file = fileInput.files[0];
     show(resultsEl, false); show(errEl, false);
-    setStatus('<i class="fas fa-rotate sw-spin"></i> Reading file…'); show(statusEl, true);
+    setStatus('<i class="fas fa-rotate sw-spin" aria-hidden="true"></i> Reading file…'); show(statusEl, true);
     btnConvert.disabled = true;
     var ext = (file.name.split('.').pop() || '').toLowerCase();
     try {
@@ -74,7 +74,7 @@
     var reader = new FileReader();
     reader.onload = function (ev) {
       try {
-        setStatus('<i class="fas fa-rotate sw-spin"></i> Parsing spreadsheet…');
+        setStatus('<i class="fas fa-rotate sw-spin" aria-hidden="true"></i> Parsing spreadsheet…');
         var wb = window.XLSX.read(new Uint8Array(ev.target.result), { type: 'array' });
         var ws = wb.Sheets[wb.SheetNames[0]];
         var rows = window.XLSX.utils.sheet_to_json(ws, { defval: '', raw: false });

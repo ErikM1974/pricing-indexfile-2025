@@ -31,7 +31,12 @@
 
   function fail(message) {
     status.className = 'da-status is-error';
-    status.textContent = message;
+    status.setAttribute('role', 'alert');
+    status.textContent = message + ' ';
+    const retry = document.createElement('button');
+    retry.type = 'button'; retry.className = 'da-retry'; retry.textContent = 'Try again';
+    retry.addEventListener('click', () => window.location.reload());
+    status.appendChild(retry);
     grid.innerHTML = '<div class="da-empty">No access data loaded.</div>';
     countEl.textContent = '';
   }
@@ -151,15 +156,15 @@
     try {
       r = await fetch('/api/staff/drive-access', { credentials: 'same-origin' });
     } catch (e) {
-      return fail('Could not reach the server to load the drive map. Check your connection and refresh. (' + e.message + ')');
+      return fail('Could not reach the server to load the drive map. Check your connection. (' + e.message + ')');
     }
     if (r.status === 401) return fail('Your session has expired. Please sign in again and reload this page.');
     if (r.status === 403) return fail('Your account does not have access to the drive map. Ask Erik if you need it.');
-    if (!r.ok) return fail('The drive map could not be loaded (HTTP ' + r.status + '). Nothing below is current — please refresh or tell Erik.');
+    if (!r.ok) return fail('The drive map could not be loaded (HTTP ' + r.status + '). Nothing below is current — try again or tell Erik.');
     try {
       snapshot = await r.json();
     } catch (e) {
-      return fail('The drive map came back unreadable. Please refresh, and tell Erik if it keeps happening.');
+      return fail('The drive map came back unreadable. Try again, and tell Erik if it keeps happening.');
     }
     if (!snapshot || !Array.isArray(snapshot.profiles) || !Array.isArray(snapshot.drives)) {
       return fail('The drive map came back in an unexpected shape. Nothing is being shown rather than showing a partial map.');

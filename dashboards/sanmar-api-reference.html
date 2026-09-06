@@ -14,7 +14,7 @@
 
     <link rel="stylesheet" href="/shared_components/css/art-hub.css">
     <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
-    <link rel="stylesheet" href="/dashboards/css/sanmar-api-reference.css?v=2026.07.10.1">
+    <link rel="stylesheet" href="/dashboards/css/sanmar-api-reference.css?v=2026.09.05.73">
 </head>
 <body>
     <div class="dash-shell">
@@ -27,8 +27,8 @@
                 <h1 class="dash-header-title">SanMar Web Services <span class="sm-subhead">SOAP API cheat sheet · guide v24.5</span></h1>
             </div>
             <div class="dash-header-right">
-                <span class="sm-lock" title="Admin only"><i class="fas fa-user-shield"></i> Admin</span>
-                <a href="/staff-dashboard.html" class="dash-back-link"><i class="fas fa-arrow-left"></i> Dashboard</a>
+                <span class="sm-lock" title="Admin only"><i class="fas fa-user-shield" aria-hidden="true"></i> Admin</span>
+                <a href="/staff-dashboard.html" class="dash-back-link"><i class="fas fa-arrow-left" aria-hidden="true"></i> Dashboard</a>
             </div>
         </header>
 
@@ -44,7 +44,7 @@
                     <span class="sm-chip sm-chip--muted">Canonical: <b>memory/SANMAR_API_REFERENCE.md</b> + <b>sanmar-api-guide-24.5-jul2026.pdf</b></span>
                 </div>
                 <div class="sm-callout sm-callout--danger">
-                    <h4><i class="fas fa-triangle-exclamation"></i> The gotchas that actually break integrations</h4>
+                    <h4><i class="fas fa-triangle-exclamation" aria-hidden="true"></i> The gotchas that actually break integrations</h4>
                     <ul>
                         <li><b>Color = <code>catalogColor</code> / mainframe code</b> ("BrillOrng"), never the display <code>COLOR_NAME</code> — for every SanMar API, inventory, and order call. (One exception: our proxy's <code>/api/inventory</code> product feed keys on COLOR_NAME.)</li>
                         <li><b>Inventory caps at 3000/warehouse</b> — a returned "3000" means <em>≥3000</em>, not an exact count (both inventory services).</li>
@@ -131,6 +131,6 @@
         </main>
     </div>
 
-    <script src="/dashboards/js/sanmar-api-reference.js?v=2026.07.10.1"></script>
+    <script src="/dashboards/js/sanmar-api-reference.js?v=2026.09.05.72"></script>
 </body>
 </html>
