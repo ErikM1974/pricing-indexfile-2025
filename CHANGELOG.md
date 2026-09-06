@@ -1,3 +1,8 @@
+## v2026.09.05.71 (2026.09.05)
+
+- Quote Management + Inbound Calendar + box labels + Purchasing Portal + Product Manager: 12 items — inbound modal without inline style/onerror (custom properties, capture listener), hidden attr + dialog + focus return; label template colours via --m; PM load Retry, named actions, form focus; icons decorative, titled buttons named, assets versioned
+- Deploy v2026.09.05.71: Quote Management + Inbound Calendar + box labels + Purchasing Portal + Product Manager (12 items)
+
 ## v2026.09.05.69 (2026.09.05)
 
 - Volume Quote + Blog Editor + SEO Strategy review: 12 items — Blog error banner was blank (wrong span class) + Dismiss, honest preview failure, list Retry, named toolbar/upload controls; VQ local valid-until default, named remove buttons; SEO TOC labelled + aria-current; icons decorative, assets versioned
