@@ -143,7 +143,7 @@ function showToast(message, type = 'info', duration = 3000) {
     };
     const icon = icons[type] || 'info-circle';
 
-    toast.innerHTML = `<i class="fas fa-${escapeHtml(icon)}"></i> ${escapeHtml(message)}`;
+    toast.innerHTML = `<i class="fas fa-${escapeHtml(icon)}" aria-hidden="true"></i> ${escapeHtml(message)}`;
     container.appendChild(toast);
 
     // Add 'show' class after brief delay for CSS transition (required by quote-builder-common.css)
@@ -597,10 +597,10 @@ function updateProductThumbnail(rowId, imageUrl, productName, styleNumber, color
         // Broken image → placeholder (was an inline onerror= handler; Rule 3).
         const thumbImg = thumbContainer.querySelector('img.product-thumbnail');
         if (thumbImg) thumbImg.addEventListener('error', () => {
-            thumbContainer.innerHTML = '<div class="thumb-placeholder"><i class="fas fa-image"></i></div>';
+            thumbContainer.innerHTML = '<div class="thumb-placeholder"><i class="fas fa-image" aria-hidden="true"></i></div>';
         }, { once: true });
     } else {
-        thumbContainer.innerHTML = '<div class="thumb-placeholder"><i class="fas fa-image"></i></div>';
+        thumbContainer.innerHTML = '<div class="thumb-placeholder"><i class="fas fa-image" aria-hidden="true"></i></div>';
     }
 }
 
@@ -746,7 +746,7 @@ function renderLtmControlPanel(containerId, options = {}) {
     container.innerHTML = `
         <div class="ltm-control-panel">
             <div class="ltm-control-header">
-                <i class="fas fa-exclamation-triangle"></i>
+                <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
                 <span>${escapeHtml(feeLabel)}</span>
             </div>
             <div class="ltm-control-body">
@@ -962,7 +962,7 @@ function assertQuoteEditable(session, opts = {}) {
                 if (notes.acceptedByName) acceptedOn += ' by ' + notes.acceptedByName;
             } catch (_) { }
             const rev = session.RevisionNumber != null ? ` (Rev ${session.RevisionNumber})` : '';
-            banner.innerHTML = '<i class="fas fa-file-signature"></i> ' +
+            banner.innerHTML = '<i class="fas fa-file-signature" aria-hidden="true"></i> ' +
                 '<strong>Customer accepted this quote' + escapeHtml(acceptedOn) + escapeHtml(rev) + '.</strong> ' +
                 'Saving creates a revision they have <u>not</u> re-approved — re-send for approval after any price change.';
         } catch (_) { /* banner is best-effort; never block the edit-load */ }
@@ -997,7 +997,7 @@ function updateEditModeUI(quoteId, revision) {
     }
     const saveBtn = document.querySelector('.btn-save-quote, [onclick*="saveAndGetLink"]');
     if (saveBtn) {
-        saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Revision';
+        saveBtn.innerHTML = '<i class="fas fa-save" aria-hidden="true"></i> Save Revision';
     }
     // Phase A lookup-first panel: an edit-load restores customer fields inside the
     // collapsed "Enter details manually" section — reveal them so nothing loads hidden.
@@ -1098,16 +1098,16 @@ function focusPushBlockerField(focusId) {
 function renderPushChecklist(el, blockers) {
     if (!el) return;
     const item = (b) => b.ok
-        ? `<div class="pr-item pr-ok"><i class="fas fa-check-circle"></i>${b.label}</div>`
+        ? `<div class="pr-item pr-ok"><i class="fas fa-check-circle" aria-hidden="true"></i>${b.label}</div>`
         : `<button type="button" class="pr-item pr-no" data-pr-focus="${escapeHtml(b.focusId)}"
              title="Click to jump to this field"
              style="background:none;border:none;font:inherit;color:inherit;cursor:pointer;width:100%;text-align:left;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:2px;">
-             <i class="fas fa-circle"></i>${b.label}</button>`;
+             <i class="fas fa-circle" aria-hidden="true"></i>${b.label}</button>`;
     // Logo TBD = NON-blocking warning (2026-07-07): quoting on an assumption is
     // fine, but nobody should start a production order on art we've never seen
     // without a deliberate look at this line first.
     const tbdWarn = (typeof window !== 'undefined' && window._logoStatus === 'tbd')
-        ? '<div class="pr-item pr-warn"><i class="fas fa-triangle-exclamation"></i> Artwork TBD — confirm the logo before pushing to production</div>'
+        ? '<div class="pr-item pr-warn"><i class="fas fa-triangle-exclamation" aria-hidden="true"></i> Artwork TBD — confirm the logo before pushing to production</div>'
         : '';
     // eslint-disable-next-line no-unsanitized/property -- audited (1.4): internal literal checklist labels only
     el.innerHTML = '<div class="pr-title">Before you push</div>' + blockers.map(item).join('') + tbdWarn;
@@ -1307,7 +1307,7 @@ function renderOrderShippingFields(containerId) {
         <div class="order-shipping-panel">
             <div class="charges-header" data-call="toggleOrderShippingPanel" data-args="${escapeHtml(JSON.stringify([containerId]))}">
                 <div class="d-flex align-items-center gap-2">
-                    <i class="fas fa-truck"></i>
+                    <i class="fas fa-truck" aria-hidden="true"></i>
                     <span>Order & Shipping</span>
                     <span class="order-shipping-badge charges-badge hidden">!</span>
                 </div>
@@ -1371,7 +1371,7 @@ function renderOrderShippingFields(containerId) {
                                    style="font-size: 12px; padding: 6px 8px;">
                         </div>
                         <button type="button" class="btn-tax-lookup" title="Look up tax rate">
-                            <i class="fas fa-search"></i>
+                            <i class="fas fa-search" aria-hidden="true"></i>
                         </button>
                     </div>
                     <div class="os-tax-status" style="font-size: 11px; color: #64748b; min-height: 14px;"></div>
@@ -1389,7 +1389,7 @@ function renderOrderShippingFields(containerId) {
                     </div>
                     <!-- Notes -->
                     <div class="customer-field" style="margin-top: 4px;">
-                        <label class="quote-label" style="font-size: 11px;"><i class="fas fa-sticky-note" style="color: #f9a825;"></i> Notes</label>
+                        <label class="quote-label" style="font-size: 11px;"><i class="fas fa-sticky-note" aria-hidden="true" style="color: #f9a825;"></i> Notes</label>
                         <textarea class="os-notes quote-input" aria-label="Order notes" placeholder="Special instructions, employee names, etc."
                                   style="font-size: 12px; padding: 6px 8px; min-height: 60px; resize: vertical; font-family: inherit;"></textarea>
                     </div>
@@ -1713,7 +1713,7 @@ function updateQuantityNudge(totalQty, method, savingsPerPiece = null, container
         // (EMB: caps + garments) — a bare "pieces" implied adding ANY product moves
         // the tier, which is false for mixed orders.
         const pieceWord = categoryLabel ? `${categoryLabel} piece` : 'piece';
-        let html = `<i class="fas fa-arrow-up" style="margin-right: 4px;"></i>Add <strong>${needed}</strong> more ${pieceWord}${needed === 1 ? '' : 's'} to reach <strong>${tierLabel}</strong> tier pricing`;
+        let html = `<i class="fas fa-arrow-up" aria-hidden="true" style="margin-right: 4px;"></i>Add <strong>${needed}</strong> more ${pieceWord}${needed === 1 ? '' : 's'} to reach <strong>${tierLabel}</strong> tier pricing`;
         if (savingsPerPiece && savingsPerPiece > 0.01) {
             html += ` — <strong style="color: #15803d;">save ~$${savingsPerPiece.toFixed(2)}/piece</strong>`;
         }
@@ -2312,9 +2312,9 @@ function initLogoStatusChips(cfg) {
         '<div class="lsc-row">' +
         '  <span class="lsc-label"><i class="fas fa-shapes" aria-hidden="true"></i> Logo</span>' +
         '  <div class="lsc-group" role="group" aria-label="Logo status">' +
-        '    <button type="button" class="lsc-chip" data-status="onfile" title="We already have this design — link it by design #"><i class="fas fa-folder-open"></i> On file</button>' +
-        '    <button type="button" class="lsc-chip" data-status="new" title="New logo — attach the customer&#39;s art file"><i class="fas fa-upload"></i> New — upload</button>' +
-        '    <button type="button" class="lsc-chip" data-status="tbd" title="Haven&#39;t seen the logo yet — quote on a stated assumption"><i class="fas fa-circle-question"></i> TBD — quote first</button>' +
+        '    <button type="button" class="lsc-chip" data-status="onfile" title="We already have this design — link it by design #"><i class="fas fa-folder-open" aria-hidden="true"></i> On file</button>' +
+        '    <button type="button" class="lsc-chip" data-status="new" title="New logo — attach the customer&#39;s art file"><i class="fas fa-upload" aria-hidden="true"></i> New — upload</button>' +
+        '    <button type="button" class="lsc-chip" data-status="tbd" title="Haven&#39;t seen the logo yet — quote on a stated assumption"><i class="fas fa-circle-question" aria-hidden="true"></i> TBD — quote first</button>' +
         '  </div>' +
         '</div>' +
         '<div class="lsc-assumption" id="logo-assumption-panel" style="display:none;"></div>';
@@ -2505,7 +2505,7 @@ function _renderRecentOrdersPanel(anchor, orders, cfg) {
     // eslint-disable-next-line no-unsanitized/property -- audited (1.4): recent-orders rows escapeHtml every ShopWorks value at build
     panel.innerHTML = '<div style="display:flex;align-items:center;margin-bottom:4px;">'
         + '<strong style="flex:1;font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:#64748b;">'
-        + '<i class="fas fa-history" style="margin-right:5px;"></i>Recent ShopWorks orders</strong>'
+        + '<i class="fas fa-history" aria-hidden="true" style="margin-right:5px;"></i>Recent ShopWorks orders</strong>'
         + '<button type="button" data-ro-dismiss="1" aria-label="Dismiss recent orders"'
         + ' style="background:none;border:none;color:#94a3b8;font-size:14px;cursor:pointer;line-height:1;padding:0 2px;">&times;</button>'
         + '</div>' + rows;
@@ -2707,6 +2707,70 @@ function qbInstallCallDelegator() {
         const thisObj = name.includes('.') ? name.split('.').slice(0, -1).reduce((o, k) => (o == null ? o : o[k]), window) : window;
         fn.apply(thisObj, args.map((a) => qbResolveArg(a, el, event)));
     });
+
+    /* 2026-09-06: change / input / blur / keydown delegation — replaces the builders' onchange= /
+       oninput= / onblur= / onkeydown= attributes (Rule 3), in the pages AND the row templates.
+         data-change="a,b"            → window.a(); window.b()   ("?name" = optional: skip silently when the
+                                        page doesn't define it — the old inline guard `if(window.x)x()`)
+         data-change-args='[…]'       → args for a single-call list ("$this"/"$event" tokens as above)
+         data-input / data-blur (focusout) / data-keydown  → same contract
+         data-keyclick="1"            → Enter/Space on a role=button element clicks it
+         data-enter="fn" (+ data-enter-args, data-enter-unless="prop") → fn on Enter only
+         <img data-onerror="hide|hide-parent">  → hides itself / its parent when the image fails */
+    function qbRunList(list, argsJson, el, event) {
+        let args = [];
+        if (argsJson) {
+            try { args = JSON.parse(argsJson); } catch (e) { console.error('[qb] bad args on', el, e); return; }
+        }
+        list.split(',').forEach((raw) => {
+            const optional = raw.startsWith('?');
+            const name = raw.replace(/^\?/, '').trim();
+            if (!name) return;
+            const fn = name.split('.').reduce((o, k) => (o == null ? o : o[k]), window);
+            if (typeof fn !== 'function') {
+                if (optional) return;
+                console.error('[qb] delegated target is not a function:', name);
+                if (typeof showToast === 'function') showToast(`That action isn't available (${name}) — refresh the page and try again.`, 'error', 6000);
+                return;
+            }
+            const thisObj = name.includes('.') ? name.split('.').slice(0, -1).reduce((o, k) => (o == null ? o : o[k]), window) : window;
+            fn.apply(thisObj, args.map((a) => qbResolveArg(a, el, event)));
+        });
+    }
+    document.addEventListener('change', (event) => {
+        const el = event.target.closest && event.target.closest('[data-change]');
+        if (el) qbRunList(el.dataset.change, el.dataset.changeArgs, el, event);
+    });
+    document.addEventListener('input', (event) => {
+        const el = event.target.closest && event.target.closest('[data-input]');
+        if (el) qbRunList(el.dataset.input, el.dataset.inputArgs, el, event);
+    });
+    document.addEventListener('focusout', (event) => {
+        const el = event.target.closest && event.target.closest('[data-blur]');
+        if (el) qbRunList(el.dataset.blur, el.dataset.blurArgs, el, event);
+    });
+    document.addEventListener('keydown', (event) => {
+        const t = event.target;
+        if (!t || !t.closest) return;
+        const kc = t.closest('[data-keyclick]');
+        if (kc && (event.key === 'Enter' || event.key === ' ')) { event.preventDefault(); kc.click(); return; }
+        const en = t.closest('[data-enter]');
+        if (en && event.key === 'Enter') {
+            const unless = en.dataset.enterUnless;
+            if (!unless || !en[unless]) qbRunList(en.dataset.enter, en.dataset.enterArgs, en, event);
+        }
+        const kd = t.closest('[data-keydown]');
+        if (kd) qbRunList(kd.dataset.keydown, kd.dataset.keydownArgs, kd, event);
+    });
+    document.addEventListener('error', (event) => {
+        const img = event.target;
+        if (!img || img.tagName !== 'IMG' || !img.dataset || !img.dataset.onerror) return;
+        const mode = img.dataset.onerror;
+        if (mode === 'hide') img.hidden = true;
+        else if (mode === 'hide-parent' && img.parentElement) img.parentElement.hidden = true;
+        else if (mode === 'no-image' && img.parentElement) { img.parentElement.classList.add('no-image'); img.hidden = true; }
+        else if (mode === 'placeholder-icon' && img.parentElement) img.parentElement.innerHTML = '<i class="fas fa-image" aria-hidden="true"></i>';
+    }, true);
 }
 if (typeof window !== 'undefined') {
     window.qbFocusMain = qbFocusMain;

@@ -42,16 +42,16 @@
         </div>
         <div class="header-actions">
             <button class="btn-header btn-new-quote" data-call="dtgConfirmNewQuote">
-                <i class="fas fa-plus"></i> New Quote
+                <i class="fas fa-plus" aria-hidden="true"></i> New Quote
             </button>
             <!-- Persistent Save so DTG matches EMB/DTF/SCP (Rule 8). Previously the ONLY
                  save control lived inside the hidden AI chat panel, so reps thought DTG
                  quotes couldn't be saved. Calls the same handleSaveQuote path. -->
             <button class="btn-header btn-save-quote" data-call="dtgSaveQuote">
-                <i class="fas fa-link"></i> Save &amp; Share Link
+                <i class="fas fa-link" aria-hidden="true"></i> Save &amp; Share Link
             </button>
             <button class="btn-header" data-href="/staff-dashboard.html">
-                <i class="fas fa-arrow-left"></i> Dashboard
+                <i class="fas fa-arrow-left" aria-hidden="true"></i> Dashboard
             </button>
         </div>
     </header>
@@ -62,7 +62,7 @@
         <!-- ========== LTM fee tip strip (Phase 11.7: title moved to power-header above) ========== -->
         <section class="page-titlebar" aria-label="Pricing tip">
             <div class="page-titlebar-fact" title="Orders below 24 use the 24-47 tier base price + a $50 LTM fee distributed per piece. Order 24+ and the fee disappears entirely.">
-                <i class="fas fa-cube"></i>
+                <i class="fas fa-cube" aria-hidden="true"></i>
                 <span>Order <strong>24+</strong> to skip the <strong>$50 LTM fee</strong></span>
             </div>
         </section>
@@ -83,7 +83,7 @@
                         <span class="dtg-catalog-section-meta">20 top-selling, DTG-tested garments — click any card to drop it into the order on the right</span>
                     </div>
                     <div class="dtg-catalog-eyebrow">
-                        <i class="fas fa-shield-check"></i> Tested on our Kornit Storm Hexa · Sales-proven · SanMar-stocked
+                        <i class="fas fa-shield-check" aria-hidden="true"></i> Tested on our Kornit Storm Hexa · Sales-proven · SanMar-stocked
                     </div>
                     <div class="dtg-catalog-toolbar">
                         <div class="dtg-catalog-tabs" id="dtgCatalogTabs">
@@ -91,7 +91,7 @@
                             <!-- categories injected dynamically -->
                         </div>
                         <div class="dtg-catalog-search-wrap">
-                            <i class="fas fa-search dtg-catalog-search-icon"></i>
+                            <i class="fas fa-search dtg-catalog-search-icon" aria-hidden="true"></i>
                             <input type="text" class="dtg-catalog-search" id="dtgCatalogSearch" aria-label="Catalog quick find"
                                 placeholder="Find a style — PC54, BELLA… or any SanMar style for full-catalog pricing" autocomplete="off">
                         </div>
@@ -100,7 +100,7 @@
                 <div class="dtg-catalog-grid" id="dtgCatalogGrid">
                     <!-- Cards injected by dtg-catalog.js -->
                     <div class="dtg-catalog-loading">
-                        <i class="fas fa-circle-notch fa-spin"></i> Loading catalog…
+                        <i class="fas fa-circle-notch fa-spin" aria-hidden="true"></i> Loading catalog…
                     </div>
                 </div>
                 <div class="dtg-catalog-foot">
@@ -119,7 +119,7 @@
         <div class="dtg-catalog-modal-backdrop" id="dtgCatalogModalBackdrop" hidden></div>
         <div class="dtg-catalog-modal" id="dtgCatalogModal" hidden role="dialog" aria-modal="true" aria-labelledby="dtgCatalogModalTitle">
             <button type="button" class="dtg-catalog-modal-close" id="dtgCatalogModalClose" aria-label="Close catalog modal">
-                <i class="fas fa-times"></i>
+                <i class="fas fa-times" aria-hidden="true"></i>
             </button>
             <div class="dtg-catalog-modal-body" id="dtgCatalogModalBody">
                 <!-- injected by dtg-catalog.js -->
@@ -130,8 +130,8 @@
         <section class="cta-compact">
             <div class="cta-text">Need to look up a price, customer, or color before placing an order? Open the floating chat — the research assistant knows our pricing inside out.</div>
             <div class="cta-links">
-                <a href="tel:253-922-5793"><i class="fas fa-phone"></i> (253) 922-5793</a>
-                <a href="mailto:sales@nwcustomapparel.com"><i class="fas fa-envelope"></i> sales@nwcustomapparel.com</a>
+                <a href="tel:253-922-5793"><i class="fas fa-phone" aria-hidden="true"></i> (253) 922-5793</a>
+                <a href="mailto:sales@nwcustomapparel.com"><i class="fas fa-envelope" aria-hidden="true"></i> sales@nwcustomapparel.com</a>
             </div>
         </section>
 
@@ -170,13 +170,13 @@
         <div class="ai-chat-messages" id="aiChatMessages" aria-live="polite"></div>
         <div class="ai-chat-actions" id="aiChatActions" hidden>
             <button type="button" class="ai-action-btn primary" id="aiOutlookBtn" disabled>
-                <i class="fas fa-envelope-open-text"></i> Open in Outlook
+                <i class="fas fa-envelope-open-text" aria-hidden="true"></i> Open in Outlook
             </button>
             <button type="button" class="ai-action-btn" id="aiCopyEmailBtn" disabled>
-                <i class="fas fa-copy"></i> Copy email
+                <i class="fas fa-copy" aria-hidden="true"></i> Copy email
             </button>
             <button type="button" class="ai-action-btn" id="aiSaveQuoteBtn" disabled>
-                <i class="fas fa-link"></i> Save &amp; share link
+                <i class="fas fa-link" aria-hidden="true"></i> Save &amp; share link
             </button>
         </div>
         <form class="ai-chat-input" id="aiChatForm">
@@ -192,7 +192,7 @@
 
     <!-- Share-link toast -->
     <div class="share-toast" id="shareToast" role="status" aria-live="polite">
-        <i class="fas fa-check-circle"></i>
+        <i class="fas fa-check-circle" aria-hidden="true"></i>
         <span id="shareToastText">Quote link copied — paste into your email or chat</span>
     </div>
 
@@ -211,13 +211,13 @@
     <!-- EmailJS for Email Quote button -->
     <script src="/shared_components/vendor/emailjs/email.min.js?v=2026.07.08.8"></script>
     <!-- Shared utilities: emailQuote, assertQuoteEditable, showToast (DTG inline form also uses its own toast — both coexist) -->
-    <script src="/shared_components/js/quote-builder-utils.js?v=2026.09.05.13"></script>
+    <script src="/shared_components/js/quote-builder-utils.js?v=2026.09.06.19"></script>
     <!-- Shared error surfaces bridge (1.15 parity for DTG) — must precede dtg-inline-form.js -->
     <!-- Normalises stored absolute proxy Box urls onto this origin so the session-gated
          forwarder authorises them (design thumbnails in the catalog search). Classic
          script on purpose — the bundle reads window.boxUrl at render time. -->
     <script src="/shared_components/js/box-url.js?v=2026.08.06.1"></script>
-    <script src="/shared_components/js/builders/dtg/index.js"></script>
+    <script src="/shared_components/js/builders/dtg/index.js?v=2026.09.06.18"></script>
     <!-- Invoice generator for Print Quote (PDF-quality invoice from current quote state) -->
     <script src="/shared_components/js/quote-pricing-data.js?v=2026.06.27.1"></script>
     <script src="/shared_components/js/embroidery-quote-invoice.js?v=2026.08.15.1"></script>

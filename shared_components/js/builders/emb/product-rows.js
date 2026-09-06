@@ -301,7 +301,7 @@ function showSearchSuggestions(products) {
         // eslint-disable-next-line no-unsanitized/property -- audited (1.4): only escapeHtml(q) interpolations (nested-ternary shape the rule cannot parse)
         suggestions.innerHTML = `
             <div class="suggestion-item"><span>No SanMar products found${q ? ` for "${escapeHtml(q)}"` : ''}</span></div>
-            ${q ? `<div class="suggestion-item suggestion-add-nonsanmar" data-call="addNonSanmarFromSearch" style="cursor:pointer; color:#16a34a; font-weight:600;"><span><i class="fas fa-plus-circle"></i> Enter "${escapeHtml(q)}" manually — type the cost we pay</span></div>` : ''}`;
+            ${q ? `<div class="suggestion-item suggestion-add-nonsanmar" data-call="addNonSanmarFromSearch" style="cursor:pointer; color:#16a34a; font-weight:600;"><span><i class="fas fa-plus-circle" aria-hidden="true"></i> Enter "${escapeHtml(q)}" manually — type the cost we pay</span></div>` : ''}`;
         suggestions.classList.add('show');
         return;
     }
@@ -392,8 +392,8 @@ export function addNewRow() {
             <input type="text" class="cell-input style-input"
                    placeholder="Style #"
                    data-field="style"
-                   onchange="onStyleChange(this, ${rowId})"
-                   onkeydown="handleCellKeydown(event, this)">
+                   data-change="onStyleChange" data-change-args='["$this", ${rowId}]'
+                   data-keydown="handleCellKeydown" data-keydown-args='["$event", "$this"]'>
         </td>
         <td class="thumbnail-col">
             <div class="product-thumbnail no-image qb-thumb-box" id="thumb-${rowId}"
@@ -406,27 +406,27 @@ export function addNewRow() {
                        data-field="description"
                        readonly>
                 <span class="cap-badge" id="cap-badge-${rowId}" style="display: none;">
-                    <i class="fas fa-hat-cowboy"></i> Cap
+                    <i class="fas fa-hat-cowboy" aria-hidden="true"></i> Cap
                 </span>
             </div>
             <div class="pricing-breakdown" id="breakdown-${rowId}"></div>
         </td>
         <td>
             <div class="color-picker-wrapper" data-row-id="${rowId}">
-                <div class="color-picker-selected disabled" data-call="toggleColorPicker" data-args="[${rowId}]" tabindex="0" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-label="Garment color" onkeydown="handleColorPickerKeydown(event, ${rowId})">
+                <div class="color-picker-selected disabled" data-call="toggleColorPicker" data-args="[${rowId}]" tabindex="0" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-label="Garment color" data-keydown="handleColorPickerKeydown" data-keydown-args='["$event", ${rowId}]'>
                     <span class="color-swatch empty"></span>
                     <span class="color-name placeholder">Select color...</span>
-                    <i class="fas fa-chevron-down picker-arrow"></i>
+                    <i class="fas fa-chevron-down picker-arrow" aria-hidden="true"></i>
                 </div>
                 <div class="color-picker-dropdown hidden" role="listbox" aria-label="Colors" id="color-dropdown-${rowId}"></div>
             </div>
         </td>
-        <td><input type="number" class="cell-input size-input" data-size="S" aria-label="Quantity S" min="0" max="9999" value="" placeholder="0" onchange="onSizeChange(${rowId})" onkeydown="handleCellKeydown(event, this)" disabled></td>
-        <td><input type="number" class="cell-input size-input" data-size="M" aria-label="Quantity M" min="0" max="9999" value="" placeholder="0" onchange="onSizeChange(${rowId})" onkeydown="handleCellKeydown(event, this)" disabled></td>
-        <td><input type="number" class="cell-input size-input" data-size="L" aria-label="Quantity L" min="0" max="9999" value="" placeholder="0" onchange="onSizeChange(${rowId})" onkeydown="handleCellKeydown(event, this)" disabled></td>
-        <td><input type="number" class="cell-input size-input" data-size="XL" aria-label="Quantity XL" min="0" max="9999" value="" placeholder="0" onchange="onSizeChange(${rowId})" onkeydown="handleCellKeydown(event, this)" disabled></td>
-        <td><input type="number" class="cell-input size-input" data-size="2XL" aria-label="Quantity 2XL" min="0" max="9999" value="" placeholder="0" onchange="onSizeChange(${rowId})" onkeydown="handleCellKeydown(event, this)" disabled></td>
-        <td><input type="text" class="cell-input size-input xxxl-picker-btn" data-size="3XL" aria-label="Quantity 3XL" value="" placeholder="+" readonly data-call="openExtendedSizePopup" data-args="[${rowId}]" onkeydown="if(event.key==='Enter'){openExtendedSizePopup(${rowId})}" disabled title="Click to add extended sizes (3XL, 4XL, 5XL, XS, etc.)"></td>
+        <td><input type="number" class="cell-input size-input" data-size="S" aria-label="Quantity S" min="0" max="9999" value="" placeholder="0" data-change="onSizeChange" data-change-args='[${rowId}]' data-keydown="handleCellKeydown" data-keydown-args='["$event", "$this"]' disabled></td>
+        <td><input type="number" class="cell-input size-input" data-size="M" aria-label="Quantity M" min="0" max="9999" value="" placeholder="0" data-change="onSizeChange" data-change-args='[${rowId}]' data-keydown="handleCellKeydown" data-keydown-args='["$event", "$this"]' disabled></td>
+        <td><input type="number" class="cell-input size-input" data-size="L" aria-label="Quantity L" min="0" max="9999" value="" placeholder="0" data-change="onSizeChange" data-change-args='[${rowId}]' data-keydown="handleCellKeydown" data-keydown-args='["$event", "$this"]' disabled></td>
+        <td><input type="number" class="cell-input size-input" data-size="XL" aria-label="Quantity XL" min="0" max="9999" value="" placeholder="0" data-change="onSizeChange" data-change-args='[${rowId}]' data-keydown="handleCellKeydown" data-keydown-args='["$event", "$this"]' disabled></td>
+        <td><input type="number" class="cell-input size-input" data-size="2XL" aria-label="Quantity 2XL" min="0" max="9999" value="" placeholder="0" data-change="onSizeChange" data-change-args='[${rowId}]' data-keydown="handleCellKeydown" data-keydown-args='["$event", "$this"]' disabled></td>
+        <td><input type="text" class="cell-input size-input xxxl-picker-btn" data-size="3XL" aria-label="Quantity 3XL" value="" placeholder="+" readonly data-call="openExtendedSizePopup" data-args="[${rowId}]" data-enter="openExtendedSizePopup" data-enter-args='[${rowId}]' disabled title="Click to add extended sizes (3XL, 4XL, 5XL, XS, etc.)"></td>
         <td class="cell-qty" id="row-qty-${rowId}">0</td>
         <td class="cell-price" id="row-price-${rowId}"
             ondblclick="enablePriceOverride(${rowId})"
@@ -434,10 +434,10 @@ export function addNewRow() {
         <td class="cell-total" id="row-total-${rowId}">-</td>
         <td class="cell-actions">
             <button class="btn-duplicate-row" data-call="duplicateRowNewColor" data-args="[${rowId}]" title="Add another color of this style" disabled>
-                <i class="fas fa-copy"></i>
+                <i class="fas fa-copy" aria-hidden="true"></i>
             </button>
             <button class="btn-delete-row" data-call="deleteRow" data-args="[${rowId}]" title="Delete row">
-                <i class="fas fa-times"></i>
+                <i class="fas fa-times" aria-hidden="true"></i>
             </button>
         </td>
     `;
@@ -573,20 +573,20 @@ export function createServiceProductRow(serviceType, data) {
     row.innerHTML = `
         <td>
             <span class="service-style-badge" style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; background: ${isCap ? '#dbeafe' : '#fef3c7'}; color: ${isCap ? '#1e40af' : '#92400e'}; border-radius: 4px; font-weight: 600; font-size: 12px;">
-                <i class="fas ${meta.icon}"></i>
+                <i class="fas ${meta.icon}" aria-hidden="true"></i>
                 ${serviceType}
             </span>
         </td>
         <td class="thumbnail-col">
             <div class="service-icon" style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; background: ${isCap ? '#eff6ff' : '#fffbeb'}; border-radius: 6px;">
-                <i class="fas ${meta.icon}" style="font-size: 20px; color: ${isCap ? '#3b82f6' : '#f59e0b'};"></i>
+                <i class="fas ${meta.icon}" aria-hidden="true" style="font-size: 20px; color: ${isCap ? '#3b82f6' : '#f59e0b'};"></i>
             </div>
         </td>
         <td class="desc-cell">
             <div class="desc-row">
                 <span class="service-description" style="font-size: 13px; color: #334155;">${escapeHtml(displayDescription)}</span>
-                ${isCap ? '<span class="cap-badge" style="display: inline-flex;"><i class="fas fa-hat-cowboy"></i> Cap</span>' : ''}
-                ${['DECG', 'DECC'].includes(serviceType) ? `<button type="button" class="btn-describe-cs" data-call="openCustomerSuppliedDialog" data-args="[${rowId}]" title="Describe the customer's goods"><i class="fas fa-pencil-alt"></i> Describe</button>` : ''}
+                ${isCap ? '<span class="cap-badge" style="display: inline-flex;"><i class="fas fa-hat-cowboy" aria-hidden="true"></i> Cap</span>' : ''}
+                ${['DECG', 'DECC'].includes(serviceType) ? `<button type="button" class="btn-describe-cs" data-call="openCustomerSuppliedDialog" data-args="[${rowId}]" title="Describe the customer's goods"><i class="fas fa-pencil-alt" aria-hidden="true"></i> Describe</button>` : ''}
             </div>
         </td>
         <td>
@@ -597,7 +597,7 @@ export function createServiceProductRow(serviceType, data) {
         </td>
         <td class="cell-qty">
             <input type="number" class="cell-input service-qty" min="0" max="9999" value="${quantity}"
-                   onchange="onServiceQtyChange(${rowId})" onkeydown="handleCellKeydown(event, this)"
+                   data-change="onServiceQtyChange" data-change-args='[${rowId}]' data-keydown="handleCellKeydown" data-keydown-args='["$event", "$this"]'
                    style="width: 60px; text-align: center;">
         </td>
         <td class="cell-price" id="row-price-${rowId}"
@@ -605,7 +605,7 @@ export function createServiceProductRow(serviceType, data) {
         <td class="cell-total" id="row-total-${rowId}">$${total.toFixed(2)}</td>
         <td class="cell-actions">
             <button class="btn-delete-row" data-call="deleteServiceRow" data-args="[${rowId}]" title="Delete service">
-                <i class="fas fa-times"></i>
+                <i class="fas fa-times" aria-hidden="true"></i>
             </button>
         </td>
     `;
@@ -892,7 +892,7 @@ export function openCustomerSuppliedDialog(rowId) {
     // Every interpolated value goes through escapeHtml (rep-typed free text).
     wrap.innerHTML =
         '<div class="mnd-card" role="dialog" aria-modal="true" aria-labelledby="csg-title">' +
-        '  <div id="csg-title" class="mnd-title"><i class="fas fa-box-open"></i> What is the customer bringing?</div>' +
+        '  <div id="csg-title" class="mnd-title"><i class="fas fa-box-open" aria-hidden="true"></i> What is the customer bringing?</div>' +
         '  <div class="mnd-hint">Shows on the quote and the work order, so production and Receiving know what to expect. All optional.</div>' +
         '  <input type="text" class="mnd-input csg-brand" maxlength="80" placeholder="Brand / style — e.g. Carhartt CTK87" value="' + escapeHtml(existing[0] || '') + '">' +
         '  <input type="text" class="mnd-input csg-color" maxlength="40" placeholder="Color — e.g. Navy" value="' + escapeHtml(existing[1] || '') + '">' +
@@ -938,7 +938,7 @@ export function openMonogramNamesDialog(row, serviceType) {
     wrap.className = 'monogram-names-dialog';
     wrap.innerHTML =
         '<div class="mnd-card" role="dialog" aria-modal="true" aria-labelledby="mnd-title">' +
-        '  <div id="mnd-title" class="mnd-title"><i class="fas fa-font"></i> ' + escapeHtml(serviceType) + ' — who gets one?</div>' +
+        '  <div id="mnd-title" class="mnd-title"><i class="fas fa-font" aria-hidden="true"></i> ' + escapeHtml(serviceType) + ' — who gets one?</div>' +
         '  <div class="mnd-hint">One name per line (add size/placement after a comma if needed, e.g. "Sarah M, L"). The line count becomes the quantity.</div>' +
         '  <textarea class="mnd-names" rows="6" placeholder="Sarah M&#10;John D, XL&#10;Riley P"></textarea>' +
         '  <div class="mnd-actions">' +
@@ -1148,7 +1148,7 @@ async function _handleStyleNotFound(row, rowId, descInput, styleNumber) {
         const manualBtn = document.createElement('button');
         manualBtn.className = 'btn-add-nonsanmar pulse';
         manualBtn.title = 'Enter this item manually — nothing is saved to the catalog';
-        manualBtn.innerHTML = '<i class="fas fa-pen-to-square"></i> Enter manually';
+        manualBtn.innerHTML = '<i class="fas fa-pen-to-square" aria-hidden="true"></i> Enter manually';
         manualBtn.onclick = () => openManualItemDialog(rowId);
         btnWrap.appendChild(manualBtn);
         descCell.appendChild(btnWrap);
@@ -1330,7 +1330,7 @@ export function openManualItemDialog(rowId) {
     // The only interpolated value is escapeHtml(style); everything else is static markup.
     wrap.innerHTML =
         '<div class="mnd-card" role="dialog" aria-modal="true" aria-labelledby="mi-title">' +
-        '  <div id="mi-title" class="mnd-title"><i class="fas fa-pen-to-square"></i> Enter this item manually</div>' +
+        '  <div id="mi-title" class="mnd-title"><i class="fas fa-pen-to-square" aria-hidden="true"></i> Enter this item manually</div>' +
         '  <div class="mnd-hint">We don\'t carry pricing for this style. Enter what we pay per blank and we price it exactly like a SanMar garment — margin, tier, embroidery and size upcharges all applied. Nothing is saved to the catalog.</div>' +
         '  <input type="text" class="mnd-input mi-style" maxlength="40" placeholder="Style" value="' + escapeHtml(style) + '">' +
         // Include the VENDOR in the description. It is the only thing that carries the
@@ -1579,11 +1579,11 @@ export function updateNonSanmarPriceCell(row, rowId) {
     const sellPrice = parseFloat(row.dataset.sellPrice) || 0;
     if (sellPrice > 0) {
         // eslint-disable-next-line no-unsanitized/property -- audited (1.4): numeric price + rowId only
-        priceCell.innerHTML = `<span class="ns-price-display" data-call="enablePriceOverride" data-args="[${rowId}]" title="Click to edit price">$${sellPrice.toFixed(2)} <i class="fas fa-pencil-alt"></i></span>`;
+        priceCell.innerHTML = `<span class="ns-price-display" data-call="enablePriceOverride" data-args="[${rowId}]" title="Click to edit price">$${sellPrice.toFixed(2)} <i class="fas fa-pencil-alt" aria-hidden="true"></i></span>`;
         priceCell.classList.remove('ns-price-zero');
     } else {
         // eslint-disable-next-line no-unsanitized/property -- audited (1.4): numeric price + rowId only
-        priceCell.innerHTML = `<span class="ns-price-display" data-call="enablePriceOverride" data-args="[${rowId}]" title="Click to set price">$0.00 &#9888; <i class="fas fa-pencil-alt"></i></span>`;
+        priceCell.innerHTML = `<span class="ns-price-display" data-call="enablePriceOverride" data-args="[${rowId}]" title="Click to set price">$0.00 &#9888; <i class="fas fa-pencil-alt" aria-hidden="true"></i></span>`;
         priceCell.classList.add('ns-price-zero');
         row.classList.add('price-warning');
     }
@@ -3199,10 +3199,10 @@ export function createChildRow(parentRowId, size, qty) {
         </td>
         <td>
             <div class="color-picker-wrapper child-color-picker" data-row-id="${childRowId}">
-                <div class="color-picker-selected" data-call="toggleColorPicker" data-args="[${childRowId}]" tabindex="0" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-label="Garment color" onkeydown="handleColorPickerKeydown(event, ${childRowId})">
+                <div class="color-picker-selected" data-call="toggleColorPicker" data-args="[${childRowId}]" tabindex="0" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-label="Garment color" data-keydown="handleColorPickerKeydown" data-keydown-args='["$event", ${childRowId}]'>
                     <span class="color-swatch" style="${currentSwatchStyle}"></span>
                     <span class="color-name">${escapeHtml(parentColor)}</span>
-                    <i class="fas fa-chevron-down picker-arrow"></i>
+                    <i class="fas fa-chevron-down picker-arrow" aria-hidden="true"></i>
                 </div>
                 <div class="color-picker-dropdown hidden" role="listbox" aria-label="Colors" id="color-dropdown-${childRowId}">
                     ${colorOptionsHtml}
@@ -3213,8 +3213,8 @@ export function createChildRow(parentRowId, size, qty) {
         <td><input type="number" class="cell-input size-input qb-bg-gray" data-size="M" aria-label="Quantity M" disabled value=""></td>
         <td><input type="number" class="cell-input size-input qb-bg-gray" data-size="L" aria-label="Quantity L" disabled value=""></td>
         <td><input type="number" class="cell-input size-input qb-bg-gray" data-size="XL" aria-label="Quantity XL" disabled value=""></td>
-        <td><input type="number" class="cell-input size-input" data-size="2XL" aria-label="Quantity 2XL" ${isSize05 ? '' : 'disabled'} value="${isSize05 ? qty : ''}" placeholder="${isSize05 ? qty : ''}" style="${isSize05 ? '' : 'background: #f5f5f5;'}" onchange="onChildSizeChange(${childRowId}, ${parentRowId}, '${size}')" onkeydown="handleCellKeydown(event, this)"></td>
-        <td><input type="number" class="cell-input size-input" data-size="${size}" aria-label="Quantity ${size}" ${isSize06 ? '' : 'disabled'} value="${isSize06 ? qty : ''}" placeholder="${isSize06 ? qty : ''}" style="${isSize06 ? '' : 'background: #f5f5f5;'}" onchange="onChildSizeChange(${childRowId}, ${parentRowId}, '${size}')" onkeydown="handleCellKeydown(event, this)"></td>
+        <td><input type="number" class="cell-input size-input" data-size="2XL" aria-label="Quantity 2XL" ${isSize05 ? '' : 'disabled'} value="${isSize05 ? qty : ''}" placeholder="${isSize05 ? qty : ''}" style="${isSize05 ? '' : 'background: #f5f5f5;'}" data-change="onChildSizeChange" data-change-args='[${childRowId}, ${parentRowId}, "${size}"]' data-keydown="handleCellKeydown" data-keydown-args='["$event", "$this"]'></td>
+        <td><input type="number" class="cell-input size-input" data-size="${size}" aria-label="Quantity ${size}" ${isSize06 ? '' : 'disabled'} value="${isSize06 ? qty : ''}" placeholder="${isSize06 ? qty : ''}" style="${isSize06 ? '' : 'background: #f5f5f5;'}" data-change="onChildSizeChange" data-change-args='[${childRowId}, ${parentRowId}, "${size}"]' data-keydown="handleCellKeydown" data-keydown-args='["$event", "$this"]'></td>
         <td class="cell-qty qty-display" id="row-qty-${childRowId}">${qty}</td>
         <td class="cell-price unit-price-display" id="row-price-${childRowId}"
             ondblclick="enablePriceOverride(${childRowId})"
@@ -3222,7 +3222,7 @@ export function createChildRow(parentRowId, size, qty) {
         <td class="cell-total" id="row-total-${childRowId}">-</td>
         <td class="cell-actions">
             <button class="btn-delete-row" data-call="clearExtendedSize" data-args="${escapeHtml(JSON.stringify([parentRowId, size]))}" title="Remove ${displaySize}">
-                <i class="fas fa-times"></i>
+                <i class="fas fa-times" aria-hidden="true"></i>
             </button>
         </td>
     `;

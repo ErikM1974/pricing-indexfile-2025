@@ -4,7 +4,7 @@
  */
 
 /* Logging gate (2026-09-06): dtg-page-setup chatter only on localhost or ?debug=1; console.error/warn stay live. */
-var DPS_LOG_ON = window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug');
+var DPS_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
 var dpsLog = DPS_LOG_ON ? console.log.bind(console) : function () {};
 (function() {
     "use strict";

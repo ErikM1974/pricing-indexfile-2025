@@ -5,7 +5,7 @@
  */
 
 /* Logging gate (2026-09-06): universal-header-component.js chatter only on localhost or ?debug=1; console.error/warn stay live. */
-var UHC_LOG_ON = window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug');
+var UHC_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
 var uhcLog = UHC_LOG_ON ? console.log.bind(console) : function () {};
 const UniversalHeaderComponent = {
     // Default configuration

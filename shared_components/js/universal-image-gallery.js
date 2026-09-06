@@ -5,7 +5,7 @@
  */
 
 /* Logging gate (2026-09-06): universal-image-gallery.js chatter only on localhost or ?debug=1; console.error/warn stay live. */
-var UIG_LOG_ON = window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug');
+var UIG_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
 var uigLog = UIG_LOG_ON ? console.log.bind(console) : function () {};
 (function() {
     'use strict';

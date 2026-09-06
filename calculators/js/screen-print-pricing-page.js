@@ -3,7 +3,7 @@
  * from the page's second inline <script> (Rule 3). Runs AFTER screenprint-pricing-v2.js. */
 /* Debug logging gate — this is a staff calculator; the chatter (37 + 30 console.log lines across the two
  * page scripts) only prints on localhost or with ?debug=1. console.error / console.warn stay live. */
-var SP_DEBUG = window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug');
+var SP_DEBUG = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
 var spLog = SP_DEBUG ? console.log.bind(console) : function () {};
 
 (function () {

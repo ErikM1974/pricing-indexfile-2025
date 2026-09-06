@@ -157,7 +157,7 @@ export const pricingMethods = {
                 if (ltmTableTotal) ltmTableTotal.textContent = `(included)`;
                 // Update fee label to clarify it's informational
                 const feeLabel = ltmTableRow.querySelector('.fee-label');
-                if (feeLabel) feeLabel.innerHTML = '<i class="fas fa-info-circle"></i> LTM Fee ($' + escapeHtml(effectiveLtmFee.toFixed(2)) + ' included in unit prices)';
+                if (feeLabel) feeLabel.innerHTML = '<i class="fas fa-info-circle" aria-hidden="true"></i> LTM Fee ($' + escapeHtml(effectiveLtmFee.toFixed(2)) + ' included in unit prices)';
             }
         } else {
             // builtin mode or LTM waived — hide fee row

@@ -431,7 +431,7 @@ export const outputMethods = {
         const toast = document.createElement('div');
         toast.className = `dtf-toast dtf-toast-${type}`;
         toast.innerHTML = `
-            <i class="fas ${escapeHtml(type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle')}"></i>
+            <i class="fas ${escapeHtml(type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle')}" aria-hidden="true"></i>
             <span>${escapeHtml(message)}</span>
         `;
 
@@ -552,7 +552,7 @@ export const outputMethods = {
             const copyBtn = document.getElementById('copy-quote-btn');
             if (copyBtn) {
                 const originalHTML = copyBtn.innerHTML;
-                copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                copyBtn.innerHTML = '<i class="fas fa-check" aria-hidden="true"></i> Copied!';
                 copyBtn.classList.add('success');
 
                 setTimeout(() => {

@@ -4,7 +4,7 @@
  */
 
 /* Logging gate (2026-09-06): pricing-pages chatter only on localhost or ?debug=1; console.error/warn stay live. */
-var PP_LOG_ON = window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug');
+var PP_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
 var ppLog = PP_LOG_ON ? console.log.bind(console) : function () {};
 ppLog("PricingPages: Shared pricing page script loaded (v4).");
 

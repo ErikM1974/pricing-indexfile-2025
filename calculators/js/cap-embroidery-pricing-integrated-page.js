@@ -1,7 +1,7 @@
 /* cap-embroidery-pricing-integrated-page.js — the page script for /calculators/cap-embroidery-pricing-integrated.html, extracted 2026-09-06 from its inline <script>
  * (Rule 3). Kept at global scope on purpose: it was global before, and the shared calculator scripts call some
  * of these functions by name. Logging is gated (localhost or ?debug=1); console.error/warn stay live. */
-var CAPEMB_LOG_ON = window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug');
+var CAPEMB_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
 var capembLog = CAPEMB_LOG_ON ? console.log.bind(console) : function () {};
 // Proxy host from /config/app.config.js (Rule 6) — never guess a backend.
 var CAPEMB_API_BASE = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) || '';

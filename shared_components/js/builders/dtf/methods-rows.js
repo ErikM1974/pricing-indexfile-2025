@@ -434,7 +434,7 @@ export const rowsMethods = {
         backdrop.classList.remove('hidden');
         body.innerHTML = `
             <div class="ext-popup-loading">
-                <i class="fas fa-spinner fa-spin"></i>
+                <i class="fas fa-spinner fa-spin" aria-hidden="true"></i>
                 Loading available sizes...
             </div>
         `;
@@ -473,7 +473,7 @@ export const rowsMethods = {
                 : 'Unable to load extended sizes. Please try again.';
             body.innerHTML = `
                 <div class="ext-popup-error" style="padding: 20px; text-align: center; color: #c00;">
-                    <i class="fas fa-exclamation-triangle"></i>
+                    <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
                     <p>${escapeHtml(message)}</p>
                 </div>
             `;
@@ -483,7 +483,7 @@ export const rowsMethods = {
         if (extendedSizes.length === 0) {
             body.innerHTML = `
                 <div class="ext-popup-empty" style="padding: 20px; text-align: center; color: #666;">
-                    <i class="fas fa-info-circle"></i>
+                    <i class="fas fa-info-circle" aria-hidden="true"></i>
                     <p>No extended sizes available for this product.</p>
                 </div>
             `;
@@ -521,7 +521,7 @@ export const rowsMethods = {
                 }).join('')}
             </div>
             <div class="ext-popup-note">
-                <i class="fas fa-info-circle"></i>
+                <i class="fas fa-info-circle" aria-hidden="true"></i>
                 ${extendedSizes.length > 5
                     ? 'Extended sizes available for this product. Garment size upcharges may apply.'
                     : 'Larger garment sizes carry a garment upcharge — the transfer price is the same for every size.'}

@@ -1337,3 +1337,21 @@ Lock: `tests/unit/calculator-hygiene.test.js` (parametrised over all 19 non-temp
 
 **Left alone** — inline `style="display:none"` + `.style.display` toggle PAIRS in compare/manual/safety/christmas (consistent; a per-page `hidden` migration); christmas-bundles' 45 cosmetic inline styles in its HTML; `calculators/archive/*`; `shared_components/js/dtg-config.js` orphan.
 
+---
+
+# QUOTE BUILDERS — review, 9 items (2026-09-06, `v2026.09.06.18`)
+
+Lock: `tests/unit/quote-builders-hygiene.test.js` (+ the existing `quote-builders-page`, `no-cdn-in-builders`, all `*-save-parity` / `quick-quote-parity` / `web-quote-cart-parity` suites green — NO pricing math touched, Rule 9). Synced across all four per Rule 8 by changing the SHARED delegator, not four copies.
+
+1. **The delegator in `quote-builder-utils.js` now covers change / input / blur / keydown / image-error** — `data-change="a,?b"` (comma list, `?` = optional, the old `if(window.x)x()` guard), `data-*-args` JSON with `$this`/`$event`, `data-keyclick` (Enter/Space clicks a role=button), `data-enter` (+`-args`, `-unless="prop"`), `<img data-onerror="hide|hide-parent|no-image|placeholder-icon">`. The 2026-09-05 review had only converted `onclick=`.
+2. **185 remaining inline handlers → attributes**: dtf 22, embroidery 38, screenprint 52 in the pages; dtf/emb/scp `product-rows` (19/21/19), emb `spr-modal` (10), emb `design-search` (2 escaped-quote `onerror`s) in the module templates. The parser converted every form mechanically (single/multi call, guarded, with args, Enter-only, Enter/Space-click, `!this._galleryMode`); zero left (`grep on\w+="` = 0).
+3. **Icons decorative**: pages 34 + 14 + 88 + 24 + 6 + 34; modules ~150 (incl. dynamic `fa-${…}`); utils 14.
+4. **Every builder asset versioned** (`tenant.js`, `fetch-timeout.js`, `product-category-filter.js`, `*-pricing-service.js`, `builders/*/index.js`, monogram's `quote-builder-common.css`).
+5. **screenprint-fast-quote** — 370-line inline `<style>` + 170-line inline `<script>` extracted; 4 `onclick` → `data-call`/`data-href` via `data-call-delegator.js`; EmailJS from the jsdelivr CDN → the vendored copy (the `no-cdn-in-builders` rule now holds for this page too).
+6. 🔑 **h1s NOT added**: an `sr-only` h1 on the four builders tripped the axe `heading-order` + `region` baselines (`tests/a11y/builders.a11y.test.js`), so the builders stay without an h1 by design; monogram + fast-quote already have one.
+7. 🔑 **Logging gates hardened repo-wide** (16 files from the calculator sweep): `window.location.hostname` at module top threw in `scp-dark-garment-parity.test.js`, which evals `screenprint-pricing-v2.js` without a window → `typeof window !== 'undefined' && !!window.location && (…)`.
+8. `utils` version bumped on every consumer page (builders + the other pages that load it).
+9. Verified: full unit suite 4,079 passed (the only other failure, `tests/integration/pricing-baselines`, is the live-API integration test); jsdom test exercises every new delegator path; live check after deploy below.
+
+**Left alone** — inline `style="display:none"` regions + their `.style.display` toggles in utils (61 sites, consistent pairs); ~150 cosmetic inline styles on the embroidery page (149) / screenprint (78) / dtf (50) — a classes migration is its own job; `confirm()` dialogs for destructive actions (deliberate).
+

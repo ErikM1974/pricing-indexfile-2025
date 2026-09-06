@@ -29,7 +29,7 @@ export async function dtfPushToShopWorks() {
     if (dtfState._dtfPushInFlight) return;
     dtfState._dtfPushInFlight = true;
     const label = document.getElementById('dtf-push-shopworks-label');
-    if (label) label.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Preparing preview…';
+    if (label) label.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Preparing preview…';
     try {
         // Do NOT disable the button — openDtfPushPreview() bails if the button is disabled.
         // Gate on THIS save's return value, not the persistent _dtfPushQuoteId (which
@@ -80,10 +80,10 @@ export async function openDtfPushPreview() {
 
     if (statusEl) statusEl.innerHTML = '';
     previewEl.innerHTML = '<div class="qb-loading-pad">' +
-        '<i class="fas fa-spinner fa-spin"></i> Loading preview…</div>';
+        '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Loading preview…</div>';
     confirmBtn.disabled = true;
     confirmBtn.style.opacity = '0.6';
-    confirmBtn.innerHTML = '<i class="fas fa-upload"></i> Push to ShopWorks';
+    confirmBtn.innerHTML = '<i class="fas fa-upload" aria-hidden="true"></i> Push to ShopWorks';
     modal.classList.add('show');
     if (typeof openAccessibleModal === 'function') openAccessibleModal(modal, { label: 'Push to ShopWorks preview', onEsc: closeDtfPushPreview }); // 1.8
 
@@ -97,7 +97,7 @@ export async function openDtfPushPreview() {
     } catch (err) {
         console.error('[DTF Push] Preview error:', err);
         previewEl.innerHTML = '<div class="qb-err-16">' +
-            '<i class="fas fa-exclamation-triangle"></i> Could not load preview: ' + _dtfEsc(err.message) +
+            '<i class="fas fa-exclamation-triangle" aria-hidden="true"></i> Could not load preview: ' + _dtfEsc(err.message) +
             '<br><span class="qb-muted">You can still push below.</span></div>';
         /** @type {HTMLInputElement} */ (confirmBtn).disabled = false;
         confirmBtn.style.opacity = '1';
@@ -144,7 +144,7 @@ export function renderDtfPushPreview(o) {
         'Order total (pre-tax): $' + preTax.toFixed(2) + '</div>';
     if (designs.length === 0) {
         html += '<div class="qb-warn-box--mt">' +
-            '<i class="fas fa-exclamation-triangle"></i> No design linked — a rep must assign the design in ShopWorks.</div>';
+            '<i class="fas fa-exclamation-triangle" aria-hidden="true"></i> No design linked — a rep must assign the design in ShopWorks.</div>';
     }
     // eslint-disable-next-line no-unsanitized/property -- audited (1.4): preview html built above with _dtfEsc on every dynamic value
     previewEl.innerHTML = html;
@@ -172,7 +172,7 @@ export async function confirmDtfPush(directFallback) {
     } else if (confirmBtn) {
         confirmBtn.disabled = true;
         confirmBtn.style.opacity = '0.6';
-        confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Pushing…';
+        confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Pushing…';
     }
 
     const notifyToast = (msg, type) => {
@@ -209,7 +209,7 @@ export async function confirmDtfPush(directFallback) {
     } catch (error) {
         console.error('[DTF Push] Push error:', error);
         if (statusEl) statusEl.innerHTML = '<div class="qb-err-8">Push failed: ' + _dtfEsc(error.message) + '</div>';
-        if (confirmBtn) { /** @type {HTMLInputElement} */ (confirmBtn).disabled = false; confirmBtn.style.opacity = '1'; confirmBtn.innerHTML = '<i class="fas fa-upload"></i> Push to ShopWorks'; }
+        if (confirmBtn) { /** @type {HTMLInputElement} */ (confirmBtn).disabled = false; confirmBtn.style.opacity = '1'; confirmBtn.innerHTML = '<i class="fas fa-upload" aria-hidden="true"></i> Push to ShopWorks'; }
         if (mainBtn) { /** @type {HTMLInputElement} */ (mainBtn).disabled = false; mainBtn.style.opacity = '1'; }
         if (mainLabel) mainLabel.textContent = 'Push to ShopWorks';
         notifyToast(`Push failed: ${error.message}`, 'error');

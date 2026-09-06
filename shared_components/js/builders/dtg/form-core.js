@@ -92,7 +92,7 @@ function renderArtFeeSection() {
     return `
             <section class="dtg-art-fees" id="dtgArtFees">
                 <div class="daf-label">
-                    <i class="fas fa-palette"></i> Art charges
+                    <i class="fas fa-palette" aria-hidden="true"></i> Art charges
                     <span class="daf-sub">from Caspio Service_Codes · taxable · pushes to ShopWorks</span>
                 </div>
                 <div class="daf-row">
@@ -141,7 +141,7 @@ export function render() {
             <div class="dtg-thumb-lightbox-backdrop" data-action="close"></div>
             <div class="dtg-thumb-lightbox-panel">
                 <button type="button" class="dtg-thumb-lightbox-close" data-action="close" aria-label="Close design preview">
-                    <i class="fas fa-times"></i>
+                    <i class="fas fa-times" aria-hidden="true"></i>
                 </button>
                 <div class="dtg-thumb-lightbox-title" id="dtgThumbLightboxTitle"></div>
                 <img id="dtgThumbLightboxImg" alt="" loading="lazy">
@@ -149,7 +149,7 @@ export function render() {
         </div>
         <div class="dtg-form-wrap">
             <header class="dtg-form-header">
-                <div class="dfh-title"><i class="fas fa-clipboard-list"></i> DTG order form</div>
+                <div class="dfh-title"><i class="fas fa-clipboard-list" aria-hidden="true"></i> DTG order form</div>
                 <div class="dfh-sub">
                     <strong>Every field is editable.</strong> After the AI fills it, you can swap colors, change sizes, add or remove rows, switch print location, or edit the customer/design # — then click Submit. Same canonical pricing as <a href="/pricing/dtg" class="dff-pricing-link">/pricing/dtg</a> and the order form.
                 </div>
@@ -159,7 +159,7 @@ export function render() {
             <div id="dtgResumeBannerMount"></div>
 
             <section class="dtg-form-section">
-                <div class="dfs-label"><i class="fas fa-print"></i> Print location (shared across all rows)</div>
+                <div class="dfs-label"><i class="fas fa-print" aria-hidden="true"></i> Print location (shared across all rows)</div>
                 <div class="dtg-location-row">
                     <div class="dlr-group">
                         <div class="dlr-group-label">FRONT (pick one)</div>
@@ -175,14 +175,14 @@ export function render() {
 
             <div class="dtg-form-body">
                 <div class="dtg-rows-pane">
-                    <div class="dfs-label" style="margin-bottom:8px;"><i class="fas fa-list"></i> Line items</div>
+                    <div class="dfs-label" style="margin-bottom:8px;"><i class="fas fa-list" aria-hidden="true"></i> Line items</div>
                     <!-- 2026-05-19: switched from <table> to card-per-line-item
                          so the form fits cleanly in the new sticky right column
                          of the two-column layout. Each card is self-contained:
                          style + color row at top, size grid wrapping below,
                          totals at the bottom. -->
                     <div class="dtg-rows-cards" id="dtgRowsCards"></div>
-                    <button type="button" class="dtg-add-row-btn" id="dtgAddRowBtn"><i class="fas fa-plus"></i> Add row</button>
+                    <button type="button" class="dtg-add-row-btn" id="dtgAddRowBtn"><i class="fas fa-plus" aria-hidden="true"></i> Add row</button>
 
                     ${renderArtFeeSection()}
                     <div id="dtgPriceSummary" class="dtg-price-summary"></div>
@@ -192,7 +192,7 @@ export function render() {
                 </div>
 
                 <aside class="dtg-customer-pane dcp-horizontal">
-                    <div class="dcp-label"><i class="fas fa-building"></i> Customer + push</div>
+                    <div class="dcp-label"><i class="fas fa-building" aria-hidden="true"></i> Customer + push</div>
                     <div class="dcp-search-label">Search customer</div>
                     <div class="dtg-combobox" id="dtgCompanyCombo">
                         <input type="text" id="dtgCompanyInput" autocomplete="off" placeholder="Company name or contact…">
@@ -220,10 +220,10 @@ export function render() {
                          to apply suggestions explicitly. -->
                     <div class="dcp-history-pill" id="dtgHistoryPill" hidden>
                         <div class="dhp-head" id="dtgHistoryPillHead">
-                            <i class="fas fa-clipboard-list"></i>
+                            <i class="fas fa-clipboard-list" aria-hidden="true"></i>
                             <span class="dhp-summary" id="dtgHistoryPillSummary">Loading customer history…</span>
                             <button type="button" class="dhp-toggle" id="dtgHistoryPillToggle" aria-label="Expand history" aria-expanded="false">
-                                <i class="fas fa-chevron-down"></i>
+                                <i class="fas fa-chevron-down" aria-hidden="true"></i>
                             </button>
                         </div>
                         <div class="dhp-body" id="dtgHistoryPillBody" hidden></div>
@@ -235,7 +235,7 @@ export function render() {
                          and Alexx Bacon). Hidden when no contacts exist. -->
                     <div class="dcp-contact-row" id="dtgContactRow" hidden>
                         <div class="dcp-field-label">
-                            <i class="fas fa-user"></i>
+                            <i class="fas fa-user" aria-hidden="true"></i>
                             Contact at this company
                             <span class="dcp-contact-count" id="dtgContactCount"></span>
                         </div>
@@ -286,7 +286,7 @@ export function render() {
                                     <a id="dtgDesignThumbAnchor" class="dtg-design-thumb-anchor" href="#" aria-label="Open design preview" hidden>
                                         <img id="dtgDesignThumbImg" alt="" loading="lazy">
                                         <span class="dtg-design-thumb-zoom" aria-hidden="true">
-                                            <i class="fas fa-search-plus"></i>
+                                            <i class="fas fa-search-plus" aria-hidden="true"></i>
                                         </span>
                                     </a>
                                 </div>
@@ -316,7 +316,7 @@ export function render() {
                              ============================================================ -->
                         <div class="dcp-newart" id="dtgNewArtworkBlock">
                             <div class="dcp-section-head">
-                                <i class="fas fa-paint-brush"></i> Or upload new artwork
+                                <i class="fas fa-paint-brush" aria-hidden="true"></i> Or upload new artwork
                                 <span class="dcp-newart-sub">No design # yet? Upload the file here.</span>
                             </div>
                             <div class="dcp-field-wrap">
@@ -331,7 +331,7 @@ export function render() {
                                 <div class="dcp-field-hint">Used to find this design later in ShopWorks's art library.</div>
                             </div>
                             <div class="dcp-newart-dropzone" id="dtgNewArtworkDropzone" tabindex="0" role="button" aria-label="Upload artwork file">
-                                <i class="fas fa-cloud-upload-alt"></i>
+                                <i class="fas fa-cloud-upload-alt" aria-hidden="true"></i>
                                 <div class="dcp-newart-dropzone-msg">
                                     <strong>Drop file here</strong> or <span class="dcp-newart-browse">click to browse</span>
                                 </div>
@@ -367,7 +367,7 @@ export function render() {
                              Rep can override either date. Drop dead optional. -->
                         <div class="dcp-dates">
                             <div class="dcp-section-head">
-                                <i class="fas fa-calendar-alt"></i> Schedule
+                                <i class="fas fa-calendar-alt" aria-hidden="true"></i> Schedule
                             </div>
                             <div class="dcp-row">
                                 <div>
@@ -409,7 +409,7 @@ export function render() {
                              allowed for drop-ships. -->
                         <div class="dcp-shipto" id="dtgShipToBlock"${isPickupMethod(state.shipping.method) ? ' hidden' : ''}>
                             <div class="dcp-shipto-head">
-                                <i class="fas fa-truck"></i> Ship to
+                                <i class="fas fa-truck" aria-hidden="true"></i> Ship to
                                 <span class="dcp-shipto-sub">Destination drives the tax rate</span>
                             </div>
                             <div class="dcp-field-wrap">
@@ -446,7 +446,7 @@ export function render() {
                                 <div class="dcp-shipfee-row">
                                     <span class="dcp-shipfee-prefix">$</span>
                                     <input type="number" id="dtgShipFee" step="0.01" min="0" inputmode="decimal" autocomplete="off" placeholder="0.00" value="${Number(state.shipping.fee) > 0 ? Number(state.shipping.fee).toFixed(2) : ''}">
-                                    <button type="button" id="dtgEstimateShipBtn" class="dcp-estimate-btn" data-call="estimateShipping"><i class="fas fa-truck-fast"></i> Estimate UPS Ground</button>
+                                    <button type="button" id="dtgEstimateShipBtn" class="dcp-estimate-btn" data-call="estimateShipping"><i class="fas fa-truck-fast" aria-hidden="true"></i> Estimate UPS Ground</button>
                                 </div>
                                 <div class="dcp-estimate-result" id="dtgEstimateShipResult"></div>
                             </div>
@@ -472,7 +472,7 @@ export function render() {
                     <div id="dtgPreflightPanel" class="dtg-preflight-panel"></div>
 
                     <button type="button" class="dtg-submit-btn" id="dtgSubmitBtn">
-                        <i class="fas fa-upload"></i> Push to ShopWorks
+                        <i class="fas fa-upload" aria-hidden="true"></i> Push to ShopWorks
                     </button>
                     <div id="dtgSubmitStatus" class="dtg-submit-status" hidden></div>
 
@@ -486,13 +486,13 @@ export function render() {
                              saves, second copies the share link. Manual quotes were previously
                              unsaveable (the chat-panel Save button is hidden without an AI quote). -->
                         <button type="button" class="dtg-secondary-btn" id="dtgSaveBtn" title="Save this quote &amp; get a shareable link">
-                            <i class="fas fa-floppy-disk"></i> Save &amp; Get Link
+                            <i class="fas fa-floppy-disk" aria-hidden="true"></i> Save &amp; Get Link
                         </button>
                         <button type="button" class="dtg-secondary-btn" id="dtgPrintBtn" title="Open printable PDF-quality invoice of this quote">
-                            <i class="fas fa-print"></i> Print Quote
+                            <i class="fas fa-print" aria-hidden="true"></i> Print Quote
                         </button>
                         <button type="button" class="dtg-secondary-btn" id="dtgEmailBtn" title="Email this quote link to the customer (save quote first)">
-                            <i class="fas fa-envelope"></i> Email Quote
+                            <i class="fas fa-envelope" aria-hidden="true"></i> Email Quote
                         </button>
                     </div>
                 </aside>
@@ -970,7 +970,7 @@ export function updateSubmitEnabled() {
         const quoteID = getQuoteID();
         const qidLabel = quoteID ? `<span class="dpp-qid">${escapeHtml(quoteID)}</span>` : '';
         const headerClass = ready ? 'dpp-header dpp-header--ready' : 'dpp-header dpp-header--blocked';
-        const headerIcon = ready ? '<i class="fas fa-check-circle"></i>' : '<i class="fas fa-exclamation-triangle"></i>';
+        const headerIcon = ready ? '<i class="fas fa-check-circle" aria-hidden="true"></i>' : '<i class="fas fa-exclamation-triangle" aria-hidden="true"></i>';
         const headerText = ready
             ? (warnings > 0
                 ? `Ready to push — ${warnings} thing${warnings === 1 ? '' : 's'} worth a glance`

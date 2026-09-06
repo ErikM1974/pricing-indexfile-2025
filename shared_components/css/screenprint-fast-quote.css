@@ -1,0 +1,375 @@
+/* screenprint-fast-quote.css — extracted 2026-09-06 from the inline <style> in quote-builders/screenprint-fast-quote.html (Rule 3). */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.container {
+    max-width: 600px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+/* Header */
+.header {
+    background: linear-gradient(135deg, #3a7c52 0%, #2d5f3f 100%);
+    color: white;
+    padding: 30px;
+    text-align: center;
+}
+
+.header h1 {
+    font-size: 28px;
+    margin-bottom: 10px;
+}
+
+.header p {
+    font-size: 16px;
+    opacity: 0.9;
+}
+
+/* Progress Indicator */
+.progress-bar {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px 30px;
+    background: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.progress-step {
+    flex: 1;
+    text-align: center;
+    position: relative;
+}
+
+.progress-step:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 15px;
+    right: -50%;
+    width: 100%;
+    height: 2px;
+    background: #dee2e6;
+    z-index: 0;
+}
+
+.progress-step.active:not(:last-child)::after {
+    background: #3a7c52;
+}
+
+.progress-circle {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #dee2e6;
+    color: #6c757d;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 14px;
+    position: relative;
+    z-index: 1;
+    transition: all 0.3s;
+}
+
+.progress-step.active .progress-circle {
+    background: #3a7c52;
+    color: white;
+    transform: scale(1.1);
+}
+
+.progress-step.completed .progress-circle {
+    background: #28a745;
+    color: white;
+}
+
+.progress-label {
+    display: block;
+    margin-top: 8px;
+    font-size: 12px;
+    color: #6c757d;
+}
+
+.progress-step.active .progress-label {
+    color: #3a7c52;
+    font-weight: 600;
+}
+
+/* Content Area */
+.content {
+    padding: 40px 30px;
+}
+
+.step {
+    display: none;
+}
+
+.step.active {
+    display: block;
+    animation: fadeIn 0.3s;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.step-title {
+    font-size: 24px;
+    color: #2d3748;
+    margin-bottom: 10px;
+}
+
+.step-subtitle {
+    font-size: 14px;
+    color: #718096;
+    margin-bottom: 30px;
+}
+
+/* Form Elements */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 8px;
+}
+
+.form-input,
+.form-select {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 15px;
+    transition: all 0.2s;
+}
+
+.form-input:focus,
+.form-select:focus {
+    outline: none;
+    border-color: #3a7c52;
+    box-shadow: 0 0 0 3px rgba(58, 124, 82, 0.1);
+}
+
+.form-textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 15px;
+    min-height: 100px;
+    resize: vertical;
+    font-family: inherit;
+}
+
+/* Option Cards */
+.option-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.option-card {
+    padding: 20px;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+}
+
+.option-card:hover {
+    border-color: #3a7c52;
+    background: #f0f9f4;
+    transform: translateY(-2px);
+}
+
+.option-card.selected {
+    border-color: #3a7c52;
+    background: linear-gradient(135deg, #e8f5e9 0%, #f1f8f4 100%);
+    box-shadow: 0 4px 12px rgba(58, 124, 82, 0.2);
+}
+
+.option-card-icon {
+    font-size: 32px;
+    margin-bottom: 10px;
+    color: #3a7c52;
+}
+
+.option-card-label {
+    font-size: 15px;
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.option-card-hint {
+    font-size: 12px;
+    color: #718096;
+    margin-top: 5px;
+}
+
+/* Buttons */
+.button-group {
+    display: flex;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.btn {
+    flex: 1;
+    padding: 14px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #3a7c52 0%, #2d5f3f 100%);
+    color: white;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(58, 124, 82, 0.3);
+}
+
+.btn-secondary {
+    background: #e2e8f0;
+    color: #4a5568;
+}
+
+.btn-secondary:hover {
+    background: #cbd5e0;
+}
+
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+/* Success Screen */
+.success-icon {
+    text-align: center;
+    font-size: 64px;
+    color: #28a745;
+    margin-bottom: 20px;
+}
+
+.success-message {
+    text-align: center;
+}
+
+.success-message h2 {
+    font-size: 28px;
+    color: #2d3748;
+    margin-bottom: 10px;
+}
+
+.success-message p {
+    font-size: 16px;
+    color: #718096;
+    line-height: 1.6;
+}
+
+.quote-id-display {
+    background: #f7fafc;
+    border: 2px solid #3a7c52;
+    border-radius: 12px;
+    padding: 20px;
+    margin: 30px 0;
+    text-align: center;
+}
+
+.quote-id-label {
+    font-size: 14px;
+    color: #718096;
+    margin-bottom: 5px;
+}
+
+.quote-id-value {
+    font-size: 32px;
+    font-weight: 700;
+    color: #3a7c52;
+}
+
+/* Estimate Display */
+.estimate-box {
+    background: linear-gradient(135deg, #e8f5e9 0%, #f1f8f4 100%);
+    border: 2px solid #3a7c52;
+    border-radius: 12px;
+    padding: 25px;
+    margin: 30px 0;
+}
+
+.estimate-label {
+    font-size: 14px;
+    color: #2d5f3f;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 10px;
+}
+
+.estimate-range {
+    font-size: 36px;
+    font-weight: 700;
+    color: #3a7c52;
+    margin-bottom: 10px;
+}
+
+.estimate-note {
+    font-size: 13px;
+    color: #4a5568;
+    line-height: 1.5;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+    .container {
+        border-radius: 0;
+    }
+
+    .content {
+        padding: 30px 20px;
+    }
+
+    .option-cards {
+        grid-template-columns: 1fr;
+    }
+
+    .button-group {
+        flex-direction: column;
+    }
+
+    .header h1 {
+        font-size: 24px;
+    }
+}
+
+/* 2026-09-06 review */
+[hidden] { display: none !important; }
+.fq-thanks-list { text-align: left; margin: 20px 0; padding-left: 40px; color: #4a5568; }
+.fq-mt-30 { margin-top: 30px; }

@@ -2,7 +2,7 @@
 
 // ── moved from inline <script> in calculators/christmas-bundles.html (Rule 3, 2026.09.05.11) ──
 /* Logging gate (2026-09-06): christmas-bundles chatter only on localhost or ?debug=1; console.error/warn stay live. */
-var CB_LOG_ON = window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug');
+var CB_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
 var cbLog = CB_LOG_ON ? console.log.bind(console) : function () {};
 // Proxy host from /config/app.config.js (Rule 6) — never guess a backend.
 var CB_API_BASE = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) || '';

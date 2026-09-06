@@ -131,7 +131,7 @@ function renderPriceErrorRetries() {
         const rid = /** @type {HTMLElement} */ (row).dataset.rowId;
         const cell = document.getElementById(`row-price-${rid}`);
         if (!cell || cell.querySelector('.btn-retry-pricing')) return;
-        cell.innerHTML = '<button type="button" class="btn-retry-pricing" data-call="retryRowPricing" title="Pricing failed to load — retry without refreshing the page"><i class="fas fa-rotate-right"></i> Retry</button>';
+        cell.innerHTML = '<button type="button" class="btn-retry-pricing" data-call="retryRowPricing" title="Pricing failed to load — retry without refreshing the page"><i class="fas fa-rotate-right" aria-hidden="true"></i> Retry</button>';
     });
 }
 
@@ -754,7 +754,7 @@ function paintRowPrices(pricing, logoConfigs, ltmDisplayMode) {
                             // Non-SanMar: pencil icon, no clear button (price override IS the price)
                             priceCell.classList.remove('price-overridden');
                             priceCell.classList.remove('ns-price-zero');
-                            priceCell.innerHTML = `<span class="ns-price-display" data-call="enablePriceOverride" data-args="[${escapeHtml(String(rowId))}]" title="Click to edit price">$${escapeHtml(displayPrice.toFixed(2))} <i class="fas fa-pencil-alt"></i></span>`;
+                            priceCell.innerHTML = `<span class="ns-price-display" data-call="enablePriceOverride" data-args="[${escapeHtml(String(rowId))}]" title="Click to edit price">$${escapeHtml(displayPrice.toFixed(2))} <i class="fas fa-pencil-alt" aria-hidden="true"></i></span>`;
                         } else if (hasOverride) {
                             priceCell.classList.add('price-overridden');
                             priceCell.innerHTML = `<span class="price-override-wrapper">$${escapeHtml(displayPrice.toFixed(2))}<button class="btn-clear-override" data-stop="1" data-call="clearPriceOverride" data-args="[${escapeHtml(String(rowId))}]" title="Clear override">&times;</button></span>`;
@@ -1315,9 +1315,9 @@ function paintFeeRows(pricing) {
             const setupLabel = setupFeeTableRow.querySelector('.fee-label');
             if (setupLabel) {
                 if (hasCapSetup && !hasGarmentSetup && isCapLaserPatch) {
-                    setupLabel.innerHTML = '<i class="fas fa-cog"></i> GRT-50 : Laser Patch Setup';
+                    setupLabel.innerHTML = '<i class="fas fa-cog" aria-hidden="true"></i> GRT-50 : Laser Patch Setup';
                 } else {
-                    setupLabel.innerHTML = '<i class="fas fa-cog"></i> Digitizing/Setup Fee';
+                    setupLabel.innerHTML = '<i class="fas fa-cog" aria-hidden="true"></i> Digitizing/Setup Fee';
                 }
             }
             if (setupFeeUnit) setupFeeUnit.textContent = `$${pricing.setupFees.toFixed(2)}`;
@@ -1412,7 +1412,7 @@ function paintAlAndCapEmbRows(pricing) {
         // eslint-disable-next-line no-unsanitized/property -- audited (1.4): AL sync rows — internal labels + numeric qty/fees only
         alContainer.innerHTML = `
             <div class="pricing-row al-pricing-row">
-                <span class="label"><i class="fas fa-tshirt qb-fs10-mr3"></i> AL:</span>
+                <span class="label"><i class="fas fa-tshirt qb-fs10-mr3" aria-hidden="true"></i> AL:</span>
                 <span class="value">$${garmentALTotal.toFixed(2)}</span>
             </div>
             <div class="pricing-row sub-breakdown">
@@ -1431,7 +1431,7 @@ function paintAlAndCapEmbRows(pricing) {
         // eslint-disable-next-line no-unsanitized/property -- audited (1.4): AL sync rows — internal labels + numeric qty/fees only
         capAlContainer.innerHTML = `
             <div class="pricing-row al-pricing-row cap-al">
-                <span class="label"><i class="fas fa-hat-cowboy qb-fs10-mr3"></i> AL-Cap:</span>
+                <span class="label"><i class="fas fa-hat-cowboy qb-fs10-mr3" aria-hidden="true"></i> AL-Cap:</span>
                 <span class="value">$${capALTotal.toFixed(2)}</span>
             </div>
             <div class="pricing-row sub-breakdown">
@@ -1580,11 +1580,11 @@ function showTaxStatus(message, type) {
     };
 
     const icons = {
-        success: '<i class="fas fa-check-circle"></i> ',
-        warning: '<i class="fas fa-exclamation-triangle"></i> ',
-        error: '<i class="fas fa-times-circle"></i> ',
-        loading: '<i class="fas fa-spinner fa-spin"></i> ',
-        info: '<i class="fas fa-info-circle"></i> '
+        success: '<i class="fas fa-check-circle" aria-hidden="true"></i> ',
+        warning: '<i class="fas fa-exclamation-triangle" aria-hidden="true"></i> ',
+        error: '<i class="fas fa-times-circle" aria-hidden="true"></i> ',
+        loading: '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> ',
+        info: '<i class="fas fa-info-circle" aria-hidden="true"></i> '
     };
 
     el.style.color = colors[type] || '#64748b';

@@ -370,7 +370,7 @@ export const lifecycleMethods = {
         // Update save button text
         const saveBtn = document.querySelector('.btn-save-quote, [onclick*="saveAndGetLink"]');
         if (saveBtn) {
-            saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Revision';
+            saveBtn.innerHTML = '<i class="fas fa-save" aria-hidden="true"></i> Save Revision';
         }
     },
 
@@ -1169,7 +1169,7 @@ export const lifecycleMethods = {
         const saveBtn = /** @type {HTMLInputElement|null} */ (document.querySelector('.btn-save-quote, [onclick*="saveAndGetLink"]'));
         const originalText = saveBtn?.innerHTML;
         if (saveBtn) {
-            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Saving...';
             saveBtn.disabled = true;
         }
 
@@ -1441,7 +1441,7 @@ export const lifecycleMethods = {
         const headerSubtitleReset = document.querySelector('.power-header .power-header-subtitle');
         if (headerSubtitleReset) headerSubtitleReset.textContent = 'Direct-to-Film Transfers';
         const saveBtnReset = document.querySelector('.btn-save-quote, [onclick*="saveAndGetLink"]');
-        if (saveBtnReset) saveBtnReset.innerHTML = '<i class="fas fa-link"></i> Save & Get Shareable Link';
+        if (saveBtnReset) saveBtnReset.innerHTML = '<i class="fas fa-link" aria-hidden="true"></i> Save & Get Shareable Link';
         if (window.location.search.includes('edit=') || window.location.search.includes('duplicate=')) {
             try { history.replaceState(null, '', window.location.pathname); } catch (_) {}
         }
