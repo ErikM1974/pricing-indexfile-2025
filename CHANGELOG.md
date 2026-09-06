@@ -1,3 +1,8 @@
+## v2026.09.05.69 (2026.09.05)
+
+- Volume Quote + Blog Editor + SEO Strategy review: 12 items — Blog error banner was blank (wrong span class) + Dismiss, honest preview failure, list Retry, named toolbar/upload controls; VQ local valid-until default, named remove buttons; SEO TOC labelled + aria-current; icons decorative, assets versioned
+- Deploy v2026.09.05.69: Volume Quote + Blog Editor + SEO Strategy review (12 items)
+
 ## v2026.09.05.67 (2026.09.05)
 
 - Jim's Mailing List + Commission Structure review: 11 items — [hidden] guard (empty screenshot placeholder showed on every load), aria-pressed views/chips, Try again on load failure, keyboard screenshot label; 22 inline styles to CSS, accordion buttons with aria-expanded, decorative icons, versioned assets
