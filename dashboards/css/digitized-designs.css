@@ -682,3 +682,17 @@ body {
     .al-tables { flex-direction: column; }
     .al-modal-content { padding: 20px; }
 }
+
+/* 2026-09-05 review */
+[hidden] { display: none !important; }
+.img-btn { background: none; border: 0; padding: 0; margin: 0; cursor: pointer; display: inline-block; max-width: 100%; line-height: 0; border-radius: 8px; }
+.img-btn:focus-visible { outline: 2px solid #4cb354; outline-offset: 3px; }
+.image-modal-close { position: fixed; top: 16px; right: 20px; width: 40px; height: 40px; border: 0; border-radius: 50%; background: rgba(255,255,255,0.9); color: #111; font-size: 26px; line-height: 1; cursor: pointer; }
+.image-modal-close:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+.al-source-note { margin: -4px 0 10px; font-size: 12.5px; color: #6b7280; }
+.al-source-note--warn { color: #b45309; font-weight: 600; }
+.design-from-file { font-size: 11px; font-weight: 500; color: #b45309; }
+.no-design-num { font-size: 13px; font-weight: 500; color: #b91c1c; }
+.al-pricing-btn:focus-visible, .card-details-toggle:focus-visible, .al-modal-close:focus-visible, .mockup-link:focus-visible, .back-link:focus-visible { outline: 2px solid #4cb354; outline-offset: 2px; }
+.caspio-fail { margin: 24px; padding: 16px; border: 1px solid #fca5a5; background: #fef2f2; color: #991b1b; border-radius: 8px; font-size: 14px; }
+.caspio-fail-retry { margin-left: 8px; padding: 6px 12px; border: 1px solid #991b1b; border-radius: 6px; background: #fff; color: #991b1b; cursor: pointer; font: inherit; }

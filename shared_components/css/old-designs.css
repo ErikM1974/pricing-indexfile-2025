@@ -704,3 +704,15 @@ body {
     .sticky-content { padding: 8px 12px; }
     .sticky-chip { font-size: 12px; padding: 2px 8px; }
 }
+
+/* 2026-09-05 review */
+[hidden] { display: none !important; }
+.sr-copy { position: fixed; opacity: 0; left: -9999px; }
+.caspio-container [data-cb-name="data-row"]:focus-within .card-actions { opacity: 1; }
+.caspio-container [data-cb-name="data-row"] img[role="button"] { cursor: zoom-in; }
+.caspio-container [data-cb-name="data-row"] img[role="button"]:focus-visible { outline: 2px solid #d97706; outline-offset: 3px; }
+.card-action-btn:focus-visible, .modal-nav:focus-visible, .sticky-edit-btn:focus-visible { outline: 2px solid #d97706; outline-offset: 2px; }
+.image-modal-close { position: fixed; top: 16px; right: 20px; width: 40px; height: 40px; border: 0; border-radius: 50%; background: rgba(255,255,255,0.9); color: #111; font-size: 26px; line-height: 1; cursor: pointer; }
+.image-modal-close:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+.caspio-fail { margin: 24px; padding: 16px; border: 1px solid #fca5a5; background: #fef2f2; color: #991b1b; border-radius: 8px; font-size: 14px; }
+.caspio-fail-retry { margin-left: 8px; padding: 6px 12px; border: 1px solid #991b1b; border-radius: 6px; background: #fff; color: #991b1b; cursor: pointer; font: inherit; }

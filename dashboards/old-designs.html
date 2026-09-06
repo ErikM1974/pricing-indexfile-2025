@@ -6,7 +6,7 @@
     <meta name="robots" content="noindex, nofollow">
     <title>Old Designs Archive - Northwest Custom Apparel</title>
     <link rel="icon" href="/favicon.png" type="image/png">
-    <link rel="stylesheet" href="/shared_components/css/old-designs.css">
+    <link rel="stylesheet" href="/shared_components/css/old-designs.css?v=2026.09.05.58">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
@@ -23,17 +23,18 @@
         </div>
     </div>
 
-    <div class="image-modal-overlay" id="image-modal">
-        <button class="modal-nav modal-prev" aria-label="Previous image"><i class="fa-solid fa-chevron-left"></i></button>
+    <div class="image-modal-overlay" id="image-modal" role="dialog" aria-modal="true" aria-label="Design preview, full size" tabindex="-1">
+        <button type="button" class="modal-nav modal-prev" aria-label="Previous image"><i class="fa-solid fa-chevron-left" aria-hidden="true"></i></button>
         <img alt="Design preview">
-        <button class="modal-nav modal-next" aria-label="Next image"><i class="fa-solid fa-chevron-right"></i></button>
-        <span class="modal-counter"></span>
+        <button type="button" class="modal-nav modal-next" aria-label="Next image"><i class="fa-solid fa-chevron-right" aria-hidden="true"></i></button>
+        <span class="modal-counter" role="status"></span>
+        <button type="button" class="image-modal-close" id="image-modal-close" aria-label="Close preview">&times;</button>
     </div>
 
     <div class="sticky-search-bar" id="sticky-search-bar"></div>
-    <div id="toast-container"></div>
+    <div id="toast-container" role="status" aria-live="polite"></div>
 
     <script src="/shared_components/js/data-call-delegator.js"></script>
-    <script src="/shared_components/js/old-designs.js"></script>
+    <script src="/shared_components/js/old-designs.js?v=2026.09.05.58"></script>
 </body>
 </html>

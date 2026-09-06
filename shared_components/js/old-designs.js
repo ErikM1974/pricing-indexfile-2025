@@ -15,6 +15,7 @@
     function showToast(message, type) {
         var toast = document.createElement('div');
         toast.className = 'toast toast-' + (type || 'success');
+        toast.setAttribute('role', type === 'error' ? 'alert' : 'status');
         toast.textContent = message;
         toastContainer.appendChild(toast);
         requestAnimationFrame(function() { toast.classList.add('show'); });
@@ -50,8 +51,8 @@
     function fallbackCopy(text, designNum) {
         var ta = document.createElement('textarea');
         ta.value = text;
-        ta.style.position = 'fixed';
-        ta.style.opacity = '0';
+        ta.className = 'sr-copy';
+        ta.setAttribute('aria-hidden', 'true');
         document.body.appendChild(ta);
         ta.select();
         try {
@@ -91,33 +92,31 @@
         cards.forEach(function(card) {
             var imgs = card.querySelectorAll('img');
             imgs.forEach(function(img) {
-                if (img.src && img.src !== window.location.href && img.src !== '' && img.style.display !== 'none') {
+                if (img.src && img.src !== window.location.href && img.src !== '' && !img.hidden) {
                     allImages.push(img.src);
                 }
             });
         });
     }
 
+    var modalReturnFocus = null;
     function openModal(src) {
         collectVisibleImages();
         currentIndex = allImages.indexOf(src);
         if (currentIndex === -1) currentIndex = 0;
+        modalReturnFocus = document.activeElement;
         modalImg.src = src;
         updateModalCounter();
         modal.classList.add('active');
+        setTimeout(function () { var c = document.getElementById('image-modal-close'); if (c) c.focus(); }, 30);
     }
 
     function updateModalCounter() {
-        if (allImages.length > 1) {
-            modalCounter.textContent = (currentIndex + 1) + ' / ' + allImages.length;
-            modalCounter.style.display = 'block';
-            prevBtn.style.display = 'flex';
-            nextBtn.style.display = 'flex';
-        } else {
-            modalCounter.style.display = 'none';
-            prevBtn.style.display = 'none';
-            nextBtn.style.display = 'none';
-        }
+        var many = allImages.length > 1;
+        if (many) modalCounter.textContent = (currentIndex + 1) + ' / ' + allImages.length;
+        modalCounter.hidden = !many;
+        prevBtn.hidden = !many;
+        nextBtn.hidden = !many;
     }
 
     function navigateModal(dir) {
@@ -128,8 +127,11 @@
     }
 
     function closeModal() {
+        if (!modal.classList.contains('active')) return;
         modal.classList.remove('active');
         modalImg.src = '';
+        if (modalReturnFocus && document.body.contains(modalReturnFocus)) { try { modalReturnFocus.focus(); } catch (e) { /* gone */ } }
+        modalReturnFocus = null;
     }
 
     container.addEventListener('click', function(e) {
@@ -159,6 +161,31 @@
             closeModal();
         }
     });
+    document.getElementById('image-modal-close').addEventListener('click', closeModal);
+
+    /* Thumbnails are focusable (role=button, set in cleanupResults) — Enter/Space opens the preview */
+    container.addEventListener('keydown', function (e) {
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        var img = e.target.closest && e.target.closest('img[role="button"]');
+        if (img && img.naturalWidth > 0) { e.preventDefault(); openModal(img.src); }
+    });
+    /* Caspio embed watchdog — a DataPage that never renders used to leave a silent blank card.
+       After 15 s with neither a search form nor a result row, say so and offer a reload. */
+    setTimeout(function () {
+        if (container.querySelector('form, [data-cb-name="data-row"], .cbResultSetError')) return;
+        var note = document.createElement('div');
+        note.className = 'caspio-fail';
+        note.setAttribute('role', 'alert');
+        note.textContent = 'The Caspio list did not load. Check your connection, then ';
+        var retry = document.createElement('button');
+        retry.type = 'button';
+        retry.className = 'caspio-fail-retry';
+        retry.textContent = 'Reload the page';
+        retry.addEventListener('click', function () { window.location.reload(); });
+        note.appendChild(retry);
+        container.appendChild(note);
+    }, 15000);
+
 
     prevBtn.addEventListener('click', function(e) {
         e.stopPropagation();
@@ -227,11 +254,15 @@
         cards.forEach(function(card) {
             if (card.dataset.cleaned) return;
 
-            /* Hide empty images */
+            /* Hide empty images; real ones become keyboard-openable previews */
             var imgs = card.querySelectorAll('img');
             imgs.forEach(function(img) {
-                if (!img.src || img.src === window.location.href || img.src === '') {
-                    img.style.display = 'none';
+                if (!img.getAttribute('src') || img.src === window.location.href) {
+                    img.hidden = true;
+                } else {
+                    img.setAttribute('role', 'button');
+                    img.tabIndex = 0;
+                    if (!img.getAttribute('alt')) img.setAttribute('alt', 'Design preview — press Enter to enlarge');
                 }
             });
 
@@ -243,7 +274,7 @@
                     var prevDt = dd.previousElementSibling;
                     if (prevDt && prevDt.tagName === 'DT') {
                         if (prevDt.textContent.trim() === 'DST File') {
-                            dd.style.display = 'none';
+                            dd.hidden = true;
                         }
                     }
                 }
@@ -254,8 +285,8 @@
                 var actions = document.createElement('div');
                 actions.className = 'card-actions';
                 actions.innerHTML =
-                    '<button class="card-action-btn card-copy-btn" title="Copy design number"><i class="fa-regular fa-copy"></i></button>' +
-                    '<button class="card-action-btn card-share-btn" title="Copy image link for customer"><i class="fa-solid fa-share-from-square"></i></button>';
+                    '<button type="button" class="card-action-btn card-copy-btn" title="Copy design number" aria-label="Copy design number"><i class="fa-regular fa-copy" aria-hidden="true"></i></button>' +
+                    '<button type="button" class="card-action-btn card-share-btn" title="Copy image link for customer" aria-label="Copy image link for customer"><i class="fa-solid fa-share-from-square" aria-hidden="true"></i></button>';
                 card.appendChild(actions);
             }
 
@@ -309,7 +340,8 @@
             }
         }
 
-        existing.innerHTML = '<i class="fa-solid fa-layer-group"></i> ' + totalText;
+        existing.setAttribute('role', 'status');
+        existing.innerHTML = '<i class="fa-solid fa-layer-group" aria-hidden="true"></i> ' + totalText;
     }
 
     /* ===========================
@@ -321,7 +353,8 @@
         hideLoading();
         loadingEl = document.createElement('div');
         loadingEl.className = 'loading-spinner';
-        loadingEl.innerHTML = '<div class="spinner-ring"></div><span>Searching archives...</span>';
+        loadingEl.setAttribute('role', 'status');
+        loadingEl.innerHTML = '<div class="spinner-ring" aria-hidden="true"></div><span>Searching archives...</span>';
         container.appendChild(loadingEl);
     }
 
@@ -366,8 +399,9 @@
         if ((hasNav || hasZero) && !existing) {
             var empty = document.createElement('div');
             empty.className = 'empty-state';
+            empty.setAttribute('role', 'status');
             empty.innerHTML =
-                '<i class="fa-solid fa-box-archive"></i>' +
+                '<i class="fa-solid fa-box-archive" aria-hidden="true"></i>' +
                 '<h3>No designs found</h3>' +
                 '<p>Try broadening your search or using fewer filters</p>';
             var resultsSection = container.querySelector('section.cbColumnarReport, [id^="GridCtnr_"]');
@@ -434,9 +468,9 @@
         });
 
         if (chips.length === 0) {
-            stickyBar.innerHTML = '<div class="sticky-content"><span class="sticky-label">Showing all designs</span><button class="sticky-edit-btn" data-call="scrollToCaspioSearch">Edit Search</button></div>';
+            stickyBar.innerHTML = '<div class="sticky-content"><span class="sticky-label">Showing all designs</span><button type="button" class="sticky-edit-btn" data-call="scrollToCaspioSearch">Edit Search</button></div>';
         } else {
-            stickyBar.innerHTML = '<div class="sticky-content"><span class="sticky-label">Filtered by:</span>' + chips.join('') + '<button class="sticky-edit-btn" data-call="scrollToCaspioSearch">Edit Search</button></div>';
+            stickyBar.innerHTML = '<div class="sticky-content"><span class="sticky-label">Filtered by:</span>' + chips.join('') + '<button type="button" class="sticky-edit-btn" data-call="scrollToCaspioSearch">Edit Search</button></div>';
         }
     }
 
