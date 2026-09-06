@@ -63,7 +63,7 @@ var dtfadapLog = DTFADAP_LOG_ON ? console.log.bind(console) : function () {}; //
         async fetchBaseGarmentCost(styleNumber) {
             try {
                 // First try the base-item-costs endpoint
-                const apiUrl = ((typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) ? window.APP_CONFIG.API.BASE_URL + '/api/base-item-costs?styleNumber=${encodeURIComponent(styleNumber)}' : '');
+                const apiUrl = ((typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) ? window.APP_CONFIG.API.BASE_URL + `/api/base-item-costs?styleNumber=${encodeURIComponent(styleNumber)}` : '');
                 if (!apiUrl) console.error('[dtf-adapter] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
                 this.log('DTF Adapter: Fetching base garment costs from:', apiUrl);
                 
@@ -103,7 +103,7 @@ var dtfadapLog = DTFADAP_LOG_ON ? console.log.bind(console) : function () {}; //
         async fetchAlternativeGarmentCost(styleNumber) {
             try {
                 // Try size-pricing endpoint as alternative
-                const altUrl = ((typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) ? window.APP_CONFIG.API.BASE_URL + '/api/size-pricing?styleNumber=${encodeURIComponent(styleNumber)}' : '');
+                const altUrl = ((typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) ? window.APP_CONFIG.API.BASE_URL + `/api/size-pricing?styleNumber=${encodeURIComponent(styleNumber)}` : '');
                 if (!altUrl) console.error('[dtf-adapter] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
                 this.log('DTF Adapter: Trying alternative endpoint:', altUrl);
                 
@@ -126,7 +126,7 @@ var dtfadapLog = DTFADAP_LOG_ON ? console.log.bind(console) : function () {}; //
                 }
                 
                 // If still no data, check for max-prices endpoint
-                const maxPriceUrl = ((typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) ? window.APP_CONFIG.API.BASE_URL + '/api/max-prices-by-style?styleNumber=${encodeURIComponent(styleNumber)}' : '');
+                const maxPriceUrl = ((typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) ? window.APP_CONFIG.API.BASE_URL + `/api/max-prices-by-style?styleNumber=${encodeURIComponent(styleNumber)}` : '');
                 if (!maxPriceUrl) console.error('[dtf-adapter] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
                 this.log('DTF Adapter: Trying max-prices endpoint:', maxPriceUrl);
                 

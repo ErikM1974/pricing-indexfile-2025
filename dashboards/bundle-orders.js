@@ -114,7 +114,7 @@ function cleanNotesDisplay(notes) {
 
 // Download logo function
 function downloadLogo(externalKey, quoteID) {
-    const url = ((typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) ? window.APP_CONFIG.API.BASE_URL + '/api/files/${externalKey}' : '');
+    const url = ((typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) ? window.APP_CONFIG.API.BASE_URL + `/api/files/${externalKey}` : '');
     if (!url) console.error('[bundle-orders] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
     const link = document.createElement('a');
     link.href = url;
@@ -126,7 +126,7 @@ function downloadLogo(externalKey, quoteID) {
 
 // View logo full size in new tab
 function viewLogoFullSize(externalKey) {
-    const url = ((typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) ? window.APP_CONFIG.API.BASE_URL + '/api/files/${externalKey}' : '');
+    const url = ((typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) ? window.APP_CONFIG.API.BASE_URL + `/api/files/${externalKey}` : '');
     if (!url) console.error('[bundle-orders] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
     window.open(url, '_blank');
 }
