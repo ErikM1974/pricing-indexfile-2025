@@ -1,3 +1,8 @@
+## v2026.09.06.27 (2026.09.06)
+
+- Staff pages live pass (teamnwca.com): delegator covers input/open/img load+error; garment designer 71 handlers + AE dashboard 15 + pride wall delegated; 7 shared scripts' injected <style> → stylesheets; employee-bundle inline styles extracted; submit-form labels wired; icons/versions across 97 pages + 38 scripts; console gates; lock staff-live-hygiene.test.js
+- Deploy v2026.09.06.27: staff pages live pass
+
 ## v2026.09.06.25 (2026.09.06)
 
 - Decorative icons where another attribute precedes class= (183 sites across builders + shared scripts); hygiene lock regex accepts any attribute order
