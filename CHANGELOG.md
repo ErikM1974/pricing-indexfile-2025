@@ -1,3 +1,10 @@
+## v2026.09.06.42 (2026.09.06)
+
+- Memory: runtime a11y probe + CSP report-stream finding (v2026.09.06.41)
+- Screen-print calculator: tier strip + Small Batch Fee labels rendered from the API tiers (were typed 24-36/$75, 37-71/$50 while Caspio charges 24-47/$50, 48-71/$0)
+- screenprint-pricing-v2: dead duplicate showError (alert) removed — the banner version always won
+- Deploy v2026.09.06.42: screen-print tier strip and fee labels from the API tiers
+
 ## v2026.09.06.41 (2026.09.06)
 
 - Memory: runtime console audit + DTF URL regression recorded (v2026.09.06.40); Customer Portals LESSONS entry archived
