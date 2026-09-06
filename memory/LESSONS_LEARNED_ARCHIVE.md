@@ -3266,3 +3266,18 @@ the admin console one grant per order keyed by Order_Ref. Detail → `memory/CUS
 - 🔴 **Never put a multi-line text with backticks inside a double-quoted `node -e "…"` in bash** —
   every `` `word` `` runs as a command and vanishes from the text (this entry was written twice).
   Write the script to a file, or use a single-quoted heredoc.
+
+## Volume Quote page: re-rendering a list wiped what the user was typing in another row (2026-09-02)
+
+**Problem.** Building `/dashboards/volume-quote.html`: entering three styles in a row only ever
+produced ONE loaded garment line.
+**Root cause.** `renderLines()` rebuilt every row's `innerHTML` whenever ANY row changed state
+(loading → loaded → stock checked). The rows whose inputs the user was still typing in were
+replaced by fresh elements, so their values and pending events went to detached nodes.
+**Solution.** Rows are created once and updated in place: find the row by `data-id`, refresh only
+the three info cells, remove rows no longer in state. Inputs are never re-created.
+**Prevention.** 🔑 In a list where the user types while async loads land, never rebuild the whole
+list from state — patch the cells that changed. 🔑 The first-render bug beside it (`addLine()`
+without a render) was invisible because the add BUTTON rendered; test the initial state, not only
+the interaction. 🔑 Cost-model constants for a staff page live in Caspio (`Service_Codes`
+`VOL-*`), never in the page's `.js` — `/dashboards` gates `.html` only, the `.js` is public.

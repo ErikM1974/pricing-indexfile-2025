@@ -19,21 +19,6 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 ### 2-minute proxy outage: the commit shipped half the change, and the boot probe tested the other half (2026-08-27, ARCHIVED 2026-09-05): stage the WHOLE change (a `require` and the file it names land in one commit); the boot probe must exercise the route table, not just `listen`; a 2-minute outage is a half-shipped commit until proven otherwise. Full entry in archive.
 ### Top Sellers "flickers blank, refresh fixes it" (2026-08-26, ARCHIVED 2026-09-02): "works after refresh" = a cold query behind a response cache — time the UNCACHED path first; variant-heavy `limit=48` pages hydrate 10k rows, so partition STYLE IN chunks in parallel; `?isTopSeller=1` is silently ignored (route wants `true`) — validate the result set before trusting a timing. Full entry in archive.
 ### Customer portal redesign + reward-dollar accrual (2026-09-01, ARCHIVED 2026-09-05): reward money is never computed silently — every ledger line names its source and the 8 `REWARD` Service_Codes rows ARE the program; never claw back automatically. Full entry in archive.
-## Volume Quote page: re-rendering a list wiped what the user was typing in another row (2026-09-02)
-
-**Problem.** Building `/dashboards/volume-quote.html`: entering three styles in a row only ever
-produced ONE loaded garment line.
-**Root cause.** `renderLines()` rebuilt every row's `innerHTML` whenever ANY row changed state
-(loading → loaded → stock checked). The rows whose inputs the user was still typing in were
-replaced by fresh elements, so their values and pending events went to detached nodes.
-**Solution.** Rows are created once and updated in place: find the row by `data-id`, refresh only
-the three info cells, remove rows no longer in state. Inputs are never re-created.
-**Prevention.** 🔑 In a list where the user types while async loads land, never rebuild the whole
-list from state — patch the cells that changed. 🔑 The first-render bug beside it (`addLine()`
-without a render) was invisible because the add BUTTON rendered; test the initial state, not only
-the interaction. 🔑 Cost-model constants for a staff page live in Caspio (`Service_Codes`
-`VOL-*`), never in the page's `.js` — `/dashboards` gates `.html` only, the `.js` is public.
-
 ## Contract fee was "Caspio-driven" on paper and hardcoded in practice (2026-09-02)
 
 **Problem.** Raising the contract small-order fee in Caspio (Embroidery_Costs.LTM 50 → 100) would
