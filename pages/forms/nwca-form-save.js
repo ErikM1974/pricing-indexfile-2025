@@ -81,7 +81,7 @@
         saveBtn.type = 'button';
         saveBtn.id = 'saveFormBtn';
         saveBtn.className = 'toolbar-btn toolbar-btn--save';
-        saveBtn.innerHTML = '<i class="fas fa-cloud-arrow-up"></i> Save to NWCA';
+        saveBtn.innerHTML = '<i class="fas fa-cloud-arrow-up" aria-hidden="true"></i> Save to NWCA';
         actions.insertBefore(saveBtn, printBtn);
 
         saveBtn.addEventListener('click', function () {
@@ -89,21 +89,21 @@
             try { data = opts.build(); }
             catch (e) {
                 console.error('[form-save] build failed:', e);
-                banner('error', '<i class="fas fa-triangle-exclamation"></i> Could not read the form — nothing was saved.');
+                banner('error', '<i class="fas fa-triangle-exclamation" aria-hidden="true"></i> Could not read the form — nothing was saved.');
                 return;
             }
             if (!data.company) {
-                banner('error', '<i class="fas fa-triangle-exclamation"></i> Enter the <strong>Company</strong> before saving.');
+                banner('error', '<i class="fas fa-triangle-exclamation" aria-hidden="true"></i> Enter the <strong>Company</strong> before saving.');
                 return;
             }
             var base = apiBase();
             if (!base) {
-                banner('error', '<i class="fas fa-triangle-exclamation"></i> Config failed to load — print a paper copy; saving is unavailable.');
+                banner('error', '<i class="fas fa-triangle-exclamation" aria-hidden="true"></i> Config failed to load — print a paper copy; saving is unavailable.');
                 return;
             }
 
             saveBtn.disabled = true;
-            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving…';
+            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Saving…';
 
             fetch(base + '/api/form-submissions', {
                 method: 'POST',
@@ -131,17 +131,17 @@
                 .then(function (body) {
                     NWCAForm.markClean();
                     document.dispatchEvent(new CustomEvent('nwca-form:saved')); // clears the autosave draft
-                    banner('ok', '<i class="fas fa-circle-check"></i> Saved to NWCA as <strong>' + escapeHtml(body.submissionId) +
+                    banner('ok', '<i class="fas fa-circle-check" aria-hidden="true"></i> Saved to NWCA as <strong>' + escapeHtml(body.submissionId) +
                         '</strong> — it\'s in the Forms Inbox. You can still print.');
                 })
                 .catch(function (err) {
                     console.error('[form-save] save failed:', err);
-                    banner('error', '<i class="fas fa-triangle-exclamation"></i> <strong>NOT saved</strong> (' + escapeHtml(err.message) +
+                    banner('error', '<i class="fas fa-triangle-exclamation" aria-hidden="true"></i> <strong>NOT saved</strong> (' + escapeHtml(err.message) +
                         '). Your typing is still here — print a paper copy and try again in a minute.');
                 })
                 .finally(function () {
                     saveBtn.disabled = false;
-                    saveBtn.innerHTML = '<i class="fas fa-cloud-arrow-up"></i> Save to NWCA';
+                    saveBtn.innerHTML = '<i class="fas fa-cloud-arrow-up" aria-hidden="true"></i> Save to NWCA';
                 });
         });
     }

@@ -140,7 +140,7 @@
                 var bar = document.createElement('div');
                 bar.className = 'form-save-banner form-save-banner--ok no-print';
                 var when = new Date(saved.at);
-                bar.innerHTML = '<i class="fas fa-clock-rotate-left"></i> Unsaved draft from ' +
+                bar.innerHTML = '<i class="fas fa-clock-rotate-left" aria-hidden="true"></i> Unsaved draft from ' +
                     ((when.getMonth() + 1) + '/' + when.getDate() + ' ' + ((when.getHours() % 12) || 12) + ':' + String(when.getMinutes()).padStart(2, '0') + (when.getHours() < 12 ? 'am' : 'pm')) +
                     ' — <button type="button" class="draft-restore-btn">Restore it</button> or <button type="button" class="draft-discard-btn">discard</button>.';
                 var sheet = document.querySelector('.form-sheet');

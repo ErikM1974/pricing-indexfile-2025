@@ -32,7 +32,9 @@ const RENDERERS = ['shared_components/js/mockup-ae.js', 'shared_components/js/ar
     'shared_components/js/sticker-banner-submit-form.js', 'shared_components/js/jds-submit-form.js', 'pages/js/garment-designer.js', 'dashboards/js/DrainPro-Bundle.js',
     'shared_components/js/staff-dashboard/controllers/pride-wall-controller.js', 'shared_components/js/policies/policy-detail.js', 'shared_components/js/policies/policies-hub.js',
     'shared_components/js/policies/policy-comments.js', 'shared_components/js/policies/policy-editor-tiptap.js', 'shared_components/js/policies/policy-ai-assist.js', 'shared_components/js/policies/policy-mermaid.js',
-    'pages/js/dst-viewer.js', 'admin/js/universal-records-admin.js', 'dashboards/js/design-gallery-drawer.js', 'dashboards/js/design-gallery-grid.js', 'dashboards/js/design-gallery-rails.js', 'dashboards/js/design-gallery.js'].filter(exists);
+    'pages/js/dst-viewer.js', 'admin/js/universal-records-admin.js', 'dashboards/js/design-gallery-drawer.js', 'dashboards/js/design-gallery-grid.js', 'dashboards/js/design-gallery-rails.js', 'dashboards/js/design-gallery.js',
+    // the forms-library shared scripts render the save button, date pickers and banners (live probe 2026-09-06: 5 bare icons on every form)
+    'pages/forms/nwca-form-save.js', 'pages/forms/nwca-form-dates.js', 'pages/forms/nwca-form-shared.js'].filter(exists);
 const MOVED_STYLES = {
     'shared_components/js/elapsed-time-utils.js': 'shared_components/css/elapsed-time-utils.css',
     'shared_components/js/company-contact-picker.js': 'shared_components/css/company-contact-picker.css',

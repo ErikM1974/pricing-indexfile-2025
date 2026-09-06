@@ -47,7 +47,7 @@
         btn.type = 'button';
         btn.className = 'date-pick-btn no-print';
         btn.setAttribute('aria-label', 'Pick a date');
-        btn.innerHTML = '<i class="far fa-calendar"></i>';
+        btn.innerHTML = '<i class="far fa-calendar" aria-hidden="true"></i>';
 
         var hidden = document.createElement('input');
         hidden.type = 'date';
