@@ -831,3 +831,49 @@ had a role, 6 bare icons.
 15. Left alone: `confirm()`/`alert()` on Complete / bulk Complete (staff page pattern, consistent with
     earlier decisions); `refresh()` after every action re-fetches 200 rows (fine at this size).
 16. ⏭️ Ruth's page (`mockup-ruth.js`, 1.5K) shares the same shared module — review next.
+
+## Ruth's Queue (art-hub-ruth) — review, 15 items (2026-09-05, `v2026.09.05.54`)
+
+`dashboards/art-hub-ruth.html` + `shared_components/js/mockup-ruth.js` (1.5K) + `dashboards/css/art-hub-ruth.css`.
+Live probe before: **no h1**, 158 inline `onerror=`, 173 inline `style=`, chips display-only, tabs without
+tablist semantics, cards showed **OVERDUE on the due date itself**.
+
+1. 🔴 **Due TODAY read "OVERDUE" all day** — `isOverdue` did `new Date('2026-09-05') < new Date()`; the
+   ISO date parses as UTC midnight = 5 PM the day before in Pacific. Now `parseCalendarDate` +
+   `daysFromToday` (day-granular): today → "Due Sep 5", yesterday → OVERDUE. Same fix for `isDueSoon`,
+   `formatDate`, `formatDateShort` (a day early before).
+2. **No `<h1>`** → `sr-only` "Ruth's Queue — Digitizing Mockup Dashboard" (visible title is the breadcrumb,
+   same pattern as Steve).
+3. **Tabs = real tablist**: 4 `role=tab` buttons (`aria-selected`, roving `tabindex`, `aria-controls`),
+   panes `role=tabpanel aria-labelledby`, ArrowLeft/Right/Home/End; the 4 external links sit in a
+   sibling `<nav aria-label="Other tools">`. Both wrappers are `display:contents` so the flex row is unchanged.
+4. **Status chips filter the queue** (were "display only" divs): `<button aria-pressed>`; click again
+   clears; the On Hold chip opens the On Hold tab; empty state explains the active filter with a
+   "Show all" link. (Steve's chips got the same treatment in `.52`.)
+5. **Rule 3** — 2 inline `onerror=` (each ~80 chars of JS, ×79 cards live) → `data-onerror="box-parent|
+   box-self"` + one capture listener that defers to `ArtActions.handleBoxImageError` when present;
+   search bar / empty states / error / stagger delays / header rows → classes (`.rq-*`, `.mockup-span`,
+   `--delay` custom property). `[hidden]` guard added; view toggle / kanban hidden cards / widget /
+   loading use `hidden`.
+6. **Quick actions were attributed to a hardcoded Ruth** (`author: 'ruth@…'`). Now `/api/crm-session/me`
+   (fallback Ruth) — Erik or a covering artist acting on her page is recorded correctly.
+7. **Billing Codes tab typed $50 / $75 / increments** → `loadBillingRates()` fills them from Service_Codes
+   GRT-50 / GRT-75; `#billing-rate-note` says "Prices live from Caspio…" or "⚠ Could not verify…
+   showing the reference values" (never a silent typed price — Erik's rule).
+8. Load failure: reason shown, `role=alert`, **Retry re-fetches** (was `location.reload`); toast
+   failures include the reason; toasts are `role=status|alert`.
+9. Kanban cards `role=link tabindex=0` + Enter/Space (click already worked via the delegator's
+   `data-href`); "Show all" is a `<button>`; hidden-beyond-limit cards use `hidden`.
+10. Rep name → `<button aria-label="Filter by Nika">`; action buttons `type=button` + spoken labels
+    ("Send Acme Co for approval"); thumbnails get the company in `alt`; SVGs `aria-hidden`.
+11. Broken-mockups modal `role=dialog aria-labelledby`, focus → Close, returns on close.
+12. Search input is `type=search` + `autocomplete=off`; count is `role=status`.
+13. Lock: `tests/unit/art-hub-ruth-page.test.js`.
+14. Smoke on static-dist (no backend → real failure path first): "Unable to load mockups (API returned
+    404)" + Retry; stubbed data → 3 queue cards, today = "Due Sep 5", yesterday = OVERDUE; Submitted
+    chip → 1 card / pressed; click again → 3; On Hold chip → tab 3 selected, tabindex 0/-1 roving;
+    ArrowRight → Billing focused+selected; billing prices live ($56.25 for 45 min); Board → grid
+    hidden, 5 cards `role=link`; 0 inline styles besides `--delay`, 0 handlers, 0 buttons without type.
+15. Left alone: kanban column-header collapse is a click-only div (same on Steve's board — kanban.css
+    shared; a future kanban pass); `pollNotifications` still polls as Ruth (`user=ruth@…`) — the
+    notifications ARE for Ruth's queue regardless of who is looking.
