@@ -593,6 +593,9 @@ const CSP_DIRECTIVES = {
     'https://cdni.sanmar.com',
     'https://www.sanmar.com',
     'https://northwestcustomapparel.box.com',
+    // Box "public/static" image links (calculator hero/how-to images) — caught by the
+    // report-only stream 2026-09-06 on the screen-print calculator and PC54 product page.
+    'https://northwestcustomapparel.app.box.com',
     'https://*.boxcloud.com',
     'https://via.placeholder.com',
     'https://images.squarespace-cdn.com',
@@ -631,6 +634,10 @@ const CSP_DIRECTIVES = {
   objectSrc: ["'none'"],
   baseUri: ["'self'"],
   reportUri: ['/api/csp-report'],
+  // helmet's default set includes upgrade-insecure-requests, which browsers REJECT in a
+  // Report-Only policy and log as a console error on every page load (2026-09-06). Drop it
+  // until the policy is enforced; HSTS already forces https.
+  upgradeInsecureRequests: null,
 };
 
 app.use(

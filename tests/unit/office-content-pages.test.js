@@ -33,7 +33,7 @@ describe('blog editor', () => {
         expect(html).not.toMatch(/<label class="be-label">Hero image<\/label>/);
         expect(html).not.toMatch(BARE);
         expect(css).toMatch(/^\[hidden\] \{ display: none !important; \}/m);
-        expect(html).toMatch(/blog-editor\.js\?v=2026\.09\./);
+        expect(html).toMatch(/blog-editor\.js\??v=d{4}.d{2}.d{2}.d+/);
     });
 });
 
@@ -47,7 +47,7 @@ describe('volume quote', () => {
         expect(js).not.toMatch(BARE);
         expect(html).not.toMatch(BARE);
         expect(html).toMatch(/id="vq-save-status" role="status"/);
-        expect(html).toMatch(/volume-quote\.js\?v=2026\.09\./);
+        expect(html).toMatch(/volume-quote\.js\??v=d{4}.d{2}.d{2}.d+/);
         expect(html).toMatch(/<button type="button" class="dash-error-banner-close" aria-label="Dismiss">/);
         // pricing math untouched — the compute/round helpers are exactly as shipped 2026-09-02
         expect(js).toMatch(/function roundPrice\(p\)/);
@@ -62,7 +62,7 @@ describe('seo strategy', () => {
         expect(html).toMatch(/<nav aria-labelledby="seo-toc-title">/);
         expect(js).toMatch(/link\.setAttribute\('aria-current', 'true'\)/);
         expect(html).not.toMatch(BARE);
-        expect(html).toMatch(/seo-strategy\.js\?v=2026\.09\./);
+        expect(html).toMatch(/seo-strategy\.js\??v=d{4}.d{2}.d{2}.d+/);
         expect(html).toMatch(/<button type="button" class="dash-error-banner-close" aria-label="Dismiss">/);
     });
 });

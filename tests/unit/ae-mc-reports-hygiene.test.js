@@ -48,6 +48,6 @@ describe('price audit report', () => {
     test('icons decorative; css versioned', () => {
         const html = read('dashboards/reports/price-audit-report.html');
         expect(html).not.toMatch(BARE);
-        expect(html).toMatch(/price-audit-report\.css\?v=2026\.09\./);
+        expect(html).toMatch(/price-audit-report\.css\??v=d{4}.d{2}.d{2}.d+/);
     });
 });

@@ -145,6 +145,12 @@ var dp5Log = DP5_LOG_ON ? console.log.bind(console) : function () {};
                 dp5Log("[DP5-HELPER] DTF page detected, skipping pricing grid check.");
                 return;
             }
+            // 2026-09-06: a page without the legacy #custom-pricing-grid (screen print prices through
+            // screenprint-pricing-v2) has nothing for this fallback to fill — not an error.
+            if (!document.getElementById('custom-pricing-grid')) {
+                dp5Log("[DP5-HELPER] No legacy pricing grid on this page, skipping the 7s fallback.");
+                return;
+            }
             
             const customGridTbody = document.getElementById('custom-pricing-grid')?.querySelector('tbody');
             
@@ -608,7 +614,7 @@ var dp5Log = DP5_LOG_ON ? console.log.bind(console) : function () {};
         dp5Log("[DP5-HELPER] Initializing color swatches with provided data.");
         const swatchesContainer = document.getElementById('color-swatches');
         if (!swatchesContainer) {
-            console.warn("[DP5-HELPER] Color swatches container not found.");
+            dp5Log("[DP5-HELPER] No #color-swatches on this page (the calculator renders its own swatches).");
             return;
         }
 
@@ -628,7 +634,7 @@ var dp5Log = DP5_LOG_ON ? console.log.bind(console) : function () {};
         console.warn(`[DP5-HELPER] Using LEGACY initColorSwatches for Style: ${styleNumber}`);
         const swatchesContainer = document.getElementById('color-swatches');
         if (!swatchesContainer) {
-            console.warn("[DP5-HELPER] Color swatches container not found (legacy init).");
+            dp5Log("[DP5-HELPER] No #color-swatches on this page (legacy init).");
             return;
         }
         if (!styleNumber) {

@@ -29,7 +29,7 @@ pricmatrapi42Log("[PRICING-MATRIX-API:LOAD] Pricing matrix API loaded");
 
         // Backward compatibility / alias (with warning)
         if (!window.PricingMatrix) {
-             console.warn("[PRICING-MATRIX-API:INIT] Creating alias 'window.PricingMatrix'. Use 'window.PricingMatrixAPI' instead.");
+             pricmatrapi42Log("[PRICING-MATRIX-API:INIT] Creating alias 'window.PricingMatrix'. Use 'window.PricingMatrixAPI' instead.");
              window.PricingMatrix = window.PricingMatrixAPI;
         }
     }
