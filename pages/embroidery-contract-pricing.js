@@ -232,8 +232,8 @@ function formatPrice(value) {
 function hideLoadingState() {
     const loading = document.getElementById('loadingState');
     const content = document.getElementById('pricingContent');
-    if (loading) loading.style.display = 'none';
-    if (content) content.style.display = 'block';
+    if (loading) loading.hidden = true;
+    if (content) content.hidden = false;
 }
 
 /**
@@ -242,7 +242,7 @@ function hideLoadingState() {
 function showError(message) {
     const loading = document.getElementById('loadingState');
     const errorBanner = document.getElementById('errorBanner');
-    if (loading) loading.style.display = 'none';
+    if (loading) loading.hidden = true;
     if (errorBanner) {
         errorBanner.textContent = message;
         errorBanner.classList.add('show');
@@ -255,3 +255,7 @@ function showError(message) {
 function printContractPricing() {
     window.print();
 }
+document.addEventListener('DOMContentLoaded', function () {
+    const b = document.getElementById('ecp-print');
+    if (b) b.addEventListener('click', printContractPricing);
+});

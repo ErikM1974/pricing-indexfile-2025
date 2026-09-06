@@ -691,7 +691,7 @@ body {
 
 /* ===== Loading State ===== */
 #loading-spinner {
-    display: none;
+    display: flex; /* hidden attribute (guarded below) hides it at rest */
     justify-content: center;
     align-items: center;
     padding: 60px;
@@ -718,7 +718,6 @@ body {
 
 /* ===== Error State ===== */
 #error-message {
-    display: none;
     background: #f8d7da;
     color: #721c24;
     padding: 20px;
@@ -1179,3 +1178,9 @@ body {
         font-size: 24px;
     }
 }
+
+/* 2026-09-05 review */
+.pricing-table th.th-center { text-align: center; }
+
+/* 2026-09-06 review: the hidden attribute must beat any display rule */
+[hidden] { display: none !important; }

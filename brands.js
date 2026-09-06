@@ -19,7 +19,9 @@
 
 class BrandsPage {
     constructor() {
-        this.apiBase = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api';
+        // Proxy host from /config/app.config.js (Rule 6) — a missing config fails visibly in loadBrands()
+        const base = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) || '';
+        this.apiBase = base ? base + '/api' : '';
         this.allBrands = [];
         this.filteredBrands = [];
 
@@ -38,7 +40,13 @@ class BrandsPage {
     }
 
     async init() {
-        console.log('[BrandsPage] Initializing...');
+        const retry = document.getElementById('brandsRetry');
+        if (retry) retry.addEventListener('click', () => window.location.reload());
+        // Logo images that fail hide themselves (was an inline handler on every card)
+        document.addEventListener('error', (e) => {
+            const img = e.target;
+            if (img && img.tagName === 'IMG' && img.dataset && img.dataset.onerror === 'hide') img.hidden = true;
+        }, true);
 
         // Set up search input
         this.setupSearch();
@@ -69,7 +77,6 @@ class BrandsPage {
         const container = document.getElementById('brandsContainer');
 
         try {
-            console.log('[BrandsPage] Fetching brands from API...');
 
             const response = await fetch(`${this.apiBase}/all-brands`);
 
@@ -78,7 +85,6 @@ class BrandsPage {
             }
 
             const data = await response.json();
-            console.log('[BrandsPage] API response:', data);
 
             // Extract brands array from response
             this.allBrands = data.brands || data.data?.brands || data;
@@ -95,25 +101,23 @@ class BrandsPage {
             // Sort by priority (Carhartt first), then alphabetically
             this.allBrands = this.sortBrandsByPriority(this.allBrands);
 
-            console.log(`[BrandsPage] Loaded ${this.allBrands.length} brands`);
 
             this.filteredBrands = [...this.allBrands];
             this.displayBrands();
 
             // Hide loading, show container
-            loadingState.style.display = 'none';
-            container.style.display = 'block';
+            loadingState.hidden = true;
+            container.hidden = false;
 
         } catch (error) {
             console.error('[BrandsPage] Error loading brands:', error);
-            loadingState.style.display = 'none';
-            errorState.style.display = 'block';
+            loadingState.hidden = true;
+            errorState.hidden = false;
         }
     }
 
     async enrichBrandsWithCounts() {
         // For each brand, try to get product count from a quick search
-        console.log('[BrandsPage] Enriching brands with product counts...');
 
         const enrichPromises = this.allBrands.map(async (brand) => {
             const brandName = brand.brand || brand.name || brand;
@@ -251,7 +255,7 @@ class BrandsPage {
                      alt="${this.escapeHtml(name)}"
                      class="brand-card-logo brand-logo-loading"
                      decoding="async"
-                     onerror="this.style.display='none';">
+                     data-onerror="hide">
             `;
         }
 
@@ -269,11 +273,9 @@ class BrandsPage {
         const brandImages = document.querySelectorAll('.brand-card-logo[data-src]');
 
         if (brandImages.length === 0) {
-            console.log('[BrandsPage] No images to progressively load');
             return;
         }
 
-        console.log(`[BrandsPage] Initializing progressive loading for ${brandImages.length} images`);
 
         // Load images in batches with priority
         this.loadImagesBatched(brandImages);
@@ -290,18 +292,15 @@ class BrandsPage {
         const secondaryImages = imageArray.slice(10, 20);
         const remainingImages = imageArray.slice(20);
 
-        console.log(`[BrandsPage] Loading priority batch (${priorityImages.length} images)`);
         priorityImages.forEach(img => this.loadImage(img));
 
         // Batch 2: Next 10 brands - load after 500ms
         setTimeout(() => {
-            console.log(`[BrandsPage] Loading secondary batch (${secondaryImages.length} images)`);
             secondaryImages.forEach(img => this.loadImage(img));
         }, 500);
 
         // Batch 3: Remaining brands - load after 1000ms
         setTimeout(() => {
-            console.log(`[BrandsPage] Loading remaining batch (${remainingImages.length} images)`);
             remainingImages.forEach(img => this.loadImage(img));
         }, 1000);
     }
@@ -327,7 +326,7 @@ class BrandsPage {
         loader.onerror = () => {
             // Image failed to load - hide gracefully
             console.warn(`[BrandsPage] Failed to load image: ${src}`);
-            img.style.display = 'none';
+            img.hidden = true;
             img.classList.remove('brand-logo-loading');
         };
 

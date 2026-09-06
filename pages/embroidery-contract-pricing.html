@@ -10,7 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
 
     <!-- Page Styles -->
-    <link rel="stylesheet" href="/pages/embroidery-contract-pricing.css">
+    <link rel="stylesheet" href="/pages/embroidery-contract-pricing.css?v=2026.09.06.3">
 </head>
 <body>
     <div class="contract-pricing-page">
@@ -24,7 +24,7 @@
         </div>
 
         <!-- Main Content (hidden until loaded) -->
-        <div id="pricingContent" style="display: none;">
+        <div id="pricingContent" hidden>
             <!-- Header -->
             <header class="page-header">
                 <div class="logo-section">
@@ -43,7 +43,7 @@
                     <p class="contact-title">Plant Manager Since 1998</p>
                     <a href="mailto:ruth@nwcustomapparel.com" class="contact-email">ruth@nwcustomapparel.com</a>
                     <p class="contact-phone">ext. 119</p>
-                    <button class="print-btn" onclick="printContractPricing()">
+                    <button type="button" class="print-btn" id="ecp-print">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
                         Print PDF
                     </button>
@@ -130,6 +130,6 @@
     </div>
 
     <script src="/config/app.config.js"></script>
-    <script src="/pages/embroidery-contract-pricing.js?v=2026.09.02.12"></script>
+    <script src="/pages/embroidery-contract-pricing.js?v=2026.09.06.3"></script>
 </body>
 </html>
