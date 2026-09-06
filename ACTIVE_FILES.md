@@ -22,7 +22,6 @@
 | `brands.js` | Brands listing page logic — priority order + landing-page routing now from `brands-registry.js` | brands.html, brands-registry.js | Move to shared_components |
 | `brands-flyout.js` | Brands flyout/dropdown menu (header nav) — static featured tier (never renders empty) + type-to-filter over all catalog brands; featured tier + landing pages from `brands-registry.js` | index.html, multiple, brands-registry.js | Move to shared_components |
 | `shared_components/js/nav-dropdown.js` | CLICK-to-open disclosure for the Products/Brands mega dropdowns — toggles `.nav-open`, closes on outside-click/Escape/other-trigger, one open at a time, `aria-expanded`. Replaced hover-open (finicky on desktop, absent on touch); CSS has NO `:hover` open rule | index.html, pages/catalog.html; CSS `.nav-item.nav-open` in nwca-2026-core.css | ✅ Active (NEW 2026-07-13) |
-| `c112-bogo-promo.js` | ⛔ **DEAD (2026-09-06 census: zero references from any page, script, route or build — pending Erik's `git rm`, see `memory/DASHBOARD_REVIEWS_2026-09.md` § FINAL CENSUS)** BOGO promotion logic (swatches, BOGO math, PDF quote) | NONE — `admin/c112-bogo-promo.html` retired 2026-08-17 (Erik: promo no longer offered); page 410s via a tombstone in server.js. Was ALREADY broken: the page loaded it relatively so it 404'd in prod | 🚩 Dead — flagged for deletion |
 | `catalog-search.js` | Catalog search | index.html | Move to shared_components |
 | `home-2026.js` | Homepage chrome glue (drawer close/Escape/scroll-lock, All-categories tile) — 2026 redesign | index.html | ✅ Active (NEW 2026-06-11) |
 | `dp5-helper.js` | Helper functions (root copy — see also `/shared_components/js/dp5-helper.js`) | Unknown | Verify if needed |
@@ -185,7 +184,6 @@
 | `/pages/forms/sample-checkout-form.css` | Sample checkout page-specifics (landscape @page, items column widths, conditions/card two-column) | nwca-form-shared.css | ✅ Active |
 | `/pages/forms/sample-checkout-form.js` | Sample checkout controller — seeds 7 numbered rows, Add Row, per-row Charge Value = 75% of Retail (cents-rounded; manual override wins) | nwca-form-shared.js | ✅ Active |
 | `/pages/policies-hub.html` | **CANONICAL** Caspio-backed Policies Hub (tree sidebar, search, category chips, admin-gated CRUD) — renamed 2026-05-14 from policies-hub-v2.html as the production cutover | policies-admin-gate.js, policies-api.js, policies-hub.js, policies-hub-v2.css | ✅ Active |
-| `/pages/policies-hub-legacy.html` | ⛔ **DEAD (2026-09-06 census: zero references from any page, script, route or build — pending Erik's `git rm`, see `memory/DASHBOARD_REVIEWS_2026-09.md` § FINAL CENSUS)** Pre-Caspio hardcoded hub (9 cards, no editing) — archived 2026-05-14 for safety; safe to delete after ~30 days if no fallback events | dashboard-styles.css, policies-hub.css | 🗄️ Legacy |
 | `/pages/policy-detail.html` | **NEW** Individual policy read/edit page (TipTap rich-text editor, breadcrumb, outline, sub-procedures) | policies-admin-gate.js, policies-api.js, policy-editor-tiptap.js, policy-detail.js, policies-hub-v2.css, policy-detail.css | ✅ Active |
 | `/pages/css/policies-hub-v2.css` | **NEW** Stylesheet for policies hub v2 (tree sidebar, cards, category chips, NW-green theme) | — | ✅ Active |
 | `/pages/css/policy-detail.css` | **NEW** Stylesheet for policy-detail.html (prose body, TipTap chrome, outline sidebar, edit form) | — | ✅ Active |
@@ -407,15 +405,11 @@
 | `/pages/sample-cart.html` | Sample ordering cart + checkout page — **RESKINNED on nwca-2026 (2026-07-06)**, inline monolith extracted per Rule 3 | sample-cart.css, sample-cart-page.js, sample-checkout.js, sample-order-service.js, sample-inventory-service.js, nwca-2026-core.css | ✅ Active |
 | `/pages/css/sample-cart.css` | **NEW (2026-07-06)** Sample Cart page styles on 2026 tokens (replaces the legacy inline style monolith); styles the SAME class names the extracted renderer emits + legacy token bridge (--primary-color → --green-700) | nwca-2026-core.css | ✅ Active |
 | `/pages/js/sample-cart-page.js` | **NEW (2026-07-06)** Sample Cart page controller — extracted VERBATIM from the legacy inline script (cart load + upcharge migration, inventory check, render, free-flow direct ShopWorks submit, EmailJS notify) minus debug chatter + old chrome; adds 2026 drawer/search wiring. Paid carts delegate to sample-checkout.js. | sample-order-service.js, sample-inventory-service.js, sample-checkout.js, EmailJS | ✅ Active |
-| `/shared_components/js/sticker-pricing-service.js` | ⛔ **DEAD (2026-09-06 census: zero references from any page, script, route or build — pending Erik's `git rm`, see `memory/DASHBOARD_REVIEWS_2026-09.md` § FINAL CENSUS)** 🔻 **DEAD — and it holds money.** Nothing has loaded this since the order-form module its header still describes was retired; grep for `StickerPricingService` returns only this file and doc comments. Its `INLINE_GRID` is a **hardcoded copy of all 50 sticker prices** plus the $50 setup fee, with no visible-warning path — i.e. a Rule 4 hazard sitting in the tree waiting for someone to wire it up. If sticker prices change in Caspio this file silently disagrees. Delete it or give it a warning banner; do not "reuse" it. | — | 🔻 Dead — delete candidate |
 | `/shared_components/js/sticker-pricing-page.js` | **NEW (2026-05-15)** Sticker + Banner quote page logic — renders sticker pricing tables (`/api/sticker-pricing`) AND banner rate card (`/api/banner-pricing`), drives AI chat (SSE via `/api/contract-sticker-ai/chat` which handles BOTH product lines), parses PRICE_QUOTE/CUSTOMER_FINAL/EMAIL DRAFT blocks, highlights sticker rows OR banner rate cards based on `productType`, renders inline banner-quote card, saves to `quote_sessions` with STK prefix. **2026-07-24:** per-sticker column now DERIVED (`TotalPrice ÷ Quantity`, rendered `≈`) — never the stored `PricePerSticker`, which fails to reconcile on 26 of 50 rows; added the `#pricingSourceWarn` backup-rate-card banner (Rule 4) and switched the GRT-50 line to `EmbellishmentType:'fee'` so quote-view renders it as a fee, not a product. 🔻 **DEAD 2026-07-29** — its page was retired; the decal calculator was extracted to custom-decal-pricing-page.js and the AI drawer + STK save were dropped (Erik: rep attribution on sticker quotes is acceptable to lose). Its retirement orphaned the `/api/sticker-ai/chat` forwarder in server.js, **which has since been removed** (2026-07-29) — so this file's AI code no longer has a backend even if the page were revived. The proxy's `/api/contract-sticker-ai/chat` still exists behind CRM_API_SECRET. | sticker-pricing-service.js, sticker-manual-pricing.html | 🔻 Dead — retired 2026-07-29 |
 | `/shared_components/js/custom-decal-pricing-page.js` | **NEW (2026-07-29)** Decal page controller, extracted from sticker-pricing-page.js. Rate card + square-foot calculator, all rates from `/api/custom-decal-pricing` (zero hardcoded money). `computeDecalQuote()` is a pure, DOM-free function exported through a `module.exports` test seam and locked by `tests/unit/custom-decal-pricing.test.js` — the math had NO coverage in its previous life. Mirrors proxy `src/routes/custom-decal-pricing.js computeDecalQuote()`; keep in sync. Normalizes a trailing `/api` off BASE_URL because the two config files in this repo disagree about whether it belongs. On API failure it shows the banner and clears the grid — never a cached or guessed rate. | /api/custom-decal-pricing, /config/app.config.js | ✅ Active |
-| `/shared_components/js/emblem-pricing-service.js` | ⛔ **DEAD (2026-09-06 census: zero references from any page, script, route or build — pending Erik's `git rm`, see `memory/DASHBOARD_REVIEWS_2026-09.md` § FINAL CENSUS)** Embroidered emblem/patch pricing service — fetches `/api/emblem-pricing`; falls back to inline grid (16 sizes × 10 qty tiers + LTM/digitizing/add-on rules) until Caspio table is deployed | — | ✅ Active |
-| `/shared_components/js/order-form-size-suffix.js` | ⛔ **DEAD (2026-09-06 census: zero references from any page, script, route or build — pending Erik's `git rm`, see `memory/DASHBOARD_REVIEWS_2026-09.md` § FINAL CENSUS)** Isomorphic ShopWorks size-suffix mapping (PC61 → PC61_2X / PC61_3XL etc.). `require()`d by server.js for ShopWorks push size mapping (the browser copy was only loaded by the Order Form, retired 2026-07-11). Single source of truth — verified against the 15,152-row ShopWorks CSV | — | ✅ Active |
 | `/shared_components/js/sanmar-inventory-check.js` | **MOVED 2026-07-11** from `/pages/order-form/inventory/inventory-check.js` (Order Form retired) — SanMar per-size inventory fetch (`/api/sanmar/inventory/{style}?color=`, 5-min cache, 2XL/XXL alias) + `classifyInventory()`. Exposes `window.OrderFormInventory` (legacy global name kept — every consumer references it). Stock badges for ALL 4 quote builders: EMB/SCP/DTF via inventory-badges.js, DTG via builders/dtg/catalog-search.js + form-core.js | — | ✅ Active |
 | `/pages/css/policies-hub.css` | Policies hub page styles | — | ✅ Active |
 | `/pages/css/utilities.css` | Shared utility CSS for pages | — | ✅ Active |
-| `/pages/policies/dtg-artwork-checklist.html` | ⛔ **DEAD (2026-09-06 census: zero references from any page, script, route or build — pending Erik's `git rm`, see `memory/DASHBOARD_REVIEWS_2026-09.md` § FINAL CENSUS)** DTG artwork preparation checklist | — | ✅ Active |
 
 ### SanMar Catalog Color Audit (NEW 2026-05-02)
 | File | Purpose | Dependencies | Status |
@@ -540,8 +534,6 @@
 | `/calculators/archive/manual-pricing-deprecated/dtg-manual-pricing.html` | Archived pre-unification DTG manual calculator | — | 📦 Archived |
 | `/quote-builders/dtg-quote-builder.html` | **DTG flagship (v14, 2026-05-19+).** Manual-first inline-form DTG quote builder + DTG AI bot + Submit-to-ShopWorks + sales tax (per-address WA DOR lookup, exempt/pickup/out-of-state) + order-summary band. Legacy iframe REMOVED (legacy builder deleted 2026-06-08; `/quote-builders/dtg-quote-builder-legacy.html` 301-redirects here). This is the sole DTG builder. | builders/dtg/* (bundle), dtg-quote-page.js, dtg-pricing-service.js, quote-order-summary.js | ✅ Active |
 | ~~`/shared_components/js/dtg-quote-pricing.js`~~ | **DELETED 2026-06-09** — dead legacy DTG quote pricing engine; only consumer was the also-dead dtg-quote-products.js. No HTML loaded it. | — | ❌ Deleted |
-| `/shared_components/js/dtg-quote-products.js` | ⛔ **DEAD (2026-09-06 census: zero references from any page, script, route or build — pending Erik's `git rm`, see `memory/DASHBOARD_REVIEWS_2026-09.md` § FINAL CENSUS)** DTG quote product manager (⚠️ legacy — was loaded by the deleted legacy builder; dead-code candidate; refs now-deleted DTGQuotePricing) | SanMar API | ⚠️ Orphan? |
-| `/shared_components/js/dtg-quote-system.js` | ⛔ **DEAD (2026-09-06 census: zero references from any page, script, route or build — pending Erik's `git rm`, see `memory/DASHBOARD_REVIEWS_2026-09.md` § FINAL CENSUS)** DTG quote system orchestrator (⚠️ legacy — dead-code candidate) | — | ⚠️ Orphan? |
 
 ### DTF System
 
@@ -585,7 +577,6 @@
 | `/shared_components/js/embroidery-quote-invoice.js` | Embroidery invoice generation (ShopWorks format) | — | ✅ Active |
 | `/shared_components/js/quote-pricing-data.js` | Shared `pricingData` contract (Phase 3.1) — builds + validates the shape all 4 quote builders pass to `embroidery-quote-invoice.js`. Normalizes method→flags, percent tax→decimal, zero-fills fee fields. | — | ✅ Active |
 | `/shared_components/js/quote-services-bar.js` | Persistent, catalog-driven "Add to order" services bar (2026-06-03) — `QuoteServicesBar.render(mountId, catalog, onAdd)`; clicking a chip adds that service as a line item. Reusable across EMB/SCP/DTG/DTF (each passes its own catalog). **`openServiceGroup(label)` (2026-08-14)** opens a group programmatically (deferred past the caller's own click) so a page can point a rep at a group they wouldn't find — used by the EMB empty state for Customer-Supplied. | quote builders | ✅ Active |
-| `/shared_components/js/embroidery-quote-adapter.js` | ⛔ **DEAD (2026-09-06 census: zero references from any page, script, route or build — pending Erik's `git rm`, see `memory/DASHBOARD_REVIEWS_2026-09.md` § FINAL CENSUS)** Embroidery data adapter (Caspio → pricing engine) | Caspio API | ✅ Active |
 
 > `embroidery-quote-logos.js` + `embroidery-quote-products.js` DELETED 2026-07-07 (expert audit): zero `<script>` references repo-wide, encoded an OLDER ruleset than the live builder (a fix applied there was a silent no-op), yet were documented ✅ Active — exactly the drift ACTIVE_FILES.md exists to prevent. Live logo/product logic is all in `embroidery-quote-builder.js`.
 
@@ -594,7 +585,6 @@
 |------|---------|--------------|--------|
 | `/calculators/screen-print-pricing.html` | Screen print calculator | screenprint-pricing-v2.js, screenprint-pricing-service.js | ✅ Active |
 | `/quote-builders/screenprint-quote-builder.html` | Screen Print Quote Builder 2026 (Excel-style) | screenprint-pricing-service.js | ✅ Active |
-| `/shared_components/js/screenprint-quote-products.js` | ⛔ **DEAD (2026-09-06 census: zero references from any page, script, route or build — pending Erik's `git rm`, see `memory/DASHBOARD_REVIEWS_2026-09.md` § FINAL CENSUS)** Screen print quote product manager | SanMar API | ✅ Active |
 | `/shared_components/js/screenprint-quote-service.js` | Screen print quote save/email service | Caspio API, EmailJS | ✅ Active |
 | `/quote-builders/screenprint-fast-quote.html` | Fast quote form (60 sec) | screenprint-fast-quote-service.js | ✅ Active |
 | `/shared_components/js/screenprint-pricing-v2.js` | Main calculator logic | screenprint-pricing-service.js | ✅ Active |
@@ -627,9 +617,6 @@
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|
 | `/calculators/webstores.html` | **REWRITTEN (2026-05-16)** Custom webstore quote + fundraiser pricing page — AI-first redesign mirroring sticker/emblem layout. Bot handles BOTH store-setup quotes AND per-item fundraiser math via 4 tools (lookup_customer + 2 pricing + web_search). External CSS/JS only. | sticker-pricing-page.css, webstore-pricing-page.css, webstore-pricing-page.js | ✅ Active |
-| `/calculators/webstores-calculator.js` | ⛔ **DEAD (2026-09-06 census: zero references from any page, script, route or build — pending Erik's `git rm`, see `memory/DASHBOARD_REVIEWS_2026-09.md` § FINAL CENSUS)** 🗄️ Pre-AI store-setup logic. Save flow + math now handled inline in webstore-pricing-page.js (same WEB prefix). Delete after soak. | — | 🗄️ Legacy (delete ~2026-06-16) |
-| `/calculators/webstores-fundraiser.js` | ⛔ **DEAD (2026-09-06 census: zero references from any page, script, route or build — pending Erik's `git rm`, see `memory/DASHBOARD_REVIEWS_2026-09.md` § FINAL CENSUS)** 🗄️ Pre-AI fundraiser pricing calculator. Math now in `quote_fundraiser_pricing` tool on the proxy. Delete after soak. | — | 🗄️ Legacy (delete ~2026-06-16) |
-| `/calculators/webstores-quote-service.js` | ⛔ **DEAD (2026-09-06 census: zero references from any page, script, route or build — pending Erik's `git rm`, see `memory/DASHBOARD_REVIEWS_2026-09.md` § FINAL CENSUS)** 🗄️ Pre-AI quote save service. Save flow now in webstore-pricing-page.js (same Caspio endpoints, same WEB prefix). Delete after soak. | base-quote-service.js | 🗄️ Legacy (delete ~2026-06-16) |
 | `/calculators/webstores-styles.css` | 🗄️ Pre-AI page styles. New page uses sticker-pricing-page.css + webstore-pricing-page.css. Delete after soak. | — | 🗄️ Legacy (delete ~2026-06-16) |
 
 ### Special Calculators
@@ -645,8 +632,6 @@
 | `/calculators/safety-stripe-creator.html` | Safety stripes creator (drag-drop config builder) | safety-stripe-calculator.js, safety-stripe-creator-service.js | ✅ Active |
 | `/calculators/safety-stripe-calculator.js` | Safety stripes pricing logic | screenprint-pricing-service.js | ✅ Active |
 | `/calculators/safety-stripe-creator-service.js` | Safety stripes quote save/email service | base-quote-service.js, EmailJS | ✅ Active |
-| `/calculators/embroidery-manual-service.js` | ⛔ **DEAD (2026-09-06 census: zero references from any page, script, route or build — pending Erik's `git rm`, see `memory/DASHBOARD_REVIEWS_2026-09.md` § FINAL CENSUS)** Embroidery manual pricing service (used by unified manual calculator) | embroidery-pricing-service.js | ✅ Active |
-| `/calculators/leatherette-patch-quote-service.js` | ⛔ **DEAD (2026-09-06 census: zero references from any page, script, route or build — pending Erik's `git rm`, see `memory/DASHBOARD_REVIEWS_2026-09.md` § FINAL CENSUS)** Leatherette patch (PATCH) quote save service | base-quote-service.js | ✅ Active |
 
 ### DTG Contract Pricing (Customer-facing)
 | File | Purpose | Dependencies | Status |
@@ -800,7 +785,7 @@
 | `/shared_components/css/elapsed-time-utils.css` · `company-contact-picker.css` · `toast-notifications.css` · `embroidery-quote-pricing.css` · `quote-session.css` · `universal-pricing-grid.css` · `/admin/css/universal-records-admin-injected.css` · `/employee-bundles/css/streich-bros-bundle.css` · `wcttr-bundle.css` | **NEW (2026-09-06)** Stylesheets extracted from `<style>` blocks that shared scripts injected at runtime (Rule 3 by another route) and from the two employee-bundle pages' inline `<style>`. Each is linked by every consumer page of the script it came from. | the scripts of the same name | ✅ Active |
 | `/shared_components/css/screenprint-fast-quote.css` · `/shared_components/js/screenprint-fast-quote-page.js` | **NEW (2026-09-06)** The fast-quote page's inline `<style>` (370 lines) and `<script>` (170 lines) extracted (Rule 3); the page now routes its 4 buttons through `data-call-delegator.js` and loads the VENDORED EmailJS instead of the jsdelivr CDN. | quote-builders/screenprint-fast-quote.html | ✅ Active |
 | `/shared_components/css/calculator-inventory.css` · `manual-mode-indicator.css` · `screenprint-pricing-v2.css` | **NEW (2026-09-06)** Stylesheets extracted from the `<style>` blocks those three shared scripts used to inject on every render (Rule 3). Linked by the 5 calculator pages (v2 by screen-print + the test runner). | calculator-inventory.js, manual-mode-indicator.js, screenprint-pricing-v2.js | ✅ Active |
-| `/admin/css/announcements-create.css` · `announcements-manage.css` · `c112-bogo-promo.css` · `/admin/js/announcements-create-page.js` · `announcements-manage-page.js` · `c112-bogo-promo-page.js` · `c112-bogo-promo-page-2.js` | **NEW (2026-09-06 unlinked-staff batch, `v2026.09.06.30`)** Rule-3 extractions from the three admin pages' inline `<style>`/`<script>` blocks (verbatim, global scope kept — the pages' `data-call` attributes resolve on `window`). Announcements pages are second-hop (reached from the dashboard's announcement bar); the C112 BOGO promo is a retired 2025 promo page kept for its PDF flow. |
+| `/admin/css/announcements-create.css` · `announcements-manage.css` · `/admin/js/announcements-create-page.js` · `announcements-manage-page.js` | **NEW (2026-09-06 unlinked-staff batch, `v2026.09.06.30`)** Rule-3 extractions from the two announcement admin pages' inline `<style>`/`<script>` blocks (verbatim, global scope kept — the pages' `data-call` attributes resolve on `window`). Second-hop pages, reached from the dashboard's announcement bar. (The C112 BOGO promo extractions made in the same batch were deleted 2026-09-06 with the promo page: `server.js` serves that URL as a 410.) |
 | `/dashboards/css/staff-login.css` · `/dashboards/js/staff-login-page.js` · `/dashboards/js/staff-portal-final-page.js` | **NEW (2026-09-06 unlinked-staff batch)** Extracted from `staff-login.html` (the SAML fallback login page) and `staff-portal-final.html` (an old portal index — ORPHAN: nothing links it; candidate for deletion, see DASHBOARD_REVIEWS § unlinked staff pages). |
 | `/vendor-portals/css/sanmar-portal-shared.css` · `sanmar-vendor-portal.css` · `/pages/css/art-billing-reference.css` | **NEW (2026-09-06 final census, `v2026.09.06.32`)** Rule-3 extractions: the SanMar credits + invoices pages shared one identical inline `<style>` block (now one stylesheet), the vendor-portal index had its own; art-billing-reference had a `:root` theme block + a style block, and its three quick-nav `scrollIntoView` buttons became in-page anchors with `scroll-behavior: smooth`. |
 | `/tests/unit/repo-hygiene-final.test.js` | **NEW (2026-09-06 final census)** Repo-WIDE lock: every tracked, served HTML page (≈240) is Rule-3 clean (no `<style>`, no inline script, no handlers, no bare icons, all local assets versioned); no orphan browser script (every JS outside Node-side dirs is referenced by a page/script/route/build); the 69 files the census verified dead (`PENDING_DELETION`) stay unreferenced until Erik's `git rm`. A new page or script anywhere is locked the day it lands. |
@@ -884,14 +869,9 @@
 | `/shared_components/js/quote-formatter.js` | Format quotes | All quote builders | ✅ Active |
 | `/shared_components/js/quote-persistence.js` | Save/load quotes | All quote builders | ✅ Active |
 | `/shared_components/js/quote-session.js` | Session management | All quote builders | ✅ Active |
-| `/shared_components/js/quote-validation.js` | ⛔ **DEAD (2026-09-06 census: zero references from any page, script, route or build — pending Erik's `git rm`, see `memory/DASHBOARD_REVIEWS_2026-09.md` § FINAL CENSUS)** Input validation | All quote builders | ✅ Active |
-| `/shared_components/js/quote-ui-feedback.js` | ⛔ **DEAD (2026-09-06 census: zero references from any page, script, route or build — pending Erik's `git rm`, see `memory/DASHBOARD_REVIEWS_2026-09.md` § FINAL CENSUS)** User feedback | All quote builders | ✅ Active |
-| `/shared_components/js/quote-builder-step2-modern.js` | ⛔ **DEAD (2026-09-06 census: zero references from any page, script, route or build — pending Erik's `git rm`, see `memory/DASHBOARD_REVIEWS_2026-09.md` § FINAL CENSUS)** **NEW** Modern Step 2 UI manager (2025 refactor) | Embroidery & Cap quote builders | ✅ Active |
 | `/shared_components/js/sidebar-resize.js` | **NEW** Resizable sidebar with drag handle | Embroidery quote builder | ✅ Active |
-| `/shared_components/js/color-picker-component.js` | ⛔ **DEAD (2026-09-06 census: zero references from any page, script, route or build — pending Erik's `git rm`, see `memory/DASHBOARD_REVIEWS_2026-09.md` § FINAL CENSUS)** **NEW** Shared color picker module (2026 consolidation) | All quote builders | ✅ Active |
 | `/shared_components/js/extended-sizes-config.js` | **NEW** Shared extended sizes config (2026 consolidation) | All quote builders | ✅ Active |
 | `/shared_components/js/quote-extended-sizes.js` | **NEW** Shared extended size popup functions (2026-03-21 extraction). Waist-group header is `data-call="toggleWaistGroup"` (2026-09-05, no inline handlers) | EMB, DTG, Screenprint | ✅ Active |
-| `/shared_components/js/pricing-sidebar-component.js` | ⛔ **DEAD (2026-09-06 census: zero references from any page, script, route or build — pending Erik's `git rm`, see `memory/DASHBOARD_REVIEWS_2026-09.md` § FINAL CENSUS)** **NEW** Unified pricing sidebar (2026 consolidation) | All quote builders | ✅ Active |
 | `/shared_components/js/quote-share-modal.js` | **NEW** Shareable URL success modal (2026 consolidation) | All quote builders | ✅ Active |
 | `/shared_components/js/customer-lookup-service.js` | **NEW** Customer autocomplete search (2026-01-29) | All quote builders | ✅ Active |
 | `/shared_components/js/customer-context-banners.js` | **NEW** Customer Warning banner + Tax Exempt chip + Account Tier badge + Payment Terms autofill with legacy-CRM mapping (2026-05-23). Exposes `window.surfaceCustomerContext(contact, config)` + `window.mapToOfferedTerms()` | EMB, DTF, SCP quote builders + customer-lookup-service.js | ✅ Active |
@@ -972,7 +952,6 @@
 ### Cap Embroidery Quote System
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|
-| `/shared_components/js/cap-embroidery-pricing-logic.js` | ⛔ **DEAD (2026-09-06 census: zero references from any page, script, route or build — pending Erik's `git rm`, see `memory/DASHBOARD_REVIEWS_2026-09.md` § FINAL CENSUS)** Cap embroidery pricing logic (shared between manual + quote builder) | embroidery-pricing-service.js | ✅ Active |
 | `/shared_components/js/cap-embroidery-pricing-service.js` | Cap embroidery Caspio data adapter | Caspio API | ✅ Active |
 | ~~`/shared_components/js/cap-quote-builder.js`~~ | **DELETED 2026-06-09** — dead cap-quote system (no HTML loads it; EMB builder handles caps via shared services). | — | ❌ Deleted |
 | ~~`/shared_components/js/cap-quote-logos.js`~~ | **DELETED 2026-06-09** — orphaned after cap-quote-builder.js deletion; zero references verified. | — | ❌ Deleted |
@@ -993,12 +972,8 @@
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|
 | `/shared_components/js/dtg-catalog.js` | NWCA-Approved DTG Catalog browser on `/quote-builders/dtg-quote-builder.html` — fetches `/api/dtg/top-sellers/{categories,styles,?style=X}`, renders style grid + detail modal with colors/sizes, drops picks onto the inline form via `window.DTGInlineForm.previewStyle()` (surface now served by builders/dtg/form-core.js). **2026-06-03**: when a quick-find search misses the curated 20, offers a fallback to the FULL SanMar catalog via `/api/stylesearch` (empty-state CTA + a quiet footer link for queries that collide with a curated style, e.g. "5000"→DT5000); picking a result fetches `/api/product-colors` and drops the style into the form (full DTG pricing hydrates via `/api/dtg/product-bundle`, identical to curated). Non-blocking DTG-suitability warnings flag Gildan + poly/performance fabrics (`dtgSuitabilityWarning()`). | `/api/dtg/top-sellers/*`, `/api/stylesearch`, `/api/product-colors` proxy endpoints, dtg-inline-form.js, dtg-catalog.css | ✅ Active |
-| `/shared_components/js/dtg-config.js` | ⛔ **DEAD (2026-09-06 census: zero references from any page, script, route or build — pending Erik's `git rm`, see `memory/DASHBOARD_REVIEWS_2026-09.md` § FINAL CENSUS)** DTG location/print settings configuration | — | ✅ Active |
-| `/shared_components/js/dtg-integration.js` | ⛔ **DEAD (2026-09-06 census: zero references from any page, script, route or build — pending Erik's `git rm`, see `memory/DASHBOARD_REVIEWS_2026-09.md` § FINAL CENSUS)** DTG calculator/adapter coordinator | dtg-pricing-service.js | ✅ Active |
 | `/shared_components/js/dtg-page-setup.js` | DTG pricing page initialization | — | ✅ Active |
 | `/shared_components/js/dtg-pricing-service.js` | DTG pricing Caspio data adapter | Caspio API | ✅ Active |
-| `/shared_components/js/dtg-product-recommendations.js` | ⛔ **DEAD (2026-09-06 census: zero references from any page, script, route or build — pending Erik's `git rm`, see `memory/DASHBOARD_REVIEWS_2026-09.md` § FINAL CENSUS)** DTG-tested product suggestions | — | ✅ Active |
-| `/shared_components/js/dtg-product-recommendations-modal.js` | ⛔ **DEAD (2026-09-06 census: zero references from any page, script, route or build — pending Erik's `git rm`, see `memory/DASHBOARD_REVIEWS_2026-09.md` § FINAL CENSUS)** Modal UI for DTG product recommendations | dtg-product-recommendations.js | ✅ Active |
 
 ### DTF Extended Services
 | File | Purpose | Dependencies | Status |
@@ -1009,8 +984,6 @@
 ### Embroidery Extended Services
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|
-| `/shared_components/js/embroidery-customization-options.js` | ⛔ **DEAD (2026-09-06 census: zero references from any page, script, route or build — pending Erik's `git rm`, see `memory/DASHBOARD_REVIEWS_2026-09.md` § FINAL CENSUS)** Embroidery customization options UI (logo placements, AL toggles) | — | ✅ Active |
-| `/shared_components/js/embroidery-enhanced-loading.js` | ⛔ **DEAD (2026-09-06 census: zero references from any page, script, route or build — pending Erik's `git rm`, see `memory/DASHBOARD_REVIEWS_2026-09.md` § FINAL CENSUS)** Embroidery page loading animations | — | ✅ Active |
 | `/shared_components/js/embroidery-quote-builder.js` | **TOMBSTONE (2026-07-08)** — the 13,703-line monolith is fully decomposed (0.4+0.5): behavior → builders/emb/*.js, boot → QuoteBuilderBase+EmbAdapter, state → builders/emb/state.js. The EMB page no longer loads this path; delete once nothing references it. | — | 🪦 Tombstone |
 
 ### Screen Print Extended Services
@@ -1018,7 +991,6 @@
 |------|---------|--------------|--------|
 | `/shared_components/js/screenprint-manual-pricing.js` | Screen print manual pricing service (used by unified manual calculator) | screenprint-pricing-service.js | ✅ Active |
 | `/shared_components/js/screenprint-quote-builder.js` | **TOMBSTONE (2026-07-08)** — the SCP monolith is fully decomposed into `builders/scp/*` (state/adapter + 7 domain modules + index boot); the page loads ONLY the bundle. Kept so stale references fail loudly. | (none — do not add code) | 🪦 Tombstone |
-| `/shared_components/js/screenprint-shopworks-guide-generator.js` | ⛔ **DEAD (2026-09-06 census: zero references from any page, script, route or build — pending Erik's `git rm`, see `memory/DASHBOARD_REVIEWS_2026-09.md` § FINAL CENSUS)** Screen print ShopWorks manual data-entry guide generator | shopworks-guide-generator.js | ⚠️ Orphan — loaded by no HTML; superseded by the `/api/scp-push/push-quote` API push (2026-05-29). Safe to delete pending Erik's OK. |
 
 ### Universal Components (header, gallery, grid)
 | File | Purpose | Dependencies | Status |
@@ -1039,16 +1011,12 @@
 | `/shared_components/js/product-grid.js` | Product grid display + lazy load | — | ✅ Active |
 | `/shared_components/js/safety-stripe-recs.js` | **NEW (2026-06-28)** Shared renderer for curated hi-vis "safety apparel" recommendation cards (`SafetyStripeRecs.render(mountId, {variant,audience,onAdd,limit})`). Used by all 4 quote builders, Quick Quote, and the customer catalog. Fetches `GET /api/safety-stripes/top-sellers/styles` (Caspio `Safety_Stripe_Top_Sellers_2026`); `variant:'builder'` = one-click Add, `variant:'catalog'` = customer card (no sales numbers). Fails quiet (optional cross-sell). | safety-stripe-recs.css, caspio-proxy API | ✅ Active |
 | `/shared_components/js/product-pricing-ui.js` | Product pricing UI rendering | universal-pricing-grid.js | ✅ Active |
-| `/shared_components/js/product-recommendations.js` | ⛔ **DEAD (2026-09-06 census: zero references from any page, script, route or build — pending Erik's `git rm`, see `memory/DASHBOARD_REVIEWS_2026-09.md` § FINAL CENSUS)** Product recommendation engine | — | ✅ Active |
 | `/shared_components/js/product-search.js` | Product search UI | product-search-service.js | ✅ Active |
 | `/shared_components/js/exact-match-search.js` | Optimized exact-style-number search for sales reps | /api/products/search | ✅ Active |
 
 ### ShopWorks Integration Services
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|
-| `/shared_components/js/edp-generator-service.js` | ⛔ **DEAD (2026-09-06 census: zero references from any page, script, route or build — pending Erik's `git rm`, see `memory/DASHBOARD_REVIEWS_2026-09.md` § FINAL CENSUS)** OnSite 7 EDP file generator (External Data Processor format) | — | ✅ Active |
-| `/shared_components/js/shopworks-edp-generator.js` | ⛔ **DEAD (2026-09-06 census: zero references from any page, script, route or build — pending Erik's `git rm`, see `memory/DASHBOARD_REVIEWS_2026-09.md` § FINAL CENSUS)** ShopWorks-specific EDP wrapper | edp-generator-service.js | ✅ Active |
-| `/shared_components/js/shopworks-guide-generator.js` | ⛔ **DEAD (2026-09-06 census: zero references from any page, script, route or build — pending Erik's `git rm`, see `memory/DASHBOARD_REVIEWS_2026-09.md` § FINAL CENSUS)** Generic ShopWorks order guide generator | — | ✅ Active |
 | `/shared_components/js/manageorders-customer-service.js` | ManageOrders customer lookup service | /api/manageorders/customers | ✅ Active |
 | `/shared_components/js/manageorders-inventory-service.js` | ManageOrders inventory queries | /api/manageorders/inventory | ✅ Active |
 
@@ -1103,12 +1071,9 @@
 | `/shared_components/js/toast-notifications.js` | **2026-09-05: self-styling (no stylesheet ever defined `.nwca-toast` — toasts rendered as bare text), message via textContent (was innerHTML), `role=alert` on errors, errors stay 8 s. Now loaded by art-request-detail, quote-view and invoice, whose 45 `alert()` calls became `ToastNotifications.error/success/info` (mockup-detail used its own `showToast`).** Toast notification system (success/error/info) | — | ✅ Active |
 | `/shared_components/js/elapsed-time-utils.js` | Elapsed-time badges with urgency tiers (Fresh / Waiting / Overdue) — used by all art/mockup dashboards | caspio-date-utils.js | ✅ Active |
 | `/shared_components/js/caspio-date-utils.js` | Single source of truth for parsing Caspio timestamps (Pacific server time → correct UTC instant, DST-aware). Use `window.CaspioDate.parse/formatDateTime/formatDate/formatAge` instead of any `+ 'Z'` append idiom. | — | ✅ Active |
-| `/shared_components/js/enhanced-loading-animations.js` | ⛔ **DEAD (2026-09-06 census: zero references from any page, script, route or build — pending Erik's `git rm`, see `memory/DASHBOARD_REVIEWS_2026-09.md` § FINAL CENSUS)** Enhanced loading animations (skeleton screens, spinners) | — | ✅ Active |
 | `/shared_components/js/manual-mode-indicator.js` | Visual banner shown when pricing pages are in manual cost override mode | — | ✅ Active |
-| `/shared_components/js/header-button-functions.js` | ⛔ **DEAD (2026-09-06 census: zero references from any page, script, route or build — pending Erik's `git rm`, see `memory/DASHBOARD_REVIEWS_2026-09.md` § FINAL CENSUS)** Header button helper functions (shareQuote, etc.) | — | ✅ Active |
 | `/shared_components/js/cart-drawer.js` | Slide-in sample-cart drawer (color/size picker) — used by /catalog Top Sellers view + product.html Order-a-sample CTA | sample-cart-service.js, cart-drawer.css | ✅ Active |
 | `/shared_components/js/confetti.js` | Canvas-based confetti animation (lightweight, no library) | — | ✅ Active |
-| `/shared_components/js/quote-indicator-manager.js` | ⛔ **DEAD (2026-09-06 census: zero references from any page, script, route or build — pending Erik's `git rm`, see `memory/DASHBOARD_REVIEWS_2026-09.md` § FINAL CENSUS)** Persistent quote-indicator widget (collapsible, real-time updates) | — | ✅ Active |
 | `/shared_components/js/design-thumbnail-service.js` | Fetch design thumbnails from `Shopworks_Thumbnail_Report` (cached) | /api/thumbnails | ✅ Active |
 | `/shared_components/js/jds-api-service.js` | JDS Industries API service (laser tumblers, 1hr cache) | /api/jds | ✅ Active |
 | `/shared_components/js/laser-tumbler-simple.js` | Simple laser tumbler quote flow | jds-api-service.js | ✅ Active |
@@ -1126,8 +1091,6 @@
 ### Test/Dev Utilities (in shared_components/js — TODO move to /tests/)
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|
-| `/shared_components/js/order-service-test-extended.js` | ⛔ **DEAD (2026-09-06 census: zero references from any page, script, route or build — pending Erik's `git rm`, see `memory/DASHBOARD_REVIEWS_2026-09.md` § FINAL CENSUS)** Extended order service tests | sample-order-service.js | ⚠️ Move to /tests/ |
-| `/shared_components/js/order-service-test-utilities.js` | ⛔ **DEAD (2026-09-06 census: zero references from any page, script, route or build — pending Erik's `git rm`, see `memory/DASHBOARD_REVIEWS_2026-09.md` § FINAL CENSUS)** Order service test utilities | — | ⚠️ Move to /tests/ |
 
 ### Product Page Modules (`/product/`)
 | File | Purpose | Dependencies | Status |
@@ -1608,7 +1571,6 @@ cap-embroidery-fix.css
 | File | Purpose | Status |
 |------|---------|--------|
 | `/shared_components/js/staff-dashboard-service.js` | ShopWorks ManageOrders API integration. **⚠️ DEAD as of 2026-07-25** — it existed solely as the garment-tracker bridge; the Embroidery Bonus card that replaced that tracker calls the API directly, so no HTML loads this file any more. Left on disk (flagged, not auto-deleted per CLAUDE.md dead-code policy). Its ~1,500 lines of garment sync logic and hardcoded proxy URL (Rule #7 debt) are no longer shipped to any page. | 🗑️ Dead — no `<script>` references |
-| `/shared_components/js/staff-dashboard-announcements.js` | ⛔ **DEAD (2026-09-06 census: zero references from any page, script, route or build — pending Erik's `git rm`, see `memory/DASHBOARD_REVIEWS_2026-09.md` § FINAL CENSUS)** Priority announcements with dismiss | ✅ Active |
 | `/shared_components/js/staff-dashboard-init.js` | Initialization, widget toggles, auto-refresh | ✅ Active |
 
 ### Staff Dashboard V3 Refactor (in development on `refactor/staff-dashboard-v3` branch — 2026-05-12)
@@ -1807,7 +1769,6 @@ Operational guides, training modules, and Adriyella's daily-task tooling. Most a
 | `/training/team-match-game.html` | Team match game (training) | ✅ Active |
 | `/training/test.html` | Test page (likely scratch — verify) | ⚠️ Verify |
 | `/training/thank-you-card-guide.html` | Thank-you card guide | ✅ Active |
-| `/training/training-engine-base.js` | ⛔ **DEAD (2026-09-06 census: zero references from any page, script, route or build — pending Erik's `git rm`, see `memory/DASHBOARD_REVIEWS_2026-09.md` § FINAL CENSUS)** Training engine base class | ✅ Active |
 | `/training/training-games-hub.html` | Training games hub | ✅ Active |
 | `/training/server.js` | Local training server (dev only) | ⚙️ Tooling |
 | `/training/simple-server.js` | Simple training server (dev only) | ⚙️ Tooling |
@@ -1818,17 +1779,6 @@ UI/UX prototypes used during design iteration. Not in production routes.
 
 | File | Purpose | Status |
 |------|---------|--------|
-| `/mockups/dtg-3-step-mockup.html` | ⛔ **DEAD (2026-09-06 census: zero references from any page, script, route or build — pending Erik's `git rm`, see `memory/DASHBOARD_REVIEWS_2026-09.md` § FINAL CENSUS)** DTG 3-step ordering flow mockup | 🎨 Prototype |
-| `/mockups/dtg-3-step-complete.html` | ⛔ **DEAD (2026-09-06 census: zero references from any page, script, route or build — pending Erik's `git rm`, see `memory/DASHBOARD_REVIEWS_2026-09.md` § FINAL CENSUS)** DTG 3-step complete state mockup | 🎨 Prototype |
-| `/mockups/dtg-location-mockup.html` | ⛔ **DEAD (2026-09-06 census: zero references from any page, script, route or build — pending Erik's `git rm`, see `memory/DASHBOARD_REVIEWS_2026-09.md` § FINAL CENSUS)** DTG location selector mockup | 🎨 Prototype |
-| `/mockups/dtg-location-mockup-real-image.html` | ⛔ **DEAD (2026-09-06 census: zero references from any page, script, route or build — pending Erik's `git rm`, see `memory/DASHBOARD_REVIEWS_2026-09.md` § FINAL CENSUS)** DTG location mockup (real image variant) | 🎨 Prototype |
-| `/mockups/dtg-location-mockup-with-images.html` | ⛔ **DEAD (2026-09-06 census: zero references from any page, script, route or build — pending Erik's `git rm`, see `memory/DASHBOARD_REVIEWS_2026-09.md` § FINAL CENSUS)** DTG location mockup (with images) | 🎨 Prototype |
-| `/mockups/dtg-location-selector-final.html` | ⛔ **DEAD (2026-09-06 census: zero references from any page, script, route or build — pending Erik's `git rm`, see `memory/DASHBOARD_REVIEWS_2026-09.md` § FINAL CENSUS)** DTG location selector (final design) | 🎨 Prototype |
-| `/mockups/edit-ruth-mockup.html` | ⛔ **DEAD (2026-09-06 census: zero references from any page, script, route or build — pending Erik's `git rm`, see `memory/DASHBOARD_REVIEWS_2026-09.md` § FINAL CENSUS)** Ruth mockup edit prototype | 🎨 Prototype |
-| `/mockups/product-page-complete-mockup.html` | ⛔ **DEAD (2026-09-06 census: zero references from any page, script, route or build — pending Erik's `git rm`, see `memory/DASHBOARD_REVIEWS_2026-09.md` § FINAL CENSUS)** Product page complete mockup | 🎨 Prototype |
-| `/mockups/staff-portal-mockup-1.html` | ⛔ **DEAD (2026-09-06 census: zero references from any page, script, route or build — pending Erik's `git rm`, see `memory/DASHBOARD_REVIEWS_2026-09.md` § FINAL CENSUS)** Staff portal mockup variant 1 | 🎨 Prototype |
-| `/mockups/staff-portal-mockup-2.html` | ⛔ **DEAD (2026-09-06 census: zero references from any page, script, route or build — pending Erik's `git rm`, see `memory/DASHBOARD_REVIEWS_2026-09.md` § FINAL CENSUS)** Staff portal mockup variant 2 | 🎨 Prototype |
-| `/mockups/staff-portal-mockup-3.html` | ⛔ **DEAD (2026-09-06 census: zero references from any page, script, route or build — pending Erik's `git rm`, see `memory/DASHBOARD_REVIEWS_2026-09.md` § FINAL CENSUS)** Staff portal mockup variant 3 | 🎨 Prototype |
 
 ### Other Active Directories (file-count summary)
 
@@ -1841,7 +1791,7 @@ These directories contain code but aren't enumerated at file level — list grow
 | `/email-templates/` | 7 HTML | EmailJS templates: BCA customer email, xmas bundle, ready, embroidery, sample request, screenprint customer |
 | `/employee-bundles/` | 2 HTML | streich-bros-bundle, wcttr-bundle |
 | `/policies/` (root-level) | 8 HTML | Bundle kitting xmas, customer notification SOP, DTG artwork checklist, LTM fee policy, LTM order decision algorithm, payment terms, retail-vs-wholesale policy, sales office procedures |
-| `/richardson-caps/` | 1 HTML + 1 JS | view-combination-caps.html, scripts/richardson-combination-caps-manual.js |
+| `/richardson-caps/` | docs + data only | Richardson is CLOSED (Erik); the page + script were deleted 2026-09-06 (final census). `docs/`, `data/`, `README.md` kept as reference. |
 | `/scripts/` | 14 JS | Backfill, validation, prevention, cleanup, doc-freshness, generate-new-products, parse-production-schedule, etc. |
 | `/scripts/safety-tools/` | 7 JS | auto-recovery, comprehensive-test-suite, dependency-mapper, error-monitor, file-access-monitor, safe-delete, validate-critical-paths |
 | `/templates/` | 4 HTML + 1 JS | Calculator template, email template, emblem email template, laser tumbler EmailJS template, quote service template |
