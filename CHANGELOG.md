@@ -1,3 +1,9 @@
+## v2026.09.06.35 (2026.09.06)
+
+- Memory: final-census section + LESSONS entry, DEAD_FILES_2026-09-06.md (69 files + Erik's git rm command), INDEX pointer; customer-login LESSONS entry archived
+- Delete the 69 dead files from the 2026-09-06 census (Erik's instruction)
+- Deploy v2026.09.06.35: 69 dead files removed (2026-09-06 census)
+
 ## v2026.09.06.34 (2026.09.06)
 
 - Forms library: the 5 icons the shared scripts render (save button, date pickers, banners) are decorative; scripts added to the renderer lock
