@@ -26,13 +26,13 @@
         el.className = 'pd-lightbox-overlay';
         el.innerHTML = `
             <button type="button" class="pd-lightbox-close" aria-label="Close (Esc)">
-                <i class="fas fa-xmark"></i>
+                <i class="fas fa-xmark" aria-hidden="true"></i>
             </button>
             <button type="button" class="pd-lightbox-prev" aria-label="Previous image (←)">
-                <i class="fas fa-chevron-left"></i>
+                <i class="fas fa-chevron-left" aria-hidden="true"></i>
             </button>
             <button type="button" class="pd-lightbox-next" aria-label="Next image (→)">
-                <i class="fas fa-chevron-right"></i>
+                <i class="fas fa-chevron-right" aria-hidden="true"></i>
             </button>
             <div class="pd-lightbox-stage">
                 <img class="pd-lightbox-img" src="" alt="">

@@ -87,7 +87,7 @@
                 block.classList.add('mermaid-error');
                 const errEl = document.createElement('div');
                 errEl.className = 'mermaid-error-banner';
-                errEl.innerHTML = `<i class="fas fa-triangle-exclamation"></i> Diagram failed to render — showing source below`;
+                errEl.innerHTML = `<i class="fas fa-triangle-exclamation" aria-hidden="true"></i> Diagram failed to render — showing source below`;
                 block.parentNode.insertBefore(errEl, block);
             }
         }
@@ -140,18 +140,18 @@
                 <div class="ai-modal" role="dialog" aria-labelledby="mermaidTitle" style="max-width:780px">
                     <div class="ai-modal-header">
                         <h2 id="mermaidTitle">
-                            <i class="fas fa-diagram-project"></i>
+                            <i class="fas fa-diagram-project" aria-hidden="true"></i>
                             Insert diagram
                         </h2>
                         <button type="button" class="ai-modal-close" aria-label="Close">
-                            <i class="fas fa-xmark"></i>
+                            <i class="fas fa-xmark" aria-hidden="true"></i>
                         </button>
                     </div>
 
                     <div class="ai-modal-body">
                         <div class="mermaid-tabs">
-                            <button type="button" class="mermaid-tab active" data-tab="generate"><i class="fas fa-sparkles"></i> Generate from description</button>
-                            <button type="button" class="mermaid-tab" data-tab="manual"><i class="fas fa-code"></i> Write Mermaid code</button>
+                            <button type="button" class="mermaid-tab active" data-tab="generate"><i class="fas fa-sparkles" aria-hidden="true"></i> Generate from description</button>
+                            <button type="button" class="mermaid-tab" data-tab="manual"><i class="fas fa-code" aria-hidden="true"></i> Write Mermaid code</button>
                         </div>
 
                         <div class="mermaid-pane mermaid-pane-generate active">
@@ -161,7 +161,7 @@
                             </div>
                             <form class="ai-search-form" id="mermaidGenForm">
                                 <input type="text" id="mermaidPrompt" class="ai-search-input" placeholder="What should the diagram show?" maxlength="300">
-                                <button type="submit" class="btn btn-primary" id="mermaidGenBtn"><i class="fas fa-sparkles"></i> Generate</button>
+                                <button type="submit" class="btn btn-primary" id="mermaidGenBtn"><i class="fas fa-sparkles" aria-hidden="true"></i> Generate</button>
                             </form>
                             <div class="ai-search-status" id="mermaidStatus"></div>
                         </div>
@@ -175,14 +175,14 @@
                         </div>
 
                         <div class="mermaid-preview-wrap" id="mermaidPreviewWrap" style="display:none">
-                            <div class="ai-output-header"><span><i class="fas fa-eye"></i> Preview</span></div>
+                            <div class="ai-output-header"><span><i class="fas fa-eye" aria-hidden="true"></i> Preview</span></div>
                             <div class="mermaid-preview" id="mermaidPreview"></div>
                         </div>
                     </div>
 
                     <div class="ai-modal-footer">
                         <button type="button" class="btn btn-secondary" id="mermaidCancel">Cancel</button>
-                        <button type="button" class="btn btn-primary" id="mermaidInsert" disabled><i class="fas fa-check"></i> Insert</button>
+                        <button type="button" class="btn btn-primary" id="mermaidInsert" disabled><i class="fas fa-check" aria-hidden="true"></i> Insert</button>
                     </div>
                 </div>
             </div>
@@ -239,23 +239,23 @@
             const prompt = promptInput.value.trim();
             if (!prompt) return;
             genBtn.disabled = true;
-            genBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Generating…';
+            genBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin" aria-hidden="true"></i> Generating…';
             statusEl.innerHTML = '';
             statusEl.classList.remove('error');
 
             try {
                 const code = await runGenerateMermaid(prompt, editor);
                 codeArea.value = code;
-                statusEl.innerHTML = `<i class="fas fa-check-circle"></i> Diagram generated — review the preview below, edit if needed, then click Insert`;
+                statusEl.innerHTML = `<i class="fas fa-check-circle" aria-hidden="true"></i> Diagram generated — review the preview below, edit if needed, then click Insert`;
                 // Auto-switch to manual tab so user can tweak
                 tabs[1].click();
                 await updatePreview(code);
             } catch (err) {
-                statusEl.innerHTML = `<i class="fas fa-triangle-exclamation"></i> ${escapeHtml(err.message)}`;
+                statusEl.innerHTML = `<i class="fas fa-triangle-exclamation" aria-hidden="true"></i> ${escapeHtml(err.message)}`;
                 statusEl.classList.add('error');
             } finally {
                 genBtn.disabled = false;
-                genBtn.innerHTML = '<i class="fas fa-sparkles"></i> Generate';
+                genBtn.innerHTML = '<i class="fas fa-sparkles" aria-hidden="true"></i> Generate';
             }
         });
 
@@ -280,7 +280,7 @@
                 return;
             }
             previewWrap.style.display = '';
-            previewEl.innerHTML = '<div class="mermaid-preview-loading"><i class="fas fa-circle-notch fa-spin"></i> Rendering…</div>';
+            previewEl.innerHTML = '<div class="mermaid-preview-loading"><i class="fas fa-circle-notch fa-spin" aria-hidden="true"></i> Rendering…</div>';
 
             try {
                 const lib = await loadMermaid();
@@ -289,7 +289,7 @@
                 previewEl.innerHTML = svg;
                 insertBtn.disabled = false;
             } catch (e) {
-                previewEl.innerHTML = `<div class="mermaid-preview-error"><i class="fas fa-triangle-exclamation"></i> ${escapeHtml(e.message || 'Invalid Mermaid syntax')}</div>`;
+                previewEl.innerHTML = `<div class="mermaid-preview-error"><i class="fas fa-triangle-exclamation" aria-hidden="true"></i> ${escapeHtml(e.message || 'Invalid Mermaid syntax')}</div>`;
                 insertBtn.disabled = true;
             }
         }

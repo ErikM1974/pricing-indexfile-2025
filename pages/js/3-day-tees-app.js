@@ -841,7 +841,7 @@
                     <span class="chip-swatch" style="background-image:url('${escapeHTML(c.swatchImage)}')"></span>
                     <strong>${escapeHTML(c.colorName)}</strong>
                     ${copyLink}
-                    <button type="button" class="color-card-remove" data-remove="${escapeHTML(line.catalogColor)}" aria-label="Remove ${escapeHTML(c.colorName)}"><i class="fas fa-times"></i></button>
+                    <button type="button" class="color-card-remove" data-remove="${escapeHTML(line.catalogColor)}" aria-label="Remove ${escapeHTML(c.colorName)}"><i class="fas fa-times" aria-hidden="true"></i></button>
                 </div>
                 <div class="size-grid">${cells}</div>
                 <div class="color-card-foot"><span>${count} piece${count === 1 ? '' : 's'}</span></div>`;
@@ -1016,7 +1016,7 @@
 
         totals.innerHTML = buildTotalsHtml(q);
         const p = TDTShipDate.promise(new Date());
-        $('review-promise').innerHTML = `<i class="fas fa-truck-fast"></i> Ships ${escapeHTML(p.shipDateLong)} from Milton, WA`;
+        $('review-promise').innerHTML = `<i class="fas fa-truck-fast" aria-hidden="true"></i> Ships ${escapeHTML(p.shipDateLong)} from Milton, WA`;
 
         // Low-DPI acknowledgment restated
         const ackEl = $('review-ack');

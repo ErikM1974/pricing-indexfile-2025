@@ -66,7 +66,7 @@ function dtgInlineAlert(message) {
                 cardsHTML += `
                     <div class="dtg-product-section">
                         <h4 class="dtg-section-title">
-                            <i class="fas fa-tshirt"></i>
+                            <i class="fas fa-tshirt" aria-hidden="true"></i>
                             T-Shirts
                         </h4>
                         <div class="dtg-section-grid">
@@ -87,7 +87,7 @@ function dtgInlineAlert(message) {
                 cardsHTML += `
                     <div class="dtg-product-section">
                         <h4 class="dtg-section-title">
-                            <i class="fas fa-hoodie"></i>
+                            <i class="fas fa-hoodie" aria-hidden="true"></i>
                             Hoodies & Sweatshirts
                         </h4>
                         <div class="dtg-section-grid">
@@ -153,7 +153,7 @@ function dtgInlineAlert(message) {
                                 </div>
                             ` : ''}
                             <button class="dtg-card-button" onclick="loadProductStyle('${product.style}')">
-                                <i class="fas fa-arrow-right"></i> Load This Style
+                                <i class="fas fa-arrow-right" aria-hidden="true"></i> Load This Style
                             </button>
                         </div>
                     </div>
@@ -1285,7 +1285,7 @@ function dtgInlineAlert(message) {
                 }
 
                 // Show loading state
-                resultsContainer.innerHTML = '<div class="search-loading"><i class="fas fa-spinner fa-spin"></i> Searching...</div>';
+                resultsContainer.innerHTML = '<div class="search-loading"><i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Searching...</div>';
                 resultsContainer.classList.add('active');
 
                 try {
@@ -1395,7 +1395,7 @@ function dtgInlineAlert(message) {
 
         function showNoProduct() {
             loadingState.innerHTML = `
-                <i class="fas fa-search"></i>
+                <i class="fas fa-search" aria-hidden="true"></i>
                 <p>Search for a style to view DTG pricing</p>
             `;
         }

@@ -334,13 +334,13 @@
                 
                 let message = '';
                 if (accuracy >= 90) {
-                    message = `<i class="fas fa-star" style="color: gold;"></i> Outstanding! You're a tax code expert!`;
+                    message = `<i class="fas fa-star" style="color: gold;" aria-hidden="true"></i> Outstanding! You're a tax code expert!`;
                 } else if (accuracy >= 70) {
-                    message = `<i class="fas fa-thumbs-up" style="color: var(--primary-color);"></i> Good job! You're getting the hang of it!`;
+                    message = `<i class="fas fa-thumbs-up" style="color: var(--primary-color);" aria-hidden="true"></i> Good job! You're getting the hang of it!`;
                 } else if (accuracy >= 50) {
-                    message = `<i class="fas fa-chart-line" style="color: var(--warning-text);"></i> Keep practicing! You're improving!`;
+                    message = `<i class="fas fa-chart-line" style="color: var(--warning-text);" aria-hidden="true"></i> Keep practicing! You're improving!`;
                 } else {
-                    message = `<i class="fas fa-book" style="color: var(--text-secondary);"></i> Review the tax codes and try again!`;
+                    message = `<i class="fas fa-book" style="color: var(--text-secondary);" aria-hidden="true"></i> Review the tax codes and try again!`;
                 }
                 
                 document.getElementById('performanceMessage').innerHTML = message;

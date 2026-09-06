@@ -4823,7 +4823,7 @@
         changesAttachedFiles.forEach(function (f, idx) {
             var chip = document.createElement('span');
             chip.className = 'ard-changes-file-chip';
-            chip.innerHTML = '<i class="fas fa-paperclip"></i> ' + escapeHtml(f.name)
+            chip.innerHTML = '<i class="fas fa-paperclip" aria-hidden="true"></i> ' + escapeHtml(f.name)
                 + ' <span class="ard-changes-file-chip-remove" data-idx="' + idx + '">&times;</span>';
             chip.querySelector('.ard-changes-file-chip-remove').onclick = function () {
                 changesAttachedFiles.splice(idx, 1);

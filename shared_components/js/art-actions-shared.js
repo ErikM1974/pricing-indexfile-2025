@@ -8,6 +8,9 @@
  *
  * Depends on: EmailJS SDK (optional, for notifications), APP_CONFIG (optional)
  */
+/* Logging gate (2026-09-06): art-actions-shared.js chatter only on localhost or ?debug=1; console.error/warn stay live. */
+var AAS_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
+var aasLog = AAS_LOG_ON ? console.log.bind(console) : function () {};
 (function () {
     'use strict';
 
@@ -482,7 +485,7 @@
         });
         var aeSend = emailjs.send(EMAILJS_SERVICE_ID, 'template_rush_confirm', aeParams)
             .then(function () {
-                console.log('[Rush] AE confirmation sent to', params.aeEmail, ccEmail ? '(cc ' + ccEmail + ')' : '');
+                aasLog('[Rush] AE confirmation sent to', params.aeEmail, ccEmail ? '(cc ' + ccEmail + ')' : '');
             })
             .catch(function (err) {
                 console.warn('[Rush] AE confirmation failed (non-blocking):', err);
@@ -499,7 +502,7 @@
         });
         var recipientSend = emailjs.send(EMAILJS_SERVICE_ID, 'template_rush_confirm', recipientParams)
             .then(function () {
-                console.log('[Rush] Recipient notification sent to', recipientEmail);
+                aasLog('[Rush] Recipient notification sent to', recipientEmail);
             })
             .catch(function (err) {
                 console.warn('[Rush] Recipient notification failed (non-blocking):', err);
@@ -534,7 +537,7 @@
      */
     async function showArtTimeModal(designId, repEmail, companyName, onSuccess) {
       try {
-        console.log('[ArtActions.showArtTimeModal] opening for designId=', designId);
+        aasLog('[ArtActions.showArtTimeModal] opening for designId=', designId);
         removeModals();
 
         var currentMins = 0;

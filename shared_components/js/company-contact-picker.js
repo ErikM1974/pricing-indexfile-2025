@@ -55,56 +55,7 @@
     function injectStyles() {
         if (STYLE_INJECTED) return;
         STYLE_INJECTED = true;
-        var css = ''
-            + '.ccp-dropdown {'
-            + '  position: absolute; top: 100%; left: 0; right: 0; z-index: 1000;'
-            + '  background: #fff; border: 1px solid #d1d5db; border-radius: 6px;'
-            + '  box-shadow: 0 4px 12px rgba(0,0,0,0.1);'
-            + '  max-height: 380px; overflow-y: auto; margin-top: 2px;'
-            + '  display: none;'
-            + '}'
-            + '.ccp-dropdown.ccp-open { display: block; }'
-            + '.ccp-section-header {'
-            + '  padding: 8px 12px 4px; font-size: 11px; font-weight: 700;'
-            + '  text-transform: uppercase; letter-spacing: 0.05em;'
-            + '  color: #6b7280; background: #f9fafb; border-bottom: 1px solid #e5e7eb;'
-            + '  position: sticky; top: 0;'
-            + '}'
-            + '.ccp-item {'
-            + '  padding: 8px 12px; cursor: pointer;'
-            + '  border-bottom: 1px solid #f3f4f6; display: flex; align-items: center;'
-            + '  gap: 10px;'
-            + '}'
-            + '.ccp-item:hover, .ccp-item.ccp-highlight { background: #f3f4f6; }'
-            + '.ccp-item-icon { font-size: 16px; flex-shrink: 0; opacity: 0.6; }'
-            + '.ccp-item-body { flex: 1; min-width: 0; }'
-            + '.ccp-item-primary {'
-            + '  font-weight: 600; color: #111827; font-size: 14px;'
-            + '  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;'
-            + '}'
-            + '.ccp-item-secondary {'
-            + '  font-size: 12px; color: #6b7280;'
-            + '  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;'
-            + '}'
-            + '.ccp-item-meta {'
-            + '  font-size: 11px; color: #9ca3af; flex-shrink: 0;'
-            + '}'
-            + '.ccp-item-id {'
-            + '  font-size: 12px; font-weight: 400; color: #9ca3af; margin-left: 4px;'
-            + '}'
-            + '.ccp-empty, .ccp-loading {'
-            + '  padding: 16px 12px; text-align: center; color: #6b7280; font-size: 13px;'
-            + '}'
-            + '.ccp-back {'
-            + '  padding: 6px 12px; cursor: pointer; font-size: 12px;'
-            + '  color: #2563eb; background: #eff6ff; border-bottom: 1px solid #dbeafe;'
-            + '}'
-            + '.ccp-back:hover { background: #dbeafe; }'
-            + '';
-        var styleEl = document.createElement('style');
-        styleEl.id = 'ccp-styles';
-        styleEl.textContent = css;
-        document.head.appendChild(styleEl);
+        // (2026-09-06) styles live in /shared_components/css/company-contact-picker.css — linked by every consumer page.
     }
 
     function escapeHtml(str) {

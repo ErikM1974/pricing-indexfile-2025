@@ -158,10 +158,10 @@
         if (root) {
             root.innerHTML = `
                 <div class="detail-error">
-                    <i class="fas fa-exclamation-triangle"></i>
+                    <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
                     <h2>${escapeHtml(msg)}</h2>
                     <a href="/pages/policies-hub.html" class="btn btn-secondary">
-                        <i class="fas fa-arrow-left"></i> Back to Hub
+                        <i class="fas fa-arrow-left" aria-hidden="true"></i> Back to Hub
                     </a>
                 </div>
             `;
@@ -178,7 +178,7 @@
             parts.push(`<a href="/pages/policies-hub.html?category=${encodeURIComponent(state.policy.Category)}">${escapeHtml(state.policy.Category)}</a>`);
         }
         parts.push(`<span class="crumb-current">${escapeHtml(state.policy.Title || 'New policy')}</span>`);
-        el.innerHTML = parts.join('<i class="fas fa-chevron-right crumb-sep"></i>');
+        el.innerHTML = parts.join('<i class="fas fa-chevron-right crumb-sep" aria-hidden="true"></i>');
     }
 
     function renderHeader() {
@@ -193,7 +193,7 @@
                 <div class="input-with-ai">
                     <input type="text" id="editSummary" class="summary-input" value="${escapeHtml(state.policy.Summary || '')}" placeholder="Short one-line summary (shows on card)">
                     <button type="button" class="ai-suggest-btn" id="aiSuggestSummary" title="Let Claude write the summary from the policy body">
-                        <i class="fas fa-sparkles"></i> Suggest
+                        <i class="fas fa-sparkles" aria-hidden="true"></i> Suggest
                     </button>
                 </div>
             `;
@@ -225,7 +225,7 @@
                         <div class="input-with-ai">
                             <input type="text" id="editTags" value="${escapeHtml(state.policy.Tags || '')}" placeholder="e.g. embroidery, LTM, pickup">
                             <button type="button" class="ai-suggest-btn ai-suggest-btn-sm" id="aiSuggestTags" title="Let Claude propose tags from the policy body">
-                                <i class="fas fa-sparkles"></i>
+                                <i class="fas fa-sparkles" aria-hidden="true"></i>
                             </button>
                         </div>
                     </label>
@@ -246,19 +246,19 @@
 
             metaEl.innerHTML = `
                 <span class="meta-pill meta-category">
-                    <i class="fas ${categoryIcon(state.policy.Category)}"></i> ${escapeHtml(state.policy.Category)}
+                    <i class="fas ${categoryIcon(state.policy.Category)}" aria-hidden="true"></i> ${escapeHtml(state.policy.Category)}
                 </span>
                 ${state.policy.Status !== 'Published'
                     ? `<span class="meta-pill meta-status meta-${state.policy.Status.toLowerCase()}">${escapeHtml(state.policy.Status)}</span>`
                     : ''}
                 ${readMinutes > 0
-                    ? `<span class="meta-readtime"><i class="far fa-clock"></i> ${readMinutes} min read</span>`
+                    ? `<span class="meta-readtime"><i class="far fa-clock" aria-hidden="true"></i> ${readMinutes} min read</span>`
                     : ''}
                 <span class="meta-owner">
-                    <i class="far fa-user"></i> ${escapeHtml(state.policy.Owner_Name || '—')}
+                    <i class="far fa-user" aria-hidden="true"></i> ${escapeHtml(state.policy.Owner_Name || '—')}
                 </span>
                 <span class="meta-updated">
-                    <i class="far fa-calendar"></i> Updated ${formatDate(state.policy.Updated_At)}
+                    <i class="far fa-calendar" aria-hidden="true"></i> Updated ${formatDate(state.policy.Updated_At)}
                     ${state.policy.Updated_By ? ` by ${escapeHtml(state.policy.Updated_By)}` : ''}
                 </span>
                 ${tagsHtml ? `<div class="meta-tags">${tagsHtml}</div>` : ''}
@@ -319,15 +319,15 @@
 
         // Share button — visible in both read and edit mode (when there's a real policy)
         const shareBtn = state.policy && !state.isNew
-            ? `<button id="shareBtn" class="btn btn-secondary" type="button" title="Copy a link to this policy"><i class="fas fa-link"></i> Copy link</button>`
+            ? `<button id="shareBtn" class="btn btn-secondary" type="button" title="Copy a link to this policy"><i class="fas fa-link" aria-hidden="true"></i> Copy link</button>`
             : '';
 
         if (state.isEditing) {
             el.innerHTML = `
-                <button id="saveBtn" class="btn btn-primary"><i class="fas fa-save"></i> Save</button>
+                <button id="saveBtn" class="btn btn-primary"><i class="fas fa-save" aria-hidden="true"></i> Save</button>
                 <button id="cancelBtn" class="btn btn-secondary">Cancel</button>
                 ${!state.isNew && window.IS_POLICIES_ADMIN
-                    ? '<button id="archiveBtn" class="btn btn-danger" type="button"><i class="fas fa-archive"></i> Archive</button>'
+                    ? '<button id="archiveBtn" class="btn btn-danger" type="button"><i class="fas fa-archive" aria-hidden="true"></i> Archive</button>'
                     : ''}
                 ${shareBtn}
                 <span id="saveStatus" class="save-status"></span>
@@ -338,7 +338,7 @@
             if (archive) archive.addEventListener('click', onArchive);
         } else if (window.IS_POLICIES_ADMIN && state.policy && !state.policy.External_URL) {
             el.innerHTML = `
-                <button id="editBtn" class="btn btn-primary"><i class="fas fa-edit"></i> Edit</button>
+                <button id="editBtn" class="btn btn-primary"><i class="fas fa-edit" aria-hidden="true"></i> Edit</button>
                 ${shareBtn}
             `;
             $('editBtn').addEventListener('click', () => {
@@ -370,7 +370,7 @@
                 const editor = state.editor;
                 const bodyHtml = editor ? editor.getHTML() : (state.policy.Body_HTML || '');
                 if (!bodyHtml || bodyHtml.replace(/<[^>]+>/g, '').trim().length < 20) {
-                    showToast('<i class="fas fa-circle-info"></i> Write some body content first, then I can summarize it.');
+                    showToast('<i class="fas fa-circle-info" aria-hidden="true"></i> Write some body content first, then I can summarize it.');
                     return;
                 }
                 await runAISuggest(summaryBtn, input, 'auto-summarize', { surroundingContext: bodyHtml });
@@ -383,7 +383,7 @@
                 const editor = state.editor;
                 const bodyHtml = editor ? editor.getHTML() : (state.policy.Body_HTML || '');
                 if (!bodyHtml || bodyHtml.replace(/<[^>]+>/g, '').trim().length < 20) {
-                    showToast('<i class="fas fa-circle-info"></i> Write some body content first, then I can suggest tags.');
+                    showToast('<i class="fas fa-circle-info" aria-hidden="true"></i> Write some body content first, then I can suggest tags.');
                     return;
                 }
                 await runAISuggest(tagsBtn, input, 'suggest-tags', { surroundingContext: bodyHtml });
@@ -396,7 +396,7 @@
         const categoryEl = $('editCategory');
         const originalHtml = btn.innerHTML;
         btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i>';
+        btn.innerHTML = '<i class="fas fa-circle-notch fa-spin" aria-hidden="true"></i>';
 
         try {
             const payload = {
@@ -453,16 +453,16 @@
                 .trim();
 
             if (!output) {
-                showToast('<i class="fas fa-circle-info"></i> Claude returned nothing — try again.');
+                showToast('<i class="fas fa-circle-info" aria-hidden="true"></i> Claude returned nothing — try again.');
                 return;
             }
 
             inputEl.value = output;
             inputEl.dispatchEvent(new Event('input', { bubbles: true }));
-            showToast('<i class="fas fa-check-circle"></i> Filled — review and tweak before saving');
+            showToast('<i class="fas fa-check-circle" aria-hidden="true"></i> Filled — review and tweak before saving');
         } catch (e) {
             console.error('[ai-suggest] error:', e);
-            showToast(`<i class="fas fa-triangle-exclamation"></i> ${e.message}`);
+            showToast(`<i class="fas fa-triangle-exclamation" aria-hidden="true"></i> ${e.message}`);
         } finally {
             btn.disabled = false;
             btn.innerHTML = originalHtml;
@@ -479,7 +479,7 @@
 
         try {
             await navigator.clipboard.writeText(shareUrl);
-            showToast(`<i class="fas fa-check-circle"></i> Link copied — paste anywhere`);
+            showToast(`<i class="fas fa-check-circle" aria-hidden="true"></i> Link copied — paste anywhere`);
         } catch (e) {
             // Older browser / no clipboard permission — fallback to prompt
             window.prompt('Copy this link:', shareUrl);
@@ -520,14 +520,14 @@
             el.style.display = '';
             el.innerHTML = `
                 <h2 class="sub-procedures-title">
-                    <i class="fas fa-folder-tree"></i> Sub-procedures
+                    <i class="fas fa-folder-tree" aria-hidden="true"></i> Sub-procedures
                 </h2>
                 <div class="sub-procedures-list">
                     ${children.map(c => `
                         <a href="/pages/policy-detail.html?id=${encodeURIComponent(c.Policy_ID)}" class="sub-procedure-card">
                             <span class="sub-title">${escapeHtml(c.Title)}</span>
                             <span class="sub-summary">${escapeHtml(c.Summary || '')}</span>
-                            <i class="fas fa-arrow-right sub-arrow"></i>
+                            <i class="fas fa-arrow-right sub-arrow" aria-hidden="true"></i>
                         </a>
                     `).join('')}
                 </div>

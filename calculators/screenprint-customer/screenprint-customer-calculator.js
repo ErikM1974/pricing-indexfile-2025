@@ -716,7 +716,7 @@ class CustomerScreenPrintCalculator {
 
     hideLoading() {
         this.submitQuoteBtn.disabled = false;
-        this.submitQuoteBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Send Quote';
+        this.submitQuoteBtn.innerHTML = '<i class="fas fa-paper-plane" aria-hidden="true"></i> Send Quote';
     }
 }
 

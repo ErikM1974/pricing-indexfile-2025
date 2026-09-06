@@ -28,10 +28,10 @@
     <!-- Top bar -->
     <header class="hub-topbar">
         <a href="/pages/policies-hub.html" class="hub-topbar-back" aria-label="Back to Policies Hub">
-            <i class="fas fa-arrow-left"></i> Hub
+            <i class="fas fa-arrow-left" aria-hidden="true"></i> Hub
         </a>
         <div class="hub-topbar-title">
-            <i class="fas fa-comments-question"></i>
+            <i class="fas fa-comments-question" aria-hidden="true"></i>
             Open Questions
             <span class="question-count-chip" id="inboxCount"></span>
         </div>
@@ -51,12 +51,12 @@
 
             <!-- Questions list / empty state -->
             <section id="questionsList" class="questions-list">
-                <div class="questions-loading"><i class="fas fa-circle-notch fa-spin"></i> Loading inbox…</div>
+                <div class="questions-loading"><i class="fas fa-circle-notch fa-spin" aria-hidden="true"></i> Loading inbox…</div>
             </section>
 
             <!-- Non-admin block -->
             <div id="questionsLockedNote" class="hub-empty" style="display:none">
-                <i class="fas fa-lock"></i>
+                <i class="fas fa-lock" aria-hidden="true"></i>
                 The Open Questions inbox is admin-only. If you have a question, post it on the relevant policy page.
             </div>
 

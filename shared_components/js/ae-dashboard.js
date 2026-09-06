@@ -666,7 +666,7 @@
 
                     var imageHtml;
                     if (mockupUrl) {
-                        imageHtml = '<div class="ae-art-card__image ae-art-card__image--loading"><img src="' + escapeHtml(mockupDisplayUrl) + '" alt="' + escapeHtml(company) + ' mockup" loading="lazy" style="cursor:pointer" data-mockup-url="' + escapeHtml(mockupDisplayUrl) + '" onload="this.parentElement.classList.remove(\'ae-art-card__image--loading\')" onerror="this.parentElement.classList.remove(\'ae-art-card__image--loading\'); this.parentElement.innerHTML=\'<div class=ae-art-card__placeholder><svg width=48 height=48 viewBox=&quot;0 0 24 24&quot; fill=none stroke=#9ca3af stroke-width=1.5><rect x=3 y=3 width=18 height=18 rx=2/><circle cx=8.5 cy=8.5 r=1.5/><path d=&quot;M21 15l-5-5L5 21&quot;/></svg></div>\'"></div>';
+                        imageHtml = '<div class="ae-art-card__image ae-art-card__image--loading"><img src="' + escapeHtml(mockupDisplayUrl) + '" alt="' + escapeHtml(company) + ' mockup" loading="lazy" style="cursor:pointer" data-mockup-url="' + escapeHtml(mockupDisplayUrl) + '" data-onload="parent-remove-class" data-onload-class="ae-art-card__image--loading" data-onerror="call:aeArtCardImageError"></div>';
                     } else {
                         imageHtml = '<div class="ae-art-card__image"><div class="ae-art-card__placeholder"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div></div>';
                     }
@@ -718,3 +718,11 @@
     // MutationObserver for view-tab moved to art-hub-ae.js (shared gallery DataPage)
 
 })();
+
+// <img> error outcome for the AE art cards (was an inline onerror= with the placeholder SVG baked in, Rule 3)
+window.aeArtCardImageError = function (img) {
+    const wrap = img && img.parentElement;
+    if (!wrap) return;
+    wrap.classList.remove('ae-art-card__image--loading');
+    wrap.innerHTML = '<div class="ae-art-card__placeholder"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div>';
+};

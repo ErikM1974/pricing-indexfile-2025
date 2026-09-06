@@ -79,7 +79,7 @@ function tileHtml(p) {
     return `
         <a class="pw-tilelink" href="/dashboards/finished-photos-library.html" title="${escapeHtml(title)}">
             <img src="${escapeHtml(resolveBoxUrl(p.imageUrl))}" alt="${escapeHtml(co || 'Finished product photo')}" loading="lazy"
-                 onerror="this.closest('.pw-tile').classList.add('pw-tile--dead')">
+                 data-onerror="closest-class" data-onerror-closest=".pw-tile" data-onerror-class="pw-tile--dead">
             <span class="pw-cap">
                 ${line1}
                 ${meta ? `<span class="pw-cap-meta">${escapeHtml(meta)}</span>` : ''}

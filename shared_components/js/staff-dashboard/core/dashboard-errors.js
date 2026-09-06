@@ -70,13 +70,13 @@ export function showApiError(area, error, opts = {}) {
         : '';
 
     const retryBtn = opts.onRetry
-        ? `<button type="button" class="dashboard-error__retry" data-action="dashboard-error:retry" data-area="${escapeHtml(area)}"><i class="fas fa-rotate-right"></i> Retry</button>`
+        ? `<button type="button" class="dashboard-error__retry" data-action="dashboard-error:retry" data-area="${escapeHtml(area)}"><i class="fas fa-rotate-right" aria-hidden="true"></i> Retry</button>`
         : '';
 
     container.innerHTML = `
         <div class="dashboard-error ${isPartial ? 'dashboard-error--partial' : 'dashboard-error--bad'}" role="alert">
             <div class="dashboard-error__icon">
-                <i class="fas ${isPartial ? 'fa-triangle-exclamation' : 'fa-circle-exclamation'}"></i>
+                <i class="fas ${isPartial ? 'fa-triangle-exclamation' : 'fa-circle-exclamation'}" aria-hidden="true"></i>
             </div>
             <div class="dashboard-error__body">
                 <div class="dashboard-error__title">${escapeHtml(baseMsg)}</div>

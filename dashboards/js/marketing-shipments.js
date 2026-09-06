@@ -73,7 +73,7 @@
             if (seq !== state.loadSeq) return;
             console.error('[marketing-shipments] load failed:', err);
             DashPage.showError('Could not load the queue (' + err.message + '). Refresh to retry.');
-            tbody.innerHTML = '<tr><td colspan="6" class="ld-empty"><i class="fas fa-triangle-exclamation"></i> Queue unavailable.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6" class="ld-empty"><i class="fas fa-triangle-exclamation" aria-hidden="true"></i> Queue unavailable.</td></tr>';
         });
     }
 

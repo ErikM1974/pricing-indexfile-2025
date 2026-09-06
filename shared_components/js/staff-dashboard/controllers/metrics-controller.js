@@ -85,19 +85,19 @@ function renderRevenue(payload, yoy) {
         if (yoy?.lastYearError) {
             badge.className = 'metrics-comparison-badge warning';
             badge.title = `Last-year comparison unavailable: ${yoy.lastYearError.message}`;
-            badge.innerHTML = `<i class="fas fa-triangle-exclamation"></i> YoY unavailable`;
+            badge.innerHTML = `<i class="fas fa-triangle-exclamation" aria-hidden="true"></i> YoY unavailable`;
         } else if (growth == null) {
             badge.className = 'metrics-comparison-badge';
             badge.removeAttribute('title');
-            badge.innerHTML = `<i class="fas fa-minus"></i> --`;
+            badge.innerHTML = `<i class="fas fa-minus" aria-hidden="true"></i> --`;
         } else if (growth >= 0) {
             badge.className = 'metrics-comparison-badge positive';
             badge.removeAttribute('title');
-            badge.innerHTML = `<i class="fas fa-arrow-up"></i> ${growth.toFixed(1)}%`;
+            badge.innerHTML = `<i class="fas fa-arrow-up" aria-hidden="true"></i> ${growth.toFixed(1)}%`;
         } else {
             badge.className = 'metrics-comparison-badge negative';
             badge.removeAttribute('title');
-            badge.innerHTML = `<i class="fas fa-arrow-down"></i> ${Math.abs(growth).toFixed(1)}%`;
+            badge.innerHTML = `<i class="fas fa-arrow-down" aria-hidden="true"></i> ${Math.abs(growth).toFixed(1)}%`;
         }
     }
     if (compEl) compEl.textContent = currentDays >= 30 ? 'vs. last year' : 'vs. last year (same days)';

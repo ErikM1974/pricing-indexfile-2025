@@ -28,7 +28,7 @@
             <div class="header-right">
                 <span class="current-date" id="currentDate"></span>
                 <a href="/dashboards/names-numbers-dashboard.html" class="btn-secondary" title="Back to all rosters">
-                    <i class="fas fa-arrow-left"></i> All Rosters
+                    <i class="fas fa-arrow-left" aria-hidden="true"></i> All Rosters
                 </a>
             </div>
         </div>
@@ -40,17 +40,17 @@
         <div class="page-header">
             <div class="page-header-content">
                 <h1 class="page-title">
-                    <i class="fas fa-users"></i>
+                    <i class="fas fa-users" aria-hidden="true"></i>
                     Names & Numbers
                 </h1>
                 <p class="page-subtitle">Team roster management for personalized orders</p>
             </div>
             <div class="page-header-actions">
                 <button type="button" class="btn-icon" id="searchBtn" title="Search existing rosters">
-                    <i class="fas fa-search"></i>
+                    <i class="fas fa-search" aria-hidden="true"></i>
                 </button>
                 <button type="button" class="btn-icon" id="newRosterBtn" title="Start new roster">
-                    <i class="fas fa-plus"></i>
+                    <i class="fas fa-plus" aria-hidden="true"></i>
                 </button>
             </div>
         </div>
@@ -59,8 +59,8 @@
         <div class="search-panel" id="searchPanel" style="display: none;">
             <div class="search-row">
                 <input type="text" id="searchInput" placeholder="Search by roster name, company, or order #...">
-                <button type="button" class="btn-primary" id="searchGoBtn"><i class="fas fa-search"></i> Search</button>
-                <button type="button" class="btn-secondary" id="searchCloseBtn"><i class="fas fa-times"></i></button>
+                <button type="button" class="btn-primary" id="searchGoBtn"><i class="fas fa-search" aria-hidden="true"></i> Search</button>
+                <button type="button" class="btn-secondary" id="searchCloseBtn"><i class="fas fa-times" aria-hidden="true"></i></button>
             </div>
             <div id="searchResults" style="margin-top: 1rem;"></div>
         </div>
@@ -68,7 +68,7 @@
         <!-- Roster Info Card -->
         <div class="card" id="rosterInfoCard">
             <div class="card-header">
-                <span class="card-title"><i class="fas fa-info-circle"></i> Roster Details</span>
+                <span class="card-title"><i class="fas fa-info-circle" aria-hidden="true"></i> Roster Details</span>
                 <span class="status-badge status-draft" id="statusBadge">Draft</span>
             </div>
             <div class="form-row">
@@ -108,13 +108,13 @@
         <!-- Import Toolbar -->
         <div class="import-toolbar">
             <button type="button" class="btn-secondary" id="uploadExcelBtn">
-                <i class="fas fa-file-excel"></i> Upload Excel
+                <i class="fas fa-file-excel" aria-hidden="true"></i> Upload Excel
             </button>
             <button type="button" class="btn-secondary" id="ocrBtn">
-                <i class="fas fa-camera"></i> Upload Image / PDF (OCR)
+                <i class="fas fa-camera" aria-hidden="true"></i> Upload Image / PDF (OCR)
             </button>
             <button type="button" class="btn-secondary" id="pasteNamesBtn">
-                <i class="fas fa-paste"></i> Paste Names
+                <i class="fas fa-paste" aria-hidden="true"></i> Paste Names
             </button>
             <input type="file" id="excelFileInput" accept=".xlsx,.xls" style="display:none;">
             <input type="file" id="ocrFileInput" accept="image/jpeg,image/png,image/gif,image/webp,application/pdf" style="display:none;">
@@ -124,7 +124,7 @@
         <div class="tab-bar" id="tabBar">
             <!-- Tabs injected dynamically -->
             <button type="button" class="tab-add-btn" id="addGroupBtn">
-                <i class="fas fa-plus"></i> Add Group
+                <i class="fas fa-plus" aria-hidden="true"></i> Add Group
             </button>
         </div>
 
@@ -134,10 +134,10 @@
                 <span class="group-config-title" id="groupConfigTitle">Group Settings</span>
                 <div style="display: flex; gap: 0.5rem;">
                     <button type="button" class="btn-sm btn-secondary" id="toggleConfigBtn">
-                        <i class="fas fa-chevron-up"></i>
+                        <i class="fas fa-chevron-up" aria-hidden="true"></i>
                     </button>
                     <button type="button" class="btn-sm btn-danger" id="deleteGroupBtn" title="Delete this group">
-                        <i class="fas fa-trash"></i>
+                        <i class="fas fa-trash" aria-hidden="true"></i>
                     </button>
                 </div>
             </div>
@@ -153,7 +153,7 @@
                     <div class="config-section-header">
                         <label>Garments in this order</label>
                         <button type="button" class="btn-sm btn-secondary" id="addGarmentBtn">
-                            <i class="fas fa-plus"></i> Add Garment
+                            <i class="fas fa-plus" aria-hidden="true"></i> Add Garment
                         </button>
                     </div>
                     <div class="config-section-hint">
@@ -172,7 +172,7 @@
                     <div class="config-section-header">
                         <label>Custom columns</label>
                         <button type="button" class="btn-sm btn-secondary" id="addCustomColumnBtn">
-                            <i class="fas fa-plus"></i> Add Custom Column
+                            <i class="fas fa-plus" aria-hidden="true"></i> Add Custom Column
                         </button>
                     </div>
                     <div id="customColumnsEditor" class="custom-columns-editor"></div>
@@ -191,10 +191,10 @@
             </div>
             <div style="margin-top: 0.75rem; display: flex; gap: 0.5rem;">
                 <button type="button" class="btn-secondary btn-sm" id="addRowBtn">
-                    <i class="fas fa-plus"></i> Add Row
+                    <i class="fas fa-plus" aria-hidden="true"></i> Add Row
                 </button>
                 <button type="button" class="btn-secondary btn-sm" id="addFiveRowsBtn">
-                    <i class="fas fa-plus"></i> Add 5 Rows
+                    <i class="fas fa-plus" aria-hidden="true"></i> Add 5 Rows
                 </button>
             </div>
         </div>
@@ -202,14 +202,14 @@
         <!-- Size Breakdown (auto-generated from entered sizes) -->
         <div class="card size-breakdown-card" id="sizeBreakdownCard" style="display: none;">
             <div class="card-header">
-                <span class="card-title"><i class="fas fa-chart-bar"></i> Size Breakdown</span>
+                <span class="card-title"><i class="fas fa-chart-bar" aria-hidden="true"></i> Size Breakdown</span>
             </div>
             <div id="sizeBreakdownBody" class="size-breakdown-body"></div>
         </div>
 
         <!-- Empty State (shown when no groups) -->
         <div class="empty-state" id="emptyState" style="display: none;">
-            <i class="fas fa-clipboard-list"></i>
+            <i class="fas fa-clipboard-list" aria-hidden="true"></i>
             <h3>No Roster Data Yet</h3>
             <p>Upload an Excel file, take a photo with OCR, paste names, or add a group manually to get started.</p>
         </div>
@@ -218,21 +218,21 @@
         <div class="action-bar">
             <div class="action-bar-group">
                 <button type="button" class="btn-primary" id="saveDraftBtn">
-                    <i class="fas fa-save"></i> Save Draft
+                    <i class="fas fa-save" aria-hidden="true"></i> Save Draft
                 </button>
                 <button type="button" class="btn-success" id="saveSubmitBtn">
-                    <i class="fas fa-check"></i> Save & Submit
+                    <i class="fas fa-check" aria-hidden="true"></i> Save & Submit
                 </button>
                 <button type="button" class="btn-secondary" id="saveAndReturnBtn" title="Save and go back to the rosters list">
-                    <i class="fas fa-check-double"></i> Save & Back to Dashboard
+                    <i class="fas fa-check-double" aria-hidden="true"></i> Save & Back to Dashboard
                 </button>
             </div>
             <div class="action-bar-group">
                 <button type="button" class="btn-secondary" id="printBtn">
-                    <i class="fas fa-print"></i> Print
+                    <i class="fas fa-print" aria-hidden="true"></i> Print
                 </button>
                 <button type="button" class="btn-secondary" id="exportExcelBtn">
-                    <i class="fas fa-file-excel"></i> Export Excel
+                    <i class="fas fa-file-excel" aria-hidden="true"></i> Export Excel
                 </button>
             </div>
         </div>
@@ -242,7 +242,7 @@
     <div class="modal-overlay" id="pasteModal">
         <div class="modal">
             <div class="modal-header">
-                <span class="modal-title"><i class="fas fa-paste"></i> Paste Names</span>
+                <span class="modal-title"><i class="fas fa-paste" aria-hidden="true"></i> Paste Names</span>
                 <button type="button" class="modal-close" id="pasteModalClose">&times;</button>
             </div>
             <div class="modal-body">
@@ -254,7 +254,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn-secondary" id="pasteCancelBtn">Cancel</button>
-                <button type="button" class="btn-primary" id="pasteImportBtn"><i class="fas fa-download"></i> Import</button>
+                <button type="button" class="btn-primary" id="pasteImportBtn"><i class="fas fa-download" aria-hidden="true"></i> Import</button>
             </div>
         </div>
     </div>
@@ -263,12 +263,12 @@
     <div class="modal-overlay" id="ocrModal">
         <div class="modal">
             <div class="modal-header">
-                <span class="modal-title"><i class="fas fa-camera"></i> Upload Image or PDF for OCR</span>
+                <span class="modal-title"><i class="fas fa-camera" aria-hidden="true"></i> Upload Image or PDF for OCR</span>
                 <button type="button" class="modal-close" id="ocrModalClose">&times;</button>
             </div>
             <div class="modal-body">
                 <div class="ocr-drop-zone" id="ocrDropZone">
-                    <i class="fas fa-cloud-upload-alt"></i>
+                    <i class="fas fa-cloud-upload-alt" aria-hidden="true"></i>
                     <p><strong>Drag & drop an image or PDF here</strong></p>
                     <p>or click to browse (JPEG, PNG, GIF, WebP, or PDF)</p>
                 </div>
@@ -282,7 +282,7 @@
             <div class="modal-footer">
                 <button type="button" class="btn-secondary" id="ocrCancelBtn">Cancel</button>
                 <button type="button" class="btn-primary" id="ocrImportBtn" style="display: none;">
-                    <i class="fas fa-download"></i> Import Extracted Names
+                    <i class="fas fa-download" aria-hidden="true"></i> Import Extracted Names
                 </button>
             </div>
         </div>
@@ -292,7 +292,7 @@
     <div class="modal-overlay" id="addGroupModal">
         <div class="modal">
             <div class="modal-header">
-                <span class="modal-title"><i class="fas fa-layer-group"></i> Add New Group</span>
+                <span class="modal-title"><i class="fas fa-layer-group" aria-hidden="true"></i> Add New Group</span>
                 <button type="button" class="modal-close" id="addGroupModalClose">&times;</button>
             </div>
             <div class="modal-body">
@@ -311,12 +311,12 @@
                     </div>
                 </div>
                 <p style="margin-top: 0.75rem; font-size: 0.8rem; color: var(--nn-text-secondary);">
-                    <i class="fas fa-info-circle"></i> You can add more garments (e.g. T-shirt + Hoodie) after the group is created.
+                    <i class="fas fa-info-circle" aria-hidden="true"></i> You can add more garments (e.g. T-shirt + Hoodie) after the group is created.
                 </p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn-secondary" id="addGroupCancelBtn">Cancel</button>
-                <button type="button" class="btn-primary" id="addGroupConfirmBtn"><i class="fas fa-plus"></i> Add Group</button>
+                <button type="button" class="btn-primary" id="addGroupConfirmBtn"><i class="fas fa-plus" aria-hidden="true"></i> Add Group</button>
             </div>
         </div>
     </div>

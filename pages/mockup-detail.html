@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="/pages/css/mockup-detail.css?v=2026.09.04.4">
     <link rel="stylesheet" href="/pages/css/thread-color-picker.css?v=1">
     <link rel="stylesheet" href="/shared_components/css/transfer-actions.css?v=2026.08.18.1">
+    <link rel="stylesheet" href="/shared_components/css/elapsed-time-utils.css?v=2026.09.06.26">
 </head>
 <body>
     <!-- Header -->
@@ -201,7 +202,7 @@
                 <div class="pmd-revise-upload-section">
                     <label class="pmd-revise-upload-label">Attach reference file (optional)</label>
                     <div class="pmd-revise-dropzone" id="pmd-revise-dropzone">
-                        <i class="fas fa-cloud-upload-alt pmd-revise-dropzone-icon"></i>
+                        <i class="fas fa-cloud-upload-alt pmd-revise-dropzone-icon" aria-hidden="true"></i>
                         <span class="pmd-revise-dropzone-text">Click or drag file here (max 20MB)</span>
                         <input type="file" id="pmd-revise-file-input" accept=".png,.jpg,.jpeg,.pdf,.ai,.eps,.svg,.psd,.tif,.tiff" style="display:none;">
                     </div>
@@ -373,7 +374,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="/shared_components/js/app-config.js"></script>
+    <script src="/shared_components/js/app-config.js?v=2026.09.06.26"></script>
     <script src="/shared_components/js/mo-fetch.js?v=2026.08.10.4"></script>
     <script src="/pages/js/thread-color-picker.js?v=2"></script>
     <script src="/shared_components/js/confetti.js?v=1"></script>

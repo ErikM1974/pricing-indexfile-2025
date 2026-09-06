@@ -511,11 +511,11 @@ function dstThreadSelectorHtml(entry, modalMode) {
     html += '<div class="dst-thread-row">'
       + '<span class="dst-thread-swatch" style="background:' + cur.hex + '"></span>'
       + '<span class="dst-thread-stop">Stop ' + (i + 1) + '</span>'
-      + '<div><select onchange="updateDSTThreadColor(' + entry.id + ',' + i + ',this.value)">' + opts + '</select>'
+      + '<div><select data-change="updateDSTThreadColor" data-change-args="[' + entry.id + ',' + i + ',&quot;$this.value&quot;]">' + opts + '</select>'
       + '<div class="dst-thread-name">' + escapeHtml(cur.code + ' · ' + cur.name) + '</div></div>'
       + '<div class="dst-thread-element-wrap">'
       + '<span class="dst-thread-element-label">Element / run</span>'
-      + '<input class="dst-thread-element-input" value="' + escapeHtml(element) + '" placeholder="outline, fill, text, accent…" oninput="updateDSTThreadElement(' + entry.id + ',' + i + ',this.value)">'
+      + '<input class="dst-thread-element-input" value="' + escapeHtml(element) + '" placeholder="outline, fill, text, accent…" data-input="updateDSTThreadElement" data-input-args="[' + entry.id + ',' + i + ',&quot;$this.value&quot;]">'
       + '</div>'
       + '<span class="dst-pill">' + escapeHtml(cur.hex.toUpperCase()) + '</span>'
       + '</div>';
@@ -577,7 +577,7 @@ function openPlacementChooser(side) {
     title.textContent = 'Back artwork placement';
     subtitle.textContent = 'Choose a recommended back print location before you upload the artwork.';
     body.innerHTML = `
-      <button class="chooser-option" onclick="choosePlacementAndUpload('Upper Back')">
+      <button class="chooser-option" data-call="choosePlacementAndUpload" data-args="[&quot;Upper Back&quot;]">
         <span class="badge">Recommended small back print</span>
         <h4>Upper Back</h4>
         <p>Great for small event marks or secondary back logos placed higher on the shirt.</p>
@@ -587,7 +587,7 @@ function openPlacementChooser(side) {
           <li>You can still drag and resize it after upload</li>
         </ul>
       </button>
-      <button class="chooser-option" onclick="choosePlacementAndUpload('Full Back')">
+      <button class="chooser-option" data-call="choosePlacementAndUpload" data-args="[&quot;Full Back&quot;]">
         <span class="badge">Recommended large back print</span>
         <h4>Full Back</h4>
         <p>Best for main back graphics, event artwork, and larger statement prints.</p>
@@ -601,7 +601,7 @@ function openPlacementChooser(side) {
     title.textContent = 'Front artwork placement';
     subtitle.textContent = 'Choose a recommended front print location before you upload the artwork.';
     body.innerHTML = `
-      <button class="chooser-option" onclick="choosePlacementAndUpload('Left Chest')">
+      <button class="chooser-option" data-call="choosePlacementAndUpload" data-args="[&quot;Left Chest&quot;]">
         <span class="badge">Recommended small front print</span>
         <h4>Left Chest</h4>
         <p>Great for company logos and small marks placed in the standard left-chest area.</p>
@@ -611,7 +611,7 @@ function openPlacementChooser(side) {
           <li>You can still drag and resize it after upload</li>
         </ul>
       </button>
-      <button class="chooser-option" onclick="choosePlacementAndUpload('Full Front')">
+      <button class="chooser-option" data-call="choosePlacementAndUpload" data-args="[&quot;Full Front&quot;]">
         <span class="badge">Recommended large front print</span>
         <h4>Full Front</h4>
         <p>Best for centered chest artwork and larger front designs.</p>
@@ -1202,7 +1202,7 @@ function addFileItem(entry) {
     '<div class="meta"><div class="fname" title="' + escapeHtml(entry.name) + '">' + escapeHtml(entry.name) + '</div>' +
     '<div class="fsize">' + fmtSize(entry.size) + '</div><div class="file-advice" id="advice-' + entry.id + '"></div></div>' +
     '<span class="badge load" id="badge-' + entry.id + '">…</span>' +
-    '<button type="button" class="file-x" title="Remove this file from the mockup" aria-label="Remove ' + escapeHtml(entry.name) + '" onclick="removeEntry(' + entry.id + ', event)">×</button>';
+    '<button type="button" class="file-x" title="Remove this file from the mockup" aria-label="Remove ' + escapeHtml(entry.name) + '" data-call="removeEntry" data-args="[' + entry.id + ', &quot;$event&quot;]">×</button>';
   $('fileList').appendChild(div);
 }
 

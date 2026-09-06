@@ -97,7 +97,7 @@
             renderList();
         } catch (e) {
             console.error('[inbox] load error:', e);
-            listEl.innerHTML = `<div class="hub-error"><i class="fas fa-triangle-exclamation"></i> Could not load inbox: ${escapeHtml(e.message)}</div>`;
+            listEl.innerHTML = `<div class="hub-error"><i class="fas fa-triangle-exclamation" aria-hidden="true"></i> Could not load inbox: ${escapeHtml(e.message)}</div>`;
         }
     }
 
@@ -181,7 +181,7 @@
         if (state.questions.length === 0) {
             el.innerHTML = `
                 <div class="inbox-zero">
-                    <i class="fas fa-circle-check"></i>
+                    <i class="fas fa-circle-check" aria-hidden="true"></i>
                     <h2>Inbox zero</h2>
                     <p>No open questions. Either everyone's caught up or no one's asking.</p>
                 </div>
@@ -192,7 +192,7 @@
         if (filtered.length === 0) {
             el.innerHTML = `
                 <div class="inbox-zero inbox-zero-filtered">
-                    <i class="fas fa-filter"></i>
+                    <i class="fas fa-filter" aria-hidden="true"></i>
                     <h2>No matches</h2>
                     <p>No questions match the current filters. <a href="#" id="clearFilters">Clear filters</a></p>
                 </div>
@@ -233,7 +233,7 @@
                         </div>
                     </div>
                     <div class="question-age">
-                        <i class="fas fa-clock"></i> Waiting ${escapeHtml(relativeTime(q.Created_At))}
+                        <i class="fas fa-clock" aria-hidden="true"></i> Waiting ${escapeHtml(relativeTime(q.Created_At))}
                     </div>
                 </div>
 
@@ -243,19 +243,19 @@
                     <span class="question-policy-label">On:</span>
                     <a href="${policyUrl}" class="question-policy-link">${escapeHtml(q.Policy_Title)}</a>
                     <span class="question-policy-category">
-                        <i class="fas ${categoryIcon(q.Policy_Category)}"></i> ${escapeHtml(q.Policy_Category)}
+                        <i class="fas ${categoryIcon(q.Policy_Category)}" aria-hidden="true"></i> ${escapeHtml(q.Policy_Category)}
                     </span>
                 </div>
 
                 <div class="question-actions">
                     <a href="${policyUrl}" class="btn btn-primary question-reply-btn">
-                        <i class="fas fa-reply"></i> Reply on policy
+                        <i class="fas fa-reply" aria-hidden="true"></i> Reply on policy
                     </a>
                     <button type="button" class="btn btn-secondary question-resolve-btn" data-action="resolve" data-id="${escapeHtml(q.Comment_ID)}">
-                        <i class="fas fa-check"></i> Mark resolved
+                        <i class="fas fa-check" aria-hidden="true"></i> Mark resolved
                     </button>
                     <button type="button" class="btn btn-secondary question-hide-btn" data-action="hide" data-id="${escapeHtml(q.Comment_ID)}">
-                        <i class="fas fa-eye-slash"></i> Hide
+                        <i class="fas fa-eye-slash" aria-hidden="true"></i> Hide
                     </button>
                 </div>
             </article>
@@ -270,12 +270,12 @@
                 if (action === 'resolve') {
                     if (!confirm('Mark this question as resolved? It will be removed from the inbox.')) return;
                     btn.disabled = true;
-                    btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Resolving…';
+                    btn.innerHTML = '<i class="fas fa-circle-notch fa-spin" aria-hidden="true"></i> Resolving…';
                     await adminAction(`/${encodeURIComponent(id)}/resolve`, 'POST');
                 } else if (action === 'hide') {
                     if (!confirm('Hide this question? Hidden comments stay in Caspio for audit but no one sees them.')) return;
                     btn.disabled = true;
-                    btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Hiding…';
+                    btn.innerHTML = '<i class="fas fa-circle-notch fa-spin" aria-hidden="true"></i> Hiding…';
                     await adminAction(`/${encodeURIComponent(id)}`, 'DELETE');
                 }
                 // Reload the inbox after either action

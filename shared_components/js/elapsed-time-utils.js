@@ -183,18 +183,7 @@
     // Inject CSS if not already present
     function injectElapsedCSS() {
         if (document.getElementById('elapsed-time-styles')) return;
-        var style = document.createElement('style');
-        style.id = 'elapsed-time-styles';
-        style.textContent = [
-            /* Grid badge styles */
-            '.elapsed-badge { display: inline-block; font-size: 12px; padding: 2px 8px; border-radius: 10px; margin-top: 4px; }',
-            '.elapsed--fresh { color: #16a34a; background: #f0fdf4; }',
-            '.elapsed--waiting { color: #d97706; background: #fffbeb; }',
-            '.elapsed--overdue { color: #dc2626; background: #fef2f2; font-weight: 600; }',
-            /* Kanban compact badge */
-            '.kanban-elapsed { display: inline-block; font-size: 10px; padding: 1px 5px; border-radius: 8px; margin-left: 6px; font-weight: 600; }',
-        ].join('\n');
-        document.head.appendChild(style);
+        // (2026-09-06) styles live in /shared_components/css/elapsed-time-utils.css — linked by every consumer page, nothing injected.
     }
 
     // Auto-inject CSS on load

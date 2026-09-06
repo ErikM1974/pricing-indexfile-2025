@@ -103,7 +103,7 @@
     function renderError(msg) {
         const grid = document.getElementById('policiesGrid');
         if (grid) {
-            grid.innerHTML = `<div class="hub-error"><i class="fas fa-exclamation-triangle"></i> ${escapeHtml(msg)}</div>`;
+            grid.innerHTML = `<div class="hub-error"><i class="fas fa-exclamation-triangle" aria-hidden="true"></i> ${escapeHtml(msg)}</div>`;
         }
     }
 
@@ -123,7 +123,7 @@
             return `
                 <details class="tree-cat" open>
                     <summary>
-                        <i class="fas ${categoryIcon(cat.category)}"></i>
+                        <i class="fas ${categoryIcon(cat.category)}" aria-hidden="true"></i>
                         <span>${escapeHtml(cat.category)}</span>
                         <span class="tree-count">${vis.length}</span>
                     </summary>
@@ -148,7 +148,7 @@
         if (archived) linkClass.push('is-archived');
         if (isExternal) linkClass.push('is-external');
 
-        const externalBadge = isExternal ? '<i class="fas fa-external-link-alt tree-external-icon" aria-label="External"></i>' : '';
+        const externalBadge = isExternal ? '<i class="fas fa-external-link-alt tree-external-icon" aria-label="External" aria-hidden="true"></i>' : '';
         const draftBadge = isDraft ? '<span class="tree-badge tree-badge-draft">Draft</span>' : '';
         const archivedBadge = archived ? '<span class="tree-badge tree-badge-archived">Archived</span>' : '';
 
@@ -192,7 +192,7 @@
 
         el.innerHTML = chips.map(c => `
             <button class="category-chip ${state.categoryFilter === c.key ? 'active' : ''}" data-category="${escapeHtml(c.key)}">
-                <i class="fas ${c.icon}"></i>
+                <i class="fas ${c.icon}" aria-hidden="true"></i>
                 ${escapeHtml(c.label)}
                 <span class="count">${counts[c.key] || 0}</span>
             </button>
@@ -233,7 +233,7 @@
             const msg = state.searchResults !== null
                 ? `No policies match "${escapeHtml(state.searchQuery)}".`
                 : 'No policies in this category yet.';
-            grid.innerHTML = `<div class="hub-empty"><i class="far fa-folder-open"></i> ${msg}</div>`;
+            grid.innerHTML = `<div class="hub-empty"><i class="far fa-folder-open" aria-hidden="true"></i> ${msg}</div>`;
             list.innerHTML = '';
             return;
         }
@@ -266,18 +266,18 @@
             <a href="${href}" class="policy-card ${isDraft ? 'is-draft' : ''} ${archived ? 'is-archived' : ''}" data-category="${escapeHtml(p.Category)}">
                 ${archived ? '<span class="policy-flag flag-archived">ARCHIVED</span>' : ''}
                 ${isDraft ? '<span class="policy-flag flag-draft">DRAFT</span>' : ''}
-                ${isExternal ? '<span class="policy-flag flag-external"><i class="fas fa-external-link-alt"></i> External</span>' : ''}
+                ${isExternal ? '<span class="policy-flag flag-external"><i class="fas fa-external-link-alt" aria-hidden="true"></i> External</span>' : ''}
                 <span class="policy-category-tag">
-                    <i class="fas ${categoryIcon(p.Category)}"></i> ${escapeHtml(p.Category)}
+                    <i class="fas ${categoryIcon(p.Category)}" aria-hidden="true"></i> ${escapeHtml(p.Category)}
                 </span>
                 <h3 class="policy-title">${escapeHtml(p.Title)}</h3>
                 <p class="policy-description">${escapeHtml(p.Summary || '')}</p>
                 <div class="policy-meta">
                     <span class="policy-updated">
-                        <i class="far fa-calendar"></i> ${formatDate(p.Updated_At || p.Created_At)}
+                        <i class="far fa-calendar" aria-hidden="true"></i> ${formatDate(p.Updated_At || p.Created_At)}
                     </span>
                     <span class="policy-owner">
-                        <i class="far fa-user"></i> ${escapeHtml(p.Owner_Name || '—')}
+                        <i class="far fa-user" aria-hidden="true"></i> ${escapeHtml(p.Owner_Name || '—')}
                     </span>
                 </div>
             </a>

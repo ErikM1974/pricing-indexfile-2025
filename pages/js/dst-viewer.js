@@ -271,7 +271,7 @@
             tile.className = 'recent-tile' + (r.b64 ? '' : ' uncached');
             tile.title = r.b64 ? r.name : r.name + ' (too large to cache — re-drop the file)';
             tile.innerHTML =
-                (r.thumb ? '<img alt="" src="' + r.thumb + '">' : '<span class="recent-noimg"><i class="fas fa-vector-square"></i></span>') +
+                (r.thumb ? '<img alt="" src="' + r.thumb + '">' : '<span class="recent-noimg"><i class="fas fa-vector-square" aria-hidden="true"></i></span>') +
                 '<span class="recent-name">' + esc(r.name) + '</span>' +
                 '<span class="recent-meta">' + Number(r.st).toLocaleString() + ' st · ' + fmtIn(r.wMM) + '</span>';
             tile.addEventListener('click', function () {
@@ -785,7 +785,7 @@
     function traceStart() {
         if (!state.data) return;
         trace.playing = true;
-        $('btnTracePlay').innerHTML = '<i class="fas fa-pause"></i>';
+        $('btnTracePlay').innerHTML = '<i class="fas fa-pause" aria-hidden="true"></i>';
         var runs = state.data.colorRuns;
         if (trace.run >= runs.length - 1 && trace.stitch >= runs[trace.run].endIdx - runs[trace.run].startIdx) {
             trace.run = 0; trace.stitch = 0;
@@ -794,7 +794,7 @@
     }
     function traceStop() {
         trace.playing = false;
-        $('btnTracePlay').innerHTML = '<i class="fas fa-play"></i>';
+        $('btnTracePlay').innerHTML = '<i class="fas fa-play" aria-hidden="true"></i>';
         if (trace.raf) { cancelAnimationFrame(trace.raf); trace.raf = null; }
     }
     function traceTick() {
@@ -963,7 +963,7 @@
         var warn = $('mockupWarning');
         if (w > pl.maxWmm + 0.5 || h > pl.maxHmm + 0.5) {
             var fitPct = Math.floor(Math.min(pl.maxWmm / bb.widthMM, pl.maxHmm / bb.heightMM) * 100);
-            warn.innerHTML = '<i class="fas fa-triangle-exclamation"></i> Design is ' + fmtIn(w) + ' wide — ' +
+            warn.innerHTML = '<i class="fas fa-triangle-exclamation" aria-hidden="true"></i> Design is ' + fmtIn(w) + ' wide — ' +
                 esc(pl.label) + ' max is ' + fmtIn(pl.maxWmm) + ' × ' + fmtIn(pl.maxHmm) +
                 '. Scale to ' + fitPct + '% or choose a larger placement.';
             warn.classList.add('visible');
@@ -1266,12 +1266,12 @@
         var hl = $('hotspotList');
         hl.innerHTML = '';
         if (!state.density.hotspots.length) {
-            hl.innerHTML = '<div class="hotspot-none"><i class="fas fa-circle-check"></i> No density hotspots — clean file.</div>';
+            hl.innerHTML = '<div class="hotspot-none"><i class="fas fa-circle-check" aria-hidden="true"></i> No density hotspots — clean file.</div>';
         } else {
             state.density.hotspots.slice(0, 6).forEach(function (h) {
                 var el = document.createElement('div');
                 el.className = 'hotspot-item';
-                el.innerHTML = '<i class="fas fa-fire"></i> ' + h.count + ' hits at (' +
+                el.innerHTML = '<i class="fas fa-fire" aria-hidden="true"></i> ' + h.count + ' hits at (' +
                     h.xMM.toFixed(0) + ', ' + h.yMM.toFixed(0) + ') mm';
                 hl.appendChild(el);
             });
@@ -1292,7 +1292,7 @@
             var b = document.createElement('button');
             b.type = 'button';
             b.className = 'garment-tile' + (g.id === state.mock.garment ? ' active' : '');
-            b.innerHTML = '<i class="fas ' + g.icon + '"></i><span>' + esc(g.label) + '</span>';
+            b.innerHTML = '<i class="fas ' + g.icon + '" aria-hidden="true"></i><span>' + esc(g.label) + '</span>';
             b.addEventListener('click', function () {
                 state.mock.garment = g.id;
                 state.mock.placement = g.defaultPlacement;

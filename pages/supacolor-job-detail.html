@@ -39,7 +39,7 @@
         <div class="sjd-page-header">
             <div class="sjd-page-header-left">
                 <a href="/dashboards/supacolor-orders.html" class="sjd-back-link">
-                    <i class="fas fa-arrow-left"></i> Jobs
+                    <i class="fas fa-arrow-left" aria-hidden="true"></i> Jobs
                 </a>
                 <h1 class="sjd-job-title">
                     <span id="sjd-job-number">Loading…</span>
@@ -48,25 +48,25 @@
             </div>
             <div class="sjd-page-header-right">
                 <button id="sjd-api-refresh-btn" class="bt-btn bt-btn--primary" title="Pull the latest detail + history from Supacolor's API">
-                    <i class="fas fa-cloud-download-alt"></i> Refresh from API
+                    <i class="fas fa-cloud-download-alt" aria-hidden="true"></i> Refresh from API
                 </button>
                 <button id="sjd-paste-btn" class="bt-btn bt-btn--secondary" title="Fallback: paste a screenshot if the API is down">
-                    <i class="fas fa-paste"></i> Paste Screenshot
+                    <i class="fas fa-paste" aria-hidden="true"></i> Paste Screenshot
                 </button>
                 <button id="sjd-status-btn" class="bt-btn bt-btn--secondary" title="Change job status">
-                    <i class="fas fa-exchange-alt"></i> Change Status
+                    <i class="fas fa-exchange-alt" aria-hidden="true"></i> Change Status
                 </button>
                 <button id="sjd-edit-btn" class="bt-btn bt-btn--secondary" title="Edit job fields">
-                    <i class="fas fa-pen"></i> Edit
+                    <i class="fas fa-pen" aria-hidden="true"></i> Edit
                 </button>
                 <button id="sjd-delete-btn" class="bt-btn bt-btn--danger" title="Delete this job from the local mirror">
-                    <i class="fas fa-trash"></i> Delete
+                    <i class="fas fa-trash" aria-hidden="true"></i> Delete
                 </button>
             </div>
         </div>
 
         <div id="sjd-loading" class="sjd-loading">
-            <i class="fas fa-spinner fa-spin"></i> Loading job…
+            <i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Loading job…
         </div>
 
         <div id="sjd-content" style="display:none;">
@@ -144,7 +144,7 @@
             <!-- Shipping Card -->
             <section class="sjd-card">
                 <div class="sjd-card-header">
-                    <i class="fas fa-map-marker-alt"></i> Shipping
+                    <i class="fas fa-map-marker-alt" aria-hidden="true"></i> Shipping
                     <span class="sjd-shipping-method" id="sjd-shipping-method"></span>
                 </div>
                 <div class="sjd-card-body sjd-shipping">
@@ -163,7 +163,7 @@
                         <div class="sjd-ship-label">Tracking</div>
                         <a id="sjd-tracking-link" href="#" target="_blank" rel="noopener">
                             <span id="sjd-tracking-number"></span>
-                            <i class="fas fa-external-link-alt"></i>
+                            <i class="fas fa-external-link-alt" aria-hidden="true"></i>
                         </a>
                         <div class="sjd-carrier-line" id="sjd-carrier-line"></div>
                     </div>
@@ -173,7 +173,7 @@
             <!-- Linked Transfer Orders Card -->
             <section class="sjd-card" id="sjd-linked-card" style="display:none;">
                 <div class="sjd-card-header">
-                    <i class="fas fa-link"></i> Linked Transfer Orders
+                    <i class="fas fa-link" aria-hidden="true"></i> Linked Transfer Orders
                 </div>
                 <div class="sjd-card-body">
                     <div id="sjd-linked-list" class="sjd-linked-list"></div>
@@ -204,7 +204,7 @@
     <div id="sjd-paste-modal" class="bt-modal" style="display:none;">
         <div class="bt-modal-content">
             <div class="bt-modal-header">
-                <h3><i class="fas fa-paste"></i> Paste Job Detail Screenshot</h3>
+                <h3><i class="fas fa-paste" aria-hidden="true"></i> Paste Job Detail Screenshot</h3>
                 <button class="bt-modal-close" id="sjd-paste-modal-close">&times;</button>
             </div>
             <div class="bt-modal-body">
@@ -213,7 +213,7 @@
                     All visible fields — joblines, timeline, shipping, payment, history — will be extracted and filled in.
                 </div>
                 <div class="bt-modal-intro" style="background:#fff8e1; border-left:4px solid #ffc107; color:#856404;">
-                    <i class="fas fa-info-circle"></i>
+                    <i class="fas fa-info-circle" aria-hidden="true"></i>
                     <strong>By default, only empty fields are filled.</strong> Check the box below to overwrite manually-edited values.
                     <label style="display:block; margin-top:8px; font-weight:normal;">
                         <input type="checkbox" id="sjd-overwrite"> Overwrite existing fields with extracted values
@@ -222,7 +222,7 @@
 
                 <div class="sc-paste-zone" id="sjd-paste-zone" tabindex="0">
                     <div class="sc-paste-empty" id="sjd-paste-empty">
-                        <i class="fas fa-image"></i>
+                        <i class="fas fa-image" aria-hidden="true"></i>
                         <p><strong>Click here, then press Ctrl+V</strong> to paste your screenshot</p>
                         <p class="sc-paste-hint">Or drag &amp; drop an image file</p>
                     </div>
@@ -237,7 +237,7 @@
                 <div class="bt-form-actions">
                     <button type="button" class="bt-btn bt-btn--secondary" id="sjd-paste-cancel">Cancel</button>
                     <button type="button" class="bt-btn bt-btn--primary" id="sjd-paste-apply" disabled>
-                        <i class="fas fa-check"></i> Apply to Job
+                        <i class="fas fa-check" aria-hidden="true"></i> Apply to Job
                     </button>
                 </div>
             </div>
@@ -248,7 +248,7 @@
     <div id="sjd-delete-modal" class="bt-modal" style="display:none;">
         <div class="bt-modal-content sjd-delete-modal-content">
             <div class="bt-modal-header">
-                <h3><i class="fas fa-exclamation-triangle" style="color:#c92a2a;"></i> Delete Job</h3>
+                <h3><i class="fas fa-exclamation-triangle" style="color:#c92a2a;" aria-hidden="true"></i> Delete Job</h3>
                 <button class="bt-modal-close" id="sjd-delete-modal-close">&times;</button>
             </div>
             <div class="bt-modal-body">
@@ -263,12 +263,12 @@
                     </ul>
                 </div>
                 <div class="sjd-delete-note">
-                    <i class="fas fa-info-circle"></i>
+                    <i class="fas fa-info-circle" aria-hidden="true"></i>
                     Linked Transfer Orders are <strong>not</strong> affected — they live in a separate table.
                     The Supacolor.com record is also untouched. You can re-import this job by pasting its detail screenshot again.
                 </div>
                 <div id="sjd-delete-open-warning" class="sjd-delete-open-warning" style="display:none;">
-                    <i class="fas fa-exclamation-triangle"></i>
+                    <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
                     This job is still <strong>Open</strong>. Confirm to delete anyway:
                     <label style="display:block; margin-top:8px;">
                         <input type="checkbox" id="sjd-delete-open-confirm"> Yes, I want to delete this open job
@@ -277,7 +277,7 @@
                 <div class="bt-form-actions">
                     <button type="button" class="bt-btn bt-btn--secondary" id="sjd-delete-cancel">Cancel</button>
                     <button type="button" class="bt-btn bt-btn--danger" id="sjd-delete-confirm">
-                        <i class="fas fa-trash"></i> Delete Permanently
+                        <i class="fas fa-trash" aria-hidden="true"></i> Delete Permanently
                     </button>
                 </div>
             </div>
@@ -288,7 +288,7 @@
     <div id="sjd-status-modal" class="bt-modal" style="display:none;">
         <div class="bt-modal-content" style="max-width: 440px;">
             <div class="bt-modal-header">
-                <h3><i class="fas fa-exchange-alt"></i> Change Status</h3>
+                <h3><i class="fas fa-exchange-alt" aria-hidden="true"></i> Change Status</h3>
                 <button class="bt-modal-close" id="sjd-status-modal-close">&times;</button>
             </div>
             <div class="bt-modal-body">
@@ -316,7 +316,7 @@
                 <div class="bt-form-actions">
                     <button type="button" class="bt-btn bt-btn--secondary" id="sjd-status-cancel">Cancel</button>
                     <button type="button" class="bt-btn bt-btn--primary" id="sjd-status-save" disabled>
-                        <i class="fas fa-check"></i> Save Status
+                        <i class="fas fa-check" aria-hidden="true"></i> Save Status
                     </button>
                 </div>
             </div>

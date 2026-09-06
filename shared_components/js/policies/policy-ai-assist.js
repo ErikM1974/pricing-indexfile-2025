@@ -88,7 +88,7 @@
         const actionCards = ACTIONS.map(a => `
             <label class="ai-action-card" data-action="${a.key}">
                 <input type="radio" name="ai-action" value="${a.key}">
-                <div class="ai-action-icon"><i class="fas ${a.icon}"></i></div>
+                <div class="ai-action-icon"><i class="fas ${a.icon}" aria-hidden="true"></i></div>
                 <div class="ai-action-body">
                     <div class="ai-action-label">${escapeHtml(a.label)}</div>
                     <div class="ai-action-desc">${escapeHtml(a.description)}</div>
@@ -101,11 +101,11 @@
                 <div class="ai-modal" role="dialog" aria-labelledby="aiModalTitle">
                     <div class="ai-modal-header">
                         <h2 id="aiModalTitle">
-                            <i class="fas fa-sparkles"></i>
+                            <i class="fas fa-sparkles" aria-hidden="true"></i>
                             AI Assist
                         </h2>
                         <button type="button" class="ai-modal-close" aria-label="Close">
-                            <i class="fas fa-xmark"></i>
+                            <i class="fas fa-xmark" aria-hidden="true"></i>
                         </button>
                     </div>
 
@@ -123,7 +123,7 @@
 
                         <div class="ai-output-wrap" id="aiOutputWrap" style="display:none">
                             <div class="ai-output-header">
-                                <span><i class="fas fa-sparkles"></i> Claude is writing…</span>
+                                <span><i class="fas fa-sparkles" aria-hidden="true"></i> Claude is writing…</span>
                                 <span class="ai-status" id="aiStatus"></span>
                             </div>
                             <div class="ai-output" id="aiOutput"></div>
@@ -133,16 +133,16 @@
                     <div class="ai-modal-footer">
                         <button type="button" class="btn btn-secondary" id="aiCancelBtn">Cancel</button>
                         <button type="button" class="btn btn-secondary" id="aiTryAgainBtn" style="display:none">
-                            <i class="fas fa-rotate-right"></i> Try again
+                            <i class="fas fa-rotate-right" aria-hidden="true"></i> Try again
                         </button>
                         <button type="button" class="btn btn-primary" id="aiSubmitBtn" disabled>
-                            <i class="fas fa-sparkles"></i> Generate
+                            <i class="fas fa-sparkles" aria-hidden="true"></i> Generate
                         </button>
                         <button type="button" class="btn btn-primary" id="aiInsertBtn" style="display:none">
-                            <i class="fas fa-check"></i> Insert into policy
+                            <i class="fas fa-check" aria-hidden="true"></i> Insert into policy
                         </button>
                         <button type="button" class="btn btn-primary" id="aiReplaceBtn" style="display:none">
-                            <i class="fas fa-check"></i> Replace selection
+                            <i class="fas fa-check" aria-hidden="true"></i> Replace selection
                         </button>
                     </div>
                 </div>
@@ -189,12 +189,12 @@
 
         // Show what we're applying to
         if (selectedText) {
-            selectionNote.innerHTML = `<i class="fas fa-quote-left"></i> Will apply to your selection (${selectedText.length} chars).`;
+            selectionNote.innerHTML = `<i class="fas fa-quote-left" aria-hidden="true"></i> Will apply to your selection (${selectedText.length} chars).`;
             selectionNote.classList.add('has-selection');
         } else if (fullPlain.trim()) {
-            selectionNote.innerHTML = `<i class="fas fa-file-lines"></i> No selection — will use the whole policy as context.`;
+            selectionNote.innerHTML = `<i class="fas fa-file-lines" aria-hidden="true"></i> No selection — will use the whole policy as context.`;
         } else {
-            selectionNote.innerHTML = `<i class="fas fa-circle-info"></i> Policy is empty — start with "Write a new policy".`;
+            selectionNote.innerHTML = `<i class="fas fa-circle-info" aria-hidden="true"></i> Policy is empty — start with "Write a new policy".`;
         }
 
         function close() {
@@ -224,7 +224,7 @@
 
             // Selection requirement warning
             if (currentAction.needsSelection && !selectedText) {
-                selectionNote.innerHTML = `<i class="fas fa-triangle-exclamation"></i> This action needs you to select text in the policy first. Cancel, select text, then try again.`;
+                selectionNote.innerHTML = `<i class="fas fa-triangle-exclamation" aria-hidden="true"></i> This action needs you to select text in the policy first. Cancel, select text, then try again.`;
                 selectionNote.classList.add('warn');
                 submitBtn.disabled = true;
                 return;
@@ -299,7 +299,7 @@
                             const u = event.data.usage || {};
                             const cacheRead = u.cache_read_input_tokens || 0;
                             const cacheNote = cacheRead > 0 ? ` · cache hit (${cacheRead} tokens cached)` : '';
-                            statusEl.innerHTML = `<i class="fas fa-check"></i> Done — ${u.output_tokens || 0} tokens out${cacheNote}`;
+                            statusEl.innerHTML = `<i class="fas fa-check" aria-hidden="true"></i> Done — ${u.output_tokens || 0} tokens out${cacheNote}`;
                             insertBtn.style.display = '';
                             if (selectedText) replaceBtn.style.display = '';
                             tryAgainBtn.style.display = '';
@@ -310,10 +310,10 @@
                 }
             } catch (e) {
                 if (e.name === 'AbortError') {
-                    statusEl.innerHTML = `<i class="fas fa-circle-stop"></i> Cancelled.`;
+                    statusEl.innerHTML = `<i class="fas fa-circle-stop" aria-hidden="true"></i> Cancelled.`;
                 } else {
                     console.error('[ai-assist] error:', e);
-                    statusEl.innerHTML = `<i class="fas fa-triangle-exclamation"></i> ${escapeHtml(e.message)}`;
+                    statusEl.innerHTML = `<i class="fas fa-triangle-exclamation" aria-hidden="true"></i> ${escapeHtml(e.message)}`;
                     statusEl.classList.add('error');
                 }
                 tryAgainBtn.style.display = '';

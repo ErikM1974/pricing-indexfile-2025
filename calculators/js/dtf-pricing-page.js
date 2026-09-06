@@ -335,7 +335,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const errorHTML = `
                 <div class="alert alert-danger" role="alert">
                     <h4 class="alert-heading">
-                        <i class="fas fa-exclamation-circle"></i> Connection Error
+                        <i class="fas fa-exclamation-circle" aria-hidden="true"></i> Connection Error
                     </h4>
                     <p>We're unable to retrieve pricing information at this time.</p>
                     <hr>
@@ -588,7 +588,7 @@ document.addEventListener('DOMContentLoaded', function() {
         console.warn('⚠️ [DTF] No image found');
         imageEl.style.display = 'none';
         placeholderEl.style.display = 'flex';
-        placeholderEl.innerHTML = '<i class="fas fa-tshirt" style="font-size: 48px; margin-bottom: 12px;"></i><div>Image Not Available</div>';
+        placeholderEl.innerHTML = '<i class="fas fa-tshirt" style="font-size: 48px; margin-bottom: 12px;" aria-hidden="true"></i><div>Image Not Available</div>';
     }
 
     // Update color swatches
@@ -696,7 +696,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             // Show loading state
-            resultsContainer.innerHTML = '<div class="search-loading"><i class="fas fa-spinner fa-spin"></i> Searching...</div>';
+            resultsContainer.innerHTML = '<div class="search-loading"><i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Searching...</div>';
             resultsContainer.classList.add('active');
 
             try {

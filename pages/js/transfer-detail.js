@@ -274,13 +274,13 @@
         var badgesHtml = '<span class="bt-badge ' + statusBadgeClass(r.Status) + '" style="font-size:13px; padding:5px 14px;">' +
                          escapeHtml(statusLabel(r.Status)) + '</span>';
         if (isRush(r)) {
-            badgesHtml += '<span class="bt-badge bt-badge--rush" style="font-size:12px;"><i class="fas fa-bolt"></i> RUSH</span>';
+            badgesHtml += '<span class="bt-badge bt-badge--rush" style="font-size:12px;"><i class="fas fa-bolt" aria-hidden="true"></i> RUSH</span>';
         }
         if (r.Is_Reorder) {
-            badgesHtml += '<span class="tas-reorder-badge" style="font-size:12px;"><i class="fas fa-redo"></i> REORDER</span>';
+            badgesHtml += '<span class="tas-reorder-badge" style="font-size:12px;"><i class="fas fa-redo" aria-hidden="true"></i> REORDER</span>';
         }
         if (state.lines && state.lines.length > 1) {
-            badgesHtml += '<span class="tas-line-count-pill" style="font-size:12px;"><i class="fas fa-list-ol"></i> ' + state.lines.length + ' lines</span>';
+            badgesHtml += '<span class="tas-line-count-pill" style="font-size:12px;"><i class="fas fa-list-ol" aria-hidden="true"></i> ' + state.lines.length + ' lines</span>';
         }
         $('td-header-badges').innerHTML = badgesHtml;
 
@@ -324,7 +324,7 @@
         // Show the card with SP-specific copy.
         card.style.display = '';
         var header = card.querySelector('.td-card-header h3');
-        if (header) header.innerHTML = '<i class="fas fa-print"></i> Screen Print Order';
+        if (header) header.innerHTML = '<i class="fas fa-print" aria-hidden="true"></i> Screen Print Order';
         var headerHint = card.querySelector('.td-card-header-hint');
         if (headerHint) headerHint.textContent = 'Manual relay to vendor (no API)';
 
@@ -398,7 +398,7 @@
     function renderSupacolorJoblines(joblines, job) {
         if (!joblines || !joblines.length) return '';
         var html = ['<div class="td-jobline-section">',
-            '<div class="td-subsection-title"><i class="fas fa-list"></i> Joblines (' + joblines.length + ')</div>',
+            '<div class="td-subsection-title"><i class="fas fa-list" aria-hidden="true"></i> Joblines (' + joblines.length + ')</div>',
             '<div class="td-jobline-list">'];
 
         joblines.forEach(function (line) {
@@ -415,7 +415,7 @@
                   ' alt="" title="Click to view larger"' +
                   ' onerror="this.style.display=\'none\'">'
                 : '<div class="td-jobline-thumb td-jobline-thumb--placeholder">' +
-                    '<i class="fas fa-' + (line.Line_Type === 'SHIPPING' ? 'truck' : line.Line_Type === 'FEE' ? 'tag' : 'image') + '"></i>' +
+                    '<i class="fas fa-' + (line.Line_Type === 'SHIPPING' ? 'truck' : line.Line_Type === 'FEE' ? 'tag' : 'image') + '" aria-hidden="true"></i>' +
                   '</div>';
 
             var qtyPrice = (line.Quantity != null && line.Unit_Price != null)
@@ -471,13 +471,13 @@
 
         var rows = [];
         rows.push('<div class="td-shipping-section">');
-        rows.push('<div class="td-subsection-title"><i class="fas fa-map-marker-alt"></i> Shipping</div>');
+        rows.push('<div class="td-subsection-title"><i class="fas fa-map-marker-alt" aria-hidden="true"></i> Shipping</div>');
         rows.push('<div class="td-shipping-block">');
         if (job.Ship_To_Name) rows.push('<div class="td-shipping-name">' + escapeHtml(job.Ship_To_Name) + '</div>');
         if (addrLines) rows.push('<div class="td-shipping-address">' + addrLines + '</div>');
-        if (job.Ship_To_Contact) rows.push('<div class="td-shipping-contact"><i class="fas fa-user"></i> ' + escapeHtml(job.Ship_To_Contact) + '</div>');
-        if (job.Ship_To_Phone) rows.push('<div class="td-shipping-contact"><i class="fas fa-phone"></i> ' + escapeHtml(job.Ship_To_Phone) + '</div>');
-        if (job.Ship_To_Email) rows.push('<div class="td-shipping-contact"><i class="fas fa-envelope"></i> ' + escapeHtml(job.Ship_To_Email) + '</div>');
+        if (job.Ship_To_Contact) rows.push('<div class="td-shipping-contact"><i class="fas fa-user" aria-hidden="true"></i> ' + escapeHtml(job.Ship_To_Contact) + '</div>');
+        if (job.Ship_To_Phone) rows.push('<div class="td-shipping-contact"><i class="fas fa-phone" aria-hidden="true"></i> ' + escapeHtml(job.Ship_To_Phone) + '</div>');
+        if (job.Ship_To_Email) rows.push('<div class="td-shipping-contact"><i class="fas fa-envelope" aria-hidden="true"></i> ' + escapeHtml(job.Ship_To_Email) + '</div>');
         rows.push('</div>');
         rows.push('</div>');
         return rows.join('');
@@ -506,7 +506,7 @@
 
         var rows = [];
         rows.push('<div class="td-history-section">');
-        rows.push('<div class="td-subsection-title"><i class="fas fa-history"></i> History</div>');
+        rows.push('<div class="td-subsection-title"><i class="fas fa-history" aria-hidden="true"></i> History</div>');
         rows.push('<div class="td-history-list">');
         rows.push(first.map(eventHtml).join(''));
         rows.push('</div>');
@@ -578,13 +578,13 @@
 
         // Render a loading stub immediately so the card appears
         card.style.display = '';
-        panel.innerHTML = '<div class="td-empty-panel" style="padding:12px 0;"><i class="fas fa-spinner fa-spin"></i> Loading live status...</div>';
+        panel.innerHTML = '<div class="td-empty-panel" style="padding:12px 0;"><i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Loading live status...</div>';
 
         try {
             var resp = await fetch(API_BASE + '/api/supacolor-jobs/by-number/' + encodeURIComponent(num));
             if (resp.status === 404) {
                 panel.innerHTML = '<div class="td-empty-panel" style="padding:12px 0; color:#92400e;">' +
-                    '<i class="fas fa-info-circle"></i> Supacolor job <strong>#' + escapeHtml(num) + '</strong> not yet synced. ' +
+                    '<i class="fas fa-info-circle" aria-hidden="true"></i> Supacolor job <strong>#' + escapeHtml(num) + '</strong> not yet synced. ' +
                     'The 10-min API sync will catch it shortly, or click "Mark as Ordered" again to re-trigger.' +
                     '</div>';
                 return;
@@ -613,7 +613,7 @@
             if (carrier) rows.push('<dt>Carrier</dt><dd>' + escapeHtml(carrier) + (job.Shipping_Method ? ' &middot; ' + escapeHtml(job.Shipping_Method) : '') + '</dd>');
             if (tracking) {
                 var trackDisplay = trackUrl
-                    ? '<a href="' + escapeHtml(trackUrl) + '" target="_blank" rel="noopener">' + escapeHtml(tracking) + ' <i class="fas fa-external-link-alt" style="font-size:10px;"></i></a>'
+                    ? '<a href="' + escapeHtml(trackUrl) + '" target="_blank" rel="noopener">' + escapeHtml(tracking) + ' <i class="fas fa-external-link-alt" style="font-size:10px;" aria-hidden="true"></i></a>'
                     : escapeHtml(tracking);
                 rows.push('<dt>Tracking</dt><dd>' + trackDisplay + '</dd>');
             }
@@ -628,7 +628,7 @@
             if (caspioId) {
                 rows.push('<div class="td-supacolor-deeplink">' +
                     '<a href="/pages/supacolor-job-detail.html?id=' + encodeURIComponent(caspioId) + '" class="bt-btn bt-btn--link bt-btn--small">' +
-                        'Open in Supacolor dashboard <i class="fas fa-arrow-right"></i>' +
+                        'Open in Supacolor dashboard <i class="fas fa-arrow-right" aria-hidden="true"></i>' +
                     '</a>' +
                 '</div>');
             }
@@ -640,7 +640,7 @@
             if (caspioId) {
                 var slot = $('td-supacolor-detail-slot');
                 if (slot) {
-                    slot.innerHTML = '<div class="td-empty-panel" style="padding:8px 0; font-size:12px;"><i class="fas fa-spinner fa-spin"></i> Loading joblines & shipping...</div>';
+                    slot.innerHTML = '<div class="td-empty-panel" style="padding:8px 0; font-size:12px;"><i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Loading joblines & shipping...</div>';
                     fetch(API_BASE + '/api/supacolor-jobs/' + encodeURIComponent(caspioId))
                         .then(function (r2) {
                             if (!r2.ok) throw new Error('HTTP ' + r2.status);
@@ -659,7 +659,7 @@
                         .catch(function (err) {
                             console.error('[transfer-detail] full Supacolor fetch failed:', err);
                             slot.innerHTML = '<div class="td-empty-panel" style="padding:8px 0; color:#991b1b; font-size:12px;">' +
-                                '<i class="fas fa-exclamation-triangle"></i> Couldn\'t load joblines/shipping. ' +
+                                '<i class="fas fa-exclamation-triangle" aria-hidden="true"></i> Couldn\'t load joblines/shipping. ' +
                                 'Try the dedicated Supacolor dashboard.' +
                                 '</div>';
                         });
@@ -668,7 +668,7 @@
         } catch (err) {
             console.error('[transfer-detail] Live Supacolor fetch failed:', err);
             panel.innerHTML = '<div class="td-empty-panel" style="padding:12px 0; color:#991b1b;">' +
-                '<i class="fas fa-exclamation-triangle"></i> Unable to load live Supacolor status. ' +
+                '<i class="fas fa-exclamation-triangle" aria-hidden="true"></i> Unable to load live Supacolor status. ' +
                 'Open the Supacolor Orders dashboard to view directly.' +
                 '</div>';
         }
@@ -687,7 +687,7 @@
 
         if (allFiles.length === 0) {
             if (r.Is_Reorder) {
-                panel.innerHTML = '<div class="td-empty-panel" style="background:#f0fdf4;border-left:3px solid #16a34a;padding:10px 14px;color:#166534;"><i class="fas fa-info-circle"></i> Reorder — artwork is already on file at Supacolor under order #' + escapeHtml(r.Supacolor_Order_Number || 'n/a') + '. No files attached here.</div>';
+                panel.innerHTML = '<div class="td-empty-panel" style="background:#f0fdf4;border-left:3px solid #16a34a;padding:10px 14px;color:#166534;"><i class="fas fa-info-circle" aria-hidden="true"></i> Reorder — artwork is already on file at Supacolor under order #' + escapeHtml(r.Supacolor_Order_Number || 'n/a') + '. No files attached here.</div>';
             } else {
                 panel.innerHTML = '<div class="td-empty-panel">No working files attached. Only Steve can attach files via the "Send to Supacolor" button on the mockup or his dashboard.</div>';
             }
@@ -706,9 +706,9 @@
                             '<img src="' + escapeHtml(thumbSrc) + '" alt="' + escapeHtml(mockupName) + '" class="td-artwork-mockup-img" onerror="this.classList.add(\'td-artwork-mockup-img--err\'); this.removeAttribute(\'src\');">' +
                         '</a>' +
                         '<div class="td-artwork-mockup-meta">' +
-                            '<span class="td-artwork-badge td-artwork-badge--mockup"><i class="fas fa-image"></i> Mockup</span> ' +
+                            '<span class="td-artwork-badge td-artwork-badge--mockup"><i class="fas fa-image" aria-hidden="true"></i> Mockup</span> ' +
                             escapeHtml(mockupName) +
-                            ' <a href="' + escapeHtml(mockupUrl) + '" target="_blank" rel="noopener" class="td-artwork-open-link"><i class="fas fa-external-link-alt"></i> Open</a>' +
+                            ' <a href="' + escapeHtml(mockupUrl) + '" target="_blank" rel="noopener" class="td-artwork-open-link"><i class="fas fa-external-link-alt" aria-hidden="true"></i> Open</a>' +
                         '</div>' +
                     '</div>';
         }
@@ -726,7 +726,7 @@
                 var thumbSrc = boxUrl(f.Thumbnail_URL) || (isImage ? url : null);
                 var thumb = thumbSrc
                     ? '<img src="' + escapeHtml(thumbSrc) + '" alt="" class="td-artwork-tile-thumb" onerror="this.parentElement.innerHTML = \'<div class=&quot;td-artwork-tile-thumb td-artwork-tile-thumb--placeholder&quot;><i class=&quot;fas fa-file&quot;></i></div>\';">'
-                    : '<div class="td-artwork-tile-thumb td-artwork-tile-thumb--placeholder"><i class="fas fa-file"></i></div>';
+                    : '<div class="td-artwork-tile-thumb td-artwork-tile-thumb--placeholder"><i class="fas fa-file" aria-hidden="true"></i></div>';
                 html += '<a href="' + escapeHtml(url) + '" target="_blank" rel="noopener" class="td-artwork-tile" title="' + escapeHtml(name) + '">' +
                             thumb +
                             '<div class="td-artwork-tile-meta">' +
@@ -771,7 +771,7 @@
         if (r.Is_Reorder) {
             var num = r.Supacolor_Order_Number ? escapeHtml(r.Supacolor_Order_Number) : '(not provided)';
             parts.push('<div class="td-reorder-banner" style="background:#dcfce7;border-left:4px solid #16a34a;padding:12px 16px;border-radius:4px;margin-bottom:14px;">' +
-                '<strong style="color:#166534;font-size:14px;"><i class="fas fa-redo"></i> REORDER — Supacolor #' + num + '</strong>' +
+                '<strong style="color:#166534;font-size:14px;"><i class="fas fa-redo" aria-hidden="true"></i> REORDER — Supacolor #' + num + '</strong>' +
                 '<div style="color:#166534;font-size:12px;margin-top:3px;">Artwork already on file at Supacolor.</div>' +
                 '</div>');
         }
@@ -837,7 +837,7 @@
             var displayVal;
             if (value) {
                 displayVal = url
-                    ? '<a href="' + escapeHtml(url) + '" target="_blank" rel="noopener" class="td-tracking-value">' + escapeHtml(value) + ' <i class="fas fa-external-link-alt" style="font-size:10px;"></i></a>'
+                    ? '<a href="' + escapeHtml(url) + '" target="_blank" rel="noopener" class="td-tracking-value">' + escapeHtml(value) + ' <i class="fas fa-external-link-alt" style="font-size:10px;" aria-hidden="true"></i></a>'
                     : '<span class="td-tracking-value">' + escapeHtml(value) + '</span>';
             } else {
                 displayVal = '<span class="td-tracking-value td-tracking-value--empty">not set</span>';
@@ -1002,7 +1002,7 @@
                 return '<button class="td-action-btn td-action-btn--' + a.variant + '" data-id="' + a.id + '"' +
                     (a.modal ? ' data-modal="' + a.modal + '"' : '') +
                     (a.action ? ' data-action="' + a.action + '"' : '') + '>' +
-                    '<i class="fas fa-' + a.icon + '"></i> ' + escapeHtml(a.label) +
+                    '<i class="fas fa-' + a.icon + '" aria-hidden="true"></i> ' + escapeHtml(a.label) +
                 '</button>';
             }).join('') +
         '</div>';
@@ -1053,7 +1053,7 @@
             var icon = iconMap[n.Note_Type] || 'circle';
             var iconClass = iconClassMap[n.Note_Type] || '';
             return '<div class="td-timeline-item">' +
-                '<div class="td-timeline-icon ' + iconClass + '"><i class="fas fa-' + icon + '"></i></div>' +
+                '<div class="td-timeline-icon ' + iconClass + '"><i class="fas fa-' + icon + '" aria-hidden="true"></i></div>' +
                 '<div class="td-timeline-body">' +
                     '<div class="td-timeline-text">' + escapeHtml(n.Note_Text || '') + '</div>' +
                     '<div class="td-timeline-meta">' + escapeHtml(n.Author_Name || n.Author_Email || 'System') + ' · ' + escapeHtml(formatDateTime(n.Created_At)) + '</div>' +
@@ -1107,10 +1107,10 @@
         var el = $('td-' + target + '-paste-status');
         if (!el) return;
         var icon = state === 'loading'
-            ? '<i class="fas fa-spinner fa-spin td-paste-status-icon"></i>'
+            ? '<i class="fas fa-spinner fa-spin td-paste-status-icon" aria-hidden="true"></i>'
             : state === 'success'
-                ? '<i class="fas fa-check-circle td-paste-status-icon"></i>'
-                : '<i class="fas fa-exclamation-triangle td-paste-status-icon"></i>';
+                ? '<i class="fas fa-check-circle td-paste-status-icon" aria-hidden="true"></i>'
+                : '<i class="fas fa-exclamation-triangle td-paste-status-icon" aria-hidden="true"></i>';
         var thumb = thumbUri ? '<img src="' + thumbUri + '" class="td-paste-thumb" alt="">' : '';
         el.className = 'td-paste-status td-paste-status--' + state;
         el.innerHTML = icon + '<span>' + message + '</span>' + thumb;
@@ -1307,8 +1307,8 @@
     function openRushModal(markingRush) {
         var modal = $('td-rush-modal');
         $('td-rush-modal-title').innerHTML = markingRush
-            ? '<i class="fas fa-bolt"></i> Mark as Rush'
-            : '<i class="fas fa-bolt"></i> Clear Rush Flag';
+            ? '<i class="fas fa-bolt" aria-hidden="true"></i> Mark as Rush'
+            : '<i class="fas fa-bolt" aria-hidden="true"></i> Clear Rush Flag';
         $('td-rush-submit-btn').textContent = markingRush ? 'Mark Rush' : 'Clear Rush';
         $('td-rush-reason-row').style.display = markingRush ? '' : 'none';
         modal.setAttribute('data-marking-rush', markingRush ? '1' : '0');
@@ -1475,7 +1475,7 @@
         banner.className = 'td-po-banner td-po-banner--empty';
         banner.innerHTML =
             '<div class="td-po-banner-header">' +
-                '<div class="td-po-banner-icon"><i class="fas fa-print"></i></div>' +
+                '<div class="td-po-banner-icon"><i class="fas fa-print" aria-hidden="true"></i></div>' +
                 '<div>' +
                     '<h2 class="td-po-banner-title">Ready to send to L&P?</h2>' +
                     '<p class="td-po-banner-help">Enter the <strong>ShopWorks PO#</strong> you used when you relayed this to L&P. We&rsquo;ll mark this <strong>Ordered</strong>.</p>' +
@@ -1489,7 +1489,7 @@
                 '</div>' +
                 '<div class="td-po-banner-actions">' +
                     '<button type="button" id="td-po-submit-btn" class="td-po-submit" disabled>' +
-                        '<i class="fas fa-paper-plane"></i> Mark as Ordered' +
+                        '<i class="fas fa-paper-plane" aria-hidden="true"></i> Mark as Ordered' +
                     '</button>' +
                 '</div>' +
             '</div>';
@@ -1532,7 +1532,7 @@
     function renderScreenPrintPoBannerConfirmed(banner, poDigits) {
         banner.className = 'td-po-banner td-po-banner--linked';
         banner.innerHTML =
-            '<div class="td-po-banner-icon"><i class="fas fa-check-circle"></i></div>' +
+            '<div class="td-po-banner-icon"><i class="fas fa-check-circle" aria-hidden="true"></i></div>' +
             '<div>' +
                 '<h2 class="td-po-banner-title">Ordered &mdash; <code>PO ' + poDigits + ' BW</code> sent to L&P</h2>' +
                 '<p class="td-po-banner-help">Use the actions panel below to mark Shipped (when L&P gives you a tracking #) or Received (when it lands).</p>' +
@@ -1543,7 +1543,7 @@
         banner.className = 'td-po-banner td-po-banner--empty';
         banner.innerHTML =
             '<div class="td-po-banner-header">' +
-                '<div class="td-po-banner-icon"><i class="fas fa-bolt"></i></div>' +
+                '<div class="td-po-banner-icon"><i class="fas fa-bolt" aria-hidden="true"></i></div>' +
                 '<div>' +
                     '<h2 class="td-po-banner-title">Ready to order on Supacolor?</h2>' +
                     '<p class="td-po-banner-help">Enter the <strong>ShopWorks PO#</strong> you just used. We’ll mark this <strong>Ordered</strong> and auto-link the Supacolor job within ~10 min.</p>' +
@@ -1557,7 +1557,7 @@
                 '</div>' +
                 '<div class="td-po-banner-actions">' +
                     '<button type="button" id="td-po-submit-btn" class="td-po-submit" disabled>' +
-                        '<i class="fas fa-paper-plane"></i> Mark as Ordered &amp; Link' +
+                        '<i class="fas fa-paper-plane" aria-hidden="true"></i> Mark as Ordered &amp; Link' +
                     '</button>' +
                     '<button type="button" id="td-po-fallback-btn" class="td-po-fallback-link">' +
                         'No PO yet? Mark as Ordered with Supacolor # instead' +
@@ -1612,7 +1612,7 @@
     function renderPoBannerPending(banner, poDigits) {
         banner.className = 'td-po-banner td-po-banner--pending';
         banner.innerHTML =
-            '<div class="td-po-banner-icon"><i class="fas fa-circle-notch fa-spin"></i></div>' +
+            '<div class="td-po-banner-icon"><i class="fas fa-circle-notch fa-spin" aria-hidden="true"></i></div>' +
             '<div>' +
                 '<h2 class="td-po-banner-title">Ordered — PO ' + poDigits + ' BW</h2>' +
                 '<p class="td-po-banner-help">Linking to Supacolor on next sync (within 10 min). The auto-link cron matches your PO digits to <code>Supacolor_Jobs.PO_Number</code> automatically.</p>' +
@@ -1623,7 +1623,7 @@
         banner.className = 'td-po-banner td-po-banner--linked';
         var supaSafe = escapeHtml(String(supaNumber));
         banner.innerHTML =
-            '<div class="td-po-banner-icon"><i class="fas fa-check-circle"></i></div>' +
+            '<div class="td-po-banner-icon"><i class="fas fa-check-circle" aria-hidden="true"></i></div>' +
             '<div>' +
                 '<h2 class="td-po-banner-title">Ordered — <code>PO ' + poDigits + ' BW</code> → Supacolor #' + supaSafe + '</h2>' +
                 '<p class="td-po-banner-help">Linked and tracking. Live status syncs from Supacolor every 10 min.</p>' +
@@ -1641,7 +1641,7 @@
 
         submitBtn.disabled = true;
         var originalText = submitBtn.innerHTML;
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Submitting...';
 
         try {
             // Phase 1 backend extension: PUT /status with status='Ordered' + shopworksPO

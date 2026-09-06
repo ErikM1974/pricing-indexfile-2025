@@ -66,7 +66,7 @@ function setupSearch() {
         }
 
         // Show loading state
-        resultsContainer.innerHTML = '<div class="search-loading"><i class="fas fa-spinner fa-spin"></i> Searching caps...</div>';
+        resultsContainer.innerHTML = '<div class="search-loading"><i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Searching caps...</div>';
         resultsContainer.classList.add('active');
 
         try {
@@ -101,7 +101,7 @@ function setupSearch() {
                 if (beanieResults.length > 0) {
                     resultsHTML += `
                         <div style="padding: 10px; background: #fef3c7; border-bottom: 1px solid #fbbf24; color: #92400e; font-size: 13px;">
-                            <i class="fas fa-info-circle" style="margin-right: 5px;"></i>
+                            <i class="fas fa-info-circle" style="margin-right: 5px;" aria-hidden="true"></i>
                             Found ${beanieResults.length} beanie/knit item(s). Please use the <a href="/pricing/embroidery" style="color: #4cb354; font-weight: 600;">Flat Embroidery Pricing</a> page for beanies and knit caps.
                         </div>
                     `;
@@ -788,7 +788,7 @@ function showProductMismatchOverlay(styleNumber, productName, reason) {
             <div id="productMismatchOverlay" class="product-mismatch-overlay">
                 <div class="product-mismatch-modal">
                     <div class="product-mismatch-icon">
-                        <i class="fas fa-exclamation-triangle"></i>
+                        <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
                     </div>
                     <h2 class="product-mismatch-title">Wrong Pricing Calculator</h2>
                     <p class="product-mismatch-message" id="mismatchMessage"></p>
@@ -843,7 +843,7 @@ function showProduct() {
 
 function showNoProduct() {
     loadingState.innerHTML = `
-        <i class="fas fa-search"></i>
+        <i class="fas fa-search" aria-hidden="true"></i>
         <p>Search for a cap style to view pricing</p>
     `;
 }

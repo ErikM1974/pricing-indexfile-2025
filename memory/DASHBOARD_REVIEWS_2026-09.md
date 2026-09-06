@@ -1355,3 +1355,22 @@ Lock: `tests/unit/quote-builders-hygiene.test.js` (+ the existing `quote-builder
 
 **Left alone** — inline `style="display:none"` regions + their `.style.display` toggles in utils (61 sites, consistent pairs); ~150 cosmetic inline styles on the embroidery page (149) / screenprint (78) / dtf (50) — a classes migration is its own job; `confirm()` dialogs for destructive actions (deliberate).
 
+---
+
+# STAFF PAGES — LIVE PASS on teamnwca.com (signed in), 80 pages, 10 items (2026-09-06, `v2026.09.06.26`)
+
+Lock: `tests/unit/staff-live-hygiene.test.js`. Method: collected every internal link from the signed-in dashboard (98), probed each page's RUNTIME DOM in Erik's browser (inline handlers, undecorated icons, injected `<style>`, unversioned assets, unnamed buttons, unlabeled inputs, h1), then traced every finding to its source file. The static locks from the 09-05 sweep had missed everything a script renders after load.
+
+1. **`data-call-delegator.js` extended** — `data-input`, `data-open` (new tab), `<img data-onerror="hide|hide-parent|closest-class|parent-remove-class|call:obj.fn" data-onerror-else>` and `data-onload`.
+2. **Garment designer (`/pages/garment-designer.html`)** had **64 inline `onclick`/`onchange`** in the page + 7 in its script → delegated (incl. `if(event.target===this)` overlays → `data-self-only`, and `this.value` args). It was the single biggest Rule 3 hole left on a staff page.
+3. **AE dashboard** — 13 runtime handlers came from `mockup-ae.js` (6), `art-ae.js` (8: kanban collapse/show-all, gallery init/filter, new-tab opens, Box-image error fallbacks) and the art-card `onload/onerror` pair in `ae-dashboard.js` → `data-*`; `window.aeArtCardImageError` holds the placeholder SVG. 7 unlabeled inputs → the four submit-form templates' `<label>`s now carry `for=` (77 wired across mockup/garment/sticker-banner/JDS forms).
+4. **Staff dashboard** Pride Wall tiles: `onerror="this.closest('.pw-tile').classList.add('pw-tile--dead')"` → `data-onerror="closest-class"` (bundle rebuilt by `scripts/build.js`).
+5. **Injected `<style>` blocks → stylesheets** (7 scripts): `elapsed-time-utils` (art hubs/AE), `company-contact-picker`, `toast-notifications`, `universal-records-admin` (3 blocks), `embroidery-quote-pricing` (builders), `quote-session` (2), `universal-pricing-grid`; each consumer page links the CSS. 🔍 `dtg-product-recommendations(-modal).js` and `header-button-functions.js` also inject styles but have ZERO consumers — orphans, flagged.
+6. **Employee-bundle pages** (`/streich-bros-bundle.html`, `/wcttr-bundle.html`) carried 230-line inline `<style>` blocks → `employee-bundles/css/*.css`; DrainPro tabs `onclick` → `data-call`, inline styles → classes.
+7. **Icons**: any-attribute-order + dynamic forms hidden across 97 staff HTML + 38 scripts (policies suite alone had 103 + 23 + 21 + 26 + 16 + 14 in six scripts; dst-viewer 42 + 7; universal-records-admin 56; training pages 5–19 each). 🔑 The Design Vault's 110 "bare" icons are **intentional**: `<i class="dg-src fas …" aria-label="Art request">` source badges with accessible names — not defects.
+8. **Unversioned assets** on 20 pages (`art-hub.css`, `dash-shell.css`, `fetch-timeout.js`, `dash-page-helpers.js`, `data-call-delegator.js`, `confetti.js`, training/calculator page assets) → `?v=`.
+9. `pages/data-entry-guide.html` gained its `<h1>` (was a `div.page-title`); `screenprint-pricing-service.js` (27), `jds-api-service.js` (7), `art-actions-shared.js` (3) `console.log` gated.
+10. Verified on static-dist: garment designer — `data-call` nudge reaches `designerNudge(-5,0)`, `pickSide('front')`, 3 self-only overlays, 0 handlers; AE dashboard 0 handlers, 0 injected styles, delegator + CSS links present; universal-records-admin toast rules load from the linked file; Design Vault toast CSS linked; full unit suite + a11y baselines green (Mission Control harness re-synced).
+
+**Backlog (not linked from the dashboard, found by the lock's directory scan, deliberately out of this batch):** 33 second-hop/orphan staff pages with inline code — `dashboards/{bundle-orders-dashboard,embroidery-bonus-plan,staff-login,staff-portal-final}.html`, `admin/{announcements-create,announcements-manage,c112-bogo-promo}.html`, 21 `training/*.html` sub-guides/games (handlers), `tools/{cap-layout-mockup,css-diagnostic,decoration-selector-mockup,diagnose-*}.html`. Also: the `no-hardcoded-hosts` ratchet (222 literals) — ~40 `|| 'https://caspio-pricing-proxy…'` silent fallbacks in shared scripts are the next Rule 6 batch.
+

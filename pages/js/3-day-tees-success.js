@@ -108,8 +108,8 @@
         $('s-order-num').textContent = row.QuoteID;
         const promise = orderSettings.shipPromise && orderSettings.shipPromise.label;
         $('s-ship-line').innerHTML = promise
-            ? `<i class="fas fa-truck-fast"></i> Ships ${escapeHTML(promise)} from Milton, WA`
-            : '<i class="fas fa-truck-fast"></i> Ships in 3 business days from Milton, WA';
+            ? `<i class="fas fa-truck-fast" aria-hidden="true"></i> Ships ${escapeHTML(promise)} from Milton, WA`
+            : '<i class="fas fa-truck-fast" aria-hidden="true"></i> Ships in 3 business days from Milton, WA';
 
         // Mockups straight from the saved order
         const mocks = (orderSettings.mockups || []).slice(0, 6);
@@ -143,7 +143,7 @@
             sub: promise ? `Promised: ${promise}` : 'Within 3 business days', done: false,
         });
         $('s-timeline').innerHTML = steps.map((s) =>
-            `<div class="success-step ${s.done ? '' : 'is-pending'}"><i class="fas ${s.icon}"></i>` +
+            `<div class="success-step ${s.done ? '' : 'is-pending'}"><i class="fas ${s.icon}" aria-hidden="true"></i>` +
             `<span><strong>${escapeHTML(s.title)}</strong><small>${escapeHTML(s.sub)}</small></span></div>`).join('');
 
         if (status.indexOf('ShopWorks Failed') !== -1) {

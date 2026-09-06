@@ -684,7 +684,7 @@ class RichardsonPricingLookup {
                         <p class="cap-price">$${cap.price.toFixed(2)} blank</p>
                     </div>
                     <button type="button" class="quick-select-btn" onclick="window.richardsonPricing.quickSelectCap('${cap.style}')">
-                        <i class="fas fa-check"></i> Select
+                        <i class="fas fa-check" aria-hidden="true"></i> Select
                     </button>
                 </div>
             `;

@@ -24,7 +24,7 @@
             <span class="bt-breadcrumb-current" id="bt-breadcrumb-current">Loading…</span>
         </nav>
         <span class="td-user-chip" id="td-user-chip">
-            <i class="fas fa-user"></i>
+            <i class="fas fa-user" aria-hidden="true"></i>
             <span id="td-user-display">Not signed in</span>
             <button class="bt-btn bt-btn--link bt-btn--small" id="td-change-user-btn">Change</button>
         </span>
@@ -33,12 +33,12 @@
     <div class="td-container">
         <!-- Loading state -->
         <div id="td-loading" class="td-loading">
-            <i class="fas fa-spinner fa-spin"></i> Loading transfer...
+            <i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Loading transfer...
         </div>
 
         <!-- Error state -->
         <div id="td-error" class="td-error" style="display:none;">
-            <i class="fas fa-exclamation-triangle"></i>
+            <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
             <h2>Unable to load transfer</h2>
             <div id="td-error-message"></div>
             <a href="/dashboards/bradley-transfers.html" class="bt-btn bt-btn--primary">Back to Queue</a>
@@ -79,7 +79,7 @@
                     <!-- Artwork Panel -->
                     <div class="td-card">
                         <div class="td-card-header">
-                            <h3><i class="fas fa-file-image"></i> Mockup</h3>
+                            <h3><i class="fas fa-file-image" aria-hidden="true"></i> Mockup</h3>
                         </div>
                         <div class="td-card-body" id="td-artwork-panel">
                             <div class="td-empty-panel">No working file attached.</div>
@@ -102,7 +102,7 @@
                     <!-- Live Supacolor Status (populated from Supacolor_Jobs once linked) -->
                     <div class="td-card" id="td-supacolor-live-card" style="display:none;">
                         <div class="td-card-header">
-                            <h3><i class="fas fa-satellite-dish"></i> Live Supacolor Status</h3>
+                            <h3><i class="fas fa-satellite-dish" aria-hidden="true"></i> Live Supacolor Status</h3>
                             <span class="td-card-header-hint">Synced from Supacolor API</span>
                         </div>
                         <div class="td-card-body" id="td-supacolor-live-panel"></div>
@@ -114,7 +114,7 @@
                     <!-- Action Panel -->
                     <div class="td-card">
                         <div class="td-card-header">
-                            <h3><i class="fas fa-bolt"></i> Actions</h3>
+                            <h3><i class="fas fa-bolt" aria-hidden="true"></i> Actions</h3>
                         </div>
                         <div class="td-card-body" id="td-actions-panel"></div>
                     </div>
@@ -122,13 +122,13 @@
                     <!-- Notes/Timeline Panel -->
                     <div class="td-card">
                         <div class="td-card-header">
-                            <h3><i class="fas fa-comments"></i> Activity Timeline</h3>
+                            <h3><i class="fas fa-comments" aria-hidden="true"></i> Activity Timeline</h3>
                         </div>
                         <div class="td-card-body">
                             <div class="td-comment-form">
                                 <textarea id="td-comment-input" placeholder="Add a comment..." rows="2"></textarea>
                                 <button class="bt-btn bt-btn--primary bt-btn--small" id="td-add-comment-btn">
-                                    <i class="fas fa-paper-plane"></i> Post
+                                    <i class="fas fa-paper-plane" aria-hidden="true"></i> Post
                                 </button>
                             </div>
                             <div class="td-timeline" id="td-timeline"></div>
@@ -145,7 +145,7 @@
     <div id="td-user-modal" class="bt-modal" style="display:none;">
         <div class="bt-modal-content" style="max-width:400px;">
             <div class="bt-modal-header">
-                <h3><i class="fas fa-user-circle"></i> Who are you?</h3>
+                <h3><i class="fas fa-user-circle" aria-hidden="true"></i> Who are you?</h3>
             </div>
             <div class="bt-modal-body">
                 <div class="bt-modal-intro">
@@ -177,7 +177,7 @@
     <div id="td-ordered-modal" class="bt-modal" style="display:none;">
         <div class="bt-modal-content" style="max-width:500px;">
             <div class="bt-modal-header">
-                <h3><i class="fas fa-paper-plane"></i> Mark as Ordered</h3>
+                <h3><i class="fas fa-paper-plane" aria-hidden="true"></i> Mark as Ordered</h3>
                 <button class="bt-modal-close" data-close="td-ordered-modal">&times;</button>
             </div>
             <div class="bt-modal-body">
@@ -187,7 +187,7 @@
 
                 <!-- Paste screenshot to auto-fill (Phase 2.5) -->
                 <div class="td-paste-zone" id="td-ordered-paste-zone" tabindex="0" data-target="ordered">
-                    <i class="fas fa-paste"></i>
+                    <i class="fas fa-paste" aria-hidden="true"></i>
                     <div class="td-paste-text">
                         <strong>Paste a Supacolor screenshot (Ctrl+V)</strong>
                         <span class="td-paste-hint">Claude will auto-fill Job # and Ship Date</span>
@@ -233,7 +233,7 @@
     <div id="td-po-modal" class="bt-modal" style="display:none;">
         <div class="bt-modal-content" style="max-width:500px;">
             <div class="bt-modal-header">
-                <h3><i class="fas fa-file-invoice-dollar"></i> Add ShopWorks PO</h3>
+                <h3><i class="fas fa-file-invoice-dollar" aria-hidden="true"></i> Add ShopWorks PO</h3>
                 <button class="bt-modal-close" data-close="td-po-modal">&times;</button>
             </div>
             <div class="bt-modal-body">
@@ -266,13 +266,13 @@
     <div id="td-shipped-modal" class="bt-modal" style="display:none;">
         <div class="bt-modal-content" style="max-width:500px;">
             <div class="bt-modal-header">
-                <h3><i class="fas fa-truck"></i> Mark as Shipped</h3>
+                <h3><i class="fas fa-truck" aria-hidden="true"></i> Mark as Shipped</h3>
                 <button class="bt-modal-close" data-close="td-shipped-modal">&times;</button>
             </div>
             <div class="bt-modal-body">
                 <!-- Paste screenshot to auto-fill (Phase 2.5) -->
                 <div class="td-paste-zone" id="td-shipped-paste-zone" tabindex="0" data-target="shipped">
-                    <i class="fas fa-paste"></i>
+                    <i class="fas fa-paste" aria-hidden="true"></i>
                     <div class="td-paste-text">
                         <strong>Paste a Supacolor screenshot (Ctrl+V)</strong>
                         <span class="td-paste-hint">Claude will auto-fill Tracking # and Delivery Date</span>
@@ -312,7 +312,7 @@
     <div id="td-cancel-modal" class="bt-modal" style="display:none;">
         <div class="bt-modal-content" style="max-width:500px;">
             <div class="bt-modal-header">
-                <h3><i class="fas fa-times-circle"></i> Cancel Transfer</h3>
+                <h3><i class="fas fa-times-circle" aria-hidden="true"></i> Cancel Transfer</h3>
                 <button class="bt-modal-close" data-close="td-cancel-modal">&times;</button>
             </div>
             <div class="bt-modal-body">
@@ -339,7 +339,7 @@
     <div id="td-delete-modal" class="bt-modal" style="display:none;">
         <div class="bt-modal-content" style="max-width:500px;">
             <div class="bt-modal-header">
-                <h3><i class="fas fa-trash"></i> Permanently Delete Transfer</h3>
+                <h3><i class="fas fa-trash" aria-hidden="true"></i> Permanently Delete Transfer</h3>
                 <button class="bt-modal-close" data-close="td-delete-modal">&times;</button>
             </div>
             <div class="bt-modal-body">
@@ -374,7 +374,7 @@
     <div id="td-rush-modal" class="bt-modal" style="display:none;">
         <div class="bt-modal-content" style="max-width:500px;">
             <div class="bt-modal-header">
-                <h3 id="td-rush-modal-title"><i class="fas fa-bolt"></i> Mark as Rush</h3>
+                <h3 id="td-rush-modal-title"><i class="fas fa-bolt" aria-hidden="true"></i> Mark as Rush</h3>
                 <button class="bt-modal-close" data-close="td-rush-modal">&times;</button>
             </div>
             <div class="bt-modal-body">
@@ -398,7 +398,7 @@
     <div id="td-specs-modal" class="bt-modal" style="display:none;">
         <div class="bt-modal-content">
             <div class="bt-modal-header">
-                <h3><i class="fas fa-pen"></i> Edit Order Specs</h3>
+                <h3><i class="fas fa-pen" aria-hidden="true"></i> Edit Order Specs</h3>
                 <button class="bt-modal-close" data-close="td-specs-modal">&times;</button>
             </div>
             <div class="bt-modal-body">

@@ -161,31 +161,7 @@
 
             // Add some basic styling if not already present
             if (!document.querySelector('#universal-pricing-grid-styles')) {
-                const styleElement = document.createElement('style');
-                styleElement.id = 'universal-pricing-grid-styles';
-                styleElement.textContent = `
-                    .upcharge-grid {
-                        display: flex;
-                        flex-direction: column;
-                        gap: 0.5rem;
-                    }
-                    .upcharge-row {
-                        display: flex;
-                        justify-content: space-between;
-                        padding: 0.5rem;
-                        background: #f8f9fa;
-                        border-radius: 4px;
-                    }
-                    .upcharge-sizes {
-                        font-weight: 500;
-                        color: #495057;
-                    }
-                    .upcharge-amount {
-                        font-weight: 600;
-                        color: #28a745;
-                    }
-                `;
-                document.head.appendChild(styleElement);
+                // (2026-09-06) styles live in /shared_components/css/universal-pricing-grid.css — linked by every consumer page, nothing injected.
             }
 
             return html;

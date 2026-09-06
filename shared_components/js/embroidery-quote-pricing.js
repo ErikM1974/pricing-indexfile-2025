@@ -2151,15 +2151,7 @@ class EmbroideryPricingCalculator {
         
         // Add CSS animation if not already present
         if (!document.getElementById('api-warning-styles')) {
-            const style = document.createElement('style');
-            style.id = 'api-warning-styles';
-            style.textContent = `
-                @keyframes pulse {
-                    0%, 100% { opacity: 1; }
-                    50% { opacity: 0.85; }
-                }
-            `;
-            document.head.appendChild(style);
+            // (2026-09-06) styles live in /shared_components/css/embroidery-quote-pricing.css — linked by every consumer page, nothing injected.
         }
         
         // Add to page
