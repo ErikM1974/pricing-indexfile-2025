@@ -1,3 +1,8 @@
+## v2026.09.06.19 (2026.09.06)
+
+- Quote builders review: shared delegator now covers change/input/blur/keydown/image-error; 185 inline handlers → data-* across the 4 builders + module templates; icons decorative; assets versioned; fast-quote de-inlined + vendored EmailJS; logging gates hardened for non-browser contexts; lock quote-builders-hygiene.test.js
+- Deploy v2026.09.06.19: quote builders review — delegated change/input/keydown, fast-quote de-inlined
+
 ## v2026.09.06.17 (2026.09.06)
 
 - LESSONS: calculator sweep 2026-09-06 entry
