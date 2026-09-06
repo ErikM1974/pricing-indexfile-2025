@@ -39,8 +39,21 @@
     'use strict';
 
     // ── Config ──────────────────────────────────────────────────────
-    const API_BASE = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL)
-        || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+    const API_BASE = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) || '';
+    if (!API_BASE) {
+        // Rule 6: the proxy host comes from /config/app.config.js — never guess a backend silently.
+        console.error('[storefront] APP_CONFIG.API.BASE_URL missing — pricing cannot load');
+        document.addEventListener('DOMContentLoaded', () => {
+            const wrap = document.getElementById('tdt-toasts');
+            if (wrap) {
+                const el = document.createElement('div');
+                el.className = 'tdt-toast is-error';
+                el.setAttribute('role', 'alert');
+                el.textContent = 'Pricing is unavailable right now (site configuration did not load). Please refresh, or call 253-922-5793.';
+                wrap.appendChild(el);
+            }
+        });
+    }
     const PERSIST_KEY = 'caps_studio_v1';
     const DEFAULT_FIRST_QTY = 24;          // first color line starts here (min is API-derived, 8)
 
@@ -761,7 +774,7 @@
                     <input type="text" inputmode="numeric" value="${line.quantity}" data-color="${escapeHTML(line.catalogColor)}" aria-label="${escapeHTML(c.colorName)} cap quantity" ${stock <= 0 ? 'disabled' : ''}>
                     <button type="button" data-color="${escapeHTML(line.catalogColor)}" data-d="1" aria-label="More ${escapeHTML(c.colorName)} caps" ${line.quantity >= stock ? 'disabled' : ''}>+</button>
                 </div>
-                <button type="button" class="color-card-remove" data-remove="${escapeHTML(line.catalogColor)}" aria-label="Remove ${escapeHTML(c.colorName)}"><i class="fas fa-times"></i></button>`;
+                <button type="button" class="color-card-remove" data-remove="${escapeHTML(line.catalogColor)}" aria-label="Remove ${escapeHTML(c.colorName)}"><i class="fas fa-times" aria-hidden="true"></i></button>`;
             wrap.appendChild(card);
         });
 
@@ -953,7 +966,7 @@
 
         totals.innerHTML = buildTotalsHtml(q);
         $('review-promise').innerHTML =
-            `<i class="fas ${S.delivery.method === 'pickup' ? 'fa-store' : 'fa-truck-fast'}"></i> ` +
+            `<i class="fas ${S.delivery.method === 'pickup' ? 'fa-store' : 'fa-truck-fast'}" aria-hidden="true"></i> ` +
             escapeHTML(shipPromiseCopy());
 
         const ackEl = $('review-ack');
