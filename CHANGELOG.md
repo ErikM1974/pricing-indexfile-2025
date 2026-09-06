@@ -1,3 +1,8 @@
+## v2026.09.05.59 (2026.09.05)
+
+- Digitized Designs + Old Designs review: 14 items — AL pricing from /api/al-pricing with visible fallback (tables were hardcoded), blank Design Number derived from DST filename + flagged, Rule 3 onerror/style cleanup, keyboard thumbnails, labelled dialogs with focus return, typed+named actions, Caspio watchdog, versioned assets
+- Deploy v2026.09.05.59: Digitized Designs + Old Designs review (14 items)
+
 ## v2026.09.05.57 (2026.09.05)
 
 - Design Queue + Monogram + Names & Numbers review: 22 items — filter tiles (aria-pressed, synced), Retry on every load failure, Monogram inline onkeyup/onchange removed + local-day date filter + HTTP checks + foreign contact email fixed, N&N KPI status filters + live filtering + keyboard rows, labels/icons/types
