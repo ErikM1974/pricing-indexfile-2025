@@ -1,3 +1,9 @@
+## v2026.09.05.77 (2026.09.05)
+
+- LESSONS_LEARNED: archive the 2026-09-01 customer-portal entry; add the 2026-09-05 whole-dashboard sweep entry (six recurring defect classes + prevention)
+- Public pages review B1: Rule 3 extraction on 5 legacy public pages (webstore-info, inventory-details, dtg-compatible-products, pricing-negotiation-policy, design-view) — 14 items, lock public-legacy-pages.test.js
+- Deploy v2026.09.05.77: public batch B1 — 5 legacy public pages Rule 3 extraction (webstore-info, inventory-details, dtg-compatible-products, pricing-negotiation-policy, design-view)
+
 ## v2026.09.05.75 (2026.09.05)
 
 - AE Mission Control hygiene + Pricing Analysis (regenerated via its Python) + Price Audit Report: custom-property bars/markers, Reload-to-retry controls, decorative icons, typed banner, versioned assets; harness re-synced
