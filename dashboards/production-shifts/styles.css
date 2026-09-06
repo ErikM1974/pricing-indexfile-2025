@@ -1836,3 +1836,8 @@ button { font-family: inherit; cursor: pointer; }
 
   .master-table tbody tr { cursor: default !important; }
 }
+
+/* 2026-09-05 review — keyboard path for master-table rows + visible focus */
+.row-btn { background: none; border: 0; padding: 0; margin: 0; font: inherit; color: inherit; text-align: left; cursor: pointer; }
+.row-btn:focus-visible, .chip:focus-visible, .roster-card:focus-visible, .tl-row-label:focus-visible,
+.detail-close:focus-visible, .master-print:focus-visible, .btn-ghost:focus-visible, .waiver-card:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }

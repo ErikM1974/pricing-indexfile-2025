@@ -750,3 +750,35 @@ inline style, `[hidden]` guard, real `<button>`s) — the fixes are the failure 
 
 Left alone: camera can't be exercised in the pane (permission blocked); `DashTabs` migration not worth
 it for three static tabs; `resolveBoxUrl` thumbs still hit Box directly (design decision).
+
+## Production Shifts + Roland Printer Supplies — review, 9 items (2026-09-05, `v2026.09.05.50`)
+
+`dashboards/production-shifts.html` + `production-shifts/app.jsx` (React 18 via unpkg, JSX transpiled
+in-browser by Babel standalone — the only React page in the repo) and `roland-printer-supplies.html`
+(85-line static page: intro, PDF link, JotForm embed).
+
+1. 🔴 **Development React builds in production** — `react.development.js` + `react-dom.development.js`
+   (≈1 MB unminified, dev-only warnings, slower render) had shipped to staff since launch. Now the
+   `production.min` UMD builds, integrity hashes computed from the files (`openssl dgst -sha384`).
+   Babel standalone stays — precompiling JSX would need a build step nobody else uses; its one console
+   warning ("in-browser Babel transformer") is expected and documented in ACTIVE_FILES.
+2. **Master-table rows were `<tr onClick>`** — no keyboard path, nothing announced. The name cell is
+   now a real `<button aria-pressed aria-label="Kanha Chhorn — show shift details">`; the row keeps
+   its mouse click (`stopPropagation` so a button click doesn't toggle twice).
+3. Timeline row labels + roster cards `aria-pressed`; the coloured timeline row is `aria-hidden`
+   (its segments are a mouse convenience duplicating the row-label button).
+4. Dept chips = `role=group aria-label` + `aria-pressed`; "Filter" caption decorative.
+5. **Detail panel = `role=dialog aria-modal aria-labelledby=detail-name`** — `useEffect` focuses Close,
+   Esc closes, focus returns to the trigger on unmount. 🔑 `onClose` MUST be a `useCallback` — an
+   inline arrow re-creates the function every render, the effect re-runs and yanks focus back to
+   Close on each keystroke.
+6. Every `<button>` declares `type="button"`; scrim `aria-hidden`; focus rings for row/chip/card/
+   label/close/print/ghost controls (`.row-btn` resets the button chrome inside the name cell).
+7. Cache-bust `?v=` on `app.jsx` **and** `styles.css` (the CSS was still on `2026.05.26.4`).
+8. **Roland**: 5 icons `aria-hidden`. Nothing else — one h1, no inline code, PDF is same-origin.
+9. Lock: `tests/unit/production-small-pages.test.js`. Smoke on static-dist: prod builds load, row
+   button → dialog with focus on Close, Esc → focus back on the row button + `aria-pressed=false`,
+   Embroidery chip → 6 rows; 0 buttons without `type`.
+
+Left alone: in-browser Babel (see 1); the timeline segments' `title` tooltips (mouse-only, duplicates
+the detail panel); JotForm embed on Roland (third-party, not ours to fix).
