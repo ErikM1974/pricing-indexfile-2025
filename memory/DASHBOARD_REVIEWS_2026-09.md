@@ -1446,3 +1446,10 @@ With debug logging gated, every page's console was read after load (clear → na
 - 🔴 **DTF calculator** requested `…/api/base-item-costs?styleNumber=${encodeURIComponent(styleNumber)}` LITERALLY (404 + "Alternative endpoint error" every load) — the S3 host rewrite had turned 7 template-literal URLs (dtf-adapter ×3, catalog-search ×2 cap pricing, bundle-orders ×2) into single-quoted strings. Restored; lock "no quoted URL string with an unexpanded `${…}`" (attribute strings inside template literals excluded).
 - **Cap calculator (C112)**: `/api/sanmar/inventory/C112` is 400 "Product Id not found" for EVERY colour — Richardson caps are not SanMar items; the widget said "Please try again" → now "Live inventory is not available for this style (not a SanMar item)".
 - **DTG calculator**: `[UniversalPricingGrid] Upcharge container not found` — the page shows size pricing in its tooltip; debug note now.
+
+# RUNTIME A11Y PROBE + CSP REPORT STREAM (2026-09-06, `v2026.09.06.41`)
+
+- Runtime probe (labels/names after JS render) on custom-tees, custom-caps, PC54 product, homepage, screen-print calculator, transfer-detail, names-numbers, quote-management, past-due, purchasing, AE dashboard, art-hub-ruth, design-gallery, leads, company-numbers, garment designer: only two misses — the homepage category search input (`app-modern.js`, now `aria-label`) and the v2 screen-print quantity-tier inputs (labels had no `for=`, now wired). `tests/a11y` (axe on the builders) green.
+- **CSP report-only stream** (Heroku logs): the only violations are `script-src-elem: inline` on `vendor-portals/sanmar-invoices.html` — the Caspio DataPage embed injects inline scripts. ⏭️ **Enforce-day backlog**: Caspio embeds need a nonce or `'unsafe-inline'` scoped to those pages before the policy can be enforced; nothing in our own code trips it.
+- Heroku logs (last 1,500 lines): no 5xx, no unhandled rejections.
+- The DTF page's "Calculator not found yet" timing message is a debug note now.
