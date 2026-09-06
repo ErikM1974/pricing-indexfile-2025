@@ -1,3 +1,8 @@
+## v2026.09.05.57 (2026.09.05)
+
+- Design Queue + Monogram + Names & Numbers review: 22 items — filter tiles (aria-pressed, synced), Retry on every load failure, Monogram inline onkeyup/onchange removed + local-day date filter + HTTP checks + foreign contact email fixed, N&N KPI status filters + live filtering + keyboard rows, labels/icons/types
+- Deploy v2026.09.05.57: Design Queue + Monogram + Names & Numbers review (22 items)
+
 ## v2026.09.05.55 (2026.09.05)
 
 - Ruth's Queue review: 15 items — due-today no longer OVERDUE (calendar dates), h1, real tablist + arrows, status chips filter the queue (aria-pressed), Rule 3 onerror/style cleanup, session identity for quick actions, Billing Codes from Service_Codes with visible fallback, Retry instead of reload, kanban keyboard path, dialog focus return
