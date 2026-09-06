@@ -1,3 +1,8 @@
+## v2026.09.06.10 (2026.09.06)
+
+- Screen Print calculator: Rule 3 extraction (1,100-line <style> + two inline scripts → calculators/css + calculators/js), APP_CONFIG proxy host, gated logging, hidden regions, --swatch, versioned assets; lock screen-print-pricing-page.test.js
+- Deploy v2026.09.06.10: Screen Print calculator Rule 3 extraction
+
 ## v2026.09.06.8 (2026.09.06)
 
 - Remove the legacy runtime script loader from pricing-pages.js; delete cart.js, order-form-pdf.js, cart-price-recalculator.js (cart.js was force-skipped, half the chain's files no longer existed); lock pricing-pages-no-legacy-loader.test.js
