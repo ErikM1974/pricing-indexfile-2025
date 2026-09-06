@@ -83,7 +83,7 @@
 
     function sectionShell(id, icon, title) {
         return '<section class="dg-drawer-section" data-section="' + id + '">'
-            + '<h3><i class="fas ' + icon + '"></i> ' + DG.esc(title) + '</h3>'
+            + '<h3><i aria-hidden="true" class="fas ' + icon + '"></i> ' + DG.esc(title) + '</h3>'
             + '<div class="dg-section-body" data-body="' + id + '"><div class="dg-skel dg-skel--rows"></div></div>'
             + '</section>';
     }
@@ -92,7 +92,7 @@
         var host = els.body && els.body.querySelector('[data-body="' + id + '"]');
         if (!host) return;
         host.innerHTML = '<div class="dg-section-err">'
-            + '<i class="fas fa-triangle-exclamation"></i> '
+            + '<i class="fas fa-triangle-exclamation" aria-hidden="true"></i> '
             + DG.esc(msg)
             + ' <button type="button" class="dash-btn dash-btn--sm" data-retry="' + id + '">Retry</button>'
             + '</div>';
@@ -171,7 +171,7 @@
                         var fn = String(files[j].dstFilename);
                         dst += '<li><span class="dg-mono">' + DG.esc(fn) + '</span>'
                             + (files[j].stitchCount ? '<em>' + DG.esc(fmtStitch(files[j].stitchCount)) + '</em>' : '')
-                            + '<button type="button" class="dg-copy-inline" data-copy-text="' + DG.esc(fn) + '" title="Copy filename"><i class="fas fa-copy"></i></button></li>';
+                            + '<button type="button" class="dg-copy-inline" data-copy-text="' + DG.esc(fn) + '" title="Copy filename"><i class="fas fa-copy" aria-hidden="true"></i></button></li>';
                     }
                     dst += '</ul>';
                 }
@@ -277,7 +277,7 @@
             + '<div><h2 class="dg-mono">#' + (+d.dn) + '</h2>'
             + '<p class="dg-drawer-company">' + DG.esc(d.company || '') + '</p>'
             + '<p class="dg-drawer-name">' + DG.esc(d.name || '') + '</p></div>'
-            + '<button type="button" class="dg-drawer-close" data-close="1" aria-label="Close"><i class="fas fa-xmark"></i></button>'
+            + '<button type="button" class="dg-drawer-close" data-close="1" aria-label="Close"><i class="fas fa-xmark" aria-hidden="true"></i></button>'
             + '</header>'
             + '<div class="dg-drawer-hero" data-hero></div>'
             + '<div class="dg-drawer-strip" data-strip></div>'
@@ -286,13 +286,13 @@
             + sectionShell('art', 'fa-palette', "Steve's art requests")
             + sectionShell('ruth', 'fa-layer-group', "Ruth's mockups")
             + '<div class="dg-actions">'
-            + '<button type="button" class="dash-btn dash-btn--primary" data-act="copy"><i class="fas fa-copy"></i> Copy #</button>'
-            + '<button type="button" class="dash-btn" data-act="share"><i class="fas fa-link"></i> Share</button>'
-            + '<a class="dash-btn" data-act="quote" href="/quote-builders/embroidery-quote-builder.html?design=' + (+d.dn) + '"><i class="fas fa-file-invoice-dollar"></i> Quote</a>'
+            + '<button type="button" class="dash-btn dash-btn--primary" data-act="copy"><i class="fas fa-copy" aria-hidden="true"></i> Copy #</button>'
+            + '<button type="button" class="dash-btn" data-act="share"><i class="fas fa-link" aria-hidden="true"></i> Share</button>'
+            + '<a class="dash-btn" data-act="quote" href="/quote-builders/embroidery-quote-builder.html?design=' + (+d.dn) + '"><i class="fas fa-file-invoice-dollar" aria-hidden="true"></i> Quote</a>'
             + '<span class="dg-actions-nav">'
-            + '<button type="button" class="dash-btn" data-act="prev" aria-label="Previous design"><i class="fas fa-chevron-left"></i></button>'
+            + '<button type="button" class="dash-btn" data-act="prev" aria-label="Previous design"><i class="fas fa-chevron-left" aria-hidden="true"></i></button>'
             + pos
-            + '<button type="button" class="dash-btn" data-act="next" aria-label="Next design"><i class="fas fa-chevron-right"></i></button>'
+            + '<button type="button" class="dash-btn" data-act="next" aria-label="Next design"><i class="fas fa-chevron-right" aria-hidden="true"></i></button>'
             + '</span></div>';
     }
 

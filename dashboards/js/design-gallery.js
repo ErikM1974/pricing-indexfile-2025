@@ -142,7 +142,7 @@
             '<div class="dg-portfolio-head">'
             + '<h2>' + DG.esc(info.company || ('Customer #' + st.customer)) + '</h2>'
             + '<span class="dg-mono">#' + st.customer + '</span>'
-            + '<button type="button" class="dash-btn" data-exit-customer="1"><i class="fas fa-xmark"></i> Exit portfolio</button>'
+            + '<button type="button" class="dash-btn" data-exit-customer="1"><i class="fas fa-xmark" aria-hidden="true"></i> Exit portfolio</button>'
             + '</div>'
             + '<div class="dg-portfolio-meta">'
             + '<span><strong>' + info.designs.length.toLocaleString() + '</strong> designs</span>'
@@ -157,14 +157,14 @@
         els.customerBanner.hidden = false;
         els.customerBanner.innerHTML = 'Customer match: <button type="button" class="dg-chip" data-customer="'
             + (+hit.customerId) + '">' + DG.esc(hit.company || ('#' + hit.customerId))
-            + ' — ' + hit.count.toLocaleString() + ' designs <i class="fas fa-arrow-right"></i></button>';
+            + ' — ' + hit.count.toLocaleString() + ' designs <i class="fas fa-arrow-right" aria-hidden="true"></i></button>';
     }
 
     function renderTokens() {
         var t = '';
         function tok(kind, label) {
             return '<button type="button" class="dg-token" data-token="' + kind + '">'
-                + DG.esc(label) + ' <i class="fas fa-xmark"></i></button>';
+                + DG.esc(label) + ' <i class="fas fa-xmark" aria-hidden="true"></i></button>';
         }
         if (st.tier) t += tok('tier', 'Tier: ' + st.tier);
         for (var i = 0; i < st.src.length; i++) t += tok('src:' + st.src[i], 'Source: ' + st.src[i]);
@@ -179,7 +179,7 @@
         els.deepRow.hidden = false;
         els.deepRow.innerHTML = localTotal
             ? '<span>Not finding it?</span> <button type="button" class="dash-btn dash-btn--sm" data-deep="1">'
-              + '<i class="fas fa-cloud-arrow-down"></i> Deep-search server records</button>'
+              + '<i class="fas fa-cloud-arrow-down" aria-hidden="true"></i> Deep-search server records</button>'
               + '<span class="dg-deep-hint">threads, DST files, art notes, placement</span>'
             : '<span>No local matches — searching server records…</span>';
     }
@@ -190,7 +190,7 @@
         var seq = ++deepSeq;
         var q = st.q;
         els.deepRow.hidden = false;
-        els.deepRow.innerHTML = '<span><i class="fas fa-spinner fa-spin"></i> Searching server records for “' + DG.esc(q) + '”…</span>';
+        els.deepRow.innerHTML = '<span><i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Searching server records for “' + DG.esc(q) + '”…</span>';
 
         var url = APP_CONFIG.API.BASE_URL + '/api/digitized-designs/search-all?fields=deep&limit=50&q=' + encodeURIComponent(q);
         var f = window.fetchWithTimeout || window.fetch;
@@ -233,14 +233,14 @@
                 DG.grid.setData(merged);
                 els.count.textContent = merged.length.toLocaleString();
                 els.deepRow.innerHTML = added
-                    ? '<span class="dg-deep-badge"><i class="fas fa-cloud"></i> Deep search</span> added <strong>'
+                    ? '<span class="dg-deep-badge"><i class="fas fa-cloud" aria-hidden="true"></i> Deep search</span> added <strong>'
                       + added + '</strong> result' + (added === 1 ? '' : 's') + ' matching threads, DST files, or art notes.'
-                    : '<span class="dg-deep-badge"><i class="fas fa-cloud"></i> Deep search</span> found nothing beyond the local matches.';
+                    : '<span class="dg-deep-badge"><i class="fas fa-cloud" aria-hidden="true"></i> Deep search</span> found nothing beyond the local matches.';
             })
             .catch(function (err) {
                 if (seq !== deepSeq) return;
                 // Rule 4: a failed deep search is stated, never shown as "no results".
-                els.deepRow.innerHTML = '<span class="dg-section-err"><i class="fas fa-triangle-exclamation"></i> '
+                els.deepRow.innerHTML = '<span class="dg-section-err"><i class="fas fa-triangle-exclamation" aria-hidden="true"></i> '
                     + 'Deep search failed (' + DG.esc(err.message) + '). Local results are unaffected. '
                     + '<button type="button" class="dash-btn dash-btn--sm" data-deep="1">Retry</button></span>';
             });
@@ -298,10 +298,11 @@
 
     // ── filters ─────────────────────────────────────────────────────────────
     function buildFilterUI() {
-        var pills = '<button type="button" class="dg-pill' + (!st.tier ? ' dg-pill--active' : '') + '" data-tier="">All</button>';
+        var pills = '<button type="button" class="dg-pill' + (!st.tier ? ' dg-pill--active' : '') + '" data-tier="" aria-pressed="' + (!st.tier ? 'true' : 'false') + '">All</button>';
         for (var i = 0; i < TIERS.length; i++) {
-            pills += '<button type="button" class="dg-pill' + (st.tier === TIERS[i] ? ' dg-pill--active' : '')
-                + '" data-tier="' + DG.esc(TIERS[i]) + '">' + DG.esc(TIERS[i]) + '</button>';
+            var tierOn = st.tier === TIERS[i];
+            pills += '<button type="button" class="dg-pill' + (tierOn ? ' dg-pill--active' : '')
+                + '" data-tier="' + DG.esc(TIERS[i]) + '" aria-pressed="' + (tierOn ? 'true' : 'false') + '">' + DG.esc(TIERS[i]) + '</button>';
         }
         els.tierPills.innerHTML = pills;
 
@@ -309,8 +310,9 @@
         for (var j = 0; j < SRC_CHIPS.length; j++) {
             var key = SRC_CHIPS[j][0];
             if (!srcBits[key]) continue;
-            chips += '<button type="button" class="dg-chip' + (st.src.indexOf(key) !== -1 ? ' dg-chip--active' : '')
-                + '" data-src="' + key + '"><i class="fas ' + SRC_CHIPS[j][2] + '"></i> ' + DG.esc(SRC_CHIPS[j][1]) + '</button>';
+            var srcOn = st.src.indexOf(key) !== -1;
+            chips += '<button type="button" class="dg-chip' + (srcOn ? ' dg-chip--active' : '')
+                + '" data-src="' + key + '" aria-pressed="' + (srcOn ? 'true' : 'false') + '"><i aria-hidden="true" class="fas ' + SRC_CHIPS[j][2] + '" aria-hidden="true"></i> ' + DG.esc(SRC_CHIPS[j][1]) + '</button>';
         }
         els.srcChips.innerHTML = chips;
         els.hasImage.checked = st.hasImage;
@@ -375,7 +377,9 @@
         var d = DG.grid.getDensity();
         var btns = els.density.querySelectorAll('[data-density]');
         for (var i = 0; i < btns.length; i++) {
-            btns[i].classList.toggle('is-active', btns[i].getAttribute('data-density') === d);
+            var on = btns[i].getAttribute('data-density') === d;
+            btns[i].classList.toggle('is-active', on);
+            btns[i].setAttribute('aria-pressed', on ? 'true' : 'false');
         }
     }
 
@@ -415,7 +419,10 @@
     function showBoot(msg, pct) {
         els.boot.hidden = false;
         els.bootMsg.textContent = msg;
-        els.bootBar.style.width = (pct == null ? 8 : Math.max(2, Math.min(100, pct))) + '%';
+        var w = (pct == null ? 8 : Math.max(2, Math.min(100, pct)));
+        els.bootBar.style.setProperty('--w', w + '%');
+        var track = document.getElementById('dg-boot-track');
+        if (track) track.setAttribute('aria-valuenow', String(Math.round(w)));
     }
 
     function hideBoot() { els.boot.hidden = true; }
@@ -482,7 +489,7 @@
         els.bootMsg.textContent = meta.building
             ? 'The design index is building on the server. This takes a minute or two on a fresh deploy.'
             : 'Design index unavailable: ' + err.message;
-        els.bootBar.style.width = '100%';
+        els.bootBar.style.setProperty('--w', '100%');
         if (window.DashPage && DashPage.showError) {
             DashPage.showError('Design index unavailable — ' + err.message);
         }

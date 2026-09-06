@@ -465,7 +465,10 @@
             var pane = $('gp-step-' + s);
             if (pane) pane.hidden = s !== d.step;
             var tab = document.querySelector('[data-step="' + s + '"]');
-            if (tab) tab.classList.toggle('is-current', s === d.step);
+            if (tab) {
+                tab.classList.toggle('is-current', s === d.step);
+                if (s === d.step) tab.setAttribute('aria-current', 'step'); else tab.removeAttribute('aria-current');
+            }
         });
 
         if (d.step === 'photos') global.GearImages.render($('gp-grid-host'), d);

@@ -82,7 +82,7 @@
                 '<button type="button" class="gp-cell-btn" data-act="remove">Remove</button>' +
                 '</div>';
         } else if (state === 'uploading') {
-            body = '<div class="gp-cell-progress"><div class="gp-cell-progress-bar" style="width:' +
+            body = '<div class="gp-cell-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + (img.progress || 0) + '"><div class="gp-cell-progress-bar" style="--w:' +
                 (img.progress || 0) + '%"></div></div>' +
                 '<span class="gp-cell-status">Uploading ' + (img.progress || 0) + '%</span>';
         } else if (state === 'failed') {

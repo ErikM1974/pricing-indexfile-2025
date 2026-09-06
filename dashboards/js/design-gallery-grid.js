@@ -103,7 +103,7 @@
                 .filter(function (n) { return +n !== dn; })
                 .map(function (n) { return '#' + (+n || 0); })
                 .join(', ');
-            dup = '<span class="dg-dup" title="' + DG.esc('Possible duplicate of ' + others) + '"><i class="fas fa-clone"></i></span>';
+            dup = '<span class="dg-dup" title="' + DG.esc('Possible duplicate of ' + others) + '" aria-label="' + DG.esc('Possible duplicate of ' + others) + '"><i class="fas fa-clone" aria-hidden="true"></i></span>';
         }
         const custAttr = +d.customerId ? ' data-customer="' + (+d.customerId) + '" title="Open customer portfolio"' : '';
         return '<article class="dg-card' + (density === 'wall' ? ' dg-card--wall' : '') + '"'
@@ -119,7 +119,7 @@
             + (d.variantCount > 1 ? '<span class="dg-variants">&times;' + (+d.variantCount) + '</span>' : '')
             + dup + '</div>'
             + '<button type="button" class="dg-copy" data-copy-dn="' + dn + '" tabindex="-1"'
-            + ' title="Copy design number" aria-label="' + DG.esc('Copy design number ' + dn) + '"><i class="fas fa-copy"></i></button>'
+            + ' title="Copy design number" aria-label="' + DG.esc('Copy design number ' + dn) + '"><i class="fas fa-copy" aria-hidden="true"></i></button>'
             + '</article>';
     }
 
@@ -148,8 +148,8 @@
         const totalRows = Math.ceil(data.length / cols);
         const rowsMounted = Math.ceil(els.grid.children.length / cols);
         const rowsAfter = Math.max(0, totalRows - rowsBefore - rowsMounted);
-        els.topSpacer.style.height = (rowsBefore * rowH) + 'px';
-        els.bottomSpacer.style.height = (rowsAfter * rowH) + 'px';
+        els.topSpacer.style.setProperty('--h', (rowsBefore * rowH) + 'px');
+        els.bottomSpacer.style.setProperty('--h', (rowsAfter * rowH) + 'px');
     }
 
     function renderWindow() {
@@ -296,7 +296,7 @@
                 thumbIO.observe(card);
             }
         } else if (img.parentNode) {
-            img.style.visibility = 'hidden';
+            img.classList.add('is-blank');
         }
     }
 
@@ -395,7 +395,7 @@
         els.grid.addEventListener('click', onGridClick);
         els.grid.addEventListener('error', onImgError, true);   // delegated — never an on* attribute
         if (els.viewport) {
-            els.viewport.style.overflowAnchor = 'none';   // the spacer math owns scroll anchoring
+            // overflow-anchor: none lives in design-gallery.css (.dg-grid-viewport) — the spacer math owns scroll anchoring
             els.viewport.addEventListener('keydown', onKeydown);
         }
         if (typeof IntersectionObserver !== 'undefined') {

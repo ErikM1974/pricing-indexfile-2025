@@ -11,30 +11,30 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/shared_components/css/art-hub.css?v=2026.08.05.1">
     <link rel="stylesheet" href="/shared_components/css/dash-shell.css?v=2026.08.13.2">
-    <link rel="stylesheet" href="/dashboards/css/design-gallery.css?v=2026.08.05.6">
+    <link rel="stylesheet" href="/dashboards/css/design-gallery.css?v=2026.09.05.60">
 </head>
 <body class="dg-body">
 
     <!-- Boot surface: first-visit index download / build-wait / hard error -->
     <div id="dg-boot" class="dg-boot" hidden>
         <div class="dg-boot-card">
-            <div class="dg-boot-logo"><i class="fas fa-vault"></i></div>
+            <div class="dg-boot-logo"><i class="fas fa-vault" aria-hidden="true"></i></div>
             <div class="dg-boot-title">Design Vault</div>
-            <p id="dg-boot-msg" class="dg-boot-msg">Preparing the design index…</p>
-            <div class="dg-boot-track"><div id="dg-boot-bar" class="dg-boot-bar"></div></div>
+            <p id="dg-boot-msg" class="dg-boot-msg" role="status">Preparing the design index…</p>
+            <div class="dg-boot-track" role="progressbar" aria-label="Index download" aria-valuemin="0" aria-valuemax="100" aria-valuenow="8" id="dg-boot-track"><div id="dg-boot-bar" class="dg-boot-bar"></div></div>
             <button id="dg-boot-retry" class="dash-btn" type="button" hidden>Retry</button>
         </div>
     </div>
 
     <header class="dash-header dg-header">
         <div class="dash-header-inner">
-            <a href="/staff-dashboard.html" class="dash-back-link"><i class="fas fa-arrow-left"></i> Dashboard</a>
+            <a href="/staff-dashboard.html" class="dash-back-link"><i class="fas fa-arrow-left" aria-hidden="true"></i> Dashboard</a>
             <div class="dg-header-title">
-                <h1><i class="fas fa-vault"></i> Design Vault</h1>
+                <h1><i class="fas fa-vault" aria-hidden="true"></i> Design Vault</h1>
                 <span id="dg-subtitle" class="dg-subtitle">Every design, one search</span>
             </div>
-            <button id="dg-freshness" class="dg-freshness" type="button" title="Index freshness">
-                <i class="fas fa-circle-check"></i> <span id="dg-freshness-label">Loading…</span>
+            <button id="dg-freshness" class="dg-freshness" type="button" title="Index freshness" aria-describedby="dg-freshness-label">
+                <i class="fas fa-circle-check" aria-hidden="true"></i> <span id="dg-freshness-label">Loading…</span>
             </button>
         </div>
     </header>
@@ -47,11 +47,11 @@
         <section class="dg-toolbar" aria-label="Search and filters">
             <div class="dg-toolbar-row dg-toolbar-row--search">
                 <div class="dg-omnibox-wrap">
-                    <i class="fas fa-magnifying-glass dg-omnibox-icon"></i>
+                    <i class="fas fa-magnifying-glass dg-omnibox-icon" aria-hidden="true"></i>
                     <input id="dg-omnibox" class="dg-omnibox" type="search" autocomplete="off" spellcheck="false"
                            placeholder="Search designs, companies, design # — instant" aria-label="Search designs">
                     <button id="dg-search-clear" class="dg-omnibox-clear" type="button" aria-label="Clear search" hidden>
-                        <i class="fas fa-xmark"></i>
+                        <i class="fas fa-xmark" aria-hidden="true"></i>
                     </button>
                     <kbd class="dg-omnibox-kbd">/</kbd>
                 </div>
@@ -59,8 +59,8 @@
                     <label class="dg-customer-label" for="dg-customer-input">Customer #</label>
                     <input id="dg-customer-input" class="dg-customer-input" type="text" inputmode="numeric"
                            maxlength="10" autocomplete="off" placeholder="12025">
-                    <button id="dg-customer-load" class="dash-btn dg-customer-btn" type="button" title="Open customer portfolio">
-                        <i class="fas fa-folder-open"></i>
+                    <button id="dg-customer-load" class="dash-btn dg-customer-btn" type="button" title="Open customer portfolio" aria-label="Open customer portfolio">
+                        <i class="fas fa-folder-open" aria-hidden="true"></i>
                     </button>
                 </div>
             </div>
@@ -70,8 +70,8 @@
                 <label class="dg-toggle"><input id="dg-has-image" type="checkbox"> <span>Has image</span></label>
                 <select id="dg-year-select" class="dg-year" aria-label="Last order year" hidden></select>
                 <div id="dg-density" class="dg-density" role="group" aria-label="Card density">
-                    <button type="button" class="dg-density-btn" data-density="comfortable" title="Comfortable"><i class="fas fa-table-cells-large"></i></button>
-                    <button type="button" class="dg-density-btn" data-density="wall" title="Wall"><i class="fas fa-table-cells"></i></button>
+                    <button type="button" class="dg-density-btn" data-density="comfortable" title="Comfortable" aria-label="Comfortable card size" aria-pressed="false"><i class="fas fa-table-cells-large" aria-hidden="true"></i></button>
+                    <button type="button" class="dg-density-btn" data-density="wall" title="Wall" aria-label="Wall card size" aria-pressed="false"><i class="fas fa-table-cells" aria-hidden="true"></i></button>
                 </div>
             </div>
             <div id="dg-filter-tokens" class="dg-tokens" aria-live="polite"></div>
@@ -109,7 +109,7 @@
 
     <!-- Lightbox -->
     <div id="dg-lightbox" class="dg-lightbox" role="dialog" aria-modal="true" aria-label="Image zoom" hidden>
-        <button id="dg-lightbox-close" class="dg-lightbox-close" type="button" aria-label="Close"><i class="fas fa-xmark"></i></button>
+        <button id="dg-lightbox-close" class="dg-lightbox-close" type="button" aria-label="Close"><i class="fas fa-xmark" aria-hidden="true"></i></button>
         <img id="dg-lightbox-img" class="dg-lightbox-img" alt="">
         <div id="dg-lightbox-cap" class="dg-lightbox-cap"></div>
     </div>
@@ -121,10 +121,10 @@
     <script src="/shared_components/js/design-thumbnail-service.js?v=2026.08.05.1"></script>
     <script src="/dashboards/js/design-gallery-search.js?v=2026.08.05.17"></script>
     <script src="/dashboards/js/design-gallery-store.js?v=2026.08.05.1"></script>
-    <script src="/dashboards/js/design-gallery-grid.js?v=2026.08.05.1"></script>
-    <script src="/dashboards/js/design-gallery-rails.js?v=2026.08.05.1"></script>
+    <script src="/dashboards/js/design-gallery-grid.js?v=2026.09.05.60"></script>
+    <script src="/dashboards/js/design-gallery-rails.js?v=2026.09.05.60"></script>
     <script src="/shared_components/js/box-url.js?v=2026.08.05.23"></script>
-    <script src="/dashboards/js/design-gallery-drawer.js?v=2026.08.11.1"></script>
-    <script src="/dashboards/js/design-gallery.js?v=2026.08.04.4"></script>
+    <script src="/dashboards/js/design-gallery-drawer.js?v=2026.09.05.60"></script>
+    <script src="/dashboards/js/design-gallery.js?v=2026.09.05.60"></script>
 </body>
 </html>

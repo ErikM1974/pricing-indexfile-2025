@@ -953,3 +953,30 @@ an "AL Pricing" modal) and `old-designs.html` + `shared_components/js/old-design
     "~23,544 designs found" badge role=status, Enter on a thumbnail → dialog with focus on Close, Esc → back.
 12. Left alone: Caspio form labels/inputs (Caspio-rendered, already labelled); the 24-per-page estimate
     in the badge (Caspio's own paging); no server-side design-number backfill (Erik's call in Caspio).
+
+## Design Vault + 253gear Publisher — review, 9 items (2026-09-05, `v2026.09.05.60`) — Art workspace COMPLETE
+
+Both pages were already the strongest in the workspace (textContent renderers, drawer focus trap +
+lightbox, Retry on every fetch, honest "locked" metrics). Fixes are hygiene:
+1. **236 bare icons** live on the Vault → `aria-hidden` across the HTML + 4 renderer modules (static
+   `<i class="fas fa-x">` and the dynamic `'<i class="fas ' + icon + '">'` pattern).
+2. Tier pills / source chips → `aria-pressed`; density buttons `aria-pressed` + spoken names; customer
+   portfolio button named; boot bar is a `role=progressbar` with `aria-valuenow`.
+3. Layout values via custom properties: boot bar `--w`, virtual-scroll spacers `--h`, blank thumbnails
+   `.is-blank`, `overflow-anchor:none` moved into CSS — no `.style.width/height/visibility` left.
+4. Publisher: 8 status lines (`gp-ocr-status`, dup check, copy status, word count, counter, publish reason,
+   blockers, job body) → `role=status`; step rail `aria-current="step"` follows the wizard; upload
+   progress bar `role=progressbar` + `--w` (was `style="width:"`); `[hidden]` guard in its CSS.
+5. `?v=` bumped on all 5 Vault assets + 4 Publisher assets.
+6. Lock: `tests/unit/art-tools-pages.test.js`.
+7. Smoke on static-dist: Vault pills toggle pressed (All→Standard), density wall/comfortable pressed,
+   boot bar `--w` 97% + valuenow 97, spacers/anchor via CSS, 0 bare icons / unnamed buttons / inline
+   styles; Publisher rail `step` follows Next/Back, all 8 statuses announce, blockers list + config 404
+   surfaced in the banner (no backend locally).
+8. 🔑 The Vault's design index is same-origin — static-dist shows "Building search…" with 0 results;
+   the real page was verified live before the change (37,731 designs).
+9. Left alone: Vault card grid semantics (`role=grid` with virtualised rows — a deeper ARIA pass for
+   another day); Publisher `Ctrl+V` screenshot OCR (works, untestable without the proxy).
+
+**Art workspace done (2026-09-05):** Steve `.53`, Ruth `.55`, Design Queue + Monogram + Names & Numbers
+`.57`, Digitized + Old Designs `.59`, Vault + Publisher `.60`. Next: Office workspace.
