@@ -1,3 +1,8 @@
+## v2026.09.06.34 (2026.09.06)
+
+- Forms library: the 5 icons the shared scripts render (save button, date pickers, banners) are decorative; scripts added to the renderer lock
+- Deploy v2026.09.06.34: forms-library rendered icons decorative
+
 ## v2026.09.06.33 (2026.09.06)
 
 - Memory: S2 unlinked-pages + S3 host-sweep sections, ACTIVE_FILES rows for the 18 S2 extractions, LESSONS S3 entry (Workspaces entry archived)
