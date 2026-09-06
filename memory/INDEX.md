@@ -107,3 +107,4 @@ Last Updated: 2026-09-03 (/memory-maintain: MEMORY.md 24.0→~19 KB — Sept shi
   overlaps `CASPIO_QUOTA_2026-07.md` (27 Jul–1 Aug) in SUBJECT but not in DATE RANGE.
   Not collapsed — folding it into the repo copy would drop the wave-2 record. Reconcile
   deliberately, do not just delete.
+- `DEAD_FILES_2026-09-06.md` — the 69 files the 2026-09-06 census verified dead (zero references), why each group is dead, and the one `git rm` command Erik runs to remove them.
