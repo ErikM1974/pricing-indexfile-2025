@@ -6,6 +6,43 @@ Resolved entries aged out of `LESSONS_LEARNED.md` (300-line cap). Newest first. 
 
 ## Archived 2026-09-06
 
+## Whole-dashboard deep-review sweep (`.24` → `.75`, 54 pages): the same six bugs kept reappearing
+
+**Problem.** Fifty-four staff pages, each "done" by a different session, shared the same defects: (1) a
+page's error banner span carried a class the shared helper never writes (`.dash-error-text` vs
+`.dash-error-banner-message`) so **every** failure on the Blog Editor showed an empty red bar; (2)
+`toISOString().slice(0,10)` as "today" on SIX pages (Payables default range + import-stamp, Payroll pill +
+slip run date, Forms Inbox `Date_Returned`, Volume Quote valid-until, Ruth's due badges, Monogram date
+filter) — a day ahead after 5 PM Pacific, and in Ruth's case "due today" read OVERDUE all day; (3) flex/grid
+wrappers beating the UA `[hidden]` rule (Jim's Mailing List showed an empty screenshot placeholder on every
+load; the vendor portal showed its error banner on every load); (4) `r.ok ? r.json() : {rows:[]}` rendering a
+500 as "No matches"/"No photos yet" (Finished Photos, Payables imports cross-ref → every row "NOT IMPORTED");
+(5) prices typed in reference UIs (Digitized Designs AL tables, Ruth's Billing Codes, the shared art-time
+modal's `* 75` in 18 places incl. a Caspio write); (6) click-only tiles/chips/rows and unlabelled dialogs.
+
+**Root cause.** Each page was built to work, not to fail: no page had a failure-path smoke, no shared
+lock caught a helper/class mismatch, and "today" was written six different ways because no helper existed.
+
+**Solution.** One jest lock per page (`tests/unit/<page>-page.test.js`, ~30 new files) + a section per page in
+`memory/DASHBOARD_REVIEWS_2026-09.md`; fixes verified on `static-dist` with fetch stubbed to FAIL first,
+then live in Erik's Chrome. Shared fixes: `artRate()` from Service_Codes GRT-75 with a visible fallback note;
+`/api/al-pricing` behind the Digitized AL modal; `SanMarInvoiceViewer` title/focus fixes for 3 pages.
+
+**Prevention.**
+- 🔴 **Smoke the failure path first**: on static-dist every same-origin API 404s — if a page shows an empty
+  state, a blank banner, or stale data instead of the reason + Retry, that is the bug.
+- 🔴 **"Today" = local calendar day** (`getFullYear/getMonth/getDate`), never `toISOString().slice(0,10)`;
+  Caspio `YYYY-MM-DD` parses via `parseCalendarDate()`; compare at DAY granularity.
+- 🔴 Every page CSS carries `[hidden] { display: none !important; }` — the lock for each page asserts it.
+- 🔴 A helper's DOM contract (`.dash-error-banner-message`, `.dash-error-banner-close`) is locked per page;
+  a wrong class is a silent error path.
+- 🔑 Computed colours/sizes go in `style="--w:…"` custom properties + a CSS `var()` — the lock regex allows
+  `style="--` and nothing else. Icons are `aria-hidden`; a `title`-only button also gets `aria-label`.
+- 🔑 Background tabs freeze CSS transitions — a `width` read as 0 with `--w: 85%` set is the tab, not the CSS
+  (`document.hidden`); set `transition:none` before trusting a computed size. (2026-09-05)
+
+---
+
 ## Customer Portals console said nobody had ever signed in (141 invites, "Have Signed In: 0")
 
 **Problem.** The staff console's "Have Signed In" tile read 0 and every "Last Sign-In" cell read
