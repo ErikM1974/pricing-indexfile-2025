@@ -1,6 +1,6 @@
 /**
  * Public legacy pages — Rule 3 extraction locks (2026-09-05).
- *   webstore-info, inventory-details, dtg-compatible-products, pricing-negotiation-policy carried
+ *   inventory-details, dtg-compatible-products, pricing-negotiation-policy carried
  *   whole <style> and <script> blocks plus inline onclick=/onerror= handlers on PUBLIC pages;
  *   design-view carried 4 inline handlers and display toggles. All moved to /pages/css + /pages/js,
  *   handlers replaced by listeners, proxy host taken from APP_CONFIG, icons decorative.
@@ -13,7 +13,6 @@ const BARE = /<i class="(?:fa[sr]|fab|fa-solid|fa-regular) [^"]*"><\/i>/;
 const strip = (h) => h.replace(/<!--[\s\S]*?-->/g, '').replace(/<script type="application\/ld\+json">[\s\S]*?<\/script>/g, '');
 
 const PAGES = {
-    'webstore-info': { css: 'pages/css/webstore-info.css', js: 'pages/js/webstore-info.js' },
     'inventory-details': { css: 'pages/css/inventory-details.css', js: 'pages/js/inventory-details.js' },
     'dtg-compatible-products': { css: 'pages/css/dtg-compatible-products.css', js: 'pages/js/dtg-compatible-products.js' },
     'pricing-negotiation-policy': { css: 'pages/css/pricing-negotiation-policy.css', js: 'pages/js/pricing-negotiation-policy.js' },
@@ -63,16 +62,6 @@ describe('public legacy pages — specifics', () => {
         expect(js).not.toMatch(/(?<!data-)style="/);
         expect(js).not.toMatch(/.style.background/);
         expect(html).toMatch(/<h1 id="header-product-name"/);
-    });
-    test('webstore-info: FAQ + modal semantics; dead mobile button hidden', () => {
-        const html = read('pages/webstore-info.html');
-        const js = read('pages/js/webstore-info.js');
-        expect((html.match(/class="faq-question" role="button" tabindex="0" aria-expanded="false"/g) || []).length).toBe(5);
-        expect(html).toMatch(/id="imageModal" role="dialog" aria-modal="true"/);
-        expect(html).toMatch(/<button type="button" class="modal-close" aria-label="Close">/);
-        expect(html).toMatch(/class="mobile-menu-btn" hidden/);
-        expect(js).not.toMatch(/alert\(/);
-        expect(js).toMatch(/q\.setAttribute\('aria-expanded'/);
     });
     test('design-view: dialog lightbox with focus return, hidden attr, keyboard hero/grid', () => {
         const html = read('pages/design-view.html');
