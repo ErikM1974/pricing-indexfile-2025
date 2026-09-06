@@ -1195,3 +1195,23 @@ Rule-3 clean; the sweep is what the earlier passes left.
    (regenerate from its source when the numbers are refreshed).
 8. **Sweep complete**: every page linked from the staff dashboard (54 hrefs) has had a review pass in
    this series (`.24` → `.74` today). Remaining known debt is listed per section as "Left alone".
+
+---
+
+# CUSTOMER-FACING PAGES (public) — second sweep, begins 2026-09-05
+
+## Public batch B1 — 5 legacy pages (webstore-info · inventory-details · dtg-compatible-products · pricing-negotiation-policy · design-view), 14 items (2026-09-05, `v2026.09.05.76`)
+
+Lock: `tests/unit/public-legacy-pages.test.js`. Four of these PUBLIC pages still carried whole `<style>` + `<script>` blocks and `onclick=`/`onerror=` handlers (Rule 3); design-view had 4 inline handlers and display toggles.
+
+1. **Rule 3 extraction** — `<style>` → `pages/css/<page>.css` (+ `[hidden]` guard), inline script → `pages/js/<page>.js` (inventory-details stays an ES module: `<script type="module" src>`). All `on*=` handlers → listeners. Everything versioned `?v=2026.09.05.76`.
+2. **webstore-info** — FAQ questions are `role=button tabindex=0 aria-expanded`; sample-store image opens a real dialog (`role=dialog aria-modal`, close button, Esc, focus return); the "mobile menu" button only ever `alert()`ed "Full implementation needed" → hidden; icons decorative.
+3. **inventory-details** — pricing dropdown is a disclosure (`aria-haspopup/aria-expanded/aria-controls`, Esc closes); colour options are keyboard buttons with `aria-pressed`; search results are `<button data-style>` with escaped text (was `onclick="navigateToProduct('${style}')"` string-interpolated into HTML); swatch colour via `--swatch` custom property (82 inline styles gone); the breadcrumb product name is now the page's `<h1>` (had none); `console.log` removed.
+4. **dtg-compatible-products** — proxy host from `APP_CONFIG.API.BASE_URL` (was the Heroku host hardcoded in the page); 🔴 the grid had `style="display:none"` while the script set `.hidden=false` — the inline style won, so the grid could never show → `hidden` attribute; empty state is honest ("Products could not be loaded (…)" + Retry) instead of a blank grid; cards are keyboard `role=link`; image fallback via one capture-phase error listener; 3 inline `<p style>` → classes; card-template icon decorative.
+5. **pricing-negotiation-policy** — back-to-top toggles `hidden`; smooth anchors; icons decorative.
+6. **design-view** — lightbox is `hidden` at rest (a visible-to-AT `aria-modal` dialog at opacity 0 before), fade via reflow + `.active`, focus to Close and back; 🔴 the Escape listener was registered AFTER `init()`'s early `return` (no design number → no Esc) → registered unconditionally; hero/grid items are buttons; `data-onerror="hide|hide-parent"`; company/name lines use `hidden` not `.style.display`.
+
+**Verification** — static-dist smoke of all 5 (webstore FAQ/modal/Esc, inventory `?style=PC54` disclosure + 82 keyboard colours + visible "Failed to load inventory" on the 404 path, DTG grid `display:grid` with 11 cards via the proxy, lightbox open/Esc/hidden), eslint clean, lock 9/9, consistency suites green.
+
+**Left alone** — the universal header component injects its own `<style>` + 3 bare icons + 2 inline styles on every public page (shared component, separate batch); `pages/inventory-details.html` still has no visible product image (by design); `design-view` fetch error copy unchanged.
+

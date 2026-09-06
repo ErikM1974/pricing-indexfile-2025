@@ -27,11 +27,6 @@
             return;
         }
         fetchDesign(designNumber);
-
-        // Escape key closes lightbox
-        document.addEventListener('keydown', function (e) {
-            if (e.key === 'Escape') closeLightbox();
-        });
     }
 
     function getDesignNumberFromUrl() {
@@ -68,14 +63,14 @@
         if (design.company) {
             companyEl.textContent = design.company;
         } else {
-            companyEl.style.display = 'none';
+            companyEl.hidden = true;
         }
 
         var nameEl = document.getElementById('dv-name');
         if (design.designName) {
             nameEl.textContent = design.designName;
         } else {
-            nameEl.style.display = 'none';
+            nameEl.hidden = true;
         }
 
         // Collect ALL unique images from group + variants
@@ -83,9 +78,9 @@
 
         if (images.length === 0) {
             // Show no-images fallback
-            document.getElementById('dv-no-images').style.display = 'block';
-            document.getElementById('dv-hero').style.display = 'none';
-            document.getElementById('dv-image-grid').style.display = 'none';
+            document.getElementById('dv-no-images').hidden = false;
+            document.getElementById('dv-hero').hidden = true;
+            document.getElementById('dv-image-grid').hidden = true;
         } else {
             // Set hero to the first (best) image
             var heroImg = document.getElementById('dv-hero-img');
@@ -96,13 +91,13 @@
             if (images.length > 1) {
                 renderImageGrid(images, designNumber);
             } else {
-                document.getElementById('dv-image-grid').style.display = 'none';
+                document.getElementById('dv-image-grid').hidden = true;
             }
         }
 
         // Show content, hide loading
-        document.getElementById('dv-loading').style.display = 'none';
-        document.getElementById('dv-content').style.display = 'block';
+        document.getElementById('dv-loading').hidden = true;
+        document.getElementById('dv-content').hidden = false;
     }
 
     function collectAllImages(design) {
@@ -141,10 +136,10 @@
 
         for (var i = 0; i < images.length; i++) {
             var img = images[i];
-            html += '<div class="dv-grid-item" onclick="setHero(\'' + escapeHtml(img.url) + '\', this)">'
-                + '<img src="' + escapeHtml(img.url) + '" alt="' + escapeHtml(img.label) + ' - Design #' + escapeHtml(designNumber) + '" loading="lazy" onerror="this.parentElement.style.display=\'none\'">'
+            html += '<button type="button" class="dv-grid-item" data-url="' + escapeHtml(img.url) + '" aria-label="Show ' + escapeHtml(img.label) + '">'
+                + '<img src="' + escapeHtml(img.url) + '" alt="' + escapeHtml(img.label) + ' - Design #' + escapeHtml(designNumber) + '" loading="lazy" data-onerror="hide-parent">'
                 + '<div class="dv-grid-label">' + escapeHtml(img.label) + '</div>'
-                + '</div>';
+                + '</button>';
         }
 
         grid.innerHTML = html;
@@ -155,10 +150,10 @@
     }
 
     function showError(title, message) {
-        document.getElementById('dv-loading').style.display = 'none';
+        document.getElementById('dv-loading').hidden = true;
         document.getElementById('dv-error-title').textContent = title;
         document.getElementById('dv-error-msg').textContent = message;
-        document.getElementById('dv-error').style.display = 'block';
+        document.getElementById('dv-error').hidden = false;
     }
 
     function escapeHtml(str) {
@@ -168,7 +163,7 @@
         return div.innerHTML;
     }
 
-    // --- Global functions (called from HTML onclick) ---
+    // --- Global functions (kept on window for backwards compatibility; wired by listeners below) ---
 
     window.setHero = function (url, thumbEl) {
         var heroImg = document.getElementById('dv-hero-img');
@@ -184,21 +179,49 @@
         if (thumbEl) thumbEl.classList.add('active');
     };
 
+    var lightboxReturnFocus = null;
     window.openLightbox = function (src) {
         if (!src) return;
         var overlay = document.getElementById('dv-lightbox');
         var img = document.getElementById('dv-lightbox-img');
+        lightboxReturnFocus = document.activeElement;
         img.src = src;
+        overlay.hidden = false;
+        void overlay.offsetWidth; // commit display before the opacity transition starts
         overlay.classList.add('active');
-        document.body.style.overflow = 'hidden';
+        document.body.classList.add('dv-modal-open');
+        setTimeout(function () { var c = document.getElementById('dv-lightbox-close'); if (c) c.focus(); }, 30);
     };
 
     window.closeLightbox = function (e) {
         // Don't close if clicking the image itself
         if (e && e.target && e.target.id === 'dv-lightbox-img') return;
         var overlay = document.getElementById('dv-lightbox');
-        if (overlay) overlay.classList.remove('active');
-        document.body.style.overflow = '';
+        if (!overlay || !overlay.classList.contains('active')) return;
+        overlay.classList.remove('active');
+        setTimeout(function () { if (!overlay.classList.contains('active')) overlay.hidden = true; }, 260);
+        document.body.classList.remove('dv-modal-open');
+        if (lightboxReturnFocus && document.body.contains(lightboxReturnFocus)) { try { lightboxReturnFocus.focus(); } catch (err) { /* gone */ } }
+        lightboxReturnFocus = null;
     };
+
+    // Wiring that used to be inline handlers (Rule 3)
+    var heroBtn = document.getElementById('dv-hero-btn');
+    if (heroBtn) heroBtn.addEventListener('click', function () { window.openLightbox(document.getElementById('dv-hero-img').src); });
+    var lb = document.getElementById('dv-lightbox');
+    if (lb) lb.addEventListener('click', window.closeLightbox);
+    // Escape closes the lightbox — registered unconditionally (it used to sit after init()'s early return)
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') window.closeLightbox(); });
+    var grid = document.getElementById('dv-image-grid');
+    if (grid) grid.addEventListener('click', function (e) {
+        var item = e.target.closest('.dv-grid-item[data-url]');
+        if (item) window.setHero(item.dataset.url, item);
+    });
+    document.addEventListener('error', function (e) {
+        var img = e.target;
+        if (!img || img.tagName !== 'IMG' || !img.dataset) return;
+        if (img.dataset.onerror === 'hide') img.hidden = true;
+        else if (img.dataset.onerror === 'hide-parent' && img.parentElement) img.parentElement.hidden = true;
+    }, true);
 
 })();
