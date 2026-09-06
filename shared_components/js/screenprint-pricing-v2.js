@@ -2286,9 +2286,7 @@ class ScreenPrintPricing {
         this.elements.additionalLocationGuideContent.innerHTML = html;
     }
 
-    showError(message) {
-        alert(message);
-    }
+    // (a second showError(message) — alert() — used to sit here; the later banner version always won. Removed 2026-09-06.)
 
     updateHeaderPricing(quantity, unitPrice) {
         const headerQty = document.getElementById('header-quantity');
