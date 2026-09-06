@@ -328,3 +328,11 @@
 
     .inbox-modal-body { overflow: visible; }
 }
+
+/* 2026-09-05 review */
+[hidden] { display: none !important; }
+.inbox-stat-btn { font: inherit; color: inherit; text-align: left; cursor: pointer; }
+.inbox-stat-btn[aria-pressed="true"] { outline: 2px solid var(--gray-800); outline-offset: -2px; }
+.inbox-stat-btn:focus-visible, .inbox-tab:focus-visible, .inbox-chip:focus-visible, .copy-id:focus-visible { outline: 2px solid var(--gray-800); outline-offset: 2px; }
+.sw-preview-body { width: 100%; }
+.inbox-retry { margin-left: 8px; }

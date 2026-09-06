@@ -91,3 +91,7 @@
         justify-content: flex-start;
     }
 }
+
+/* 2026-09-05 review */
+[hidden] { display: none !important; }
+.forms-load-failed .dash-btn { margin-left: 8px; }
