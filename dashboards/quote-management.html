@@ -15,8 +15,8 @@
     <!-- Dashboard Styles -->
     <link rel="stylesheet" href="/dashboards/css/quote-management.css?v=2026.09.05.4">
     <!-- SanMar Inbound modal + its printable reports/box labels (window.openInboundTodayModal) -->
-    <link rel="stylesheet" href="/dashboards/css/sanmar-inbound.css?v=2026.08.26.4">
-    <link rel="stylesheet" href="/shared_components/css/box-label-print.css?v=2026.08.04.2">
+    <link rel="stylesheet" href="/dashboards/css/sanmar-inbound.css?v=2026.09.05.71">
+    <link rel="stylesheet" href="/shared_components/css/box-label-print.css?v=2026.09.05.71">
 </head>
 <body>
     <!--
@@ -36,20 +36,17 @@
         <h1>Quote Management</h1>
         <div class="header-actions">
             <span class="user-info" id="user-display">Loading...</span>
-            <button id="btn-sync-sw" class="btn-header" type="button" data-action="sync-sw"
-                    title="Pull live order #, status, production progress, and salesperson from ShopWorks for every processed quote in the window. Runs the same reconciliation as the hourly scheduler — use it if the dashboard looks stale.">
-                <i class="fas fa-sync"></i> <span class="btn-header__tx">Sync from ShopWorks</span>
+            <button id="btn-sync-sw" class="btn-header" type="button" data-action="sync-sw" title="Pull live order #, status, production progress, and salesperson from ShopWorks for every processed quote in the window. Runs the same reconciliation as the hourly scheduler — use it if the dashboard looks stale." aria-label="Pull live order #, status, production progress, and salesperson from ShopWorks for every processed quote in the window. Runs the same reconciliation as the hourly scheduler — use it if the dashboard looks stale.">
+                <i class="fas fa-sync" aria-hidden="true"></i> <span class="btn-header__tx">Sync from ShopWorks</span>
             </button>
-            <button id="btn-refresh-inbound" class="btn-header" type="button" data-action="refresh-inbound"
-                    title="Manual SanMar sync. Two passes: (1) ingest orders that shipped & completed BETWEEN the nightly syncs and so never landed in the system at all, then (2) pull live tracking for in-table open orders. An order that just shipped flips to Shipped (with tracking) right now instead of waiting for the daily sync. Bounded — if it says orders are still pending, click again.">
-                <i class="fas fa-dolly"></i> <span class="btn-header__tx">Refresh Inbound</span>
+            <button id="btn-refresh-inbound" class="btn-header" type="button" data-action="refresh-inbound" title="Manual SanMar sync. Two passes: (1) ingest orders that shipped & completed BETWEEN the nightly syncs and so never landed in the system at all, then (2) pull live tracking for in-table open orders. An order that just shipped flips to Shipped (with tracking) right now instead of waiting for the daily sync. Bounded — if it says orders are still pending, click again." aria-label="Manual SanMar sync. Two passes: (1) ingest orders that shipped & completed BETWEEN the nightly syncs and so never landed in the system at all, then (2) pull live tracking for in-table open orders. An order that just shipped flips to Shipped (with tracking) right now instead of waiting for the daily sync. Bounded — if it says orders are still pending, click again.">
+                <i class="fas fa-dolly" aria-hidden="true"></i> <span class="btn-header__tx">Refresh Inbound</span>
             </button>
-            <button id="btn-inbound-today" class="btn-header" type="button" data-action="inbound-today"
-                    title="SanMar Inbound Calendar: pick any day to see its incoming SanMar boxes — each PO + work order, line items with color/size, pieces per box — and print box labels or a PDF for that day.">
-                <i class="fas fa-calendar-days"></i> <span class="btn-header__tx">SanMar Inbound Calendar</span>
+            <button id="btn-inbound-today" class="btn-header" type="button" data-action="inbound-today" title="SanMar Inbound Calendar: pick any day to see its incoming SanMar boxes — each PO + work order, line items with color/size, pieces per box — and print box labels or a PDF for that day." aria-label="SanMar Inbound Calendar: pick any day to see its incoming SanMar boxes — each PO + work order, line items with color/size, pieces per box — and print box labels or a PDF for that day.">
+                <i class="fas fa-calendar-days" aria-hidden="true"></i> <span class="btn-header__tx">SanMar Inbound Calendar</span>
             </button>
             <a href="/staff-dashboard.html" class="btn-header">
-                <i class="fas fa-arrow-left"></i> <span class="btn-header__tx">Dashboard</span>
+                <i class="fas fa-arrow-left" aria-hidden="true"></i> <span class="btn-header__tx">Dashboard</span>
             </a>
         </div>
     </header>
@@ -92,29 +89,29 @@
             </div>
 
             <button class="btn-search" type="button" data-action="search">
-                <i class="fas fa-search"></i> Search
+                <i class="fas fa-search" aria-hidden="true"></i> Search
             </button>
         </div>
 
         <!-- Stats Cards — BUTTONS that filter the table (2026-09-05). Click again to clear. -->
         <div class="stats-section">
-            <button type="button" class="stat-card active qm-tile" data-tile="active" title="Show active quotes (open, awaiting payment, in ShopWorks and not yet complete)">
+            <button type="button" class="stat-card active qm-tile" data-tile="active" title="Show active quotes (open, awaiting payment, in ShopWorks and not yet complete)" aria-label="Show active quotes (open, awaiting payment, in ShopWorks and not yet complete)">
                 <div class="stat-value" id="stat-active">-</div>
                 <div class="stat-label">Active Quotes</div>
             </button>
-            <button type="button" class="stat-card accepted qm-tile" data-tile="accepted" title="Show accepted quotes">
+            <button type="button" class="stat-card accepted qm-tile" data-tile="accepted" title="Show accepted quotes" aria-label="Show accepted quotes">
                 <div class="stat-value" id="stat-accepted">-</div>
                 <div class="stat-label">Accepted</div>
             </button>
-            <button type="button" class="stat-card expiring qm-tile" data-tile="expiring" title="Show open quotes that expire within 7 days">
+            <button type="button" class="stat-card expiring qm-tile" data-tile="expiring" title="Show open quotes that expire within 7 days" aria-label="Show open quotes that expire within 7 days">
                 <div class="stat-value" id="stat-expiring">-</div>
                 <div class="stat-label">Expiring Soon</div>
             </button>
-            <button type="button" class="stat-card cancelled qm-tile" data-tile="cancelled" title="Show quotes cancelled in ShopWorks">
+            <button type="button" class="stat-card cancelled qm-tile" data-tile="cancelled" title="Show quotes cancelled in ShopWorks" aria-label="Show quotes cancelled in ShopWorks">
                 <div class="stat-value" id="stat-cancelled">-</div>
                 <div class="stat-label">Cancelled</div>
             </button>
-            <button type="button" class="stat-card failed qm-tile" id="stat-card-failed" data-tile="failed" title="Show quotes whose push to ShopWorks failed — these need a hand">
+            <button type="button" class="stat-card failed qm-tile" id="stat-card-failed" data-tile="failed" title="Show quotes whose push to ShopWorks failed — these need a hand" aria-label="Show quotes whose push to ShopWorks failed — these need a hand">
                 <div class="stat-value" id="stat-failed">-</div>
                 <div class="stat-label">Push Failed</div>
             </button>
@@ -131,7 +128,7 @@
                 <h2>Quotes</h2>
                 <div class="table-actions">
                     <button id="btn-bulk-delete" class="btn-bulk-delete" type="button" data-action="bulk-delete" disabled>
-                        <i class="fas fa-trash"></i> Delete Selected (<span id="selected-count">0</span>)
+                        <i class="fas fa-trash" aria-hidden="true"></i> Delete Selected (<span id="selected-count">0</span>)
                     </button>
                     <span class="table-count" id="table-count">Loading...</span>
                     <span class="qm-updated" id="qm-updated" role="status"></span>
@@ -164,7 +161,7 @@
             </div>
 
             <div id="table-empty" class="empty-state" hidden>
-                <i class="fas fa-file-invoice"></i>
+                <i class="fas fa-file-invoice" aria-hidden="true"></i>
                 <h3>No quotes found</h3>
                 <p>Try adjusting your filters or search terms</p>
             </div>
@@ -197,11 +194,11 @@
 
             <div class="pagination" id="pagination" hidden>
                 <button id="btn-prev" type="button" data-action="prev-page" disabled>
-                    <i class="fas fa-chevron-left"></i> Previous
+                    <i class="fas fa-chevron-left" aria-hidden="true"></i> Previous
                 </button>
                 <span class="page-info" id="page-info">Page 1 of 1</span>
                 <button id="btn-next" type="button" data-action="next-page">
-                    Next <i class="fas fa-chevron-right"></i>
+                    Next <i class="fas fa-chevron-right" aria-hidden="true"></i>
                 </button>
             </div>
         </div>
@@ -250,16 +247,16 @@
     <script src="/config/app.config.js?v=2026.09.03.11"></script>
     <!-- Shared box-label template (also used by the standalone Box Labels page) —
          must load BEFORE sanmar-inbound-today.js. -->
-    <script src="/shared_components/js/box-label-template.js?v=2026.08.04.2"></script>
+    <script src="/shared_components/js/box-label-template.js?v=2026.09.05.71"></script>
     <!-- SanMar Inbound Calendar modal (Erik 2026-06-17). Self-contained;
          exposes window.openInboundTodayModal for the header button. -->
     <script src="/shared_components/js/box-url.js?v=2026.08.06.1"></script>
-    <script src="/dashboards/js/sanmar-inbound-today.js?v=2026.08.26.4"></script>
+    <script src="/dashboards/js/sanmar-inbound-today.js?v=2026.09.05.71"></script>
     <!-- EmailJS browser SDK — same tag the quote builders load; used by
          "Resend quote email" (row action). Loaded before the page script so
          resendQuoteEmail() can init lazily on first use. -->
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <!-- Dashboard JS (extracted from inline script — Rule 3, 2026-07-05) -->
-    <script src="/dashboards/js/quote-management.js?v=2026.09.05.2"></script>
+    <script src="/dashboards/js/quote-management.js?v=2026.09.05.71"></script>
 </body>
 </html>

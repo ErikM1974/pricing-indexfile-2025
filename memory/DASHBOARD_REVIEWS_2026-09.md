@@ -1110,3 +1110,37 @@ lightbox, Retry on every fetch, honest "locked" metrics). Fixes are hygiene:
     `beforeunload` guard.
 12. ⏭️ Next: Quote Management hygiene (25 bare icons, 3 unnamed buttons — it had its own deep review
     2026-09-05.2), Purchasing Portal, Product Manager, then the reference/admin pages.
+
+## Quote Management (hygiene) + SanMar Inbound Calendar + box labels + Purchasing Portal (hygiene) + Product Manager — 12 items (2026-09-05, `v2026.09.05.70`)
+
+Quote Management and Purchasing Portal had their deep reviews earlier on 2026-09-05 (`.2`, `.1`); this pass
+is what those left: icons, the shared Inbound Calendar modal they open, and the print-label template.
+1. **Inbound Calendar modal** (`js/sanmar-inbound-today.js`, opened from Quote Management): 7 inline `style=`
+   (method chip colours, right-aligned Qty/Cost cells, method border colour, calendar heat) → `--c` / `--bg`
+   custom properties + `.sit-r`; 2 inline `onerror=` (artwork tile swap, print-sheet logo) → `data-onerror`
+   + one capture-phase listener; `modalEl.style.display` ×4 → `hidden` (+ `.sit-modal[hidden]` in its CSS);
+   `role=dialog aria-modal aria-label`; focus → first control, **returns to the header button** on close/Esc.
+2. **Box-label print template** (`shared_components/js/box-label-template.js`): method colour via `--m` on
+   `.sl-type` (border + name), `style="flex:1.7"` → `.sl-fill--wide`, artwork `onerror` → `data-onerror`
+   + listener (guarded `window.__slLogoErrWired`). `box-label-template.test.js` still green.
+3. Quote Management: 9 + 23 bare icons `aria-hidden` (incl. the dynamic `${icon}` template and the three
+   spinner swaps); every `title`-only button also carries `aria-label` (3 were unnamed live); all 5 QM assets
+   `?v=` bumped.
+4. Purchasing Portal: banner close typed, 6 icons `aria-hidden`, viewer CSS `?v=` aligned, `[hidden]` guard.
+5. **Product Manager**: load failure → reason + Retry (was "Please refresh"); Edit / View buttons named per
+   style ("Edit CTJ140", "View CTJ140 in the catalog (new tab)"); opening the form focuses the first editable
+   field, closing returns focus to "Add product"; empty-thumb placeholder named; icons `aria-hidden`;
+   `[hidden]` guard; `?v=`.
+6. Lock: `tests/unit/office-ops-pages.test.js`.
+7. Smoke on static-dist: QM 0 bare icons / 0 untitled-only buttons; Inbound Calendar → `display:flex`,
+   `role=dialog`, focus inside (day-step button), 0 non-custom-property inline styles, Esc → `display:none`
+   + focus back on the header button; Product Manager (real proxy data) 35 rows, "Edit CTJ140", Add →
+   focus `fStyle`, Close → focus `pmAddBtn`.
+8. 🔑 Custom-property inline styles (`style="--c:…"`) are the sanctioned form for computed colours/sizes —
+   the lock regex allows `style="--` and nothing else.
+9. Left alone: QM 5-minute visible-tab refresh; the Inbound modal's `window.print` flows (printed on real
+   paper by Bradley — not exercised here).
+10. ⏭️ Next: the admin + reference pages (api-usage, access-admin, drive-access, bandit-integration,
+    contract-break-even, policy-migration, table-usage-audit, sanmar-ftp-integration, sanmar-shopworks-converter,
+    the 4 API reference pages), then AE Mission Control, pricing-analysis (GENERATED — edit Python, not HTML)
+    and price-audit-report.

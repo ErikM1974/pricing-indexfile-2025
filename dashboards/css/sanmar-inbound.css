@@ -428,3 +428,10 @@
         -webkit-print-color-adjust: exact; print-color-adjust: exact;
     }
 }
+
+/* 2026-09-05 review — colours/alignment via custom properties + classes (no inline style=) */
+.sit-modal[hidden] { display: none; }
+.sit-chip { background: var(--c, #9ca3af); }
+.sit-ps-tbl .sit-r, .sit-r { text-align: right; }
+.sit-rt-method { border-left-color: var(--c, #444); }
+.sit-cal-has { background: var(--bg); }

@@ -310,7 +310,7 @@ async function syncFromShopWorks() {
     if (!btn || btn.disabled) return;
     const original = btn.innerHTML;
     btn.disabled = true;
-    btn.innerHTML = '<i class="fas fa-sync fa-spin"></i> Syncing…';
+    btn.innerHTML = '<i class="fas fa-sync fa-spin" aria-hidden="true"></i> Syncing…';
     try {
         const resp = await fetch('/api/quote-sessions/bulk-sync-from-shopworks', {
             method: 'POST',
@@ -361,7 +361,7 @@ async function refreshInboundLive() {
     if (!btn || btn.disabled) return;
     const original = btn.innerHTML;
     btn.disabled = true;
-    btn.innerHTML = '<i class="fas fa-dolly fa-spin"></i> Refreshing…';
+    btn.innerHTML = '<i class="fas fa-dolly fa-spin" aria-hidden="true"></i> Refreshing…';
     try {
         // 1. Ingest orders that fell BETWEEN scheduled syncs (Erik 2026-06-26):
         //    ones that raced placed→shipped→Complete in one hop, so the daily
@@ -388,12 +388,12 @@ async function refreshInboundLive() {
                     if (lr.error) ingestErr = lr.error; else ingested = lr.ingested || 0;
                     break;
                 }
-                if (s && s.progress) btn.innerHTML = `<i class="fas fa-dolly fa-spin"></i> Ingesting ${s.progress.ingested || 0}/${s.progress.pending || '…'}…`;
+                if (s && s.progress) btn.innerHTML = `<i class="fas fa-dolly fa-spin" aria-hidden="true"></i> Ingesting ${s.progress.ingested || 0}/${s.progress.pending || '…'}…`;
             }
         } catch (e) { ingestErr = e.message; }
 
         // 2. Pull live tracking for in-table open orders (original behavior).
-        btn.innerHTML = '<i class="fas fa-dolly fa-spin"></i> Refreshing…';
+        btn.innerHTML = '<i class="fas fa-dolly fa-spin" aria-hidden="true"></i> Refreshing…';
         const resp = await fetch('/api/sanmar-orders/sync-shipments', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -673,7 +673,7 @@ function getWoId(quote) {
 function renderShopWorksRef(quote) {
     const wo = getWoId(quote);
     if (!wo) return '';
-    return `<div class="sw-ref" title="In ShopWorks — order #${wo}"><i class="fas fa-check-circle"></i> SW #${wo}</div>`;
+    return `<div class="sw-ref" title="In ShopWorks — order #${wo}"><i class="fas fa-check-circle" aria-hidden="true"></i> SW #${wo}</div>`;
 }
 
 // Online deposit chip (Storefront Checkout Phase 1, 2026-07-05). Reads the
@@ -692,25 +692,25 @@ function renderDepositChip(quote) {
     const usd = (n) => `$${(Number(n) || 0).toFixed(2)}`;
     if (balancePaid) {
         return `<span class="status-badge deposit-chip deposit-chip--paid" title="Paid in full online via Stripe (deposit + balance).">
-                    <i class="fas fa-dollar-sign"></i> Paid in full
+                    <i class="fas fa-dollar-sign" aria-hidden="true"></i> Paid in full
                 </span>`;
     }
     if (depositPaid) {
         // DEPOSIT-PCT=100 → zero balance = paid in full (Erik 2026-07-05).
         if (dep && Number(dep.balanceAmount) === 0) {
             return `<span class="status-badge deposit-chip deposit-chip--paid" title="Paid in full online via Stripe — ${usd(depositPaid.amount)}.">
-                        <i class="fas fa-dollar-sign"></i> Paid in full
+                        <i class="fas fa-dollar-sign" aria-hidden="true"></i> Paid in full
                     </span>`;
         }
         const bal = dep && isFinite(Number(dep.balanceAmount)) ? ` · bal ${usd(dep.balanceAmount)}` : '';
         return `<span class="status-badge deposit-chip deposit-chip--paid" title="Deposit paid online via Stripe — ${usd(depositPaid.amount)}${dep ? ` of ${usd(dep.grandTotal)}` : ''}. Balance due after proof approval.">
-                    <i class="fas fa-dollar-sign"></i> Deposit paid${bal}
+                    <i class="fas fa-dollar-sign" aria-hidden="true"></i> Deposit paid${bal}
                 </span>`;
     }
     if (dep && dep.enabled) {
         const label = Number(dep.depositPct) >= 100 ? 'Payment link live' : 'Deposit link live';
         return `<span class="status-badge deposit-chip deposit-chip--live" title="Pay link is live on the quote page — ${usd(dep.depositAmount)}${Number(dep.depositPct) >= 100 ? ' (full order total)' : ` (${Number(dep.depositPct) || 0}% of ${usd(dep.grandTotal)})`}. Waiting on the customer.">
-                    <i class="fas fa-link"></i> ${label}
+                    <i class="fas fa-link" aria-hidden="true"></i> ${label}
                 </span>`;
     }
     return '';
@@ -732,7 +732,7 @@ function renderInboundIndicator(quote) {
     // Progress "Shipped" truck so a SanMar blanks delivery is never misread
     // as the customer's order shipping out (Erik 2026-06-16).
     const title = `Inbound blanks · SanMar PO ${info.po || '?'} · ${LABEL[info.state] || info.status || ''}${info.trackingNumber ? ' · ' + info.trackingNumber : ''}`;
-    const icon = '<i class="fas fa-dolly"></i>';
+    const icon = '<i class="fas fa-dolly" aria-hidden="true"></i>';
     // Only emit a real link when the tracking URL is a well-formed http(s)
     // URL — trackingUrl comes from the SanMar batch-status API, so treat it
     // as untrusted and always escapeHtml it (never interpolate raw). A blank
@@ -747,7 +747,7 @@ function renderInboundIndicator(quote) {
     if (info.issue && (info.issue.backorder || info.issue.hold)) {
         const isBo = info.issue.backorder;
         const aTitle = `SanMar ${isBo ? 'BACKORDER' : 'HOLD'}${info.issue.label ? ' · ' + info.issue.label : ''}`;
-        alert = ` <span class="inbound-alert ${isBo ? 'inbound-backorder' : 'inbound-hold'}" title="${escapeHtml(aTitle)}"><i class="fas fa-triangle-exclamation"></i> ${isBo ? 'Backorder' : 'Hold'}</span>`;
+        alert = ` <span class="inbound-alert ${isBo ? 'inbound-backorder' : 'inbound-hold'}" title="${escapeHtml(aTitle)}"><i class="fas fa-triangle-exclamation" aria-hidden="true"></i> ${isBo ? 'Backorder' : 'Hold'}</span>`;
     }
     return base + alert;
 }
@@ -797,7 +797,7 @@ function renderMilestonePills(quote) {
         // (partial→amber, na/unknown→neutral). Tooltip shows exact state.
         const tone = st.state === 'yes' ? 'done' : (st.state === 'no' ? 'pending' : st.state);
         return `<span class="milestone-pill milestone-pill--${tone}" title="${escapeHtml(label)}: ${escapeHtml(st.label)}">
-                    <i class="fas ${icon}"></i>
+                    <i class="fas ${icon}" aria-hidden="true"></i>
                 </span>`;
     }).join('');
     return `<div class="milestone-pills">${pills}</div>`;
@@ -944,14 +944,12 @@ function renderShipStationButton(quote) {
     const s = getShipStationState(quote);
     if (s.state === 'hidden') return '';
     if (s.state === 'waiting') {
-        return `<button type="button" class="action-btn action-btn--waiting" disabled
-                        title="Waiting for production (sts_Produced=${s.stsProduced ?? 'unknown'}). Enables once SW marks decoration complete.">
+        return `<button type="button" class="action-btn action-btn--waiting" disabled title="Waiting for production (sts_Produced=${s.stsProduced ?? 'unknown'}). Enables once SW marks decoration complete." aria-label="Waiting for production (sts_Produced=${s.stsProduced ?? 'unknown'}). Enables once SW marks decoration complete.">
                     <span class="action-emoji" aria-hidden="true">🕐</span>
                 </button>`;
     }
     if (s.state === 'sent') {
-        return `<button type="button" class="action-btn action-btn--sent" disabled
-                        title="In ShipStation #${s.shipstationId}. Warehouse will buy the label in ShipStation; tracking will appear here once shipped.">
+        return `<button type="button" class="action-btn action-btn--sent" disabled title="In ShipStation #${s.shipstationId}. Warehouse will buy the label in ShipStation; tracking will appear here once shipped." aria-label="In ShipStation #${s.shipstationId}. Warehouse will buy the label in ShipStation; tracking will appear here once shipped.">
                     <span class="action-emoji" aria-hidden="true">✓</span>
                 </button>`;
     }
@@ -1136,7 +1134,7 @@ function renderTable() {
         let statusCellHtml;
         if (isCancelled) {
             statusCellHtml = `<span class="status-badge status-cancelled" title="Order was deleted in ShopWorks. Will be permanently purged after 30 days.">
-                                  <i class="fas fa-ban"></i> Cancelled (SW)
+                                  <i class="fas fa-ban" aria-hidden="true"></i> Cancelled (SW)
                                </span>`;
         } else if (isProcessed) {
             // A2 (2026-05-22): the indexed column is the primary source,
@@ -1155,30 +1153,30 @@ function renderTable() {
             }
             const woNum = woId ? ` #${woId}` : '';
             statusCellHtml = `<span class="status-badge status-processed" title="Order successfully pushed to ShopWorks${woNum ? ` (WO${woNum})` : ''}. System-managed state — syncs hourly.">
-                                  <i class="fas fa-check-circle"></i> In ShopWorks${woNum}
+                                  <i class="fas fa-check-circle" aria-hidden="true"></i> In ShopWorks${woNum}
                                </span>`;
         } else if (isChargedNoSWOrder) {
             statusCellHtml = `<span class="status-badge status-charged-no-sw" title="URGENT — payment was processed but the order didn't land in ShopWorks. Customer has been charged. Manually enter the order in ShopWorks, then mark this quote as Processed.">
-                                  <i class="fas fa-exclamation-triangle"></i> Charged · No SW Order
+                                  <i class="fas fa-exclamation-triangle" aria-hidden="true"></i> Charged · No SW Order
                                </span>`;
         } else if (isFailed) {
             statusCellHtml = `<span class="status-badge status-failed" title="Push to ShopWorks failed. Open the quote and click Refresh to retry, or contact dev to inspect the proxy logs.">
-                                  <i class="fas fa-exclamation-triangle"></i> Push Failed
+                                  <i class="fas fa-exclamation-triangle" aria-hidden="true"></i> Push Failed
                                </span>`;
         } else if (isPendingPayment) {
             statusCellHtml = `<span class="status-badge status-pending-payment" title="3-Day Tees order — credit card is processed in ShopWorks. Status updates once the order is completed there.">
-                                  <i class="fas fa-credit-card"></i> Awaiting Payment
+                                  <i class="fas fa-credit-card" aria-hidden="true"></i> Awaiting Payment
                                </span>`;
         } else if (isPaymentConfirmed) {
             statusCellHtml = `<span class="status-badge status-payment-confirmed" title="3-Day Tees order — payment received, ShopWorks order hasn't been created yet. Should advance to In ShopWorks shortly.">
-                                  <i class="fas fa-check-circle"></i> Payment Received
+                                  <i class="fas fa-check-circle" aria-hidden="true"></i> Payment Received
                                </span>`;
         } else if (quote.PushedToShopWorks) {
             // P2-1 (audit 2026-06-06): a pushed order whose Status hasn't yet flipped to Processed
             // (the hourly sync runs AFTER SW imports) would otherwise render the editable dropdown,
             // letting a rep mark a LIVE ShopWorks order "Lost". Show a read-only locked badge.
             statusCellHtml = `<span class="status-badge status-processed" title="Pushed to ShopWorks — locked. Status syncs from ShopWorks hourly.">
-                                  <i class="fas fa-lock"></i> In ShopWorks
+                                  <i class="fas fa-lock" aria-hidden="true"></i> In ShopWorks
                                </span>`;
         } else {
             statusCellHtml = `<select class="status-dropdown status-${(quote.Status || 'Open').toLowerCase()}"
@@ -1261,8 +1259,7 @@ function renderTable() {
                         const isEditLocked = lockedStatuses.has(quote.Status) || !!quote.PushedToShopWorks;
                         if (isEditLocked) {
                             return `<button type="button" class="action-btn action-btn--locked"
-                                            disabled
-                                            title="In ShopWorks — edit there. Changes here would not sync back.">
+                                            disabled title="In ShopWorks — edit there. Changes here would not sync back." aria-label="In ShopWorks — edit there. Changes here would not sync back.">
                                         <i class="fas fa-lock" aria-hidden="true"></i>
                                     </button>`;
                         }
@@ -1286,7 +1283,7 @@ function renderTable() {
                         ? `<button type="button" class="action-btn action-delete" data-action="delete" data-pk-id="${quote.PK_ID}" data-quote-id="${qid}" data-status="${escapeHtml(quote.Status || 'Open')}" title="Delete Quote" aria-label="Delete ${qid}">
                         <i class="fas fa-trash" aria-hidden="true"></i>
                     </button>`
-                        : `<button type="button" class="action-btn action-btn--locked" disabled title="Only the quote owner or Erik can delete this quote">
+                        : `<button type="button" class="action-btn action-btn--locked" disabled title="Only the quote owner or Erik can delete this quote" aria-label="Only the quote owner or Erik can delete this quote">
                         <i class="fas fa-trash" aria-hidden="true"></i>
                     </button>`}
                 </td>
@@ -1861,7 +1858,7 @@ function deleteQuote(pkId, quoteId, status) {
     let message = `Are you sure you want to delete quote <strong>${quoteId}</strong>?`;
 
     if (status === 'Accepted') {
-        message = `<span class="warning-text"><i class="fas fa-exclamation-triangle"></i> Warning:</span> Quote <strong>${quoteId}</strong> has been <strong>Accepted</strong>. Deleting it will remove the record permanently.<br><br>Are you sure you want to proceed?`;
+        message = `<span class="warning-text"><i class="fas fa-exclamation-triangle" aria-hidden="true"></i> Warning:</span> Quote <strong>${quoteId}</strong> has been <strong>Accepted</strong>. Deleting it will remove the record permanently.<br><br>Are you sure you want to proceed?`;
     }
 
     showDeleteModal('Delete Quote', message, [{ pkId, quoteId, status }], 'single');
@@ -1878,12 +1875,12 @@ function bulkDelete() {
     let message = '';
 
     if (acceptedQuotes.length > 0 && otherQuotes.length > 0) {
-        message = `<span class="warning-text"><i class="fas fa-exclamation-triangle"></i> Warning:</span> You selected <strong>${quotes.length} quotes</strong>, including <strong>${acceptedQuotes.length} Accepted</strong> quote(s).<br><br>`;
+        message = `<span class="warning-text"><i class="fas fa-exclamation-triangle" aria-hidden="true"></i> Warning:</span> You selected <strong>${quotes.length} quotes</strong>, including <strong>${acceptedQuotes.length} Accepted</strong> quote(s).<br><br>`;
         message += `<strong>Accepted:</strong> ${acceptedQuotes.map(q => q.quoteId).join(', ')}<br>`;
         message += `<strong>Other:</strong> ${otherQuotes.map(q => q.quoteId).join(', ')}<br><br>`;
         message += `Are you sure you want to delete all ${quotes.length} quotes?`;
     } else if (acceptedQuotes.length > 0) {
-        message = `<span class="warning-text"><i class="fas fa-exclamation-triangle"></i> Warning:</span> All <strong>${acceptedQuotes.length}</strong> selected quote(s) are <strong>Accepted</strong>:<br><br>`;
+        message = `<span class="warning-text"><i class="fas fa-exclamation-triangle" aria-hidden="true"></i> Warning:</span> All <strong>${acceptedQuotes.length}</strong> selected quote(s) are <strong>Accepted</strong>:<br><br>`;
         message += `${acceptedQuotes.map(q => q.quoteId).join(', ')}<br><br>`;
         message += `Are you sure you want to delete them permanently?`;
     } else {
@@ -1921,7 +1918,7 @@ async function confirmDelete() {
 
     const confirmBtn = document.querySelector('.btn-confirm-delete');
     confirmBtn.disabled = true;
-    confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting...';
+    confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Deleting...';
 
     let successCount = 0;
     let failCount = 0;

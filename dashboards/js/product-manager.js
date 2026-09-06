@@ -45,11 +45,21 @@
 
     document.addEventListener('DOMContentLoaded', function () {
         wire();
-        loadProducts().catch(function (err) {
-            console.error('[product-manager] load failed:', err);
-            DashPage.showError('Unable to load products. Please refresh — or check the console.');
-        });
+        boot();
     });
+
+    function boot() {
+        const root = $('content-root');
+        root.classList.add('dash-loading'); root.textContent = 'Loading products…';
+        loadProducts().then(function () { DashPage.hideError(); }).catch(function (err) {
+            console.error('[product-manager] load failed:', err);
+            DashPage.showError('Unable to load products (' + (err.message || 'request failed') + ').');
+            root.classList.remove('dash-loading');
+            root.innerHTML = '<p class="pm-empty" role="alert">Products unavailable (' + escapeHtml(err.message || 'request failed') + '). ' +
+                '<button type="button" class="pm-btn pm-btn-ghost" id="pmRetry">Retry</button></p>';
+            const rb = $('pmRetry'); if (rb) rb.addEventListener('click', boot);
+        });
+    }
 
     async function loadProducts() {
         const data = await DashPage.fetchJson('/api/non-sanmar-products?active=all&refresh=true');
@@ -101,7 +111,7 @@
                         <tr data-id="${escapeHtml(String(p.ID_Product))}" class="${isActiveRow(p) ? '' : 'pm-row-inactive'}">
                             <td>${p.ImageURL
                                 ? `<img class="pm-thumb" src="${escapeHtml(p.ImageURL)}" alt="" loading="lazy">`
-                                : '<span class="pm-thumb pm-thumb-empty" title="No image"><i class="fas fa-image"></i></span>'}</td>
+                                : '<span class="pm-thumb pm-thumb-empty" title="No image" aria-label="No image"><i class="fas fa-image" aria-hidden="true"></i></span>'}</td>
                             <td class="pm-style">${escapeHtml(p.StyleNumber)}</td>
                             <td>${escapeHtml(p.ProductName)}</td>
                             <td>${escapeHtml(p.Brand)}</td>
@@ -114,8 +124,8 @@
                                 ? '<span class="pm-chip pm-chip-live">Live</span>'
                                 : '<span class="pm-chip">Hidden</span>'}</td>
                             <td class="pm-actions">
-                                <button type="button" class="pm-btn pm-btn-ghost pm-edit" data-id="${escapeHtml(String(p.ID_Product))}"><i class="fas fa-pen"></i> Edit</button>
-                                <a class="pm-btn pm-btn-ghost" href="/product.html?style=${encodeURIComponent(p.StyleNumber)}" target="_blank" rel="noopener" title="View in catalog"><i class="fas fa-eye"></i></a>
+                                <button type="button" class="pm-btn pm-btn-ghost pm-edit" data-id="${escapeHtml(String(p.ID_Product))}" aria-label="Edit ${escapeHtml(p.StyleNumber)}"><i class="fas fa-pen" aria-hidden="true"></i> Edit</button>
+                                <a class="pm-btn pm-btn-ghost" href="/product.html?style=${encodeURIComponent(p.StyleNumber)}" target="_blank" rel="noopener" title="View in catalog" aria-label="View ${escapeHtml(p.StyleNumber)} in the catalog (new tab)"><i class="fas fa-eye" aria-hidden="true"></i></a>
                             </td>
                         </tr>`).join('')}
                 </tbody>
@@ -148,10 +158,13 @@
         syncImagePreview();
         $('pmFormCard').hidden = false;
         $('pmFormCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        // Focus the first editable field so keyboard users land in the form (style is locked on edit)
+        setTimeout(function () { const f = product ? $('fName') : $('fStyle'); if (f) f.focus(); }, 60);
     }
 
     function closeForm() {
         $('pmFormCard').hidden = true;
+        const add = $('pmAddBtn'); if (add) add.focus();
     }
 
     function syncSellVisibility() {
@@ -224,7 +237,7 @@
         const saveBtn = $('pmSaveBtn');
         const original = saveBtn.innerHTML;
         saveBtn.disabled = true;
-        saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving…';
+        saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Saving…';
         try {
             const pricingMethod = $('fPricingMethod').value;
             const cost = parseFloat($('fCost').value) || 0;
@@ -240,9 +253,9 @@
             let imageUrl = $('fImageUrl').value.trim();
             const file = $('fImageFile').files && $('fImageFile').files[0];
             if (file) {
-                saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading image…';
+                saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Uploading image…';
                 imageUrl = await uploadImage(file);
-                saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving…';
+                saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Saving…';
             }
 
             const payload = {
