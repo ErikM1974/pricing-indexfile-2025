@@ -23,26 +23,7 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 ### Company Numbers review — a date a day early, a refresh that wasn't, a goal nobody could change (2026-09-04, ARCHIVED 2026-09-06): `YYYY-MM-DD` parses as UTC midnight (use `toLocalDate()`); a Refresh button must re-fetch, not re-render; a business constant belongs in a Caspio `Service_Codes` row (`CO-ANNUAL-GOAL`) with a VISIBLE fallback. Full entry in archive.
 ### Customer login dropped the deep link it was handed (2026-09-05, ARCHIVED 2026-09-06, `v2026.09.05.26`): a login page must carry its `?next=` through every hop (magic-link request → email → callback) and validate it as a same-origin path; test the round trip, not the first page. Full entry in archive.
 ### JSON-in-attribute broke on the first quote (Names & Numbers delete button, 2026-09-05, ARCHIVED 2026-09-06, `v2026.09.05.17`): never put JSON with quotes/apostrophes in an HTML attribute — pass an index/id and look the record up, or escape with `escapeHtml` on the attribute value. Full entry in archive.
-
-## 2026-09-05 — Customer Portals console said nobody had ever signed in (141 invites, "Have Signed In: 0")
-
-**Problem.** The staff console's "Have Signed In" tile read 0 and every "Last Sign-In" cell read
-"Never" for all 141 invited customers — including customers known to have used the portal.
-
-**Root cause.** The table has a `LastLogin` column, the proxy PROJECTS it (`last_login`) and the
-console RENDERS it, but nothing ever WROTE it: the customer magic-link verify route never stamped a
-login, and the proxy had no `customer-portal-access/touch-login` route — the vendor portal got both
-(2026-07-19) and the customer side was never mirrored. Three layers displayed a field with no writer.
-
-**Solution.** Proxy `POST /api/customer-portal-access/touch-login` (mirrors vendor); app
-`/auth/customer/verify` calls it fire-and-forget after setting the cookie. Locked in
-`tests/unit/customer-portal-admin-page.test.js` (server call + proxy route, cross-repo when present).
-
-**Prevention.** For every field a page renders, name its WRITER — if the answer is "the table has the
-column", nothing writes it. A stat that reads 0 across 100% of rows is a data-plane gap, not a fact;
-check for the writer before reporting it as truth. Pairs with the deep-link lesson above: a chain
-(write → project → render) needs every hop, and the missing hop is invisible from either end.
-🔑 History before 2026-09-05 is unrecoverable — "Never" for old rows means "not recorded", not "never".
+### Customer Portals console said nobody had ever signed in (2026-09-05, ARCHIVED 2026-09-06): a "0" that never moves is a broken reader, not a quiet business — the count read a field the login flow never wrote; assert every counter against a source of truth once. Full entry in archive.
 
 ## 2026-09-05 — Whole-dashboard deep-review sweep (`.24` → `.75`, 54 pages): the same six bugs kept reappearing
 
@@ -286,3 +267,21 @@ quoted `"/name.js"` for root files, sibling `./name.js` for ES modules).
 comments, tests, one-off scripts and archives. 🔑 Gate, don't delete, debug logging: the
 `?debug=1` switch keeps the diagnostics Erik uses without paying for them on every customer load.
 🔑 A generated identifier prefix can start with a digit — check the first character.
+
+## 2026-09-06 — My own host sweep broke the DTF calculator for four deploys, and only a console read caught it (`v2026.09.06.40`)
+
+**Problem.** S3 (`.31`) rewrote `fetch(\`https://HOST/api/x?style=${s}\`)` sites to
+`BASE_URL + '/api/x?style=${s}'` — a single-quoted string — so the DTF calculator fetched the
+`${…}` text literally and 404'd on every load from `.31` to `.39`. 182 suites stayed green
+(no test exercises that adapter against a URL) and the parity suites price through services
+that never hit it.
+**Root cause.** The rewrite's `suffix` branch dropped the literal into `'%s'` regardless of the
+original quote character; a template literal's backtick was in the regex's quote class, so it
+matched, and the replacement lost it.
+**Solution.** Backticks restored on all 7 sites; a lock fails on any complete quoted string
+containing both `/api/` and `${`.
+**Prevention.** 🔑 A scripted rewrite must preserve the ORIGINAL quote character (or refuse
+backtick literals); grep the diff for `'…${` before committing. 🔑 After any sweep that touches
+fetch URLs, read the live console AND the failed-request list on the pages that use them —
+a green suite proves nothing about a URL no test builds. 🔑 Read `performance.getEntriesByType('resource')`
+for `responseStatus >= 400`: it shows the literal URL that went out.

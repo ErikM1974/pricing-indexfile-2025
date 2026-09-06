@@ -6,6 +6,28 @@ Resolved entries aged out of `LESSONS_LEARNED.md` (300-line cap). Newest first. 
 
 ## Archived 2026-09-06
 
+## Customer Portals console said nobody had ever signed in (141 invites, "Have Signed In: 0")
+
+**Problem.** The staff console's "Have Signed In" tile read 0 and every "Last Sign-In" cell read
+"Never" for all 141 invited customers — including customers known to have used the portal.
+
+**Root cause.** The table has a `LastLogin` column, the proxy PROJECTS it (`last_login`) and the
+console RENDERS it, but nothing ever WROTE it: the customer magic-link verify route never stamped a
+login, and the proxy had no `customer-portal-access/touch-login` route — the vendor portal got both
+(2026-07-19) and the customer side was never mirrored. Three layers displayed a field with no writer.
+
+**Solution.** Proxy `POST /api/customer-portal-access/touch-login` (mirrors vendor); app
+`/auth/customer/verify` calls it fire-and-forget after setting the cookie. Locked in
+`tests/unit/customer-portal-admin-page.test.js` (server call + proxy route, cross-repo when present).
+
+**Prevention.** For every field a page renders, name its WRITER — if the answer is "the table has the
+column", nothing writes it. A stat that reads 0 across 100% of rows is a data-plane gap, not a fact;
+check for the writer before reporting it as truth. Pairs with the deep-link lesson above: a chain
+(write → project → render) needs every hop, and the missing hop is invisible from either end.
+🔑 History before 2026-09-05 is unrecoverable — "Never" for old rows means "not recorded", not "never". (2026-09-05)
+
+---
+
 ## JSON-in-attribute broke on the first quote (Names & Numbers delete button, `v2026.09.05.17`)
 **Problem:** after converting `onclick="dashboard.deleteRoster(${id}, '${esc(name)}')"` to `data-args="${esc(JSON.stringify([id, name]))}"`, the attribute read `[10,` — the delete button silently did nothing.
 **Root cause:** that page's `esc()` is the `div.textContent → innerHTML` trick, which escapes `< > &` but NOT `"`, so the JSON's quotes ended the attribute early.
