@@ -1,3 +1,9 @@
+## v2026.09.06.36 (2026.09.06)
+
+- Memory: 69-file deletion recorded as done (v2026.09.06.35), live smoke noted
+- Rule 6 for EmailJS (69 → 10 literals) + static accessibility pass on every served page
+- Deploy v2026.09.06.36: EmailJS from APP_CONFIG, accessibility pass, webstore pages as real documents
+
 ## v2026.09.06.35 (2026.09.06)
 
 - Memory: final-census section + LESSONS entry, DEAD_FILES_2026-09-06.md (69 files + Erik's git rm command), INDEX pointer; customer-login LESSONS entry archived
