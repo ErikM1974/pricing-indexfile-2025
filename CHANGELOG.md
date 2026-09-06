@@ -1,3 +1,8 @@
+## v2026.09.05.61 (2026.09.05)
+
+- Design Vault + 253gear Publisher review: 9 items — 236 bare icons aria-hidden, aria-pressed pills/chips/density, named icon buttons, layout via CSS custom properties (no .style.width/height), Publisher status regions + aria-current step rail + progressbar
+- Deploy v2026.09.05.61: Design Vault + 253gear Publisher review (9 items) — Art workspace complete
+
 ## v2026.09.05.59 (2026.09.05)
 
 - Digitized Designs + Old Designs review: 14 items — AL pricing from /api/al-pricing with visible fallback (tables were hardcoded), blank Design Number derived from DST filename + flagged, Rule 3 onerror/style cleanup, keyboard thumbnails, labelled dialogs with focus return, typed+named actions, Caspio watchdog, versioned assets
