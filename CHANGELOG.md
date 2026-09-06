@@ -1,3 +1,8 @@
+## v2026.09.05.63 (2026.09.05)
+
+- SanMar Payables review: 14 items — local calendar dates (UTC today was a day ahead after 5 PM), imported cross-ref failure visible + Retry, load-error row survives feed re-renders, tablist + arrows, filter tiles, keyboard upload, decorative icons, progressbar via --w; shared invoice viewer labelled dialog + focus return + honest PO title, one version on 3 pages
+- Deploy v2026.09.05.63: SanMar Payables review (14 items) + shared invoice viewer
+
 ## v2026.09.05.61 (2026.09.05)
 
 - Design Vault + 253gear Publisher review: 9 items — 236 bare icons aria-hidden, aria-pressed pills/chips/density, named icon buttons, layout via CSS custom properties (no .style.width/height), Publisher status regions + aria-current step rail + progressbar
