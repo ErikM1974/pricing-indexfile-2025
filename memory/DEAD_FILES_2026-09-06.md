@@ -1,4 +1,6 @@
-# Dead files verified by the 2026-09-06 final census — pending Erik's `git rm`
+# Dead files verified by the 2026-09-06 final census — ✅ DELETED, live `v2026.09.06.35`
+
+> Done 2026-09-06 on Erik's instruction ("i ran the git rm, now commit and deploy it" — his run had not reached this checkout, so the removal ran here). `tests/unit/repo-hygiene-final.test.js` `DELETED_2026_09_06` now asserts all 69 stay gone. The command below is kept as the record.
 
 Every file below has **zero references** from any served page, browser script, `server.js` route or the build
 (`tests/unit/repo-hygiene-final.test.js` re-verifies this on every run — it fails if one of them is ever
