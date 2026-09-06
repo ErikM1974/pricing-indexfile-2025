@@ -83,7 +83,7 @@
           '<td class="sf-file-meta">' + humanSize(f.size) + '</td>' +
           '<td class="sf-file-meta">' + esc(fmtDate(f.modifiedAt)) + '</td>' +
           '<td><a class="sf-btn" href="' + href + '" download="' + esc(f.name) + '">' +
-            '<i class="fas fa-download"></i> Download</a></td>' +
+            '<i class="fas fa-download" aria-hidden="true"></i> Download</a></td>' +
         '</tr>';
     }).join('');
 
@@ -94,7 +94,7 @@
   }
 
   function load(fresh) {
-    setStatus('<i class="fas fa-rotate sf-spin"></i> Connecting to SanMar…', false);
+    setStatus('<i class="fas fa-rotate sf-spin" aria-hidden="true"></i> Connecting to SanMar…', false);
     filesEl.innerHTML = '';
     if (configNote) configNote.hidden = true;
     if (refreshBtn) refreshBtn.classList.add('is-busy');

@@ -205,14 +205,14 @@
                 var note = notes[f[0]] || '';
                 var star = note.indexOf('★') === 0;
                 return '<tr' + (star ? ' class="swo-row--star"' : '') + '>' +
-                    '<td class="swo-fname">' + (star ? '<i class="fas fa-star swo-star"></i>' : '') + hl(f[0], q) + KIND_BADGE[kind] + '</td>' +
+                    '<td class="swo-fname">' + (star ? '<i class="fas fa-star swo-star" aria-hidden="true"></i>' : '') + hl(f[0], q) + KIND_BADGE[kind] + '</td>' +
                     '<td class="swo-ftype">' + esc(f[1]) + '</td>' +
                     '<td class="swo-fnote">' + (note ? hl(note.replace(/^★\s*/, ''), q) : '') + '</td></tr>';
             }).join('');
             return '<div class="swo-tbl' + (isCollapsed ? ' collapsed' : '') + '" data-table="' + esc(t) + '">' +
                 '<div class="swo-tbl-head" data-action="toggle"><h3>' + hl(t, q) + '</h3>' +
                 '<span class="swo-tbl-count">' + rows.length + ' fields</span>' +
-                '<i class="fas fa-chevron-down swo-tbl-chevron"></i></div>' +
+                '<i class="fas fa-chevron-down swo-tbl-chevron" aria-hidden="true"></i></div>' +
                 '<p class="swo-tbl-desc">' + esc(TABLE_DESC[t] || '') + '</p>' +
                 '<div class="swo-scroll"><table class="swo-table"><thead><tr><th>field</th><th>type</th><th>notes / gotchas</th></tr></thead><tbody>' +
                 body + '</tbody></table></div></div>';
@@ -246,8 +246,10 @@
             .catch(function (err) {
                 console.error('[shopworks-odbc-reference] schema load failed:', err);
                 countEl.textContent = 'Failed to load field catalog.';
-                host.innerHTML = '<div class="swo-empty"><i class="fas fa-triangle-exclamation"></i> Unable to load the field catalog (' + esc(err.message) + '). Refresh to retry.</div>';
-                if (window.DashPage && DashPage.showError) DashPage.showError('Unable to load the ODBC field catalog. Please refresh.');
+                host.innerHTML = '<div class="swo-empty" role="alert"><i class="fas fa-triangle-exclamation" aria-hidden="true"></i> Unable to load the field catalog (' + esc(err.message) + '). ' +
+                    '<button type="button" class="dash-btn dash-btn--sm" id="swo-retry">Retry</button></div>';
+                var rb = document.getElementById('swo-retry'); if (rb) rb.addEventListener('click', function () { window.location.reload(); });
+                if (window.DashPage && DashPage.showError) DashPage.showError('Unable to load the ODBC field catalog (' + err.message + ').');
             });
         filterEl.addEventListener('input', render);
         storedOnlyEl.addEventListener('change', render);

@@ -14,7 +14,7 @@
 
     <link rel="stylesheet" href="/shared_components/css/art-hub.css">
     <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
-    <link rel="stylesheet" href="/dashboards/css/sanmar-shopworks-converter.css?v=2026.07.23.1">
+    <link rel="stylesheet" href="/dashboards/css/sanmar-shopworks-converter.css?v=2026.09.05.72">
 </head>
 <body>
     <div class="dash-shell">
@@ -27,8 +27,8 @@
                 <h1 class="dash-header-title">SanMar → ShopWorks Parts <span class="sw-subhead">convert a SanMar price list into a ShopWorks parts import</span></h1>
             </div>
             <div class="dash-header-right">
-                <span class="sw-lock" title="Admin only"><i class="fas fa-user-shield"></i> Admin</span>
-                <a href="/staff-dashboard.html" class="dash-back-link"><i class="fas fa-arrow-left"></i> Dashboard</a>
+                <span class="sw-lock" title="Admin only"><i class="fas fa-user-shield" aria-hidden="true"></i> Admin</span>
+                <a href="/staff-dashboard.html" class="dash-back-link"><i class="fas fa-arrow-left" aria-hidden="true"></i> Dashboard</a>
             </div>
         </header>
 
@@ -36,26 +36,26 @@
 
             <!-- ── Convert ──────────────────────────────────────────────── -->
             <section class="dash-card">
-                <div class="dash-card-header"><h2 class="dash-card-title"><i class="fas fa-wand-magic-sparkles"></i> Convert a price list</h2></div>
+                <div class="dash-card-header"><h2 class="dash-card-title"><i class="fas fa-wand-magic-sparkles" aria-hidden="true"></i> Convert a price list</h2></div>
                 <p class="sw-lead">Pick a SanMar price list and click <b>Convert</b>. It runs entirely in your browser (nothing is uploaded), then you download a CSV ready to import into <b>ShopWorks → Parts</b>. It auto-detects the file: a ShopWorks <b>Integration Only Price List</b> (already formatted) gets the sizes added to its descriptions and <code>_2XL</code>→<code>_2X</code> fixed; a <b>raw SanMar feed</b> is fully converted (colors collapsed, part numbers, prices, size flags, sizes in descriptions).</p>
 
                 <div class="sw-drop">
                     <input type="file" id="sw-file" class="sw-file-input" accept=".csv,.tsv,.txt,.xlsx,.xls">
-                    <label for="sw-file" class="sw-btn sw-btn--ghost"><i class="fas fa-folder-open"></i> Choose file</label>
+                    <label for="sw-file" class="sw-btn sw-btn--ghost"><i class="fas fa-folder-open" aria-hidden="true"></i> Choose file</label>
                     <span id="sw-file-name" class="sw-file-name">No file selected</span>
-                    <button type="button" id="sw-convert" class="sw-btn" disabled><i class="fas fa-wand-magic-sparkles"></i> Convert</button>
-                    <button type="button" id="sw-reset" class="sw-btn sw-btn--ghost"><i class="fas fa-rotate-left"></i> Reset</button>
+                    <button type="button" id="sw-convert" class="sw-btn" disabled><i class="fas fa-wand-magic-sparkles" aria-hidden="true"></i> Convert</button>
+                    <button type="button" id="sw-reset" class="sw-btn sw-btn--ghost"><i class="fas fa-rotate-left" aria-hidden="true"></i> Reset</button>
                 </div>
 
-                <div id="sw-status" class="sw-status" aria-live="polite" style="display:none"></div>
-                <div id="sw-error" class="sw-msg sw-msg--error" style="display:none"></div>
+                <div id="sw-status" class="sw-status" role="status" aria-live="polite" hidden></div>
+                <div id="sw-error" class="sw-msg sw-msg--error" role="alert" hidden></div>
 
-                <div id="sw-results" style="display:none">
+                <div id="sw-results" hidden>
                     <div class="sw-stats">
                         <span class="sw-stat"><b id="sw-stat-in">0</b> rows in</span>
                         <span class="sw-stat"><b id="sw-stat-out">0</b> parts out</span>
                         <span class="sw-stat sw-stat--mode" id="sw-stat-fmt"></span>
-                        <button type="button" id="sw-download" class="sw-btn sw-btn--go"><i class="fas fa-download"></i> Download CSV</button>
+                        <button type="button" id="sw-download" class="sw-btn sw-btn--go"><i class="fas fa-download" aria-hidden="true"></i> Download CSV</button>
                     </div>
                     <div class="sw-table-wrap">
                         <table class="sw-table">
@@ -69,7 +69,7 @@
 
             <!-- ── What it does ─────────────────────────────────────────── -->
             <section class="dash-card">
-                <div class="dash-card-header"><h2 class="dash-card-title"><i class="fas fa-list-check"></i> What the converter does</h2></div>
+                <div class="dash-card-header"><h2 class="dash-card-title"><i class="fas fa-list-check" aria-hidden="true"></i> What the converter does</h2></div>
                 <ul class="sw-list">
                     <li><b>Descriptions get the size.</b> Extended-size rows become <code>Size 3XL - …</code>, <code>Size 2XL - …</code>, <code>Size OSFA - …</code> — matching how your existing parts read.</li>
                     <li><b>2XL part numbers are fixed.</b> <code>_2XL</code> → <code>_2X</code> so an import <em>updates</em> your existing parts instead of creating duplicates. Ladies <code>_XXL</code> parts are left alone.</li>
@@ -77,14 +77,14 @@
                     <li><b>Prices &amp; brand carried through.</b> Piece / Dozen / Case pricing and brand come straight from the feed.</li>
                 </ul>
                 <div class="sw-callout sw-callout--info">
-                    <h4><i class="fas fa-circle-info"></i> Two ways to get a price list</h4>
+                    <h4><i class="fas fa-circle-info" aria-hidden="true"></i> Two ways to get a price list</h4>
                     <p>Use ShopWorks's monthly <b>"Sanmar Integration Only Price List"</b>, or pull the raw SanMar feed yourself from the <a href="/dashboards/sanmar-ftp-integration.html">SanMar Downloads</a> page / FileZilla. Either one works here.</p>
                 </div>
             </section>
 
             <!-- ── Import into ShopWorks ────────────────────────────────── -->
             <section class="dash-card">
-                <div class="dash-card-header"><h2 class="dash-card-title"><i class="fas fa-boxes-stacked"></i> Then import into ShopWorks</h2></div>
+                <div class="dash-card-header"><h2 class="dash-card-title"><i class="fas fa-boxes-stacked" aria-hidden="true"></i> Then import into ShopWorks</h2></div>
                 <ol class="sw-steps">
                     <li>Download the CSV above.</li>
                     <li>In ShopWorks (OnSite), import it into <b>Parts</b> — it matches on <code>ID_Product</code>, so existing parts update and new ones are added.</li>
@@ -95,10 +95,10 @@
         </main>
     </div>
 
-    <script src="/dashboards/js/vendor/papaparse.min.js"></script>
-    <script src="/dashboards/js/vendor/xlsx.full.min.js"></script>
+    <script src="/dashboards/js/vendor/papaparse.min.js?v=2026.09.05.72"></script>
+    <script src="/dashboards/js/vendor/xlsx.full.min.js?v=2026.09.05.72"></script>
     <script src="/shared_components/js/sku-validation-service.js"></script>
-    <script src="/dashboards/js/sanmar-shopworks-parts.js?v=2026.07.23.2"></script>
-    <script src="/dashboards/js/sanmar-shopworks-converter.js?v=2026.07.23.1"></script>
+    <script src="/dashboards/js/sanmar-shopworks-parts.js?v=2026.09.05.72"></script>
+    <script src="/dashboards/js/sanmar-shopworks-converter.js?v=2026.09.05.72"></script>
 </body>
 </html>

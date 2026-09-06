@@ -16,7 +16,7 @@
     <!-- 2026 design tokens (must load before dash-shell.css) -->
     <link rel="stylesheet" href="/shared_components/css/art-hub.css">
     <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
-    <link rel="stylesheet" href="/dashboards/css/contract-break-even.css">
+    <link rel="stylesheet" href="/dashboards/css/contract-break-even.css?v=2026.09.05.72">
 </head>
 <body>
     <div class="dash-shell">
@@ -30,7 +30,7 @@
             </div>
             <div class="dash-header-right">
                 <a href="/staff-dashboard.html" class="dash-back-link">
-                    <i class="fas fa-arrow-left"></i>
+                    <i class="fas fa-arrow-left" aria-hidden="true"></i>
                     Dashboard
                 </a>
             </div>
@@ -38,10 +38,10 @@
 
         <main class="dash-content">
             <div class="dash-error-banner" role="alert">
-                <i class="fas fa-exclamation-triangle"></i>
+                <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
                 <span class="dash-error-banner-message"></span>
-                <button class="dash-error-banner-close" aria-label="Dismiss">
-                    <i class="fas fa-times"></i>
+                <button type="button" class="dash-error-banner-close" aria-label="Dismiss">
+                    <i class="fas fa-times" aria-hidden="true"></i>
                 </button>
             </div>
 
@@ -62,7 +62,7 @@
                     <button type="button" class="dash-btn" data-view="profit" aria-pressed="false">Profit / pc at the card</button>
                 </div>
                 <div class="cbe-actions">
-                    <button type="button" class="dash-btn" id="cbe-print"><i class="fas fa-print"></i> Print</button>
+                    <button type="button" class="dash-btn" id="cbe-print"><i class="fas fa-print" aria-hidden="true"></i> Print</button>
                 </div>
             </section>
 
@@ -94,6 +94,6 @@
     <script src="/config/app.config.js"></script>
     <script src="/shared_components/js/fetch-timeout.js"></script>
     <script src="/shared_components/js/dash-page-helpers.js"></script>
-    <script src="/dashboards/js/contract-break-even.js"></script>
+    <script src="/dashboards/js/contract-break-even.js?v=2026.09.05.72"></script>
 </body>
 </html>

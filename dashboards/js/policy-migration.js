@@ -20,12 +20,22 @@
         AUTO: '🤖 AUTO — archive/retire pile'
     };
 
-    document.addEventListener('DOMContentLoaded', function () {
-        loadData().catch(function (err) {
+    document.addEventListener('DOMContentLoaded', boot);
+
+    function boot() {
+        var root = document.getElementById('content-root');
+        if (root) { root.classList.add('dash-loading'); root.textContent = 'Loading…'; }
+        loadData().then(function () { DashPage.hideError(); }).catch(function (err) {
             console.error('[policy-migration] load failed:', err);
-            DashPage.showError('Unable to load migration data. Please refresh — or check the console.');
+            DashPage.showError('Unable to load migration data (' + (err.message || 'request failed') + ').');
+            if (root) {
+                root.classList.remove('dash-loading');
+                root.innerHTML = '<p class="pm-empty" role="alert">Migration data unavailable (' + esc(err.message || 'request failed') + '). ' +
+                    '<button type="button" class="dash-btn dash-btn--sm" id="pmig-retry">Retry</button></p>';
+                var rb = document.getElementById('pmig-retry'); if (rb) rb.addEventListener('click', boot);
+            }
         });
-    });
+    }
 
     function esc(s) {
         return String(s == null ? '' : s)

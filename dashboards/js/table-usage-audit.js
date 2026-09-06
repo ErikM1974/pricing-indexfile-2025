@@ -88,7 +88,7 @@
         if (va < vb) return -1 * d; if (va > vb) return 1 * d; return a.n.localeCompare(b.n);
     }
 
-    function sigChips(r) { return r.u.map(function (s) { return '<span class="tua-sig ' + s + '">' + s + '</span>'; }).join(' ') || '<span style="color:var(--gray-400)">—</span>'; }
+    function sigChips(r) { return r.u.map(function (s) { return '<span class="tua-sig ' + s + '">' + s + '</span>'; }).join(' ') || '<span class="tua-none">—</span>'; }
     function flagChips(r) {
         var out = [];
         if (r.dup) out.push('<span class="tua-flag dup" title="Name looks like a backup/old copy">dup/old</span>');
@@ -191,14 +191,14 @@
     // ---- live refresh (proxy /usage: view/rel/webhook wiring + fieldCount + new/gone) ----
     var liveInfoEl = document.getElementById('tuaLiveInfo');
     document.getElementById('tuaLive').addEventListener('click', function () {
-        var btn = this; btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Refreshing…';
+        var btn = this; btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Refreshing…';
         DashPage.fetchJson('/api/caspio-schema/usage')
             .then(function (j) {
                 applyLive(j);
                 refreshStats(); render();
                 var gone = DATA.filter(function (r) { return r._exists === false; }).length;
                 var isnew = DATA.filter(function (r) { return r._new; }).length;
-                btn.disabled = false; btn.innerHTML = '<i class="fas fa-rotate"></i> Refresh (live)';
+                btn.disabled = false; btn.innerHTML = '<i class="fas fa-rotate" aria-hidden="true"></i> Refresh (live)';
                 if (liveInfoEl) liveInfoEl.textContent = 'live: ' + (j.count || 0) + ' tables'
                     + (isnew ? ' · ' + isnew + ' new' : '') + (gone ? ' · ' + gone + ' gone' : '')
                     + ' · ' + new Date(j.generatedAt).toLocaleTimeString();
@@ -206,7 +206,7 @@
             .catch(function (err) {
                 console.error('refresh failed:', err);
                 DashPage.showError('Could not reach the live schema (proxy /api/caspio-schema/usage). Try again.');
-                btn.disabled = false; btn.innerHTML = '<i class="fas fa-rotate"></i> Refresh (live)';
+                btn.disabled = false; btn.innerHTML = '<i class="fas fa-rotate" aria-hidden="true"></i> Refresh (live)';
             });
     });
 

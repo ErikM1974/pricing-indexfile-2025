@@ -104,3 +104,7 @@
 .tua-empty { padding: var(--space-6); text-align: center; color: var(--gray-500); }
 
 @media (max-width: 700px) { .tua-actions { margin-left: 0; } }
+
+/* 2026-09-05 review */
+[hidden] { display: none !important; }
+.tua-none { color: var(--gray-400); }

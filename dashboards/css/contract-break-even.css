@@ -49,3 +49,6 @@
     .cbe-table td.loss, .cbe-table td.thin, .cbe-table th, .cbe-table tfoot td { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     .cbe-table { font-size: .78rem; }
 }
+
+/* 2026-09-05 review */
+[hidden] { display: none !important; }
