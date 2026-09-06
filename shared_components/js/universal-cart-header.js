@@ -70,13 +70,11 @@ class UniversalCartHeader {
         const badge = document.querySelector('.cart-count-badge');
         if (badge) {
             badge.textContent = this.cartCount;
-            badge.style.display = this.cartCount > 0 ? 'flex' : 'none';
+            badge.hidden = !(this.cartCount > 0);
 
             // Add pulse animation on count change
-            badge.style.animation = 'none';
-            setTimeout(() => {
-                badge.style.animation = 'badgePulse 0.3s ease-out';
-            }, 10);
+            badge.classList.remove('is-pulse');
+            setTimeout(() => { badge.classList.add('is-pulse'); }, 10);
         }
 
         // Update cart label
@@ -98,8 +96,6 @@ class UniversalCartHeader {
 
     generateHeaderHTML() {
         const cartIndicatorClass = this.options.isCartPage ? 'cart-indicator on-cart-page' : 'cart-indicator';
-        const cursorStyle = this.options.isCartPage ? 'cursor: default;' : 'cursor: pointer;';
-        const clickHandler = this.options.isCartPage ? '' : 'onclick="window.universalCartHeader.handleCartClick(event)"';
 
         return `
             <header class="universal-header">
@@ -113,23 +109,21 @@ class UniversalCartHeader {
                         ${this.options.showContactInfo ? `
                         <div class="contact-info">
                             <a href="tel:253-922-5793">
-                                <i class="fas fa-phone"></i>
+                                <i class="fas fa-phone" aria-hidden="true"></i>
                                 253-922-5793
                             </a>
                             <a href="mailto:sales@nwcustomapparel.com">
-                                <i class="fas fa-envelope"></i>
+                                <i class="fas fa-envelope" aria-hidden="true"></i>
                                 sales@nwcustomapparel.com
                             </a>
                         </div>
                         ` : ''}
-                        <div class="${cartIndicatorClass}"
-                             style="${cursorStyle}"
-                             ${clickHandler}
+                        <a class="${cartIndicatorClass}" href="${this.options.isCartPage ? '#' : this.options.cartPageUrl}"
                              aria-label="Shopping cart with ${this.cartCount} items">
-                            <i class="fas fa-shopping-cart"></i>
-                            <span class="cart-count-badge" style="display: ${this.cartCount > 0 ? 'flex' : 'none'};">${this.cartCount}</span>
+                            <i class="fas fa-shopping-cart" aria-hidden="true"></i>
+                            <span class="cart-count-badge"${this.cartCount > 0 ? '' : ' hidden'}>${this.cartCount}</span>
                             <span class="cart-label">${this.cartCount} ${this.cartCount === 1 ? 'item' : 'items'}</span>
-                        </div>
+                        </a>
                     </div>
                 </div>
             </header>
@@ -137,148 +131,8 @@ class UniversalCartHeader {
     }
 
     generateStyles() {
-        return `
-        <style>
-        .universal-header {
-            background: white;
-            border-bottom: 2px solid #4cb354;
-            padding: 1.5rem 0;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-
-        .universal-header .header-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .universal-header .logo-link {
-            text-decoration: none;
-        }
-
-        .universal-header .company-logo {
-            height: 50px;
-            transition: opacity 0.2s;
-        }
-
-        .universal-header .company-logo:hover {
-            opacity: 0.8;
-        }
-
-        .universal-header .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 2rem;
-        }
-
-        .universal-header .contact-info {
-            display: flex;
-            gap: 1.5rem;
-            align-items: center;
-        }
-
-        .universal-header .contact-info a {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: #1f2937;
-            text-decoration: none;
-            font-size: 0.9rem;
-            transition: color 0.2s;
-        }
-
-        .universal-header .contact-info a:hover {
-            color: #4cb354;
-        }
-
-        .universal-header .cart-indicator {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.75rem 1.25rem;
-            background: #4cb354;
-            color: white;
-            border-radius: 8px;
-            font-weight: 600;
-            position: relative;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-            transition: all 0.2s;
-        }
-
-        .universal-header .cart-indicator:not(.on-cart-page):hover {
-            background: #409a47;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
-        }
-
-        .universal-header .cart-indicator.on-cart-page {
-            opacity: 0.9;
-        }
-
-        .universal-header .cart-indicator i {
-            font-size: 1.25rem;
-        }
-
-        .universal-header .cart-count-badge {
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            background: #dc3545;
-            color: white;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.75rem;
-            font-weight: 700;
-            border: 2px solid white;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
-
-        @keyframes badgePulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.2); }
-            100% { transform: scale(1); }
-        }
-
-        .universal-header .cart-label {
-            font-size: 0.95rem;
-        }
-
-        @media (max-width: 768px) {
-            .universal-header .header-container {
-                flex-direction: column;
-                gap: 1rem;
-            }
-
-            .universal-header .header-actions {
-                width: 100%;
-                flex-direction: column;
-                gap: 1rem;
-            }
-
-            .universal-header .contact-info {
-                width: 100%;
-                justify-content: center;
-                gap: 1rem;
-                flex-wrap: wrap;
-            }
-
-            .universal-header .cart-indicator {
-                width: 100%;
-                justify-content: center;
-            }
-        }
-        </style>
-        `;
+        // Styles live in /shared_components/css/universal-cart-header.css (linked by the page) — nothing injected.
+        return '';
     }
 
     render() {
@@ -290,6 +144,10 @@ class UniversalCartHeader {
             // Insert at beginning of body if no placeholder
             document.body.insertAdjacentHTML('afterbegin', this.generateStyles() + this.generateHeaderHTML());
         }
+
+        // Cart indicator click (was an inline handler); a real link, so keyboard + middle-click work
+        const ind = document.querySelector('.cart-indicator');
+        if (ind) ind.addEventListener('click', (e) => this.handleCartClick(e));
 
         // Update cart count after render
         this.updateCartCount();

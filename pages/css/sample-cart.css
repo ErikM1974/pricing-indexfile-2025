@@ -296,3 +296,13 @@
     .empty-cart .features { grid-template-columns: 1fr; }
     .button-group .btn { width: 100%; justify-content: center; }
 }
+
+/* 2026-09-06 review: render-error card (was inline styles); remove control is a real button */
+.sc-render-error { margin: 2rem; padding: 1.5rem; background: #fee2e2; border: 1px solid #f87171; border-radius: 8px; }
+.sc-render-error h4 { color: #991b1b; margin-bottom: 0.5rem; }
+.sc-render-error p { color: #7f1d1d; margin: 0; }
+.sc-render-error .sc-reload { margin-top: 1rem; }
+button.item-remove { border: 0; background: transparent; font: inherit; }
+
+/* 2026-09-06 review: the hidden attribute must beat any display rule */
+[hidden] { display: none !important; }

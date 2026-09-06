@@ -19,14 +19,21 @@ export class InventoryDisplay {
         this.render();
     }
 
+    _wirePrint() {
+        if (this._printWired || !this.container) return;
+        this._printWired = true;
+        this.container.addEventListener('click', (e) => { if (e.target.closest('.print-inventory')) window.print(); });
+    }
+
     render() {
+        this._wirePrint();
         const { style, color, sizes, warehouses, sizeTotals, grandTotal } = this.data;
 
         let html = `
             <div class="inventory-header">
                 <span class="inventory-style">Style: ${style}</span>
                 <span class="inventory-color">Color: ${color}</span>
-                <button class="print-inventory" onclick="window.print()">🖨️ Print</button>
+                <button type="button" class="print-inventory">🖨️ Print</button>
             </div>
             
             <div class="table-wrapper">

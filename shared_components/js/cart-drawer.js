@@ -50,8 +50,8 @@ class CartDrawer {
                 <!-- Drawer Header -->
                 <div class="drawer-header">
                     <h3 class="drawer-title">Your Sample Cart</h3>
-                    <button type="button" class="drawer-close" id="drawer-close">
-                        <i class="fas fa-times"></i>
+                    <button type="button" class="drawer-close" id="drawer-close" aria-label="Close cart">
+                        <i class="fas fa-times" aria-hidden="true"></i>
                     </button>
                 </div>
 
@@ -226,7 +226,7 @@ class CartDrawer {
             swatch.title = color.name;
 
             // Add checkmark for selection
-            swatch.innerHTML = '<i class="fas fa-check color-check"></i>';
+            swatch.innerHTML = '<i class="fas fa-check color-check" aria-hidden="true"></i>';
 
             swatch.addEventListener('click', () => this.selectColor(color, swatch));
             container.appendChild(swatch);
@@ -368,7 +368,7 @@ class CartDrawer {
                             class="cart-item-remove"
                             onclick="cartDrawer.removeItem(${index})"
                             title="Remove">
-                        <i class="fas fa-trash"></i>
+                        <i class="fas fa-trash" aria-hidden="true"></i>
                     </button>
                 </div>
             `;
@@ -402,7 +402,7 @@ class CartDrawer {
         const toast = document.createElement('div');
         toast.className = 'drawer-toast';
         toast.innerHTML = `
-            <i class="fas fa-check-circle"></i>
+            <i class="fas fa-check-circle" aria-hidden="true"></i>
             <span>${message}</span>
         `;
         document.body.appendChild(toast);
