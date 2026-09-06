@@ -1453,3 +1453,12 @@ With debug logging gated, every page's console was read after load (clear → na
 - **CSP report-only stream** (Heroku logs): the only violations are `script-src-elem: inline` on `vendor-portals/sanmar-invoices.html` — the Caspio DataPage embed injects inline scripts. ⏭️ **Enforce-day backlog**: Caspio embeds need a nonce or `'unsafe-inline'` scoped to those pages before the policy can be enforced; nothing in our own code trips it.
 - Heroku logs (last 1,500 lines): no 5xx, no unhandled rejections.
 - The DTF page's "Calculator not found yet" timing message is a debug note now.
+
+# SCREEN-PRINT CALCULATOR: TIER STRIP FROM THE API (2026-09-06, `v2026.09.06.42`) — Rule #1 bug
+
+Found while chasing the fee labels: `screenprint-pricing-v2.js` typed its quantity-tier buttons as **24-36 (+$75) / 37-71 (+$50) / 72-144 / 145-576** while live Caspio `Pricing_Tiers` for ScreenPrint are **24-47 (LTM $50) / 48-71 ($0) / 72-144 / 145-576**. The engine priced from the API (`findTierForQuantity` + `LTM_Fee`), so a customer at 50 pieces saw "+ $50 Small Batch Fee" and "$50 ÷ 50 = $1.00/piece" while paying no fee, and at 30 pieces saw $75 while paying $50 — confirmed on the live page before the fix.
+1. `renderTierButtons()` builds the strip from `masterBundle.tierData|tiersR|tiers`: one button per tier (`sp-tier-<TierLabel>`, "min-max pieces" / "145+ pieces", fee note only when `LTM_Fee > 0`), an exact-quantity input + hint only for LTM tiers (`sp-qty-<label>`, `sp-ltm-calc-<label>`, clamped to the tier range), handlers wired per tier; `isQuantityInTier` / `collapseLTMTiers` / `expandLTMTier` / `isLtmTier` read the same list. Art-setup tooltip amount from Service_Codes `GRT-50`.
+2. Lock (`calculator-shared-components`): no typed tier id / fee / "$75 Small Batch" in v2, `renderTierButtons` + `LTM_Fee` + `map['GRT-50']` present.
+3. ⚠️ The scripted refactor's `cut(start, end)` between two markers removed 117 lines of unrelated methods (`updateColorToggles` …) — caught only because the local dev-server probe showed the calculator failing to construct. Restored from `git show HEAD:`, method list diffed against HEAD (0 missing, 6 added). 🔑 Assert the method count before/after any marker-based cut.
+4. Dead duplicate `showError()` (alert) removed — the banner version always won.
+5. Verified on the local dev server and live: 24-47 (+$50) selected with the exact-quantity input open, 50 clamps to 47 inside 24-47, 48-71 has no fee and no input, tier label + prices follow, console clean.

@@ -58,6 +58,19 @@ describe('shared calculator scripts', () => {
         expect(js).toMatch(/map\['GRT-50'\]/); // art-setup tooltip amount from Service_Codes
     });
 
+    test('DTG calculator: tier strip from the API tiers, sub-24 priced through the canonical engine (2026-09-06)', () => {
+        // Caspio split the DTG LTM row into 1-11 (fee) and 12-23 (none); the page still typed "Less than 24 + $50"
+        // and priced every sub-24 quantity as 24-47 + $50 — disagreeing with Quick Quote and the builders.
+        const html = read('calculators/dtg-pricing.html');
+        expect(html).toMatch(/id="dtg-tier-list"/);
+        expect(html).not.toMatch(/data-tier="1-23"|Less than 24 pieces|\$50 Small Batch|\$50 ÷ 12/);
+        const js = read('calculators/js/dtg-pricing-page.js');
+        expect(js).toMatch(/function renderTierButtons\(\)/);
+        expect(js).toMatch(/DTGCanonicalPricing\.ltmPerUnit\(/);
+        expect(js).toMatch(/DTGCanonicalPricing\.priceForLocationCombo\(/);
+        expect(js).not.toMatch(/'1-23'|'24-47' : tierLabel|Less than 24|: 50\.00/);
+    });
+
     test('the extracted stylesheets exist', () => {
         expect(read('shared_components/css/calculator-inventory.css')).toMatch(/\.calc-inv-bar \{/);
         expect(read('shared_components/css/manual-mode-indicator.css')).toMatch(/\.manual-mode-banner/);

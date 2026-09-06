@@ -24,41 +24,7 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 ### Customer login dropped the deep link it was handed (2026-09-05, ARCHIVED 2026-09-06, `v2026.09.05.26`): a login page must carry its `?next=` through every hop (magic-link request → email → callback) and validate it as a same-origin path; test the round trip, not the first page. Full entry in archive.
 ### JSON-in-attribute broke on the first quote (Names & Numbers delete button, 2026-09-05, ARCHIVED 2026-09-06, `v2026.09.05.17`): never put JSON with quotes/apostrophes in an HTML attribute — pass an index/id and look the record up, or escape with `escapeHtml` on the attribute value. Full entry in archive.
 ### Customer Portals console said nobody had ever signed in (2026-09-05, ARCHIVED 2026-09-06): a "0" that never moves is a broken reader, not a quiet business — the count read a field the login flow never wrote; assert every counter against a source of truth once. Full entry in archive.
-
-## 2026-09-05 — Whole-dashboard deep-review sweep (`.24` → `.75`, 54 pages): the same six bugs kept reappearing
-
-**Problem.** Fifty-four staff pages, each "done" by a different session, shared the same defects: (1) a
-page's error banner span carried a class the shared helper never writes (`.dash-error-text` vs
-`.dash-error-banner-message`) so **every** failure on the Blog Editor showed an empty red bar; (2)
-`toISOString().slice(0,10)` as "today" on SIX pages (Payables default range + import-stamp, Payroll pill +
-slip run date, Forms Inbox `Date_Returned`, Volume Quote valid-until, Ruth's due badges, Monogram date
-filter) — a day ahead after 5 PM Pacific, and in Ruth's case "due today" read OVERDUE all day; (3) flex/grid
-wrappers beating the UA `[hidden]` rule (Jim's Mailing List showed an empty screenshot placeholder on every
-load; the vendor portal showed its error banner on every load); (4) `r.ok ? r.json() : {rows:[]}` rendering a
-500 as "No matches"/"No photos yet" (Finished Photos, Payables imports cross-ref → every row "NOT IMPORTED");
-(5) prices typed in reference UIs (Digitized Designs AL tables, Ruth's Billing Codes, the shared art-time
-modal's `* 75` in 18 places incl. a Caspio write); (6) click-only tiles/chips/rows and unlabelled dialogs.
-
-**Root cause.** Each page was built to work, not to fail: no page had a failure-path smoke, no shared
-lock caught a helper/class mismatch, and "today" was written six different ways because no helper existed.
-
-**Solution.** One jest lock per page (`tests/unit/<page>-page.test.js`, ~30 new files) + a section per page in
-`memory/DASHBOARD_REVIEWS_2026-09.md`; fixes verified on `static-dist` with fetch stubbed to FAIL first,
-then live in Erik's Chrome. Shared fixes: `artRate()` from Service_Codes GRT-75 with a visible fallback note;
-`/api/al-pricing` behind the Digitized AL modal; `SanMarInvoiceViewer` title/focus fixes for 3 pages.
-
-**Prevention.**
-- 🔴 **Smoke the failure path first**: on static-dist every same-origin API 404s — if a page shows an empty
-  state, a blank banner, or stale data instead of the reason + Retry, that is the bug.
-- 🔴 **"Today" = local calendar day** (`getFullYear/getMonth/getDate`), never `toISOString().slice(0,10)`;
-  Caspio `YYYY-MM-DD` parses via `parseCalendarDate()`; compare at DAY granularity.
-- 🔴 Every page CSS carries `[hidden] { display: none !important; }` — the lock for each page asserts it.
-- 🔴 A helper's DOM contract (`.dash-error-banner-message`, `.dash-error-banner-close`) is locked per page;
-  a wrong class is a silent error path.
-- 🔑 Computed colours/sizes go in `style="--w:…"` custom properties + a CSS `var()` — the lock regex allows
-  `style="--` and nothing else. Icons are `aria-hidden`; a `title`-only button also gets `aria-label`.
-- 🔑 Background tabs freeze CSS transitions — a `width` read as 0 with `--w: 85%` set is the tab, not the CSS
-  (`document.hidden`); set `transition:none` before trusting a computed size.
+### Whole-dashboard deep-review sweep — the same six bugs kept reappearing (2026-09-05, ARCHIVED 2026-09-06, `.24`→`.75`, 54 pages): UTC "today", `[hidden]` beaten by flex, silent-empty states, hardcoded `* 75` art rates, unversioned assets, inline handlers — each is now a jest lock; a review without a lock is a review that repeats. Full entry in archive.
 
 ## 2026-09-06 — Customer-facing sweep (`v2026.09.05.77` → `v2026.09.06.5`, 5 batches, ~70 public pages): the SAME rules the staff pages broke, plus three real bugs
 
@@ -285,3 +251,20 @@ backtick literals); grep the diff for `'…${` before committing. 🔑 After any
 fetch URLs, read the live console AND the failed-request list on the pages that use them —
 a green suite proves nothing about a URL no test builds. 🔑 Read `performance.getEntriesByType('resource')`
 for `responseStatus >= 400`: it shows the literal URL that went out.
+
+## 2026-09-06 — The screen-print tier buttons promised a fee Caspio no longer charges (`v2026.09.06.42`)
+
+**Problem.** Erik moved the ScreenPrint tiers in Caspio (24-47 with a $50 LTM, 48-71 with none).
+The calculator's ENGINE followed (it reads `LTM_Fee` off the matched API tier) but its tier strip
+was typed in the template: "24-36 + $75 Small Batch Fee", "37-71 + $50", with `(75 / clamped)` and
+`(50 / clamped)` in the input handlers. At 50 pieces the page showed a $50 fee it did not charge.
+**Root cause.** "Pricing from the API" was applied to the numbers that reach the total and not to
+the numbers the customer READS; the strip was built once for a tier layout and never re-derived.
+**Solution.** The strip, its inputs, clamps and hints are rendered from the API tiers when the
+bundle lands; the art-setup tooltip reads GRT-50; a lock forbids typed tier ids/fees in v2.
+**Prevention.** 🔑 Every dollar or range a customer can read is pricing — grep templates for
+`$\d` and `\d+-\d+ pieces`, not just the math. 🔑 Compare the UI's tier labels with
+`GET /api/pricing-bundle` tiers on each calculator after ANY Caspio tier change. 🔑 A
+marker-based `cut()` in a refactor script must assert the method count before/after (117
+unrelated lines vanished here and only a runtime probe caught it). 🔑 The dev server serves
+`/dist` hashed assets — `node scripts/build.js` before a local probe, or you test the old file.
