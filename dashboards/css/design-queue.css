@@ -678,3 +678,10 @@
         grid-column: 2;
     }
 }
+
+/* 2026-09-05 review — verdict tiles are filter buttons */
+[hidden] { display: none !important; }
+.dq-stat-btn { font: inherit; text-align: left; cursor: pointer; color: inherit; }
+.dq-stat-btn[aria-pressed="true"] { outline: 2px solid var(--art-theme, #0a8a1f); outline-offset: -2px; }
+.dq-stat-btn:focus-visible { outline: 2px solid var(--art-theme, #0a8a1f); outline-offset: 2px; }
+.dq-empty .dq-refresh, .dq-note .dq-refresh, .dq-notice .dq-refresh { margin-left: 8px; }

@@ -19,3 +19,15 @@
         .dashboard-table .actions { display: flex; gap: 0.4rem; }
         .filter-bar { display: flex; gap: 0.75rem; margin-bottom: 1.5rem; flex-wrap: wrap; align-items: end; }
         .filter-bar .form-group { min-width: 180px; }
+
+/* 2026-09-05 review */
+[hidden] { display: none !important; }
+.kpi-btn { font: inherit; color: inherit; text-align: center; cursor: pointer; }
+.kpi-btn[aria-pressed="true"] { outline: 2px solid var(--nn-primary, #4cb354); outline-offset: -2px; }
+.kpi-btn:focus-visible, .dashboard-table tr[role="link"]:focus-visible, .btn-sm:focus-visible { outline: 2px solid var(--nn-primary, #4cb354); outline-offset: 2px; }
+.filter-bar > .btn-primary, .filter-bar > .btn-secondary { align-self: end; }
+.nn-result-count { align-self: end; padding-bottom: 0.6rem; font-size: 0.85rem; color: var(--nn-text-secondary, #6b7280); margin-left: auto; }
+.nn-table-msg { text-align: center; padding: 2rem; color: var(--nn-text-secondary, #6b7280); }
+.nn-table-msg--error { color: var(--nn-error-text, #b91c1c); }
+.nn-table-msg .btn-sm { margin-left: 8px; }
+.dashboard-table tr[data-href] { cursor: pointer; }

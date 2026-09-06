@@ -22,7 +22,23 @@ let uniqueSalesReps = [];
  */
 document.addEventListener('DOMContentLoaded', function() {
     loadMonograms();
+    // Filters (were inline onkeyup/onchange= — Rule 3). Search is debounced; the rest filter on change.
+    var search = document.getElementById('searchInput');
+    var timer = null;
+    if (search) search.addEventListener('input', function () { clearTimeout(timer); timer = setTimeout(filterMonograms, 150); });
+    ['salesRepFilter', 'statusFilter', 'dateFrom', 'dateTo'].forEach(function (id) {
+        var el = document.getElementById(id);
+        if (el) el.addEventListener('change', filterMonograms);
+    });
 });
+
+// A Caspio/ISO timestamp compared against the <input type=date> values must use the LOCAL calendar
+// day — `toISOString()` is UTC, so an order created at 6 PM Pacific fell on the next day's date filter.
+function localYmd(value) {
+    var d = new Date(value);
+    if (isNaN(d.getTime())) return '';
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
 
 /**
  * Load all monograms from API
@@ -35,13 +51,14 @@ async function loadMonograms() {
     tbody.innerHTML = `
         <tr>
             <td colspan="7" class="loading">
-                <i class="fas fa-spinner"></i> Loading monograms...
+                <i class="fas fa-spinner" aria-hidden="true"></i> Loading monograms...
             </td>
         </tr>
     `;
 
     try {
         const response = await fetch(`${apiUrl}/api/monograms`);
+        if (!response.ok) throw new Error('HTTP ' + response.status);
         const data = await response.json();
 
         if (data.success && data.monograms) {
@@ -58,16 +75,16 @@ async function loadMonograms() {
         console.error('Error loading monograms:', error);
         tbody.innerHTML = `
             <tr>
-                <td colspan="7" class="empty-state">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    <p>Unable to load monograms. Please try again.</p>
-                    <button class="btn btn-primary" data-call="loadMonograms" style="margin-top: 1rem;">
-                        <i class="fas fa-sync-alt"></i> Retry
+                <td colspan="7" class="empty-state" role="alert">
+                    <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
+                    <p>Unable to load monograms (${escapeHTML(error.message || 'request failed')}).</p>
+                    <button type="button" class="btn btn-primary retry-btn" data-call="loadMonograms">
+                        <i class="fas fa-sync-alt" aria-hidden="true"></i> Retry
                     </button>
                 </td>
             </tr>
         `;
-        resultCount.textContent = 'Error loading data';
+        resultCount.textContent = 'Error loading data — ' + (error.message || 'request failed');
     }
 }
 
@@ -142,15 +159,10 @@ function filterMonograms() {
         }
 
         // Date from filter
-        if (dateFrom) {
-            const monogramDate = new Date(m.CreatedAt).toISOString().split('T')[0];
-            if (monogramDate < dateFrom) return false;
-        }
-
-        // Date to filter
-        if (dateTo) {
-            const monogramDate = new Date(m.CreatedAt).toISOString().split('T')[0];
-            if (monogramDate > dateTo) return false;
+        if (dateFrom || dateTo) {
+            const monogramDate = localYmd(m.CreatedAt);
+            if (dateFrom && monogramDate < dateFrom) return false;
+            if (dateTo && monogramDate > dateTo) return false;
         }
 
         return true;
@@ -170,8 +182,8 @@ function renderTable(data) {
         tbody.innerHTML = `
             <tr>
                 <td colspan="7" class="empty-state">
-                    <i class="fas fa-inbox"></i>
-                    <p>No monogram orders found</p>
+                    <i class="fas fa-inbox" aria-hidden="true"></i>
+                    <p>No monogram orders match these filters</p>
                 </td>
             </tr>
         `;
@@ -198,25 +210,25 @@ function renderTable(data) {
                 </td>
                 <td>${companyName}</td>
                 <td>${salesRep}</td>
-                <td style="text-align: center;">${totalItems}</td>
+                <td class="td-center">${totalItems}</td>
                 <td>${createdDate}</td>
-                <td style="text-align: center;">${statusBadge}</td>
-                <td>
-                    <button class="action-btn edit" data-call="editMonogram" data-args="[${Number(orderNum)}]" title="Edit">
-                        <i class="fas fa-edit"></i>
+                <td class="td-center">${statusBadge}</td>
+                <td class="td-actions">
+                    <button type="button" class="action-btn edit" data-call="editMonogram" data-args="[${Number(orderNum)}]" title="Edit" aria-label="Edit order ${orderNum}">
+                        <i class="fas fa-edit" aria-hidden="true"></i>
                     </button>
-                    <button class="action-btn print" data-call="printMonogram" data-args="[${Number(orderNum)}]" title="Print">
-                        <i class="fas fa-print"></i>
+                    <button type="button" class="action-btn print" data-call="printMonogram" data-args="[${Number(orderNum)}]" title="Print" aria-label="Print order ${orderNum}">
+                        <i class="fas fa-print" aria-hidden="true"></i>
                     </button>
-                    <button class="action-btn proof" data-call="proofMonogram" data-args="[${Number(orderNum)}]" title="Customer Proof">
-                        <i class="fas fa-file-signature"></i>
+                    <button type="button" class="action-btn proof" data-call="proofMonogram" data-args="[${Number(orderNum)}]" title="Customer Proof" aria-label="Customer proof for order ${orderNum}">
+                        <i class="fas fa-file-signature" aria-hidden="true"></i>
                     </button>
                     ${status !== 'Printed' ? `
-                    <button class="action-btn done" data-call="markPrinted" data-args="[${Number(idMonogram)}]" title="Mark as Printed">
-                        <i class="fas fa-check"></i>
+                    <button type="button" class="action-btn done" data-call="markPrinted" data-args="[${Number(idMonogram)}]" title="Mark as Printed" aria-label="Mark order ${orderNum} as printed">
+                        <i class="fas fa-check" aria-hidden="true"></i>
                     </button>` : ''}
-                    <button class="action-btn delete" data-call="deleteMonogram" data-args="[${Number(idMonogram)}, ${Number(orderNum)}]" title="Delete">
-                        <i class="fas fa-trash"></i>
+                    <button type="button" class="action-btn delete" data-call="deleteMonogram" data-args="[${Number(idMonogram)}, ${Number(orderNum)}]" title="Delete" aria-label="Delete order ${orderNum}">
+                        <i class="fas fa-trash" aria-hidden="true"></i>
                     </button>
                 </td>
             </tr>
@@ -265,10 +277,10 @@ function truncate(str, maxLen) {
  */
 function getStatusBadge(status) {
     const badges = {
-        'Submitted': '<span class="badge badge-secondary"><i class="fas fa-clock"></i> Submitted</span>',
-        'Printed': '<span class="badge badge-success"><i class="fas fa-check"></i> Printed</span>',
-        'Complete': '<span class="badge badge-info"><i class="fas fa-check-double"></i> Complete</span>',
-        'Cancelled': '<span class="badge badge-warning"><i class="fas fa-ban"></i> Cancelled</span>'
+        'Submitted': '<span class="badge badge-secondary"><i class="fas fa-clock" aria-hidden="true"></i> Submitted</span>',
+        'Printed': '<span class="badge badge-success"><i class="fas fa-check" aria-hidden="true"></i> Printed</span>',
+        'Complete': '<span class="badge badge-info"><i class="fas fa-check-double" aria-hidden="true"></i> Complete</span>',
+        'Cancelled': '<span class="badge badge-warning"><i class="fas fa-ban" aria-hidden="true"></i> Cancelled</span>'
     };
     return badges[status] || badges['Submitted'];
 }
@@ -312,6 +324,7 @@ async function markPrinted(idMonogram) {
             body: JSON.stringify({ Status: 'Printed', PrintedAt: new Date().toISOString() })
         });
 
+        if (!response.ok) throw new Error('HTTP ' + response.status);
         const data = await response.json();
 
         if (data.success) {
@@ -325,7 +338,7 @@ async function markPrinted(idMonogram) {
         }
     } catch (error) {
         console.error('Error marking as printed:', error);
-        showToast('Failed to update status', 'error');
+        showToast('Failed to mark as printed: ' + (error.message || 'request failed'), 'error');
     }
 }
 
@@ -339,13 +352,13 @@ async function deleteMonogram(idMonogram, orderNumber) {
 
     // Disable all delete buttons to prevent double-clicks
     const deleteButtons = document.querySelectorAll('.action-btn.delete');
-    deleteButtons.forEach(btn => { btn.disabled = true; btn.style.opacity = '0.5'; });
+    deleteButtons.forEach(btn => { btn.disabled = true; });
 
     try {
         const response = await fetch(`${apiUrl}/api/monograms/${idMonogram}`, {
             method: 'DELETE'
         });
-
+        if (!response.ok) throw new Error('HTTP ' + response.status);
         const data = await response.json();
 
         if (data.success) {
@@ -356,10 +369,10 @@ async function deleteMonogram(idMonogram, orderNumber) {
         }
     } catch (error) {
         console.error('Error deleting monogram:', error);
-        showToast('Failed to delete monogram', 'error');
+        showToast('Failed to delete monogram: ' + (error.message || 'request failed'), 'error');
     } finally {
         // Re-enable delete buttons
-        deleteButtons.forEach(btn => { btn.disabled = false; btn.style.opacity = '1'; });
+        deleteButtons.forEach(btn => { btn.disabled = false; });
     }
 }
 
@@ -379,6 +392,7 @@ function showToast(message, type = 'info') {
 
     // Set type class for color
     toast.className = `toast ${type}`;
+    toast.setAttribute('role', type === 'error' ? 'alert' : 'status');
     toast.textContent = message;
 
     // Show toast with CSS transition

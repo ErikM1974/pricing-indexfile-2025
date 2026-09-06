@@ -47,10 +47,14 @@
             root.classList.remove('dash-loading');
             root.innerHTML = '';
             // Never a stale or invented figure — say it failed and why.
-            root.appendChild(notice('warn', 'Could not read the store',
+            var n = notice('warn', 'Could not read the store',
                 ['The Shopify read failed: ' + String(err.message || err) + '. Nothing below is a '
-                 + 'measurement — refresh, and if it persists the proxy or the Shopify credential '
-                 + 'needs a look.']));
+                 + 'measurement — if it persists the proxy or the Shopify credential needs a look.']);
+            var retry = el('button', 'dq-refresh', 'Retry');
+            retry.type = 'button';
+            retry.addEventListener('click', function () { load(true); });
+            n.appendChild(retry);
+            root.appendChild(n);
         }
     }
 

@@ -531,3 +531,11 @@ body {
         display: none;
     }
 }
+
+/* 2026-09-05 review */
+[hidden] { display: none !important; }
+.breadcrumb-sep { opacity: 0.5; }
+.td-center { text-align: center; }
+.retry-btn { margin-top: 1rem; }
+.action-btn:disabled { opacity: 0.5; cursor: default; }
+.action-btn:focus-visible, .btn:focus-visible, .order-link:focus-visible { outline: 2px solid var(--primary-color, #4cb354); outline-offset: 2px; }

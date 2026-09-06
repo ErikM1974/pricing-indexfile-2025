@@ -22,7 +22,12 @@
 
     document.addEventListener('DOMContentLoaded', function () {
         var root = document.getElementById('briefs-root');
-        if (!root) return;
+        if (root) load(root);
+    });
+
+    function load(root) {
+        root.classList.add('dash-loading');
+        root.textContent = 'Loading the briefs…';
         // The queue controller already fetches the file; read it again rather than couple
         // the two modules. It is a static file behind a 5-minute cache, so the cost is nil.
         fetch('/dashboards/data/design-queue.json?v=' + Date.now(), { cache: 'no-store' })
@@ -35,9 +40,14 @@
                 console.error('[design-queue-briefs]', err);
                 root.classList.remove('dash-loading');
                 root.innerHTML = '';
-                root.appendChild(el('p', 'dq-note', 'Could not load the briefs. Refresh — and if it persists the data file may not have deployed.'));
+                var p = el('p', 'dq-note', 'Could not load the briefs (' + (err.message || err) + '). If it persists the data file may not have deployed. ');
+                var retry = el('button', 'dq-refresh', 'Retry');
+                retry.type = 'button';
+                retry.addEventListener('click', function () { load(root); });
+                p.appendChild(retry);
+                root.appendChild(p);
             });
-    });
+    }
 
     function render(root, d) {
         root.classList.remove('dash-loading');
