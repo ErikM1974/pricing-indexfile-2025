@@ -41,27 +41,35 @@
         modal.id = 'smiv-modal';
         modal.setAttribute('role', 'dialog');
         modal.setAttribute('aria-modal', 'true');
+        modal.setAttribute('aria-labelledby', 'smiv-title');
         modal.hidden = true;
         modal.innerHTML =
             '<div class="smiv-head">' +
-            '<h2 class="smiv-title" id="smiv-title"><i class="fas fa-file-invoice-dollar"></i> SanMar Invoice</h2>' +
+            '<h2 class="smiv-title" id="smiv-title"><i class="fas fa-file-invoice-dollar" aria-hidden="true"></i> SanMar Invoice</h2>' +
             '<div class="smiv-head-actions">' +
-            '<button type="button" id="smiv-print" class="smiv-btn smiv-btn--primary"><i class="fas fa-print"></i> Print / Save PDF</button>' +
-            '<button type="button" class="smiv-close" id="smiv-close" aria-label="Close"><i class="fas fa-times"></i></button>' +
+            '<button type="button" id="smiv-print" class="smiv-btn smiv-btn--primary"><i class="fas fa-print" aria-hidden="true"></i> Print / Save PDF</button>' +
+            '<button type="button" class="smiv-close" id="smiv-close" aria-label="Close"><i class="fas fa-times" aria-hidden="true"></i></button>' +
             '</div></div>' +
-            '<div class="smiv-body" id="smiv-body"></div>';
+            '<div class="smiv-body" id="smiv-body" role="status" aria-live="polite"></div>';
         document.body.appendChild(overlay);
         document.body.appendChild(modal);
         document.getElementById('smiv-close').addEventListener('click', close);
         overlay.addEventListener('click', close);
         document.getElementById('smiv-print').addEventListener('click', print);
-        document.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
+        document.addEventListener('keydown', function (e) {
+            var m = document.getElementById('smiv-modal');
+            if (e.key === 'Escape' && m && !m.hidden) close();
+        });
     }
 
+    var returnFocus = null;
     function close() {
         var o = document.getElementById('smiv-overlay'), m = document.getElementById('smiv-modal');
+        var wasOpen = !!(m && !m.hidden);
         if (o) o.hidden = true;
         if (m) m.hidden = true;
+        if (wasOpen && returnFocus && document.body.contains(returnFocus)) { try { returnFocus.focus(); } catch (e) { /* gone */ } }
+        returnFocus = null;
     }
 
     function invoiceHtml(inv, wo, company) {
@@ -107,10 +115,15 @@
         var wo = opts.wo, company = opts.company || '', pos = opts.pos || [], orderedDate = opts.orderedDate || '';
         if (!pos.length) return;
         ensureModal();
+        returnFocus = opts.returnFocus || document.activeElement;
         document.getElementById('smiv-overlay').hidden = false;
         document.getElementById('smiv-modal').hidden = false;
-        document.getElementById('smiv-title').innerHTML = '<i class="fas fa-file-invoice-dollar"></i> SanMar Invoice — WO #' + esc(wo);
+        // Title names what was asked for: the WO when the caller has one, else the PO(s). (Was "WO #undefined"
+        // whenever a page opened the viewer by PO only — SanMar Payables does.)
+        var subject = wo ? 'WO #' + esc(wo) : 'PO ' + pos.map(esc).join(', ');
+        document.getElementById('smiv-title').innerHTML = '<i class="fas fa-file-invoice-dollar" aria-hidden="true"></i> SanMar Invoice — ' + subject;
         document.getElementById('smiv-print').disabled = true;
+        setTimeout(function () { var c = document.getElementById('smiv-close'); if (c) c.focus(); }, 30);
         var body = document.getElementById('smiv-body');
         body.innerHTML = '<div class="smiv-loading">Fetching the invoice from SanMar…</div>';
 

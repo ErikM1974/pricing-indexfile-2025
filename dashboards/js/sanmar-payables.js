@@ -31,6 +31,7 @@
     var state = {
         activeTab: 'invoices',
         unpaid: [], range: { start: '', end: '' },
+        loadError: '',
         imports: null, importsLoaded: false, // Map(normInv → {date}) — self-managed "imported to ShopWorks" stamps (primary)
         sw: null,       // { map: Map(normInv → {datePaid, outstanding}) } — optional ShopWorks feed/upload (adds Paid)
         mkt: null
@@ -62,8 +63,11 @@
         return (n < 0 ? '-$' : '$') + Math.abs(n).toLocaleString('en-US', { maximumFractionDigits: 0 });
     }
     function basePo(po) { return String(po || '').replace(/\s+[A-Za-z]+$/, '').trim(); }
-    function isoDaysAgo(n) { var d = new Date(); d.setDate(d.getDate() - n); return d.toISOString().slice(0, 10); }
-    function todayIso() { return new Date().toISOString().slice(0, 10); }
+    // LOCAL calendar day — toISOString() is UTC, which after 5 PM Pacific is already tomorrow (the
+    // default date range and the import-stamp date were a day ahead every evening).
+    function localIso(d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+    function isoDaysAgo(n) { var d = new Date(); d.setDate(d.getDate() - n); return localIso(d); }
+    function todayIso() { return localIso(new Date()); }
     function termsOf(i) { return String(i.terms || '').toUpperCase(); }
     function isMarketing(i) { return termsOf(i) === 'MRKFUND'; }
 
@@ -114,8 +118,30 @@
     }
 
     document.addEventListener('DOMContentLoaded', function () {
-        Array.prototype.forEach.call(document.querySelectorAll('.smp-tab'), function (btn) {
+        var tabs = Array.prototype.slice.call(document.querySelectorAll('.smp-tab'));
+        tabs.forEach(function (btn, i) {
             btn.addEventListener('click', function () { switchTab(btn.dataset.tab); });
+            // WAI-ARIA tabs: arrow keys move between Invoices / Marketing Fund
+            btn.addEventListener('keydown', function (e) {
+                if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+                var n = tabs[(i + (e.key === 'ArrowRight' ? 1 : tabs.length - 1)) % tabs.length];
+                n.focus(); switchTab(n.dataset.tab);
+            });
+        });
+        // Stat tiles set the Show filter (click the active tile to go back to "Not imported & unpaid")
+        Array.prototype.forEach.call(document.querySelectorAll('.smp-stat-btn'), function (t) {
+            t.addEventListener('click', function () {
+                var sel = el('smp-status-filter');
+                if (sel.disabled) return;
+                var f = t.dataset.filter;
+                sel.value = (sel.value === f) ? 'needimport' : f;
+                renderInvoiceTable();
+            });
+        });
+        // The upload control is a <label for=file> — make it keyboard-operable
+        var up = document.querySelector('.smp-upload-btn');
+        if (up) up.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); el('smp-sw-file').click(); }
         });
         el('smp-start').value = isoDaysAgo(RECENT_DAYS);
         el('smp-end').value = todayIso();
@@ -150,7 +176,10 @@
         if (tab === state.activeTab) return;
         state.activeTab = tab;
         Array.prototype.forEach.call(document.querySelectorAll('.smp-tab'), function (b) {
-            b.classList.toggle('is-active', b.dataset.tab === tab);
+            var on = b.dataset.tab === tab;
+            b.classList.toggle('is-active', on);
+            b.setAttribute('aria-selected', on ? 'true' : 'false');
+            b.tabIndex = on ? 0 : -1;
         });
         el('smp-panel-invoices').hidden = tab !== 'invoices';
         el('smp-panel-marketing').hidden = tab !== 'marketing';
@@ -170,6 +199,7 @@
         el('smp-select-all').checked = false;
         // GetUnpaidInvoices returns the full open ledger; filter to vendor-1002 (non-MRKFUND) in the date window.
         fetchJson('/api/staff/sanmar-invoices/unpaid').then(function (data) {
+            state.loadError = '';
             var all = (data.invoices || []).filter(function (i) { return !isMarketing(i); });
             state.olderCount = all.filter(function (i) { return String(i.invoiceDate) < start; }).length;
             state.unpaid = all.filter(function (i) {
@@ -185,9 +215,11 @@
                 new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) +
                 ' · ' + toMDY(start) + ' – ' + toMDY(end);
         }).catch(function (err) {
-            DashPage.showError('Could not load open payables: ' + err.message + ' — refresh to retry.');
-            el('smp-tbody').innerHTML = '<tr><td colspan="8" class="smp-empty">Not loaded — ' + esc(err.message) + '</td></tr>';
-            state.unpaid = []; renderInvoiceStats();
+            DashPage.showError('Could not load open payables: ' + err.message);
+            // Remember the failure: renderInvoiceTable() is also called by the imports/ShopWorks feeds
+            // when THEY land, and used to overwrite this row with "No open payables in this range".
+            state.loadError = err.message || 'request failed';
+            state.unpaid = []; renderInvoiceStats(); renderInvoiceTable();
         });
     }
 
@@ -203,6 +235,13 @@
         var m = state.sw ? state.sw.map.get(norm) : null;
         var paid = !!(m && m.datePaid && m.datePaid.trim());
         return { known: true, imported: !!(stamp || m), paid: paid, datePaid: m ? m.datePaid : '', importedDate: stamp ? stamp.date : '' };
+    }
+
+    function syncStatTiles() {
+        var sel = el('smp-status-filter');
+        Array.prototype.forEach.call(document.querySelectorAll('.smp-stat-btn'), function (t) {
+            t.setAttribute('aria-pressed', (!sel.disabled && sel.value === t.dataset.filter) ? 'true' : 'false');
+        });
     }
 
     function matchesStatus(inv) {
@@ -249,7 +288,14 @@
     }
 
     function renderInvoiceTable() {
+        syncStatTiles();
         var rows = filteredInvoices();
+        if (!rows.length && state.loadError) {
+            el('smp-tbody').innerHTML = '<tr><td colspan="8" class="smp-empty" role="alert">Not loaded — ' + esc(state.loadError) + ' ' +
+                '<button type="button" class="dash-btn smp-retry" id="smp-inv-retry">Retry</button></td></tr>';
+            var rb = el('smp-inv-retry'); if (rb) rb.addEventListener('click', loadInvoices);
+            el('smp-select-all').checked = false; updateSelectionCount(); return;
+        }
         if (!rows.length) {
             el('smp-tbody').innerHTML = '<tr><td colspan="8" class="smp-empty">' +
                 (state.unpaid.length ? 'No open payables match the current filters.' : 'No open SanMar payables in this date range.') + '</td></tr>';
@@ -338,7 +384,19 @@
             enableStatusFilter();
             el('smp-sw-status').textContent = statusLine();
             renderInvoiceStats(); renderInvoiceTable();
-        }).catch(function () { state.importsLoaded = true; renderInvoiceStats(); renderInvoiceTable(); });
+        }).catch(function (err) {
+            // Rule 4: the imported cross-reference failing must be SEEN — otherwise every row reads
+            // "NOT IMPORTED" and looks like fresh work.
+            state.importsLoaded = true;
+            var st = el('smp-sw-status');
+            st.textContent = '\u26a0 Imported status unavailable (' + (err.message || 'request failed') + ') — every row shows as not imported. ';
+            st.classList.add('smp-sw-status--warn');
+            var rb = document.createElement('button');
+            rb.type = 'button'; rb.className = 'smp-linkbtn'; rb.textContent = 'Retry';
+            rb.addEventListener('click', function () { st.classList.remove('smp-sw-status--warn'); st.textContent = 'Loading imported status…'; state.importsLoaded = false; loadImports(); });
+            st.appendChild(rb);
+            renderInvoiceStats(); renderInvoiceTable();
+        });
     }
 
     // Stamp the selected (not-yet-imported) invoices → they drop off the worklist.
@@ -493,8 +551,10 @@
             el('smp-mkt-updated').textContent = 'Pulled live from SanMar · ' + new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) + ' · Jan 1 – today';
             renderMarketingTable(); renderMarketingMonths(); renderMarketingSummary();
         }).catch(function (err) {
-            DashPage.showError('Could not load marketing-fund activity: ' + err.message + ' — refresh to retry.');
-            el('smp-mkt-tbody').innerHTML = '<tr><td colspan="5" class="smp-empty">Not loaded — ' + esc(err.message) + '</td></tr>';
+            DashPage.showError('Could not load marketing-fund activity: ' + err.message);
+            el('smp-mkt-tbody').innerHTML = '<tr><td colspan="5" class="smp-empty" role="alert">Not loaded — ' + esc(err.message) + ' ' +
+                '<button type="button" class="dash-btn smp-retry" id="smp-mkt-retry">Retry</button></td></tr>';
+            var rb = el('smp-mkt-retry'); if (rb) rb.addEventListener('click', loadMarketing);
             el('smp-mkt-monthbars').innerHTML = '';
         });
     }
@@ -519,8 +579,10 @@
             : 'At the current pace (~' + money0(perMonth) + '/mo) you’re on track to spend ~' + money0(projectedSpend) + ' — about ' + money0(-projectedUnused) + ' OVER the fund by Dec 31.';
         var fillPct = allowance > 0 ? Math.min(100, Math.max(0, pct)) : 0;
         var bar = el('smp-mkt-bar');
-        bar.style.width = fillPct.toFixed(1) + '%';
+        bar.style.setProperty('--w', fillPct.toFixed(1) + '%');
         bar.classList.toggle('smp-progress-fill--over', spent > allowance);
+        var prog = el('smp-mkt-progress');
+        if (prog) prog.setAttribute('aria-valuenow', String(Math.round(fillPct)));
         el('smp-mkt-bar-spent').textContent = money0(spent);
         el('smp-mkt-bar-left').textContent = money0(Math.max(0, remaining));
     }
@@ -534,7 +596,7 @@
             var v = byMonth[k], label = new Date(k + '-01T12:00:00').toLocaleDateString('en-US', { month: 'short' });
             var w = (Math.abs(v) / max) * 100;
             return '<div class="smp-monthrow"><span class="smp-monthlbl">' + esc(label) + '</span>' +
-                '<span class="smp-monthbar-track"><span class="smp-monthbar-fill' + (v < 0 ? ' smp-monthbar-fill--credit' : '') + '" style="width:' + w.toFixed(1) + '%"></span></span>' +
+                '<span class="smp-monthbar-track"><span class="smp-monthbar-fill' + (v < 0 ? ' smp-monthbar-fill--credit' : '') + '" style="--w:' + w.toFixed(1) + '%"></span></span>' +
                 '<span class="smp-monthval">' + money(v) + '</span></div>';
         }).join('');
     }
@@ -568,7 +630,7 @@
     function viewBtn(i, ship) {
         return '<button type="button" class="smp-view-btn" data-po="' + esc(basePo(i.purchaseOrderNo)) +
             '" data-company="' + esc(ship || '') + '" data-ordered="' + esc(i.orderDate || '') +
-            '"><i class="fas fa-file-invoice-dollar"></i> View</button>';
+            '" aria-label="View SanMar invoice ' + esc(i.invoiceNumber || '') + '"><i class="fas fa-file-invoice-dollar" aria-hidden="true"></i> View</button>';
     }
     function wireViewButtons(scope) {
         Array.prototype.forEach.call(scope.querySelectorAll('.smp-view-btn'), function (btn) {
@@ -576,7 +638,7 @@
                 if (!window.SanMarInvoiceViewer) { DashPage.showError('Invoice viewer failed to load — refresh the page.'); return; }
                 var po = btn.dataset.po;
                 if (!po) { DashPage.showError('This invoice has no numeric PO to look up.'); return; }
-                window.SanMarInvoiceViewer.open({ pos: [po], company: btn.dataset.company, orderedDate: btn.dataset.ordered });
+                window.SanMarInvoiceViewer.open({ pos: [po], company: btn.dataset.company, orderedDate: btn.dataset.ordered, returnFocus: btn });
             });
         });
     }

@@ -239,3 +239,13 @@
 }
 .smp-markbtn:hover:not(:disabled) { background: #d8f0e2; }
 .smp-markbtn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* 2026-09-05 review */
+[hidden] { display: none !important; }
+.smp-stat-btn { font: inherit; color: inherit; text-align: left; cursor: pointer; }
+.smp-stat-btn[aria-pressed="true"] { outline: 2px solid var(--art-theme, #009900); outline-offset: -2px; }
+.smp-stat-btn:focus-visible, .smp-tab:focus-visible, .smp-upload-btn:focus-visible, .smp-view-btn:focus-visible, .smp-linkbtn:focus-visible { outline: 2px solid var(--art-theme, #009900); outline-offset: 2px; }
+.smp-progress-fill { width: var(--w, 0%); }
+.smp-monthbar-fill { width: var(--w, 0%); }
+.smp-sw-status--warn { color: var(--state-danger, #c0392b); font-weight: 600; }
+.smp-retry { margin-left: 8px; }
