@@ -1,3 +1,9 @@
+## v2026.09.06.41 (2026.09.06)
+
+- Memory: runtime console audit + DTF URL regression recorded (v2026.09.06.40); Customer Portals LESSONS entry archived
+- Runtime a11y + console: quantity-tier labels wired (screen-print v2), category search named (homepage), DTF timing note is debug
+- Deploy v2026.09.06.41: runtime a11y labels, DTF timing note
+
 ## v2026.09.06.40 (2026.09.06)
 
 - Memory: calculator console + CSP batch recorded (v2026.09.06.39)
