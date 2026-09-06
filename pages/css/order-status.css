@@ -123,3 +123,6 @@
     .status-card { padding: 26px 16px; }
     .status-card h1 { font-size: 22px; }
 }
+
+/* 2026-09-05 review: the hidden attribute must beat any display rule */
+[hidden] { display: none !important; }

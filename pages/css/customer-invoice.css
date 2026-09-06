@@ -48,3 +48,6 @@ body { margin:0; background:#eceee9; color:#222; padding:0 0 30px;
 
 @media print { body { background:#fff; } .ci-toolbar { display:none; } .ci-paper { box-shadow:none; margin:0; max-width:100%; padding:0; } }
 @media (max-width:640px) { .ci-paper { padding:20px 16px; } .ci-meta-grid { grid-template-columns:repeat(2,1fr); } }
+
+/* 2026-09-05 review: the hidden attribute must beat any display rule */
+[hidden] { display: none !important; }

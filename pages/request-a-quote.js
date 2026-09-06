@@ -77,7 +77,7 @@
         var base = (window.APP_CONFIG && APP_CONFIG.API && APP_CONFIG.API.BASE_URL || '').replace(/\/+$/, '');
         if (!base) { status.textContent = 'Upload unavailable — email the logo instead; your request still goes through.'; return; }
 
-        status.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading ' + escapeText(file.name) + '…';
+        status.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Uploading ' + escapeText(file.name) + '…';
         var fd = new FormData();
         fd.append('file', file);
         fd.append('description', 'Quote request logo — ' + (NWCAPublicForm.val('fldCompany') || NWCAPublicForm.val('fldName') || 'web lead'));
@@ -87,7 +87,7 @@
             .then(function (body) {
                 logoUrl = (body.image && body.image.url) || '';
                 logoName = file.name;
-                status.innerHTML = '<i class="fas fa-circle-check ok"></i> Attached: ' + escapeText(file.name);
+                status.innerHTML = '<i class="fas fa-circle-check ok" aria-hidden="true"></i> Attached: ' + escapeText(file.name);
             })
             .catch(function (err) {
                 console.error('[quote-request] upload failed:', err);
