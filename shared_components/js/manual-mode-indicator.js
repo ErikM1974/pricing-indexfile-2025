@@ -11,7 +11,7 @@
  */
 
 /* Logging gate (2026-09-06): manual-mode-indicator chatter only on localhost or ?debug=1; console.error/warn stay live. */
-var MMI_LOG_ON = window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug');
+var MMI_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
 var mmiLog = MMI_LOG_ON ? console.log.bind(console) : function () {};
 (function() {
     'use strict';

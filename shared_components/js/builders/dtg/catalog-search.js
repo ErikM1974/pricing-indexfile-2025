@@ -579,7 +579,7 @@ function paintDesignMenuItems(cbx) {
         cbx.menu.innerHTML = cbx.filtered.slice(0, 30).map((d, i) => {
             const thumb = d.thumbnailUrl
                 ? `<img class="dtg-design-row-thumb" src="${escapeHtml(resolveBoxUrl(d.thumbnailUrl))}" alt="" loading="lazy">`
-                : `<div class="dtg-design-row-thumb dtg-design-row-thumb--blank"><i class="fas fa-image"></i></div>`;
+                : `<div class="dtg-design-row-thumb dtg-design-row-thumb--blank"><i class="fas fa-image" aria-hidden="true"></i></div>`;
             const meta = [];
             if (d.locationCount > 1) meta.push(`${d.locationCount} locations`);
             if (d.isVariation) meta.push('variation');

@@ -4,7 +4,7 @@
  */
 
 /* Logging gate (2026-09-06): dp5-helper chatter only on localhost or ?debug=1; console.error/warn stay live. */
-var DP5_LOG_ON = window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug');
+var DP5_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
 var dp5Log = DP5_LOG_ON ? console.log.bind(console) : function () {};
 (function() {
     "use strict";

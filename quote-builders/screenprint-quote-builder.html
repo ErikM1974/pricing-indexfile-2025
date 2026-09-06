@@ -50,7 +50,7 @@
     <!-- App Configuration (centralized API URLs, settings) + runtime tenant
          resolution (roadmap 0.3 — ?tenant= / hostname → window.TENANT) -->
     <script src="/config/app.config.js"></script>
-    <script src="/config/tenant.js"></script>
+    <script src="/config/tenant.js?v=2026.09.06.18"></script>
 
     <!-- Extended Sizes Shared Module (2026-03-21 consolidation) -->
     <script src="/shared_components/js/extended-sizes-config.js?v=2026.03.22.1"></script>
@@ -79,10 +79,10 @@
         </div>
         <div class="header-actions">
             <button class="btn-header btn-new-quote" data-call="confirmNewQuote">
-                <i class="fas fa-plus"></i> New Quote
+                <i class="fas fa-plus" aria-hidden="true"></i> New Quote
             </button>
             <button class="btn-header" data-href="/staff-dashboard.html">
-                <i class="fas fa-arrow-left"></i> Dashboard
+                <i class="fas fa-arrow-left" aria-hidden="true"></i> Dashboard
             </button>
         </div>
     </header>
@@ -94,16 +94,16 @@
             <!-- Screen Print Configuration Section -->
             <div class="logo-section print-location-section">
                 <div class="primary-logo-config">
-                    <span class="logo-section-label"><i class="fas fa-tshirt"></i> Print Configuration</span>
+                    <span class="logo-section-label"><i class="fas fa-tshirt" aria-hidden="true"></i> Print Configuration</span>
 
                     <!-- Global Options Row -->
                     <div class="options-box-warning">
                         <label class="location-radio d-flex align-items-center gap-2">
-                            <input type="checkbox" id="dark-garment-toggle" onchange="updatePrintConfig()">
+                            <input type="checkbox" id="dark-garment-toggle" data-change="updatePrintConfig">
                             <span><strong>Dark Garment</strong> <span class="hint-text">(dark shirts need a white base layer under the ink — adds 1 screen per print location)</span></span>
                         </label>
                         <label class="location-radio d-flex align-items-center gap-2">
-                            <input type="checkbox" id="safety-stripes-toggle" onchange="updatePrintConfig()">
+                            <input type="checkbox" id="safety-stripes-toggle" data-change="updatePrintConfig">
                             <span><strong>Safety Stripes</strong> <span class="hint-text">(+$2.00/piece/location)</span></span>
                         </label>
                         <a class="safety-stripes-example" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/Erik%20Modeling%20Hoodie%20Front%20and%20Back.png?ver=1" target="_blank" rel="noopener" title="Safety stripes example — front &amp; back (click to enlarge)" aria-label="Safety stripes example, front and back — opens full-size image in a new tab">
@@ -115,19 +115,19 @@
                         <!-- Front Location with Ink Colors -->
                         <div class="location-group location-group-card">
                             <div class="section-label">
-                                <i class="fas fa-check-circle" style="color: #28a745;"></i> FRONT LOCATION
+                                <i class="fas fa-check-circle" aria-hidden="true" style="color: #28a745;"></i> FRONT LOCATION
                             </div>
                             <div class="d-flex flex-column gap-2 mb-3">
                                 <label class="location-radio">
-                                    <input type="radio" name="front-location" value="LC" checked onchange="updatePrintConfig()">
+                                    <input type="radio" name="front-location" value="LC" checked data-change="updatePrintConfig">
                                     <span>Left Chest <span class="hint-text">(4" x 4")</span></span>
                                 </label>
                                 <label class="location-radio">
-                                    <input type="radio" name="front-location" value="FF" onchange="updatePrintConfig()">
+                                    <input type="radio" name="front-location" value="FF" data-change="updatePrintConfig">
                                     <span>Full Front <span class="hint-text">(12" x 16")</span></span>
                                 </label>
                                 <label class="location-radio">
-                                    <input type="radio" name="front-location" value="JF" onchange="updatePrintConfig()">
+                                    <input type="radio" name="front-location" value="JF" data-change="updatePrintConfig">
                                     <span>Jumbo Front <span class="hint-text">(16" x 20")</span></span>
                                 </label>
                             </div>
@@ -135,12 +135,12 @@
                             <div class="border-top" style="padding-top: 10px;">
                                 <div class="hint-text mb-2">INK COLORS</div>
                                 <div class="ink-color-selector d-flex gap-1">
-                                    <label class="ink-btn"><input type="radio" name="front-colors" value="1" checked onchange="updatePrintConfig()"><span>1</span></label>
-                                    <label class="ink-btn"><input type="radio" name="front-colors" value="2" onchange="updatePrintConfig()"><span>2</span></label>
-                                    <label class="ink-btn"><input type="radio" name="front-colors" value="3" onchange="updatePrintConfig()"><span>3</span></label>
-                                    <label class="ink-btn"><input type="radio" name="front-colors" value="4" onchange="updatePrintConfig()"><span>4</span></label>
-                                    <label class="ink-btn"><input type="radio" name="front-colors" value="5" onchange="updatePrintConfig()"><span>5</span></label>
-                                    <label class="ink-btn"><input type="radio" name="front-colors" value="6" onchange="updatePrintConfig()"><span>6</span></label>
+                                    <label class="ink-btn"><input type="radio" name="front-colors" value="1" checked data-change="updatePrintConfig"><span>1</span></label>
+                                    <label class="ink-btn"><input type="radio" name="front-colors" value="2" data-change="updatePrintConfig"><span>2</span></label>
+                                    <label class="ink-btn"><input type="radio" name="front-colors" value="3" data-change="updatePrintConfig"><span>3</span></label>
+                                    <label class="ink-btn"><input type="radio" name="front-colors" value="4" data-change="updatePrintConfig"><span>4</span></label>
+                                    <label class="ink-btn"><input type="radio" name="front-colors" value="5" data-change="updatePrintConfig"><span>5</span></label>
+                                    <label class="ink-btn"><input type="radio" name="front-colors" value="6" data-change="updatePrintConfig"><span>6</span></label>
                                 </div>
                                 <div id="front-setup-display" class="hint-text mt-2">1 screen × $30 = $30.00</div>
                             </div>
@@ -149,19 +149,19 @@
                         <!-- Back Location with Ink Colors (Optional) -->
                         <div class="location-group location-group-card" id="back-location-group">
                             <div class="section-label">
-                                <i class="fas fa-plus-circle" id="back-icon" style="color: #666;"></i> BACK LOCATION <span style="font-weight: 400; color: #666;">(optional)</span>
+                                <i class="fas fa-plus-circle" aria-hidden="true" id="back-icon" style="color: #666;"></i> BACK LOCATION <span style="font-weight: 400; color: #666;">(optional)</span>
                             </div>
                             <div style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px;">
                                 <label class="location-radio">
-                                    <input type="radio" name="back-location" value="" checked onchange="updatePrintConfig()">
+                                    <input type="radio" name="back-location" value="" checked data-change="updatePrintConfig">
                                     <span>None</span>
                                 </label>
                                 <label class="location-radio">
-                                    <input type="radio" name="back-location" value="FB" onchange="updatePrintConfig()">
+                                    <input type="radio" name="back-location" value="FB" data-change="updatePrintConfig">
                                     <span>Full Back <span style="color: #666; font-size: 11px;">(12" x 16")</span></span>
                                 </label>
                                 <label class="location-radio">
-                                    <input type="radio" name="back-location" value="JB" onchange="updatePrintConfig()">
+                                    <input type="radio" name="back-location" value="JB" data-change="updatePrintConfig">
                                     <span>Jumbo Back <span style="color: #666; font-size: 11px;">(16" x 20")</span></span>
                                 </label>
                             </div>
@@ -169,12 +169,12 @@
                             <div id="back-colors-section" style="border-top: 1px solid #dee2e6; padding-top: 10px; display: none;">
                                 <div style="font-size: 11px; color: #666; margin-bottom: 6px;">INK COLORS</div>
                                 <div class="ink-color-selector" style="display: flex; gap: 4px;">
-                                    <label class="ink-btn"><input type="radio" name="back-colors" value="1" checked onchange="updatePrintConfig()"><span>1</span></label>
-                                    <label class="ink-btn"><input type="radio" name="back-colors" value="2" onchange="updatePrintConfig()"><span>2</span></label>
-                                    <label class="ink-btn"><input type="radio" name="back-colors" value="3" onchange="updatePrintConfig()"><span>3</span></label>
-                                    <label class="ink-btn"><input type="radio" name="back-colors" value="4" onchange="updatePrintConfig()"><span>4</span></label>
-                                    <label class="ink-btn"><input type="radio" name="back-colors" value="5" onchange="updatePrintConfig()"><span>5</span></label>
-                                    <label class="ink-btn"><input type="radio" name="back-colors" value="6" onchange="updatePrintConfig()"><span>6</span></label>
+                                    <label class="ink-btn"><input type="radio" name="back-colors" value="1" checked data-change="updatePrintConfig"><span>1</span></label>
+                                    <label class="ink-btn"><input type="radio" name="back-colors" value="2" data-change="updatePrintConfig"><span>2</span></label>
+                                    <label class="ink-btn"><input type="radio" name="back-colors" value="3" data-change="updatePrintConfig"><span>3</span></label>
+                                    <label class="ink-btn"><input type="radio" name="back-colors" value="4" data-change="updatePrintConfig"><span>4</span></label>
+                                    <label class="ink-btn"><input type="radio" name="back-colors" value="5" data-change="updatePrintConfig"><span>5</span></label>
+                                    <label class="ink-btn"><input type="radio" name="back-colors" value="6" data-change="updatePrintConfig"><span>6</span></label>
                                 </div>
                                 <div id="back-setup-display" style="font-size: 11px; color: #666; margin-top: 6px;">1 screen × $30 = $30.00</div>
                             </div>
@@ -183,39 +183,39 @@
                         <!-- Sleeve Locations with Ink Colors (Optional) — each sleeve prices as an additional print location -->
                         <div class="location-group location-group-card" id="sleeve-location-group">
                             <div class="section-label">
-                                <i class="fas fa-plus-circle" id="sleeve-icon" style="color: #666;"></i> SLEEVES <span style="font-weight: 400; color: #666;">(optional · each is an added location)</span>
+                                <i class="fas fa-plus-circle" aria-hidden="true" id="sleeve-icon" style="color: #666;"></i> SLEEVES <span style="font-weight: 400; color: #666;">(optional · each is an added location)</span>
                             </div>
                             <!-- Left Sleeve -->
                             <label class="location-radio" style="margin-bottom: 6px;">
-                                <input type="checkbox" id="left-sleeve-toggle" onchange="updatePrintConfig()">
+                                <input type="checkbox" id="left-sleeve-toggle" data-change="updatePrintConfig">
                                 <span>Left Sleeve</span>
                             </label>
                             <div id="left-sleeve-colors-section" style="border-top: 1px solid #dee2e6; padding-top: 10px; display: none; margin-bottom: 12px;">
                                 <div style="font-size: 11px; color: #666; margin-bottom: 6px;">LEFT SLEEVE INK COLORS</div>
                                 <div class="ink-color-selector" style="display: flex; gap: 4px;">
-                                    <label class="ink-btn"><input type="radio" name="left-sleeve-colors" value="1" checked onchange="updatePrintConfig()"><span>1</span></label>
-                                    <label class="ink-btn"><input type="radio" name="left-sleeve-colors" value="2" onchange="updatePrintConfig()"><span>2</span></label>
-                                    <label class="ink-btn"><input type="radio" name="left-sleeve-colors" value="3" onchange="updatePrintConfig()"><span>3</span></label>
-                                    <label class="ink-btn"><input type="radio" name="left-sleeve-colors" value="4" onchange="updatePrintConfig()"><span>4</span></label>
-                                    <label class="ink-btn"><input type="radio" name="left-sleeve-colors" value="5" onchange="updatePrintConfig()"><span>5</span></label>
-                                    <label class="ink-btn"><input type="radio" name="left-sleeve-colors" value="6" onchange="updatePrintConfig()"><span>6</span></label>
+                                    <label class="ink-btn"><input type="radio" name="left-sleeve-colors" value="1" checked data-change="updatePrintConfig"><span>1</span></label>
+                                    <label class="ink-btn"><input type="radio" name="left-sleeve-colors" value="2" data-change="updatePrintConfig"><span>2</span></label>
+                                    <label class="ink-btn"><input type="radio" name="left-sleeve-colors" value="3" data-change="updatePrintConfig"><span>3</span></label>
+                                    <label class="ink-btn"><input type="radio" name="left-sleeve-colors" value="4" data-change="updatePrintConfig"><span>4</span></label>
+                                    <label class="ink-btn"><input type="radio" name="left-sleeve-colors" value="5" data-change="updatePrintConfig"><span>5</span></label>
+                                    <label class="ink-btn"><input type="radio" name="left-sleeve-colors" value="6" data-change="updatePrintConfig"><span>6</span></label>
                                 </div>
                                 <div id="left-sleeve-setup-display" style="font-size: 11px; color: #666; margin-top: 6px;">1 screen × $30 = $30.00</div>
                             </div>
                             <!-- Right Sleeve -->
                             <label class="location-radio" style="margin-bottom: 6px;">
-                                <input type="checkbox" id="right-sleeve-toggle" onchange="updatePrintConfig()">
+                                <input type="checkbox" id="right-sleeve-toggle" data-change="updatePrintConfig">
                                 <span>Right Sleeve</span>
                             </label>
                             <div id="right-sleeve-colors-section" style="border-top: 1px solid #dee2e6; padding-top: 10px; display: none;">
                                 <div style="font-size: 11px; color: #666; margin-bottom: 6px;">RIGHT SLEEVE INK COLORS</div>
                                 <div class="ink-color-selector" style="display: flex; gap: 4px;">
-                                    <label class="ink-btn"><input type="radio" name="right-sleeve-colors" value="1" checked onchange="updatePrintConfig()"><span>1</span></label>
-                                    <label class="ink-btn"><input type="radio" name="right-sleeve-colors" value="2" onchange="updatePrintConfig()"><span>2</span></label>
-                                    <label class="ink-btn"><input type="radio" name="right-sleeve-colors" value="3" onchange="updatePrintConfig()"><span>3</span></label>
-                                    <label class="ink-btn"><input type="radio" name="right-sleeve-colors" value="4" onchange="updatePrintConfig()"><span>4</span></label>
-                                    <label class="ink-btn"><input type="radio" name="right-sleeve-colors" value="5" onchange="updatePrintConfig()"><span>5</span></label>
-                                    <label class="ink-btn"><input type="radio" name="right-sleeve-colors" value="6" onchange="updatePrintConfig()"><span>6</span></label>
+                                    <label class="ink-btn"><input type="radio" name="right-sleeve-colors" value="1" checked data-change="updatePrintConfig"><span>1</span></label>
+                                    <label class="ink-btn"><input type="radio" name="right-sleeve-colors" value="2" data-change="updatePrintConfig"><span>2</span></label>
+                                    <label class="ink-btn"><input type="radio" name="right-sleeve-colors" value="3" data-change="updatePrintConfig"><span>3</span></label>
+                                    <label class="ink-btn"><input type="radio" name="right-sleeve-colors" value="4" data-change="updatePrintConfig"><span>4</span></label>
+                                    <label class="ink-btn"><input type="radio" name="right-sleeve-colors" value="5" data-change="updatePrintConfig"><span>5</span></label>
+                                    <label class="ink-btn"><input type="radio" name="right-sleeve-colors" value="6" data-change="updatePrintConfig"><span>6</span></label>
                                 </div>
                                 <div id="right-sleeve-setup-display" style="font-size: 11px; color: #666; margin-top: 6px;">1 screen × $30 = $30.00</div>
                             </div>
@@ -237,7 +237,7 @@
                  panel (2026-06-14). Mount id #scp-artwork-mount preserved so artwork-upload.js still targets it. -->
             <div class="logo-section reference-artwork-section">
                 <div class="primary-logo-config">
-                    <span class="logo-section-label"><i class="fas fa-image"></i> Reference Artwork <span class="hint-text" style="font-weight:400;">— optional; attach the customer's art file</span></span>
+                    <span class="logo-section-label"><i class="fas fa-image" aria-hidden="true"></i> Reference Artwork <span class="hint-text" style="font-weight:400;">— optional; attach the customer's art file</span></span>
                     <div id="scp-artwork-mount" style="margin-top: 8px;"></div>
                 </div>
             </div>
@@ -247,7 +247,7 @@
                 <!-- Search Row -->
                 <div class="search-row">
                     <div class="search-input-wrapper">
-                        <i class="fas fa-search search-icon"></i>
+                        <i class="fas fa-search search-icon" aria-hidden="true"></i>
                         <input type="text"
                                id="product-search" aria-label="Product style search"
                                class="search-input"
@@ -259,7 +259,7 @@
 
                 <!-- Minimum Order Warning Banner -->
                 <div id="min-order-warning" style="display: none;">
-                    <i class="fas fa-exclamation-triangle"></i>
+                    <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
                     <strong>Minimum Order: 24 pieces</strong> -
                     Orders under 48 pieces include a $50 small-batch fee — it drops off at 48+.
                 </div>
@@ -301,7 +301,7 @@
                         <tbody id="fees-tbody" class="fee-summary-section">
                             <tr id="setup-fee-table-row" class="fee-row">
                                 <td colspan="10" class="fee-label">
-                                    <i class="fas fa-cog"></i> Screen Print Set Up Charge (<span id="setup-screens-label">1 screen</span> × <span id="setup-per-screen-label">$30</span>)
+                                    <i class="fas fa-cog" aria-hidden="true"></i> Screen Print Set Up Charge (<span id="setup-screens-label">1 screen</span> × <span id="setup-per-screen-label">$30</span>)
                                 </td>
                                 <td class="cell-qty">1</td>
                                 <td class="cell-price" id="setup-fee-unit">$30.00</td>
@@ -310,7 +310,7 @@
                             </tr>
                             <tr id="ltm-fee-row" class="fee-row" style="display: none;">
                                 <td colspan="10" class="fee-label">
-                                    <i class="fas fa-info-circle"></i> <span title="Also called the Less Than Minimum (LTM) fee">Small-batch fee</span>
+                                    <i class="fas fa-info-circle" aria-hidden="true"></i> <span title="Also called the Less Than Minimum (LTM) fee">Small-batch fee</span>
                                 </td>
                                 <td class="cell-qty">1</td>
                                 <td class="cell-price" id="ltm-row-unit">$50.00</td>
@@ -319,7 +319,7 @@
                             </tr>
                             <tr id="art-charge-row" class="fee-row" style="display: none;">
                                 <td colspan="10" class="fee-label">
-                                    <i class="fas fa-palette"></i> Art Charge (Logo Mockup & Review)
+                                    <i class="fas fa-palette" aria-hidden="true"></i> Art Charge (Logo Mockup & Review)
                                 </td>
                                 <td class="cell-qty">1</td>
                                 <td class="cell-price" id="art-charge-unit">$0.00</td>
@@ -328,7 +328,7 @@
                             </tr>
                             <tr id="graphic-design-row" class="fee-row" style="display: none;">
                                 <td colspan="10" class="fee-label">
-                                    <i class="fas fa-pencil-ruler"></i> Graphic Design (<span id="design-hours-label">0</span> hrs × $75)
+                                    <i class="fas fa-pencil-ruler" aria-hidden="true"></i> Graphic Design (<span id="design-hours-label">0</span> hrs × $75)
                                 </td>
                                 <td class="cell-qty">1</td>
                                 <td class="cell-price" id="graphic-design-unit">$0.00</td>
@@ -337,7 +337,7 @@
                             </tr>
                             <tr id="rush-fee-row" class="fee-row" style="display: none;">
                                 <td colspan="10" class="fee-label">
-                                    <i class="fas fa-bolt"></i> Rush Fee
+                                    <i class="fas fa-bolt" aria-hidden="true"></i> Rush Fee
                                 </td>
                                 <td class="cell-qty">1</td>
                                 <td class="cell-price" id="rush-fee-unit">$0.00</td>
@@ -346,7 +346,7 @@
                             </tr>
                             <tr id="vellum-fee-row" class="fee-row" style="display: none;">
                                 <td colspan="10" class="fee-label">
-                                    <i class="fas fa-file-image"></i> Vellum Print (<span id="vellum-qty-label">0</span> × <span id="vellum-per-label">$10</span>)
+                                    <i class="fas fa-file-image" aria-hidden="true"></i> Vellum Print (<span id="vellum-qty-label">0</span> × <span id="vellum-per-label">$10</span>)
                                 </td>
                                 <td class="cell-qty" id="vellum-qty-cell">0</td>
                                 <td class="cell-price" id="vellum-fee-unit">$0.00</td>
@@ -355,7 +355,7 @@
                             </tr>
                             <tr id="color-change-fee-row" class="fee-row" style="display: none;">
                                 <td colspan="10" class="fee-label">
-                                    <i class="fas fa-fill-drip"></i> Color Change (<span id="color-change-qty-label">0</span> × <span id="color-change-per-label">$15</span>)
+                                    <i class="fas fa-fill-drip" aria-hidden="true"></i> Color Change (<span id="color-change-qty-label">0</span> × <span id="color-change-per-label">$15</span>)
                                 </td>
                                 <td class="cell-qty" id="color-change-qty-cell">0</td>
                                 <td class="cell-price" id="color-change-fee-unit">$0.00</td>
@@ -369,7 +369,7 @@
 
                 <!-- Add Row Button -->
                 <button class="add-row-btn" data-call="addNewRow">
-                    <i class="fas fa-plus"></i> Add Product (or press Tab from last cell)
+                    <i class="fas fa-plus" aria-hidden="true"></i> Add Product (or press Tab from last cell)
                 </button>
 
                 <!-- Recommended safety apparel — curated hi-vis top sellers that pair with safety stripes -->
@@ -390,7 +390,7 @@
                 <!-- Extended Size Picker Popup (for Size06/Other sizes) -->
                 <div id="extended-size-popup" class="size-popup hidden">
                     <div class="size-popup-header">
-                        <h4><i class="fas fa-ruler"></i> Extended Sizes (Size06)</h4>
+                        <h4><i class="fas fa-ruler" aria-hidden="true"></i> Extended Sizes (Size06)</h4>
                         <button class="size-popup-close" data-call="closeExtendedSizePopup">&times;</button>
                     </div>
                     <p class="size-popup-hint">Enter quantities for extended sizes. These create separate line items.</p>
@@ -400,7 +400,7 @@
                     <div class="size-popup-actions">
                         <button class="size-popup-cancel" data-call="closeExtendedSizePopup">Cancel</button>
                         <button class="size-popup-apply" data-call="applyExtendedSizes">
-                            <i class="fas fa-check"></i> Apply Changes
+                            <i class="fas fa-check" aria-hidden="true"></i> Apply Changes
                         </button>
                     </div>
                 </div>
@@ -413,7 +413,7 @@
             <div class="additional-charges-panel" style="margin: 0 0 14px;">
                 <div class="charges-header" data-call="toggleFeesCharges">
                     <div class="d-flex align-items-center gap-2">
-                        <i class="fas fa-plus-circle"></i>
+                        <i class="fas fa-plus-circle" aria-hidden="true"></i>
                         <span>More services &amp; fees</span>
                         <span style="font-size:11px;color:#55606e;font-weight:400;">mockups · design time · rush · vellum</span>
                         <span id="charges-badge" class="charges-badge hidden">$0.00</span>
@@ -424,14 +424,14 @@
                     <div style="display:flex; flex-wrap:wrap; gap:24px; align-items:flex-end; padding-top:8px;">
                         <div class="charge-field qb-m0">
                             <label class="d-flex align-items-center gap-2" style="cursor: pointer;">
-                                <input type="checkbox" id="art-charge-toggle" onchange="toggleArtCharge(); updateAdditionalCharges();">
+                                <input type="checkbox" id="art-charge-toggle" data-change="toggleArtCharge,updateAdditionalCharges">
                                 <span>Logo Mockup &amp; Review</span>
                             </label>
                             <div class="input-with-prefix" id="art-charge-wrapper" style="opacity: 0.4;">
                                 <span class="prefix">$</span>
                                 <input type="number" id="art-charge" aria-label="Art charge in dollars" class="quote-input"
                                        min="0" step="0.01" value="0" disabled
-                                       onchange="updateArtworkCharges(); updateAdditionalCharges();" oninput="updateArtworkCharges(); updateAdditionalCharges();">
+                                       data-change="updateArtworkCharges,updateAdditionalCharges" data-input="updateArtworkCharges,updateAdditionalCharges">
                             </div>
                         </div>
                         <div class="charge-field qb-m0">
@@ -439,7 +439,7 @@
                             <div class="d-flex align-items-center gap-2">
                                 <input type="number" id="graphic-design-hours" aria-label="Graphic design hours" class="quote-input qb-w80"
                                        min="0" step="0.5" placeholder="0"
-                                       onchange="updateArtworkCharges(); updateAdditionalCharges();" oninput="updateArtworkCharges(); updateAdditionalCharges();">
+                                       data-change="updateArtworkCharges,updateAdditionalCharges" data-input="updateArtworkCharges,updateAdditionalCharges">
                                 <span class="text-muted">hrs</span>
                                 <span class="text-muted">= $<span id="graphic-design-total">0.00</span></span>
                             </div>
@@ -450,8 +450,8 @@
                                 <span class="prefix">$</span>
                                 <input type="number" id="rush-fee" aria-label="Rush fee in dollars" class="quote-input"
                                        min="0" step="0.01" placeholder="0.00"
-                                       onchange="updateAdditionalCharges()">
-                                <button type="button" class="btn-rush-percent" data-call="applyRushPercent" title="Fill from the live rush rate (Caspio RUSH service code) as a % of the quote — re-click if the quote changes afterward"><i class="fas fa-bolt"></i> auto %</button>
+                                       data-change="updateAdditionalCharges">
+                                <button type="button" class="btn-rush-percent" data-call="applyRushPercent" title="Fill from the live rush rate (Caspio RUSH service code) as a % of the quote — re-click if the quote changes afterward"><i class="fas fa-bolt" aria-hidden="true"></i> auto %</button>
                             </div>
                         </div>
                         <div class="charge-field qb-m0">
@@ -459,7 +459,7 @@
                             <div class="d-flex align-items-center gap-2">
                                 <input type="number" id="vellum-qty" aria-label="Vellum count" class="quote-input qb-w80"
                                        min="0" step="1" placeholder="0"
-                                       onchange="updateAdditionalCharges()" oninput="updateAdditionalCharges()">
+                                       data-change="updateAdditionalCharges" data-input="updateAdditionalCharges">
                                 <span class="text-muted">= $<span id="vellum-charge-total">0.00</span></span>
                             </div>
                         </div>
@@ -468,7 +468,7 @@
                             <div class="d-flex align-items-center gap-2">
                                 <input type="number" id="color-change-qty" aria-label="Color change count" class="quote-input qb-w80"
                                        min="0" step="1" placeholder="0"
-                                       onchange="updateAdditionalCharges()" oninput="updateAdditionalCharges()">
+                                       data-change="updateAdditionalCharges" data-input="updateAdditionalCharges">
                                 <span class="text-muted">= $<span id="color-change-charge-total">0.00</span></span>
                             </div>
                         </div>
@@ -491,7 +491,7 @@
                     <div class="estimate-ship-row" id="spc-estimate-row" style="margin: 8px 0 0;">
                         <label><input type="checkbox" id="ship-residential"> Residential delivery (+ UPS surcharge)</label>
                         <button type="button" id="estimate-ship-btn" class="estimate-ship-btn" data-call="estimateShipping">
-                            <i class="fas fa-truck-fast"></i> Estimate UPS Ground
+                            <i class="fas fa-truck-fast" aria-hidden="true"></i> Estimate UPS Ground
                         </button>
                         <div id="estimate-ship-result" class="estimate-ship-result"></div>
                     </div>
@@ -505,20 +505,20 @@
                         </div>
                         <div class="pricing-row" id="tax-toggle-row">
                             <label class="d-flex align-items-center gap-2" style="cursor: pointer;">
-                                <input type="checkbox" id="include-tax" checked onchange="updateTaxCalculation()">
+                                <input type="checkbox" id="include-tax" checked data-change="updateTaxCalculation">
                                 <span style="font-size: 12px;">Include Tax</span>
                             </label>
                             <div class="d-flex align-items-center gap-1">
                                 <input type="number" id="tax-rate-input" aria-label="Sales tax rate percent" value="10.2" step="0.1" min="0" max="20"
                                        style="width: 52px; font-size: 11px; text-align: center; border: 1px solid #ddd; border-radius: 4px; padding: 2px 4px;"
-                                       onchange="updateTaxCalculation()" title="Tax rate %">
+                                       data-change="updateTaxCalculation" title="Tax rate %">
                                 <span style="font-size: 11px; color: #64748b;">%</span>
                             </div>
                         </div>
                         <!-- Wholesale / reseller — per-order, by the sales tax (mirror EMB). Routes the push to GL 2203. -->
                         <div class="pricing-row" id="wholesale-row" style="border-bottom:none; padding:2px 0;">
                             <label class="d-flex align-items-center gap-2" style="font-size:11px; color:#475569; cursor:pointer; margin:0;">
-                                <input type="checkbox" id="wholesale-checkbox" onchange="toggleWholesale()">
+                                <input type="checkbox" id="wholesale-checkbox" data-change="toggleWholesale">
                                 <span>Wholesale / Reseller — no tax (WA permit on file)</span>
                             </label>
                         </div>
@@ -543,9 +543,9 @@
             <div class="sidebar-scroll-container">
             <!-- Customer Info (moved above Quote Summary 2026-03-23) -->
             <div class="customer-panel" style="padding: 12px 16px; border-bottom: 1px solid #e5e7eb; margin: -16px -16px 16px -16px;">
-                <div class="customer-panel-header qb-mb8" data-toggle-hidden="spc-customer-fields" tabindex="0" role="button" aria-label="Toggle customer details" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">
-                    <h4 style="display: flex; align-items: center; gap: 6px;"><i class="fas fa-user" style="color: #2e5827;"></i> Customer</h4>
-                    <i class="fas fa-chevron-down" style="font-size: 12px; color: #999;"></i>
+                <div class="customer-panel-header qb-mb8" data-toggle-hidden="spc-customer-fields" tabindex="0" role="button" aria-label="Toggle customer details" data-keyclick="1">
+                    <h4 style="display: flex; align-items: center; gap: 6px;"><i class="fas fa-user" aria-hidden="true" style="color: #2e5827;"></i> Customer</h4>
+                    <i class="fas fa-chevron-down" aria-hidden="true" style="font-size: 12px; color: #999;"></i>
                 </div>
                 <div id="spc-customer-fields">
                     <!-- Lookup-first (2026-07-07 Phase A / P1 #4): the search field is the
@@ -553,7 +553,7 @@
                          edit-load fills them (syncCustomerManualDetails). All input ids
                          unchanged — save/load key off getElementById. -->
                     <div class="customer-field customer-lookup-container customer-lookup-hero qb-mb8">
-                        <label class="quote-label"><i class="fas fa-search" style="margin-right: 4px;"></i> FIND CUSTOMER</label>
+                        <label class="quote-label"><i class="fas fa-search" aria-hidden="true" style="margin-right: 4px;"></i> FIND CUSTOMER</label>
                         <input type="text" id="customer-lookup" aria-label="Customer lookup" placeholder="Company, name, or email — fills everything below" class="quote-input customer-lookup-input">
 
                         <!-- Customer context banners (Erik 2026-05-23) -->
@@ -568,19 +568,19 @@
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
                         <div class="customer-field">
                             <label class="quote-label">NAME *</label>
-                            <input type="text" id="customer-name" aria-label="Customer name" placeholder="Customer name" class="quote-input" oninput="if(window.renderOrderRecap)renderOrderRecap(); if(window.updateScpPushButtonState)updateScpPushButtonState()">
+                            <input type="text" id="customer-name" aria-label="Customer name" placeholder="Customer name" class="quote-input" data-input="?renderOrderRecap,?updateScpPushButtonState">
                         </div>
                         <div class="customer-field">
                             <label class="quote-label">EMAIL *</label>
-                            <input type="email" id="customer-email" aria-label="Customer email" placeholder="email@company.com" class="quote-input" oninput="if(window.updateScpPushButtonState)updateScpPushButtonState()">
+                            <input type="email" id="customer-email" aria-label="Customer email" placeholder="email@company.com" class="quote-input" data-input="?updateScpPushButtonState">
                         </div>
                         <div class="customer-field">
                             <label class="quote-label">COMPANY</label>
-                            <input type="text" id="company-name" aria-label="Company name" placeholder="Company name" class="quote-input" oninput="if(window.renderOrderRecap)renderOrderRecap(); if(window.updateScpPushButtonState)updateScpPushButtonState()">
+                            <input type="text" id="company-name" aria-label="Company name" placeholder="Company name" class="quote-input" data-input="?renderOrderRecap,?updateScpPushButtonState">
                         </div>
                         <div class="customer-field">
                             <label class="quote-label">SHOPWORKS CUST #</label>
-                            <input type="text" id="customer-number" aria-label="ShopWorks customer ID" placeholder="auto-fills from lookup" class="quote-input" inputmode="numeric" oninput="if(window.renderOrderRecap)renderOrderRecap(); if(window.updateScpPushButtonState)updateScpPushButtonState()">
+                            <input type="text" id="customer-number" aria-label="ShopWorks customer ID" placeholder="auto-fills from lookup" class="quote-input" inputmode="numeric" data-input="?renderOrderRecap,?updateScpPushButtonState">
                         </div>
                         <div class="customer-field">
                             <label class="quote-label">SALES REP</label>
@@ -624,7 +624,7 @@
             <!-- Pricing Panel -->
             <div class="pricing-panel">
                 <div class="pricing-title">
-                    <i class="fas fa-calculator"></i> Quote Summary
+                    <i class="fas fa-calculator" aria-hidden="true"></i> Quote Summary
                 </div>
 
                 <!-- Print Configuration Summary -->
@@ -724,23 +724,23 @@
                      integration these land under the EMB integration (caspio-pricing-proxy/config/manageorders-scp-config.js). -->
                 <button id="scp-push-shopworks-btn" class="btn-action btn-push-shopworks" data-call="scpPushToShopWorks" disabled
                         title="Complete the Before-you-push checklist (Customer #, a product, name + email) to enable push">
-                    <i class="fas fa-upload"></i> <span id="scp-push-shopworks-label">Push to ShopWorks</span>
+                    <i class="fas fa-upload" aria-hidden="true"></i> <span id="scp-push-shopworks-label">Push to ShopWorks</span>
                 </button>
                 <!-- Save & Get Shareable Link — always visible (flagship parity) -->
                 <button class="btn-action btn-secondary-action btn-share-link" data-call="saveAndGetLink">
-                    <i class="fas fa-link"></i> Save & Get Shareable Link
+                    <i class="fas fa-link" aria-hidden="true"></i> Save & Get Shareable Link
                 </button>
                 <button class="btn-action btn-secondary-action" data-call="copyToClipboard">
-                    <i class="fas fa-copy"></i> Copy Quote to Clipboard
+                    <i class="fas fa-copy" aria-hidden="true"></i> Copy Quote to Clipboard
                 </button>
                 <button class="btn-action btn-secondary-action" data-call="printQuote">
-                    <i class="fas fa-print"></i> Print Quote
+                    <i class="fas fa-print" aria-hidden="true"></i> Print Quote
                 </button>
                 <button class="btn-action btn-secondary-action" data-call="saveQuotePdf" title="Opens the print window with a reminder to pick 'Save as PDF' as the destination — downloads the quote as a PDF file">
-                    <i class="fas fa-file-pdf"></i> Save as PDF
+                    <i class="fas fa-file-pdf" aria-hidden="true"></i> Save as PDF
                 </button>
                 <button class="btn-action btn-secondary-action btn-email-quote" data-call="spcEmailQuote">
-                    <i class="fas fa-envelope"></i> Email Quote
+                    <i class="fas fa-envelope" aria-hidden="true"></i> Email Quote
                 </button>
             </div>
         </div>
@@ -753,7 +753,7 @@
     <div id="scp-push-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-label="Push to ShopWorks">
         <div class="modal-content" style="width: 660px; max-width: 94%;">
             <div class="modal-header">
-                <h3><i class="fas fa-upload"></i> Push to ShopWorks — Review Order</h3>
+                <h3><i class="fas fa-upload" aria-hidden="true"></i> Push to ShopWorks — Review Order</h3>
                 <button class="modal-close" data-call="closeScpPushPreview">&times;</button>
             </div>
             <div class="modal-body">
@@ -763,7 +763,7 @@
             <div class="modal-footer">
                 <button class="btn-action btn-secondary-action" data-call="closeScpPushPreview" style="background: #6c757d;">Cancel</button>
                 <button id="scp-push-confirm" class="btn-action btn-primary-action" data-call="confirmScpPush">
-                    <i class="fas fa-upload"></i> Push to ShopWorks
+                    <i class="fas fa-upload" aria-hidden="true"></i> Push to ShopWorks
                 </button>
             </div>
         </div>
@@ -773,11 +773,11 @@
     <div id="toast-container" class="toast-container"></div>
 
     <!-- Core Dependencies -->
-    <script src="/shared_components/js/product-category-filter.js"></script>
-    <script src="/shared_components/js/quote-builder-utils.js?v=2026.09.05.13"></script>
+    <script src="/shared_components/js/product-category-filter.js?v=2026.09.06.18"></script>
+    <script src="/shared_components/js/quote-builder-utils.js?v=2026.09.06.18"></script>
     <script src="/shared_components/js/exact-match-search.js?v=2026.01.30.1"></script>
     <script src="/shared_components/js/quote-share-modal.js?v=2026.07.07.7"></script>
-    <script src="/shared_components/js/screenprint-pricing-service.js"></script>
+    <script src="/shared_components/js/screenprint-pricing-service.js?v=2026.09.06.18"></script>
     <script src="/shared_components/js/screenprint-quote-service.js?v=2026.08.26.3"></script>
     <script src="/shared_components/js/sku-validation-service.js?v=20260220-xxl-fix"></script>
     <script src="/shared_components/js/quote-pricing-data.js?v=2026.06.27.1"></script>
@@ -822,7 +822,7 @@
     <!-- The SCP builder (roadmap 0.4, decomposition complete 2026-07-08):
          builders/scp modules + QuoteBuilderBase boot, esbuild bundle. The old
          screenprint-quote-builder.js monolith is a tombstone. Loads last. -->
-    <script src="/shared_components/js/builders/scp/index.js"></script>
+    <script src="/shared_components/js/builders/scp/index.js?v=2026.09.06.18"></script>
 
 </body>
 </html>

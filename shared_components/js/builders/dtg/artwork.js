@@ -74,7 +74,7 @@ export function artworkFileThumbHtml(file) {
         psd: 'fa-layer-group', tiff: 'fa-image', tif: 'fa-image',
     };
     const icon = iconMap[ext] || 'fa-file';
-    return `<div class="dcp-newart-thumb-icon"><i class="fas ${icon}"></i><div class="dcp-newart-thumb-ext">${escapeHtml(ext.toUpperCase())}</div></div>`;
+    return `<div class="dcp-newart-thumb-icon"><i class="fas ${icon}" aria-hidden="true"></i><div class="dcp-newart-thumb-ext">${escapeHtml(ext.toUpperCase())}</div></div>`;
 }
 
 export function renderNewArtworkList() {
@@ -101,7 +101,7 @@ export function renderNewArtworkList() {
                 </div>
             </div>
             <button type="button" class="dcp-newart-remove" data-file-idx="${idx}" aria-label="Remove ${escapeHtml(f.fileName)}">
-                <i class="fas fa-times"></i>
+                <i class="fas fa-times" aria-hidden="true"></i>
             </button>
         </div>
     `).join('');

@@ -153,7 +153,7 @@ export function updateDarkGarmentNudge(productList) {
     chip = document.createElement('span');
     chip.id = 'dark-garment-nudge';
     chip.className = 'dark-garment-nudge';
-    chip.innerHTML = '<i class="fas fa-exclamation-triangle"></i>' +
+    chip.innerHTML = '<i class="fas fa-exclamation-triangle" aria-hidden="true"></i>' +
         ' Dark garments in this quote — add white underbase screens?' +
         ' <button type="button" class="dark-garment-nudge-apply">Enable</button>' +
         ' <button type="button" class="dark-garment-nudge-dismiss" aria-label="Dismiss underbase reminder" title="Dismiss">&times;</button>';

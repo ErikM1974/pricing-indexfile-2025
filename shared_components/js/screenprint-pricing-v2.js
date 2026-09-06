@@ -44,7 +44,7 @@
  */
 
 /* Logging gate (2026-09-06): screenprint-pricing-v2 chatter only on localhost or ?debug=1; console.error/warn stay live. */
-var SPV2_LOG_ON = window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug');
+var SPV2_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
 var spv2Log = SPV2_LOG_ON ? console.log.bind(console) : function () {};
 class ScreenPrintPricing {
     constructor() {

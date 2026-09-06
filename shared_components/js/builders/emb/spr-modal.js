@@ -76,7 +76,7 @@ function renderSprProductsSection(productItems) {
                     // ShopWorks column
                     pHtml += `<td class="spr-radio-cell">`;
                     if (swAvail) {
-                        pHtml += `<label><input type="radio" name="spr-psource-${pIdx}" value="sw" ${defaultSel === 'sw' ? 'checked' : ''} onchange="onSprProductSourceChange(${pIdx})"><span class="spr-price-label">$${swPrice.toFixed(2)}</span></label>`;
+                        pHtml += `<label><input type="radio" name="spr-psource-${pIdx}" value="sw" ${defaultSel === 'sw' ? 'checked' : ''} data-change="onSprProductSourceChange" data-change-args='[${pIdx}]'><span class="spr-price-label">$${swPrice.toFixed(2)}</span></label>`;
                     } else {
                         pHtml += `<span class="spr-price-label disabled">$0.00</span>`;
                     }
@@ -85,7 +85,7 @@ function renderSprProductsSection(productItems) {
                     // API column
                     pHtml += `<td class="spr-radio-cell">`;
                     if (apiAvail) {
-                        pHtml += `<label><input type="radio" name="spr-psource-${pIdx}" value="api" ${defaultSel === 'api' ? 'checked' : ''} onchange="onSprProductSourceChange(${pIdx})"><span class="spr-price-label">${group.apiPrice != null ? '$' + group.apiPrice.toFixed(2) : '—'}</span></label>`;
+                        pHtml += `<label><input type="radio" name="spr-psource-${pIdx}" value="api" ${defaultSel === 'api' ? 'checked' : ''} data-change="onSprProductSourceChange" data-change-args='[${pIdx}]'><span class="spr-price-label">${group.apiPrice != null ? '$' + group.apiPrice.toFixed(2) : '—'}</span></label>`;
                     } else {
                         pHtml += `<span class="spr-unavailable">(unavailable)</span>`;
                     }
@@ -93,8 +93,8 @@ function renderSprProductsSection(productItems) {
 
                     // Custom column
                     pHtml += `<td class="spr-radio-cell">`;
-                    pHtml += `<label><input type="radio" name="spr-psource-${pIdx}" value="custom" ${defaultSel === 'custom' ? 'checked' : ''} onchange="onSprProductSourceChange(${pIdx})">`;
-                    pHtml += `<input type="number" class="spr-custom-input${defaultSel !== 'custom' ? ' spr-muted' : ''}" id="spr-pcustom-${pIdx}" step="0.01" min="0" placeholder="0.00" onfocus="onSprCustomProductFocus(${pIdx})" oninput="onSprCustomProductFocus(${pIdx})"></label>`;
+                    pHtml += `<label><input type="radio" name="spr-psource-${pIdx}" value="custom" ${defaultSel === 'custom' ? 'checked' : ''} data-change="onSprProductSourceChange" data-change-args='[${pIdx}]'>`;
+                    pHtml += `<input type="number" class="spr-custom-input${defaultSel !== 'custom' ? ' spr-muted' : ''}" id="spr-pcustom-${pIdx}" step="0.01" min="0" placeholder="0.00" onfocus="onSprCustomProductFocus(${pIdx})" data-input="onSprCustomProductFocus" data-input-args='[${pIdx}]'></label>`;
                     pHtml += `</td>`;
                 } else {
                     // Subsequent rows: just prices (no radios), aligned under radio+price above
@@ -158,14 +158,14 @@ function renderSprServicesSection(serviceItems) {
             html += `<td>${item.quantity}</td>`;
 
             if (hasStitches) {
-                html += `<td><input type="number" class="spr-stitch-input" id="spr-stitch-${idx}" value="${item.stitchCount || 8000}" min="1000" max="200000" step="1000" onchange="onSprStitchChange(${idx})"></td>`;
+                html += `<td><input type="number" class="spr-stitch-input" id="spr-stitch-${idx}" value="${item.stitchCount || 8000}" min="1000" max="200000" step="1000" data-change="onSprStitchChange" data-change-args='[${idx}]'></td>`;
             } else {
                 html += `<td style="text-align:center; color:#94a3b8;">&mdash;</td>`;
             }
 
             html += `<td class="spr-radio-cell">`;
             if (swAvail) {
-                html += `<label><input type="radio" name="spr-source-${idx}" value="sw" ${defaultSel === 'sw' ? 'checked' : ''} onchange="onSprSourceChange(${idx})"><span class="spr-price-label">$${swPrice.toFixed(2)}</span></label>`;
+                html += `<label><input type="radio" name="spr-source-${idx}" value="sw" ${defaultSel === 'sw' ? 'checked' : ''} data-change="onSprSourceChange" data-change-args='[${idx}]'><span class="spr-price-label">$${swPrice.toFixed(2)}</span></label>`;
             } else {
                 html += `<span class="spr-price-label disabled">$0.00</span>`;
             }
@@ -173,15 +173,15 @@ function renderSprServicesSection(serviceItems) {
 
             html += `<td class="spr-radio-cell">`;
             if (apiAvail) {
-                html += `<label><input type="radio" name="spr-source-${idx}" value="api" ${defaultSel === 'api' ? 'checked' : ''} onchange="onSprSourceChange(${idx})"><span class="spr-price-label" id="spr-api-price-${idx}">$${apiPrice.toFixed(2)}</span></label>`;
+                html += `<label><input type="radio" name="spr-source-${idx}" value="api" ${defaultSel === 'api' ? 'checked' : ''} data-change="onSprSourceChange" data-change-args='[${idx}]'><span class="spr-price-label" id="spr-api-price-${idx}">$${apiPrice.toFixed(2)}</span></label>`;
             } else {
                 html += `<span class="spr-unavailable">(unavailable)</span>`;
             }
             html += `</td>`;
 
             html += `<td class="spr-radio-cell">`;
-            html += `<label><input type="radio" name="spr-source-${idx}" value="custom" ${defaultSel === 'custom' ? 'checked' : ''} onchange="onSprSourceChange(${idx})">`;
-            html += `<input type="number" class="spr-custom-input${defaultSel !== 'custom' ? ' spr-muted' : ''}" id="spr-custom-${idx}" step="0.01" min="0" placeholder="0.00" onfocus="onSprCustomServiceFocus(${idx})" oninput="onSprCustomServiceFocus(${idx})"></label>`;
+            html += `<label><input type="radio" name="spr-source-${idx}" value="custom" ${defaultSel === 'custom' ? 'checked' : ''} data-change="onSprSourceChange" data-change-args='[${idx}]'>`;
+            html += `<input type="number" class="spr-custom-input${defaultSel !== 'custom' ? ' spr-muted' : ''}" id="spr-custom-${idx}" step="0.01" min="0" placeholder="0.00" onfocus="onSprCustomServiceFocus(${idx})" data-input="onSprCustomServiceFocus" data-input-args='[${idx}]'></label>`;
             html += `</td>`;
 
             html += `<td style="text-align:center;">${deltaBadgeHtml}</td>`;
@@ -216,7 +216,7 @@ function renderSprServicesSection(serviceItems) {
             warningDiv.id = 'spr-delta-warning';
             warningDiv.className = 'spr-delta-warning';
             // eslint-disable-next-line no-unsanitized/property -- audited (1.4): numeric prices/indices + internal enums; typeUpper escapeHtml-wrapped
-            warningDiv.innerHTML = `<i class="fas fa-exclamation-triangle"></i> <span>${escapeHtml(String(issueCount))} service item${issueCount > 1 ? 's have' : ' has'} significant price differences from 2026 pricing</span>`;
+            warningDiv.innerHTML = `<i class="fas fa-exclamation-triangle" aria-hidden="true"></i> <span>${escapeHtml(String(issueCount))} service item${issueCount > 1 ? 's have' : ' has'} significant price differences from 2026 pricing</span>`;
             const tableWrapper = servicesSection.querySelector('.spr-table-wrapper');
             servicesSection.insertBefore(warningDiv, tableWrapper);
         }
@@ -274,7 +274,7 @@ function _buildSprDesignRow(entry, defaultAssignments, embConfigOptions, st) {
 
         rowHtml += `<div style="display:flex;align-items:center;gap:8px;padding:5px 0;flex-wrap:wrap;">`;
         if (thumbUrl) {
-            rowHtml += `<img src="${escapeHtml(thumbUrl)}" alt="Design #${escapeHtml(num)}" style="width:40px;height:40px;border-radius:4px;object-fit:cover;border:1px solid #ddd;flex-shrink:0;" onerror="this.style.display='none'">`;
+            rowHtml += `<img src="${escapeHtml(thumbUrl)}" alt="Design #${escapeHtml(num)}" style="width:40px;height:40px;border-radius:4px;object-fit:cover;border:1px solid #ddd;flex-shrink:0;" data-onerror="hide">`;
         }
         rowHtml += `<span id="spr-thumb-${escapeHtml(num)}" style="display:none;"></span>`;
         rowHtml += `<strong>#${escapeHtml(num)}</strong>`;
@@ -390,7 +390,7 @@ function _renderSprDesignBanner(embConfigOptions, designEntries, st) {
     st.showAssignment = designEntries.length >= 2 && (embConfigOptions.hasGarments || embConfigOptions.hasCaps);
 
     if (st.showAssignment) {
-        bannerHtml += `<div style="font-size:11px;font-weight:600;color:#1e40af;margin-bottom:6px;"><i class="fas fa-object-group qb-mr4"></i>Design Logo Assignment</div>`;
+        bannerHtml += `<div style="font-size:11px;font-weight:600;color:#1e40af;margin-bottom:6px;"><i class="fas fa-object-group qb-mr4" aria-hidden="true"></i>Design Logo Assignment</div>`;
     }
 
     // Smart auto-assign defaults
@@ -420,7 +420,7 @@ function _renderSprDesignBanner(embConfigOptions, designEntries, st) {
 
     st.designBanner.style.display = '';
     st.designBanner.style.background = '#eff6ff';
-    const headerText = st.showAssignment ? '' : '<div style="font-size:11px;font-weight:600;color:#1e40af;margin-bottom:4px;"><i class="fas fa-search qb-mr4"></i>Design Stitch Lookup</div>';
+    const headerText = st.showAssignment ? '' : '<div style="font-size:11px;font-weight:600;color:#1e40af;margin-bottom:4px;"><i class="fas fa-search qb-mr4" aria-hidden="true"></i>Design Stitch Lookup</div>';
     // eslint-disable-next-line no-unsanitized/property -- audited (1.4): numeric prices/indices + internal enums; typeUpper escapeHtml-wrapped
     st.designBanner.innerHTML = headerText + bannerHtml;
 
@@ -432,7 +432,7 @@ function _renderSprDesignBanner(embConfigOptions, designEntries, st) {
                 if (url) {
                     const slot = document.getElementById('spr-thumb-' + dn);
                     if (slot) {
-                        slot.innerHTML = '<img src="' + escapeHtml(url) + '" class="spr-design-thumb" alt="Design #' + escapeHtml(dn) + '" onerror="this.parentElement.style.display=\'none\'">';
+                        slot.innerHTML = '<img src="' + escapeHtml(url) + '" class="spr-design-thumb" alt="Design #' + escapeHtml(dn) + '" data-onerror="hide-parent">';
                         slot.style.display = 'inline-block';
                     }
                 }
@@ -666,7 +666,7 @@ export function renderSprEmbConfigSection(embConfigOptions) {
     } else if (embConfigOptions.designInfo) {
         // Fallback: show simple design text if lookup had no results and no raw design numbers
         st.designBanner.style.display = '';
-        st.designBanner.innerHTML = `<i class="fas fa-palette" style="margin-right:6px;"></i><span>${escapeHtml(embConfigOptions.designInfo)}</span>`;
+        st.designBanner.innerHTML = `<i class="fas fa-palette" aria-hidden="true" style="margin-right:6px;"></i><span>${escapeHtml(embConfigOptions.designInfo)}</span>`;
     } else {
         st.designBanner.style.display = 'none';
     }

@@ -578,7 +578,7 @@ export async function submitToShopWorks() {
 
     state.submitting = true;
     updateSubmitEnabled();
-    setStatus('busy', '<i class="fas fa-circle-notch fa-spin"></i> Pricing + pushing…');
+    setStatus('busy', '<i class="fas fa-circle-notch fa-spin" aria-hidden="true"></i> Pricing + pushing…');
 
     // 1) Authoritative price via canonical endpoint
     let pricing;
@@ -628,7 +628,7 @@ export async function postPayloadToShopWorks(body, ctx) {
         statusEl.innerHTML = msg;
         statusEl.hidden = false;
     };
-    setStatus('busy', '<i class="fas fa-circle-notch fa-spin"></i> Pushing to ShopWorks…');
+    setStatus('busy', '<i class="fas fa-circle-notch fa-spin" aria-hidden="true"></i> Pushing to ShopWorks…');
     try {
         const r = await fetch(SUBMIT_URL, {
             method: 'POST',
@@ -658,8 +658,8 @@ export function renderRetryCard(setStatus, errorMsg) {
     setStatus('error', `
         <div class="dts-error-head"><strong>Push failed.</strong> ${escapeHtml(errorMsg)}</div>
         <div class="dts-error-actions">
-            <button type="button" class="dts-retry-btn" data-action="retry"><i class="fas fa-rotate-right"></i> Retry</button>
-            <button type="button" class="dts-copy-btn" data-action="copy-payload"><i class="fas fa-copy"></i> Copy payload</button>
+            <button type="button" class="dts-retry-btn" data-action="retry"><i class="fas fa-rotate-right" aria-hidden="true"></i> Retry</button>
+            <button type="button" class="dts-copy-btn" data-action="copy-payload"><i class="fas fa-copy" aria-hidden="true"></i> Copy payload</button>
         </div>
     `);
     const statusEl = document.getElementById('dtgSubmitStatus');

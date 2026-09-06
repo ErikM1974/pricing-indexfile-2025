@@ -80,7 +80,7 @@ export function initStitchEstimators() {
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'stitch-estimate-btn';
-        btn.innerHTML = '<i class="fas fa-ruler-combined"></i>';
+        btn.innerHTML = '<i class="fas fa-ruler-combined" aria-hidden="true"></i>';
         btn.title = 'Estimate stitch count from logo size';
         btn.setAttribute('aria-label', 'Estimate stitch count from logo size');
         btn.addEventListener('click', (e) => { e.preventDefault(); openStitchEstimator(selId, kind, btn); });
@@ -95,7 +95,7 @@ export function openStitchEstimator(selId, kind, anchorBtn) {
     pop.id = 'stitch-estimator-pop';
     pop.className = 'stitch-estimator-pop';
     pop.innerHTML = `
-        <div class="se-title"><i class="fas fa-ruler-combined"></i> Stitch estimate</div>
+        <div class="se-title"><i class="fas fa-ruler-combined" aria-hidden="true"></i> Stitch estimate</div>
         <div class="se-row">
             <label>W <input type="number" id="se-width" min="0.5" max="16" step="0.25" value="3.5"> in</label>
             <label>H <input type="number" id="se-height" min="0.5" max="16" step="0.25" value="2"> in</label>

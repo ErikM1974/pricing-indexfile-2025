@@ -392,7 +392,7 @@ function _paintImportProducts(data) {
         }
 
         // Add note about stitch count confirmation
-        productsHtml += '<p style="font-size: 11px; color: #64748b; margin-top: 8px; font-style: italic;"><i class="fas fa-info-circle"></i> After import, you\'ll be prompted to confirm stitch counts for accurate pricing</p>';
+        productsHtml += '<p style="font-size: 11px; color: #64748b; margin-top: 8px; font-style: italic;"><i class="fas fa-info-circle" aria-hidden="true"></i> After import, you\'ll be prompted to confirm stitch counts for accurate pricing</p>';
     }
 
     // Non-SanMar products (require manual pricing)
@@ -420,10 +420,10 @@ function _paintImportServices(data) {
     let servicesHtml = '';
     if (data.services.digitizing) {
         const codes = data.services.digitizingCodes || ['DD'];
-        servicesHtml += `<span class="preview-service-badge"><i class="fas fa-cog"></i> Digitizing (${codes.join(', ')})</span>`;
+        servicesHtml += `<span class="preview-service-badge"><i class="fas fa-cog" aria-hidden="true"></i> Digitizing (${codes.join(', ')})</span>`;
     }
     if (data.services.patchSetup) {
-        servicesHtml += `<span class="preview-service-badge"><i class="fas fa-layer-group"></i> Patch Setup ($${Number.isFinite(parseFloat(embState.pricingCalculator?.patchSetupFee)) ? parseFloat(embState.pricingCalculator.patchSetupFee) : 50})</span>`;
+        servicesHtml += `<span class="preview-service-badge"><i class="fas fa-layer-group" aria-hidden="true"></i> Patch Setup ($${Number.isFinite(parseFloat(embState.pricingCalculator?.patchSetupFee)) ? parseFloat(embState.pricingCalculator.patchSetupFee) : 50})</span>`;
     }
 
     // Handle new additionalLogos array
@@ -435,47 +435,47 @@ function _paintImportServices(data) {
         const typeLabel = al.type === 'fb' ? 'Full Back' :
                          al.type === 'cb' ? 'Cap Back' :
                          al.position || 'Additional Logo';
-        servicesHtml += `<span class="preview-service-badge"><i class="fas fa-plus-circle"></i> ${escapeHtml(typeLabel)}</span>`;
+        servicesHtml += `<span class="preview-service-badge"><i class="fas fa-plus-circle" aria-hidden="true"></i> ${escapeHtml(typeLabel)}</span>`;
     }
 
     if (data.services.monograms.length > 0) {
         const totalNames = data.services.monograms.reduce((sum, m) => sum + m.quantity, 0);
-        servicesHtml += `<span class="preview-service-badge"><i class="fas fa-font"></i> Monograms: ${totalNames} names</span>`;
+        servicesHtml += `<span class="preview-service-badge"><i class="fas fa-font" aria-hidden="true"></i> Monograms: ${totalNames} names</span>`;
     }
     if (data.services.designTransfer && data.services.designTransfer.length > 0) {
-        servicesHtml += `<span class="preview-service-badge"><i class="fas fa-exchange-alt"></i> Design Transfer: $${data.services.designTransfer.reduce((s, dt) => s + (dt.unitPrice || 50), 0).toFixed(2)}</span>`;
+        servicesHtml += `<span class="preview-service-badge"><i class="fas fa-exchange-alt" aria-hidden="true"></i> Design Transfer: $${data.services.designTransfer.reduce((s, dt) => s + (dt.unitPrice || 50), 0).toFixed(2)}</span>`;
     }
     if (data.services.contract && data.services.contract.length > 0) {
-        servicesHtml += `<span class="preview-service-badge"><i class="fas fa-file-contract"></i> Contract: ${data.services.contract.length} item(s)</span>`;
+        servicesHtml += `<span class="preview-service-badge"><i class="fas fa-file-contract" aria-hidden="true"></i> Contract: ${data.services.contract.length} item(s)</span>`;
     }
     if (data.services.sewing && data.services.sewing.length > 0) {
         const totalSewQty = data.services.sewing.reduce((sum, s) => sum + (s.quantity || 0), 0);
-        servicesHtml += `<span class="preview-service-badge"><i class="fas fa-scissors"></i> Sewing: ${totalSewQty} items</span>`;
+        servicesHtml += `<span class="preview-service-badge"><i class="fas fa-scissors" aria-hidden="true"></i> Sewing: ${totalSewQty} items</span>`;
     }
     if (data.services.weights && data.services.weights.length > 0) {
         const totalWeightQty = data.services.weights.reduce((sum, w) => sum + (w.quantity || 0), 0);
-        servicesHtml += `<span class="preview-service-badge"><i class="fas fa-weight-hanging"></i> Weight: ${totalWeightQty} items</span>`;
+        servicesHtml += `<span class="preview-service-badge"><i class="fas fa-weight-hanging" aria-hidden="true"></i> Weight: ${totalWeightQty} items</span>`;
     }
     if (data.services.capEmbellishments && data.services.capEmbellishments.length > 0) {
         const ceTypes = data.services.capEmbellishments.map(ce => ce.partNumber).join(', ');
-        servicesHtml += `<span class="preview-service-badge"><i class="fas fa-hat-cowboy"></i> Cap Embellishment: ${escapeHtml(ceTypes)}</span>`;
+        servicesHtml += `<span class="preview-service-badge"><i class="fas fa-hat-cowboy" aria-hidden="true"></i> Cap Embellishment: ${escapeHtml(ceTypes)}</span>`;
     }
     if (data.services.rush) {
-        servicesHtml += `<span class="preview-service-badge warning"><i class="fas fa-bolt"></i> Rush Fee: $${data.services.rush.amount.toFixed(2)}</span>`;
+        servicesHtml += `<span class="preview-service-badge warning"><i class="fas fa-bolt" aria-hidden="true"></i> Rush Fee: $${data.services.rush.amount.toFixed(2)}</span>`;
     }
     if (data.services.discount && data.services.discount.amount > 0) {
         // 'warning' on purpose: this is the one imported figure the builder CANNOT apply
         // for the rep (the discount input was removed 2026-06-04), so it has to be loud.
-        servicesHtml += `<span class="preview-service-badge warning"><i class="fas fa-tag"></i> Discount NOT applied: -$${data.services.discount.amount.toFixed(2)}</span>`;
+        servicesHtml += `<span class="preview-service-badge warning"><i class="fas fa-tag" aria-hidden="true"></i> Discount NOT applied: -$${data.services.discount.amount.toFixed(2)}</span>`;
     }
     if (data.services.artCharges) {
-        servicesHtml += `<span class="preview-service-badge"><i class="fas fa-palette"></i> Art Charge: $${data.services.artCharges.amount.toFixed(2)}</span>`;
+        servicesHtml += `<span class="preview-service-badge"><i class="fas fa-palette" aria-hidden="true"></i> Art Charge: $${data.services.artCharges.amount.toFixed(2)}</span>`;
     }
     if (data.services.graphicDesign) {
-        servicesHtml += `<span class="preview-service-badge"><i class="fas fa-pencil-ruler"></i> Design: ${data.services.graphicDesign.hours} hrs</span>`;
+        servicesHtml += `<span class="preview-service-badge"><i class="fas fa-pencil-ruler" aria-hidden="true"></i> Design: ${data.services.graphicDesign.hours} hrs</span>`;
     }
     if (data.services.ltmFee) {
-        servicesHtml += `<span class="preview-service-badge warning"><i class="fas fa-exclamation-circle"></i> LTM Fee: $${data.services.ltmFee.amount.toFixed(2)}</span>`;
+        servicesHtml += `<span class="preview-service-badge warning"><i class="fas fa-exclamation-circle" aria-hidden="true"></i> LTM Fee: $${data.services.ltmFee.amount.toFixed(2)}</span>`;
     }
 
     if (servicesHtml) {
@@ -490,13 +490,13 @@ function _paintImportWarnings(data) {
     const warnings = document.getElementById('preview-warnings');
     // Warnings - highlight DECG API failures prominently (CLAUDE.md rule #4)
     if (data.warnings.length > 0 || data.notes.length > 0) {
-        let warningsHtml = '<h5><i class="fas fa-exclamation-triangle"></i> Notes & Warnings</h5>';
+        let warningsHtml = '<h5><i class="fas fa-exclamation-triangle" aria-hidden="true"></i> Notes & Warnings</h5>';
 
         // Show DECG API failure as prominent error banner
         if (data.decgApiFailed) {
             warningsHtml += `
                 <div style="background: #fef2f2; border: 1px solid #ef4444; border-radius: 6px; padding: 10px 12px; margin-bottom: 10px; color: #b91c1c;">
-                    <strong><i class="fas fa-exclamation-circle"></i> DECG API Error:</strong> Unable to load current pricing from server.
+                    <strong><i class="fas fa-exclamation-circle" aria-hidden="true"></i> DECG API Error:</strong> Unable to load current pricing from server.
                     Prices shown are <em>fallback estimates</em> and may be incorrect.
                     <strong>Verify DECG prices manually before sending quote.</strong>
                 </div>`;
@@ -548,7 +548,7 @@ function _paintImportWarnings(data) {
 
     // Show "Items for Review" section with checkboxes
     if (allReviewItems.length > 0) {
-        let reviewHtml = '<h5 style="margin-top: 12px; color: #b45309;"><i class="fas fa-search"></i> Items for Review — Check to Import as Notes</h5>';
+        let reviewHtml = '<h5 style="margin-top: 12px; color: #b45309;"><i class="fas fa-search" aria-hidden="true"></i> Items for Review — Check to Import as Notes</h5>';
         reviewHtml += '<div style="max-height: 150px; overflow-y: auto; padding: 4px 0;">';
         allReviewItems.forEach((item, i) => {
             const hasPrice = item.unitPrice > 0;
@@ -1786,7 +1786,7 @@ export async function confirmShopWorksImport() {
     } finally {
         hideImportProgress();
         /** @type {HTMLInputElement} */ (btn).disabled = false;
-        btn.innerHTML = '<i class="fas fa-check"></i> Import Items';
+        btn.innerHTML = '<i class="fas fa-check" aria-hidden="true"></i> Import Items';
     }
 }
 

@@ -648,7 +648,7 @@ export function showDuplicateModeBanner(sourceQuoteId) {
             'background:#ecfdf5;border:1px solid #34d399;border-left:4px solid #059669;' +
             'border-radius:6px;color:#065f46;font-size:13px;line-height:1.4;margin-bottom:10px;';
         banner.innerHTML = `
-            <i class="fas fa-copy"></i>
+            <i class="fas fa-copy" aria-hidden="true"></i>
             <div>
                 <strong>Duplicated from ${escapeHtml(String(sourceQuoteId))}</strong>
                 <span class="qb-dim"> — saving creates a NEW quote at today's prices.</span>
@@ -672,7 +672,7 @@ export function showEditModeBanner(quoteId, revision) {
             'background:#fef3c7;border:1px solid #fbbf24;border-left:4px solid #d97706;' +
             'border-radius:6px;color:#92400e;font-size:13px;line-height:1.4;margin-bottom:10px;';
         banner.innerHTML = `
-            <i class="fas fa-pencil-alt"></i>
+            <i class="fas fa-pencil-alt" aria-hidden="true"></i>
             <div>
                 <strong>Editing ${escapeHtml(String(quoteId))}</strong> · Rev ${escapeHtml(String(revision))}
                 <span class="qb-dim"> — Saving will create Rev ${escapeHtml(String(revision + 1))} (same quote ID).</span>
@@ -715,13 +715,13 @@ export function showResumeBanner() {
         banner.className = 'dtg-resume-banner-inline';
         // eslint-disable-next-line no-unsanitized/property -- audited (Batch 5 move): every interpolation is escapeHtml()d, numeric, or static config
         banner.innerHTML = `
-            <span class="drbi-icon"><i class="fas fa-clock-rotate-left"></i></span>
+            <span class="drbi-icon"><i class="fas fa-clock-rotate-left" aria-hidden="true"></i></span>
             <span class="drbi-msg">Resumed your last quote${qidLabel}${escapeHtml(summary)}. Continue editing below, or start over.</span>
             <button type="button" class="drbi-dismiss" data-action="dismiss">
-                <i class="fas fa-trash-can"></i> Start fresh
+                <i class="fas fa-trash-can" aria-hidden="true"></i> Start fresh
             </button>
             <button type="button" class="drbi-close" data-action="close" aria-label="Dismiss this notice">
-                <i class="fas fa-times"></i>
+                <i class="fas fa-times" aria-hidden="true"></i>
             </button>
         `;
         const dismissBtn = banner.querySelector('[data-action="dismiss"]');

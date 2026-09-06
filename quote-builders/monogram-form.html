@@ -8,7 +8,7 @@
     <link rel="icon" href="/favicon.png" type="image/png">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Dancing+Script:wght@600;700&family=Archivo+Black&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-    <link href="/shared_components/css/quote-builder-common.css" rel="stylesheet">
+    <link href="/shared_components/css/quote-builder-common.css?v=2026.09.06.18" rel="stylesheet">
     <link href="/shared_components/css/monogram-form.css?v=2026.08.04.3" rel="stylesheet">
 </head>
 <body>
@@ -27,7 +27,7 @@
             <div class="header-right">
                 <span class="current-date" id="currentDate"></span>
                 <a href="/staff-dashboard.html" class="btn-secondary">
-                    <i class="fas fa-arrow-left"></i>
+                    <i class="fas fa-arrow-left" aria-hidden="true"></i>
                     Back to Dashboard
                 </a>
             </div>
@@ -40,17 +40,17 @@
         <div class="page-header">
             <div class="page-header-content">
                 <h1 class="page-title">
-                    <i class="fas fa-signature"></i>
+                    <i class="fas fa-signature" aria-hidden="true"></i>
                     Monogram Form 2026
                 </h1>
                 <p class="page-subtitle">Embroidery personalization tracking for production</p>
             </div>
             <div class="page-header-actions">
                 <button type="button" class="btn-icon" id="searchBtn" title="Search existing forms">
-                    <i class="fas fa-search"></i>
+                    <i class="fas fa-search" aria-hidden="true"></i>
                 </button>
                 <button type="button" class="btn-icon" id="newFormBtn" title="Start new form">
-                    <i class="fas fa-plus"></i>
+                    <i class="fas fa-plus" aria-hidden="true"></i>
                 </button>
             </div>
         </div>
@@ -58,7 +58,7 @@
         <!-- Search Panel (Hidden by default) -->
         <div class="search-panel" id="searchPanel" style="display: none;">
             <div class="search-panel-header">
-                <h3><i class="fas fa-search"></i> Search Existing Forms</h3>
+                <h3><i class="fas fa-search" aria-hidden="true"></i> Search Existing Forms</h3>
                 <button type="button" class="btn-close" id="closeSearchBtn">&times;</button>
             </div>
             <div class="search-panel-body">
@@ -72,7 +72,7 @@
                         <input type="text" id="searchCompanyName" placeholder="e.g., Puyallup">
                     </div>
                     <button type="button" class="btn-primary" id="doSearchBtn">
-                        <i class="fas fa-search"></i> Search
+                        <i class="fas fa-search" aria-hidden="true"></i> Search
                     </button>
                 </div>
                 <div class="search-results" id="searchResults">
@@ -86,7 +86,7 @@
             <!-- Order Lookup Section -->
             <section class="form-section">
                 <h2 class="section-title">
-                    <i class="fas fa-clipboard-list"></i>
+                    <i class="fas fa-clipboard-list" aria-hidden="true"></i>
                     Order Information
                 </h2>
                 <div class="form-row">
@@ -96,7 +96,7 @@
                             <input type="text" id="orderNumber" name="orderNumber"
                                    placeholder="Enter ShopWorks order number" required>
                             <button type="button" id="lookupOrderBtn" class="btn-lookup">
-                                <i class="fas fa-search"></i> Lookup
+                                <i class="fas fa-search" aria-hidden="true"></i> Lookup
                             </button>
                         </div>
                         <span class="field-hint">Enter order number to auto-populate order details</span>
@@ -116,7 +116,7 @@
                 <!-- Order Status Indicator -->
                 <div class="order-status" id="orderStatus" style="display: none;">
                     <div class="status-badge status-loading" id="orderStatusBadge">
-                        <i class="fas fa-spinner fa-spin"></i>
+                        <i class="fas fa-spinner fa-spin" aria-hidden="true"></i>
                         <span id="orderStatusText">Looking up order...</span>
                     </div>
                 </div>
@@ -125,7 +125,7 @@
             <!-- Monogram Details Section -->
             <section class="form-section">
                 <h2 class="section-title">
-                    <i class="fas fa-palette"></i>
+                    <i class="fas fa-palette" aria-hidden="true"></i>
                     Monogram Details
                 </h2>
                 <div class="form-row">
@@ -139,7 +139,7 @@
                         <div class="thread-color-selector">
                             <button type="button" id="threadColorBtn" class="thread-color-toggle">
                                 <span id="threadColorBtnText">Select Thread Colors...</span>
-                                <i class="fas fa-chevron-down"></i>
+                                <i class="fas fa-chevron-down" aria-hidden="true"></i>
                             </button>
                             <div id="threadColorDropdown" class="thread-color-dropdown" hidden>
                                 <div class="thread-color-search">
@@ -162,7 +162,7 @@
                         <div class="location-selector">
                             <button type="button" id="locationBtn" class="location-toggle">
                                 <span id="locationBtnText">Select Locations...</span>
-                                <i class="fas fa-chevron-down"></i>
+                                <i class="fas fa-chevron-down" aria-hidden="true"></i>
                             </button>
                             <div id="locationDropdown" class="location-dropdown" hidden>
                                 <div class="location-list" id="locationList">
@@ -189,17 +189,17 @@
                                   rows="4"></textarea>
                         <div class="paste-names-actions">
                             <button type="button" id="importNamesBtn" class="btn-secondary btn-sm">
-                                <i class="fas fa-upload"></i> Import Names
+                                <i class="fas fa-upload" aria-hidden="true"></i> Import Names
                             </button>
                             <button type="button" id="clearNamesBtn" class="btn-secondary btn-sm">
-                                <i class="fas fa-times"></i> Clear
+                                <i class="fas fa-times" aria-hidden="true"></i> Clear
                             </button>
                             <span class="imported-count" id="importedCount"></span>
                         </div>
                     </div>
                     <div class="unassigned-names-panel" id="unassignedNamesPanel" style="display: none;">
                         <div class="unassigned-header">
-                            <strong><i class="fas fa-user-clock"></i> Unassigned Names</strong>
+                            <strong><i class="fas fa-user-clock" aria-hidden="true"></i> Unassigned Names</strong>
                             <span class="unassigned-count" id="unassignedCount">(0)</span>
                         </div>
                         <div class="unassigned-list" id="unassignedNamesList">
@@ -218,16 +218,16 @@
             <section class="form-section names-section">
                 <div class="section-header-row">
                     <h2 class="section-title">
-                        <i class="fas fa-users"></i>
+                        <i class="fas fa-users" aria-hidden="true"></i>
                         Names
                         <span class="name-count" id="nameCount">(0 entries)</span>
                     </h2>
                     <div class="section-actions">
                         <button type="button" class="btn-secondary btn-sm" id="addRowBtn">
-                            <i class="fas fa-plus"></i> Add Row
+                            <i class="fas fa-plus" aria-hidden="true"></i> Add Row
                         </button>
                         <button type="button" class="btn-secondary btn-sm" id="add5RowsBtn">
-                            <i class="fas fa-plus"></i> Add 5 Rows
+                            <i class="fas fa-plus" aria-hidden="true"></i> Add 5 Rows
                         </button>
                     </div>
                 </div>
@@ -254,14 +254,14 @@
 
                 <div class="table-footer">
                     <button type="button" class="btn-secondary" id="addRowBtnBottom">
-                        <i class="fas fa-plus"></i> Add Row
+                        <i class="fas fa-plus" aria-hidden="true"></i> Add Row
                     </button>
                 </div>
 
                 <!-- Stitch Check: live QA on the name list (monogram-name-qa.js) -->
                 <div class="stitch-check-panel" id="stitchCheckPanel" style="display: none;">
                     <div class="stitch-check-header">
-                        <strong><i class="fas fa-spell-check"></i> Stitch Check</strong>
+                        <strong><i class="fas fa-spell-check" aria-hidden="true"></i> Stitch Check</strong>
                         <span class="stitch-check-summary" id="stitchCheckSummary"></span>
                     </div>
                     <ul class="stitch-check-list" id="stitchCheckList"></ul>
@@ -272,18 +272,18 @@
             <section class="form-actions">
                 <div class="actions-left">
                     <button type="button" class="btn-secondary" id="clearFormBtn">
-                        <i class="fas fa-eraser"></i> Clear Form
+                        <i class="fas fa-eraser" aria-hidden="true"></i> Clear Form
                     </button>
                 </div>
                 <div class="actions-right">
                     <button type="button" class="btn-secondary" id="saveDraftBtn">
-                        <i class="fas fa-save"></i> Save Draft
+                        <i class="fas fa-save" aria-hidden="true"></i> Save Draft
                     </button>
                     <button type="button" class="btn-secondary" id="printProofBtn">
-                        <i class="fas fa-file-signature"></i> Print Customer Proof
+                        <i class="fas fa-file-signature" aria-hidden="true"></i> Print Customer Proof
                     </button>
                     <button type="button" class="btn-primary" id="printPdfBtn">
-                        <i class="fas fa-print"></i> Print PDF
+                        <i class="fas fa-print" aria-hidden="true"></i> Print PDF
                     </button>
                 </div>
             </section>

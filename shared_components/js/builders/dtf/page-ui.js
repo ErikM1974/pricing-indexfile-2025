@@ -414,7 +414,7 @@ export function copyShareableUrl() {
     const btn = /** @type {HTMLElement} */ (event.target).closest('button');
     const originalHTML = btn.innerHTML;
      
-    btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+    btn.innerHTML = '<i class="fas fa-check" aria-hidden="true"></i> Copied!';
     btn.style.background = '#28a745';
     setTimeout(() => {
         // eslint-disable-next-line no-unsanitized/property -- self-restore of markup captured from this element

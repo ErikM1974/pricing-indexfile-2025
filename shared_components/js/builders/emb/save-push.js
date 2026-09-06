@@ -478,7 +478,7 @@ async function _saveAndGetLinkInner(opts = {}) {
     const saveBtn = /** @type {HTMLInputElement|null} */ (document.querySelector('.btn-save-quote, [onclick*="saveAndGetLink"]'));
     const originalText = saveBtn?.innerHTML;
     if (saveBtn) {
-        saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+        saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Saving...';
         saveBtn.disabled = true;
     }
 
@@ -642,7 +642,7 @@ export function renderPushReadiness() {
         renderPushChecklist(el, getPushBlockers(r));
     } else {
         const item = (ok, label) =>
-            `<div class="pr-item ${ok ? 'pr-ok' : 'pr-no'}"><i class="fas fa-${ok ? 'check-circle' : 'circle'}"></i>${label}</div>`;
+            `<div class="pr-item ${ok ? 'pr-ok' : 'pr-no'}"><i class="fas fa-${ok ? 'check-circle' : 'circle'}" aria-hidden="true"></i>${label}</div>`;
         // eslint-disable-next-line no-unsanitized/property -- audited (1.4): internal literal checklist labels only
         el.innerHTML = '<div class="pr-title">Before you push</div>' +
             item(r.hasCustomer, 'ShopWorks Customer #') +
@@ -689,7 +689,7 @@ export async function pushToShopWorks() {
         // destroys #emb-push-shopworks-label, which updatePushButtonState needs, and would strand the button
         // disabled (the greyed-Push regression). updatePushButtonState() in the finally resets the label text.
         const lbl = document.getElementById('emb-push-shopworks-label');
-        if (lbl) lbl.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Preparing preview…';
+        if (lbl) lbl.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Preparing preview…';
     }
     try {
         const dirty = (typeof hasUnsavedChanges === 'function') ? hasUnsavedChanges() : true;
@@ -720,11 +720,11 @@ export async function openPushPreview() {
 
     if (statusEl) statusEl.innerHTML = '';
     previewEl.innerHTML = '<div class="qb-loading-pad">' +
-        '<i class="fas fa-spinner fa-spin"></i> Loading preview…</div>';
+        '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Loading preview…</div>';
     confirmBtn.disabled = true;
     confirmBtn.style.display = '';
     confirmBtn.dataset.force = 'false';
-    confirmBtn.innerHTML = '<i class="fas fa-upload"></i> Push to ShopWorks';
+    confirmBtn.innerHTML = '<i class="fas fa-upload" aria-hidden="true"></i> Push to ShopWorks';
     modal.classList.add('active');
     if (typeof openAccessibleModal === 'function') openAccessibleModal(modal, { label: 'Push to ShopWorks preview', onEsc: closePushPreview }); // 1.8: focus trap + Esc
 
@@ -754,12 +754,12 @@ export async function openPushPreview() {
         renderPushPreview(data);
         if (data.alreadyPushed) {
             confirmBtn.dataset.force = 'true';
-            confirmBtn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Push Again (creates duplicate)';
+            confirmBtn.innerHTML = '<i class="fas fa-exclamation-triangle" aria-hidden="true"></i> Push Again (creates duplicate)';
         }
         confirmBtn.disabled = false;
     } catch (err) {
         console.error('[Embroidery] Preview error:', err);
-        previewEl.innerHTML = '<div class="preview-warnings"><h5><i class="fas fa-exclamation-triangle"></i> ' +
+        previewEl.innerHTML = '<div class="preview-warnings"><h5><i class="fas fa-exclamation-triangle" aria-hidden="true"></i> ' +
             'Could not load preview</h5><ul><li>' + escapeHtml(err.message) + '</li></ul></div>';
     }
 }
@@ -774,7 +774,7 @@ function renderPushPreview(data) {
 
     if (data.alreadyPushed && statusEl) {
         // eslint-disable-next-line no-unsanitized/property -- audited (1.4): pushedAt escapeHtml-wrapped; rest literal
-        statusEl.innerHTML = '<div class="preview-warnings"><h5><i class="fas fa-exclamation-triangle"></i> ' +
+        statusEl.innerHTML = '<div class="preview-warnings"><h5><i class="fas fa-exclamation-triangle" aria-hidden="true"></i> ' +
             'Already pushed to ShopWorks</h5><ul><li>This quote was pushed' +
             (data.pushedAt ? ' on ' + escapeHtml(String(data.pushedAt)) : '') +
             '. Pushing again will create a DUPLICATE order.</li></ul></div>';
@@ -845,7 +845,7 @@ function renderPushPreview(data) {
         else if (/^Order notes:/i.test(t)) warnings.push('Fee sent as a note (not a billable line): ' + t.replace(/^Order notes:\s*/i, ''));
     }
     if (warnings.length > 0) {
-        html += '<div class="preview-warnings"><h5><i class="fas fa-exclamation-triangle"></i> Heads up</h5><ul>';
+        html += '<div class="preview-warnings"><h5><i class="fas fa-exclamation-triangle" aria-hidden="true"></i> Heads up</h5><ul>';
         for (const w of warnings) html += '<li>' + escapeHtml(w) + '</li>';
         html += '</ul></div>';
     }
@@ -858,7 +858,7 @@ function renderPushPreview(data) {
     // and needs-review cases.
     const taxLines = oNotes.map(n => String(n.Note || '')).filter(t => /^(Tax Rate:|Tax Account:|Tax Amount:|Tax: |Apply Tax:|Rep:|State:)/i.test(t));  // +Rep:/State:/Tax Amount: so needs-review + out-of-state instructions surface (review C36)
     if (taxLines.length) {
-        html += '<div class="preview-warnings preview-manual-tax"><h5><i class="fas fa-info-circle"></i> After import — set tax in ShopWorks</h5><ul>' +
+        html += '<div class="preview-warnings preview-manual-tax"><h5><i class="fas fa-info-circle" aria-hidden="true"></i> After import — set tax in ShopWorks</h5><ul>' +
             taxLines.map(t => '<li>' + escapeHtml(t.trim()) + '</li>').join('') +
             '</ul></div>';
     }
@@ -884,7 +884,7 @@ export async function confirmPushToShopWorks() {
 
     const origHtml = confirmBtn.innerHTML;
     confirmBtn.disabled = true;
-    confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Pushing…';
+    confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Pushing…';
 
     try {
         const response = await fetch(`/api/embroidery-push/push-quote`, {
@@ -899,13 +899,13 @@ export async function confirmPushToShopWorks() {
                 // Caspio says already pushed — offer a guarded force re-push.
                 if (statusEl) {
                     // eslint-disable-next-line no-unsanitized/property -- audited (1.4): pushedAt escapeHtml-wrapped; rest literal
-                    statusEl.innerHTML = '<div class="preview-warnings"><h5><i class="fas fa-exclamation-triangle"></i> ' +
+                    statusEl.innerHTML = '<div class="preview-warnings"><h5><i class="fas fa-exclamation-triangle" aria-hidden="true"></i> ' +
                         'Already pushed</h5><ul><li>This quote was already pushed' +
                         (data.pushedAt ? ' on ' + escapeHtml(String(data.pushedAt)) : '') +
                         '. Click again to push a DUPLICATE.</li></ul></div>';
                 }
                 confirmBtn.dataset.force = 'true';
-                confirmBtn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Push Again (creates duplicate)';
+                confirmBtn.innerHTML = '<i class="fas fa-exclamation-triangle" aria-hidden="true"></i> Push Again (creates duplicate)';
                 confirmBtn.disabled = false;
                 return;
             }
@@ -925,7 +925,7 @@ export async function confirmPushToShopWorks() {
         const extId = data.extOrderId || embState._pushQuoteId;
         if (statusEl) {
             statusEl.innerHTML = '<div class="shopworks-import-preview active" style="background:#eff6ff; border-color:#bfdbfe;">' +
-                '<h4><i class="fas fa-paper-plane"></i> Sent to ManageOrders</h4>' +
+                '<h4><i class="fas fa-paper-plane" aria-hidden="true"></i> Sent to ManageOrders</h4>' +
                 '<div class="preview-item-value">Uploaded as <strong>' + escapeHtml(extId) + '</strong> · ' +
                 escapeHtml(String(data.lineItemCount || 0)) + ' line items · ' +
                 escapeHtml(String(data.designCount || 0)) + ' design(s).</div>' +
@@ -934,7 +934,7 @@ export async function confirmPushToShopWorks() {
                 '<div id="emb-sw-import-result" style="margin-top:8px; font-size:0.92em;"></div>' +
                 '<button type="button" id="emb-sw-verify-btn" style="margin-top:8px; padding:6px 12px; background:#1a5276; ' +
                 'color:#fff; border:none; border-radius:6px; cursor:pointer;">' +
-                '<i class="fas fa-magnifying-glass"></i> Verify in ShopWorks</button></div>';
+                '<i class="fas fa-magnifying-glass" aria-hidden="true"></i> Verify in ShopWorks</button></div>';
             const vbtn = document.getElementById('emb-sw-verify-btn');
             if (vbtn) vbtn.addEventListener('click', () => verifyShopWorksImport(extId));
             // Initial check — usually still "pending" right after a push, which is the
@@ -947,7 +947,7 @@ export async function confirmPushToShopWorks() {
     } catch (error) {
         console.error('[Embroidery] Push error:', error);
         if (statusEl) {
-            statusEl.innerHTML = '<div class="preview-warnings"><h5><i class="fas fa-exclamation-triangle"></i> ' +
+            statusEl.innerHTML = '<div class="preview-warnings"><h5><i class="fas fa-exclamation-triangle" aria-hidden="true"></i> ' +
                 'Push failed</h5><ul><li>' + escapeHtml(error.message) + '</li></ul></div>';
         }
         confirmBtn.disabled = false;
@@ -967,7 +967,7 @@ export async function confirmPushToShopWorks() {
 export async function verifyShopWorksImport(extOrderId) {
     const out = document.getElementById('emb-sw-import-result');
     if (!extOrderId || !out) return;
-    out.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Checking ShopWorks…';
+    out.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Checking ShopWorks…';
     try {
         const apiBase = window.APP_CONFIG.API.BASE_URL;
         const resp = await fetch(`${apiBase}/api/manageorders/getorderno/${encodeURIComponent(extOrderId)}`);
@@ -976,10 +976,10 @@ export async function verifyShopWorksImport(extOrderId) {
         const row = Array.isArray(data.result) && data.result.length ? data.result[0] : null;
         const orderNo = row ? (row.id_Order || row.ID_Order || row) : null;
         if (orderNo) {
-            out.innerHTML = '<span style="color:#15803d; font-weight:600;"><i class="fas fa-check-circle"></i> ' +
+            out.innerHTML = '<span style="color:#15803d; font-weight:600;"><i class="fas fa-check-circle" aria-hidden="true"></i> ' +
                 'Confirmed in ShopWorks — order #' + escapeHtml(String(orderNo)) + '</span>';
         } else {
-            out.innerHTML = '<span class="qb-amber-dark"><i class="fas fa-exclamation-triangle"></i> ' +
+            out.innerHTML = '<span class="qb-amber-dark"><i class="fas fa-exclamation-triangle" aria-hidden="true"></i> ' +
                 '<strong>Not in ShopWorks yet.</strong> ManageOrders accepted the upload, but OnSite has not ' +
                 'imported it. OnSite pulls new orders periodically — wait a few minutes and click ' +
                 '“Verify in ShopWorks” again. If it never appears, the MO→OnSite conversion failed ' +
@@ -987,7 +987,7 @@ export async function verifyShopWorksImport(extOrderId) {
                 'conversion log for this order.</span>';
         }
     } catch (err) {
-        out.innerHTML = '<span class="qb-amber-dark"><i class="fas fa-exclamation-triangle"></i> ' +
+        out.innerHTML = '<span class="qb-amber-dark"><i class="fas fa-exclamation-triangle" aria-hidden="true"></i> ' +
             'Could not verify ShopWorks import: ' + escapeHtml(err.message) + '. Try again shortly.</span>';
     }
 }

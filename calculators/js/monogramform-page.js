@@ -1,7 +1,7 @@
 /* monogramform-page.js — the page script for /calculators/monogramform.html, extracted 2026-09-06 from its inline <script>
  * (Rule 3). Kept at global scope on purpose: it was global before, and the shared calculator scripts call some
  * of these functions by name. Logging is gated (localhost or ?debug=1); console.error/warn stay live. */
-var MONO_LOG_ON = window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug');
+var MONO_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
 var monoLog = MONO_LOG_ON ? console.log.bind(console) : function () {};
 
 // Wait for JotForm to fully load and apply styling

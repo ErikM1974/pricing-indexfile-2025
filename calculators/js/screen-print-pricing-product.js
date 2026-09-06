@@ -3,7 +3,7 @@
  * (Rule 3). Runs BEFORE pricing-pages.js so its productColorsReady listener is registered in time. */
 /* Debug logging gate — this is a staff calculator; the chatter (37 + 30 console.log lines across the two
  * page scripts) only prints on localhost or with ?debug=1. console.error / console.warn stay live. */
-var SP_DEBUG = window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug');
+var SP_DEBUG = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
 var spLog = SP_DEBUG ? console.log.bind(console) : function () {};
 // Proxy host from /config/app.config.js (Rule 6) — never guess a backend.
 var SP_API_BASE = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) || '';

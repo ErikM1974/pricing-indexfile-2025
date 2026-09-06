@@ -467,7 +467,7 @@ export async function saveAndGetLink(opts = {}) {
     const saveBtn = /** @type {HTMLInputElement|null} */ (document.querySelector('.btn-save-quote, [onclick*="saveAndGetLink"]'));
     const originalText = saveBtn?.innerHTML;
     if (saveBtn) {
-        saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+        saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Saving...';
         saveBtn.disabled = true;
     }
 

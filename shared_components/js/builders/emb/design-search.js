@@ -275,7 +275,7 @@ export async function lookupDesignNumber(type) {
     // Show loading state
     infoBadge.style.display = 'block';
     infoBadge.className = 'design-info-badge design-info-loading';
-    infoBadge.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Looking up design #' + escapeHtml(designNum) + '...';
+    infoBadge.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Looking up design #' + escapeHtml(designNum) + '...';
 
     try {
         const apiBase = window.APP_CONFIG.API.BASE_URL;
@@ -308,7 +308,7 @@ export async function lookupDesignNumber(type) {
             // EXISTING ShopWorks design (id_Design), NOT a new one — so the old "a new design will be created"
             // copy was misleading and gave false comfort about a wrong/typo'd number. Tell the rep exactly
             // what will happen so they verify the # or clear it and upload artwork for a genuinely new design.
-            infoBadge.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Design #' + escapeHtml(designNum) +
+            infoBadge.innerHTML = '<i class="fas fa-exclamation-triangle" aria-hidden="true"></i> Design #' + escapeHtml(designNum) +
                 ' not found in our database. It will be pushed as an EXISTING ShopWorks design # — verify it is correct, or clear it and upload artwork to create a NEW design.';
             // Still set the number — the rep may know it exists in ShopWorks (the warning above makes the
             // "existing id_Design" behavior explicit).
@@ -318,7 +318,7 @@ export async function lookupDesignNumber(type) {
     } catch (err) {
         console.error('Design lookup failed:', err);
         infoBadge.className = 'design-info-badge design-info-error';
-        infoBadge.innerHTML = '<i class="fas fa-times-circle"></i> Lookup failed: ' + escapeHtml(err.message);
+        infoBadge.innerHTML = '<i class="fas fa-times-circle" aria-hidden="true"></i> Lookup failed: ' + escapeHtml(err.message);
     }
 }
 
@@ -339,13 +339,13 @@ async function applyDesignToCard(type, designNum, design) {
     const parts = [company, designName, stitchStr, tierBadge, placement].filter(Boolean);
 
     // Build enhanced info badge with DST, order history, extra color warning
-    let badgeHtml = '<i class="fas fa-check-circle"></i> ' + escapeHtml(parts.join(' · '));
+    let badgeHtml = '<i class="fas fa-check-circle" aria-hidden="true"></i> ' + escapeHtml(parts.join(' · '));
 
     // DST filenames (show first 2)
     const dstArr = design.dstFilenames || [];
     if (dstArr.length > 0) {
         const dstDisplay = dstArr.length <= 2 ? dstArr.join(', ') : dstArr.slice(0, 2).join(', ') + ' +' + (dstArr.length - 2) + ' more';
-        badgeHtml += '<br><span class="qb-hint-indigo"><i class="fas fa-file-code" style="margin-right:2px;"></i>DST: ' + escapeHtml(dstDisplay) + '</span>';
+        badgeHtml += '<br><span class="qb-hint-indigo"><i class="fas fa-file-code" aria-hidden="true" style="margin-right:2px;"></i>DST: ' + escapeHtml(dstDisplay) + '</span>';
     }
 
     // Order history
@@ -754,7 +754,7 @@ async function loadCustomerDesignGallery(customerId) {
             const searchInput = /** @type {(HTMLInputElement & { _galleryMode?: boolean })|null} */ (document.getElementById('design-search-input'));
             const searchHint = document.getElementById('design-search-hint');
             const searchBtn = document.getElementById('design-search-go');
-            if (results) results.innerHTML = '<div class="design-search-empty" style="display:flex;"><i class="fas fa-folder-open"></i><p>No designs found for this customer. Use the search bar to find designs by name or number.</p></div>';
+            if (results) results.innerHTML = '<div class="design-search-empty" style="display:flex;"><i class="fas fa-folder-open" aria-hidden="true"></i><p>No designs found for this customer. Use the search bar to find designs by name or number.</p></div>';
             if (searchInput) {
                 searchInput.placeholder = 'Search by company name or design number...';
                 searchInput._galleryMode = false;
@@ -785,7 +785,7 @@ async function loadCustomerDesignGallery(customerId) {
 
     } catch (err) {
         if (loading) loading.style.display = 'none';
-        if (results) results.innerHTML = '<div class="design-search-error"><i class="fas fa-times-circle"></i> Failed to load designs: ' + escapeHtml(err.message) + '</div>';
+        if (results) results.innerHTML = '<div class="design-search-error"><i class="fas fa-times-circle" aria-hidden="true"></i> Failed to load designs: ' + escapeHtml(err.message) + '</div>';
     }
 }
 
@@ -803,7 +803,7 @@ function renderDesignSearchGrid(designs) {
     if (oldMore) oldMore.remove();
 
     if (!designs || designs.length === 0) {
-        results.innerHTML = '<div class="design-gallery-no-match"><i class="fas fa-filter"></i> No designs match this filter</div>';
+        results.innerHTML = '<div class="design-gallery-no-match"><i class="fas fa-filter" aria-hidden="true"></i> No designs match this filter</div>';
         _designSearchState.displayedCount = 0;
         return;
     }
@@ -818,7 +818,7 @@ function renderDesignSearchGrid(designs) {
     if (designs.length > DESIGN_SEARCH_INITIAL_RENDER) {
         const remaining = designs.length - DESIGN_SEARCH_INITIAL_RENDER;
         // eslint-disable-next-line no-unsanitized/property -- audited (1.4): card/chip/badge builders escapeHtml every API string (extraction #2 audit + the 1.4 chip attr fix); counts numeric
-        results.innerHTML += '<div class="design-search-show-more"><button type="button" data-call="showMoreDesignSearchResults"><i class="fas fa-chevron-down"></i> Show all ' + designs.length + ' designs (' + remaining + ' more)</button></div>';
+        results.innerHTML += '<div class="design-search-show-more"><button type="button" data-call="showMoreDesignSearchResults"><i class="fas fa-chevron-down" aria-hidden="true"></i> Show all ' + designs.length + ' designs (' + remaining + ' more)</button></div>';
     }
 
     // Lazy-load thumbnails for designs without images
@@ -832,8 +832,8 @@ function buildDesignSearchCardHtml(d) {
     const dn = escapeHtml(String(d.designNumber));
     const previewUrl = resolveBoxUrl(d.mockupUrl || d.artworkUrl || d.thumbnailUrl || null);
     const thumbHtml = previewUrl
-        ? '<img src="' + escapeHtml(previewUrl) + '" alt="Design #' + dn + '" onerror="this.parentElement.innerHTML=\'<i class=\\\'fas fa-image\\\'></i>\'">'
-        : '<i class="fas fa-image"></i>';
+        ? '<img src="' + escapeHtml(previewUrl) + '" alt="Design #' + dn + '" data-onerror="placeholder-icon">'
+        : '<i class="fas fa-image" aria-hidden="true"></i>';
 
     let tierBadge = '';
     if (d.maxStitchCount > 0) {
@@ -862,7 +862,7 @@ function buildDesignSearchCardHtml(d) {
             + (name ? '<div class="design-gallery-name" title="' + escapeHtml(d.designName || '') + '">' + escapeHtml(name) + '</div>' : '')
             + '<div class="design-gallery-meta">' + tierBadge + (stitchText ? ' <span class="design-result-stitch">' + stitchText + '</span>' : '') + '</div>'
             + ((placementBadge || threadText) ? '<div class="design-gallery-detail">' + placementBadge + (threadText ? '<span class="design-thread-info" title="' + escapeHtml(d.threadColors || '') + '">' + escapeHtml(threadText) + '</span>' : '') + '</div>' : '')
-            + (dstDisplay ? '<div class="design-dst-files" title="' + escapeHtml(dstText) + '"><i class="fas fa-file-code"></i> ' + escapeHtml(dstDisplay) + '</div>' : '')
+            + (dstDisplay ? '<div class="design-dst-files" title="' + escapeHtml(dstText) + '"><i class="fas fa-file-code" aria-hidden="true"></i> ' + escapeHtml(dstDisplay) + '</div>' : '')
         + '</div>'
     + '</div>';
 }
@@ -910,7 +910,7 @@ function lazyLoadDesignSearchThumbnails(designs, container) {
                 // Update DOM
                 const slot = container.querySelector('#gallery-thumb-' + dn);
                 if (slot && !slot.querySelector('img')) {
-                    slot.innerHTML = '<img src="' + escapeHtml(url) + '" alt="Design #' + escapeHtml(dn) + '" onerror="this.parentElement.innerHTML=\'<i class=\\\'fas fa-image\\\'></i>\'">';
+                    slot.innerHTML = '<img src="' + escapeHtml(url) + '" alt="Design #' + escapeHtml(dn) + '" data-onerror="placeholder-icon">';
                 }
             }
         }
@@ -1002,7 +1002,7 @@ export async function runDesignSearch() {
     } catch (err) {
         loading.style.display = 'none';
         console.error('Design search failed:', err);
-        results.innerHTML = '<div class="design-search-error"><i class="fas fa-times-circle"></i> Search failed: ' + escapeHtml(err.message) + '</div>';
+        results.innerHTML = '<div class="design-search-error"><i class="fas fa-times-circle" aria-hidden="true"></i> Search failed: ' + escapeHtml(err.message) + '</div>';
     }
 }
 
