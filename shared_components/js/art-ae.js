@@ -273,7 +273,7 @@ var ArtAeGallery = (function () {
         // Search bar
         html += '<div style="display:flex;gap:12px;margin-bottom:16px;align-items:center;flex-wrap:wrap;">'
             + '<div style="flex:1;min-width:200px;max-width:340px;position:relative;">'
-            + '<input type="text" id="art-ae-search" placeholder="Search company, design #, contact, or rep..." '
+            + '<input type="text" id="art-ae-search" aria-label="Search art requests" placeholder="Search company, design #, contact, or rep..." '
             + 'value="' + escapeHtml(searchTerm) + '" '
             + 'style="width:100%;padding:8px 12px 8px 34px;border:1px solid #d1d5db;border-radius:6px;font-size:14px;font-family:inherit;">'
             + '<span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#9ca3af;font-size:16px;">&#128269;</span>'

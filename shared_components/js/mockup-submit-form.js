@@ -304,7 +304,7 @@ var MockupSubmitForm = (function () {
             + '        </div>'
             + '      </div>'
             + '      <div class="msf-file-drop-types">.DST, .EMB, .AI, .EPS, .PDF, images · 20MB each</div>'
-            + '      <input type="file" id="msf-file-input" style="display:none;" accept="image/*,.pdf,.dst,.emb,.eps,.ai,.svg" multiple>'
+            + '      <input type="file" id="msf-file-input" aria-label="Choose artwork files" style="display:none;" accept="image/*,.pdf,.dst,.emb,.eps,.ai,.svg" multiple>'
             + '      <div id="msf-file-preview-area"></div>'
             + '    </div>'
 
@@ -439,6 +439,7 @@ var MockupSubmitForm = (function () {
             styleWrap.className = 'msf-garment-style-wrap';
 
             var styleInput = document.createElement('input');
+            styleInput.setAttribute('aria-label', 'Style number');
             styleInput.type = 'text';
             styleInput.className = 'msf-input msf-garment-style';
             styleInput.placeholder = 'Style # (e.g. PC54)';
@@ -454,6 +455,7 @@ var MockupSubmitForm = (function () {
             styleWrap.appendChild(styleDropdown);
 
             var colorSelect = document.createElement('select');
+            colorSelect.setAttribute('aria-label', 'Color');
             colorSelect.className = 'msf-select msf-garment-color';
             colorSelect.setAttribute('data-idx', idx);
             colorSelect.innerHTML = '<option value="">Select color...</option>';
