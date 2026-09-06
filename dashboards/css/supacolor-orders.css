@@ -490,3 +490,21 @@
     .sc-preview-row > div:nth-child(2),
     .sc-preview-row > div:nth-child(5) { display: none; }
 }
+
+/* ── 2026-09-05 review ────────────────────────────────────────────────────── */
+[hidden] { display: none !important; }
+.sc-title { margin-bottom: 4px; display: flex; align-items: center; gap: 12px; }
+.sc-title-mark { display: inline-flex; align-items: center; background: #1e293b; padding: 8px 14px; border-radius: 8px; }
+.sc-title-logo { height: 28px; width: auto; display: block; }
+/* View chips are real <button>s now (aria-pressed replaces the .selected class as the state). */
+.bt-stat-chip[aria-pressed="true"] { background: #f0f4fa; border-color: #4a6fa5; box-shadow: 0 0 0 2px rgba(74, 111, 165, 0.25); }
+.sc-preview-note { margin-top: 12px; font-size: 13px; color: #475569; }
+.sc-error { text-align: center; padding: 40px 20px; color: #991b1b; background: #fee2e2; border: 1px solid #fecaca; border-radius: 8px; }
+.sc-error .bt-btn { margin-top: 12px; }
+.sc-page-btn:focus-visible, .sc-fallback-btn:focus-visible, .sc-paste-zone:focus-visible, .sc-row:focus-visible { outline: 2px solid #4a6fa5; outline-offset: 2px; }
+@media (max-width: 600px) {
+    .bt-stat-chip { min-width: 0; flex: 1 1 45%; }
+    .bt-filter-bar { flex-wrap: wrap; }
+    .bt-filter-group { flex: 1 1 100%; }
+    .sc-title { flex-wrap: wrap; }
+}
