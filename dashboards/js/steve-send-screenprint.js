@@ -8,6 +8,8 @@
  * Depends on: transfer-actions-shared.js (window.TransferActions)
  */
 
+var STEVSENDSCRE_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
+var stevsendscreLog = STEVSENDSCRE_LOG_ON ? console.log.bind(console) : function () {}; // debug logging: localhost or ?debug=1 only (2026-09-06 console sweep)
 (function () {
     'use strict';
 
@@ -28,7 +30,7 @@
             requestedBy: STEVE_USER,
             enableLines: true,
             onSuccess: function (record) {
-                console.log('Screen-print transfer created:', record.ID_Transfer);
+                stevsendscreLog('Screen-print transfer created:', record.ID_Transfer);
             }
         });
     }

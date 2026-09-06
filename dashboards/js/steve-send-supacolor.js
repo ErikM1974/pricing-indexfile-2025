@@ -8,6 +8,8 @@
  * Depends on: transfer-actions-shared.js (window.TransferActions)
  */
 
+var STEVSENDSUPA_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
+var stevsendsupaLog = STEVSENDSUPA_LOG_ON ? console.log.bind(console) : function () {}; // debug logging: localhost or ?debug=1 only (2026-09-06 console sweep)
 (function () {
     'use strict';
 
@@ -32,7 +34,7 @@
             // openSendModal with their own opts (legacy single-line paths).
             enableLines: true,
             onSuccess: function (record) {
-                console.log('Transfer created:', record.ID_Transfer);
+                stevsendsupaLog('Transfer created:', record.ID_Transfer);
             }
         });
     }

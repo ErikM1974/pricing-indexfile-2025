@@ -2,6 +2,8 @@
 
 // ── moved from inline <script> in training/customer-categorization-training.html (Rule 3, 2026.09.05.11) ──
 // Customer categories with examples and characteristics
+var CUSTCATETRAI_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
+var custcatetraiLog = CUSTCATETRAI_LOG_ON ? console.log.bind(console) : function () {}; // debug logging: localhost or ?debug=1 only (2026-09-06 console sweep)
 const categories = {
     corporate: {
         name: "Corporate",
@@ -365,7 +367,7 @@ function initLearnMode() {
 
 function showCategoryDetails(category) {
     // Could expand to show modal with full customer list
-    console.log('Selected category:', category);
+    custcatetraiLog('Selected category:', category);
 }
 
 function initPracticeMode() {

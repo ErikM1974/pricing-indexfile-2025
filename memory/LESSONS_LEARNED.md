@@ -28,26 +28,7 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 **Root cause:** that page's `esc()` is the `div.textContent → innerHTML` trick, which escapes `< > &` but NOT `"`, so the JSON's quotes ended the attribute early.
 **Solution:** escape for an attribute (`&amp; &quot; &lt;`) — `JSON.stringify(...).replace(/"/g,'&quot;')`; the quote-builder `escapeHtml()` and portal-directory `escapeAttr()` already do.
 **Prevention:** the delegator reports a bad `data-args` as a visible error (never silent); when writing JSON into a `data-*` attribute inside a template literal, check the page's escaper handles `"` first. Lock: `tests/unit/staff-pages-datacall.test.js`.
-
-## 2026-09-05 — Vendor portal showed "Unable to load jobs" on EVERY load since launch (`v2026.09.05.28`)
-
-**Problem.** The red error banner on `/vendor` was visible all the time — including when jobs loaded
-fine — since the portal shipped (2026-07-19). Nobody reported it; Ed presumably read past it.
-
-**Root cause.** `<div id="vp-error" class="vp-error" hidden>` relied on the browser's default
-`[hidden] { display: none }`, but `.vp-error { display: flex }` is an AUTHOR rule, and any author
-rule beats the UA stylesheet regardless of specificity. Same for the `.vp-btn { display: inline-flex }`
-Retry button. The controller dutifully toggled `.hidden` and it changed nothing visible. The
-customer portal never hit this because its CSS declares `[hidden] { display: none !important; }`.
-
-**Solution.** `[hidden] { display: none !important; }` at the top of `vendor-portal.css`; lock in
-`tests/unit/vendor-portal-page.test.js` (rule present AND before the first `.vp-*` display rule).
-
-**Prevention.** Every page-level stylesheet that toggles visibility with the `hidden` attribute MUST
-declare `[hidden] { display: none !important; }` itself — the moment any hidden-able element gets a
-class with `display: flex/grid/inline-flex`, the attribute silently stops working. When auditing a
-page, read `getComputedStyle(el).display` on a `hidden` element at least once; `el.hidden === true`
-proves nothing. 🔑 Verification: a JS probe of `.hidden` is a probe of INTENT, not of the pixels.
+### Vendor portal showed "Unable to load jobs" on EVERY load since launch (2026-09-05, ARCHIVED 2026-09-06, `v2026.09.05.28`): a page that fails identically on every load has never worked — check the FIRST request's status, not the retry path; a launch is not verified until a real user's session has loaded real data. Full entry in archive.
 
 ## 2026-09-05 — Customer Portals console said nobody had ever signed in (141 invites, "Have Signed In: 0")
 
@@ -273,3 +254,24 @@ must exclude `tests/`, `scripts/` (one-off Node), and `/archive/` — those "ref
 alive for a year. 🔑 Rendered markup is only visible at runtime: the forms' shared scripts added 5 bare icons
 per page that 18 static locks passed; probe the DOM after load, then add the renderer to the lock.
 🔑 Never pin a cache-bust version prefix in a test; the next deploy bumps it.
+
+## 2026-09-06 — EmailJS ids in 25 scripts, 118 unlabelled controls, and 12 SEO pages rendering in quirks mode (`v2026.09.06.36`)
+
+**Problem.** Rule 6 had been applied to the proxy host but not to EmailJS: 69 copies of the public
+key / service id sat in served scripts while `APP_CONFIG.EMAIL` (tenant getters) existed unused.
+A static census found 118 form controls with no accessible name, and the 12 `*-webstores` SEO pages
+had no doctype/`<html>`/`<body>` at all — bare fragments served with `sendFile`, so every browser
+rendered them in quirks mode.
+**Root cause.** Config centralisation was done per-constant when a file was touched; nothing
+swept for the second literal. Labels were written next to controls (`<label>Name</label><input>`)
+without `for=`, which looks right and is invisible to AT. The SEO pages were authored as body
+fragments for a wrapper that never existed.
+**Solution.** Sweep script → `APP_CONFIG.EMAIL.*` with a visible error, window-guarded; a11y
+fixer: `for=` where a label sits beside the control (minting ids), else `aria-label` from the
+visible label/placeholder; the fragments wrapped as documents. Both locked in
+`repo-hygiene-final.test.js`.
+**Prevention.** 🔑 When a config getter exists, grep for the VALUE it returns — a literal beside
+an unused getter is the common failure. 🔑 `<label>` without `for=` and not wrapping is
+decoration; the a11y lock now fails on it. 🔑 A page that starts with `<meta charset>` has no
+`<html>`: check `document.compatMode` on any page that "looks slightly off". 🔑 Module-scope
+config reads need `typeof window !== 'undefined'` — the Node-run service tests load the file.

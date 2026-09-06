@@ -3,6 +3,8 @@
  * Product page for Polar Camel 16 oz Pint with color variant selector
  * Uses JDS API for all product data and pricing
  */
+var LASETUMBSIMP_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
+var lasetumbsimpLog = LASETUMBSIMP_LOG_ON ? console.log.bind(console) : function () {}; // debug logging: localhost or ?debug=1 only (2026-09-06 console sweep)
 var LASER_API_BASE = (typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) || '';
 if (!LASER_API_BASE) console.error('[laser-tumbler-simple] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
 
@@ -26,7 +28,7 @@ class LaserTumblerPage {
         this.pricingTiers = null;       // Pricing tiers for current product
         this.localInventory = null;     // Local warehouse inventory
 
-        console.log('[LaserTumblerPage] Initialized with multi-color support');
+        lasetumbsimpLog('[LaserTumblerPage] Initialized with multi-color support');
     }
 
     /**
@@ -66,7 +68,7 @@ class LaserTumblerPage {
             // progressive enhancement — no-op if its script didn't load)
             window.laserTumblerMockup?.onPageReady(this);
 
-            console.log('[LaserTumblerPage] Page loaded successfully with', this.allProducts.length, 'color variants');
+            lasetumbsimpLog('[LaserTumblerPage] Page loaded successfully with', this.allProducts.length, 'color variants');
 
         } catch (error) {
             console.error('[LaserTumblerPage] Error loading page:', error);
@@ -87,7 +89,7 @@ class LaserTumblerPage {
             // Extract color name from current product (e.g., "Black" from "Polar Camel Black 16 oz Pint")
             const colorName = this.currentProduct ? this.extractColorFromName(this.currentProduct.name) : null;
 
-            console.log('[LaserTumblerPage] Loading local inventory for', this.currentSKU, 'Color:', colorName);
+            lasetumbsimpLog('[LaserTumblerPage] Loading local inventory for', this.currentSKU, 'Color:', colorName);
 
             // Query ManageOrders API for local warehouse stock (filtered by color)
             const inventory = await this.inventoryService.checkInventory(this.currentSKU, colorName);
@@ -95,7 +97,7 @@ class LaserTumblerPage {
             // Store inventory data
             this.localInventory = inventory;
 
-            console.log('[LaserTumblerPage] Local inventory loaded:',
+            lasetumbsimpLog('[LaserTumblerPage] Local inventory loaded:',
                 inventory.totalStock, 'units',
                 inventory.available ? 'in stock' : 'out of stock'
             );
@@ -115,7 +117,7 @@ class LaserTumblerPage {
      * Load all color variants using batch API call
      */
     async loadAllColorVariants() {
-        console.log('[LaserTumblerPage] Loading all color variants...');
+        lasetumbsimpLog('[LaserTumblerPage] Loading all color variants...');
 
         try {
             // Check sessionStorage cache first (v2: tiers computed from live JDS
@@ -129,7 +131,7 @@ class LaserTumblerPage {
                 const cacheMaxAge = 60 * 60 * 1000; // 1 hour
 
                 if (cacheAge < cacheMaxAge) {
-                    console.log('[LaserTumblerPage] Using cached color variants');
+                    lasetumbsimpLog('[LaserTumblerPage] Using cached color variants');
                     this.allProducts = cacheData.products;
                     return;
                 }
@@ -170,7 +172,7 @@ class LaserTumblerPage {
                 timestamp: Date.now()
             }));
 
-            console.log('[LaserTumblerPage] Loaded', this.allProducts.length, 'color variants');
+            lasetumbsimpLog('[LaserTumblerPage] Loaded', this.allProducts.length, 'color variants');
 
         } catch (error) {
             console.error('[LaserTumblerPage] Error loading color variants:', error);
@@ -228,7 +230,7 @@ class LaserTumblerPage {
             });
         });
 
-        console.log('[LaserTumblerPage] Rendered', this.allProducts.length, 'color swatches');
+        lasetumbsimpLog('[LaserTumblerPage] Rendered', this.allProducts.length, 'color swatches');
 
         // Add keyboard navigation
         this.addKeyboardNavigation();
@@ -294,14 +296,14 @@ class LaserTumblerPage {
             }
         });
 
-        console.log('[LaserTumblerPage] Keyboard navigation enabled');
+        lasetumbsimpLog('[LaserTumblerPage] Keyboard navigation enabled');
     }
 
     /**
      * Select a color variant
      */
     async selectColor(sku, skipURLUpdate = false) {
-        console.log('[LaserTumblerPage] Selecting color:', sku);
+        lasetumbsimpLog('[LaserTumblerPage] Selecting color:', sku);
 
         // Find product in allProducts array
         const product = this.allProducts.find(p => p.sku === sku);
@@ -345,7 +347,7 @@ class LaserTumblerPage {
             window.laserTumblerMockup?.onColorChanged();
         }
 
-        console.log('[LaserTumblerPage] Color selected:', product.name);
+        lasetumbsimpLog('[LaserTumblerPage] Color selected:', product.name);
     }
 
     /**
@@ -720,7 +722,7 @@ class LaserTumblerPage {
      * Refresh product data
      */
     async refresh() {
-        console.log('[LaserTumblerPage] Refreshing product data...');
+        lasetumbsimpLog('[LaserTumblerPage] Refreshing product data...');
         await this.init();
     }
 }

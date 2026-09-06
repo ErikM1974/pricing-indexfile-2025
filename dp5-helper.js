@@ -3,10 +3,12 @@
  * Handles the interaction between the hidden Caspio matrix and the custom UI
  */
 
+var DP5HELP_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
+var dp5helpLog = DP5HELP_LOG_ON ? console.log.bind(console) : function () {}; // debug logging: localhost or ?debug=1 only (2026-09-06 console sweep)
 (function() {
     "use strict";
     
-    console.log("[DP5-HELPER] Loading DP5 Helper for enhanced UI (v5 - Refined Fallbacks)");
+    dp5helpLog("[DP5-HELPER] Loading DP5 Helper for enhanced UI (v5 - Refined Fallbacks)");
     
     // State variables
     let initialized = false;
@@ -15,14 +17,14 @@
     // Initialize the helper
     function initialize() {
         if (initialized) return;
-        console.log("[DP5-HELPER] Initializing DP5 Helper");
+        dp5helpLog("[DP5-HELPER] Initializing DP5 Helper");
         
         window.API_PROXY_BASE_URL = window.API_PROXY_BASE_URL || (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) || '';
         if (!window.API_PROXY_BASE_URL) console.error('[dp5-helper] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
         
         // Listen for pricing data loaded event - This is the primary trigger.
         window.addEventListener('pricingDataLoaded', function(event) {
-            console.log("[DP5-HELPER] 'pricingDataLoaded' event received.", event.detail);
+            dp5helpLog("[DP5-HELPER] 'pricingDataLoaded' event received.", event.detail);
             
             if (event.detail && event.detail.headers && event.detail.prices && event.detail.tierData) {
                 const pricingDataFromEvent = {
@@ -38,10 +40,10 @@
                 };
 
                 if (!window.directFixApplied) {
-                    console.log("[DP5-HELPER] Pricing data is available from event. Updating custom pricing grid.");
+                    dp5helpLog("[DP5-HELPER] Pricing data is available from event. Updating custom pricing grid.");
                     updateCustomPricingGrid(pricingDataFromEvent);
                 } else {
-                    console.log("[DP5-HELPER] Skipping custom pricing grid update (via 'pricingDataLoaded' event) as DIRECT-FIX already applied it.");
+                    dp5helpLog("[DP5-HELPER] Skipping custom pricing grid update (via 'pricingDataLoaded' event) as DIRECT-FIX already applied it.");
                 }
             } else {
                 console.warn("[DP5-HELPER] 'pricingDataLoaded' event received, but event.detail is missing required pricing data. Grid will not be updated by this event.");
@@ -54,15 +56,15 @@
             }
         });
         
-        console.log("[DP5-HELPER] MutationObserver logic removed; relying on pricing-matrix-capture.js for table detection and 'pricingDataLoaded' event.");
+        dp5helpLog("[DP5-HELPER] MutationObserver logic removed; relying on pricing-matrix-capture.js for table detection and 'pricingDataLoaded' event.");
         
         // Fallback check if 'pricingDataLoaded' is somehow missed or data is incomplete.
         setTimeout(function() {
-            console.log("[DP5-HELPER] Performing delayed final check for pricing data (7s).");
+            dp5helpLog("[DP5-HELPER] Performing delayed final check for pricing data (7s).");
             
             // Skip fallback check for DTF pages (they use their own calculator)
             if (window.location.pathname.includes('dtf')) {
-                console.log("[DP5-HELPER] DTF page detected, skipping pricing grid check.");
+                dp5helpLog("[DP5-HELPER] DTF page detected, skipping pricing grid check.");
                 return;
             }
             
@@ -79,7 +81,7 @@
                         console.warn("[DP5-HELPER] Final fallback: Grid empty & global data missing/incomplete. Attempting direct extraction from Caspio table.");
                         const extractedData = extractDataFromCaspioTableForFallback(caspioTable); 
                         if (extractedData) {
-                            console.log("[DP5-HELPER] Final fallback: Successfully extracted data directly. Updating grid.");
+                            dp5helpLog("[DP5-HELPER] Final fallback: Successfully extracted data directly. Updating grid.");
                             // Set global nwcaPricingData with this last resort data before updating grid
                             window.nwcaPricingData = extractedData;
                             updateCustomPricingGrid(extractedData); 
@@ -91,7 +93,7 @@
                     }
                 }
             } else {
-                console.log("[DP5-HELPER] Final fallback: Grid seems populated or directFixApplied, no action needed.");
+                dp5helpLog("[DP5-HELPER] Final fallback: Grid seems populated or directFixApplied, no action needed.");
             }
         }, 7000); 
         
@@ -100,7 +102,7 @@
     }
     
     function updateCustomPricingGrid(pricingDataInput) {
-        console.log("[DP5-HELPER] updateCustomPricingGrid called with data:", pricingDataInput);
+        dp5helpLog("[DP5-HELPER] updateCustomPricingGrid called with data:", pricingDataInput);
         let dataToUse = pricingDataInput;
 
         // Primary validation: Check if the passed data is usable
@@ -117,7 +119,7 @@
             return;
         }
         
-        console.log("[DP5-HELPER] Using data for pricing grid. Headers:", dataToUse.headers);
+        dp5helpLog("[DP5-HELPER] Using data for pricing grid. Headers:", dataToUse.headers);
         
         // Extract individual sizes from headers that contain "/" (like S/M, M/L, L/XL)
         if (!dataToUse.uniqueSizes || dataToUse.uniqueSizes.length === 0) {
@@ -149,7 +151,7 @@
             });
             
             dataToUse.uniqueSizes = extractedSizes;
-            console.log("[DP5-HELPER] Extracted uniqueSizes from headers:", dataToUse.uniqueSizes);
+            dp5helpLog("[DP5-HELPER] Extracted uniqueSizes from headers:", dataToUse.uniqueSizes);
         }
 
         // Look for both the old custom-pricing-grid ID and the new universal pricing grid table
@@ -163,7 +165,7 @@
             }
             
             if (pricingGrid) {
-                console.log("[DP5-HELPER] Using universal pricing grid table:", pricingGrid.id);
+                dp5helpLog("[DP5-HELPER] Using universal pricing grid table:", pricingGrid.id);
             } else {
                 console.warn("[DP5-HELPER] No pricing grid element found (neither custom-pricing-grid nor universal grid).");
                 return;
@@ -246,7 +248,7 @@
         });
         
         window.dp5UniqueSizes = dataToUse.uniqueSizes; 
-        console.log("[DP5-HELPER] Custom pricing grid updated. Unique sizes for Add to Cart:", window.dp5UniqueSizes);
+        dp5helpLog("[DP5-HELPER] Custom pricing grid updated. Unique sizes for Add to Cart:", window.dp5UniqueSizes);
         updateAddToCartSection(dataToUse.uniqueSizes);
     }
     
@@ -308,7 +310,7 @@
     
     function updateAddToCartSection(sizes) {
         if (window.directFixApplied || window.addToCartInitialized) {
-            console.log("[DP5-HELPER] Skipping Add to Cart section update as it's already handled.");
+            dp5helpLog("[DP5-HELPER] Skipping Add to Cart section update as it's already handled.");
             return;
         }
         if (!sizes || sizes.length === 0) {
@@ -318,7 +320,7 @@
             // if (sizeQuantityGrid) sizeQuantityGrid.innerHTML = '<p>Size selection unavailable.</p>';
             return;
         }
-        console.log("[DP5-HELPER] Updating Add to Cart section with sizes:", sizes);
+        dp5helpLog("[DP5-HELPER] Updating Add to Cart section with sizes:", sizes);
         const sizeQuantityGrid = document.getElementById('size-quantity-grid');
         if (!sizeQuantityGrid) {
             console.warn("[DP5-HELPER] Size quantity grid not found for Add to Cart.");
@@ -379,7 +381,7 @@
             row.appendChild(priceDisplay);
             sizeQuantityGrid.appendChild(row);
         });
-        console.log("[DP5-HELPER] Add to Cart section updated.");
+        dp5helpLog("[DP5-HELPER] Add to Cart section updated.");
     }
     
     function addInventoryIndicator(priceCell, sizeGroup, inventoryData) {
@@ -422,7 +424,7 @@
             console.warn("[DP5-HELPER] Missing style number or color code for inventory data");
             return;
         }
-        console.log(`[DP5-HELPER] Loading inventory data for ${styleNumber}, ${colorCode}`);
+        dp5helpLog(`[DP5-HELPER] Loading inventory data for ${styleNumber}, ${colorCode}`);
         fetch(`${window.API_PROXY_BASE_URL}/api/inventory?styleNumber=${encodeURIComponent(styleNumber)}&color=${encodeURIComponent(colorCode)}`)
             .then(response => response.json())
             .then(data => {
@@ -439,15 +441,15 @@
                     inventoryData = { styleNumber, color: colorCode, sizes, sizeTotals, timestamp: new Date().toISOString() };
                     window.inventoryData = inventoryData;
                     if (window.nwcaPricingData) { // If pricing data already exists, refresh grid for indicators
-                        console.log("[DP5-HELPER] Inventory loaded, refreshing pricing grid for indicators.");
+                        dp5helpLog("[DP5-HELPER] Inventory loaded, refreshing pricing grid for indicators.");
                         updateCustomPricingGrid(window.nwcaPricingData); 
                     }
-                    console.log("[DP5-HELPER] Inventory data processed:", sizes);
+                    dp5helpLog("[DP5-HELPER] Inventory data processed:", sizes);
                 } else {
                     // console.warn("[DP5-HELPER] No inventory data found for style/color.");
                     window.inventoryData = { styleNumber, color: colorCode, sizes: [], sizeTotals: [], timestamp: new Date().toISOString(), noData: true }; // Mark as no data
                      if (window.nwcaPricingData) { // Refresh grid to remove old indicators if any
-                        console.log("[DP5-HELPER] No inventory data, refreshing pricing grid to clear indicators.");
+                        dp5helpLog("[DP5-HELPER] No inventory data, refreshing pricing grid to clear indicators.");
                         updateCustomPricingGrid(window.nwcaPricingData);
                     }
                 }
@@ -456,14 +458,14 @@
                 console.error("[DP5-HELPER] Error fetching inventory data:", error);
                 window.inventoryData = { styleNumber, color: colorCode, sizes: [], sizeTotals: [], timestamp: new Date().toISOString(), error: true }; // Mark error
                  if (window.nwcaPricingData) { // Refresh grid to remove old indicators
-                    console.log("[DP5-HELPER] Inventory fetch error, refreshing pricing grid.");
+                    dp5helpLog("[DP5-HELPER] Inventory fetch error, refreshing pricing grid.");
                     updateCustomPricingGrid(window.nwcaPricingData);
                 }
             });
     }
     
     function initColorSwatches() {
-        console.log("[DP5-HELPER] Initializing color swatches");
+        dp5helpLog("[DP5-HELPER] Initializing color swatches");
         const swatchesContainer = document.getElementById('color-swatches');
         if (!swatchesContainer) {
             console.warn("[DP5-HELPER] Color swatches container not found");
@@ -501,7 +503,7 @@
     }
 
     function tryFallbackColorFetchUI(styleNumber, container, currentUrlColor) {
-        console.log("[DP5-HELPER] Trying fallback color fetch (legacy /api/colors) for style:", styleNumber);
+        dp5helpLog("[DP5-HELPER] Trying fallback color fetch (legacy /api/colors) for style:", styleNumber);
         fetch(`${window.API_PROXY_BASE_URL}/api/colors?styleNumber=${encodeURIComponent(styleNumber)}`)
             .then(response => {
                 if (!response.ok) throw new Error('Fallback API /colors request failed');

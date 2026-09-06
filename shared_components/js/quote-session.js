@@ -3,6 +3,8 @@
  * Manages user sessions, recent quotes, and recovery functionality
  */
 
+var QUOTSESS_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
+var quotsessLog = QUOTSESS_LOG_ON ? console.log.bind(console) : function () {}; // debug logging: localhost or ?debug=1 only (2026-09-06 console sweep)
 class QuoteSession {
     constructor(config = {}) {
         this.prefix = config.prefix || 'QUOTE';
@@ -368,7 +370,7 @@ class QuoteSession {
      */
     log(...args) {
         if (this.debug) {
-            console.log(`[QuoteSession:${this.prefix}]`, ...args);
+            quotsessLog(`[QuoteSession:${this.prefix}]`, ...args);
         }
     }
     

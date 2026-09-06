@@ -10,6 +10,8 @@
  * - Calculates pricing using DTFQuotePricing
  */
 
+var DTFQUOTPROD_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
+var dtfquotprodLog = DTFQUOTPROD_LOG_ON ? console.log.bind(console) : function () {}; // debug logging: localhost or ?debug=1 only (2026-09-06 console sweep)
 class DTFQuoteProducts {
     constructor() {
         this.apiBase = (typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) || '';
@@ -21,7 +23,7 @@ class DTFQuoteProducts {
         // Initialize exact match search (optimized for sales reps)
         this.exactMatchSearch = null;
 
-        console.log('[DTFQuoteProducts] Products manager initialized');
+        dtfquotprodLog('[DTFQuoteProducts] Products manager initialized');
     }
 
     /**
@@ -59,7 +61,7 @@ class DTFQuoteProducts {
             }
         });
 
-        console.log('[DTFQuoteProducts] Exact match search initialized with keyboard navigation');
+        dtfquotprodLog('[DTFQuoteProducts] Exact match search initialized with keyboard navigation');
         return true;
     }
 
@@ -147,7 +149,7 @@ class DTFQuoteProducts {
                 return aUpper.localeCompare(bUpper);
             });
 
-            console.log('[DTFQuoteProducts] Search results:', products.length);
+            dtfquotprodLog('[DTFQuoteProducts] Search results:', products.length);
             return products;
 
         } catch (error) {
@@ -202,7 +204,7 @@ class DTFQuoteProducts {
 
             const data = await response.json();
             const sizes = data.sizes || [];
-            console.log('[DTFQuoteProducts] Loaded sizes for', styleNumber, color, ':', sizes);
+            dtfquotprodLog('[DTFQuoteProducts] Loaded sizes for', styleNumber, color, ':', sizes);
             return sizes.length > 0 ? sizes : ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL'];
 
         } catch (error) {
@@ -227,7 +229,7 @@ class DTFQuoteProducts {
             const data = await response.json();
             // API returns CASE_PRICE as the base cost
             const baseCost = data.CASE_PRICE || data.baseCost || 0;
-            console.log('[DTFQuoteProducts] Base cost for', styleNumber, ':', baseCost);
+            dtfquotprodLog('[DTFQuoteProducts] Base cost for', styleNumber, ':', baseCost);
             return parseFloat(baseCost);
 
         } catch (error) {
@@ -246,7 +248,7 @@ class DTFQuoteProducts {
         const index = this.products.findIndex(p => p.id === productId);
         if (index !== -1) {
             const removed = this.products.splice(index, 1)[0];
-            console.log('[DTFQuoteProducts] Product removed:', removed.styleNumber);
+            dtfquotprodLog('[DTFQuoteProducts] Product removed:', removed.styleNumber);
             return true;
         }
         return false;
@@ -260,7 +262,7 @@ class DTFQuoteProducts {
         if (product) {
             product.sizeQuantities = sizeQuantities;
             product.totalQuantity = this.calculateProductQuantity(sizeQuantities);
-            console.log('[DTFQuoteProducts] Product updated:', product.styleNumber, product.totalQuantity);
+            dtfquotprodLog('[DTFQuoteProducts] Product updated:', product.styleNumber, product.totalQuantity);
             return product;
         }
         return null;
@@ -293,7 +295,7 @@ class DTFQuoteProducts {
     clearProducts() {
         this.products = [];
         this.currentProduct = null;
-        console.log('[DTFQuoteProducts] All products cleared');
+        dtfquotprodLog('[DTFQuoteProducts] All products cleared');
     }
 
     /**
@@ -461,7 +463,7 @@ class DTFQuoteProducts {
             id: p.id || Date.now() + Math.random()
         }));
 
-        console.log('[DTFQuoteProducts] Imported products:', this.products.length);
+        dtfquotprodLog('[DTFQuoteProducts] Imported products:', this.products.length);
         return this.products;
     }
 

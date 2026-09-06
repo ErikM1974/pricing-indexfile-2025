@@ -10,6 +10,8 @@
  * Form submission uses EmailJS dual-fire (customer confirmation + sales lead alert)
  * mirroring the pattern from calculators/christmas-bundles.html.
  */
+var GOLFTOURSHOW_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
+var golftourshowLog = GOLFTOURSHOW_LOG_ON ? console.log.bind(console) : function () {}; // debug logging: localhost or ?debug=1 only (2026-09-06 console sweep)
 (function () {
     'use strict';
 
@@ -693,7 +695,7 @@
                 }
 
                 // Log lead to console for recovery if EmailJS misconfigured
-                console.log('[golf-showcase] LEAD CAPTURED:', {
+                golftourshowLog('[golf-showcase] LEAD CAPTURED:', {
                     quoteId,
                     ...formData,
                     leadScore: leadScore.label,

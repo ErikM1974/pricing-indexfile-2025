@@ -2,6 +2,8 @@
  * DTF Caspio Adapter V2
  * Handles communication between Caspio forms and DTF pricing calculator
  */
+var DTFADAP_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
+var dtfadapLog = DTFADAP_LOG_ON ? console.log.bind(console) : function () {}; // debug logging: localhost or ?debug=1 only (2026-09-06 console sweep)
 (function() {
     'use strict';
 
@@ -442,7 +444,7 @@
 
         log(...args) {
             if (this.config.debug) {
-                console.log('[DTF Adapter]', ...args);
+                dtfadapLog('[DTF Adapter]', ...args);
             }
         }
 

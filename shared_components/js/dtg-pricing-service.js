@@ -20,6 +20,8 @@
  * @version 1.0.0
  */
 
+var DTGPRICSERV_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
+var dtgpricservLog = DTGPRICSERV_LOG_ON ? console.log.bind(console) : function () {}; // debug logging: localhost or ?debug=1 only (2026-09-06 console sweep)
 class DTGPricingService {
     constructor() {
         this.apiBase = ((typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) ? window.APP_CONFIG.API.BASE_URL + '/api' : '');
@@ -46,7 +48,7 @@ class DTGPricingService {
             console.error('[DTGPricingService] dtg-canonical-pricing.js is missing - DTG pricing cannot compute.');
             if (typeof window.showToast === 'function') window.showToast('DTG pricing engine failed to load - refresh the page.', 'error', 8000);
         }
-        console.log('[DTGPricingService] Service initialized - API bundle endpoint only (no fallback)');
+        dtgpricservLog('[DTGPricingService] Service initialized - API bundle endpoint only (no fallback)');
     }
 
     /**
@@ -59,7 +61,7 @@ class DTGPricingService {
         const bundleUrl = `${this.apiBase}/dtg/product-bundle?styleNumber=${encodeURIComponent(styleNumber)}${color ? `&color=${encodeURIComponent(color)}` : ''}`;
         
         try {
-            console.log('[DTGPricingService] Attempting to fetch from bundle endpoint:', bundleUrl);
+            dtgpricservLog('[DTGPricingService] Attempting to fetch from bundle endpoint:', bundleUrl);
             const response = await fetch(bundleUrl);
             
             if (response.status === 404) {
@@ -73,7 +75,7 @@ class DTGPricingService {
             }
             
             const data = await response.json();
-            console.log('[DTGPricingService] Bundle data received successfully');
+            dtgpricservLog('[DTGPricingService] Bundle data received successfully');
 
             // Transform bundle data to match existing format
             // NEW API structure (Oct 2025): { product: {...}, pricing: { tiers, costs, sizes, upcharges } }
@@ -122,7 +124,7 @@ class DTGPricingService {
         const urlCost = urlParams.get('manualCost') || urlParams.get('cost');
         if (urlCost && !isNaN(parseFloat(urlCost))) {
             const cost = parseFloat(urlCost);
-            console.log('[DTGPricingService] Manual cost from URL:', cost);
+            dtgpricservLog('[DTGPricingService] Manual cost from URL:', cost);
             // Store in sessionStorage for persistence during navigation
             sessionStorage.setItem('manualCostOverride', cost.toString());
             return cost;
@@ -132,7 +134,7 @@ class DTGPricingService {
         const storedCost = sessionStorage.getItem('manualCostOverride');
         if (storedCost && !isNaN(parseFloat(storedCost))) {
             const cost = parseFloat(storedCost);
-            console.log('[DTGPricingService] Manual cost from storage:', cost);
+            dtgpricservLog('[DTGPricingService] Manual cost from storage:', cost);
             return cost;
         }
 
@@ -144,7 +146,7 @@ class DTGPricingService {
      */
     clearManualCostOverride() {
         sessionStorage.removeItem('manualCostOverride');
-        console.log('[DTGPricingService] Manual cost override cleared');
+        dtgpricservLog('[DTGPricingService] Manual cost override cleared');
     }
 
     /**
@@ -154,7 +156,7 @@ class DTGPricingService {
      */
     async fetchPricingBundle() {
         const url = `${this.apiBase}/pricing-bundle?method=DTG&styleNumber=PC61`;
-        console.log('[DTGPricingService] Fetching complete pricing bundle from API...');
+        dtgpricservLog('[DTGPricingService] Fetching complete pricing bundle from API...');
 
         const response = await fetch(url);
         if (!response.ok) {
@@ -169,7 +171,7 @@ class DTGPricingService {
         }
 
         // DEBUG: Log complete API response to investigate tier-specific costs
-        console.log('[DTGPricingService] 🔍 DEBUG: Complete API response:', {
+        dtgpricservLog('[DTGPricingService] 🔍 DEBUG: Complete API response:', {
             totalTiers: data.tiersR?.length,
             totalCosts: data.allDtgCostsR?.length,
             tiers: data.tiersR,
@@ -178,9 +180,9 @@ class DTGPricingService {
 
         // DEBUG: Show LC costs specifically
         const lcCosts = data.allDtgCostsR?.filter(c => c.PrintLocationCode === 'LC');
-        console.log('[DTGPricingService] 🔍 DEBUG: LC costs from API:', lcCosts);
+        dtgpricservLog('[DTGPricingService] 🔍 DEBUG: LC costs from API:', lcCosts);
 
-        console.log('[DTGPricingService] Successfully fetched complete pricing bundle from API');
+        dtgpricservLog('[DTGPricingService] Successfully fetched complete pricing bundle from API');
         return data;
     }
 
@@ -191,17 +193,17 @@ class DTGPricingService {
      * @returns {Object} Pricing data with API rules + manual garment cost
      */
     async generateManualPricingData(manualCost) {
-        console.log('[DTGPricingService] Generating manual pricing data with base cost:', manualCost);
+        dtgpricservLog('[DTGPricingService] Generating manual pricing data with base cost:', manualCost);
 
         // CRITICAL: Clear cache to ensure fresh API data for manual mode
-        console.log('[DTGPricingService] Clearing cache for fresh API data...');
+        dtgpricservLog('[DTGPricingService] Clearing cache for fresh API data...');
         this.cache.clear();
 
         // Fetch complete pricing bundle from API (throws error if fails - no fallback)
         const apiBundle = await this.fetchPricingBundle();
 
         // VALIDATION: Ensure API data is complete and correct
-        console.log('[Manual Pricing] 🔍 API Data Validation:', {
+        dtgpricservLog('[Manual Pricing] 🔍 API Data Validation:', {
             totalTiers: apiBundle.tiersR?.length,
             totalCosts: apiBundle.allDtgCostsR?.length,
             tierLabels: apiBundle.tiersR?.map(t => t.TierLabel),
@@ -209,7 +211,7 @@ class DTGPricingService {
 
         // VALIDATION: Check LC costs specifically
         const lcCosts = apiBundle.allDtgCostsR?.filter(c => c.PrintLocationCode === 'LC');
-        console.log('[Manual Pricing] 🔍 LC Costs from API:', lcCosts?.map(c => ({
+        dtgpricservLog('[Manual Pricing] 🔍 LC Costs from API:', lcCosts?.map(c => ({
             tier: c.TierLabel,
             cost: c.PrintCost,
             fullData: c
@@ -255,7 +257,7 @@ class DTGPricingService {
         };
 
         // FINAL VALIDATION: Verify costs array is complete
-        console.log('[Manual Pricing] 🔍 Final data structure validation:', {
+        dtgpricservLog('[Manual Pricing] 🔍 Final data structure validation:', {
             totalCosts: manualPricingData.pricing.costs?.length,
             lcCostsCount: manualPricingData.pricing.costs?.filter(c => c.PrintLocationCode === 'LC').length,
             firstFewLcCosts: manualPricingData.pricing.costs
@@ -277,7 +279,7 @@ class DTGPricingService {
         // FIRST: Check for manual cost override
         const manualCost = this.getManualCostOverride();
         if (manualCost !== null) {
-            console.log('[DTGPricingService] 🔧 MANUAL PRICING MODE - Base cost:', manualCost);
+            dtgpricservLog('[DTGPricingService] 🔧 MANUAL PRICING MODE - Base cost:', manualCost);
             return await this.generateManualPricingData(manualCost);
         }
 
@@ -288,7 +290,7 @@ class DTGPricingService {
         const isDebugStyle = debugStyles.some(style => styleNumber.startsWith(style));
 
         if (isDebugStyle || window.DTG_PERFORMANCE?.debug) {
-            console.log(`[DTGPricingService DEBUG] ${styleNumber} pricing request:`, {
+            dtgpricservLog(`[DTGPricingService DEBUG] ${styleNumber} pricing request:`, {
                 styleNumber: styleNumber,
                 color: color,
                 cacheKey: cacheKey,
@@ -302,7 +304,7 @@ class DTGPricingService {
             if (Date.now() - cached.timestamp < this.cacheTimeout) {
                 // Validate cached data before returning
                 if (cached.data && cached.data.sizes && cached.data.sizes.length > 0) {
-                    console.log('[DTGPricingService] Returning cached data for:', cacheKey);
+                    dtgpricservLog('[DTGPricingService] Returning cached data for:', cacheKey);
                     return cached.data;
                 } else {
                     console.warn('[DTGPricingService] Invalid cached data detected, fetching fresh data for:', cacheKey);
@@ -312,7 +314,7 @@ class DTGPricingService {
         }
 
         // Use bundle endpoint only - no fallback to individual endpoints
-        console.log('[DTGPricingService] Fetching data from bundle endpoint for:', styleNumber, color);
+        dtgpricservLog('[DTGPricingService] Fetching data from bundle endpoint for:', styleNumber, color);
 
         try {
             const bundleData = await this.fetchBundledData(styleNumber, color);
@@ -322,11 +324,11 @@ class DTGPricingService {
                 throw new Error(`Failed to fetch DTG pricing data for ${styleNumber}. API bundle endpoint is required.`);
             }
 
-            console.log('[DTGPricingService] Bundle endpoint data received successfully');
+            dtgpricservLog('[DTGPricingService] Bundle endpoint data received successfully');
 
             // Cache the bundled data
             this.cache.set(cacheKey, { data: bundleData, timestamp: Date.now() });
-            console.log(`[DTGPricingService] Cached pricing data for:`, cacheKey);
+            dtgpricservLog(`[DTGPricingService] Cached pricing data for:`, cacheKey);
 
             return bundleData;
 
@@ -345,8 +347,8 @@ class DTGPricingService {
      * @returns {Object} Price matrix for all locations and sizes
      */
     calculateAllLocationPrices(data, quantity) {
-// 🔍 DEBUG: Log what data parameter looks like when received        console.log('🔍 [DTGPricingService] calculateAllLocationPrices RECEIVED:', {            dataType: typeof data,            dataKeys: data ? Object.keys(data) : [],            tiersType: typeof data?.tiers,            tiersIsArray: Array.isArray(data?.tiers),            tiersLength: data?.tiers?.length,            costsLength: data?.costs?.length,            sizesLength: data?.sizes?.length,            upchargesLength: data?.upcharges ? Object.keys(data.upcharges).length : 0        });
-        console.log('[DTGPricingService] Calculating prices for quantity:', quantity);
+// 🔍 DEBUG: Log what data parameter looks like when received        dtgpricservLog('🔍 [DTGPricingService] calculateAllLocationPrices RECEIVED:', {            dataType: typeof data,            dataKeys: data ? Object.keys(data) : [],            tiersType: typeof data?.tiers,            tiersIsArray: Array.isArray(data?.tiers),            tiersLength: data?.tiers?.length,            costsLength: data?.costs?.length,            sizesLength: data?.sizes?.length,            upchargesLength: data?.upcharges ? Object.keys(data.upcharges).length : 0        });
+        dtgpricservLog('[DTGPricingService] Calculating prices for quantity:', quantity);
         
         const { tiers, costs, sizes, upcharges } = data;
         const allLocationPrices = {};
@@ -358,7 +360,7 @@ class DTGPricingService {
             return null;
         }
         
-        console.log('[DTGPricingService] Using tier:', tier.TierLabel);
+        dtgpricservLog('[DTGPricingService] Using tier:', tier.TierLabel);
         
         // Calculate prices for each location (passing all tiers so the LTM
         // print-cost fallback can find the lowest non-LTM tier label).
@@ -527,7 +529,7 @@ class DTGPricingService {
      * This allows gradual migration
      */
     buildCompatibilityBundle(data, quantity, selectedLocation = 'LC') {
-        console.log('[DTGPricingService] Building compatibility bundle for location:', selectedLocation);
+        dtgpricservLog('[DTGPricingService] Building compatibility bundle for location:', selectedLocation);
         
         const allLocationPrices = this.calculateAllLocationPrices(data, quantity);
         const tier = this.getTierForQuantity(data.tiers, quantity);
@@ -657,7 +659,7 @@ class DTGPricingService {
      */
     clearCache() {
         this.cache.clear();
-        console.log('[DTGPricingService] Cache cleared');
+        dtgpricservLog('[DTGPricingService] Cache cleared');
     }
 
     /**
@@ -686,4 +688,4 @@ class DTGPricingService {
 // Make available globally
 window.DTGPricingService = DTGPricingService;
 
-console.log('[DTGPricingService] Service loaded with API bundle endpoint (required for operation)');
+dtgpricservLog('[DTGPricingService] Service loaded with API bundle endpoint (required for operation)');

@@ -9139,10 +9139,8 @@ app.get('/brands.html', (req, res) => {
 // tests/, which is now neither mounted nor shipped in the slug. No tombstone
 // needed — there is no static mount underneath that could pick these paths up.
 
-// Also serve the new JS files explicitly if needed
-app.get('/app-new.js', (req, res) => {
-  res.sendFile(path.join(__dirname, 'app-new.js'));
-});
+// (2026-09-06: the explicit route for the retired root "app-new" script is gone with the file — no
+// page ever requested it; index.html loads app-modern.js.)
 
 app.get('/autocomplete-new.js', (req, res) => {
   res.sendFile(path.join(__dirname, 'autocomplete-new.js'));

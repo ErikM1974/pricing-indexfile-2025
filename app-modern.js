@@ -9,12 +9,14 @@
  */
 
 // Configuration
+var APPMODE_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
+var appmodeLog = APPMODE_LOG_ON ? console.log.bind(console) : function () {}; // debug logging: localhost or ?debug=1 only (2026-09-06 console sweep)
 const DEBUG_MODE = false;
 
 // Debug logging wrapper
 const debugLog = (...args) => {
     if (DEBUG_MODE) {
-        console.log(...args);
+        appmodeLog(...args);
     }
 };
 

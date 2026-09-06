@@ -3,6 +3,8 @@
  * Handles saving safety stripe designs to Caspio database
  */
 
+var SAFESTRICREA_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
+var safestricreaLog = SAFESTRICREA_LOG_ON ? console.log.bind(console) : function () {}; // debug logging: localhost or ?debug=1 only (2026-09-06 console sweep)
 class SafetyStripeQuoteService {
     constructor() {
         this.baseURL = ''; // same-origin since the 2026-08-26 quote-plane lockdown (rate-limited public relays)
@@ -58,7 +60,7 @@ class SafetyStripeQuoteService {
             const quoteID = this.generateQuoteID();
             const sessionID = this.generateSessionID();
             
-            console.log('[SafetyStripeQuoteService] Saving design with ID:', quoteID);
+            safestricreaLog('[SafetyStripeQuoteService] Saving design with ID:', quoteID);
 
             // Step 1: Create quote session
             const expiresAtDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
@@ -80,7 +82,7 @@ class SafetyStripeQuoteService {
                 Notes: `Safety Stripe Design - ${designData.stripeStyle}\nFront: ${designData.frontOption}, Back: ${designData.backOption}`
             };
 
-            console.log('[SafetyStripeQuoteService] Session data:', sessionData);
+            safestricreaLog('[SafetyStripeQuoteService] Session data:', sessionData);
 
             const sessionResponse = await fetch(`${this.baseURL}/api/quote_sessions`, {
                 method: 'POST',
@@ -91,7 +93,7 @@ class SafetyStripeQuoteService {
             });
 
             const responseText = await sessionResponse.text();
-            console.log('[SafetyStripeQuoteService] Session response:', sessionResponse.status, responseText);
+            safestricreaLog('[SafetyStripeQuoteService] Session response:', sessionResponse.status, responseText);
 
             if (!sessionResponse.ok) {
                 let errorMessage = `Session creation failed: ${sessionResponse.status}`;
@@ -141,7 +143,7 @@ class SafetyStripeQuoteService {
                 AddedAt: addedAt
             };
 
-            console.log('[SafetyStripeQuoteService] Item data:', itemData);
+            safestricreaLog('[SafetyStripeQuoteService] Item data:', itemData);
 
             const itemResponse = await fetch(`${this.baseURL}/api/quote_items`, {
                 method: 'POST',
@@ -152,7 +154,7 @@ class SafetyStripeQuoteService {
             });
 
             const itemResponseText = await itemResponse.text();
-            console.log('[SafetyStripeQuoteService] Item response:', itemResponse.status, itemResponseText);
+            safestricreaLog('[SafetyStripeQuoteService] Item response:', itemResponse.status, itemResponseText);
 
             if (!itemResponse.ok) {
                 console.error('Failed to save design details:', itemResponseText);

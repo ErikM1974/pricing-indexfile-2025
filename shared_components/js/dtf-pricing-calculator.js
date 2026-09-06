@@ -3,6 +3,8 @@
  * Implements Location = Size model with iOS-style toggle switches
  * 100% API-driven pricing with HalfDollarCeil rounding
  */
+var DTFPRICCALC_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
+var dtfpriccalcLog = DTFPRICCALC_LOG_ON ? console.log.bind(console) : function () {}; // debug logging: localhost or ?debug=1 only (2026-09-06 console sweep)
 var DTF_CALC_API_BASE = (typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) || '';
 if (!DTF_CALC_API_BASE) console.error('[dtf-pricing-calculator] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
 class DTFPricingCalculator {
@@ -35,25 +37,25 @@ class DTFPricingCalculator {
         try {
             await this.loadApiData();
             this.apiDataLoaded = true;
-            console.log('[DTF Calculator] API data loaded successfully');
+            dtfpriccalcLog('[DTF Calculator] API data loaded successfully');
 
             // The DTF pricing bundle API should include sizes and upcharges
             if (this.apiData) {
                 // Extract sizes
                 if (this.apiData.sizes && Array.isArray(this.apiData.sizes)) {
                     this.productSizes = this.apiData.sizes.map(s => s.size);
-                    console.log('✅ [DTF Calculator] Sizes loaded from API:', this.productSizes);
+                    dtfpriccalcLog('✅ [DTF Calculator] Sizes loaded from API:', this.productSizes);
                 }
 
                 // Extract upcharges
                 if (this.apiData.sellingPriceDisplayAddOns) {
                     this.productUpcharges = this.apiData.sellingPriceDisplayAddOns;
-                    console.log('✅ [DTF Calculator] Upcharges loaded from API:', this.productUpcharges);
+                    dtfpriccalcLog('✅ [DTF Calculator] Upcharges loaded from API:', this.productUpcharges);
                 }
 
                 // If we don't have upcharges yet, we'll get them later from product event
                 if (!this.productUpcharges || Object.keys(this.productUpcharges).length === 0) {
-                    console.log('⏳ [DTF Calculator] No upcharges in initial load, waiting for product data...');
+                    dtfpriccalcLog('⏳ [DTF Calculator] No upcharges in initial load, waiting for product data...');
                 }
             }
         } catch (error) {
@@ -70,7 +72,7 @@ class DTFPricingCalculator {
         const urlParams = new URLSearchParams(window.location.search);
         const styleNumber = urlParams.get('StyleNumber') || urlParams.get('styleNumber');
         if (styleNumber) {
-            console.log('🚀 [DTF Calculator] Style number found in URL, fetching upcharge data immediately:', styleNumber);
+            dtfpriccalcLog('🚀 [DTF Calculator] Style number found in URL, fetching upcharge data immediately:', styleNumber);
             this.fetchUpchargeData(styleNumber);
         }
 
@@ -125,7 +127,7 @@ class DTFPricingCalculator {
         if (apiData.pricingTiers && Array.isArray(apiData.pricingTiers) &&
             apiData.transferSizes && apiData.freightTiers) {
 
-            console.log('[DTF Calculator] Using pre-transformed API data from service');
+            dtfpriccalcLog('[DTF Calculator] Using pre-transformed API data from service');
 
             // Use already-transformed pricing tiers directly
             this.pricingTiers = apiData.pricingTiers;
@@ -137,15 +139,15 @@ class DTFPricingCalculator {
                     this.transferPricingTiers[sizeKey] = sizeData.pricingTiers;
                 }
             });
-            console.log('[DTF Calculator] Transfer pricing tiers loaded:', Object.keys(this.transferPricingTiers));
+            dtfpriccalcLog('[DTF Calculator] Transfer pricing tiers loaded:', Object.keys(this.transferPricingTiers));
 
             // Use pre-built freight tiers
             this.freightTiers = apiData.freightTiers;
-            console.log('[DTF Calculator] Freight tiers loaded:', this.freightTiers.length, 'tiers');
+            dtfpriccalcLog('[DTF Calculator] Freight tiers loaded:', this.freightTiers.length, 'tiers');
 
             // Use pre-extracted labor cost
             this.laborCostPerLocation = apiData.laborCostPerLocation || 0;
-            console.log('[DTF Calculator] Labor cost from API:', this.laborCostPerLocation);
+            dtfpriccalcLog('[DTF Calculator] Labor cost from API:', this.laborCostPerLocation);
 
             // Extract LTM fee from first tier with LTM
             this.ltmFeeAmount = 0;
@@ -159,10 +161,10 @@ class DTFPricingCalculator {
             // Get margin from first tier
             if (this.pricingTiers[0]) {
                 this.marginDenominator = this.pricingTiers[0].marginDenominator;
-                console.log('[DTF Calculator] Margin denominator from API:', this.marginDenominator);
+                dtfpriccalcLog('[DTF Calculator] Margin denominator from API:', this.marginDenominator);
             }
 
-            console.log('[DTF Calculator] Pre-transformed data loaded successfully');
+            dtfpriccalcLog('[DTF Calculator] Pre-transformed data loaded successfully');
             this.updateLTMFeeDisplays();
             return;
         }
@@ -208,7 +210,7 @@ class DTFPricingCalculator {
                 this.transferPricingTiers[size].sort((a, b) => a.minQty - b.minQty);
             });
 
-            console.log('[DTF Calculator] Transfer pricing tiers loaded:', Object.keys(this.transferPricingTiers));
+            dtfpriccalcLog('[DTF Calculator] Transfer pricing tiers loaded:', Object.keys(this.transferPricingTiers));
         }
 
         // Store freight tiers in instance (NOT in DTFConfig)
@@ -220,14 +222,14 @@ class DTFPricingCalculator {
                 costPerTransfer: parseFloat(freight.cost_per_transfer)
             })).sort((a, b) => a.minQty - b.minQty);
 
-            console.log('[DTF Calculator] Freight tiers loaded:', this.freightTiers.length, 'tiers');
+            dtfpriccalcLog('[DTF Calculator] Freight tiers loaded:', this.freightTiers.length, 'tiers');
         }
 
         // Store labor cost in instance (NOT in DTFConfig)
         this.laborCostPerLocation = 0;
         if (rawData.allDtfCostsR && rawData.allDtfCostsR[0] && rawData.allDtfCostsR[0].PressingLaborCost) {
             this.laborCostPerLocation = parseFloat(rawData.allDtfCostsR[0].PressingLaborCost);
-            console.log('[DTF Calculator] Labor cost from API:', this.laborCostPerLocation);
+            dtfpriccalcLog('[DTF Calculator] Labor cost from API:', this.laborCostPerLocation);
         }
 
         // Store margin and LTM data from pricing tiers
@@ -253,11 +255,11 @@ class DTFPricingCalculator {
             // Get margin from first tier
             if (this.pricingTiers[0]) {
                 this.marginDenominator = this.pricingTiers[0].marginDenominator;
-                console.log('[DTF Calculator] Margin denominator from API:', this.marginDenominator);
+                dtfpriccalcLog('[DTF Calculator] Margin denominator from API:', this.marginDenominator);
             }
         }
 
-        console.log('[DTF Calculator] API data stored in instance - no hardcoded fallbacks');
+        dtfpriccalcLog('[DTF Calculator] API data stored in instance - no hardcoded fallbacks');
 
         // Update dynamic LTM fee displays now that we have API data
         this.updateLTMFeeDisplays();
@@ -863,7 +865,7 @@ class DTFPricingCalculator {
         const dtfSetupFeeTooltip = document.getElementById('dtf-setup-fee-tooltip');
 
         if (dtfSetupFeeBadge && dtfSetupFeeTooltip) {
-            console.log('✅ [DTF Calculator] Initializing setup fee tooltip');
+            dtfpriccalcLog('✅ [DTF Calculator] Initializing setup fee tooltip');
 
             // Desktop: Show on hover
             dtfSetupFeeBadge.addEventListener('mouseenter', () => {
@@ -907,7 +909,7 @@ class DTFPricingCalculator {
         const dtfUpchargeTooltip = document.getElementById('dtf-upcharge-tooltip');
 
         if (dtfUpchargeIcon && dtfUpchargeTooltip) {
-            console.log('✅ [DTF Calculator] Initializing size upcharge tooltip');
+            dtfpriccalcLog('✅ [DTF Calculator] Initializing size upcharge tooltip');
 
             // Desktop: Show on hover
             dtfUpchargeIcon.addEventListener('mouseenter', () => {
@@ -952,7 +954,7 @@ class DTFPricingCalculator {
     async fetchUpchargeData(styleNumber) {
         try {
             // Fetch max prices and upcharges data
-            console.log('📡 [DTF Calculator] Fetching max prices for style:', styleNumber);
+            dtfpriccalcLog('📡 [DTF Calculator] Fetching max prices for style:', styleNumber);
             const response = await fetch(`${DTF_CALC_API_BASE}/api/max-prices-by-style?styleNumber=${styleNumber}`);
 
             if (!response.ok) {
@@ -960,18 +962,18 @@ class DTFPricingCalculator {
             }
 
             const data = await response.json();
-            console.log('✅ [DTF Calculator] Max prices data received:', data);
+            dtfpriccalcLog('✅ [DTF Calculator] Max prices data received:', data);
 
             // Extract sizes from the response
             if (data.sizes && Array.isArray(data.sizes)) {
                 this.productSizes = data.sizes.map(s => s.size);
-                console.log('✅ [DTF Calculator] Sizes loaded:', this.productSizes);
+                dtfpriccalcLog('✅ [DTF Calculator] Sizes loaded:', this.productSizes);
             }
 
             // Extract upcharges directly from sellingPriceDisplayAddOns
             if (data.sellingPriceDisplayAddOns) {
                 this.productUpcharges = data.sellingPriceDisplayAddOns;
-                console.log('✅ [DTF Calculator] Upcharges loaded:', this.productUpcharges);
+                dtfpriccalcLog('✅ [DTF Calculator] Upcharges loaded:', this.productUpcharges);
             }
 
             // Update tooltip content immediately
@@ -983,7 +985,7 @@ class DTFPricingCalculator {
                 this.updateUpchargeTooltipContent();
             }
 
-            console.log('📊 [DTF Calculator] Tooltip data updated:', {
+            dtfpriccalcLog('📊 [DTF Calculator] Tooltip data updated:', {
                 sizes: this.productSizes,
                 upcharges: this.productUpcharges
             });
@@ -997,12 +999,12 @@ class DTFPricingCalculator {
     }
 
     setupProductDataListener() {
-        console.log('🔧 [DTF Calculator] Setting up product data listener...');
+        dtfpriccalcLog('🔧 [DTF Calculator] Setting up product data listener...');
 
         // Listen for productColorsReady event - but we need to fetch our own sizing data
         document.addEventListener('productColorsReady', async (e) => {
-            console.log('🎯 [DTF Calculator] Product colors event received, fetching size/upcharge data...');
-            console.log('📦 [DTF Calculator] Event detail:', e.detail);
+            dtfpriccalcLog('🎯 [DTF Calculator] Product colors event received, fetching size/upcharge data...');
+            dtfpriccalcLog('📦 [DTF Calculator] Event detail:', e.detail);
 
             // Try to get style number from multiple possible locations
             const styleNumber = e.detail?.styleNumber ||
@@ -1010,7 +1012,7 @@ class DTFPricingCalculator {
                                window.selectedStyleNumber ||
                                new URLSearchParams(window.location.search).get('StyleNumber');
 
-            console.log('🏷️ [DTF Calculator] Style number resolved to:', styleNumber);
+            dtfpriccalcLog('🏷️ [DTF Calculator] Style number resolved to:', styleNumber);
 
             if (!styleNumber) {
                 console.warn('⚠️ [DTF Calculator] No style number found in event or globals');
@@ -1026,7 +1028,7 @@ class DTFPricingCalculator {
         const tooltipBody = document.getElementById('dtf-upcharge-tooltip-body');
         if (!tooltipBody) return;
 
-        console.log('🎯 [DTF Calculator] Updating upcharge tooltip with:', {
+        dtfpriccalcLog('🎯 [DTF Calculator] Updating upcharge tooltip with:', {
             sizes: this.productSizes,
             upcharges: this.productUpcharges
         });
@@ -1102,7 +1104,7 @@ class DTFPricingCalculator {
         }
 
         if (Math.abs(previousCost - this.currentData.garmentCost) > 0.01) {
-            console.log('[DTF Calculator] Garment cost updated:', this.currentData.garmentCost);
+            dtfpriccalcLog('[DTF Calculator] Garment cost updated:', this.currentData.garmentCost);
         }
 
         this.updatePricingDisplay();
@@ -1124,7 +1126,7 @@ class DTFPricingCalculator {
         }
 
         if (previousQty !== this.currentData.quantity) {
-            console.log('[DTF Calculator] Quantity changed:', this.currentData.quantity);
+            dtfpriccalcLog('[DTF Calculator] Quantity changed:', this.currentData.quantity);
         }
 
         this.updatePricingDisplay();

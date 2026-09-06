@@ -2,6 +2,8 @@
  * Screen Print Fast Quote Service
  * Handles simplified quote submissions
  */
+var SCREFASTQUOT_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
+var screfastquotLog = SCREFASTQUOT_LOG_ON ? console.log.bind(console) : function () {}; // debug logging: localhost or ?debug=1 only (2026-09-06 console sweep)
 class ScreenPrintFastQuoteService {
     constructor() {
         this.baseURL = ''; // same-origin since the 2026-08-26 quote-plane lockdown (staff session auth)
@@ -16,7 +18,7 @@ class ScreenPrintFastQuoteService {
             emailjs.init(this.emailjsPublicKey);
         }
 
-        console.log('[FastQuoteService] Initialized');
+        screfastquotLog('[FastQuoteService] Initialized');
     }
 
     /**
@@ -52,7 +54,7 @@ class ScreenPrintFastQuoteService {
     async submitQuote(formData) {
         try {
             const quoteId = await this.generateQuoteID();  // async now (server sequence)
-            console.log('[FastQuoteService] Submitting quote:', quoteId);
+            screfastquotLog('[FastQuoteService] Submitting quote:', quoteId);
 
             // Save to database
             const dbResult = await this.saveToDatabase(quoteId, formData);
@@ -106,7 +108,7 @@ class ScreenPrintFastQuoteService {
                 Notes: this.formatNotes(formData)
             };
 
-            console.log('[FastQuoteService] Saving to database:', sessionData);
+            screfastquotLog('[FastQuoteService] Saving to database:', sessionData);
 
             const response = await fetch(`${this.baseURL}/api/quote_sessions`, {
                 method: 'POST',
@@ -117,7 +119,7 @@ class ScreenPrintFastQuoteService {
             });
 
             const responseText = await response.text();
-            console.log('[FastQuoteService] Database response:', response.status, responseText);
+            screfastquotLog('[FastQuoteService] Database response:', response.status, responseText);
 
             if (!response.ok) {
                 throw new Error(`Database save failed: ${responseText}`);
@@ -182,7 +184,7 @@ class ScreenPrintFastQuoteService {
                 company_email: 'sales@nwcustomapparel.com'
             };
 
-            console.log('[FastQuoteService] Sending customer email');
+            screfastquotLog('[FastQuoteService] Sending customer email');
 
             await emailjs.send(
                 this.emailjsServiceId,
@@ -190,7 +192,7 @@ class ScreenPrintFastQuoteService {
                 emailData
             );
 
-            console.log('[FastQuoteService] Customer email sent');
+            screfastquotLog('[FastQuoteService] Customer email sent');
             return { success: true };
 
         } catch (error) {
@@ -219,7 +221,7 @@ class ScreenPrintFastQuoteService {
                 submitted_date: new Date().toLocaleString()
             };
 
-            console.log('[FastQuoteService] Sending sales team email');
+            screfastquotLog('[FastQuoteService] Sending sales team email');
 
             await emailjs.send(
                 this.emailjsServiceId,
@@ -227,7 +229,7 @@ class ScreenPrintFastQuoteService {
                 emailData
             );
 
-            console.log('[FastQuoteService] Sales team email sent');
+            screfastquotLog('[FastQuoteService] Sales team email sent');
             return { success: true };
 
         } catch (error) {
@@ -240,4 +242,4 @@ class ScreenPrintFastQuoteService {
 // Make service available globally
 window.ScreenPrintFastQuoteService = ScreenPrintFastQuoteService;
 
-console.log('[FastQuoteService] Loaded successfully');
+screfastquotLog('[FastQuoteService] Loaded successfully');

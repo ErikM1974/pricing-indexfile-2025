@@ -1,5 +1,7 @@
 // pricing-matrix-capture.js - Captures pricing matrix data from Caspio tables
-console.log("[PRICING-MATRIX:LOAD] Pricing matrix capture system loaded (v4 Resilient)");
+var PRICMATRCAPT_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
+var pricmatrcaptLog = PRICMATRCAPT_LOG_ON ? console.log.bind(console) : function () {}; // debug logging: localhost or ?debug=1 only (2026-09-06 console sweep)
+pricmatrcaptLog("[PRICING-MATRIX:LOAD] Pricing matrix capture system loaded (v4 Resilient)");
 
 (function() {
     "use strict";
@@ -25,13 +27,13 @@ console.log("[PRICING-MATRIX:LOAD] Pricing matrix capture system loaded (v4 Resi
 
         // Check if we're in quote-only mode
         if (window.NWCA && NWCA.config && NWCA.config.features && !NWCA.config.features.cartEnabled) {
-            console.log("[PRICING-MATRIX:SAVE] Quote mode active, skipping server save");
+            pricmatrcaptLog("[PRICING-MATRIX:SAVE] Quote mode active, skipping server save");
             return;
         }
         
         // Also check app config for quote mode
         if (window.NWCA_APP_CONFIG && NWCA_APP_CONFIG.FEATURES && NWCA_APP_CONFIG.FEATURES.QUOTE_MODE) {
-            console.log("[PRICING-MATRIX:SAVE] Quote-only workflow detected, skipping pricing matrix server save");
+            pricmatrcaptLog("[PRICING-MATRIX:SAVE] Quote-only workflow detected, skipping pricing matrix server save");
             return;
         }
 
@@ -58,7 +60,7 @@ console.log("[PRICING-MATRIX:LOAD] Pricing matrix capture system loaded (v4 Resi
             SessionID: currentSessionId // Include the SessionID
         };
 
-        console.log("[PRICING-MATRIX:SAVE] Attempting to save pricing matrix to server (with SessionID):", payload);
+        pricmatrcaptLog("[PRICING-MATRIX:SAVE] Attempting to save pricing matrix to server (with SessionID):", payload);
 
         try {
             const response = await fetch(`${API_BASE_URL}/pricing-matrix`, {
@@ -76,11 +78,11 @@ console.log("[PRICING-MATRIX:LOAD] Pricing matrix capture system loaded (v4 Resi
             }
 
             const result = await response.json();
-            console.log("[PRICING-MATRIX:SAVE-SUCCESS] Pricing matrix saved successfully:", result);
+            pricmatrcaptLog("[PRICING-MATRIX:SAVE-SUCCESS] Pricing matrix saved successfully:", result);
             // Optionally store the returned ID back into the captured data if needed elsewhere
             if (window.nwcaPricingData && result && result.PK_ID) {
                  window.nwcaPricingData.matrixId = result.PK_ID;
-                 console.log(`[PRICING-MATRIX:SAVE] Stored matrix ID ${result.PK_ID} in window.nwcaPricingData`);
+                 pricmatrcaptLog(`[PRICING-MATRIX:SAVE] Stored matrix ID ${result.PK_ID} in window.nwcaPricingData`);
             }
 
         } catch (error) {
@@ -91,7 +93,7 @@ console.log("[PRICING-MATRIX:LOAD] Pricing matrix capture system loaded (v4 Resi
 
     function initialize() {
         if (initialized) return;
-        console.log("[PRICING-MATRIX:INIT] Initializing pricing matrix capture system");
+        pricmatrcaptLog("[PRICING-MATRIX:INIT] Initializing pricing matrix capture system");
         if (captureInterval) clearInterval(captureInterval);
         captureAttempts = 0;
         captureCompleted = false; // Reset flag on init
@@ -102,7 +104,7 @@ console.log("[PRICING-MATRIX:LOAD] Pricing matrix capture system loaded (v4 Resi
 
     function checkForPricingData() {
         if (captureCompleted) {
-            // console.log("[PRICING-MATRIX:CHECK] Capture already completed, stopping interval.");
+            // pricmatrcaptLog("[PRICING-MATRIX:CHECK] Capture already completed, stopping interval.");
             if (captureInterval) clearInterval(captureInterval);
             captureInterval = null;
             return;
@@ -110,20 +112,20 @@ console.log("[PRICING-MATRIX:LOAD] Pricing matrix capture system loaded (v4 Resi
         
         // Check if master bundle mode is active
         if (window.EMBROIDERY_MASTER_BUNDLE_MODE || window.EMBROIDERY_MASTER_BUNDLE_LOADED) {
-            console.log("[PRICING-MATRIX:CHECK] Master bundle mode is active, stopping interval.");
+            pricmatrcaptLog("[PRICING-MATRIX:CHECK] Master bundle mode is active, stopping interval.");
             if (captureInterval) clearInterval(captureInterval);
             captureInterval = null;
             return;
         }
 
         captureAttempts++;
-        // console.log(`[PRICING-MATRIX:CHECK] Checking for pricing table (Attempt ${captureAttempts}/${MAX_CAPTURE_ATTEMPTS})`);
+        // pricmatrcaptLog(`[PRICING-MATRIX:CHECK] Checking for pricing table (Attempt ${captureAttempts}/${MAX_CAPTURE_ATTEMPTS})`);
 
         const pricingTable = document.querySelector('.matrix-price-table') ||
                             document.querySelector('.cbResultSetTable');
 
         if (pricingTable) {
-            console.log("[PRICING-MATRIX:CHECK] Pricing table found. Attempting capture.");
+            pricmatrcaptLog("[PRICING-MATRIX:CHECK] Pricing table found. Attempting capture.");
             const urlParams = new URLSearchParams(window.location.search);
             const styleNumber = urlParams.get('StyleNumber');
             const colorCode = urlParams.get('COLOR'); // Use the raw URL param
@@ -132,7 +134,7 @@ console.log("[PRICING-MATRIX:LOAD] Pricing matrix capture system loaded (v4 Resi
             if (styleNumber && colorCode && embType) {
                 const capturedData = capturePricingMatrix(pricingTable, styleNumber, colorCode, embType);
                 if (capturedData) {
-                    console.log("[PRICING-MATRIX:CHECK] Capture successful. Stopping interval check.");
+                    pricmatrcaptLog("[PRICING-MATRIX:CHECK] Capture successful. Stopping interval check.");
                     // captureCompleted flag is set inside capturePricingMatrix on success
                     clearInterval(captureInterval);
                     captureInterval = null;
@@ -168,14 +170,14 @@ console.log("[PRICING-MATRIX:LOAD] Pricing matrix capture system loaded (v4 Resi
     function capturePricingMatrix(pricingTable, styleNumber, colorCode, embType) {
         // Check if we already have complete data from the caspioCapPricingCalculated event
         if (window.capEmbroideryMasterData && embType === 'cap-embroidery') {
-            console.log("[PRICING-MATRIX:CAPTURE] Complete cap embroidery data already available from caspioCapPricingCalculated event. Using that instead of capturing from table.");
+            pricmatrcaptLog("[PRICING-MATRIX:CAPTURE] Complete cap embroidery data already available from caspioCapPricingCalculated event. Using that instead of capturing from table.");
             
             // Create a compatible data structure from the master data
             const masterData = window.capEmbroideryMasterData;
             const selectedStitchCount = document.getElementById('client-stitch-count-select')?.value || '8000';
             const pricingDataForStitchCount = masterData.allPriceProfiles[selectedStitchCount];
             
-            console.log(`[PRICING-MATRIX:CAPTURE] Using stitch count ${selectedStitchCount} for initial capture`);
+            pricmatrcaptLog(`[PRICING-MATRIX:CAPTURE] Using stitch count ${selectedStitchCount} for initial capture`);
             
             if (pricingDataForStitchCount) {
                 const headers = masterData.groupedHeaders || [];
@@ -224,12 +226,12 @@ console.log("[PRICING-MATRIX:LOAD] Pricing matrix capture system loaded (v4 Resi
                     currentStitchCount: selectedStitchCount
                 };
                 
-                console.log("[PRICING-MATRIX:CAPTURE] Created complete pricing data from master data:", JSON.stringify(window.nwcaPricingData, null, 2));
+                pricmatrcaptLog("[PRICING-MATRIX:CAPTURE] Created complete pricing data from master data:", JSON.stringify(window.nwcaPricingData, null, 2));
                 captureCompleted = true;
                 
                 const event = new CustomEvent('pricingDataLoaded', { detail: window.nwcaPricingData });
                 window.dispatchEvent(event);
-                console.log("[PRICING-MATRIX:CAPTURE] 'pricingDataLoaded' event dispatched with complete data.");
+                pricmatrcaptLog("[PRICING-MATRIX:CAPTURE] 'pricingDataLoaded' event dispatched with complete data.");
                 
                 // Call the save function asynchronously
                 savePricingMatrixToServer(window.nwcaPricingData);
@@ -239,10 +241,10 @@ console.log("[PRICING-MATRIX:LOAD] Pricing matrix capture system loaded (v4 Resi
         }
         
         if (captureCompleted) {
-             console.log("[PRICING-MATRIX:CAPTURE] Capture already completed, skipping redundant capture.");
+             pricmatrcaptLog("[PRICING-MATRIX:CAPTURE] Capture already completed, skipping redundant capture.");
              return window.nwcaPricingData;
         }
-        console.log(`[PRICING-MATRIX:CAPTURE] Capturing data for ${styleNumber}, ${colorCode}, ${embType}`);
+        pricmatrcaptLog(`[PRICING-MATRIX:CAPTURE] Capturing data for ${styleNumber}, ${colorCode}, ${embType}`);
         try {
             const headers = [];
             const headerRow = pricingTable.querySelector('tr');
@@ -251,7 +253,7 @@ console.log("[PRICING-MATRIX:LOAD] Pricing matrix capture system loaded (v4 Resi
             if (headerCells.length <= 1) { console.error("[PRICING-MATRIX:CAPTURE-ERROR] Header cells not found/insufficient."); return null; }
             headerCells.forEach((cell, index) => { if (index > 0) headers.push(cell.textContent.trim()); });
             if (headers.length === 0) { console.error("[PRICING-MATRIX:CAPTURE-ERROR] No size headers extracted."); return null; }
-            console.log("[PRICING-MATRIX:DEBUG] Setting window.availableSizesFromTable:", headers); // DEBUG LOG
+            pricmatrcaptLog("[PRICING-MATRIX:DEBUG] Setting window.availableSizesFromTable:", headers); // DEBUG LOG
             window.availableSizesFromTable = headers; // Set this early for UI builders
 
             const priceMatrix = {};
@@ -312,7 +314,7 @@ console.log("[PRICING-MATRIX:LOAD] Pricing matrix capture system loaded (v4 Resi
                  return null;
              }
 
-            console.log("[PRICING-MATRIX:DEBUG] Preparing to set window.nwcaPricingData"); // DEBUG LOG
+            pricmatrcaptLog("[PRICING-MATRIX:DEBUG] Preparing to set window.nwcaPricingData"); // DEBUG LOG
             window.nwcaPricingData = {
                 styleNumber, color: colorCode, embellishmentType: embType,
                 headers, prices: priceMatrix, tierData,
@@ -322,13 +324,13 @@ console.log("[PRICING-MATRIX:LOAD] Pricing matrix capture system loaded (v4 Resi
                 capturedAt: new Date().toISOString()
             };
 
-            console.log("[PRICING-MATRIX:CAPTURE] Data captured successfully. Value:", JSON.stringify(window.nwcaPricingData, null, 2)); // DEBUG LOG (Stringified)
+            pricmatrcaptLog("[PRICING-MATRIX:CAPTURE] Data captured successfully. Value:", JSON.stringify(window.nwcaPricingData, null, 2)); // DEBUG LOG (Stringified)
             captureCompleted = true; // Set flag *after* successful capture and data assignment
 
             const event = new CustomEvent('pricingDataLoaded', { detail: window.nwcaPricingData });
-            console.log("[PRICING-MATRIX:DEBUG] Dispatching 'pricingDataLoaded' event."); // DEBUG LOG
+            pricmatrcaptLog("[PRICING-MATRIX:DEBUG] Dispatching 'pricingDataLoaded' event."); // DEBUG LOG
             window.dispatchEvent(event);
-            console.log("[PRICING-MATRIX:CAPTURE] 'pricingDataLoaded' event dispatched.");
+            pricmatrcaptLog("[PRICING-MATRIX:CAPTURE] 'pricingDataLoaded' event dispatched.");
 // Call the save function asynchronously after dispatching the event
             savePricingMatrixToServer(window.nwcaPricingData);
 
@@ -336,7 +338,7 @@ console.log("[PRICING-MATRIX:LOAD] Pricing matrix capture system loaded (v4 Resi
 
         } catch (error) {
             console.error("[PRICING-MATRIX:CAPTURE-ERROR] Error during capture:", error);
-            console.log("[PRICING-MATRIX:DEBUG] Setting pricing data to null due to error."); // DEBUG LOG
+            pricmatrcaptLog("[PRICING-MATRIX:DEBUG] Setting pricing data to null due to error."); // DEBUG LOG
             window.nwcaPricingData = null; window.availableSizesFromTable = null;
             window.dispatchEvent(new CustomEvent('pricingDataError', { detail: { message: 'Error capturing pricing data.', error: error } }));
             return null;
@@ -353,7 +355,7 @@ console.log("[PRICING-MATRIX:LOAD] Pricing matrix capture system loaded (v4 Resi
         
         // Skip fallback if master bundle is handling the pricing
         if ((embType === 'embroidery' || embType === 'dtg') && (window.EMBROIDERY_MASTER_BUNDLE_MODE || window.EMBROIDERY_MASTER_BUNDLE_LOADED)) {
-            console.log('[PRICING-MATRIX] Skipping fallback - master bundle is active');
+            pricmatrcaptLog('[PRICING-MATRIX] Skipping fallback - master bundle is active');
             return;
         }
         
@@ -375,7 +377,7 @@ console.log("[PRICING-MATRIX:LOAD] Pricing matrix capture system loaded (v4 Resi
             };
             
             window.nwcaPricingData = fallbackData;
-            console.log("[PRICING-MATRIX] Dispatching fallback event for DTF - will trigger API fetch");
+            pricmatrcaptLog("[PRICING-MATRIX] Dispatching fallback event for DTF - will trigger API fetch");
             window.dispatchEvent(new CustomEvent('pricingDataLoaded', { detail: fallbackData }));
             captureCompleted = true;
             return;
@@ -385,9 +387,9 @@ console.log("[PRICING-MATRIX:LOAD] Pricing matrix capture system loaded (v4 Resi
         let headers = ['S-XL', '2XL', '3XL']; let prices = { 'S-XL': { 'Tier1': 20.00, 'Tier2': 19.00, 'Tier3': 18.00, 'Tier4': 17.00 }, '2XL': { 'Tier1': 22.00, 'Tier2': 21.00, 'Tier3': 20.00, 'Tier4': 19.00 }, '3XL': { 'Tier1': 23.00, 'Tier2': 22.00, 'Tier3': 21.00, 'Tier4': 20.00 }, }; let tiers = { 'Tier1': { 'MinQuantity': 1, 'MaxQuantity': 11, LTM_Fee: 50 }, 'Tier2': { 'MinQuantity': 12, 'MaxQuantity': 23, LTM_Fee: 25 }, 'Tier3': { 'MinQuantity': 24, 'MaxQuantity': 47 }, 'Tier4': { 'MinQuantity': 48, 'MaxQuantity': 71 }, 'Tier5': { 'MinQuantity': 72, 'MaxQuantity': 10000 }, }; let uniqueSizes = ['S', 'M', 'L', 'XL', '2XL', '3XL']; if (embType === 'cap-embroidery') { headers = ['One Size']; prices = { 'One Size': { 'Tier1': 22.99, 'Tier2': 21.99, 'Tier3': 20.99, 'Tier4': 19.99, 'Tier5': 18.99 } }; uniqueSizes = ['OS']; }
         window.nwcaPricingData = { styleNumber: window.selectedStyleNumber || 'FALLBACK', color: window.selectedColorName || 'FALLBACK', embellishmentType: embType, headers: headers, prices: prices, tierData: tiers, uniqueSizes: uniqueSizes, capturedAt: new Date().toISOString(), isFallback: true };
         window.availableSizesFromTable = headers;
-        console.log('PricingPages: Fallback pricing global variables initialized.', JSON.stringify(window.nwcaPricingData, null, 2)); // DEBUG LOG (Stringified)
+        pricmatrcaptLog('PricingPages: Fallback pricing global variables initialized.', JSON.stringify(window.nwcaPricingData, null, 2)); // DEBUG LOG (Stringified)
         // Dispatch event so other components know data (even fallback) is ready
-        console.log("[PRICING-MATRIX:DEBUG] Dispatching 'pricingDataLoaded' event (Fallback)."); // DEBUG LOG
+        pricmatrcaptLog("[PRICING-MATRIX:DEBUG] Dispatching 'pricingDataLoaded' event (Fallback)."); // DEBUG LOG
         window.dispatchEvent(new CustomEvent('pricingDataLoaded', { detail: window.nwcaPricingData }));
         captureCompleted = true; // Mark as completed even with fallback
     }

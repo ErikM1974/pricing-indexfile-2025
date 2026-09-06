@@ -2,8 +2,10 @@
 
 // ── moved from inline <script> in training/sales-coordinator-manual.html (Rule 3, 2026.09.05.7) ──
 // Show specific chapter
+var SALECOORMANU_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
+var salecoormanuLog = SALECOORMANU_LOG_ON ? console.log.bind(console) : function () {}; // debug logging: localhost or ?debug=1 only (2026-09-06 console sweep)
         function showChapter(chapterId) {
-            console.log(`Navigating to chapter: ${chapterId}`);
+            salecoormanuLog(`Navigating to chapter: ${chapterId}`);
             
             // Hide all chapters
             document.querySelectorAll('.chapter').forEach(chapter => {
@@ -14,7 +16,7 @@
             const chapter = document.getElementById(chapterId);
             if (chapter) {
                 chapter.classList.add('active');
-                console.log(`Successfully activated chapter: ${chapterId}`);
+                salecoormanuLog(`Successfully activated chapter: ${chapterId}`);
                 
                 // If it's Chapter 43, populate the staff data
                 if (chapterId === 'chapter43') {
@@ -29,7 +31,7 @@
                 const contentContainer = document.querySelector('.content');
                 if (contentContainer) {
                     contentContainer.scrollTop = 0;
-                    console.log(`Content container scrolled to top for chapter: ${chapterId}`);
+                    salecoormanuLog(`Content container scrolled to top for chapter: ${chapterId}`);
                 }
                 
                 // Also scroll the window to top in case user scrolled down
@@ -41,7 +43,7 @@
                 // Force the chapter into view with a small delay to ensure DOM updates
                 setTimeout(() => {
                     chapter.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    console.log(`Chapter ${chapterId} scrolled into view`);
+                    salecoormanuLog(`Chapter ${chapterId} scrolled into view`);
                 }, 100);
                 
             } else {
@@ -61,7 +63,7 @@
             const activeLink = document.querySelector(`.sidebar a[onclick*="'${chapterId}'"]`);
             if (activeLink) {
                 activeLink.classList.add('active-chapter');
-                console.log(`Highlighted sidebar link for: ${chapterId}`);
+                salecoormanuLog(`Highlighted sidebar link for: ${chapterId}`);
             }
         }
 
@@ -466,7 +468,7 @@
         // Initialize with foreword
         document.addEventListener('DOMContentLoaded', function() {
             showChapter('foreword');
-            console.log('Sales Coordinator Manual loaded. All 43 chapters ready for navigation.');
+            salecoormanuLog('Sales Coordinator Manual loaded. All 43 chapters ready for navigation.');
             
             // Add click tracking for debugging
             document.querySelectorAll('.sidebar a[onclick*="showChapter"]').forEach(link => {
@@ -474,7 +476,7 @@
                     e.preventDefault();
                     const chapterMatch = this.getAttribute('onclick').match(/'([^']+)'/);
                     if (chapterMatch) {
-                        console.log(`Sidebar click detected for: ${chapterMatch[1]}`);
+                        salecoormanuLog(`Sidebar click detected for: ${chapterMatch[1]}`);
                     }
                 });
             });

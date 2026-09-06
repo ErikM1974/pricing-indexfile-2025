@@ -21,6 +21,8 @@
  *     but does NOT require it (EmailJS is deferred to Phase 2b via sendTransferNotification).
  */
 
+var TRANACTISHAR_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
+var tranactisharLog = TRANACTISHAR_LOG_ON ? console.log.bind(console) : function () {}; // debug logging: localhost or ?debug=1 only (2026-09-06 console sweep)
 (function () {
     'use strict';
 
@@ -456,7 +458,7 @@
         }
         return window.emailjs.send(EMAILJS_SERVICE_ID, templateId, params, EMAILJS_PUBLIC_KEY)
             .then(function (resp) {
-                console.log('EmailJS ' + templateId + ' sent:', resp && resp.status);
+                tranactisharLog('EmailJS ' + templateId + ' sent:', resp && resp.status);
                 return resp;
             })
             .catch(function (err) {
@@ -1723,7 +1725,7 @@
 
             // Dry-run short-circuit for local verification
             if (/[?&]dryRun=1\b/.test(window.location.search)) {
-                console.log('[DRYRUN] POST /api/transfer-orders', payload);
+                tranactisharLog('[DRYRUN] POST /api/transfer-orders', payload);
                 var fakeRecord = Object.assign({ ID_Transfer: 'ST-DRYRUN-0000' }, payload);
                 delete fakeRecord.lines;
                 delete fakeRecord.files;
@@ -1741,7 +1743,7 @@
                     if (vision.garmentColorStyle) overrides.garment_info = vision.garmentColorStyle;
                     if (vision.transferType) overrides.transfer_type = vision.transferType;
                 }
-                console.log('[DRYRUN] transfer_requested params:', buildEmailParams(fakeRecord, overrides));
+                tranactisharLog('[DRYRUN] transfer_requested params:', buildEmailParams(fakeRecord, overrides));
                 closeModal();
                 showToast('DRY RUN \u2014 payload logged to console.', 'info');
                 submitBtn.disabled = false;

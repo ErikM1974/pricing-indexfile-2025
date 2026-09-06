@@ -2,6 +2,8 @@
 // Richardson Factory Direct Pricing 2026
 // Simple real-time pricing lookup (no quote building)
 // ============================================================================
+var RICHFACTDIRE_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
+var richfactdireLog = RICHFACTDIRE_LOG_ON ? console.log.bind(console) : function () {}; // debug logging: localhost or ?debug=1 only (2026-09-06 console sweep)
 
 const RICHARDSON_API_BASE = (typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) || '';
 if (!RICHARDSON_API_BASE) console.error('[richardson-factory-direct] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
@@ -203,7 +205,7 @@ const CAP_LTM_FEE = 50.00;
 async function initializeRichardsonData() {
     if (richardsonDataInitialized) return;
 
-    console.log('[Richardson] Initializing data from API...');
+    richfactdireLog('[Richardson] Initializing data from API...');
 
     try {
         // Fetch SanMar Richardson styles (to filter out)
@@ -211,12 +213,12 @@ async function initializeRichardsonData() {
         if (sanmarResponse.ok) {
             const sanmarData = await sanmarResponse.json();
             sanmarRichardsonStyles = Object.keys(sanmarData.prices || {});
-            console.log(`[Richardson] Found ${sanmarRichardsonStyles.length} SanMar Richardson styles to filter out`);
+            richfactdireLog(`[Richardson] Found ${sanmarRichardsonStyles.length} SanMar Richardson styles to filter out`);
 
             // Filter capData to only show Richardson-direct styles
             const originalCount = capData.length;
             capData = allRichardsonCaps.filter(cap => !sanmarRichardsonStyles.includes(cap.style));
-            console.log(`[Richardson] Filtered caps: ${originalCount} -> ${capData.length}`);
+            richfactdireLog(`[Richardson] Filtered caps: ${originalCount} -> ${capData.length}`);
         }
 
         // Fetch embroidery costs + cap margin from API
@@ -233,13 +235,13 @@ async function initializeRichardsonData() {
                 });
                 if (Object.keys(apiCosts).length > 0) {
                     embroideryCosts = apiCosts;
-                    console.log('[Richardson] Embroidery costs loaded from API');
+                    richfactdireLog('[Richardson] Embroidery costs loaded from API');
                 }
             }
             // Cap margin denominator — mirror the Embroidery Quote Builder (tiersR[0].MarginDenominator)
             if (embData.tiersR && embData.tiersR[0] && embData.tiersR[0].MarginDenominator) {
                 capMarginDenominator = parseFloat(embData.tiersR[0].MarginDenominator);
-                console.log(`[Richardson] Cap margin denominator loaded from API: ${capMarginDenominator}`);
+                richfactdireLog(`[Richardson] Cap margin denominator loaded from API: ${capMarginDenominator}`);
             }
         }
 
@@ -251,7 +253,7 @@ async function initializeRichardsonData() {
                 const patchRecord = (patchData.allPatchCostsR || []).find(c => c.ItemType === 'Patch');
                 if (patchRecord && patchRecord.EmbroideryCost != null) {
                     patchUpchargePerCap = parseFloat(patchRecord.EmbroideryCost);
-                    console.log(`[Richardson] Patch upcharge loaded from API: $${patchUpchargePerCap}`);
+                    richfactdireLog(`[Richardson] Patch upcharge loaded from API: $${patchUpchargePerCap}`);
                 }
             }
         } catch (patchError) {
@@ -266,7 +268,7 @@ async function initializeRichardsonData() {
                 const puffRecord = (puffData.allEmbroideryCostsR || []).find(c => c.ItemType === '3D-Puff');
                 if (puffRecord && puffRecord.EmbroideryCost != null) {
                     puffUpchargePerCap = parseFloat(puffRecord.EmbroideryCost);
-                    console.log(`[Richardson] 3D Puff upcharge loaded from API: $${puffUpchargePerCap}`);
+                    richfactdireLog(`[Richardson] 3D Puff upcharge loaded from API: $${puffUpchargePerCap}`);
                 }
             }
         } catch (puffError) {
@@ -281,7 +283,7 @@ async function initializeRichardsonData() {
                 const grt50 = (codesData.data || []).find(c => c.ServiceCode === 'GRT-50');
                 if (grt50 && grt50.SellPrice != null) {
                     patchSetupFee = parseFloat(grt50.SellPrice);
-                    console.log(`[Richardson] Patch setup fee (GRT-50) loaded from API: $${patchSetupFee}`);
+                    richfactdireLog(`[Richardson] Patch setup fee (GRT-50) loaded from API: $${patchSetupFee}`);
                 }
             }
         } catch (codesError) {
@@ -289,7 +291,7 @@ async function initializeRichardsonData() {
         }
 
         richardsonDataInitialized = true;
-        console.log('[Richardson] Data initialization complete');
+        richfactdireLog('[Richardson] Data initialization complete');
 
     } catch (error) {
         console.error('[Richardson] Error initializing data:', error);
@@ -313,7 +315,7 @@ class RichardsonPricingLookup {
         this.initCapBrowser();
         this.updateCapCount();
 
-        console.log('[Richardson] Price lookup initialized with', capData.length, 'caps');
+        richfactdireLog('[Richardson] Price lookup initialized with', capData.length, 'caps');
     }
 
     initializeElements() {
@@ -715,8 +717,8 @@ class RichardsonPricingLookup {
 // ============================================================================
 
 document.addEventListener('DOMContentLoaded', async () => {
-    console.log('[Richardson] Starting initialization...');
+    richfactdireLog('[Richardson] Starting initialization...');
     await initializeRichardsonData();
     window.richardsonPricing = new RichardsonPricingLookup();
-    console.log('[Richardson] Factory Direct pricing ready');
+    richfactdireLog('[Richardson] Factory Direct pricing ready');
 });

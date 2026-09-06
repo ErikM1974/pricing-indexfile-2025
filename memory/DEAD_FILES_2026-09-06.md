@@ -106,3 +106,20 @@ and the `PENDING_DELETION` entries in `tests/unit/repo-hygiene-final.test.js` (t
 - `tests/order-service-test-harness.html`
 - `training/js/api-test-runner.js`
 - `training/training-engine-base.js`
+
+## Second pass (2026-09-06, later): 4 stale ROOT-LEVEL duplicates — pending Erik's `git rm`
+
+The first census matched referrers by basename, which let a stale root copy hide behind its `shared_components/js`
+twin. The lock is now path-aware (`referrers()` in `repo-hygiene-final.test.js`) and these four have NO loader:
+
+- `pricing-matrix-api.js` — byte-identical to `shared_components/js/pricing-matrix-api.js`, which is what the two calculators load.
+- `dp5-helper.js` — a 632-line 2025 version of the 938-line `shared_components/js/dp5-helper.js` the calculators load.
+- `utils.js` — diverged from `shared_components/js/utils.js` in 2025-07; the DTG builder's `./utils.js` imports resolve to `builders/dtg/utils.js`, not this.
+- `app-new.js` — only ever served by an explicit `/app-new.js` route that no page requested (removed from `server.js` in `v2026.09.06.37`); `index.html` loads `app-modern.js`.
+- `shared_components/js/quote-builder-base.js` — a comment-only tombstone since 2026-07-08 pointing at `builders/shared/quote-builder-base.js`; no page or script loads it.
+
+```bash
+git rm -q -- pricing-matrix-api.js dp5-helper.js utils.js app-new.js shared_components/js/quote-builder-base.js
+```
+
+Then drop the four rows from `ACTIVE_FILES.md` and move them from `PENDING_DELETION` to `DELETED_2026_09_06` in the lock.

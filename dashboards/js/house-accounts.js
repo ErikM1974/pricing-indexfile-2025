@@ -13,6 +13,8 @@
 // ============================================================
 // SERVICE CLASS
 // ============================================================
+var HOUSACCO_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
+var housaccoLog = HOUSACCO_LOG_ON ? console.log.bind(console) : function () {}; // debug logging: localhost or ?debug=1 only (2026-09-06 console sweep)
 
 class HouseAccountsService {
     constructor() {
@@ -283,29 +285,29 @@ class HouseAccountsService {
             const response = await fetch(url, { credentials: 'same-origin' });
 
             if (this.handleAuthError(response)) {
-                console.log(`[SW Lookup] ID ${customerId}: Auth error`);
+                housaccoLog(`[SW Lookup] ID ${customerId}: Auth error`);
                 return null;
             }
             if (response.status === 404) {
-                console.log(`[SW Lookup] ID ${customerId}: NOT FOUND (404)`);
+                housaccoLog(`[SW Lookup] ID ${customerId}: NOT FOUND (404)`);
                 return { notFound: true };
             }
             if (response.status === 429) {
-                console.log(`[SW Lookup] ID ${customerId}: RATE LIMITED (429)`);
+                housaccoLog(`[SW Lookup] ID ${customerId}: RATE LIMITED (429)`);
                 return { rateLimited: true };
             }
             if (!response.ok) {
-                console.log(`[SW Lookup] ID ${customerId}: Error (${response.status})`);
+                housaccoLog(`[SW Lookup] ID ${customerId}: Error (${response.status})`);
                 return null;
             }
 
             const data = await response.json();
 
             if (data.record) {
-                console.log(`[SW Lookup] ID ${customerId}: Found - Rep="${data.record.CustomerServiceRep}"`);
+                housaccoLog(`[SW Lookup] ID ${customerId}: Found - Rep="${data.record.CustomerServiceRep}"`);
                 return data.record;
             } else {
-                console.log(`[SW Lookup] ID ${customerId}: No record in response`);
+                housaccoLog(`[SW Lookup] ID ${customerId}: No record in response`);
                 return null;
             }
         } catch (error) {
@@ -326,7 +328,7 @@ class HouseAccountsService {
         }
 
         try {
-            console.log(`[SW Batch] Fetching ${customerIds.length} customers in single request...`);
+            housaccoLog(`[SW Batch] Fetching ${customerIds.length} customers in single request...`);
 
             const response = await fetch(
                 `${this.baseURL}/api/crm-proxy/sales-reps-2026/batch`,
@@ -360,7 +362,7 @@ class HouseAccountsService {
                 }
             });
 
-            console.log(`[SW Batch] Fetched ${data.count}/${customerIds.length} records`);
+            housaccoLog(`[SW Batch] Fetched ${data.count}/${customerIds.length} records`);
             return results;
         } catch (error) {
             console.error('[SW Batch] Error:', error);
@@ -1397,7 +1399,7 @@ class HouseAccountsController {
         }
 
         try {
-            console.log('[Reconcile] Refreshing data from Caspio...');
+            housaccoLog('[Reconcile] Refreshing data from Caspio...');
             await this.openReconcileModal();
         } finally {
             // Remove spinning animation

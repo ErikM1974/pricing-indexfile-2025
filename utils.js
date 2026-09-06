@@ -3,11 +3,13 @@
 /**
  * @namespace NWCAUtils
  */
+var UTIL67_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
+var util67Log = UTIL67_LOG_ON ? console.log.bind(console) : function () {}; // debug logging: localhost or ?debug=1 only (2026-09-06 console sweep)
 const NWCAUtils = (function() {
     'use strict';
 
     function debugUtil(level, message, data = null) {
-        console.log(`[NWCAUtils-${level}] ${message}`, data);
+        util67Log(`[NWCAUtils-${level}] ${message}`, data);
     }
 
     /**

@@ -11,6 +11,8 @@
  * - Transfer breakdown by location
  */
 
+var DTFQUOTSERV_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
+var dtfquotservLog = DTFQUOTSERV_LOG_ON ? console.log.bind(console) : function () {}; // debug logging: localhost or ?debug=1 only (2026-09-06 console sweep)
 class DTFQuoteService {
     constructor() {
         // Same-origin since the 2026-08-26 quote-plane lockdown. NOTE this
@@ -24,7 +26,7 @@ class DTFQuoteService {
             emailjs.init(window.APP_CONFIG.EMAIL.PUBLIC_KEY);
         }
 
-        console.log('[DTFQuoteService] Service initialized');
+        dtfquotservLog('[DTFQuoteService] Service initialized');
     }
 
     /**
@@ -136,7 +138,7 @@ class DTFQuoteService {
      */
     async saveQuote(quoteData) {
         try {
-            console.log('[DTFQuoteService] Saving quote:', quoteData);
+            dtfquotservLog('[DTFQuoteService] Saving quote:', quoteData);
 
             const quoteID = quoteData.quoteId || await this.generateQuoteID();  // [2026-06-11] async now (server sequence)
             const sessionID = this.generateSessionID();
@@ -251,7 +253,7 @@ class DTFQuoteService {
             }
 
             const sessionResult = await sessionResponse.json();
-            console.log('[DTFQuoteService] Session saved:', sessionResult);
+            dtfquotservLog('[DTFQuoteService] Session saved:', sessionResult);
 
             // Save items - track failures
             let lineNumber = 1;
@@ -309,7 +311,7 @@ class DTFQuoteService {
                             failedItems++;
                         } else {
                             const itemResult = await itemResponse.json();
-                            console.log('[DTFQuoteService] Item saved:', itemResult);
+                            dtfquotservLog('[DTFQuoteService] Item saved:', itemResult);
                         }
                     }
                 } else {
@@ -326,7 +328,7 @@ class DTFQuoteService {
 
                     // Skip if no quantity
                     if (totalQty === 0) {
-                        console.log('[DTFQuoteService] Skipping item with 0 quantity:', product.styleNumber);
+                        dtfquotservLog('[DTFQuoteService] Skipping item with 0 quantity:', product.styleNumber);
                         continue;
                     }
 
@@ -343,7 +345,7 @@ class DTFQuoteService {
                             `https://cdnm.sanmar.com/imglib/mresjpg/2022/${product.styleNumber}/${product.styleNumber}_${cleanColorCode}_model_front_072022.jpg` :
                             '');
 
-                    console.log('[DTFQuoteService] Fallback item data:', {
+                    dtfquotservLog('[DTFQuoteService] Fallback item data:', {
                         styleNumber: product.styleNumber,
                         color: product.color,
                         colorCode: cleanColorCode,
@@ -390,14 +392,14 @@ class DTFQuoteService {
                         failedItems++;
                     } else {
                         const itemResult = await itemResponse.json();
-                        console.log('[DTFQuoteService] Item saved (fallback):', itemResult);
+                        dtfquotservLog('[DTFQuoteService] Item saved (fallback):', itemResult);
                     }
                 }
             }
 
             await this._saveShipFeeItem(quoteID, quoteData, lineNumber);  // [2026-06-08] SHIP fee row so /invoice shows + foots shipping (TotalAmount now excludes it)
 
-            console.log('[DTFQuoteService] Quote saved:', quoteID,
+            dtfquotservLog('[DTFQuoteService] Quote saved:', quoteID,
                 failedItems > 0 ? `(${failedItems} items failed)` : '');
 
             return {
@@ -489,7 +491,7 @@ class DTFQuoteService {
      */
     async updateQuote(quoteID, quoteData) {
         try {
-            console.log('[DTFQuoteService] Updating quote:', quoteID);
+            dtfquotservLog('[DTFQuoteService] Updating quote:', quoteID);
 
             // Get current session to find PK_ID and revision number
             const loadResult = await this.loadQuote(quoteID);
@@ -662,7 +664,7 @@ class DTFQuoteService {
 
             await this._saveShipFeeItem(quoteID, quoteData, lineNumber);  // [2026-06-08] SHIP fee row so /invoice shows + foots shipping (TotalAmount now excludes it)
 
-            console.log('[DTFQuoteService] Quote updated successfully:', quoteID, 'Rev', newRevision);
+            dtfquotservLog('[DTFQuoteService] Quote updated successfully:', quoteID, 'Rev', newRevision);
 
             return {
                 success: true,
@@ -753,7 +755,7 @@ class DTFQuoteService {
             throw new Error(`${failed} old line item(s) could not be removed — the quote would show duplicated lines. Try saving again.`);
         }
 
-        console.log('[DTFQuoteService] Deleted', items.length, 'existing items');
+        dtfquotservLog('[DTFQuoteService] Deleted', items.length, 'existing items');
     }
 
     /**

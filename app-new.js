@@ -12,6 +12,8 @@
  */
 
 // Load required modules
+var APPNEW_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
+var appnewLog = APPNEW_LOG_ON ? console.log.bind(console) : function () {}; // debug logging: localhost or ?debug=1 only (2026-09-06 console sweep)
 const loadScript = (src) => {
     return new Promise((resolve, reject) => {
         const script = document.createElement('script');
@@ -86,7 +88,7 @@ class CatalogApp {
             this.setupEventListeners();
             
             this.isInitialized = true;
-            console.log('Catalog app initialized successfully');
+            appnewLog('Catalog app initialized successfully');
             
         } catch (error) {
             console.error('Failed to initialize catalog app:', error);
@@ -527,7 +529,7 @@ class CatalogApp {
     
     showQuickView(styleNumber) {
         // TODO: Implement quick view modal
-        console.log('Quick view for:', styleNumber);
+        appnewLog('Quick view for:', styleNumber);
     }
 }
 

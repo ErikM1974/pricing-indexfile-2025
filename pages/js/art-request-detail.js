@@ -9,6 +9,8 @@
  *
  * Depends on: app-config.js (APP_CONFIG.API.BASE_URL), EmailJS SDK
  */
+var ARTREQUDETA_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
+var artrequdetaLog = ARTREQUDETA_LOG_ON ? console.log.bind(console) : function () {}; // debug logging: localhost or ?debug=1 only (2026-09-06 console sweep)
 (function () {
     'use strict';
 
@@ -1546,7 +1548,7 @@
         }
 
         if (btnComplete) btnComplete.addEventListener('click', function () {
-            console.log('[art-request-detail] Mark Complete clicked — opening modal for', designId);
+            artrequdetaLog('[art-request-detail] Mark Complete clicked — opening modal for', designId);
             ArtActions.showArtTimeModal(designId, repEmail, company);
         });
 
@@ -4927,7 +4929,7 @@
                     detail_link: window.location.origin + '/art-request/' + designId + '?view=ae',
                     from_name: 'Steve — Art Department'
                 }, EMAILJS_PUBLIC_KEY)
-                    .then(function () { console.log('AE revision confirmation sent to', aeConfirmEmail); })
+                    .then(function () { artrequdetaLog('AE revision confirmation sent to', aeConfirmEmail); })
                     .catch(function (err) { console.warn('AE revision confirmation failed:', err); });
             }
 
@@ -4989,7 +4991,7 @@
 
         if (templateId) {
             emailjs.send(EMAILJS_SERVICE_ID, templateId, templateParams, EMAILJS_PUBLIC_KEY)
-                .then(() => console.log(`AE notification email sent (${type})`))
+                .then(() => artrequdetaLog(`AE notification email sent (${type})`))
                 .catch(err => console.warn(`AE notification email failed (${type}, non-blocking):`, err));
         }
     }

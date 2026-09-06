@@ -8,6 +8,8 @@
  * - Price: $0.01 per sample (nominal)
  * - Email notifications to: erik@nwcustomapparel.com
  */
+var SAMPORDESERV_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
+var sampordeservLog = SAMPORDESERV_LOG_ON ? console.log.bind(console) : function () {}; // debug logging: localhost or ?debug=1 only (2026-09-06 console sweep)
 class SampleOrderService {
     constructor() {
         this.apiBase = (typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) || '';
@@ -20,12 +22,12 @@ class SampleOrderService {
         // Initialize EmailJS if available
         if (typeof emailjs !== 'undefined') {
             emailjs.init(this.emailPublicKey);
-            console.log('[SampleOrderService] EmailJS initialized');
+            sampordeservLog('[SampleOrderService] EmailJS initialized');
         } else {
             console.warn('[SampleOrderService] EmailJS not available');
         }
 
-        console.log('[SampleOrderService] Service initialized');
+        sampordeservLog('[SampleOrderService] Service initialized');
     }
 
     /**
@@ -56,7 +58,7 @@ class SampleOrderService {
         // Add millisecond timestamp suffix for uniqueness (prevents simultaneous user collisions)
         const ms = String(now.getMilliseconds()).padStart(3, '0');
         const orderNumber = `SAMPLE-${month}${day}-${sequence}-${ms}`;
-        console.log('[SampleOrderService] Generated order number:', orderNumber);
+        sampordeservLog('[SampleOrderService] Generated order number:', orderNumber);
 
         return orderNumber;
     }
@@ -90,9 +92,9 @@ class SampleOrderService {
             return [];
         }
 
-        console.log(`[SampleOrderService] Expanding ${basePartNumber} into line items:`, sample.sizes);
+        sampordeservLog(`[SampleOrderService] Expanding ${basePartNumber} into line items:`, sample.sizes);
         if (Object.keys(upcharges).length > 0) {
-            console.log(`[SampleOrderService] Applying size upcharges:`, upcharges);
+            sampordeservLog(`[SampleOrderService] Applying size upcharges:`, upcharges);
         }
 
         // Each size becomes a separate line item
@@ -115,11 +117,11 @@ class SampleOrderService {
                     : 'FREE SAMPLE'
             };
 
-            console.log(`  → ${basePartNumber} (${size}): ${qty} units @ $${sizePrice.toFixed(2)} (base: $${sample.price.toFixed(2)} + upcharge: $${upcharge.toFixed(2)})`);
+            sampordeservLog(`  → ${basePartNumber} (${size}): ${qty} units @ $${sizePrice.toFixed(2)} (base: $${sample.price.toFixed(2)} + upcharge: $${upcharge.toFixed(2)})`);
             lineItems.push(lineItem);
         });
 
-        console.log(`[SampleOrderService] Created ${lineItems.length} line items from ${basePartNumber}`);
+        sampordeservLog(`[SampleOrderService] Created ${lineItems.length} line items from ${basePartNumber}`);
         return lineItems;
     }
 
@@ -239,13 +241,13 @@ class SampleOrderService {
         try {
             const orderNumber = this.generateOrderNumber();
 
-            console.log('[SampleOrderService] Submitting order:', orderNumber);
-            console.log('[SampleOrderService] Customer:', formData.firstName, formData.lastName);
-            console.log('[SampleOrderService] Samples:', samples.length);
+            sampordeservLog('[SampleOrderService] Submitting order:', orderNumber);
+            sampordeservLog('[SampleOrderService] Customer:', formData.firstName, formData.lastName);
+            sampordeservLog('[SampleOrderService] Samples:', samples.length);
 
             // Log sample details for debugging
             samples.forEach((sample, index) => {
-                console.log(`[SampleOrderService] Sample ${index + 1}:`, {
+                sampordeservLog(`[SampleOrderService] Sample ${index + 1}:`, {
                     style: sample.style,
                     name: sample.name,
                     color: sample.color,
@@ -280,7 +282,7 @@ class SampleOrderService {
             const total = subtotal + salesTax;
             const { taxPartNumber, taxPartDescription, taxPct } = this.deriveTaxPartFields(salesTaxRate, taxInfo);
 
-            console.log('[SampleOrderService] Order breakdown:', {
+            sampordeservLog('[SampleOrderService] Order breakdown:', {
                 freeItems: freeItems.length,
                 paidItems: paidItems.length,
                 subtotal: subtotal.toFixed(2),
@@ -294,7 +296,7 @@ class SampleOrderService {
             // DO NOT add tax as line item in LinesOE - causes duplicate tax entries in OnSite
             // See: memory/manageorders-push/PAYMENT_SHIPPING_FIELDS.md#payment-subblock
             if (salesTax > 0) {
-                console.log('[SampleOrderService] ✅ Tax will be added via Payment block:', {
+                sampordeservLog('[SampleOrderService] ✅ Tax will be added via Payment block:', {
                     taxTotal: salesTax.toFixed(2),
                     taxPartNumber: taxPartNumber,
                     taxPartDescription: taxPartDescription,
@@ -309,7 +311,7 @@ class SampleOrderService {
                 throw new Error('No valid items in cart. Each sample must have at least one size with quantity > 0. Please check your cart and try again.');
             }
 
-            console.log('[SampleOrderService] Generated line items:', {
+            sampordeservLog('[SampleOrderService] Generated line items:', {
                 count: lineItems.length,
                 items: lineItems.map(item => `${item.partNumber} ${item.size} x${item.quantity}`)
             });
@@ -398,23 +400,23 @@ class SampleOrderService {
             // Add files array if logo was uploaded
             if (logoFile) {
                 order.files = [logoFile];
-                console.log('[SampleOrderService] Logo file included:', logoFile.fileName);
+                sampordeservLog('[SampleOrderService] Logo file included:', logoFile.fileName);
             }
 
-            console.log('[SampleOrderService] Order payload:', order);
+            sampordeservLog('[SampleOrderService] Order payload:', order);
 
             // Log line items specifically to verify color data
-            console.log('[SampleOrderService] Line items being sent:');
+            sampordeservLog('[SampleOrderService] Line items being sent:');
             order.lineItems.forEach((item, index) => {
-                console.log(`  Item ${index + 1}: ${item.partNumber} - Color: "${item.color}" - Size: ${item.size}`);
+                sampordeservLog(`  Item ${index + 1}: ${item.partNumber} - Color: "${item.color}" - Size: ${item.size}`);
             });
 
             // DEBUG: Enhanced payload display with formatted output
             console.group('🚀 [ManageOrders PUSH] Complete Payload');
-            console.log('%c Order Number:', 'font-weight: bold; color: #2196F3', order.orderNumber);
-            console.log('%c Customer:', 'font-weight: bold; color: #4CAF50', order.customer);
-            console.log('%c Shipping:', 'font-weight: bold; color: #FF9800', order.shipping);
-            console.log('%c Line Items:', 'font-weight: bold; color: #9C27B0', order.lineItems.length);
+            sampordeservLog('%c Order Number:', 'font-weight: bold; color: #2196F3', order.orderNumber);
+            sampordeservLog('%c Customer:', 'font-weight: bold; color: #4CAF50', order.customer);
+            sampordeservLog('%c Shipping:', 'font-weight: bold; color: #FF9800', order.shipping);
+            sampordeservLog('%c Line Items:', 'font-weight: bold; color: #9C27B0', order.lineItems.length);
             console.table(order.lineItems.map((item, i) => ({
                 Line: i + 1,
                 Part: item.partNumber,
@@ -425,8 +427,8 @@ class SampleOrderService {
                 Price: `$${item.price.toFixed(2)}`,
                 Type: item.notes
             })));
-            console.log('%c Full JSON:', 'font-weight: bold; color: #00BCD4');
-            console.log(JSON.stringify(order, null, 2));
+            sampordeservLog('%c Full JSON:', 'font-weight: bold; color: #00BCD4');
+            sampordeservLog(JSON.stringify(order, null, 2));
             console.groupEnd();
 
             // Submit to ManageOrders PUSH API
@@ -438,7 +440,7 @@ class SampleOrderService {
                 body: JSON.stringify(order)
             });
 
-            console.log('[SampleOrderService] API response status:', response.status);
+            sampordeservLog('[SampleOrderService] API response status:', response.status);
 
             if (!response.ok) {
                 const errorText = await response.text();
@@ -448,13 +450,13 @@ class SampleOrderService {
 
             const result = await response.json();
 
-            console.log('[SampleOrderService] Order created successfully:', result);
+            sampordeservLog('[SampleOrderService] Order created successfully:', result);
 
             // DEBUG: Log API response
             console.group('📨 [ManageOrders API] Response');
-            console.log('Status:', response.status, response.statusText);
-            console.log('Headers:', Object.fromEntries(response.headers.entries()));
-            console.log('Body:', JSON.stringify(result, null, 2));
+            sampordeservLog('Status:', response.status, response.statusText);
+            sampordeservLog('Headers:', Object.fromEntries(response.headers.entries()));
+            sampordeservLog('Body:', JSON.stringify(result, null, 2));
             console.groupEnd();
 
             // Send email notification to Erik
@@ -486,7 +488,7 @@ class SampleOrderService {
      */
     async sendEmailNotification(orderNumber, customerData, samples) {
         try {
-            console.log('[SampleOrderService] Sending email notification to Erik');
+            sampordeservLog('[SampleOrderService] Sending email notification to Erik');
 
             // Simplified email: Order number + directive to check ShopWorks
             // ShopWorks is single source of truth for all order details
@@ -507,7 +509,7 @@ class SampleOrderService {
                 emailData
             );
 
-            console.log('[SampleOrderService] Email sent successfully');
+            sampordeservLog('[SampleOrderService] Email sent successfully');
 
         } catch (error) {
             console.error('[SampleOrderService] Email error:', error);
@@ -519,5 +521,5 @@ class SampleOrderService {
 // Initialize service on page load
 if (typeof window !== 'undefined') {
     window.sampleOrderService = new SampleOrderService();
-    console.log('[SampleOrderService] Service globally available as window.sampleOrderService');
+    sampordeservLog('[SampleOrderService] Service globally available as window.sampleOrderService');
 }

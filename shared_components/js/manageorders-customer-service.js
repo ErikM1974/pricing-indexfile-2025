@@ -17,6 +17,8 @@
  *   const results = service.searchCustomers('acme');
  */
 
+var MANACUSTSERV_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
+var manacustservLog = MANACUSTSERV_LOG_ON ? console.log.bind(console) : function () {}; // debug logging: localhost or ?debug=1 only (2026-09-06 console sweep)
 class ManageOrdersCustomerService {
     constructor() {
         this.baseURL = (typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) || '';
@@ -25,7 +27,7 @@ class ManageOrdersCustomerService {
         this.cacheKey = 'manageorders_customers_cache';
         this.cacheDuration = 24 * 60 * 60 * 1000; // 1 day in milliseconds
 
-        console.log('[ManageOrdersService] Service initialized');
+        manacustservLog('[ManageOrdersService] Service initialized');
     }
 
     /**
@@ -33,19 +35,19 @@ class ManageOrdersCustomerService {
      * @returns {Promise<void>}
      */
     async initialize() {
-        console.log('[ManageOrdersService] Initializing...');
+        manacustservLog('[ManageOrdersService] Initializing...');
 
         // Try to load from cache first
         const cached = this.loadCache();
 
         if (cached && this.isCacheValid(cached)) {
             this.customers = cached.data;
-            console.log('[ManageOrdersService] ✓ Loaded from cache:', this.customers.length, 'customers');
+            manacustservLog('[ManageOrdersService] ✓ Loaded from cache:', this.customers.length, 'customers');
             return;
         }
 
         // Cache invalid or missing - fetch from server
-        console.log('[ManageOrdersService] Cache expired, fetching from server...');
+        manacustservLog('[ManageOrdersService] Cache expired, fetching from server...');
 
         try {
             const response = await fetch(`${this.baseURL}/api/manageorders/customers`);
@@ -61,7 +63,7 @@ class ManageOrdersCustomerService {
             }
 
             this.customers = data.customers;
-            console.log('[ManageOrdersService] ✓ Fetched from server:', this.customers.length, 'customers');
+            manacustservLog('[ManageOrdersService] ✓ Fetched from server:', this.customers.length, 'customers');
 
             // Save to cache
             this.saveCache(this.customers);
@@ -156,7 +158,7 @@ class ManageOrdersCustomerService {
             };
 
             sessionStorage.setItem(this.cacheKey, JSON.stringify(cacheData));
-            console.log('[ManageOrdersService] ✓ Saved to cache:', customers.length, 'customers');
+            manacustservLog('[ManageOrdersService] ✓ Saved to cache:', customers.length, 'customers');
         } catch (error) {
             console.error('[ManageOrdersService] Failed to save cache:', error);
         }
@@ -174,7 +176,7 @@ class ManageOrdersCustomerService {
         const isValid = age < this.cacheDuration;
 
         if (!isValid) {
-            console.log('[ManageOrdersService] Cache expired (age:', Math.round(age / 1000 / 60 / 60), 'hours)');
+            manacustservLog('[ManageOrdersService] Cache expired (age:', Math.round(age / 1000 / 60 / 60), 'hours)');
         }
 
         return isValid;
@@ -185,7 +187,7 @@ class ManageOrdersCustomerService {
      * @returns {Promise<void>}
      */
     async refreshCache() {
-        console.log('[ManageOrdersService] Force refreshing cache...');
+        manacustservLog('[ManageOrdersService] Force refreshing cache...');
 
         try {
             const response = await fetch(`${this.baseURL}/api/manageorders/customers?refresh=true`);
@@ -198,7 +200,7 @@ class ManageOrdersCustomerService {
             this.customers = data.customers;
             this.saveCache(this.customers);
 
-            console.log('[ManageOrdersService] ✓ Cache refreshed:', this.customers.length, 'customers');
+            manacustservLog('[ManageOrdersService] ✓ Cache refreshed:', this.customers.length, 'customers');
         } catch (error) {
             console.error('[ManageOrdersService] ✗ Failed to refresh cache:', error);
             throw error;
@@ -224,4 +226,4 @@ class ManageOrdersCustomerService {
 // Make service available globally
 window.ManageOrdersCustomerService = ManageOrdersCustomerService;
 
-console.log('[ManageOrdersService] ✓ Service class loaded');
+manacustservLog('[ManageOrdersService] ✓ Service class loaded');

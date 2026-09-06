@@ -4,6 +4,8 @@
  * across all pricing pages (embroidery, cap embroidery, DTG, screen print, DTF)
  */
 
+var UNIVPRODDISP_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
+var univproddispLog = UNIVPRODDISP_LOG_ON ? console.log.bind(console) : function () {}; // debug logging: localhost or ?debug=1 only (2026-09-06 console sweep)
 class UniversalProductDisplay {
     constructor(config = {}) {
         // Set pageType first so it's available for other methods
@@ -44,7 +46,7 @@ class UniversalProductDisplay {
     }
 
     init() {
-        console.log('[UniversalProductDisplay] Initializing with config:', this.config);
+        univproddispLog('[UniversalProductDisplay] Initializing with config:', this.config);
         
         // Get container
         this.container = document.getElementById(this.config.containerId);
@@ -90,7 +92,7 @@ class UniversalProductDisplay {
     }
 
     loadProductData() {
-        console.log('[UniversalProductDisplay] Loading product data...');
+        univproddispLog('[UniversalProductDisplay] Loading product data...');
         
         // Load from URL parameters and global state
         const urlParams = new URLSearchParams(window.location.search);
@@ -108,7 +110,7 @@ class UniversalProductDisplay {
                                   window.selectedColorName || 
                                   '';
         
-        console.log('[UniversalProductDisplay] Initial state:', {
+        univproddispLog('[UniversalProductDisplay] Initial state:', {
             productTitle: this.state.productTitle,
             styleNumber: this.state.styleNumber,
             selectedColor: this.state.selectedColor
@@ -117,12 +119,12 @@ class UniversalProductDisplay {
         // Get color data if available
         if (window.selectedColorData) {
             this.state.selectedColorData = window.selectedColorData;
-            console.log('[UniversalProductDisplay] Found selectedColorData:', window.selectedColorData);
+            univproddispLog('[UniversalProductDisplay] Found selectedColorData:', window.selectedColorData);
         }
         
         // Also listen for product context updates and product colors ready
         window.addEventListener('productColorsReady', (event) => {
-            console.log('[UniversalProductDisplay] Product colors ready event received:', event.detail);
+            univproddispLog('[UniversalProductDisplay] Product colors ready event received:', event.detail);
             if (event.detail) {
                 // Update product title from the API data
                 const titleEl = this.container.querySelector('#product-title-display');
@@ -143,7 +145,7 @@ class UniversalProductDisplay {
                 
                 // Re-render gallery if we have new data
                 if (this.config.enableGallery) {
-                    console.log('[UniversalProductDisplay] Re-initializing gallery with new data');
+                    univproddispLog('[UniversalProductDisplay] Re-initializing gallery with new data');
                     this.initializeSubComponents();
                 }
             }

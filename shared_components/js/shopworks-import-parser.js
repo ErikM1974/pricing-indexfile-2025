@@ -12,6 +12,8 @@
  * @date 2026-02-15
  */
 
+var SHOPIMPOPARS_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
+var shopimpoparsLog = SHOPIMPOPARS_LOG_ON ? console.log.bind(console) : function () {}; // debug logging: localhost or ?debug=1 only (2026-09-06 console sweep)
 class ShopWorksImportParser {
     constructor() {
         // API endpoint for service codes
@@ -294,7 +296,7 @@ class ShopWorksImportParser {
      */
     async loadServiceCodes() {
         if (this.serviceCodesLoaded) {
-            console.log('[ShopWorksImportParser] Service codes already loaded');
+            shopimpoparsLog('[ShopWorksImportParser] Service codes already loaded');
             return true;
         }
 
@@ -308,7 +310,7 @@ class ShopWorksImportParser {
         const serviceCodesOk = results[0].status === 'fulfilled' && results[0].value === true;
         const decgPricingOk = results[1].status === 'fulfilled' && results[1].value === true;
 
-        console.log(`[ShopWorksImportParser] Loading complete - Service codes: ${serviceCodesOk ? 'OK' : 'FALLBACK'}, DECG pricing: ${decgPricingOk ? 'OK' : 'FALLBACK'}`);
+        shopimpoparsLog(`[ShopWorksImportParser] Loading complete - Service codes: ${serviceCodesOk ? 'OK' : 'FALLBACK'}, DECG pricing: ${decgPricingOk ? 'OK' : 'FALLBACK'}`);
 
         return serviceCodesOk;
     }
@@ -329,7 +331,7 @@ class ShopWorksImportParser {
                 this.serviceCodesData = data.data;
                 this._buildPricingTables();
                 this.serviceCodesLoaded = true;
-                console.log(`[ShopWorksImportParser] Loaded ${data.data.length} service codes from API`);
+                shopimpoparsLog(`[ShopWorksImportParser] Loaded ${data.data.length} service codes from API`);
                 return true;
             }
         } catch (error) {
@@ -353,7 +355,7 @@ class ShopWorksImportParser {
                     this.DECG_TIERS[record.TierLabel] = record.SellPrice;
                 }
             }
-            console.log('[ShopWorksImportParser] Built DECG tiers from API:', Object.keys(this.DECG_TIERS).length);
+            shopimpoparsLog('[ShopWorksImportParser] Built DECG tiers from API:', Object.keys(this.DECG_TIERS).length);
         }
 
         // Build DECC tiers from API data
@@ -365,7 +367,7 @@ class ShopWorksImportParser {
                     this.DECC_TIERS[record.TierLabel] = record.SellPrice;
                 }
             }
-            console.log('[ShopWorksImportParser] Built DECC tiers from API:', Object.keys(this.DECC_TIERS).length);
+            shopimpoparsLog('[ShopWorksImportParser] Built DECC tiers from API:', Object.keys(this.DECC_TIERS).length);
         }
 
         // Get Monogram price from API
@@ -374,42 +376,42 @@ class ShopWorksImportParser {
         );
         if (monogramRecord && monogramRecord.SellPrice) {
             this.MONOGRAM_PRICE = monogramRecord.SellPrice;
-            console.log('[ShopWorksImportParser] Monogram price from API:', this.MONOGRAM_PRICE);
+            shopimpoparsLog('[ShopWorksImportParser] Monogram price from API:', this.MONOGRAM_PRICE);
         }
 
         // Get LTM fee from API
         const ltmRecord = this.serviceCodesData.find(sc => sc.ServiceCode === 'LTM');
         if (ltmRecord && ltmRecord.SellPrice) {
             this.LTM_FEE = ltmRecord.SellPrice;
-            console.log('[ShopWorksImportParser] LTM fee from API:', this.LTM_FEE);
+            shopimpoparsLog('[ShopWorksImportParser] LTM fee from API:', this.LTM_FEE);
         }
 
         // Get CAP_DISCOUNT from API (2026-02-01 pricing audit)
         const capDiscountRecord = this.serviceCodesData.find(sc => sc.ServiceCode === 'CAP-DISCOUNT');
         if (capDiscountRecord && capDiscountRecord.SellPrice) {
             this.CAP_DISCOUNT = capDiscountRecord.SellPrice;
-            console.log('[ShopWorksImportParser] CAP_DISCOUNT from API:', this.CAP_DISCOUNT);
+            shopimpoparsLog('[ShopWorksImportParser] CAP_DISCOUNT from API:', this.CAP_DISCOUNT);
         }
 
         // Get HEAVYWEIGHT_SURCHARGE from API (HW-SURCHG is new name, HEAVYWEIGHT-SURCHARGE is legacy)
         const heavyRecord = this.serviceCodesData.find(sc => sc.ServiceCode === 'HW-SURCHG' || sc.ServiceCode === 'HEAVYWEIGHT-SURCHARGE');
         if (heavyRecord && heavyRecord.SellPrice) {
             this.HEAVYWEIGHT_SURCHARGE = heavyRecord.SellPrice;
-            console.log('[ShopWorksImportParser] HEAVYWEIGHT_SURCHARGE from API:', this.HEAVYWEIGHT_SURCHARGE);
+            shopimpoparsLog('[ShopWorksImportParser] HEAVYWEIGHT_SURCHARGE from API:', this.HEAVYWEIGHT_SURCHARGE);
         }
 
         // Get GRT-75 rate from API (2026-02-01 pricing audit)
         const grt75Record = this.serviceCodesData.find(sc => sc.ServiceCode === 'GRT-75');
         if (grt75Record && grt75Record.SellPrice) {
             this.GRT75_RATE = grt75Record.SellPrice;
-            console.log('[ShopWorksImportParser] GRT75_RATE from API:', this.GRT75_RATE);
+            shopimpoparsLog('[ShopWorksImportParser] GRT75_RATE from API:', this.GRT75_RATE);
         }
 
         // Get sewing price from API (SEG/SECC)
         const segRecord = this.serviceCodesData.find(sc => sc.ServiceCode === 'SEG');
         if (segRecord && segRecord.SellPrice) {
             this.SEWING_PRICE = segRecord.SellPrice;
-            console.log('[ShopWorksImportParser] SEWING_PRICE from API:', this.SEWING_PRICE);
+            shopimpoparsLog('[ShopWorksImportParser] SEWING_PRICE from API:', this.SEWING_PRICE);
         }
     }
 
@@ -420,7 +422,7 @@ class ShopWorksImportParser {
      */
     async loadDECGPricing() {
         if (this.decgApiLoaded) {
-            console.log('[ShopWorksImportParser] DECG API pricing already loaded');
+            shopimpoparsLog('[ShopWorksImportParser] DECG API pricing already loaded');
             return true;
         }
 
@@ -440,7 +442,7 @@ class ShopWorksImportParser {
                 this.DECG_UPCHARGE = data.garments.perThousandUpcharge || 1.25;
                 this.DECG_LTM_FEE = data.garments.ltmFee || 50.00;
                 this.DECG_LTM_THRESHOLD = data.garments.ltmThreshold || 7;
-                console.log('[ShopWorksImportParser] DECG garment tiers from API:', Object.keys(this.DECG_TIERS_API).length);
+                shopimpoparsLog('[ShopWorksImportParser] DECG garment tiers from API:', Object.keys(this.DECG_TIERS_API).length);
             }
 
             if (data.caps && data.caps.basePrices) {
@@ -448,14 +450,14 @@ class ShopWorksImportParser {
                 this.DECC_UPCHARGE = data.caps.perThousandUpcharge || 1.00;
                 this.DECC_LTM_FEE = data.caps.ltmFee || 50.00;
                 this.DECC_LTM_THRESHOLD = data.caps.ltmThreshold || 7;
-                console.log('[ShopWorksImportParser] DECC cap tiers from API:', Object.keys(this.DECC_TIERS_API).length);
+                shopimpoparsLog('[ShopWorksImportParser] DECC cap tiers from API:', Object.keys(this.DECC_TIERS_API).length);
             }
 
             if (data.heavyweightSurcharge) {
                 this.HEAVYWEIGHT_SURCHARGE = data.heavyweightSurcharge;
             }
 
-            console.log('[ShopWorksImportParser] DECG API pricing loaded successfully');
+            shopimpoparsLog('[ShopWorksImportParser] DECG API pricing loaded successfully');
             this.decgApiFailed = false;
             return true;
         } catch (error) {
@@ -623,8 +625,8 @@ class ShopWorksImportParser {
         }
 
         // Debug logging for email extraction
-        console.log('[ShopWorksImportParser] Extracted customer email:', result.customer.email || 'NOT FOUND');
-        console.log('[ShopWorksImportParser] Extracted customer name:', result.customer.contactName || 'NOT FOUND');
+        shopimpoparsLog('[ShopWorksImportParser] Extracted customer email:', result.customer.email || 'NOT FOUND');
+        shopimpoparsLog('[ShopWorksImportParser] Extracted customer name:', result.customer.contactName || 'NOT FOUND');
 
         // Add warning if DECG API failed and order has DECG items (per CLAUDE.md rule #4)
         if (this.isDECGApiUsingFallback() && result.decgItems.length > 0) {
@@ -665,7 +667,7 @@ class ShopWorksImportParser {
 
         // If only one candidate after filtering, use it
         if (candidateEmails.length === 1) {
-            console.log('[ShopWorksImportParser] Email extracted via fallback (single candidate):', candidateEmails[0]);
+            shopimpoparsLog('[ShopWorksImportParser] Email extracted via fallback (single candidate):', candidateEmails[0]);
             return candidateEmails[0];
         }
 
@@ -680,7 +682,7 @@ class ShopWorksImportParser {
                 if (nearbyEmail && nearbyEmail[0]) {
                     // Make sure it's not the sales rep email
                     if (!salesRepEmail || nearbyEmail[0].toLowerCase() !== salesRepEmail.toLowerCase()) {
-                        console.log('[ShopWorksImportParser] Email extracted via fallback (near "' + keyword + '"):', nearbyEmail[0]);
+                        shopimpoparsLog('[ShopWorksImportParser] Email extracted via fallback (near "' + keyword + '"):', nearbyEmail[0]);
                         return nearbyEmail[0];
                     }
                 }
@@ -690,7 +692,7 @@ class ShopWorksImportParser {
         // Last resort: return the first non-salesperson email that appears after the first email
         // (First email is usually salesperson, second is often customer)
         if (candidateEmails.length >= 1) {
-            console.log('[ShopWorksImportParser] Email extracted via fallback (first candidate):', candidateEmails[0]);
+            shopimpoparsLog('[ShopWorksImportParser] Email extracted via fallback (first candidate):', candidateEmails[0]);
             return candidateEmails[0];
         }
 
@@ -818,7 +820,7 @@ class ShopWorksImportParser {
             result.orderSummary.taxRate = parseFloat(
                 ((result.orderSummary.salesTax / result.orderSummary.subtotal) * 100).toFixed(1)
             );
-            console.log(`[ShopWorksImportParser] Order Summary tax rate: ${result.orderSummary.taxRate}% ($${result.orderSummary.salesTax} / $${result.orderSummary.subtotal})`);
+            shopimpoparsLog(`[ShopWorksImportParser] Order Summary tax rate: ${result.orderSummary.taxRate}% ($${result.orderSummary.salesTax} / $${result.orderSummary.subtotal})`);
         }
 
         // Populate services.shipping from Order Summary if no SHIPPING part number was found
@@ -827,7 +829,7 @@ class ShopWorksImportParser {
                 amount: result.orderSummary.shipping,
                 description: 'Shipping (from Order Summary)'
             };
-            console.log(`[ShopWorksImportParser] Shipping from Order Summary: $${result.orderSummary.shipping}`);
+            shopimpoparsLog(`[ShopWorksImportParser] Shipping from Order Summary: $${result.orderSummary.shipping}`);
         }
     }
 
@@ -857,7 +859,7 @@ class ShopWorksImportParser {
                     seenBaseNumbers.add(baseNum);
                     result.designNumbersRaw.push(baseNum);
                 }
-                console.log(`[ShopWorksImportParser] Design info: #${designNum} — ${designName} (base: ${baseNum})`);
+                shopimpoparsLog(`[ShopWorksImportParser] Design info: #${designNum} — ${designName} (base: ${baseNum})`);
                 continue;
             }
 
@@ -872,7 +874,7 @@ class ShopWorksImportParser {
                     seenBaseNumbers.add(baseNum);
                     result.designNumbersRaw.push(baseNum);
                 }
-                console.log(`[ShopWorksImportParser] Design info: #${simpleMatch[1]} (base: ${baseNum})`);
+                shopimpoparsLog(`[ShopWorksImportParser] Design info: #${simpleMatch[1]} (base: ${baseNum})`);
             }
         }
     }
@@ -984,7 +986,7 @@ class ShopWorksImportParser {
                 }
             }
 
-            console.log(`[ShopWorksImportParser] Shipping parsed: ${shipping.street}, ${shipping.city}, ${shipping.state} ${shipping.zip}`);
+            shopimpoparsLog(`[ShopWorksImportParser] Shipping parsed: ${shipping.street}, ${shipping.city}, ${shipping.state} ${shipping.zip}`);
         }
 
         result.shipping = shipping;
@@ -1110,7 +1112,7 @@ class ShopWorksImportParser {
                     item.sizes = {};
                     // Add the size from the suffix with the item quantity
                     item.sizes[normalizedSize] = item.quantity;
-                    console.log(`[ShopWorksImportParser] Extracted size ${normalizedSize} (qty: ${item.quantity}) from part number ${item.partNumber}`);
+                    shopimpoparsLog(`[ShopWorksImportParser] Extracted size ${normalizedSize} (qty: ${item.quantity}) from part number ${item.partNumber}`);
                 }
                 // Clean the part number (remove the suffix)
                 item.partNumber = extracted.cleanedPartNumber;
@@ -1124,7 +1126,7 @@ class ShopWorksImportParser {
                 && this.classifyPartNumber(item.partNumber) === 'product') {
                 item.sizes = { 'OSFA': item.quantity };
                 item.partNumber = item.partNumber + '_OSFA';
-                console.log(`[ShopWorksImportParser] Remapped cap ${item.partNumber} to OSFA (legacy "(Other)" size data)`);
+                shopimpoparsLog(`[ShopWorksImportParser] Remapped cap ${item.partNumber} to OSFA (legacy "(Other)" size data)`);
             }
 
             return item;
@@ -1964,7 +1966,7 @@ class ShopWorksImportParser {
             ltmFee = ltmFeeAmount;
         }
 
-        console.log(`[ShopWorksImportParser] DECG calc: qty=${quantity}, tier=${tier}, stitches=${stitchCount}, base=$${basePrice}, extra=$${extraCharge.toFixed(2)}, unit=$${unitPrice.toFixed(2)}, LTM=$${ltmFee}, source=${pricingSource}`);
+        shopimpoparsLog(`[ShopWorksImportParser] DECG calc: qty=${quantity}, tier=${tier}, stitches=${stitchCount}, base=$${basePrice}, extra=$${extraCharge.toFixed(2)}, unit=$${unitPrice.toFixed(2)}, LTM=$${ltmFee}, source=${pricingSource}`);
 
         return {
             unitPrice: parseFloat(unitPrice.toFixed(2)),
@@ -2025,7 +2027,7 @@ class ShopWorksImportParser {
             ltmFee = ltmFeeAmount;
         }
 
-        console.log(`[ShopWorksImportParser] DECC calc: qty=${quantity}, tier=${tier}, stitches=${stitchCount}, base=$${basePrice}, extra=$${extraCharge.toFixed(2)}, unit=$${unitPrice.toFixed(2)}, LTM=$${ltmFee}, source=${pricingSource}`);
+        shopimpoparsLog(`[ShopWorksImportParser] DECC calc: qty=${quantity}, tier=${tier}, stitches=${stitchCount}, base=$${basePrice}, extra=$${extraCharge.toFixed(2)}, unit=$${unitPrice.toFixed(2)}, LTM=$${ltmFee}, source=${pricingSource}`);
 
         return {
             unitPrice: parseFloat(unitPrice.toFixed(2)),
@@ -2083,7 +2085,7 @@ class ShopWorksImportParser {
 
         // Log consolidation results for debugging
         if (consolidated.length < products.length) {
-            console.log(`[ShopWorksImportParser] Consolidated ${products.length} items → ${consolidated.length} products`);
+            shopimpoparsLog(`[ShopWorksImportParser] Consolidated ${products.length} items → ${consolidated.length} products`);
         }
 
         return consolidated;
@@ -2151,4 +2153,4 @@ if (typeof module !== 'undefined' && module.exports) {
     module.exports = ShopWorksImportParser;
 }
 
-console.log('[ShopWorksImportParser] Module loaded v1.20.0 - 3D-EMB & Laser Patch cap embellishment recognition');
+shopimpoparsLog('[ShopWorksImportParser] Module loaded v1.20.0 - 3D-EMB & Laser Patch cap embellishment recognition');

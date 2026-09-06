@@ -4,6 +4,8 @@
  * @version 3.1.0
  */
 
+var AUTONEW_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
+var autonewLog = AUTONEW_LOG_ON ? console.log.bind(console) : function () {}; // debug logging: localhost or ?debug=1 only (2026-09-06 console sweep)
 class SmartAutocomplete {
     constructor() {
         this.searchInput = document.getElementById('navSearchInput');
@@ -23,7 +25,7 @@ class SmartAutocomplete {
     }
     
     init() {
-        console.log('[SmartAutocomplete] Initializing v3.0...');
+        autonewLog('[SmartAutocomplete] Initializing v3.0...');
         
         // Set up event listeners
         this.searchInput.addEventListener('input', this.handleInput.bind(this));
@@ -127,7 +129,7 @@ class SmartAutocomplete {
         try {
             // Check if it looks like a style number
             const isStyle = this.searchService.isStyleNumber(query);
-            console.log(`[SmartAutocomplete] Fetching suggestions for "${query}" - isStyle: ${isStyle}`);
+            autonewLog(`[SmartAutocomplete] Fetching suggestions for "${query}" - isStyle: ${isStyle}`);
             
             let suggestions = [];
             const seenStyles = new Set(); // Track styles we've already added
@@ -248,17 +250,17 @@ class SmartAutocomplete {
             
             // Only update display if the query hasn't changed (double-check with searchQuery)
             if (this.currentQuery === query && this.currentQuery === searchQuery) {
-                console.log(`[SmartAutocomplete] Displaying ${this.suggestions.length} suggestions for "${query}"`);
+                autonewLog(`[SmartAutocomplete] Displaying ${this.suggestions.length} suggestions for "${query}"`);
                 // Log if PC61 is in the results when searching for PC61
                 if (query.toUpperCase() === 'PC61') {
                     const pc61Index = this.suggestions.findIndex(s => s.styleNumber === 'PC61');
                     if (pc61Index >= 0) {
-                        console.log(`[SmartAutocomplete] ✅ PC61 found at position ${pc61Index + 1} with priority ${this.suggestions[pc61Index].priority}`);
+                        autonewLog(`[SmartAutocomplete] ✅ PC61 found at position ${pc61Index + 1} with priority ${this.suggestions[pc61Index].priority}`);
                     }
                 }
                 this.displaySuggestions();
             } else {
-                console.log(`[SmartAutocomplete] Query changed, not updating display (was: "${searchQuery}", now: "${this.currentQuery}")`);
+                autonewLog(`[SmartAutocomplete] Query changed, not updating display (was: "${searchQuery}", now: "${this.currentQuery}")`);
             }
             
         } catch (error) {
@@ -420,6 +422,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Only initialize if ProductSearchService is available
     if (window.ProductSearchService) {
         window.smartAutocomplete = new SmartAutocomplete();
-        console.log('[SmartAutocomplete] v3.1 Initialized - Clean text dropdown with direct navigation');
+        autonewLog('[SmartAutocomplete] v3.1 Initialized - Clean text dropdown with direct navigation');
     }
 });

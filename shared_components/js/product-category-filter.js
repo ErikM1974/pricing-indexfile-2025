@@ -11,6 +11,8 @@
  * @created 2025-10-31
  */
 
+var PRODCATEFILT_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
+var prodcatefiltLog = PRODCATEFILT_LOG_ON ? console.log.bind(console) : function () {}; // debug logging: localhost or ?debug=1 only (2026-09-06 console sweep)
 window.ProductCategoryFilter = {
     /**
      * Flat embroidery headwear keywords
@@ -107,4 +109,4 @@ window.ProductCategoryFilter = {
     }
 };
 
-console.log('[ProductCategoryFilter] Utility loaded - Single source of truth for product filtering');
+prodcatefiltLog('[ProductCategoryFilter] Utility loaded - Single source of truth for product filtering');

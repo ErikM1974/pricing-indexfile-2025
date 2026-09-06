@@ -7,6 +7,8 @@
  * Created: 2026-01-13 (Quote builder feature parity consolidation)
  */
 
+var STAFAUTHHELP_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
+var stafauthhelpLog = STAFAUTHHELP_LOG_ON ? console.log.bind(console) : function () {}; // debug logging: localhost or ?debug=1 only (2026-09-06 console sweep)
 const StaffAuthHelper = {
     /**
      * Staff name to email mapping
@@ -107,7 +109,7 @@ const StaffAuthHelper = {
 
         const select = document.getElementById(selectId);
         if (!select) {
-            console.log(`[StaffAuthHelper] Select element #${selectId} not found`);
+            stafauthhelpLog(`[StaffAuthHelper] Select element #${selectId} not found`);
             return false;
         }
 
@@ -117,10 +119,10 @@ const StaffAuthHelper = {
 
         if (matchingOption) {
             select.value = email;
-            console.log(`[StaffAuthHelper] Auto-selected sales rep: ${matchingOption.text} (${email})`);
+            stafauthhelpLog(`[StaffAuthHelper] Auto-selected sales rep: ${matchingOption.text} (${email})`);
             return true;
         } else {
-            console.log(`[StaffAuthHelper] No matching option found for: ${email}`);
+            stafauthhelpLog(`[StaffAuthHelper] No matching option found for: ${email}`);
             return false;
         }
     },

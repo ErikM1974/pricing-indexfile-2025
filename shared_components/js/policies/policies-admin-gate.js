@@ -21,13 +21,15 @@
  * react without polling. Verbose console logs (`[admin-gate]`) make
  * production debugging straightforward.
  */
+var POLIADMIGATE_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
+var poliadmigateLog = POLIADMIGATE_LOG_ON ? console.log.bind(console) : function () {}; // debug logging: localhost or ?debug=1 only (2026-09-06 console sweep)
 (function () {
     'use strict';
 
     window.IS_POLICIES_ADMIN = false;
     window.POLICIES_USER = null;
 
-    const log = (...args) => console.log('[admin-gate]', ...args);
+    const log = (...args) => poliadmigateLog('[admin-gate]', ...args);
 
     function readSessionStorage() {
         const name = sessionStorage.getItem('nwca_user_name') || '';

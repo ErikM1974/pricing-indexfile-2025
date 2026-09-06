@@ -4,6 +4,8 @@
  * All calculator-specific quote services should extend this class
  */
 
+var BASEQUOTSERV_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
+var basequotservLog = BASEQUOTSERV_LOG_ON ? console.log.bind(console) : function () {}; // debug logging: localhost or ?debug=1 only (2026-09-06 console sweep)
 class BaseQuoteService {
     constructor(config = {}) {
         // Common configuration
@@ -81,7 +83,7 @@ class BaseQuoteService {
             const quoteID = this.generateQuoteID();
             const sessionID = this.generateSessionID();
             
-            console.log(`[${this.constructor.name}] Saving quote with ID:`, quoteID);
+            basequotservLog(`[${this.constructor.name}] Saving quote with ID:`, quoteID);
 
             // Step 1: Create quote session
             const expiresAtDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
@@ -102,7 +104,7 @@ class BaseQuoteService {
                 Notes: quoteData.notes || ''
             };
 
-            console.log(`[${this.constructor.name}] Session data:`, sessionData);
+            basequotservLog(`[${this.constructor.name}] Session data:`, sessionData);
 
             const sessionResponse = await fetch(`${this.baseURL}/api/quote_sessions`, {
                 method: 'POST',
@@ -113,7 +115,7 @@ class BaseQuoteService {
             });
 
             const responseText = await sessionResponse.text();
-            console.log(`[${this.constructor.name}] Session response:`, sessionResponse.status, responseText);
+            basequotservLog(`[${this.constructor.name}] Session response:`, sessionResponse.status, responseText);
 
             if (!sessionResponse.ok) {
                 throw new Error(`Failed to create quote session: ${responseText}`);
@@ -173,7 +175,7 @@ class BaseQuoteService {
                 AddedAt: addedAt
             };
 
-            console.log(`[${this.constructor.name}] Saving item ${i + 1}:`, itemData);
+            basequotservLog(`[${this.constructor.name}] Saving item ${i + 1}:`, itemData);
 
             try {
                 const itemResponse = await fetch(`${this.baseURL}/api/quote_items`, {
@@ -185,7 +187,7 @@ class BaseQuoteService {
                 });
 
                 const itemResponseText = await itemResponse.text();
-                console.log(`[${this.constructor.name}] Item response:`, itemResponse.status, itemResponseText);
+                basequotservLog(`[${this.constructor.name}] Item response:`, itemResponse.status, itemResponseText);
 
                 if (!itemResponse.ok) {
                     console.error(`Failed to save item ${i + 1}:`, itemResponseText);

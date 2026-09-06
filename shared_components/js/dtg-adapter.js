@@ -1,5 +1,7 @@
 // shared_components/js/dtg-adapter.js
-console.log("[ADAPTER:DTG] DTG Adapter loaded. Master Bundle Version with BaseAdapter.");
+var DTGADAP_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
+var dtgadapLog = DTGADAP_LOG_ON ? console.log.bind(console) : function () {}; // debug logging: localhost or ?debug=1 only (2026-09-06 console sweep)
+dtgadapLog("[ADAPTER:DTG] DTG Adapter loaded. Master Bundle Version with BaseAdapter.");
 
 (function() {
     "use strict";
@@ -397,7 +399,7 @@ console.log("[ADAPTER:DTG] DTG Adapter loaded. Master Bundle Version with BaseAd
 
     // Initialize DTG adapter using the new class-based approach
     async function initDTGPricing() {
-        console.log("[ADAPTER:DTG] Initializing DTG pricing adapter (Master Bundle)...");
+        dtgadapLog("[ADAPTER:DTG] Initializing DTG pricing adapter (Master Bundle)...");
         
         // Create and initialize the DTG adapter instance
         if (!window.dtgAdapter) {

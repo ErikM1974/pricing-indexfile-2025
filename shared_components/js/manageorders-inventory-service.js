@@ -9,9 +9,11 @@
  * Usage:
  *   const service = new ManageOrdersInventoryService();
  *   const inventory = await service.checkInventory('LTM752', 'Black');
- *   console.log(`Local stock: ${inventory.totalStock} units`);
+ *   manainveservLog(`Local stock: ${inventory.totalStock} units`);
  */
 
+var MANAINVESERV_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
+var manainveservLog = MANAINVESERV_LOG_ON ? console.log.bind(console) : function () {}; // debug logging: localhost or ?debug=1 only (2026-09-06 console sweep)
 class ManageOrdersInventoryService {
     constructor() {
         this.baseURL = (typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) || '';
@@ -34,7 +36,7 @@ class ManageOrdersInventoryService {
         if (this.cache.has(cacheKey)) {
             const cached = this.cache.get(cacheKey);
             if (Date.now() - cached.timestamp < this.cacheDuration) {
-                console.log(`[ManageOrdersInventory] Using cached data for ${partNumber}`, cached.data.totalStock, 'units');
+                manainveservLog(`[ManageOrdersInventory] Using cached data for ${partNumber}`, cached.data.totalStock, 'units');
                 return cached.data;
             }
         }
@@ -46,7 +48,7 @@ class ManageOrdersInventoryService {
                 url += `&PartColor=${encodeURIComponent(color)}`;
             }
 
-            console.log(`[ManageOrdersInventory] Fetching from API:`, partNumber, color || '(all colors)');
+            manainveservLog(`[ManageOrdersInventory] Fetching from API:`, partNumber, color || '(all colors)');
 
             const response = await fetch(url);
 
@@ -125,7 +127,7 @@ class ManageOrdersInventoryService {
                 timestamp: Date.now()
             });
 
-            console.log(`[ManageOrdersInventory] ✓ Fetched from server:`, partNumber, totalStock, 'units in stock');
+            manainveservLog(`[ManageOrdersInventory] ✓ Fetched from server:`, partNumber, totalStock, 'units in stock');
             return result;
 
         } catch (error) {
@@ -157,7 +159,7 @@ class ManageOrdersInventoryService {
             url += `&Color=${encodeURIComponent(color)}`;
         }
 
-        console.log(`[ManageOrdersInventory] Force refresh:`, partNumber);
+        manainveservLog(`[ManageOrdersInventory] Force refresh:`, partNumber);
 
         // Pre-fetch to force server cache refresh
         await fetch(url);
@@ -184,7 +186,7 @@ class ManageOrdersInventoryService {
      */
     clearCache() {
         this.cache.clear();
-        console.log('[ManageOrdersInventory] Cache cleared');
+        manainveservLog('[ManageOrdersInventory] Cache cleared');
     }
 }
 

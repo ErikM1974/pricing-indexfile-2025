@@ -15,6 +15,8 @@
  * @updated 2025-01-30 - Switched to Caspio Sanmar inventory
  */
 
+var SAMPINVESERV_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
+var sampinveservLog = SAMPINVESERV_LOG_ON ? console.log.bind(console) : function () {}; // debug logging: localhost or ?debug=1 only (2026-09-06 console sweep)
 class SampleInventoryService {
     constructor() {
         this.apiBase = (typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) || '';
@@ -26,7 +28,7 @@ class SampleInventoryService {
         // Load cache from sessionStorage
         this.loadCache();
 
-        console.log('[SampleInventory] Service initialized (Sanmar vendor inventory)');
+        sampinveservLog('[SampleInventory] Service initialized (Sanmar vendor inventory)');
     }
 
     /**
@@ -41,9 +43,9 @@ class SampleInventoryService {
                 // Check if cache is still valid
                 if (Date.now() - data.timestamp < this.cacheDuration) {
                     this.cache = new Map(data.entries);
-                    console.log(`[SampleInventory] ✓ Loaded cache: ${this.cache.size} products`);
+                    sampinveservLog(`[SampleInventory] ✓ Loaded cache: ${this.cache.size} products`);
                 } else {
-                    console.log('[SampleInventory] Cache expired, will fetch fresh data');
+                    sampinveservLog('[SampleInventory] Cache expired, will fetch fresh data');
                     sessionStorage.removeItem(this.cacheKey);
                 }
             }
@@ -79,12 +81,12 @@ class SampleInventoryService {
 
         // Check cache first
         if (this.cache.has(cacheKey)) {
-            console.log(`[SampleInventory] ✓ Using cached data for ${cacheKey}`);
+            sampinveservLog(`[SampleInventory] ✓ Using cached data for ${cacheKey}`);
             return this.cache.get(cacheKey);
         }
 
         try {
-            console.log(`[SampleInventory] Fetching Sanmar inventory for ${styleNumber} ${colorName}...`);
+            sampinveservLog(`[SampleInventory] Fetching Sanmar inventory for ${styleNumber} ${colorName}...`);
 
             const url = `${this.apiBase}/api/sizes-by-style-color?styleNumber=${encodeURIComponent(styleNumber)}&color=${encodeURIComponent(colorName)}`;
             const response = await fetch(url);
@@ -98,7 +100,7 @@ class SampleInventoryService {
             // Parse Caspio response structure
             const inventory = this.parseCaspioInventory(data);
 
-            console.log(`[SampleInventory] ✓ Fetched inventory for ${inventory.sizes.length} sizes`);
+            sampinveservLog(`[SampleInventory] ✓ Fetched inventory for ${inventory.sizes.length} sizes`);
 
             // Cache the result
             this.cache.set(cacheKey, inventory);
@@ -315,8 +317,8 @@ class SampleInventoryService {
      * @returns {Promise<Array>} Samples with inventory status added
      */
     async checkCartInventory(samples) {
-        console.log(`[SampleInventory] Checking inventory for ${samples.length} samples...`);
-        console.log(`[SampleInventory] Input samples:`, samples);
+        sampinveservLog(`[SampleInventory] Checking inventory for ${samples.length} samples...`);
+        sampinveservLog(`[SampleInventory] Input samples:`, samples);
 
         // Validate input
         if (!Array.isArray(samples)) {
@@ -328,7 +330,7 @@ class SampleInventoryService {
 
         for (let i = 0; i < samples.length; i++) {
             const sample = samples[i];
-            console.log(`[SampleInventory] Processing sample ${i}:`, {
+            sampinveservLog(`[SampleInventory] Processing sample ${i}:`, {
                 style: sample.style,
                 catalogColor: sample.catalogColor,
                 sizes: sample.sizes
@@ -351,7 +353,7 @@ class SampleInventoryService {
                     lastInventoryCheck: new Date().toISOString()
                 });
 
-                console.log(`[SampleInventory] ✓ Processed sample ${i}, status: ${stockStatus.status}`);
+                sampinveservLog(`[SampleInventory] ✓ Processed sample ${i}, status: ${stockStatus.status}`);
 
             } catch (error) {
                 console.error(`[SampleInventory] ❌ Error checking ${sample.style}:`, error);
@@ -368,8 +370,8 @@ class SampleInventoryService {
             }
         }
 
-        console.log(`[SampleInventory] ✓ Check complete. Processed ${samples.length} samples, returning ${results.length} results`);
-        console.log(`[SampleInventory] Results array:`, results);
+        sampinveservLog(`[SampleInventory] ✓ Check complete. Processed ${samples.length} samples, returning ${results.length} results`);
+        sampinveservLog(`[SampleInventory] Results array:`, results);
         return results;
     }
 
@@ -438,14 +440,14 @@ class SampleInventoryService {
     clearCache() {
         this.cache.clear();
         sessionStorage.removeItem(this.cacheKey);
-        console.log('[SampleInventory] Cache cleared');
+        sampinveservLog('[SampleInventory] Cache cleared');
     }
 
     /**
      * Force re-check inventory for all cart items (clears cache and re-fetches)
      */
     async forceRefreshCartInventory() {
-        console.log('[SampleInventory] 🔄 Forcing inventory refresh...');
+        sampinveservLog('[SampleInventory] 🔄 Forcing inventory refresh...');
 
         // Clear all cached inventory
         this.clearCache();
@@ -453,7 +455,7 @@ class SampleInventoryService {
         // Get current cart
         const cartData = sessionStorage.getItem('sampleCart');
         if (!cartData) {
-            console.log('[SampleInventory] No cart found');
+            sampinveservLog('[SampleInventory] No cart found');
             return;
         }
 
@@ -475,7 +477,7 @@ class SampleInventoryService {
             timestamp: new Date().toISOString()
         }));
 
-        console.log('[SampleInventory] ✓ Inventory refreshed, reload page to see changes');
+        sampinveservLog('[SampleInventory] ✓ Inventory refreshed, reload page to see changes');
         return updatedCart;
     }
 
@@ -497,5 +499,5 @@ class SampleInventoryService {
 if (typeof window !== 'undefined') {
     window.SampleInventoryService = SampleInventoryService;
     window.sampleInventoryService = new SampleInventoryService();
-    console.log('[SampleInventory] Service ready - Using Sanmar vendor inventory');
+    sampinveservLog('[SampleInventory] Service ready - Using Sanmar vendor inventory');
 }

@@ -3,6 +3,8 @@
  * Centralized API communication with error handling and caching
  */
 
+var API_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
+var apiLog = API_LOG_ON ? console.log.bind(console) : function () {}; // debug logging: localhost or ?debug=1 only (2026-09-06 console sweep)
 export class API {
     constructor() {
         this.baseUrl = '/api'; // Use local server proxy
@@ -28,7 +30,7 @@ export class API {
             }
 
             const data = await response.json();
-            console.log('[API] Search response:', data);
+            apiLog('[API] Search response:', data);
             return data || [];
         } catch (error) {
             console.error('Search API error:', error);
