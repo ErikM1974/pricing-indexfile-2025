@@ -1,5 +1,5 @@
 /* global React, ReactDOM */
-const { useState, useMemo } = React;
+const { useState, useMemo, useEffect, useRef, useCallback } = React;
 const { minToTime, segments } = window.NWCA_HELPERS;
 
 const TL_START = 8 * 60;    // 8:00 AM — earliest clock-in on the schedule
@@ -149,7 +149,7 @@ function MasterTable({ employees, onSelect, selectedId }) {
             <span className="legend-item"><span className="legend-sw legend-break" />Rest break (paid, no punch)</span>
             <span className="legend-item"><span className="legend-sw legend-lunch" />Lunch (unpaid, punch out &amp; in)</span>
           </div>
-          <button className="btn-primary master-print" onClick={() => window.print()}>
+          <button type="button" className="btn-primary master-print" onClick={() => window.print()}>
             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
               <path d="M6 9V3h12v6M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
               <rect x="6" y="14" width="12" height="8" rx="1"/>
@@ -186,10 +186,17 @@ function MasterTable({ employees, onSelect, selectedId }) {
                   onClick={() => onSelect(emp.id)}
                 >
                   <td className="td-name">
-                    <div className="td-name-wrap">
+                    {/* The row is mouse-clickable; this button is the keyboard / screen-reader path. */}
+                    <button
+                      type="button"
+                      className="td-name-wrap row-btn"
+                      aria-pressed={isSel}
+                      aria-label={`${emp.name} — ${isSel ? "hide" : "show"} shift details`}
+                      onClick={(e) => { e.stopPropagation(); onSelect(emp.id); }}
+                    >
                       <Avatar name={emp.name} size={30} />
                       <span>{emp.name}</span>
-                    </div>
+                    </button>
                   </td>
                   <td className="td-role">{emp.role}</td>
                   <td className="cell cell-clock mono">{minToTime(start.min)}</td>
@@ -252,7 +259,10 @@ function Timeline({ employees, onSelect, selectedId }) {
             return (
               <React.Fragment key={emp.id}>
                 <button
+                  type="button"
                   className={`tl-row-label ${isSelected ? "selected" : ""}`}
+                  aria-pressed={isSelected}
+                  aria-label={`${emp.name} — ${isSelected ? "hide" : "show"} shift details`}
                   onClick={() => onSelect(emp.id)}
                 >
                   <Avatar name={emp.name} size={28} />
@@ -261,7 +271,7 @@ function Timeline({ employees, onSelect, selectedId }) {
                     <div className="tl-row-role">{emp.role}</div>
                   </div>
                 </button>
-                <div className={`tl-row ${isSelected ? "selected" : ""}`}>
+                <div className={`tl-row ${isSelected ? "selected" : ""}`} aria-hidden="true">
                   {Array.from({ length: TL_HOURS }).map((_, i) => (
                     <div key={i} className="tl-gridline" style={{ left: `${pct((TL_START / 60 + 1 + i) * 60)}%` }} />
                   ))}
@@ -315,8 +325,10 @@ function Roster({ employees, onSelect, selectedId }) {
           const lunch = emp.events.find(e => e.type === "lunch");
           return (
             <button
+              type="button"
               key={emp.id}
               className={`roster-card ${selectedId === emp.id ? "selected" : ""}`}
+              aria-pressed={selectedId === emp.id}
               onClick={() => onSelect(emp.id)}
             >
               <div className="roster-card-top">
@@ -357,12 +369,14 @@ function DeptChips({ dept, setDept, employees }) {
     return map;
   }, [employees]);
   return (
-    <div className="chip-row">
-      <span className="chip-label">Filter</span>
+    <div className="chip-row" role="group" aria-label="Filter by department">
+      <span className="chip-label" aria-hidden="true">Filter</span>
       {DEPTS.map(d => (
         <button
+          type="button"
           key={d}
           className={`chip ${dept === d ? "chip-active" : ""}`}
+          aria-pressed={dept === d}
           onClick={() => setDept(d)}
         >
           <span>{d}</span>
@@ -375,12 +389,26 @@ function DeptChips({ dept, setDept, employees }) {
 
 // ---------------- Detail Panel ----------------
 function DetailPanel({ emp, onClose }) {
+  const closeRef = useRef(null);
+  const returnRef = useRef(null);
+  // Dialog behaviour: remember the trigger, move focus to Close, Esc closes, focus returns on unmount.
+  useEffect(() => {
+    returnRef.current = document.activeElement;
+    if (closeRef.current) closeRef.current.focus();
+    const onKey = (e) => { if (e.key === "Escape") onClose(); };
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      const back = returnRef.current;
+      if (back && document.body.contains(back) && typeof back.focus === "function") back.focus();
+    };
+  }, [onClose]);
   if (!emp) return null;
   const { shiftStart, shiftEnd } = segments(emp);
 
   return (
-    <aside className="detail-panel">
-      <button className="detail-close" onClick={onClose} aria-label="Close">
+    <aside className="detail-panel" role="dialog" aria-modal="true" aria-labelledby="detail-name">
+      <button type="button" ref={closeRef} className="detail-close" onClick={onClose} aria-label="Close shift details">
         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
           <path d="M6 6l12 12M18 6L6 18"/>
         </svg>
@@ -388,7 +416,7 @@ function DetailPanel({ emp, onClose }) {
       <div className="detail-head">
         <Avatar name={emp.name} size={56} />
         <div>
-          <div className="detail-name">{emp.name}</div>
+          <div className="detail-name" id="detail-name">{emp.name}</div>
           <div className="detail-role">{emp.role} · {emp.dept}</div>
         </div>
       </div>
@@ -720,6 +748,8 @@ function App() {
     () => all.find(e => e.id === selectedId) || null,
     [selectedId, all]
   );
+  // Stable identity — DetailPanel's dialog effect depends on it and must not re-run every render.
+  const closeDetail = useCallback(() => setSelectedId(null), []);
 
   return (
     <div className="app">
@@ -861,9 +891,9 @@ function App() {
       </main>
 
       {selected && (
-        <DetailPanel emp={selected} onClose={() => setSelectedId(null)} />
+        <DetailPanel emp={selected} onClose={closeDetail} />
       )}
-      {selected && <div className="scrim" onClick={() => setSelectedId(null)} />}
+      {selected && <div className="scrim" aria-hidden="true" onClick={() => setSelectedId(null)} />}
     </div>
   );
 }
