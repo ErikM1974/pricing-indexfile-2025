@@ -1,3 +1,8 @@
+## v2026.09.05.49 (2026.09.05)
+
+- Finished Photos capture + Library review: 14 items — honest failures + Retry (search/designs/manage/publish/delete), Rule 3 onerror, tablist keys, keyboard file labels, labelled dialogs + Esc + focus return, zoom allowed, back arrow without FA, calendar dates
+- Deploy v2026.09.05.49: Finished Photos capture + Library review (14 items)
+
 ## v2026.09.05.47 (2026.09.05)
 
 - Bradley Screen Print review: 11 items — page gains its h1 (was an h2), API base from APP_CONFIG, first-load error + Retry, synced aria-pressed chips, inline onerror/style removed, keyboard cards, labelled delete dialog with focus return + Esc, session identity; lock test
