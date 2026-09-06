@@ -42,7 +42,7 @@ describe('digitized designs', () => {
         expect(js).toMatch(/\(from DST file\)/);
         expect(js).toMatch(/The Caspio list did not load/);
         expect(css).toMatch(/^\[hidden\] \{ display: none !important; \}/m);
-        expect(html).toMatch(/digitized-designs\.css\?v=2026\./);
+        expect(html).toMatch(/digitized-designs\.css\?v=\d{4}\.\d{2}\.\d{2}\.\d+/);
     });
 });
 
@@ -69,6 +69,6 @@ describe('old designs', () => {
         expect(js).toMatch(/toast\.setAttribute\('role', type === 'error' \? 'alert' : 'status'\);/);
         expect(css).toMatch(/^\[hidden\] \{ display: none !important; \}/m);
         expect(css).toMatch(/:focus-within \.card-actions \{ opacity: 1; \}/);
-        expect(html).toMatch(/old-designs\.js\?v=2026\./);
+        expect(html).toMatch(/old-designs\.js\?v=\d{4}\.\d{2}\.\d{2}\.\d+/);
     });
 });

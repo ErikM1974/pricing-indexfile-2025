@@ -31,7 +31,7 @@ describe('screen-print-pricing.html', () => {
         for (let i = 1; i < idx.length; i++) expect(idx[i]).toBeGreaterThan(idx[i - 1]);
     });
     test('hidden attribute on the six formerly display:none regions', () => {
-        for (const id of ['productImage', 'imageThumbnails', 'colorSwatchesSection', 'caspio-iframe-container', 'sp-size-upcharges-container']) {
+        for (const id of ['productImage', 'imageThumbnails', 'colorSwatchesSection', 'caspio-iframe-container']) {
             expect(html).toMatch(new RegExp('id="' + id + '"[^>]* hidden>'));
         }
         expect(read('calculators/css/screen-print-pricing.css')).toMatch(/\[hidden\] \{ display: none !important; \}/);

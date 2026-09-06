@@ -22,13 +22,7 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 ### Staff dashboard Workspaces — three traps the harness caught (2026-09-03, ARCHIVED 2026-09-06): check `admin` FIRST in any role→default map; `hidden` on the dashboard belongs to nav-access (tabs/folds use classes); a harness driving the REAL controllers finds what structural unit tests cannot; multi-line edits against this repo need `\r\n` and an asserted match count. Full entry in archive.
 ### Company Numbers review — a date a day early, a refresh that wasn't, a goal nobody could change (2026-09-04, ARCHIVED 2026-09-06): `YYYY-MM-DD` parses as UTC midnight (use `toLocalDate()`); a Refresh button must re-fetch, not re-render; a business constant belongs in a Caspio `Service_Codes` row (`CO-ANNUAL-GOAL`) with a VISIBLE fallback. Full entry in archive.
 ### Customer login dropped the deep link it was handed (2026-09-05, ARCHIVED 2026-09-06, `v2026.09.05.26`): a login page must carry its `?next=` through every hop (magic-link request → email → callback) and validate it as a same-origin path; test the round trip, not the first page. Full entry in archive.
-
-## 2026-09-05 — JSON-in-attribute broke on the first quote (Names & Numbers delete button, `v2026.09.05.17`)
-**Problem:** after converting `onclick="dashboard.deleteRoster(${id}, '${esc(name)}')"` to `data-args="${esc(JSON.stringify([id, name]))}"`, the attribute read `[10,` — the delete button silently did nothing.
-**Root cause:** that page's `esc()` is the `div.textContent → innerHTML` trick, which escapes `< > &` but NOT `"`, so the JSON's quotes ended the attribute early.
-**Solution:** escape for an attribute (`&amp; &quot; &lt;`) — `JSON.stringify(...).replace(/"/g,'&quot;')`; the quote-builder `escapeHtml()` and portal-directory `escapeAttr()` already do.
-**Prevention:** the delegator reports a bad `data-args` as a visible error (never silent); when writing JSON into a `data-*` attribute inside a template literal, check the page's escaper handles `"` first. Lock: `tests/unit/staff-pages-datacall.test.js`.
-### Vendor portal showed "Unable to load jobs" on EVERY load since launch (2026-09-05, ARCHIVED 2026-09-06, `v2026.09.05.28`): a page that fails identically on every load has never worked — check the FIRST request's status, not the retry path; a launch is not verified until a real user's session has loaded real data. Full entry in archive.
+### JSON-in-attribute broke on the first quote (Names & Numbers delete button, 2026-09-05, ARCHIVED 2026-09-06, `v2026.09.05.17`): never put JSON with quotes/apostrophes in an HTML attribute — pass an index/id and look the record up, or escape with `escapeHtml` on the attribute value. Full entry in archive.
 
 ## 2026-09-05 — Customer Portals console said nobody had ever signed in (141 invites, "Have Signed In: 0")
 
@@ -275,3 +269,20 @@ an unused getter is the common failure. 🔑 `<label>` without `for=` and not wr
 decoration; the a11y lock now fails on it. 🔑 A page that starts with `<meta charset>` has no
 `<html>`: check `document.compatMode` on any page that "looks slightly off". 🔑 Module-scope
 config reads need `typeof window !== 'undefined'` — the Node-run service tests load the file.
+
+## 2026-09-06 — 700 console.logs in production, and a basename match that hid four stale root copies (`v2026.09.06.37`)
+
+**Problem.** CLAUDE.md says "remove console.log before committing"; 68 served scripts still shipped
+~700 of them (a customer's console on the screen-print calculator scrolled 35 lines). The orphan
+lock said every script was referenced — but root-level `utils.js`, `dp5-helper.js`,
+`pricing-matrix-api.js` and `app-new.js` were stale copies nothing loads: their basenames appeared
+in comments and in the paths of their `shared_components/js` twins.
+**Root cause.** The rule was enforced by review, not by a lock. A referrer census that matches on
+basename cannot tell `/utils.js` from `/shared_components/js/utils.js` or `./utils.js`.
+**Solution.** Per-file gated logger (localhost / `?debug=1`) via one idempotent script; lock on bare
+`console.log(`. Referrer matching is now path-aware (directory-qualified for duplicated basenames,
+quoted `"/name.js"` for root files, sibling `./name.js` for ES modules).
+**Prevention.** 🔑 Any "is X referenced" census must match the PATH, not the name — and skip
+comments, tests, one-off scripts and archives. 🔑 Gate, don't delete, debug logging: the
+`?debug=1` switch keeps the diagnostics Erik uses without paying for them on every customer load.
+🔑 A generated identifier prefix can start with a digit — check the first character.

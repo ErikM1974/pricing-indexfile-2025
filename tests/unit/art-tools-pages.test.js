@@ -36,7 +36,7 @@ describe('design vault', () => {
         expect(css).toMatch(/\.dg-spacer \{ height: var\(--h, 0px\); \}/);
         expect(css).toMatch(/\.dg-grid-viewport \{ overflow-anchor: none; \}/);
         expect(html).toMatch(/role="progressbar" aria-label="Index download"/);
-        expect(html).toMatch(/design-gallery\.js\?v=2026\.09\./);
+        expect(html).toMatch(/design-gallery\.js\?v=\d{4}\.\d{2}\.\d{2}\.\d+/);
     });
 });
 
@@ -57,7 +57,7 @@ describe('253gear publisher', () => {
         expect(css).toMatch(/\.gp-cell-progress-bar \{ height: 100%; width: var\(--w, 0%\);/);
         expect(css).toMatch(/^\[hidden\] \{ display: none !important; \}/m);
         expect(html).not.toMatch(BARE);
-        expect(html).toMatch(/gear-publisher\.js\?v=2026\.09\./);
+        expect(html).toMatch(/gear-publisher\.js\?v=\d{4}\.\d{2}\.\d{2}\.\d+/);
         expect(html).not.toMatch(/<button class=/);
     });
 });
