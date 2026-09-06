@@ -1,3 +1,8 @@
+## v2026.09.06.8 (2026.09.06)
+
+- Remove the legacy runtime script loader from pricing-pages.js; delete cart.js, order-form-pdf.js, cart-price-recalculator.js (cart.js was force-skipped, half the chain's files no longer existed); lock pricing-pages-no-legacy-loader.test.js
+- Deploy v2026.09.06.8: remove legacy loader + cart.js, order-form-pdf.js, cart-price-recalculator.js
+
 ## v2026.09.06.6 (2026.09.06)
 
 - LESSONS: customer-facing sweep 2026-09-06 entry
