@@ -10,7 +10,8 @@
     'use strict';
 
     const API_BASE = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL)
-        || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        || '';
+    if (!API_BASE) console.error('[ae-dashboard] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
 
     // Stored Caspio rows hold absolute proxy Box urls that 401 since the Box
     // surface was session-gated; boxUrl() re-points them at this origin so the

@@ -3,6 +3,8 @@
  * Implements Location = Size model with iOS-style toggle switches
  * 100% API-driven pricing with HalfDollarCeil rounding
  */
+var DTF_CALC_API_BASE = (typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) || '';
+if (!DTF_CALC_API_BASE) console.error('[dtf-pricing-calculator] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
 class DTFPricingCalculator {
     constructor(containerId) {
         this.container = document.getElementById(containerId);
@@ -951,7 +953,7 @@ class DTFPricingCalculator {
         try {
             // Fetch max prices and upcharges data
             console.log('📡 [DTF Calculator] Fetching max prices for style:', styleNumber);
-            const response = await fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/max-prices-by-style?styleNumber=${styleNumber}`);
+            const response = await fetch(`${DTF_CALC_API_BASE}/api/max-prices-by-style?styleNumber=${styleNumber}`);
 
             if (!response.ok) {
                 throw new Error(`Failed to fetch max prices: ${response.status}`);

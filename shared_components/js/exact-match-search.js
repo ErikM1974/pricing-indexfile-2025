@@ -11,7 +11,7 @@
  *
  * Usage:
  *   const searcher = new ExactMatchSearch({
- *       apiBase: 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api',
+ *       apiBase: APP_CONFIG.API.BASE_URL + '/api',
  *       onExactMatch: (product) => { ... },
  *       onSuggestions: (products) => { ... },
  *       onSelect: (product) => { ... },           // Called when item is selected via keyboard
@@ -26,7 +26,8 @@
 
 class ExactMatchSearch {
     constructor(config = {}) {
-        this.apiBase = config.apiBase || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        this.apiBase = config.apiBase || '';
+        if (!this.apiBase) console.error('[exact-match-search] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
         this.onExactMatch = config.onExactMatch || null; // Callback for exact matches
         this.onSuggestions = config.onSuggestions || null; // Callback for suggestion list
         this.onError = config.onError || null; // Callback for errors

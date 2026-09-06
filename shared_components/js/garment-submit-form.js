@@ -27,7 +27,8 @@ var GarmentSubmitForm = (function () {
     'use strict';
 
     var API_BASE = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL)
-        || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        || '';
+    if (!API_BASE) console.error('[garment-submit-form] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
     var SITE_ORIGIN = 'https://www.teamnwca.com';
     var STEVE_EMAIL = 'art@nwcustomapparel.com';
     var MAX_FILES = 4;

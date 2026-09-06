@@ -11,7 +11,8 @@
 (function () {
     'use strict';
 
-    var API_BASE = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+    var API_BASE = (typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) || '';
+    if (!API_BASE) console.error('[supacolor-job-detail] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
 
     var state = {
         idJob: null,

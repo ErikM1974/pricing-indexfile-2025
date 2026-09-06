@@ -2,7 +2,7 @@
  * JDS Industries API Service
  * Handles product data and pricing from JDS API for laser tumblers
  *
- * Base URL: https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/jds
+ * Base URL: APP_CONFIG.API.BASE_URL + /api/jds
  * Cache: 1 hour parameter-aware caching
  * Rate Limit: 60 requests per minute per IP
  */
@@ -12,7 +12,8 @@ var JDS_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.
 var jdsLog = JDS_LOG_ON ? console.log.bind(console) : function () {};
 class JDSApiService {
     constructor() {
-        this.proxyBase = window.APP_CONFIG?.API?.BASE_URL || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        this.proxyBase = window.APP_CONFIG?.API?.BASE_URL || '';
+        if (!this.proxyBase) console.error('[jds-api-service] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
         this.baseURL = `${this.proxyBase}/api/jds`;
         this.cache = new Map();
         this.cacheDuration = 60 * 60 * 1000; // 1 hour

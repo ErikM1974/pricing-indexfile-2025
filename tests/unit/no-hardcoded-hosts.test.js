@@ -24,7 +24,7 @@ const HOST_RE = /caspio-pricing-proxy-ab30a049961a/g;
 const EMAILJS_RE = /service_jgrave3|4qSbDO-SQs19TbP80/g;
 
 // Frozen 2026-07-07 (task 0.3 sweep complete). Only lower these.
-const HOST_BASELINE = 222; // 224 -> 223: art-aging-widget.js lost its fallback literal; -> 222: staff-dashboard-v3/config.js retired (dashboard reads are all same-origin relays)
+const HOST_BASELINE = 42; // 222 -> 42 (2026-09-06 S3 batch): every browser-side `|| HOST` fallback, direct fetch(HOST) and return-HOST accessor now reads APP_CONFIG.API.BASE_URL and logs a visible error when it is missing; what remains is Node-side (lib/, scripts/, tools/seed-top-sellers.js, templates/), the two sanctioned EXACT_ONE literals, and 3 <link rel=preconnect> hints
 const EMAILJS_BASELINE = 69;
 
 const SKIP_DIRS = new Set(['node_modules', '.claude', '.git', 'dist', 'tests', 'memory', 'docs', 'migrations', 'workflows']);

@@ -61,7 +61,8 @@
         async fetchBaseGarmentCost(styleNumber) {
             try {
                 // First try the base-item-costs endpoint
-                const apiUrl = `https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/base-item-costs?styleNumber=${encodeURIComponent(styleNumber)}`;
+                const apiUrl = ((typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) ? window.APP_CONFIG.API.BASE_URL + '/api/base-item-costs?styleNumber=${encodeURIComponent(styleNumber)}' : '');
+                if (!apiUrl) console.error('[dtf-adapter] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
                 this.log('DTF Adapter: Fetching base garment costs from:', apiUrl);
                 
                 const response = await fetch(apiUrl);
@@ -100,7 +101,8 @@
         async fetchAlternativeGarmentCost(styleNumber) {
             try {
                 // Try size-pricing endpoint as alternative
-                const altUrl = `https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/size-pricing?styleNumber=${encodeURIComponent(styleNumber)}`;
+                const altUrl = ((typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) ? window.APP_CONFIG.API.BASE_URL + '/api/size-pricing?styleNumber=${encodeURIComponent(styleNumber)}' : '');
+                if (!altUrl) console.error('[dtf-adapter] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
                 this.log('DTF Adapter: Trying alternative endpoint:', altUrl);
                 
                 const response = await fetch(altUrl);
@@ -122,7 +124,8 @@
                 }
                 
                 // If still no data, check for max-prices endpoint
-                const maxPriceUrl = `https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/max-prices-by-style?styleNumber=${encodeURIComponent(styleNumber)}`;
+                const maxPriceUrl = ((typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) ? window.APP_CONFIG.API.BASE_URL + '/api/max-prices-by-style?styleNumber=${encodeURIComponent(styleNumber)}' : '');
+                if (!maxPriceUrl) console.error('[dtf-adapter] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
                 this.log('DTF Adapter: Trying max-prices endpoint:', maxPriceUrl);
                 
                 const maxResponse = await fetch(maxPriceUrl);

@@ -25,7 +25,8 @@
     // Config
     // -----------------------------------------------------------------
     const API_BASE_URL = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL)
-        || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        || '';
+    if (!API_BASE_URL) console.error('[sticker-pricing-page] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
     // SAME-ORIGIN, deliberately (2026-07-24). The AI chat is the one call on
     // this page that can surface customer PII (lookup_customer returns email,
     // phone, address, sales rep, payment terms), so it goes through the app's

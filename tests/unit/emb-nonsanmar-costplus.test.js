@@ -17,7 +17,7 @@ const Calc = require('../../shared_components/js/embroidery-quote-pricing.js');
 const BLANK_COST = 8.42;   // what S&S charges us per blank
 
 function makeCalc() {
-    const c = new Calc();
+    const c = new Calc({ skipInit: true }); // never hit the live proxy from a unit test (2026-09-06: the host fallback is gone, so a bare Calc() would fetch a relative URL)
     c.roundingMethod = 'CeilDollar';
     c.marginDenominator = 0.53;
     c.capMarginDenominator = 0.53;

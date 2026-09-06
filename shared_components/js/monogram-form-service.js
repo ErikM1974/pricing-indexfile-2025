@@ -18,8 +18,8 @@ class MonogramFormService {
         if (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) {
             return window.APP_CONFIG.API.BASE_URL;
         }
-        console.warn('[MonogramService] APP_CONFIG not loaded, using fallback URL');
-        return 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        console.error('[monogram-form-service] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
+        return '';
     }
 
     // ============================================

@@ -3,6 +3,8 @@
  * Product page for Polar Camel 16 oz Pint with color variant selector
  * Uses JDS API for all product data and pricing
  */
+var LASER_API_BASE = (typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) || '';
+if (!LASER_API_BASE) console.error('[laser-tumbler-simple] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
 
 class LaserTumblerPage {
     constructor() {
@@ -134,7 +136,7 @@ class LaserTumblerPage {
             }
 
             // Make batch API call
-            const response = await fetch('https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/jds/products', {
+            const response = await fetch(LASER_API_BASE + '/api/jds/products', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

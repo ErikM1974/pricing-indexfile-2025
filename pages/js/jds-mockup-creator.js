@@ -21,7 +21,8 @@
 (function () {
     'use strict';
 
-    var API_BASE = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+    var API_BASE = (typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) || '';
+    if (!API_BASE) console.error('[jds-mockup-creator] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
 
     // Render canvas dimensions. The actual source is 1800×1800, but for preview
     // performance we render at 900×900 (half-size). Drag offsets are stored in

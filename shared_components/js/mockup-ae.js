@@ -12,7 +12,8 @@ var MockupAeGallery = (function () {
     'use strict';
 
     var API_BASE = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL)
-        || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        || '';
+    if (!API_BASE) console.error('[mockup-ae] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
 
     var containerId = null;
     var allMockups = [];

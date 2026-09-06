@@ -22,7 +22,8 @@
 
     // ── Config ──────────────────────────────────────────────────────
     const API_BASE = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL)
-        || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        || '';
+    if (!API_BASE) console.error('[3-day-tees-app] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
     const STYLE = 'PC54';
     const SIZES = ['S', 'M', 'L', 'XL', '2XL', '3XL'];
     const PERSIST_KEY = '3dt_studio_v1';

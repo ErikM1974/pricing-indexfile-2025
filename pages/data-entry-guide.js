@@ -6,7 +6,8 @@
 (function () {
     var BASE_URL = (typeof APP_CONFIG !== 'undefined' && APP_CONFIG.API && APP_CONFIG.API.BASE_URL)
         ? APP_CONFIG.API.BASE_URL
-        : 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        : '';
+    if (!BASE_URL) console.error('[data-entry-guide] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
 
     // Fallback data — matches service-price-cheat-sheet.js FALLBACK_FIXED exactly
     var FALLBACK_SERVICES = [

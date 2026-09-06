@@ -16,8 +16,9 @@
     const TTL = 5 * 60 * 1000;
 
     function apiBase() {
-        return (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL)
-            || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        var base = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) || '';
+        if (!base) console.error('[delivery-promise] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
+        return base;
     }
 
     // ONE call loads every method's lead days (mirrors getCtsSalesMap's

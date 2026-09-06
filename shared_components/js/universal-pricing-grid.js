@@ -2,6 +2,8 @@
  * Universal Pricing Grid Component
  * Displays size upcharges dynamically based on available sizes from API
  */
+var UPG_API_BASE = (typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) || '';
+if (!UPG_API_BASE) console.error('[universal-pricing-grid] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
 
 (function() {
     'use strict';
@@ -186,7 +188,7 @@
             console.log(`[UniversalPricingGrid] Loading size pricing for ${styleNumber}`);
 
             try {
-                const response = await fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/size-pricing?styleNumber=${styleNumber}`);
+                const response = await fetch(`${UPG_API_BASE}/api/size-pricing?styleNumber=${styleNumber}`);
                 if (!response.ok) {
                     throw new Error(`Failed to fetch size pricing: ${response.status}`);
                 }

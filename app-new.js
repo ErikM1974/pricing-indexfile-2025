@@ -5,7 +5,7 @@
  * for improved performance and better user experience.
  * 
  * API ENDPOINT:
- * - Products Search: GET https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/products/search
+ * - Products Search: GET {APP_CONFIG.API.BASE_URL}/api/products/search
  * 
  * @author Northwest Custom Apparel
  * @version 3.0

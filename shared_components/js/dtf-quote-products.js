@@ -12,7 +12,8 @@
 
 class DTFQuoteProducts {
     constructor() {
-        this.apiBase = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        this.apiBase = (typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) || '';
+        if (!this.apiBase) console.error('[dtf-quote-products] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
         this.products = [];
         this.currentProduct = null;
         this.pricingCalculator = new window.DTFQuotePricing();

@@ -24,7 +24,8 @@
 (function () {
     'use strict';
 
-    var PROXY_DEFAULT = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+    var PROXY_DEFAULT = (typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) || '';
+    if (!PROXY_DEFAULT) console.error('[finished-photos] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
     function apiBase() {
         return (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) || PROXY_DEFAULT;
     }

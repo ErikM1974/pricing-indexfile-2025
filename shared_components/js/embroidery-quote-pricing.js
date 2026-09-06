@@ -5,7 +5,8 @@
 
 class EmbroideryPricingCalculator {
     constructor(options = {}) {
-        this.baseURL = (typeof window !== 'undefined' && window.APP_CONFIG?.API?.BASE_URL) || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        this.baseURL = (typeof window !== 'undefined' && window.APP_CONFIG?.API?.BASE_URL) || '';
+        if (!this.baseURL) console.error('[embroidery-quote-pricing] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
         
         // Default fallback values (will be replaced by API data)
         // 2026-02 RESTRUCTURE: New tiers 1-7 (LTM) and 8-23 (no LTM, +$4 surcharge baked in)

@@ -21,7 +21,8 @@
 (function () {
     'use strict';
 
-    const PROXY = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+    const PROXY = (typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) || '';
+    if (!PROXY) console.error('[handbook-reader] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
     const PARENT_ID = 'employee-handbook';
     const BATCH_SIZE = 4;            // Parallel fetches per batch
     const BATCH_DELAY_MS = 250;       // Gap between batches to avoid 429
@@ -269,7 +270,7 @@
         els.content.innerHTML = `<div class="handbook-error">
             <strong>Could not load handbook.</strong> ${escapeHTML(msg)}
             <br><br>Try refreshing the page. If the problem persists, the Policies API may be down — check
-            <a href="https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/policies-public/tree" target="_blank">the API directly</a>.
+            <a href="${PROXY}/api/policies-public/tree" target="_blank">the API directly</a>.
         </div>`;
     }
 

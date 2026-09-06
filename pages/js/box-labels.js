@@ -21,7 +21,8 @@
   'use strict';
 
   const API_BASE = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL)
-    || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+    || '';
+  if (!API_BASE) console.error('[box-labels] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
   const DRAFT_TTL_MS = 24 * 60 * 60 * 1000;
 
   // ── State ──

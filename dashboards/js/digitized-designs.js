@@ -6,7 +6,8 @@
             var modalImg = modal.querySelector('img');
             var container = document.querySelector('.caspio-container');
             var API_BASE = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL)
-                || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+                || '';
+            if (!API_BASE) console.error('[digitized-designs] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
 
             /* Image modal — click (or Enter on) a thumbnail to enlarge; focus returns on close */
             var imageReturnFocus = null;

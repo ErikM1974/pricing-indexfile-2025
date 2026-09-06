@@ -15,7 +15,8 @@ var aasLog = AAS_LOG_ON ? console.log.bind(console) : function () {};
     'use strict';
 
     var API_BASE = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL)
-        || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        || '';
+    if (!API_BASE) console.error('[art-actions-shared] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
 
     // ── Art hourly rate = Service_Codes GRT-75 (Erik's rule: prices come from Caspio, never a typed $) ──
     // 75 is the FALLBACK only. Until the live rate lands (or if the API is unreachable) every cost

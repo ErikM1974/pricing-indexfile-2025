@@ -13,7 +13,8 @@
 
 class StickerPricingService {
     constructor() {
-        this.baseURL = window.APP_CONFIG?.API?.BASE_URL || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        this.baseURL = window.APP_CONFIG?.API?.BASE_URL || '';
+        if (!this.baseURL) console.error('[sticker-pricing-service] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
         this.cachePrefix = 'stickerPricingData';
         this.cacheDuration = 60 * 60 * 1000; // 1h — prices don't change often
     }

@@ -20,7 +20,8 @@
     'use strict';
 
     const API_BASE = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL)
-        || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        || '';
+    if (!API_BASE) console.error('[dtg-catalog] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
 
     // Cache the styles list — we fetch it once
     let stylesCache = null;

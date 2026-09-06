@@ -31,7 +31,8 @@
     // /api/api/... and 404 instead of failing loudly.
     const RAW_BASE = (typeof window !== 'undefined' && window.APP_CONFIG
         && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL)
-        || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        || '';
+    if (!RAW_BASE) console.error('[custom-decal-pricing-page] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
     const API_BASE_URL = String(RAW_BASE).replace(/\/api\/?$/, '');
 
     // Populated by the API. Deliberately null until then: every render path

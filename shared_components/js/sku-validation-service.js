@@ -13,7 +13,8 @@
 
 class SKUValidationService {
     constructor() {
-        this.baseURL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        this.baseURL = (typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) || '';
+        if (!this.baseURL) console.error('[sku-validation-service] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
         this.cache = new Map();
         this.cacheDuration = 5 * 60 * 1000; // 5 minutes
     }

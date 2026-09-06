@@ -37,7 +37,8 @@
 (function (global) {
     'use strict';
 
-    const API_BASE_DEFAULT = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+    const API_BASE_DEFAULT = (typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) || '';
+    if (!API_BASE_DEFAULT) console.error('[customer-design-combobox] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
 
     function getApiBase() {
         if (typeof window !== 'undefined' && window.APP_CONFIG?.API?.BASE_URL) {

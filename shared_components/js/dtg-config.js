@@ -144,7 +144,7 @@ const DTGConfig = {
     
     // API configuration
     api: {
-        baseUrl: window.API_PROXY_BASE_URL || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com',
+        baseUrl: window.API_PROXY_BASE_URL || (typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) || '', // '' = not configured (visible: every fetch fails on a relative URL)
         endpoints: {
             pricing: '/api/proxy',
             inventory: '/api/inventory'

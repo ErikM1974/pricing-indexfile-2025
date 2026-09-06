@@ -4,7 +4,8 @@
  */
 class CustomerLookupService {
     constructor(options = {}) {
-        this.baseURL = options.baseURL || window.APP_CONFIG?.API?.BASE_URL || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        this.baseURL = options.baseURL || window.APP_CONFIG?.API?.BASE_URL || '';
+        if (!this.baseURL) console.error('[customer-lookup-service] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
         this.minSearchLength = options.minSearchLength || 3;
         this.debounceMs = options.debounceMs || 300;
         this.maxResults = options.maxResults || 25;  // 25 = proxy max; shows all contacts for larger accounts (e.g. Aaberg's has 17) (Erik 2026-06-05)

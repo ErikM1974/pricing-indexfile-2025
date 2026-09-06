@@ -8,7 +8,8 @@
 (function() {
     'use strict';
 
-    const API_BASE = window.APP_CONFIG?.API?.BASE_URL || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+    const API_BASE = window.APP_CONFIG?.API?.BASE_URL || '';
+    if (!API_BASE) console.error('[additional-logo-embroidery-simple] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
     const API_ENDPOINT = `${API_BASE}/api/pricing-bundle?method=EMB-AL`;
 
     // Fallback pricing (used only if API fails)

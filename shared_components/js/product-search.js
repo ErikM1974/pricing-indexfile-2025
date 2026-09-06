@@ -6,7 +6,8 @@
 
 class ProductSearch {
     constructor() {
-        this.baseURL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/products/search';
+        this.baseURL = ((typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) ? window.APP_CONFIG.API.BASE_URL + '/api/products/search' : '');
+        if (!this.baseURL) console.error('[product-search] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
         this.cache = new Map();
         this.cacheTimeout = 120000; // 2 minutes
         this.currentRequest = null;

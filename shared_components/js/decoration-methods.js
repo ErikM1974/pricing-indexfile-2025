@@ -30,7 +30,8 @@
     'use strict';
 
     var API_BASE = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL)
-        || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        || '';
+    if (!API_BASE) console.error('[decoration-methods] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
     var ENDPOINT = '/api/decoration-methods';
     var CACHE_KEY = 'nwca.decorationMethods.v1';
     var CACHE_TTL_MS = 60 * 60 * 1000; // 1 hour

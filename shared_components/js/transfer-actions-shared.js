@@ -26,7 +26,8 @@
 
     // ── Config ───────────────────────────────────────────────────────
     var API_BASE = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL)
-        || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        || '';
+    if (!API_BASE) console.error('[transfer-actions-shared] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
     // The picker builds thumbnail urls as API_BASE + '/api/box/thumbnail/<id>', which is
     // CROSS-ORIGIN and 401s since the Box surface was session-gated — a browser can't hold
     // the proxy secret and the SAML cookie doesn't travel to another origin. boxUrl() folds

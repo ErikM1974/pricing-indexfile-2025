@@ -17,7 +17,8 @@
 
 class SampleInventoryService {
     constructor() {
-        this.apiBase = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        this.apiBase = (typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) || '';
+        if (!this.apiBase) console.error('[sample-inventory-service] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
         this.cacheKey = 'sample_inventory_cache';
         this.cacheDuration = 5 * 60 * 1000; // 5 minutes (matches API cache)
         this.cache = new Map();

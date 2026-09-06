@@ -23,8 +23,9 @@
     var FA_HREF = '/shared_components/vendor/fontawesome/css/all.min.css?v=20260708'; // vendored 6.6.0 (roadmap 1.3)
 
     function apiBase() {
-        return (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) ||
-            'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        var base = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) || '';
+        if (!base) console.error('[sample-cart-service] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
+        return base;
     }
 
     /** Lazy-load Font Awesome (drawer + toast icons) on pages that skip it. */

@@ -24,6 +24,8 @@
  *
  * Last synchronized: 2025-10-04
  */
+var SP_MANUAL_API_BASE = (typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) || '';
+if (!SP_MANUAL_API_BASE) console.error('[screenprint-manual-pricing] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
 
 class ScreenPrintManualPricing {
     constructor() {
@@ -105,7 +107,7 @@ class ScreenPrintManualPricing {
         if (this.config.isManualMode) {
             console.log('[Manual] Loading raw API pricing data...');
             try {
-                const response = await fetch('https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/pricing-bundle?method=ScreenPrint');
+                const response = await fetch(SP_MANUAL_API_BASE + '/api/pricing-bundle?method=ScreenPrint');
                 if (!response.ok) {
                     throw new Error(`API request failed: ${response.status}`);
                 }

@@ -1,3 +1,5 @@
+var C112_API_BASE = (typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) || '';
+if (!C112_API_BASE) console.error('[c112-bogo-promo] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
 document.addEventListener('DOMContentLoaded', () => {
     // REMOVE const BASE_PRICE = 12.00;
     const MIN_ORDER_QUANTITY = 24;
@@ -169,7 +171,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function fetchAndRenderColors() {
         // Use the more comprehensive product-colors API endpoint
-        const apiUrl = `https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/product-colors?styleNumber=${PRODUCT_STYLE}`;
+        const apiUrl = ((typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) ? window.APP_CONFIG.API.BASE_URL + '/api/product-colors?styleNumber=${PRODUCT_STYLE}' : '');
+        if (!apiUrl) console.error('[c112-bogo-promo] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
         try {
             const response = await fetch(apiUrl);
             if (!response.ok) {
@@ -584,7 +587,7 @@ document.addEventListener('DOMContentLoaded', () => {
             customerDataForPdf = { ...customerDataPayload }; // Store for PDF regardless of API outcome
 
             try {
-                const response = await fetch('https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/customers', {
+                const response = await fetch(C112_API_BASE + '/api/customers', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(customerDataPayload)

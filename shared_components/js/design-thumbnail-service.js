@@ -19,8 +19,9 @@ const DesignThumbnailService = (() => {
     const _pending = new Map();
 
     function _getApiBase() {
-        return (window.APP_CONFIG && APP_CONFIG.API && APP_CONFIG.API.BASE_URL)
-            || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        const base = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) || '';
+        if (!base) console.error('[design-thumbnail-service] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
+        return base;
     }
 
     /**

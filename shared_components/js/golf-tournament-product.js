@@ -11,7 +11,8 @@
 (function () {
     'use strict';
 
-    const API_BASE = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+    const API_BASE = (typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) || '';
+    if (!API_BASE) console.error('[golf-tournament-product] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
     const STITCH_COUNT = 8000;
     const COMPANY_PHONE = '253-922-5793';
     const SALES_EMAIL = 'sales@nwcustomapparel.com';
