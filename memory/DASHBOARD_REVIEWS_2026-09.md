@@ -713,3 +713,40 @@ with focus return + Esc, session identity for the delete audit, icons `aria-hidd
 Lock: `tests/unit/bradley-screenprint-page.test.js`. Live: 0 active orders today (all terminal) —
 the empty state renders; card interactions are covered by the lock + the transfers twin's smoke.
 
+## Finished Photos capture + Library — review, 14 items (2026-09-05, `v2026.09.05.48`)
+
+`dashboards/finished-photos.html` + `js/finished-photos.js` (phone/iPad capture) and
+`finished-photos-library.html` + `js/finished-photos-library.js`. Both were already well built (no
+inline style, `[hidden]` guard, real `<button>`s) — the fixes are the failure paths and dialogs.
+
+1. 🔴 **Silent "empty" states** — customer search, designs and the manage list all did
+   `r.ok ? r.json() : { …: [] }`, so a 500 rendered as "No matches" / "No registered designs" /
+   "No photos for this customer yet" — a photographer would think the customer wasn't set up. Now
+   each throws and shows "…failed (HTTP 500)" with **Retry** (Erik's #1 rule).
+2. 🔴 **Publish toggle + Delete never reported failure** — PATCH ignored `r.ok`, both catches were
+   empty; the list just re-rendered unchanged. Now "✗ Photo NOT published/deleted: …" in the status
+   line, and a success line ("✓ Published to the portal.").
+3. **Rule 3** — the design-thumb and library-card `onerror="this.style.visibility='hidden'"` →
+   `data-onerror="blank"` + one capture-phase `error` listener → `.is-broken`.
+4. **Back arrow was invisible** — the capture page uses `<i class="fas fa-arrow-left">` but never
+   loads Font Awesome (mobile page, no dashboard chrome). Now `&larr;`. Lock forbids `<i class="fa`.
+5. **Pinch-zoom blocked** — `maximum-scale=1.0` removed from the viewport meta (WCAG 1.4.4).
+6. **Find modes** — tabs carry `aria-controls`, panes `role=tabpanel aria-labelledby`, ArrowLeft/Right
+   moves + selects (hand-rolled tabs predate `DashTabs`; left as-is otherwise).
+7. **Camera / Album buttons are `<label for=file>`** → not focusable. Now `role=button tabindex=0`
+   with Enter/Space clicking the input.
+8. **Scanner sheet + lightbox** = `role=dialog aria-modal` labelled; focus → Close, returns to the
+   trigger; document-level **Esc** closes whichever is open (lightbox first).
+9. Publish toggle `aria-pressed` + spoken label; Delete named; caption chips `role=group`.
+10. `fmtDate` → `parseCalendarDate` (both pages) — `YYYY-MM-DD` was read as UTC (day early in Pacific).
+11. **Library**: load failure had "refresh to retry" text → inline **Retry** button that re-runs `load(true)`.
+12. Library rep chips `aria-pressed` (+ visible pressed outline); Publish/Hide and View buttons named
+    per photo ("Hide Acme Co from the portal").
+13. Library lightbox `role=dialog aria-labelledby=fpl-lightbox-cap`, focus in/return; `fpl-sub` is
+    `role=status`; banner close `type=button`; all icons `aria-hidden`.
+14. Lock: `tests/unit/finished-photos-pages.test.js`. Smoke on static-dist (mobile): failed search
+    shows the honest message, ArrowRight moves scan←search, scanner dialog focus + Esc return, library
+    Retry → data, chips pressed, lightbox focus/Esc — 0 overflow at 375px.
+
+Left alone: camera can't be exercised in the pane (permission blocked); `DashTabs` migration not worth
+it for three static tabs; `resolveBoxUrl` thumbs still hit Box directly (design decision).

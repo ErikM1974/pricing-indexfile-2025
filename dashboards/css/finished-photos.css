@@ -364,3 +364,9 @@ body {
 /* Back to the staff dashboard (2026-09-05 sweep — the page had no way out). */
 .fp-back { margin-left: auto; color: #fff; text-decoration: none; font-size: 13px; font-weight: 600; opacity: .9; white-space: nowrap; padding: 6px 10px; border: 1px solid rgba(255,255,255,.35); border-radius: 6px; }
 .fp-back:hover { opacity: 1; background: rgba(255,255,255,.12); }
+
+/* 2026-09-05 review */
+.fp-d-img.is-broken { visibility: hidden; }
+.fp-camera-btn:focus-visible, .fp-album-btn:focus-visible, .fp-btn:focus-visible, .fp-result:focus-visible,
+.fp-design:focus-visible, .fp-cchip:focus-visible, .fp-toggle:focus-visible, .fp-del:focus-visible,
+.fp-mrow-thumb:focus-visible, .fp-scan-close:focus-visible, .fp-lightbox-close:focus-visible, .fp-back:focus-visible { outline: 2px solid var(--fp-green, #2e7d32); outline-offset: 2px; }

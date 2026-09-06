@@ -258,3 +258,8 @@
 /* Page theme (2026-09-03, dashboard Workspaces): the photos family — the Photo Capture
    app's own greens (--fp-green / --fp-green-deep), so Library and Capture match. */
 :root { --dash-theme: #2e7d32; --dash-theme-dark: #14351c; --dash-theme-bg: #f1f8e9; }
+
+/* 2026-09-05 review */
+.fpl-card-imgbtn img.is-broken { visibility: hidden; }
+.fpl-chip[aria-pressed="true"] { outline: 2px solid var(--gray-900); outline-offset: -2px; }
+.fpl-chip:focus-visible, .fpl-pub-btn:focus-visible, .fpl-card-imgbtn:focus-visible, .fpl-lightbox-close:focus-visible { outline: 2px solid var(--gray-900); outline-offset: 2px; }
