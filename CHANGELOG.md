@@ -1,3 +1,9 @@
+## v2026.09.06.37 (2026.09.06)
+
+- Memory: EmailJS Rule 6 + accessibility pass recorded (v2026.09.06.36); vendor-portal LESSONS entry archived
+- Console sweep: ~700 bare console.log in 68 served scripts gated behind localhost / ?debug=1; path-aware orphan lock
+- Deploy v2026.09.06.37: console.log gated in every served script; path-aware orphan lock
+
 ## v2026.09.06.36 (2026.09.06)
 
 - Memory: 69-file deletion recorded as done (v2026.09.06.35), live smoke noted
