@@ -97,7 +97,7 @@
             + cfg.steps.map((s, i) =>
                 '<button type="button" class="guided-step" data-step="' + i + '">'
                 + '<span class="gs-num"><span class="gs-n">' + (i + 1) + '</span><i class="fas fa-check gs-check" aria-hidden="true"></i></span>'
-                + '<span class="gs-txt"><span class="gs-title"><i class="fas ' + s.icon + '"></i> ' + s.title + '</span>'
+                + '<span class="gs-txt"><span class="gs-title"><i class="fas ' + s.icon + '" aria-hidden="true"></i> ' + s.title + '</span>'
                 + '<span class="gs-hint">' + s.hint + '</span></span>'
                 + '</button>').join('')
             + '<button type="button" class="guided-toggle" title="Switch between the guided steps and the classic all-on-one-page workbench">'

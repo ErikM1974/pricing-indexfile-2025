@@ -156,7 +156,7 @@
                 return `
                     <div class="pants-waist-group ${isExpanded ? 'expanded' : 'collapsed'}">
                         <div class="waist-header" data-call="toggleWaistGroup" data-args='["$this"]'>
-                            <i class="fas fa-chevron-${isExpanded ? 'down' : 'right'}"></i>
+                            <i class="fas fa-chevron-${isExpanded ? 'down' : 'right'}" aria-hidden="true"></i>
                             <span>Waist ${escapeHtml(waist)}</span>
                             <span class="waist-count">(${waistGroups[waist].length} sizes)</span>
                         </div>
