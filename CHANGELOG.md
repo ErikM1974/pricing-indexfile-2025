@@ -1,3 +1,8 @@
+## v2026.09.05.65 (2026.09.05)
+
+- Payroll + Forms Inbox + Forms Library review: 18 items — local calendar dates (payroll pill/slip run date, Date_Returned were UTC), manual-lead badge + Leads chip, aria-pressed chips/tiles, tablists with arrows, Retry on every load, dialog focus return, decorative icons, versioned assets
+- Deploy v2026.09.05.65: Payroll + Forms Inbox + Forms Library review (18 items)
+
 ## v2026.09.05.63 (2026.09.05)
 
 - SanMar Payables review: 14 items — local calendar dates (UTC today was a day ahead after 5 PM), imported cross-ref failure visible + Retry, load-error row survives feed re-renders, tablist + arrows, filter tiles, keyboard upload, decorative icons, progressbar via --w; shared invoice viewer labelled dialog + focus return + honest PO title, one version on 3 pages
