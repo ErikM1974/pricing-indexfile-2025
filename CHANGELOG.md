@@ -1,3 +1,10 @@
+## v2026.09.06.43 (2026.09.06)
+
+- Memory: screen-print tier-strip Rule #1 fix recorded (v2026.09.06.42)
+- LESSONS under the cap (dashboard-sweep entry archived)
+- DTG calculator: tier strip from the API tiers and sub-24 pricing through the canonical engine (was "1-23 → 24-47 + $50", now 1-11 / 12-23 per Caspio)
+- Deploy v2026.09.06.43: DTG calculator tiers + sub-24 pricing aligned with the engine
+
 ## v2026.09.06.42 (2026.09.06)
 
 - Memory: runtime a11y probe + CSP report-stream finding (v2026.09.06.41)
