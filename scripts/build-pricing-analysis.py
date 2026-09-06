@@ -26,8 +26,8 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA = os.path.join(ROOT, 'memory', 'pricing-analysis-data.json')
 OUT = os.path.join(ROOT, 'dashboards', 'pricing-analysis.html')
 
-CSS_VER = '2026.07.30.7'
-JS_VER = '2026.07.30.7'
+CSS_VER = '2026.09.05.74'
+JS_VER = '2026.09.05.74'
 TIERS = ['1-7', '8-23', '24-47', '48-71', '72+']
 BANDS = ['<$4', '$4-8', '$8-15', '$15-25', '$25+']
 BAND_LABEL = {
@@ -1402,8 +1402,8 @@ def build():
                 <h1 class="dash-header-title">Pricing Analysis <span class="pa-subhead">embroidery &amp; caps &mdash; what we charge, what it costs, what we are leaving behind</span></h1>
             </div>
             <div class="dash-header-right">
-                <span class="pa-lock" title="Admin only"><i class="fas fa-user-shield"></i> Admin</span>
-                <a href="/staff-dashboard.html" class="dash-back-link"><i class="fas fa-arrow-left"></i> Dashboard</a>
+                <span class="pa-lock" title="Admin only"><i class="fas fa-user-shield" aria-hidden="true"></i> Admin</span>
+                <a href="/staff-dashboard.html" class="dash-back-link"><i class="fas fa-arrow-left" aria-hidden="true"></i> Dashboard</a>
             </div>
         </header>
 

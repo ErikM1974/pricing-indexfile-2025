@@ -1167,3 +1167,31 @@ Rule-3 clean; the sweep is what the earlier passes left.
 9. Smoke on static-dist: api-usage meter `--w` computed width, bars `--h`; converter status/results
    `display:none` via `hidden`; drive-access 404 → "Try again" + `role=alert`; policy-migration 404 → Retry;
    ODBC reference schema (static JSON) renders with 0 bare icons; bandit page 0 bare icons.
+
+## AE Mission Control (hygiene) + Pricing Analysis + Price Audit Report — 8 items (2026-09-05, `v2026.09.05.74`) — ALL 54 linked pages now deep-reviewed
+
+1. **Mission Control** (`dashboards/js/ae-mission-control.js`, 2.7K — deep review was `.5`): bar widths
+   (`aemc-bh-fill`, kicker, condensed) and ladder marker positions via `--w`/`--x` custom properties — no
+   `.style.width/left`, no inline `width:`/`left:` strings; the existing lock's regex now accepts the custom
+   properties. **"Refresh to retry." ×12 panel messages → a one-click `Reload to retry` button** (one
+   delegated `[data-reload]` listener); the two banner texts drop the advice. Modal scroll lock via
+   `body.is-modal-open`; 42 + 15 icons `aria-hidden`; banner close typed; `?v=` bumped. The UI harness
+   (`tests/ui/test-ae-mission-control.html`) re-synced with `node scripts/sync-test-harness.js`.
+2. **Pricing Analysis is GENERATED** — edited `scripts/build-pricing-analysis.py` (2 header icons
+   `aria-hidden`, `CSS_VER`/`JS_VER` bumped) and re-ran it; structural self-check OK; the HTML diff is
+   exactly those 4 lines. Never hand-edit the HTML.
+3. **Price Audit Report** (static export): 14 icons `aria-hidden`, CSS `?v=` (was unversioned).
+4. Lock: `tests/unit/ae-mc-reports-hygiene.test.js`.
+5. 🔑 **API Usage meter "0px" scare** — after `.73` the live meter read `--w: 85%` yet `width: 0px`, even with
+   `width:300px !important` inline, while a fresh child rendered fine. Cause: `.au-meter-fill` has
+   `transition: width .24s` and Claude-in-Chrome's tab is a background tab — CSS transitions never advance,
+   so the computed value stays at the start (0). `transition:none` → 85% instantly. Same trap as the hidden
+   Browser pane (`DASHBOARD_REVIEWS` § Verification gotchas). Not a bug; nothing changed.
+6. Smoke on static-dist: Mission Control stops at the login check without a backend ("Could not confirm
+   your login: HTTP 404"), so the panels never render locally — the `Reload to retry` markup is covered by
+   the jest lock and verified live; 0 bare icons, banner close typed, 0 non-custom-property inline styles.
+   Pricing Analysis 33 tables / 0 bare icons; Price Audit Report 0 bare icons, CSS versioned.
+7. Left alone: Mission Control's 5-minute refresh and confetti; the Price Audit Report is a frozen export
+   (regenerate from its source when the numbers are refreshed).
+8. **Sweep complete**: every page linked from the staff dashboard (54 hrefs) has had a review pass in
+   this series (`.24` → `.74` today). Remaining known debt is listed per section as "Left alone".
