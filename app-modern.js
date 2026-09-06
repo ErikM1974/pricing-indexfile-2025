@@ -74,6 +74,7 @@ function buildTopNavCategories() {
             <div class="dropdown-search-container">
                 <input type="text"
                        id="categoryDropdownSearch"
+                       aria-label="Search categories"
                        class="dropdown-search-input"
                        placeholder="Search categories..."
                        autocomplete="off">

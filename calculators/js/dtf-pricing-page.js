@@ -89,7 +89,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 calculator.updateUpchargeTooltipContent();
             }
         } else {
-            console.warn('⚠️ [DTF] Calculator not found yet, data may be picked up by event listener');
+            dtfLog('[DTF] Calculator not found yet, data may be picked up by event listener');
         }
 
         // Hide loading, show product

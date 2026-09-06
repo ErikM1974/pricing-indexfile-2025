@@ -279,7 +279,7 @@ class ScreenPrintPricing {
 
                         <!-- Separate input container for 24-36 tier -->
                         <div class="sp-quantity-input-container-1 universal-quantity-input-container">
-                            <label class="sp-quantity-input-label universal-quantity-input-label">
+                            <label for="sp-qty-tier-1" class="sp-quantity-input-label universal-quantity-input-label">
                                 <i class="fas fa-calculator" aria-hidden="true"></i> Enter Exact Quantity (24-36 pieces):
                             </label>
                             <input type="number" id="sp-qty-tier-1" class="sp-quantity-input universal-quantity-input"
@@ -298,7 +298,7 @@ class ScreenPrintPricing {
 
                         <!-- Separate input container for 37-71 tier -->
                         <div class="sp-quantity-input-container-2 universal-quantity-input-container show">
-                            <label class="sp-quantity-input-label universal-quantity-input-label">
+                            <label for="sp-qty-tier-2" class="sp-quantity-input-label universal-quantity-input-label">
                                 <i class="fas fa-calculator" aria-hidden="true"></i> Enter Exact Quantity (37-71 pieces):
                             </label>
                             <input type="number" id="sp-qty-tier-2" class="sp-quantity-input universal-quantity-input"
