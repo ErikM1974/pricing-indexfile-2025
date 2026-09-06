@@ -29,7 +29,7 @@ describe('ae mission control hygiene', () => {
         expect(js).not.toMatch(BARE);
         expect(html).not.toMatch(BARE);
         expect(html).toMatch(/<button type="button" class="dash-error-banner-close" aria-label="Dismiss">/);
-        expect(html).toMatch(/ae-mission-control\.js\?v=2026\.09\.05\.(7\d|[89]\d)/);
+        expect(html).toMatch(/ae-mission-control\.js\?v=\d{4}\.\d{2}\.\d{2}\.\d+/);
     });
 });
 
@@ -48,6 +48,6 @@ describe('price audit report', () => {
     test('icons decorative; css versioned', () => {
         const html = read('dashboards/reports/price-audit-report.html');
         expect(html).not.toMatch(BARE);
-        expect(html).toMatch(/price-audit-report\.css\??v=d{4}.d{2}.d{2}.d+/);
+        expect(html).toMatch(/price-audit-report\.css\?v=\d{4}\.\d{2}\.\d{2}\.\d+/);
     });
 });

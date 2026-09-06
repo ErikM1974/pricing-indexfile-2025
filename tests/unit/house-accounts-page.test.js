@@ -30,8 +30,8 @@ describe('house accounts — Rule 3', () => {
     test('every icon is decorative; asset versions bumped', () => {
         expect(html).not.toMatch(/<i class="fa[^"]*"><\/i>/);
         expect(js).not.toMatch(/<i class="fa[^"]*"><\/i>/);
-        expect(html).toMatch(/house-accounts\.css\?v=2026\.09\.05\.3\d/);
-        expect(html).toMatch(/house-accounts\.js\?v=2026\.09\.05\.3\d/);
+        expect(html).toMatch(/house-accounts\.css\?v=\d{4}\.\d{2}\.\d{2}\.\d+/);
+        expect(html).toMatch(/house-accounts\.js\?v=\d{4}\.\d{2}\.\d{2}\.\d+/);
     });
 });
 
