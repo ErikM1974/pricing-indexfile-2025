@@ -46,6 +46,18 @@ describe('shared calculator scripts', () => {
         expect(read(J + 'manual-mode-indicator.js')).toMatch(/closest\('\.manual-mode-exit'\)/);
         expect(read(J + 'screenprint-pricing-v2.js')).toMatch(/class="sp-error-dismiss" aria-label="Dismiss"/);
     });
+    test('screen-print v2: the tier strip and every fee label come from the API tiers (2026-09-06)', () => {
+        // Live Caspio had moved to 24-47 (+$50) / 48-71 ($0) while the UI still said 24-36 (+$75) / 37-71 (+$50):
+        // the engine priced from the API, the buttons and "$X ÷ qty" hints did not. Never type a tier or a fee here again.
+        const js = read('shared_components/js/screenprint-pricing-v2.js');
+        expect(js).toMatch(/renderTierButtons\(\)\s*\{/);
+        expect(js).toMatch(/id="sp-tier-list"/);
+        expect(js).toMatch(/LTM_Fee/);
+        expect(js).not.toMatch(/sp-tier-24-36|sp-qty-tier-1|Small Batch Fee<\/small>\s*<\/button>\s*\n\s*<!--/);
+        expect(js).not.toMatch(/\$75 Small Batch|\$50 Small Batch|\(75 \/ clamped\)|\(50 \/ clamped\)|'24-36'|'37-71'/);
+        expect(js).toMatch(/map\['GRT-50'\]/); // art-setup tooltip amount from Service_Codes
+    });
+
     test('the extracted stylesheets exist', () => {
         expect(read('shared_components/css/calculator-inventory.css')).toMatch(/\.calc-inv-bar \{/);
         expect(read('shared_components/css/manual-mode-indicator.css')).toMatch(/\.manual-mode-banner/);
