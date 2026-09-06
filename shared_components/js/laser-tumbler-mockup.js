@@ -514,7 +514,7 @@
 
         var localStock = (page.localInventory && page.localInventory.totalStock) || 0;
         if (qty < SUPPLIER_MIN && localStock <= 0) {
-            box.innerHTML = '<div class="ltmk-quote-warning"><i class="fas fa-exclamation-triangle"></i> '
+            box.innerHTML = '<div class="ltmk-quote-warning"><i class="fas fa-exclamation-triangle" aria-hidden="true"></i> '
                 + 'This color has no local stock right now, so the minimum order is ' + SUPPLIER_MIN
                 + ' pieces (one case from our supplier). Call us at 253-922-5793 for options.</div>';
             return;
@@ -528,7 +528,7 @@
             unit = svc.halfDollarUp(svc.calculatePrice(parseFloat(wholesale)));
         } catch (err) {
             console.error('[laser-tumbler-mockup] Quote unavailable:', err);
-            box.innerHTML = '<div class="ltmk-quote-warning"><i class="fas fa-exclamation-triangle"></i> '
+            box.innerHTML = '<div class="ltmk-quote-warning"><i class="fas fa-exclamation-triangle" aria-hidden="true"></i> '
                 + 'Live pricing is unavailable right now — call us at 253-922-5793 for a quote.</div>';
             return;
         }

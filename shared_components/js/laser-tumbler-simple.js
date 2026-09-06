@@ -498,7 +498,7 @@ class LaserTumblerPage {
                 infoRow.classList.add('pricing-info-row');
                 infoRow.innerHTML = `
                     <td colspan="2" class="pricing-info">
-                        <i class="fas fa-info-circle"></i>
+                        <i class="fas fa-info-circle" aria-hidden="true"></i>
                         <span>Less than minimum (LTM) fee of $${tier.handlingFee.toFixed(2)} applies to orders under 12 pieces. This covers personalized service and setup time for very small orders.</span>
                     </td>
                 `;
@@ -511,7 +511,7 @@ class LaserTumblerPage {
                 warningRow.classList.add('pricing-warning-row');
                 warningRow.innerHTML = `
                     <td colspan="2" class="pricing-warning">
-                        <i class="fas fa-exclamation-triangle"></i>
+                        <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
                         <span>Unavailable - No local inventory. Minimum 24 pieces when ordering from supplier.</span>
                     </td>
                 `;
@@ -572,11 +572,11 @@ class LaserTumblerPage {
                 <!-- Local Warehouse (highlight first) -->
                 <div class="inventory-section local-inventory">
                     <h4 class="inventory-section-title">
-                        <i class="fas fa-warehouse"></i>
+                        <i class="fas fa-warehouse" aria-hidden="true"></i>
                         In Our Warehouse
                     </h4>
                     <div class="inventory-badge ${localStatusClass}">
-                        <i class="fas ${localStatusIcon}"></i>
+                        <i class="fas ${localStatusIcon}" aria-hidden="true"></i>
                         <span>${localStatusText}</span>
                     </div>
                     <div class="inventory-details">
@@ -590,11 +590,11 @@ class LaserTumblerPage {
                 <!-- Supplier Inventory -->
                 <div class="inventory-section supplier-inventory">
                     <h4 class="inventory-section-title">
-                        <i class="fas fa-truck"></i>
+                        <i class="fas fa-truck" aria-hidden="true"></i>
                         Supplier Inventory
                     </h4>
                     <div class="inventory-badge ${jdsStatusClass}">
-                        <i class="fas ${jdsStatusIcon}"></i>
+                        <i class="fas ${jdsStatusIcon}" aria-hidden="true"></i>
                         <span>${jdsStatusText}</span>
                     </div>
                     <div class="inventory-details">
@@ -681,7 +681,7 @@ class LaserTumblerPage {
         // Show loading spinner
         const loadingEl = document.getElementById('loading-spinner');
         if (loadingEl) {
-            loadingEl.style.display = 'flex';
+            loadingEl.hidden = false;
         }
     }
 
@@ -697,7 +697,7 @@ class LaserTumblerPage {
         // Hide loading spinner
         const loadingEl = document.getElementById('loading-spinner');
         if (loadingEl) {
-            loadingEl.style.display = 'none';
+            loadingEl.hidden = true;
         }
     }
 
@@ -708,7 +708,7 @@ class LaserTumblerPage {
         const errorEl = document.getElementById('error-message');
         if (errorEl) {
             errorEl.textContent = message;
-            errorEl.style.display = 'block';
+            errorEl.hidden = false;
         }
 
         this.hideLoading();

@@ -464,6 +464,10 @@
 
   function init() {
     if (!els.sections) return;
+    // "Clear filters" in the empty state forwards to the real control (was an inline handler)
+    document.querySelectorAll('[data-fc-clear]').forEach(function (b) {
+      b.addEventListener('click', function () { if (els.clear) els.clear.click(); });
+    });
     buildChips();
     render();      // instant paint with CDN placeholders…
     hydrate();     // …then swap in API model shots + price labels

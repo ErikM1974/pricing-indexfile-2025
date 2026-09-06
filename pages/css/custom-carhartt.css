@@ -132,3 +132,6 @@
     .cch-hero-grid { grid-template-columns: 1fr; gap: 24px; }
     .cch-hero-media { max-width: 420px; margin: 0 auto; }
 }
+
+/* 2026-09-05 review: non-interactive showcase tiles (Richardson) */
+.cch-tile--static { cursor: default; }

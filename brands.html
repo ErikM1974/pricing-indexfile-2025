@@ -17,7 +17,7 @@
     <!-- Styles -->
     <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/shared_components/css/nwca-2026-core.css?v=2026.08.25.4">
-    <link rel="stylesheet" href="/brands.css?v=2026.08.26.5">
+    <link rel="stylesheet" href="/brands.css?v=2026.09.06.2">
 </head>
 <body>
     <a class="skip-link" href="#main">Skip to content</a>
@@ -181,13 +181,13 @@
             </div>
 
             <!-- Error State -->
-            <div id="errorState" class="error-state" style="display: none;">
+            <div id="errorState" class="error-state" role="alert" hidden>
                 <p>Unable to load brands. Please try again later.</p>
-                <button onclick="location.reload()" class="btn-retry">Retry</button>
+                <button type="button" id="brandsRetry" class="btn-retry">Retry</button>
             </div>
 
             <!-- Brands Grid -->
-            <div id="brandsContainer" class="brands-container" style="display: none;">
+            <div id="brandsContainer" class="brands-container" hidden>
                 <!-- Brands will be dynamically inserted by brands.js -->
             </div>
         </div>
@@ -242,8 +242,9 @@
     </footer>
 
     <!-- Scripts -->
+    <script src="/config/app.config.js"></script>
     <script src="/shared_components/js/brands-registry.js?v=2026.07.25.3"></script>
-    <script src="/brands.js?v=2026.08.26.5"></script>
+    <script src="/brands.js?v=2026.09.06.2"></script>
     <script src="/shared_components/js/quote-cart-store.js?v=2026.08.19.5" defer></script>
 </body>
 </html>
