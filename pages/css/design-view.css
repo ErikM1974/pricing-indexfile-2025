@@ -400,3 +400,11 @@ body {
         max-height: 280px;
     }
 }
+
+/* 2026-09-05 review */
+[hidden] { display: none !important; }
+body.dv-modal-open { overflow: hidden; }
+.dv-hero-btn { display: block; width: 100%; background: none; border: 0; padding: 0; cursor: zoom-in; }
+.dv-hero-btn img { display: block; width: 100%; }
+button.dv-grid-item { font: inherit; background: none; border: 0; padding: 0; cursor: pointer; text-align: center; }
+.dv-hero-btn:focus-visible, .dv-grid-item:focus-visible, .dv-lightbox-close:focus-visible { outline: 3px solid #2e6f40; outline-offset: 3px; }
