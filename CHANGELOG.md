@@ -1,3 +1,9 @@
+## v2026.09.05.41 (2026.09.05)
+
+- Memory: pricing-bundle cache shipped as proxy v2026.09.05.4 (Heroku v1119)
+- Portal Directory + Lead Scorecard + Unqualified & Spam review: 20 items — feeds fail loudly with Retry (was a silent half-directory), staff Preview opens the portal mirror (Open bounced to customer login), no prompt(), hidden toggles; aria-pressed presets + --w bar; real tablist + rescan result as status not error; lock test
+- Deploy v2026.09.05.41: 5 files (portal-directory.html,lead-scorecard.html,unqualified-leads.html,...) — sales pages review cache-bust
+
 ## v2026.09.05.39 (2026.09.05)
 
 - House Accounts review: 13 items — YTD Sales tile no longer empties the grid (data-assignee keyed filter), inline onchange → data-change, 5 labelled dialogs with focus in/out + Esc, hidden toggles (Rule 3), keyboard expanders with aria-expanded, Retry, local calendar dates, audit trail author from session, aria-hidden icons, phone layout; lock test
