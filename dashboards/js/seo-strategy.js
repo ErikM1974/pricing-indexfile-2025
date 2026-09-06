@@ -28,7 +28,9 @@
         // Scroll-spy — highlight the TOC link for the topmost visible section
         function setActive(id) {
             links.forEach(function (link) {
-                link.classList.toggle('is-active', link.getAttribute('href') === '#' + id);
+                var on = link.getAttribute('href') === '#' + id;
+                link.classList.toggle('is-active', on);
+                if (on) link.setAttribute('aria-current', 'true'); else link.removeAttribute('aria-current');
             });
         }
 

@@ -38,14 +38,20 @@
     }
 
     function loadList() {
+        var root = document.getElementById('postList');
+        root.classList.add('dash-loading');
+        root.textContent = 'Loading posts…';
         api('?status=all').then(function (body) {
+            DashPage.hideError();
             state.posts = body.posts || [];
             renderList();
         }).catch(function (err) {
             console.error('[blog-editor] list failed:', err);
-            DashPage.showError('Unable to load posts (' + err.message + '). Refresh to retry.');
-            document.getElementById('postList').classList.remove('dash-loading');
-            document.getElementById('postList').textContent = 'Posts unavailable.';
+            DashPage.showError('Unable to load posts (' + err.message + ').');
+            root.classList.remove('dash-loading');
+            root.innerHTML = '<p class="be-empty" role="alert">Posts unavailable (' + esc(err.message) + '). ' +
+                '<button type="button" class="be-btn" id="postListRetry">Retry</button></p>';
+            var rb = document.getElementById('postListRetry'); if (rb) rb.addEventListener('click', loadList);
         });
     }
 
@@ -141,6 +147,15 @@
 
         document.querySelectorAll('.be-toolbar [data-md]').forEach(function (btn) {
             btn.addEventListener('click', function () { insertMd(btn.dataset.md); });
+        });
+        // The two upload controls are <label for=file> — make Enter/Space open the picker
+        document.querySelectorAll('.be-file-btn').forEach(function (lab) {
+            lab.addEventListener('keydown', function (e) {
+                if (e.key !== 'Enter' && e.key !== ' ') return;
+                e.preventDefault();
+                var input = document.getElementById(lab.getAttribute('for'));
+                if (input) input.click();
+            });
         });
         document.getElementById('fldBodyImage').addEventListener('change', function () {
             var input = this;
@@ -258,10 +273,12 @@
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ markdown: document.getElementById('fldBody').value }),
-        }).then(function (r) { return r.json(); }).then(function (body) {
+        }).then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }).then(function (body) {
             document.getElementById('previewPane').innerHTML = body.html || '';
         }).catch(function (err) {
+            // A stale preview would lie about what publishes — say it failed instead (Erik's #1 rule).
             console.error('[blog-editor] preview failed:', err);
+            document.getElementById('previewPane').innerHTML = '<p class="be-preview-fail">Preview unavailable (' + esc(err.message || 'request failed') + ') — keep writing, it retries on the next keystroke.</p>';
         });
     }
 
