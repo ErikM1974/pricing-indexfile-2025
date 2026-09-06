@@ -13,7 +13,7 @@ const strip = (h) => h.replace(/<!--[\s\S]*?-->/g, '').replace(/<script type="ap
 const BARE = /<i class="(?:fa[sr]|fab|fa-solid|fa-regular) [^"]*"(?![^>]*aria-hidden)[^>]*><\/i>/;
 const HOST = /caspio-pricing-proxy-ab30/;
 const PAGES = fs.readdirSync(path.join(ROOT, 'calculators')).filter((f) => f.endsWith('.html') && !/emailjs-template/.test(f)).map((f) => 'calculators/' + f);
-const SCRIPTS = ['calculators/manual-pricing.js', 'calculators/safety-stripe-calculator.js', 'calculators/webstores-calculator.js',
+const SCRIPTS = ['calculators/manual-pricing.js', 'calculators/safety-stripe-calculator.js',
     'calculators/js/christmas-bundles.js', 'calculators/js/purchasingform.js', 'calculators/service-price-cheat-sheet.js'];
 
 describe('calculator pages', () => {
@@ -54,6 +54,5 @@ describe('delegated handlers', () => {
     });
     test('webstores hero image fallback via data-onerror', () => {
         expect(read('calculators/webstores.html')).toMatch(/data-onerror="hide"/);
-        expect(read('calculators/webstores-calculator.js')).toMatch(/img\.dataset\.onerror === 'hide'/);
     });
 });

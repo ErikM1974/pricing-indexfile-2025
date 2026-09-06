@@ -21,7 +21,11 @@ describe('quote management hygiene', () => {
         expect(js).not.toMatch(BARE);
         expect(js).not.toMatch(/<i class="fas \$\{icon\}"><\/i>/);
         expect(html).not.toMatch(/<button(?![^>]*aria-label)[^>]*title="/);
-        expect(html).toMatch(/quote-management\.js\?v=2026\.09\.05\.(7\d|[89]\d)/);
+        // versioned at or after the 2026-09-05 review (deploys keep bumping it — compare, never pin a prefix)
+        const v = (html.match(/quote-management\.js\?v=(\d{4}\.\d{2}\.\d{2}\.\d+)/) || [])[1];
+        expect(v).toBeDefined();
+        const key = (s) => s.split('.').map(Number).reduce((acc, n, i) => acc + n * [1e9, 1e7, 1e5, 1][i], 0);
+        expect(key(v)).toBeGreaterThanOrEqual(key('2026.09.05.70'));
     });
 });
 

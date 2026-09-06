@@ -4,6 +4,61 @@ Resolved entries aged out of `LESSONS_LEARNED.md` (300-line cap). Newest first. 
 
 ---
 
+## Archived 2026-09-06
+
+## Company Numbers review: a date a day early, a refresh that wasn't, a goal nobody could change
+
+**Problem.** The revenue card said "Jun 5 - Sep 3" for a fetch that ran Jun 6 → Sep 4; the header
+promised "refreshes every 5 minutes" while seven of eight cards loaded once; the $3M annual goal
+was a JS constant (`ANNUAL_GOAL`) so a new year meant a deploy; "DEAD" (ShopWorks' dead-accounts
+rep) ranked as a salesperson; the static Production card had a refresh button that re-rendered
+the same file.
+**Root cause.** (1) `new Date('2026-09-04')` is UTC midnight = Sep 3 evening in Pacific — the
+same UTC/Pacific class as the 2026-08-26 dashboard bugs, this time in the range FORMATTER, not the
+range MATH, so the API window was right and only the label lied. (2) The refresh loop only ever
+called `initMetrics()`; the header copy was written for the whole page. (3) A "config" value that
+never had a Caspio home stays a constant until someone asks why it needs a deploy.
+**Solution.** `toLocalDate()` parses bare `YYYY-MM-DD` as a local calendar day; "Last N days" is
+N days inclusive (was N+1). One 5-minute tick refreshes every live card, only while the tab is
+visible (hidden tabs spend no Caspio calls; catch-up on return), with an `Updated h:mm` /
+`Failed h:mm` stamp per card. Goal → Service_Codes `CO-ANNUAL-GOAL` via `company-goal-service.js`
+through `/api/staff/service-codes`; the built-in default is used ONLY with a visible ⚠ (chip +
+team card). DEAD folds into House. Refresh button gone; footer prints `dataThrough` + `updatedAt`.
+**Prevention.** 🔑 A `YYYY-MM-DD` string is a DAY, never an instant — build it with
+`new Date(y, m-1, d)`; grep for `new Date(` over anything that formats a Caspio/ShopWorks day.
+🔑 Copy that describes behaviour ("refreshes every…", "based on N…") is a claim — lock it with a
+test that reads the code path, or print the truth from the data (stamps, `dataThrough`).
+🔑 A proxy WRITE (POST) needs the CRM secret and auto-mode blocks a shell that reads it — creating
+a Caspio row from a session is Erik's step, so ship the visible-fallback path first and hand him
+the one-line curl. 🔑 Placeholder reps (DEAD, House-Legacy) live in the archive forever — the
+consolidation set is the only filter; add to it, never to the query. (2026-09-04)
+
+---
+
+## Staff dashboard Workspaces: three traps the harness caught before anyone did
+
+**Problem.** The role-based tab layout (`workspace-controller.js`) landed Erik on the Office tab
+and its generated Everything tab silently dropped every Admin tool whenever the Admin tab was
+not the active one. Both passed the unit test and failed only in `tests/ui/test-workspaces.html`.
+**Root cause.** (1) `permissionsFromRole('admin')` fans out to `accountant`, `house`, `taneisha`,
+`nika` — a role→default map that checks `accountant` before `admin` sends every admin to Office.
+(2) The tab code hid inactive panels with the `hidden` ATTRIBUTE, but `hidden` on a
+`[data-requires-role]` node is nav-access-controller's gate signal ("not allowed / not yet
+resolved"), and the palette, My Stuff and the Everything builder all skip such nodes — so an
+inactive Admin tab looked "not allowed". (3) The repo's files are CRLF: a node edit script with
+`\n` in multi-line search strings matched nothing (single-line edits worked, which hid it), and a
+re-run then appended duplicate CSS blocks; the Bash tool's heredoc also breaks on 4-byte emoji.
+**Solution.** Check `admin` FIRST in the role map; panels switch with an `is-on` class and never
+touch `hidden`; the edit script is CRLF-aware and idempotent, written to a file and run with node.
+**Prevention.** 🔑 Any role→default mapping must treat the admin fan-out as a superset: match
+`admin` first. 🔑 One attribute, one owner: `hidden` on the dashboard belongs to nav-access; tab
+and fold visibility use classes. 🔑 A harness that lifts the REAL markup and drives the REAL
+controllers over a stubbed session finds what a structural unit test cannot — keep both.
+🔑 Multi-line string edits against this repo need `\r\n`; assert the match count and make the
+script idempotent before running it twice. (2026-09-03)
+
+---
+
 ## Archived 2026-09-03
 
 ## Bonus hero dial: money inside a fixed ring, and a CTA column that wrapped at every width (2026-09-01)

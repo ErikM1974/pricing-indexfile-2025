@@ -243,5 +243,7 @@ class QuoteAuditPage {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    const printBtn = document.getElementById('qa-print-btn');
+    if (printBtn) printBtn.addEventListener('click', () => window.print());
     new QuoteAuditPage();
 });

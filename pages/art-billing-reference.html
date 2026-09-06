@@ -13,31 +13,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Inline theme :root must come AFTER any imports of mockup-ruth.css; here we
          have no mockup-ruth.css so order is moot — kept for parity with the dashboards. -->
-    <style>:root { --art-theme: #009900; --art-theme-dark: #006600; --art-theme-light: #f0f9f0; --art-theme-hover: #009900; --art-theme-bg: #f0f9f0; --art-theme-bg-hover: #e6f7e6; --art-theme-bg-selected: #e0f5e0; --art-theme-rgba-15: rgba(0,153,0,0.15); --art-theme-rgba-10: rgba(0,153,0,0.1); }</style>
-    <style>
-        /* Standalone page wrapper. Reuses art-hub.css for the actual reference
-           content (.billing-code-card, .file-req-card, .file-def-card, .fee-card-*) —
-           those styles already exist; we just need a page chrome around them. */
-        body { background: #f8fafc; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; margin: 0; }
-        main.art-billing-reference {
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 28px 20px 60px;
-        }
-        .art-billing-reference > h1 {
-            font-size: 28px;
-            margin: 0 0 8px;
-            color: #111827;
-            font-weight: 700;
-        }
-        .art-billing-reference .page-intro {
-            font-size: 14px;
-            color: #4b5563;
-            margin: 0 0 28px;
-            line-height: 1.55;
-            max-width: 760px;
-        }
-    </style>
+    <link rel="stylesheet" href="/pages/css/art-billing-reference.css?v=2026.09.06.33">
 </head>
 <body>
     <div class="minimal-header">
@@ -139,15 +115,9 @@
 
         <!-- Quick Navigation -->
         <div class="quick-nav">
-            <button class="quick-nav-btn" onclick="document.getElementById('file-requirements').scrollIntoView({behavior: 'smooth'})">
-                File Requirements
-            </button>
-            <button class="quick-nav-btn" onclick="document.getElementById('file-definitions').scrollIntoView({behavior: 'smooth'})">
-                File Definitions
-            </button>
-            <button class="quick-nav-btn" onclick="document.getElementById('fee-structure').scrollIntoView({behavior: 'smooth'})">
-                Fee Structure
-            </button>
+            <a class="quick-nav-btn" href="#file-requirements">File Requirements</a>
+            <a class="quick-nav-btn" href="#file-definitions">File Definitions</a>
+            <a class="quick-nav-btn" href="#fee-structure">Fee Structure</a>
         </div>
 
         <!-- Section 1: File Requirements by Method -->

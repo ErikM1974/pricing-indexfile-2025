@@ -19,55 +19,8 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 ### 2-minute proxy outage: the commit shipped half the change, and the boot probe tested the other half (2026-08-27, ARCHIVED 2026-09-05): stage the WHOLE change (a `require` and the file it names land in one commit); the boot probe must exercise the route table, not just `listen`; a 2-minute outage is a half-shipped commit until proven otherwise. Full entry in archive.
 ### Top Sellers "flickers blank, refresh fixes it" (2026-08-26, ARCHIVED 2026-09-02): "works after refresh" = a cold query behind a response cache — time the UNCACHED path first; variant-heavy `limit=48` pages hydrate 10k rows, so partition STYLE IN chunks in parallel; `?isTopSeller=1` is silently ignored (route wants `true`) — validate the result set before trusting a timing. Full entry in archive.
 ### Customer portal redesign + reward-dollar accrual (2026-09-01, ARCHIVED 2026-09-05): reward money is never computed silently — every ledger line names its source and the 8 `REWARD` Service_Codes rows ARE the program; never claw back automatically. Full entry in archive.
-## 2026-09-03 — Staff dashboard Workspaces: three traps the harness caught before anyone did
-
-**Problem.** The role-based tab layout (`workspace-controller.js`) landed Erik on the Office tab
-and its generated Everything tab silently dropped every Admin tool whenever the Admin tab was
-not the active one. Both passed the unit test and failed only in `tests/ui/test-workspaces.html`.
-**Root cause.** (1) `permissionsFromRole('admin')` fans out to `accountant`, `house`, `taneisha`,
-`nika` — a role→default map that checks `accountant` before `admin` sends every admin to Office.
-(2) The tab code hid inactive panels with the `hidden` ATTRIBUTE, but `hidden` on a
-`[data-requires-role]` node is nav-access-controller's gate signal ("not allowed / not yet
-resolved"), and the palette, My Stuff and the Everything builder all skip such nodes — so an
-inactive Admin tab looked "not allowed". (3) The repo's files are CRLF: a node edit script with
-`\n` in multi-line search strings matched nothing (single-line edits worked, which hid it), and a
-re-run then appended duplicate CSS blocks; the Bash tool's heredoc also breaks on 4-byte emoji.
-**Solution.** Check `admin` FIRST in the role map; panels switch with an `is-on` class and never
-touch `hidden`; the edit script is CRLF-aware and idempotent, written to a file and run with node.
-**Prevention.** 🔑 Any role→default mapping must treat the admin fan-out as a superset: match
-`admin` first. 🔑 One attribute, one owner: `hidden` on the dashboard belongs to nav-access; tab
-and fold visibility use classes. 🔑 A harness that lifts the REAL markup and drives the REAL
-controllers over a stubbed session finds what a structural unit test cannot — keep both.
-🔑 Multi-line string edits against this repo need `\r\n`; assert the match count and make the
-script idempotent before running it twice.
-
-
-## 2026-09-04 — Company Numbers review: a date a day early, a refresh that wasn't, a goal nobody could change
-
-**Problem.** The revenue card said "Jun 5 - Sep 3" for a fetch that ran Jun 6 → Sep 4; the header
-promised "refreshes every 5 minutes" while seven of eight cards loaded once; the $3M annual goal
-was a JS constant (`ANNUAL_GOAL`) so a new year meant a deploy; "DEAD" (ShopWorks' dead-accounts
-rep) ranked as a salesperson; the static Production card had a refresh button that re-rendered
-the same file.
-**Root cause.** (1) `new Date('2026-09-04')` is UTC midnight = Sep 3 evening in Pacific — the
-same UTC/Pacific class as the 2026-08-26 dashboard bugs, this time in the range FORMATTER, not the
-range MATH, so the API window was right and only the label lied. (2) The refresh loop only ever
-called `initMetrics()`; the header copy was written for the whole page. (3) A "config" value that
-never had a Caspio home stays a constant until someone asks why it needs a deploy.
-**Solution.** `toLocalDate()` parses bare `YYYY-MM-DD` as a local calendar day; "Last N days" is
-N days inclusive (was N+1). One 5-minute tick refreshes every live card, only while the tab is
-visible (hidden tabs spend no Caspio calls; catch-up on return), with an `Updated h:mm` /
-`Failed h:mm` stamp per card. Goal → Service_Codes `CO-ANNUAL-GOAL` via `company-goal-service.js`
-through `/api/staff/service-codes`; the built-in default is used ONLY with a visible ⚠ (chip +
-team card). DEAD folds into House. Refresh button gone; footer prints `dataThrough` + `updatedAt`.
-**Prevention.** 🔑 A `YYYY-MM-DD` string is a DAY, never an instant — build it with
-`new Date(y, m-1, d)`; grep for `new Date(` over anything that formats a Caspio/ShopWorks day.
-🔑 Copy that describes behaviour ("refreshes every…", "based on N…") is a claim — lock it with a
-test that reads the code path, or print the truth from the data (stamps, `dataThrough`).
-🔑 A proxy WRITE (POST) needs the CRM secret and auto-mode blocks a shell that reads it — creating
-a Caspio row from a session is Erik's step, so ship the visible-fallback path first and hand him
-the one-line curl. 🔑 Placeholder reps (DEAD, House-Legacy) live in the archive forever — the
-consolidation set is the only filter; add to it, never to the query.
+### Staff dashboard Workspaces — three traps the harness caught (2026-09-03, ARCHIVED 2026-09-06): check `admin` FIRST in any role→default map; `hidden` on the dashboard belongs to nav-access (tabs/folds use classes); a harness driving the REAL controllers finds what structural unit tests cannot; multi-line edits against this repo need `\r\n` and an asserted match count. Full entry in archive.
+### Company Numbers review — a date a day early, a refresh that wasn't, a goal nobody could change (2026-09-04, ARCHIVED 2026-09-06): `YYYY-MM-DD` parses as UTC midnight (use `toLocalDate()`); a Refresh button must re-fetch, not re-render; a business constant belongs in a Caspio `Service_Codes` row (`CO-ANNUAL-GOAL`) with a VISIBLE fallback. Full entry in archive.
 
 ## 2026-09-05 — JSON-in-attribute broke on the first quote (Names & Numbers delete button, `v2026.09.05.17`)
 **Problem:** after converting `onclick="dashboard.deleteRoster(${id}, '${esc(name)}')"` to `data-args="${esc(JSON.stringify([id, name]))}"`, the attribute read `[10,` — the delete button silently did nothing.
@@ -294,3 +247,30 @@ consumer; lock `staff-live-hygiene.test.js` checks the SCRIPTS that render into 
 - 🔑 The esbuild-hashed dashboard bundle (`dashboard-app.XXXXXXXX.js`, 8 chars) is versioned; a "10-hex"
   hash regex flags it falsely.
 
+## 2026-09-06 — Rule 6 sweep S3 (`v2026.09.06.31`): 118 scripts still guessed the proxy host, and two unit tests had been hitting the live API
+
+**Problem.** After every sweep, `no-hardcoded-hosts` still counted 222 proxy-host literals. 118
+browser scripts carried `|| 'https://caspio-pricing-proxy…'` (or a ternary, a direct
+`fetch('https://…')`, an object property, or a `return 'https://…'` accessor) — so a page that
+forgot `/config/app.config.js` silently worked against the literal and nobody noticed the config
+was missing. Two embroidery unit suites had passed for months only because the calculator's
+constructor fetched the LIVE proxy from Node.
+**Root cause.** Rule 6 was applied per-file when a file was touched; nothing swept the tree, and
+the fallback made the missing config invisible. The tests constructed `new Calc()` without
+`skipInit`, and the fallback host made that a real network call that happened to succeed.
+**Solution.** One script rewrote every fallback form to read `APP_CONFIG.API.BASE_URL` and log
+`[file] APP_CONFIG.API.BASE_URL missing` when absent (accessors return `''`); 18 forms the regex
+could not classify were rewritten by hand; `app.config.js` added in `<head>` of 32 consumer pages
+and moved ahead of the first script on 5 more (the homepage tag was `defer`, but `brands-flyout.js`
+instantiates at parse time). Baseline 222 → 42 (Node-side `lib/`, `scripts/`, the two sanctioned
+`EXACT_ONE` literals, three `preconnect` hints). Tests construct with `{ skipInit: true }`.
+**Prevention.** 🔑 A colon is not a ternary: `key: 'https://…'` inside an object literal matched
+the `[?:]` regex and became `key: ''` — a SILENT empty base; grep the diff for `: ''` after any
+regex rewrite. 🔑 Whole-file diffs after a scripted edit = line endings, not content: this repo
+mixes CRLF files, LF files and MIXED files (`dtg-pricing-service.js`); rebuild from `git show
+HEAD:` with `difflib` keeping each original line's ending, never `replace('\n','\r\n')`.
+🔑 A script that reads config at parse time needs the config tag BEFORE it, and `defer` on the
+config tag re-orders it after every non-deferred script. 🔑 A unit test that only passes with
+network access is an integration test in disguise — `skipInit` exists for exactly this.
+🔑 `git diff` on this OneDrive checkout warns "LF will be replaced by CRLF" for every touched
+file; silence it with `-c core.safecrlf=false`, it is not a content change.
