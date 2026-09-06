@@ -1,3 +1,8 @@
+## v2026.09.06.16 (2026.09.06)
+
+- Calculators final hygiene: compare-pricing + safety-stripe handlers via data-call delegator (window.compareCalc exposed), webstores onerror listener, christmas-bundles APP_CONFIG host + 185 logs gated, cheat-sheet fallback host removed, icons/versions/inline styles across every remaining calculator; lock calculator-hygiene.test.js
+- Deploy v2026.09.06.16: calculators final hygiene pass
+
 ## v2026.09.06.14 (2026.09.06)
 
 - Shared calculator components: APP_CONFIG hosts (5 scripts, unused backup host removed), injected <style> → 3 stylesheets, duplicate inventory IIFE + dead cart toast removed from pricing-pages, delegated handlers, gated logging, icons; config script moved to <head> on all 5 calculators; christmas-bundles duplicate resetForm removed; lock calculator-shared-components.test.js
