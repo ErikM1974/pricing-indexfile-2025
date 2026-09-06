@@ -711,3 +711,7 @@
         display: block !important;
     }
 }
+
+/* 2026-09-06 review */
+.banner-formula--airy { line-height: 1.7; }
+.banner-section-header--gap { margin-top: 24px; }

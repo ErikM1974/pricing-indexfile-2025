@@ -49,11 +49,11 @@
 
         <!-- ========== Quick-facts strip (replaces 3 info boxes) ========== -->
         <section class="quick-facts" aria-label="Pricing facts at a glance">
-            <div class="quick-fact"><i class="fas fa-robot"></i> <span>Pricing via AI chat</span></div>
-            <div class="quick-fact"><i class="fas fa-flag"></i> <span>$40 banner minimum</span></div>
-            <div class="quick-fact"><i class="fas fa-bolt"></i> <span>+25% rush &lt;5 days</span></div>
-            <div class="quick-fact"><i class="fas fa-palette"></i> <span>$50 setup if new art</span></div>
-            <div class="quick-fact"><i class="fas fa-clock"></i> <span>10–12 day standard</span></div>
+            <div class="quick-fact"><i class="fas fa-robot" aria-hidden="true"></i> <span>Pricing via AI chat</span></div>
+            <div class="quick-fact"><i class="fas fa-flag" aria-hidden="true"></i> <span>$40 banner minimum</span></div>
+            <div class="quick-fact"><i class="fas fa-bolt" aria-hidden="true"></i> <span>+25% rush &lt;5 days</span></div>
+            <div class="quick-fact"><i class="fas fa-palette" aria-hidden="true"></i> <span>$50 setup if new art</span></div>
+            <div class="quick-fact"><i class="fas fa-clock" aria-hidden="true"></i> <span>10–12 day standard</span></div>
         </section>
 
         <!-- Loading-error banner (shown by JS when API fails) -->
@@ -77,7 +77,7 @@
         <details class="pricing-accordion" id="bannerAccordion">
             <summary class="pricing-accordion-toggle">
                 <span class="toggle-label">
-                    <i class="fas fa-flag"></i>
+                    <i class="fas fa-flag" aria-hidden="true"></i>
                     Vinyl banner pricing
                 </span>
                 <span class="toggle-meta">$10/sqft · $40 minimum · 13oz vinyl</span>
@@ -87,11 +87,11 @@
             <div class="pricing-accordion-body">
                 <section class="banner-section" id="bannerSection">
                     <div class="banner-section-header">
-                        <h2><i class="fas fa-flag"></i> Vinyl Banners</h2>
+                        <h2><i class="fas fa-flag" aria-hidden="true"></i> Vinyl Banners</h2>
                         <span class="banner-section-eyebrow">13oz vinyl · Custom size · $10/sqft</span>
                     </div>
                     <div class="banner-rate-grid" id="bannerRateGrid">
-                        <div class="pricing-loading"><i class="fas fa-spinner fa-spin"></i> Loading banner rates…</div>
+                        <div class="pricing-loading"><i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Loading banner rates…</div>
                     </div>
                     <div class="banner-formula">
                         <strong>Formula:</strong> (Width&nbsp;×&nbsp;Height ÷&nbsp;144) × $10/sqft × Qty &nbsp;·&nbsp;
@@ -106,7 +106,7 @@
         <details class="pricing-accordion" id="pricingAccordion" open>
             <summary class="pricing-accordion-toggle">
                 <span class="toggle-label">
-                    <i class="fas fa-table"></i>
+                    <i class="fas fa-table" aria-hidden="true"></i>
                     Sticker pricing reference
                 </span>
                 <span class="toggle-meta">50 SKUs · sizes 2×2 → 6×6</span>
@@ -116,7 +116,7 @@
             <div class="pricing-accordion-body">
                 <section class="pricing-grid" id="pricingGrid" aria-label="Sticker pricing tables">
                     <div class="pricing-loading">
-                        <i class="fas fa-spinner fa-spin"></i> Loading pricing…
+                        <i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Loading pricing…
                     </div>
                 </section>
             </div>
@@ -126,7 +126,7 @@
         <details class="pricing-accordion" id="decalAccordion">
             <summary class="pricing-accordion-toggle">
                 <span class="toggle-label">
-                    <i class="fas fa-vector-square"></i>
+                    <i class="fas fa-vector-square" aria-hidden="true"></i>
                     Custom &amp; oversize decal pricing
                 </span>
                 <span class="toggle-meta">Sq-ft calculator · &gt;6×6 &amp; custom shapes</span>
@@ -144,13 +144,13 @@
 
                 <!-- Live calculator -->
                 <section class="decal-calc" id="decalCalc" aria-label="Custom decal quote calculator">
-                    <div class="decal-calc-head"><i class="fas fa-calculator"></i> Quick decal quote</div>
+                    <div class="decal-calc-head"><i class="fas fa-calculator" aria-hidden="true"></i> Quick decal quote</div>
 
                     <div class="decal-rows-head" aria-hidden="true">
                         <span>Width&nbsp;(in)</span><span>Height&nbsp;(in)</span><span>Qty</span><span>Sq ft</span><span></span>
                     </div>
                     <div class="decal-rows" id="decalSizeRows"><!-- JS injects size rows --></div>
-                    <button type="button" class="decal-add-row" id="decalAddRow"><i class="fas fa-plus"></i> Add another size</button>
+                    <button type="button" class="decal-add-row" id="decalAddRow"><i class="fas fa-plus" aria-hidden="true"></i> Add another size</button>
 
                     <div class="decal-calc-controls">
                         <label class="decal-check">
@@ -169,9 +169,9 @@
                 </section>
 
                 <!-- Rate card (API-driven — never hardcoded) -->
-                <h3 class="decal-subhead"><i class="fas fa-table"></i> Square-foot rate card</h3>
+                <h3 class="decal-subhead"><i class="fas fa-table" aria-hidden="true"></i> Square-foot rate card</h3>
                 <div id="decalRateGrid" class="decal-rate-wrap">
-                    <div class="pricing-loading"><i class="fas fa-spinner fa-spin"></i> Loading decal rates…</div>
+                    <div class="pricing-loading"><i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Loading decal rates…</div>
                 </div>
 
                 <div class="banner-formula">
@@ -182,7 +182,7 @@
                 </div>
 
                 <!-- Square-foot cheat sheet (geometry only — not pricing) -->
-                <h3 class="decal-subhead"><i class="fas fa-ruler-combined"></i> Square-foot cheat sheet</h3>
+                <h3 class="decal-subhead"><i class="fas fa-ruler-combined" aria-hidden="true"></i> Square-foot cheat sheet</h3>
                 <div class="decal-cheat-wrap">
                     <table class="pricing-table decal-cheat">
                         <thead><tr><th>Size</th><th>Sq ft each</th></tr></thead>
@@ -223,8 +223,8 @@
         <section class="cta-compact">
             <div class="cta-text">Need a custom quote, rush order, or help with art?</div>
             <div class="cta-links">
-                <a href="tel:253-922-5793"><i class="fas fa-phone"></i> (253) 922-5793</a>
-                <a href="mailto:sales@nwcustomapparel.com"><i class="fas fa-envelope"></i> sales@nwcustomapparel.com</a>
+                <a href="tel:253-922-5793"><i class="fas fa-phone" aria-hidden="true"></i> (253) 922-5793</a>
+                <a href="mailto:sales@nwcustomapparel.com"><i class="fas fa-envelope" aria-hidden="true"></i> sales@nwcustomapparel.com</a>
             </div>
         </section>
 
@@ -260,13 +260,13 @@
         <div class="ai-chat-messages" id="aiChatMessages" aria-live="polite"></div>
         <div class="ai-chat-actions" id="aiChatActions" hidden>
             <button type="button" class="ai-action-btn primary" id="aiOutlookBtn" disabled>
-                <i class="fas fa-envelope-open-text"></i> Open in Outlook
+                <i class="fas fa-envelope-open-text" aria-hidden="true"></i> Open in Outlook
             </button>
             <button type="button" class="ai-action-btn" id="aiCopyEmailBtn" disabled>
-                <i class="fas fa-copy"></i> Copy email
+                <i class="fas fa-copy" aria-hidden="true"></i> Copy email
             </button>
             <button type="button" class="ai-action-btn" id="aiSaveQuoteBtn" disabled>
-                <i class="fas fa-link"></i> Save &amp; share link
+                <i class="fas fa-link" aria-hidden="true"></i> Save &amp; share link
             </button>
         </div>
         <form class="ai-chat-input" id="aiChatForm">
@@ -282,7 +282,7 @@
 
     <!-- Share-link toast -->
     <div class="share-toast" id="shareToast" role="status" aria-live="polite">
-        <i class="fas fa-check-circle"></i>
+        <i class="fas fa-check-circle" aria-hidden="true"></i>
         <span id="shareToastText">Quote link copied — paste into your email or chat</span>
     </div>
 

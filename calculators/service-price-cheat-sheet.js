@@ -18,7 +18,8 @@
 
     const BASE_URL = (typeof APP_CONFIG !== 'undefined' && APP_CONFIG.API && APP_CONFIG.API.BASE_URL)
         ? APP_CONFIG.API.BASE_URL
-        : 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        : '';
+    if (!BASE_URL) console.error('[service-price-cheat-sheet] APP_CONFIG.API.BASE_URL missing — prices cannot load');
 
     // Fee courses: what to show and in what order. Prices come from Caspio by code; the
     // fallback price is used only when the API is down and is badged "fallback".

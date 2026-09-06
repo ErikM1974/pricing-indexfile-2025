@@ -632,3 +632,6 @@
         box-shadow: none;
     }
 }
+
+/* 2026-09-06 review */
+.stitch-note { font-size: 0.75rem; margin-left: 0.5rem; }

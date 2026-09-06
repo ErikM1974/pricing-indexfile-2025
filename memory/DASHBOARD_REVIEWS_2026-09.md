@@ -1323,3 +1323,17 @@ Lock: `tests/unit/calculator-shared-components.test.js`. The scripts every calcu
 
 **Left alone** — v2's `style="display:none"` regions + their `.style.display` toggles (consistent pair, 2,525-line file); pricing-pages' 26 inline styles in the legacy price-card templates; `shared_components/js/dtg-config.js` (orphan, still has a host fallback — no consumer); `calculators/archive/*` pages (archived).
 
+## Calculators — final hygiene pass, every remaining page (2026-09-06, `v2026.09.06.15`) — CALCULATOR SWEEP COMPLETE
+
+Lock: `tests/unit/calculator-hygiene.test.js` (parametrised over all 19 non-template calculator pages + 7 page scripts).
+
+1. **compare-pricing** — 18 inline handlers (`onchange="compareCalc.onX()"` ×17, `onclick`, `onkeypress`) → `data-change`/`data-call` through the shared `data-call-delegator.js` + an Enter-key listener; 🔴 the delegator resolves `window.compareCalc`, and the page's `let compareCalc` was NOT a window property (inline handlers see lexical globals; `data-call` does not) → `window.compareCalc = compareCalc` after construction — caught in the static-dist smoke (lookup did nothing). Page gained its `<h1>` (was a `div.page-title`); 13 + 7 icons decorative; 10 unversioned assets versioned; two inline styles → classes; debug logs removed.
+2. **safety-stripe-creator** — 9 `onclick` → `data-call`; the four stripe tiles are `role=button tabindex=0` with Enter/Space; required-field asterisks via `.req`; 6 assets versioned; icons.
+3. **webstores** — hero `onerror="this.style.display='none'"` → `data-onerror="hide"` + capture listener; 20 + 1 icons; 2 inline styles → classes.
+4. **christmas-bundles** — 🔴 3 hardcoded proxy hosts in the page script → `CB_API_BASE` from `APP_CONFIG` (config script added to `<head>`); **185 `console.log`** → gated `cbLog`; 41 + 26 icons decorative (incl. two dynamic `fa-${…}` forms).
+5. **service-price-cheat-sheet.js** — the ternary's hardcoded fallback host → `''` + console.error (Rule 6).
+6. **manual-pricing** (11 + 3 icons, 9 versions, 2 inline spans), **custom-decal-pricing** (11), **sticker-manual-pricing** (22), **purchasingform** (5 + a debug log), **richardson-2025** (3 versions), **laser-manual-pricing** (6 inline icon/paragraph styles → classes) — icons decorative everywhere; `screenprint-pricing-v2.js` had 3 icons with an `id` attribute the regex had skipped.
+7. Verified on static-dist: compare-pricing Enter → lookup → banner + method cards + 4 prices, a delegated `data-change` reaches `compareCalc.onEmbLTMQtyChange`; safety-stripe tile click AND Enter select (design area `grid`), `.req` red; webstores prices; christmas-bundles $213/$258/$295 with `CB_API_BASE` set; cheat sheet $75/$75/$25; laser-manual 0 inline styles, class colours applied.
+
+**Left alone** — inline `style="display:none"` + `.style.display` toggle PAIRS in compare/manual/safety/christmas (consistent; a per-page `hidden` migration); christmas-bundles' 45 cosmetic inline styles in its HTML; `calculators/archive/*`; `shared_components/js/dtg-config.js` orphan.
+

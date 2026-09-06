@@ -32,7 +32,6 @@ class ManualPricingCalculator {
         };
 
         this.checkUrlParams();
-        console.log('[ManualPricing] Calculator initialized');
     }
 
     // =========================================================
@@ -526,7 +525,7 @@ class ManualPricingCalculator {
         if (!body) return;
 
         if (rows.length === 0) {
-            body.innerHTML = '<div class="card-error"><i class="fas fa-exclamation-circle"></i> No pricing data available</div>';
+            body.innerHTML = '<div class="card-error"><i class="fas fa-exclamation-circle" aria-hidden="true"></i> No pricing data available</div>';
             return;
         }
 
@@ -577,7 +576,7 @@ class ManualPricingCalculator {
 
         // LTM note
         if (hasLTM && options.ltmNote) {
-            html += `<div class="ltm-note"><i class="fas fa-info-circle"></i> ${escapeHtml(options.ltmNote)}</div>`;
+            html += `<div class="ltm-note"><i class="fas fa-info-circle" aria-hidden="true"></i> ${escapeHtml(options.ltmNote)}</div>`;
         }
 
         body.innerHTML = html;
@@ -602,7 +601,7 @@ class ManualPricingCalculator {
     showCardError(bodyId, message) {
         const el = document.getElementById(bodyId);
         if (el) {
-            el.innerHTML = `<div class="card-error"><i class="fas fa-exclamation-circle"></i> ${escapeHtml(message)}</div>`;
+            el.innerHTML = `<div class="card-error"><i class="fas fa-exclamation-circle" aria-hidden="true"></i> ${escapeHtml(message)}</div>`;
         }
     }
 

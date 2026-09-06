@@ -197,3 +197,7 @@
         border-left: 4px solid var(--primary-color);
     }
 }
+
+/* 2026-09-06 review */
+.cost-input-group--wide { flex: 0 0 280px; }
+.dollar-sign--sm { font-size: 0.9rem; }
