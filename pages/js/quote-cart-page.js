@@ -211,8 +211,11 @@
     const sizesCache = {};
 
     function apiBase() {
-        return (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL)
-            || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        // Rule 6: from /config/app.config.js. Only the size-list lookup uses it (prices go through the same-origin engine);
+        // a missing config fails that lookup loudly instead of guessing a host.
+        const base = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) || '';
+        if (!base) console.error('[QuoteCart] APP_CONFIG.API.BASE_URL missing — size lists cannot load');
+        return base;
     }
 
     function fetchAvailableSizes(item) {

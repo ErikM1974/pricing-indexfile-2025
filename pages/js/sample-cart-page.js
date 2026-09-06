@@ -75,7 +75,9 @@ async function migrateCartUpcharges(cart) {
 
 
     let updated = false;
-    const apiBase = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+    // Proxy host from /config/app.config.js (Rule 6); a missing config surfaces in the price cells below, never a guessed host
+    const apiBase = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) || '';
+    if (!apiBase) console.error('[Sample Cart] APP_CONFIG.API.BASE_URL missing — sample prices cannot load');
 
     for (let i = 0; i < cart.length; i++) {
         const item = cart[i];
@@ -146,7 +148,7 @@ function updateCartSummary(cart) {
     const badge = document.querySelector('.cart-count-badge');
     if (badge) {
         badge.textContent = itemCount;
-        badge.style.display = itemCount > 0 ? 'flex' : 'none';
+        badge.hidden = !(itemCount > 0);
     }
 
     // Update summary bar
@@ -160,7 +162,7 @@ async function loadCart() {
     // === ENSURE CONTAINER IS VISIBLE (Fix for browser back button edge cases) ===
     const cartContainer = document.getElementById('cartContainer');
     if (cartContainer) {
-        cartContainer.style.display = 'block';
+        cartContainer.hidden = false;
     }
 
     let cart = getCartSamples();
@@ -217,27 +219,27 @@ async function loadCart() {
     if (cart.length === 0) {
         container.innerHTML = `
             <div class="empty-cart">
-                <i class="fas fa-shopping-cart"></i>
+                <i class="fas fa-shopping-cart" aria-hidden="true"></i>
                 <h3>Your sample cart is empty</h3>
                 <p>Start exploring our top-selling products and add samples to your cart!</p>
 
                 <div class="features">
                     <div class="feature">
-                        <i class="fas fa-shipping-fast"></i>
+                        <i class="fas fa-shipping-fast" aria-hidden="true"></i>
                         <div class="feature-text">
                             <h4>Free Samples</h4>
                             <p>Get physical samples to feel the quality</p>
                         </div>
                     </div>
                     <div class="feature">
-                        <i class="fas fa-palette"></i>
+                        <i class="fas fa-palette" aria-hidden="true"></i>
                         <div class="feature-text">
                             <h4>All Colors</h4>
                             <p>See the actual colors before ordering</p>
                         </div>
                     </div>
                     <div class="feature">
-                        <i class="fas fa-ruler"></i>
+                        <i class="fas fa-ruler" aria-hidden="true"></i>
                         <div class="feature-text">
                             <h4>Check Sizes</h4>
                             <p>Try on different sizes for the perfect fit</p>
@@ -246,7 +248,7 @@ async function loadCart() {
                 </div>
 
                 <a href="/catalog?topSellers=1" class="btn btn-primary" style="margin-top: 1rem; padding: 1rem 2.5rem; font-size: 1.1rem;">
-                    <i class="fas fa-search"></i>
+                    <i class="fas fa-search" aria-hidden="true"></i>
                     Browse Top Sellers
                 </a>
 
@@ -256,13 +258,13 @@ async function loadCart() {
             </div>
         `;
         // Hide contact form and summary bar
-        document.getElementById('contactForm').style.display = 'none';
-        document.getElementById('cartSummaryBar').style.display = 'none';
+        document.getElementById('contactForm').hidden = true;
+        document.getElementById('cartSummaryBar').hidden = true;
         return;
     } else {
         // Show contact form and summary bar if cart has items
-        document.getElementById('contactForm').style.display = 'block';
-        document.getElementById('cartSummaryBar').style.display = 'flex';
+        document.getElementById('contactForm').hidden = false;
+        document.getElementById('cartSummaryBar').hidden = false;
     }
 
     // === CRITICAL DEBUG POINT: Before rendering ===
@@ -317,13 +319,13 @@ async function loadCart() {
         // Generate inventory status badge
         let inventoryBadge = '';
         if (inventoryStatus === 'in_stock') {
-            inventoryBadge = '<div class="inventory-status-badge in-stock"><i class="fas fa-check-circle"></i> In Stock</div>';
+            inventoryBadge = '<div class="inventory-status-badge in-stock"><i class="fas fa-check-circle" aria-hidden="true"></i> In Stock</div>';
         } else if (inventoryStatus === 'low_stock') {
-            inventoryBadge = '<div class="inventory-status-badge low-stock"><i class="fas fa-exclamation-triangle"></i> Low Stock</div>';
+            inventoryBadge = '<div class="inventory-status-badge low-stock"><i class="fas fa-exclamation-triangle" aria-hidden="true"></i> Low Stock</div>';
         } else if (inventoryStatus === 'out_of_stock') {
-            inventoryBadge = '<div class="inventory-status-badge out-of-stock"><i class="fas fa-times-circle"></i> Out of Stock</div>';
+            inventoryBadge = '<div class="inventory-status-badge out-of-stock"><i class="fas fa-times-circle" aria-hidden="true"></i> Out of Stock</div>';
         } else if (inventoryStatus === 'unknown') {
-            inventoryBadge = '<div class="inventory-status-badge checking"><i class="fas fa-clock"></i> Stock confirmed at fulfillment</div>';
+            inventoryBadge = '<div class="inventory-status-badge checking"><i class="fas fa-clock" aria-hidden="true"></i> Stock confirmed at fulfillment</div>';
         }
 
         // Generate size-specific warnings
@@ -336,7 +338,7 @@ async function loadCart() {
             if (unavailableSizes.length > 0) {
                 sizeWarnings = `
                     <div class="inventory-warning error">
-                        <i class="fas fa-exclamation-circle"></i>
+                        <i class="fas fa-exclamation-circle" aria-hidden="true"></i>
                         <div>
                             <strong>Some sizes are unavailable:</strong>
                             ${unavailableSizes.join(', ')}
@@ -360,9 +362,9 @@ async function loadCart() {
                         ${totalQty} ${totalQty === 1 ? 'item' : 'items'} = $${itemTotal.toFixed(2)}
                     </div>
                 </div>
-                <div class="item-remove" onclick="removeItem(${index})">
-                    <i class="fas fa-times"></i>
-                </div>
+                <button type="button" class="item-remove" data-remove="${index}" aria-label="Remove ${escText(item.style || 'item')}">
+                    <i class="fas fa-times" aria-hidden="true"></i>
+                </button>
             </div>
         `;
         }).join('');
@@ -373,11 +375,11 @@ async function loadCart() {
         console.error('❌ [RENDER ERROR] Error message:', error.message);
         console.error('❌ [RENDER ERROR] Error stack:', error.stack);
         container.innerHTML = `
-            <div class="alert alert-danger" style="margin: 2rem; padding: 1.5rem; background: #fee2e2; border: 1px solid #f87171; border-radius: 8px;">
-                <h4 style="color: #991b1b; margin-bottom: 0.5rem;"><i class="fas fa-exclamation-triangle"></i> Display Error</h4>
-                <p style="color: #7f1d1d; margin: 0;">Failed to render cart items. Error: ${error.message}</p>
-                <button onclick="location.reload()" class="btn btn-primary" style="margin-top: 1rem;">
-                    <i class="fas fa-sync"></i> Reload Page
+            <div class="alert alert-danger sc-render-error" role="alert">
+                <h4><i class="fas fa-exclamation-triangle" aria-hidden="true"></i> Display Error</h4>
+                <p>Failed to render cart items. Error: ${escText(error.message)}</p>
+                <button type="button" class="btn btn-primary sc-reload">
+                    <i class="fas fa-sync" aria-hidden="true"></i> Reload Page
                 </button>
             </div>
         `;
@@ -417,11 +419,11 @@ document.getElementById('same-as-billing').addEventListener('change', function()
 
     if (this.checked) {
         // Hide shipping section and copy billing data
-        shippingSection.style.display = 'none';
+        shippingSection.hidden = true;
         copyBillingToShipping();
     } else {
         // Show shipping section
-        shippingSection.style.display = 'block';
+        shippingSection.hidden = false;
     }
 });
 
@@ -461,14 +463,14 @@ document.getElementById('sampleRequestForm').addEventListener('submit', async fu
             // Show validation alert
             const alertHtml = `
                 <div class="checkout-validation-alert">
-                    <i class="fas fa-exclamation-triangle"></i>
+                    <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
                     <div class="alert-content">
                         <h3>Cannot Complete Order</h3>
                         <p>${validation.message}</p>
                         <ul class="out-of-stock-list">
                             ${validation.outOfStockItems.map(item => `
                                 <li>
-                                    <i class="fas fa-times-circle"></i>
+                                    <i class="fas fa-times-circle" aria-hidden="true"></i>
                                     ${item.name} (${item.color})
                                 </li>
                             `).join('')}
@@ -566,7 +568,7 @@ document.getElementById('sampleRequestForm').addEventListener('submit', async fu
     // Disable submit button
     const submitBtn = e.target.querySelector('[type="submit"]');
     submitBtn.disabled = true;
-    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Submitting...';
 
     try {
         let shopWorksOrderNumber = null;
@@ -643,7 +645,7 @@ document.getElementById('sampleRequestForm').addEventListener('submit', async fu
         finishSampleLeadHandoff(shopWorksOrderNumber);
 
         // Show success message
-        document.getElementById('cartContainer').style.display = 'none';
+        document.getElementById('cartContainer').hidden = true;
         document.getElementById('confirmationId').textContent = shopWorksOrderNumber || 'SR-' + Date.now().toString().slice(-6);
         document.getElementById('successMessage').classList.add('show');
 
@@ -651,7 +653,7 @@ document.getElementById('sampleRequestForm').addEventListener('submit', async fu
         console.error('[Sample Cart] ❌ Error submitting order:', error);
         alert('There was an error submitting your order. Please try again or call us at 253-922-5793.\n\nError: ' + error.message);
         submitBtn.disabled = false;
-        submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Sample Request';
+        submitBtn.innerHTML = '<i class="fas fa-paper-plane" aria-hidden="true"></i> Submit Sample Request';
     }
 });
 // Load cart on page load — EXCEPT on a Stripe success return, where
@@ -795,7 +797,6 @@ async function createSampleLead(orderNumber, customerData, items) {
         });
         if (!resp.ok) throw new Error('HTTP ' + resp.status);
         var body = await resp.json().catch(function () { return {}; });
-        console.log('[Sample Cart] lead created for follow-up:', body.submissionId || '(no id returned)');
     } catch (e) {
         console.error('[Sample Cart] request NOT added to Leads (order '
             + (orderNumber || '?') + ' WAS still placed):', e);
@@ -853,3 +854,14 @@ if (term) window.location.href = '/catalog?q=' + encodeURIComponent(term);
 
 // Rendered cart rows use inline onclick — keep the handler global
 window.removeItem = removeItem;
+function escText(v) {
+    return String(v == null ? '' : v).replace(/[&<>"']/g, function (ch) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch];
+    });
+}
+// Remove / reload controls in rendered cart HTML (were inline handlers)
+document.addEventListener('click', function (e) {
+    const rm = e.target.closest('[data-remove]');
+    if (rm) { removeItem(Number(rm.dataset.remove)); return; }
+    if (e.target.closest('.sc-reload')) window.location.reload();
+});

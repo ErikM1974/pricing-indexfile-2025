@@ -86,7 +86,7 @@
     var colors = Array.isArray(style.colors) ? style.colors : [];
     return colors.map(function (c, i) {
       return '<button type="button" class="ssr-swatch' + (i === 0 ? ' is-selected' : '') + '"'
-        + ' style="background:' + hueHex(c.color_name) + '"'
+        + ' style="--swatch:' + hueHex(c.color_name) + '"'
         + ' title="' + esc(c.color_name) + '"'
         + ' data-color-name="' + esc(c.color_name) + '"'
         + ' data-catalog-color="' + esc(c.catalog_color) + '"'
@@ -224,7 +224,7 @@
       var count = collapsible ? ' <span class="ssr-head-count">(' + list.length + ')</span>' : '';
       root.innerHTML =
         '<div class="ssr-head"' + (collapsible ? ' role="button" tabindex="0" aria-expanded="' + (!isCollapsed) + '"' : '') + '>'
-        + '<span class="ssr-head-title"><i class="fas fa-bolt ssr-head-icon"></i>' + esc(title) + count + '</span>'
+        + '<span class="ssr-head-title"><i class="fas fa-bolt ssr-head-icon" aria-hidden="true"></i>' + esc(title) + count + '</span>'
         + (subtitle ? '<span class="ssr-head-sub">' + esc(subtitle) + '</span>' : '')
         + (collapsible ? '<i class="fas fa-chevron-down ssr-head-chevron" aria-hidden="true"></i>' : '')
         + '</div>'
