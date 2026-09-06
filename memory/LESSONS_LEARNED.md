@@ -18,83 +18,7 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 ### /inventorylevels leaked wholesale cost + supplier anonymously (2026-08-27, ARCHIVED 2026-09-03): an anonymous route that must stay open for one public caller gets a field PROJECTION (`INVENTORY_PUBLIC_FIELDS` whitelist), not a gate; jest-lock the projection red-first. Full entry in archive.
 ### 2-minute proxy outage: the commit shipped half the change, and the boot probe tested the other half (2026-08-27, ARCHIVED 2026-09-05): stage the WHOLE change (a `require` and the file it names land in one commit); the boot probe must exercise the route table, not just `listen`; a 2-minute outage is a half-shipped commit until proven otherwise. Full entry in archive.
 ### Top Sellers "flickers blank, refresh fixes it" (2026-08-26, ARCHIVED 2026-09-02): "works after refresh" = a cold query behind a response cache — time the UNCACHED path first; variant-heavy `limit=48` pages hydrate 10k rows, so partition STYLE IN chunks in parallel; `?isTopSeller=1` is silently ignored (route wants `true`) — validate the result set before trusting a timing. Full entry in archive.
-## Customer portal redesign + reward-dollar accrual — the self-service portal, and money that must never be computed silently (2026-09-01)
-
-**Problem.** The portal was four tabs on one scroll: logos/invoices/orders existed but a customer
-could not approve a proof, download a logo, see tracking, print a statement, ask for a quote, or
-see their quotes without emailing the rep. Reward dollars were hand-granted with no rule.
-
-**Solution.** App-shell redesign (sidebar spine + attention list + order drawer + statement +
-quotes + account) on the SAME allowlist endpoints, plus `/api/portal/me`, `/quotes`,
-`/order/:no/tracking`, `POST /api/portal/request` (general requests into the existing rep queue),
-and a reward ACCRUAL: garment lines on invoiced+paid orders in a 12-month window × a rate per
-SanMar piece-cost band, bands Erik-editable in Service_Codes (`REWARD`/`RWD-EARN`), posted from
-the admin console one grant per order keyed by Order_Ref. Detail → `memory/CUSTOMER_PORTAL_2026-09.md`.
-
-**Prevention / lessons.**
-- 🔴 **Credit that a customer can redeem is money: no default rate, ever.** With no config rows the
-  calculator returns configured:false and $0 with every line annotated — the ONE fallback that
-  must be a visible refusal, not a "reasonable" 1%. Locked by `portal-reward-accrual.test.js`.
-- 🔴 **"Paid" needs a known balance.** `cur_Balance` can be null in ManageOrders; null ≠ 0. Paid =
-  `sts_Paid==='1'` OR a KNOWN zero balance on a non-zero invoice; `cur_TotalInvoice=0` rows
-  (`sts_Paid='8'`) never earn.
-- 🔑 **Idempotency by Order_Ref, recompute on post.** The console shows a breakdown, but the POST
-  recomputes server-side and grants only `reward − already granted` per order — a stale tab or a
-  double-click cannot double-pay, and client amounts are never trusted.
-- 🔑 **Verify a money calculation against LIVE data with the program INJECTED** before any config
-  exists: lift the block out of server.js, stub its four helpers, run it for one customer, read
-  every line. That turned "looks right" into $58.08 with the cost and band on each line.
-- 🔑 **A page that shares a stylesheet is a hidden consumer.** `customer-product.html` links
-  `customer-portal.css`; a full rewrite still had to keep every legacy `--cp-*` token as an
-  alias and the .cp-header/.cp-swatch/.cp-size/.cp-btn blocks. Grep the class list before rewriting.
-- 🔑 **Screenshots of an emulated phone can be a cropped 3× render** — measure
-  `scrollWidth`/`getBoundingClientRect` before "fixing" an overflow that isn't there.
-- 🔑 **Locally, a staff session is a cookie-session cookie signed by keygrip over `name=value`**
-  and a customer session is `lib/customer-magic-link.mintSession()` — both mintable from .env
-  secrets, so gated routes and the preview console can be exercised without SAML.
-- 🔴 **The proxy's ManageOrders limiter is ONE 30-requests/minute bucket per IP — the whole
-  dyno shares it.** `Promise.all` over 25 line-item calls trips it and `portalFetchJson` returns
-  null, which downstream reads as "no lines" (a 630-order web-store account lost every line).
-  Pace ManageOrders fan-outs (~2.2 s apart), cache immutable results (invoiced+paid line items),
-  bound each request under Heroku's 30 s H12 and return `partial` + progress. ⚠️ `buildMyProducts`
-  still fans out 25 in parallel — same latent bug.
-- 🔑 **Scope a money program to the orders it is FOR.** GOLD accounts looked like 600 orders/yr
-  until ORDER_ODBC showed 95% were Inksoft web-store purchases by employees. Excluding them made the
-  accrual tractable AND correct; a config row (`RWD-WEBSTORE`) can bring them back deliberately.
-- 🔑 **Caspio `Service_Codes.Notes` is Text-255** — a longer note 400s as "doesn't match the data
-  type", which reads like a schema error, not a length error.
-- 🔑 **The Heroku CLI session can expire mid-session while git pushes keep working** (git uses the
-  long-lived deploy token, the CLI uses its own ~14-day token). Symptoms: `heroku releases --json`
-  returns EMPTY (my poll loop parsed nothing 40 times) and `config:set` asks for a browser login with
-  `setRawMode is not a function`. Verify a release with the app's `/api/version` (or the proxy's
-  `/api/health` + a live probe of the new route), and set config vars through the Platform API:
-  `curl -X PATCH https://api.heroku.com/apps/<app>/config-vars -H "Authorization: Bearer $(cat ~/.heroku-deploy-token)" -H "Accept: application/vnd.heroku+json; version=3" -d '{"VAR":"1"}'`.
-- 🔑 **Before building a new mirror table, ask what already syncs.** I built an `ORDER_LINES` route +
-  CSV export before Erik pointed at `ManageOrders_LineItems` — the daily `sync-manageorders` archive
-  the rep bonuses already read. Same data, zero new plumbing. `grep -rn <TableName> ../caspio-pricing-proxy/scripts`
-  (and ask) is a two-minute check that saved nothing here because it ran too late.
-- 🔴 **Per-customer money JSON needs `Cache-Control: no-store`.** Express's default weak ETag let
-  Chrome answer a fresh portal load from its own copy and show a customer their PRE-grant $0
-  balance minutes after $97 had posted — the API returned 97 to curl the whole time. Any route
-  whose body changes because of a write elsewhere (balances, ledgers, statuses) sets no-store;
-  now done for every `/api/portal*` route in one middleware.
-- 🔑 **A mirror pulled by ORDER DATE goes stale for anything reopened later.** The 60-day
-  ManageOrders pull never revisits a March order re-invoiced in September. Two guards, both cheap:
-  the engine compares archived Σ(qty×price) to the LIVE `cur_SubTotal` it already holds and refetches
-  on a mismatch; the sync compares the archive to `ORDER_ODBC` (delta-synced by modification stamp,
-  any age) and re-pulls mismatches. Neither needs a modification column the archive does not have.
-- 🔑 **Money that was granted is a policy question, not a math one.** Erik: never claw back
-  automatically — but a zeroed $4,000 order must not keep its reward. Engine reports `overGranted`
-  (never a negative pending); a staff **Reverse** posts −min(over-grant, unspent balance). Per-order
-  `adjust` entries net against grants; only `redeem` counts as spent.
-- 🔴 **The proxy pre-push hook only lets `Release v…` / `Changelog v…` subjects onto main.** A
-  hand-typed "Release: …" merge was refused 4× and the force-push to undo it was (rightly) blocked —
-  follow `.claude/skills/deploy/SKILL.md` Steps 6-11 verbatim (commits captured BEFORE the merge,
-  `Release vTAG`, CHANGELOG commit, tag, push) even when hand-rolling.
-- 🔴 **Never put a multi-line text with backticks inside a double-quoted `node -e "…"` in bash** —
-  every `` `word` `` runs as a command and vanishes from the text (this entry was written twice).
-  Write the script to a file, or use a single-quoted heredoc.
-
+### Customer portal redesign + reward-dollar accrual (2026-09-01, ARCHIVED 2026-09-05): reward money is never computed silently — every ledger line names its source and the 8 `REWARD` Service_Codes rows ARE the program; never claw back automatically. Full entry in archive.
 ## Volume Quote page: re-rendering a list wiped what the user was typing in another row (2026-09-02)
 
 **Problem.** Building `/dashboards/volume-quote.html`: entering three styles in a row only ever
@@ -249,4 +173,39 @@ column", nothing writes it. A stat that reads 0 across 100% of rows is a data-pl
 check for the writer before reporting it as truth. Pairs with the deep-link lesson above: a chain
 (write → project → render) needs every hop, and the missing hop is invisible from either end.
 🔑 History before 2026-09-05 is unrecoverable — "Never" for old rows means "not recorded", not "never".
+
+## 2026-09-05 — Whole-dashboard deep-review sweep (`.24` → `.75`, 54 pages): the same six bugs kept reappearing
+
+**Problem.** Fifty-four staff pages, each "done" by a different session, shared the same defects: (1) a
+page's error banner span carried a class the shared helper never writes (`.dash-error-text` vs
+`.dash-error-banner-message`) so **every** failure on the Blog Editor showed an empty red bar; (2)
+`toISOString().slice(0,10)` as "today" on SIX pages (Payables default range + import-stamp, Payroll pill +
+slip run date, Forms Inbox `Date_Returned`, Volume Quote valid-until, Ruth's due badges, Monogram date
+filter) — a day ahead after 5 PM Pacific, and in Ruth's case "due today" read OVERDUE all day; (3) flex/grid
+wrappers beating the UA `[hidden]` rule (Jim's Mailing List showed an empty screenshot placeholder on every
+load; the vendor portal showed its error banner on every load); (4) `r.ok ? r.json() : {rows:[]}` rendering a
+500 as "No matches"/"No photos yet" (Finished Photos, Payables imports cross-ref → every row "NOT IMPORTED");
+(5) prices typed in reference UIs (Digitized Designs AL tables, Ruth's Billing Codes, the shared art-time
+modal's `* 75` in 18 places incl. a Caspio write); (6) click-only tiles/chips/rows and unlabelled dialogs.
+
+**Root cause.** Each page was built to work, not to fail: no page had a failure-path smoke, no shared
+lock caught a helper/class mismatch, and "today" was written six different ways because no helper existed.
+
+**Solution.** One jest lock per page (`tests/unit/<page>-page.test.js`, ~30 new files) + a section per page in
+`memory/DASHBOARD_REVIEWS_2026-09.md`; fixes verified on `static-dist` with fetch stubbed to FAIL first,
+then live in Erik's Chrome. Shared fixes: `artRate()` from Service_Codes GRT-75 with a visible fallback note;
+`/api/al-pricing` behind the Digitized AL modal; `SanMarInvoiceViewer` title/focus fixes for 3 pages.
+
+**Prevention.**
+- 🔴 **Smoke the failure path first**: on static-dist every same-origin API 404s — if a page shows an empty
+  state, a blank banner, or stale data instead of the reason + Retry, that is the bug.
+- 🔴 **"Today" = local calendar day** (`getFullYear/getMonth/getDate`), never `toISOString().slice(0,10)`;
+  Caspio `YYYY-MM-DD` parses via `parseCalendarDate()`; compare at DAY granularity.
+- 🔴 Every page CSS carries `[hidden] { display: none !important; }` — the lock for each page asserts it.
+- 🔴 A helper's DOM contract (`.dash-error-banner-message`, `.dash-error-banner-close`) is locked per page;
+  a wrong class is a silent error path.
+- 🔑 Computed colours/sizes go in `style="--w:…"` custom properties + a CSS `var()` — the lock regex allows
+  `style="--` and nothing else. Icons are `aria-hidden`; a `title`-only button also gets `aria-label`.
+- 🔑 Background tabs freeze CSS transitions — a `width` read as 0 with `--w: 85%` set is the tab, not the CSS
+  (`document.hidden`); set `transition:none` before trusting a computed size.
 
