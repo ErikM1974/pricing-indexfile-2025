@@ -1,3 +1,8 @@
+## v2026.09.05.67 (2026.09.05)
+
+- Jim's Mailing List + Commission Structure review: 11 items — [hidden] guard (empty screenshot placeholder showed on every load), aria-pressed views/chips, Try again on load failure, keyboard screenshot label; 22 inline styles to CSS, accordion buttons with aria-expanded, decorative icons, versioned assets
+- Deploy v2026.09.05.67: Jim's Mailing List + Commission Structure review (11 items)
+
 ## v2026.09.05.65 (2026.09.05)
 
 - Payroll + Forms Inbox + Forms Library review: 18 items — local calendar dates (payroll pill/slip run date, Date_Returned were UTC), manual-lead badge + Leads chip, aria-pressed chips/tiles, tablists with arrows, Retry on every load, dialog focus return, decorative icons, versioned assets
