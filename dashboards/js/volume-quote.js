@@ -62,9 +62,11 @@
 
     async function init() {
         wireEvents();
-        const today = new Date();
-        const valid = new Date(today.getTime() + 30 * 86400000);
-        $('vq-valid-until').value = valid.toISOString().slice(0, 10);
+        // Default "valid until" = 30 days out as a LOCAL calendar day (toISOString() is UTC — after 5 PM
+        // Pacific it is already tomorrow, so the default landed a day late every evening).
+        const valid = new Date();
+        valid.setDate(valid.getDate() + 30);
+        $('vq-valid-until').value = valid.getFullYear() + '-' + String(valid.getMonth() + 1).padStart(2, '0') + '-' + String(valid.getDate()).padStart(2, '0');
         await Promise.all([loadConfig(), loadReps()]);
         addLine();
         renderLines();
@@ -255,9 +257,9 @@
             renderLines(); render();
         });
         $('vq-copy').addEventListener('click', async () => {
-            try { await navigator.clipboard.writeText($('vq-memo').textContent); $('vq-copy').innerHTML = '<i class="fas fa-check"></i> Copied'; }
+            try { await navigator.clipboard.writeText($('vq-memo').textContent); $('vq-copy').innerHTML = '<i class="fas fa-check" aria-hidden="true"></i> Copied'; }
             catch (e) { DashPage.showError('Copy failed. Select the memo text and copy it manually.'); }
-            setTimeout(() => { $('vq-copy').innerHTML = '<i class="fas fa-copy"></i> Copy'; }, 1500);
+            setTimeout(() => { $('vq-copy').innerHTML = '<i class="fas fa-copy" aria-hidden="true"></i> Copy'; }, 1500);
         });
         // Two print modes: the internal memo (cost + margin) and the customer sheet (prices only).
         // The body class picks which card survives @media print; cleared after the dialog closes.
@@ -459,7 +461,7 @@
                     '<input type="text" class="vq-line-style" aria-label="Style number" value="' + esc(l.style) + '" placeholder="1566" autocomplete="off">' +
                     '<input type="number" class="vq-line-qty" aria-label="Quantity" min="0" step="1" value="' + (l.qty || '') + '" placeholder="500">' +
                     '<div class="vq-line-info"></div><div class="vq-line-info"></div><div class="vq-line-info"></div>' +
-                    '<button type="button" class="vq-line-remove" title="Remove"><i class="fas fa-times"></i></button>';
+                    '<button type="button" class="vq-line-remove" title="Remove" aria-label="Remove this style"><i class="fas fa-times" aria-hidden="true"></i></button>';
                 root.appendChild(row);
             }
             const d = l.data;

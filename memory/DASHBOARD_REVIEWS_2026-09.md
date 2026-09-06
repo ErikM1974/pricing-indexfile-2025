@@ -1076,3 +1076,37 @@ lightbox, Retry on every fetch, honest "locked" metrics). Fixes are hygiene:
 10. Left alone: `window.confirm` before delete / Mailchimp sync (deliberate friction).
 11. ⏭️ Next: Volume Quote, Blog Editor, SEO Strategy, then Quote Management + Purchasing Portal + Product
     Manager + the reference/admin pages.
+
+## Volume Quote + Blog Editor + SEO Strategy — review, 12 items (2026-09-05, `v2026.09.05.68`)
+
+**Blog Editor** (`dashboards/blog-editor.html` + `js/blog-editor.js`)
+1. 🔴 **Every error showed an EMPTY red banner** — the page's banner span was `.dash-error-text` but
+   `DashPage.showError` writes `.dash-error-banner-message`. Save failures ("NOT saved: …"), upload failures
+   and list failures all rendered as a blank red bar. Fixed + a Dismiss button (the helper wires it).
+2. Failed live preview used to keep the previous render on screen (a stale preview lies about what publishes)
+   → "Preview unavailable (HTTP …) — keep writing, it retries on the next keystroke"; `!r.ok` now throws.
+3. List failure → reason + Retry (was "Refresh to retry"); banner cleared on success.
+4. Toolbar icon buttons named (Bold / Italic / Bullet list / Insert link / Quote); "Upload image" + "Insert
+   image" `<label for=file>` → `role=button tabindex=0` + Enter/Space, inputs visually hidden with names;
+   "Hero image" label (no control) → labelled group; 15 icons `aria-hidden`; `[hidden]` guard; `?v=`.
+
+**Volume Quote** (`dashboards/volume-quote.html` + `js/volume-quote.js`) — pricing math untouched.
+5. Default "valid until" (today + 30) was `toISOString().slice(0,10)` → a day late after 5 PM Pacific → local.
+6. Remove-style buttons named; 12 icons `aria-hidden`; save status `role=status`; banner close typed;
+   `[hidden]` guard; `?v=` on css/js (were unversioned).
+7. 🔑 Left alone on purpose: `CreatedAt_Quote`/`AddedAt` are stamped `toISOString().replace(/\.\d{3}Z$/,'')`
+   (UTC wall-clock, no Z) — the SAME convention every quote builder uses (`embroidery-quote-service.js`),
+   so VQ stays consistent. Whether Caspio should hold UTC-no-Z vs Pacific wall-clock is a system-wide call
+   (CaspioDate treats naive stamps as Pacific) — flagged for Erik, not changed page-by-page.
+
+**SEO Strategy** (`dashboards/seo-strategy.html`, static)
+8. TOC `<nav aria-labelledby>`; scroll-spy sets `aria-current="true"` on the active link; 4 icons
+   `aria-hidden`; banner close typed; `?v=`; `[hidden]` guard.
+9. Lock: `tests/unit/office-content-pages.test.js`.
+10. Smoke on static-dist: Blog 404 → banner "Unable to load posts (HTTP 404)." (visible text now) + Retry;
+    stubbed → 1 row, editor opens, preview 500 → "Preview unavailable (HTTP 500)…"; VQ valid-until
+    2026-10-05 (UTC would be 10-06); SEO first TOC link `aria-current`.
+11. Left alone: VQ `loadReps` silent fallback to free text (rep name is free text by design); the Blog
+    `beforeunload` guard.
+12. ⏭️ Next: Quote Management hygiene (25 bare icons, 3 unnamed buttons — it had its own deep review
+    2026-09-05.2), Purchasing Portal, Product Manager, then the reference/admin pages.

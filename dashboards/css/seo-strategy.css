@@ -261,3 +261,6 @@
 @media (max-width: 640px) {
     .dash-shell table { display: block; overflow-x: auto; max-width: 100%; -webkit-overflow-scrolling: touch; }
 }
+
+/* 2026-09-05 review */
+[hidden] { display: none !important; }

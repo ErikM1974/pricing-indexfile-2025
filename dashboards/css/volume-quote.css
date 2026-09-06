@@ -145,3 +145,6 @@
     .vq-line > * { min-width: 0; }
     .vq-line-info { flex: 1 1 100%; }
 }
+
+/* 2026-09-05 review */
+[hidden] { display: none !important; }
