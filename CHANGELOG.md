@@ -1,3 +1,9 @@
+## v2026.09.06.22 (2026.09.06)
+
+- Builders: decorative icons in the 16 shared classic scripts the builders load (79 sites), consumer versions bumped, lock extended
+- Builders: last two concatenated icon forms decorative (guided, extended-sizes)
+- Deploy v2026.09.06.22: quote builders review — delegated events, decorative icons, fast-quote de-inlined
+
 ## v2026.09.06.19 (2026.09.06)
 
 - Quote builders review: shared delegator now covers change/input/blur/keydown/image-error; 185 inline handlers → data-* across the 4 builders + module templates; icons decorative; assets versioned; fast-quote de-inlined + vendored EmailJS; logging gates hardened for non-browser contexts; lock quote-builders-hygiene.test.js
