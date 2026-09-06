@@ -1,3 +1,8 @@
+## v2026.09.05.43 (2026.09.05)
+
+- Bradley Transfers review: 11 items — API base from APP_CONFIG (Rule 6), first-load error + Retry, stat chips as synced aria-pressed buttons (.active was never set), inline onerror/style removed (Rule 3), keyboard cards, labelled delete dialog with focus return + Esc, link-modal listener leak fixed, session identity for delete audit; lock test
+- Deploy v2026.09.05.43: 3 files (bradley-transfers.html,transfer-detail.html,supacolor-job-detail.html) — Bradley Transfers review cache-bust
+
 ## v2026.09.05.41 (2026.09.05)
 
 - Memory: pricing-bundle cache shipped as proxy v2026.09.05.4 (Heroku v1119)
