@@ -1,3 +1,8 @@
+## v2026.09.05.47 (2026.09.05)
+
+- Bradley Screen Print review: 11 items — page gains its h1 (was an h2), API base from APP_CONFIG, first-load error + Retry, synced aria-pressed chips, inline onerror/style removed, keyboard cards, labelled delete dialog with focus return + Esc, session identity; lock test
+- Deploy v2026.09.05.47: 1 file (bradley-screenprint.html) — Screen Print review cache-bust
+
 ## v2026.09.05.45 (2026.09.05)
 
 - Supacolor Orders review: 10 items — API base from APP_CONFIG (Rule 6), first-load error + Retry, view chips as aria-pressed buttons, inline style/display toggles removed (Rule 3), labelled backfill dialog with focus return + Esc + keyboard paste zone, pagination nav, aria-hidden icons, phone layout; lock test
