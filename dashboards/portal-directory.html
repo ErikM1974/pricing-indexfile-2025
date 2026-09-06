@@ -8,7 +8,7 @@
     <link rel="icon" href="/favicon.png" type="image/png">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="/dashboards/css/portal-directory.css?v=1" rel="stylesheet">
+    <link href="/dashboards/css/portal-directory.css?v=2026.09.05.41" rel="stylesheet">
 </head>
 <body>
     <div class="pd-page">
@@ -16,20 +16,19 @@
         <header class="pd-header">
             <div class="pd-header-left">
                 <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
-                     alt="NWCA" class="pd-header-logo"
-                     onerror="this.style.display='none'">
+                     alt="Northwest Custom Apparel" class="pd-header-logo" data-onerror="hide">
                 <h1 class="pd-header-title">Customer Portals</h1>
             </div>
             <a href="/staff-dashboard.html" class="pd-back-btn">
-                <i class="fas fa-arrow-left"></i> Back to Dashboard
+                <i class="fas fa-arrow-left" aria-hidden="true"></i> Back to Dashboard
             </a>
         </header>
 
         <div class="pd-content">
             <!-- Toolbar -->
-            <div class="pd-toolbar" id="pd-toolbar" style="display:none;">
+            <div class="pd-toolbar" id="pd-toolbar" hidden>
                 <div class="pd-search-wrap">
-                    <i class="fas fa-search pd-search-icon"></i>
+                    <i class="fas fa-search pd-search-icon" aria-hidden="true"></i>
                     <input type="text" class="pd-search" id="pd-search" aria-label="Search portals"
                            placeholder="Search companies...">
                 </div>
@@ -38,34 +37,35 @@
                     <option value="nameAZ">Company A-Z</option>
                     <option value="mostItems">Most Items</option>
                 </select>
-                <div class="pd-stats" id="pd-stats"></div>
+                <div class="pd-stats" id="pd-stats" role="status"></div>
             </div>
 
             <!-- Loading -->
-            <div class="pd-loading" id="pd-loading">
+            <div class="pd-loading" id="pd-loading" role="status">
                 <div class="pd-spinner"></div>
                 <div class="pd-loading-text">Loading customer portals...</div>
             </div>
 
             <!-- Error -->
-            <div class="pd-error" id="pd-error" style="display:none;">
-                <div class="pd-error-icon"><i class="fas fa-exclamation-triangle"></i></div>
+            <div class="pd-error" id="pd-error" role="alert" hidden>
+                <div class="pd-error-icon"><i class="fas fa-exclamation-triangle" aria-hidden="true"></i></div>
                 <div class="pd-error-title" id="pd-error-title">Unable to Load</div>
                 <div class="pd-error-message" id="pd-error-message">Please refresh the page or try again later.</div>
+                <button type="button" class="pd-btn-open pd-btn-retry" id="pd-retry" data-call="_pdRetry"><i class="fas fa-rotate" aria-hidden="true"></i> Retry</button>
             </div>
 
             <!-- Card Grid -->
-            <div class="pd-grid" id="pd-grid" style="display:none;"></div>
+            <div class="pd-grid" id="pd-grid" hidden></div>
 
             <!-- Empty State -->
-            <div class="pd-empty" id="pd-empty" style="display:none;">
-                <div class="pd-empty-icon"><i class="fas fa-globe"></i></div>
+            <div class="pd-empty" id="pd-empty" role="status" hidden>
+                <div class="pd-empty-icon"><i class="fas fa-globe" aria-hidden="true"></i></div>
                 <div class="pd-empty-text">No customer portals yet. Portals are created when mockups or art requests are submitted.</div>
             </div>
         </div>
 
         <!-- Toast -->
-        <div class="pd-toast" id="pd-toast"></div>
+        <div class="pd-toast" id="pd-toast" role="status" aria-live="polite"></div>
 
         <!-- Footer -->
         <div class="pd-footer">
@@ -75,6 +75,6 @@
 
     <script src="/shared_components/js/app-config.js"></script>
     <script src="/shared_components/js/data-call-delegator.js"></script>
-    <script src="/dashboards/js/portal-directory.js?v=2026.09.05.16"></script>
+    <script src="/dashboards/js/portal-directory.js?v=2026.09.05.41"></script>
 </body>
 </html>

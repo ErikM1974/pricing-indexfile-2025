@@ -31,15 +31,31 @@
         document.getElementById('uq-search').addEventListener('input', function () {
             state.search = this.value.trim().toLowerCase(); render();
         });
-        Array.prototype.forEach.call(document.querySelectorAll('.uq-tab'), function (t) {
-            t.addEventListener('click', function () {
-                Array.prototype.forEach.call(document.querySelectorAll('.uq-tab'), function (x) { x.classList.remove('is-active'); });
-                t.classList.add('is-active');
-                state.cat = t.getAttribute('data-cat');
-                document.getElementById('section-title').textContent = state.cat === 'spam' ? 'Spam' : 'Unqualified';
-                document.getElementById('spam-note').style.display = state.cat === 'spam' ? '' : 'none';
-                load(state.cat);
+        var tabs = Array.prototype.slice.call(document.querySelectorAll('.uq-tab'));
+        function selectTab(t) {
+            tabs.forEach(function (x) {
+                var on = x === t;
+                x.classList.toggle('is-active', on);
+                x.setAttribute('aria-selected', on ? 'true' : 'false');
+                x.setAttribute('tabindex', on ? '0' : '-1');
             });
+            state.cat = t.getAttribute('data-cat');
+            document.getElementById('section-title').textContent = state.cat === 'spam' ? 'Spam' : 'Unqualified';
+            document.getElementById('spam-note').hidden = state.cat !== 'spam';
+            document.getElementById('uq-panel').setAttribute('aria-labelledby', t.id);
+            document.title = (state.cat === 'spam' ? 'Spam' : 'Unqualified') + ' Leads - Northwest Custom Apparel';
+            load(state.cat);
+        }
+        tabs.forEach(function (t, i) {
+            t.addEventListener('click', function () { selectTab(t); });
+            t.addEventListener('keydown', function (e) {
+                if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+                var n = tabs[(i + (e.key === 'ArrowRight' ? 1 : tabs.length - 1)) % tabs.length];
+                n.focus(); selectTab(n);
+            });
+        });
+        document.getElementById('uq-tbody').addEventListener('click', function (e) {
+            if (e.target.closest('#uq-retry')) { state.cache = {}; load(state.cat); }
         });
         // preload both counts for the badges
         load('spam');
@@ -60,7 +76,7 @@
         var btn = document.getElementById('btn-rescan');
         var orig = btn.innerHTML;
         btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Scanning…';
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Scanning…';
         DashPage.hideError();
         fetch('/api/crm-proxy/lead-classify/run', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' })
             .then(function (resp) {
@@ -73,12 +89,14 @@
                 state.cache = {};
                 load('spam'); prefetchCount('unqualified');
                 var added = (r.spam || 0) + (r.unqualified || 0);
-                DashPage.showError((r.classified || 0) === 0
+                // A successful rescan is news, not an error — it used to be shown in the red error banner.
+                var st = document.getElementById('uq-status');
+                st.textContent = (r.classified || 0) === 0
                     ? 'No new leads to categorize — everything is already sorted.'
                     : 'Claude categorized ' + r.classified + ' new lead' + (r.classified === 1 ? '' : 's') + ': ' +
                         (r.spam || 0) + ' spam, ' + (r.unqualified || 0) + ' unqualified, ' + (r.qualified || 0) + ' qualified' +
-                        (added ? ' (' + added + ' moved off the board).' : '.'),
-                    'info');
+                        (added ? ' (' + added + ' moved off the board).' : '.');
+                st.hidden = false;
             })
             .catch(function (err) {
                 DashPage.showError('Rescan failed: ' + err.message +
@@ -101,6 +119,7 @@
 
     function load(cat) {
         DashPage.hideError();
+        var st = document.getElementById('uq-status'); if (st && cat !== state.cat) st.hidden = true;
         document.getElementById('uq-tbody').innerHTML = '<tr><td colspan="5" class="uq-empty dash-loading">Loading…</td></tr>';
         if (state.cache[cat]) { setBadge(cat, state.cache[cat].length); render(); return; }
         fetchCat(cat).then(function (rows) {
@@ -109,8 +128,8 @@
             render();
         }).catch(function (err) {
             console.error('[unqualified] load failed:', err);
-            DashPage.showError('Unable to load ' + cat + ' leads (' + err.message + '). Refresh to retry.');
-            document.getElementById('uq-tbody').innerHTML = '<tr><td colspan="5" class="uq-empty"><i class="fas fa-triangle-exclamation"></i> Unavailable.</td></tr>';
+            DashPage.showError('Unable to load ' + cat + ' leads (' + err.message + ').');
+            document.getElementById('uq-tbody').innerHTML = '<tr><td colspan="5" class="uq-empty"><i class="fas fa-triangle-exclamation" aria-hidden="true"></i> Unavailable. <button type="button" id="uq-retry" class="uq-btn uq-retry"><i class="fas fa-rotate" aria-hidden="true"></i> Retry</button></td></tr>';
         });
     }
 

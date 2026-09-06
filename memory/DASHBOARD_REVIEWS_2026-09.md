@@ -617,3 +617,30 @@ Live: 34 accounts, $20.4k YTD, 0 console errors. Every modal exercised on `stati
 Left alone: `loadSyncStatus()` fetches every Nika + Taneisha account on each page load just to find the
 latest `Last_Sync_Date` (a proxy-side "last sync" endpoint would be the real fix — Caspio quota, not UI).
 
+## Portal Directory + Lead Scorecard + Unqualified & Spam — review, 20 items (2026-09-05, `v2026.09.05.41`)
+
+Three small sales pages done as one batch (lock: `tests/unit/sales-small-pages.test.js`).
+
+**Portal Directory** (`portal-directory.*`, 246 companies live):
+1. 🔴 **A failed feed rendered a silent half-directory** — `fetchMockups`/`fetchArtRequests` caught
+   their own errors and resolved `[]`, so a 404/500 on one source showed the other source as the whole
+   truth. Both now throw → error panel with the real message + **Retry**.
+2. 🔴 **"Open" was useless for staff** — it linked `/portal/:id`, which the server redirects to `/portal`
+   (customer session), bouncing staff to the customer login. Now **Preview** → `/portal-admin/preview/:id`
+   (the read-only staff mirror). "Copy Link" still copies the customer-facing URL.
+3. Inline `onerror=` on the logo → `data-onerror` + capture listener; 4 `style=display` → `hidden`
+   (+ `[hidden]` rule); disabled Preview uses a class, not inline opacity.
+4. Clipboard failure fell back to `prompt()` → a 6-second toast carrying the link.
+5. 988 icons `aria-hidden`; activity dot is `role=img "Last activity Sep 4, 2026"`; Copy/Preview named
+   per company; "1 art" → "1 art request(s)"; loading/stats/empty/toast are status regions.
+
+**Lead Scorecard** (`lead-scorecard.*`): presets carry `aria-pressed` (a custom Apply clears them);
+the value bar passes `--w` instead of `style="width"`; failure row gains Retry and clears the stale
+leads table; icons decorative; banner close `type=button`.
+
+**Unqualified & Spam** (`unqualified-leads.*`, 545 spam / 171 unqualified live): the tabs are a real
+tablist (`aria-selected`, `aria-controls`, roving `tabindex`, ArrowLeft/Right, panel labelled by the
+active tab, `document.title` per tab); 🔴 **the rescan SUCCESS message was displayed in the red error
+banner** (`DashPage.showError(msg, 'info')` — the helper has no info mode) → a green `#uq-status`
+line; spam note toggles with `hidden`; failure row gains Retry.
+

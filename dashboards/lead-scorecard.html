@@ -16,7 +16,7 @@
     <!-- 2026 design tokens (must load before dash-shell.css) -->
     <link rel="stylesheet" href="/shared_components/css/art-hub.css">
     <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
-    <link rel="stylesheet" href="/dashboards/css/lead-scorecard.css?v=2026.07.19.1">
+    <link rel="stylesheet" href="/dashboards/css/lead-scorecard.css?v=2026.09.05.41">
 </head>
 <body>
     <div class="dash-shell">
@@ -29,9 +29,9 @@
                 <h1 class="dash-header-title">Lead Scorecard</h1>
             </div>
             <div class="dash-header-right">
-                <button type="button" id="sc-refresh" class="sc-btn" title="Reload the scorecard"><i class="fas fa-rotate"></i> Refresh</button>
+                <button type="button" id="sc-refresh" class="sc-btn" title="Reload the scorecard"><i class="fas fa-rotate" aria-hidden="true"></i> Refresh</button>
                 <a href="/dashboards/leads.html" class="dash-back-link">
-                    <i class="fas fa-table-columns"></i>
+                    <i class="fas fa-table-columns" aria-hidden="true"></i>
                     Leads board
                 </a>
             </div>
@@ -39,26 +39,26 @@
 
         <main class="dash-content">
             <div class="dash-error-banner" role="alert">
-                <i class="fas fa-exclamation-triangle"></i>
+                <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
                 <span class="dash-error-banner-message"></span>
-                <button class="dash-error-banner-close" aria-label="Dismiss">
-                    <i class="fas fa-times"></i>
+                <button type="button" class="dash-error-banner-close" aria-label="Dismiss">
+                    <i class="fas fa-times" aria-hidden="true"></i>
                 </button>
             </div>
 
             <div class="dash-card sc-controls-card">
                 <div class="sc-presets" role="group" aria-label="Date range presets">
-                    <button type="button" class="sc-preset" data-preset="taneisha-oct">Since Oct 2025</button>
-                    <button type="button" class="sc-preset" data-preset="ytd">This year</button>
-                    <button type="button" class="sc-preset" data-preset="90d">Last 90 days</button>
-                    <button type="button" class="sc-preset" data-preset="all">All time</button>
+                    <button type="button" class="sc-preset" data-preset="taneisha-oct" aria-pressed="false">Since Oct 2025</button>
+                    <button type="button" class="sc-preset" data-preset="ytd" aria-pressed="false">This year</button>
+                    <button type="button" class="sc-preset" data-preset="90d" aria-pressed="false">Last 90 days</button>
+                    <button type="button" class="sc-preset" data-preset="all" aria-pressed="false">All time</button>
                 </div>
                 <div class="sc-range">
                     <label class="sc-field"><span>From</span>
                         <input type="date" id="sc-since" class="sc-input"></label>
                     <label class="sc-field"><span>To</span>
                         <input type="date" id="sc-until" class="sc-input"></label>
-                    <button type="button" id="sc-apply" class="sc-btn sc-btn--primary"><i class="fas fa-magnifying-glass"></i> Apply</button>
+                    <button type="button" id="sc-apply" class="sc-btn sc-btn--primary"><i class="fas fa-magnifying-glass" aria-hidden="true"></i> Apply</button>
                 </div>
             </div>
 
@@ -106,7 +106,7 @@
             <div class="dash-card">
                 <div class="dash-card-header">
                     <h2 class="dash-card-title">Closed leads</h2>
-                    <span class="sc-count" id="leads-count"></span>
+                    <span class="sc-count" id="leads-count" role="status"></span>
                     <select id="sc-rep-filter" class="sc-input sc-rep-filter" aria-label="Filter by rep">
                         <option value="">All reps</option>
                     </select>
@@ -136,6 +136,6 @@
     <script src="/config/app.config.js"></script>
     <script src="/shared_components/js/fetch-timeout.js"></script>
     <script src="/shared_components/js/dash-page-helpers.js"></script>
-    <script src="/dashboards/js/lead-scorecard.js?v=2026.07.19.5"></script>
+    <script src="/dashboards/js/lead-scorecard.js?v=2026.09.05.41"></script>
 </body>
 </html>
