@@ -58,10 +58,10 @@
     </div>
 
     <div class="game-controls">
-        <button class="mode-btn active" onclick="setGameMode('tenure')">Years of Service</button>
-        <button class="mode-btn" onclick="setGameMode('position')">Job Positions</button>
-        <button class="mode-btn" onclick="setGameMode('birthday')">Birthdays</button>
-        <button class="mode-btn" onclick="setGameMode('mix')">Mix Challenge</button>
+        <button class="mode-btn active" data-call="setGameMode" data-args='["tenure"]'>Years of Service</button>
+        <button class="mode-btn" data-call="setGameMode" data-args='["position"]'>Job Positions</button>
+        <button class="mode-btn" data-call="setGameMode" data-args='["birthday"]'>Birthdays</button>
+        <button class="mode-btn" data-call="setGameMode" data-args='["mix"]'>Mix Challenge</button>
     </div>
 
     <div class="game-info">
@@ -93,11 +93,12 @@
             <p>Attempts: <span id="finalAttempts"></span></p>
             <p>Accuracy: <span id="accuracy"></span>%</p>
         </div>
-        <button class="btn" onclick="playAgain()">Play Again</button>
-        <button class="btn" onclick="nextMode()">Next Challenge</button>
+        <button class="btn" data-call="playAgain">Play Again</button>
+        <button class="btn" data-call="nextMode">Next Challenge</button>
     </div>
 </div>
 
+    <script src="/shared_components/js/data-call-delegator.js?v=2026.09.06.29"></script>
 <script src="/training/js/team-match-game.js?v=2026.09.05.12"></script>
 
 </body>

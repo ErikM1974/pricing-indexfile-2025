@@ -83,7 +83,7 @@
                     Bundle Orders
                 </h1>
                 <div class="header-actions">
-                    <button onclick="refreshSampleRequests()" class="quick-btn">
+                    <button data-call="refreshSampleRequests" class="quick-btn">
                         <i class="fas fa-sync-alt" aria-hidden="true"></i> Refresh
                     </button>
                 </div>
@@ -93,7 +93,7 @@
             <div class="filters-section">
                 <div class="filters-grid">
                     <input type="text" id="sampleSearchInput" placeholder="Search by name, email, or ID..." class="filter-input">
-                    <select id="sampleStatusFilter" onchange="filterSampleRequests()" class="filter-input">
+                    <select id="sampleStatusFilter" data-change="filterSampleRequests" class="filter-input">
                         <option value="">Active (No Archived)</option>
                         <option value="ALL">All (Including Archived)</option>
                         <option value="XMAS">Christmas Bundles Only</option>
@@ -104,7 +104,7 @@
                         <option value="Cancelled">Cancelled</option>
                         <option value="Archived">Archived</option>
                     </select>
-                    <select id="salesRepFilter" aria-label="Sales rep" onchange="filterSampleRequests()" class="filter-input">
+                    <select id="salesRepFilter" aria-label="Sales rep" data-change="filterSampleRequests" class="filter-input">
                         <option value="">All Sales Reps</option>
                         <option value="unassigned">Unassigned</option>
                         <option value="Nika">Nika</option>
@@ -112,8 +112,8 @@
                         <option value="Ruth">Ruth</option>
                         <option value="Erik">Erik</option>
                     </select>
-                    <input type="date" id="sampleDateFrom" onchange="filterSampleRequests()" class="filter-input">
-                    <input type="date" id="sampleDateTo" onchange="filterSampleRequests()" class="filter-input">
+                    <input type="date" id="sampleDateFrom" data-change="filterSampleRequests" class="filter-input">
+                    <input type="date" id="sampleDateTo" data-change="filterSampleRequests" class="filter-input">
                 </div>
 
                 <!-- Icon Legend -->
@@ -163,7 +163,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h3>Bundle Order Details</h3>
-                <button onclick="closeSampleDetails()" class="modal-close">
+                <button data-call="closeSampleDetails" class="modal-close">
                     <i class="fas fa-times" aria-hidden="true"></i>
                 </button>
             </div>
@@ -172,16 +172,16 @@
             </div>
             <div class="modal-footer">
                 <div class="modal-actions">
-                    <button onclick="archiveRequest()" class="quick-btn" style="background: #6b7280; color: white;">
+                    <button data-call="archiveRequest" class="quick-btn" style="background: #6b7280; color: white;">
                         <i class="fas fa-archive" aria-hidden="true"></i> Archive
                     </button>
-                    <button onclick="downloadOrderPDF()" class="quick-btn" style="background: #dc2626; color: white;">
+                    <button data-call="downloadOrderPDF" class="quick-btn" style="background: #dc2626; color: white;">
                         <i class="fas fa-file-pdf" aria-hidden="true"></i> Download PDF
                     </button>
                 </div>
                 <div class="modal-actions">
-                    <button onclick="closeSampleDetails()" class="quick-btn">Close</button>
-                    <button id="markProcessedBtn" onclick="markAsProcessed()" class="quick-btn" style="background: #10b981; color: white;">
+                    <button data-call="closeSampleDetails" class="quick-btn">Close</button>
+                    <button id="markProcessedBtn" data-call="markAsProcessed" class="quick-btn" style="background: #10b981; color: white;">
                         <i class="fas fa-check" aria-hidden="true"></i> Mark as Processed
                     </button>
                 </div>
@@ -190,6 +190,7 @@
     </div>
 
     <!-- Bundle Orders Dashboard JavaScript -->
+    <script src="/shared_components/js/data-call-delegator.js?v=2026.09.06.29"></script>
     <script src="/dashboards/bundle-orders.js?v=2026.08.26.3"></script>
 </body>
 </html>

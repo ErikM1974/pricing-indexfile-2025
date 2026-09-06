@@ -37,19 +37,19 @@
         </div>
 
         <div class="game-modes">
-            <div class="mode-card" onclick="startMode('explorer')">
+            <div class="mode-card" data-call="startMode" data-args='["explorer"]'>
                 <h3>🔍 Field Explorer</h3>
                 <p>Learn about each field and its purpose in customer setup</p>
             </div>
-            <div class="mode-card" onclick="startMode('simulator')">
+            <div class="mode-card" data-call="startMode" data-args='["simulator"]'>
                 <h3>💼 Setup Simulator</h3>
                 <p>Practice setting up real customer scenarios</p>
             </div>
-            <div class="mode-card" onclick="startMode('detective')">
+            <div class="mode-card" data-call="startMode" data-args='["detective"]'>
                 <h3>🕵️ Field Detective</h3>
                 <p>Identify and fix errors in customer records</p>
             </div>
-            <div class="mode-card" onclick="startMode('speed')">
+            <div class="mode-card" data-call="startMode" data-args='["speed"]'>
                 <h3>⚡ Speed Challenge</h3>
                 <p>Test your knowledge against the clock</p>
             </div>
@@ -60,6 +60,7 @@
         </div>
     </div>
 
+    <script src="/shared_components/js/data-call-delegator.js?v=2026.09.06.29"></script>
     <script src="/training/js/shopworks-customer-setup-working.js?v=2026.09.05.12"></script>
 </body>
 </html>

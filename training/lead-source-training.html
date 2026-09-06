@@ -56,16 +56,16 @@
         </div>
 
         <div class="game-controls">
-            <button class="mode-btn active" onclick="setGameMode('learn')">
+            <button class="mode-btn active" data-call="setGameMode" data-args='["learn"]'>
                 <i class="fas fa-book" aria-hidden="true"></i> Learn Sources
             </button>
-            <button class="mode-btn" onclick="setGameMode('scenario')">
+            <button class="mode-btn" data-call="setGameMode" data-args='["scenario"]'>
                 <i class="fas fa-comments" aria-hidden="true"></i> Practice Scenarios
             </button>
-            <button class="mode-btn" onclick="setGameMode('referral')">
+            <button class="mode-btn" data-call="setGameMode" data-args='["referral"]'>
                 <i class="fas fa-gift" aria-hidden="true"></i> Referral Training
             </button>
-            <button class="mode-btn" onclick="setGameMode('speed')">
+            <button class="mode-btn" data-call="setGameMode" data-args='["speed"]'>
                 <i class="fas fa-tachometer-alt" aria-hidden="true"></i> Speed Challenge
             </button>
         </div>
@@ -197,22 +197,22 @@
             </div>
 
             <div class="source-options" id="sourceOptions">
-                <div class="source-option" onclick="selectSource('Google Search')">
+                <div class="source-option" data-call="selectSource" data-args='["Google Search"]'>
                     <i class="fas fa-search" aria-hidden="true"></i><br>Google Search
                 </div>
-                <div class="source-option" onclick="selectSource('Walk In')">
+                <div class="source-option" data-call="selectSource" data-args='["Walk In"]'>
                     <i class="fas fa-walking" aria-hidden="true"></i><br>Walk In
                 </div>
-                <div class="source-option" onclick="selectSource('Old Customer')">
+                <div class="source-option" data-call="selectSource" data-args='["Old Customer"]'>
                     <i class="fas fa-history" aria-hidden="true"></i><br>Old Customer
                 </div>
-                <div class="source-option" onclick="selectSource('Referral')">
+                <div class="source-option" data-call="selectSource" data-args='["Referral"]'>
                     <i class="fas fa-user-friends" aria-hidden="true"></i><br>Referral
                 </div>
-                <div class="source-option" onclick="selectSource('Other')">
+                <div class="source-option" data-call="selectSource" data-args='["Other"]'>
                     <i class="fas fa-ellipsis-h" aria-hidden="true"></i><br>Other
                 </div>
-                <div class="source-option" onclick="selectSource('Drive By')">
+                <div class="source-option" data-call="selectSource" data-args='["Drive By"]'>
                     <i class="fas fa-car" aria-hidden="true"></i><br>Drive By
                 </div>
             </div>
@@ -220,7 +220,7 @@
             <div id="feedbackArea"></div>
 
             <div class="nav-buttons">
-                <button class="nav-btn" onclick="nextScenario()">Next Scenario →</button>
+                <button class="nav-btn" data-call="nextScenario">Next Scenario →</button>
             </div>
         </div>
 
@@ -235,8 +235,8 @@
             <div id="referralQuestions"></div>
 
             <div class="nav-buttons">
-                <button class="nav-btn" onclick="checkReferralAnswer()">Check Answer</button>
-                <button class="nav-btn" onclick="nextReferralScenario()">Next Scenario →</button>
+                <button class="nav-btn" data-call="checkReferralAnswer">Check Answer</button>
+                <button class="nav-btn" data-call="nextReferralScenario">Next Scenario →</button>
             </div>
         </div>
 
@@ -268,6 +268,7 @@
     </div>
 </div>
 
+    <script src="/shared_components/js/data-call-delegator.js?v=2026.09.06.29"></script>
 <script src="/training/js/lead-source-training.js?v=2026.09.05.12"></script>
 
 </body>

@@ -12,7 +12,7 @@
 <body>
     <!-- Navigation Header -->
     <div class="nav-header">
-        <button class="back-button" onclick="goToDashboard()">
+        <button class="back-button" data-call="goToDashboard">
             <i class="fas fa-arrow-left" aria-hidden="true"></i>
             Back to Dashboard
         </button>
@@ -27,7 +27,7 @@
         <p style="text-align: center; font-size: 1.2em;">Capture every detail from incoming calls or walk-ins—turns leads into revenue! Update your bonus app after completing. 📈</p>
 
         <section>
-            <h2 onclick="toggleAccordion(this)"><i class="fas fa-list-ol" aria-hidden="true"></i> How to Fill Out Lead Sheets</h2>
+            <h2 data-call="toggleAccordion" data-args='["$this"]'><i class="fas fa-list-ol" aria-hidden="true"></i> How to Fill Out Lead Sheets</h2>
             <div class="accordion-content">
                 <ol>
                     <li><strong>When to Use:</strong> For every incoming phone call or walk-in customer inquiry—grab all info before handing off to sales.</li>
@@ -41,7 +41,7 @@
         </section>
 
         <section>
-            <h2 onclick="toggleAccordion(this)"><i class="fas fa-info-circle" aria-hidden="true"></i> Field Guide: What Goes Where</h2>
+            <h2 data-call="toggleAccordion" data-args='["$this"]'><i class="fas fa-info-circle" aria-hidden="true"></i> Field Guide: What Goes Where</h2>
             <div class="accordion-content">
                 <p>Hover over each field label for tips on what to enter and examples! Below is pre-filled with a real customer example (Brianna Gillespie from Region 6 Systems Integration, referred by Hart's Service).</p>
                 <div class="lead-form">
@@ -157,6 +157,7 @@
         </section>
     </div>
 
+    <script src="/shared_components/js/data-call-delegator.js?v=2026.09.06.29"></script>
     <script src="/training/js/lead-sheet-guide.js?v=2026.09.05.12"></script>
 </body>
 </html>

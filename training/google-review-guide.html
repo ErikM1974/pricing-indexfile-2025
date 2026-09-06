@@ -12,7 +12,7 @@
 <body>
     <!-- Navigation Header -->
     <div class="nav-header">
-        <button class="back-button" onclick="goToDashboard()">
+        <button class="back-button" data-call="goToDashboard">
             <i class="fas fa-arrow-left" aria-hidden="true"></i>
             Back to Dashboard
         </button>
@@ -27,7 +27,7 @@
         <p style="text-align: center; font-size: 1.2em;">Pro tip: Aim for genuine chats—happy customers love sharing! Track your wins in the bonus app. 🚀</p>
 
         <section>
-            <h2 onclick="toggleAccordion(this)"><i class="fas fa-list-ol" aria-hidden="true"></i> Asking for the Review (In-Person Pickup)</h2>
+            <h2 data-call="toggleAccordion" data-args='["$this"]'><i class="fas fa-list-ol" aria-hidden="true"></i> Asking for the Review (In-Person Pickup)</h2>
             <div class="accordion-content">
                 <ol>
                     <li><strong>Present the Google Review Card:</strong> When the customer arrives to pick up their completed apparel, have the review card ready.</li>
@@ -39,7 +39,7 @@
         </section>
 
         <section>
-            <h2 onclick="toggleAccordion(this)"><i class="fas fa-check-circle" aria-hidden="true"></i> Ensure They Leave a Review</h2>
+            <h2 data-call="toggleAccordion" data-args='["$this"]'><i class="fas fa-check-circle" aria-hidden="true"></i> Ensure They Leave a Review</h2>
             <div class="accordion-content">
                 <ol>
                     <li><strong>Encourage On-the-Spot:</strong> Suggest they do it right there via the QR code, or later from their phone.</li>
@@ -50,7 +50,7 @@
         </section>
 
         <section>
-            <h2 onclick="toggleAccordion(this)"><i class="fas fa-search" aria-hidden="true"></i> Confirming the Google Review</h2>
+            <h2 data-call="toggleAccordion" data-args='["$this"]'><i class="fas fa-search" aria-hidden="true"></i> Confirming the Google Review</h2>
             <div class="accordion-content">
                 <ol>
                     <li><strong>Check Google Reviews:</strong> Once they say they've submitted a 5-star review, head to our Google Business Profile and verify it's posted.</li>
@@ -61,7 +61,7 @@
         </section>
 
         <section>
-            <h2 onclick="toggleAccordion(this)"><i class="fas fa-desktop" aria-hidden="true"></i> How to Log in Shopworks</h2>
+            <h2 data-call="toggleAccordion" data-args='["$this"]'><i class="fas fa-desktop" aria-hidden="true"></i> How to Log in Shopworks</h2>
             <div class="accordion-content">
                 <p>Log every successful review for bonuses.</p>
                 <h3>Step 1: Quick Add from Customer Screen</h3>
@@ -74,6 +74,7 @@
         </section>
     </div>
 
+    <script src="/shared_components/js/data-call-delegator.js?v=2026.09.06.29"></script>
     <script src="/training/js/google-review-guide.js?v=2026.09.05.12"></script>
 </body>
 </html>

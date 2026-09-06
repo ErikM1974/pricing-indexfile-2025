@@ -12,7 +12,7 @@
 <body>
     <!-- Navigation Header -->
     <div class="nav-header">
-        <button class="back-button" onclick="goToDashboard()">
+        <button class="back-button" data-call="goToDashboard">
             <i class="fas fa-arrow-left" aria-hidden="true"></i>
             Back to Dashboard
         </button>
@@ -27,7 +27,7 @@
         <p style="text-align: center; font-size: 1.2em;">Streamline the process, free up the AE, and speed up production—win-win! Update your bonus app after each approval. 🎉</p>
 
         <section>
-            <h2 onclick="toggleAccordion(this)"><i class="fas fa-list-ol" aria-hidden="true"></i> How to Handle Art Approvals</h2>
+            <h2 data-call="toggleAccordion" data-args='["$this"]'><i class="fas fa-list-ol" aria-hidden="true"></i> How to Handle Art Approvals</h2>
             <div class="accordion-content">
                 <ol>
                     <li><strong>Receive from AE:</strong> When a new artwork or mockup comes in, the AE hands it off to you (via email, Shopworks, or in-person).</li>
@@ -41,7 +41,7 @@
         </section>
 
         <section>
-            <h2 onclick="toggleAccordion(this)"><i class="fas fa-ruler" aria-hidden="true"></i> Step-by-Step Workflow</h2>
+            <h2 data-call="toggleAccordion" data-args='["$this"]'><i class="fas fa-ruler" aria-hidden="true"></i> Step-by-Step Workflow</h2>
             <div class="accordion-content">
                 <table>
                     <tr><th>Step</th><th>What to Do</th><th>Tips/Examples</th></tr>
@@ -57,7 +57,7 @@
         </section>
 
         <section>
-            <h2 onclick="toggleAccordion(this)"><i class="fas fa-comment-dots" aria-hidden="true"></i> Communication Scripts</h2>
+            <h2 data-call="toggleAccordion" data-args='["$this"]'><i class="fas fa-comment-dots" aria-hidden="true"></i> Communication Scripts</h2>
             <div class="accordion-content">
                 <p>Keep it pro and clear—examples for team and customers.</p>
                 
@@ -79,6 +79,7 @@
         </section>
     </div>
 
+    <script src="/shared_components/js/data-call-delegator.js?v=2026.09.06.29"></script>
     <script src="/training/js/art-approval-guide.js?v=2026.09.05.12"></script>
 </body>
 </html>

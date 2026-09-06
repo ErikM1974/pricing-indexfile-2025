@@ -148,11 +148,11 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="closeResults()">
+                <button class="btn btn-secondary" data-call="closeResults">
                     <i class="fas fa-times" aria-hidden="true"></i>
                     Close
                 </button>
-                <button class="btn btn-primary" onclick="restartGame()">
+                <button class="btn btn-primary" data-call="restartGame">
                     <i class="fas fa-redo" aria-hidden="true"></i>
                     Try Again
                 </button>
@@ -160,6 +160,7 @@
         </div>
     </div>
 
+    <script src="/shared_components/js/data-call-delegator.js?v=2026.09.06.29"></script>
     <script src="/training/js/sales-tax-code-trainer.js?v=2026.09.06.27"></script>
 </body>
 </html>
