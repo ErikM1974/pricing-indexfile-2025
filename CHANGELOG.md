@@ -1,3 +1,10 @@
+## v2026.09.06.33 (2026.09.06)
+
+- Memory: S2 unlinked-pages + S3 host-sweep sections, ACTIVE_FILES rows for the 18 S2 extractions, LESSONS S3 entry (Workspaces entry archived)
+- LESSONS under the 300-line cap: Company Numbers entry archived
+- Final census: repo-wide Rule-3 lock, last reachable-page fixes, 69 dead files identified
+- Deploy v2026.09.06.33: final census — repo-wide Rule-3 lock, forms/vendor-portal/art-billing fixes, AE stub 301s
+
 ## v2026.09.06.31 (2026.09.06)
 
 - Rule 6 sweep S3: every browser-side proxy-host fallback now reads APP_CONFIG (222 → 42 literals)
