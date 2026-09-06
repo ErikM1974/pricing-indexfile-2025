@@ -30,15 +30,15 @@
             </div>
             <div class="dash-header-right">
                 <a href="/dashboards/finished-photos.html" class="dash-btn" title="Snap a new finished-product photo">
-                    <i class="fas fa-camera"></i>
+                    <i class="fas fa-camera" aria-hidden="true"></i>
                     Add a photo
                 </a>
                 <button type="button" id="fpl-refresh" class="dash-btn" title="Refresh photos">
-                    <i class="fas fa-rotate"></i>
+                    <i class="fas fa-rotate" aria-hidden="true"></i>
                     Refresh
                 </button>
                 <a href="/staff-dashboard.html" class="dash-back-link">
-                    <i class="fas fa-arrow-left"></i>
+                    <i class="fas fa-arrow-left" aria-hidden="true"></i>
                     Dashboard
                 </a>
             </div>
@@ -46,10 +46,10 @@
 
         <main class="dash-content">
             <div class="dash-error-banner" role="alert">
-                <i class="fas fa-exclamation-triangle"></i>
+                <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
                 <span class="dash-error-banner-message"></span>
-                <button class="dash-error-banner-close" aria-label="Dismiss">
-                    <i class="fas fa-times"></i>
+                <button type="button" class="dash-error-banner-close" aria-label="Dismiss">
+                    <i class="fas fa-times" aria-hidden="true"></i>
                 </button>
             </div>
 
@@ -74,7 +74,7 @@
 
             <div class="dash-card">
                 <div class="dash-card-header">
-                    <h2 class="dash-card-title"><i class="fas fa-images"></i> Browse <span class="fpl-sub" id="fpl-sub"></span></h2>
+                    <h2 class="dash-card-title"><i class="fas fa-images" aria-hidden="true"></i> Browse <span class="fpl-sub" id="fpl-sub" role="status"></span></h2>
                 </div>
                 <div class="fpl-toolbar">
                     <div class="fpl-chips" id="fpl-rep-chips" role="group" aria-label="Filter by sales rep"></div>
@@ -93,9 +93,9 @@
     </div>
 
     <!-- Full-size viewer -->
-    <div class="fpl-lightbox" id="fpl-lightbox" hidden>
+    <div class="fpl-lightbox" id="fpl-lightbox" role="dialog" aria-modal="true" aria-labelledby="fpl-lightbox-cap" hidden>
         <button type="button" class="fpl-lightbox-close" id="fpl-lightbox-close" aria-label="Close">
-            <i class="fas fa-times"></i>
+            <i class="fas fa-times" aria-hidden="true"></i>
         </button>
         <figure class="fpl-lightbox-fig">
             <img id="fpl-lightbox-img" alt="Finished product photo, full size" hidden>
@@ -111,6 +111,6 @@
     <script src="/shared_components/js/fetch-timeout.js"></script>
     <script src="/shared_components/js/dash-page-helpers.js"></script>
     <script src="/shared_components/js/box-url.js?v=2026.08.05.23"></script>
-    <script src="/dashboards/js/finished-photos-library.js?v=2026.08.06.1"></script>
+    <script src="/dashboards/js/finished-photos-library.js?v=2026.09.05.48"></script>
 </body>
 </html>

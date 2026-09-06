@@ -34,10 +34,18 @@
             return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
         });
     }
+    // Caspio date fields arrive as "YYYY-MM-DD" or "YYYY-MM-DDT00:00:00(.000)(Z)" — `new Date()` reads those
+    // as UTC midnight (the previous evening in Pacific), so a date could display a day early.
+    function parseCalendarDate(value) {
+        var s = String(value == null ? '' : value).trim();
+        if (!s) return null;
+        var m = /^(\d{4})-(\d{2})-(\d{2})(?:T00:00:00(?:\.0+)?Z?)?$/.exec(s);
+        var d = m ? new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3])) : new Date(s);
+        return isNaN(d.getTime()) ? null : d;
+    }
     function fmtDate(s) {
-        if (!s) return '';
-        try { var d = new Date(s); if (isNaN(d.getTime())) return ''; return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }); }
-        catch (e) { return ''; }
+        var d = parseCalendarDate(s);
+        return d ? d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
     }
     function fmtMB(bytes) {
         if (!(bytes > 0)) return '';
@@ -73,8 +81,27 @@
             if (mode === 'search') { var si = el('fp-cust-search'); if (si) si.focus(); }
         }
     }
-    document.querySelectorAll('.fp-mode').forEach(function (btn) {
+    var modeBtns = Array.prototype.slice.call(document.querySelectorAll('.fp-mode'));
+    modeBtns.forEach(function (btn, i) {
         btn.addEventListener('click', function () { setMode(btn.getAttribute('data-mode'), true); });
+        // WAI-ARIA tabs: arrow keys move between the find modes.
+        btn.addEventListener('keydown', function (e) {
+            if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+            var n = modeBtns[(i + (e.key === 'ArrowRight' ? 1 : modeBtns.length - 1)) % modeBtns.length];
+            n.focus(); setMode(n.getAttribute('data-mode'), false);
+        });
+    });
+    // Image fallbacks (Rule 3 — was an inline onerror=): `error` does not bubble → capture phase.
+    document.addEventListener('error', function (e) {
+        var img = e.target;
+        if (img && img.tagName === 'IMG' && img.dataset && img.dataset.onerror === 'blank') img.classList.add('is-broken');
+    }, true);
+    // The file-input labels are the two big photo buttons — make them keyboard-operable.
+    ['fp-camera-btn', 'fp-album-btn'].forEach(function (id) {
+        var lab = el(id);
+        if (lab) lab.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); var inp = el(lab.getAttribute('for')); if (inp) inp.click(); }
+        });
     });
     (function initMode() {
         var saved = null;
@@ -122,8 +149,11 @@
     // ── Barcode scanner (vendored html5-qrcode — works on iOS Safari via getUserMedia) ──
     var scanner = null;
     function setScanStatus(msg) { var s = el('fp-scan-status'); if (s) s.textContent = msg; }
+    var scanReturnFocus = null;
     function openScanner() {
+        scanReturnFocus = document.activeElement;
         el('fp-scan-modal').hidden = false;
+        setTimeout(function () { var c = el('fp-scan-close'); if (c) c.focus(); }, 30);
         setScanStatus('Starting camera…');
         if (!window.Html5Qrcode) { setScanStatus('Scanner failed to load — type the order # instead.'); return; }
         if (scanner) return; // already running
@@ -159,7 +189,10 @@
         });
     }
     function closeScanner() {
+        var wasOpen = !el('fp-scan-modal').hidden;
         el('fp-scan-modal').hidden = true;
+        if (wasOpen && scanReturnFocus && document.body.contains(scanReturnFocus)) { try { scanReturnFocus.focus(); } catch (e) { /* gone */ } }
+        scanReturnFocus = null;
         var s = scanner; scanner = null;
         if (s) {
             s.stop().then(function () { s.clear(); }).catch(function () { try { s.clear(); } catch (e) { /* already gone */ } });
@@ -168,6 +201,11 @@
     el('fp-scan-open').addEventListener('click', openScanner);
     el('fp-scan-close').addEventListener('click', closeScanner);
     el('fp-scan-modal').addEventListener('click', function (e) { if (e.target === el('fp-scan-modal')) closeScanner(); });
+    document.addEventListener('keydown', function (e) {
+        if (e.key !== 'Escape') return;
+        if (!el('fp-lightbox').hidden) closeLightbox();
+        else if (!el('fp-scan-modal').hidden) closeScanner();
+    });
 
     // ── Customer search (open proxy GET) ──
     var searchInput = el('fp-cust-search'), results = el('fp-cust-results');
@@ -175,7 +213,7 @@
         var q = searchInput.value.trim();
         if (q.length < 2) { results.hidden = true; results.innerHTML = ''; return; }
         fetch(apiBase() + '/api/company-contacts/search?q=' + encodeURIComponent(q) + '&limit=25')
-            .then(function (r) { return r.ok ? r.json() : { contacts: [] }; })
+            .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
             .then(function (d) {
                 var seen = {}, rows = [];
                 ((d && d.contacts) || []).forEach(function (c) { var id = c.id_Customer; if (id && !seen[id]) { seen[id] = 1; rows.push(c); } });
@@ -196,7 +234,11 @@
                 }).join('');
                 results.hidden = false;
             })
-            .catch(function () { results.hidden = true; });
+            .catch(function (err) {
+                // A failed search is not "no matches" — say so (Erik's #1 rule).
+                results.innerHTML = '<div class="fp-result fp-muted">Search failed (' + esc(err.message) + ') — try again.</div>';
+                results.hidden = false;
+            });
     }, 300));
     results.addEventListener('click', function (e) {
         var btn = e.target.closest('.fp-result[data-id]'); if (!btn) return;
@@ -237,7 +279,7 @@
         var grid = el('fp-design-grid');
         grid.innerHTML = '<div class="fp-muted">Loading designs…</div>';
         fetch(apiBase() + '/api/designs/by-customer/' + encodeURIComponent(cid) + '?method=all&limit=200')
-            .then(function (r) { return r.ok ? r.json() : { designs: [] }; })
+            .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
             .then(function (d) {
                 var ds = (d && d.designs) || [];
                 if (!ds.length) { grid.innerHTML = '<div class="fp-muted">No registered designs — use “No specific design” below.</div>'; return; }
@@ -246,13 +288,17 @@
                     // (designs-by-method.js falls back to the stored FileUrl), so they
                     // need the same normalisation as the photos below.
                     var img = x.thumbnailUrl
-                        ? '<img class="fp-d-img" src="' + esc(resolveBoxUrl(x.thumbnailUrl)) + '" alt="" loading="lazy" onerror="this.style.visibility=\'hidden\'">'
+                        ? '<img class="fp-d-img" src="' + esc(resolveBoxUrl(x.thumbnailUrl)) + '" alt="" loading="lazy" data-onerror="blank">'
                         : '<div class="fp-d-img"></div>';
                     return '<button type="button" class="fp-design" data-num="' + esc(x.idDesign) + '" data-name="' + esc(x.designName || '') + '">'
                         + img + '<div class="fp-d-cap"><b>#' + esc(x.idDesign) + '</b>' + esc(x.designName || '') + '</div></button>';
                 }).join('');
             })
-            .catch(function () { grid.innerHTML = '<div class="fp-muted">Couldn’t load designs.</div>'; });
+            .catch(function (err) {
+                grid.innerHTML = '<div class="fp-muted">Couldn’t load designs (' + esc(err.message) + '). ' +
+                    '<button type="button" class="fp-link" id="fp-designs-retry">Retry</button> or use “No specific design” below.</div>';
+                var rb = el('fp-designs-retry'); if (rb) rb.addEventListener('click', function () { loadDesigns(cid); });
+            });
     }
     el('fp-design-grid').addEventListener('click', function (e) {
         var b = e.target.closest('.fp-design[data-num]'); if (!b) return;
@@ -384,7 +430,7 @@
         var listEl = el('fp-manage-list'), emptyEl = el('fp-manage-empty');
         listEl.innerHTML = '<div class="fp-muted">Loading…</div>'; emptyEl.hidden = true;
         fetch('/api/staff/finished-photos?idCustomer=' + encodeURIComponent(cid), { credentials: 'same-origin' })
-            .then(function (r) { return r.ok ? r.json() : { photos: [] }; })
+            .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
             .then(function (d) {
                 var ps = (d && d.photos) || [];
                 if (!ps.length) { listEl.innerHTML = ''; emptyEl.hidden = false; return; }
@@ -405,37 +451,48 @@
                         + '<div class="fp-mrow-body"><div class="fp-mrow-title">' + esc(title) + '</div>'
                         + '<div class="fp-mrow-sub">' + (on ? '<span class="fp-live-dot">Live on portal</span>' + (sub ? ' · ' : '') : '') + sub + '</div></div>'
                         + '<div class="fp-mrow-actions">'
-                        + '<button type="button" class="fp-toggle' + (on ? ' is-on' : '') + '" data-act="toggle" data-on="' + (on ? '1' : '0') + '">' + (on ? '✓ Published' : 'Publish') + '</button>'
-                        + '<button type="button" class="fp-del" data-act="del">Delete</button>'
+                        + '<button type="button" class="fp-toggle' + (on ? ' is-on' : '') + '" data-act="toggle" data-on="' + (on ? '1' : '0') + '" aria-pressed="' + (on ? 'true' : 'false') + '" aria-label="' + (on ? 'Published — tap to hide from the portal' : 'Publish to the portal') + '">' + (on ? '✓ Published' : 'Publish') + '</button>'
+                        + '<button type="button" class="fp-del" data-act="del" aria-label="Delete this photo">Delete</button>'
                         + '</div></div>';
                 }).join('');
             })
-            .catch(function () { listEl.innerHTML = '<div class="fp-muted">Couldn’t load photos.</div>'; });
+            .catch(function (err) {
+                listEl.innerHTML = '<div class="fp-muted">Couldn’t load this customer’s photos (' + esc(err.message) + '). ' +
+                    '<button type="button" class="fp-link" id="fp-manage-retry">Retry</button></div>';
+                var rb = el('fp-manage-retry'); if (rb) rb.addEventListener('click', function () { loadManage(cid); });
+            });
     }
+    function setManageStatus(kind, msg) { setStatus(kind, msg); }
     el('fp-manage-list').addEventListener('click', function (e) {
         var row = e.target.closest('.fp-mrow[data-pk]'); if (!row) return;
         var t = e.target.closest('[data-act]'); if (!t) return;
         var pk = row.getAttribute('data-pk'), act = t.getAttribute('data-act');
         if (act === 'view') {
             var src = t.getAttribute('data-src');
-            if (src) { el('fp-lightbox-img').src = src; el('fp-lightbox').hidden = false; }
+            if (src) { lightboxReturnFocus = t; el('fp-lightbox-img').src = src; el('fp-lightbox').hidden = false; setTimeout(function () { el('fp-lightbox-close').focus(); }, 30); }
         } else if (act === 'toggle') {
             var turnOn = t.getAttribute('data-on') !== '1';
             t.disabled = true;
             fetch('/api/staff/finished-photos/' + encodeURIComponent(pk), {
                 method: 'PATCH', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ show: turnOn })
-            }).then(function (r) { return r.json(); })
-                .then(function () { if (state.cust) loadManage(state.cust.id); })
-                .catch(function () { t.disabled = false; });
+            }).then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { if (!r.ok || j.success === false) throw new Error(j.error || ('HTTP ' + r.status)); }); })
+                .then(function () { setManageStatus('ok', turnOn ? '✓ Published to the portal.' : 'Hidden from the portal.'); if (state.cust) loadManage(state.cust.id); })
+                .catch(function (err) { t.disabled = false; setManageStatus('err', '✗ Photo NOT ' + (turnOn ? 'published' : 'hidden') + ': ' + (err.message || 'request failed')); });
         } else if (act === 'del') {
             if (!window.confirm('Delete this photo permanently?')) return;
             fetch('/api/staff/finished-photos/' + encodeURIComponent(pk), { method: 'DELETE', credentials: 'same-origin' })
-                .then(function () { if (state.cust) loadManage(state.cust.id); })
-                .catch(function () { });
+                .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); setManageStatus('ok', 'Photo deleted.'); if (state.cust) loadManage(state.cust.id); })
+                .catch(function (err) { setManageStatus('err', '✗ Photo NOT deleted: ' + (err.message || 'request failed')); });
         }
     });
-    function closeLightbox() { el('fp-lightbox').hidden = true; el('fp-lightbox-img').src = ''; }
+    var lightboxReturnFocus = null;
+    function closeLightbox() {
+        var wasOpen = !el('fp-lightbox').hidden;
+        el('fp-lightbox').hidden = true; el('fp-lightbox-img').src = '';
+        if (wasOpen && lightboxReturnFocus && document.body.contains(lightboxReturnFocus)) { try { lightboxReturnFocus.focus(); } catch (e) { /* gone */ } }
+        lightboxReturnFocus = null;
+    }
     el('fp-lightbox-close').addEventListener('click', closeLightbox);
     el('fp-lightbox').addEventListener('click', function (e) { if (e.target === el('fp-lightbox')) closeLightbox(); });
 })();

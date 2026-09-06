@@ -33,11 +33,18 @@
             return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
         });
     }
+    // Caspio date fields arrive as "YYYY-MM-DD" or "YYYY-MM-DDT00:00:00(.000)(Z)" — `new Date()` reads those
+    // as UTC midnight (the previous evening in Pacific), so a date could display a day early.
+    function parseCalendarDate(value) {
+        var s = String(value == null ? '' : value).trim();
+        if (!s) return null;
+        var m = /^(\d{4})-(\d{2})-(\d{2})(?:T00:00:00(?:\.0+)?Z?)?$/.exec(s);
+        var d = m ? new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3])) : new Date(s);
+        return isNaN(d.getTime()) ? null : d;
+    }
     function fmtDate(s) {
-        if (!s) return '';
-        var d = new Date(s);
-        if (isNaN(d.getTime())) return '';
-        return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        var d = parseCalendarDate(s);
+        return d ? d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
     }
 
     // Finished_Photos.Image_URL is written as an ABSOLUTE proxy url
@@ -76,6 +83,11 @@
         });
         // Delegated once — the container survives every render(), so no stacking listeners.
         el('fpl-body').addEventListener('click', bodyClick);
+        // Broken thumbnails (Rule 3 — was an inline onerror=): `error` does not bubble → capture phase.
+        document.addEventListener('error', function (e) {
+            var img = e.target;
+            if (img && img.tagName === 'IMG' && img.dataset && img.dataset.onerror === 'blank') img.classList.add('is-broken');
+        }, true);
         el('fpl-lightbox-close').addEventListener('click', closeLightbox);
         el('fpl-lightbox').addEventListener('click', function (e) {
             if (e.target === el('fpl-lightbox')) closeLightbox();
@@ -101,8 +113,10 @@
                 render();
             })
             .catch(function (err) {
-                el('fpl-body').innerHTML = '<div class="fpl-empty">The library could not load.</div>';
-                DashPage.showError('Unable to load finished photos: ' + err.message + ' — refresh to retry.');
+                el('fpl-body').innerHTML = '<div class="fpl-empty">The library could not load (' + esc(err.message) + '). ' +
+                    '<button type="button" class="dash-btn" id="fpl-retry"><i class="fas fa-rotate" aria-hidden="true"></i> Retry</button></div>';
+                var rb = el('fpl-retry'); if (rb) rb.addEventListener('click', function () { load(true); });
+                DashPage.showError('Unable to load finished photos: ' + err.message);
             });
     }
 
@@ -174,8 +188,8 @@
         var capBits = [p.companyName, title, p.caption].filter(Boolean).join(' · ');
         var src = resolveBoxUrl(p.imageUrl);
         return '<article class="fpl-card" data-pk="' + esc(p.pkId) + '">' +
-            '<button type="button" class="fpl-card-imgbtn" data-act="view" data-src="' + esc(src) + '" data-cap="' + esc(capBits) + '" aria-label="View full size">' +
-            '<img src="' + esc(src) + '" alt="" loading="lazy" onerror="this.style.visibility=\'hidden\'">' +
+            '<button type="button" class="fpl-card-imgbtn" data-act="view" data-src="' + esc(src) + '" data-cap="' + esc(capBits) + '" aria-label="View full size: ' + esc(capBits || title) + '">' +
+            '<img src="' + esc(src) + '" alt="" loading="lazy" data-onerror="blank">' +
             '</button>' +
             '<div class="fpl-card-body">' +
             '<div class="fpl-card-title">' + esc(title) + '</div>' +
@@ -183,8 +197,8 @@
             (p.caption ? '<div>' + esc(p.caption) + '</div>' : '') +
             '<div class="fpl-card-foot">' +
             (p.showToCustomer
-                ? '<span class="fpl-live"><i class="fas fa-circle"></i> Live on portal</span><button type="button" class="fpl-pub-btn" data-act="pub" data-on="1">Hide</button>'
-                : '<span class="fpl-hidden-note">Hidden</span><button type="button" class="fpl-pub-btn" data-act="pub" data-on="0">Publish</button>') +
+                ? '<span class="fpl-live"><i class="fas fa-circle" aria-hidden="true"></i> Live on portal</span><button type="button" class="fpl-pub-btn" data-act="pub" data-on="1" aria-label="Hide ' + esc(title) + ' from the portal">Hide</button>'
+                : '<span class="fpl-hidden-note">Hidden</span><button type="button" class="fpl-pub-btn" data-act="pub" data-on="0" aria-label="Publish ' + esc(title) + ' to the portal">Publish</button>') +
             '</div></div></article>';
     }
 
@@ -243,7 +257,7 @@
         host.innerHTML = chips.map(function (c) {
             var active = (state.rep || '') === c.name ||
                 (c.name !== '' && state.rep.toLowerCase() === c.name.toLowerCase());
-            return '<button type="button" class="fpl-chip' + (active ? ' is-active' : '') + '" data-rep="' + esc(c.name) + '">' +
+            return '<button type="button" class="fpl-chip' + (active ? ' is-active' : '') + '" data-rep="' + esc(c.name) + '" aria-pressed="' + (active ? 'true' : 'false') + '">' +
                 esc(c.label) + '<span class="fpl-chip-count">' + c.count + '</span></button>';
         }).join('');
         Array.prototype.forEach.call(host.querySelectorAll('.fpl-chip'), function (btn) {
@@ -267,8 +281,11 @@
         return src + (src.indexOf('?') === -1 ? '?' : '&') + 'size=large';
     }
 
+    var lightboxReturnFocus = null;
     function openLightbox(thumbUrl, cap) {
+        lightboxReturnFocus = document.activeElement;
         var box = el('fpl-lightbox');
+        setTimeout(function () { var c = el('fpl-lightbox-close'); if (c) c.focus(); }, 30);
         var img = el('fpl-lightbox-img');
         var status = el('fpl-lightbox-status');
         el('fpl-lightbox-cap').textContent = cap || '';
@@ -302,7 +319,10 @@
     }
 
     function closeLightbox() {
+        var wasOpen = !el('fpl-lightbox').hidden;
         el('fpl-lightbox').hidden = true;
+        if (wasOpen && lightboxReturnFocus && document.body.contains(lightboxReturnFocus)) { try { lightboxReturnFocus.focus(); } catch (e) { /* gone */ } }
+        lightboxReturnFocus = null;
         var img = el('fpl-lightbox-img');
         img.onload = img.onerror = null;
         img.removeAttribute('src');
