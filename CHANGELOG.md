@@ -1,3 +1,8 @@
+## v2026.09.06.25 (2026.09.06)
+
+- Decorative icons where another attribute precedes class= (183 sites across builders + shared scripts); hygiene lock regex accepts any attribute order
+- Deploy v2026.09.06.25: decorative icons, any attribute order
+
 ## v2026.09.06.24 (2026.09.06)
 
 - LESSONS: quote-builders review entry
