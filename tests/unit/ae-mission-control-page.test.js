@@ -35,10 +35,10 @@ describe('Rule 3', () => {
         const bodies = [...stripped.matchAll(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/gi)].filter((m) => m[1].trim());
         expect(bodies).toEqual([]);
     });
-    test('templates: no onclick=; every remaining style= is a computed width/left', () => {
+    test('templates: no onclick=; every remaining style= is a computed width/left custom property', () => {
         expect(code).not.toMatch(/onclick="/);
         const styles = [...code.matchAll(/style="([^"]*)/g)].map((m) => m[1]);
-        for (const s of styles) expect(s).toMatch(/^(width|left):' \+ /);
+        for (const s of styles) expect(s).toMatch(/^(width|left|--w|--x):' \+ /); // --w/--x = custom properties (2026-09-05)
         expect(css).toContain('.mc-sw--late');
         expect(css).toContain('.mc-chip.is-fire .mc-chip-dot');
     });

@@ -157,7 +157,7 @@
         if (items.length > visible) {
             var more = items.length - visible;
             html += '<button type="button" class="aemc-more-toggle" aria-expanded="false" data-more="' + more +
-                '" data-noun="' + esc(noun) + '"><i class="fas fa-chevron-down"></i> Show ' + more + ' more ' +
+                '" data-noun="' + esc(noun) + '"><i class="fas fa-chevron-down" aria-hidden="true"></i> Show ' + more + ' more ' +
                 esc(noun) + (more === 1 ? '' : 's') + '</button>';
         }
         return html;
@@ -173,10 +173,10 @@
             var expanded = ul.classList.toggle('is-expanded');
             btn.setAttribute('aria-expanded', expanded ? 'true' : 'false');
             if (expanded) {
-                btn.innerHTML = '<i class="fas fa-chevron-up"></i> Show less';
+                btn.innerHTML = '<i class="fas fa-chevron-up" aria-hidden="true"></i> Show less';
             } else {
                 var n = btn.getAttribute('data-more'), noun = btn.getAttribute('data-noun') || 'row';
-                btn.innerHTML = '<i class="fas fa-chevron-down"></i> Show ' + n + ' more ' + noun + (n === '1' ? '' : 's');
+                btn.innerHTML = '<i class="fas fa-chevron-down" aria-hidden="true"></i> Show ' + n + ' more ' + noun + (n === '1' ? '' : 's');
             }
         });
     }
@@ -285,7 +285,7 @@
         drawerState.opener = opener || null;
         scrim.hidden = false;
         d.hidden = false;
-        document.body.style.overflow = 'hidden';
+        document.body.classList.add('is-modal-open');
         var first = d.querySelector('.mc-drawer-close');
         if (first) first.focus();
     }
@@ -295,7 +295,7 @@
         if (!d || d.hidden) return;
         d.hidden = true;
         scrim.hidden = true;
-        document.body.style.overflow = '';
+        document.body.classList.remove('is-modal-open');
         // Focus goes back to whatever opened it, or the keyboard user is dumped at the top.
         if (drawerState.opener && document.contains(drawerState.opener)) drawerState.opener.focus();
         drawerState.open = null;
@@ -531,6 +531,11 @@
     }
 
     // ---------- boot ----------
+    // One listener for every "Reload to retry" control rendered into a failed panel.
+    document.addEventListener('click', function (e) {
+        var b = e.target && e.target.closest && e.target.closest('[data-reload]');
+        if (b) { e.preventDefault(); window.location.reload(); }
+    });
     document.addEventListener('DOMContentLoaded', init);
 
     function init() {
@@ -762,7 +767,7 @@
                 if (tabs) tabs.resetMounted();
             }
         }).catch(function (err) {
-            DashPage.showError('Could not load your dashboard: ' + err.message + ' — refresh to retry.');
+            DashPage.showError('Could not load your dashboard: ' + err.message + '');
             el('aemc-greeting').textContent = 'Your data could not be loaded.';
             ['aemc-queue', 'panel-leads', 'panel-quotes', 'panel-art', 'panel-orders'].forEach(function (id) {
                 el(id).innerHTML = '<div class="aemc-panel-error">Not loaded — ' + esc(err.message) + '</div>';
@@ -810,7 +815,7 @@
 
         if (data.errors) {
             var failed = Object.keys(data.errors).join(', ');
-            DashPage.showError('Some sections could not load (' + failed + '). The rest of the page is live — refresh to retry.');
+            DashPage.showError('Some sections could not load (' + failed + '). The rest of the page is live');
         }
 
         // Written only on SUCCESS, never in a catch: the baseline must always describe a state
@@ -1025,7 +1030,7 @@
             }
         }
         if (fill && axisMax) {
-            fill.style.width = Math.max(0, Math.min((l.revenue / axisMax) * 100, 100)).toFixed(1) + '%';
+            fill.style.setProperty('--w', Math.max(0, Math.min((l.revenue / axisMax) * 100, 100)).toFixed(1) + '%');
         }
     }
 
@@ -1147,7 +1152,7 @@
         host.innerHTML =
             '<p class="mc-kicker-line"><strong>' + money0(revenue) + '</strong> of ' + money0(target) +
                 ' company-wide this quarter · ' + pct.toFixed(0) + '%</p>' +
-            '<span class="mc-kicker-track"><span class="mc-kicker-fill" style="width:' + pct.toFixed(1) + '%"></span></span>' +
+            '<span class="mc-kicker-track"><span class="mc-kicker-fill" style="--w:' + pct.toFixed(1) + '%"></span></span>' +
             (k.next
                 ? '<p class="mc-kicker-line">' + money0(k.amountToNext) + ' to go → <strong>' +
                   money2(k.next.pay) + ' each</strong></p>'
@@ -1169,7 +1174,7 @@
         if (!t) {
             if (sourceFailed(data, 'sales')) {
                 host.innerHTML = '<div class="aemc-panel-error">Your sales history could not be loaded, ' +
-                    'so records are unavailable. Refresh to retry.</div>';
+                    'so records are unavailable. <button type="button" class="aemc-reload" data-reload="1">Reload to retry</button></div>';
             } else if (card) {
                 // The daily-trend payload ships with the proxy half of this feature. Until that
                 // deploys the field is simply absent — hide the card rather than report a
@@ -1230,7 +1235,7 @@
                     '<span class="aemc-row-meta">' + money0(x.a.revenue) + ' embroidery this quarter</span></span></li>';
             }).join('') + '</ul>';
         }).catch(function (err) {
-            host.innerHTML = '<div class="aemc-panel-error">Could not load your wins (' + esc(err.message) + '). Refresh to retry.</div>';
+            host.innerHTML = '<div class="aemc-panel-error">Could not load your wins (' + esc(err.message) + '). <button type="button" class="aemc-reload" data-reload="1">Reload to retry</button></div>';
         });
     }
 
@@ -1266,7 +1271,7 @@
                 }).join('') + '</div>';
             }).catch(function (err) {
                 host.innerHTML = '<div class="aemc-panel-error">Finished photos failed to load (' +
-                    esc(err.message) + '). Refresh to retry.</div>';
+                    esc(err.message) + '). <button type="button" class="aemc-reload" data-reload="1">Reload to retry</button></div>';
             });
     }
 
@@ -1452,9 +1457,9 @@
             '<span class="aemc-queue-actions">' + (actionsHtml || '') + '</span></li>';
     }
     function leadQueueItem(cls, lead, metaText) {
-        var actions = '<a class="aemc-mini-btn" href="' + leadLink(lead.submissionId) + '"><i class="fas fa-up-right-from-square"></i> Open</a>';
+        var actions = '<a class="aemc-mini-btn" href="' + leadLink(lead.submissionId) + '"><i class="fas fa-up-right-from-square" aria-hidden="true"></i> Open</a>';
         if (lead.email) {
-            actions += '<button type="button" class="aemc-mini-btn aemc-email-btn" data-lead="' + esc(JSON.stringify(lead)) + '"><i class="fas fa-envelope"></i> Email</button>';
+            actions += '<button type="button" class="aemc-mini-btn aemc-email-btn" data-lead="' + esc(JSON.stringify(lead)) + '"><i class="fas fa-envelope" aria-hidden="true"></i> Email</button>';
         }
         var main = '<a class="aemc-queue-main" href="' + leadLink(lead.submissionId) + '">' +
             esc(lead.company || lead.contactName || '(no name)') + '</a>';
@@ -1498,7 +1503,7 @@
                 '<span class="aemc-row-right">' +
                   '<span class="aemc-row-meta' + ageCls + '">' +
                   (a.dueDate ? 'due ' + fmtWhen(a.dueDate) : 'awaiting you') + '</span> ' +
-                  '<a class="aemc-mini-btn" href="/dashboards/ae-dashboard.html"><i class="fas fa-eye"></i> Review</a>' +
+                  '<a class="aemc-mini-btn" href="/dashboards/ae-dashboard.html"><i class="fas fa-eye" aria-hidden="true"></i> Review</a>' +
                 '</span></li>';
         };
         host.innerHTML = cappedRows(byAge, row);
@@ -1537,8 +1542,8 @@
         var quotes = (q.staleQuotes || []).map(function (qt) {
             var builder = builderFor(qt.quoteId);
             var actions = builder
-                ? '<a class="aemc-mini-btn" href="' + builder + '?duplicate=' + encodeURIComponent(qt.quoteId) + '"><i class="fas fa-copy"></i> Reopen</a>'
-                : '<a class="aemc-mini-btn" href="/dashboards/quote-management.html"><i class="fas fa-up-right-from-square"></i> Find</a>';
+                ? '<a class="aemc-mini-btn" href="' + builder + '?duplicate=' + encodeURIComponent(qt.quoteId) + '"><i class="fas fa-copy" aria-hidden="true"></i> Reopen</a>'
+                : '<a class="aemc-mini-btn" href="/dashboards/quote-management.html"><i class="fas fa-up-right-from-square" aria-hidden="true"></i> Find</a>';
             var main = '<span class="aemc-queue-main">' + esc(qt.quoteId) + ' — ' + esc(qt.companyName || qt.customerName || '') + '</span>';
             return queueItem('quote', main, money0(qt.totalAmount) + ' · quiet since ' + fmtWhen(qt.updatedAt || qt.createdAt), actions);
         }).join('');
@@ -1556,14 +1561,14 @@
                 ? '<a class="aemc-queue-main" href="' + leadLink(k.submissionId) + '">' + esc(k.company || k.recipientName || k.shipmentId) + '</a>'
                 : '<span class="aemc-queue-main">' + esc(k.company || k.recipientName || k.shipmentId) + '</span>';
             return queueItem('kit', main, k.shipmentId + ' · ' + k.status + ' since ' + fmtWhen(k.createdAt),
-                '<a class="aemc-mini-btn" href="/dashboards/marketing-shipments.html"><i class="fas fa-truck"></i> Queue</a>');
+                '<a class="aemc-mini-btn" href="/dashboards/marketing-shipments.html"><i class="fas fa-truck" aria-hidden="true"></i> Queue</a>');
         }).join('');
         // kits are informational (Mikalah's court) — not counted in "needs you"
         html += section('📦 Kits in Mikalah’s queue', kits);
 
         el('aemc-queue-count').textContent = total ? (total + ' item' + (total === 1 ? '' : 's') + ' need attention') : '';
         el('aemc-queue').innerHTML = html ||
-            '<div class="aemc-queue-empty"><i class="fas fa-circle-check"></i>You’re all caught up — nothing needs you right now.</div>';
+            '<div class="aemc-queue-empty"><i class="fas fa-circle-check" aria-hidden="true"></i>You’re all caught up — nothing needs you right now.</div>';
 
         Array.prototype.forEach.call(el('aemc-queue').querySelectorAll('.aemc-email-btn'), function (btn) {
             btn.addEventListener('click', function () {
@@ -1617,7 +1622,7 @@
         var prevBox = el('aemc-bonus-prev'), curBox = el('aemc-bonus-cur');
         if (data.errors && data.errors.payouts) {
             prevBox.innerHTML = curBox.innerHTML =
-                '<div class="aemc-panel-error">Bonus data failed to load (' + esc(data.errors.payouts) + '). Refresh to retry.</div>';
+                '<div class="aemc-panel-error">Bonus data failed to load (' + esc(data.errors.payouts) + '). <button type="button" class="aemc-reload" data-reload="1">Reload to retry</button></div>';
             return;
         }
         if (!b) { prevBox.innerHTML = curBox.innerHTML = '<div class="aemc-empty">No bonus data.</div>'; return; }
@@ -1670,7 +1675,7 @@
     // ---------- work panels ----------
     function panelError(id, key, data) {
         if (data.errors && data.errors[key]) {
-            el(id).innerHTML = '<div class="aemc-panel-error">This section failed to load (' + esc(data.errors[key]) + '). Refresh to retry.</div>';
+            el(id).innerHTML = '<div class="aemc-panel-error">This section failed to load (' + esc(data.errors[key]) + '). <button type="button" class="aemc-reload" data-reload="1">Reload to retry</button></div>';
             return true;
         }
         return false;
@@ -1773,7 +1778,7 @@
                 if (m.bradleyPo) meta.push('PO# ' + m.bradleyPo);
                 // SanMar invoice button — same shared viewer as the Purchasing Portal.
                 var invBtn = (o.sanmarPos && o.sanmarPos.length)
-                    ? '<button type="button" class="aemc-mini-btn aemc-inv-btn" data-wo="' + esc(o.orderNumber) + '" data-company="' + esc(o.company || '') + '" data-pos="' + esc(o.sanmarPos.join(',')) + '" data-ordered="' + esc(o.orderedDate || '') + '"><i class="fas fa-file-invoice-dollar"></i> Invoice</button>'
+                    ? '<button type="button" class="aemc-mini-btn aemc-inv-btn" data-wo="' + esc(o.orderNumber) + '" data-company="' + esc(o.company || '') + '" data-pos="' + esc(o.sanmarPos.join(',')) + '" data-ordered="' + esc(o.orderedDate || '') + '"><i class="fas fa-file-invoice-dollar" aria-hidden="true"></i> Invoice</button>'
                     : '';
                 return '<li class="aemc-row' + (hidden ? ' aemc-row--collapsed' : '') + '">' +
                     '<span class="aemc-row-main">WO #' + esc(o.orderNumber) + (o.company ? ' — ' + esc(o.company) : '') + '</span>' +
@@ -1794,7 +1799,7 @@
                 });
             });
         }).catch(function (err) {
-            el('aemc-purch').innerHTML = '<div class="aemc-panel-error">Purchasing tracker failed to load (' + esc(err.message) + '). Refresh to retry.</div>';
+            el('aemc-purch').innerHTML = '<div class="aemc-panel-error">Purchasing tracker failed to load (' + esc(err.message) + '). <button type="button" class="aemc-reload" data-reload="1">Reload to retry</button></div>';
         });
     }
 
@@ -1877,7 +1882,7 @@
                       '<a class="aemc-viewall" href="/dashboards/purchasing-portal.html">Full purchasing portal</a>',
             };
         }).catch(function (err) {
-            el('aemc-due').innerHTML = '<div class="aemc-panel-error">Order due dates failed to load (' + esc(err.message) + '). Refresh to retry.</div>';
+            el('aemc-due').innerHTML = '<div class="aemc-panel-error">Order due dates failed to load (' + esc(err.message) + '). <button type="button" class="aemc-reload" data-reload="1">Reload to retry</button></div>';
             var ck = el('mc-clock');
             if (ck) ck.innerHTML = '<div class="aemc-panel-error">Couldn\'t read your due dates.</div>';
         });
@@ -1916,7 +1921,7 @@
             }, { noun: 'account' }) +
                 (g.truncated ? '<p class="aemc-hint">…and ' + g.truncated + ' more flagged — work these first, then refresh tomorrow.</p>' : '');
         }).catch(function (err) {
-            el('aemc-growth').innerHTML = '<div class="aemc-panel-error">Growth radar failed to load (' + esc(err.message) + '). Refresh to retry.</div>';
+            el('aemc-growth').innerHTML = '<div class="aemc-panel-error">Growth radar failed to load (' + esc(err.message) + '). <button type="button" class="aemc-reload" data-reload="1">Reload to retry</button></div>';
         });
     }
 
@@ -1960,7 +1965,7 @@
         if (!host) return;
         host.innerHTML = '<i class="fas fa-triangle-exclamation" aria-hidden="true"></i> ' +
             'Your bonus figures couldn’t load (' + esc(err.message) + '). ' +
-            'Nothing else on this page is affected — hit Refresh to retry.';
+            'Nothing else on this page is affected — use the Reload button or refresh.';
         host.hidden = false;
     }
 
@@ -1975,7 +1980,7 @@
             .then(function (r) { renderEarnedAccounts(r && r.mine); })
             .catch(function (err) {
                 el('aemc-earned').innerHTML = '<div class="aemc-panel-error">Bonus detail failed to load (' +
-                    esc(err.message) + '). Refresh to retry.</div>';
+                    esc(err.message) + '). <button type="button" class="aemc-reload" data-reload="1">Reload to retry</button></div>';
             });
     }
 
@@ -2105,7 +2110,7 @@
         var dialCap = el('aemc-bh-dial-cap');
         if (dialCap) dialCap.textContent = l.baseline ? 'OF GOAL' : '';
 
-        el('aemc-bh-fill').style.width = pctDraw.toFixed(1) + '%';
+        el('aemc-bh-fill').style.setProperty('--w', pctDraw.toFixed(1) + '%');
         el('aemc-bh-goal').innerHTML = l.baseline
             ? '<strong>' + money0(l.revenue) + '</strong> today · ' + pctExact.toFixed(1) + '%'
             : '';
@@ -2116,13 +2121,13 @@
         var marks = '';
         if (isRate && l.baseline) {
             marks += '<span class="aemc-bh-mark' + (pctExact >= l.rate.startPct ? ' is-hit' : '') +
-                '" style="left:' + (Number(l.rate.startPct) || 85) + '%" title="' +
+                '" style="--x:' + (Number(l.rate.startPct) || 85) + '%" title="' +
                 money0(l.rate.revenueAtStart) + ' — earning starts here"></span>';
         } else {
             marks += rungs.map(function (r) {
                 var at = l.baseline ? Math.min((r.threshold / l.baseline) * 100, 100) : 0;
                 return '<span class="aemc-bh-mark' + (l.revenue >= r.threshold ? ' is-hit' : '') +
-                    '" style="left:' + at.toFixed(1) + '%" title="' + money0(r.threshold) + ' pays ' + money2(r.pay) + '"></span>';
+                    '" style="--x:' + at.toFixed(1) + '%" title="' + money0(r.threshold) + ' pays ' + money2(r.pay) + '"></span>';
             }).join('');
         }
         marks += '<span class="aemc-bh-endcap"></span>';
@@ -2135,7 +2140,7 @@
             var atPace = Math.max(0, Math.min(Number(pace.projectedPct), 100));
             var paceBehind = pace.status === 'behind' || pace.status === 'below-start';
             marks += '<span class="mc-bh-pace-mark' + (paceBehind ? ' is-behind' : '') +
-                '" style="left:' + atPace.toFixed(1) + '%" role="img" aria-label="Projected ' +
+                '" style="--x:' + atPace.toFixed(1) + '%" role="img" aria-label="Projected ' +
                 money0(pace.projectedRevenue) + ' by September 30 at your current pace"></span>';
         }
         el('aemc-bh-marks').innerHTML = marks;
@@ -2144,7 +2149,7 @@
         var startCap = el('aemc-bh-startcap');
         if (startCap) {
             startCap.innerHTML = (isRate && l.baseline)
-                ? '<span style="left:' + (Number(l.rate.startPct) || 85) + '%">' +
+                ? '<span style="--x:' + (Number(l.rate.startPct) || 85) + '%">' +
                   (Number(l.rate.startPct) || 85) + '% · ' + money0(l.rate.revenueAtStart) +
                   ' — earning starts ↓</span>'
                 : '';
@@ -2286,7 +2291,7 @@
         if (!host) return;
         if (!mine) {
             host.innerHTML = '<div class="aemc-panel-error">Bonus detail unavailable — no figures came back ' +
-                'for your account. Refresh to retry.</div>';
+                'for your account. <button type="button" class="aemc-reload" data-reload="1">Reload to retry</button></div>';
             return;
         }
         var link = el('aemc-emb-bonus-link');
@@ -2447,7 +2452,7 @@
             if (pb) pb.hidden = false;
             renderCallRows(Math.min(15, callState.items.length));
         }).catch(function (err) {
-            el('aemc-calls').innerHTML = '<div class="aemc-panel-error">Call list failed to load (' + esc(err.message) + '). Refresh to retry.</div>';
+            el('aemc-calls').innerHTML = '<div class="aemc-panel-error">Call list failed to load (' + esc(err.message) + '). <button type="button" class="aemc-reload" data-reload="1">Reload to retry</button></div>';
         });
     }
 
@@ -2534,7 +2539,7 @@
             html += '</ul>';
             el('aemc-dq').innerHTML = html;
         }).catch(function (err) {
-            el('aemc-dq').innerHTML = '<div class="aemc-panel-error">Missing-info check failed to load (' + esc(err.message) + '). Refresh to retry.</div>';
+            el('aemc-dq').innerHTML = '<div class="aemc-panel-error">Missing-info check failed to load (' + esc(err.message) + '). <button type="button" class="aemc-reload" data-reload="1">Reload to retry</button></div>';
         });
     }
 
@@ -2684,7 +2689,7 @@
         el('aemc-outreach-lead').textContent = (lead.company || '') + ' — ' + (lead.contactName || '') + ' <' + lead.email + '>';
         el('aemc-outreach-preview').innerHTML = '';
         el('aemc-outreach-btns').innerHTML = OUTREACH_TEMPLATES.map(function (t, i) {
-            return '<button type="button" class="dash-btn" data-tpl="' + i + '"><i class="fas ' + t.icon + '"></i> ' + t.label + '</button>';
+            return '<button type="button" class="dash-btn" data-tpl="' + i + '"><i class="fas ' + t.icon + '" aria-hidden="true"></i> ' + t.label + '</button>';
         }).join('');
         Array.prototype.forEach.call(el('aemc-outreach-btns').querySelectorAll('[data-tpl]'), function (b) {
             b.addEventListener('click', function () {
@@ -2708,7 +2713,7 @@
                 // HTML-escaped in lead-outreach-templates.js (jest-locked).
                 '<div class="aemc-outreach-body">' + (p.bodyHtml || '') + '</div>' +
                 '<div class="aemc-modal-actions">' +
-                '<button type="button" id="aemc-outreach-send" class="dash-btn dash-btn--primary"><i class="fas fa-paper-plane"></i> Send to ' + esc(lead.email) + '</button>' +
+                '<button type="button" id="aemc-outreach-send" class="dash-btn dash-btn--primary"><i class="fas fa-paper-plane" aria-hidden="true"></i> Send to ' + esc(lead.email) + '</button>' +
                 '<span id="aemc-outreach-note" class="aemc-muted"></span>' +
                 '</div>';
             el('aemc-outreach-send').addEventListener('click', function () {
@@ -2716,7 +2721,7 @@
                 btn.disabled = true;
                 el('aemc-outreach-note').textContent = 'Sending…';
                 outreachFetch(outreachBody(lead, tpl, false)).then(function (r) {
-                    box.innerHTML = '<div class="aemc-outreach-sent"><i class="fas fa-circle-check"></i> Sent “' +
+                    box.innerHTML = '<div class="aemc-outreach-sent"><i class="fas fa-circle-check" aria-hidden="true"></i> Sent “' +
                         esc(r.label || tpl.label) + '” to ' + esc(r.to || lead.email) + '</div>';
                 }).catch(function (err) {
                     btn.disabled = false;

@@ -1471,3 +1471,10 @@ a.aemc-row-main:hover { text-decoration: underline; }
 .mc-sw--ok   { background: #4cb354; }
 .mc-chip.is-fire .mc-chip-dot { background: #dc2626; }
 .mc-chip.is-art  .mc-chip-dot { background: #8b5cf6; }
+
+/* 2026-09-05 hygiene — bar widths / marker positions via custom properties; reload control; modal scroll lock */
+body.is-modal-open { overflow: hidden; }
+.aemc-bh-fill, .mc-kicker-fill, .mc-condensed-fill { width: var(--w, 0%); }
+.aemc-bh-mark, .mc-bh-pace-mark, .aemc-bh-startcap span { left: var(--x, 0%); }
+.aemc-reload { margin-left: 6px; padding: 2px 10px; border: 1px solid currentColor; border-radius: 6px; background: transparent; color: inherit; cursor: pointer; font: inherit; font-size: 12px; }
+.aemc-reload:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
