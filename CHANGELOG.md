@@ -1,3 +1,10 @@
+## v2026.09.06.39 (2026.09.06)
+
+- Memory: console sweep + root-duplicate findings recorded (v2026.09.06.37); Names & Numbers LESSONS entry archived
+- Calculator console errors + CSP: retire the never-rendered size-upcharge panel, DP5 skips pages without its grid, report-only CSP no longer carries upgrade-insecure-requests
+- Locks: six cache-bust version pins loosened to 'is versioned' (the .38 phase A bump broke them)
+- Deploy v2026.09.06.39: calculator console errors fixed, CSP report-only cleaned, version-pin locks loosened
+
 ## v2026.09.06.37 (2026.09.06)
 
 - Memory: EmailJS Rule 6 + accessibility pass recorded (v2026.09.06.36); vendor-portal LESSONS entry archived
