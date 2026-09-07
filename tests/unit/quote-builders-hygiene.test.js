@@ -22,7 +22,7 @@ const PAGES = fs.readdirSync(path.join(ROOT, 'quote-builders')).filter((f) => f.
 const MODULES = ['dtf', 'dtg', 'emb', 'scp', 'shared'].flatMap((d) => fs.readdirSync(path.join(ROOT, 'shared_components/js/builders', d)).filter((f) => f.endsWith('.js')).map((f) => `shared_components/js/builders/${d}/${f}`));
 const utils = read('shared_components/js/quote-builder-utils.js');
 
-describe('builder markup carries no decorative inline styles (2026-09-06 extraction → quote-builder-inline.css)', () => {
+describe('builder markup carries no decorative inline styles (2026-09-06 extraction → quote-builder-inline.css, retired 2026-09-07 into the readable quote-builder-utilities.css)', () => {
     // Only STATE properties may stay inline: the builders toggle display/opacity/visibility with el.style.* at runtime.
     const STATE = new Set(['display', 'opacity', 'visibility']);
     test.each(['quote-builders/embroidery-quote-builder.html', 'quote-builders/screenprint-quote-builder.html', 'quote-builders/dtf-quote-builder.html', 'quote-builders/dtg-quote-builder.html'])('%s', (rel) => {
@@ -33,7 +33,7 @@ describe('builder markup carries no decorative inline styles (2026-09-06 extract
             if (props.some((p) => !STATE.has(p))) decorative.push(m[1]);
         }
         expect(decorative).toEqual([]);
-        if (rel !== 'quote-builders/dtg-quote-builder.html') expect(html).toMatch(/quote-builder-inline\.css\?v=/);
+        if (rel !== 'quote-builders/dtg-quote-builder.html') expect(html).toMatch(/quote-builder-utilities\.css\?v=/);
     });
 });
 

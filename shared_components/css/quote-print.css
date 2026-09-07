@@ -1,3 +1,5 @@
+/* stylelint-disable declaration-no-important -- legacy sheet: a stack of overrides and Caspio/inline-style fights; the flags come out together when the page is untangled (2026-09-07) */
+
 /**
  * Quote Print Stylesheet — QuickBooks-style Invoice
  * ============================================================
@@ -22,6 +24,20 @@
  * .meta-card, .product-table, .totals-card, .quote-footer, etc.).
  */
 
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue so the page
+   keeps its exact look. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   every rule below uses var(). Raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
+:root {
+    --quote-print-green: #86efac;
+    --quote-print-red: #fca5a5;
+    --quote-print-yellow: #fcd34d;
+    --quote-print-green-tint: #bbf7d0;
+    --quote-print-yellow-2: #fde68a;
+    --quote-print-orange: #78350f;
+}
+/* stylelint-enable color-no-hex */
+
 /* Phase 11.1 (2026-05-14): print-only terms paragraph.
    Mirrors the email closing — "Pricing is based on customer-supplied
    blanks. This quote is valid for 30 days. Reply to confirm or send
@@ -39,7 +55,6 @@
 }
 
 @media print {
-
     /* ============================================================
        PAGE SETUP
        ============================================================ */
@@ -50,24 +65,22 @@
     }
 
     html, body {
-        background: #fff !important;
+        background: var(--color-surface) !important;
         margin: 0 !important;
         padding: 0 !important;
-        color: #1a202c !important;
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif !important;
+        color: var(--gray-900) !important;
+        font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif !important;
         font-size: 10pt;
         line-height: 1.35;
-        text-rendering: optimizeLegibility;
+        text-rendering: optimizelegibility;
         -webkit-font-smoothing: antialiased;
         -webkit-print-color-adjust: exact !important;
-        print-color-adjust: exact !important;
         color-adjust: exact !important;
     }
 
     /* Preserve all colored backgrounds */
     *, *::before, *::after {
         -webkit-print-color-adjust: exact !important;
-        print-color-adjust: exact !important;
     }
 
     /* ============================================================
@@ -108,7 +121,7 @@
         padding: 0 !important;
         box-shadow: none !important;
         border: none !important;
-        background: #fff !important;
+        background: var(--color-surface) !important;
     }
 
     /* ============================================================
@@ -120,13 +133,13 @@
         justify-content: space-between;
         align-items: flex-start;
         gap: 14pt;
-        padding: 0 0 6pt 0 !important;       /* Phase 11.4: 10pt → 6pt */
-        margin: 0 0 8pt 0 !important;        /* Phase 11.4: 14pt → 8pt */
+        padding: 0 0 6pt !important;       /* Phase 11.4: 10pt → 6pt */
+        margin: 0 0 8pt !important;        /* Phase 11.4: 14pt → 8pt */
         background: none !important;
         border: none !important;
-        border-bottom: 2pt solid #2e5827 !important;
+        border-bottom: 2pt solid var(--brand-700) !important;
         border-radius: 0 !important;
-        color: #1a202c !important;
+        color: var(--gray-900) !important;
     }
 
     .quote-header .header-left,
@@ -161,8 +174,8 @@
         font-size: 18pt !important;          /* Phase 11.4: 22pt → 18pt */
         font-weight: 700 !important;
         letter-spacing: -0.01em;
-        color: #1a202c !important;
-        margin: 0 0 3pt 0 !important;
+        color: var(--gray-900) !important;
+        margin: 0 0 3pt !important;
         line-height: 1.1;
         background: none !important;
         text-shadow: none !important;
@@ -180,30 +193,30 @@
         font-weight: 700 !important;
         letter-spacing: 0.06em !important;
         text-transform: uppercase !important;
-        background: #fef3c7 !important;
-        color: #92400e !important;
-        border: 1pt solid #fcd34d !important;
+        background: var(--amber-100) !important;
+        color: var(--amber-800) !important;
+        border: 1pt solid var(--quote-print-yellow) !important;
     }
 
     .status-badge.status-accepted {
-        background: #dcfce7 !important;
-        color: #166534 !important;
-        border-color: #86efac !important;
+        background: var(--store-green-100) !important;
+        color: var(--print-green) !important;
+        border-color: var(--quote-print-green) !important;
     }
 
     .status-badge.status-expired,
     .status-badge.status-rejected {
-        background: #fee2e2 !important;
-        color: #991b1b !important;
-        border-color: #fca5a5 !important;
+        background: var(--red-100) !important;
+        color: var(--red-800) !important;
+        border-color: var(--quote-print-red) !important;
     }
 
     /* PO number row (when present) */
     #po-number-row {
-        margin: 0 0 8pt 0 !important;
+        margin: 0 0 8pt !important;
         text-align: right !important;
         font-size: 9pt;
-        color: #475569;
+        color: var(--slate-600);
     }
 
     /* ============================================================
@@ -217,19 +230,17 @@
         display: grid !important;
         grid-template-columns: 1.2fr 1fr 1.1fr !important;
         gap: 6pt !important;             /* Phase 11.4: 8pt → 6pt */
-        margin: 0 0 6pt 0 !important;    /* Phase 11.4: 10pt → 6pt */
+        margin: 0 0 6pt !important;    /* Phase 11.4: 10pt → 6pt */
         padding: 0 !important;
-        page-break-inside: avoid;
         break-inside: avoid;
     }
 
     .meta-card {
-        background: #f9fafb !important;
-        border: 1pt solid #e2e8f0 !important;
+        background: var(--gray-50) !important;
+        border: 1pt solid var(--slate-200) !important;
         border-radius: 4pt !important;
         padding: 6pt 8pt !important;     /* Phase 11.4: 8pt 10pt → 6pt 8pt */
         box-shadow: none !important;
-        page-break-inside: avoid;
         break-inside: avoid;
     }
 
@@ -238,17 +249,17 @@
         font-weight: 700 !important;
         letter-spacing: 0.08em !important;
         text-transform: uppercase !important;
-        color: #2e5827 !important;
-        margin: 0 0 5pt 0 !important;
+        color: var(--brand-700) !important;
+        margin: 0 0 5pt !important;
         padding: 0 !important;
         border: none !important;
     }
 
     .meta-card p {
-        margin: 0 0 2pt 0 !important;
+        margin: 0 0 2pt !important;
         padding: 0 !important;
         font-size: 9pt !important;
-        color: #1a202c !important;
+        color: var(--gray-900) !important;
         line-height: 1.4;
     }
 
@@ -256,17 +267,17 @@
     .customer-name {
         font-weight: 700 !important;
         font-size: 10pt !important;
-        color: #1a202c !important;
+        color: var(--gray-900) !important;
     }
 
     .company-name {
         font-weight: 500 !important;
-        color: #1a202c !important;
+        color: var(--gray-900) !important;
     }
 
     .customer-email,
     .customer-phone {
-        color: #475569 !important;
+        color: var(--slate-600) !important;
         font-size: 8.5pt !important;
         word-break: break-all;
     }
@@ -276,7 +287,7 @@
         display: block !important;
         margin-top: 6pt !important;
         padding-top: 5pt !important;
-        border-top: 1pt dashed #cbd5e0 !important;
+        border-top: 1pt dashed var(--gray-300) !important;
         background: none !important;
     }
 
@@ -285,34 +296,34 @@
         font-weight: 700 !important;
         letter-spacing: 0.08em !important;
         text-transform: uppercase !important;
-        color: #2e5827 !important;
-        margin: 0 0 3pt 0 !important;
+        color: var(--brand-700) !important;
+        margin: 0 0 3pt !important;
     }
 
     .billing-address,
     .billing-city-state {
         font-size: 9pt !important;
         font-weight: 400 !important;
-        color: #1a202c !important;
+        color: var(--gray-900) !important;
     }
 
     /* Ship-to card */
     .ship-to-card #ship-to-address,
     .ship-to-card #ship-to-city-state {
         font-size: 9pt !important;
-        color: #1a202c !important;
+        color: var(--gray-900) !important;
     }
 
     #ship-to-method {
         font-style: italic !important;
-        color: #475569 !important;
+        color: var(--slate-600) !important;
         font-size: 8.5pt !important;
         margin-top: 3pt !important;
     }
 
     #ship-to-tracking {
         font-size: 8pt !important;
-        color: #475569 !important;
+        color: var(--slate-600) !important;
     }
 
     /* Dates card — key/value rows.
@@ -326,20 +337,20 @@
         align-items: baseline;
         gap: 6pt !important;
         font-size: 9pt !important;
-        margin: 0 0 2pt 0 !important;
+        margin: 0 0 2pt !important;
         padding: 0 !important;
         border: none !important;
         background: none !important;
     }
 
     .dates-card .date-row .label {
-        color: #475569 !important;
+        color: var(--slate-600) !important;
         font-weight: 500 !important;
         white-space: nowrap;
     }
 
     .dates-card .date-row .value {
-        color: #1a202c !important;
+        color: var(--gray-900) !important;
         font-weight: 600 !important;
         text-align: right;
     }
@@ -363,20 +374,20 @@
     .accepted-banner {
         padding: 4pt 10pt !important;     /* Phase 11.2: 6pt → 4pt */
         border-radius: 3pt !important;    /* Phase 11.2: 4pt → 3pt */
-        margin: 0 0 6pt 0 !important;     /* Phase 11.2: 8pt → 6pt */
+        margin: 0 0 6pt !important;     /* Phase 11.2: 8pt → 6pt */
         font-size: 8pt !important;        /* Phase 11.2: 9pt → 8pt */
-        page-break-inside: avoid;
-        background: #f0fdf4 !important;
-        border: 0.5pt solid #86efac !important;  /* Phase 11.2: 1pt → 0.5pt */
-        color: #166534 !important;
+        break-inside: avoid;
+        background: var(--brand-50) !important;
+        border: 0.5pt solid var(--quote-print-green) !important;  /* Phase 11.2: 1pt → 0.5pt */
+        color: var(--print-green) !important;
         align-items: center;
         gap: 6pt;
     }
 
     .expired-banner {
-        background: #fef2f2 !important;
-        border-color: #fca5a5 !important;
-        color: #991b1b !important;
+        background: var(--red-50) !important;
+        border-color: var(--quote-print-red) !important;
+        color: var(--red-800) !important;
     }
 
     /* Phase 11.2: collapse the title + detail children into a single
@@ -392,6 +403,7 @@
         margin: 0 !important;
         display: inline !important;
     }
+
     .expired-banner p, .expired-banner .banner-detail,
     .accepted-banner p, .accepted-banner .banner-detail {
         font-size: 8pt !important;
@@ -399,6 +411,7 @@
         margin: 0 0 0 8pt !important;
         display: inline !important;
     }
+
     /* Hide the warning/check icon SVG — wordmark alone conveys the state */
     .expired-banner svg,
     .accepted-banner svg {
@@ -413,24 +426,24 @@
     #quote-content > .quote-items > h2 {
         font-size: 11pt !important;
         font-weight: 700 !important;
-        color: #1a202c !important;
-        margin: 6pt 0 4pt 0 !important;      /* Phase 11.4: 12pt 0 6pt 0 → 6pt 0 4pt 0 */
+        color: var(--gray-900) !important;
+        margin: 6pt 0 4pt !important;      /* Phase 11.4: 12pt 0 6pt 0 → 6pt 0 4pt 0 */
         padding: 0 !important;
         border: none !important;
         background: none !important;
     }
 
     .embroidery-info {
-        background: #f0fdf4 !important;
-        border: 1pt solid #bbf7d0 !important;
+        background: var(--brand-50) !important;
+        border: 1pt solid var(--quote-print-green-tint) !important;
         border-radius: 4pt !important;
         padding: 5pt 10pt !important;        /* Phase 11.4: 6pt → 5pt */
-        margin: 0 0 5pt 0 !important;        /* Phase 11.4: 8pt → 5pt */
+        margin: 0 0 5pt !important;        /* Phase 11.4: 8pt → 5pt */
         display: flex !important;
         flex-wrap: wrap;
         gap: 14pt;
         font-size: 9pt !important;
-        page-break-inside: avoid;
+        break-inside: avoid;
     }
 
     .emb-detail {
@@ -440,12 +453,12 @@
 
     .emb-label {
         font-weight: 600 !important;
-        color: #166534 !important;
+        color: var(--print-green) !important;
         margin-right: 3pt;
     }
 
     .emb-value {
-        color: #1a202c !important;
+        color: var(--gray-900) !important;
         font-weight: 500 !important;
     }
 
@@ -467,8 +480,8 @@
         width: 100% !important;
         border-collapse: collapse !important;
         font-size: 9pt !important;
-        margin: 0 0 5pt 0 !important;        /* Phase 11.4: 8pt → 5pt */
-        page-break-inside: avoid;
+        margin: 0 0 5pt !important;        /* Phase 11.4: 8pt → 5pt */
+        break-inside: avoid;
     }
 
     .product-table thead {
@@ -476,8 +489,8 @@
     }
 
     .product-table thead th {
-        background: #2e5827 !important;
-        color: #fff !important;
+        background: var(--brand-700) !important;
+        color: var(--color-on-brand) !important;
         font-size: 8pt !important;
         font-weight: 700 !important;
         letter-spacing: 0.05em !important;
@@ -494,16 +507,16 @@
     }
 
     .product-table tbody td {
-        border-bottom: 0.5pt solid #e2e8f0 !important;
+        border-bottom: 0.5pt solid var(--slate-200) !important;
         padding: 4pt 6pt !important;     /* Phase 11.4: 5pt → 4pt (saves ~1pt per row) */
         font-size: 9pt !important;
-        color: #1a202c !important;
+        color: var(--gray-900) !important;
         vertical-align: top !important;
-        background: #fff !important;
+        background: var(--color-surface) !important;
     }
 
     .product-table tbody tr {
-        page-break-inside: avoid;
+        break-inside: avoid;
     }
 
     /* Hide the empty size columns — CEMB quotes are per-piece, not per-size */
@@ -526,20 +539,20 @@
 
     /* Customer-supplied row style (CEMB items) */
     .customer-supplied-row td {
-        background: #fffdf5 !important;
+        background: var(--store-paper) !important;
     }
 
     /* Style col: SKU subtitle styling */
     .product-table .style-col > div:first-child {
         font-weight: 700 !important;
-        color: #1a202c !important;
+        color: var(--gray-900) !important;
         font-size: 9.5pt;
     }
 
     .product-table .style-col > div:last-child {
         font-family: ui-monospace, 'SF Mono', Menlo, monospace !important;
         font-size: 7.5pt !important;
-        color: #94a3b8 !important;
+        color: var(--gray-400) !important;
         font-weight: 500 !important;
         margin-top: 2pt !important;
         letter-spacing: 0.04em !important;
@@ -553,12 +566,12 @@
     .special-notes-section {
         margin: 8pt 0 !important;
         padding: 0 !important;
-        page-break-inside: avoid;
+        break-inside: avoid;
     }
 
     .special-notes-card {
-        background: #fefce8 !important;
-        border: 1pt solid #fde68a !important;
+        background: var(--red-50) !important;
+        border: 1pt solid var(--quote-print-yellow-2) !important;
         border-radius: 4pt !important;
         padding: 6pt 10pt !important;
     }
@@ -568,17 +581,17 @@
         font-weight: 700 !important;
         text-transform: uppercase !important;
         letter-spacing: 0.06em !important;
-        color: #92400e !important;
-        margin: 0 0 4pt 0 !important;
+        color: var(--amber-800) !important;
+        margin: 0 0 4pt !important;
     }
 
     .special-notes-content,
     #special-notes-content {
         font-family: inherit !important;
         font-size: 8.5pt !important;
-        color: #78350f !important;
+        color: var(--quote-print-orange) !important;
         white-space: pre-wrap;
-        word-wrap: break-word;
+        overflow-wrap: break-word;
         line-height: 1.4;
         margin: 0 !important;
     }
@@ -597,15 +610,15 @@
         padding: 0 !important;
         display: flex !important;
         justify-content: flex-end;
-        page-break-inside: avoid;
+        break-inside: avoid;
     }
 
     .totals-card {
         width: 40% !important;
         min-width: 220pt;
         padding: 5pt 10pt !important;        /* Phase 11.4: 6pt → 5pt */
-        background: #f9fafb !important;
-        border: 1pt solid #e2e8f0 !important;
+        background: var(--gray-50) !important;
+        border: 1pt solid var(--slate-200) !important;
         border-radius: 4pt !important;
         box-shadow: none !important;
     }
@@ -620,12 +633,12 @@
     }
 
     .totals-card .total-row .label {
-        color: #475569 !important;
+        color: var(--slate-600) !important;
         font-weight: 500 !important;
     }
 
     .totals-card .total-row .value {
-        color: #1a202c !important;
+        color: var(--gray-900) !important;
         font-weight: 600 !important;
         font-variant-numeric: tabular-nums;
     }
@@ -633,12 +646,12 @@
     .totals-card .total-row.grand-total {
         margin-top: 4pt !important;
         padding-top: 6pt !important;
-        border-top: 1pt solid #2e5827 !important;
+        border-top: 1pt solid var(--brand-700) !important;
     }
 
     .totals-card .total-row.grand-total .label,
     .totals-card .total-row.grand-total .value {
-        color: #2e5827 !important;
+        color: var(--brand-700) !important;
         font-weight: 700 !important;
         font-size: 12pt !important;
     }
@@ -646,8 +659,8 @@
     .totals-card .total-quantity {
         text-align: right !important;
         font-size: 7.5pt !important;
-        color: #94a3b8 !important;
-        margin: 4pt 0 0 0 !important;
+        color: var(--gray-400) !important;
+        margin: 4pt 0 0 !important;
         padding: 0 !important;
         font-style: italic;
     }
@@ -660,13 +673,13 @@
 
     .print-only-terms {
         display: block !important;
-        margin: 4pt 0 3pt 0 !important;      /* Phase 11.4: 8pt 0 6pt 0 → 4pt 0 3pt 0 */
+        margin: 4pt 0 3pt !important;      /* Phase 11.4: 8pt 0 6pt 0 → 4pt 0 3pt 0 */
         padding: 0 !important;
         font-size: 8.5pt !important;         /* Phase 11.4: 9pt → 8.5pt */
-        color: #475569 !important;
+        color: var(--slate-600) !important;
         line-height: 1.4 !important;
         font-style: italic;
-        page-break-inside: avoid;
+        break-inside: avoid;
     }
 
     /* ============================================================
@@ -680,13 +693,13 @@
         2. Footer section margins + line-heights were generous
        Fix: tighter sizes across the board + small phone link.            */
     .quote-footer {
-        margin: 5pt 0 0 0 !important;    /* Phase 11.4: 8pt → 5pt */
-        padding: 4pt 0 0 0 !important;   /* Phase 11.4: 5pt → 4pt */
-        border-top: 0.5pt solid #e2e8f0 !important;
+        margin: 5pt 0 0 !important;    /* Phase 11.4: 8pt → 5pt */
+        padding: 4pt 0 0 !important;   /* Phase 11.4: 5pt → 4pt */
+        border-top: 0.5pt solid var(--slate-200) !important;
         background: none !important;
-        color: #475569 !important;
+        color: var(--slate-600) !important;
         font-size: 7.5pt !important;
-        page-break-inside: avoid;
+        break-inside: avoid;
         line-height: 1.3;
     }
 
@@ -695,7 +708,7 @@
         justify-content: space-between;
         align-items: flex-start;
         gap: 12pt;                       /* Phase 11.3: 16pt → 12pt */
-        margin: 0 0 4pt 0 !important;    /* Phase 11.3: 6pt → 4pt */
+        margin: 0 0 4pt !important;    /* Phase 11.3: 6pt → 4pt */
         background: none !important;
     }
 
@@ -711,15 +724,15 @@
         font-weight: 700 !important;
         text-transform: uppercase !important;
         letter-spacing: 0.06em !important;
-        color: #2e5827 !important;
-        margin: 0 0 2pt 0 !important;    /* Phase 11.3: 3pt → 2pt */
+        color: var(--brand-700) !important;
+        margin: 0 0 2pt !important;    /* Phase 11.3: 3pt → 2pt */
         padding: 0 !important;
     }
 
     .footer-section p,
     .footer-section ul {
         font-size: 7.5pt !important;     /* Phase 11.3: 8pt → 7.5pt */
-        color: #475569 !important;
+        color: var(--slate-600) !important;
         margin: 0 !important;
         padding: 0 !important;
         line-height: 1.3;                /* Phase 11.3: 1.4 → 1.3 */
@@ -731,7 +744,7 @@
 
     .footer-section li {
         font-size: 7.5pt !important;     /* Phase 11.3: 8pt → 7.5pt */
-        color: #475569 !important;
+        color: var(--slate-600) !important;
         margin: 0 !important;
         padding-left: 7pt !important;    /* Phase 11.3: 8pt → 7pt */
         position: relative;
@@ -742,7 +755,7 @@
         content: '•';
         position: absolute;
         left: 0;
-        color: #2e5827;
+        color: var(--brand-700);
         font-weight: 700;
     }
 
@@ -754,7 +767,7 @@
     .phone-link {
         font-size: 8pt !important;
         font-weight: 700 !important;
-        color: #1a202c !important;
+        color: var(--gray-900) !important;
         text-decoration: none !important;
         display: inline !important;
         margin: 0 !important;
@@ -766,10 +779,10 @@
     .footer-section + p {
         text-align: center;
         font-size: 6.5pt !important;     /* Phase 11.3: 7.5pt → 6.5pt */
-        color: #94a3b8 !important;
+        color: var(--gray-400) !important;
         padding-top: 3pt !important;     /* Phase 11.3: 4pt → 3pt */
         margin: 0 !important;
-        border-top: 0.5pt solid #e2e8f0 !important;
+        border-top: 0.5pt solid var(--slate-200) !important;
         line-height: 1.3;
     }
 
@@ -778,7 +791,7 @@
        ============================================================ */
 
     a {
-        color: #1a202c !important;
+        color: var(--gray-900) !important;
         text-decoration: none !important;
     }
 
@@ -801,18 +814,15 @@
     .quote-totals,
     .totals-card,
     .quote-footer {
-        page-break-inside: avoid !important;
         break-inside: avoid !important;
     }
 
     .product-table tr,
     .quote-items tr {
-        page-break-inside: avoid !important;
         break-inside: avoid !important;
     }
 
     h1, h2, h3, h4, h5, h6 {
-        page-break-after: avoid !important;
         break-after: avoid !important;
     }
 

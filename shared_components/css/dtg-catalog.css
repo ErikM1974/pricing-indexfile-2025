@@ -12,6 +12,21 @@
    card-with-hover-lift pattern same as the rest of the page.
    ========================================================================== */
 
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue so the page
+   keeps its exact look. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   every rule below uses var(). Raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
+:root {
+    --dtg-catalog-orange: #78350f;
+    --dtg-catalog-orange-2: #bdb097;
+    --dtg-catalog-yellow: #fde68a;
+    --dtg-catalog-orange-3: #fed7aa;
+    --dtg-catalog-yellow-2: #fbbf24;
+    --dtg-catalog-green: #16a34a;
+    --dtg-catalog-green-2: #15803d;
+}
+/* stylelint-enable color-no-hex */
+
 /* ============================================================================
    Two-column layout (2026-05-19) — catalog on the left, sticky order form
    on the right. Industry-standard pattern for catalog-to-order workflows.
@@ -28,6 +43,7 @@
 
 .dtg-layout {
     display: grid;
+
     /* Catalog: stretches to fill remaining space (minmax 0 prevents grid
        blow-out from the catalog content). Form: 440-520px — wide enough
        for the line-item card layout (commit 2) but narrow enough to leave
@@ -37,44 +53,50 @@
     align-items: start;
     margin-bottom: 18px;
 }
+
 .dtg-layout > .dtg-catalog-section--standalone {
     /* Left column — catalog. Sticky behavior is on the RIGHT column, not
        this one. Catalog scrolls with the page so the rep can see all 20
        cards without horizontal-scroll on a single-row layout. */
     min-width: 0; /* allow the grid cell to shrink without overflow */
 }
+
 .dtg-form-column {
     /* Right column — order form. Sticky so it stays in view as the rep
        scrolls through the catalog. Has its own scroll for tall forms. */
     position: sticky;
     top: 14px;
     max-height: calc(100vh - 28px);
-    overflow-y: auto;
+    overflow: hidden auto;
+
     /* Hide horizontal scrollbar (vertical only) */
-    overflow-x: hidden;
+
     /* Smooth out browser-default scrollbar on Webkit + Firefox */
     scrollbar-width: thin;
-    scrollbar-color: #d6cdb8 transparent;
+    scrollbar-color: var(--store-line-strong) transparent;
 }
 .dtg-form-column::-webkit-scrollbar { width: 8px; }
+
 .dtg-form-column::-webkit-scrollbar-thumb {
-    background: #d6cdb8;
+    background: var(--store-line-strong);
     border-radius: 4px;
 }
+
 .dtg-form-column::-webkit-scrollbar-thumb:hover {
-    background: #bdb097;
+    background: var(--dtg-catalog-orange-2);
 }
 
 /* Below 1280px (laptops, smaller monitors): single-column stacked. The
    form sits below the catalog as it did pre-restructure. No sticky, no
    side-by-side. Catches all the reps on smaller displays. */
-@media (max-width: 1279px) {
+@media (width <= 1279px) {
     .dtg-layout {
         /* minmax(0, 1fr) — a bare 1fr is minmax(auto, 1fr), so the column grew to the
            form's min-content (~420px) and widened the whole layout viewport on phones
            (2026-09-05 builder review item 6). */
         grid-template-columns: minmax(0, 1fr);
     }
+
     .dtg-form-column {
         position: static;
         max-height: none;
@@ -91,7 +113,8 @@
     justify-content: space-between;
     gap: 16px;
     padding: 18px 22px;
-    margin: 14px 0 14px;
+    margin: 14px 0;
+
     /* PNW theme: soft cream → white gradient on a deep-forest left rail.
        Echoes a forest clearing on the right meeting tree-shadow on the left. */
     background: linear-gradient(90deg, var(--pnw-mist) 0%, var(--pnw-paper) 22%);
@@ -101,6 +124,7 @@
     box-shadow: var(--pnw-shadow-sm);
     position: relative;
 }
+
 .page-titlebar-title {
     margin: 0;
     font-size: 22px;
@@ -108,21 +132,23 @@
     color: var(--pnw-pine);
     letter-spacing: -0.01em;
 }
+
 .page-titlebar-fact {
     display: inline-flex;
     align-items: center;
     gap: 8px;
     padding: 7px 14px;
-    background: #edf3ea;
+    background: var(--brand-100);
     color: var(--pnw-pine);
-    border: 1px solid rgba(46, 88, 39, 0.25);
+    border: 1px solid rgb(46 88 39 / 25%);
     border-radius: 999px;
     font-size: 13px;
     font-weight: 500;
 }
 .page-titlebar-fact i { color: var(--pnw-forest); }
 .page-titlebar-fact strong { font-weight: 700; }
-@media (max-width: 700px) {
+
+@media (width <= 700px) {
     .page-titlebar { flex-direction: column; align-items: flex-start; }
     .page-titlebar-title { font-size: 18px; }
 }
@@ -132,18 +158,20 @@
 .dtg-catalog-section {
     padding: 16px 4px 8px;
 }
+
 /* Standalone modifier — the catalog no longer lives inside an accordion
    (2026-05-19). It's a top-level section with its own card-style frame.
    Internal padding is tight (16px) because the catalog sits in the
    narrower left column of the two-column layout. */
 .dtg-catalog-section--standalone {
-    padding: 18px 16px 18px;
+    padding: 18px 16px;
     margin: 0;
-    background: #ffffff;
-    border: 1px solid rgba(0, 0, 0, 0.06);
+    background: var(--color-surface);
+    border: 1px solid rgb(0 0 0 / 6%);
     border-radius: 10px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 1px 3px rgb(0 0 0 / 4%);
 }
+
 .dtg-catalog-section-title {
     display: flex;
     align-items: baseline;
@@ -154,24 +182,28 @@
     color: var(--pnw-pine);
     margin-bottom: 10px;
 }
+
 .dtg-catalog-section-title > i {
     color: var(--pnw-forest);
     font-size: 14px;
 }
+
 .dtg-catalog-section-meta {
     font-size: 12px;
     font-weight: 400;
-    color: #6b7280;
+    color: var(--gray-500);
     letter-spacing: 0;
     text-transform: none;
 }
+
 .dtg-catalog-head {
     margin-bottom: 14px;
 }
+
 .dtg-catalog-eyebrow {
     font-size: 11px;
     font-weight: 700;
-    color: #6b7280;
+    color: var(--gray-500);
     text-transform: uppercase;
     letter-spacing: 0.06em;
     margin-bottom: 10px;
@@ -189,32 +221,36 @@
     gap: 6px;
     margin-bottom: 4px;
 }
+
 .dtg-cat-tab {
     display: inline-flex;
     align-items: center;
     gap: 4px;
     padding: 6px 14px;
-    background: #fff;
-    border: 1px solid #d6cdb8;
+    background: var(--color-surface);
+    border: 1px solid var(--store-line-strong);
     border-radius: 999px;
     font: inherit;
     font-size: 12px;
     font-weight: 600;
-    color: #4b5563;
+    color: var(--gray-600);
     cursor: pointer;
     transition: background 120ms ease,
                 border-color 120ms ease,
                 color 120ms ease;
 }
+
 .dtg-cat-tab:hover {
     background: var(--pnw-birch);
-    border-color: #bdb097;
+    border-color: var(--dtg-catalog-orange-2);
 }
+
 .dtg-cat-tab.active {
     background: var(--pnw-forest);
-    color: #fff;
+    color: var(--color-on-brand);
     border-color: var(--pnw-forest);
 }
+
 .dtg-cat-tab .dtg-cat-count {
     font-size: 11px;
     opacity: 0.8;
@@ -230,35 +266,39 @@
     gap: 16px;
     flex-wrap: wrap;
 }
+
 .dtg-catalog-search-wrap {
     position: relative;
     flex: 0 1 320px;
     min-width: 200px;
 }
+
 .dtg-catalog-search-icon {
     position: absolute;
     left: 12px;
     top: 50%;
     transform: translateY(-50%);
-    color: #9ca3af;
+    color: var(--gray-400);
     font-size: 12px;
     pointer-events: none;
 }
+
 .dtg-catalog-search {
     width: 100%;
     padding: 8px 14px 8px 32px;
-    border: 1px solid #d6cdb8;
+    border: 1px solid var(--store-line-strong);
     border-radius: 999px;
     font: inherit;
     font-size: 12.5px;
     color: var(--pnw-pine);
-    background: #fff;
+    background: var(--color-surface);
     transition: border-color 120ms ease, box-shadow 120ms ease;
 }
+
 .dtg-catalog-search:focus {
     outline: none;
     border-color: var(--pnw-forest);
-    box-shadow: 0 0 0 3px rgba(46, 88, 39, 0.12);
+    box-shadow: 0 0 0 3px rgb(46 88 39 / 12%);
 }
 .dtg-catalog-search:focus + /* unused */ .dummy { /* selector helper */ }
 
@@ -274,28 +314,33 @@
     gap: 14px;
     margin-top: 14px;
 }
-@media (max-width: 900px) {
+
+@media (width <= 900px) {
     .dtg-catalog-grid { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
 }
-@media (max-width: 600px) {
+
+@media (width <= 600px) {
     .dtg-catalog-grid { grid-template-columns: 1fr; }
 }
+
 .dtg-catalog-loading,
 .dtg-catalog-empty,
 .dtg-catalog-error {
     grid-column: 1 / -1;
     padding: 30px 20px;
     text-align: center;
-    color: #6b7280;
+    color: var(--gray-500);
     font-size: 13px;
 }
+
 .dtg-catalog-loading i,
 .dtg-catalog-error i { margin-right: 8px; color: var(--pnw-forest); }
+
 .dtg-catalog-error button {
     margin-left: 8px;
     padding: 4px 10px;
     background: var(--pnw-forest);
-    color: #fff;
+    color: var(--color-on-brand);
     border: none;
     border-radius: 4px;
     font-size: 11px;
@@ -308,8 +353,8 @@
 .dtg-catalog-card {
     display: flex;
     flex-direction: column;
-    background: #fff;
-    border: 1px solid rgba(0, 0, 0, 0.08);
+    background: var(--color-surface);
+    border: 1px solid rgb(0 0 0 / 8%);
     border-radius: 12px;
     overflow: hidden;
     transition: transform 180ms ease,
@@ -318,18 +363,21 @@
     font: inherit;
     color: inherit;
 }
+
 .dtg-catalog-card:hover {
     transform: translateY(-3px);
-    box-shadow: 0 10px 24px rgba(46, 88, 39, 0.16);
+    box-shadow: 0 10px 24px rgb(46 88 39 / 16%);
     border-color: var(--pnw-forest);
 }
+
 .dtg-cc-just-added {
     animation: dtg-cc-pulse 1.2s ease-out;
 }
+
 @keyframes dtg-cc-pulse {
-    0%   { box-shadow: 0 0 0 0 rgba(46, 88, 39, 0.55); border-color: var(--pnw-forest); }
-    60%  { box-shadow: 0 0 0 14px rgba(46, 88, 39, 0); }
-    100% { box-shadow: 0 1px 4px rgba(46, 88, 39, 0.10); border-color: rgba(0,0,0,0.08); }
+    0%   { box-shadow: 0 0 0 0 rgb(46 88 39 / 55%); border-color: var(--pnw-forest); }
+    60%  { box-shadow: 0 0 0 14px rgb(46 88 39 / 0%); }
+    100% { box-shadow: 0 1px 4px rgb(46 88 39 / 10%); border-color: rgb(0 0 0 / 8%); }
 }
 
 /* Hero image */
@@ -337,34 +385,39 @@
     position: relative;
     width: 100%;
     aspect-ratio: 4 / 3;
-    background: linear-gradient(135deg, #fafafa 0%, #f0f0f0 100%);
+    background: linear-gradient(135deg, var(--gray-50) 0%, var(--gray-100) 100%);
     overflow: hidden;
     cursor: pointer;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+    border-bottom: 1px solid rgb(0 0 0 / 4%);
 }
+
 .dtg-cc-hero-img {
     width: 100%;
     height: 100%;
     object-fit: contain;
     object-position: center;
     transition: transform 200ms ease, opacity 200ms ease;
-    background: #ffffff;
+    background: var(--color-surface);
 }
+
 .dtg-catalog-card:hover .dtg-cc-hero-img {
     transform: scale(1.02);
 }
+
 .dtg-cc-hero-placeholder {
     width: 100%;
     height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #d1d5db;
+    color: var(--gray-300);
     font-size: 60px;
 }
+
 .dtg-cc-hero-missing {
-    background: repeating-linear-gradient(45deg, #f5f5f5, #f5f5f5 10px, #ebebeb 10px, #ebebeb 20px);
+    background: repeating-linear-gradient(45deg, var(--gray-100), var(--gray-100) 10px, var(--gray-200) 10px, var(--gray-200) 20px);
 }
+
 .dtg-cc-hero-badges {
     position: absolute;
     top: 10px;
@@ -372,6 +425,7 @@
     display: flex;
     gap: 4px;
 }
+
 .dtg-cc-rank {
     display: inline-flex;
     align-items: center;
@@ -379,28 +433,30 @@
     min-width: 28px;
     height: 22px;
     padding: 0 8px;
-    background: rgba(255, 255, 255, 0.95);
-    color: #4b5563;
+    background: rgb(255 255 255 / 95%);
+    color: var(--gray-600);
     border-radius: 999px;
     font-size: 10.5px;
     font-weight: 700;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+    box-shadow: 0 1px 3px rgb(0 0 0 / 15%);
 }
-.dtg-cc-rank-1 { background: linear-gradient(135deg, #fde68a 0%, #f59e0b 100%); color: #78350f; }
-.dtg-cc-rank-2 { background: linear-gradient(135deg, #e5e7eb 0%, #9ca3af 100%); color: #374151; }
-.dtg-cc-rank-3 { background: linear-gradient(135deg, #fbbf24 0%, #b45309 100%); color: #78350f; }
+.dtg-cc-rank-1 { background: linear-gradient(135deg, var(--dtg-catalog-yellow) 0%, var(--amber-500) 100%); color: var(--dtg-catalog-orange); }
+.dtg-cc-rank-2 { background: linear-gradient(135deg, var(--gray-200) 0%, var(--gray-400) 100%); color: var(--gray-700); }
+.dtg-cc-rank-3 { background: linear-gradient(135deg, var(--dtg-catalog-yellow-2) 0%, var(--amber-700) 100%); color: var(--dtg-catalog-orange); }
 
 /* Title block */
 .dtg-cc-titleblock {
     padding: 12px 14px 8px;
     cursor: pointer;
 }
+
 .dtg-cc-style-row {
     display: flex;
     align-items: center;
     gap: 8px;
     margin-bottom: 3px;
 }
+
 .dtg-cc-style {
     font-family: var(--mono, ui-monospace, monospace);
     font-size: 13px;
@@ -408,16 +464,18 @@
     color: var(--pnw-forest);
     letter-spacing: 0.02em;
 }
+
 .dtg-cc-category {
     padding: 2px 8px;
-    background: #f3f4f6;
-    color: #565e6b; /* 1.8: 4.39 -> 4.9:1 (49 catalog pills) */
+    background: var(--gray-100);
+    color: var(--gray-600); /* 1.8: 4.39 -> 4.9:1 (49 catalog pills) */
     border-radius: 999px;
     font-size: 10px;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.05em;
 }
+
 .dtg-cc-title {
     font-size: 14px;
     font-weight: 700;
@@ -425,9 +483,10 @@
     line-height: 1.3;
     margin: 2px 0 4px;
 }
+
 .dtg-cc-meta {
     font-size: 11.5px;
-    color: #6b7280;
+    color: var(--gray-500);
     font-weight: 500;
 }
 
@@ -439,13 +498,14 @@
     gap: 5px;
     padding: 0 14px 8px;
 }
+
 .dtg-cc-color-swatch {
     position: relative; /* anchor the .dtg-cc-swatch-check dot */
     width: 28px;
     height: 28px;
     padding: 0;
-    background: #fff;
-    border: 1.5px solid rgba(0, 0, 0, 0.12);
+    background: var(--color-surface);
+    border: 1.5px solid rgb(0 0 0 / 12%);
     border-radius: 5px;
     overflow: visible; /* let the check dot poke out the corner */
     cursor: pointer;
@@ -453,23 +513,27 @@
                 border-color 100ms ease,
                 box-shadow 100ms ease;
 }
+
 .dtg-cc-color-swatch:hover {
     transform: scale(1.18);
     border-color: var(--pnw-forest);
-    box-shadow: 0 2px 6px rgba(46, 88, 39, 0.30);
+    box-shadow: 0 2px 6px rgb(46 88 39 / 30%);
     z-index: 2;
 }
+
 .dtg-cc-color-swatch:focus-visible {
     outline: 2px solid var(--pnw-forest);
     outline-offset: 1px;
 }
+
 /* Selected state — ring + checkmark badge so the rep can SEE which color
    the green CTA below is about to add. Matches the Shopify pattern. */
 .dtg-cc-color-swatch--selected {
     border-color: var(--pnw-forest);
-    box-shadow: 0 0 0 2px var(--pnw-forest), 0 2px 6px rgba(46, 88, 39, 0.35);
+    box-shadow: 0 0 0 2px var(--pnw-forest), 0 2px 6px rgb(46 88 39 / 35%);
     z-index: 2;
 }
+
 .dtg-cc-color-swatch img {
     width: 100%;
     height: 100%;
@@ -477,13 +541,15 @@
     display: block;
     border-radius: 3px; /* round corners inside parent's border */
 }
+
 .dtg-cc-swatch-placeholder {
     display: block;
     width: 100%;
     height: 100%;
-    background: linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%);
+    background: linear-gradient(135deg, var(--gray-200) 0%, var(--gray-300) 100%);
     border-radius: 3px;
 }
+
 /* Tiny check badge in the swatch corner — only visible on --selected */
 .dtg-cc-swatch-check {
     position: absolute;
@@ -492,19 +558,21 @@
     width: 14px;
     height: 14px;
     background: var(--pnw-forest);
-    color: #fff;
+    color: var(--color-on-brand);
     border-radius: 50%;
-    border: 2px solid #fff;
+    border: 2px solid var(--color-surface);
     display: none;
     align-items: center;
     justify-content: center;
     font-size: 7px;
     line-height: 1;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 1px 3px rgb(0 0 0 / 20%);
 }
+
 .dtg-cc-color-swatch--selected .dtg-cc-swatch-check {
     display: flex;
 }
+
 /* "+N" overflow badge — now a real button that opens the All-colors modal */
 .dtg-cc-more {
     display: inline-flex;
@@ -514,9 +582,9 @@
     height: 28px;
     padding: 0 6px;
     background: transparent;
-    border: 1.5px dashed #d6cdb8;
+    border: 1.5px dashed var(--store-line-strong);
     border-radius: 5px;
-    color: #6b7280;
+    color: var(--gray-500);
     font: inherit;
     font-size: 10.5px;
     font-weight: 700;
@@ -525,11 +593,12 @@
                 border-color 100ms ease,
                 color 100ms ease;
 }
+
 .dtg-cc-more:hover {
     background: var(--pnw-birch);
     border-color: var(--pnw-forest);
-    color: var(--pnw-forest);
 }
+
 .dtg-cc-selected-color-label {
     /* Label inside the CTA that flips as the rep picks different swatches */
     font-weight: 700;
@@ -544,23 +613,27 @@
     gap: 5px;
     padding: 0 14px 6px;
     font-size: 11.5px;
-    color: #4b5563;
+    color: var(--gray-600);
     line-height: 1.3;
 }
+
 .dtg-cc-color-stat-name {
     font-weight: 700;
     color: var(--pnw-pine);
 }
+
 .dtg-cc-color-stat-dot {
-    color: #9ca3af;
+    color: var(--gray-400);
 }
+
 .dtg-cc-color-stat-units {
     font-weight: 700;
     color: var(--pnw-forest);
     font-variant-numeric: tabular-nums;
 }
+
 .dtg-cc-color-stat-label {
-    color: #6b7280;
+    color: var(--gray-500);
     font-size: 10.5px;
 }
 
@@ -570,9 +643,10 @@
     grid-template-columns: 1fr auto;
     gap: 6px;
     padding: 8px 12px 12px;
-    border-top: 1px solid rgba(0, 0, 0, 0.04);
+    border-top: 1px solid rgb(0 0 0 / 4%);
     margin-top: 4px;
 }
+
 .dtg-cc-add-default,
 .dtg-cc-view-all {
     display: inline-flex;
@@ -592,23 +666,28 @@
     overflow: hidden;
     text-overflow: ellipsis;
 }
+
 .dtg-cc-add-default {
     background: linear-gradient(135deg, var(--pnw-forest) 0%, var(--pnw-pine) 100%);
-    color: #fff8e0;
+    color: var(--store-rush-soft);
     border: none;
 }
+
 .dtg-cc-add-default:hover {
     transform: translateY(-1px);
-    box-shadow: 0 3px 8px rgba(46, 88, 39, 0.30);
+    box-shadow: 0 3px 8px rgb(46 88 39 / 30%);
 }
+
 .dtg-cc-view-all {
-    background: #fff;
+    background: var(--color-surface);
     color: var(--pnw-forest);
     border: 1px solid var(--pnw-forest);
 }
+
 .dtg-cc-view-all:hover {
-    background: #f3f7f1;
+    background: var(--color-dash-theme-bg);
 }
+
 .dtg-cc-add-default i,
 .dtg-cc-view-all i { font-size: 10px; }
 
@@ -617,14 +696,14 @@
 .dtg-catalog-foot {
     margin-top: 16px;
     padding: 10px 14px;
-    background: #fef3c7;
-    border-left: 3px solid #d97706;
+    background: var(--amber-100);
+    border-left: 3px solid var(--amber-600);
     border-radius: 4px;
     font-size: 12px;
-    color: #78350f;
+    color: var(--dtg-catalog-orange);
     line-height: 1.5;
 }
-.dtg-catalog-foot strong { color: #92400e; }
+.dtg-catalog-foot strong { color: var(--amber-800); }
 
 /* ----- Modal -------------------------------------------------------------- */
 
@@ -637,18 +716,19 @@
    in dtg-quote-page.css.) */
 .dtg-catalog-modal[hidden],
 .dtg-catalog-modal-backdrop[hidden] {
+    /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
     display: none !important;
 }
 
 .dtg-catalog-modal-backdrop {
     position: fixed;
     inset: 0;
-    background: rgba(20, 30, 15, 0.55);
+    background: rgb(20 30 15 / 55%);
     backdrop-filter: blur(2px);
-    -webkit-backdrop-filter: blur(2px);
     z-index: 200;
     animation: dtg-cat-fade 180ms ease;
 }
+
 @keyframes dtg-cat-fade { from { opacity: 0; } to { opacity: 1; } }
 
 .dtg-catalog-modal {
@@ -658,15 +738,16 @@
     transform: translate(-50%, -50%);
     width: min(900px, 92vw);
     max-height: 88vh;
-    background: var(--paper, #fffaf0);
+    background: var(--paper, var(--store-paper));
     border-radius: 14px;
-    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.35);
+    box-shadow: 0 30px 60px rgb(0 0 0 / 35%);
     overflow: hidden;
     z-index: 201;
     display: flex;
     flex-direction: column;
     animation: dtg-cat-pop 220ms cubic-bezier(0.22, 1, 0.36, 1);
 }
+
 @keyframes dtg-cat-pop {
     from { transform: translate(-50%, -50%) scale(0.92); opacity: 0; }
     to   { transform: translate(-50%, -50%) scale(1);    opacity: 1; }
@@ -679,7 +760,7 @@ body.dtg-catalog-modal-open { overflow: hidden; }
     right: 14px;
     width: 36px;
     height: 36px;
-    background: rgba(0, 0, 0, 0.06);
+    background: rgb(0 0 0 / 6%);
     border: none;
     border-radius: 999px;
     color: var(--pnw-pine);
@@ -688,25 +769,27 @@ body.dtg-catalog-modal-open { overflow: hidden; }
     transition: background 120ms ease;
     z-index: 1;
 }
-.dtg-catalog-modal-close:hover { background: rgba(0, 0, 0, 0.12); }
+.dtg-catalog-modal-close:hover { background: rgb(0 0 0 / 12%); }
 
 .dtg-catalog-modal-body {
     padding: 22px 26px 24px;
     overflow-y: auto;
 }
+
 .dtg-catalog-modal-loading,
 .dtg-catalog-error {
     padding: 60px 20px;
     text-align: center;
-    color: #6b7280;
+    color: var(--gray-500);
 }
 
 /* Modal head */
 .dtg-mc-head {
     margin-bottom: 18px;
     padding-bottom: 14px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    border-bottom: 1px solid rgb(0 0 0 / 8%);
 }
+
 .dtg-mc-style {
     font-family: var(--mono, ui-monospace, monospace);
     font-size: 13px;
@@ -715,6 +798,7 @@ body.dtg-catalog-modal-open { overflow: hidden; }
     letter-spacing: 0.04em;
     text-transform: uppercase;
 }
+
 .dtg-mc-title {
     margin: 4px 0 8px;
     font-size: 20px;
@@ -722,33 +806,37 @@ body.dtg-catalog-modal-open { overflow: hidden; }
     color: var(--pnw-pine);
     line-height: 1.25;
 }
+
 .dtg-mc-meta {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
     font-size: 12px;
-    color: #4b5563;
+    color: var(--gray-600);
 }
+
 .dtg-mc-rank {
-    background: linear-gradient(135deg, #fde68a 0%, #f59e0b 100%);
-    color: #78350f;
+    background: linear-gradient(135deg, var(--dtg-catalog-yellow) 0%, var(--amber-500) 100%);
+    color: var(--dtg-catalog-orange);
     font-weight: 700;
     padding: 3px 10px;
     border-radius: 999px;
     font-size: 11px;
 }
+
 .dtg-mc-stat {
     padding: 3px 10px;
-    background: #f3f4f6;
-    color: #4b5563;
+    background: var(--gray-100);
+    color: var(--gray-600);
     border-radius: 999px;
     font-size: 11px;
     font-weight: 500;
 }
+
 .dtg-mc-section-label {
     font-size: 11px;
     font-weight: 700;
-    color: #6b7280;
+    color: var(--gray-500);
     text-transform: uppercase;
     letter-spacing: 0.06em;
     margin: 0 0 10px;
@@ -760,36 +848,42 @@ body.dtg-catalog-modal-open { overflow: hidden; }
     grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
     gap: 10px;
 }
+
 .dtg-mc-color-card {
     display: grid;
     grid-template-columns: 48px 1fr auto;
     gap: 10px;
     align-items: center;
     padding: 10px 12px;
-    background: #fff;
-    border: 1px solid rgba(0, 0, 0, 0.08);
+    background: var(--color-surface);
+    border: 1px solid rgb(0 0 0 / 8%);
     border-radius: 8px;
     transition: border-color 120ms ease, box-shadow 120ms ease, background 200ms ease;
 }
+
 .dtg-mc-color-card:hover {
     border-color: var(--pnw-forest);
-    box-shadow: 0 2px 6px rgba(46, 88, 39, 0.10);
+    box-shadow: 0 2px 6px rgb(46 88 39 / 10%);
 }
+
 .dtg-mc-color-card-added {
-    background: #ecf6ec;
+    background: var(--brand-100);
     border-color: var(--pnw-forest);
 }
+
 .dtg-mc-color-swatch {
     width: 48px;
     height: 48px;
     border-radius: 6px;
-    border: 1px solid rgba(0, 0, 0, 0.10);
+    border: 1px solid rgb(0 0 0 / 10%);
     object-fit: cover;
 }
+
 .dtg-mc-color-swatch-placeholder {
-    background: linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%);
+    background: linear-gradient(135deg, var(--gray-200) 0%, var(--gray-300) 100%);
 }
 .dtg-mc-color-info { min-width: 0; }
+
 .dtg-mc-color-name {
     font-size: 13px;
     font-weight: 700;
@@ -798,27 +892,31 @@ body.dtg-catalog-modal-open { overflow: hidden; }
     overflow: hidden;
     text-overflow: ellipsis;
 }
+
 .dtg-mc-color-meta {
     display: flex;
     gap: 6px;
     margin-top: 2px;
     font-size: 11px;
 }
+
 .dtg-mc-color-rank {
     padding: 1px 7px;
-    background: #f3f4f6;
-    color: #4b5563;
+    background: var(--gray-100);
+    color: var(--gray-600);
     border-radius: 999px;
     font-weight: 600;
 }
+
 .dtg-mc-color-units {
-    color: #6b7280;
+    color: var(--gray-500);
     font-weight: 500;
 }
+
 .dtg-mc-color-sizes {
     margin-top: 3px;
     font-size: 10.5px;
-    color: #9ca3af;
+    color: var(--gray-400);
     font-family: var(--mono, ui-monospace, monospace);
     white-space: nowrap;
     overflow: hidden;
@@ -831,7 +929,7 @@ body.dtg-catalog-modal-open { overflow: hidden; }
     gap: 5px;
     padding: 6px 12px;
     background: linear-gradient(135deg, var(--pnw-forest) 0%, var(--pnw-pine) 100%);
-    color: #fff8e0;
+    color: var(--store-rush-soft);
     border: none;
     border-radius: 6px;
     font: inherit;
@@ -840,12 +938,14 @@ body.dtg-catalog-modal-open { overflow: hidden; }
     cursor: pointer;
     transition: transform 100ms ease, box-shadow 120ms ease, opacity 120ms ease;
 }
+
 .dtg-mc-add-btn:hover:not(:disabled) {
     transform: translateY(-1px);
-    box-shadow: 0 4px 10px rgba(46, 88, 39, 0.25);
+    box-shadow: 0 4px 10px rgb(46 88 39 / 25%);
 }
+
 .dtg-mc-add-btn:disabled {
-    background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+    background: linear-gradient(135deg, var(--gray-500) 0%, var(--gray-600) 100%);
     cursor: not-allowed;
     opacity: 0.85;
 }
@@ -864,14 +964,15 @@ body.dtg-catalog-modal-open { overflow: hidden; }
     align-items: center;
     gap: 10px;
 }
-.dtg-fullcat-prompt-line { font-size: 13px; color: #4b5563; font-weight: 600; }
+.dtg-fullcat-prompt-line { font-size: 13px; color: var(--gray-600); font-weight: 600; }
+
 .dtg-fullcat-trigger {
     display: inline-flex;
     align-items: center;
     gap: 8px;
     padding: 10px 18px;
     background: linear-gradient(135deg, var(--pnw-forest) 0%, var(--pnw-pine) 100%);
-    color: #fff8e0;
+    color: var(--store-rush-soft);
     border: none;
     border-radius: 8px;
     font: inherit;
@@ -880,8 +981,8 @@ body.dtg-catalog-modal-open { overflow: hidden; }
     cursor: pointer;
     transition: transform 120ms ease, box-shadow 140ms ease;
 }
-.dtg-fullcat-trigger:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(46, 88, 39, 0.25); }
-.dtg-fullcat-prompt-hint { font-size: 11.5px; color: #9ca3af; max-width: 360px; }
+.dtg-fullcat-trigger:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgb(46 88 39 / 25%); }
+.dtg-fullcat-prompt-hint { font-size: 11.5px; color: var(--gray-400); max-width: 360px; }
 
 /* Results header (back link + count + suitability note) — spans the grid */
 .dtg-fullcat-head {
@@ -891,15 +992,16 @@ body.dtg-catalog-modal-open { overflow: hidden; }
     gap: 8px;
     margin-bottom: 4px;
 }
+
 .dtg-fullcat-back {
     align-self: flex-start;
     display: inline-flex;
     align-items: center;
     gap: 6px;
     padding: 6px 12px;
-    background: #fff;
+    background: var(--color-surface);
     color: var(--pnw-forest);
-    border: 1px solid rgba(46, 88, 39, 0.30);
+    border: 1px solid rgb(46 88 39 / 30%);
     border-radius: 6px;
     font: inherit;
     font-size: 12px;
@@ -907,17 +1009,18 @@ body.dtg-catalog-modal-open { overflow: hidden; }
     cursor: pointer;
     transition: background 120ms ease, border-color 120ms ease;
 }
-.dtg-fullcat-back:hover { background: #ecf6ec; border-color: var(--pnw-forest); }
-.dtg-fullcat-head-text { font-size: 13px; color: #374151; }
+.dtg-fullcat-back:hover { background: var(--brand-100); border-color: var(--pnw-forest); }
+.dtg-fullcat-head-text { font-size: 13px; color: var(--gray-700); }
+
 .dtg-fullcat-head-warn {
     display: block;
     margin-top: 4px;
     padding: 6px 10px;
-    background: #fff7ed;
-    border: 1px solid #fed7aa;
+    background: var(--red-50);
+    border: 1px solid var(--dtg-catalog-orange-3);
     border-radius: 6px;
     font-size: 11.5px;
-    color: #9a3412;
+    color: var(--store-rush-deeper);
 }
 .dtg-fullcat-head-warn i { margin-right: 5px; }
 
@@ -928,20 +1031,22 @@ body.dtg-catalog-modal-open { overflow: hidden; }
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 10px;
 }
+
 .dtg-fullcat-card {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 10px;
     padding: 12px 14px;
-    background: #fff;
-    border: 1px solid rgba(0, 0, 0, 0.08);
+    background: var(--color-surface);
+    border: 1px solid rgb(0 0 0 / 8%);
     border-radius: 10px;
     transition: border-color 140ms ease, box-shadow 140ms ease;
 }
-.dtg-fullcat-card:hover { border-color: var(--pnw-forest); box-shadow: 0 4px 12px rgba(46, 88, 39, 0.12); }
-.dtg-fullcat-card--warn { border-color: #fed7aa; background: #fffdfa; }
+.dtg-fullcat-card:hover { border-color: var(--pnw-forest); box-shadow: 0 4px 12px rgb(46 88 39 / 12%); }
+.dtg-fullcat-card--warn { border-color: var(--dtg-catalog-orange-3); background: var(--color-on-brand); }
 .dtg-fullcat-card-main { min-width: 0; }
+
 .dtg-fullcat-card-style {
     font-family: var(--mono, ui-monospace, monospace);
     font-size: 13px;
@@ -949,22 +1054,25 @@ body.dtg-catalog-modal-open { overflow: hidden; }
     color: var(--pnw-forest);
     letter-spacing: 0.03em;
 }
+
 .dtg-fullcat-card-title {
     font-size: 12.5px;
-    color: #374151;
+    color: var(--gray-700);
     margin-top: 1px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
+
 .dtg-fullcat-card-warn {
     margin-top: 5px;
     font-size: 11px;
-    color: #9a3412;
+    color: var(--store-rush-deeper);
     line-height: 1.3;
     white-space: normal;
 }
 .dtg-fullcat-card-warn i { margin-right: 4px; }
+
 .dtg-fullcat-add {
     flex-shrink: 0;
     display: inline-flex;
@@ -972,7 +1080,7 @@ body.dtg-catalog-modal-open { overflow: hidden; }
     gap: 5px;
     padding: 7px 12px;
     background: linear-gradient(135deg, var(--pnw-forest) 0%, var(--pnw-pine) 100%);
-    color: #fff8e0;
+    color: var(--store-rush-soft);
     border: none;
     border-radius: 6px;
     font: inherit;
@@ -981,9 +1089,9 @@ body.dtg-catalog-modal-open { overflow: hidden; }
     cursor: pointer;
     transition: transform 100ms ease, box-shadow 120ms ease, opacity 120ms ease;
 }
-.dtg-fullcat-add:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 4px 10px rgba(46, 88, 39, 0.25); }
+.dtg-fullcat-add:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 4px 10px rgb(46 88 39 / 25%); }
 .dtg-fullcat-add:disabled { opacity: 0.8; cursor: default; }
-.dtg-fullcat-add--done { background: linear-gradient(135deg, #16a34a 0%, #15803d 100%); }
+.dtg-fullcat-add--done { background: linear-gradient(135deg, var(--dtg-catalog-green) 0%, var(--dtg-catalog-green-2) 100%); }
 .dtg-fullcat-add i { font-size: 10px; }
 
 /* Quiet footer link — shown under curated results while a search is active,
@@ -992,11 +1100,12 @@ body.dtg-catalog-modal-open { overflow: hidden; }
     grid-column: 1 / -1;
     margin-top: 6px;
     padding-top: 10px;
-    border-top: 1px dashed rgba(0, 0, 0, 0.12);
+    border-top: 1px dashed rgb(0 0 0 / 12%);
     text-align: center;
     font-size: 12px;
-    color: #6b7280;
+    color: var(--gray-500);
 }
+
 .dtg-fullcat-footer-link {
     background: none;
     border: none;

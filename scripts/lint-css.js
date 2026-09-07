@@ -170,6 +170,30 @@ const CSS_LINT_SCOPE = [
     'shared_components/css/garment-submit-form.css',
     'shared_components/css/product-thumbnail-modal.css',
     'shared_components/css/universal-cart-header.css',
+    // quote builders family (2026-09-07, LAST — the money path): the builders' sheets + quote-builder-utilities.css (replaces the generated quote-builder-inline.css)
+    'shared_components/css/quote-builder-shell.css',
+    'shared_components/css/sticker-pricing-page.css',
+    'shared_components/css/quote-share-modal.css',
+    'shared_components/css/quote-session.css',
+    'shared_components/css/quote-builder-guided.css',
+    'shared_components/css/quote-builder-common.css',
+    'shared_components/css/customer-lookup.css',
+    'shared_components/css/color-picker-shared.css',
+    'shared_components/css/quote-print.css',
+    'shared_components/css/shopworks-import.css',
+    'shared_components/css/screenprint-quote-builder-extracted.css',
+    'shared_components/css/embroidery-quote-builder-extracted.css',
+    'shared_components/css/dtg-quote-page.css',
+    'shared_components/css/dtg-inline-form.css',
+    'shared_components/css/dtg-catalog.css',
+    'shared_components/css/dtf-quote-builder.css',
+    'shared_components/css/monogram-form.css',
+    'shared_components/css/screenprint-fast-quote.css',
+    'shared_components/css/quote-builder-utilities.css',
+    // shared_components/css remainder (2026-09-07, with the quote builders family): the AE dashboard's nav + submit-form sheets
+    'shared_components/css/ae-nav-v2.css',
+    'shared_components/css/jds-submit-form.css',
+    'shared_components/css/mockup-submit-form.css',
 ];
 
 async function run() {

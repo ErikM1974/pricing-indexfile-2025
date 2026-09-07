@@ -7,22 +7,38 @@
  * exactly; keep them in step.
  */
 
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue so the page
+   keeps its exact look. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   every rule below uses var(). Raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
+:root {
+    --jds-submit-form-teal-dark: #047857;
+    --jds-submit-form-orange: #78350f;
+    --jds-submit-form-yellow: #fde68a;
+    --jds-submit-form-green-tint: #cdf3d6;
+    --jds-submit-form-red: #ef4444;
+    --jds-submit-form-teal-dark-2: #064e3b;
+    --jds-submit-form-red-tint: #fecaca;
+}
+/* stylelint-enable color-no-hex */
+
 /* ── Scoped design tokens ───────────────────────────────────────────────
    Every visual constant the form uses lives here so a colour change is one
    edit. --fx-* names are shared by all four intake forms (gsf/sbf/jds/msf);
    only the values differ per form. */
 .jds-container {
-    --fx-accent:       #0a8a1f;
-    --fx-accent-dark:  #006600;
-    --fx-accent-light: #33bb33;
-    --fx-tint:         #ecfdf0;
-    --fx-tint-2:       #cdf3d6;
-    --fx-ring:         rgba(10,138,31,.16);
+    --fx-accent:       var(--color-steve);
+    --fx-accent-dark:  var(--color-steve-dark);
+    --fx-accent-light: var(--color-steve-light);
+    --fx-tint:         var(--color-steve-tint);
+    --fx-tint-2:       var(--jds-submit-form-green-tint);
+    --fx-ring:         rgb(10 138 31 / 16%);
     --fx-grad:         linear-gradient(135deg, var(--fx-accent-dark) 0%, var(--fx-accent) 55%, var(--fx-accent-light) 100%);
+
     max-width: 1020px;
     margin: 0 auto;
     font-family: inherit;
-    color: var(--gray-800, #1f2937);
+    color: var(--gray-800, var(--gray-800));
 }
 
 /* ── Hero banner ────────────────────────────────────────────────────── */
@@ -36,21 +52,23 @@
     padding: 24px 28px;
     border-radius: 18px;
     margin-bottom: 20px;
-    color: #fff;
+    color: var(--color-on-brand);
     background: var(--fx-grad);
     box-shadow: 0 18px 40px -18px color-mix(in srgb, var(--fx-accent) 75%, transparent),
-                0 2px 6px rgba(15, 23, 42, .06);
+                0 2px 6px rgb(15 23 42 / 6%);
 }
+
 .jds-banner::before {
     content: '';
     position: absolute;
     inset: 0;
     z-index: -1;
     background:
-        radial-gradient(circle at 88% 12%, rgba(255, 255, 255, .22), transparent 42%),
-        radial-gradient(circle at 8% 120%, rgba(255, 255, 255, .12), transparent 40%);
+        radial-gradient(circle at 88% 12%, rgb(255 255 255 / 22%), transparent 42%),
+        radial-gradient(circle at 8% 120%, rgb(255 255 255 / 12%), transparent 40%);
     pointer-events: none;
 }
+
 .jds-banner::after {
     content: '';
     position: absolute;
@@ -59,10 +77,11 @@
     width: 240px;
     height: 240px;
     border-radius: 50%;
-    border: 30px solid rgba(255, 255, 255, .07);
+    border: 30px solid rgb(255 255 255 / 7%);
     z-index: -1;
     pointer-events: none;
 }
+
 .jds-banner-emoji {
     flex: 0 0 auto;
     width: 66px;
@@ -73,12 +92,13 @@
     justify-content: center;
     font-size: 34px;
     line-height: 1;
-    background: rgba(255, 255, 255, .16);
-    border: 1px solid rgba(255, 255, 255, .3);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .3), 0 10px 22px -10px rgba(0, 0, 0, .4);
+    background: rgb(255 255 255 / 16%);
+    border: 1px solid rgb(255 255 255 / 30%);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 30%), 0 10px 22px -10px rgb(0 0 0 / 40%);
     backdrop-filter: blur(6px);
 }
 .jds-banner-text { min-width: 0; }
+
 .jds-banner-text::before {
     content: 'Steve · JDS Products';
     display: block;
@@ -86,9 +106,10 @@
     font-weight: 700;
     letter-spacing: .12em;
     text-transform: uppercase;
-    color: rgba(255, 255, 255, .74);
+    color: rgb(255 255 255 / 74%);
     margin-bottom: 6px;
 }
+
 .jds-banner-text h3 {
     margin: 0 0 6px;
     font-size: 22px;
@@ -96,20 +117,21 @@
     letter-spacing: -.02em;
     line-height: 1.2;
 }
+
 .jds-banner-text p {
     margin: 0;
     font-size: 14px;
     line-height: 1.55;
-    color: rgba(255, 255, 255, .88);
+    color: rgb(255 255 255 / 88%);
     max-width: 660px;
 }
 
 /* ── Form card ──────────────────────────────────────────────────────── */
 .jds-form-card {
-    background: #fff;
-    border: 1px solid var(--gray-200, #e5e7eb);
+    background: var(--color-surface);
+    border: 1px solid var(--gray-200, var(--gray-200));
     border-radius: 18px;
-    box-shadow: var(--shadow-md, 0 2px 4px rgba(15,23,42,.04), 0 4px 12px rgba(15,23,42,.06));
+    box-shadow: var(--shadow-md, 0 2px 4px rgb(15 23 42 / 4%), 0 4px 12px rgb(15 23 42 / 6%));
 }
 
 .jds-form-header {
@@ -117,15 +139,16 @@
     align-items: center;
     gap: 10px;
     padding: 14px 28px;
-    background: var(--gray-50, #f9fafb);
-    border-bottom: 1px solid var(--gray-200, #e5e7eb);
+    background: var(--gray-50, var(--gray-50));
+    border-bottom: 1px solid var(--gray-200, var(--gray-200));
     border-radius: 18px 18px 0 0;
     font-size: 12px;
     font-weight: 700;
     letter-spacing: .08em;
     text-transform: uppercase;
-    color: var(--gray-600, #4b5563);
+    color: var(--gray-600, var(--gray-600));
 }
+
 .jds-form-header::before {
     content: '';
     width: 8px;
@@ -143,6 +166,7 @@
     grid-template-columns: 1fr 1fr;
     gap: 0 20px;
 }
+
 .jds-field {
     display: flex;
     flex-direction: column;
@@ -150,20 +174,22 @@
     margin-bottom: 18px;
     min-width: 0;
 }
+
 .jds-field-label {
     display: flex;
     align-items: center;
     gap: 4px;
     font-size: 13px;
     font-weight: 600;
-    color: var(--gray-700, #374151);
+    color: var(--gray-700, var(--gray-700));
     letter-spacing: -.005em;
     line-height: 1.3;
 }
 .jds-required { color: var(--fx-accent); font-weight: 700; }
+
 .jds-field-hint {
     font-size: 12px;
-    color: var(--gray-500, #6b7280);
+    color: var(--gray-500, var(--gray-500));
     line-height: 1.45;
     margin-top: 2px;
 }
@@ -176,30 +202,33 @@
     box-sizing: border-box;
     min-height: 42px;
     padding: 10px 13px;
-    border: 1px solid var(--gray-300, #d1d5db);
+    border: 1px solid var(--gray-300, var(--gray-300));
     border-radius: 10px;
     font-size: 14px;
     font-family: inherit;
-    color: var(--gray-900, #111827);
-    background-color: #fff;
-    box-shadow: 0 1px 2px rgba(15, 23, 42, .04);
+    color: var(--gray-900, var(--gray-900));
+    background-color: var(--color-on-brand);
+    box-shadow: 0 1px 2px rgb(15 23 42 / 4%);
     transition: border-color .15s ease, box-shadow .15s ease, background-color .15s ease;
 }
+
 .jds-input:hover,
 .jds-select:hover,
-.jds-textarea:hover { border-color: var(--gray-400, #9ca3af); }
+.jds-textarea:hover { border-color: var(--gray-400, var(--gray-400)); }
+
 .jds-input:focus,
 .jds-select:focus,
 .jds-textarea:focus {
     outline: none;
     border-color: var(--fx-accent);
-    box-shadow: 0 0 0 4px var(--fx-ring), 0 1px 2px rgba(15, 23, 42, .04);
+    box-shadow: 0 0 0 4px var(--fx-ring), 0 1px 2px rgb(15 23 42 / 4%);
 }
+
 .jds-input::placeholder,
-.jds-textarea::placeholder { color: var(--gray-400, #9ca3af); }
+.jds-textarea::placeholder { color: var(--gray-400, var(--gray-400)); }
+
 .jds-select {
     appearance: none;
-    -webkit-appearance: none;
     padding-right: 38px;
     cursor: pointer;
     background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
@@ -207,31 +236,35 @@
     background-position: right 12px center;
     background-size: 16px;
 }
+
 .jds-input:disabled,
 .jds-select:disabled,
 .jds-input[readonly] {
-    background-color: var(--gray-50, #f9fafb);
-    color: var(--gray-500, #6b7280);
+    background-color: var(--gray-50, var(--gray-50));
+    color: var(--gray-500, var(--gray-500));
     cursor: not-allowed;
     box-shadow: none;
 }
+
 .jds-textarea {
     min-height: 96px;
     resize: vertical;
     line-height: 1.5;
 }
+
 .jds-input.jds-error,
 .jds-select.jds-error,
 .jds-textarea.jds-error {
-    border-color: var(--state-danger, #dc2626);
-    background-color: var(--state-danger-bg, #fef2f2);
-    box-shadow: 0 0 0 4px rgba(220, 38, 38, .10);
+    border-color: var(--state-danger, var(--red-600));
+    background-color: var(--state-danger-bg, var(--red-50));
+    box-shadow: 0 0 0 4px rgb(220 38 38 / 10%);
 }
+
 .jds-error-msg {
     display: none;
     font-size: 12.5px;
     font-weight: 500;
-    color: var(--state-danger, #dc2626);
+    color: var(--state-danger, var(--red-600));
     margin-top: 2px;
     line-height: 1.4;
 }
@@ -240,77 +273,88 @@
 .jds-file-drop {
     position: relative;
     padding: 28px 20px 22px;
-    border: 2px dashed var(--gray-300, #d1d5db);
+    border: 2px dashed var(--gray-300, var(--gray-300));
     border-radius: 16px;
     text-align: center;
     cursor: pointer;
-    color: var(--gray-500, #6b7280);
+    color: var(--gray-500, var(--gray-500));
     font-size: 14px;
-    background: linear-gradient(180deg, #fff 0%, var(--gray-50, #f9fafb) 100%);
+    background: linear-gradient(180deg, var(--color-surface) 0%, var(--gray-50, var(--gray-50)) 100%);
     transition: border-color .2s ease, background .2s ease, box-shadow .2s ease, transform .2s ease;
 }
+
 .jds-file-drop:hover,
 .jds-file-drop--active {
     border-color: var(--fx-accent);
-    background: linear-gradient(180deg, #fff 0%, var(--fx-tint) 100%);
+    background: linear-gradient(180deg, var(--color-surface) 0%, var(--fx-tint) 100%);
     box-shadow: 0 0 0 4px var(--fx-ring);
 }
 .jds-file-drop--active { transform: scale(1.004); }
+
 .jds-file-drop-icon {
     width: 52px;
     height: 46px;
     margin: 0 auto 10px;
     display: block;
-    color: var(--gray-400, #9ca3af);
+    color: var(--gray-400, var(--gray-400));
     transition: transform .25s var(--ease-out, cubic-bezier(.2,.8,.2,1));
 }
+
 .jds-file-drop:hover .jds-file-drop-icon,
 .jds-file-drop--active .jds-file-drop-icon { transform: translateY(-3px); }
+
 .jds-file-drop-cta {
     font-size: 15.5px;
     font-weight: 700;
-    color: var(--gray-800, #1f2937);
+    color: var(--gray-800, var(--gray-800));
 }
+
 .jds-file-drop-sub {
     font-size: 13px;
-    color: var(--gray-500, #6b7280);
+    color: var(--gray-500, var(--gray-500));
     margin: 4px 0 12px;
 }
+
 .jds-file-drop-dots {
     display: flex;
     justify-content: center;
     gap: 8px;
 }
+
 .jds-file-drop-dot {
     width: 10px;
     height: 10px;
     border-radius: 50%;
     background: transparent;
-    border: 2px solid var(--gray-300, #d1d5db);
+    border: 2px solid var(--gray-300, var(--gray-300));
     transition: background .2s ease, border-color .2s ease, transform .2s ease, box-shadow .2s ease;
 }
+
 .jds-file-drop-dot--filled {
-    background: var(--state-success, #059669);
-    border-color: var(--state-success, #059669);
-    box-shadow: 0 0 0 3px rgba(5, 150, 105, .18);
+    background: var(--state-success, var(--emerald-600));
+    border-color: var(--state-success, var(--emerald-600));
+    box-shadow: 0 0 0 3px rgb(5 150 105 / 18%);
     transform: scale(1.1);
 }
+
 .jds-file-drop-types {
     font-size: 12px;
-    color: var(--gray-500, #6b7280);
+    color: var(--gray-500, var(--gray-500));
     text-align: center;
     margin-top: 10px;
 }
+
 /* Capacity reached — reads as "no more room", hover neutralised */
 .jds-file-drop--full {
     opacity: .55;
     cursor: not-allowed;
-    background: var(--gray-100, #f3f4f6);
+    background: var(--gray-100, var(--gray-100));
 }
+
 .jds-file-drop--full:hover,
 .jds-file-drop--full.jds-file-drop--active {
-    border-color: var(--gray-300, #d1d5db);
-    background: var(--gray-100, #f3f4f6);
+    border-color: var(--gray-300, var(--gray-300));
+    background: var(--gray-100, var(--gray-100));
     box-shadow: none;
     transform: none;
 }
@@ -321,17 +365,19 @@
     flex-direction: column;
     gap: 8px;
 }
+
 .jds-file-item {
     display: flex;
     align-items: center;
     gap: 12px;
     padding: 9px 12px 9px 9px;
-    background: #fff;
-    border: 1px solid var(--gray-200, #e5e7eb);
+    background: var(--color-surface);
+    border: 1px solid var(--gray-200, var(--gray-200));
     border-radius: 12px;
     font-size: 13px;
-    box-shadow: var(--shadow-sm, 0 1px 2px rgba(15,23,42,.04));
+    box-shadow: var(--shadow-sm, 0 1px 2px rgb(15 23 42 / 4%));
 }
+
 .jds-file-item::before {
     content: '';
     flex: 0 0 32px;
@@ -340,28 +386,31 @@
     border-radius: 9px;
     background: var(--fx-tint) url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%230a8a1f' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z'/%3E%3Cpolyline points='14 2 14 8 20 8'/%3E%3C/svg%3E") center / 16px no-repeat;
 }
+
 .jds-file-name {
     flex: 1;
     min-width: 0;
-    color: var(--gray-800, #1f2937);
+    color: var(--gray-800, var(--gray-800));
     font-weight: 500;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
+
 .jds-file-size {
-    color: var(--gray-500, #6b7280);
+    color: var(--gray-500, var(--gray-500));
     font-size: 12px;
     flex: 0 0 auto;
     font-variant-numeric: tabular-nums;
 }
+
 .jds-file-remove {
     width: 26px;
     height: 26px;
     border-radius: 50%;
     border: none;
-    background: var(--gray-100, #f3f4f6);
-    color: var(--gray-500, #6b7280);
+    background: var(--gray-100, var(--gray-100));
+    color: var(--gray-500, var(--gray-500));
     cursor: pointer;
     font-size: 15px;
     line-height: 1;
@@ -371,7 +420,7 @@
     justify-content: center;
     transition: background .15s ease, color .15s ease;
 }
-.jds-file-remove:hover { background: var(--state-danger, #dc2626); color: #fff; }
+.jds-file-remove:hover { background: var(--state-danger, var(--red-600)); color: var(--color-on-brand); }
 
 /* ── Rush toggle ────────────────────────────────────────────────────── */
 .jds-rush-toggle {
@@ -379,20 +428,21 @@
     align-items: center;
     gap: 10px;
     padding: 10px 18px 10px 14px;
-    background: #fff;
-    border: 1.5px dashed var(--gray-300, #d1d5db);
+    background: var(--color-surface);
+    border: 1.5px dashed var(--gray-300, var(--gray-300));
     border-radius: 999px;
-    color: var(--gray-600, #4b5563);
+    color: var(--gray-600, var(--gray-600));
     font-family: inherit;
     font-size: 14px;
     cursor: pointer;
     transition: background .2s ease, border-color .2s ease, color .2s ease, box-shadow .2s ease;
 }
+
 .jds-rush-toggle:hover {
-    border-color: var(--state-danger, #dc2626);
-    color: var(--state-danger, #dc2626);
-    background: var(--state-danger-bg, #fef2f2);
+    border-color: var(--state-danger, var(--red-600));
+    background: var(--state-danger-bg, var(--red-50));
 }
+
 .jds-rush-icon {
     font-size: 18px;
     line-height: 1;
@@ -402,24 +452,28 @@
 }
 .jds-rush-label { font-weight: 700; }
 .jds-rush-hint { font-size: 12px; opacity: .8; }
+
 .jds-rush-toggle--active,
 .jds-rush-toggle--active:hover {
-    background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
-    border: 1.5px solid #991b1b;
-    color: #fff;
-    box-shadow: 0 10px 22px -10px rgba(220, 38, 38, .75), 0 0 0 4px rgba(220, 38, 38, .15);
+    background: linear-gradient(135deg, var(--jds-submit-form-red) 0%, var(--red-700) 100%);
+    border: 1.5px solid var(--red-800);
+    color: var(--color-on-brand);
+    box-shadow: 0 10px 22px -10px rgb(220 38 38 / 75%), 0 0 0 4px rgb(220 38 38 / 15%);
     animation: jds-rush-pulse 1.8s ease-in-out infinite;
 }
+
 .jds-rush-toggle--active .jds-rush-icon {
     filter: none;
     opacity: 1;
     animation: jds-rush-flicker 1.1s ease-in-out infinite;
 }
 .jds-rush-toggle--active .jds-rush-hint { opacity: .9; }
+
 @keyframes jds-rush-pulse {
-    0%, 100% { box-shadow: 0 10px 22px -10px rgba(220, 38, 38, .75), 0 0 0 4px rgba(220, 38, 38, .15); }
-    50%      { box-shadow: 0 10px 22px -10px rgba(220, 38, 38, .75), 0 0 0 9px rgba(220, 38, 38, .06); }
+    0%, 100% { box-shadow: 0 10px 22px -10px rgb(220 38 38 / 75%), 0 0 0 4px rgb(220 38 38 / 15%); }
+    50%      { box-shadow: 0 10px 22px -10px rgb(220 38 38 / 75%), 0 0 0 9px rgb(220 38 38 / 6%); }
 }
+
 @keyframes jds-rush-flicker {
     0%, 100% { transform: scale(1); }
     50%      { transform: scale(1.18); }
@@ -433,15 +487,16 @@
     flex-wrap: wrap;
     padding-top: 22px;
     margin-top: 8px;
-    border-top: 1px solid var(--gray-200, #e5e7eb);
+    border-top: 1px solid var(--gray-200, var(--gray-200));
 }
+
 .jds-submit-btn {
     display: inline-flex;
     align-items: center;
     gap: 8px;
     padding: 13px 30px;
     background: var(--fx-grad);
-    color: #fff;
+    color: var(--color-on-brand);
     border: none;
     border-radius: 12px;
     font-size: 15px;
@@ -450,26 +505,28 @@
     cursor: pointer;
     font-family: inherit;
     box-shadow: 0 10px 22px -10px color-mix(in srgb, var(--fx-accent) 85%, transparent),
-                0 1px 2px rgba(15, 23, 42, .08);
+                0 1px 2px rgb(15 23 42 / 8%);
     transition: transform .15s ease, box-shadow .15s ease, filter .15s ease;
 }
+
 .jds-submit-btn:hover {
     transform: translateY(-1px);
     filter: brightness(1.06);
     box-shadow: 0 16px 30px -12px color-mix(in srgb, var(--fx-accent) 90%, transparent),
-                0 1px 2px rgba(15, 23, 42, .08);
+                0 1px 2px rgb(15 23 42 / 8%);
 }
 .jds-submit-btn:active { transform: translateY(0); filter: none; }
 .jds-submit-btn:focus-visible { outline: none; box-shadow: 0 0 0 4px var(--fx-ring); }
+
 .jds-submit-btn:disabled {
-    background: var(--gray-300, #d1d5db);
-    color: #fff;
+    background: var(--gray-300, var(--gray-300));
+    color: var(--color-on-brand);
     cursor: not-allowed;
     box-shadow: none;
     transform: none;
     filter: none;
 }
-.jds-submit-status { color: var(--gray-500, #6b7280); font-size: 13px; }
+.jds-submit-status { color: var(--gray-500, var(--gray-500)); font-size: 13px; }
 
 /* ── Success ────────────────────────────────────────────────────────── */
 .jds-success {
@@ -477,6 +534,7 @@
     padding: 56px 20px 48px;
     animation: jds-fade-up .4s var(--ease-out, cubic-bezier(.2,.8,.2,1));
 }
+
 .jds-success-icon {
     width: 92px;
     height: 92px;
@@ -487,17 +545,19 @@
     justify-content: center;
     font-size: 44px;
     line-height: 1;
-    background: var(--state-success-bg, #ecfdf5);
-    box-shadow: 0 0 0 10px rgba(5, 150, 105, .08), 0 0 0 20px rgba(5, 150, 105, .04);
+    background: var(--state-success-bg, var(--brand-50));
+    box-shadow: 0 0 0 10px rgb(5 150 105 / 8%), 0 0 0 20px rgb(5 150 105 / 4%);
     animation: jds-pop .55s cubic-bezier(.2, .8, .2, 1);
 }
+
 .jds-success h3 {
     margin: 0 0 10px;
     font-size: 24px;
     font-weight: 800;
     letter-spacing: -.02em;
-    color: var(--gray-900, #111827);
+    color: var(--gray-900, var(--gray-900));
 }
+
 .jds-success-id {
     display: inline-block;
     margin-left: 6px;
@@ -509,32 +569,35 @@
     font-weight: 700;
     vertical-align: middle;
 }
+
 .jds-success p {
-    color: var(--gray-600, #4b5563);
+    color: var(--gray-600, var(--gray-600));
     line-height: 1.6;
     margin: 0 auto 24px;
     max-width: 480px;
     font-size: 14.5px;
 }
+
 .jds-success-link {
     display: inline-flex;
     align-items: center;
     gap: 6px;
     padding: 11px 22px;
     margin: 0 8px 8px 0;
-    background: var(--state-success, #059669);
-    color: #fff;
+    background: var(--state-success, var(--emerald-600));
+    color: var(--color-on-brand);
     text-decoration: none;
     border-radius: 10px;
     font-weight: 700;
     font-size: 14px;
-    box-shadow: 0 8px 18px -8px rgba(5, 150, 105, .7);
+    box-shadow: 0 8px 18px -8px rgb(5 150 105 / 70%);
     transition: background .15s ease, transform .15s ease;
 }
-.jds-success-link:hover { background: #047857; transform: translateY(-1px); }
+.jds-success-link:hover { background: var(--jds-submit-form-teal-dark); transform: translateY(-1px); }
+
 .jds-success-another {
     padding: 11px 22px;
-    background: #fff;
+    background: var(--color-surface);
     color: var(--fx-accent);
     border: 1.5px solid var(--fx-accent);
     border-radius: 10px;
@@ -544,12 +607,14 @@
     font-family: inherit;
     transition: background .15s ease, color .15s ease;
 }
-.jds-success-another:hover { background: var(--fx-accent); color: #fff; }
+.jds-success-another:hover { background: var(--fx-accent); color: var(--color-on-brand); }
+
 @keyframes jds-pop {
     0%   { transform: scale(.4); opacity: 0; }
     60%  { transform: scale(1.08); opacity: 1; }
     100% { transform: scale(1); }
 }
+
 @keyframes jds-fade-up {
     from { opacity: 0; transform: translateY(8px); }
     to   { opacity: 1; transform: none; }
@@ -564,10 +629,10 @@
     padding: 12px 20px 12px 16px;
     border-radius: 12px;
     border-left: 4px solid transparent;
-    color: #fff;
+    color: var(--color-on-brand);
     font-weight: 500;
     font-size: 14px;
-    box-shadow: 0 12px 32px -8px rgba(15, 23, 42, .45);
+    box-shadow: 0 12px 32px -8px rgb(15 23 42 / 45%);
     opacity: 0;
     transition: opacity .25s ease, transform .25s ease;
     z-index: 9999;
@@ -575,21 +640,21 @@
     text-align: center;
 }
 .jds-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-.jds-toast--info    { background: #1f2937; border-left-color: #0a8a1f; }
-.jds-toast--error   { background: #dc2626; border-left-color: #7f1d1d; }
-.jds-toast--success { background: #059669; border-left-color: #064e3b; }
+.jds-toast--info    { background: var(--gray-800); border-left-color: var(--color-steve); }
+.jds-toast--error   { background: var(--red-600); border-left-color: var(--print-red); }
+.jds-toast--success { background: var(--emerald-600); border-left-color: var(--jds-submit-form-teal-dark-2); }
 
 /* ── Empty / error state ────────────────────────────────────────────── */
 .jds-empty {
     padding: 36px 20px;
     text-align: center;
-    color: var(--gray-500, #6b7280);
+    color: var(--gray-500, var(--gray-500));
     font-size: 14px;
-    background: var(--gray-50, #f9fafb);
-    border: 1.5px dashed var(--gray-200, #e5e7eb);
+    background: var(--gray-50, var(--gray-50));
+    border: 1.5px dashed var(--gray-200, var(--gray-200));
     border-radius: 14px;
 }
-.jds-empty--error { color: #b91c1c; background: #fef2f2; border-color: #fecaca; }
+.jds-empty--error { color: var(--red-700); background: var(--red-50); border-color: var(--jds-submit-form-red-tint); }
 
 /* ── Section eyebrow ────────────────────────────────────────────────── */
 .jds-section-header {
@@ -603,35 +668,38 @@
     text-transform: uppercase;
     color: var(--fx-accent);
 }
+
 .jds-section-header::after {
     content: '';
     flex: 1;
     height: 1px;
-    background: linear-gradient(90deg, var(--fx-tint-2), var(--gray-200, #e5e7eb) 60%, transparent);
+    background: linear-gradient(90deg, var(--fx-tint-2), var(--gray-200, var(--gray-200)) 60%, transparent);
 }
 
 /* ── Search ─────────────────────────────────────────────────────────── */
 .jds-search-bar { margin-bottom: 22px; }
+
 .jds-search-input {
     width: 100%;
     box-sizing: border-box;
     min-height: 48px;
     padding: 12px 16px 12px 46px;
-    border: 1px solid var(--gray-300, #d1d5db);
+    border: 1px solid var(--gray-300, var(--gray-300));
     border-radius: 14px;
     font-size: 15px;
     font-family: inherit;
-    color: var(--gray-900, #111827);
-    background: #fff url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E") 16px center / 18px no-repeat;
-    box-shadow: var(--shadow-sm, 0 1px 2px rgba(15,23,42,.04));
+    color: var(--gray-900, var(--gray-900));
+    background: var(--color-surface) url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E") 16px center / 18px no-repeat;
+    box-shadow: var(--shadow-sm, 0 1px 2px rgb(15 23 42 / 4%));
     transition: border-color .15s ease, box-shadow .15s ease;
 }
-.jds-search-input::placeholder { color: var(--gray-400, #9ca3af); }
-.jds-search-input:hover { border-color: var(--gray-400, #9ca3af); }
+.jds-search-input::placeholder { color: var(--gray-400, var(--gray-400)); }
+.jds-search-input:hover { border-color: var(--gray-400, var(--gray-400)); }
+
 .jds-search-input:focus {
     outline: none;
     border-color: var(--fx-accent);
-    box-shadow: 0 0 0 4px var(--fx-ring), var(--shadow-sm, 0 1px 2px rgba(15,23,42,.04));
+    box-shadow: 0 0 0 4px var(--fx-ring), var(--shadow-sm, 0 1px 2px rgb(15 23 42 / 4%));
 }
 
 /* ── Breadcrumb ─────────────────────────────────────────────────────── */
@@ -642,16 +710,18 @@
     gap: 6px;
     margin-bottom: 16px;
     font-size: 13.5px;
-    color: var(--gray-500, #6b7280);
+    color: var(--gray-500, var(--gray-500));
 }
-.jds-breadcrumb-sep { color: var(--gray-300, #d1d5db); }
+.jds-breadcrumb-sep { color: var(--gray-300, var(--gray-300)); }
+
 .jds-breadcrumb-current {
-    color: var(--gray-900, #111827);
+    color: var(--gray-900, var(--gray-900));
     font-weight: 700;
     padding: 4px 10px;
-    background: var(--gray-100, #f3f4f6);
+    background: var(--gray-100, var(--gray-100));
     border-radius: 999px;
 }
+
 .jds-link {
     background: none;
     border: none;
@@ -668,6 +738,7 @@
 .jds-link:hover { background: var(--fx-tint); color: var(--fx-accent-dark); }
 
 /* ── Category + product tiles ───────────────────────────────────────── */
+
 /* Flex (not grid) so a single-card view doesn't balloon to full width. */
 .jds-category-grid,
 .jds-product-grid {
@@ -675,6 +746,7 @@
     flex-wrap: wrap;
     gap: 14px;
 }
+
 .jds-category-card,
 .jds-product-card {
     display: flex;
@@ -682,51 +754,57 @@
     align-items: stretch;
     gap: 10px;
     padding: 12px;
-    background: #fff;
-    border: 1px solid var(--gray-200, #e5e7eb);
+    background: var(--color-surface);
+    border: 1px solid var(--gray-200, var(--gray-200));
     border-radius: 16px;
     cursor: pointer;
     text-align: left;
     font-family: inherit;
     color: inherit;
-    box-shadow: var(--shadow-sm, 0 1px 2px rgba(15,23,42,.04));
+    box-shadow: var(--shadow-sm, 0 1px 2px rgb(15 23 42 / 4%));
     transition: transform .2s var(--ease-out, cubic-bezier(.2,.8,.2,1)), box-shadow .2s ease, border-color .2s ease;
 }
 .jds-category-card { flex: 0 0 220px; max-width: 240px; }
 .jds-product-card  { flex: 0 0 204px; max-width: 224px; }
+
 .jds-category-card:hover,
 .jds-product-card:hover {
     border-color: var(--fx-accent-light);
-    box-shadow: var(--shadow-lg, 0 8px 24px -8px rgba(15,23,42,.18)), 0 0 0 4px var(--fx-ring);
+    box-shadow: var(--shadow-lg, 0 8px 24px -8px rgb(15 23 42 / 18%)), 0 0 0 4px var(--fx-ring);
     transform: translateY(-3px);
 }
+
 .jds-category-card:focus-visible,
 .jds-product-card:focus-visible { outline: none; box-shadow: 0 0 0 4px var(--fx-ring); }
+
 .jds-card-thumb {
     width: 100%;
     aspect-ratio: 1 / 1;
     max-height: 220px;
-    background: linear-gradient(180deg, #fff 0%, var(--gray-100, #f3f4f6) 100%);
+    background: linear-gradient(180deg, var(--color-surface) 0%, var(--gray-100, var(--gray-100)) 100%);
     border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
 }
+
 .jds-card-thumb img {
     max-width: 88%;
     max-height: 88%;
     object-fit: contain;
     transition: transform .3s var(--ease-out, cubic-bezier(.2,.8,.2,1));
 }
+
 .jds-category-card:hover .jds-card-thumb img,
 .jds-product-card:hover .jds-card-thumb img { transform: scale(1.06); }
-.jds-card-thumb-empty { font-size: 36px; color: var(--gray-300, #d1d5db); }
+.jds-card-thumb-empty { font-size: 36px; color: var(--gray-300, var(--gray-300)); }
 .jds-card-body { display: flex; flex-direction: column; gap: 3px; padding: 0 2px 2px; }
+
 .jds-card-name {
     font-size: 14px;
     font-weight: 700;
-    color: var(--gray-900, #111827);
+    color: var(--gray-900, var(--gray-900));
     line-height: 1.3;
     letter-spacing: -.01em;
     display: -webkit-box;
@@ -735,6 +813,7 @@
     overflow: hidden;
 }
 .jds-category-card .jds-card-name { padding: 0 2px; }
+
 .jds-card-sku {
     font-size: 12px;
     color: var(--fx-accent);
@@ -742,29 +821,31 @@
     letter-spacing: .02em;
     font-variant-numeric: tabular-nums;
 }
-.jds-card-count { font-size: 12px; color: var(--gray-500, #6b7280); padding: 0 2px; }
+.jds-card-count { font-size: 12px; color: var(--gray-500, var(--gray-500)); padding: 0 2px; }
+
 .jds-card-imprint {
     align-self: flex-start;
     font-size: 11px;
-    color: #78350f;
+    color: var(--jds-submit-form-orange);
     background: var(--fx-tint-2);
     border-radius: 6px;
     padding: 3px 7px;
     margin-top: 4px;
     line-height: 1.3;
 }
+
 .jds-card-family-badge {
     align-self: flex-start;
     margin-top: 2px;
     padding: 3px 9px;
     background: var(--fx-grad);
-    color: #fff;
+    color: var(--color-on-brand);
     font-size: 11px;
     font-weight: 700;
     border-radius: 999px;
     letter-spacing: .02em;
 }
-.jds-product-card--family { border-color: var(--fx-tint-2); background: linear-gradient(180deg, #fff 0%, var(--fx-tint) 100%); }
+.jds-product-card--family { border-color: var(--fx-tint-2); background: linear-gradient(180deg, var(--color-surface) 0%, var(--fx-tint) 100%); }
 
 /* ── Selected-product summary card (sticky above the form) ──────────── */
 .jds-selected-card {
@@ -772,29 +853,31 @@
     grid-template-columns: 150px 1fr;
     gap: 20px;
     padding: 16px;
-    background: #fff;
-    border: 1px solid var(--gray-200, #e5e7eb);
+    background: var(--color-surface);
+    border: 1px solid var(--gray-200, var(--gray-200));
     border-left: 4px solid var(--fx-accent);
     border-radius: 16px;
     margin-bottom: 20px;
     position: sticky;
     top: 12px;
     z-index: 5;
-    box-shadow: var(--shadow-lg, 0 8px 24px -8px rgba(15,23,42,.18));
+    box-shadow: var(--shadow-lg, 0 8px 24px -8px rgb(15 23 42 / 18%));
 }
+
 .jds-selected-thumb {
     width: 150px;
     height: 150px;
-    background: linear-gradient(180deg, #fff 0%, var(--gray-100, #f3f4f6) 100%);
+    background: linear-gradient(180deg, var(--color-surface) 0%, var(--gray-100, var(--gray-100)) 100%);
     border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
-    border: 1px solid var(--gray-200, #e5e7eb);
+    border: 1px solid var(--gray-200, var(--gray-200));
 }
 .jds-selected-thumb img { max-width: 88%; max-height: 88%; object-fit: contain; }
 .jds-selected-body { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+
 .jds-selected-cat {
     font-size: 11px;
     text-transform: uppercase;
@@ -802,18 +885,20 @@
     color: var(--fx-accent);
     font-weight: 700;
 }
+
 .jds-selected-name {
     font-size: 19px;
     font-weight: 800;
     letter-spacing: -.02em;
-    color: var(--gray-900, #111827);
+    color: var(--gray-900, var(--gray-900));
     line-height: 1.25;
 }
-.jds-selected-sku { font-size: 13px; color: var(--gray-600, #4b5563); }
-.jds-selected-sku strong { color: var(--gray-900, #111827); font-variant-numeric: tabular-nums; }
+.jds-selected-sku { font-size: 13px; color: var(--gray-600, var(--gray-600)); }
+.jds-selected-sku strong { color: var(--gray-900, var(--gray-900)); font-variant-numeric: tabular-nums; }
+
 .jds-selected-imprint {
     font-size: 13px;
-    color: var(--gray-800, #1f2937);
+    color: var(--gray-800, var(--gray-800));
     margin-top: 6px;
     padding: 7px 10px;
     background: var(--fx-tint);
@@ -827,29 +912,32 @@
 .jds-live-block {
     margin-top: 10px;
     padding: 10px 12px;
-    background: var(--gray-50, #f9fafb);
-    border: 1px solid var(--gray-200, #e5e7eb);
+    background: var(--gray-50, var(--gray-50));
+    border: 1px solid var(--gray-200, var(--gray-200));
     border-radius: 10px;
     font-size: 13px;
 }
-.jds-live-loading { color: var(--gray-500, #6b7280); font-style: italic; }
-.jds-live-warn { color: #92400e; font-size: 12.5px; line-height: 1.45; }
-.jds-live-stock { font-weight: 700; color: #047857; margin-bottom: 8px; }
-.jds-out { color: #b91c1c; font-weight: 700; }
+.jds-live-loading { color: var(--gray-500, var(--gray-500)); font-style: italic; }
+.jds-live-warn { color: var(--amber-800); font-size: 12.5px; line-height: 1.45; }
+.jds-live-stock { font-weight: 700; color: var(--jds-submit-form-teal-dark); margin-bottom: 8px; }
+.jds-out { color: var(--red-700); font-weight: 700; }
 .jds-live-tier-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+
 .jds-live-tier-table th,
-.jds-live-tier-table td { text-align: left; padding: 5px 6px; border-bottom: 1px solid var(--gray-200, #e5e7eb); }
+.jds-live-tier-table td { text-align: left; padding: 5px 6px; border-bottom: 1px solid var(--gray-200, var(--gray-200)); }
+
 .jds-live-tier-table th {
-    color: var(--gray-500, #6b7280);
+    color: var(--gray-500, var(--gray-500));
     font-weight: 700;
     text-transform: uppercase;
     font-size: 10px;
     letter-spacing: .06em;
 }
 .jds-live-tier-table tbody tr:last-child td { border-bottom: none; }
+
 .jds-live-tier-table td:last-child,
 .jds-live-tier-table th:last-child { text-align: right; }
-.jds-live-tier-table td:last-child { font-weight: 700; color: var(--gray-900, #111827); font-variant-numeric: tabular-nums; }
+.jds-live-tier-table td:last-child { font-weight: 700; color: var(--gray-900, var(--gray-900)); font-variant-numeric: tabular-nums; }
 
 /* Tip callout */
 .jds-tip {
@@ -857,14 +945,15 @@
     align-items: flex-start;
     gap: 12px;
     padding: 12px 14px;
-    background: linear-gradient(180deg, #fffbeb 0%, #fef3c7 100%);
-    border: 1px solid #fde68a;
+    background: linear-gradient(180deg, var(--store-paper) 0%, var(--amber-100) 100%);
+    border: 1px solid var(--jds-submit-form-yellow);
     border-radius: 12px;
-    color: #78350f;
+    color: var(--jds-submit-form-orange);
     font-size: 13px;
     line-height: 1.55;
     margin: 4px 0 18px;
 }
+
 .jds-tip-icon {
     flex: 0 0 auto;
     width: 30px;
@@ -873,17 +962,17 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    background: #fff;
-    border: 1px solid #fde68a;
+    background: var(--color-surface);
+    border: 1px solid var(--jds-submit-form-yellow);
     font-size: 15px;
 }
 .jds-rush-row { margin: 4px 0 18px; }
 
 /* Legacy hint class kept for backwards compat — superseded by .jds-file-drop-sub */
-.jds-file-drop-hint { font-size: 12px; color: var(--gray-400, #9ca3af); margin-top: 6px; }
+.jds-file-drop-hint { font-size: 12px; color: var(--gray-400, var(--gray-400)); margin-top: 6px; }
 
 /* ── Responsive ─────────────────────────────────────────────────────── */
-@media (max-width: 760px) {
+@media (width <= 760px) {
     .jds-row { grid-template-columns: 1fr; }
     .jds-form-body { padding: 20px 18px 22px; }
     .jds-banner { flex-direction: column; text-align: center; gap: 12px; padding: 22px 18px; }

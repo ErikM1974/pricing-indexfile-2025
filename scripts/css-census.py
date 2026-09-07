@@ -8,11 +8,12 @@ CSS variables, !important declarations, distinct hex colours, font families, and
 5+ files (the duplication the shared component layer should absorb). Re-run after each migrated family; the
 targets are in memory/CSS_STANDARDIZATION_PLAN_2026-09.md.
 """
-import re, subprocess, sys, collections
+import re, subprocess, sys, collections, os
 sys.stdout.reconfigure(encoding='utf-8')
 TOP = int(sys.argv[sys.argv.index('--top') + 1]) if '--top' in sys.argv else 0
+# git ls-files still lists a sheet deleted in the working tree until the deletion is staged — skip those
 files = [f for f in subprocess.check_output(['git', 'ls-files', '*.css'], text=True).split('\n')
-         if f and not re.search(r'^(dist|node_modules|tests)/|/vendor/|/archive/', f)]
+         if f and os.path.exists(f) and not re.search(r'^(dist|node_modules|tests)/|/vendor/|/archive/', f)]
 total = 0; var_files = 0; important = 0
 colors = collections.Counter(); blocks = collections.Counter(); fonts = collections.Counter(); raw_color_files = 0
 for f in files:

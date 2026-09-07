@@ -3,6 +3,19 @@
  * Used by quote builders for customer search functionality
  */
 
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue so the page
+   keeps its exact look. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   every rule below uses var(). Raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
+:root {
+    --customer-lookup-gray: #888;
+    --customer-lookup-gray-2: #666;
+    --customer-lookup-gray-dark: #3d3d3d;
+    --customer-lookup-gray-dark-2: #333;
+    --customer-lookup-green: #c8e6c9;
+}
+/* stylelint-enable color-no-hex */
+
 /* Container for lookup field */
 .customer-lookup-container {
     position: relative;
@@ -13,7 +26,7 @@
 .customer-lookup-input {
     width: 100%;
     padding: 10px 12px 10px 36px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--store-line);
     border-radius: 6px;
     font-size: 14px;
     transition: border-color 0.2s, box-shadow 0.2s;
@@ -21,12 +34,12 @@
 
 .customer-lookup-input:focus {
     outline: none;
-    border-color: #4cb354;
-    box-shadow: 0 0 0 3px rgba(76, 179, 84, 0.15);
+    border-color: var(--brand-500);
+    box-shadow: 0 0 0 3px rgb(76 179 84 / 15%);
 }
 
 .customer-lookup-input::placeholder {
-    color: #999;
+    color: var(--print-line);
 }
 
 /* Search icon */
@@ -35,7 +48,7 @@
     left: 12px;
     top: 50%;
     transform: translateY(-50%);
-    color: #888;
+    color: var(--customer-lookup-gray);
     font-size: 14px;
     pointer-events: none;
 }
@@ -48,7 +61,7 @@
     transform: translateY(-50%);
     background: none;
     border: none;
-    color: #999;
+    color: var(--print-line);
     cursor: pointer;
     padding: 4px;
     font-size: 14px;
@@ -63,7 +76,7 @@
 }
 
 .customer-lookup-clear:hover {
-    color: #666;
+    color: var(--customer-lookup-gray-2);
 }
 
 /* Dropdown container */
@@ -75,10 +88,10 @@
     max-height: 300px;
     overflow-y: auto;
     background: white;
-    border: 1px solid #ddd;
+    border: 1px solid var(--store-line);
     border-top: none;
     border-radius: 0 0 6px 6px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 12px rgb(0 0 0 / 15%);
     z-index: 1000;
     display: none;
 }
@@ -87,7 +100,7 @@
 .customer-lookup-item {
     padding: 10px 12px;
     cursor: pointer;
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid var(--gray-100);
     transition: background-color 0.15s;
 }
 
@@ -97,13 +110,13 @@
 
 .customer-lookup-item:hover,
 .customer-lookup-item.highlighted {
-    background-color: #f5f9f5;
+    background-color: var(--slate-100);
 }
 
 /* Company name (primary text) */
 .customer-lookup-company {
     font-weight: 600;
-    color: #333;
+    color: var(--customer-lookup-gray-dark-2);
     font-size: 14px;
     margin-bottom: 2px;
 }
@@ -113,30 +126,30 @@
     display: flex;
     gap: 8px;
     font-size: 12px;
-    color: #666;
+    color: var(--customer-lookup-gray-2);
 }
 
 /* Contact name */
 .customer-lookup-name {
-    color: #555;
+    color: var(--print-ink-soft);
 }
 
 /* Email */
 .customer-lookup-email {
-    color: #888;
+    color: var(--customer-lookup-gray);
 }
 
 .customer-lookup-email::before {
     content: '\2022';
     margin-right: 8px;
-    color: #ccc;
+    color: var(--gray-300);
 }
 
 /* Loading state */
 .customer-lookup-loading {
     padding: 12px;
     text-align: center;
-    color: #888;
+    color: var(--customer-lookup-gray);
     font-size: 13px;
 }
 
@@ -145,8 +158,8 @@
     display: inline-block;
     width: 14px;
     height: 14px;
-    border: 2px solid #ddd;
-    border-top-color: #4cb354;
+    border: 2px solid var(--store-line);
+    border-top-color: var(--brand-500);
     border-radius: 50%;
     margin-right: 8px;
     vertical-align: middle;
@@ -161,17 +174,17 @@
 .customer-lookup-no-results {
     padding: 16px 12px;
     text-align: center;
-    color: #888;
+    color: var(--customer-lookup-gray);
     font-size: 13px;
 }
 
 /* Manual entry hint */
 .customer-lookup-hint {
     padding: 8px 12px;
-    background: #f9f9f9;
-    border-top: 1px solid #eee;
+    background: var(--gray-50);
+    border-top: 1px solid var(--brand-100);
     font-size: 11px;
-    color: #888;
+    color: var(--customer-lookup-gray);
     text-align: center;
 }
 
@@ -180,7 +193,7 @@
     display: flex;
     align-items: center;
     margin: 12px 0;
-    color: #aaa;
+    color: var(--gray-400);
     font-size: 11px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -191,7 +204,7 @@
     content: '';
     flex: 1;
     height: 1px;
-    background: #ddd;
+    background: var(--store-line);
 }
 
 .customer-lookup-divider::before {
@@ -208,18 +221,18 @@
     align-items: center;
     gap: 6px;
     padding: 4px 10px;
-    background: #e8f5e9;
-    border: 1px solid #c8e6c9;
+    background: var(--brand-100);
+    border: 1px solid var(--customer-lookup-green);
     border-radius: 16px;
     font-size: 12px;
-    color: #2e7d32;
+    color: var(--store-green-700);
     margin-bottom: 8px;
 }
 
 .customer-lookup-selected-remove {
     background: none;
     border: none;
-    color: #666;
+    color: var(--customer-lookup-gray-2);
     cursor: pointer;
     padding: 2px;
     line-height: 1;
@@ -227,35 +240,35 @@
 }
 
 .customer-lookup-selected-remove:hover {
-    color: #c62828;
+    color: var(--red-700);
 }
 
 /* Dark mode support (if needed) */
 @media (prefers-color-scheme: dark) {
     .customer-lookup-dropdown {
-        background: #2d2d2d;
-        border-color: #444;
+        background: var(--gray-800);
+        border-color: var(--gray-700);
     }
 
     .customer-lookup-item {
-        border-bottom-color: #3d3d3d;
+        border-bottom-color: var(--customer-lookup-gray-dark);
     }
 
     .customer-lookup-item:hover,
     .customer-lookup-item.highlighted {
-        background-color: #3d3d3d;
+        background-color: var(--customer-lookup-gray-dark);
     }
 
     .customer-lookup-company {
-        color: #eee;
+        color: var(--brand-100);
     }
 
     .customer-lookup-details {
-        color: #aaa;
+        color: var(--gray-400);
     }
 
     .customer-lookup-name {
-        color: #ccc;
+        color: var(--gray-300);
     }
 }
 

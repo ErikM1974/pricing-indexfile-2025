@@ -130,6 +130,20 @@
             <p class="text-muted">This page is a working document. Every standard that changed how a page looks is
                 recorded here, newest first, with the release that shipped it.</p>
             <ul class="rules decisions">
+                <li><strong>2026-09-07 · quote builders (the last family).</strong> The four quote builders, the monogram form
+                    and the fast quote, and the thirteen calculator, dashboard and storefront pages that share their sheets read
+                    the token file, and so do the AE dashboard's nav and submit-form sheets (the last of
+                    <code>shared_components/css</code>): 2,573 colour uses became 1,415 exact tokens, 691 near tokens and
+                    467 sheet-scoped variables;
+                    the shell's <code>--pnw-*</code> forest palette and the common sheet's <code>--builder-*</code> palette now
+                    alias the tokens wherever the values match. The generated hash-named <code>quote-builder-inline.css</code>
+                    is retired: the same 127 declaration sets live in <code>quote-builder-utilities.css</code> under names that
+                    say what they do (<code>.qb-mt-4</code>, <code>.qb-bg-amber-100-p-2-8-r-4-c-amber-800</code>). Their
+                    <code>!important</code> stays for now — it reproduces the precedence an inline attribute had over the
+                    builders' id-based rules, and dropping it means refactoring those id rules on the money path, which is
+                    design work, not a script. <strong>Follow-up:</strong> retire the flags builder by builder as the id rules
+                    are refactored; <code>quote-print.css</code> (296 flags over inline-styled print markup) is the biggest.
+                    The sticker pricing page keeps its own 20/24/32 spacing steps, which shadow the token scale on that page.</li>
                 <li><strong>2026-09-07 · staff pages + customer portal.</strong> The forty-five remaining pages under
                     <code>pages/</code> (art request and mockup detail, quote view, invoices, policies, the customer portal and
                     login, the garment designer, the SanMar vendor portal) and the product page's shared sheet read the token

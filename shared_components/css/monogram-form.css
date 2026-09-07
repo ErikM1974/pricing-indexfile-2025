@@ -1,3 +1,5 @@
+/* stylelint-disable no-duplicate-selectors -- legacy sheet: rules were appended over time; merging them would reorder the cascade (2026-09-07) */
+
 /**
  * Monogram Form Styles
  * Styling for the monogram/personalization tracking form
@@ -6,24 +8,45 @@
 /* ============================================
    CSS VARIABLES
    ============================================ */
+
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue, merged into its
+   existing :root. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
 :root {
-    --primary-color: #3a7c52;
-    --primary-dark: #2d5f3f;
-    --primary-light: #4cb861;
-    --bg-color: #f5f7fa;
-    --card-bg: #ffffff;
-    --border-color: #e5e7eb;
-    --text-primary: #1f2937;
-    --text-secondary: #6b7280;
-    --hover-bg: #f3f4f6;
-    --success-bg: #d1fae5;
-    --success-text: #065f46;
-    --warning-bg: #fef3c7;
-    --warning-text: #92400e;
-    --error-bg: #fee2e2;
-    --error-text: #991b1b;
-    --focus-shadow: 0 0 0 0.25rem rgba(58, 124, 82, 0.25);
+    --monogram-form-gray-dark: #000;
+    --monogram-form-cyan-dark: #1a3a5c;
+    --monogram-form-red: #dc3545;
+    --monogram-form-gray: #666;
+    --monogram-form-green: #3a7c52;
+    --monogram-form-green-tint: #d1fae5;
+    --monogram-form-teal-dark: #065f46;
+    --monogram-form-cyan: #4a90a4;
+    --monogram-form-yellow: #f0d78c;
+    --monogram-form-yellow-2: #8a6d00;
+    --monogram-form-yellow-3: #a88400;
+    --monogram-form-yellow-4: #e0d4a8;
+    --monogram-form-yellow-dark: #5a4a00;
+    --monogram-form-yellow-5: #e5c66d;
+    --monogram-form-gray-dark-2: #333;
+    --primary-color: var(--monogram-form-green);
+    --primary-dark: var(--print-green);
+    --primary-light: var(--brand-500);
+    --bg-color: var(--color-bradley-tint);
+    --card-bg: var(--color-surface);
+    --border-color: var(--gray-200);
+    --text-primary: var(--gray-800);
+    --text-secondary: var(--gray-500);
+    --hover-bg: var(--gray-100);
+    --success-bg: var(--monogram-form-green-tint);
+    --success-text: var(--monogram-form-teal-dark);
+    --warning-bg: var(--amber-100);
+    --warning-text: var(--amber-800);
+    --error-bg: var(--red-100);
+    --error-text: var(--red-800);
+    --focus-shadow: 0 0 0 0.25rem rgb(58 124 82 / 25%);
 }
+/* stylelint-enable color-no-hex */
 
 /* ============================================
    BASE STYLES
@@ -35,7 +58,7 @@
 }
 
 body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
     background: var(--bg-color);
     color: var(--text-primary);
     line-height: 1.6;
@@ -52,7 +75,7 @@ body {
     position: sticky;
     top: 0;
     z-index: 100;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    box-shadow: 0 1px 3px rgb(0 0 0 / 5%);
 }
 
 .header-container {
@@ -127,7 +150,7 @@ body {
 .btn-primary:hover {
     background: var(--primary-dark);
     transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(58, 124, 82, 0.3);
+    box-shadow: 0 4px 8px rgb(58 124 82 / 30%);
 }
 
 .btn-secondary {
@@ -149,7 +172,6 @@ body {
 .btn-secondary:hover {
     background: var(--hover-bg);
     border-color: var(--primary-color);
-    color: var(--primary-color);
 }
 
 .btn-sm {
@@ -226,7 +248,7 @@ body {
     padding: 1.5rem 2rem;
     border-radius: 0.75rem;
     margin-bottom: 1.5rem;
-    box-shadow: 0 4px 12px rgba(58, 124, 82, 0.3);
+    box-shadow: 0 4px 12px rgb(58 124 82 / 30%);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -252,8 +274,8 @@ body {
 }
 
 .page-header-actions .btn-icon {
-    background: rgba(255,255,255,0.2);
-    border-color: rgba(255,255,255,0.3);
+    background: rgb(255 255 255 / 20%);
+    border-color: rgb(255 255 255 / 30%);
     color: white;
 }
 
@@ -269,7 +291,7 @@ body {
     background: var(--card-bg);
     border-radius: 0.75rem;
     margin-bottom: 1.5rem;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    box-shadow: 0 2px 8px rgb(0 0 0 / 8%);
     overflow: hidden;
 }
 
@@ -376,7 +398,7 @@ body {
     background: var(--card-bg);
     border-radius: 0.75rem;
     padding: 1.5rem;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    box-shadow: 0 2px 8px rgb(0 0 0 / 8%);
 }
 
 .section-title {
@@ -446,7 +468,7 @@ body {
 }
 
 .form-group .required {
-    color: #dc3545;
+    color: var(--monogram-form-red);
 }
 
 .form-group input,
@@ -549,7 +571,7 @@ body {
     background: var(--card-bg);
     border: 1px solid var(--border-color);
     border-radius: 0.375rem;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 12px rgb(0 0 0 / 15%);
     z-index: 1000;
     max-height: 300px;
     display: flex;
@@ -659,7 +681,7 @@ body {
     justify-content: center;
     width: 16px;
     height: 16px;
-    background: rgba(255,255,255,0.2);
+    background: rgb(255 255 255 / 20%);
     border: none;
     border-radius: 50%;
     color: white;
@@ -670,7 +692,7 @@ body {
 }
 
 .thread-color-tag .remove-tag:hover {
-    background: rgba(255,255,255,0.4);
+    background: rgb(255 255 255 / 40%);
 }
 
 /* ============================================
@@ -729,7 +751,7 @@ body {
     background: var(--card-bg);
     border: 1px solid var(--border-color);
     border-radius: 0.375rem;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 12px rgb(0 0 0 / 15%);
     z-index: 1000;
     max-height: 300px;
     display: flex;
@@ -819,7 +841,7 @@ body {
     align-items: center;
     gap: 0.375rem;
     padding: 0.25rem 0.5rem;
-    background: #4a90a4;
+    background: var(--monogram-form-cyan);
     color: white;
     border-radius: 1rem;
     font-size: 0.8125rem;
@@ -832,7 +854,7 @@ body {
     justify-content: center;
     width: 16px;
     height: 16px;
-    background: rgba(255,255,255,0.2);
+    background: rgb(255 255 255 / 20%);
     border: none;
     border-radius: 50%;
     color: white;
@@ -843,7 +865,7 @@ body {
 }
 
 .location-tag .remove-tag:hover {
-    background: rgba(255,255,255,0.4);
+    background: rgb(255 255 255 / 40%);
 }
 
 /* ============================================
@@ -892,8 +914,8 @@ body {
 .unassigned-names-panel {
     margin-top: 0.75rem;
     padding: 0.75rem;
-    background: #fff8e6;
-    border: 1px solid #f0d78c;
+    background: var(--store-rush-soft);
+    border: 1px solid var(--monogram-form-yellow);
     border-radius: 0.375rem;
 }
 
@@ -902,12 +924,12 @@ body {
     align-items: center;
     gap: 0.5rem;
     margin-bottom: 0.5rem;
-    color: #8a6d00;
+    color: var(--monogram-form-yellow-2);
 }
 
 .unassigned-count {
     font-weight: normal;
-    color: #a88400;
+    color: var(--monogram-form-yellow-3);
 }
 
 .unassigned-list {
@@ -920,10 +942,10 @@ body {
     display: inline-block;
     padding: 0.25rem 0.5rem;
     background: white;
-    border: 1px solid #e0d4a8;
+    border: 1px solid var(--monogram-form-yellow-4);
     border-radius: 0.25rem;
     font-size: 0.8125rem;
-    color: #5a4a00;
+    color: var(--monogram-form-yellow-dark);
 }
 
 .all-assigned {
@@ -1054,7 +1076,7 @@ body {
 .names-table select:focus {
     outline: none;
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 2px rgba(58, 124, 82, 0.15);
+    box-shadow: 0 0 0 2px rgb(58 124 82 / 15%);
 }
 
 .names-table .row-number {
@@ -1069,8 +1091,8 @@ body {
 
 /* Manual entry mode styling */
 .names-table .manual-entry {
-    background: #fffdf5;  /* Subtle warm tint to indicate manual entry */
-    border-color: #e5c66d;
+    background: var(--store-paper);  /* Subtle warm tint to indicate manual entry */
+    border-color: var(--monogram-form-yellow-5);
 }
 
 .names-table .manual-entry:focus {
@@ -1080,12 +1102,12 @@ body {
 
 /* Fields that need user input (e.g., null color from API) */
 .names-table .needs-input {
-    border-color: #f59e0b;
-    background: #fffbeb;
+    border-color: var(--amber-500);
+    background: var(--store-paper);
 }
 
 .names-table .needs-input::placeholder {
-    color: #b45309;
+    color: var(--amber-700);
 }
 
 /* Delete row button */
@@ -1105,8 +1127,7 @@ body {
 
 .btn-delete-row:hover {
     background: var(--error-bg);
-    border-color: #dc3545;
-    color: #dc3545;
+    border-color: var(--monogram-form-red);
 }
 
 .table-footer {
@@ -1125,7 +1146,7 @@ body {
     background: var(--card-bg);
     border-radius: 0.75rem;
     padding: 1.25rem 1.5rem;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    box-shadow: 0 2px 8px rgb(0 0 0 / 8%);
 }
 
 .actions-left,
@@ -1166,6 +1187,7 @@ body {
     .main-container,
     .loading-overlay,
     .toast-container {
+        /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
         display: none !important;
     }
 
@@ -1176,7 +1198,7 @@ body {
         align-items: flex-start;
         margin-bottom: 20px;
         padding-bottom: 15px;
-        border-bottom: 2px solid #1a3a5c;
+        border-bottom: 2px solid var(--monogram-form-cyan-dark);
     }
 
     .print-logo {
@@ -1190,12 +1212,12 @@ body {
 
     .print-date {
         font-size: 12px;
-        color: #666;
+        color: var(--monogram-form-gray);
     }
 
     .print-title {
         font-size: 24px;
-        color: #1a3a5c;
+        color: var(--monogram-form-cyan-dark);
         margin-top: 5px;
     }
 
@@ -1205,14 +1227,14 @@ body {
         gap: 40px;
         margin-bottom: 20px;
         padding: 15px;
-        background: #f5f7fa;
+        background: var(--color-bradley-tint);
         border-radius: 5px;
     }
 
     .print-field strong {
         display: block;
         font-size: 11px;
-        color: #666;
+        color: var(--monogram-form-gray);
         margin-bottom: 3px;
     }
 
@@ -1228,10 +1250,10 @@ body {
 
     .print-monogram-details h3 {
         font-size: 14px;
-        color: #1a3a5c;
+        color: var(--monogram-form-cyan-dark);
         margin-bottom: 10px;
         padding-bottom: 5px;
-        border-bottom: 1px solid #ddd;
+        border-bottom: 1px solid var(--store-line);
     }
 
     .print-detail-row {
@@ -1245,7 +1267,7 @@ body {
     }
 
     .print-notes p {
-        background: #f5f7fa;
+        background: var(--color-bradley-tint);
         padding: 10px;
         border-radius: 5px;
         font-size: 13px;
@@ -1255,7 +1277,7 @@ body {
     /* Print names table */
     .print-names-section h3 {
         font-size: 14px;
-        color: #1a3a5c;
+        color: var(--monogram-form-cyan-dark);
         margin-bottom: 10px;
     }
 
@@ -1266,7 +1288,7 @@ body {
     }
 
     .print-names-table th {
-        background: #1a3a5c;
+        background: var(--monogram-form-cyan-dark);
         color: white;
         padding: 8px 6px;
         text-align: left;
@@ -1275,21 +1297,21 @@ body {
 
     .print-names-table td {
         padding: 6px;
-        border-bottom: 1px solid #ddd;
+        border-bottom: 1px solid var(--store-line);
     }
 
     .print-names-table tbody tr:nth-child(even) {
-        background: #f9f9f9;
+        background: var(--gray-50);
     }
 
     /* Page breaks */
     .print-names-table {
-        page-break-inside: auto;
+        break-inside: auto;
     }
 
     .print-names-table tr {
-        page-break-inside: avoid;
-        page-break-after: auto;
+        break-inside: avoid;
+        break-after: auto;
     }
 
     .print-footer {
@@ -1297,14 +1319,14 @@ body {
         bottom: 20px;
         right: 20px;
         font-size: 10px;
-        color: #999;
+        color: var(--print-line);
     }
 }
 
 /* ============================================
    RESPONSIVE DESIGN
    ============================================ */
-@media (max-width: 768px) {
+@media (width <= 768px) {
     .header-container {
         flex-direction: column;
         gap: 1rem;
@@ -1450,7 +1472,7 @@ body {
 
 .stitch-finding .btn-fix-finding:hover {
     background: var(--primary-color);
-    color: #fff;
+    color: var(--color-on-brand);
 }
 
 /* Row highlight when a finding is clicked */
@@ -1469,27 +1491,27 @@ body {
 .print-run-plan {
     margin-top: 0.5rem;
     padding: 0.4rem 0.6rem;
-    border: 1px solid #000;
+    border: 1px solid var(--monogram-form-gray-dark);
     font-weight: 600;
     font-size: 10pt;
 }
 
 .print-names-table tr.thread-change-row td {
-    background: #000 !important;
-    color: #fff !important;
+    /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
+    background: var(--monogram-form-gray-dark) !important;
+    /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
+    color: var(--color-on-brand) !important;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.05em;
     padding: 0.3rem 0.6rem;
     -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
 }
 
 /* Never let a thread-change banner orphan at the foot of a page — the
    operator would start a group with no visible cone instruction. */
 .print-names-table tr.thread-change-row {
     break-after: avoid;
-    page-break-after: avoid;
 }
 
 /* ============================================
@@ -1498,7 +1520,7 @@ body {
 .proof-instructions {
     margin: 0.75rem 0 1rem;
     padding: 0.6rem 0.8rem;
-    border: 1px solid #000;
+    border: 1px solid var(--monogram-form-gray-dark);
     font-size: 10pt;
     line-height: 1.5;
 }
@@ -1508,7 +1530,7 @@ body {
 .proof-color-notice {
     margin: 0 0 1rem;
     padding: 0.5rem 0.8rem;
-    border: 1.5pt solid #000;
+    border: 1.5pt solid var(--monogram-form-gray-dark);
     font-size: 9.5pt;
     font-weight: 700;
 }
@@ -1522,16 +1544,15 @@ body {
     align-items: center;
     gap: 0.9rem;
     padding: 0.55rem 0.25rem;
-    border-bottom: 1px solid #ccc;
+    border-bottom: 1px solid var(--gray-300);
     break-inside: avoid;
-    page-break-inside: avoid;
 }
 
 .proof-checkbox {
     flex: 0 0 auto;
     width: 16pt;
     height: 16pt;
-    border: 1.5pt solid #000;
+    border: 1.5pt solid var(--monogram-form-gray-dark);
     display: inline-block;
 }
 
@@ -1540,7 +1561,6 @@ body {
     font-size: 22pt;
     line-height: 1.25;
     -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
 }
 
 /* White/pale thread on white paper: show the name on a dark chip so it stays
@@ -1548,20 +1568,19 @@ body {
    flex + fit-content keeps the chip hugging the name — .proof-name's
    `flex: 1 1 auto` would otherwise stretch it into a full-width bar. */
 .proof-name-light {
-    background: #4a4a4a;
+    background: var(--store-ink-soft);
     border-radius: 4px;
     padding: 0 0.5rem;
     flex: 0 1 auto;
     width: fit-content;
     max-width: 100%;
     -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
 }
 
 .proof-meta {
     flex: 0 0 38%;
     font-size: 8.5pt;
-    color: #333;
+    color: var(--monogram-form-gray-dark-2);
     line-height: 1.4;
     text-align: right;
 }
@@ -1576,9 +1595,8 @@ body {
     display: inline-block;
     width: 8pt;
     height: 8pt;
-    border: 0.5pt solid #000;
+    border: 0.5pt solid var(--monogram-form-gray-dark);
     -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
 }
 
 .proof-signoff {
@@ -1586,12 +1604,11 @@ body {
     gap: 2rem;
     margin-top: 2.5rem;
     break-inside: avoid;
-    page-break-inside: avoid;
 }
 
 .proof-signoff-line {
     flex: 1 1 auto;
-    border-top: 1.5pt solid #000;
+    border-top: 1.5pt solid var(--monogram-form-gray-dark);
     padding-top: 0.3rem;
     font-size: 9pt;
 }
@@ -1604,10 +1621,12 @@ body {
    printProof()/afterprint (monogram-form-controller.js). */
 @media print {
     body:not(.print-mode-proof) #proofTemplate {
+        /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
         display: none !important;
     }
 
     body.print-mode-proof #printTemplate {
+        /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
         display: none !important;
     }
 }

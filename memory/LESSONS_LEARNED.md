@@ -33,23 +33,7 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 ### EmailJS ids in 25 scripts, 118 unlabelled controls, and 12 SEO pages rendering in quirks mode (2026-09-06, ARCHIVED 2026-09-07, `v2026.09.06.36`): EmailJS service/template ids come from `APP_CONFIG`, never a literal; every control gets a label or `aria-label`; a page that starts with a fragment instead of `<!DOCTYPE html>` renders in quirks mode. Full entry in archive.
 ### 700 console.logs in production, and a basename match that hid four stale root copies (2026-09-06, ARCHIVED 2026-09-07, `v2026.09.06.37`): `console.log` in served scripts is gated behind localhost / `?debug=1` (lock in `repo-hygiene-final`); an orphan census must match the PATH, not the basename. Full entry in archive.
 ### My own host sweep broke the DTF calculator for four deploys, and only a console read caught it (2026-09-06, ARCHIVED 2026-09-07, `v2026.09.06.40`): a scripted rewrite must preserve the ORIGINAL quote character (a template literal lost its backticks and fetched `${…}` literally; 182 suites stayed green); after any sweep that touches fetch URLs, read the live console and `performance.getEntriesByType('resource')` for `responseStatus >= 400` on the pages that use them. Full entry in archive.
-
-## 2026-09-06 — The screen-print tier buttons promised a fee Caspio no longer charges (`v2026.09.06.42`)
-
-**Problem.** Erik moved the ScreenPrint tiers in Caspio (24-47 with a $50 LTM, 48-71 with none).
-The calculator's ENGINE followed (it reads `LTM_Fee` off the matched API tier) but its tier strip
-was typed in the template: "24-36 + $75 Small Batch Fee", "37-71 + $50", with `(75 / clamped)` and
-`(50 / clamped)` in the input handlers. At 50 pieces the page showed a $50 fee it did not charge.
-**Root cause.** "Pricing from the API" was applied to the numbers that reach the total and not to
-the numbers the customer READS; the strip was built once for a tier layout and never re-derived.
-**Solution.** The strip, its inputs, clamps and hints are rendered from the API tiers when the
-bundle lands; the art-setup tooltip reads GRT-50; a lock forbids typed tier ids/fees in v2.
-**Prevention.** 🔑 Every dollar or range a customer can read is pricing — grep templates for
-`$\d` and `\d+-\d+ pieces`, not just the math. 🔑 Compare the UI's tier labels with
-`GET /api/pricing-bundle` tiers on each calculator after ANY Caspio tier change. 🔑 A
-marker-based `cut()` in a refactor script must assert the method count before/after (117
-unrelated lines vanished here and only a runtime probe caught it). 🔑 The dev server serves
-`/dist` hashed assets — `node scripts/build.js` before a local probe, or you test the old file.
+### The screen-print tier buttons promised a fee Caspio no longer charges (2026-09-06, ARCHIVED 2026-09-07, `v2026.09.06.42`): every dollar or range a customer can READ is pricing — render tier strips, clamps and hints from the API tiers, never type them; after any Caspio tier change compare each calculator's labels with `GET /api/pricing-bundle`; a marker-based `cut()` in a refactor script must assert the method count before/after. Full entry in archive.
 
 ## 2026-09-06 — Two customer calculators drifted from Caspio's tiers while the engine followed them (`v2026.09.06.42`–`.43`)
 
@@ -274,3 +258,30 @@ before tokenizing — a declaration can span three lines, so join until the line
 Run the tokenizer with `--dry` on an already-migrated sheet before a re-run: the expected report is
 `exact 0 · near 0 · far 0 → 0 page vars`. 🔑 After a re-run, grep `^\s*(--[a-z0-9-]+):\s*var\(\1\)` — a
 self-referencing custom property is silent in the browser and blanks every use of the variable.
+
+## 2026-09-07 — Quote builders family: retiring a generated sheet by renaming, a near-mapped ink, and curl vs the office firewall
+
+**Problem.** (a) The generated `quote-builder-inline.css` (127 `.qbi-<hash>` classes, all `!important`) could not
+simply lose its flags: each flag reproduces the precedence an inline `style=""` had over the builders' id-based
+rules, and a screenshot only proves the default state of a page — modals, later steps and error states never
+render in a shot, so a dropped flag could regress a state nobody sees until a customer does. (b) On the garment
+designer the page ink `--text: #22301c` was within the "near" threshold of the storefront ink and got mapped to it;
+every heading on the page came out a shade darker (the diff caught 351 px on one heading only — small text stays
+under the per-channel threshold). (c) Both curls on this machine (Git Bash's and Windows' `curl.exe`) failed the
+TLS handshake to `www.teamnwca.com` (exit 35) minutes after a verified Heroku release; `openssl s_client` showed
+the certificate was issued by a FortiGate (`CN=FGT61FTK22016247`) — the office firewall inspects TLS for that
+domain and curl does not trust its CA. The app was fine: the direct `*.herokuapp.com` URL answered and the
+in-app browser loaded the page with the new stylesheet.
+**Root cause.** (a) A flag is a cascade fact, not a lint problem. (b) The near threshold is a colour-distance
+rule; it has no idea which colour is the page's body ink. (c) A corporate TLS proxy in the path.
+**Solution.** (a) The sheet was retired as a GENERATED artifact, not as a set of flags: the same 127 declaration
+sets became `quote-builder-utilities.css` with names that are their declarations (`.qb-mt-4`,
+`.qb-bg-amber-100-p-2-8-r-4-c-amber-800`) — tokenize the source sheet first so the names carry token names —
+the markup's classes were rewritten in the three builders, and the flags stay with a file-level reason until the
+id rules are refactored builder by builder (recorded on the Brand Standards page). (b) Kept the page's exact ink;
+the tokenizer's near rule now has a documented exception: a sheet's body ink / page text variable is never
+near-mapped. (c) Verify a release through the `herokuapp.com` URL or the browser when curl exits 35 here.
+**Prevention.** 🔑 Never delete `!important` on the money path by script — a screenshot cannot see the states
+that need it. 🔑 A "near" colour rule must exempt the page's ink (`--text`, `--ink`, `--text-primary`): a
+shade on the body text is a look change even when no pixel crosses the threshold. 🔑 curl exit 35 from the
+office to teamnwca.com is the FortiGate, not the site — check `openssl s_client -connect … | grep issuer`.

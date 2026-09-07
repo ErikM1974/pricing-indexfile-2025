@@ -13,38 +13,48 @@
  * data-section on .ae-nav so the Tier-2 accent follows the active department.
  */
 
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue so the page
+   keeps its exact look. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   every rule below uses var(). Raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
+:root {
+    --ae-nav-v2-blue: #6b8fc4;
+    --ae-nav-v2-cyan: #60a5fa;
+}
+/* stylelint-enable color-no-hex */
+
 .ae-nav {
-    --ae-maroon:       #981e32;
-    --ae-maroon-deep:  #7a1828;
-    --ae-maroon-light: #b92c43;
-    --ae-maroon-tint:  #fdf2f4;
-    --ae-maroon-soft:  #fbe4e8;
-    --ae-maroon-ring:  rgba(152, 30, 50, .16);
-    --ae-purple:       #6b46c1;
-    --ae-purple-deep:  #4c3391;
-    --ae-purple-light: #8b5cf6;
-    --ae-purple-tint:  #f5f3ff;
-    --ae-purple-ring:  rgba(107, 70, 193, .16);
-    --ae-green:        #0a8a1f;
-    --ae-green-deep:   #006600;
-    --ae-green-light:  #33bb33;
-    --ae-green-tint:   #ecfdf0;
-    --ae-green-ring:   rgba(10, 138, 31, .16);
-    --ae-blue:         #4a6fa5;
-    --ae-blue-deep:    #33537d;
-    --ae-blue-light:   #6b8fc4;
-    --ae-blue-tint:    #f4f7fb;
-    --ae-blue-ring:    rgba(74, 111, 165, .16);
-    --ae-floor:        #2563eb;
-    --ae-floor-deep:   #1d4ed8;
-    --ae-floor-light:  #60a5fa;
-    --ae-floor-tint:   #eff6ff;
-    --ae-floor-ring:   rgba(37, 99, 235, .16);
-    --ae-ink:   #111827;
-    --ae-ink-2: #374151;
-    --ae-ink-3: #6b7280;
-    --ae-line:   #e5e7eb;
-    --ae-line-2: #f3f4f6;
+    --ae-maroon:       var(--color-ae);
+    --ae-maroon-deep:  var(--color-ae-dark);
+    --ae-maroon-light: var(--color-ae-light);
+    --ae-maroon-tint:  var(--red-50);
+    --ae-maroon-soft:  var(--red-100);
+    --ae-maroon-ring:  rgb(152 30 50 / 16%);
+    --ae-purple:       var(--color-ruth);
+    --ae-purple-deep:  var(--color-ruth-dark);
+    --ae-purple-light: var(--color-ruth-light);
+    --ae-purple-tint:  var(--color-ruth-tint);
+    --ae-purple-ring:  rgb(107 70 193 / 16%);
+    --ae-green:        var(--color-steve);
+    --ae-green-deep:   var(--color-steve-dark);
+    --ae-green-light:  var(--color-steve-light);
+    --ae-green-tint:   var(--color-steve-tint);
+    --ae-green-ring:   rgb(10 138 31 / 16%);
+    --ae-blue:         var(--color-bradley);
+    --ae-blue-deep:    var(--color-bradley-dark);
+    --ae-blue-light:   var(--ae-nav-v2-blue);
+    --ae-blue-tint:    var(--color-bradley-tint);
+    --ae-blue-ring:    rgb(74 111 165 / 16%);
+    --ae-floor:        var(--blue-600);
+    --ae-floor-deep:   var(--color-floor-dark);
+    --ae-floor-light:  var(--ae-nav-v2-cyan);
+    --ae-floor-tint:   var(--color-floor-tint);
+    --ae-floor-ring:   rgb(37 99 235 / 16%);
+    --ae-ink:   var(--gray-900);
+    --ae-ink-2: var(--gray-700);
+    --ae-ink-3: var(--gray-500);
+    --ae-line:   var(--gray-200);
+    --ae-line-2: var(--gray-100);
 
     /* Accent follows the active department (maroon default, purple for Ruth) */
     --ae-accent:      var(--ae-maroon);
@@ -52,15 +62,16 @@
     --ae-accent-tint: var(--ae-maroon-tint);
     --ae-accent-ring: var(--ae-maroon-ring);
 
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     position: relative;
     z-index: 20;
-    background: #fff;
+    background: var(--color-surface);
     border: 1px solid var(--ae-line);
     border-radius: 18px;
-    box-shadow: var(--shadow-lg, 0 8px 24px -8px rgba(15,23,42,.18), 0 4px 10px -4px rgba(15,23,42,.08));
+    box-shadow: var(--shadow-lg, 0 8px 24px -8px rgb(15 23 42 / 18%), 0 4px 10px -4px rgb(15 23 42 / 8%));
     margin-bottom: 18px;
 }
+
 /* Person colour-coding (Erik, 2026-09-04): Steve = GREEN (his Art Request
    Detail page green), Ruth = PURPLE, Bradley / purchasing / transfers = the
    slate BLUE of his transfer queue + the Supacolor page, Personalization
@@ -72,18 +83,21 @@
     --ae-accent-tint: var(--ae-floor-tint);
     --ae-accent-ring: var(--ae-floor-ring);
 }
+
 .ae-nav[data-section="transfers"] {
     --ae-accent:      var(--ae-blue);
     --ae-accent-deep: var(--ae-blue-deep);
     --ae-accent-tint: var(--ae-blue-tint);
     --ae-accent-ring: var(--ae-blue-ring);
 }
+
 .ae-nav[data-section="steve"] {
     --ae-accent:      var(--ae-green);
     --ae-accent-deep: var(--ae-green-deep);
     --ae-accent-tint: var(--ae-green-tint);
     --ae-accent-ring: var(--ae-green-ring);
 }
+
 .ae-nav[data-section="ruth"] {
     --ae-accent:      var(--ae-purple);
     --ae-accent-deep: var(--ae-purple-deep);
@@ -124,39 +138,46 @@
     min-width: 0;
     transition: background 150ms ease, color 150ms ease, box-shadow 150ms ease;
 }
+
 .ae-nav__section:hover {
     color: var(--ae-ink);
     background: var(--ae-line-2);
 }
+
 .ae-nav__section:focus-visible {
     outline: none;
     box-shadow: 0 0 0 3px var(--ae-maroon-ring);
 }
+
 .ae-nav__section.is-active,
 .ae-nav__section.is-active:hover {
-    color: #fff;
+    color: var(--color-on-brand);
     background: linear-gradient(135deg, var(--ae-maroon-deep) 0%, var(--ae-maroon) 60%, var(--ae-maroon-light) 100%);
-    box-shadow: 0 10px 20px -10px rgba(152, 30, 50, .65), inset 0 1px 0 rgba(255, 255, 255, .18);
+    box-shadow: 0 10px 20px -10px rgb(152 30 50 / 65%), inset 0 1px 0 rgb(255 255 255 / 18%);
 }
+
 .ae-nav__section[data-section="steve"].is-active,
 .ae-nav__section[data-section="steve"].is-active:hover {
-    background: linear-gradient(135deg, var(--ae-green-deep) 0%, #008a12 60%, var(--ae-green-light) 100%);
-    box-shadow: 0 10px 20px -10px rgba(0, 102, 0, .65), inset 0 1px 0 rgba(255, 255, 255, .18);
+    background: linear-gradient(135deg, var(--ae-green-deep) 0%, var(--color-steve) 60%, var(--ae-green-light) 100%);
+    box-shadow: 0 10px 20px -10px rgb(0 102 0 / 65%), inset 0 1px 0 rgb(255 255 255 / 18%);
 }
+
 .ae-nav__section[data-section="personalization"].is-active,
 .ae-nav__section[data-section="personalization"].is-active:hover {
     background: linear-gradient(135deg, var(--ae-floor-deep) 0%, var(--ae-floor) 60%, var(--ae-floor-light) 100%);
-    box-shadow: 0 10px 20px -10px rgba(29, 78, 216, .65), inset 0 1px 0 rgba(255, 255, 255, .18);
+    box-shadow: 0 10px 20px -10px rgb(29 78 216 / 65%), inset 0 1px 0 rgb(255 255 255 / 18%);
 }
+
 .ae-nav__section[data-section="transfers"].is-active,
 .ae-nav__section[data-section="transfers"].is-active:hover {
     background: linear-gradient(135deg, var(--ae-blue-deep) 0%, var(--ae-blue) 60%, var(--ae-blue-light) 100%);
-    box-shadow: 0 10px 20px -10px rgba(51, 83, 125, .65), inset 0 1px 0 rgba(255, 255, 255, .18);
+    box-shadow: 0 10px 20px -10px rgb(51 83 125 / 65%), inset 0 1px 0 rgb(255 255 255 / 18%);
 }
+
 .ae-nav__section[data-section="ruth"].is-active,
 .ae-nav__section[data-section="ruth"].is-active:hover {
     background: linear-gradient(135deg, var(--ae-purple-deep) 0%, var(--ae-purple) 60%, var(--ae-purple-light) 100%);
-    box-shadow: 0 10px 20px -10px rgba(107, 70, 193, .65), inset 0 1px 0 rgba(255, 255, 255, .18);
+    box-shadow: 0 10px 20px -10px rgb(107 70 193 / 65%), inset 0 1px 0 rgb(255 255 255 / 18%);
 }
 
 .ae-nav__section-label {
@@ -165,6 +186,7 @@
     letter-spacing: -.01em;
     line-height: 1.2;
 }
+
 .ae-nav__section-sub {
     font-size: 10.5px;
     font-weight: 600;
@@ -186,6 +208,7 @@
    behind a hairline so departments (left) read apart from tools (right). */
 .ae-nav__section--link { color: var(--ae-ink-3); }
 a.ae-nav__section--link:first-of-type { margin-left: auto; }
+
 a.ae-nav__section--link:first-of-type::before {
     content: '';
     position: absolute;
@@ -195,6 +218,7 @@ a.ae-nav__section--link:first-of-type::before {
     width: 1px;
     background: var(--ae-line);
 }
+
 .ae-nav__section--link .ae-nav__section-label::after {
     content: "↗";
     display: inline-block;
@@ -204,10 +228,12 @@ a.ae-nav__section--link:first-of-type::before {
     opacity: .45;
     transition: opacity 150ms ease, transform 150ms ease;
 }
+
 .ae-nav__section--link:hover .ae-nav__section-label::after {
     opacity: .9;
     transform: translate(1px, -1px);
 }
+
 .ae-nav__section--link.is-active,
 .ae-nav__section--link.is-active:hover {
     color: var(--ae-ink-3);
@@ -224,7 +250,7 @@ a.ae-nav__section--link:first-of-type::before {
     padding: 7px 12px;
     min-height: 52px;
     box-sizing: border-box;
-    background: var(--gray-50, #f9fafb);
+    background: var(--gray-50, var(--gray-50));
     border-radius: 0 0 18px 18px;
     position: relative;
 }
@@ -247,21 +273,25 @@ a.ae-nav__section--link:first-of-type::before {
     white-space: nowrap;
     transition: color 150ms ease, background 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
 }
+
 .ae-nav__sub-tab:hover {
     color: var(--ae-ink);
-    background: #fff;
+    background: var(--color-surface);
     border-color: var(--ae-line);
 }
+
 .ae-nav__sub-tab:focus-visible {
     outline: none;
     box-shadow: 0 0 0 3px var(--ae-accent-ring);
 }
+
 .ae-nav__sub-tab.is-active {
     color: var(--ae-accent);
-    background: #fff;
+    background: var(--color-surface);
     border-color: var(--ae-line);
-    box-shadow: var(--shadow-sm, 0 1px 2px rgba(15,23,42,.04), 0 1px 1px rgba(15,23,42,.03));
+    box-shadow: var(--shadow-sm, 0 1px 2px rgb(15 23 42 / 4%), 0 1px 1px rgb(15 23 42 / 3%));
 }
+
 .ae-nav__sub-tab.is-active::before {
     content: '';
     width: 7px;
@@ -270,6 +300,7 @@ a.ae-nav__section--link:first-of-type::before {
     background: var(--ae-accent);
     box-shadow: 0 0 0 3px var(--ae-accent-ring);
 }
+
 .ae-nav__sub-tab--external::after {
     content: "↗";
     font-size: 11px;
@@ -293,13 +324,15 @@ a.ae-nav__section--link:first-of-type::before {
     min-width: 16px;
     height: 16px;
 }
-.ae-nav .ae-badge--maroon { background: var(--ae-maroon); color: #fff; }
+.ae-nav .ae-badge--maroon { background: var(--ae-maroon); color: var(--color-on-brand); }
 .ae-nav .ae-badge--soft   { background: var(--ae-maroon-soft); color: var(--ae-maroon); }
+
 .ae-nav__section.is-active .ae-badge--maroon,
-.ae-nav__section.is-active .ae-badge--soft { background: #fff; color: var(--ae-maroon); }
+.ae-nav__section.is-active .ae-badge--soft { background: var(--color-surface); color: var(--ae-maroon); }
 
 /* Badges hidden by default in V1 — counts will be wired up in a follow-up */
 .ae-nav__section-badge[hidden],
+/* stylelint-disable-next-line declaration-no-important -- the hidden attribute must beat any display rule */
 .ae-nav__sub-tab .ae-badge[hidden] { display: none !important; }
 
 /* ── More dropdown — right of the sub-tab row ────────────────────────── */
@@ -308,10 +341,11 @@ a.ae-nav__section--link:first-of-type::before {
     margin-left: auto;
     position: relative;
 }
+
 .ae-nav__sub .more-button {
     appearance: none;
     border: 1px solid var(--ae-line);
-    background: #fff;
+    background: var(--color-surface);
     cursor: pointer;
     padding: 0 12px 0 14px;
     height: 34px;
@@ -323,17 +357,19 @@ a.ae-nav__section--link:first-of-type::before {
     align-items: center;
     gap: 6px;
     border-radius: 10px;
-    box-shadow: var(--shadow-sm, 0 1px 2px rgba(15,23,42,.04), 0 1px 1px rgba(15,23,42,.03));
+    box-shadow: var(--shadow-sm, 0 1px 2px rgb(15 23 42 / 4%), 0 1px 1px rgb(15 23 42 / 3%));
     transition: background 150ms ease, color 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
 }
+
 .ae-nav__sub .more-button:hover {
-    border-color: var(--gray-300, #d1d5db);
+    border-color: var(--gray-300, var(--gray-300));
     color: var(--ae-ink);
 }
+
 .ae-nav__sub .more-button.open,
 .ae-nav__sub .more-button.active {
     background: var(--ae-accent);
-    color: #fff;
+    color: var(--color-on-brand);
     border-color: var(--ae-accent);
     box-shadow: 0 0 0 3px var(--ae-accent-ring);
 }
@@ -347,8 +383,9 @@ a.ae-nav__section--link:first-of-type::before {
     padding: 6px;
     border: 1px solid var(--ae-line);
     border-radius: 14px;
-    box-shadow: var(--shadow-lg, 0 8px 24px -8px rgba(15,23,42,.18), 0 4px 10px -4px rgba(15,23,42,.08));
+    box-shadow: var(--shadow-lg, 0 8px 24px -8px rgb(15 23 42 / 18%), 0 4px 10px -4px rgb(15 23 42 / 8%));
 }
+
 .ae-nav .dropdown-category {
     padding: 8px 12px 6px;
     font-size: 10.5px;
@@ -357,6 +394,7 @@ a.ae-nav__section--link:first-of-type::before {
     background: transparent;
     border-bottom: none;
 }
+
 .ae-nav .dropdown-item {
     padding: 10px 12px;
     border-radius: 9px;
@@ -365,10 +403,12 @@ a.ae-nav__section--link:first-of-type::before {
     color: var(--ae-ink-2);
     transition: background 120ms ease, color 120ms ease;
 }
+
 .ae-nav .dropdown-item:hover {
     background: var(--ae-line-2);
     color: var(--ae-ink);
 }
+
 .ae-nav .dropdown-item.active {
     background: var(--ae-maroon-tint);
     color: var(--ae-maroon);
@@ -378,13 +418,14 @@ a.ae-nav__section--link:first-of-type::before {
 
 /* ── Responsive: tighter on narrow screens ───────────────────────────── */
 
-@media (max-width: 720px) {
+@media (width <= 720px) {
     .ae-nav { border-radius: 14px; }
     .ae-nav__sections { padding: 8px; }
     .ae-nav__section { padding: 9px 12px 8px; border-radius: 10px; }
     .ae-nav__section-label { font-size: 14px; }
     .ae-nav__section-sub { font-size: 10px; }
     a.ae-nav__section--link:first-of-type { margin-left: 4px; }
+
     .ae-nav__sub {
         padding: 6px 8px;
         overflow-x: auto;
