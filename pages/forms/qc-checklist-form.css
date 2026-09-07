@@ -24,7 +24,7 @@
     accent-color: var(--form-green);
 }
 
-.qc-table .cell-mark--fail input[type="checkbox"] { accent-color: #b91c1c; }
+.qc-table .cell-mark--fail input[type="checkbox"] { accent-color: var(--red-700); }
 
 /* quantity verification */
 .col-style { width: 20%; }

@@ -35,7 +35,7 @@
 
 .budget-approval {
     border: 1.5px solid var(--form-green);
-    border-radius: 0 4px 4px 4px;
+    border-radius: 0 4px 4px;
     padding: 12px 14px;
 }
 
@@ -43,7 +43,7 @@
 
 .signature-row--approval { margin-top: 18px; }
 
-@media (max-width: 700px) {
+@media (width <= 700px) {
     .artwork-two-col { grid-template-columns: 1fr; }
 }
 

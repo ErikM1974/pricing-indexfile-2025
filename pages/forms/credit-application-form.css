@@ -3,11 +3,11 @@
 .info-field--wide { grid-column: span 2; }
 
 .waiver-box--nocard {
-    border-color: #b3261e;
-    background: #fdf1f0;
+    border-color: var(--red-700);
+    background: var(--red-50);
     margin-bottom: 12px;
 }
-.waiver-box--nocard .waiver-text { color: #7a1c16; }
+.waiver-box--nocard .waiver-text { color: var(--print-red); }
 .waiver-box--nocard .fa-shield-halved { margin-right: 5px; }
 
 .ref-table .col-refco { width: 30%; }

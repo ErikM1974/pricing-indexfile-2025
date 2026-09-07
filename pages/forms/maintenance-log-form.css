@@ -30,7 +30,7 @@
 
 .type-chip.is-active {
     background: var(--form-green);
-    color: #fff;
+    color: var(--color-on-brand);
 }
 
 /* Task checklist */
@@ -56,7 +56,7 @@
 
 .signoff-grid { margin-top: 12px; grid-template-columns: repeat(3, 1fr); }
 
-@media (max-width: 700px) {
+@media (width <= 700px) {
     .signoff-grid { grid-template-columns: 1fr; }
 }
 

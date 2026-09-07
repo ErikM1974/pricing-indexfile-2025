@@ -31,7 +31,7 @@
     font-weight: 800;
     letter-spacing: 0.04em;
     text-transform: uppercase;
-    color: #4a4a4a;
+    color: var(--print-ink-soft);
     margin-bottom: 6px;
 }
 
@@ -39,7 +39,7 @@
     width: 100%;
     border: 2px solid var(--ink);
     border-radius: 4px;
-    background: #eef1fb;
+    background: var(--slate-100);
     font: inherit;
     font-size: 1.9rem;
     font-weight: 700;
@@ -47,11 +47,11 @@
     height: 68px;
 }
 
-.label-field input:focus { outline: 3px solid #bcd8c6; background: #f0f7f2; }
+.label-field input:focus { outline: 3px solid var(--color-brand); background: var(--brand-50); }
 
 /* Drop-dead date pops in orange like the PDF */
-.label-field--dropdead label { color: #b45309; }
-.label-field--dropdead input { border-color: #b45309; }
+.label-field--dropdead label { color: var(--amber-700); }
+.label-field--dropdead input { border-color: var(--amber-700); }
 
 /* Customer is the biggest read-from-across-the-room field */
 .label-field--customer input {
@@ -70,7 +70,7 @@
 .label-table { margin-top: 22px; }
 
 .label-table th {
-    background: #e7f0e9;
+    background: var(--brand-100);
     color: var(--form-green-dark);
     font-size: 0.9rem;
     padding: 8px 4px;
@@ -96,7 +96,7 @@
 
 .label-logo img { height: 58px; }
 
-@media (max-width: 700px) {
+@media (width <= 700px) {
     .label-row, .label-row--design { grid-template-columns: 1fr; }
     .label-field input { font-size: 1.3rem; height: 54px; }
     .label-field--customer input { font-size: 1.6rem; height: 64px; }
@@ -104,6 +104,6 @@
 
 @media print {
     .label-sheet { border-width: 4px; }
-    .label-field input { background: #fff; }
+    .label-field input { background: var(--color-surface); }
     .label-table th { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
 }

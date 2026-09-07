@@ -39,7 +39,7 @@
     min-width: 60px;
 }
 
-.spec-field input:focus { outline: none; background: #f0f7f2; }
+.spec-field input:focus { outline: none; background: var(--brand-50); }
 
 .spec-field--wide { min-width: 220px; }
 
@@ -53,7 +53,7 @@
 .col-notes { width: 31.5%; }
 
 /* Tighter rows so 20 fit on one landscape sheet */
-.name-table td input { padding: 5px 5px; font-size: 0.82rem; }
+.name-table td input { padding: 5px; font-size: 0.82rem; }
 .name-table td.cell-num { padding: 5px 2px; }
 
 /* Verification row: Total Names + 4 signature fields */
@@ -64,7 +64,7 @@
 
 .total-names { font-weight: 700; }
 
-@media (max-width: 700px) {
+@media (width <= 700px) {
     .signature-row--five { grid-template-columns: 1fr 1fr; }
 }
 

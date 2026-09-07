@@ -18,6 +18,8 @@ const CSS_LINT_SCOPE = [
     // Step 1 (2026-09-07): the two token files
     'shared_components/css/tokens.css',
     'shared_components/css/staff-dashboard/tokens.css',
+    // Forms family (2026-09-07): the shared form framework + 17 per-form sheets
+    'pages/forms/*.css',
 ];
 
 async function run() {

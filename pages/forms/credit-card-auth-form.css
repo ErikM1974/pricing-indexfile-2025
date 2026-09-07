@@ -4,12 +4,13 @@
 
 /* secure-channels box — green (informational), warning line inside stays red */
 .waiver-box--pci {
-    border-color: #2e6f40;
-    background: #eef6f0;
+    border-color: var(--print-green);
+    background: var(--brand-50);
     margin-bottom: 12px;
 }
-.waiver-box--pci .waiver-title { color: #1f4d2c; }
+.waiver-box--pci .waiver-title { color: var(--print-green-dark); }
 .waiver-box--pci .fa-shield-halved { margin-right: 5px; }
+
 .pci-ways {
     margin: 6px 0 8px 18px;
     padding: 0;
@@ -17,8 +18,9 @@
     line-height: 1.5;
 }
 .pci-ways li { margin-bottom: 3px; }
+
 .pci-warn {
-    color: #7a1c16;
+    color: var(--print-red);
     font-weight: 500;
 }
 .pci-warn .fa-triangle-exclamation { margin-right: 4px; }
@@ -33,7 +35,7 @@
 .exp-hint {
     font-weight: 400;
     font-size: 0.72rem;
-    color: #8a6d1a;
+    color: var(--print-gold);
 }
 
 #fldEnding { letter-spacing: 3px; font-weight: 600; }
@@ -44,6 +46,7 @@
     gap: 14px;
 }
 .ship-block .info-field { margin-bottom: 6px; }
+
 .ship-title {
     font-weight: 700;
     font-size: 0.9rem;
@@ -55,10 +58,10 @@
     max-width: 850px;
     margin: 10px auto 0;
     padding: 10px 14px;
-    border: 2px solid #b3261e;
+    border: 2px solid var(--red-700);
     border-radius: 8px;
-    background: #fdf1f0;
-    color: #7a1c16;
+    background: var(--red-50);
+    color: var(--print-red);
     font-size: 0.9rem;
     font-weight: 500;
 }

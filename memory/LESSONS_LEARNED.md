@@ -27,35 +27,7 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 ### Whole-dashboard deep-review sweep — the same six bugs kept reappearing (2026-09-05, ARCHIVED 2026-09-06, `.24`→`.75`, 54 pages): UTC "today", `[hidden]` beaten by flex, silent-empty states, hardcoded `* 75` art rates, unversioned assets, inline handlers — each is now a jest lock; a review without a lock is a review that repeats. Full entry in archive.
 ### Customer-facing sweep — the same rules the staff pages broke, plus three real bugs (2026-09-06, ARCHIVED 2026-09-06, `v2026.09.05.77`→`v2026.09.06.5`): inline `display:none` beats `.hidden=false`; a listener registered after an early return never fires; render colours only after the fallback resolves; 6 scripts had a silent proxy-host fallback → `''` + visible error. Full entry in archive.
 ### Quote builders: finishing Rule 3 meant teaching the shared delegator four more events (2026-09-06, ARCHIVED 2026-09-07, `v2026.09.06.19`–`.22`): 185 inline change/input/blur/keydown/error handlers → `data-change`/`-input`/`-blur`/`-keydown`/`-enter`/`data-onerror` in the ONE shared delegator (`quote-builder-utils.js`, Rule 8); never add an `sr-only` h1 to the builders (axe baselines fail); gate a top-of-file `window.location` read for window-less tests; catch concatenated icon classes at runtime. Full entry in archive.
-
-## 2026-09-06 — Staff pages, the LIVE pass: what a signed-in runtime walk found that 80 static locks had not (`v2026.09.06.26`–`.28`)
-
-**Problem.** Every dashboard-linked page had a static jest lock from the 09-05 sweep, yet a signed-in walk of
-the RUNTIME DOM on teamnwca.com found: 64 inline `onclick`s on the garment designer, 15 handlers rendered by
-the AE dashboard's scripts, `onerror` on every Pride Wall tile, seven shared scripts injecting `<style>` blocks
-on every render, two employee-bundle pages with 230-line inline `<style>`, ~100 undecorated icons in scripts
-whose `class=` was not the first attribute, unversioned shared assets on 20 pages, seven unlabeled AE controls.
-
-**Root cause.** The static locks matched the page HTML and one icon regex shape; anything a script rendered
-after load, any `<i id=… class=…>` ordering, and any JS-injected stylesheet was invisible to them.
-
-**Solution.** One generic runtime probe per page (handlers / bare icons / injected styles / unversioned /
-unnamed buttons / unlabeled inputs / h1), traced to source; `data-call-delegator.js` grew `data-input`,
-`data-open` and `<img data-onerror|data-onload>` modes; injected styles became real stylesheets linked by every
-consumer; lock `staff-live-hygiene.test.js` checks the SCRIPTS that render into pages, not only the pages.
-
-**Prevention.**
-- 🔴 A page lock must also cover the scripts that render into it (`RENDERERS` list) — that is where the
-  handlers and icons live. Grep `<i(?![^>]*aria-hidden)[^>]*class="fa…"` (any attribute order).
-- 🔴 Runtime "bare icon" counts must exclude icons with `aria-label` — the Design Vault's 110 source badges
-  are deliberate, labelled icons, not defects.
-- 🔑 `<style>` elements at runtime on a page that ships none are usually Caspio DataPage embeds (DrainPro,
-  employee bundles, digitized/old designs) or a browser extension (glasp) — check `textContent` before chasing.
-- 🔑 A JS-created control (`document.createElement('input')`) needs its `aria-label` set in code; the template
-  scan will never see it.
-- 🔑 The Mission Control harness drifts whenever its page changes — `node scripts/sync-test-harness.js`.
-- 🔑 The esbuild-hashed dashboard bundle (`dashboard-app.XXXXXXXX.js`, 8 chars) is versioned; a "10-hex"
-  hash regex flags it falsely.
+### Staff pages, the LIVE pass — what a signed-in runtime walk found that 80 static locks had not (2026-09-06, ARCHIVED 2026-09-07, `v2026.09.06.26`–`.28`): a page lock must also cover the scripts that render into it (`RENDERERS`); runtime bare-icon counts must exclude `aria-label` icons; a runtime `<style>` on a page that ships none is a Caspio DataPage embed; JS-created controls get their `aria-label` in code; the Mission Control harness drifts with its page (`node scripts/sync-test-harness.js`); the hashed dashboard bundle is versioned. Full entry in archive.
 
 ## 2026-09-06 — Rule 6 sweep S3 (`v2026.09.06.31`): 118 scripts still guessed the proxy host, and two unit tests had been hitting the live API
 
@@ -275,3 +247,26 @@ config-standard rewrites are value-identical (hue `deg`, `rgb(… / 12%)`, `#fff
 line) but prove it with the pixel diff, not by eye. 🔑 Another session deployed `v2026.09.07.2` into
 this checkout between my first read and my first edit — `git log -1` + `git status` before the first
 commit is what caught that develop had moved (DURABLE_GOTCHAS § Repo/deploy, again).
+
+## 2026-09-07 — Forms family migration (`v2026.09.07.4`): the family list was wrong, and `--fix` is not cosmetic
+
+**Problem.** (a) "The 18 forms stylesheets" were migrated and pixel-verified — and the deploy's cache-bust
+then bumped two pages outside `pages/forms/` (`request-a-quote`, `webstore-inquiry`) that load the same
+shared sheet. Without the tokens link those pages would have rendered every `var(--print-*)` as nothing.
+(b) `stylelint --fix` rewrote `@media (max-width: 700px)` to range syntax, `page-break-inside` to
+`break-inside`, and dropped `-webkit-`/`-moz-appearance` (leaving a duplicated `appearance: textfield`).
+(c) A one-command migration chain broke at a Python error, but because `for …; done;` ends the `&&`
+chain, the second half (`--fix`) still ran and the output read as if everything had.
+**Root cause.** (a) A family was defined by directory; consumers are defined by `<link>`. (b) The
+standard config's fixers modernize syntax — byte changes, fine in 2026 browsers, but not "formatting".
+(c) `;` after a compound command terminates an `&&` chain.
+**Solution.** (a) `grep -rl 'pages/forms/.*\.css' --include=*.html .` BEFORE the family list is final; the
+two pages got the link and their own before/after through a HEAD worktree. (b) Read `git diff -U0` of
+every `--fix` run; dedupe by hand; the pixel diff (screen AND print) is the proof. (c) One step per Bash
+call, or `;`-separated steps each ending in a printed count.
+**Prevention.** 🔑 A family = every page that LINKS its stylesheets, not a directory listing. 🔑 Name the
+three diff classes before diffing — identical, threshold-neutral (≤16/channel), deliberate consolidation —
+so differing shots read as expected or as a bug, never as "close enough". 🔑 Printed sheets: verify with
+`SHOT_MEDIA=print` too. 🔑 A specificity fight is fixed with a more specific selector
+(`.form-table td .size-chip input`), never `!important`; the `!important`s that must stay (print beating
+JS-toggled state) carry a `stylelint-disable-next-line` reason.

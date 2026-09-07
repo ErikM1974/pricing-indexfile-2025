@@ -114,6 +114,36 @@ three gap sizes, `opacity:.5;cursor:not-allowed` ×26 (disabled). These become u
 
 ## 8. Progress log (newest first)
 
+### 2026-09-07 — Forms family LIVE (`v2026.09.07.4`): 18 stylesheets, 0 raw hex, 3 documented `!important`
+
+- **What moved.** 17 forms + `nwca-form-shared.css` link `tokens.css` first; every hex became `var(--…)` (93 uses
+  → 0). The family's deliberate print palette (green sampled from the official PDFs, neutral inks that print
+  true) became 7 named tokens — `--print-green/-green-dark/-ink/-ink-soft/-line/-red/-gold` — and the
+  info banner became the app's `--color-info-bg/-line/-ink` (sky trio); everything else mapped to the palette
+  within the diff threshold (≤16 per channel). Two pages OUTSIDE the directory load the family sheet
+  (`pages/request-a-quote.html`, `pages/webstore-inquiry.html`) — found by the cache-bust, not by the family
+  list; they got the tokens link too. 🔑 Always grep the whole tree for a family stylesheet before calling
+  the family list complete.
+- **Deliberate consolidations (the only pixels that changed, eyeballed in crops):** `#666` → `--print-ink-soft`
+  (d=17) on two labels, `#333` → `--print-ink` on the PTO signature line — 4 of 34 shots, all on those elements.
+- **`!important` 6 → 3.** `.size-chip input` now outranks `.form-table td input` through
+  `.form-table td .size-chip input`; the three print rules (`.contacts-dropdown`, `.swatch-grid`, `.no-print`)
+  stay, each with a `stylelint-disable-next-line` reason (print must beat JS-toggled state).
+- **stylelint.** `--fix` rewrote value-identical syntax (`rgba()` → `rgb(… / %)`, `#ffffff` → `#fff`,
+  `max-width:` → `width <=`, `page-break-inside` → `break-inside`, `-webkit-/-moz-appearance` dropped — one
+  duplicate deduped by hand); reviewed in `git diff -U0`. Three rules are off with reasons in
+  `stylelint.config.mjs`: `no-descending-specificity` (would reorder the cascade), `selector-id-pattern`
+  (camelCase ids are wired into JS), `declaration-block-single-line-max-declarations` (house style); `clip` is
+  allowed for `.sr-only`. All 18 sheets are in `CSS_LINT_SCOPE`.
+- **Verification.** 17 pages × screen + print (`SHOT_MEDIA=print` added to `builder-screenshots.spec.js`):
+  30/34 identical, the 4 = the consolidations above; the two outside consumers before/after through a HEAD
+  worktree; unit 188 suites, dom, a11y, lint 0 errors / 99 warnings, e2e a11y + money-path green.
+- **Step 2 not started here.** The forms' shared sheet already IS the family component layer; components.css +
+  utilities.css get their first real consumer with the training family (`nav-header + .container`).
+- **Census after:** 296 sheets · 4,575 KB · 224 use `var(--)` (+8) · 252 raw-hex files (−15) · 1,348 distinct
+  hex (−7) · 3,179 `!important` (−3) · 226 duplicated bodies (+2: tokenizing made five `.assist-hint` icon rules
+  byte-identical — that is a utility waiting to be absorbed, not a regression).
+
 ### 2026-09-07 — Step 1 + Step 3 shipped as ONE deploy (`v2026.09.07.3`), zero visual change
 
 - **Tokens.** `shared_components/css/tokens.css` = the `@layer` order statement + everything the dashboard seed

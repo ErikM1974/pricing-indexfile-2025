@@ -4,10 +4,10 @@
 
 .assist-hint {
     font-size: 0.82rem;
-    color: #555;
+    color: var(--print-ink-soft);
     margin: 8px 0 0;
 }
-.assist-hint .fa-circle-info { color: #2e6f40; margin-right: 4px; }
+.assist-hint .fa-circle-info { color: var(--print-green); margin-right: 4px; }
 
 .approval-strip {
     display: flex;
@@ -16,21 +16,24 @@
     flex-wrap: wrap;
     margin-top: 16px;
     padding-top: 10px;
-    border-top: 1px solid #d8dcd8;
+    border-top: 1px solid var(--gray-300);
 }
+
 .approval-title {
     font-weight: 700;
     font-size: 0.9rem;
 }
+
 .approval-sig {
     flex: 1;
     min-width: 220px;
     display: flex;
     flex-direction: column;
 }
-.approval-sig label { font-size: 0.72rem; color: #666; }
+.approval-sig label { font-size: 0.72rem; color: var(--print-ink-soft); }
+
 .signature-line--inline {
     display: block;
-    border-bottom: 1px solid #333;
+    border-bottom: 1px solid var(--print-ink);
     height: 22px;
 }
