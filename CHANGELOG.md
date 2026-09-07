@@ -1,3 +1,7 @@
+## v2026.09.07.19 (2026.09.07)
+
+- Deploy v2026.09.07.19: CSS palette pass 1 — 30 shared ramp steps named in tokens.css, 604 page-scoped colour variables collapsed into them across 147 sheets (value-identical; 31-page sample pixel-identical, unresolved var() count unchanged at 434)
+
 ## v2026.09.07.18 (2026.09.07)
 
 - Deploy v2026.09.07.18: CSS standardization — tail batch (12 sheets, 12 pages: admin, production shifts, price audit report, employee bundles, tools, vendor-portal css, DTF prototype; all pixel-identical) + 18 dead stylesheets and 2 dead fixtures deleted (~17,000 lines nothing referenced)
