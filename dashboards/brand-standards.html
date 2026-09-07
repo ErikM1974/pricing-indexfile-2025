@@ -130,6 +130,16 @@
             <p class="text-muted">This page is a working document. Every standard that changed how a page looks is
                 recorded here, newest first, with the release that shipped it.</p>
             <ul class="rules decisions">
+                <li><strong>2026-09-07 · staff pages + customer portal.</strong> The forty-five remaining pages under
+                    <code>pages/</code> (art request and mockup detail, quote view, invoices, policies, the customer portal and
+                    login, the garment designer, the SanMar vendor portal) and the product page's shared sheet read the token
+                    file: 3,324 colour uses became 1,650 exact tokens, 1,023 near tokens and 651 sheet-scoped variables. Six
+                    sheets keep their own radius or shadow values that shadow the tokens on their pages (3-day tees, custom
+                    tees and caps, quote view, quote audit, the product page, the JDS mockup creator) — recorded, not moved.
+                    The icon font (Font Awesome) is exempt from the generic-font-family rule: its glyphs are private-use
+                    codepoints and no fallback renders them. Follow-up: seven sheets (invoice, quote view, quote audit, art
+                    request detail, policy detail, garment designer, embroidery contract pricing) are override stacks held
+                    together by <code>!important</code> (298 flags across the batch, all documented).</li>
                 <li><strong>2026-09-07 · calculators.</strong> The 25 calculator pages read the token file; every colour is a token or a
                     sheet-scoped variable. The DTF, screen-print and universal pricing pages are stacks of fix/override sheets held
                     together by <code>!important</code> (446 flags, all documented); untangling them is per-page design work, not a

@@ -1,13 +1,26 @@
 /* Enhanced Header Styles */
+
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue so the page
+   keeps its exact look. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   every rule below uses var(). Raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
+:root {
+    --inventory-details-gray: #666;
+    --inventory-details-gray-dark: #333;
+    --inventory-details-green-dark: #1e4d0f;
+    --inventory-details-red: #dc3545;
+}
+/* stylelint-enable color-no-hex */
+
 body {
     padding-top: 210px; /* Space for fixed header - contact(35) + nav(80) + context(70) + buffer(25) */
     margin: 0;
-    background-color: #f9fbf8;
+    background-color: var(--gray-50);
 }
 
 .enhanced-inventory-header {
     background: white;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    box-shadow: 0 4px 12px rgb(0 0 0 / 8%);
     position: fixed;
     top: 0;
     left: 0;
@@ -17,7 +30,7 @@ body {
 
 /* Contact Bar */
 .header-contact-bar {
-    background: #2d5f3f;
+    background: var(--print-green);
     color: white;
     padding: 8px 0;
     font-size: 14px;
@@ -51,7 +64,7 @@ body {
 .header-nav {
     background: white;
     padding: 15px 0;
-    border-bottom: 1px solid #e0e0e0;
+    border-bottom: 1px solid var(--gray-200);
 }
 
 .nav-content {
@@ -75,22 +88,22 @@ body {
 }
 
 .main-nav-links a {
-    color: #333;
+    color: var(--inventory-details-gray-dark);
     text-decoration: none;
     font-size: 16px;
     transition: color 0.2s;
 }
 
 .main-nav-links a:hover {
-    color: #2f661e;
+    color: var(--brand-700);
 }
 
 /* Context Bar */
 .inventory-context-bar {
-    background: #f8f9fa;
+    background: var(--gray-50);
     padding: 20px 0;
-    border-bottom: 2px solid #e8e8e8;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    border-bottom: 2px solid var(--gray-200);
+    box-shadow: 0 2px 4px rgb(0 0 0 / 2%);
 }
 
 .context-bar-content {
@@ -115,11 +128,11 @@ body {
     align-items: center;
     gap: 8px;
     font-size: 16px;
-    color: #333;
+    color: var(--inventory-details-gray-dark);
 }
 
 .breadcrumb i {
-    color: #666;
+    color: var(--inventory-details-gray);
 }
 
 /* Navigation Buttons */
@@ -130,7 +143,7 @@ body {
 }
 
 .btn-back {
-    background: #2f661e;
+    background: var(--brand-700);
     color: white;
     border: none;
     padding: 8px 16px;
@@ -145,7 +158,7 @@ body {
 }
 
 .btn-back:hover {
-    background: #1e4d0f;
+    background: var(--inventory-details-green-dark);
     text-decoration: none;
 }
 
@@ -156,8 +169,8 @@ body {
 
 .btn-pricing {
     background: white;
-    color: #2f661e;
-    border: 1px solid #2f661e;
+    color: var(--brand-700);
+    border: 1px solid var(--brand-700);
     padding: 8px 16px;
     border-radius: 4px;
     font-size: 14px;
@@ -169,7 +182,7 @@ body {
 }
 
 .btn-pricing:hover {
-    background: #2f661e;
+    background: var(--brand-700);
     color: white;
 }
 
@@ -179,9 +192,9 @@ body {
     left: 0;
     margin-top: 6px;
     background: white;
-    border: 1px solid #ddd;
+    border: 1px solid var(--store-line);
     border-radius: 4px;
-    box-shadow: 0 6px 12px rgba(0,0,0,0.12);
+    box-shadow: 0 6px 12px rgb(0 0 0 / 12%);
     min-width: 180px;
     z-index: 1002;
     display: none;
@@ -194,10 +207,10 @@ body {
 .dropdown-item {
     display: block;
     padding: 10px 15px;
-    color: #333;
+    color: var(--inventory-details-gray-dark);
     text-decoration: none;
     transition: background 0.2s;
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid var(--gray-100);
 }
 
 .dropdown-item:last-child {
@@ -205,8 +218,8 @@ body {
 }
 
 .dropdown-item:hover {
-    background: #f8f9fa;
-    color: #2f661e;
+    background: var(--gray-50);
+    color: var(--brand-700);
 }
 
 /* Search Box in Header */
@@ -218,14 +231,14 @@ body {
 .header-search-input {
     width: 100%;
     padding: 8px 12px 8px 35px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--store-line);
     border-radius: 4px;
     font-size: 14px;
 }
 
 .header-search-input:focus {
     outline: none;
-    border-color: #2f661e;
+    border-color: var(--brand-700);
 }
 
 .header-search-icon {
@@ -233,7 +246,7 @@ body {
     left: 10px;
     top: 50%;
     transform: translateY(-50%);
-    color: #666;
+    color: var(--inventory-details-gray);
 }
 
 .header-search-results {
@@ -243,9 +256,9 @@ body {
     right: 0;
     margin-top: 4px;
     background: white;
-    border: 1px solid #ddd;
+    border: 1px solid var(--store-line);
     border-radius: 4px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 6px rgb(0 0 0 / 10%);
     max-height: 300px;
     overflow-y: auto;
     z-index: 1001;
@@ -253,13 +266,13 @@ body {
 
 .search-result-item {
     padding: 10px 15px;
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid var(--gray-100);
     cursor: pointer;
     transition: background 0.2s;
 }
 
 .search-result-item:hover {
-    background: #f8f9fa;
+    background: var(--gray-50);
 }
 
 .search-result-item:last-child {
@@ -287,16 +300,16 @@ body {
     background: white;
     border-radius: 8px;
     padding: 1.5rem;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-    border: 1px solid #e0e0e0;
+    box-shadow: 0 2px 8px rgb(0 0 0 / 6%);
+    border: 1px solid var(--gray-200);
 }
 
 .color-list {
     background: white;
     border-radius: 8px;
     padding: 1rem;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-    border: 1px solid #e0e0e0;
+    box-shadow: 0 2px 8px rgb(0 0 0 / 6%);
+    border: 1px solid var(--gray-200);
 }
 
 /* Product Image above colors */
@@ -304,7 +317,7 @@ body {
     margin-bottom: 1.5rem;
     text-align: center;
     padding: 0.5rem;
-    background: #f9fbf8;
+    background: var(--gray-50);
     border-radius: 8px;
 }
 
@@ -313,7 +326,7 @@ body {
     max-width: 180px;
     height: auto;
     border-radius: 4px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    box-shadow: 0 1px 3px rgb(0 0 0 / 10%);
 }
 
 /* Print Button */
@@ -321,7 +334,7 @@ body {
     position: absolute;
     top: 1.5rem;
     right: 1.5rem;
-    background: #2f661e;
+    background: var(--brand-700);
     color: white;
     border: none;
     padding: 8px 12px;
@@ -336,13 +349,13 @@ body {
 }
 
 .print-btn:hover {
-    background: #1e4d0f;
+    background: var(--inventory-details-green-dark);
 }
 
 .color-list h3 {
-    margin: 0 0 1rem 0;
+    margin: 0 0 1rem;
     font-size: 1rem;
-    color: #2f661e;
+    color: var(--brand-700);
 }
 
 .color-option {
@@ -357,12 +370,12 @@ body {
 }
 
 .color-option:hover {
-    background: #f5f5f5;
+    background: var(--gray-100);
 }
 
 .color-option.selected {
-    background: #eaf2e9;
-    border: 2px solid #2f661e;
+    background: var(--brand-100);
+    border: 2px solid var(--brand-700);
     padding: calc(0.5rem - 1px);
 }
 
@@ -370,11 +383,11 @@ body {
     width: 24px;
     height: 24px;
     border-radius: 4px;
-    border: 1px solid #ddd;
-    background: var(--swatch, #eee);
+    border: 1px solid var(--store-line);
+    background: var(--swatch, var(--brand-100));
 }
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
     body {
         padding-top: 320px; /* More space needed on mobile when bars stack */
     }
@@ -450,7 +463,7 @@ body {
     }
 }
 
-@media (max-width: 480px) {
+@media (width <= 480px) {
     body {
         padding-top: 360px; /* Even more space for very small screens */
     }
@@ -477,10 +490,12 @@ body {
     .enhanced-inventory-header,
     .loading-overlay,
     .print-btn {
+        /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
         display: none !important;
     }
 
     body {
+        /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
         padding-top: 0 !important;
         background: white;
     }
@@ -501,17 +516,18 @@ body {
     }
 
     .inventory-table {
-        page-break-inside: avoid;
+        break-inside: avoid;
     }
 }
 
 /* 2026-09-05 review: extracted from the page (Rule 3) */
+/* stylelint-disable-next-line declaration-no-important -- the hidden attribute must beat any display rule */
 [hidden] { display: none !important; }
 .inventory-section--rel { position: relative; }
-.search-msg { padding: 10px; text-align: center; color: #666; }
-.search-msg--error { color: #dc3545; }
+.search-msg { padding: 10px; text-align: center; color: var(--inventory-details-gray); }
+.search-msg--error { color: var(--inventory-details-red); }
 button.search-result-item { display: block; width: 100%; text-align: left; font: inherit; background: none; border: 0; cursor: pointer; }
-.search-result-style { font-weight: 600; color: #2f661e; }
-.search-result-name { font-size: 14px; color: #666; }
-.color-option:focus-visible, .btn-pricing:focus-visible, .print-btn:focus-visible, .search-result-item:focus-visible { outline: 2px solid #2f661e; outline-offset: 2px; }
+.search-result-style { font-weight: 600; color: var(--brand-700); }
+.search-result-name { font-size: 14px; color: var(--inventory-details-gray); }
+.color-option:focus-visible, .btn-pricing:focus-visible, .print-btn:focus-visible, .search-result-item:focus-visible { outline: 2px solid var(--brand-700); outline-offset: 2px; }
 .breadcrumb-title { display: inline; margin: 0; font: inherit; }

@@ -13,16 +13,22 @@
  * both files is harmless (just a byte duplicate).
  */
 
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue so the page
+   keeps its exact look. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   every rule below uses var(). Raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
+:root {
+    --product-thumbnail-modal-blue: #3d5e8f;
+}
+/* stylelint-enable color-no-hex */
+
 /* ============================================
    PRODUCT IMAGE MODAL (click thumbnail to see larger)
    ============================================ */
 
 .product-image-modal {
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    inset: 0;
     z-index: var(--z-modal, 1000);
     display: flex;
     align-items: center;
@@ -36,7 +42,7 @@
 .product-image-modal-backdrop {
     position: absolute;
     inset: 0;
-    background: rgba(0, 0, 0, 0.6);
+    background: rgb(0 0 0 / 60%);
     backdrop-filter: blur(2px);
 }
 
@@ -47,7 +53,7 @@
     max-width: 480px;
     width: 90%;
     padding: 20px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 20px 60px rgb(0 0 0 / 30%);
     animation: productModalSlideIn 0.2s ease;
 }
 
@@ -56,6 +62,7 @@
         opacity: 0;
         transform: scale(0.95) translateY(10px);
     }
+
     to {
         opacity: 1;
         transform: scale(1) translateY(0);
@@ -69,11 +76,11 @@
     width: 32px;
     height: 32px;
     border: none;
-    background: #f1f5f9;
+    background: var(--slate-100);
     border-radius: 50%;
     cursor: pointer;
     font-size: 20px;
-    color: #64748b;
+    color: var(--slate-500);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -82,8 +89,8 @@
 }
 
 .product-image-modal-close:hover {
-    background: #e2e8f0;
-    color: #334155;
+    background: var(--slate-200);
+    color: var(--gray-700);
 }
 
 .product-image-modal-image {
@@ -92,7 +99,7 @@
     object-fit: contain;
     border-radius: 8px;
     margin-bottom: 16px;
-    background: #f8f9fa;
+    background: var(--gray-50);
 }
 
 .product-image-modal-details {
@@ -103,17 +110,17 @@
     margin: 0 0 12px;
     font-size: 18px;
     font-weight: 600;
-    color: #1e293b;
+    color: var(--gray-800);
 }
 
 .product-image-modal-details p {
     margin: 6px 0;
     font-size: 14px;
-    color: #64748b;
+    color: var(--slate-500);
 }
 
 .product-image-modal-details p span {
-    color: #334155;
+    color: var(--gray-700);
     font-weight: 500;
 }
 
@@ -123,7 +130,7 @@
    ============================================ */
 
 .product-image-modal-details .meta-label {
-    color: #64748b;
+    color: var(--slate-500);
     font-weight: 600;
     margin-right: 4px;
 }
@@ -134,7 +141,7 @@
     gap: 10px;
     padding-top: 14px;
     margin-top: 14px;
-    border-top: 1px solid #e5e7eb;
+    border-top: 1px solid var(--gray-200);
 }
 
 .product-image-modal-download {
@@ -142,7 +149,7 @@
     align-items: center;
     gap: 8px;
     padding: 9px 18px;
-    background: #4a6fa5;
+    background: var(--color-bradley);
     color: white;
     border-radius: 6px;
     text-decoration: none;
@@ -154,7 +161,7 @@
 }
 
 .product-image-modal-download:hover {
-    background: #3d5e8f;
+    background: var(--product-thumbnail-modal-blue);
     color: white;
     text-decoration: none;
 }
@@ -164,7 +171,7 @@
 }
 
 /* Mobile responsive */
-@media (max-width: 768px) {
+@media (width <= 768px) {
     .product-image-modal-content {
         max-width: 95%;
         margin: 10px;

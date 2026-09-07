@@ -1,3 +1,5 @@
+/* stylelint-disable no-duplicate-selectors -- legacy sheet: rules were appended over time; merging them would reorder the cascade (2026-09-07) */
+
 /* ==========================================================================
    Mockup Detail Page — Digitizing Mockup Detail
    Used by: pages/mockup-detail.html
@@ -7,29 +9,63 @@
    Ruth purple); the customer view swaps to NWCA green in mockup-detail.js.
    ========================================================================== */
 
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue, merged into its
+   existing :root. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
 :root {
-    --art-theme: #6B46C1;
-    --art-theme-dark: #553C9A;
-    --art-theme-light: #8B5CF6;
-    --art-theme-bg: #f8f5ff;
-    --art-theme-bg-hover: #f3f0ff;
-    --art-theme-bg-selected: #f3eaff;
-    --art-theme-rgba-15: rgba(107,70,193,0.15);
-    --art-theme-rgba-10: rgba(107,70,193,0.1);
+    --mockup-detail-gray-dark: #333;
+    --mockup-detail-gray: #666;
+    --mockup-detail-gray-2: #888;
+    --mockup-detail-indigo: #6b21a8;
+    --mockup-detail-green: #16a34a;
+    --mockup-detail-red: #c0392b;
+    --mockup-detail-red-2: #dc3545;
+    --mockup-detail-red-3: #ef4444;
+    --mockup-detail-orange: #e67e22;
+    --mockup-detail-gray-3: #bbb;
+    --mockup-detail-indigo-2: #a78bfa;
+    --mockup-detail-yellow: #fcd34d;
+    --mockup-detail-green-2: #15803d;
+    --mockup-detail-red-tint: #fecaca;
+    --mockup-detail-green-3: #22c55e;
+    --mockup-detail-green-4: #28a745;
+    --mockup-detail-indigo-tint: #d4bfff;
+    --mockup-detail-orange-2: #78350f;
+    --mockup-detail-indigo-3: #7c3aed;
+    --mockup-detail-teal: #10b981;
+    --mockup-detail-indigo-tint-2: #d6bcfa;
+    --mockup-detail-green-tint: #bbf7d0;
+    --mockup-detail-red-4: #f1c7be;
+    --mockup-detail-green-tint-2: #d1fae5;
+    --mockup-detail-teal-dark: #065f46;
+    --mockup-detail-cyan-dark: #1e3a5f;
+    --mockup-detail-gray-4: #6b7b6b;
+    --mockup-detail-green-5: #4a7a4a;
+    --art-theme: var(--color-ruth);
+    --art-theme-dark: var(--color-ruth-dark);
+    --art-theme-light: var(--color-ruth-light);
+    --art-theme-bg: var(--color-ruth-tint);
+    --art-theme-bg-hover: var(--color-ruth-tint);
+    --art-theme-bg-selected: var(--color-ruth-tint);
+    --art-theme-rgba-15: rgb(107 70 193 / 15%);
+    --art-theme-rgba-10: rgb(107 70 193 / 10%);
 }
+/* stylelint-enable color-no-hex */
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: #f5f6fa;
-    color: #333;
+    background: var(--color-bradley-tint);
+    color: var(--mockup-detail-gray-dark);
     min-height: 100vh;
     display: flex;
     flex-direction: column;
 }
 
 /* ── Signed-out banner ──────────────────────────────── */
+
 /* Raised when a Box asset returns 401/403. Amber, not red: nothing is broken —
    the user just needs to sign in. */
 .pmd-auth-banner {
@@ -39,11 +75,11 @@ body {
     max-width: 1100px;
     margin: 16px auto 0;
     padding: 12px 16px;
-    background: #fffbeb;
-    border: 1px solid #fcd34d;
-    border-left: 4px solid #f59e0b;
+    background: var(--store-paper);
+    border: 1px solid var(--mockup-detail-yellow);
+    border-left: 4px solid var(--amber-500);
     border-radius: 6px;
-    color: #78350f;
+    color: var(--mockup-detail-orange-2);
     font-size: 14px;
 }
 
@@ -52,8 +88,8 @@ body {
     width: 20px;
     height: 20px;
     border-radius: 50%;
-    background: #f59e0b;
-    color: #fff;
+    background: var(--amber-500);
+    color: var(--color-on-brand);
     font-weight: 700;
     font-size: 13px;
     line-height: 20px;
@@ -65,31 +101,31 @@ body {
 .pmd-auth-banner-btn {
     flex: 0 0 auto;
     padding: 7px 16px;
-    background: #b45309;
-    color: #fff;
+    background: var(--amber-700);
+    color: var(--color-on-brand);
     text-decoration: none;
     border-radius: 5px;
     font-weight: 600;
     font-size: 13px;
 }
 
-.pmd-auth-banner-btn:hover { background: #92400e; }
+.pmd-auth-banner-btn:hover { background: var(--amber-800); }
 
 /* Box Files panel failure text (was an inline style on a generated <p>) */
 .pmd-box-panel-error {
-    color: #dc2626;
+    color: var(--red-600);
     padding: 12px;
     font-size: 13px;
 }
 
-.pmd-box-panel-error a { color: #b45309; font-weight: 600; }
+.pmd-box-panel-error a { color: var(--amber-700); font-weight: 600; }
 
 /* ── Header ─────────────────────────────────────────── */
 .pmd-header {
     background: linear-gradient(135deg, var(--art-theme), var(--art-theme-dark));
     color: white;
     padding: 16px 24px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    box-shadow: 0 2px 8px rgb(0 0 0 / 15%);
 }
 
 .pmd-header-inner {
@@ -116,8 +152,8 @@ body {
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    background: rgba(255,255,255,0.18);
-    color: #fff;
+    background: rgb(255 255 255 / 18%);
+    color: var(--color-on-brand);
     text-decoration: none;
     font-size: 14px;
     font-weight: 600;
@@ -127,13 +163,13 @@ body {
 }
 
 .pmd-back-link:hover {
-    background: #fff;
-    color: var(--art-theme-dark, #006600);
+    background: var(--color-surface);
+    color: var(--art-theme-dark, var(--color-steve-dark));
     text-decoration: none;
     transform: translateX(-2px);
 }
 
-@media (max-width: 640px) {
+@media (width <= 640px) {
     .pmd-back-link {
         font-size: 13px;
         padding: 4px 10px;
@@ -144,13 +180,13 @@ body {
 .pmd-loading {
     text-align: center;
     padding: 80px 20px;
-    color: #666;
+    color: var(--mockup-detail-gray);
 }
 
 .pmd-spinner {
     width: 40px;
     height: 40px;
-    border: 3px solid #e0e0e0;
+    border: 3px solid var(--gray-200);
     border-top-color: var(--art-theme);
     border-radius: 50%;
     margin: 0 auto 16px;
@@ -165,15 +201,15 @@ body {
 .pmd-error {
     text-align: center;
     padding: 80px 20px;
-    color: #666;
+    color: var(--mockup-detail-gray);
 }
 
 .pmd-error-icon {
     width: 60px;
     height: 60px;
     border-radius: 50%;
-    background: #fee;
-    color: #dc3545;
+    background: var(--red-50);
+    color: var(--mockup-detail-red-2);
     font-size: 32px;
     font-weight: bold;
     line-height: 60px;
@@ -181,7 +217,7 @@ body {
 }
 
 .pmd-error h2 {
-    color: #333;
+    color: var(--mockup-detail-gray-dark);
     margin-bottom: 8px;
 }
 
@@ -202,29 +238,31 @@ body {
     gap: 10px;
     padding: 8px 14px;
     margin: 0 0 10px;
-    background: #fff;
+    background: var(--color-surface);
     border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    box-shadow: 0 1px 3px rgb(0 0 0 / 8%);
 }
+
 .pmd-nav-btn {
     padding: 6px 14px;
-    border: 1px solid #d1d5db;
+    border: 1px solid var(--gray-300);
     border-radius: 6px;
-    background: #f8fafc;
+    background: var(--slate-50);
     font-size: 13px;
     font-weight: 600;
     font-family: inherit;
-    color: #1e293b;
+    color: var(--gray-800);
     cursor: pointer;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 200px;
 }
-.pmd-nav-btn:hover:not(:disabled) { background: #e2e8f0; border-color: #94a3b8; }
+.pmd-nav-btn:hover:not(:disabled) { background: var(--slate-200); border-color: var(--gray-400); }
 .pmd-nav-btn:disabled { opacity: 0.35; cursor: default; }
-.pmd-nav-position { font-size: 12px; font-weight: 600; color: #64748b; white-space: nowrap; }
-@media (max-width: 500px) {
+.pmd-nav-position { font-size: 12px; font-weight: 600; color: var(--slate-500); white-space: nowrap; }
+
+@media (width <= 500px) {
     .pmd-nav-btn { max-width: 120px; font-size: 12px; padding: 5px 10px; }
 }
 
@@ -237,10 +275,11 @@ body {
     padding: 8px 0;
     flex-wrap: wrap;
 }
+
 .pmd-ae-edit-btn {
     padding: 8px 18px;
-    background: #2563eb;
-    color: #fff;
+    background: var(--blue-600);
+    color: var(--color-on-brand);
     border: none;
     border-radius: 6px;
     font-size: 13px;
@@ -248,63 +287,72 @@ body {
     font-family: inherit;
     cursor: pointer;
 }
-.pmd-ae-edit-btn:hover { background: #1d4ed8; }
+.pmd-ae-edit-btn:hover { background: var(--color-floor-dark); }
 
 /* ── Edit Mockup Modal ────────────────────────────────── */
 .pmd-edit-overlay {
-    position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+    position: fixed; inset: 0; background: rgb(0 0 0 / 50%);
     z-index: 1100; display: flex; justify-content: center; align-items: center;
 }
+
 .pmd-edit-modal {
-    background: #fff; border-radius: 12px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    background: var(--color-surface); border-radius: 12px;
+    box-shadow: 0 20px 60px rgb(0 0 0 / 30%);
     width: 94%; max-width: 640px; max-height: 85vh;
     display: flex; flex-direction: column;
 }
+
 .pmd-edit-header {
     display: flex; justify-content: space-between; align-items: center;
-    padding: 16px 20px; border-bottom: 1px solid #e9ecef;
+    padding: 16px 20px; border-bottom: 1px solid var(--gray-200);
 }
-.pmd-edit-header h3 { margin: 0; font-size: 18px; font-weight: 700; color: #1e293b; }
+.pmd-edit-header h3 { margin: 0; font-size: 18px; font-weight: 700; color: var(--gray-800); }
+
 .pmd-edit-close {
     background: none; border: none; font-size: 24px;
-    cursor: pointer; color: #94a3b8; line-height: 1;
+    cursor: pointer; color: var(--gray-400); line-height: 1;
 }
-.pmd-edit-close:hover { color: #334155; }
+.pmd-edit-close:hover { color: var(--gray-700); }
 .pmd-edit-body { padding: 16px 20px; overflow-y: auto; flex: 1; min-height: 0; }
+
 .pmd-edit-footer {
     display: flex; justify-content: flex-end; gap: 10px;
-    padding: 12px 20px; border-top: 1px solid #e9ecef;
+    padding: 12px 20px; border-top: 1px solid var(--gray-200);
 }
 .pmd-edit-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 .pmd-edit-full { grid-column: 1 / -1; }
+
 .pmd-edit-field label {
-    display: block; font-size: 12px; font-weight: 600; color: #64748b;
+    display: block; font-size: 12px; font-weight: 600; color: var(--slate-500);
     margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.4px;
 }
+
 .pmd-edit-field input,
 .pmd-edit-field select,
 .pmd-edit-field textarea {
-    width: 100%; padding: 8px 10px; border: 1px solid #d1d5db;
+    width: 100%; padding: 8px 10px; border: 1px solid var(--gray-300);
     border-radius: 6px; font-size: 14px; font-family: inherit;
-    color: #1e293b; box-sizing: border-box;
+    color: var(--gray-800); box-sizing: border-box;
 }
+
 .pmd-edit-field input:focus,
 .pmd-edit-field select:focus,
 .pmd-edit-field textarea:focus {
-    outline: none; border-color: #2563eb;
-    box-shadow: 0 0 0 2px rgba(37,99,235,0.15);
+    outline: none; border-color: var(--blue-600);
+    box-shadow: 0 0 0 2px rgb(37 99 235 / 15%);
 }
+
 .pmd-edit-btn {
     padding: 9px 22px; border-radius: 6px; font-size: 14px;
     font-weight: 600; font-family: inherit; cursor: pointer; border: none;
 }
-.pmd-edit-btn--cancel { background: #f1f5f9; border: 1px solid #e2e8f0; color: #64748b; }
-.pmd-edit-btn--cancel:hover { background: #e2e8f0; }
-.pmd-edit-btn--save { background: #16a34a; color: #fff; }
-.pmd-edit-btn--save:hover { background: #15803d; }
-.pmd-edit-btn--save:disabled { background: #94a3b8; cursor: not-allowed; }
-@media (max-width: 500px) { .pmd-edit-grid { grid-template-columns: 1fr; } }
+.pmd-edit-btn--cancel { background: var(--slate-100); border: 1px solid var(--slate-200); color: var(--slate-500); }
+.pmd-edit-btn--cancel:hover { background: var(--slate-200); }
+.pmd-edit-btn--save { background: var(--mockup-detail-green); color: var(--color-on-brand); }
+.pmd-edit-btn--save:hover { background: var(--mockup-detail-green-2); }
+.pmd-edit-btn--save:disabled { background: var(--gray-400); cursor: not-allowed; }
+
+@media (width <= 500px) { .pmd-edit-grid { grid-template-columns: 1fr; } }
 
 /* ── Title Row ──────────────────────────────────────── */
 .pmd-title-row {
@@ -318,7 +366,7 @@ body {
 .pmd-design-id {
     font-size: 22px;
     font-weight: 700;
-    color: #333;
+    color: var(--mockup-detail-gray-dark);
 }
 
 .pmd-badges {
@@ -338,28 +386,28 @@ body {
 }
 
 .pmd-status-badge--submitted {
-    background: rgba(139,92,246,0.2);
-    color: #7c3aed;
+    background: rgb(139 92 246 / 20%);
+    color: var(--mockup-detail-indigo-3);
 }
 
 .pmd-status-badge--in-progress {
-    background: rgba(59,130,246,0.15);
-    color: #2563eb;
+    background: rgb(59 130 246 / 15%);
+    color: var(--blue-600);
 }
 
 .pmd-status-badge--awaiting-approval {
-    background: rgba(245,158,11,0.15);
-    color: #d97706;
+    background: rgb(245 158 11 / 15%);
+    color: var(--amber-600);
 }
 
 .pmd-status-badge--approved {
-    background: rgba(16,185,129,0.15);
-    color: #059669;
+    background: rgb(16 185 129 / 15%);
+    color: var(--emerald-600);
 }
 
 .pmd-status-badge--revision-requested {
-    background: rgba(239,68,68,0.15);
-    color: #dc2626;
+    background: rgb(239 68 68 / 15%);
+    color: var(--red-600);
 }
 
 .pmd-revision-badge {
@@ -368,8 +416,8 @@ body {
     border-radius: 4px;
     font-size: 12px;
     font-weight: 600;
-    background: #fef2f2;
-    color: #dc2626;
+    background: var(--red-50);
+    color: var(--red-600);
 }
 
 .pmd-rush-toggle {
@@ -382,14 +430,14 @@ body {
     font-weight: 700;
     font-family: inherit;
     cursor: pointer;
-    background: #fff;
-    color: #dc2626;
-    border: 1.5px dashed #dc2626;
+    background: var(--color-surface);
+    color: var(--red-600);
+    border: 1.5px dashed var(--red-600);
     letter-spacing: 0.03em;
     transition: all 0.2s;
 }
 
-.pmd-rush-toggle:hover { background: #fee2e2; }
+.pmd-rush-toggle:hover { background: var(--red-100); }
 .pmd-rush-toggle:disabled { opacity: 0.5; cursor: not-allowed; }
 
 .pmd-rush-toggle-hint {
@@ -399,19 +447,19 @@ body {
 }
 
 .pmd-rush-toggle--active {
-    background: #dc2626;
-    color: #fff;
+    background: var(--red-600);
+    color: var(--color-on-brand);
     border-style: solid;
-    border-color: #991b1b;
-    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.2);
+    border-color: var(--red-800);
+    box-shadow: 0 0 0 3px rgb(220 38 38 / 20%);
     animation: pmd-rush-pulse 1.6s ease-in-out infinite;
 }
 
-.pmd-rush-toggle--active .pmd-rush-toggle-hint { color: #fecaca; }
+.pmd-rush-toggle--active .pmd-rush-toggle-hint { color: var(--mockup-detail-red-tint); }
 
 @keyframes pmd-rush-pulse {
-    0%, 100% { box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.2); }
-    50%       { box-shadow: 0 0 0 6px rgba(220, 38, 38, 0.35); }
+    0%, 100% { box-shadow: 0 0 0 3px rgb(220 38 38 / 20%); }
+    50%       { box-shadow: 0 0 0 6px rgb(220 38 38 / 35%); }
 }
 
 /* ── ShopWorks Art Done Badge ──────────────────────── */
@@ -424,12 +472,12 @@ body {
     font-size: 12px;
     font-weight: 600;
 }
-.pmd-sw-badge--done { background: #dcfce7; color: #166534; }
-.pmd-sw-badge--pending { background: #fef3c7; color: #92400e; }
+.pmd-sw-badge--done { background: var(--store-green-100); color: var(--print-green); }
+.pmd-sw-badge--pending { background: var(--amber-100); color: var(--amber-800); }
 
 /* ── Find Order Button & Modal ─────────────────────── */
 .pmd-find-order-btn {
-    background: #3b82f6;
+    background: var(--color-floor-light);
     color: white;
     border: none;
     border-radius: 4px;
@@ -440,16 +488,16 @@ body {
     font-family: inherit;
     transition: background 0.15s;
 }
-.pmd-find-order-btn:hover { background: #2563eb; }
+.pmd-find-order-btn:hover { background: var(--blue-600); }
 
 .pmd-fo-modal {
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background: #fff;
+    background: var(--color-surface);
     border-radius: 12px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    box-shadow: 0 20px 60px rgb(0 0 0 / 30%);
     z-index: 9001;
     width: 90%;
     max-width: 600px;
@@ -457,57 +505,64 @@ body {
     display: flex;
     flex-direction: column;
 }
+
 .pmd-fo-modal-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 16px 20px;
-    border-bottom: 1px solid #e9ecef;
+    border-bottom: 1px solid var(--gray-200);
     font-size: 16px;
     font-weight: 700;
-    color: #1e293b;
+    color: var(--gray-800);
 }
+
 .pmd-fo-modal-close {
     background: none;
     border: none;
     font-size: 22px;
     cursor: pointer;
-    color: #94a3b8;
+    color: var(--gray-400);
     padding: 0 4px;
 }
-.pmd-fo-modal-close:hover { color: #334155; }
+.pmd-fo-modal-close:hover { color: var(--gray-700); }
+
 .pmd-fo-modal-body {
     padding: 16px 20px;
     overflow-y: auto;
     flex: 1;
     min-height: 0;
 }
-.pmd-fo-loading { font-size: 13px; color: #64748b; font-style: italic; padding: 16px 0; }
-.pmd-fo-empty { font-size: 13px; color: #94a3b8; padding: 16px 0; }
-.pmd-fo-error { font-size: 13px; color: #dc2626; padding: 16px 0; }
-.pmd-fo-header { font-size: 12px; color: #64748b; margin-bottom: 10px; font-weight: 600; }
+.pmd-fo-loading { font-size: 13px; color: var(--slate-500); font-style: italic; padding: 16px 0; }
+.pmd-fo-empty { font-size: 13px; color: var(--gray-400); padding: 16px 0; }
+.pmd-fo-error { font-size: 13px; color: var(--red-600); padding: 16px 0; }
+.pmd-fo-header { font-size: 12px; color: var(--slate-500); margin-bottom: 10px; font-weight: 600; }
+
 .pmd-fo-manual {
     padding: 12px 20px;
-    border-top: 1px solid #e2e8f0;
+    border-top: 1px solid var(--slate-200);
 }
-.pmd-fo-manual-label { font-size: 11px; color: #64748b; margin-bottom: 6px; }
+.pmd-fo-manual-label { font-size: 11px; color: var(--slate-500); margin-bottom: 6px; }
 .pmd-fo-manual-row { display: flex; gap: 6px; }
+
 .pmd-fo-manual-input {
     flex: 1;
     padding: 6px 10px;
-    border: 1px solid #cbd5e1;
+    border: 1px solid var(--gray-300);
     border-radius: 4px;
     font-size: 13px;
     font-family: inherit;
     box-sizing: border-box;
 }
+
 .pmd-fo-manual-input:focus {
     outline: none;
-    border-color: #6B46C1;
-    box-shadow: 0 0 0 2px rgba(107,70,193,0.15);
+    border-color: var(--color-ruth);
+    box-shadow: 0 0 0 2px rgb(107 70 193 / 15%);
 }
+
 .pmd-fo-manual-btn {
-    background: #475569;
+    background: var(--slate-600);
     color: white;
     border: none;
     border-radius: 4px;
@@ -517,28 +572,31 @@ body {
     cursor: pointer;
     font-family: inherit;
 }
-.pmd-fo-manual-btn:hover { background: #334155; }
+.pmd-fo-manual-btn:hover { background: var(--gray-700); }
+
 .pmd-fo-manual-note {
     font-size: 10px;
-    color: #94a3b8;
+    color: var(--gray-400);
     margin-top: 6px;
     font-style: italic;
 }
+
 .pmd-order-card {
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--slate-200);
     border-radius: 8px;
     padding: 12px;
     margin-bottom: 8px;
     transition: border-color 0.15s, background 0.15s;
 }
-.pmd-order-card:hover { border-color: #94a3b8; background: #f8fafc; }
-.pmd-order-num { font-size: 15px; font-weight: 700; color: #1e293b; }
-.pmd-order-meta { font-size: 12px; color: #64748b; margin-top: 2px; }
+.pmd-order-card:hover { border-color: var(--gray-400); background: var(--slate-50); }
+.pmd-order-num { font-size: 15px; font-weight: 700; color: var(--gray-800); }
+.pmd-order-meta { font-size: 12px; color: var(--slate-500); margin-top: 2px; }
 .pmd-order-actions { margin-top: 8px; display: flex; gap: 8px; }
+
 .pmd-view-items-btn {
-    background: #f1f5f9;
-    color: #334155;
-    border: 1px solid #cbd5e1;
+    background: var(--slate-100);
+    color: var(--gray-700);
+    border: 1px solid var(--gray-300);
     border-radius: 4px;
     padding: 4px 10px;
     font-size: 11px;
@@ -546,9 +604,10 @@ body {
     cursor: pointer;
     font-family: inherit;
 }
-.pmd-view-items-btn:hover { background: #e2e8f0; }
+.pmd-view-items-btn:hover { background: var(--slate-200); }
+
 .pmd-link-order-btn {
-    background: #6B46C1;
+    background: var(--color-ruth);
     color: white;
     border: none;
     border-radius: 4px;
@@ -558,7 +617,8 @@ body {
     cursor: pointer;
     font-family: inherit;
 }
-.pmd-link-order-btn:hover { background: #553C9A; }
+.pmd-link-order-btn:hover { background: var(--color-ruth-dark); }
+
 .pmd-fo-art-status {
     font-size: 11px;
     font-weight: 600;
@@ -566,26 +626,29 @@ body {
     border-radius: 3px;
     margin-left: 6px;
 }
-.pmd-fo-art-status--done { background: #dcfce7; color: #166534; }
-.pmd-fo-art-status--pending { background: #fef3c7; color: #92400e; }
+.pmd-fo-art-status--done { background: var(--store-green-100); color: var(--print-green); }
+.pmd-fo-art-status--pending { background: var(--amber-100); color: var(--amber-800); }
+
 .pmd-line-items-table {
     width: 100%;
     border-collapse: collapse;
     font-size: 11px;
     margin-top: 8px;
 }
+
 .pmd-line-items-table th {
     text-align: left;
     padding: 4px 6px;
-    background: #f1f5f9;
-    border-bottom: 1px solid #e2e8f0;
+    background: var(--slate-100);
+    border-bottom: 1px solid var(--slate-200);
     font-weight: 600;
-    color: #475569;
+    color: var(--slate-600);
 }
+
 .pmd-line-items-table td {
     padding: 4px 6px;
-    border-bottom: 1px solid #f1f5f9;
-    color: #334155;
+    border-bottom: 1px solid var(--slate-100);
+    color: var(--gray-700);
 }
 
 /* ── Action Bars ────────────────────────────────────── */
@@ -596,7 +659,7 @@ body {
     padding: 16px;
     background: white;
     border-radius: 10px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    box-shadow: 0 1px 4px rgb(0 0 0 / 8%);
     flex-wrap: wrap;
     align-items: center;
 }
@@ -604,7 +667,7 @@ body {
 .pmd-action-bar-label {
     font-size: 14px;
     font-weight: 600;
-    color: #555;
+    color: var(--print-ink-soft);
     margin-right: 8px;
 }
 
@@ -613,9 +676,9 @@ body {
     font-weight: 600;
     margin-right: auto;
 }
-.approval-elapsed--fresh { color: #16a34a; }
-.approval-elapsed--waiting { color: #d97706; }
-.approval-elapsed--overdue { color: #dc2626; }
+.approval-elapsed--fresh { color: var(--mockup-detail-green); }
+.approval-elapsed--waiting { color: var(--amber-600); }
+.approval-elapsed--overdue { color: var(--red-600); }
 
 .pmd-action-btn {
     padding: 8px 20px;
@@ -628,6 +691,7 @@ body {
     font-family: inherit;
     white-space: nowrap;
 }
+
 .pmd-action-btn:hover:not(:disabled) {
     transform: translateY(-1px);
     filter: brightness(1.05);
@@ -643,49 +707,49 @@ body {
 }
 
 .pmd-action-btn--start {
-    background: #3b82f6;
+    background: var(--color-floor-light);
     color: white;
 }
 
 .pmd-action-btn--start:hover {
-    background: #2563eb;
+    background: var(--blue-600);
 }
 
 .pmd-action-btn--send {
-    background: #f59e0b;
+    background: var(--amber-500);
     color: white;
 }
 
 .pmd-action-btn--send:hover {
-    background: #d97706;
+    background: var(--amber-600);
 }
 
 .pmd-action-btn--approve {
-    background: #10b981;
+    background: var(--mockup-detail-teal);
     color: white;
 }
 
 .pmd-action-btn--approve:hover {
-    background: #059669;
+    background: var(--emerald-600);
 }
 
 .pmd-action-btn--revise {
-    background: #ef4444;
+    background: var(--mockup-detail-red-3);
     color: white;
 }
 
 .pmd-action-btn--revise:hover {
-    background: #dc2626;
+    background: var(--red-600);
 }
 
 .pmd-action-btn--delete {
-    background: #dc2626;
+    background: var(--red-600);
     color: white;
     margin-left: auto;
 }
 
 .pmd-action-btn--delete:hover {
-    background: #b91c1c;
+    background: var(--red-700);
 }
 
 .pmd-action-btn:disabled {
@@ -705,7 +769,7 @@ body {
 .pmd-card {
     background: white;
     border-radius: 10px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    box-shadow: 0 1px 4px rgb(0 0 0 / 8%);
     overflow: hidden;
     margin-bottom: 20px;
 }
@@ -738,7 +802,7 @@ body {
     border-radius: 8px;
     overflow: hidden;
     cursor: pointer;
-    border: 2px solid #e5e7eb;
+    border: 2px solid var(--gray-200);
     transition: border-color 0.2s, box-shadow 0.2s;
 }
 
@@ -782,7 +846,7 @@ body {
     bottom: 0;
     left: 0;
     right: 0;
-    background: rgba(0,0,0,0.6);
+    background: rgb(0 0 0 / 60%);
     color: white;
     font-size: 11px;
     font-weight: 500;
@@ -797,7 +861,7 @@ body {
     width: 24px;
     height: 24px;
     border-radius: 50%;
-    background: rgba(239,68,68,0.9);
+    background: rgb(239 68 68 / 90%);
     color: white;
     border: none;
     font-size: 14px;
@@ -821,7 +885,7 @@ body {
     left: 4px;
     padding: 3px 8px;
     border-radius: 4px;
-    background: rgba(13,148,136,0.9);
+    background: rgb(13 148 136 / 90%);
     color: white;
     border: none;
     font-size: 11px;
@@ -840,7 +904,7 @@ body {
 }
 
 .pmd-slot-replace:hover {
-    background: rgba(15,118,110,1);
+    background: rgb(15 118 110 / 100%);
 }
 
 .pmd-slot-download {
@@ -850,7 +914,7 @@ body {
     width: 28px;
     height: 28px;
     border-radius: 50%;
-    background: rgba(0,0,0,0.55);
+    background: rgb(0 0 0 / 55%);
     color: white;
     border: none;
     cursor: pointer;
@@ -867,7 +931,7 @@ body {
 }
 
 .pmd-slot-download:hover {
-    background: rgba(0,0,0,0.8);
+    background: rgb(0 0 0 / 80%);
 }
 
 .pmd-slot-download svg {
@@ -923,7 +987,7 @@ body {
     z-index: 100;
     background: white;
     border-radius: 8px;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 16px rgb(0 0 0 / 15%);
     padding: 8px;
     display: none;
 }
@@ -937,7 +1001,7 @@ body {
     cursor: pointer;
     font-size: 13px;
     font-weight: 500;
-    color: #333;
+    color: var(--mockup-detail-gray-dark);
     transition: background 0.2s;
     white-space: nowrap;
 }
@@ -951,7 +1015,7 @@ body {
 .pmd-field-row {
     display: flex;
     padding: 8px 0;
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid var(--gray-100);
     font-size: 14px;
 }
 
@@ -962,22 +1026,24 @@ body {
 .pmd-field-label {
     width: 120px;
     flex-shrink: 0;
-    color: #888;
+    color: var(--mockup-detail-gray-2);
     font-weight: 500;
     font-size: 13px;
 }
 
 .pmd-field-value {
     flex: 1;
-    color: #333;
+    color: var(--mockup-detail-gray-dark);
+    /* stylelint-disable-next-line declaration-property-value-keyword-no-deprecated -- overflow-wrap: anywhere is not a byte-identical swap; legacy */
     word-break: break-word;
 }
+
 .pmd-type-badge {
     display: inline-block;
     padding: 3px 10px;
     background: var(--art-theme-bg-selected);
     color: var(--art-theme-dark);
-    border: 1px solid #d6bcfa;
+    border: 1px solid var(--mockup-detail-indigo-tint-2);
     border-radius: 12px;
     font-size: 12px;
     font-weight: 500;
@@ -994,8 +1060,8 @@ body {
 .pmd-note {
     padding: 12px;
     border-radius: 8px;
-    background: #f8f9fa;
-    border-left: 3px solid #e5e7eb;
+    background: var(--gray-50);
+    border-left: 3px solid var(--gray-200);
 }
 
 .pmd-note--ae_instruction {
@@ -1004,18 +1070,18 @@ body {
 }
 
 .pmd-note--artist_note {
-    border-left-color: #3b82f6;
-    background: #eff6ff;
+    border-left-color: var(--color-floor-light);
+    background: var(--color-floor-tint);
 }
 
 .pmd-note--status_change {
-    border-left-color: #f59e0b;
-    background: #fffbeb;
+    border-left-color: var(--amber-500);
+    background: var(--store-paper);
 }
 
 .pmd-note--revision_request {
-    border-left-color: #ef4444;
-    background: #fef2f2;
+    border-left-color: var(--mockup-detail-red-3);
+    background: var(--red-50);
 }
 
 .pmd-note-header {
@@ -1042,28 +1108,28 @@ body {
 }
 
 .pmd-note-type--artist_note {
-    background: rgba(59,130,246,0.15);
-    color: #2563eb;
+    background: rgb(59 130 246 / 15%);
+    color: var(--blue-600);
 }
 
 .pmd-note-type--status_change {
-    background: rgba(245,158,11,0.15);
-    color: #d97706;
+    background: rgb(245 158 11 / 15%);
+    color: var(--amber-600);
 }
 
 .pmd-note-type--revision_request {
-    background: rgba(239,68,68,0.15);
-    color: #dc2626;
+    background: rgb(239 68 68 / 15%);
+    color: var(--red-600);
 }
 
 .pmd-note-meta {
     font-size: 12px;
-    color: #999;
+    color: var(--print-line);
 }
 
 .pmd-note-text {
     font-size: 14px;
-    color: #333;
+    color: var(--mockup-detail-gray-dark);
     line-height: 1.5;
     white-space: pre-wrap;
 }
@@ -1071,7 +1137,7 @@ body {
 .pmd-empty-notes {
     text-align: center;
     padding: 30px;
-    color: #999;
+    color: var(--print-line);
     font-size: 14px;
 }
 
@@ -1079,14 +1145,14 @@ body {
 .pmd-add-note {
     margin-top: 16px;
     padding-top: 16px;
-    border-top: 1px solid #e5e7eb;
+    border-top: 1px solid var(--gray-200);
 }
 
 .pmd-add-note textarea {
     width: 100%;
     min-height: 80px;
     padding: 10px 12px;
-    border: 1px solid #d1d5db;
+    border: 1px solid var(--gray-300);
     border-radius: 6px;
     font-family: inherit;
     font-size: 14px;
@@ -1138,7 +1204,7 @@ body {
 
 .pmd-note-notify-label {
     font-size: 12px;
-    color: #666;
+    color: var(--mockup-detail-gray);
     display: flex;
     align-items: center;
     gap: 5px;
@@ -1152,19 +1218,20 @@ body {
     gap: 6px;
     margin-bottom: 6px;
     font-size: 12px;
-    color: #6b7280;
+    color: var(--gray-500);
 }
 .pmd-posting-as .posting-as-label { font-weight: 600; }
-.pmd-posting-as .posting-as-name { font-weight: 700; color: #1f2937; }
-.pmd-posting-as .posting-as-check { color: #16a34a; font-weight: 700; }
+.pmd-posting-as .posting-as-name { font-weight: 700; color: var(--gray-800); }
+.pmd-posting-as .posting-as-check { color: var(--mockup-detail-green); font-weight: 700; }
+
 .pmd-posting-as select {
     font-size: 12px;
     padding: 2px 6px;
-    border: 1px solid #d1d5db;
+    border: 1px solid var(--gray-300);
     border-radius: 4px;
     font-family: inherit;
-    color: #1f2937;
-    background: #fff;
+    color: var(--gray-800);
+    background: var(--color-surface);
     width: auto;
 }
 
@@ -1173,7 +1240,7 @@ body {
     position: fixed;
     inset: 0;
     z-index: 10000;
-    background: rgba(0,0,0,0.85);
+    background: rgb(0 0 0 / 85%);
     display: none;
     align-items: center;
     justify-content: center;
@@ -1188,7 +1255,7 @@ body {
     max-width: 90vw;
     max-height: 90vh;
     border-radius: 8px;
-    box-shadow: 0 4px 30px rgba(0,0,0,0.5);
+    box-shadow: 0 4px 30px rgb(0 0 0 / 50%);
 }
 
 .pmd-lightbox-close {
@@ -1198,7 +1265,7 @@ body {
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background: rgba(255,255,255,0.15);
+    background: rgb(255 255 255 / 15%);
     color: white;
     font-size: 24px;
     border: none;
@@ -1215,7 +1282,7 @@ body {
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background: rgba(255,255,255,0.15);
+    background: rgb(255 255 255 / 15%);
     color: white;
     border: none;
     cursor: pointer;
@@ -1226,7 +1293,7 @@ body {
 }
 
 .pmd-lightbox-download:hover {
-    background: rgba(255,255,255,0.3);
+    background: rgb(255 255 255 / 30%);
 }
 
 .pmd-lightbox-download svg {
@@ -1243,7 +1310,7 @@ body {
     transform: translateX(-50%);
     color: white;
     font-size: 14px;
-    background: rgba(0,0,0,0.5);
+    background: rgb(0 0 0 / 50%);
     padding: 6px 16px;
     border-radius: 20px;
 }
@@ -1252,7 +1319,7 @@ body {
 .pmd-box-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.5);
+    background: rgb(0 0 0 / 50%);
     z-index: 9000;
     display: none;
 }
@@ -1267,7 +1334,7 @@ body {
     max-height: 80vh;
     background: white;
     border-radius: 12px;
-    box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+    box-shadow: 0 8px 30px rgb(0 0 0 / 25%);
     z-index: 9001;
     display: none;
     flex-direction: column;
@@ -1309,7 +1376,7 @@ body {
     gap: 4px;
     align-items: center;
     font-size: 13px;
-    color: #666;
+    color: var(--mockup-detail-gray);
     margin-bottom: 12px;
     flex-wrap: wrap;
 }
@@ -1341,11 +1408,11 @@ body {
 }
 
 .pmd-box-file-item:hover {
-    background: #f0f0f0;
+    background: var(--gray-100);
 }
 
 .pmd-box-file-item.selected {
-    background: #ede9fe;
+    background: var(--color-ruth-tint);
     border: 2px solid var(--art-theme);
     border-radius: 8px;
 }
@@ -1367,13 +1434,13 @@ body {
     align-items: center;
     justify-content: center;
     padding: 40px;
-    color: #888;
+    color: var(--mockup-detail-gray-2);
     gap: 10px;
 }
 
 .pmd-box-modal-footer {
     padding: 12px 20px;
-    border-top: 1px solid #e5e7eb;
+    border-top: 1px solid var(--gray-200);
     display: flex;
     justify-content: flex-end;
     gap: 10px;
@@ -1381,7 +1448,7 @@ body {
 
 .pmd-box-cancel-btn {
     padding: 8px 16px;
-    border: 1px solid #d1d5db;
+    border: 1px solid var(--gray-300);
     border-radius: 6px;
     background: white;
     font-size: 13px;
@@ -1412,10 +1479,10 @@ body {
     gap: 14px;
     margin-bottom: 20px;
     padding: 16px 20px;
-    background: #fef2f2;
-    border-left: 4px solid #ef4444;
+    background: var(--red-50);
+    border-left: 4px solid var(--mockup-detail-red-3);
     border-radius: 10px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    box-shadow: 0 1px 4px rgb(0 0 0 / 8%);
 }
 
 .pmd-rev-icon {
@@ -1432,12 +1499,12 @@ body {
 .pmd-rev-title {
     font-weight: 700;
     font-size: 15px;
-    color: #991b1b;
+    color: var(--red-800);
     margin-bottom: 8px;
 }
 
 .pmd-rev-text {
-    color: #374151;
+    color: var(--gray-700);
     font-size: 14px;
     line-height: 1.5;
     white-space: pre-wrap;
@@ -1459,25 +1526,25 @@ body {
     height: 56px;
     object-fit: cover;
     border-radius: 6px;
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--gray-200);
     flex-shrink: 0;
 }
 
 .pmd-rev-section-content {
-    color: #374151;
+    color: var(--gray-700);
     font-size: 14px;
     line-height: 1.5;
 }
 
 .pmd-rev-section-content strong {
-    color: #991b1b;
+    color: var(--red-800);
 }
 
 /* ── Request Changes Modal ──────────────────────────── */
 .pmd-modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.5);
+    background: rgb(0 0 0 / 50%);
     z-index: 9000;
     display: none;
     align-items: center;
@@ -1496,7 +1563,7 @@ body {
     max-height: 90vh;
     display: flex;
     flex-direction: column;
-    box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+    box-shadow: 0 8px 30px rgb(0 0 0 / 25%);
     overflow: hidden;
 }
 
@@ -1523,7 +1590,7 @@ body {
     width: 100%;
     min-height: 100px;
     padding: 10px;
-    border: 1px solid #d1d5db;
+    border: 1px solid var(--gray-300);
     border-radius: 6px;
     font-family: inherit;
     font-size: 14px;
@@ -1534,19 +1601,20 @@ body {
     display: block;
     font-size: 14px;
     font-weight: 500;
-    color: #555;
+    color: var(--print-ink-soft);
     margin-bottom: 8px;
 }
 
 .pmd-modal-footer {
     padding: 12px 20px;
-    border-top: 1px solid #e5e7eb;
+    border-top: 1px solid var(--gray-200);
     display: flex;
     justify-content: flex-end;
     gap: 10px;
 }
 
 /* ── Approve Mockup Modal ───────────────────────────── */
+
 /* Reuses the .pmd-modal* shell (overlay, body, styled textarea/label,
    footer); only the green identity and the summary chip are new.
    #16a34a matches Ruth's Mark Complete modal so the two read as a family. */
@@ -1555,22 +1623,22 @@ body {
 }
 
 .pmd-modal-header--approve {
-    background: #16a34a;
+    background: var(--mockup-detail-green);
 }
 
 .pmd-approve-summary {
-    background: #f0fdf4;
-    border: 1px solid #bbf7d0;
+    background: var(--brand-50);
+    border: 1px solid var(--mockup-detail-green-tint);
     border-radius: 6px;
     padding: 10px 12px;
     font-size: 14px;
-    color: #166534;
+    color: var(--print-green);
     margin-bottom: 14px;
 }
 
 .pmd-approve-hint {
     font-size: 12px;
-    color: #6b7280;
+    color: var(--gray-500);
     margin-top: 6px;
 }
 
@@ -1580,13 +1648,13 @@ body {
 }
 
 .pmd-modal-header--delete {
-    background: #dc2626;
+    background: var(--red-600);
 }
 
 .pmd-delete-warning {
-    color: #991b1b;
-    background: #fef2f2;
-    border: 1px solid #fecaca;
+    color: var(--red-800);
+    background: var(--red-50);
+    border: 1px solid var(--mockup-detail-red-tint);
     border-radius: 8px;
     padding: 12px 14px;
     margin: 0 0 16px;
@@ -1601,13 +1669,13 @@ body {
 .pmd-delete-info-row {
     font-size: 14px;
     padding: 4px 0;
-    color: #374151;
+    color: var(--gray-700);
 }
 
 .pmd-delete-info-row strong {
     display: inline-block;
     width: 110px;
-    color: #111827;
+    color: var(--gray-900);
 }
 
 /* ── Per-Mockup Revision Slots ───────────────────── */
@@ -1616,7 +1684,7 @@ body {
     gap: 12px;
     margin-bottom: 16px;
     padding-bottom: 16px;
-    border-bottom: 1px solid #e5e7eb;
+    border-bottom: 1px solid var(--gray-200);
 }
 
 .pmd-revise-slot:last-child {
@@ -1628,7 +1696,7 @@ body {
     height: 64px;
     object-fit: cover;
     border-radius: 6px;
-    border: 1px solid #d1d5db;
+    border: 1px solid var(--gray-300);
     flex-shrink: 0;
 }
 
@@ -1641,7 +1709,7 @@ body {
     display: block;
     font-size: 13px;
     font-weight: 600;
-    color: #374151;
+    color: var(--gray-700);
     margin-bottom: 6px;
 }
 
@@ -1649,7 +1717,7 @@ body {
     width: 100%;
     min-height: 60px;
     padding: 8px 10px;
-    border: 1px solid #d1d5db;
+    border: 1px solid var(--gray-300);
     border-radius: 6px;
     font-family: inherit;
     font-size: 13px;
@@ -1658,8 +1726,8 @@ body {
 
 .pmd-revise-slot-textarea:focus {
     outline: none;
-    border-color: var(--art-theme, #6b21a8);
-    box-shadow: 0 0 0 2px rgba(107,33,168,0.15);
+    border-color: var(--art-theme, var(--mockup-detail-indigo));
+    box-shadow: 0 0 0 2px rgb(107 33 168 / 15%);
 }
 
 /* ── Revise Modal Upload ────────────────────────────── */
@@ -1671,12 +1739,12 @@ body {
     display: block;
     font-size: 13px;
     font-weight: 600;
-    color: #374151;
+    color: var(--gray-700);
     margin-bottom: 6px;
 }
 
 .pmd-revise-dropzone {
-    border: 2px dashed #d1d5db;
+    border: 2px dashed var(--gray-300);
     border-radius: 8px;
     padding: 18px;
     text-align: center;
@@ -1686,19 +1754,19 @@ body {
 
 .pmd-revise-dropzone:hover,
 .pmd-revise-dropzone.dragover {
-    border-color: var(--art-theme, #6b21a8);
-    background-color: rgba(107,33,168,0.04);
+    border-color: var(--art-theme, var(--mockup-detail-indigo));
+    background-color: rgb(107 33 168 / 4%);
 }
 
 .pmd-revise-dropzone-icon {
     display: block;
     font-size: 20px;
-    color: #9ca3af;
+    color: var(--gray-400);
     margin-bottom: 4px;
 }
 
 .pmd-revise-dropzone-text {
-    color: #9ca3af;
+    color: var(--gray-400);
     font-size: 13px;
 }
 
@@ -1713,8 +1781,8 @@ body {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    background: #f3e8ff;
-    color: #6b21a8;
+    background: var(--color-ruth-tint);
+    color: var(--mockup-detail-indigo);
     font-size: 12px;
     padding: 4px 10px;
     border-radius: 12px;
@@ -1722,14 +1790,14 @@ body {
 
 .pmd-revise-file-chip-remove {
     cursor: pointer;
-    color: #9ca3af;
+    color: var(--gray-400);
     font-weight: bold;
     font-size: 14px;
     line-height: 1;
 }
 
 .pmd-revise-file-chip-remove:hover {
-    color: #dc3545;
+    color: var(--mockup-detail-red-2);
 }
 
 /* Inline button spinner for upload states */
@@ -1737,8 +1805,8 @@ body {
     display: inline-block;
     width: 14px;
     height: 14px;
-    border: 2px solid rgba(255,255,255,0.3);
-    border-top-color: #fff;
+    border: 2px solid rgb(255 255 255 / 30%);
+    border-top-color: var(--color-on-brand);
     border-radius: 50%;
     animation: pmd-spin 0.7s linear infinite;
     vertical-align: middle;
@@ -1758,7 +1826,7 @@ body {
     align-items: center;
     justify-content: center;
     padding: 30px;
-    color: #888;
+    color: var(--mockup-detail-gray-2);
     gap: 10px;
     font-size: 13px;
 }
@@ -1766,7 +1834,7 @@ body {
 .pmd-box-panel-empty {
     text-align: center;
     padding: 30px 16px;
-    color: #999;
+    color: var(--print-line);
     font-size: 13px;
 }
 
@@ -1784,15 +1852,15 @@ body {
     aspect-ratio: 1;
     border-radius: 6px;
     overflow: hidden;
-    border: 2px solid #e5e7eb;
+    border: 2px solid var(--gray-200);
     cursor: grab;
     transition: border-color 0.2s, box-shadow 0.2s, opacity 0.2s;
-    background: #f8f9fa;
+    background: var(--gray-50);
 }
 
 .pmd-box-panel-item:hover {
-    border-color: var(--art-theme, #6b21a8);
-    box-shadow: 0 2px 8px rgba(107,33,168,0.15);
+    border-color: var(--art-theme, var(--mockup-detail-indigo));
+    box-shadow: 0 2px 8px rgb(107 33 168 / 15%);
 }
 
 .pmd-box-panel-item.dragging {
@@ -1810,7 +1878,7 @@ body {
     bottom: 0;
     left: 0;
     right: 0;
-    background: rgba(0,0,0,0.65);
+    background: rgb(0 0 0 / 65%);
     color: white;
     font-size: 10px;
     padding: 3px 6px;
@@ -1826,7 +1894,7 @@ body {
     width: 20px;
     height: 20px;
     border-radius: 50%;
-    background: rgba(239,68,68,0.85);
+    background: rgb(239 68 68 / 85%);
     color: white;
     border: none;
     font-size: 12px;
@@ -1859,21 +1927,23 @@ body {
     border-radius: 3px;
     font-size: 10px;
     font-weight: 700;
-    background: #e5e7eb;
-    color: #555;
+    background: var(--gray-200);
+    color: var(--print-ink-soft);
     text-transform: uppercase;
 }
 
 /* Drag-and-drop visual feedback */
 .pmd-box-panel-grid.drag-over {
-    outline: 2px dashed var(--art-theme, #6b21a8);
+    outline: 2px dashed var(--art-theme, var(--mockup-detail-indigo));
     outline-offset: -2px;
-    background: rgba(107,33,168,0.05);
+    background: rgb(107 33 168 / 5%);
 }
 
 .pmd-gallery-slot.drag-over {
-    border-color: var(--art-theme, #6b21a8) !important;
-    box-shadow: 0 0 0 3px rgba(107,33,168,0.15) !important;
+    /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
+    border-color: var(--art-theme, var(--mockup-detail-indigo)) !important;
+    /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
+    box-shadow: 0 0 0 3px rgb(107 33 168 / 15%) !important;
 }
 
 .pmd-gallery-slot.dragging {
@@ -1893,7 +1963,7 @@ body {
     transform: translateY(100px);
     opacity: 0;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 12px rgb(0 0 0 / 15%);
 }
 
 .pmd-toast.show {
@@ -1901,11 +1971,12 @@ body {
     opacity: 1;
 }
 
-.pmd-toast--success { background: #059669; }
-.pmd-toast--error { background: #dc2626; }
+.pmd-toast--success { background: var(--emerald-600); }
+.pmd-toast--error { background: var(--red-600); }
 .pmd-toast--info { background: var(--art-theme); }
 
 /* ── Customer Approval View ─────────────────────────── */
+
 /* Customer view: always show download button, larger and labeled */
 .pmd-customer-view .pmd-slot-download {
     opacity: 1;
@@ -1919,15 +1990,18 @@ body {
     font-weight: 600;
     color: white;
     gap: 5px;
-    background: rgba(0,0,0,0.65);
+    background: rgb(0 0 0 / 65%);
 }
+
 .pmd-customer-view .pmd-slot-download svg {
     width: 16px;
     height: 16px;
 }
+
 .pmd-customer-view .pmd-slot-download:hover {
-    background: rgba(0,0,0,0.85);
+    background: rgb(0 0 0 / 85%);
 }
+
 .pmd-customer-view .pmd-gallery-slot {
     cursor: pointer;
 }
@@ -1936,8 +2010,8 @@ body {
 .pmd-slot-broken-overlay {
     position: absolute;
     inset: 0;
-    background: #fff5f5;
-    border: 2px solid #dc3545;
+    background: var(--red-50);
+    border: 2px solid var(--mockup-detail-red-2);
     border-radius: inherit;
     display: flex;
     flex-direction: column;
@@ -1948,27 +2022,32 @@ body {
     z-index: 3;
     pointer-events: none;
 }
+
 .pmd-gallery-slot.is-broken,
 .pmd-box-panel-item.is-broken {
     position: relative;
 }
+
 .pmd-slot-broken-icon {
     font-size: 26px;
-    color: #dc3545;
+    color: var(--mockup-detail-red-2);
     margin-bottom: 4px;
 }
+
 .pmd-slot-broken-title {
     font-size: 12px;
     font-weight: 700;
-    color: #c0392b;
+    color: var(--mockup-detail-red);
     margin-bottom: 4px;
     line-height: 1.2;
 }
+
 .pmd-slot-broken-msg {
     font-size: 11px;
-    color: #666;
+    color: var(--mockup-detail-gray);
     line-height: 1.35;
 }
+
 /* Identifier row (Design # · Box ID + Copy) — helps staff find the file in Box manually */
 .pmd-slot-broken-ids {
     display: flex;
@@ -1977,52 +2056,59 @@ body {
     justify-content: center;
     gap: 4px 6px;
     font-size: 10px;
-    color: #777;
+    color: var(--gray-500);
     margin-top: 8px;
     padding: 5px 8px;
-    background: #fff;
-    border: 1px solid #f1c7be;
+    background: var(--color-surface);
+    border: 1px solid var(--mockup-detail-red-4);
     border-radius: 4px;
     max-width: 100%;
     pointer-events: auto;
 }
+
 .pmd-slot-broken-id-label {
-    color: #999;
+    color: var(--print-line);
     text-transform: uppercase;
     letter-spacing: 0.03em;
     font-weight: 600;
     font-size: 9px;
 }
+
 .pmd-slot-broken-id-value {
-    color: #333;
+    color: var(--mockup-detail-gray-dark);
     font-weight: 600;
     font-size: 11px;
     user-select: all;
 }
+
 .pmd-slot-broken-id-file {
     font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
     font-size: 10px;
     word-break: break-all;
 }
+
 .pmd-slot-broken-id-link {
-    color: #c0392b;
+    color: var(--mockup-detail-red);
     text-decoration: underline;
     text-decoration-style: dotted;
     text-underline-offset: 2px;
     cursor: pointer;
     pointer-events: auto;
 }
+
 .pmd-slot-broken-id-link:hover {
-    color: #8e2a1e;
+    color: var(--store-rush-deeper);
     text-decoration-style: solid;
 }
+
 .pmd-slot-broken-id-sep {
-    color: #ccc;
+    color: var(--gray-300);
 }
+
 .pmd-slot-broken-copy {
-    background: #fff;
-    color: #c0392b;
-    border: 1px solid #c0392b;
+    background: var(--color-surface);
+    color: var(--mockup-detail-red);
+    border: 1px solid var(--mockup-detail-red);
     padding: 1px 8px;
     border-radius: 3px;
     font-size: 10px;
@@ -2031,41 +2117,50 @@ body {
     line-height: 1.4;
     pointer-events: auto;
 }
+
 .pmd-slot-broken-copy:hover {
-    background: #c0392b;
-    color: #fff;
+    background: var(--mockup-detail-red);
+    color: var(--color-on-brand);
 }
+
 .pmd-customer-view .pmd-slot-broken-ids {
     display: none;
 }
+
 .pmd-customer-view .pmd-slot-filled img {
     transition: opacity 0.15s;
 }
+
 .pmd-customer-view .pmd-gallery-slot:hover .pmd-slot-filled img {
     opacity: 0.9;
 }
+
 .pmd-customer-view .pmd-grid {
     grid-template-columns: 1fr;
     max-width: 800px;
     margin: 0 auto;
 }
+
 .pmd-customer-action-panel {
     text-align: center;
     display: flex;
     flex-direction: column;
     align-items: center;
 }
+
 .pmd-customer-prompt {
-    margin: 0 0 8px 0;
+    margin: 0 0 8px;
     font-size: 15px;
-    color: #555;
+    color: var(--print-ink-soft);
 }
+
 .pmd-customer-sent-date {
-    margin: 0 0 16px 0;
+    margin: 0 0 16px;
     font-size: 0.8rem;
-    color: #888;
+    color: var(--mockup-detail-gray-2);
     font-style: italic;
 }
+
 .pmd-pdf-download-btn {
     display: inline-flex;
     align-items: center;
@@ -2073,102 +2168,123 @@ body {
     margin-top: 12px;
     padding: 8px 20px;
     background: transparent;
-    border: 1.5px solid #bbb;
+    border: 1.5px solid var(--mockup-detail-gray-3);
     border-radius: 6px;
-    color: #666;
+    color: var(--mockup-detail-gray);
     font-size: 0.82rem;
     cursor: pointer;
     transition: all 0.15s;
     align-self: center;
 }
+
 .pmd-pdf-download-btn:hover {
-    border-color: #2e7d32;
-    color: #2e7d32;
-    background: #f0f7f0;
+    border-color: var(--store-green-700);
+    background: var(--store-green-50);
 }
+
 .pmd-pdf-download-btn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
 }
+
 .pmd-customer-btns {
     display: flex;
     gap: 12px;
     justify-content: center;
     flex-wrap: wrap;
 }
+
 .pmd-action-btn--lg {
+    /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
     padding: 14px 28px !important;
+    /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
     font-size: 16px !important;
+    /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
     border-radius: 8px !important;
 }
+
 .pmd-action-btn--copy {
-    background: #f0f0f0;
-    color: #333;
-    border: 1px solid #ccc;
+    background: var(--gray-100);
+    color: var(--mockup-detail-gray-dark);
+    border: 1px solid var(--gray-300);
 }
+
 .pmd-action-btn--copy:hover {
-    background: #e0e0e0;
+    background: var(--gray-200);
 }
+
 .pmd-action-btn--supacolor {
-    background: #4a6fa5;
+    background: var(--color-bradley);
     color: white;
 }
+
 .pmd-action-btn--supacolor:hover {
-    background: #33537d;
+    background: var(--color-bradley-dark);
 }
+
 .pmd-action-btn--complete {
-    background: #16a34a;
-    color: #fff;
+    background: var(--mockup-detail-green);
+    color: var(--color-on-brand);
     border: none;
     font-weight: 600;
 }
+
 .pmd-action-btn--complete:hover {
-    background: #15803d;
+    background: var(--mockup-detail-green-2);
 }
+
 .pmd-action-btn--reopen {
-    background: #f59e0b;
-    color: #fff;
+    background: var(--amber-500);
+    color: var(--color-on-brand);
     border: none;
 }
+
 .pmd-action-btn--reopen:hover {
-    background: #d97706;
+    background: var(--amber-600);
 }
+
 /* ── Ruth's Editable Fields ────────────────────────── */
 .pmd-editable-section {
     margin-top: 16px;
     padding-top: 14px;
-    border-top: 2px dashed var(--art-theme-rgba-15, rgba(107,70,193,0.15));
+    border-top: 2px dashed var(--art-theme-rgba-15, rgb(107 70 193 / 15%));
 }
+
 .pmd-editable-header {
     font-size: 0.78rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    color: var(--art-theme, #6B46C1);
+    color: var(--art-theme, var(--color-ruth));
     margin-bottom: 10px;
 }
+
 .pmd-field-row--editable {
     align-items: center;
 }
+
 .pmd-inline-input {
     flex: 1;
     padding: 6px 10px;
     font-size: 0.9rem;
-    border: 1px solid #d1d5db;
+    border: 1px solid var(--gray-300);
     border-radius: 6px;
-    background: #fff;
+    background: var(--color-surface);
     transition: border-color 0.2s, box-shadow 0.2s;
     max-width: 200px;
 }
+
 .pmd-inline-input:focus {
     outline: none;
-    border-color: var(--art-theme, #6B46C1);
-    box-shadow: 0 0 0 2px var(--art-theme-rgba-15, rgba(107,70,193,0.15));
+    border-color: var(--art-theme, var(--color-ruth));
+    box-shadow: 0 0 0 2px var(--art-theme-rgba-15, rgb(107 70 193 / 15%));
 }
+
 .pmd-inline-input.pmd-inline-saved {
-    border-color: #22c55e;
-    box-shadow: 0 0 0 2px rgba(34,197,94,0.15);
+    border-color: var(--mockup-detail-green-3);
+    box-shadow: 0 0 0 2px rgb(34 197 94 / 15%);
 }
+
 .pmd-save-status {
     margin-left: 8px;
     padding: 2px 10px;
@@ -2180,58 +2296,70 @@ body {
     white-space: nowrap;
     align-self: center;
 }
+
 .pmd-save-status:empty {
     display: none;
 }
+
 .pmd-save-status--saving {
-    background: #fef3c7;
-    color: #92400e;
+    background: var(--amber-100);
+    color: var(--amber-800);
 }
+
 .pmd-save-status--saved {
-    background: #d1fae5;
-    color: #065f46;
+    background: var(--mockup-detail-green-tint-2);
+    color: var(--mockup-detail-teal-dark);
     animation: pmd-save-pop 0.3s ease-out;
 }
+
 .pmd-save-status--failed {
-    background: #fee2e2;
-    color: #991b1b;
+    background: var(--red-100);
+    color: var(--red-800);
 }
+
 @keyframes pmd-save-pop {
     0% { transform: scale(0.85); opacity: 0; }
     100% { transform: scale(1); opacity: 1; }
 }
+
 .pmd-thread-input {
+    /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
     max-width: 100% !important;
     width: 100%;
 }
+
 .pmd-thread-input-wrapper {
     position: relative;
     width: 100%;
 }
+
 .pmd-thread-suggestions {
     display: none;
     position: absolute;
     top: 100%;
     left: 0;
     right: 0;
-    background: #fff;
-    border: 1px solid #d1d5db;
+    background: var(--color-surface);
+    border: 1px solid var(--gray-300);
     border-radius: 0 0 6px 6px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 12px rgb(0 0 0 / 10%);
     z-index: 100;
     max-height: 200px;
     overflow-y: auto;
 }
+
 .pmd-thread-suggestion {
     padding: 8px 12px;
     cursor: pointer;
     font-size: 0.88rem;
-    border-bottom: 1px solid #f3f4f6;
+    border-bottom: 1px solid var(--gray-100);
 }
+
 .pmd-thread-suggestion:hover {
-    background: var(--art-theme-bg, #f8f5ff);
-    color: var(--art-theme, #6B46C1);
+    background: var(--art-theme-bg, var(--color-ruth-tint));
+    color: var(--art-theme, var(--color-ruth));
 }
+
 .pmd-thread-suggestion:last-child {
     border-bottom: none;
 }
@@ -2243,12 +2371,13 @@ body {
     gap: 10px;
     margin-bottom: 12px;
 }
+
 .pmd-emb-upload-btn {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    background: var(--art-theme, #6B46C1);
-    color: #fff;
+    background: var(--art-theme, var(--color-ruth));
+    color: var(--color-on-brand);
     border: none;
     padding: 7px 16px;
     border-radius: 6px;
@@ -2257,22 +2386,25 @@ body {
     cursor: pointer;
     transition: background 0.2s, opacity 0.2s;
 }
-.pmd-emb-upload-btn:hover { background: var(--art-theme-dark, #553C9A); }
+.pmd-emb-upload-btn:hover { background: var(--art-theme-dark, var(--color-ruth-dark)); }
 .pmd-emb-upload-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
 .pmd-emb-upload-btn .pmd-emb-spinner {
     display: none;
     width: 14px; height: 14px;
-    border: 2px solid rgba(255,255,255,0.3);
-    border-top-color: #fff;
+    border: 2px solid rgb(255 255 255 / 30%);
+    border-top-color: var(--color-on-brand);
     border-radius: 50%;
     animation: pmd-spin 0.6s linear infinite;
 }
 .pmd-emb-upload-btn.loading .pmd-emb-spinner { display: inline-block; }
 .pmd-emb-upload-btn.loading .pmd-emb-btn-text { display: none; }
+
 @keyframes pmd-spin { to { transform: rotate(360deg); } }
+
 .pmd-emb-filename {
     font-size: 0.78rem;
-    color: #6b7280;
+    color: var(--gray-500);
     font-style: italic;
     max-width: 200px;
     overflow: hidden;
@@ -2285,34 +2417,38 @@ body {
     display: none;
     margin-bottom: 12px;
     padding: 10px 12px;
-    background: var(--art-theme-bg, #f8f5ff);
+    background: var(--art-theme-bg, var(--color-ruth-tint));
     border-radius: 8px;
-    border: 1px solid var(--art-theme-rgba-15, rgba(107,70,193,0.15));
+    border: 1px solid var(--art-theme-rgba-15, rgb(107 70 193 / 15%));
 }
 .pmd-emb-results.active { display: block; }
+
 .pmd-emb-results-header {
     display: flex;
     align-items: center;
     gap: 12px;
     margin-bottom: 8px;
 }
+
 .pmd-emb-preview {
     width: 64px; height: 64px;
     object-fit: contain;
     border-radius: 6px;
-    border: 1px solid #e5e7eb;
-    background: #fff;
+    border: 1px solid var(--gray-200);
+    background: var(--color-surface);
 }
+
 .pmd-emb-stats {
     display: flex;
     flex-direction: column;
     gap: 3px;
     font-size: 0.8rem;
-    color: #374151;
+    color: var(--gray-700);
 }
+
 .pmd-emb-stat-label {
     font-weight: 600;
-    color: var(--art-theme, #6B46C1);
+    color: var(--art-theme, var(--color-ruth));
 }
 
 /* ── Thread Swatches ──────────────────────────────── */
@@ -2324,37 +2460,42 @@ body {
     padding: 8px 0;
 }
 .pmd-thread-swatches.active { display: flex; }
+
 .pmd-thread-swatch {
     display: inline-flex;
     align-items: center;
     gap: 4px;
     font-size: 0.72rem;
-    color: #555;
-    background: #fff;
+    color: var(--print-ink-soft);
+    background: var(--color-surface);
     padding: 3px 8px 3px 4px;
     border-radius: 12px;
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--gray-200);
     line-height: 1.2;
 }
+
 .pmd-thread-swatch-dot {
     width: 12px; height: 12px;
     border-radius: 50%;
-    border: 1px solid rgba(0,0,0,0.15);
+    border: 1px solid rgb(0 0 0 / 15%);
     flex-shrink: 0;
 }
+
 .pmd-thread-swatch-run {
     font-weight: 700;
-    color: #374151;
+    color: var(--gray-700);
     min-width: 14px;
 }
+
 .pmd-thread-swatch-catalog {
     font-family: monospace;
-    color: #9ca3af;
+    color: var(--gray-400);
     font-size: 0.68rem;
 }
+
 .pmd-thread-swatch-stitches {
     font-size: 0.65rem;
-    color: #9ca3af;
+    color: var(--gray-400);
     font-style: italic;
     margin-left: 2px;
 }
@@ -2369,44 +2510,49 @@ body {
     align-items: center;
     gap: 5px;
     padding: 6px 10px;
-    background: rgba(0,0,0,0.55);
+    background: rgb(0 0 0 / 55%);
     border-radius: 0 0 6px 6px;
     z-index: 2;
     flex-wrap: wrap;
 }
+
 .pmd-mini-dot {
     width: 16px;
     height: 16px;
     border-radius: 50%;
-    border: 1.5px solid rgba(255,255,255,0.5);
+    border: 1.5px solid rgb(255 255 255 / 50%);
     flex-shrink: 0;
     cursor: default;
 }
+
 .pmd-mini-dot[title]:hover {
     transform: scale(1.3);
     transition: transform 0.15s;
 }
+
 .pmd-edit-threads-btn {
     margin-left: auto;
-    background: rgba(255,255,255,0.15);
-    border: 1px solid rgba(255,255,255,0.3);
-    color: #fff;
+    background: rgb(255 255 255 / 15%);
+    border: 1px solid rgb(255 255 255 / 30%);
+    color: var(--color-on-brand);
     font-size: 13px;
     padding: 3px 10px;
     border-radius: 8px;
     cursor: pointer;
     line-height: 1.4;
 }
+
 .pmd-edit-threads-btn:hover {
-    background: rgba(255,255,255,0.3);
+    background: rgb(255 255 255 / 30%);
 }
+
 .pmd-add-threads-btn {
     position: absolute;
     bottom: 6px;
     left: 50%;
     transform: translateX(-50%);
-    background: rgba(107,70,193,0.8);
-    color: #fff;
+    background: rgb(107 70 193 / 80%);
+    color: var(--color-on-brand);
     border: none;
     font-size: 11px;
     padding: 3px 10px;
@@ -2414,40 +2560,45 @@ body {
     cursor: pointer;
     z-index: 2;
 }
+
 .pmd-add-threads-btn:hover {
-    background: rgba(107,70,193,1);
+    background: rgb(107 70 193 / 100%);
 }
 
 /* ── Thread Editor Panel (below gallery grid) ──────────────────────── */
 .pmd-thread-editor-container {
     margin-top: 12px;
-    border: 1px solid var(--art-theme-rgba-15, rgba(107,70,193,0.15));
+    border: 1px solid var(--art-theme-rgba-15, rgb(107 70 193 / 15%));
     border-radius: 8px;
-    background: var(--art-theme-bg, #f8f5ff);
+    background: var(--art-theme-bg, var(--color-ruth-tint));
     overflow: hidden;
 }
+
 .pmd-thread-editor-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 8px 12px;
-    background: var(--art-theme, #6B46C1);
-    color: #fff;
+    background: var(--art-theme, var(--color-ruth));
+    color: var(--color-on-brand);
     font-size: 0.82rem;
     font-weight: 600;
 }
+
 .pmd-thread-editor-header button {
-    background: rgba(255,255,255,0.2);
-    border: 1px solid rgba(255,255,255,0.3);
-    color: #fff;
+    background: rgb(255 255 255 / 20%);
+    border: 1px solid rgb(255 255 255 / 30%);
+    color: var(--color-on-brand);
     font-size: 0.75rem;
     padding: 3px 10px;
     border-radius: 6px;
     cursor: pointer;
 }
+
 .pmd-thread-editor-header button:hover {
-    background: rgba(255,255,255,0.35);
+    background: rgb(255 255 255 / 35%);
 }
+
 .pmd-thread-editor-col-headers {
     display: grid;
     grid-template-columns: 32px 28px 1fr auto 60px;
@@ -2455,9 +2606,10 @@ body {
     padding: 4px 12px;
     font-size: 0.7rem;
     font-weight: 600;
-    color: #6b7280;
-    border-bottom: 1px solid rgba(107,70,193,0.1);
+    color: var(--gray-500);
+    border-bottom: 1px solid rgb(107 70 193 / 10%);
 }
+
 .pmd-thread-editor-row {
     display: grid;
     grid-template-columns: 32px 28px 1fr auto 60px;
@@ -2465,68 +2617,80 @@ body {
     padding: 6px 12px;
     align-items: center;
     font-size: 0.8rem;
-    border-bottom: 1px solid rgba(107,70,193,0.06);
+    border-bottom: 1px solid rgb(107 70 193 / 6%);
     cursor: pointer;
     transition: background 0.15s;
 }
+
 .pmd-thread-editor-row:hover {
-    background: rgba(107,70,193,0.06);
+    background: rgb(107 70 193 / 6%);
 }
+
 .pmd-thread-editor-row.modified {
-    background: #fef3c7;
+    background: var(--amber-100);
 }
+
 .pmd-te-run {
     font-weight: 700;
-    color: #374151;
+    color: var(--gray-700);
     text-align: center;
 }
+
 .pmd-te-swatch {
     width: 20px;
     height: 20px;
     border-radius: 50%;
-    border: 1px solid rgba(0,0,0,0.15);
+    border: 1px solid rgb(0 0 0 / 15%);
 }
+
 .pmd-te-name {
-    color: #374151;
+    color: var(--gray-700);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
+
 .pmd-te-catalog {
     font-family: monospace;
     font-size: 0.75rem;
-    color: #9ca3af;
+    color: var(--gray-400);
     text-align: right;
 }
+
 .pmd-te-edit-icon {
-    color: #9ca3af;
+    color: var(--gray-400);
     font-size: 0.75rem;
     text-align: center;
 }
+
 .pmd-thread-editor-actions {
     display: flex;
     gap: 8px;
     padding: 8px 12px;
-    border-top: 1px solid rgba(107,70,193,0.1);
+    border-top: 1px solid rgb(107 70 193 / 10%);
 }
+
 .pmd-thread-editor-actions button {
     font-size: 0.78rem;
     padding: 4px 12px;
     border-radius: 6px;
     cursor: pointer;
-    border: 1px solid #d1d5db;
-    background: #fff;
-    color: #374151;
+    border: 1px solid var(--gray-300);
+    background: var(--color-surface);
+    color: var(--gray-700);
 }
+
 .pmd-thread-editor-actions button:hover {
-    background: #f3f4f6;
+    background: var(--gray-100);
 }
+
 .pmd-thread-editor-actions .pmd-te-save-btn {
-    background: var(--art-theme, #6B46C1);
-    color: #fff;
-    border-color: var(--art-theme, #6B46C1);
+    background: var(--art-theme, var(--color-ruth));
+    color: var(--color-on-brand);
+    border-color: var(--art-theme, var(--color-ruth));
     margin-left: auto;
 }
+
 .pmd-thread-editor-actions .pmd-te-save-btn:hover {
     opacity: 0.9;
 }
@@ -2537,16 +2701,17 @@ body {
     align-items: center;
     gap: 6px;
     padding: 6px 14px;
-    background: #1e293b;
-    color: #fff;
+    background: var(--gray-800);
+    color: var(--color-on-brand);
     border: none;
     border-radius: 6px;
     font-size: 0.8rem;
     cursor: pointer;
     margin-top: 8px;
 }
+
 .pmd-print-thread-sheet-btn:hover {
-    background: #334155;
+    background: var(--gray-700);
 }
 
 .pmd-slot-select-badge {
@@ -2554,7 +2719,7 @@ body {
     bottom: 28px;
     left: 50%;
     transform: translateX(-50%);
-    background: rgba(0,0,0,0.6);
+    background: rgb(0 0 0 / 60%);
     color: white;
     padding: 4px 12px;
     border-radius: 12px;
@@ -2562,55 +2727,68 @@ body {
     pointer-events: none;
     opacity: 0.8;
 }
+
 .pmd-gallery-slot.pmd-slot-selected {
-    outline: 3px solid #059669;
+    outline: 3px solid var(--emerald-600);
     outline-offset: 2px;
     border-radius: 10px;
 }
+
 .pmd-gallery-slot.pmd-slot-selected .pmd-slot-select-badge {
-    background: #059669;
+    background: var(--emerald-600);
     opacity: 1;
 }
+
 .pmd-gallery-slot.pmd-slot-selected .pmd-slot-select-badge::after {
     content: ' \2713 Selected';
 }
+
 .pmd-gallery-slot.pmd-slot-selected .pmd-slot-select-badge {
     font-size: 0;
 }
+
 .pmd-gallery-slot.pmd-slot-selected .pmd-slot-select-badge::after {
     font-size: 11px;
 }
+
 .pmd-customer-thankyou,
 .pmd-customer-confirmation {
     text-align: center;
     padding: 60px 20px;
 }
+
 .pmd-customer-thankyou-icon,
 .pmd-customer-confirmation-icon {
     font-size: 64px;
     margin-bottom: 16px;
 }
+
 .pmd-customer-thankyou h3,
 .pmd-customer-confirmation h2 {
-    margin: 0 0 12px 0;
-    color: #333;
+    margin: 0 0 12px;
+    color: var(--mockup-detail-gray-dark);
 }
+
 .pmd-customer-thankyou p,
 .pmd-customer-confirmation p {
-    color: #666;
+    color: var(--mockup-detail-gray);
     font-size: 15px;
     max-width: 500px;
     margin: 0 auto 8px;
 }
+
 .pmd-customer-company {
     font-weight: 600;
+    /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
     color: var(--art-theme) !important;
+    /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
     margin-top: 16px !important;
 }
+
 .pmd-customer-status-msg {
     text-align: center;
     padding: 30px;
-    color: #888;
+    color: var(--mockup-detail-gray-2);
     font-size: 15px;
 }
 
@@ -2619,33 +2797,38 @@ body {
     aspect-ratio: 2.5 / 1;
     grid-column: 1 / -1;
     border-style: dashed;
-    border-color: #d1d5db;
+    border-color: var(--gray-300);
 }
+
 .pmd-gallery-slot--reference .pmd-slot-empty {
-    background: #f5f5f5;
-    color: #999;
+    background: var(--gray-100);
+    color: var(--print-line);
 }
+
 .pmd-gallery-slot--reference .pmd-slot-empty-icon {
-    color: #bbb;
+    color: var(--mockup-detail-gray-3);
 }
+
 .pmd-gallery-slot--reference:hover {
-    border-color: #aaa;
+    border-color: var(--gray-400);
     box-shadow: none;
 }
 
 /* ── Revision Emphasis ─────────────────────────────── */
 .pmd-gallery-slot--needs-revision {
-    border-color: #f59e0b;
-    box-shadow: 0 0 0 2px rgba(245,158,11,0.2);
+    border-color: var(--amber-500);
+    box-shadow: 0 0 0 2px rgb(245 158 11 / 20%);
 }
+
 .pmd-gallery-slot--needs-revision:hover {
-    border-color: #d97706;
+    border-color: var(--amber-600);
 }
+
 .pmd-slot-revision-badge {
     position: absolute;
     top: 4px;
     left: 4px;
-    background: #f59e0b;
+    background: var(--amber-500);
     color: white;
     padding: 2px 8px;
     border-radius: 4px;
@@ -2660,7 +2843,7 @@ body {
     position: absolute;
     top: 4px;
     right: 4px;
-    background: rgba(0,0,0,0.6);
+    background: rgb(0 0 0 / 60%);
     color: white;
     padding: 2px 8px;
     border-radius: 4px;
@@ -2670,8 +2853,9 @@ body {
     cursor: pointer;
     transition: background 0.15s;
 }
+
 .pmd-slot-version-badge:hover {
-    background: rgba(0,0,0,0.85);
+    background: rgb(0 0 0 / 85%);
 }
 
 .pmd-version-dropdown {
@@ -2680,13 +2864,14 @@ body {
     right: 4px;
     background: white;
     border-radius: 8px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 20px rgb(0 0 0 / 20%);
     z-index: 10;
     min-width: 220px;
     max-height: 240px;
     overflow-y: auto;
     padding: 4px 0;
 }
+
 .pmd-version-item {
     display: flex;
     align-items: center;
@@ -2694,30 +2879,34 @@ body {
     padding: 8px 12px;
     cursor: pointer;
     font-size: 12px;
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid var(--gray-100);
 }
 .pmd-version-item:last-child { border-bottom: none; }
-.pmd-version-item:hover { background: #f5f3ff; }
-.pmd-version-item--current { background: #f0fdf4; }
+.pmd-version-item:hover { background: var(--color-ruth-tint); }
+.pmd-version-item--current { background: var(--brand-50); }
+
 .pmd-version-num {
     font-weight: 700;
     color: var(--art-theme);
     min-width: 20px;
 }
+
 .pmd-version-name {
     flex: 1;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    color: #333;
+    color: var(--mockup-detail-gray-dark);
 }
+
 .pmd-version-date {
-    color: #999;
+    color: var(--print-line);
     font-size: 11px;
     white-space: nowrap;
 }
+
 .pmd-version-current-tag {
-    background: #059669;
+    background: var(--emerald-600);
     color: white;
     padding: 1px 6px;
     border-radius: 3px;
@@ -2737,7 +2926,7 @@ body {
     gap: 8px 16px;
     margin-bottom: 16px;
     padding-bottom: 16px;
-    border-bottom: 1px solid #e5e7eb;
+    border-bottom: 1px solid var(--gray-200);
 }
 
 .pmd-send-info-item {
@@ -2749,28 +2938,28 @@ body {
 .pmd-send-info-label {
     font-size: 11px;
     font-weight: 600;
-    color: #9ca3af;
+    color: var(--gray-400);
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
 
 .pmd-send-info-value {
     font-size: 14px;
-    color: #1f2937;
+    color: var(--gray-800);
     font-weight: 500;
 }
 
 .pmd-send-section-title {
     font-size: 14px;
     font-weight: 600;
-    color: #374151;
-    margin: 0 0 12px 0;
+    color: var(--gray-700);
+    margin: 0 0 12px;
 }
 
 .pmd-send-contact-section {
     margin-bottom: 16px;
     padding-bottom: 16px;
-    border-bottom: 1px solid #e5e7eb;
+    border-bottom: 1px solid var(--gray-200);
 }
 
 .pmd-send-input-group {
@@ -2781,29 +2970,29 @@ body {
     display: block;
     font-size: 13px;
     font-weight: 500;
-    color: #555;
+    color: var(--print-ink-soft);
     margin-bottom: 4px;
 }
 
 .pmd-send-input {
     width: 100%;
     padding: 8px 12px;
-    border: 1px solid #d1d5db;
+    border: 1px solid var(--gray-300);
     border-radius: 6px;
     font-family: inherit;
     font-size: 14px;
-    color: #1f2937;
+    color: var(--gray-800);
     box-sizing: border-box;
 }
 
 .pmd-send-input:focus {
     outline: none;
-    border-color: var(--art-theme, #6B46C1);
-    box-shadow: 0 0 0 2px var(--art-theme-rgba-15, rgba(107,70,193,0.15));
+    border-color: var(--art-theme, var(--color-ruth));
+    box-shadow: 0 0 0 2px var(--art-theme-rgba-15, rgb(107 70 193 / 15%));
 }
 
 .pmd-send-required {
-    color: #dc2626;
+    color: var(--red-600);
     font-weight: 700;
 }
 
@@ -2822,18 +3011,18 @@ body {
     height: 80px;
     object-fit: cover;
     border-radius: 6px;
-    border: 2px solid #e5e7eb;
+    border: 2px solid var(--gray-200);
 }
 
 .pmd-send-preview-label {
     display: block;
     font-size: 11px;
-    color: #6b7280;
+    color: var(--gray-500);
     margin-top: 4px;
 }
 
 .pmd-send-preview-empty {
-    color: #9ca3af;
+    color: var(--gray-400);
     font-size: 13px;
     font-style: italic;
     padding: 12px 0;
@@ -2842,22 +3031,22 @@ body {
 .pmd-send-cc-info {
     margin-top: 12px;
     padding: 10px 12px;
-    background: #f9fafb;
+    background: var(--gray-50);
     border-radius: 6px;
     font-size: 12px;
-    color: #6b7280;
+    color: var(--gray-500);
 }
 
 .pmd-send-cc-info strong {
-    color: #374151;
+    color: var(--gray-700);
 }
 
 /* ── Customer Greeting ──────────────────────────────── */
 .pmd-customer-greeting {
     font-size: 18px;
     font-weight: 500;
-    color: #374151;
-    margin: 0 0 4px 0;
+    color: var(--gray-700);
+    margin: 0 0 4px;
 }
 
 /* ── Customer Approval Elapsed (AE view) ────────────── */
@@ -2867,12 +3056,13 @@ body {
 }
 
 /* ── Responsive ─────────────────────────────────────── */
+
 /* ── Status Timeline ──────────────────────────────────── */
 .pmd-timeline-container {
     margin-bottom: 24px;
     background: white;
     border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    box-shadow: 0 2px 8px rgb(0 0 0 / 6%);
     padding: 20px 24px;
     overflow-x: auto;
 }
@@ -2892,7 +3082,7 @@ body {
     left: 24px;
     right: 24px;
     height: 2px;
-    background: #e0e0e0;
+    background: var(--gray-200);
     z-index: 0;
 }
 
@@ -2910,72 +3100,72 @@ body {
     width: 24px;
     height: 24px;
     border-radius: 50%;
-    border: 3px solid #d1d5db;
+    border: 3px solid var(--gray-300);
     background: white;
     margin-bottom: 8px;
     transition: all 0.3s;
 }
 
 .pmd-step--done .pmd-step-dot {
-    background: #28a745;
-    border-color: #28a745;
+    background: var(--mockup-detail-green-4);
+    border-color: var(--mockup-detail-green-4);
 }
 
 .pmd-step--current .pmd-step-dot {
-    background: #6B46C1;
-    border-color: #6B46C1;
-    box-shadow: 0 0 0 4px rgba(107,70,193,0.2);
+    background: var(--color-ruth);
+    border-color: var(--color-ruth);
+    box-shadow: 0 0 0 4px rgb(107 70 193 / 20%);
     animation: pmd-pulse 2s infinite;
 }
 
 @keyframes pmd-pulse {
-    0%, 100% { box-shadow: 0 0 0 4px rgba(107,70,193,0.2); }
-    50% { box-shadow: 0 0 0 8px rgba(107,70,193,0.1); }
+    0%, 100% { box-shadow: 0 0 0 4px rgb(107 70 193 / 20%); }
+    50% { box-shadow: 0 0 0 8px rgb(107 70 193 / 10%); }
 }
 
 .pmd-step--revision .pmd-step-dot {
-    border-color: #e67e22;
+    border-color: var(--mockup-detail-orange);
 }
 
 .pmd-step--revision.pmd-step--done .pmd-step-dot,
 .pmd-step--revision.pmd-step--current .pmd-step-dot {
-    background: #e67e22;
-    border-color: #e67e22;
-    box-shadow: 0 0 0 4px rgba(230,126,34,0.2);
+    background: var(--mockup-detail-orange);
+    border-color: var(--mockup-detail-orange);
+    box-shadow: 0 0 0 4px rgb(230 126 34 / 20%);
 }
 
 .pmd-step--future .pmd-step-dot {
-    background: #f8f9fa;
+    background: var(--gray-50);
 }
 
 .pmd-step-label {
     font-size: 12px;
     font-weight: 600;
-    color: #666;
+    color: var(--mockup-detail-gray);
     text-align: center;
     line-height: 1.3;
 }
 
 .pmd-step--current .pmd-step-label {
-    color: #6B46C1;
+    color: var(--color-ruth);
     font-weight: 700;
 }
 
 .pmd-step--done .pmd-step-label {
-    color: #333;
+    color: var(--mockup-detail-gray-dark);
 }
 
 .pmd-step--future .pmd-step-label {
-    color: #bbb;
+    color: var(--mockup-detail-gray-3);
 }
 
 .pmd-step--revision .pmd-step-label {
-    color: #e67e22;
+    color: var(--mockup-detail-orange);
 }
 
 .pmd-step-date {
     font-size: 10px;
-    color: #999;
+    color: var(--print-line);
     margin-top: 2px;
     text-align: center;
 }
@@ -2987,43 +3177,50 @@ body {
     gap: 8px;
     margin-top: 6px;
 }
+
 .pmd-dst-upload-btn {
     display: inline-flex;
     align-items: center;
     gap: 6px;
     padding: 6px 14px;
-    background: #1e3a5f;
-    color: #fff;
+    background: var(--mockup-detail-cyan-dark);
+    color: var(--color-on-brand);
     border: none;
     border-radius: 6px;
     font-size: 0.8rem;
     cursor: pointer;
     position: relative;
 }
+
 .pmd-dst-upload-btn:hover {
-    background: #264a75;
+    background: var(--color-bradley-dark);
 }
+
 .pmd-dst-upload-btn.loading .pmd-dst-btn-text {
     opacity: 0.4;
 }
+
 .pmd-dst-upload-btn.loading .pmd-dst-spinner {
     display: block;
 }
+
 .pmd-dst-upload-btn:disabled {
     cursor: wait;
 }
+
 .pmd-dst-spinner {
     display: none;
     width: 14px;
     height: 14px;
-    border: 2px solid rgba(255,255,255,0.3);
-    border-top-color: #fff;
+    border: 2px solid rgb(255 255 255 / 30%);
+    border-top-color: var(--color-on-brand);
     border-radius: 50%;
     animation: pmd-spin 0.6s linear infinite;
 }
+
 .pmd-dst-filename {
     font-size: 0.75rem;
-    color: #6b7280;
+    color: var(--gray-500);
     max-width: 160px;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -3036,8 +3233,8 @@ body {
     bottom: 6px;
     left: 50%;
     transform: translateX(-50%);
-    background: rgba(107,70,193,0.85);
-    color: #fff;
+    background: rgb(107 70 193 / 85%);
+    color: var(--color-on-brand);
     border: none;
     padding: 5px 14px;
     border-radius: 14px;
@@ -3046,11 +3243,13 @@ body {
     cursor: pointer;
     z-index: 3;
     white-space: nowrap;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+    box-shadow: 0 2px 8px rgb(0 0 0 / 25%);
 }
+
 .pmd-generate-elements-btn:hover {
-    background: rgba(107,70,193,1);
+    background: rgb(107 70 193 / 100%);
 }
+
 .pmd-generate-elements-btn:disabled {
     opacity: 0.7;
     cursor: wait;
@@ -3059,9 +3258,9 @@ body {
 /* ── Thread Info Button (in strip) ──────────────────── */
 .pmd-thread-info-btn {
     margin-left: 4px;
-    background: rgba(167,139,250,0.25);
-    border: 1px solid rgba(167,139,250,0.5);
-    color: #d4bfff;
+    background: rgb(167 139 250 / 25%);
+    border: 1px solid rgb(167 139 250 / 50%);
+    color: var(--mockup-detail-indigo-tint);
     font-size: 13px;
     font-weight: 700;
     font-style: italic;
@@ -3077,103 +3276,116 @@ body {
     align-items: center;
     justify-content: center;
 }
+
 .pmd-thread-info-btn:hover {
-    background: rgba(167,139,250,0.45);
-    color: #fff;
+    background: rgb(167 139 250 / 45%);
+    color: var(--color-on-brand);
 }
 
 /* ── Thread Info Popover (click-triggered) ─────────── */
 .pmd-thread-popover {
     position: fixed;
     z-index: 9999;
-    background: #1e1e2e;
-    color: #e5e5e5;
+    background: var(--gray-800);
+    color: var(--gray-200);
     border-radius: 8px;
     padding: 10px 14px;
-    box-shadow: 0 6px 24px rgba(0,0,0,0.35);
+    box-shadow: 0 6px 24px rgb(0 0 0 / 35%);
     min-width: 200px;
     max-width: 380px;
     font-size: 0.78rem;
     pointer-events: auto;
     animation: pmd-pop-in 0.15s ease-out;
 }
+
 @keyframes pmd-pop-in {
     from { opacity: 0; transform: translateY(-4px); }
     to { opacity: 1; transform: translateY(0); }
 }
+
 .pmd-thread-popover-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     margin-bottom: 8px;
 }
+
 .pmd-thread-popover-title {
     font-weight: 700;
     font-size: 0.72rem;
-    color: #a78bfa;
+    color: var(--mockup-detail-indigo-2);
     text-transform: uppercase;
     letter-spacing: 0.3px;
 }
+
 .pmd-thread-popover-close {
     background: none;
     border: none;
-    color: #9ca3af;
+    color: var(--gray-400);
     font-size: 16px;
     cursor: pointer;
     padding: 0 2px;
     line-height: 1;
 }
+
 .pmd-thread-popover-close:hover {
-    color: #fff;
+    color: var(--color-on-brand);
 }
 
 /* ── Apply DST Elements Button ─────────────────────── */
 .pmd-te-apply-dst-btn {
-    background: rgba(167,139,250,0.15);
-    border: 1px solid rgba(167,139,250,0.4);
-    color: #a78bfa;
+    background: rgb(167 139 250 / 15%);
+    border: 1px solid rgb(167 139 250 / 40%);
+    color: var(--mockup-detail-indigo-2);
     font-size: 0.75rem;
     padding: 3px 10px;
     border-radius: 4px;
     cursor: pointer;
     margin-right: 8px;
 }
+
 .pmd-te-apply-dst-btn:hover {
-    background: rgba(167,139,250,0.3);
-    color: #d4bfff;
+    background: rgb(167 139 250 / 30%);
+    color: var(--mockup-detail-indigo-tint);
 }
+
 .pmd-thread-popover-row {
     display: flex;
     align-items: center;
     gap: 8px;
     padding: 3px 0;
-    border-bottom: 1px solid rgba(255,255,255,0.06);
+    border-bottom: 1px solid rgb(255 255 255 / 6%);
 }
+
 .pmd-thread-popover-row:last-child {
     border-bottom: none;
 }
+
 .pmd-thread-popover-dot {
     width: 14px;
     height: 14px;
     border-radius: 50%;
-    border: 1px solid rgba(255,255,255,0.2);
+    border: 1px solid rgb(255 255 255 / 20%);
     flex-shrink: 0;
 }
+
 .pmd-thread-popover-num {
     font-weight: 700;
     width: 18px;
     text-align: center;
-    color: #9ca3af;
+    color: var(--gray-400);
     flex-shrink: 0;
 }
+
 .pmd-thread-popover-name {
     flex: 1;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
+
 .pmd-thread-popover-element {
-    color: #a78bfa;
+    color: var(--mockup-detail-indigo-2);
     font-style: italic;
     font-size: 0.72rem;
     white-space: nowrap;
@@ -3181,56 +3393,63 @@ body {
     text-overflow: ellipsis;
     max-width: 120px;
 }
+
 .pmd-thread-popover-cat {
     font-family: monospace;
     font-size: 0.72rem;
-    color: #6b7280;
+    color: var(--gray-500);
     flex-shrink: 0;
 }
 
 /* ── Customer View: Inline Thread Sequence Box ──────── */
 .pmd-thread-inline-box {
-    background: #f8faf8;
-    border: 1px solid #d1d9d1;
+    background: var(--gray-50);
+    border: 1px solid var(--gray-300);
     border-radius: 8px;
     padding: 10px 14px;
     margin-top: 8px;
 }
+
 .pmd-thread-inline-title {
     font-size: 0.7rem;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    color: #6b7b6b;
+    color: var(--mockup-detail-gray-4);
     margin-bottom: 6px;
 }
+
 .pmd-thread-inline-row {
     display: flex;
     align-items: center;
     gap: 8px;
     padding: 3px 0;
 }
+
 .pmd-thread-inline-dot {
     width: 14px;
     height: 14px;
     border-radius: 50%;
-    border: 1.5px solid rgba(0,0,0,0.15);
+    border: 1.5px solid rgb(0 0 0 / 15%);
     flex-shrink: 0;
 }
+
 .pmd-thread-inline-num {
     font-size: 0.75rem;
-    color: #888;
+    color: var(--mockup-detail-gray-2);
     width: 16px;
     text-align: center;
     flex-shrink: 0;
 }
+
 .pmd-thread-inline-name {
     font-size: 0.85rem;
-    color: #333;
+    color: var(--mockup-detail-gray-dark);
 }
+
 .pmd-thread-inline-element {
     font-size: 0.75rem;
-    color: #4a7a4a;
+    color: var(--mockup-detail-green-5);
     font-style: italic;
     margin-left: auto;
 }
@@ -3240,22 +3459,23 @@ body {
 .pmd-thread-editor-row.pmd-te-has-elements {
     grid-template-columns: 32px 28px 1fr 1fr auto 60px;
 }
+
 .pmd-te-element {
     font-size: 0.75rem;
-    color: #6b7280;
+    color: var(--gray-500);
     font-style: italic;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-@media (max-width: 900px) {
+@media (width <= 900px) {
     .pmd-grid {
         grid-template-columns: 1fr;
     }
 }
 
-@media (max-width: 600px) {
+@media (width <= 600px) {
     .pmd-header { padding: 12px 16px; }
     .pmd-content { padding: 16px 12px; }
     .pmd-gallery-grid { grid-template-columns: repeat(2, 1fr); }
@@ -3266,7 +3486,8 @@ body {
     .pmd-timeline-container { padding: 16px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
     .pmd-timeline-steps { min-width: 400px; }
 }
-@media (max-width: 480px) {
+
+@media (width <= 480px) {
     .pmd-customer-view .pmd-gallery-grid { grid-template-columns: 1fr; }
     .pmd-timeline-steps { min-width: 340px; font-size: 0.7rem; }
 }
@@ -3276,43 +3497,49 @@ body {
     display: flex;
     flex-direction: column;
 }
+
 .pmd-mockup-note-input {
     width: 100%;
     padding: 4px 8px;
     margin-top: 4px;
     font-size: 12px;
     font-family: inherit;
-    color: #374151;
-    background: #f9fafb;
-    border: 1px solid #e2e8f0;
+    color: var(--gray-700);
+    background: var(--gray-50);
+    border: 1px solid var(--slate-200);
     border-radius: 4px;
     outline: none;
     transition: border-color 0.2s;
     box-sizing: border-box;
 }
+
 .pmd-mockup-note-input:focus {
-    border-color: #3b82f6;
-    background: #fff;
+    border-color: var(--color-floor-light);
+    background: var(--color-surface);
 }
+
 .pmd-mockup-note-input::placeholder {
-    color: #9ca3af;
+    color: var(--gray-400);
     font-style: italic;
 }
+
 .pmd-mockup-note-input.pmd-note-saved {
-    border-color: #22c55e;
-    background: #f0fdf4;
+    border-color: var(--mockup-detail-green-3);
+    background: var(--brand-50);
 }
+
 .pmd-mockup-note-input.pmd-note-error {
-    border-color: #ef4444;
-    background: #fef2f2;
+    border-color: var(--mockup-detail-red-3);
+    background: var(--red-50);
 }
+
 .pmd-mockup-note-display {
     margin-top: 4px;
     padding: 3px 8px;
     font-size: 11px;
     font-style: italic;
-    color: #6b7280;
-    background: #f3f4f6;
+    color: var(--gray-500);
+    background: var(--gray-100);
     border-radius: 4px;
     white-space: nowrap;
     overflow: hidden;
@@ -3329,9 +3556,9 @@ body {
     align-items: center;
     gap: 6px;
     padding: 4px 10px 4px 8px;
-    background: #f3f4f6;
-    color: #4b5563;
-    border: 1px solid #d1d5db;
+    background: var(--gray-100);
+    color: var(--gray-600);
+    border: 1px solid var(--gray-300);
     border-radius: 999px;
     font-size: 11.5px;
     font-weight: 700;
@@ -3340,12 +3567,13 @@ body {
     text-transform: uppercase;
     cursor: help;
 }
+
 .pmd-on-hold-pill::before {
     content: "";
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background: #9ca3af;
+    background: var(--gray-400);
     flex: 0 0 6px;
 }
 
@@ -3354,17 +3582,18 @@ body {
     flex-direction: column;
     gap: 8px;
     padding: 8px 12px;
-    background: #f9fafb;
-    border: 1px solid #e5e7eb;
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
     border-radius: 8px;
     transition: background 0.25s ease, border-color 0.25s ease;
     flex: 1 1 auto;
     min-width: 0;
     max-width: 460px;
 }
+
 .pmd-on-hold-bar--active {
-    background: #fffbeb;
-    border-color: #fcd34d;
+    background: var(--store-paper);
+    border-color: var(--mockup-detail-yellow);
 }
 
 .pmd-on-hold-toggle {
@@ -3374,6 +3603,7 @@ body {
     cursor: pointer;
     user-select: none;
 }
+
 .pmd-on-hold-toggle input[type="checkbox"] {
     position: absolute;
     opacity: 0;
@@ -3381,15 +3611,17 @@ body {
     width: 0;
     height: 0;
 }
+
 .pmd-on-hold-slider {
     flex: 0 0 auto;
     position: relative;
     width: 40px;
     height: 22px;
-    background: #d1d5db;
+    background: var(--gray-300);
     border-radius: 999px;
     transition: background 0.2s ease;
 }
+
 .pmd-on-hold-slider::before {
     content: "";
     position: absolute;
@@ -3397,46 +3629,51 @@ body {
     left: 2px;
     width: 18px;
     height: 18px;
-    background: #ffffff;
+    background: var(--color-surface);
     border-radius: 50%;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 1px 3px rgb(0 0 0 / 20%);
     transition: transform 0.2s ease;
 }
-.pmd-on-hold-toggle input:checked + .pmd-on-hold-slider { background: #d97706; }
+.pmd-on-hold-toggle input:checked + .pmd-on-hold-slider { background: var(--amber-600); }
 .pmd-on-hold-toggle input:checked + .pmd-on-hold-slider::before { transform: translateX(18px); }
+
 .pmd-on-hold-toggle input:focus-visible + .pmd-on-hold-slider {
-    outline: 2px solid #3b82f6;
+    outline: 2px solid var(--color-floor-light);
     outline-offset: 2px;
 }
+
 .pmd-on-hold-label {
     font-size: 13.5px;
     font-weight: 600;
-    color: #1f2937;
+    color: var(--gray-800);
 }
-.pmd-on-hold-bar--active .pmd-on-hold-label { color: #92400e; }
+.pmd-on-hold-bar--active .pmd-on-hold-label { color: var(--amber-800); }
 
 .pmd-on-hold-details {
     display: none;
     flex-direction: column;
     gap: 4px;
 }
+
 .pmd-on-hold-details textarea {
     width: 100%;
     padding: 6px 9px;
-    border: 1px solid #d1d5db;
+    border: 1px solid var(--gray-300);
     border-radius: 6px;
-    background: #ffffff;
+    background: var(--color-surface);
     font-family: inherit;
     font-size: 13px;
     line-height: 1.4;
     resize: vertical;
     min-height: 50px;
 }
+
 .pmd-on-hold-details textarea:focus {
     outline: none;
-    border-color: #d97706;
-    box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.15);
+    border-color: var(--amber-600);
+    box-shadow: 0 0 0 3px rgb(217 119 6 / 15%);
 }
+
 .pmd-on-hold-meta {
     display: flex;
     justify-content: space-between;
@@ -3445,9 +3682,10 @@ body {
     font-size: 12px;
     line-height: 1.3;
 }
-.pmd-on-hold-since { color: #6b7280; font-style: italic; }
+.pmd-on-hold-since { color: var(--gray-500); font-style: italic; }
+
 .pmd-on-hold-saved {
-    color: #059669;
+    color: var(--emerald-600);
     font-weight: 600;
     opacity: 0;
     transition: opacity 0.2s ease;
@@ -3465,9 +3703,10 @@ body {
     transition: opacity 0.3s ease;
     pointer-events: none;
 }
+
 .pmd-content--on-hold .pmd-ae-edit-bar,
 .pmd-content--on-hold .pmd-on-hold-bar { opacity: 1; pointer-events: auto; }
 
-@media (max-width: 600px) {
+@media (width <= 600px) {
     .pmd-on-hold-bar { max-width: 100%; }
 }

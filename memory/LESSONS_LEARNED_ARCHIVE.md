@@ -149,6 +149,24 @@ comments, tests, one-off scripts and archives. 🔑 Gate, don't delete, debug lo
 `?debug=1` switch keeps the diagnostics Erik uses without paying for them on every customer load.
 🔑 A generated identifier prefix can start with a digit — check the first character.
 
+## 2026-09-06 — My own host sweep broke the DTF calculator for four deploys, and only a console read caught it (`v2026.09.06.40`)
+
+**Problem.** S3 (`.31`) rewrote `fetch(\`https://HOST/api/x?style=${s}\`)` sites to
+`BASE_URL + '/api/x?style=${s}'` — a single-quoted string — so the DTF calculator fetched the
+`${…}` text literally and 404'd on every load from `.31` to `.39`. 182 suites stayed green
+(no test exercises that adapter against a URL) and the parity suites price through services
+that never hit it.
+**Root cause.** The rewrite's `suffix` branch dropped the literal into `'%s'` regardless of the
+original quote character; a template literal's backtick was in the regex's quote class, so it
+matched, and the replacement lost it.
+**Solution.** Backticks restored on all 7 sites; a lock fails on any complete quoted string
+containing both `/api/` and `${`.
+**Prevention.** 🔑 A scripted rewrite must preserve the ORIGINAL quote character (or refuse
+backtick literals); grep the diff for `'…${` before committing. 🔑 After any sweep that touches
+fetch URLs, read the live console AND the failed-request list on the pages that use them —
+a green suite proves nothing about a URL no test builds. 🔑 Read `performance.getEntriesByType('resource')`
+for `responseStatus >= 400`: it shows the literal URL that went out.
+
 ## Archived 2026-09-06
 
 ## 2026-09-06 — Calculator sweep (`v2026.09.06.9` → `.16`): 8 pages of inline code, 5 shared scripts with hardcoded hosts, and a dead loader

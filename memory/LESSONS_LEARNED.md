@@ -32,24 +32,7 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 ### Final census — 69 dead files, a retired page that still got "fixed" twice, and a lock that pinned a version prefix (2026-09-06, ARCHIVED 2026-09-07, `v2026.09.06.33`–`.34`): check linked + mounted + the `server.js` route (410/301) before "fixing" a page; an orphan census matches the PATH, not the basename; never pin a `?v=` prefix in a test. Full entry in archive.
 ### EmailJS ids in 25 scripts, 118 unlabelled controls, and 12 SEO pages rendering in quirks mode (2026-09-06, ARCHIVED 2026-09-07, `v2026.09.06.36`): EmailJS service/template ids come from `APP_CONFIG`, never a literal; every control gets a label or `aria-label`; a page that starts with a fragment instead of `<!DOCTYPE html>` renders in quirks mode. Full entry in archive.
 ### 700 console.logs in production, and a basename match that hid four stale root copies (2026-09-06, ARCHIVED 2026-09-07, `v2026.09.06.37`): `console.log` in served scripts is gated behind localhost / `?debug=1` (lock in `repo-hygiene-final`); an orphan census must match the PATH, not the basename. Full entry in archive.
-
-## 2026-09-06 — My own host sweep broke the DTF calculator for four deploys, and only a console read caught it (`v2026.09.06.40`)
-
-**Problem.** S3 (`.31`) rewrote `fetch(\`https://HOST/api/x?style=${s}\`)` sites to
-`BASE_URL + '/api/x?style=${s}'` — a single-quoted string — so the DTF calculator fetched the
-`${…}` text literally and 404'd on every load from `.31` to `.39`. 182 suites stayed green
-(no test exercises that adapter against a URL) and the parity suites price through services
-that never hit it.
-**Root cause.** The rewrite's `suffix` branch dropped the literal into `'%s'` regardless of the
-original quote character; a template literal's backtick was in the regex's quote class, so it
-matched, and the replacement lost it.
-**Solution.** Backticks restored on all 7 sites; a lock fails on any complete quoted string
-containing both `/api/` and `${`.
-**Prevention.** 🔑 A scripted rewrite must preserve the ORIGINAL quote character (or refuse
-backtick literals); grep the diff for `'…${` before committing. 🔑 After any sweep that touches
-fetch URLs, read the live console AND the failed-request list on the pages that use them —
-a green suite proves nothing about a URL no test builds. 🔑 Read `performance.getEntriesByType('resource')`
-for `responseStatus >= 400`: it shows the literal URL that went out.
+### My own host sweep broke the DTF calculator for four deploys, and only a console read caught it (2026-09-06, ARCHIVED 2026-09-07, `v2026.09.06.40`): a scripted rewrite must preserve the ORIGINAL quote character (a template literal lost its backticks and fetched `${…}` literally; 182 suites stayed green); after any sweep that touches fetch URLs, read the live console and `performance.getEntriesByType('resource')` for `responseStatus >= 400` on the pages that use them. Full entry in archive.
 
 ## 2026-09-06 — The screen-print tier buttons promised a fee Caspio no longer charges (`v2026.09.06.42`)
 
@@ -270,3 +253,24 @@ stylesheet. (f) Write lint output to a file and read it.
 value is a colour. 🔑 After every automated pass, run the full lint and grep for `var(--[a-z0-9-]+)[A-Za-z_-]`
 before the screenshots; a dropped rule is silent in a browser. 🔑 A substring lock on CSS should pin the
 MEANING (a selector exists, a value is a custom property), not the exact bytes.
+
+## 2026-09-07 — Pages batch: a re-run tokenizer turned its own variables into `--x: var(--x)`
+
+**Problem.** Two sheets had gradient values wrapped onto continuation lines, which the tokenizer's
+"a `:` must precede the hex on its line" guard skips. Joining the lines and re-running the tokenizer on
+those two sheets rewrote the page-theme `:root` block it had written on the first pass: every
+`--customer-portal-yellow: #e6bb4a` became `--customer-portal-yellow: var(--customer-portal-yellow)`,
+a new block re-declared the hexes above it, and the last declaration wins — a self-reference, which a
+browser treats as invalid at computed-value time. Three pages (customer portal, customer product, garment
+designer) would have lost every one-off colour. The lint caught it as `declaration-block-no-duplicate-custom-properties`;
+the screenshot diff would have too.
+**Root cause.** The tokenizer skipped comments but not the `stylelint-disable color-no-hex … enable`
+region it writes, and it named variables fresh on every run instead of reusing the ones already declared.
+**Solution.** The disable/enable region is now skipped like a comment, existing `--<prefix>-*` declarations
+are read first and reused by value, and new names avoid the existing ones; a dry run over a migrated sheet
+reports `0 page vars`. Continuation lines are joined onto their declaration line (`join-continuations.py`)
+before tokenizing — a declaration can span three lines, so join until the line carries the `:`.
+**Prevention.** 🔑 Any script that rewrites a file it may run over again must recognise its own output. 🔑
+Run the tokenizer with `--dry` on an already-migrated sheet before a re-run: the expected report is
+`exact 0 · near 0 · far 0 → 0 page vars`. 🔑 After a re-run, grep `^\s*(--[a-z0-9-]+):\s*var\(\1\)` — a
+self-referencing custom property is silent in the browser and blanks every use of the variable.
