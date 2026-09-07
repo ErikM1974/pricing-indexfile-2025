@@ -3174,7 +3174,8 @@ async function rebuildTdtQuote(colorConfigs, orderSettings, customerData) {
 // Serve product.html routes BEFORE static middleware to avoid conflicts.
 // SEO hybrid-SSR (2026-07-12): when ?style= is present, the static file goes
 // out with a per-product <title>/meta/canonical/OG + Product JSON-LD injected
-// (lib/product-seo.js, 10-min cache) — same pattern as /blog. The client JS
+// (lib/product-seo.js, 60-min cache over the proxy's /api/product-heads catalog
+// map — see that file for why) — same pattern as /blog. The client JS
 // runs unchanged. ANY failure serves the untouched static file (fail-open).
 const productSeo = require('./lib/product-seo');
 const productHtmlPath = path.join(__dirname, 'product.html');
