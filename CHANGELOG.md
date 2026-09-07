@@ -1,3 +1,7 @@
+## v2026.09.06.51 (2026.09.06)
+
+- Deploy v2026.09.06.51: <main> landmark on all 96 served pages that lacked one (70 tag swaps, 26 sibling wraps); fix unclosed .main-container (embroidery calculator) + literal <<placeholder>> text (thank-you-card guide); lock one main per page; screenshot spec takes SHOT_PAGES_FILE
+
 ## v2026.09.06.50 (2026.09.06)
 
 - Quote builders: 196 decorative inline styles → quote-builder-inline.css (state properties stay inline)
