@@ -36,7 +36,7 @@
     padding: 6px 2px;
 }
 
-.spoil-table .color-select:focus { outline: none; background: #f0f7f2; }
+.spoil-table .color-select:focus { outline: none; background: var(--brand-50); }
 
 .loss-total-row {
     display: flex;
@@ -60,7 +60,7 @@
     background: transparent;
 }
 
-.loss-total-row input:focus { outline: none; background: #f0f7f2; }
+.loss-total-row input:focus { outline: none; background: var(--brand-50); }
 
 @media print {
     .form-logo { height: 44px; }

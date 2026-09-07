@@ -112,6 +112,20 @@
         --amber-800: #92400e; /* warning ink (177) */
         --emerald-600: #059669; /* success (105) */
         --blue-600: #2563eb; /* info; also the shop-floor family (86) */
+        --sky-100: #e0f2fe; /* info banner background */
+        --sky-700: #0369a1; /* info banner border */
+        --sky-900: #0c4a6e; /* info banner text */
+
+        /* Print collateral — the fillable forms (pages/forms/) are printed at the counter and their
+           colours were sampled from the official PDF forms (nwca-form-shared.css, 2026-07-11). A screen
+           nudge would print differently, so these stay exact. Use ONLY on printed sheets. */
+        --print-green: #256a42; /* form green: toolbar, section bars, accents (absorbs #2e6f40, d=9) */
+        --print-green-dark: #1c5233; /* headings, dark accents (absorbs #1f4d2c) */
+        --print-ink: #1a1a1a; /* body ink on paper (absorbs the stray #333 / #000 inks) */
+        --print-ink-soft: #555; /* labels, hints (absorbs #4a4a4a, #666) */
+        --print-line: #9aa5a0; /* fill lines, borders */
+        --print-red: #7a1c16; /* waiver / urgent text (absorbs #7f1d1d) */
+        --print-gold: #8a6d1a; /* PCI / tax-certificate notices */
 
         /* Semantic colour — what page rules should reference */
         --color-brand: var(--brand-500);
@@ -138,6 +152,9 @@
         --color-success: var(--emerald-600);
         --color-success-bg: var(--brand-50);
         --color-info: var(--blue-600);
+        --color-info-bg: var(--sky-100);
+        --color-info-line: var(--sky-700);
+        --color-info-ink: var(--sky-900);
 
         /* Space scale (4 / 8 / 12 / 16 / 24 / 32 / 48 / 64 / 96 px) */
         --space-1: 4px;

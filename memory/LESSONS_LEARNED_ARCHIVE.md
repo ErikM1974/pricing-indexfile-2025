@@ -6,6 +6,35 @@ Resolved entries aged out of `LESSONS_LEARNED.md` (300-line cap). Newest first. 
 
 ## Archived 2026-09-07
 
+## 2026-09-06 — Staff pages, the LIVE pass: what a signed-in runtime walk found that 80 static locks had not (`v2026.09.06.26`–`.28`)
+
+**Problem.** Every dashboard-linked page had a static jest lock from the 09-05 sweep, yet a signed-in walk of
+the RUNTIME DOM on teamnwca.com found: 64 inline `onclick`s on the garment designer, 15 handlers rendered by
+the AE dashboard's scripts, `onerror` on every Pride Wall tile, seven shared scripts injecting `<style>` blocks
+on every render, two employee-bundle pages with 230-line inline `<style>`, ~100 undecorated icons in scripts
+whose `class=` was not the first attribute, unversioned shared assets on 20 pages, seven unlabeled AE controls.
+
+**Root cause.** The static locks matched the page HTML and one icon regex shape; anything a script rendered
+after load, any `<i id=… class=…>` ordering, and any JS-injected stylesheet was invisible to them.
+
+**Solution.** One generic runtime probe per page (handlers / bare icons / injected styles / unversioned /
+unnamed buttons / unlabeled inputs / h1), traced to source; `data-call-delegator.js` grew `data-input`,
+`data-open` and `<img data-onerror|data-onload>` modes; injected styles became real stylesheets linked by every
+consumer; lock `staff-live-hygiene.test.js` checks the SCRIPTS that render into pages, not only the pages.
+
+**Prevention.**
+- 🔴 A page lock must also cover the scripts that render into it (`RENDERERS` list) — that is where the
+  handlers and icons live. Grep `<i(?![^>]*aria-hidden)[^>]*class="fa…"` (any attribute order).
+- 🔴 Runtime "bare icon" counts must exclude icons with `aria-label` — the Design Vault's 110 source badges
+  are deliberate, labelled icons, not defects.
+- 🔑 `<style>` elements at runtime on a page that ships none are usually Caspio DataPage embeds (DrainPro,
+  employee bundles, digitized/old designs) or a browser extension (glasp) — check `textContent` before chasing.
+- 🔑 A JS-created control (`document.createElement('input')`) needs its `aria-label` set in code; the template
+  scan will never see it.
+- 🔑 The Mission Control harness drifts whenever its page changes — `node scripts/sync-test-harness.js`.
+- 🔑 The esbuild-hashed dashboard bundle (`dashboard-app.XXXXXXXX.js`, 8 chars) is versioned; a "10-hex"
+  hash regex flags it falsely.
+
 ## 2026-09-06 — Quote builders: finishing Rule 3 meant teaching the shared delegator four more events (`v2026.09.06.19`–`.22`)
 
 **Problem.** The 2026-09-05 review had converted the builders' `onclick=` to `data-call`, but 185 `onchange=` /

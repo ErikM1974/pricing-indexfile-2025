@@ -12,20 +12,20 @@
    ========================================================================== */
 
 :root {
-    --form-green: #256a42;
-    --form-green-dark: #1c5233;
-    --ink: #1a1a1a;
-    --ink-soft: #555;
-    --line: #9aa5a0;
-    --paper: #ffffff;
+    --form-green: var(--print-green);
+    --form-green-dark: var(--print-green-dark);
+    --ink: var(--print-ink);
+    --ink-soft: var(--print-ink-soft);
+    --line: var(--print-line);
+    --paper: var(--color-surface);
 }
 
 * { box-sizing: border-box; }
 
 body {
     margin: 0;
-    font-family: 'Inter', -apple-system, 'Segoe UI', sans-serif;
-    background: #eef1ef;
+    font-family: Inter, -apple-system, 'Segoe UI', sans-serif;
+    background: var(--gray-100);
     color: var(--ink);
 }
 
@@ -41,12 +41,12 @@ body {
     gap: 12px;
     padding: 10px 16px;
     background: var(--form-green);
-    color: #fff;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    color: var(--color-on-brand);
+    box-shadow: 0 2px 6px rgb(0 0 0 / 15%);
 }
 
 .toolbar-link {
-    color: #fff;
+    color: var(--color-on-brand);
     text-decoration: none;
     font-weight: 600;
     font-size: 0.9rem;
@@ -62,9 +62,9 @@ body {
     gap: 6px;
     padding: 8px 14px;
     border-radius: 6px;
-    border: 1px solid rgba(255, 255, 255, 0.7);
+    border: 1px solid rgb(255 255 255 / 70%);
     background: transparent;
-    color: #fff;
+    color: var(--color-on-brand);
     font: inherit;
     font-size: 0.875rem;
     font-weight: 600;
@@ -72,22 +72,22 @@ body {
     text-decoration: none;
 }
 
-.toolbar-btn--ghost:hover { background: rgba(255, 255, 255, 0.12); }
+.toolbar-btn--ghost:hover { background: rgb(255 255 255 / 12%); }
 
 .toolbar-btn--primary {
-    background: #fff;
+    background: var(--color-surface);
     color: var(--form-green-dark);
-    border-color: #fff;
+    border-color: var(--color-on-brand);
 }
 
-.toolbar-btn--primary:hover { background: #e9f3ec; }
+.toolbar-btn--primary:hover { background: var(--brand-100); }
 
 .toolbar-btn--save {
-    background: rgba(255, 255, 255, 0.18);
-    border-color: #fff;
+    background: rgb(255 255 255 / 18%);
+    border-color: var(--color-on-brand);
 }
 
-.toolbar-btn--save:hover { background: rgba(255, 255, 255, 0.3); }
+.toolbar-btn--save:hover { background: rgb(255 255 255 / 30%); }
 
 .toolbar-btn:disabled { opacity: 0.6; cursor: default; }
 
@@ -106,15 +106,15 @@ body {
 .form-save-banner--wide { max-width: 11in; }
 
 .form-save-banner--ok {
-    background: #e9f3ec;
+    background: var(--brand-100);
     border-color: var(--form-green);
     color: var(--form-green-dark);
 }
 
 .form-save-banner--error {
-    background: #fdecea;
-    border-color: #b91c1c;
-    color: #7f1d1d;
+    background: var(--red-50);
+    border-color: var(--red-700);
+    color: var(--print-red);
 }
 
 /* ---------- The sheet ---------- */
@@ -124,7 +124,7 @@ body {
     margin: 24px auto 48px;
     padding: 0.45in 0.5in;
     background: var(--paper);
-    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 4px 18px rgb(0 0 0 / 12%);
 }
 
 /* Landscape forms (name list, sample checkout) get a wider sheet on screen. */
@@ -163,7 +163,7 @@ body {
 .section-bar {
     display: inline-block;
     background: var(--form-green);
-    color: #fff;
+    color: var(--color-on-brand);
     font-weight: 700;
     font-size: 0.8rem;
     letter-spacing: 0.06em;
@@ -175,7 +175,7 @@ body {
 .form-section > .info-grid,
 .form-section > .decoration-row {
     border: 1.5px solid var(--form-green);
-    border-radius: 0 4px 4px 4px;
+    border-radius: 0 4px 4px;
     padding: 12px 14px;
 }
 
@@ -183,8 +183,7 @@ body {
 .info-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    column-gap: 28px;
-    row-gap: 10px;
+    gap: 10px 28px;
 }
 
 .info-grid--cols4 { grid-template-columns: repeat(4, 1fr); }
@@ -222,7 +221,7 @@ body {
 .notes-area:focus,
 .signature-field input:focus {
     outline: none;
-    background: #f0f7f2;
+    background: var(--brand-50);
 }
 
 /* ---------- Checkbox rows ---------- */
@@ -277,7 +276,7 @@ body {
 }
 
 .form-table th {
-    background: #e4e6e5;
+    background: var(--gray-200);
     font-size: 0.72rem;
     font-weight: 700;
     padding: 6px 4px;
@@ -302,17 +301,17 @@ body {
     font-size: 0.8rem;
     font-weight: 600;
     padding: 7px 2px;
-    background: #f3f5f4;
+    background: var(--gray-100);
 }
 
 /* hide number spinners so cells print clean */
 .form-table input[type="number"]::-webkit-outer-spin-button,
 .form-table input[type="number"]::-webkit-inner-spin-button {
-    -webkit-appearance: none;
+    appearance: none;
     margin: 0;
 }
 
-.form-table input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
+.form-table input[type="number"] { appearance: textfield; }
 
 .cell-total input { font-weight: 700; }
 
@@ -323,14 +322,14 @@ body {
     background: transparent;
 }
 
-.add-row-btn:hover { background: #e9f3ec; }
+.add-row-btn:hover { background: var(--brand-100); }
 
 /* ---------- Free-text areas ---------- */
 
 .notes-area {
     width: 100%;
     border: 1.5px solid var(--form-green);
-    border-radius: 0 4px 4px 4px;
+    border-radius: 0 4px 4px;
     font: inherit;
     font-size: 0.9rem;
     padding: 10px 12px;
@@ -457,8 +456,8 @@ body {
     border: 1.5px solid;
 }
 
-.intel-banner--warning { background: #fef3c7; border-color: #b45309; color: #7c2d12; }
-.intel-banner--info { background: #e0f2fe; border-color: #0369a1; color: #0c4a6e; }
+.intel-banner--warning { background: var(--amber-100); border-color: var(--amber-700); color: var(--amber-800); }
+.intel-banner--info { background: var(--color-info-bg); border-color: var(--color-info-line); color: var(--color-info-ink); }
 
 /* ---------- Customer-lookup dropdown (nwca-form-contacts.js) ---------- */
 
@@ -470,10 +469,10 @@ body {
     left: 0;
     right: 0;
     z-index: 20;
-    background: #fff;
+    background: var(--color-surface);
     border: 1.5px solid var(--form-green);
     border-radius: 0 0 6px 6px;
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+    box-shadow: 0 6px 18px rgb(0 0 0 / 18%);
     max-height: 280px;
     overflow-y: auto;
 }
@@ -482,15 +481,15 @@ body {
     padding: 8px 12px;
     font-size: 0.9rem;
     cursor: pointer;
-    border-top: 1px solid #eef1ef;
+    border-top: 1px solid var(--gray-100);
 }
 
-.contacts-row--company { background: #f7faf8; }
+.contacts-row--company { background: var(--gray-50); }
 
 .contacts-row--contact { padding-left: 28px; }
 
 .contacts-row.is-active,
-.contacts-row:hover { background: #e9f3ec; }
+.contacts-row:hover { background: var(--brand-100); }
 
 .contacts-row--empty {
     color: var(--ink-soft);
@@ -501,6 +500,7 @@ body {
 .contacts-muted { color: var(--ink-soft); font-weight: 400; font-size: 0.82em; }
 
 @media print {
+    /* stylelint-disable-next-line declaration-no-important -- the dropdown is opened by a higher-specificity class; print must always win */
     .contacts-dropdown { display: none !important; }
 }
 
@@ -526,7 +526,7 @@ body {
     height: 16px;
     border-radius: 3px;
     border: 1px solid var(--line);
-    background-color: #f3f4f6;
+    background-color: var(--gray-100);
     background-size: cover;
     background-position: center;
 }
@@ -546,10 +546,10 @@ body {
     max-width: 330px;
     max-height: 280px;
     overflow-y: auto;
-    background: #fff;
+    background: var(--color-surface);
     border: 1.5px solid var(--form-green);
     border-radius: 6px;
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+    box-shadow: 0 6px 18px rgb(0 0 0 / 18%);
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 2px;
@@ -574,7 +574,7 @@ body {
     text-align: left;
 }
 
-.swatch-cell:hover { background: #e9f3ec; }
+.swatch-cell:hover { background: var(--brand-100); }
 
 .swatch-cell .swatch-chip { width: 20px; height: 20px; }
 
@@ -588,10 +588,11 @@ body {
     grid-column: 1 / -1;
     justify-content: center;
     color: var(--ink-soft);
-    border-top: 1px solid #eef1ef;
+    border-top: 1px solid var(--gray-100);
 }
 
 @media print {
+    /* stylelint-disable-next-line declaration-no-important -- the swatch grid is toggled by JS; print must always win */
     .swatch-grid { display: none !important; }
     .swatch-btn { padding: 5px 2px; }
     .swatch-btn .swatch-chip { display: none; }
@@ -614,15 +615,17 @@ body {
     font-weight: 700;
 }
 
-.size-chip input {
-    width: 34px !important;
-    border: 1px solid var(--line) !important;
+/* the second selector outranks .form-table td input (0,2,1), so no !important is needed (2026-09-07) */
+.size-chip input,
+.form-table td .size-chip input {
+    width: 34px;
+    border: 1px solid var(--line);
     border-radius: 3px;
     text-align: center;
-    padding: 3px 2px !important;
+    padding: 3px 2px;
 }
 
-.size-chip--upcharge label { color: #b45309; }
+.size-chip--upcharge label { color: var(--amber-700); }
 
 /* ---------- Footer ---------- */
 
@@ -641,22 +644,23 @@ body {
 
 /* ---------- Mobile ---------- */
 
-@media (max-width: 700px) {
+@media (width <= 700px) {
     .form-sheet { padding: 20px 14px; margin: 12px 8px 32px; }
     .info-grid, .info-grid--cols4 { grid-template-columns: 1fr; }
     .signature-row { grid-template-columns: 1fr 1fr; }
     .form-table { font-size: 0.75rem; }
 }
 
-@media (min-width: 701px) and (max-width: 1000px) {
+@media (width >= 701px) and (width <= 1000px) {
     .info-grid--cols4 { grid-template-columns: 1fr 1fr; }
 }
 
 /* ---------- Print (orientation via per-form @page) ---------- */
 
 @media print {
-    body { background: #fff; }
+    body { background: var(--color-surface); }
 
+    /* stylelint-disable-next-line declaration-no-important -- screen-only chrome must never print, whatever else styles it */
     .no-print { display: none !important; }
 
     .form-sheet,
@@ -678,7 +682,7 @@ body {
 
     .form-logo { height: 52px; }
     .form-title { font-size: 1.45rem; }
-    .waiver-box, .signature-row, .form-footer { page-break-inside: avoid; }
+    .waiver-box, .signature-row, .form-footer { break-inside: avoid; }
 
     .notes-area { min-height: 0.9in; resize: none; }
 

@@ -24,6 +24,17 @@ export default {
         'declaration-no-important': [true, { message: '!important is reserved for the generated quote-builder-inline.css' }],
         // font names are proper nouns (Inter, Menlo, BlinkMacSystemFont) — lower-casing them is noise, not consistency
         'value-keyword-case': ['lower', { ignoreProperties: ['font-family', 'font', '/^--font-/'] }],
+        // compact one-line rules (`.x { a: 1; b: 2; }`) are this repo's house style; reflowing thousands of them is
+        // churn, not consistency. The auto-fixable formatting rules of the standard config stay on.
+        'declaration-block-single-line-max-declarations': null,
+        // Satisfying this rule means REORDERING rules, which changes the cascade — the one thing a pixel-verified
+        // migration must not do. Specificity order is reviewed per family in the screenshot diff instead.
+        'no-descending-specificity': null,
+        // ids are camelCase across the legacy pages AND their scripts (getElementById); renaming is an HTML+JS
+        // change, not a CSS one. New pages use kebab-case ids by convention (templates/page-template.html).
+        'selector-id-pattern': null,
+        // `clip: rect(0 0 0 0)` is the canonical visually-hidden (.sr-only) pattern; clip-path is not a byte-identical swap
+        'property-no-deprecated': [true, { ignoreProperties: ['clip'] }],
         // kebab-case classes, BEM block__element--modifier allowed (the dashboard already uses ws-card--wide)
         'selector-class-pattern': [
             '^[a-z][a-z0-9]*(?:-[a-z0-9]+)*(?:__[a-z0-9]+(?:-[a-z0-9]+)*)?(?:--[a-z0-9]+(?:-[a-z0-9]+)*)?$',

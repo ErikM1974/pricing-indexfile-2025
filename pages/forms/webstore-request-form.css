@@ -4,10 +4,10 @@
 
 .assist-hint {
     font-size: 0.82rem;
-    color: #555;
+    color: var(--print-ink-soft);
     margin: 6px 0 8px;
 }
-.assist-hint .fa-wand-magic-sparkles { color: #2e6f40; margin-right: 4px; }
+.assist-hint .fa-wand-magic-sparkles { color: var(--print-green); margin-right: 4px; }
 
 .store-table .col-style { width: 14%; }
 .store-table .col-color { width: 18%; }
