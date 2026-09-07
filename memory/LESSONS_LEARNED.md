@@ -29,28 +29,7 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 ### Quote builders: finishing Rule 3 meant teaching the shared delegator four more events (2026-09-06, ARCHIVED 2026-09-07, `v2026.09.06.19`–`.22`): 185 inline change/input/blur/keydown/error handlers → `data-change`/`-input`/`-blur`/`-keydown`/`-enter`/`data-onerror` in the ONE shared delegator (`quote-builder-utils.js`, Rule 8); never add an `sr-only` h1 to the builders (axe baselines fail); gate a top-of-file `window.location` read for window-less tests; catch concatenated icon classes at runtime. Full entry in archive.
 ### Staff pages, the LIVE pass — what a signed-in runtime walk found that 80 static locks had not (2026-09-06, ARCHIVED 2026-09-07, `v2026.09.06.26`–`.28`): a page lock must also cover the scripts that render into it (`RENDERERS`); runtime bare-icon counts must exclude `aria-label` icons; a runtime `<style>` on a page that ships none is a Caspio DataPage embed; JS-created controls get their `aria-label` in code; the Mission Control harness drifts with its page (`node scripts/sync-test-harness.js`); the hashed dashboard bundle is versioned. Full entry in archive.
 ### Rule 6 sweep S3 — 118 scripts still guessed the proxy host, and two unit tests had been hitting the live API (2026-09-06, ARCHIVED 2026-09-07, `v2026.09.06.31`): every proxy URL comes from `APP_CONFIG.API.BASE_URL` with a VISIBLE failure when it is missing; a scripted rewrite must keep the ORIGINAL quote character; `tests/setup.js`'s fetch stub never installs on Node 18+ (native fetch) — stub `global.fetch` per test. Full entry in archive.
-
-## 2026-09-06 — Final census (`v2026.09.06.33`–`.34`): 69 dead files, a retired page that still got "fixed" twice, and a lock that pinned a version prefix
-
-**Problem.** After five sweeps the tree still held 35 browser scripts nobody loads (oldest untouched since
-2025-06), 11 design mockups, 8 pre-Caspio policy pages with no static mount, and a C112 promo page that
-`server.js` answers with a 410 — yet the S2 batch had extracted its inline code and S3 had converted its host
-literal. A lock (`office-ops-pages`) failed the day after it was written because it matched `?v=2026.09.05.7x`
-and the deploy bumped the version.
-**Root cause.** No repo-wide reference count existed; every sweep worked from a linked-page list, so a file
-that nothing links was invisible until a directory scan pulled it in — and then it got "cleaned" instead of
-deleted. Reachability was never checked against `server.js` (a route can retire a page that the file
-system still shows as live).
-**Solution.** `repo-hygiene-final.test.js`: every served page is Rule-3 clean, every browser script has a
-referrer (page, script, `server.js`, build), and the census's dead list stays unreferenced. The deletion
-itself is a human `git rm` (`memory/DEAD_FILES_2026-09-06.md`) — the agent's bulk removal is blocked by
-policy, correctly. Version assertions compare numerically (≥ a floor), never a prefix.
-**Prevention.** 🔑 Before fixing a page, check three things: is it linked, is it mounted, and does a
-`server.js` route override it (410/301/redirect) — a file on disk is not a live page. 🔑 A referrer census
-must exclude `tests/`, `scripts/` (one-off Node), and `/archive/` — those "references" kept dead files
-alive for a year. 🔑 Rendered markup is only visible at runtime: the forms' shared scripts added 5 bare icons
-per page that 18 static locks passed; probe the DOM after load, then add the renderer to the lock.
-🔑 Never pin a cache-bust version prefix in a test; the next deploy bumps it.
+### Final census — 69 dead files, a retired page that still got "fixed" twice, and a lock that pinned a version prefix (2026-09-06, ARCHIVED 2026-09-07, `v2026.09.06.33`–`.34`): check linked + mounted + the `server.js` route (410/301) before "fixing" a page; an orphan census matches the PATH, not the basename; never pin a `?v=` prefix in a test. Full entry in archive.
 
 ## 2026-09-06 — EmailJS ids in 25 scripts, 118 unlabelled controls, and 12 SEO pages rendering in quirks mode (`v2026.09.06.36`)
 
@@ -265,3 +244,21 @@ screen shots were clean. 🔑 A byte-identical rule shared by N pages is a compo
 family sheet linked before the page sheet, then re-theme it ONCE (ten maroon training headers → the
 Training Center's green in one rule). 🔑 Admin pages cannot be screenshotted by the e2e spec (its session
 is role `staff`) — verify them live.
+
+## 2026-09-07 — Webstore family (`v2026.09.07.8`): a push that "succeeded", and variables a sheet did not need
+
+**Problem.** (a) My deploy helper ran `git push … 2>&1 | tail -2` and tested the pipeline's status — `tail`'s.
+A reset connection printed `fatal:` and the helper reported success; `origin/main` was a release behind while
+Heroku and the tag were current. Caught by asking the remote (`git ls-remote origin refs/heads/main`) before
+the next step. (b) `golf-tournament-showcase.css` (15 SEO pages) declared its own `--gray-50…900`; with
+`tokens.css` now loading first, a same-named token silently loses to the page's copy on those pages — a
+latent trap for every semantic alias built on `--gray-*`. (c) `stylelint --fix` dropped `-webkit-` prefixes
+and left `backdrop-filter`/`appearance`/`background-clip` declared twice.
+**Root cause.** (a) A pipe returns the LAST command's status. (b) Every sheet minted its own palette; the
+names collided with the canonical ones. (c) The prefix fixer does not dedupe.
+**Solution.** (a) `if git push … > log 2>&1; then` — or `set -o pipefail`; the deploy skill's own steps
+have no pipe. (b) Compare values: identical → delete the page copy; different → rename with the sheet's
+prefix (`--gts-*`). (c) A dedupe pass after every `--fix`.
+**Prevention.** 🔑 Verify a push by reading the remote, never by the push's printed lines. 🔑 Before linking
+`tokens.css` to a page, grep its sheets for `--gray-|--space-|--radius-|--font-` definitions — a same-named
+local variable shadows the token on that page. 🔑 `--fix` then dedupe then lint again.

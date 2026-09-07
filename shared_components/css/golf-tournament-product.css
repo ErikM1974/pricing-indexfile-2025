@@ -4,6 +4,16 @@
    Loads ON TOP OF golf-tournament-showcase.css (shares variables, header, footer, hero CTA, loading-state)
    ============================================================ */
 
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue so the page
+   keeps its exact look. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   every rule below uses var(). Raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
+:root {
+    --gtp-yellow: #fbbf24;
+    --gtp-red: #ef4444;
+}
+/* stylelint-enable color-no-hex */
+
 /* ============================================================
    Breadcrumb
    ============================================================ */
@@ -72,7 +82,7 @@
     align-items: start;
 }
 
-@media (max-width: 880px) {
+@media (width <= 880px) {
     .product-detail__hero {
         grid-template-columns: 1fr;
         gap: 2rem;
@@ -164,7 +174,7 @@
 }
 
 .product-info__name {
-    font-family: 'Poppins', sans-serif;
+    font-family: Poppins, sans-serif;
     font-size: clamp(1.5rem, 3vw, 2.125rem);
     font-weight: 700;
     line-height: 1.15;
@@ -174,7 +184,7 @@
 }
 
 .product-info__price-card {
-    background: linear-gradient(135deg, var(--primary-light) 0%, #ffffff 100%);
+    background: linear-gradient(135deg, var(--primary-light) 0%, var(--color-surface) 100%);
     border: 2px solid var(--primary);
     border-radius: var(--radius-lg);
     padding: 1.25rem 1.5rem;
@@ -194,7 +204,7 @@
 }
 
 .product-info__price-value {
-    font-family: 'Poppins', sans-serif;
+    font-family: Poppins, sans-serif;
     font-size: 2.25rem;
     font-weight: 800;
     color: var(--primary-dark);
@@ -215,12 +225,13 @@
     line-height: 1.4;
 }
 
-@media (max-width: 540px) {
+@media (width <= 540px) {
     .product-info__price-card {
         flex-direction: column;
         align-items: flex-start;
         gap: 0.5rem;
     }
+
     .product-info__price-note {
         margin-left: 0;
         text-align: left;
@@ -243,9 +254,9 @@
     margin: 1.25rem 0 1.75rem;
     border-radius: var(--radius-lg);
     overflow: hidden;
-    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #fbbf24 100%);
+    background: linear-gradient(135deg, var(--gtp-yellow) 0%, var(--amber-500) 50%, var(--gtp-yellow) 100%);
     background-size: 200% 200%;
-    box-shadow: 0 12px 32px rgba(245, 158, 11, 0.35), 0 0 0 1px rgba(217, 119, 6, 0.3) inset;
+    box-shadow: 0 12px 32px rgb(245 158 11 / 35%), 0 0 0 1px rgb(217 119 6 / 30%) inset;
     animation: bonus-glow 4s ease-in-out infinite;
 }
 
@@ -260,7 +271,7 @@
     left: -100%;
     width: 50%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.45), transparent);
+    background: linear-gradient(90deg, transparent, rgb(255 255 255 / 45%), transparent);
     animation: bonus-shimmer 3.5s ease-in-out infinite;
     pointer-events: none;
     z-index: 1;
@@ -274,7 +285,7 @@
 .bonus-callout__inner {
     position: relative;
     z-index: 2;
-    background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+    background: linear-gradient(135deg, var(--store-paper) 0%, var(--amber-100) 100%);
     margin: 4px;
     padding: 1.5rem 1.5rem 1.25rem;
     border-radius: calc(var(--radius-lg) - 4px);
@@ -287,7 +298,7 @@
     font-size: 3rem;
     line-height: 1;
     flex-shrink: 0;
-    filter: drop-shadow(0 4px 8px rgba(217, 119, 6, 0.4));
+    filter: drop-shadow(0 4px 8px rgb(217 119 6 / 40%));
     animation: bonus-bounce 2.5s ease-in-out infinite;
 }
 
@@ -301,7 +312,7 @@
 .bonus-callout__eyebrow {
     font-size: 0.75rem;
     font-weight: 800;
-    color: #92400e;
+    color: var(--amber-800);
     letter-spacing: 0.12em;
     margin-bottom: 0.5rem;
     display: flex;
@@ -325,18 +336,17 @@
 }
 
 .bonus-callout__headline {
-    font-family: 'Poppins', sans-serif;
+    font-family: Poppins, sans-serif;
     font-size: clamp(1.25rem, 2.3vw, 1.75rem);
     font-weight: 800;
     line-height: 1.15;
-    color: #1a472a;
+    color: var(--brand-800);
     margin-bottom: 0.75rem;
     letter-spacing: -0.01em;
 }
 
 .bonus-callout__free {
-    background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
-    -webkit-background-clip: text;
+    background: linear-gradient(135deg, var(--amber-600) 0%, var(--amber-700) 100%);
     background-clip: text;
     color: transparent;
     -webkit-text-fill-color: transparent;
@@ -344,17 +354,17 @@
     font-size: 1.2em;
     text-transform: uppercase;
     letter-spacing: 0.02em;
-    text-shadow: 0 2px 8px rgba(217, 119, 6, 0.25);
+    text-shadow: 0 2px 8px rgb(217 119 6 / 25%);
 }
 
 .bonus-callout__sub {
-    color: #374151;
+    color: var(--gray-700);
     font-size: 0.9375rem;
     line-height: 1.55;
     margin-bottom: 0.875rem;
 }
 
-.bonus-callout__sub strong { color: #1a472a; }
+.bonus-callout__sub strong { color: var(--brand-800); }
 
 .bonus-callout__perks {
     display: flex;
@@ -367,34 +377,34 @@
     display: inline-flex;
     align-items: center;
     gap: 0.375rem;
-    background: rgba(255, 255, 255, 0.6);
+    background: rgb(255 255 255 / 60%);
     padding: 0.3rem 0.75rem;
     border-radius: 9999px;
     font-size: 0.8125rem;
     font-weight: 600;
-    color: #1a472a;
-    border: 1px solid rgba(217, 119, 6, 0.25);
+    color: var(--brand-800);
+    border: 1px solid rgb(217 119 6 / 25%);
 }
 
 .bonus-callout__cta {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    background: linear-gradient(135deg, #1a472a 0%, #2d5a3d 100%);
-    color: #ffffff;
+    background: linear-gradient(135deg, var(--brand-800) 0%, var(--print-green) 100%);
+    color: var(--color-on-brand);
     padding: 0.875rem 1.75rem;
     border-radius: 9999px;
     text-decoration: none;
     font-weight: 700;
     font-size: 1rem;
-    box-shadow: 0 6px 18px rgba(26, 71, 42, 0.4);
+    box-shadow: 0 6px 18px rgb(26 71 42 / 40%);
     transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
 }
 
 .bonus-callout__cta:hover {
     transform: translateY(-2px);
-    box-shadow: 0 10px 24px rgba(26, 71, 42, 0.5);
-    background: linear-gradient(135deg, #2d5a3d 0%, #3a7d44 100%);
+    box-shadow: 0 10px 24px rgb(26 71 42 / 50%);
+    background: linear-gradient(135deg, var(--print-green) 0%, var(--store-green-700) 100%);
 }
 
 .bonus-callout__cta span {
@@ -407,18 +417,18 @@
 .bonus-callout__deadline {
     margin-top: 0.875rem;
     font-size: 0.75rem;
-    color: #6b7280;
+    color: var(--gray-500);
     font-style: italic;
     line-height: 1.5;
 }
 
 .bonus-callout__deadline strong {
-    color: #92400e;
+    color: var(--amber-800);
     font-weight: 700;
     font-style: normal;
 }
 
-@media (max-width: 540px) {
+@media (width <= 540px) {
     .bonus-callout__inner {
         flex-direction: column;
         gap: 0.75rem;
@@ -540,7 +550,7 @@
 
 .size-pill--upcharge {
     border-color: var(--gold);
-    background: #fef9e7;
+    background: var(--store-rush-soft);
     position: relative;
 }
 
@@ -609,7 +619,7 @@
 }
 
 .volume-pricing__title {
-    font-family: 'Poppins', sans-serif;
+    font-family: Poppins, sans-serif;
     font-size: 1.5rem;
     font-weight: 700;
     color: var(--gray-900);
@@ -674,7 +684,7 @@
 }
 
 .volume-pricing__table .tier-label { font-weight: 600; color: var(--gray-700); text-align: left; padding-left: 1.5rem; }
-.volume-pricing__table .tier-price { font-family: 'Poppins', sans-serif; font-weight: 700; color: var(--gray-900); font-size: 1rem; }
+.volume-pricing__table .tier-price { font-family: Poppins, sans-serif; font-weight: 700; color: var(--gray-900); font-size: 1rem; }
 .volume-pricing__table .tier-ltm-yes { color: var(--gold); font-size: 0.8125rem; font-weight: 600; }
 .volume-pricing__table .tier-ltm-no { color: var(--primary); font-size: 0.8125rem; font-weight: 600; }
 
@@ -707,7 +717,7 @@
 }
 
 .cta-band__title {
-    font-family: 'Poppins', sans-serif;
+    font-family: Poppins, sans-serif;
     font-size: 1.5rem;
     font-weight: 700;
     margin-bottom: 0.375rem;
@@ -715,11 +725,11 @@
 }
 
 .cta-band__sub {
-    color: rgba(255,255,255,0.85);
+    color: rgb(255 255 255 / 85%);
     font-size: 0.9375rem;
 }
 
-@media (max-width: 720px) {
+@media (width <= 720px) {
     .cta-band__inner { flex-direction: column; text-align: center; }
 }
 
@@ -734,12 +744,12 @@
 
 .product-error__icon {
     font-size: 3rem;
-    color: var(--accent-red, #ef4444);
+    color: var(--accent-red, var(--gtp-red));
     margin-bottom: 1rem;
 }
 
 .product-error__title {
-    font-family: 'Poppins', sans-serif;
+    font-family: Poppins, sans-serif;
     font-size: 1.5rem;
     color: var(--gray-900);
     margin-bottom: 0.5rem;

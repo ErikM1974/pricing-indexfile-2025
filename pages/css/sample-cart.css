@@ -1,12 +1,18 @@
 /* sample-cart.css — Sample Cart page on the NWCA 2026 design system
-   (reskin 2026-07-06; replaces the legacy inline <style> monolith).
+   (reskin 2026-07-06; replaces the legacy inline \3c style> monolith).
    Styles the SAME class names the extracted page controller renders
    (cart-item / size-badge / inventory-status-badge / …) so the ported
    JS needed zero markup changes. */
 
 /* Legacy token bridge — the ported renderer's inline styles reference the
    old custom properties; resolve them to 2026 tokens. */
+
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue, merged into its
+   existing :root. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
 :root {
+    --sc-red: #f87171;
     --primary-color: var(--green-700);
     --primary-dark: var(--green-900);
     --text-primary: var(--ink);
@@ -15,6 +21,7 @@
     --card-bg: var(--card);
     --bg-color: var(--paper);
 }
+/* stylelint-enable color-no-hex */
 
 /* ── Layout: focused single-column checkout, properly centered ───────── */
 .sc-wrap { max-width: 920px; }
@@ -29,21 +36,25 @@
     padding: 18px 22px;
     margin-bottom: 18px;
 }
+
 .summary-stats {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 12px;
 }
 .summary-item { text-align: center; }
+
 .summary-label {
     font-size: 12px; font-weight: 700; letter-spacing: 0.08em;
     text-transform: uppercase; color: var(--ink-faint);
 }
+
 .summary-value {
     font-family: var(--font-display);
     font-size: 26px; font-weight: 800; color: var(--green-900);
     line-height: 1.2;
 }
+
 #sampleCreditNote {
     margin: 14px 0 0;
     padding: 10px 14px;
@@ -61,6 +72,7 @@
     padding: 8px 22px;
     margin-bottom: 18px;
 }
+
 .cart-item {
     display: grid;
     grid-template-columns: 92px 1fr auto;
@@ -70,6 +82,7 @@
     align-items: start;
 }
 .cart-item:last-child { border-bottom: none; }
+
 .item-image {
     width: 92px; height: 92px;
     object-fit: contain;
@@ -77,6 +90,7 @@
     border: 1px solid var(--line);
     border-radius: var(--radius-sm);
 }
+
 .item-details h3 {
     font-family: var(--font-display);
     font-size: 17px; font-weight: 700; color: var(--ink);
@@ -85,6 +99,7 @@
 .item-style, .item-color { font-size: 13.5px; color: var(--ink-soft); }
 .item-sizes { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 13.5px; color: var(--ink-soft); }
 .item-price { font-size: 14px; }
+
 .item-remove {
     align-self: start;
     width: 32px; height: 32px;
@@ -133,16 +148,19 @@
 /* ── Empty state ──────────────────────────────────────────────────────── */
 .empty-cart { text-align: center; padding: 40px 16px 32px; color: var(--ink-soft); }
 .empty-cart > i { font-size: 34px; color: var(--line-strong); }
+
 .empty-cart h3 {
     font-family: var(--font-display);
     font-size: 22px; font-weight: 800; color: var(--ink);
     margin: 10px 0 4px;
 }
+
 .empty-cart .features {
     display: grid; grid-template-columns: repeat(3, 1fr);
     gap: 14px; margin: 22px 0;
     text-align: left;
 }
+
 .empty-cart .feature {
     display: flex; gap: 10px; align-items: flex-start;
     padding: 12px;
@@ -162,6 +180,7 @@
     padding: 24px 22px;
 }
 .form-block { margin-bottom: 26px; }
+
 .form-block h2 {
     font-family: var(--font-display);
     font-size: 17px; font-weight: 800; color: var(--ink);
@@ -170,6 +189,7 @@
     padding-bottom: 8px;
     border-bottom: 1px dashed var(--line-strong);
 }
+
 .form-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -177,11 +197,13 @@
 }
 .form-group { display: flex; flex-direction: column; gap: 5px; }
 .form-group.span-2 { grid-column: span 2; }
+
 .form-group label {
     font-size: 13px; font-weight: 700; color: var(--ink-soft);
 }
 .form-group .label-soft { font-weight: 400; color: var(--ink-faint); }
 .form-group .required { color: var(--rush); }
+
 .form-group input[type="text"],
 .form-group input[type="email"],
 .form-group input[type="tel"],
@@ -197,6 +219,7 @@
     transition: border-color 0.15s, box-shadow 0.15s;
     width: 100%;
 }
+
 .form-group input:focus,
 .form-group select:focus,
 .form-group textarea:focus {
@@ -205,6 +228,7 @@
     box-shadow: 0 0 0 3px var(--green-50);
 }
 .form-group textarea { min-height: 96px; resize: vertical; }
+
 .form-group input[type="file"] {
     font-size: 14px; color: var(--ink-soft);
     border: 1.5px dashed var(--line-strong);
@@ -222,11 +246,13 @@
     border: 1px solid var(--line);
     border-radius: var(--radius-sm);
 }
+
 .checkbox-label {
     display: flex; align-items: center; gap: 10px;
     font-size: 14.5px; font-weight: 600; color: var(--ink);
     cursor: pointer;
 }
+
 .checkbox-label input[type="checkbox"] {
     width: 18px; height: 18px;
     accent-color: var(--green-700);
@@ -240,6 +266,7 @@
 }
 .button-group.center { justify-content: center; }
 .btn-lg { padding: 13px 26px; font-size: 15.5px; }
+
 /* legacy alias used by ported markup strings */
 .btn-secondary { background: transparent; color: var(--ink-soft); border: 1.5px solid var(--line-strong); }
 .btn-secondary:hover { border-color: var(--green-700); color: var(--green-900); }
@@ -255,6 +282,7 @@
     margin: 0 0 18px;
 }
 .checkout-validation-alert > i { color: var(--bad); font-size: 18px; margin-top: 2px; }
+
 .checkout-validation-alert h3 {
     font-family: var(--font-display);
     font-size: 16px; font-weight: 800; color: var(--ink);
@@ -276,6 +304,7 @@
 }
 .success-message.show { display: block; }
 .success-message > i { font-size: 44px; color: var(--green-700); }
+
 .success-message h2 {
     font-family: var(--font-display);
     font-size: 26px; font-weight: 800; color: var(--ink);
@@ -286,7 +315,7 @@
 .success-message .button-group { margin-top: 22px; }
 
 /* ── Responsive ───────────────────────────────────────────────────────── */
-@media (max-width: 720px) {
+@media (width <= 720px) {
     .form-grid { grid-template-columns: 1fr; }
     .form-group.span-2 { grid-column: span 1; }
     .summary-stats { gap: 6px; }
@@ -298,11 +327,12 @@
 }
 
 /* 2026-09-06 review: render-error card (was inline styles); remove control is a real button */
-.sc-render-error { margin: 2rem; padding: 1.5rem; background: #fee2e2; border: 1px solid #f87171; border-radius: 8px; }
-.sc-render-error h4 { color: #991b1b; margin-bottom: 0.5rem; }
-.sc-render-error p { color: #7f1d1d; margin: 0; }
+.sc-render-error { margin: 2rem; padding: 1.5rem; background: var(--red-100); border: 1px solid var(--sc-red); border-radius: 8px; }
+.sc-render-error h4 { color: var(--red-800); margin-bottom: 0.5rem; }
+.sc-render-error p { color: var(--print-red); margin: 0; }
 .sc-render-error .sc-reload { margin-top: 1rem; }
 button.item-remove { border: 0; background: transparent; font: inherit; }
 
 /* 2026-09-06 review: the hidden attribute must beat any display rule */
+/* stylelint-disable-next-line declaration-no-important -- the hidden attribute must beat any display rule */
 [hidden] { display: none !important; }

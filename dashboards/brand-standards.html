@@ -13,8 +13,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <!-- Built from templates/page-template.html: tokens first (the @layer order), then this page only. -->
-    <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.07.6">
-    <link rel="stylesheet" href="/dashboards/css/brand-standards.css?v=2026.09.07.6">
+    <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.07.8">
+    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.07.8">
+    <link rel="stylesheet" href="/shared_components/css/utilities.css?v=2026.09.07.8">
+    <link rel="stylesheet" href="/dashboards/css/brand-standards.css?v=2026.09.07.8">
 </head>
 <body>
     <a class="skip-link" href="#main">Skip to content</a>
@@ -128,6 +130,11 @@
             <p class="text-muted">This page is a working document. Every standard that changed how a page looks is
                 recorded here, newest first, with the release that shipped it.</p>
             <ul class="rules decisions">
+                <li><strong>2026-09-07 · storefront + components.</strong> The customer-facing 2026 storefront palette (cream paper, forest
+                    greens, safety-orange rush accent, Bricolage Grotesque display type) is named as the <code>--store-*</code> tokens and
+                    shown on this page beside the staff palette; <code>nwca-2026-core.css</code> aliases to it. The shared component and
+                    utility layers (<code>components.css</code>, <code>utilities.css</code>) shipped — new pages get buttons, cards, fields,
+                    tables, alerts, badges, modals, toasts and empty states on tokens without writing them.</li>
                 <li><strong>2026-09-07 · training family.</strong> The ten training pages that copied the AE dashboard's
                     maroon header now wear the Training Center's green staff chrome from one shared sheet
                     (<code>training/css/training-shared.css</code>); three coral-styled guides (art approval, Google review,
