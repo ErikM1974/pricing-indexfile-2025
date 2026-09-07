@@ -1,3 +1,5 @@
+/* stylelint-disable no-duplicate-selectors -- legacy sheet: rules were appended over time; merging them would reorder the cascade (2026-09-07) */
+
 /**
  * Quote Management Dashboard Styles
  * Created: 2026-01-13 (Phase 5 - Quote builder feature parity)
@@ -11,18 +13,18 @@
 body {
     margin: 0;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
-    background-color: #f5f5f5;
-    color: #333;
+    background-color: var(--gray-100);
+    color: var(--quote-management-gray-dark);
 }
 
 /* Header */
 .dashboard-header {
-    background: linear-gradient(135deg, var(--pnw-forest, #2e4a62) 0%, var(--pnw-forest-deep, #1a2f42) 100%);
+    background: linear-gradient(135deg, var(--pnw-forest, var(--quote-management-cyan)) 0%, var(--pnw-forest-deep, var(--gray-800)) 100%);
     padding: 12px 24px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 4px rgb(0 0 0 / 10%);
 }
 
 .dashboard-header .logo {
@@ -44,16 +46,16 @@ body {
 }
 
 .user-info {
-    color: rgba(255,255,255,0.8);
+    color: rgb(255 255 255 / 80%);
     font-size: 13px;
     padding-right: 12px;
-    border-right: 1px solid rgba(255,255,255,0.3);
+    border-right: 1px solid rgb(255 255 255 / 30%);
 }
 
 .btn-header {
-    background: rgba(255,255,255,0.15);
+    background: rgb(255 255 255 / 15%);
     color: white;
-    border: 1px solid rgba(255,255,255,0.3);
+    border: 1px solid rgb(255 255 255 / 30%);
     padding: 8px 16px;
     border-radius: 4px;
     font-size: 13px;
@@ -63,7 +65,7 @@ body {
 }
 
 .btn-header:hover {
-    background: rgba(255,255,255,0.25);
+    background: rgb(255 255 255 / 25%);
 }
 
 /* Main Container */
@@ -79,7 +81,7 @@ body {
     border-radius: 8px;
     padding: 16px 20px;
     margin-bottom: 24px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 4px rgb(0 0 0 / 5%);
     display: flex;
     gap: 16px;
     flex-wrap: wrap;
@@ -95,7 +97,7 @@ body {
 .filter-group label {
     font-size: 11px;
     font-weight: 600;
-    color: #666;
+    color: var(--quote-management-gray);
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
@@ -103,7 +105,7 @@ body {
 .filter-group select,
 .filter-group input {
     padding: 8px 12px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--store-line);
     border-radius: 4px;
     font-size: 14px;
     min-width: 150px;
@@ -116,12 +118,12 @@ body {
 .filter-group select:focus,
 .filter-group input:focus {
     outline: none;
-    border-color: var(--pnw-forest, #2e4a62);
-    box-shadow: 0 0 0 2px rgba(46,74,98,0.1);
+    border-color: var(--pnw-forest, var(--quote-management-cyan));
+    box-shadow: 0 0 0 2px rgb(46 74 98 / 10%);
 }
 
 .btn-search {
-    background: var(--pnw-forest, #2e4a62);
+    background: var(--pnw-forest, var(--quote-management-cyan));
     color: white;
     border: none;
     padding: 10px 20px;
@@ -134,7 +136,7 @@ body {
 }
 
 .btn-search:hover {
-    background: var(--pnw-forest-deep, #1a2f42);
+    background: var(--pnw-forest-deep, var(--gray-800));
 }
 
 /* Stats Cards */
@@ -149,38 +151,40 @@ body {
     background: white;
     border-radius: 8px;
     padding: 20px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 4px rgb(0 0 0 / 5%);
     text-align: center;
 }
 
 .stat-card.active {
-    border-left: 4px solid #28a745;
+    border-left: 4px solid var(--quote-management-green-2);
 }
 
 .stat-card.accepted {
-    border-left: 4px solid var(--pnw-forest, #2e4a62);
+    border-left: 4px solid var(--pnw-forest, var(--quote-management-cyan));
 }
 
 .stat-card.expiring {
-    border-left: 4px solid #ffc107;
+    border-left: 4px solid var(--quote-management-yellow-3);
 }
 
 .stat-card.cancelled {
-    border-left: 4px solid #b91c1c;
+    border-left: 4px solid var(--red-700);
 }
+
 .stat-card.cancelled .stat-value {
-    color: #b91c1c;
+    color: var(--red-700);
 }
 
 .stat-card.failed {
-    border-left: 4px solid #d97706;
+    border-left: 4px solid var(--amber-600);
 }
+
 .stat-card.failed .stat-value {
-    color: #d97706;
+    color: var(--amber-600);
 }
 
 .stat-card.total {
-    border-left: 4px solid #17a2b8;
+    border-left: 4px solid var(--quote-management-teal);
 }
 
 /* Cancelled-in-ShopWorks badge — replaces the status dropdown on
@@ -190,9 +194,9 @@ body {
     align-items: center;
     gap: 6px;
     padding: 5px 10px;
-    background: #fef2f2;
-    border: 1px solid #fecaca;
-    color: #b91c1c;
+    background: var(--red-50);
+    border: 1px solid var(--quote-management-red-tint);
+    color: var(--red-700);
     font-weight: 700;
     font-size: 12px;
     letter-spacing: 0.02em;
@@ -200,6 +204,7 @@ body {
     cursor: help;
     white-space: nowrap;
 }
+
 .status-badge.status-cancelled i {
     font-size: 11px;
 }
@@ -212,9 +217,9 @@ body {
     align-items: center;
     gap: 6px;
     padding: 5px 10px;
-    background: #dcfce7;
-    border: 1px solid #bbf7d0;
-    color: #166534;
+    background: var(--store-green-100);
+    border: 1px solid var(--quote-management-green-tint);
+    color: var(--print-green);
     font-weight: 700;
     font-size: 12px;
     letter-spacing: 0.02em;
@@ -231,9 +236,9 @@ body {
     align-items: center;
     gap: 6px;
     padding: 5px 10px;
-    background: #fef3c7;
-    border: 1px solid #fde68a;
-    color: #92400e;
+    background: var(--amber-100);
+    border: 1px solid var(--quote-management-yellow-2);
+    color: var(--amber-800);
     font-weight: 700;
     font-size: 12px;
     letter-spacing: 0.02em;
@@ -250,9 +255,9 @@ body {
     align-items: center;
     gap: 6px;
     padding: 5px 10px;
-    background: #fffbeb;
-    border: 1px solid #fde68a;
-    color: #b45309;
+    background: var(--store-paper);
+    border: 1px solid var(--quote-management-yellow-2);
+    color: var(--amber-700);
     font-weight: 700;
     font-size: 12px;
     letter-spacing: 0.02em;
@@ -271,9 +276,9 @@ body {
     align-items: center;
     gap: 6px;
     padding: 5px 10px;
-    background: #ccfbf1;
-    border: 1px solid #99f6e4;
-    color: #115e59;
+    background: var(--quote-management-teal-tint);
+    border: 1px solid var(--quote-management-teal-2);
+    color: var(--quote-management-teal-dark);
     font-weight: 700;
     font-size: 12px;
     letter-spacing: 0.02em;
@@ -292,9 +297,9 @@ body {
     align-items: center;
     gap: 6px;
     padding: 5px 10px;
-    background: #fee2e2;
-    border: 1px solid #fecaca;
-    color: #991b1b;
+    background: var(--red-100);
+    border: 1px solid var(--quote-management-red-tint);
+    color: var(--red-800);
     font-weight: 700;
     font-size: 12px;
     letter-spacing: 0.02em;
@@ -312,6 +317,7 @@ body {
     gap: 4px;
     align-items: center;
 }
+
 .milestone-pill {
     display: inline-flex;
     align-items: center;
@@ -325,59 +331,68 @@ body {
     transition: transform 100ms ease;
 }
 .milestone-pill:hover { transform: scale(1.1); }
+
 .milestone-pill--done {
-    background: #dcfce7;
-    color: #14532d;
-    border-color: #86efac;
+    background: var(--store-green-100);
+    color: var(--print-green-dark);
+    border-color: var(--quote-management-green);
 }
+
 .milestone-pill--pending {
-    background: #f1f5f9;
-    color: #94a3b8;
-    border-color: #e2e8f0;
+    background: var(--slate-100);
+    color: var(--gray-400);
+    border-color: var(--slate-200);
 }
+
 /* ShopWorks Partial (.5) and N/A (8/222) / unknown ("—") states (Erik 2026-06-16)
    so dashboard pills mirror the OnSite order screen, not a forced done/pending. */
 .milestone-pill--partial {
-    background: #fef3c7;
-    color: #92400e;
-    border-color: #fcd34d;
+    background: var(--amber-100);
+    color: var(--amber-800);
+    border-color: var(--quote-management-yellow);
 }
+
 .milestone-pill--na,
 .milestone-pill--unknown {
-    background: #f8fafc;
-    color: #cbd5e1;
-    border-color: #e2e8f0;
+    background: var(--slate-50);
+    color: var(--gray-300);
+    border-color: var(--slate-200);
 }
+
 .milestone-na {
-    color: #94a3b8;
+    color: var(--gray-400);
     font-style: italic;
 }
 
 /* Row tint for cancelled quotes — subtle so it doesn't drown out
    active quotes when mixed in. */
 .quote-row--cancelled {
-    background: #fef9f9 !important;
+    /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
+    background: var(--gray-50) !important;
     opacity: 0.85;
 }
+
 .quote-row--cancelled:hover {
-    background: #fef2f2 !important;
+    /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
+    background: var(--red-50) !important;
     opacity: 1;
 }
+
 .quote-row--cancelled .quote-id,
 .quote-row--cancelled .customer-name {
-    color: #6b7280;
+    color: var(--gray-500);
 }
 
 .stat-value {
     font-size: 32px;
     font-weight: 700;
-    color: #333;
+    color: var(--quote-management-gray-dark);
     margin-bottom: 4px;
 }
 
 .stat-label {
     font-size: 13px;
-    color: #666;
+    color: var(--quote-management-gray);
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
@@ -386,13 +401,13 @@ body {
 .quotes-table-section {
     background: white;
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 4px rgb(0 0 0 / 5%);
     overflow: hidden;
 }
 
 .table-header {
     padding: 16px 20px;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--brand-100);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -402,12 +417,12 @@ body {
     margin: 0;
     font-size: 16px;
     font-weight: 600;
-    color: #333;
+    color: var(--quote-management-gray-dark);
 }
 
 .table-count {
     font-size: 13px;
-    color: #666;
+    color: var(--quote-management-gray);
 }
 
 /* Active / Completed / All tabs (Erik 2026-06-15). Completed orders
@@ -416,9 +431,10 @@ body {
     display: flex;
     gap: 4px;
     padding: 0 16px;
-    border-bottom: 2px solid #e5e7eb;
+    border-bottom: 2px solid var(--gray-200);
     margin-bottom: 4px;
 }
+
 .qm-tab {
     appearance: none;
     background: none;
@@ -428,24 +444,28 @@ body {
     padding: 10px 16px;
     font-size: 14px;
     font-weight: 600;
-    color: #6b7280;
+    color: var(--gray-500);
     cursor: pointer;
     transition: color 0.15s, border-color 0.15s;
 }
+
 .qm-tab:hover {
-    color: var(--pnw-forest, #2e4a62);
+    color: var(--pnw-forest, var(--quote-management-cyan));
 }
+
 .qm-tab--active {
-    color: var(--pnw-forest, #2e4a62);
-    border-bottom-color: var(--pnw-forest, #2e4a62);
+    color: var(--pnw-forest, var(--quote-management-cyan));
+    border-bottom-color: var(--pnw-forest, var(--quote-management-cyan));
 }
+
 .qm-tab-count {
     font-weight: 500;
-    color: #9ca3af;
+    color: var(--gray-400);
     font-size: 13px;
 }
+
 .qm-tab--active .qm-tab-count {
-    color: var(--pnw-forest, #2e4a62);
+    color: var(--pnw-forest, var(--quote-management-cyan));
 }
 
 .quotes-table {
@@ -454,20 +474,20 @@ body {
 }
 
 .quotes-table th {
-    background: #f8f9fa;
+    background: var(--gray-50);
     padding: 12px 16px;
     text-align: left;
     font-size: 12px;
     font-weight: 600;
-    color: #666;
+    color: var(--quote-management-gray);
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--brand-100);
 }
 
 .quotes-table td {
     padding: 14px 16px;
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid var(--gray-100);
     font-size: 14px;
 }
 
@@ -477,12 +497,12 @@ body {
 }
 
 .quotes-table tbody tr:hover {
-    background: #f8f9fa;
+    background: var(--gray-50);
 }
 
 .quote-id {
     font-weight: 600;
-    color: var(--pnw-forest, #2e4a62);
+    color: var(--pnw-forest, var(--quote-management-cyan));
 }
 
 /* ShopWorks order-# cross-check, under the Quote ID (Erik 2026-06-25).
@@ -497,11 +517,11 @@ body {
     margin-top: 3px;
     font-size: 11px;
     font-weight: 600;
-    color: #166534;
+    color: var(--print-green);
     white-space: nowrap;
 }
 .sw-ref i { font-size: 10px; }
-.quote-row--cancelled .sw-ref { color: #9ca3af; }
+.quote-row--cancelled .sw-ref { color: var(--gray-400); }
 
 .customer-name {
     font-weight: 500;
@@ -509,22 +529,23 @@ body {
 
 .customer-email {
     font-size: 12px;
-    color: #888;
+    color: var(--quote-management-gray-2);
 }
 
 /* Salesperson column — ShopWorks order owner (order.CustomerServiceRep),
    falls back to the quote-time rep. Secondary-text weight so it doesn't
    compete with the customer name. (Erik 2026-06-15) */
 .salesperson-cell {
-    color: #444;
+    color: var(--gray-700);
     white-space: nowrap;
 }
 
 /* Inbound vendor (SanMar) shipment indicator (Erik 2026-06-15). Blank goods
    shipping vendor → us, distinct from the outbound Progress milestones. */
 .inbound-cell { text-align: center; }
-.inbound-na { color: #cbd5e1; }
-.inbound-pending { color: #cbd5e1; font-weight: 700; }
+.inbound-na { color: var(--gray-300); }
+.inbound-pending { color: var(--gray-300); font-weight: 700; }
+
 .inbound-pill {
     display: inline-flex;
     align-items: center;
@@ -536,10 +557,10 @@ body {
     text-decoration: none;
     border: 1px solid transparent;
 }
-.inbound-confirmed { background: #f1f5f9; color: #64748b; border-color: #e2e8f0; }
-.inbound-partial   { background: #fef3c7; color: #92400e; border-color: #fcd34d; }
-.inbound-shipped   { background: #dcfce7; color: #166534; border-color: #86efac; }
-.inbound-canceled  { background: #fee2e2; color: #991b1b; border-color: #fca5a5; }
+.inbound-confirmed { background: var(--slate-100); color: var(--slate-500); border-color: var(--slate-200); }
+.inbound-partial   { background: var(--amber-100); color: var(--amber-800); border-color: var(--quote-management-yellow); }
+.inbound-shipped   { background: var(--store-green-100); color: var(--print-green); border-color: var(--quote-management-green); }
+.inbound-canceled  { background: var(--red-100); color: var(--red-800); border-color: var(--quote-management-red-2); }
 a.inbound-pill:hover { filter: brightness(0.95); }
 
 /* SanMar backorder / hold alert pill (next to the inbound dot) */
@@ -555,8 +576,8 @@ a.inbound-pill:hover { filter: brightness(0.95); }
     cursor: help;
     white-space: nowrap;
 }
-.inbound-backorder { background: #fee2e2; color: #991b1b; border-color: #fca5a5; }
-.inbound-hold      { background: #fef3c7; color: #92400e; border-color: #fcd34d; }
+.inbound-backorder { background: var(--red-100); color: var(--red-800); border-color: var(--quote-management-red-2); }
+.inbound-hold      { background: var(--amber-100); color: var(--amber-800); border-color: var(--quote-management-yellow); }
 
 .quote-amount {
     font-weight: 600;
@@ -574,59 +595,59 @@ a.inbound-pill:hover { filter: brightness(0.95); }
 }
 
 .status-badge.active {
-    background: #d4edda;
-    color: #155724;
+    background: var(--store-green-100);
+    color: var(--print-green-dark);
 }
 
 .status-badge.accepted {
-    background: #d1e7f0;
-    color: #0c5460;
+    background: var(--sky-100);
+    color: var(--sky-900);
 }
 
 .status-badge.expired {
-    background: #f8d7da;
-    color: #721c24;
+    background: var(--red-100);
+    color: var(--color-ae-dark);
 }
 
 .status-badge.expiring-soon {
-    background: #fff3cd;
-    color: #856404;
+    background: var(--amber-100);
+    color: var(--quote-management-yellow-4);
 }
 
 /* Created/Expires Date */
 .date-cell {
     font-size: 13px;
-    color: #666;
+    color: var(--quote-management-gray);
 }
 
 .date-relative {
     font-size: 11px;
-    color: #999;
+    color: var(--print-line);
 }
 
 /* Due (Requested Ship) date + drop-dead flag (Erik 2026-06-17) */
 .due-cell { white-space: nowrap; }
-.due-date { font-size: 13px; font-weight: 600; color: #334155; }
-.due-date.due-soon { color: #b45309; }            /* within 3 days / today — amber */
-.due-date.due-overdue { color: #b91c1c; }          /* past due — red */
+.due-date { font-size: 13px; font-weight: 600; color: var(--gray-700); }
+.due-date.due-soon { color: var(--amber-700); }            /* within 3 days / today — amber */
+.due-date.due-overdue { color: var(--red-700); }          /* past due — red */
 
 /* Empty State */
 .empty-state {
     text-align: center;
     padding: 60px 20px;
-    color: #888;
+    color: var(--quote-management-gray-2);
 }
 
 .empty-state i {
     font-size: 48px;
-    color: #ddd;
+    color: var(--store-line);
     margin-bottom: 16px;
 }
 
 .empty-state h3 {
     margin: 0 0 8px;
     font-size: 18px;
-    color: #666;
+    color: var(--quote-management-gray);
 }
 
 .empty-state p {
@@ -645,8 +666,8 @@ a.inbound-pill:hover { filter: brightness(0.95); }
 .loading-spinner {
     width: 40px;
     height: 40px;
-    border: 3px solid #f3f3f3;
-    border-top: 3px solid var(--pnw-forest, #2e4a62);
+    border: 3px solid var(--gray-100);
+    border-top: 3px solid var(--pnw-forest, var(--quote-management-cyan));
     border-radius: 50%;
     animation: spin 1s linear infinite;
 }
@@ -660,7 +681,7 @@ a.inbound-pill:hover { filter: brightness(0.95); }
 .action-btn {
     background: none;
     border: none;
-    color: var(--pnw-forest, #2e4a62);
+    color: var(--pnw-forest, var(--quote-management-cyan));
     cursor: pointer;
     padding: 4px 8px;
     border-radius: 4px;
@@ -669,7 +690,7 @@ a.inbound-pill:hover { filter: brightness(0.95); }
 }
 
 .action-btn:hover {
-    background: #e8f0f6;
+    background: var(--slate-200);
 }
 
 /* Phase 11.3.5 (Erik 2026-05-24): locked-edit button — quote is in ShopWorks
@@ -677,7 +698,7 @@ a.inbound-pill:hover { filter: brightness(0.95); }
    that the button is dormant; tooltip explains why. */
 .action-btn.action-btn--locked,
 .action-btn.action-btn--locked:hover {
-    color: var(--qb-text-muted, #9ca3af);
+    color: var(--qb-text-muted, var(--gray-400));
     background: transparent;
     cursor: not-allowed;
     opacity: 0.55;
@@ -690,12 +711,12 @@ a.inbound-pill:hover { filter: brightness(0.95); }
     align-items: center;
     gap: 8px;
     padding: 16px;
-    border-top: 1px solid #eee;
+    border-top: 1px solid var(--brand-100);
 }
 
 .pagination button {
     background: white;
-    border: 1px solid #ddd;
+    border: 1px solid var(--store-line);
     padding: 8px 12px;
     border-radius: 4px;
     cursor: pointer;
@@ -704,8 +725,8 @@ a.inbound-pill:hover { filter: brightness(0.95); }
 }
 
 .pagination button:hover:not(:disabled) {
-    background: #f8f9fa;
-    border-color: var(--pnw-forest, #2e4a62);
+    background: var(--gray-50);
+    border-color: var(--pnw-forest, var(--quote-management-cyan));
 }
 
 .pagination button:disabled {
@@ -715,7 +736,7 @@ a.inbound-pill:hover { filter: brightness(0.95); }
 
 .pagination .page-info {
     font-size: 13px;
-    color: #666;
+    color: var(--quote-management-gray);
     padding: 0 12px;
 }
 
@@ -723,7 +744,7 @@ a.inbound-pill:hover { filter: brightness(0.95); }
 .status-dropdown {
     padding: 6px 10px;
     border-radius: 6px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--store-line);
     font-size: 12px;
     font-weight: 600;
     cursor: pointer;
@@ -733,43 +754,43 @@ a.inbound-pill:hover { filter: brightness(0.95); }
 
 .status-dropdown:focus {
     outline: none;
-    box-shadow: 0 0 0 2px rgba(46,74,98,0.2);
+    box-shadow: 0 0 0 2px rgb(46 74 98 / 20%);
 }
 
 .status-dropdown.status-open {
-    background: #d4edda;
-    border-color: #28a745;
-    color: #155724;
+    background: var(--store-green-100);
+    border-color: var(--quote-management-green-2);
+    color: var(--print-green-dark);
 }
 
 .status-dropdown.status-accepted {
-    background: #d1e7f0;
-    border-color: #17a2b8;
-    color: #0c5460;
+    background: var(--sky-100);
+    border-color: var(--quote-management-teal);
+    color: var(--sky-900);
 }
 
 .status-dropdown.status-lost {
-    background: #f8d7da;
-    border-color: #dc3545;
-    color: #721c24;
+    background: var(--red-100);
+    border-color: var(--quote-management-red);
+    color: var(--color-ae-dark);
 }
 
 .status-dropdown.status-expired {
-    background: #e2e3e5;
-    border-color: #6c757d;
-    color: #383d41;
+    background: var(--gray-200);
+    border-color: var(--gray-500);
+    color: var(--gray-700);
 }
 
 /* Status badge for Open */
 .status-badge.open {
-    background: #d4edda;
-    color: #155724;
+    background: var(--store-green-100);
+    color: var(--print-green-dark);
 }
 
 /* Status badge for Lost */
 .status-badge.lost {
-    background: #f8d7da;
-    color: #721c24;
+    background: var(--red-100);
+    color: var(--color-ae-dark);
 }
 
 /* Checkbox Column */
@@ -793,7 +814,7 @@ a.inbound-pill:hover { filter: brightness(0.95); }
 
 /* Bulk Delete Button */
 .btn-bulk-delete {
-    background: #dc3545;
+    background: var(--quote-management-red);
     color: white;
     border: none;
     padding: 8px 16px;
@@ -808,7 +829,7 @@ a.inbound-pill:hover { filter: brightness(0.95); }
 }
 
 .btn-bulk-delete:hover:not(:disabled) {
-    background: #c82333;
+    background: var(--color-ae-light);
 }
 
 .btn-bulk-delete:disabled {
@@ -818,20 +839,20 @@ a.inbound-pill:hover { filter: brightness(0.95); }
 
 /* Audit Action Button */
 .action-audit {
-    color: #7c3aed;
+    color: var(--quote-management-indigo);
 }
 
 .action-audit:hover {
-    background: #ede9fe;
+    background: var(--color-ruth-tint);
 }
 
 /* Delete Action Button */
 .action-delete {
-    color: #dc3545;
+    color: var(--quote-management-red);
 }
 
 .action-delete:hover {
-    background: #dc3545;
+    background: var(--quote-management-red);
     color: white;
 }
 
@@ -839,7 +860,7 @@ a.inbound-pill:hover { filter: brightness(0.95); }
 .modal {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgb(0 0 0 / 50%);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -852,20 +873,20 @@ a.inbound-pill:hover { filter: brightness(0.95); }
     border-radius: 8px;
     max-width: 480px;
     width: 90%;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 20px rgb(0 0 0 / 20%);
 }
 
 .modal-content h3 {
     margin: 0 0 16px;
     font-size: 18px;
-    color: #333;
+    color: var(--quote-management-gray-dark);
 }
 
 .modal-content p {
     margin: 0 0 20px;
     font-size: 14px;
     line-height: 1.6;
-    color: #555;
+    color: var(--print-ink-soft);
 }
 
 .modal-actions {
@@ -875,9 +896,9 @@ a.inbound-pill:hover { filter: brightness(0.95); }
 }
 
 .btn-cancel {
-    background: #f8f9fa;
-    color: #333;
-    border: 1px solid #ddd;
+    background: var(--gray-50);
+    color: var(--quote-management-gray-dark);
+    border: 1px solid var(--store-line);
     padding: 10px 20px;
     border-radius: 4px;
     font-size: 14px;
@@ -886,11 +907,11 @@ a.inbound-pill:hover { filter: brightness(0.95); }
 }
 
 .btn-cancel:hover {
-    background: #e9ecef;
+    background: var(--gray-200);
 }
 
 .btn-confirm-delete {
-    background: #dc3545;
+    background: var(--quote-management-red);
     color: white;
     border: none;
     padding: 10px 20px;
@@ -905,7 +926,7 @@ a.inbound-pill:hover { filter: brightness(0.95); }
 }
 
 .btn-confirm-delete:hover:not(:disabled) {
-    background: #c82333;
+    background: var(--color-ae-light);
 }
 
 .btn-confirm-delete:disabled {
@@ -915,7 +936,7 @@ a.inbound-pill:hover { filter: brightness(0.95); }
 
 /* Warning text in modal */
 .warning-text {
-    color: #dc3545;
+    color: var(--quote-management-red);
     font-weight: 600;
 }
 
@@ -924,7 +945,7 @@ a.inbound-pill:hover { filter: brightness(0.95); }
 }
 
 /* Responsive */
-@media (max-width: 768px) {
+@media (width <= 768px) {
     .dashboard-container {
         padding: 16px;
     }
@@ -985,15 +1006,17 @@ a.inbound-pill:hover { filter: brightness(0.95); }
 /* Online deposit chips (Storefront Checkout Phase 1, 2026-07-05) —
    rendered next to the status badge by renderDepositChip(). */
 .status-badge.deposit-chip { margin-top: 4px; display: inline-flex; }
+
 .status-badge.deposit-chip--live {
-    background: #eef2ff;
-    color: #4338ca;
-    border: 1px solid #a5b4fc;
+    background: var(--color-floor-tint);
+    color: var(--quote-management-blue);
+    border: 1px solid var(--quote-management-blue-2);
 }
+
 .status-badge.deposit-chip--paid {
-    background: #dcfce7;
-    color: #166534;
-    border: 1px solid #86efac;
+    background: var(--store-green-100);
+    color: var(--print-green);
+    border: 1px solid var(--quote-management-green);
 }
 .status-badge.deposit-chip i { font-size: 11px; }
 
@@ -1001,19 +1024,50 @@ a.inbound-pill:hover { filter: brightness(0.95); }
    blue-grey instead of the quote-builder shell's forest green, so it stops looking
    like every other green page. Overrides the --pnw-forest hooks this page's header
    gradient reads (quote-builder-shell.css loads first). */
-:root { --pnw-forest: #2e4a62; --pnw-forest-deep: #1a2f42; --pnw-forest-mid: #3d6584; }
+
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue, merged into its
+   existing :root. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
+:root {
+    --quote-management-cyan: #2e4a62;
+    --quote-management-gray: #666;
+    --quote-management-red: #dc3545;
+    --quote-management-gray-dark: #333;
+    --quote-management-yellow: #fcd34d;
+    --quote-management-green: #86efac;
+    --quote-management-green-2: #28a745;
+    --quote-management-teal: #17a2b8;
+    --quote-management-red-tint: #fecaca;
+    --quote-management-yellow-2: #fde68a;
+    --quote-management-gray-2: #888;
+    --quote-management-red-2: #fca5a5;
+    --quote-management-yellow-3: #ffc107;
+    --quote-management-green-tint: #bbf7d0;
+    --quote-management-teal-tint: #ccfbf1;
+    --quote-management-teal-2: #99f6e4;
+    --quote-management-teal-dark: #115e59;
+    --quote-management-yellow-4: #856404;
+    --quote-management-indigo: #7c3aed;
+    --quote-management-blue: #4338ca;
+    --quote-management-blue-2: #a5b4fc;
+    --quote-management-cyan-2: #3d6584;
+ --pnw-forest: var(--quote-management-cyan); --pnw-forest-deep: var(--gray-800); --pnw-forest-mid: var(--quote-management-cyan-2); }
+/* stylelint-enable color-no-hex */
 
 /* =====================================================================
    2026-09-05 review additions
    ===================================================================== */
 
 /* Visibility toggles use the hidden attribute (no inline style=). */
+/* stylelint-disable-next-line declaration-no-important -- the hidden attribute must beat any display rule */
 [hidden] { display: none !important; }
 
 /* Header: buttons wrap on phones instead of scrolling the page sideways
    (the action row was 459px wide at 375px). */
 .header-actions { flex-wrap: wrap; justify-content: flex-end; }
-@media (max-width: 768px) {
+
+@media (width <= 768px) {
     .dashboard-header { flex-wrap: wrap; padding: 10px 12px; }
     .header-actions { width: 100%; justify-content: flex-start; gap: 6px; }
     .btn-header { padding: 6px 10px; font-size: 12px; }
@@ -1024,6 +1078,7 @@ a.inbound-pill:hover { filter: brightness(0.95); }
 /* Table: room for the row, one line for the actions, no wrapped IDs.
    Rows were 167px tall because six icon buttons stacked in an 86px cell. */
 .quotes-table-scroll { overflow-x: auto; }
+
 /* Actions wrap into a compact 2-row block (~150px) — one long line pushed the table to
    1,650px in a 1,352px container and hid the column behind a scrollbar. */
 .quotes-table td.actions-cell { white-space: normal; min-width: 150px; max-width: 170px; line-height: 1; }
@@ -1037,19 +1092,22 @@ a.inbound-pill:hover { filter: brightness(0.95); }
 .quotes-table td { vertical-align: middle; }
 .action-btn { display: inline-flex; align-items: center; justify-content: center; min-width: 28px; height: 28px; }
 .action-emoji { font-size: 14px; }
+
 /* ShipStation button states (were inline styles) */
 .action-btn--waiting, .action-btn--waiting:hover { opacity: 0.4; cursor: not-allowed; background: transparent; }
-.action-btn--sent, .action-btn--sent:hover { opacity: 0.6; cursor: not-allowed; background: #f3f4f6; }
-.action-btn--shipped, .action-btn--shipped:hover { text-decoration: none; color: #166534; background: #dcfce7; }
+.action-btn--sent, .action-btn--sent:hover { opacity: 0.6; cursor: not-allowed; background: var(--gray-100); }
+.action-btn--shipped, .action-btn--shipped:hover { text-decoration: none; color: var(--print-green); background: var(--store-green-100); }
 .action-btn--shipped-static { cursor: default; }
-.action-btn--ready { color: #0369a1; }
+.action-btn--ready { color: var(--sky-700); }
+
 /* Cancelled-row purge countdown (was style="color:#b91c1c") */
-.date-relative.qm-purge { color: #b91c1c; }
+.date-relative.qm-purge { color: var(--red-700); }
+
 /* Error state icon (was style="color:#dc3545") */
-.empty-state .qm-error-icon { color: #dc3545; }
+.empty-state .qm-error-icon { color: var(--quote-management-red); }
 
 /* Phone: hide the low-value columns; the rest stays readable. */
-@media (max-width: 768px) {
+@media (width <= 768px) {
     .qm-col-phone-hide { display: none; }
     .th-actions, td.actions-cell { min-width: 0; }
     .quotes-table { display: table; }   /* the scroll wrapper handles overflow now */
@@ -1061,16 +1119,15 @@ button.stat-card {
     text-align: center;
     cursor: pointer;
     appearance: none;
-    -webkit-appearance: none;
     color: inherit;
     width: 100%;
 }
-button.stat-card:focus-visible { outline: 2px solid var(--pnw-forest, #2e4a62); outline-offset: 2px; }
-button.stat-card.is-active { box-shadow: 0 0 0 3px rgba(46, 74, 98, 0.18); transform: translateY(-1px); }
-.stat-sub { margin-top: 4px; font-size: 11px; color: #94a3b8; }
+button.stat-card:focus-visible { outline: 2px solid var(--pnw-forest, var(--quote-management-cyan)); outline-offset: 2px; }
+button.stat-card.is-active { box-shadow: 0 0 0 3px rgb(46 74 98 / 18%); transform: translateY(-1px); }
+.stat-sub { margin-top: 4px; font-size: 11px; color: var(--gray-400); }
 
 /* Loaded-time stamp next to the row count */
-.qm-updated { font-size: 12px; color: #94a3b8; white-space: nowrap; }
+.qm-updated { font-size: 12px; color: var(--gray-400); white-space: nowrap; }
 .qm-updated:empty { display: none; }
 
 /* "Search widened to All Time" notice */
@@ -1078,24 +1135,26 @@ button.stat-card.is-active { box-shadow: 0 0 0 3px rgba(46, 74, 98, 0.18); trans
     margin: 0 0 12px;
     padding: 10px 14px;
     border-radius: 8px;
-    background: #fffbeb;
-    color: #92400e;
-    border: 1px solid #fcd34d;
+    background: var(--store-paper);
+    color: var(--amber-800);
+    border: 1px solid var(--quote-management-yellow);
     font-size: 13px;
 }
 .qm-notice i { margin-right: 6px; }
 
 /* Real tabs: focus ring for keyboard users */
-.qm-tab:focus-visible { outline: 2px solid var(--pnw-forest, #2e4a62); outline-offset: 2px; }
+.qm-tab:focus-visible { outline: 2px solid var(--pnw-forest, var(--quote-management-cyan)); outline-offset: 2px; }
 
 /* Generic modal input */
-.qm-modal-field { display: block; margin: 12px 0 4px; font-size: 13px; color: #475569; }
+.qm-modal-field { display: block; margin: 12px 0 4px; font-size: 13px; color: var(--slate-600); }
+
 .qm-modal-field input {
     display: block; width: 100%; margin-top: 6px; padding: 8px 10px;
-    border: 1px solid #cbd5e1; border-radius: 6px; font: inherit; font-size: 14px;
+    border: 1px solid var(--gray-300); border-radius: 6px; font: inherit; font-size: 14px;
 }
+
 .modal .btn-confirm {
-    background: var(--pnw-forest, #2e4a62); color: #fff; border: none;
+    background: var(--pnw-forest, var(--quote-management-cyan)); color: var(--color-on-brand); border: none;
     padding: 8px 16px; border-radius: 6px; font: inherit; cursor: pointer;
 }
 .modal .btn-confirm:hover { filter: brightness(1.1); }
@@ -1103,9 +1162,10 @@ button.stat-card.is-active { box-shadow: 0 0 0 3px rgba(46, 74, 98, 0.18); trans
 
 /* Toasts (were a cssText blob per toast) */
 .qm-toasts { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 8px; align-items: center; pointer-events: none; }
+
 .qm-toast {
-    background: #333; color: #fff; padding: 12px 24px; border-radius: 6px; font-size: 14px;
-    max-width: min(90vw, 640px); box-shadow: 0 6px 20px rgba(0,0,0,0.25); pointer-events: auto; white-space: pre-line;
+    background: var(--quote-management-gray-dark); color: var(--color-on-brand); padding: 12px 24px; border-radius: 6px; font-size: 14px;
+    max-width: min(90vw, 640px); box-shadow: 0 6px 20px rgb(0 0 0 / 25%); pointer-events: auto; white-space: pre-line;
 }
-.qm-toast--error { background: #991b1b; }
-.qm-toast--success { background: #14532d; }
+.qm-toast--error { background: var(--red-800); }
+.qm-toast--success { background: var(--print-green-dark); }

@@ -114,6 +114,30 @@ three gap sizes, `opacity:.5;cursor:not-allowed` ×26 (disabled). These become u
 
 ## 8. Progress log (newest first)
 
+### 2026-09-07 — Dashboards family LIVE (`v2026.09.07.10`): 78 sheets, 70 pages
+
+- **Family = every `dashboards/*.html` (60) + the queue-dashboard system they share (`art-hub.css` on 41 pages,
+  `dash-shell.css` on 34), the staff dashboard's own nine layers, every `dashboards/css` sheet (58) and the ten
+  shared widgets the dashboards load (kanban, transfer-actions, mockup-ruth, invoice viewer, toasts, box-label
+  print, names-numbers…). Ten `pages/` staff pages that load those widgets got the tokens link too and were
+  screenshotted (their own big sheets — art-request-detail, mockup-detail, quote-view, policy-detail, invoice —
+  are the next batch).
+- **Colours:** 1,965 hex uses in dashboards/css alone (827 exact / 697 near / 441 far); across all 78 sheets 1,821 exact / 1,012 near / 713 far, the far ones now 386 sheet-scoped variables. `art-hub.css`'s ten `--gray-*` definitions were byte-identical to the token file's and
+  were removed; its `--state-*` and `--surface-*` names became aliases of the ramps. The people/department
+  colours the pages already carried (`--art-theme: #009900 / #6b46c1 / #981e32`, workspaces' `--f-*` families)
+  now read `var(--color-dash-theme)`, `var(--color-ruth)`, `var(--color-ae)` … — the colour code is code.
+- **Open decision (brand page):** `art-hub.css` keeps its own spacing/radius/shadow scale (4-based to 32, radius
+  4/8/12/16) which differs from the token file's (seeded from the staff dashboard: to 96, radius 6/10/14/20).
+  On art-hub pages the page copy wins (loaded after tokens), so nothing moved; unifying the two scales is a
+  visible layout change across 41 staff pages and is Erik's call — recorded in the Decisions log as OPEN.
+- **`!important` 577 flags across the 78 sheets, none removed this pass** — the 49 `[hidden] { display: none !important }` copies (the repo's own rule:
+  the attribute must beat any display rule) carry per-line reasons; three sheets that override Caspio DataPage
+  markup (`digitized-designs`, `sanmar-inbound`, `company-numbers`) carry a file-level reason.
+- **Verification:** 70 pages: 61 identical; the 9 that differ are 'loaded h:mm' timestamps and badge counters, one gallery thumbnail that had not loaded in the before shot, and three async-rendered pages (the production-shifts React app, Roland supplies, Supacolor orders) whose before shot was the pre-render viewport — their repeat after-shots are pixel-identical to each other. Gates + e2e green.
+- **Census after:** 300 sheets · 4755 KB · 256 use var(--) · 237 raw-hex files · 1122 distinct hex · 3073 !important · 210 duplicated bodies (the size grew ~130 KB: one-line reasons on 577 flags and 386 declared theme variables — the price of legibility)
+- **Next:** calculators (11 sheets), then the `pages/css` staff pages batch, then the quote builders + the
+  generated `quote-builder-inline.css` retirement.
+
 ### 2026-09-07 — Webstore / SEO family + Step 2 components LIVE (`v2026.09.07.8`)
 
 - **Family = 39 public pages, 19 sheets** (every page with the `g-header` template or `nwca-2026-core.css`, plus

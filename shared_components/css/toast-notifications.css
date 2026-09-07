@@ -1,6 +1,17 @@
-/* toast-notifications.css — extracted 2026-09-06 from the <style> block(s) toast-notifications.js used to inject (Rule 3). */
+/* toast-notifications.css — extracted 2026-09-06 from the \3c style> block(s) toast-notifications.js used to inject (Rule 3). */
+
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue so the page
+   keeps its exact look. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   every rule below uses var(). Raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
+:root {
+    --toast-notifications-cyan-dark: #1e3a5f;
+}
+/* stylelint-enable color-no-hex */
+
 #nwca-toast-container{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);z-index:99999;display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none;max-width:min(92vw,640px)}
-.nwca-toast{display:flex;align-items:flex-start;gap:10px;padding:12px 18px;border-radius:8px;background:#1f2937;color:#fff;font:14px/1.4 Inter,-apple-system,"Segoe UI",sans-serif;box-shadow:0 8px 24px rgba(0,0,0,.28);opacity:0;transform:translateY(8px);transition:opacity .2s ease,transform .2s ease;pointer-events:auto;white-space:pre-line;word-break:break-word}
+/* stylelint-disable-next-line declaration-property-value-keyword-no-deprecated -- overflow-wrap: anywhere is not a byte-identical swap; legacy */
+.nwca-toast{display:flex;align-items:flex-start;gap:10px;padding:12px 18px;border-radius:8px;background:var(--gray-800);color:var(--color-surface);font:14px/1.4 Inter,-apple-system,"Segoe UI",sans-serif;box-shadow:0 8px 24px rgb(0 0 0 / 28%);opacity:0;transform:translateY(8px);transition:opacity .2s ease,transform .2s ease;pointer-events:auto;white-space:pre-line;word-break:break-word}
 .nwca-toast.show{opacity:1;transform:translateY(0)}
-.nwca-toast-success{background:#14532d}.nwca-toast-error{background:#991b1b}.nwca-toast-warning{background:#92400e}.nwca-toast-info{background:#1e3a5f}
+.nwca-toast-success{background:var(--print-green-dark)}.nwca-toast-error{background:var(--red-800)}.nwca-toast-warning{background:var(--amber-800)}.nwca-toast-info{background:var(--toast-notifications-cyan-dark)}
 .nwca-toast-icon{margin-top:2px;flex:none}

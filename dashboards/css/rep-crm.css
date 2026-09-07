@@ -1,3 +1,5 @@
+/* stylelint-disable no-duplicate-selectors -- legacy sheet: rules were appended over time; merging them would reorder the cascade (2026-09-07) */
+
 /* =====================================================
    REP CRM DASHBOARD STYLES (SHARED)
    Dark Navy Theme - Account Management System
@@ -7,61 +9,78 @@
 /* =====================================================
    CSS VARIABLES - DARK MODE
    ===================================================== */
+
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue, merged into its
+   existing :root. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
 :root {
+    --rep-crm-teal: #10b981;
+    --rep-crm-yellow: #fbbf24;
+    --rep-crm-green: #34d399;
+    --rep-crm-cyan: #60a5fa;
+    --rep-crm-orange: #cd7f32;
+    --rep-crm-red: #ef4444;
+    --rep-crm-red-2: #f87171;
+    --rep-crm-blue: #1e40af;
+    --rep-crm-orange-2: #e5a55d;
+    --rep-crm-yellow-2: #eab308;
+
     /* Dark Mode Base */
-    --bg-dark: #1a2332;
-    --bg-darker: #141c27;
-    --card-dark: #243447;
-    --card-border: #2d4a5e;
-    --text-primary: #ffffff;
-    --text-secondary: #94a3b8;
-    --text-muted: #64748b;
+    --bg-dark: var(--gray-800);
+    --bg-darker: var(--gray-900);
+    --card-dark: var(--gray-800);
+    --card-border: var(--gray-700);
+    --text-primary: var(--color-surface);
+    --text-secondary: var(--gray-400);
+    --text-muted: var(--slate-500);
 
     /* Tier Colors (accent only) */
-    --tier-gold: #f59e0b;
-    --tier-gold-bg: rgba(245, 158, 11, 0.15);
-    --tier-gold-border: #f59e0b;
-    --tier-gold-text: #fbbf24;
-    --tier-silver: #94a3b8;
-    --tier-silver-bg: rgba(148, 163, 184, 0.15);
-    --tier-silver-border: #94a3b8;
-    --tier-silver-text: #cbd5e1;
-    --tier-bronze: #cd7f32;
-    --tier-bronze-bg: rgba(205, 127, 50, 0.15);
-    --tier-bronze-border: #cd7f32;
-    --tier-bronze-text: #e5a55d;
-    --tier-winback: #10b981;
-    --tier-winback-bg: rgba(16, 185, 129, 0.15);
-    --tier-winback-border: #10b981;
-    --tier-winback-text: #34d399;
+    --tier-gold: var(--amber-500);
+    --tier-gold-bg: rgb(245 158 11 / 15%);
+    --tier-gold-border: var(--amber-500);
+    --tier-gold-text: var(--rep-crm-yellow);
+    --tier-silver: var(--gray-400);
+    --tier-silver-bg: rgb(148 163 184 / 15%);
+    --tier-silver-border: var(--gray-400);
+    --tier-silver-text: var(--gray-300);
+    --tier-bronze: var(--rep-crm-orange);
+    --tier-bronze-bg: rgb(205 127 50 / 15%);
+    --tier-bronze-border: var(--rep-crm-orange);
+    --tier-bronze-text: var(--rep-crm-orange-2);
+    --tier-winback: var(--rep-crm-teal);
+    --tier-winback-bg: rgb(16 185 129 / 15%);
+    --tier-winback-border: var(--rep-crm-teal);
+    --tier-winback-text: var(--rep-crm-green);
 
     /* Action Colors */
-    --accent-blue: #3b82f6;
-    --success: #10b981;
-    --error: #ef4444;
-    --warning: #f59e0b;
+    --accent-blue: var(--color-floor-light);
+    --success: var(--rep-crm-teal);
+    --error: var(--rep-crm-red);
+    --warning: var(--amber-500);
 
     /* Priority Colors */
-    --priority-a: #ef4444;
-    --priority-b: #f59e0b;
-    --priority-c: #eab308;
-    --priority-d: #6b7280;
-    --priority-e: #6b7280;
+    --priority-a: var(--rep-crm-red);
+    --priority-b: var(--amber-500);
+    --priority-c: var(--rep-crm-yellow-2);
+    --priority-d: var(--gray-500);
+    --priority-e: var(--gray-500);
 
     /* Health Score Colors (dark-adapted) */
-    --health-good-bg: rgba(16, 185, 129, 0.2);
-    --health-good-text: #34d399;
-    --health-warning-bg: rgba(245, 158, 11, 0.2);
-    --health-warning-text: #fbbf24;
-    --health-danger-bg: rgba(239, 68, 68, 0.2);
-    --health-danger-text: #f87171;
+    --health-good-bg: rgb(16 185 129 / 20%);
+    --health-good-text: var(--rep-crm-green);
+    --health-warning-bg: rgb(245 158 11 / 20%);
+    --health-warning-text: var(--rep-crm-yellow);
+    --health-danger-bg: rgb(239 68 68 / 20%);
+    --health-danger-text: var(--rep-crm-red-2);
 
     /* Status Colors (dark-adapted) */
-    --at-risk-bg: rgba(239, 68, 68, 0.2);
-    --at-risk-text: #f87171;
-    --overdue-bg: rgba(245, 158, 11, 0.2);
-    --overdue-text: #fbbf24;
+    --at-risk-bg: rgb(239 68 68 / 20%);
+    --at-risk-text: var(--rep-crm-red-2);
+    --overdue-bg: rgb(245 158 11 / 20%);
+    --overdue-text: var(--rep-crm-yellow);
 }
+/* stylelint-enable color-no-hex */
 
 /* =====================================================
    PAGE LAYOUT
@@ -72,7 +91,7 @@
 
 body {
     margin: 0;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     background: var(--bg-dark);
     color: var(--text-primary);
     line-height: 1.5;
@@ -93,7 +112,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 2px 8px rgb(0 0 0 / 30%);
     flex-wrap: wrap;
     gap: 1rem;
     border-bottom: 1px solid var(--card-border);
@@ -129,20 +148,20 @@ body {
     align-items: center;
     gap: 0.375rem;
     padding: 0.5rem 0.875rem;
-    background: rgba(255, 255, 255, 0.1);
+    background: rgb(255 255 255 / 10%);
     color: white;
     text-decoration: none;
     border-radius: 6px;
     font-weight: 500;
     font-size: 0.8125rem;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid rgb(255 255 255 / 20%);
     cursor: pointer;
     transition: all 0.2s;
 }
 
 .quick-action-btn:hover {
-    background: rgba(255, 255, 255, 0.2);
-    border-color: rgba(255, 255, 255, 0.4);
+    background: rgb(255 255 255 / 20%);
+    border-color: rgb(255 255 255 / 40%);
 }
 
 .quick-action-btn.active {
@@ -160,19 +179,19 @@ body {
     align-items: center;
     gap: 0.5rem;
     padding: 0.5rem 1rem;
-    background: rgba(255, 255, 255, 0.15);
+    background: rgb(255 255 255 / 15%);
     color: white;
     text-decoration: none;
     border-radius: 6px;
     font-weight: 500;
     font-size: 0.875rem;
-    border: 1px solid rgba(255, 255, 255, 0.25);
+    border: 1px solid rgb(255 255 255 / 25%);
     transition: all 0.2s;
 }
 
 .back-btn:hover {
-    background: rgba(255, 255, 255, 0.25);
-    border-color: rgba(255, 255, 255, 0.45);
+    background: rgb(255 255 255 / 25%);
+    border-color: rgb(255 255 255 / 45%);
 }
 
 /* Welcome Message (in dark header) */
@@ -181,10 +200,10 @@ body {
     align-items: center;
     gap: 0.35rem;
     padding: 0.5rem 1rem;
-    background: rgba(16, 185, 129, 0.2);
-    border: 1px solid rgba(16, 185, 129, 0.4);
+    background: rgb(16 185 129 / 20%);
+    border: 1px solid rgb(16 185 129 / 40%);
     border-radius: 8px;
-    color: #34d399;
+    color: var(--rep-crm-green);
     font-size: 0.875rem;
 }
 
@@ -207,15 +226,15 @@ body {
     flex-direction: column;
     align-items: center;
     padding: 0.375rem 0.75rem;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgb(255 255 255 / 10%);
+    border: 1px solid rgb(255 255 255 / 20%);
     border-radius: 6px;
     cursor: pointer;
     transition: all 0.2s;
 }
 
 .header-stat:hover {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgb(255 255 255 / 20%);
 }
 
 .header-stat.active {
@@ -240,7 +259,7 @@ body {
 
 .header-stat-label {
     font-size: 0.625rem;
-    color: rgba(255, 255, 255, 0.7);
+    color: rgb(255 255 255 / 70%);
     text-transform: uppercase;
 }
 
@@ -269,7 +288,7 @@ body {
     background: var(--card-dark);
     border-radius: 10px;
     padding: 1.25rem;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 2px 8px rgb(0 0 0 / 30%);
     border: 1px solid var(--card-border);
     text-align: center;
     transition: transform 0.2s, box-shadow 0.2s;
@@ -277,7 +296,7 @@ body {
 
 .stat-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 4px 16px rgb(0 0 0 / 40%);
 }
 
 .stat-card.gold-tier {
@@ -289,11 +308,11 @@ body {
 }
 
 .stat-card.at-risk {
-    border-left: 4px solid #dc2626;
+    border-left: 4px solid var(--red-600);
 }
 
 .stat-card.overdue {
-    border-left: 4px solid #ea580c;
+    border-left: 4px solid var(--store-rush);
 }
 
 .stat-value {
@@ -324,12 +343,12 @@ body {
     border-radius: 10px;
     padding: 1.25rem 1.5rem;
     margin-bottom: 1.5rem;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 2px 8px rgb(0 0 0 / 30%);
     border: 1px solid var(--card-border);
 }
 
 .sales-breakdown-section .section-title {
-    margin: 0 0 1rem 0;
+    margin: 0 0 1rem;
     font-size: 1rem;
     font-weight: 600;
     color: var(--text-primary);
@@ -383,7 +402,7 @@ body {
 
 .tier-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 4px 16px rgb(0 0 0 / 40%);
 }
 
 .tier-card.active {
@@ -416,8 +435,8 @@ body {
 }
 
 .tier-card.unclassified {
-    background: rgba(107, 114, 128, 0.15);
-    border-top: 3px solid #6b7280;
+    background: rgb(107 114 128 / 15%);
+    border-top: 3px solid var(--gray-500);
     color: var(--text-secondary);
 }
 
@@ -444,7 +463,7 @@ body {
 .bonus-line {
     margin-top: 0.5rem;
     padding-top: 0.5rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.3);
+    border-top: 1px solid rgb(255 255 255 / 30%);
     font-size: 0.8125rem;
     display: flex;
     justify-content: space-between;
@@ -484,7 +503,7 @@ body {
     border-radius: 10px;
     padding: 1rem 1.25rem;
     margin-bottom: 1.25rem;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 2px 8px rgb(0 0 0 / 30%);
     border: 1px solid var(--card-border);
     display: flex;
     flex-wrap: wrap;
@@ -521,7 +540,7 @@ body {
 .filter-group select:focus {
     outline: none;
     border-color: var(--accent-blue);
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    box-shadow: 0 0 0 3px rgb(59 130 246 / 20%);
 }
 
 .filter-group.search-group {
@@ -583,7 +602,7 @@ body {
 .accounts-section {
     background: var(--card-dark);
     border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 2px 8px rgb(0 0 0 / 30%);
     border: 1px solid var(--card-border);
     overflow: hidden;
 }
@@ -631,7 +650,7 @@ body {
 
 .account-card:hover {
     border-color: var(--accent-blue);
-    box-shadow: 0 4px 16px rgba(59, 130, 246, 0.2);
+    box-shadow: 0 4px 16px rgb(59 130 246 / 20%);
 }
 
 /* Priority Bar */
@@ -662,7 +681,7 @@ body {
     font-weight: 600;
     font-size: 1rem;
     color: var(--text-primary);
-    margin: 0 0 0.375rem 0;
+    margin: 0 0 0.375rem;
 }
 
 .card-badges {
@@ -725,8 +744,8 @@ body {
 }
 
 .status-badge.contact-status {
-    background: #dbeafe;
-    color: #1e40af;
+    background: var(--sky-100);
+    color: var(--rep-crm-blue);
 }
 
 /* Contact Info */
@@ -850,11 +869,8 @@ body {
 .modal-overlay {
     display: none;
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.7);
+    inset: 0;
+    background: rgb(0 0 0 / 70%);
     z-index: 1000;
     align-items: center;
     justify-content: center;
@@ -872,7 +888,7 @@ body {
     max-width: 600px;
     max-height: 90vh;
     overflow-y: auto;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 20px 40px rgb(0 0 0 / 50%);
     border: 1px solid var(--card-border);
 }
 
@@ -924,10 +940,10 @@ body {
     display: inline-flex;
     align-items: center;
     padding: 0.25rem 0.5rem;
-    background: #f3f4f6;
+    background: var(--gray-100);
     border-radius: 4px;
     font-size: 0.6875rem;
-    color: #4b5563;
+    color: var(--gray-600);
 }
 
 .product-tag.active {
@@ -959,14 +975,14 @@ body {
 .form-group label {
     font-size: 0.8125rem;
     font-weight: 600;
-    color: #374151;
+    color: var(--gray-700);
 }
 
 .form-group input,
 .form-group select,
 .form-group textarea {
     padding: 0.625rem 0.875rem;
-    border: 1px solid #d1d5db;
+    border: 1px solid var(--gray-300);
     border-radius: 6px;
     font-size: 0.9375rem;
     font-family: inherit;
@@ -978,7 +994,7 @@ body {
 .form-group textarea:focus {
     outline: none;
     border-color: var(--wsu-crimson);
-    box-shadow: 0 0 0 3px rgba(152, 30, 50, 0.1);
+    box-shadow: 0 0 0 3px rgb(152 30 50 / 10%);
 }
 
 .form-group textarea {
@@ -1025,7 +1041,7 @@ body {
 }
 
 .btn-save:hover {
-    background: #2563eb;
+    background: var(--blue-600);
 }
 
 .btn-save:disabled {
@@ -1041,13 +1057,13 @@ body {
     bottom: 2rem;
     left: 50%;
     transform: translateX(-50%) translateY(100px);
-    background: linear-gradient(135deg, #10b981, #059669);
+    background: linear-gradient(135deg, var(--rep-crm-teal), var(--emerald-600));
     color: white;
     padding: 1rem 2rem;
     border-radius: 12px;
     font-weight: 600;
     font-size: 1rem;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 10px 25px rgb(0 0 0 / 20%);
     z-index: 3000;
     opacity: 0;
     transition: all 0.3s ease;
@@ -1059,11 +1075,11 @@ body {
 }
 
 .celebration-toast.streak {
-    background: linear-gradient(135deg, #f59e0b, #d97706);
+    background: linear-gradient(135deg, var(--amber-500), var(--amber-600));
 }
 
 .celebration-toast.calls {
-    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    background: linear-gradient(135deg, var(--color-floor-light), var(--blue-600));
 }
 
 /* =====================================================
@@ -1072,7 +1088,7 @@ body {
 .error-banner {
     display: none;
     background: var(--health-danger-bg);
-    border: 1px solid rgba(239, 68, 68, 0.3);
+    border: 1px solid rgb(239 68 68 / 30%);
     border-radius: 8px;
     padding: 1rem 1.25rem;
     margin-bottom: 1.5rem;
@@ -1121,11 +1137,8 @@ body {
 .loading-overlay {
     display: none;
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(26, 35, 50, 0.9);
+    inset: 0;
+    background: rgb(26 35 50 / 90%);
     align-items: center;
     justify-content: center;
     z-index: 10;
@@ -1153,7 +1166,7 @@ body {
 }
 
 .empty-state h3 {
-    margin: 0 0 0.5rem 0;
+    margin: 0 0 0.5rem;
     font-size: 1.125rem;
     color: var(--text-secondary);
 }
@@ -1172,18 +1185,18 @@ body {
 }
 
 .trend-badge.growing {
-    background: #dcfce7;
-    color: #166534;
+    background: var(--store-green-100);
+    color: var(--print-green);
 }
 
 .trend-badge.stable {
-    background: #dbeafe;
-    color: #1e40af;
+    background: var(--sky-100);
+    color: var(--rep-crm-blue);
 }
 
 .trend-badge.declining {
-    background: #fee2e2;
-    color: #991b1b;
+    background: var(--red-100);
+    color: var(--red-800);
 }
 
 /* =====================================================
@@ -1241,7 +1254,7 @@ body {
 /* =====================================================
    RESPONSIVE DESIGN
    ===================================================== */
-@media (max-width: 1200px) {
+@media (width <= 1200px) {
     .crm-layout {
         grid-template-columns: 1fr;
     }
@@ -1255,7 +1268,7 @@ body {
     }
 }
 
-@media (max-width: 1024px) {
+@media (width <= 1024px) {
     .stats-grid {
         grid-template-columns: repeat(2, 1fr);
     }
@@ -1269,7 +1282,7 @@ body {
     }
 }
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
     .crm-header {
         flex-direction: column;
         align-items: stretch;
@@ -1327,6 +1340,7 @@ body {
 /* =====================================================
    PRINT STYLES
    ===================================================== */
+
 /* =====================================================
    RECONCILE BUTTON & MODAL
    ===================================================== */
@@ -1335,18 +1349,18 @@ body {
     align-items: center;
     gap: 0.375rem;
     padding: 0.375rem 0.75rem;
-    background: rgba(59, 130, 246, 0.2);
-    border: 1px solid rgba(59, 130, 246, 0.4);
+    background: rgb(59 130 246 / 20%);
+    border: 1px solid rgb(59 130 246 / 40%);
     border-radius: 6px;
     font-size: 0.75rem;
-    color: #60a5fa;
+    color: var(--rep-crm-cyan);
     cursor: pointer;
     transition: all 0.2s;
 }
 
 .reconcile-btn:hover {
-    background: rgba(59, 130, 246, 0.3);
-    border-color: rgba(59, 130, 246, 0.6);
+    background: rgb(59 130 246 / 30%);
+    border-color: rgb(59 130 246 / 60%);
 }
 
 .reconcile-btn:disabled {
@@ -1368,20 +1382,20 @@ body {
     max-width: 800px;
     max-height: 90vh;
     overflow: hidden;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 20px 40px rgb(0 0 0 / 50%);
     border: 1px solid var(--card-border);
     display: flex;
     flex-direction: column;
 }
 
 .reconcile-modal .modal-header {
-    background: rgba(59, 130, 246, 0.15);
+    background: rgb(59 130 246 / 15%);
     border-bottom: 1px solid var(--card-border);
     border-top: 3px solid var(--accent-blue);
 }
 
 .reconcile-modal .modal-title h2 {
-    color: #60a5fa;
+    color: var(--rep-crm-cyan);
 }
 
 .reconcile-modal .modal-title h2 i {
@@ -1391,7 +1405,7 @@ body {
 .modal-subtitle {
     font-size: 0.875rem;
     color: var(--text-secondary);
-    margin: 0.25rem 0 0 0;
+    margin: 0.25rem 0 0;
     font-weight: 400;
 }
 
@@ -1442,7 +1456,7 @@ body {
 .reconcile-summary-stat .stat-value {
     font-size: 1.5rem;
     font-weight: 700;
-    color: #60a5fa;
+    color: var(--rep-crm-cyan);
     line-height: 1;
 }
 
@@ -1525,7 +1539,7 @@ body {
 }
 
 .reconcile-empty h3 {
-    margin: 0 0 0.5rem 0;
+    margin: 0 0 0.5rem;
     font-size: 1.25rem;
     font-weight: 600;
 }
@@ -1546,7 +1560,7 @@ body {
 }
 
 #reconcile-add-all:hover {
-    background: #059669;
+    background: var(--emerald-600);
 }
 
 #reconcile-add-all:disabled {
@@ -1564,7 +1578,7 @@ body {
     max-width: 900px;
     max-height: 90vh;
     overflow: hidden;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 20px 40px rgb(0 0 0 / 50%);
     border: 1px solid var(--card-border);
     display: flex;
     flex-direction: column;
@@ -1577,7 +1591,7 @@ body {
 }
 
 .account-detail-modal .modal-title h2 {
-    margin: 0 0 0.5rem 0;
+    margin: 0 0 0.5rem;
     font-size: 1.375rem;
     color: var(--text-primary);
 }
@@ -1614,7 +1628,7 @@ body {
     color: var(--text-muted);
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    margin: 0 0 0.75rem 0;
+    margin: 0 0 0.75rem;
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -1846,7 +1860,7 @@ body {
 .checkmark-item.active {
     background: var(--health-good-bg);
     color: var(--health-good-text);
-    border-color: rgba(16, 185, 129, 0.3);
+    border-color: rgb(16 185 129 / 30%);
 }
 
 .checkmark-item i {
@@ -1881,7 +1895,7 @@ body {
 .month-box.active {
     background: var(--health-good-bg);
     color: var(--health-good-text);
-    border-color: rgba(16, 185, 129, 0.3);
+    border-color: rgb(16 185 129 / 30%);
 }
 
 .month-box.primary {
@@ -1933,7 +1947,7 @@ body {
 }
 
 /* Responsive adjustments */
-@media (max-width: 768px) {
+@media (width <= 768px) {
     .account-detail-modal {
         max-width: 100%;
         max-height: 100vh;
@@ -1967,19 +1981,20 @@ body {
 @media print {
     .crm-header {
         background: white;
-        color: #1f2937;
+        color: var(--gray-800);
         border-bottom: 2px solid var(--accent-blue);
         box-shadow: none;
     }
 
     .header-title {
-        color: #1f2937;
+        color: var(--gray-800);
     }
 
     .back-btn,
     .quick-action-btn,
     .user-welcome,
     .filters-section {
+        /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
         display: none !important;
     }
 
@@ -1990,37 +2005,44 @@ body {
     .account-card {
         break-inside: avoid;
         box-shadow: none;
-        border: 1px solid #e5e7eb;
+        border: 1px solid var(--gray-200);
     }
 }
 
 /* ── 2026-09-05 review ────────────────────────────────────────────────────── */
+
 /* `hidden` must beat the display rules above (.user-welcome / .modal-overlay etc.). */
+/* stylelint-disable-next-line declaration-no-important -- the hidden attribute must beat any display rule */
 [hidden] { display: none !important; }
+
 /* Tier cards are real <button>s now (keyboard + aria-pressed); reset the UA button look. */
 .tier-card { font: inherit; color: inherit; width: 100%; display: block; }
 .tier-card > span { display: block; }
 .tier-card .bonus-line { display: flex; }
 .tier-card[aria-pressed="true"] { outline: 2px solid white; outline-offset: 2px; }
+
 .tier-card:focus-visible, .account-card:focus-visible, .header-stat:focus-visible, .product-toggle:focus-visible,
 .clear-filters-btn:focus-visible, .modal-close:focus-visible, .btn-cancel:focus-visible, .error-banner-retry:focus-visible,
-.back-btn:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+.back-btn:focus-visible { outline: 2px solid var(--color-surface); outline-offset: 2px; }
 .crm-layout--single { grid-template-columns: 1fr; }
-.crm-archive-hint { display: flex; align-items: center; gap: 6px; color: #6b7280; font-size: 11px; margin: 2px 0 6px; }
+.crm-archive-hint { display: flex; align-items: center; gap: 6px; color: var(--gray-500); font-size: 11px; margin: 2px 0 6px; }
 .crm-archive-hint i { font-size: 10px; }
-.crm-archive-hint.is-warning { color: #f59e0b; }
-.crm-recon-line { color: #9ca3af; font-size: 11px; margin-top: 4px; text-align: right; }
+.crm-archive-hint.is-warning { color: var(--amber-500); }
+.crm-recon-line { color: var(--gray-400); font-size: 11px; margin-top: 4px; text-align: right; }
 .order-type-primary { margin: 0 0 0.75rem; color: var(--text-secondary); }
 .health-gauge-fill { width: var(--fill, 0%); }
+
 .error-banner-retry {
     margin-left: auto; font: inherit; font-size: 0.8rem; font-weight: 600; color: inherit;
-    background: rgba(255, 255, 255, 0.12); border: 1px solid rgba(255, 255, 255, 0.35); border-radius: 6px;
+    background: rgb(255 255 255 / 12%); border: 1px solid rgb(255 255 255 / 35%); border-radius: 6px;
     padding: 4px 10px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
 }
-.error-banner-retry:hover { background: rgba(255, 255, 255, 0.22); }
+.error-banner-retry:hover { background: rgb(255 255 255 / 22%); }
 .error-banner-retry + .error-banner-close { margin-left: 8px; }
-@media (max-width: 640px) {
+
+@media (width <= 640px) {
     .header-right { flex-wrap: wrap; gap: 8px; }
+    /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
     .user-welcome { display: none !important; }
     .crm-header { padding: 0.75rem 1rem; }
     .header-stat { padding: 0.4rem 0.75rem; }

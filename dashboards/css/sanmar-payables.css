@@ -1,8 +1,22 @@
+/* stylelint-disable no-duplicate-selectors -- legacy sheet: rules were appended over time; merging them would reorder the cascade (2026-09-07) */
+
 /* sanmar-payables.css — native SanMar Payables page (Phase 1).
  * Page-specific styles only; design tokens from art-hub.css, shell from
  * dash-shell.css. Prefix: smp-. Mirrors the purchasing-portal table look. */
 
-:root { --art-theme: #009900; }
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue, merged into its
+   existing :root. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
+:root {
+    --sanmar-payables-red: #c0392b;
+    --sanmar-payables-orange: #f5d3ad;
+    --sanmar-payables-green: #b7e0c5;
+    --sanmar-payables-red-tint: #f3c4c4;
+    --sanmar-payables-blue: #0a4fb5;
+    --sanmar-payables-blue-tint: #c4d7f7;
+ --art-theme: var(--color-dash-theme); }
+/* stylelint-enable color-no-hex */
 
 .smp-toolbar { flex-wrap: wrap; gap: var(--space-2); }
 .smp-updated { font-size: 0.78rem; color: var(--gray-500); }
@@ -15,6 +29,7 @@
     margin-bottom: var(--space-3);
 }
 .smp-field { display: flex; flex-direction: column; gap: 4px; }
+
 .smp-field-label {
     font-size: 0.7rem;
     font-weight: 700;
@@ -22,6 +37,7 @@
     letter-spacing: 0.04em;
     color: var(--gray-500);
 }
+
 .smp-input {
     font: inherit;
     font-size: 0.88rem;
@@ -35,11 +51,13 @@
 .smp-filters-spacer { flex: 1; }
 
 .smp-table-scroll { overflow-x: auto; }
+
 .smp-table {
     width: 100%;
     border-collapse: collapse;
     font-size: 0.85rem;
 }
+
 .smp-table th {
     text-align: left;
     font-size: 0.72rem;
@@ -51,6 +69,7 @@
     border-bottom: 1px solid var(--gray-200);
     white-space: nowrap;
 }
+
 .smp-table td {
     padding: 8px 10px;
     border-bottom: 1px solid var(--gray-100);
@@ -62,9 +81,9 @@
 .smp-po { font-family: 'JetBrains Mono', monospace; white-space: nowrap; }
 .smp-ship { color: var(--gray-700); }
 .smp-amt { font-family: 'JetBrains Mono', monospace; font-weight: 600; text-align: right; color: var(--gray-900); white-space: nowrap; }
-.smp-amt--credit { color: var(--state-danger, #c0392b); }
-.smp-tr--credit { background: #fff8f5; }
-.smp-tr--excluded { background: var(--surface-inset, #f7f7f8); color: var(--gray-500); }
+.smp-amt--credit { color: var(--state-danger, var(--sanmar-payables-red)); }
+.smp-tr--credit { background: var(--store-paper); }
+.smp-tr--excluded { background: var(--surface-inset, var(--gray-50)); color: var(--gray-500); }
 .smp-tr--excluded .smp-inv, .smp-tr--excluded .smp-amt { color: var(--gray-500); }
 .smp-empty { text-align: center; color: var(--gray-500); padding: var(--space-4); }
 .smp-check-cell { width: 34px; text-align: center; }
@@ -73,7 +92,7 @@
 
 .smp-badge {
     display: inline-block;
-    font-family: 'Inter', sans-serif;
+    font-family: Inter, sans-serif;
     font-size: 0.62rem;
     font-weight: 700;
     letter-spacing: 0.03em;
@@ -82,12 +101,12 @@
     margin-left: 6px;
     vertical-align: middle;
 }
-.smp-badge--mkt { background: #fff3e0; color: #b45309; border: 1px solid #f5d3ad; }
-.smp-badge--credit { background: #fdecec; color: #c0392b; border: 1px solid #f3c4c4; }
-.smp-badge--zero { background: var(--surface-inset, #eee); color: var(--gray-500); border: 1px solid var(--gray-300); }
-.smp-badge--todo { background: #eef4ff; color: #0a4fb5; border: 1px solid #c4d7f7; }
-.smp-badge--imported { background: #fff8f0; color: #b45309; border: 1px solid #f5d3ad; }
-.smp-badge--paid { background: #eaf7ef; color: #0f5132; border: 1px solid #b7e0c5; }
+.smp-badge--mkt { background: var(--store-rush-soft); color: var(--amber-700); border: 1px solid var(--sanmar-payables-orange); }
+.smp-badge--credit { background: var(--red-50); color: var(--sanmar-payables-red); border: 1px solid var(--sanmar-payables-red-tint); }
+.smp-badge--zero { background: var(--surface-inset, var(--brand-100)); color: var(--gray-500); border: 1px solid var(--gray-300); }
+.smp-badge--todo { background: var(--color-floor-tint); color: var(--sanmar-payables-blue); border: 1px solid var(--sanmar-payables-blue-tint); }
+.smp-badge--imported { background: var(--store-paper); color: var(--amber-700); border: 1px solid var(--sanmar-payables-orange); }
+.smp-badge--paid { background: var(--brand-50); color: var(--brand-800); border: 1px solid var(--sanmar-payables-green); }
 .smp-paiddate { font-size: 0.72rem; color: var(--gray-500); margin-left: 4px; }
 
 /* ShopWorks upload bar */
@@ -98,21 +117,23 @@
     flex-wrap: wrap;
     padding: 10px 12px;
     margin-bottom: var(--space-3);
-    background: var(--surface-inset, #f7f7f8);
+    background: var(--surface-inset, var(--gray-50));
     border: 1px solid var(--gray-200);
     border-radius: var(--radius-sm);
 }
 .smp-upload-btn { cursor: pointer; }
 .smp-sw-status { font-size: 0.8rem; color: var(--gray-600); }
+
 .smp-linkbtn {
-    border: none; background: none; color: var(--art-theme, #009900);
+    border: none; background: none; color: var(--art-theme, var(--color-dash-theme));
     font: inherit; font-size: 0.8rem; cursor: pointer; text-decoration: underline; padding: 0;
 }
+
 .smp-older-hint {
     font-size: 0.8rem;
-    color: #b45309;
-    background: #fff8f0;
-    border: 1px solid #f5d3ad;
+    color: var(--amber-700);
+    background: var(--store-paper);
+    border: 1px solid var(--sanmar-payables-orange);
     border-radius: var(--radius-sm);
     padding: 6px 10px;
     margin: 0 0 var(--space-2);
@@ -124,7 +145,7 @@
     color: var(--gray-500);
     line-height: 1.45;
 }
-.smp-note i { color: #b45309; }
+.smp-note i { color: var(--amber-700); }
 
 /* ---------- tabs ---------- */
 .smp-tabs {
@@ -133,6 +154,7 @@
     margin-bottom: var(--space-3);
     border-bottom: 1px solid var(--gray-200);
 }
+
 .smp-tab {
     font: inherit;
     font-size: 0.9rem;
@@ -146,7 +168,7 @@
     cursor: pointer;
 }
 .smp-tab:hover { color: var(--gray-800); }
-.smp-tab.is-active { color: var(--art-theme, #009900); border-bottom-color: var(--art-theme, #009900); }
+.smp-tab.is-active { color: var(--art-theme, var(--color-dash-theme)); border-bottom-color: var(--art-theme, var(--color-dash-theme)); }
 .smp-tab i { margin-right: 5px; }
 
 /* ---------- marketing fund ---------- */
@@ -163,18 +185,20 @@
 .smp-progress {
     height: 14px;
     border-radius: 999px;
-    background: var(--surface-inset, #eef0f2);
+    background: var(--surface-inset, var(--gray-100));
     overflow: hidden;
     border: 1px solid var(--gray-200);
 }
+
 .smp-progress-fill {
     height: 100%;
     width: 0;
-    background: var(--art-theme, #009900);
+    background: var(--art-theme, var(--color-dash-theme));
     border-radius: 999px;
     transition: width var(--dur-base, 0.3s) var(--ease-out, ease);
 }
-.smp-progress-fill--over { background: var(--state-danger, #c0392b); }
+.smp-progress-fill--over { background: var(--state-danger, var(--sanmar-payables-red)); }
+
 .smp-progress-legend {
     display: flex;
     gap: var(--space-4);
@@ -183,7 +207,7 @@
     color: var(--gray-600);
 }
 .smp-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 4px; }
-.smp-dot--spent { background: var(--art-theme, #009900); }
+.smp-dot--spent { background: var(--art-theme, var(--color-dash-theme)); }
 .smp-dot--left { background: var(--gray-300); }
 
 .smp-mkt-cols {
@@ -192,7 +216,9 @@
     gap: var(--space-5);
     margin-top: var(--space-4);
 }
-@media (max-width: 860px) { .smp-mkt-cols { grid-template-columns: 1fr; } }
+
+@media (width <= 860px) { .smp-mkt-cols { grid-template-columns: 1fr; } }
+
 .smp-subhead {
     font-size: 0.72rem;
     font-weight: 700;
@@ -204,9 +230,9 @@
 
 .smp-monthrow { display: flex; align-items: center; gap: var(--space-2); margin-bottom: 6px; font-size: 0.8rem; }
 .smp-monthlbl { width: 34px; color: var(--gray-500); flex-shrink: 0; }
-.smp-monthbar-track { flex: 1; height: 10px; background: var(--surface-inset, #eef0f2); border-radius: 999px; overflow: hidden; }
-.smp-monthbar-fill { display: block; height: 100%; background: var(--art-theme, #009900); border-radius: 999px; }
-.smp-monthbar-fill--credit { background: var(--state-danger, #c0392b); }
+.smp-monthbar-track { flex: 1; height: 10px; background: var(--surface-inset, var(--gray-100)); border-radius: 999px; overflow: hidden; }
+.smp-monthbar-fill { display: block; height: 100%; background: var(--art-theme, var(--color-dash-theme)); border-radius: 999px; }
+.smp-monthbar-fill--credit { background: var(--state-danger, var(--sanmar-payables-red)); }
 .smp-monthval { width: 84px; text-align: right; font-family: 'JetBrains Mono', monospace; color: var(--gray-700); flex-shrink: 0; }
 
 .smp-view-btn {
@@ -232,20 +258,22 @@
     border-top: 1px solid var(--gray-200);
 }
 .smp-download:disabled { opacity: 0.5; cursor: not-allowed; }
+
 .smp-markbtn {
-    background: #eaf7ef;
-    color: #0f5132;
-    border: 1px solid #b7e0c5;
+    background: var(--brand-50);
+    color: var(--brand-800);
+    border: 1px solid var(--sanmar-payables-green);
 }
-.smp-markbtn:hover:not(:disabled) { background: #d8f0e2; }
+.smp-markbtn:hover:not(:disabled) { background: var(--store-green-100); }
 .smp-markbtn:disabled { opacity: 0.5; cursor: not-allowed; }
 
 /* 2026-09-05 review */
+/* stylelint-disable-next-line declaration-no-important -- the hidden attribute must beat any display rule */
 [hidden] { display: none !important; }
 .smp-stat-btn { font: inherit; color: inherit; text-align: left; cursor: pointer; }
-.smp-stat-btn[aria-pressed="true"] { outline: 2px solid var(--art-theme, #009900); outline-offset: -2px; }
-.smp-stat-btn:focus-visible, .smp-tab:focus-visible, .smp-upload-btn:focus-visible, .smp-view-btn:focus-visible, .smp-linkbtn:focus-visible { outline: 2px solid var(--art-theme, #009900); outline-offset: 2px; }
+.smp-stat-btn[aria-pressed="true"] { outline: 2px solid var(--art-theme, var(--color-dash-theme)); outline-offset: -2px; }
+.smp-stat-btn:focus-visible, .smp-tab:focus-visible, .smp-upload-btn:focus-visible, .smp-view-btn:focus-visible, .smp-linkbtn:focus-visible { outline: 2px solid var(--art-theme, var(--color-dash-theme)); outline-offset: 2px; }
 .smp-progress-fill { width: var(--w, 0%); }
 .smp-monthbar-fill { width: var(--w, 0%); }
-.smp-sw-status--warn { color: var(--state-danger, #c0392b); font-weight: 600; }
+.smp-sw-status--warn { color: var(--state-danger, var(--sanmar-payables-red)); font-weight: 600; }
 .smp-retry { margin-left: 8px; }

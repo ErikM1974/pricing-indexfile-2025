@@ -6,9 +6,10 @@
    ========================================================================== */
 
 .sf-subhead { font-weight: 400; font-size: 0.68em; opacity: 0.85; }
+
 .sf-lock {
-    display: inline-flex; align-items: center; gap: 6px; font-size: 0.8rem; font-weight: 600; color: #fff;
-    background: rgba(0,0,0,0.18); border: 1px solid rgba(255,255,255,0.35); padding: 5px 12px; border-radius: var(--radius-pill);
+    display: inline-flex; align-items: center; gap: 6px; font-size: 0.8rem; font-weight: 600; color: var(--color-on-brand);
+    background: rgb(0 0 0 / 18%); border: 1px solid rgb(255 255 255 / 35%); padding: 5px 12px; border-radius: var(--radius-pill);
 }
 
 .sf-lead { font-size: 1rem; line-height: 1.6; color: var(--gray-700); margin: 0 0 var(--space-4); }
@@ -21,7 +22,7 @@
     display: inline-flex; align-items: center; gap: 7px; font-size: 0.84rem; font-weight: 600;
     padding: 7px 14px; border-radius: var(--radius-md); border: 1px solid transparent;
     cursor: pointer; text-decoration: none; white-space: nowrap; line-height: 1;
-    background: var(--dash-theme); color: #fff; transition: filter .12s ease, background .12s ease;
+    background: var(--dash-theme); color: var(--color-on-brand); transition: filter .12s ease, background .12s ease;
 }
 .sf-btn:hover { filter: brightness(1.05); }
 .sf-btn:active { filter: brightness(0.95); }
@@ -32,15 +33,18 @@
 /* ---------- status / messages ---------- */
 .sf-status { font-size: 0.9rem; color: var(--gray-600); margin: 0 0 var(--space-3); }
 .sf-status.is-error { color: var(--state-danger); }
+
 .sf-msg { border: 1px solid var(--gray-200); border-left: 4px solid var(--gray-400); border-radius: var(--radius-md);
     padding: var(--space-3) var(--space-4); background: var(--surface-inset); font-size: 0.9rem; color: var(--gray-700); line-height: 1.55; }
 .sf-msg--error { border-left-color: var(--state-danger); background: var(--state-danger-bg); color: var(--state-danger); }
 .sf-spin { animation: sf-spin 0.8s linear infinite; display: inline-block; }
+
 @keyframes sf-spin { to { transform: rotate(360deg); } }
 
 /* ---------- file table ---------- */
 .sf-table-wrap { overflow-x: auto; }
 .sf-table { width: 100%; border-collapse: collapse; font-size: 0.86rem; min-width: 620px; }
+
 .sf-table thead th { text-align: left; padding: 8px var(--space-3); border-bottom: 2px solid var(--gray-300);
     color: var(--gray-500); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.04em; font-weight: 600; background: var(--surface-inset); }
 .sf-table td { padding: 9px var(--space-3); border-bottom: 1px solid var(--gray-200); vertical-align: middle; color: var(--gray-700); }
@@ -49,6 +53,7 @@
 .sf-file-kind { font-size: 0.82rem; color: var(--gray-600); }
 .sf-file-meta { font-size: 0.8rem; color: var(--gray-500); white-space: nowrap; font-variant-numeric: tabular-nums; }
 .sf-row--master td { background: var(--dash-theme-bg); }
+
 .sf-tag { display: inline-block; font-size: 0.66rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em;
     padding: 2px 8px; border-radius: var(--radius-pill); color: var(--dash-theme-dark); background: var(--dash-theme-bg);
     border: 1px solid var(--dash-theme); margin-left: 6px; vertical-align: middle; }
@@ -57,6 +62,7 @@
 .sf-flow { display: flex; align-items: stretch; flex-wrap: wrap; gap: var(--space-2);
     background: var(--surface-inset); border: 1px solid var(--gray-200); border-radius: var(--radius-md);
     padding: var(--space-3) var(--space-4); margin-bottom: var(--space-4); }
+
 .sf-node { display: flex; flex-direction: column; justify-content: center; gap: 2px; text-align: center;
     font-size: 0.82rem; font-weight: 600; color: var(--gray-800); background: var(--surface-card);
     border: 1px solid var(--gray-200); border-radius: var(--radius-sm); padding: var(--space-2) var(--space-3); }
@@ -81,8 +87,8 @@
 .sf-callout--danger h4 { color: var(--state-danger); }
 .sf-callout--info { border-left-color: var(--state-info); }
 .sf-callout--info h4 { color: var(--state-info); }
-.sf-callout--warn { border-left-color: var(--state-warning, #b45309); }
-.sf-callout--warn h4 { color: var(--state-warning, #b45309); }
+.sf-callout--warn { border-left-color: var(--state-warning, var(--amber-700)); }
+.sf-callout--warn h4 { color: var(--state-warning, var(--amber-700)); }
 
 /* ---------- steps ---------- */
 .sf-steps { margin: 0; padding-left: var(--space-5); }
@@ -95,4 +101,5 @@
 }
 
 /* 2026-09-05 review */
+/* stylelint-disable-next-line declaration-no-important -- the hidden attribute must beat any display rule */
 [hidden] { display: none !important; }

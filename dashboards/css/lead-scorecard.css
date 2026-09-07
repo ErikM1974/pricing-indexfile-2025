@@ -14,6 +14,7 @@
     flex-wrap: wrap;
 }
 .sc-presets { display: flex; gap: 6px; flex-wrap: wrap; }
+
 .sc-preset {
     font: inherit;
     font-size: 0.8rem;
@@ -30,6 +31,7 @@
 
 .sc-range { display: flex; align-items: flex-end; gap: 10px; flex-wrap: wrap; }
 .sc-field { display: flex; flex-direction: column; gap: 3px; font-size: 0.72rem; font-weight: 600; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.03em; }
+
 .sc-input {
     font: inherit;
     font-size: 0.88rem;
@@ -65,12 +67,14 @@
 
 .sc-table-scroll { overflow-x: auto; }
 .sc-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+
 .sc-table th, .sc-table td {
     text-align: left;
     padding: 10px 14px;
     border-bottom: 1px solid var(--gray-100);
     white-space: nowrap;
 }
+
 .sc-table th {
     font-size: 0.72rem;
     font-weight: 600;
@@ -87,6 +91,7 @@
 
 /* rep row: a subtle value bar behind the name */
 .sc-table td:first-child { position: relative; }
+
 .sc-bar {
     position: absolute;
     left: 0; top: 0; bottom: 0;
@@ -97,10 +102,10 @@
 }
 .sc-rep-name { position: relative; z-index: 1; font-weight: 600; color: var(--gray-800); }
 .sc-cust { color: var(--gray-400); font-size: 0.78rem; font-family: 'JetBrains Mono', monospace; }
-.sc-table a { color: var(--state-info-text, #2563eb); text-decoration: none; }
+.sc-table a { color: var(--state-info-text, var(--blue-600)); text-decoration: none; }
 .sc-table a:hover { text-decoration: underline; }
 
-@media (max-width: 640px) {
+@media (width <= 640px) {
     .sc-controls-card { align-items: stretch; }
     .sc-range { justify-content: space-between; }
 }

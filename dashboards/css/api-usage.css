@@ -1,3 +1,5 @@
+/* stylelint-disable no-duplicate-selectors -- legacy sheet: rules were appended over time; merging them would reorder the cascade (2026-09-07) */
+
 /* ==========================================================================
    api-usage.css — page-specific styles for dashboards/api-usage.html
 
@@ -11,6 +13,7 @@
    ========================================================================== */
 
 /* --- Scope banner ------------------------------------------------------- */
+
 /* Deliberately prominent. The whole reason the 2026-07 overage went unnoticed
    is that a confident-looking number was trusted without knowing its scope. */
 .au-scope {
@@ -203,7 +206,7 @@
     background-image: repeating-linear-gradient(
         45deg,
         transparent 0 3px,
-        rgba(15, 23, 42, 0.28) 3px 6px
+        rgb(15 23 42 / 28%) 3px 6px
     );
 }
 
@@ -244,6 +247,7 @@
 }
 
 /* 2026-09-05 review */
+/* stylelint-disable-next-line declaration-no-important -- the hidden attribute must beat any display rule */
 [hidden] { display: none !important; }
 .au-meter-fill { width: var(--w, 0%); }
 .au-row-share span { width: var(--w, 0%); }

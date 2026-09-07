@@ -10,6 +10,16 @@
    colors/shadows/radii — use var(--token-name).
    ========================================================================== */
 
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue so the page
+   keeps its exact look. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   every rule below uses var(). Raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
+:root {
+    --policy-migration-green-tint: #d1e7dd;
+    --policy-migration-yellow-dark: #664d03;
+}
+/* stylelint-enable color-no-hex */
+
 .pm-questions-list {
     margin: 0;
     padding: 0 0 0 1.2rem;
@@ -106,7 +116,7 @@
     border-bottom: 1px solid var(--gray-200);
     position: sticky;
     top: 0;
-    background: var(--surface-card, #fff);
+    background: var(--surface-card, var(--color-surface));
 }
 
 .pm-table td {
@@ -126,9 +136,9 @@
     color: var(--gray-700);
 }
 
-.pm-badge--done    { background: var(--state-success-bg, #d1e7dd); color: var(--state-success-text, #0f5132); }
-.pm-badge--core    { background: var(--state-warning-bg, #fff3cd); color: var(--state-warning-text, #664d03); }
-.pm-badge--erik    { background: var(--state-danger-bg, #f8d7da);  color: var(--state-danger-text, #842029); }
+.pm-badge--done    { background: var(--state-success-bg, var(--policy-migration-green-tint)); color: var(--state-success-text, var(--brand-800)); }
+.pm-badge--core    { background: var(--state-warning-bg, var(--amber-100)); color: var(--state-warning-text, var(--policy-migration-yellow-dark)); }
+.pm-badge--erik    { background: var(--state-danger-bg, var(--red-100));  color: var(--state-danger-text, var(--color-ae-dark)); }
 .pm-badge--auto    { background: var(--gray-100); color: var(--gray-600); }
 
 .pm-note {
@@ -150,13 +160,14 @@
 
 /* Phone (≤640px) — 2026-09-05 staff-dashboard sweep: the page measured wider than the
    viewport at 375px and panned sideways. */
-@media (max-width: 640px) {
+@media (width <= 640px) {
     .pm-table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
 }
 
-@media (max-width: 640px) {
+@media (width <= 640px) {
     .dash-card-header { flex-wrap: wrap; row-gap: 6px; }
 }
 
 /* 2026-09-05 review */
+/* stylelint-disable-next-line declaration-no-important -- the hidden attribute must beat any display rule */
 [hidden] { display: none !important; }

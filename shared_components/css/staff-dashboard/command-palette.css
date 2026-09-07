@@ -32,13 +32,13 @@
     background: var(--surface-card-2, var(--bg-card-2));
     border: 1px solid color-mix(in oklch, var(--accent) 40%, var(--border-base));
     border-radius: var(--radius-lg);
-    box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.05) inset, 0 8px 24px rgba(0, 0, 0, 0.35);
+    box-shadow: 0 1px 0 0 rgb(255 255 255 / 5%) inset, 0 8px 24px rgb(0 0 0 / 35%);
     transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .hero-search:focus-within {
     border-color: var(--accent);
-    box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.05) inset, 0 0 0 3px var(--accent-bg, rgba(74, 222, 128, 0.12)), 0 8px 24px rgba(0, 0, 0, 0.35);
+    box-shadow: 0 1px 0 0 rgb(255 255 255 / 5%) inset, 0 0 0 3px var(--accent-bg, rgb(74 222 128 / 12%)), 0 8px 24px rgb(0 0 0 / 35%);
 }
 
 .hero-search__icon {
@@ -114,7 +114,7 @@
     cursor: pointer;
 }
 
-.cp-item--sel { background: var(--accent-bg, rgba(74, 222, 128, 0.08)); }
+.cp-item--sel { background: var(--accent-bg, rgb(74 222 128 / 8%)); }
 
 .cp-icon {
     width: 22px;
@@ -169,19 +169,17 @@
 
 
 
-@media (max-width: 640px) {
+@media (width <= 640px) {
     .hero-search__kbd { display: none; }
     .cp-results { max-height: 60vh; }
 }
 
-@media (prefers-reduced-motion: reduce) {
-    .hero-search,
-}
 
 /* 2026-09-03: [hidden] must WIN. The rules above set display on .cp-panel /
    .cp-backdrop, and an author display beats the UA [hidden] style, so the
    closed panel still rendered its empty .cp-status strip as a bare 34px bar
    under the search box on every load. */
+/* stylelint-disable-next-line declaration-no-important -- the hidden attribute must beat any display rule */
 .cp-panel[hidden] { display: none !important; }
 
 /* ── × in the bar (2026-09-03) — shown while the panel is open or the box has text;

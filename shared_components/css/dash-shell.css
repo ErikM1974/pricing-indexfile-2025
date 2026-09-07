@@ -16,9 +16,9 @@
    ========================================================================== */
 
 :root {
-    --dash-theme:       #009900;
-    --dash-theme-dark:  #006600;
-    --dash-theme-bg:    #f0f9f0;
+    --dash-theme:       var(--color-dash-theme);
+    --dash-theme-dark:  var(--color-steve-dark);
+    --dash-theme-bg:    var(--color-dash-theme-bg);
 }
 
 /* ---------- Shell ---------- */
@@ -32,7 +32,7 @@
 /* ---------- Header ---------- */
 .dash-header {
     background: var(--dash-theme);
-    color: #fff;
+    color: var(--color-on-brand);
     padding: var(--space-3) var(--space-6);
     display: flex;
     align-items: center;
@@ -56,10 +56,10 @@
 
 .dash-header-title {
     margin: 0;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     font-size: 1.25rem;
     font-weight: 600;
-    color: #fff;
+    color: var(--color-on-brand);
     letter-spacing: -0.01em;
 }
 
@@ -70,6 +70,7 @@
 }
 
 /* ---------- Back link ---------- */
+
 /* Works as either <a> or <button>. The background/font/cursor declarations are what make
    the <button> form work: a button that sets `color: #fff` but no background keeps the UA's
    grey `buttonface`, which is white-on-light-grey — effectively invisible on the themed
@@ -80,22 +81,21 @@
     align-items: center;
     gap: 6px;
     padding: 8px 16px;
-    -webkit-appearance: none;
     appearance: none;
     background: transparent;
-    color: #fff;
+    color: var(--color-on-brand);
     text-decoration: none;
     font-family: inherit;
     font-size: 0.875rem;
     font-weight: 500;
-    border: 1px solid rgba(255,255,255,0.5);
+    border: 1px solid rgb(255 255 255 / 50%);
     border-radius: var(--radius-md);
     cursor: pointer;
     transition: background var(--dur-base) var(--ease-out), color var(--dur-base) var(--ease-out);
 }
 
 .dash-back-link:hover {
-    background: #fff;
+    background: var(--color-surface);
     color: var(--dash-theme);
 }
 
@@ -108,7 +108,7 @@
 
 .dash-back-link:disabled:hover {
     background: transparent;
-    color: #fff;
+    color: var(--color-on-brand);
 }
 
 /* ---------- Content container ---------- */
@@ -253,14 +253,14 @@
 
 .dash-btn--primary {
     background: var(--dash-theme);
-    color: #fff;
+    color: var(--color-on-brand);
     border-color: var(--dash-theme);
 }
 
 .dash-btn--primary:hover {
     background: var(--dash-theme-dark);
     border-color: var(--dash-theme-dark);
-    color: #fff;
+    color: var(--color-on-brand);
 }
 
 /* ---------- Loading indicator ---------- */
@@ -289,13 +289,15 @@
 }
 
 /* ---------- Responsive ---------- */
-@media (max-width: 640px) {
+@media (width <= 640px) {
     .dash-header {
         padding: var(--space-3);
     }
+
     .dash-header-title {
         font-size: 1.0625rem;
     }
+
     .dash-content {
         padding: var(--space-4);
     }

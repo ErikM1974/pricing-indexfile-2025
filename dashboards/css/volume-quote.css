@@ -22,6 +22,7 @@
 /* ── form ─────────────────────────────────────────────────────────────── */
 .vq-form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: .9rem; }
 .vq-field { display: flex; flex-direction: column; gap: .3rem; font-size: .85rem; color: var(--gray-600); }
+
 .vq-field input, .vq-field select, .vq-lever input[type="number"], .vq-line input {
     font: inherit; padding: .5rem .6rem; border: 1px solid var(--gray-300);
     border-radius: var(--radius-md); background: var(--surface-card); color: var(--gray-900);
@@ -60,6 +61,7 @@
 /* ── result ────────────────────────────────────────────────────────────── */
 .vq-stats { margin-bottom: 1rem; }
 .vq-warnings:empty { display: none; }
+
 .vq-warning {
     padding: .6rem .8rem; margin-bottom: .6rem; border-radius: var(--radius-md);
     background: var(--state-warning-bg); color: var(--state-warning); font-size: .85rem;
@@ -78,13 +80,14 @@
 
 /* ── memo ──────────────────────────────────────────────────────────────── */
 .vq-memo-actions { display: flex; gap: .5rem; }
+
 .vq-memo {
     white-space: pre-wrap; font-family: 'JetBrains Mono', monospace; font-size: .82rem; line-height: 1.5;
     background: var(--surface-inset); border: 1px solid var(--gray-200); border-radius: var(--radius-md);
     padding: 1rem; margin: 0; color: var(--gray-800);
 }
 
-@media (max-width: 720px) {
+@media (width <= 720px) {
     .vq-lines-head { display: none; }
     .vq-line { grid-template-columns: 1fr 1fr; }
 }
@@ -93,14 +96,15 @@
 .vq-save-status { font-size: .8rem; color: var(--gray-600); align-self: center; }
 .vq-save-status--ok { color: var(--state-success); }
 .vq-save-status--error { color: var(--state-danger); }
+
 .vq-cq {
     background: var(--surface-card); border: 1px solid var(--gray-200); border-radius: var(--radius-md);
     padding: 1.5rem 1.75rem; margin-top: .75rem; color: var(--gray-900); font-size: .9rem; max-width: 860px;
 }
-.vq-cq-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; border-bottom: 3px solid var(--nwca-green, #1a472a); padding-bottom: .9rem; margin-bottom: 1rem; }
+.vq-cq-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; border-bottom: 3px solid var(--nwca-green, var(--brand-800)); padding-bottom: .9rem; margin-bottom: 1rem; }
 .vq-cq-logo { height: 52px; width: auto; }
 .vq-cq-title { text-align: right; }
-.vq-cq-title h3 { margin: 0 0 .25rem; font-size: 1.25rem; color: var(--nwca-green, #1a472a); letter-spacing: .02em; }
+.vq-cq-title h3 { margin: 0 0 .25rem; font-size: 1.25rem; color: var(--nwca-green, var(--brand-800)); letter-spacing: .02em; }
 .vq-cq-meta { font-size: .8rem; color: var(--gray-600); line-height: 1.5; }
 .vq-cq-meta strong { color: var(--gray-900); font-family: 'JetBrains Mono', monospace; }
 .vq-cq-parties { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; font-size: .85rem; }
@@ -119,10 +123,14 @@
 .vq-cq-empty { color: var(--gray-500); font-style: italic; }
 
 @media print {
+    /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
     .dash-header, .vq-intro, .dash-error-banner, .vq-memo-actions, .vq-cq-hint, .dash-card-header { display: none !important; }
     .dash-shell, .dash-content { padding: 0; margin: 0; }
+
     /* Two print modes, set on <body> by the button that was clicked. */
+    /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
     body.vq-mode-memo .dash-card:not(.vq-print-keep) { display: none !important; }
+    /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
     body.vq-mode-customer .dash-card:not(.vq-print-customer-keep) { display: none !important; }
     .dash-card { border: 0; box-shadow: none; padding: 0; }
     .vq-memo { border: 0; background: transparent; padding: 0; font-size: 11pt; }
@@ -133,12 +141,12 @@
 
 /* Phone (≤640px) — 2026-09-05 staff-dashboard sweep: the page measured wider than the
    viewport at 375px and panned sideways. */
-@media (max-width: 640px) {
+@media (width <= 640px) {
     /* .vq-table already sits in .vq-table-wrap; the customer-quote table did not. */
     .vq-cq-table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
 }
 
-@media (max-width: 640px) {
+@media (width <= 640px) {
     /* Line rows are a 6-column grid sized for a desk; on a phone let the cells wrap. */
     .vq-lines-head { display: none; }
     .vq-line { display: flex; flex-wrap: wrap; gap: .4rem .6rem; }
@@ -147,4 +155,5 @@
 }
 
 /* 2026-09-05 review */
+/* stylelint-disable-next-line declaration-no-important -- the hidden attribute must beat any display rule */
 [hidden] { display: none !important; }

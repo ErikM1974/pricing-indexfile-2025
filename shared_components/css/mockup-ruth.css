@@ -1,3 +1,5 @@
+/* stylelint-disable no-duplicate-selectors -- legacy sheet: rules were appended over time; merging them would reorder the cascade (2026-09-07) */
+
 /* ==========================================================================
    Ruth Digitizing Mockup Dashboard - Styles
    Used by: dashboards/art-hub-ruth.html, dashboards/ae-dashboard.html
@@ -6,25 +8,46 @@
    AE dashboard overrides with maroon via :root in ae-dashboard.html.
    ========================================================================== */
 
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue, merged into its
+   existing :root. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
 :root {
-    --art-theme: #6B46C1;
-    --art-theme-dark: #553C9A;
-    --art-theme-light: #8B5CF6;
-    --art-theme-bg: #f8f5ff;
-    --art-theme-bg-hover: #f3f0ff;
-    --art-theme-rgba-15: rgba(107,70,193,0.15);
-    --art-theme-rgba-10: rgba(107,70,193,0.1);
+    --mockup-ruth-gray-dark: #333;
+    --mockup-ruth-indigo: #7c3aed;
+    --mockup-ruth-gray: #666;
+    --mockup-ruth-gray-2: #888;
+    --mockup-ruth-red-tint: #fecaca;
+    --mockup-ruth-green: #22c55e;
+    --mockup-ruth-green-2: #16a34a;
+    --mockup-ruth-red: #9d174d;
+    --mockup-ruth-blue: #1e40af;
+    --mockup-ruth-blue-2: #3730a3;
+    --mockup-ruth-teal-dark: #065f46;
+    --mockup-ruth-teal: #10b981;
+    --mockup-ruth-yellow: #ffc107;
+    --mockup-ruth-orange: #f57c00;
+    --mockup-ruth-red-2: #fca5a5;
+    --art-theme: var(--color-ruth);
+    --art-theme-dark: var(--color-ruth-dark);
+    --art-theme-light: var(--color-ruth-light);
+    --art-theme-bg: var(--color-ruth-tint);
+    --art-theme-bg-hover: var(--color-ruth-tint);
+    --art-theme-rgba-15: rgb(107 70 193 / 15%);
+    --art-theme-rgba-10: rgb(107 70 193 / 10%);
 }
+/* stylelint-enable color-no-hex */
 
 /* ---------- Base ---------- */
+
 /* Tokens & body font live in art-hub.css (loaded alongside this file).
    Background uses --surface-page from there. */
 body {
     margin: 0;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+    font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
     font-feature-settings: 'cv11', 'ss01', 'ss03';
     -webkit-font-smoothing: antialiased;
-    background-color: var(--surface-page, #f7f8fa);
+    background-color: var(--surface-page, var(--gray-50));
 }
 
 /* ---------- Header ---------- */
@@ -34,7 +57,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 4px rgb(0 0 0 / 10%);
 }
 
 .header-left {
@@ -66,7 +89,7 @@ body {
     align-items: center;
     gap: 12px;
     padding: 6px 12px;
-    background: rgba(255,255,255,0.1);
+    background: rgb(255 255 255 / 10%);
     border-radius: 50px;
 }
 
@@ -80,14 +103,14 @@ body {
 
 .profile-info { color: white; }
 .profile-info h3 { margin: 0; font-size: 15px; font-weight: 600; }
-.profile-info p { margin: 2px 0 0 0; font-size: 12px; opacity: 0.9; }
+.profile-info p { margin: 2px 0 0; font-size: 12px; opacity: 0.9; }
 
 .header-btn {
     color: white;
     text-decoration: none;
     font-size: 13px;
     padding: 7px 14px;
-    border: 1px solid rgba(255,255,255,0.6);
+    border: 1px solid rgb(255 255 255 / 60%);
     border-radius: 4px;
     transition: all 0.3s;
     background: transparent;
@@ -113,11 +136,11 @@ body {
     align-items: center;
     gap: 4px;
     margin-bottom: 20px;
-    background: var(--surface-card, #fff);
+    background: var(--surface-card, var(--color-surface));
     padding: 6px;
     border-radius: var(--radius-md, 8px);
-    border: 1px solid var(--gray-200, #e5e7eb);
-    box-shadow: var(--shadow-sm, 0 1px 2px rgba(15,23,42,.04));
+    border: 1px solid var(--gray-200, var(--gray-200));
+    box-shadow: var(--shadow-sm, 0 1px 2px rgb(15 23 42 / 4%));
     flex-wrap: wrap;
 }
 
@@ -132,41 +155,43 @@ body {
     transition: background var(--dur-base, 200ms) var(--ease-out, cubic-bezier(.2,.8,.2,1)),
                 color var(--dur-base, 200ms) var(--ease-out, cubic-bezier(.2,.8,.2,1)),
                 box-shadow var(--dur-base, 200ms) var(--ease-out, cubic-bezier(.2,.8,.2,1));
-    color: var(--gray-700, #374151);
+    color: var(--gray-700, var(--gray-700));
     white-space: nowrap;
     font-family: inherit;
     letter-spacing: -0.005em;
 }
 
-.tab-button:hover { background: var(--gray-100, #f3f4f6); color: var(--gray-900, #111827); }
+.tab-button:hover { background: var(--gray-100, var(--gray-100)); color: var(--gray-900, var(--gray-900)); }
+
 .tab-button.active {
     background: var(--art-theme);
     color: white;
-    box-shadow: var(--shadow-glow-theme, 0 0 0 4px rgba(107,70,193,.14));
+    box-shadow: var(--shadow-glow-theme, 0 0 0 4px rgb(107 70 193 / 14%));
 }
 
 /* Tab-styled <a> that navigates to another page (e.g. Names & Numbers).
    Shares the .tab-button base styling; adds an external-arrow hint. */
 .tab-button-link {
     text-decoration: none;
-    color: var(--gray-700, #374151);
+    color: var(--gray-700, var(--gray-700));
     display: inline-flex;
     align-items: center;
     gap: 6px;
 }
+
 .tab-button-link::after {
     content: "\2197";  /* ↗ */
     font-size: 12px;
     opacity: 0.55;
     margin-left: 2px;
 }
-.tab-button-link:hover { background: var(--gray-100, #f3f4f6); color: var(--gray-900, #111827); }
+.tab-button-link:hover { background: var(--gray-100, var(--gray-100)); color: var(--gray-900, var(--gray-900)); }
 .tab-button-link:hover::after { opacity: 0.85; }
 
 .tab-badge {
     display: inline-block;
-    background: var(--gray-200, #e5e7eb);
-    color: var(--gray-700, #374151);
+    background: var(--gray-200, var(--gray-200));
+    color: var(--gray-700, var(--gray-700));
     font-size: 12px;
     padding: 2px 8px;
     border-radius: var(--radius-pill, 999px);
@@ -176,7 +201,7 @@ body {
 }
 
 .tab-button.active .tab-badge {
-    background: rgba(255,255,255,0.22);
+    background: rgb(255 255 255 / 22%);
     color: white;
 }
 
@@ -185,10 +210,11 @@ body {
     background: white;
     padding: 20px;
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 4px rgb(0 0 0 / 10%);
 }
 
 .tab-pane { display: none; }
+
 .tab-pane.active {
     display: block;
     animation: fadeIn 0.3s ease-in-out;
@@ -202,8 +228,8 @@ body {
 .tab-title {
     font-size: 22px;
     font-weight: 600;
-    color: #333;
-    margin: 0 0 20px 0;
+    color: var(--mockup-ruth-gray-dark);
+    margin: 0 0 20px;
     padding-bottom: 10px;
     border-bottom: 2px solid var(--art-theme);
 }
@@ -222,9 +248,9 @@ body {
     gap: 8px;
     padding: 7px 14px 7px 12px;
     border-radius: var(--radius-pill, 999px);
-    background: var(--surface-card, #fff);
-    border: 1px solid var(--gray-200, #e5e7eb);
-    color: var(--gray-700, #374151);
+    background: var(--surface-card, var(--color-surface));
+    border: 1px solid var(--gray-200, var(--gray-200));
+    color: var(--gray-700, var(--gray-700));
     font-size: 13.5px;
     font-weight: 500;
     cursor: pointer;
@@ -241,37 +267,38 @@ body {
     width: 7px;
     height: 7px;
     border-radius: 50%;
-    background: var(--gray-400, #9ca3af);
+    background: var(--gray-400, var(--gray-400));
     flex: 0 0 7px;
     transition: background var(--dur-base, 200ms) var(--ease-out, cubic-bezier(.2,.8,.2,1));
 }
-.status-stat--submitted::before          { background: var(--state-violet,  #7c3aed); }
-.status-stat--in-progress::before        { background: var(--state-info,    #2563eb); }
-.status-stat--awaiting-approval::before  { background: var(--state-warning, #d97706); }
-.status-stat--revision-requested::before { background: var(--state-danger,  #dc2626); }
-.status-stat--completed::before          { background: var(--state-success, #059669); }
-.status-stat--needs-review::before       { background: var(--state-warning, #d97706); }
-.status-stat--other::before              { background: var(--gray-400,      #9ca3af); }
+.status-stat--submitted::before          { background: var(--state-violet,  var(--mockup-ruth-indigo)); }
+.status-stat--in-progress::before        { background: var(--state-info,    var(--blue-600)); }
+.status-stat--awaiting-approval::before  { background: var(--state-warning, var(--amber-600)); }
+.status-stat--revision-requested::before { background: var(--state-danger,  var(--red-600)); }
+.status-stat--completed::before          { background: var(--state-success, var(--emerald-600)); }
+.status-stat--needs-review::before       { background: var(--state-warning, var(--amber-600)); }
+.status-stat--other::before              { background: var(--gray-400,      var(--gray-400)); }
+
 /* AE-view buckets (mockup-ae.js + art-ae.js): roll up granular statuses
    into 4 chips. needs-review reuses the warning amber dot above. */
-.status-stat--with-ruth::before          { background: var(--state-info,    #2563eb); }
-.status-stat--with-steve::before         { background: var(--state-info,    #2563eb); }
-.status-stat--done::before               { background: var(--state-success, #059669); }
-.status-stat--all::before                { background: var(--gray-400,      #9ca3af); }
+.status-stat--with-ruth::before          { background: var(--state-info,    var(--blue-600)); }
+.status-stat--with-steve::before         { background: var(--state-info,    var(--blue-600)); }
+.status-stat--done::before               { background: var(--state-success, var(--emerald-600)); }
+.status-stat--all::before                { background: var(--gray-400,      var(--gray-400)); }
 
 .status-stat:hover {
-    background: var(--surface-hover, #f9fafb);
-    border-color: var(--gray-300, #d1d5db);
-    color: var(--gray-900, #111827);
+    background: var(--surface-hover, var(--gray-50));
+    border-color: var(--gray-300, var(--gray-300));
+    color: var(--gray-900, var(--gray-900));
 }
 
 .status-stat.active {
     background: var(--art-theme);
     color: white;
     border-color: var(--art-theme);
-    box-shadow: var(--shadow-glow-theme, 0 0 0 4px rgba(107,70,193,.14));
+    box-shadow: var(--shadow-glow-theme, 0 0 0 4px rgb(107 70 193 / 14%));
 }
-.status-stat.active::before { background: rgba(255,255,255,.92); }
+.status-stat.active::before { background: rgb(255 255 255 / 92%); }
 
 .status-stat-count {
     font-weight: 700;
@@ -288,7 +315,7 @@ body {
     opacity: 0.85;
 }
 
-.status-stat.active .status-stat-label { opacity: 1; color: rgba(255,255,255,0.95); }
+.status-stat.active .status-stat-label { opacity: 1; color: rgb(255 255 255 / 95%); }
 
 /* Count-change pop animation — JS toggles .status-stat-count--pop briefly */
 @keyframes statCountPop {
@@ -306,10 +333,10 @@ body {
 }
 
 .mockup-card {
-    background: var(--surface-card, #fff);
+    background: var(--surface-card, var(--color-surface));
     border-radius: var(--radius-lg, 12px);
-    border: 1px solid var(--gray-200, #e5e7eb);
-    box-shadow: var(--shadow-sm, 0 1px 2px rgba(15,23,42,.04), 0 1px 1px rgba(15,23,42,.03));
+    border: 1px solid var(--gray-200, var(--gray-200));
+    box-shadow: var(--shadow-sm, 0 1px 2px rgb(15 23 42 / 4%), 0 1px 1px rgb(15 23 42 / 3%));
     overflow: hidden;
     transition: transform var(--dur-base, 200ms) var(--ease-out, cubic-bezier(.2,.8,.2,1)),
                 box-shadow var(--dur-base, 200ms) var(--ease-out, cubic-bezier(.2,.8,.2,1));
@@ -324,42 +351,44 @@ body {
     content: '';
     display: block;
     height: 3px;
-    background: var(--gray-200, #e5e7eb);
+    background: var(--gray-200, var(--gray-200));
 }
-.mockup-card--submitted::before          { background: var(--state-violet,  #7c3aed); }
-.mockup-card--in-progress::before        { background: var(--state-info,    #2563eb); }
-.mockup-card--awaiting-approval::before  { background: var(--state-warning, #d97706); }
-.mockup-card--revision-requested::before { background: var(--state-danger,  #dc2626); }
-.mockup-card--approved::before           { background: var(--state-success, #059669); }
-.mockup-card--completed::before          { background: var(--state-success, #22c55e); }
+.mockup-card--submitted::before          { background: var(--state-violet,  var(--mockup-ruth-indigo)); }
+.mockup-card--in-progress::before        { background: var(--state-info,    var(--blue-600)); }
+.mockup-card--awaiting-approval::before  { background: var(--state-warning, var(--amber-600)); }
+.mockup-card--revision-requested::before { background: var(--state-danger,  var(--red-600)); }
+.mockup-card--approved::before           { background: var(--state-success, var(--emerald-600)); }
+.mockup-card--completed::before          { background: var(--state-success, var(--mockup-ruth-green)); }
 .mockup-card--completed                  { opacity: 0.85; }
 
 /* ---------- Card Hover Lift + Status Glow ---------- */
 .mockup-card:hover {
     transform: translateY(-2px);
-    box-shadow: var(--shadow-lg, 0 8px 24px -8px rgba(15,23,42,.18), 0 4px 10px -4px rgba(15,23,42,.08));
+    box-shadow: var(--shadow-lg, 0 8px 24px -8px rgb(15 23 42 / 18%), 0 4px 10px -4px rgb(15 23 42 / 8%));
 }
-.mockup-card--submitted:hover          { box-shadow: var(--shadow-lg), 0 0 0 4px rgba(124,58,237,.10); }
-.mockup-card--in-progress:hover        { box-shadow: var(--shadow-lg), 0 0 0 4px rgba(37,99,235,.10); }
-.mockup-card--awaiting-approval:hover  { box-shadow: var(--shadow-lg), 0 0 0 4px rgba(217,119,6,.10); }
-.mockup-card--revision-requested:hover { box-shadow: var(--shadow-lg), 0 0 0 4px rgba(220,38,38,.10); }
-.mockup-card--approved:hover           { box-shadow: var(--shadow-lg), 0 0 0 4px rgba(5,150,105,.10); }
-.mockup-card--completed:hover          { box-shadow: var(--shadow-lg), 0 0 0 4px rgba(34,197,94,.10); }
+.mockup-card--submitted:hover          { box-shadow: var(--shadow-lg), 0 0 0 4px rgb(124 58 237 / 10%); }
+.mockup-card--in-progress:hover        { box-shadow: var(--shadow-lg), 0 0 0 4px rgb(37 99 235 / 10%); }
+.mockup-card--awaiting-approval:hover  { box-shadow: var(--shadow-lg), 0 0 0 4px rgb(217 119 6 / 10%); }
+.mockup-card--revision-requested:hover { box-shadow: var(--shadow-lg), 0 0 0 4px rgb(220 38 38 / 10%); }
+.mockup-card--approved:hover           { box-shadow: var(--shadow-lg), 0 0 0 4px rgb(5 150 105 / 10%); }
+.mockup-card--completed:hover          { box-shadow: var(--shadow-lg), 0 0 0 4px rgb(34 197 94 / 10%); }
 
 /* ---------- Staggered Card Entry Animation ---------- */
 @keyframes fadeSlideUp {
     from { opacity: 0; transform: translateY(16px); }
     to   { opacity: 1; transform: translateY(0); }
 }
+
 .mockup-card {
     animation: fadeSlideUp 0.35s ease both;
 }
 
 /* ---------- Animated Status Badges ---------- */
 @keyframes pulseGlow {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(217,119,6,0.4); }
-    50%      { box-shadow: 0 0 0 6px rgba(217,119,6,0); }
+    0%, 100% { box-shadow: 0 0 0 0 rgb(217 119 6 / 40%); }
+    50%      { box-shadow: 0 0 0 6px rgb(217 119 6 / 0%); }
 }
+
 @keyframes gentleShake {
     0%, 100% { transform: translateX(0); }
     20%      { transform: translateX(-2px); }
@@ -375,27 +404,31 @@ body {
     0%   { background-position: -200% 0; }
     100% { background-position: 200% 0; }
 }
+
 .skeleton-card {
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--gray-200);
     border-radius: 12px;
     overflow: hidden;
     background: white;
     min-height: 200px;
 }
+
 .skeleton-header {
     height: 52px;
     background: linear-gradient(90deg, var(--art-theme-rgba-10) 25%, var(--art-theme-rgba-15) 50%, var(--art-theme-rgba-10) 75%);
     background-size: 200% 100%;
     animation: shimmer 1.5s ease-in-out infinite;
 }
+
 .skeleton-body {
     padding: 14px;
 }
+
 .skeleton-line {
     height: 12px;
     border-radius: 4px;
     margin-bottom: 10px;
-    background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%);
+    background: linear-gradient(90deg, var(--gray-100) 25%, var(--gray-200) 50%, var(--gray-100) 75%);
     background-size: 200% 100%;
     animation: shimmer 1.5s ease-in-out infinite;
 }
@@ -412,18 +445,20 @@ body {
     flex-wrap: wrap;
     margin-top: 6px;
     padding-top: 6px;
-    border-top: 1px solid #f3f4f6;
+    border-top: 1px solid var(--gray-100);
 }
+
 .thread-dot {
     width: 10px;
     height: 10px;
     border-radius: 50%;
-    border: 1px solid rgba(0,0,0,0.15);
+    border: 1px solid rgb(0 0 0 / 15%);
     flex-shrink: 0;
 }
+
 .thread-dots-label {
     font-size: 9px;
-    color: #9ca3af;
+    color: var(--gray-400);
     text-transform: uppercase;
     letter-spacing: 0.3px;
     margin-right: 4px;
@@ -466,7 +501,7 @@ body {
     width: 100%;
     max-height: 180px;
     overflow: hidden;
-    background: #f5f5f5;
+    background: var(--gray-100);
 }
 
 .card-thumb img {
@@ -478,9 +513,9 @@ body {
 
 /* ---------- Approval Elapsed ---------- */
 .approval-elapsed { font-size: 12px; padding: 4px 0; }
-.approval-elapsed--fresh { color: #16a34a; }
-.approval-elapsed--waiting { color: #d97706; }
-.approval-elapsed--overdue { color: #dc2626; }
+.approval-elapsed--fresh { color: var(--mockup-ruth-green-2); }
+.approval-elapsed--waiting { color: var(--amber-600); }
+.approval-elapsed--overdue { color: var(--red-600); }
 
 /* ---------- 2026 Pill base + semantic variants ----------
    Single base class for status pills, card badges, and filter chips.
@@ -497,18 +532,19 @@ body {
     font-weight: 600;
     line-height: 1.4;
     letter-spacing: 0.01em;
-    background: var(--gray-100, #f3f4f6);
-    color: var(--gray-700, #374151);
+    background: var(--gray-100, var(--gray-100));
+    color: var(--gray-700, var(--gray-700));
     border: 1px solid transparent;
     white-space: nowrap;
     font-variant-numeric: tabular-nums;
 }
+
 .pill::before {
     content: '';
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background: currentColor;
+    background: currentcolor;
     flex: 0 0 6px;
 }
 .pill--info    { background: var(--state-info-bg);    color: var(--state-info); }
@@ -516,8 +552,8 @@ body {
 .pill--warning { background: var(--state-warning-bg); color: var(--state-warning); }
 .pill--danger  { background: var(--state-danger-bg);  color: var(--state-danger); }
 .pill--violet  { background: var(--state-violet-bg);  color: var(--state-violet); }
-.pill--solid   { background: currentColor; color: white; }
-.pill--solid::before { background: rgba(255,255,255,.85); }
+.pill--solid   { background: currentcolor; color: white; }
+.pill--solid::before { background: rgb(255 255 255 / 85%); }
 
 /* ---------- Status Pills (cards) — inherit .pill DNA via shared selector ---------- */
 .status-pill {
@@ -532,24 +568,26 @@ body {
     letter-spacing: 0.01em;
     white-space: nowrap;
     font-variant-numeric: tabular-nums;
-    background: rgba(255,255,255,0.92);
+    background: rgb(255 255 255 / 92%);
     border: 1px solid transparent;
 }
+
 .status-pill::before {
     content: '';
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background: currentColor;
+    background: currentcolor;
     flex: 0 0 6px;
 }
 
-.status-pill--submitted          { color: var(--state-violet,  #7c3aed); }
-.status-pill--in-progress        { color: var(--state-info,    #2563eb); }
-.status-pill--awaiting-approval  { color: var(--state-warning, #d97706); }
+.status-pill--submitted          { color: var(--state-violet,  var(--mockup-ruth-indigo)); }
+.status-pill--in-progress        { color: var(--state-info,    var(--blue-600)); }
+.status-pill--awaiting-approval  { color: var(--state-warning, var(--amber-600)); }
+
 .status-pill--completed,
-.status-pill--approved           { color: var(--state-success, #059669); }
-.status-pill--revision-requested { color: var(--state-danger,  #dc2626); }
+.status-pill--approved           { color: var(--state-success, var(--emerald-600)); }
+.status-pill--revision-requested { color: var(--state-danger,  var(--red-600)); }
 
 /* ---------- Card Body ---------- */
 .card-body {
@@ -559,7 +597,7 @@ body {
 .card-design-name {
     font-size: 14px;
     font-weight: 500;
-    color: #333;
+    color: var(--mockup-ruth-gray-dark);
     margin-bottom: 10px;
     white-space: nowrap;
     overflow: hidden;
@@ -571,7 +609,7 @@ body {
     flex-direction: column;
     gap: 6px;
     font-size: 13px;
-    color: #666;
+    color: var(--mockup-ruth-gray);
 }
 
 .card-meta-row {
@@ -587,7 +625,7 @@ body {
     opacity: 0.6;
 }
 
-.card-meta-label { font-weight: 500; color: #888; }
+.card-meta-label { font-weight: 500; color: var(--mockup-ruth-gray-2); }
 
 .card-badges {
     display: flex;
@@ -609,30 +647,33 @@ body {
     color: var(--art-theme);
     font-variant-numeric: tabular-nums;
 }
+
 .card-badge::before {
     content: '';
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background: currentColor;
+    background: currentcolor;
     flex: 0 0 6px;
 }
 
 /* Item-Type badges (Sticker/Banner extension, 2026-05-06; JDS extension, 2026-05-06)
  * — Garment is the implicit default and renders no badge. */
 .card-badge--sticker {
-    background: #fce7f3;
-    color: #9d174d;
+    background: var(--red-50);
+    color: var(--mockup-ruth-red);
     font-weight: 600;
 }
+
 .card-badge--banner {
-    background: #dbeafe;
-    color: #1e40af;
+    background: var(--sky-100);
+    color: var(--mockup-ruth-blue);
     font-weight: 600;
 }
+
 .card-badge--jds {
-    background: #fef3c7;
-    color: #92400e;
+    background: var(--amber-100);
+    color: var(--amber-800);
     font-weight: 600;
 }
 
@@ -643,24 +684,26 @@ body {
     position: relative;
     width: 100%;
     height: 100%;
-    background: #fffbeb;
+    background: var(--store-paper);
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
 }
+
 .card-thumb-jds img {
     max-width: 92%;
     max-height: 92%;
     object-fit: contain;
 }
+
 .card-thumb-jds-label {
     position: absolute;
     bottom: 6px;
     left: 6px;
     padding: 2px 8px;
-    background: rgba(146, 64, 14, 0.92);
-    color: #fff;
+    background: rgb(146 64 14 / 92%);
+    color: var(--color-on-brand);
     font-size: 11px;
     font-weight: 600;
     border-radius: 999px;
@@ -668,30 +711,30 @@ body {
 }
 
 .card-badge--revision {
-    background: var(--state-danger-bg, #fef2f2);
-    color: var(--state-danger, #dc2626);
+    background: var(--state-danger-bg, var(--red-50));
+    color: var(--state-danger, var(--red-600));
 }
 
 .card-badge--due-soon {
-    background: var(--state-warning-bg, #fff7ed);
-    color: var(--state-warning, #ea580c);
+    background: var(--state-warning-bg, var(--red-50));
+    color: var(--state-warning, var(--store-rush));
 }
 
 .card-badge--rush {
-    background: var(--state-danger, #dc2626);
-    color: #fff;
+    background: var(--state-danger, var(--red-600));
+    color: var(--color-on-brand);
     padding: 3px 10px 3px 8px;
     font-weight: 700;
     letter-spacing: 0.04em;
-    box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.25);
+    box-shadow: 0 0 0 2px rgb(220 38 38 / 25%);
     animation: mockup-rush-pulse 1.6s ease-in-out infinite;
 }
-.card-badge--rush::before { background: rgba(255,255,255,.92); }
+.card-badge--rush::before { background: rgb(255 255 255 / 92%); }
 
 /* Structured garment-form status badges (2026-06-17) — Steve + AE galleries */
-.card-badge--artwork { background: #eef2ff; color: #3730a3; font-weight: 700; }
-.card-badge--approval { background: #fff7ed; color: #9a3412; font-weight: 700; }
-.card-badge--approved { background: #ecfdf5; color: #065f46; font-weight: 700; }
+.card-badge--artwork { background: var(--color-floor-tint); color: var(--mockup-ruth-blue-2); font-weight: 700; }
+.card-badge--approval { background: var(--red-50); color: var(--store-rush-deeper); font-weight: 700; }
+.card-badge--approved { background: var(--brand-50); color: var(--mockup-ruth-teal-dark); font-weight: 700; }
 
 /* At-a-glance art-spec line on gallery cards (placement/size · color · text) */
 .card-artspec {
@@ -700,8 +743,9 @@ body {
     gap: 6px 10px;
     margin: 8px 0 2px;
     font-size: 12px;
-    color: #475569;
+    color: var(--slate-600);
 }
+
 .card-spec-item {
     display: inline-flex;
     align-items: center;
@@ -710,35 +754,40 @@ body {
 }
 
 .kanban-card-badge--rush {
-    background: #dc2626 !important;
-    color: #fff !important;
+    /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
+    background: var(--red-600) !important;
+    /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
+    color: var(--color-on-brand) !important;
     font-weight: 700;
-    box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.25);
+    box-shadow: 0 0 0 2px rgb(220 38 38 / 25%);
     animation: mockup-rush-pulse 1.6s ease-in-out infinite;
 }
 
 .mockup-card--rush {
-    box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.25), var(--shadow-sm);
+    box-shadow: 0 0 0 2px rgb(220 38 38 / 25%), var(--shadow-sm);
 }
+
 .mockup-card--rush::before {
-    background: var(--state-danger, #dc2626) !important;
+    /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
+    background: var(--state-danger, var(--red-600)) !important;
     height: 4px;
 }
 
 .kanban-card--rush {
-    border-left: 4px solid #dc2626 !important;
-    background: #fff5f5;
+    /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
+    border-left: 4px solid var(--red-600) !important;
+    background: var(--red-50);
 }
 
 @keyframes mockup-rush-pulse {
-    0%, 100% { box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.25); }
-    50%       { box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.45); }
+    0%, 100% { box-shadow: 0 0 0 2px rgb(220 38 38 / 25%); }
+    50%       { box-shadow: 0 0 0 4px rgb(220 38 38 / 45%); }
 }
 
 /* ---------- Card Footer ---------- */
 .card-footer {
     padding: 10px 16px;
-    border-top: 1px solid #f0f0f0;
+    border-top: 1px solid var(--gray-100);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -746,7 +795,7 @@ body {
 
 .card-date {
     font-size: 12px;
-    color: #999;
+    color: var(--print-line);
 }
 
 .card-action-link {
@@ -764,7 +813,7 @@ body {
     display: flex;
     gap: 8px;
     padding: 10px 16px;
-    border-top: 1px solid #f0f0f0;
+    border-top: 1px solid var(--gray-100);
     flex-wrap: wrap;
 }
 
@@ -780,34 +829,34 @@ body {
 }
 
 .card-action-btn--start {
-    background: #3b82f6;
+    background: var(--color-floor-light);
     color: white;
 }
-.card-action-btn--start:hover { background: #2563eb; }
+.card-action-btn--start:hover { background: var(--blue-600); }
 
 .card-action-btn--send {
-    background: #f59e0b;
+    background: var(--amber-500);
     color: white;
 }
-.card-action-btn--send:hover { background: #d97706; }
+.card-action-btn--send:hover { background: var(--amber-600); }
 
 .card-action-btn--complete {
-    background: #10b981;
+    background: var(--mockup-ruth-teal);
     color: white;
 }
-.card-action-btn--complete:hover { background: #059669; }
+.card-action-btn--complete:hover { background: var(--emerald-600); }
 
 /* ---------- Loading / Empty States ---------- */
 .mockup-loading {
     text-align: center;
     padding: 60px 20px;
-    color: #888;
+    color: var(--mockup-ruth-gray-2);
 }
 
 .mockup-loading-spinner {
     width: 40px;
     height: 40px;
-    border: 4px solid #e5e7eb;
+    border: 4px solid var(--gray-200);
     border-top-color: var(--art-theme);
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
@@ -821,7 +870,7 @@ body {
 .mockup-empty {
     text-align: center;
     padding: 60px 20px;
-    color: #999;
+    color: var(--print-line);
 }
 
 .mockup-empty-icon {
@@ -837,15 +886,15 @@ body {
 .mockup-error {
     text-align: center;
     padding: 40px 20px;
-    color: #dc2626;
-    background: #fef2f2;
+    color: var(--red-600);
+    background: var(--red-50);
     border-radius: 8px;
-    border: 1px solid #fecaca;
+    border: 1px solid var(--mockup-ruth-red-tint);
 }
 
 /* ---------- Billing Codes (reused from old Ruth page) ---------- */
 .billing-codes-section {
-    background: linear-gradient(135deg, #F3E5F5 0%, #EDE7F6 100%);
+    background: linear-gradient(135deg, var(--red-50) 0%, var(--gray-200) 100%);
     border: 2px solid var(--art-theme);
     border-radius: 12px;
     padding: 25px;
@@ -889,7 +938,7 @@ body {
     background: white;
     border-radius: 10px;
     overflow: hidden;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    box-shadow: 0 3px 10px rgb(0 0 0 / 10%);
 }
 
 .billing-card-header {
@@ -901,15 +950,15 @@ body {
 }
 
 .billing-card-header--purple { background: var(--art-theme-light); }
-.billing-card-header--dark { background: #7C3AED; }
+.billing-card-header--dark { background: var(--mockup-ruth-indigo); }
 
 .billing-card-pn { font-size: 24px; font-weight: bold; }
 .billing-card-subtitle { font-size: 14px; opacity: 0.95; margin-top: 2px; }
 .billing-card-price { font-size: 28px; font-weight: bold; }
 
 .billing-card-body { padding: 20px; }
-.billing-card-body-title { font-weight: 600; color: #333; margin-bottom: 10px; font-size: 15px; }
-.billing-card-body-desc { color: #666; font-size: 14px; line-height: 1.6; margin-bottom: 15px; }
+.billing-card-body-title { font-weight: 600; color: var(--mockup-ruth-gray-dark); margin-bottom: 10px; font-size: 15px; }
+.billing-card-body-desc { color: var(--mockup-ruth-gray); font-size: 14px; line-height: 1.6; margin-bottom: 15px; }
 
 .billing-callout {
     padding: 10px 15px;
@@ -917,24 +966,24 @@ body {
 }
 
 .billing-callout--purple {
-    background: #F3E5F5;
+    background: var(--red-50);
     border-left: 3px solid var(--art-theme);
 }
 
 .billing-callout--amber {
-    background: #FFF8E1;
-    border-left: 3px solid #FFC107;
+    background: var(--store-rush-soft);
+    border-left: 3px solid var(--mockup-ruth-yellow);
 }
 
 .billing-callout-label { font-weight: 600; font-size: 13px; margin-bottom: 5px; }
 .billing-callout-label--purple { color: var(--art-theme); }
-.billing-callout-label--amber { color: #F57C00; }
+.billing-callout-label--amber { color: var(--mockup-ruth-orange); }
 
 .billing-callout ul {
-    margin: 5px 0 0 0;
+    margin: 5px 0 0;
     padding-left: 20px;
     font-size: 13px;
-    color: #555;
+    color: var(--print-ink-soft);
 }
 
 .billing-increments-grid {
@@ -942,7 +991,7 @@ body {
     grid-template-columns: auto auto;
     gap: 5px 15px;
     font-size: 13px;
-    color: #555;
+    color: var(--print-ink-soft);
 }
 
 .billing-increments-grid .amount { font-weight: 600; }
@@ -952,7 +1001,7 @@ body {
     padding: 15px;
     background: white;
     border-radius: 8px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--store-line);
 }
 
 .billing-pro-tip-inner {
@@ -960,7 +1009,7 @@ body {
     align-items: center;
     gap: 10px;
     font-size: 14px;
-    color: #333;
+    color: var(--mockup-ruth-gray-dark);
 }
 
 /* ---------- Toast Notification ---------- */
@@ -976,7 +1025,7 @@ body {
     transform: translateY(100px);
     opacity: 0;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 12px rgb(0 0 0 / 15%);
 }
 
 .mockup-toast.show {
@@ -984,8 +1033,8 @@ body {
     opacity: 1;
 }
 
-.mockup-toast--success { background: #059669; }
-.mockup-toast--error { background: #dc2626; }
+.mockup-toast--success { background: var(--emerald-600); }
+.mockup-toast--error { background: var(--red-600); }
 .mockup-toast--info { background: var(--art-theme); }
 
 /* ---------- Audit Badges ---------- */
@@ -1000,9 +1049,9 @@ body {
     text-transform: uppercase;
     letter-spacing: 0.3px;
 }
-.audit-badge--green { background: #ecfdf5; color: #059669; border: 1px solid #059669; }
-.audit-badge--red { background: #fef2f2; color: #dc2626; border: 1px solid #dc2626; }
-.audit-badge--amber { background: #fffbeb; color: #d97706; border: 1px solid #d97706; }
+.audit-badge--green { background: var(--brand-50); color: var(--emerald-600); border: 1px solid var(--emerald-600); }
+.audit-badge--red { background: var(--red-50); color: var(--red-600); border: 1px solid var(--red-600); }
+.audit-badge--amber { background: var(--store-paper); color: var(--amber-600); border: 1px solid var(--amber-600); }
 
 /* ==========================================================================
    Kanban Board View (Ruth)
@@ -1012,18 +1061,19 @@ body {
 .view-toggle {
     display: inline-flex;
     gap: 0;
-    border: 1px solid #d1d5db;
+    border: 1px solid var(--gray-300);
     border-radius: 6px;
     overflow: hidden;
     margin-left: auto;
 }
+
 .view-toggle-btn {
     padding: 7px 14px;
     font-size: 13px;
     font-weight: 600;
     border: none;
     background: white;
-    color: #6b7280;
+    color: var(--gray-500);
     cursor: pointer;
     transition: all 0.2s;
     display: flex;
@@ -1031,17 +1081,21 @@ body {
     gap: 5px;
     font-family: inherit;
 }
+
 .view-toggle-btn:not(:last-child) {
-    border-right: 1px solid #d1d5db;
+    border-right: 1px solid var(--gray-300);
 }
+
 .view-toggle-btn:hover {
-    background: #f3f4f6;
+    background: var(--gray-100);
 }
+
 .view-toggle-btn.active {
     background: var(--art-theme);
     color: white;
     border-color: var(--art-theme);
 }
+
 .view-toggle-icon {
     font-size: 14px;
     line-height: 1;
@@ -1050,7 +1104,7 @@ body {
 /* Kanban styles moved to /shared_components/css/kanban.css */
 
 /* ---------- Responsive ---------- */
-@media (max-width: 768px) {
+@media (width <= 768px) {
     .mockup-header { flex-direction: column; gap: 10px; padding: 10px; }
     .header-right { flex-wrap: wrap; justify-content: center; }
     .mockup-grid { grid-template-columns: 1fr; }
@@ -1064,41 +1118,46 @@ body {
    Shared across all galleries that use .mockup-card / .status-pill / .status-stat
    ============================================================ */
 .status-pill--on-hold {
-    color: var(--gray-500, #6b7280);
-    background: var(--gray-100, #f3f4f6);
-    border-color: var(--gray-200, #e5e7eb);
+    color: var(--gray-500, var(--gray-500));
+    background: var(--gray-100, var(--gray-100));
+    border-color: var(--gray-200, var(--gray-200));
 }
 
-.status-stat--on-hold::before { background: var(--gray-400, #9ca3af); }
+.status-stat--on-hold::before { background: var(--gray-400, var(--gray-400)); }
 
 /* Link Broken chip (Steve gallery) — replaces the legacy pulsing pill.
    Red theme to read as "needs attention", subtle pulsing dot to draw eye
    without being disruptive. Click filters the grid to broken cards AND
    programmatically opens the bulk-recover modal owned by art-hub-steve.js. */
 .status-stat--broken {
-    background: #fef2f2;
-    border-color: #fecaca;
-    color: #b91c1c;
+    background: var(--red-50);
+    border-color: var(--mockup-ruth-red-tint);
+    color: var(--red-700);
 }
+
 .status-stat--broken::before {
-    background: #dc2626;
+    background: var(--red-600);
     animation: sg-broken-pulse 1.6s ease-in-out infinite;
 }
+
 .status-stat--broken:hover {
-    background: #fee2e2;
-    border-color: #fca5a5;
-    color: #991b1b;
+    background: var(--red-100);
+    border-color: var(--mockup-ruth-red-2);
+    color: var(--red-800);
 }
+
 .status-stat--broken.active {
-    background: #dc2626;
-    border-color: #b91c1c;
-    color: #ffffff;
-    box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.18);
+    background: var(--red-600);
+    border-color: var(--red-700);
+    color: var(--color-on-brand);
+    box-shadow: 0 0 0 4px rgb(220 38 38 / 18%);
 }
+
 .status-stat--broken.active::before {
-    background: rgba(255, 255, 255, 0.95);
+    background: rgb(255 255 255 / 95%);
     animation: none;  /* the active state is already loud — quiet the dot */
 }
+
 @keyframes sg-broken-pulse {
     0%, 100% { opacity: 1;   transform: scale(1); }
     50%      { opacity: 0.55; transform: scale(0.85); }

@@ -130,6 +130,11 @@
             <p class="text-muted">This page is a working document. Every standard that changed how a page looks is
                 recorded here, newest first, with the release that shipped it.</p>
             <ul class="rules decisions">
+                <li><strong>2026-09-07 · dashboards.</strong> Sixty dashboards and the queue-dashboard system they share now read the token
+                    file; the person/department colours those pages already wore are code (<code>--art-theme: var(--color-ruth)</code>).
+                    <strong>Open for Erik:</strong> two spacing/radius scales exist — <code>art-hub.css</code> (4 → 32, radius 4/8/12/16, used by 41
+                    queue pages) and the token file's (4 → 96, radius 6/10/14/20, from the Staff Dashboard seed). Nothing moved: on
+                    art-hub pages the page copy still wins. Choosing one scale re-lays out 41 staff pages, so it stays a decision, not a script.</li>
                 <li><strong>2026-09-07 · storefront + components.</strong> The customer-facing 2026 storefront palette (cream paper, forest
                     greens, safety-orange rush accent, Bricolage Grotesque display type) is named as the <code>--store-*</code> tokens and
                     shown on this page beside the staff palette; <code>nwca-2026-core.css</code> aliases to it. The shared component and

@@ -32,23 +32,41 @@
      menu           wine #7a1f2b on paper        (Shop Menu)
    ===================================================================== */
 
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue, merged into its
+   existing :root. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
 :root {
-    --f-money: var(--accent, #22c55e);   --f-money-fg: #06210f;
-    --f-steel: #2e4a62;                  --f-steel-fg: #dbe7f3;
-    --f-crm:   #1a2332;                  --f-crm-fg: #f59e0b;   --f-crm-ring: #f59e0b;
-    --f-purch: #4a6fa5;                  --f-purch-fg: #ffffff;
-    --f-mock:  #6B46C1;                  --f-mock-fg: #ffffff;
-    --f-artreq:#981e32;                  --f-artreq-fg: #ffffff;
-    --f-steve: #0a8a1f;                  --f-steve-fg: #ffffff;
-    --f-floor: #2563eb;                  --f-floor-fg: #ffffff;
-    --f-photo: #14351c;                  --f-photo-fg: #4ade80; --f-photo-ring: #2f7d38;
-    --f-arch:  #d97706;                  --f-arch-fg: #ffffff;
-    --f-ox:    #7f1d1d;                  --f-ox-fg: #fecaca;
-    --f-vault: #2e5827;                  --f-vault-fg: #bbf7d0;
-    --f-ref:   var(--line, #3a4452);     --f-ref-fg: var(--text, #e6edf3);
-    --f-store: #2f7d3b;                  --f-store-fg: #faf8f3;
-    --f-menu:  #7a1f2b;                  --f-menu-fg: #f6efe1;
+    --workspaces-red: #b91c5c;
+    --workspaces-green: #4ade80;
+    --workspaces-teal: #45d6c5;
+    --workspaces-green-tint: #bbf7d0;
+    --workspaces-green-2: #22c55e;
+    --workspaces-cyan: #2e4a62;
+    --workspaces-red-tint: #fecaca;
+    --workspaces-orange: #c9b99c;
+    --workspaces-magenta: #8e1147;
+    --workspaces-orange-2: #cd7f32;
+    --workspaces-cyan-2: #9fb3c8;
+    --workspaces-green-3: #86c99a;
+    --workspaces-green-4: #8fd19f;
+    --f-money: var(--accent, var(--workspaces-green-2));   --f-money-fg: var(--store-green-950);
+    --f-steel: var(--workspaces-cyan);                  --f-steel-fg: var(--slate-200);
+    --f-crm:   var(--gray-800);                  --f-crm-fg: var(--amber-500);   --f-crm-ring: var(--amber-500);
+    --f-purch: var(--color-bradley);                  --f-purch-fg: var(--color-surface);
+    --f-mock:  var(--color-ruth);                  --f-mock-fg: var(--color-surface);
+    --f-artreq:var(--color-ae);                  --f-artreq-fg: var(--color-surface);
+    --f-steve: var(--color-steve);                  --f-steve-fg: var(--color-surface);
+    --f-floor: var(--blue-600);                  --f-floor-fg: var(--color-surface);
+    --f-photo: var(--store-green-950);                  --f-photo-fg: var(--workspaces-green); --f-photo-ring: var(--store-green-700);
+    --f-arch:  var(--amber-600);                  --f-arch-fg: var(--color-surface);
+    --f-ox:    var(--print-red);                  --f-ox-fg: var(--workspaces-red-tint);
+    --f-vault: var(--brand-700);                  --f-vault-fg: var(--workspaces-green-tint);
+    --f-ref:   var(--line, var(--gray-700));     --f-ref-fg: var(--text, var(--slate-200));
+    --f-store: var(--store-green-700);                  --f-store-fg: var(--store-paper);
+    --f-menu:  var(--color-ae-dark);                  --f-menu-fg: var(--store-paper-deep);
 }
+/* stylelint-enable color-no-hex */
 
 /* Family classes: set --fam/--fam-fg for whatever they sit on. */
 .f-money  { --fam: var(--f-money);  --fam-fg: var(--f-money-fg); }
@@ -59,13 +77,14 @@
 .f-artreq { --fam: var(--f-artreq); --fam-fg: var(--f-artreq-fg); }
 .f-steve  { --fam: var(--f-steve);  --fam-fg: var(--f-steve-fg); }
 .f-floor  { --fam: var(--f-floor);  --fam-fg: var(--f-floor-fg); }
-.f-photo  { --fam: var(--f-photo);  --fam-fg: var(--f-photo-fg); --fam-ring: var(--f-photo-ring); --fam-mark: #2f7d38; }
+.f-photo  { --fam: var(--f-photo);  --fam-fg: var(--f-photo-fg); --fam-ring: var(--f-photo-ring); --fam-mark: var(--store-green-700); }
 .f-arch   { --fam: var(--f-arch);   --fam-fg: var(--f-arch-fg); }
 .f-ox     { --fam: var(--f-ox);     --fam-fg: var(--f-ox-fg); }
 .f-vault  { --fam: var(--f-vault);  --fam-fg: var(--f-vault-fg); }
 .f-ref    { --fam: var(--f-ref);    --fam-fg: var(--f-ref-fg); }
 .f-store  { --fam: var(--f-store);  --fam-fg: var(--f-store-fg); }
 .f-menu   { --fam: var(--f-menu);   --fam-fg: var(--f-menu-fg); }
+
 /* (The per-client bundle colours — Drain-Pro red, Streich navy, WCTTR charcoal,
    Christmas mint — were retired 2026-09-04: colour means a person or department
    here, and those pages are customer-facing order pages, so they carry f-store.) */
@@ -96,6 +115,7 @@
 .pw-strip .pw-track { gap: 8px; }
 
 /* ── Tab strip ─────────────────────────────────────────────────────── */
+
 /* 2026-09-03 (Erik: "should look like tabs, not static text"): a segmented
    control — a recessed strip holding pill buttons; the active one is filled
    green-tinted with a green top edge, the rest lift on hover. */
@@ -104,14 +124,16 @@
     padding: 4px; margin: 0 0 14px;
     background: var(--bg-elev); border: 1px solid var(--line-soft); border-radius: var(--radius-lg);
     overflow-x: auto; scrollbar-width: none;
+
     /* Sticky (Erik, 2026-09-03): pins just under the sticky .top-header while you
        scroll. --ws-sticky-top is the header's measured height, set by
        workspace-controller (it wraps taller on narrow screens). z-index sits
        under the header's --z-sticky (100) and over the content. */
     position: sticky; top: var(--ws-sticky-top, 66px); z-index: 90;
-    box-shadow: 0 10px 24px -14px rgba(0, 0, 0, 0.7);
+    box-shadow: 0 10px 24px -14px rgb(0 0 0 / 70%);
 }
 .ws-tabs::-webkit-scrollbar { display: none; }
+
 .ws-tab {
     position: relative; display: inline-flex; align-items: center; gap: 8px;
     height: 36px; padding: 0 16px;
@@ -121,6 +143,7 @@
     transition: background var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out);
 }
 .ws-tab:hover { background: var(--bg-card-2); color: var(--text); }
+
 .ws-tab[aria-selected="true"] {
     background: var(--accent-bg); border-color: color-mix(in oklch, var(--accent) 45%, transparent);
     color: var(--text); font-weight: 600;
@@ -129,37 +152,43 @@
 .ws-tab:focus-visible { outline: none; box-shadow: var(--focus-ring); }
 .ws-tab__you { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); display: none; }
 .ws-tab.is-you .ws-tab__you { display: inline-block; }
+
 /* Everything — the safety net gets a cue so nobody hunts through tabs. */
 .ws-tab--everything { color: var(--text-2); gap: 7px; }
 .ws-tab--everything i { font-size: 12px; color: var(--accent); }
+
 .ws-tab__cue {
     font-size: 10.5px; font-weight: 500; letter-spacing: .01em; white-space: nowrap;
     padding: 2px 8px; border-radius: var(--radius-pill);
     background: var(--accent-bg); color: var(--accent-2); border: 1px solid color-mix(in oklch, var(--accent) 35%, transparent);
 }
-.ws-tab--everything[aria-selected="true"] .ws-tab__cue { background: var(--accent); color: #06210f; border-color: var(--accent); }
+.ws-tab--everything[aria-selected="true"] .ws-tab__cue { background: var(--accent); color: var(--store-green-950); border-color: var(--accent); }
 .ws-tab--admin { margin-left: auto; color: var(--text-3); }
 .ws-tab--admin[aria-selected="true"] { color: var(--text); }
 .ws-tab--admin::before { content: ""; width: 1px; height: 18px; background: var(--line); margin-right: 10px; }
 .ws-tab--admin[hidden] { display: none; }
 .ws-tabs__hint { padding: 0 10px; font-size: 12px; color: var(--text-dim); white-space: nowrap; }
+
 .ws-tabs__hint kbd {
     font-family: var(--font-mono); font-size: 11px; padding: 1px 5px;
     border: 1px solid var(--line); border-radius: 4px; color: var(--text-3);
 }
 
 /* ── Panels + cards ────────────────────────────────────────────────── */
+
 /* Panels are off until workspace-controller marks the active one `is-on`, so
    nothing flashes before the module runs. [hidden] = gated and not (yet)
    allowed — set only by nav-access-controller — and always wins. */
 .ws-panel { display: none; }
 .ws-panel.is-on { display: block; }
+/* stylelint-disable-next-line declaration-no-important -- the hidden attribute must beat any display rule */
 .ws-panel[hidden] { display: none !important; }
 .ws-head { display: flex; align-items: baseline; gap: 12px; margin: 0 0 14px; flex-wrap: wrap; }
 .ws-head h2 { font-size: 16px; font-weight: 600; margin: 0; color: var(--text); }
 .ws-head p { margin: 0; color: var(--text-3); font-size: 13px; }
 
 .ws-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; align-items: start; margin-bottom: 22px; }
+
 .ws-card {
     background: var(--bg-card); border: 1px solid var(--line-soft); border-radius: var(--radius-lg);
     padding: 14px 14px 10px; display: flex; flex-direction: column; min-width: 0;
@@ -168,6 +197,7 @@
 .ws-card-h { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; padding: 0 4px 10px; }
 .ws-card-h h3 { font-size: 14px; font-weight: 600; margin: 0; color: var(--text); }
 .ws-card-h .ws-n { font-family: var(--font-mono); font-size: 11px; color: var(--text-dim); }
+
 .ws-sub {
     padding: 10px 4px 4px; font-size: 11px; font-weight: 600; letter-spacing: .06em;
     text-transform: uppercase; color: var(--text-3);
@@ -185,13 +215,15 @@
 }
 .ws-row:hover { background: var(--bg-card-2); }
 .ws-row:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+
 .ws-mk {
     width: 10px; height: 10px; border-radius: 3px; flex: none;
     background: var(--fam-mark, var(--fam, var(--line)));
-    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .08);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 8%);
 }
 .ws-nm { white-space: nowrap; }
 .ws-who { color: var(--text-3); font-size: 12px; white-space: nowrap; }
+
 .ws-d {
     margin-left: auto; font-size: 12px; color: var(--text-dim); text-align: right;
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0;
@@ -219,9 +251,10 @@ details.ws-more > summary .ws-n { margin-left: auto; font-family: var(--font-mon
 }
 .ws-tile:hover { border-color: var(--fam, var(--accent)); }
 .ws-tile:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+
 .ws-chip-mk {
     width: 34px; height: 34px; border-radius: 9px; flex: none;
-    background: var(--fam, var(--line)); color: var(--fam-fg, #fff);
+    background: var(--fam, var(--line)); color: var(--fam-fg, var(--color-surface));
     display: grid; place-items: center; font-family: var(--font-mono); font-weight: 600; font-size: 15px;
     box-shadow: 0 0 0 1px var(--fam-ring, transparent) inset;
 }
@@ -248,74 +281,76 @@ details.ws-more > summary .ws-n { margin-left: auto; font-family: var(--font-mon
 .ws-card-h .ws-note { font-size: 12px; color: var(--text-3); }
 
 /* ── Bespoke tiles: the tile looks like the page ───────────────────── */
+
 /* Shop Menu — paper, wine, Bodoni, Est. 1977 (mirrors service-price-cheat-sheet.css) */
 .ws-tile.bs-menu {
-    background: #f6efe1;
-    background-image: radial-gradient(ellipse at 15% 0%, rgba(255, 255, 255, .7), transparent 55%);
-    border: 2px solid #7a1f2b; color: #1c1712;
+    background: var(--store-paper-deep);
+    background-image: radial-gradient(ellipse at 15% 0%, rgb(255 255 255 / 70%), transparent 55%);
+    border: 2px solid var(--color-ae-dark); color: var(--print-ink);
 }
+
 .ws-tile.bs-menu .ws-chip-mk {
-    background: rgba(122, 31, 43, .06); border: 1px solid #7a1f2b; color: #7a1f2b; border-radius: 50%;
-    box-shadow: none; font-family: 'Bodoni Moda', 'Didot', 'Times New Roman', serif;
+    background: rgb(122 31 43 / 6%); border: 1px solid var(--color-ae-dark); color: var(--color-ae-dark); border-radius: 50%;
+    box-shadow: none; font-family: 'Bodoni Moda', Didot, 'Times New Roman', serif;
 }
-.ws-tile.bs-menu .ws-tile__tx b { font-family: 'Bodoni Moda', 'Didot', 'Times New Roman', serif; font-weight: 700; font-size: 17px; color: #1c1712; }
-.ws-tile.bs-menu .ws-tile__tx .ws-d { font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: #7a1f2b; }
-.ws-tile.bs-menu .ws-tile__go, .ws-tile.bs-menu:hover .ws-tile__go { color: #7a1f2b; }
-.ws-tile.bs-menu:hover { box-shadow: inset 0 0 0 1px #c9b99c, 0 6px 14px rgba(122, 31, 43, .35); }
+.ws-tile.bs-menu .ws-tile__tx b { font-family: 'Bodoni Moda', Didot, 'Times New Roman', serif; font-weight: 700; font-size: 17px; color: var(--print-ink); }
+.ws-tile.bs-menu .ws-tile__tx .ws-d { font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--color-ae-dark); }
+.ws-tile.bs-menu .ws-tile__go, .ws-tile.bs-menu:hover .ws-tile__go { color: var(--color-ae-dark); }
+.ws-tile.bs-menu:hover { box-shadow: inset 0 0 0 1px var(--workspaces-orange), 0 6px 14px rgb(122 31 43 / 35%); }
 
 /* Supacolor Jobs — the vendor's own mark on the dark chip its page uses */
-.ws-tile.bs-supa { background: #1e293b; border-color: #334155; }
-.ws-tile.bs-supa .ws-chip-mk { width: auto; min-width: 34px; padding: 0 6px; background: #0f172a; box-shadow: none; }
+.ws-tile.bs-supa { background: var(--gray-800); border-color: var(--gray-700); }
+.ws-tile.bs-supa .ws-chip-mk { width: auto; min-width: 34px; padding: 0 6px; background: var(--gray-900); box-shadow: none; }
 .ws-tile.bs-supa .ws-chip-mk img { height: 18px; width: auto; }
-.ws-tile.bs-supa .ws-tile__tx .ws-d { color: #94a3b8; }
-.ws-tile.bs-supa:hover { border-color: #64748b; }
+.ws-tile.bs-supa .ws-tile__tx .ws-d { color: var(--gray-400); }
+.ws-tile.bs-supa:hover { border-color: var(--slate-500); }
 
 /* DST Studio — "digitizer's bench": near-black, thread-teal, mono numbers */
-.ws-tile.bs-dst { background: #0b0d11; border-color: #1f2530; }
-.ws-tile.bs-dst .ws-chip-mk { background: #12151b; color: #45d6c5; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .07); }
-.ws-tile.bs-dst .ws-tile__tx b { color: #e8edf2; letter-spacing: .01em; }
-.ws-tile.bs-dst .ws-tile__tx .ws-d { color: #45d6c5; font-family: var(--font-mono); font-size: 11px; }
-.ws-tile.bs-dst:hover { border-color: #45d6c5; }
+.ws-tile.bs-dst { background: var(--print-ink); border-color: var(--gray-800); }
+.ws-tile.bs-dst .ws-chip-mk { background: var(--print-ink); color: var(--workspaces-teal); box-shadow: inset 0 0 0 1px rgb(255 255 255 / 7%); }
+.ws-tile.bs-dst .ws-tile__tx b { color: var(--slate-200); letter-spacing: .01em; }
+.ws-tile.bs-dst .ws-tile__tx .ws-d { color: var(--workspaces-teal); font-family: var(--font-mono); font-size: 11px; }
+.ws-tile.bs-dst:hover { border-color: var(--workspaces-teal); }
 
 /* Contract Embroidery / DTG — pink, Fraunces italic "2026." (contract-pricing-2026.css) */
-.ws-tile.bs-contract { background: #FBF8FA; border-color: #e9cfd9; color: #1A1318; }
-.ws-tile.bs-contract .ws-chip-mk { background: #B91C5C; color: #fff; font-family: 'Fraunces', Georgia, serif; font-style: italic; font-size: 15px; box-shadow: none; }
-.ws-tile.bs-contract .ws-tile__tx b { color: #1A1318; font-family: 'Fraunces', Georgia, serif; font-weight: 600; font-size: 15px; }
-.ws-tile.bs-contract .ws-tile__tx b em { font-style: italic; color: #B91C5C; }
-.ws-tile.bs-contract .ws-tile__tx .ws-d { color: #8E1147; }
-.ws-tile.bs-contract .ws-tile__go, .ws-tile.bs-contract:hover .ws-tile__go { color: #B91C5C; }
-.ws-tile.bs-contract:hover { border-color: #B91C5C; }
+.ws-tile.bs-contract { background: var(--gray-50); border-color: var(--store-line); color: var(--print-ink); }
+.ws-tile.bs-contract .ws-chip-mk { background: var(--workspaces-red); color: var(--color-on-brand); font-family: Fraunces, Georgia, serif; font-style: italic; font-size: 15px; box-shadow: none; }
+.ws-tile.bs-contract .ws-tile__tx b { color: var(--print-ink); font-family: Fraunces, Georgia, serif; font-weight: 600; font-size: 15px; }
+.ws-tile.bs-contract .ws-tile__tx b em { font-style: italic; color: var(--workspaces-red); }
+.ws-tile.bs-contract .ws-tile__tx .ws-d { color: var(--workspaces-magenta); }
+.ws-tile.bs-contract .ws-tile__go, .ws-tile.bs-contract:hover .ws-tile__go { color: var(--workspaces-red); }
+.ws-tile.bs-contract:hover { border-color: var(--workspaces-red); }
 
 /* Customer storefront pages — cream paper, Bricolage, NWCA storefront green */
-.ws-tile.bs-store { background: #faf8f3; border-color: #e6e1d6; color: #1f2a1f; }
-.ws-tile.bs-store .ws-chip-mk { background: #2f7d3b; color: #faf8f3; box-shadow: none; }
-.ws-tile.bs-store .ws-tile__tx b { color: #1f2a1f; font-family: 'Bricolage Grotesque', var(--font-sans); font-weight: 700; font-size: 14.5px; }
-.ws-tile.bs-store .ws-tile__tx .ws-d { color: #4b5a4b; }
-.ws-tile.bs-store .ws-tile__go, .ws-tile.bs-store:hover .ws-tile__go { color: #2f7d3b; }
-.ws-tile.bs-store:hover { border-color: #2f7d3b; }
+.ws-tile.bs-store { background: var(--store-paper); border-color: var(--store-line); color: var(--store-ink); }
+.ws-tile.bs-store .ws-chip-mk { background: var(--store-green-700); color: var(--store-paper); box-shadow: none; }
+.ws-tile.bs-store .ws-tile__tx b { color: var(--store-ink); font-family: 'Bricolage Grotesque', var(--font-sans); font-weight: 700; font-size: 14.5px; }
+.ws-tile.bs-store .ws-tile__tx .ws-d { color: var(--print-ink-soft); }
+.ws-tile.bs-store .ws-tile__go, .ws-tile.bs-store:hover .ws-tile__go { color: var(--store-green-700); }
+.ws-tile.bs-store:hover { border-color: var(--store-green-700); }
 
 /* My Accounts — the rep CRM's navy with its gold / silver / bronze tiers */
-.ws-tile.bs-acct { background: #1a2332; border-color: #2d4a5e; }
-.ws-tile.bs-acct .ws-chip-mk { background: #243447; box-shadow: none; display: flex; flex-direction: column; gap: 3px; align-items: center; justify-content: center; }
+.ws-tile.bs-acct { background: var(--gray-800); border-color: var(--gray-700); }
+.ws-tile.bs-acct .ws-chip-mk { background: var(--gray-800); box-shadow: none; display: flex; flex-direction: column; gap: 3px; align-items: center; justify-content: center; }
 .ws-tile.bs-acct .ws-chip-mk i { display: block; width: 16px; height: 4px; border-radius: 2px; }
-.ws-tile.bs-acct .ws-chip-mk i:nth-child(1) { background: #f59e0b; }
-.ws-tile.bs-acct .ws-chip-mk i:nth-child(2) { background: #94a3b8; }
-.ws-tile.bs-acct .ws-chip-mk i:nth-child(3) { background: #cd7f32; }
-.ws-tile.bs-acct .ws-tile__tx .ws-d { color: #9fb3c8; }
-.ws-tile.bs-acct:hover { border-color: #f59e0b; }
+.ws-tile.bs-acct .ws-chip-mk i:nth-child(1) { background: var(--amber-500); }
+.ws-tile.bs-acct .ws-chip-mk i:nth-child(2) { background: var(--gray-400); }
+.ws-tile.bs-acct .ws-chip-mk i:nth-child(3) { background: var(--workspaces-orange-2); }
+.ws-tile.bs-acct .ws-tile__tx .ws-d { color: var(--workspaces-cyan-2); }
+.ws-tile.bs-acct:hover { border-color: var(--amber-500); }
 
 /* Design Vault — forest green with the vault door */
-.ws-tile.bs-vault { background: #0f1a10; border-color: #2e5827; }
-.ws-tile.bs-vault .ws-chip-mk { background: #2e5827; color: #bbf7d0; border-radius: 50%; box-shadow: none; }
-.ws-tile.bs-vault .ws-tile__tx .ws-d { color: #86c99a; }
-.ws-tile.bs-vault:hover { border-color: #4ade80; }
+.ws-tile.bs-vault { background: var(--store-ink); border-color: var(--brand-700); }
+.ws-tile.bs-vault .ws-chip-mk { background: var(--brand-700); color: var(--workspaces-green-tint); border-radius: 50%; box-shadow: none; }
+.ws-tile.bs-vault .ws-tile__tx .ws-d { color: var(--workspaces-green-3); }
+.ws-tile.bs-vault:hover { border-color: var(--workspaces-green); }
 
 /* Photo Capture — the installable app's own icon */
-.ws-tile.bs-capture { background: #14351c; border-color: #1f5a2c; }
+.ws-tile.bs-capture { background: var(--store-green-950); border-color: var(--print-green-dark); }
 .ws-tile.bs-capture .ws-chip-mk { background: transparent; box-shadow: none; padding: 0; }
 .ws-tile.bs-capture .ws-chip-mk img { width: 34px; height: 34px; border-radius: 9px; }
-.ws-tile.bs-capture .ws-tile__tx .ws-d { color: #8fd19f; }
-.ws-tile.bs-capture:hover { border-color: #4ade80; }
+.ws-tile.bs-capture .ws-tile__tx .ws-d { color: var(--workspaces-green-4); }
+.ws-tile.bs-capture:hover { border-color: var(--workspaces-green); }
 
 /* ── Everything (generated) ────────────────────────────────────────── */
 .ws-filter {
@@ -328,27 +363,32 @@ details.ws-more > summary .ws-n { margin-left: auto; font-family: var(--font-mon
 .ws-filter__count { font-family: var(--font-mono); font-size: 12px; color: var(--text-dim); }
 .ws-every { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px 24px; }
 .ws-every__grp[hidden] { display: none; }
+
 /* Everything rows carry the tool's description under its name (2026-09-04) — it
    is the safety net, so it has to say what each thing IS, not just its name. */
 .ws-every .ws-row { flex-wrap: wrap; min-height: 0; padding: 5px 8px; }
+
 .ws-every .ws-row .ws-d {
     flex-basis: 100%; margin: 1px 0 0 19px; text-align: left; white-space: normal; line-height: 1.35;
 }
 
 /* ── Responsive ────────────────────────────────────────────────────── */
-@media (max-width: 1100px) {
+@media (width <= 1100px) {
     .ws-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .ws-card--wide { grid-column: span 2; }
     .ws-every { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
     /* Row descriptions WRAP under the name instead of disappearing (2026-09-04).
        They used to be display:none from 1100px down, which left every row on a
        1024-1100px laptop as a bare name. */
     .ws-row { flex-wrap: wrap; min-height: 0; padding: 6px 8px; }
+
     .ws-row .ws-d {
         flex-basis: 100%; margin: 1px 0 0 19px; text-align: left; white-space: normal; line-height: 1.35;
     }
 }
-@media (max-width: 768px) {
+
+@media (width <= 768px) {
     .ws-grid, .ws-every { grid-template-columns: 1fr; }
     .ws-card--wide { grid-column: auto; }
     .ws-tools--cols { grid-template-columns: 1fr; }
@@ -364,10 +404,12 @@ details.ws-more > summary .ws-n { margin-left: auto; font-family: var(--font-mon
        header drops from ~115px to one row. patch-2 sets these with !important, so
        the overrides need it too (same weight → later source wins). */
     .page-title { display: none; }
+    /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
     .top-header { padding: 8px 0 10px !important; margin-bottom: 8px !important; gap: 6px !important; }
     .header-right { gap: 6px; flex-wrap: wrap; }
     .goal-chip__amt { display: none; }
     .header-right .goal-chip__track { width: 56px; }
+
     /* Team keeps its name; the birthday / anniversary pills live in its dropdown anyway. */
     .team-btn__pill, .team-btn__divider { display: none; }
     .ws-head p { display: none; }
@@ -375,12 +417,14 @@ details.ws-more > summary .ws-n { margin-left: auto; font-family: var(--font-mon
     /* The tab strip scrolls sideways on a phone: tighter tabs, plus a fade at the
        right edge so the off-screen tabs (Company, Everything) announce themselves. */
     .ws-tab { height: 34px; padding: 0 12px; font-size: 13.5px; }
+
     .ws-tabs::after {
         content: ""; position: sticky; right: 0; flex: none; align-self: stretch;
         width: 34px; margin-left: -34px; pointer-events: none;
         background: linear-gradient(90deg, transparent, var(--bg-elev) 80%);
     }
 }
+
 @media (prefers-reduced-motion: reduce) {
     details.ws-more > summary i.fa-chevron-right { transition: none; }
     .ws-tab { transition: none; }

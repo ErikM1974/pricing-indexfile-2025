@@ -33,7 +33,7 @@ describe('design vault', () => {
         expect(files[1]).toMatch(/els\.topSpacer\.style\.setProperty\('--h'/);
         expect(files[1]).toMatch(/img\.classList\.add\('is-blank'\);/);
         expect(css).toMatch(/\.dg-boot-bar \{ width: var\(--w, 8%\); \}/);
-        expect(css).toMatch(/\.dg-spacer \{ height: var\(--h, 0px\); \}/);
+        expect(css).toMatch(/\.dg-spacer \{ height: var\(--h, 0(?:px)?\); \}/);
         expect(css).toMatch(/\.dg-grid-viewport \{ overflow-anchor: none; \}/);
         expect(html).toMatch(/role="progressbar" aria-label="Index download"/);
         expect(html).toMatch(/design-gallery\.js\?v=\d{4}\.\d{2}\.\d{2}\.\d+/);

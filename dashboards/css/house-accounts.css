@@ -1,3 +1,5 @@
+/* stylelint-disable no-duplicate-selectors -- legacy sheet: rules were appended over time; merging them would reorder the cascade (2026-09-07) */
+
 /* =====================================================
    HOUSE ACCOUNTS DASHBOARD STYLES
    Dark Navy Theme - Account Assignment Dashboard
@@ -6,26 +8,44 @@
 /* =====================================================
    CSS VARIABLES - DARK MODE
    ===================================================== */
+
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue, merged into its
+   existing :root. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
 :root {
+    --house-accounts-red: #f87171;
+    --house-accounts-cyan: #60a5fa;
+    --house-accounts-green: #34d399;
+    --house-accounts-yellow: #fbbf24;
+    --house-accounts-teal: #10b981;
+    --house-accounts-red-2: #ef4444;
+    --house-accounts-indigo: #7c3aed;
+    --house-accounts-cyan-2: #0891b2;
+    --house-accounts-teal-2: #06b6d4;
+    --house-accounts-indigo-2: #a78bfa;
+    --house-accounts-green-2: #22c55e;
+
     /* Dark Mode Base */
-    --bg-dark: #1a2332;
-    --bg-darker: #141c27;
-    --card-dark: #243447;
-    --card-border: #2d4a5e;
-    --text-primary: #ffffff;
-    --text-secondary: #94a3b8;
-    --text-muted: #64748b;
+    --bg-dark: var(--gray-800);
+    --bg-darker: var(--gray-900);
+    --card-dark: var(--gray-800);
+    --card-border: var(--gray-700);
+    --text-primary: var(--color-surface);
+    --text-secondary: var(--gray-400);
+    --text-muted: var(--slate-500);
 
     /* Action Colors */
-    --accent-blue: #3b82f6;
-    --success: #10b981;
-    --error: #ef4444;
-    --warning: #f59e0b;
+    --accent-blue: var(--color-floor-light);
+    --success: var(--house-accounts-teal);
+    --error: var(--house-accounts-red-2);
+    --warning: var(--amber-500);
 
     /* Rep Colors */
-    --taneisha-color: #8b5cf6;
-    --nika-color: #06b6d4;
+    --taneisha-color: var(--color-ruth-light);
+    --nika-color: var(--house-accounts-teal-2);
 }
+/* stylelint-enable color-no-hex */
 
 /* =====================================================
    PAGE LAYOUT
@@ -36,7 +56,7 @@
 
 body {
     margin: 0;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     background: var(--bg-dark);
     color: var(--text-primary);
     line-height: 1.5;
@@ -57,7 +77,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 2px 8px rgb(0 0 0 / 30%);
     flex-wrap: wrap;
     gap: 1rem;
     border-bottom: 1px solid var(--card-border);
@@ -92,19 +112,19 @@ body {
     align-items: center;
     gap: 0.5rem;
     padding: 0.5rem 1rem;
-    background: rgba(255, 255, 255, 0.15);
+    background: rgb(255 255 255 / 15%);
     color: white;
     text-decoration: none;
     border-radius: 6px;
     font-weight: 500;
     font-size: 0.875rem;
-    border: 1px solid rgba(255, 255, 255, 0.25);
+    border: 1px solid rgb(255 255 255 / 25%);
     transition: all 0.2s;
 }
 
 .back-btn:hover {
-    background: rgba(255, 255, 255, 0.25);
-    border-color: rgba(255, 255, 255, 0.45);
+    background: rgb(255 255 255 / 25%);
+    border-color: rgb(255 255 255 / 45%);
 }
 
 /* =====================================================
@@ -132,7 +152,7 @@ body {
     background: var(--card-dark);
     border-radius: 10px;
     padding: 1.25rem;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 2px 8px rgb(0 0 0 / 30%);
     border: 1px solid var(--card-border);
     text-align: center;
     transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s, background 0.2s;
@@ -141,12 +161,12 @@ body {
 
 .stat-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 4px 16px rgb(0 0 0 / 40%);
 }
 
 .stat-card.active {
     border-color: var(--accent-blue);
-    background: rgba(59, 130, 246, 0.15);
+    background: rgb(59 130 246 / 15%);
 }
 
 .stat-card.total {
@@ -175,7 +195,7 @@ body {
     border-radius: 10px;
     padding: 1rem 1.25rem;
     margin-bottom: 1.25rem;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 2px 8px rgb(0 0 0 / 30%);
     border: 1px solid var(--card-border);
     display: flex;
     flex-wrap: wrap;
@@ -212,7 +232,7 @@ body {
 .filter-group select:focus {
     outline: none;
     border-color: var(--accent-blue);
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    box-shadow: 0 0 0 3px rgb(59 130 246 / 20%);
 }
 
 .filter-group.search-group {
@@ -246,7 +266,7 @@ body {
 .accounts-section {
     background: var(--card-dark);
     border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 2px 8px rgb(0 0 0 / 30%);
     border: 1px solid var(--card-border);
     overflow: hidden;
     position: relative;
@@ -300,7 +320,7 @@ body {
 
 .account-card:hover {
     border-color: var(--accent-blue);
-    box-shadow: 0 4px 16px rgba(59, 130, 246, 0.2);
+    box-shadow: 0 4px 16px rgb(59 130 246 / 20%);
 }
 
 .account-card-content {
@@ -318,7 +338,7 @@ body {
     font-weight: 600;
     font-size: 1rem;
     color: var(--text-primary);
-    margin: 0 0 0.25rem 0;
+    margin: 0 0 0.25rem;
 }
 
 .current-assignee {
@@ -328,16 +348,16 @@ body {
     border-radius: 20px;
     font-size: 0.75rem;
     font-weight: 600;
-    background: rgba(107, 114, 128, 0.2);
+    background: rgb(107 114 128 / 20%);
     color: var(--text-secondary);
 }
 
 /* Rep-specific badge colors */
-.current-assignee.ruthie { background: rgba(239, 68, 68, 0.2); color: #f87171; }
-.current-assignee.erik { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
-.current-assignee.web { background: rgba(16, 185, 129, 0.2); color: #34d399; }
-.current-assignee.jim { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
-.current-assignee.house { background: rgba(107, 114, 128, 0.2); color: #9ca3af; }
+.current-assignee.ruthie { background: rgb(239 68 68 / 20%); color: var(--house-accounts-red); }
+.current-assignee.erik { background: rgb(59 130 246 / 20%); color: var(--house-accounts-cyan); }
+.current-assignee.web { background: rgb(16 185 129 / 20%); color: var(--house-accounts-green); }
+.current-assignee.jim { background: rgb(245 158 11 / 20%); color: var(--house-accounts-yellow); }
+.current-assignee.house { background: rgb(107 114 128 / 20%); color: var(--gray-400); }
 
 .account-meta {
     display: flex;
@@ -400,7 +420,7 @@ body {
 }
 
 .assign-btn.taneisha:hover {
-    background: #7c3aed;
+    background: var(--house-accounts-indigo);
     transform: translateY(-1px);
 }
 
@@ -410,7 +430,7 @@ body {
 }
 
 .assign-btn.nika:hover {
-    background: #0891b2;
+    background: var(--house-accounts-cyan-2);
     transform: translateY(-1px);
 }
 
@@ -425,12 +445,12 @@ body {
    ===================================================== */
 .error-banner {
     display: none;
-    background: rgba(239, 68, 68, 0.2);
-    border: 1px solid rgba(239, 68, 68, 0.3);
+    background: rgb(239 68 68 / 20%);
+    border: 1px solid rgb(239 68 68 / 30%);
     border-radius: 8px;
     padding: 1rem 1.25rem;
     margin-bottom: 1.5rem;
-    color: #f87171;
+    color: var(--house-accounts-red);
 }
 
 .error-banner.show {
@@ -450,7 +470,7 @@ body {
 .error-banner-close {
     background: none;
     border: none;
-    color: #f87171;
+    color: var(--house-accounts-red);
     cursor: pointer;
     padding: 0.25rem;
 }
@@ -475,11 +495,8 @@ body {
 .loading-overlay {
     display: none;
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(26, 35, 50, 0.9);
+    inset: 0;
+    background: rgb(26 35 50 / 90%);
     align-items: center;
     justify-content: center;
     z-index: 10;
@@ -503,7 +520,7 @@ body {
 }
 
 .empty-state h3 {
-    margin: 0 0 0.5rem 0;
+    margin: 0 0 0.5rem;
     font-size: 1.125rem;
     color: var(--text-secondary);
 }
@@ -519,11 +536,8 @@ body {
 .modal-overlay {
     display: none;
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.7);
+    inset: 0;
+    background: rgb(0 0 0 / 70%);
     z-index: 1000;
     align-items: center;
     justify-content: center;
@@ -540,7 +554,7 @@ body {
     border-radius: 12px;
     width: 100%;
     max-width: 450px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 20px 40px rgb(0 0 0 / 50%);
     border: 1px solid var(--card-border);
 }
 
@@ -591,7 +605,7 @@ body {
 }
 
 .modal-body p {
-    margin: 0 0 1rem 0;
+    margin: 0 0 1rem;
     color: var(--text-secondary);
 }
 
@@ -603,7 +617,7 @@ body {
 }
 
 .account-preview .company-name {
-    margin: 0 0 0.5rem 0;
+    margin: 0 0 0.5rem;
 }
 
 .account-preview .current-assignee {
@@ -653,7 +667,7 @@ body {
 }
 
 .btn-save:hover {
-    background: #059669;
+    background: var(--emerald-600);
 }
 
 .btn-save:disabled {
@@ -666,7 +680,7 @@ body {
 }
 
 .btn-save.taneisha:hover {
-    background: #7c3aed;
+    background: var(--house-accounts-indigo);
 }
 
 .btn-save.nika {
@@ -674,7 +688,7 @@ body {
 }
 
 .btn-save.nika:hover {
-    background: #0891b2;
+    background: var(--house-accounts-cyan-2);
 }
 
 /* =====================================================
@@ -685,13 +699,13 @@ body {
     bottom: 2rem;
     left: 50%;
     transform: translateX(-50%) translateY(100px);
-    background: linear-gradient(135deg, #10b981, #059669);
+    background: linear-gradient(135deg, var(--house-accounts-teal), var(--emerald-600));
     color: white;
     padding: 1rem 2rem;
     border-radius: 12px;
     font-weight: 600;
     font-size: 1rem;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 10px 25px rgb(0 0 0 / 30%);
     z-index: 3000;
     opacity: 0;
     transition: all 0.3s ease;
@@ -716,9 +730,9 @@ body {
     align-items: center;
     gap: 0.5rem;
     padding: 0.5rem 1rem;
-    background: rgba(16, 185, 129, 0.2);
-    color: #34d399;
-    border: 1px solid rgba(16, 185, 129, 0.3);
+    background: rgb(16 185 129 / 20%);
+    color: var(--house-accounts-green);
+    border: 1px solid rgb(16 185 129 / 30%);
     border-radius: 6px;
     font-size: 0.875rem;
     font-weight: 500;
@@ -727,8 +741,8 @@ body {
 }
 
 .reconcile-btn:hover {
-    background: rgba(16, 185, 129, 0.3);
-    border-color: rgba(16, 185, 129, 0.5);
+    background: rgb(16 185 129 / 30%);
+    border-color: rgb(16 185 129 / 50%);
 }
 
 .reconcile-btn:disabled {
@@ -747,7 +761,7 @@ body {
     max-height: 80vh;
     display: flex;
     flex-direction: column;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 20px 40px rgb(0 0 0 / 50%);
     border: 1px solid var(--card-border);
 }
 
@@ -774,7 +788,7 @@ body {
 }
 
 .refresh-btn:hover {
-    background: rgba(59, 130, 246, 0.1);
+    background: rgb(59 130 246 / 10%);
     border-color: var(--accent-blue);
     color: var(--accent-blue);
 }
@@ -883,7 +897,7 @@ body {
 }
 
 .reconcile-table tbody tr:hover {
-    background: rgba(59, 130, 246, 0.1);
+    background: rgb(59 130 246 / 10%);
 }
 
 .reconcile-table tbody tr:last-child td {
@@ -931,7 +945,7 @@ body {
 }
 
 .reconcile-empty h3 {
-    margin: 0 0 0.5rem 0;
+    margin: 0 0 0.5rem;
     color: var(--text-primary);
 }
 
@@ -957,18 +971,18 @@ body {
 }
 
 .sw-match {
-    background: rgba(16, 185, 129, 0.15);
-    color: #34d399;
+    background: rgb(16 185 129 / 15%);
+    color: var(--house-accounts-green);
 }
 
 .sw-mismatch {
-    background: rgba(245, 158, 11, 0.15);
-    color: #fbbf24;
+    background: rgb(245 158 11 / 15%);
+    color: var(--house-accounts-yellow);
 }
 
 .sw-not-found {
-    background: rgba(239, 68, 68, 0.15);
-    color: #f87171;
+    background: rgb(239 68 68 / 15%);
+    color: var(--house-accounts-red);
 }
 
 /* Tier column */
@@ -993,7 +1007,7 @@ body {
 }
 
 .btn-assign-row:hover {
-    background: #2563eb;
+    background: var(--blue-600);
 }
 
 /* Assign dropdown in reconcile table */
@@ -1009,7 +1023,7 @@ body {
 }
 
 .assign-dropdown:hover {
-    background: #2563eb;
+    background: var(--blue-600);
 }
 
 .assign-dropdown option {
@@ -1041,7 +1055,7 @@ body {
 }
 
 .reconcile-table .customer-row:hover {
-    background: rgba(255, 255, 255, 0.02);
+    background: rgb(255 255 255 / 2%);
 }
 
 .reconcile-table .customer-row:hover .expand-toggle {
@@ -1053,6 +1067,7 @@ body {
 }
 
 .order-details-row td {
+    /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
     padding: 0 !important;
 }
 
@@ -1155,7 +1170,7 @@ body {
 }
 
 .btn-assign-rep:hover {
-    background: rgba(59, 130, 246, 0.1);
+    background: rgb(59 130 246 / 10%);
     border-color: var(--accent-blue);
 }
 
@@ -1217,7 +1232,7 @@ body {
     align-items: center;
     gap: 0.625rem;
     padding: 0.75rem;
-    background: rgba(59, 130, 246, 0.1);
+    background: rgb(59 130 246 / 10%);
     border-radius: 8px;
 }
 
@@ -1235,13 +1250,13 @@ body {
 /* =====================================================
    RESPONSIVE DESIGN
    ===================================================== */
-@media (max-width: 1200px) {
+@media (width <= 1200px) {
     .stats-grid {
         grid-template-columns: repeat(3, 1fr);
     }
 }
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
     .house-header {
         flex-direction: column;
         align-items: stretch;
@@ -1296,9 +1311,9 @@ body {
     align-items: center;
     gap: 0.5rem;
     padding: 0.5rem 1rem;
-    background: rgba(59, 130, 246, 0.2);
-    color: #60a5fa;
-    border: 1px solid rgba(59, 130, 246, 0.3);
+    background: rgb(59 130 246 / 20%);
+    color: var(--house-accounts-cyan);
+    border: 1px solid rgb(59 130 246 / 30%);
     border-radius: 6px;
     font-size: 0.875rem;
     font-weight: 500;
@@ -1307,8 +1322,8 @@ body {
 }
 
 .gap-report-btn:hover {
-    background: rgba(59, 130, 246, 0.3);
-    border-color: rgba(59, 130, 246, 0.5);
+    background: rgb(59 130 246 / 30%);
+    border-color: rgb(59 130 246 / 50%);
 }
 
 /* =====================================================
@@ -1327,9 +1342,9 @@ body {
     align-items: center;
     gap: 0.5rem;
     padding: 0.5rem 1rem;
-    background: rgba(139, 92, 246, 0.2);
-    color: #a78bfa;
-    border: 1px solid rgba(139, 92, 246, 0.3);
+    background: rgb(139 92 246 / 20%);
+    color: var(--house-accounts-indigo-2);
+    border: 1px solid rgb(139 92 246 / 30%);
     border-radius: 6px;
     font-size: 0.875rem;
     font-weight: 500;
@@ -1338,19 +1353,19 @@ body {
 }
 
 .sync-btn:hover {
-    background: rgba(139, 92, 246, 0.3);
-    border-color: rgba(139, 92, 246, 0.5);
+    background: rgb(139 92 246 / 30%);
+    border-color: rgb(139 92 246 / 50%);
 }
 
 .sync-btn.primary {
-    background: rgba(59, 130, 246, 0.2);
-    color: #60a5fa;
-    border-color: rgba(59, 130, 246, 0.3);
+    background: rgb(59 130 246 / 20%);
+    color: var(--house-accounts-cyan);
+    border-color: rgb(59 130 246 / 30%);
 }
 
 .sync-btn.primary:hover {
-    background: rgba(59, 130, 246, 0.3);
-    border-color: rgba(59, 130, 246, 0.5);
+    background: rgb(59 130 246 / 30%);
+    border-color: rgb(59 130 246 / 50%);
 }
 
 .sync-btn:disabled {
@@ -1363,7 +1378,7 @@ body {
     width: 14px;
     height: 14px;
     border: 2px solid transparent;
-    border-top-color: currentColor;
+    border-top-color: currentcolor;
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
 }
@@ -1408,18 +1423,18 @@ body {
 }
 
 .sync-status-item .status-badge.fresh {
-    background: rgba(34, 197, 94, 0.2);
-    color: #22c55e;
+    background: rgb(34 197 94 / 20%);
+    color: var(--house-accounts-green-2);
 }
 
 .sync-status-item .status-badge.stale {
-    background: rgba(251, 191, 36, 0.2);
-    color: #fbbf24;
+    background: rgb(251 191 36 / 20%);
+    color: var(--house-accounts-yellow);
 }
 
 .sync-status-item .status-badge.critical {
-    background: rgba(239, 68, 68, 0.2);
-    color: #ef4444;
+    background: rgb(239 68 68 / 20%);
+    color: var(--house-accounts-red-2);
 }
 
 .gap-report-modal {
@@ -1430,7 +1445,7 @@ body {
     max-height: 85vh;
     display: flex;
     flex-direction: column;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 20px 40px rgb(0 0 0 / 50%);
     border: 1px solid var(--card-border);
 }
 
@@ -1526,7 +1541,7 @@ body {
 }
 
 .gap-rep-header:hover {
-    background: rgba(59, 130, 246, 0.1);
+    background: rgb(59 130 246 / 10%);
 }
 
 .gap-rep-info {
@@ -1593,12 +1608,12 @@ body {
 }
 
 .gap-group-header.outbound {
-    background: rgba(245, 158, 11, 0.1);
+    background: rgb(245 158 11 / 10%);
     color: var(--warning);
 }
 
 .gap-group-header.inbound {
-    background: rgba(59, 130, 246, 0.1);
+    background: rgb(59 130 246 / 10%);
     color: var(--accent-blue);
 }
 
@@ -1638,7 +1653,7 @@ body {
 }
 
 .gap-conflict-row:hover {
-    background: rgba(255, 255, 255, 0.02);
+    background: rgb(255 255 255 / 2%);
 }
 
 .gap-company {
@@ -1678,6 +1693,7 @@ body {
 }
 
 .gap-orders-row td {
+    /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
     padding: 0 !important;
 }
 
@@ -1766,7 +1782,7 @@ body {
     margin-left: 4px;
     border-radius: 9px;
     background: var(--warning);
-    color: #1a2332;
+    color: var(--gray-800);
     font-size: 11px;
     font-weight: 700;
     text-align: center;
@@ -1816,31 +1832,36 @@ body {
 
 /* Phone (≤640px) — 2026-09-05 staff-dashboard sweep: the page measured wider than the
    viewport at 375px and panned sideways. */
-@media (max-width: 640px) {
+@media (width <= 640px) {
     .accounts-header, .accounts-meta { flex-wrap: wrap; row-gap: 8px; }
 }
 
 /* ── 2026-09-05 review ────────────────────────────────────────────────────── */
+/* stylelint-disable-next-line declaration-no-important -- the hidden attribute must beat any display rule */
 [hidden] { display: none !important; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+
 /* Stat tiles are real <button>s (keyboard + aria-pressed); reset the UA button look. */
 .stat-card { font: inherit; color: inherit; width: 100%; display: block; text-align: center; }
 .stat-card > span { display: block; }
-.stat-card[aria-pressed="true"] { outline: 2px solid #fff; outline-offset: 2px; }
+.stat-card[aria-pressed="true"] { outline: 2px solid var(--color-surface); outline-offset: 2px; }
+
 .stat-card:focus-visible, .gap-report-btn:focus-visible, .reconcile-btn:focus-visible, .sync-btn:focus-visible,
 .clear-filters-btn:focus-visible, .modal-close:focus-visible, .refresh-btn:focus-visible, .btn-cancel:focus-visible,
 .btn-save:focus-visible, .error-banner-retry:focus-visible, .back-btn:focus-visible, .btn-assign-rep:focus-visible,
-tr[tabindex]:focus-visible, .gap-rep-header:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
-.house-data-subline { display: flex; align-items: center; gap: 6px; color: #6b7280; font-size: 11px; margin: 6px 0 0; }
+tr[tabindex]:focus-visible, .gap-rep-header:focus-visible { outline: 2px solid var(--color-surface); outline-offset: 2px; }
+.house-data-subline { display: flex; align-items: center; gap: 6px; color: var(--gray-500); font-size: 11px; margin: 6px 0 0; }
 .house-data-subline i { font-size: 10px; }
 .modal-content--narrow { max-width: 480px; }
+
 .error-banner-retry {
     margin-left: auto; font: inherit; font-size: 0.8rem; font-weight: 600; color: inherit;
-    background: rgba(255, 255, 255, 0.12); border: 1px solid rgba(255, 255, 255, 0.35); border-radius: 6px;
+    background: rgb(255 255 255 / 12%); border: 1px solid rgb(255 255 255 / 35%); border-radius: 6px;
     padding: 4px 10px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
 }
-.error-banner-retry:hover { background: rgba(255, 255, 255, 0.22); }
-@media (max-width: 640px) {
+.error-banner-retry:hover { background: rgb(255 255 255 / 22%); }
+
+@media (width <= 640px) {
     .header-right { flex-wrap: wrap; gap: 8px; }
     .stats-grid { grid-template-columns: 1fr 1fr; }
     .stat-card.total { grid-column: 1 / -1; }

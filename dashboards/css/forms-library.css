@@ -81,7 +81,7 @@
 }
 
 /* Stack rows on narrow screens so buttons don't crush the text */
-@media (max-width: 640px) {
+@media (width <= 640px) {
     .forms-row {
         flex-direction: column;
         align-items: flex-start;
@@ -93,5 +93,6 @@
 }
 
 /* 2026-09-05 review */
+/* stylelint-disable-next-line declaration-no-important -- the hidden attribute must beat any display rule */
 [hidden] { display: none !important; }
 .forms-load-failed .dash-btn { margin-left: 8px; }

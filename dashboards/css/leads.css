@@ -12,6 +12,7 @@
 
 /* Author display rules (.ld-board { display: grid }) beat the UA's
    [hidden] { display: none }, so JS view toggling silently fails without this. */
+/* stylelint-disable-next-line declaration-no-important -- the hidden attribute must beat any display rule */
 [hidden] { display: none !important; }
 
 /* ── Toolbar ── */
@@ -37,6 +38,7 @@
     padding: 7px 10px;
 }
 .ld-search { flex: 1 1 220px; min-width: 180px; }
+
 .ld-select:focus-visible,
 .ld-search:focus-visible { outline: 2px solid var(--gray-400); outline-offset: 1px; }
 
@@ -68,6 +70,7 @@
 
 /* ── View toggle + Mine chip ── */
 .ld-view-toggle { display: inline-flex; margin-left: auto; border: 1px solid var(--gray-300); border-radius: var(--radius-sm); overflow: hidden; }
+
 .ld-toggle-btn {
     font: inherit;
     font-size: 0.78rem;
@@ -129,6 +132,7 @@
     overflow-x: auto;
     padding-bottom: 6px;
 }
+
 .ld-col {
     background: var(--gray-50);
     border: 1px solid var(--gray-100);
@@ -138,6 +142,7 @@
     flex-direction: column;
 }
 .ld-col.is-drop-over { border-color: var(--gray-500); background: var(--gray-100); }
+
 .ld-col-head {
     display: flex;
     justify-content: space-between;
@@ -155,6 +160,7 @@
 .ld-col-body { padding: 8px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
 .ld-col-empty { text-align: center; color: var(--gray-400); padding: 16px 0; }
 .ld-col-older { text-align: center; font-size: 0.72rem; color: var(--gray-500); padding: 4px 0; }
+
 .ld-col-more {
     font: inherit; font-size: 0.75rem; font-weight: 600;
     color: var(--gray-600); background: var(--gray-100);
@@ -175,19 +181,22 @@
 .ld-card:hover { border-color: var(--gray-400); }
 .ld-card.is-dragging { opacity: 0.5; cursor: grabbing; }
 .ld-card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 6px; }
+/* stylelint-disable-next-line declaration-property-value-keyword-no-deprecated -- overflow-wrap: anywhere is not a byte-identical swap; legacy */
 .ld-card-company { font-size: 0.84rem; font-weight: 600; color: var(--gray-900); word-break: break-word; }
 .ld-card-contact { font-size: 0.76rem; color: var(--gray-500); margin-top: 1px; }
 .ld-card-meta { display: flex; align-items: center; gap: 8px; margin-top: 8px; font-size: 0.74rem; color: var(--gray-500); }
 .ld-card-val { font-weight: 700; color: var(--gray-800); }
 .ld-card-age { margin-left: auto; }
+
 .ld-dot {
     flex-shrink: 0;
     width: 9px;
     height: 9px;
     border-radius: 999px;
-    background: var(--state-danger-text, #b42318);
+    background: var(--state-danger-text, var(--red-700));
     margin-top: 4px;
 }
+
 .ld-rep-chip {
     display: inline-flex;
     align-items: center;
@@ -201,7 +210,7 @@
     font-weight: 700;
 }
 
-@media (max-width: 900px) {
+@media (width <= 900px) {
     .ld-board { grid-template-columns: repeat(5, 220px); }
 }
 
@@ -209,6 +218,7 @@
 .ld-table-scroll { overflow-x: auto; }
 
 .ld-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+
 .ld-table th {
     text-align: left;
     font-size: 0.72rem;
@@ -220,6 +230,7 @@
     border-bottom: 1px solid var(--gray-200);
     white-space: nowrap;
 }
+
 .ld-table td {
     padding: 10px;
     border-bottom: 1px solid var(--gray-100);
@@ -278,6 +289,7 @@
     box-shadow: var(--shadow-lg);
     z-index: 80;
 }
+
 .ld-modal-head {
     display: flex;
     justify-content: space-between;
@@ -294,14 +306,15 @@
 .ld-modal-actions { display: flex; align-items: center; gap: 10px; margin-top: 4px; }
 .ld-btn--primary { background: var(--gray-900); color: var(--surface-card); border-color: var(--gray-900); }
 .ld-btn--primary:hover { background: var(--gray-700); color: var(--surface-card); }
-.ld-btn--danger { color: var(--state-danger, #b42318); border-color: var(--state-danger, #f0c2bd); }
-.ld-btn--danger:hover { background: var(--state-danger-bg, #fde8e8); color: var(--state-danger, #b42318); }
+.ld-btn--danger { color: var(--state-danger, var(--red-700)); border-color: var(--state-danger, var(--leads-red)); }
+.ld-btn--danger:hover { background: var(--state-danger-bg, var(--red-100)); color: var(--state-danger, var(--red-700)); }
 
 /* Edit / Delete action row at the top of the drawer body */
 .ld-drawer-actions { display: flex; gap: 8px; }
 
 /* ── 🔥 heat + first-response timer ── */
 .ld-fire { flex-shrink: 0; font-size: 0.85rem; cursor: help; }
+
 .ld-timer {
     font-size: 0.68rem;
     font-weight: 700;
@@ -311,13 +324,13 @@
 }
 .ld-timer--ok { background: var(--state-success-bg, var(--gray-100)); color: var(--state-success-text, var(--gray-700)); }
 .ld-timer--warn { background: var(--state-warning-bg, var(--gray-100)); color: var(--state-warning-text, var(--gray-700)); }
-.ld-timer--late { background: var(--state-danger-bg, #fde8e8); color: var(--state-danger-text, #b42318); }
+.ld-timer--late { background: var(--state-danger-bg, var(--red-100)); color: var(--state-danger-text, var(--red-700)); }
 
 /* ── Drawer ── */
 .ld-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(17, 24, 39, 0.45);
+    background: rgb(17 24 39 / 45%);
     z-index: 60;
 }
 
@@ -363,6 +376,7 @@
 .ld-drawer-body { padding: 16px 18px 28px; overflow-y: auto; }
 
 .ld-section { margin-bottom: 18px; }
+
 .ld-section-title {
     font-size: 0.72rem;
     font-weight: 600;
@@ -379,6 +393,7 @@
 
 .ld-kv { display: grid; grid-template-columns: minmax(110px, 38%) 1fr; gap: 4px 12px; font-size: 0.85rem; }
 .ld-kv dt { color: var(--gray-500); }
+/* stylelint-disable-next-line declaration-property-value-keyword-no-deprecated -- overflow-wrap: anywhere is not a byte-identical swap; legacy */
 .ld-kv dd { color: var(--gray-800); margin: 0; word-break: break-word; white-space: pre-wrap; }
 
 .ld-summary {
@@ -393,6 +408,7 @@
 
 .ld-links a { display: inline-flex; align-items: center; gap: 6px; margin: 0 10px 6px 0; font-size: 0.84rem; }
 .ld-att { display: inline-flex; align-items: center; }
+
 .ld-att .ld-dl {
     margin: 0 14px 6px -4px;
     padding: 2px 6px;
@@ -403,6 +419,7 @@
 .ld-att .ld-dl:hover { background: var(--gray-100); color: var(--gray-800); }
 
 .ld-thumbs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+
 .ld-thumb {
     max-width: 120px;
     max-height: 120px;
@@ -421,6 +438,7 @@
 }
 .ld-match--found { border-color: var(--state-success-text, var(--gray-300)); }
 .ld-match-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+
 .ld-pill {
     font-size: 0.72rem;
     font-weight: 700;
@@ -452,6 +470,7 @@
 .ld-match-search { display: flex; gap: 6px; margin-top: 10px; }
 .ld-match-search input { flex: 1; }
 .ld-match-results { margin-top: 8px; display: grid; gap: 6px; }
+
 .ld-match-result {
     display: flex;
     justify-content: space-between;
@@ -464,6 +483,7 @@
 
 /* ── Order history ── */
 .ld-orders-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; margin-top: 8px; }
+
 .ld-orders-table th {
     text-align: left;
     font-size: 0.7rem;
@@ -475,8 +495,9 @@
 .ld-orders-table td { padding: 6px 8px; border-bottom: 1px solid var(--gray-100); white-space: nowrap; }
 .ld-muted { color: var(--gray-500); font-size: 0.82rem; }
 
-@media (max-width: 720px) {
+@media (width <= 720px) {
     .ld-toolbar { flex-direction: column; align-items: stretch; }
+
     /* in a column flexbox the search's flex-basis would become HEIGHT */
     .ld-search { flex: none; min-width: 0; }
     .ld-kv { grid-template-columns: 1fr; }
@@ -485,11 +506,19 @@
 /* Page theme (2026-09-03, dashboard Workspaces): the customer family's navy, so the
    Leads tile on the staff dashboard and this header are the same color. Only the
    dash-shell theme hooks — nothing else redefined. */
-:root { --dash-theme: #1a2332; --dash-theme-dark: #141c27; --dash-theme-bg: #eef1f5; }
+
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue, merged into its
+   existing :root. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
+:root {
+    --leads-red: #f0c2bd;
+ --dash-theme: var(--gray-800); --dash-theme-dark: var(--gray-900); --dash-theme-bg: var(--slate-100); }
+/* stylelint-enable color-no-hex */
 
 /* Phone (≤640px) — 2026-09-05 staff-dashboard sweep: the page measured wider than the
    viewport at 375px and panned sideways. */
-@media (max-width: 640px) {
+@media (width <= 640px) {
     .dash-header-right { flex-wrap: wrap; justify-content: flex-end; row-gap: 6px; }
 }
 
@@ -503,9 +532,11 @@
 .ld-board-msg { text-align: center; color: var(--gray-500); padding: 28px 10px; font-size: 0.9rem; }
 .ld-board-msg .ld-btn { margin-left: 8px; }
 .ld-hint-sm { font-size: 0.78rem; }
+
 .ld-refresh-btn:focus-visible, .ld-btn:focus-visible, .ld-toggle-btn:focus-visible, .ld-chip-btn:focus-visible,
 .ld-drawer-close:focus-visible, .ld-col-more:focus-visible { outline: 2px solid var(--gray-900); outline-offset: 2px; }
-@media (max-width: 640px) {
+
+@media (width <= 640px) {
     /* the header carries 5 actions — keep the icons, drop the words */
     .dash-header-right .ld-refresh-btn { padding: 7px 9px; }
     .dash-header-right .ld-refresh-btn .ld-btn-txt { display: none; }

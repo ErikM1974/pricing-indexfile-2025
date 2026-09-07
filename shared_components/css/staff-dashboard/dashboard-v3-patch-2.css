@@ -12,103 +12,180 @@
    4. Metrics zone spacing
    ===================================================================== */
 
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue so the page
+   keeps its exact look. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   every rule below uses var(). Raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
+:root {
+    --dashboard-v3-patch-2-blue-tint: #c7d2fe;
+    --dashboard-v3-patch-2-green: #22c55e;
+    --dashboard-v3-patch-2-green-2: #a7f3d0;
+    --dashboard-v3-patch-2-green-3: #1f9d4d;
+    --dashboard-v3-patch-2-teal: #1de9b6;
+    --dashboard-v3-patch-2-cyan: #29b6f6;
+    --dashboard-v3-patch-2-cyan-2: #2196f3;
+    --dashboard-v3-patch-2-teal-2: #5eead4;
+    --dashboard-v3-patch-2-cyan-3: #38bdf8;
+    --dashboard-v3-patch-2-yellow: #fcd34d;
+    --dashboard-v3-patch-2-green-tint: #d1fae5;
+    --dashboard-v3-patch-2-yellow-2: #fde68a;
+    --dashboard-v3-patch-2-cyan-4: #8aa0b6;
+}
+/* stylelint-enable color-no-hex */
+
 /* ── 1. Hide the empty announcements zone so it doesn't reserve space ── */
 .zone-announcements:empty,
 .zone-announcements:has(.announcements-hero:empty + .announcements-list:empty),
 .announcements-hero:empty,
 .announcements-list:empty {
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   display: none !important;
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   margin: 0 !important;
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   padding: 0 !important;
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   border: 0 !important;
 }
 
 /* If your announcement cards have a ::before/::after that creates space
    even when empty, this catches it: */
 .zone-announcements > div:empty {
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   display: none !important;
 }
 
 /* ── 2. Compress the Pinned row ────────────────────────────────────── */
 .pinned-row {
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   display: flex !important;
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   flex-direction: row !important;
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   align-items: center !important;
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   gap: 14px !important;
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   padding: 10px 16px !important;
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   min-height: auto !important;
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   max-height: 56px !important;
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   background: var(--surface-card) !important;
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   border: 1px solid var(--surface-border) !important;
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   border-radius: 10px !important;
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   margin-bottom: 14px !important;
 }
+
 .pinned-row__label {
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   font-size: 11px !important;
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   letter-spacing: .14em !important;
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   text-transform: uppercase !important;
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   color: var(--ink-lo) !important;
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   font-weight: 700 !important;
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   flex: 0 0 auto !important;
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   padding: 0 !important;
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   margin: 0 !important;
 }
+
 .pinned-row__list {
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   display: flex !important;
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   align-items: center !important;
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   gap: 8px !important;
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   flex: 1 !important;
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   padding: 0 !important;
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   margin: 0 !important;
 }
+
 .pinned-row__empty {
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   color: var(--ink-dim) !important;
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   font-size: 12.5px !important;
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   font-style: italic !important;
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   padding: 0 !important;
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   margin: 0 !important;
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   background: transparent !important;
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   border: 0 !important;
 }
 
 /* ── 3. Tighten zone spacing ───────────────────────────────────────── */
 .dashboard-zones {
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   display: flex !important;
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   flex-direction: column !important;
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   gap: 20px !important;
 }
+
 .dashboard-zones > section {
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   margin: 0 !important;
 }
+
 .zone-quick-access,
 .zone-metrics,
 .zone-announcements {
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   padding: 0 !important;
 }
 
 /* Zone header should sit close to its content, not float */
 .zone-header {
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   margin-bottom: 14px !important;
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   margin-top: 0 !important;
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   padding: 0 !important;
 }
 
 /* ── 4. Sales goal banner — make sure percent inherits color ───────── */
 .sales-goal-percent,
 .sales-goal-percent #goalPercent {
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   color: var(--nw-green) !important;
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   font-weight: 700 !important;
 }
 
 /* ── 5. Top header spacing ─────────────────────────────────────────── */
 .top-header {
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   padding: 12px 0 16px !important;
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   margin-bottom: 12px !important;
 }
 
 /* ── 6. Main content padding ───────────────────────────────────────── */
 .main-content {
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   padding: 18px 28px 80px !important;
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   gap: 18px !important;
 }
 
@@ -131,21 +208,29 @@
    868px at minmax(280px)+14px gap) so nothing reflows at a width where
    it didn't before. The container is .zone-quick-access, which sets
    container-type: inline-size in components.css. */
+
 /* The tool-grid column rules (section 7) were removed 2026-09-03 with the grid they
    styled — see workspaces.css. */
 
 
 /* ── 8. Metrics zone grid ──────────────────────────────────────────── */
 .zone-metrics {
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   display: grid !important;
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   gap: 16px !important;
 }
+
 .zone-metrics .col-span-full {
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   grid-column: 1 / -1 !important;
 }
-@media (max-width: 1100px) {
+
+@media (width <= 1100px) {
   .zone-metrics {
+    /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
     grid-template-columns: 1fr !important;
   }
 }
@@ -158,6 +243,7 @@
 .production-capacity-dot,
 .production-capacity-dot.capacity-moderate,
 .production-capacity-dot.capacity-busy {
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   display: none !important;
 }
 
@@ -168,8 +254,10 @@
 .sign-out-link,
 .team-btn,
 .user-welcome {
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   flex-shrink: 0 !important;
 }
+
 /* Keep the welcome message visible to the LEFT of the Sign Out button
    once auth-controller fills in the user name. */
 .user-welcome {
@@ -183,24 +271,41 @@
    learn the sequence. Bradley's Queue gets a distinctive cyan→teal
    gradient (the v2 deploy used this; staff recognize it). */
 .pinned-row.pinned-row--frequent {
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   display: block !important;
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   max-height: none !important;
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   padding: 16px 18px !important;
-  background: var(--surface-card, #1c2128) !important;
-  border: 1px solid var(--surface-border, #2b333d) !important;
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
+  background: var(--surface-card, var(--gray-900)) !important;
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
+  border: 1px solid var(--surface-border, var(--gray-800)) !important;
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   border-radius: 12px !important;
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   margin-bottom: 16px !important;
 }
+
 .pinned-row--frequent .pinned-row__label {
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   margin-bottom: 12px !important;
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   display: block !important;
 }
+
 .pinned-row--frequent .pinned-row__list {
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   display: flex !important;
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   flex-wrap: wrap !important;
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   align-items: stretch !important;
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   gap: 10px !important;
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   padding: 0 !important;
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   overflow: visible !important;
 }
 
@@ -210,12 +315,13 @@
   flex-direction: column;
   gap: 8px;
   padding: 10px 12px;
-  background: var(--surface-card-2, #232a33);
-  border: 1px dashed var(--nw-green-dim, #1f9d4d);
+  background: var(--surface-card-2, var(--gray-800));
+  border: 1px dashed var(--nw-green-dim, var(--dashboard-v3-patch-2-green-3));
   border-radius: 10px;
 }
+
 .pinned-row--frequent .tool-workflow-label {
-  color: var(--nw-green, #22c55e);
+  color: var(--nw-green, var(--dashboard-v3-patch-2-green));
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.06em;
@@ -224,32 +330,44 @@
   align-items: center;
   gap: 6px;
 }
+
 .pinned-row--frequent .tool-workflow-row {
   display: flex;
   align-items: center;
   gap: 8px;
   flex-wrap: wrap;
 }
+
 .pinned-row--frequent .tool-workflow-arrow {
-  color: var(--nw-green, #22c55e);
+  color: var(--nw-green, var(--dashboard-v3-patch-2-green));
   display: inline-flex;
   align-items: center;
   font-size: 14px;
 }
+
 /* Bradley's Queue tile — cyan→teal gradient (matches v2 deploy) */
 .pinned-row--frequent .tool-btn--workflow {
-  background: linear-gradient(135deg, #1de9b6 0%, #29b6f6 50%, #2196f3 100%) !important;
-  color: #0b0f14 !important;
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
+  background: linear-gradient(135deg, var(--dashboard-v3-patch-2-teal) 0%, var(--dashboard-v3-patch-2-cyan) 50%, var(--dashboard-v3-patch-2-cyan-2) 100%) !important;
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
+  color: var(--print-ink) !important;
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   font-weight: 700 !important;
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   border: 0 !important;
 }
+
 .pinned-row--frequent .tool-btn--workflow i {
-  color: #0b0f14 !important;
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
+  color: var(--print-ink) !important;
 }
+
 .pinned-row--frequent .tool-btn--workflow:hover {
-  background: linear-gradient(135deg, #5eead4 0%, #38bdf8 50%, #3b82f6 100%) !important;
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
+  background: linear-gradient(135deg, var(--dashboard-v3-patch-2-teal-2) 0%, var(--dashboard-v3-patch-2-cyan-3) 50%, var(--color-floor-light) 100%) !important;
   transform: translateY(-1px);
 }
+
 /* Inline supacolor logo image inside .tool-btn */
 .pinned-row--frequent .tool-btn__inline-img {
   height: 14px;
@@ -286,14 +404,17 @@
   font-weight: 700;
   letter-spacing: .04em;
   white-space: nowrap;
+
   /* Override the .user-welcome flex-shrink:0 rule at line 154/159 — already
      compatible since flex-shrink doesn't affect inline-flex sizing here.
      The .hide-mobile class on the element keeps it hidden under 720px. */
 }
+
 .user-welcome--chip .welcome-text {
   color: var(--nw-green-hi);
   text-transform: uppercase;
 }
+
 .user-welcome--chip .user-name {
   color: var(--nw-green-hi);
   text-transform: none;
@@ -306,24 +427,28 @@
   margin: 0 auto;
   padding: 20px 28px;
   box-shadow:
-    0 0 0 1px rgba(34, 197, 94, 0.18),
-    0 8px 32px -8px rgba(34, 197, 94, 0.30),
+    0 0 0 1px rgb(34 197 94 / 18%),
+    0 8px 32px -8px rgb(34 197 94 / 30%),
     var(--shadow-card);
 }
+
 .sales-goal-row {
   justify-content: center;
 }
+
 /* The "$3.0M" goal label — slightly larger than the base 15px so it reads
    as a meaningful number, not metadata. */
 .sales-goal-amount {
   font-size: 18px;
 }
+
 /* The YTD dollar value ($971,153) — this is the page's primary KPI, so
    it gets the biggest weight. ~22px keeps it readable without making the
    banner feel cartoonish. */
 .sales-goal-current {
   font-size: 22px;
 }
+
 /* Thicker, wider progress bar so the green fill feels substantial. The
    theme's existing gradient + glow on .progress-fill carries over. */
 .sales-goal-progress {
@@ -332,6 +457,7 @@
   max-width: 460px;
   border-radius: 6px;
 }
+
 .sales-goal-progress .progress-fill {
   border-radius: 6px;
   animation: goalPulse 3s ease-in-out infinite;
@@ -345,7 +471,7 @@
 /* Narrow viewports — relax the centering so the banner doesn't crush
    against tiny gutters. The theme's existing mobile rule at line 948
    shrinks the row font; this preserves the spread. */
-@media (max-width: 720px) {
+@media (width <= 720px) {
   .sales-goal-banner {
     max-width: 100%;
     padding: 14px 18px;
@@ -367,6 +493,7 @@
 .sales-goal-banner.is-loading .sales-goal-percent {
   display: none;
 }
+
 .sales-goal-banner.is-loading .sales-goal-current {
   font-size: 14px;
   color: var(--ink-md);
@@ -374,6 +501,7 @@
   letter-spacing: .02em;
   font-weight: 500;
 }
+
 .sales-goal-banner.is-loading .progress-fill {
   /* Override the normal goalPulse animation with a left-to-right shimmer
      while data is pending. Width stays 0% (set by controller) so the bar
@@ -385,6 +513,7 @@
   );
   background-size: 200% 100%;
   animation: goalShimmer 1.6s ease-in-out infinite;
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   width: 100% !important;
   opacity: 0.6;
 }
@@ -430,22 +559,31 @@
    not shipped" tool will want. Delete it if nothing claims it. */
 .tool-btn--soon {
   position: relative;
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   padding-right: 102px !important;          /* reserve room for the badge */
   color: var(--ink-lo);                     /* dim label, badge stays bright */
   cursor: not-allowed;
+
   /* Block parent .tool-btn:hover translate/border-color so the button
      doesn't jitter when the cursor crosses it. */
   pointer-events: auto;
 }
+
 .tool-btn--soon i {
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   color: var(--ink-lo) !important;          /* dim icon too — was nw-green */
   opacity: 0.55;
 }
+
 .tool-btn--soon:hover,
 .tool-btn--soon:focus {
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   background: var(--surface-card-2) !important;
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   color: var(--ink-lo) !important;
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   border-color: var(--surface-border) !important;
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   transform: none !important;
 }
 
@@ -455,12 +593,10 @@
   right: 10px;
   top: 50%;
   transform: translateY(-50%);
-
   display: inline-flex;
   align-items: center;
   padding: 4px 9px;
   line-height: 1;
-
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.06em;
@@ -469,9 +605,9 @@
   /* Dark-mode amber: translucent so it sits ON the surface rather than
      punching a beige rectangle into it. amber-400 (#fbbf24) reads ~5:1
      contrast against the card bg → WCAG AA pass. */
-  background: rgba(251, 191, 36, 0.14);
-  color: #fcd34d;                            /* amber-300 */
-  border: 1px solid rgba(251, 191, 36, 0.38);
+  background: rgb(251 191 36 / 14%);
+  color: var(--dashboard-v3-patch-2-yellow);                            /* amber-300 */
+  border: 1px solid rgb(251 191 36 / 38%);
   border-radius: 6px;
   white-space: nowrap;
   pointer-events: none;                      /* tooltip text shouldn't be hoverable */
@@ -497,6 +633,7 @@
    roadmap, indigo = in-development. Matches GitHub's Beta badge color
    and Linear's "In progress" workflow state, which AEs may already
    recognize from those products. */
+
 /* AI chip — flags buttons that drop into an AI-assisted flow.
    Real markup (not ::after) because we want both icon + text inside.
 
@@ -508,56 +645,58 @@
    claims it. */
 .tool-btn--ai {
   position: relative;
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   padding-right: 64px !important;            /* reserve room for the chip */
 }
+
 .tool-btn-ai-chip {
   position: absolute;
   right: 10px;
   top: 50%;
   transform: translateY(-50%);
-
   display: inline-flex;
   align-items: center;
   gap: 4px;
   padding: 3px 8px;
   line-height: 1;
-
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-
-  background: rgba(129, 140, 248, 0.16);
-  color: #c7d2fe;
-  border: 1px solid rgba(129, 140, 248, 0.42);
+  background: rgb(129 140 248 / 16%);
+  color: var(--dashboard-v3-patch-2-blue-tint);
+  border: 1px solid rgb(129 140 248 / 42%);
   border-radius: 6px;
   white-space: nowrap;
   pointer-events: none;
 }
+
 .tool-btn-ai-chip i {
   font-size: 10px;
-  color: #c7d2fe !important;                 /* override .tool-btn i color rule */
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
+  color: var(--dashboard-v3-patch-2-blue-tint) !important;                 /* override .tool-btn i color rule */
 }
+
 .tool-btn--ai:hover .tool-btn-ai-chip {
-  background: rgba(129, 140, 248, 0.22);
+  background: rgb(129 140 248 / 22%);
 }
 
 .tool-btn--beta {
   position: relative;
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   padding-right: 60px !important;            /* reserve room for the BETA chip */
 }
+
 .tool-btn--beta::after {
   content: "BETA";
   position: absolute;
   right: 10px;
   top: 50%;
   transform: translateY(-50%);
-
   display: inline-flex;
   align-items: center;
   padding: 4px 8px;
   line-height: 1;
-
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -565,57 +704,58 @@
 
   /* Dark-mode indigo: translucent so it sits on the surface. indigo-300
      (#a5b4fc) on indigo-500/14 hits WCAG AA on the card surface. */
-  background: rgba(129, 140, 248, 0.16);     /* indigo-400 @ 16% */
-  color: #c7d2fe;                            /* indigo-200 — readable on dark */
-  border: 1px solid rgba(129, 140, 248, 0.42);
+  background: rgb(129 140 248 / 16%);     /* indigo-400 @ 16% */
+  color: var(--dashboard-v3-patch-2-blue-tint);                            /* indigo-200 — readable on dark */
+  border: 1px solid rgb(129 140 248 / 42%);
   border-radius: 6px;
   white-space: nowrap;
   pointer-events: none;                      /* chip is advisory only */
 }
+
 /* On hover: keep the chip steady; only the button reacts. The parent's
    transform: translateX(2px) already shows the affordance. */
 .tool-btn--beta:hover::after {
   /* Slight brightening on hover so the chip doesn't feel "ignored" when
      the rest of the button lights up. */
-  background: rgba(129, 140, 248, 0.22);
-  color: #e0e7ff;                            /* indigo-100 */
-  border-color: rgba(129, 140, 248, 0.55);
+  background: rgb(129 140 248 / 22%);
+  color: var(--sky-100);                            /* indigo-100 */
+  border-color: rgb(129 140 248 / 55%);
 }
 
 /* NEW chip — same mechanism as --beta, emerald to read as "fresh / good to use"
    (not the indigo "still being refined" beta signal). */
 .tool-btn--new {
   position: relative;
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   padding-right: 58px !important;            /* reserve room for the NEW chip */
 }
+
 .tool-btn--new::after {
   content: "NEW";
   position: absolute;
   right: 10px;
   top: 50%;
   transform: translateY(-50%);
-
   display: inline-flex;
   align-items: center;
   padding: 4px 8px;
   line-height: 1;
-
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-
-  background: rgba(52, 211, 153, 0.16);      /* emerald-400 @ 16% */
-  color: #a7f3d0;                            /* emerald-200 — readable on dark */
-  border: 1px solid rgba(52, 211, 153, 0.42);
+  background: rgb(52 211 153 / 16%);      /* emerald-400 @ 16% */
+  color: var(--dashboard-v3-patch-2-green-2);                            /* emerald-200 — readable on dark */
+  border: 1px solid rgb(52 211 153 / 42%);
   border-radius: 6px;
   white-space: nowrap;
   pointer-events: none;                      /* chip is advisory only */
 }
+
 .tool-btn--new:hover::after {
-  background: rgba(52, 211, 153, 0.24);
-  color: #d1fae5;                            /* emerald-100 */
-  border-color: rgba(52, 211, 153, 0.55);
+  background: rgb(52 211 153 / 24%);
+  color: var(--dashboard-v3-patch-2-green-tint);                            /* emerald-100 */
+  border-color: rgb(52 211 153 / 55%);
 }
 
 /* "Updated · <date>" badge — AMBER (vs green NEW=first-launch) so a refreshed tool re-catches the
@@ -623,36 +763,36 @@
    old date is the cue to refresh or retire it. The "what changed" detail lives in the tile tooltip. */
 .tool-btn--updated {
   position: relative;
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   padding-right: 132px !important;           /* reserve room for the dated chip */
 }
+
 .tool-btn--updated::after {
   content: "Updated · Jun 24";
   position: absolute;
   right: 10px;
   top: 50%;
   transform: translateY(-50%);
-
   display: inline-flex;
   align-items: center;
   padding: 4px 8px;
   line-height: 1;
-
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-
-  background: rgba(251, 191, 36, 0.16);      /* amber-400 @ 16% */
-  color: #fde68a;                            /* amber-200 — readable on dark */
-  border: 1px solid rgba(251, 191, 36, 0.45);
+  background: rgb(251 191 36 / 16%);      /* amber-400 @ 16% */
+  color: var(--dashboard-v3-patch-2-yellow-2);                            /* amber-200 — readable on dark */
+  border: 1px solid rgb(251 191 36 / 45%);
   border-radius: 6px;
   white-space: nowrap;
   pointer-events: none;                      /* chip is advisory only */
 }
+
 .tool-btn--updated:hover::after {
-  background: rgba(251, 191, 36, 0.24);
-  color: #fef3c7;                            /* amber-100 */
-  border-color: rgba(251, 191, 36, 0.6);
+  background: rgb(251 191 36 / 24%);
+  color: var(--amber-100);                            /* amber-100 */
+  border-color: rgb(251 191 36 / 60%);
 }
 
 /* Compact "which to use" line — one short row instead of a block. The work of
@@ -662,20 +802,21 @@
   font-size: 11.5px;
   line-height: 1.4;
 }
+
 .quote-guide-mini .qg-chip {
   display: inline-block;
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: #a7f3d0;                            /* emerald-200 */
-  background: rgba(52, 211, 153, 0.12);
-  border: 1px solid rgba(52, 211, 153, 0.28);
+  color: var(--dashboard-v3-patch-2-green-2);                            /* emerald-200 */
+  background: rgb(52 211 153 / 12%);
+  border: 1px solid rgb(52 211 153 / 28%);
   border-radius: 6px;
   padding: 2px 7px;
   margin-right: 6px;
 }
-.quote-guide-mini .qg-note { color: #94a3b8; }
+.quote-guide-mini .qg-note { color: var(--gray-400); }
 
 /* Sub-group labels inside a tool group — the grouping itself answers
    "which do I click for what I'm trying to do". */
@@ -684,19 +825,20 @@
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: #8aa0b6;
+  color: var(--dashboard-v3-patch-2-cyan-4);
   margin: 9px 2px 2px;
   display: flex;
   align-items: baseline;
   gap: 8px;
 }
 .tool-subhead:first-child { margin-top: 0; }
+
 .tool-subhead-note {
   font-size: 10px;
   font-weight: 400;
   letter-spacing: 0;
   text-transform: none;
-  color: #6b7c8f;
+  color: var(--slate-500);
 }
 
 /* ── 15. Merged Pricing card (2026-07-29 IA reorg) ────────────────────
@@ -707,6 +849,7 @@
    way. Two internal columns only when the card is actually wide (it
    spans 2 tracks at ≥880px); below that it falls back to the theme's
    single flex column. */
+
 /* Pricing-card two-column rules removed 2026-09-03 (grid retired). */
 
 /* ── "Updated" chip inside a tool button (2026-08-05) ──────────────────────
@@ -721,7 +864,8 @@
   margin-left: 0;
   flex: 0 0 auto;                            /* never squeeze the chip */
 }
-@media (max-width: 900px) {
+
+@media (width <= 900px) {
   /* Narrow columns: drop the chip rather than the tool's name. .tool-btn is
      `white-space: nowrap`, so the ~110px chip pushes the label out of the
      button instead of wrapping (BETA avoids this by being absolutely
@@ -733,4 +877,4 @@
 /* Goal chip: the annual goal is a Caspio row (CO-ANNUAL-GOAL). When it cannot be
    read the controller uses the built-in default AND marks the chip — the amount
    goes amber and the label carries "⚠" + a tooltip (2026-09-04, Rule 4). */
-.sales-goal-banner.is-goal-fallback #goalOf { color: #f59e0b; font-weight: 700; }
+.sales-goal-banner.is-goal-fallback #goalOf { color: var(--amber-500); font-weight: 700; }

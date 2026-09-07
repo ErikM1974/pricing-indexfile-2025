@@ -48,6 +48,22 @@ const CSS_LINT_SCOPE = [
     'product/css/product-2026.css',
     'catalog-search.css',
     'brands.css',
+    // Dashboards family (2026-09-07): the queue-dashboard system (art-hub + dash-shell), the staff dashboard's
+    // own layers, every dashboards/css sheet and the shared widgets the dashboards load
+    'shared_components/css/art-hub.css',
+    'shared_components/css/dash-shell.css',
+    'shared_components/css/staff-dashboard/*.css',
+    'dashboards/css/*.css',
+    'shared_components/css/transfer-actions.css',
+    'shared_components/css/sanmar-invoice-viewer.css',
+    'shared_components/css/mockup-ruth.css',
+    'shared_components/css/kanban.css',
+    'shared_components/css/elapsed-time-utils.css',
+    'shared_components/css/box-label-print.css',
+    'shared_components/css/toast-notifications.css',
+    'shared_components/css/sticker-banner-submit-form.css',
+    'shared_components/css/old-designs.css',
+    'shared_components/css/names-numbers.css',
 ];
 
 async function run() {

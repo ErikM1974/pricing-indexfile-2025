@@ -111,6 +111,27 @@ alive for a year. 🔑 Rendered markup is only visible at runtime: the forms' sh
 per page that 18 static locks passed; probe the DOM after load, then add the renderer to the lock.
 🔑 Never pin a cache-bust version prefix in a test; the next deploy bumps it.
 
+## 2026-09-06 — EmailJS ids in 25 scripts, 118 unlabelled controls, and 12 SEO pages rendering in quirks mode (`v2026.09.06.36`)
+
+**Problem.** Rule 6 had been applied to the proxy host but not to EmailJS: 69 copies of the public
+key / service id sat in served scripts while `APP_CONFIG.EMAIL` (tenant getters) existed unused.
+A static census found 118 form controls with no accessible name, and the 12 `*-webstores` SEO pages
+had no doctype/`<html>`/`<body>` at all — bare fragments served with `sendFile`, so every browser
+rendered them in quirks mode.
+**Root cause.** Config centralisation was done per-constant when a file was touched; nothing
+swept for the second literal. Labels were written next to controls (`<label>Name</label><input>`)
+without `for=`, which looks right and is invisible to AT. The SEO pages were authored as body
+fragments for a wrapper that never existed.
+**Solution.** Sweep script → `APP_CONFIG.EMAIL.*` with a visible error, window-guarded; a11y
+fixer: `for=` where a label sits beside the control (minting ids), else `aria-label` from the
+visible label/placeholder; the fragments wrapped as documents. Both locked in
+`repo-hygiene-final.test.js`.
+**Prevention.** 🔑 When a config getter exists, grep for the VALUE it returns — a literal beside
+an unused getter is the common failure. 🔑 `<label>` without `for=` and not wrapping is
+decoration; the a11y lock now fails on it. 🔑 A page that starts with `<meta charset>` has no
+`<html>`: check `document.compatMode` on any page that "looks slightly off". 🔑 Module-scope
+config reads need `typeof window !== 'undefined'` — the Node-run service tests load the file.
+
 ## Archived 2026-09-06
 
 ## 2026-09-06 — Calculator sweep (`v2026.09.06.9` → `.16`): 8 pages of inline code, 5 shared scripts with hardcoded hosts, and a dead loader

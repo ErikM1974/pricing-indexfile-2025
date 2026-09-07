@@ -1,83 +1,106 @@
 /* Payroll — admin-only leave/hours dashboard. NWCA green theme; no inline styles. */
+
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue so the page
+   keeps its exact look. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   every rule below uses var(). Raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
+:root {
+    --payroll-gray: #5a665e;
+    --payroll-green: #1a7c3a;
+    --payroll-gray-2: #8a968f;
+    --payroll-green-2: #3a7c52;
+    --payroll-green-dark: #2c3b33;
+    --payroll-gray-dark: #000;
+    --payroll-orange: #8a5a10;
+    --payroll-orange-2: #7a4f0d;
+    --payroll-orange-3: #d9932a;
+    --payroll-green-dark-2: #14682f;
+    --payroll-orange-4: #7a4b06;
+    --payroll-orange-5: #c77700;
+}
+/* stylelint-enable color-no-hex */
+
 * { box-sizing: border-box; }
-body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; background: #f5f7f5; color: #1f2a24; }
+body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; background: var(--gray-100); color: var(--store-ink); }
 
 .pr-wrap { max-width: 1240px; margin: 0 auto; padding: 1.5rem 1.25rem 4rem; }
 
-.pr-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; border-bottom: 3px solid #1a472a; padding-bottom: 1rem; margin-bottom: 1rem; }
-.pr-header h1 { color: #1a472a; font-size: 1.6rem; margin: 0; }
-.pr-sub { color: #5a665e; margin: .35rem 0 0; font-size: .92rem; max-width: 72ch; }
-.pr-back { color: #3a7c52; text-decoration: none; font-weight: 600; font-size: .9rem; white-space: nowrap; }
-.pr-back:hover { color: #1a472a; }
+.pr-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; border-bottom: 3px solid var(--brand-800); padding-bottom: 1rem; margin-bottom: 1rem; }
+.pr-header h1 { color: var(--brand-800); font-size: 1.6rem; margin: 0; }
+.pr-sub { color: var(--payroll-gray); margin: .35rem 0 0; font-size: .92rem; max-width: 72ch; }
+.pr-back { color: var(--payroll-green-2); text-decoration: none; font-weight: 600; font-size: .9rem; white-space: nowrap; }
+.pr-back:hover { color: var(--brand-800); }
 
 .pr-status { min-height: 1.4rem; margin: .25rem 0 .75rem; font-size: .9rem; font-weight: 500; }
-.pr-status.is-ok { color: #1a7c3a; }
-.pr-status.is-error { color: #b3261e; }
-.pr-status.is-info { color: #5a665e; }
+.pr-status.is-ok { color: var(--payroll-green); }
+.pr-status.is-error { color: var(--red-700); }
+.pr-status.is-info { color: var(--payroll-gray); }
 
 .pr-tabs { display: flex; gap: .5rem; margin-bottom: 1rem; flex-wrap: wrap; }
-.pr-tab { background: #e7ede9; border: none; color: #3a4a42; padding: .55rem 1.1rem; border-radius: 8px 8px 0 0; font-weight: 600; cursor: pointer; font-size: .95rem; }
-.pr-tab.is-active { background: #1a472a; color: #fff; }
+.pr-tab { background: var(--store-green-100); border: none; color: var(--store-ink-soft); padding: .55rem 1.1rem; border-radius: 8px 8px 0 0; font-weight: 600; cursor: pointer; font-size: .95rem; }
+.pr-tab.is-active { background: var(--brand-800); color: var(--color-on-brand); }
 
-.pr-panel { display: none; background: #fff; border-radius: 10px; padding: 1.25rem; box-shadow: 0 1px 3px rgba(26,71,42,.08); }
+.pr-panel { display: none; background: var(--color-surface); border-radius: 10px; padding: 1.25rem; box-shadow: 0 1px 3px rgb(26 71 42 / 8%); }
 .pr-panel.is-active { display: block; }
-.pr-panel-head h2 { color: #1a472a; font-size: 1.15rem; margin: 0 0 .35rem; }
-.pr-panel-head p { color: #5a665e; font-size: .9rem; margin: 0 0 1rem; max-width: 80ch; line-height: 1.5; }
-.pr-h3 { color: #1a472a; font-size: 1rem; margin: 1.5rem 0 .6rem; }
+.pr-panel-head h2 { color: var(--brand-800); font-size: 1.15rem; margin: 0 0 .35rem; }
+.pr-panel-head p { color: var(--payroll-gray); font-size: .9rem; margin: 0 0 1rem; max-width: 80ch; line-height: 1.5; }
+.pr-h3 { color: var(--brand-800); font-size: 1rem; margin: 1.5rem 0 .6rem; }
 
 .pr-toolbar { display: flex; align-items: center; gap: .75rem; margin-bottom: .9rem; flex-wrap: wrap; }
-.pr-label { font-size: .88rem; font-weight: 600; color: #3a4a42; }
-.pr-search, .pr-select { border: 1px solid #cfdad3; border-radius: 7px; padding: .5rem .7rem; font-size: .92rem; font-family: inherit; color: #1f2a24; background: #fff; }
+.pr-label { font-size: .88rem; font-weight: 600; color: var(--store-ink-soft); }
+.pr-search, .pr-select { border: 1px solid var(--gray-300); border-radius: 7px; padding: .5rem .7rem; font-size: .92rem; font-family: inherit; color: var(--store-ink); background: var(--color-surface); }
 .pr-search { min-width: 18rem; }
-.pr-search:focus, .pr-select:focus { outline: 2px solid #3a7c52; outline-offset: 1px; }
-.pr-asof { font-size: .85rem; color: #5a665e; margin-left: auto; }
+.pr-search:focus, .pr-select:focus { outline: 2px solid var(--payroll-green-2); outline-offset: 1px; }
+.pr-asof { font-size: .85rem; color: var(--payroll-gray); margin-left: auto; }
 
 /* Wide tables scroll inside their own container — the page never scrolls sideways. */
 .pr-tablewrap { overflow-x: auto; }
 .pr-table { width: 100%; border-collapse: collapse; font-size: .9rem; }
-.pr-table th { text-align: left; background: #eef3f0; color: #2c3b33; font-weight: 600; padding: .55rem .65rem; border-bottom: 2px solid #d6e0da; white-space: nowrap; }
+.pr-table th { text-align: left; background: var(--store-green-50); color: var(--payroll-green-dark); font-weight: 600; padding: .55rem .65rem; border-bottom: 2px solid var(--gray-300); white-space: nowrap; }
+
 /* Spanning "Vacation"/"Sick" caption over their columns — see the two-row thead.
    Qualified with th so it outspecifies `.pr-table th { text-align: left }` above. */
-.pr-table th.pr-group-head { text-align: center; font-size: .8rem; letter-spacing: .04em; text-transform: uppercase; color: #5a665e; border-bottom: 1px solid #d6e0da; padding-bottom: .3rem; border-left: 1px solid #d6e0da; }
+.pr-table th.pr-group-head { text-align: center; font-size: .8rem; letter-spacing: .04em; text-transform: uppercase; color: var(--payroll-gray); border-bottom: 1px solid var(--gray-300); padding-bottom: .3rem; border-left: 1px solid var(--gray-300); }
 .pr-table thead tr:first-child th { padding-bottom: .3rem; }
 .pr-table thead tr:last-child th { padding-top: .3rem; }
-.pr-table td { padding: .5rem .65rem; border-bottom: 1px solid #edf1ee; white-space: nowrap; }
-.pr-table tbody tr:hover { background: #f7faf8; }
+.pr-table td { padding: .5rem .65rem; border-bottom: 1px solid var(--brand-100); white-space: nowrap; }
+.pr-table tbody tr:hover { background: var(--gray-50); }
 .pr-num { text-align: right; }
-.pr-loading { color: #8a968f; font-style: italic; padding: 1rem .65rem; }
+.pr-loading { color: var(--payroll-gray-2); font-style: italic; padding: 1rem .65rem; }
 
-.pr-neg { color: #b3261e; font-weight: 600; }
-.pr-zero { color: #9aa69f; }
-.pr-name { font-weight: 600; color: #1f2a24; }
-.pr-dept { color: #5a665e; }
-.pr-pill { display: inline-block; font-size: .74rem; font-weight: 600; padding: .1rem .45rem; border-radius: 20px; background: #e7ede9; color: #3a4a42; margin-left: .4rem; }
-.pr-pill-wait { background: #fdf1dc; color: #8a5a10; }
-.pr-pill-flag { background: #fdecea; color: #96201a; }
-.pr-yes { color: #1a7c3a; font-weight: 600; }
-.pr-no { color: #9aa69f; }
+.pr-neg { color: var(--red-700); font-weight: 600; }
+.pr-zero { color: var(--print-line); }
+.pr-name { font-weight: 600; color: var(--store-ink); }
+.pr-dept { color: var(--payroll-gray); }
+.pr-pill { display: inline-block; font-size: .74rem; font-weight: 600; padding: .1rem .45rem; border-radius: 20px; background: var(--store-green-100); color: var(--store-ink-soft); margin-left: .4rem; }
+.pr-pill-wait { background: var(--store-rush-soft); color: var(--payroll-orange); }
+.pr-pill-flag { background: var(--store-rush-soft); color: var(--red-800); }
+.pr-yes { color: var(--payroll-green); font-weight: 600; }
+.pr-no { color: var(--print-line); }
 
 /* --- carryover correction ------------------------------------------------
    The imported figure stays on screen next to the printed one, so the page can
    still be reconciled against the accountant's report at a glance. */
-.pr-raw { color: #8a968f; text-decoration: line-through; }
-.pr-arrow { color: #8a968f; margin: 0 .3rem; }
-.pr-adj-demo { font-family: inherit; white-space: nowrap; color: #3a4a42; background: #eef3f0; border-radius: 4px; padding: 0 .3rem; }
-.pr-entitle { color: #3a4a42; }
+.pr-raw { color: var(--payroll-gray-2); text-decoration: line-through; }
+.pr-arrow { color: var(--payroll-gray-2); margin: 0 .3rem; }
+.pr-adj-demo { font-family: inherit; white-space: nowrap; color: var(--store-ink-soft); background: var(--store-green-50); border-radius: 4px; padding: 0 .3rem; }
+.pr-entitle { color: var(--store-ink-soft); }
+
 /* An unset entitlement is not zero — it blocks the slip, so it must not read as a number. */
-.pr-missing { color: #b3261e; font-weight: 600; font-size: .82rem; }
-.pr-row-flag { background: #fdf6f5; }
-.pr-row-flag:hover { background: #fbeeec; }
+.pr-missing { color: var(--red-700); font-weight: 600; font-size: .82rem; }
+.pr-row-flag { background: var(--store-paper); }
+.pr-row-flag:hover { background: var(--red-50); }
 
 .pr-flags { margin-bottom: .9rem; }
 .pr-flag-list { list-style: none; margin: 0; padding: 0; display: grid; gap: .4rem; }
 .pr-flag-list li { font-size: .88rem; line-height: 1.45; padding: .55rem .8rem; border-radius: 7px; }
-.pr-flag-block { background: #fdecea; color: #96201a; border-left: 4px solid #b3261e; }
-.pr-flag-warn { background: #fdf1dc; color: #7a4f0d; border-left: 4px solid #d9932a; }
+.pr-flag-block { background: var(--store-rush-soft); color: var(--red-800); border-left: 4px solid var(--red-700); }
+.pr-flag-warn { background: var(--store-rush-soft); color: var(--payroll-orange-2); border-left: 4px solid var(--payroll-orange-3); }
 .pr-flag-list em { font-style: normal; font-weight: 600; }
 
-.pr-upload { display: flex; align-items: center; gap: .75rem; flex-wrap: wrap; padding: 1rem; background: #f7faf8; border: 1px dashed #cfdad3; border-radius: 9px; }
+.pr-upload { display: flex; align-items: center; gap: .75rem; flex-wrap: wrap; padding: 1rem; background: var(--gray-50); border: 1px dashed var(--gray-300); border-radius: 9px; }
 .pr-file { font-size: .9rem; font-family: inherit; }
-.pr-note { font-size: .85rem; color: #5a665e; }
+.pr-note { font-size: .85rem; color: var(--payroll-gray); }
 
 /* Busy indicator for the packet read. The read takes ~40s, and a greyed-out button with no
    motion reads as BROKEN rather than working — Erik, 2026-08-10, having just been burned by a
@@ -85,44 +108,49 @@ body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Ro
    counter is the part that says "and it is making progress".
    🔑 display:inline-flex would BEAT the UA's [hidden]{display:none}, so the attribute alone
    would not hide it — the explicit [hidden] rule is what makes it actually disappear. */
-.pr-progress { display: inline-flex; align-items: center; gap: .45rem; font-size: .85rem; font-weight: 600; color: #3a4a42; }
+.pr-progress { display: inline-flex; align-items: center; gap: .45rem; font-size: .85rem; font-weight: 600; color: var(--store-ink-soft); }
 .pr-progress[hidden] { display: none; }
+
 .pr-spin {
   width: .85em; height: .85em; flex: none;
-  border: 2px solid #cfdad3; border-top-color: #1a472a; border-radius: 50%;
+  border: 2px solid var(--gray-300); border-top-color: var(--brand-800); border-radius: 50%;
   animation: pr-spin .7s linear infinite;
 }
+
 @keyframes pr-spin { to { transform: rotate(360deg); } }
+
 /* Still turns, just slowly — a frozen ring next to "reading…" would read as hung. */
 @media (prefers-reduced-motion: reduce) { .pr-spin { animation-duration: 2.4s; } }
 
-.pr-btn { background: #e7ede9; border: none; color: #2c3b33; padding: .55rem 1.1rem; border-radius: 7px; font-weight: 600; font-size: .92rem; cursor: pointer; font-family: inherit; }
-.pr-btn:hover:not(:disabled) { background: #d8e3dc; }
+.pr-btn { background: var(--store-green-100); border: none; color: var(--payroll-green-dark); padding: .55rem 1.1rem; border-radius: 7px; font-weight: 600; font-size: .92rem; cursor: pointer; font-family: inherit; }
+.pr-btn:hover:not(:disabled) { background: var(--store-line); }
 .pr-btn:disabled { opacity: .5; cursor: not-allowed; }
-.pr-btn-primary { background: #1a472a; color: #fff; }
-.pr-btn-primary:hover:not(:disabled) { background: #2a5c3a; }
-.pr-btn-ghost { background: transparent; color: #5a665e; }
-.pr-btn-ghost:hover:not(:disabled) { background: #f0f4f1; }
+.pr-btn-primary { background: var(--brand-800); color: var(--color-on-brand); }
+.pr-btn-primary:hover:not(:disabled) { background: var(--print-green); }
+.pr-btn-ghost { background: transparent; color: var(--payroll-gray); }
+.pr-btn-ghost:hover:not(:disabled) { background: var(--store-green-50); }
 
-.pr-review { margin-top: 1.5rem; border-top: 1px solid #e3eae6; padding-top: 1.25rem; }
+.pr-review { margin-top: 1.5rem; border-top: 1px solid var(--gray-200); padding-top: 1.25rem; }
 .pr-verdict { padding: .8rem 1rem; border-radius: 8px; font-size: .93rem; font-weight: 600; margin-bottom: 1rem; line-height: 1.5; }
+
 /* [hidden]{display:none} is only a UA default — any author display: on these would beat it
    and leave a "hidden" block on screen. Both blocks are toggled by the hidden attribute. */
 .pr-review[hidden], .pr-verdict[hidden] { display: none; }
-.pr-verdict.is-ok { background: #e8f5ec; color: #14682f; border-left: 4px solid #1a7c3a; }
-.pr-verdict.is-bad { background: #fdecea; color: #96201a; border-left: 4px solid #b3261e; }
+.pr-verdict.is-ok { background: var(--brand-100); color: var(--payroll-green-dark-2); border-left: 4px solid var(--payroll-green); }
+.pr-verdict.is-bad { background: var(--store-rush-soft); color: var(--red-800); border-left: 4px solid var(--red-700); }
+
 /* Reconciled, but something on the page is worth a second look before saving — an
    over-drawn balance the report floors at zero, say. Not a failure: Save stays live. */
-.pr-verdict.is-warn { background: #fff6e5; color: #7a4b06; border-left: 4px solid #c77700; }
+.pr-verdict.is-warn { background: var(--store-rush-soft); color: var(--payroll-orange-4); border-left: 4px solid var(--payroll-orange-5); }
 .pr-verdict ul { margin: .5rem 0 0; padding-left: 1.2rem; font-weight: 400; }
 
 .pr-check-table { max-width: 44rem; }
-.pr-ok { color: #1a7c3a; font-weight: 600; }
-.pr-bad { color: #b3261e; font-weight: 600; }
+.pr-ok { color: var(--payroll-green); font-weight: 600; }
+.pr-bad { color: var(--red-700); font-weight: 600; }
 
 .pr-commit { display: flex; gap: .6rem; margin-top: 1.25rem; align-items: center; flex-wrap: wrap; }
 
-@media (max-width: 720px) {
+@media (width <= 720px) {
   .pr-header { flex-direction: column; }
   .pr-search { min-width: 100%; }
   .pr-asof { margin-left: 0; }
@@ -139,56 +167,65 @@ body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Ro
 @media print {
   /* Only the Print-slips button prints slips. A plain Ctrl+P still prints the
      dashboard, which is what someone expects when they didn't ask for slips. */
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   body.print-slips .pr-wrap { display: none !important; }
+  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
   body.print-slips #print-sheet { display: block !important; }
 
   @page { size: 8.5in 11in; margin: 0.5in; }
-  body.print-slips { background: #fff; margin: 0; }
+  body.print-slips { background: var(--color-surface); margin: 0; }
 
   #print-slips-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
+
     /* Dashed guides on the outside; each slip draws its own right/bottom edge, so
        adjacent slips share ONE line and every cut is a single scissor pass. */
-    border-top: 1px dashed #999;
-    border-left: 1px dashed #999;
+    border-top: 1px dashed var(--print-line);
+    border-left: 1px dashed var(--print-line);
   }
+
   .slip {
     height: 3.333in;
-    border-right: 1px dashed #999;
-    border-bottom: 1px dashed #999;
+    border-right: 1px dashed var(--print-line);
+    border-bottom: 1px dashed var(--print-line);
     padding: 0.3in 0.32in;
     break-inside: avoid;
-    page-break-inside: avoid;
     display: flex;
     flex-direction: column;
-    color: #000;
+    color: var(--payroll-gray-dark);
+
     /* Serif reads as a document rather than a screenshot — this is handed to a person. */
     font-family: Georgia, 'Times New Roman', serif;
   }
-  .slip-co { font-size: 8pt; letter-spacing: .06em; text-transform: uppercase; color: #444; }
+  .slip-co { font-size: 8pt; letter-spacing: .06em; text-transform: uppercase; color: var(--gray-700); }
   .slip-name { font-size: 13.5pt; font-weight: 700; margin: .04in 0 .01in; line-height: 1.1; }
-  .slip-asof { font-size: 8pt; color: #555; margin-bottom: .1in; }
+  .slip-asof { font-size: 8pt; color: var(--print-ink-soft); margin-bottom: .1in; }
 
-  .slip-rows { border-top: 1.5px solid #000; padding-top: .05in; }
+  .slip-rows { border-top: 1.5px solid var(--payroll-gray-dark); padding-top: .05in; }
+
   /* Vacation and sick both print accrued/used/remaining, so each set is labelled —
      six bare rows would be ambiguous about which balance is which. */
   .slip-group { font-size: 8pt; letter-spacing: .07em; text-transform: uppercase;
-                color: #555; font-weight: 700; margin: .05in 0 .01in; }
+                color: var(--print-ink-soft); font-weight: 700; margin: .05in 0 .01in; }
+
   .slip-row { display: flex; justify-content: space-between; align-items: baseline;
               font-size: 10pt; padding: .028in 0; }
-  .slip-row + .slip-row { border-top: 1px solid #ddd; }
-  .slip-label { color: #222; }
+  .slip-row + .slip-row { border-top: 1px solid var(--store-line); }
+  .slip-label { color: var(--print-ink); }
+
   /* Ties the vacation line to the footnote below it. */
   .slip-star { font-weight: 700; margin-left: .04in; }
   .slip-val { font-weight: 700; font-variant-numeric: tabular-nums; }
+
   /* A negative balance is legitimate here (vacation accrues at one year), so it is
      printed plainly with a note rather than flagged red like an error on screen. */
-  .slip-note { font-size: 7.5pt; color: #555; margin-top: auto; padding-top: .07in;
+  .slip-note { font-size: 7.5pt; color: var(--print-ink-soft); margin-top: auto; padding-top: .07in;
                line-height: 1.3; font-style: italic; }
 }
 
 /* 2026-09-05 review */
+/* stylelint-disable-next-line declaration-no-important -- the hidden attribute must beat any display rule */
 [hidden] { display: none !important; }
 .pr-retry { margin-left: .5rem; padding: .3rem .7rem; font-size: .85rem; }
-.pr-tab:focus-visible, .pr-btn:focus-visible, .pr-back:focus-visible { outline: 2px solid #1a472a; outline-offset: 2px; }
+.pr-tab:focus-visible, .pr-btn:focus-visible, .pr-back:focus-visible { outline: 2px solid var(--brand-800); outline-offset: 2px; }

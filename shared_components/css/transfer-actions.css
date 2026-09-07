@@ -1,19 +1,41 @@
+/* stylelint-disable no-duplicate-selectors -- legacy sheet: rules were appended over time; merging them would reorder the cascade (2026-09-07) */
+
 /* Transfer Actions Shared — Styles for the Send to Supacolor modal
  * Self-contained (doesn't depend on bradley-transfers.css). Prefix: tas-
  * Toast classes (bt-toast*) are duplicated here from bradley-transfers.css
  * so pages that only load this one CSS still get toasts.
  */
 
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue, merged into its
+   existing :root. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
 :root {
-    --tas-theme: #4a6fa5;
-    --tas-theme-dark: #33537d;
-    --tas-theme-light: #eaf0f9;
-    --tas-theme-rgba-10: rgba(74, 111, 165, 0.1);
-    --tas-rush: #dc2626;
-    --tas-border: #e5e7eb;
-    --tas-text: #111827;
-    --tas-text-muted: #6b7280;
+    --transfer-actions-green: #16a34a;
+    --transfer-actions-red: #fca5a5;
+    --transfer-actions-orange: #78350f;
+    --transfer-actions-yellow: #fde68a;
+    --transfer-actions-blue: #1e40af;
+    --transfer-actions-indigo: #a855f7;
+    --transfer-actions-green-2: #22c55e;
+    --transfer-actions-green-tint: #bbf7d0;
+    --transfer-actions-red-tint: #fecaca;
+    --transfer-actions-green-3: #86efac;
+    --transfer-actions-indigo-2: #6b21a8;
+    --transfer-actions-gray: #78716c;
+    --transfer-actions-yellow-2: #ca8a04;
+    --transfer-actions-orange-2: #fed7aa;
+    --transfer-actions-orange-3: #7c2d12;
+    --tas-theme: var(--color-bradley);
+    --tas-theme-dark: var(--color-bradley-dark);
+    --tas-theme-light: var(--color-floor-tint);
+    --tas-theme-rgba-10: rgb(74 111 165 / 10%);
+    --tas-rush: var(--red-600);
+    --tas-border: var(--gray-200);
+    --tas-text: var(--gray-900);
+    --tas-text-muted: var(--gray-500);
 }
+/* stylelint-enable color-no-hex */
 
 /* ── Modal shell ───────────────────────────────────────────── */
 .tas-modal {
@@ -25,11 +47,13 @@
     z-index: 10000;
     padding: 20px;
 }
+
 .tas-modal-backdrop {
     position: absolute;
     inset: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgb(0 0 0 / 50%);
 }
+
 .tas-modal-content {
     position: relative;
     background: white;
@@ -39,9 +63,10 @@
     max-height: 90vh;
     display: flex;
     flex-direction: column;
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 12px 40px rgb(0 0 0 / 25%);
     overflow: hidden;
 }
+
 .tas-modal-header {
     padding: 14px 20px;
     border-bottom: 1px solid var(--tas-border);
@@ -51,6 +76,7 @@
     background: linear-gradient(135deg, var(--tas-theme) 0%, var(--tas-theme-dark) 100%);
     color: white;
 }
+
 .tas-modal-header h3 {
     margin: 0;
     font-size: 17px;
@@ -58,6 +84,7 @@
     align-items: center;
     gap: 8px;
 }
+
 .tas-modal-close {
     background: transparent;
     border: none;
@@ -69,11 +96,13 @@
     opacity: 0.85;
 }
 .tas-modal-close:hover { opacity: 1; }
+
 .tas-modal-body {
     padding: 20px;
     overflow-y: auto;
     flex: 1;
 }
+
 .tas-modal-intro {
     background: var(--tas-theme-light);
     border-left: 3px solid var(--tas-theme);
@@ -90,13 +119,14 @@
     flex-wrap: wrap;
     gap: 14px 24px;
     padding: 10px 14px;
-    background: #f9fafb;
+    background: var(--gray-50);
     border: 1px solid var(--tas-border);
     border-radius: 6px;
     margin-bottom: 16px;
     font-size: 13px;
     color: var(--tas-text);
 }
+
 .tas-context-label {
     display: block;
     font-size: 10px;
@@ -114,6 +144,7 @@
     padding: 14px 16px;
     margin-bottom: 16px;
 }
+
 .tas-fieldset legend {
     padding: 0 8px;
     font-size: 13px;
@@ -122,6 +153,7 @@
 }
 
 /* ── Inline transfer status badge (D.5) ──────────────────── */
+
 /* Injected into mockup-detail / art-request-detail header by
    TransferActions.renderTransferStatusBadge(). Clicks through to transfer-detail. */
 .tas-transfer-badge {
@@ -130,9 +162,9 @@
     gap: 8px;
     padding: 6px 12px;
     border-radius: 999px;
-    background: var(--badge-bg, #f1f5f9);
-    color: var(--badge-color, #64748b);
-    border: 1px solid var(--badge-color, #64748b);
+    background: var(--badge-bg, var(--slate-100));
+    color: var(--badge-color, var(--slate-500));
+    border: 1px solid var(--badge-color, var(--slate-500));
     font-size: 12px;
     font-weight: 500;
     text-decoration: none;
@@ -142,31 +174,36 @@
     max-width: 100%;
     flex-wrap: wrap;
 }
+
 .tas-transfer-badge:hover {
     transform: translateY(-1px);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 2px 4px rgb(0 0 0 / 8%);
     text-decoration: none;
-    color: var(--badge-color, #64748b);
+    color: var(--badge-color, var(--slate-500));
 }
-.tas-transfer-badge i { color: var(--badge-color, #64748b); }
+.tas-transfer-badge i { color: var(--badge-color, var(--slate-500)); }
+
 .tas-transfer-badge-id {
-    font-family: 'Monaco', 'Courier New', monospace;
+    font-family: Monaco, 'Courier New', monospace;
     font-size: 11px;
     opacity: 0.85;
 }
+
 .tas-transfer-badge-status {
     font-weight: 600;
 }
+
 .tas-transfer-badge-track {
     margin-left: 6px;
     padding-left: 10px;
-    border-left: 1px solid currentColor;
-    font-family: 'Monaco', 'Courier New', monospace;
+    border-left: 1px solid currentcolor;
+    font-family: Monaco, 'Courier New', monospace;
     font-size: 11px;
     opacity: 0.9;
     text-decoration: none;
     color: inherit;
 }
+
 .tas-transfer-badge-track:hover {
     text-decoration: underline;
     color: inherit;
@@ -179,6 +216,7 @@
     flex-wrap: wrap;
     padding: 8px 0;
 }
+
 .tas-radio {
     display: inline-flex;
     align-items: center;
@@ -188,6 +226,7 @@
     cursor: pointer;
     color: var(--tas-text);
 }
+
 .tas-radio input[type="radio"] {
     margin: 0;
     cursor: pointer;
@@ -217,8 +256,9 @@
     padding: 4px;
     border: 1px solid var(--tas-border);
     border-radius: 6px;
-    background: #fafbfc;
+    background: var(--gray-50);
 }
+
 .tas-file-row {
     display: flex;
     align-items: center;
@@ -230,34 +270,39 @@
     cursor: pointer;
     transition: all 0.15s ease;
 }
+
 .tas-file-row:hover {
     background: var(--tas-theme-light);
 }
+
 .tas-file-row--selected {
     background: var(--tas-theme-light);
     border-color: var(--tas-theme);
     box-shadow: 0 0 0 1px var(--tas-theme);
 }
+
 .tas-file-check {
     flex-shrink: 0;
     width: 18px;
     height: 18px;
     cursor: pointer;
 }
+
 .tas-file-thumb {
     width: 48px;
     height: 48px;
     object-fit: cover;
     border-radius: 4px;
     border: 1px solid var(--tas-border);
-    background: #f3f4f6;
+    background: var(--gray-100);
     flex-shrink: 0;
 }
+
 .tas-file-icon {
     width: 48px;
     height: 48px;
     border-radius: 4px;
-    background: #f3f4f6;
+    background: var(--gray-100);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -265,10 +310,12 @@
     font-size: 20px;
     flex-shrink: 0;
 }
+
 .tas-file-meta {
     flex: 1;
     min-width: 0;
 }
+
 .tas-file-name {
     font-size: 13px;
     font-weight: 500;
@@ -277,31 +324,35 @@
     text-overflow: ellipsis;
     white-space: nowrap;
 }
+
 .tas-file-sub {
     font-size: 11px;
     color: var(--tas-text-muted);
     margin-top: 2px;
 }
+
 .tas-hint {
     font-size: 12px;
     color: var(--tas-text-muted);
     margin-top: 8px;
     font-style: italic;
 }
+
 .tas-loading, .tas-empty, .tas-error {
     text-align: center;
     padding: 24px 12px;
     color: var(--tas-text-muted);
     font-size: 13px;
 }
+
 .tas-empty i, .tas-error i {
     display: block;
     font-size: 24px;
     margin-bottom: 8px;
-    color: #d1d5db;
+    color: var(--gray-300);
 }
-.tas-error { color: #991b1b; }
-.tas-error i { color: #dc2626; }
+.tas-error { color: var(--red-800); }
+.tas-error i { color: var(--red-600); }
 
 /* ── Form ──────────────────────────────────────────────────── */
 .tas-form-row {
@@ -312,12 +363,14 @@
 }
 .tas-form-row--3col { grid-template-columns: 1fr 1fr 1fr; }
 .tas-form-row--rush { grid-template-columns: 1fr 1fr; align-items: end; }
+
 .tas-form-row--design {
     grid-template-columns: 120px 1fr;
     align-items: center;
     gap: 10px;
     margin-top: 8px;
 }
+
 .tas-design-label {
     font-size: 13px;
     font-weight: 600;
@@ -327,46 +380,56 @@
     gap: 2px;
     line-height: 1.2;
 }
+
 .tas-design-source {
     font-size: 11px;
     font-weight: normal;
 }
+
 .tas-input {
     width: 100%;
     padding: 8px 10px;
     border: 1px solid var(--tas-border);
     border-radius: 5px;
     font: inherit;
-    background: #fff;
+    background: var(--color-surface);
     box-sizing: border-box;
 }
+
 .tas-input:focus {
     outline: none;
-    border-color: var(--tas-primary, #2e7d32);
-    box-shadow: 0 0 0 2px rgba(46, 125, 50, 0.15);
+    border-color: var(--tas-primary, var(--store-green-700));
+    box-shadow: 0 0 0 2px rgb(46 125 50 / 15%);
 }
+
 .tas-input--error {
-    border-color: #dc2626 !important;
-    background: #fef2f2;
+    /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
+    border-color: var(--red-600) !important;
+    background: var(--red-50);
 }
+
 .tas-input--error:focus {
-    box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.2);
+    box-shadow: 0 0 0 2px rgb(220 38 38 / 20%);
 }
+
 .tas-form-field {
     display: flex;
     flex-direction: column;
     gap: 4px;
 }
 .tas-form-field--full { grid-column: 1 / -1; }
+
 .tas-form-field--inline {
     flex-direction: row;
     align-items: center;
 }
+
 .tas-form-field label {
     font-size: 12px;
     font-weight: 500;
     color: var(--tas-text);
 }
+
 .tas-form-field input[type="text"],
 .tas-form-field input[type="number"],
 .tas-form-field input[type="email"],
@@ -380,6 +443,7 @@
     font-size: 14px;
     font-family: inherit;
 }
+
 .tas-form-field input:focus,
 .tas-form-field textarea:focus,
 .tas-form-field select:focus {
@@ -387,6 +451,7 @@
     border-color: var(--tas-theme);
     box-shadow: 0 0 0 2px var(--tas-theme-rgba-10);
 }
+
 .tas-form-field input[type="checkbox"] {
     width: 16px;
     height: 16px;
@@ -415,25 +480,30 @@
     gap: 6px;
     transition: all 0.15s ease;
 }
+
 .tas-btn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
 }
+
 .tas-btn--primary {
     background: var(--tas-theme);
     color: white;
     border-color: var(--tas-theme);
 }
+
 .tas-btn--primary:hover:not(:disabled) {
     background: var(--tas-theme-dark);
 }
+
 .tas-btn--secondary {
     background: white;
     color: var(--tas-text);
     border-color: var(--tas-border);
 }
+
 .tas-btn--secondary:hover:not(:disabled) {
-    background: #f9fafb;
+    background: var(--gray-50);
 }
 
 /* ── Toasts (duplicated from bradley-transfers.css) ────────── */
@@ -447,21 +517,22 @@
     gap: 8px;
     pointer-events: none;
 }
+
 .bt-toast {
     background: white;
     border-left: 4px solid var(--tas-theme);
     padding: 12px 16px;
     border-radius: 6px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 12px rgb(0 0 0 / 15%);
     max-width: 360px;
     pointer-events: auto;
     font-size: 13px;
     animation: tas-toast-in 0.3s ease;
 }
-.bt-toast--success { border-left-color: #059669; }
+.bt-toast--success { border-left-color: var(--emerald-600); }
 .bt-toast--error { border-left-color: var(--tas-rush); }
 .bt-toast--info { border-left-color: var(--tas-theme); }
-.bt-toast--warning { border-left-color: #d97706; background: #fef3c7; color: #78350f; }
+.bt-toast--warning { border-left-color: var(--amber-600); background: var(--amber-100); color: var(--transfer-actions-orange); }
 
 /* ── File checklist (Steve modal v3.3) ────────────────────────────────
  * Live "what Bradley needs" reminder that auto-checks as Steve adds files.
@@ -474,48 +545,56 @@
     border: 1px solid transparent;
     transition: background 0.2s ease, border-color 0.2s ease;
 }
+
 .tas-checklist--incomplete {
-    background: #fffbeb;
-    border-color: #fde68a;
+    background: var(--store-paper);
+    border-color: var(--transfer-actions-yellow);
 }
+
 .tas-checklist--complete {
-    background: #f0fdf4;
-    border-color: #bbf7d0;
+    background: var(--brand-50);
+    border-color: var(--transfer-actions-green-tint);
 }
+
 .tas-checklist-title {
     font-size: 11px;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    color: #6b7280;
+    color: var(--gray-500);
     margin-bottom: 6px;
 }
+
 .tas-checklist-items {
     display: flex;
     flex-direction: column;
     gap: 4px;
 }
+
 .tas-checklist-item {
     display: flex;
     align-items: flex-start;
     gap: 8px;
     font-size: 13px;
-    color: #374151;
+    color: var(--gray-700);
     line-height: 1.4;
 }
+
 .tas-checklist-marker {
     flex-shrink: 0;
     width: 16px;
     margin-top: 2px;
-    color: #d1d5db;
+    color: var(--gray-300);
     font-size: 14px;
     transition: color 0.2s ease;
 }
+
 .tas-checklist-item--done .tas-checklist-marker {
-    color: #16a34a;
+    color: var(--transfer-actions-green);
 }
+
 .tas-checklist-item--done .tas-checklist-text {
-    color: #14532d;
+    color: var(--print-green-dark);
 }
 
 /* ── Mockup-missing soft warning (above Send button) ──────────────── */
@@ -525,22 +604,24 @@
     gap: 10px;
     margin-top: 12px;
     padding: 10px 12px;
-    background: #fef3c7;
-    border: 1px solid #fde68a;
-    border-left: 3px solid #d97706;
+    background: var(--amber-100);
+    border: 1px solid var(--transfer-actions-yellow);
+    border-left: 3px solid var(--amber-600);
     border-radius: 6px;
     font-size: 13px;
-    color: #92400e;
+    color: var(--amber-800);
     line-height: 1.4;
 }
+
 .tas-mockup-warning i {
-    color: #d97706;
+    color: var(--amber-600);
     font-size: 14px;
     margin-top: 1px;
     flex-shrink: 0;
 }
+
 .tas-mockup-warning strong {
-    color: #78350f;
+    color: var(--transfer-actions-orange);
 }
 
 @keyframes tas-toast-in {
@@ -554,10 +635,11 @@
     gap: 0;
     margin: 0 0 16px;
     padding: 4px;
-    background: #f3f4f6;
+    background: var(--gray-100);
     border-radius: 8px;
     border: 1px solid var(--tas-border);
 }
+
 .tas-mode-option {
     flex: 1;
     display: flex;
@@ -573,32 +655,37 @@
     transition: background 0.15s, color 0.15s;
     user-select: none;
 }
+
 .tas-mode-option input {
     position: absolute;
     opacity: 0;
     pointer-events: none;
 }
+
 .tas-mode-option--active {
     background: white;
     color: var(--tas-theme);
-    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    box-shadow: 0 1px 3px rgb(0 0 0 / 8%);
 }
+
 .tas-mode-option--reorder.tas-mode-option--active {
-    color: #16a34a;
+    color: var(--transfer-actions-green);
 }
+
 .tas-mode-hint {
     font-size: 12px;
     color: var(--tas-text-muted);
     margin: -4px 0 12px;
     padding: 8px 12px;
-    background: #f9fafb;
+    background: var(--gray-50);
     border-left: 3px solid var(--tas-border);
     border-radius: 4px;
 }
+
 .tas-mode-reorder .tas-mode-hint {
-    background: #f0fdf4;
-    border-left-color: #16a34a;
-    color: #166534;
+    background: var(--brand-50);
+    border-left-color: var(--transfer-actions-green);
+    color: var(--print-green);
 }
 
 /* Reorder-mode conditional visibility.
@@ -607,6 +694,7 @@
 #tas-files-fieldset,
 #tas-primary-color-row { display: block; }
 #tas-supacolor-number-row { display: none; }
+
 .tas-mode-reorder #tas-files-fieldset,
 .tas-mode-reorder #tas-primary-color-row { display: none; }
 .tas-mode-reorder #tas-supacolor-number-row { display: block; }
@@ -617,13 +705,15 @@
     flex-direction: column;
     gap: 10px;
 }
+
 .tas-line-row {
     border: 1px solid var(--tas-border);
     border-radius: 8px;
     padding: 12px 14px 10px;
-    background: #fafafa;
+    background: var(--gray-50);
     position: relative;
 }
+
 .tas-line-row__header {
     display: flex;
     align-items: center;
@@ -635,6 +725,7 @@
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
+
 .tas-line-row__remove {
     background: transparent;
     border: 1px solid transparent;
@@ -647,9 +738,10 @@
     align-items: center;
     gap: 4px;
 }
+
 .tas-line-row__remove:hover {
-    background: #fee2e2;
-    border-color: #fecaca;
+    background: var(--red-100);
+    border-color: var(--transfer-actions-red-tint);
 }
 .tas-line-row--first .tas-line-row__remove { display: none; }
 
@@ -668,6 +760,7 @@
     gap: 6px;
     transition: background 0.15s;
 }
+
 .tas-add-line-btn:hover {
     background: var(--tas-theme-light);
 }
@@ -675,6 +768,7 @@
 /* When lines are disabled (enableLines:false, legacy single-line callers) */
 .tas-lines--single .tas-add-line-btn,
 .tas-lines--single .tas-line-row__header { display: none; }
+
 .tas-lines--single .tas-line-row {
     border: none;
     padding: 0;
@@ -688,30 +782,32 @@
     gap: 4px;
     padding: 2px 8px;
     border-radius: 4px;
-    background: #dcfce7;
-    color: #166534;
-    border: 1px solid #86efac;
+    background: var(--store-green-100);
+    color: var(--print-green);
+    border: 1px solid var(--transfer-actions-green-3);
     font-size: 11px;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
+
 .tas-line-count-pill {
     display: inline-flex;
     align-items: center;
     gap: 4px;
     padding: 2px 8px;
     border-radius: 12px;
-    background: #eaf0f9;
+    background: var(--color-floor-tint);
     color: var(--tas-theme-dark);
     font-size: 11px;
     font-weight: 600;
 }
 
 /* ── Responsive ────────────────────────────────────────────── */
-@media (max-width: 700px) {
+@media (width <= 700px) {
     .tas-modal { padding: 8px; }
     .tas-modal-body { padding: 14px; }
+
     .tas-form-row,
     .tas-form-row--3col,
     .tas-form-row--rush { grid-template-columns: 1fr; }
@@ -736,13 +832,13 @@
 }
 
 .tas-link-row {
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
+    background: var(--slate-50);
+    border: 1px solid var(--slate-200);
     border-radius: 8px;
     padding: 10px 12px;
     transition: border-color 0.15s ease;
 }
-.tas-link-row:focus-within { border-color: var(--tas-theme, #4a6fa5); }
+.tas-link-row:focus-within { border-color: var(--tas-theme, var(--color-bradley)); }
 
 .tas-link-row-input-line {
     display: flex;
@@ -754,16 +850,17 @@
     flex: 1;
     min-width: 0;
     padding: 8px 10px;
-    border: 1px solid #cbd5e1;
+    border: 1px solid var(--gray-300);
     border-radius: 6px;
     font-size: 13px;
     font-family: 'SF Mono', Monaco, Consolas, monospace;
     background: white;
 }
+
 .tas-link-input:focus {
     outline: none;
-    border-color: var(--tas-theme, #4a6fa5);
-    box-shadow: 0 0 0 2px rgba(74, 111, 165, 0.15);
+    border-color: var(--tas-theme, var(--color-bradley));
+    box-shadow: 0 0 0 2px rgb(74 111 165 / 15%);
 }
 
 .tas-row-remove,
@@ -772,10 +869,11 @@
     height: 28px;
     flex-shrink: 0;
 }
+
 .tas-row-remove {
-    border: 1px solid #fca5a5;
-    background: #fff;
-    color: #dc2626;
+    border: 1px solid var(--transfer-actions-red);
+    background: var(--color-surface);
+    color: var(--red-600);
     border-radius: 50%;
     font-size: 18px;
     line-height: 1;
@@ -785,7 +883,7 @@
     justify-content: center;
     transition: all 0.15s ease;
 }
-.tas-row-remove:hover { background: #fee2e2; border-color: #dc2626; }
+.tas-row-remove:hover { background: var(--red-100); border-color: var(--red-600); }
 
 /* Status blocks below input (analyzing / error / result card) */
 
@@ -798,19 +896,19 @@
     border-radius: 6px;
     font-size: 13px;
 }
-.tas-row-status--busy { background: #eff6ff; color: #1e40af; }
-.tas-row-status--err { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+.tas-row-status--busy { background: var(--color-floor-tint); color: var(--transfer-actions-blue); }
+.tas-row-status--err { background: var(--red-100); color: var(--red-800); border: 1px solid var(--transfer-actions-red); }
 
 .tas-row-card {
     margin-top: 10px;
     padding: 10px 12px;
     background: white;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--slate-200);
     border-radius: 6px;
-    border-left: 3px solid #4a6fa5;
+    border-left: 3px solid var(--color-bradley);
 }
-.tas-row-card--mockup { border-left-color: #a855f7; }
-.tas-row-card--transfer { border-left-color: #22c55e; }
+.tas-row-card--mockup { border-left-color: var(--transfer-actions-indigo); }
+.tas-row-card--transfer { border-left-color: var(--transfer-actions-green-2); }
 
 .tas-row-head {
     display: flex;
@@ -819,6 +917,7 @@
     margin-bottom: 6px;
     flex-wrap: wrap;
 }
+
 .tas-row-badge {
     display: inline-flex;
     align-items: center;
@@ -829,45 +928,47 @@
     text-transform: uppercase;
     letter-spacing: 0.5px;
     border-radius: 4px;
-    background: #f1f5f9;
-    color: #475569;
+    background: var(--slate-100);
+    color: var(--slate-600);
 }
-.tas-row-card--mockup .tas-row-badge { background: #f3e8ff; color: #6b21a8; }
-.tas-row-card--transfer .tas-row-badge { background: #dcfce7; color: #14532d; }
+.tas-row-card--mockup .tas-row-badge { background: var(--color-ruth-tint); color: var(--transfer-actions-indigo-2); }
+.tas-row-card--transfer .tas-row-badge { background: var(--store-green-100); color: var(--print-green-dark); }
 
 /* Working / Mockup type toggle on each picked file's analysis card. */
 .tas-row-type-toggle {
     display: inline-flex;
-    border: 1px solid #cbd5e1;
+    border: 1px solid var(--gray-300);
     border-radius: 5px;
     overflow: hidden;
-    background: #f8fafc;
+    background: var(--slate-50);
     margin-left: auto;
 }
+
 .tas-type-btn {
     background: transparent;
     border: none;
     padding: 4px 10px;
     font-size: 11px;
     font-weight: 600;
-    color: #64748b;
+    color: var(--slate-500);
     cursor: pointer;
     display: inline-flex;
     align-items: center;
     gap: 4px;
     transition: background 0.12s, color 0.12s;
 }
-.tas-type-btn:hover { background: #e2e8f0; color: #1e293b; }
-.tas-type-btn + .tas-type-btn { border-left: 1px solid #cbd5e1; }
+.tas-type-btn:hover { background: var(--slate-200); color: var(--gray-800); }
+.tas-type-btn + .tas-type-btn { border-left: 1px solid var(--gray-300); }
+
 .tas-type-btn--active {
-    background: #4a6fa5;
+    background: var(--color-bradley);
     color: white;
 }
-.tas-type-btn--active:hover { background: #3b5a8a; color: white; }
+.tas-type-btn--active:hover { background: var(--color-bradley-dark); color: white; }
 
 .tas-row-filename {
     font-size: 13px;
-    color: #1e293b;
+    color: var(--gray-800);
     font-weight: 500;
     word-break: break-all;
     flex: 1;
@@ -876,26 +977,26 @@
 
 .tas-row-meta {
     font-size: 12px;
-    color: #64748b;
+    color: var(--slate-500);
     font-family: 'SF Mono', Monaco, Consolas, monospace;
 }
 
 .tas-row-place {
     margin-top: 4px;
     font-size: 12px;
-    color: #14532d;
+    color: var(--print-green-dark);
     font-weight: 500;
 }
-.tas-row-place i { color: #16a34a; margin-right: 4px; }
+.tas-row-place i { color: var(--transfer-actions-green); margin-right: 4px; }
 
 .tas-row-warn {
     margin-top: 6px;
     padding: 6px 10px;
-    background: #fef3c7;
-    border-left: 3px solid #f59e0b;
+    background: var(--amber-100);
+    border-left: 3px solid var(--amber-500);
     border-radius: 4px;
     font-size: 12px;
-    color: #92400e;
+    color: var(--amber-800);
 }
 .tas-row-warn i { margin-right: 4px; }
 
@@ -905,50 +1006,54 @@
     width: 100%;
     padding: 10px;
     background: transparent;
-    border: 1px dashed #cbd5e1;
+    border: 1px dashed var(--gray-300);
     border-radius: 6px;
-    color: #475569;
+    color: var(--slate-600);
     font-size: 13px;
     cursor: pointer;
     transition: all 0.15s ease;
     margin-bottom: 14px;
 }
+
 .tas-add-row-btn:hover {
-    border-color: var(--tas-theme, #4a6fa5);
-    color: var(--tas-theme, #4a6fa5);
-    background: #f8fafc;
+    border-color: var(--tas-theme, var(--color-bradley));
+    color: var(--tas-theme, var(--color-bradley));
+    background: var(--slate-50);
 }
 
 /* Aggregate "Extracted from mockup" summary panel */
 
 .tas-mockup-summary {
-    background: #fafaf9;
-    border: 1px solid #e7e5e4;
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
     border-radius: 8px;
     padding: 12px 14px;
     margin-bottom: 14px;
 }
+
 .tas-mockup-summary-head {
     font-size: 12px;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    color: #57534e;
+    color: var(--print-ink-soft);
     margin-bottom: 8px;
 }
-.tas-mockup-summary-head i { color: #a855f7; margin-right: 4px; }
+.tas-mockup-summary-head i { color: var(--transfer-actions-indigo); margin-right: 4px; }
 
 .tas-mockup-summary-table {
     width: 100%;
     border-collapse: collapse;
     font-size: 13px;
 }
+
 .tas-mockup-summary-table td {
     padding: 4px 0;
     vertical-align: top;
 }
+
 .tas-mockup-summary-table td.tas-label {
-    color: #78716c;
+    color: var(--transfer-actions-gray);
     font-weight: 500;
     width: 90px;
     padding-right: 10px;
@@ -956,14 +1061,14 @@
 
 .tas-crm-check {
     font-size: 11px;
-    color: #16a34a;
+    color: var(--transfer-actions-green);
     margin-left: 6px;
 }
 .tas-crm-check i { margin-right: 2px; }
 
 .tas-crm-miss {
     font-size: 11px;
-    color: #ca8a04;
+    color: var(--transfer-actions-yellow-2);
     margin-left: 6px;
 }
 
@@ -974,23 +1079,24 @@
     align-items: center;
     gap: 8px;
     padding: 10px 12px;
-    background: #fff7ed;
-    border: 1px solid #fed7aa;
+    background: var(--red-50);
+    border: 1px solid var(--transfer-actions-orange-2);
     border-radius: 6px;
     cursor: pointer;
     font-size: 13px;
-    color: #7c2d12;
+    color: var(--transfer-actions-orange-3);
 }
+
 .tas-checkbox-label input[type="checkbox"] {
     width: 16px;
     height: 16px;
     cursor: pointer;
 }
-.tas-muted { color: #9ca3af; font-weight: normal; }
+.tas-muted { color: var(--gray-400); font-weight: normal; }
 
 /* Mobile tweaks */
 
-@media (max-width: 700px) {
+@media (width <= 700px) {
     .tas-modal-content--paste { max-width: 100%; }
     .tas-mockup-summary-table td.tas-label { width: auto; display: block; }
     .tas-mockup-summary-table tr td:nth-child(2) { padding-bottom: 8px; }
@@ -1013,38 +1119,42 @@
     display: flex;
     align-items: center;
     background: white;
-    border: 1px solid #cbd5e1;
+    border: 1px solid var(--gray-300);
     border-radius: 8px;
     transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
+
 .tas-picker-search:focus-within {
-    border-color: var(--tas-theme, #4a6fa5);
-    box-shadow: 0 0 0 3px rgba(74, 111, 165, 0.12);
+    border-color: var(--tas-theme, var(--color-bradley));
+    box-shadow: 0 0 0 3px rgb(74 111 165 / 12%);
 }
+
 .tas-picker-search-icon {
     position: absolute;
     left: 12px;
-    color: #64748b;
+    color: var(--slate-500);
     font-size: 14px;
     pointer-events: none;
 }
+
 .tas-picker-search-input {
     flex: 1;
-    padding: 10px 36px 10px 36px;
+    padding: 10px 36px;
     border: none;
     background: transparent;
     font-size: 14px;
-    color: #1e293b;
+    color: var(--gray-800);
     outline: none;
 }
+
 .tas-picker-clear {
     position: absolute;
     right: 8px;
     width: 24px;
     height: 24px;
     border: none;
-    background: #f1f5f9;
-    color: #64748b;
+    background: var(--slate-100);
+    color: var(--slate-500);
     border-radius: 50%;
     font-size: 16px;
     line-height: 1;
@@ -1053,7 +1163,7 @@
     align-items: center;
     justify-content: center;
 }
-.tas-picker-clear:hover { background: #e2e8f0; color: #334155; }
+.tas-picker-clear:hover { background: var(--slate-200); color: var(--gray-700); }
 
 .tas-picker-results,
 .tas-picker-recent {
@@ -1067,9 +1177,9 @@
     border-radius: 6px;
     font-size: 13px;
 }
-.tas-picker-busy { background: #eff6ff; color: #1e40af; }
-.tas-picker-empty { background: #f8fafc; color: #64748b; text-align: center; }
-.tas-picker-err { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+.tas-picker-busy { background: var(--color-floor-tint); color: var(--transfer-actions-blue); }
+.tas-picker-empty { background: var(--slate-50); color: var(--slate-500); text-align: center; }
+.tas-picker-err { background: var(--red-100); color: var(--red-800); border: 1px solid var(--transfer-actions-red); }
 
 .tas-picker-results-label,
 .tas-picker-recent-label {
@@ -1077,7 +1187,7 @@
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    color: #64748b;
+    color: var(--slate-500);
     margin-bottom: 6px;
 }
 
@@ -1088,43 +1198,46 @@
     max-height: 280px;
     overflow-y: auto;
 }
+
 .tas-picker-folder {
     display: flex;
     align-items: center;
     gap: 10px;
     padding: 10px 12px;
     background: white;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--slate-200);
     border-radius: 6px;
     font-size: 13px;
-    color: #1e293b;
+    color: var(--gray-800);
     text-align: left;
     cursor: pointer;
     transition: background-color 0.15s ease, border-color 0.15s ease;
 }
+
 .tas-picker-folder:hover {
-    background: #f8fafc;
-    border-color: var(--tas-theme, #4a6fa5);
+    background: var(--slate-50);
+    border-color: var(--tas-theme, var(--color-bradley));
 }
-.tas-picker-folder i.fa-folder { color: #f59e0b; }
+.tas-picker-folder i.fa-folder { color: var(--amber-500); }
 .tas-picker-folder span { flex: 1; word-break: break-all; }
-.tas-picker-folder-arrow { color: #64748b; font-size: 11px; }
+.tas-picker-folder-arrow { color: var(--slate-500); font-size: 11px; }
 
 .tas-picker-recent-pills {
     display: flex;
     flex-wrap: wrap;
     gap: 6px;
 }
+
 .tas-picker-pill {
     display: inline-flex;
     align-items: center;
     gap: 6px;
     padding: 5px 10px;
-    background: #f1f5f9;
-    border: 1px solid #e2e8f0;
+    background: var(--slate-100);
+    border: 1px solid var(--slate-200);
     border-radius: 14px;
     font-size: 12px;
-    color: #475569;
+    color: var(--slate-600);
     cursor: pointer;
     transition: all 0.15s ease;
     max-width: 100%;
@@ -1132,12 +1245,13 @@
     text-overflow: ellipsis;
     white-space: nowrap;
 }
+
 .tas-picker-pill:hover {
-    background: #e2e8f0;
-    color: #1e293b;
-    border-color: var(--tas-theme, #4a6fa5);
+    background: var(--slate-200);
+    color: var(--gray-800);
+    border-color: var(--tas-theme, var(--color-bradley));
 }
-.tas-picker-pill i { color: #f59e0b; font-size: 10px; }
+.tas-picker-pill i { color: var(--amber-500); font-size: 10px; }
 
 /* Folder open → file grid */
 
@@ -1146,33 +1260,35 @@
     align-items: center;
     gap: 10px;
     padding: 8px 0;
-    border-bottom: 1px solid #e5e7eb;
+    border-bottom: 1px solid var(--gray-200);
     margin-bottom: 10px;
 }
+
 .tas-picker-back {
     padding: 6px 10px;
     background: transparent;
-    border: 1px solid #cbd5e1;
+    border: 1px solid var(--gray-300);
     border-radius: 6px;
     font-size: 12px;
-    color: #475569;
+    color: var(--slate-600);
     cursor: pointer;
     display: inline-flex;
     align-items: center;
     gap: 6px;
 }
-.tas-picker-back:hover { background: #f1f5f9; }
+.tas-picker-back:hover { background: var(--slate-100); }
+
 .tas-picker-folder-title {
     flex: 1;
     font-size: 13px;
     font-weight: 600;
-    color: #1e293b;
+    color: var(--gray-800);
     display: flex;
     align-items: center;
     gap: 6px;
     word-break: break-all;
 }
-.tas-picker-folder-title i { color: #f59e0b; }
+.tas-picker-folder-title i { color: var(--amber-500); }
 
 .tas-picker-file-grid {
     display: flex;
@@ -1181,86 +1297,98 @@
     max-height: 340px;
     overflow-y: auto;
 }
+
 .tas-picker-file {
     display: flex;
     align-items: center;
     gap: 12px;
     padding: 8px 10px;
     background: white;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--slate-200);
     border-radius: 6px;
     text-align: left;
     cursor: pointer;
     transition: all 0.15s ease;
     font-family: inherit;
 }
+
 .tas-picker-file:hover {
-    border-color: var(--tas-theme, #4a6fa5);
-    background: #f8fafc;
+    border-color: var(--tas-theme, var(--color-bradley));
+    background: var(--slate-50);
 }
+
 .tas-picker-file--added {
-    background: #dcfce7;
-    border-color: #22c55e;
+    background: var(--store-green-100);
+    border-color: var(--transfer-actions-green-2);
     cursor: default;
 }
+
 .tas-picker-file-thumb {
     width: 48px;
     height: 48px;
     object-fit: cover;
     border-radius: 4px;
     flex-shrink: 0;
-    background: #f1f5f9;
+    background: var(--slate-100);
 }
+
 .tas-picker-file-thumb--placeholder {
     display: flex;
     align-items: center;
     justify-content: center;
+
     /* slate-600 — the thumb background is #f1f5f9, where slate-500 is 4.34:1. */
-    color: #475569;
+    color: var(--slate-600);
     font-size: 18px;
 }
+
 .tas-picker-file-meta {
     flex: 1;
     min-width: 0;
 }
+
 .tas-picker-file-name {
     font-size: 13px;
-    color: #1e293b;
+    color: var(--gray-800);
     word-break: break-all;
     line-height: 1.3;
 }
+
 .tas-picker-file-sub {
     font-size: 11px;
-    color: #6b7280;
+    color: var(--gray-500);
     font-family: 'SF Mono', Monaco, Consolas, monospace;
     margin-top: 2px;
 }
+
 .tas-picker-file-add {
-    color: var(--tas-theme, #4a6fa5);
+    color: var(--tas-theme, var(--color-bradley));
     font-size: 18px;
     flex-shrink: 0;
 }
-.tas-picker-file-add--done { color: #16a34a; }
+.tas-picker-file-add--done { color: var(--transfer-actions-green); }
 
 /* Paste-URL fallback (disclosed) */
 
 .tas-paste-details {
     margin-top: 16px;
-    border: 1px dashed #cbd5e1;
+    border: 1px dashed var(--gray-300);
     border-radius: 6px;
     padding: 10px 14px;
-    background: #fafbfc;
+    background: var(--gray-50);
 }
+
 .tas-paste-details summary {
     font-size: 12px;
-    color: #64748b;
+    color: var(--slate-500);
     cursor: pointer;
     user-select: none;
     padding: 4px 0;
 }
-.tas-paste-details summary:hover { color: #334155; }
+.tas-paste-details summary:hover { color: var(--gray-700); }
+
 .tas-paste-details[open] summary {
     margin-bottom: 8px;
     padding-bottom: 8px;
-    border-bottom: 1px solid #e5e7eb;
+    border-bottom: 1px solid var(--gray-200);
 }

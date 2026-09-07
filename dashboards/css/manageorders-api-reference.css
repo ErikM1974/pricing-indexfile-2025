@@ -5,9 +5,10 @@
    ========================================================================== */
 
 .mo-subhead { font-weight: 400; font-size: 0.7em; opacity: 0.85; }
+
 .mo-lock {
-    display: inline-flex; align-items: center; gap: 6px; font-size: 0.8rem; font-weight: 600; color: #fff;
-    background: rgba(0,0,0,0.18); border: 1px solid rgba(255,255,255,0.35); padding: 5px 12px; border-radius: var(--radius-pill);
+    display: inline-flex; align-items: center; gap: 6px; font-size: 0.8rem; font-weight: 600; color: var(--color-on-brand);
+    background: rgb(0 0 0 / 18%); border: 1px solid rgb(255 255 255 / 35%); padding: 5px 12px; border-radius: var(--radius-pill);
 }
 
 .mo-lead { font-size: 1rem; line-height: 1.6; color: var(--gray-700); margin: 0 0 var(--space-4); }
@@ -45,7 +46,7 @@
 .mo-ep { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-3); align-items: baseline; padding: var(--space-2) var(--space-3); border-bottom: 1px solid var(--gray-200); background: var(--surface-card); }
 .mo-ep:last-child { border-bottom: 0; }
 .mo-ep:hover { background: var(--surface-hover); }
-.mo-m { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.04em; padding: 3px 7px; border-radius: var(--radius-sm); min-width: 46px; text-align: center; color: #fff; flex: 0 0 auto; font-family: 'JetBrains Mono', ui-monospace, monospace; }
+.mo-m { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.04em; padding: 3px 7px; border-radius: var(--radius-sm); min-width: 46px; text-align: center; color: var(--color-on-brand); flex: 0 0 auto; font-family: 'JetBrains Mono', ui-monospace, monospace; }
 .mo-m.GET  { background: var(--state-info); }
 .mo-m.POST { background: var(--state-success); }
 .mo-path { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 0.8rem; color: var(--gray-900); font-weight: 600; }
@@ -80,7 +81,8 @@ mark.mo-hit { background: var(--state-warning-bg); color: var(--state-warning); 
 
 .mo-foot { margin-top: var(--space-6); padding-top: var(--space-4); border-top: 1px solid var(--gray-200); color: var(--gray-500); font-size: 0.8rem; line-height: 1.6; }
 
-@media (max-width: 700px) { .mo-desc { display: none; } }
+@media (width <= 700px) { .mo-desc { display: none; } }
 
 /* 2026-09-05 review */
+/* stylelint-disable-next-line declaration-no-important -- the hidden attribute must beat any display rule */
 [hidden] { display: none !important; }

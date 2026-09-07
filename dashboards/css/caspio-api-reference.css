@@ -9,26 +9,28 @@
 .capi-v {
     font-family: 'JetBrains Mono', ui-monospace, monospace;
     font-weight: 600;
-    background: rgba(255, 255, 255, 0.18);
+    background: rgb(255 255 255 / 18%);
     padding: 1px 8px;
     border-radius: var(--radius-pill);
     font-size: 0.85em;
 }
+
 .capi-sub {
     font-weight: 400;
     font-size: 0.7em;
     opacity: 0.85;
     letter-spacing: 0.02em;
 }
+
 .capi-lock {
     display: inline-flex;
     align-items: center;
     gap: 6px;
     font-size: 0.8rem;
     font-weight: 600;
-    color: #fff;
-    background: rgba(0, 0, 0, 0.18);
-    border: 1px solid rgba(255, 255, 255, 0.35);
+    color: var(--color-on-brand);
+    background: rgb(0 0 0 / 18%);
+    border: 1px solid rgb(255 255 255 / 35%);
     padding: 5px 12px;
     border-radius: var(--radius-pill);
 }
@@ -40,12 +42,14 @@
     color: var(--gray-700);
     margin: 0 0 var(--space-4);
 }
+
 .capi-chips {
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-2);
     margin-bottom: var(--space-4);
 }
+
 .capi-chip {
     background: var(--surface-inset);
     border: 1px solid var(--gray-200);
@@ -54,10 +58,12 @@
     font-size: 0.8rem;
     color: var(--gray-600);
 }
+
 .capi-chip b {
     color: var(--gray-900);
     font-family: 'JetBrains Mono', ui-monospace, monospace;
 }
+
 .capi-chip--muted {
     background: transparent;
     color: var(--gray-500);
@@ -70,6 +76,7 @@
     gap: var(--space-2);
     margin-bottom: var(--space-6);
 }
+
 .capi-toc a {
     font-size: 0.8125rem;
     font-weight: 500;
@@ -81,6 +88,7 @@
     border-radius: var(--radius-pill);
     transition: color var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out);
 }
+
 .capi-toc a:hover {
     color: var(--dash-theme-dark);
     border-color: var(--dash-theme);
@@ -91,6 +99,7 @@
 .capi-section {
     scroll-margin-top: var(--space-4);
 }
+
 .capi-h {
     display: flex;
     align-items: center;
@@ -104,16 +113,18 @@
     border-bottom: 1px solid var(--gray-200);
     letter-spacing: -0.01em;
 }
+
 .capi-h--flush {
     margin-bottom: 0;
     padding-bottom: 0;
     border-bottom: 0;
 }
+
 .capi-n {
     font-family: 'JetBrains Mono', ui-monospace, monospace;
     font-size: 0.8rem;
     font-weight: 600;
-    color: #fff;
+    color: var(--color-on-brand);
     background: var(--dash-theme);
     width: 30px;
     height: 30px;
@@ -123,6 +134,7 @@
     border-radius: var(--radius-md);
     flex: 0 0 auto;
 }
+
 .capi-tag {
     font-size: 0.72rem;
     font-weight: 500;
@@ -133,29 +145,35 @@
     border-radius: var(--radius-pill);
     padding: 3px 10px;
 }
+
 .capi-h4 {
     font-size: 0.95rem;
     font-weight: 600;
     color: var(--gray-800);
     margin: var(--space-5) 0 var(--space-2);
 }
+
 .capi-section p,
 .capi-section li {
     color: var(--gray-700);
     line-height: 1.6;
 }
+
 .capi-section ul,
 .capi-section ol {
     margin: var(--space-2) 0;
     padding-left: var(--space-5);
 }
+
 .capi-section li {
     margin: var(--space-1) 0;
 }
+
 .capi-note {
     font-size: 0.85rem;
     color: var(--gray-500);
 }
+
 .capi-req {
     color: var(--state-danger);
     font-weight: 700;
@@ -170,10 +188,13 @@
     color: var(--gray-800);
     padding: 1.5px 6px;
     border-radius: var(--radius-sm);
+
     /* Long tokens (URLs, deep paths) must break rather than push the page sideways. */
     overflow-wrap: anywhere;
+    /* stylelint-disable-next-line declaration-property-value-keyword-no-deprecated -- overflow-wrap: anywhere is not a byte-identical swap; legacy */
     word-break: break-word;
 }
+
 .capi-section pre {
     background: var(--gray-900);
     color: var(--gray-100);
@@ -185,6 +206,7 @@
     line-height: 1.55;
     margin: var(--space-3) 0;
 }
+
 .capi-section pre code {
     background: transparent;
     color: inherit;
@@ -197,12 +219,14 @@
     overflow-x: auto;
     margin: var(--space-3) 0;
 }
+
 .capi-table {
     width: 100%;
     border-collapse: collapse;
     font-size: 0.86rem;
     min-width: 520px;
 }
+
 .capi-table th,
 .capi-table td {
     text-align: left;
@@ -211,6 +235,7 @@
     vertical-align: top;
     color: var(--gray-700);
 }
+
 .capi-table th {
     color: var(--gray-500);
     font-weight: 600;
@@ -221,6 +246,7 @@
     position: sticky;
     top: 0;
 }
+
 .capi-table tr:last-child td {
     border-bottom: 0;
 }
@@ -234,6 +260,7 @@
     margin: var(--space-4) 0;
     background: var(--surface-inset);
 }
+
 .capi-callout h4 {
     margin: 0 0 var(--space-2);
     font-size: 0.92rem;
@@ -243,26 +270,31 @@
     align-items: center;
     gap: var(--space-2);
 }
+
 .capi-callout p,
 .capi-callout li {
     margin: var(--space-1) 0;
     font-size: 0.88rem;
 }
+
 .capi-callout--tip {
     border-left-color: var(--state-info);
     background: var(--state-info-bg);
 }
 .capi-callout--tip h4 { color: var(--state-info); }
+
 .capi-callout--good {
     border-left-color: var(--state-success);
     background: var(--state-success-bg);
 }
 .capi-callout--good h4 { color: var(--state-success); }
+
 .capi-callout--warn {
     border-left-color: var(--state-warning);
     background: var(--state-warning-bg);
 }
 .capi-callout--warn h4 { color: var(--state-warning); }
+
 .capi-callout--danger {
     border-left-color: var(--state-danger);
     background: var(--state-danger-bg);
@@ -276,6 +308,7 @@
     overflow: hidden;
     margin: var(--space-3) 0;
 }
+
 .capi-ep {
     display: flex;
     flex-wrap: wrap;
@@ -287,6 +320,7 @@
 }
 .capi-ep:last-child { border-bottom: 0; }
 .capi-ep:hover { background: var(--surface-hover); }
+
 .capi-m {
     font-size: 0.68rem;
     font-weight: 700;
@@ -295,7 +329,7 @@
     border-radius: var(--radius-sm);
     min-width: 58px;
     text-align: center;
-    color: #fff;
+    color: var(--color-on-brand);
     flex: 0 0 auto;
     font-family: 'JetBrains Mono', ui-monospace, monospace;
 }
@@ -304,14 +338,17 @@
 .capi-m.PUT    { background: var(--state-warning); }
 .capi-m.PATCH  { background: var(--state-violet); }
 .capi-m.DELETE { background: var(--state-danger); }
+
 .capi-path {
     font-family: 'JetBrains Mono', ui-monospace, monospace;
     font-size: 0.8rem;
     color: var(--gray-900);
     min-width: 0;
     overflow-wrap: anywhere;
+    /* stylelint-disable-next-line declaration-property-value-keyword-no-deprecated -- overflow-wrap: anywhere is not a byte-identical swap; legacy */
     word-break: break-word;
 }
+
 .capi-desc {
     color: var(--gray-500);
     font-size: 0.8rem;
@@ -319,6 +356,7 @@
     text-align: right;
     max-width: 46%;
 }
+
 .capi-desc code {
     white-space: nowrap;
 }
@@ -334,6 +372,7 @@
     padding-bottom: var(--space-3);
     border-bottom: 1px solid var(--gray-200);
 }
+
 .capi-filter {
     flex: 1 1 260px;
     max-width: 360px;
@@ -345,23 +384,27 @@
     border: 1px solid var(--gray-300);
     border-radius: var(--radius-md);
 }
+
 .capi-filter:focus {
     outline: none;
     border-color: var(--dash-theme);
     box-shadow: 0 0 0 3px var(--dash-theme-bg);
 }
+
 .capi-grpbar {
     display: flex;
     align-items: center;
     gap: var(--space-3);
     margin: var(--space-5) 0 var(--space-2);
 }
+
 .capi-grpbar h3 {
     margin: 0;
     font-size: 0.95rem;
     font-weight: 600;
     color: var(--gray-800);
 }
+
 .capi-count {
     font-size: 0.72rem;
     color: var(--gray-500);
@@ -370,12 +413,14 @@
     border-radius: var(--radius-pill);
     font-family: 'JetBrains Mono', ui-monospace, monospace;
 }
+
 .capi-empty {
     padding: var(--space-6);
     text-align: center;
     color: var(--gray-500);
     font-size: 0.9rem;
 }
+
 mark.capi-hit {
     background: var(--state-warning-bg);
     color: var(--state-warning);
@@ -394,10 +439,11 @@ mark.capi-hit {
 }
 
 /* ---------- Responsive ---------- */
-@media (max-width: 700px) {
+@media (width <= 700px) {
     .capi-desc { display: none; }
     .capi-h { font-size: 1.05rem; }
 }
 
 /* 2026-09-05 review */
+/* stylelint-disable-next-line declaration-no-important -- the hidden attribute must beat any display rule */
 [hidden] { display: none !important; }

@@ -98,7 +98,7 @@ describe('workable', () => {
 describe('phone + freshness', () => {
     test('low-value columns hide under 640px', () => {
         expect(doc.querySelectorAll('th.pp-col-phone-hide').length).toBe(4);
-        expect(css).toMatch(/@media \(max-width: 640px\)[\s\S]*\.pp-col-phone-hide \{ display: none; \}/);
+        expect(css).toMatch(/@media \((?:max-width: 640px|width <= 640px)\)[\s\S]*\.pp-col-phone-hide \{ display: none; \}/);
     });
     test('5-minute refresh while visible, loaded-time stamp', () => {
         expect(js).toMatch(/REFRESH_INTERVAL_MS = 5 \* 60 \* 1000/);

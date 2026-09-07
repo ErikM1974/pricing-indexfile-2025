@@ -1,3 +1,6 @@
+/* stylelint-disable no-duplicate-selectors -- legacy sheet: rules were appended over time; merging them would reorder the cascade (2026-09-07) */
+/* stylelint-disable declaration-no-important -- legacy sheet: these flags override Caspio DataPage markup and inline styles the page does not own; re-examine when it is redesigned (2026-09-07) */
+
 /* ============================================================
    SanMar Inbound modal — SELF-CONTAINED stylesheet
    ------------------------------------------------------------
@@ -28,6 +31,34 @@
    rendering is unchanged.
    ============================================================ */
 
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue so the page
+   keeps its exact look. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   every rule below uses var(). Raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
+:root {
+    --sanmar-inbound-gray-dark: #000;
+    --sanmar-inbound-gray-dark-2: #333;
+    --sanmar-inbound-yellow: #fcd34d;
+    --sanmar-inbound-gray: #8a9097;
+    --sanmar-inbound-gray-2: #888;
+    --sanmar-inbound-red: #fca5a5;
+    --sanmar-inbound-orange: #f0c9a8;
+    --sanmar-inbound-green: #4a7a58;
+    --sanmar-inbound-cyan-dark: #245;
+    --sanmar-inbound-green-tint: #cfe6d4;
+    --sanmar-inbound-cyan: #b5d4f4;
+    --sanmar-inbound-green-2: #5f7d68;
+    --sanmar-inbound-gray-3: #c7cec7;
+    --sanmar-inbound-gray-4: #b9c0b9;
+    --sanmar-inbound-orange-2: #fdba74;
+    --sanmar-inbound-magenta: #b08;
+    --sanmar-inbound-green-3: #86efac;
+    --sanmar-inbound-green-tint-2: #bbf7d0;
+    --sanmar-inbound-red-2: #b4232f;
+    --sanmar-inbound-red-3: #e0a3a3;
+}
+/* stylelint-enable color-no-hex */
+
 /* Border-box, scoped. Every rule below was written under quote-management.css's global
    `* { box-sizing: border-box }`; no stylesheet on ae-mission-control.html declares one,
    so without this the modal and BOTH printed sheets lay out to different widths there
@@ -43,49 +74,54 @@
 .modal.sit-modal {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgb(0 0 0 / 50%);
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 9999;
 }
+
 .modal-content.sit-modal-content {
     background: white;
     padding: 24px;
     border-radius: 8px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 20px rgb(0 0 0 / 20%);
+
     /* Pinned because it was inherited from quote-management.css's `body { color: #333 }`:
        the handful of elements below that don't set their own colour were designed
        against #333, and on a page without that body rule they'd fall back to black.
        Font is deliberately NOT pinned — the modal has always inherited its host page's
        typeface, and #sit-print-sheet / #sit-label-sheet already pin their own. */
-    color: #333;
+    color: var(--sanmar-inbound-gray-dark-2);
 }
+
 /* Body text inside the modal (.sit-empty / .sit-note / .sit-costnote are <p>) —
    restated from .modal-content p. */
 .sit-modal-content p {
     margin: 0 0 20px;
     font-size: 14px;
     line-height: 1.6;
-    color: #555;
+    color: var(--print-ink-soft);
 }
+
 /* Header buttons (Box Labels / Print for… / Refresh) and the error Retry —
    restated from .btn-cancel. Kept at .sit-modal .btn-cancel (0,2,0) and placed
    ABOVE the moved block so the two rules that refine it below still win the way
    they always have: .sit-header-actions .btn-cancel:disabled (0,2,1) and
    .sit-error .btn-cancel (0,2,0, later in source). */
 .sit-modal .btn-cancel {
-    background: #f8f9fa;
-    color: #333;
-    border: 1px solid #ddd;
+    background: var(--gray-50);
+    color: var(--sanmar-inbound-gray-dark-2);
+    border: 1px solid var(--store-line);
     padding: 10px 20px;
     border-radius: 4px;
     font-size: 14px;
     cursor: pointer;
     transition: all 0.2s;
 }
+
 .sit-modal .btn-cancel:hover {
-    background: #e9ecef;
+    background: var(--gray-200);
 }
 
 /* ============================================================
@@ -98,6 +134,7 @@
     max-height: 92vh;
     overflow-y: auto;
 }
+
 .sit-header {
     display: flex;
     align-items: flex-start;
@@ -105,8 +142,8 @@
     gap: 12px;
     margin-bottom: 16px;
 }
-.sit-header h3 { margin: 0; font-size: 18px; color: #333; }
-.sit-date-line { font-size: 13px; color: #6b7280; margin-top: 2px; }
+.sit-header h3 { margin: 0; font-size: 18px; color: var(--sanmar-inbound-gray-dark-2); }
+.sit-date-line { font-size: 13px; color: var(--gray-500); margin-top: 2px; }
 .sit-header-actions { display: flex; align-items: center; gap: 8px; flex: none; }
 .sit-header-actions .btn-cancel:disabled { opacity: 0.5; cursor: not-allowed; }
 
@@ -116,222 +153,234 @@
 .sit-banner {
     display: flex; align-items: flex-start; gap: 9px;
     margin: 0 0 14px; padding: 10px 13px;
-    border: 1px solid #f0c9a8; border-left: 4px solid #c2410c; border-radius: 8px;
-    background: #fff5ec; color: #8a3a06; font-size: 13px; line-height: 1.45;
+    border: 1px solid var(--sanmar-inbound-orange); border-left: 4px solid var(--store-rush-deep); border-radius: 8px;
+    background: var(--red-50); color: var(--amber-800); font-size: 13px; line-height: 1.45;
 }
 .sit-banner[hidden] { display: none; }
-.sit-banner > i { margin-top: 1px; color: #c2410c; flex: none; }
+.sit-banner > i { margin-top: 1px; color: var(--store-rush-deep); flex: none; }
 
 /* "Print for…" recipient dropdown (screen) — one item per person, tailored report each */
 .sit-printmenu-wrap { position: relative; display: inline-flex; }
-.sit-print-caret { font-size: 11px; margin-left: 2px; color: #6b8a72; }
+.sit-print-caret { font-size: 11px; margin-left: 2px; color: var(--store-ink-faint); }
+
 .sit-printmenu {
     position: absolute; top: calc(100% + 6px); right: 0; z-index: 40;
     min-width: 292px; max-height: 62vh; overflow-y: auto;
-    background: #fff; border: 1px solid #d6e0d6; border-radius: 10px;
-    box-shadow: 0 12px 34px rgba(20, 45, 25, 0.18); padding: 6px;
+    background: var(--color-surface); border: 1px solid var(--gray-300); border-radius: 10px;
+    box-shadow: 0 12px 34px rgb(20 45 25 / 18%); padding: 6px;
 }
 .sit-printmenu[hidden] { display: none; }
-.sit-pm-group { font-size: 11px; font-weight: 700; color: #6b8a72; text-transform: uppercase; letter-spacing: .03em; padding: 8px 10px 3px; }
+.sit-pm-group { font-size: 11px; font-weight: 700; color: var(--store-ink-faint); text-transform: uppercase; letter-spacing: .03em; padding: 8px 10px 3px; }
+
 .sit-pm-item {
     display: flex; align-items: center; gap: 9px; width: 100%; text-align: left;
     background: none; border: none; border-radius: 7px; padding: 8px 10px;
-    font-size: 13.5px; color: #24402c; cursor: pointer;
+    font-size: 13.5px; color: var(--store-green-900); cursor: pointer;
 }
-.sit-pm-item:hover { background: #eef4ee; }
-.sit-pm-item > i { width: 16px; text-align: center; color: #4a7a58; flex: none; }
+.sit-pm-item:hover { background: var(--store-green-50); }
+.sit-pm-item > i { width: 16px; text-align: center; color: var(--sanmar-inbound-green); flex: none; }
 .sit-pm-txt { flex: 1; min-width: 0; }
 .sit-pm-strong { font-weight: 600; }
-.sit-pm-hint { color: #8aa392; font-weight: 400; }
-.sit-pm-count { color: #8aa392; }
+.sit-pm-hint { color: var(--print-line); font-weight: 400; }
+.sit-pm-count { color: var(--print-line); }
+
 .sit-pm-ini {
     display: inline-flex; align-items: center; justify-content: center;
     width: 24px; height: 24px; flex: none; border-radius: 50%;
-    background: #e3efe6; color: #2e6f40; font-size: 11px; font-weight: 700;
+    background: var(--store-green-100); color: var(--print-green); font-size: 11px; font-weight: 700;
 }
-.sit-pm-empty { padding: 8px 10px; font-size: 12.5px; color: #8aa392; }
+.sit-pm-empty { padding: 8px 10px; font-size: 12.5px; color: var(--print-line); }
 
 /* Date navigation (prev / pick-a-day / next / today) */
 .sit-datenav { display: flex; align-items: center; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
-.sit-datenav .sit-date-line { margin-top: 0; color: #245; }
-.sit-datebtn { display: inline-flex; align-items: center; gap: 7px; background: #f3f6f3; border: 1px solid #d6e0d6; border-radius: 7px; padding: 4px 12px; font-size: 13px; font-weight: 600; cursor: pointer; }
-.sit-datebtn:hover { background: #e9f1ea; border-color: #2e6f40; }
-.sit-datebtn .sit-cal-caret { font-size: 11px; color: #6b8a72; }
-.sit-daystep { background: #fff; border: 1px solid #dde5dd; color: #456; border-radius: 6px; padding: 4px 9px; font-size: 12px; cursor: pointer; }
-.sit-daystep:hover { background: #f3f6f3; }
-.sit-todaybtn { background: #2e6f40; color: #fff; border: none; border-radius: 6px; padding: 5px 12px; font-size: 12px; font-weight: 700; cursor: pointer; }
-.sit-todaybtn:hover { background: #25592f; }
+.sit-datenav .sit-date-line { margin-top: 0; color: var(--sanmar-inbound-cyan-dark); }
+.sit-datebtn { display: inline-flex; align-items: center; gap: 7px; background: var(--gray-100); border: 1px solid var(--gray-300); border-radius: 7px; padding: 4px 12px; font-size: 13px; font-weight: 600; cursor: pointer; }
+.sit-datebtn:hover { background: var(--brand-100); border-color: var(--print-green); }
+.sit-datebtn .sit-cal-caret { font-size: 11px; color: var(--store-ink-faint); }
+.sit-daystep { background: var(--color-surface); border: 1px solid var(--store-line); color: var(--slate-600); border-radius: 6px; padding: 4px 9px; font-size: 12px; cursor: pointer; }
+.sit-daystep:hover { background: var(--gray-100); }
+.sit-todaybtn { background: var(--print-green); color: var(--color-on-brand); border: none; border-radius: 6px; padding: 5px 12px; font-size: 12px; font-weight: 700; cursor: pointer; }
+.sit-todaybtn:hover { background: var(--brand-700); }
 
 /* Inbound calendar (rendered into the modal body) */
 .sit-cal { max-width: 720px; margin: 4px auto 0; }
 .sit-cal-head { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
-.sit-cal-title { font-size: 17px; font-weight: 700; color: #222; min-width: 180px; text-align: center; }
-.sit-cal-nav { background: #fff; border: 1px solid #dde5dd; border-radius: 7px; padding: 5px 11px; cursor: pointer; color: #2e6f40; }
-.sit-cal-nav:hover { background: #f3f6f3; }
-.sit-cal-todaybtn { margin-left: auto; background: #f3f6f3; border: 1px solid #d6e0d6; border-radius: 7px; padding: 5px 12px; font-size: 12px; font-weight: 600; color: #2e6f40; cursor: pointer; }
-.sit-cal-todaybtn:hover { background: #e9f1ea; }
+.sit-cal-title { font-size: 17px; font-weight: 700; color: var(--print-ink); min-width: 180px; text-align: center; }
+.sit-cal-nav { background: var(--color-surface); border: 1px solid var(--store-line); border-radius: 7px; padding: 5px 11px; cursor: pointer; color: var(--print-green); }
+.sit-cal-nav:hover { background: var(--gray-100); }
+.sit-cal-todaybtn { margin-left: auto; background: var(--gray-100); border: 1px solid var(--gray-300); border-radius: 7px; padding: 5px 12px; font-size: 12px; font-weight: 600; color: var(--print-green); cursor: pointer; }
+.sit-cal-todaybtn:hover { background: var(--brand-100); }
 .sit-cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
-.sit-cal-wd { text-align: center; font-size: 11px; font-weight: 700; letter-spacing: 0.03em; color: #8a9097; padding-bottom: 2px; }
-.sit-cal-cell { position: relative; min-height: 58px; border: 1px solid #eef0ee; border-radius: 8px; padding: 5px 7px; background: #fff; }
+.sit-cal-wd { text-align: center; font-size: 11px; font-weight: 700; letter-spacing: 0.03em; color: var(--sanmar-inbound-gray); padding-bottom: 2px; }
+.sit-cal-cell { position: relative; min-height: 58px; border: 1px solid var(--brand-100); border-radius: 8px; padding: 5px 7px; background: var(--color-surface); }
 .sit-cal-blank { background: transparent; border-color: transparent; }
-.sit-cal-dn { font-size: 13px; font-weight: 600; color: #333; }
+.sit-cal-dn { font-size: 13px; font-weight: 600; color: var(--sanmar-inbound-gray-dark-2); }
 .sit-cal-has { cursor: pointer; }
-.sit-cal-has:hover { box-shadow: 0 0 0 2px #2e6f40 inset; }
-.sit-cal-hot .sit-cal-dn { color: #fff; }
-.sit-cal-chip { position: absolute; left: 7px; bottom: 6px; font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 8px; background: rgba(255, 255, 255, 0.82); color: #1d4427; }
-.sit-cal-today { outline: 2px solid #2e6f40; outline-offset: -2px; }
-.sit-cal-sel { background: #2e6f40 !important; }
-.sit-cal-sel .sit-cal-dn { color: #fff; }
-.sit-cal-sel .sit-cal-chip { background: rgba(255, 255, 255, 0.92); color: #1d4427; }
-.sit-cal-legend { margin-top: 14px; font-size: 12px; color: #8a9097; text-align: center; }
-.sit-close { background: none; border: none; font-size: 26px; line-height: 1; color: #888; cursor: pointer; padding: 0 6px; }
-.sit-close:hover { color: #333; }
+.sit-cal-has:hover { box-shadow: 0 0 0 2px var(--print-green) inset; }
+.sit-cal-hot .sit-cal-dn { color: var(--color-on-brand); }
+.sit-cal-chip { position: absolute; left: 7px; bottom: 6px; font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 8px; background: rgb(255 255 255 / 82%); color: var(--brand-800); }
+.sit-cal-today { outline: 2px solid var(--print-green); outline-offset: -2px; }
+.sit-cal-sel { background: var(--print-green) !important; }
+.sit-cal-sel .sit-cal-dn { color: var(--color-on-brand); }
+.sit-cal-sel .sit-cal-chip { background: rgb(255 255 255 / 92%); color: var(--brand-800); }
+.sit-cal-legend { margin-top: 14px; font-size: 12px; color: var(--sanmar-inbound-gray); text-align: center; }
+.sit-close { background: none; border: none; font-size: 26px; line-height: 1; color: var(--sanmar-inbound-gray-2); cursor: pointer; padding: 0 6px; }
+.sit-close:hover { color: var(--sanmar-inbound-gray-dark-2); }
 
 .sit-summary { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; }
-.sit-stat { flex: 1 1 130px; background: #f6f8f6; border: 1px solid #e4e9e4; border-radius: 6px; padding: 10px 12px; text-align: center; }
-.sit-stat-num { display: block; font-size: 22px; font-weight: 700; color: #2f6b34; }
-.sit-stat-lbl { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 0.03em; color: #6b7280; margin-top: 2px; }
+.sit-stat { flex: 1 1 130px; background: var(--gray-100); border: 1px solid var(--gray-200); border-radius: 6px; padding: 10px 12px; text-align: center; }
+.sit-stat-num { display: block; font-size: 22px; font-weight: 700; color: var(--print-green); }
+.sit-stat-lbl { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 0.03em; color: var(--gray-500); margin-top: 2px; }
+
 /* Blank-cost ($) styling */
+
 /* RUSH (2026-08-04) — 3 or fewer WORKING days between the blanks landing and the due date.
    Red because it changes what production picks up first; pastDue is inverted so it cannot be
    skimmed past. Print rules below keep both readable in greyscale, since these sheets are
    normally run off on a mono laser. */
 .sit-rush {
     display: inline-flex; align-items: center; gap: 4px;
-    background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5;
+    background: var(--red-100); color: var(--red-800); border: 1px solid var(--sanmar-inbound-red);
     border-radius: 5px; padding: 2px 8px; font-size: 12px; font-weight: 800;
     letter-spacing: .01em; white-space: nowrap;
 }
-.sit-rush--past { background: #991b1b; color: #fff; border-color: #7f1d1d; }
-.sit-stat--rush { background: #fee2e2; border-color: #fca5a5; }
-.sit-stat--rush .sit-stat-num { color: #991b1b; }
-.sit-stat--cost { background: #eef7f0; border-color: #cfe6d4; }
-.sit-stat--cost .sit-stat-num { color: #1d7a3a; }
-.sit-cost { color: #1d7a3a; font-weight: 700; }
+.sit-rush--past { background: var(--red-800); color: var(--color-on-brand); border-color: var(--print-red); }
+.sit-stat--rush { background: var(--red-100); border-color: var(--sanmar-inbound-red); }
+.sit-stat--rush .sit-stat-num { color: var(--red-800); }
+.sit-stat--cost { background: var(--color-dash-theme-bg); border-color: var(--sanmar-inbound-green-tint); }
+.sit-stat--cost .sit-stat-num { color: var(--print-green); }
+.sit-cost { color: var(--print-green); font-weight: 700; }
+
 /* UPS live-arrival chip */
 .sit-ups { font-weight: 700; padding: 1px 8px; border-radius: 10px; border: 1px solid; white-space: nowrap; }
-.sit-ups--ok { background: #e8f4ff; color: #0c447c; border-color: #b5d4f4; }
-.sit-ups--resched { background: #fef3c7; color: #92400e; border-color: #fcd34d; }
-.sit-ups--est { background: #f3f4f6; color: #6b7280; border-color: #d1d5db; font-weight: 600; }
-.sit-cost-cell { color: #1d4427; font-variant-numeric: tabular-nums; white-space: nowrap; }
-.sit-costnote { font-size: 11px; color: #5f7d68; margin: 12px 0 0; line-height: 1.5; }
-.sit-cal-cost { position: absolute; top: 5px; right: 7px; font-size: 11px; font-weight: 800; color: #1d4427; }
-.sit-cal-hot .sit-cal-cost, .sit-cal-sel .sit-cal-cost { color: #fff; }
+.sit-ups--ok { background: var(--color-floor-tint); color: var(--sky-900); border-color: var(--sanmar-inbound-cyan); }
+.sit-ups--resched { background: var(--amber-100); color: var(--amber-800); border-color: var(--sanmar-inbound-yellow); }
+.sit-ups--est { background: var(--gray-100); color: var(--gray-500); border-color: var(--gray-300); font-weight: 600; }
+.sit-cost-cell { color: var(--brand-800); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.sit-costnote { font-size: 11px; color: var(--sanmar-inbound-green-2); margin: 12px 0 0; line-height: 1.5; }
+.sit-cal-cost { position: absolute; top: 5px; right: 7px; font-size: 11px; font-weight: 800; color: var(--brand-800); }
+.sit-cal-hot .sit-cal-cost, .sit-cal-sel .sit-cal-cost { color: var(--color-on-brand); }
 
 .sit-cards { display: flex; flex-direction: column; gap: 14px; }
-.sit-card { border: 1px solid #e5e7e5; border-radius: 8px; overflow: hidden; }
-.sit-card-main { display: flex; gap: 14px; padding: 12px 14px; background: #fafbfa; border-bottom: 1px solid #eee; }
-.sit-logo { width: 74px; height: 74px; flex: none; object-fit: contain; border: 1px solid #e0e0e0; border-radius: 6px; background: #fff; }
+.sit-card { border: 1px solid var(--gray-200); border-radius: 8px; overflow: hidden; }
+.sit-card-main { display: flex; gap: 14px; padding: 12px 14px; background: var(--gray-50); border-bottom: 1px solid var(--brand-100); }
+.sit-logo { width: 74px; height: 74px; flex: none; object-fit: contain; border: 1px solid var(--gray-200); border-radius: 6px; background: var(--color-surface); }
+
 /* Artwork EXPECTED but not on file — a gap worth chasing. Dashed = "something
    belongs here". */
-.sit-logo--off { display: flex; align-items: center; justify-content: center; font-size: 26px; color: #c7cec7; border-style: dashed; }
+.sit-logo--off { display: flex; align-items: center; justify-content: center; font-size: 26px; color: var(--sanmar-inbound-gray-3); border-style: dashed; }
+
 /* No design on the order at all (blanks / undecorated) — nothing is missing, so
    this reads as settled rather than unfinished: solid border, flat fill, no
    dashes. Same footprint so the card layout is unchanged, and both the glyph and
    the border differ, because the PRINTED sheet has no tooltip to explain it. */
-.sit-logo--blank { display: flex; align-items: center; justify-content: center; font-size: 24px; color: #b9c0b9; background: #f4f6f4; border-style: solid; }
+.sit-logo--blank { display: flex; align-items: center; justify-content: center; font-size: 24px; color: var(--sanmar-inbound-gray-4); background: var(--gray-100); border-style: solid; }
 .sit-card-info { flex: 1; min-width: 0; }
 .sit-card-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
-.sit-fields { display: flex; flex-wrap: wrap; gap: 3px 14px; margin-top: 6px; font-size: 12px; color: #555; }
-.sit-f .sit-fl { color: #9097a0; }
-.sit-f b { color: #222; font-weight: 600; }
+.sit-fields { display: flex; flex-wrap: wrap; gap: 3px 14px; margin-top: 6px; font-size: 12px; color: var(--print-ink-soft); }
+.sit-f .sit-fl { color: var(--print-line); }
+.sit-f b { color: var(--print-ink); font-weight: 600; }
 .sit-card-title { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
-.sit-company { font-weight: 700; color: #222; }
-.sit-po { font-family: "Geist Mono", ui-monospace, monospace; font-size: 13px; color: #444; }
-.sit-wo { font-size: 12px; color: #2f6fed; }
-.sit-chip { color: #fff; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 10px; }
+.sit-company { font-weight: 700; color: var(--print-ink); }
+.sit-po { font-family: "Geist Mono", ui-monospace, monospace; font-size: 13px; color: var(--gray-700); }
+.sit-wo { font-size: 12px; color: var(--blue-600); }
+.sit-chip { color: var(--color-on-brand); font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 10px; }
 .sit-issue { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 10px; border: 1px solid; cursor: help; }
-.sit-issue--bo { background: #fee2e2; color: #991b1b; border-color: #fca5a5; }
-.sit-issue--hold { background: #fef3c7; color: #92400e; border-color: #fcd34d; }
-.sit-issue--urgent { background: #fee2e2; color: #9a3412; border-color: #fdba74; }
-.sit-issue--other { background: #f1f5f9; color: #475569; border-color: #cbd5e1; }
+.sit-issue--bo { background: var(--red-100); color: var(--red-800); border-color: var(--sanmar-inbound-red); }
+.sit-issue--hold { background: var(--amber-100); color: var(--amber-800); border-color: var(--sanmar-inbound-yellow); }
+.sit-issue--urgent { background: var(--red-100); color: var(--store-rush-deeper); border-color: var(--sanmar-inbound-orange-2); }
+.sit-issue--other { background: var(--slate-100); color: var(--slate-600); border-color: var(--gray-300); }
+
 /* Drop-ship is a NEGATIVE fact -- this freight is not coming here -- so it reads as an
    exclusion (slate, arrow) rather than as another warning competing with backorder. */
 .sit-dropship {
     font-size: 11px; font-weight: 800; padding: 2px 8px; border-radius: 10px;
-    background: #1f2937; color: #fff; border: 1px solid #111827; cursor: help;
+    background: var(--gray-800); color: var(--color-on-brand); border: 1px solid var(--gray-900); cursor: help;
 }
-.sit-card-meta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 6px; font-size: 12px; color: #444; }
-.sit-card-meta a { color: #2f6fed; text-decoration: none; }
+.sit-card-meta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 6px; font-size: 12px; color: var(--gray-700); }
+.sit-card-meta a { color: var(--blue-600); text-decoration: none; }
 .sit-card-meta a:hover { text-decoration: underline; }
-.sit-muted { color: #9097a0; }
-.sit-na { color: #b08; font-style: italic; }
+.sit-muted { color: var(--print-line); }
+.sit-na { color: var(--sanmar-inbound-magenta); font-style: italic; }
 
 /* Received (counted in by receiving in ShopWorks) — collapsed + de-emphasized. Physically here,
    so it drops off the arriving totals/labels but stays visible for reconciliation (never hidden). */
 .sit-card--received { opacity: 0.66; }
-.sit-card--received .sit-card-main { background: #f4f7f4; border-bottom: none; }
+.sit-card--received .sit-card-main { background: var(--gray-100); border-bottom: none; }
 .sit-card--received .sit-logo { width: 46px; height: 46px; font-size: 20px; }
-.sit-recv { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 10px; background: #dcfce7; color: #166534; border: 1px solid #86efac; white-space: nowrap; cursor: help; }
+.sit-recv { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 10px; background: var(--store-green-100); color: var(--print-green); border: 1px solid var(--sanmar-inbound-green-3); white-space: nowrap; cursor: help; }
 
 /* Follow-on shipment — the PO was counted in, but SanMar shipped ANOTHER carton afterwards, so
    these pieces are still inbound. Amber (not the green "received" treatment) because the row
    looks like a duplicate of shelf stock and would otherwise be waved through at the dock. */
-.sit-followon { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 10px; background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; white-space: nowrap; cursor: help; }
-.sit-stat--recv { background: #f0fdf4; border-color: #bbf7d0; }
-.sit-stat--recv .sit-stat-num { color: #166534; }
+.sit-followon { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 10px; background: var(--amber-100); color: var(--amber-800); border: 1px solid var(--sanmar-inbound-yellow); white-space: nowrap; cursor: help; }
+.sit-stat--recv { background: var(--brand-50); border-color: var(--sanmar-inbound-green-tint-2); }
+.sit-stat--recv .sit-stat-num { color: var(--print-green); }
 
 .sit-lines { width: 100%; border-collapse: collapse; font-size: 13px; }
-.sit-lines th, .sit-lines td { padding: 6px 14px; border-bottom: 1px solid #f0f0f0; text-align: left; }
-.sit-lines th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.03em; color: #6b7280; background: #fff; }
+.sit-lines th, .sit-lines td { padding: 6px 14px; border-bottom: 1px solid var(--gray-100); text-align: left; }
+.sit-lines th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.03em; color: var(--gray-500); background: var(--color-surface); }
 .sit-lines .sit-style { font-family: "Geist Mono", ui-monospace, monospace; white-space: nowrap; }
-.sit-lines .sit-desc { color: #555; font-size: 12px; max-width: 320px; }
+.sit-lines .sit-desc { color: var(--print-ink-soft); font-size: 12px; max-width: 320px; }
 .sit-lines .sit-num { text-align: right; font-variant-numeric: tabular-nums; }
 .sit-lines tbody tr:last-child td { border-bottom: none; }
 
 /* Per-box contents (screen) */
-.sit-box { border-top: 1px solid #eee; }
+.sit-box { border-top: 1px solid var(--brand-100); }
 .sit-box:first-child { border-top: none; }
-.sit-box-head { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; padding: 8px 14px; background: #f3f6f3; font-size: 12px; }
-.sit-box-n { font-weight: 700; color: #2f6b34; }
-.sit-box-head a { color: #2f6fed; text-decoration: none; }
+.sit-box-head { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; padding: 8px 14px; background: var(--gray-100); font-size: 12px; }
+.sit-box-n { font-weight: 700; color: var(--print-green); }
+.sit-box-head a { color: var(--blue-600); text-decoration: none; }
 .sit-box-head a:hover { text-decoration: underline; }
-.sit-label-btn { margin-left: auto; background: #2e6f40; color: #fff; border: none; border-radius: 5px; padding: 3px 10px; font-size: 11px; font-weight: 700; cursor: pointer; }
-.sit-label-btn:hover { background: #25592f; }
+.sit-label-btn { margin-left: auto; background: var(--print-green); color: var(--color-on-brand); border: none; border-radius: 5px; padding: 3px 10px; font-size: 11px; font-weight: 700; cursor: pointer; }
+.sit-label-btn:hover { background: var(--brand-700); }
 
-.sit-note { font-size: 11px; color: #8a9097; margin: 14px 0 0; line-height: 1.5; }
-.sit-loading, .sit-error, .sit-empty { padding: 32px 16px; text-align: center; color: #667; font-size: 14px; }
-.sit-error { color: #b4232f; }
-.sit-error small { color: #888; }
+.sit-note { font-size: 11px; color: var(--sanmar-inbound-gray); margin: 14px 0 0; line-height: 1.5; }
+.sit-loading, .sit-error, .sit-empty { padding: 32px 16px; text-align: center; color: var(--gray-500); font-size: 14px; }
+.sit-error { color: var(--sanmar-inbound-red-2); }
+.sit-error small { color: var(--sanmar-inbound-gray-2); }
 .sit-error .btn-cancel { margin-top: 12px; }
 
 /* ── Printable report (shown only when printing in sit-printing mode) ── */
 #sit-print-sheet { display: none; }
+
 @media print {
     body.sit-printing > *:not(#sit-print-sheet) { display: none !important; }
     body.sit-printing #sit-print-sheet { display: block !important; }
+
     @page { size: letter portrait; margin: 0.5in; }
 }
-#sit-print-sheet { color: #1a1d1a; font-family: system-ui, "Segoe UI", sans-serif; font-size: 11px; }
-.sit-ps-head { border-bottom: 2px solid #2e6f40; padding-bottom: 8px; margin-bottom: 12px; }
-.sit-ps-brand { font-size: 15px; font-weight: 800; color: #2e6f40; }
+#sit-print-sheet { color: var(--print-ink); font-family: system-ui, "Segoe UI", sans-serif; font-size: 11px; }
+.sit-ps-head { border-bottom: 2px solid var(--print-green); padding-bottom: 8px; margin-bottom: 12px; }
+.sit-ps-brand { font-size: 15px; font-weight: 800; color: var(--print-green); }
 .sit-ps-title { font-size: 14px; font-weight: 700; margin-top: 2px; }
-.sit-ps-sub { font-size: 11px; color: #333; margin-top: 4px; }
-.sit-ps-note { font-size: 9.5px; color: #777; margin-top: 3px; }
-.sit-ps-recipient { font-size: 14px; font-weight: 800; color: #24402c; margin-top: 3px; }
+.sit-ps-sub { font-size: 11px; color: var(--sanmar-inbound-gray-dark-2); margin-top: 4px; }
+.sit-ps-note { font-size: 9.5px; color: var(--gray-500); margin-top: 3px; }
+.sit-ps-recipient { font-size: 14px; font-weight: 800; color: var(--store-green-900); margin-top: 3px; }
 
 /* ── Role-tailored sheets: receiving checklist / production plan / purchasing reconcile ── */
 .sit-rt-tbl { width: 100%; border-collapse: collapse; font-size: 10.5px; margin-bottom: 10px; }
-.sit-rt-tbl th { text-align: left; background: #eef4ee; border: 1px solid #d5ddd5; padding: 4px 6px; font-size: 9.5px; text-transform: uppercase; letter-spacing: .02em; color: #35503b; }
-.sit-rt-tbl td { border: 1px solid #e2e8e2; padding: 4px 6px; vertical-align: top; }
-.sit-rt-tbl tbody tr { page-break-inside: avoid; }
+.sit-rt-tbl th { text-align: left; background: var(--store-green-50); border: 1px solid var(--gray-300); padding: 4px 6px; font-size: 9.5px; text-transform: uppercase; letter-spacing: .02em; color: var(--store-ink-soft); }
+.sit-rt-tbl td { border: 1px solid var(--gray-200); padding: 4px 6px; vertical-align: top; }
+.sit-rt-tbl tbody tr { break-inside: avoid; }
 .sit-rt-c { text-align: center; white-space: nowrap; }
-.sit-rt-muted { color: #999; }
+.sit-rt-muted { color: var(--print-line); }
 .sit-rt-check { width: 26px; text-align: center; }
-.sit-rt-recv tbody .sit-rt-check::before { content: ""; display: inline-block; width: 13px; height: 13px; border: 1.5px solid #7a8a7a; border-radius: 2px; }
-.sit-rt-method { font-size: 12px; font-weight: 800; color: #2e6f40; margin: 12px 0 4px; padding: 2px 0 2px 8px; border-left: 4px solid #444; page-break-after: avoid; }
+.sit-rt-recv tbody .sit-rt-check::before { content: ""; display: inline-block; width: 13px; height: 13px; border: 1.5px solid var(--store-ink-faint); border-radius: 2px; }
+.sit-rt-method { font-size: 12px; font-weight: 800; color: var(--print-green); margin: 12px 0 4px; padding: 2px 0 2px 8px; border-left: 4px solid var(--gray-700); break-after: avoid; }
 .sit-rt-method:first-of-type { margin-top: 2px; }
-.sit-rt-method-sub { font-size: 10px; font-weight: 600; color: #667; }
-.sit-rt-due-soon { font-weight: 800; color: #a3300f; }
-.sit-rt-flag { display: inline-block; font-size: 8.5px; font-weight: 800; color: #a32d2d; border: 1px solid #e0a3a3; border-radius: 3px; padding: 0 4px; margin-left: 4px; vertical-align: 1px; }
-.sit-rt-followon { display: block; font-size: 8.5px; font-weight: 800; color: #92400e; margin-top: 1px; }
-.sit-rt-short { color: #a32d2d; font-weight: 800; }
+.sit-rt-method-sub { font-size: 10px; font-weight: 600; color: var(--gray-500); }
+.sit-rt-due-soon { font-weight: 800; color: var(--store-rush-deeper); }
+.sit-rt-flag { display: inline-block; font-size: 8.5px; font-weight: 800; color: var(--color-ae); border: 1px solid var(--sanmar-inbound-red-3); border-radius: 3px; padding: 0 4px; margin-left: 4px; vertical-align: 1px; }
+.sit-rt-followon { display: block; font-size: 8.5px; font-weight: 800; color: var(--amber-800); margin-top: 1px; }
+.sit-rt-short { color: var(--color-ae); font-weight: 800; }
 .sit-rt-cost { font-variant-numeric: tabular-nums; }
-.sit-rt-tot td { border-top: 2px solid #2e6f40; font-weight: 800; background: #f4f8f4; }
-.sit-ps-po { margin-bottom: 12px; page-break-inside: avoid; }
-.sit-ps-po-head { display: flex; gap: 8px; align-items: flex-start; background: #f1f5f1; padding: 5px 8px; font-size: 11px; border: 1px solid #dde5dd; }
-.sit-ps-po-head .sit-ps-r { float: right; color: #555; }
-.sit-ps-logo { width: 42px; height: 42px; flex: none; object-fit: contain; border: 1px solid #d5ddd5; border-radius: 3px; background: #fff; }
+.sit-rt-tot td { border-top: 2px solid var(--print-green); font-weight: 800; background: var(--gray-100); }
+.sit-ps-po { margin-bottom: 12px; break-inside: avoid; }
+.sit-ps-po-head { display: flex; gap: 8px; align-items: flex-start; background: var(--store-green-50); padding: 5px 8px; font-size: 11px; border: 1px solid var(--store-line); }
+.sit-ps-po-head .sit-ps-r { float: right; color: var(--print-ink-soft); }
+.sit-ps-logo { width: 42px; height: 42px; flex: none; object-fit: contain; border: 1px solid var(--gray-300); border-radius: 3px; background: var(--color-surface); }
+
 /* Printed stand-ins for the two no-image states. Text, not emoji: these sheets go
    to a mono laser, where a 42px glyph is a smudge and colour carries nothing.
    The BORDER does the signalling — dashed "something belongs here" vs solid
@@ -341,53 +390,59 @@
     display: flex; align-items: center; justify-content: center; text-align: center;
     font-size: 7px; font-weight: 700; letter-spacing: .03em; line-height: 1.1;
 }
-.sit-ps-logo--off { border-style: dashed; border-color: #9aa79a; color: #44514a; background: #fff; }
-.sit-ps-logo--blank { border-style: solid; color: #97a097; background: #f4f6f4; }
+.sit-ps-logo--off { border-style: dashed; border-color: var(--print-line); color: var(--store-ink-soft); background: var(--color-surface); }
+.sit-ps-logo--blank { border-style: solid; color: var(--print-line); background: var(--gray-100); }
 .sit-ps-po-htxt { flex: 1; min-width: 0; }
-.sit-ps-fields { font-size: 9.5px; color: #555; margin-top: 2px; }
+.sit-ps-fields { font-size: 9.5px; color: var(--print-ink-soft); margin-top: 2px; }
+
 .sit-ps-rush {
-    font-size: 11px; font-weight: 900; color: #7f1d1d; background: #fee2e2;
-    border: 1.5px solid #b91c1c; border-radius: 3px; padding: 2px 7px;
+    font-size: 11px; font-weight: 900; color: var(--print-red); background: var(--red-100);
+    border: 1.5px solid var(--red-700); border-radius: 3px; padding: 2px 7px;
     margin-top: 3px; display: inline-block; letter-spacing: .02em;
 }
-.sit-ps-rushcount { color: #7f1d1d; }
-.sit-rt-rush { display: block; font-size: 8.5px; font-weight: 900; color: #7f1d1d; margin-top: 1px; }
+.sit-ps-rushcount { color: var(--print-red); }
+.sit-rt-rush { display: block; font-size: 8.5px; font-weight: 900; color: var(--print-red); margin-top: 1px; }
+
 .sit-rt-rushtag {
-    display: inline-block; font-size: 8px; font-weight: 900; color: #fff; background: #b91c1c;
+    display: inline-block; font-size: 8px; font-weight: 900; color: var(--color-on-brand); background: var(--red-700);
     border-radius: 3px; padding: 0 4px; margin-left: 4px; vertical-align: middle;
 }
-.sit-rt-rush-cell { font-weight: 900; color: #7f1d1d; }
-.sit-ps-followon { font-size: 9.5px; font-weight: 800; color: #92400e; background: #fef3c7; border: 1px solid #fcd34d; border-radius: 3px; padding: 1px 5px; margin-top: 3px; display: inline-block; }
+.sit-rt-rush-cell { font-weight: 900; color: var(--print-red); }
+.sit-ps-followon { font-size: 9.5px; font-weight: 800; color: var(--amber-800); background: var(--amber-100); border: 1px solid var(--sanmar-inbound-yellow); border-radius: 3px; padding: 1px 5px; margin-top: 3px; display: inline-block; }
+
 /* DROP-SHIP on paper. Solid dark fill, reversed text, no emoji -- these sheets go to the
    mono laser and get handed to Ruthie, Nika and Taneisha, so the one line that says
    "this is NOT arriving" has to survive greyscale as strongly as RUSH does. */
 .sit-ps-dropship {
-    font-size: 11px; font-weight: 900; color: #fff; background: #111827;
-    border: 1.5px solid #111827; border-radius: 3px; padding: 2px 7px;
+    font-size: 11px; font-weight: 900; color: var(--color-on-brand); background: var(--gray-900);
+    border: 1.5px solid var(--gray-900); border-radius: 3px; padding: 2px 7px;
     margin-top: 3px; display: inline-block; letter-spacing: .02em;
 }
 .sit-ps-issue { margin-top: 3px; }
-.sit-ps-dropcount { color: #111827; }
+.sit-ps-dropcount { color: var(--gray-900); }
+
 /* Which printing is this? A sheet carried round the shop all day looks identical to a
    fresh one without it. Small and grey on screen; forced black on paper (below). */
-.sit-ps-asof { font-size: 8.5px; color: #888; margin-top: 3px; }
+.sit-ps-asof { font-size: 8.5px; color: var(--sanmar-inbound-gray-2); margin-top: 3px; }
+
 /* Table-row form of DROP-SHIP, for the receiving / production / purchasing sheets. */
 .sit-rt-dropship {
-    display: inline-block; font-size: 8px; font-weight: 900; color: #fff; background: #111827;
+    display: inline-block; font-size: 8px; font-weight: 900; color: var(--color-on-brand); background: var(--gray-900);
     border-radius: 3px; padding: 0 4px; margin-left: 4px; vertical-align: middle;
 }
 .sit-ps-tbl { width: 100%; border-collapse: collapse; font-size: 10.5px; }
-.sit-ps-tbl th, .sit-ps-tbl td { border: 1px solid #e0e0e0; padding: 3px 6px; text-align: left; }
-.sit-ps-tbl th { background: #fafafa; font-weight: 600; }
-.sit-ps-box { font-size: 10px; font-weight: 700; color: #2e6f40; margin: 4px 0 2px; }
+.sit-ps-tbl th, .sit-ps-tbl td { border: 1px solid var(--gray-200); padding: 3px 6px; text-align: left; }
+.sit-ps-tbl th { background: var(--gray-50); font-weight: 600; }
+.sit-ps-box { font-size: 10px; font-weight: 700; color: var(--print-green); margin: 4px 0 2px; }
+
 /* ── Rep sections in the Daily Inbound Report — each rep starts on a fresh page
    so the day's printout can be physically split into each AE's bin ── */
-.sit-ps-rep { page-break-before: always; }
-.sit-ps-rep:first-of-type { page-break-before: avoid; } /* first rep rides on the header page */
-.sit-ps-rep-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; border-bottom: 2px solid #2e6f40; margin: 0 0 8px; padding-bottom: 4px; page-break-after: avoid; }
-.sit-ps-rep-name { font-size: 13px; font-weight: 800; color: #2e6f40; }
-.sit-ps-rep-ini { font-weight: 600; color: #555; }
-.sit-ps-rep-sub { font-size: 10px; color: #555; white-space: nowrap; }
+.sit-ps-rep { break-before: always; }
+.sit-ps-rep:first-of-type { break-before: avoid; } /* first rep rides on the header page */
+.sit-ps-rep-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; border-bottom: 2px solid var(--print-green); margin: 0 0 8px; padding-bottom: 4px; break-after: avoid; }
+.sit-ps-rep-name { font-size: 13px; font-weight: 800; color: var(--print-green); }
+.sit-ps-rep-ini { font-weight: 600; color: var(--print-ink-soft); }
+.sit-ps-rep-sub { font-size: 10px; color: var(--print-ink-soft); white-space: nowrap; }
 
 /* ── Per-box labels: moved to shared_components/css/box-label-print.css (2026-08-04) ──
    #sit-label-sheet / .sit-label / .sl-* now live there, shared with pages/box-labels.html. */
@@ -397,41 +452,46 @@
    (.sl-rush — the label's block — has the same rule in box-label-print.css.) */
 @media print {
     .sit-ps-rush, .sit-rt-rushtag {
-        background: #000 !important; color: #fff !important;
-        border-color: #000 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact;
+        background: var(--sanmar-inbound-gray-dark) !important; color: var(--color-on-brand) !important;
+        border-color: var(--sanmar-inbound-gray-dark) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact;
     }
-    .sit-rt-rush, .sit-rt-rush-cell, .sit-ps-rushcount { color: #000 !important; font-weight: 900; }
+    .sit-rt-rush, .sit-rt-rush-cell, .sit-ps-rushcount { color: var(--sanmar-inbound-gray-dark) !important; font-weight: 900; }
+
     /* DROP-SHIP and BACKORDER/HOLD/URGENT carry the same weight as RUSH: each one tells the
        reader NOT to do the obvious thing with this row. Black fill, reversed text, so they
        survive the mono laser exactly as the rush tags do. Without this the drop-ship token
        prints as a pale box and the sheet goes back to implying the freight is arriving. */
     .sit-ps-dropship, .sit-rt-dropship {
-        background: #000 !important; color: #fff !important;
-        border-color: #000 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact;
+        background: var(--sanmar-inbound-gray-dark) !important; color: var(--color-on-brand) !important;
+        border-color: var(--sanmar-inbound-gray-dark) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact;
     }
+
     .sit-rt-flag {
-        background: #000 !important; color: #fff !important;
-        border-color: #000 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact;
+        background: var(--sanmar-inbound-gray-dark) !important; color: var(--color-on-brand) !important;
+        border-color: var(--sanmar-inbound-gray-dark) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact;
     }
-    .sit-ps-dropcount { color: #000 !important; font-weight: 900; }
+    .sit-ps-dropcount { color: var(--sanmar-inbound-gray-dark) !important; font-weight: 900; }
+
     /* The as-of stamp must be legible on paper -- it is the whole point of printing it. */
-    .sit-ps-asof { color: #000 !important; }
+    .sit-ps-asof { color: var(--sanmar-inbound-gray-dark) !important; }
+
     /* Browsers drop backgrounds when printing unless told otherwise, and BLANKS
        leans on its flat fill to read as "settled". Without this it would print as
        a plain box and lose the contrast with NO ART. */
     .sit-ps-logo--blank {
-        background: #f0f2f0 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact;
+        background: var(--store-green-50) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact;
     }
+
     /* NO ART is the actionable one — make it hold its own on a grey page. */
     .sit-ps-logo--off {
-        border-color: #000 !important; color: #000 !important;
+        border-color: var(--sanmar-inbound-gray-dark) !important; color: var(--sanmar-inbound-gray-dark) !important;
         -webkit-print-color-adjust: exact; print-color-adjust: exact;
     }
 }
 
 /* 2026-09-05 review — colours/alignment via custom properties + classes (no inline style=) */
 .sit-modal[hidden] { display: none; }
-.sit-chip { background: var(--c, #9ca3af); }
+.sit-chip { background: var(--c, var(--gray-400)); }
 .sit-ps-tbl .sit-r, .sit-r { text-align: right; }
-.sit-rt-method { border-left-color: var(--c, #444); }
+.sit-rt-method { border-left-color: var(--c, var(--gray-700)); }
 .sit-cal-has { background: var(--bg); }

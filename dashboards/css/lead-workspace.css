@@ -8,6 +8,15 @@
    Tokens from art-hub.css; shell from dash-shell.css. No hardcoded palette.
    ========================================================================== */
 
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue so the page
+   keeps its exact look. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   every rule below uses var(). Raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
+:root {
+    --lead-workspace-red: #f0c2bd;
+}
+/* stylelint-enable color-no-hex */
+
 /* ── Header strip ── */
 .lw-head {
     display: flex;
@@ -33,7 +42,7 @@
 .lw-rail { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
 .lw-panel { padding: 14px 16px; }
 
-@media (max-width: 900px) {
+@media (width <= 900px) {
     .lw-grid { grid-template-columns: 1fr; }
 }
 
@@ -59,6 +68,7 @@
     margin-top: 10px;
     flex-wrap: wrap;
 }
+
 .ld-btn--primary {
     background: var(--gray-900);
     color: var(--surface-card);
@@ -85,6 +95,7 @@
 
 /* ── Timeline ── */
 .lw-timeline-list { list-style: none; margin: 0; padding: 0; }
+
 .lw-item {
     display: flex;
     gap: 12px;
@@ -92,6 +103,7 @@
     border-bottom: 1px solid var(--gray-100);
 }
 .lw-item:last-child { border-bottom: none; }
+
 .lw-item-icon {
     flex: 0 0 32px;
     width: 32px;
@@ -112,12 +124,14 @@
 
 .lw-item-body { min-width: 0; flex: 1; }
 .lw-item-meta { font-size: 0.74rem; color: var(--gray-500); margin-bottom: 2px; }
+/* stylelint-disable-next-line declaration-property-value-keyword-no-deprecated -- overflow-wrap: anywhere is not a byte-identical swap; legacy */
 .lw-item-text { font-size: 0.88rem; color: var(--gray-800); white-space: pre-wrap; word-break: break-word; }
 .lw-item--system .lw-item-text { color: var(--gray-500); font-size: 0.82rem; }
 .lw-item-origin .lw-item-text { color: var(--gray-600); }
 
 /* ── Rail panels ── */
 .lw-chips { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+
 .lw-chip {
     font: inherit;
     font-size: 0.74rem;
@@ -131,7 +145,7 @@
 }
 .lw-chip:hover { background: var(--gray-200); color: var(--gray-800); }
 
-.lw-due-overdue { color: var(--state-danger-text, #b42318); font-weight: 600; font-size: 0.8rem; margin-top: 6px; }
+.lw-due-overdue { color: var(--state-danger-text, var(--red-700)); font-weight: 600; font-size: 0.8rem; margin-top: 6px; }
 
 .lw-value-input, .lw-quote-input {
     width: 100%;
@@ -158,16 +172,16 @@
 .lw-quote-amount { font-size: 1.1rem; font-weight: 700; color: var(--gray-900); }
 .lw-quote-linked-actions { display: inline-flex; gap: 6px; align-items: center; }
 .lw-head-actions { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
-.ld-btn--danger { color: var(--state-danger, #b42318); border-color: var(--state-danger, #f0c2bd); }
-.ld-btn--danger:hover { background: var(--state-danger-bg, #fde8e8); color: var(--state-danger, #b42318); }
+.ld-btn--danger { color: var(--state-danger, var(--red-700)); border-color: var(--state-danger, var(--lead-workspace-red)); }
+.ld-btn--danger:hover { background: var(--state-danger-bg, var(--red-100)); color: var(--state-danger, var(--red-700)); }
 
 /* Send-to-the-art-team modal (mounts the shared GarmentSubmitForm) — cloned from
    quote-view's sts-modal so the lazy-loaded form renders the same way. */
 .lw-art-modal { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: flex-start; justify-content: center; padding: 24px 16px; overflow-y: auto; }
-.lw-art-modal-backdrop { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.55); }
-.lw-art-modal-dialog { position: relative; z-index: 1; width: 100%; max-width: 880px; margin: auto; background: #ffffff; border-radius: 12px; box-shadow: 0 24px 60px rgba(15, 23, 42, 0.35); padding: 20px 20px 28px; }
-.lw-art-modal-close { position: absolute; top: 10px; right: 12px; width: 34px; height: 34px; border: none; border-radius: 50%; background: #f1f5f9; color: #475569; font-size: 22px; line-height: 1; cursor: pointer; z-index: 2; }
-.lw-art-modal-close:hover { background: #e2e8f0; color: #0f172a; }
+.lw-art-modal-backdrop { position: fixed; inset: 0; background: rgb(15 23 42 / 55%); }
+.lw-art-modal-dialog { position: relative; z-index: 1; width: 100%; max-width: 880px; margin: auto; background: var(--color-surface); border-radius: 12px; box-shadow: 0 24px 60px rgb(15 23 42 / 35%); padding: 20px 20px 28px; }
+.lw-art-modal-close { position: absolute; top: 10px; right: 12px; width: 34px; height: 34px; border: none; border-radius: 50%; background: var(--slate-100); color: var(--slate-600); font-size: 22px; line-height: 1; cursor: pointer; z-index: 2; }
+.lw-art-modal-close:hover { background: var(--slate-200); color: var(--gray-900); }
 
 /* Send-a-marketing-kit modal (uses the shared .ld-modal atoms) */
 .lw-kit-modal .ld-modal-body { max-height: 78vh; overflow-y: auto; }
@@ -175,12 +189,13 @@
 .lw-kit-item { display: flex; align-items: center; gap: 8px; font-size: 0.88rem; color: var(--gray-800); }
 .lw-kit-item-label { flex: 1; }
 .lw-kit-qty { width: 64px; font: inherit; border: 1px solid var(--gray-300); border-radius: var(--radius-sm); padding: 4px 6px; }
-.lw-quote-missing { color: var(--state-danger, #b42318); }
+.lw-quote-missing { color: var(--state-danger, var(--red-700)); }
 .lw-quote-row { display: flex; gap: 6px; margin-top: 8px; }
 .lw-quote-row .lw-quote-input { flex: 1; }
 
 /* ── 🔥 header chips + one-click outreach ── */
 .lw-head-chips { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+
 .lw-fire-chip {
     font-size: 0.74rem;
     font-weight: 600;
@@ -193,6 +208,7 @@
 .lw-outreach-btns { display: flex; flex-direction: column; gap: 6px; }
 .lw-outreach-btn { justify-content: flex-start; }
 .lw-outreach-card { margin-top: 10px; border: 1px solid var(--gray-200); border-radius: var(--radius-md); overflow: hidden; }
+
 .lw-outreach-subject {
     font-weight: 700;
     font-size: 0.84rem;
@@ -202,6 +218,7 @@
 }
 .lw-outreach-body { padding: 10px; font-size: 0.8rem; color: var(--gray-800); max-height: 260px; overflow-y: auto; }
 .lw-outreach-body p { margin: 0 0 8px; }
+
 .lw-outreach-actions {
     display: flex;
     align-items: center;
@@ -216,10 +233,12 @@
 .lw-mt-6 { margin-top: 6px; }
 .lw-mt-8 { margin-top: 8px; }
 .lw-retry { margin-left: 6px; }
+
 .lw-chip:focus-visible, .lw-method-btn:focus-visible, .lw-outreach-btn:focus-visible, .lw-art-modal-close:focus-visible,
 .lw-value-input:focus-visible, .lw-quote-input:focus-visible { outline: 2px solid var(--gray-900); outline-offset: 2px; }
 .lw-item-icon[role="img"] { cursor: default; }
-@media (max-width: 640px) {
+
+@media (width <= 640px) {
     .lw-head-controls { width: 100%; }
     .lw-head-controls .ld-control { flex: 1 1 140px; min-width: 0; }
     .lw-composer-actions { flex-direction: column; align-items: stretch; }
