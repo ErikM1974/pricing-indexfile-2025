@@ -6,6 +6,41 @@ Resolved entries aged out of `LESSONS_LEARNED.md` (300-line cap). Newest first. 
 
 ## Archived 2026-09-06
 
+## Customer-facing sweep (`v2026.09.05.77` → `v2026.09.06.5`, 5 batches, ~70 public pages): the SAME rules the staff pages broke, plus three real bugs
+
+**Problem.** Public pages had never been through the deep-review loop. Beyond the hygiene the staff sweep
+found (bare icons, inline handlers, `display:none` beaten by `.hidden=`), three things were wrong for customers:
+(1) `dtg-compatible-products` grid had `style="display:none"` while the script set `.hidden = false` — the inline
+style always won, so the product grid could never show; (2) `design-view`'s Escape listener was registered
+AFTER `init()`'s early `return`, so the lightbox had no Esc on error pages; (3) `inventory-details` rendered
+the colour swatches BEFORE resolving the fallback colour, so with no `COLOR` in the URL nothing showed selected.
+Six public scripts still carried the proxy host as a silent fallback (`… || 'https://caspio-pricing-proxy…'`),
+and four legacy public pages carried whole `<style>`/`<script>` blocks + `onclick=`/`onerror=` (Rule 3).
+
+**Root cause.** The same as the staff sweep: pages built to work, never smoked on the failure path; plus
+"fallback host" habits from before Rule 6 existed.
+
+**Solution.** Five batches, each with a scratchpad python fix script, a jest lock (`public-legacy-pages`,
+`public-storefront-pages`, `public-forms-account-pages`, `public-content-pages`, `public-cart-header-pages`),
+static-dist smoke, deploy, live verify in Chrome. Sections per batch in `memory/DASHBOARD_REVIEWS_2026-09.md`
+(§ CUSTOMER-FACING PAGES).
+
+**Prevention.**
+- 🔴 **`hidden` attribute + `[hidden]{display:none!important}` guard, never `style="display:none"` + `.hidden=`** —
+  the inline style outranks the attribute's UA rule (the dtg grid bug).
+- 🔴 **No fallback host.** `const API_BASE = (APP_CONFIG…) || ''` and a VISIBLE message when empty
+  (toast / error panel / console.error + placeholder for image-only lookups). The locks assert the host string is absent.
+- 🔴 Register global listeners (Esc, delegated clicks) OUTSIDE any function that can return early.
+- 🔴 Resolve state (selected colour, fallbacks) BEFORE rendering the controls that display it.
+- 🔑 Live host for public verification is `sanmar-inventory-app-4cd7b252508d.herokuapp.com` —
+  `www.nwcustomapparel.com` is the Apache marketing site and 404s on app paths.
+- 🔑 A JS component that injects `<style>` on render is a Rule 3 violation by another route — extract to a
+  stylesheet the consumer links (universal cart header).
+- 🔑 The icon-hiding regex must allow `_` in extra classes (`g-footer__rep-icon`) and the `${…}` dynamic form.
+- 🔑 `loading="lazy"` images read `naturalWidth 0` until scrolled near — not a broken image. (2026-09-06)
+
+---
+
 ## Whole-dashboard deep-review sweep (`.24` → `.75`, 54 pages): the same six bugs kept reappearing
 
 **Problem.** Fifty-four staff pages, each "done" by a different session, shared the same defects: (1) a

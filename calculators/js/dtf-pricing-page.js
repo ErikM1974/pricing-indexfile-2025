@@ -174,10 +174,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (realCost !== null) {
                     dtfLog('[DTF] Successfully fetched real garment cost:', realCost);
                     // Force a refresh after API cost is loaded
-                    if (window.dtfIntegration && window.dtfIntegration.calculator) {
-                        setTimeout(() => {
-                            window.dtfIntegration.calculator.refreshTransferPricing();
-                        }, 50);
+                    // refreshTransferPricing() no longer exists on the calculator (it recalculates on
+                    // updateGarmentCost); calling it threw a TypeError on the fallback path (2026-09-06).
+                    const calc = window.dtfIntegration && window.dtfIntegration.calculator;
+                    if (calc && typeof calc.refreshTransferPricing === 'function') {
+                        setTimeout(() => calc.refreshTransferPricing(), 50);
+                    } else if (calc && typeof calc.calculatePricing === 'function') {
+                        setTimeout(() => calc.calculatePricing(), 50);
                     }
                     return; // Exit early, we've set the real cost
                 }
