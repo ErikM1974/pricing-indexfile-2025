@@ -1471,3 +1471,18 @@ Caspio's DTG `Pricing_Tiers` now has **1-11 (LTM $50)** and **12-23 (LTM $0)** r
 3. Lock in `calculator-shared-components`. Parity suites green. Verified locally AND live against the engine computed from the live bundle: 8 → $20.75, 11 → $19.04, 12-23 → $14.50, 24-47 → $13.50, 72+ → $11.50.
    **Cross-surface check against the proxy's `POST /api/dtg/quote-pricing` (what Quick Quote and the builders call):** 8 pcs → tier 1-11 (LTM), subtotal $166 = $20.75/pc · 15 → 12-23, $217.50 = $14.50 · 30 → 24-47, $405 = $13.50 — identical to the calculator after `.43`.
 4. Checked the other calculators: **DTF** builds its tier buttons from the API and reads `LTM_Fee` per tier (live: one LTM row, 10-23/$50) — ⚠️ it takes the FIRST tier with a fee as "the" LTM tier and `threshold = its max + 1`, so a second LTM row (as DTG now has) would need the DTG treatment. **Embroidery/cap** pages read the small-order fee live (`_ltmFeeLive`, visible fallback warning) and show the documented 1-7/8-23/24-47/48-71/72+ headers (stable since 2026-02; typed, so re-check after any embroidery tier change). `screenprint-manual-pricing.js` has the same typed strip but is loaded only by an ARCHIVED page → added to `PENDING_DELETION`.
+
+# CROSS-SURFACE PRICING PARITY RUN — every customer calculator vs the shared engine (2026-09-06, `v2026.09.06.44`)
+
+Erik: "so are you saying our pricing isn't the same for all the calculators… run the test." Method: on the Quick Quote page (staff, loads `quote-cart-engine.js` + services) call `QuoteCartEngine.singleItemPreview` for a fixed scenario set; then read what each customer calculator DISPLAYS for the same style/location/quantity.
+
+| Method · scenario | Engine (Quick Quote / builders) | Calculator page | Match |
+|---|---|---|---|
+| SCP 1-color LC, PC54: 30 / 48 / 72 / 145 | $13.17 (incl. $50 LTM ÷ 30) / $11.00 / $11.00 / $10.50 | $13.17 / $11.00 / $11.00 / $10.50 | ✅ |
+| DTG LC, PC54: 8 / 15 / 30 | $20.75 / $14.50 / $13.50 (proxy `/api/dtg/quote-pricing`) | same after `.43` (was $19.75 / $16.83 / $13.50) | ✅ after fix |
+| EMB LC 8k, PC54: 5 / 8 / 24 / 48 / 72 | $34.00 / $24.00 / $20.00 / $19.00 / $18.00 | table S-XL: $34.00 / $24.00 / $20.00 / $19.00 / $18.00 | ✅ |
+| CAP C112 8k: 5 / 24 / 48 / 72 | $33.50 / $19.50 / $17.50 / $16.00 | $33.50 / $19.50 / $17.50 / $16.00 | ✅ |
+| DTF LC, PC54: 15 / 24 / 48 | $19.00 / $15.00 / $13.50 | **$0.00 / $0.00 / $0.00** → fixed `.44`: $19.00 / $15.00 / $13.50 | ✅ after fix |
+
+🔴 **DTF was showing $0.00 to customers.** `dtf-adapter.js` fetched the garment cost ($3, `base-item-costs` 200) and then merged the sessionStorage copy over it: the merge assigned the stored object onto the target and the target onto itself, so a stored `garmentCost: 0` (the adapter persists its initial state on every update) won → `updateGarmentCost(0)` → "No garment cost" → $0.00 on every load after the first in a tab. Fixed: fresh URL/API data wins; a stored cost of 0 or for another style is dropped. Reproduced with a seeded stale copy on the dev server, then live.
+🔑 This is exactly the check the repo lacked: the jest parity suites hold Quick Quote ↔ builders ↔ engine, but nothing compared a customer calculator PAGE (its own DOM + adapters + sessionStorage) with the engine. Two of five calculators were wrong today (DTG maths for <24, DTF $0.00) and one had wrong labels (SCP). ⏭️ Turn this table into a repeatable check (see backlog).
