@@ -1,3 +1,12 @@
+## v2026.09.06.44 (2026.09.06)
+
+- Memory: DTG sub-24 parity fix recorded (v2026.09.06.43)
+- Pending deletion: screenprint-manual-pricing.js (archive-only loader); DTF/embroidery tier checks recorded
+- Comments no longer name the pending-deletion manual calculator script (lock: pending files stay unreferenced)
+- Memory: DTG calculator cross-checked against the proxy quote-pricing endpoint (identical)
+- DTF calculator priced at $0.00 after the first load in a tab: stored sessionStorage copy overrode the API garment cost
+- Deploy v2026.09.06.44: DTF calculator garment cost no longer overridden by a stale stored copy
+
 ## v2026.09.06.43 (2026.09.06)
 
 - Memory: screen-print tier-strip Rule #1 fix recorded (v2026.09.06.42)
