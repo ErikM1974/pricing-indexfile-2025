@@ -1,3 +1,7 @@
+## v2026.09.07.6 (2026.09.07)
+
+- Deploy v2026.09.07.6: CSS standardization — training family (26 sheets → tokens + page-scoped themes, shared nav chrome re-themed to the Training Center green, !important 120→15) + Brand Standards page (Administration, rendered live from tokens.css, decisions log) + people/department and staff-chrome tokens
+
 ## v2026.09.07.4 (2026.09.07)
 
 - Deploy v2026.09.07.4: CSS standardization — forms family (18 sheets → 0 raw hex, print palette as tokens, !important 6→3 with reasons, stylelint scope widened; 32/36 shots identical + 4 deliberate ink consolidations, screen and print)
