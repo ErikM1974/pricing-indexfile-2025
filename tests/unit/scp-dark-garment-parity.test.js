@@ -29,7 +29,6 @@ function loadClass(file, className, doc) {
   const win = {};
   const docStub = doc || { getElementById: () => null, querySelector: () => null, querySelectorAll: () => [] };
   const quietConsole = { log() {}, warn() {}, error() {}, info() {} };
-  // eslint-disable-next-line no-new-func
   const factory = new Function('window', 'document', 'console', code + `\nreturn ${className};`);
   return factory(win, docStub, quietConsole);
 }

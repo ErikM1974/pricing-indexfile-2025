@@ -80,6 +80,18 @@ describe('shared calculator scripts', () => {
         expect(js).toMatch(/Object\.assign\(data, stored, fresh\);/);
     });
 
+    test('embroidery + cap calculators: table columns and the small-order fee come from the API tiers (2026-09-06)', () => {
+        for (const f of ['calculators/js/embroidery-pricing-page.js', 'calculators/js/cap-embroidery-pricing-integrated-page.js']) {
+            const js = read(f);
+            expect(js).toMatch(/function apiTiersFrom\(source\)/);
+            expect(js).toMatch(/function renderTierHead\(/);
+            expect(js).not.toMatch(/quantity >= 72\) return '72\+'|const LTM_FEE = 50;|tier === '1-7' \|\| tier === '8-23'|basePrices\.tier[0-4]/);
+        }
+        for (const f of ['calculators/embroidery-pricing.html', 'calculators/cap-embroidery-pricing-integrated.html']) {
+            expect(read(f)).not.toMatch(/\*1-7 piece prices vary/);
+        }
+    });
+
     test('the extracted stylesheets exist', () => {
         expect(read('shared_components/css/calculator-inventory.css')).toMatch(/\.calc-inv-bar \{/);
         expect(read('shared_components/css/manual-mode-indicator.css')).toMatch(/\.manual-mode-banner/);

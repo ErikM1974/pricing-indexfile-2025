@@ -36,7 +36,8 @@
     "capture:pricing": "node scripts/capture-pricing-baselines.js",
     "capture:pricing:headed": "node scripts/capture-pricing-baselines.js --headed",
     "capture:pricing:ci": "node scripts/capture-pricing-baselines.js --start-server",
-    "test:pricing-baselines": "jest tests/integration/pricing-baselines.test.js --verbose"
+    "test:pricing-baselines": "jest tests/integration/pricing-baselines.test.js --verbose",
+    "test:parity:surfaces": "playwright test --config tests/e2e/playwright.config.js calculator-parity"
   },
   "engines": {
     "node": "18.x"

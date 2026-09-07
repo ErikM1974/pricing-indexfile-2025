@@ -1486,3 +1486,20 @@ Erik: "so are you saying our pricing isn't the same for all the calculators… r
 
 🔴 **DTF was showing $0.00 to customers.** `dtf-adapter.js` fetched the garment cost ($3, `base-item-costs` 200) and then merged the sessionStorage copy over it: the merge assigned the stored object onto the target and the target onto itself, so a stored `garmentCost: 0` (the adapter persists its initial state on every update) won → `updateGarmentCost(0)` → "No garment cost" → $0.00 on every load after the first in a tab. Fixed: fresh URL/API data wins; a stored cost of 0 or for another style is dropped. Reproduced with a seeded stale copy on the dev server, then live.
 🔑 This is exactly the check the repo lacked: the jest parity suites hold Quick Quote ↔ builders ↔ engine, but nothing compared a customer calculator PAGE (its own DOM + adapters + sessionStorage) with the engine. Two of five calculators were wrong today (DTG maths for <24, DTF $0.00) and one had wrong labels (SCP). ⏭️ Turn this table into a repeatable check (see backlog).
+
+# ORPHAN SWEEP — 42 more files removed (2026-09-06, `v2026.09.06.46`; Erik: "get rid of the orphan files .. go for it")
+
+Erik chose deletion over dashboard tiles for the four unlinked tools. Removed with their extracted CSS/JS: `bundle-orders-dashboard` (+ its `server.js` route), `finished-photos-poster`, `training/bonus-policy`, `tools/art-search`, `staff-portal-simple`, `staff-portal-final`, the five `/tools/` diagnostics, `training/test`, `shopworks-customer-setup-working`, the orphan `api-test-runner.css`; the six pending root files (stale `utils.js`/`dp5-helper.js`/`pricing-matrix-api.js` copies, `app-new.js`, the quote-builder-base tombstone, the archive-only manual screen-print calculator); and `product-filters/grid/search.js`, which only the deleted diagnostics loaded (the orphan lock found them the moment their pages went). `scp-dark-garment-parity` lost its manual-calculator describe. `DELETED_2026_09_06` = **111 files**; nothing pending. Full suite green, 445 assets in dist (was 461).
+
+# REPEATABLE CROSS-SURFACE PARITY CHECK BUILT (2026-09-06) — `npm run test:parity:surfaces`
+
+`tests/e2e/calculator-parity.spec.js` (Playwright, the existing e2e project: server.js on :3400 with the staff session). On the Quick Quote page it runs `QuoteCartEngine.singleItemPreview` for every LIVE tier of each method (tiers read from `/api/pricing-bundle`, so a Caspio re-cut reshapes the table instead of breaking it; LTM tiers use a mid-range exact quantity), then drives each customer calculator's strip and asserts the displayed price to the cent. First full run, all green (23 rows):
+
+| SCP 1c LC | 24-47 @36 $12.89 · 48-71 $11.00 · 72-144 $11.00 · 145+ $10.50 |
+|---|---|
+| DTG LC | 1-11 @6 $22.83 · 12-23 $14.50 · 24-47 $13.50 · 48-71 $12.50 · 72+ $11.50 |
+| DTF LC | 10-23 @17 $18.50 · 24-47 $15.00 · 48-71 $13.50 · 72+ $12.50 |
+| EMB LC 8k (S–XL) | 1-7 @4 $36.50 · 8-23 $24.00 · 24-47 $20.00 · 48-71 $19.00 · 72+ $18.00 |
+| CAP C112 8k | 1-7 @4 $36.00 · 8-23 $23.50 · 24-47 $19.50 · 48-71 $17.50 · 72+ $16.00 |
+
+🔑 Locally it drives the installed Chrome (`channel: 'chrome'`) because this network's TLS interception blocks Playwright's browser download (`UNABLE_TO_VERIFY_LEAF_SIGNATURE`); CI uses the project's chromium. ~100 live proxy reads per run — run after a calculator/adapter/Caspio-tier change, not in a loop. Rule 9 in CLAUDE.md now names it.

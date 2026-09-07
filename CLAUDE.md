@@ -12,7 +12,7 @@ Guidance for Claude Code when working in this repository.
 6. **USE CONFIG for API URLs** — Don't hardcode `caspio-pricing-proxy` URL. Use `APP_CONFIG.API.BASE_URL`.
 7. **SYNC calculator + quote builder prices** — If both exist for a method, test identical inputs match.
 8. **SYNC all 4 quote builders** — A change to one (DTG/DTF/EMB/SCP) usually applies to all four. Always check.
-9. **3 PRICE SURFACES = ONE engine** — Customer Catalog, Quick Quote, and the Quote Builders all price through `QuoteCartEngine.singleItemPreview` → Caspio (identical *by construction*). ANY price change (Caspio OR a `*-pricing-service.js`) MUST re-run `web-quote-cart-parity` + `quick-quote-parity` and verify ALL 3 — never just one. Never add a 4th pricing path or a hardcoded price.
+9. **3 PRICE SURFACES = ONE engine** — Customer Catalog, Quick Quote, and the Quote Builders all price through `QuoteCartEngine.singleItemPreview` → Caspio (identical *by construction*). ANY price change (Caspio OR a `*-pricing-service.js`) MUST re-run `web-quote-cart-parity` + `quick-quote-parity` and verify ALL 3 — never just one. The customer CALCULATOR pages are a 4th surface with their own DOM/adapters: after any change to a calculator, an adapter or a Caspio tier also run `npm run test:parity:surfaces` (`tests/e2e/calculator-parity.spec.js` — engine vs every calculator's displayed price, every live tier; it caught DTF at $0.00 and the DTG sub-24 gap on 2026-09-06). Never add a 4th pricing path or a hardcoded price.
 
 ## Pre-Flight Checklist
 

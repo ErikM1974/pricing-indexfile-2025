@@ -648,94 +648,65 @@ function updateMainImageForColor(colorName) {
         });
 }
 
-// Update pricing table with multiple size rows
+// Update pricing table with multiple size rows — columns are the API tiers (see apiTiersFrom)
 function updatePricing(pricingData) {
 
-    const tiers = pricingData.tierData || [];
-
-    // Get pricing tiers
-    const tier1 = tiers.find(t => t.TierLabel === '24-47');
-    const tier2 = tiers.find(t => t.TierLabel === '48-71');
-    const tier3 = tiers.find(t => t.TierLabel === '72+');
-
-    // Get base prices from the calculated pricing data
-    // The service returns prices in two formats:
-    // pricingData.pricing['24-47']['S'] or pricingData.prices['S']['24-47']
-    let basePrices = {
-        tier0: null,  // 1-7 pieces
-        tier1: null,  // 8-23 pieces
-        tier2: null,  // 24-47 pieces
-        tier3: null,  // 48-71 pieces
-        tier4: null   // 72+ pieces
-    };
+    const tiers = apiTiersFrom(pricingData);
+    if (!tiers.length) {
+        console.error('❌ Invalid pricing data - no tiers');
+        showApiError('Pricing data is incomplete. Please contact support at 253-922-5793.');
+        return;
+    }
 
     // Get sizes with sortOrder from API data for determining base size
     const sizesWithOrder = pricingData.apiData?.sizes || [];
     const displayAddOns = pricingData.apiData?.sellingPriceDisplayAddOns || {};
 
-    // Find the first base size (no upcharge) to use for base pricing
     // Find the base size - the size with the lowest upcharge (or zero upcharge)
     // For standard products, this will be S/M/L/XL with zero upcharge
     // For tall-only products, this will be the size with the minimum upcharge (e.g., LT)
-    let firstBaseSize = sizesWithOrder.find(s =>
-        !displayAddOns[s.size] || displayAddOns[s.size] === 0
-    );
-
-    // If no size has zero upcharge (tall-only products), find the one with minimum upcharge
+    let firstBaseSize = sizesWithOrder.find(s => !displayAddOns[s.size] || displayAddOns[s.size] === 0);
     if (!firstBaseSize && sizesWithOrder.length > 0) {
-        const minUpcharge = Math.min(...sizesWithOrder.map(s => displayAddOns[s.size] || 0));
-        firstBaseSize = sizesWithOrder.find(s => (displayAddOns[s.size] || 0) === minUpcharge);
+        const minUp = Math.min(...sizesWithOrder.map(s => displayAddOns[s.size] || 0));
+        firstBaseSize = sizesWithOrder.find(s => (displayAddOns[s.size] || 0) === minUp);
     }
-
     const baseSizeToUse = firstBaseSize ? firstBaseSize.size : sizesWithOrder[0]?.size || 'S';
 
-
-    // Try to get calculated prices from the service
-    if (pricingData.pricing) {
-        // Format: pricingData.pricing['24-47']['S']
-        // Helper to get price from tier
-        const getPriceFromTier = (tierKey) => {
-            if (!pricingData.pricing[tierKey]) return null;
-            const tierPrices = pricingData.pricing[tierKey];
-            return tierPrices[baseSizeToUse] || tierPrices['S'] || tierPrices['SM'] || tierPrices['OSFA'] || Object.values(tierPrices).find(p => typeof p === 'number');
-        };
-
-        basePrices.tier0 = getPriceFromTier('1-7');
-        basePrices.tier1 = getPriceFromTier('8-23');
-        basePrices.tier2 = getPriceFromTier('24-47');
-        basePrices.tier3 = getPriceFromTier('48-71');
-        basePrices.tier4 = getPriceFromTier('72+');
-    } else if (pricingData.prices) {
-        // Alternative format: pricingData.prices['S']['24-47']
-        // Find the first available size (use base size from API, or fallback to S, SM, OSFA, or any)
-        const availableSizes = Object.keys(pricingData.prices);
-        const baseSize = availableSizes.find(s => s === baseSizeToUse) ||
-                        availableSizes.find(s => s === 'S') ||
-                        availableSizes.find(s => s === 'SM') ||
-                        availableSizes.find(s => s === 'OSFA') ||
-                        availableSizes[0];
-
-        if (baseSize && pricingData.prices[baseSize]) {
-            basePrices.tier0 = pricingData.prices[baseSize]['1-7'] || null;
-            basePrices.tier1 = pricingData.prices[baseSize]['8-23'] || null;
-            basePrices.tier2 = pricingData.prices[baseSize]['24-47'] || null;
-            basePrices.tier3 = pricingData.prices[baseSize]['48-71'] || null;
-            basePrices.tier4 = pricingData.prices[baseSize]['72+'] || null;
+    // Base price per tier label. The service returns prices in two formats:
+    // pricingData.pricing[tierLabel][size] or pricingData.prices[size][tierLabel]
+    const priceFor = (label, size) => {
+        if (pricingData.pricing && pricingData.pricing[label]) {
+            const tierPrices = pricingData.pricing[label];
+            const v = tierPrices[size];
+            return typeof v === 'number' && v > 0 ? v : null;
         }
-    }
+        if (pricingData.prices && pricingData.prices[size]) {
+            const v = pricingData.prices[size][label];
+            return typeof v === 'number' && v > 0 ? v : null;
+        }
+        return null;
+    };
+    const basePriceFor = (label) => {
+        if (pricingData.pricing && pricingData.pricing[label]) {
+            const tp = pricingData.pricing[label];
+            return tp[baseSizeToUse] || tp['S'] || tp['SM'] || tp['OSFA'] || Object.values(tp).find(v => typeof v === 'number' && v > 0) || null;
+        }
+        return priceFor(label, baseSizeToUse);
+    };
+    const basePrices = {};
+    tiers.forEach(t => { basePrices[t.TierLabel] = basePriceFor(t.TierLabel); });
 
+    const pricingTable = document.querySelector('.pricing-table:not(.additional-logo-table)');
+    const tbody = pricingTable.querySelector('tbody');
 
-    // Check if we have valid pricing data (tier2, tier3, tier4 are required; tier0 and tier1 may be missing from older API responses)
-    if (!basePrices.tier2 || !basePrices.tier3 || !basePrices.tier4) {
-        console.error('❌ Invalid pricing data - missing base prices');
+    // Every non-LTM tier must price (the small-order tier may be absent from older API responses)
+    const missing = tiers.filter(t => t.LTM_Fee === 0 && !basePrices[t.TierLabel]);
+    if (missing.length) {
+        console.error('❌ Invalid pricing data - missing base prices for', missing.map(t => t.TierLabel));
         showApiError('Pricing data is incomplete. Please contact support at 253-922-5793.');
-
-        // Show pricing unavailable in table
-        const pricingTable = document.querySelector('.pricing-table');
-        const tbody = pricingTable.querySelector('tbody');
         tbody.innerHTML = `
             <tr>
-                <td colspan="6" style="text-align: center; padding: 30px; color: #666;">
+                <td colspan="${tiers.length + 1}" style="text-align: center; padding: 30px; color: #666;">
                     <i class="fas fa-exclamation-triangle" style="color: #fbbf24; margin-right: 8px;" aria-hidden="true"></i>
                     Pricing currently unavailable. Please contact sales for a quote.
                 </td>
@@ -744,103 +715,71 @@ function updatePricing(pricingData) {
         return;
     }
 
-    // Sort by sortOrder (we already have sizesWithOrder and displayAddOns from above)
+    renderTierHead(pricingTable, tiers, 'Size Range');
+    renderSmallOrderCopy(tiers, 'pieces');
+
+    // Sort by sortOrder
     const sortedSizes = [...sizesWithOrder].sort((a, b) => a.sortOrder - b.sortOrder);
-
-
-    // Build pricing table HTML with multiple rows
-    const pricingTable = document.querySelector('.pricing-table');
-    const tbody = pricingTable.querySelector('tbody');
-
-    // Clear existing rows
     tbody.innerHTML = '';
 
-    // Determine base sizes dynamically from API data
-    // For products with standard sizes (S/M/L/XL), base sizes are those with no upcharge
-    // For products without standard sizes (like tall-only jackets), use the size with lowest upcharge
-    let baseSizes = sortedSizes.filter(s =>
-        !displayAddOns[s.size] || displayAddOns[s.size] === 0
-    );
-
-    // If no sizes have zero upcharge (e.g., tall-only products), use the size(s) with lowest upcharge
-    if (baseSizes.length === 0 && sortedSizes.length > 0) {
-        // Find the minimum upcharge value
-        const minUpcharge = Math.min(...sortedSizes.map(s => displayAddOns[s.size] || 0));
-        // Get all sizes with that minimum upcharge (could be multiple like LT and XLT both at $4)
-        baseSizes = sortedSizes.filter(s => (displayAddOns[s.size] || 0) === minUpcharge);
-    }
-
-    // Get the base size names for display - always use actual sizes from API
+    // Base sizes = zero upcharge (or the lowest upcharge for tall-only products)
+    const minUpcharge = Math.min(...sortedSizes.map(s => displayAddOns[s.size] || 0));
+    let baseSizes = sortedSizes.filter(s => !displayAddOns[s.size] || displayAddOns[s.size] === 0);
+    if (baseSizes.length === 0 && sortedSizes.length > 0) baseSizes = sortedSizes.filter(s => (displayAddOns[s.size] || 0) === minUpcharge);
     const baseSizeNames = baseSizes.map(s => s.size);
     const baseSizeDisplay = baseSizeNames.length > 0 ? baseSizeNames.join(', ') : sortedSizes[0]?.size || 'N/A';
 
+    const cell = (t, price) => t.LTM_Fee > 0
+        ? `<td class="price-cell ltm-column" data-base-price="${price || ''}">${price ? '$' + price.toFixed(2) : '-'}</td>`
+        : `<td class="price-cell">${price ? '$' + price.toFixed(2) : '-'}</td>`;
 
-    // Add base sizes row
+    // Base sizes row
     const baseRow = document.createElement('tr');
-    baseRow.innerHTML = `
-        <td class="size-cell">${baseSizeDisplay}</td>
-        <td class="price-cell ltm-column" data-base-price="${basePrices.tier0 || ''}">${basePrices.tier0 ? '$' + basePrices.tier0.toFixed(2) : '-'}</td>
-        <td class="price-cell">${basePrices.tier1 ? '$' + basePrices.tier1.toFixed(2) : '-'}</td>
-        <td class="price-cell">$${basePrices.tier2.toFixed(2)}</td>
-        <td class="price-cell">$${basePrices.tier3.toFixed(2)}</td>
-        <td class="price-cell">$${basePrices.tier4.toFixed(2)}</td>
-    `;
+    baseRow.innerHTML = `<td class="size-cell">${baseSizeDisplay}</td>` + tiers.map(t => cell(t, basePrices[t.TierLabel])).join('');
     tbody.appendChild(baseRow);
 
-    // Filter for extended sizes that have upcharges
-    // For tall-only products, this means sizes with upcharges HIGHER than the base
-    const minUpcharge = Math.min(...sortedSizes.map(s => displayAddOns[s.size] || 0));
-    const extendedSizes = sortedSizes.filter(s =>
-        displayAddOns[s.size] > minUpcharge
-    );
-
-    // Add extended size rows in sorted order
+    // Extended sizes (upcharge above the base) in sorted order
+    const extendedSizes = sortedSizes.filter(s => displayAddOns[s.size] > minUpcharge);
     extendedSizes.forEach(sizeData => {
         const size = sizeData.size;
-        const absoluteUpcharge = displayAddOns[size] || 0;
-        // Calculate RELATIVE upcharge (difference from minimum upcharge)
-        const relativeUpcharge = absoluteUpcharge - minUpcharge;
-
-        if (relativeUpcharge > 0) {
-            let price0, price1, price2, price3, price4;
-
-            // Try to get calculated prices for this specific size first
-            if (pricingData.pricing) {
-                // Format: pricingData.pricing['24-47']['2XL'] or ['XXL']
-                price0 = pricingData.pricing['1-7']?.[size] || (basePrices.tier0 ? basePrices.tier0 + relativeUpcharge : null);
-                price1 = pricingData.pricing['8-23']?.[size] || (basePrices.tier1 ? basePrices.tier1 + relativeUpcharge : null);
-                price2 = pricingData.pricing['24-47']?.[size] || (basePrices.tier2 + relativeUpcharge);
-                price3 = pricingData.pricing['48-71']?.[size] || (basePrices.tier3 + relativeUpcharge);
-                price4 = pricingData.pricing['72+']?.[size] || (basePrices.tier4 + relativeUpcharge);
-            } else if (pricingData.prices && pricingData.prices[size]) {
-                // Alternative format: pricingData.prices['2XL']['24-47']
-                price0 = pricingData.prices[size]?.['1-7'] || (basePrices.tier0 ? basePrices.tier0 + relativeUpcharge : null);
-                price1 = pricingData.prices[size]?.['8-23'] || (basePrices.tier1 ? basePrices.tier1 + relativeUpcharge : null);
-                price2 = pricingData.prices[size]?.['24-47'] || (basePrices.tier2 + relativeUpcharge);
-                price3 = pricingData.prices[size]?.['48-71'] || (basePrices.tier3 + relativeUpcharge);
-                price4 = pricingData.prices[size]?.['72+'] || (basePrices.tier4 + relativeUpcharge);
-            } else {
-                // Fall back to base price + relative upcharge
-                price0 = basePrices.tier0 ? basePrices.tier0 + relativeUpcharge : null;
-                price1 = basePrices.tier1 ? basePrices.tier1 + relativeUpcharge : null;
-                price2 = basePrices.tier2 + relativeUpcharge;
-                price3 = basePrices.tier3 + relativeUpcharge;
-                price4 = basePrices.tier4 + relativeUpcharge;
-            }
-
-            const extendedRow = document.createElement('tr');
-            extendedRow.innerHTML = `
-                <td class="size-cell">${size}</td>
-                <td class="price-cell ltm-column" data-base-price="${price0 || ''}">${price0 ? '$' + price0.toFixed(2) : '-'}</td>
-                <td class="price-cell">${price1 ? '$' + price1.toFixed(2) : '-'}</td>
-                <td class="price-cell">$${price2.toFixed(2)}</td>
-                <td class="price-cell">$${price3.toFixed(2)}</td>
-                <td class="price-cell">$${price4.toFixed(2)}</td>
-            `;
-            tbody.appendChild(extendedRow);
-        }
+        const relativeUpcharge = (displayAddOns[size] || 0) - minUpcharge;
+        if (relativeUpcharge <= 0) return;
+        const row = document.createElement('tr');
+        row.innerHTML = `<td class="size-cell">${size}</td>` + tiers.map(t => {
+            const exact = priceFor(t.TierLabel, size);
+            const price = exact || (basePrices[t.TierLabel] ? basePrices[t.TierLabel] + relativeUpcharge : null);
+            return cell(t, price);
+        }).join('');
+        tbody.appendChild(row);
     });
 
+}
+
+// ==================== API-DRIVEN TIER COLUMNS (2026-09-06) ====================
+// Erik's rule: every range a customer reads is pricing. The table columns used to be typed
+// (1-7 / 8-23 / 24-47 / 48-71 / 72+) while the prices came from the API tiers — a Caspio re-cut
+// would have priced right under wrong headers. Now the tiers drive the headers, the LTM column
+// and the per-tier cells.
+function apiTiersFrom(source) {
+    const raw = (source && (source.tierData || (source.apiData && source.apiData.tiersR) || source.tiersR)) || [];
+    return (Array.isArray(raw) ? raw : Object.values(raw))
+        .filter(t => t && Number.isFinite(Number(t.MinQuantity)))
+        .map(t => ({ ...t, MinQuantity: Number(t.MinQuantity), MaxQuantity: Number(t.MaxQuantity), LTM_Fee: parseFloat(t.LTM_Fee) || 0 }))
+        .sort((a, b) => a.MinQuantity - b.MinQuantity);
+}
+function tierHeaderText(t) { return (t.MaxQuantity >= 99999 || /\+$/.test(String(t.TierLabel))) ? `${t.MinQuantity}+ pieces` : `${t.MinQuantity}-${t.MaxQuantity} pieces`; }
+function renderTierHead(table, tiers, firstHeader) {
+    const thead = table && table.querySelector('thead');
+    if (!thead || !tiers.length) return;
+    thead.innerHTML = '<tr><th>' + firstHeader + '</th>' + tiers.map(t =>
+        `<th${t.LTM_Fee > 0 ? ' class="ltm-column"' : ''} data-tier="${t.TierLabel}">${tierHeaderText(t)}</th>`).join('') + '</tr>';
+}
+function renderSmallOrderCopy(tiers, unitWord) {
+    const ltm = tiers.find(t => t.LTM_Fee > 0);
+    if (!ltm) return;
+    const span = document.querySelector('#ltmCalculator h4 span');
+    if (span) span.textContent = `(${ltm.MinQuantity}-${ltm.MaxQuantity} ${unitWord})`;
+    document.querySelectorAll('.pricing-note').forEach(p => { p.textContent = `*${ltm.MinQuantity}-${ltm.MaxQuantity} piece prices vary by quantity selected below`; });
 }
 
 // Show loading state
@@ -954,23 +893,21 @@ function updateLTMCalculator() {
     renderLtmFeeWarning(isFallback, ltmFee);
     const ltmPerUnit = ltmFee / qty;
 
-    // Update main pricing table 1-7 column
+    // Update the small-order column (the API tier carrying the LTM fee)
     const rows = document.querySelectorAll('.pricing-table:not(.additional-logo-table) tbody tr');
     rows.forEach(row => {
-        const cells = row.querySelectorAll('td');
-        if (cells.length >= 2) {
-            const cell = cells[1]; // 1-7 column is index 1
-            const basePrice = parseFloat(cell.dataset.basePrice);
-            if (!isNaN(basePrice)) {
-                const allInPrice = basePrice + ltmPerUnit;
-                cell.textContent = '$' + allInPrice.toFixed(2);
-            }
-        }
+        const cell = row.querySelector('td.ltm-column');
+        if (!cell) return;
+        const basePrice = parseFloat(cell.dataset.basePrice);
+        if (!isNaN(basePrice)) cell.textContent = '$' + (basePrice + ltmPerUnit).toFixed(2);
     });
 
-    // Update column header to show qty context
+    // Update column header to show qty context (label from the API tier)
     const header = document.querySelector('.pricing-table:not(.additional-logo-table) thead th.ltm-column');
-    if (header) header.textContent = '1-7 pieces (' + qty + ' pcs)';
+    if (header) {
+        const label = header.dataset.tier || header.textContent.replace(/\s*\(.*$/, '').replace(' pieces', '');
+        header.textContent = label + ' pieces (' + qty + ' pcs)';
+    }
 }
 
 // Initialize calculator when DOM is ready

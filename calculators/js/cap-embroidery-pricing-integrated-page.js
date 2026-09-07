@@ -413,13 +413,14 @@ function calculateCapPrice(baseCapPrice, quantity, sizeUpcharge = 0) {
     return finalPrice;
 }
 
-// Get tier for quantity
+// Get tier for quantity — from the API tiers (Caspio Pricing_Tiers), never a typed threshold
 function getTierForQuantity(quantity) {
-    if (quantity >= 72) return '72+';
-    if (quantity >= 48) return '48-71';
-    if (quantity >= 24) return '24-47';
-    if (quantity >= 8) return '8-23';
-    return '1-7';
+    const tiers = apiTiersFrom(pricingData);
+    const hit = tiers.find(t => quantity >= t.MinQuantity && quantity <= t.MaxQuantity);
+    if (hit) return hit.TierLabel;
+    if (tiers.length) return quantity > tiers[tiers.length - 1].MaxQuantity ? tiers[tiers.length - 1].TierLabel : tiers[0].TierLabel;
+    console.error('❌ No API tiers loaded — cannot resolve a tier for quantity', quantity);
+    return null;
 }
 
 // Get embroidery price for tier (8000 stitches, no extra stitches)
@@ -449,10 +450,14 @@ function getEmbroideryPriceForTier(tier) {
         return parseFloat(embroideryDataAny.EmbroideryCost);
     }
 
-    // For 1-7 and 8-23 tiers, fall back to 24-47 tier price (same embroidery cost, different quantity breaks)
-    // This handles backward compatibility when API doesn't have new tier data yet
-    if (tier === '1-7' || tier === '8-23') {
-        return getEmbroideryPriceForTier('24-47');
+    // A small-order tier with no cost row of its own prices at the lowest tier that HAS one (the same
+    // rule the canonical engines use) — never a typed '24-47'.
+    const tiers = apiTiersFrom(pricingData);
+    const me = tiers.find(t => t.TierLabel === tier);
+    if (me) {
+        const withCosts = tiers.find(t => t.MinQuantity > me.MinQuantity &&
+            pricingData.apiData.allEmbroideryCostsR.some(e => e.TierLabel === t.TierLabel));
+        if (withCosts) return getEmbroideryPriceForTier(withCosts.TierLabel);
     }
 
     // NO FALLBACKS for other tiers - API data is required for accurate pricing
@@ -490,6 +495,12 @@ function updateCapPricing() {
     }
 
 
+    // Columns are the API tiers (see apiTiersFrom); the LTM column is whichever tier carries the fee
+    const tiers = apiTiersFrom(pricingData);
+    const table = document.querySelector('.pricing-table:not(.additional-logo-table)');
+    renderTierHead(table, tiers, 'Size Range');
+    renderSmallOrderCopy(tiers, 'caps');
+
     // Generate rows for each size
     currentSizes.forEach(size => {
         const row = document.createElement('tr');
@@ -497,31 +508,48 @@ function updateCapPricing() {
         // Get upcharge for this size
         const upcharge = window.currentSizeUpcharges?.[size] || 0;
 
-        // Calculate prices for each tier (all 5 tiers)
-        const price1_7 = calculateCapPrice(baseCapPrice, 1, upcharge);
-        const price8_23 = calculateCapPrice(baseCapPrice, 8, upcharge);
-        const price24 = calculateCapPrice(baseCapPrice, 24, upcharge);
-        const price48 = calculateCapPrice(baseCapPrice, 48, upcharge);
-        const price72 = calculateCapPrice(baseCapPrice, 72, upcharge);
-
-        // Build row HTML
         let sizeDisplay = size;
         if (upcharge > 0) {
             sizeDisplay += ` <span class="size-note">(+$${upcharge.toFixed(2)} upcharge)</span>`;
         }
 
-        row.innerHTML = `
-            <td>${sizeDisplay}</td>
-            <td class="ltm-column" data-base-price="${price1_7}"><span class="price">$${price1_7.toFixed(2)}</span></td>
-            <td><span class="price">$${price8_23.toFixed(2)}</span></td>
-            <td><span class="price">$${price24.toFixed(2)}</span></td>
-            <td><span class="price">$${price48.toFixed(2)}</span></td>
-            <td><span class="price">$${price72.toFixed(2)}</span></td>
-        `;
+        row.innerHTML = `<td>${sizeDisplay}</td>` + tiers.map(t => {
+            const price = calculateCapPrice(baseCapPrice, t.MinQuantity, upcharge);
+            return t.LTM_Fee > 0
+                ? `<td class="ltm-column" data-base-price="${price}"><span class="price">$${price.toFixed(2)}</span></td>`
+                : `<td><span class="price">$${price.toFixed(2)}</span></td>`;
+        }).join('');
 
         tbody.appendChild(row);
     });
 
+}
+
+// ==================== API-DRIVEN TIER COLUMNS (2026-09-06) ====================
+// Erik's rule: every range a customer reads is pricing. The table columns used to be typed
+// (1-7 / 8-23 / 24-47 / 48-71 / 72+) while the prices came from the API tiers — a Caspio re-cut
+// would have priced right under wrong headers. Now the tiers drive the headers, the LTM column
+// and the per-tier cells.
+function apiTiersFrom(source) {
+    const raw = (source && (source.tierData || (source.apiData && source.apiData.tiersR) || source.tiersR)) || [];
+    return (Array.isArray(raw) ? raw : Object.values(raw))
+        .filter(t => t && Number.isFinite(Number(t.MinQuantity)))
+        .map(t => ({ ...t, MinQuantity: Number(t.MinQuantity), MaxQuantity: Number(t.MaxQuantity), LTM_Fee: parseFloat(t.LTM_Fee) || 0 }))
+        .sort((a, b) => a.MinQuantity - b.MinQuantity);
+}
+function tierHeaderText(t) { return (t.MaxQuantity >= 99999 || /\+$/.test(String(t.TierLabel))) ? `${t.MinQuantity}+ pieces` : `${t.MinQuantity}-${t.MaxQuantity} pieces`; }
+function renderTierHead(table, tiers, firstHeader) {
+    const thead = table && table.querySelector('thead');
+    if (!thead || !tiers.length) return;
+    thead.innerHTML = '<tr><th>' + firstHeader + '</th>' + tiers.map(t =>
+        `<th${t.LTM_Fee > 0 ? ' class="ltm-column"' : ''} data-tier="${t.TierLabel}">${tierHeaderText(t)}</th>`).join('') + '</tr>';
+}
+function renderSmallOrderCopy(tiers, unitWord) {
+    const ltm = tiers.find(t => t.LTM_Fee > 0);
+    if (!ltm) return;
+    const span = document.querySelector('#ltmCalculator h4 span');
+    if (span) span.textContent = `(${ltm.MinQuantity}-${ltm.MaxQuantity} ${unitWord})`;
+    document.querySelectorAll('.pricing-note').forEach(p => { p.textContent = `*${ltm.MinQuantity}-${ltm.MaxQuantity} piece prices vary by quantity selected below`; });
 }
 
 // Update product information
@@ -876,27 +904,31 @@ function updateLTMCapPricing() {
 // Recalculate all 1-7 column cells based on selected quantity
 function updateLTMCalculator() {
     const qty = parseInt(document.getElementById('ltmQuantity')?.value || 3);
-    const LTM_FEE = 50;
+    // The small-order fee is the API tier's LTM_Fee (Caspio Pricing_Tiers) — it used to be a typed 50.
+    const ltmTier = apiTiersFrom(pricingData).find(t => t.LTM_Fee > 0);
+    const isFallback = !ltmTier;
+    const LTM_FEE = ltmTier ? ltmTier.LTM_Fee : 50;
+    if (isFallback) console.warn('[CapEmbroidery] No LTM tier in the API data yet — small-order fee shown as a $50 estimate');
     const ltmPerUnit = LTM_FEE / qty;
 
-    // Update main pricing table 1-7 column
+    // Update the small-order column (the API tier carrying the LTM fee)
     const rows = document.querySelectorAll('.pricing-table:not(.additional-logo-table) tbody tr');
     rows.forEach(row => {
-        const cells = row.querySelectorAll('td');
-        if (cells.length >= 2) {
-            const cell = cells[1]; // 1-7 column is index 1
-            const basePrice = parseFloat(cell.dataset.basePrice);
-            if (!isNaN(basePrice)) {
-                const allInPrice = basePrice + ltmPerUnit;
-                const span = cell.querySelector('.price') || cell;
-                span.textContent = '$' + allInPrice.toFixed(2);
-            }
+        const cell = row.querySelector('td.ltm-column');
+        if (!cell) return;
+        const basePrice = parseFloat(cell.dataset.basePrice);
+        if (!isNaN(basePrice)) {
+            const span = cell.querySelector('.price') || cell;
+            span.textContent = '$' + (basePrice + ltmPerUnit).toFixed(2);
         }
     });
 
-    // Update column header to show qty context
+    // Update column header to show qty context (label from the API tier)
     const header = document.querySelector('.pricing-table:not(.additional-logo-table) thead th.ltm-column');
-    if (header) header.textContent = '1-7 pieces (' + qty + ' pcs)';
+    if (header) {
+        const label = header.dataset.tier || header.textContent.replace(/\s*\(.*$/, '').replace(' pieces', '');
+        header.textContent = label + ' pieces (' + qty + ' pcs)' + (isFallback ? ' ⚠ est.' : '');
+    }
 }
 
 // Initialize calculator when DOM is ready
