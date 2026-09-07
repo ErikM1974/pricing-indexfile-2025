@@ -1,3 +1,9 @@
+## v2026.09.06.45 (2026.09.06)
+
+- Memory: cross-surface parity run recorded — DTF $0.00 root cause, table of all five calculators vs the engine (v2026.09.06.44)
+- DTF page: guard the retired refreshTransferPricing() call on the fallback path (TypeError); LESSONS under the cap
+- Deploy v2026.09.06.45: DTF fallback-path guard
+
 ## v2026.09.06.44 (2026.09.06)
 
 - Memory: DTG sub-24 parity fix recorded (v2026.09.06.43)
