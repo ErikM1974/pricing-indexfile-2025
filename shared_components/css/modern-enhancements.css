@@ -1,3 +1,5 @@
+/* stylelint-disable no-duplicate-selectors -- legacy sheet: rules were appended over time; merging them would reorder the cascade (2026-09-07) */
+
 /* ============================================
    PHASE 1: VISUAL FOUNDATION
    Modern enhancements for cap-embroidery-pricing
@@ -5,55 +7,72 @@
 
 /* 1. MODERN COLOR SYSTEM
    ============================================ */
+
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue, merged into its
+   existing :root. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
 :root {
+    --modern-enhancements-green: #3d7a2a;
+    --modern-enhancements-green-dark: #1e4d0f;
+    --modern-enhancements-green-2: #4a8837;
+    --modern-enhancements-green-3: #6fd86f;
+    --modern-enhancements-gray: #adb5bd;
+    --modern-enhancements-gray-dark: #343a40;
+    --modern-enhancements-green-4: #28a745;
+    --modern-enhancements-teal: #17a2b8;
+    --modern-enhancements-yellow: #ffc107;
+    --modern-enhancements-red: #dc3545;
+    --modern-enhancements-gray-dark-2: #000;
+    --modern-enhancements-teal-dark: #00695c;
+
     /* Primary colors with gradients */
-    --primary-color: #2f661e;
-    --primary-dark: #1e4d0f;
-    --primary-light: #eaf2e9;
-    --primary-gradient: linear-gradient(135deg, #2f661e 0%, #3d7a2a 100%);
-    --primary-gradient-hover: linear-gradient(135deg, #3d7a2a 0%, #4a8837 100%);
+    --primary-color: var(--brand-700);
+    --primary-dark: var(--modern-enhancements-green-dark);
+    --primary-light: var(--brand-100);
+    --primary-gradient: linear-gradient(135deg, var(--brand-700) 0%, var(--modern-enhancements-green) 100%);
+    --primary-gradient-hover: linear-gradient(135deg, var(--modern-enhancements-green) 0%, var(--modern-enhancements-green-2) 100%);
     
     /* Secondary colors */
-    --secondary-color: #5cb85c;
-    --secondary-light: #eaffea;
-    --secondary-gradient: linear-gradient(135deg, #5cb85c 0%, #6fd86f 100%);
+    --secondary-color: var(--brand-500);
+    --secondary-light: var(--color-steve-tint);
+    --secondary-gradient: linear-gradient(135deg, var(--brand-500) 0%, var(--modern-enhancements-green-3) 100%);
     
     /* Neutral palette */
-    --neutral-50: #fafafa;
-    --neutral-100: #f8f9fa;
-    --neutral-200: #e9ecef;
-    --neutral-300: #dee2e6;
-    --neutral-400: #ced4da;
-    --neutral-500: #adb5bd;
-    --neutral-600: #6c757d;
-    --neutral-700: #495057;
-    --neutral-800: #343a40;
-    --neutral-900: #212529;
+    --neutral-50: var(--gray-50);
+    --neutral-100: var(--gray-50);
+    --neutral-200: var(--gray-200);
+    --neutral-300: var(--gray-200);
+    --neutral-400: var(--gray-300);
+    --neutral-500: var(--modern-enhancements-gray);
+    --neutral-600: var(--gray-500);
+    --neutral-700: var(--gray-600);
+    --neutral-800: var(--modern-enhancements-gray-dark);
+    --neutral-900: var(--gray-800);
     
     /* Semantic colors */
-    --success-color: #28a745;
-    --success-light: #d4edda;
-    --info-color: #17a2b8;
-    --info-light: #d1ecf1;
-    --warning-color: #ffc107;
-    --warning-light: #fff3cd;
-    --danger-color: #dc3545;
-    --danger-light: #f8d7da;
+    --success-color: var(--modern-enhancements-green-4);
+    --success-light: var(--store-green-100);
+    --info-color: var(--modern-enhancements-teal);
+    --info-light: var(--sky-100);
+    --warning-color: var(--modern-enhancements-yellow);
+    --warning-light: var(--amber-100);
+    --danger-color: var(--modern-enhancements-red);
+    --danger-light: var(--red-100);
     
     /* Shadows - more subtle and modern */
-    --shadow-xs: 0 1px 3px rgba(0, 0, 0, 0.05);
-    --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.08);
-    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
-    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
-    --shadow-xl: 0 12px 48px rgba(0, 0, 0, 0.15);
+    --shadow-xs: 0 1px 3px rgb(0 0 0 / 5%);
+    --shadow-sm: 0 2px 6px rgb(0 0 0 / 8%);
+    --shadow-md: 0 4px 12px rgb(0 0 0 / 10%);
+    --shadow-lg: 0 8px 24px rgb(0 0 0 / 12%);
+    --shadow-xl: 0 12px 48px rgb(0 0 0 / 15%);
     
     /* Colored shadows for depth */
-    --shadow-primary: 0 4px 14px rgba(47, 102, 30, 0.15);
-    --shadow-success: 0 4px 14px rgba(40, 167, 69, 0.15);
+    --shadow-primary: 0 4px 14px rgb(47 102 30 / 15%);
+    --shadow-success: 0 4px 14px rgb(40 167 69 / 15%);
     
     /* Border radius system */
     --radius-xs: 4px;
-    --radius-sm: 6px;
     --radius-md: 8px;
     --radius-lg: 12px;
     --radius-xl: 16px;
@@ -66,6 +85,7 @@
     --transition-slow: 350ms ease;
     --transition-slower: 500ms ease;
 }
+/* stylelint-enable color-no-hex */
 
 /* 2. MODERN SPACING SYSTEM
    ============================================ */
@@ -189,6 +209,7 @@ h4 {
     from {
         transform: translateX(-100%);
     }
+
     to {
         transform: translateX(0);
     }
@@ -276,7 +297,7 @@ h4 {
 
 .thumbnail-item.active {
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(47, 102, 30, 0.1);
+    box-shadow: 0 0 0 3px rgb(47 102 30 / 10%);
 }
 
 /* Enhanced color swatches */
@@ -294,7 +315,7 @@ h4 {
     left: 50%;
     width: 0;
     height: 0;
-    background: rgba(255, 255, 255, 0.3);
+    background: rgb(255 255 255 / 30%);
     border-radius: 50%;
     transform: translate(-50%, -50%);
     transition: all var(--transition-slow);
@@ -313,7 +334,7 @@ h4 {
 
 .color-swatch.active {
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 4px rgba(47, 102, 30, 0.2);
+    box-shadow: 0 0 0 4px rgb(47 102 30 / 20%);
     transform: scale(1.05);
 }
 
@@ -399,7 +420,7 @@ h4 {
     left: 50%;
     width: 0;
     height: 0;
-    background: rgba(255, 255, 255, 0.2);
+    background: rgb(255 255 255 / 20%);
     border-radius: 50%;
     transform: translate(-50%, -50%);
     transition: all var(--transition-slow);
@@ -447,12 +468,12 @@ h4 {
 .quantity-input:focus {
     outline: none;
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(47, 102, 30, 0.1);
+    box-shadow: 0 0 0 3px rgb(47 102 30 / 10%);
 }
 
 /* Enhanced size cards */
 .size-card {
-    background: linear-gradient(135deg, var(--primary-light) 0%, rgba(234, 242, 233, 0.5) 100%);
+    background: linear-gradient(135deg, var(--primary-light) 0%, rgb(234 242 233 / 50%) 100%);
     border: 2px solid transparent;
     border-radius: var(--radius-lg);
     padding: var(--space-lg);
@@ -473,7 +494,7 @@ h4 {
 
 /* Enhanced cart summary */
 .cart-summary {
-    background: linear-gradient(135deg, var(--primary-light) 0%, rgba(234, 242, 233, 0.7) 100%);
+    background: linear-gradient(135deg, var(--primary-light) 0%, rgb(234 242 233 / 70%) 100%);
     border-radius: var(--radius-lg);
     padding: var(--space-xl);
     box-shadow: var(--shadow-md);
@@ -504,7 +525,7 @@ select:hover {
 select:focus {
     outline: none;
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(47, 102, 30, 0.1);
+    box-shadow: 0 0 0 3px rgb(47 102 30 / 10%);
 }
 
 /* Enhanced loading states */
@@ -550,7 +571,7 @@ select:focus {
 /* Enhanced info boxes */
 .pricing-tier-info,
 .ltm-fee-notice {
-    background: linear-gradient(135deg, var(--info-light) 0%, rgba(209, 236, 241, 0.5) 100%);
+    background: linear-gradient(135deg, var(--info-light) 0%, rgb(209 236 241 / 50%) 100%);
     border-radius: var(--radius-lg);
     padding: var(--space-lg);
     border-left: 4px solid var(--info-color);
@@ -588,6 +609,7 @@ select,
         opacity: 0;
         transform: translateY(20px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -597,13 +619,15 @@ select,
 /* Pulse animation for active elements */
 @keyframes pulse {
     0% {
-        box-shadow: 0 0 0 0 rgba(47, 102, 30, 0.4);
+        box-shadow: 0 0 0 0 rgb(47 102 30 / 40%);
     }
+
     70% {
-        box-shadow: 0 0 0 10px rgba(47, 102, 30, 0);
+        box-shadow: 0 0 0 10px rgb(47 102 30 / 0%);
     }
+
     100% {
-        box-shadow: 0 0 0 0 rgba(47, 102, 30, 0);
+        box-shadow: 0 0 0 0 rgb(47 102 30 / 0%);
     }
 }
 
@@ -614,7 +638,7 @@ select,
 /* 7. RESPONSIVE ADJUSTMENTS
    ============================================ */
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
     :root {
         --text-base: 0.875rem;  /* 14px on mobile */
     }
@@ -637,7 +661,7 @@ select,
     }
 }
 
-@media (max-width: 480px) {
+@media (width <= 480px) {
     :root {
         --text-base: 0.8125rem;  /* 13px on small mobile */
     }
@@ -661,12 +685,13 @@ select,
     }
     
     .no-print {
+        /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
         display: none !important;
     }
     
     .pricing-grid {
         box-shadow: none;
-        border: 1px solid #000;
+        border: 1px solid var(--modern-enhancements-gray-dark-2);
     }
 }
 
@@ -679,7 +704,7 @@ select,
     align-items: center;
     gap: var(--space-md);
     padding: var(--space-md) var(--space-lg);
-    background: linear-gradient(135deg, var(--info-light) 0%, rgba(209, 236, 241, 0.3) 100%);
+    background: linear-gradient(135deg, var(--info-light) 0%, rgb(209 236 241 / 30%) 100%);
     border-radius: var(--radius-lg);
     border: 2px solid var(--info-color);
     margin-bottom: var(--space-lg);
@@ -709,7 +734,7 @@ select,
 .back-logo-pricing-info {
     margin-top: var(--space-md);
     padding: var(--space-md) var(--space-lg);
-    background: linear-gradient(135deg, var(--info-light) 0%, rgba(209, 236, 241, 0.3) 100%);
+    background: linear-gradient(135deg, var(--info-light) 0%, rgb(209 236 241 / 30%) 100%);
     border-radius: var(--radius-lg);
     border: 2px solid var(--info-color);
     font-size: var(--text-sm);
@@ -738,6 +763,7 @@ select,
         opacity: 0;
         transform: translateY(-10px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -780,7 +806,7 @@ select,
 }
 
 /* Responsive adjustments for back logo */
-@media (max-width: 768px) {
+@media (width <= 768px) {
     .back-logo-option {
         padding: var(--space-sm) var(--space-md);
     }
@@ -800,20 +826,28 @@ select,
         width: 100%;
     }
 }
+
 /* Screen Print Pricing V2 - Subtitle Enhancements */
 .sp-price-subtitle { /* Existing class for the dynamic subtitle container */
+    /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
     font-size: 0.85em !important; /* Increased from 0.8em in JS, or default 14px in HTML */
+    /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
     line-height: 1.4 !important;   /* Increased for better readability of multi-line */
-    /* color: #555; */ /* Slightly darker than default #666 if needed, but let's test default first */
+
+    /* color: #555; */
+
+ /* Slightly darker than default #666 if needed, but let's test default first */
 }
 
 .sp-dark-garment-indicator { /* Existing class for the dark garment text */
+    /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
     font-size: 0.85em !important; /* Further increased for prominence */
     font-weight: bold;
-    color: #555 !important; /* Slightly darker grey for better visibility */
+    /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
+    color: var(--print-ink-soft) !important; /* Slightly darker grey for better visibility */
 }
 
 .sp-print-only-total { /* New class for the print-only sum */
     font-weight: bold;
-    color: #00695C; /* A distinct, readable teal/green color */
+    color: var(--modern-enhancements-teal-dark); /* A distinct, readable teal/green color */
 }

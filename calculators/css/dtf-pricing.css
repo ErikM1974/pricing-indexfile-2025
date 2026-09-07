@@ -1,13 +1,30 @@
-/* dtf-pricing.css — extracted 2026-09-06 from 2 inline <style> block(s) in dtf-pricing.html (Rule 3). */
+/* stylelint-disable declaration-no-important -- override stack: this calculator page layers fix/override sheets and JS-injected styles; the flags come out together when the page is untangled (2026-09-07) */
+
+/* dtf-pricing.css — extracted 2026-09-06 from 2 inline \3c style> block(s) in dtf-pricing.html (Rule 3). */
+
 /* CRITICAL: Override blue theme with green - MUST be inline to override JS */
+
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue, merged into its
+   existing :root. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
 :root {
+    --dtf-pricing-gray: #666;
+    --dtf-pricing-gray-dark: #333;
+    --dtf-pricing-teal: #add;
+    --dtf-pricing-cyan: #007bff;
+    --dtf-pricing-cyan-2: #0056b3;
+    --dtf-pricing-gray-2: #bdbdbd;
+    --dtf-pricing-red: #f87171;
+
     /* Phase 2d (2026-05-23): var() ref so PNW palette resolves via shell.css */
-    --primary-color: var(--pnw-forest, #4cb354) !important;  /* PNW forest */
-    --primary: var(--pnw-forest, #4cb354) !important;
-    --primary-dark: var(--pnw-forest-deep, #409a47) !important;
-    --primary-light: var(--pnw-mist, #e8f5e9) !important;
-    --nwca-primary: var(--pnw-forest, #4cb354) !important;
+    --primary-color: var(--pnw-forest, var(--brand-500)) !important;  /* PNW forest */
+    --primary: var(--pnw-forest, var(--brand-500)) !important;
+    --primary-dark: var(--pnw-forest-deep, var(--brand-600)) !important;
+    --primary-light: var(--pnw-mist, var(--brand-100)) !important;
+    --nwca-primary: var(--pnw-forest, var(--brand-500)) !important;
 }
+/* stylelint-enable color-no-hex */
 
 /* Enhanced Header Styles for DTF */
 body.dtf-pricing-page {
@@ -16,7 +33,7 @@ body.dtf-pricing-page {
 
 .enhanced-pricing-header {
     background: white;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 8px rgb(0 0 0 / 10%);
     position: fixed;
     top: 0;
     left: 0;
@@ -26,7 +43,7 @@ body.dtf-pricing-page {
 
 /* Top contact bar */
 .header-contact-bar {
-    background: #409a47;  /* Updated to match DTG dark green */
+    background: var(--brand-600);  /* Updated to match DTG dark green */
     color: white;
     padding: 10px 0;
     font-size: 14px;
@@ -67,7 +84,7 @@ body.dtf-pricing-page {
 .header-nav {
     padding: 15px 0;
     background: white;
-    border-bottom: 1px solid #e0e0e0;
+    border-bottom: 1px solid var(--gray-200);
 }
 
 .nav-content {
@@ -95,8 +112,8 @@ body.dtf-pricing-page {
 
 /* Pricing Context Bar */
 .pricing-context-bar {
-    background: #f8f9fa;
-    border-bottom: 2px solid #4cb354;  /* Updated to match DTG green */
+    background: var(--gray-50);
+    border-bottom: 2px solid var(--brand-500);  /* Updated to match DTG green */
     padding: 15px 0;
 }
 
@@ -112,7 +129,7 @@ body.dtf-pricing-page {
 .breadcrumb {
     font-size: 18px;
     font-weight: 600;
-    color: #4cb354;  /* Updated to match DTG green */
+    color: var(--brand-500);  /* Updated to match DTG green */
 }
 
 /* Live Pricing Display */
@@ -130,23 +147,23 @@ body.dtf-pricing-page {
 
 .header-price-label {
     font-size: 14px;
-    color: #666;
+    color: var(--dtf-pricing-gray);
     font-weight: 500;
 }
 
 .header-price-value {
     font-size: 20px;
     font-weight: 700;
-    color: #333;
+    color: var(--dtf-pricing-gray-dark);
 }
 
 .header-price-value.highlight {
-    color: #4cb354;  /* Updated to match DTG green */
+    color: var(--brand-500);  /* Updated to match DTG green */
     font-size: 24px;
 }
 
 /* Responsive adjustments */
-@media (max-width: 768px) {
+@media (width <= 768px) {
     body.dtf-pricing-page {
         padding-top: 220px;
     }
@@ -184,7 +201,7 @@ body.dtf-pricing-page {
 .universal-header,
 .pricing-header,
 .header-container {
-    background: linear-gradient(135deg, #4cb354 0%, #409a47 100%) !important;  /* Updated to match DTG gradient */
+    background: linear-gradient(135deg, var(--brand-500) 0%, var(--brand-600) 100%) !important;  /* Updated to match DTG gradient */
 }
 
 /* Override any blue colors in buttons and links */
@@ -192,30 +209,30 @@ body.dtf-pricing-page {
 .action-btn,
 .dtf-btn,
 button[type="submit"] {
-    background-color: #4cb354 !important;  /* Updated to match DTG green */
-    border-color: #4cb354 !important;
+    background-color: var(--brand-500) !important;  /* Updated to match DTG green */
+    border-color: var(--brand-500) !important;
 }
 
 .btn-primary:hover,
 .action-btn:hover,
 .dtf-btn:hover,
 button[type="submit"]:hover {
-    background-color: #409a47 !important;  /* Updated to match DTG dark green */
-    border-color: #409a47 !important;
+    background-color: var(--brand-600) !important;  /* Updated to match DTG dark green */
+    border-color: var(--brand-600) !important;
 }
 
 a {
-    color: #4cb354 !important;  /* Updated to match DTG green */
+    color: var(--brand-500) !important;  /* Updated to match DTG green */
 }
 
 /* DTF Calculator specific overrides */
 .dtf-calculator-header {
-    background: #4cb354 !important;  /* Updated to match DTG green */
+    background: var(--brand-500) !important;  /* Updated to match DTG green */
 }
 
 .dtf-price-display {
-    color: #4cb354 !important;  /* Updated to match DTG green */
-    border-color: #4cb354 !important;
+    color: var(--brand-500) !important;  /* Updated to match DTG green */
+    border-color: var(--brand-500) !important;
 }
 
 /* Critical internal-only hiding styles - must be inline for immediate effect */
@@ -257,11 +274,11 @@ body.show-internal .accordion-item.internal-only {
 
 /* Page header styles */
 .page-header {
-    background: linear-gradient(135deg, #007bff, #0056b3);
+    background: linear-gradient(135deg, var(--dtf-pricing-cyan), var(--dtf-pricing-cyan-2));
     color: white;
     padding: 30px 0;
     margin-bottom: 30px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 15px rgb(0 0 0 / 10%);
 }
 
 .page-header h1 {
@@ -275,7 +292,7 @@ body.show-internal .accordion-item.internal-only {
     opacity: 0.9;
 }
 
-@media (max-width: 992px) {
+@media (width <= 992px) {
     .product-page-columns-container {
         flex-direction: column;
     }
@@ -289,6 +306,7 @@ body.show-internal .accordion-item.internal-only {
         font-size: 2rem;
     }
 }
+
 /* Breadcrumb Links */
 .breadcrumb a {
     color: var(--primary-color);
@@ -311,7 +329,7 @@ body.show-internal .accordion-item.internal-only {
 
 .search-input {
     padding: 12px 16px;
-    border: 1px solid #e0e0e0;
+    border: 1px solid var(--gray-200);
     border-radius: 8px;
     font-size: 14px;
     font-weight: 500;
@@ -322,7 +340,7 @@ body.show-internal .accordion-item.internal-only {
 .search-input:focus {
     outline: none;
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(58, 124, 82, 0.1);
+    box-shadow: 0 0 0 3px rgb(58 124 82 / 10%);
 }
 
 .search-btn {
@@ -347,14 +365,14 @@ body.show-internal .accordion-item.internal-only {
     left: 0;
     right: 0;
     background: white;
-    border: 1px solid #e0e0e0;
+    border: 1px solid var(--gray-200);
     border-radius: 8px;
     margin-top: 4px;
     max-height: 400px;
     overflow-y: auto;
     display: none;
     z-index: 1000;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 6px rgb(0 0 0 / 10%);
 }
 
 .search-results.active {
@@ -364,24 +382,24 @@ body.show-internal .accordion-item.internal-only {
 .search-loading {
     padding: 12px;
     text-align: center;
-    color: #666;
+    color: var(--dtf-pricing-gray);
 }
 
 .search-no-results {
     padding: 12px;
     text-align: center;
-    color: #666;
+    color: var(--dtf-pricing-gray);
 }
 
 .search-result-item {
     padding: 10px 12px;
     cursor: pointer;
-    border-bottom: 1px solid #f3f4f6;
+    border-bottom: 1px solid var(--gray-100);
     transition: background-color 0.2s;
 }
 
 .search-result-item:hover {
-    background-color: #f9fafb;
+    background-color: var(--gray-50);
 }
 
 .search-result-item:last-child {
@@ -390,11 +408,11 @@ body.show-internal .accordion-item.internal-only {
 
 .search-result-style {
     font-weight: 600;
-    color: #333;
+    color: var(--dtf-pricing-gray-dark);
 }
 
 .search-result-desc {
-    color: #666;
+    color: var(--dtf-pricing-gray);
     font-size: 0.875rem;
     margin-top: 2px;
 }
@@ -403,7 +421,7 @@ body.show-internal .accordion-item.internal-only {
 .loading {
     text-align: center;
     padding: 100px 20px;
-    color: #666;
+    color: var(--dtf-pricing-gray);
 }
 
 .loading i {
@@ -421,14 +439,14 @@ body.show-internal .accordion-item.internal-only {
 .product-hero {
     background: white;
     border-radius: 16px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 6px rgb(0 0 0 / 10%);
     overflow: hidden;
     margin-bottom: 40px;
     transition: box-shadow 0.3s ease;
 }
 
 .product-hero:hover {
-    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 10px 15px rgb(0 0 0 / 10%);
 }
 
 .product-content {
@@ -440,7 +458,7 @@ body.show-internal .accordion-item.internal-only {
 
 /* Product Image Section */
 .product-image-section {
-    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    background: linear-gradient(135deg, var(--gray-50), var(--gray-200));
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -482,7 +500,7 @@ body.show-internal .accordion-item.internal-only {
     background: white;
     border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 6px rgb(0 0 0 / 10%);
 }
 
 .product-image {
@@ -501,13 +519,13 @@ body.show-internal .accordion-item.internal-only {
 .image-placeholder {
     width: 100%;
     height: 100%;
-    background: linear-gradient(135deg, #e0e0e0, #bdbdbd);
+    background: linear-gradient(135deg, var(--gray-200), var(--dtf-pricing-gray-2));
     border-radius: 12px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    color: #666;
+    color: var(--dtf-pricing-gray);
     font-size: 18px;
     font-weight: 600;
 }
@@ -521,17 +539,17 @@ body.show-internal .accordion-item.internal-only {
 }
 
 .product-title {
-    font-family: 'Poppins', sans-serif;
+    font-family: Poppins, sans-serif;
     font-size: 28px;
     font-weight: 700;
-    color: #333;
+    color: var(--dtf-pricing-gray-dark);
     margin-bottom: 8px;
     line-height: 1.3;
 }
 
 .product-description {
     font-size: 16px;
-    color: #666;
+    color: var(--dtf-pricing-gray);
     margin-bottom: 24px;
     line-height: 1.6;
 }
@@ -548,7 +566,7 @@ body.show-internal .accordion-item.internal-only {
     align-items: center;
     gap: 12px;
     font-size: 14px;
-    color: #666;
+    color: var(--dtf-pricing-gray);
 }
 
 .product-detail-item i {
@@ -558,7 +576,7 @@ body.show-internal .accordion-item.internal-only {
 
 .product-detail-value {
     font-weight: 600;
-    color: #333;
+    color: var(--dtf-pricing-gray-dark);
 }
 
 /* Color Swatches */
@@ -569,7 +587,7 @@ body.show-internal .accordion-item.internal-only {
 .color-swatches-title {
     font-size: 16px;
     font-weight: 600;
-    color: #333;
+    color: var(--dtf-pricing-gray-dark);
     margin-bottom: 16px;
 }
 
@@ -583,7 +601,7 @@ body.show-internal .accordion-item.internal-only {
     width: 40px;
     height: 40px;
     border-radius: 8px;
-    border: 2px solid #e5e7eb;
+    border: 2px solid var(--gray-200);
     cursor: pointer;
     transition: all 0.3s ease;
     position: relative;
@@ -597,11 +615,11 @@ body.show-internal .accordion-item.internal-only {
 
 .color-swatch.active {
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 2px rgba(58, 124, 82, 0.3);
+    box-shadow: 0 0 0 2px rgb(58 124 82 / 30%);
 }
 
 /* Responsive adjustments for product hero */
-@media (max-width: 768px) {
+@media (width <= 768px) {
     .product-content {
         grid-template-columns: 1fr;
     }
@@ -618,18 +636,18 @@ body.show-internal .accordion-item.internal-only {
 /* DTF toggle items styling to match DTG */
 body.dtf-pricing-page .dtf-toggle-item.active,
 .dtf-toggle-item.active {
-    background: #e8f5e9 !important;  /* Light green background like DTG */
-    background-color: #e8f5e9 !important;
+    background: var(--brand-100) !important;  /* Light green background like DTG */
+    background-color: var(--brand-100) !important;
     background-image: none !important;
-    border: 3px solid #4cb354 !important;
-    color: #4cb354 !important;
-    box-shadow: 0 0 0 2px rgba(76, 179, 84, 0.2) !important;
+    border: 3px solid var(--brand-500) !important;
+    color: var(--brand-500) !important;
+    box-shadow: 0 0 0 2px rgb(76 179 84 / 20%) !important;
 }
 
 /* Ensure toggle label text is green, not white */
 body.dtf-pricing-page .dtf-toggle-item.active .dtf-toggle-label,
 .dtf-toggle-item.active .dtf-toggle-label {
-    color: #4cb354 !important;
+    color: var(--brand-500) !important;
     font-weight: 600 !important;
 }
 
@@ -639,11 +657,11 @@ body.dtf-pricing-page .dtf-tier-button.selected,
     background: white !important;
     background-color: white !important;
     background-image: none !important;
-    border: 3px solid #4cb354 !important;
+    border: 3px solid var(--brand-500) !important;
     border-width: 3px !important;
-    color: #4cb354 !important;
+    color: var(--brand-500) !important;
     font-weight: 600 !important;
-    box-shadow: 0 0 0 2px rgba(76, 179, 84, 0.2) !important;
+    box-shadow: 0 0 0 2px rgb(76 179 84 / 20%) !important;
 }
 
 /* Prevent any pseudo-elements from adding backgrounds */
@@ -657,7 +675,7 @@ body.dtf-pricing-page .dtf-tier-button.selected,
 
 /* Keep the toggle switch slider green when active */
 .dtf-toggle-item.active .dtf-toggle-switch {
-    background: #4cb354 !important;
+    background: var(--brand-500) !important;
 }
 
 .dtf-toggle-item.active .dtf-toggle-switch .dtf-toggle-slider {
@@ -666,17 +684,17 @@ body.dtf-pricing-page .dtf-tier-button.selected,
 
 /* Override hover states to maintain proper backgrounds */
 .dtf-toggle-item.active:hover {
-    background: #e8f5e9 !important;  /* Keep light green on hover */
-    background-color: #e8f5e9 !important;
-    border-color: #4cb354 !important;
+    background: var(--brand-100) !important;  /* Keep light green on hover */
+    background-color: var(--brand-100) !important;
+    border-color: var(--brand-500) !important;
 }
 
 .dtf-tier-button.selected:hover {
     background: white !important;  /* Keep tier buttons white as per DTG */
     background-color: white !important;
-    border-color: #4cb354 !important;
+    border-color: var(--brand-500) !important;
 }
 
 /* 2026-09-06 review: the hidden attribute must beat any display rule */
 [hidden] { display: none !important; }
-.calc-inline-alert { margin: 12px auto; max-width: 960px; padding: 12px 16px; border-radius: 8px; background: #fee2e2; color: #991b1b; border: 1px solid #f87171; font-weight: 600; }
+.calc-inline-alert { margin: 12px auto; max-width: 960px; padding: 12px 16px; border-radius: 8px; background: var(--red-100); color: var(--red-800); border: 1px solid var(--dtf-pricing-red); font-weight: 600; }

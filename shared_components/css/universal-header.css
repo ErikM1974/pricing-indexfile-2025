@@ -1,11 +1,13 @@
+/* stylelint-disable declaration-no-important -- override stack: this calculator page layers fix/override sheets and JS-injected styles; the flags come out together when the page is untangled (2026-09-07) */
+
 /* Universal Header Styles */
 
 /* Base Universal Header Structure */
 .universal-header {
-    background: linear-gradient(135deg, #2e5827 0%, #3e6837 100%);
+    background: linear-gradient(135deg, var(--brand-700) 0%, var(--brand-700) 100%);
     color: white;
     padding: 0;
-    box-shadow: 0 4px 12px rgba(46,88,39,0.3);
+    box-shadow: 0 4px 12px rgb(46 88 39 / 30%);
     position: sticky;
     top: 0;
     z-index: 1000;
@@ -13,10 +15,10 @@
 
 /* Header Top Bar */
 .header-top-bar {
-    background: rgba(0,0,0,0.1);
+    background: rgb(0 0 0 / 10%);
     padding: 8px 0;
     font-size: 0.85em;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
+    border-bottom: 1px solid rgb(255 255 255 / 10%);
 }
 
 .header-top-bar-content {
@@ -51,7 +53,7 @@
 }
 
 .header-action-btn:hover {
-    background: rgba(255,255,255,0.1);
+    background: rgb(255 255 255 / 10%);
 }
 
 /* Header Main Section */
@@ -109,20 +111,20 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    background: rgba(255,255,255,0.15);
+    background: rgb(255 255 255 / 15%);
     color: white;
     padding: 10px 16px;
     border-radius: 6px;
     text-decoration: none;
     font-weight: 600;
     transition: all 0.2s ease;
-    border: 1px solid rgba(255,255,255,0.2);
+    border: 1px solid rgb(255 255 255 / 20%);
 }
 
 .back-to-product:hover {
-    background: rgba(255,255,255,0.25);
+    background: rgb(255 255 255 / 25%);
     transform: translateY(-1px);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 4px rgb(0 0 0 / 10%);
 }
 
 .back-icon {
@@ -139,10 +141,10 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    background: rgba(255,255,255,0.15);
+    background: rgb(255 255 255 / 15%);
     padding: 8px 12px;
     border-radius: 6px;
-    border: 1px solid rgba(255,255,255,0.2);
+    border: 1px solid rgb(255 255 255 / 20%);
 }
 
 .style-search-icon {
@@ -159,7 +161,7 @@
 }
 
 .style-search-input::placeholder {
-    color: rgba(255,255,255,0.7);
+    color: rgb(255 255 255 / 70%);
 }
 
 .style-search-results {
@@ -169,7 +171,7 @@
     right: 0;
     background: white;
     border-radius: 6px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 12px rgb(0 0 0 / 20%);
     max-height: 300px;
     overflow-y: auto;
     z-index: 1000;
@@ -178,10 +180,11 @@
 
 /* Page Context Indicator */
 .page-context {
-    background: rgba(255,255,255,0.1);
+    background: rgb(255 255 255 / 10%);
     padding: 6px 10px; /* Reduced padding */
     border-radius: 6px;
     font-size: 0.85em; /* Slightly smaller */
+
     /* Removed border-left that was causing white gap */
     display: flex;
     flex-direction: column;
@@ -207,9 +210,9 @@
 }
 
 .quick-action-btn {
-    background: rgba(255,255,255,0.2);
+    background: rgb(255 255 255 / 20%);
     color: white;
-    border: 1px solid rgba(255,255,255,0.3);
+    border: 1px solid rgb(255 255 255 / 30%);
     padding: 10px 14px; /* Slightly increased for consistency */
     border-radius: 6px;
     cursor: pointer;
@@ -222,34 +225,34 @@
 }
 
 .quick-action-btn:hover {
-    background: rgba(255,255,255,0.3);
+    background: rgb(255 255 255 / 30%);
     transform: translateY(-1px);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 4px rgb(0 0 0 / 10%);
 }
 
 .primary-action-btn {
     background: white;
-    color: #2e5827;
+    color: var(--brand-700);
     border: none;
     padding: 10px 16px;
     border-radius: 6px;
     cursor: pointer;
     font-weight: bold;
     font-size: 0.95em;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 4px rgb(0 0 0 / 10%);
     transition: all 0.2s ease;
 }
 
 .primary-action-btn:hover {
     transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 8px rgb(0 0 0 / 15%);
 }
 
 /* Header Breadcrumb */
 .header-breadcrumb {
-    background: rgba(0,0,0,0.1);
+    background: rgb(0 0 0 / 10%);
     padding: 8px 0;
-    border-top: 1px solid rgba(255,255,255,0.1);
+    border-top: 1px solid rgb(255 255 255 / 10%);
     font-size: 0.85em;
 }
 
@@ -266,7 +269,7 @@
 }
 
 .breadcrumb-link {
-    color: rgba(255,255,255,0.8);
+    color: rgb(255 255 255 / 80%);
     text-decoration: none;
     transition: color 0.2s;
     cursor: pointer;
@@ -277,7 +280,7 @@
 }
 
 .breadcrumb-separator {
-    color: rgba(255,255,255,0.6);
+    color: rgb(255 255 255 / 60%);
 }
 
 .breadcrumb-current {
@@ -286,7 +289,7 @@
 }
 
 /* Mobile responsiveness for universal header */
-@media (max-width: 768px) {
+@media (width <= 768px) {
     .header-main-content {
         flex-direction: column !important;
         gap: 12px !important;
@@ -326,7 +329,7 @@
     }
 }
 
-@media (max-width: 480px) {
+@media (width <= 480px) {
     .header-top-bar {
         display: none; /* Hide top bar on very small screens */
     }
@@ -350,21 +353,21 @@
 
 /* Improved search results positioning */
 #style-search-results {
-    box-shadow: 0 8px 24px rgba(0,0,0,0.15) !important;
-    border: 1px solid rgba(0,0,0,0.1);
+    box-shadow: 0 8px 24px rgb(0 0 0 / 15%) !important;
+    border: 1px solid rgb(0 0 0 / 10%);
     margin-top: 4px;
 }
 
 /* Search result hover effects */
 .search-result-item {
     padding: 12px;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--brand-100);
     cursor: pointer;
     transition: background-color 0.2s ease;
 }
 
 .search-result-item:hover {
-    background-color: #f8f9fa;
+    background-color: var(--gray-50);
 }
 
 .search-result-item:last-child {
@@ -391,7 +394,7 @@
         box-shadow: none !important;
         background: white !important;
         color: black !important;
-        border-bottom: 2px solid #2e5827;
+        border-bottom: 2px solid var(--brand-700);
     }
     
     .header-top-bar, .header-quick-actions {

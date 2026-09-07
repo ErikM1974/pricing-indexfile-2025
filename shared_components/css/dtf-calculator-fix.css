@@ -1,3 +1,5 @@
+/* stylelint-disable declaration-no-important -- override stack: this calculator page layers fix/override sheets and JS-injected styles; the flags come out together when the page is untangled (2026-09-07) */
+
 /**
  * DTF Calculator Fix CSS
  * Fixes styling issues and ensures NWCA green theme consistency
@@ -7,23 +9,37 @@
 /* ============================================
    ROOT THEME OVERRIDES - NWCA GREEN
    ============================================ */
+
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue, merged into its
+   existing :root. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
 :root {
-    --primary-color: #4cb354 !important;
-    --primary: #4cb354 !important;
-    --primary-dark: #409a47 !important;
-    --primary-light: #5bc85f !important;
-    --nwca-primary: #4cb354 !important;
-    --primary-hover: #409a47 !important;
-    --bs-primary: #4cb354 !important;
+    --dtf-calculator-fix-red: #ef4444;
+    --dtf-calculator-fix-green-tint: #d1fae5;
+    --dtf-calculator-fix-teal-dark: #065f46;
+    --dtf-calculator-fix-green: #5bc85f;
+    --dtf-calculator-fix-cyan-tint: #bfdbfe;
+    --dtf-calculator-fix-cyan: #60a5fa;
+    --dtf-calculator-fix-blue: #1e40af;
+    --dtf-calculator-fix-green-tint-2: #bbf7d0;
+    --primary-color: var(--brand-500) !important;
+    --primary: var(--brand-500) !important;
+    --primary-dark: var(--brand-600) !important;
+    --primary-light: var(--dtf-calculator-fix-green) !important;
+    --nwca-primary: var(--brand-500) !important;
+    --primary-hover: var(--brand-600) !important;
+    --bs-primary: var(--brand-500) !important;
     --bs-primary-rgb: 76, 179, 84 !important;
 }
+/* stylelint-enable color-no-hex */
 
 /* ============================================
    MAIN CONTAINER FIXES
    ============================================ */
 body.dtf-pricing-page {
-    background: #f5f7fa;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--color-bradley-tint);
+    font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 .container {
@@ -48,7 +64,7 @@ body.dtf-pricing-page {
     margin: 0;
 }
 
-@media (max-width: 992px) {
+@media (width <= 992px) {
     .dtf-calculator-wrapper {
         grid-template-columns: 1fr;
     }
@@ -59,12 +75,12 @@ body.dtf-pricing-page {
    ============================================ */
 .alert-info,
 .info-box {
-    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%) !important;
-    border: 1px solid #60a5fa !important;
+    background: linear-gradient(135deg, var(--sky-100) 0%, var(--dtf-calculator-fix-cyan-tint) 100%) !important;
+    border: 1px solid var(--dtf-calculator-fix-cyan) !important;
     border-radius: 8px;
     padding: 0.875rem 1.25rem;
     margin-bottom: 1.5rem;
-    color: #1e40af;
+    color: var(--dtf-calculator-fix-blue);
     font-size: 0.9rem;
     display: flex;
     align-items: center;
@@ -73,7 +89,7 @@ body.dtf-pricing-page {
 
 .alert-info i,
 .info-box i {
-    color: #2563eb;
+    color: var(--blue-600);
     font-size: 1.125rem;
 }
 
@@ -84,8 +100,8 @@ body.dtf-pricing-page {
     background: white;
     border-radius: 12px;
     padding: 2rem;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-    border: 1px solid #e5e7eb;
+    box-shadow: 0 2px 10px rgb(0 0 0 / 8%);
+    border: 1px solid var(--gray-200);
 }
 
 /* ============================================
@@ -94,12 +110,12 @@ body.dtf-pricing-page {
 .dtf-calculator-main h3,
 .quantity-section h3,
 .transfers-section h3 {
-    color: #1f2937 !important;
+    color: var(--gray-800) !important;
     font-size: 1.25rem !important;
     font-weight: 600 !important;
     margin-bottom: 1.25rem !important;
     padding-bottom: 0.5rem;
-    border-bottom: 2px solid #e5e7eb;
+    border-bottom: 2px solid var(--gray-200);
 }
 
 /* ============================================
@@ -112,10 +128,10 @@ select.form-control,
 .form-select {
     width: 100%;
     padding: 0.75rem 1rem !important;
-    border: 2px solid #e5e7eb !important;
+    border: 2px solid var(--gray-200) !important;
     border-radius: 8px !important;
     font-size: 1rem !important;
-    color: #1f2937 !important;
+    color: var(--gray-800) !important;
     background: white !important;
     transition: all 0.2s !important;
 }
@@ -126,15 +142,15 @@ input[type="number"]:focus,
 select.form-control:focus,
 .form-select:focus {
     outline: none !important;
-    border-color: #4cb354 !important;
-    box-shadow: 0 0 0 4px rgba(76, 179, 84, 0.1) !important;
+    border-color: var(--brand-500) !important;
+    box-shadow: 0 0 0 4px rgb(76 179 84 / 10%) !important;
     background: white !important;
 }
 
 .form-control:hover,
 input:hover,
 select:hover {
-    border-color: #9ca3af !important;
+    border-color: var(--gray-400) !important;
 }
 
 /* Labels */
@@ -144,7 +160,7 @@ label {
     display: block;
     margin-bottom: 0.5rem;
     font-weight: 600;
-    color: #374151;
+    color: var(--gray-700);
     font-size: 0.875rem;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -156,7 +172,7 @@ label {
 small {
     display: block;
     margin-top: 0.25rem;
-    color: #6b7280;
+    color: var(--gray-500);
     font-size: 0.813rem;
 }
 
@@ -164,11 +180,11 @@ small {
    QUANTITY SECTION
    ============================================ */
 .quantity-section {
-    background: linear-gradient(135deg, #f8fffe 0%, #f0fdf4 100%);
+    background: linear-gradient(135deg, var(--gray-50) 0%, var(--brand-50) 100%);
     padding: 1.25rem;
     border-radius: 8px;
     margin-bottom: 1.5rem;
-    border: 1px solid #d1fae5;
+    border: 1px solid var(--dtf-calculator-fix-green-tint);
 }
 
 .quantity-input-group {
@@ -193,18 +209,18 @@ small {
 
 .transfer-location-item {
     background: white;
-    border: 2px solid #e5e7eb;
+    border: 2px solid var(--gray-200);
     border-radius: 10px;
     padding: 1.5rem;
     margin-bottom: 1rem;
     position: relative;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 4px rgb(0 0 0 / 5%);
     transition: all 0.2s;
 }
 
 .transfer-location-item:hover {
-    border-color: #4cb354;
-    box-shadow: 0 4px 8px rgba(76, 179, 84, 0.15);
+    border-color: var(--brand-500);
+    box-shadow: 0 4px 8px rgb(76 179 84 / 15%);
 }
 
 .transfer-header {
@@ -215,7 +231,7 @@ small {
 }
 
 .transfer-number {
-    background: linear-gradient(135deg, #4cb354 0%, #409a47 100%);
+    background: linear-gradient(135deg, var(--brand-500) 0%, var(--brand-600) 100%);
     color: white;
     width: 35px;
     height: 35px;
@@ -225,13 +241,13 @@ small {
     justify-content: center;
     font-weight: bold;
     font-size: 1.125rem;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 4px rgb(0 0 0 / 10%);
 }
 
 .transfer-header h4 {
     font-size: 1.125rem;
     margin: 0;
-    color: #1f2937;
+    color: var(--gray-800);
     font-weight: 600;
 }
 
@@ -240,8 +256,8 @@ small {
     right: 1rem;
     top: 1rem;
     background: white;
-    border: 2px solid #ef4444;
-    color: #ef4444;
+    border: 2px solid var(--dtf-calculator-fix-red);
+    color: var(--dtf-calculator-fix-red);
     width: 32px;
     height: 32px;
     border-radius: 50%;
@@ -254,7 +270,7 @@ small {
 }
 
 .btn-remove-transfer:hover {
-    background: #ef4444;
+    background: var(--dtf-calculator-fix-red);
     color: white;
     transform: scale(1.1);
 }
@@ -287,25 +303,25 @@ button[type="submit"] {
 
 .btn-primary,
 .add-transfer-btn {
-    background: linear-gradient(135deg, #4cb354 0%, #409a47 100%) !important;
+    background: linear-gradient(135deg, var(--brand-500) 0%, var(--brand-600) 100%) !important;
     color: white !important;
-    box-shadow: 0 4px 6px rgba(76, 179, 84, 0.2);
+    box-shadow: 0 4px 6px rgb(76 179 84 / 20%);
 }
 
 .btn-primary:hover,
 .add-transfer-btn:hover {
-    background: linear-gradient(135deg, #409a47 0%, #358a3a 100%) !important;
+    background: linear-gradient(135deg, var(--brand-600) 0%, var(--store-green-700) 100%) !important;
     transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(76, 179, 84, 0.3);
+    box-shadow: 0 6px 12px rgb(76 179 84 / 30%);
 }
 
 .btn-secondary {
-    background: #6b7280 !important;
+    background: var(--gray-500) !important;
     color: white !important;
 }
 
 .btn-secondary:hover {
-    background: #4b5563 !important;
+    background: var(--gray-600) !important;
 }
 
 .add-transfer-btn {
@@ -323,7 +339,7 @@ button[type="submit"] {
 .size-guide,
 .dtf-sizes-box,
 .accordion-body {
-    background: #f9fafb;
+    background: var(--gray-50);
     border-radius: 8px;
     padding: 1.5rem;
 }
@@ -331,8 +347,8 @@ button[type="submit"] {
 /* Specific styling for the DTF sizes info box */
 #dtf-calculator-container > .dtf-calculator-main + div,
 .transfers-section + div[style*="background"] {
-    background: linear-gradient(135deg, #d1fae5 0%, #bbf7d0 100%) !important;
-    border: 2px solid #4cb354 !important;
+    background: linear-gradient(135deg, var(--dtf-calculator-fix-green-tint) 0%, var(--dtf-calculator-fix-green-tint-2) 100%) !important;
+    border: 2px solid var(--brand-500) !important;
     border-radius: 10px !important;
     padding: 1.5rem !important;
     margin-top: 1.5rem !important;
@@ -340,7 +356,7 @@ button[type="submit"] {
 
 .size-guide h4,
 .dtf-sizes-box h4 {
-    color: #065f46;
+    color: var(--dtf-calculator-fix-teal-dark);
     font-size: 1.125rem;
     font-weight: 600;
     margin-bottom: 1rem;
@@ -351,7 +367,7 @@ button[type="submit"] {
 
 .size-guide h4 i,
 .dtf-sizes-box h4 i {
-    color: #4cb354;
+    color: var(--brand-500);
 }
 
 /* Size grid */
@@ -368,13 +384,13 @@ button[type="submit"] {
     background: white;
     padding: 1rem;
     border-radius: 8px;
-    border: 1px solid #d1fae5;
+    border: 1px solid var(--dtf-calculator-fix-green-tint);
     text-align: center;
 }
 
 .size-tier-section h5,
 .size-item h5 {
-    color: #4cb354;
+    color: var(--brand-500);
     font-size: 1rem;
     font-weight: 600;
     margin-bottom: 0.5rem;
@@ -382,7 +398,7 @@ button[type="submit"] {
 
 .size-tier-section p,
 .size-item p {
-    color: #374151;
+    color: var(--gray-700);
     font-size: 0.875rem;
     margin: 0.25rem 0;
 }
@@ -395,8 +411,8 @@ button[type="submit"] {
     background: white;
     border-radius: 12px;
     padding: 2rem;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-    border: 1px solid #e5e7eb;
+    box-shadow: 0 2px 10px rgb(0 0 0 / 8%);
+    border: 1px solid var(--gray-200);
     position: sticky;
     top: 200px;
     min-height: 400px;
@@ -404,12 +420,12 @@ button[type="submit"] {
 
 .dtf-calculator-summary h3,
 .pricing-breakdown h3 {
-    color: #1f2937;
+    color: var(--gray-800);
     font-size: 1.25rem;
     font-weight: 600;
     margin-bottom: 1.25rem;
     padding-bottom: 0.5rem;
-    border-bottom: 2px solid #e5e7eb;
+    border-bottom: 2px solid var(--gray-200);
     text-align: center;
 }
 
@@ -421,7 +437,7 @@ button[type="submit"] {
     align-items: center;
     justify-content: center;
     min-height: 250px;
-    color: #9ca3af;
+    color: var(--gray-400);
     padding: 2rem;
     text-align: center;
 }
@@ -429,13 +445,13 @@ button[type="submit"] {
 .pricing-placeholder i,
 .empty-state i {
     font-size: 3.5rem;
-    color: #e5e7eb;
+    color: var(--gray-200);
     margin-bottom: 1rem;
     opacity: 0.5;
 }
 
 .pricing-placeholder h5 {
-    color: #9ca3af;
+    color: var(--gray-400);
     font-size: 1.125rem;
     margin-bottom: 0.5rem;
     font-weight: 500;
@@ -443,7 +459,7 @@ button[type="submit"] {
 
 .pricing-placeholder p,
 .empty-state p {
-    color: #9ca3af;
+    color: var(--gray-400);
     font-size: 0.875rem;
     line-height: 1.5;
 }
@@ -452,7 +468,7 @@ button[type="submit"] {
 .summary-section {
     margin-bottom: 1.5rem;
     padding-bottom: 1.5rem;
-    border-bottom: 1px solid #e5e7eb;
+    border-bottom: 1px solid var(--gray-200);
 }
 
 .summary-section:last-child {
@@ -460,7 +476,7 @@ button[type="submit"] {
 }
 
 .summary-section h5 {
-    color: #6b7280;
+    color: var(--gray-500);
     font-size: 0.875rem;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -477,21 +493,21 @@ button[type="submit"] {
 }
 
 .summary-line-item span:first-child {
-    color: #6b7280;
+    color: var(--gray-500);
 }
 
 .summary-line-item span:last-child {
-    color: #1f2937;
+    color: var(--gray-800);
     font-weight: 600;
 }
 
 /* Total section */
 .summary-total {
-    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+    background: linear-gradient(135deg, var(--brand-50) 0%, var(--store-green-100) 100%);
     padding: 1.25rem;
     border-radius: 8px;
     margin-top: 1.5rem;
-    border: 2px solid #4cb354;
+    border: 2px solid var(--brand-500);
 }
 
 .summary-total .summary-line-item {
@@ -499,7 +515,7 @@ button[type="submit"] {
 }
 
 .price-highlight {
-    color: #4cb354 !important;
+    color: var(--brand-500) !important;
     font-weight: 700 !important;
     font-size: 1.5rem !important;
 }
@@ -509,21 +525,21 @@ button[type="submit"] {
    ============================================ */
 .accordion-button {
     background: white !important;
-    color: #1f2937 !important;
+    color: var(--gray-800) !important;
     font-weight: 600;
     padding: 1rem 1.25rem;
-    border: 2px solid #e5e7eb;
+    border: 2px solid var(--gray-200);
 }
 
 .accordion-button:not(.collapsed) {
-    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%) !important;
-    color: #065f46 !important;
-    border-color: #4cb354;
+    background: linear-gradient(135deg, var(--brand-50) 0%, var(--store-green-100) 100%) !important;
+    color: var(--dtf-calculator-fix-teal-dark) !important;
+    border-color: var(--brand-500);
 }
 
 .accordion-button:focus {
-    box-shadow: 0 0 0 4px rgba(76, 179, 84, 0.1) !important;
-    border-color: #4cb354 !important;
+    box-shadow: 0 0 0 4px rgb(76 179 84 / 10%) !important;
+    border-color: var(--brand-500) !important;
 }
 
 .accordion-button::after {
@@ -539,12 +555,12 @@ button[type="submit"] {
     justify-content: center;
     align-items: center;
     min-height: 400px;
-    color: #6b7280;
+    color: var(--gray-500);
 }
 
 .dtf-calculator-loading i {
     font-size: 3rem;
-    color: #4cb354;
+    color: var(--brand-500);
     animation: spin 1s linear infinite;
     margin-bottom: 1rem;
 }
@@ -556,23 +572,23 @@ button[type="submit"] {
 
 .dtf-calculator-error,
 .alert-danger {
-    background: #fee2e2 !important;
-    color: #991b1b !important;
+    background: var(--red-100) !important;
+    color: var(--red-800) !important;
     padding: 1.5rem;
     border-radius: 10px;
-    border: 2px solid #ef4444 !important;
+    border: 2px solid var(--dtf-calculator-fix-red) !important;
 }
 
 /* ============================================
    RESPONSIVE DESIGN
    ============================================ */
-@media (max-width: 1200px) {
+@media (width <= 1200px) {
     .container {
         padding: 1.5rem;
     }
 }
 
-@media (max-width: 992px) {
+@media (width <= 992px) {
     .dtf-calculator-wrapper {
         grid-template-columns: 1fr;
     }
@@ -584,7 +600,7 @@ button[type="submit"] {
     }
 }
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
     #dtf-calculator-container {
         padding: 1.5rem;
     }
@@ -611,31 +627,32 @@ button[type="submit"] {
 /* ============================================
    OVERRIDE CONFLICTING STYLES
    ============================================ */
+
 /* Force green theme over any blue */
 .page-header {
-    background: linear-gradient(135deg, #4cb354 0%, #409a47 100%) !important;
+    background: linear-gradient(135deg, var(--brand-500) 0%, var(--brand-600) 100%) !important;
 }
 
 /* Override Bootstrap blue */
 .text-primary {
-    color: #4cb354 !important;
+    color: var(--brand-500) !important;
 }
 
 .bg-primary {
-    background-color: #4cb354 !important;
+    background-color: var(--brand-500) !important;
 }
 
 .border-primary {
-    border-color: #4cb354 !important;
+    border-color: var(--brand-500) !important;
 }
 
 /* Ensure links are green */
 a {
-    color: #4cb354;
+    color: var(--brand-500);
 }
 
 a:hover {
-    color: #409a47;
+    color: var(--brand-600);
 }
 
 /* ============================================
@@ -645,26 +662,26 @@ a:hover {
     text-align: center;
     margin-top: 2rem;
     padding-top: 1.5rem;
-    border-top: 1px solid #e5e7eb;
+    border-top: 1px solid var(--gray-200);
 }
 
 .staff-view-toggle a {
-    color: #6b7280;
+    color: var(--gray-500);
     text-decoration: none;
     font-size: 0.875rem;
     transition: color 0.2s;
 }
 
 .staff-view-toggle a:hover {
-    color: #4cb354;
+    color: var(--brand-500);
 }
 
 body.show-internal .staff-view-toggle a {
-    color: #4cb354;
+    color: var(--brand-500);
     font-weight: 600;
 }
 
 body.show-internal .staff-view-toggle a::after {
     content: " ✓";
-    color: #4cb354;
+    color: var(--brand-500);
 }

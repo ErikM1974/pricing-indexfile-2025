@@ -130,6 +130,10 @@
             <p class="text-muted">This page is a working document. Every standard that changed how a page looks is
                 recorded here, newest first, with the release that shipped it.</p>
             <ul class="rules decisions">
+                <li><strong>2026-09-07 · calculators.</strong> The 25 calculator pages read the token file; every colour is a token or a
+                    sheet-scoped variable. The DTF, screen-print and universal pricing pages are stacks of fix/override sheets held
+                    together by <code>!important</code> (446 flags, all documented); untangling them is per-page design work, not a
+                    script — listed here as follow-up. The two sheets the quote builders also load wait for that family.</li>
                 <li><strong>2026-09-07 · dashboards.</strong> Sixty dashboards and the queue-dashboard system they share now read the token
                     file; the person/department colours those pages already wore are code (<code>--art-theme: var(--color-ruth)</code>).
                     <strong>Open for Erik:</strong> two spacing/radius scales exist — <code>art-hub.css</code> (4 → 32, radius 4/8/12/16, used by 41

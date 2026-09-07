@@ -1,10 +1,20 @@
-/* manual-mode-indicator.css — extracted 2026-09-06 from the <style> manual-mode-indicator.js used to inject (Rule 3). */
+/* manual-mode-indicator.css — extracted 2026-09-06 from the \3c style> manual-mode-indicator.js used to inject (Rule 3). */
+
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue so the page
+   keeps its exact look. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   every rule below uses var(). Raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
+:root {
+    --manual-mode-indicator-green: #c8e6c9;
+}
+/* stylelint-enable color-no-hex */
+
 .manual-mode-banner {
-    background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
-    color: #2d5f3f;
-    border-bottom: 3px solid #4cb354;
+    background: linear-gradient(135deg, var(--brand-100) 0%, var(--manual-mode-indicator-green) 100%);
+    color: var(--print-green);
+    border-bottom: 3px solid var(--brand-500);
     padding: 14px 20px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    box-shadow: 0 2px 6px rgb(0 0 0 / 8%);
     position: sticky;
     top: 0;
     z-index: 9999;
@@ -16,6 +26,7 @@
         transform: translateY(-100%);
         opacity: 0;
     }
+
     to {
         transform: translateY(0);
         opacity: 1;
@@ -60,9 +71,9 @@
 }
 
 .manual-mode-exit {
-    background: rgba(45, 95, 63, 0.15);
-    border: 2px solid #2d5f3f;
-    color: #2d5f3f;
+    background: rgb(45 95 63 / 15%);
+    border: 2px solid var(--print-green);
+    color: var(--print-green);
     padding: 10px 20px;
     border-radius: 6px;
     cursor: pointer;
@@ -73,10 +84,10 @@
 }
 
 .manual-mode-exit:hover {
-    background: #2d5f3f;
+    background: var(--print-green);
     color: white;
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(45, 95, 63, 0.3);
+    box-shadow: 0 4px 8px rgb(45 95 63 / 30%);
 }
 
 .manual-mode-exit i {
@@ -84,7 +95,7 @@
 }
 
 /* Mobile responsive */
-@media (max-width: 768px) {
+@media (width <= 768px) {
     .manual-mode-content {
         flex-direction: column;
         align-items: flex-start;
@@ -107,5 +118,6 @@
 
 /* Adjust body padding when banner is present */
 body.manual-mode-active {
+    /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
     padding-top: 80px !important;
 }

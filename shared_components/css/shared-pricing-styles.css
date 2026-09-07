@@ -1,17 +1,39 @@
+/* stylelint-disable no-duplicate-selectors -- legacy sheet: rules were appended over time; merging them would reorder the cascade (2026-09-07) */
+
+/* stylelint-disable declaration-no-important -- override stack: this calculator page layers fix/override sheets and JS-injected styles; the flags come out together when the page is untangled (2026-09-07) */
+
 /* Enhanced Pricing Pages CSS for Embroidery Pricing Redesign */
+
 /* Variables from main.css */
+
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue, merged into its
+   existing :root. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
 :root {
-    --primary-color: #2f661e;     /* Main green */
-    --primary-dark: #1e4d0f;      /* Darker green for hover */
-    --primary-light: #eaf2e9;     /* Lighter green for backgrounds/borders */
-    --secondary-color: #5cb85c;   /* Accent green */
-    --secondary-light: #eaffea;   /* Lighter green */
-    --text-color: #333;           /* Main text color */
-    --border-color: #ddd;         /* Standard border color */
-    --background-light: #f8f8f8;  /* Light background */
-    --white: #ffffff;             /* White */
-    --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
-    --shadow-md: 0 4px 8px rgba(0,0,0,0.1);
+    --shared-pricing-styles-gray-dark: #333;
+    --shared-pricing-styles-yellow: #ffc107;
+    --shared-pricing-styles-teal: #add;
+    --shared-pricing-styles-cyan: #007bff;
+    --shared-pricing-styles-green-dark: #1e4d0f;
+    --shared-pricing-styles-green: #28a745;
+    --shared-pricing-styles-red: #dc3545;
+    --shared-pricing-styles-yellow-2: #856404;
+    --shared-pricing-styles-teal-2: #17a2b8;
+    --shared-pricing-styles-teal-3: #117a8b;
+    --shared-pricing-styles-gray: #adb5bd;
+    --shared-pricing-styles-cyan-dark: #036;
+    --primary-color: var(--brand-700);     /* Main green */
+    --primary-dark: var(--shared-pricing-styles-green-dark);      /* Darker green for hover */
+    --primary-light: var(--brand-100);     /* Lighter green for backgrounds/borders */
+    --secondary-color: var(--brand-500);   /* Accent green */
+    --secondary-light: var(--color-steve-tint);   /* Lighter green */
+    --text-color: var(--shared-pricing-styles-gray-dark);           /* Main text color */
+    --border-color: var(--store-line);         /* Standard border color */
+    --background-light: var(--gray-50);  /* Light background */
+    --white: var(--color-surface);             /* White */
+    --shadow-sm: 0 2px 4px rgb(0 0 0 / 5%);
+    --shadow-md: 0 4px 8px rgb(0 0 0 / 10%);
     --radius-sm: 4px;
     --radius-md: 8px;
     --spacing-sm: 10px;
@@ -19,6 +41,7 @@
     --spacing-lg: 30px;
     --font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
+/* stylelint-enable color-no-hex */
 
 body {
     font-family: var(--font-family);
@@ -220,7 +243,6 @@ h1 {
     display: block;
     margin-top: 8px;
     line-height: 1.2;
-    word-wrap: break-word;
     overflow-wrap: break-word;
 }
 
@@ -276,7 +298,7 @@ h1 {
 .pricing-grid td:first-child {
     text-align: left;
     font-weight: bold;
-    background-color: #f8f9fa;
+    background-color: var(--gray-50);
     color: var(--primary-dark);
     border-right: 2px solid var(--primary-light);
     position: relative;
@@ -289,21 +311,21 @@ h1 {
 }
 
 .pricing-grid tbody tr:hover {
-    background-color: rgba(46, 88, 39, 0.05);
+    background-color: rgb(46 88 39 / 5%);
     transform: translateX(2px);
 }
 
 /* Style the price cells */
 .pricing-grid td:not(:first-child) {
     font-weight: 600;
-    color: #2e5827;
+    color: var(--brand-700);
     font-size: 1.05em;
 }
 
 /* Fix for DTG pricing initial message visibility */
 #custom-pricing-grid td.initial-message {
-    background-color: #f8f9fa !important; /* Light gray background */
-    color: #333 !important; /* Dark text for contrast */
+    background-color: var(--gray-50) !important; /* Light gray background */
+    color: var(--shared-pricing-styles-gray-dark) !important; /* Dark text for contrast */
     font-style: italic;
     padding: 20px;
     text-align: center;
@@ -333,15 +355,15 @@ h1 {
 }
 
 .inventory-good {
-    background-color: #28a745;
+    background-color: var(--shared-pricing-styles-green);
 }
 
 .inventory-low {
-    background-color: #ffc107;
+    background-color: var(--shared-pricing-styles-yellow);
 }
 
 .inventory-none {
-    background-color: #dc3545;
+    background-color: var(--shared-pricing-styles-red);
 }
 
 /* LTM Fee Container */
@@ -418,7 +440,7 @@ h1 {
 }
 
 /* Responsive Design */
-@media (max-width: 768px) {
+@media (width <= 768px) {
     .product-context {
         flex-direction: column;
         text-align: center;
@@ -479,7 +501,7 @@ h1 {
     }
 }
 
-@media (max-width: 480px) {
+@media (width <= 480px) {
     .pricing-tabs {
         flex-wrap: nowrap;
         overflow-x: auto;
@@ -568,14 +590,14 @@ h1 {
     font-weight: bold;
     margin: 20px auto 0;
     font-size: 1.1rem;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    box-shadow: 0 2px 4px rgb(0 0 0 / 20%);
     transition: all 0.2s ease;
 }
 
 #add-to-cart-button:hover {
     background-color: var(--primary-dark);
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 8px rgb(0 0 0 / 20%);
 }
 
 .size-input-grid {
@@ -672,7 +694,7 @@ h1 {
 }
 
 .quantity-matrix tr:nth-child(odd) {
-    background-color: rgba(234, 242, 233, 0.3);
+    background-color: rgb(234 242 233 / 30%);
 }
 
 .quantity-matrix tr:hover {
@@ -819,14 +841,14 @@ h1 {
 }
 
 .ltm-fee-notice {
-    background-color: #fff3cd;
-    color: #856404;
+    background-color: var(--amber-100);
+    color: var(--shared-pricing-styles-yellow-2);
     padding: 8px 12px;
     border-radius: var(--radius-sm);
     margin-bottom: var(--spacing-md);
     display: flex;
     align-items: center;
-    border-left: 3px solid #ffc107;
+    border-left: 3px solid var(--shared-pricing-styles-yellow);
 }
 
 .ltm-icon {
@@ -857,7 +879,7 @@ h1 {
     box-shadow: var(--shadow-sm);
 }
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
     .size-quantity-grid {
         grid-template-columns: 1fr;
     }
@@ -891,7 +913,7 @@ h1 {
     }
 }
 
-@media (max-width: 480px) {
+@media (width <= 480px) {
     .size-quantity-row {
         padding: 8px;
     }
@@ -935,9 +957,10 @@ h1 {
         padding: 6px 3px;
     }
 }
+
 /* View Cart Button in Summary */
 .view-cart-button {
-    background-color: #17a2b8; /* Teal/Info color */
+    background-color: var(--shared-pricing-styles-teal-2); /* Teal/Info color */
     color: white;
     border: none;
     border-radius: var(--radius-sm);
@@ -952,15 +975,16 @@ h1 {
 }
 
 .view-cart-button:hover {
-    background-color: #117a8b; /* Darker teal */
+    background-color: var(--shared-pricing-styles-teal-3); /* Darker teal */
     transform: translateY(-1px);
     box-shadow: var(--shadow-sm);
 }
 
 .view-cart-button:disabled {
-    background-color: #adb5bd;
+    background-color: var(--shared-pricing-styles-gray);
     cursor: not-allowed;
 }
+
 /* Styles for Two-Column Product Page Layout */
 .product-page-columns-container {
     display: flex;
@@ -971,11 +995,16 @@ h1 {
 
 .product-context-column {
     flex: 0 0 350px; /* Adjust width as needed, e.g., 300px, 400px */
+
     /* For sticky behavior, uncomment and adjust: */
+
     /* position: sticky; 
     top: 20px;  */
+
     /* Consider max-height if content can be very long and you want internal scroll for this column */
+
     /* height: calc(100vh - 40px); /* Example: full viewport height minus some padding */
+
     /* overflow-y: auto; */
     background-color: var(--white);
     padding: var(--spacing-md);
@@ -1000,23 +1029,23 @@ h1 {
     box-shadow: var(--shadow-sm);
     margin-bottom: var(--spacing-md);
 }
+
 .product-image-container-context .image-zoom-overlay { /* Ensure zoom overlay is positioned correctly */
     position: absolute; /* If not already, or adjust as needed */
 }
 
-
 /* Highlight for active pricing tier in the pricing grid */
 .pricing-grid th.active-tier-highlight,
 .pricing-grid td.active-tier-highlight {
-    background-color: var(--primary-extralight, #e6f3ff) !important; /* A lighter shade of primary */
+    background-color: var(--primary-extralight, var(--sky-100)) !important; /* A lighter shade of primary */
     font-weight: bold;
-    color: var(--primary-dark, #003366) !important; /* Darker primary color for text */
-    border: 1px solid var(--primary-color, #007bff); /* Optional: border to emphasize */
-}
-.pricing-grid th.active-tier-highlight {
-    border-bottom: 2px solid var(--primary-color, #007bff) !important;
+    color: var(--primary-dark, var(--shared-pricing-styles-cyan-dark)) !important; /* Darker primary color for text */
+    border: 1px solid var(--primary-color, var(--shared-pricing-styles-cyan)); /* Optional: border to emphasize */
 }
 
+.pricing-grid th.active-tier-highlight {
+    border-bottom: 2px solid var(--primary-color, var(--shared-pricing-styles-cyan)) !important;
+}
 
 /* Styling for the sticky cart summary at the bottom of the interactive column */
 #sticky-product-cart-summary {
@@ -1025,7 +1054,7 @@ h1 {
     background-color: var(--white);
     padding: var(--spacing-md);
     border-top: 2px solid var(--primary-color);
-    box-shadow: 0 -4px 12px rgba(0,0,0,0.1);
+    box-shadow: 0 -4px 12px rgb(0 0 0 / 10%);
     z-index: 100; /* Ensure it's above other content in the column */
 }
 
@@ -1035,21 +1064,25 @@ h1 {
     align-items: center;
     margin-bottom: var(--spacing-sm);
 }
+
 #sticky-product-cart-summary .cart-total > div {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
 }
+
 #sticky-product-cart-summary .total-label {
     font-size: 0.9em;
     color: var(--text-muted);
 }
+
 #sticky-product-cart-summary .total-quantity,
 #sticky-product-cart-summary .total-price {
     font-size: 1.2em;
     font-weight: bold;
     color: var(--primary-dark);
 }
+
 #sticky-product-cart-summary .add-to-cart-button,
 
 /* ============================================= */
@@ -1101,7 +1134,7 @@ h1 {
 #color-select:focus {
     outline: none;
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 2px rgba(47, 102, 30, 0.2); /* primary-light with alpha */
+    box-shadow: 0 0 0 2px rgb(47 102 30 / 20%); /* primary-light with alpha */
 }
 
 /* Additional Logo Checkbox */
@@ -1113,12 +1146,12 @@ h1 {
 }
 
 #parent-dtg-location-select:hover {
-    box-shadow: 0 0 8px rgba(46, 88, 39, 0.4) !important;
+    box-shadow: 0 0 8px rgb(46 88 39 / 40%) !important;
     transform: translateY(-1px);
 }
 
 #parent-dtg-location-select:focus {
-    outline: 2px solid #2e5827;
+    outline: 2px solid var(--brand-700);
     outline-offset: 2px;
 }
 
@@ -1127,7 +1160,7 @@ h1 {
     display: inline-block;
     margin-left: 10px;
     padding: 2px 8px;
-    background-color: rgba(46, 88, 39, 0.1);
+    background-color: rgb(46 88 39 / 10%);
     border-radius: 4px;
     font-weight: normal;
 }
@@ -1157,7 +1190,7 @@ h1 {
 #custom-pricing-grid td:first-child {
     text-align: left !important;
     font-weight: bold !important;
-    background-color: #f8f9fa !important;
+    background-color: var(--gray-50) !important;
     min-width: 80px !important;
 }
 
@@ -1185,6 +1218,7 @@ h1 {
     overflow: hidden !important;
     text-overflow: ellipsis !important;
 }
+
 #additional-logo-container { /* Assuming this ID for the container div for flex layout */
     display: flex; /* For aligning checkbox and label */
     align-items: center;
@@ -1226,17 +1260,18 @@ h1 {
     color: var(--primary-dark);
     font-size: 1.2em;
 }
+
 #sticky-product-cart-summary .view-cart-button {
     width: 100%;
     margin-top: var(--spacing-sm);
 }
 
-
 /* Responsive adjustments for the two-column layout */
-@media (max-width: 1024px) { /* Adjust this breakpoint as needed */
+@media (width <= 1024px) { /* Adjust this breakpoint as needed */
     .product-page-columns-container {
         flex-direction: column;
     }
+
     .product-context-column {
         flex: 0 0 auto; /* Reset flex basis for stacked layout */
         position: static; /* Remove sticky behavior when stacked */
@@ -1244,6 +1279,7 @@ h1 {
         overflow-y: visible; /* Reset overflow */
         margin-bottom: var(--spacing-lg);
     }
+
     #sticky-product-cart-summary {
         position: static; /* Non-sticky on smaller screens, part of normal flow */
         border-top: 1px solid var(--border-color);
@@ -1259,24 +1295,29 @@ h1 {
     text-align: center;
     min-height: 20px; /* Adjust if needed */
     display: table-cell !important; /* Ensure it behaves as a table cell */
+
     /* vertical-align: top; is handled by the general td rule or JS */
+
     /* width and max-width are handled by JS inline styles */
     font-size: 0.9em;
+
     /* Removed align-items and justify-content as they are not applicable to table-cell */
 }
+
 .price-display .dynamic-unit-price {
     margin-left: 5px;
     font-weight: normal; /* Or bold if preferred */
     color: var(--text-color); /* Or var(--primary-color) */
 }
+
 /* Default Pricing Box Styles (Universal) */
 td.price-display > div { /* This is the main container for one price box */
-    border: 1px solid #ced4da;      /* Softer border */
+    border: 1px solid var(--gray-300);      /* Softer border */
     border-radius: 0.375rem;        /* Bootstrap-like rounded corners (6px) */
     overflow: hidden;
     margin: 5px auto;               /* Some spacing around, centered if td allows */
-    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075); /* Subtle shadow */
-    background-color: #f8f9fa;      /* Light background for the box frame, rows will be white */
+    box-shadow: 0 0.125rem 0.25rem rgb(0 0 0 / 7.5%); /* Subtle shadow */
+    background-color: var(--gray-50);      /* Light background for the box frame, rows will be white */
     max-width: 230px;               /* Control width */
     min-height: 100px;              /* Ensure some minimum height */
     padding: 0;                     /* Reset padding, children will define */
@@ -1287,22 +1328,25 @@ td.price-display > div { /* This is the main container for one price box */
 
 /* Default Header within the pricing box */
 td.price-display > div > div:first-child {
-    background-color: #6c757d;      /* Muted Grey/Blue (Bootstrap secondary) */
+    background-color: var(--gray-500);      /* Muted Grey/Blue (Bootstrap secondary) */
     color: white;
     font-weight: bold;
     padding: 0.5rem 0.75rem;        /* 8px 12px */
     text-align: center;
-    border-bottom: 1px solid #5a6268; /* Darker shade for separation */
+    border-bottom: 1px solid var(--gray-600); /* Darker shade for separation */
 }
 
 /* Default Rows within the pricing box */
 td.price-display > div > div:not(:first-child) {
     background-color: white;        /* Rows are white */
-    color: #212529;                 /* Dark text for rows */
+    color: var(--gray-800);                 /* Dark text for rows */
     padding: 0.375rem 0.75rem;      /* 6px 12px */
-    border-bottom: 1px solid #e9ecef; /* Light separator for rows */
+    border-bottom: 1px solid var(--gray-200); /* Light separator for rows */
+
     /* display: flex; /* REMOVED - let content flow naturally or be styled by more specific rules */
+
     /* justify-content: space-between; /* REMOVED */
+
     /* align-items: center; /* REMOVED */
     font-size: 0.875em;             /* Slightly smaller font for row content */
     line-height: 1.4;               /* Added for better readability of multi-line content */
@@ -1311,12 +1355,15 @@ td.price-display > div > div:not(:first-child) {
 /* IF a row *specifically* uses the span > span structure for label/value, style it */
 td.price-display > div > div:not(:first-child) > span:first-child + span:last-child {
     /* This selector targets rows that have exactly two spans, implying label/value */
+
     /* Re-apply flex for these specific cases if needed, or assume they are inline-block and will space out */
+
     /* For now, let's assume the spans themselves will handle their layout or are simple enough. */
+
     /* If they still need to be on one line and spaced, add: */
+
     /* display: flex; justify-content: space-between; align-items: center; width: 100%; */
 }
-
 
 /* Remove border from the very last data row */
 td.price-display > div > div:last-of-type {
@@ -1325,7 +1372,7 @@ td.price-display > div > div:last-of-type {
 
 /* Styling for label and value spans within rows (if structure is span:span) */
 td.price-display > div > div:not(:first-child) > span:first-child {
-    color: #495057;                 /* Grey for label text */
+    color: var(--gray-600);                 /* Grey for label text */
     margin-right: 0.5rem;
 }
 
@@ -1339,12 +1386,15 @@ td.price-display > div > div:not(:first-child) > span:last-child {
     border-bottom: 1px solid var(--border-light);
     margin-bottom: var(--spacing-md);
 }
+
 .product-context-column .product-title-area h2 {
     font-size: 1.3em; /* Adjust as needed */
 }
+
 .product-context-column .product-meta {
     font-size: 0.9em;
 }
+
 .product-context-column .product-meta .mini-color-swatch {
     width: 20px;
     height: 20px;
@@ -1359,12 +1409,15 @@ td.price-display > div > div:not(:first-child) > span:last-child {
     overflow: hidden;
     transition: max-height 0.3s ease-out;
 }
+
 .collapsible-content.is-expanded {
     max-height: 1000px; /* Adjust to a sufficiently large value */
     transition: max-height 0.5s ease-in;
 }
+
 .collapsible-toggle { /* Style for the button/link that toggles */
     cursor: pointer;
+
     /* Add other styling as needed */
 }
 
@@ -1386,26 +1439,34 @@ table.quantity-price-table {
 table.quantity-price-table > tbody > tr > td {
     padding: 5px; /* Adjust for "nicely spaced" */
     vertical-align: top;
-    /* text-align: left; */ /* Or 'center' if preferred for all cells by default */
+
+    /* text-align: left; */
+
+ /* Or 'center' if preferred for all cells by default */
 }
+
 /* Conditional Green Styling - Applied when LTM is NOT applicable and qty >= 24 */
+
 /* This class is added to the main div inside td.price-display */
 td.price-display > div.pricing-box-no-ltm > div:first-child { /* Target only the header of the green box */
     background-color: var(--secondary-color) !important; /* #5cb85c - Standard Green */
     color: white !important;
-    border-bottom: 1px solid #4a9d4a !important; /* Slightly darker green for separation */
+    border-bottom: 1px solid var(--brand-600) !important; /* Slightly darker green for separation */
 }
 
 /* Rows within the green box will inherit default styling from: */
+
 /* td.price-display > div > div:not(:first-child) */
+
 /* No need to repeat row styling unless specific overrides for green box rows are needed. */
 
 /* ============================= */
+
 /* Quote System Integration */
+
 /* ============================= */
 
 /* Import quote system styles */
-@import url('quote-system.css');
 
 /* Quote-specific overrides for pricing pages */
 .pricing-page .quote-builder-container {
@@ -1419,11 +1480,11 @@ td.price-display > div.pricing-box-no-ltm > div:first-child { /* Target only the
 
 /* Quote button integration with add-to-cart section */
 .add-to-cart-section.quote-mode {
-    border-left-color: var(--secondary-color, #5cb85c);
+    border-left-color: var(--secondary-color, var(--brand-500));
 }
 
 .add-to-cart-section.quote-mode .section-title {
-    color: var(--secondary-color, #5cb85c);
+    color: var(--secondary-color, var(--brand-500));
 }
 
 /* Quote builder within pricing context */
@@ -1443,7 +1504,7 @@ td.price-display > div.pricing-box-no-ltm > div:first-child { /* Target only the
 }
 
 /* Mobile adjustments for quote system on pricing pages */
-@media (max-width: 768px) {
+@media (width <= 768px) {
     .pricing-page .quote-summary-panel {
         top: 0;
     }
@@ -1461,6 +1522,6 @@ td.price-display > div.pricing-box-no-ltm > div:first-child { /* Target only the
     }
     
     .pricing-page .quote-summary-panel {
-        page-break-inside: avoid;
+        break-inside: avoid;
     }
 }

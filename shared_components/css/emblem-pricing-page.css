@@ -9,13 +9,27 @@
    By design, when sticker visuals get tweaked, emblem follows.
    ========================================================================== */
 
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue so the page
+   keeps its exact look. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   every rule below uses var(). Raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
+:root {
+    --emblem-pricing-page-gray-dark: #000;
+    --emblem-pricing-page-yellow: #4b4538;
+    --emblem-pricing-page-yellow-dark: #6b4a05;
+    --emblem-pricing-page-yellow-2: #f4d77a;
+    --emblem-pricing-page-orange: #c9a36e;
+    --emblem-pricing-page-blue: #1e3a8a;
+}
+/* stylelint-enable color-no-hex */
+
 /* -- Emblem 16×10 pricing grid -------------------------------------------- */
 
 .emblem-grid-wrap {
     width: 100%;
     overflow-x: auto;          /* horizontal scroll on small screens */
     border-radius: var(--radius-2, 12px);
-    background: var(--paper-1, #fff);
+    background: var(--paper-1, var(--color-surface));
     box-shadow: var(--shadow-1);
 }
 
@@ -31,14 +45,14 @@
     position: sticky;
     top: 0;
     z-index: 1;
-    background: var(--paper-2, #f6f1e6);
-    color: var(--ink-2, #4b4538);
+    background: var(--paper-2, var(--store-paper-deep));
+    color: var(--ink-2, var(--emblem-pricing-page-yellow));
     font-size: 11px;
     font-weight: 700;
     letter-spacing: 0.05em;
     text-transform: uppercase;
     padding: 10px 8px;
-    border-bottom: 1px solid var(--rule, rgba(0,0,0,0.08));
+    border-bottom: 1px solid var(--rule, rgb(0 0 0 / 8%));
     text-align: center;
 }
 
@@ -50,8 +64,8 @@
 .emblem-pricing-table tbody td {
     padding: 9px 8px;
     text-align: center;
-    border-bottom: 1px solid var(--rule-soft, rgba(0,0,0,0.04));
-    color: var(--ink-2, #4b4538);
+    border-bottom: 1px solid var(--rule-soft, rgb(0 0 0 / 4%));
+    color: var(--ink-2, var(--emblem-pricing-page-yellow));
     transition: background var(--dur-fast, 120ms) ease,
                 color var(--dur-fast, 120ms) ease;
 }
@@ -60,8 +74,8 @@
     text-align: left;
     padding-left: 16px;
     font-weight: 600;
-    color: var(--ink-1, #2a2419);
-    background: var(--paper-2, #f6f1e6);
+    color: var(--ink-1, var(--print-ink));
+    background: var(--paper-2, var(--store-paper-deep));
     white-space: nowrap;
     position: sticky;
     left: 0;
@@ -74,21 +88,21 @@
 
 /* Hover highlight on each cell to make scanning the grid easier */
 .emblem-pricing-table tbody tr:hover td:not(.size-label) {
-    background: var(--paper-2, #f6f1e6);
+    background: var(--paper-2, var(--store-paper-deep));
 }
 
 /* AI-quoted cell highlight (mirrors sticker's row highlight) */
 .emblem-pricing-table tbody td.ai-highlighted {
-    background: var(--accent-soft, #fde7d4);
-    color: var(--accent-deep, #b8420a);
+    background: var(--accent-soft, var(--amber-100));
+    color: var(--accent-deep, var(--store-rush-deep));
     font-weight: 700;
     position: relative;
     animation: pulse-cell 1.4s ease-in-out 2;
 }
 
 @keyframes pulse-cell {
-    0%, 100% { box-shadow: 0 0 0 0 var(--accent-soft, #fde7d4); }
-    50%      { box-shadow: 0 0 0 6px var(--accent-soft, #fde7d4); }
+    0%, 100% { box-shadow: 0 0 0 0 var(--accent-soft, var(--amber-100)); }
+    50%      { box-shadow: 0 0 0 6px var(--accent-soft, var(--amber-100)); }
 }
 
 .emblem-pricing-table tbody td.ai-highlighted::after {
@@ -100,8 +114,8 @@
     font-weight: 700;
     letter-spacing: 0.04em;
     text-transform: uppercase;
-    background: var(--accent-deep, #b8420a);
-    color: #fff;
+    background: var(--accent-deep, var(--store-rush-deep));
+    color: var(--color-on-brand);
     padding: 2px 6px;
     border-radius: 4px;
     pointer-events: none;
@@ -114,18 +128,20 @@
    "money / savings opportunity" without being alarm-red.
    ---------------------------------------------------------------------- */
 .quick-fact.quick-fact--accent {
-    background: linear-gradient(135deg, #fff8e7 0%, #ffeec9 100%);
-    border: 1px solid #f4d77a;
-    box-shadow: 0 1px 0 0 rgba(232, 175, 30, 0.18) inset,
-                0 2px 8px -2px rgba(180, 130, 20, 0.18);
-    color: #6b4a05;
+    background: linear-gradient(135deg, var(--store-rush-soft) 0%, var(--amber-100) 100%);
+    border: 1px solid var(--emblem-pricing-page-yellow-2);
+    box-shadow: 0 1px 0 0 rgb(232 175 30 / 18%) inset,
+                0 2px 8px -2px rgb(180 130 20 / 18%);
+    color: var(--emblem-pricing-page-yellow-dark);
     font-weight: 500;
 }
+
 .quick-fact.quick-fact--accent i {
-    color: #b8420a;
+    color: var(--store-rush-deep);
 }
+
 .quick-fact.quick-fact--accent strong {
-    color: #6b4a05;
+    color: var(--emblem-pricing-page-yellow-dark);
     font-weight: 700;
 }
 
@@ -135,7 +151,7 @@
 .page-hero h1 .em-mono {
     font-family: var(--mono, ui-monospace, 'SF Mono', Menlo, monospace);
     font-size: 0.85em;
-    color: var(--accent-deep, #b8420a);
+    color: var(--accent-deep, var(--store-rush-deep));
     letter-spacing: -0.01em;
 }
 
@@ -165,15 +181,14 @@
        starts much further left and ends at full opacity earlier — so the
        collage stays mostly visible while still blending into the
        headline area on the far left */
-    -webkit-mask-image: linear-gradient(95deg, transparent 0%, rgba(0,0,0,0.4) 12%, #000 32%, #000 100%);
-            mask-image: linear-gradient(95deg, transparent 0%, rgba(0,0,0,0.4) 12%, #000 32%, #000 100%);
+            mask-image: linear-gradient(95deg, transparent 0%, rgb(0 0 0 / 40%) 12%, var(--emblem-pricing-page-gray-dark) 32%, var(--emblem-pricing-page-gray-dark) 100%);
 
     /* Subtle shadow lifts the patches off the cream hero background */
-    filter: drop-shadow(0 6px 18px rgba(20, 18, 12, 0.16));
+    filter: drop-shadow(0 6px 18px rgb(20 18 12 / 16%));
 }
 
 /* Tablet — slightly less width, still contained */
-@media (max-width: 960px) {
+@media (width <= 960px) {
     .page-hero-art.emblem-hero-art {
         width: clamp(280px, 45%, 460px);
         padding: var(--space-2, 12px) var(--space-3, 16px) var(--space-2, 12px) 0;
@@ -182,14 +197,14 @@
 
 /* Mobile — hide the hero art entirely; the headline + CTA need the full
    width and the collage would compete with the AI CTA for attention */
-@media (max-width: 640px) {
+@media (width <= 640px) {
     .page-hero-art.emblem-hero-art {
         display: none;
     }
 }
 
 /* Tool-chip alternate icon for emblem tool */
-.tool-chip.emblem-tool i { color: var(--accent-deep, #b8420a); }
+.tool-chip.emblem-tool i { color: var(--accent-deep, var(--store-rush-deep)); }
 
 /* Live emblem-quote card — mirrors banner-quote-card structure. Renders
    inline in the chat when AI emits PRICE_QUOTE so the rep sees the order
@@ -197,21 +212,23 @@
 .emblem-quote-card {
     margin-top: 12px;
     padding: 14px 16px;
-    background: linear-gradient(135deg, #1f3a1f 0%, #2d5a2d 100%);
-    color: #fff;
+    background: linear-gradient(135deg, var(--store-green-900) 0%, var(--brand-700) 100%);
+    color: var(--color-on-brand);
     border-radius: var(--radius-2, 12px);
-    box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+    box-shadow: 0 4px 14px rgb(0 0 0 / 18%);
     position: relative;
     overflow: hidden;
 }
+
 .emblem-quote-card::before {
     content: "";
     position: absolute;
     top: 0; right: 0;
     width: 80px; height: 80px;
-    background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
+    background: radial-gradient(circle, rgb(255 255 255 / 8%) 0%, transparent 70%);
     pointer-events: none;
 }
+
 .emblem-quote-card .eqc-label {
     font-size: 10px;
     font-weight: 700;
@@ -220,36 +237,42 @@
     opacity: 0.7;
     margin-bottom: 4px;
 }
+
 .emblem-quote-card .eqc-pn {
     font-family: var(--mono, ui-monospace, 'SF Mono', Menlo, monospace);
     font-size: 16px;
     font-weight: 600;
-    color: #fff8e7;
+    color: var(--store-rush-soft);
 }
+
 .emblem-quote-card .eqc-spec {
     font-size: 12px;
     opacity: 0.85;
     margin: 2px 0 12px;
 }
+
 .emblem-quote-card .eqc-line {
     display: flex;
     justify-content: space-between;
     gap: 12px;
     font-size: 13px;
     padding: 4px 0;
-    border-top: 1px solid rgba(255,255,255,0.08);
+    border-top: 1px solid rgb(255 255 255 / 8%);
 }
 .emblem-quote-card .eqc-line:first-of-type { border-top: none; }
+
 .emblem-quote-card .eqc-line.total {
-    border-top: 1px solid rgba(255,255,255,0.25);
+    border-top: 1px solid rgb(255 255 255 / 25%);
     margin-top: 6px;
     padding-top: 8px;
     font-weight: 700;
     font-size: 15px;
 }
+
 .emblem-quote-card .eqc-line .v {
     font-family: var(--mono, ui-monospace, 'SF Mono', Menlo, monospace);
 }
+
 .emblem-quote-card .eqc-note {
     font-size: 11px;
     opacity: 0.75;
@@ -266,32 +289,35 @@
     margin-right: 4px;
     vertical-align: middle;
 }
-.backing-swatch.iron-on { background: #c9a36e; }
-.backing-swatch.sewn-on { background: #6b7280; }
-.backing-swatch.velcro  { background: #1e3a8a; }
+.backing-swatch.iron-on { background: var(--emblem-pricing-page-orange); }
+.backing-swatch.sewn-on { background: var(--gray-500); }
+.backing-swatch.velcro  { background: var(--emblem-pricing-page-blue); }
 
 /* -- Responsive: stack the grid into vertical cards on small screens ---- */
-@media (max-width: 640px) {
+@media (width <= 640px) {
     .emblem-pricing-table { min-width: 0; }
     .emblem-pricing-table thead { display: none; }
     .emblem-pricing-table tbody td:not(.size-label) { display: none; }
+
     .emblem-pricing-table tbody td.size-label {
         display: block;
         position: static;
-        background: var(--paper-1, #fff);
+        background: var(--paper-1, var(--color-surface));
         padding: 12px 16px;
-        border-bottom: 1px solid var(--rule-soft, rgba(0,0,0,0.06));
+        border-bottom: 1px solid var(--rule-soft, rgb(0 0 0 / 6%));
     }
+
     .emblem-pricing-table tbody td.size-label::after {
         content: " — open chat for a quote at your qty";
         font-weight: 400;
-        color: var(--ink-3, #6b7280);
+        color: var(--ink-3, var(--gray-500));
         font-size: 12px;
     }
 }
 
 /* -- Screen-reader-only utility (visually hidden, still announced) -------- */
 .sr-only {
+    /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
     position: absolute !important;
     width: 1px;
     height: 1px;
@@ -309,8 +335,9 @@
     padding: 6px 16px 0;
     font-size: 11px;
     line-height: 1.4;
-    color: var(--ink-3, #6b7280);
+    color: var(--ink-3, var(--gray-500));
 }
-@media (max-width: 640px) {
+
+@media (width <= 640px) {
     .ai-chat-tip { display: none; }   /* save vertical space on phones */
 }

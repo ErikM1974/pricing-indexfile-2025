@@ -9,7 +9,13 @@
    MODERN CSS CUSTOM PROPERTIES
    ============================================ */
 @layer enhancements {
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue, merged into its
+   existing :root. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
   :root {
+    --calculator-modern-enhancements-red: #ef4444;
+
     /* Fluid Typography Scale */
     --fluid-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
     --fluid-sm: clamp(0.875rem, 0.8rem + 0.3vw, 1rem);
@@ -27,18 +33,19 @@
     --space-xl: clamp(2rem, 1.75rem + 1.25vw, 3rem);
     
     /* Modern Shadow System */
-    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
-    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.05);
-    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.05);
-    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.05), 0 4px 6px rgba(0, 0, 0, 0.05);
-    --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.05), 0 10px 10px rgba(0, 0, 0, 0.04);
+    --shadow-xs: 0 1px 2px rgb(0 0 0 / 5%);
+    --shadow-sm: 0 2px 4px rgb(0 0 0 / 5%), 0 1px 2px rgb(0 0 0 / 5%);
+    --shadow-md: 0 4px 6px rgb(0 0 0 / 5%), 0 2px 4px rgb(0 0 0 / 5%);
+    --shadow-lg: 0 10px 15px rgb(0 0 0 / 5%), 0 4px 6px rgb(0 0 0 / 5%);
+    --shadow-xl: 0 20px 25px rgb(0 0 0 / 5%), 0 10px 10px rgb(0 0 0 / 4%);
     
     /* Glass Effect Variables */
-    --glass-bg: rgba(255, 255, 255, 0.7);
-    --glass-border: rgba(255, 255, 255, 0.3);
-    --glass-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+    --glass-bg: rgb(255 255 255 / 70%);
+    --glass-border: rgb(255 255 255 / 30%);
+    --glass-shadow: 0 8px 32px rgb(31 38 135 / 15%);
     --glass-blur: blur(10px);
   }
+/* stylelint-enable color-no-hex */
 }
 
 /* ============================================
@@ -46,6 +53,7 @@
    ============================================ */
 @supports (container-type: inline-size) {
   /* Define container contexts - REMOVED main-container to prevent layout issues */
+
   /* Container queries should be opt-in per calculator */
   
   .input-section,
@@ -82,6 +90,7 @@
   }
   
   /* Grid adjustments removed - let base CSS handle this */
+
   /* Calculator-specific styles should handle their own grid layouts */
 }
 
@@ -111,7 +120,9 @@
 }
 
 /* Named grid areas for semantic layouts - DISABLED to prevent conflicts */
+
 /* Calculators should define their own grid areas if needed */
+
 /* @supports (grid-template-areas: "header") {
   .calculator-layout {
     display: grid;
@@ -153,12 +164,13 @@
 /* ============================================
    MODERN SELECTORS
    ============================================ */
+
 /* Enhanced form group styling with :has() */
 @supports selector(:has(*)) {
   /* Highlight form groups with errors */
   .form-group:has(.error) {
-    background: linear-gradient(to right, rgba(239, 68, 68, 0.05), transparent);
-    border-left: 3px solid #ef4444;
+    background: linear-gradient(to right, rgb(239 68 68 / 5%), transparent);
+    border-left: 3px solid var(--calculator-modern-enhancements-red);
     padding-left: 1rem;
     margin-left: -1rem;
   }
@@ -187,7 +199,7 @@
 
 /* Focus-within for better visual feedback */
 .form-group:focus-within {
-  background: linear-gradient(to right, rgba(76, 179, 84, 0.03), transparent);
+  background: linear-gradient(to right, rgb(76 179 84 / 3%), transparent);
   border-radius: 8px;
   transition: background 0.3s ease;
 }
@@ -195,13 +207,14 @@
 /* ============================================
    GLASSMORPHISM EFFECTS
    ============================================ */
+
 /* Glassmorphism disabled by default to prevent rendering issues */
+
 /* Calculators can opt-in by adding .enable-glass class to body */
 body.enable-glass .glass-card {
   @supports (backdrop-filter: blur(10px)) {
     background: var(--glass-bg);
     backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
     border: 1px solid var(--glass-border);
     box-shadow: var(--glass-shadow);
   }
@@ -210,11 +223,10 @@ body.enable-glass .glass-card {
 body.enable-glass .results-section.glass {
   @supports (backdrop-filter: blur(12px)) {
     background: linear-gradient(135deg, 
-      rgba(255, 255, 255, 0.8) 0%, 
-      rgba(255, 255, 255, 0.6) 100%);
+      rgb(255 255 255 / 80%) 0%, 
+      rgb(255 255 255 / 60%) 100%);
     backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.4);
+    border: 1px solid rgb(255 255 255 / 40%);
   }
 }
 
@@ -222,14 +234,14 @@ body.enable-glass .results-section.glass {
 @supports (backdrop-filter: blur(5px)) {
   .modal-backdrop {
     backdrop-filter: blur(5px);
-    -webkit-backdrop-filter: blur(5px);
-    background: rgba(0, 0, 0, 0.3);
+    background: rgb(0 0 0 / 30%);
   }
 }
 
 /* ============================================
    MODERN TYPOGRAPHY
    ============================================ */
+
 /* Balanced text wrapping */
 @supports (text-wrap: balance) {
   h1, h2, h3, h4, h5, h6,
@@ -261,8 +273,8 @@ body.enable-glass .results-section.glass {
     
     /* Semantic color tokens */
     --success-subtle: color-mix(in srgb, var(--primary-green) 10%, white);
-    --warning-subtle: color-mix(in srgb, #f59e0b 10%, white);
-    --error-subtle: color-mix(in srgb, #ef4444 10%, white);
+    --warning-subtle: color-mix(in srgb, var(--amber-500) 10%, white);
+    --error-subtle: color-mix(in srgb, var(--calculator-modern-enhancements-red) 10%, white);
   }
 }
 
@@ -276,6 +288,7 @@ body.enable-glass .results-section.glass {
       opacity: 0;
       transform: translateY(20px);
     }
+
     to {
       opacity: 1;
       transform: translateY(0);
@@ -308,6 +321,7 @@ body.enable-glass .results-section.glass {
 /* ============================================
    ENHANCED BUTTONS & INTERACTIONS
    ============================================ */
+
 /* Modern button styles with better states */
 .btn {
   position: relative;
@@ -326,7 +340,7 @@ body.enable-glass .results-section.glass {
   width: 0;
   height: 0;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.3);
+  background: rgb(255 255 255 / 30%);
   transform: translate(-50%, -50%);
   transition: width 0.4s, height 0.4s;
 }
@@ -354,6 +368,7 @@ body.enable-glass .results-section.glass {
   0% {
     background-position: -200% 0;
   }
+
   100% {
     background-position: 200% 0;
   }
@@ -362,9 +377,9 @@ body.enable-glass .results-section.glass {
 .skeleton {
   background: linear-gradient(
     90deg,
-    #f0f0f0 25%,
-    #e0e0e0 50%,
-    #f0f0f0 75%
+    var(--gray-100) 25%,
+    var(--gray-200) 50%,
+    var(--gray-100) 75%
   );
   background-size: 200% 100%;
   animation: skeleton-loading 1.5s infinite;
@@ -425,7 +440,7 @@ body.enable-glass .results-section.glass {
       padding-left: 50%;
     }
     
-    .pricing-table td:before {
+    .pricing-table td::before {
       content: attr(data-label);
       position: absolute;
       left: 6px;
@@ -440,6 +455,7 @@ body.enable-glass .results-section.glass {
 /* ============================================
    PERFORMANCE OPTIMIZATIONS
    ============================================ */
+
 /* Content visibility for better rendering */
 @supports (content-visibility: auto) {
   .results-section:not(.active) {
@@ -453,9 +469,13 @@ body.enable-glass .results-section.glass {
   *,
   *::before,
   *::after {
+    /* stylelint-disable-next-line declaration-no-important -- prefers-reduced-motion kill switch must beat every animation */
     animation-duration: 0.01ms !important;
+    /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
     animation-iteration-count: 1 !important;
+    /* stylelint-disable-next-line declaration-no-important -- prefers-reduced-motion kill switch must beat every animation */
     transition-duration: 0.01ms !important;
+    /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
     scroll-behavior: auto !important;
   }
 }
@@ -463,6 +483,7 @@ body.enable-glass .results-section.glass {
 /* ============================================
    MODERN FORM PATTERNS
    ============================================ */
+
 /* Floating labels without JavaScript */
 .form-field {
   position: relative;
@@ -505,19 +526,19 @@ body.enable-glass .results-section.glass {
    ============================================ */
 .card {
   box-shadow: 
-    0 1px 3px rgba(0, 0, 0, 0.02),
-    0 2px 8px rgba(0, 0, 0, 0.04),
-    0 4px 16px rgba(0, 0, 0, 0.06);
+    0 1px 3px rgb(0 0 0 / 2%),
+    0 2px 8px rgb(0 0 0 / 4%),
+    0 4px 16px rgb(0 0 0 / 6%);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .card:hover {
   transform: translateY(-4px);
   box-shadow: 
-    0 2px 4px rgba(0, 0, 0, 0.02),
-    0 4px 12px rgba(0, 0, 0, 0.04),
-    0 8px 24px rgba(0, 0, 0, 0.08),
-    0 16px 32px rgba(0, 0, 0, 0.10);
+    0 2px 4px rgb(0 0 0 / 2%),
+    0 4px 12px rgb(0 0 0 / 4%),
+    0 8px 24px rgb(0 0 0 / 8%),
+    0 16px 32px rgb(0 0 0 / 10%);
 }
 
 /* ============================================

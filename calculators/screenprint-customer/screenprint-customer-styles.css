@@ -1,5 +1,18 @@
 /* ============================================ */
+
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue so the page
+   keeps its exact look. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   every rule below uses var(). Raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
+:root {
+    --screenprint-customer-styles-green-tint: #d1fae5;
+    --screenprint-customer-styles-teal: #10b981;
+    --screenprint-customer-styles-teal-dark: #065f46;
+}
+/* stylelint-enable color-no-hex */
+
 /* SCREEN PRINT CUSTOMER CALCULATOR SPECIFIC   */
+
 /* ============================================ */
 
 /* Screen print location cards */
@@ -16,12 +29,12 @@
 .location-card:hover {
     border-color: var(--primary-color);
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 8px rgb(0 0 0 / 10%);
 }
 
 .location-card.selected {
     border-color: var(--primary-color);
-    background: rgba(58, 124, 82, 0.05);
+    background: rgb(58 124 82 / 5%);
 }
 
 .location-icon {
@@ -106,9 +119,9 @@
 
 /* Customer supplied note */
 .customer-supplied-banner {
-    background: linear-gradient(135deg, #e8f4ea 0%, #d1fae5 100%);
-    border: 1px solid #10b981;
-    color: #065f46;
+    background: linear-gradient(135deg, var(--brand-100) 0%, var(--screenprint-customer-styles-green-tint) 100%);
+    border: 1px solid var(--screenprint-customer-styles-teal);
+    color: var(--screenprint-customer-styles-teal-dark);
     padding: 1rem;
     border-radius: 8px;
     margin-bottom: 1.5rem;
@@ -123,9 +136,9 @@
 
 /* LTM warning for screen print */
 .ltm-warning {
-    background: #fef3c7;
-    border: 1px solid #f59e0b;
-    color: #92400e;
+    background: var(--amber-100);
+    border: 1px solid var(--amber-500);
+    color: var(--amber-800);
     padding: 1rem;
     border-radius: 6px;
     margin-top: 1rem;

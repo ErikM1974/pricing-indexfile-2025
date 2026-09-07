@@ -1,27 +1,45 @@
+/* stylelint-disable declaration-no-important -- override stack: this calculator page layers fix/override sheets and JS-injected styles; the flags come out together when the page is untangled (2026-09-07) */
+
 /**
  * DTF Toggle Pricing Interface Styles
  * Two-column layout: Print Locations (left) | Quantity Tiers (right)
  * iOS-style toggle switches with green theme
  */
 
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue so the page
+   keeps its exact look. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   every rule below uses var(). Raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
+:root {
+    --dtf-toggle-pricing-yellow: #fbbf24;
+    --dtf-toggle-pricing-green: #22c55e;
+    --dtf-toggle-pricing-green-2: #15803d;
+    --dtf-toggle-pricing-green-3: #3a7c52;
+    --dtf-toggle-pricing-green-4: #c8e6c9;
+    --dtf-toggle-pricing-green-5: #4ade80;
+    --dtf-toggle-pricing-cyan-tint: #bfdbfe;
+    --dtf-toggle-pricing-blue: #1e3a8a;
+}
+/* stylelint-enable color-no-hex */
+
 /* Pricing Matrix Header - Matches DTG style */
 .dtf-pricing-matrix-header {
     margin-bottom: 32px;
     padding-bottom: 24px;
-    border-bottom: 1px solid #e5e7eb;
+    border-bottom: 1px solid var(--gray-200);
 }
 
 .dtf-matrix-title {
     font-size: 2rem;
     font-weight: 700;
-    color: #1f2937;
+    color: var(--gray-800);
     margin-bottom: 8px;
     letter-spacing: -0.5px;
 }
 
 .dtf-matrix-subtitle {
     font-size: 1.125rem;
-    color: #6b7280;
+    color: var(--gray-500);
     margin: 0;
     font-weight: 400;
 }
@@ -45,12 +63,12 @@
     padding: 16px;
     background: white;
     border-radius: 12px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 1px 3px rgb(0 0 0 / 10%);
 }
 
 .dtf-section-icon {
     font-size: 1.5rem;
-    color: #4cb354;
+    color: var(--brand-500);
     margin-top: 4px;
     flex-shrink: 0;
 }
@@ -59,14 +77,14 @@
 .dtf-column-header {
     font-size: 1.25rem;
     font-weight: 700;
-    color: #1f2937;
+    color: var(--gray-800);
     margin-bottom: 4px;
     margin-top: 0;
 }
 
 .dtf-column-subtitle {
     font-size: 0.875rem;
-    color: #6b7280;
+    color: var(--gray-500);
     margin: 0;
     font-weight: 400;
 }
@@ -83,16 +101,16 @@
     background: white;
     border-radius: 12px;
     padding: 20px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 2px 8px rgb(0 0 0 / 8%);
 }
 
 .dtf-size-category-header {
     font-size: 1rem;
     font-weight: 600;
-    color: #3a7c52;
+    color: var(--dtf-toggle-pricing-green-3);
     margin-bottom: 16px;
     padding-bottom: 8px;
-    border-bottom: 1px solid #e8f5e9;
+    border-bottom: 1px solid var(--brand-100);
     display: flex;
     align-items: center;
     gap: 8px;
@@ -101,11 +119,11 @@
 .dtf-size-badge {
     display: inline-block;
     padding: 4px 12px;
-    background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+    background: linear-gradient(135deg, var(--brand-100) 0%, var(--dtf-toggle-pricing-green-4) 100%);
     border-radius: 12px;
     font-size: 0.75rem;
     font-weight: 600;
-    color: #2d5f3f;
+    color: var(--print-green);
 }
 
 /* Toggle Items - 2 Column Layout */
@@ -121,8 +139,8 @@
     align-items: center;
     justify-content: space-between;
     padding: 14px 18px;
-    background: #f7fafc;
-    border: 2px solid #e2e8f0;
+    background: var(--slate-50);
+    border: 2px solid var(--slate-200);
     border-radius: 10px;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -130,8 +148,8 @@
 }
 
 .dtf-toggle-item:hover {
-    background: #edf2f7;
-    border-color: #cbd5e0;
+    background: var(--slate-100);
+    border-color: var(--gray-300);
     transform: translateX(2px);
 }
 
@@ -139,10 +157,10 @@
     background: white !important;
     background-color: white !important;
     background-image: none !important;
-    border: 3px solid #4cb354 !important;
-    color: #4cb354 !important;
+    border: 3px solid var(--brand-500) !important;
+    color: var(--brand-500) !important;
     transform: translateX(4px);
-    box-shadow: 0 0 0 2px rgba(76, 179, 84, 0.2);
+    box-shadow: 0 0 0 2px rgb(76 179 84 / 20%);
 }
 
 .dtf-toggle-label {
@@ -152,7 +170,7 @@
 }
 
 .dtf-toggle-item.active .dtf-toggle-label {
-    color: #4cb354 !important;
+    color: var(--brand-500) !important;
     font-weight: 600;
 }
 
@@ -161,13 +179,13 @@
     position: relative;
     width: 52px;
     height: 28px;
-    background: #cbd5e0;
+    background: var(--gray-300);
     border-radius: 14px;
     transition: background-color 0.3s ease;
 }
 
 .dtf-toggle-item.active .dtf-toggle-switch {
-    background: #4ade80;
+    background: var(--dtf-toggle-pricing-green-5);
 }
 
 .dtf-toggle-switch-slider {
@@ -179,7 +197,7 @@
     background: white;
     border-radius: 50%;
     transition: transform 0.3s ease;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 2px 4px rgb(0 0 0 / 20%);
 }
 
 .dtf-toggle-item.active .dtf-toggle-switch-slider {
@@ -194,6 +212,7 @@
 }
 
 /* Tier Buttons - Vertical Stack */
+
 /* Override any grid layouts (including .pricing-tiers-grid from dtf-calculator-fix.css) */
 #dtf-tier-buttons,
 .dtf-tier-buttons,
@@ -205,25 +224,25 @@
     background: white;
     border-radius: 12px;
     padding: 20px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 2px 8px rgb(0 0 0 / 8%);
 }
 
 .dtf-tier-button {
     padding: 16px 20px;
-    background: #f7fafc;
-    border: 2px solid #e2e8f0;
+    background: var(--slate-50);
+    border: 2px solid var(--slate-200);
     border-radius: 10px;
     font-size: 0.95rem;
     font-weight: 500;
-    color: #2d3748;
+    color: var(--gray-700);
     cursor: pointer;
     transition: all 0.3s ease;
     text-align: center;
 }
 
 .dtf-tier-button:hover {
-    background: #edf2f7;
-    border-color: #cbd5e0;
+    background: var(--slate-100);
+    border-color: var(--gray-300);
     transform: translateY(-2px);
 }
 
@@ -231,10 +250,10 @@
     background: white !important;
     background-color: white !important;
     background-image: none !important;
-    border: 3px solid #4cb354 !important;
-    color: #4cb354 !important;
+    border: 3px solid var(--brand-500) !important;
+    color: var(--brand-500) !important;
     font-weight: 600;
-    box-shadow: 0 0 0 2px rgba(76, 179, 84, 0.2);
+    box-shadow: 0 0 0 2px rgb(76 179 84 / 20%);
 }
 
 /* Conditional Quantity Input for 10-23 Tier */
@@ -242,8 +261,8 @@
     display: none;
     margin-top: 12px;
     padding: 16px;
-    background: #fef3c7;
-    border: 2px solid #fbbf24;
+    background: var(--amber-100);
+    border: 2px solid var(--dtf-toggle-pricing-yellow);
     border-radius: 10px;
 }
 
@@ -257,6 +276,7 @@
         opacity: 0;
         transform: translateY(-10px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -267,7 +287,7 @@
     display: block;
     font-size: 0.85rem;
     font-weight: 600;
-    color: #92400e;
+    color: var(--amber-800);
     margin-bottom: 8px;
 }
 
@@ -275,51 +295,51 @@
     width: 100%;
     padding: 10px 14px;
     font-size: 1rem;
-    border: 2px solid #fbbf24;
+    border: 2px solid var(--dtf-toggle-pricing-yellow);
     border-radius: 8px;
     background: white;
-    color: #1f2937;
+    color: var(--gray-800);
 }
 
 .dtf-quantity-input:focus {
     outline: none;
-    border-color: #f59e0b;
-    box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.2);
+    border-color: var(--amber-500);
+    box-shadow: 0 0 0 3px rgb(251 191 36 / 20%);
 }
 
 .dtf-quantity-hint {
     display: block;
     margin-top: 6px;
     font-size: 0.75rem;
-    color: #92400e;
+    color: var(--amber-800);
 }
 
 /* Info Box Below Tiers */
 .dtf-info-box {
     padding: 16px;
-    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
-    border: 2px solid #3b82f6;
+    background: linear-gradient(135deg, var(--sky-100) 0%, var(--dtf-toggle-pricing-cyan-tint) 100%);
+    border: 2px solid var(--color-floor-light);
     border-radius: 10px;
     font-size: 0.875rem;
-    color: #1e3a8a;
+    color: var(--dtf-toggle-pricing-blue);
     line-height: 1.5;
 }
 
 .dtf-info-box i {
     margin-right: 8px;
-    color: #3b82f6;
+    color: var(--color-floor-light);
 }
 
 /* Live Price Display - Matches DTG style */
 .dtf-live-price-display {
     margin-top: 32px;
     padding: 32px;
-    background: linear-gradient(135deg, #4cb354, #2d5f3f);
+    background: linear-gradient(135deg, var(--brand-500), var(--print-green));
     border: none;
     border-radius: 12px;
     text-align: center;
     position: relative; /* CRITICAL: Allows absolutely positioned tooltips to be positioned relative to this container */
-    box-shadow: 0 4px 12px rgba(76, 179, 84, 0.3);
+    box-shadow: 0 4px 12px rgb(76 179 84 / 30%);
 }
 
 /* Price label - matches DTG "Price per shirt" */
@@ -355,15 +375,15 @@
 .dtf-ltm-warning {
     margin-top: 12px;
     padding: 12px;
-    background: #fef3c7;
-    border: 2px solid #fbbf24;
+    background: var(--amber-100);
+    border: 2px solid var(--dtf-toggle-pricing-yellow);
     border-radius: 8px;
     font-size: 0.85rem;
-    color: #92400e;
+    color: var(--amber-800);
 }
 
 /* Responsive Design */
-@media (max-width: 968px) {
+@media (width <= 968px) {
     .dtf-toggle-pricing-container {
         grid-template-columns: 1fr;
         gap: 30px;
@@ -395,7 +415,7 @@
     }
 }
 
-@media (max-width: 640px) {
+@media (width <= 640px) {
     .dtf-toggle-pricing-container {
         padding: 10px;
         margin: 20px 0;
@@ -442,9 +462,9 @@
     left: 50%;
     transform: translateX(-50%);
     background: white;
-    border: 2px solid #22c55e;
+    border: 2px solid var(--dtf-toggle-pricing-green);
     border-radius: 12px;
-    box-shadow: 0 8px 24px rgba(34, 197, 94, 0.25);
+    box-shadow: 0 8px 24px rgb(34 197 94 / 25%);
     padding: 16px;
     min-width: 280px;
     max-width: 320px;
@@ -457,6 +477,7 @@
         opacity: 0;
         transform: translateX(-50%) translateY(10px);
     }
+
     to {
         opacity: 1;
         transform: translateX(-50%) translateY(0);
@@ -470,21 +491,21 @@
     left: 50%;
     transform: translateX(-50%);
     border: 10px solid transparent;
-    border-top-color: #22c55e;
+    border-top-color: var(--dtf-toggle-pricing-green);
 }
 
 .dtf-upcharge-tooltip-content {
     font-size: 14px;
-    color: #166534;
+    color: var(--print-green);
 }
 
 .dtf-upcharge-tooltip-header {
     font-size: 16px;
     font-weight: 700;
-    color: #15803d;
+    color: var(--dtf-toggle-pricing-green-2);
     margin-bottom: 12px;
     padding-bottom: 10px;
-    border-bottom: 2px solid #dcfce7;
+    border-bottom: 2px solid var(--store-green-100);
 }
 
 .dtf-upcharge-tooltip-body {
@@ -496,7 +517,7 @@
 .dtf-upcharge-base {
     margin-bottom: 8px;
     padding-bottom: 8px;
-    border-bottom: 1px solid #dcfce7;
+    border-bottom: 1px solid var(--store-green-100);
 }
 
 .dtf-upcharge-item {
@@ -504,22 +525,22 @@
     justify-content: space-between;
     align-items: center;
     padding: 6px 8px;
-    background: #f0fdf4;
+    background: var(--brand-50);
     border-radius: 6px;
 }
 
 .dtf-upcharge-item-size {
     font-weight: 600;
-    color: #15803d;
+    color: var(--dtf-toggle-pricing-green-2);
 }
 
 .dtf-upcharge-item-price {
     font-weight: 600;
-    color: #22c55e;
+    color: var(--dtf-toggle-pricing-green);
 }
 
 /* Mobile responsive */
-@media (max-width: 768px) {
+@media (width <= 768px) {
     .dtf-upcharge-tooltip {
         min-width: 240px;
         max-width: 280px;

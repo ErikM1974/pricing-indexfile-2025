@@ -132,6 +132,23 @@ decoration; the a11y lock now fails on it. 🔑 A page that starts with `<meta c
 `<html>`: check `document.compatMode` on any page that "looks slightly off". 🔑 Module-scope
 config reads need `typeof window !== 'undefined'` — the Node-run service tests load the file.
 
+## 2026-09-06 — 700 console.logs in production, and a basename match that hid four stale root copies (`v2026.09.06.37`)
+
+**Problem.** CLAUDE.md says "remove console.log before committing"; 68 served scripts still shipped
+~700 of them (a customer's console on the screen-print calculator scrolled 35 lines). The orphan
+lock said every script was referenced — but root-level `utils.js`, `dp5-helper.js`,
+`pricing-matrix-api.js` and `app-new.js` were stale copies nothing loads: their basenames appeared
+in comments and in the paths of their `shared_components/js` twins.
+**Root cause.** The rule was enforced by review, not by a lock. A referrer census that matches on
+basename cannot tell `/utils.js` from `/shared_components/js/utils.js` or `./utils.js`.
+**Solution.** Per-file gated logger (localhost / `?debug=1`) via one idempotent script; lock on bare
+`console.log(`. Referrer matching is now path-aware (directory-qualified for duplicated basenames,
+quoted `"/name.js"` for root files, sibling `./name.js` for ES modules).
+**Prevention.** 🔑 Any "is X referenced" census must match the PATH, not the name — and skip
+comments, tests, one-off scripts and archives. 🔑 Gate, don't delete, debug logging: the
+`?debug=1` switch keeps the diagnostics Erik uses without paying for them on every customer load.
+🔑 A generated identifier prefix can start with a digit — check the first character.
+
 ## Archived 2026-09-06
 
 ## 2026-09-06 — Calculator sweep (`v2026.09.06.9` → `.16`): 8 pages of inline code, 5 shared scripts with hardcoded hosts, and a dead loader

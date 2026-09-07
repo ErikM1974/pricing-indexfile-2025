@@ -12,19 +12,40 @@
    By design, when sticker visuals get tweaked, webstore follows.
    ========================================================================== */
 
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue so the page
+   keeps its exact look. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   every rule below uses var(). Raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
+:root {
+    --webstore-pricing-page-cyan: #1e5aa0;
+    --webstore-pricing-page-cyan-2: #94bbe0;
+    --webstore-pricing-page-yellow: #d6c896;
+    --webstore-pricing-page-yellow-2: #82704a;
+    --webstore-pricing-page-green: #0e7c46;
+    --webstore-pricing-page-orange: #78350f;
+    --webstore-pricing-page-indigo-dark: #2d1b5f;
+    --webstore-pricing-page-yellow-3: #ffe8a0;
+    --webstore-pricing-page-cyan-3: #38bdf8;
+    --webstore-pricing-page-cyan-4: #0284c7;
+    --webstore-pricing-page-blue: #1e40af;
+    --webstore-pricing-page-yellow-4: #4b4538;
+}
+/* stylelint-enable color-no-hex */
+
 /* -- Quick-fact accent (mirrors emblem's amber LTM treatment, slightly
       navier — webstore is a B2B service vs emblem's product order) ------- */
 .quick-fact.quick-fact--accent {
-    background: linear-gradient(135deg, #e8f1fb 0%, #d1e5f7 100%);
-    border: 1px solid #94bbe0;
-    box-shadow: 0 1px 0 0 rgba(30, 90, 160, 0.10) inset,
-                0 2px 8px -2px rgba(30, 90, 160, 0.18);
-    color: #0e3a66;
+    background: linear-gradient(135deg, var(--color-floor-tint) 0%, var(--sky-100) 100%);
+    border: 1px solid var(--webstore-pricing-page-cyan-2);
+    box-shadow: 0 1px 0 0 rgb(30 90 160 / 10%) inset,
+                0 2px 8px -2px rgb(30 90 160 / 18%);
+    color: var(--sky-900);
     font-weight: 500;
 }
-.quick-fact.quick-fact--accent i { color: #1e5aa0; }
+.quick-fact.quick-fact--accent i { color: var(--webstore-pricing-page-cyan); }
+
 .quick-fact.quick-fact--accent strong {
-    color: #0e3a66;
+    color: var(--sky-900);
     font-weight: 700;
 }
 
@@ -32,14 +53,15 @@
 .webstore-quote-card {
     margin-top: 12px;
     padding: 16px 18px;
-    background: linear-gradient(135deg, #fdfbf3 0%, #f6efde 100%);
-    color: #1a2a3f;
-    border: 1px solid #d6c896;
+    background: linear-gradient(135deg, var(--store-paper) 0%, var(--store-paper-deep) 100%);
+    color: var(--gray-800);
+    border: 1px solid var(--webstore-pricing-page-yellow);
     border-radius: var(--radius-2, 12px);
-    box-shadow: 0 4px 14px rgba(20, 40, 60, 0.10);
+    box-shadow: 0 4px 14px rgb(20 40 60 / 10%);
     position: relative;
     overflow: hidden;
 }
+
 .webstore-quote-card::before {
     content: "";
     position: absolute;
@@ -47,74 +69,83 @@
     right: -10px;
     width: 80px;
     height: 80px;
-    background: radial-gradient(circle, rgba(30, 60, 100, 0.06) 0%, transparent 70%);
+    background: radial-gradient(circle, rgb(30 60 100 / 6%) 0%, transparent 70%);
     pointer-events: none;
 }
+
 .webstore-quote-card .wsq-label {
     font-size: 10px;
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: #82704a;
+    color: var(--webstore-pricing-page-yellow-2);
     margin-bottom: 4px;
 }
+
 .webstore-quote-card .wsq-pn {
     font-family: var(--mono, ui-monospace, 'SF Mono', Menlo, monospace);
     font-size: 14px;
     font-weight: 600;
-    color: #1a2a3f;
+    color: var(--gray-800);
 }
+
 .webstore-quote-card .wsq-store-type {
     display: inline-block;
     margin-top: 4px;
     margin-bottom: 12px;
     padding: 3px 10px;
-    background: #1e5aa0;
-    color: #fff;
+    background: var(--webstore-pricing-page-cyan);
+    color: var(--color-on-brand);
     border-radius: 999px;
     font-size: 11px;
     font-weight: 600;
     letter-spacing: 0.03em;
 }
+
 .webstore-quote-card .wsq-store-type.open-close {
-    background: #0e7c46;
+    background: var(--webstore-pricing-page-green);
 }
+
 .webstore-quote-card .wsq-line {
     display: flex;
     justify-content: space-between;
     gap: 12px;
     font-size: 13px;
     padding: 5px 0;
-    border-top: 1px solid rgba(20, 40, 60, 0.08);
+    border-top: 1px solid rgb(20 40 60 / 8%);
 }
 .webstore-quote-card .wsq-line:first-of-type { border-top: none; }
+
 .webstore-quote-card .wsq-line.total {
-    border-top: 1px solid rgba(20, 40, 60, 0.25);
+    border-top: 1px solid rgb(20 40 60 / 25%);
     margin-top: 6px;
     padding-top: 8px;
     font-weight: 700;
     font-size: 15px;
 }
+
 .webstore-quote-card .wsq-line .v {
     font-family: var(--mono, ui-monospace, 'SF Mono', Menlo, monospace);
 }
+
 .webstore-quote-card .wsq-meta {
     margin-top: 10px;
     padding-top: 10px;
-    border-top: 1px dashed rgba(20, 40, 60, 0.16);
+    border-top: 1px dashed rgb(20 40 60 / 16%);
     font-size: 12px;
-    color: #4a5870;
+    color: var(--slate-600);
     line-height: 1.45;
 }
-.webstore-quote-card .wsq-meta strong { color: #1a2a3f; }
+.webstore-quote-card .wsq-meta strong { color: var(--gray-800); }
+
 .webstore-quote-card .wsq-warn {
     margin-top: 8px;
     padding: 8px 10px;
-    background: #fef3c7;
-    border-left: 3px solid #d97706;
+    background: var(--amber-100);
+    border-left: 3px solid var(--amber-600);
     border-radius: 6px;
     font-size: 12px;
-    color: #78350f;
+    color: var(--webstore-pricing-page-orange);
     line-height: 1.4;
 }
 
@@ -122,13 +153,14 @@
 .fundraiser-quote-card {
     margin-top: 12px;
     padding: 16px 18px;
-    background: linear-gradient(135deg, #2d1b5f 0%, #4a2d8f 100%);
-    color: #fff;
+    background: linear-gradient(135deg, var(--webstore-pricing-page-indigo-dark) 0%, var(--color-ruth-dark) 100%);
+    color: var(--color-on-brand);
     border-radius: var(--radius-2, 12px);
-    box-shadow: 0 6px 18px rgba(45, 27, 95, 0.30);
+    box-shadow: 0 6px 18px rgb(45 27 95 / 30%);
     position: relative;
     overflow: hidden;
 }
+
 .fundraiser-quote-card::before {
     content: "";
     position: absolute;
@@ -136,138 +168,153 @@
     right: -20px;
     width: 100px;
     height: 100px;
-    background: radial-gradient(circle, rgba(255, 220, 100, 0.16) 0%, transparent 70%);
+    background: radial-gradient(circle, rgb(255 220 100 / 16%) 0%, transparent 70%);
     pointer-events: none;
 }
+
 .fundraiser-quote-card .fqc-label {
     font-size: 10px;
     font-weight: 700;
     letter-spacing: 0.10em;
     text-transform: uppercase;
-    color: #ffe8a0;
+    color: var(--webstore-pricing-page-yellow-3);
     margin-bottom: 6px;
 }
+
 .fundraiser-quote-card .fqc-price {
     font-family: var(--mono, ui-monospace, 'SF Mono', Menlo, monospace);
     font-size: 36px;
     font-weight: 700;
-    color: #fff8e0;
+    color: var(--store-rush-soft);
     line-height: 1.1;
     margin: 4px 0;
 }
+
 .fundraiser-quote-card .fqc-spec {
     font-size: 12px;
     opacity: 0.85;
     margin: 2px 0 12px;
 }
+
 .fundraiser-quote-card .fqc-line {
     display: flex;
     justify-content: space-between;
     gap: 12px;
     font-size: 12px;
     padding: 3px 0;
-    color: rgba(255, 255, 255, 0.85);
+    color: rgb(255 255 255 / 85%);
 }
+
 .fundraiser-quote-card .fqc-line.total {
-    border-top: 1px solid rgba(255, 232, 160, 0.30);
+    border-top: 1px solid rgb(255 232 160 / 30%);
     margin-top: 6px;
     padding-top: 8px;
     font-weight: 700;
     font-size: 14px;
-    color: #fff;
+    color: var(--color-on-brand);
 }
+
 .fundraiser-quote-card .fqc-line .v {
     font-family: var(--mono, ui-monospace, 'SF Mono', Menlo, monospace);
 }
+
 .fundraiser-quote-card .fqc-donation-banner {
     margin-top: 10px;
     padding: 8px 12px;
-    background: rgba(255, 232, 160, 0.18);
-    border: 1px solid rgba(255, 232, 160, 0.35);
+    background: rgb(255 232 160 / 18%);
+    border: 1px solid rgb(255 232 160 / 35%);
     border-radius: 8px;
     font-size: 13px;
-    color: #fff8e0;
+    color: var(--store-rush-soft);
     text-align: center;
     font-weight: 600;
 }
+
 .fundraiser-quote-card .fqc-tax-warn {
     margin-top: 8px;
     padding: 8px 12px;
-    background: rgba(220, 38, 38, 0.18);
-    border: 1px solid rgba(252, 165, 165, 0.50);
+    background: rgb(220 38 38 / 18%);
+    border: 1px solid rgb(252 165 165 / 50%);
     border-radius: 6px;
     font-size: 11px;
-    color: #fef2f2;
+    color: var(--red-50);
     line-height: 1.4;
 }
-.fundraiser-quote-card .fqc-tax-warn strong { color: #fffaf0; }
+.fundraiser-quote-card .fqc-tax-warn strong { color: var(--store-paper); }
 
 /* -- WEB SEARCH chip — distinct from price/tool chips ------------------- */
 .tool-chip.web-search-chip {
-    background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-    color: #f8fafc;
-    border-color: #475569;
+    background: linear-gradient(135deg, var(--gray-800) 0%, var(--gray-700) 100%);
+    color: var(--slate-50);
+    border-color: var(--slate-600);
 }
-.tool-chip.web-search-chip i { color: #38bdf8; }
+.tool-chip.web-search-chip i { color: var(--webstore-pricing-page-cyan-3); }
 
 /* When a web-search produces multi-result inline display, render below
    the chip as a small list of cards */
 .web-search-results {
     margin-top: 8px;
     padding: 10px 12px;
-    background: var(--paper-2, #f6f1e6);
-    border: 1px solid var(--rule, rgba(0,0,0,0.08));
+    background: var(--paper-2, var(--store-paper-deep));
+    border: 1px solid var(--rule, rgb(0 0 0 / 8%));
     border-radius: 10px;
     font-size: 12px;
 }
+
 .web-search-results .wsr-query {
     font-weight: 700;
     font-size: 11px;
     text-transform: uppercase;
     letter-spacing: 0.04em;
-    color: var(--ink-3, #6b7280);
+    color: var(--ink-3, var(--gray-500));
     margin-bottom: 8px;
 }
+
 .web-search-results .wsr-answer {
     padding: 6px 10px;
-    background: #e0f2fe;
-    border-left: 3px solid #0284c7;
+    background: var(--sky-100);
+    border-left: 3px solid var(--webstore-pricing-page-cyan-4);
     border-radius: 4px;
-    color: #0c4a6e;
+    color: var(--sky-900);
     font-size: 12px;
     line-height: 1.5;
     margin-bottom: 8px;
 }
+
 .web-search-results .wsr-result {
     padding: 6px 0;
-    border-top: 1px solid var(--rule-soft, rgba(0,0,0,0.05));
+    border-top: 1px solid var(--rule-soft, rgb(0 0 0 / 5%));
     line-height: 1.4;
 }
 .web-search-results .wsr-result:first-of-type { border-top: none; }
+
 .web-search-results .wsr-result a {
-    color: #1e40af;
+    color: var(--webstore-pricing-page-blue);
     text-decoration: none;
     font-weight: 600;
     font-size: 12px;
 }
 .web-search-results .wsr-result a:hover { text-decoration: underline; }
+
 .web-search-results .wsr-result .wsr-snip {
-    color: var(--ink-2, #4b4538);
+    color: var(--ink-2, var(--webstore-pricing-page-yellow-4));
     font-size: 11px;
     margin-top: 2px;
 }
+
 .web-search-results .wsr-result .wsr-domain {
-    color: var(--ink-3, #6b7280);
+    color: var(--ink-3, var(--gray-500));
     font-size: 10px;
     margin-left: 6px;
 }
 
 /* -- Mobile tweaks ------------------------------------------------------- */
-@media (max-width: 640px) {
+@media (width <= 640px) {
     .webstore-quote-card,
     .fundraiser-quote-card {
-        padding: 14px 14px;
+        padding: 14px;
     }
+
     .fundraiser-quote-card .fqc-price {
         font-size: 30px;
     }

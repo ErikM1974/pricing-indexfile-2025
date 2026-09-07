@@ -7,27 +7,42 @@
 /* ============================================
    ROOT VARIABLES - NWCA Green Theme
    ============================================ */
+
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue, merged into its
+   existing :root. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
 :root {
-    --primary-green: #4cb354;
-    --primary-dark: #409a47;
-    --primary-color: #4cb354; /* Alias for compatibility */
-    --bg-color: #f5f7fa;
-    --card-bg: #ffffff;
-    --border-color: #e5e7eb;
-    --text-primary: #1f2937;
-    --text-secondary: #6b7280;
-    --hover-bg: #f3f4f6;
-    --success-bg: #d1fae5;
-    --success-text: #065f46;
-    --warning-bg: #fef3c7;
-    --warning-text: #92400e;
-    --focus-shadow: 0 0 0 0.25rem rgba(76, 179, 84, 0.25);
+    --calculator-base-green-tint: #d1fae5;
+    --calculator-base-teal-dark: #065f46;
+    --calculator-base-red: #ef4444;
+    --calculator-base-cyan: #0ea5e9;
+    --calculator-base-blue: #1e40af;
+    --calculator-base-cyan-2: #93c5fd;
+    --calculator-base-green: #86efac;
+    --calculator-base-yellow: #fbbf24;
+    --calculator-base-red-2: #fca5a5;
+    --primary-green: var(--brand-500);
+    --primary-dark: var(--brand-600);
+    --primary-color: var(--brand-500); /* Alias for compatibility */
+    --bg-color: var(--color-bradley-tint);
+    --card-bg: var(--color-surface);
+    --border-color: var(--gray-200);
+    --text-primary: var(--gray-800);
+    --text-secondary: var(--gray-500);
+    --hover-bg: var(--gray-100);
+    --success-bg: var(--calculator-base-green-tint);
+    --success-text: var(--calculator-base-teal-dark);
+    --warning-bg: var(--amber-100);
+    --warning-text: var(--amber-800);
+    --focus-shadow: 0 0 0 0.25rem rgb(76 179 84 / 25%);
     
     /* Compatibility variables for emblem calculator */
     --surface-color: var(--card-bg);
     --text-color: var(--text-primary);
     --muted-text-color: var(--text-secondary);
 }
+/* stylelint-enable color-no-hex */
 
 /* ============================================
    BASE RESET & TYPOGRAPHY
@@ -39,7 +54,7 @@
 }
 
 body {
-    font-family: 'Inter', sans-serif;
+    font-family: Inter, sans-serif;
     background: var(--bg-color);
     color: var(--text-primary);
     line-height: 1.6;
@@ -55,7 +70,7 @@ body {
     position: sticky;
     top: 0;
     z-index: 100;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    box-shadow: 0 1px 3px rgb(0 0 0 / 5%);
 }
 
 .header-container {
@@ -135,7 +150,7 @@ body {
     background: var(--card-bg);
     border-radius: 12px;
     padding: 2rem;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    box-shadow: 0 1px 3px rgb(0 0 0 / 5%);
 }
 
 .card-title {
@@ -183,7 +198,7 @@ body {
     border-radius: 8px;
     border: 2px solid var(--border-color);
     font-size: 1rem;
-    font-family: 'Inter', sans-serif;
+    font-family: Inter, sans-serif;
     transition: all 0.2s;
     background: white;
 }
@@ -198,7 +213,7 @@ body {
 
 .form-input:invalid,
 .form-control:invalid {
-    border-color: #ef4444;
+    border-color: var(--calculator-base-red);
 }
 
 .form-grid {
@@ -229,7 +244,7 @@ body {
     cursor: pointer;
     transition: all 0.2s;
     text-align: center;
-    font-family: 'Inter', sans-serif;
+    font-family: Inter, sans-serif;
 }
 
 .selector-btn:hover {
@@ -254,7 +269,7 @@ body {
     cursor: pointer;
     transition: all 0.2s;
     border: none;
-    font-family: 'Inter', sans-serif;
+    font-family: Inter, sans-serif;
     font-size: 0.875rem;
     display: inline-flex;
     align-items: center;
@@ -270,7 +285,7 @@ body {
 .btn-primary:hover {
     background: var(--primary-dark);
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(76, 179, 84, 0.2);
+    box-shadow: 0 4px 12px rgb(76 179 84 / 20%);
 }
 
 .btn-secondary {
@@ -315,16 +330,13 @@ body {
 .slider {
     position: absolute;
     cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    inset: 0;
     background-color: var(--border-color);
     transition: 0.3s;
     border-radius: 24px;
 }
 
-.slider:before {
+.slider::before {
     position: absolute;
     content: "";
     height: 18px;
@@ -340,7 +352,7 @@ body {
     background-color: var(--primary-green);
 }
 
-.switch input:checked + .slider:before {
+.switch input:checked + .slider::before {
     transform: translateX(24px);
 }
 
@@ -360,11 +372,8 @@ body {
 .modal-backdrop,
 .modal-overlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
+    inset: 0;
+    background: rgb(0 0 0 / 50%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -388,7 +397,7 @@ body {
     width: 90%;
     max-height: 90vh;
     overflow-y: auto;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 20px 60px rgb(0 0 0 / 30%);
     transform: scale(0.9);
     transition: transform 0.3s;
 }
@@ -519,8 +528,8 @@ body {
    ADD-ON ORDER STYLES
    ============================================ */
 .addon-section {
-    background: #f0f9ff;
-    border: 1px solid #0ea5e9;
+    background: var(--color-floor-tint);
+    border: 1px solid var(--calculator-base-cyan);
     border-radius: 8px;
     padding: 1.5rem;
     margin-top: 1rem;
@@ -606,27 +615,27 @@ body {
 }
 
 .alert-info {
-    background: #dbeafe;
-    color: #1e40af;
-    border: 1px solid #93c5fd;
+    background: var(--sky-100);
+    color: var(--calculator-base-blue);
+    border: 1px solid var(--calculator-base-cyan-2);
 }
 
 .alert-success {
     background: var(--success-bg);
     color: var(--success-text);
-    border: 1px solid #86efac;
+    border: 1px solid var(--calculator-base-green);
 }
 
 .alert-warning {
     background: var(--warning-bg);
     color: var(--warning-text);
-    border: 1px solid #fbbf24;
+    border: 1px solid var(--calculator-base-yellow);
 }
 
 .alert-error {
-    background: #fee2e2;
-    color: #991b1b;
-    border: 1px solid #fca5a5;
+    background: var(--red-100);
+    color: var(--red-800);
+    border: 1px solid var(--calculator-base-red-2);
 }
 
 /* ============================================
@@ -671,7 +680,7 @@ body {
    ============================================ */
 .notice-section {
     background: var(--warning-bg);
-    border: 2px solid #f59e0b;
+    border: 2px solid var(--amber-500);
     border-radius: 8px;
     padding: 1.5rem;
     margin: 2rem 0;
@@ -754,18 +763,18 @@ body {
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s;
-    font-family: 'Inter', sans-serif;
+    font-family: Inter, sans-serif;
 }
 
 .help-btn:hover {
     border-color: var(--primary-green);
-    color: var(--primary-green);
 }
 
 /* ============================================
    UTILITY CLASSES
    ============================================ */
 .hidden {
+    /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
     display: none !important;
 }
 
@@ -780,14 +789,14 @@ body {
 
 .empty-state i {
     font-size: 3rem;
-    color: #e5e7eb;
+    color: var(--gray-200);
     margin-bottom: 1rem;
 }
 
 /* ============================================
    RESPONSIVE DESIGN
    ============================================ */
-@media (max-width: 768px) {
+@media (width <= 768px) {
     .calculator-grid {
         grid-template-columns: 1fr;
     }
@@ -817,6 +826,7 @@ body {
     .header,
     .btn,
     .modal-backdrop {
+        /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
         display: none !important;
     }
     

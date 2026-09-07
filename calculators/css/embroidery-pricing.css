@@ -1,21 +1,34 @@
-/* embroidery-pricing.css — extracted 2026-09-06 from the FIRST inline <style> in embroidery-pricing.html (Rule 3). */
+/* embroidery-pricing.css — extracted 2026-09-06 from the FIRST inline \3c style> in embroidery-pricing.html (Rule 3). */
+
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue, merged into its
+   existing :root. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
 :root {
+    --embroidery-pricing-gray: #666;
+    --embroidery-pricing-yellow: #fbbf24;
+    --embroidery-pricing-gray-dark: #333;
+    --embroidery-pricing-gray-2: #bdbdbd;
+    --embroidery-pricing-red-tint: #fcc;
+    --embroidery-pricing-red: #c00;
+
     /* Phase 2d (2026-05-23): var() ref so PNW palette resolves via shell.css */
-    --primary-color: var(--pnw-forest, #4cb354);
-    --primary-dark: var(--pnw-forest-deep, #409a47);
-    --primary-light: var(--pnw-mist, #e8f5e9);
-    --bg-color: #f9f9f9;
-    --card-bg: #ffffff;
-    --border-color: #e5e7eb;
-    --text-primary: #333333;
-    --text-secondary: #666666;
-    --warning-bg: #fef3c7;
-    --warning-border: #fbbf24;
-    --warning-text: #92400e;
-    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --primary-color: var(--pnw-forest, var(--brand-500));
+    --primary-dark: var(--pnw-forest-deep, var(--brand-600));
+    --primary-light: var(--pnw-mist, var(--brand-100));
+    --bg-color: var(--gray-50);
+    --card-bg: var(--color-surface);
+    --border-color: var(--gray-200);
+    --text-primary: var(--embroidery-pricing-gray-dark);
+    --text-secondary: var(--embroidery-pricing-gray);
+    --warning-bg: var(--amber-100);
+    --warning-border: var(--embroidery-pricing-yellow);
+    --warning-text: var(--amber-800);
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 5%);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 10%), 0 2px 4px -1px rgb(0 0 0 / 6%);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 10%), 0 4px 6px -2px rgb(0 0 0 / 5%);
 }
+/* stylelint-enable color-no-hex */
 
 * {
     margin: 0;
@@ -24,7 +37,7 @@
 }
 
 body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     background-color: var(--bg-color);
     color: var(--text-primary);
     line-height: 1.6;
@@ -85,7 +98,7 @@ body {
 .search-input:focus {
     outline: none;
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(76, 179, 84, 0.1);
+    box-shadow: 0 0 0 3px rgb(76 179 84 / 10%);
 }
 
 .search-btn {
@@ -129,7 +142,7 @@ body {
     padding: 12px 16px;
     cursor: pointer;
     transition: background 0.2s ease;
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid var(--gray-100);
 }
 
 .search-result-item:hover {
@@ -145,7 +158,7 @@ body {
     height: 40px;
     object-fit: cover;
     border-radius: 4px;
-    background: #f5f5f5;
+    background: var(--gray-100);
 }
 
 .search-result-info {
@@ -179,11 +192,8 @@ body {
 /* Product type mismatch overlay */
 .product-mismatch-overlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.7);
+    inset: 0;
+    background: rgb(0 0 0 / 70%);
     z-index: 9999;
     display: flex;
     align-items: center;
@@ -203,7 +213,7 @@ body {
     max-width: 500px;
     width: 90%;
     text-align: center;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 20px 60px rgb(0 0 0 / 30%);
     animation: slideUp 0.3s ease-out;
 }
 
@@ -212,6 +222,7 @@ body {
         transform: translateY(20px);
         opacity: 0;
     }
+
     to {
         transform: translateY(0);
         opacity: 1;
@@ -220,32 +231,32 @@ body {
 
 .product-mismatch-icon {
     font-size: 48px;
-    color: #fbbf24;
+    color: var(--embroidery-pricing-yellow);
     margin-bottom: 20px;
 }
 
 .product-mismatch-title {
     font-size: 24px;
     font-weight: 700;
-    color: #1f2937;
+    color: var(--gray-800);
     margin-bottom: 16px;
-    font-family: 'Poppins', sans-serif;
+    font-family: Poppins, sans-serif;
 }
 
 .product-mismatch-message {
     font-size: 16px;
-    color: #6b7280;
+    color: var(--gray-500);
     line-height: 1.6;
     margin-bottom: 24px;
 }
 
 .product-mismatch-message strong {
-    color: #1f2937;
+    color: var(--gray-800);
     font-weight: 600;
 }
 
 .product-mismatch-button {
-    background: #4cb354;
+    background: var(--brand-500);
     color: white;
     padding: 12px 32px;
     border-radius: 8px;
@@ -257,7 +268,7 @@ body {
 }
 
 .product-mismatch-button:hover {
-    background: #409a47;
+    background: var(--brand-600);
     color: white;
     text-decoration: none;
 }
@@ -292,7 +303,7 @@ body {
 
 /* Product Image Section */
 .product-image-section {
-    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    background: linear-gradient(135deg, var(--gray-50), var(--gray-200));
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -344,7 +355,7 @@ body {
     background: white;
     border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 6px rgb(0 0 0 / 10%);
 }
 
 .image-thumbnails {
@@ -362,7 +373,7 @@ body {
     cursor: pointer;
     transition: all 0.3s ease;
     background: white;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 4px rgb(0 0 0 / 10%);
 }
 
 .image-thumbnail:hover {
@@ -372,7 +383,7 @@ body {
 
 .image-thumbnail.active {
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 2px rgba(76, 179, 84, 0.3);
+    box-shadow: 0 0 0 2px rgb(76 179 84 / 30%);
 }
 
 .image-thumbnail img {
@@ -397,12 +408,12 @@ body {
 .image-placeholder {
     width: 100%;
     height: 100%;
-    background: linear-gradient(135deg, #e0e0e0, #bdbdbd);
+    background: linear-gradient(135deg, var(--gray-200), var(--embroidery-pricing-gray-2));
     border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #666;
+    color: var(--embroidery-pricing-gray);
     font-size: 18px;
     font-weight: 600;
 }
@@ -416,7 +427,7 @@ body {
 }
 
 .product-title {
-    font-family: 'Poppins', sans-serif;
+    font-family: Poppins, sans-serif;
     font-size: 28px;
     font-weight: 700;
     color: var(--text-primary);
@@ -492,7 +503,7 @@ body {
 
 .color-swatch.active {
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 2px rgba(76, 179, 84, 0.3);
+    box-shadow: 0 0 0 2px rgb(76 179 84 / 30%);
 }
 
 .color-swatch img {
@@ -546,7 +557,7 @@ body {
 }
 
 .pricing-title {
-    font-family: 'Poppins', sans-serif;
+    font-family: Poppins, sans-serif;
     font-size: 32px;
     font-weight: 700;
     color: var(--text-primary);
@@ -590,11 +601,11 @@ body {
 }
 
 .pricing-table tbody tr:hover {
-    background: rgba(76, 179, 84, 0.05);
+    background: rgb(76 179 84 / 5%);
 }
 
 .pricing-table .size-cell {
-    background: #f8f9fa;
+    background: var(--gray-50);
     font-weight: 700;
     color: var(--text-primary);
 }
@@ -608,20 +619,20 @@ body {
 /* LTM Column Highlighting (1-7 pieces) - Subtle but clear */
 .pricing-table th.ltm-column,
 .pricing-table td.ltm-column {
-    background-color: #fefbf3;
-    border-left: 2px solid #e5d9c3;
-    border-right: 2px solid #e5d9c3;
+    background-color: var(--store-paper);
+    border-left: 2px solid var(--store-line);
+    border-right: 2px solid var(--store-line);
 }
 
 .pricing-table thead th.ltm-column {
     background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
-    border-left: 2px solid #e5d9c3;
-    border-right: 2px solid #e5d9c3;
+    border-left: 2px solid var(--store-line);
+    border-right: 2px solid var(--store-line);
 }
 
 .ltm-badge {
     display: inline-block;
-    background: #f59e0b;
+    background: var(--amber-500);
     color: white;
     padding: 3px 8px;
     border-radius: 10px;
@@ -646,7 +657,7 @@ body {
 }
 
 .order-info-title {
-    font-family: 'Poppins', sans-serif;
+    font-family: Poppins, sans-serif;
     font-size: 24px;
     font-weight: 700;
     color: var(--text-primary);
@@ -665,13 +676,13 @@ body {
     align-items: flex-start;
     gap: 16px;
     padding: 24px;
-    background: #f8f9fa;
+    background: var(--gray-50);
     border-radius: 12px;
     transition: all 0.3s ease;
 }
 
 .order-info-item:hover {
-    background: rgba(76, 179, 84, 0.05);
+    background: rgb(76 179 84 / 5%);
     transform: translateY(-2px);
 }
 
@@ -729,9 +740,9 @@ body {
 
 /* API Error Notification */
 .api-error-notification {
-    background: #fee;
-    border: 1px solid #fcc;
-    color: #c00;
+    background: var(--red-50);
+    border: 1px solid var(--embroidery-pricing-red-tint);
+    color: var(--embroidery-pricing-red);
     padding: 15px 20px;
     margin: 20px auto;
     max-width: 1200px;
@@ -739,7 +750,7 @@ body {
     display: flex;
     align-items: center;
     gap: 10px;
-    box-shadow: 0 2px 4px rgba(204, 0, 0, 0.1);
+    box-shadow: 0 2px 4px rgb(204 0 0 / 10%);
     animation: slideDown 0.3s ease-out;
 }
 
@@ -757,6 +768,7 @@ body {
         transform: translateY(-20px);
         opacity: 0;
     }
+
     to {
         transform: translateY(0);
         opacity: 1;
@@ -764,7 +776,7 @@ body {
 }
 
 /* Responsive */
-@media (max-width: 768px) {
+@media (width <= 768px) {
     .header-content {
         flex-direction: column;
         gap: 20px;
@@ -808,7 +820,7 @@ body {
     }
 }
 
-@media (max-width: 480px) {
+@media (width <= 480px) {
     .product-title {
         font-size: 24px;
     }
@@ -829,8 +841,9 @@ body {
 }
 
 /* 2026-09-06 review: the hidden attribute must beat any display rule */
+/* stylelint-disable-next-line declaration-no-important -- the hidden attribute must beat any display rule */
 [hidden] { display: none !important; }
 
 /* 2026-09-06: the Headwear Note link (was inline style + onmouseover/onmouseout) */
-.emb-note-link { color: #4cb354; text-decoration: none; font-weight: 600; border-bottom: 1px dotted #4cb354; transition: border-bottom 0.2s ease; }
-.emb-note-link:hover, .emb-note-link:focus { border-bottom: 1px solid #4cb354; }
+.emb-note-link { color: var(--brand-500); text-decoration: none; font-weight: 600; border-bottom: 1px dotted var(--brand-500); transition: border-bottom 0.2s ease; }
+.emb-note-link:hover, .emb-note-link:focus { border-bottom: 1px solid var(--brand-500); }

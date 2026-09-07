@@ -1,9 +1,20 @@
 /* screenprint-pricing-v2.css — styles the Screen Print V2 calculator used to inject / inline (2026-09-06). */
+
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue so the page
+   keeps its exact look. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   every rule below uses var(). Raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
+:root {
+    --screenprint-pricing-v2-green: #3a7c52;
+    --screenprint-pricing-v2-gray: #666;
+}
+/* stylelint-enable color-no-hex */
+
 @keyframes spin { to { transform: rotate(360deg); } }
 .sp-loading-inner { text-align: center; }
-.sp-loading-spinner { width: 40px; height: 40px; border: 4px solid #e5e7eb; border-top-color: #3a7c52; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto; }
-.sp-loading-text { margin-top: 1rem; color: #666; }
-.sp-error-dismiss { margin-left: auto; background: none; border: none; color: #991b1b; cursor: pointer; font-size: 1.25rem; }
+.sp-loading-spinner { width: 40px; height: 40px; border: 4px solid var(--gray-200); border-top-color: var(--screenprint-pricing-v2-green); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto; }
+.sp-loading-text { margin-top: 1rem; color: var(--screenprint-pricing-v2-gray); }
+.sp-error-dismiss { margin-left: auto; background: none; border: none; color: var(--red-800); cursor: pointer; font-size: 1.25rem; }
 .sp-fee-note { font-size: 11px; opacity: 0.9; margin-top: 4px; font-weight: 600; }
 .sp-tooltip-list { margin: 8px 0; padding-left: 20px; }
 .sp-mt-8 { margin-top: 8px; }

@@ -31,23 +31,7 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 ### Rule 6 sweep S3 — 118 scripts still guessed the proxy host, and two unit tests had been hitting the live API (2026-09-06, ARCHIVED 2026-09-07, `v2026.09.06.31`): every proxy URL comes from `APP_CONFIG.API.BASE_URL` with a VISIBLE failure when it is missing; a scripted rewrite must keep the ORIGINAL quote character; `tests/setup.js`'s fetch stub never installs on Node 18+ (native fetch) — stub `global.fetch` per test. Full entry in archive.
 ### Final census — 69 dead files, a retired page that still got "fixed" twice, and a lock that pinned a version prefix (2026-09-06, ARCHIVED 2026-09-07, `v2026.09.06.33`–`.34`): check linked + mounted + the `server.js` route (410/301) before "fixing" a page; an orphan census matches the PATH, not the basename; never pin a `?v=` prefix in a test. Full entry in archive.
 ### EmailJS ids in 25 scripts, 118 unlabelled controls, and 12 SEO pages rendering in quirks mode (2026-09-06, ARCHIVED 2026-09-07, `v2026.09.06.36`): EmailJS service/template ids come from `APP_CONFIG`, never a literal; every control gets a label or `aria-label`; a page that starts with a fragment instead of `<!DOCTYPE html>` renders in quirks mode. Full entry in archive.
-
-## 2026-09-06 — 700 console.logs in production, and a basename match that hid four stale root copies (`v2026.09.06.37`)
-
-**Problem.** CLAUDE.md says "remove console.log before committing"; 68 served scripts still shipped
-~700 of them (a customer's console on the screen-print calculator scrolled 35 lines). The orphan
-lock said every script was referenced — but root-level `utils.js`, `dp5-helper.js`,
-`pricing-matrix-api.js` and `app-new.js` were stale copies nothing loads: their basenames appeared
-in comments and in the paths of their `shared_components/js` twins.
-**Root cause.** The rule was enforced by review, not by a lock. A referrer census that matches on
-basename cannot tell `/utils.js` from `/shared_components/js/utils.js` or `./utils.js`.
-**Solution.** Per-file gated logger (localhost / `?debug=1`) via one idempotent script; lock on bare
-`console.log(`. Referrer matching is now path-aware (directory-qualified for duplicated basenames,
-quoted `"/name.js"` for root files, sibling `./name.js` for ES modules).
-**Prevention.** 🔑 Any "is X referenced" census must match the PATH, not the name — and skip
-comments, tests, one-off scripts and archives. 🔑 Gate, don't delete, debug logging: the
-`?debug=1` switch keeps the diagnostics Erik uses without paying for them on every customer load.
-🔑 A generated identifier prefix can start with a digit — check the first character.
+### 700 console.logs in production, and a basename match that hid four stale root copies (2026-09-06, ARCHIVED 2026-09-07, `v2026.09.06.37`): `console.log` in served scripts is gated behind localhost / `?debug=1` (lock in `repo-hygiene-final`); an orphan census must match the PATH, not the basename. Full entry in archive.
 
 ## 2026-09-06 — My own host sweep broke the DTF calculator for four deploys, and only a console read caught it (`v2026.09.06.40`)
 
@@ -261,3 +245,28 @@ the values against the token file: identical → delete the copy; different → 
 the conflict; never silently switch a page to the token value. 🔑 Colour = person/department is now checkable
 in code: `--art-theme: var(--color-ruth)` reads as the rule it implements — grep for a person's token to find
 every page that wears their colour.
+
+## 2026-09-07 — Dashboards + calculators families: six ways a mechanical CSS migration bit back
+
+**Problem.** (a) The hex tokenizer matched `#add` in `#add-to-cart-button {` — three letters that happen to
+be hex — and rewrote the id selector to `var(--…-teal)-to-cart-button`, silently dropping the rule. Three
+selectors in the calculators family; a scan of every migrated sheet found no other case. (b) A `!important`
+annotation perl inserted `/* stylelint-disable-next-line … */` before every line containing `!important`,
+including lines inside comment blocks that merely mention it, nesting a comment in a comment and breaking
+four staff-dashboard sheets at parse time. (c) A consecutive-duplicate dedupe assumed declarations end with
+`;` on their own line; SVG data URIs contain `;`. (d) Five page locks pinned incidental CSS text
+(`max-width: 760px`, `0px`, `#9ca3af` as a `var()` fallback) that the standard config rewrites
+value-identically. (e) The generated Pricing Analysis page carries its stylesheet `?v=` in a Python constant;
+the deploy's cache-bust bumps the HTML, not the generator, and a lock compares the two. (f) `node lint |
+grep | head -8` on Windows Git Bash hung the chain — `head` closed the pipe and nothing upstream got SIGPIPE.
+**Root cause.** Regexes that are not comment-aware, value-aware or selector-aware; locks that assert bytes
+instead of meaning; a version that lives in two places; MSYS pipe semantics.
+**Solution.** (a) A hex is a colour only when a `:` precedes it on its line and no identifier char follows;
+the damage signature `var(--x)<letter or dash>` is now part of the post-run scan. (b) A comment-aware
+scanner (`fix-nested-annotations.py`) drops nested annotations. (c) Whole-line dedupe with a property
+lookahead. (d) Locks accept both forms. (e) Bump `CSS_VER` in `scripts/build-pricing-analysis.py` with its
+stylesheet. (f) Write lint output to a file and read it.
+**Prevention.** 🔑 Every text transform over CSS must skip comments AND selectors — only a declaration
+value is a colour. 🔑 After every automated pass, run the full lint and grep for `var(--[a-z0-9-]+)[A-Za-z_-]`
+before the screenshots; a dropped rule is silent in a browser. 🔑 A substring lock on CSS should pin the
+MEANING (a selector exists, a value is a custom property), not the exact bytes.
