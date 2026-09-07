@@ -19,26 +19,30 @@
 /* ----------------------------------------------------------------------------
    Page-scoped tokens (do NOT redefine the shared brand tokens)
    ---------------------------------------------------------------------------- */
+
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue, merged into its
+   existing :root. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
 :root {
-    --rfd-green-ink: #2f7d37;            /* accessible green: white text on it (5.1:1) and green text on white */
-    --rfd-green-tint: #f0faf1;           /* ~10% green wash — surface of "the answer" */
-    --rfd-green-border: rgba(76, 179, 84, 0.35);
-
-    --rfd-amber-bg: #fffbeb;             /* LTM caution only */
-    --rfd-amber-border: #fcd34d;
-    --rfd-amber-text: #92400e;
-    --rfd-amber-icon: #d97706;
-
-    --rfd-red: #e4002b;                  /* Richardson brand red — one 3px keyline, nothing else */
-
+    --richardson-2025-styles-yellow: #fcd34d;
+    --richardson-2025-styles-red: #e4002b;
+    --rfd-green-ink: var(--store-green-700);            /* accessible green: white text on it (5.1:1) and green text on white */
+    --rfd-green-tint: var(--color-dash-theme-bg);           /* ~10% green wash — surface of "the answer" */
+    --rfd-green-border: rgb(76 179 84 / 35%);
+    --rfd-amber-bg: var(--store-paper);             /* LTM caution only */
+    --rfd-amber-border: var(--richardson-2025-styles-yellow);
+    --rfd-amber-text: var(--amber-800);
+    --rfd-amber-icon: var(--amber-600);
+    --rfd-red: var(--richardson-2025-styles-red);                  /* Richardson brand red — one 3px keyline, nothing else */
     --rfd-radius: 10px;                  /* containers */
     --rfd-radius-sm: 6px;                /* controls, chips, tags */
     --rfd-radius-pill: 999px;            /* count badge + category chips only */
-
     --rfd-focus-ring: 0 0 0 3px var(--rfd-green-border);
-    --rfd-shadow-float: 0 4px 12px rgba(0, 0, 0, 0.06);   /* the only shadow on the page */
+    --rfd-shadow-float: 0 4px 12px rgb(0 0 0 / 6%);   /* the only shadow on the page */
     --rfd-transition: 150ms ease;
 }
+/* stylelint-enable color-no-hex */
 
 /* ----------------------------------------------------------------------------
    Header — light touch (base styles the rest). Fix breadcrumb link contrast.
@@ -198,7 +202,7 @@
 .form-input {
     width: 100%;
     padding: 0.625rem 0.75rem;
-    font-family: 'Inter', sans-serif;
+    font-family: Inter, sans-serif;
     font-size: 0.9375rem;
     font-weight: 500;
     color: var(--text-primary);
@@ -485,7 +489,7 @@
     border: 1px solid var(--border-color);
     border-radius: var(--rfd-radius);
     cursor: pointer;
-    font-family: 'Inter', sans-serif;
+    font-family: Inter, sans-serif;
     transition: border-color var(--rfd-transition);
 }
 
@@ -517,7 +521,7 @@
 .cap-count-badge {
     padding: 0.125rem 0.625rem;
     background: var(--rfd-green-ink);
-    color: #fff;
+    color: var(--color-on-brand);
     border-radius: var(--rfd-radius-pill);
     font-size: 0.75rem;
     font-weight: 600;
@@ -606,7 +610,7 @@
     border: 1px solid var(--border-color);
     border-radius: var(--rfd-radius-pill);
     color: var(--text-secondary);
-    font-family: 'Inter', sans-serif;
+    font-family: Inter, sans-serif;
     font-size: 0.8125rem;
     font-weight: 600;
     cursor: pointer;
@@ -618,7 +622,7 @@
 .category-chip.active {
     background: var(--rfd-green-ink);
     border-color: var(--rfd-green-ink);
-    color: #fff;
+    color: var(--color-on-brand);
 }
 
 .category-chip:focus-visible {
@@ -638,7 +642,7 @@
 
 .cap-grid::-webkit-scrollbar { width: 6px; }
 .cap-grid::-webkit-scrollbar-track { background: var(--bg-color); border-radius: var(--rfd-radius-pill); }
-.cap-grid::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: var(--rfd-radius-pill); }
+.cap-grid::-webkit-scrollbar-thumb { background: var(--gray-300); border-radius: var(--rfd-radius-pill); }
 .cap-grid::-webkit-scrollbar-thumb:hover { background: var(--text-secondary); }
 
 .cap-card {
@@ -712,10 +716,10 @@
     margin-top: auto;
     padding: 0.5rem 0.75rem;
     background: var(--rfd-green-ink);
-    color: #fff;
+    color: var(--color-on-brand);
     border: none;
     border-radius: var(--rfd-radius-sm);
-    font-family: 'Inter', sans-serif;
+    font-family: Inter, sans-serif;
     font-size: 0.8125rem;
     font-weight: 600;
     cursor: pointer;
@@ -750,14 +754,14 @@
 /* ----------------------------------------------------------------------------
    Responsive
    ---------------------------------------------------------------------------- */
-@media (min-width: 768px) {
+@media (width >= 768px) {
     .lookup-form {
         grid-template-columns: 1fr 1fr 1fr;
         gap: 1.5rem;
     }
 }
 
-@media (max-width: 640px) {
+@media (width <= 640px) {
     .page-header { flex-wrap: wrap; gap: 1rem; }
 
     .sanmar-notice,
@@ -807,10 +811,10 @@
 
     .page-header { border-top: none; padding-top: 0; }
 
-    .pricing-card { border: 1px solid #ccc; }
+    .pricing-card { border: 1px solid var(--gray-300); }
 
     .price-result {
-        background: #fff;
-        border: 1px solid #ccc;
+        background: var(--color-surface);
+        border: 1px solid var(--gray-300);
     }
 }

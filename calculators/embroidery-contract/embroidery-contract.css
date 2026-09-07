@@ -17,6 +17,17 @@
      · tfoot active-column highlight (td.cell-hi)
    ===================================================== */
 
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue so the page
+   keeps its exact look. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   every rule below uses var(). Raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
+:root {
+    --embroidery-contract-orange: #ffd08a;
+    --embroidery-contract-green: #6ee7a8;
+    --embroidery-contract-red: #ff9aa8;
+}
+/* stylelint-enable color-no-hex */
+
 /* Two-column quantity + stitch-count row */
 .calc-form .row {
     display: grid;
@@ -34,6 +45,7 @@
     padding: 4px;
     gap: 4px;
 }
+
 .seg button {
     background: transparent;
     border: 0;
@@ -50,21 +62,24 @@
     line-height: 1.1;
     transition: background 120ms, color 120ms, box-shadow 120ms;
 }
+
 .seg button .label {
     display: inline-flex;
     align-items: center;
     gap: 6px;
 }
+
 .seg button .code {
     font-family: var(--mono);
     font-size: 10px;
     color: var(--slate-2);
     letter-spacing: 0.04em;
 }
+
 .seg button.active {
     background: var(--paper);
     color: var(--ink);
-    box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 0 0 1px var(--pink-200);
+    box-shadow: 0 1px 2px rgb(0 0 0 / 4%), 0 0 0 1px var(--pink-200);
 }
 .seg button.active .code { color: var(--pink-600); }
 .seg button:hover:not(.active) { color: var(--ink-2); }
@@ -78,6 +93,7 @@
     padding: 4px;
     gap: 2px;
 }
+
 .tabs button {
     background: transparent;
     border: 0;
@@ -91,6 +107,7 @@
     gap: 8px;
     transition: all 120ms;
 }
+
 .tabs button .code {
     font-family: var(--mono);
     font-size: 10px;
@@ -100,13 +117,15 @@
     border-radius: 4px;
     letter-spacing: 0.04em;
 }
+
 .tabs button.active {
     background: var(--ink);
-    color: #fff;
+    color: var(--color-on-brand);
 }
+
 .tabs button.active .code {
-    background: rgba(255,255,255,0.15);
-    color: rgba(255,255,255,0.85);
+    background: rgb(255 255 255 / 15%);
+    color: rgb(255 255 255 / 85%);
 }
 .tabs button:hover:not(.active) { color: var(--ink); }
 
@@ -137,6 +156,7 @@ table.price tfoot td.cell-hi {
    the ✕ on the card brings it back. #dstField.dragging is toggled by JS
    during drag-over.
    ===================================================== */
+
 /* 🔴 The [hidden] attribute is a UA-stylesheet rule, so ANY author `display`
    declaration beats it — these are all flex/grid containers and would stay on
    screen with el.hidden = true (an empty bordered strip in the card, a drop
@@ -169,6 +189,7 @@ table.price tfoot td.cell-hi {
     text-transform: none;
     letter-spacing: 0;
 }
+
 .dst-drop {
     display: flex;
     align-items: center;
@@ -181,12 +202,14 @@ table.price tfoot td.cell-hi {
     cursor: pointer;
     transition: border-color 120ms, background 120ms, color 120ms;
 }
+
 .dst-drop:hover,
 #dstField.dragging .dst-drop {
     border-color: var(--pink-600);
     background: var(--paper);
     color: var(--ink);
 }
+
 .dst-drop:focus-visible {
     outline: 2px solid var(--pink-600);
     outline-offset: 2px;
@@ -194,6 +217,7 @@ table.price tfoot td.cell-hi {
 .dst-drop svg { flex: none; }
 .dst-drop-text { font-size: 13px; line-height: 1.35; }
 .dst-drop-text strong { color: var(--ink); font-weight: 600; }
+
 .dst-drop-text .hint {
     display: block;
     font-size: 11px;
@@ -206,13 +230,14 @@ table.price tfoot td.cell-hi {
 .dst-error {
     margin-top: 8px;
     padding: 10px 12px;
-    border: 1px solid rgba(180, 122, 0, 0.25);
+    border: 1px solid rgb(180 122 0 / 25%);
     border-left: 3px solid var(--warn);
     border-radius: var(--r);
-    background: rgba(180, 122, 0, 0.08);
+    background: rgb(180 122 0 / 8%);
     color: var(--warn);
     font-size: 12.5px;
     line-height: 1.4;
+    /* stylelint-disable-next-line declaration-property-value-keyword-no-deprecated -- overflow-wrap: anywhere is not a byte-identical swap; legacy */
     word-break: break-word;
 }
 
@@ -223,17 +248,20 @@ table.price tfoot td.cell-hi {
     padding: 12px 14px;
 }
 #dstField.dragging .dst-card { border-color: var(--pink-600); }
+
 .dst-card-head {
     display: flex;
     align-items: center;
     gap: 10px;
     color: var(--pink-600);
 }
+
 .dst-card-names {
     display: flex;
     flex-direction: column;
     min-width: 0;
 }
+
 .dst-file-name {
     font-family: var(--mono);
     font-size: 12.5px;
@@ -242,6 +270,7 @@ table.price tfoot td.cell-hi {
     word-break: break-all;
 }
 .dst-file-label { font-size: 11px; color: var(--slate); }
+
 .dst-remove {
     margin-left: auto;
     background: transparent;
@@ -263,6 +292,7 @@ table.price tfoot td.cell-hi {
     gap: 6px 22px;
     margin: 10px 0 0;
 }
+
 .dst-facts dt {
     font-size: 10px;
     text-transform: uppercase;
@@ -270,6 +300,7 @@ table.price tfoot td.cell-hi {
     color: var(--slate);
     margin-bottom: 2px;
 }
+
 .dst-facts dd {
     margin: 0;
     font-family: var(--mono);
@@ -290,6 +321,7 @@ table.price tfoot td.cell-hi {
     color: var(--slate);
     line-height: 1.4;
 }
+
 .dst-mini-btn {
     background: var(--paper-3);
     border: 1px solid var(--line);
@@ -309,6 +341,7 @@ table.price tfoot td.cell-hi {
 /* Cards stack; the drop zone shrinks to an "add another" affordance once at
    least one file is loaded. */
 #dstLines { display: flex; flex-direction: column; gap: 10px; }
+
 /* The adjacent-sibling form broke when the margin panel was inserted between
    #dstLines and .dst-prod (Round 14). The spacing only ever needed to hang off
    the card list itself. */
@@ -335,6 +368,7 @@ table.price tfoot td.cell-hi {
     color: var(--pink-600);
     font-weight: 600;
 }
+
 .dst-line-price {
     margin-left: auto;
     font-family: var(--mono);
@@ -343,6 +377,7 @@ table.price tfoot td.cell-hi {
     color: var(--ink);
     white-space: nowrap;
 }
+
 /* The ✕ follows the price, so it must not also claim the auto margin. */
 .dst-card-head .dst-line-price + .dst-remove { margin-left: 4px; }
 
@@ -354,6 +389,7 @@ table.price tfoot td.cell-hi {
     margin-top: 10px;
 }
 .dst-chips { display: inline-flex; gap: 4px; }
+
 .dst-chip {
     background: var(--paper-3);
     border: 1px solid var(--line);
@@ -366,14 +402,16 @@ table.price tfoot td.cell-hi {
     transition: background 120ms, color 120ms, border-color 120ms;
 }
 .dst-chip:hover { color: var(--ink); border-color: var(--slate-3); }
+
 .dst-chip.active {
     background: var(--ink);
     border-color: var(--ink);
-    color: #fff;
+    color: var(--color-on-brand);
 }
 .dst-chip:focus-visible { outline: 2px solid var(--pink-600); outline-offset: 2px; }
 
 .dst-line-stitch { display: inline-flex; align-items: center; gap: 8px; }
+
 .dst-line-stitch span {
     font-size: 10px;
     text-transform: uppercase;
@@ -392,6 +430,7 @@ table.price tfoot td.cell-hi {
     border-radius: var(--r);
     background: var(--paper-2);
 }
+
 .dst-prod-head {
     display: flex;
     align-items: baseline;
@@ -403,6 +442,7 @@ table.price tfoot td.cell-hi {
     letter-spacing: 0.07em;
     color: var(--ink);
 }
+
 .dst-prod-sub {
     font-weight: 400;
     text-transform: none;
@@ -411,6 +451,7 @@ table.price tfoot td.cell-hi {
     color: var(--slate);
 }
 .dst-time { margin-top: 8px; display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+
 .dst-time-big {
     font-family: var(--mono);
     font-size: 18px;
@@ -420,6 +461,7 @@ table.price tfoot td.cell-hi {
 .dst-time-sub { font-size: 11.5px; color: var(--slate); }
 
 .dst-risks { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 8px; }
+
 .dst-risk {
     display: grid;
     gap: 2px;
@@ -442,6 +484,7 @@ table.price tfoot td.cell-hi {
     display: grid;
     gap: 6px;
 }
+
 .res-lines li {
     display: grid;
     grid-template-columns: 1fr auto;
@@ -449,17 +492,20 @@ table.price tfoot td.cell-hi {
     align-items: baseline;
     font-size: 12px;
 }
+
 .res-lines .rl-name {
     font-family: var(--mono);
     font-size: 11.5px;
     color: var(--ink);
     overflow-wrap: anywhere;
 }
+
 .res-lines .rl-meta {
     grid-column: 1;
     font-size: 10.5px;
     color: var(--slate);
 }
+
 .res-lines .rl-amt {
     grid-column: 2;
     grid-row: 1 / span 2;
@@ -496,8 +542,9 @@ table.price tfoot td.cell-hi {
     border: 1px solid var(--ink);
     border-radius: var(--r);
     background: var(--ink);
-    color: #fff;
+    color: var(--color-on-brand);
 }
+
 .dst-margin-head {
     display: flex;
     align-items: baseline;
@@ -505,6 +552,7 @@ table.price tfoot td.cell-hi {
     flex-wrap: wrap;
     gap: 4px 10px;
 }
+
 /* --pink-400 (#E45D92) gives only 3.34:1 against white at 10px/700 — under the
    4.5:1 AA floor. This chip is the single visual thing stopping a rep pasting a
    cost screenshot into a distributor thread, so it gets the darkest pink:
@@ -515,28 +563,32 @@ table.price tfoot td.cell-hi {
     text-transform: uppercase;
     letter-spacing: 0.09em;
     background: var(--pink-600);
-    color: #fff;
+    color: var(--color-on-brand);
     padding: 2px 8px;
     border-radius: 999px;
 }
 
 /* Partial cost basis — deliberately plain and unmissable, no numbers. */
 .dm-incomplete { display: grid; gap: 3px; }
+
 .dm-incomplete-title {
     font-size: 12.5px;
     font-weight: 600;
-    color: #FFD08A;
+    color: var(--embroidery-contract-orange);
 }
+
 .dm-incomplete-detail {
     font-size: 11.5px;
     line-height: 1.45;
-    color: rgba(255,255,255,0.78);
+    color: rgb(255 255 255 / 78%);
 }
+
 .dst-margin-asof {
     font-family: var(--mono);
     font-size: 10.5px;
-    color: rgba(255,255,255,0.62);
+    color: rgb(255 255 255 / 62%);
 }
+
 .dst-margin-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -544,37 +596,42 @@ table.price tfoot td.cell-hi {
     margin-top: 10px;
 }
 .dm-cell { display: grid; gap: 2px; }
+
 .dm-k {
     font-size: 9.5px;
     text-transform: uppercase;
     letter-spacing: 0.07em;
-    color: rgba(255,255,255,0.60);
+    color: rgb(255 255 255 / 60%);
 }
+
 .dm-v {
     font-family: var(--mono);
     font-size: 14px;
     font-weight: 600;
-    color: #fff;
+    color: var(--color-on-brand);
 }
-.dm-cell.pos .dm-v { color: #6EE7A8; }
-.dm-cell.neg .dm-v { color: #FF9AA8; }
+.dm-cell.pos .dm-v { color: var(--embroidery-contract-green); }
+.dm-cell.neg .dm-v { color: var(--embroidery-contract-red); }
+
 .dst-margin-note {
     margin: 10px 0 0;
     font-size: 10.5px;
     line-height: 1.45;
-    color: rgba(255,255,255,0.62);
+    color: rgb(255 255 255 / 62%);
 }
 
 /* 🔴 Cost NEVER reaches paper. A printed contract quote goes to the customer. */
 @media print {
+    /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
     .dst-margin { display: none !important; }
 }
 
 /* Responsive — stack the two-column qty/stitch row on narrow screens */
-@media (max-width: 980px) {
+@media (width <= 980px) {
     .dst-margin-grid { grid-template-columns: repeat(2, 1fr); }
 }
-@media (max-width: 980px) {
+
+@media (width <= 980px) {
     .calc-form .row { grid-template-columns: 1fr; }
     .dst-facts { grid-template-columns: repeat(2, auto); }
     .dst-line-stitch { width: 100%; }
@@ -593,7 +650,7 @@ table.price tfoot td.cell-hi {
 .price-foot .print-list-link:hover { text-decoration: underline; }
 
 /* Phone (≤640px) — 2026-09-05 sweep: the segmented control / tab strip did not wrap. */
-@media (max-width: 640px) {
+@media (width <= 640px) {
     .tabs { flex-wrap: wrap; }
     .seg { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
 }

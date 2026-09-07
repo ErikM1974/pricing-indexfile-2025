@@ -1,8 +1,19 @@
+/* stylelint-disable no-duplicate-selectors -- legacy sheet: rules were appended over time; merging them would reorder the cascade (2026-09-07) */
+
 /**
  * Universal Image Gallery Styles
  * Extracted from DTG pricing page and enhanced for all pricing pages
  * Features: thumbnails, zoom, loading states, responsive design
  */
+
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue so the page
+   keeps its exact look. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   every rule below uses var(). Raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
+:root {
+    --universal-image-gallery-green-dark: #1e4d0f;
+}
+/* stylelint-enable color-no-hex */
 
 /* ==========================================================================
    Image Gallery Container
@@ -22,16 +33,16 @@
 .main-image-container {
     position: relative;
     width: 100%;
-    background-color: #f8f9fa;
+    background-color: var(--gray-50);
     border-radius: var(--radius-md, 8px);
     overflow: hidden;
-    box-shadow: var(--shadow-md, 0 4px 8px rgba(0,0,0,0.1));
+    box-shadow: var(--shadow-md, 0 4px 8px rgb(0 0 0 / 10%));
     margin-bottom: 15px;
     transition: all 0.3s ease;
 }
 
 .main-image-container:hover {
-    box-shadow: var(--shadow-lg, 0 8px 16px rgba(0,0,0,0.15));
+    box-shadow: var(--shadow-lg, 0 8px 16px rgb(0 0 0 / 15%));
 }
 
 .main-image-container img {
@@ -59,8 +70,8 @@
     transform: translate(-50%, -50%);
     width: 40px;
     height: 40px;
-    border: 3px solid #f3f3f3;
-    border-top: 3px solid var(--primary-color, #2f661e);
+    border: 3px solid var(--gray-100);
+    border-top: 3px solid var(--primary-color, var(--brand-700));
     border-radius: 50%;
     animation: spin 1s linear infinite;
     display: none;
@@ -88,7 +99,7 @@
     position: absolute;
     bottom: 10px;
     right: 10px;
-    background-color: rgba(255, 255, 255, 0.9);
+    background-color: rgb(255 255 255 / 90%);
     border-radius: 50%;
     width: 40px;
     height: 40px;
@@ -98,7 +109,7 @@
     cursor: pointer;
     opacity: 0;
     transition: all 0.3s ease;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    box-shadow: 0 2px 8px rgb(0 0 0 / 20%);
     backdrop-filter: blur(4px);
 }
 
@@ -108,7 +119,7 @@
 }
 
 .image-zoom-overlay:hover {
-    background-color: var(--primary-color, #2f661e);
+    background-color: var(--primary-color, var(--brand-700));
     color: white;
 }
 
@@ -131,7 +142,7 @@
     overflow-x: auto;
     padding: 10px 0;
     scrollbar-width: thin;
-    scrollbar-color: var(--primary-color, #2f661e) var(--primary-light, #eaf2e9);
+    scrollbar-color: var(--primary-color, var(--brand-700)) var(--primary-light, var(--brand-100));
     scroll-behavior: smooth;
 }
 
@@ -140,18 +151,18 @@
 }
 
 .image-thumbnails::-webkit-scrollbar-track {
-    background: var(--primary-light, #eaf2e9);
+    background: var(--primary-light, var(--brand-100));
     border-radius: 3px;
 }
 
 .image-thumbnails::-webkit-scrollbar-thumb {
-    background-color: var(--primary-color, #2f661e);
+    background-color: var(--primary-color, var(--brand-700));
     border-radius: 3px;
     transition: background-color 0.3s ease;
 }
 
 .image-thumbnails::-webkit-scrollbar-thumb:hover {
-    background-color: var(--primary-dark, #1e4d0f);
+    background-color: var(--primary-dark, var(--universal-image-gallery-green-dark));
 }
 
 /* ==========================================================================
@@ -168,18 +179,18 @@
     transition: all 0.3s ease;
     background-color: white;
     position: relative;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 4px rgb(0 0 0 / 10%);
 }
 
 .thumbnail-item:hover {
-    border-color: var(--primary-light, #eaf2e9);
+    border-color: var(--primary-light, var(--brand-100));
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 8px rgb(0 0 0 / 15%);
 }
 
 .thumbnail-item.active {
-    border-color: var(--primary-color, #2f661e);
-    box-shadow: 0 0 0 3px var(--primary-light, #eaf2e9);
+    border-color: var(--primary-color, var(--brand-700));
+    box-shadow: 0 0 0 3px var(--primary-light, var(--brand-100));
     transform: translateY(-1px);
 }
 
@@ -203,7 +214,7 @@
     bottom: 0;
     left: 0;
     right: 0;
-    background: linear-gradient(transparent, rgba(0,0,0,0.8));
+    background: linear-gradient(transparent, rgb(0 0 0 / 80%));
     color: white;
     font-size: 0.7em;
     padding: 8px 4px 4px;
@@ -232,7 +243,7 @@
     top: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.9);
+    background-color: rgb(0 0 0 / 90%);
     backdrop-filter: blur(4px);
     animation: fadeIn 0.3s ease;
 }
@@ -252,7 +263,7 @@
     position: absolute;
     top: 15px;
     right: 35px;
-    color: #f1f1f1;
+    color: var(--gray-100);
     font-size: 40px;
     font-weight: bold;
     cursor: pointer;
@@ -263,13 +274,13 @@
     align-items: center;
     justify-content: center;
     border-radius: 50%;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgb(0 0 0 / 50%);
     backdrop-filter: blur(4px);
 }
 
 .universal-image-modal .close-modal:hover {
     color: white;
-    background: rgba(255, 255, 255, 0.2);
+    background: rgb(255 255 255 / 20%);
     transform: scale(1.1);
 }
 
@@ -277,7 +288,7 @@
     width: 100%;
     height: auto;
     border-radius: 8px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 8px 32px rgb(0 0 0 / 50%);
 }
 
 .universal-image-modal #modal-caption {
@@ -286,7 +297,7 @@
     width: 80%;
     max-width: 700px;
     text-align: center;
-    color: #ccc;
+    color: var(--gray-300);
     padding: 20px 0;
     font-size: 1.1em;
     font-weight: 500;
@@ -299,20 +310,20 @@
 .no-images-message {
     text-align: center;
     padding: 60px 20px;
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    background: linear-gradient(135deg, var(--gray-50) 0%, var(--gray-200) 100%);
     border-radius: var(--radius-md, 8px);
-    border: 2px dashed #dee2e6;
+    border: 2px dashed var(--gray-200);
     margin: 20px 0;
 }
 
 .no-images-message h3 {
-    color: #6c757d;
-    margin: 20px 0 10px 0;
+    color: var(--gray-500);
+    margin: 20px 0 10px;
     font-size: 1.5em;
 }
 
 .no-images-message p {
-    color: #6c757d;
+    color: var(--gray-500);
     margin: 0;
     font-size: 1.1em;
 }
@@ -331,6 +342,7 @@
         opacity: 0;
         transform: translateY(-50%) scale(0.8);
     }
+
     to { 
         opacity: 1;
         transform: translateY(-50%) scale(1);
@@ -342,6 +354,7 @@
         opacity: 0;
         transform: translateY(20px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -361,7 +374,7 @@
    Responsive Design
    ========================================================================== */
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
     .main-image-container img {
         min-height: 300px;
     }
@@ -396,7 +409,7 @@
     }
 }
 
-@media (max-width: 480px) {
+@media (width <= 480px) {
     .main-image-container img {
         min-height: 250px;
     }

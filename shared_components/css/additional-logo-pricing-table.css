@@ -5,6 +5,18 @@
  * Created: 2025-01-10
  */
 
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue so the page
+   keeps its exact look. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   every rule below uses var(). Raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
+:root {
+    --additional-logo-pricing-table-gray: #666;
+    --additional-logo-pricing-table-yellow: #ffc107;
+    --additional-logo-pricing-table-gray-dark: #333;
+    --additional-logo-pricing-table-yellow-2: #856404;
+}
+/* stylelint-enable color-no-hex */
+
 /* Section Container */
 .additional-logo-pricing-section {
     margin-top: 40px;
@@ -12,15 +24,15 @@
     background: white;
     border-radius: 12px;
     padding: 32px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 8px rgb(0 0 0 / 10%);
 }
 
 /* Title */
 .additional-logo-title {
-    font-family: 'Poppins', sans-serif;
+    font-family: Poppins, sans-serif;
     font-size: 24px;
     font-weight: 700;
-    color: #2d5f3f;
+    color: var(--print-green);
     margin-bottom: 24px;
     display: flex;
     align-items: center;
@@ -28,7 +40,7 @@
 }
 
 .additional-logo-title i {
-    color: #4cb354;
+    color: var(--brand-500);
     font-size: 28px;
 }
 
@@ -38,12 +50,12 @@
     border-collapse: collapse;
     border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 2px 8px rgb(0 0 0 / 8%);
     margin-bottom: 24px;
 }
 
 .additional-logo-table thead {
-    background: linear-gradient(135deg, #4cb354, #2d5f3f);
+    background: linear-gradient(135deg, var(--brand-500), var(--print-green));
     color: white;
 }
 
@@ -60,7 +72,7 @@
     text-align: center;
     font-size: 16px;
     font-weight: 600;
-    border-bottom: 1px solid #e8f5e9;
+    border-bottom: 1px solid var(--brand-100);
 }
 
 .additional-logo-table tbody tr {
@@ -68,22 +80,22 @@
 }
 
 .additional-logo-table tbody tr:hover {
-    background: rgba(76, 179, 84, 0.05);
+    background: rgb(76 179 84 / 5%);
 }
 
 /* Tier Label Cell (First Column) */
 .additional-logo-table .tier-label {
     text-align: left;
     font-weight: 700;
-    color: #2d5f3f;
-    background: #f1f8f4;
+    color: var(--print-green);
+    background: var(--gray-100);
 }
 
 .additional-logo-table .tier-label small {
     display: block;
     font-size: 13px;
     font-weight: 500;
-    color: #666;
+    color: var(--additional-logo-pricing-table-gray);
     margin-top: 4px;
 }
 
@@ -91,11 +103,11 @@
 .additional-logo-table .price-cell {
     font-size: 20px;
     font-weight: 700;
-    color: #4cb354;
+    color: var(--brand-500);
 }
 
 .additional-logo-table .price-cell.loading {
-    color: #999;
+    color: var(--print-line);
     font-size: 14px;
     font-weight: 500;
 }
@@ -103,17 +115,17 @@
 /* Notes Section */
 .additional-logo-notes {
     padding: 20px;
-    background: #f8f9fa;
-    border-left: 4px solid #4cb354;
+    background: var(--gray-50);
+    border-left: 4px solid var(--brand-500);
     border-radius: 8px;
     margin-top: 16px;
 }
 
 .additional-logo-notes p {
-    margin: 0 0 8px 0;
+    margin: 0 0 8px;
     font-size: 15px;
     line-height: 1.6;
-    color: #333;
+    color: var(--additional-logo-pricing-table-gray-dark);
 }
 
 .additional-logo-notes p:last-child {
@@ -121,20 +133,20 @@
 }
 
 .additional-logo-notes strong {
-    color: #2d5f3f;
+    color: var(--print-green);
     font-weight: 700;
 }
 
 .additional-logo-notes small {
     font-size: 13px;
-    color: #666;
+    color: var(--additional-logo-pricing-table-gray);
 }
 
 /* API Error State */
 .additional-logo-error {
     padding: 16px;
-    background: #fff3cd;
-    border-left: 4px solid #ffc107;
+    background: var(--amber-100);
+    border-left: 4px solid var(--additional-logo-pricing-table-yellow);
     border-radius: 8px;
     margin-bottom: 16px;
 }
@@ -142,16 +154,16 @@
 .additional-logo-error p {
     margin: 0;
     font-size: 14px;
-    color: #856404;
+    color: var(--additional-logo-pricing-table-yellow-2);
 }
 
 .additional-logo-error i {
-    color: #ffc107;
+    color: var(--additional-logo-pricing-table-yellow);
     margin-right: 8px;
 }
 
 /* Responsive Design */
-@media screen and (max-width: 768px) {
+@media screen and (width <= 768px) {
     .additional-logo-pricing-section {
         padding: 20px;
         margin-top: 24px;
@@ -186,7 +198,7 @@
     }
 }
 
-@media screen and (max-width: 480px) {
+@media screen and (width <= 480px) {
     /* Stack table on very small screens */
     .additional-logo-table th:first-child,
     .additional-logo-table td:first-child {
@@ -197,7 +209,7 @@
     }
 
     .additional-logo-table thead th:first-child {
-        background: linear-gradient(135deg, #4cb354, #2d5f3f);
+        background: linear-gradient(135deg, var(--brand-500), var(--print-green));
     }
 
     .additional-logo-table .tier-label {

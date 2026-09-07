@@ -1,21 +1,34 @@
-/* universal-pricing-grid.css — extracted 2026-09-06 from the <style> block(s) universal-pricing-grid.js used to inject (Rule 3). */
+/* universal-pricing-grid.css — extracted 2026-09-06 from the \3c style> block(s) universal-pricing-grid.js used to inject (Rule 3). */
+
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue so the page
+   keeps its exact look. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   every rule below uses var(). Raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
+:root {
+    --universal-pricing-grid-green: #28a745;
+}
+/* stylelint-enable color-no-hex */
+
 .upcharge-grid {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
 }
+
 .upcharge-row {
     display: flex;
     justify-content: space-between;
     padding: 0.5rem;
-    background: #f8f9fa;
+    background: var(--gray-50);
     border-radius: 4px;
 }
+
 .upcharge-sizes {
     font-weight: 500;
-    color: #495057;
+    color: var(--gray-600);
 }
+
 .upcharge-amount {
     font-weight: 600;
-    color: #28a745;
+    color: var(--universal-pricing-grid-green);
 }

@@ -1,4 +1,14 @@
 /* ==================== DTG LTM QUANTITY INPUT ==================== */
+
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue so the page
+   keeps its exact look. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   every rule below uses var(). Raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
+:root {
+    --dtg-ltm-quantity-input-red: #ef4444;
+}
+/* stylelint-enable color-no-hex */
+
 /*
  * DTG Less-Than-Minimum Quantity Input Styling
  * Created: 2025-01-XX
@@ -13,10 +23,10 @@
     gap: 12px;
     margin-top: 20px;
     padding: 20px;
-    background: linear-gradient(135deg, #f0fdf4 0%, #e8f5e9 100%);
-    border: 3px solid #4cb354;
+    background: linear-gradient(135deg, var(--brand-50) 0%, var(--brand-100) 100%);
+    border: 3px solid var(--brand-500);
     border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(76, 179, 84, 0.15);
+    box-shadow: 0 4px 12px rgb(76 179 84 / 15%);
     animation: slideDown 0.3s ease-out;
 }
 
@@ -32,6 +42,7 @@
         transform: translateY(-10px);
         max-height: 0;
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -43,14 +54,14 @@
 .dtg-quantity-input-label {
     font-size: 16px;
     font-weight: 700;
-    color: #1f2937;
+    color: var(--gray-800);
     display: flex;
     align-items: center;
     gap: 8px;
 }
 
 .dtg-quantity-input-label i {
-    color: #4cb354;
+    color: var(--brand-500);
     font-size: 18px;
 }
 
@@ -62,8 +73,8 @@
     font-size: 20px;
     font-weight: 700;
     text-align: center;
-    color: #1f2937;
-    border: 2px solid #d1d5db;
+    color: var(--gray-800);
+    border: 2px solid var(--gray-300);
     border-radius: 10px;
     background: white;
     transition: all 0.3s ease;
@@ -71,23 +82,23 @@
 
 .dtg-quantity-input:focus {
     outline: none;
-    border-color: #4cb354;
-    box-shadow: 0 0 0 4px rgba(76, 179, 84, 0.15);
+    border-color: var(--brand-500);
+    box-shadow: 0 0 0 4px rgb(76 179 84 / 15%);
 }
 
 .dtg-quantity-input:hover {
-    border-color: #9ca3af;
+    border-color: var(--gray-400);
 }
 
 /* Invalid state */
 .dtg-quantity-input:invalid {
-    border-color: #ef4444;
+    border-color: var(--dtg-ltm-quantity-input-red);
 }
 
 /* Hint text */
 .dtg-quantity-hint {
     font-size: 13px;
-    color: #6b7280;
+    color: var(--gray-500);
     display: flex;
     align-items: center;
     gap: 6px;
@@ -95,20 +106,20 @@
 }
 
 .dtg-quantity-hint i {
-    color: #4cb354;
+    color: var(--brand-500);
     font-size: 14px;
 }
 
 .dtg-quantity-hint strong {
-    color: #4cb354;
+    color: var(--brand-500);
     font-weight: 700;
     padding: 2px 6px;
-    background: rgba(76, 179, 84, 0.1);
+    background: rgb(76 179 84 / 10%);
     border-radius: 4px;
 }
 
 /* Mobile responsive adjustments */
-@media (max-width: 768px) {
+@media (width <= 768px) {
     .dtg-quantity-input-container {
         padding: 16px;
         gap: 10px;
@@ -134,13 +145,14 @@
 
 /* Accessibility: Focus visible for keyboard navigation */
 .dtg-quantity-input:focus-visible {
-    outline: 3px solid #4cb354;
+    outline: 3px solid var(--brand-500);
     outline-offset: 2px;
 }
 
 /* Print styles - hide input when printing */
 @media print {
     .dtg-quantity-input-container {
+        /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
         display: none !important;
     }
 }

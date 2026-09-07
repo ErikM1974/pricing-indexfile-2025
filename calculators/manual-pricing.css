@@ -1,3 +1,5 @@
+/* stylelint-disable no-duplicate-selectors -- legacy sheet: rules were appended over time; merging them would reorder the cascade (2026-09-07) */
+
 /**
  * Manual Pricing Calculator - Unified Page Styles
  * Extends manual-calculator-styles.css base theme
@@ -10,6 +12,19 @@
  *   Cap Embroidery: #f59e0b (amber)
  *   Screen Print: #ef4444 (red)
  */
+
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue so the page
+   keeps its exact look. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   every rule below uses var(). Raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
+:root {
+    --manual-pricing-teal: #10b981;
+    --manual-pricing-red: #ef4444;
+    --manual-pricing-yellow: #fbbf24;
+    --manual-pricing-orange: #78350f;
+    --manual-pricing-red-tint: #fecaca;
+}
+/* stylelint-enable color-no-hex */
 
 /* Animation keyframes */
 @keyframes fadeIn {
@@ -24,7 +39,7 @@
     background: var(--card-bg);
     border-radius: 12px;
     padding: 1.5rem 2rem;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+    box-shadow: 0 1px 3px rgb(0 0 0 / 8%), 0 1px 2px rgb(0 0 0 / 6%);
     margin-bottom: 2rem;
 }
 
@@ -81,12 +96,12 @@
 .cost-input:focus {
     outline: none;
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(76, 179, 84, 0.15);
+    box-shadow: 0 0 0 3px rgb(76 179 84 / 15%);
 }
 
 .cost-input::placeholder {
     font-weight: 400;
-    color: #9ca3af;
+    color: var(--gray-400);
 }
 
 /* Item type toggle (Garment / Cap) */
@@ -106,7 +121,7 @@
 
 .toggle-buttons {
     display: flex;
-    background: #f1f5f9;
+    background: var(--slate-100);
     border-radius: 10px;
     padding: 3px;
     gap: 2px;
@@ -136,12 +151,12 @@
 .toggle-btn.active {
     background: var(--primary-color);
     color: white;
-    box-shadow: 0 2px 8px rgba(76, 179, 84, 0.3);
+    box-shadow: 0 2px 8px rgb(76 179 84 / 30%);
     font-weight: 600;
 }
 
 .toggle-btn:not(.active):hover {
-    background: rgba(76, 179, 84, 0.08);
+    background: rgb(76 179 84 / 8%);
     color: var(--text-primary);
 }
 
@@ -169,12 +184,12 @@
 .btn-calculate:hover {
     background: var(--primary-dark);
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(76, 179, 84, 0.3);
+    box-shadow: 0 4px 12px rgb(76 179 84 / 30%);
 }
 
 .btn-calculate:active {
     transform: translateY(0);
-    box-shadow: 0 2px 6px rgba(76, 179, 84, 0.2);
+    box-shadow: 0 2px 6px rgb(76 179 84 / 20%);
 }
 
 .btn-calculate:disabled {
@@ -215,23 +230,23 @@
 .method-card {
     background: var(--card-bg);
     border-radius: 12px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+    box-shadow: 0 1px 3px rgb(0 0 0 / 6%), 0 1px 2px rgb(0 0 0 / 4%);
     overflow: hidden;
     transition: box-shadow 0.25s ease, transform 0.25s ease;
     position: relative;
 }
 
 .method-card:hover {
-    box-shadow: 0 4px 16px rgba(0,0,0,0.1), 0 2px 4px rgba(0,0,0,0.06);
+    box-shadow: 0 4px 16px rgb(0 0 0 / 10%), 0 2px 4px rgb(0 0 0 / 6%);
     transform: translateY(-1px);
 }
 
 /* Colored top accent bars per method */
-#dtgCard    { border-top: 3px solid #3b82f6; }
-#dtfCard    { border-top: 3px solid #8b5cf6; }
-#embCard    { border-top: 3px solid #10b981; }
-#capEmbCard { border-top: 3px solid #f59e0b; }
-#spCard     { border-top: 3px solid #ef4444; }
+#dtgCard    { border-top: 3px solid var(--color-floor-light); }
+#dtfCard    { border-top: 3px solid var(--color-ruth-light); }
+#embCard    { border-top: 3px solid var(--manual-pricing-teal); }
+#capEmbCard { border-top: 3px solid var(--amber-500); }
+#spCard     { border-top: 3px solid var(--manual-pricing-red); }
 
 .method-card-header {
     display: flex;
@@ -239,7 +254,7 @@
     justify-content: space-between;
     padding: 1rem 1.5rem;
     border-bottom: 1px solid var(--border-color);
-    background: linear-gradient(180deg, #fafbfc 0%, #f6f8fa 100%);
+    background: linear-gradient(180deg, var(--gray-50) 0%, var(--slate-50) 100%);
 }
 
 .method-card-title {
@@ -264,11 +279,11 @@
     flex-shrink: 0;
 }
 
-.method-icon.dtg { background: #3b82f6; }
-.method-icon.dtf { background: #8b5cf6; }
-.method-icon.emb { background: #10b981; }
-.method-icon.cap { background: #f59e0b; }
-.method-icon.sp  { background: #ef4444; }
+.method-icon.dtg { background: var(--color-floor-light); }
+.method-icon.dtf { background: var(--color-ruth-light); }
+.method-icon.emb { background: var(--manual-pricing-teal); }
+.method-icon.cap { background: var(--amber-500); }
+.method-icon.sp  { background: var(--manual-pricing-red); }
 
 .method-card-controls {
     display: flex;
@@ -292,7 +307,7 @@
 .method-select:focus {
     outline: none;
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(76, 179, 84, 0.12);
+    box-shadow: 0 0 0 3px rgb(76 179 84 / 12%);
 }
 
 .method-card-body {
@@ -307,7 +322,7 @@
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     border-radius: 8px;
-    border: 1px solid #e8ecf1;
+    border: 1px solid var(--gray-200);
 }
 
 .pricing-table {
@@ -317,15 +332,15 @@
 }
 
 .pricing-table thead th {
-    background: #e8ecf1;
+    background: var(--gray-200);
     padding: 0.625rem 0.875rem;
     text-align: center;
     font-weight: 700;
     font-size: 0.75rem;
-    color: #475569;
+    color: var(--slate-600);
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    border-bottom: 2px solid #d1d9e4;
+    border-bottom: 2px solid var(--gray-300);
     white-space: nowrap;
 }
 
@@ -343,7 +358,7 @@
 }
 
 .pricing-table thead th:first-child {
-    background: #e8ecf1;
+    background: var(--gray-200);
 }
 
 .pricing-table tbody td:first-child {
@@ -353,7 +368,7 @@
 .pricing-table tbody td {
     padding: 0.625rem 0.875rem;
     text-align: center;
-    border-bottom: 1px solid #f0f3f7;
+    border-bottom: 1px solid var(--slate-100);
     white-space: nowrap;
     transition: background-color 0.15s ease;
 }
@@ -367,20 +382,20 @@
 
 /* Alternating row backgrounds */
 .pricing-table tbody tr:nth-child(even) td {
-    background: #f8fafb;
+    background: var(--gray-50);
 }
 
 .pricing-table tbody tr:nth-child(even) td:first-child {
-    background: #f8fafb;
+    background: var(--gray-50);
 }
 
 /* Row hover */
 .pricing-table tbody tr:hover td {
-    background: rgba(76, 179, 84, 0.06);
+    background: rgb(76 179 84 / 6%);
 }
 
 .pricing-table tbody tr:hover td:first-child {
-    background: rgba(76, 179, 84, 0.06);
+    background: rgb(76 179 84 / 6%);
     box-shadow: inset 3px 0 0 var(--primary-color);
 }
 
@@ -391,7 +406,7 @@
 /* Price cells */
 .pricing-table .price-cell {
     font-weight: 700;
-    color: #166534;
+    color: var(--print-green);
     font-variant-numeric: tabular-nums;
     font-size: 0.9375rem;
     letter-spacing: -0.01em;
@@ -399,21 +414,21 @@
 
 /* LTM row accent */
 .pricing-table .ltm-row td {
-    background: #fffbeb;
+    background: var(--store-paper);
 }
 
 .pricing-table .ltm-row td:first-child {
-    background: #fffbeb;
-    box-shadow: inset 3px 0 0 #f59e0b;
+    background: var(--store-paper);
+    box-shadow: inset 3px 0 0 var(--amber-500);
 }
 
 .pricing-table tbody tr.ltm-row:hover td {
-    background: #fef3c7;
+    background: var(--amber-100);
 }
 
 .pricing-table tbody tr.ltm-row:hover td:first-child {
-    background: #fef3c7;
-    box-shadow: inset 3px 0 0 #f59e0b;
+    background: var(--amber-100);
+    box-shadow: inset 3px 0 0 var(--amber-500);
 }
 
 /* LTM Badge */
@@ -421,8 +436,8 @@
     display: inline-block;
     font-size: 0.625rem;
     font-weight: 700;
-    background: #fbbf24;
-    color: #78350f;
+    background: var(--manual-pricing-yellow);
+    color: var(--manual-pricing-orange);
     padding: 0.125rem 0.5rem;
     border-radius: 10px;
     margin-left: 0.5rem;
@@ -464,7 +479,7 @@
 
 .card-error {
     padding: 1rem 1.25rem;
-    background: #fef2f2;
+    background: var(--red-50);
     color: var(--error-text);
     border-radius: 8px;
     border-left: 4px solid var(--error-text);
@@ -487,7 +502,7 @@
    GLOBAL ERROR BANNER
    ===================================================== */
 .api-error-banner {
-    background: #fef2f2;
+    background: var(--red-50);
     color: var(--error-text);
     padding: 0.75rem 1.5rem;
     text-align: center;
@@ -496,7 +511,7 @@
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    border-bottom: 2px solid #fecaca;
+    border-bottom: 2px solid var(--manual-pricing-red-tint);
 }
 
 .api-error-banner.hidden {
@@ -509,11 +524,11 @@
 .ltm-note {
     margin-top: 0.75rem;
     padding: 0.5rem 0.875rem;
-    background: #fffbeb;
-    border-left: 4px solid #f59e0b;
+    background: var(--store-paper);
+    border-left: 4px solid var(--amber-500);
     border-radius: 0 6px 6px 0;
     font-size: 0.8125rem;
-    color: #92400e;
+    color: var(--amber-800);
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -544,19 +559,19 @@
 .ltm-qty-input {
     width: 65px;
     text-align: center;
-    -moz-appearance: textfield;
+    appearance: textfield;
 }
 
 .ltm-qty-input::-webkit-outer-spin-button,
 .ltm-qty-input::-webkit-inner-spin-button {
-    -webkit-appearance: none;
+    appearance: none;
     margin: 0;
 }
 
 /* =====================================================
    RESPONSIVE
    ===================================================== */
-@media (max-width: 768px) {
+@media (width <= 768px) {
     .input-section {
         padding: 1.25rem;
     }
@@ -594,7 +609,7 @@
 
     .pricing-table thead th,
     .pricing-table tbody td {
-        padding: 0.5rem 0.5rem;
+        padding: 0.5rem;
     }
 
     .pricing-table .price-cell {
@@ -615,6 +630,7 @@
         box-shadow: none;
         border: 1px solid var(--border-color);
         break-inside: avoid;
+        /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
         transform: none !important;
     }
 

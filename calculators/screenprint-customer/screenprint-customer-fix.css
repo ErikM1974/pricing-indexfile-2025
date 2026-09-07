@@ -1,6 +1,19 @@
 /* ============================================ */
+
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue so the page
+   keeps its exact look. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   every rule below uses var(). Raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
+:root {
+    --screenprint-customer-fix-yellow: #fcd34d;
+    --screenprint-customer-fix-yellow-2: #fde68a;
+}
+/* stylelint-enable color-no-hex */
+
 /* CUSTOMER SCREEN PRINT CALCULATOR FIX CSS  */
+
 /* ============================================ */
+
 /* Fixes styling to match NWCA green reference design */
 
 /* Product Showcase Section */
@@ -10,7 +23,7 @@
     padding: 2rem;
     margin-bottom: 2rem;
     margin-top: 1.5rem;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.08);
+    box-shadow: 0 4px 6px rgb(0 0 0 / 8%);
     position: relative;
     overflow: hidden;
 }
@@ -41,13 +54,13 @@
     max-width: 300px;
     height: auto;
     border-radius: 12px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    box-shadow: 0 8px 24px rgb(0 0 0 / 15%);
     transition: all 0.3s ease;
 }
 
 .product-showcase-image img:hover {
     transform: scale(1.02) rotate(1deg);
-    box-shadow: 0 12px 32px rgba(76, 179, 84, 0.3);
+    box-shadow: 0 12px 32px rgb(76 179 84 / 30%);
 }
 
 .product-showcase-content h3 {
@@ -79,7 +92,7 @@
     font-size: 0.8rem;
 }
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
     .product-showcase-inner {
         grid-template-columns: 1fr;
     }
@@ -102,7 +115,7 @@
     background: var(--card-bg);
     padding: 2rem;
     border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 1px 3px rgb(0 0 0 / 10%);
     border: 1px solid var(--border-color);
 }
 
@@ -118,7 +131,7 @@
     background: var(--card-bg);
     padding: 2rem;
     border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 1px 3px rgb(0 0 0 / 10%);
     border: 1px solid var(--border-color);
 }
 
@@ -140,12 +153,12 @@
     padding: 1.5rem;
     border-radius: 8px;
     margin-bottom: 0.5rem;
-    box-shadow: 0 2px 4px rgba(76, 179, 84, 0.2);
+    box-shadow: 0 2px 4px rgb(76 179 84 / 20%);
 }
 
 .price-display.prompt {
-    background: #e5e7eb;
-    color: #6b7280;
+    background: var(--gray-200);
+    color: var(--gray-500);
     font-weight: 500;
     font-size: 1.25rem;
 }
@@ -221,16 +234,13 @@
 .slider {
     position: absolute;
     cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #ccc;
+    inset: 0;
+    background-color: var(--gray-300);
     transition: .3s;
     border-radius: 24px;
 }
 
-.slider:before {
+.slider::before {
     position: absolute;
     content: "";
     height: 18px;
@@ -246,7 +256,7 @@ input:checked + .slider {
     background-color: var(--primary-color);
 }
 
-input:checked + .slider:before {
+input:checked + .slider::before {
     transform: translateX(26px);
 }
 
@@ -256,7 +266,7 @@ input:checked + .slider:before {
     color: var(--warning-text);
     padding: 1rem;
     border-radius: 6px;
-    border: 1px solid #fcd34d;
+    border: 1px solid var(--screenprint-customer-fix-yellow);
     margin-bottom: 1rem;
 }
 
@@ -314,7 +324,7 @@ input:checked + .slider:before {
 .btn-primary:hover {
     background: var(--primary-dark);
     transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(76, 179, 84, 0.3);
+    box-shadow: 0 4px 8px rgb(76 179 84 / 30%);
 }
 
 .btn-secondary {
@@ -336,16 +346,16 @@ input:checked + .slider:before {
 
 /* Notice section styling */
 .notice-section {
-    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-    border: 1px solid #f59e0b;
-    color: #92400e;
+    background: linear-gradient(135deg, var(--amber-100) 0%, var(--screenprint-customer-fix-yellow-2) 100%);
+    border: 1px solid var(--amber-500);
+    color: var(--amber-800);
     padding: 2rem;
     border-radius: 8px;
     margin-top: 2rem;
 }
 
 .notice-section h2 {
-    color: #92400e;
+    color: var(--amber-800);
     margin-bottom: 1rem;
 }
 
@@ -353,11 +363,8 @@ input:checked + .slider:before {
 .modal-overlay {
     display: none;
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
+    inset: 0;
+    background-color: rgb(0 0 0 / 50%);
     z-index: 1000;
     overflow-y: auto;
 }
@@ -372,7 +379,7 @@ input:checked + .slider:before {
     margin: 50px auto;
     border-radius: 8px;
     overflow: hidden;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 20px 25px -5px rgb(0 0 0 / 10%);
 }
 
 .modal-header {
@@ -448,7 +455,7 @@ input:checked + .slider:before {
     display: inline-block;
     width: 20px;
     height: 20px;
-    border: 3px solid #f3f3f3;
+    border: 3px solid var(--gray-100);
     border-top: 3px solid var(--primary-color);
     border-radius: 50%;
     animation: spin 1s linear infinite;
@@ -462,6 +469,7 @@ input:checked + .slider:before {
 /* Print styles */
 @media print {
     .no-print {
+        /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
         display: none !important;
     }
     
@@ -470,14 +478,16 @@ input:checked + .slider:before {
     }
     
     .price-display {
-        background: #f3f4f6 !important;
-        color: #1f2937 !important;
-        border: 1px solid #d1d5db;
+        /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
+        background: var(--gray-100) !important;
+        /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
+        color: var(--gray-800) !important;
+        border: 1px solid var(--gray-300);
     }
 }
 
 /* Mobile responsiveness */
-@media (max-width: 768px) {
+@media (width <= 768px) {
     .calculator-grid {
         grid-template-columns: 1fr;
         gap: 1rem;
@@ -531,9 +541,9 @@ input:checked + .slider:before {
 
 /* Live-pricing error banner (Erik's #1 rule: never a silent/stale price) */
 .pricing-error-banner {
-    background: var(--warning-bg, #fef3c7);
-    color: var(--warning-text, #92400e);
-    border: 1px solid #f59e0b;
+    background: var(--warning-bg, var(--amber-100));
+    color: var(--warning-text, var(--amber-800));
+    border: 1px solid var(--amber-500);
     padding: 1rem;
     border-radius: 6px;
     margin-bottom: 1rem;
@@ -580,7 +590,7 @@ input:checked + .slider:before {
 }
 
 .tier-ladder-table tr.tier-current {
-    background: rgba(76, 179, 84, 0.12);
+    background: rgb(76 179 84 / 12%);
 }
 
 .tier-ladder-table tr.tier-current td {

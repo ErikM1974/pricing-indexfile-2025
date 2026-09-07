@@ -18,48 +18,65 @@
    ===================================================== */
 
 /* ========== Design Tokens ========== */
+
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue, merged into its
+   existing :root. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
 :root {
-    --pink-50:  #FDF3F7;
-    --pink-100: #FBE2EC;
-    --pink-200: #F6C2D6;
-    --pink-300: #EF94B7;
-    --pink-400: #E45D92;
-    --pink-500: #D43575;
-    --pink-600: #B91C5C;
-    --pink-700: #8E1147;
-    --pink-800: #5C0B30;
-    --pink-900: #340518;
-
-    --ink:        #1A1318;
-    --ink-2:      #2C2228;
-    --slate:      #5E5660;
-    --slate-2:    #87808A;
-    --slate-3:    #B8B2BB;
-    --line:       #ECE3E8;
-    --line-2:     #F4ECF0;
-    --paper:      #FFFFFF;
-    --paper-2:    #FBF8FA;
-    --paper-3:    #F6F1F4;
-    --bg:         #F3EDF1;
-
-    --ok:    #2E7D5B;
-    --warn:  #B47A00;
-
-    --sans:  "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    --mono:  "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
-    --serif: "Fraunces", "Iowan Old Style", Georgia, serif;
+    --contract-pricing-2026-cyan: #106ebe;
+    --contract-pricing-2026-red-tint: #f6c2d6;
+    --contract-pricing-2026-red: #ef94b7;
+    --contract-pricing-2026-red-2: #e45d92;
+    --contract-pricing-2026-red-3: #d43575;
+    --contract-pricing-2026-red-4: #b91c5c;
+    --contract-pricing-2026-magenta: #8e1147;
+    --contract-pricing-2026-magenta-dark: #5c0b30;
+    --contract-pricing-2026-red-dark: #340518;
+    --contract-pricing-2026-gray: #87808a;
+    --contract-pricing-2026-gray-2: #b8b2bb;
+    --contract-pricing-2026-green: #2e7d5b;
+    --contract-pricing-2026-yellow: #b47a00;
+    --contract-pricing-2026-cyan-2: #0078d4;
+    --pink-50:  var(--red-50);
+    --pink-100: var(--red-100);
+    --pink-200: var(--contract-pricing-2026-red-tint);
+    --pink-300: var(--contract-pricing-2026-red);
+    --pink-400: var(--contract-pricing-2026-red-2);
+    --pink-500: var(--contract-pricing-2026-red-3);
+    --pink-600: var(--contract-pricing-2026-red-4);
+    --pink-700: var(--contract-pricing-2026-magenta);
+    --pink-800: var(--contract-pricing-2026-magenta-dark);
+    --pink-900: var(--contract-pricing-2026-red-dark);
+    --ink:        var(--print-ink);
+    --ink-2:      var(--gray-800);
+    --slate:      var(--print-ink-soft);
+    --slate-2:    var(--contract-pricing-2026-gray);
+    --slate-3:    var(--contract-pricing-2026-gray-2);
+    --line:       var(--gray-200);
+    --line-2:     var(--gray-100);
+    --paper:      var(--color-surface);
+    --paper-2:    var(--gray-50);
+    --paper-3:    var(--gray-100);
+    --bg:         var(--gray-100);
+    --ok:    var(--contract-pricing-2026-green);
+    --warn:  var(--contract-pricing-2026-yellow);
+    --sans:  "Geist", -apple-system, blinkmacsystemfont, "Segoe UI", sans-serif;
+    --mono:  "Geist Mono", ui-monospace, "SF Mono", menlo, monospace;
+    --serif: "Fraunces", "Iowan Old Style", georgia, serif;
     --headline-size: clamp(36px, 4.6vw, 60px);
-
     --r-sm: 6px;
     --r:    10px;
     --r-lg: 16px;
     --r-xl: 22px;
-    --shadow-sm: 0 1px 2px rgba(52, 5, 24, 0.04), 0 1px 1px rgba(52, 5, 24, 0.03);
-    --shadow:    0 1px 2px rgba(52, 5, 24, 0.05), 0 8px 24px -8px rgba(52, 5, 24, 0.10);
-    --shadow-lg: 0 2px 4px rgba(52, 5, 24, 0.05), 0 20px 40px -16px rgba(52, 5, 24, 0.16);
+    --shadow-sm: 0 1px 2px rgb(52 5 24 / 4%), 0 1px 1px rgb(52 5 24 / 3%);
+    --shadow:    0 1px 2px rgb(52 5 24 / 5%), 0 8px 24px -8px rgb(52 5 24 / 10%);
+    --shadow-lg: 0 2px 4px rgb(52 5 24 / 5%), 0 20px 40px -16px rgb(52 5 24 / 16%);
 }
+/* stylelint-enable color-no-hex */
 
 * { box-sizing: border-box; }
+
 html, body {
     margin: 0;
     background: var(--bg);
@@ -68,7 +85,7 @@ html, body {
     font-size: 15px;
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
-    text-rendering: optimizeLegibility;
+    text-rendering: optimizelegibility;
 }
 button { font-family: inherit; cursor: pointer; }
 input, select, textarea { font-family: inherit; }
@@ -82,6 +99,7 @@ input, select, textarea { font-family: inherit; }
     align-items: center;
     gap: 20px;
 }
+
 a.logo {
     display: inline-flex;
     align-items: center;
@@ -98,6 +116,7 @@ a.logo:hover { opacity: 0.85; }
     font-size: 13px;
     color: var(--slate);
 }
+
 .crumbs a {
     color: var(--pink-600);
     text-decoration: none;
@@ -110,6 +129,7 @@ a.logo:hover { opacity: 0.85; }
 .crumbs .here { color: var(--ink); font-weight: 500; }
 
 .topbar .spacer { flex: 1; }
+
 .theme-chip {
     display: inline-flex;
     align-items: center;
@@ -123,6 +143,7 @@ a.logo:hover { opacity: 0.85; }
     font-weight: 500;
     letter-spacing: 0.01em;
 }
+
 .theme-chip .dot {
     width: 6px; height: 6px;
     border-radius: 999px;
@@ -146,6 +167,7 @@ a.logo:hover { opacity: 0.85; }
     border-bottom: 1px solid var(--line);
     margin-bottom: 32px;
 }
+
 .eyebrow {
     font-size: 11px;
     text-transform: uppercase;
@@ -156,11 +178,13 @@ a.logo:hover { opacity: 0.85; }
     align-items: center;
     gap: 10px;
 }
+
 .eyebrow::before {
     content: "";
     width: 24px; height: 1px;
     background: var(--pink-500);
 }
+
 h1.page-title {
     font-family: var(--serif);
     font-weight: 600;
@@ -170,17 +194,20 @@ h1.page-title {
     margin: 14px 0;
     color: var(--ink);
 }
+
 h1.page-title em {
     font-style: italic;
     color: var(--pink-600);
     font-weight: 500;
 }
+
 .lede {
     font-size: 16px;
     color: var(--slate);
     max-width: 56ch;
 }
 .hero-aside { display: grid; gap: 10px; }
+
 .fact {
     background: var(--paper);
     border: 1px solid var(--line);
@@ -190,6 +217,7 @@ h1.page-title em {
     align-items: center;
     gap: 12px;
 }
+
 .fact .k {
     font-family: var(--mono);
     font-size: 11px;
@@ -199,12 +227,14 @@ h1.page-title em {
     width: 96px;
     flex: 0 0 96px;
 }
+
 .fact .v {
     font-size: 14px;
     color: var(--ink);
     font-weight: 500;
 }
 .fact .v strong { font-weight: 600; }
+
 .fact .v .pill {
     display: inline-block;
     background: var(--pink-50);
@@ -227,6 +257,7 @@ h1.page-title em {
     grid-template-columns: 1.05fr 1fr;
     margin-bottom: 40px;
 }
+
 .calc-head {
     padding: 22px 28px 18px;
     border-bottom: 1px solid var(--line);
@@ -234,6 +265,7 @@ h1.page-title em {
     align-items: center;
     justify-content: space-between;
 }
+
 .calc-head h2 {
     font-family: var(--serif);
     font-size: 22px;
@@ -241,6 +273,7 @@ h1.page-title em {
     font-weight: 600;
     letter-spacing: -0.01em;
 }
+
 .calc-head .meta {
     font-size: 12px;
     color: var(--slate-2);
@@ -250,6 +283,7 @@ h1.page-title em {
 }
 .calc-form { padding: 4px 28px 28px; }
 .field { margin-top: 22px; }
+
 /* Narrow to the field-TITLE label only (direct first-child of .field).
    Without `> :first-child` this rule's specificity (0,1,1) beat .hw-toggle
    (0,1,0) and .loc (0,1,0), forcing those interactive labels back into
@@ -263,6 +297,7 @@ h1.page-title em {
     color: var(--slate);
     margin-bottom: 8px;
 }
+
 .field-hint {
     font-weight: 500;
     text-transform: none;
@@ -270,6 +305,7 @@ h1.page-title em {
     color: var(--slate-2);
     margin-left: 4px;
 }
+
 .field .input {
     width: 100%;
     background: var(--paper-2);
@@ -281,12 +317,14 @@ h1.page-title em {
     color: var(--ink);
     transition: border-color 120ms, box-shadow 120ms, background 120ms;
 }
+
 .field .input:focus {
     outline: none;
     border-color: var(--pink-400);
     box-shadow: 0 0 0 4px var(--pink-50);
     background: var(--paper);
 }
+
 .field .input.num {
     font-family: var(--mono);
     font-variant-numeric: tabular-nums;
@@ -300,12 +338,13 @@ h1.page-title em {
 
 /* Result panel (right half of calculator card) */
 .calc-result {
-    background: linear-gradient(180deg, #FAF1F5 0%, #F4E0EB 100%);
+    background: linear-gradient(180deg, var(--red-50) 0%, var(--red-100) 100%);
     padding: 28px 28px 24px;
     position: relative;
     display: flex;
     flex-direction: column;
 }
+
 .calc-result::before {
     content: "";
     position: absolute;
@@ -313,6 +352,7 @@ h1.page-title em {
     width: 1px;
     background: var(--line);
 }
+
 .calc-result .res-eyebrow {
     font-family: var(--mono);
     font-size: 11px;
@@ -325,14 +365,16 @@ h1.page-title em {
     justify-content: space-between;
     gap: 10px;
 }
+
 .calc-result .res-tier {
     background: var(--pink-600);
-    color: #fff;
+    color: var(--color-on-brand);
     padding: 2px 8px;
     border-radius: 4px;
     font-weight: 600;
     letter-spacing: 0.04em;
 }
+
 .unit-price {
     font-family: var(--serif);
     font-weight: 600;
@@ -345,11 +387,13 @@ h1.page-title em {
     align-items: baseline;
     gap: 6px;
 }
+
 .unit-price .currency {
     font-size: 32px;
     font-weight: 500;
     color: var(--slate);
 }
+
 .unit-price .per {
     font-family: var(--sans);
     font-size: 14px;
@@ -358,6 +402,7 @@ h1.page-title em {
     margin-left: 6px;
     letter-spacing: 0;
 }
+
 .unit-sub {
     margin-top: 6px;
     font-size: 13px;
@@ -365,18 +410,21 @@ h1.page-title em {
     font-family: var(--mono);
 }
 .unit-sub b { color: var(--ink-2); font-weight: 600; }
+
 /* .divider (EMB) and .pp-breakdown (DTG) live in their page CSS. */
 .totals {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 14px;
 }
+
 .tot {
-    background: rgba(255,255,255,0.55);
-    border: 1px solid rgba(185, 28, 92, 0.12);
+    background: rgb(255 255 255 / 55%);
+    border: 1px solid rgb(185 28 92 / 12%);
     border-radius: var(--r);
     padding: 10px 12px;
 }
+
 .tot .k {
     font-size: 11px;
     text-transform: uppercase;
@@ -384,6 +432,7 @@ h1.page-title em {
     color: var(--slate);
     font-weight: 600;
 }
+
 .tot .v {
     margin-top: 2px;
     font-family: var(--mono);
@@ -393,11 +442,13 @@ h1.page-title em {
     font-weight: 600;
 }
 .tot .note { font-size: 11px; color: var(--slate-2); margin-top: 2px; }
+
 .tot.tot--total {
     grid-column: 1 / -1;
-    background: rgba(255,255,255,0.85);
-    border-color: rgba(185,28,92,0.22);
+    background: rgb(255 255 255 / 85%);
+    border-color: rgb(185 28 92 / 22%);
 }
+
 .tot.tot--total .row {
     display: flex;
     justify-content: space-between;
@@ -405,11 +456,13 @@ h1.page-title em {
     gap: 16px;
 }
 .totals--single .tot.tot--total { padding: 16px 18px; }
+
 .totals--single .tot.tot--total .v {
     font-size: 32px;
     font-weight: 700;
     color: var(--pink-700);
 }
+
 .totals--single .tot.tot--total .k {
     font-size: 12px;
     color: var(--pink-700);
@@ -422,6 +475,7 @@ h1.page-title em {
     gap: 10px;
     flex-wrap: wrap;
 }
+
 .btn {
     display: inline-flex;
     align-items: center;
@@ -437,6 +491,7 @@ h1.page-title em {
     text-decoration: none;
 }
 .btn:hover { border-color: var(--slate-3); }
+
 /* Keyboard focus rings (WCAG 2.4.7) — visible outline for tab users on the
    shared buttons. Page-specific controls (EMB seg/tabs, DTG location cards +
    HW toggle) add their own :focus-visible / :focus-within in their own CSS. */
@@ -446,34 +501,38 @@ h1.page-title em {
     outline: 2px solid var(--pink-600);
     outline-offset: 2px;
 }
+
 .btn.primary {
     background: var(--pink-600);
-    color: #fff;
+    color: var(--color-on-brand);
     border-color: var(--pink-600);
 }
 .btn.primary:hover { background: var(--pink-700); border-color: var(--pink-700); }
 .btn.ghost { background: transparent; }
 .btn .ico { width: 16px; height: 16px; }
-.btn.copied { color: var(--ok); border-color: var(--ok); background: rgba(46,125,91,0.06); }
+.btn.copied { color: var(--ok); border-color: var(--ok); background: rgb(46 125 91 / 6%); }
 
 /* AI button — primary with a soft pink glow. The trailing zero-alpha ring
    in the base shadow lets the hover ring grow smoothly instead of popping. */
 .btn.btn--ai {
     background: linear-gradient(135deg, var(--pink-600) 0%, var(--pink-500) 100%);
     border-color: var(--pink-600);
-    box-shadow: 0 1px 2px rgba(185,28,92,0.16), 0 0 0 0 rgba(212,53,117,0);
+    box-shadow: 0 1px 2px rgb(185 28 92 / 16%), 0 0 0 0 rgb(212 53 117 / 0%);
     transition: all 160ms;
 }
+
 .btn.btn--ai:hover {
     background: linear-gradient(135deg, var(--pink-700) 0%, var(--pink-600) 100%);
-    box-shadow: 0 2px 6px rgba(185,28,92,0.24), 0 0 0 4px rgba(212,53,117,0.10);
+    box-shadow: 0 2px 6px rgb(185 28 92 / 24%), 0 0 0 4px rgb(212 53 117 / 10%);
     transform: translateY(-1px);
 }
+
 .btn.btn--ai .ai-sparkle {
     font-size: 16px;
     display: inline-block;
     animation: ai-sparkle-pulse 2.4s ease-in-out infinite;
 }
+
 @keyframes ai-sparkle-pulse {
     0%, 100% { transform: scale(1); opacity: 1; }
     50% { transform: scale(1.15); opacity: 0.85; }
@@ -481,6 +540,7 @@ h1.page-title em {
 
 /* ========== Pricing table ========== */
 .section { margin-bottom: 44px; }
+
 .section-head {
     display: flex;
     align-items: end;
@@ -489,6 +549,7 @@ h1.page-title em {
     margin-bottom: 18px;
     flex-wrap: wrap;
 }
+
 .section-head h2 {
     font-family: var(--serif);
     font-size: 30px;
@@ -497,6 +558,7 @@ h1.page-title em {
     letter-spacing: -0.015em;
     color: var(--ink);
 }
+
 .section-head p {
     margin: 4px 0 0;
     font-size: 14px;
@@ -510,6 +572,7 @@ h1.page-title em {
     box-shadow: var(--shadow-sm);
     overflow: hidden;
 }
+
 .price-head {
     padding: 22px 28px;
     border-bottom: 1px solid var(--line);
@@ -519,11 +582,13 @@ h1.page-title em {
     gap: 20px;
     flex-wrap: wrap;
 }
+
 .price-head .title {
     display: flex;
     align-items: center;
     gap: 14px;
 }
+
 .price-head .icon-bubble {
     width: 40px;
     height: 40px;
@@ -534,6 +599,7 @@ h1.page-title em {
     align-items: center;
     justify-content: center;
 }
+
 .price-head h3 {
     margin: 0;
     font-family: var(--serif);
@@ -542,6 +608,7 @@ h1.page-title em {
     letter-spacing: -0.01em;
 }
 .price-head .sub { font-size: 13px; color: var(--slate); margin-top: 2px; }
+
 .price-head .code-chip {
     font-family: var(--mono);
     font-size: 12px;
@@ -559,6 +626,7 @@ table.price {
     border-collapse: collapse;
     font-variant-numeric: tabular-nums;
 }
+
 table.price thead th {
     background: var(--paper-3);
     text-align: right;
@@ -570,14 +638,17 @@ table.price thead th {
     color: var(--slate);
     border-bottom: 1px solid var(--line);
 }
+
 table.price thead th:first-child {
     text-align: left;
     border-right: 1px solid var(--line);
 }
+
 table.price thead th.qty-col {
     background: linear-gradient(180deg, var(--pink-50), var(--pink-100));
     color: var(--pink-700);
 }
+
 table.price tbody td {
     padding: 13px 16px;
     font-size: 14px;
@@ -587,6 +658,7 @@ table.price tbody td {
     border-bottom: 1px solid var(--line-2);
 }
 table.price tbody tr:last-child td { border-bottom: 0; }
+
 table.price tbody td:first-child {
     text-align: left;
     font-family: var(--sans);
@@ -596,25 +668,30 @@ table.price tbody td:first-child {
     background: var(--paper-2);
     font-variant-numeric: normal;
 }
+
 table.price tbody td.qty-col {
     background: var(--pink-50);
     color: var(--pink-800);
     font-weight: 600;
 }
+
 table.price tbody tr.row-hi td {
-    background: linear-gradient(90deg, rgba(212,53,117,0.04), rgba(212,53,117,0.10));
+    background: linear-gradient(90deg, rgb(212 53 117 / 4%), rgb(212 53 117 / 10%));
 }
+
 table.price tbody tr.row-hi td:first-child {
     background: var(--pink-100);
     color: var(--pink-800);
     border-right-color: var(--pink-200);
 }
+
 table.price tbody tr.row-hi td.cell-hi {
     background: var(--pink-600);
-    color: #fff;
+    color: var(--color-on-brand);
     font-weight: 600;
     position: relative;
 }
+
 table.price tbody tr.row-hi td.cell-hi::after {
     content: "";
     position: absolute;
@@ -623,6 +700,7 @@ table.price tbody tr.row-hi td.cell-hi::after {
     border-radius: 4px;
     pointer-events: none;
 }
+
 table.price tfoot td {
     padding: 12px 16px;
     font-size: 12px;
@@ -635,12 +713,14 @@ table.price tfoot td {
     text-transform: uppercase;
     letter-spacing: 0.06em;
 }
+
 table.price tfoot td:first-child {
     text-align: left;
     color: var(--ink);
     font-family: var(--sans);
     border-right: 1px solid var(--line);
 }
+
 /* DTG-only tfoot: per-tier qty-col highlight + the "effective rate" row
    live in dtg-contract.css. EMB's tfoot ($/1,000-stitch row) highlights the
    active column via td.cell-hi, which lives in embroidery-contract.css. */
@@ -657,17 +737,20 @@ table.price tfoot td:first-child {
     flex-wrap: wrap;
     gap: 12px;
 }
+
 .price-foot .legend {
     display: flex;
     gap: 16px;
     align-items: center;
     flex-wrap: wrap;
 }
+
 .legend-item {
     display: inline-flex;
     align-items: center;
     gap: 6px;
 }
+
 .legend-item .sw {
     width: 12px;
     height: 12px;
@@ -682,48 +765,54 @@ table.price tfoot td:first-child {
     display: grid;
     grid-template-columns: 1.1fr 1fr;
     background: var(--ink);
-    color: #FAEEF4;
+    color: var(--red-50);
     border-radius: var(--r-lg);
     overflow: hidden;
     box-shadow: var(--shadow-lg);
 }
+
 .contact-left {
     padding: 32px;
-    background: radial-gradient(120% 100% at 0% 0%, rgba(212,53,117,0.22), transparent 60%), var(--ink);
+    background: radial-gradient(120% 100% at 0% 0%, rgb(212 53 117 / 22%), transparent 60%), var(--ink);
 }
 .contact-left .eyebrow { color: var(--pink-300); }
 .contact-left .eyebrow::before { background: var(--pink-400); }
+
 .contact-left h3 {
     font-family: var(--serif);
     font-size: 36px;
     margin: 12px 0 4px;
     font-weight: 600;
     letter-spacing: -0.015em;
-    color: #fff;
+    color: var(--color-on-brand);
 }
+
 .contact-left .role {
     font-size: 14px;
     color: var(--pink-200);
     margin-bottom: 22px;
 }
 .contact-links { display: grid; gap: 10px; }
+
 .contact-links a {
     display: flex;
     align-items: center;
     gap: 12px;
     padding: 12px 14px;
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.08);
+    background: rgb(255 255 255 / 4%);
+    border: 1px solid rgb(255 255 255 / 8%);
     border-radius: var(--r);
-    color: #fff;
+    color: var(--color-on-brand);
     text-decoration: none;
     font-size: 14px;
     transition: background 120ms, border-color 120ms;
 }
+
 .contact-links a:hover {
-    background: rgba(255,255,255,0.08);
-    border-color: rgba(244,148,183,0.4);
+    background: rgb(255 255 255 / 8%);
+    border-color: rgb(244 148 183 / 40%);
 }
+
 .contact-links .k {
     font-family: var(--mono);
     font-size: 11px;
@@ -732,25 +821,28 @@ table.price tfoot td:first-child {
     letter-spacing: 0.06em;
     margin-right: auto;
 }
+
 .contact-links .ico {
     width: 32px;
     height: 32px;
     border-radius: 8px;
-    background: rgba(244,148,183,0.12);
+    background: rgb(244 148 183 / 12%);
     color: var(--pink-200);
     display: inline-flex;
     align-items: center;
     justify-content: center;
     flex: 0 0 32px;
 }
-.contact-right { padding: 32px; background: #221A1F; }
+.contact-right { padding: 32px; background: var(--print-ink); }
+
 .contact-right h4 {
     font-family: var(--serif);
     font-size: 20px;
     margin: 0 0 14px;
     font-weight: 600;
-    color: #fff;
+    color: var(--color-on-brand);
 }
+
 .checklist {
     display: grid;
     gap: 10px;
@@ -758,15 +850,17 @@ table.price tfoot td:first-child {
     padding: 0;
     list-style: none;
 }
+
 .checklist li {
     display: flex;
     align-items: flex-start;
     gap: 12px;
     padding: 12px 14px;
-    background: rgba(255,255,255,0.03);
-    border: 1px solid rgba(255,255,255,0.06);
+    background: rgb(255 255 255 / 3%);
+    border: 1px solid rgb(255 255 255 / 6%);
     border-radius: var(--r);
 }
+
 .checklist .num {
     font-family: var(--mono);
     font-size: 11px;
@@ -775,8 +869,9 @@ table.price tfoot td:first-child {
     flex: 0 0 18px;
     margin-top: 2px;
 }
-.checklist .what { font-size: 14px; color: #fff; font-weight: 500; }
+.checklist .what { font-size: 14px; color: var(--color-on-brand); font-weight: 500; }
 .checklist .why { font-size: 12px; color: var(--pink-200); opacity: 0.7; margin-top: 2px; }
+
 .hours {
     margin-top: 18px;
     font-size: 12px;
@@ -801,6 +896,7 @@ table.price tfoot td:first-child {
     margin-bottom: 24px;
     flex-wrap: wrap;
 }
+
 .parts-row .lbl {
     font-size: 12px;
     font-weight: 600;
@@ -809,6 +905,7 @@ table.price tfoot td:first-child {
     letter-spacing: 0.06em;
     margin-right: 4px;
 }
+
 .part {
     display: inline-flex;
     align-items: center;
@@ -819,6 +916,7 @@ table.price tfoot td:first-child {
     background: var(--paper-3);
     color: var(--ink-2);
 }
+
 .part .pc {
     font-family: var(--mono);
     font-size: 11px;
@@ -847,7 +945,7 @@ table.price tfoot td:first-child {
     transform: translateX(-50%) translateY(20px);
     padding: 12px 20px;
     background: var(--ink);
-    color: #fff;
+    color: var(--color-on-brand);
     border-radius: 8px;
     font-size: 14px;
     font-weight: 500;
@@ -860,6 +958,7 @@ table.price tfoot td:first-child {
     align-items: center;
     gap: 8px;
 }
+
 .share-toast.is-visible {
     opacity: 1;
     transform: translateX(-50%) translateY(0);
@@ -868,8 +967,8 @@ table.price tfoot td:first-child {
 
 /* Pricing-unavailable error state */
 .pricing-error {
-    background: rgba(180, 122, 0, 0.08);
-    border: 1px solid rgba(180, 122, 0, 0.25);
+    background: rgb(180 122 0 / 8%);
+    border: 1px solid rgb(180 122 0 / 25%);
     border-left: 3px solid var(--warn);
     border-radius: var(--r);
     padding: 14px 18px;
@@ -879,7 +978,7 @@ table.price tfoot td:first-child {
 }
 
 /* Responsive */
-@media (max-width: 980px) {
+@media (width <= 980px) {
     .hero { grid-template-columns: 1fr; }
     .calc { grid-template-columns: 1fr; }
     .calc-result::before { display: none; }
@@ -888,7 +987,8 @@ table.price tfoot td:first-child {
     .topbar { flex-wrap: wrap; }
     .topbar .spacer { display: none; }
 }
-@media (max-width: 640px) {
+
+@media (width <= 640px) {
     .page { padding: 20px 16px 60px; }
     .topbar { padding: 12px 16px; }
     table.price thead th, table.price tbody td { padding: 10px 8px; font-size: 13px; }
@@ -899,10 +999,11 @@ table.price tfoot td:first-child {
 /* Print: clean black-on-white pricing card */
 @media print {
     body { background: white; }
+    /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
     .topbar, .calc, .contact, .parts-row, .share-toast, .calc-actions, .ai-chat-panel { display: none !important; }
     .page-title { color: var(--ink); }
-    table.price thead th { background: #f3f4f6; color: #1f2937; border-bottom: 2px solid #6b7280; }
-    table.price tbody tr.row-hi td { background: #fafafa; }
+    table.price thead th { background: var(--gray-100); color: var(--gray-800); border-bottom: 2px solid var(--gray-500); }
+    table.price tbody tr.row-hi td { background: var(--gray-50); }
 }
 
 /* ========== AI Chat Panel ========== */
@@ -913,7 +1014,7 @@ table.price tfoot td:first-child {
     max-width: 92vw;
     background: var(--paper);
     border-left: 1px solid var(--line);
-    box-shadow: -8px 0 32px -8px rgba(52, 5, 24, 0.18);
+    box-shadow: -8px 0 32px -8px rgb(52 5 24 / 18%);
     display: flex;
     flex-direction: column;
     z-index: 100;
@@ -921,16 +1022,18 @@ table.price tfoot td:first-child {
     transition: transform 280ms cubic-bezier(0.32, 0.72, 0, 1), visibility 0s linear 280ms;
     visibility: hidden;
 }
+
 .ai-chat-panel.is-open {
     transform: translateX(0);
     visibility: visible;
     transition: transform 320ms cubic-bezier(0.32, 0.72, 0, 1), visibility 0s linear 0s;
 }
+
 .ai-chat-panel.is-open::before {
     content: "";
     position: fixed;
-    top: 0; left: 0; right: 480px; bottom: 0;
-    background: rgba(26, 19, 24, 0.32);
+    inset: 0 480px 0 0;
+    background: rgb(26 19 24 / 32%);
     pointer-events: none;
     z-index: -1;
 }
@@ -943,6 +1046,7 @@ table.price tfoot td:first-child {
     border-bottom: 1px solid var(--line);
     background: linear-gradient(180deg, var(--paper) 0%, var(--paper-2) 100%);
 }
+
 .ai-chat-title {
     display: inline-flex;
     align-items: center;
@@ -954,6 +1058,7 @@ table.price tfoot td:first-child {
     color: var(--ink);
 }
 .ai-chat-title .ai-sparkle { font-size: 20px; }
+
 .ai-chat-close {
     width: 32px;
     height: 32px;
@@ -966,6 +1071,7 @@ table.price tfoot td:first-child {
     justify-content: center;
     transition: all 140ms;
 }
+
 .ai-chat-close:hover {
     background: var(--paper-3);
     color: var(--ink);
@@ -994,6 +1100,7 @@ table.price tfoot td:first-child {
     gap: 12px;
     scroll-behavior: smooth;
 }
+
 .chat-message {
     display: flex;
     flex-direction: column;
@@ -1008,16 +1115,19 @@ table.price tfoot td:first-child {
     font-size: 14px;
     line-height: 1.5;
     white-space: pre-wrap;
+    /* stylelint-disable-next-line declaration-property-value-keyword-no-deprecated -- overflow-wrap: anywhere is not a byte-identical swap; legacy */
     word-break: break-word;
 }
+
 .chat-message.assistant .chat-bubble {
     background: var(--paper-3);
     color: var(--ink);
     border-bottom-left-radius: 4px;
 }
+
 .chat-message.user .chat-bubble {
     background: var(--pink-600);
-    color: #fff;
+    color: var(--color-on-brand);
     border-bottom-right-radius: 4px;
 }
 
@@ -1026,6 +1136,7 @@ table.price tfoot td:first-child {
     gap: 4px;
     padding: 10px 14px;
 }
+
 .chat-typing span {
     width: 6px; height: 6px;
     border-radius: 50%;
@@ -1034,6 +1145,7 @@ table.price tfoot td:first-child {
 }
 .chat-typing span:nth-child(2) { animation-delay: 0.15s; }
 .chat-typing span:nth-child(3) { animation-delay: 0.3s; }
+
 @keyframes chat-typing-bounce {
     0%, 80%, 100% { transform: scale(0.7); opacity: 0.5; }
     40% { transform: scale(1); opacity: 1; }
@@ -1041,13 +1153,14 @@ table.price tfoot td:first-child {
 
 /* Email draft card */
 .email-draft-card {
-    background: linear-gradient(180deg, #FFFFFF 0%, var(--pink-50) 100%);
+    background: linear-gradient(180deg, var(--color-surface) 0%, var(--pink-50) 100%);
     border: 1px solid var(--pink-200);
     border-left: 3px solid var(--pink-600);
     border-radius: var(--r);
     padding: 14px 16px;
     margin-top: 6px;
 }
+
 .email-draft-card .draft-label {
     font-family: var(--mono);
     font-size: 11px;
@@ -1061,12 +1174,14 @@ table.price tfoot td:first-child {
     gap: 6px;
 }
 .email-draft-card .draft-label::before { content: "✉"; font-size: 14px; }
+
 .email-draft-card .draft-body {
     font-family: var(--mono);
     font-size: 13px;
     line-height: 1.55;
     color: var(--ink);
     white-space: pre-wrap;
+    /* stylelint-disable-next-line declaration-property-value-keyword-no-deprecated -- overflow-wrap: anywhere is not a byte-identical swap; legacy */
     word-break: break-word;
     max-height: 360px;
     overflow-y: auto;
@@ -1075,6 +1190,7 @@ table.price tfoot td:first-child {
     border-radius: 6px;
     padding: 12px 14px;
 }
+
 .email-draft-card .draft-meta {
     margin-bottom: 8px;
     border: 1px solid var(--line);
@@ -1084,24 +1200,28 @@ table.price tfoot td:first-child {
     font-size: 12px;
     line-height: 1.45;
 }
+
 .email-draft-card .draft-meta-row {
     display: flex;
     gap: 8px;
     align-items: baseline;
 }
 .email-draft-card .draft-meta-row + .draft-meta-row { margin-top: 4px; }
+
 .email-draft-card .draft-meta-label {
     font-family: var(--mono);
     font-size: 10px;
     font-weight: 700;
     letter-spacing: 0.06em;
     text-transform: uppercase;
-    color: #6B7280;
+    color: var(--gray-500);
     flex: 0 0 52px;
 }
+
 .email-draft-card .draft-meta-val {
     flex: 1;
     color: var(--ink);
+    /* stylelint-disable-next-line declaration-property-value-keyword-no-deprecated -- overflow-wrap: anywhere is not a byte-identical swap; legacy */
     word-break: break-word;
 }
 
@@ -1111,10 +1231,11 @@ table.price tfoot td:first-child {
     gap: 8px;
     flex-wrap: wrap;
 }
+
 .btn-outlook {
-    background: #0078D4;
-    color: #fff;
-    border: 1px solid #106EBE;
+    background: var(--contract-pricing-2026-cyan-2);
+    color: var(--color-on-brand);
+    border: 1px solid var(--contract-pricing-2026-cyan);
     border-radius: 6px;
     padding: 7px 12px;
     font-size: 13px;
@@ -1125,12 +1246,12 @@ table.price tfoot td:first-child {
     transition: all 140ms;
     cursor: pointer;
 }
-.btn-outlook:hover { background: #106EBE; }
+.btn-outlook:hover { background: var(--contract-pricing-2026-cyan); }
 .btn-outlook.opened { background: var(--ok); border-color: var(--ok); }
 .btn-outlook svg { flex-shrink: 0; }
 
 .btn-copy-email {
-    background: #FFFFFF;
+    background: var(--color-surface);
     color: var(--pink-700);
     border: 1px solid var(--pink-300);
     border-radius: 6px;
@@ -1144,7 +1265,7 @@ table.price tfoot td:first-child {
     cursor: pointer;
 }
 .btn-copy-email:hover { background: var(--pink-50); color: var(--pink-700); }
-.btn-copy-email.copied { background: var(--ok); color: #fff; border-color: var(--ok); }
+.btn-copy-email.copied { background: var(--ok); color: var(--color-on-brand); border-color: var(--ok); }
 
 .ai-chat-input {
     border-top: 1px solid var(--line);
@@ -1154,6 +1275,7 @@ table.price tfoot td:first-child {
     gap: 8px;
     background: var(--paper);
 }
+
 .ai-chat-input textarea {
     flex: 1;
     resize: none;
@@ -1169,19 +1291,21 @@ table.price tfoot td:first-child {
     line-height: 1.4;
     transition: border-color 120ms, box-shadow 120ms;
 }
+
 .ai-chat-input textarea:focus {
     outline: none;
     border-color: var(--pink-400);
     box-shadow: 0 0 0 4px var(--pink-50);
     background: var(--paper);
 }
+
 .ai-chat-send {
     width: 40px;
     height: 40px;
     border-radius: 10px;
     background: var(--pink-600);
     border: 1px solid var(--pink-700);
-    color: #fff;
+    color: var(--color-on-brand);
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -1189,6 +1313,7 @@ table.price tfoot td:first-child {
     flex-shrink: 0;
 }
 .ai-chat-send:hover { background: var(--pink-700); }
+
 .ai-chat-send:disabled {
     background: var(--slate-3);
     border-color: var(--slate-3);
@@ -1196,19 +1321,19 @@ table.price tfoot td:first-child {
 }
 
 .chat-message.error .chat-bubble {
-    background: rgba(180, 122, 0, 0.08);
-    border: 1px solid rgba(180, 122, 0, 0.30);
+    background: rgb(180 122 0 / 8%);
+    border: 1px solid rgb(180 122 0 / 30%);
     color: var(--warn);
 }
 
-@media (max-width: 640px) {
+@media (width <= 640px) {
     .ai-chat-panel { width: 100vw; max-width: 100vw; }
     .ai-chat-panel.is-open::before { right: 0; }
 }
 
 /* Phone (≤640px) — 2026-09-05 staff-dashboard sweep: the page measured wider than the
    viewport at 375px and panned sideways. */
-@media (max-width: 640px) {
+@media (width <= 640px) {
     .contact { grid-template-columns: minmax(0, 1fr); }
     table.price { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
 }

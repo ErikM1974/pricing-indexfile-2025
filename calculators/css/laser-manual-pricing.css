@@ -1,5 +1,7 @@
-/* laser-manual-pricing.css — extracted 2026-09-06 from 1 inline <style> block(s) in laser-manual-pricing.html (Rule 3). */
+/* laser-manual-pricing.css — extracted 2026-09-06 from 1 inline \3c style> block(s) in laser-manual-pricing.html (Rule 3). */
+
 /* Laser-specific styles */
+
 /* Product Showcase Section */
 .product-showcase {
     background: var(--card-bg);
@@ -7,7 +9,7 @@
     padding: 2rem;
     margin-bottom: 2rem;
     margin-top: 1.5rem;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.08);
+    box-shadow: 0 4px 6px rgb(0 0 0 / 8%);
     position: relative;
     overflow: hidden;
 }
@@ -38,13 +40,13 @@
     max-width: 300px;
     height: auto;
     border-radius: 12px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    box-shadow: 0 8px 24px rgb(0 0 0 / 15%);
     transition: all 0.3s ease;
 }
 
 .product-showcase-image img:hover {
     transform: scale(1.02) rotate(1deg);
-    box-shadow: 0 12px 32px rgba(76, 179, 84, 0.3);
+    box-shadow: 0 12px 32px rgb(76 179 84 / 30%);
 }
 
 .product-showcase-content h3 {
@@ -76,7 +78,7 @@
     font-size: 0.8rem;
 }
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
     .product-showcase-inner {
         grid-template-columns: 1fr;
     }
@@ -120,6 +122,7 @@
 }
 
 /* 2026-09-06 review: the hidden attribute must beat any display rule */
+/* stylelint-disable-next-line declaration-no-important -- the hidden attribute must beat any display rule */
 [hidden] { display: none !important; }
 
 /* 2026-09-06 review */

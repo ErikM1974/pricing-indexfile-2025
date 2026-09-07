@@ -8,25 +8,39 @@
  */
 
 /* Root variables - Consistent Green Theme */
+
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue, merged into its
+   existing :root. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
 :root {
-    --primary-color: #4cb354;
-    --primary-dark: #2d5f3f;
-    --primary-light: #4cb861;
-    --primary-lighter: #e8f5e9;
-    --bg-color: #f5f7fa;
-    --card-bg: #ffffff;
-    --border-color: #e5e7eb;
-    --text-primary: #1f2937;
-    --text-secondary: #6b7280;
-    --hover-bg: #f3f4f6;
-    --success-bg: #d1fae5;
-    --success-text: #065f46;
-    --warning-bg: #fef3c7;
-    --warning-text: #92400e;
-    --error-bg: #fee;
-    --error-text: #c53030;
-    --focus-shadow: 0 0 0 0.25rem rgba(76, 179, 84, 0.25);
+    --manual-calculator-styles-green-tint: #d1fae5;
+    --manual-calculator-styles-teal-dark: #065f46;
+    --manual-calculator-styles-red: #c53030;
+    --manual-calculator-styles-cyan: #075985;
+    --manual-calculator-styles-cyan-2: #7dd3fc;
+    --manual-calculator-styles-orange: #fed7aa;
+    --manual-calculator-styles-green: #86efac;
+    --manual-calculator-styles-red-tint: #fecaca;
+    --primary-color: var(--brand-500);
+    --primary-dark: var(--print-green);
+    --primary-light: var(--brand-500);
+    --primary-lighter: var(--brand-100);
+    --bg-color: var(--color-bradley-tint);
+    --card-bg: var(--color-surface);
+    --border-color: var(--gray-200);
+    --text-primary: var(--gray-800);
+    --text-secondary: var(--gray-500);
+    --hover-bg: var(--gray-100);
+    --success-bg: var(--manual-calculator-styles-green-tint);
+    --success-text: var(--manual-calculator-styles-teal-dark);
+    --warning-bg: var(--amber-100);
+    --warning-text: var(--amber-800);
+    --error-bg: var(--red-50);
+    --error-text: var(--manual-calculator-styles-red);
+    --focus-shadow: 0 0 0 0.25rem rgb(76 179 84 / 25%);
 }
+/* stylelint-enable color-no-hex */
 
 /* Reset and Base Styles */
 * {
@@ -36,7 +50,7 @@
 }
 
 body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     background: var(--bg-color);
     color: var(--text-primary);
     line-height: 1.6;
@@ -74,7 +88,7 @@ h3 {
     position: sticky;
     top: 0;
     z-index: 100;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    box-shadow: 0 1px 3px rgb(0 0 0 / 5%);
 }
 
 .header-container {
@@ -145,7 +159,7 @@ h3 {
     background: var(--card-bg);
     border-radius: 12px;
     padding: 2rem;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    box-shadow: 0 1px 3px rgb(0 0 0 / 10%);
     margin-bottom: 1.5rem;
 }
 
@@ -202,7 +216,7 @@ h3 {
 }
 
 .form-control:hover {
-    border-color: #d1d5db;
+    border-color: var(--gray-300);
 }
 
 .form-control:focus {
@@ -214,18 +228,20 @@ h3 {
 /* Select Elements */
 select.form-control {
     cursor: pointer;
+
     /* Use browser's default dropdown arrow */
+
     /* Removed custom arrow to prevent double arrows */
 }
 
 /* Number Inputs */
 input[type="number"].form-control {
-    -moz-appearance: textfield;
+    appearance: textfield;
 }
 
 input[type="number"]::-webkit-outer-spin-button,
 input[type="number"]::-webkit-inner-spin-button {
-    -webkit-appearance: none;
+    appearance: none;
     margin: 0;
 }
 
@@ -255,7 +271,7 @@ input[type="number"]::-webkit-inner-spin-button {
 .btn-primary:hover {
     background: var(--primary-dark);
     transform: translateY(-1px);
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 6px rgb(0 0 0 / 10%);
 }
 
 .btn-primary:active {
@@ -269,7 +285,7 @@ input[type="number"]::-webkit-inner-spin-button {
 }
 
 .btn-secondary:hover {
-    background: #e5e7eb;
+    background: var(--gray-200);
 }
 
 .btn-sm {
@@ -288,27 +304,27 @@ input[type="number"]::-webkit-inner-spin-button {
 }
 
 .alert-info {
-    background: #e0f2fe;
-    color: #075985;
-    border: 1px solid #7dd3fc;
+    background: var(--sky-100);
+    color: var(--manual-calculator-styles-cyan);
+    border: 1px solid var(--manual-calculator-styles-cyan-2);
 }
 
 .alert-warning {
     background: var(--warning-bg);
     color: var(--warning-text);
-    border: 1px solid #fed7aa;
+    border: 1px solid var(--manual-calculator-styles-orange);
 }
 
 .alert-success {
     background: var(--success-bg);
     color: var(--success-text);
-    border: 1px solid #86efac;
+    border: 1px solid var(--manual-calculator-styles-green);
 }
 
 .alert-error {
     background: var(--error-bg);
     color: var(--error-text);
-    border: 1px solid #fecaca;
+    border: 1px solid var(--manual-calculator-styles-red-tint);
 }
 
 .alert-icon {
@@ -357,7 +373,7 @@ input[type="number"]::-webkit-inner-spin-button {
     background: var(--card-bg);
     border-radius: 12px;
     padding: 2rem;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    box-shadow: 0 1px 3px rgb(0 0 0 / 10%);
 }
 
 .results-header {
@@ -448,18 +464,18 @@ input[type="number"]::-webkit-inner-spin-button {
 }
 
 .price-display.neutral {
-    background: #e8f5e9;
-    color: #2e7d32;
+    background: var(--brand-100);
+    color: var(--store-green-700);
 }
 
 .price-display.positive {
-    background: #ffebee;
-    color: #c62828;
+    background: var(--red-50);
+    color: var(--red-700);
 }
 
 .price-display.negative {
-    background: #e8f5e9;
-    color: #2e7d32;
+    background: var(--brand-100);
+    color: var(--store-green-700);
 }
 
 .slider-wrapper {
@@ -471,7 +487,7 @@ input[type="number"]::-webkit-inner-spin-button {
     width: 100%;
     height: 8px;
     border-radius: 4px;
-    background: linear-gradient(to right, #e0e0e0 0%, #e0e0e0 100%);
+    background: linear-gradient(to right, var(--gray-200) 0%, var(--gray-200) 100%);
     outline: none;
     appearance: none;
     cursor: pointer;
@@ -484,13 +500,13 @@ input[type="number"]::-webkit-inner-spin-button {
     border-radius: 50%;
     background: var(--primary-color);
     cursor: pointer;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    box-shadow: 0 2px 6px rgb(0 0 0 / 20%);
     transition: all 0.2s ease;
 }
 
 .slider::-webkit-slider-thumb:hover {
     transform: scale(1.1);
-    box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+    box-shadow: 0 3px 8px rgb(0 0 0 / 30%);
 }
 
 .slider::-moz-range-thumb {
@@ -500,19 +516,19 @@ input[type="number"]::-webkit-inner-spin-button {
     background: var(--primary-color);
     cursor: pointer;
     border: none;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    box-shadow: 0 2px 6px rgb(0 0 0 / 20%);
     transition: all 0.2s ease;
 }
 
 .slider::-moz-range-thumb:hover {
     transform: scale(1.1);
-    box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+    box-shadow: 0 3px 8px rgb(0 0 0 / 30%);
 }
 
 .slider-tooltip {
     position: absolute;
     top: -50px;
-    background: rgba(0,0,0,0.8);
+    background: rgb(0 0 0 / 80%);
     color: white;
     padding: 8px 12px;
     border-radius: 6px;
@@ -538,7 +554,7 @@ input[type="number"]::-webkit-inner-spin-button {
     left: 50%;
     transform: translateX(-50%);
     border: 6px solid transparent;
-    border-top-color: rgba(0,0,0,0.8);
+    border-top-color: rgb(0 0 0 / 80%);
 }
 
 .slider-range-info {
@@ -600,7 +616,7 @@ input[type="number"]::-webkit-inner-spin-button {
 }
 
 /* Responsive Design */
-@media (max-width: 768px) {
+@media (width <= 768px) {
     .header-container {
         flex-wrap: wrap;
         padding: 0 1rem;
@@ -650,6 +666,7 @@ input[type="number"]::-webkit-inner-spin-button {
     
     .btn,
     .no-print {
+        /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
         display: none !important;
     }
 }

@@ -3,10 +3,23 @@
  * High-visibility styling for construction safety stripes option
  */
 
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue so the page
+   keeps its exact look. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   every rule below uses var(). Raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
+:root {
+    --screenprint-safety-stripes-orange: #ff6b35;
+    --screenprint-safety-stripes-red: #d64520;
+    --screenprint-safety-stripes-orange-tint: #ffdcc6;
+    --screenprint-safety-stripes-orange-2: #e55a2b;
+    --screenprint-safety-stripes-gray: #666;
+}
+/* stylelint-enable color-no-hex */
+
 /* Safety Stripes Section */
 .sp-safety-stripes-section {
-    background: linear-gradient(135deg, #fff5f0 0%, #ffe8dc 100%);
-    border: 2px solid #ff6b35;
+    background: linear-gradient(135deg, var(--red-50) 0%, var(--red-100) 100%);
+    border: 2px solid var(--screenprint-safety-stripes-orange);
     border-radius: 8px;
     padding: 15px;
     margin: 15px 0;
@@ -15,14 +28,15 @@
 }
 
 .sp-safety-stripes-section.sp-safety-active {
-    box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.3);
-    border-color: #ff6b35;
-    background: linear-gradient(135deg, #fff0e6 0%, #ffdcc6 100%);
+    box-shadow: 0 0 0 3px rgb(255 107 53 / 30%);
+    border-color: var(--screenprint-safety-stripes-orange);
+    background: linear-gradient(135deg, var(--store-rush-soft) 0%, var(--screenprint-safety-stripes-orange-tint) 100%);
 }
 
 /* Safety Label and Icon */
 .sp-safety-label {
-    color: #ff6b35 !important;
+    /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
+    color: var(--screenprint-safety-stripes-orange) !important;
     font-weight: 600;
     display: flex;
     align-items: center;
@@ -30,13 +44,13 @@
 }
 
 .sp-safety-icon {
-    color: #ff6b35;
+    color: var(--screenprint-safety-stripes-orange);
     font-size: 1.2em;
 }
 
 /* Safety Info Button */
 .sp-safety-info-btn {
-    background: #ff6b35;
+    background: var(--screenprint-safety-stripes-orange);
     color: white;
     border: none;
     padding: 8px 12px;
@@ -52,9 +66,9 @@
 }
 
 .sp-safety-info-btn:hover {
-    background: #e55a2b;
+    background: var(--screenprint-safety-stripes-orange-2);
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(255, 107, 53, 0.3);
+    box-shadow: 0 4px 8px rgb(255 107 53 / 30%);
 }
 
 /* Safety Thumbnail */
@@ -63,7 +77,7 @@
     height: 30px;
     object-fit: cover;
     border-radius: 4px;
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    border: 1px solid rgb(255 255 255 / 30%);
 }
 
 /* Safety Details */
@@ -76,7 +90,7 @@
 }
 
 .sp-safety-badge {
-    background: #ff6b35;
+    background: var(--screenprint-safety-stripes-orange);
     color: white;
     padding: 4px 8px;
     border-radius: 4px;
@@ -86,18 +100,18 @@
 }
 
 .sp-safety-cost {
-    color: #d64520;
+    color: var(--screenprint-safety-stripes-red);
     font-weight: 600;
     font-size: 0.95em;
 }
 
 /* Safety Checkbox Custom Styling */
 .sp-safety-label input[type="checkbox"] {
-    accent-color: #ff6b35;
+    accent-color: var(--screenprint-safety-stripes-orange);
 }
 
 .sp-safety-label input[type="checkbox"]:checked {
-    background-color: #ff6b35;
+    background-color: var(--screenprint-safety-stripes-orange);
 }
 
 /* Safety Modal */
@@ -109,7 +123,7 @@
     top: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.8);
+    background-color: rgb(0 0 0 / 80%);
     animation: fadeIn 0.3s ease;
 }
 
@@ -136,17 +150,17 @@
     height: auto;
     border-radius: 8px;
     margin-bottom: 20px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 12px rgb(0 0 0 / 15%);
 }
 
 .sp-safety-modal-content h3 {
-    color: #ff6b35;
+    color: var(--screenprint-safety-stripes-orange);
     margin-bottom: 10px;
     font-size: 1.5em;
 }
 
 .sp-safety-modal-content p {
-    color: #666;
+    color: var(--screenprint-safety-stripes-gray);
     line-height: 1.6;
 }
 
@@ -156,22 +170,22 @@
     right: 20px;
     font-size: 28px;
     font-weight: bold;
-    color: #999;
+    color: var(--print-line);
     cursor: pointer;
     transition: color 0.3s;
 }
 
 .sp-safety-modal-close:hover {
-    color: #ff6b35;
+    color: var(--screenprint-safety-stripes-orange);
 }
 
 /* Safety Row in Order Summary */
 .sp-safety-row {
-    background-color: #fff5f0;
+    background-color: var(--red-50);
 }
 
 .sp-safety-row td {
-    color: #d64520;
+    color: var(--screenprint-safety-stripes-red);
     font-weight: 500;
 }
 
@@ -186,6 +200,7 @@
         transform: translateY(-20px);
         opacity: 0;
     }
+
     to {
         transform: translateY(0);
         opacity: 1;
@@ -193,7 +208,7 @@
 }
 
 /* Responsive */
-@media (max-width: 768px) {
+@media (width <= 768px) {
     .sp-safety-stripes-section {
         padding: 12px;
     }

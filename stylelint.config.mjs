@@ -36,6 +36,8 @@ export default {
         // keyframe names (fadeIn, slideDown…) are referenced from animation shorthands across the legacy sheets and
         // sometimes from JS (`el.style.animation`); renaming them is churn with a runtime risk, not consistency.
         'keyframes-name-pattern': null,
+        // legacy sheets carry 5-decimal em values (0.71875em = 11.5px); rounding them is a sub-pixel change, not consistency
+        'number-max-precision': 5,
         // `clip: rect(0 0 0 0)` is the canonical visually-hidden (.sr-only) pattern; clip-path is not a byte-identical swap
         'property-no-deprecated': [true, { ignoreProperties: ['clip'] }],
         // Class names: kebab-case with BEM __element / --modifier is the convention for NEW pages

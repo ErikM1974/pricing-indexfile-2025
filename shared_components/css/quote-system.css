@@ -1,21 +1,39 @@
 /* Quote System Styles */
+
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue so the page
+   keeps its exact look. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   every rule below uses var(). Raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
+:root {
+    --quote-system-red: #dc3545;
+    --quote-system-green-dark: #1e4d0f;
+    --quote-system-gray: #666;
+    --quote-system-green: #c3e6cb;
+    --quote-system-yellow: #856404;
+    --quote-system-gray-dark: #000;
+}
+/* stylelint-enable color-no-hex */
+
 /* For Northwest Custom Apparel Quote Builder */
+
 /* June 2025 */
 
 /* ============================= */
+
 /* Quote Builder Container */
+
 /* ============================= */
 .quote-builder-container {
-    background-color: var(--white, #ffffff);
+    background-color: var(--white, var(--color-surface));
     border-radius: var(--radius-md, 8px);
-    box-shadow: var(--shadow-md, 0 4px 8px rgba(0,0,0,0.1));
+    box-shadow: var(--shadow-md, 0 4px 8px rgb(0 0 0 / 10%));
     padding: var(--spacing-md, 20px);
     margin-bottom: var(--spacing-md, 20px);
-    border-left: 4px solid var(--primary-color, #2e5827);
+    border-left: 4px solid var(--primary-color, var(--brand-700));
 }
 
 .quote-builder-container .section-title {
-    color: var(--primary-color, #2e5827);
+    color: var(--primary-color, var(--brand-700));
     margin-top: 0;
     margin-bottom: var(--spacing-md, 20px);
     font-size: 1.3em;
@@ -25,18 +43,18 @@
 .quote-step {
     margin-bottom: var(--spacing-lg, 30px);
     padding: var(--spacing-md, 20px);
-    background-color: var(--background-light, #f8f8f8);
+    background-color: var(--background-light, var(--gray-50));
     border-radius: var(--radius-sm, 4px);
-    border: 1px solid var(--border-color, #ddd);
+    border: 1px solid var(--border-color, var(--store-line));
     transition: all 0.3s ease;
 }
 
 .quote-step:hover {
-    box-shadow: var(--shadow-sm, 0 2px 4px rgba(0,0,0,0.05));
+    box-shadow: var(--shadow-sm, 0 2px 4px rgb(0 0 0 / 5%));
 }
 
 .quote-step h4 {
-    color: var(--primary-dark, #1e4d0f);
+    color: var(--primary-dark, var(--quote-system-green-dark));
     margin-top: 0;
     margin-bottom: var(--spacing-md, 20px);
     font-size: 1.1em;
@@ -54,7 +72,7 @@
     font-size: 1.2em;
     padding: 10px 15px;
     width: 200px;
-    border: 2px solid var(--primary-color, #2e5827);
+    border: 2px solid var(--primary-color, var(--brand-700));
     border-radius: var(--radius-sm, 4px);
     text-align: center;
     transition: all 0.3s ease;
@@ -62,7 +80,7 @@
 
 .quantity-input-group input[type="number"]:focus {
     outline: none;
-    box-shadow: 0 0 0 3px rgba(46, 88, 39, 0.2);
+    box-shadow: 0 0 0 3px rgb(46 88 39 / 20%);
     transform: scale(1.02);
 }
 
@@ -77,6 +95,7 @@
         opacity: 0;
         transform: translateY(10px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -84,28 +103,28 @@
 }
 
 .ltm-explanation {
-    background: #fff3cd;
-    border: 1px solid #ffeeba;
+    background: var(--amber-100);
+    border: 1px solid var(--amber-100);
     padding: 15px;
     border-radius: var(--radius-sm, 4px);
     margin-bottom: var(--spacing-md, 20px);
 }
 
 .ltm-explanation h4 {
-    color: #856404;
+    color: var(--quote-system-yellow);
     margin-top: 0;
     margin-bottom: var(--spacing-sm, 10px);
 }
 
 .pricing-info {
-    background: #d4edda;
-    border: 1px solid #c3e6cb;
+    background: var(--store-green-100);
+    border: 1px solid var(--quote-system-green);
     padding: 15px;
     border-radius: var(--radius-sm, 4px);
 }
 
 .pricing-info h4 {
-    color: #155724;
+    color: var(--print-green-dark);
     margin-top: 0;
     margin-bottom: var(--spacing-sm, 10px);
 }
@@ -113,7 +132,7 @@
 .price-breakdown {
     margin-top: var(--spacing-sm, 10px);
     padding-top: var(--spacing-sm, 10px);
-    border-top: 1px solid rgba(0,0,0,0.1);
+    border-top: 1px solid rgb(0 0 0 / 10%);
 }
 
 .price-breakdown > div {
@@ -126,7 +145,7 @@
 .price-breakdown > div:last-child {
     font-size: 1.2em;
     padding-top: 10px;
-    border-top: 1px solid #ddd;
+    border-top: 1px solid var(--store-line);
     margin-top: 10px;
 }
 
@@ -145,46 +164,48 @@
 #size-distribution-grid .size-input-container {
     text-align: center;
     padding: 10px;
-    border: 1px solid var(--border-color, #ddd);
+    border: 1px solid var(--border-color, var(--store-line));
     border-radius: var(--radius-sm, 4px);
-    background-color: var(--white, #ffffff);
+    background-color: var(--white, var(--color-surface));
     transition: all 0.2s ease;
 }
 
 #size-distribution-grid .size-input-container:hover {
-    border-color: var(--primary-color, #2e5827);
-    box-shadow: var(--shadow-sm, 0 2px 4px rgba(0,0,0,0.05));
+    border-color: var(--primary-color, var(--brand-700));
+    box-shadow: var(--shadow-sm, 0 2px 4px rgb(0 0 0 / 5%));
 }
 
 #size-distribution-grid label {
     font-weight: bold;
     display: block;
     margin-bottom: 5px;
-    color: var(--primary-dark, #1e4d0f);
+    color: var(--primary-dark, var(--quote-system-green-dark));
 }
 
 .size-qty-input {
     width: 60px;
     padding: 5px;
     text-align: center;
-    border: 1px solid var(--border-color, #ddd);
+    border: 1px solid var(--border-color, var(--store-line));
     border-radius: var(--radius-sm, 4px);
 }
 
 .size-qty-input:focus {
     outline: none;
-    border-color: var(--primary-color, #2e5827);
+    border-color: var(--primary-color, var(--brand-700));
 }
 
 .size-validation-message {
-    color: #dc3545;
+    color: var(--quote-system-red);
     text-align: center;
     margin-top: var(--spacing-sm, 10px);
     font-weight: 500;
 }
 
 /* ============================= */
+
 /* Quote Summary Panel */
+
 /* ============================= */
 .quote-summary-panel {
     position: fixed;
@@ -193,9 +214,9 @@
     width: 380px;
     height: 100vh;
     background: white;
-    border-left: 3px solid var(--primary-color, #2e5827);
+    border-left: 3px solid var(--primary-color, var(--brand-700));
     padding: 20px;
-    box-shadow: -4px 0 12px rgba(0,0,0,0.15);
+    box-shadow: -4px 0 12px rgb(0 0 0 / 15%);
     z-index: 1000;
     overflow-y: auto;
     transition: transform 0.3s ease;
@@ -212,17 +233,17 @@
     align-items: center;
     margin-bottom: 15px;
     padding-bottom: 15px;
-    border-bottom: 2px solid var(--primary-light, #eaf2e9);
+    border-bottom: 2px solid var(--primary-light, var(--brand-100));
 }
 
 .quote-panel-header h3 {
-    color: var(--primary-color, #2e5827);
+    color: var(--primary-color, var(--brand-700));
     margin: 0;
     font-size: 1.3em;
 }
 
 .quote-close-btn {
-    background: #dc3545;
+    background: var(--quote-system-red);
     color: white;
     border: none;
     border-radius: var(--radius-sm, 4px);
@@ -234,7 +255,7 @@
 }
 
 .quote-close-btn:hover {
-    background: #c82333;
+    background: var(--color-ae-light);
     transform: scale(1.05);
 }
 
@@ -244,7 +265,7 @@
 }
 
 .empty-quote-message {
-    color: #666;
+    color: var(--quote-system-gray);
     text-align: center;
     padding: var(--spacing-lg, 30px);
     font-style: italic;
@@ -253,14 +274,14 @@
 .quote-item {
     margin-bottom: 15px;
     padding: 10px;
-    background: var(--background-light, #f8f9fa);
+    background: var(--background-light, var(--gray-50));
     border-radius: var(--radius-sm, 4px);
-    border: 1px solid var(--border-color, #ddd);
+    border: 1px solid var(--border-color, var(--store-line));
     transition: all 0.2s ease;
 }
 
 .quote-item:hover {
-    box-shadow: var(--shadow-sm, 0 2px 4px rgba(0,0,0,0.05));
+    box-shadow: var(--shadow-sm, 0 2px 4px rgb(0 0 0 / 5%));
     transform: translateY(-1px);
 }
 
@@ -271,12 +292,12 @@
 }
 
 .quote-item-header strong {
-    color: var(--primary-dark, #1e4d0f);
+    color: var(--primary-dark, var(--quote-system-green-dark));
     font-size: 0.95em;
 }
 
 .quote-item-remove {
-    color: #dc3545;
+    color: var(--quote-system-red);
     border: none;
     background: none;
     cursor: pointer;
@@ -293,13 +314,13 @@
 }
 
 .quote-item-remove:hover {
-    background-color: #dc3545;
+    background-color: var(--quote-system-red);
     color: white;
 }
 
 .quote-item-details {
     font-size: 0.9em;
-    color: #666;
+    color: var(--quote-system-gray);
     margin-bottom: 5px;
 }
 
@@ -310,7 +331,7 @@
 .quote-item-total {
     text-align: right;
     font-weight: bold;
-    color: var(--primary-color, #2e5827);
+    color: var(--primary-color, var(--brand-700));
     font-size: 1.05em;
 }
 
@@ -318,7 +339,7 @@
 .quote-totals {
     margin-top: 20px;
     padding-top: 20px;
-    border-top: 1px solid var(--border-color, #ddd);
+    border-top: 1px solid var(--border-color, var(--store-line));
 }
 
 .total-row {
@@ -329,20 +350,21 @@
 }
 
 .total-row span:first-child {
-    color: #666;
+    color: var(--quote-system-gray);
 }
 
 .total-row span:last-child {
     font-weight: 600;
-    color: var(--primary-dark, #1e4d0f);
+    color: var(--primary-dark, var(--quote-system-green-dark));
 }
 
 .ltm-row {
-    color: #dc3545;
+    color: var(--quote-system-red);
 }
 
 .ltm-row span {
-    color: #dc3545 !important;
+    /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
+    color: var(--quote-system-red) !important;
 }
 
 .grand-total {
@@ -350,11 +372,11 @@
     font-size: 1.2em;
     margin-top: 10px;
     padding-top: 10px;
-    border-top: 2px solid var(--primary-color, #2e5827);
+    border-top: 2px solid var(--primary-color, var(--brand-700));
 }
 
 .grand-total span:last-child {
-    color: var(--primary-color, #2e5827);
+    color: var(--primary-color, var(--brand-700));
     font-size: 1.1em;
 }
 
@@ -362,16 +384,16 @@
 .quote-actions {
     margin-top: var(--spacing-md, 20px);
     padding-top: var(--spacing-md, 20px);
-    border-top: 1px solid var(--border-color, #ddd);
+    border-top: 1px solid var(--border-color, var(--store-line));
 }
 
 .quote-action-btn {
     width: 100%;
     margin-bottom: 10px;
     padding: 10px 15px;
-    border: 1px solid var(--primary-color, #2e5827);
-    background-color: var(--white, #ffffff);
-    color: var(--primary-color, #2e5827);
+    border: 1px solid var(--primary-color, var(--brand-700));
+    background-color: var(--white, var(--color-surface));
+    color: var(--primary-color, var(--brand-700));
     border-radius: var(--radius-sm, 4px);
     cursor: pointer;
     font-weight: 500;
@@ -380,15 +402,15 @@
 }
 
 .quote-action-btn:hover {
-    background-color: var(--primary-color, #2e5827);
+    background-color: var(--primary-color, var(--brand-700));
     color: white;
     transform: translateY(-1px);
-    box-shadow: var(--shadow-sm, 0 2px 4px rgba(0,0,0,0.05));
+    box-shadow: var(--shadow-sm, 0 2px 4px rgb(0 0 0 / 5%));
 }
 
 .quote-clear-btn {
     width: 100%;
-    color: #dc3545;
+    color: var(--quote-system-red);
     background: none;
     border: none;
     cursor: pointer;
@@ -398,26 +420,28 @@
 }
 
 .quote-clear-btn:hover {
-    background-color: #dc3545;
+    background-color: var(--quote-system-red);
     color: white;
     border-radius: var(--radius-sm, 4px);
 }
 
 /* ============================= */
+
 /* Floating Toggle Button */
+
 /* ============================= */
 .quote-panel-toggle {
     position: fixed;
     right: 20px;
     bottom: 20px;
-    background: var(--primary-color, #2e5827);
+    background: var(--primary-color, var(--brand-700));
     color: white;
     border: none;
     border-radius: 25px;
     padding: 12px 20px;
     cursor: pointer;
     font-weight: bold;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 12px rgb(0 0 0 / 20%);
     z-index: 999;
     transition: all 0.3s ease;
     font-size: 0.9em;
@@ -425,8 +449,8 @@
 
 .quote-panel-toggle:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(0,0,0,0.25);
-    background: var(--primary-dark, #1e4d0f);
+    box-shadow: 0 6px 16px rgb(0 0 0 / 25%);
+    background: var(--primary-dark, var(--quote-system-green-dark));
 }
 
 .quote-panel-toggle:active {
@@ -434,18 +458,20 @@
 }
 
 /* ============================= */
+
 /* Success & Loading Messages */
+
 /* ============================= */
 .quote-success-message {
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background: #d4edda;
-    border: 1px solid #c3e6cb;
+    background: var(--store-green-100);
+    border: 1px solid var(--quote-system-green);
     padding: 20px 30px;
     border-radius: var(--radius-md, 8px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 12px rgb(0 0 0 / 15%);
     z-index: 10000;
     animation: successPulse 0.5s ease;
 }
@@ -455,9 +481,11 @@
         transform: translate(-50%, -50%) scale(0.8);
         opacity: 0;
     }
+
     50% {
         transform: translate(-50%, -50%) scale(1.05);
     }
+
     100% {
         transform: translate(-50%, -50%) scale(1);
         opacity: 1;
@@ -465,7 +493,7 @@
 }
 
 .quote-success-message h4 {
-    color: #155724;
+    color: var(--print-green-dark);
     margin: 0;
     font-size: 1.1em;
 }
@@ -477,23 +505,25 @@
     transform: translate(-50%, -50%);
     background: white;
     padding: 20px 30px;
-    border: 2px solid var(--primary-color, #2e5827);
+    border: 2px solid var(--primary-color, var(--brand-700));
     border-radius: var(--radius-md, 8px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 12px rgb(0 0 0 / 15%);
     z-index: 10000;
 }
 
 .quote-loading-message p {
     margin: 0;
-    color: var(--primary-color, #2e5827);
+    color: var(--primary-color, var(--brand-700));
     font-weight: 500;
 }
 
 /* ============================= */
+
 /* Buttons */
+
 /* ============================= */
 .btn-primary {
-    background-color: var(--primary-color, #2e5827);
+    background-color: var(--primary-color, var(--brand-700));
     color: white;
     border: none;
     border-radius: var(--radius-sm, 4px);
@@ -505,9 +535,9 @@
 }
 
 .btn-primary:hover {
-    background-color: var(--primary-dark, #1e4d0f);
+    background-color: var(--primary-dark, var(--quote-system-green-dark));
     transform: translateY(-1px);
-    box-shadow: var(--shadow-md, 0 4px 8px rgba(0,0,0,0.1));
+    box-shadow: var(--shadow-md, 0 4px 8px rgb(0 0 0 / 10%));
 }
 
 .btn-primary:active {
@@ -526,9 +556,9 @@
 }
 
 .btn-secondary {
-    background-color: var(--white, #ffffff);
-    color: var(--primary-color, #2e5827);
-    border: 1px solid var(--primary-color, #2e5827);
+    background-color: var(--white, var(--color-surface));
+    color: var(--primary-color, var(--brand-700));
+    border: 1px solid var(--primary-color, var(--brand-700));
     border-radius: var(--radius-sm, 4px);
     padding: 10px 20px;
     font-weight: 500;
@@ -537,14 +567,14 @@
 }
 
 .btn-secondary:hover {
-    background-color: var(--primary-color, #2e5827);
+    background-color: var(--primary-color, var(--brand-700));
     color: white;
 }
 
 .btn-link {
     background: none;
     border: none;
-    color: var(--primary-color, #2e5827);
+    color: var(--primary-color, var(--brand-700));
     cursor: pointer;
     text-decoration: underline;
     padding: 5px;
@@ -552,13 +582,15 @@
 }
 
 .btn-link:hover {
-    color: var(--primary-dark, #1e4d0f);
+    color: var(--primary-dark, var(--quote-system-green-dark));
 }
 
 /* ============================= */
+
 /* Responsive Design */
+
 /* ============================= */
-@media (max-width: 768px) {
+@media (width <= 768px) {
     .quote-summary-panel {
         width: 100%;
         max-width: 380px;
@@ -586,7 +618,7 @@
     }
 }
 
-@media (max-width: 480px) {
+@media (width <= 480px) {
     .quote-builder-container {
         padding: var(--spacing-sm, 10px);
     }
@@ -619,13 +651,16 @@
 }
 
 /* ============================= */
+
 /* Print Styles */
+
 /* ============================= */
 @media print {
     .quote-panel-toggle,
     .quote-close-btn,
     .quote-item-remove,
     .quote-actions {
+        /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
         display: none !important;
     }
     
@@ -633,7 +668,7 @@
         position: static;
         width: 100%;
         transform: none;
-        border: 1px solid #000;
+        border: 1px solid var(--quote-system-gray-dark);
         box-shadow: none;
     }
 }

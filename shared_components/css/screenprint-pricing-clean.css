@@ -1,9 +1,23 @@
+/* stylelint-disable declaration-no-important -- override stack: this calculator page layers fix/override sheets and JS-injected styles; the flags come out together when the page is untangled (2026-09-07) */
+
 /**
  * Screen Print Pricing - Clean Style Overrides
  * Applies to ORIGINAL screenprint-pricing-v2.js
  * CSS-ONLY changes to match DTG/DTF appearance
  * NO JavaScript changes - all functionality preserved
  */
+
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue so the page
+   keeps its exact look. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   every rule below uses var(). Raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
+:root {
+    --screenprint-pricing-clean-orange: #78350f;
+    --screenprint-pricing-clean-green: #15803d;
+    --screenprint-pricing-clean-red: #ef4444;
+    --screenprint-pricing-clean-green-2: #16a34a;
+}
+/* stylelint-enable color-no-hex */
 
 /* ========================================
    HIDE STEP LABELS FOR CLEANER LOOK
@@ -32,8 +46,8 @@
 
 /* Ensure both sections are equal height */
 .sp-toggle-section {
-    background: #f9fafb;
-    border: 1px solid #e5e7eb;
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
     border-radius: 12px;
     padding: 24px;
 }
@@ -42,7 +56,7 @@
 .sp-toggle-section-title {
     font-size: 16px;
     font-weight: 600;
-    color: #1f2937;
+    color: var(--gray-800);
     margin-bottom: 8px;
     display: flex;
     align-items: center;
@@ -50,13 +64,13 @@
 }
 
 .sp-toggle-section-title i {
-    color: #4cb354;
+    color: var(--brand-500);
     font-size: 18px;
 }
 
 .sp-toggle-section-subtitle {
     font-size: 13px;
-    color: #6b7280;
+    color: var(--gray-500);
     margin-bottom: 16px;
 }
 
@@ -84,12 +98,12 @@
 .sp-safety-stripes-toggle {
     margin-top: 12px;
     padding-top: 12px;
-    border-top: 1px solid #e5e7eb;
+    border-top: 1px solid var(--gray-200);
 }
 
 .sp-safety-stripes-info {
     font-size: 12px;
-    color: #f59e0b !important;
+    color: var(--amber-500) !important;
     font-weight: 500;
 }
 
@@ -122,8 +136,8 @@
 }
 
 .sp-additional-locations-header {
-    background: #f9fafb;
-    border: 1px solid #e5e7eb;
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
     border-radius: 8px;
     padding: 16px 20px;
     cursor: pointer;
@@ -131,14 +145,14 @@
 }
 
 .sp-additional-locations-header:hover {
-    background: #f3f4f6;
-    border-color: #4cb354;
+    background: var(--gray-100);
+    border-color: var(--brand-500);
 }
 
 .sp-additional-locations-title {
     font-size: 15px;
     font-weight: 600;
-    color: #374151;
+    color: var(--gray-700);
     display: flex;
     align-items: center;
     gap: 8px;
@@ -146,7 +160,7 @@
 
 .sp-additional-locations-subtitle {
     font-size: 12px;
-    color: #6b7280;
+    color: var(--gray-500);
     margin-top: 4px;
 }
 
@@ -154,7 +168,7 @@
 .sp-additional-locations-content {
     padding: 16px;
     background: white;
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--gray-200);
     border-top: none;
     border-radius: 0 0 8px 8px;
 }
@@ -166,7 +180,7 @@
 .sp-live-price-display {
     margin-top: 30px;
     background: white;
-    border: 2px solid #4cb354;
+    border: 2px solid var(--brand-500);
     border-radius: 12px;
     padding: 24px;
 }
@@ -175,20 +189,20 @@
 .sp-live-price-amount {
     font-size: 48px !important;
     font-weight: 700 !important;
-    color: #4cb354 !important;
+    color: var(--brand-500) !important;
 }
 
 /* Price per shirt label */
 .sp-price-label {
     font-size: 14px;
-    color: #6b7280;
+    color: var(--gray-500);
     font-weight: 500;
 }
 
 /* Setup Fees section - more compact */
 .sp-pricing-setup {
-    background: #fffbeb;
-    border-left: 3px solid #f59e0b;
+    background: var(--store-paper);
+    border-left: 3px solid var(--amber-500);
     padding: 12px 16px;
     margin-top: 16px;
     border-radius: 4px;
@@ -197,34 +211,34 @@
 .sp-setup-header {
     font-size: 13px;
     font-weight: 600;
-    color: #92400e;
+    color: var(--amber-800);
     margin-bottom: 8px;
 }
 
 .sp-setup-breakdown-live {
     font-size: 12px;
-    color: #78350f;
+    color: var(--screenprint-pricing-clean-orange);
     line-height: 1.6;
 }
 
 /* LTM Fee section - more compact */
 .sp-pricing-ltm {
-    background: #fef2f2;
-    border-left: 3px solid #ef4444;
+    background: var(--red-50);
+    border-left: 3px solid var(--screenprint-pricing-clean-red);
     padding: 12px 16px;
     margin-top: 12px;
     border-radius: 4px;
 }
 
 .sp-ltm-fee-amount {
-    color: #dc2626 !important;
+    color: var(--red-600) !important;
     font-weight: 600;
 }
 
 /* Order Total - make it stand out */
 .sp-pricing-total {
-    background: #f0fdf4;
-    border: 2px solid #4cb354;
+    background: var(--brand-50);
+    border: 2px solid var(--brand-500);
     padding: 16px;
     margin-top: 16px;
     border-radius: 8px;
@@ -237,12 +251,12 @@
 .sp-total-highlight {
     font-size: 28px !important;
     font-weight: 700 !important;
-    color: #15803d !important;
+    color: var(--screenprint-pricing-clean-green) !important;
 }
 
 .sp-price-average {
     font-size: 13px;
-    color: #16a34a;
+    color: var(--screenprint-pricing-clean-green-2);
     margin-top: 8px;
     text-align: center;
 }
@@ -256,7 +270,7 @@
 .sp-toggle-breakdown-btn {
     background: none;
     border: none;
-    color: #4cb354;
+    color: var(--brand-500);
     font-size: 13px;
     font-weight: 500;
     cursor: pointer;
@@ -265,7 +279,7 @@
 }
 
 .sp-toggle-breakdown-btn:hover {
-    background: #f0fdf4;
+    background: var(--brand-50);
     border-radius: 4px;
 }
 
@@ -273,7 +287,7 @@
    MOBILE RESPONSIVENESS
    ======================================== */
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
     .sp-toggle-pricing-container {
         grid-template-columns: 1fr;
         gap: 16px;
@@ -303,29 +317,29 @@
     text-align: center;
     font-size: 24px;
     font-weight: 600;
-    color: #1f2937;
+    color: var(--gray-800);
     margin-bottom: 24px;
     padding-bottom: 16px;
-    border-bottom: 2px solid #4cb354;
+    border-bottom: 2px solid var(--brand-500);
 }
 
 /* Pricing tier display - cleaner */
 .sp-pricing-tier-display {
-    background: #f0fdf4;
+    background: var(--brand-50);
     padding: 8px 12px;
     border-radius: 6px;
     margin-bottom: 16px;
     font-size: 13px;
-    color: #15803d;
+    color: var(--screenprint-pricing-clean-green);
 }
 
 .sp-pricing-tier-display i {
-    color: #4cb354;
+    color: var(--brand-500);
 }
 
 /* Info icon next to price */
 .sp-upcharge-info-icon {
-    color: #6b7280;
+    color: var(--gray-500);
     font-size: 18px;
     margin-left: 8px;
     cursor: pointer;
@@ -333,13 +347,13 @@
 }
 
 .sp-upcharge-info-icon:hover {
-    color: #4cb354;
+    color: var(--brand-500);
 }
 
 /* Setup Fee Badge Styles */
 .sp-setup-fee-badge {
     font-size: 20px;
-    color: #f59e0b;  /* Amber color */
+    color: var(--amber-500);  /* Amber color */
     opacity: 0.85;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -359,9 +373,9 @@
     left: 50%;
     transform: translateX(-50%);
     background: white;
-    border: 2px solid #f59e0b;
+    border: 2px solid var(--amber-500);
     border-radius: 12px;
-    box-shadow: 0 8px 24px rgba(245, 158, 11, 0.25);
+    box-shadow: 0 8px 24px rgb(245 158 11 / 25%);
     padding: 20px;
     min-width: 300px;
     max-width: 350px;
@@ -376,29 +390,29 @@
 .sp-setup-fee-tooltip-header {
     font-size: 16px;
     font-weight: 700;
-    color: #92400e;
+    color: var(--amber-800);
     margin-bottom: 12px;
     padding-bottom: 10px;
-    border-bottom: 2px solid #fef3c7;
+    border-bottom: 2px solid var(--amber-100);
     display: flex;
     align-items: center;
     gap: 8px;
 }
 
 .sp-setup-fee-tooltip-header i {
-    color: #f59e0b;
+    color: var(--amber-500);
 }
 
 .sp-setup-fee-tooltip-body {
     font-size: 14px;
-    color: #78350f;
+    color: var(--screenprint-pricing-clean-orange);
     line-height: 1.6;
 }
 
 .sp-setup-fee-amount {
     font-size: 18px;
     font-weight: 700;
-    color: #f59e0b;
+    color: var(--amber-500);
     margin: 8px 0;
 }
 
@@ -417,17 +431,17 @@
 
 .sp-setup-fee-details {
     font-size: 13px;
-    color: #92400e;
+    color: var(--amber-800);
     margin-top: 8px;
     padding-top: 8px;
-    border-top: 1px solid #fef3c7;
+    border-top: 1px solid var(--amber-100);
     display: flex;
     align-items: center;
     gap: 6px;
 }
 
 .sp-setup-fee-details:first-of-type {
-    border-top: 1px solid #fef3c7;
+    border-top: 1px solid var(--amber-100);
 }
 
 .sp-setup-fee-details:last-of-type {
@@ -437,7 +451,7 @@
 }
 
 .sp-setup-fee-details i {
-    color: #f59e0b;
+    color: var(--amber-500);
 }
 
 /* END OF FILE */

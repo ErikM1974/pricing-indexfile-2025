@@ -1,23 +1,34 @@
-/* purchasingform.css — page styles (extracted from inline <style>, 2026.09.05.7) */
+/* purchasingform.css — page styles (extracted from inline \3c style>, 2026.09.05.7) */
 
-/* ── moved from inline <style> in calculators/purchasingform.html (Rule 3, 2026.09.05.7) ── */
+/* ── moved from inline \3c style> in calculators/purchasingform.html (Rule 3, 2026.09.05.7) ── */
+
 /* Root variables - Consistent Green Theme */
+
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue, merged into its
+   existing :root. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
         :root {
-            --primary-color: #4a6fa5; /* Purchasing family slate blue (2026-09-03) — matches Transfer Queue + Purchase Tracking */
-            --primary-dark: #33537d;
-            --primary-light: #7d9bc9;
-            --bg-color: #f5f7fa;
-            --card-bg: #ffffff;
-            --border-color: #e5e7eb;
-            --text-primary: #1f2937;
-            --text-secondary: #6b7280;
-            --hover-bg: #f3f4f6;
-            --success-bg: #d1fae5;
-            --success-text: #065f46;
-            --warning-bg: #fef3c7;
-            --warning-text: #92400e;
-            --focus-shadow: 0 0 0 0.25rem rgba(58, 124, 82, 0.25);
+    --purchasingform-blue: #7d9bc9;
+    --purchasingform-green-tint: #d1fae5;
+    --purchasingform-teal-dark: #065f46;
+    --purchasingform-green: #a7f3d0;
+            --primary-color: var(--color-bradley); /* Purchasing family slate blue (2026-09-03) — matches Transfer Queue + Purchase Tracking */
+            --primary-dark: var(--color-bradley-dark);
+            --primary-light: var(--purchasingform-blue);
+            --bg-color: var(--color-bradley-tint);
+            --card-bg: var(--color-surface);
+            --border-color: var(--gray-200);
+            --text-primary: var(--gray-800);
+            --text-secondary: var(--gray-500);
+            --hover-bg: var(--gray-100);
+            --success-bg: var(--purchasingform-green-tint);
+            --success-text: var(--purchasingform-teal-dark);
+            --warning-bg: var(--amber-100);
+            --warning-text: var(--amber-800);
+            --focus-shadow: 0 0 0 0.25rem rgb(58 124 82 / 25%);
         }
+/* stylelint-enable color-no-hex */
 
         * {
             margin: 0;
@@ -26,7 +37,7 @@
         }
 
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: Inter, sans-serif;
             background: var(--bg-color);
             color: var(--text-primary);
             line-height: 1.6;
@@ -40,7 +51,7 @@
             position: sticky;
             top: 0;
             z-index: 100;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            box-shadow: 0 1px 3px rgb(0 0 0 / 5%);
         }
 
         .header-container {
@@ -108,7 +119,7 @@
         .help-btn:hover {
             background: var(--primary-dark);
             transform: translateY(-1px);
-            box-shadow: 0 4px 8px rgba(58, 124, 82, 0.3);
+            box-shadow: 0 4px 8px rgb(58 124 82 / 30%);
         }
 
         /* Main Content */
@@ -124,7 +135,7 @@
             padding: 2rem;
             border-radius: 0.75rem;
             margin-bottom: 2rem;
-            box-shadow: 0 4px 12px rgba(58, 124, 82, 0.3);
+            box-shadow: 0 4px 12px rgb(58 124 82 / 30%);
         }
 
         .page-title {
@@ -147,7 +158,7 @@
             background: var(--card-bg);
             border-radius: 0.75rem;
             padding: 2rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 6px rgb(0 0 0 / 5%);
             border: 1px solid var(--border-color);
             margin-bottom: 2rem;
         }
@@ -176,7 +187,7 @@
             width: 100%;
             min-height: 800px;
             border-radius: 0.5rem;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 8px rgb(0 0 0 / 10%);
             background: white;
             overflow: hidden;
         }
@@ -190,8 +201,8 @@
         }
 
         .info-card {
-            background: linear-gradient(135deg, var(--success-bg), #f0f9ff);
-            border: 1px solid #a7f3d0;
+            background: linear-gradient(135deg, var(--success-bg), var(--color-floor-tint));
+            border: 1px solid var(--purchasingform-green);
             border-radius: 0.5rem;
             padding: 1.5rem;
             text-align: center;
@@ -216,7 +227,7 @@
         }
 
         /* Responsive Design */
-        @media (max-width: 768px) {
+        @media (width <= 768px) {
             .main-container {
                 padding: 0 1rem;
                 margin: 1rem auto;

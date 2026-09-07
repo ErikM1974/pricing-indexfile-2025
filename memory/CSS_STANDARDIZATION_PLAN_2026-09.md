@@ -114,6 +114,24 @@ three gap sizes, `opacity:.5;cursor:not-allowed` ×26 (disabled). These become u
 
 ## 8. Progress log (newest first)
 
+### 2026-09-07 — Calculators family LIVE (`v2026.09.07.12`): 58 sheets, 26 pages
+
+- **Family = the 25 calculator pages + `pages/dtg-compatible-products.html` (it loads two of the same shared
+  sheets) and 58 stylesheets: every `calculators/**` sheet plus the shared `universal-*`, `calculator-*`,
+  `dtf-*`, `screenprint-*`, contract-pricing and pricing-widget sheets that ONLY calculators load. Two sheets
+  the quote builders also load (`quote-builder-shell.css`, `sticker-pricing-page.css`) wait for the builders
+  family — nothing on the money path's builder pages changed.
+- **Colours:** 2,261 hex uses across the 58 sheets → 955 exact / 723 near / 583 far, the far ones now sheet-scoped variables declared once. Definitions that duplicated the token file byte-for-byte were removed (eleven `--gray-*` and a `--radius-sm` in embroidery-pricing-all); nine sheets keep their own `--shadow-sm`/`--shadow-md` values, which shadow the token on their pages.
+- **`!important`: 446 flags — 14 sheets carry a file-level reason (the override stacks), 75 flags a per-line one.** This family is the override-stack archetype — one DTF page layers
+  `dtf-calculator.css` + `dtf-calculator-fix.css` + `dtf-outline-override.css` + `dtf-toggle-pricing.css`, and
+  `force-green-theme.css` exists only to `!important` CSS variables over JS-injected styles. Sheets with more
+  than ten flags carry a file-level reason; the flags come out only when a page is untangled as a whole
+  (recorded on the Brand Standards page as follow-up work, page by page).
+- **Verification:** 26 pages: 18 identical; the 8 that differ are timestamps and badge counters (cap-embroidery, cheat-sheet, purchasing form, emblem), the christmas-bundles top strip, the webstores chat greeting (generated text and quote number), and two pages whose product photo and colour data loaded after the before shot (DTG, laser tumbler). The tokenizer had mangled three `#add-to-cart` id selectors (a three-letter id read as a hex colour); repaired, the two pages that use them re-shot pixel-identical, and the scan found no other case in any family. Gates + e2e (a11y, money path) green; `npm run test:parity:surfaces` 5 passed (every live tier on every customer calculator equals the engine).
+- **Census after:** 300 sheets · 4832 KB · 279 use var(--) · 231 raw-hex files · 1023 distinct hex · 3073 !important · 211 duplicated bodies
+- **Next:** the `pages/css` staff pages batch (art-request-detail, mockup-detail, quote-view, policy-detail,
+  invoice…), then the quote builders + the generated `quote-builder-inline.css` retirement.
+
 ### 2026-09-07 — Dashboards family LIVE (`v2026.09.07.10`): 78 sheets, 70 pages
 
 - **Family = every `dashboards/*.html` (60) + the queue-dashboard system they share (`art-hub.css` on 41 pages,

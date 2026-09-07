@@ -3,9 +3,31 @@
  * Clean, modern design for product information display
  */
 
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue so the page
+   keeps its exact look. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   every rule below uses var(). Raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
+:root {
+    --laser-tumbler-simple-gray: #666;
+    --laser-tumbler-simple-gray-dark: #333;
+    --laser-tumbler-simple-yellow: #856404;
+    --laser-tumbler-simple-yellow-2: #ffc107;
+    --laser-tumbler-simple-cyan: #06c;
+    --laser-tumbler-simple-yellow-3: #f0d9a8;
+    --laser-tumbler-simple-green: #c4d4ca;
+    --laser-tumbler-simple-orange: #ffa726;
+    --laser-tumbler-simple-cyan-2: #004085;
+    --laser-tumbler-simple-cyan-3: #2196f3;
+    --laser-tumbler-simple-cyan-4: #1976d2;
+    --laser-tumbler-simple-green-2: #9db8a8;
+    --laser-tumbler-simple-gray-2: #888;
+    --laser-tumbler-simple-red-tint: #f2c4c0;
+}
+/* stylelint-enable color-no-hex */
+
 /* ===== Page Layout ===== */
 body {
-    background: #f5f5f5;
+    background: var(--gray-100);
 }
 
 .container {
@@ -20,7 +42,7 @@ body {
     border-radius: 8px;
     padding: 40px;
     margin-bottom: 30px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 8px rgb(0 0 0 / 10%);
 }
 
 .hero-content {
@@ -42,32 +64,32 @@ body {
 
 .hero-info h1 {
     font-size: 32px;
-    margin: 0 0 10px 0;
-    color: #2d5f3f;
+    margin: 0 0 10px;
+    color: var(--print-green);
 }
 
 .product-subtitle {
     font-size: 18px;
-    color: #666;
-    margin: 0 0 20px 0;
+    color: var(--laser-tumbler-simple-gray);
+    margin: 0 0 20px;
 }
 
 .product-sku {
     font-size: 14px;
-    color: #666;
-    margin: 8px 0 16px 0;
+    color: var(--laser-tumbler-simple-gray);
+    margin: 8px 0 16px;
     font-weight: 500;
 }
 
 .product-sku span {
-    color: #2d5f3f;
+    color: var(--print-green);
     font-weight: 600;
 }
 
 .product-description {
     font-size: 16px;
     line-height: 1.6;
-    color: #555;
+    color: var(--print-ink-soft);
     margin-bottom: 20px;
 }
 
@@ -81,13 +103,13 @@ body {
 .color-selector legend {
     font-size: 18px;
     font-weight: 600;
-    color: #333;
+    color: var(--laser-tumbler-simple-gray-dark);
     margin-bottom: 15px;
     padding: 0;
 }
 
 .selected-color-name {
-    color: #2d5f3f;
+    color: var(--print-green);
     font-weight: 700;
 }
 
@@ -124,7 +146,7 @@ body {
     width: 70px;
     height: 70px;
     border-radius: 50%;
-    border: 2px solid #e0e0e0;
+    border: 2px solid var(--gray-200);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -136,7 +158,7 @@ body {
 
 .color-name {
     font-size: 12px;
-    color: #666;
+    color: var(--laser-tumbler-simple-gray);
     text-align: center;
     line-height: 1.2;
     max-width: 70px;
@@ -149,15 +171,15 @@ body {
 
 /* Hover State */
 .color-swatch:hover .color-preview {
-    border-color: #333;
+    border-color: var(--laser-tumbler-simple-gray-dark);
     transform: scale(1.05);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    box-shadow: 0 2px 8px rgb(0 0 0 / 15%);
 }
 
 /* Selected State */
 .color-swatch-input:checked + .color-swatch .color-preview {
-    border: 3px solid #2d5f3f;
-    box-shadow: 0 0 0 2px white, 0 0 0 5px #2d5f3f;
+    border: 3px solid var(--print-green);
+    box-shadow: 0 0 0 2px white, 0 0 0 5px var(--print-green);
 }
 
 .color-swatch-input:checked + .color-swatch .color-preview::after {
@@ -166,17 +188,17 @@ body {
     color: white;
     font-size: 24px;
     font-weight: bold;
-    text-shadow: 0 0 3px rgba(0,0,0,0.5);
+    text-shadow: 0 0 3px rgb(0 0 0 / 50%);
 }
 
 .color-swatch-input:checked + .color-swatch .color-name {
-    color: #2d5f3f;
+    color: var(--print-green);
     font-weight: 600;
 }
 
 /* Focus State (keyboard navigation) */
 .color-swatch-input:focus-visible + .color-swatch .color-preview {
-    outline: 3px solid #2d5f3f;
+    outline: 3px solid var(--print-green);
     outline-offset: 2px;
 }
 
@@ -186,15 +208,15 @@ body {
     align-items: center;
     gap: 12px;
     padding: 20px;
-    color: #666;
+    color: var(--laser-tumbler-simple-gray);
     font-size: 14px;
 }
 
 .color-loading-spinner {
     width: 20px;
     height: 20px;
-    border: 3px solid #f3f3f3;
-    border-top: 3px solid #2d5f3f;
+    border: 3px solid var(--gray-100);
+    border-top: 3px solid var(--print-green);
     border-radius: 50%;
     animation: spin 1s linear infinite;
 }
@@ -229,18 +251,18 @@ body {
 }
 
 .inventory-badge.in-stock {
-    background: #d4edda;
-    color: #155724;
+    background: var(--store-green-100);
+    color: var(--print-green-dark);
 }
 
 .inventory-badge.low-stock {
-    background: #fff3cd;
-    color: #856404;
+    background: var(--amber-100);
+    color: var(--laser-tumbler-simple-yellow);
 }
 
 .inventory-badge.out-of-stock {
-    background: #f8d7da;
-    color: #721c24;
+    background: var(--red-100);
+    color: var(--color-ae-dark);
 }
 
 .inventory-details {
@@ -255,12 +277,12 @@ body {
 }
 
 .inventory-label {
-    color: #666;
+    color: var(--laser-tumbler-simple-gray);
 }
 
 .inventory-value {
     font-weight: 600;
-    color: #333;
+    color: var(--laser-tumbler-simple-gray-dark);
 }
 
 /* Dual Inventory Grid Layout */
@@ -272,16 +294,16 @@ body {
 }
 
 .inventory-section {
-    background: #f8f9fa;
-    border: 2px solid #e9ecef;
+    background: var(--gray-50);
+    border: 2px solid var(--gray-200);
     border-radius: 8px;
     padding: 20px;
     transition: all 0.3s ease;
 }
 
 .inventory-section:hover {
-    border-color: #dee2e6;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-color: var(--gray-200);
+    box-shadow: 0 2px 8px rgb(0 0 0 / 10%);
 }
 
 .inventory-section-title {
@@ -290,7 +312,7 @@ body {
     gap: 8px;
     font-size: 16px;
     font-weight: 600;
-    color: #333;
+    color: var(--laser-tumbler-simple-gray-dark);
     margin-bottom: 15px;
 }
 
@@ -300,34 +322,34 @@ body {
 
 /* Local Warehouse Inventory - Emphasized with brand green */
 .local-inventory {
-    background: linear-gradient(135deg, #f0f9f4 0%, #ffffff 100%);
-    border-color: #2d5f3f;
+    background: linear-gradient(135deg, var(--brand-50) 0%, var(--color-surface) 100%);
+    border-color: var(--print-green);
     border-width: 3px;
 }
 
 .local-inventory .inventory-section-title {
-    color: #2d5f3f;
+    color: var(--print-green);
 }
 
 .local-inventory .inventory-section-title i {
-    color: #2d5f3f;
+    color: var(--print-green);
 }
 
 /* Supplier Inventory - Standard styling */
 .supplier-inventory {
-    background: #ffffff;
+    background: var(--color-surface);
 }
 
 .supplier-inventory .inventory-section-title {
-    color: #495057;
+    color: var(--gray-600);
 }
 
 .supplier-inventory .inventory-section-title i {
-    color: #6c757d;
+    color: var(--gray-500);
 }
 
 /* Responsive: Stack on mobile */
-@media (max-width: 768px) {
+@media (width <= 768px) {
     .inventory-grid {
         grid-template-columns: 1fr;
         gap: 15px;
@@ -340,19 +362,19 @@ body {
     border-radius: 8px;
     padding: 40px;
     margin-bottom: 30px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 8px rgb(0 0 0 / 10%);
 }
 
 .pricing-section h2 {
     font-size: 28px;
-    margin: 0 0 10px 0;
-    color: #2d5f3f;
+    margin: 0 0 10px;
+    color: var(--print-green);
 }
 
 .pricing-subtitle {
     font-size: 16px;
-    color: #666;
-    margin: 0 0 30px 0;
+    color: var(--laser-tumbler-simple-gray);
+    margin: 0 0 30px;
 }
 
 /* ===== Pricing Table ===== */
@@ -363,7 +385,7 @@ body {
 }
 
 .pricing-table thead {
-    background: #2d5f3f;
+    background: var(--print-green);
     color: white;
 }
 
@@ -374,21 +396,21 @@ body {
 }
 
 .pricing-table tbody tr {
-    border-bottom: 1px solid #e0e0e0;
+    border-bottom: 1px solid var(--gray-200);
     transition: background 0.2s;
 }
 
 .pricing-table tbody tr:hover {
-    background: #f9f9f9;
+    background: var(--gray-50);
 }
 
 .pricing-table tbody tr.highlight-tier {
-    background: #fff8e1;
-    border-left: 4px solid #ffa726;
+    background: var(--store-rush-soft);
+    border-left: 4px solid var(--laser-tumbler-simple-orange);
 }
 
 .pricing-table tbody tr.highlight-tier:hover {
-    background: #fff3cd;
+    background: var(--amber-100);
 }
 
 .pricing-table td {
@@ -401,13 +423,13 @@ body {
 
 .tier-qty {
     font-size: 18px;
-    color: #333;
+    color: var(--laser-tumbler-simple-gray-dark);
     margin-bottom: 5px;
 }
 
 .tier-desc {
     font-size: 14px;
-    color: #666;
+    color: var(--laser-tumbler-simple-gray);
 }
 
 .tier-price {
@@ -417,12 +439,12 @@ body {
 .price-large {
     font-size: 28px;
     font-weight: 700;
-    color: #2d5f3f;
+    color: var(--print-green);
 }
 
 .price-small {
     font-size: 14px;
-    color: #666;
+    color: var(--laser-tumbler-simple-gray);
 }
 
 .tier-total {
@@ -432,53 +454,56 @@ body {
 .total-price {
     font-size: 22px;
     font-weight: 600;
-    color: #333;
+    color: var(--laser-tumbler-simple-gray-dark);
 }
 
 .total-qty {
     font-size: 14px;
-    color: #666;
+    color: var(--laser-tumbler-simple-gray);
 }
 
 /* ===== Unavailable Pricing Tier ===== */
 .pricing-tier-unavailable {
     opacity: 0.5;
-    color: #999;
+    color: var(--print-line);
 }
 
 .pricing-tier-unavailable .tier-qty,
 .pricing-tier-unavailable .price-large,
 .pricing-tier-unavailable .total-price {
     text-decoration: line-through;
-    color: #999;
+    color: var(--print-line);
 }
 
 .pricing-tier-unavailable .tier-desc,
 .pricing-tier-unavailable .price-small,
 .pricing-tier-unavailable .total-qty {
-    color: #aaa;
+    color: var(--gray-400);
 }
 
 /* ===== Pricing Warning Row ===== */
 .pricing-warning-row {
-    background: #fff3cd;
-    border-left: 4px solid #ffc107;
+    background: var(--amber-100);
+    border-left: 4px solid var(--laser-tumbler-simple-yellow-2);
 }
 
 .pricing-warning-row:hover {
-    background: #fff3cd !important;
+    /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
+    background: var(--amber-100) !important;
 }
 
 .pricing-warning {
-    color: #856404;
+    color: var(--laser-tumbler-simple-yellow);
     font-weight: 500;
+    /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
     padding: 12px 15px !important;
+    /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
     border-bottom: none !important;
 }
 
 .pricing-warning i {
     margin-right: 8px;
-    color: #ffc107;
+    color: var(--laser-tumbler-simple-yellow-2);
     font-size: 16px;
 }
 
@@ -489,24 +514,27 @@ body {
 
 /* ===== Pricing Info Row (Handling Fee Explanation) ===== */
 .pricing-info-row {
-    background: #e8f4f8;
-    border-left: 4px solid #0066cc;
+    background: var(--color-floor-tint);
+    border-left: 4px solid var(--laser-tumbler-simple-cyan);
 }
 
 .pricing-info-row:hover {
-    background: #e8f4f8 !important;
+    /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
+    background: var(--color-floor-tint) !important;
 }
 
 .pricing-info {
-    color: #004085;
+    color: var(--laser-tumbler-simple-cyan-2);
     font-weight: 500;
+    /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
     padding: 12px 15px !important;
+    /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
     border-bottom: none !important;
 }
 
 .pricing-info i {
     margin-right: 8px;
-    color: #0066cc;
+    color: var(--laser-tumbler-simple-cyan);
     font-size: 16px;
 }
 
@@ -519,14 +547,14 @@ body {
 .pricing-notes {
     margin-top: 25px;
     padding: 20px;
-    background: #f0f8ff;
-    border-left: 4px solid #2196f3;
+    background: var(--color-floor-tint);
+    border-left: 4px solid var(--laser-tumbler-simple-cyan-3);
     border-radius: 4px;
 }
 
 .pricing-notes h4 {
-    margin: 0 0 10px 0;
-    color: #1976d2;
+    margin: 0 0 10px;
+    color: var(--laser-tumbler-simple-cyan-4);
     font-size: 16px;
 }
 
@@ -537,7 +565,7 @@ body {
 
 .pricing-notes li {
     margin: 8px 0;
-    color: #555;
+    color: var(--print-ink-soft);
     font-size: 14px;
 }
 
@@ -545,14 +573,14 @@ body {
 .pricing-additional-charges {
     margin-top: 25px;
     padding: 20px;
-    background: #fff3cd;
-    border-left: 4px solid #ffc107;
+    background: var(--amber-100);
+    border-left: 4px solid var(--laser-tumbler-simple-yellow-2);
     border-radius: 4px;
 }
 
 .pricing-additional-charges h4 {
-    margin: 0 0 10px 0;
-    color: #856404;
+    margin: 0 0 10px;
+    color: var(--laser-tumbler-simple-yellow);
     font-size: 16px;
 }
 
@@ -563,7 +591,7 @@ body {
 
 .pricing-additional-charges li {
     margin: 8px 0;
-    color: #856404;
+    color: var(--laser-tumbler-simple-yellow);
     font-size: 14px;
     font-weight: 500;
 }
@@ -574,13 +602,13 @@ body {
     border-radius: 8px;
     padding: 40px;
     margin-bottom: 30px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 8px rgb(0 0 0 / 10%);
 }
 
 .gallery-section h2 {
     font-size: 28px;
-    margin: 0 0 20px 0;
-    color: #2d5f3f;
+    margin: 0 0 20px;
+    color: var(--print-green);
 }
 
 .product-gallery {
@@ -592,14 +620,14 @@ body {
 .gallery-item {
     border-radius: 8px;
     overflow: hidden;
-    border: 1px solid #e0e0e0;
+    border: 1px solid var(--gray-200);
     cursor: pointer;
     transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .gallery-item:hover {
     transform: translateY(-4px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 12px rgb(0 0 0 / 15%);
 }
 
 .gallery-thumbnail {
@@ -618,7 +646,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0,0,0,0.9);
+    background: rgb(0 0 0 / 90%);
     z-index: 10000;
 }
 
@@ -645,28 +673,28 @@ body {
 }
 
 .lightbox-close:hover {
-    color: #ccc;
+    color: var(--gray-300);
 }
 
 /* ===== CTA Section ===== */
 .cta-section {
-    background: linear-gradient(135deg, #2d5f3f 0%, #1a4029 100%);
+    background: linear-gradient(135deg, var(--print-green) 0%, var(--store-green-900) 100%);
     color: white;
     border-radius: 8px;
     padding: 40px;
     text-align: center;
     margin-bottom: 30px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 8px rgb(0 0 0 / 10%);
 }
 
 .cta-section h2 {
     font-size: 32px;
-    margin: 0 0 15px 0;
+    margin: 0 0 15px;
 }
 
 .cta-section p {
     font-size: 18px;
-    margin: 0 0 25px 0;
+    margin: 0 0 25px;
     opacity: 0.9;
 }
 
@@ -675,7 +703,7 @@ body {
     align-items: center;
     gap: 10px;
     background: white;
-    color: #2d5f3f;
+    color: var(--print-green);
     padding: 15px 30px;
     border-radius: 30px;
     font-size: 18px;
@@ -686,7 +714,7 @@ body {
 
 .cta-button:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(255,255,255,0.3);
+    box-shadow: 0 4px 12px rgb(255 255 255 / 30%);
 }
 
 /* ===== Loading State ===== */
@@ -700,8 +728,8 @@ body {
 .spinner {
     width: 50px;
     height: 50px;
-    border: 4px solid #f3f3f3;
-    border-top: 4px solid #2d5f3f;
+    border: 4px solid var(--gray-100);
+    border-top: 4px solid var(--print-green);
     border-radius: 50%;
     animation: spin 1s linear infinite;
 }
@@ -718,8 +746,8 @@ body {
 
 /* ===== Error State ===== */
 #error-message {
-    background: #f8d7da;
-    color: #721c24;
+    background: var(--red-100);
+    color: var(--color-ae-dark);
     padding: 20px;
     border-radius: 8px;
     margin: 20px 0;
@@ -728,7 +756,7 @@ body {
 }
 
 /* ===== Responsive Design ===== */
-@media (max-width: 768px) {
+@media (width <= 768px) {
     /* Color Selector Responsive */
     .color-grid {
         grid-template-columns: repeat(4, 1fr);
@@ -789,6 +817,7 @@ body {
     /* Pricing warning responsive */
     .pricing-warning {
         font-size: 13px;
+        /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
         padding: 10px 12px !important;
     }
 
@@ -816,7 +845,7 @@ body {
     }
 }
 
-@media (max-width: 480px) {
+@media (width <= 480px) {
     .hero-info h1 {
         font-size: 24px;
     }
@@ -840,12 +869,12 @@ body {
 
 .mockup-section {
     padding: 60px 0;
-    background: #f8faf9;
-    border-top: 3px solid #2d5f3f;
+    background: var(--gray-50);
+    border-top: 3px solid var(--print-green);
 }
 
 .mockup-section h2 {
-    color: #2d5f3f;
+    color: var(--print-green);
     font-size: 32px;
     margin-bottom: 8px;
     text-align: center;
@@ -853,7 +882,7 @@ body {
 
 .mockup-subtitle {
     text-align: center;
-    color: #555;
+    color: var(--print-ink-soft);
     margin-bottom: 36px;
 }
 
@@ -865,8 +894,8 @@ body {
 }
 
 .mockup-step {
-    background: #fff;
-    border: 1px solid #e2e8e4;
+    background: var(--color-surface);
+    border: 1px solid var(--gray-200);
     border-radius: 10px;
     padding: 20px;
     margin-bottom: 18px;
@@ -876,7 +905,7 @@ body {
     display: flex;
     align-items: center;
     gap: 10px;
-    color: #2d5f3f;
+    color: var(--print-green);
     font-size: 18px;
     margin: 0 0 14px;
 }
@@ -888,8 +917,8 @@ body {
     width: 26px;
     height: 26px;
     border-radius: 50%;
-    background: #2d5f3f;
-    color: #fff;
+    background: var(--print-green);
+    color: var(--color-on-brand);
     font-size: 14px;
     font-weight: 700;
     flex-shrink: 0;
@@ -897,26 +926,26 @@ body {
 
 /* Upload drop zone */
 .ltmk-drop-zone {
-    border: 2px dashed #9db8a8;
+    border: 2px dashed var(--laser-tumbler-simple-green-2);
     border-radius: 10px;
     padding: 28px 16px;
     text-align: center;
-    color: #555;
+    color: var(--print-ink-soft);
     cursor: pointer;
     transition: border-color 0.15s, background 0.15s;
 }
 
 .ltmk-drop-zone i {
     font-size: 28px;
-    color: #2d5f3f;
+    color: var(--print-green);
     margin-bottom: 8px;
 }
 
 .ltmk-drop-zone:hover,
 .ltmk-drop-zone:focus-visible,
 .ltmk-drop-zone--active {
-    border-color: #2d5f3f;
-    background: #eef5f0;
+    border-color: var(--print-green);
+    background: var(--store-green-50);
     outline: none;
 }
 
@@ -926,7 +955,7 @@ body {
     gap: 10px;
     margin-top: 12px;
     padding: 8px 10px;
-    background: #eef5f0;
+    background: var(--store-green-50);
     border-radius: 8px;
 }
 
@@ -934,18 +963,18 @@ body {
     width: 36px;
     height: 36px;
     border-radius: 6px;
-    background-color: #fff;
+    background-color: var(--color-on-brand);
     background-size: contain;
     background-position: center;
     background-repeat: no-repeat;
-    border: 1px solid #d4e0d8;
+    border: 1px solid var(--gray-300);
     flex-shrink: 0;
 }
 
 .ltmk-logo-name {
     flex: 1;
     font-size: 14px;
-    color: #333;
+    color: var(--laser-tumbler-simple-gray-dark);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -954,7 +983,7 @@ body {
 .ltmk-logo-remove {
     border: none;
     background: none;
-    color: #b91c1c;
+    color: var(--red-700);
     font-size: 20px;
     cursor: pointer;
     line-height: 1;
@@ -965,21 +994,21 @@ body {
 .ltmk-warning {
     margin-top: 12px;
     padding: 14px;
-    background: #fff8eb;
-    border: 1px solid #f0d9a8;
+    background: var(--red-50);
+    border: 1px solid var(--laser-tumbler-simple-yellow-3);
     border-radius: 8px;
 }
 
 .ltmk-warning h4 {
     margin: 0 0 8px;
-    color: #92600a;
+    color: var(--print-gold);
     font-size: 15px;
 }
 
 .ltmk-warning p {
     margin: 0 0 12px;
     font-size: 14px;
-    color: #555;
+    color: var(--print-ink-soft);
 }
 
 .ltmk-warning-actions {
@@ -990,9 +1019,9 @@ body {
 
 /* Buttons */
 .ltmk-btn {
-    border: 1px solid #2d5f3f;
-    background: #fff;
-    color: #2d5f3f;
+    border: 1px solid var(--print-green);
+    background: var(--color-surface);
+    color: var(--print-green);
     border-radius: 8px;
     padding: 9px 16px;
     font-size: 14px;
@@ -1002,36 +1031,36 @@ body {
 }
 
 .ltmk-btn:hover {
-    background: #eef5f0;
+    background: var(--store-green-50);
 }
 
 .ltmk-btn--primary {
-    background: #2d5f3f;
-    color: #fff;
+    background: var(--print-green);
+    color: var(--color-on-brand);
     width: 100%;
     padding: 13px 16px;
     font-size: 16px;
 }
 
 .ltmk-btn--primary:hover {
-    background: #234c32;
+    background: var(--print-green-dark);
 }
 
 .ltmk-btn--secondary {
-    background: #fff;
+    background: var(--color-surface);
 }
 
 /* Size controls */
 .ltmk-slider-label {
     display: block;
     font-size: 14px;
-    color: #333;
+    color: var(--laser-tumbler-simple-gray-dark);
     margin-bottom: 6px;
 }
 
 #ltmk-size-slider {
     width: 100%;
-    accent-color: #2d5f3f;
+    accent-color: var(--print-green);
 }
 
 .ltmk-size-actions {
@@ -1043,21 +1072,21 @@ body {
 .ltmk-hint {
     margin: 10px 0 0;
     font-size: 13px;
-    color: #777;
+    color: var(--gray-500);
 }
 
 /* Quote */
 .ltmk-qty-label {
     display: block;
     font-size: 14px;
-    color: #333;
+    color: var(--laser-tumbler-simple-gray-dark);
     margin-bottom: 6px;
 }
 
 #ltmk-qty {
     width: 120px;
     padding: 9px 12px;
-    border: 1px solid #c4d4ca;
+    border: 1px solid var(--laser-tumbler-simple-green);
     border-radius: 8px;
     font-size: 16px;
 }
@@ -1070,7 +1099,7 @@ body {
     display: flex;
     justify-content: space-between;
     font-size: 14px;
-    color: #444;
+    color: var(--gray-700);
     padding: 5px 0;
 }
 
@@ -1079,8 +1108,8 @@ body {
     justify-content: space-between;
     font-size: 18px;
     font-weight: 700;
-    color: #2d5f3f;
-    border-top: 2px solid #2d5f3f;
+    color: var(--print-green);
+    border-top: 2px solid var(--print-green);
     margin-top: 8px;
     padding-top: 10px;
 }
@@ -1088,7 +1117,7 @@ body {
 .ltmk-quote-note {
     margin: 10px 0 0;
     font-size: 12px;
-    color: #888;
+    color: var(--laser-tumbler-simple-gray-2);
 }
 
 .ltmk-quote-warning {
@@ -1096,9 +1125,9 @@ body {
     gap: 8px;
     align-items: flex-start;
     font-size: 14px;
-    color: #92600a;
-    background: #fff8eb;
-    border: 1px solid #f0d9a8;
+    color: var(--print-gold);
+    background: var(--red-50);
+    border: 1px solid var(--laser-tumbler-simple-yellow-3);
     border-radius: 8px;
     padding: 12px;
 }
@@ -1106,8 +1135,8 @@ body {
 /* Preview pane */
 .mockup-preview {
     position: relative;
-    background: #fff;
-    border: 1px solid #e2e8e4;
+    background: var(--color-surface);
+    border: 1px solid var(--gray-200);
     border-radius: 10px;
     padding: 20px;
     text-align: center;
@@ -1126,20 +1155,20 @@ body {
 }
 
 #ltmk-canvas:focus-visible {
-    outline: 3px solid #2d5f3f;
+    outline: 3px solid var(--print-green);
     outline-offset: 2px;
 }
 
 .ltmk-preview-empty {
     padding: 90px 20px;
-    color: #999;
+    color: var(--print-line);
 }
 
 .ltmk-preview-empty i {
     font-size: 42px;
     margin-bottom: 12px;
     display: block;
-    color: #c4d4ca;
+    color: var(--laser-tumbler-simple-green);
 }
 
 .ltmk-preview-loading {
@@ -1148,28 +1177,28 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(255, 255, 255, 0.7);
+    background: rgb(255 255 255 / 70%);
     border-radius: 10px;
 }
 
 .ltmk-preview-error {
     margin-top: 12px;
     padding: 12px;
-    background: #fdf0ef;
-    border: 1px solid #f2c4c0;
+    background: var(--red-50);
+    border: 1px solid var(--laser-tumbler-simple-red-tint);
     border-radius: 8px;
-    color: #b91c1c;
+    color: var(--red-700);
     font-size: 14px;
 }
 
 .ltmk-caption {
     margin: 12px 0 0;
     font-size: 13px;
-    color: #777;
+    color: var(--gray-500);
     font-style: italic;
 }
 
-@media (max-width: 900px) {
+@media (width <= 900px) {
     .mockup-layout {
         grid-template-columns: 1fr;
     }
@@ -1183,4 +1212,5 @@ body {
 .pricing-table th.th-center { text-align: center; }
 
 /* 2026-09-06 review: the hidden attribute must beat any display rule */
+/* stylelint-disable-next-line declaration-no-important -- the hidden attribute must beat any display rule */
 [hidden] { display: none !important; }
