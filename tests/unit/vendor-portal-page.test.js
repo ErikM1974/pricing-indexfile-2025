@@ -111,6 +111,7 @@ describe('vendor portal — rendering', () => {
     test('shared CSS: sr-only, focus-visible, phone block', () => {
         expect(css).toMatch(/\.vp-sr \{ position: absolute; width: 1px/);
         expect(css).toMatch(/\.vp-job-card:focus-visible/);
-        expect(css).toMatch(/@media \(max-width: 560px\) \{[\s\S]*\.vp-job-grid \{ grid-template-columns: 1fr; \}/);
+        // the phone block collapses the job grid (either media-query syntax: stylelint's standard config writes the range form)
+        expect(css).toMatch(/@media \((?:max-width: 560px|width <= 560px)\) \{[\s\S]*\.vp-job-grid \{ grid-template-columns: 1fr; \}/);
     });
 });

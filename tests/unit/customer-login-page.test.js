@@ -59,10 +59,11 @@ describe.each(pages)('%s login page', (_name, html, js, prefix, loginPath) => {
 describe('shared login CSS', () => {
     test('visible focus, invalid outline, readable footer, phone padding', () => {
         expect(css).toMatch(/#cl-submit:focus-visible, \.cl-card a:focus-visible \{ outline: 3px solid/);
-        expect(css).toMatch(/#cl-email\[aria-invalid="true"\] \{ border-color: #a32d2d; \}/);
+        // the invalid outline is the page's red (a raw hex before 2026-09-07, a page-scoped variable since)
+        expect(css).toMatch(/#cl-email\[aria-invalid="true"\] \{ border-color: (?:#a32d2d|var\(--[a-z0-9-]+\)); \}/);
         expect(css).not.toMatch(/\.cl-foot \{ color:#bbb;/);
         expect(css).not.toMatch(/\.cl-hint \{ color:#999;/);
-        expect(css).toMatch(/@media \(max-width: 420px\) \{[\s\S]*\.cl-card \{ padding: 2rem 1\.25rem 1\.5rem;/);
+        expect(css).toMatch(/@media \((?:max-width: 420px|width <= 420px)\) \{[\s\S]*\.cl-card \{ padding: 2rem 1\.25rem 1\.5rem;/);
     });
 });
 

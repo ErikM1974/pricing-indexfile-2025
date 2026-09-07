@@ -1,48 +1,63 @@
-:root { --nw-dark:#1a472a; --nw-med:#3a7c52; }
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue, merged into its
+   existing :root. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
+:root {
+    --customer-login-green: #3a7c52;
+    --customer-login-gray: #5f6b63;
+    --customer-login-gray-2: #66736a;
+ --nw-dark:var(--brand-800); --nw-med:var(--customer-login-green); }
+/* stylelint-enable color-no-hex */
 * { box-sizing: border-box; }
+
 body {
   margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center;
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;
-  background:linear-gradient(135deg,#f5f7f5 0%,#e3f0e7 100%); padding:20px;
+  background:linear-gradient(135deg,var(--gray-100) 0%,var(--store-green-100) 100%); padding:20px;
 }
 .cl-wrap { width:100%; max-width:420px; }
+
 .cl-card {
-  position:relative; background:#fff; border-radius:16px; box-shadow:0 12px 44px rgba(26,71,42,.13);
+  position:relative; background:var(--color-surface); border-radius:16px; box-shadow:0 12px 44px rgb(26 71 42 / 13%);
   padding:2.5rem 2.25rem 2rem; text-align:center; overflow:hidden;
 }
+
 .cl-accent {
   position:absolute; top:0; left:0; right:0; height:5px;
   background:linear-gradient(90deg,var(--nw-dark) 0%,var(--nw-med) 50%,var(--nw-dark) 100%);
 }
 .cl-logo { max-width:180px; height:auto; margin:.5rem 0 1.4rem; }
 h1 { color:var(--nw-dark); font-size:1.4rem; margin:.4rem 0 .5rem; }
-.cl-sub { color:#555; font-size:.97rem; line-height:1.5; margin:0 0 1.4rem; }
+.cl-sub { color:var(--print-ink-soft); font-size:.97rem; line-height:1.5; margin:0 0 1.4rem; }
+
 #cl-email {
-  width:100%; padding:.8rem 1rem; font-size:1rem; border:1.5px solid #d8e0d8; border-radius:9px;
+  width:100%; padding:.8rem 1rem; font-size:1rem; border:1.5px solid var(--gray-300); border-radius:9px;
   outline:none; transition:border-color .15s;
 }
 #cl-email:focus { border-color:var(--nw-med); }
+
 #cl-submit {
   width:100%; margin-top:.9rem; padding:.8rem 1rem; font-size:1rem; font-weight:600;
-  color:#fff; background:var(--nw-med); border:none; border-radius:9px; cursor:pointer;
-  box-shadow:0 4px 14px rgba(58,124,82,.28); transition:background .15s;
+  color:var(--color-surface); background:var(--nw-med); border:none; border-radius:9px; cursor:pointer;
+  box-shadow:0 4px 14px rgb(58 124 82 / 28%); transition:background .15s;
 }
 #cl-submit:hover { background:var(--nw-dark); }
 #cl-submit:disabled { opacity:.6; cursor:default; }
-.cl-error { color:#a32d2d; background:#fceaea; border-radius:8px; padding:.6rem .8rem; font-size:.88rem; margin:1rem 0 0; }
-.cl-check { width:60px; height:60px; margin:0 auto 1rem; border-radius:50%; background:#e8f5e9; color:var(--nw-dark); font-size:1.8rem; line-height:60px; }
-.cl-hint { color:#5f6b63; font-size:.88rem; margin:1rem 0 0; }
+.cl-error { color:var(--color-ae); background:var(--store-rush-soft); border-radius:8px; padding:.6rem .8rem; font-size:.88rem; margin:1rem 0 0; }
+.cl-check { width:60px; height:60px; margin:0 auto 1rem; border-radius:50%; background:var(--brand-100); color:var(--nw-dark); font-size:1.8rem; line-height:60px; }
+.cl-hint { color:var(--customer-login-gray); font-size:.88rem; margin:1rem 0 0; }
 .cl-hint a, .cl-error a, .cl-foot a { color:var(--nw-med); }
-.cl-foot { color:#66736a; font-size:.8rem; margin:1.6rem 0 0; border-top:1px solid #eee; padding-top:1.1rem; }
+.cl-foot { color:var(--customer-login-gray-2); font-size:.8rem; margin:1.6rem 0 0; border-top:1px solid var(--brand-100); padding-top:1.1rem; }
 
 /* Screen-reader-only label for the email field (2026-09-05 portal review). */
 .cl-sr { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 
 /* 2026-09-05 login review: keyboard focus is visible, invalid email is outlined, phones get room. */
 #cl-submit:focus-visible, .cl-card a:focus-visible { outline: 3px solid var(--nw-med); outline-offset: 2px; }
-#cl-email[aria-invalid="true"] { border-color: #a32d2d; }
+#cl-email[aria-invalid="true"] { border-color: var(--color-ae); }
 #cl-sent-view h1:focus { outline: none; }
-@media (max-width: 420px) {
+
+@media (width <= 420px) {
   body { padding: 12px; }
   .cl-card { padding: 2rem 1.25rem 1.5rem; border-radius: 12px; }
   .cl-logo { max-width: 150px; }

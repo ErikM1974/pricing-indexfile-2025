@@ -114,6 +114,41 @@ three gap sizes, `opacity:.5;cursor:not-allowed` ×26 (disabled). These become u
 
 ## 8. Progress log (newest first)
 
+### 2026-09-07 — Staff pages + customer portal batch LIVE (`v2026.09.07.14`): 45 sheets, 46 pages
+
+- **Family = the 45 `pages/*.html` not in the storefront list + `vendor-portals/sanmar-vendor-portal.html`
+  (it loads `vendor-portal.css`), and 45 stylesheets: every remaining `pages/css/*.css`, the four page-level
+  sheets in `pages/`, `product/styles/product.css` (also loaded by the root product page and the golf product
+  page) and four shared widgets (company-contact-picker, garment-submit-form, product-thumbnail-modal,
+  universal-cart-header — the first two also load on the AE dashboard). `quote-print.css` waits for the
+  builders family (one builder links it). The two EmailJS template pages have no stylesheets and were left alone.
+- **Colours:** 3,324 hex uses → 1,650 exact / 1,023 near / 651 far, the far ones now 342 sheet-scoped
+  variables. Token definitions that duplicated the token file byte-for-byte were removed (fifteen in
+  `jds-mockup-creator.css`); six sheets keep their own `--radius-sm/-md` or `--shadow-*` values that shadow
+  the token on their pages (3-day-tees, custom-caps, custom-tees, quote-audit, quote-view, product.css) and
+  `jds-mockup-creator.css` keeps nine — logged on the brand page, not moved.
+- **`!important`: 298 flags — 7 sheets carry a file-level reason (art-request-detail, garment-designer,
+  invoice, policy-detail, quote-audit, quote-view, embroidery-contract-pricing), 56 flags a per-line one.**
+  Eight sheets carry a file-level `no-duplicate-selectors` reason (appended rules; merging reorders the cascade).
+  `font-family-no-missing-generic-family-keyword` now ignores `Font Awesome*`: icon glyphs are private-use
+  codepoints and no fallback family renders them.
+- **Two deliberate look changes, both recorded on the brand page:** the garment designer's page ink
+  (`--text: #22301c`) is KEPT exact — the near token (`--store-ink`) was a shade darker on every heading
+  (the diff caught it: 351 px on one heading). The mockup-library header gradient and back-link now use the
+  brand greens and storefront rule colour (all three stops within the near threshold; the 398 px the diff
+  flagged are sub-pixel text fringes over the slightly darker gradient — verified with a fresh before-shot
+  from a HEAD worktree, which matched the original before-shot pixel for pixel).
+- **Verification:** 49 shots (46 pages + root product page, golf product page, AE dashboard): 46 identical;
+  the 3 that differ are the data-entry guide's "last loaded" timestamp, which product photo the DTG page's
+  grid loaded, and the mockup-library header above. Gates + e2e green.
+- **Tooling:** a re-run of the tokenizer over an already-migrated sheet rewrote its own page-theme block into
+  `--x: var(--x)` self-references (invalid in a browser); the tokenizer now skips its own block and reuses
+  existing page variables, and value continuation lines are joined before tokenizing (memory/LESSONS_LEARNED.md).
+- **Census after:** see § 2 comparison in the final report.
+- **Next:** the quote builders family (`quote-builder-shell.css`, `sticker-pricing-page.css`,
+  `quote-print.css`, the generated `quote-builder-inline.css` retirement) — money path: parity suites +
+  `test:parity:surfaces` after, no `*-pricing-service.js` changes.
+
 ### 2026-09-07 — Calculators family LIVE (`v2026.09.07.12`): 58 sheets, 26 pages
 
 - **Family = the 25 calculator pages + `pages/dtg-compatible-products.html` (it loads two of the same shared

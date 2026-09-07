@@ -1,33 +1,52 @@
+/* stylelint-disable no-duplicate-selectors -- legacy sheet: rules were appended over time; merging them would reorder the cascade (2026-09-07) */
+
 /**
  * Product Page Styles
  * Clean, modern styling with NW Custom Apparel green theme
  */
 
 /* CSS Variables */
+
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue, merged into its
+   existing :root. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
 :root {
+    --product-red: #dc3545;
+    --product-green-dark: #1e4d0f;
+    --product-gray-dark: #333;
+    --product-gray: #666;
+    --product-green: #28a745;
+    --product-yellow: #ffc107;
+    --product-teal: #17a2b8;
+    --product-yellow-2: #d4a017;
+    --product-cyan: #0078d4;
+    --product-cyan-2: #106ebe;
+    --product-yellow-3: #856404;
+
     /* NW Custom Apparel Green Theme */
-    --primary-color: #2f661e;
-    --primary-dark: #1e4d0f;
-    --primary-light: #eaf2e9;
-    --secondary-color: #5cb85c;
+    --primary-color: var(--brand-700);
+    --primary-dark: var(--product-green-dark);
+    --primary-light: var(--brand-100);
+    --secondary-color: var(--brand-500);
     
     /* Neutral Colors */
-    --text-color: #333;
-    --text-light: #666;
-    --border-color: #d8e0d6;
-    --background: #fff;
-    --background-light: #f9fbf8;
+    --text-color: var(--product-gray-dark);
+    --text-light: var(--product-gray);
+    --border-color: var(--gray-300);
+    --background: var(--color-surface);
+    --background-light: var(--gray-50);
     
     /* UI Colors */
-    --error-color: #dc3545;
-    --success-color: #28a745;
-    --warning-color: #ffc107;
-    --info-color: #17a2b8;
+    --error-color: var(--product-red);
+    --success-color: var(--product-green);
+    --warning-color: var(--product-yellow);
+    --info-color: var(--product-teal);
     
     /* Shadows & Effects */
-    --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
-    --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
-    --shadow-lg: 0 10px 20px rgba(0,0,0,0.1);
+    --shadow-sm: 0 1px 3px rgb(0 0 0 / 10%);
+    --shadow-md: 0 4px 6px rgb(0 0 0 / 10%);
+    --shadow-lg: 0 10px 20px rgb(0 0 0 / 10%);
     
     /* Spacing */
     --spacing-xs: 0.25rem;
@@ -40,6 +59,7 @@
     --transition-fast: 0.2s ease;
     --transition-normal: 0.3s ease;
 }
+/* stylelint-enable color-no-hex */
 
 /* Reset & Base Styles */
 * {
@@ -76,6 +96,7 @@ button {
 
 /* Utility Classes */
 .hidden {
+    /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
     display: none !important;
 }
 
@@ -253,14 +274,11 @@ button {
 
 .image-loading {
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    inset: 0;
     display: none;
     align-items: center;
     justify-content: center;
-    background: rgba(255, 255, 255, 0.9);
+    background: rgb(255 255 255 / 90%);
 }
 
 .gallery-thumbnails {
@@ -590,19 +608,19 @@ button {
 }
 
 .stock-indicator.high-stock {
-    color: #2d7a2d;
+    color: var(--store-green-700);
 }
 
 .stock-indicator.medium-stock {
-    color: #2d7a2d;
+    color: var(--store-green-700);
 }
 
 .stock-indicator.low-stock {
-    color: #d4a017;
+    color: var(--product-yellow-2);
 }
 
 .stock-indicator.out-of-stock {
-    color: #dc3545;
+    color: var(--product-red);
 }
 
 .stock-details {
@@ -611,7 +629,7 @@ button {
 }
 
 .check-inventory-btn {
-    background: #0078d4;
+    background: var(--product-cyan);
     color: white;
     border: none;
     padding: 0.75rem 1.5rem;
@@ -623,7 +641,7 @@ button {
 }
 
 .check-inventory-btn:hover {
-    background: #106ebe;
+    background: var(--product-cyan-2);
 }
 
 .inventory-summary.loading {
@@ -687,6 +705,7 @@ button {
 }
 
 .warehouse-col {
+    /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
     text-align: left !important;
     font-weight: 600;
 }
@@ -707,18 +726,18 @@ button {
 
 /* Stock Indicators */
 .stock-good {
-    background: #d4edda;
-    color: #155724;
+    background: var(--store-green-100);
+    color: var(--print-green-dark);
 }
 
 .stock-low {
-    background: #fff3cd;
-    color: #856404;
+    background: var(--amber-100);
+    color: var(--product-yellow-3);
 }
 
 .stock-out {
-    background: #f8d7da;
-    color: #721c24;
+    background: var(--red-100);
+    color: var(--color-ae-dark);
 }
 
 .inventory-legend {
@@ -741,25 +760,22 @@ button {
 }
 
 .stock-indicator.good {
-    background: #d4edda;
+    background: var(--store-green-100);
 }
 
 .stock-indicator.low {
-    background: #fff3cd;
+    background: var(--amber-100);
 }
 
 .stock-indicator.out {
-    background: #f8d7da;
+    background: var(--red-100);
 }
 
 /* Loading & Error States */
 .loading-overlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(255, 255, 255, 0.9);
+    inset: 0;
+    background: rgb(255 255 255 / 90%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -823,7 +839,7 @@ button {
 }
 
 /* Responsive Design */
-@media (max-width: 768px) {
+@media (width <= 768px) {
     .product-content {
         grid-template-columns: 1fr;
     }
@@ -853,7 +869,7 @@ button {
     }
 }
 
-@media (max-width: 480px) {
+@media (width <= 480px) {
     .header-content {
         flex-direction: column;
         gap: var(--spacing-md);
@@ -875,11 +891,12 @@ button {
     .pricing-section,
     .print-inventory,
     .back-link {
+        /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
         display: none !important;
     }
     
     .inventory-table {
-        page-break-inside: avoid;
+        break-inside: avoid;
     }
     
     body {
@@ -895,8 +912,8 @@ button {
 .feature-coming-soon {
     margin-top: 20px;
     padding-top: 15px;
-    border-top: 1px solid #eee;
-    color: #999;
+    border-top: 1px solid var(--brand-100);
+    color: var(--print-line);
     font-size: 0.85em;
     text-align: center;
 }

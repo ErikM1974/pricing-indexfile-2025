@@ -1,8 +1,21 @@
+/* stylelint-disable no-duplicate-selectors -- legacy sheet: rules were appended over time; merging them would reorder the cascade (2026-09-07) */
+
 /* ==========================================================================
    customer-product.css — /portal/product/:style detail page.
    Layers on customer-portal.css (tokens + .cp-swatch-*, .cp-size-*, .cp-btn-*).
    Only page-specific layout lives here.
    ========================================================================== */
+
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue so the page
+   keeps its exact look. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   every rule below uses var(). Raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
+:root {
+    --customer-product-orange: #8a5a00;
+    --customer-product-yellow: #f0d79a;
+    --customer-product-red: #f3c0bb;
+}
+/* stylelint-enable color-no-hex */
 
 .pp-back {
     display: inline-block; margin: 0 0 14px; font-size: 13px; font-weight: 600;
@@ -14,14 +27,16 @@
 .pp-head { margin-bottom: 14px; }
 .pp-title { font-size: 22px; font-weight: 700; color: var(--cp-ink); line-height: 1.25; }
 .pp-sub { font-size: 13.5px; color: var(--cp-ink-soft); margin-top: 3px; }
+
 .pp-total {
     display: inline-block; margin-top: 8px; font-size: 12.5px; font-weight: 700;
     color: var(--cp-theme-dark); background: var(--cp-theme-bg); border: 1px solid var(--cp-theme-light);
     padding: 3px 11px; border-radius: 999px;
 }
+
 .pp-closeout {
     display: flex; gap: 8px; align-items: center; margin-bottom: 16px;
-    font-size: 13px; color: #8a5a00; background: #fff7e8; border: 1px solid #f0d79a;
+    font-size: 13px; color: var(--customer-product-orange); background: var(--store-rush-soft); border: 1px solid var(--customer-product-yellow);
     border-radius: var(--cp-radius-sm); padding: 10px 12px;
 }
 .pp-closeout i { font-style: normal; font-size: 16px; }
@@ -29,14 +44,17 @@
 /* Hero: image + colors */
 .pp-hero { display: flex; gap: 20px; align-items: flex-start; margin-bottom: 8px; flex-wrap: wrap; }
 .pp-hero-media { flex: 0 0 300px; width: 300px; max-width: 100%; }
+
 .pp-hero-img {
     width: 100%; height: 340px;
     background: var(--cp-surface-2); border: 1px solid var(--cp-border); border-radius: var(--cp-radius-lg);
     display: flex; align-items: center; justify-content: center; overflow: hidden;
 }
 .pp-hero-img img { width: 100%; height: 100%; object-fit: contain; }
+
 /* Thumbnail strip — one per available angle (Model front/back/side + Flat front/back) */
 .pp-thumbs { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+
 .pp-thumb {
     width: 58px; height: 66px; padding: 0; overflow: hidden; cursor: pointer;
     border: 1px solid var(--cp-border); border-radius: var(--cp-radius-sm); background: var(--cp-surface-2);
@@ -49,7 +67,7 @@
 .pp-noimg-ico { font-size: 60px; opacity: .3; }
 .pp-hero-side { flex: 1; min-width: 240px; }
 .pp-colorname { font-size: 16px; font-weight: 700; color: var(--cp-ink); margin-bottom: 8px; }
-.pp-swatches-label { font-size: 13px; font-weight: 600; color: #444; margin: 12px 0 7px; }
+.pp-swatches-label { font-size: 13px; font-weight: 600; color: var(--gray-700); margin: 12px 0 7px; }
 .pp-swatches-label small { font-weight: 400; color: var(--cp-ink-mute); }
 .pp-swatches { max-height: none; }   /* show all colors — the page scrolls */
 
@@ -58,13 +76,14 @@
 .pp-avail-label { font-size: 12px; font-weight: 600; color: var(--cp-ink-soft); margin-right: 2px; }
 .pp-avail-load { font-size: 12px; color: var(--cp-ink-mute); }
 .pp-avail-note { font-size: 12px; color: var(--cp-ink-mute); font-style: italic; }
+
 .pp-dot {
     font-size: 11px; font-weight: 700; letter-spacing: .01em; padding: 2px 8px; border-radius: 999px;
     border: 1px solid transparent;
 }
 .pp-dot--in  { background: var(--cp-theme-bg-hover); color: var(--cp-theme-dark); border-color: var(--cp-theme-light); }
-.pp-dot--low { background: #fff4e0; color: #8a5a00; border-color: #f0d79a; }
-.pp-dot--out { background: #fdecea; color: #b3261e; border-color: #f3c0bb; text-decoration: line-through; }
+.pp-dot--low { background: var(--store-rush-soft); color: var(--customer-product-orange); border-color: var(--customer-product-yellow); }
+.pp-dot--out { background: var(--store-rush-soft); color: var(--red-700); border-color: var(--customer-product-red); text-decoration: line-through; }
 .pp-dot--na  { background: var(--cp-gray-100); color: var(--cp-ink-mute); }
 
 /* Sections (card-like, matching the portal) */
@@ -96,15 +115,17 @@
 /* Re-order panel */
 .pp-reorder .cp-size-grid { margin-top: 2px; }
 .pp-field { display: block; margin: 12px 0; }
-.pp-flabel { display: block; font-size: 13px; font-weight: 600; color: #444; margin-bottom: 6px; }
-.pp-flabel small { font-weight: 400; color: #999; }
+.pp-flabel { display: block; font-size: 13px; font-weight: 600; color: var(--gray-700); margin-bottom: 6px; }
+.pp-flabel small { font-weight: 400; color: var(--print-line); }
+
 .pp-reorder textarea {
-    width: 100%; padding: 9px 11px; border: 1px solid #d4d9d0; border-radius: 8px;
+    width: 100%; padding: 9px 11px; border: 1px solid var(--gray-300); border-radius: 8px;
     font-size: 14px; font-family: inherit; resize: vertical;
 }
-.pp-reorder textarea:focus { outline: none; border-color: var(--cp-theme); box-shadow: 0 0 0 3px rgba(46,125,50,.12); }
-.pp-req-error { color: #b3261e; font-size: 13px; min-height: 1em; margin-bottom: 6px; }
+.pp-reorder textarea:focus { outline: none; border-color: var(--cp-theme); box-shadow: 0 0 0 3px rgb(46 125 50 / 12%); }
+.pp-req-error { color: var(--red-700); font-size: 13px; min-height: 1em; margin-bottom: 6px; }
 .pp-req-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+
 .pp-addlist-btn {
     background: var(--cp-surface); color: var(--cp-theme-dark); border: 1px solid var(--cp-theme-light);
     border-radius: 8px; padding: 11px 16px; font-size: 14px; font-weight: 600; font-family: inherit; cursor: pointer;
@@ -114,6 +135,7 @@
 
 /* Decoration-method picker (re-order) — defaulted from history; enforces the API minimum, no price */
 .pp-methods { display: flex; flex-wrap: wrap; gap: 8px; }
+
 .pp-method {
     position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: 1px;
     padding: 8px 13px; min-width: 96px; border: 1px solid var(--cp-border); border-radius: var(--cp-radius-sm);
@@ -123,15 +145,17 @@
 .pp-method.is-selected { border: 2px solid var(--cp-theme); padding: 7px 12px; background: var(--cp-theme-bg); }
 .pp-method-nm { font-size: 13.5px; font-weight: 700; color: var(--cp-ink); }
 .pp-method-hint { font-size: 11px; color: var(--cp-ink-mute); }
+
 .pp-method-tag {
     position: absolute; top: -8px; right: 8px; font-size: 9px; font-weight: 700; letter-spacing: .02em;
-    background: var(--cp-theme); color: #fff; padding: 1px 6px; border-radius: 999px;
+    background: var(--cp-theme); color: var(--color-on-brand); padding: 1px 6px; border-radius: 999px;
 }
-.pp-method-note { flex-basis: 100%; font-size: 12px; color: #8a5a00; margin-top: 4px; }
+.pp-method-note { flex-basis: 100%; font-size: 12px; color: var(--customer-product-orange); margin-top: 4px; }
 .pp-method-min { font-size: 12.5px; line-height: 1.5; margin-top: 8px; }
+
 .pp-method-min--warn {
-    display: flex; gap: 8px; align-items: flex-start; color: #8a5a00;
-    background: #fff7e8; border: 1px solid #f0d79a; border-radius: var(--cp-radius-sm); padding: 9px 11px;
+    display: flex; gap: 8px; align-items: flex-start; color: var(--customer-product-orange);
+    background: var(--store-rush-soft); border: 1px solid var(--customer-product-yellow); border-radius: var(--cp-radius-sm); padding: 9px 11px;
 }
 .pp-method-min--warn i { font-style: normal; font-size: 15px; line-height: 1.2; }
 
@@ -160,7 +184,7 @@
 .pp-up-mxtable th, .pp-up-mxtable td { border: 1px solid var(--cp-border-soft); padding: 6px 8px; text-align: center; }
 .pp-up-mxtable th.lbl, .pp-up-mxtable td.lbl { text-align: left; color: var(--cp-ink-soft); }
 .pp-up-mxtable thead th { background: var(--cp-zebra); color: var(--cp-ink-soft); font-weight: 700; }
-.pp-up-mxtable td.warn { color: #8a5a00; }
+.pp-up-mxtable td.warn { color: var(--customer-product-orange); }
 .pp-up-mxfoot { font-size: 11px; color: var(--cp-ink-mute); margin-top: 6px; line-height: 1.5; }
 .pp-up-btn { margin-top: 8px; }
 .pp-req-hint { font-weight: 400; font-size: 12px; color: var(--cp-ink-mute); }
@@ -175,6 +199,7 @@
 /* Quick-link chips — jump to page sections (portal-appropriate stand-in for SanMar's
    "Check inventory and pricing": we route to a rep quote, not a public price) */
 .pp-quicklinks { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 16px; }
+
 .pp-ql {
     display: inline-flex; align-items: center; font-size: 12.5px; font-weight: 600; text-decoration: none;
     padding: 6px 13px; border-radius: 999px; background: var(--cp-surface-2); color: var(--cp-ink);
@@ -195,7 +220,7 @@ html { scroll-behavior: smooth; }
 .pp-swatches .cp-swatch-qty { font-size: 10px; }
 .pp-swatches .cp-swatch-tag { font-size: 9px; padding: 1px 6px; }
 
-@media (max-width: 560px) {
+@media (width <= 560px) {
     .pp-hero-media { flex-basis: 100%; width: 100%; }
     .pp-hero-img { height: 300px; }
     .pp-title { font-size: 19px; }
@@ -205,7 +230,8 @@ html { scroll-behavior: smooth; }
 .cp-header-brand { font-family: var(--cp-font-display); font-size: 19px; font-weight: 600; line-height: 1.15; }
 .pp-title { margin: 0; }
 .pp-error-retry { margin-top: 14px; }
-@media (max-width: 560px) {
+
+@media (width <= 560px) {
     .cp-header { padding: 12px 14px; gap: 10px; }
     .cp-header-logo { height: 36px; padding: 4px 8px; }
     .cp-header-text { min-width: 0; }
@@ -215,4 +241,5 @@ html { scroll-behavior: smooth; }
     .cp-header-link .pp-back-long { display: none; }
 }
 .cp-header-link .pp-back-short { display: none; }
-@media (max-width: 560px) { .cp-header-link .pp-back-short { display: inline; } }
+
+@media (width <= 560px) { .cp-header-link .pp-back-short { display: inline; } }

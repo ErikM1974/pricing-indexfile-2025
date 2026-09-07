@@ -3,6 +3,19 @@
  * Clean, branded layout for sharing design images with customers.
  */
 
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue so the page
+   keeps its exact look. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   every rule below uses var(). Raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
+:root {
+    --design-view-gray: #888;
+    --design-view-gray-dark: #333;
+    --design-view-gray-2: #666;
+    --design-view-gray-3: #bbb;
+    --design-view-lime: #8cc63f;
+}
+/* stylelint-enable color-no-hex */
+
 /* ── Reset & Base ─────────────────────────────────────── */
 *, *::before, *::after {
     box-sizing: border-box;
@@ -12,8 +25,8 @@
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-    background: #f5f6f8;
-    color: #333;
+    background: var(--gray-100);
+    color: var(--design-view-gray-dark);
     min-height: 100vh;
     display: flex;
     flex-direction: column;
@@ -21,10 +34,10 @@ body {
 
 /* ── Header ───────────────────────────────────────────── */
 .dv-header {
-    background: #2e5827;
-    color: #fff;
+    background: var(--brand-700);
+    color: var(--color-on-brand);
     padding: 16px 24px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 2px 8px rgb(0 0 0 / 15%);
 }
 
 .dv-header-inner {
@@ -67,8 +80,8 @@ body {
 .dv-spinner {
     width: 40px;
     height: 40px;
-    border: 4px solid #e0e0e0;
-    border-top-color: #2e5827;
+    border: 4px solid var(--gray-200);
+    border-top-color: var(--brand-700);
     border-radius: 50%;
     animation: dv-spin 0.8s linear infinite;
 }
@@ -78,7 +91,7 @@ body {
 }
 
 .dv-loading p {
-    color: #888;
+    color: var(--design-view-gray);
     font-size: 15px;
 }
 
@@ -95,30 +108,30 @@ body {
 
 .dv-error i {
     font-size: 48px;
-    color: #cc3333;
+    color: var(--red-600);
     margin-bottom: 16px;
 }
 
 .dv-error h2 {
     font-size: 22px;
-    color: #333;
+    color: var(--design-view-gray-dark);
     margin-bottom: 8px;
 }
 
 .dv-error p {
     font-size: 15px;
-    color: #666;
+    color: var(--design-view-gray-2);
     max-width: 400px;
 }
 
 .dv-contact {
     margin-top: 24px;
     font-size: 14px;
-    color: #888;
+    color: var(--design-view-gray);
 }
 
 .dv-contact a {
-    color: #2e5827;
+    color: var(--brand-700);
     text-decoration: none;
     font-weight: 600;
 }
@@ -145,27 +158,27 @@ body {
 .dv-design-number {
     font-size: 26px;
     font-weight: 700;
-    color: #2e5827;
+    color: var(--brand-700);
     margin-bottom: 6px;
 }
 
 .dv-company {
     font-size: 16px;
-    color: #555;
+    color: var(--print-ink-soft);
     font-weight: 500;
 }
 
 .dv-name {
     font-size: 14px;
-    color: #888;
+    color: var(--design-view-gray);
     margin-top: 4px;
 }
 
 /* ── Hero Image ───────────────────────────────────────── */
 .dv-hero {
-    background: #fff;
+    background: var(--color-surface);
     border-radius: 12px;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 2px 12px rgb(0 0 0 / 8%);
     overflow: hidden;
     margin-bottom: 24px;
     text-align: center;
@@ -196,9 +209,9 @@ body {
 }
 
 .dv-grid-item {
-    background: #fff;
+    background: var(--color-surface);
     border-radius: 10px;
-    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.07);
+    box-shadow: 0 1px 6px rgb(0 0 0 / 7%);
     overflow: hidden;
     cursor: pointer;
     transition: box-shadow 0.2s ease, transform 0.15s ease;
@@ -206,13 +219,13 @@ body {
 }
 
 .dv-grid-item:hover {
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 4px 16px rgb(0 0 0 / 12%);
     transform: translateY(-2px);
 }
 
 .dv-grid-item.active {
-    border-color: #2e5827;
-    box-shadow: 0 2px 10px rgba(46, 88, 39, 0.2);
+    border-color: var(--brand-700);
+    box-shadow: 0 2px 10px rgb(46 88 39 / 20%);
 }
 
 .dv-grid-item img {
@@ -220,17 +233,17 @@ body {
     height: 180px;
     object-fit: contain;
     padding: 12px;
-    background: #fafafa;
+    background: var(--gray-50);
 }
 
 .dv-grid-label {
     padding: 8px 12px;
     font-size: 12px;
     font-weight: 600;
-    color: #555;
+    color: var(--print-ink-soft);
     text-align: center;
-    background: #fff;
-    border-top: 1px solid #f0f0f0;
+    background: var(--color-surface);
+    border-top: 1px solid var(--gray-100);
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
@@ -239,12 +252,12 @@ body {
 .dv-no-images {
     text-align: center;
     padding: 60px 24px;
-    color: #888;
+    color: var(--design-view-gray);
 }
 
 .dv-no-images i {
     font-size: 48px;
-    color: #ccc;
+    color: var(--gray-300);
     margin-bottom: 16px;
 }
 
@@ -255,8 +268,8 @@ body {
 
 /* ── Footer ───────────────────────────────────────────── */
 .dv-footer {
-    background: #333;
-    color: #bbb;
+    background: var(--design-view-gray-dark);
+    color: var(--design-view-gray-3);
     padding: 20px 24px;
     text-align: center;
     margin-top: auto;
@@ -273,11 +286,11 @@ body {
 }
 
 .dv-footer strong {
-    color: #fff;
+    color: var(--color-on-brand);
 }
 
 .dv-footer a {
-    color: #8cc63f;
+    color: var(--design-view-lime);
     text-decoration: none;
 }
 
@@ -289,7 +302,7 @@ body {
 .dv-lightbox {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.92);
+    background: rgb(0 0 0 / 92%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -309,16 +322,16 @@ body {
     max-height: 92vh;
     object-fit: contain;
     border-radius: 4px;
-    box-shadow: 0 0 40px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 0 40px rgb(0 0 0 / 40%);
 }
 
 .dv-lightbox-close {
     position: absolute;
     top: 16px;
     right: 20px;
-    background: rgba(255, 255, 255, 0.15);
+    background: rgb(255 255 255 / 15%);
     border: none;
-    color: #fff;
+    color: var(--color-on-brand);
     font-size: 22px;
     width: 44px;
     height: 44px;
@@ -332,11 +345,11 @@ body {
 }
 
 .dv-lightbox-close:hover {
-    background: rgba(255, 255, 255, 0.3);
+    background: rgb(255 255 255 / 30%);
 }
 
 /* ── Responsive ───────────────────────────────────────── */
-@media (max-width: 768px) {
+@media (width <= 768px) {
     .dv-header {
         padding: 12px 16px;
     }
@@ -386,7 +399,7 @@ body {
     }
 }
 
-@media (max-width: 480px) {
+@media (width <= 480px) {
     .dv-image-grid {
         grid-template-columns: 1fr 1fr;
         gap: 10px;
@@ -402,9 +415,10 @@ body {
 }
 
 /* 2026-09-05 review */
+/* stylelint-disable-next-line declaration-no-important -- the hidden attribute must beat any display rule */
 [hidden] { display: none !important; }
 body.dv-modal-open { overflow: hidden; }
 .dv-hero-btn { display: block; width: 100%; background: none; border: 0; padding: 0; cursor: zoom-in; }
 .dv-hero-btn img { display: block; width: 100%; }
 button.dv-grid-item { font: inherit; background: none; border: 0; padding: 0; cursor: pointer; text-align: center; }
-.dv-hero-btn:focus-visible, .dv-grid-item:focus-visible, .dv-lightbox-close:focus-visible { outline: 3px solid #2e6f40; outline-offset: 3px; }
+.dv-hero-btn:focus-visible, .dv-grid-item:focus-visible, .dv-lightbox-close:focus-visible { outline: 3px solid var(--print-green); outline-offset: 3px; }

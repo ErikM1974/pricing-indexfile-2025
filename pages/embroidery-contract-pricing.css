@@ -1,3 +1,7 @@
+/* stylelint-disable no-duplicate-selectors -- legacy sheet: rules were appended over time; merging them would reorder the cascade (2026-09-07) */
+
+/* stylelint-disable declaration-no-important -- legacy sheet: a stack of overrides and Caspio/inline-style fights; the flags come out together when the page is untangled (2026-09-07) */
+
 /**
  * Embroidery Contract Pricing - Standalone Page Styles
  *
@@ -5,18 +9,30 @@
  * Mobile responsive and printable.
  */
 
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue, merged into its
+   existing :root. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
 :root {
-    --primary-color: #4cb354;
-    --primary-dark: #409a47;
-    --text-primary: #333333;
-    --text-secondary: #666666;
-    --border-color: #e5e7eb;
-    --bg-light: #f9f9f9;
-    --ltm-bg: #fef08a;
-    --ltm-border: #ca8a04;
-    --ltm-text: #92400e;
-    --rate-row-bg: #e8f5e9;
+    --embroidery-contract-pricing-yellow: #fde047;
+    --embroidery-contract-pricing-gray-dark: #333;
+    --embroidery-contract-pricing-gray: #666;
+    --embroidery-contract-pricing-yellow-2: #fef08a;
+    --embroidery-contract-pricing-yellow-3: #ca8a04;
+    --embroidery-contract-pricing-orange: #78350f;
+    --embroidery-contract-pricing-red: #ef4444;
+    --primary-color: var(--brand-500);
+    --primary-dark: var(--brand-600);
+    --text-primary: var(--embroidery-contract-pricing-gray-dark);
+    --text-secondary: var(--embroidery-contract-pricing-gray);
+    --border-color: var(--gray-200);
+    --bg-light: var(--gray-50);
+    --ltm-bg: var(--embroidery-contract-pricing-yellow-2);
+    --ltm-border: var(--embroidery-contract-pricing-yellow-3);
+    --ltm-text: var(--amber-800);
+    --rate-row-bg: var(--brand-100);
 }
+/* stylelint-enable color-no-hex */
 
 * {
     margin: 0;
@@ -25,7 +41,7 @@
 }
 
 body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     background-color: var(--bg-light);
     color: var(--text-primary);
     line-height: 1.6;
@@ -71,19 +87,19 @@ body {
 }
 
 .company-name {
-    font-family: 'Poppins', sans-serif;
+    font-family: Poppins, sans-serif;
     font-size: 28px;
     font-weight: 700;
     color: var(--text-primary);
-    margin: 0 0 4px 0;
+    margin: 0 0 4px;
 }
 
 .page-title {
-    font-family: 'Poppins', sans-serif;
+    font-family: Poppins, sans-serif;
     font-size: 20px;
     font-weight: 600;
     color: var(--primary-color);
-    margin: 0 0 8px 0;
+    margin: 0 0 8px;
 }
 
 .company-address {
@@ -101,13 +117,13 @@ body {
     font-size: 16px;
     font-weight: 600;
     color: var(--text-primary);
-    margin: 0 0 4px 0;
+    margin: 0 0 4px;
 }
 
 .contact-title {
     font-size: 13px;
     color: var(--text-secondary);
-    margin: 0 0 4px 0;
+    margin: 0 0 4px;
 }
 
 .contact-email {
@@ -115,7 +131,7 @@ body {
     color: var(--primary-color);
     text-decoration: none;
     display: block;
-    margin: 0 0 2px 0;
+    margin: 0 0 2px;
 }
 
 .contact-email:hover {
@@ -125,7 +141,7 @@ body {
 .contact-phone {
     font-size: 13px;
     color: var(--text-secondary);
-    margin: 0 0 10px 0;
+    margin: 0 0 10px;
 }
 
 /* Print Button */
@@ -168,11 +184,11 @@ body {
 }
 
 .table-section h3 {
-    font-family: 'Poppins', sans-serif;
+    font-family: Poppins, sans-serif;
     font-size: 16px;
     font-weight: 600;
     color: var(--text-primary);
-    margin: 0 0 12px 0;
+    margin: 0 0 12px;
     padding-bottom: 8px;
     border-bottom: 2px solid var(--border-color);
     display: flex;
@@ -181,11 +197,11 @@ body {
 }
 
 .part-number {
-    font-family: 'Consolas', 'Monaco', monospace;
+    font-family: Consolas, Monaco, monospace;
     font-size: 11px;
     font-weight: 500;
     color: var(--text-secondary);
-    background: #f0f0f0;
+    background: var(--gray-100);
     padding: 3px 8px;
     border-radius: 4px;
     border: 1px solid var(--border-color);
@@ -206,7 +222,7 @@ body {
 }
 
 .pricing-table th {
-    background: #f5f5f5;
+    background: var(--gray-100);
     font-weight: 600;
     color: var(--text-primary);
     font-size: 12px;
@@ -216,16 +232,16 @@ body {
 .pricing-table td:first-child {
     text-align: left;
     font-weight: 500;
-    background: #fafafa;
+    background: var(--gray-50);
     width: 70px;
 }
 
 .pricing-table tbody tr:nth-child(even) {
-    background: #fcfcfc;
+    background: var(--gray-50);
 }
 
 .pricing-table tbody tr:hover {
-    background: #f0f9f0;
+    background: var(--color-dash-theme-bg);
 }
 
 /* LTM Columns (yellow highlight) */
@@ -236,7 +252,7 @@ body {
 }
 
 .pricing-table tbody tr:hover td.ltm-col {
-    background-color: #fde047;
+    background-color: var(--embroidery-contract-pricing-yellow);
 }
 
 /* Rate footer row */
@@ -260,15 +276,15 @@ body {
 .ltm-note {
     font-size: 13px;
     color: var(--ltm-text);
-    background: #fef9c3;
+    background: var(--amber-100);
     padding: 10px 14px;
     border-radius: 6px;
     margin: 16px 0;
-    border-left: 4px solid #fde047;
+    border-left: 4px solid var(--embroidery-contract-pricing-yellow);
 }
 
 .ltm-note strong {
-    color: #78350f;
+    color: var(--embroidery-contract-pricing-orange);
 }
 
 /* ============================================
@@ -282,11 +298,11 @@ body {
 }
 
 .laser-patch-section h3 {
-    font-family: 'Poppins', sans-serif;
+    font-family: Poppins, sans-serif;
     font-size: 16px;
     font-weight: 600;
     color: var(--text-primary);
-    margin: 0 0 12px 0;
+    margin: 0 0 12px;
 }
 
 .laser-patch-table {
@@ -317,7 +333,7 @@ body {
 
 .page-footer p {
     font-size: 12px;
-    color: #999;
+    color: var(--print-line);
     margin: 0;
 }
 
@@ -346,12 +362,12 @@ body {
 }
 
 .error-banner {
-    background: #fee2e2;
-    color: #b91c1c;
+    background: var(--red-100);
+    color: var(--red-700);
     padding: 16px 20px;
     border-radius: 8px;
     margin-bottom: 20px;
-    border-left: 4px solid #ef4444;
+    border-left: 4px solid var(--embroidery-contract-pricing-red);
     display: none;
 }
 
@@ -363,7 +379,7 @@ body {
    MOBILE RESPONSIVE
    ============================================ */
 
-@media (max-width: 900px) {
+@media (width <= 900px) {
     .contract-pricing-page {
         padding: 16px;
     }
@@ -393,7 +409,7 @@ body {
     }
 }
 
-@media (max-width: 600px) {
+@media (width <= 600px) {
     .company-name {
         font-size: 22px;
     }
@@ -514,7 +530,7 @@ body {
     }
 
     .table-section {
-        page-break-inside: avoid;
+        break-inside: avoid;
     }
 
     .table-section h3 {
@@ -545,12 +561,12 @@ body {
 
     /* Force background colors in print */
     .pricing-table th {
-        background: #f5f5f5 !important;
+        background: var(--gray-100) !important;
     }
 
     .pricing-table th:first-child,
     .pricing-table td:first-child {
-        background: #fafafa !important;
+        background: var(--gray-50) !important;
     }
 
     .pricing-table th.ltm-col,

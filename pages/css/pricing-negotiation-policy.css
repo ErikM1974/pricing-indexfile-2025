@@ -1,16 +1,28 @@
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue, merged into its
+   existing :root. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
 :root {
-    --nwca-green: #2d5f3f;
-    --nwca-dark-green: #1a3a26;
-    --nwca-light-green: #4a7c59;
-    --warning-red: #dc3545;
-    --success-green: #28a745;
-    --info-blue: #17a2b8;
-    --warning-yellow: #ffc107;
+    --pricing-negotiation-policy-green: #4a7c59;
+    --pricing-negotiation-policy-red: #dc3545;
+    --pricing-negotiation-policy-green-2: #28a745;
+    --pricing-negotiation-policy-teal: #17a2b8;
+    --pricing-negotiation-policy-yellow: #ffc107;
+    --pricing-negotiation-policy-red-2: #ff6b6b;
+    --pricing-negotiation-policy-red-3: #ff5252;
+    --nwca-green: var(--print-green);
+    --nwca-dark-green: var(--store-green-900);
+    --nwca-light-green: var(--pricing-negotiation-policy-green);
+    --warning-red: var(--pricing-negotiation-policy-red);
+    --success-green: var(--pricing-negotiation-policy-green-2);
+    --info-blue: var(--pricing-negotiation-policy-teal);
+    --warning-yellow: var(--pricing-negotiation-policy-yellow);
 }
+/* stylelint-enable color-no-hex */
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    background-color: #f8f9fa;
+    background-color: var(--gray-50);
 }
 
 .header-banner {
@@ -24,16 +36,13 @@ body {
 .header-banner::before {
     content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    inset: 0;
     background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></svg>') center/cover;
 }
 
 .new-badge {
     display: inline-block;
-    background: linear-gradient(135deg, #ff6b6b 0%, #ff5252 100%);
+    background: linear-gradient(135deg, var(--pricing-negotiation-policy-red-2) 0%, var(--pricing-negotiation-policy-red-3) 100%);
     color: white;
     padding: 0.25rem 0.75rem;
     border-radius: 20px;
@@ -41,7 +50,7 @@ body {
     font-weight: 600;
     margin-left: 1rem;
     animation: pulse 2s infinite;
-    box-shadow: 0 2px 8px rgba(255, 82, 82, 0.3);
+    box-shadow: 0 2px 8px rgb(255 82 82 / 30%);
 }
 
 @keyframes pulse {
@@ -53,7 +62,7 @@ body {
 .breadcrumb-container {
     background: white;
     padding: 1rem 0;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 4px rgb(0 0 0 / 5%);
     margin-bottom: 2rem;
 }
 
@@ -62,11 +71,11 @@ body {
     border-radius: 10px;
     padding: 2rem;
     margin-bottom: 2rem;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 8px rgb(0 0 0 / 5%);
 }
 
 .executive-summary {
-    background: linear-gradient(135deg, #f8f9fa 0%, #fff 100%);
+    background: linear-gradient(135deg, var(--gray-50) 0%, var(--color-surface) 100%);
     border-left: 5px solid var(--nwca-green);
     padding: 2rem;
     margin-bottom: 2rem;
@@ -74,7 +83,7 @@ body {
 
 .principle-card {
     background: white;
-    border: 1px solid #e9ecef;
+    border: 1px solid var(--gray-200);
     border-radius: 8px;
     padding: 1.5rem;
     margin-bottom: 1rem;
@@ -82,7 +91,7 @@ body {
 }
 
 .principle-card:hover {
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 12px rgb(0 0 0 / 10%);
     transform: translateY(-2px);
 }
 
@@ -100,7 +109,7 @@ body {
 }
 
 .danger-box {
-    background: linear-gradient(135deg, #fff5f5 0%, #ffe0e0 100%);
+    background: linear-gradient(135deg, var(--red-50) 0%, var(--red-100) 100%);
     border: 2px solid var(--warning-red);
     border-radius: 8px;
     padding: 1.5rem;
@@ -108,7 +117,7 @@ body {
 }
 
 .success-box {
-    background: linear-gradient(135deg, #f0fff4 0%, #dcffe4 100%);
+    background: linear-gradient(135deg, var(--brand-50) 0%, var(--brand-100) 100%);
     border: 2px solid var(--success-green);
     border-radius: 8px;
     padding: 1.5rem;
@@ -116,7 +125,7 @@ body {
 }
 
 .info-box {
-    background: linear-gradient(135deg, #e7f5ff 0%, #d0ebff 100%);
+    background: linear-gradient(135deg, var(--sky-100) 0%, var(--sky-100) 100%);
     border: 2px solid var(--info-blue);
     border-radius: 8px;
     padding: 1.5rem;
@@ -124,7 +133,7 @@ body {
 }
 
 .scenario-card {
-    background: #f8f9fa;
+    background: var(--gray-50);
     border-radius: 8px;
     padding: 1.5rem;
     margin-bottom: 1.5rem;
@@ -145,7 +154,7 @@ body {
 
 .economic-table {
     background: white;
-    border: 2px solid #dee2e6;
+    border: 2px solid var(--gray-200);
     border-radius: 8px;
     overflow: hidden;
 }
@@ -162,11 +171,11 @@ body {
 
 .economic-table td {
     padding: 1rem;
-    border-bottom: 1px solid #dee2e6;
+    border-bottom: 1px solid var(--gray-200);
 }
 
 .economic-table tr:nth-child(even) {
-    background: #f8f9fa;
+    background: var(--gray-50);
 }
 
 .timeline {
@@ -207,7 +216,7 @@ body {
     background: var(--nwca-green);
     border-radius: 50%;
     border: 4px solid white;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    box-shadow: 0 2px 4px rgb(0 0 0 / 20%);
 }
 
 .timeline-item:nth-child(odd) .timeline-dot {
@@ -219,7 +228,7 @@ body {
 }
 
 .value-add-card {
-    background: linear-gradient(135deg, #f0fff4 0%, #dcffe4 100%);
+    background: linear-gradient(135deg, var(--brand-50) 0%, var(--brand-100) 100%);
     border: 2px solid var(--success-green);
     border-radius: 8px;
     padding: 1.5rem;
@@ -244,7 +253,7 @@ body {
     text-align: center;
     line-height: 50px;
     cursor: pointer;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 12px rgb(0 0 0 / 20%);
     transition: all 0.3s ease;
     z-index: 1000;
 }
@@ -260,7 +269,7 @@ body {
     background: white;
     border-radius: 8px;
     padding: 1.5rem;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 8px rgb(0 0 0 / 10%);
 }
 
 .quick-reference h5 {
@@ -275,11 +284,11 @@ body {
 
 .quick-reference li {
     padding: 0.5rem 0;
-    border-bottom: 1px solid #e9ecef;
+    border-bottom: 1px solid var(--gray-200);
 }
 
 .quick-reference a {
-    color: #495057;
+    color: var(--gray-600);
     text-decoration: none;
     transition: color 0.3s ease;
 }
@@ -288,18 +297,21 @@ body {
     color: var(--nwca-green);
 }
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
     .timeline::before {
         left: 20px;
     }
 
     .timeline-item {
         width: 100%;
+        /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
         margin-left: 40px !important;
+        /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
         text-align: left !important;
     }
 
     .timeline-dot {
+        /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
         left: -30px !important;
     }
 
@@ -309,4 +321,5 @@ body {
 }
 
 /* 2026-09-05 review: extracted from the page (Rule 3) */
+/* stylelint-disable-next-line declaration-no-important -- the hidden attribute must beat any display rule */
 [hidden] { display: none !important; }

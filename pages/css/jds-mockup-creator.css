@@ -11,55 +11,53 @@
  */
 
 /* ── 2026 design tokens (scoped to this page) ───────────────────────── */
+
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue, merged into its
+   existing :root. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
 :root {
+    --jds-mockup-creator-yellow: #fcd34d;
+    --jds-mockup-creator-green: #16a34a;
+    --jds-mockup-creator-green-2: #15803d;
+    --jds-mockup-creator-orange: #78350f;
+    --jds-mockup-creator-red-tint: #fecaca;
+
     /* Surfaces */
-    --surface-page:     #f7f8fa;
-    --surface-card:     #ffffff;
-    --surface-inset:    #f3f4f6;
-    --surface-hover:    #f9fafb;
+    --surface-page:     var(--gray-50);
+    --surface-card:     var(--color-surface);
+    --surface-inset:    var(--gray-100);
+    --surface-hover:    var(--gray-50);
 
     /* Neutral ramp */
-    --gray-50:  #f9fafb;
-    --gray-100: #f3f4f6;
-    --gray-200: #e5e7eb;
-    --gray-300: #d1d5db;
-    --gray-400: #9ca3af;
-    --gray-500: #6b7280;
-    --gray-600: #4b5563;
-    --gray-700: #374151;
-    --gray-800: #1f2937;
-    --gray-900: #111827;
 
     /* Brand — NWCA maroon */
-    --brand:        #7f1d1d;
-    --brand-strong: #991b1b;
-    --brand-tint:   #fef2f2;
-    --brand-ring:   rgba(127, 29, 29, 0.22);
+    --brand:        var(--print-red);
+    --brand-strong: var(--red-800);
+    --brand-tint:   var(--red-50);
+    --brand-ring:   rgb(127 29 29 / 22%);
 
     /* Positive action (download) */
-    --success:       #16a34a;
-    --success-hover: #15803d;
+    --success:       var(--jds-mockup-creator-green);
+    --success-hover: var(--jds-mockup-creator-green-2);
 
     /* Semantic state */
-    --warning:      #d97706;
-    --warning-bg:   #fffbeb;
-    --warning-line: #f59e0b;
-    --warning-ink:  #78350f;
-    --warning-ink-strong: #92400e;
-    --danger:       #b91c1c;
-    --danger-bg:    #fef2f2;
-    --danger-line:  #fecaca;
+    --warning:      var(--amber-600);
+    --warning-bg:   var(--store-paper);
+    --warning-line: var(--amber-500);
+    --warning-ink:  var(--jds-mockup-creator-orange);
+    --warning-ink-strong: var(--amber-800);
+    --danger:       var(--red-700);
+    --danger-bg:    var(--red-50);
+    --danger-line:  var(--jds-mockup-creator-red-tint);
 
     /* Elevation */
-    --shadow-sm: 0 1px 2px rgba(15,23,42,.04), 0 1px 1px rgba(15,23,42,.03);
-    --shadow-md: 0 2px 4px rgba(15,23,42,.04), 0 4px 12px rgba(15,23,42,.06);
-    --shadow-lg: 0 8px 24px -8px rgba(15,23,42,.18), 0 4px 10px -4px rgba(15,23,42,.08);
+    --shadow-sm: 0 1px 2px rgb(15 23 42 / 4%), 0 1px 1px rgb(15 23 42 / 3%);
+    --shadow-md: 0 2px 4px rgb(15 23 42 / 4%), 0 4px 12px rgb(15 23 42 / 6%);
+    --shadow-lg: 0 8px 24px -8px rgb(15 23 42 / 18%), 0 4px 10px -4px rgb(15 23 42 / 8%);
 
     /* Spacing (4-base) */
-    --space-1: 4px;
-    --space-2: 8px;
-    --space-3: 12px;
-    --space-4: 16px;
+
     --space-5: 20px;
     --space-6: 24px;
     --space-8: 32px;
@@ -68,19 +66,19 @@
     --radius-sm:   4px;
     --radius-md:   8px;
     --radius-lg:   12px;
-    --radius-pill: 999px;
 
     /* Motion */
     --ease-out: cubic-bezier(.2,.8,.2,1);
     --dur-fast: 120ms;
     --dur-base: 200ms;
 }
+/* stylelint-enable color-no-hex */
 
 * { box-sizing: border-box; }
 
 body {
     margin: 0;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     font-feature-settings: 'cv11', 'ss01';
     -webkit-font-smoothing: antialiased;
     background: var(--surface-page);
@@ -89,6 +87,7 @@ body {
 }
 
 /* Utility */
+/* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
 .jmc-hidden { display: none !important; }
 
 /* Shared focus ring — keyboard users get a clear, branded outline */
@@ -100,10 +99,11 @@ body {
 /* ── Header ─────────────────────────────────────────────────────────── */
 .jmc-header {
     background: linear-gradient(135deg, var(--brand) 0%, var(--brand-strong) 100%);
-    color: #fff;
+    color: var(--color-on-brand);
     padding: var(--space-4) var(--space-6);
     box-shadow: var(--shadow-md);
 }
+
 .jmc-header-inner {
     max-width: 1400px;
     margin: 0 auto;
@@ -111,37 +111,41 @@ body {
     align-items: center;
     gap: var(--space-5);
 }
+
 .jmc-logo {
     height: 48px;
     width: auto;
-    background: #fff;
+    background: var(--color-surface);
     padding: var(--space-1) var(--space-2);
     border-radius: var(--radius-sm);
 }
 .jmc-header-text { flex: 1; min-width: 0; }
+
 .jmc-header-text h1 {
     margin: 0 0 var(--space-1);
     font-size: 22px;
     font-weight: 800;
     letter-spacing: -0.01em;
 }
+
 .jmc-header-text p {
     margin: 0;
     font-size: 13px;
     opacity: 0.88;
 }
+
 .jmc-back {
-    color: #fff;
+    color: var(--color-on-brand);
     text-decoration: none;
     font-size: 14px;
     font-weight: 500;
     white-space: nowrap;
     padding: var(--space-2) var(--space-4);
-    border: 1px solid rgba(255, 255, 255, 0.35);
+    border: 1px solid rgb(255 255 255 / 35%);
     border-radius: var(--radius-md);
     transition: background var(--dur-fast) var(--ease-out);
 }
-.jmc-back:hover { background: rgba(255, 255, 255, 0.14); }
+.jmc-back:hover { background: rgb(255 255 255 / 14%); }
 
 /* ── Main grid layout ───────────────────────────────────────────────── */
 .jmc-main {
@@ -153,8 +157,10 @@ body {
     gap: var(--space-6);
     align-items: start;
 }
-@media (max-width: 900px) {
+
+@media (width <= 900px) {
     .jmc-main { grid-template-columns: 1fr; }
+
     /* Canvas first on mobile so the result is what you see when you land */
     .jmc-preview { order: -1; }
 }
@@ -165,6 +171,7 @@ body {
     flex-direction: column;
     gap: var(--space-4);
 }
+
 .jmc-step {
     background: var(--surface-card);
     border: 1px solid var(--gray-200);
@@ -172,19 +179,21 @@ body {
     padding: var(--space-5);
     box-shadow: var(--shadow-sm);
 }
+
 .jmc-step-header {
     display: flex;
     align-items: center;
     gap: var(--space-3);
     margin-bottom: var(--space-4);
 }
+
 .jmc-step-num {
     flex: 0 0 28px;
     width: 28px;
     height: 28px;
     border-radius: 50%;
     background: var(--brand);
-    color: #fff;
+    color: var(--color-on-brand);
     font-weight: 700;
     font-size: 14px;
     display: flex;
@@ -192,16 +201,19 @@ body {
     justify-content: center;
     transition: background var(--dur-base) var(--ease-out);
 }
+
 /* A step the user has satisfied flips to a green check via JS */
 .jmc-step-num--done {
     background: var(--success);
     font-size: 16px;
 }
+
 .jmc-step-num--optional {
     background: var(--gray-400);
     font-size: 18px;
     line-height: 1;
 }
+
 .jmc-step-header h2 {
     margin: 0;
     font-size: 16px;
@@ -211,6 +223,7 @@ body {
     align-items: center;
     gap: var(--space-2);
 }
+
 .jmc-optional-tag {
     font-size: 11px;
     font-weight: 600;
@@ -228,6 +241,7 @@ body {
     grid-template-columns: repeat(6, 1fr);
     gap: var(--space-2);
 }
+
 .jmc-swatch-loading {
     grid-column: 1 / -1;
     text-align: center;
@@ -235,6 +249,7 @@ body {
     padding: var(--space-4);
     font-size: 13px;
 }
+
 .jmc-swatch {
     aspect-ratio: 1 / 1;
     border-radius: var(--radius-md);
@@ -248,34 +263,38 @@ body {
     overflow: hidden;
     background: var(--gray-100);
 }
+
 .jmc-swatch:hover {
     transform: translateY(-2px) scale(1.04);
     border-color: var(--brand);
     box-shadow: var(--shadow-md);
 }
+
 .jmc-swatch--active {
     border-color: var(--brand);
     border-width: 3px;
     box-shadow: 0 0 0 3px var(--brand-ring);
 }
+
 .jmc-swatch--active::after {
     content: '✓';
     position: absolute;
     top: 2px;
     right: 4px;
-    color: #fff;
+    color: var(--color-on-brand);
     font-size: 12px;
     font-weight: 700;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+    text-shadow: 0 1px 2px rgb(0 0 0 / 50%);
 }
 .jmc-swatch-fill { position: absolute; inset: 0; }
+
 .jmc-swatch-label {
     position: absolute;
     bottom: 0;
     left: 0;
     right: 0;
-    background: rgba(0, 0, 0, 0.62);
-    color: #fff;
+    background: rgb(0 0 0 / 62%);
+    color: var(--color-on-brand);
     font-size: 10px;
     font-weight: 500;
     text-align: center;
@@ -285,6 +304,7 @@ body {
     text-overflow: ellipsis;
     white-space: nowrap;
 }
+
 .jmc-selected-label {
     margin-top: var(--space-3);
     padding: var(--space-3);
@@ -293,6 +313,7 @@ body {
     font-size: 13px;
     line-height: 1.4;
 }
+
 .jmc-selected-sku {
     font-weight: 600;
     color: var(--brand);
@@ -312,12 +333,14 @@ body {
                 background var(--dur-fast) var(--ease-out),
                 color var(--dur-fast) var(--ease-out);
 }
+
 .jmc-drop-zone:hover,
 .jmc-drop-zone--active {
     border-color: var(--brand);
     background: var(--brand-tint);
     color: var(--brand);
 }
+
 .jmc-drop-icon {
     width: 44px;
     height: 38px;
@@ -325,6 +348,7 @@ body {
     display: block;
     color: var(--gray-400);
 }
+
 .jmc-drop-cta {
     font-size: 15px;
     font-weight: 600;
@@ -343,17 +367,19 @@ body {
     gap: var(--space-3);
     font-size: 13px;
 }
+
 .jmc-logo-thumb {
     flex: 0 0 auto;
     width: 32px;
     height: 32px;
     border-radius: var(--radius-sm);
-    background-color: #fff;
+    background-color: var(--color-on-brand);
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
     border: 1px solid var(--gray-200);
 }
+
 .jmc-logo-name {
     flex: 1;
     overflow: hidden;
@@ -362,6 +388,7 @@ body {
     color: var(--gray-700);
     font-weight: 500;
 }
+
 .jmc-logo-remove {
     flex: 0 0 auto;
     background: transparent;
@@ -374,6 +401,7 @@ body {
     border-radius: var(--radius-sm);
 }
 .jmc-logo-remove:hover { color: var(--danger); }
+
 .jmc-logo-tip {
     margin-top: var(--space-3);
     padding: var(--space-2) var(--space-3);
@@ -388,12 +416,13 @@ body {
 /* ── Complexity warning panel ───────────────────────────────────────── */
 .jmc-warning {
     background: var(--warning-bg);
-    border: 1px solid #fcd34d;
+    border: 1px solid var(--jds-mockup-creator-yellow);
     border-left: 4px solid var(--warning-line);
     border-radius: var(--radius-lg);
     padding: var(--space-4) var(--space-5);
     box-shadow: var(--shadow-sm);
 }
+
 .jmc-warning-title {
     font-size: 15px;
     font-weight: 700;
@@ -401,6 +430,7 @@ body {
     margin-bottom: var(--space-2);
     line-height: 1.3;
 }
+
 .jmc-warning-body {
     font-size: 13px;
     color: var(--warning-ink);
@@ -408,11 +438,13 @@ body {
     margin-bottom: var(--space-4);
 }
 .jmc-warning-body strong { color: var(--warning-ink-strong); }
+
 .jmc-warning-actions {
     display: flex;
     gap: var(--space-2);
     flex-wrap: wrap;
 }
+
 .jmc-warning-btn {
     flex: 1 1 auto;
     min-width: 120px;
@@ -425,22 +457,26 @@ body {
     transition: background var(--dur-fast) var(--ease-out),
                 border-color var(--dur-fast) var(--ease-out);
 }
+
 .jmc-warning-btn--primary {
     background: var(--warning-ink-strong);
-    color: #fff;
+    color: var(--color-on-brand);
     border-color: var(--warning-ink-strong);
 }
+
 .jmc-warning-btn--primary:hover {
     background: var(--warning-ink);
     border-color: var(--warning-ink);
 }
+
 .jmc-warning-btn--secondary {
-    background: #fff;
+    background: var(--color-surface);
     color: var(--warning-ink);
-    border-color: #fcd34d;
+    border-color: var(--jds-mockup-creator-yellow);
 }
+
 .jmc-warning-btn--secondary:hover {
-    background: #fef3c7;
+    background: var(--amber-100);
     border-color: var(--warning-line);
 }
 
@@ -454,6 +490,7 @@ body {
 }
 .jmc-size-row { margin-bottom: var(--space-2); }
 .jmc-position-row { margin: var(--space-3) 0 var(--space-2); }
+
 .jmc-size-label {
     font-size: 13px;
     color: var(--gray-700);
@@ -465,30 +502,30 @@ body {
 .jmc-size-slider {
     width: 100%;
     margin: var(--space-1) 0 var(--space-2);
-    -webkit-appearance: none;
     appearance: none;
     height: 6px;
     border-radius: var(--radius-pill);
     background: var(--gray-200);
     cursor: pointer;
 }
+
 .jmc-size-slider::-webkit-slider-thumb {
-    -webkit-appearance: none;
     appearance: none;
     width: 20px;
     height: 20px;
     border-radius: 50%;
     background: var(--brand);
-    border: 3px solid #fff;
+    border: 3px solid var(--color-surface);
     box-shadow: var(--shadow-md);
     cursor: grab;
 }
+
 .jmc-size-slider::-moz-range-thumb {
     width: 20px;
     height: 20px;
     border-radius: 50%;
     background: var(--brand);
-    border: 3px solid #fff;
+    border: 3px solid var(--color-surface);
     box-shadow: var(--shadow-md);
     cursor: grab;
 }
@@ -521,6 +558,7 @@ body {
     user-select: none;
 }
 .jmc-check--block { display: flex; margin-bottom: var(--space-3); line-height: 1.4; }
+
 .jmc-check input[type="checkbox"] {
     width: 16px;
     height: 16px;
@@ -534,11 +572,12 @@ body {
     display: flex;
     gap: var(--space-2);
 }
+
 .jmc-download-btn {
     flex: 1 1 auto;
     padding: var(--space-3) var(--space-4);
     background: var(--success);
-    color: #fff;
+    color: var(--color-on-brand);
     border: none;
     border-radius: var(--radius-md);
     font-size: 15px;
@@ -551,6 +590,7 @@ body {
     transition: background var(--dur-fast) var(--ease-out);
 }
 .jmc-download-btn:hover { background: var(--success-hover); }
+
 .jmc-copy-btn {
     flex: 0 0 auto;
     padding: var(--space-3) var(--space-4);
@@ -569,6 +609,7 @@ body {
 }
 .jmc-copy-btn:hover { background: var(--surface-inset); border-color: var(--gray-400); }
 .jmc-btn-icon { font-size: 16px; line-height: 1; }
+
 .jmc-download-hint {
     margin-top: var(--space-2);
     font-size: 12px;
@@ -584,12 +625,14 @@ body {
     color: var(--gray-600);
     line-height: 1.45;
 }
+
 .jmc-compare-grid {
     display: grid;
     grid-template-columns: repeat(6, 1fr);
     gap: var(--space-2);
     margin-bottom: var(--space-4);
 }
+
 .jmc-compare-swatch {
     aspect-ratio: 1 / 1;
     border-radius: var(--radius-md);
@@ -603,26 +646,29 @@ body {
                 border-color var(--dur-fast) var(--ease-out);
 }
 .jmc-compare-swatch:hover { transform: scale(1.04); border-color: var(--gray-400); }
+
 .jmc-compare-swatch--selected {
     border-color: var(--brand);
     border-width: 3px;
     box-shadow: 0 0 0 2px var(--brand-ring);
 }
+
 .jmc-compare-swatch--selected::after {
     content: '✓';
     position: absolute;
     top: 1px;
     right: 3px;
-    color: #fff;
+    color: var(--color-on-brand);
     font-size: 11px;
     font-weight: 700;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.6);
+    text-shadow: 0 1px 2px rgb(0 0 0 / 60%);
 }
+
 .jmc-compare-btn {
     width: 100%;
     padding: var(--space-3) var(--space-4);
     background: var(--brand);
-    color: #fff;
+    color: var(--color-on-brand);
     border: none;
     border-radius: var(--radius-md);
     font-size: 14px;
@@ -635,6 +681,7 @@ body {
     transition: background var(--dur-fast) var(--ease-out);
 }
 .jmc-compare-btn:hover:not(:disabled) { background: var(--brand-strong); }
+
 .jmc-compare-btn:disabled {
     background: var(--gray-300);
     color: var(--gray-500);
@@ -649,10 +696,12 @@ body {
     position: sticky;
     top: var(--space-6);
 }
+
 .jmc-preview-toolbar {
     display: flex;
     justify-content: flex-end;
 }
+
 .jmc-segmented {
     display: inline-flex;
     background: var(--surface-inset);
@@ -661,6 +710,7 @@ body {
     padding: 3px;
     gap: 3px;
 }
+
 .jmc-seg-btn {
     border: none;
     background: transparent;
@@ -673,11 +723,13 @@ body {
     transition: background var(--dur-fast) var(--ease-out),
                 color var(--dur-fast) var(--ease-out);
 }
+
 .jmc-seg-btn--active {
     background: var(--surface-card);
     color: var(--brand);
     box-shadow: var(--shadow-sm);
 }
+
 .jmc-preview-frame {
     background: var(--surface-card);
     border: 1px solid var(--gray-200);
@@ -690,14 +742,17 @@ body {
     align-items: center;
     justify-content: center;
     overflow: hidden;
+
     /* Subtle studio backdrop so the tumbler reads as a product shot */
-    background-image: radial-gradient(circle at 50% 38%, #ffffff 0%, var(--surface-page) 78%);
+    background-image: radial-gradient(circle at 50% 38%, var(--color-surface) 0%, var(--surface-page) 78%);
 }
+
 .jmc-preview-empty {
     color: var(--gray-400);
     text-align: center;
     font-size: 15px;
 }
+
 .jmc-empty-icon {
     width: 64px;
     height: 64px;
@@ -705,6 +760,7 @@ body {
     display: block;
     color: var(--gray-300);
 }
+
 .jmc-canvas {
     max-width: 100%;
     max-height: 100%;
@@ -726,8 +782,9 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    background: rgba(255,255,255,0.7);
+    background: rgb(255 255 255 / 70%);
 }
+
 .jmc-spinner {
     width: 32px;
     height: 32px;
@@ -737,7 +794,9 @@ body {
     animation: jmc-spin 0.8s linear infinite;
     margin: 0 auto var(--space-3);
 }
+
 @keyframes jmc-spin { to { transform: rotate(360deg); } }
+
 .jmc-preview-error {
     color: var(--danger);
     background: var(--danger-bg);
@@ -747,6 +806,7 @@ body {
     font-size: 13px;
     line-height: 1.5;
 }
+
 .jmc-preview-caption {
     text-align: center;
     color: var(--gray-500);
@@ -761,7 +821,7 @@ body {
     left: 50%;
     transform: translateX(-50%) translateY(100px);
     background: var(--gray-900);
-    color: #fff;
+    color: var(--color-on-brand);
     padding: var(--space-3) var(--space-5);
     border-radius: var(--radius-md);
     font-size: 14px;
@@ -772,6 +832,7 @@ body {
     z-index: 1000;
     box-shadow: var(--shadow-lg);
 }
+
 .jmc-toast--show {
     transform: translateX(-50%) translateY(0);
     opacity: 1;
@@ -782,8 +843,11 @@ body {
 /* ── Reduced motion ─────────────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
     * {
+        /* stylelint-disable-next-line declaration-no-important -- prefers-reduced-motion kill switch must beat every animation */
         animation-duration: 0.01ms !important;
+        /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
         animation-iteration-count: 1 !important;
+        /* stylelint-disable-next-line declaration-no-important -- prefers-reduced-motion kill switch must beat every animation */
         transition-duration: 0.01ms !important;
     }
     .jmc-swatch:hover { transform: none; }
