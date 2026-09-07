@@ -71,6 +71,15 @@ describe('shared calculator scripts', () => {
         expect(js).not.toMatch(/'1-23'|'24-47' : tierLabel|Less than 24|: 50\.00/);
     });
 
+    test('DTF adapter: a stored sessionStorage copy never overrides the API garment cost (2026-09-06)', () => {
+        // `Object.assign(data, parsedData, data)` overwrote the fresh $3 with a stored 0 and then "restored" from
+        // the already-overwritten object — every DTF calculator load after the first in a tab priced at $0.00.
+        const js = read('shared_components/js/dtf-adapter.js');
+        expect(js).not.toMatch(/Object\.assign\(data, parsedData, data\)/);
+        expect(js).toMatch(/if \(!\(parseFloat\(stored\.garmentCost\) > 0\)\) delete stored\.garmentCost;/);
+        expect(js).toMatch(/Object\.assign\(data, stored, fresh\);/);
+    });
+
     test('the extracted stylesheets exist', () => {
         expect(read('shared_components/css/calculator-inventory.css')).toMatch(/\.calc-inv-bar \{/);
         expect(read('shared_components/css/manual-mode-indicator.css')).toMatch(/\.manual-mode-banner/);
