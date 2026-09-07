@@ -1,3 +1,8 @@
+## v2026.09.07.14 (2026.09.07)
+
+- Deploy v2026.09.07.14: CSS standardization — staff pages + customer portal batch (45 sheets, 46 pages: every hex a token or a sheet-scoped variable, 15 duplicate token definitions dropped, 298 !important flags documented as 7 override stacks; 46/49 shots identical, the rest a load timestamp, a product photo and the mockup-library header on the brand greens; the garment designer's page ink kept exact; tokenizer made idempotent)
+- Locks: vendor-portal and customer-login CSS locks accept the range media syntax and a page variable
+
 ## v2026.09.07.12 (2026.09.07)
 
 - Deploy v2026.09.07.12: CSS standardization — calculators family (58 sheets, 26 pages: every hex a token or a sheet-scoped variable, duplicate token definitions dropped, 446 !important flags documented as override stacks; 18/26 shots identical, the rest async; three #add-to-cart selectors the tokenizer had mangled repaired; calculator parity 5/5)
