@@ -96,6 +96,7 @@ describe('freshness', () => {
 
 describe('phone', () => {
     test('the header controls wrap on narrow screens', () => {
-        expect(css).toMatch(/@media \(max-width: 760px\)[\s\S]*\.dash-header-right[\s\S]*flex-wrap: wrap/);
+        // range syntax accepted since the 2026-09-07 CSS standardization (stylelint's media-feature-range-notation)
+        expect(css).toMatch(/@media \((?:max-width: 760px|width <= 760px)\)[\s\S]*\.dash-header-right[\s\S]*flex-wrap: wrap/);
     });
 });
