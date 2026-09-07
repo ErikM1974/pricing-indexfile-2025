@@ -184,6 +184,24 @@ marker-based `cut()` in a refactor script must assert the method count before/af
 unrelated lines vanished here and only a runtime probe caught it). 🔑 The dev server serves
 `/dist` hashed assets — `node scripts/build.js` before a local probe, or you test the old file.
 
+## 2026-09-06 — Two customer calculators drifted from Caspio's tiers while the engine followed them (`v2026.09.06.42`–`.43`)
+
+**Problem.** Erik re-cut the ScreenPrint tiers (24-47/$50, 48-71/$0) and split the DTG LTM row
+(1-11/$50, 12-23/$0) in Caspio. Quick Quote and the builders followed at once (the canonical
+engines resolve the row by quantity). The two customer calculators did not: screen print typed
+its buttons and fees; DTG typed "Less than 24 + $50" and mapped every sub-24 quantity to 24-47
+costs + $50 — $1 under the engine at 8 pieces, $2.33 over at 15.
+**Root cause.** Rule 9 was enforced on the engines, not on the pages that render tier buttons:
+a page can read `LTM_Fee` for the total and still type the tier ranges, fees and sub-24 mapping.
+**Solution.** Both strips are generated from `pricing-bundle` tiers; DTG sub-24 prices through
+`DTGCanonicalPricing` (cost-row fallback + `ltmPerUnit`), verified against the engine computed
+from the live bundle on the local dev server and live.
+**Prevention.** 🔑 After ANY Caspio tier change, diff every calculator's tier buttons against
+`/api/pricing-bundle?method=X` tiers AND compare its price at a sub-minimum quantity with Quick
+Quote. 🔑 A tier label in a template is a price. 🔑 The dev server serves `/dist` — rebuild
+before a local probe; the Browser pane's console log is cumulative across pages, read the page's
+own behaviour (a constructed calculator) not the log.
+
 ## Archived 2026-09-06
 
 ## 2026-09-06 — Calculator sweep (`v2026.09.06.9` → `.16`): 8 pages of inline code, 5 shared scripts with hardcoded hosts, and a dead loader

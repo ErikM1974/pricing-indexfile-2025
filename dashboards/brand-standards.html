@@ -15,7 +15,7 @@
     <!-- Built from templates/page-template.html: tokens first (the @layer order), then this page only. -->
     <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.07.8">
     <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.07.8">
-    <link rel="stylesheet" href="/shared_components/css/utilities.css?v=2026.09.07.8">
+    <link rel="stylesheet" href="/shared_components/css/utilities.css?v=2026.09.07.18">
     <link rel="stylesheet" href="/dashboards/css/brand-standards.css?v=2026.09.07.8">
 </head>
 <body>
@@ -130,6 +130,15 @@
             <p class="text-muted">This page is a working document. Every standard that changed how a page looks is
                 recorded here, newest first, with the release that shipped it.</p>
             <ul class="rules decisions">
+                <li><strong>2026-09-07 · the tail, and the dead sheets.</strong> The twelve sheets no family covered (the admin
+                    pages, production shifts, the price audit report, the employee bundles, the calibration tool, the vendor
+                    portals, the DTF prototype) read the token file, pixel-identical. Eighteen stylesheets that no page, script,
+                    route or import referenced (about 17,000 lines, several pre-dating the 2026 storefront) were deleted on
+                    Erik's instruction, with the two test fixtures that pointed at one of them. Every served stylesheet is now
+                    under stylelint and every served page that loads one loads the tokens.
+                    <strong>Next:</strong> the storefront and catalog palette pass — first an app-wide, zero-visual collapse of
+                    the page variables that share a value across many sheets into ramp tokens, then the customer-facing pages
+                    themselves, with Erik's authority to make them look better.</li>
                 <li><strong>2026-09-07 · quote builders (the last family).</strong> The four quote builders, the monogram form
                     and the fast quote, and the thirteen calculator, dashboard and storefront pages that share their sheets read
                     the token file, and so do the AE dashboard's nav and submit-form sheets (the last of

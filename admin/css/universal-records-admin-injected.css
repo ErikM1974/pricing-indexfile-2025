@@ -1,4 +1,4 @@
-/* universal-records-admin-injected.css — extracted 2026-09-06 from the <style> block(s) universal-records-admin.js used to inject (Rule 3). */
+/* universal-records-admin-injected.css — extracted 2026-09-06 from the \3c style> block(s) universal-records-admin.js used to inject (Rule 3). */
 .toast {
     position: fixed;
     bottom: 2rem;
@@ -6,7 +6,7 @@
     background: var(--card-bg);
     padding: 1rem 1.5rem;
     border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 6px rgb(0 0 0 / 10%);
     display: flex;
     align-items: center;
     gap: 0.75rem;
@@ -35,6 +35,7 @@
         transform: translateX(100%);
         opacity: 0;
     }
+
     to {
         transform: translateX(0);
         opacity: 1;
@@ -43,17 +44,14 @@
 
 .quote-view-modal {
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    inset: 0;
     z-index: 1000;
 }
 
 .modal-overlay {
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgb(0 0 0 / 50%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -72,7 +70,7 @@
 
 .modal-header {
     padding: 1.5rem;
-    border-bottom: 1px solid #e5e7eb;
+    border-bottom: 1px solid var(--gray-200);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -80,7 +78,7 @@
 
 .modal-header h2 {
     margin: 0;
-    color: #1f2937;
+    color: var(--gray-800);
 }
 
 .close-btn {
@@ -88,7 +86,7 @@
     border: none;
     font-size: 1.5rem;
     cursor: pointer;
-    color: #6b7280;
+    color: var(--gray-500);
 }
 
 .modal-body {
@@ -105,8 +103,8 @@
 }
 
 .info-section h3 {
-    margin: 0 0 1rem 0;
-    color: #374151;
+    margin: 0 0 1rem;
+    color: var(--gray-700);
     font-size: 1.125rem;
 }
 
@@ -115,7 +113,7 @@
 }
 
 .notes-section {
-    background: #f9fafb;
+    background: var(--gray-50);
     padding: 1rem;
     border-radius: 6px;
     margin-bottom: 2rem;
@@ -130,18 +128,18 @@
 .items-table td {
     padding: 0.75rem;
     text-align: left;
-    border-bottom: 1px solid #e5e7eb;
+    border-bottom: 1px solid var(--gray-200);
 }
 
 .items-table th {
-    background: #f9fafb;
+    background: var(--gray-50);
     font-weight: 600;
-    color: #374151;
+    color: var(--gray-700);
 }
 
 .modal-footer {
     padding: 1.5rem;
-    border-top: 1px solid #e5e7eb;
+    border-top: 1px solid var(--gray-200);
     display: flex;
     gap: 1rem;
     justify-content: flex-end;
@@ -149,17 +147,14 @@
 
 .quote-edit-modal {
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    inset: 0;
     z-index: 1000;
 }
 
 .quote-edit-modal .modal-overlay {
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgb(0 0 0 / 50%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -178,7 +173,7 @@
 
 .quote-edit-modal .modal-header {
     padding: 1.5rem;
-    border-bottom: 1px solid #e5e7eb;
+    border-bottom: 1px solid var(--gray-200);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -186,7 +181,7 @@
 
 .quote-edit-modal .modal-header h2 {
     margin: 0;
-    color: #1f2937;
+    color: var(--gray-800);
 }
 
 .quote-edit-modal .close-btn {
@@ -194,7 +189,7 @@
     border: none;
     font-size: 1.5rem;
     cursor: pointer;
-    color: #6b7280;
+    color: var(--gray-500);
 }
 
 .quote-edit-modal .modal-body {
@@ -221,13 +216,13 @@
     display: block;
     margin-bottom: 0.5rem;
     font-weight: 500;
-    color: #374151;
+    color: var(--gray-700);
 }
 
 .quote-edit-modal .form-control {
     width: 100%;
     padding: 0.5rem 0.75rem;
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--gray-200);
     border-radius: 6px;
     font-size: 0.875rem;
     background: white;
@@ -235,8 +230,8 @@
 
 .quote-edit-modal .form-control:focus {
     outline: none;
-    border-color: #4cb354;
-    box-shadow: 0 0 0 0.25rem rgba(76, 179, 84, 0.25);
+    border-color: var(--brand-500);
+    box-shadow: 0 0 0 0.25rem rgb(76 179 84 / 25%);
 }
 
 .quote-edit-modal textarea.form-control {
@@ -245,7 +240,7 @@
 
 .quote-edit-modal .modal-footer {
     padding: 1.5rem;
-    border-top: 1px solid #e5e7eb;
+    border-top: 1px solid var(--gray-200);
     display: flex;
     gap: 1rem;
     justify-content: flex-end;

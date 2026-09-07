@@ -194,6 +194,19 @@ const CSS_LINT_SCOPE = [
     'shared_components/css/ae-nav-v2.css',
     'shared_components/css/jds-submit-form.css',
     'shared_components/css/mockup-submit-form.css',
+    // tail batch (2026-09-07): admin, production-shifts, price-audit-report, employee bundles, tools, vendor-portal css, dtf prototype css
+    'admin/css/announcements-create.css',
+    'admin/css/announcements-manage.css',
+    'admin/css/universal-records-admin-injected.css',
+    'admin/css/universal-records-admin.css',
+    'calculators/quick-quote/dtf-prints-prototype.css',
+    'dashboards/production-shifts/styles.css',
+    'dashboards/reports/price-audit-report.css',
+    'employee-bundles/css/streich-bros-bundle.css',
+    'employee-bundles/css/wcttr-bundle.css',
+    'tools/custom-tees-calibrate.css',
+    'vendor-portals/css/sanmar-portal-shared.css',
+    'vendor-portals/css/sanmar-vendor-portal.css',
 ];
 
 async function run() {
