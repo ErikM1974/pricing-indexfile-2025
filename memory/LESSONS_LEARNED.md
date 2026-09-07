@@ -25,39 +25,7 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 ### JSON-in-attribute broke on the first quote (Names & Numbers delete button, 2026-09-05, ARCHIVED 2026-09-06, `v2026.09.05.17`): never put JSON with quotes/apostrophes in an HTML attribute — pass an index/id and look the record up, or escape with `escapeHtml` on the attribute value. Full entry in archive.
 ### Customer Portals console said nobody had ever signed in (2026-09-05, ARCHIVED 2026-09-06): a "0" that never moves is a broken reader, not a quiet business — the count read a field the login flow never wrote; assert every counter against a source of truth once. Full entry in archive.
 ### Whole-dashboard deep-review sweep — the same six bugs kept reappearing (2026-09-05, ARCHIVED 2026-09-06, `.24`→`.75`, 54 pages): UTC "today", `[hidden]` beaten by flex, silent-empty states, hardcoded `* 75` art rates, unversioned assets, inline handlers — each is now a jest lock; a review without a lock is a review that repeats. Full entry in archive.
-
-## 2026-09-06 — Customer-facing sweep (`v2026.09.05.77` → `v2026.09.06.5`, 5 batches, ~70 public pages): the SAME rules the staff pages broke, plus three real bugs
-
-**Problem.** Public pages had never been through the deep-review loop. Beyond the hygiene the staff sweep
-found (bare icons, inline handlers, `display:none` beaten by `.hidden=`), three things were wrong for customers:
-(1) `dtg-compatible-products` grid had `style="display:none"` while the script set `.hidden = false` — the inline
-style always won, so the product grid could never show; (2) `design-view`'s Escape listener was registered
-AFTER `init()`'s early `return`, so the lightbox had no Esc on error pages; (3) `inventory-details` rendered
-the colour swatches BEFORE resolving the fallback colour, so with no `COLOR` in the URL nothing showed selected.
-Six public scripts still carried the proxy host as a silent fallback (`… || 'https://caspio-pricing-proxy…'`),
-and four legacy public pages carried whole `<style>`/`<script>` blocks + `onclick=`/`onerror=` (Rule 3).
-
-**Root cause.** The same as the staff sweep: pages built to work, never smoked on the failure path; plus
-"fallback host" habits from before Rule 6 existed.
-
-**Solution.** Five batches, each with a scratchpad python fix script, a jest lock (`public-legacy-pages`,
-`public-storefront-pages`, `public-forms-account-pages`, `public-content-pages`, `public-cart-header-pages`),
-static-dist smoke, deploy, live verify in Chrome. Sections per batch in `memory/DASHBOARD_REVIEWS_2026-09.md`
-(§ CUSTOMER-FACING PAGES).
-
-**Prevention.**
-- 🔴 **`hidden` attribute + `[hidden]{display:none!important}` guard, never `style="display:none"` + `.hidden=`** —
-  the inline style outranks the attribute's UA rule (the dtg grid bug).
-- 🔴 **No fallback host.** `const API_BASE = (APP_CONFIG…) || ''` and a VISIBLE message when empty
-  (toast / error panel / console.error + placeholder for image-only lookups). The locks assert the host string is absent.
-- 🔴 Register global listeners (Esc, delegated clicks) OUTSIDE any function that can return early.
-- 🔴 Resolve state (selected colour, fallbacks) BEFORE rendering the controls that display it.
-- 🔑 Live host for public verification is `sanmar-inventory-app-4cd7b252508d.herokuapp.com` —
-  `www.nwcustomapparel.com` is the Apache marketing site and 404s on app paths.
-- 🔑 A JS component that injects `<style>` on render is a Rule 3 violation by another route — extract to a
-  stylesheet the consumer links (universal cart header).
-- 🔑 The icon-hiding regex must allow `_` in extra classes (`g-footer__rep-icon`) and the `${…}` dynamic form.
-- 🔑 `loading="lazy"` images read `naturalWidth 0` until scrolled near — not a broken image.
+### Customer-facing sweep — the same rules the staff pages broke, plus three real bugs (2026-09-06, ARCHIVED 2026-09-06, `v2026.09.05.77`→`v2026.09.06.5`): inline `display:none` beats `.hidden=false`; a listener registered after an early return never fires; render colours only after the fallback resolves; 6 scripts had a silent proxy-host fallback → `''` + visible error. Full entry in archive.
 
 ## 2026-09-06 — Calculator sweep (`v2026.09.06.9` → `.16`): 8 pages of inline code, 5 shared scripts with hardcoded hosts, and a dead loader
 
