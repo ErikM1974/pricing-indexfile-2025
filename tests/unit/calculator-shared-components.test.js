@@ -92,6 +92,15 @@ describe('shared calculator scripts', () => {
         }
     });
 
+    test('additional-logo tables render their columns from the API tiers (2026-09-06)', () => {
+        for (const f of ['shared_components/js/additional-logo-embroidery-simple.js', 'shared_components/js/additional-logo-cap-simple.js']) {
+            const js = read(f);
+            expect(js).toMatch(/function renderTableFromTiers\(tiers, pricing\)/);
+            expect(js).toMatch(/return \{ pricing, config, tiers \};/);
+            expect(js).not.toMatch(/updateCell\('(emb|cap)-al-1-7', pricing\['1-7'\]\)/);
+        }
+    });
+
     test('the extracted stylesheets exist', () => {
         expect(read('shared_components/css/calculator-inventory.css')).toMatch(/\.calc-inv-bar \{/);
         expect(read('shared_components/css/manual-mode-indicator.css')).toMatch(/\.manual-mode-banner/);

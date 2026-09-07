@@ -92,7 +92,13 @@
             });
 
 
-            return { pricing, config };
+            // The tier list (Pricing_Tiers) drives the table's columns — never a typed 1-7…72+ layout (2026-09-06).
+            const tiers = (Array.isArray(data.tiersR) ? data.tiersR : [])
+                .filter(t => t && Number.isFinite(Number(t.MinQuantity)))
+                .map(t => ({ label: t.TierLabel, min: Number(t.MinQuantity), max: Number(t.MaxQuantity), ltm: parseFloat(t.LTM_Fee) || 0 }))
+                .sort((a, b) => a.min - b.min);
+
+            return { pricing, config, tiers };
         } else {
             throw new Error('Invalid API response structure');
         }
@@ -102,21 +108,43 @@
      * Populate the pricing table with data
      */
     function populatePricingTable(data) {
-        const { pricing, config } = data;
+        const { pricing, config, tiers } = data;
 
-        // Update table cells
-        // 2026-02 RESTRUCTURE: New tiers 1-7 and 8-23
-        updateCell('cap-al-1-7', pricing['1-7']);
-        updateCell('cap-al-8-23', pricing['8-23']);
-        updateCell('cap-al-24-47', pricing['24-47']);
-        updateCell('cap-al-48-71', pricing['48-71']);
-        updateCell('cap-al-72', pricing['72+']);
+        if (Array.isArray(tiers) && tiers.length) {
+            renderTableFromTiers(tiers, pricing);
+        } else {
+            // API answered without a tier list (or the fallback pricing is in use): fill the static cells by label
+            ['1-7', '8-23', '24-47', '48-71', '72+'].forEach(label => updateCell('cap-al-' + label.replace('72+', '72'), pricing[label]));
+        }
 
         // Update note with stitch rate (if available)
         if (config && config.additionalStitchRate) {
             updateNoteWithStitchRate(config.baseStitchCount, config.additionalStitchRate);
         }
 
+    }
+
+    /**
+     * Build the header row and the price row from the API tiers: one column per tier, the tier
+     * carrying the LTM fee gets the ltm-column class, every cell keeps the cap-al-<TierLabel> id.
+     */
+    function renderTableFromTiers(tiers, pricing) {
+        const table = document.querySelector('.additional-logo-table');
+        if (!table) return;
+        const thead = table.querySelector('thead');
+        const firstTh = thead && thead.querySelector('th');
+        const firstHeader = firstTh ? firstTh.textContent.trim() : 'Quantity';
+        const rangeText = (t) => (t.max >= 99999 || /\+$/.test(String(t.label))) ? `${t.min}+ pieces` : `${t.min}-${t.max} pieces`;
+        if (thead) {
+            thead.innerHTML = '<tr><th>' + firstHeader + '</th>' + tiers.map(t =>
+                `<th${t.ltm > 0 ? ' class="ltm-column"' : ''} data-tier="${t.label}">${rangeText(t)}</th>`).join('') + '</tr>';
+        }
+        const row = table.querySelector('tbody tr');
+        if (!row) return;
+        const labelCell = row.querySelector('td.tier-label');
+        row.innerHTML = (labelCell ? labelCell.outerHTML : '<td class="tier-label">Base Price</td>') + tiers.map(t =>
+            `<td id="cap-al-${t.label}" class="price-cell${t.ltm > 0 ? ' ltm-column' : ''} loading">Loading...</td>`).join('');
+        tiers.forEach(t => updateCell('cap-al-' + t.label, pricing[t.label]));
     }
 
     /**

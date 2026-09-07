@@ -39,14 +39,26 @@ function qtyFor(tier) {
 }
 const money = (text) => { const m = String(text || '').replace(/\s+/g, ' ').match(/\$\s?(\d+(?:\.\d{2})?)/); return m ? parseFloat(m[1]) : NaN; };
 
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 async function engine(page, item, groups) {
-    return page.evaluate(async ({ item, groups }) => {
-        let shared = null;
-        const deps = { EmbroideryPricingCalculator: function (opts) { if (!shared) shared = new window.EmbroideryPricingCalculator(opts || { skipInit: true }); return shared; } };
-        const r = await window.QuoteCartEngine.singleItemPreview(Object.assign({ id: '__parity__' }, item), { groups, deps, nudge: false });
-        return r.ok ? { perPiece: r.effectivePerPiece, tier: r.tierLabel } : { error: r.error && r.error.message };
-    }, { item, groups });
+    // paced: every preview re-reads the pricing bundle through the live proxy, and a tight loop trips its 429 limiter
+    for (let attempt = 1; attempt <= 3; attempt++) {
+        await sleep(attempt === 1 ? 350 : 4000 * attempt);
+        const r = await page.evaluate(async ({ item, groups }) => {
+            let shared = null;
+            const deps = { EmbroideryPricingCalculator: function (opts) { if (!shared) shared = new window.EmbroideryPricingCalculator(opts || { skipInit: true }); return shared; } };
+            const res = await window.QuoteCartEngine.singleItemPreview(Object.assign({ id: '__parity__' }, item), { groups, deps, nudge: false });
+            return res.ok
+                ? { perPiece: res.effectivePerPiece, tier: res.tierLabel, serviceLines: (res.serviceLines || []).map((s) => ({ code: s.code, label: s.label, unitPrice: s.unitPrice, total: s.total })) }
+                : { error: res.error && res.error.message };
+        }, { item, groups });
+        if (!r.error || !/429|Too Many|unavailable/i.test(r.error)) return r;
+        if (attempt === 3) return r;
+    }
+    return { error: 'unreachable' };
 }
+// the additional-logo cost is a SERVICE LINE (code AL for a garment logo, CB for a cap back), not part of the unit price
+const serviceUnit = (r, codes) => { const s = (r.serviceLines || []).find((x) => codes.includes(x.code)); return s ? Number(s.unitPrice) : NaN; };
 
 // Locally this drives the installed Google Chrome (no Playwright browser download needed on Erik's machine);
 // CI keeps the project's chromium.
@@ -144,6 +156,18 @@ test.describe('customer calculators price like the engine', () => {
             rows.push({ tier: t.label, qty, engine: eng.perPiece, calculator: money(shown), error: eng.error });
         }
         report('EMB', rows);
+
+        // Additional-logo table: the engine prices a second 8,000-stitch logo as the AL service line (per piece)
+        const al = [];
+        for (const t of tiers) {
+            const qty = qtyFor(t);
+            const primary = { position: 'Left Chest', stitchCount: 8000, needsDigitizing: false };
+            const withAl = await engine(qq, Object.assign({ method: 'EMB', sizes: { M: qty } }, STYLE),
+                { 'emb:garment': { logos: { primary, additional: [{ position: 'Additional Logo', stitchCount: 8000, needsDigitizing: false }] } } });
+            const shown = await page.evaluate((label) => (document.getElementById(`emb-al-${label}`) || {}).textContent, t.label);
+            al.push({ tier: t.label, qty, engine: serviceUnit(withAl, ['AL']), calculator: money(shown), error: withAl.error });
+        }
+        report('EMB additional logo', al);
     });
 
     test('cap embroidery — C112 front, 8,000 stitches (OSFA row)', async ({ page, request }) => {
@@ -170,6 +194,18 @@ test.describe('customer calculators price like the engine', () => {
             rows.push({ tier: t.label, qty, engine: eng.perPiece, calculator: money(shown), error: eng.error });
         }
         report('CAP', rows);
+
+        // Additional-logo table (cap back, 5,000 stitches) = the engine's CB service line per piece
+        const al = [];
+        for (const t of tiers) {
+            const qty = qtyFor(t);
+            const primary = { position: 'Cap Front', stitchCount: 8000, needsDigitizing: false };
+            const withAl = await engine(qq, Object.assign({ method: 'CAP', isCap: true, sizes: { OSFA: qty } }, CAP),
+                { 'emb:cap': { logos: { primary, additional: [{ position: 'Cap Back', stitchCount: 5000, needsDigitizing: false }] } } });
+            const shown = await page.evaluate((label) => (document.getElementById(`cap-al-${label}`) || {}).textContent, t.label);
+            al.push({ tier: t.label, qty, engine: serviceUnit(withAl, ['CB', 'AL']), calculator: money(shown), error: withAl.error });
+        }
+        report('CAP additional logo', al);
     });
 });
 
