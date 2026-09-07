@@ -1,3 +1,9 @@
+## v2026.09.07.2 (2026.09.07)
+
+- Customer-supplied quoting: design + decisions doc; ACTIVE_FILES no longer cites the two memory docs removed in the dead-files sweep
+- CSS standardization: project brief for a fresh session + css-census / screenshot-diff scripts
+- Deploy v2026.09.07.2: product-page SEO head reads the proxy's /api/product-heads catalog map, not /api/product-details
+
 ## v2026.09.07.1 (2026.09.07)
 
 - Deploy v2026.09.07.1: money-path alerts EMAIL the shop via EmailJS template_staff_alert (no Slack hook was ever set); Rule 9 reworded (builders own their math, engine replicates, DTF covered); locks for ShopWorks import full-back/cap routing and sample-request lead creation; SHOP notes + CO-ANNUAL-GOAL row in Caspio
