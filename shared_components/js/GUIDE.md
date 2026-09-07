@@ -7,7 +7,6 @@
 | File | Purpose |
 |------|---------|
 | `base-quote-service.js` | Base class for all quote save/email services |
-| `quote-builder-base.js` | **RETIRED → pointer stub (2026-07-08)** — the ONE base lives at `builders/shared/quote-builder-base.js`; per-method adapters implement the MethodAdapter contract (`builders/emb/adapter.js` first) |
 | `builders/emb/index.js` | **ESM entry point (roadmap 0.1/0.4)** — the ONE sanctioned window re-export surface for the EMB decomposition (eslint-enforced); runs before DOMContentLoaded. Extracted so far: `pricing.js`, `design-search.js`, `spr-modal.js`, `shopworks-import.js`, `persistence.js`, output.js. Map → memory/emb-decomposition-plan.md |
 | `builders/emb/pricing.js` | **Extraction #0 (2026-07-07)** — Service_Codes fees: `loadServiceCodePrices()` (window._serviceCodes cache = cross-file contract) + `getServicePrice(code, fallback)` (live price, fallback + visible toast on API failure). Becomes the only module talking to the pricing APIs |
 | `builders/emb/design-search.js` | **Extraction #1 (2026-07-07)** — design lookup/gallery modal (search, filters, batched grid, apply-to-logo-card, customer autofill). 15 window bridges via index.js; reset accessors for the monolith's customer-change/resetQuote paths |
@@ -142,7 +141,6 @@
 |------|---------|
 | `screenprint-pricing-service.js` | Pricing data adapter (Caspio API) |
 | `screenprint-pricing-v2.js` | Main calculator logic (v2 = current active) |
-| `screenprint-manual-pricing.js` | Manual pricing calculator logic |
 | `screenprint-quote-service.js` | Quote save/email service |
 | `screenprint-fast-quote-service.js` | Fast quote (60 sec) service |
 
@@ -151,9 +149,6 @@
 | File | Purpose |
 |------|---------|
 | `decoration-methods.js` | Decoration method eligibility (NEW 2026-06-11) — `/api/decoration-methods` rules+overrides, sessionStorage 1h cache. `eligibleFor(product)` → EMB/SCP/DTF bools + DTG 'yes'/'warn'/'no' cotton gate; `categoriesFor(method)` feeds the /catalog Decoration filter. API down → embroidery-only fallback (`source:'fallback'` — caller MUST show a visible warning). Used by product.html + /catalog. |
-| `product-search.js` | Product search functionality |
-| `product-grid.js` | Product grid display |
-| `product-filters.js` | Product filtering |
 | `product-category-filter.js` | Category-based filtering |
 | `product-pricing-ui.js` | Product pricing display |
 | `universal-product-display.js` | Universal product display component |

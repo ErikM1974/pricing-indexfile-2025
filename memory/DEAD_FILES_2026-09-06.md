@@ -107,7 +107,7 @@ and the `PENDING_DELETION` entries in `tests/unit/repo-hygiene-final.test.js` (t
 - `training/js/api-test-runner.js`
 - `training/training-engine-base.js`
 
-## Second pass (2026-09-06, later): 4 stale ROOT-LEVEL duplicates — pending Erik's `git rm`
+## Second pass (2026-09-06, later): stale ROOT-LEVEL duplicates + the unlinked staff orphans — ✅ DELETED (Erik: "get rid of the orphan files .. go for it")
 
 The first census matched referrers by basename, which let a stale root copy hide behind its `shared_components/js`
 twin. The lock is now path-aware (`referrers()` in `repo-hygiene-final.test.js`) and these four have NO loader:
@@ -124,3 +124,6 @@ git rm -q -- pricing-matrix-api.js dp5-helper.js utils.js app-new.js shared_comp
 ```
 
 Then drop the four rows from `ACTIVE_FILES.md` and move them from `PENDING_DELETION` to `DELETED_2026_09_06` in the lock.
+
+### Also removed in the second pass (39 files total, `v2026.09.06.46`)
+The unlinked staff pages the UNLINKED census classed as orphans, with their extracted CSS/JS: `dashboards/bundle-orders-dashboard.html` (+ `bundle-orders.js`, its css; the `server.js` route removed), `dashboards/finished-photos-poster.html` (+ js), `training/bonus-policy.html` (+ css/js), `tools/art-search.{html,css,js}`, `dashboards/staff-portal-simple.html` (+ css), `dashboards/staff-portal-final.html` (+ page js), the five `/tools/` diagnostics (`cap-layout-mockup`, `diagnose-css-override`, `css-diagnostic`, `decoration-selector-mockup`, `diagnose-search-issue` + css/js), `training/test.html`, `training/shopworks-customer-setup-working.{html,css,js}`, the orphan `training/css/api-test-runner.css`. Erik chose deletion over dashboard tiles for the four real tools.

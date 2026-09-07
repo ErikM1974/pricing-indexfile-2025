@@ -263,7 +263,6 @@ dotenv.config();
 //   /cart → 301 /pages/sample-cart.html (legacy Bootstrap cart retired 2026-06-11; cart.html + pages/order-confirmation.html deleted; 7 zombie sendFile routes to missing files removed same day)
 //   L657  /calculators/embroidery-contract* → embroidery-pricing-all
 //   L662  /staff-dashboard.html → /dashboards/
-//   L666  /bundle-orders-dashboard.html → /dashboards/
 //   L783  /ae-dashboard.html → /dashboards/
 //   L791  /digitizingform.html → /calculators/
 //   L806  /christmas-bundles.html → /calculators/
@@ -5480,10 +5479,6 @@ app.get('/staff-dashboard-v3/index.html', requireStaff, (req, res) => {
 // requireStaff gates above cover only the .html; never put internal-only data
 // in these files (roster went to lib/ + /api/staff/employees for this reason).
 app.use('/staff-dashboard-v3', express.static(path.join(__dirname, 'staff-dashboard-v3'), staticOptions));
-
-app.get('/bundle-orders-dashboard.html', gateStaffPage, (req, res) => {
-  res.sendFile(path.join(__dirname, 'dashboards', 'bundle-orders-dashboard.html'));
-});
 
 // Employee Bundle Pages
 app.get('/DrainPro-Bundle.html', (req, res) => {
