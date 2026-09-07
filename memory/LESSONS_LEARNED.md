@@ -219,7 +219,7 @@ stylesheet. (f) Write lint output to a file and read it.
 **Prevention.** 🔑 Every text transform over CSS must skip comments AND selectors — only a declaration
 value is a colour. 🔑 After every automated pass, run the full lint and grep for `var(--[a-z0-9-]+)[A-Za-z_-]`
 before the screenshots; a dropped rule is silent in a browser. 🔑 A substring lock on CSS should pin the
-MEANING (a selector exists, a value is a custom property), not the exact bytes.
+MEANING (a selector exists, a value is a custom property), not the exact bytes. 🔑 `stylelint --fix` (number-no-trailing-zeros) rewrote `oklch(55.0% …)` as `oklch(55.% …)`, an invalid value that silently drops the declaration — after every `--fix`, grep the touched sheets for `[0-9]\.[%)]` and re-lint (the parser reports it as declaration-property-value-no-unknown).
 
 ## 2026-09-07 — Pages batch: a re-run tokenizer turned its own variables into `--x: var(--x)`
 

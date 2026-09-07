@@ -114,6 +114,27 @@ three gap sizes, `opacity:.5;cursor:not-allowed` ×26 (disabled). These become u
 
 ## 8. Progress log (newest first)
 
+### 2026-09-07 — Tail batch + dead sheets LIVE (`v2026.09.07.18`): 12 sheets, 12 pages migrated; 18 sheets + 2 fixtures deleted
+
+- **Tail = the 12 sheets no family covered:** `admin/css/*` (4 sheets, 3 admin pages), `dashboards/production-shifts/styles.css`,
+  `dashboards/reports/price-audit-report.css`, `employee-bundles/css/*` (2), `tools/custom-tees-calibrate.css`,
+  `vendor-portals/css/*` (2 sheets, 3 pages), `calculators/quick-quote/dtf-prints-prototype.css`. 458 colours →
+  84 exact / 113 near / 61 far as 39 sheet-scoped variables; the two vendor-portal sheets lost ten byte-identical
+  `--gray-*` definitions each. 9 pages gained the tokens link (12 of 12 now).
+- **Verification:** all 12 pages screenshot pixel-identical before/after through the static server (the admin pages
+  redirect under the staff session, so every tail page was shot statically — layout and chrome, no live data).
+  Two lint findings fixed by hand: stylelint's number fixer had turned `oklch(55.0% …)` into `oklch(55.% …)` (an
+  invalid value — the page was re-shot after the fix, still identical), and three empty flag-row rules were removed.
+- **Dead sheets deleted (Erik, 2026-09-07: "get rid of the dead sheets"):** 18 stylesheets, ~17,000 lines, that no page,
+  script, server route or `@import` referenced (verified by path, basename and stem search): `laser-tumbler-styles`,
+  `screenprint-manual-fix`, `webstores-styles`, `cart-styles`, `gallery-styles`, `main-redesign`, `main`,
+  `modern-search-interface`, `pages/css/policies-hub`, `pages/css/utilities`, `pricing-pages-enhanced`, `pricing-pages`,
+  `product-styles`, `shared_components/css/contract-pricing-theme`, `dashboard-styles`, `dtg-brand-override`,
+  `dtg-quote-builder-extracted`, `dtg-quote-builder` — plus the two `tests/ui/test-dtg-*-layout.html` fixtures that
+  linked the last one and that no test ran. ACTIVE_FILES rows marked ❌ Removed (three rows had claimed consumers that
+  no longer linked them).
+- **Next:** the storefront + catalog palette pass (Erik: "you have the authority to make it look even better").
+
 ### 2026-09-07 — Quote builders family LIVE (`v2026.09.07.16`) — the LAST family: 19 sheets, 19 pages
 
 - **Family = the 6 `quote-builders/` pages (4 builders, the monogram form, the screen-print fast quote) + the 13
@@ -374,13 +395,13 @@ three gap sizes, `opacity:.5;cursor:not-allowed` ×26 (disabled). These become u
 **Eight releases:** foundation `v2026.09.07.3` · forms `.4` · training + Brand Standards `.6` · webstore + components `.8`
 · dashboards `.10` · calculators `.12` · staff pages + customer portal `.14` · quote builders `.16`.
 
-**Remaining tail — 12 sheets (~4,600 lines) loaded by pages outside the plan's families:** `admin/css/*` (4 sheets,
+**Remaining tail — DONE in `v2026.09.07.18` (12 sheets, all pages pixel-identical). Was:** `admin/css/*` (4 sheets,
 3 admin pages), `dashboards/production-shifts/styles.css`, `dashboards/reports/price-audit-report.css`,
 `employee-bundles/css/*` (2), `tools/custom-tees-calibrate.css`, `vendor-portals/css/*` (2 sheets, 3 pages),
 `calculators/quick-quote/dtf-prints-prototype.css`. One small batch with the same pipeline (before-shots →
 tokenize → lint → after-shots → diff) finishes them.
 
-**Link-orphans — 18 sheets (~17,000 lines) no page or script references; deleting them is Erik's call:**
+**Link-orphans — DELETED in `v2026.09.07.18` on Erik's instruction (18 sheets, ~17,000 lines, plus two dead `tests/ui` fixtures). Were:**
 `laser-tumbler-styles`, `screenprint-manual-fix`, `webstores-styles`, `cart-styles`, `gallery-styles`,
 `main-redesign` (4,345 lines), `main` (named only in a `server.js` comment), `modern-search-interface`,
 `pages/css/policies-hub` + `pages/css/utilities` (flagged 2026-09-07), `pricing-pages-enhanced`, `pricing-pages`,

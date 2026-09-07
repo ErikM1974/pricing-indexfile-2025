@@ -1,15 +1,23 @@
-/* wcttr-bundle.css — extracted 2026-09-06 from the inline <style> in employee-bundles/wcttr-bundle.html (Rule 3). */
+/* wcttr-bundle.css — extracted 2026-09-06 from the inline \3c style> in employee-bundles/wcttr-bundle.html (Rule 3). */
+
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue, merged into its
+   existing :root. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
 :root {
-    --primary-color: #1f2937;
-    --secondary-color: #f97316;
-    --accent-color: #ef4444;
-    --dark-text: #374151;
-    --light-text: #9ca3af;
+    --wcttr-bundle-orange: #f97316;
+    --wcttr-bundle-red: #ef4444;
+    --primary-color: var(--gray-800);
+    --secondary-color: var(--wcttr-bundle-orange);
+    --accent-color: var(--wcttr-bundle-red);
+    --dark-text: var(--gray-700);
+    --light-text: var(--gray-400);
 }
+/* stylelint-enable color-no-hex */
 
 body {
-    font-family: 'Lato', sans-serif;
-    background-color: #f5f5f5;
+    font-family: Lato, sans-serif;
+    background-color: var(--gray-100);
     color: var(--dark-text);
 }
 
@@ -35,7 +43,7 @@ body {
 }
 
 .header h1 {
-    font-family: 'Oxanium', sans-serif;
+    font-family: Oxanium, sans-serif;
     font-weight: 700;
     margin-bottom: 0.5rem;
     letter-spacing: 0.5px;
@@ -52,20 +60,20 @@ body {
     border-radius: 8px;
     padding: 2rem;
     margin-bottom: 1.5rem;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 4px rgb(0 0 0 / 10%);
 }
 
 .section-title {
     color: var(--primary-color);
     font-weight: 700;
-    font-family: 'Oxanium', sans-serif;
+    font-family: Oxanium, sans-serif;
     margin-bottom: 1.5rem;
     padding-bottom: 0.5rem;
-    border-bottom: 2px solid #eee;
+    border-bottom: 2px solid var(--brand-100);
 }
 
 .important-note {
-    background-color: #fff7ed;
+    background-color: var(--red-50);
     border-left: 4px solid var(--secondary-color);
     padding: 1rem 1.5rem;
     margin-bottom: 1.5rem;
@@ -78,7 +86,7 @@ body {
 }
 
 .instructions-box {
-    background-color: #f8f9fa;
+    background-color: var(--gray-50);
     border-left: 4px solid var(--primary-color);
     padding: 1.5rem;
     border-radius: 4px;
@@ -119,11 +127,11 @@ body {
     border-radius: 8px;
     padding: 2rem;
     margin-top: 2rem;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 4px rgb(0 0 0 / 10%);
 }
 
 .bundles-title {
-    font-family: 'Oxanium', sans-serif;
+    font-family: Oxanium, sans-serif;
     font-weight: 700;
     margin-bottom: 1.5rem;
     display: flex;
@@ -144,7 +152,7 @@ body {
 }
 
 .bundle-card {
-    border: 2px dashed #ddd;
+    border: 2px dashed var(--store-line);
     border-radius: 8px;
     padding: 1.5rem 1rem;
     text-align: center;
@@ -155,9 +163,9 @@ body {
 
 .bundle-card:hover {
     border-color: var(--primary-color);
-    background-color: #f9fafb;
+    background-color: var(--gray-50);
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(31, 41, 55, 0.15);
+    box-shadow: 0 4px 8px rgb(31 41 55 / 15%);
 }
 
 .bundle-card.active {
@@ -165,11 +173,11 @@ body {
     color: white;
     border-color: var(--primary-color);
     border-style: solid;
-    box-shadow: 0 4px 12px rgba(31, 41, 55, 0.25);
+    box-shadow: 0 4px 12px rgb(31 41 55 / 25%);
 }
 
 .bundle-card.active:hover {
-    background-color: #111827;
+    background-color: var(--gray-900);
 }
 
 .bundle-card i {
@@ -195,7 +203,7 @@ body {
 
 .instructions-box h5 {
     color: var(--primary-color);
-    font-family: 'Oxanium', sans-serif;
+    font-family: Oxanium, sans-serif;
     font-weight: 700;
     letter-spacing: 0.3px;
 }
@@ -221,7 +229,7 @@ body {
     opacity: 0.9;
 }
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
     .bundles-grid {
         grid-template-columns: repeat(2, 1fr);
     }
@@ -231,4 +239,5 @@ body {
     }
 }
 
+/* stylelint-disable-next-line declaration-no-important -- the hidden attribute must beat any display rule */
 [hidden] { display: none !important; }
