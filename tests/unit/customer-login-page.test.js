@@ -9,6 +9,7 @@
  *   5. The two pages share markup + CSS — what one has, the other has.
  */
 const fs = require('fs');
+const { serverSource } = require('../helpers/server-source');
 const path = require('path');
 const ROOT = path.join(__dirname, '..', '..');
 const read = (rel) => fs.readFileSync(path.join(ROOT, rel), 'utf8');
@@ -19,7 +20,7 @@ const pages = [
     ['vendor', strip(read('pages/vendor-login.html')), read('pages/js/vendor-login.js'), '/vendor', '/vendor/login'],
 ];
 const css = read('pages/css/customer-login.css');
-const server = read('server.js');
+const server = serverSource();
 
 describe.each(pages)('%s login page', (_name, html, js, prefix, loginPath) => {
     test('Rule 3 + structure', () => {

@@ -21,10 +21,11 @@
  */
 
 const fs = require('fs');
+const { serverSource } = require('../helpers/server-source');
 const path = require('path');
 
 const REPO = path.join(__dirname, '..', '..');
-const SERVER = fs.readFileSync(path.join(REPO, 'server.js'), 'utf8');
+const SERVER = serverSource();
 
 /** The forwarder block only, so an assertion cannot pass on unrelated code. */
 const BLOCK = (() => {

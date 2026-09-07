@@ -20,9 +20,10 @@
  */
 
 const fs = require('fs');
+const { serverSource } = require('../helpers/server-source');
 const path = require('path');
 
-const serverSrc = fs.readFileSync(path.join(__dirname, '..', '..', 'server.js'), 'utf8');
+const serverSrc = serverSource();
 
 function assertRegistration(pattern, description) {
     test(description, () => {

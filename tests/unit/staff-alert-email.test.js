@@ -4,8 +4,9 @@
  * payment reached nobody. Runs the real helper source out of server.js with fetch mocked.
  */
 const fs = require('fs');
+const { serverSource } = require('../helpers/server-source');
 const path = require('path');
-const src = fs.readFileSync(path.join(__dirname, '..', '..', 'server.js'), 'utf8');
+const src = serverSource();
 
 function slice(from, to) {
     const a = src.indexOf(from); const b = src.indexOf(to, a);

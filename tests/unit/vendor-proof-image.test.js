@@ -20,13 +20,14 @@
 process.env.SESSION_SECRET = 'test-session-secret-for-proof-tokens';
 
 const fs = require('fs');
+const { serverSource } = require('../helpers/server-source');
 const path = require('path');
 const crypto = require('crypto');
 const vml = require('../../lib/vendor-magic-link');
 const cml = require('../../lib/customer-magic-link');
 
 const REPO = path.join(__dirname, '..', '..');
-const SERVER = fs.readFileSync(path.join(REPO, 'server.js'), 'utf8');
+const SERVER = serverSource();
 
 describe('vendor proof token — integrity', () => {
     test('round-trips the file id and vendor it was minted for', () => {

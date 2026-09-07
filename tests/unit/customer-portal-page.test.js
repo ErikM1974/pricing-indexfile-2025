@@ -9,6 +9,7 @@
  *   6. The login email field has a real label.
  */
 const fs = require('fs');
+const { serverSource } = require('../helpers/server-source');
 const path = require('path');
 const ROOT = path.join(__dirname, '..', '..');
 const read = (rel) => fs.readFileSync(path.join(ROOT, rel), 'utf8');
@@ -18,7 +19,7 @@ const portalHtml = strip(read('pages/customer-portal.html'));
 const loginHtml = strip(read('pages/customer-login.html'));
 const js = read('pages/js/customer-portal.js');
 const css = read('pages/css/customer-portal.css');
-const server = read('server.js');
+const server = serverSource();
 
 describe('customer portal — Rule 3', () => {
     test.each([['pages/customer-portal.html', portalHtml], ['pages/customer-login.html', loginHtml]])('%s has no inline handlers, scripts or styles', (_rel, html) => {

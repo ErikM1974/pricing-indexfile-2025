@@ -12,6 +12,7 @@
  *   4. Phone: low-value columns hidden under 640px; 5-minute visible-tab refresh.
  */
 const fs = require('fs');
+const { serverSource } = require('../helpers/server-source');
 const path = require('path');
 
 const ROOT = path.join(__dirname, '..', '..');
@@ -21,7 +22,7 @@ const html = read('dashboards/purchasing-portal.html');
 const doc = new DOMParser().parseFromString(html, 'text/html');
 const js = read('dashboards/js/purchasing-portal.js');
 const css = read('dashboards/css/purchasing-portal.css');
-const serverSrc = read('server.js');
+const serverSrc = serverSource();
 
 describe('Rule 3 + shell', () => {
     test('no inline code', () => {

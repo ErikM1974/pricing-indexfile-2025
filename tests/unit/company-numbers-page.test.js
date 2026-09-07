@@ -12,6 +12,7 @@
  *      Collected is named for what it is; the entry is bundled with relative imports.
  */
 const fs = require('fs');
+const { serverSource } = require('../helpers/server-source');
 const path = require('path');
 const vm = require('vm');
 
@@ -30,7 +31,7 @@ const goalChip = read('shared_components/js/staff-dashboard/controllers/sales-go
 const goalService = read('shared_components/js/staff-dashboard/services/company-goal-service.js');
 const bonus = read('shared_components/js/staff-dashboard/controllers/embroidery-bonus-controller.js');
 const production = read('shared_components/js/staff-dashboard/controllers/production-controller.js');
-const serverSrc = read('server.js');
+const serverSrc = serverSource();
 
 // Load an ESM file's pure functions into a sandbox (jest here is CommonJS).
 function loadEsm(src) {
