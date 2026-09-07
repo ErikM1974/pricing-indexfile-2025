@@ -17,7 +17,11 @@ const CALL = /^[^\r\n]*require\('\.\/routes\/([a-z0-9-]+)'\)\(app, ctx\);[^\r\n]
 
 function serverSource() {
     const raw = fs.readFileSync(path.join(ROOT, 'server.js'), 'utf8');
-    return raw.replace(CALL, (line, name) => fs.readFileSync(path.join(ROOT, 'routes', `${name}.js`), 'utf8'));
+    // A moved module says SERVER_DIR / SERVER_FILE where the monolith said __dirname / __filename (the extractor
+    // rewrites them and passes the originals through ctx). Locks keep asserting the original spelling.
+    const inline = (name) => fs.readFileSync(path.join(ROOT, 'routes', `${name}.js`), 'utf8')
+        .replace(/\bSERVER_DIR\b/g, '__dirname').replace(/\bSERVER_FILE\b/g, '__filename');
+    return raw.replace(CALL, (line, name) => inline(name));
 }
 
 module.exports = { serverSource, ROOT };

@@ -90,6 +90,10 @@ if (lateConst.length) problems.push(`ctx bindings declared BELOW the section (te
 // `app` and `require`/`module` are provided by the module function / Node itself
 ctxNames.delete('app'); ctxNames.delete('require'); ctxNames.delete('module'); ctxNames.delete('exports'); ctxNames.delete('__dirname'); ctxNames.delete('__filename');
 
+// a range that contains another module's call site would move that registration into this module (and the
+// relative-require rewrite would then hide it from the route-table walker) — refuse outright
+const swallowed = lines.slice(FROM - 1, TO).map((l, i) => [FROM + i, l]).filter(([, l]) => /require\(['"]\.\/routes\//.test(l));
+if (swallowed.length) problems.push(`the range contains a routes/ call site at line(s) ${swallowed.map(([n]) => n).join(', ')} — start or end the cut elsewhere`);
 const registrations = inRange.filter((s) => /^app\.(get|post|put|patch|delete|all|use)\(/.test(lines[s.loc.start.line - 1].trim())).length;
 console.log(`section ${FROM}-${TO}: ${inRange.length} statements, ${registrations} registrations at top level, ${declaredIn.size} local bindings, ${ctxNames.size} ctx names`);
 console.log(`ctx: ${[...ctxNames].sort().join(', ')}`);

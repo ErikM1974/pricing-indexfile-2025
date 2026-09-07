@@ -21,7 +21,9 @@ const ROOT = path.resolve(__dirname, '..', '..');
 const FIXTURE = path.join(ROOT, 'tests', 'fixtures', 'server-route-table.json');
 const REG = /^(\s*)app\.(get|post|put|patch|delete|all|use)\(/;
 // the call site extract-section.js writes is one line: `{ const ctx = { … }; require('./routes/<name>')(app, ctx); }`
-const INCLUDE = /require\('\.\/routes\/([a-z0-9-]+)'\)\(app, ctx\);/;
+// …and `require('../routes/x')` is what a swallowed call site looks like after the extractor's relative-require
+// rewrite: recognised here so the guard below can reject it instead of silently dropping those registrations.
+const INCLUDE = /require\('\.\.?\/routes\/([a-z0-9-]+)'\)\(app, ctx\);/;
 
 function firstArgs(text) {
     // text starts right after "app.<method>(". Return { path, middleware } from the argument list up to the handler.

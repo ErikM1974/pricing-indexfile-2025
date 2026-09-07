@@ -51,6 +51,20 @@ half-finished work — and a `server.js` committed with call sites but without `
 
 ## 8. Progress log (newest first)
 
+### 2026-09-07 — third cut LIVE (`v2026.09.07.24`): 4 more modules, 119 registrations, `server.js` 10,561 → 9,529 lines
+
+- `routes/pages.js` (83 — the staff dashboard entry pages, page gates, clean-URL storefront routes and redirects,
+  the pages sitemap), `routes/staff-api.js` (29 — ManageOrders reads, payments, quote-session reads, SanMar invoices
+  and FTP, finished photos, command search), `routes/customer-auth.js` (4 — the customer magic-link login), and
+  `routes/crm-auth.js` (3). The helpers between them that the portal modules receive through ctx (`requireCustomer`,
+  `fetchPortalAccess`, `safeLoginNext`, the magic-link template) stay in `server.js` on purpose.
+- Two tool rules added after a mis-cut on stale line numbers (dry runs made before the stash, cuts after it, twenty
+  lines apart): the extractor refuses any range that contains another module's call site, and the walker now
+  recognises the `require('../routes/…')` spelling such a swallow produces and rejects it. Ranges are derived from
+  text anchors on the tree being cut, never carried over.
+- Route table identical (455); no undefined names in 14 modules; boot + request smoke (storefront pages 200, staff
+  pages 302 to login, staff API 401 anonymous, customer login 200); gates + e2e + both parity suites green.
+
 ### 2026-09-07 — second cut LIVE (`v2026.09.07.23`): 4 more modules, 92 registrations, `server.js` 14,600 → 10,561 lines
 
 - `routes/staff-saml.js` (16), `routes/vendor-portal.js` (12), `routes/customer-portal.js` (58, 3,242 lines — the
