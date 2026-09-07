@@ -1,19 +1,26 @@
-/* get-to-know-erik.css — page styles (extracted from inline <style>, 2026.09.05.11) */
+/* get-to-know-erik.css — page styles (extracted from inline \3c style>, 2026.09.05.11) */
 
-/* ── moved from inline <style> in training/get-to-know-erik.html (Rule 3, 2026.09.05.11) ── */
+/* ── moved from inline \3c style> in training/get-to-know-erik.html (Rule 3, 2026.09.05.11) ── */
+
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue, merged into its
+   existing :root. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
 :root {
-            --primary-green: #4cb354;
-            --primary-dark: #409a47;
-            --primary-light: #5bc85f;
-            --text-primary: #1f2937;
-            --text-secondary: #4b5563;
-            --bg-primary: #ffffff;
-            --bg-secondary: #f9fafb;
-            --border-color: #e5e7eb;
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    --page-green: #5bc85f;
+            --primary-green: var(--brand-500);
+            --primary-dark: var(--brand-600);
+            --primary-light: var(--page-green);
+            --text-primary: var(--gray-800);
+            --text-secondary: var(--gray-600);
+            --bg-primary: var(--color-surface);
+            --bg-secondary: var(--gray-50);
+            --border-color: var(--gray-200);
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 5%);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 10%);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 10%);
         }
+/* stylelint-enable color-no-hex */
 
         * {
             margin: 0;
@@ -22,8 +29,8 @@
         }
 
         body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #f0fdf4 0%, #f9fafb 100%);
+            font-family: Inter, sans-serif;
+            background: linear-gradient(135deg, var(--brand-50) 0%, var(--gray-50) 100%);
             color: var(--text-primary);
             line-height: 1.6;
             min-height: 100vh;
@@ -71,7 +78,7 @@
         }
 
         .back-link:hover {
-            background: #f0fdf4;
+            background: var(--brand-50);
             transform: translateX(-2px);
         }
 
@@ -110,7 +117,7 @@
             color: var(--primary-dark);
             font-style: italic;
             padding: 1rem;
-            background: #f0fdf4;
+            background: var(--brand-50);
             border-radius: 0.5rem;
             border-left: 4px solid var(--primary-green);
         }
@@ -180,7 +187,7 @@
         }
 
         .section-header:hover {
-            background: #f0fdf4;
+            background: var(--brand-50);
         }
 
         .section-title {
@@ -236,7 +243,7 @@
 
         /* Special Highlights */
         .highlight-box {
-            background: #f0fdf4;
+            background: var(--brand-50);
             border-left: 4px solid var(--primary-green);
             padding: 1rem;
             margin: 1rem 0;
@@ -267,7 +274,7 @@
         }
 
         /* Responsive Design */
-        @media (max-width: 768px) {
+        @media (width <= 768px) {
             .hero-title {
                 font-size: 2rem;
             }
@@ -296,11 +303,11 @@
             }
 
             .bio-section {
-                page-break-inside: avoid;
+                break-inside: avoid;
             }
 
             .bio-section.collapsed .section-content {
-                max-height: none !important;
-                padding: 1.5rem !important;
+                max-height: none;
+                padding: 1.5rem;
             }
         }

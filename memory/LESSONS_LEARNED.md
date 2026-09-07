@@ -28,34 +28,7 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 ### Customer-facing sweep — the same rules the staff pages broke, plus three real bugs (2026-09-06, ARCHIVED 2026-09-06, `v2026.09.05.77`→`v2026.09.06.5`): inline `display:none` beats `.hidden=false`; a listener registered after an early return never fires; render colours only after the fallback resolves; 6 scripts had a silent proxy-host fallback → `''` + visible error. Full entry in archive.
 ### Quote builders: finishing Rule 3 meant teaching the shared delegator four more events (2026-09-06, ARCHIVED 2026-09-07, `v2026.09.06.19`–`.22`): 185 inline change/input/blur/keydown/error handlers → `data-change`/`-input`/`-blur`/`-keydown`/`-enter`/`data-onerror` in the ONE shared delegator (`quote-builder-utils.js`, Rule 8); never add an `sr-only` h1 to the builders (axe baselines fail); gate a top-of-file `window.location` read for window-less tests; catch concatenated icon classes at runtime. Full entry in archive.
 ### Staff pages, the LIVE pass — what a signed-in runtime walk found that 80 static locks had not (2026-09-06, ARCHIVED 2026-09-07, `v2026.09.06.26`–`.28`): a page lock must also cover the scripts that render into it (`RENDERERS`); runtime bare-icon counts must exclude `aria-label` icons; a runtime `<style>` on a page that ships none is a Caspio DataPage embed; JS-created controls get their `aria-label` in code; the Mission Control harness drifts with its page (`node scripts/sync-test-harness.js`); the hashed dashboard bundle is versioned. Full entry in archive.
-
-## 2026-09-06 — Rule 6 sweep S3 (`v2026.09.06.31`): 118 scripts still guessed the proxy host, and two unit tests had been hitting the live API
-
-**Problem.** After every sweep, `no-hardcoded-hosts` still counted 222 proxy-host literals. 118
-browser scripts carried `|| 'https://caspio-pricing-proxy…'` (or a ternary, a direct
-`fetch('https://…')`, an object property, or a `return 'https://…'` accessor) — so a page that
-forgot `/config/app.config.js` silently worked against the literal and nobody noticed the config
-was missing. Two embroidery unit suites had passed for months only because the calculator's
-constructor fetched the LIVE proxy from Node.
-**Root cause.** Rule 6 was applied per-file when a file was touched; nothing swept the tree, and
-the fallback made the missing config invisible. The tests constructed `new Calc()` without
-`skipInit`, and the fallback host made that a real network call that happened to succeed.
-**Solution.** One script rewrote every fallback form to read `APP_CONFIG.API.BASE_URL` and log
-`[file] APP_CONFIG.API.BASE_URL missing` when absent (accessors return `''`); 18 forms the regex
-could not classify were rewritten by hand; `app.config.js` added in `<head>` of 32 consumer pages
-and moved ahead of the first script on 5 more (the homepage tag was `defer`, but `brands-flyout.js`
-instantiates at parse time). Baseline 222 → 42 (Node-side `lib/`, `scripts/`, the two sanctioned
-`EXACT_ONE` literals, three `preconnect` hints). Tests construct with `{ skipInit: true }`.
-**Prevention.** 🔑 A colon is not a ternary: `key: 'https://…'` inside an object literal matched
-the `[?:]` regex and became `key: ''` — a SILENT empty base; grep the diff for `: ''` after any
-regex rewrite. 🔑 Whole-file diffs after a scripted edit = line endings, not content: this repo
-mixes CRLF files, LF files and MIXED files (`dtg-pricing-service.js`); rebuild from `git show
-HEAD:` with `difflib` keeping each original line's ending, never `replace('\n','\r\n')`.
-🔑 A script that reads config at parse time needs the config tag BEFORE it, and `defer` on the
-config tag re-orders it after every non-deferred script. 🔑 A unit test that only passes with
-network access is an integration test in disguise — `skipInit` exists for exactly this.
-🔑 `git diff` on this OneDrive checkout warns "LF will be replaced by CRLF" for every touched
-file; silence it with `-c core.safecrlf=false`, it is not a content change.
+### Rule 6 sweep S3 — 118 scripts still guessed the proxy host, and two unit tests had been hitting the live API (2026-09-06, ARCHIVED 2026-09-07, `v2026.09.06.31`): every proxy URL comes from `APP_CONFIG.API.BASE_URL` with a VISIBLE failure when it is missing; a scripted rewrite must keep the ORIGINAL quote character; `tests/setup.js`'s fetch stub never installs on Node 18+ (native fetch) — stub `global.fetch` per test. Full entry in archive.
 
 ## 2026-09-06 — Final census (`v2026.09.06.33`–`.34`): 69 dead files, a retired page that still got "fixed" twice, and a lock that pinned a version prefix
 
@@ -270,3 +243,25 @@ so differing shots read as expected or as a bug, never as "close enough". 🔑 P
 `SHOT_MEDIA=print` too. 🔑 A specificity fight is fixed with a more specific selector
 (`.form-table td .size-chip input`), never `!important`; the `!important`s that must stay (print beating
 JS-toggled state) carry a `stylelint-disable-next-line` reason.
+
+## 2026-09-07 — Training family (`v2026.09.07.6`): an `!important` that source order cannot replace, and a family with no palette
+
+**Problem.** (a) Moving `nwca-language-reference.css`'s 117-flag print block to the END of the file and
+stripping `!important` looked right on screen and broke ONE card in print: its columns are laid out by
+inline `style=""` attributes in the HTML, and the print block overrides them with `[style*=…]` selectors.
+(b) A parser I wrote to find the losing rules choked on those very selectors (a `{`-free attribute value
+containing `)`) and "restored" three wrong declarations. (c) The training family has 190 distinct colours
+across 26 one-off pages — no palette to map to without repainting 26 pages.
+**Root cause.** (a) Inline styles beat every stylesheet rule except `!important`; source order is
+irrelevant. (b) Regex CSS parsing. (c) Pages built one at a time, each with its own theme.
+**Solution.** (a) Keep `!important` only on the print rules whose selector targets `[style` (a
+disable/enable pair with the reason); everything else in the block runs on source order — verified by the
+print pixel diff. (b) Read the card's markup and grep its classes instead. (c) Exact/near colours →
+tokens; every other colour → a `--page-<hue>` variable declared ONCE in the page's `:root` (auto-named by
+hue, stylelint-disable block), so consolidation later is one block per page, not a page-wide hunt.
+**Prevention.** 🔑 Before stripping `!important`, grep the page for `style="` — anything the sheet must
+beat inline needs the flag, full stop. 🔑 Print verification (`SHOT_MEDIA=print`) is what caught it; the
+screen shots were clean. 🔑 A byte-identical rule shared by N pages is a component; extract it to a
+family sheet linked before the page sheet, then re-theme it ONCE (ten maroon training headers → the
+Training Center's green in one rule). 🔑 Admin pages cannot be screenshotted by the e2e spec (its session
+is role `staff`) — verify them live.

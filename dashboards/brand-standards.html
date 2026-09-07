@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Brand Standards - Northwest Custom Apparel</title>
+    <link rel="icon" href="/favicon.png" type="image/png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Built from templates/page-template.html: tokens first (the @layer order), then this page only. -->
+    <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.07.6">
+    <link rel="stylesheet" href="/dashboards/css/brand-standards.css?v=2026.09.07.6">
+</head>
+<body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <header class="page-header">
+        <div class="page-header-inner">
+            <a href="/staff-dashboard.html" class="page-header-brand" title="Staff Dashboard">
+                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                     alt="Northwest Custom Apparel" class="page-header-logo">
+            </a>
+            <h1 class="page-title">Brand Standards</h1>
+            <nav class="page-nav" aria-label="Page">
+                <a href="/staff-dashboard.html" class="page-nav-link">
+                    <i class="fas fa-arrow-left" aria-hidden="true"></i> Dashboard
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <main id="main" class="page-main">
+        <p class="lede">
+            Every colour, type size, spacing step, radius, shadow and layer on this page is read <strong>live</strong> from
+            <code>shared_components/css/tokens.css</code> — the one file every page loads first. If a value here looks wrong,
+            fix it there; nothing on this page is typed by hand.
+        </p>
+
+        <div id="page-error" class="alert alert-error" role="alert" hidden>
+            <strong class="alert-title">Unable to load the token file</strong>
+            <p class="alert-body">Refresh the page. If it keeps failing, the stylesheet path changed — tell Erik.</p>
+        </div>
+
+        <nav class="toc" aria-label="Sections">
+            <a href="#rules">Rules</a>
+            <a href="#colour">Colour</a>
+            <a href="#people">People &amp; departments</a>
+            <a href="#type">Type</a>
+            <a href="#space">Space, radius, shadow</a>
+            <a href="#motion">Motion &amp; layers</a>
+            <a href="#new-page">Building a page</a>
+        </nav>
+
+        <section class="card" id="rules" aria-labelledby="rules-title">
+            <h2 class="card-title" id="rules-title">The rules that do not bend</h2>
+            <ol class="rules">
+                <li><strong>One token file.</strong> Colour, type, space, radius, shadow, motion and z-index come from
+                    <code>tokens.css</code>. A page never types a hex colour; <code>npm run lint:css</code> rejects it.</li>
+                <li><strong>Colour means a person or a department, not a page type.</strong> Steve is green, Ruth is purple,
+                    Bradley is slate, the shop floor is blue, the AE dashboard is maroon. Money and quoting is NW green.
+                    Two greens and two blues exist on purpose — never merge them.</li>
+                <li><strong>Reference pages wear the staff chrome, not a person's colour.</strong> Training, policies and
+                    the handbook use the Training Center's green header (<code>--color-dash-theme</code>) and a neutral
+                    tile on the staff dashboard. Customer-facing pages use the brand green (<code>--color-brand</code>).</li>
+                <li><strong>Printed sheets use the print palette.</strong> The fillable forms are printed at the counter;
+                    their colours were sampled from the official PDFs and stay exact (<code>--print-*</code>).</li>
+                <li><strong>A page's own colours are declared once.</strong> If a page genuinely needs a colour that is not
+                    a token, it goes in ONE <code>:root</code> block at the top of that page's stylesheet — and nowhere else —
+                    so re-theming the page is one edit.</li>
+                <li><strong>No <code>!important</code></strong> except the generated <code>quote-builder-inline.css</code> and
+                    a print rule that must beat JS-toggled state, which carries a written reason.</li>
+                <li><strong>Tokens load first.</strong> The token file declares the cascade layers
+                    (<code>reset → tokens → base → components → utilities → overrides</code>); a page stylesheet is linked after
+                    it and holds only what is specific to that page.</li>
+            </ol>
+        </section>
+
+        <section class="card" id="colour" aria-labelledby="colour-title">
+            <h2 class="card-title" id="colour-title">Colour</h2>
+            <p class="text-muted">Ramps first, then the semantic names pages should actually use. The number beside a ramp
+                colour is how often that exact hex appeared across the 295 stylesheets before the token file existed.</p>
+            <div id="colour-sections"></div>
+        </section>
+
+        <section class="card" id="people" aria-labelledby="people-title">
+            <h2 class="card-title" id="people-title">People &amp; departments</h2>
+            <p class="text-muted">A rep should know at a glance whose page a request goes to, and a tile on the staff
+                dashboard should look like the page it opens.</p>
+            <div id="people-sections"></div>
+        </section>
+
+        <section class="card" id="type" aria-labelledby="type-title">
+            <h2 class="card-title" id="type-title">Type</h2>
+            <div id="type-sections"></div>
+        </section>
+
+        <section class="card" id="space" aria-labelledby="space-title">
+            <h2 class="card-title" id="space-title">Space, radius, shadow</h2>
+            <div id="space-sections"></div>
+        </section>
+
+        <section class="card" id="motion" aria-labelledby="motion-title">
+            <h2 class="card-title" id="motion-title">Motion &amp; layers</h2>
+            <div id="motion-sections"></div>
+        </section>
+
+        <section class="card" id="new-page" aria-labelledby="new-page-title">
+            <h2 class="card-title" id="new-page-title">Building a page</h2>
+            <ol class="rules">
+                <li>Copy <code>templates/page-template.html</code>; replace the placeholders; one page stylesheet, one page script.</li>
+                <li>Write the stylesheet with <code>var(--…)</code> names from this page. Need a colour that is not here?
+                    Add it to <code>tokens.css</code> with a comment, or declare it once in the page's <code>:root</code> block.</li>
+                <li>Run <code>npm run lint:css</code> and <code>npm test</code>. Register the files in <code>ACTIVE_FILES.md</code>.
+                    A staff page that should be restricted gets a <code>Staff_Page_Access</code> row.</li>
+                <li>Give the page the colour family of the person or department it belongs to, and the matching family
+                    class on its staff-dashboard tile.</li>
+            </ol>
+            <p class="text-muted">Plan, progress and decisions: <code>memory/CSS_STANDARDIZATION_PLAN_2026-09.md</code>.</p>
+        </section>
+
+        <section class="card" id="decisions" aria-labelledby="decisions-title">
+            <h2 class="card-title" id="decisions-title">Decisions log</h2>
+            <p class="text-muted">This page is a working document. Every standard that changed how a page looks is
+                recorded here, newest first, with the release that shipped it.</p>
+            <ul class="rules decisions">
+                <li><strong>2026-09-07 · training family.</strong> The ten training pages that copied the AE dashboard's
+                    maroon header now wear the Training Center's green staff chrome from one shared sheet
+                    (<code>training/css/training-shared.css</code>); three coral-styled guides (art approval, Google review,
+                    lead sheet) keep their own chrome until they are redesigned. Each training page's remaining
+                    one-off colours are named once in its own <code>:root</code> block.</li>
+                <li><strong>2026-09-07 · forms family.</strong> The printable forms keep their PDF-sampled palette as
+                    the <code>--print-*</code> tokens; two stray inks (<code>#333</code>, <code>#666</code>) were folded into
+                    the print inks.</li>
+                <li><strong>2026-09-07 · foundation.</strong> One app-wide token file promoted from the staff dashboard
+                    seed; the brand green is <code>#4cb354</code> (the most-used green across 295 stylesheets), dark
+                    <code>#2e5827</code>; neutral ramps are the grey and slate scales the pages already used.</li>
+            </ul>
+        </section>
+    </main>
+
+    <footer class="page-footer">
+        <p>Northwest Custom Apparel &middot; Brand standards are generated from the token file &middot; <span id="token-count"></span></p>
+    </footer>
+
+    <script src="/config/app.config.js"></script>
+    <script src="/shared_components/js/data-call-delegator.js?v=2026.09.07.5"></script>
+    <script src="/dashboards/js/brand-standards.js?v=2026.09.07.6"></script>
+</body>
+</html>

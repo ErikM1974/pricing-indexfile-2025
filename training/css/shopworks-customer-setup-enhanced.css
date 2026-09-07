@@ -1,6 +1,26 @@
-/* shopworks-customer-setup-enhanced.css — page styles (extracted from inline <style>, 2026.09.05.11) */
+/* shopworks-customer-setup-enhanced.css — page styles (extracted from inline \3c style>, 2026.09.05.11) */
 
-/* ── moved from inline <style> in training/shopworks-customer-setup-enhanced.html (Rule 3, 2026.09.05.11) ── */
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue so the page
+   keeps its exact look. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   every rule below uses var(). Raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
+:root {
+    --page-gray: #848484;
+    --page-orange: #d4d0c8;
+    --page-blue: #2b5797;
+    --page-yellow-tint: #ece9d8;
+    --page-cyan: #7f9db9;
+    --page-yellow: #ffc107;
+    --page-blue-2: #4a7cc6;
+    --page-gray-2: #c0c0c0;
+    --page-blue-3: #4169e1;
+    --page-green: #208020;
+    --page-green-tint: #d4edda;
+    --page-gray-dark: #333;
+}
+/* stylelint-enable color-no-hex */
+
+/* ── moved from inline \3c style> in training/shopworks-customer-setup-enhanced.html (Rule 3, 2026.09.05.11) ── */
 * {
             margin: 0;
             padding: 0;
@@ -9,7 +29,7 @@
 
         body {
             font-family: Tahoma, Arial, sans-serif;
-            background: #d4d0c8;
+            background: var(--page-orange);
             overflow-x: auto;
             min-width: 1200px;
             font-size: 11px;
@@ -17,9 +37,9 @@
 
         /* Shopworks Top Navigation Bar */
         .shopworks-nav {
-            background: linear-gradient(to bottom, #4a7cc6, #2B5797);
+            background: linear-gradient(to bottom, var(--page-blue-2), var(--page-blue));
             padding: 2px 0;
-            border-bottom: 1px solid #1a3a6b;
+            border-bottom: 1px solid var(--sky-900);
         }
 
         .nav-modules {
@@ -42,11 +62,11 @@
         }
 
         .nav-module:hover {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgb(255 255 255 / 10%);
         }
 
         .nav-module.active {
-            background: rgba(255, 255, 255, 0.2);
+            background: rgb(255 255 255 / 20%);
         }
 
         .nav-module i {
@@ -56,17 +76,17 @@
 
         /* Main Container */
         .main-container {
-            background: #ece9d8;
+            background: var(--page-yellow-tint);
             margin: 0;
             min-height: calc(100vh - 60px);
-            border: 1px solid #848484;
+            border: 1px solid var(--page-gray);
         }
 
         /* Customer Header Section */
         .customer-header {
-            background: #d4d0c8;
+            background: var(--page-orange);
             padding: 3px 5px;
-            border-bottom: 1px solid #848484;
+            border-bottom: 1px solid var(--page-gray);
             display: flex;
             align-items: center;
             gap: 5px;
@@ -79,7 +99,7 @@
 
         .customer-header input {
             padding: 2px 3px;
-            border: 1px solid #7f9db9;
+            border: 1px solid var(--page-cyan);
             font-size: 11px;
             background: white;
         }
@@ -99,8 +119,8 @@
 
         /* Tab Navigation */
         .tab-nav {
-            background: #d4d0c8;
-            border-bottom: 1px solid #848484;
+            background: var(--page-orange);
+            border-bottom: 1px solid var(--page-gray);
             display: flex;
             align-items: flex-end;
             padding-left: 5px;
@@ -108,8 +128,8 @@
 
         .tab {
             padding: 4px 12px;
-            background: #d4d0c8;
-            border: 1px solid #848484;
+            background: var(--page-orange);
+            border: 1px solid var(--page-gray);
             border-bottom: none;
             margin-right: 1px;
             cursor: pointer;
@@ -119,12 +139,12 @@
         }
 
         .tab:hover {
-            background: #f0f0f0;
+            background: var(--gray-100);
         }
 
         .tab.active {
-            background: #ece9d8;
-            border-bottom: 1px solid #ece9d8;
+            background: var(--page-yellow-tint);
+            border-bottom: 1px solid var(--page-yellow-tint);
             position: relative;
             z-index: 10;
             padding-bottom: 5px;
@@ -142,21 +162,21 @@
         .action-btn {
             padding: 2px 8px;
             font-size: 11px;
-            border: 1px solid #848484;
-            background: linear-gradient(to bottom, #ffffff, #d4d0c8);
+            border: 1px solid var(--page-gray);
+            background: linear-gradient(to bottom, var(--color-surface), var(--page-orange));
             cursor: pointer;
             border-radius: 2px;
             min-width: 60px;
         }
 
         .action-btn:hover {
-            background: linear-gradient(to bottom, #f0f0f0, #d0d0d0);
+            background: linear-gradient(to bottom, var(--gray-100), var(--gray-300));
         }
 
         .action-btn.primary {
-            background: linear-gradient(to bottom, #5cb85c, #4cae4c);
+            background: linear-gradient(to bottom, var(--brand-500), var(--brand-500));
             color: white;
-            border-color: #4cae4c;
+            border-color: var(--brand-500);
         }
 
         /* Main Content Area */
@@ -177,20 +197,20 @@
 
         /* Contacts Section */
         .contacts-section {
-            background: #ece9d8;
-            border: 1px solid #848484;
+            background: var(--page-yellow-tint);
+            border: 1px solid var(--page-gray);
             flex: 1;
         }
 
         .section-tabs {
             display: flex;
-            background: #f0f0f0;
-            border-bottom: 1px solid #ccc;
+            background: var(--gray-100);
+            border-bottom: 1px solid var(--gray-300);
         }
 
         .section-tab {
             padding: 5px 15px;
-            border-right: 1px solid #ccc;
+            border-right: 1px solid var(--gray-300);
             cursor: pointer;
             font-size: 12px;
         }
@@ -208,9 +228,9 @@
         }
 
         .contacts-grid th {
-            background: #d4d0c8;
+            background: var(--page-orange);
             padding: 3px;
-            border: 1px solid #848484;
+            border: 1px solid var(--page-gray);
             text-align: left;
             font-weight: normal;
             position: sticky;
@@ -220,13 +240,13 @@
 
         .contacts-grid td {
             padding: 2px 3px;
-            border: 1px solid #c0c0c0;
+            border: 1px solid var(--page-gray-2);
             font-size: 11px;
             background: white;
         }
 
         .contacts-grid tr:hover {
-            background: #f5f5f5;
+            background: var(--gray-100);
         }
 
         .grid-checkbox {
@@ -234,7 +254,7 @@
         }
 
         .sort-arrow {
-            color: #2B5797;
+            color: var(--page-blue);
             cursor: pointer;
             margin-left: 3px;
         }
@@ -242,14 +262,14 @@
         /* Activities Section */
         .activities-section {
             background: white;
-            border: 1px solid #ccc;
+            border: 1px solid var(--gray-300);
             height: 200px;
         }
 
         .activities-filters {
             padding: 5px;
-            background: #f5f5f5;
-            border-bottom: 1px solid #ccc;
+            background: var(--gray-100);
+            border-bottom: 1px solid var(--gray-300);
             display: flex;
             gap: 10px;
             align-items: center;
@@ -269,16 +289,16 @@
 
         .sales-tax-section {
             background: white;
-            border: 1px solid #ccc;
+            border: 1px solid var(--gray-300);
             flex: 1;
         }
 
         .sales-tax-title {
-            background: #e0e0e0;
+            background: var(--gray-200);
             padding: 3px 8px;
             font-size: 12px;
             font-weight: bold;
-            border-bottom: 1px solid #ccc;
+            border-bottom: 1px solid var(--gray-300);
         }
 
         .sales-tax-content {
@@ -293,7 +313,7 @@
 
         .tax-header-row {
             display: table-row;
-            background: #f0f0f0;
+            background: var(--gray-100);
         }
 
         .tax-header {
@@ -301,7 +321,7 @@
             padding: 3px 5px;
             font-size: 11px;
             font-weight: normal;
-            border: 1px solid #d0d0d0;
+            border: 1px solid var(--gray-300);
         }
 
         .tax-row {
@@ -311,7 +331,7 @@
         .tax-cell {
             display: table-cell;
             padding: 2px 3px;
-            border: 1px solid #d0d0d0;
+            border: 1px solid var(--gray-300);
             font-size: 11px;
             vertical-align: middle;
             background: white;
@@ -325,7 +345,7 @@
         .tax-code {
             width: 60px;
             padding: 1px 3px;
-            border: 1px solid #7f9db9;
+            border: 1px solid var(--page-cyan);
             font-size: 11px;
             background: white;
         }
@@ -333,7 +353,7 @@
         .tax-desc {
             width: 180px;
             padding: 1px 3px;
-            border: 1px solid #7f9db9;
+            border: 1px solid var(--page-cyan);
             font-size: 11px;
             background: white;
         }
@@ -346,7 +366,7 @@
             cursor: pointer;
             vertical-align: middle;
             margin-left: 3px;
-            border: 1px solid #4169E1;
+            border: 1px solid var(--page-blue-3);
             border-radius: 2px;
         }
 
@@ -369,8 +389,8 @@
             display: flex;
             align-items: center;
             padding: 5px;
-            background: #f0f0f0;
-            border-top: 1px solid #d0d0d0;
+            background: var(--gray-100);
+            border-top: 1px solid var(--gray-300);
             gap: 10px;
         }
 
@@ -391,7 +411,7 @@
 
         .tax-exempt-input {
             padding: 1px 3px;
-            border: 1px solid #7f9db9;
+            border: 1px solid var(--page-cyan);
             font-size: 11px;
             background: white;
             width: 150px;
@@ -399,7 +419,7 @@
 
         .expiration-input {
             padding: 1px 3px;
-            border: 1px solid #7f9db9;
+            border: 1px solid var(--page-cyan);
             font-size: 11px;
             background: white;
             width: 100px;
@@ -418,18 +438,18 @@
         /* Right Panel - Profile */
         .right-panel {
             width: 300px;
-            background: #ece9d8;
-            border: 1px solid #848484;
+            background: var(--page-yellow-tint);
+            border: 1px solid var(--page-gray);
             padding: 5px;
         }
 
         .profile-header {
-            background: #d4d0c8;
+            background: var(--page-orange);
             padding: 3px;
-            margin: -5px -5px 5px -5px;
+            margin: -5px -5px 5px;
             font-weight: bold;
             font-size: 11px;
-            border-bottom: 1px solid #848484;
+            border-bottom: 1px solid var(--page-gray);
         }
 
         .profile-field {
@@ -448,7 +468,7 @@
         .profile-field input, .profile-field select {
             flex: 1;
             padding: 1px 3px;
-            border: 1px solid #7f9db9;
+            border: 1px solid var(--page-cyan);
             font-size: 11px;
             background: white;
         }
@@ -456,14 +476,14 @@
         /* Custom Fields */
         .custom-fields {
             margin-top: 20px;
-            border-top: 1px solid #ccc;
+            border-top: 1px solid var(--gray-300);
             padding-top: 10px;
         }
 
         .custom-fields h4 {
             font-size: 13px;
             margin-bottom: 8px;
-            color: #2B5797;
+            color: var(--page-blue);
         }
 
         /* Toggle Switch - Shopworks Style */
@@ -471,8 +491,8 @@
             display: inline-block;
             width: 16px;
             height: 16px;
-            background: #c0c0c0;
-            border: 1px solid #848484;
+            background: var(--page-gray-2);
+            border: 1px solid var(--page-gray);
             border-radius: 50%;
             position: relative;
             cursor: pointer;
@@ -480,8 +500,8 @@
         }
 
         .toggle-switch.active {
-            background: #40c040;
-            border-color: #208020;
+            background: var(--color-steve-light);
+            border-color: var(--page-green);
         }
 
         .toggle-switch.active::after {
@@ -495,8 +515,8 @@
 
         /* Status Bar */
         .status-bar {
-            background: #e0e0e0;
-            border-top: 1px solid #999;
+            background: var(--gray-200);
+            border-top: 1px solid var(--print-line);
             padding: 3px 10px;
             display: flex;
             justify-content: space-between;
@@ -512,17 +532,17 @@
             position: fixed;
             top: 60px;
             right: 10px;
-            background: #ece9d8;
-            border: 2px solid #848484;
+            background: var(--page-yellow-tint);
+            border: 2px solid var(--page-gray);
             border-radius: 0;
             padding: 10px;
-            box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+            box-shadow: 2px 2px 5px rgb(0 0 0 / 30%);
             z-index: 1000;
             width: 280px;
         }
 
         .training-overlay h3 {
-            color: #2B5797;
+            color: var(--page-blue);
             margin-bottom: 10px;
         }
 
@@ -535,8 +555,8 @@
 
         .mode-btn {
             padding: 8px;
-            background: linear-gradient(to bottom, #ffffff, #d4d0c8);
-            border: 1px solid #848484;
+            background: linear-gradient(to bottom, var(--color-surface), var(--page-orange));
+            border: 1px solid var(--page-gray);
             border-radius: 2px;
             cursor: pointer;
             font-size: 11px;
@@ -544,45 +564,45 @@
         }
 
         .mode-btn:hover {
-            background: linear-gradient(to bottom, #e0e0e0, #d0d0d0);
+            background: linear-gradient(to bottom, var(--gray-200), var(--gray-300));
             transform: translateX(5px);
         }
 
         .mode-btn.active {
-            background: linear-gradient(to bottom, #4a7cc6, #2B5797);
+            background: linear-gradient(to bottom, var(--page-blue-2), var(--page-blue));
             color: white;
-            border: 1px solid #1a3a6b;
+            border: 1px solid var(--sky-900);
         }
 
         /* Score Display */
         .score-display {
-            background: #d4d0c8;
+            background: var(--page-orange);
             padding: 8px;
-            border: 1px solid #848484;
+            border: 1px solid var(--page-gray);
             margin-top: 10px;
         }
 
         .score-display h4 {
-            color: #2B5797;
+            color: var(--page-blue);
             margin-bottom: 5px;
         }
 
         .score-value {
             font-size: 24px;
             font-weight: bold;
-            color: #5cb85c;
+            color: var(--brand-500);
         }
 
         /* Highlight for training */
         .highlight-field {
             animation: pulse 2s infinite;
-            box-shadow: 0 0 0 2px #ffc107;
+            box-shadow: 0 0 0 2px var(--page-yellow);
         }
 
         @keyframes pulse {
-            0% { box-shadow: 0 0 0 2px #ffc107; }
-            50% { box-shadow: 0 0 0 4px #ffc107, 0 0 20px rgba(255, 193, 7, 0.5); }
-            100% { box-shadow: 0 0 0 2px #ffc107; }
+            0% { box-shadow: 0 0 0 2px var(--page-yellow); }
+            50% { box-shadow: 0 0 0 4px var(--page-yellow), 0 0 20px rgb(255 193 7 / 50%); }
+            100% { box-shadow: 0 0 0 2px var(--page-yellow); }
         }
 
         /* Success/Error animations */
@@ -592,7 +612,7 @@
 
         @keyframes successFlash {
             0% { background: white; }
-            50% { background: #d4edda; }
+            50% { background: var(--page-green-tint); }
             100% { background: white; }
         }
 
@@ -602,14 +622,14 @@
 
         @keyframes errorFlash {
             0% { background: white; }
-            50% { background: #f8d7da; }
+            50% { background: var(--red-100); }
             100% { background: white; }
         }
 
         /* Tooltip */
         .tooltip {
             position: absolute;
-            background: #333;
+            background: var(--page-gray-dark);
             color: white;
             padding: 5px 10px;
             border-radius: 4px;
@@ -625,11 +645,8 @@
         /* Loading Screen */
         .loading-screen {
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.8);
+            inset: 0;
+            background: rgb(0 0 0 / 80%);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -644,13 +661,13 @@
         }
 
         .loading-content h2 {
-            color: #2B5797;
+            color: var(--page-blue);
             margin-bottom: 10px;
         }
 
         .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #2B5797;
+            border: 4px solid var(--gray-100);
+            border-top: 4px solid var(--page-blue);
             border-radius: 50%;
             width: 40px;
             height: 40px;

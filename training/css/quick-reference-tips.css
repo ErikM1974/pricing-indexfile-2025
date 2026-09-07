@@ -1,16 +1,24 @@
-/* quick-reference-tips.css — page styles (extracted from inline <style>, 2026.09.05.7) */
+/* quick-reference-tips.css — page styles (extracted from inline \3c style>, 2026.09.05.7) */
 
-/* ── moved from inline <style> in training/quick-reference-tips.html (Rule 3, 2026.09.05.7) ── */
+/* ── moved from inline \3c style> in training/quick-reference-tips.html (Rule 3, 2026.09.05.7) ── */
+
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue, merged into its
+   existing :root. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
 :root {
-            --wsu-crimson: #981e32;
-            --wsu-grey: #5e6a71;
-            --wsu-light-grey: #f0f0f0;
-            --text-primary: #1f2937;
-            --text-secondary: #6b7280;
-            --bg-primary: #ffffff;
-            --bg-secondary: #f9fafb;
-            --border-color: #e5e7eb;
+    --page-red: #c4365f;
+    --page-green: #22c55e;
+            --wsu-crimson: var(--color-ae);
+            --wsu-grey: var(--gray-500);
+            --wsu-light-grey: var(--gray-100);
+            --text-primary: var(--gray-800);
+            --text-secondary: var(--gray-500);
+            --bg-primary: var(--color-surface);
+            --bg-secondary: var(--gray-50);
+            --border-color: var(--gray-200);
         }
+/* stylelint-enable color-no-hex */
 
         * {
             margin: 0;
@@ -29,7 +37,7 @@
             background: var(--wsu-crimson);
             color: white;
             padding: 1.5rem 2rem;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgb(0 0 0 / 10%);
         }
 
         .header-content {
@@ -55,13 +63,13 @@
             align-items: center;
             gap: 0.5rem;
             padding: 0.5rem 1rem;
-            background: rgba(255,255,255,0.1);
+            background: rgb(255 255 255 / 10%);
             border-radius: 4px;
             transition: background 0.2s;
         }
 
         .back-link:hover {
-            background: rgba(255,255,255,0.2);
+            background: rgb(255 255 255 / 20%);
         }
 
         .container {
@@ -74,7 +82,7 @@
             background: white;
             padding: 1.5rem;
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+            box-shadow: 0 2px 4px rgb(0 0 0 / 6%);
             margin-bottom: 2rem;
             border-left: 4px solid var(--wsu-crimson);
         }
@@ -101,7 +109,7 @@
             background: white;
             padding: 1.25rem;
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+            box-shadow: 0 2px 4px rgb(0 0 0 / 6%);
             text-align: center;
         }
 
@@ -125,18 +133,18 @@
         .tip-card {
             background: white;
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+            box-shadow: 0 2px 4px rgb(0 0 0 / 6%);
             overflow: hidden;
             transition: transform 0.2s, box-shadow 0.2s;
         }
 
         .tip-card:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 8px rgb(0 0 0 / 10%);
         }
 
         .tip-header {
-            background: linear-gradient(135deg, var(--wsu-crimson), #c4365f);
+            background: linear-gradient(135deg, var(--wsu-crimson), var(--page-red));
             color: white;
             padding: 1rem 1.5rem;
             display: flex;
@@ -164,7 +172,7 @@
         }
 
         .new-badge {
-            background: #22c55e;
+            background: var(--page-green);
             color: white;
             padding: 0.25rem 0.5rem;
             border-radius: 12px;
@@ -195,7 +203,7 @@
             padding: 1rem;
             border-radius: 8px;
             margin-bottom: 1.5rem;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+            box-shadow: 0 2px 4px rgb(0 0 0 / 6%);
         }
 
         .search-input {
@@ -211,7 +219,7 @@
             border-color: var(--wsu-crimson);
         }
 
-        @media (max-width: 768px) {
+        @media (width <= 768px) {
             .container {
                 padding: 0 1rem;
             }

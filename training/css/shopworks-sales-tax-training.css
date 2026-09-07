@@ -1,6 +1,28 @@
-/* shopworks-sales-tax-training.css — page styles (extracted from inline <style>, 2026.09.05.11) */
+/* shopworks-sales-tax-training.css — page styles (extracted from inline \3c style>, 2026.09.05.11) */
 
-/* ── moved from inline <style> in training/shopworks-sales-tax-training.html (Rule 3, 2026.09.05.11) ── */
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue so the page
+   keeps its exact look. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   every rule below uses var(). Raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
+:root {
+    --page-blue: #2b5797;
+    --page-blue-2: #4169e1;
+    --page-gray: #848484;
+    --page-red: #c9302c;
+    --page-orange: #d4d0c8;
+    --page-yellow-tint: #ece9d8;
+    --page-blue-3: #4a7cc6;
+    --page-gray-dark: #333;
+    --page-red-2: #d9534f;
+    --page-green-tint: #d4edda;
+    --page-green: #c3e6cb;
+    --page-red-tint: #f5c6cb;
+    --page-yellow: #ffeaa7;
+    --page-yellow-2: #856404;
+}
+/* stylelint-enable color-no-hex */
+
+/* ── moved from inline \3c style> in training/shopworks-sales-tax-training.html (Rule 3, 2026.09.05.11) ── */
 * {
             margin: 0;
             padding: 0;
@@ -9,92 +31,21 @@
 
         body {
             font-family: Tahoma, Arial, sans-serif;
-            background: #d4d0c8;
+            background: var(--page-orange);
             min-height: 100vh;
             font-size: 11px;
             padding: 0;
         }
 
-        /* Navigation Header */
-        .nav-header {
-            background: linear-gradient(135deg, #981e32 0%, #b82940 100%);
-            color: white;
-            padding: 1rem 2rem;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            position: sticky;
-            top: 0;
-            z-index: 999;
-        }
-
-        .nav-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .nav-left {
-            display: flex;
-            align-items: center;
-            gap: 1.5rem;
-        }
-
-        .back-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem 1rem;
-            background: rgba(255,255,255,0.1);
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 6px;
-            color: white;
-            text-decoration: none;
-            transition: all 0.3s;
-            font-weight: 500;
-            font-size: 14px;
-        }
-
-        .back-btn:hover {
-            background: rgba(255,255,255,0.2);
-            transform: translateX(-2px);
-        }
-
-        .page-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
         .page-title i {
             font-size: 1.25rem;
             opacity: 0.9;
-        }
-
-        .nav-right {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .logo-container {
-            height: 35px;
-            opacity: 0.95;
-        }
-
-        .logo-container img {
-            height: 100%;
-            width: auto;
-        }
-
-        /* Breadcrumb */
+        }        /* Breadcrumb */
         .breadcrumb {
             background: white;
             padding: 0.75rem 2rem;
-            border-bottom: 1px solid #e5e7eb;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border-bottom: 1px solid var(--gray-200);
+            box-shadow: 0 1px 3px rgb(0 0 0 / 5%);
         }
 
         .breadcrumb-container {
@@ -107,19 +58,19 @@
         }
 
         .breadcrumb a {
-            color: #981e32;
+            color: var(--color-ae);
             text-decoration: none;
             font-weight: 500;
             transition: color 0.2s;
         }
 
         .breadcrumb a:hover {
-            color: #b82940;
+            color: var(--color-ae-light);
             text-decoration: underline;
         }
 
         .breadcrumb span {
-            color: #6b7280;
+            color: var(--gray-500);
         }
 
         /* Main Content Area */
@@ -130,15 +81,15 @@
         .training-container {
             max-width: 1000px;
             margin: 0 auto;
-            background: #ece9d8;
-            border: 2px solid #848484;
+            background: var(--page-yellow-tint);
+            border: 2px solid var(--page-gray);
             border-radius: 8px;
             overflow: hidden;
-            box-shadow: 4px 4px 8px rgba(0,0,0,0.3);
+            box-shadow: 4px 4px 8px rgb(0 0 0 / 30%);
         }
 
         .header {
-            background: linear-gradient(to bottom, #4a7cc6, #2B5797);
+            background: linear-gradient(to bottom, var(--page-blue-3), var(--page-blue));
             color: white;
             padding: 15px;
             text-align: center;
@@ -167,18 +118,18 @@
 
         .tax-code-card {
             background: white;
-            border: 1px solid #848484;
+            border: 1px solid var(--page-gray);
             border-radius: 4px;
             padding: 15px;
         }
 
         .tax-code-card h3 {
-            color: #2B5797;
+            color: var(--page-blue);
             font-size: 14px;
             margin-bottom: 10px;
             text-align: center;
             padding: 8px;
-            background: #f0f0f0;
+            background: var(--gray-100);
             border-radius: 4px;
         }
 
@@ -192,28 +143,28 @@
         }
 
         .use-when {
-            background: #e8f4fd;
+            background: var(--color-floor-tint);
             padding: 10px;
             border-radius: 4px;
             margin-top: 10px;
         }
 
         .use-when strong {
-            color: #2B5797;
+            color: var(--page-blue);
             font-size: 11px;
         }
 
         .game-section {
             background: white;
-            border: 2px solid #2B5797;
+            border: 2px solid var(--page-blue);
             border-radius: 8px;
             padding: 20px;
             margin-bottom: 20px;
         }
 
         .scenario-card {
-            background: #f8f9fa;
-            border: 1px solid #ddd;
+            background: var(--gray-50);
+            border: 1px solid var(--gray-300);
             border-radius: 6px;
             padding: 20px;
             margin-bottom: 20px;
@@ -232,17 +183,17 @@
             justify-content: space-between;
             padding: 8px;
             background: white;
-            border: 1px solid #ddd;
+            border: 1px solid var(--gray-300);
             border-radius: 4px;
         }
 
         .info-label {
             font-weight: bold;
-            color: #333;
+            color: var(--page-gray-dark);
         }
 
         .info-value {
-            color: #2B5797;
+            color: var(--page-blue);
             font-weight: bold;
         }
 
@@ -259,8 +210,8 @@
         }
 
         .tax-option {
-            background: linear-gradient(to bottom, #ffffff, #f0f0f0);
-            border: 2px solid #848484;
+            background: linear-gradient(to bottom, var(--color-surface), var(--gray-100));
+            border: 2px solid var(--page-gray);
             border-radius: 6px;
             padding: 15px;
             cursor: pointer;
@@ -270,35 +221,35 @@
         }
 
         .tax-option:hover {
-            border-color: #4169E1;
+            border-color: var(--page-blue-2);
             transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(65, 105, 225, 0.3);
+            box-shadow: 0 4px 8px rgb(65 105 225 / 30%);
         }
 
         .tax-option.selected {
-            background: linear-gradient(to bottom, #4169E1, #2B5797);
+            background: linear-gradient(to bottom, var(--page-blue-2), var(--page-blue));
             color: white;
-            border-color: #1a3a6b;
+            border-color: var(--sky-900);
         }
 
         .tax-option.correct {
-            background: linear-gradient(to bottom, #5cb85c, #4cae4c);
+            background: linear-gradient(to bottom, var(--brand-500), var(--brand-500));
             color: white;
-            border-color: #4cae4c;
+            border-color: var(--brand-500);
             animation: pulse-green 0.6s;
         }
 
         .tax-option.incorrect {
-            background: linear-gradient(to bottom, #d9534f, #c9302c);
+            background: linear-gradient(to bottom, var(--page-red-2), var(--page-red));
             color: white;
-            border-color: #c9302c;
+            border-color: var(--page-red);
             animation: shake 0.6s;
         }
 
         @keyframes pulse-green {
-            0% { box-shadow: 0 0 0 0 rgba(92, 184, 92, 0.7); }
-            70% { box-shadow: 0 0 0 10px rgba(92, 184, 92, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(92, 184, 92, 0); }
+            0% { box-shadow: 0 0 0 0 rgb(92 184 92 / 70%); }
+            70% { box-shadow: 0 0 0 10px rgb(92 184 92 / 0%); }
+            100% { box-shadow: 0 0 0 0 rgb(92 184 92 / 0%); }
         }
 
         @keyframes shake {
@@ -310,7 +261,7 @@
         .code-number {
             font-size: 18px;
             font-weight: bold;
-            color: #2B5797;
+            color: var(--page-blue);
         }
 
         .code-name {
@@ -320,9 +271,9 @@
         }
 
         .submit-btn {
-            background: linear-gradient(to bottom, #5cb85c, #4cae4c);
+            background: linear-gradient(to bottom, var(--brand-500), var(--brand-500));
             color: white;
-            border: 2px solid #4cae4c;
+            border: 2px solid var(--brand-500);
             border-radius: 6px;
             padding: 12px 30px;
             font-size: 14px;
@@ -332,7 +283,7 @@
         }
 
         .submit-btn:hover:not(:disabled) {
-            background: linear-gradient(to bottom, #4cae4c, #449d44);
+            background: linear-gradient(to bottom, var(--brand-500), var(--brand-600));
         }
 
         .submit-btn:disabled {
@@ -350,36 +301,36 @@
         }
 
         .feedback.success {
-            background: #d4edda;
-            border: 1px solid #c3e6cb;
-            color: #155724;
+            background: var(--page-green-tint);
+            border: 1px solid var(--page-green);
+            color: var(--print-green-dark);
         }
 
         .feedback.error {
-            background: #f8d7da;
-            border: 1px solid #f5c6cb;
-            color: #721c24;
+            background: var(--red-100);
+            border: 1px solid var(--page-red-tint);
+            color: var(--color-ae-dark);
         }
 
         .score-section {
             text-align: center;
             margin: 20px 0;
             padding: 15px;
-            background: #f0f0f0;
+            background: var(--gray-100);
             border-radius: 6px;
         }
 
         .score-display {
             font-size: 24px;
             font-weight: bold;
-            color: #2B5797;
+            color: var(--page-blue);
             margin-bottom: 10px;
         }
 
         .next-scenario-btn {
-            background: linear-gradient(to bottom, #4169E1, #2B5797);
+            background: linear-gradient(to bottom, var(--page-blue-2), var(--page-blue));
             color: white;
-            border: 2px solid #2B5797;
+            border: 2px solid var(--page-blue);
             border-radius: 6px;
             padding: 10px 25px;
             font-size: 13px;
@@ -389,13 +340,13 @@
         }
 
         .next-scenario-btn:hover {
-            background: linear-gradient(to bottom, #2B5797, #1a3a6b);
+            background: linear-gradient(to bottom, var(--page-blue), var(--sky-900));
         }
 
         .progress-bar {
             width: 100%;
             height: 8px;
-            background: #e0e0e0;
+            background: var(--gray-200);
             border-radius: 4px;
             overflow: hidden;
             margin-bottom: 20px;
@@ -403,13 +354,13 @@
 
         .progress-fill {
             height: 100%;
-            background: linear-gradient(to right, #4169E1, #2B5797);
+            background: linear-gradient(to right, var(--page-blue-2), var(--page-blue));
             transition: width 0.3s;
         }
 
         .hint-section {
-            background: #fff3cd;
-            border: 1px solid #ffeaa7;
+            background: var(--amber-100);
+            border: 1px solid var(--page-yellow);
             border-radius: 4px;
             padding: 15px;
             margin-top: 15px;
@@ -418,13 +369,13 @@
 
         .hint-title {
             font-weight: bold;
-            color: #856404;
+            color: var(--page-yellow-2);
             margin-bottom: 10px;
         }
 
         .decision-tree {
             background: white;
-            border: 2px solid #2B5797;
+            border: 2px solid var(--page-blue);
             border-radius: 8px;
             padding: 20px;
             margin-bottom: 20px;
@@ -432,7 +383,7 @@
 
         .tree-title {
             text-align: center;
-            color: #2B5797;
+            color: var(--page-blue);
             font-size: 16px;
             font-weight: bold;
             margin-bottom: 20px;
@@ -443,12 +394,12 @@
             align-items: center;
             margin-bottom: 15px;
             padding: 10px;
-            background: #f8f9fa;
+            background: var(--gray-50);
             border-radius: 4px;
         }
 
         .step-number {
-            background: #2B5797;
+            background: var(--page-blue);
             color: white;
             border-radius: 50%;
             width: 25px;
@@ -469,7 +420,7 @@
         .completion-celebration {
             text-align: center;
             padding: 30px;
-            background: linear-gradient(135deg, #5cb85c, #4cae4c);
+            background: linear-gradient(135deg, var(--brand-500), var(--brand-500));
             color: white;
             border-radius: 8px;
             margin-top: 20px;
@@ -482,7 +433,7 @@
 
         .restart-btn {
             background: white;
-            color: #2B5797;
+            color: var(--page-blue);
             border: 2px solid white;
             border-radius: 6px;
             padding: 12px 25px;
@@ -493,11 +444,11 @@
         }
 
         .restart-btn:hover {
-            background: #f0f0f0;
+            background: var(--gray-100);
         }
 
         /* Mobile Responsive Navigation */
-        @media (max-width: 768px) {
+        @media (width <= 768px) {
             .nav-header {
                 padding: 0.75rem 1rem;
             }

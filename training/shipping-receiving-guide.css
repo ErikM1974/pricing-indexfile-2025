@@ -1,29 +1,51 @@
 /* Shipping & Receiving Clerk — Training Guide Styles */
+
 /* Self-contained; follows the data-entry-guide.css / service-price-cheat-sheet design system. */
 
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue, merged into its
+   existing :root. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
 :root {
-    --primary-green: #2e7d32;
-    --primary-green-dark: #1b5e20;
-    --bg-light: #f8fafc;
-    --text-primary: #1e293b;
-    --text-secondary: #64748b;
-    --border-color: #e2e8f0;
-    --card-shadow: 0 1px 3px rgba(0,0,0,0.08);
-
-    --receive-color: #1d4ed8;  --receive-bg: #eff6ff;  --receive-border: #bfdbfe;
-    --ship-color:    #15803d;  --ship-bg:    #f0fdf4;  --ship-border:    #bbf7d0;
-    --pack-color:    #0f766e;  --pack-bg:    #f0fdfa;  --pack-border:    #99f6e4;
-    --pickup-color:  #7c3aed;  --pickup-bg:  #f5f3ff;  --pickup-border:  #ddd6fe;
-    --close-color:   #a16207;  --close-bg:   #fefce8;  --close-border:   #fde68a;
-    --special-color: #c2410c;  --special-bg: #fff7ed;  --special-border: #fed7aa;
-    --handoff-color: #4338ca;  --handoff-bg: #eef2ff;  --handoff-border: #c7d2fe;
-    --warn-red: #dc2626;       --warn-bg: #fef2f2;     --warn-border: #fecaca;
+    --page-cyan-tint: #bfdbfe;
+    --page-green-tint: #bbf7d0;
+    --page-yellow: #fde68a;
+    --page-green: #2e7d32;
+    --page-green-dark: #1b5e20;
+    --page-green-2: #15803d;
+    --page-teal: #0f766e;
+    --page-teal-2: #99f6e4;
+    --page-indigo: #7c3aed;
+    --page-indigo-tint: #ddd6fe;
+    --page-orange: #a16207;
+    --page-orange-2: #c2410c;
+    --page-orange-3: #fed7aa;
+    --page-blue: #4338ca;
+    --page-blue-tint: #c7d2fe;
+    --page-red-tint: #fecaca;
+    --page-blue-2: #1e40af;
+    --primary-green: var(--page-green);
+    --primary-green-dark: var(--page-green-dark);
+    --bg-light: var(--slate-50);
+    --text-primary: var(--gray-800);
+    --text-secondary: var(--slate-500);
+    --border-color: var(--slate-200);
+    --card-shadow: 0 1px 3px rgb(0 0 0 / 8%);
+    --receive-color: var(--color-floor-dark);  --receive-bg: var(--color-floor-tint);  --receive-border: var(--page-cyan-tint);
+    --ship-color:    var(--page-green-2);  --ship-bg:    var(--brand-50);  --ship-border:    var(--page-green-tint);
+    --pack-color:    var(--page-teal);  --pack-bg:    var(--brand-50);  --pack-border:    var(--page-teal-2);
+    --pickup-color:  var(--page-indigo);  --pickup-bg:  var(--color-ruth-tint);  --pickup-border:  var(--page-indigo-tint);
+    --close-color:   var(--page-orange);  --close-bg:   var(--red-50);  --close-border:   var(--page-yellow);
+    --special-color: var(--page-orange-2);  --special-bg: var(--red-50);  --special-border: var(--page-orange-3);
+    --handoff-color: var(--page-blue);  --handoff-bg: var(--color-floor-tint);  --handoff-border: var(--page-blue-tint);
+    --warn-red: var(--red-600);       --warn-bg: var(--red-50);     --warn-border: var(--page-red-tint);
 }
+/* stylelint-enable color-no-hex */
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
     background: var(--bg-light);
     color: var(--text-primary);
     line-height: 1.55;
@@ -41,6 +63,7 @@ body {
     border-bottom: 1px solid var(--border-color);
     margin-bottom: 20px;
 }
+
 .header-container {
     display: flex;
     justify-content: space-between;
@@ -68,7 +91,7 @@ body {
     gap: 6px;
     text-decoration: none;
 }
-.btn-print:hover, .btn-link:hover { background: #f1f5f9; }
+.btn-print:hover, .btn-link:hover { background: var(--slate-100); }
 
 /* ── Page Title ─────────────────────────────────────────────────────── */
 .page-title {
@@ -78,6 +101,7 @@ body {
     margin-bottom: 4px;
 }
 .page-title i { color: var(--primary-green); margin-right: 8px; }
+
 .page-subtitle {
     font-size: 14px;
     color: var(--text-secondary);
@@ -94,6 +118,7 @@ body {
     padding: 14px 18px;
     margin-bottom: 24px;
 }
+
 .quicknav h2 {
     font-size: 12px;
     font-weight: 700;
@@ -102,12 +127,14 @@ body {
     color: var(--text-secondary);
     margin-bottom: 10px;
 }
+
 .quicknav ul {
     list-style: none;
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 4px 18px;
 }
+
 .quicknav a {
     display: block;
     font-size: 13px;
@@ -116,6 +143,7 @@ body {
     padding: 4px 0;
 }
 .quicknav a:hover { text-decoration: underline; }
+
 .quicknav a .num {
     display: inline-block;
     width: 20px;
@@ -130,6 +158,7 @@ body {
     gap: 14px;
     margin-bottom: 8px;
 }
+
 .pillar {
     background: white;
     border: 1px solid var(--border-color);
@@ -138,6 +167,7 @@ body {
     box-shadow: var(--card-shadow);
     padding: 16px;
 }
+
 .pillar .pillar-step {
     display: inline-flex;
     align-items: center;
@@ -183,15 +213,17 @@ body {
     margin-bottom: 14px;
     overflow: hidden;
 }
+
 .ref-card-header {
     padding: 12px 18px;
-    background: #f8fafc;
+    background: var(--slate-50);
     border-bottom: 1px solid var(--border-color);
     display: flex;
     justify-content: space-between;
     align-items: center;
     gap: 10px;
 }
+
 .ref-card-header h2, .ref-card-header h3 {
     font-size: 15px;
     font-weight: 600;
@@ -207,13 +239,15 @@ body {
 
 /* Numbered step rows */
 .steps { counter-reset: step; list-style: none; }
+
 .steps > li {
     position: relative;
     padding: 8px 0 8px 38px;
     font-size: 14px;
-    border-bottom: 1px solid #f1f5f9;
+    border-bottom: 1px solid var(--slate-100);
 }
 .steps > li:last-child { border-bottom: none; }
+
 .steps > li::before {
     counter-increment: step;
     content: counter(step);
@@ -221,7 +255,7 @@ body {
     left: 0; top: 8px;
     width: 24px; height: 24px;
     border-radius: 50%;
-    background: #eef2f7;
+    background: var(--slate-100);
     color: var(--primary-green);
     font-weight: 700;
     font-size: 12px;
@@ -246,8 +280,9 @@ body {
     gap: 6px;
     margin: 6px 0 4px;
 }
+
 .priority .chip {
-    background: #eef2f7;
+    background: var(--slate-100);
     border: 1px solid var(--border-color);
     border-radius: 20px;
     padding: 4px 12px;
@@ -268,15 +303,15 @@ body {
 }
 .callout i { margin-right: 6px; }
 .callout strong { color: inherit; }
-.callout-do   { background: #f0fdf4; border-color: #bbf7d0; color: #166534; }
-.callout-warn { background: var(--warn-bg); border-color: var(--warn-border); color: #991b1b; }
-.callout-info { background: #eff6ff; border-color: #bfdbfe; color: #1e40af; }
-.callout-tip  { background: #fefce8; border-color: #fde68a; color: #854d0e; }
+.callout-do   { background: var(--brand-50); border-color: var(--page-green-tint); color: var(--print-green); }
+.callout-warn { background: var(--warn-bg); border-color: var(--warn-border); color: var(--red-800); }
+.callout-info { background: var(--color-floor-tint); border-color: var(--page-cyan-tint); color: var(--page-blue-2); }
+.callout-tip  { background: var(--red-50); border-color: var(--page-yellow); color: var(--amber-800); }
 .callout-key  { background: var(--handoff-bg); border-color: var(--handoff-border); color: var(--handoff-color); }
 
 /* ── "Boxes of money" hero quote ───────────────────────────────────── */
 .philosophy {
-    background: linear-gradient(135deg, #ecfdf5 0%, #f0fdf4 100%);
+    background: linear-gradient(135deg, var(--brand-50) 0%, var(--brand-50) 100%);
     border-left: 4px solid var(--primary-green);
     border-radius: 8px;
     padding: 16px 18px;
@@ -288,6 +323,7 @@ body {
 
 /* ── Tables ─────────────────────────────────────────────────────────── */
 .ref-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+
 .ref-table th {
     text-align: left;
     padding: 8px 10px;
@@ -297,21 +333,23 @@ body {
     letter-spacing: 0.5px;
     color: var(--text-secondary);
     border-bottom: 2px solid var(--border-color);
-    background: #fafbfc;
+    background: var(--gray-50);
 }
+
 .ref-table td {
     padding: 9px 10px;
-    border-bottom: 1px solid #f1f5f9;
+    border-bottom: 1px solid var(--slate-100);
     vertical-align: top;
 }
 .ref-table tbody tr:last-child td { border-bottom: none; }
-.ref-table tbody tr:hover { background: #f8fafc; }
+.ref-table tbody tr:hover { background: var(--slate-50); }
+
 .ref-table code {
     font-size: 12px;
-    background: #f1f5f9;
+    background: var(--slate-100);
     padding: 2px 6px;
     border-radius: 3px;
-    color: #475569;
+    color: var(--slate-600);
 }
 .compact-table { max-width: 560px; }
 
@@ -321,11 +359,12 @@ body {
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     gap: 10px;
 }
+
 .contact-card {
     border: 1px solid var(--border-color);
     border-radius: 8px;
     padding: 12px 14px;
-    background: #fafbfc;
+    background: var(--gray-50);
 }
 .contact-card .who { font-weight: 700; font-size: 14px; color: var(--text-primary); }
 .contact-card .role { font-size: 12px; color: var(--primary-green); font-weight: 600; margin: 2px 0 4px; }
@@ -334,6 +373,7 @@ body {
 /* ── Checklist (interactive, persists) ──────────────────────────────── */
 .checklist-card .ref-card-body { padding: 16px 18px; }
 .checklist-grid { display: flex; flex-direction: column; gap: 8px; }
+
 .checklist-item {
     display: flex;
     align-items: flex-start;
@@ -345,7 +385,8 @@ body {
     cursor: pointer;
     transition: background 0.15s;
 }
-.checklist-item:hover { background: #f8fafc; }
+.checklist-item:hover { background: var(--slate-50); }
+
 .checklist-item input[type="checkbox"] {
     margin-top: 2px;
     accent-color: var(--primary-green);
@@ -353,6 +394,7 @@ body {
     width: 16px; height: 16px;
 }
 .checklist-item input:checked + span { text-decoration: line-through; color: var(--text-secondary); }
+
 .checklist-reset {
     margin-top: 10px;
     font-size: 12px;
@@ -369,29 +411,32 @@ body {
 
 /* Two-column bullet list (login checklist) */
 .cols-2 { columns: 2; column-gap: 28px; }
-@media (max-width: 600px) { .cols-2 { columns: 1; } }
+
+@media (width <= 600px) { .cols-2 { columns: 1; } }
 
 /* Weekly sign-off grid */
 .signoff-wrap { overflow-x: auto; }
 .signoff { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 520px; }
+
 .signoff th, .signoff td {
     border: 1px solid var(--border-color);
     padding: 7px 8px;
     text-align: center;
 }
-.signoff th { background: #fafbfc; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); }
+.signoff th { background: var(--gray-50); font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); }
 .signoff td.task { text-align: left; font-size: 13px; }
 
 /* ── Sources / footer ───────────────────────────────────────────────── */
 .sources-note {
     font-size: 12px;
     color: var(--text-secondary);
-    background: #fafbfc;
+    background: var(--gray-50);
     border: 1px dashed var(--border-color);
     border-radius: 8px;
     padding: 12px 14px;
     margin-top: 20px;
 }
+
 .page-footer {
     text-align: center;
     font-size: 12px;
@@ -414,7 +459,7 @@ body {
     color: white;
     border: none;
     cursor: pointer;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 12px rgb(0 0 0 / 20%);
     font-size: 16px;
     display: none;
     align-items: center;
@@ -433,8 +478,8 @@ body {
     .page-subtitle { font-size: 11px; margin-bottom: 10px; }
     .pillars { grid-template-columns: repeat(3, 1fr); }
     .section-divider { margin: 16px 0 10px; padding: 6px 12px; font-size: 14px; break-after: avoid; }
-    .ref-card { box-shadow: none; border: 1px solid #ccc; margin-bottom: 10px; break-inside: avoid; }
-    .ref-card-header { background: #f0f0f0; padding: 8px 12px; }
+    .ref-card { box-shadow: none; border: 1px solid var(--gray-300); margin-bottom: 10px; break-inside: avoid; }
+    .ref-card-header { background: var(--gray-100); padding: 8px 12px; }
     .ref-card-body { padding: 8px 12px; }
     .ref-table th, .ref-table td { padding: 4px 8px; font-size: 11px; }
     .callout, .philosophy { font-size: 11px; padding: 6px 10px; }
@@ -442,10 +487,11 @@ body {
 }
 
 /* ── Responsive ─────────────────────────────────────────────────────── */
-@media (max-width: 720px) {
+@media (width <= 720px) {
     .pillars { grid-template-columns: 1fr; }
 }
-@media (max-width: 600px) {
+
+@media (width <= 600px) {
     .header-container { flex-direction: column; align-items: flex-start; gap: 8px; }
     .header-right { width: 100%; justify-content: flex-end; }
     .compact-table { max-width: 100%; }

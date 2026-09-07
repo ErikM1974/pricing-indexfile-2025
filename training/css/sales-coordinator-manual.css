@@ -1,21 +1,34 @@
-/* sales-coordinator-manual.css — page styles (extracted from inline <style>, 2026.09.05.7) */
+/* stylelint-disable no-duplicate-selectors -- legacy sheet: rules were appended over time; merging them would reorder the cascade (2026-09-07) */
 
-/* ── moved from inline <style> in training/sales-coordinator-manual.html (Rule 3, 2026.09.05.7) ── */
+/* sales-coordinator-manual.css — page styles (extracted from inline \3c style>, 2026.09.05.7) */
+
+/* ── moved from inline \3c style> in training/sales-coordinator-manual.html (Rule 3, 2026.09.05.7) ── */
+
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue, merged into its
+   existing :root. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
 :root {
-            --primary-color: #4cb354;
-            --primary-dark: #409a47;
-            --primary-light: #5bc85f;
-            --bg-color: #f5f7fa;
-            --card-bg: #ffffff;
-            --border-color: #e5e7eb;
-            --text-primary: #1f2937;
-            --text-secondary: #6b7280;
-            --hover-bg: #f3f4f6;
-            --success-bg: #d1fae5;
-            --success-text: #065f46;
-            --warning-bg: #fef3c7;
-            --warning-text: #92400e;
+    --page-cyan: #0284c7;
+    --page-green: #5bc85f;
+    --page-green-tint: #d1fae5;
+    --page-teal-dark: #065f46;
+    --page-orange: #78350f;
+            --primary-color: var(--brand-500);
+            --primary-dark: var(--brand-600);
+            --primary-light: var(--page-green);
+            --bg-color: var(--color-bradley-tint);
+            --card-bg: var(--color-surface);
+            --border-color: var(--gray-200);
+            --text-primary: var(--gray-800);
+            --text-secondary: var(--gray-500);
+            --hover-bg: var(--gray-100);
+            --success-bg: var(--page-green-tint);
+            --success-text: var(--page-teal-dark);
+            --warning-bg: var(--amber-100);
+            --warning-text: var(--amber-800);
         }
+/* stylelint-enable color-no-hex */
 
         * {
             margin: 0;
@@ -24,7 +37,7 @@
         }
 
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: Inter, sans-serif;
             background: var(--bg-color);
             color: var(--text-primary);
             line-height: 1.6;
@@ -38,7 +51,7 @@
             position: sticky;
             top: 0;
             z-index: 100;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            box-shadow: 0 1px 3px rgb(0 0 0 / 5%);
         }
 
         .header-container {
@@ -94,7 +107,7 @@
             background: var(--card-bg);
             border-radius: 8px;
             padding: 1.5rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            box-shadow: 0 1px 3px rgb(0 0 0 / 10%);
             position: sticky;
             top: 80px;
             height: calc(100vh - 100px);
@@ -153,7 +166,7 @@
             background: var(--primary-color);
             color: white;
             font-weight: 600;
-            box-shadow: 0 2px 4px rgba(76, 179, 84, 0.3);
+            box-shadow: 0 2px 4px rgb(76 179 84 / 30%);
         }
         
         .sidebar a.active-chapter:hover {
@@ -167,11 +180,10 @@
             background: var(--card-bg);
             border-radius: 8px;
             padding: 2rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            box-shadow: 0 1px 3px rgb(0 0 0 / 10%);
             max-width: 900px;
             height: calc(100vh - 100px);
-            overflow-y: auto;
-            overflow-x: hidden;
+            overflow: hidden auto;
             position: relative;
         }
 
@@ -257,6 +269,7 @@
                 opacity: 0; 
                 transform: translateY(20px);
             }
+
             to { 
                 opacity: 1; 
                 transform: translateY(0);
@@ -279,15 +292,15 @@
 
         .warning-box {
             background: var(--warning-bg);
-            border-left: 4px solid #f59e0b;
+            border-left: 4px solid var(--amber-500);
             padding: 1rem;
             margin: 1.5rem 0;
             border-radius: 6px;
         }
 
         .tip-box {
-            background: #e0f2fe;
-            border-left: 4px solid #0284c7;
+            background: var(--sky-100);
+            border-left: 4px solid var(--page-cyan);
             padding: 1rem;
             margin: 1.5rem 0;
             border-radius: 6px;
@@ -331,15 +344,15 @@
 
         /* Key Questions */
         .key-questions {
-            background: #f0f9ff;
-            border: 2px solid #0284c7;
+            background: var(--color-floor-tint);
+            border: 2px solid var(--page-cyan);
             border-radius: 8px;
             padding: 1.5rem;
             margin: 1.5rem 0;
         }
 
         .key-questions h4 {
-            color: #0284c7;
+            color: var(--page-cyan);
             margin-bottom: 1rem;
         }
 
@@ -353,8 +366,8 @@
 
         /* Script Box */
         .script-box {
-            background: #fef3c7;
-            border: 1px solid #f59e0b;
+            background: var(--amber-100);
+            border: 1px solid var(--amber-500);
             border-radius: 6px;
             padding: 1rem;
             margin: 1rem 0;
@@ -362,13 +375,13 @@
 
         .script-box .scenario {
             font-weight: 600;
-            color: #92400e;
+            color: var(--amber-800);
             margin-bottom: 0.5rem;
         }
 
         .script-box .response {
             font-style: italic;
-            color: #78350f;
+            color: var(--page-orange);
             padding-left: 1rem;
         }
 
@@ -386,7 +399,7 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 6px rgb(0 0 0 / 10%);
             transition: all 0.3s;
             opacity: 0;
             visibility: hidden;
@@ -403,7 +416,7 @@
         }
 
         /* Responsive */
-        @media (max-width: 968px) {
+        @media (width <= 968px) {
             .container {
                 flex-direction: column;
             }
@@ -434,8 +447,8 @@
             }
 
             .chapter {
-                display: block !important;
-                page-break-before: always;
+                display: block;
+                break-before: always;
             }
         }
 
@@ -472,7 +485,7 @@
         }
 
         .data-table tbody tr:nth-child(even) {
-            background: rgba(76, 179, 84, 0.03);
+            background: rgb(76 179 84 / 3%);
         }
 
         .data-table td:first-child {
@@ -497,11 +510,11 @@
 
         #celebrationsWidget > div > div:hover {
             transform: translateX(5px);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            box-shadow: 0 2px 8px rgb(0 0 0 / 15%);
         }
 
 /* Phone (≤640px) — 2026-09-05 staff-dashboard sweep: the page measured wider than the
    viewport at 375px and panned sideways. */
-@media (max-width: 640px) {
+@media (width <= 640px) {
     .breadcrumb { flex-wrap: wrap; }
 }

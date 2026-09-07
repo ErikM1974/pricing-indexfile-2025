@@ -1,6 +1,24 @@
-/* training-games-hub.css — page styles (extracted from inline <style>, 2026.09.05.7) */
+/* stylelint-disable no-duplicate-selectors -- legacy sheet: rules were appended over time; merging them would reorder the cascade (2026-09-07) */
 
-/* ── moved from inline <style> in training/training-games-hub.html (Rule 3, 2026.09.05.7) ── */
+/* training-games-hub.css — page styles (extracted from inline \3c style>, 2026.09.05.7) */
+
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue so the page
+   keeps its exact look. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   every rule below uses var(). Raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
+:root {
+    --page-blue: #667eea;
+    --page-indigo: #764ba2;
+    --page-teal: #10b981;
+    --page-green-tint: #d1fae5;
+    --page-teal-dark: #065f46;
+    --page-orange: #fed7aa;
+    --page-red-tint: #fecaca;
+    --page-blue-2: #1e40af;
+}
+/* stylelint-enable color-no-hex */
+
+/* ── moved from inline \3c style> in training/training-games-hub.html (Rule 3, 2026.09.05.7) ── */
 * {
             margin: 0;
             padding: 0;
@@ -8,80 +26,10 @@
         }
 
         body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            font-family: Inter, sans-serif;
+            background: linear-gradient(135deg, var(--color-bradley-tint) 0%, var(--gray-300) 100%);
             min-height: 100vh;
-        }
-
-        /* Navigation Header */
-        .nav-header {
-            background: linear-gradient(135deg, #981e32 0%, #b82940 100%);
-            color: white;
-            padding: 1rem 2rem;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            position: sticky;
-            top: 0;
-            z-index: 999;
-        }
-
-        .nav-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .nav-left {
-            display: flex;
-            align-items: center;
-            gap: 1.5rem;
-        }
-
-        .back-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem 1rem;
-            background: rgba(255,255,255,0.1);
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 6px;
-            color: white;
-            text-decoration: none;
-            transition: all 0.3s;
-            font-weight: 500;
-        }
-
-        .back-btn:hover {
-            background: rgba(255,255,255,0.2);
-            transform: translateX(-2px);
-        }
-
-        .page-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .nav-right {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .logo-container {
-            height: 35px;
-            opacity: 0.95;
-        }
-
-        .logo-container img {
-            height: 100%;
-            width: auto;
-        }
-
-        /* Main Container */
+        }        /* Main Container */
         .container {
             max-width: 1400px;
             margin: 0 auto;
@@ -90,20 +38,19 @@
 
         /* Hero Section */
         .hero {
-            background: white;
             border-radius: 16px;
             padding: 3rem;
             text-align: center;
             margin-bottom: 3rem;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 0 10px 40px rgb(0 0 0 / 10%);
+            background: linear-gradient(135deg, var(--page-blue) 0%, var(--page-indigo) 100%);
             color: white;
         }
 
         .hero h1 {
             font-size: 3rem;
             margin-bottom: 1rem;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            text-shadow: 2px 2px 4px rgb(0 0 0 / 20%);
         }
 
         .hero p {
@@ -121,7 +68,7 @@
         }
 
         .stat-item {
-            background: rgba(255,255,255,0.2);
+            background: rgb(255 255 255 / 20%);
             padding: 1rem 2rem;
             border-radius: 12px;
             backdrop-filter: blur(10px);
@@ -152,11 +99,11 @@
 
         .category-header h2 {
             font-size: 1.75rem;
-            color: #1f2937;
+            color: var(--gray-800);
         }
 
         .category-badge {
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: linear-gradient(135deg, var(--page-blue), var(--page-indigo));
             color: white;
             padding: 0.25rem 0.75rem;
             border-radius: 20px;
@@ -176,7 +123,7 @@
         .game-card {
             background: white;
             border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            box-shadow: 0 4px 20px rgb(0 0 0 / 8%);
             transition: all 0.3s;
             position: relative;
             padding: 2rem;
@@ -190,13 +137,13 @@
 
         .game-card:hover {
             transform: translateY(-8px) scale(1.05);
-            box-shadow: 0 12px 40px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 12px 40px rgb(102 126 234 / 30%);
         }
 
         .game-icon {
             width: 80px;
             height: 80px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--page-blue) 0%, var(--page-indigo) 100%);
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -208,20 +155,20 @@
         .game-title {
             font-size: 1.25rem;
             font-weight: 600;
-            color: #1f2937;
+            color: var(--gray-800);
             margin: 0;
         }
 
         .game-header {
             padding: 1.5rem;
-            background: linear-gradient(135deg, #f6f8fb 0%, #e5e7eb 100%);
-            border-bottom: 1px solid #e5e7eb;
+            background: linear-gradient(135deg, var(--slate-50) 0%, var(--gray-200) 100%);
+            border-bottom: 1px solid var(--gray-200);
         }
 
         .game-title {
             font-size: 1.25rem;
             font-weight: 600;
-            color: #1f2937;
+            color: var(--gray-800);
             margin-bottom: 0.5rem;
             display: flex;
             align-items: center;
@@ -229,11 +176,11 @@
         }
 
         .game-title i {
-            color: #667eea;
+            color: var(--page-blue);
         }
 
         .game-subtitle {
-            color: #6b7280;
+            color: var(--gray-500);
             font-size: 0.875rem;
         }
 
@@ -242,7 +189,7 @@
         }
 
         .game-description {
-            color: #4b5563;
+            color: var(--gray-600);
             line-height: 1.6;
             margin-bottom: 1.5rem;
         }
@@ -254,7 +201,7 @@
 
         .features-list li {
             padding: 0.5rem 0;
-            color: #4b5563;
+            color: var(--gray-600);
             font-size: 0.875rem;
             display: flex;
             align-items: flex-start;
@@ -262,7 +209,7 @@
         }
 
         .features-list li i {
-            color: #10b981;
+            color: var(--page-teal);
             margin-top: 2px;
             font-size: 0.75rem;
         }
@@ -279,18 +226,18 @@
         }
 
         .difficulty-easy {
-            background: #d1fae5;
-            color: #065f46;
+            background: var(--page-green-tint);
+            color: var(--page-teal-dark);
         }
 
         .difficulty-medium {
-            background: #fed7aa;
-            color: #92400e;
+            background: var(--page-orange);
+            color: var(--amber-800);
         }
 
         .difficulty-hard {
-            background: #fecaca;
-            color: #991b1b;
+            background: var(--page-red-tint);
+            color: var(--red-800);
         }
 
         .status-badge {
@@ -304,24 +251,24 @@
         }
 
         .status-new {
-            background: #fef3c7;
-            color: #92400e;
+            background: var(--amber-100);
+            color: var(--amber-800);
         }
 
         .status-updated {
-            background: #dbeafe;
-            color: #1e40af;
+            background: var(--sky-100);
+            color: var(--page-blue-2);
         }
 
         .status-popular {
-            background: #fce7f3;
-            color: #9f1239;
+            background: var(--red-50);
+            color: var(--color-ae);
         }
 
         .play-btn {
             width: 100%;
             padding: 0.75rem;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--page-blue) 0%, var(--page-indigo) 100%);
             color: white;
             border: none;
             border-radius: 8px;
@@ -337,15 +284,15 @@
 
         .play-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 4px 12px rgb(102 126 234 / 40%);
         }
 
         .play-btn.secondary {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            background: linear-gradient(135deg, var(--page-teal) 0%, var(--emerald-600) 100%);
         }
 
         .play-btn.secondary:hover {
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+            box-shadow: 0 4px 12px rgb(16 185 129 / 40%);
         }
 
         /* Quick Stats */
@@ -354,7 +301,7 @@
             border-radius: 12px;
             padding: 2rem;
             margin-bottom: 3rem;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            box-shadow: 0 4px 20px rgb(0 0 0 / 8%);
         }
 
         .quick-stats-grid {
@@ -370,7 +317,7 @@
         .quick-stat-icon {
             width: 48px;
             height: 48px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--page-blue) 0%, var(--page-indigo) 100%);
             border-radius: 12px;
             display: flex;
             align-items: center;
@@ -383,12 +330,12 @@
         .quick-stat-value {
             font-size: 1.5rem;
             font-weight: bold;
-            color: #1f2937;
+            color: var(--gray-800);
             margin-bottom: 0.25rem;
         }
 
         .quick-stat-label {
-            color: #6b7280;
+            color: var(--gray-500);
             font-size: 0.875rem;
         }
 
@@ -403,9 +350,9 @@
         .filter-pill {
             padding: 0.5rem 1rem;
             background: white;
-            border: 2px solid #e5e7eb;
+            border: 2px solid var(--gray-200);
             border-radius: 20px;
-            color: #4b5563;
+            color: var(--gray-600);
             cursor: pointer;
             transition: all 0.3s;
             font-weight: 500;
@@ -413,12 +360,12 @@
         }
 
         .filter-pill:hover {
-            border-color: #667eea;
-            color: #667eea;
+            border-color: var(--page-blue);
+            color: var(--page-blue);
         }
 
         .filter-pill.active {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--page-blue) 0%, var(--page-indigo) 100%);
             color: white;
             border-color: transparent;
         }
@@ -427,11 +374,11 @@
         .footer {
             text-align: center;
             padding: 3rem 0;
-            color: #6b7280;
+            color: var(--gray-500);
         }
 
         .footer a {
-            color: #667eea;
+            color: var(--page-blue);
             text-decoration: none;
             font-weight: 500;
         }
@@ -441,7 +388,7 @@
         }
 
         /* Responsive */
-        @media (max-width: 768px) {
+        @media (width <= 768px) {
             .hero h1 {
                 font-size: 2rem;
             }
