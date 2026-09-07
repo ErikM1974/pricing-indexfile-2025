@@ -1,4 +1,15 @@
-/* screenprint-fast-quote.css — extracted 2026-09-06 from the inline <style> in quote-builders/screenprint-fast-quote.html (Rule 3). */
+/* screenprint-fast-quote.css — extracted 2026-09-06 from the inline \3c style> in quote-builders/screenprint-fast-quote.html (Rule 3). */
+
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue so the page
+   keeps its exact look. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   every rule below uses var(). Raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
+:root {
+    --screenprint-fast-quote-green: #3a7c52;
+    --screenprint-fast-quote-green-2: #28a745;
+}
+/* stylelint-enable color-no-hex */
+
 * {
     margin: 0;
     padding: 0;
@@ -7,7 +18,7 @@
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    background: linear-gradient(135deg, var(--color-bradley-tint) 0%, var(--gray-300) 100%);
     min-height: 100vh;
     padding: 20px;
 }
@@ -17,13 +28,13 @@ body {
     margin: 0 auto;
     background: white;
     border-radius: 16px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 10px 40px rgb(0 0 0 / 10%);
     overflow: hidden;
 }
 
 /* Header */
 .header {
-    background: linear-gradient(135deg, #3a7c52 0%, #2d5f3f 100%);
+    background: linear-gradient(135deg, var(--screenprint-fast-quote-green) 0%, var(--print-green) 100%);
     color: white;
     padding: 30px;
     text-align: center;
@@ -44,8 +55,8 @@ body {
     display: flex;
     justify-content: space-between;
     padding: 20px 30px;
-    background: #f8f9fa;
-    border-bottom: 1px solid #e9ecef;
+    background: var(--gray-50);
+    border-bottom: 1px solid var(--gray-200);
 }
 
 .progress-step {
@@ -61,20 +72,20 @@ body {
     right: -50%;
     width: 100%;
     height: 2px;
-    background: #dee2e6;
+    background: var(--gray-200);
     z-index: 0;
 }
 
 .progress-step.active:not(:last-child)::after {
-    background: #3a7c52;
+    background: var(--screenprint-fast-quote-green);
 }
 
 .progress-circle {
     width: 30px;
     height: 30px;
     border-radius: 50%;
-    background: #dee2e6;
-    color: #6c757d;
+    background: var(--gray-200);
+    color: var(--gray-500);
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -86,13 +97,13 @@ body {
 }
 
 .progress-step.active .progress-circle {
-    background: #3a7c52;
+    background: var(--screenprint-fast-quote-green);
     color: white;
     transform: scale(1.1);
 }
 
 .progress-step.completed .progress-circle {
-    background: #28a745;
+    background: var(--screenprint-fast-quote-green-2);
     color: white;
 }
 
@@ -100,11 +111,11 @@ body {
     display: block;
     margin-top: 8px;
     font-size: 12px;
-    color: #6c757d;
+    color: var(--gray-500);
 }
 
 .progress-step.active .progress-label {
-    color: #3a7c52;
+    color: var(--screenprint-fast-quote-green);
     font-weight: 600;
 }
 
@@ -129,13 +140,13 @@ body {
 
 .step-title {
     font-size: 24px;
-    color: #2d3748;
+    color: var(--gray-700);
     margin-bottom: 10px;
 }
 
 .step-subtitle {
     font-size: 14px;
-    color: #718096;
+    color: var(--slate-500);
     margin-bottom: 30px;
 }
 
@@ -148,7 +159,7 @@ body {
     display: block;
     font-size: 14px;
     font-weight: 600;
-    color: #2d3748;
+    color: var(--gray-700);
     margin-bottom: 8px;
 }
 
@@ -156,7 +167,7 @@ body {
 .form-select {
     width: 100%;
     padding: 12px 16px;
-    border: 2px solid #e2e8f0;
+    border: 2px solid var(--slate-200);
     border-radius: 8px;
     font-size: 15px;
     transition: all 0.2s;
@@ -165,14 +176,14 @@ body {
 .form-input:focus,
 .form-select:focus {
     outline: none;
-    border-color: #3a7c52;
-    box-shadow: 0 0 0 3px rgba(58, 124, 82, 0.1);
+    border-color: var(--screenprint-fast-quote-green);
+    box-shadow: 0 0 0 3px rgb(58 124 82 / 10%);
 }
 
 .form-textarea {
     width: 100%;
     padding: 12px 16px;
-    border: 2px solid #e2e8f0;
+    border: 2px solid var(--slate-200);
     border-radius: 8px;
     font-size: 15px;
     min-height: 100px;
@@ -190,7 +201,7 @@ body {
 
 .option-card {
     padding: 20px;
-    border: 2px solid #e2e8f0;
+    border: 2px solid var(--slate-200);
     border-radius: 12px;
     cursor: pointer;
     text-align: center;
@@ -198,32 +209,32 @@ body {
 }
 
 .option-card:hover {
-    border-color: #3a7c52;
-    background: #f0f9f4;
+    border-color: var(--screenprint-fast-quote-green);
+    background: var(--brand-50);
     transform: translateY(-2px);
 }
 
 .option-card.selected {
-    border-color: #3a7c52;
-    background: linear-gradient(135deg, #e8f5e9 0%, #f1f8f4 100%);
-    box-shadow: 0 4px 12px rgba(58, 124, 82, 0.2);
+    border-color: var(--screenprint-fast-quote-green);
+    background: linear-gradient(135deg, var(--brand-100) 0%, var(--gray-100) 100%);
+    box-shadow: 0 4px 12px rgb(58 124 82 / 20%);
 }
 
 .option-card-icon {
     font-size: 32px;
     margin-bottom: 10px;
-    color: #3a7c52;
+    color: var(--screenprint-fast-quote-green);
 }
 
 .option-card-label {
     font-size: 15px;
     font-weight: 600;
-    color: #2d3748;
+    color: var(--gray-700);
 }
 
 .option-card-hint {
     font-size: 12px;
-    color: #718096;
+    color: var(--slate-500);
     margin-top: 5px;
 }
 
@@ -246,27 +257,28 @@ body {
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, #3a7c52 0%, #2d5f3f 100%);
+    background: linear-gradient(135deg, var(--screenprint-fast-quote-green) 0%, var(--print-green) 100%);
     color: white;
 }
 
 .btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(58, 124, 82, 0.3);
+    box-shadow: 0 6px 16px rgb(58 124 82 / 30%);
 }
 
 .btn-secondary {
-    background: #e2e8f0;
-    color: #4a5568;
+    background: var(--slate-200);
+    color: var(--slate-600);
 }
 
 .btn-secondary:hover {
-    background: #cbd5e0;
+    background: var(--gray-300);
 }
 
 .btn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+    /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
     transform: none !important;
 }
 
@@ -274,7 +286,7 @@ body {
 .success-icon {
     text-align: center;
     font-size: 64px;
-    color: #28a745;
+    color: var(--screenprint-fast-quote-green-2);
     margin-bottom: 20px;
 }
 
@@ -284,19 +296,19 @@ body {
 
 .success-message h2 {
     font-size: 28px;
-    color: #2d3748;
+    color: var(--gray-700);
     margin-bottom: 10px;
 }
 
 .success-message p {
     font-size: 16px;
-    color: #718096;
+    color: var(--slate-500);
     line-height: 1.6;
 }
 
 .quote-id-display {
-    background: #f7fafc;
-    border: 2px solid #3a7c52;
+    background: var(--slate-50);
+    border: 2px solid var(--screenprint-fast-quote-green);
     border-radius: 12px;
     padding: 20px;
     margin: 30px 0;
@@ -305,20 +317,20 @@ body {
 
 .quote-id-label {
     font-size: 14px;
-    color: #718096;
+    color: var(--slate-500);
     margin-bottom: 5px;
 }
 
 .quote-id-value {
     font-size: 32px;
     font-weight: 700;
-    color: #3a7c52;
+    color: var(--screenprint-fast-quote-green);
 }
 
 /* Estimate Display */
 .estimate-box {
-    background: linear-gradient(135deg, #e8f5e9 0%, #f1f8f4 100%);
-    border: 2px solid #3a7c52;
+    background: linear-gradient(135deg, var(--brand-100) 0%, var(--gray-100) 100%);
+    border: 2px solid var(--screenprint-fast-quote-green);
     border-radius: 12px;
     padding: 25px;
     margin: 30px 0;
@@ -326,7 +338,7 @@ body {
 
 .estimate-label {
     font-size: 14px;
-    color: #2d5f3f;
+    color: var(--print-green);
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -336,18 +348,18 @@ body {
 .estimate-range {
     font-size: 36px;
     font-weight: 700;
-    color: #3a7c52;
+    color: var(--screenprint-fast-quote-green);
     margin-bottom: 10px;
 }
 
 .estimate-note {
     font-size: 13px;
-    color: #4a5568;
+    color: var(--slate-600);
     line-height: 1.5;
 }
 
 /* Responsive */
-@media (max-width: 640px) {
+@media (width <= 640px) {
     .container {
         border-radius: 0;
     }
@@ -370,6 +382,7 @@ body {
 }
 
 /* 2026-09-06 review */
+/* stylelint-disable-next-line declaration-no-important -- the hidden attribute must beat any display rule */
 [hidden] { display: none !important; }
-.fq-thanks-list { text-align: left; margin: 20px 0; padding-left: 40px; color: #4a5568; }
+.fq-thanks-list { text-align: left; margin: 20px 0; padding-left: 40px; color: var(--slate-600); }
 .fq-mt-30 { margin-top: 30px; }

@@ -7,9 +7,10 @@
 //
 // The two rules that carry the project (memory/CSS_STANDARDIZATION_PLAN_2026-09.md § 4):
 //   color-no-hex            raw hex colours live ONLY in the two token files — pages use var(--color-…)
-//   declaration-no-important the generated quote-builder-inline.css is the one deliberate exception
-//                           (127 hash classes that replace inline style="" attributes; it is ignored,
-//                           not exempted, and retires with the quote-builders family)
+//   declaration-no-important every flag carries a reason (`stylelint-disable-next-line … -- why`, or a
+//                           file-level reason on a legacy override stack); nothing is ignored. The generated
+//                           quote-builder-inline.css that was the one ignored file retired with the
+//                           quote-builders family (2026-09-07) into the readable quote-builder-utilities.css.
 export default {
     extends: ['stylelint-config-standard'],
     ignoreFiles: [
@@ -17,11 +18,10 @@ export default {
         'node_modules/**',
         '**/vendor/**',
         '**/archive/**',
-        'shared_components/css/quote-builder-inline.css',
     ],
     rules: {
         'color-no-hex': [true, { message: 'Raw hex colours belong in shared_components/css/tokens.css — use var(--color-…)' }],
-        'declaration-no-important': [true, { message: '!important is reserved for the generated quote-builder-inline.css' }],
+        'declaration-no-important': [true, { message: '!important needs a stylelint-disable comment that says why (see memory/CSS_STANDARDIZATION_PLAN_2026-09.md § 4)' }],
         // font names are proper nouns (Inter, Menlo, BlinkMacSystemFont) — lower-casing them is noise, not consistency
         'value-keyword-case': ['lower', { ignoreProperties: ['font-family', 'font', '/^--font-/'] }],
         // compact one-line rules (`.x { a: 1; b: 2; }`) are this repo's house style; reflowing thousands of them is

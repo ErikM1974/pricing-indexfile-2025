@@ -12,23 +12,29 @@
 /* =============================================
    CSS Variables with Defaults
    ============================================= */
+
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue, merged into its
+   existing :root. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
 :root {
-    --quote-modal-primary: var(--builder-primary, #10b981);
-    --quote-modal-primary-dark: var(--builder-primary-dark, #059669);
-    --quote-modal-secondary: var(--builder-secondary, #1e40af);
-    --quote-modal-secondary-dark: var(--builder-secondary-dark, #1e3a8a);
+    --quote-share-modal-teal: #10b981;
+    --quote-share-modal-blue: #1e40af;
+    --quote-share-modal-blue-2: #1e3a8a;
+    --quote-modal-primary: var(--builder-primary, var(--quote-share-modal-teal));
+    --quote-modal-primary-dark: var(--builder-primary-dark, var(--emerald-600));
+    --quote-modal-secondary: var(--builder-secondary, var(--quote-share-modal-blue));
+    --quote-modal-secondary-dark: var(--builder-secondary-dark, var(--quote-share-modal-blue-2));
 }
+/* stylelint-enable color-no-hex */
 
 /* =============================================
    MODAL OVERLAY
    ============================================= */
 .quote-share-modal-overlay {
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.6);
+    inset: 0;
+    background: rgb(0 0 0 / 60%);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -59,7 +65,7 @@
     border-radius: 12px;
     width: 90%;
     max-width: 480px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 20px 60px rgb(0 0 0 / 30%);
     animation: quoteShareSlideUp 0.3s ease;
     overflow: hidden;
 }
@@ -69,6 +75,7 @@
         opacity: 0;
         transform: translateY(20px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -105,8 +112,8 @@
 }
 
 .quote-share-modal-body p {
-    margin: 0 0 12px 0;
-    color: #1f2937;
+    margin: 0 0 12px;
+    color: var(--gray-800);
     font-size: 14px;
 }
 
@@ -127,12 +134,12 @@
 .quote-share-url-input {
     flex: 1;
     padding: 12px 14px;
-    border: 2px solid #dee2e6;
+    border: 2px solid var(--gray-200);
     border-radius: 8px;
     font-size: 13px;
     font-family: monospace;
-    background: #f8f9fa;
-    color: #1f2937;
+    background: var(--gray-50);
+    color: var(--gray-800);
 }
 
 .quote-share-url-input:focus {
@@ -164,7 +171,7 @@
 }
 
 .quote-share-btn-copy.copied {
-    background: #059669;
+    background: var(--emerald-600);
 }
 
 /* =============================================
@@ -174,8 +181,8 @@
     display: flex;
     gap: 12px;
     padding: 16px 24px 24px;
-    border-top: 1px solid #dee2e6;
-    background: #f8f9fa;
+    border-top: 1px solid var(--gray-200);
+    background: var(--gray-50);
 }
 
 /* View Quote Button */
@@ -206,8 +213,8 @@
     flex: 1;
     padding: 12px 20px;
     background: white;
-    color: #1f2937;
-    border: 1px solid #dee2e6;
+    color: var(--gray-800);
+    border: 1px solid var(--gray-200);
     border-radius: 8px;
     font-size: 14px;
     font-weight: 500;
@@ -216,13 +223,13 @@
 }
 
 .quote-share-btn-close:hover {
-    background: #f3f4f6;
+    background: var(--gray-100);
 }
 
 /* =============================================
    RESPONSIVE
    ============================================= */
-@media (max-width: 480px) {
+@media (width <= 480px) {
     .quote-share-modal-content {
         width: 95%;
         margin: 10px;
@@ -248,21 +255,22 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    border: 1px solid var(--pnw-forest, #2e5827);
-    background: var(--pnw-forest, #2e5827);
-    color: #fff;
+    border: 1px solid var(--pnw-forest, var(--brand-700));
+    background: var(--pnw-forest, var(--brand-700));
+    color: var(--color-on-brand);
     border-radius: 6px;
     padding: 8px 14px;
     font-size: 13.5px;
     font-weight: 700;
     cursor: pointer;
 }
-.quote-share-btn-email:hover:not(:disabled) { background: var(--pnw-forest-deep, #1f4922); }
+.quote-share-btn-email:hover:not(:disabled) { background: var(--pnw-forest-deep, var(--store-green-900)); }
 .quote-share-btn-email:disabled { opacity: 0.7; cursor: default; }
-.quote-share-btn-email:focus-visible { outline: 2px solid var(--pnw-forest, #2e5827); outline-offset: 2px; }
+.quote-share-btn-email:focus-visible { outline: 2px solid var(--pnw-forest, var(--brand-700)); outline-offset: 2px; }
+
 .quote-share-note {
     margin-left: 8px;
     font-size: 12px;
     font-weight: 600;
-    color: var(--pnw-stone, #6b7280);
+    color: var(--pnw-stone, var(--gray-500));
 }

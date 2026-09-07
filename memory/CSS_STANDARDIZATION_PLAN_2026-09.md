@@ -114,6 +114,37 @@ three gap sizes, `opacity:.5;cursor:not-allowed` ×26 (disabled). These become u
 
 ## 8. Progress log (newest first)
 
+### 2026-09-07 — Quote builders family LIVE (`v2026.09.07.16`) — the LAST family: 19 sheets, 19 pages
+
+- **Family = the 6 `quote-builders/` pages (4 builders, the monogram form, the screen-print fast quote) + the 13
+  calculator, dashboard and storefront pages that share their sheets, and 19 stylesheets (22,006 lines): the
+  shell, common, guided, print, share-modal, session, customer-lookup, colour-picker, ShopWorks-import and
+  sticker-pricing sheets, the per-builder sheets (dtf, dtg ×3, embroidery, screen-print, monogram, fast quote)
+  and the NEW `quote-builder-utilities.css`. No `*-pricing-service.js` touched; parity suites green.
+- **The generated `quote-builder-inline.css` is retired.** Its 127 hash classes (`.qbi-xxxxxxx`) became readable
+  utilities named by their declarations (`.qb-mt-4`, `.qb-bg-amber-100-p-2-8-r-4-c-amber-800`) in
+  `quote-builder-utilities.css`, linked in the same (last) position; 196 class uses rewritten in the three builders.
+  Their `!important` stays with a file-level reason: it reproduces the precedence an inline attribute had over the
+  builders' id-based rules, and a screenshot cannot see the modal/step/error states that depend on it — retiring
+  the flags means refactoring those id rules builder by builder (Brand Standards → Decisions, follow-up).
+- **Colours:** 2,293 hex uses → 1,159 exact / 682 near / 452 far, the far ones 205 sheet-scoped variables. The
+  shell's `--pnw-*` forest palette and common's `--builder-*`/`--color-*` palette alias the tokens ONLY where the
+  value is exact; 17 near matches were restored to their exact hex (the builders' cream/birch/fog neutrals are the
+  design system, not stray colours). Duplicate token definitions dropped (sticker-pricing-page ×5, common ×2);
+  sticker-pricing-page keeps its own 20/24/32 spacing steps (shadow, logged on the brand page).
+- **`!important`: 622 flags across the family (296 in `quote-print.css`, 127 utilities, 102 common) — 5 file-level
+  reasons, 44 per-line.** Every builder page now links `tokens.css` (13 of the 19 already did).
+- **Verification:** 21 shots (19 pages + 2 print): 15 identical; 2 async (webstores chat greeting + quote number,
+  quote-management timestamp); the DTG builder differs by 6 corner pixels of a near-mapped border; the DTF and
+  screen-print builders (screen + the DTF print, +2 px tall) differ in the safety-apparel recommendations panel —
+  a FIX, not a regression: `safety-stripe-recs.css` was migrated to bare `var(--gray-…)` tokens with the webstore
+  family (`.8`) while the four builders that also load it had no tokens link, so on those pages the panel had rendered
+  transparent with an inverted pill since that release. The tokens link restores the designed look (the same the DTF
+  calculator shows). A repo-wide audit found one more such page (`calculators/quick-quote/dtf-prints-prototype.html`,
+  now linked) and `tests/unit/css-tokens.test.js` locks it: no page may load a `CSS_LINT_SCOPE` sheet without `tokens.css`.
+  Gates: unit, e2e (a11y, money path), `test:parity` 84/84, `test:parity:surfaces` green.
+- **Census after:** see the final census in § 9.
+
 ### 2026-09-07 — Staff pages + customer portal batch LIVE (`v2026.09.07.14`): 45 sheets, 46 pages
 
 - **Family = the 45 `pages/*.html` not in the storefront list + `vendor-portals/sanmar-vendor-portal.html`
@@ -144,7 +175,7 @@ three gap sizes, `opacity:.5;cursor:not-allowed` ×26 (disabled). These become u
 - **Tooling:** a re-run of the tokenizer over an already-migrated sheet rewrote its own page-theme block into
   `--x: var(--x)` self-references (invalid in a browser); the tokenizer now skips its own block and reuses
   existing page variables, and value continuation lines are joined before tokenizing (memory/LESSONS_LEARNED.md).
-- **Census after:** see § 2 comparison in the final report.
+- **Census after:** 300 sheets · 4910 KB · 287 use var(--) · 227 raw-hex files (theme blocks included) · 808 distinct hex (1023 before the batch) · 3072 !important · 212 duplicated bodies
 - **Next:** the quote builders family (`quote-builder-shell.css`, `sticker-pricing-page.css`,
   `quote-print.css`, the generated `quote-builder-inline.css` retirement) — money path: parity suites +
   `test:parity:surfaces` after, no `*-pricing-service.js` changes.
@@ -326,3 +357,36 @@ three gap sizes, `opacity:.5;cursor:not-allowed` ×26 (disabled). These become u
   § 2 baseline plus the token file, as intended: nothing migrated yet.
 - **Next:** forms family (18 pages, `form-sheet`), and Step 2 (`components.css` + `utilities.css`) ships with
   it as its first consumer.
+
+## 9. Final census — 2026-09-07, after the last family (`v2026.09.07.16`), next to the § 2 baseline
+
+| Measure | § 2 baseline | Final | What the number means now |
+|---|---|---|---|
+| Stylesheets served (outside dist/vendor/archive/tests) | 295, 4,567 KB | 300, 4,968 KB | + `tokens.css`, `components.css`, `utilities.css`, `training-shared.css`, `brand-standards.css`, `quote-builder-utilities.css`; − `quote-builder-inline.css`. Larger because every `!important` and every one-off colour now carries a written reason or a named variable. |
+| Files using `var(--…)` | 215 | 293 of 300 | the 7 without are link-orphans or the tail below |
+| Files with raw hex colours | 266 | **30** outside the token files and the `:root` theme blocks (226 if the theme blocks count) | 12 are loaded by pages outside the plan's families, 18 are link-orphans (below) |
+| Distinct hex colours | 1,355 | 725 | nearly all now sit inside the sheet-scoped `:root` theme blocks; the 12 most-used colours in the wild are tokens or theme values |
+| `!important` | 3,182 | 3,066 | every flag carries a reason — per line, or a file-level reason on a documented override stack (the calculators' fix/override sheets, `quote-print.css`, `invoice.css`…); the generated sheet's 127 hash rules are now readable utilities. Removing flags is per-page design work, listed on the Brand Standards page |
+| Rule bodies repeated in 5+ files | 224 | 222 | `components.css` + `utilities.css` exist for NEW pages; legacy duplicates were deliberately not rewritten (pixel-identical mandate) |
+| Sheets under stylelint (`CSS_LINT_SCOPE`) | 0 | 271 | a ratchet — a sheet never leaves; `npm run lint:css`, CI, and `tests/unit/css-lint.test.js` |
+| Pages loading `tokens.css` | 0 | 218 of 242 — every page that loads a migrated sheet | locked by `tests/unit/css-tokens.test.js` |
+
+**Eight releases:** foundation `v2026.09.07.3` · forms `.4` · training + Brand Standards `.6` · webstore + components `.8`
+· dashboards `.10` · calculators `.12` · staff pages + customer portal `.14` · quote builders `.16`.
+
+**Remaining tail — 12 sheets (~4,600 lines) loaded by pages outside the plan's families:** `admin/css/*` (4 sheets,
+3 admin pages), `dashboards/production-shifts/styles.css`, `dashboards/reports/price-audit-report.css`,
+`employee-bundles/css/*` (2), `tools/custom-tees-calibrate.css`, `vendor-portals/css/*` (2 sheets, 3 pages),
+`calculators/quick-quote/dtf-prints-prototype.css`. One small batch with the same pipeline (before-shots →
+tokenize → lint → after-shots → diff) finishes them.
+
+**Link-orphans — 18 sheets (~17,000 lines) no page or script references; deleting them is Erik's call:**
+`laser-tumbler-styles`, `screenprint-manual-fix`, `webstores-styles`, `cart-styles`, `gallery-styles`,
+`main-redesign` (4,345 lines), `main` (named only in a `server.js` comment), `modern-search-interface`,
+`pages/css/policies-hub` + `pages/css/utilities` (flagged 2026-09-07), `pricing-pages-enhanced`, `pricing-pages`,
+`product-styles`, `shared_components/css/contract-pricing-theme`, `dashboard-styles`, `dtg-brand-override`,
+`dtg-quote-builder-extracted`, `dtg-quote-builder` (2,115 lines).
+
+**Open decisions for Erik (also on the Brand Standards page):** the art-hub vs token spacing/radius scale (41 queue
+pages); the sticker pricing page's own spacing steps; retiring the builders' inline-precedence `!important`
+(an id-rule refactor, builder by builder, on the money path).

@@ -73,6 +73,36 @@ describe('staff-dashboard/tokens.css = theme additions only', () => {
     });
 });
 
+describe('every page that loads a migrated stylesheet loads the app-wide tokens', () => {
+    // 2026-09-07 lesson (quote builders family): safety-stripe-recs.css was migrated to var(--gray-…) tokens with the
+    // webstore family while the four quote builders, which also load it, had no tokens link — on those pages every
+    // token was undefined, the recommendations panel went transparent and its pill inverted, and nothing failed.
+    // A migrated sheet (one in scripts/lint-css.js CSS_LINT_SCOPE) may only be loaded by a page that loads tokens.css.
+    const { CSS_LINT_SCOPE } = require(path.join(ROOT, 'scripts/lint-css.js'));
+    const globToRe = (g) => new RegExp('^' + g.replace(/[.+^${}()|[\]\\]/g, '\\$&').replace(/\*\*\//g, '(?:.*/)?').replace(/\*/g, '[^/]*') + '$');
+    const scopeRes = CSS_LINT_SCOPE.map(globToRe);
+    const inScope = (rel) => scopeRes.some((re) => re.test(rel));
+    test('no page loads a CSS_LINT_SCOPE sheet without shared_components/css/tokens.css', () => {
+        const tracked = execSync('git ls-files "*.html"', { cwd: ROOT, encoding: 'utf8' }).split(/\r?\n/).filter(Boolean)
+            .filter((f) => !/^(dist|node_modules|templates|tests)\//.test(f) && !/(^|\/)archive\//.test(f));
+        const offenders = [];
+        for (const p of tracked) {
+            const html = read(p);
+            if (html.includes('shared_components/css/tokens.css')) continue;
+            const links = [...html.matchAll(/href="([^"]*\.css)[^"]*"/g)].map((m) => m[1]).filter((u) => !/^https?:/.test(u))
+                .map((u) => (u.startsWith('/') ? u.slice(1) : path.posix.normalize(path.posix.join(path.posix.dirname(p), u))));
+            const hit = links.filter(inScope);
+            if (hit.length) offenders.push(`${p} -> ${hit.join(', ')}`);
+        }
+        expect(offenders).toEqual([]);
+    });
+    test('the matcher recognises the scope (sanity)', () => {
+        expect(inScope('shared_components/css/tokens.css')).toBe(true);
+        expect(inScope('shared_components/css/safety-stripe-recs.css')).toBe(true);
+        expect(inScope('shared_components/vendor/bootstrap/css/bootstrap.min.css')).toBe(false);
+    });
+});
+
 describe('templates/page-template.html', () => {
     const raw = read('templates/page-template.html');
     const html = raw.replace(/<!--[\s\S]*?-->/g, '');

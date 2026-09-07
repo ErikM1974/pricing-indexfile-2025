@@ -6,6 +6,17 @@
  * Update this file to change appearance across all quote builders
  */
 
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue so the page
+   keeps its exact look. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   every rule below uses var(). Raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
+:root {
+    --color-picker-shared-gray-dark: #333;
+    --color-picker-shared-blue: #4169e1;
+    --color-picker-shared-gray: #666;
+}
+/* stylelint-enable color-no-hex */
+
 /* =============================================
    COLOR PICKER WRAPPER
    ============================================= */
@@ -30,18 +41,18 @@
 }
 
 .color-picker-selected.disabled {
-    background: #f5f5f5;
+    background: var(--gray-100);
     cursor: not-allowed;
     opacity: 0.7;
 }
 
 .color-picker-selected:hover:not(.disabled) {
-    background: #f0f7ff;
+    background: var(--color-floor-tint);
 }
 
 /* Focus indicator for accessibility (WCAG 2.4.7) */
 .color-picker-selected:focus-visible {
-    outline: 2px solid #4169E1;
+    outline: 2px solid var(--color-picker-shared-blue);
     outline-offset: 2px;
 }
 
@@ -49,14 +60,14 @@
     width: 22px;
     height: 22px;
     border-radius: 4px;
-    border: 1px solid #ccc;
+    border: 1px solid var(--gray-300);
     flex-shrink: 0;
     background-size: cover;
     background-position: center;
 }
 
 .color-picker-selected .color-swatch.empty {
-    background: linear-gradient(135deg, #eee 25%, #ddd 25%, #ddd 50%, #eee 50%, #eee 75%, #ddd 75%);
+    background: linear-gradient(135deg, var(--brand-100) 25%, var(--store-line) 25%, var(--store-line) 50%, var(--brand-100) 50%, var(--brand-100) 75%, var(--store-line) 75%);
     background-size: 8px 8px;
 }
 
@@ -67,15 +78,15 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    color: #333;
+    color: var(--color-picker-shared-gray-dark);
 }
 
 .color-picker-selected .color-name.placeholder {
-    color: #999;
+    color: var(--print-line);
 }
 
 .color-picker-selected .picker-arrow {
-    color: #666;
+    color: var(--color-picker-shared-gray);
     font-size: 10px;
     flex-shrink: 0;
 }
@@ -92,9 +103,9 @@
     max-height: 280px;
     overflow-y: auto;
     background: white;
-    border: 2px solid var(--builder-primary, #2e5827);   /* --primary-color only existed where an unrelated sheet defined it — EMB rendered lime, SCP bootstrap-blue (expert audit 2026-07-07) */
+    border: 2px solid var(--builder-primary, var(--brand-700));   /* --primary-color only existed where an unrelated sheet defined it — EMB rendered lime, SCP bootstrap-blue (expert audit 2026-07-07) */
     border-radius: 6px;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+    box-shadow: 0 6px 20px rgb(0 0 0 / 20%);
     z-index: 1000;
 }
 
@@ -111,7 +122,7 @@
     gap: 10px;
     padding: 10px 12px;
     cursor: pointer;
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid var(--gray-100);
 }
 
 .color-picker-option:last-child {
@@ -119,17 +130,17 @@
 }
 
 .color-picker-option:hover {
-    background: var(--pnw-fog, #f4f6f3);
+    background: var(--pnw-fog, var(--gray-100));
 }
 
 .color-picker-option.focused {
-    background: var(--pnw-mist, #e8eee7);
-    outline: 2px solid var(--builder-primary, #2e5827);
+    background: var(--pnw-mist, var(--store-green-100));
+    outline: 2px solid var(--builder-primary, var(--brand-700));
     outline-offset: -2px;
 }
 
 .color-picker-option.selected {
-    background: var(--pnw-mist, #e8eee7);
+    background: var(--pnw-mist, var(--store-green-100));
     font-weight: 600;
 }
 
@@ -137,7 +148,7 @@
     width: 24px;
     height: 24px;
     border-radius: 4px;
-    border: 1px solid #ccc;
+    border: 1px solid var(--gray-300);
     flex-shrink: 0;
     background-size: cover;
     background-position: center;
@@ -145,7 +156,7 @@
 
 .color-picker-option .color-name {
     font-size: 13px;
-    color: #333;
+    color: var(--color-picker-shared-gray-dark);
 }
 
 /* THEME OVERRIDES DELETED 2026-07-07 (expert audit): the .embroidery-builder /

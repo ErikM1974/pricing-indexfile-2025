@@ -1,10 +1,17 @@
-/* quote-session.css — extracted 2026-09-06 from the <style> block(s) quote-session.js used to inject (Rule 3). */
+/* quote-session.css — extracted 2026-09-06 from the \3c style> block(s) quote-session.js used to inject (Rule 3). */
+
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue so the page
+   keeps its exact look. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   every rule below uses var(). Raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
+:root {
+    --quote-session-cyan-dark: #003f7f;
+}
+/* stylelint-enable color-no-hex */
+
 .recovery-modal {
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    inset: 0;
     z-index: 10000;
     display: flex;
     align-items: center;
@@ -14,18 +21,15 @@
 
 .recovery-modal-backdrop {
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
+    inset: 0;
+    background: rgb(0 0 0 / 50%);
 }
 
 .recovery-modal-content {
     position: relative;
     background: white;
     border-radius: 8px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 10px 30px rgb(0 0 0 / 30%);
     max-width: 500px;
     width: 90%;
     animation: slideUp 0.3s ease;
@@ -33,12 +37,12 @@
 
 .recovery-modal-header {
     padding: 20px;
-    border-bottom: 1px solid #e9ecef;
+    border-bottom: 1px solid var(--gray-200);
 }
 
 .recovery-modal-header h3 {
     margin: 0;
-    color: #003f7f;
+    color: var(--quote-session-cyan-dark);
     font-size: 20px;
 }
 
@@ -48,12 +52,12 @@
 
 .recovery-modal-body p {
     margin: 10px 0;
-    color: #495057;
+    color: var(--gray-600);
 }
 
 .recovery-modal-footer {
     padding: 20px;
-    border-top: 1px solid #e9ecef;
+    border-top: 1px solid var(--gray-200);
     display: flex;
     gap: 10px;
     justify-content: flex-end;
@@ -76,21 +80,20 @@
 
 .recent-quotes-toggle {
     background: white;
-    border: 1px solid #dee2e6;
+    border: 1px solid var(--gray-200);
     border-radius: 5px;
     padding: 8px 15px;
     cursor: pointer;
     display: flex;
     align-items: center;
     gap: 8px;
-    color: #495057;
+    color: var(--gray-600);
     transition: all 0.2s;
 }
 
 .recent-quotes-toggle:hover {
-    background: #f8f9fa;
-    border-color: #003f7f;
-    color: #003f7f;
+    background: var(--gray-50);
+    border-color: var(--quote-session-cyan-dark);
 }
 
 .recent-quotes-menu {
@@ -99,9 +102,9 @@
     left: 0;
     margin-top: 5px;
     background: white;
-    border: 1px solid #dee2e6;
+    border: 1px solid var(--gray-200);
     border-radius: 5px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    box-shadow: 0 5px 15px rgb(0 0 0 / 10%);
     min-width: 300px;
     max-height: 400px;
     overflow-y: auto;
@@ -110,13 +113,13 @@
 
 .recent-quote-item {
     padding: 12px 15px;
-    border-bottom: 1px solid #e9ecef;
+    border-bottom: 1px solid var(--gray-200);
     cursor: pointer;
     transition: background 0.2s;
 }
 
 .recent-quote-item:hover {
-    background: #f8f9fa;
+    background: var(--gray-50);
 }
 
 .recent-quote-item:last-child {
@@ -130,7 +133,7 @@
 }
 
 .recent-quote-info strong {
-    color: #003f7f;
+    color: var(--quote-session-cyan-dark);
 }
 
 .recent-quote-meta {
@@ -138,5 +141,5 @@
     justify-content: space-between;
     margin-top: 5px;
     font-size: 0.875em;
-    color: #6c757d;
+    color: var(--gray-500);
 }

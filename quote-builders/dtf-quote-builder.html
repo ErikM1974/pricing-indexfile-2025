@@ -14,6 +14,7 @@
     <link rel="icon" type="image/png" href="/favicon.png">
 
     <!-- Font Awesome -->
+    <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.07.15">
     <link rel="stylesheet" href="/shared_components/vendor/fontawesome/css/all.min.css?v=2026.07.08.8">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"><!-- PNW shell typography (expert audit 2026-07-07): DTG loaded Inter, the trio never did -->
 
@@ -29,28 +30,28 @@
     <script src="/config/tenant.js?v=2026.09.06.18"></script>
 
     <!-- Quote Builder Common Styles (loads FIRST — base styles) -->
-    <link rel="stylesheet" href="/shared_components/css/quote-builder-common.css?v=2026.08.18.1">
+    <link rel="stylesheet" href="/shared_components/css/quote-builder-common.css?v=2026.09.07.16">
 
     <!-- Quote Builder Shell (Phase 2a — PNW palette + tokens; overrides common's legacy --builder-* tokens) -->
-    <link rel="stylesheet" href="/shared_components/css/quote-builder-shell.css?v=2026.09.05.14">
+    <link rel="stylesheet" href="/shared_components/css/quote-builder-shell.css?v=2026.09.07.16">
 
     <!-- Guided Quote shell (Phase B, 2026-07-07) -->
-    <link rel="stylesheet" href="/shared_components/css/quote-builder-guided.css?v=2026.07.08.12">
+    <link rel="stylesheet" href="/shared_components/css/quote-builder-guided.css?v=2026.09.07.16">
 
     <!-- DTF Quote Builder Styles (overrides common + shell) -->
-    <link rel="stylesheet" href="/shared_components/css/dtf-quote-builder.css?v=2026.07.08.12">
-    <link rel="stylesheet" href="/shared_components/css/quote-print.css?v=2026.07.07.7">
-    <link rel="stylesheet" href="/shared_components/css/color-picker-shared.css?v=2026.07.07.7">
-    <link rel="stylesheet" href="/shared_components/css/quote-share-modal.css?v=2026.07.07.7">
-    <link rel="stylesheet" href="/shared_components/css/customer-lookup.css?v=2026.05.26.1">
+    <link rel="stylesheet" href="/shared_components/css/dtf-quote-builder.css?v=2026.09.07.16">
+    <link rel="stylesheet" href="/shared_components/css/quote-print.css?v=2026.09.07.16">
+    <link rel="stylesheet" href="/shared_components/css/color-picker-shared.css?v=2026.09.07.16">
+    <link rel="stylesheet" href="/shared_components/css/quote-share-modal.css?v=2026.09.07.16">
+    <link rel="stylesheet" href="/shared_components/css/customer-lookup.css?v=2026.09.07.16">
     <link rel="stylesheet" href="/shared_components/css/safety-stripe-recs.css?v=2026.09.07.8">
     <!-- quote-builder-base.js tag removed 2026-07-07 (roadmap 0.4 audit): the class
          was never instantiated or extended — 793 dead lines per pageload. The file
          stays in the repo as the base being revived by the 0.4 decomposition. -->
     <script src="/shared_components/js/quote-formatter.js?v=2026.09.03.11"></script>
     <script src="/shared_components/js/product-thumbnail-modal.js?v=2026.09.06.22"></script>
-    <link rel="stylesheet" href="/shared_components/css/quote-session.css?v=2026.09.06.27">
-    <link rel="stylesheet" href="/shared_components/css/quote-builder-inline.css?v=2026.09.06.50">
+    <link rel="stylesheet" href="/shared_components/css/quote-session.css?v=2026.09.07.16">
+    <link rel="stylesheet" href="/shared_components/css/quote-builder-utilities.css?v=2026.09.07.16">
 </head>
 <body class="dtf-builder qb-shell-body">
     <nav aria-label="Skip link"><a href="#" class="qb-skip-link" data-call="qbFocusMain" data-prevent="1">Skip to quote builder</a></nav><!-- qb-shell-body: 2026 PNW shell (Inter + tabular numerals + birch ground) — built 2026-06, had ZERO adopters until 2026-07-07 (expert audit) --><!-- scoping hook for Option C page-flow overrides (2026-06-07) -->
@@ -175,7 +176,7 @@
                     <span class="location-label"><i class="fas fa-image" aria-hidden="true"></i> Reference Artwork</span>
                     <span class="location-hint">Optional — attach the customer's art file.</span>
                 </div>
-                <div class="qbi-0d69e4b" id="dtf-artwork-mount"></div>
+                <div class="qb-mt-8" id="dtf-artwork-mount"></div>
             </div>
 
             <!-- Product Grid Section -->
@@ -227,8 +228,8 @@
                             <tr id="empty-state-row">
                                 <td colspan="14" class="qb-empty-state">
                                     <div class="qb-empty-state-emoji">&#128085;</div>
-                                    <div class="qbi-35c9137">Getting Started</div>
-                                    <div class="qbi-8bb166d">
+                                    <div class="qb-fs-16-fw-500-mb-8">Getting Started</div>
+                                    <div class="qb-fs-13-c-gray-600-lh-1-8">
                                         <span class="step-badge step-1">1</span> Select transfer locations above
                                         &nbsp;&bull;&nbsp;
                                         <span class="step-badge step-2">2</span> Type a style # (e.g., PC54, G500)
@@ -311,20 +312,20 @@
                  (EMB services-bar position, 2026-06-14). Same controls + handlers as before (pricing unchanged).
                  Phase A (2026-07-07): default-COLLAPSED to calm the page — the badge stays visible in the
                  header, and autoExpandFeesOnFirstCharge() opens it once when a saved fee loads. -->
-            <div class="additional-charges-panel qbi-181b1d4">
+            <div class="additional-charges-panel qb-m-0-0-14">
                 <div class="charges-header" data-call="toggleFeesCharges">
                     <div class="d-flex align-items-center gap-2">
                         <i class="fas fa-plus-circle" aria-hidden="true"></i>
                         <span>More services &amp; fees</span>
-                        <span class="qbi-5eb5022">mockups · design time · rush</span>
+                        <span class="qb-fs-11-c-gray-600-fw-400">mockups · design time · rush</span>
                         <span id="charges-badge" class="charges-badge hidden">$0.00</span>
                     </div>
                     <i id="charges-chevron" class="fas fa-chevron-down collapsible-chevron" aria-hidden="true"></i>
                 </div>
                 <div id="fees-charges-content" class="charges-content hidden" style="display:none">
-                    <div class="qbi-78d910c" style="display: flex">
+                    <div class="qb-fwrap-wrap-gap-24-ai-flex-end-pt-8" style="display: flex">
                         <div class="charge-field qb-m0">
-                            <label class="d-flex align-items-center gap-2 qbi-74fa97c">
+                            <label class="d-flex align-items-center gap-2 qb-cur-pointer">
                                 <input type="checkbox" id="art-charge-toggle" data-change="toggleArtCharge,updateAdditionalCharges">
                                 <span>Logo Mockup &amp; Review</span>
                             </label>
@@ -378,7 +379,7 @@
                             <i id="order-details-chevron" class="fas fa-chevron-down collapsible-chevron" aria-hidden="true"></i>
                         </div>
                         <div id="order-details-content" class="charges-content hidden">
-                            <div class="d-flex flex-column gap-2 qbi-c079eee">
+                            <div class="d-flex flex-column gap-2 qb-p-8-0">
                                 <!-- Order Info Row -->
                                 <div class="d-flex gap-2">
                                     <div class="customer-field qb-flex1">
@@ -410,11 +411,11 @@
                                     <input type="text" id="ship-address" aria-label="Shipping street address" placeholder="Street address" class="quote-input qb-compact" data-input="?renderOrderRecap">
                                 </div>
                                 <div class="d-flex gap-2">
-                                    <div class="customer-field qbi-08ec4a1">
+                                    <div class="customer-field qb-flex-2">
                                         <input type="text" id="ship-city" aria-label="Shipping city" placeholder="City" class="quote-input qb-compact" data-input="?renderOrderRecap">
                                     </div>
-                                    <div class="customer-field qbi-36ebddf">
-                                        <select id="ship-state" aria-label="Shipping state" class="quote-input qbi-338d29c" data-change="onShipStateChange,?renderOrderRecap">
+                                    <div class="customer-field qb-flex-0-0-60">
+                                        <select id="ship-state" aria-label="Shipping state" class="quote-input qb-fs-12-p-6-4" data-change="onShipStateChange,?renderOrderRecap">
                                             <option value="WA" selected>WA</option>
                                             <option value="AL">AL</option><option value="AK">AK</option><option value="AZ">AZ</option>
                                             <option value="AR">AR</option><option value="CA">CA</option><option value="CO">CO</option>
@@ -435,7 +436,7 @@
                                             <option value="WY">WY</option>
                                         </select>
                                     </div>
-                                    <div class="customer-field qbi-75e00e8">
+                                    <div class="customer-field qb-flex-0-0-80">
                                         <input type="text" id="ship-zip" aria-label="Shipping ZIP code" placeholder="ZIP" maxlength="10" class="quote-input qb-compact"
                                                data-blur="onShipZipBlur" data-input="?renderOrderRecap">
                                     </div>
@@ -443,7 +444,7 @@
                                         <i class="fas fa-search" aria-hidden="true"></i>
                                     </button>
                                 </div>
-                                <div class="qbi-5a5e72e" id="tax-lookup-status"></div>
+                                <div class="qb-fs-11-c-slate-500-minh-14" id="tax-lookup-status"></div>
                                 <!-- Shipping Method -->
                                 <div class="customer-field">
                                     <label class="quote-label qb-fs11">Shipping Method</label>
@@ -459,10 +460,10 @@
                                 <!-- Shipping Fee -->
                                 <div class="customer-field">
                                     <label class="quote-label qb-fs11">Shipping Fee</label>
-                                    <div class="qbi-a8a9035">
-                                        <span class="qbi-2ef0a91">$</span>
+                                    <div class="qb-pos-relative">
+                                        <span class="qb-pos-absolute-left-8-top-50-tf-translatey-50-c-qb-gray-fs-12">$</span>
                                         <input type="number" id="dtf-shipping-fee" aria-label="Shipping fee in dollars" min="0" step="0.01" placeholder="0.00" value="0"
-                                               class="quote-input qbi-574ad8b"
+                                               class="quote-input qb-fs-12-p-6-8-6-22"
                                                data-change="updateTaxCalculation" data-input="updateTaxCalculation">
                                     </div>
                                 </div>
@@ -475,10 +476,10 @@
                                     <div id="estimate-ship-result" class="estimate-ship-result"></div>
                                 </div>
                                 <!-- Notes -->
-                                <div class="customer-field qbi-6b1f0d9">
-                                    <label class="quote-label qb-fs11"><i class="fas fa-sticky-note qbi-9206f2c" aria-hidden="true"></i> Notes</label>
+                                <div class="customer-field qb-mt-4">
+                                    <label class="quote-label qb-fs11"><i class="fas fa-sticky-note qb-c-qb-orange" aria-hidden="true"></i> Notes</label>
                                     <textarea id="dtf-notes" aria-label="Quote notes" placeholder="Special instructions, employee names, etc."
-                                              class="quote-input qbi-2710755"></textarea>
+                                              class="quote-input qb-fs-12-p-6-8-minh-60-rs-vertical-ff-inherit"></textarea>
                                 </div>
                             </div>
                         </div>
@@ -489,7 +490,7 @@
                 <!-- Tax Section -->
                 <div class="pricing-totals-section">
                     <div class="pricing-row">
-                        <span class="label qbi-21a1be8">Subtotal:</span>
+                        <span class="label qb-fw-600">Subtotal:</span>
                         <span class="value" id="pre-tax-subtotal">$0.00</span>
                     </div>
                     <div class="pricing-row" id="tax-toggle-row">
@@ -499,15 +500,15 @@
                         </label>
                         <!-- Wrapped input + % so space-between keeps them grouped on the right (parity with SCP, 2026-06-14) -->
                         <div class="d-flex align-items-center gap-1">
-                            <input class="qbi-fcdb17d" type="number" id="tax-rate-input" aria-label="Sales tax rate percent" value="10.2" step="0.1" min="0" max="20"
+                            <input class="qb-w-52-fs-11-ta-center-b-1-solid-store-line-r-4-p-2-4" type="number" id="tax-rate-input" aria-label="Sales tax rate percent" value="10.2" step="0.1" min="0" max="20"
                                   
                                    data-change="updateTaxCalculation" title="Tax rate %">
-                            <span class="qbi-89ecc1c">%</span>
+                            <span class="qb-fs-11-c-slate-500">%</span>
                         </div>
                     </div>
                     <!-- [2026-06-08] Wholesale / reseller — per-order, by the sales tax (mirror EMB). Routes the push to GL 2203. -->
-                    <div class="pricing-row qbi-4f6c9e9" id="wholesale-row">
-                        <label class="d-flex align-items-center gap-2 qbi-01e2c4e">
+                    <div class="pricing-row qb-bb-none-p-2-0" id="wholesale-row">
+                        <label class="d-flex align-items-center gap-2 qb-fs-11-c-slate-600-cur-pointer-m-0">
                             <input type="checkbox" id="wholesale-checkbox" data-change="toggleWholesale">
                             <span>Wholesale / Reseller — no tax (WA permit on file)</span>
                         </label>
@@ -533,10 +534,10 @@
             <!-- Scrollable content container -->
             <div class="sidebar-scroll-container">
             <!-- Customer Info (moved above Quote Summary 2026-03-23) -->
-            <div class="customer-panel qbi-c61fc52">
+            <div class="customer-panel qb-p-12-16-bb-1-solid-gray-200-m-16-16-16-16">
                 <div class="customer-panel-header qb-mb8" data-toggle-hidden="dtf-customer-fields" tabindex="0" role="button" aria-label="Toggle customer details" data-keyclick="1">
-                    <h4 class="qbi-003e6a3" style="display: flex"><i class="fas fa-user qbi-11120ad" aria-hidden="true"></i> Customer</h4>
-                    <i class="fas fa-chevron-down qbi-d2f745e" aria-hidden="true"></i>
+                    <h4 class="qb-ai-center-gap-6" style="display: flex"><i class="fas fa-user qb-c-brand-700" aria-hidden="true"></i> Customer</h4>
+                    <i class="fas fa-chevron-down qb-fs-12-c-print-line" aria-hidden="true"></i>
                 </div>
                 <div id="dtf-customer-fields">
                     <!-- Lookup-first (2026-07-07 Phase A / P1 #4): the search field is the
@@ -544,19 +545,19 @@
                          edit-load fills them (syncCustomerManualDetails). All input ids
                          unchanged — save/load key off getElementById. -->
                     <div class="customer-field customer-lookup-container customer-lookup-hero qb-mb8">
-                        <label class="quote-label"><i class="fas fa-search qbi-1d673f2" aria-hidden="true"></i> FIND CUSTOMER</label>
+                        <label class="quote-label"><i class="fas fa-search qb-mr-4" aria-hidden="true"></i> FIND CUSTOMER</label>
                         <input type="text" id="customer-lookup" aria-label="Customer lookup" placeholder="Company, name, or email — fills everything below" class="quote-input customer-lookup-input">
 
                         <!-- Customer context banners (Erik 2026-05-23) -->
                         <div id="customer-warning-banner" hidden></div>
-                        <div class="qbi-e9863ba" style="display: flex">
+                        <div class="qb-fwrap-wrap-gap-6-m-4-0" style="display: flex">
                             <span id="customer-tax-chip" hidden></span>
                             <span id="customer-tier-badge" hidden></span>
                         </div>
                     </div>
                     <details class="customer-manual" id="dtf-customer-manual">
                     <summary>Enter details manually <span class="cm-hint">— the search fills these for you</span></summary>
-                    <div class="qbi-bacf216" style="display: grid">
+                    <div class="qb-cols-1fr-1fr-gap-8" style="display: grid">
                         <div class="customer-field">
                             <label class="quote-label">NAME *</label>
                             <input type="text" id="customer-name" aria-label="Customer name" placeholder="Customer name" class="quote-input" data-input="?renderOrderRecap,?updateDtfPushButtonState">
@@ -571,7 +572,7 @@
                         </div>
                         <div class="customer-field">
                             <label class="quote-label">SALES REP</label>
-                            <select id="sales-rep" aria-label="Sales rep" class="quote-input qbi-73403f4">
+                            <select id="sales-rep" aria-label="Sales rep" class="quote-input qb-bg-white">
                                 <option value="sales@nwcustomapparel.com">General Sales</option>
                                 <option value="bradley@nwcustomapparel.com">Bradley Wright</option>
                                 <option value="erik@nwcustomapparel.com">Erik Mickelson</option>
@@ -597,7 +598,7 @@
                         <!-- Phase 11.1 (2026-05-24): customer-aware Design # lookup -->
                         <div class="customer-field qb-span-all">
                             <label class="quote-label" for="design-number">
-                                DESIGN # <span class="qbi-9f0775f">(pick from this customer's DTF designs)</span>
+                                DESIGN # <span class="qb-c-gray-400-fw-400">(pick from this customer's DTF designs)</span>
                             </label>
                             <input type="text" id="design-number" placeholder="Type design # or name…" class="quote-input">
                         </div>
@@ -632,9 +633,9 @@
                     <span class="label">Products Subtotal:</span>
                     <span class="value" id="subtotal">$0.00</span>
                 </div>
-                <div class="pricing-row qbi-15ddad0" id="per-unit-price-row" style="display: none">
-                    <span class="label qbi-2ba262c">Per Piece:</span>
-                    <span class="value qbi-38588b7" id="per-unit-price">-</span>
+                <div class="pricing-row qb-fs-12-c-gray-500-bb-none-p-2-0" id="per-unit-price-row" style="display: none">
+                    <span class="label qb-fst-italic">Per Piece:</span>
+                    <span class="value qb-fst-italic-fw-500" id="per-unit-price">-</span>
                 </div>
 
                 <!-- Subtotal/Tax/TOTAL + Order Recap + Ship-To relocated to the footer invoice band
@@ -646,7 +647,7 @@
 
 
             <!-- LTM Control Panel (shown only when LTM applies) -->
-            <div class="qbi-5beb8fb" id="dtf-ltm-wrapper" style="display: none">
+            <div class="qb-mb-12" id="dtf-ltm-wrapper" style="display: none">
                 <div id="dtf-ltm-panel"></div>
             </div>
 
@@ -802,7 +803,7 @@
 
     <!-- Push to ShopWorks Preview Modal (review-before-push parity with EMB/SCP) -->
     <div id="dtf-push-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-label="Push to ShopWorks">
-        <div class="modal-content qbi-64c36fb">
+        <div class="modal-content qb-w-660-maxw-94">
             <div class="modal-header">
                 <h3><i class="fas fa-upload" aria-hidden="true"></i> Push to ShopWorks — Review Order</h3>
                 <button class="modal-close" data-call="closeDtfPushPreview">&times;</button>
@@ -812,7 +813,7 @@
                 <div id="dtf-push-preview"></div>
             </div>
             <div class="modal-footer">
-                <button class="btn-action btn-secondary-action qbi-7fde9b5" data-call="closeDtfPushPreview">Cancel</button>
+                <button class="btn-action btn-secondary-action qb-bg-gray-500" data-call="closeDtfPushPreview">Cancel</button>
                 <button id="dtf-push-confirm" class="btn-action btn-primary-action" data-call="confirmDtfPush">
                     <i class="fas fa-upload" aria-hidden="true"></i> Push to ShopWorks
                 </button>

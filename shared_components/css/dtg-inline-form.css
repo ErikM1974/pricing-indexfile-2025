@@ -1,14 +1,38 @@
+/* stylelint-disable no-duplicate-selectors -- legacy sheet: rules were appended over time; merging them would reorder the cascade (2026-09-07) */
+
 /* DTG Inline Form — NWCA-green, no Bootstrap.
    Lives on /quote-builders/dtg-quote-builder.html alongside the chat drawer.
    Mirrors the order-form's paper-like aesthetic but DTG-only and lighter weight. */
 
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue so the page
+   keeps its exact look. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   every rule below uses var(). Raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
+:root {
+    --dtg-inline-form-orange: #78350f;
+    --dtg-inline-form-green: #16a34a;
+    --dtg-inline-form-green-2: #15803d;
+    --dtg-inline-form-green-tint: #d1fae5;
+    --dtg-inline-form-green-3: #98c98a;
+    --dtg-inline-form-orange-2: #bdb097;
+    --dtg-inline-form-cyan: #93c5fd;
+    --dtg-inline-form-cyan-2: #60a5fa;
+    --dtg-inline-form-blue: #1e40af;
+    --dtg-inline-form-yellow: #fde68a;
+    --dtg-inline-form-orange-3: #c8b08a;
+    --dtg-inline-form-teal-dark: #065f46;
+    --dtg-inline-form-green-4: #22c55e;
+    --dtg-inline-form-green-5: #a5d6a7;
+}
+/* stylelint-enable color-no-hex */
+
 .dtg-form-wrap {
     margin: 24px 0;
-    background: #ffffff;
-    border: 1px solid var(--rule, rgba(0, 0, 0, 0.08));
+    background: var(--color-surface);
+    border: 1px solid var(--rule, rgb(0 0 0 / 8%));
     border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 2px 8px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 1px 2px rgb(0 0 0 / 4%), 0 2px 8px rgb(0 0 0 / 4%);
     position: relative;
 }
 
@@ -19,38 +43,42 @@
 .dtg-resume-banner-inline {
     margin: 12px 20px 0;
     padding: 10px 14px;
-    background: linear-gradient(180deg, #fef9e7 0%, #fef3c7 100%);
-    border: 1px solid rgba(217, 119, 6, 0.4);
-    border-left: 4px solid #d97706;
+    background: linear-gradient(180deg, var(--store-rush-soft) 0%, var(--amber-100) 100%);
+    border: 1px solid rgb(217 119 6 / 40%);
+    border-left: 4px solid var(--amber-600);
     border-radius: 6px;
     display: flex;
     align-items: center;
     gap: 12px;
     font-size: 12.5px;
-    color: #78350f;
+    color: var(--dtg-inline-form-orange);
     line-height: 1.4;
     animation: drbi-slide 0.25s ease;
 }
+
 @keyframes drbi-slide { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+
 .dtg-resume-banner-inline .drbi-icon {
     flex: 0 0 auto;
-    color: #92400e /* 1.8: amber text on tan wash was 4.0:1 */;
+    color: var(--amber-800) /* 1.8: amber text on tan wash was 4.0:1 */;
     font-size: 14px;
 }
+
 .dtg-resume-banner-inline .drbi-msg {
     flex: 1 1 auto;
     font-weight: 500;
-    color: #78350f;
+    color: var(--dtg-inline-form-orange);
 }
-.dtg-resume-banner-inline .drbi-msg strong { color: #92400e; font-weight: 700; }
+.dtg-resume-banner-inline .drbi-msg strong { color: var(--amber-800); font-weight: 700; }
+
 .dtg-resume-banner-inline .drbi-dismiss {
     display: inline-flex;
     align-items: center;
     gap: 5px;
     flex: 0 0 auto;
-    background: #ffffff;
-    border: 1px solid #d97706;
-    color: #92400e;
+    background: var(--color-surface);
+    border: 1px solid var(--amber-600);
+    color: var(--amber-800);
     padding: 5px 12px;
     border-radius: 5px;
     font: inherit;
@@ -59,13 +87,14 @@
     cursor: pointer;
     transition: background 120ms ease;
 }
-.dtg-resume-banner-inline .drbi-dismiss:hover { background: #fef3c7; }
+.dtg-resume-banner-inline .drbi-dismiss:hover { background: var(--amber-100); }
 .dtg-resume-banner-inline .drbi-dismiss i { font-size: 10px; }
+
 .dtg-resume-banner-inline .drbi-close {
     flex: 0 0 auto;
     background: transparent;
     border: none;
-    color: #92400e;
+    color: var(--amber-800);
     font-size: 14px;
     line-height: 1;
     cursor: pointer;
@@ -73,9 +102,9 @@
     border-radius: 4px;
     transition: background 120ms ease;
 }
-.dtg-resume-banner-inline .drbi-close:hover { background: rgba(217, 119, 6, 0.10); }
+.dtg-resume-banner-inline .drbi-close:hover { background: rgb(217 119 6 / 10%); }
 
-@media (max-width: 700px) {
+@media (width <= 700px) {
     .dtg-resume-banner-inline {
         margin: 12px 12px 0;
         flex-wrap: wrap;
@@ -85,14 +114,15 @@
 
 .dtg-form-header {
     padding: 14px 20px;
-    background: linear-gradient(180deg, var(--pnw-birch) 0%, #ffffff 100%);
-    border-bottom: 1px solid var(--rule, rgba(0, 0, 0, 0.08));
+    background: linear-gradient(180deg, var(--pnw-birch) 0%, var(--color-surface) 100%);
+    border-bottom: 1px solid var(--rule, rgb(0 0 0 / 8%));
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 16px;
     flex-wrap: wrap;
 }
+
 .dtg-form-header .dfh-title {
     font-size: 17px;
     font-weight: 700;
@@ -102,20 +132,22 @@
     gap: 10px;
 }
 .dtg-form-header .dfh-title i { color: var(--pnw-forest); }
+
 .dtg-form-header .dfh-sub {
     font-size: 12px;
-    color: var(--pnw-stone-strong, #55606e) /* 1.8: stone on tinted washes */;
+    color: var(--pnw-stone-strong, var(--gray-600)) /* 1.8: stone on tinted washes */;
 }
 
 /* Location chooser at the top */
 .dtg-form-section {
     padding: 16px 20px;
-    border-bottom: 1px solid var(--rule, rgba(0, 0, 0, 0.06));
+    border-bottom: 1px solid var(--rule, rgb(0 0 0 / 6%));
 }
+
 .dtg-form-section .dfs-label {
     font-size: 11px;
     font-weight: 700;
-    color: var(--pnw-stone-strong, #55606e) /* 1.8: stone on tinted washes */;
+    color: var(--pnw-stone-strong, var(--gray-600)) /* 1.8: stone on tinted washes */;
     text-transform: uppercase;
     letter-spacing: 0.05em;
     margin-bottom: 10px;
@@ -131,57 +163,66 @@
     gap: 14px;
     align-items: center;
 }
-@media (max-width: 700px) {
+
+@media (width <= 700px) {
     .dtg-location-row { grid-template-columns: 1fr; }
 }
+
 .dtg-location-row .dlr-group {
     display: flex;
     flex-direction: column;
     gap: 4px;
 }
+
 .dtg-location-row .dlr-group-label {
     font-size: 11px;
     font-weight: 700;
-    color: #4b5563;
+    color: var(--gray-600);
     text-transform: uppercase;
     letter-spacing: 0.04em;
 }
+
 .dtg-location-row .dlr-options {
     display: flex;
     flex-wrap: wrap;
     gap: 4px;
 }
+
 .dtg-location-pill {
     display: inline-flex;
     align-items: center;
     gap: 4px;
     padding: 6px 10px;
     background: var(--pnw-birch);
-    border: 1px solid #d6cdb8;
+    border: 1px solid var(--store-line-strong);
     border-radius: 999px;
     font-size: 12px;
     font-weight: 500;
-    color: #4b5563;
+    color: var(--gray-600);
     cursor: pointer;
     transition: all 0.18s ease;
     user-select: none;
 }
+
 .dtg-location-pill:hover {
-    background: #efe7d3;
-    border-color: #bdb097;
+    background: var(--store-line);
+    border-color: var(--dtg-inline-form-orange-2);
 }
+
 .dtg-location-pill.selected {
     background: var(--pnw-forest);
-    color: #fff;
+    color: var(--color-on-brand);
     border-color: var(--pnw-forest);
     font-weight: 700;
 }
+
 .dtg-location-pill .dim {
     font-size: 10px;
-    color: var(--pnw-stone-strong, #55606e); /* 1.8: was 2.26:1 on birch */
+    color: var(--pnw-stone-strong, var(--gray-600)); /* 1.8: was 2.26:1 on birch */
     margin-left: 4px;
 }
-.dtg-location-pill.selected .dim { color: rgba(255, 255, 255, 0.7); }
+.dtg-location-pill.selected .dim { color: rgb(255 255 255 / 70%); }
+
 /* Unpriceable front+back combo (FF_JB / JF_FB) — no DTG_Costs data backs it,
    so the pill renders disabled with a title attr explaining why. */
 .dtg-location-pill:disabled {
@@ -189,9 +230,10 @@
     cursor: not-allowed;
     text-decoration: line-through;
 }
+
 .dtg-location-pill:disabled:hover {
     background: var(--pnw-birch);
-    border-color: #d6cdb8;
+    border-color: var(--store-line-strong);
 }
 
 .dtg-location-summary {
@@ -200,14 +242,15 @@
     font-weight: 600;
     color: var(--pnw-forest);
     padding: 8px 12px;
-    background: #ecf6ec;
+    background: var(--brand-100);
     border-radius: 8px;
     line-height: 1.3;
 }
+
 .dtg-location-summary .dls-code {
     font-family: var(--mono, ui-monospace, monospace);
     font-size: 11px;
-    color: #4b5563;
+    color: var(--gray-600);
     display: block;
     margin-top: 2px;
 }
@@ -226,7 +269,7 @@
 
 .dtg-rows-pane {
     padding: 12px 16px;
-    border-bottom: 1px solid var(--rule, rgba(0, 0, 0, 0.06));
+    border-bottom: 1px solid var(--rule, rgb(0 0 0 / 6%));
     min-width: 0;
 }
 
@@ -244,33 +287,38 @@
     gap: 10px;
     margin-bottom: 10px;
 }
+
 .dtg-rows-empty {
     padding: 18px;
     text-align: center;
-    color: var(--pnw-stone-strong, #55606e) /* 1.8: stone-soft text 2.4:1 */;
+    color: var(--pnw-stone-strong, var(--gray-600)) /* 1.8: stone-soft text 2.4:1 */;
     font-style: italic;
-    border: 1.5px dashed rgba(0, 0, 0, 0.08);
+    border: 1.5px dashed rgb(0 0 0 / 8%);
     border-radius: 8px;
-    background: rgba(0, 0, 0, 0.015);
+    background: rgb(0 0 0 / 1.5%);
 }
+
 .dtg-line-card {
-    background: #ffffff;
-    border: 1px solid rgba(0, 0, 0, 0.08);
+    background: var(--color-surface);
+    border: 1px solid rgb(0 0 0 / 8%);
     border-radius: 8px;
     padding: 10px 12px 12px;
     transition: border-color 120ms ease, box-shadow 120ms ease;
 }
+
 .dtg-line-card:hover {
-    border-color: rgba(46, 88, 39, 0.2);
-    box-shadow: 0 1px 3px rgba(46, 88, 39, 0.08);
+    border-color: rgb(46 88 39 / 20%);
+    box-shadow: 0 1px 3px rgb(46 88 39 / 8%);
 }
+
 .dtg-line-card--ai-touched {
     animation: dtg-line-pulse 1.6s ease-out;
 }
+
 @keyframes dtg-line-pulse {
-    0%   { box-shadow: 0 0 0 0 rgba(46, 88, 39, 0.55); border-color: var(--pnw-forest); }
-    60%  { box-shadow: 0 0 0 10px rgba(46, 88, 39, 0); }
-    100% { box-shadow: 0 1px 3px rgba(46, 88, 39, 0.08); border-color: rgba(0, 0, 0, 0.08); }
+    0%   { box-shadow: 0 0 0 0 rgb(46 88 39 / 55%); border-color: var(--pnw-forest); }
+    60%  { box-shadow: 0 0 0 10px rgb(46 88 39 / 0%); }
+    100% { box-shadow: 0 1px 3px rgb(46 88 39 / 8%); border-color: rgb(0 0 0 / 8%); }
 }
 
 /* Top row: style combobox + color combobox + actions (clone, remove) */
@@ -280,15 +328,18 @@
     gap: 8px;
     align-items: center;
 }
+
 .dtg-line-actions {
     display: flex;
     align-items: center;
     gap: 4px;
 }
+
 .dtg-line-style .dtg-combobox,
 .dtg-line-color .dtg-combobox {
     width: 100%;
 }
+
 .dtg-line-style input,
 .dtg-line-color input {
     width: 100%;
@@ -296,25 +347,29 @@
     padding: 4px 8px;
     font-size: 13px;
     font-family: inherit;
-    border: 1px solid #d6cdb8;
+    border: 1px solid var(--store-line-strong);
     border-radius: 5px;
-    background: #fff;
+    background: var(--color-surface);
 }
+
 .dtg-line-style input {
     font-family: ui-monospace, "Cascadia Code", "SF Mono", monospace;
     font-weight: 700;
     color: var(--pnw-forest);
     text-transform: uppercase;
 }
+
 .dtg-line-style input:focus,
 .dtg-line-color input:focus {
     outline: none;
     border-color: var(--pnw-forest);
-    box-shadow: 0 0 0 3px rgba(46, 88, 39, 0.12);
+    box-shadow: 0 0 0 3px rgb(46 88 39 / 12%);
 }
+
 .dtg-line-color {
     position: relative;
 }
+
 .dtg-line-color .dtg-row-color-swatch {
     position: absolute;
     left: 7px;
@@ -323,19 +378,22 @@
     width: 18px;
     height: 18px;
     border-radius: 3px;
-    border: 1px solid rgba(0, 0, 0, 0.12);
+    border: 1px solid rgb(0 0 0 / 12%);
     background-size: cover;
     background-position: center;
     pointer-events: none;
     z-index: 1;
 }
+
 .dtg-line-color input[data-has-swatch="true"] {
     padding-left: 32px;
 }
+
 .dtg-line-color.dtg-row-color-invalid input {
-    border-color: #dc2626;
-    background: rgba(220, 38, 38, 0.04);
+    border-color: var(--red-600);
+    background: rgb(220 38 38 / 4%);
 }
+
 .dtg-line-remove,
 .dtg-line-clone {
     width: 28px;
@@ -344,7 +402,7 @@
     background: transparent;
     border: 1px solid transparent;
     border-radius: 5px;
-    color: var(--pnw-stone-strong, #55606e) /* 1.8: stone-soft text 2.4:1 */;
+    color: var(--pnw-stone-strong, var(--gray-600)) /* 1.8: stone-soft text 2.4:1 */;
     font-size: 13px;
     line-height: 1;
     cursor: pointer;
@@ -353,20 +411,24 @@
     justify-content: center;
     transition: color 120ms ease, background 120ms ease, border-color 120ms ease, transform 80ms ease;
 }
+
 .dtg-line-remove {
     font-size: 20px;
     font-weight: 700;
 }
+
 .dtg-line-remove:hover {
-    color: #dc2626;
-    background: rgba(220, 38, 38, 0.06);
-    border-color: rgba(220, 38, 38, 0.25);
+    color: var(--red-600);
+    background: rgb(220 38 38 / 6%);
+    border-color: rgb(220 38 38 / 25%);
 }
+
 .dtg-line-clone:hover {
     color: var(--pnw-forest);
-    background: rgba(46, 88, 39, 0.07);
-    border-color: rgba(46, 88, 39, 0.3);
+    background: rgb(46 88 39 / 7%);
+    border-color: rgb(46 88 39 / 30%);
 }
+
 .dtg-line-clone:active {
     transform: scale(0.94);
 }
@@ -378,17 +440,20 @@
     right: 9px;
     top: 50%;
     transform: translateY(-50%);
-    color: var(--pnw-stone-strong, #55606e) /* 1.8: stone-soft text 2.4:1 */;
+    color: var(--pnw-stone-strong, var(--gray-600)) /* 1.8: stone-soft text 2.4:1 */;
     font-size: 11px;
     pointer-events: none;
     transition: color 120ms ease;
 }
+
 .dtg-line-color .dtg-combobox {
     position: relative;
 }
+
 .dtg-line-color input {
     padding-right: 24px; /* leave room for the chevron */
 }
+
 .dtg-line-color .dtg-combobox:focus-within .dtg-combobox-chevron {
     color: var(--pnw-forest);
 }
@@ -397,7 +462,7 @@
 .dtg-line-desc {
     margin: 6px 0 8px;
     font-size: 11.5px;
-    color: var(--pnw-stone-strong, #55606e) /* 1.8: stone on tinted washes */;
+    color: var(--pnw-stone-strong, var(--gray-600)) /* 1.8: stone on tinted washes */;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -407,20 +472,21 @@
 .dtg-line-card .dtg-row-color-warn {
     margin: 4px 0 8px;
     padding: 6px 8px;
-    background: rgba(220, 38, 38, 0.06);
-    border: 1px solid rgba(220, 38, 38, 0.2);
+    background: rgb(220 38 38 / 6%);
+    border: 1px solid rgb(220 38 38 / 20%);
     border-radius: 4px;
     font-size: 11px;
-    color: #991b1b;
+    color: var(--red-800);
 }
 
 /* Size grid — fixed 5-column layout that wraps to 2 rows for the 10 sizes */
 .dtg-line-sizes {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
-    gap: 6px 6px;
+    gap: 6px;
     margin: 2px 0 8px;
 }
+
 .dtg-size-cell {
     display: flex;
     flex-direction: column;
@@ -428,16 +494,18 @@
     gap: 2px;
     min-width: 0;
 }
+
 .dtg-size-label {
     text-align: center;
     font-size: 9.5px;
     font-weight: 700;
-    color: var(--pnw-stone-strong, #55606e) /* 1.8: stone on tinted washes */;
+    color: var(--pnw-stone-strong, var(--gray-600)) /* 1.8: stone on tinted washes */;
     text-transform: uppercase;
     letter-spacing: 0.04em;
     line-height: 1;
     padding-bottom: 1px;
 }
+
 .dtg-size-cell input[type="number"] {
     width: 100%;
     height: 30px;
@@ -446,43 +514,48 @@
     font-size: 13px;
     font-weight: 600;
     font-family: inherit;
-    border: 1px solid #d6cdb8;
+    border: 1px solid var(--store-line-strong);
     border-radius: 4px;
-    background: #fff;
-    -moz-appearance: textfield;
+    background: var(--color-surface);
+    appearance: textfield;
 }
+
 .dtg-size-cell input[type="number"]::-webkit-outer-spin-button,
 .dtg-size-cell input[type="number"]::-webkit-inner-spin-button {
-    -webkit-appearance: none;
+    appearance: none;
     margin: 0;
 }
+
 .dtg-size-cell input[type="number"]:focus {
     outline: none;
     border-color: var(--pnw-forest);
-    box-shadow: 0 0 0 2px rgba(46, 88, 39, 0.15);
+    box-shadow: 0 0 0 2px rgb(46 88 39 / 15%);
 }
+
 .dtg-size-cell--na {
     opacity: 0.5;
 }
+
 .dtg-size-na {
     height: 30px;
-    border: 1px dashed #d1d5db;
+    border: 1px dashed var(--gray-300);
     border-radius: 4px;
-    background: rgba(0, 0, 0, 0.025);
-    color: var(--pnw-stone-strong, #55606e) /* 1.8: stone-soft text 2.4:1 */;
+    background: rgb(0 0 0 / 2.5%);
+    color: var(--pnw-stone-strong, var(--gray-600)) /* 1.8: stone-soft text 2.4:1 */;
     font-size: 9.5px;
     font-weight: 700;
     display: flex;
     align-items: center;
     justify-content: center;
 }
+
 /* Per-size price (replaced raw inventory count on 2026-05-19). Reps see
    the tier-adjusted + LTM-amortized price for each size at a glance,
    so they can quote upcharges without mental math. */
 .dtg-size-price {
     text-align: center;
     font-size: 10.5px;
-    color: #4b5563;
+    color: var(--gray-600);
     line-height: 1.2;
     min-height: 13px;
     font-variant-numeric: tabular-nums;
@@ -492,46 +565,52 @@
     justify-content: center;
     gap: 3px;
 }
+
 .dtg-size-price--oos {
-    color: #dc2626;
+    color: var(--red-600);
 }
+
 .dtg-size-oos-dot {
     display: inline-block;
     width: 6px;
     height: 6px;
-    background: #dc2626;
+    background: var(--red-600);
     border-radius: 50%;
     flex: 0 0 auto;
 }
+
 /* OOS cell — red border on the input as a visual warning. Does not block
    typing (rep may know stock is incoming); the typed-OOS warning below
    the cell catches the case where they actually fill an OOS size.
    Note: the attribute selector [type="number"] is required to outrank
    the base rule's specificity (same selector pattern). */
 .dtg-size-cell--oos input[type="number"] {
-    border-color: #dc2626;
-    background: rgba(220, 38, 38, 0.03);
+    border-color: var(--red-600);
+    background: rgb(220 38 38 / 3%);
 }
+
 .dtg-size-cell--oos input[type="number"]:focus {
-    box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.15);
-    border-color: #dc2626;
+    box-shadow: 0 0 0 2px rgb(220 38 38 / 15%);
+    border-color: var(--red-600);
     outline: none;
 }
+
 .dtg-size-warn {
     margin-top: 2px;
     padding: 2px 4px;
-    background: rgba(220, 38, 38, 0.1);
-    color: #991b1b;
+    background: rgb(220 38 38 / 10%);
+    color: var(--red-800);
     border-radius: 3px;
     font-size: 9px;
     font-weight: 700;
     text-align: center;
     line-height: 1.2;
 }
+
 /* The "typed more than in stock" case still gets a red border too. */
 .dtg-size-cell--overflow input[type="number"] {
-    border-color: #dc2626;
-    background: rgba(220, 38, 38, 0.04);
+    border-color: var(--red-600);
+    background: rgb(220 38 38 / 4%);
 }
 
 /* Footer row: qty · $/pc · total */
@@ -540,13 +619,14 @@
     align-items: baseline;
     gap: 10px;
     padding-top: 8px;
-    border-top: 1px dashed rgba(0, 0, 0, 0.06);
+    border-top: 1px dashed rgb(0 0 0 / 6%);
     font-size: 12px;
-    color: var(--pnw-stone-strong, #55606e) /* 1.8: stone on tinted washes */;
+    color: var(--pnw-stone-strong, var(--gray-600)) /* 1.8: stone on tinted washes */;
 }
 .dtg-line-qty { flex: 0 0 auto; }
 .dtg-line-qty strong { color: var(--pnw-pine); font-size: 14px; font-variant-numeric: tabular-nums; }
 .dtg-line-perpiece { flex: 1 1 auto; }
+
 .dtg-line-total {
     flex: 0 0 auto;
     font-size: 14px;
@@ -564,22 +644,25 @@
     font-size: 12px;
     table-layout: auto;
 }
+
 .dtg-rows-table thead th {
     text-align: left;
     font-size: 10px;
     font-weight: 700;
-    color: var(--pnw-stone-strong, #55606e) /* 1.8: stone on tinted washes */;
+    color: var(--pnw-stone-strong, var(--gray-600)) /* 1.8: stone on tinted washes */;
     text-transform: uppercase;
     letter-spacing: 0.04em;
     padding: 4px 3px;
-    border-bottom: 1px solid var(--rule, rgba(0, 0, 0, 0.10));
+    border-bottom: 1px solid var(--rule, rgb(0 0 0 / 10%));
     white-space: nowrap;
 }
+
 .dtg-rows-table thead th.size-col {
     text-align: center;
     width: 34px;
     min-width: 34px;
 }
+
 .dtg-rows-table thead th.total-col,
 .dtg-rows-table thead th.price-col {
     text-align: right;
@@ -587,43 +670,48 @@
     min-width: 46px;
     padding-right: 6px;
 }
+
 .dtg-rows-table tbody td {
-    padding: 3px 3px;
-    border-bottom: 1px solid var(--rule, rgba(0, 0, 0, 0.04));
+    padding: 3px;
+    border-bottom: 1px solid var(--rule, rgb(0 0 0 / 4%));
     vertical-align: middle;
 }
-.dtg-rows-table tbody tr:hover { background: rgba(46, 88, 39, 0.03); }
+.dtg-rows-table tbody tr:hover { background: rgb(46 88 39 / 3%); }
 
 .dtg-rows-table input[type="text"],
 .dtg-rows-table input[type="number"],
 .dtg-rows-table select {
     width: 100%;
     padding: 4px 5px;
-    border: 1px solid #d6cdb8;
+    border: 1px solid var(--store-line-strong);
     border-radius: 4px;
     font-size: 12px;
     font-family: inherit;
-    background: #ffffff;
+    background: var(--color-surface);
     color: var(--pnw-pine);
     box-sizing: border-box;
 }
+
 .dtg-rows-table input:focus,
 .dtg-rows-table select:focus {
     outline: none;
     border-color: var(--pnw-forest);
-    box-shadow: 0 0 0 3px rgba(46, 88, 39, 0.12);
+    box-shadow: 0 0 0 3px rgb(46 88 39 / 12%);
 }
+
 .dtg-rows-table input[type="number"] {
     text-align: center;
-    -moz-appearance: textfield;
+    appearance: textfield;
     padding-left: 2px;
     padding-right: 2px;
 }
+
 .dtg-rows-table input[type="number"]::-webkit-outer-spin-button,
 .dtg-rows-table input[type="number"]::-webkit-inner-spin-button {
-    -webkit-appearance: none;
+    appearance: none;
     margin: 0;
 }
+
 .dtg-rows-table td.size-col,
 .dtg-rows-table td.total-col,
 .dtg-rows-table td.price-col {
@@ -631,6 +719,7 @@
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
 }
+
 .dtg-rows-table td.total-col,
 .dtg-rows-table td.price-col {
     text-align: right;
@@ -638,9 +727,10 @@
 }
 
 .dtg-row-style { width: 78px; min-width: 78px; }
+
 .dtg-row-desc {
     min-width: 0;
-    color: var(--pnw-stone-strong, #55606e) /* 1.8: stone on tinted washes */;
+    color: var(--pnw-stone-strong, var(--gray-600)) /* 1.8: stone on tinted washes */;
     font-size: 11px;
     line-height: 1.3;
     max-width: 240px;
@@ -649,11 +739,13 @@
     white-space: nowrap;
 }
 .dtg-row-color { width: 110px; min-width: 110px; }
+
 /* Inline color swatch chip in the color cell — sits inside the combobox
    to the left of the color-name input. Driven by row.colorSwatch (from
    /api/product-colors COLOR_SQUARE_IMAGE) so the rep can see at a
    glance which color is on each line. */
 .dtg-row-color .dtg-combobox { position: relative; }
+
 .dtg-row-color-swatch {
     position: absolute;
     left: 5px;
@@ -662,14 +754,14 @@
     width: 16px;
     height: 16px;
     border-radius: 3px;
-    border: 1px solid rgba(0, 0, 0, 0.15);
+    border: 1px solid rgb(0 0 0 / 15%);
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
     pointer-events: none;
     z-index: 1;
 }
-.dtg-row-color-swatch--blank { background-color: #e5e7eb; }
+.dtg-row-color-swatch--blank { background-color: var(--gray-200); }
 .dtg-row-color input[data-has-swatch="true"] { padding-left: 26px; }
 
 /* Invalid color state — rep typed a color SanMar doesn't carry for this
@@ -677,18 +769,20 @@
    dropdown. Hard red border + inline ⚠ message below the cell make the
    error impossible to miss. */
 .dtg-row-color.dtg-row-color-invalid .dtg-combobox input {
-    border-color: #dc2626;
-    background: #fef2f2;
+    border-color: var(--red-600);
+    background: var(--red-50);
 }
+
 .dtg-row-color.dtg-row-color-invalid .dtg-combobox input:focus {
-    border-color: #b91c1c;
-    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.18);
+    border-color: var(--red-700);
+    box-shadow: 0 0 0 3px rgb(220 38 38 / 18%);
 }
+
 .dtg-row-color-warn {
     margin-top: 3px;
     font-size: 10px;
     font-weight: 700;
-    color: #b91c1c;
+    color: var(--red-700);
     line-height: 1.3;
     cursor: help;
 }
@@ -698,10 +792,11 @@
    row. Gives the rep a visible "the form caught the chat" cue so they
    know the AI just updated the line. */
 @keyframes dtgRowAiPulse {
-    0%   { background: rgba(46, 88, 39, 0.18); box-shadow: inset 3px 0 0 var(--pnw-forest); }
-    60%  { background: rgba(46, 88, 39, 0.08); box-shadow: inset 3px 0 0 var(--pnw-forest); }
+    0%   { background: rgb(46 88 39 / 18%); box-shadow: inset 3px 0 0 var(--pnw-forest); }
+    60%  { background: rgb(46 88 39 / 8%); box-shadow: inset 3px 0 0 var(--pnw-forest); }
     100% { background: transparent;            box-shadow: inset 3px 0 0 transparent; }
 }
+
 .dtg-rows-table tbody tr.dtg-row-ai-touched {
     animation: dtgRowAiPulse 2s ease-out forwards;
 }
@@ -709,7 +804,7 @@
 /* Narrow viewport — hide the (already truncated) description column.
    The style + color columns retain the data identity. Hovering the Style
    cell still reveals the description via the `title` attribute. */
-@media (max-width: 900px) {
+@media (width <= 900px) {
     .dtg-rows-table .dtg-row-desc,
     .dtg-rows-table thead th:nth-child(2) {
         display: none;
@@ -721,11 +816,12 @@
    pattern (styles.css:.sz-unavail / .sz-na) so reps see the same UI on
    both pages. */
 .dtg-rows-table td.sz-unavail {
-    background: repeating-linear-gradient(135deg, transparent 0 4px, rgba(0, 0, 0, 0.06) 4px 5px);
+    background: repeating-linear-gradient(135deg, transparent 0 4px, rgb(0 0 0 / 6%) 4px 5px);
     cursor: not-allowed;
     text-align: center;
     vertical-align: middle;
 }
+
 .dtg-rows-table .sz-na {
     display: block;
     font-family: var(--mono, ui-monospace, monospace);
@@ -733,7 +829,7 @@
     font-weight: 600;
     letter-spacing: 0.06em;
     text-transform: uppercase;
-    color: var(--pnw-stone-strong, #55606e) /* 1.8: stone-soft text 2.4:1 */;
+    color: var(--pnw-stone-strong, var(--gray-600)) /* 1.8: stone-soft text 2.4:1 */;
     text-align: center;
     line-height: 1.6;
     user-select: none;
@@ -751,123 +847,139 @@
     margin-top: 2px;
     line-height: 1.2;
     user-select: none;
-    color: var(--pnw-stone-strong, #55606e) /* 1.8: stone on tinted washes */;
+    color: var(--pnw-stone-strong, var(--gray-600)) /* 1.8: stone on tinted washes */;
     transition: opacity 0.15s ease;
 }
-.dtg-rows-table td .sz-inv-good     { color: #15803d; }     /* green — plenty */
-.dtg-rows-table td .sz-inv-low      { color: #92400e /* 1.8: amber text on tan wash was 4.0:1 */; }     /* amber — qty close to available */
-.dtg-rows-table td .sz-inv-over     { color: #b91c1c; font-weight: 700; }  /* red — qty > available */
-.dtg-rows-table td .sz-inv-oos      { color: #b91c1c; font-weight: 700; }  /* red — out of stock */
-.dtg-rows-table td .sz-inv-unknown  { color: var(--pnw-stone-strong, #55606e) /* 1.8: stone-soft text 2.4:1 */; font-style: italic; }
-.dtg-rows-table td .sz-inv-not-local { color: #475569; font-style: italic; font-size: 8px; }
+.dtg-rows-table td .sz-inv-good     { color: var(--dtg-inline-form-green-2); }     /* green — plenty */
+.dtg-rows-table td .sz-inv-low      { color: var(--amber-800) /* 1.8: amber text on tan wash was 4.0:1 */; }     /* amber — qty close to available */
+.dtg-rows-table td .sz-inv-over     { color: var(--red-700); font-weight: 700; }  /* red — qty > available */
+.dtg-rows-table td .sz-inv-oos      { color: var(--red-700); font-weight: 700; }  /* red — out of stock */
+.dtg-rows-table td .sz-inv-unknown  { color: var(--pnw-stone-strong, var(--gray-600)) /* 1.8: stone-soft text 2.4:1 */; font-style: italic; }
+.dtg-rows-table td .sz-inv-not-local { color: var(--slate-600); font-style: italic; font-size: 8px; }
+
 /* Sz-overflow: red-tinted background when qty > available. */
 .dtg-rows-table td.sz-overflow {
-    background: color-mix(in oklab, #fee2e2 50%, transparent);
+    background: color-mix(in oklab, var(--red-100) 50%, transparent);
 }
+
 /* Collapse the green "good" badge to a tiny dot in the resting state so
    the table doesn't get cluttered with numbers — hover or focus reveals
    the actual digits. Mirrors the order-form's paper.css pattern. */
-.dtg-rows-table td:not(.sz-overflow):not(:focus-within):not(:hover) .sz-inv-good {
+.dtg-rows-table td:not(.sz-overflow, :focus-within, :hover) .sz-inv-good {
     color: transparent;
     text-indent: -9999px;
     overflow: hidden;
 }
-.dtg-rows-table td:not(.sz-overflow):not(:focus-within):not(:hover) .sz-inv-good::before {
+
+.dtg-rows-table td:not(.sz-overflow, :focus-within, :hover) .sz-inv-good::before {
     content: '●';
     display: block;
     text-indent: 0;
     font-size: 6px;
     line-height: 1;
-    color: #15803d;
+    color: var(--dtg-inline-form-green-2);
 }
-.dtg-rows-table td:not(:focus-within):not(:hover) .sz-inv-unknown {
+
+.dtg-rows-table td:not(:focus-within, :hover) .sz-inv-unknown {
     opacity: 0.55;
 }
+
 .dtg-row-remove {
     background: none;
     border: none;
-    color: #b91c1c;
+    color: var(--red-700);
     cursor: pointer;
     padding: 4px 6px;
     border-radius: 4px;
     font-size: 14px;
     transition: background 0.15s ease;
 }
-.dtg-row-remove:hover { background: #fee2e2; }
+.dtg-row-remove:hover { background: var(--red-100); }
 
 /* Style + color combobox menus */
 .dtg-combobox { position: relative; }
+
 /* The combobox menu is portaled to document.body via JS so it floats
    above the chat panel (z-index 100), the customer pane below the table,
    and the live pricing card. JS sets position:fixed + top/left/width
    dynamically — these CSS positioning rules are a fallback only. */
 .dtg-combobox-menu {
     position: fixed;
-    background: #ffffff;
-    border: 1px solid #d6cdb8;
+    background: var(--color-surface);
+    border: 1px solid var(--store-line-strong);
     border-radius: 6px;
     max-height: 280px;
     overflow-y: auto;
     z-index: 10050;
-    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.20);
+    box-shadow: 0 10px 28px rgb(0 0 0 / 20%);
 }
+
 .dtg-combobox-item {
     padding: 8px 10px;
     cursor: pointer;
     font-size: 12px;
     line-height: 1.4;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+    border-bottom: 1px solid rgb(0 0 0 / 4%);
 }
 .dtg-combobox-item:last-child { border-bottom: none; }
+
 .dtg-combobox-item:hover,
 .dtg-combobox-item.active {
-    background: #ecf6ec;
+    background: var(--brand-100);
 }
+
 .dtg-combobox-item .ci-primary {
     font-weight: 600;
     color: var(--pnw-pine);
 }
+
 .dtg-combobox-item .ci-secondary {
-    color: var(--pnw-stone-strong, #55606e) /* 1.8: stone on tinted washes */;
+    color: var(--pnw-stone-strong, var(--gray-600)) /* 1.8: stone on tinted washes */;
     font-size: 11px;
     margin-top: 1px;
 }
+
 .dtg-combobox-empty {
     padding: 10px 12px;
     text-align: center;
-    color: var(--pnw-stone-strong, #55606e) /* 1.8: stone-soft text 2.4:1 */;
+    color: var(--pnw-stone-strong, var(--gray-600)) /* 1.8: stone-soft text 2.4:1 */;
     font-size: 12px;
     font-style: italic;
 }
+
 /* "Did you mean" hint at the top of the dropdown — appears when the
    typed query had no exact hits but a shorter prefix found matches. */
 .dtg-combobox-hint {
     padding: 8px 12px;
-    background: linear-gradient(180deg, #fef9e7 0%, #fef3c7 100%);
-    border-bottom: 1px solid rgba(217, 119, 6, 0.25);
-    color: #78350f;
+    background: linear-gradient(180deg, var(--store-rush-soft) 0%, var(--amber-100) 100%);
+    border-bottom: 1px solid rgb(217 119 6 / 25%);
+    color: var(--dtg-inline-form-orange);
     font-size: 11.5px;
     line-height: 1.4;
 }
+
 .dtg-combobox-hint strong {
     color: var(--pnw-pine);
     font-weight: 700;
 }
+
 .dtg-combobox-hint em {
-    color: var(--pnw-stone-strong, #55606e) /* 1.8: stone on tinted washes */;
+    color: var(--pnw-stone-strong, var(--gray-600)) /* 1.8: stone on tinted washes */;
     font-style: italic;
 }
+
 .dtg-combobox-item .ci-swatches {
     display: flex;
     gap: 3px;
     margin-top: 4px;
     flex-wrap: wrap;
 }
+
 .dtg-combobox-item .ci-swatch-mini {
     width: 14px;
     height: 14px;
     border-radius: 2px;
-    border: 1px solid rgba(0, 0, 0, 0.1);
+    border: 1px solid rgb(0 0 0 / 10%);
     object-fit: cover;
 }
 
@@ -877,18 +989,20 @@
     gap: 6px;
     padding: 4px 8px;
     background: var(--pnw-birch);
-    border: 1px solid #d6cdb8;
+    border: 1px solid var(--store-line-strong);
     border-radius: 4px;
     font-size: 12px;
     cursor: pointer;
 }
+
 .dtg-color-pill .swatch {
     width: 14px;
     height: 14px;
     border-radius: 2px;
-    border: 1px solid rgba(0, 0, 0, 0.15);
+    border: 1px solid rgb(0 0 0 / 15%);
     flex-shrink: 0;
 }
+
 .dtg-color-pill .swatch img {
     width: 100%;
     height: 100%;
@@ -899,7 +1013,7 @@
 .dtg-add-row-btn {
     margin-top: 10px;
     padding: 8px 14px;
-    background: #fff;
+    background: var(--color-surface);
     border: 1px dashed var(--pnw-forest);
     border-radius: 6px;
     color: var(--pnw-forest);
@@ -908,8 +1022,9 @@
     cursor: pointer;
     transition: all 0.18s ease;
 }
+
 .dtg-add-row-btn:hover {
-    background: #ecf6ec;
+    background: var(--brand-100);
     border-style: solid;
 }
 
@@ -918,11 +1033,12 @@
     margin-top: 14px;
     padding: 14px 16px;
     background: linear-gradient(135deg, var(--pnw-forest) 0%, var(--pnw-pine) 100%);
-    color: #fff;
+    color: var(--color-on-brand);
     border-radius: 10px;
     position: relative;
     overflow: hidden;
 }
+
 .dtg-price-summary::before {
     content: '';
     position: absolute;
@@ -930,17 +1046,19 @@
     right: -20px;
     width: 80px;
     height: 80px;
-    background: radial-gradient(circle, rgba(255, 232, 160, 0.25) 0%, transparent 70%);
+    background: radial-gradient(circle, rgb(255 232 160 / 25%) 0%, transparent 70%);
     pointer-events: none;
 }
+
 .dtg-price-summary .dps-label {
     font-size: 11px;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    color: rgba(255, 255, 255, 0.85);
+    color: rgb(255 255 255 / 85%);
     margin-bottom: 6px;
 }
+
 .dtg-price-summary .dps-grid {
     display: grid;
     grid-template-columns: auto 1fr auto;
@@ -948,42 +1066,48 @@
     align-items: baseline;
     font-size: 13px;
 }
+
 .dtg-price-summary .dps-tier-pill {
     display: inline-block;
     padding: 3px 10px;
-    background: rgba(255, 255, 255, 0.18);
+    background: rgb(255 255 255 / 18%);
     border-radius: 999px;
     font-size: 12px;
     font-weight: 600;
 }
+
 .dtg-price-summary .dps-tier-pill.ltm {
-    background: rgba(255, 232, 160, 0.85);
+    background: rgb(255 232 160 / 85%);
     color: var(--pnw-pine);
 }
+
 .dtg-price-summary .dps-total {
     font-size: 22px;
     font-weight: 700;
     text-align: right;
     grid-column: 3;
 }
+
 .dtg-price-summary .dps-subtotal-row {
     display: flex;
     justify-content: space-between;
     margin-top: 8px;
     padding-top: 8px;
-    border-top: 1px solid rgba(255, 255, 255, 0.18);
+    border-top: 1px solid rgb(255 255 255 / 18%);
     font-size: 13px;
     font-weight: 600;
 }
+
 .dtg-price-summary .dps-note {
     margin-top: 8px;
     font-size: 11px;
-    color: rgba(255, 232, 160, 0.95);
+    color: rgb(255 232 160 / 95%);
     font-style: italic;
 }
+
 .dtg-price-summary .dps-empty {
     font-size: 13px;
-    color: rgba(255, 255, 255, 0.75);
+    color: rgb(255 255 255 / 75%);
     font-style: italic;
 }
 
@@ -995,32 +1119,38 @@
    back to vertical sidebar mode. */
 .dtg-customer-pane {
     padding: 14px 20px;
-    background: #fafaf6;
+    background: var(--store-paper);
 }
+
 .dtg-customer-pane.dcp-horizontal .dcp-manual {
     display: flex;
     flex-wrap: wrap;
     gap: 6px 14px;
     align-items: flex-start;
 }
+
 .dtg-customer-pane.dcp-horizontal .dcp-manual > .dcp-row {
     /* Unwrap so the inner pairs become direct flex items */
     display: contents;
 }
+
 .dtg-customer-pane.dcp-horizontal .dcp-manual > .dcp-row > div,
 .dtg-customer-pane.dcp-horizontal .dcp-manual > .dcp-field-wrap {
     flex: 1 1 180px;
     min-width: 160px;
     max-width: 240px;
 }
+
 .dtg-customer-pane.dcp-horizontal .dcp-manual > .dcp-field-email {
     flex: 1 1 280px;
     max-width: 380px;
 }
+
 .dtg-customer-pane.dcp-horizontal .dcp-field-label {
     margin: 2px 0 3px;
 }
-@media (max-width: 600px) {
+
+@media (width <= 600px) {
     .dtg-customer-pane.dcp-horizontal .dcp-manual > .dcp-row > div,
     .dtg-customer-pane.dcp-horizontal .dcp-manual > .dcp-field-wrap,
     .dtg-customer-pane.dcp-horizontal .dcp-manual > .dcp-field-email {
@@ -1028,10 +1158,11 @@
         max-width: none;
     }
 }
+
 .dtg-customer-pane .dcp-label {
     font-size: 11px;
     font-weight: 700;
-    color: var(--pnw-stone-strong, #55606e) /* 1.8: stone on tinted washes */;
+    color: var(--pnw-stone-strong, var(--gray-600)) /* 1.8: stone on tinted washes */;
     text-transform: uppercase;
     letter-spacing: 0.05em;
     margin-bottom: 10px;
@@ -1044,7 +1175,7 @@
 .dtg-customer-pane .dcp-search-label {
     font-size: 10px;
     font-weight: 700;
-    color: var(--pnw-stone-strong, #55606e) /* 1.8: stone-soft text 2.4:1 */;
+    color: var(--pnw-stone-strong, var(--gray-600)) /* 1.8: stone-soft text 2.4:1 */;
     text-transform: uppercase;
     letter-spacing: 0.05em;
     margin-bottom: 4px;
@@ -1052,29 +1183,33 @@
     align-items: center;
     gap: 4px;
 }
+
 .dtg-customer-pane input[type="text"],
 .dtg-customer-pane input[type="email"],
 .dtg-customer-pane input[type="tel"],
 .dtg-customer-pane select {
     width: 100%;
     padding: 6px 8px;
-    border: 1px solid #d6cdb8;
+    border: 1px solid var(--store-line-strong);
     border-radius: 6px;
     font-size: 12.5px;
-    background: #ffffff;
+    background: var(--color-surface);
     color: var(--pnw-pine);
     margin-bottom: 6px;
     font-family: inherit;
     box-sizing: border-box;
 }
+
 .dtg-customer-pane input:focus,
 .dtg-customer-pane select:focus {
     outline: none;
     border-color: var(--pnw-forest);
-    box-shadow: 0 0 0 3px rgba(46, 88, 39, 0.12);
+    box-shadow: 0 0 0 3px rgb(46 88 39 / 12%);
 }
+
 .dtg-customer-pane .dcp-row {
     display: grid;
+
     /* minmax(0, 1fr): a bare 1fr lets a long label or a date input's intrinsic width
        blow the row past its column on phones (2026-09-05 builder review item 6). */
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
@@ -1083,14 +1218,16 @@
 }
 .dtg-customer-pane .dcp-row > div { min-width: 0; }
 .dtg-customer-pane .dcp-row input { margin-bottom: 0; min-width: 0; max-width: 100%; }
+
 .dtg-customer-pane .dcp-field-label {
     font-size: 10px;
     font-weight: 700;
-    color: var(--pnw-stone-strong, #55606e) /* 1.8: stone-soft text 2.4:1 */;
+    color: var(--pnw-stone-strong, var(--gray-600)) /* 1.8: stone-soft text 2.4:1 */;
     text-transform: uppercase;
     margin: 6px 0 3px;
     letter-spacing: 0.04em;
 }
+
 /* Contact picker row — appears between the customer search and "Or fill
    manually" once a company is selected. Lets the rep switch between the
    company's contacts (e.g. Aaberg's has 3: Craig Edward, Accounting,
@@ -1098,15 +1235,17 @@
 .dcp-contact-row {
     margin: 10px 0 4px;
     padding: 10px 12px;
-    background: linear-gradient(180deg, #f0fdf4 0%, #ecfdf5 100%);
-    border: 1px solid rgba(46, 88, 39, 0.18);
+    background: linear-gradient(180deg, var(--brand-50) 0%, var(--brand-50) 100%);
+    border: 1px solid rgb(46 88 39 / 18%);
     border-radius: 6px;
     animation: dcp-contact-row-in 0.2s ease;
 }
+
 @keyframes dcp-contact-row-in {
     from { opacity: 0; transform: translateY(-4px); }
     to { opacity: 1; transform: translateY(0); }
 }
+
 .dcp-contact-row .dcp-field-label {
     display: flex;
     align-items: center;
@@ -1119,41 +1258,45 @@
     margin-bottom: 6px;
 }
 .dcp-contact-row .dcp-field-label i { color: var(--pnw-forest); font-size: 11px; }
+
 .dcp-contact-count {
     font-weight: 500;
-    color: var(--pnw-stone-strong, #55606e) /* 1.8: stone on tinted washes */;
+    color: var(--pnw-stone-strong, var(--gray-600)) /* 1.8: stone on tinted washes */;
     text-transform: none;
     letter-spacing: 0;
     font-size: 10.5px;
     margin-left: 4px;
 }
+
 .dcp-contact-select {
     width: 100%;
     padding: 7px 10px;
     font: inherit;
     font-size: 13px;
-    color: #1f2937;
-    background: #ffffff;
-    border: 1px solid #d6cdb8;
+    color: var(--gray-800);
+    background: var(--color-surface);
+    border: 1px solid var(--store-line-strong);
     border-radius: 5px;
     cursor: pointer;
 }
+
 .dcp-contact-select:focus {
     outline: none;
     border-color: var(--pnw-forest);
-    box-shadow: 0 0 0 3px rgba(46, 88, 39, 0.12);
+    box-shadow: 0 0 0 3px rgb(46 88 39 / 12%);
 }
 
 .dtg-customer-pane .dcp-divider {
     margin: 14px 0 8px;
     text-align: center;
-    color: var(--pnw-stone-strong, #55606e) /* 1.8: stone-soft text 2.4:1 */;
+    color: var(--pnw-stone-strong, var(--gray-600)) /* 1.8: stone-soft text 2.4:1 */;
     font-size: 11px;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.05em;
     position: relative;
 }
+
 .dtg-customer-pane .dcp-divider::before,
 .dtg-customer-pane .dcp-divider::after {
     content: '';
@@ -1161,7 +1304,7 @@
     top: 50%;
     width: calc(50% - 60px);
     height: 1px;
-    background: rgba(0, 0, 0, 0.08);
+    background: rgb(0 0 0 / 8%);
 }
 .dtg-customer-pane .dcp-divider::before { left: 0; }
 .dtg-customer-pane .dcp-divider::after { right: 0; }
@@ -1170,10 +1313,11 @@
     width: 100%;
     margin-top: 16px;
     padding: 12px 16px;
+
     /* PNW theme: deeper forest gradient (more saturation than the old
        forest→pine ramp) with a subtle inner highlight for depth. */
     background: linear-gradient(180deg, var(--pnw-forest-mid) 0%, var(--pnw-forest) 50%, var(--pnw-forest-deep) 100%);
-    color: #fff;
+    color: var(--color-on-brand);
     border: none;
     border-radius: 8px;
     font-size: 14px;
@@ -1186,19 +1330,22 @@
     transition: transform 180ms ease, box-shadow 180ms ease, filter 180ms ease;
     text-transform: uppercase;
     letter-spacing: 0.04em;
-    box-shadow: var(--pnw-shadow-sm), 0 1px 0 0 rgba(255, 255, 255, 0.12) inset;
+    box-shadow: var(--pnw-shadow-sm), 0 1px 0 0 rgb(255 255 255 / 12%) inset;
 }
+
 .dtg-submit-btn:hover:not(:disabled) {
-    box-shadow: var(--pnw-shadow-md), 0 1px 0 0 rgba(255, 255, 255, 0.18) inset;
+    box-shadow: var(--pnw-shadow-md), 0 1px 0 0 rgb(255 255 255 / 18%) inset;
     transform: translateY(-1px);
     filter: brightness(1.04);
 }
+
 .dtg-submit-btn:active:not(:disabled) {
     transform: translateY(0);
     filter: brightness(0.96);
 }
+
 .dtg-submit-btn:disabled {
-    background: #a7a7a7;
+    background: var(--gray-400);
     cursor: not-allowed;
     opacity: 0.7;
 }
@@ -1211,24 +1358,28 @@
     font-size: 12px;
     line-height: 1.4;
 }
+
 .dtg-submit-status.success {
-    background: #ecf6ec;
+    background: var(--brand-100);
     border-left: 3px solid var(--pnw-forest);
     color: var(--pnw-pine);
 }
+
 .dtg-submit-status.error {
-    background: #fef2f2;
-    border-left: 3px solid #b91c1c;
-    color: #991b1b;
+    background: var(--red-50);
+    border-left: 3px solid var(--red-700);
+    color: var(--red-800);
 }
+
 .dtg-submit-status.busy {
-    background: #fef9e7;
-    border-left: 3px solid #d97706;
-    color: #92400e;
+    background: var(--store-rush-soft);
+    border-left: 3px solid var(--amber-600);
+    color: var(--amber-800);
 }
+
 .dtg-submit-status code {
     font-family: var(--mono, ui-monospace, monospace);
-    background: rgba(0, 0, 0, 0.05);
+    background: rgb(0 0 0 / 5%);
     padding: 1px 4px;
     border-radius: 3px;
 }
@@ -1242,6 +1393,7 @@
     gap: 8px;
     margin-top: 12px;
 }
+
 .dtg-secondary-btn {
     flex: 1;
     display: inline-flex;
@@ -1249,33 +1401,37 @@
     justify-content: center;
     gap: 8px;
     padding: 9px 12px;
-    background: #ffffff;
-    border: 1px solid #cbd5e1;
+    background: var(--color-surface);
+    border: 1px solid var(--gray-300);
     border-radius: 8px;
     font-size: 13px;
     font-weight: 600;
-    color: #334155;
+    color: var(--gray-700);
     cursor: pointer;
     transition: background 0.15s, border-color 0.15s, color 0.15s;
 }
+
 .dtg-secondary-btn:hover {
-    background: #f1f5f9;
-    border-color: #94a3b8;
-    color: #1e293b;
+    background: var(--slate-100);
+    border-color: var(--gray-400);
+    color: var(--gray-800);
 }
+
 .dtg-secondary-btn:active {
-    background: #e2e8f0;
+    background: var(--slate-200);
 }
 .dtg-secondary-btn i { font-size: 13px; }
+
 #dtgEmailBtn {
-    background: #eff6ff;
-    border-color: #93c5fd;
-    color: #1d4ed8;
+    background: var(--color-floor-tint);
+    border-color: var(--dtg-inline-form-cyan);
+    color: var(--color-floor-dark);
 }
+
 #dtgEmailBtn:hover {
-    background: #dbeafe;
-    border-color: #60a5fa;
-    color: #1e40af;
+    background: var(--sky-100);
+    border-color: var(--dtg-inline-form-cyan-2);
+    color: var(--dtg-inline-form-blue);
 }
 
 /* Stock-confirm modal — shown at Submit time when one or more sizes
@@ -1285,7 +1441,7 @@
 .dtg-stock-confirm-backdrop {
     position: fixed;
     inset: 0;
-    background: rgba(15, 23, 42, 0.55);
+    background: rgb(15 23 42 / 55%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1293,11 +1449,13 @@
     padding: 24px;
     animation: dscm-fade 0.18s ease;
 }
+
 @keyframes dscm-fade { from { opacity: 0; } to { opacity: 1; } }
+
 .dtg-stock-confirm-modal {
-    background: #ffffff;
+    background: var(--color-surface);
     border-radius: 14px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+    box-shadow: 0 20px 60px rgb(0 0 0 / 35%);
     width: 100%;
     max-width: 520px;
     max-height: 80vh;
@@ -1305,40 +1463,47 @@
     padding: 22px 24px 18px;
     animation: dscm-pop 0.2s ease;
 }
+
 @keyframes dscm-pop {
     from { transform: scale(0.96); opacity: 0; }
     to   { transform: scale(1); opacity: 1; }
 }
+
 .dtg-stock-confirm-modal .dscm-head {
     display: flex;
     align-items: center;
     gap: 10px;
     margin-bottom: 8px;
 }
+
 .dtg-stock-confirm-modal .dscm-head-icon {
     font-size: 22px;
-    color: #92400e /* 1.8: amber text on tan wash was 4.0:1 */;
+    color: var(--amber-800) /* 1.8: amber text on tan wash was 4.0:1 */;
 }
+
 .dtg-stock-confirm-modal .dscm-title {
     margin: 0;
     font-size: 18px;
     font-weight: 700;
     color: var(--pnw-pine);
 }
+
 .dtg-stock-confirm-modal .dscm-body {
     margin: 6px 0 14px;
     font-size: 13.5px;
     line-height: 1.5;
-    color: #4b5563;
+    color: var(--gray-600);
 }
+
 .dtg-stock-confirm-modal .dscm-list {
     list-style: none;
     margin: 0 0 16px;
     padding: 0;
-    border: 1px solid var(--rule, rgba(0, 0, 0, 0.08));
+    border: 1px solid var(--rule, rgb(0 0 0 / 8%));
     border-radius: 8px;
     overflow: hidden;
 }
+
 .dtg-stock-confirm-modal .dscm-item {
     display: grid;
     grid-template-columns: auto auto 1fr auto;
@@ -1346,35 +1511,41 @@
     align-items: baseline;
     padding: 8px 12px;
     font-size: 12.5px;
-    border-bottom: 1px solid var(--rule, rgba(0, 0, 0, 0.05));
+    border-bottom: 1px solid var(--rule, rgb(0 0 0 / 5%));
 }
 .dtg-stock-confirm-modal .dscm-item:last-child { border-bottom: none; }
-.dtg-stock-confirm-modal .dscm-item:nth-child(even) { background: #fafaf6; }
+.dtg-stock-confirm-modal .dscm-item:nth-child(even) { background: var(--store-paper); }
+
 .dtg-stock-confirm-modal .dscm-style {
     font-family: var(--mono, ui-monospace, monospace);
     font-weight: 700;
     color: var(--pnw-pine);
 }
+
 .dtg-stock-confirm-modal .dscm-color {
-    color: #4b5563;
+    color: var(--gray-600);
 }
+
 .dtg-stock-confirm-modal .dscm-size {
     font-family: var(--mono, ui-monospace, monospace);
     font-weight: 600;
     color: var(--pnw-pine);
     text-align: right;
 }
+
 .dtg-stock-confirm-modal .dscm-stock {
     font-family: var(--mono, ui-monospace, monospace);
     font-size: 11px;
-    color: #b91c1c;
+    color: var(--red-700);
     font-weight: 700;
 }
+
 .dtg-stock-confirm-modal .dscm-actions {
     display: flex;
     justify-content: flex-end;
     gap: 10px;
 }
+
 .dtg-stock-confirm-modal .dscm-btn {
     padding: 9px 18px;
     border-radius: 7px;
@@ -1384,67 +1555,73 @@
     border: 1px solid transparent;
     transition: all 0.18s ease;
 }
+
 .dtg-stock-confirm-modal .dscm-btn-cancel {
-    background: #fff;
-    border-color: #d6cdb8;
-    color: #4b5563;
+    background: var(--color-surface);
+    border-color: var(--store-line-strong);
+    color: var(--gray-600);
 }
+
 .dtg-stock-confirm-modal .dscm-btn-cancel:hover {
     background: var(--pnw-birch);
     border-color: var(--pnw-forest);
-    color: var(--pnw-forest);
 }
+
 .dtg-stock-confirm-modal .dscm-btn-proceed {
-    background: linear-gradient(135deg, #b45309 0%, #92400e 100%);
-    color: #fff;
+    background: linear-gradient(135deg, var(--amber-700) 0%, var(--amber-800) 100%);
+    color: var(--color-on-brand);
 }
+
 .dtg-stock-confirm-modal .dscm-btn-proceed:hover {
-    box-shadow: 0 4px 14px rgba(180, 83, 9, 0.35);
+    box-shadow: 0 4px 14px rgb(180 83 9 / 35%);
     transform: translateY(-1px);
 }
 
 .dtg-form-foot {
     padding: 10px 20px;
     background: var(--pnw-birch);
-    border-top: 1px solid var(--rule, rgba(0, 0, 0, 0.06));
+    border-top: 1px solid var(--rule, rgb(0 0 0 / 6%));
     font-size: 11px;
-    color: var(--pnw-stone-strong, #55606e) /* 1.8: stone on tinted washes */;
+    color: var(--pnw-stone-strong, var(--gray-600)) /* 1.8: stone on tinted washes */;
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 12px;
     flex-wrap: wrap;
 }
+
 .dtg-form-foot .dff-pricing-link {
     color: var(--pnw-forest);
     text-decoration: none;
     font-weight: 600;
 }
 .dtg-form-foot .dff-pricing-link:hover { text-decoration: underline; }
+
 .dtg-form-foot .dff-reset-btn {
     background: none;
-    border: 1px solid #d6cdb8;
-    color: #4b5563;
+    border: 1px solid var(--store-line-strong);
+    color: var(--gray-600);
     padding: 4px 10px;
     border-radius: 4px;
     font-size: 11px;
     cursor: pointer;
 }
-.dtg-form-foot .dff-reset-btn:hover { background: #fff; border-color: var(--pnw-forest); color: var(--pnw-forest); }
+.dtg-form-foot .dff-reset-btn:hover { background: var(--color-surface); border-color: var(--pnw-forest); }
 
 /* B6 — Inline validation banner above Submit. Names the specific missing
    field(s) live so reps stop guessing what's blocking them. */
 .dtg-validation-banner {
     margin: 12px 0 6px;
     padding: 8px 12px;
-    background: #fef3c7;
-    border-left: 3px solid #d97706;
+    background: var(--amber-100);
+    border-left: 3px solid var(--amber-600);
     border-radius: 5px;
     font-size: 12px;
-    color: #78350f;
+    color: var(--dtg-inline-form-orange);
     line-height: 1.45;
 }
-.dtg-validation-banner i { margin-right: 6px; color: #92400e /* 1.8: amber text on tan wash was 4.0:1 */; }
+.dtg-validation-banner i { margin-right: 6px; color: var(--amber-800) /* 1.8: amber text on tan wash was 4.0:1 */; }
+
 .dtg-validation-banner .dvb-item {
     display: inline-block;
     font-weight: 600;
@@ -1460,8 +1637,8 @@
 
 .dtg-preflight-panel {
     margin: 12px 0 8px;
-    background: #ffffff;
-    border: 1px solid rgba(0, 0, 0, 0.08);
+    background: var(--color-surface);
+    border: 1px solid rgb(0 0 0 / 8%);
     border-radius: 8px;
     overflow: hidden;
 }
@@ -1475,35 +1652,40 @@
     font-weight: 700;
     line-height: 1.3;
 }
+
 .dpp-header > i {
     font-size: 14px;
     flex: 0 0 auto;
 }
+
 .dpp-header-text {
     flex: 1 1 auto;
 }
+
 .dpp-qid {
     font-family: ui-monospace, "Cascadia Code", "SF Mono", monospace;
     font-size: 11px;
     font-weight: 700;
-    color: #4b5563;
-    background: rgba(0, 0, 0, 0.04);
+    color: var(--gray-600);
+    background: rgb(0 0 0 / 4%);
     padding: 2px 7px;
     border-radius: 4px;
     flex: 0 0 auto;
 }
+
 .dpp-header--ready {
-    background: linear-gradient(180deg, #ecfdf5 0%, #d1fae5 100%);
-    color: #14532d;
-    border-bottom: 1px solid rgba(20, 83, 45, 0.15);
+    background: linear-gradient(180deg, var(--brand-50) 0%, var(--dtg-inline-form-green-tint) 100%);
+    color: var(--print-green-dark);
+    border-bottom: 1px solid rgb(20 83 45 / 15%);
 }
-.dpp-header--ready > i { color: #16a34a; }
+.dpp-header--ready > i { color: var(--dtg-inline-form-green); }
+
 .dpp-header--blocked {
-    background: linear-gradient(180deg, #fef3c7 0%, #fde68a 100%);
-    color: #78350f;
-    border-bottom: 1px solid rgba(120, 53, 15, 0.15);
+    background: linear-gradient(180deg, var(--amber-100) 0%, var(--dtg-inline-form-yellow) 100%);
+    color: var(--dtg-inline-form-orange);
+    border-bottom: 1px solid rgb(120 53 15 / 15%);
 }
-.dpp-header--blocked > i { color: #d97706; }
+.dpp-header--blocked > i { color: var(--amber-600); }
 
 .dpp-items {
     padding: 6px 6px 8px;
@@ -1511,6 +1693,7 @@
     flex-direction: column;
     gap: 2px;
 }
+
 .dpp-item {
     display: flex;
     align-items: baseline;
@@ -1519,41 +1702,47 @@
     border-radius: 4px;
     font-size: 12px;
     line-height: 1.4;
-    color: #374151;
+    color: var(--gray-700);
     transition: background 100ms ease;
 }
+
 .dpp-item > i {
     flex: 0 0 14px;
     font-size: 12px;
     line-height: 1.4;
 }
+
 .dpp-label {
     font-weight: 700;
-    color: #1f2937;
+    color: var(--gray-800);
     flex: 0 0 auto;
 }
+
 .dpp-value {
     flex: 1 1 auto;
-    color: #4b5563;
+    color: var(--gray-600);
 }
+
 .dpp-item--clickable {
     cursor: pointer;
 }
+
 .dpp-item--clickable:hover {
-    background: rgba(46, 88, 39, 0.05);
+    background: rgb(46 88 39 / 5%);
 }
+
 .dpp-item--clickable::after {
     content: "›";
-    color: var(--pnw-stone-strong, #55606e) /* 1.8: stone-soft text 2.4:1 */;
+    color: var(--pnw-stone-strong, var(--gray-600)) /* 1.8: stone-soft text 2.4:1 */;
     flex: 0 0 auto;
     font-weight: 700;
 }
 
 /* State icons */
-.dpp-i--ok    { color: #16a34a; }
-.dpp-i--warn  { color: #d97706; }
-.dpp-i--block { color: #dc2626; }
-.dpp-i--tip   { color: #2563eb; }
+.dpp-i--ok    { color: var(--dtg-inline-form-green); }
+.dpp-i--warn  { color: var(--amber-600); }
+.dpp-i--block { color: var(--red-600); }
+.dpp-i--tip   { color: var(--blue-600); }
 
 /* ============================================================================
    Design # picker (2026-05-19). The Design # input is wrapped in a combobox
@@ -1568,14 +1757,17 @@
     gap: 8px;
     align-items: center;
 }
+
 .dtg-design-row .dtg-combobox {
     position: relative;
     width: 100%;
 }
+
 .dtg-design-row input {
     width: 100%;
     padding-right: 24px; /* room for the chevron */
 }
+
 .dtg-design-thumb-anchor {
     flex: 0 0 auto;
     display: inline-block;
@@ -1583,15 +1775,17 @@
     height: 38px;
     border-radius: 5px;
     overflow: hidden;
-    border: 1px solid rgba(0, 0, 0, 0.12);
-    background: #fff;
+    border: 1px solid rgb(0 0 0 / 12%);
+    background: var(--color-surface);
     transition: transform 100ms ease, box-shadow 100ms ease;
 }
+
 .dtg-design-thumb-anchor:hover {
     transform: scale(1.08);
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 3px 8px rgb(0 0 0 / 15%);
     border-color: var(--pnw-forest);
 }
+
 .dtg-design-thumb-anchor img {
     width: 100%;
     height: 100%;
@@ -1607,53 +1801,61 @@
     width: 380px;
     max-width: calc(100vw - 24px);
 }
+
 .dtg-design-row.dtg-combobox-item {
     display: flex;
     align-items: center;
     gap: 10px;
     padding: 8px 10px;
 }
+
 .dtg-design-row-thumb {
     flex: 0 0 auto;
     width: 44px;
     height: 44px;
     border-radius: 4px;
     overflow: hidden;
-    border: 1px solid rgba(0, 0, 0, 0.08);
-    background: linear-gradient(135deg, #fafafa 0%, #f0f0f0 100%);
+    border: 1px solid rgb(0 0 0 / 8%);
+    background: linear-gradient(135deg, var(--gray-50) 0%, var(--gray-100) 100%);
 }
+
 .dtg-design-row-thumb--blank {
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #d1d5db;
+    color: var(--gray-300);
     font-size: 16px;
 }
+
 .dtg-design-row-thumb img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     display: block;
 }
+
 .dtg-design-row-text {
     flex: 1 1 auto;
     min-width: 0;
 }
+
 .dtg-design-row-text .ci-primary {
     font-size: 12.5px;
-    color: #1f2937;
+    color: var(--gray-800);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
+
 .dtg-design-row-text .ci-primary strong {
     color: var(--pnw-forest);
     font-family: ui-monospace, "Cascadia Code", "SF Mono", monospace;
     margin-right: 4px;
 }
+
 .dtg-design-row-text .ci-secondary {
     font-size: 10.5px;
-    color: var(--pnw-stone-strong, #55606e) /* 1.8: stone on tinted washes */;
+    color: var(--pnw-stone-strong, var(--gray-600)) /* 1.8: stone on tinted washes */;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -1665,7 +1867,7 @@
 .dcp-field-label .dcp-optional {
     font-size: 9px;
     font-weight: 600;
-    color: var(--pnw-stone-strong, #55606e) /* 1.8: stone on tinted washes */;
+    color: var(--pnw-stone-strong, var(--gray-600)) /* 1.8: stone on tinted washes */;
     text-transform: lowercase;
     letter-spacing: 0.02em;
     margin-left: 4px;
@@ -1677,27 +1879,30 @@
 .dtg-price-summary .dps-totals-rows {
     margin-top: 10px;
     padding-top: 10px;
-    border-top: 1px solid rgba(255, 255, 255, 0.18);
+    border-top: 1px solid rgb(255 255 255 / 18%);
     display: flex;
     flex-direction: column;
     gap: 4px;
 }
+
 .dtg-price-summary .dps-totals-row {
     display: flex;
     justify-content: space-between;
     align-items: baseline;
     font-size: 12px;
-    color: rgba(255, 255, 255, 0.86);
+    color: rgb(255 255 255 / 86%);
 }
 .dtg-price-summary .dps-tax-row { font-style: italic; }
+
 .dtg-price-summary .dps-grand-row {
     margin-top: 2px;
     padding-top: 4px;
-    border-top: 1px solid rgba(255, 255, 255, 0.18);
+    border-top: 1px solid rgb(255 255 255 / 18%);
     font-size: 14px;
     font-weight: 700;
-    color: #ffffff;
+    color: var(--color-on-brand);
 }
+
 .dtg-price-summary .dps-mono {
     font-family: var(--mono, ui-monospace, monospace);
     font-variant-numeric: tabular-nums;
@@ -1710,11 +1915,13 @@
     font-size: 12px;
     line-height: 1.5;
 }
+
 .dtg-submit-status .dts-error-actions {
     display: flex;
     gap: 8px;
     margin-top: 6px;
 }
+
 .dtg-submit-status .dts-retry-btn,
 .dtg-submit-status .dts-copy-btn {
     flex: 1;
@@ -1730,23 +1937,27 @@
     gap: 5px;
     transition: all 0.18s ease;
 }
+
 .dtg-submit-status .dts-retry-btn {
     background: var(--pnw-forest);
-    color: #fff;
+    color: var(--color-on-brand);
     border-color: var(--pnw-forest);
 }
+
 .dtg-submit-status .dts-retry-btn:hover {
     background: var(--pnw-pine);
-    box-shadow: 0 2px 6px rgba(46, 88, 39, 0.35);
+    box-shadow: 0 2px 6px rgb(46 88 39 / 35%);
 }
+
 .dtg-submit-status .dts-copy-btn {
-    background: #ffffff;
-    color: #4b5563;
-    border-color: #d6cdb8;
+    background: var(--color-surface);
+    color: var(--gray-600);
+    border-color: var(--store-line-strong);
 }
+
 .dtg-submit-status .dts-copy-btn:hover {
     background: var(--pnw-birch);
-    border-color: var(--pnw-stone-strong, #55606e) /* 1.8: stone on tinted washes */;
+    border-color: var(--pnw-stone-strong, var(--gray-600)) /* 1.8: stone on tinted washes */;
     color: var(--pnw-pine);
 }
 
@@ -1762,13 +1973,15 @@
     margin: 12px 0 4px;
     padding: 10px 12px;
     background: var(--pnw-birch);
-    border: 1px solid #d6cdb8;
+    border: 1px solid var(--store-line-strong);
     border-radius: 8px;
 }
+
 .dcp-pickup-toggle:has(input:checked) {
-    background: #ecf6e7;
-    border-color: #98c98a;
+    background: var(--brand-100);
+    border-color: var(--dtg-inline-form-green-3);
 }
+
 .dcp-toggle-label {
     display: flex;
     align-items: center;
@@ -1776,6 +1989,7 @@
     cursor: pointer;
     user-select: none;
 }
+
 .dcp-toggle-label input[type="checkbox"] {
     /* Visually hidden but keeps semantics + keyboard focus */
     position: absolute;
@@ -1783,58 +1997,68 @@
     pointer-events: none;
     width: 0; height: 0;
 }
+
 .dcp-toggle-track {
     flex: 0 0 auto;
     width: 38px;
     height: 22px;
-    background: #c8b08a;
+    background: var(--dtg-inline-form-orange-3);
     border-radius: 999px;
     position: relative;
     transition: background 120ms ease;
 }
+
 .dcp-toggle-label input:checked + .dcp-toggle-track {
     background: var(--pnw-forest);
 }
+
 .dcp-toggle-label input:focus-visible + .dcp-toggle-track {
     outline: 2px solid var(--pnw-forest);
     outline-offset: 2px;
 }
+
 .dcp-toggle-thumb {
     position: absolute;
     top: 2px; left: 2px;
     width: 18px; height: 18px;
-    background: #ffffff;
+    background: var(--color-surface);
     border-radius: 50%;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    box-shadow: 0 1px 2px rgb(0 0 0 / 20%);
     transition: transform 120ms ease;
 }
+
 .dcp-toggle-label input:checked + .dcp-toggle-track .dcp-toggle-thumb {
     transform: translateX(16px);
 }
+
 .dcp-toggle-text {
     display: flex;
     flex-direction: column;
     line-height: 1.25;
 }
+
 .dcp-toggle-text strong {
     font-size: 14px;
     color: var(--pnw-pine);
     font-weight: 600;
 }
+
 .dcp-toggle-sub {
     font-size: 12px;
-    color: var(--pnw-stone-strong, #55606e) /* 1.8: stone on tinted washes */;
+    color: var(--pnw-stone-strong, var(--gray-600)) /* 1.8: stone on tinted washes */;
 }
 
 /* --- Ship-to block (visible when pickup is OFF) --- */
 .dcp-shipto {
     margin-top: 8px;
     padding: 10px 12px;
-    background: #ffffff;
-    border: 1px solid #e7dfca;
+    background: var(--color-surface);
+    border: 1px solid var(--store-line);
     border-radius: 8px;
 }
+/* stylelint-disable-next-line declaration-no-important -- the hidden attribute must beat any display rule */
 .dcp-shipto[hidden] { display: none !important; }
+
 .dcp-shipto-head {
     display: flex;
     align-items: baseline;
@@ -1845,10 +2069,11 @@
     color: var(--pnw-pine);
 }
 .dcp-shipto-head .fas { color: var(--pnw-forest); }
+
 .dcp-shipto-sub {
     font-size: 11px;
     font-weight: 400;
-    color: var(--pnw-stone-strong, #55606e) /* 1.8: stone on tinted washes */;
+    color: var(--pnw-stone-strong, var(--gray-600)) /* 1.8: stone on tinted washes */;
     margin-left: auto;
 }
 
@@ -1864,14 +2089,15 @@
     margin-top: 8px;
     font-size: 12px;
     line-height: 1.4;
-    color: #64748b;
+    color: var(--slate-500);
     min-height: 1.4em;
 }
-.dcp-tax-status--success { color: #16a34a; font-weight: 500; }
-.dcp-tax-status--info    { color: #64748b; }
-.dcp-tax-status--warning { color: #d97706; }
-.dcp-tax-status--error   { color: #dc2626; }
-.dcp-tax-status--loading { color: var(--pnw-stone-strong, #55606e) /* 1.8: stone on tinted washes */; font-style: italic; }
+.dcp-tax-status--success { color: var(--dtg-inline-form-green); font-weight: 500; }
+.dcp-tax-status--info    { color: var(--slate-500); }
+.dcp-tax-status--warning { color: var(--amber-600); }
+.dcp-tax-status--error   { color: var(--red-600); }
+.dcp-tax-status--loading { color: var(--pnw-stone-strong, var(--gray-600)) /* 1.8: stone on tinted washes */; font-style: italic; }
+
 .dcp-tax-status--loading::before {
     content: "⏳ ";
 }
@@ -1887,17 +2113,19 @@
 .dcp-history-pill {
     margin: 8px 0 10px;
     padding: 8px 12px;
-    background: linear-gradient(180deg, #ecf6e7 0%, #f4fbef 100%);
-    border: 1px solid #98c98a;
+    background: linear-gradient(180deg, var(--brand-100) 0%, var(--color-dash-theme-bg) 100%);
+    border: 1px solid var(--dtg-inline-form-green-3);
     border-radius: 8px;
     font-size: 12px;
     color: var(--pnw-pine);
     animation: dhp-slide-in 200ms ease-out;
 }
+
 @keyframes dhp-slide-in {
     from { opacity: 0; transform: translateY(-4px); }
     to   { opacity: 1; transform: translateY(0); }
 }
+/* stylelint-disable-next-line declaration-no-important -- the hidden attribute must beat any display rule */
 .dcp-history-pill[hidden] { display: none !important; }
 
 .dhp-head {
@@ -1907,17 +2135,21 @@
     cursor: pointer;
     user-select: none;
 }
+
 .dhp-head:hover {
     color: var(--pnw-forest);
 }
+
 .dhp-head .fa-clipboard-list {
     color: var(--pnw-forest);
     font-size: 13px;
 }
+
 .dhp-summary {
     flex: 1 1 auto;
     font-weight: 500;
 }
+
 .dhp-toggle {
     flex: 0 0 auto;
     width: 24px;
@@ -1933,18 +2165,20 @@
     border-radius: 4px;
     transition: background 100ms ease;
 }
+
 .dhp-toggle:hover {
-    background: rgba(46, 88, 39, 0.10);
+    background: rgb(46 88 39 / 10%);
 }
 
 .dhp-body {
     margin-top: 8px;
     padding-top: 8px;
-    border-top: 1px dashed rgba(46, 88, 39, 0.25);
+    border-top: 1px dashed rgb(46 88 39 / 25%);
     display: flex;
     flex-direction: column;
     gap: 6px;
 }
+/* stylelint-disable-next-line declaration-no-important -- the hidden attribute must beat any display rule */
 .dhp-body[hidden] { display: none !important; }
 
 .dhp-row {
@@ -1953,43 +2187,49 @@
     gap: 8px;
     flex-wrap: wrap;
 }
+
 .dhp-label {
     flex: 0 0 auto;
     font-weight: 600;
-    color: #4b5563;
+    color: var(--gray-600);
     min-width: 80px;
     font-size: 11px;
     text-transform: uppercase;
     letter-spacing: 0.03em;
 }
+
 .dhp-value {
     flex: 1 1 auto;
     color: var(--pnw-pine);
     line-height: 1.4;
+    /* stylelint-disable-next-line declaration-property-value-keyword-no-deprecated -- overflow-wrap: anywhere is not a byte-identical swap; legacy */
     word-break: break-word;
 }
+
 .dhp-meta {
     font-size: 11px;
-    color: var(--pnw-stone-strong, #55606e) /* 1.8: stone on tinted washes */;
+    color: var(--pnw-stone-strong, var(--gray-600)) /* 1.8: stone on tinted washes */;
     font-style: italic;
     margin-left: 4px;
 }
 
 /* Suggestion rows have a subtle accent so they stand out from informational rows */
 .dhp-row.dhp-suggest .dhp-label {
-    color: #92400e /* 1.8: amber text on tan wash was 4.0:1 */;
+    color: var(--amber-800) /* 1.8: amber text on tan wash was 4.0:1 */;
 }
+
 .dhp-row.dhp-warn .dhp-label {
-    color: #b91c1c;
+    color: var(--red-700);
 }
+
 .dhp-row.dhp-warn .dhp-value {
-    color: #7f1d1d;
+    color: var(--print-red);
 }
 
 .dhp-apply {
     flex: 0 0 auto;
     padding: 3px 10px;
-    background: #ffffff;
+    background: var(--color-surface);
     border: 1px solid var(--pnw-forest);
     color: var(--pnw-forest);
     font-size: 11px;
@@ -1998,16 +2238,17 @@
     cursor: pointer;
     transition: background 100ms ease;
 }
+
 .dhp-apply:hover {
     background: var(--pnw-forest);
-    color: #ffffff;
+    color: var(--color-on-brand);
 }
 
 .dhp-applied {
     flex: 0 0 auto;
     padding: 3px 8px;
-    background: #d1fae5;
-    color: #065f46;
+    background: var(--dtg-inline-form-green-tint);
+    color: var(--dtg-inline-form-teal-dark);
     font-size: 11px;
     font-weight: 600;
     border-radius: 4px;
@@ -2015,7 +2256,7 @@
 
 .dhp-source .dhp-meta {
     font-size: 10px;
-    color: var(--pnw-stone-strong, #55606e) /* 1.8: stone-soft text 2.4:1 */;
+    color: var(--pnw-stone-strong, var(--gray-600)) /* 1.8: stone-soft text 2.4:1 */;
     margin-left: 0;
 }
 
@@ -2027,9 +2268,10 @@
     margin: 12px 0 4px;
     padding: 10px 12px;
     background: var(--pnw-fog);
-    border: 1px solid #e7dfca;
+    border: 1px solid var(--store-line);
     border-radius: 8px;
 }
+
 .dcp-dates .dcp-section-head,
 .dcp-section-head {
     display: flex;
@@ -2041,30 +2283,34 @@
     margin-bottom: 8px;
 }
 .dcp-section-head .fas { color: var(--pnw-forest); }
+
 .dcp-dates input[type="date"] {
     width: 100%;
     padding: 6px 8px;
-    border: 1px solid #d6cdb8;
+    border: 1px solid var(--store-line-strong);
     border-radius: 6px;
-    background: #ffffff;
+    background: var(--color-surface);
     font: inherit;
     color: var(--pnw-pine);
 }
+
 .dcp-dates input[type="date"]:focus {
     outline: 2px solid var(--pnw-forest);
     outline-offset: -1px;
     border-color: var(--pnw-forest);
 }
+
 .dcp-date-hint {
     margin-top: 4px;
     font-size: 11px;
-    color: var(--pnw-stone-strong, #55606e) /* 1.8: stone on tinted washes */;
+    color: var(--pnw-stone-strong, var(--gray-600)) /* 1.8: stone on tinted washes */;
     line-height: 1.3;
 }
+
 .dcp-field-sub {
     font-weight: 400;
     font-size: 11px;
-    color: var(--pnw-stone-strong, #55606e) /* 1.8: stone on tinted washes */;
+    color: var(--pnw-stone-strong, var(--gray-600)) /* 1.8: stone on tinted washes */;
     margin-left: 4px;
 }
 
@@ -2081,26 +2327,29 @@
     cursor: zoom-in;
     transition: transform 120ms ease, box-shadow 120ms ease;
 }
+
 .dtg-design-thumb-anchor:hover {
     transform: scale(1.05);
-    box-shadow: 0 2px 8px rgba(46, 88, 39, 0.20);
+    box-shadow: 0 2px 8px rgb(46 88 39 / 20%);
 }
+
 .dtg-design-thumb-zoom {
     position: absolute;
     inset: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(0, 0, 0, 0.0);
-    color: rgba(255, 255, 255, 0);
+    background: rgb(0 0 0 / 0%);
+    color: rgb(255 255 255 / 0%);
     font-size: 16px;
     border-radius: inherit;
     transition: background 120ms ease, color 120ms ease;
     pointer-events: none;
 }
+
 .dtg-design-thumb-anchor:hover .dtg-design-thumb-zoom {
-    background: rgba(0, 0, 0, 0.35);
-    color: #ffffff;
+    background: rgb(0 0 0 / 35%);
+    color: var(--color-on-brand);
 }
 
 /* Lightbox modal — position:fixed full viewport, z-index above sticky form */
@@ -2113,15 +2362,17 @@
     justify-content: center;
     padding: 40px;
 }
+/* stylelint-disable-next-line declaration-no-important -- the hidden attribute must beat any display rule */
 .dtg-thumb-lightbox[hidden] { display: none !important; }
 
 .dtg-thumb-lightbox-backdrop {
     position: absolute;
     inset: 0;
-    background: rgba(15, 23, 42, 0.85);
+    background: rgb(15 23 42 / 85%);
     cursor: pointer;
     animation: dtg-tlb-fade 160ms ease;
 }
+
 @keyframes dtg-tlb-fade {
     from { opacity: 0; }
     to   { opacity: 1; }
@@ -2131,16 +2382,17 @@
     position: relative;
     max-width: 90vw;
     max-height: 90vh;
-    background: #ffffff;
+    background: var(--color-surface);
     border-radius: 12px;
     padding: 24px;
-    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 24px 48px rgb(0 0 0 / 40%);
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 12px;
     animation: dtg-tlb-zoom 200ms cubic-bezier(0.22, 1, 0.36, 1);
 }
+
 @keyframes dtg-tlb-zoom {
     from { opacity: 0; transform: scale(0.92); }
     to   { opacity: 1; transform: scale(1); }
@@ -2152,7 +2404,7 @@
     right: 8px;
     width: 36px;
     height: 36px;
-    background: rgba(15, 23, 42, 0.08);
+    background: rgb(15 23 42 / 8%);
     border: none;
     border-radius: 50%;
     cursor: pointer;
@@ -2163,8 +2415,9 @@
     justify-content: center;
     transition: background 120ms ease, transform 120ms ease;
 }
+
 .dtg-thumb-lightbox-close:hover {
-    background: rgba(15, 23, 42, 0.16);
+    background: rgb(15 23 42 / 16%);
     transform: scale(1.08);
 }
 
@@ -2175,6 +2428,7 @@
     text-align: center;
     margin-right: 40px; /* avoid the close X */
 }
+
 .dtg-thumb-lightbox-title:empty {
     display: none;
 }
@@ -2185,7 +2439,7 @@
     object-fit: contain;
     background: var(--pnw-birch);
     border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) inset;
+    box-shadow: 0 1px 3px rgb(0 0 0 / 10%) inset;
 }
 
 /* ============================================================================
@@ -2203,6 +2457,7 @@
     border-radius: 8px;
     transition: opacity 180ms ease, max-height 220ms ease, padding 180ms ease;
 }
+
 .dcp-newart.dcp-newart-collapsed {
     /* Hide the upload block when an existing design # is picked. Animate to
        avoid a jarring snap. */
@@ -2211,6 +2466,7 @@
     overflow: hidden;
     padding-bottom: 0;
 }
+
 .dcp-newart.dcp-newart-collapsed .dcp-newart-dropzone,
 .dcp-newart.dcp-newart-collapsed .dcp-newart-list,
 .dcp-newart.dcp-newart-collapsed .dcp-field-wrap {
@@ -2226,13 +2482,15 @@
     font-weight: 600;
     color: var(--pnw-pine);
 }
+
 .dcp-newart .dcp-section-head .fas {
     color: var(--pnw-forest);
 }
+
 .dcp-newart-sub {
     font-size: 11px;
     font-weight: 400;
-    color: var(--pnw-stone-strong, #55606e); /* 1.8 */
+    color: var(--pnw-stone-strong, var(--gray-600)); /* 1.8 */
     margin-left: auto;
 }
 
@@ -2240,8 +2498,8 @@
     display: inline-block;
     margin-left: 4px;
     padding: 1px 6px;
-    background: rgba(180, 83, 9, 0.12);
-    color: #92400e /* 1.8: amber text on tan wash was 4.0:1 */;
+    background: rgb(180 83 9 / 12%);
+    color: var(--amber-800) /* 1.8: amber text on tan wash was 4.0:1 */;
     border-radius: 4px;
     font-size: 10px;
     font-weight: 700;
@@ -2252,7 +2510,7 @@
 .dcp-field-hint {
     margin-top: 4px;
     font-size: 11px;
-    color: var(--pnw-stone-strong, #55606e); /* 1.8 */
+    color: var(--pnw-stone-strong, var(--gray-600)); /* 1.8 */
     line-height: 1.3;
 }
 
@@ -2268,40 +2526,47 @@
     transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
     user-select: none;
 }
+
 .dcp-newart-dropzone:hover,
 .dcp-newart-dropzone:focus-visible {
     background: var(--pnw-mist);
     border-color: var(--pnw-forest);
     outline: none;
 }
+
 .dcp-newart-dropzone--over {
     background: var(--pnw-mist);
     border-color: var(--pnw-forest-deep);
     transform: scale(1.01);
     box-shadow: var(--pnw-shadow-sm);
 }
+
 .dcp-newart-dropzone .fas {
     font-size: 28px;
     color: var(--pnw-forest);
     margin-bottom: 6px;
     display: block;
 }
+
 .dcp-newart-dropzone-msg {
     font-size: 13px;
     color: var(--pnw-pine);
     margin-bottom: 2px;
 }
+
 .dcp-newart-dropzone-msg strong {
     font-weight: 700;
 }
+
 .dcp-newart-browse {
     color: var(--pnw-forest);
     text-decoration: underline;
     font-weight: 500;
 }
+
 .dcp-newart-dropzone-sub {
     font-size: 11px;
-    color: var(--pnw-stone-strong, #55606e); /* 1.8 */
+    color: var(--pnw-stone-strong, var(--gray-600)); /* 1.8 */
 }
 
 /* --- Status line (upload progress, errors, success) --- */
@@ -2309,11 +2574,11 @@
     margin-top: 8px;
     font-size: 12px;
     line-height: 1.4;
-    color: var(--pnw-stone-strong, #55606e); /* 1.8 */
+    color: var(--pnw-stone-strong, var(--gray-600)); /* 1.8 */
     min-height: 1.4em;
 }
-.dcp-newart-status--success { color: #16a34a; font-weight: 500; }
-.dcp-newart-status--error   { color: #dc2626; font-weight: 500; }
+.dcp-newart-status--success { color: var(--dtg-inline-form-green); font-weight: 500; }
+.dcp-newart-status--error   { color: var(--red-600); font-weight: 500; }
 .dcp-newart-status--loading { color: var(--pnw-forest); font-style: italic; }
 
 /* --- File list (uploaded cards) --- */
@@ -2323,6 +2588,7 @@
     gap: 8px;
     margin-top: 10px;
 }
+
 .dcp-newart-card {
     display: grid;
     grid-template-columns: 56px 1fr auto;
@@ -2334,6 +2600,7 @@
     border-radius: 8px;
     transition: border-color 160ms ease, box-shadow 160ms ease;
 }
+
 .dcp-newart-card:hover {
     border-color: var(--pnw-sage);
     box-shadow: var(--pnw-shadow-sm);
@@ -2350,31 +2617,36 @@
     justify-content: center;
     flex-shrink: 0;
 }
+
 .dcp-newart-thumb-img {
     width: 100%;
     height: 100%;
     object-fit: cover;
 }
+
 .dcp-newart-thumb-icon {
     display: flex;
     flex-direction: column;
     align-items: center;
     color: var(--pnw-forest);
 }
+
 .dcp-newart-thumb-icon .fas {
     font-size: 22px;
     margin-bottom: 2px;
 }
+
 .dcp-newart-thumb-ext {
     font-size: 9px;
     font-weight: 700;
-    color: var(--pnw-stone-strong, #55606e); /* 1.8 */
+    color: var(--pnw-stone-strong, var(--gray-600)); /* 1.8 */
     letter-spacing: 0.05em;
 }
 
 .dcp-newart-card-body {
     min-width: 0;  /* allow text truncation in name */
 }
+
 .dcp-newart-card-name {
     font-size: 13px;
     font-weight: 600;
@@ -2383,22 +2655,26 @@
     overflow: hidden;
     text-overflow: ellipsis;
 }
+
 .dcp-newart-card-meta {
     font-size: 11px;
-    color: var(--pnw-stone-strong, #55606e); /* 1.8 */
+    color: var(--pnw-stone-strong, var(--gray-600)); /* 1.8 */
     margin-top: 2px;
 }
+
 .dcp-newart-card-placement {
     margin-top: 6px;
     font-size: 11px;
 }
+
 .dcp-newart-card-placement label {
     display: flex;
     align-items: center;
     gap: 6px;
-    color: var(--pnw-stone-strong, #55606e); /* 1.8 */
+    color: var(--pnw-stone-strong, var(--gray-600)); /* 1.8 */
     font-weight: 500;
 }
+
 .dcp-newart-placement-select {
     padding: 3px 6px;
     border: 1px solid var(--pnw-rule-strong);
@@ -2410,6 +2686,7 @@
     flex: 1 1 auto;
     min-width: 0;
 }
+
 .dcp-newart-placement-select:focus-visible {
     outline: 2px solid var(--pnw-forest);
     outline-offset: -1px;
@@ -2423,17 +2700,17 @@
     background: transparent;
     border: 1px solid var(--pnw-rule);
     border-radius: 50%;
-    color: var(--pnw-stone-strong, #55606e); /* 1.8 */
+    color: var(--pnw-stone-strong, var(--gray-600)); /* 1.8 */
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all 120ms ease;
 }
+
 .dcp-newart-remove:hover {
-    background: #fee2e2;
-    border-color: #dc2626;
-    color: #dc2626;
+    background: var(--red-100);
+    border-color: var(--red-600);
 }
 
 /* [2026-06-08] Order-at-a-glance band (shared module quote-order-summary.js) — DTG Phase 0. Card shell + inner copied
@@ -2442,109 +2719,120 @@
    🔴 THIS IS A COPY — it drifts silently. quote-builder-common.css darkened these four muted
    labels #94a3b8→#64748b on 2026-06-10 for WCAG AA; this copy missed it and carried 2.56:1
    text until 2026-08-18. When you change the shared block, change this one in the same commit. */
-.order-recap { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); font-size: 12px; color: #475569; margin-top: 12px; }
+.order-recap { background: var(--color-surface); border: 1px solid var(--slate-200); border-radius: 8px; padding: 8px 14px; box-shadow: 0 1px 3px rgb(0 0 0 / 4%); font-size: 12px; color: var(--slate-600); margin-top: 12px; }
 .order-recap:empty { display: none; }
-.order-recap .or-title { font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: #64748b; margin-bottom: 4px; }
+.order-recap .or-title { font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--slate-500); margin-bottom: 4px; }
 .order-recap .or-row { display: flex; gap: 8px; padding: 2px 0; line-height: 1.35; }
-.order-recap .or-label { color: #64748b; flex: 0 0 56px; }
-.order-recap .or-val { color: #334155; font-weight: 500; min-width: 0; overflow-wrap: anywhere; }
+.order-recap .or-label { color: var(--slate-500); flex: 0 0 56px; }
+.order-recap .or-val { color: var(--gray-700); font-weight: 500; min-width: 0; overflow-wrap: anywhere; }
 .order-recap .or-thumbs { display: flex; gap: 10px; padding: 6px 0 2px; flex-wrap: wrap; }
 .order-recap .or-thumb { margin: 0; text-align: center; }
-.order-recap .or-thumb img { width: 56px; height: 56px; object-fit: contain; border: 1px solid #e2e8f0; border-radius: 6px; background: #fff; display: block; }
-.order-recap .or-thumb figcaption { font-size: 10px; color: #64748b; margin-top: 3px; max-width: 56px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.ship-to-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); font-size: 12px; margin-top: 10px; }
+.order-recap .or-thumb img { width: 56px; height: 56px; object-fit: contain; border: 1px solid var(--slate-200); border-radius: 6px; background: var(--color-surface); display: block; }
+.order-recap .or-thumb figcaption { font-size: 10px; color: var(--slate-500); margin-top: 3px; max-width: 56px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ship-to-card { background: var(--color-surface); border: 1px solid var(--slate-200); border-radius: 8px; padding: 8px 14px; box-shadow: 0 1px 3px rgb(0 0 0 / 4%); font-size: 12px; margin-top: 10px; }
 .ship-to-card:empty { display: none; }
-.ship-to-card .st-title { font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: #64748b; margin-bottom: 4px; }
-.ship-to-card .st-line { padding: 1px 0; line-height: 1.35; color: #334155; }
+.ship-to-card .st-title { font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--slate-500); margin-bottom: 4px; }
+.ship-to-card .st-line { padding: 1px 0; line-height: 1.35; color: var(--gray-700); }
 .ship-to-card .st-co { font-weight: 600; }
-.ship-to-card .st-method { color: #64748b; font-size: 11px; margin-top: 2px; }
+.ship-to-card .st-method { color: var(--slate-500); font-size: 11px; margin-top: 2px; }
 .ship-to-card .st-actions { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
-.ship-to-card .st-btn { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 6px; border: 1px solid #cbd5e1; background: #f8fafc; color: #334155; cursor: pointer; }
-.ship-to-card .st-btn:hover { background: #eef2f7; }
+.ship-to-card .st-btn { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 6px; border: 1px solid var(--gray-300); background: var(--slate-50); color: var(--gray-700); cursor: pointer; }
+.ship-to-card .st-btn:hover { background: var(--slate-100); }
 .ship-to-card .st-btn:disabled { opacity: .6; cursor: default; }
-.ship-to-card .st-btn-reest { border-color: #16a34a; color: #166534; background: #f0fdf4; }
-.ship-to-card .st-btn-reest:hover { background: #dcfce7; }
+.ship-to-card .st-btn-reest { border-color: var(--dtg-inline-form-green); color: var(--print-green); background: var(--brand-50); }
+.ship-to-card .st-btn-reest:hover { background: var(--store-green-100); }
 
 /* [2026-06-08] Phase 1 tax controls (include-tax / manual rate / wholesale) under the ship-to tax status */
-.dtg-tax-controls { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; margin-top: 8px; font-size: 12px; color: #475569; }
+.dtg-tax-controls { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; margin-top: 8px; font-size: 12px; color: var(--slate-600); }
 .dtg-tax-ctl { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; margin: 0; }
-.dtg-tax-ctl input[type="number"] { width: 56px; padding: 2px 4px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 12px; text-align: center; }
-.dtg-tax-ctl input[type="checkbox"] { accent-color: #22c55e; }
+.dtg-tax-ctl input[type="number"] { width: 56px; padding: 2px 4px; border: 1px solid var(--gray-300); border-radius: 4px; font-size: 12px; text-align: center; }
+.dtg-tax-ctl input[type="checkbox"] { accent-color: var(--dtg-inline-form-green-4); }
 
 /* [2026-06-09] Phase 2 — billed shipping charge + UPS-Ground estimator (inside #dtgShipToBlock) */
 .dcp-shipfee-wrap { margin-top: 10px; }
 .dcp-shipfee-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-.dcp-shipfee-prefix { font-size: 13px; font-weight: 600; color: #475569; }
+.dcp-shipfee-prefix { font-size: 13px; font-weight: 600; color: var(--slate-600); }
+
 .dcp-shipfee-row input[type="number"] {
-    width: 90px; padding: 5px 8px; border: 1px solid #cbd5e1; border-radius: 6px;
+    width: 90px; padding: 5px 8px; border: 1px solid var(--gray-300); border-radius: 6px;
     font-size: 13px; text-align: right; font-variant-numeric: tabular-nums;
 }
+
 .dcp-estimate-btn {
     display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px;
-    background: var(--pnw-forest, #2d5f3f); color: #fff; border: none; border-radius: 6px;
+    background: var(--pnw-forest, var(--print-green)); color: var(--color-on-brand); border: none; border-radius: 6px;
     font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap;
     transition: background 0.18s ease;
 }
-.dcp-estimate-btn:hover { background: var(--pnw-pine, #1f4a30); }
+.dcp-estimate-btn:hover { background: var(--pnw-pine, var(--brand-800)); }
 .dcp-estimate-btn:disabled { opacity: 0.65; cursor: default; }
-.dcp-estimate-result { margin-top: 6px; font-size: 11.5px; line-height: 1.4; color: #64748b; min-height: 1em; }
+.dcp-estimate-result { margin-top: 6px; font-size: 11.5px; line-height: 1.4; color: var(--slate-500); min-height: 1em; }
 
 /* [2026-08-06] Art charges — Caspio Service_Codes GRT-50 (setup) + GRT-75 (design/hr).
    Sits between the line-item cards and the live price summary so the rep sees the
    charge land in the total. .daf-active tints the block once something is billed. */
 .dtg-art-fees {
     margin: 12px 0 10px; padding: 10px 12px;
-    border: 1px solid #e2e8f0; border-radius: 8px; background: #f8fafc;
+    border: 1px solid var(--slate-200); border-radius: 8px; background: var(--slate-50);
     transition: border-color .18s ease, background .18s ease;
 }
-.dtg-art-fees.daf-active { border-color: #a5d6a7; background: #f2fbf4; }
+.dtg-art-fees.daf-active { border-color: var(--dtg-inline-form-green-5); background: var(--brand-50); }
+
 .dtg-art-fees .daf-label {
     display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
     font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em;
-    color: #475569; margin-bottom: 8px;
+    color: var(--slate-600); margin-bottom: 8px;
 }
+
 /* Muted secondary text. 🔴 Must clear 4.5:1 on BOTH card backgrounds — #f8fafc (rest)
    and #f2fbf4 (.daf-active) — at 11px, which is normal-size text for WCAG. slate-400
    (#94a3b8) was 2.45:1 and failed the rendered axe ratchet; slate-500 is 4.55/4.51.
    Anything lighter than slate-500 fails here. */
 .dtg-art-fees .daf-sub {
-    font-size: 11px; font-weight: 500; text-transform: none; letter-spacing: 0; color: #64748b;
+    font-size: 11px; font-weight: 500; text-transform: none; letter-spacing: 0; color: var(--slate-500);
 }
+
 .dtg-art-fees .daf-row {
     display: flex; align-items: center; justify-content: space-between;
     gap: 10px; flex-wrap: wrap; padding: 4px 0;
 }
+
 .dtg-art-fees .daf-toggle {
     display: inline-flex; align-items: center; gap: 8px;
-    font-size: 13px; color: #334155; cursor: pointer; margin: 0;
+    font-size: 13px; color: var(--gray-700); cursor: pointer; margin: 0;
 }
 .dtg-art-fees .daf-toggle-plain { cursor: default; }
-.dtg-art-fees .daf-toggle input[type="checkbox"] { width: 15px; height: 15px; accent-color: #2d5f3f; cursor: pointer; }
-.dtg-art-fees .daf-note { color: #64748b; font-size: 11.5px; } /* slate-500 — see .daf-sub note */
+.dtg-art-fees .daf-toggle input[type="checkbox"] { width: 15px; height: 15px; accent-color: var(--print-green); cursor: pointer; }
+.dtg-art-fees .daf-note { color: var(--slate-500); font-size: 11.5px; } /* slate-500 — see .daf-sub note */
 .dtg-art-fees .daf-code {
     font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 10.5px; font-weight: 700;
-    color: #475569; background: #e2e8f0; border-radius: 4px; padding: 1px 6px; letter-spacing: .02em;
+    color: var(--slate-600); background: var(--slate-200); border-radius: 4px; padding: 1px 6px; letter-spacing: .02em;
 }
+
 .dtg-art-fees .daf-calc {
     display: inline-flex; align-items: center; gap: 8px;
-    font-size: 12px; color: #64748b; margin-left: auto;
+    font-size: 12px; color: var(--slate-500); margin-left: auto;
 }
+
 .dtg-art-fees .daf-calc input[type="number"] {
-    width: 62px; padding: 5px 8px; border: 1px solid #cbd5e1; border-radius: 6px;
-    font-size: 13px; text-align: right; font-variant-numeric: tabular-nums; background: #fff;
+    width: 62px; padding: 5px 8px; border: 1px solid var(--gray-300); border-radius: 6px;
+    font-size: 13px; text-align: right; font-variant-numeric: tabular-nums; background: var(--color-surface);
 }
-.dtg-art-fees .daf-calc input[type="number"]:disabled { background: #f1f5f9; color: #94a3b8; cursor: not-allowed; }
+.dtg-art-fees .daf-calc input[type="number"]:disabled { background: var(--slate-100); color: var(--gray-400); cursor: not-allowed; }
+
 /* Dim the maths, never the control — the input keeps full contrast so a rep can
    still read what is (not) being charged. */
 .dtg-art-fees .daf-calc-off .daf-rate,
 .dtg-art-fees .daf-calc-off .daf-line-total { opacity: .45; }
+
 .dtg-art-fees .daf-line-total {
     min-width: 68px; text-align: right; font-size: 13px; font-weight: 700;
-    color: #2d5f3f; font-variant-numeric: tabular-nums;
+    color: var(--print-green); font-variant-numeric: tabular-nums;
 }
-@media (max-width: 640px) {
+
+@media (width <= 640px) {
     .dtg-art-fees .daf-calc { margin-left: 0; width: 100%; justify-content: flex-end; }
 }
 
 /* Art-charge rows in the live price summary — same weight as the shipping row. */
-.dtg-price-summary .dps-fee-row span:last-child { color: #334155; }
+.dtg-price-summary .dps-fee-row span:last-child { color: var(--gray-700); }
