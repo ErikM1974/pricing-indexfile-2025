@@ -7,9 +7,10 @@
    ========================================================================== */
 
 .swo-subhead { font-weight: 400; font-size: 0.7em; opacity: 0.85; }
+
 .swo-lock {
-    display: inline-flex; align-items: center; gap: 6px; font-size: 0.8rem; font-weight: 600; color: #fff;
-    background: rgba(0,0,0,0.18); border: 1px solid rgba(255,255,255,0.35); padding: 5px 12px; border-radius: var(--radius-pill);
+    display: inline-flex; align-items: center; gap: 6px; font-size: 0.8rem; font-weight: 600; color: var(--color-on-brand);
+    background: rgb(0 0 0 / 18%); border: 1px solid rgb(255 255 255 / 35%); padding: 5px 12px; border-radius: var(--radius-pill);
 }
 
 .swo-lead { font-size: 1rem; line-height: 1.6; color: var(--gray-700); margin: 0 0 var(--space-4); }
@@ -45,6 +46,7 @@
 .swo-arch { font-size: 0.86rem; color: var(--gray-700); background: var(--surface-inset); border: 1px solid var(--gray-200); border-radius: var(--radius-md); padding: var(--space-3) var(--space-4); line-height: 1.7; }
 .swo-arch b { color: var(--gray-900); }
 .swo-arrow { color: var(--state-info); font-weight: 700; white-space: nowrap; }
+
 .swo-code {
     font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 0.78rem; line-height: 1.55; color: var(--gray-800);
     background: var(--surface-inset); border: 1px solid var(--gray-200); border-radius: var(--radius-md);
@@ -61,7 +63,8 @@
 .swo-cols { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); }
 .swo-rules { margin: 0; padding-left: var(--space-5); }
 .swo-rules li { margin: var(--space-2) 0; font-size: 0.86rem; color: var(--gray-700); line-height: 1.55; }
-@media (max-width: 900px) { .swo-cols { grid-template-columns: 1fr; } }
+
+@media (width <= 900px) { .swo-cols { grid-template-columns: 1fr; } }
 
 /* ---------- Field explorer ---------- */
 .swo-fieldhead { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--space-3); margin-bottom: var(--space-2); padding-bottom: var(--space-3); border-bottom: 1px solid var(--gray-200); }
@@ -104,7 +107,8 @@ mark.swo-hit { background: var(--state-warning-bg); color: var(--state-warning);
 .swo-gaps td:first-child { font-weight: 600; color: var(--gray-800); white-space: nowrap; }
 .swo-foot { margin-top: var(--space-6); padding-top: var(--space-4); border-top: 1px solid var(--gray-200); color: var(--gray-500); font-size: 0.8rem; line-height: 1.6; }
 
-@media (max-width: 700px) { .swo-gaps td:first-child { white-space: normal; } }
+@media (width <= 700px) { .swo-gaps td:first-child { white-space: normal; } }
 
 /* 2026-09-05 review */
+/* stylelint-disable-next-line declaration-no-important -- the hidden attribute must beat any display rule */
 [hidden] { display: none !important; }

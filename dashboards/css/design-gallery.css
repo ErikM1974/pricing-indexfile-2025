@@ -1,3 +1,5 @@
+/* stylelint-disable no-duplicate-selectors -- legacy sheet: rules were appended over time; merging them would reorder the cascade (2026-09-07) */
+
 /* ==========================================================================
    design-gallery.css — Design Vault (Design Gallery v3)
    Page: dashboards/design-gallery.html
@@ -16,13 +18,14 @@
 /* File-wide [hidden] guard — REQUIRED first rule. An author display rule
    (grid/flex) beats the UA [hidden]{display:none}; this keeps JS `hidden`
    toggles honest (LESSONS 2026-07-19, recurrence #5). */
+/* stylelint-disable-next-line declaration-no-important -- the hidden attribute must beat any display rule */
 [hidden] { display: none !important; }
 
 /* ---------- Page theme (the ONLY hex in this file) ---------- */
 :root {
-    --dash-theme:      #2e5827;
-    --dash-theme-dark: #234420;
-    --dash-theme-bg:   #eef4ec;
+    --dash-theme:      var(--brand-700);
+    --dash-theme-dark: var(--store-green-900);
+    --dash-theme-bg:   var(--store-green-50);
 }
 
 /* ==========================================================================
@@ -614,7 +617,6 @@
     scroll-padding-left: var(--space-1);
     scrollbar-width: thin;
     scrollbar-color: var(--gray-300) transparent;
-    -webkit-mask-image: linear-gradient(to right, transparent, black 26px, black calc(100% - 26px), transparent);
     mask-image: linear-gradient(to right, transparent, black 26px, black calc(100% - 26px), transparent);
 }
 
@@ -626,6 +628,7 @@
 .dg-rail-track .dg-card { width: 196px; }
 
 .dg-rail-track::-webkit-scrollbar { height: 8px; }
+
 .dg-rail-track::-webkit-scrollbar-thumb {
     background: var(--gray-300);
     border-radius: var(--radius-pill);
@@ -976,6 +979,7 @@
 
 /* Wall density card — thumb-forward, quiet text */
 .dg-card--wall .dg-card-body { padding: var(--space-2) var(--space-3); gap: 2px; }
+
 .dg-card--wall .dg-card-name,
 .dg-card--wall .dg-src-row,
 .dg-card--wall .dg-card-meta { display: none; }
@@ -1215,8 +1219,7 @@ mark.dg-mark {
 .dg-meta-rows {
     display: grid;
     grid-template-columns: minmax(96px, 130px) 1fr;
-    row-gap: var(--space-2);
-    column-gap: var(--space-4);
+    gap: var(--space-2) var(--space-4);
     font-size: 0.86rem;
     margin: 0;
 }
@@ -1367,7 +1370,7 @@ mark.dg-mark {
 /* ==========================================================================
    Responsive
    ========================================================================== */
-@media (max-width: 900px) {
+@media (width <= 900px) {
     .dg-toolbar-row--search { flex-direction: column; align-items: stretch; }
     .dg-omnibox-wrap { flex: 1 1 auto; min-width: 0; }
     .dg-customer-wrap { justify-content: flex-start; }
@@ -1376,7 +1379,7 @@ mark.dg-mark {
     .dg-omnibox-kbd { display: none; }
 }
 
-@media (max-width: 640px) {
+@media (width <= 640px) {
     .dg-main { padding: var(--space-4); }
     .dg-toolbar { padding: var(--space-3) var(--space-4); margin-bottom: var(--space-4); }
     .dg-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: var(--space-3); }
@@ -1405,9 +1408,13 @@ mark.dg-mark {
     .dg-drawer,
     .dg-drawer-overlay,
     .dg-lightbox {
+        /* stylelint-disable-next-line declaration-no-important -- prefers-reduced-motion kill switch must beat every animation */
         animation-duration: 0.01ms !important;
+        /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
         animation-iteration-count: 1 !important;
+        /* stylelint-disable-next-line declaration-no-important -- prefers-reduced-motion kill switch must beat every animation */
         transition-duration: 0.01ms !important;
+        /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
         scroll-behavior: auto !important;
     }
     .dg-card:hover { transform: none; }
@@ -1431,6 +1438,7 @@ mark.dg-mark {
     .dg-copy,
     .dg-banner,
     .dash-back-link {
+        /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
         display: none !important;
     }
 
@@ -1454,7 +1462,6 @@ mark.dg-mark {
     .dg-rail-track {
         flex-wrap: wrap;
         overflow: visible;
-        -webkit-mask-image: none;
         mask-image: none;
     }
 }
@@ -1692,7 +1699,7 @@ mark.dg-mark {
 
 /* 2026-09-05 review — layout values via custom properties (no inline style=), pressed-state chrome */
 .dg-boot-bar { width: var(--w, 8%); }
-.dg-spacer { height: var(--h, 0px); }
+.dg-spacer { height: var(--h, 0); }
 .dg-grid-viewport { overflow-anchor: none; }
 .dg-grid img.is-blank { visibility: hidden; }
-.dg-pill:focus-visible, .dg-chip:focus-visible, .dg-density-btn:focus-visible, .dg-customer-btn:focus-visible, .dg-freshness:focus-visible { outline: 2px solid var(--dash-theme, #0a8a1f); outline-offset: 2px; }
+.dg-pill:focus-visible, .dg-chip:focus-visible, .dg-density-btn:focus-visible, .dg-customer-btn:focus-visible, .dg-freshness:focus-visible { outline: 2px solid var(--dash-theme, var(--color-steve)); outline-offset: 2px; }

@@ -26,11 +26,12 @@
 
 .gp-rail li.is-current {
     background: var(--dash-theme);
-    color: #fff;
+    color: var(--color-on-brand);
 }
 
 /* ── Fields ────────────────────────────────────────────────────────────────── */
 .gp-step h2 { margin-top: 0; }
+
 .gp-step h3 {
     margin: var(--space-5) 0 var(--space-2);
     font-size: 14px;
@@ -218,6 +219,7 @@
 
 .gp-binding { margin-top: var(--space-4); }
 .gp-binding-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+
 .gp-binding-table th,
 .gp-binding-table td { padding: var(--space-1) var(--space-2); border-bottom: 1px solid var(--gray-100); text-align: left; }
 .gp-row-unbound { background: var(--state-danger-bg); color: var(--state-danger); }
@@ -249,10 +251,11 @@
 
 .gp-empty { padding: var(--space-6); text-align: center; color: var(--gray-500); }
 
-@media (max-width: 640px) {
+@media (width <= 640px) {
     .gp-grid { grid-template-columns: 1fr; }
     .gp-rail li { font-size: 12px; padding: var(--space-1) var(--space-2); }
 }
 
 /* 2026-09-05 review */
+/* stylelint-disable-next-line declaration-no-important -- the hidden attribute must beat any display rule */
 [hidden] { display: none !important; }

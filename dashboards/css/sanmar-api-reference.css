@@ -5,9 +5,10 @@
    ========================================================================== */
 
 .sm-subhead { font-weight: 400; font-size: 0.7em; opacity: 0.85; }
+
 .sm-lock {
-    display: inline-flex; align-items: center; gap: 6px; font-size: 0.8rem; font-weight: 600; color: #fff;
-    background: rgba(0,0,0,0.18); border: 1px solid rgba(255,255,255,0.35); padding: 5px 12px; border-radius: var(--radius-pill);
+    display: inline-flex; align-items: center; gap: 6px; font-size: 0.8rem; font-weight: 600; color: var(--color-on-brand);
+    background: rgb(0 0 0 / 18%); border: 1px solid rgb(255 255 255 / 35%); padding: 5px 12px; border-radius: var(--radius-pill);
 }
 
 .sm-lead { font-size: 1rem; line-height: 1.6; color: var(--gray-700); margin: 0 0 var(--space-4); }
@@ -43,7 +44,7 @@
 .sm-ep { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-3); align-items: baseline; padding: var(--space-2) var(--space-3); border-bottom: 1px solid var(--gray-200); background: var(--surface-card); }
 .sm-ep:last-child { border-bottom: 0; }
 .sm-ep:hover { background: var(--surface-hover); }
-.sm-grp { font-size: 0.66rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; padding: 2px 8px; border-radius: var(--radius-sm); color: #fff; flex: 0 0 auto; font-family: 'JetBrains Mono', ui-monospace, monospace; }
+.sm-grp { font-size: 0.66rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; padding: 2px 8px; border-radius: var(--radius-sm); color: var(--color-on-brand); flex: 0 0 auto; font-family: 'JetBrains Mono', ui-monospace, monospace; }
 .sm-grp.std { background: var(--state-info); }
 .sm-grp.ps  { background: var(--state-violet); }
 .sm-path { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 0.78rem; color: var(--gray-900); font-weight: 600; overflow-wrap: anywhere; }
@@ -76,7 +77,8 @@ mark.sm-hit { background: var(--state-warning-bg); color: var(--state-warning); 
 
 .sm-foot { margin-top: var(--space-6); padding-top: var(--space-4); border-top: 1px solid var(--gray-200); color: var(--gray-500); font-size: 0.8rem; line-height: 1.6; }
 
-@media (max-width: 700px) { .sm-desc { display: none; } }
+@media (width <= 700px) { .sm-desc { display: none; } }
 
 /* 2026-09-05 review */
+/* stylelint-disable-next-line declaration-no-important -- the hidden attribute must beat any display rule */
 [hidden] { display: none !important; }

@@ -5,6 +5,7 @@
    art-hub.css; shell from dash-shell.css. Only queue-specific styles here.
    ========================================================================== */
 
+/* stylelint-disable-next-line declaration-no-important -- the hidden attribute must beat any display rule */
 [hidden] { display: none !important; }
 
 .ms-tab { cursor: pointer; }

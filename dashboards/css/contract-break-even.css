@@ -43,6 +43,7 @@
 .cbe-howto code { font-family: 'JetBrains Mono', monospace; font-size: .85em; }
 
 @media print {
+    /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
     .dash-header, .cbe-controls, .dash-error-banner { display: none !important; }
     .dash-shell, .dash-content { padding: 0; margin: 0; }
     .dash-card { border: 0; box-shadow: none; padding: 0 0 .6rem; break-inside: avoid; }
@@ -51,4 +52,5 @@
 }
 
 /* 2026-09-05 review */
+/* stylelint-disable-next-line declaration-no-important -- the hidden attribute must beat any display rule */
 [hidden] { display: none !important; }

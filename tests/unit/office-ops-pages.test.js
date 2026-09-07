@@ -44,7 +44,7 @@ describe('sanmar inbound calendar modal', () => {
         expect(js).toMatch(/data-onerror="sit-logo"/);
         expect(js).toMatch(/<th class="sit-r">/);
         expect(css).toMatch(/\.sit-modal\[hidden\] \{ display: none; \}/);
-        expect(css).toMatch(/\.sit-chip \{ background: var\(--c, #9ca3af\); \}/);
+        expect(css).toMatch(/\.sit-chip \{ background: var\(--c, (?:#9ca3af|var\(--gray-400\))\); \}/);
         expect(css).toMatch(/\.sit-cal-has \{ background: var\(--bg\); \}/);
         expect(js).not.toMatch(BARE);
     });
@@ -58,7 +58,7 @@ describe('box label template', () => {
         expect(noComments(js)).not.toMatch(/(?<!data-)onerror=/);
         expect(js).toMatch(/data-onerror="sl-logo"/);
         expect(js).toMatch(/window\.__slLogoErrWired = true;/);
-        expect(css).toMatch(/\.sl-type \{ border-left-color: var\(--m, #555\); \}/);
+        expect(css).toMatch(/\.sl-type \{ border-left-color: var\(--m, (?:#555|var\(--print-ink-soft\))\); \}/);
         expect(css).toMatch(/\.sl-fill--wide \{ flex: 1\.7; \}/);
     });
 });

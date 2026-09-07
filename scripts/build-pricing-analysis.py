@@ -26,7 +26,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA = os.path.join(ROOT, 'memory', 'pricing-analysis-data.json')
 OUT = os.path.join(ROOT, 'dashboards', 'pricing-analysis.html')
 
-CSS_VER = '2026.09.05.74'
+CSS_VER = '2026.09.07.10'
 JS_VER = '2026.09.05.74'
 TIERS = ['1-7', '8-23', '24-47', '48-71', '72+']
 BANDS = ['<$4', '$4-8', '$8-15', '$15-25', '$25+']

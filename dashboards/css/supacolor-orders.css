@@ -4,6 +4,26 @@
  * .sc-* classes for the table layout, view toggle, paste zone, and pagination.
  */
 
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue so the page
+   keeps its exact look. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   every rule below uses var(). Raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
+:root {
+    --supacolor-orders-gray: #adb5bd;
+    --supacolor-orders-red: #c0392b;
+    --supacolor-orders-blue: #4338ca;
+    --supacolor-orders-green: #198754;
+    --supacolor-orders-blue-tint: #c7d2fe;
+    --supacolor-orders-blue-2: #3730a3;
+    --supacolor-orders-orange: #d68910;
+    --supacolor-orders-orange-2: #ffe0b2;
+    --supacolor-orders-cyan: #1971c2;
+    --supacolor-orders-teal-tint: #c3fae8;
+    --supacolor-orders-red-2: #e74c3c;
+    --supacolor-orders-red-tint: #fecaca;
+}
+/* stylelint-enable color-no-hex */
+
 /* ── Filter bar growth ─────────────────────────────────────────────── */
 .bt-filter-group--grow { flex: 1; }
 .bt-filter-group--grow .bt-filter-input { width: 100%; }
@@ -16,10 +36,11 @@
     gap: 2px;
     margin-left: 4px;
 }
+
 .sc-fallback-btn {
     background: transparent;
-    color: #6b7280;
-    border: 1px solid #d1d5db;
+    color: var(--gray-500);
+    border: 1px solid var(--gray-300);
     font-size: 12px;
     padding: 4px 10px;
     border-radius: 4px;
@@ -30,17 +51,20 @@
     gap: 6px;
     transition: background-color 0.15s, color 0.15s, border-color 0.15s;
 }
+
 .sc-fallback-btn:hover {
-    background: #f3f4f6;
-    color: #374151;
-    border-color: #9ca3af;
+    background: var(--gray-100);
+    color: var(--gray-700);
+    border-color: var(--gray-400);
 }
+
 .sc-fallback-btn i {
     font-size: 11px;
 }
+
 .sc-fallback-note {
     font-size: 10px;
-    color: #9ca3af;
+    color: var(--gray-400);
     font-style: italic;
     letter-spacing: 0.02em;
 }
@@ -50,17 +74,17 @@
     grid-column: 1 / -1;
     width: 100%;
     font-size: 12px;
-    color: #64748b;
+    color: var(--slate-500);
     margin-top: 6px;
     text-align: right;
     font-style: italic;
 }
 
 /* ── Stat chip extras ──────────────────────────────────────────────── */
-.bt-stat-chip--cancelled { border-left: 4px solid #c0392b; }
-.bt-stat-chip--cancelled .bt-stat-count { color: #c0392b; }
-.bt-stat-chip--total { border-left: 4px solid #4a6fa5; }
-.bt-stat-chip--total .bt-stat-count { color: #4a6fa5; }
+.bt-stat-chip--cancelled { border-left: 4px solid var(--supacolor-orders-red); }
+.bt-stat-chip--cancelled .bt-stat-count { color: var(--supacolor-orders-red); }
+.bt-stat-chip--total { border-left: 4px solid var(--color-bradley); }
+.bt-stat-chip--total .bt-stat-count { color: var(--color-bradley); }
 
 /* ── Clickable stat chips (= view filter) ──────────────────────────── */
 .bt-stat-chip--clickable {
@@ -69,81 +93,91 @@
     user-select: none;
     outline: none;
 }
+
 .bt-stat-chip--clickable:hover {
-    background: #f8f9fa;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    background: var(--gray-50);
+    box-shadow: 0 2px 6px rgb(0 0 0 / 8%);
 }
+
 .bt-stat-chip--clickable:focus-visible {
-    box-shadow: 0 0 0 2px #4a6fa5;
+    box-shadow: 0 0 0 2px var(--color-bradley);
 }
+
 .bt-stat-chip--clickable.selected {
-    background: #eef3fb;
-    box-shadow: 0 2px 10px rgba(74, 111, 165, 0.18);
+    background: var(--slate-100);
+    box-shadow: 0 2px 10px rgb(74 111 165 / 18%);
 }
+
 .bt-stat-chip--clickable.selected .bt-stat-label {
-    color: #2c3e50;
+    color: var(--gray-700);
     font-weight: 700;
 }
 
 /* ── Table layout (mimics Supacolor's clean row layout) ────────────── */
 .sc-table-wrap {
-    background: #fff;
-    border: 1px solid #e9ecef;
+    background: var(--color-surface);
+    border: 1px solid var(--gray-200);
     border-radius: 8px;
     overflow: hidden;
     margin-top: 8px;
 }
+
 .sc-table {
     display: block;
     width: 100%;
 }
+
 .sc-row {
     display: grid;
     grid-template-columns: 110px 110px 1fr 110px 110px 130px 24px;
     gap: 16px;
     align-items: center;
     padding: 14px 20px;
-    border-bottom: 1px solid #f1f3f5;
+    border-bottom: 1px solid var(--gray-100);
     text-decoration: none;
     color: inherit;
     transition: background-color 0.1s ease;
 }
 .sc-row:last-child { border-bottom: none; }
-.sc-row:hover:not(.sc-row--header) { background: #f8f9fa; }
+.sc-row:hover:not(.sc-row--header) { background: var(--gray-50); }
 
 .sc-row--header {
-    background: #f8f9fa;
+    background: var(--gray-50);
     font-size: 11px;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    color: #6c757d;
+    color: var(--gray-500);
     cursor: default;
     pointer-events: none;
 }
 
-.sc-cell { font-size: 14px; color: #2c3e50; }
+.sc-cell { font-size: 14px; color: var(--gray-700); }
+
 .sc-cell--job {
     font-weight: 600;
-    color: #4a6fa5;
+    color: var(--color-bradley);
     font-variant-numeric: tabular-nums;
 }
+
 .sc-cell--po {
     font-family: 'SF Mono', Monaco, Consolas, monospace;
     font-size: 12px;
-    color: #6c757d;
-    background: #f8f9fa;
+    color: var(--gray-500);
+    background: var(--gray-50);
     padding: 3px 8px;
     border-radius: 4px;
     display: inline-block;
     width: fit-content;
 }
+
 .sc-row--header .sc-cell--po {
     background: transparent;
     padding: 0;
     font-family: inherit;
     font-size: 11px;
 }
+
 .sc-cell--desc {
     display: flex;
     flex-direction: column;
@@ -151,24 +185,28 @@
     gap: 2px;
     overflow: hidden;
 }
+
 .sc-customer-line {
     font-weight: 600;
-    color: #2c3e50;
+    color: var(--gray-700);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
+
 .sc-order-meta {
     font-size: 11px;
-    color: #6c757d;
+    color: var(--gray-500);
     font-variant-numeric: tabular-nums;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
+
 .sc-row--header .sc-cell--desc {
     display: block;
 }
+
 .sc-due-risk {
     display: inline-flex;
     align-items: center;
@@ -181,30 +219,35 @@
     width: fit-content;
 }
 .sc-due-risk i { font-size: 10px; }
-.sc-due-risk--overdue  { background: #fee2e2; color: #b91c1c; }
-.sc-due-risk--risk     { background: #fee2e2; color: #b91c1c; }
-.sc-due-risk--tight    { background: #ffedd5; color: #b45309; }
-.sc-due-risk--invoiced { background: #dcfce7; color: #166534; }
+.sc-due-risk--overdue  { background: var(--red-100); color: var(--red-700); }
+.sc-due-risk--risk     { background: var(--red-100); color: var(--red-700); }
+.sc-due-risk--tight    { background: var(--red-100); color: var(--amber-700); }
+.sc-due-risk--invoiced { background: var(--store-green-100); color: var(--print-green); }
+
 .sc-subtitle-meta {
-    color: #6c757d;
+    color: var(--gray-500);
     font-weight: 500;
 }
+
 .sc-cell--received {
-    color: #198754;
+    color: var(--supacolor-orders-green);
     font-size: 13px;
     font-variant-numeric: tabular-nums;
     font-weight: 500;
 }
+
 .sc-received-check {
     font-size: 11px;
     margin-right: 2px;
 }
+
 .sc-row--header .sc-cell--received {
-    color: #6c757d;
+    color: var(--gray-500);
     font-weight: 700;
 }
+
 .sc-cell--shipped {
-    color: #6c757d;
+    color: var(--gray-500);
     font-size: 13px;
     font-variant-numeric: tabular-nums;
     display: flex;
@@ -213,9 +256,11 @@
     align-items: flex-start;
     justify-content: center;
 }
+
 .sc-ship-date {
     line-height: 1.2;
 }
+
 .sc-ship-expected {
     display: inline-flex;
     align-items: center;
@@ -224,8 +269,8 @@
     border-radius: 10px;
     font-size: 11px;
     font-weight: 500;
-    background: #fef3c7;
-    color: #92400e;
+    background: var(--amber-100);
+    color: var(--amber-800);
     font-variant-numeric: tabular-nums;
     width: fit-content;
 }
@@ -233,8 +278,9 @@
 
 /* "Arriving Today" stat chip — matches the amber Expected ETA pill so the
    visual link is obvious: "this card filters to those rows." */
-.bt-stat-chip--arriving { border-left-color: #f59e0b; }
-.bt-stat-chip--arriving .bt-stat-count { color: #b45309; }
+.bt-stat-chip--arriving { border-left-color: var(--amber-500); }
+.bt-stat-chip--arriving .bt-stat-count { color: var(--amber-700); }
+
 /* Tracking pill under the shipped date. Clickable when carrier is known
    (opens carrier tracking page in new tab); static text otherwise. */
 .sc-track-pill {
@@ -245,25 +291,28 @@
     border-radius: 10px;
     font-size: 11px;
     font-weight: 500;
-    background: #eef2ff;
-    color: #4338ca;
+    background: var(--color-floor-tint);
+    color: var(--supacolor-orders-blue);
     font-variant-numeric: tabular-nums;
     max-width: 100%;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
+
 .sc-track-pill i {
     font-size: 10px;
     opacity: 0.8;
 }
+
 .sc-track-pill--link {
     cursor: pointer;
     transition: background-color 0.15s ease, color 0.15s ease;
 }
+
 .sc-track-pill--link:hover {
-    background: #c7d2fe;
-    color: #3730a3;
+    background: var(--supacolor-orders-blue-tint);
+    color: var(--supacolor-orders-blue-2);
 }
 
 /* 2026-05-13 — Whole-cell click affordance for the Shipped column.
@@ -279,21 +328,24 @@
     padding: 4px 8px;
     transition: background-color 0.15s ease;
 }
+
 .sc-cell--shipped--track:hover {
-    background: #eef2ff;
+    background: var(--color-floor-tint);
 }
+
 .sc-cell--shipped--track:hover .sc-track-pill--link {
     /* Pill already has its own hover — reset to base so the pill doesn't
        look "double-hovered" when the parent cell is also highlighted. */
-    background: #eef2ff;
-    color: #4338ca;
+    background: var(--color-floor-tint);
+    color: var(--supacolor-orders-blue);
 }
+
 .sc-cell--shipped--track:hover .sc-ship-date {
-    color: #4338ca;
+    color: var(--supacolor-orders-blue);
 }
 
 .sc-cell--chevron {
-    color: #adb5bd;
+    color: var(--supacolor-orders-gray);
     text-align: right;
 }
 
@@ -305,20 +357,23 @@
     font-size: 12px;
     font-weight: 600;
 }
+
 .sc-status-badge--open {
-    background: #fff4e6;
-    color: #d68910;
-    border: 1px solid #ffe0b2;
+    background: var(--store-rush-soft);
+    color: var(--supacolor-orders-orange);
+    border: 1px solid var(--supacolor-orders-orange-2);
 }
+
 .sc-status-badge--closed {
-    background: #f0f4f8;
-    color: #495057;
-    border: 1px solid #e2e8f0;
+    background: var(--slate-100);
+    color: var(--gray-600);
+    border: 1px solid var(--slate-200);
 }
+
 .sc-status-badge--cancelled {
-    background: #fff5f5;
-    color: #c0392b;
-    border: 1px solid #ffd6d6;
+    background: var(--red-50);
+    color: var(--supacolor-orders-red);
+    border: 1px solid var(--red-100);
 }
 
 /* ── Pagination ────────────────────────────────────────────────────── */
@@ -330,37 +385,41 @@
     padding: 16px 4px;
     margin-top: 8px;
 }
+
 .sc-page-btn {
     padding: 6px 14px;
-    border: 1px solid #dee2e6;
-    background: #fff;
+    border: 1px solid var(--gray-200);
+    background: var(--color-surface);
     border-radius: 6px;
     font-size: 13px;
-    color: #495057;
+    color: var(--gray-600);
     cursor: pointer;
     transition: all 0.15s ease;
 }
+
 .sc-page-btn:hover:not(:disabled) {
-    background: #f8f9fa;
-    border-color: #adb5bd;
+    background: var(--gray-50);
+    border-color: var(--supacolor-orders-gray);
 }
+
 .sc-page-btn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
 }
+
 .sc-page-info {
     font-size: 13px;
-    color: #6c757d;
+    color: var(--gray-500);
     font-variant-numeric: tabular-nums;
 }
 
 /* ── Backfill modal: paste zone ────────────────────────────────────── */
 .sc-paste-zone {
-    border: 2px dashed #cbd5e0;
+    border: 2px dashed var(--gray-300);
     border-radius: 8px;
     padding: 24px;
     margin-top: 16px;
-    background: #f8f9fa;
+    background: var(--gray-50);
     min-height: 180px;
     display: flex;
     align-items: center;
@@ -369,30 +428,34 @@
     transition: all 0.15s ease;
     outline: none;
 }
+
 .sc-paste-zone:hover,
 .sc-paste-zone:focus,
 .sc-paste-zone--dragover {
-    border-color: #4a6fa5;
-    background: #f0f4f8;
+    border-color: var(--color-bradley);
+    background: var(--slate-100);
 }
 
 .sc-paste-empty {
     text-align: center;
-    color: #6c757d;
+    color: var(--gray-500);
 }
+
 .sc-paste-empty i {
     font-size: 36px;
-    color: #adb5bd;
+    color: var(--supacolor-orders-gray);
     margin-bottom: 12px;
     display: block;
 }
+
 .sc-paste-empty p {
     margin: 4px 0;
     font-size: 14px;
 }
+
 .sc-paste-empty .sc-paste-hint {
     font-size: 12px;
-    color: #adb5bd;
+    color: var(--supacolor-orders-gray);
 }
 
 .sc-paste-preview {
@@ -400,7 +463,7 @@
     max-height: 320px;
     object-fit: contain;
     border-radius: 4px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 8px rgb(0 0 0 / 10%);
 }
 
 /* Status banner inside modal */
@@ -410,20 +473,23 @@
     border-radius: 6px;
     font-size: 13px;
 }
+
 .sc-extract-status--info {
-    background: #e7f5ff;
-    color: #1971c2;
-    border: 1px solid #d0ebff;
+    background: var(--sky-100);
+    color: var(--supacolor-orders-cyan);
+    border: 1px solid var(--sky-100);
 }
+
 .sc-extract-status--success {
-    background: #ebfbee;
-    color: #2f9e44;
-    border: 1px solid #c3fae8;
+    background: var(--color-steve-tint);
+    color: var(--store-green-600);
+    border: 1px solid var(--supacolor-orders-teal-tint);
 }
+
 .sc-extract-status--error {
-    background: #fff5f5;
-    color: #c92a2a;
-    border: 1px solid #ffe3e3;
+    background: var(--red-50);
+    color: var(--red-700);
+    border: 1px solid var(--red-100);
 }
 .sc-extract-status i { margin-right: 6px; }
 
@@ -432,27 +498,29 @@
     margin-top: 12px;
     max-height: 280px;
     overflow-y: auto;
-    border: 1px solid #e9ecef;
+    border: 1px solid var(--gray-200);
     border-radius: 6px;
 }
 .sc-preview-table { display: block; }
+
 .sc-preview-row {
     display: grid;
     grid-template-columns: 90px 110px 1fr 90px 110px;
     gap: 12px;
     padding: 8px 12px;
     font-size: 13px;
-    border-bottom: 1px solid #f1f3f5;
-    color: #495057;
+    border-bottom: 1px solid var(--gray-100);
+    color: var(--gray-600);
 }
 .sc-preview-row:last-child { border-bottom: none; }
+
 .sc-preview-row--header {
-    background: #f8f9fa;
+    background: var(--gray-50);
     font-weight: 700;
     font-size: 11px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    color: #6c757d;
+    color: var(--gray-500);
     position: sticky;
     top: 0;
 }
@@ -461,22 +529,24 @@
 .bt-empty {
     text-align: center;
     padding: 60px 24px;
-    color: #6c757d;
+    color: var(--gray-500);
 }
+
 .bt-empty i {
     font-size: 48px;
-    color: #adb5bd;
+    color: var(--supacolor-orders-gray);
     margin-bottom: 16px;
     display: block;
 }
+
 .bt-empty p {
     margin: 0;
     font-size: 15px;
 }
-.bt-empty--error i { color: #e74c3c; }
+.bt-empty--error i { color: var(--supacolor-orders-red-2); }
 
 /* ── Responsive ────────────────────────────────────────────────────── */
-@media (max-width: 900px) {
+@media (width <= 900px) {
     .sc-row {
         grid-template-columns: 90px 1fr 90px 24px;
         gap: 10px;
@@ -484,25 +554,30 @@
     }
     .sc-cell--po, .sc-cell--shipped, .sc-cell--received { display: none; }
     .sc-cell--desc { font-size: 13px; }
+
     .sc-preview-row {
         grid-template-columns: 70px 1fr 80px;
     }
+
     .sc-preview-row > div:nth-child(2),
     .sc-preview-row > div:nth-child(5) { display: none; }
 }
 
 /* ── 2026-09-05 review ────────────────────────────────────────────────────── */
+/* stylelint-disable-next-line declaration-no-important -- the hidden attribute must beat any display rule */
 [hidden] { display: none !important; }
 .sc-title { margin-bottom: 4px; display: flex; align-items: center; gap: 12px; }
-.sc-title-mark { display: inline-flex; align-items: center; background: #1e293b; padding: 8px 14px; border-radius: 8px; }
+.sc-title-mark { display: inline-flex; align-items: center; background: var(--gray-800); padding: 8px 14px; border-radius: 8px; }
 .sc-title-logo { height: 28px; width: auto; display: block; }
+
 /* View chips are real <button>s now (aria-pressed replaces the .selected class as the state). */
-.bt-stat-chip[aria-pressed="true"] { background: #f0f4fa; border-color: #4a6fa5; box-shadow: 0 0 0 2px rgba(74, 111, 165, 0.25); }
-.sc-preview-note { margin-top: 12px; font-size: 13px; color: #475569; }
-.sc-error { text-align: center; padding: 40px 20px; color: #991b1b; background: #fee2e2; border: 1px solid #fecaca; border-radius: 8px; }
+.bt-stat-chip[aria-pressed="true"] { background: var(--slate-100); border-color: var(--color-bradley); box-shadow: 0 0 0 2px rgb(74 111 165 / 25%); }
+.sc-preview-note { margin-top: 12px; font-size: 13px; color: var(--slate-600); }
+.sc-error { text-align: center; padding: 40px 20px; color: var(--red-800); background: var(--red-100); border: 1px solid var(--supacolor-orders-red-tint); border-radius: 8px; }
 .sc-error .bt-btn { margin-top: 12px; }
-.sc-page-btn:focus-visible, .sc-fallback-btn:focus-visible, .sc-paste-zone:focus-visible, .sc-row:focus-visible { outline: 2px solid #4a6fa5; outline-offset: 2px; }
-@media (max-width: 600px) {
+.sc-page-btn:focus-visible, .sc-fallback-btn:focus-visible, .sc-paste-zone:focus-visible, .sc-row:focus-visible { outline: 2px solid var(--color-bradley); outline-offset: 2px; }
+
+@media (width <= 600px) {
     .bt-stat-chip { min-width: 0; flex: 1 1 45%; }
     .bt-filter-bar { flex-wrap: wrap; }
     .bt-filter-group { flex: 1 1 100%; }

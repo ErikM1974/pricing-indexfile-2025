@@ -5,12 +5,11 @@
    ===================================================== */
 
 @layer base {
-
 /* =====================================================
    Modern reset (subset of modern-normalize)
    ===================================================== */
 *, *::before, *::after { box-sizing: border-box; }
-html { -webkit-text-size-adjust: 100%; tab-size: 4; }
+html { text-size-adjust: 100%; tab-size: 4; }
 
 body {
     margin: 0;
@@ -19,6 +18,7 @@ body {
     line-height: var(--line-height-base);
     color: var(--text-base);
     background: var(--surface-base);
+
     /* No -webkit-font-smoothing: antialiased — on Windows ClearType it makes
        white-on-dark text render visibly THINNER. Default subpixel rendering
        gives bolder, more readable text. */
@@ -57,6 +57,7 @@ ul { list-style: none; padding: 0; margin: 0; }
     box-shadow: var(--focus-ring);
     border-radius: var(--radius-sm);
 }
+
 /* Remove the focus ring from elements that have their own (FAB, etc.) */
 .no-focus-ring:focus-visible { box-shadow: none; }
 
@@ -64,6 +65,7 @@ ul { list-style: none; padding: 0; margin: 0; }
    Visually hidden — for sr-only labels
    ===================================================== */
 .visually-hidden {
+    /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
     position: absolute !important;
     width: 1px; height: 1px;
     padding: 0; margin: -1px;
@@ -98,11 +100,13 @@ ul { list-style: none; padding: 0; margin: 0; }
     color: var(--text-muted);
     transition: opacity var(--motion-base) var(--ease-out), visibility 0s var(--motion-base);
 }
+
 .loading-overlay.is-hidden {
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
 }
+
 .loading-spinner {
     width: 32px;
     height: 32px;
@@ -111,7 +115,9 @@ ul { list-style: none; padding: 0; margin: 0; }
     border-radius: var(--radius-pill);
     animation: spin 0.8s linear infinite;
 }
+
 @keyframes spin { to { transform: rotate(360deg); } }
+
 .loading-text {
     font-size: var(--font-size-md);
 }
@@ -127,8 +133,7 @@ ul { list-style: none; padding: 0; margin: 0; }
     height: 100vh;
     position: sticky;
     top: 0;
-    overflow-y: auto;
-    overflow-x: hidden;
+    overflow: hidden auto;
 }
 
 .sidebar-header {
@@ -141,20 +146,23 @@ ul { list-style: none; padding: 0; margin: 0; }
     text-align: center;
 }
 .sidebar-header .logo-link { display: block; }
+
 .sidebar-header .company-logo {
     max-width: 100%;
     height: auto;
     max-height: 56px;
 }
+
 .sidebar-header .company-name {
-    color: #ffffff;
+    color: var(--color-on-brand);
     font-weight: var(--font-weight-bold);
     font-size: var(--font-size-lg);
     letter-spacing: -0.01em;
     margin-top: var(--space-2);
 }
+
 .sidebar-header .company-year {
-    color: #d0d0d8;
+    color: var(--gray-300);
     font-weight: var(--font-weight-bold);
     font-size: var(--font-size-sm);
     letter-spacing: 0;
@@ -164,6 +172,7 @@ ul { list-style: none; padding: 0; margin: 0; }
     flex: 1;
     padding: var(--space-3) 0;
 }
+
 .sidebar-content {
     display: flex;
     flex-direction: column;
@@ -173,13 +182,14 @@ ul { list-style: none; padding: 0; margin: 0; }
 
 /* Nav section */
 .nav-section { display: flex; flex-direction: column; }
+
 .nav-section-header,
 .nav-section-header-link {
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: var(--space-3);
-    color: #ffffff;
+    color: var(--color-on-brand);
     border-radius: var(--radius-sm);
     cursor: pointer;
     user-select: none;
@@ -188,26 +198,31 @@ ul { list-style: none; padding: 0; margin: 0; }
     font-weight: var(--font-weight-bold);
     text-decoration: none;
 }
+
 .nav-section-header:hover,
 .nav-section-header-link:hover {
     background: var(--surface-card-2);
     color: var(--accent);
 }
+
 .nav-section:not(.collapsed) > .nav-section-header {
     background: var(--accent-bg);
     color: var(--accent);
 }
+
 .nav-section-title {
     display: flex;
     align-items: center;
     gap: var(--space-2);
 }
+
 .chevron {
-    color: #ffffff;
+    color: var(--color-on-brand);
     transition: transform var(--motion-base) var(--ease-out);
     font-size: var(--font-size-md);
     font-weight: var(--font-weight-bold);
 }
+
 .nav-section.collapsed .chevron {
     transform: rotate(-90deg);
 }
@@ -218,22 +233,26 @@ ul { list-style: none; padding: 0; margin: 0; }
     transition: grid-template-rows var(--motion-base) var(--ease-out);
     overflow: hidden;
 }
+
 .nav-section.collapsed .nav-section-content {
     grid-template-rows: 0fr;
 }
+
 .nav-section-content > div {
     min-height: 0;
 }
+
 .nav-link {
     display: block;
     padding: var(--space-2) var(--space-3) var(--space-2) var(--space-6);
-    color: #ffffff;
+    color: var(--color-on-brand);
     border-radius: var(--radius-sm);
     transition: background var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out);
     font-size: var(--font-size-md);
     font-weight: var(--font-weight-semibold);
     text-decoration: none;
 }
+
 .nav-link:hover {
     background: var(--surface-card-2);
     color: var(--accent);
@@ -263,11 +282,13 @@ ul { list-style: none; padding: 0; margin: 0; }
     top: 0;
     z-index: var(--z-sticky);
 }
+
 .header-left {
     display: flex;
     align-items: center;
     gap: var(--space-3);
 }
+
 .page-title {
     color: var(--text-base);
     font-size: var(--font-size-xl);
@@ -275,11 +296,13 @@ ul { list-style: none; padding: 0; margin: 0; }
     letter-spacing: -0.01em;
     margin: 0;
 }
+
 .header-right {
     display: flex;
     align-items: center;
     gap: var(--space-3);
 }
+
 .user-welcome {
     background: var(--accent-bg);
     border: 1px solid color-mix(in oklch, var(--accent) 35%, transparent);
@@ -293,6 +316,7 @@ ul { list-style: none; padding: 0; margin: 0; }
 }
 .welcome-text { color: var(--text-muted); font-weight: var(--font-weight-regular); }
 .user-name { color: var(--text-base); font-weight: var(--font-weight-semibold); }
+
 .sign-out-link {
     background: transparent;
     border: 1px solid var(--border-base);
@@ -307,6 +331,7 @@ ul { list-style: none; padding: 0; margin: 0; }
                 border-color var(--motion-fast) var(--ease-out),
                 color var(--motion-fast) var(--ease-out);
 }
+
 .sign-out-link:hover {
     background: color-mix(in oklch, var(--bad) 15%, transparent);
     border-color: color-mix(in oklch, var(--bad) 50%, transparent);
@@ -330,10 +355,11 @@ ul { list-style: none; padding: 0; margin: 0; }
 /* =====================================================
    RESPONSIVE — sidebar collapses to overlay on tablet
    ===================================================== */
-@media (max-width: 1100px) {
+@media (width <= 1100px) {
     .dashboard-container {
         grid-template-columns: 1fr;
     }
+
     .sidebar {
         position: fixed;
         top: 0;
@@ -344,28 +370,33 @@ ul { list-style: none; padding: 0; margin: 0; }
         transition: transform var(--motion-base) var(--ease-out);
         box-shadow: var(--shadow-2);
     }
+
     .sidebar.is-open {
         transform: translateX(0);
     }
+
     body.has-sidebar-open::before {
         content: "";
         position: fixed;
         inset: 0;
-        background: oklch(0% 0 0 / .55);
+        background: oklch(0% 0 0deg / 55%);
         z-index: calc(var(--z-modal) - 1);
         animation: fade-in var(--motion-base) var(--ease-out);
     }
 }
-@media (max-width: 768px) {
+
+@media (width <= 768px) {
     .top-header {
         padding: var(--space-3);
     }
+
     .dashboard-zones {
         padding: var(--space-3);
         gap: var(--space-3);
     }
     .user-welcome { display: none; }
 }
+
 @keyframes fade-in {
     from { opacity: 0; }
     to   { opacity: 1; }

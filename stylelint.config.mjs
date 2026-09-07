@@ -38,11 +38,11 @@ export default {
         'keyframes-name-pattern': null,
         // `clip: rect(0 0 0 0)` is the canonical visually-hidden (.sr-only) pattern; clip-path is not a byte-identical swap
         'property-no-deprecated': [true, { ignoreProperties: ['clip'] }],
-        // kebab-case classes, BEM block__element--modifier allowed (the dashboard already uses ws-card--wide)
-        'selector-class-pattern': [
-            '^[a-z][a-z0-9]*(?:-[a-z0-9]+)*(?:__[a-z0-9]+(?:-[a-z0-9]+)*)?(?:--[a-z0-9]+(?:-[a-z0-9]+)*)?$',
-            { message: 'Class names are kebab-case (BEM __element / --modifier allowed)' },
-        ],
+        // Class names: kebab-case with BEM __element / --modifier is the convention for NEW pages
+        // (templates/page-template.html, components.css). The rule itself is off: legacy sheets carry
+        // camelCase classes that are wired into JS (querySelector / classList) and into Caspio DataPage
+        // markup (cbFormTable…) — renaming is an HTML+JS change, not a CSS one (same reasoning as ids).
+        'selector-class-pattern': null,
     },
     overrides: [
         {

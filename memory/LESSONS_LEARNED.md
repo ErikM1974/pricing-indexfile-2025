@@ -30,27 +30,7 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 ### Staff pages, the LIVE pass — what a signed-in runtime walk found that 80 static locks had not (2026-09-06, ARCHIVED 2026-09-07, `v2026.09.06.26`–`.28`): a page lock must also cover the scripts that render into it (`RENDERERS`); runtime bare-icon counts must exclude `aria-label` icons; a runtime `<style>` on a page that ships none is a Caspio DataPage embed; JS-created controls get their `aria-label` in code; the Mission Control harness drifts with its page (`node scripts/sync-test-harness.js`); the hashed dashboard bundle is versioned. Full entry in archive.
 ### Rule 6 sweep S3 — 118 scripts still guessed the proxy host, and two unit tests had been hitting the live API (2026-09-06, ARCHIVED 2026-09-07, `v2026.09.06.31`): every proxy URL comes from `APP_CONFIG.API.BASE_URL` with a VISIBLE failure when it is missing; a scripted rewrite must keep the ORIGINAL quote character; `tests/setup.js`'s fetch stub never installs on Node 18+ (native fetch) — stub `global.fetch` per test. Full entry in archive.
 ### Final census — 69 dead files, a retired page that still got "fixed" twice, and a lock that pinned a version prefix (2026-09-06, ARCHIVED 2026-09-07, `v2026.09.06.33`–`.34`): check linked + mounted + the `server.js` route (410/301) before "fixing" a page; an orphan census matches the PATH, not the basename; never pin a `?v=` prefix in a test. Full entry in archive.
-
-## 2026-09-06 — EmailJS ids in 25 scripts, 118 unlabelled controls, and 12 SEO pages rendering in quirks mode (`v2026.09.06.36`)
-
-**Problem.** Rule 6 had been applied to the proxy host but not to EmailJS: 69 copies of the public
-key / service id sat in served scripts while `APP_CONFIG.EMAIL` (tenant getters) existed unused.
-A static census found 118 form controls with no accessible name, and the 12 `*-webstores` SEO pages
-had no doctype/`<html>`/`<body>` at all — bare fragments served with `sendFile`, so every browser
-rendered them in quirks mode.
-**Root cause.** Config centralisation was done per-constant when a file was touched; nothing
-swept for the second literal. Labels were written next to controls (`<label>Name</label><input>`)
-without `for=`, which looks right and is invisible to AT. The SEO pages were authored as body
-fragments for a wrapper that never existed.
-**Solution.** Sweep script → `APP_CONFIG.EMAIL.*` with a visible error, window-guarded; a11y
-fixer: `for=` where a label sits beside the control (minting ids), else `aria-label` from the
-visible label/placeholder; the fragments wrapped as documents. Both locked in
-`repo-hygiene-final.test.js`.
-**Prevention.** 🔑 When a config getter exists, grep for the VALUE it returns — a literal beside
-an unused getter is the common failure. 🔑 `<label>` without `for=` and not wrapping is
-decoration; the a11y lock now fails on it. 🔑 A page that starts with `<meta charset>` has no
-`<html>`: check `document.compatMode` on any page that "looks slightly off". 🔑 Module-scope
-config reads need `typeof window !== 'undefined'` — the Node-run service tests load the file.
+### EmailJS ids in 25 scripts, 118 unlabelled controls, and 12 SEO pages rendering in quirks mode (2026-09-06, ARCHIVED 2026-09-07, `v2026.09.06.36`): EmailJS service/template ids come from `APP_CONFIG`, never a literal; every control gets a label or `aria-label`; a page that starts with a fragment instead of `<!DOCTYPE html>` renders in quirks mode. Full entry in archive.
 
 ## 2026-09-06 — 700 console.logs in production, and a basename match that hid four stale root copies (`v2026.09.06.37`)
 
@@ -262,3 +242,22 @@ prefix (`--gts-*`). (c) A dedupe pass after every `--fix`.
 **Prevention.** 🔑 Verify a push by reading the remote, never by the push's printed lines. 🔑 Before linking
 `tokens.css` to a page, grep its sheets for `--gray-|--space-|--radius-|--font-` definitions — a same-named
 local variable shadows the token on that page. 🔑 `--fix` then dedupe then lint again.
+
+## 2026-09-07 — Dashboards family (`v2026.09.07.10`): two staff design systems, one token file
+
+**Problem.** The 41 queue dashboards run on `art-hub.css`'s "2026 design tokens" (spacing to 32, radius
+4/8/12/16, stacked shadows, `--state-*`), the Staff Dashboard runs on `staff-dashboard/tokens.css` (spacing
+to 96, radius 6/10/14/20, oklch), and the app-wide `tokens.css` was seeded from the second. Linking the token
+file first on an art-hub page therefore puts two definitions of `--space-5`, `--radius-md` and `--shadow-md`
+on the same page.
+**Root cause.** Both systems were built one page-family at a time, each minting the same names with
+different values; the census counted colours, not variable names.
+**Solution.** Values that were byte-identical (`--gray-50…900`) were deleted from art-hub so the token file
+is their one home; values that differ stay in art-hub, which loads AFTER tokens and therefore wins on its
+pages — zero pixels moved. The choice of ONE scale is a visible layout change across 41 staff pages and is
+logged on the Brand Standards page as an open decision for Erik, not decided by a script.
+**Prevention.** 🔑 Before a family links `tokens.css`, list every custom property its sheets DEFINE and diff
+the values against the token file: identical → delete the copy; different → keep it (it shadows) and log
+the conflict; never silently switch a page to the token value. 🔑 Colour = person/department is now checkable
+in code: `--art-theme: var(--color-ruth)` reads as the rule it implements — grep for a person's token to find
+every page that wears their colour.

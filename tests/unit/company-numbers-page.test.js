@@ -155,8 +155,8 @@ describe('second pass (2026-09-04 evening)', () => {
     });
     test('print sheet and wide-screen layout exist', () => {
         expect(css).toMatch(/@media print/);
-        expect(css).toMatch(/min-width: 1500px/);
-        expect(css).toMatch(/max-width: 1600px/);
+        expect(css).toMatch(/(?:min-width: 1500px|width >= 1500px)/);
+        expect(css).toMatch(/(?:max-width: 1600px|width <= 1600px)/);
     });
 });
 

@@ -3,7 +3,14 @@
    computer. Big type, big targets (>=52px), one column, plain language. All colors
    come from art-hub.css tokens; --art-theme is the single per-page knob (NWCA green). */
 
-:root { --art-theme: #009900; }
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue, merged into its
+   existing :root. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
+:root {
+    --jim-mailing-list-green-dark: #007a00;
+ --art-theme: var(--color-dash-theme); }
+/* stylelint-enable color-no-hex */
 
 /* Comfortable reading width, centered. */
 .jml-welcome,
@@ -13,6 +20,7 @@
 
 /* ---- welcome header (portrait + greeting) ---- */
 .jml-welcome { display: flex; align-items: center; gap: var(--space-4); margin-bottom: var(--space-4); }
+
 .jml-portrait {
     width: 64px; height: 64px; border-radius: 50%; object-fit: cover;
     border: 3px solid var(--art-theme); box-shadow: var(--shadow-sm); flex: 0 0 auto;
@@ -21,6 +29,7 @@
 
 /* ---- view toggle (Your companies / All companies) ---- */
 .jml-viewtoggle { display: flex; gap: var(--space-2); margin-bottom: var(--space-5); flex-wrap: wrap; }
+
 .jml-viewbtn {
     font-family: inherit; font-size: 18px; font-weight: 600;
     min-height: 52px; padding: 0 var(--space-6);
@@ -29,7 +38,7 @@
     cursor: pointer; display: inline-flex; align-items: center; gap: var(--space-2);
 }
 .jml-viewbtn:hover { border-color: var(--art-theme); color: var(--art-theme); }
-.jml-viewbtn.is-active { background: var(--art-theme); border-color: var(--art-theme); color: #fff; }
+.jml-viewbtn.is-active { background: var(--art-theme); border-color: var(--art-theme); color: var(--color-on-brand); }
 .jml-view-n { font-size: 15px; font-weight: 600; opacity: .9; }
 
 /* ---- Mailchimp: collapsed staff strip at the bottom ---- */
@@ -37,6 +46,7 @@
     max-width: 880px; margin: var(--space-6) auto 0;
     border: 1px solid var(--gray-200); border-radius: var(--radius-lg); background: var(--surface-card);
 }
+
 .jml-mc-summary {
     list-style: none; cursor: pointer; padding: var(--space-4) var(--space-5);
     font-size: 16px; font-weight: 600; color: var(--gray-600);
@@ -52,14 +62,14 @@
 .jml-mc-scope:empty { display: none; }
 .jml-mc-engaged-btn { border-color: var(--art-theme); color: var(--art-theme); }
 .jml-mc-engaged-btn i { color: var(--state-warning); }
-.jml-mc-engaged-btn:hover { background: var(--art-theme-light, #eaf7ea); }
+.jml-mc-engaged-btn:hover { background: var(--art-theme-light, var(--brand-100)); }
 
 /* ---- intro line ---- */
 .jml-intro {
     font-size: 20px;
     line-height: 1.55;
     color: var(--gray-700);
-    background: var(--art-theme-light, #eaf7ea);
+    background: var(--art-theme-light, var(--brand-100));
     border: 1px solid color-mix(in srgb, var(--art-theme) 25%, transparent);
     border-radius: var(--radius-lg);
     padding: var(--space-5) var(--space-6);
@@ -109,6 +119,7 @@
 
 /* ---- AI capture card ---- */
 .jml-ai-card { border: 2px solid color-mix(in srgb, var(--art-theme) 45%, transparent); }
+
 .jml-ai-title {
     font-size: 24px;
     font-weight: 700;
@@ -140,6 +151,7 @@
 .jml-ai-card textarea:focus { outline: none; border-color: var(--art-theme); box-shadow: var(--shadow-glow-theme); }
 
 .jml-ai-image-row { display: flex; align-items: center; gap: var(--space-4); flex-wrap: wrap; margin-top: var(--space-4); }
+
 .jml-ai-imgbtn {
     display: inline-flex;
     align-items: center;
@@ -156,16 +168,19 @@
 }
 .jml-ai-imgbtn:hover { background: var(--surface-inset); border-color: var(--art-theme); color: var(--art-theme); }
 .jml-ai-orpaste { font-size: 15px; color: var(--gray-500); }
+
 .jml-ai-orpaste kbd {
     font-family: inherit; font-size: 13px; background: var(--surface-inset);
     border: 1px solid var(--gray-300); border-radius: var(--radius-sm); padding: 1px 6px;
 }
 
 .jml-ai-thumb-wrap { display: flex; align-items: flex-start; gap: var(--space-3); margin-top: var(--space-4); }
+
 .jml-ai-thumb {
     max-width: 220px; max-height: 160px; border-radius: var(--radius-md);
     border: 1px solid var(--gray-300); box-shadow: var(--shadow-sm);
 }
+
 .jml-ai-thumb-clear {
     font-family: inherit; font-size: 15px; font-weight: 600;
     min-height: 40px; padding: 0 var(--space-4); cursor: pointer;
@@ -178,10 +193,10 @@
 .jml-btn-ai {
     margin-top: var(--space-5);
     background: var(--art-theme);
-    color: #fff;
+    color: var(--color-on-brand);
     width: 100%;
 }
-.jml-btn-ai:hover { background: var(--art-theme-hover, #007a00); }
+.jml-btn-ai:hover { background: var(--art-theme-hover, var(--jim-mailing-list-green-dark)); }
 .jml-btn-ai:disabled { opacity: .6; cursor: default; }
 
 .jml-ai-status {
@@ -197,6 +212,7 @@
 
 /* ---- form fields ---- */
 .jml-field { margin-bottom: var(--space-5); display: flex; flex-direction: column; }
+
 .jml-field label {
     font-size: 18px;
     font-weight: 600;
@@ -259,11 +275,11 @@
 
 .jml-btn-save {
     background: var(--art-theme);
-    color: #fff;
+    color: var(--color-on-brand);
     flex: 1 1 auto;
     min-width: 220px;
 }
-.jml-btn-save:hover { background: var(--art-theme-hover, #007a00); }
+.jml-btn-save:hover { background: var(--art-theme-hover, var(--jim-mailing-list-green-dark)); }
 
 .jml-btn-cancel {
     background: var(--surface-card);
@@ -285,10 +301,12 @@
 .jml-count { font-size: 18px; font-weight: 500; color: var(--gray-500); }
 
 .jml-search-wrap { position: relative; flex: 0 0 300px; max-width: 100%; }
+
 .jml-search-wrap i {
     position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
     color: var(--gray-400); font-size: 17px; pointer-events: none;
 }
+
 .jml-search-wrap input {
     font-family: inherit;
     font-size: 18px;
@@ -305,6 +323,7 @@
 /* ---- filter bar (segment chips + sort) ---- */
 .jml-filterbar { display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); flex-wrap: wrap; margin-bottom: var(--space-5); }
 .jml-chips { display: flex; flex-wrap: wrap; gap: var(--space-2); flex: 1 1 auto; }
+
 .jml-chip {
     font-family: inherit; font-size: 15px; font-weight: 600;
     min-height: 40px; padding: 0 var(--space-4);
@@ -313,11 +332,12 @@
     cursor: pointer; display: inline-flex; align-items: center; gap: var(--space-2);
 }
 .jml-chip:hover { border-color: var(--art-theme); color: var(--art-theme); }
-.jml-chip.is-active { background: var(--art-theme); border-color: var(--art-theme); color: #fff; }
-.jml-chip-n { font-size: 13px; font-weight: 600; background: color-mix(in srgb, currentColor 16%, transparent); border-radius: var(--radius-pill); padding: 1px 8px; }
-.jml-chip.is-active .jml-chip-n { background: rgba(255,255,255,.28); }
+.jml-chip.is-active { background: var(--art-theme); border-color: var(--art-theme); color: var(--color-on-brand); }
+.jml-chip-n { font-size: 13px; font-weight: 600; background: color-mix(in srgb, currentcolor 16%, transparent); border-radius: var(--radius-pill); padding: 1px 8px; }
+.jml-chip.is-active .jml-chip-n { background: rgb(255 255 255 / 28%); }
 
 .jml-sort { font-size: 16px; color: var(--gray-600); display: inline-flex; align-items: center; gap: var(--space-2); flex: 0 0 auto; }
+
 .jml-sort select {
     font-family: inherit; font-size: 16px; min-height: 44px; padding: 0 var(--space-3);
     border: 2px solid var(--gray-300); border-radius: var(--radius-md);
@@ -333,6 +353,7 @@
     background: var(--surface-inset); color: var(--gray-700); cursor: pointer;
 }
 .jml-showmore:hover { border-color: var(--art-theme); color: var(--art-theme); }
+
 .jml-linkbtn {
     font-family: inherit; font-size: inherit; font-weight: 600;
     background: none; border: none; color: var(--art-theme); cursor: pointer; text-decoration: underline; padding: 0;
@@ -340,6 +361,7 @@
 
 /* ---- list actions (export / print labels) ---- */
 .jml-list-actions { display: flex; align-items: center; gap: var(--space-3); flex-wrap: wrap; margin-bottom: var(--space-4); }
+
 .jml-tool-btn {
     font-family: inherit; font-size: 16px; font-weight: 600;
     min-height: 46px; padding: 0 var(--space-5);
@@ -353,6 +375,7 @@
 /* ---- per-card outreach status ---- */
 .jml-entry-status { margin-top: var(--space-3); display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap; }
 .jml-status-label { font-size: 15px; color: var(--gray-500); font-weight: 600; }
+
 .jml-status {
     font-family: inherit; font-size: 15px; font-weight: 600; min-height: 40px;
     padding: 0 var(--space-3); border: 2px solid var(--gray-300); border-radius: var(--radius-md);
@@ -401,6 +424,7 @@
 .jml-entry-line a:hover { text-decoration: underline; }
 .jml-entry-notes { margin-top: var(--space-2); font-size: 16px; color: var(--gray-600); font-style: italic; }
 .jml-entry-source { display: inline-block; margin-top: var(--space-2); font-size: 15px; color: var(--gray-500); }
+
 .jml-entry-cat {
     display: inline-block;
     margin-top: var(--space-2);
@@ -408,7 +432,7 @@
     font-size: 14px;
     font-weight: 600;
     color: var(--art-theme);
-    background: var(--art-theme-light, #eaf7ea);
+    background: var(--art-theme-light, var(--brand-100));
     border: 1px solid color-mix(in srgb, var(--art-theme) 30%, transparent);
     border-radius: var(--radius-pill);
     padding: 3px 12px;
@@ -416,6 +440,7 @@
 .jml-entry-cat i { margin-right: 4px; }
 
 .jml-entry-actions { display: flex; gap: var(--space-3); flex: 0 0 auto; }
+
 .jml-mini-btn {
     font-family: inherit;
     font-size: 17px;
@@ -450,7 +475,7 @@
 .jml-form-card.is-editing { border-color: var(--art-theme); box-shadow: var(--shadow-glow-theme), var(--shadow-md); }
 
 /* ---- phones ---- */
-@media (max-width: 640px) {
+@media (width <= 640px) {
     .jml-card, .jml-list-section { padding: var(--space-5); }
     .jml-row { flex-direction: column; gap: 0; }
     .jml-state, .jml-zip { flex: 1 1 auto; }
@@ -462,6 +487,7 @@
 
 /* 2026-09-05 review — the flex wrappers (.jml-welcome, .jml-ai-thumb-wrap, .jml-filterbar, .jml-list-actions)
    BEAT the UA [hidden] rule, so the empty screenshot placeholder + Remove button showed on every load. */
+/* stylelint-disable-next-line declaration-no-important -- the hidden attribute must beat any display rule */
 [hidden] { display: none !important; }
 .jml-visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 .jml-viewbtn:focus-visible, .jml-chip:focus-visible, .jml-btn:focus-visible, .jml-tool-btn:focus-visible, .jml-linkbtn:focus-visible, .jml-ai-imgbtn:focus-visible { outline: 2px solid var(--art-theme); outline-offset: 2px; }

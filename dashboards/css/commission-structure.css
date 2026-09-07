@@ -3,22 +3,36 @@
    Matches NWCA Staff Dashboard Theme (WSU Crimson)
    ===================================================== */
 
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue so the page
+   keeps its exact look. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   every rule below uses var(). Raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
+:root {
+    --commission-structure-teal: #10b981;
+    --commission-structure-yellow: #856404;
+    --commission-structure-blue: #1e4a8b;
+    --commission-structure-green-tint: #d1fae5;
+    --commission-structure-teal-dark: #065f46;
+    --commission-structure-yellow-dark: #5c4503;
+}
+/* stylelint-enable color-no-hex */
+
 /* =====================================================
    PAGE LAYOUT
    ===================================================== */
 .commission-page {
     min-height: 100vh;
-    background: #f7f8f9;
+    background: var(--gray-50);
 }
 
 /* Header */
 .commission-header {
-    background: #981e32;
+    background: var(--color-ae);
     padding: 1.5rem 2rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 2px 8px rgb(0 0 0 / 15%);
 }
 
 .header-left {
@@ -40,7 +54,7 @@
 }
 
 .header-subtitle {
-    color: rgba(255, 255, 255, 0.75);
+    color: rgb(255 255 255 / 75%);
     font-size: 0.875rem;
     font-weight: 400;
     margin-left: 1rem;
@@ -51,19 +65,19 @@
     align-items: center;
     gap: 0.5rem;
     padding: 0.625rem 1.25rem;
-    background: rgba(255, 255, 255, 0.1);
+    background: rgb(255 255 255 / 10%);
     color: white;
     text-decoration: none;
     border-radius: 6px;
     font-weight: 500;
     font-size: 0.875rem;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid rgb(255 255 255 / 20%);
     transition: all 0.2s;
 }
 
 .back-btn:hover {
-    background: rgba(255, 255, 255, 0.2);
-    border-color: rgba(255, 255, 255, 0.4);
+    background: rgb(255 255 255 / 20%);
+    border-color: rgb(255 255 255 / 40%);
 }
 
 /* Main Content Container */
@@ -84,14 +98,14 @@
 }
 
 .section-header i {
-    color: #981e32;
+    color: var(--color-ae);
     font-size: 1.25rem;
 }
 
 .section-title {
     font-size: 1.25rem;
     font-weight: 600;
-    color: #2a3033;
+    color: var(--gray-800);
     margin: 0;
 }
 
@@ -106,18 +120,18 @@
 }
 
 .rate-card {
-    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    background: linear-gradient(135deg, var(--color-surface) 0%, var(--gray-50) 100%);
     border-radius: 12px;
     padding: 2rem;
     text-align: center;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    border: 1px solid #e1e5e8;
+    box-shadow: 0 2px 8px rgb(0 0 0 / 8%);
+    border: 1px solid var(--gray-200);
     transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .rate-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 4px 16px rgb(0 0 0 / 12%);
 }
 
 .rate-card-header {
@@ -129,36 +143,36 @@
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.1em;
-    color: #53565a;
+    color: var(--print-ink-soft);
     margin-bottom: 0.5rem;
 }
 
 .rate-card-type {
     font-size: 1rem;
     font-weight: 500;
-    color: #8d959c;
+    color: var(--print-line);
 }
 
 .rate-value {
     font-size: 4rem;
     font-weight: 700;
-    color: #981e32;
+    color: var(--color-ae);
     line-height: 1;
     margin-bottom: 0.5rem;
 }
 
 .rate-period {
     font-size: 0.875rem;
-    color: #53565a;
+    color: var(--print-ink-soft);
     margin-bottom: 1.5rem;
 }
 
 .rate-bonus {
-    background: #fff3cd;
+    background: var(--amber-100);
     padding: 0.75rem 1rem;
     border-radius: 6px;
     font-size: 0.875rem;
-    color: #856404;
+    color: var(--commission-structure-yellow);
     margin-top: 1rem;
 }
 
@@ -167,11 +181,11 @@
 }
 
 .rate-requirement {
-    background: #e8f4fd;
+    background: var(--color-floor-tint);
     padding: 0.75rem 1rem;
     border-radius: 6px;
     font-size: 0.875rem;
-    color: #1e4a8b;
+    color: var(--commission-structure-blue);
     margin-top: 1rem;
 }
 
@@ -191,10 +205,10 @@
 
 .rep-card {
     background: white;
-    border-left: 4px solid #981e32;
+    border-left: 4px solid var(--color-ae);
     border-radius: 8px;
     padding: 1.5rem;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 2px 8px rgb(0 0 0 / 8%);
 }
 
 .rep-header {
@@ -203,23 +217,23 @@
     align-items: flex-start;
     margin-bottom: 1.25rem;
     padding-bottom: 1rem;
-    border-bottom: 1px solid #e1e5e8;
+    border-bottom: 1px solid var(--gray-200);
 }
 
 .rep-name {
     font-size: 1.5rem;
     font-weight: 700;
-    color: #2a3033;
-    margin: 0 0 0.25rem 0;
+    color: var(--gray-800);
+    margin: 0 0 0.25rem;
 }
 
 .rep-account-count {
     font-size: 0.875rem;
-    color: #53565a;
+    color: var(--print-ink-soft);
 }
 
 .rep-badge {
-    background: #981e32;
+    background: var(--color-ae);
     color: white;
     padding: 0.25rem 0.75rem;
     border-radius: 20px;
@@ -228,7 +242,7 @@
 }
 
 .rep-baseline {
-    background: #fff3cd;
+    background: var(--amber-100);
     padding: 1rem;
     border-radius: 8px;
     margin-bottom: 1.25rem;
@@ -247,14 +261,14 @@
 
 .baseline-label {
     font-size: 0.875rem;
-    color: #856404;
+    color: var(--commission-structure-yellow);
     font-weight: 500;
 }
 
 .baseline-value {
     font-size: 1.125rem;
     font-weight: 700;
-    color: #5c4503;
+    color: var(--commission-structure-yellow-dark);
 }
 
 .rep-accounts-section {
@@ -264,7 +278,7 @@
 .accounts-header {
     font-size: 0.875rem;
     font-weight: 600;
-    color: #53565a;
+    color: var(--print-ink-soft);
     margin-bottom: 0.75rem;
     display: flex;
     align-items: center;
@@ -272,7 +286,7 @@
 }
 
 .accounts-header i {
-    color: #981e32;
+    color: var(--color-ae);
 }
 
 .account-list {
@@ -286,7 +300,7 @@
     justify-content: space-between;
     align-items: center;
     padding: 0.5rem 0;
-    border-bottom: 1px solid #f0f1f3;
+    border-bottom: 1px solid var(--gray-100);
     font-size: 0.875rem;
 }
 
@@ -295,12 +309,12 @@
 }
 
 .account-name {
-    color: #2a3033;
+    color: var(--gray-800);
 }
 
 .account-revenue {
     font-weight: 600;
-    color: #10b981;
+    color: var(--commission-structure-teal);
 }
 
 /* =====================================================
@@ -309,21 +323,21 @@
 .how-it-works {
     background: white;
     border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 2px 8px rgb(0 0 0 / 8%);
     margin-bottom: 3rem;
     overflow: hidden;
 }
 
 .how-it-works-header {
-    background: #f8f9fa;
+    background: var(--gray-50);
     padding: 1.25rem 1.5rem;
-    border-bottom: 1px solid #e1e5e8;
+    border-bottom: 1px solid var(--gray-200);
 }
 
 .how-it-works-header h2 {
     font-size: 1.125rem;
     font-weight: 600;
-    color: #2a3033;
+    color: var(--gray-800);
     margin: 0;
     display: flex;
     align-items: center;
@@ -331,7 +345,7 @@
 }
 
 .how-it-works-header i {
-    color: #981e32;
+    color: var(--color-ae);
 }
 
 .accordion {
@@ -340,7 +354,7 @@
 
 .accordion-item {
     border: none;
-    border-bottom: 1px solid #e1e5e8;
+    border-bottom: 1px solid var(--gray-200);
 }
 
 .accordion-item:last-child {
@@ -358,13 +372,13 @@
 }
 
 .accordion-header:hover {
-    background: #f8f9fa;
+    background: var(--gray-50);
 }
 
 .accordion-title {
     font-size: 1rem;
     font-weight: 600;
-    color: #2a3033;
+    color: var(--gray-800);
     margin: 0;
     display: flex;
     align-items: center;
@@ -372,7 +386,7 @@
 }
 
 .accordion-title .number {
-    background: #981e32;
+    background: var(--color-ae);
     color: white;
     width: 24px;
     height: 24px;
@@ -385,7 +399,7 @@
 }
 
 .accordion-chevron {
-    color: #8d959c;
+    color: var(--print-line);
     transition: transform 0.2s;
 }
 
@@ -403,7 +417,7 @@
 }
 
 .accordion-content p {
-    color: #53565a;
+    color: var(--print-ink-soft);
     font-size: 0.9375rem;
     line-height: 1.7;
     margin-bottom: 0.75rem;
@@ -423,7 +437,7 @@
     padding: 0.5rem 0;
     padding-left: 1.5rem;
     position: relative;
-    color: #53565a;
+    color: var(--print-ink-soft);
     font-size: 0.9375rem;
 }
 
@@ -434,21 +448,21 @@
     top: 0.9rem;
     width: 6px;
     height: 6px;
-    background: #981e32;
+    background: var(--color-ae);
     border-radius: 50%;
 }
 
 .highlight-box {
-    background: #e8f4fd;
+    background: var(--color-floor-tint);
     padding: 1rem;
     border-radius: 6px;
-    border-left: 3px solid #3b82f6;
+    border-left: 3px solid var(--color-floor-light);
     margin-top: 1rem;
 }
 
 .highlight-box p {
     margin: 0;
-    color: #1e4a8b;
+    color: var(--commission-structure-blue);
     font-weight: 500;
 }
 
@@ -463,18 +477,18 @@
 }
 
 .info-table th {
-    background: #f3f4f6;
+    background: var(--gray-100);
     padding: 0.625rem 0.75rem;
     text-align: left;
     font-weight: 600;
-    color: #374151;
-    border-bottom: 2px solid #e5e7eb;
+    color: var(--gray-700);
+    border-bottom: 2px solid var(--gray-200);
 }
 
 .info-table td {
     padding: 0.625rem 0.75rem;
-    border-bottom: 1px solid #e5e7eb;
-    color: #4b5563;
+    border-bottom: 1px solid var(--gray-200);
+    color: var(--gray-600);
 }
 
 .info-table tr:last-child td {
@@ -482,14 +496,14 @@
 }
 
 .info-table tr:hover {
-    background: #f9fafb;
+    background: var(--gray-50);
 }
 
 /* =====================================================
    TIMELINE BOX
    ===================================================== */
 .timeline-box {
-    background: #f8f9fa;
+    background: var(--gray-50);
     border-radius: 8px;
     padding: 1rem;
     margin-top: 0.5rem;
@@ -499,7 +513,7 @@
     display: flex;
     gap: 1rem;
     padding: 0.75rem 0;
-    border-bottom: 1px dashed #d1d5db;
+    border-bottom: 1px dashed var(--gray-300);
 }
 
 .timeline-item:last-child {
@@ -513,13 +527,13 @@
 
 .timeline-label {
     font-weight: 600;
-    color: #981e32;
+    color: var(--color-ae);
     min-width: 100px;
     flex-shrink: 0;
 }
 
 .timeline-text {
-    color: #4b5563;
+    color: var(--gray-600);
     line-height: 1.5;
 }
 
@@ -527,14 +541,14 @@
    EXAMPLE BOXES
    ===================================================== */
 .example-box {
-    background: #f8f9fa;
+    background: var(--gray-50);
     border-radius: 8px;
     overflow: hidden;
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--gray-200);
 }
 
 .example-header {
-    background: #981e32;
+    background: var(--color-ae);
     color: white;
     padding: 0.625rem 1rem;
     font-weight: 600;
@@ -550,7 +564,7 @@
     justify-content: space-between;
     padding: 0.375rem 0;
     font-size: 0.875rem;
-    border-bottom: 1px solid #e5e7eb;
+    border-bottom: 1px solid var(--gray-200);
 }
 
 .example-row:last-of-type {
@@ -558,38 +572,38 @@
 }
 
 .example-row span:first-child {
-    color: #6b7280;
+    color: var(--gray-500);
 }
 
 .example-row span:last-child {
-    color: #1f2937;
+    color: var(--gray-800);
     font-weight: 500;
 }
 
 .example-row.total {
     margin-top: 0.5rem;
     padding-top: 0.75rem;
-    border-top: 2px solid #d1d5db;
+    border-top: 2px solid var(--gray-300);
     border-bottom: none;
 }
 
 .example-row.total span:first-child {
     font-weight: 600;
-    color: #1f2937;
+    color: var(--gray-800);
 }
 
 .example-row.total span:last-child {
     font-weight: 700;
-    color: #10b981;
+    color: var(--commission-structure-teal);
     font-size: 1rem;
 }
 
 .example-note {
     margin-top: 0.75rem;
     padding-top: 0.75rem;
-    border-top: 1px dashed #d1d5db;
+    border-top: 1px dashed var(--gray-300);
     font-size: 0.8125rem;
-    color: #6b7280;
+    color: var(--gray-500);
     font-style: italic;
 }
 
@@ -607,7 +621,7 @@
     background: white;
     border-radius: 8px;
     padding: 1.5rem;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 2px 8px rgb(0 0 0 / 8%);
 }
 
 .scenario-header {
@@ -616,55 +630,55 @@
     gap: 0.75rem;
     margin-bottom: 1rem;
     padding-bottom: 0.75rem;
-    border-bottom: 1px solid #e1e5e8;
+    border-bottom: 1px solid var(--gray-200);
 }
 
 .scenario-icon {
     width: 40px;
     height: 40px;
-    background: #e8f4fd;
+    background: var(--color-floor-tint);
     border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #3b82f6;
+    color: var(--color-floor-light);
 }
 
 .scenario-title {
     font-size: 1rem;
     font-weight: 600;
-    color: #2a3033;
+    color: var(--gray-800);
     margin: 0;
 }
 
 .scenario-content {
-    color: #53565a;
+    color: var(--print-ink-soft);
     font-size: 0.875rem;
     line-height: 1.6;
 }
 
 .scenario-calculation {
-    background: #f8f9fa;
+    background: var(--gray-50);
     padding: 0.75rem 1rem;
     border-radius: 6px;
     margin-top: 1rem;
     font-family: monospace;
     font-size: 0.875rem;
-    color: #2a3033;
+    color: var(--gray-800);
 }
 
 .scenario-result {
     margin-top: 1rem;
     padding: 0.75rem 1rem;
-    background: #d1fae5;
+    background: var(--commission-structure-green-tint);
     border-radius: 6px;
-    color: #065f46;
+    color: var(--commission-structure-teal-dark);
     font-weight: 600;
 }
 
 .scenario-result.no-pay {
-    background: #fee2e2;
-    color: #991b1b;
+    background: var(--red-100);
+    color: var(--red-800);
 }
 
 /* =====================================================
@@ -673,7 +687,7 @@
 .footer-note {
     text-align: center;
     padding: 2rem;
-    color: #8d959c;
+    color: var(--print-line);
     font-size: 0.875rem;
 }
 
@@ -684,7 +698,7 @@
 /* =====================================================
    RESPONSIVE DESIGN
    ===================================================== */
-@media (max-width: 1024px) {
+@media (width <= 1024px) {
     .rate-cards-grid {
         grid-template-columns: repeat(2, 1fr);
     }
@@ -698,7 +712,7 @@
     }
 }
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
     .commission-header {
         flex-direction: column;
         gap: 1rem;
@@ -748,13 +762,13 @@
 @media print {
     .commission-header {
         background: white;
-        color: #2a3033;
+        color: var(--gray-800);
         box-shadow: none;
-        border-bottom: 2px solid #981e32;
+        border-bottom: 2px solid var(--color-ae);
     }
 
     .header-title {
-        color: #2a3033;
+        color: var(--gray-800);
     }
 
     .back-btn {
@@ -766,7 +780,7 @@
     .how-it-works,
     .scenario-card {
         box-shadow: none;
-        border: 1px solid #e1e5e8;
+        border: 1px solid var(--gray-200);
         break-inside: avoid;
     }
 
@@ -776,8 +790,9 @@
 }
 
 /* 2026-09-05 review — inline style= moved here (Rule 3) */
+/* stylelint-disable-next-line declaration-no-important -- the hidden attribute must beat any display rule */
 [hidden] { display: none !important; }
-.cs-lead { margin: 0 0 18px; color: var(--text-muted, #64748b); line-height: 1.6; }
+.cs-lead { margin: 0 0 18px; color: var(--text-muted, var(--slate-500)); line-height: 1.6; }
 .cs-lead--tight { margin-bottom: 14px; }
 .cs-h3 { margin: 26px 0 10px; font-size: 1.05rem; }
 .table-wrapper { overflow-x: auto; }
@@ -787,10 +802,10 @@
 .cs-mt-16 { margin-top: 16px; }
 .cs-mt { margin-top: 1.25rem; }
 .cs-mt-lg { margin-top: 1.5rem; }
-.cs-legacy { color: #981e32; }
-.cs-new { color: #10b981; }
-.scenario-icon--danger { background: #fee2e2; color: #991b1b; }
-.scenario-icon--ok { background: #d1fae5; color: #065f46; }
-.scenario-icon--warn { background: #fef3c7; color: #92400e; }
+.cs-legacy { color: var(--color-ae); }
+.cs-new { color: var(--commission-structure-teal); }
+.scenario-icon--danger { background: var(--red-100); color: var(--red-800); }
+.scenario-icon--ok { background: var(--commission-structure-green-tint); color: var(--commission-structure-teal-dark); }
+.scenario-icon--warn { background: var(--amber-100); color: var(--amber-800); }
 button.accordion-header { width: 100%; font: inherit; color: inherit; text-align: left; }
-.accordion-header:focus-visible { outline: 2px solid var(--art-theme, #981e32); outline-offset: 2px; }
+.accordion-header:focus-visible { outline: 2px solid var(--art-theme, var(--color-ae)); outline-offset: 2px; }

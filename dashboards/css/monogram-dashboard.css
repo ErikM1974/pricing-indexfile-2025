@@ -7,47 +7,58 @@
 /* ============================================
    CSS Variables - NWCA Green Theme
    ============================================ */
+
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue, merged into its
+   existing :root. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
 :root {
+    --monogram-dashboard-blue: #1e40af;
+    --monogram-dashboard-green-tint: #d1fae5;
+    --monogram-dashboard-teal-dark: #065f46;
+    --monogram-dashboard-gray-dark: #333;
+
     /* Primary colours — shop-floor BLUE (2026-09-04, Erik: personalization = the
        same blue as Names & Numbers + the staff-dashboard f-floor tiles; was NWCA green) */
-    --mono-theme: #2563eb;
-    --mono-theme-dark: #1d4ed8;
-    --mono-theme-light: #3b82f6;
-    --mono-theme-hover: #1e40af;
+    --mono-theme: var(--blue-600);
+    --mono-theme-dark: var(--color-floor-dark);
+    --mono-theme-light: var(--color-floor-light);
+    --mono-theme-hover: var(--monogram-dashboard-blue);
 
     /* Neutral Colors */
-    --bg-light: #f5f7fa;
-    --bg-white: #ffffff;
-    --bg-gray: #f9fafb;
-    --border-light: #e5e7eb;
-    --border-medium: #d1d5db;
-    --border-dark: #e0e0e0;
+    --bg-light: var(--color-bradley-tint);
+    --bg-white: var(--color-surface);
+    --bg-gray: var(--gray-50);
+    --border-light: var(--gray-200);
+    --border-medium: var(--gray-300);
+    --border-dark: var(--gray-200);
 
     /* Text Colors */
-    --text-primary: #111827;
-    --text-secondary: #374151;
-    --text-muted: #6b7280;
-    --text-light: #4b5563;
+    --text-primary: var(--gray-900);
+    --text-secondary: var(--gray-700);
+    --text-muted: var(--gray-500);
+    --text-light: var(--gray-600);
 
     /* Status Colors */
-    --success: #059669;
-    --success-bg: #d1fae5;
-    --success-text: #065f46;
-    --info: #2563eb;
-    --info-bg: #dbeafe;
-    --info-text: #1e40af;
-    --warning-bg: #fef3c7;
-    --warning-text: #92400e;
-    --danger: #dc2626;
+    --success: var(--emerald-600);
+    --success-bg: var(--monogram-dashboard-green-tint);
+    --success-text: var(--monogram-dashboard-teal-dark);
+    --info: var(--blue-600);
+    --info-bg: var(--sky-100);
+    --info-text: var(--monogram-dashboard-blue);
+    --warning-bg: var(--amber-100);
+    --warning-text: var(--amber-800);
+    --danger: var(--red-600);
 
     /* Shadows */
-    --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
-    --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+    --shadow-sm: 0 1px 3px rgb(0 0 0 / 10%);
+    --shadow-md: 0 4px 12px rgb(0 0 0 / 8%);
 
     /* Transitions */
     --transition-fast: 0.2s ease;
     --transition-medium: 0.3s ease;
 }
+/* stylelint-enable color-no-hex */
 
 /* ============================================
    Reset & Base
@@ -133,7 +144,7 @@ body {
 }
 
 .main-nav-links a {
-    color: #333;
+    color: var(--monogram-dashboard-gray-dark);
     text-decoration: none;
     font-size: 16px;
     transition: color var(--transition-fast);
@@ -212,7 +223,7 @@ body {
 }
 
 .quick-btn-primary:hover {
-    background: #f3f4f6;
+    background: var(--gray-100);
 }
 
 /* ============================================
@@ -284,7 +295,7 @@ body {
 .filter-select:focus {
     outline: none;
     border-color: var(--mono-theme);
-    box-shadow: 0 0 0 3px rgba(45, 95, 63, 0.1);
+    box-shadow: 0 0 0 3px rgb(45 95 63 / 10%);
 }
 
 /* ============================================
@@ -347,7 +358,7 @@ body {
 
 #monogramsTable td {
     padding: 0.875rem;
-    border-bottom: 1px solid #f3f4f6;
+    border-bottom: 1px solid var(--gray-100);
     font-size: 0.875rem;
 }
 
@@ -414,7 +425,7 @@ body {
 }
 
 .action-btn:hover {
-    background: #f3f4f6;
+    background: var(--gray-100);
     color: var(--text-primary);
 }
 
@@ -431,7 +442,7 @@ body {
 }
 
 .action-btn.proof:hover {
-    color: var(--mono-theme-dark, #1d4ed8);
+    color: var(--mono-theme-dark, var(--color-floor-dark));
 }
 
 .action-btn.delete:hover {
@@ -512,13 +523,13 @@ body {
 /* ============================================
    Responsive Design
    ============================================ */
-@media (max-width: 1024px) {
+@media (width <= 1024px) {
     .filters-grid {
         grid-template-columns: 1fr 1fr;
     }
 }
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
     body {
         padding-top: 180px;
     }
@@ -533,9 +544,10 @@ body {
 }
 
 /* 2026-09-05 review */
+/* stylelint-disable-next-line declaration-no-important -- the hidden attribute must beat any display rule */
 [hidden] { display: none !important; }
 .breadcrumb-sep { opacity: 0.5; }
 .td-center { text-align: center; }
 .retry-btn { margin-top: 1rem; }
 .action-btn:disabled { opacity: 0.5; cursor: default; }
-.action-btn:focus-visible, .btn:focus-visible, .order-link:focus-visible { outline: 2px solid var(--primary-color, #4cb354); outline-offset: 2px; }
+.action-btn:focus-visible, .btn:focus-visible, .order-link:focus-visible { outline: 2px solid var(--primary-color, var(--brand-500)); outline-offset: 2px; }

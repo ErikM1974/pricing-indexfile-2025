@@ -1,3 +1,5 @@
+/* stylelint-disable no-duplicate-selectors -- legacy sheet: rules were appended over time; merging them would reorder the cascade (2026-09-07) */
+
 /* ============================================================
    Box-label print styles — #sit-label-sheet / .sit-label / .sl-*
    ------------------------------------------------------------
@@ -14,78 +16,96 @@
    saved harness screenshots stay byte-comparable across the move.
    ============================================================ */
 
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue so the page
+   keeps its exact look. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   every rule below uses var(). Raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
+:root {
+    --box-label-print-gray: #666;
+    --box-label-print-gray-dark: #333;
+    --box-label-print-gray-dark-2: #000;
+    --box-label-print-yellow: #d9a406;
+    --box-label-print-gray-2: #888;
+}
+/* stylelint-enable color-no-hex */
+
 /* Every rule below was written under a global `* { box-sizing: border-box }`;
    pages without such a reset (e.g. pages/box-labels.html) still need it here. */
 #sit-label-sheet, #sit-label-sheet * { box-sizing: border-box; }
 
 /* ── Per-box label (8.5×11 portrait, one page per box; sit-label-printing mode) ── */
 #sit-label-sheet { display: none; }
+
 @media print {
+    /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
     body.sit-label-printing > *:not(#sit-label-sheet) { display: none !important; }
+    /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
     body.sit-label-printing #sit-label-sheet { display: block !important; }
+
     @page { size: letter portrait; margin: 0.5in; }
 }
-#sit-label-sheet { color: #111; font-family: system-ui, "Segoe UI", Arial, sans-serif; }
-.sit-label { page-break-after: always; }
-.sit-label:last-child { page-break-after: auto; }
+#sit-label-sheet { color: var(--print-ink); font-family: system-ui, "Segoe UI", Arial, sans-serif; }
+.sit-label { break-after: always; }
+.sit-label:last-child { break-after: auto; }
 .sl-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 8px; }
-.sl-company { font-size: 33pt; font-weight: 800; line-height: 1.02; border-bottom: 3px solid #111; padding-bottom: 8px; }
-.sl-followon { font-size: 12pt; font-weight: 800; color: #92400e; background: #fef3c7; border: 2px solid #d9a406; border-radius: 4px; padding: 4px 8px; margin-top: 8px; }
+.sl-company { font-size: 33pt; font-weight: 800; line-height: 1.02; border-bottom: 3px solid var(--print-ink); padding-bottom: 8px; }
+.sl-followon { font-size: 12pt; font-weight: 800; color: var(--amber-800); background: var(--amber-100); border: 2px solid var(--box-label-print-yellow); border-radius: 4px; padding: 4px 8px; margin-top: 8px; }
 .sl-woblock { text-align: right; flex: none; min-width: 205px; }
-.sl-wolabel { font-size: 10pt; font-weight: 700; letter-spacing: 0.08em; color: #444; }
+.sl-wolabel { font-size: 10pt; font-weight: 700; letter-spacing: 0.08em; color: var(--gray-700); }
 .sl-wo { font-size: 27pt; font-weight: 800; line-height: 1; }
-.sl-ddbox { border: 2px solid #b23b0e; border-radius: 6px; padding: 3px 8px; margin-top: 6px; text-align: left; height: 44px; box-sizing: border-box; }
-.sl-ddlabel { font-size: 9pt; font-weight: 700; letter-spacing: 0.04em; color: #b23b0e; }
+.sl-ddbox { border: 2px solid var(--store-rush-deep); border-radius: 6px; padding: 3px 8px; margin-top: 6px; text-align: left; height: 44px; box-sizing: border-box; }
+.sl-ddlabel { font-size: 9pt; font-weight: 700; letter-spacing: 0.04em; color: var(--store-rush-deep); }
 .sl-contact { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-top: 9px; }
-.sl-cname { font-size: 19pt; font-weight: 800; color: #111; }
+.sl-cname { font-size: 19pt; font-weight: 800; color: var(--print-ink); }
 .sl-cright { text-align: right; }
-.sl-rep { display: block; font-size: 13pt; font-weight: 700; color: #555; }
-.sl-ord { display: block; font-size: 10pt; color: #666; margin-top: 2px; }
-.sl-custpo { font-size: 11pt; color: #444; margin-top: 3px; }
-.sl-dn { display: block; font-size: 10.5pt; font-weight: 600; color: #333; margin-top: 1px; }
+.sl-rep { display: block; font-size: 13pt; font-weight: 700; color: var(--print-ink-soft); }
+.sl-ord { display: block; font-size: 10pt; color: var(--box-label-print-gray); margin-top: 2px; }
+.sl-custpo { font-size: 11pt; color: var(--gray-700); margin-top: 3px; }
+.sl-dn { display: block; font-size: 10.5pt; font-weight: 600; color: var(--box-label-print-gray-dark); margin-top: 1px; }
 .sl-meta--manual { align-items: stretch; }
 .sl-mb--ctr { display: flex; flex-direction: column; justify-content: center; }
-.sl-terms { display: block; font-size: 10.5pt; color: #555; margin-top: 6px; }
-.sl-logo { padding: 4px; display: flex; align-items: center; justify-content: center; border: 1.5px solid #ccc; border-radius: 6px; }
+.sl-terms { display: block; font-size: 10.5pt; color: var(--print-ink-soft); margin-top: 6px; }
+.sl-logo { padding: 4px; display: flex; align-items: center; justify-content: center; border: 1.5px solid var(--gray-300); border-radius: 6px; }
 .sl-logo-img { max-width: 100%; max-height: 96px; object-fit: contain; }
-.sl-logo-none { font-size: 9pt; color: #999; text-align: center; }
-.sl-printed { color: #aaa; flex: none; }
+.sl-logo-none { font-size: 9pt; color: var(--print-line); text-align: center; }
+.sl-printed { color: var(--gray-400); flex: none; }
 .sl-meta { display: flex; gap: 10px; margin: 14px 0; }
-.sl-mb { flex: 1; border: 2px solid #111; border-radius: 6px; padding: 8px 6px; text-align: center; }
-.sl-l { display: block; font-size: 9pt; font-weight: 700; letter-spacing: 0.05em; color: #444; }
+.sl-mb { flex: 1; border: 2px solid var(--print-ink); border-radius: 6px; padding: 8px 6px; text-align: center; }
+.sl-l { display: block; font-size: 9pt; font-weight: 700; letter-spacing: 0.05em; color: var(--gray-700); }
 .sl-v { display: block; font-size: 19pt; font-weight: 800; line-height: 1.1; margin-top: 2px; }
-.sl-design { font-size: 12pt; margin-bottom: 10px; color: #222; }
+.sl-design { font-size: 12pt; margin-bottom: 10px; color: var(--print-ink); }
 .sl-tbl { width: 100%; border-collapse: collapse; font-size: 13pt; }
-.sl-tbl th, .sl-tbl td { border: 1.5px solid #222; padding: 6px 8px; text-align: left; }
-.sl-tbl th { background: #eee; font-size: 11pt; }
+.sl-tbl th, .sl-tbl td { border: 1.5px solid var(--print-ink); padding: 6px 8px; text-align: left; }
+.sl-tbl th { background: var(--brand-100); font-size: 11pt; }
 .sl-tbl .sl-style { font-weight: 700; }
 .sl-tbl .sl-c { text-align: center; }
-.sl-foot { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-top: 16px; font-size: 10pt; color: #333; border-top: 1px solid #ccc; padding-top: 8px; }
-.sl-type { display: flex; align-items: baseline; gap: 12px; border-left: 11px solid #555; padding: 2px 0 8px 14px; margin-bottom: 10px; }
-.sl-type-l { font-size: 10pt; font-weight: 700; letter-spacing: 0.08em; color: #666; }
+.sl-foot { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-top: 16px; font-size: 10pt; color: var(--box-label-print-gray-dark); border-top: 1px solid var(--gray-300); padding-top: 8px; }
+.sl-type { display: flex; align-items: baseline; gap: 12px; border-left: 11px solid var(--print-ink-soft); padding: 2px 0 8px 14px; margin-bottom: 10px; }
+.sl-type-l { font-size: 10pt; font-weight: 700; letter-spacing: 0.08em; color: var(--box-label-print-gray); }
 .sl-type-name { font-size: 28pt; font-weight: 800; line-height: 1; }
 .sl-duedate { font-size: 14pt; font-weight: 800; margin-top: 4px; }
+
 /* Box label: the label IS the instruction on the floor, so rush gets a solid block that
    survives a mono laser and a glance from arm's length. */
 .sl-rush {
     margin-top: 5px; padding: 3px 8px; display: inline-block;
     font-size: 13pt; font-weight: 900; letter-spacing: .02em;
-    color: #fff; background: #b91c1c; border: 2px solid #7f1d1d; border-radius: 4px;
+    color: var(--color-on-brand); background: var(--red-700); border: 2px solid var(--print-red); border-radius: 4px;
 }
-.sl-fill { border: 2px dashed #333; display: flex; flex-direction: column; align-items: flex-start; text-align: left; min-height: 50px; }
-.sl-hint { font-weight: 400; color: #888; }
+.sl-fill { border: 2px dashed var(--box-label-print-gray-dark); display: flex; flex-direction: column; align-items: flex-start; text-align: left; min-height: 50px; }
+.sl-hint { font-weight: 400; color: var(--box-label-print-gray-2); }
 .sl-ship { display: flex; align-items: center; gap: 16px; margin-top: 6px; }
 .sl-ship b { font-size: 17pt; font-weight: 800; }
-.sl-other { font-size: 11pt; color: #666; }
-.sl-ddline { display: block; align-self: stretch; border-bottom: 1.5px solid #aaa; margin-top: 22px; }
+.sl-other { font-size: 11pt; color: var(--box-label-print-gray); }
+.sl-ddline { display: block; align-self: stretch; border-bottom: 1.5px solid var(--gray-400); margin-top: 22px; }
 .sl-mx { width: 100%; border-collapse: collapse; font-size: 12pt; }
-.sl-mx th, .sl-mx td { border: 1.5px solid #222; padding: 5px 7px; text-align: left; }
-.sl-mx thead th { background: #ededed; font-size: 10.5pt; }
+.sl-mx th, .sl-mx td { border: 1.5px solid var(--print-ink); padding: 5px 7px; text-align: left; }
+.sl-mx thead th { background: var(--brand-100); font-size: 10.5pt; }
 .sl-mx .sl-c { text-align: center; }
 .sl-mx .sl-style { font-weight: 700; }
-.sl-mx .sl-z { color: #cfcfcf; }
+.sl-mx .sl-z { color: var(--gray-300); }
 .sl-mx .sl-rt { font-weight: 700; }
-.sl-mx .sl-tot td { background: #f3f3f3; font-weight: 800; }
+.sl-mx .sl-tot td { background: var(--gray-100); font-weight: 800; }
 .sl-mx .sl-tot td:first-child { text-align: right; }
 .sl-mx--dense { font-size: 10pt; }
 .sl-mx--dense th, .sl-mx--dense td { padding: 2px 5px; }
@@ -94,18 +114,20 @@
    Sized to scan reliably off a laser print at arm's length. */
 .sl-qr { flex: none; text-align: center; }
 .sl-qr img { width: 84px; height: 84px; }
-.sl-qr span { display: block; font-size: 8pt; color: #666; margin-top: 1px; }
+.sl-qr span { display: block; font-size: 8pt; color: var(--box-label-print-gray); margin-top: 1px; }
 
 /* Rush must survive a black-and-white printout — colour alone is not a signal on these
    sheets (they print on the mono laser). Keep the fill dark and the text reversed. */
 @media print {
     .sl-rush {
-        background: #000 !important; color: #fff !important;
-        border-color: #000 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact;
+        /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
+        background: var(--box-label-print-gray-dark-2) !important; color: var(--color-on-brand) !important;
+        /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
+        border-color: var(--box-label-print-gray-dark-2) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact;
     }
 }
 
 /* 2026-09-05 review — method colour via a custom property (no inline style=) */
-.sl-type { border-left-color: var(--m, #555); }
-.sl-type-name { color: var(--m, #444); }
+.sl-type { border-left-color: var(--m, var(--print-ink-soft)); }
+.sl-type-name { color: var(--m, var(--gray-700)); }
 .sl-fill--wide { flex: 1.7; }

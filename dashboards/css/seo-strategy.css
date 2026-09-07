@@ -26,17 +26,20 @@
     font-size: 0.9rem;
     line-height: 1.5;
 }
+
 .seo-doc-banner-main {
     display: flex;
     gap: var(--space-3);
     align-items: flex-start;
     max-width: 46rem;
 }
+
 .seo-doc-banner-main > i {
     color: var(--state-info);
     font-size: 1.15rem;
     margin-top: 2px;
 }
+
 .seo-doc-banner-meta {
     color: var(--gray-500);
     font-size: 0.8rem;
@@ -45,6 +48,7 @@
 
 /* ---- Stats strip ----------------------------------------------------- */
 .seo-stats { margin-bottom: var(--space-1); }
+
 .seo-stats-note {
     color: var(--gray-400);
     font-size: 0.78rem;
@@ -58,7 +62,8 @@
     gap: var(--space-5);
     align-items: start;
 }
-@media (max-width: 900px) {
+
+@media (width <= 900px) {
     .seo-layout { grid-template-columns: 1fr; }
     .seo-toc { position: static; }
 }
@@ -72,6 +77,7 @@
     padding: var(--space-3);
     box-shadow: var(--shadow-sm);
 }
+
 .seo-toc-title {
     font-size: 0.72rem;
     font-weight: 700;
@@ -81,6 +87,7 @@
     margin-bottom: var(--space-2);
     padding-left: var(--space-2);
 }
+
 .seo-toc-link {
     display: block;
     padding: 6px var(--space-2);
@@ -92,6 +99,7 @@
     border-left: 2px solid transparent;
 }
 .seo-toc-link:hover { background: var(--surface-hover); color: var(--gray-900); }
+
 .seo-toc-link.is-active {
     color: var(--state-info);
     border-left-color: var(--state-info);
@@ -103,6 +111,7 @@
 .seo-sections { display: flex; flex-direction: column; gap: var(--space-5); min-width: 0; }
 .seo-section { scroll-margin-top: var(--space-5); }
 .seo-section-body { padding: var(--space-4); font-size: 0.92rem; line-height: 1.65; color: var(--gray-700); }
+
 .seo-section-body h3 {
     font-size: 0.95rem;
     color: var(--gray-900);
@@ -114,6 +123,7 @@
 .seo-section-body p { margin: var(--space-2) 0; }
 .seo-section-body ul, .seo-section-body ol { margin: var(--space-2) 0; padding-left: 1.4rem; }
 .seo-section-body li { margin: var(--space-1) 0; }
+
 .seo-section-body code {
     background: var(--surface-inset);
     border-radius: var(--radius-sm);
@@ -121,8 +131,10 @@
     font-family: 'JetBrains Mono', monospace;
     font-size: 0.8em;
     color: var(--gray-800);
+    /* stylelint-disable-next-line declaration-property-value-keyword-no-deprecated -- overflow-wrap: anywhere is not a byte-identical swap; legacy */
     word-break: break-word;
 }
+
 .seo-secnum {
     display: inline-grid;
     place-items: center;
@@ -145,12 +157,14 @@
     margin: var(--space-3) 0;
     font-size: 0.85rem;
 }
+
 .seo-table th, .seo-table td {
     text-align: left;
     padding: var(--space-2) var(--space-3);
     border-bottom: 1px solid var(--gray-200);
     vertical-align: top;
 }
+
 .seo-table thead th {
     background: var(--surface-inset);
     color: var(--gray-600);
@@ -159,6 +173,7 @@
     letter-spacing: 0.05em;
     font-weight: 700;
 }
+
 .seo-table--facts th {
     width: 9.5rem;
     background: var(--surface-inset);
@@ -217,6 +232,7 @@
     background: var(--surface-card);
 }
 .seo-phase-head { font-weight: 600; color: var(--gray-900); margin-bottom: var(--space-1); }
+
 .seo-phase-when {
     display: inline-block;
     margin-right: var(--space-2);
@@ -230,6 +246,7 @@
 /* ---- Numbered flow + rules list ------------------------------------------ */
 .seo-flow li { margin: var(--space-2) 0; }
 .seo-rules { list-style: none; padding-left: 0; }
+
 .seo-rules li {
     padding: var(--space-2) var(--space-3);
     padding-left: 2.1rem;
@@ -238,8 +255,10 @@
     border-radius: var(--radius-md);
     margin: var(--space-2) 0;
 }
+
 .seo-rules li::before {
     content: "\f05e"; /* fa-ban */
+    /* stylelint-disable-next-line font-family-no-missing-generic-family-keyword -- legacy stack; adding a generic is not byte-identical */
     font-family: "Font Awesome 6 Free";
     font-weight: 900;
     position: absolute;
@@ -258,9 +277,10 @@
 
 /* Phone (≤640px) — 2026-09-05 staff-dashboard sweep: the page measured wider than the
    viewport at 375px and panned sideways. */
-@media (max-width: 640px) {
+@media (width <= 640px) {
     .dash-shell table { display: block; overflow-x: auto; max-width: 100%; -webkit-overflow-scrolling: touch; }
 }
 
 /* 2026-09-05 review */
+/* stylelint-disable-next-line declaration-no-important -- the hidden attribute must beat any display rule */
 [hidden] { display: none !important; }

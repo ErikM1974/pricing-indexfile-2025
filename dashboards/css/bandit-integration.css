@@ -6,9 +6,10 @@
    ========================================================================== */
 
 .bi-subhead { font-weight: 400; font-size: 0.68em; opacity: 0.85; }
+
 .bi-lock {
-    display: inline-flex; align-items: center; gap: 6px; font-size: 0.8rem; font-weight: 600; color: #fff;
-    background: rgba(0,0,0,0.18); border: 1px solid rgba(255,255,255,0.35); padding: 5px 12px; border-radius: var(--radius-pill);
+    display: inline-flex; align-items: center; gap: 6px; font-size: 0.8rem; font-weight: 600; color: var(--color-on-brand);
+    background: rgb(0 0 0 / 18%); border: 1px solid rgb(255 255 255 / 35%); padding: 5px 12px; border-radius: var(--radius-pill);
 }
 
 .bi-lead { font-size: 1rem; line-height: 1.6; color: var(--gray-700); margin: 0 0 var(--space-4); }
@@ -22,6 +23,7 @@
     background: var(--surface-inset); border: 1px solid var(--gray-200); border-radius: var(--radius-md);
     padding: var(--space-3) var(--space-4); margin-bottom: var(--space-4);
 }
+
 .bi-node {
     display: flex; flex-direction: column; justify-content: center; gap: 2px; text-align: center;
     font-size: 0.82rem; font-weight: 600; color: var(--gray-800); background: var(--surface-card);
@@ -78,4 +80,5 @@
 .bi-done { color: var(--state-info); background: var(--surface-inset); }
 
 /* 2026-09-05 review */
+/* stylelint-disable-next-line declaration-no-important -- the hidden attribute must beat any display rule */
 [hidden] { display: none !important; }

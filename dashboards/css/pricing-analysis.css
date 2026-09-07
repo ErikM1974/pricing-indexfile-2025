@@ -11,9 +11,10 @@
    ========================================================================== */
 
 .pa-subhead { font-weight: 400; font-size: 0.7em; opacity: 0.85; }
+
 .pa-lock {
-    display: inline-flex; align-items: center; gap: 6px; font-size: 0.8rem; font-weight: 600; color: #fff;
-    background: rgba(0,0,0,0.18); border: 1px solid rgba(255,255,255,0.35);
+    display: inline-flex; align-items: center; gap: 6px; font-size: 0.8rem; font-weight: 600; color: var(--color-on-brand);
+    background: rgb(0 0 0 / 18%); border: 1px solid rgb(255 255 255 / 35%);
     padding: 5px 12px; border-radius: var(--radius-pill);
 }
 
@@ -27,10 +28,12 @@
     margin: 0 0 var(--space-4); padding-bottom: var(--space-3);
     border-bottom: 1px solid var(--gray-200); letter-spacing: -0.01em;
 }
+
 .pa-h3 {
     font-size: 0.95rem; font-weight: 700; color: var(--gray-900);
     margin: var(--space-5) 0 var(--space-2); letter-spacing: -0.005em;
 }
+
 .pa-tag {
     font-size: 0.72rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em;
     color: var(--gray-500); background: var(--surface-inset);
@@ -45,6 +48,7 @@
     background: var(--surface-card); border-bottom: 1px solid var(--gray-200);
     box-shadow: var(--shadow-sm);
 }
+
 .pa-nav-link {
     flex: 0 0 auto; padding: 6px 12px; border-radius: var(--radius-pill);
     font-size: 0.82rem; font-weight: 600; color: var(--gray-600); text-decoration: none;
@@ -57,6 +61,7 @@
 
 /* ---------- Provenance chips ---------- */
 .pa-chips { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-bottom: var(--space-3); }
+
 .pa-chip {
     background: var(--surface-inset); border: 1px solid var(--gray-200);
     border-radius: var(--radius-md); padding: 5px 11px; font-size: 0.8rem; color: var(--gray-600);
@@ -68,21 +73,26 @@
     display: grid; gap: var(--space-3); margin-bottom: var(--space-4);
     grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
 }
+
 .pa-stat {
     display: flex; flex-direction: column; gap: 4px;
     background: var(--surface-card); border: 1px solid var(--gray-200);
     border-radius: var(--radius-lg); padding: var(--space-4);
     box-shadow: var(--shadow-sm);
 }
+
 /* The two figures that carry the argument get the accent rail. */
 .pa-stat--flag { border-left: 4px solid var(--state-warning); }
+
 /* A stat row sitting inside a section rather than at the top of the page — it needs the
    spacing above that the page-level hero gets from the header. */
 .pa-hero--inline { margin-top: var(--space-4); }
+
 .pa-stat-label {
     font-size: 0.74rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;
     color: var(--gray-500);
 }
+
 .pa-stat-value {
     font-size: 1.9rem; font-weight: 700; color: var(--gray-900);
     letter-spacing: -0.02em; font-variant-numeric: tabular-nums; line-height: 1.1;
@@ -91,24 +101,29 @@
 
 /* ---------- Tables ---------- */
 .pa-scroll { overflow-x: auto; margin: var(--space-3) 0; }
+
 .pa-table {
     width: 100%; border-collapse: collapse; font-size: 0.84rem;
     font-variant-numeric: tabular-nums;
 }
+
 .pa-table caption {
     caption-side: top; text-align: left; font-size: 0.8rem; color: var(--gray-500);
     padding-bottom: var(--space-2);
 }
+
 .pa-table th {
     font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em;
     color: var(--gray-500); background: var(--surface-inset);
     padding: 8px 10px; border-bottom: 1px solid var(--gray-200); white-space: nowrap;
 }
+
 .pa-table td {
     padding: 8px 10px; border-bottom: 1px solid var(--gray-100);
     color: var(--gray-700); white-space: nowrap;
 }
 .pa-table tbody tr:hover td { background: var(--surface-hover); }
+
 .pa-table tfoot td {
     padding: 9px 10px; font-weight: 700; color: var(--gray-900);
     background: var(--surface-inset); border-top: 2px solid var(--gray-300); border-bottom: 0;
@@ -142,6 +157,7 @@
 }
 .pa-finding--alt { border-left-color: var(--state-info); background: var(--state-info-bg); }
 .pa-finding--flag { border-left-color: var(--state-warning); background: var(--state-warning-bg); }
+
 .pa-finding h3 {
     margin: 0 0 var(--space-2); font-size: 1rem; font-weight: 700; color: var(--gray-900);
     letter-spacing: -0.01em;
@@ -154,6 +170,7 @@
     border-radius: var(--radius-md); padding: var(--space-3) var(--space-4);
     margin: var(--space-4) 0; background: var(--surface-inset);
 }
+
 .pa-callout h4 {
     margin: 0 0 var(--space-2); font-size: 0.95rem; font-weight: 700;
     display: flex; align-items: center; gap: var(--space-2);
@@ -161,6 +178,7 @@
 .pa-callout p { margin: 0; font-size: 0.88rem; line-height: 1.6; color: var(--gray-700); max-width: 82ch; }
 .pa-callout--danger { border-left-color: var(--state-danger); background: var(--state-danger-bg); }
 .pa-callout--danger h4 { color: var(--state-danger); }
+
 /* Used where the finding is that something is working — the small-order economics and the
    reorder lever. Same weight as the danger callout so neither reads as the louder claim. */
 .pa-callout--good { border-left-color: var(--state-success); background: var(--state-success-bg); }
@@ -168,12 +186,14 @@
 
 /* ---------- The five rules ---------- */
 .pa-rules { display: flex; flex-direction: column; gap: var(--space-3); margin: var(--space-4) 0; }
+
 .pa-rule {
     display: grid; grid-template-columns: auto 1fr auto; gap: var(--space-4);
     align-items: start; background: var(--surface-card);
     border: 1px solid var(--gray-200); border-radius: var(--radius-lg);
     padding: var(--space-4); box-shadow: var(--shadow-sm);
 }
+
 /* The number is the rule's stable ID from the original five-rules report, so it stays
    referenceable in conversation. It is NOT a value ranking — rule 5 outranks 2, 3 and 4. */
 .pa-rule-n {
@@ -185,6 +205,7 @@
 .pa-rule-body h3 { margin: 0 0 6px; font-size: 0.98rem; font-weight: 700; color: var(--gray-900); }
 .pa-rule-body p { margin: 0; font-size: 0.86rem; line-height: 1.6; color: var(--gray-600); max-width: 74ch; }
 .pa-rule-value { text-align: right; display: flex; flex-direction: column; gap: 2px; }
+
 .pa-rule-value span {
     font-size: 1.25rem; font-weight: 700; color: var(--dash-theme-dark);
     font-variant-numeric: tabular-nums; letter-spacing: -0.01em;
@@ -195,6 +216,7 @@
     display: flex; flex-direction: column; gap: 0; margin: var(--space-4) 0 0;
     border: 1px solid var(--gray-200); border-radius: var(--radius-lg); overflow: hidden;
 }
+
 .pa-totals > div {
     display: flex; justify-content: space-between; align-items: baseline; gap: var(--space-4);
     padding: var(--space-3) var(--space-4); border-bottom: 1px solid var(--gray-100);
@@ -208,6 +230,7 @@
 
 /* ---------- Limits ---------- */
 .pa-limits ul { margin: var(--space-3) 0 0; padding-left: var(--space-5); }
+
 .pa-limits li {
     margin: var(--space-2) 0; font-size: 0.88rem; line-height: 1.65; color: var(--gray-700);
     max-width: 84ch;
@@ -219,7 +242,7 @@
     padding: 1px 5px; border-radius: var(--radius-sm);
 }
 
-@media (max-width: 720px) {
+@media (width <= 720px) {
     .pa-rule { grid-template-columns: auto 1fr; }
     .pa-rule-value { grid-column: 2; text-align: left; }
     .pa-stat-value { font-size: 1.6rem; }

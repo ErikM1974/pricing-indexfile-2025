@@ -1,3 +1,5 @@
+/* stylelint-disable no-duplicate-selectors -- legacy sheet: rules were appended over time; merging them would reorder the cascade (2026-09-07) */
+
 /* purchasing-portal.css — company-wide Purchasing Portal (requests to Bradley)
  * Page-specific styles only; tokens from art-hub.css, shell from dash-shell.css.
  * Prefix: pp-. Status chips mirror the Mission Control aemc-purch palette. */
@@ -5,7 +7,18 @@
 /* Page theme (2026-09-03, dashboard Workspaces): the purchasing family's slate blue —
    the same #4a6fa5 Transfer Queue and Supacolor Jobs carry, so Bradley's pages read
    as one family from the dashboard tiles. */
-:root { --art-theme: #4a6fa5; --dash-theme: #4a6fa5; --dash-theme-dark: #33537d; --dash-theme-bg: #eaf0f9; }
+
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue, merged into its
+   existing :root. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
+:root {
+    --purchasing-portal-green: #b7e0c5;
+    --purchasing-portal-blue: #0a4fb5;
+    --purchasing-portal-blue-tint: #c4d7f7;
+    --purchasing-portal-orange: #f5d3ad;
+ --art-theme: var(--color-bradley); --dash-theme: var(--color-bradley); --dash-theme-dark: var(--color-bradley-dark); --dash-theme-bg: var(--color-floor-tint); }
+/* stylelint-enable color-no-hex */
 
 .pp-toolbar { flex-wrap: wrap; gap: var(--space-2); }
 .pp-updated { font-size: 0.78rem; color: var(--gray-500); }
@@ -16,6 +29,7 @@
     flex-wrap: wrap;
     margin-bottom: var(--space-3);
 }
+
 .pp-input {
     font: inherit;
     font-size: 0.88rem;
@@ -28,11 +42,13 @@
 .pp-input[type="search"] { flex: 1; min-width: 220px; }
 
 .pp-table-scroll { overflow-x: auto; }
+
 .pp-table {
     width: 100%;
     border-collapse: collapse;
     font-size: 0.85rem;
 }
+
 .pp-table th {
     text-align: left;
     font-size: 0.72rem;
@@ -44,6 +60,7 @@
     border-bottom: 1px solid var(--gray-200);
     white-space: nowrap;
 }
+
 .pp-table td {
     padding: 8px 10px;
     border-bottom: 1px solid var(--gray-100);
@@ -64,11 +81,11 @@
     white-space: nowrap;
 }
 .pp-chip--sent { background: var(--surface-inset); color: var(--gray-600); border: 1px solid var(--gray-300); }
-.pp-chip--ordered { background: #f3f7ff; color: #0a4fb5; border: 1px solid #c4d7f7; }
-.pp-chip--partial { background: #fff8f0; color: #b85a00; border: 1px solid #f5d3ad; }
-.pp-chip--received { background: #eaf7ef; color: #0f5132; border: 1px solid #b7e0c5; }
-.pp-chip--invoiced { background: #eaf7ef; color: #0f5132; border: 1px solid #b7e0c5; }
-.pp-chip--shipped { background: #4cb354; color: #fff; border: 1px solid #4cb354; }
+.pp-chip--ordered { background: var(--color-ruth-tint); color: var(--purchasing-portal-blue); border: 1px solid var(--purchasing-portal-blue-tint); }
+.pp-chip--partial { background: var(--store-paper); color: var(--amber-700); border: 1px solid var(--purchasing-portal-orange); }
+.pp-chip--received { background: var(--brand-50); color: var(--brand-800); border: 1px solid var(--purchasing-portal-green); }
+.pp-chip--invoiced { background: var(--brand-50); color: var(--brand-800); border: 1px solid var(--purchasing-portal-green); }
+.pp-chip--shipped { background: var(--brand-500); color: var(--color-on-brand); border: 1px solid var(--brand-500); }
 
 /* =====================================================
    SANMAR INVOICE — button only; the modal + print sheet
@@ -95,15 +112,16 @@
 /* Stat tiles are buttons that filter the table. Reset the UA button chrome so
    they look exactly like the div tiles they replaced, then add the pressed state. */
 .pp-tiles { grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); }
+
 button.pp-tile {
     font: inherit;
     text-align: left;
     cursor: pointer;
     appearance: none;
-    -webkit-appearance: none;
     color: inherit;
 }
 button.pp-tile:focus-visible { outline: 2px solid var(--dash-theme); outline-offset: 2px; }
+
 button.pp-tile.is-active {
     border-color: var(--dash-theme);
     box-shadow: 0 0 0 2px var(--dash-theme-bg), var(--shadow-sm);
@@ -134,6 +152,7 @@ button.pp-tile.is-active {
 
 /* Row actions: JotForm request link + SanMar invoice button */
 .pp-actions { white-space: nowrap; }
+
 .pp-req-link {
     display: inline-block;
     border: 1px solid var(--gray-300);
@@ -154,15 +173,16 @@ button.pp-tile.is-active {
 .pp-chip--partial  { background: var(--state-warning-bg); color: var(--state-warning); border: 1px solid color-mix(in srgb, var(--state-warning) 35%, transparent); }
 .pp-chip--received { background: var(--state-success-bg); color: var(--state-success); border: 1px solid color-mix(in srgb, var(--state-success) 30%, transparent); }
 .pp-chip--invoiced { background: var(--state-success-bg); color: var(--state-success); border: 1px solid color-mix(in srgb, var(--state-success) 30%, transparent); }
-.pp-chip--shipped  { background: var(--state-success);    color: #fff;                 border: 1px solid var(--state-success); }
+.pp-chip--shipped  { background: var(--state-success);    color: var(--color-on-brand);                 border: 1px solid var(--state-success); }
 
 /* Phones: 11 columns is unusable at 375px — keep WO, company, sent, PO, vendors,
    status and the actions; hide requester/type/ordered/received. */
-@media (max-width: 640px) {
+@media (width <= 640px) {
     .pp-col-phone-hide { display: none; }
     .pp-shown { margin-left: 0; }
     .pp-input[type="search"] { min-width: 0; flex-basis: 100%; }
 }
 
 /* 2026-09-05 review */
+/* stylelint-disable-next-line declaration-no-important -- the hidden attribute must beat any display rule */
 [hidden] { display: none !important; }

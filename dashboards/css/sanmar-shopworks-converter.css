@@ -4,10 +4,20 @@
    colors/shadows/radii.
    ========================================================================== */
 
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue so the page
+   keeps its exact look. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   every rule below uses var(). Raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
+:root {
+    --sanmar-shopworks-converter-green: #16a34a;
+}
+/* stylelint-enable color-no-hex */
+
 .sw-subhead { font-weight: 400; font-size: 0.68em; opacity: 0.85; }
+
 .sw-lock {
-    display: inline-flex; align-items: center; gap: 6px; font-size: 0.8rem; font-weight: 600; color: #fff;
-    background: rgba(0,0,0,0.18); border: 1px solid rgba(255,255,255,0.35); padding: 5px 12px; border-radius: var(--radius-pill);
+    display: inline-flex; align-items: center; gap: 6px; font-size: 0.8rem; font-weight: 600; color: var(--color-on-brand);
+    background: rgb(0 0 0 / 18%); border: 1px solid rgb(255 255 255 / 35%); padding: 5px 12px; border-radius: var(--radius-pill);
 }
 .sw-lead { font-size: 1rem; line-height: 1.6; color: var(--gray-700); margin: 0 0 var(--space-4); }
 .sw-note { font-size: 0.82rem; color: var(--gray-500); line-height: 1.5; margin: var(--space-3) 0 0; }
@@ -16,14 +26,14 @@
 .sw-btn {
     display: inline-flex; align-items: center; gap: 7px; font-size: 0.86rem; font-weight: 600;
     padding: 8px 15px; border-radius: var(--radius-md); border: 1px solid transparent; cursor: pointer;
-    text-decoration: none; white-space: nowrap; line-height: 1; background: var(--dash-theme); color: #fff;
+    text-decoration: none; white-space: nowrap; line-height: 1; background: var(--dash-theme); color: var(--color-on-brand);
     transition: filter .12s ease;
 }
 .sw-btn:hover { filter: brightness(1.05); }
 .sw-btn[disabled] { opacity: 0.5; pointer-events: none; }
 .sw-btn--ghost { background: var(--surface-inset); color: var(--gray-700); border-color: var(--gray-300); }
 .sw-btn--ghost:hover { background: var(--surface-card); filter: none; }
-.sw-btn--go { background: var(--state-success, #16a34a); }
+.sw-btn--go { background: var(--state-success, var(--sanmar-shopworks-converter-green)); }
 
 /* ---------- file picker row ---------- */
 .sw-drop {
@@ -37,7 +47,9 @@
 /* ---------- status / messages ---------- */
 .sw-status { font-size: 0.9rem; color: var(--gray-600); margin: var(--space-2) 0; }
 .sw-spin { animation: sw-spin 0.8s linear infinite; display: inline-block; }
+
 @keyframes sw-spin { to { transform: rotate(360deg); } }
+
 .sw-msg { border: 1px solid var(--gray-200); border-left: 4px solid var(--gray-400); border-radius: var(--radius-md);
     padding: var(--space-3) var(--space-4); background: var(--surface-inset); font-size: 0.9rem; color: var(--gray-700); line-height: 1.55; }
 .sw-msg--error { border-left-color: var(--state-danger); background: var(--state-danger-bg); color: var(--state-danger); }
@@ -52,6 +64,7 @@
 /* ---------- preview table ---------- */
 .sw-table-wrap { overflow-x: auto; border: 1px solid var(--gray-200); border-radius: var(--radius-md); }
 .sw-table { width: 100%; border-collapse: collapse; font-size: 0.83rem; min-width: 620px; }
+
 .sw-table thead th { text-align: left; padding: 8px var(--space-3); border-bottom: 2px solid var(--gray-300);
     color: var(--gray-500); font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.04em; font-weight: 600; background: var(--surface-inset); }
 .sw-table td { padding: 7px var(--space-3); border-bottom: 1px solid var(--gray-200); vertical-align: middle; color: var(--gray-700); }
@@ -64,6 +77,7 @@
 /* ---------- lists / steps / callouts ---------- */
 .sw-list, .sw-steps { margin: 0; padding-left: var(--space-5); }
 .sw-list li, .sw-steps li { margin: var(--space-2) 0; font-size: 0.9rem; color: var(--gray-700); line-height: 1.6; }
+
 .sw-callout { border: 1px solid var(--gray-200); border-left: 4px solid var(--state-info); border-radius: var(--radius-md);
     padding: var(--space-3) var(--space-4); margin: var(--space-4) 0 0; background: var(--surface-inset); }
 .sw-callout h4 { margin: 0 0 var(--space-2); font-size: 0.95rem; font-weight: 700; display: flex; align-items: center; gap: var(--space-2); color: var(--state-info); }
@@ -76,4 +90,5 @@
 }
 
 /* 2026-09-05 review */
+/* stylelint-disable-next-line declaration-no-important -- the hidden attribute must beat any display rule */
 [hidden] { display: none !important; }
