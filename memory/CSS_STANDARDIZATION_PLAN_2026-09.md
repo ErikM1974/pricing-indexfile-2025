@@ -114,6 +114,30 @@ three gap sizes, `opacity:.5;cursor:not-allowed` ×26 (disabled). These become u
 
 ## 8. Progress log (newest first)
 
+### 2026-09-07 — Webstore / SEO family + Step 2 components LIVE (`v2026.09.07.8`)
+
+- **Family = 39 public pages, 19 sheets** (every page with the `g-header` template or `nwca-2026-core.css`, plus
+  index/brands/product): 476 hex uses → 266 exact / 128 near / 82 far → 0 raw hex outside `:root` theme blocks.
+- **Storefront 2026 as tokens.** `nwca-2026-core.css`'s palette (cream paper, forest greens, safety-orange rush,
+  Bricolage Grotesque/Public Sans) became the `--store-*` and `--font-store-*` group in `tokens.css`; its own
+  `--paper/--ink/--green-*/--rush-*` names are aliases now — the brand page shows the customer-facing system
+  next to the staff one. `--gray-900 #111827` added (the SEO headline ink).
+- **golf-tournament-showcase.css** (the g-header template's 2,542-line base, 15 pages) defined seven `--gray-*`
+  variables byte-identical to the token file's → deleted (tokens load first, 69 uses resolve the same).
+- **Step 2 shipped:** `shared_components/css/components.css` (chrome, card, btn, alert, badge, field, table, modal,
+  toast, empty-state, pager; NWCA-2026-GUIDE names; `components` layer) + `utilities.css` (the census duplicates
+  as `.u-*` classes; `utilities` layer). First consumers: the page template and the Brand Standards page (its
+  own sheet shrank to swatch/table rules). Legacy pages adopt these family by family — a legacy `.card` linked
+  blindly would inherit properties it never set.
+- **`!important`:** all 8 in the family kept with `stylelint-disable-next-line` reasons — `[hidden]` must beat
+  any display rule (×4), `prefers-reduced-motion` kill switches (×2 files), one legacy blog CTA colour.
+- **Verification:** 39 pages: 32 identical; index differs by a dynamic footer link, product.html by live inventory counts, and five brand pages only where SanMar CDN product photos were not delivered during the batch run — a probe through both the static server and server.js showed those images complete and visible with the new CSS, and two single-page re-shoots matched their before shots at 0 px. Unit/dom/a11y/lint/e2e green.
+- **Orphans flagged, not deleted:** `pages/css/utilities.css` (2025-11 3-Day-Tees helpers) and `pages/css/policies-hub.css`
+  (superseded by v2) — no consumer; the hygiene lock's orphan census covers JS only. Erik's `git rm`.
+- **Census after:** 300 sheets · 4621 KB · 246 use var(--) · 248 raw-hex files · 1301 distinct hex · 3073 !important · 215 duplicated bodies
+- **Next:** dashboards (56 sheets + the staff pages under `pages/css`: art-request-detail, mockup-detail, quote-view,
+  policy-detail, invoice…), then calculators, then the quote builders (+ `quote-builder-inline.css` retirement).
+
 ### 2026-09-07 — Training family + Brand Standards page LIVE (`v2026.09.07.6`)
 
 - **Erik's mid-course instructions (2026-09-07):** "you have permission to make the CSS better", "a brand standards

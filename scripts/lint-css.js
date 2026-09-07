@@ -25,6 +25,29 @@ const CSS_LINT_SCOPE = [
     // Training family (2026-09-07): the shared chrome + 26 page sheets (page themes in one :root block each)
     'training/css/*.css',
     'training/*.css',
+    // Step 2 (2026-09-07): the shared component + utility layers
+    'shared_components/css/components.css',
+    'shared_components/css/utilities.css',
+    // Webstore / SEO family (2026-09-07): the storefront system, the g-header template sheets, catalog + carts
+    'shared_components/css/nwca-2026-core.css',
+    'shared_components/css/nwca-2026.css',
+    'shared_components/css/golf-tournament-showcase.css',
+    'shared_components/css/golf-tournament-product.css',
+    'shared_components/css/cart-drawer.css',
+    'shared_components/css/safety-stripe-recs.css',
+    'shared_components/css/blog.css',
+    'shared_components/css/embroidery-quote-pricing.css',
+    'pages/css/custom-carhartt.css',
+    'pages/css/company-webstores.css',
+    'pages/css/instant-quote.css',
+    'pages/css/sample-cart.css',
+    'pages/css/quote-cart.css',
+    'pages/css/fall-catalog-2026.css',
+    'pages/css/custom-banners.css',
+    'pages/css/catalog-2026.css',
+    'product/css/product-2026.css',
+    'catalog-search.css',
+    'brands.css',
 ];
 
 async function run() {

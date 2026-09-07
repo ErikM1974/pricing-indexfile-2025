@@ -12,7 +12,7 @@
 /* Page Container */
 .brands-page-container {
     min-height: calc(100vh - 200px);
-    background: #f9fafb;
+    background: var(--gray-50);
     padding: 40px 20px;
 }
 
@@ -30,13 +30,13 @@
 .brands-title {
     font-size: 2.5rem;
     font-weight: 700;
-    color: #1f2937;
-    margin: 0 0 16px 0;
+    color: var(--gray-800);
+    margin: 0 0 16px;
 }
 
 .brands-subtitle {
     font-size: 1.125rem;
-    color: #6b7280;
+    color: var(--gray-500);
     max-width: 600px;
     margin: 0 auto;
     line-height: 1.6;
@@ -46,14 +46,14 @@
 .brand-search-container {
     position: relative;
     max-width: 500px;
-    margin: 0 auto 50px auto;
+    margin: 0 auto 50px;
 }
 
 .brand-search-input {
     width: 100%;
     padding: 14px 20px 14px 48px;
     font-size: 16px;
-    border: 2px solid #e5e7eb;
+    border: 2px solid var(--gray-200);
     border-radius: 12px;
     transition: all 0.3s ease;
     background: white;
@@ -61,8 +61,8 @@
 
 .brand-search-input:focus {
     outline: none;
-    border-color: #2d5f3f;
-    box-shadow: 0 0 0 3px rgba(45, 95, 63, 0.1);
+    border-color: var(--print-green);
+    box-shadow: 0 0 0 3px rgb(45 95 63 / 10%);
 }
 
 .search-icon {
@@ -70,7 +70,7 @@
     left: 16px;
     top: 50%;
     transform: translateY(-50%);
-    color: #9ca3af;
+    color: var(--gray-400);
     pointer-events: none;
 }
 
@@ -84,8 +84,8 @@
     width: 50px;
     height: 50px;
     margin: 0 auto 20px;
-    border: 4px solid #e5e7eb;
-    border-top-color: #2d5f3f;
+    border: 4px solid var(--gray-200);
+    border-top-color: var(--print-green);
     border-radius: 50%;
     animation: spin 1s linear infinite;
 }
@@ -98,13 +98,13 @@
 .error-state {
     text-align: center;
     padding: 80px 20px;
-    color: #dc2626;
+    color: var(--red-600);
 }
 
 .btn-retry {
     margin-top: 20px;
     padding: 10px 24px;
-    background: #2d5f3f;
+    background: var(--print-green);
     color: white;
     border: none;
     border-radius: 8px;
@@ -114,7 +114,7 @@
 }
 
 .btn-retry:hover {
-    background: #1a472a;
+    background: var(--brand-800);
 }
 
 /* Brands Container */
@@ -122,7 +122,7 @@
     background: white;
     border-radius: 16px;
     padding: 40px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 1px 3px rgb(0 0 0 / 10%);
 }
 
 /* Letter Section */
@@ -137,10 +137,10 @@
 .brand-letter-header {
     font-size: 2rem;
     font-weight: 700;
-    color: #2d5f3f;
-    margin: 0 0 24px 0;
+    color: var(--print-green);
+    margin: 0 0 24px;
     padding-bottom: 12px;
-    border-bottom: 3px solid #2d5f3f;
+    border-bottom: 3px solid var(--print-green);
 }
 
 /* Brand Grid */
@@ -153,7 +153,7 @@
 /* Brand Card */
 .brand-card {
     background: white;
-    border: 2px solid #e5e7eb;
+    border: 2px solid var(--gray-200);
     border-radius: 12px;
     padding: 32px 24px;
     cursor: pointer;
@@ -189,14 +189,14 @@
     left: 0;
     width: 4px;
     height: 100%;
-    background: #2d5f3f;
+    background: var(--print-green);
     transform: scaleY(0);
     transition: transform 0.3s ease;
 }
 
 .brand-card:hover {
-    border-color: #2d5f3f;
-    box-shadow: 0 4px 12px rgba(45, 95, 63, 0.15);
+    border-color: var(--print-green);
+    box-shadow: 0 4px 12px rgb(45 95 63 / 15%);
     transform: translateY(-2px);
 }
 
@@ -226,12 +226,12 @@
 .no-brands {
     text-align: center;
     padding: 80px 20px;
-    color: #6b7280;
+    color: var(--gray-500);
     font-size: 1.125rem;
 }
 
 /* Mobile Responsive */
-@media (max-width: 768px) {
+@media (width <= 768px) {
     .brands-page-container {
         padding: 20px 16px;
     }
@@ -266,7 +266,7 @@
     }
 }
 
-@media (max-width: 480px) {
+@media (width <= 480px) {
     .brands-title {
         font-size: 1.75rem;
     }
@@ -297,7 +297,7 @@
     .brand-card {
         break-inside: avoid;
         box-shadow: none;
-        border: 1px solid #e5e7eb;
+        border: 1px solid var(--gray-200);
     }
 
     .brand-card-arrow {
@@ -306,4 +306,5 @@
 }
 
 /* 2026-09-05 review: the hidden attribute must beat any display rule */
+/* stylelint-disable-next-line declaration-no-important -- the hidden attribute must beat any display rule */
 [hidden] { display: none !important; }

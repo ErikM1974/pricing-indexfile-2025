@@ -5,12 +5,14 @@
 
 /* ── Hero ──────────────────────────────────────────────────── */
 .cch-hero { padding: 44px 0 36px; }
+
 .cch-hero-grid {
     display: grid;
     grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
     gap: 44px;
     align-items: center;
 }
+
 .cch-eyebrow {
     color: var(--rush-deep);
     font-weight: 800;
@@ -19,6 +21,7 @@
     text-transform: uppercase;
     margin: 0 0 10px;
 }
+
 .cch-hero h1 {
     font-size: clamp(30px, 4.4vw, 46px);
     line-height: 1.06;
@@ -26,12 +29,14 @@
 }
 .cch-lede { font-size: 16.5px; color: var(--ink-soft); max-width: 56ch; }
 .cch-hero-ctas { display: flex; gap: 12px; flex-wrap: wrap; margin: 20px 0 14px; }
+
 .cch-ticks {
     display: flex; gap: 18px; flex-wrap: wrap;
     list-style: none; margin: 0; padding: 0;
     font-size: 13.5px; font-weight: 600; color: var(--ink-soft);
 }
 .cch-hero-media { margin: 0; }
+
 .cch-hero-media img {
     width: 100%; height: auto; display: block;
     border-radius: var(--radius);
@@ -39,6 +44,7 @@
     box-shadow: var(--shadow-card);
     background: var(--card);
 }
+
 .cch-hero-media figcaption {
     font-size: 12.5px; color: var(--ink-faint); margin-top: 8px; text-align: center;
 }
@@ -56,6 +62,7 @@
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 18px;
 }
+
 .cch-why-card {
     background: var(--card);
     border: 1px solid var(--line);
@@ -75,11 +82,13 @@
     padding-bottom: 6px;
     border-bottom: 2px dashed var(--line-strong);
 }
+
 .cch-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
     gap: 16px;
 }
+
 .cch-tile {
     display: flex; flex-direction: column; gap: 3px;
     background: var(--card);
@@ -91,9 +100,10 @@
     color: var(--ink);
 }
 .cch-tile:hover { border-color: var(--green-700); }
+
 .cch-tile img {
     width: 100%; height: auto; aspect-ratio: 5 / 6; object-fit: contain;
-    background: #fff; border-radius: var(--radius-sm); margin-bottom: 8px;
+    background: var(--color-surface); border-radius: var(--radius-sm); margin-bottom: 8px;
 }
 .cch-tile-name { font-weight: 700; font-size: 14.5px; line-height: 1.3; }
 .cch-tile-style { font-size: 12.5px; font-weight: 700; color: var(--green-700); }
@@ -117,18 +127,18 @@
 
 /* ── CTA band ──────────────────────────────────────────────── */
 .cch-cta-band {
-    background: var(--green-950); color: #fff;
+    background: var(--green-950); color: var(--color-on-brand);
     padding: 44px 0;
 }
 .cch-cta-inner { text-align: center; }
-.cch-cta-band h2 { font-size: clamp(22px, 3vw, 30px); margin: 0 0 8px; color: #fff; }
-.cch-cta-band p { color: #cfe0cf; margin: 0 0 18px; }
+.cch-cta-band h2 { font-size: clamp(22px, 3vw, 30px); margin: 0 0 8px; color: var(--color-on-brand); }
+.cch-cta-band p { color: var(--gray-300); margin: 0 0 18px; }
 .cch-cta-band .cch-hero-ctas { justify-content: center; margin: 0; }
-.cch-cta-ghost { color: #e6efe6; border-color: rgba(230, 239, 230, 0.5); }
-.cch-cta-ghost:hover { color: #fff; border-color: #fff; }
+.cch-cta-ghost { color: var(--store-green-100); border-color: rgb(230 239 230 / 50%); }
+.cch-cta-ghost:hover { color: var(--color-on-brand); border-color: var(--color-on-brand); }
 
 /* ── Responsive ────────────────────────────────────────────── */
-@media (max-width: 900px) {
+@media (width <= 900px) {
     .cch-hero-grid { grid-template-columns: 1fr; gap: 24px; }
     .cch-hero-media { max-width: 420px; margin: 0 auto; }
 }

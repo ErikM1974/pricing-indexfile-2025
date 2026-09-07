@@ -89,6 +89,28 @@ network access is an integration test in disguise — `skipInit` exists for exac
 🔑 `git diff` on this OneDrive checkout warns "LF will be replaced by CRLF" for every touched
 file; silence it with `-c core.safecrlf=false`, it is not a content change.
 
+## 2026-09-06 — Final census (`v2026.09.06.33`–`.34`): 69 dead files, a retired page that still got "fixed" twice, and a lock that pinned a version prefix
+
+**Problem.** After five sweeps the tree still held 35 browser scripts nobody loads (oldest untouched since
+2025-06), 11 design mockups, 8 pre-Caspio policy pages with no static mount, and a C112 promo page that
+`server.js` answers with a 410 — yet the S2 batch had extracted its inline code and S3 had converted its host
+literal. A lock (`office-ops-pages`) failed the day after it was written because it matched `?v=2026.09.05.7x`
+and the deploy bumped the version.
+**Root cause.** No repo-wide reference count existed; every sweep worked from a linked-page list, so a file
+that nothing links was invisible until a directory scan pulled it in — and then it got "cleaned" instead of
+deleted. Reachability was never checked against `server.js` (a route can retire a page that the file
+system still shows as live).
+**Solution.** `repo-hygiene-final.test.js`: every served page is Rule-3 clean, every browser script has a
+referrer (page, script, `server.js`, build), and the census's dead list stays unreferenced. The deletion
+itself is a human `git rm` (`memory/DEAD_FILES_2026-09-06.md`) — the agent's bulk removal is blocked by
+policy, correctly. Version assertions compare numerically (≥ a floor), never a prefix.
+**Prevention.** 🔑 Before fixing a page, check three things: is it linked, is it mounted, and does a
+`server.js` route override it (410/301/redirect) — a file on disk is not a live page. 🔑 A referrer census
+must exclude `tests/`, `scripts/` (one-off Node), and `/archive/` — those "references" kept dead files
+alive for a year. 🔑 Rendered markup is only visible at runtime: the forms' shared scripts added 5 bare icons
+per page that 18 static locks passed; probe the DOM after load, then add the renderer to the lock.
+🔑 Never pin a cache-bust version prefix in a test; the next deploy bumps it.
+
 ## Archived 2026-09-06
 
 ## 2026-09-06 — Calculator sweep (`v2026.09.06.9` → `.16`): 8 pages of inline code, 5 shared scripts with hardcoded hosts, and a dead loader

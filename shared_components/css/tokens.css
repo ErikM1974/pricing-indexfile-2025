@@ -22,8 +22,8 @@
    Colour = person/department on staff pages (memory/DESIGN_COLOUR_CODE.md):
    Steve green, Ruth purple, Bradley slate, shop-floor blue and AE maroon
    stay in their pages' own theme variables — they are NOT brand tokens.
-   nwca-2026-core.css keeps its own --paper/--ink/--green-* set for the
-   25 storefront pages built on it (reconciled in the webstore family).
+   nwca-2026-core.css (the 2026 storefront system, 24 pages) aliases its
+   --paper, --ink, --green-N and --rush names to the --store-* group below.
 
    The counts in the colour comments are how many times that hex appeared
    across the 295 stylesheets (scripts/css-census.py, 2026-09-07). When a
@@ -91,6 +91,7 @@
         --gray-600: #4b5563; /* strong secondary text (122) */
         --gray-700: #374151; /* headings on light (120) */
         --gray-800: #1f2937; /* body ink (192) */
+        --gray-900: #111827; /* darkest ink — headlines on the SEO pages */
 
         /* Slate ramp — the dashboards' cooler neutral */
         --slate-50: #f8fafc; /* (95) */
@@ -152,6 +153,29 @@
         --color-dash-theme: #090; /* staff sub-page chrome: dash-shell.css --dash-theme (Training Center, hubs) */
         --color-dash-theme-dark: #060;
         --color-dash-theme-bg: #f0f9f0;
+
+        /* Storefront 2026 — the customer-facing design language (nwca-2026-core.css: homepage, catalog, product
+           page, custom-* storefronts, 24 pages). Cream paper, forest greens, safety-orange rush accent, Bricolage
+           Grotesque display type. nwca-2026-core.css aliases its own --paper, --ink, --green-N and --rush names to these. */
+        --store-paper: #faf8f3; /* page ground */
+        --store-paper-deep: #f1ede3; /* bands, wells */
+        --store-ink: #182219; /* text */
+        --store-ink-soft: #41514a; /* meaningful small text */
+        --store-ink-faint: #75847c; /* decorative / disabled ONLY (fails AA) */
+        --store-line: #e4dfd2;
+        --store-line-strong: #cfc8b6;
+        --store-green-950: #122b18;
+        --store-green-900: #1b4424;
+        --store-green-700: #2f7d3b; /* buttons, links, --ok */
+        --store-green-600: #38934a;
+        --store-green-100: #e3f1e4;
+        --store-green-50: #f0f7f0;
+        --store-rush: #e8590c; /* safety orange "rush tag" */
+        --store-rush-deep: #c2410c;
+        --store-rush-deeper: #9a3412; /* hover step for white-on-orange (AA) */
+        --store-rush-soft: #fff1e6;
+        --font-store-display: "Bricolage Grotesque", "Public Sans", sans-serif;
+        --font-store-body: "Public Sans", system-ui, sans-serif;
 
         /* Semantic colour — what page rules should reference */
         --color-brand: var(--brand-500);

@@ -66,7 +66,8 @@ describe('quote cart + PDP modules', () => {
     test('safety-stripe swatches via --swatch; drawer close named', () => {
         expect(read('shared_components/js/safety-stripe-recs.js')).not.toMatch(/style="background/);
         expect(read('shared_components/js/safety-stripe-recs.js')).toMatch(/style="--swatch:/);
-        expect(read('shared_components/css/safety-stripe-recs.css')).toMatch(/\.ssr-swatch \{ background: var\(--swatch, #ddd\); \}/);
+        // the fallback became a token on 2026-09-07 (CSS standardization: no raw hex outside tokens.css)
+        expect(read('shared_components/css/safety-stripe-recs.css')).toMatch(/\.ssr-swatch \{\s*background: var\(--swatch, (?:#ddd|var\(--[a-z0-9-]+\))\);\s*\}/);
         expect(read('shared_components/js/cart-drawer.js')).toMatch(/id="drawer-close" aria-label="Close cart"/);
         expect(read('shared_components/js/cart-drawer.js')).not.toMatch(BARE);
     });
