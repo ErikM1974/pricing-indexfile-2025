@@ -64,6 +64,7 @@
 
     <link rel="stylesheet" href="/shared_components/css/embroidery-quote-pricing.css?v=2026.09.06.27">
     <link rel="stylesheet" href="/shared_components/css/quote-session.css?v=2026.09.06.27">
+    <link rel="stylesheet" href="/shared_components/css/quote-builder-inline.css?v=2026.09.06.50">
 </head>
 <body class="emb-builder qb-shell-body">
     <nav aria-label="Skip link"><a href="#" class="qb-skip-link" data-call="qbFocusMain" data-prevent="1">Skip to quote builder</a></nav><!-- qb-shell-body: 2026 PNW shell (Inter + tabular numerals + birch ground) — built 2026-06, had ZERO adopters until 2026-07-07 (expert audit) --><!-- scoping hook: EMB-only re-skin overrides (indigo) target .emb-builder so they don't leak into DTF/SCP/DTG via shared CSS (review C33/C34) -->
@@ -139,7 +140,7 @@
                             <!-- Reference artwork — moved here from the old "Save & Share" panel (Erik 2026-06-05).
                                  Home is with the design: use it when there's no Design # yet (uploading + naming
                                  art creates the ShopWorks design). Hides with the card once a Design # is set. -->
-                            <div id="emb-artwork-mount" style="margin-top: 4px;"></div>
+                            <div class="qbi-6b1f0d9" id="emb-artwork-mount"></div>
                             <div class="logo-form-row">
                                 <!-- Primary Logo Fields -->
                                 <div class="logo-form-field">
@@ -301,7 +302,7 @@
                                 <div class="logo-form-row">
                                     <div class="logo-form-field">
                                         <label>Position</label>
-                                        <select disabled aria-label="Cap logo position" style="opacity: 0.6; cursor: not-allowed;">
+                                        <select class="qbi-20f544e" disabled aria-label="Cap logo position" style="opacity: 0.6">
                                             <option value="CF" selected>Cap Front</option>
                                         </select>
                                     </div>
@@ -372,15 +373,15 @@
                             <tr id="empty-state-row">
                                 <td colspan="14" class="qb-empty-state">
                                     <div class="qb-empty-state-emoji">&#128085;</div>
-                                    <div style="font-size: 16px; font-weight: 500; margin-bottom: 8px;">Getting Started</div>
-                                    <div style="font-size: 13px; color: #64748b; line-height: 1.8;">
-                                        <span style="background:#eef2ff; padding:2px 8px; border-radius:4px; color:#4f46e5;">1</span> Type a style # above (e.g., PC54, G500, C112)
+                                    <div class="qbi-35c9137">Getting Started</div>
+                                    <div class="qbi-d1103fb">
+                                        <span class="qbi-526db76">1</span> Type a style # above (e.g., PC54, G500, C112)
                                         &nbsp;&bull;&nbsp;
-                                        <span style="background:#f0fdf4; padding:2px 8px; border-radius:4px; color:#166534;">2</span> <a href="javascript:void(0)" data-call="openShopWorksImportModal" style="color:#4f46e5; text-decoration:underline; cursor:pointer;">Paste from ShopWorks</a>
+                                        <span class="qbi-8caf230">2</span> <a class="qbi-e34ee29" href="javascript:void(0)" data-call="openShopWorksImportModal">Paste from ShopWorks</a>
                                         &nbsp;&bull;&nbsp;
-                                        <span style="background:#fef3c7; padding:2px 8px; border-radius:4px; color:#92400e;">3</span> Use the <strong>Add to order</strong> bar below for Monogram, Additional Logo, Rush, etc.
+                                        <span class="qbi-3e8f751">3</span> Use the <strong>Add to order</strong> bar below for Monogram, Additional Logo, Rush, etc.
                                         &nbsp;&bull;&nbsp;
-                                        <span style="background:#f5f3ff; padding:2px 8px; border-radius:4px; color:#5b21b6;">4</span> Customer bringing their own garments? Use <a href="javascript:void(0)" data-call="openServiceGroup" data-args="[&quot;Customer-Supplied&quot;]" style="color:#4f46e5; text-decoration:underline; cursor:pointer;"><strong>Customer-Supplied</strong></a> in the bar below.
+                                        <span class="qbi-f110eba">4</span> Customer bringing their own garments? Use <a class="qbi-e34ee29" href="javascript:void(0)" data-call="openServiceGroup" data-args="[&quot;Customer-Supplied&quot;]"><strong>Customer-Supplied</strong></a> in the bar below.
                                     </div>
                                 </td>
                             </tr>
@@ -531,7 +532,7 @@
                 </div>
 
                 <!-- Add Row Buttons -->
-                <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                <div class="qbi-2480aea" style="display: flex">
                     <button class="add-row-btn" data-call="addNewRow">
                         <i class="fas fa-plus" aria-hidden="true"></i> Add Product (or press Tab from last cell)
                     </button>
@@ -602,11 +603,11 @@
                         <div class="flow-step-head">
                             <span class="flow-step-num">2</span>
                             <i class="fas fa-file-invoice" aria-hidden="true"></i> Order Details
-                            <span id="order-details-badge" style="display: none; background: #0284c7; color: white; border-radius: 9px; padding: 1px 6px; font-size: 10px; margin-left: 6px;">!</span>
+                            <span class="qbi-12b218d" id="order-details-badge" style="display: none">!</span>
                             <i id="order-details-chevron" class="fas fa-chevron-down" style="display:none;" aria-hidden="true"></i>
                         </div>
                         <div class="flow-step-body" id="order-details-content">
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                            <div class="qbi-bacf216" style="display: grid">
                                 <div>
                                     <label for="po-number">PO #</label>
                                     <input type="text" id="po-number" placeholder="Purchase Order #" class="qb-field--p5">
@@ -627,9 +628,9 @@
                                     <label for="payment-terms">Terms <span id="customer-terms-note" hidden></span></label>
                                     <input type="text" id="payment-terms" placeholder="Payment terms" class="qb-field--p5">
                                 </div>
-                                <div style="grid-column: 1 / -1; margin-top: 2px;">
+                                <div class="qbi-ce20d42">
                                     <label for="order-number">ShopWorks Order # <span class="field-hint-muted">— filled after you import</span></label>
-                                    <input type="text" id="order-number" placeholder="(after import)" style="width: 100%; padding: 5px 8px; border: 1px dashed #cbd5e1; border-radius: 4px; font-size: 12px; box-sizing: border-box; background:#f8fafc;">
+                                    <input class="qbi-4b1c2cf" type="text" id="order-number" placeholder="(after import)">
                                 </div>
                             </div>
                         </div>
@@ -655,7 +656,7 @@
                             <span class="it-amt" id="tax-amount">$0.00</span>
                         </div>
                         <div class="it-row it-wholesale-row">
-                            <label class="it-tax-label" style="font-size:12px; color:#475569; cursor:pointer;">
+                            <label class="it-tax-label qbi-7d9e2aa">
                                 <input type="checkbox" id="wholesale-checkbox" data-change="toggleWholesale">
                                 <span>Wholesale / Reseller — no tax (WA permit on file)</span>
                             </label>
@@ -669,16 +670,16 @@
                     </div>
                     <!-- Special Notes — relocated from the sidebar into a full-width row under the footer (Erik 2026-06-07) -->
                     <div class="footer-notes-row" id="footer-notes-row">
-                        <div class="notes-section collapsed in-footer" id="notes-section" style="margin-bottom: 0;">
+                        <div class="notes-section collapsed in-footer qbi-50435ff" id="notes-section">
                             <div class="notes-header" data-call="toggleNotesSection" tabindex="0" role="button" data-keyclick="1">
-                                <label style="font-size: 12px; color: #666; cursor: pointer; display: flex; align-items: center; gap: 6px; margin: 0;">
-                                    <i class="fas fa-sticky-note" aria-hidden="true" style="color: #f9a825;"></i> Special Notes
+                                <label class="qbi-d7ef40d" style="display: flex">
+                                    <i class="fas fa-sticky-note qbi-9206f2c" aria-hidden="true"></i> Special Notes
                                     <span id="notes-badge" class="notes-badge" style="display: none;">0</span>
-                                    <i class="fas fa-chevron-down notes-toggle-icon" aria-hidden="true" style="margin-left: auto; font-size: 10px; transition: transform 0.2s;"></i>
+                                    <i class="fas fa-chevron-down notes-toggle-icon qbi-608f993" aria-hidden="true"></i>
                                 </label>
                             </div>
                             <div class="notes-body" style="display: none;">
-                                <textarea id="notes" aria-label="Quote notes" placeholder="Add notes for this quote (employee names, special instructions, etc.)" style="width: 100%; min-height: 80px; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; font-family: inherit; resize: vertical; box-sizing: border-box; margin-top: 6px;"></textarea>
+                                <textarea class="qbi-3defaf5" id="notes" aria-label="Quote notes" placeholder="Add notes for this quote (employee names, special instructions, etc.)"></textarea>
                             </div>
                         </div>
                     </div>
@@ -696,10 +697,10 @@
 
                 <!-- Customer Info Section (always visible, top of sidebar) -->
                 <div class="customer-info-section" id="customer-info-section">
-                    <div class="section-header-compact" data-toggle-hidden="emb-customer-body" style="cursor:pointer;" tabindex="0" role="button" aria-label="Toggle customer details" data-keyclick="1">
+                    <div class="section-header-compact qbi-74fa97c" data-toggle-hidden="emb-customer-body" tabindex="0" role="button" aria-label="Toggle customer details" data-keyclick="1">
                         <span class="flow-step-num">1</span>
                         <i class="fas fa-user" aria-hidden="true"></i> Customer
-                        <i class="fas fa-chevron-down" aria-hidden="true" style="margin-left:auto; font-size:11px; color:#94a3b8;"></i>
+                        <i class="fas fa-chevron-down qbi-fc52004" aria-hidden="true"></i>
                     </div>
                     <div class="customer-info-body" id="emb-customer-body">
                         <!-- Customer Lookup — lookup-first (2026-07-07 Phase A / P1 #4): the search
@@ -708,26 +709,26 @@
                              ids unchanged — save/load key off getElementById. -->
                         <div class="customer-field customer-lookup-container customer-lookup-hero">
                             <label class="sr-only" for="customer-lookup">Search for a customer by company, name, or email</label>
-                            <input type="text" id="customer-lookup" placeholder="Find customer — company, name, or email" class="customer-lookup-input" style="width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box;">
+                            <input type="text" id="customer-lookup" placeholder="Find customer — company, name, or email" class="customer-lookup-input qbi-1e645f4">
 
                             <!-- Customer context banners (Erik 2026-05-23) — populated by
                                  window.surfaceCustomerContext() after a customer is picked.
                                  Hidden until then. Customer Warning (amber) + Tax Exempt
                                  chip (green) + Account Tier badge (indigo). -->
                             <div id="customer-warning-banner" hidden></div>
-                            <div style="display:flex;flex-wrap:wrap;gap:6px;margin:4px 0;">
+                            <div class="qbi-e9863ba" style="display: flex">
                                 <span id="customer-tax-chip" hidden></span>
                                 <span id="customer-tier-badge" hidden></span>
                             </div>
                         </div>
                         <details class="customer-manual" id="emb-customer-manual">
                         <summary>Enter details manually <span class="cm-hint">— the search fills these for you</span></summary>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
-                            <div class="customer-field" style="grid-column: span 2;">
+                        <div class="qbi-8db1e93" style="display: grid">
+                            <div class="customer-field qbi-87c5d47">
                                 <label for="customer-name" class="qb-label">Name *</label>
                                 <input type="text" id="customer-name" placeholder="Customer name" class="qb-field">
                             </div>
-                            <div class="customer-field" style="grid-column: span 2;">
+                            <div class="customer-field qbi-87c5d47">
                                 <label for="customer-email" class="qb-label">Email *</label>
                                 <input type="email" id="customer-email" placeholder="email@company.com" class="qb-field">
                             </div>
@@ -746,7 +747,7 @@
                             </div>
                             <div class="customer-field">
                                 <label for="sales-rep" class="qb-label">Sales Rep</label>
-                                <select id="sales-rep" style="width: 100%; padding: 6px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; background: white; box-sizing: border-box;">
+                                <select class="qbi-783bb85" id="sales-rep">
                                     <option value="sales@nwcustomapparel.com">General Sales</option>
                                     <option value="bradley@nwcustomapparel.com">Bradley Wright</option>
                                     <option value="erik@nwcustomapparel.com">Erik Mickelson</option>
@@ -810,9 +811,9 @@
                     <span class="label" id="products-label">Products (Base 8K):</span>
                     <span class="value" id="subtotal">$0.00</span>
                 </div>
-                <div class="pricing-row" id="per-unit-price-row" style="display: none; font-size: 12px; color: #6b7280; border-bottom: none; padding: 2px 0;">
-                    <span class="label" style="font-style: italic;">Per Piece:</span>
-                    <span class="value" id="per-unit-price" style="font-style: italic; font-weight: 500;">-</span>
+                <div class="pricing-row qbi-15ddad0" id="per-unit-price-row" style="display: none">
+                    <span class="label qbi-2ba262c">Per Piece:</span>
+                    <span class="value qbi-38588b7" id="per-unit-price">-</span>
                 </div>
 
                 <!-- Mixed Quote Breakdown (caps + garments) -->
@@ -848,32 +849,32 @@
                 <div class="flow-step-head">
                     <span class="flow-step-num">4</span>
                     <i class="fas fa-palette" aria-hidden="true"></i> Artwork Services
-                    <span id="artwork-badge" class="hidden" style="margin-left:auto; background: #22c55e; color: white; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600;">$0.00</span>
+                    <span id="artwork-badge" class="hidden qbi-05d5e39">$0.00</span>
                 </div>
                 <div class="flow-step-body" id="artwork-content">
                     <!-- Logo Mockup & Review -->
-                    <div class="charge-field" style="margin-bottom: 10px;">
-                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13px; color: #333; margin-bottom: 0;">
-                            <input type="checkbox" id="art-charge-toggle" data-change="toggleArtCharge" style="width: 16px; height: 16px; cursor: pointer;">
+                    <div class="charge-field qbi-39ae4db">
+                        <label class="qbi-1dd6bfc" style="display: flex">
+                            <input class="qbi-2d067f0" type="checkbox" id="art-charge-toggle" data-change="toggleArtCharge">
                             <span>Logo Mockup &amp; Review</span>
                         </label>
-                        <div id="art-charge-wrapper" style="position: relative; opacity: 0.4; margin-top: 6px;">
+                        <div class="qbi-4a137b7" id="art-charge-wrapper" style="opacity: 0.4">
                             <label class="sr-only" for="art-charge">Logo mockup &amp; review charge in dollars</label>
-                            <span style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #666;">$</span>
-                            <input type="number" id="art-charge" min="0" max="5000" step="0.01" value="0" disabled
+                            <span class="qbi-6e90339">$</span>
+                            <input class="qbi-e3271d5" type="number" id="art-charge" min="0" max="5000" step="0.01" value="0" disabled
                                    data-change="updateArtworkCharges" data-input="updateArtworkCharges"
-                                   style="width: 100%; padding: 8px 10px 8px 30px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box;">
+                                  >
                         </div>
                     </div>
                     <!-- Graphic Design -->
                     <div class="charge-field">
-                        <label for="graphic-design-hours" style="font-size: 12px; color: #666; margin-bottom: 4px; display: block;">Graphic Design ($75/hr)</label>
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <input type="number" id="graphic-design-hours" min="0" max="100" step="0.5" placeholder="0"
+                        <label class="qbi-1ddecc2" for="graphic-design-hours" style="display: block">Graphic Design ($75/hr)</label>
+                        <div class="qbi-9062975" style="display: flex">
+                            <input class="qbi-cd2d19b" type="number" id="graphic-design-hours" min="0" max="100" step="0.5" placeholder="0"
                                    data-change="updateArtworkCharges" data-input="updateArtworkCharges"
-                                   style="width: 80px; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box;">
-                            <span style="color: #666; font-size: 13px;">hrs</span>
-                            <span style="color: #666; font-size: 13px;">= $<span id="graphic-design-total">0.00</span></span>
+                                  >
+                            <span class="qbi-0d0c86a">hrs</span>
+                            <span class="qbi-0d0c86a">= $<span id="graphic-design-total">0.00</span></span>
                         </div>
                     </div>
                 </div>
@@ -894,24 +895,24 @@
             <div class="flow-step" id="optional-charges-step" style="display:none;">
                 <div class="flow-step-head">
                     <i class="fas fa-plus-circle" aria-hidden="true"></i> Optional Charges
-                    <span id="charges-badge" style="display: none; margin-left:auto; background: #22c55e; color: white; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600;">+$0.00</span>
+                    <span class="qbi-05d5e39" id="charges-badge" style="display: none">+$0.00</span>
                     <i id="charges-chevron" class="fas fa-chevron-up" style="display:none;" aria-hidden="true"></i>
                 </div>
                 <div class="flow-step-body" id="charges-content">
                     <div class="charge-field">
-                        <label for="rush-fee" style="font-size: 12px; color: #666; margin-bottom: 4px; display: block;">Rush Fee</label>
-                        <div style="position: relative;">
-                            <span style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #666;">$</span>
-                            <input type="number" id="rush-fee" min="0" max="10000" step="0.01" placeholder="0.00"
+                        <label class="qbi-1ddecc2" for="rush-fee" style="display: block">Rush Fee</label>
+                        <div class="qbi-a8a9035">
+                            <span class="qbi-6e90339">$</span>
+                            <input class="qbi-e3271d5" type="number" id="rush-fee" min="0" max="10000" step="0.01" placeholder="0.00"
                                    data-change="updateAdditionalCharges,updateTaxCalculation" data-input="updateAdditionalCharges,updateTaxCalculation"
-                                   style="width: 100%; padding: 8px 10px 8px 30px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box;">
+                                  >
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- LTM Control Panel (shown only when garment qty <= 7 or cap qty <= 7) -->
-            <div id="emb-ltm-wrapper" style="display: none; margin-bottom: 12px;">
+            <div class="qbi-5beb8fb" id="emb-ltm-wrapper" style="display: none">
                 <div id="emb-ltm-panel"></div>
             </div>
 
@@ -979,7 +980,7 @@
 
     <!-- Push to ShopWorks: preview + confirm modal -->
     <div class="shopworks-import-modal" id="emb-sw-push-modal" role="dialog" aria-modal="true" aria-labelledby="emb-sw-push-title">
-        <div class="shopworks-import-content" style="max-width: 760px;">
+        <div class="shopworks-import-content qbi-c06a247">
             <div class="shopworks-import-header">
                 <h3 id="emb-sw-push-title"><i class="fas fa-upload" aria-hidden="true"></i> Push to ShopWorks</h3>
                 <button class="shopworks-import-close" data-call="closePushPreview" aria-label="Close">
@@ -1068,8 +1069,8 @@ Company:Absher Construction Company
 
     <!-- Pricing Review Modal (shown during ShopWorks import for products + services) -->
     <div class="shopworks-import-modal" id="service-pricing-review-modal" role="dialog" aria-modal="true" aria-labelledby="service-pricing-review-modal-title">
-        <div class="shopworks-import-content" style="max-width: 800px;">
-            <div class="shopworks-import-header" style="background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);">
+        <div class="shopworks-import-content qbi-90eb10a">
+            <div class="shopworks-import-header qbi-e387237">
                 <h3 id="service-pricing-review-modal-title"><i class="fas fa-tags" aria-hidden="true"></i> Review Import Pricing</h3>
                 <button class="shopworks-import-close" data-call="cancelServicePricingReview" aria-label="Close">
                     <i class="fas fa-times" aria-hidden="true"></i>
@@ -1092,14 +1093,14 @@ Company:Absher Construction Company
                 <!-- Embroidery Configuration section (dynamically shown/hidden) -->
                 <div id="spr-embconfig-section" style="display: none;">
                     <div class="spr-section-label">Embroidery Configuration</div>
-                    <div id="spr-design-info-banner" style="display: none; padding: 6px 12px; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 6px; margin-bottom: 10px; font-size: 12px; color: #1e40af;">
-                        <i class="fas fa-palette" aria-hidden="true" style="margin-right: 6px;"></i><span id="spr-design-info-text"></span>
+                    <div class="qbi-ad39a33" id="spr-design-info-banner" style="display: none">
+                        <i class="fas fa-palette qbi-7cc88f6" aria-hidden="true"></i><span id="spr-design-info-text"></span>
                     </div>
-                    <div style="border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden;">
+                    <div class="qbi-199db20">
                         <!-- Garment config -->
-                        <div id="spr-garment-config" style="display: none; padding: 12px; border-bottom: 1px solid #e2e8f0;">
-                            <div style="font-size: 13px; font-weight: 600; color: #334155; margin-bottom: 8px;">&#128085; Garment</div>
-                            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                        <div class="qbi-cf8f84a" id="spr-garment-config" style="display: none">
+                            <div class="qbi-d49d2b9">&#128085; Garment</div>
+                            <div class="qbi-578fa9b" style="display: flex">
                                 <div class="qb-flex1-minw130">
                                     <label class="qb-label--mb3">Position</label>
                                     <select id="spr-garment-position" aria-label="Garment logo position" data-change="onSprGarmentPositionChange" class="qb-field--gray">
@@ -1118,18 +1119,18 @@ Company:Absher Construction Company
                                         <option value="25000">Full Back (25K+)</option>
                                     </select>
                                 </div>
-                                <div style="display: flex; align-items: flex-end; padding-bottom: 2px;">
-                                    <label style="font-size: 12px; color: #475569; display: flex; align-items: center; gap: 5px; cursor: pointer;">
-                                        <input type="checkbox" id="spr-garment-digitizing" style="width: 14px; height: 14px; accent-color: #3b82f6;">
+                                <div class="qbi-72584ba" style="display: flex">
+                                    <label class="qbi-a13bf8c" style="display: flex">
+                                        <input class="qbi-dba0195" type="checkbox" id="spr-garment-digitizing">
                                         Digitizing ($100)
                                     </label>
                                 </div>
                             </div>
                         </div>
                         <!-- Cap config -->
-                        <div id="spr-cap-config" style="display: none; padding: 12px; border-bottom: 1px solid #e2e8f0;">
-                            <div style="font-size: 13px; font-weight: 600; color: #334155; margin-bottom: 8px;">&#129506; Cap</div>
-                            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                        <div class="qbi-cf8f84a" id="spr-cap-config" style="display: none">
+                            <div class="qbi-d49d2b9">&#129506; Cap</div>
+                            <div class="qbi-578fa9b" style="display: flex">
                                 <div class="qb-flex1-minw130">
                                     <label class="qb-label--mb3">Type</label>
                                     <select id="spr-cap-embellishment" aria-label="Cap embellishment" data-change="onSprCapEmbellishmentChange" class="qb-field--gray">
@@ -1146,21 +1147,21 @@ Company:Absher Construction Company
                                         <option value="18000">Large (&le;25K)</option>
                                     </select>
                                 </div>
-                                <div style="display: flex; align-items: flex-end; padding-bottom: 2px;">
-                                    <label style="font-size: 12px; color: #475569; display: flex; align-items: center; gap: 5px; cursor: pointer;">
-                                        <input type="checkbox" id="spr-cap-digitizing" style="width: 14px; height: 14px; accent-color: #3b82f6;">
+                                <div class="qbi-72584ba" style="display: flex">
+                                    <label class="qbi-a13bf8c" style="display: flex">
+                                        <input class="qbi-dba0195" type="checkbox" id="spr-cap-digitizing">
                                         Digitizing ($100)
                                     </label>
                                 </div>
                             </div>
                         </div>
                         <!-- LTM override -->
-                        <div id="spr-ltm-row" style="display: none; padding: 10px 12px; background: #fffbeb; border-top: 1px solid #fde68a;">
-                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13px; color: #92400e;">
-                                <input type="checkbox" id="spr-ltm-enabled" checked style="width: 15px; height: 15px; accent-color: #f59e0b;">
-                                <i class="fas fa-exclamation-triangle" aria-hidden="true" style="color: #f59e0b;"></i>
+                        <div class="qbi-09cdebd" id="spr-ltm-row" style="display: none">
+                            <label class="qbi-81ee527" style="display: flex">
+                                <input class="qbi-285475e" type="checkbox" id="spr-ltm-enabled" checked>
+                                <i class="fas fa-exclamation-triangle qbi-e508374" aria-hidden="true"></i>
                                 <span title="Also called the Less Than Minimum (LTM) fee">Apply small-batch fee ($50)</span>
-                                <span id="spr-ltm-hint" style="font-size: 11px; color: #6b7280; margin-left: auto;"></span>
+                                <span class="qbi-77586b0" id="spr-ltm-hint"></span>
                             </label>
                         </div>
                     </div>
@@ -1203,7 +1204,7 @@ Company:Absher Construction Company
     <!-- Design Search Modal -->
     <div class="shopworks-import-modal" id="design-search-modal" role="dialog" aria-modal="true" aria-labelledby="design-search-modal-title">
         <div class="shopworks-import-content design-search-content">
-            <div class="shopworks-import-header" style="background: linear-gradient(135deg, #0ea5e9 0%, #0369a1 100%);">
+            <div class="shopworks-import-header qbi-6d57047">
                 <h3 id="design-search-modal-title"><i class="fas fa-database" aria-hidden="true"></i> Find Existing Design</h3>
                 <button class="shopworks-import-close" data-call="closeDesignSearchModal" aria-label="Close">
                     <i class="fas fa-times" aria-hidden="true"></i>
@@ -1217,7 +1218,7 @@ Company:Absher Construction Company
                     <span class="gallery-design-count"></span>
                 </div>
             </div>
-            <div class="shopworks-import-body" style="padding: 16px;">
+            <div class="shopworks-import-body qbi-c741527">
                 <div class="design-search-input-row">
                     <input type="text" id="design-search-input" aria-label="Design number search" class="design-search-field"
                            placeholder="Search by company name or design number..."
@@ -1269,7 +1270,7 @@ Company:Absher Construction Company
     <div class="ship-modal-overlay" id="shipping-modal" data-call="closeShippingModal" data-self-only="1" role="dialog" aria-modal="true" aria-labelledby="shipping-modal-title">
         <div class="ship-modal">
             <div class="ship-modal-head">
-                <span id="shipping-modal-title"><i class="fas fa-truck" aria-hidden="true" style="margin-right:8px;"></i>Shipping</span>
+                <span id="shipping-modal-title"><i class="fas fa-truck qbi-077c079" aria-hidden="true"></i>Shipping</span>
                 <button type="button" class="ship-modal-close" data-call="closeShippingModal" aria-label="Close">&times;</button>
             </div>
             <div class="ship-modal-body">
@@ -1284,15 +1285,15 @@ Company:Absher Construction Company
                 </div>
 
                 <!-- Pickup notice (shown when Pickup selected) -->
-                <div id="pickup-notice" style="padding: 8px 10px; background: #fef3c7; border: 1px solid #fde68a; border-radius: 4px; font-size: 12px; color: #92400e;">
-                    <i class="fas fa-store" aria-hidden="true" style="margin-right: 4px;"></i>
+                <div class="qbi-99c2d17" id="pickup-notice">
+                    <i class="fas fa-store qbi-1d673f2" aria-hidden="true"></i>
                     Customer Pickup — NW Custom Apparel, Milton, WA 98354
                 </div>
 
                 <!-- Carrier + address + shipping charge (shown when Ship it selected) -->
                 <div id="ship-carrier-wrap" style="display: none;">
                     <label for="ship-method">Carrier / Method</label>
-                    <select id="ship-method" data-change="onShipMethodChange" style="width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box; background: white; margin-bottom: 10px;">
+                    <select class="qbi-560b53b" id="ship-method" data-change="onShipMethodChange">
                         <option value="Customer Pickup" selected>Customer Pickup</option>
                         <option value="UPS Ground">UPS Ground</option>
                         <option value="USPS Priority Mail">USPS Priority Mail</option>
@@ -1300,17 +1301,17 @@ Company:Absher Construction Company
                         <option value="Sales Rep Deliver">Sales Rep Deliver</option>
                         <option value="Other">Other</option>
                     </select>
-                    <input type="text" id="ship-method-other" aria-label="Other shipping method" placeholder="Enter shipping method" style="display: none; width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box; margin-bottom: 10px;">
+                    <input class="qbi-83684ef" type="text" id="ship-method-other" aria-label="Other shipping method" placeholder="Enter shipping method" style="display: none">
 
                     <label for="ship-address">Ship To Address</label>
                     <div id="ship-address-fields">
-                        <input type="text" id="ship-address" placeholder="Street address"
-                               style="width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box; margin-bottom: 6px;">
-                        <div style="display: flex; gap: 6px;">
-                            <input type="text" id="ship-city" aria-label="Shipping city" placeholder="City"
-                                   style="flex: 2; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box;">
-                            <select id="ship-state" aria-label="Shipping state" data-change="onShipStateChange"
-                                    style="width: 64px; padding: 8px 4px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; background: white;">
+                        <input class="qbi-7c9203c" type="text" id="ship-address" placeholder="Street address"
+                              >
+                        <div class="qbi-35ecb16" style="display: flex">
+                            <input class="qbi-1c38da9" type="text" id="ship-city" aria-label="Shipping city" placeholder="City"
+                                  >
+                            <select class="qbi-63b0c72" id="ship-state" aria-label="Shipping state" data-change="onShipStateChange"
+                                   >
                                 <option value="WA" selected>WA</option>
                                 <option value="AL">AL</option><option value="AK">AK</option><option value="AZ">AZ</option>
                                 <option value="AR">AR</option><option value="CA">CA</option><option value="CO">CO</option>
@@ -1330,39 +1331,39 @@ Company:Absher Construction Company
                                 <option value="VT">VT</option><option value="VA">VA</option><option value="WV">WV</option>
                                 <option value="WI">WI</option><option value="WY">WY</option>
                             </select>
-                            <input type="text" id="ship-zip" aria-label="Shipping ZIP code" placeholder="ZIP" maxlength="10"
+                            <input class="qbi-7029b42" type="text" id="ship-zip" aria-label="Shipping ZIP code" placeholder="ZIP" maxlength="10"
                                    data-blur="onShipZipBlur"
-                                   style="width: 78px; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box;">
-                            <button type="button" id="lookup-tax-btn" data-call="lookupTaxRate" title="Look up tax rate" aria-label="Look up tax rate"
-                                    style="padding: 8px 12px; background: #0284c7; color: white; border: none; border-radius: 4px; font-size: 13px; cursor: pointer; white-space: nowrap;">
+                                  >
+                            <button class="qbi-dbccc8e" type="button" id="lookup-tax-btn" data-call="lookupTaxRate" title="Look up tax rate" aria-label="Look up tax rate"
+                                   >
                                 <i class="fas fa-search" aria-hidden="true"></i>
                             </button>
                         </div>
                     </div>
 
                     <!-- Shipping charge (only relevant when shipping) -->
-                    <div id="shipping-fee-field" style="margin-top: 10px;">
+                    <div class="qbi-e5a6d3c" id="shipping-fee-field">
                         <label for="shipping-fee">Shipping charge</label>
-                        <div style="position: relative;">
-                            <span style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #666;">$</span>
-                            <input type="number" id="shipping-fee" min="0" max="99999" step="0.01" placeholder="0.00" value="0"
+                        <div class="qbi-a8a9035">
+                            <span class="qbi-6e90339">$</span>
+                            <input class="qbi-e3271d5" type="number" id="shipping-fee" min="0" max="99999" step="0.01" placeholder="0.00" value="0"
                                    data-change="updateAdditionalCharges,updateTaxCalculation" data-input="updateAdditionalCharges,updateTaxCalculation"
-                                   style="width: 100%; padding: 8px 10px 8px 30px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box;">
+                                  >
                         </div>
                         <!-- [B12] residential delivery surcharge — check before Estimate to add the UPS residential fee -->
-                        <label style="display:block; margin-top:6px; font-size:12px; color:#475569;">
+                        <label class="qbi-a861af0" style="display: block">
                             <input type="checkbox" id="ship-residential"> Residential delivery (+$6.50)
                         </label>
                         <!-- UPS Ground prepay estimate (real SanMar weights + case packs) -->
                         <button type="button" id="estimate-ship-btn" class="estimate-ship-btn" data-call="estimateShipping">
                             <i class="fas fa-truck-fast" aria-hidden="true"></i> Estimate UPS Ground
                         </button>
-                        <div id="estimate-ship-result" style="font-size: 11px; color: #64748b; margin-top: 6px; min-height: 14px;"></div>
+                        <div class="qbi-806844a" id="estimate-ship-result"></div>
                     </div>
                 </div>
 
                 <!-- Tax-rate status (pickup shows the Milton rate; ship shows the looked-up rate) -->
-                <div id="tax-lookup-status" style="font-size: 12px; margin-top: 10px; color: #64748b; min-height: 18px;"></div>
+                <div class="qbi-2490480" id="tax-lookup-status"></div>
             </div>
             <div class="ship-modal-foot">
                 <button type="button" class="ship-modal-done" data-call="closeShippingModal">
