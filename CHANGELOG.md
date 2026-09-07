@@ -1,3 +1,8 @@
+## v2026.09.07.10 (2026.09.07)
+
+- Deploy v2026.09.07.10: CSS standardization — dashboards family (78 sheets: 60 dashboards + art-hub/dash-shell system + staff-dashboard layers + shared widgets; art-hub's duplicate greys dropped, people/department colours as tokens, every hex a token or a sheet-scoped variable, 577 !important flags documented; 61/70 shots identical, the rest timestamps/async)
+- Locks after the CSS standardization deploy: past-due header wrap accepts range media syntax; pricing-analysis generator carries the bumped stylesheet version
+
 ## v2026.09.07.8 (2026.09.07)
 
 - Deploy v2026.09.07.8: CSS standardization — webstore/SEO family (39 public pages, 19 sheets tokenized with zero visual change; storefront 2026 palette as --store-* tokens; showcase sheet's duplicate grey vars dropped) + Step 2 components.css/utilities.css (first consumers: page template, Brand Standards)
