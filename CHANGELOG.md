@@ -1,3 +1,8 @@
+## v2026.09.06.50 (2026.09.06)
+
+- Quote builders: 196 decorative inline styles → quote-builder-inline.css (state properties stay inline)
+- Deploy v2026.09.06.50: builder inline styles → quote-builder-inline.css
+
 ## v2026.09.06.48 (2026.09.06)
 
 - Memory: embroidery + cap API-driven tables recorded (v2026.09.06.47)
