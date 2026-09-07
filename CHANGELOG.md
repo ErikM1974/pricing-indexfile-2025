@@ -1,3 +1,8 @@
+## v2026.09.06.46 (2026.09.06)
+
+- Orphan sweep (Erik: "get rid of the orphan files"): 42 files removed
+- Deploy v2026.09.06.46: orphan sweep — 42 dead files removed
+
 ## v2026.09.06.45 (2026.09.06)
 
 - Memory: cross-surface parity run recorded — DTF $0.00 root cause, table of all five calculators vs the engine (v2026.09.06.44)
