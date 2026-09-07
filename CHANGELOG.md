@@ -1,3 +1,7 @@
+## v2026.09.07.1 (2026.09.07)
+
+- Deploy v2026.09.07.1: money-path alerts EMAIL the shop via EmailJS template_staff_alert (no Slack hook was ever set); Rule 9 reworded (builders own their math, engine replicates, DTF covered); locks for ShopWorks import full-back/cap routing and sample-request lead creation; SHOP notes + CO-ANNUAL-GOAL row in Caspio
+
 ## v2026.09.06.51 (2026.09.06)
 
 - Deploy v2026.09.06.51: <main> landmark on all 96 served pages that lacked one (70 tag swaps, 26 sibling wraps); fix unclosed .main-container (embroidery calculator) + literal <<placeholder>> text (thank-you-card guide); lock one main per page; screenshot spec takes SHOT_PAGES_FILE
