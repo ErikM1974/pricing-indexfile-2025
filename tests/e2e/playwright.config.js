@@ -46,5 +46,7 @@ module.exports = defineConfig({
         reuseExistingServer: !process.env.CI,
         timeout: 90000,
     },
-    projects: [{ name: 'chromium', use: { browserName: 'chromium' } }],
+    // Locally the specs drive the installed Google Chrome: this network's TLS interception blocks
+    // Playwright's browser download (UNABLE_TO_VERIFY_LEAF_SIGNATURE, 2026-09-06). CI keeps chromium.
+    projects: [{ name: 'chromium', use: { browserName: 'chromium', channel: process.env.CI ? undefined : 'chrome' } }],
 });

@@ -57,6 +57,7 @@
     <script src="/shared_components/js/quote-extended-sizes.js?v=2026.09.06.22"></script>
 
     <link rel="stylesheet" href="/shared_components/css/quote-session.css?v=2026.09.06.27">
+    <link rel="stylesheet" href="/shared_components/css/quote-builder-inline.css?v=2026.09.06.49">
 </head>
 <body class="scp-builder qb-shell-body">
     <nav aria-label="Skip link"><a href="#" class="qb-skip-link" data-call="qbFocusMain" data-prevent="1">Skip to quote builder</a></nav><!-- qb-shell-body: 2026 PNW shell (Inter + tabular numerals + birch ground) — built 2026-06, had ZERO adopters until 2026-07-07 (expert audit) --><!-- scoping hook for Option C page-flow overrides (2026-06-07) -->
@@ -116,7 +117,7 @@
                         <!-- Front Location with Ink Colors -->
                         <div class="location-group location-group-card">
                             <div class="section-label">
-                                <i class="fas fa-check-circle" aria-hidden="true" style="color: #28a745;"></i> FRONT LOCATION
+                                <i class="fas fa-check-circle qbi-a5d26d2" aria-hidden="true"></i> FRONT LOCATION
                             </div>
                             <div class="d-flex flex-column gap-2 mb-3">
                                 <label class="location-radio">
@@ -133,7 +134,7 @@
                                 </label>
                             </div>
                             <!-- Ink Colors for Front -->
-                            <div class="border-top" style="padding-top: 10px;">
+                            <div class="border-top qbi-4d5aeaa">
                                 <div class="hint-text mb-2">INK COLORS</div>
                                 <div class="ink-color-selector d-flex gap-1">
                                     <label class="ink-btn"><input type="radio" name="front-colors" value="1" checked data-change="updatePrintConfig"><span>1</span></label>
@@ -150,26 +151,26 @@
                         <!-- Back Location with Ink Colors (Optional) -->
                         <div class="location-group location-group-card" id="back-location-group">
                             <div class="section-label">
-                                <i class="fas fa-plus-circle" aria-hidden="true" id="back-icon" style="color: #666;"></i> BACK LOCATION <span style="font-weight: 400; color: #666;">(optional)</span>
+                                <i class="fas fa-plus-circle qbi-0ce45ac" aria-hidden="true" id="back-icon"></i> BACK LOCATION <span class="qbi-31a5ffd">(optional)</span>
                             </div>
-                            <div style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px;">
+                            <div class="qbi-83834a3" style="display: flex">
                                 <label class="location-radio">
                                     <input type="radio" name="back-location" value="" checked data-change="updatePrintConfig">
                                     <span>None</span>
                                 </label>
                                 <label class="location-radio">
                                     <input type="radio" name="back-location" value="FB" data-change="updatePrintConfig">
-                                    <span>Full Back <span style="color: #666; font-size: 11px;">(12" x 16")</span></span>
+                                    <span>Full Back <span class="qbi-bdf8f93">(12" x 16")</span></span>
                                 </label>
                                 <label class="location-radio">
                                     <input type="radio" name="back-location" value="JB" data-change="updatePrintConfig">
-                                    <span>Jumbo Back <span style="color: #666; font-size: 11px;">(16" x 20")</span></span>
+                                    <span>Jumbo Back <span class="qbi-bdf8f93">(16" x 20")</span></span>
                                 </label>
                             </div>
                             <!-- Ink Colors for Back (hidden when None) -->
-                            <div id="back-colors-section" style="border-top: 1px solid #dee2e6; padding-top: 10px; display: none;">
-                                <div style="font-size: 11px; color: #666; margin-bottom: 6px;">INK COLORS</div>
-                                <div class="ink-color-selector" style="display: flex; gap: 4px;">
+                            <div class="qbi-3b45870" id="back-colors-section" style="display: none">
+                                <div class="qbi-218378b">INK COLORS</div>
+                                <div class="ink-color-selector qbi-4e91564" style="display: flex">
                                     <label class="ink-btn"><input type="radio" name="back-colors" value="1" checked data-change="updatePrintConfig"><span>1</span></label>
                                     <label class="ink-btn"><input type="radio" name="back-colors" value="2" data-change="updatePrintConfig"><span>2</span></label>
                                     <label class="ink-btn"><input type="radio" name="back-colors" value="3" data-change="updatePrintConfig"><span>3</span></label>
@@ -177,23 +178,23 @@
                                     <label class="ink-btn"><input type="radio" name="back-colors" value="5" data-change="updatePrintConfig"><span>5</span></label>
                                     <label class="ink-btn"><input type="radio" name="back-colors" value="6" data-change="updatePrintConfig"><span>6</span></label>
                                 </div>
-                                <div id="back-setup-display" style="font-size: 11px; color: #666; margin-top: 6px;">1 screen × $30 = $30.00</div>
+                                <div class="qbi-239a27a" id="back-setup-display">1 screen × $30 = $30.00</div>
                             </div>
                         </div>
 
                         <!-- Sleeve Locations with Ink Colors (Optional) — each sleeve prices as an additional print location -->
                         <div class="location-group location-group-card" id="sleeve-location-group">
                             <div class="section-label">
-                                <i class="fas fa-plus-circle" aria-hidden="true" id="sleeve-icon" style="color: #666;"></i> SLEEVES <span style="font-weight: 400; color: #666;">(optional · each is an added location)</span>
+                                <i class="fas fa-plus-circle qbi-0ce45ac" aria-hidden="true" id="sleeve-icon"></i> SLEEVES <span class="qbi-31a5ffd">(optional · each is an added location)</span>
                             </div>
                             <!-- Left Sleeve -->
-                            <label class="location-radio" style="margin-bottom: 6px;">
+                            <label class="location-radio qbi-e7b1306">
                                 <input type="checkbox" id="left-sleeve-toggle" data-change="updatePrintConfig">
                                 <span>Left Sleeve</span>
                             </label>
-                            <div id="left-sleeve-colors-section" style="border-top: 1px solid #dee2e6; padding-top: 10px; display: none; margin-bottom: 12px;">
-                                <div style="font-size: 11px; color: #666; margin-bottom: 6px;">LEFT SLEEVE INK COLORS</div>
-                                <div class="ink-color-selector" style="display: flex; gap: 4px;">
+                            <div class="qbi-af0103a" id="left-sleeve-colors-section" style="display: none">
+                                <div class="qbi-218378b">LEFT SLEEVE INK COLORS</div>
+                                <div class="ink-color-selector qbi-4e91564" style="display: flex">
                                     <label class="ink-btn"><input type="radio" name="left-sleeve-colors" value="1" checked data-change="updatePrintConfig"><span>1</span></label>
                                     <label class="ink-btn"><input type="radio" name="left-sleeve-colors" value="2" data-change="updatePrintConfig"><span>2</span></label>
                                     <label class="ink-btn"><input type="radio" name="left-sleeve-colors" value="3" data-change="updatePrintConfig"><span>3</span></label>
@@ -201,16 +202,16 @@
                                     <label class="ink-btn"><input type="radio" name="left-sleeve-colors" value="5" data-change="updatePrintConfig"><span>5</span></label>
                                     <label class="ink-btn"><input type="radio" name="left-sleeve-colors" value="6" data-change="updatePrintConfig"><span>6</span></label>
                                 </div>
-                                <div id="left-sleeve-setup-display" style="font-size: 11px; color: #666; margin-top: 6px;">1 screen × $30 = $30.00</div>
+                                <div class="qbi-239a27a" id="left-sleeve-setup-display">1 screen × $30 = $30.00</div>
                             </div>
                             <!-- Right Sleeve -->
-                            <label class="location-radio" style="margin-bottom: 6px;">
+                            <label class="location-radio qbi-e7b1306">
                                 <input type="checkbox" id="right-sleeve-toggle" data-change="updatePrintConfig">
                                 <span>Right Sleeve</span>
                             </label>
-                            <div id="right-sleeve-colors-section" style="border-top: 1px solid #dee2e6; padding-top: 10px; display: none;">
-                                <div style="font-size: 11px; color: #666; margin-bottom: 6px;">RIGHT SLEEVE INK COLORS</div>
-                                <div class="ink-color-selector" style="display: flex; gap: 4px;">
+                            <div class="qbi-3b45870" id="right-sleeve-colors-section" style="display: none">
+                                <div class="qbi-218378b">RIGHT SLEEVE INK COLORS</div>
+                                <div class="ink-color-selector qbi-4e91564" style="display: flex">
                                     <label class="ink-btn"><input type="radio" name="right-sleeve-colors" value="1" checked data-change="updatePrintConfig"><span>1</span></label>
                                     <label class="ink-btn"><input type="radio" name="right-sleeve-colors" value="2" data-change="updatePrintConfig"><span>2</span></label>
                                     <label class="ink-btn"><input type="radio" name="right-sleeve-colors" value="3" data-change="updatePrintConfig"><span>3</span></label>
@@ -218,16 +219,16 @@
                                     <label class="ink-btn"><input type="radio" name="right-sleeve-colors" value="5" data-change="updatePrintConfig"><span>5</span></label>
                                     <label class="ink-btn"><input type="radio" name="right-sleeve-colors" value="6" data-change="updatePrintConfig"><span>6</span></label>
                                 </div>
-                                <div id="right-sleeve-setup-display" style="font-size: 11px; color: #666; margin-top: 6px;">1 screen × $30 = $30.00</div>
+                                <div class="qbi-239a27a" id="right-sleeve-setup-display">1 screen × $30 = $30.00</div>
                             </div>
                         </div>
 
                         <!-- Setup Fee Summary -->
-                        <div class="location-summary" style="background: #e8f5e9; padding: 16px; border-radius: 8px; min-width: 180px; border: 1px solid #a5d6a7;">
-                            <div style="font-size: 11px; color: #666; margin-bottom: 4px;">SETUP FEE</div>
-                            <div id="total-screens-display" style="font-size: 12px; color: #666; margin-bottom: 4px;">1 screen total</div>
-                            <div id="setup-fee-display" style="font-size: 20px; font-weight: 700; color: #2e7d32;">$30.00</div>
-                            <div id="dark-garment-note" style="font-size: 10px; color: #666; margin-top: 4px; display: none;">Includes white underbase</div>
+                        <div class="location-summary qbi-938a9a0">
+                            <div class="qbi-2a4f72d">SETUP FEE</div>
+                            <div class="qbi-1ddecc2" id="total-screens-display">1 screen total</div>
+                            <div class="qbi-8ede506" id="setup-fee-display">$30.00</div>
+                            <div class="qbi-0041f03" id="dark-garment-note" style="display: none">Includes white underbase</div>
                         </div>
                     </div>
                 </div>
@@ -238,8 +239,8 @@
                  panel (2026-06-14). Mount id #scp-artwork-mount preserved so artwork-upload.js still targets it. -->
             <div class="logo-section reference-artwork-section">
                 <div class="primary-logo-config">
-                    <span class="logo-section-label"><i class="fas fa-image" aria-hidden="true"></i> Reference Artwork <span class="hint-text" style="font-weight:400;">— optional; attach the customer's art file</span></span>
-                    <div id="scp-artwork-mount" style="margin-top: 8px;"></div>
+                    <span class="logo-section-label"><i class="fas fa-image" aria-hidden="true"></i> Reference Artwork <span class="hint-text qbi-7c8ebd9">— optional; attach the customer's art file</span></span>
+                    <div class="qbi-0d69e4b" id="scp-artwork-mount"></div>
                 </div>
             </div>
 
@@ -291,9 +292,9 @@
                             <tr id="empty-state-row">
                                 <td colspan="13" class="qb-empty-state">
                                     <div class="qb-empty-state-emoji">&#128085;</div>
-                                    <div style="font-size: 16px; font-weight: 500; margin-bottom: 8px;">Enter a style number to get started</div>
-                                    <div style="font-size: 13px; color: #55606e;">Type a style # in the search bar above (e.g., PC54, G500, C112)</div>
-                                    <div style="font-size: 12px; color: #55606e; margin-top: 6px;">Customer bringing their own garments? Price it in the <a href="/calculators/screenprint-customer/" target="_blank" rel="noopener" style="color:#4f46e5; text-decoration:underline;">customer-supplied screen print calculator</a>.</div>
+                                    <div class="qbi-35c9137">Enter a style number to get started</div>
+                                    <div class="qbi-6aa8117">Type a style # in the search bar above (e.g., PC54, G500, C112)</div>
+                                    <div class="qbi-bdcd24e">Customer bringing their own garments? Price it in the <a class="qbi-e01f5f9" href="/calculators/screenprint-customer/" target="_blank" rel="noopener">customer-supplied screen print calculator</a>.</div>
                                 </td>
                             </tr>
                             <!-- Product rows will be added here -->
@@ -411,20 +412,20 @@
                  (EMB services-bar position, 2026-06-14). Same controls + handlers as before (pricing unchanged).
                  Phase A (2026-07-07): default-COLLAPSED to calm the page — the badge stays visible in the
                  header, and autoExpandFeesOnFirstCharge() opens it once when a saved fee loads. -->
-            <div class="additional-charges-panel" style="margin: 0 0 14px;">
+            <div class="additional-charges-panel qbi-181b1d4">
                 <div class="charges-header" data-call="toggleFeesCharges">
                     <div class="d-flex align-items-center gap-2">
                         <i class="fas fa-plus-circle" aria-hidden="true"></i>
                         <span>More services &amp; fees</span>
-                        <span style="font-size:11px;color:#55606e;font-weight:400;">mockups · design time · rush · vellum</span>
+                        <span class="qbi-5eb5022">mockups · design time · rush · vellum</span>
                         <span id="charges-badge" class="charges-badge hidden">$0.00</span>
                     </div>
                     <i id="charges-chevron" class="fas fa-chevron-down collapsible-chevron" aria-hidden="true"></i>
                 </div>
                 <div id="fees-charges-content" class="charges-content hidden" style="display:none">
-                    <div style="display:flex; flex-wrap:wrap; gap:24px; align-items:flex-end; padding-top:8px;">
+                    <div class="qbi-78d910c" style="display: flex">
                         <div class="charge-field qb-m0">
-                            <label class="d-flex align-items-center gap-2" style="cursor: pointer;">
+                            <label class="d-flex align-items-center gap-2 qbi-74fa97c">
                                 <input type="checkbox" id="art-charge-toggle" data-change="toggleArtCharge,updateAdditionalCharges">
                                 <span>Logo Mockup &amp; Review</span>
                             </label>
@@ -489,7 +490,7 @@
                 <div class="if-order-details-col">
                     <div id="spc-order-fields"></div>
                     <!-- Shared UPS Ground estimator — reads the .os-ship-* fields + SanMar product weights, writes .os-shipping-fee -->
-                    <div class="estimate-ship-row" id="spc-estimate-row" style="margin: 8px 0 0;">
+                    <div class="estimate-ship-row qbi-f27e185" id="spc-estimate-row">
                         <label><input type="checkbox" id="ship-residential"> Residential delivery (+ UPS surcharge)</label>
                         <button type="button" id="estimate-ship-btn" class="estimate-ship-btn" data-call="estimateShipping">
                             <i class="fas fa-truck-fast" aria-hidden="true"></i> Estimate UPS Ground
@@ -501,24 +502,24 @@
                 <div class="if-totals-col">
                     <div class="pricing-totals-section">
                         <div class="pricing-row">
-                            <span class="label" style="font-weight: 600;">Subtotal:</span>
+                            <span class="label qbi-21a1be8">Subtotal:</span>
                             <span class="value" id="pre-tax-subtotal">$0.00</span>
                         </div>
                         <div class="pricing-row" id="tax-toggle-row">
-                            <label class="d-flex align-items-center gap-2" style="cursor: pointer;">
+                            <label class="d-flex align-items-center gap-2 qbi-74fa97c">
                                 <input type="checkbox" id="include-tax" checked data-change="updateTaxCalculation">
-                                <span style="font-size: 12px;">Include Tax</span>
+                                <span class="qbi-11fcdc5">Include Tax</span>
                             </label>
                             <div class="d-flex align-items-center gap-1">
-                                <input type="number" id="tax-rate-input" aria-label="Sales tax rate percent" value="10.2" step="0.1" min="0" max="20"
-                                       style="width: 52px; font-size: 11px; text-align: center; border: 1px solid #ddd; border-radius: 4px; padding: 2px 4px;"
+                                <input class="qbi-fcdb17d" type="number" id="tax-rate-input" aria-label="Sales tax rate percent" value="10.2" step="0.1" min="0" max="20"
+                                      
                                        data-change="updateTaxCalculation" title="Tax rate %">
-                                <span style="font-size: 11px; color: #64748b;">%</span>
+                                <span class="qbi-89ecc1c">%</span>
                             </div>
                         </div>
                         <!-- Wholesale / reseller — per-order, by the sales tax (mirror EMB). Routes the push to GL 2203. -->
-                        <div class="pricing-row" id="wholesale-row" style="border-bottom:none; padding:2px 0;">
-                            <label class="d-flex align-items-center gap-2" style="font-size:11px; color:#475569; cursor:pointer; margin:0;">
+                        <div class="pricing-row qbi-4f6c9e9" id="wholesale-row">
+                            <label class="d-flex align-items-center gap-2 qbi-01e2c4e">
                                 <input type="checkbox" id="wholesale-checkbox" data-change="toggleWholesale">
                                 <span>Wholesale / Reseller — no tax (WA permit on file)</span>
                             </label>
@@ -543,10 +544,10 @@
             <!-- Scrollable content container -->
             <div class="sidebar-scroll-container">
             <!-- Customer Info (moved above Quote Summary 2026-03-23) -->
-            <div class="customer-panel" style="padding: 12px 16px; border-bottom: 1px solid #e5e7eb; margin: -16px -16px 16px -16px;">
+            <div class="customer-panel qbi-c61fc52">
                 <div class="customer-panel-header qb-mb8" data-toggle-hidden="spc-customer-fields" tabindex="0" role="button" aria-label="Toggle customer details" data-keyclick="1">
-                    <h4 style="display: flex; align-items: center; gap: 6px;"><i class="fas fa-user" aria-hidden="true" style="color: #2e5827;"></i> Customer</h4>
-                    <i class="fas fa-chevron-down" aria-hidden="true" style="font-size: 12px; color: #999;"></i>
+                    <h4 class="qbi-003e6a3" style="display: flex"><i class="fas fa-user qbi-11120ad" aria-hidden="true"></i> Customer</h4>
+                    <i class="fas fa-chevron-down qbi-d2f745e" aria-hidden="true"></i>
                 </div>
                 <div id="spc-customer-fields">
                     <!-- Lookup-first (2026-07-07 Phase A / P1 #4): the search field is the
@@ -554,19 +555,19 @@
                          edit-load fills them (syncCustomerManualDetails). All input ids
                          unchanged — save/load key off getElementById. -->
                     <div class="customer-field customer-lookup-container customer-lookup-hero qb-mb8">
-                        <label class="quote-label"><i class="fas fa-search" aria-hidden="true" style="margin-right: 4px;"></i> FIND CUSTOMER</label>
+                        <label class="quote-label"><i class="fas fa-search qbi-1d673f2" aria-hidden="true"></i> FIND CUSTOMER</label>
                         <input type="text" id="customer-lookup" aria-label="Customer lookup" placeholder="Company, name, or email — fills everything below" class="quote-input customer-lookup-input">
 
                         <!-- Customer context banners (Erik 2026-05-23) -->
                         <div id="customer-warning-banner" hidden></div>
-                        <div style="display:flex;flex-wrap:wrap;gap:6px;margin:4px 0;">
+                        <div class="qbi-e9863ba" style="display: flex">
                             <span id="customer-tax-chip" hidden></span>
                             <span id="customer-tier-badge" hidden></span>
                         </div>
                     </div>
                     <details class="customer-manual" id="spc-customer-manual">
                     <summary>Enter details manually <span class="cm-hint">— the search fills these for you</span></summary>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                    <div class="qbi-bacf216" style="display: grid">
                         <div class="customer-field">
                             <label class="quote-label">NAME *</label>
                             <input type="text" id="customer-name" aria-label="Customer name" placeholder="Customer name" class="quote-input" data-input="?renderOrderRecap,?updateScpPushButtonState">
@@ -585,7 +586,7 @@
                         </div>
                         <div class="customer-field">
                             <label class="quote-label">SALES REP</label>
-                            <select id="sales-rep" aria-label="Sales rep" class="quote-input" style="background: white;">
+                            <select id="sales-rep" aria-label="Sales rep" class="quote-input qbi-73403f4">
                                 <option value="sales@nwcustomapparel.com">General Sales</option>
                                 <option value="bradley@nwcustomapparel.com">Bradley Wright</option>
                                 <option value="erik@nwcustomapparel.com">Erik Mickelson</option>
@@ -613,7 +614,7 @@
                         <!-- Phase 11.1 (2026-05-24): customer-aware Design # lookup -->
                         <div class="customer-field qb-span-all">
                             <label class="quote-label" for="design-number">
-                                DESIGN # <span style="color:#9ca3af;font-weight:400;">(pick from this customer's Screen Print designs)</span>
+                                DESIGN # <span class="qbi-9f0775f">(pick from this customer's Screen Print designs)</span>
                             </label>
                             <input type="text" id="design-number" placeholder="Type design # or name…" class="quote-input">
                         </div>
@@ -651,15 +652,15 @@
 
                 <div class="pricing-row" id="sidebar-dark-row" style="display: none;">
                     <span class="label">Dark Garment:</span>
-                    <span class="value" style="color: #f59e0b;">+ underbase</span>
+                    <span class="value qbi-e508374">+ underbase</span>
                 </div>
 
                 <div class="pricing-row" id="sidebar-stripes-row" style="display: none;">
                     <span class="label">Safety Stripes:</span>
-                    <span class="value" style="color: #f59e0b;" id="sidebar-stripes-cost">+$2.00/pc</span>
+                    <span class="value qbi-e508374" id="sidebar-stripes-cost">+$2.00/pc</span>
                 </div>
 
-                <hr style="border: none; border-top: 1px dashed #e5e7eb; margin: 12px 0;">
+                <hr class="qbi-7f73bab">
 
                 <div class="pricing-row">
                     <span class="label">Total Pieces:</span>
@@ -676,9 +677,9 @@
                     <span class="label">Products Subtotal:</span>
                     <span class="value" id="subtotal">$0.00</span>
                 </div>
-                <div class="pricing-row" id="per-unit-price-row" style="display: none; font-size: 12px; color: #6b7280; border-bottom: none; padding: 2px 0;">
-                    <span class="label" style="font-style: italic;">Per Piece:</span>
-                    <span class="value" id="per-unit-price" style="font-style: italic; font-weight: 500;">-</span>
+                <div class="pricing-row qbi-15ddad0" id="per-unit-price-row" style="display: none">
+                    <span class="label qbi-2ba262c">Per Piece:</span>
+                    <span class="value qbi-38588b7" id="per-unit-price">-</span>
                 </div>
 
                 <!-- Subtotal/Tax/TOTAL, Order Recap + Ship-To relocated to the footer invoice band below the
@@ -692,7 +693,7 @@
 
 
             <!-- LTM Control Panel (shown only when qty <= 71) -->
-            <div id="spc-ltm-wrapper" style="display: none; margin-bottom: 12px;">
+            <div class="qbi-5beb8fb" id="spc-ltm-wrapper" style="display: none">
                 <div id="spc-ltm-panel"></div>
             </div>
 
@@ -752,7 +753,7 @@
 
     <!-- Push to ShopWorks Preview Modal (review-before-push parity with EMB) -->
     <div id="scp-push-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-label="Push to ShopWorks">
-        <div class="modal-content" style="width: 660px; max-width: 94%;">
+        <div class="modal-content qbi-64c36fb">
             <div class="modal-header">
                 <h3><i class="fas fa-upload" aria-hidden="true"></i> Push to ShopWorks — Review Order</h3>
                 <button class="modal-close" data-call="closeScpPushPreview">&times;</button>
@@ -762,7 +763,7 @@
                 <div id="scp-push-preview"></div>
             </div>
             <div class="modal-footer">
-                <button class="btn-action btn-secondary-action" data-call="closeScpPushPreview" style="background: #6c757d;">Cancel</button>
+                <button class="btn-action btn-secondary-action qbi-7fde9b5" data-call="closeScpPushPreview">Cancel</button>
                 <button id="scp-push-confirm" class="btn-action btn-primary-action" data-call="confirmScpPush">
                     <i class="fas fa-upload" aria-hidden="true"></i> Push to ShopWorks
                 </button>

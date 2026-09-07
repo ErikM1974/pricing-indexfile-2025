@@ -22,6 +22,21 @@ const PAGES = fs.readdirSync(path.join(ROOT, 'quote-builders')).filter((f) => f.
 const MODULES = ['dtf', 'dtg', 'emb', 'scp', 'shared'].flatMap((d) => fs.readdirSync(path.join(ROOT, 'shared_components/js/builders', d)).filter((f) => f.endsWith('.js')).map((f) => `shared_components/js/builders/${d}/${f}`));
 const utils = read('shared_components/js/quote-builder-utils.js');
 
+describe('builder markup carries no decorative inline styles (2026-09-06 extraction → quote-builder-inline.css)', () => {
+    // Only STATE properties may stay inline: the builders toggle display/opacity/visibility with el.style.* at runtime.
+    const STATE = new Set(['display', 'opacity', 'visibility']);
+    test.each(['quote-builders/embroidery-quote-builder.html', 'quote-builders/screenprint-quote-builder.html', 'quote-builders/dtf-quote-builder.html', 'quote-builders/dtg-quote-builder.html'])('%s', (rel) => {
+        const html = strip(read(rel));
+        const decorative = [];
+        for (const m of html.matchAll(/\sstyle="([^"]*)"/g)) {
+            const props = m[1].split(';').map((d) => d.split(':')[0].trim().toLowerCase()).filter(Boolean);
+            if (props.some((p) => !STATE.has(p))) decorative.push(m[1]);
+        }
+        expect(decorative).toEqual([]);
+        if (rel !== 'quote-builders/dtg-quote-builder.html') expect(html).toMatch(/quote-builder-inline\.css\?v=/);
+    });
+});
+
 describe('no inline handlers anywhere', () => {
     test.each(PAGES)('%s', (rel) => {
         const html = strip(read(rel));
@@ -58,7 +73,7 @@ describe('no inline handlers anywhere', () => {
 describe('delegator events (jsdom)', () => {
     const src = utils.slice(utils.indexOf('function qbFocusMain'), utils.indexOf("if (typeof window !== 'undefined') {\n    window.qbFocusMain"));
     beforeAll(() => {
-        // eslint-disable-next-line no-new-func
+         
         new Function('showToast', src + '\nqbInstallCallDelegator();')(() => {});
     });
     test('change list with optional + args, input, blur, keyclick, enter, onerror', () => {

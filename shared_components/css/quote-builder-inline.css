@@ -1,0 +1,133 @@
+/* quote-builder-inline.css — the four quote builders' former inline style="" declarations as utility classes
+ * (2026-09-06). Generated from the markup by fix-builder-inline-styles.py: one class per distinct declaration set,
+ * named by hash so the same set maps to the same class on every page. !important reproduces the precedence an
+ * inline attribute had over the builders' id-based rules. STATE properties (display / opacity / visibility) were
+ * left inline on purpose: the builders toggle them with el.style.* at runtime. */
+
+.qbi-6b1f0d9 { margin-top: 4px !important; }
+.qbi-20f544e { cursor: not-allowed !important; }
+.qbi-35c9137 { font-size: 16px !important; font-weight: 500 !important; margin-bottom: 8px !important; }
+.qbi-d1103fb { font-size: 13px !important; color: #64748b !important; line-height: 1.8 !important; }
+.qbi-526db76 { background: #eef2ff !important; padding: 2px 8px !important; border-radius: 4px !important; color: #4f46e5 !important; }
+.qbi-8caf230 { background: #f0fdf4 !important; padding: 2px 8px !important; border-radius: 4px !important; color: #166534 !important; }
+.qbi-e34ee29 { color: #4f46e5 !important; text-decoration: underline !important; cursor: pointer !important; }
+.qbi-3e8f751 { background: #fef3c7 !important; padding: 2px 8px !important; border-radius: 4px !important; color: #92400e !important; }
+.qbi-f110eba { background: #f5f3ff !important; padding: 2px 8px !important; border-radius: 4px !important; color: #5b21b6 !important; }
+.qbi-2480aea { gap: 8px !important; align-items: center !important; flex-wrap: wrap !important; }
+.qbi-12b218d { background: #0284c7 !important; color: white !important; border-radius: 9px !important; padding: 1px 6px !important; font-size: 10px !important; margin-left: 6px !important; }
+.qbi-bacf216 { grid-template-columns: 1fr 1fr !important; gap: 8px !important; }
+.qbi-ce20d42 { grid-column: 1 / -1 !important; margin-top: 2px !important; }
+.qbi-4b1c2cf { width: 100% !important; padding: 5px 8px !important; border: 1px dashed #cbd5e1 !important; border-radius: 4px !important; font-size: 12px !important; box-sizing: border-box !important; background: #f8fafc !important; }
+.qbi-7d9e2aa { font-size: 12px !important; color: #475569 !important; cursor: pointer !important; }
+.qbi-50435ff { margin-bottom: 0 !important; }
+.qbi-d7ef40d { font-size: 12px !important; color: #666 !important; cursor: pointer !important; align-items: center !important; gap: 6px !important; margin: 0 !important; }
+.qbi-9206f2c { color: #f9a825 !important; }
+.qbi-608f993 { margin-left: auto !important; font-size: 10px !important; transition: transform 0.2s !important; }
+.qbi-3defaf5 { width: 100% !important; min-height: 80px !important; padding: 8px 10px !important; border: 1px solid #ddd !important; border-radius: 4px !important; font-size: 12px !important; font-family: inherit !important; resize: vertical !important; box-sizing: border-box !important; margin-top: 6px !important; }
+.qbi-74fa97c { cursor: pointer !important; }
+.qbi-fc52004 { margin-left: auto !important; font-size: 11px !important; color: #94a3b8 !important; }
+.qbi-1e645f4 { width: 100% !important; padding: 8px 10px !important; border: 1px solid #ddd !important; border-radius: 4px !important; font-size: 13px !important; box-sizing: border-box !important; }
+.qbi-e9863ba { flex-wrap: wrap !important; gap: 6px !important; margin: 4px 0 !important; }
+.qbi-8db1e93 { grid-template-columns: 1fr 1fr !important; gap: 6px !important; }
+.qbi-87c5d47 { grid-column: span 2 !important; }
+.qbi-783bb85 { width: 100% !important; padding: 6px 8px !important; border: 1px solid #ddd !important; border-radius: 4px !important; font-size: 12px !important; background: white !important; box-sizing: border-box !important; }
+.qbi-15ddad0 { font-size: 12px !important; color: #6b7280 !important; border-bottom: none !important; padding: 2px 0 !important; }
+.qbi-2ba262c { font-style: italic !important; }
+.qbi-38588b7 { font-style: italic !important; font-weight: 500 !important; }
+.qbi-05d5e39 { margin-left: auto !important; background: #22c55e !important; color: white !important; padding: 2px 8px !important; border-radius: 12px !important; font-size: 11px !important; font-weight: 600 !important; }
+.qbi-39ae4db { margin-bottom: 10px !important; }
+.qbi-1dd6bfc { align-items: center !important; gap: 8px !important; cursor: pointer !important; font-size: 13px !important; color: #333 !important; margin-bottom: 0 !important; }
+.qbi-2d067f0 { width: 16px !important; height: 16px !important; cursor: pointer !important; }
+.qbi-4a137b7 { position: relative !important; margin-top: 6px !important; }
+.qbi-6e90339 { position: absolute !important; left: 10px !important; top: 50% !important; transform: translateY(-50%) !important; color: #666 !important; }
+.qbi-e3271d5 { width: 100% !important; padding: 8px 10px 8px 30px !important; border: 1px solid #ddd !important; border-radius: 4px !important; font-size: 13px !important; box-sizing: border-box !important; }
+.qbi-1ddecc2 { font-size: 12px !important; color: #666 !important; margin-bottom: 4px !important; }
+.qbi-9062975 { align-items: center !important; gap: 8px !important; }
+.qbi-cd2d19b { width: 80px !important; padding: 8px 10px !important; border: 1px solid #ddd !important; border-radius: 4px !important; font-size: 13px !important; box-sizing: border-box !important; }
+.qbi-0d0c86a { color: #666 !important; font-size: 13px !important; }
+.qbi-a8a9035 { position: relative !important; }
+.qbi-5beb8fb { margin-bottom: 12px !important; }
+.qbi-c06a247 { max-width: 760px !important; }
+.qbi-90eb10a { max-width: 800px !important; }
+.qbi-e387237 { background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%) !important; }
+.qbi-ad39a33 { padding: 6px 12px !important; background: #eff6ff !important; border: 1px solid #bfdbfe !important; border-radius: 6px !important; margin-bottom: 10px !important; font-size: 12px !important; color: #1e40af !important; }
+.qbi-7cc88f6 { margin-right: 6px !important; }
+.qbi-199db20 { border: 1px solid #e2e8f0 !important; border-radius: 8px !important; overflow: hidden !important; }
+.qbi-cf8f84a { padding: 12px !important; border-bottom: 1px solid #e2e8f0 !important; }
+.qbi-d49d2b9 { font-size: 13px !important; font-weight: 600 !important; color: #334155 !important; margin-bottom: 8px !important; }
+.qbi-578fa9b { gap: 12px !important; flex-wrap: wrap !important; }
+.qbi-72584ba { align-items: flex-end !important; padding-bottom: 2px !important; }
+.qbi-a13bf8c { font-size: 12px !important; color: #475569 !important; align-items: center !important; gap: 5px !important; cursor: pointer !important; }
+.qbi-dba0195 { width: 14px !important; height: 14px !important; accent-color: #3b82f6 !important; }
+.qbi-09cdebd { padding: 10px 12px !important; background: #fffbeb !important; border-top: 1px solid #fde68a !important; }
+.qbi-81ee527 { align-items: center !important; gap: 8px !important; cursor: pointer !important; font-size: 13px !important; color: #92400e !important; }
+.qbi-285475e { width: 15px !important; height: 15px !important; accent-color: #f59e0b !important; }
+.qbi-e508374 { color: #f59e0b !important; }
+.qbi-77586b0 { font-size: 11px !important; color: #6b7280 !important; margin-left: auto !important; }
+.qbi-6d57047 { background: linear-gradient(135deg, #0ea5e9 0%, #0369a1 100%) !important; }
+.qbi-c741527 { padding: 16px !important; }
+.qbi-077c079 { margin-right: 8px !important; }
+.qbi-99c2d17 { padding: 8px 10px !important; background: #fef3c7 !important; border: 1px solid #fde68a !important; border-radius: 4px !important; font-size: 12px !important; color: #92400e !important; }
+.qbi-1d673f2 { margin-right: 4px !important; }
+.qbi-560b53b { width: 100% !important; padding: 8px 10px !important; border: 1px solid #ddd !important; border-radius: 4px !important; font-size: 13px !important; box-sizing: border-box !important; background: white !important; margin-bottom: 10px !important; }
+.qbi-83684ef { width: 100% !important; padding: 8px 10px !important; border: 1px solid #ddd !important; border-radius: 4px !important; font-size: 13px !important; box-sizing: border-box !important; margin-bottom: 10px !important; }
+.qbi-7c9203c { width: 100% !important; padding: 8px 10px !important; border: 1px solid #ddd !important; border-radius: 4px !important; font-size: 13px !important; box-sizing: border-box !important; margin-bottom: 6px !important; }
+.qbi-35ecb16 { gap: 6px !important; }
+.qbi-1c38da9 { flex: 2 !important; padding: 8px 10px !important; border: 1px solid #ddd !important; border-radius: 4px !important; font-size: 13px !important; box-sizing: border-box !important; }
+.qbi-63b0c72 { width: 64px !important; padding: 8px 4px !important; border: 1px solid #ddd !important; border-radius: 4px !important; font-size: 13px !important; background: white !important; }
+.qbi-7029b42 { width: 78px !important; padding: 8px 10px !important; border: 1px solid #ddd !important; border-radius: 4px !important; font-size: 13px !important; box-sizing: border-box !important; }
+.qbi-dbccc8e { padding: 8px 12px !important; background: #0284c7 !important; color: white !important; border: none !important; border-radius: 4px !important; font-size: 13px !important; cursor: pointer !important; white-space: nowrap !important; }
+.qbi-e5a6d3c { margin-top: 10px !important; }
+.qbi-a861af0 { margin-top: 6px !important; font-size: 12px !important; color: #475569 !important; }
+.qbi-806844a { font-size: 11px !important; color: #64748b !important; margin-top: 6px !important; min-height: 14px !important; }
+.qbi-2490480 { font-size: 12px !important; margin-top: 10px !important; color: #64748b !important; min-height: 18px !important; }
+.qbi-a5d26d2 { color: #28a745 !important; }
+.qbi-4d5aeaa { padding-top: 10px !important; }
+.qbi-0ce45ac { color: #666 !important; }
+.qbi-31a5ffd { font-weight: 400 !important; color: #666 !important; }
+.qbi-83834a3 { flex-direction: column !important; gap: 6px !important; margin-bottom: 12px !important; }
+.qbi-bdf8f93 { color: #666 !important; font-size: 11px !important; }
+.qbi-3b45870 { border-top: 1px solid #dee2e6 !important; padding-top: 10px !important; }
+.qbi-218378b { font-size: 11px !important; color: #666 !important; margin-bottom: 6px !important; }
+.qbi-4e91564 { gap: 4px !important; }
+.qbi-239a27a { font-size: 11px !important; color: #666 !important; margin-top: 6px !important; }
+.qbi-e7b1306 { margin-bottom: 6px !important; }
+.qbi-af0103a { border-top: 1px solid #dee2e6 !important; padding-top: 10px !important; margin-bottom: 12px !important; }
+.qbi-938a9a0 { background: #e8f5e9 !important; padding: 16px !important; border-radius: 8px !important; min-width: 180px !important; border: 1px solid #a5d6a7 !important; }
+.qbi-2a4f72d { font-size: 11px !important; color: #666 !important; margin-bottom: 4px !important; }
+.qbi-8ede506 { font-size: 20px !important; font-weight: 700 !important; color: #2e7d32 !important; }
+.qbi-0041f03 { font-size: 10px !important; color: #666 !important; margin-top: 4px !important; }
+.qbi-7c8ebd9 { font-weight: 400 !important; }
+.qbi-0d69e4b { margin-top: 8px !important; }
+.qbi-6aa8117 { font-size: 13px !important; color: #55606e !important; }
+.qbi-bdcd24e { font-size: 12px !important; color: #55606e !important; margin-top: 6px !important; }
+.qbi-e01f5f9 { color: #4f46e5 !important; text-decoration: underline !important; }
+.qbi-181b1d4 { margin: 0 0 14px !important; }
+.qbi-5eb5022 { font-size: 11px !important; color: #55606e !important; font-weight: 400 !important; }
+.qbi-78d910c { flex-wrap: wrap !important; gap: 24px !important; align-items: flex-end !important; padding-top: 8px !important; }
+.qbi-f27e185 { margin: 8px 0 0 !important; }
+.qbi-21a1be8 { font-weight: 600 !important; }
+.qbi-11fcdc5 { font-size: 12px !important; }
+.qbi-fcdb17d { width: 52px !important; font-size: 11px !important; text-align: center !important; border: 1px solid #ddd !important; border-radius: 4px !important; padding: 2px 4px !important; }
+.qbi-89ecc1c { font-size: 11px !important; color: #64748b !important; }
+.qbi-4f6c9e9 { border-bottom: none !important; padding: 2px 0 !important; }
+.qbi-01e2c4e { font-size: 11px !important; color: #475569 !important; cursor: pointer !important; margin: 0 !important; }
+.qbi-c61fc52 { padding: 12px 16px !important; border-bottom: 1px solid #e5e7eb !important; margin: -16px -16px 16px -16px !important; }
+.qbi-003e6a3 { align-items: center !important; gap: 6px !important; }
+.qbi-11120ad { color: #2e5827 !important; }
+.qbi-d2f745e { font-size: 12px !important; color: #999 !important; }
+.qbi-73403f4 { background: white !important; }
+.qbi-9f0775f { color: #9ca3af !important; font-weight: 400 !important; }
+.qbi-7f73bab { border: none !important; border-top: 1px dashed #e5e7eb !important; margin: 12px 0 !important; }
+.qbi-64c36fb { width: 660px !important; max-width: 94% !important; }
+.qbi-7fde9b5 { background: #6c757d !important; }
+.qbi-8bb166d { font-size: 13px !important; color: #55606e !important; line-height: 1.8 !important; }
+.qbi-c079eee { padding: 8px 0 !important; }
+.qbi-08ec4a1 { flex: 2 !important; }
+.qbi-36ebddf { flex: 0 0 60px !important; }
+.qbi-338d29c { font-size: 12px !important; padding: 6px 4px !important; }
+.qbi-75e00e8 { flex: 0 0 80px !important; }
+.qbi-5a5e72e { font-size: 11px !important; color: #64748b !important; min-height: 14px !important; }
+.qbi-2ef0a91 { position: absolute !important; left: 8px !important; top: 50% !important; transform: translateY(-50%) !important; color: #666 !important; font-size: 12px !important; }
+.qbi-574ad8b { font-size: 12px !important; padding: 6px 8px 6px 22px !important; }
+.qbi-2710755 { font-size: 12px !important; padding: 6px 8px !important; min-height: 60px !important; resize: vertical !important; font-family: inherit !important; }
