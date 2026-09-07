@@ -1,3 +1,7 @@
+## v2026.09.07.8 (2026.09.07)
+
+- Deploy v2026.09.07.8: CSS standardization — webstore/SEO family (39 public pages, 19 sheets tokenized with zero visual change; storefront 2026 palette as --store-* tokens; showcase sheet's duplicate grey vars dropped) + Step 2 components.css/utilities.css (first consumers: page template, Brand Standards)
+
 ## v2026.09.07.6 (2026.09.07)
 
 - Deploy v2026.09.07.6: CSS standardization — training family (26 sheets → tokens + page-scoped themes, shared nav chrome re-themed to the Training Center green, !important 120→15) + Brand Standards page (Administration, rendered live from tokens.css, decisions log) + people/department and staff-chrome tokens
