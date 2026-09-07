@@ -1,3 +1,7 @@
+## v2026.09.07.12 (2026.09.07)
+
+- Deploy v2026.09.07.12: CSS standardization — calculators family (58 sheets, 26 pages: every hex a token or a sheet-scoped variable, duplicate token definitions dropped, 446 !important flags documented as override stacks; 18/26 shots identical, the rest async; three #add-to-cart selectors the tokenizer had mangled repaired; calculator parity 5/5)
+
 ## v2026.09.07.10 (2026.09.07)
 
 - Deploy v2026.09.07.10: CSS standardization — dashboards family (78 sheets: 60 dashboards + art-hub/dash-shell system + staff-dashboard layers + shared widgets; art-hub's duplicate greys dropped, people/department colours as tokens, every hex a token or a sheet-scoped variable, 577 !important flags documented; 61/70 shots identical, the rest timestamps/async)
