@@ -6,13 +6,10 @@
 /* stylelint-disable color-no-hex */
 :root {
     --cap-embroidery-pricing-integrated-gray: #666;
-    --cap-embroidery-pricing-integrated-yellow: #fbbf24;
     --cap-embroidery-pricing-integrated-gray-dark: #333;
     --cap-embroidery-pricing-integrated-gray-2: #bdbdbd;
     --cap-embroidery-pricing-integrated-red-tint: #fcc;
     --cap-embroidery-pricing-integrated-red: #c00;
-    --cap-embroidery-pricing-integrated-green: #c8e6c9;
-    --cap-embroidery-pricing-integrated-yellow-2: #fcd34d;
 
     /* Phase 2d (2026-05-23): var() ref so PNW palette resolves via shell.css */
     --primary-color: var(--pnw-forest, var(--brand-500));
@@ -24,7 +21,7 @@
     --text-primary: var(--cap-embroidery-pricing-integrated-gray-dark);
     --text-secondary: var(--cap-embroidery-pricing-integrated-gray);
     --warning-bg: var(--amber-100);
-    --warning-border: var(--cap-embroidery-pricing-integrated-yellow);
+    --warning-border: var(--amber-400);
     --warning-text: var(--amber-800);
     --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 5%);
     --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 10%), 0 2px 4px -1px rgb(0 0 0 / 6%);
@@ -765,7 +762,7 @@ body {
 
 .product-mismatch-icon {
     font-size: 48px;
-    color: var(--cap-embroidery-pricing-integrated-yellow);
+    color: var(--amber-400);
     margin-bottom: 20px;
 }
 
@@ -828,7 +825,7 @@ body {
 /* LTM Quick Calculator Component */
 .ltm-calculator {
     background: linear-gradient(135deg, var(--gray-50) 0%, var(--color-dash-theme-bg) 100%);
-    border: 1px solid var(--cap-embroidery-pricing-integrated-green);
+    border: 1px solid var(--material-green-100);
     border-radius: 16px;
     padding: 24px;
     margin: 24px 0;
@@ -991,7 +988,7 @@ body {
     gap: 8px;
     padding: 12px;
     background: var(--store-paper);
-    border: 1px solid var(--cap-embroidery-pricing-integrated-yellow-2);
+    border: 1px solid var(--amber-300);
     border-radius: 8px;
     font-size: 13px;
     color: var(--amber-800);

@@ -4,9 +4,6 @@
    keeps its exact look. Map them to shared_components/css/tokens.css names when the page is redesigned;
    every rule below uses var(). Raw hex is allowed ONLY in this block. */
 /* stylelint-disable color-no-hex */
-:root {
-    --universal-pricing-grid-green: #28a745;
-}
 /* stylelint-enable color-no-hex */
 
 .upcharge-grid {
@@ -30,5 +27,5 @@
 
 .upcharge-amount {
     font-weight: 600;
-    color: var(--universal-pricing-grid-green);
+    color: var(--bs-success);
 }

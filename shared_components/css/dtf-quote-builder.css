@@ -20,13 +20,9 @@
 :root {
     --dtf-quote-builder-red: #9d174d;
     --dtf-quote-builder-green: #6fcf7b;
-    --dtf-quote-builder-green-2: #c8e6c9;
     --dtf-quote-builder-cyan-dark: #003f7f;
     --dtf-quote-builder-cyan-dark-2: #1e3a5f;
     --dtf-quote-builder-gray: #666;
-    --dtf-quote-builder-green-3: #a7f3d0;
-    --dtf-quote-builder-red-tint: #fecaca;
-    --dtf-quote-builder-cyan-tint: #bfdbfe;
     --dtf-quote-builder-green-4: #6b8e60;
     --dtf-quote-builder-blue: #4f46e5;
     --dtf-quote-builder-cyan: #0284c7;
@@ -36,7 +32,7 @@
     --dtf-primary-dark: var(--builder-primary-dark, var(--store-green-600));
     --dtf-primary-light: var(--builder-primary-light, var(--dtf-quote-builder-green));
     --dtf-primary-50: var(--brand-100);
-    --dtf-primary-100: var(--dtf-quote-builder-green-2);
+    --dtf-primary-100: var(--material-green-100);
     --dtf-header-bg: var(--builder-header-bg, var(--dtf-quote-builder-cyan-dark));
 
     /* Semantic colors (from quote-builder-common.css) */
@@ -1299,7 +1295,7 @@
 }
 
 .dtf-toast-success i {
-    color: var(--dtf-quote-builder-green-3);
+    color: var(--emerald-200);
 }
 
 .dtf-toast-error {
@@ -1307,7 +1303,7 @@
 }
 
 .dtf-toast-error i {
-    color: var(--dtf-quote-builder-red-tint);
+    color: var(--red-200);
 }
 
 .dtf-toast-warning {
@@ -1323,7 +1319,7 @@
 }
 
 .dtf-toast-info i {
-    color: var(--dtf-quote-builder-cyan-tint);
+    color: var(--blue-200);
 }
 
 /* =============================================

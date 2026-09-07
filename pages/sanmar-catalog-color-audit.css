@@ -5,8 +5,6 @@
 :root {
     --sanmar-catalog-color-audit-green: #6a9b53;
     --sanmar-catalog-color-audit-green-2: #4f7a3d;
-    --sanmar-catalog-color-audit-green-3: #15803d;
-    --sanmar-catalog-color-audit-indigo: #7c3aed;
     --sanmar-catalog-color-audit-green-4: #b8c9ad;
   --nwca-green: var(--sanmar-catalog-color-audit-green);
   --nwca-green-dk: var(--sanmar-catalog-color-audit-green-2);
@@ -17,9 +15,9 @@
   --line: var(--gray-200);
   --warn: var(--amber-600);
   --bad: var(--red-700);
-  --good: var(--sanmar-catalog-color-audit-green-3);
+  --good: var(--green-700);
   --info: var(--color-floor-dark);
-  --drift: var(--sanmar-catalog-color-audit-indigo);
+  --drift: var(--violet-600);
 }
 /* stylelint-enable color-no-hex */
 

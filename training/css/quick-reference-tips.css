@@ -8,7 +8,6 @@
 /* stylelint-disable color-no-hex */
 :root {
     --page-red: #c4365f;
-    --page-green: #22c55e;
             --wsu-crimson: var(--color-ae);
             --wsu-grey: var(--gray-500);
             --wsu-light-grey: var(--gray-100);
@@ -172,7 +171,7 @@
         }
 
         .new-badge {
-            background: var(--page-green);
+            background: var(--green-500);
             color: white;
             padding: 0.25rem 0.5rem;
             border-radius: 12px;

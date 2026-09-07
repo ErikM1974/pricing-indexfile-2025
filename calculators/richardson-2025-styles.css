@@ -25,13 +25,12 @@
    raw hex is allowed ONLY in this block. */
 /* stylelint-disable color-no-hex */
 :root {
-    --richardson-2025-styles-yellow: #fcd34d;
     --richardson-2025-styles-red: #e4002b;
     --rfd-green-ink: var(--store-green-700);            /* accessible green: white text on it (5.1:1) and green text on white */
     --rfd-green-tint: var(--color-dash-theme-bg);           /* ~10% green wash — surface of "the answer" */
     --rfd-green-border: rgb(76 179 84 / 35%);
     --rfd-amber-bg: var(--store-paper);             /* LTM caution only */
-    --rfd-amber-border: var(--richardson-2025-styles-yellow);
+    --rfd-amber-border: var(--amber-300);
     --rfd-amber-text: var(--amber-800);
     --rfd-amber-icon: var(--amber-600);
     --rfd-red: var(--richardson-2025-styles-red);                  /* Richardson brand red — one 3px keyline, nothing else */

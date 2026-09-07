@@ -9,7 +9,6 @@
    every rule below uses var(). Raw hex is allowed ONLY in this block. */
 /* stylelint-disable color-no-hex */
 :root {
-    --ssr-green-dark: #1b5e20;
     --ssr-lime: #b9d300;
     --ssr-orange: #ff6a13;
     --ssr-lime-dark: #5b6b00;
@@ -123,7 +122,7 @@ a.ssr-card-link:hover { transform: translateY(-1px); }
   transition: background .12s ease;
 }
 .ssr-add:hover { background: var(--ssr-green); }
-.ssr-add.is-added { background: var(--ssr-green-dark); border-color: var(--ssr-green-dark); }
+.ssr-add.is-added { background: var(--material-green-900); border-color: var(--material-green-900); }
 
 /* Collapsible accordion mode — collapsed by default; click the header to expand.
    (SCP builder auto-expands when the rep turns safety stripes on.) */
@@ -134,7 +133,7 @@ a.ssr-card-link:hover { transform: translateY(-1px); }
   margin-bottom: 0;
 }
 .ssr-panel.ssr-collapsible:not(.ssr-collapsed) .ssr-head { margin-bottom: 10px; }
-.ssr-panel.ssr-collapsible .ssr-head:hover .ssr-head-title { color: var(--ssr-green-dark); }
+.ssr-panel.ssr-collapsible .ssr-head:hover .ssr-head-title { color: var(--material-green-900); }
 .ssr-head-count { color: var(--gray-500); font-weight: 500; }
 
 .ssr-head-chevron {

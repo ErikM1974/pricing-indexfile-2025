@@ -13,7 +13,6 @@
     --page-yellow: #ffeb3b;
     --page-orange: #f57c00;
     --page-cyan-2: #1976d2;
-    --page-green: #c8e6c9;
     --page-green-2: #a5d6a7;
     --page-gray: #666;
     --page-red-2: #e53935;
@@ -254,7 +253,7 @@
     }
 
     .drop-zone.correct {
-        background: linear-gradient(135deg, var(--page-green), var(--page-green-2));
+        background: linear-gradient(135deg, var(--material-green-100), var(--page-green-2));
         border: 2px solid var(--brand-500);
     }
 

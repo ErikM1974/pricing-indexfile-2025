@@ -17,12 +17,8 @@
    raw hex is allowed ONLY in this block. */
 /* stylelint-disable color-no-hex */
 :root {
-    --invoice-yellow: #fde68a;
-    --invoice-red-tint: #fecaca;
     --invoice-orange: #7c2d12;
     --invoice-yellow-2: #ca8a04;
-    --invoice-orange-2: #78350f;
-    --invoice-green-tint: #bbf7d0;
   --inv-ink:        var(--gray-800);      /* primary text */
   --inv-ink-soft:   var(--gray-600);      /* secondary text */
   --inv-ink-mute:   var(--gray-500);      /* labels, hints */
@@ -158,11 +154,11 @@ body {
   padding: 2px 8px;
   border-radius: 3px;
   background: var(--inv-warn-soft);
-  border: 1px solid var(--invoice-yellow);
+  border: 1px solid var(--amber-200);
 }
 
 .toolbar-print-tip:hover {
-  background: var(--invoice-yellow);
+  background: var(--amber-200);
 }
 
 .toolbar-sync-status .pill {
@@ -283,7 +279,7 @@ body {
   gap: 10px;
   padding: 10px 14px;
   background: var(--red-100);
-  border: 1px solid var(--invoice-red-tint);
+  border: 1px solid var(--red-200);
   border-left: 4px solid var(--inv-danger);
   border-radius: 3px;
   margin-bottom: 14px;
@@ -591,7 +587,7 @@ body {
 
 .invoice-payment-block {
   background: var(--store-paper);
-  border: 1px solid var(--invoice-yellow);
+  border: 1px solid var(--amber-200);
   border-left: 4px solid var(--invoice-yellow-2);
   border-radius: 3px;
   padding: 10px 14px;
@@ -608,7 +604,7 @@ body {
 
 .invoice-payment-body {
   font-size: 11px;
-  color: var(--invoice-orange-2);
+  color: var(--amber-900);
   line-height: 1.5;
 }
 
@@ -937,7 +933,7 @@ body {
   .invoice-item-locations {
     background: var(--store-green-100) !important;
     color: var(--print-green) !important;
-    border: 1px solid var(--invoice-green-tint) !important;
+    border: 1px solid var(--green-200) !important;
     font-size: 7.5pt !important;
   }
 
@@ -998,7 +994,7 @@ body {
   .invoice-status-banner {
     display: flex !important;
     background: var(--red-100) !important;
-    border: 1px solid var(--invoice-red-tint) !important;
+    border: 1px solid var(--red-200) !important;
     border-left: 4px solid var(--red-700) !important;
     color: var(--red-800) !important;
     padding: 8px 12px !important;
@@ -1025,7 +1021,7 @@ body {
 
   .invoice-payment-block {
     background: var(--store-paper) !important;
-    border: 1px solid var(--invoice-yellow) !important;
+    border: 1px solid var(--amber-200) !important;
     border-left: 4px solid var(--invoice-yellow-2) !important;
     padding: 8px 12px !important;
   }
@@ -1036,7 +1032,7 @@ body {
   }
 
   .invoice-payment-body {
-    color: var(--invoice-orange-2) !important;
+    color: var(--amber-900) !important;
     font-size: 8.5pt !important;
     line-height: 1.45 !important;
   }

@@ -4,10 +4,6 @@
    keeps its exact look. Map them to shared_components/css/tokens.css names when the page is redesigned;
    every rule below uses var(). Raw hex is allowed ONLY in this block. */
 /* stylelint-disable color-no-hex */
-:root {
-    --page-green-tint: #d1fae5;
-    --page-teal-dark: #065f46;
-}
 /* stylelint-enable color-no-hex */
 
 /* ── moved from inline \3c style> in training/cap-training.html (Rule 3, 2026.09.05.11) ── */
@@ -195,8 +191,8 @@
         }
 
         .status-active {
-            background: var(--page-green-tint);
-            color: var(--page-teal-dark);
+            background: var(--emerald-100);
+            color: var(--emerald-800);
         }
 
         .status-discontinued {

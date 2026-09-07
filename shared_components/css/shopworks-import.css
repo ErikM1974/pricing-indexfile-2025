@@ -15,13 +15,7 @@
 :root {
     --shopworks-import-blue: #6366f1;
     --shopworks-import-blue-2: #4f46e5;
-    --shopworks-import-yellow: #fde68a;
-    --shopworks-import-blue-3: #4338ca;
-    --shopworks-import-teal: #10b981;
     --shopworks-import-blue-tint: #c7d2fe;
-    --shopworks-import-green-tint: #bbf7d0;
-    --shopworks-import-orange: #78350f;
-    --shopworks-import-teal-dark: #047857;
 }
 /* stylelint-enable color-no-hex */
 
@@ -45,7 +39,7 @@
 }
 
 .btn-import-shopworks:hover {
-    background: linear-gradient(135deg, var(--shopworks-import-blue-2) 0%, var(--shopworks-import-blue-3) 100%);
+    background: linear-gradient(135deg, var(--shopworks-import-blue-2) 0%, var(--indigo-700) 100%);
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgb(99 102 241 / 40%);
 }
@@ -214,7 +208,7 @@
 }
 
 .shopworks-import-preview h4 i {
-    color: var(--shopworks-import-teal);
+    color: var(--emerald-500);
 }
 
 /* Preview Grid */
@@ -321,7 +315,7 @@
     gap: 6px;
     padding: 6px 12px;
     background: var(--brand-50);
-    border: 1px solid var(--shopworks-import-green-tint);
+    border: 1px solid var(--green-200);
     border-radius: 20px;
     font-size: 12px;
     color: var(--print-green);
@@ -334,7 +328,7 @@
 
 .preview-service-badge.warning {
     background: var(--amber-100);
-    border-color: var(--shopworks-import-yellow);
+    border-color: var(--amber-200);
     color: var(--amber-800);
 }
 
@@ -343,7 +337,7 @@
     margin-top: 16px;
     padding: 12px;
     background: var(--amber-100);
-    border: 1px solid var(--shopworks-import-yellow);
+    border: 1px solid var(--amber-200);
     border-radius: 6px;
 }
 
@@ -364,7 +358,7 @@
 
 .preview-warnings li {
     font-size: 12px;
-    color: var(--shopworks-import-orange);
+    color: var(--amber-900);
     margin-bottom: 4px;
 }
 
@@ -398,7 +392,7 @@
 
 .btn-parse-import {
     padding: 10px 24px;
-    background: linear-gradient(135deg, var(--shopworks-import-teal) 0%, var(--emerald-600) 100%);
+    background: linear-gradient(135deg, var(--emerald-500) 0%, var(--emerald-600) 100%);
     border: none;
     border-radius: 6px;
     font-size: 14px;
@@ -413,7 +407,7 @@
 }
 
 .btn-parse-import:hover {
-    background: linear-gradient(135deg, var(--emerald-600) 0%, var(--shopworks-import-teal-dark) 100%);
+    background: linear-gradient(135deg, var(--emerald-600) 0%, var(--emerald-700) 100%);
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgb(16 185 129 / 40%);
 }
@@ -453,7 +447,7 @@
     gap: 4px;
     font-size: 10px;
     color: var(--amber-800);
-    background: var(--shopworks-import-yellow);
+    background: var(--amber-200);
     padding: 2px 6px;
     border-radius: 4px;
     margin-left: 6px;
@@ -469,7 +463,7 @@
     align-items: center;
     gap: 4px;
     font-size: 10px;
-    color: var(--shopworks-import-blue-3);
+    color: var(--indigo-700);
     background: var(--shopworks-import-blue-tint);
     padding: 2px 6px;
     border-radius: 4px;

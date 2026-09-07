@@ -5,11 +5,9 @@
    every rule below uses var(). Raw hex is allowed ONLY in this block. */
 /* stylelint-disable color-no-hex */
 :root {
-    --quote-system-red: #dc3545;
     --quote-system-green-dark: #1e4d0f;
     --quote-system-gray: #666;
     --quote-system-green: #c3e6cb;
-    --quote-system-yellow: #856404;
     --quote-system-gray-dark: #000;
 }
 /* stylelint-enable color-no-hex */
@@ -111,7 +109,7 @@
 }
 
 .ltm-explanation h4 {
-    color: var(--quote-system-yellow);
+    color: var(--bs-warning-ink);
     margin-top: 0;
     margin-bottom: var(--spacing-sm, 10px);
 }
@@ -196,7 +194,7 @@
 }
 
 .size-validation-message {
-    color: var(--quote-system-red);
+    color: var(--bs-danger);
     text-align: center;
     margin-top: var(--spacing-sm, 10px);
     font-weight: 500;
@@ -243,7 +241,7 @@
 }
 
 .quote-close-btn {
-    background: var(--quote-system-red);
+    background: var(--bs-danger);
     color: white;
     border: none;
     border-radius: var(--radius-sm, 4px);
@@ -297,7 +295,7 @@
 }
 
 .quote-item-remove {
-    color: var(--quote-system-red);
+    color: var(--bs-danger);
     border: none;
     background: none;
     cursor: pointer;
@@ -314,7 +312,7 @@
 }
 
 .quote-item-remove:hover {
-    background-color: var(--quote-system-red);
+    background-color: var(--bs-danger);
     color: white;
 }
 
@@ -359,12 +357,12 @@
 }
 
 .ltm-row {
-    color: var(--quote-system-red);
+    color: var(--bs-danger);
 }
 
 .ltm-row span {
     /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
-    color: var(--quote-system-red) !important;
+    color: var(--bs-danger) !important;
 }
 
 .grand-total {
@@ -410,7 +408,7 @@
 
 .quote-clear-btn {
     width: 100%;
-    color: var(--quote-system-red);
+    color: var(--bs-danger);
     background: none;
     border: none;
     cursor: pointer;
@@ -420,7 +418,7 @@
 }
 
 .quote-clear-btn:hover {
-    background-color: var(--quote-system-red);
+    background-color: var(--bs-danger);
     color: white;
     border-radius: var(--radius-sm, 4px);
 }

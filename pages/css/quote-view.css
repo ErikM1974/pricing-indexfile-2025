@@ -18,44 +18,31 @@
    raw hex is allowed ONLY in this block. */
 /* stylelint-disable color-no-hex */
 :root {
-    --quote-view-green: #86efac;
-    --quote-view-orange: #78350f;
-    --quote-view-red: #fca5a5;
     --quote-view-yellow: #f9d97a;
-    --quote-view-yellow-2: #856404;
-    --quote-view-yellow-3: #fcd34d;
     --quote-view-cyan: #075985;
-    --quote-view-green-2: #16a34a;
     --quote-view-blue: #a5b4fc;
-    --quote-view-yellow-4: #ffc107;
     --quote-view-gray-dark: #333;
     --quote-view-gray: #666;
     --quote-view-violet: #9c27b0;
-    --quote-view-green-3: #15803d;
     --quote-view-cyan-tint: #bae6fd;
     --quote-view-blue-2: #4f46e5;
-    --quote-view-blue-3: #4338ca;
     --quote-view-green-4: #5fc966;
-    --quote-view-green-5: #28a745;
-    --quote-view-red-2: #dc3545;
     --quote-view-teal: #17a2b8;
     --quote-view-violet-2: #7b1fa2;
     --quote-view-yellow-5: #f9e68c;
     --quote-view-cyan-dark: #1a365d;
-    --quote-view-green-6: #c8e6c9;
     --quote-view-cyan-2: #7dd3fc;
-    --quote-view-yellow-6: #fbbf24;
     --quote-view-blue-4: #312e81;
     --quote-view-blue-tint: #c7d2fe;
     --quote-view-blue-5: #3730a3;
     --primary-color: var(--brand-500);
     --primary-light: var(--quote-view-green-4);
     --primary-dark: var(--store-green-600);
-    --success-color: var(--quote-view-green-5);
+    --success-color: var(--bs-success);
     --success-light: var(--store-green-100);
-    --warning-color: var(--quote-view-yellow-4);
+    --warning-color: var(--bs-warning);
     --warning-light: var(--amber-100);
-    --danger-color: var(--quote-view-red-2);
+    --danger-color: var(--bs-danger);
     --danger-light: var(--red-100);
     --text-primary: var(--quote-view-gray-dark);
     --text-secondary: var(--quote-view-gray);
@@ -310,21 +297,21 @@ body {
 
 .expired-banner {
     background: var(--warning-light);
-    border-bottom: 1px solid var(--quote-view-yellow-4);
+    border-bottom: 1px solid var(--bs-warning);
 }
 
 .expired-icon {
     font-size: 24px;
-    color: var(--quote-view-yellow-2);
+    color: var(--bs-warning-ink);
 }
 
 .expired-text strong {
-    color: var(--quote-view-yellow-2);
+    color: var(--bs-warning-ink);
     display: block;
 }
 
 .expired-text p {
-    color: var(--quote-view-yellow-2);
+    color: var(--bs-warning-ink);
     font-size: 0.9rem;
     margin-top: 4px;
 }
@@ -423,7 +410,7 @@ body {
 .special-notes-content {
     font-family: inherit;
     font-size: 0.85rem;
-    color: var(--quote-view-orange);
+    color: var(--amber-900);
     margin: 0;
     white-space: pre-wrap;
     overflow-wrap: break-word;
@@ -1211,7 +1198,7 @@ body {
 /* Fee line items (Additional Stitches, AL charges, Digitizing) */
 .product-table tr.fee-row {
     background-color: var(--brand-50);
-    border-top: 1px dashed var(--quote-view-green);
+    border-top: 1px dashed var(--green-300);
 }
 
 .product-table tr.fee-row:first-of-type {
@@ -1225,7 +1212,7 @@ body {
 .product-table tr.fee-row td.fee-part {
     font-family: 'Courier New', Courier, monospace;
     font-weight: 600;
-    color: var(--quote-view-green-3);
+    color: var(--green-700);
     font-style: normal;
 }
 
@@ -1234,7 +1221,7 @@ body {
 }
 
 .product-table tr.fee-row td.total-col {
-    color: var(--quote-view-green-3);
+    color: var(--green-700);
     font-weight: 600;
 }
 
@@ -1258,7 +1245,7 @@ body {
 /* Discount row (negative fee) - red styling */
 .product-table tr.discount-row {
     background-color: var(--red-50);
-    border-top: 1px dashed var(--quote-view-red);
+    border-top: 1px dashed var(--red-300);
 }
 
 .product-table tr.discount-row td.fee-part {
@@ -1669,13 +1656,13 @@ body {
 .sw-sync-pill--imported {
     background: var(--store-green-100);
     color: var(--print-green-dark);
-    border: 1px solid var(--quote-view-green);
+    border: 1px solid var(--green-300);
 }
 
 .sw-sync-pill--unknown {
     background: var(--amber-100);
-    color: var(--quote-view-orange);
-    border: 1px solid var(--quote-view-yellow-3);
+    color: var(--amber-900);
+    border: 1px solid var(--amber-300);
 }
 
 .sw-sync-extorder {
@@ -1766,7 +1753,7 @@ body {
     padding: 2px 8px;
     background: var(--store-green-100);
     color: var(--print-green-dark);
-    border: 1px solid var(--quote-view-green);
+    border: 1px solid var(--green-300);
     border-radius: 999px;
     font-size: 9px;
     font-weight: 700;
@@ -1961,13 +1948,13 @@ body {
 .sw-status-cell-value--yes {
     background: var(--store-green-100);
     color: var(--print-green-dark);
-    border-color: var(--quote-view-green);
+    border-color: var(--green-300);
 }
 
 .sw-status-cell-value--no {
     background: var(--red-100);
     color: var(--print-red);
-    border-color: var(--quote-view-red);
+    border-color: var(--red-300);
 }
 
 /* ShopWorks 3rd/4th states (Erik 2026-06-16): Partial (.5), N/A (8/222), and
@@ -1975,7 +1962,7 @@ body {
 .sw-status-cell-value--partial {
     background: var(--amber-100);
     color: var(--amber-800);
-    border-color: var(--quote-view-yellow-3);
+    border-color: var(--amber-300);
 }
 
 .sw-status-cell-value--na,
@@ -2034,7 +2021,7 @@ body {
     border: 1px solid var(--quote-view-yellow);
     border-radius: 6px;
     font-size: 11.5px;
-    color: var(--quote-view-orange);
+    color: var(--amber-900);
     line-height: 1.4;
 }
 
@@ -2082,11 +2069,11 @@ body {
 
 .sw-vendor-pill--confirmed,
 .sw-vendor-pill--unknown { background: var(--slate-100); color: var(--slate-600); border-color: var(--gray-300); }
-.sw-vendor-pill--partial { background: var(--amber-100); color: var(--amber-800); border-color: var(--quote-view-yellow-3); }
+.sw-vendor-pill--partial { background: var(--amber-100); color: var(--amber-800); border-color: var(--amber-300); }
 
 .sw-vendor-pill--shipped,
-.sw-vendor-pill--complete { background: var(--store-green-100); color: var(--print-green); border-color: var(--quote-view-green); }
-.sw-vendor-pill--canceled { background: var(--red-100); color: var(--red-800); border-color: var(--quote-view-red); }
+.sw-vendor-pill--complete { background: var(--store-green-100); color: var(--print-green); border-color: var(--green-300); }
+.sw-vendor-pill--canceled { background: var(--red-100); color: var(--red-800); border-color: var(--red-300); }
 .sw-vendor-eta { font-size: 12px; color: var(--slate-500); }
 .sw-vendor-note { font-size: 13px; color: var(--slate-600); padding: 4px 0; }
 .sw-vendor-note--warn { color: var(--amber-800); }
@@ -2173,7 +2160,7 @@ body {
 }
 
 .sw-shipping-mode-pill--active {
-    background: var(--quote-green-light, var(--quote-view-green-6));
+    background: var(--quote-green-light, var(--material-green-100));
     border-color: var(--quote-green, var(--brand-500));
     color: var(--quote-green-dark, var(--store-green-700));
 }
@@ -2212,7 +2199,7 @@ body {
 .sw-manual-wo-label {
     font-size: 13px;
     font-weight: 600;
-    color: var(--quote-view-orange);
+    color: var(--amber-900);
 }
 
 .sw-manual-wo-input {
@@ -2540,7 +2527,7 @@ body {
 
 .sw-financial-row--total {
     background: var(--brand-50);
-    border: 1px solid var(--quote-view-green);
+    border: 1px solid var(--green-300);
     margin-top: 6px;
 }
 
@@ -2556,7 +2543,7 @@ body {
 
 .sw-financial-row--balance {
     background: var(--red-50);
-    border: 1px solid var(--quote-view-red);
+    border: 1px solid var(--red-300);
 }
 
 .sw-financial-row--balance .sw-financial-label {
@@ -2726,7 +2713,7 @@ body {
 }
 
 .sw-original-row--diff td {
-    border-bottom-color: var(--quote-view-yellow-6);
+    border-bottom-color: var(--amber-400);
 }
 
 .sw-original-label {
@@ -2854,7 +2841,7 @@ body {
 
 .sw-action-btn--success {
     background: var(--store-green-100);
-    border-color: var(--quote-view-green);
+    border-color: var(--green-300);
     color: var(--print-green-dark);
 }
 
@@ -2972,7 +2959,7 @@ body {
     text-align: right;
     font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     font-weight: 700;
-    color: var(--quote-view-green-2);
+    color: var(--green-600);
 }
 
 /* ============================================================================
@@ -3259,8 +3246,8 @@ body {
 .deposit-card {
     padding: 18px 20px;
     background: linear-gradient(180deg, var(--brand-50) 0%, var(--store-green-100) 100%);
-    border: 1px solid var(--quote-view-green);
-    border-left: 4px solid var(--quote-view-green-2);
+    border: 1px solid var(--green-300);
+    border-left: 4px solid var(--green-600);
     border-radius: 8px;
 }
 
@@ -3282,7 +3269,7 @@ body {
 }
 
 .deposit-line-total {
-    border-top: 1px solid var(--quote-view-green);
+    border-top: 1px solid var(--green-300);
     margin-top: 4px;
     padding-top: 8px;
     font-weight: 700;
@@ -3298,8 +3285,8 @@ body {
     font-size: 14px;
     margin-bottom: 10px;
 }
-.deposit-banner-ok { background: var(--store-green-100); border: 1px solid var(--quote-view-green); color: var(--print-green-dark); }
-.deposit-banner-warn { background: var(--amber-100); border: 1px solid var(--quote-view-yellow); color: var(--quote-view-orange); }
+.deposit-banner-ok { background: var(--store-green-100); border: 1px solid var(--green-300); color: var(--print-green-dark); }
+.deposit-banner-warn { background: var(--amber-100); border: 1px solid var(--quote-view-yellow); color: var(--amber-900); }
 
 /* Staff strip — mirrors the sw-manual-wo-strip visual language */
 .qv-deposit-strip {
@@ -3329,8 +3316,8 @@ body {
     border-radius: 999px;
     padding: 2px 10px;
 }
-.qv-deposit-strip-state.is-live { color: var(--quote-view-blue-3); border-color: var(--quote-view-blue); }
-.qv-deposit-strip-state.is-paid { color: var(--print-green); background: var(--store-green-100); border-color: var(--quote-view-green); }
+.qv-deposit-strip-state.is-live { color: var(--indigo-700); border-color: var(--quote-view-blue); }
+.qv-deposit-strip-state.is-paid { color: var(--print-green); background: var(--store-green-100); border-color: var(--green-300); }
 
 .qv-deposit-strip-form {
     display: flex;
@@ -3368,7 +3355,7 @@ body {
     font-size: 14px;
     cursor: pointer;
 }
-.qv-deposit-enable-btn:hover { background: var(--quote-view-blue-3); }
+.qv-deposit-enable-btn:hover { background: var(--indigo-700); }
 .qv-deposit-enable-btn:disabled { opacity: 0.6; cursor: default; }
 .qv-deposit-strip-help { margin-top: 8px; font-size: 12px; color: var(--slate-500); }
 
@@ -3399,7 +3386,7 @@ body {
 .qv-delivery-option:hover { border-color: var(--gray-400); }
 
 .qv-delivery-option:has(input:checked) {
-    border-color: var(--quote-view-green-2);
+    border-color: var(--green-600);
     background: var(--brand-50);
 }
 .qv-delivery-option input { margin-top: 3px; }

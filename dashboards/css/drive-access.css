@@ -12,7 +12,6 @@
 /* stylelint-disable color-no-hex */
 :root {
     --drive-access-red: #f0c4c0;
-    --drive-access-green: #3a7c52;
     --drive-access-gray: #5a665e;
     --drive-access-teal: #0f6e7a;
     --drive-access-green-2: #b9dcc4;
@@ -22,7 +21,7 @@
     --drive-access-green-5: #1a7c3a;
     --drive-access-gray-2: #8a968e;
   --da-green: var(--brand-800);
-  --da-green-mid: var(--drive-access-green);
+  --da-green-mid: var(--brand-mid);
   --da-green-light: var(--brand-500);
   --da-ink: var(--store-ink);
   --da-muted: var(--drive-access-gray);

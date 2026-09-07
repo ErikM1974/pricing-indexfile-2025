@@ -18,9 +18,7 @@
     --ae-dashboard-green-tint: #cdf3d6;
     --ae-dashboard-blue: #6b8fc4;
     --ae-dashboard-cyan: #60a5fa;
-    --ae-dashboard-cyan-tint: #bfdbfe;
     --ae-dashboard-indigo-tint: #ddd6fe;
-    --ae-dashboard-red-tint: #fecaca;
     --ae-dashboard-orange: #f97316;
     --ae-dashboard-violet: #9c27b0;
     --ae-dashboard-red-2: #ff5722;
@@ -81,7 +79,7 @@
     --art-theme-light:       var(--ae-dashboard-cyan);
     --art-theme-bg:          var(--color-floor-tint);
     --art-theme-bg-hover:    var(--sky-100);
-    --art-theme-bg-selected: var(--ae-dashboard-cyan-tint);
+    --art-theme-bg-selected: var(--blue-200);
     --art-theme-rgba-15:     rgb(37 99 235 / 15%);
     --art-theme-rgba-10:     rgb(37 99 235 / 10%);
     --art-theme-hover:       var(--color-floor-dark);
@@ -418,7 +416,7 @@ body {
 
 .req-fees__warning {
     margin: 0 0 16px; padding: 12px 14px; border-radius: 10px;
-    background: var(--red-50); border: 1px solid var(--ae-dashboard-red-tint); color: var(--red-800);
+    background: var(--red-50); border: 1px solid var(--red-200); color: var(--red-800);
     font-size: 13.5px; font-weight: 500;
 }
 .req-fees__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px; }

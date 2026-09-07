@@ -12,13 +12,9 @@
 /* stylelint-disable color-no-hex */
 :root {
     --shared-pricing-styles-gray-dark: #333;
-    --shared-pricing-styles-yellow: #ffc107;
     --shared-pricing-styles-teal: #add;
     --shared-pricing-styles-cyan: #007bff;
     --shared-pricing-styles-green-dark: #1e4d0f;
-    --shared-pricing-styles-green: #28a745;
-    --shared-pricing-styles-red: #dc3545;
-    --shared-pricing-styles-yellow-2: #856404;
     --shared-pricing-styles-teal-2: #17a2b8;
     --shared-pricing-styles-teal-3: #117a8b;
     --shared-pricing-styles-gray: #adb5bd;
@@ -355,15 +351,15 @@ h1 {
 }
 
 .inventory-good {
-    background-color: var(--shared-pricing-styles-green);
+    background-color: var(--bs-success);
 }
 
 .inventory-low {
-    background-color: var(--shared-pricing-styles-yellow);
+    background-color: var(--bs-warning);
 }
 
 .inventory-none {
-    background-color: var(--shared-pricing-styles-red);
+    background-color: var(--bs-danger);
 }
 
 /* LTM Fee Container */
@@ -842,13 +838,13 @@ h1 {
 
 .ltm-fee-notice {
     background-color: var(--amber-100);
-    color: var(--shared-pricing-styles-yellow-2);
+    color: var(--bs-warning-ink);
     padding: 8px 12px;
     border-radius: var(--radius-sm);
     margin-bottom: var(--spacing-md);
     display: flex;
     align-items: center;
-    border-left: 3px solid var(--shared-pricing-styles-yellow);
+    border-left: 3px solid var(--bs-warning);
 }
 
 .ltm-icon {

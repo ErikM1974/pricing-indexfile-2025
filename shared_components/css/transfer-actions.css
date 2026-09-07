@@ -11,20 +11,10 @@
    raw hex is allowed ONLY in this block. */
 /* stylelint-disable color-no-hex */
 :root {
-    --transfer-actions-green: #16a34a;
-    --transfer-actions-red: #fca5a5;
-    --transfer-actions-orange: #78350f;
-    --transfer-actions-yellow: #fde68a;
-    --transfer-actions-blue: #1e40af;
     --transfer-actions-indigo: #a855f7;
-    --transfer-actions-green-2: #22c55e;
-    --transfer-actions-green-tint: #bbf7d0;
-    --transfer-actions-red-tint: #fecaca;
-    --transfer-actions-green-3: #86efac;
     --transfer-actions-indigo-2: #6b21a8;
     --transfer-actions-gray: #78716c;
     --transfer-actions-yellow-2: #ca8a04;
-    --transfer-actions-orange-2: #fed7aa;
     --transfer-actions-orange-3: #7c2d12;
     --tas-theme: var(--color-bradley);
     --tas-theme-dark: var(--color-bradley-dark);
@@ -532,7 +522,7 @@
 .bt-toast--success { border-left-color: var(--emerald-600); }
 .bt-toast--error { border-left-color: var(--tas-rush); }
 .bt-toast--info { border-left-color: var(--tas-theme); }
-.bt-toast--warning { border-left-color: var(--amber-600); background: var(--amber-100); color: var(--transfer-actions-orange); }
+.bt-toast--warning { border-left-color: var(--amber-600); background: var(--amber-100); color: var(--amber-900); }
 
 /* ── File checklist (Steve modal v3.3) ────────────────────────────────
  * Live "what Bradley needs" reminder that auto-checks as Steve adds files.
@@ -548,12 +538,12 @@
 
 .tas-checklist--incomplete {
     background: var(--store-paper);
-    border-color: var(--transfer-actions-yellow);
+    border-color: var(--amber-200);
 }
 
 .tas-checklist--complete {
     background: var(--brand-50);
-    border-color: var(--transfer-actions-green-tint);
+    border-color: var(--green-200);
 }
 
 .tas-checklist-title {
@@ -590,7 +580,7 @@
 }
 
 .tas-checklist-item--done .tas-checklist-marker {
-    color: var(--transfer-actions-green);
+    color: var(--green-600);
 }
 
 .tas-checklist-item--done .tas-checklist-text {
@@ -605,7 +595,7 @@
     margin-top: 12px;
     padding: 10px 12px;
     background: var(--amber-100);
-    border: 1px solid var(--transfer-actions-yellow);
+    border: 1px solid var(--amber-200);
     border-left: 3px solid var(--amber-600);
     border-radius: 6px;
     font-size: 13px;
@@ -621,7 +611,7 @@
 }
 
 .tas-mockup-warning strong {
-    color: var(--transfer-actions-orange);
+    color: var(--amber-900);
 }
 
 @keyframes tas-toast-in {
@@ -669,7 +659,7 @@
 }
 
 .tas-mode-option--reorder.tas-mode-option--active {
-    color: var(--transfer-actions-green);
+    color: var(--green-600);
 }
 
 .tas-mode-hint {
@@ -684,7 +674,7 @@
 
 .tas-mode-reorder .tas-mode-hint {
     background: var(--brand-50);
-    border-left-color: var(--transfer-actions-green);
+    border-left-color: var(--green-600);
     color: var(--print-green);
 }
 
@@ -741,7 +731,7 @@
 
 .tas-line-row__remove:hover {
     background: var(--red-100);
-    border-color: var(--transfer-actions-red-tint);
+    border-color: var(--red-200);
 }
 .tas-line-row--first .tas-line-row__remove { display: none; }
 
@@ -784,7 +774,7 @@
     border-radius: 4px;
     background: var(--store-green-100);
     color: var(--print-green);
-    border: 1px solid var(--transfer-actions-green-3);
+    border: 1px solid var(--green-300);
     font-size: 11px;
     font-weight: 700;
     text-transform: uppercase;
@@ -871,7 +861,7 @@
 }
 
 .tas-row-remove {
-    border: 1px solid var(--transfer-actions-red);
+    border: 1px solid var(--red-300);
     background: var(--color-surface);
     color: var(--red-600);
     border-radius: 50%;
@@ -896,8 +886,8 @@
     border-radius: 6px;
     font-size: 13px;
 }
-.tas-row-status--busy { background: var(--color-floor-tint); color: var(--transfer-actions-blue); }
-.tas-row-status--err { background: var(--red-100); color: var(--red-800); border: 1px solid var(--transfer-actions-red); }
+.tas-row-status--busy { background: var(--color-floor-tint); color: var(--blue-800); }
+.tas-row-status--err { background: var(--red-100); color: var(--red-800); border: 1px solid var(--red-300); }
 
 .tas-row-card {
     margin-top: 10px;
@@ -908,7 +898,7 @@
     border-left: 3px solid var(--color-bradley);
 }
 .tas-row-card--mockup { border-left-color: var(--transfer-actions-indigo); }
-.tas-row-card--transfer { border-left-color: var(--transfer-actions-green-2); }
+.tas-row-card--transfer { border-left-color: var(--green-500); }
 
 .tas-row-head {
     display: flex;
@@ -987,7 +977,7 @@
     color: var(--print-green-dark);
     font-weight: 500;
 }
-.tas-row-place i { color: var(--transfer-actions-green); margin-right: 4px; }
+.tas-row-place i { color: var(--green-600); margin-right: 4px; }
 
 .tas-row-warn {
     margin-top: 6px;
@@ -1061,7 +1051,7 @@
 
 .tas-crm-check {
     font-size: 11px;
-    color: var(--transfer-actions-green);
+    color: var(--green-600);
     margin-left: 6px;
 }
 .tas-crm-check i { margin-right: 2px; }
@@ -1080,7 +1070,7 @@
     gap: 8px;
     padding: 10px 12px;
     background: var(--red-50);
-    border: 1px solid var(--transfer-actions-orange-2);
+    border: 1px solid var(--orange-200);
     border-radius: 6px;
     cursor: pointer;
     font-size: 13px;
@@ -1177,9 +1167,9 @@
     border-radius: 6px;
     font-size: 13px;
 }
-.tas-picker-busy { background: var(--color-floor-tint); color: var(--transfer-actions-blue); }
+.tas-picker-busy { background: var(--color-floor-tint); color: var(--blue-800); }
 .tas-picker-empty { background: var(--slate-50); color: var(--slate-500); text-align: center; }
-.tas-picker-err { background: var(--red-100); color: var(--red-800); border: 1px solid var(--transfer-actions-red); }
+.tas-picker-err { background: var(--red-100); color: var(--red-800); border: 1px solid var(--red-300); }
 
 .tas-picker-results-label,
 .tas-picker-recent-label {
@@ -1319,7 +1309,7 @@
 
 .tas-picker-file--added {
     background: var(--store-green-100);
-    border-color: var(--transfer-actions-green-2);
+    border-color: var(--green-500);
     cursor: default;
 }
 
@@ -1366,7 +1356,7 @@
     font-size: 18px;
     flex-shrink: 0;
 }
-.tas-picker-file-add--done { color: var(--transfer-actions-green); }
+.tas-picker-file-add--done { color: var(--green-600); }
 
 /* Paste-URL fallback (disclosed) */
 

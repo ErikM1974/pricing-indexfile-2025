@@ -17,13 +17,6 @@
    keeps its exact look. Map them to shared_components/css/tokens.css names when the page is redesigned;
    every rule below uses var(). Raw hex is allowed ONLY in this block. */
 /* stylelint-disable color-no-hex */
-:root {
-    --manual-pricing-teal: #10b981;
-    --manual-pricing-red: #ef4444;
-    --manual-pricing-yellow: #fbbf24;
-    --manual-pricing-orange: #78350f;
-    --manual-pricing-red-tint: #fecaca;
-}
 /* stylelint-enable color-no-hex */
 
 /* Animation keyframes */
@@ -244,9 +237,9 @@
 /* Colored top accent bars per method */
 #dtgCard    { border-top: 3px solid var(--color-floor-light); }
 #dtfCard    { border-top: 3px solid var(--color-ruth-light); }
-#embCard    { border-top: 3px solid var(--manual-pricing-teal); }
+#embCard    { border-top: 3px solid var(--emerald-500); }
 #capEmbCard { border-top: 3px solid var(--amber-500); }
-#spCard     { border-top: 3px solid var(--manual-pricing-red); }
+#spCard     { border-top: 3px solid var(--red-500); }
 
 .method-card-header {
     display: flex;
@@ -281,9 +274,9 @@
 
 .method-icon.dtg { background: var(--color-floor-light); }
 .method-icon.dtf { background: var(--color-ruth-light); }
-.method-icon.emb { background: var(--manual-pricing-teal); }
+.method-icon.emb { background: var(--emerald-500); }
 .method-icon.cap { background: var(--amber-500); }
-.method-icon.sp  { background: var(--manual-pricing-red); }
+.method-icon.sp  { background: var(--red-500); }
 
 .method-card-controls {
     display: flex;
@@ -436,8 +429,8 @@
     display: inline-block;
     font-size: 0.625rem;
     font-weight: 700;
-    background: var(--manual-pricing-yellow);
-    color: var(--manual-pricing-orange);
+    background: var(--amber-400);
+    color: var(--amber-900);
     padding: 0.125rem 0.5rem;
     border-radius: 10px;
     margin-left: 0.5rem;
@@ -511,7 +504,7 @@
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    border-bottom: 2px solid var(--manual-pricing-red-tint);
+    border-bottom: 2px solid var(--red-200);
 }
 
 .api-error-banner.hidden {

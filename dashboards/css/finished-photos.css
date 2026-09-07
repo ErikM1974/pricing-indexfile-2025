@@ -10,13 +10,12 @@
 :root {
     --finished-photos-green-tint: #cde6cf;
     --finished-photos-gray-dark: #000;
-    --finished-photos-green-dark: #1b5e20;
     --finished-photos-gray: #8a948d;
     --finished-photos-cyan: #14508a;
     --finished-photos-cyan-2: #b9d4f0;
     --finished-photos-green: #b7c9b8;
     --fp-green: var(--store-green-700);
-    --fp-green-dark: var(--finished-photos-green-dark);
+    --fp-green-dark: var(--material-green-900);
     --fp-green-deep: var(--store-green-950);
     --fp-green-bg: var(--color-steve-tint);
     --fp-green-bg-2: var(--brand-100);

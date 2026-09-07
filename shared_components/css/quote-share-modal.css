@@ -18,12 +18,10 @@
    raw hex is allowed ONLY in this block. */
 /* stylelint-disable color-no-hex */
 :root {
-    --quote-share-modal-teal: #10b981;
-    --quote-share-modal-blue: #1e40af;
     --quote-share-modal-blue-2: #1e3a8a;
-    --quote-modal-primary: var(--builder-primary, var(--quote-share-modal-teal));
+    --quote-modal-primary: var(--builder-primary, var(--emerald-500));
     --quote-modal-primary-dark: var(--builder-primary-dark, var(--emerald-600));
-    --quote-modal-secondary: var(--builder-secondary, var(--quote-share-modal-blue));
+    --quote-modal-secondary: var(--builder-secondary, var(--blue-800));
     --quote-modal-secondary-dark: var(--builder-secondary-dark, var(--quote-share-modal-blue-2));
 }
 /* stylelint-enable color-no-hex */

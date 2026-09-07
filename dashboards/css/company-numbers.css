@@ -63,7 +63,7 @@
 
 .rep-goal-note {
     margin-top: 10px; padding: 8px 10px; border-radius: var(--radius);
-    font-size: 12px; color: var(--company-numbers-yellow); background: rgb(245 158 11 / 10%);
+    font-size: 12px; color: var(--amber-400); background: rgb(245 158 11 / 10%);
     border: 1px solid rgb(245 158 11 / 35%);
 }
 .rep-goal-note i { margin-right: 6px; }
@@ -91,7 +91,7 @@
 .aa-chip-num { font-size: 1.5rem; font-weight: 700; }
 .aa-chip-label { font-size: .72rem; opacity: .8; }
 .aa-chip--red   { background: rgb(239 68 68 / 10%);  border-color: rgb(239 68 68 / 33%); }
-.aa-chip--red .aa-chip-num   { color: var(--company-numbers-red); }
+.aa-chip--red .aa-chip-num   { color: var(--red-500); }
 .aa-chip--amber { background: rgb(245 158 11 / 10%); border-color: rgb(245 158 11 / 33%); }
 .aa-chip--amber .aa-chip-num { color: var(--amber-500); }
 .aa-chip--green { background: var(--accent-bg); border-color: color-mix(in oklch, var(--accent) 35%, transparent); }
@@ -106,17 +106,17 @@
 }
 .aa-row:hover { background: rgb(127 127 127 / 14%); }
 .aa-row:focus-visible { outline: none; box-shadow: var(--focus-ring); }
-.aa-row--red   { border-left-color: var(--company-numbers-red); }
+.aa-row--red   { border-left-color: var(--red-500); }
 .aa-row--amber { border-left-color: var(--amber-500); }
 .aa-company { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; font-size: .85rem; }
 .aa-status  { font-size: .72rem; opacity: .75; white-space: nowrap; }
 .aa-days    { font-size: .78rem; font-weight: 700; white-space: nowrap; }
-.aa-row--red .aa-days   { color: var(--company-numbers-red); }
+.aa-row--red .aa-days   { color: var(--red-500); }
 .aa-row--amber .aa-days { color: var(--amber-500); }
 .aa-more { margin-top: 8px; }
 .aa-more a { color: inherit; }
 .aa-error { text-align: center; padding: 10px 0; }
-.aa-error-msg { font-size: .82rem; color: var(--company-numbers-red); margin-bottom: 8px; }
+.aa-error-msg { font-size: .82rem; color: var(--red-500); margin-bottom: 8px; }
 .aa-retry { width: auto; padding: 4px 14px; font-size: .8rem; }
 
 /* ── Phones ──────────────────────────────────────────────────────────── */
@@ -177,7 +177,7 @@ a.rep-card:focus-visible { outline: none; box-shadow: var(--focus-ring); }
 }
 .cn-due-num { font-size: 1.6rem; font-weight: 700; line-height: 1.1; }
 .cn-due-label { font-size: .72rem; color: var(--text-3); margin-top: 2px; }
-.cn-due-tile--late { border-color: rgb(239 68 68 / 35%); }   .cn-due-tile--late .cn-due-num { color: var(--company-numbers-red); }
+.cn-due-tile--late { border-color: rgb(239 68 68 / 35%); }   .cn-due-tile--late .cn-due-num { color: var(--red-500); }
 .cn-due-tile--risk { border-color: rgb(245 158 11 / 35%); }  .cn-due-tile--risk .cn-due-num { color: var(--amber-500); }
 .cn-due-tile--nopo { border-color: rgb(239 68 68 / 35%); }   .cn-due-tile--nopo .cn-due-num { color: var(--company-numbers-red-2); }
 .cn-due-tile--ok   { border-color: color-mix(in oklch, var(--accent) 35%, transparent); } .cn-due-tile--ok .cn-due-num { color: var(--accent); }
@@ -188,7 +188,7 @@ a.rep-card:focus-visible { outline: none; box-shadow: var(--focus-ring); }
     padding: 7px 10px; border-radius: 8px; background: rgb(127 127 127 / 8%);
     border-left: 3px solid var(--text-dim); font-size: .85rem;
 }
-.cn-due-row--late { border-left-color: var(--company-numbers-red); }
+.cn-due-row--late { border-left-color: var(--red-500); }
 .cn-due-row--risk { border-left-color: var(--amber-500); }
 .cn-due-wo { font-size: .78rem; color: var(--text-3); white-space: nowrap; }
 .cn-due-main { display: flex; flex-direction: column; min-width: 0; }
@@ -197,7 +197,7 @@ a.rep-card:focus-visible { outline: none; box-shadow: var(--focus-ring); }
 .cn-due-blanks { font-size: .72rem; color: var(--text-3); white-space: nowrap; }
 .cn-due-blanks--nopo { color: var(--company-numbers-red-2); font-weight: 600; }
 .cn-due-when { font-size: .78rem; font-weight: 700; white-space: nowrap; }
-.cn-due-row--late .cn-due-when { color: var(--company-numbers-red); }
+.cn-due-row--late .cn-due-when { color: var(--red-500); }
 .cn-due-row--risk .cn-due-when { color: var(--amber-500); }
 .cn-due-value { text-align: right; font-size: .8rem; color: var(--text-2); white-space: nowrap; }
 .cn-due-more { font-size: 12px; color: var(--text-3); margin-top: 6px; }
@@ -211,9 +211,9 @@ a.rep-card:focus-visible { outline: none; box-shadow: var(--focus-ring); }
 
 /* ── Art Requests: zombies (> 30 days) ───────────────────────────────── */
 .aa-chip--stale { background: rgb(239 68 68 / 16%); border-color: rgb(239 68 68 / 50%); }
-.aa-chip--stale .aa-chip-num { color: var(--company-numbers-red-3); }
+.aa-chip--stale .aa-chip-num { color: var(--red-300); }
 .aa-row--stale { border-left-color: var(--red-700); background: rgb(239 68 68 / 8%); }
-.aa-row--stale .aa-days { color: var(--company-numbers-red-3); }
+.aa-row--stale .aa-days { color: var(--red-300); }
 
 /* ── Wide screens: use the monitor (1360 → 1600, three-up metrics) ─────── */
 .cn-shell > .main-content { max-width: 1600px; }
@@ -230,10 +230,7 @@ a.rep-card:focus-visible { outline: none; box-shadow: var(--focus-ring); }
    raw hex is allowed ONLY in this block. */
 /* stylelint-disable color-no-hex */
     :root {
-    --company-numbers-red: #ef4444;
     --company-numbers-red-2: #f87171;
-    --company-numbers-red-3: #fca5a5;
-    --company-numbers-yellow: #fbbf24;
 
  color-scheme: light; }
 /* stylelint-enable color-no-hex */

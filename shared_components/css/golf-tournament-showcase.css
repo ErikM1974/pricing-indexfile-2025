@@ -10,9 +10,7 @@
    raw hex is allowed ONLY in this block. */
 /* stylelint-disable color-no-hex */
 :root {
-    --gts-yellow: #fde68a;
     --gts-yellow-2: #e9d8a6;
-    --gts-red: #ef4444;
 
     /* NWCA brand */
     --primary: var(--brand-500);
@@ -229,7 +227,7 @@ img { display: block; max-width: 100%; height: auto; }
 }
 
 .hero__offer {
-    background: linear-gradient(135deg, var(--amber-100) 0%, var(--gts-yellow) 100%);
+    background: linear-gradient(135deg, var(--amber-100) 0%, var(--amber-200) 100%);
     color: var(--gray-900);
     padding: 1rem 1.5rem;
     border-radius: var(--radius);
@@ -264,7 +262,7 @@ img { display: block; max-width: 100%; height: auto; }
 .hero__bonus-card {
     position: relative;
     isolation: isolate;
-    background: linear-gradient(135deg, var(--amber-100) 0%, var(--gts-yellow) 100%);
+    background: linear-gradient(135deg, var(--amber-100) 0%, var(--amber-200) 100%);
     color: var(--gray-900);
     padding: 1.5rem 1.25rem;
     border-radius: var(--radius-lg);
@@ -779,7 +777,7 @@ img { display: block; max-width: 100%; height: auto; }
    ============================================================ */
 
 .bonus-band {
-    background: linear-gradient(135deg, var(--amber-100) 0%, var(--gts-yellow) 100%);
+    background: linear-gradient(135deg, var(--amber-100) 0%, var(--amber-200) 100%);
     padding: 1.5rem 0;
     border-top: 3px solid var(--gold);
     border-bottom: 3px solid var(--gold);
@@ -1215,7 +1213,7 @@ img { display: block; max-width: 100%; height: auto; }
 }
 
 .example-package__bonus {
-    background: linear-gradient(135deg, var(--amber-100) 0%, var(--gts-yellow) 100%);
+    background: linear-gradient(135deg, var(--amber-100) 0%, var(--amber-200) 100%);
     border-left: 4px solid var(--gold);
     padding: 1rem 1.25rem;
     margin-top: 1.25rem;
@@ -1316,7 +1314,7 @@ img { display: block; max-width: 100%; height: auto; }
 }
 
 .quote-form input:invalid:not(:placeholder-shown, :focus) {
-    border-color: var(--gts-red);
+    border-color: var(--red-500);
 }
 
 .quote-form textarea {

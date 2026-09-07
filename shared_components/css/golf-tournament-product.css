@@ -8,10 +8,6 @@
    keeps its exact look. Map them to shared_components/css/tokens.css names when the page is redesigned;
    every rule below uses var(). Raw hex is allowed ONLY in this block. */
 /* stylelint-disable color-no-hex */
-:root {
-    --gtp-yellow: #fbbf24;
-    --gtp-red: #ef4444;
-}
 /* stylelint-enable color-no-hex */
 
 /* ============================================================
@@ -254,7 +250,7 @@
     margin: 1.25rem 0 1.75rem;
     border-radius: var(--radius-lg);
     overflow: hidden;
-    background: linear-gradient(135deg, var(--gtp-yellow) 0%, var(--amber-500) 50%, var(--gtp-yellow) 100%);
+    background: linear-gradient(135deg, var(--amber-400) 0%, var(--amber-500) 50%, var(--amber-400) 100%);
     background-size: 200% 200%;
     box-shadow: 0 12px 32px rgb(245 158 11 / 35%), 0 0 0 1px rgb(217 119 6 / 30%) inset;
     animation: bonus-glow 4s ease-in-out infinite;
@@ -744,7 +740,7 @@
 
 .product-error__icon {
     font-size: 3rem;
-    color: var(--accent-red, var(--gtp-red));
+    color: var(--accent-red, var(--red-500));
     margin-bottom: 1rem;
 }
 

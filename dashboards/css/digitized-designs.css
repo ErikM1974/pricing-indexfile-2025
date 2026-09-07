@@ -21,13 +21,8 @@
    every rule below uses var(). Raw hex is allowed ONLY in this block. */
 /* stylelint-disable color-no-hex */
 :root {
-    --digitized-designs-teal-dark: #065f46;
-    --digitized-designs-green-tint: #d1fae5;
     --digitized-designs-gray: #b0b0b0;
     --digitized-designs-gray-2: #b0b8c0;
-    --digitized-designs-cyan-tint: #bfdbfe;
-    --digitized-designs-blue: #1e40af;
-    --digitized-designs-red: #fca5a5;
 }
 /* stylelint-enable color-no-hex */
 
@@ -240,8 +235,8 @@ body {
 
 .as-surcharge-badge.none {
     background: var(--brand-50);
-    color: var(--digitized-designs-teal-dark);
-    border: 1px solid var(--digitized-designs-green-tint);
+    color: var(--emerald-800);
+    border: 1px solid var(--emerald-100);
     font-weight: 500;
 }
 
@@ -564,11 +559,11 @@ body {
 
 .al-stitch-info {
     background: var(--color-floor-tint);
-    border: 1px solid var(--digitized-designs-cyan-tint);
+    border: 1px solid var(--blue-200);
     border-radius: 8px;
     padding: 10px 16px;
     font-size: 13px;
-    color: var(--digitized-designs-blue);
+    color: var(--blue-800);
     margin-bottom: 20px;
     line-height: 1.5;
 }
@@ -739,5 +734,5 @@ body {
 .design-from-file { font-size: 11px; font-weight: 500; color: var(--amber-700); }
 .no-design-num { font-size: 13px; font-weight: 500; color: var(--red-700); }
 .al-pricing-btn:focus-visible, .card-details-toggle:focus-visible, .al-modal-close:focus-visible, .mockup-link:focus-visible, .back-link:focus-visible { outline: 2px solid var(--brand-500); outline-offset: 2px; }
-.caspio-fail { margin: 24px; padding: 16px; border: 1px solid var(--digitized-designs-red); background: var(--red-50); color: var(--red-800); border-radius: 8px; font-size: 14px; }
+.caspio-fail { margin: 24px; padding: 16px; border: 1px solid var(--red-300); background: var(--red-50); color: var(--red-800); border-radius: 8px; font-size: 14px; }
 .caspio-fail-retry { margin-left: 8px; padding: 6px 12px; border: 1px solid var(--red-800); border-radius: 6px; background: var(--color-surface); color: var(--red-800); cursor: pointer; font: inherit; }

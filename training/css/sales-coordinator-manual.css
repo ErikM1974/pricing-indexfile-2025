@@ -10,21 +10,17 @@
 /* stylelint-disable color-no-hex */
 :root {
     --page-cyan: #0284c7;
-    --page-green: #5bc85f;
-    --page-green-tint: #d1fae5;
-    --page-teal-dark: #065f46;
-    --page-orange: #78350f;
             --primary-color: var(--brand-500);
             --primary-dark: var(--brand-600);
-            --primary-light: var(--page-green);
+            --primary-light: var(--brand-400);
             --bg-color: var(--color-bradley-tint);
             --card-bg: var(--color-surface);
             --border-color: var(--gray-200);
             --text-primary: var(--gray-800);
             --text-secondary: var(--gray-500);
             --hover-bg: var(--gray-100);
-            --success-bg: var(--page-green-tint);
-            --success-text: var(--page-teal-dark);
+            --success-bg: var(--emerald-100);
+            --success-text: var(--emerald-800);
             --warning-bg: var(--amber-100);
             --warning-text: var(--amber-800);
         }
@@ -381,7 +377,7 @@
 
         .script-box .response {
             font-style: italic;
-            color: var(--page-orange);
+            color: var(--amber-900);
             padding-left: 1rem;
         }
 

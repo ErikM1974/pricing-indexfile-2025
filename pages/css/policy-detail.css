@@ -17,14 +17,9 @@
     --policy-detail-gray-dark: #333;
     --policy-detail-gray-dark-2: #000;
     --policy-detail-violet-2: #c93edb;
-    --policy-detail-green: #15803d;
     --policy-detail-indigo-2: #5a2eb8;
     --policy-detail-indigo-3: #7e2eb8;
     --policy-detail-indigo-tint: #e9d5ff;
-    --policy-detail-green-2: #86efac;
-    --policy-detail-red: #fca5a5;
-    --policy-detail-teal: #10b981;
-    --policy-detail-green-3: #16a34a;
     --policy-detail-gray: #666;
     --policy-detail-gray-2: #8a8a8a;
     --pd-bg: var(--color-bradley-tint);
@@ -1413,7 +1408,7 @@ body.policy-detail-body {
 
 .comment-tag-resolved {
     background: var(--store-green-100);
-    color: var(--policy-detail-green);
+    color: var(--green-700);
 }
 
 .comment-text {
@@ -1462,12 +1457,12 @@ body.policy-detail-body {
 }
 
 .comment-action-btn[data-action="resolve"] {
-    color: var(--policy-detail-green);
+    color: var(--green-700);
 }
 
 .comment-action-btn[data-action="resolve"]:hover {
     background: var(--store-green-100);
-    border-color: var(--policy-detail-green-2);
+    border-color: var(--green-300);
 }
 
 .comment-action-btn[data-action="hide"] {
@@ -1476,7 +1471,7 @@ body.policy-detail-body {
 
 .comment-action-btn[data-action="hide"]:hover {
     background: var(--red-100);
-    border-color: var(--policy-detail-red);
+    border-color: var(--red-300);
 }
 .comment-reply-btn { color: var(--pd-accent); }
 
@@ -1763,7 +1758,7 @@ body.policy-detail-body {
     opacity: 1;
     transform: translateX(-50%) translateY(0);
 }
-.pd-toast i { color: var(--policy-detail-teal); }
+.pd-toast i { color: var(--emerald-500); }
 
 /* =====================================================
    READ TIME PILL
@@ -1832,7 +1827,7 @@ body.policy-detail-body {
 
 .policy-body .callout[data-kind="tip"],
 .tt-content .callout[data-kind="tip"] {
-    --callout-accent: var(--policy-detail-green-3);
+    --callout-accent: var(--green-600);
     --callout-bg: var(--brand-50);
     --callout-icon: '\f0eb';  /* fa-lightbulb */
     --callout-label: 'Tip';

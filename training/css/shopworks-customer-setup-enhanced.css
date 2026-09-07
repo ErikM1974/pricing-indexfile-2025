@@ -10,7 +10,6 @@
     --page-blue: #2b5797;
     --page-yellow-tint: #ece9d8;
     --page-cyan: #7f9db9;
-    --page-yellow: #ffc107;
     --page-blue-2: #4a7cc6;
     --page-gray-2: #c0c0c0;
     --page-blue-3: #4169e1;
@@ -596,13 +595,13 @@
         /* Highlight for training */
         .highlight-field {
             animation: pulse 2s infinite;
-            box-shadow: 0 0 0 2px var(--page-yellow);
+            box-shadow: 0 0 0 2px var(--bs-warning);
         }
 
         @keyframes pulse {
-            0% { box-shadow: 0 0 0 2px var(--page-yellow); }
-            50% { box-shadow: 0 0 0 4px var(--page-yellow), 0 0 20px rgb(255 193 7 / 50%); }
-            100% { box-shadow: 0 0 0 2px var(--page-yellow); }
+            0% { box-shadow: 0 0 0 2px var(--bs-warning); }
+            50% { box-shadow: 0 0 0 4px var(--bs-warning), 0 0 20px rgb(255 193 7 / 50%); }
+            100% { box-shadow: 0 0 0 2px var(--bs-warning); }
         }
 
         /* Success/Error animations */

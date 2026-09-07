@@ -12,16 +12,11 @@
 /* stylelint-disable color-no-hex */
 :root {
     --dashboard-v3-theme-green: #4ade80;
-    --dashboard-v3-theme-red: #ef4444;
-    --dashboard-v3-theme-red-2: #fca5a5;
-    --dashboard-v3-theme-red-tint: #fecaca;
     --dashboard-v3-theme-orange: #c9b99c;
-    --dashboard-v3-theme-green-2: #22c55e;
     --dashboard-v3-theme-green-3: #1f9d4d;
     --dashboard-v3-theme-cyan: #b6c0cc;
     --dashboard-v3-theme-gray: #8a94a3;
     --dashboard-v3-theme-orange-2: #e6c992;
-    --dashboard-v3-theme-yellow: #fcd34d;
     --dashboard-v3-theme-red-dark: #5c1620;
 }
 /* stylelint-enable color-no-hex */
@@ -30,7 +25,7 @@
 :root,
 :root[data-theme="dark"],
 :root[data-accent="green"]{
-  --nw-green:        var(--dashboard-v3-theme-green-2);
+  --nw-green:        var(--green-500);
   --nw-green-hi:     var(--dashboard-v3-theme-green);
   --nw-green-dim:    var(--dashboard-v3-theme-green-3);
   --nw-green-soft:   rgb(34 197 94 / 12%);
@@ -229,7 +224,7 @@ a{ color: inherit; }
 
 /* Something IS past due → swap the clock for an alert triangle and go red. */
 .nav-section[data-section="past-due-orders"][data-pastdue="alert"] .nav-section-title > span[aria-hidden="true"]:first-child{
-  background-color: var(--nw-danger, var(--dashboard-v3-theme-red));
+  background-color: var(--nw-danger, var(--red-500));
           mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'><path d='M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z'/><line x1='12' y1='9' x2='12' y2='13'/><line x1='12' y1='17' x2='12.01' y2='17'/></svg>");
 }
 
@@ -247,7 +242,7 @@ a{ color: inherit; }
 .nav-pd-badge[hidden]{ display: none; }
 
 .nav-pd-badge--alert{
-  background: var(--nw-danger, var(--dashboard-v3-theme-red));
+  background: var(--nw-danger, var(--red-500));
   color: var(--color-on-brand);
 }
 
@@ -1236,7 +1231,7 @@ details.tool-category[open] .tool-category-header{ border-bottom: 1px solid var(
    Per CLAUDE-CODE-FIX-LIST.md issue B. */
 .sales-goal-pace.is-behind {
   background: rgb(239 68 68 / 12%);
-  color: var(--dashboard-v3-theme-red-2);
+  color: var(--red-300);
   border: 1px solid rgb(239 68 68 / 35%);
   padding: 4px 10px;
   border-radius: 999px;
@@ -1251,7 +1246,7 @@ details.tool-category[open] .tool-category-header{ border-bottom: 1px solid var(
 .sales-goal-pace.is-warning {
   /* Slightly behind — amber tint */
   background: rgb(251 191 36 / 12%);
-  color: var(--dashboard-v3-theme-yellow);
+  color: var(--amber-300);
   border: 1px solid rgb(251 191 36 / 35%);
   padding: 4px 10px;
   border-radius: 999px;
@@ -1347,10 +1342,10 @@ a.inbox-row:hover{ border-color: var(--nw-green-dim); background: var(--surface-
   border-radius: var(--radius); padding: 10px 12px; margin-bottom: 10px;
   font-size: 13px;
 }
-.inbox-error{ border: 1px solid rgb(239 68 68 / 40%); color: var(--dashboard-v3-theme-red-2); background: rgb(239 68 68 / 8%); }
-.inbox-failure{ border: 1px solid rgb(239 68 68 / 60%); color: var(--dashboard-v3-theme-red-tint); background: rgb(239 68 68 / 12%); }
+.inbox-error{ border: 1px solid rgb(239 68 68 / 40%); color: var(--red-300); background: rgb(239 68 68 / 8%); }
+.inbox-failure{ border: 1px solid rgb(239 68 68 / 60%); color: var(--red-200); background: rgb(239 68 68 / 12%); }
 .inbox-failure ul{ margin: 6px 0 0; padding-left: 16px; }
-.inbox-failure a{ color: var(--dashboard-v3-theme-red-tint); text-decoration: underline; }
+.inbox-failure a{ color: var(--red-200); text-decoration: underline; }
 
 .pay-totals{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 12px; }
 

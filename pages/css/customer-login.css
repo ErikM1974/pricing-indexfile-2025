@@ -3,10 +3,9 @@
    raw hex is allowed ONLY in this block. */
 /* stylelint-disable color-no-hex */
 :root {
-    --customer-login-green: #3a7c52;
     --customer-login-gray: #5f6b63;
     --customer-login-gray-2: #66736a;
- --nw-dark:var(--brand-800); --nw-med:var(--customer-login-green); }
+ --nw-dark:var(--brand-800); --nw-med:var(--brand-mid); }
 /* stylelint-enable color-no-hex */
 * { box-sizing: border-box; }
 

@@ -8,11 +8,7 @@
    every rule below uses var(). Raw hex is allowed ONLY in this block. */
 /* stylelint-disable color-no-hex */
 :root {
-    --commission-structure-teal: #10b981;
-    --commission-structure-yellow: #856404;
     --commission-structure-blue: #1e4a8b;
-    --commission-structure-green-tint: #d1fae5;
-    --commission-structure-teal-dark: #065f46;
     --commission-structure-yellow-dark: #5c4503;
 }
 /* stylelint-enable color-no-hex */
@@ -172,7 +168,7 @@
     padding: 0.75rem 1rem;
     border-radius: 6px;
     font-size: 0.875rem;
-    color: var(--commission-structure-yellow);
+    color: var(--bs-warning-ink);
     margin-top: 1rem;
 }
 
@@ -261,7 +257,7 @@
 
 .baseline-label {
     font-size: 0.875rem;
-    color: var(--commission-structure-yellow);
+    color: var(--bs-warning-ink);
     font-weight: 500;
 }
 
@@ -314,7 +310,7 @@
 
 .account-revenue {
     font-weight: 600;
-    color: var(--commission-structure-teal);
+    color: var(--emerald-500);
 }
 
 /* =====================================================
@@ -594,7 +590,7 @@
 
 .example-row.total span:last-child {
     font-weight: 700;
-    color: var(--commission-structure-teal);
+    color: var(--emerald-500);
     font-size: 1rem;
 }
 
@@ -670,9 +666,9 @@
 .scenario-result {
     margin-top: 1rem;
     padding: 0.75rem 1rem;
-    background: var(--commission-structure-green-tint);
+    background: var(--emerald-100);
     border-radius: 6px;
-    color: var(--commission-structure-teal-dark);
+    color: var(--emerald-800);
     font-weight: 600;
 }
 
@@ -803,9 +799,9 @@
 .cs-mt { margin-top: 1.25rem; }
 .cs-mt-lg { margin-top: 1.5rem; }
 .cs-legacy { color: var(--color-ae); }
-.cs-new { color: var(--commission-structure-teal); }
+.cs-new { color: var(--emerald-500); }
 .scenario-icon--danger { background: var(--red-100); color: var(--red-800); }
-.scenario-icon--ok { background: var(--commission-structure-green-tint); color: var(--commission-structure-teal-dark); }
+.scenario-icon--ok { background: var(--emerald-100); color: var(--emerald-800); }
 .scenario-icon--warn { background: var(--amber-100); color: var(--amber-800); }
 button.accordion-header { width: 100%; font: inherit; color: inherit; text-align: left; }
 .accordion-header:focus-visible { outline: 2px solid var(--art-theme, var(--color-ae)); outline-offset: 2px; }

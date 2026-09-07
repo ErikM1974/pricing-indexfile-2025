@@ -31,9 +31,6 @@
    keeps its exact look. Map them to shared_components/css/tokens.css names when the page is redesigned;
    every rule below uses var(). Raw hex is allowed ONLY in this block. */
 /* stylelint-disable color-no-hex */
-:root {
-    --iq-orange: #78350f;
-}
 /* stylelint-enable color-no-hex */
 
 /* ── Layout shell ─────────────────────────────────────────────────── */
@@ -541,7 +538,7 @@ body { --stk-bar-h: 62px; }
 .stk-alert { border-radius: var(--radius-sm); padding: 14px 16px; margin: 16px 0; font-size: 14px; }
 .stk-alert[hidden] { display: none; }
 .stk-alert-error { background: var(--bad-soft); border: 1px solid var(--bad); color: var(--print-red); }
-.stk-alert-warn { background: var(--warn-soft); border: 1px solid var(--warn); color: var(--iq-orange); }
+.stk-alert-warn { background: var(--warn-soft); border: 1px solid var(--warn); color: var(--amber-900); }
 .stk-alert strong { display: block; margin-bottom: 3px; }
 
 .stk-toast {

@@ -9,14 +9,9 @@
 /* stylelint-disable color-no-hex */
 :root {
     --policies-hub-v2-violet: #9b3edb;
-    --policies-hub-v2-green: #16a34a;
     --policies-hub-v2-indigo: #6e3edb;
-    --policies-hub-v2-red: #fca5a5;
-    --policies-hub-v2-green-2: #15803d;
     --policies-hub-v2-violet-2: #c93edb;
     --policies-hub-v2-green-tint: #cfead4;
-    --policies-hub-v2-green-tint-2: #bbf7d0;
-    --policies-hub-v2-green-3: #86efac;
     --policies-hub-v2-indigo-tint: #e9d5ff;
     --ph-bg: var(--color-bradley-tint);
     --ph-surface: var(--color-surface);
@@ -872,7 +867,7 @@ html.is-policies-admin .admin-only { display: inline-flex; }
 
 .btn-questions-badge.has-questions {
     background: var(--red-50);
-    border-color: var(--policies-hub-v2-red);
+    border-color: var(--red-300);
     color: var(--red-800);
 }
 .btn-questions-badge.has-questions i { color: var(--red-600); }
@@ -945,20 +940,20 @@ html.is-policies-admin .admin-only { display: inline-flex; }
     padding: 3.5rem 1.5rem;
     text-align: center;
     background: linear-gradient(180deg, var(--brand-50) 0%, white 60%);
-    border: 1px solid var(--policies-hub-v2-green-tint-2);
+    border: 1px solid var(--green-200);
     border-radius: var(--ph-radius);
 }
 
 .inbox-zero i {
     font-size: 3rem;
-    color: var(--policies-hub-v2-green);
+    color: var(--green-600);
     margin-bottom: 0.5rem;
     display: block;
 }
 
 .inbox-zero h2 {
     margin: 0.4rem 0 0.3rem;
-    color: var(--policies-hub-v2-green-2);
+    color: var(--green-700);
     font-size: 1.4rem;
     font-weight: 700;
 }
@@ -1121,13 +1116,13 @@ html.is-policies-admin .admin-only { display: inline-flex; }
 }
 .question-actions .btn { font-size: 0.85rem; }
 /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
-.question-resolve-btn { color: var(--policies-hub-v2-green-2) !important; }
+.question-resolve-btn { color: var(--green-700) !important; }
 
 .question-resolve-btn:hover {
     /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
     background: var(--store-green-100) !important;
     /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
-    border-color: var(--policies-hub-v2-green-3) !important;
+    border-color: var(--green-300) !important;
 }
 /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
 .question-hide-btn { color: var(--red-700) !important; }
@@ -1136,7 +1131,7 @@ html.is-policies-admin .admin-only { display: inline-flex; }
     /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
     background: var(--red-100) !important;
     /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
-    border-color: var(--policies-hub-v2-red) !important;
+    border-color: var(--red-300) !important;
 }
 
 @media (width <= 600px) {
@@ -1298,7 +1293,7 @@ html.is-policies-admin .admin-only { display: inline-flex; }
     align-items: center;
     gap: 0.4rem;
 }
-.ai-search-status i { color: var(--policies-hub-v2-green); }
+.ai-search-status i { color: var(--green-600); }
 .ai-search-status.error { color: var(--ph-danger); }
 .ai-search-status.error i { color: var(--ph-danger); }
 
@@ -1343,10 +1338,10 @@ html.is-policies-admin .admin-only { display: inline-flex; }
     background: var(--gray-400);
     display: inline-block;
 }
-.ai-search-result-high .ai-search-conf-dot { background: var(--policies-hub-v2-green); }
+.ai-search-result-high .ai-search-conf-dot { background: var(--green-600); }
 .ai-search-result-medium .ai-search-conf-dot { background: var(--amber-600); }
 .ai-search-result-low .ai-search-conf-dot { background: var(--gray-400); }
-.ai-search-result-high .ai-search-result-conf { color: var(--policies-hub-v2-green); }
+.ai-search-result-high .ai-search-result-conf { color: var(--green-600); }
 .ai-search-result-medium .ai-search-result-conf { color: var(--amber-600); }
 
 .ai-search-result-title {

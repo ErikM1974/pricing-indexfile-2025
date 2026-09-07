@@ -16,8 +16,6 @@
    every rule below uses var(). Raw hex is allowed ONLY in this block. */
 /* stylelint-disable color-no-hex */
 :root {
-    --mockup-submit-form-red: #ef4444;
-    --mockup-submit-form-teal-dark: #047857;
     --mockup-submit-form-teal-dark-2: #064e3b;
 }
 /* stylelint-enable color-no-hex */
@@ -307,7 +305,7 @@
 
 .msf-rush-toggle--active,
 .msf-rush-toggle--active:hover {
-    background: linear-gradient(135deg, var(--mockup-submit-form-red) 0%, var(--red-700) 100%);
+    background: linear-gradient(135deg, var(--red-500) 0%, var(--red-700) 100%);
     border: 1.5px solid var(--red-800);
     color: var(--color-on-brand);
     box-shadow: 0 10px 22px -10px rgb(220 38 38 / 75%), 0 0 0 4px rgb(220 38 38 / 15%);
@@ -445,7 +443,7 @@
     box-shadow: 0 8px 18px -8px rgb(5 150 105 / 70%);
     transition: background .15s ease, transform .15s ease;
 }
-.msf-success-link:hover { background: var(--mockup-submit-form-teal-dark); transform: translateY(-1px); }
+.msf-success-link:hover { background: var(--emerald-700); transform: translateY(-1px); }
 
 .msf-success-another {
     padding: 11px 22px;

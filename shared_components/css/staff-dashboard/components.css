@@ -10,9 +10,7 @@
 /* stylelint-disable color-no-hex */
 :root {
     --components-gray-dark: #000;
-    --components-yellow: #fbbf24;
     --components-green-dark: #06120a;
-    --components-yellow-2: #fde68a;
 }
 /* stylelint-enable color-no-hex */
 
@@ -1295,7 +1293,7 @@ details.tool-category > summary::-webkit-details-marker { display: none; }
     margin-bottom: var(--space-3);
     border: 1px solid var(--warn-border, var(--amber-700));
     background: var(--warn-bg, rgb(180 83 9 / 14%));
-    color: var(--warn-text, var(--components-yellow));
+    color: var(--warn-text, var(--amber-400));
     border-radius: var(--radius-sm);
     font-size: var(--font-size-sm);
     font-weight: var(--font-weight-medium);
@@ -2369,7 +2367,7 @@ dashboard-modal:not([open]) { display: none; }
     letter-spacing: 0.06em;
     text-transform: uppercase;
     background: rgb(251 191 36 / 16%);
-    color: var(--components-yellow-2);
+    color: var(--amber-200);
     border: 1px solid rgb(251 191 36 / 45%);
     border-radius: 6px;
     white-space: nowrap;

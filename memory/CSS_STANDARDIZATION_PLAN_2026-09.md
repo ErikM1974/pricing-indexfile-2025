@@ -114,6 +114,22 @@ three gap sizes, `opacity:.5;cursor:not-allowed` ×26 (disabled). These become u
 
 ## 8. Progress log (newest first)
 
+### 2026-09-07 — Palette pass 1, app-wide collapse LIVE (`v2026.09.07.19`): 30 ramp steps named, 604 page variables gone
+
+- **What:** 30 hex values that 8 to 35 sheets each declared as their own page variable are now steps of the token
+  ramps (`--red-200/300/500`, `--amber-200/300/400/900`, `--orange-200`, `--green-200/300/500/600/700`,
+  `--emerald-100/200/500/700/800`, `--blue-200/800`, `--violet-600`, `--indigo-700`, `--brand-400`, `--brand-mid`) plus
+  the legacy palettes named for what they are (`--bs-danger/-success/-warning/-warning-ink`, `--material-green-100/-900`).
+  `collapse-page-vars.py` then removed every page variable whose value equals a token and rewrote its uses: 147 sheets,
+  604 variables, 1,105 uses — value-identical by construction (every page that loads a migrated sheet loads
+  tokens.css, locked).
+- **Verification:** unresolved `var()` references counted before and after: 434 → 434, none new. A 31-page sample
+  across every family screenshot before/after: 29 identical; the christmas-bundles top strip and one DTG builder block
+  are transient (a second after-shot equals the before-shot pixel for pixel). Gates + e2e green.
+- **Why first:** it is the cheapest census win with zero look change — the remaining page variables are now the
+  genuinely page-specific colours, which is what the storefront design pass needs to see.
+- **Next:** the storefront + catalog design pass (deliberate look changes, reviewed page by page).
+
 ### 2026-09-07 — Tail batch + dead sheets LIVE (`v2026.09.07.18`): 12 sheets, 12 pages migrated; 18 sheets + 2 fixtures deleted
 
 - **Tail = the 12 sheets no family covered:** `admin/css/*` (4 sheets, 3 admin pages), `dashboards/production-shifts/styles.css`,

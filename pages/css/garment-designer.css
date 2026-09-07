@@ -8,13 +8,11 @@
 /* stylelint-disable color-no-hex */
   :root {
     --garment-designer-red: #b3392b;
-    --garment-designer-indigo: #7c3aed;
     --garment-designer-yellow-dark: #6c5200;
     --garment-designer-gray: #bbb;
     --garment-designer-yellow: #e1b844;
     --garment-designer-yellow-dark-2: #5d4700;
     --garment-designer-blue: #4f46e5;
-    --garment-designer-blue-2: #4338ca;
     --garment-designer-indigo-2: #6d28d9;
     --garment-designer-green-dark: #236414;
     --garment-designer-yellow-2: #d4a017;
@@ -455,7 +453,7 @@
   .easy-main-btn.send-steve {
     background: var(--garment-designer-blue); color: var(--color-on-brand); border-color: var(--garment-designer-blue);
   }
-  .easy-main-btn.send-steve:hover { background: var(--garment-designer-blue-2); border-color: var(--garment-designer-blue-2); }
+  .easy-main-btn.send-steve:hover { background: var(--indigo-700); border-color: var(--indigo-700); }
 
   .easy-main-btn.send-customer {
     background: var(--blue-600); color: var(--color-on-brand); border-color: var(--blue-600);
@@ -856,14 +854,14 @@
   /* "Save to Art Request" — purple, matches the Rep Reference Mockup card on
      the art-request detail page. Only shown when opened from a request. */
   .easy-main-btn.save-req {
-    background: linear-gradient(135deg, var(--garment-designer-indigo) 0%, var(--color-ruth-light) 100%);
+    background: linear-gradient(135deg, var(--violet-600) 0%, var(--color-ruth-light) 100%);
     color: var(--color-on-brand);
-    border-color: var(--garment-designer-indigo);
+    border-color: var(--violet-600);
     box-shadow: 0 1px 6px rgb(124 58 237 / 30%);
   }
 
   .easy-main-btn.save-req:hover {
-    background: linear-gradient(135deg, var(--garment-designer-indigo-2) 0%, var(--garment-designer-indigo) 100%);
+    background: linear-gradient(135deg, var(--garment-designer-indigo-2) 0%, var(--violet-600) 100%);
     border-color: var(--garment-designer-indigo-2);
   }
 

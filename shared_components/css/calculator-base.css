@@ -13,15 +13,8 @@
    raw hex is allowed ONLY in this block. */
 /* stylelint-disable color-no-hex */
 :root {
-    --calculator-base-green-tint: #d1fae5;
-    --calculator-base-teal-dark: #065f46;
-    --calculator-base-red: #ef4444;
     --calculator-base-cyan: #0ea5e9;
-    --calculator-base-blue: #1e40af;
     --calculator-base-cyan-2: #93c5fd;
-    --calculator-base-green: #86efac;
-    --calculator-base-yellow: #fbbf24;
-    --calculator-base-red-2: #fca5a5;
     --primary-green: var(--brand-500);
     --primary-dark: var(--brand-600);
     --primary-color: var(--brand-500); /* Alias for compatibility */
@@ -31,8 +24,8 @@
     --text-primary: var(--gray-800);
     --text-secondary: var(--gray-500);
     --hover-bg: var(--gray-100);
-    --success-bg: var(--calculator-base-green-tint);
-    --success-text: var(--calculator-base-teal-dark);
+    --success-bg: var(--emerald-100);
+    --success-text: var(--emerald-800);
     --warning-bg: var(--amber-100);
     --warning-text: var(--amber-800);
     --focus-shadow: 0 0 0 0.25rem rgb(76 179 84 / 25%);
@@ -213,7 +206,7 @@ body {
 
 .form-input:invalid,
 .form-control:invalid {
-    border-color: var(--calculator-base-red);
+    border-color: var(--red-500);
 }
 
 .form-grid {
@@ -616,26 +609,26 @@ body {
 
 .alert-info {
     background: var(--sky-100);
-    color: var(--calculator-base-blue);
+    color: var(--blue-800);
     border: 1px solid var(--calculator-base-cyan-2);
 }
 
 .alert-success {
     background: var(--success-bg);
     color: var(--success-text);
-    border: 1px solid var(--calculator-base-green);
+    border: 1px solid var(--green-300);
 }
 
 .alert-warning {
     background: var(--warning-bg);
     color: var(--warning-text);
-    border: 1px solid var(--calculator-base-yellow);
+    border: 1px solid var(--amber-400);
 }
 
 .alert-error {
     background: var(--red-100);
     color: var(--red-800);
-    border: 1px solid var(--calculator-base-red-2);
+    border: 1px solid var(--red-300);
 }
 
 /* ============================================

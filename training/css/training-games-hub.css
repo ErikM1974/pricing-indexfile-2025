@@ -9,12 +9,6 @@
 :root {
     --page-blue: #667eea;
     --page-indigo: #764ba2;
-    --page-teal: #10b981;
-    --page-green-tint: #d1fae5;
-    --page-teal-dark: #065f46;
-    --page-orange: #fed7aa;
-    --page-red-tint: #fecaca;
-    --page-blue-2: #1e40af;
 }
 /* stylelint-enable color-no-hex */
 
@@ -209,7 +203,7 @@
         }
 
         .features-list li i {
-            color: var(--page-teal);
+            color: var(--emerald-500);
             margin-top: 2px;
             font-size: 0.75rem;
         }
@@ -226,17 +220,17 @@
         }
 
         .difficulty-easy {
-            background: var(--page-green-tint);
-            color: var(--page-teal-dark);
+            background: var(--emerald-100);
+            color: var(--emerald-800);
         }
 
         .difficulty-medium {
-            background: var(--page-orange);
+            background: var(--orange-200);
             color: var(--amber-800);
         }
 
         .difficulty-hard {
-            background: var(--page-red-tint);
+            background: var(--red-200);
             color: var(--red-800);
         }
 
@@ -257,7 +251,7 @@
 
         .status-updated {
             background: var(--sky-100);
-            color: var(--page-blue-2);
+            color: var(--blue-800);
         }
 
         .status-popular {
@@ -288,7 +282,7 @@
         }
 
         .play-btn.secondary {
-            background: linear-gradient(135deg, var(--page-teal) 0%, var(--emerald-600) 100%);
+            background: linear-gradient(135deg, var(--emerald-500) 0%, var(--emerald-600) 100%);
         }
 
         .play-btn.secondary:hover {

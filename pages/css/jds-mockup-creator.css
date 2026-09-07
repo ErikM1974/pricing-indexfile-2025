@@ -17,12 +17,6 @@
    raw hex is allowed ONLY in this block. */
 /* stylelint-disable color-no-hex */
 :root {
-    --jds-mockup-creator-yellow: #fcd34d;
-    --jds-mockup-creator-green: #16a34a;
-    --jds-mockup-creator-green-2: #15803d;
-    --jds-mockup-creator-orange: #78350f;
-    --jds-mockup-creator-red-tint: #fecaca;
-
     /* Surfaces */
     --surface-page:     var(--gray-50);
     --surface-card:     var(--color-surface);
@@ -38,18 +32,18 @@
     --brand-ring:   rgb(127 29 29 / 22%);
 
     /* Positive action (download) */
-    --success:       var(--jds-mockup-creator-green);
-    --success-hover: var(--jds-mockup-creator-green-2);
+    --success:       var(--green-600);
+    --success-hover: var(--green-700);
 
     /* Semantic state */
     --warning:      var(--amber-600);
     --warning-bg:   var(--store-paper);
     --warning-line: var(--amber-500);
-    --warning-ink:  var(--jds-mockup-creator-orange);
+    --warning-ink:  var(--amber-900);
     --warning-ink-strong: var(--amber-800);
     --danger:       var(--red-700);
     --danger-bg:    var(--red-50);
-    --danger-line:  var(--jds-mockup-creator-red-tint);
+    --danger-line:  var(--red-200);
 
     /* Elevation */
     --shadow-sm: 0 1px 2px rgb(15 23 42 / 4%), 0 1px 1px rgb(15 23 42 / 3%);
@@ -416,7 +410,7 @@ body {
 /* ── Complexity warning panel ───────────────────────────────────────── */
 .jmc-warning {
     background: var(--warning-bg);
-    border: 1px solid var(--jds-mockup-creator-yellow);
+    border: 1px solid var(--amber-300);
     border-left: 4px solid var(--warning-line);
     border-radius: var(--radius-lg);
     padding: var(--space-4) var(--space-5);
@@ -472,7 +466,7 @@ body {
 .jmc-warning-btn--secondary {
     background: var(--color-surface);
     color: var(--warning-ink);
-    border-color: var(--jds-mockup-creator-yellow);
+    border-color: var(--amber-300);
 }
 
 .jmc-warning-btn--secondary:hover {

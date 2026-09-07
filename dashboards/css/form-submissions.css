@@ -9,18 +9,14 @@
    every rule below uses var(). Raw hex is allowed ONLY in this block. */
 /* stylelint-disable color-no-hex */
 :root {
-    --form-submissions-teal-dark: #047857;
     --form-submissions-cyan: #075985;
     --form-submissions-red: #9d174d;
     --form-submissions-teal-tint: #cffafe;
     --form-submissions-cyan-2: #155e75;
-    --form-submissions-red-tint: #fecaca;
     --form-submissions-indigo: #5b21b6;
     --form-submissions-blue: #3730a3;
     --form-submissions-violet: #86198f;
     --form-submissions-cyan-3: #0e7490;
-    --form-submissions-green: #15803d;
-    --form-submissions-blue-2: #4338ca;
 }
 /* stylelint-enable color-no-hex */
 
@@ -154,10 +150,10 @@
 .badge--pto { background: var(--form-submissions-teal-tint); color: var(--form-submissions-cyan-3); }
 .badge--inj { background: var(--red-100); color: var(--red-800); }
 .badge--cca { background: var(--color-bradley-tint); color: var(--form-submissions-cyan-2); }
-.badge--qrq { background: var(--brand-50); color: var(--form-submissions-green); }
-.badge--srq { background: var(--color-floor-tint); color: var(--form-submissions-blue-2); }
-.badge--ok  { background: var(--brand-50); color: var(--form-submissions-teal-dark); }
-.badge--check { background: var(--brand-50); color: var(--form-submissions-teal-dark); }
+.badge--qrq { background: var(--brand-50); color: var(--green-700); }
+.badge--srq { background: var(--color-floor-tint); color: var(--indigo-700); }
+.badge--ok  { background: var(--brand-50); color: var(--emerald-700); }
+.badge--check { background: var(--brand-50); color: var(--emerald-700); }
 
 .inbox-status {
     display: inline-block;
@@ -173,7 +169,7 @@
 .status--new      { background: var(--sky-100); color: var(--form-submissions-cyan); }
 .status--progress { background: var(--amber-100); color: var(--amber-800); }
 .status--art      { background: var(--red-50); color: var(--form-submissions-red); }
-.status--done     { background: var(--brand-50); color: var(--form-submissions-teal-dark); }
+.status--done     { background: var(--brand-50); color: var(--emerald-700); }
 .status--out      { background: var(--amber-100); color: var(--amber-800); }
 .status--partial  { background: var(--red-100); color: var(--store-rush-deeper); }
 .status--overdue  { background: var(--red-100); color: var(--red-700); }
@@ -190,7 +186,7 @@
 
 /* small + danger button variants on top of .dash-btn */
 .dash-btn--sm { padding: 4px 10px; font-size: 0.78rem; }
-.dash-btn--danger { border-color: var(--form-submissions-red-tint); color: var(--red-700); }
+.dash-btn--danger { border-color: var(--red-200); color: var(--red-700); }
 .dash-btn--danger:hover { background: var(--red-50); }
 
 /* ---------- samples tracker ---------- */
@@ -211,7 +207,7 @@
 
 .sample-group-head.is-overdue {
     background: var(--red-50);
-    border-color: var(--form-submissions-red-tint);
+    border-color: var(--red-200);
 }
 
 /* ---------- detail modal ---------- */

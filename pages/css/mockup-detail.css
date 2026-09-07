@@ -18,27 +18,13 @@
     --mockup-detail-gray: #666;
     --mockup-detail-gray-2: #888;
     --mockup-detail-indigo: #6b21a8;
-    --mockup-detail-green: #16a34a;
     --mockup-detail-red: #c0392b;
-    --mockup-detail-red-2: #dc3545;
-    --mockup-detail-red-3: #ef4444;
     --mockup-detail-orange: #e67e22;
     --mockup-detail-gray-3: #bbb;
     --mockup-detail-indigo-2: #a78bfa;
-    --mockup-detail-yellow: #fcd34d;
-    --mockup-detail-green-2: #15803d;
-    --mockup-detail-red-tint: #fecaca;
-    --mockup-detail-green-3: #22c55e;
-    --mockup-detail-green-4: #28a745;
     --mockup-detail-indigo-tint: #d4bfff;
-    --mockup-detail-orange-2: #78350f;
-    --mockup-detail-indigo-3: #7c3aed;
-    --mockup-detail-teal: #10b981;
     --mockup-detail-indigo-tint-2: #d6bcfa;
-    --mockup-detail-green-tint: #bbf7d0;
     --mockup-detail-red-4: #f1c7be;
-    --mockup-detail-green-tint-2: #d1fae5;
-    --mockup-detail-teal-dark: #065f46;
     --mockup-detail-cyan-dark: #1e3a5f;
     --mockup-detail-gray-4: #6b7b6b;
     --mockup-detail-green-5: #4a7a4a;
@@ -76,10 +62,10 @@ body {
     margin: 16px auto 0;
     padding: 12px 16px;
     background: var(--store-paper);
-    border: 1px solid var(--mockup-detail-yellow);
+    border: 1px solid var(--amber-300);
     border-left: 4px solid var(--amber-500);
     border-radius: 6px;
-    color: var(--mockup-detail-orange-2);
+    color: var(--amber-900);
     font-size: 14px;
 }
 
@@ -209,7 +195,7 @@ body {
     height: 60px;
     border-radius: 50%;
     background: var(--red-50);
-    color: var(--mockup-detail-red-2);
+    color: var(--bs-danger);
     font-size: 32px;
     font-weight: bold;
     line-height: 60px;
@@ -348,8 +334,8 @@ body {
 }
 .pmd-edit-btn--cancel { background: var(--slate-100); border: 1px solid var(--slate-200); color: var(--slate-500); }
 .pmd-edit-btn--cancel:hover { background: var(--slate-200); }
-.pmd-edit-btn--save { background: var(--mockup-detail-green); color: var(--color-on-brand); }
-.pmd-edit-btn--save:hover { background: var(--mockup-detail-green-2); }
+.pmd-edit-btn--save { background: var(--green-600); color: var(--color-on-brand); }
+.pmd-edit-btn--save:hover { background: var(--green-700); }
 .pmd-edit-btn--save:disabled { background: var(--gray-400); cursor: not-allowed; }
 
 @media (width <= 500px) { .pmd-edit-grid { grid-template-columns: 1fr; } }
@@ -387,7 +373,7 @@ body {
 
 .pmd-status-badge--submitted {
     background: rgb(139 92 246 / 20%);
-    color: var(--mockup-detail-indigo-3);
+    color: var(--violet-600);
 }
 
 .pmd-status-badge--in-progress {
@@ -455,7 +441,7 @@ body {
     animation: pmd-rush-pulse 1.6s ease-in-out infinite;
 }
 
-.pmd-rush-toggle--active .pmd-rush-toggle-hint { color: var(--mockup-detail-red-tint); }
+.pmd-rush-toggle--active .pmd-rush-toggle-hint { color: var(--red-200); }
 
 @keyframes pmd-rush-pulse {
     0%, 100% { box-shadow: 0 0 0 3px rgb(220 38 38 / 20%); }
@@ -676,7 +662,7 @@ body {
     font-weight: 600;
     margin-right: auto;
 }
-.approval-elapsed--fresh { color: var(--mockup-detail-green); }
+.approval-elapsed--fresh { color: var(--green-600); }
 .approval-elapsed--waiting { color: var(--amber-600); }
 .approval-elapsed--overdue { color: var(--red-600); }
 
@@ -725,7 +711,7 @@ body {
 }
 
 .pmd-action-btn--approve {
-    background: var(--mockup-detail-teal);
+    background: var(--emerald-500);
     color: white;
 }
 
@@ -734,7 +720,7 @@ body {
 }
 
 .pmd-action-btn--revise {
-    background: var(--mockup-detail-red-3);
+    background: var(--red-500);
     color: white;
 }
 
@@ -1080,7 +1066,7 @@ body {
 }
 
 .pmd-note--revision_request {
-    border-left-color: var(--mockup-detail-red-3);
+    border-left-color: var(--red-500);
     background: var(--red-50);
 }
 
@@ -1222,7 +1208,7 @@ body {
 }
 .pmd-posting-as .posting-as-label { font-weight: 600; }
 .pmd-posting-as .posting-as-name { font-weight: 700; color: var(--gray-800); }
-.pmd-posting-as .posting-as-check { color: var(--mockup-detail-green); font-weight: 700; }
+.pmd-posting-as .posting-as-check { color: var(--green-600); font-weight: 700; }
 
 .pmd-posting-as select {
     font-size: 12px;
@@ -1480,7 +1466,7 @@ body {
     margin-bottom: 20px;
     padding: 16px 20px;
     background: var(--red-50);
-    border-left: 4px solid var(--mockup-detail-red-3);
+    border-left: 4px solid var(--red-500);
     border-radius: 10px;
     box-shadow: 0 1px 4px rgb(0 0 0 / 8%);
 }
@@ -1623,12 +1609,12 @@ body {
 }
 
 .pmd-modal-header--approve {
-    background: var(--mockup-detail-green);
+    background: var(--green-600);
 }
 
 .pmd-approve-summary {
     background: var(--brand-50);
-    border: 1px solid var(--mockup-detail-green-tint);
+    border: 1px solid var(--green-200);
     border-radius: 6px;
     padding: 10px 12px;
     font-size: 14px;
@@ -1654,7 +1640,7 @@ body {
 .pmd-delete-warning {
     color: var(--red-800);
     background: var(--red-50);
-    border: 1px solid var(--mockup-detail-red-tint);
+    border: 1px solid var(--red-200);
     border-radius: 8px;
     padding: 12px 14px;
     margin: 0 0 16px;
@@ -1797,7 +1783,7 @@ body {
 }
 
 .pmd-revise-file-chip-remove:hover {
-    color: var(--mockup-detail-red-2);
+    color: var(--bs-danger);
 }
 
 /* Inline button spinner for upload states */
@@ -2011,7 +1997,7 @@ body {
     position: absolute;
     inset: 0;
     background: var(--red-50);
-    border: 2px solid var(--mockup-detail-red-2);
+    border: 2px solid var(--bs-danger);
     border-radius: inherit;
     display: flex;
     flex-direction: column;
@@ -2030,7 +2016,7 @@ body {
 
 .pmd-slot-broken-icon {
     font-size: 26px;
-    color: var(--mockup-detail-red-2);
+    color: var(--bs-danger);
     margin-bottom: 4px;
 }
 
@@ -2223,14 +2209,14 @@ body {
 }
 
 .pmd-action-btn--complete {
-    background: var(--mockup-detail-green);
+    background: var(--green-600);
     color: var(--color-on-brand);
     border: none;
     font-weight: 600;
 }
 
 .pmd-action-btn--complete:hover {
-    background: var(--mockup-detail-green-2);
+    background: var(--green-700);
 }
 
 .pmd-action-btn--reopen {
@@ -2281,7 +2267,7 @@ body {
 }
 
 .pmd-inline-input.pmd-inline-saved {
-    border-color: var(--mockup-detail-green-3);
+    border-color: var(--green-500);
     box-shadow: 0 0 0 2px rgb(34 197 94 / 15%);
 }
 
@@ -2307,8 +2293,8 @@ body {
 }
 
 .pmd-save-status--saved {
-    background: var(--mockup-detail-green-tint-2);
-    color: var(--mockup-detail-teal-dark);
+    background: var(--emerald-100);
+    color: var(--emerald-800);
     animation: pmd-save-pop 0.3s ease-out;
 }
 
@@ -3107,8 +3093,8 @@ body {
 }
 
 .pmd-step--done .pmd-step-dot {
-    background: var(--mockup-detail-green-4);
-    border-color: var(--mockup-detail-green-4);
+    background: var(--bs-success);
+    border-color: var(--bs-success);
 }
 
 .pmd-step--current .pmd-step-dot {
@@ -3524,12 +3510,12 @@ body {
 }
 
 .pmd-mockup-note-input.pmd-note-saved {
-    border-color: var(--mockup-detail-green-3);
+    border-color: var(--green-500);
     background: var(--brand-50);
 }
 
 .pmd-mockup-note-input.pmd-note-error {
-    border-color: var(--mockup-detail-red-3);
+    border-color: var(--red-500);
     background: var(--red-50);
 }
 
@@ -3593,7 +3579,7 @@ body {
 
 .pmd-on-hold-bar--active {
     background: var(--store-paper);
-    border-color: var(--mockup-detail-yellow);
+    border-color: var(--amber-300);
 }
 
 .pmd-on-hold-toggle {

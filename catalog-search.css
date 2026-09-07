@@ -10,7 +10,6 @@
    every rule below uses var(). Raw hex is allowed ONLY in this block. */
 /* stylelint-disable color-no-hex */
 :root {
-    --cs-red: #ef4444;
     --cs-cyan: #0ea5e9;
     --cs-gray-dark: #000;
     --cs-cyan-dark: #001f3f;
@@ -613,7 +612,7 @@
     top: 10px;
     left: 10px;
     padding: 4px 8px;
-    background: var(--cs-red);
+    background: var(--red-500);
     color: white;
     font-size: 0.75rem;
     font-weight: 600;
@@ -626,7 +625,7 @@
 }
 
 .badge.sale {
-    background: var(--cs-red);
+    background: var(--red-500);
 }
 
 .product-quick-actions {
@@ -714,7 +713,7 @@
 }
 
 .price-sale {
-    color: var(--cs-red);
+    color: var(--red-500);
 }
 
 .price-original {

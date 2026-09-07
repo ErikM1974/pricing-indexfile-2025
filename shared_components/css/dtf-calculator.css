@@ -10,10 +10,7 @@
     --dtf-calculator-gray-dark: #333;
     --dtf-calculator-gray: #666;
     --dtf-calculator-cyan: #007bff;
-    --dtf-calculator-yellow: #ffc107;
     --dtf-calculator-red: #ff6b6b;
-    --dtf-calculator-green: #28a745;
-    --dtf-calculator-red-2: #dc3545;
     --dtf-calculator-red-3: #bd2130;
     --dtf-calculator-blue: #0c63e4;
     --dtf-calculator-cyan-2: #80bdff;
@@ -31,7 +28,7 @@
     border-radius: 8px;
     padding: 30px;
     background-color: var(--amber-100);
-    border: 2px solid var(--dtf-calculator-yellow);
+    border: 2px solid var(--bs-warning);
 }
 
 .pricing-error-container .alert i {
@@ -127,7 +124,7 @@ body.show-internal .summary-section.internal-only {
 
 /* Visual indicator when in staff view */
 body.show-internal .staff-view-toggle a {
-    color: var(--dtf-calculator-green);
+    color: var(--bs-success);
     font-weight: 500;
 }
 
@@ -239,7 +236,7 @@ body.show-internal .staff-view-toggle a::after {
 .btn-remove-transfer {
     background: transparent;
     border: none;
-    color: var(--dtf-calculator-red-2);
+    color: var(--bs-danger);
     font-size: 1.2rem;
     cursor: pointer;
     padding: 5px 10px;

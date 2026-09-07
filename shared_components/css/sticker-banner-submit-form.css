@@ -16,12 +16,8 @@
    every rule below uses var(). Raw hex is allowed ONLY in this block. */
 /* stylelint-disable color-no-hex */
 :root {
-    --sticker-banner-submit-form-yellow: #fde68a;
     --sticker-banner-submit-form-green-tint: #cdf3d6;
-    --sticker-banner-submit-form-red: #ef4444;
-    --sticker-banner-submit-form-teal-dark: #047857;
     --sticker-banner-submit-form-teal-dark-2: #064e3b;
-    --sticker-banner-submit-form-orange: #78350f;
 }
 /* stylelint-enable color-no-hex */
 
@@ -459,7 +455,7 @@
 
 .sbf-rush-toggle--active,
 .sbf-rush-toggle--active:hover {
-    background: linear-gradient(135deg, var(--sticker-banner-submit-form-red) 0%, var(--red-700) 100%);
+    background: linear-gradient(135deg, var(--red-500) 0%, var(--red-700) 100%);
     border: 1.5px solid var(--red-800);
     color: var(--color-on-brand);
     box-shadow: 0 10px 22px -10px rgb(220 38 38 / 75%), 0 0 0 4px rgb(220 38 38 / 15%);
@@ -597,7 +593,7 @@
     box-shadow: 0 8px 18px -8px rgb(5 150 105 / 70%);
     transition: background .15s ease, transform .15s ease;
 }
-.sbf-success-link:hover { background: var(--sticker-banner-submit-form-teal-dark); transform: translateY(-1px); }
+.sbf-success-link:hover { background: var(--emerald-700); transform: translateY(-1px); }
 
 .sbf-success-another {
     padding: 11px 22px;
@@ -765,9 +761,9 @@
     gap: 12px;
     padding: 12px 14px;
     background: linear-gradient(180deg, var(--store-paper) 0%, var(--amber-100) 100%);
-    border: 1px solid var(--sticker-banner-submit-form-yellow);
+    border: 1px solid var(--amber-200);
     border-radius: 12px;
-    color: var(--sticker-banner-submit-form-orange);
+    color: var(--amber-900);
     font-size: 13px;
     line-height: 1.55;
     margin: 4px 0 18px;
@@ -782,7 +778,7 @@
     align-items: center;
     justify-content: center;
     background: var(--color-surface);
-    border: 1px solid var(--sticker-banner-submit-form-yellow);
+    border: 1px solid var(--amber-200);
     font-size: 15px;
 }
 .sbf-rush-row { margin: 4px 0 18px; }

@@ -8,15 +8,11 @@
     --page-blue: #1e3c72;
     --page-cyan: #2196f3;
     --page-blue-2: #2a5298;
-    --page-yellow: #ffc107;
-    --page-red: #dc3545;
     --page-blue-3: #667eea;
     --page-indigo: #764ba2;
     --page-gray-dark: #333;
     --page-cyan-2: #1976d2;
     --page-violet: #9c27b0;
-    --page-yellow-2: #856404;
-    --page-green: #28a745;
     --page-green-2: #2e7d32;
     --page-yellow-3: #ffd700;
 }
@@ -85,7 +81,7 @@
         /* Alert Box */
         .alert-box {
             background: var(--amber-100);
-            border: 2px solid var(--page-yellow);
+            border: 2px solid var(--bs-warning);
             border-radius: 15px;
             padding: 25px;
             margin-bottom: 30px;
@@ -104,19 +100,19 @@
         }
 
         .alert-box h2 {
-            color: var(--page-yellow-2);
+            color: var(--bs-warning-ink);
             margin-bottom: 15px;
             font-size: 1.5em;
         }
 
         .removed-text {
-            color: var(--page-red);
+            color: var(--bs-danger);
             font-weight: bold;
             text-decoration: line-through;
         }
 
         .new-text {
-            color: var(--page-green);
+            color: var(--bs-success);
             font-weight: bold;
         }
 
@@ -348,12 +344,12 @@
         }
 
         .no {
-            color: var(--page-red);
+            color: var(--bs-danger);
             font-weight: bold;
         }
 
         .note {
-            color: var(--page-yellow);
+            color: var(--bs-warning);
             font-weight: bold;
         }
 

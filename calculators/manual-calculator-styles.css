@@ -14,14 +14,9 @@
    raw hex is allowed ONLY in this block. */
 /* stylelint-disable color-no-hex */
 :root {
-    --manual-calculator-styles-green-tint: #d1fae5;
-    --manual-calculator-styles-teal-dark: #065f46;
     --manual-calculator-styles-red: #c53030;
     --manual-calculator-styles-cyan: #075985;
     --manual-calculator-styles-cyan-2: #7dd3fc;
-    --manual-calculator-styles-orange: #fed7aa;
-    --manual-calculator-styles-green: #86efac;
-    --manual-calculator-styles-red-tint: #fecaca;
     --primary-color: var(--brand-500);
     --primary-dark: var(--print-green);
     --primary-light: var(--brand-500);
@@ -32,8 +27,8 @@
     --text-primary: var(--gray-800);
     --text-secondary: var(--gray-500);
     --hover-bg: var(--gray-100);
-    --success-bg: var(--manual-calculator-styles-green-tint);
-    --success-text: var(--manual-calculator-styles-teal-dark);
+    --success-bg: var(--emerald-100);
+    --success-text: var(--emerald-800);
     --warning-bg: var(--amber-100);
     --warning-text: var(--amber-800);
     --error-bg: var(--red-50);
@@ -312,19 +307,19 @@ input[type="number"]::-webkit-inner-spin-button {
 .alert-warning {
     background: var(--warning-bg);
     color: var(--warning-text);
-    border: 1px solid var(--manual-calculator-styles-orange);
+    border: 1px solid var(--orange-200);
 }
 
 .alert-success {
     background: var(--success-bg);
     color: var(--success-text);
-    border: 1px solid var(--manual-calculator-styles-green);
+    border: 1px solid var(--green-300);
 }
 
 .alert-error {
     background: var(--error-bg);
     color: var(--error-text);
-    border: 1px solid var(--manual-calculator-styles-red-tint);
+    border: 1px solid var(--red-200);
 }
 
 .alert-icon {

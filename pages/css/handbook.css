@@ -11,7 +11,6 @@
 /* stylelint-disable color-no-hex */
 :root {
     --handbook-green-tint: #cfead4;
-    --handbook-red-tint: #fecaca;
 }
 /* stylelint-enable color-no-hex */
 
@@ -230,7 +229,7 @@ body.handbook-body {
 
 .handbook-error {
     background: var(--red-50);
-    border: 1px solid var(--handbook-red-tint);
+    border: 1px solid var(--red-200);
     color: var(--red-800);
     padding: 1rem 1.25rem;
     border-radius: var(--ph-radius, 12px);

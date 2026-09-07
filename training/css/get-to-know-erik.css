@@ -7,10 +7,9 @@
    raw hex is allowed ONLY in this block. */
 /* stylelint-disable color-no-hex */
 :root {
-    --page-green: #5bc85f;
             --primary-green: var(--brand-500);
             --primary-dark: var(--brand-600);
-            --primary-light: var(--page-green);
+            --primary-light: var(--brand-400);
             --text-primary: var(--gray-800);
             --text-secondary: var(--gray-600);
             --bg-primary: var(--color-surface);

@@ -4,13 +4,10 @@
    keeps its exact look. Map them to shared_components/css/tokens.css names when the page is redesigned;
    every rule below uses var(). Raw hex is allowed ONLY in this block. */
 /* stylelint-disable color-no-hex */
-:root {
-    --manual-mode-indicator-green: #c8e6c9;
-}
 /* stylelint-enable color-no-hex */
 
 .manual-mode-banner {
-    background: linear-gradient(135deg, var(--brand-100) 0%, var(--manual-mode-indicator-green) 100%);
+    background: linear-gradient(135deg, var(--brand-100) 0%, var(--material-green-100) 100%);
     color: var(--print-green);
     border-bottom: 3px solid var(--brand-500);
     padding: 14px 20px;

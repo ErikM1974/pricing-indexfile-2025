@@ -11,12 +11,6 @@
    keeps its exact look. Map them to shared_components/css/tokens.css names when the page is redesigned;
    every rule below uses var(). Raw hex is allowed ONLY in this block. */
 /* stylelint-disable color-no-hex */
-:root {
-    --screenprint-pricing-clean-orange: #78350f;
-    --screenprint-pricing-clean-green: #15803d;
-    --screenprint-pricing-clean-red: #ef4444;
-    --screenprint-pricing-clean-green-2: #16a34a;
-}
 /* stylelint-enable color-no-hex */
 
 /* ========================================
@@ -217,14 +211,14 @@
 
 .sp-setup-breakdown-live {
     font-size: 12px;
-    color: var(--screenprint-pricing-clean-orange);
+    color: var(--amber-900);
     line-height: 1.6;
 }
 
 /* LTM Fee section - more compact */
 .sp-pricing-ltm {
     background: var(--red-50);
-    border-left: 3px solid var(--screenprint-pricing-clean-red);
+    border-left: 3px solid var(--red-500);
     padding: 12px 16px;
     margin-top: 12px;
     border-radius: 4px;
@@ -251,12 +245,12 @@
 .sp-total-highlight {
     font-size: 28px !important;
     font-weight: 700 !important;
-    color: var(--screenprint-pricing-clean-green) !important;
+    color: var(--green-700) !important;
 }
 
 .sp-price-average {
     font-size: 13px;
-    color: var(--screenprint-pricing-clean-green-2);
+    color: var(--green-600);
     margin-top: 8px;
     text-align: center;
 }
@@ -330,7 +324,7 @@
     border-radius: 6px;
     margin-bottom: 16px;
     font-size: 13px;
-    color: var(--screenprint-pricing-clean-green);
+    color: var(--green-700);
 }
 
 .sp-pricing-tier-display i {
@@ -405,7 +399,7 @@
 
 .sp-setup-fee-tooltip-body {
     font-size: 14px;
-    color: var(--screenprint-pricing-clean-orange);
+    color: var(--amber-900);
     line-height: 1.6;
 }
 

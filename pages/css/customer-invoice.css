@@ -4,9 +4,8 @@
 /* stylelint-disable color-no-hex */
 :root {
     --customer-invoice-gray: #888;
-    --customer-invoice-green: #3a7c52;
     --customer-invoice-gray-2: #666;
- --nw-dark:var(--brand-800); --nw-med:var(--customer-invoice-green); }
+ --nw-dark:var(--brand-800); --nw-med:var(--brand-mid); }
 /* stylelint-enable color-no-hex */
 * { box-sizing: border-box; }
 

@@ -19,10 +19,7 @@
     --modern-enhancements-green-3: #6fd86f;
     --modern-enhancements-gray: #adb5bd;
     --modern-enhancements-gray-dark: #343a40;
-    --modern-enhancements-green-4: #28a745;
     --modern-enhancements-teal: #17a2b8;
-    --modern-enhancements-yellow: #ffc107;
-    --modern-enhancements-red: #dc3545;
     --modern-enhancements-gray-dark-2: #000;
     --modern-enhancements-teal-dark: #00695c;
 
@@ -51,13 +48,13 @@
     --neutral-900: var(--gray-800);
     
     /* Semantic colors */
-    --success-color: var(--modern-enhancements-green-4);
+    --success-color: var(--bs-success);
     --success-light: var(--store-green-100);
     --info-color: var(--modern-enhancements-teal);
     --info-light: var(--sky-100);
-    --warning-color: var(--modern-enhancements-yellow);
+    --warning-color: var(--bs-warning);
     --warning-light: var(--amber-100);
-    --danger-color: var(--modern-enhancements-red);
+    --danger-color: var(--bs-danger);
     --danger-light: var(--red-100);
     
     /* Shadows - more subtle and modern */

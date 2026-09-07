@@ -5,7 +5,6 @@
    every rule below uses var(). Raw hex is allowed ONLY in this block. */
 /* stylelint-disable color-no-hex */
 :root {
-    --access-admin-green: #3a7c52;
     --access-admin-gray: #5a665e;
     --access-admin-green-2: #1a7c3a;
     --access-admin-gray-2: #8a968e;
@@ -21,7 +20,7 @@ body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Ro
 .aa-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; border-bottom: 3px solid var(--brand-800); padding-bottom: 1rem; margin-bottom: 1rem; }
 .aa-header h1 { color: var(--brand-800); font-size: 1.6rem; margin: 0; }
 .aa-sub { color: var(--access-admin-gray); margin: .35rem 0 0; font-size: .92rem; max-width: 60ch; }
-.aa-back { color: var(--access-admin-green); text-decoration: none; font-weight: 600; font-size: .9rem; white-space: nowrap; }
+.aa-back { color: var(--brand-mid); text-decoration: none; font-weight: 600; font-size: .9rem; white-space: nowrap; }
 .aa-back:hover { color: var(--brand-800); }
 
 .aa-status { min-height: 1.4rem; margin: .25rem 0 .75rem; font-size: .9rem; font-weight: 500; }
@@ -50,10 +49,10 @@ body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Ro
 .aa-table select, .aa-table input, .aa-add input, .aa-add select {
   font: inherit; padding: .4rem .5rem; border: 1px solid var(--gray-300); border-radius: 6px; background: var(--color-surface); color: var(--store-ink); width: 100%;
 }
-.aa-table input:focus, .aa-table select:focus, .aa-add input:focus, .aa-add select:focus { outline: 2px solid var(--access-admin-green); outline-offset: 0; border-color: var(--access-admin-green); }
+.aa-table input:focus, .aa-table select:focus, .aa-add input:focus, .aa-add select:focus { outline: 2px solid var(--brand-mid); outline-offset: 0; border-color: var(--brand-mid); }
 .aa-table-pages td input { min-width: 120px; }
 
-.aa-btn { font: inherit; font-weight: 600; font-size: .85rem; background: var(--access-admin-green); color: var(--color-on-brand); border: none; padding: .42rem .85rem; border-radius: 6px; cursor: pointer; }
+.aa-btn { font: inherit; font-weight: 600; font-size: .85rem; background: var(--brand-mid); color: var(--color-on-brand); border: none; padding: .42rem .85rem; border-radius: 6px; cursor: pointer; }
 .aa-btn:hover { background: var(--brand-800); }
 .aa-btn.aa-ghost { background: var(--color-surface); color: var(--red-700); border: 1px solid var(--access-admin-red); }
 .aa-btn.aa-ghost:hover { background: var(--red-50); }

@@ -25,30 +25,13 @@
     --art-hub-gray: #666;
     --art-hub-cyan: #0891b2;
     --art-hub-cyan-2: #2196f3;
-    --art-hub-green: #28a745;
-    --art-hub-yellow: #fcd34d;
-    --art-hub-indigo: #7c3aed;
-    --art-hub-green-2: #15803d;
-    --art-hub-yellow-2: #fbbf24;
-    --art-hub-green-3: #16a34a;
-    --art-hub-teal-dark: #065f46;
-    --art-hub-green-tint: #bbf7d0;
-    --art-hub-blue: #1e40af;
-    --art-hub-orange: #fed7aa;
-    --art-hub-red: #dc3545;
     --art-hub-cyan-3: #1976d2;
     --art-hub-red-2: #e91e63;
-    --art-hub-green-4: #22c55e;
     --art-hub-gray-2: #888;
-    --art-hub-red-3: #ef4444;
     --art-hub-orange-2: #e67e22;
-    --art-hub-red-4: #fca5a5;
     --art-hub-red-5: #9d174d;
-    --art-hub-red-tint: #fecaca;
-    --art-hub-green-tint-2: #d1fae5;
     --art-hub-orange-3: #fdba74;
     --art-hub-cyan-4: #0061d5;
-    --art-hub-yellow-3: #ffc107;
     --art-hub-orange-4: #f57c00;
     --art-hub-violet: #9c27b0;
     --art-hub-red-6: #ff5722;
@@ -56,15 +39,9 @@
     --art-hub-green-5: #00b300;
     --art-hub-gray-3: #bbb;
     --art-hub-cyan-5: #007bff;
-    --art-hub-green-6: #a7f3d0;
     --art-hub-indigo-2: #6b21a8;
     --art-hub-green-dark: #007a00;
     --art-hub-indigo-3: #5b21b6;
-    --art-hub-yellow-4: #856404;
-    --art-hub-yellow-5: #fde68a;
-    --art-hub-orange-5: #78350f;
-    --art-hub-cyan-tint: #bfdbfe;
-    --art-hub-green-7: #86efac;
     --art-hub-lime: #65a30d;
 
     /* Surface hierarchy (page → card → inset) */
@@ -103,7 +80,7 @@
     --state-success: var(--emerald-600); --state-success-bg: var(--brand-50);
     --state-warning: var(--amber-600); --state-warning-bg: var(--store-paper);
     --state-danger:  var(--red-600); --state-danger-bg:  var(--red-50);
-    --state-violet:  var(--art-hub-indigo); --state-violet-bg:  var(--color-ruth-tint);
+    --state-violet:  var(--violet-600); --state-violet-bg:  var(--color-ruth-tint);
 
     /* Motion */
     --ease-out:  cubic-bezier(.2,.8,.2,1);
@@ -552,8 +529,8 @@ body {
 
 .note-type-pill--status-update { background: var(--sky-100); color: var(--color-floor-dark); }
 .note-type-pill--design-update { background: var(--red-100); color: var(--store-rush-deep); }
-.note-type-pill--art-time      { background: var(--store-green-100); color: var(--art-hub-green-2); }
-.note-type-pill--customer-feedback { background: var(--color-ruth-tint); color: var(--art-hub-indigo); }
+.note-type-pill--art-time      { background: var(--store-green-100); color: var(--green-700); }
+.note-type-pill--customer-feedback { background: var(--color-ruth-tint); color: var(--violet-600); }
 .note-type-pill--internal-note { background: var(--gray-100); color: var(--gray-700); }
 .note-type-pill--default       { background: var(--gray-100); color: var(--gray-500); }
 .note-type-pill--mockup-sent   { background: var(--amber-100); color: var(--amber-700); }
@@ -620,7 +597,7 @@ body {
 /* ---------- NEW Badge ---------- */
 .new-badge {
     display: inline-block;
-    background: var(--art-hub-red);
+    background: var(--bs-danger);
     color: white;
     font-size: 10px;
     font-weight: bold;
@@ -901,7 +878,7 @@ body {
 
 .callout--amber {
     background: var(--store-rush-soft);
-    border-left-color: var(--art-hub-yellow-3);
+    border-left-color: var(--bs-warning);
 }
 
 .callout--orange {
@@ -1407,12 +1384,12 @@ nav[data-cb-name="cbNavigationTableBottom"] {
     height: 3px;
     background: var(--gray-200, var(--gray-200));
 }
-.card--submitted::before          { background: var(--state-violet,  var(--art-hub-indigo)); }
+.card--submitted::before          { background: var(--state-violet,  var(--violet-600)); }
 .card--in-progress::before        { background: var(--state-info,    var(--blue-600)); }
 .card--awaiting-approval::before  { background: var(--state-warning, var(--amber-600)); }
 .card--revision-requested::before { background: var(--state-danger,  var(--red-600)); }
 .card--approved::before           { background: var(--state-success, var(--emerald-600)); }
-.card--completed::before          { background: var(--state-success, var(--art-hub-green-4)); }
+.card--completed::before          { background: var(--state-success, var(--green-500)); }
 .card--cancel::before             { background: var(--gray-400,      var(--gray-400)); }
 
 /* Per-card "File missing" badge — overlays top-right so Steve can spot which
@@ -1425,7 +1402,7 @@ nav[data-cb-name="cbNavigationTableBottom"] {
     display: inline-flex;
     align-items: center;
     gap: 5px;
-    background: var(--art-hub-red);
+    background: var(--bs-danger);
     color: var(--color-on-brand);
     padding: 4px 10px;
     border-radius: 12px;
@@ -1557,16 +1534,16 @@ nav[data-cb-name="cbNavigationTableBottom"] {
 .status-submitted        { background-color: var(--color-ruth-tint); color: var(--color-ruth); }
 .status-inprogress       { background-color: var(--sky-100); color: var(--color-floor-dark); }
 .status-awaitingapproval { background-color: var(--amber-100); color: var(--amber-700); }
-.status-completed        { background-color: var(--store-green-100); color: var(--art-hub-green-2); }
+.status-completed        { background-color: var(--store-green-100); color: var(--green-700); }
 .status-cancel           { background-color: var(--red-100); color: var(--red-700); }
 .status-revisionrequested { background-color: var(--red-100); color: var(--store-rush-deep); }
 
 .due-overdue   { background-color: var(--red-600); color: white; }
-.due-today     { background-color: var(--art-hub-red-3); color: white; }
+.due-today     { background-color: var(--red-500); color: white; }
 .due-tomorrow  { background-color: var(--amber-500); color: white; }
-.due-in-2-days { background-color: var(--art-hub-yellow-2); color: var(--print-ink); }
+.due-in-2-days { background-color: var(--amber-400); color: var(--print-ink); }
 .due-soon      { background-color: var(--color-floor-light); color: white; }
-.due-upcoming  { background-color: var(--art-hub-green-4); color: white; }
+.due-upcoming  { background-color: var(--green-500); color: white; }
 
 /* --- Request Type Badges --- */
 .badge--mockup {
@@ -1581,7 +1558,7 @@ nav[data-cb-name="cbNavigationTableBottom"] {
     text-transform: uppercase;
     background: var(--amber-100);
     color: var(--amber-700);
-    border: 1px solid var(--art-hub-yellow-2);
+    border: 1px solid var(--amber-400);
     margin-left: 6px;
     vertical-align: middle;
 }
@@ -1836,7 +1813,7 @@ nav[data-cb-name="cbNavigationTableBottom"] {
 
 .footer-btn--notes    { background: var(--color-floor-light); }
 .footer-btn--working  { background: var(--blue-600); }
-.footer-btn--done     { background: var(--art-hub-green-3); }
+.footer-btn--done     { background: var(--green-600); }
 .footer-btn--approve  { background: var(--amber-600); }
 
 /* View Details — inline text link in info row */
@@ -2001,7 +1978,7 @@ nav[data-cb-name="cbNavigationTableBottom"] {
     align-items: center;
 }
 
-.art-modal-header--green  { background: var(--art-hub-green); }
+.art-modal-header--green  { background: var(--bs-success); }
 .art-modal-header--orange { background: var(--art-hub-orange-2); }
 
 /* ---------- Modal Body ---------- */
@@ -2082,7 +2059,7 @@ nav[data-cb-name="cbNavigationTableBottom"] {
     font-weight: 600;
 }
 
-.art-modal-btn-submit--green  { background: var(--art-hub-green); }
+.art-modal-btn-submit--green  { background: var(--bs-success); }
 .art-modal-btn-submit--orange { background: var(--art-hub-orange-2); }
 
 /* ---------- Send Back Textarea ---------- */
@@ -2335,7 +2312,7 @@ input.cbSearchButton {
 }
 
 .approval-file-card:hover {
-    border-color: var(--art-hub-yellow);
+    border-color: var(--amber-300);
 }
 
 .approval-file-card.selected {
@@ -2407,7 +2384,7 @@ input.cbSearchButton {
 
 .approval-no-files {
     background: var(--amber-100);
-    border: 1px solid var(--art-hub-yellow);
+    border: 1px solid var(--amber-300);
     border-radius: 8px;
     padding: 14px;
     color: var(--amber-800);
@@ -2471,7 +2448,7 @@ input.cbSearchButton {
 }
 
 .box-file-card:hover {
-    border-color: var(--art-hub-yellow-2);
+    border-color: var(--amber-400);
     box-shadow: 0 1px 4px rgb(245 158 11 / 15%);
 }
 
@@ -2556,7 +2533,7 @@ input.cbSearchButton {
 
 .box-picker-empty {
     background: var(--amber-100);
-    border: 1px solid var(--art-hub-yellow);
+    border: 1px solid var(--amber-300);
     border-radius: 8px;
     padding: 14px;
     color: var(--amber-800);
@@ -2567,7 +2544,7 @@ input.cbSearchButton {
 
 .box-picker-error {
     background: var(--red-50);
-    border: 1px solid var(--art-hub-red-4);
+    border: 1px solid var(--red-300);
     border-radius: 8px;
     padding: 14px;
     color: var(--red-800);
@@ -2612,7 +2589,7 @@ input.cbSearchButton {
 
 .approval-files-grid--small .approval-file-card:hover {
     opacity: 1;
-    border-color: var(--art-hub-yellow);
+    border-color: var(--amber-300);
 }
 
 .approval-files-grid--small .approval-file-card.selected {
@@ -2766,11 +2743,11 @@ input.cbSearchButton {
 /* ---------- Recipient + CC Row ---------- */
 .approval-recipient {
     background: var(--brand-50);
-    border: 1px solid var(--art-hub-green-6);
+    border: 1px solid var(--emerald-200);
     border-radius: 6px;
     padding: 8px 12px;
     font-size: 13px;
-    color: var(--art-hub-teal-dark);
+    color: var(--emerald-800);
     margin-bottom: 12px;
 }
 
@@ -2900,7 +2877,7 @@ input.cbSearchButton {
 .time-log-company { font-size: 0.85em; opacity: 0.85; margin-top: 2px; }
 
 .time-log-summary {
-    background: var(--brand-50); border: 1px solid var(--art-hub-green-tint); border-radius: 8px;
+    background: var(--brand-50); border: 1px solid var(--green-200); border-radius: 8px;
     padding: 10px 14px; margin-bottom: 14px; text-align: center;
     font-weight: 600; color: var(--print-green); font-size: 0.95em;
 }
@@ -2919,7 +2896,7 @@ input.cbSearchButton {
     padding: 2px 8px; border-radius: 4px; color: white;
 }
 .time-log-badge--logtime { background: var(--art-hub-cyan); }
-.time-log-badge--completion { background: var(--art-hub-green); }
+.time-log-badge--completion { background: var(--bs-success); }
 .time-log-badge--mockup { background: var(--amber-500); }
 .time-log-badge--default { background: var(--gray-400); }
 .time-log-date { font-size: 0.8em; color: var(--gray-500); }
@@ -2989,7 +2966,7 @@ input.cbSearchButton {
     background: var(--color-surface);
     border-radius: 8px;
     box-shadow: 0 4px 12px rgb(0 0 0 / 15%);
-    border-left: 4px solid var(--art-hub-green);
+    border-left: 4px solid var(--bs-success);
     transform: translateX(120%);
     opacity: 0;
     transition: transform 0.3s ease, opacity 0.3s ease;
@@ -3269,7 +3246,7 @@ input.cbSearchButton {
 
 .status-in-progress {
     background: var(--sky-100);
-    color: var(--art-hub-blue);
+    color: var(--blue-800);
 }
 
 .status-awaiting-approval {
@@ -3283,7 +3260,7 @@ input.cbSearchButton {
 }
 
 .status-revision-requested {
-    background: var(--art-hub-orange);
+    background: var(--orange-200);
     color: var(--store-rush-deeper);
 }
 
@@ -3463,7 +3440,7 @@ input.cbSearchButton {
 }
 
 .detail-file-remove:hover {
-    color: var(--art-hub-red-3);
+    color: var(--red-500);
 }
 
 .detail-file-upload {
@@ -3765,7 +3742,7 @@ input.cbSearchButton {
 
 .ae-status--progress {
     background: var(--sky-100);
-    color: var(--art-hub-blue);
+    color: var(--blue-800);
 }
 
 .ae-status--awaiting {
@@ -4012,7 +3989,7 @@ input.cbSearchButton {
 /* ── Mark Complete Warning Banner ────────────────────────────────── */
 .art-modal-warning {
     background: var(--amber-100);
-    color: var(--art-hub-yellow-4);
+    color: var(--bs-warning-ink);
     border-left: 4px solid var(--amber-600);
     padding: 10px 14px;
     margin-bottom: 12px;
@@ -4422,7 +4399,7 @@ input.cbSearchButton {
     padding: 12px 16px;
     margin-bottom: 16px;
     background: linear-gradient(90deg, var(--red-50) 0%, var(--red-50) 100%);
-    border: 1px solid var(--art-hub-red-tint);
+    border: 1px solid var(--red-200);
     border-left: 4px solid var(--red-600);
     border-radius: 6px;
 }
@@ -4590,11 +4567,11 @@ input.cbSearchButton {
     color: var(--gray-700);
 }
 .broken-status--awaiting-approval { background: var(--amber-100); color: var(--amber-800); }
-.broken-status--in-progress { background: var(--sky-100); color: var(--art-hub-blue); }
+.broken-status--in-progress { background: var(--sky-100); color: var(--blue-800); }
 .broken-status--submitted { background: var(--red-50); color: var(--art-hub-red-5); }
-.broken-status--revision-requested { background: var(--art-hub-yellow-5); color: var(--art-hub-orange-5); }
-.broken-status--approved { background: var(--art-hub-green-tint-2); color: var(--art-hub-teal-dark); }
-.broken-status--completed { background: var(--art-hub-green-tint-2); color: var(--art-hub-teal-dark); }
+.broken-status--revision-requested { background: var(--amber-200); color: var(--amber-900); }
+.broken-status--approved { background: var(--emerald-100); color: var(--emerald-800); }
+.broken-status--completed { background: var(--emerald-100); color: var(--emerald-800); }
 
 /* ── Broken Mockups: pulsing pill (replaces verbose banner v2026.04.27) ───
  * Compact CTA pinned at the top of Steve's gallery tab. Click → modal with
@@ -4608,7 +4585,7 @@ input.cbSearchButton {
     padding: 10px 18px;
     margin-bottom: 14px;
     background: linear-gradient(90deg, var(--red-50) 0%, var(--red-100) 100%);
-    border: 1px solid var(--art-hub-red-4);
+    border: 1px solid var(--red-300);
     border-left: 4px solid var(--red-600);
     border-radius: 999px;
     color: var(--red-800);
@@ -4621,7 +4598,7 @@ input.cbSearchButton {
 }
 
 .broken-mockups-pill:hover {
-    background: linear-gradient(90deg, var(--red-100) 0%, var(--art-hub-red-tint) 100%);
+    background: linear-gradient(90deg, var(--red-100) 0%, var(--red-200) 100%);
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgb(220 38 38 / 25%);
 }
@@ -4713,7 +4690,7 @@ input.cbSearchButton {
     gap: 10px;
     padding: 10px 20px;
     background: var(--red-50);
-    border-bottom: 1px solid var(--art-hub-orange);
+    border-bottom: 1px solid var(--orange-200);
     flex-wrap: wrap;
 }
 
@@ -4868,14 +4845,14 @@ input.cbSearchButton {
 }
 
 .bml-action--recover:hover:not(:disabled) {
-    background: var(--art-hub-orange);
+    background: var(--orange-200);
     border-color: var(--store-rush);
 }
 
 .bml-action--box {
     background: var(--color-floor-tint);
     color: var(--art-hub-cyan-4);
-    border-color: var(--art-hub-cyan-tint);
+    border-color: var(--blue-200);
 }
 
 .bml-action--box:hover {
@@ -4886,19 +4863,19 @@ input.cbSearchButton {
 .bml-action--reupload {
     background: var(--brand-50);
     color: var(--print-green);
-    border-color: var(--art-hub-green-tint);
+    border-color: var(--green-200);
 }
 
 .bml-action--reupload:hover:not(:disabled) {
     background: var(--store-green-100);
-    border-color: var(--art-hub-green-3);
+    border-color: var(--green-600);
 }
 
 /* ── Broken Mockups Modal: drop zone (toggled by Re-upload button) ───── */
 .bml-row__dropzone {
     margin-top: 10px;
     padding: 18px 14px;
-    border: 2px dashed var(--art-hub-green-7);
+    border: 2px dashed var(--green-300);
     border-radius: 8px;
     background: var(--brand-50);
     text-align: center;
@@ -4908,8 +4885,8 @@ input.cbSearchButton {
 .bml-row__dropzone:hover { background: var(--store-green-100); }
 
 .bml-row__dropzone.is-dragover {
-    background: var(--art-hub-green-tint);
-    border-color: var(--art-hub-green-3);
+    background: var(--green-200);
+    border-color: var(--green-600);
     border-style: solid;
 }
 
@@ -4922,7 +4899,7 @@ input.cbSearchButton {
 
 .bml-dropzone-link {
     text-decoration: underline;
-    color: var(--art-hub-green-2);
+    color: var(--green-700);
 }
 
 .bml-dropzone-hint {

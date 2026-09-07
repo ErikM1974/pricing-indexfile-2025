@@ -22,9 +22,6 @@
 :root {
     --screenprint-quote-builder-extracted-gray: #666;
     --screenprint-quote-builder-extracted-gray-dark: #333;
-    --screenprint-quote-builder-extracted-green: #22c55e;
-    --screenprint-quote-builder-extracted-green-2: #16a34a;
-    --screenprint-quote-builder-extracted-red: #dc3545;
     --screenprint-quote-builder-extracted-yellow: #d9b94d;
 }
 /* stylelint-enable color-no-hex */
@@ -292,7 +289,7 @@
 .remove-al-btn {
     background: none;
     border: none;
-    color: var(--screenprint-quote-builder-extracted-red);
+    color: var(--bs-danger);
     cursor: pointer;
     padding: 4px 8px;
     font-size: 14px;
@@ -385,17 +382,17 @@
     gap: 4px;
     padding: 2px 8px;
     background: var(--brand-50);
-    border: 1px solid var(--pnw-forest, var(--screenprint-quote-builder-extracted-green));
+    border: 1px solid var(--pnw-forest, var(--green-500));
     border-radius: 12px;
     font-size: 11px;
-    color: var(--pnw-forest-deep, var(--screenprint-quote-builder-extracted-green-2));
+    color: var(--pnw-forest-deep, var(--green-600));
     cursor: pointer;
     margin-top: 4px;
     transition: all 0.15s ease;
 }
 
 .al-btn:hover {
-    background: var(--pnw-forest, var(--screenprint-quote-builder-extracted-green));
+    background: var(--pnw-forest, var(--green-500));
     color: white;
 }
 
@@ -516,10 +513,10 @@
     gap: 4px;
     padding: 4px 12px;
     background: var(--brand-50);
-    border: 1px dashed var(--pnw-forest, var(--screenprint-quote-builder-extracted-green));
+    border: 1px dashed var(--pnw-forest, var(--green-500));
     border-radius: 4px;
     font-size: 11px;
-    color: var(--pnw-forest-deep, var(--screenprint-quote-builder-extracted-green-2));
+    color: var(--pnw-forest-deep, var(--green-600));
     cursor: pointer;
 }
 
