@@ -1,3 +1,9 @@
+## v2026.09.06.48 (2026.09.06)
+
+- Memory: embroidery + cap API-driven tables recorded (v2026.09.06.47)
+- Additional-logo tables from the API tiers; parity spec covers them (33 rows, all to the cent)
+- Deploy v2026.09.06.48: additional-logo tables from the API tiers
+
 ## v2026.09.06.47 (2026.09.06)
 
 - Memory: orphan sweep recorded (111 dead files gone, v2026.09.06.46); unused eslint-disable removed
