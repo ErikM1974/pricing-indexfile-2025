@@ -699,7 +699,7 @@
 - LTM Fee: $50 for 1-7 pieces (garments/caps only, not full back)
 - Heavyweight Surcharge: +$10/piece (Carhartt jackets, bags, canvas, leather)
 - **API:** `/api/decg-pricing`
-- **Docs:** `/memory/DECG_PRICING_2026.md`, `/memory/EMBROIDERY_PRICING_RULES.md`
+- **Docs:** the DECG rate card + formula live in `shared_components/js/embroidery-pricing-service.js` (`calculateDECGPrice`) and `memory/DASHBOARD_REVIEWS_2026-09.md` § CUSTOMER-SUPPLIED (the old `DECG_PRICING_2026.md` / `EMBROIDERY_PRICING_RULES.md` were removed in the 2026-09-06 dead-files sweep)
 
 ## 🔧 Services & Components
 
@@ -1272,11 +1272,9 @@ cap-embroidery-fix.css
 | `/memory/QUOTE_BUILDER_UX_AUDIT_2026-07.md` | Order-entry UX audit of all 4 quote builders — click scorecard, verified price-display risks, P1–P3 recommendations (2026-07-06) | ✅ Active |
 | `/memory/QUOTE_BUILDER_EXPERT_AUDIT_2026-07-07.md` | **NEW** 5-expert audit of EMB/DTF/SCP builders — 62 verified findings: money leaks, endgame drift, guided-shell follow-ups, CSS/shell; punch list + policy decisions (2026-07-07) | ✅ Active |
 | `/memory/SCREENPRINT_QUOTE_BUILDER.md` | Screen Print Quote Builder 2026 documentation | ✅ Active |
-| `/memory/EMBROIDERY_PRICING_RULES.md` | Complete embroidery pricing formulas (FB, AL, caps, tiers) | ✅ Active |
 | `/memory/EMBROIDERY_PRICING_PHILOSOPHY.md` | **NEW** Three-tier philosophy, loopholes, financial impact (2026-02-05) | ✅ Active |
 | `/memory/training/EMBROIDERY_PRICING_SALES_TRAINING.md` | **NEW** Sales rep training slides for Taneisha & Ruthie (2026-02-05) | ✅ Active |
 | `/memory/EMBROIDERY_ITEM_TYPES.md` | Canonical ItemType reference for Embroidery_Costs table | ✅ Active |
-| `/memory/DECG_PRICING_2026.md` | **NEW** Customer Supplied Embroidery (DECG) pricing reference | ✅ Active |
 | `/memory/CASPIO_API_TEMPLATE.md` | API documentation (55 endpoints) | ✅ Active |
 | `/memory/STAFF_DIRECTORY.md` | Staff contacts for dropdowns | ✅ Active |
 | `/memory/DATABASE_PATTERNS.md` | Database schema reference | ✅ Active |

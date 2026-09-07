@@ -31,6 +31,7 @@ Last Updated: 2026-09-03 (/memory-maintain: MEMORY.md 24.0→~19 KB — Sept shi
 | [`SHOPWORKS_ODBC_INTEGRATION.md`](SHOPWORKS_ODBC_INTEGRATION.md) | ShopWorks ODBC + bandit sync cluster, thumbnails, ORDER_ODBC reconcile |
 | [`SHOP_HOURLY_RATE_2026-09.md`](SHOP_HOURLY_RATE_2026-09.md) | Garage-style shop rate: $67 production / $91 shop / $120 company per billable machine-hour, $150 posted; cards per hour; VOL-HOUR-RATE is per PAID hour |
 | [`VOLUME_QUOTE_2026-09.md`](VOLUME_QUOTE_2026-09.md) | Volume Quote admin tool — one-time price for 72+ orders, Braun NW numbers, Service_Codes VOL-* cost-model rows |
+| [`CUSTOMER_SUPPLIED_QUOTING_2026-09.md`](CUSTOMER_SUPPLIED_QUOTING_2026-09.md) | Customer brings their own garments: what exists per method (EMB chips / SCP standalone calculator / DTF none), what is wrong, the one-door redesign (supplied row type in every builder + shared intake card), and the 5 decisions Erik owns |
 | [`contract-embroidery-dst.md`](contract-embroidery-dst.md) | Contract embroidery .DST quoting |
 | [`deploy-cachebust.md`](deploy-cachebust.md) | Content-hashed assets + the ?v= cache-bust rules |
 | [`dst-studio.md`](dst-studio.md) | DST Studio |
