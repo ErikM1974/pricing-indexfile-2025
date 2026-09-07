@@ -1,3 +1,7 @@
+## v2026.09.07.21 (2026.09.07)
+
+- Deploy v2026.09.07.21: CSS handover — scripts/css toolkit (15 tools + README), CLAUDE.md CSS section and entry point, ACTIVE_FILES row, memory/INDEX one-liner (no served asset changed)
+
 ## v2026.09.07.20 (2026.09.07)
 
 - Deploy v2026.09.07.20: CSS palette pass 2 — storefront + catalog (closed sample-cart drawer hidden from the scrollbar gutter and the tab order; drawer text on the storefront inks; three shared storefront tints named as --store-* tokens; 13 near-threshold page variables mapped to tokens; swatch, hi-vis and gold accents kept)
