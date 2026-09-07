@@ -8,10 +8,6 @@
    keeps its exact look. Map them to shared_components/css/tokens.css names when the page is redesigned;
    every rule below uses var(). Raw hex is allowed ONLY in this block. */
 /* stylelint-disable color-no-hex */
-:root {
-    --cart-gray-dark: #333;
-    --cart-gray: #666;
-}
 /* stylelint-enable color-no-hex */
 
 /* ===== Drawer Overlay ===== */
@@ -44,7 +40,10 @@
     background: white;
     z-index: 9999;
     transform: translateX(100%);
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* closed: also hidden — nothing focusable off-screen, no sliver in the scrollbar gutter (palette pass 2) */
+    visibility: hidden;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), visibility 0s linear 0.3s;
     display: flex;
     flex-direction: column;
     box-shadow: -4px 0 24px rgb(0 0 0 / 15%);
@@ -52,6 +51,8 @@
 
 .cart-drawer.open {
     transform: translateX(0);
+    visibility: visible;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), visibility 0s;
 }
 
 /* ===== Drawer Header ===== */
@@ -75,7 +76,7 @@
     background: none;
     border: none;
     font-size: 24px;
-    color: var(--cart-gray);
+    color: var(--store-ink-soft);
     cursor: pointer;
     padding: 0;
     width: 32px;
@@ -89,7 +90,7 @@
 
 .drawer-close:hover {
     background: var(--gray-200);
-    color: var(--cart-gray-dark);
+    color: var(--store-ink);
 }
 
 /* ===== Drawer Content ===== */
@@ -131,13 +132,13 @@
     margin: 0 0 8px;
     font-size: 16px;
     font-weight: 600;
-    color: var(--cart-gray-dark);
+    color: var(--store-ink);
 }
 
 .product-preview-info p {
     margin: 0 0 8px;
     font-size: 14px;
-    color: var(--cart-gray);
+    color: var(--store-ink-soft);
 }
 
 /* Badge Styles */
@@ -157,7 +158,7 @@
 
 .badge-paid {
     background: var(--bs-warning);
-    color: var(--cart-gray-dark);
+    color: var(--store-ink);
 }
 
 /* ===== Selection Groups ===== */
@@ -169,7 +170,7 @@
     display: block;
     font-weight: 600;
     font-size: 14px;
-    color: var(--cart-gray-dark);
+    color: var(--store-ink);
     margin-bottom: 12px;
 }
 
@@ -230,7 +231,7 @@
     border-radius: 6px;
     font-size: 14px;
     font-weight: 600;
-    color: var(--cart-gray-dark);
+    color: var(--store-ink);
     cursor: pointer;
     transition: all 0.2s;
     text-align: center;
@@ -282,7 +283,7 @@
 .section-title {
     font-size: 16px;
     font-weight: 600;
-    color: var(--cart-gray-dark);
+    color: var(--store-ink);
     margin: 0 0 16px;
 }
 
@@ -332,12 +333,12 @@
 .cart-item-name {
     font-weight: 600;
     font-size: 14px;
-    color: var(--cart-gray-dark);
+    color: var(--store-ink);
 }
 
 .cart-item-variant {
     font-size: 13px;
-    color: var(--cart-gray);
+    color: var(--store-ink-soft);
 }
 
 .cart-item-remove {

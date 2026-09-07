@@ -12,7 +12,6 @@
     --ssr-lime: #b9d300;
     --ssr-orange: #ff6a13;
     --ssr-lime-dark: #5b6b00;
-    --ssr-green: #276a2a;
     --ssr-yellow: #ffb300;
 }
 /* stylelint-enable color-no-hex */
@@ -121,7 +120,7 @@ a.ssr-card-link:hover { transform: translateY(-1px); }
   cursor: pointer;
   transition: background .12s ease;
 }
-.ssr-add:hover { background: var(--ssr-green); }
+.ssr-add:hover { background: var(--material-green-900); }
 .ssr-add.is-added { background: var(--material-green-900); border-color: var(--material-green-900); }
 
 /* Collapsible accordion mode — collapsed by default; click the header to expand.

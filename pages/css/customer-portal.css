@@ -22,16 +22,12 @@
 /* stylelint-disable color-no-hex */
 :root {
     --customer-portal-yellow: #e6bb4a;
-    --customer-portal-green: #bfe0c1;
     --customer-portal-yellow-2: #b8912a;
     --customer-portal-yellow-3: #d9ad3c;
-    --customer-portal-yellow-4: #efdc9c;
     --customer-portal-red: #a8323e;
-    --customer-portal-red-2: #f0bfc6;
     --customer-portal-cyan: #1d4f7a;
     --customer-portal-cyan-2: #bcd3ea;
     --customer-portal-orange-dark: #7d4a00;
-    --customer-portal-orange: #f2d39a;
     --customer-portal-indigo: #cabfe8;
 
     /* ── Palette ── */
@@ -41,13 +37,13 @@
     --cp-green-700: var(--material-green-900);
     --cp-green-600: var(--store-green-700);
     --cp-green-500: var(--brand-600);
-    --cp-green-200: var(--customer-portal-green);
+    --cp-green-200: var(--material-green-100);
     --cp-green-100: var(--store-green-100);
     --cp-green-50:  var(--brand-100);
     --cp-gold-700: var(--print-gold);
     --cp-gold-600: var(--customer-portal-yellow-2);
     --cp-gold-500: var(--customer-portal-yellow-3);
-    --cp-gold-200: var(--customer-portal-yellow-4);
+    --cp-gold-200: var(--orange-200);
     --cp-gold-100: var(--amber-100);
     --cp-gold-50:  var(--store-rush-soft);
     --cp-paper:     var(--store-paper-deep);   /* page canvas — warm parchment, never gray */
@@ -60,9 +56,9 @@
     --cp-ink-4: var(--gray-400);
     --cp-line:   var(--store-line);
     --cp-line-2: var(--store-paper-deep);
-    --cp-red-700: var(--color-ae);  --cp-red-600: var(--customer-portal-red);  --cp-red-50: var(--store-rush-soft);  --cp-red-200: var(--customer-portal-red-2);
+    --cp-red-700: var(--color-ae);  --cp-red-600: var(--customer-portal-red);  --cp-red-50: var(--store-rush-soft);  --cp-red-200: var(--red-200);
     --cp-blue-700: var(--customer-portal-cyan); --cp-blue-50: var(--slate-200);  --cp-blue-200: var(--customer-portal-cyan-2);
-    --cp-amber-700: var(--customer-portal-orange-dark); --cp-amber-50: var(--store-rush-soft); --cp-amber-200: var(--customer-portal-orange);
+    --cp-amber-700: var(--customer-portal-orange-dark); --cp-amber-50: var(--store-rush-soft); --cp-amber-200: var(--orange-200);
     --cp-violet-700: var(--color-ruth-dark); --cp-violet-50: var(--slate-200); --cp-violet-200: var(--customer-portal-indigo);
 
     /* ── Type ── */

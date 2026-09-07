@@ -19,7 +19,6 @@
 /* stylelint-disable color-no-hex */
 :root {
     --n26h-yellow: #ffd21e;
-    --n26h-green: #7ed08c;
     --n26h-orange: #e7a33b;
 }
 /* stylelint-enable color-no-hex */
@@ -149,7 +148,7 @@
     font-family: var(--font-display); font-weight: 800; line-height: 1.03;
     font-size: clamp(24px, 3vw, 34px); margin-bottom: 8px;
 }
-.fall26-band h3 .yr { color: var(--n26h-green); }
+.fall26-band h3 .yr { color: var(--store-green-300); }
 .fall26-band p { font-size: 14px; opacity: 0.9; max-width: 48ch; margin-bottom: 16px; }
 
 .fall26-band-cta {

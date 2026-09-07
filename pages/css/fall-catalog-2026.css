@@ -6,10 +6,6 @@
    keeps its exact look. Map them to shared_components/css/tokens.css names when the page is redesigned;
    every rule below uses var(). Raw hex is allowed ONLY in this block. */
 /* stylelint-disable color-no-hex */
-:root {
-    --fc-green-tint: #cbe8cf;
-    --fc-green: #7ed08c;
-}
 /* stylelint-enable color-no-hex */
 
 /* ── Hero ──────────────────────────────────────────────────────── */
@@ -43,7 +39,7 @@
     font-weight: 700;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: var(--fc-green-tint);
+    color: var(--material-green-100);
     margin-bottom: 16px;
 }
 
@@ -65,7 +61,7 @@
     letter-spacing: -0.02em;
     margin: 0 0 16px;
 }
-.fc-hero-title .yr { color: var(--fc-green); }
+.fc-hero-title .yr { color: var(--store-green-300); }
 
 .fc-hero-sub {
     max-width: 640px;

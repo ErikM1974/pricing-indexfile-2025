@@ -114,6 +114,27 @@ three gap sizes, `opacity:.5;cursor:not-allowed` ×26 (disabled). These become u
 
 ## 8. Progress log (newest first)
 
+### 2026-09-07 — Palette pass 2, storefront + catalog LIVE (`v2026.09.07.20`)
+
+- **Scope:** the 22 customer-facing pages (home, catalog, product, brands, fall catalog, carts, custom tees/caps/3-day,
+  stickers, banners, quote/inquiry forms, sample checkout, customer login/portal/product, golf product) and the
+  sheets they load. Erik 2026-09-07: "you have the authority to make it look even better".
+- **What changed on purpose:** (1) the sample-cart drawer, when closed, is now also `visibility: hidden` — it used to sit
+  in the scrollbar gutter (15 px on screen at 1440, visible with overlay scrollbars and in every screenshot) and its
+  buttons stayed keyboard-focusable while off-screen; (2) the drawer's legacy `#333` / `#666` text greys are the
+  storefront inks (`--store-ink`, `--store-ink-soft`), so the drawer reads like the rest of the storefront.
+- **What changed with no visible effect:** three storefront accent tints that several pages shared are named once
+  (`--store-green-300`, `--store-green-200`, `--store-rush-tint`), and 13 page variables within the near threshold of a
+  token were mapped to it (product page orange tints, fall-catalog green tint, customer portal/product tints, the
+  recommendations sheet's green).
+- **Deliberately left alone:** the catalog's colour-family filter swatches (`--cs-*`), the hi-vis safety colours
+  (`--ssr-lime/-orange/-yellow`), the home hero accents and the customer portal's gold ramp — they represent
+  products or a deliberate accent, not the brand.
+- **Verification:** before/after shots of all 22 pages, diffs reviewed page by page; e2e (a11y, money path) green.
+- **Storefront review verdict:** the 2026 storefront is already a coherent design system (cream paper, forest green,
+  rush orange, Bricolage display); the remaining page variables are page-specific by design. No further "look"
+  changes were warranted without a design brief.
+
 ### 2026-09-07 — Palette pass 1, app-wide collapse LIVE (`v2026.09.07.19`): 30 ramp steps named, 604 page variables gone
 
 - **What:** 30 hex values that 8 to 35 sheets each declared as their own page variable are now steps of the token

@@ -14,9 +14,6 @@
    raw hex is allowed ONLY in this block. */
 /* stylelint-disable color-no-hex */
 :root {
-    --three-day-tees-green: #9be3a8;
-    --three-day-tees-orange: #ffd9a8;
-
     /* Ground + ink */
     --paper: var(--store-paper);
     --paper-deep: var(--store-paper-deep);
@@ -562,10 +559,10 @@ input[type="range"] { width: 100%; accent-color: var(--green-700); min-height: 3
     background: var(--green-950); color: var(--color-on-brand); border-radius: 16px; padding: 22px 24px;
     box-shadow: var(--shadow-pop);
 }
-.guarantee-tag i { font-size: 26px; color: var(--three-day-tees-green); margin-top: 3px; }
+.guarantee-tag i { font-size: 26px; color: var(--store-green-200); margin-top: 3px; }
 .guarantee-tag strong { font-family: var(--font-display); font-size: 18px; display: block; margin-bottom: 4px; }
 .guarantee-tag p { margin: 0; font-size: 14px; opacity: 0.85; }
-.guarantee-tag a { color: var(--three-day-tees-green); font-weight: 700; }
+.guarantee-tag a { color: var(--store-green-200); font-weight: 700; }
 
 .site-foot { text-align: center; padding: 26px 16px 40px; font-size: 13px; color: var(--ink-faint); }
 
@@ -631,7 +628,7 @@ input[type="range"] { width: 100%; accent-color: var(--green-700); min-height: 3
 }
 .tdt-toast.is-error { background: var(--bad); }
 .tdt-toast.is-success { background: var(--green-900); }
-.tdt-toast .link-btn { color: var(--three-day-tees-orange); font-weight: 700; text-decoration: none; }
+.tdt-toast .link-btn { color: var(--store-rush-tint); font-weight: 700; text-decoration: none; }
 
 @keyframes toast-in { from { opacity: 0; transform: translateY(8px); } }
 
