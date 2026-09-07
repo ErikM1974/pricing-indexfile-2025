@@ -1,3 +1,10 @@
+## v2026.09.06.47 (2026.09.06)
+
+- Memory: orphan sweep recorded (111 dead files gone, v2026.09.06.46); unused eslint-disable removed
+- Repeatable cross-surface pricing check: tests/e2e/calculator-parity.spec.js + npm run test:parity:surfaces
+- Embroidery + cap calculators: table columns, LTM column and small-order fee from the API tiers
+- Deploy v2026.09.06.47: embroidery + cap tables from the API tiers; parity spec + orphan sweep ride along
+
 ## v2026.09.06.46 (2026.09.06)
 
 - Orphan sweep (Erik: "get rid of the orphan files"): 42 files removed
