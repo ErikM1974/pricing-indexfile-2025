@@ -91,7 +91,8 @@ describe('every served HTML page is Rule-3 clean (2026-09-06 census)', () => {
 });
 
 // Browser scripts: everything tracked as .js except Node-side dirs, tests, build output, vendored/archived code.
-const JS_SKIP = /^(dist|tests|node_modules|memory|docs|scripts|templates|lib|config|\.claude|richardson-caps)\/|^server\.js$|^tools\/seed-top-sellers\.js$|\/vendor\/|\/archive\/|archive-working-files\//;
+// routes/ = sections of server.js moved verbatim (server split, 2026-09-07): Node code, exempt like server.js itself
+const JS_SKIP = /^routes\/|^(dist|tests|node_modules|memory|docs|scripts|templates|lib|config|\.claude|richardson-caps)\/|^server\.js$|^tools\/seed-top-sellers\.js$|\/vendor\/|\/archive\/|archive-working-files\//;
 const BROWSER_JS = tracked.filter((f) => f.endsWith('.js') && !JS_SKIP.test(f));
 // Referrers that count: served pages, browser scripts, server.js and the build. Not: tests, one-off Node scripts, archives.
 const CORPUS = tracked.filter((f) => (f.endsWith('.html') || f.endsWith('.js') || f.endsWith('.jsx')) && !/^(dist|node_modules|tests)\/|\/archive\/|archive-working-files\//.test(f) && (!f.startsWith('scripts/') || f === 'scripts/build.js'));
