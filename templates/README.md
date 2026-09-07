@@ -12,6 +12,13 @@ This directory contains reusable templates for creating new pricing calculators 
 
 ## 📁 Template Files
 
+### Page template (any new page — 2026-09-07)
+- **`page-template.html`** - Copy this for ANY new staff or public page: tokens.css first (the `@layer`
+  order), then the shared components/utilities, then ONE page stylesheet and ONE page script. It is already
+  Rule-3 clean, versioned, landmarked and labelled, so a copy passes `tests/unit/repo-hygiene-final.test.js`
+  on day one; `tests/unit/css-tokens.test.js` keeps the template itself that way. Write page CSS with
+  `var(--…)` tokens — `npm run lint:css` rejects raw hex (`memory/CSS_STANDARDIZATION_PLAN_2026-09.md`).
+
 ### Core Templates
 - **`calculator-template.html`** - Main calculator page with UI and logic structure
 - **`quote-service-template.js`** - Database integration service

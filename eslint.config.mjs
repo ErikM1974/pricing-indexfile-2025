@@ -1,19 +1,90 @@
-// ESLint flat config (roadmap 0.6) — scoped to NEW Phase-0+ code only.
-// Legacy files are grandfathered; they come under lint as task 0.4 migrates
-// them into shared_components/js/builders/**. Widening the scope is the
-// ratchet — never loosen a rule to admit a file.
+// ESLint flat config (roadmap 0.6). Two scopes, one ratchet — never loosen a rule to admit a file:
+//   STRICT  — the NEW Phase-0+ code (builders, lib, build, tenant config, lint-css): the full ruleset below.
+//   LEGACY  — every other browser script (widened 2026-09-07, CSS standardization Step 3): parsed, and
+//             checked with js.configs.recommended MINUS the two rules that only a per-file `/* global */`
+//             audit can satisfy for classic scripts sharing window globals (no-undef 1,088 findings in
+//             146 files, no-unused-vars 843 in 206 — measured 2026-09-07). The rules that DID fire are
+//             `warn`, capped by `--max-warnings` in package.json `lint` (99 at the time of writing):
+//             fix some, lower the cap, never raise it. A file that moves into the strict scope gets the
+//             strict rules automatically — that is how legacy code graduates.
 import js from '@eslint/js';
+import globals from 'globals';
 import noUnsanitized from 'eslint-plugin-no-unsanitized';
+
+// The strict-scope files; the legacy block ignores exactly these so the two never merge.
+const STRICT_FILES = [
+    'shared_components/js/builders/**/*.js',
+    'lib/**/*.js',
+    'scripts/build.js',
+    'scripts/lint-css.js',
+    'config/tenant.js',
+];
+
+// Browser scripts written as ES modules (import/export) — everything else is a classic script.
+const LEGACY_ESM = [
+    'shared_components/js/staff-dashboard/**/*.js',
+    'dashboards/js/company-numbers.js',
+    'pages/js/inventory-details.js',
+    'product/**/*.js',
+];
 
 export default [
     {
-        // New-code scope
-        files: [
-            'shared_components/js/builders/**/*.js',
-            'lib/**/*.js',
-            'scripts/build.js',
-            'config/tenant.js',
+        // Global ignores — what `eslint .` never reads: build output, deps, tests, Node-side scripts
+        // (except the two in STRICT_FILES), docs/memory, vendored + archived code, the in-browser-Babel .jsx,
+        // and server.js (Node, 5,600 lines, its own review process).
+        ignores: [
+            'dist/**',
+            'node_modules/**',
+            'tests/**',
+            '.claude/**',
+            'memory/**',
+            'docs/**',
+            'richardson-caps/**',
+            'templates/**',
+            '**/vendor/**',
+            '**/archive/**',
+            '**/archive-working-files/**',
+            '**/*.jsx',
+            'server.js',
+            'tools/seed-top-sellers.js',
+            'scripts/**/*.js',
+            '!scripts/build.js',
+            '!scripts/lint-css.js',
         ],
+    },
+    {
+        // LEGACY browser scope (2026-09-07) — see the header.
+        files: ['**/*.js'],
+        ignores: [...STRICT_FILES, 'shared_components/js/quote-builder-utils.js'],
+        languageOptions: {
+            ecmaVersion: 2022,
+            sourceType: 'script',
+            globals: { ...globals.browser },
+        },
+        rules: {
+            ...js.configs.recommended.rules,
+            'no-undef': 'off',
+            'no-unused-vars': 'off',
+            // What fired on 2026-09-07 (count): warnings under the --max-warnings cap until fixed.
+            'no-useless-escape': 'warn', // 43
+            'no-case-declarations': 'warn', // 19
+            'no-prototype-builtins': 'warn', // 12
+            'no-redeclare': 'warn', // 9
+            'no-empty': ['warn', { allowEmptyCatch: true }], // 8
+            'no-unreachable': 'warn', // 3
+            'no-control-regex': 'warn', // 2
+            'no-irregular-whitespace': 'warn', // 1
+            'no-unused-labels': 'warn', // 1
+        },
+    },
+    {
+        files: LEGACY_ESM,
+        languageOptions: { sourceType: 'module' },
+    },
+    {
+        // STRICT — new-code scope
+        files: STRICT_FILES,
         languageOptions: {
             ecmaVersion: 2022,
             sourceType: 'module',
@@ -122,7 +193,7 @@ export default [
     },
     {
         // Node-side build/server helpers — CommonJS, not ESM.
-        files: ['lib/**/*.js', 'scripts/build.js'],
+        files: ['lib/**/*.js', 'scripts/build.js', 'scripts/lint-css.js'],
         languageOptions: {
             sourceType: 'commonjs',
         },

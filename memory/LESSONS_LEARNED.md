@@ -26,31 +26,7 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 ### Customer Portals console said nobody had ever signed in (2026-09-05, ARCHIVED 2026-09-06): a "0" that never moves is a broken reader, not a quiet business — the count read a field the login flow never wrote; assert every counter against a source of truth once. Full entry in archive.
 ### Whole-dashboard deep-review sweep — the same six bugs kept reappearing (2026-09-05, ARCHIVED 2026-09-06, `.24`→`.75`, 54 pages): UTC "today", `[hidden]` beaten by flex, silent-empty states, hardcoded `* 75` art rates, unversioned assets, inline handlers — each is now a jest lock; a review without a lock is a review that repeats. Full entry in archive.
 ### Customer-facing sweep — the same rules the staff pages broke, plus three real bugs (2026-09-06, ARCHIVED 2026-09-06, `v2026.09.05.77`→`v2026.09.06.5`): inline `display:none` beats `.hidden=false`; a listener registered after an early return never fires; render colours only after the fallback resolves; 6 scripts had a silent proxy-host fallback → `''` + visible error. Full entry in archive.
-
-## 2026-09-06 — Quote builders: finishing Rule 3 meant teaching the shared delegator four more events (`v2026.09.06.19`–`.22`)
-
-**Problem.** The 2026-09-05 review had converted the builders' `onclick=` to `data-call`, but 185 `onchange=` /
-`oninput=` / `onblur=` / `onkeydown=` / `onerror=` handlers remained across the three builder pages and their
-row templates, plus a 540-line inline style/script pair on the fast-quote page and 79 bare icons in the shared
-classic scripts every builder loads.
-
-**Solution.** ONE change to `quote-builder-utils.js` (Rule 8: shared, not four copies): `data-change` /
-`data-input` / `data-blur` (focusout) / `data-keydown` with comma lists, `?optional` names, `data-*-args`
-(`$this`/`$event`), `data-keyclick`, `data-enter` (+`-args`, `-unless`), `<img data-onerror>`; a parser rewrote
-every inline form mechanically (dry run reviewed first). Locks: `quote-builders-hygiene.test.js` (jsdom exercises
-every new path) + the parity suites untouched and green.
-
-**Prevention.**
-- 🔴 **Do not add an `sr-only` h1 to the four builders** — axe `heading-order` + `region` baselines
-  (`tests/a11y/builders.a11y.test.js`) fail; they carry no h1 by design.
-- 🔴 A top-of-file `window.location.hostname` read breaks any test that evals the file without a window
-  (`scp-dark-garment-parity`) — gate with `typeof window !== 'undefined' && !!window.location`.
-- 🔑 The old inline guard `if(window.x)x()` is the delegator's `?x` — keep it for functions a page may not define
-  (`renderOrderRecap`, the push-button state updaters).
-- 🔑 Icon regexes must also catch `class="fas ' + var + '"` (concatenation) and `fa-${expr}` forms; grep at
-  runtime (`i.fas:not([aria-hidden])`) after the static pass.
-- 🔑 Builders are staff-gated: an expired Chrome session redirects to the Caspio login silently (the probe
-  returns empty counts). Verify wiring on static-dist (no auth) and ask Erik to sign in for the live pass.
+### Quote builders: finishing Rule 3 meant teaching the shared delegator four more events (2026-09-06, ARCHIVED 2026-09-07, `v2026.09.06.19`–`.22`): 185 inline change/input/blur/keydown/error handlers → `data-change`/`-input`/`-blur`/`-keydown`/`-enter`/`data-onerror` in the ONE shared delegator (`quote-builder-utils.js`, Rule 8); never add an `sr-only` h1 to the builders (axe baselines fail); gate a top-of-file `window.location` read for window-less tests; catch concatenated icon classes at runtime. Full entry in archive.
 
 ## 2026-09-06 — Staff pages, the LIVE pass: what a signed-in runtime walk found that 80 static locks had not (`v2026.09.06.26`–`.28`)
 
@@ -277,3 +253,25 @@ from a Heroku one-off dyno. Locked by `staff-alert-email.test.js`.
 **Prevention.** 🔑 An alert path is not verified until a test message has ARRIVED. 🔑 When a
 feature depends on a config var, check `heroku config:get` (presence only) before assuming the
 errand was done. 🔑 This LAN blocks `api.emailjs.com` (TLS interception): prove sends from Heroku.
+
+## 2026-09-07 — CSS standardization Step 1+3 (`v2026.09.07.3`): three traps in a zero-change deploy
+
+**Problem.** (a) A Bash heredoc that was to write the two token files died at parse time and wrote
+nothing — the CSS comments contain apostrophes. (b) The three `tests/ui/*.html` token fixtures could
+not be screenshotted through `server.js` (no `/tests` mount), so "the five pages that load the
+dashboard tokens" were only two served pages. (c) stylelint-config-standard's `value-keyword-case`
+demanded `inter`, `menlo`, `blinkmacsystemfont` inside the `--font-*` tokens.
+**Root cause.** (a) The harness hands the whole command to `bash -c`; a quoted heredoc is not immune.
+(b) `tests/` is deliberately outside every static mount. (c) The rule checks custom-property values
+too, and font names are proper nouns.
+**Solution.** (a) Write tool for any multi-line file; Bash only for one-line edits (`perl -pi`, CRLF
+kept with `\r\n` in the replacement). (b) `node scripts/qa-static-server.js <repo> 8098` serves the
+whole tree; a scratch Playwright config (`baseURL` :8098, `testDir` tests/e2e, `testMatch`
+builder-screenshots) reuses the spec unchanged — 3 fixtures screenshotted and diffed with the rest.
+(c) `'value-keyword-case': ['lower', { ignoreProperties: ['font-family', 'font', '/^--font-/'] }]`.
+**Prevention.** 🔑 Write tool for files, perl for lines. 🔑 A page is only screenshot-able if something
+SERVES it — check the mount before counting it. 🔑 Lint the token file BEFORE settling the config:
+config-standard rewrites are value-identical (hue `deg`, `rgb(… / 12%)`, `#fff`, one declaration per
+line) but prove it with the pixel diff, not by eye. 🔑 Another session deployed `v2026.09.07.2` into
+this checkout between my first read and my first edit — `git log -1` + `git status` before the first
+commit is what caught that develop had moved (DURABLE_GOTCHAS § Repo/deploy, again).

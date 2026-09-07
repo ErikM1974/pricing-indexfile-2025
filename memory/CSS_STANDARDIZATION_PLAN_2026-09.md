@@ -111,3 +111,49 @@ three gap sizes, `opacity:.5;cursor:not-allowed` ×26 (disabled). These become u
 > after, then proceed family by family per § 4 without asking, following the per-family verification loop.
 > Never touch pricing services or the generated `quote-builder-inline.css` until the builders family. Record
 > progress in this plan file and MEMORY.md after every family.
+
+## 8. Progress log (newest first)
+
+### 2026-09-07 — Step 1 + Step 3 shipped as ONE deploy (`v2026.09.07.3`), zero visual change
+
+- **Tokens.** `shared_components/css/tokens.css` = the `@layer` order statement + everything the dashboard seed
+  had (type ramp, `--nw-*`, space, radius, motion, z-index — values untouched) + the § 2 palette as ramps
+  (`--brand-50/100/500/600/700/800` = #f0fdf4 #e8f5e9 **#4cb354** #409a47 #2e5827 #1a472a; `--gray-50…800`;
+  `--slate-*`; `--red/amber/emerald/blue-*`) and the semantic names the plan asked for (`--color-brand`,
+  `-brand-hover/-dark/-deep/-tint`, `--color-on-brand`, `--color-ink/-ink-soft/-muted/-faint`,
+  `--color-line/-line-strong`, `--color-surface/-alt/-raised`, `--color-danger/-ink/-bg`,
+  `--color-warning/-ink/-bg`, `--color-success/-bg`, `--color-info`, `--shadow-sm/md`, `--z-nav`). Every hex
+  carries its census count. `staff-dashboard/tokens.css` is theme-only now (density, dark/light, accent
+  overrides, aliases) and the 5 pages that load it link the app file first. **15/15 pages pixel-identical**
+  (12 served through server.js + the 3 `tests/ui` fixtures through `scripts/qa-static-server.js` with a scratch
+  Playwright config — server.js has no `/tests` mount).
+- **Decisions.** Brand = `#4cb354` (383 uses); dark = `#2e5827` (146); deep = `#1a472a` (116). The other greens
+  (`#2d5f3f` 111, `#3a7c52` 77, `#16a34a` 74, `#166534` 68, `#22c55e` 60) map to the nearest of those, family
+  by family. The 2026 storefront set (`nwca-2026-core.css`: `--paper/--ink/--green-*`, 25 pages, cream +
+  forest, Bricolage/Public Sans) is a different design language — NOT folded in; reconcile in the webstore
+  family. Person/department colours (`DESIGN_COLOUR_CODE.md`) stay page-local, never brand tokens.
+- **Page template.** `templates/page-template.html`: tokens → (components/utilities when Step 2 lands) → ONE
+  page CSS → `app.config.js` + `data-call-delegator.js` + ONE page JS; header/main/footer; labelled; versioned;
+  class vocabulary = `NWCA-2026-GUIDE.md` (btn, card, alert, field, table-wrap/data-table, empty-state) so
+  Step 2's components.css has one name set. Locked by `tests/unit/css-tokens.test.js`, which also locks: layer
+  order is the file's first statement, no token defined in both token files, app tokens before dashboard
+  tokens on every page that loads them.
+- **stylelint.** `stylelint.config.mjs` = standard + `color-no-hex` (off only in the two token files) +
+  `declaration-no-important` (`quote-builder-inline.css` ignored) + BEM-tolerant `selector-class-pattern`; font
+  names exempt from `value-keyword-case`. Scope ratchet = `CSS_LINT_SCOPE` in `scripts/lint-css.js` (today:
+  the two token files; each family's stylesheets are ADDED when it migrates, never removed). Runs as
+  `npm run lint:css`, in CI's lint job, and as `tests/unit/css-lint.test.js` under `test:unit` — so `/deploy`
+  Step 0.6 gates on it. Standard's value-identical rewrites to know about: hue `150deg`, `rgb(34 197 94 / 12%)`,
+  `#fff`, one declaration per line, blank line before a rule.
+- **ESLint widened to ALL browser JS** (`eslint . --max-warnings 99`). STRICT scope unchanged (+ `scripts/lint-css.js`).
+  LEGACY scope = `js.configs.recommended` minus `no-undef` (1,088 findings in 146 files) and `no-unused-vars`
+  (843 in 206) — classic scripts share `window` globals across files; those two need a per-file `/* global */`
+  audit and are their own ratchet. The 9 rules that fired (99 findings: useless-escape 43, case-declarations
+  19, prototype-builtins 12, redeclare 9, empty 8, unreachable 3, control-regex 2, irregular-whitespace 1,
+  unused-labels 1) are warnings under the cap: fix some → lower the cap; never raise it. 30 ESM files are
+  declared in `LEGACY_ESM`. Measured before the split: 2,119 findings in 294 of 410 files.
+- **Census after this deploy:** 296 stylesheets · 4,572 KB · 216 use `var(--)` · 267 raw-hex files (the new
+  token file is one of them, by design) · 1,355 distinct hex · 3,182 `!important` · 224 duplicated bodies — the
+  § 2 baseline plus the token file, as intended: nothing migrated yet.
+- **Next:** forms family (18 pages, `form-sheet`), and Step 2 (`components.css` + `utilities.css`) ships with
+  it as its first consumer.
