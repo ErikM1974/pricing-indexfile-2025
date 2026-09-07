@@ -1258,7 +1258,7 @@ async function importSanmarProducts(mergedProductResults, progress) {
 }
 
 /** An imported cap logo (CB / CS / AL-CAP) → the CAP side of globalAL. */
-function _applyImportedCapLogo(result) {
+export function _applyImportedCapLogo(result) {
     embState.globalAL.cap.enabled = true;
     // Position stays the canonical 'AL-Cap': it is a FEE PART NAME downstream
     // (output.js expectedFees, persistence, state defaults), not a free-text label.
@@ -1298,7 +1298,7 @@ function _applyImportedCapLogo(result) {
  * a real Full Back additional logo. That is correct in all four combinations, including the
  * Left Chest + Full Back order, which gets both priced properly.
  */
-function _applyImportedFullBack(result) {
+export function _applyImportedFullBack(result) {
     if (embState.primaryLogo && embState.primaryLogo.position === 'Full Back') {
         // Already priced as the primary, off the DECG-FB ladder. Adding a second charge here
         // is the double-count. Leave a note so the rep can see we recognised the fee line.
@@ -1332,7 +1332,7 @@ function _applyImportedFullBack(result) {
 
 /** Import services from the review modal — AL / cap logo / Full Back (global toggles, or a
  * service row when there are no products), DECG/DECC, Monogram (+ names into notes). */
-function applyServiceResults(serviceResults, data, progress) {
+export function applyServiceResults(serviceResults, data, progress) {
     // 12. Process service results
     progress.step++;
     updateImportProgress(progress.step, progress.total, 'Processing services...', '');

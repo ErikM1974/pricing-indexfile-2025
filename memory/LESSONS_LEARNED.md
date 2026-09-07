@@ -261,3 +261,19 @@ existing wrapper's tag over inserting a new element: nothing in CSS or JS target
 🔑 Grep a stylesheet for bare `main {` BEFORE introducing a `<main>` — a themed reset would restyle
 the swapped element (none of these 96 pages had one; 47 other stylesheets in the repo do).
 🔑 A page list built from repo paths is not a URL list: server.js serves some pages at other paths.
+
+## 2026-09-07 — Every money-path alert had gone to a log nobody reads (`v2026.09.07.1`)
+
+**Problem.** `alert3DT` / `alertQuotePay` (paid order never reached ShopWorks, payment with no
+ledger row) posted to a Slack webhook that a memory errand said was "still to set". A
+`heroku config:get` showed NEITHER Slack var was ever set — so since the day they were written
+these alerts went to Papertrail and nowhere else.
+**Root cause.** The fallback was designed as "log, then Slack if configured", and nobody
+verified the "if configured" half on the live app. A read of the code says "alerts exist"; only
+the config says whether they reach a human.
+**Solution.** One `staffAlert` pipe: log + Slack-if-set + EMAIL through EmailJS
+`template_staff_alert` (keys already live for order confirmations). Verified by an actual send
+from a Heroku one-off dyno. Locked by `staff-alert-email.test.js`.
+**Prevention.** 🔑 An alert path is not verified until a test message has ARRIVED. 🔑 When a
+feature depends on a config var, check `heroku config:get` (presence only) before assuming the
+errand was done. 🔑 This LAN blocks `api.emailjs.com` (TLS interception): prove sends from Heroku.
