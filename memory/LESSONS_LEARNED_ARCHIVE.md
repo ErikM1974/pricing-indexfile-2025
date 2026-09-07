@@ -6,6 +6,40 @@ Resolved entries aged out of `LESSONS_LEARNED.md` (300-line cap). Newest first. 
 
 ## Archived 2026-09-06
 
+## 2026-09-06 — Calculator sweep (`v2026.09.06.9` → `.16`): 8 pages of inline code, 5 shared scripts with hardcoded hosts, and a dead loader
+
+**Problem.** The staff calculators were the last family untouched by Rule 3: screen-print, dtf, dtg, embroidery,
+cap-embroidery, digitizing, monogram and laser-manual carried 1,000-line inline `<style>` blocks and up to
+1,416-line inline `<script>` blocks; six shared calculator scripts and three page scripts had the proxy host
+hardcoded (pricing-pages even kept an unused "backup host"); `pricing-pages.js` chain-loaded `cart.js` at runtime
+through a loader that force-skipped it and pointed at three files that no longer existed, and carried a full
+duplicate of `calculator-inventory.js`; `app.config.js` was loaded AFTER the scripts that read it on four pages.
+
+**Root cause.** Pages were built by copy-paste in 2025; nothing locked them; the config script was appended
+where it was convenient, not where parse-time reads needed it.
+
+**Solution.** Verbatim extraction (CSS → `calculators/css/<page>.css`, JS → `calculators/js/<page>-page.js` at the
+same script position, global scope preserved because shared scripts call page functions by name), hosts from
+`APP_CONFIG` with a visible console.error when missing, one config tag in `<head>`, injected `<style>` blocks
+→ real stylesheets, delegated handlers via `data-call-delegator.js`, gated logging. Locks:
+`screen-print-pricing-page`, `calculator-pages-rule3`, `calculator-shared-components`, `calculator-hygiene`,
+`pricing-pages-no-legacy-loader`. Sections in `memory/DASHBOARD_REVIEWS_2026-09.md` § CALCULATORS.
+
+**Prevention.**
+- 🔴 **`app.config.js` goes in `<head>`.** A module-level `const HOST = APP_CONFIG…` reads at parse time; a
+  config tag placed later in `<body>` leaves it empty. The lock asserts config precedes every shared script.
+- 🔴 **`data-call="x.fn"` resolves `window.x`** — a top-level `let`/`const` is NOT a window property (inline
+  `onclick` saw it through lexical scope). Expose it (`window.compareCalc = compareCalc`) when converting.
+- 🔴 A runtime `loadScript('/cart.js')` string is a reference a `<script>`-tag scan will miss — grep the string,
+  not just the tag, before calling a file dead (cart.js was "dead" for 3 months while still referenced).
+- 🔑 Keep extracted page scripts at GLOBAL scope when shared scripts call their functions by name; an IIFE
+  wrapper silently breaks `showLoading`/`loadProduct`-style cross-calls.
+- 🔑 A shared script that injects `<style>` on render is Rule 3 by another route; extract and link.
+- 🔑 The icon-hiding regex must tolerate extra attributes (`id=`) after `class=` and the `fa-${…}` dynamic form.
+- 🔑 A page that 301s live (compare-pricing → quick-quote, webstore-info → company-webstores) still passes every
+  static-dist smoke — check the live URL before trusting a smoke on a retired page.
+
+
 ## Customer-facing sweep (`v2026.09.05.77` → `v2026.09.06.5`, 5 batches, ~70 public pages): the SAME rules the staff pages broke, plus three real bugs
 
 **Problem.** Public pages had never been through the deep-review loop. Beyond the hygiene the staff sweep

@@ -124,7 +124,8 @@ function referrers(rel) {
 const innerText = (frag) => frag.replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').trim();
 const NAMED = /aria-label|aria-labelledby|\btitle=/;
 const A11Y_SKIP = /emailjs-template/; // email bodies, not pages
-function a11yFindings(html) {
+const MAIN_AT_RUNTIME = new Set(['dashboards/production-shifts.html']);
+function a11yFindings(html, file) {
     const h = html.replace(/<!--[\s\S]*?-->/g, '');
     const out = [];
     for (const m of h.matchAll(/<img\b[^>]*>/g)) if (!/\balt=/.test(m[0])) out.push('img without alt: ' + m[0].slice(0, 80));
@@ -141,12 +142,16 @@ function a11yFindings(html) {
         out.push('unlabelled control: ' + m[0].slice(0, 80));
     }
     if (!/<html\b[^>]*\blang=/.test(h)) out.push('no <html lang>');
+    // 2026-09-06: every served page exposes exactly ONE main landmark (97 pages had none; a swapped div/section keeps its
+    // classes, a wrapped range gets a bare <main>). production-shifts renders its own <main> from React into #root.
+    const mains = (h.match(/<main[\s>]|\brole="main"/g) || []).length;
+    if (mains !== 1 && !MAIN_AT_RUNTIME.has(file)) out.push(mains ? 'more than one main landmark' : 'no main landmark');
     if (!/<title>/.test(h)) out.push('no <title>');
     return out;
 }
 describe('every served HTML page names its controls (static accessibility)', () => {
     test.each(PAGES.filter((p) => !A11Y_SKIP.test(p)))('%s', (rel) => {
-        expect({ file: rel, findings: a11yFindings(read(rel)) }).toEqual({ file: rel, findings: [] });
+        expect({ file: rel, findings: a11yFindings(read(rel), rel) }).toEqual({ file: rel, findings: [] });
     });
 });
 

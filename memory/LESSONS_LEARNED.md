@@ -1,4 +1,4 @@
-﻿# LESSONS LEARNED
+# LESSONS LEARNED
 
 Bug â†’ root cause â†’ fix â†’ prevention. Newest first. **Hard limit 300 lines** â€” archive the
 oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
@@ -26,39 +26,6 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 ### Customer Portals console said nobody had ever signed in (2026-09-05, ARCHIVED 2026-09-06): a "0" that never moves is a broken reader, not a quiet business — the count read a field the login flow never wrote; assert every counter against a source of truth once. Full entry in archive.
 ### Whole-dashboard deep-review sweep — the same six bugs kept reappearing (2026-09-05, ARCHIVED 2026-09-06, `.24`→`.75`, 54 pages): UTC "today", `[hidden]` beaten by flex, silent-empty states, hardcoded `* 75` art rates, unversioned assets, inline handlers — each is now a jest lock; a review without a lock is a review that repeats. Full entry in archive.
 ### Customer-facing sweep — the same rules the staff pages broke, plus three real bugs (2026-09-06, ARCHIVED 2026-09-06, `v2026.09.05.77`→`v2026.09.06.5`): inline `display:none` beats `.hidden=false`; a listener registered after an early return never fires; render colours only after the fallback resolves; 6 scripts had a silent proxy-host fallback → `''` + visible error. Full entry in archive.
-
-## 2026-09-06 — Calculator sweep (`v2026.09.06.9` → `.16`): 8 pages of inline code, 5 shared scripts with hardcoded hosts, and a dead loader
-
-**Problem.** The staff calculators were the last family untouched by Rule 3: screen-print, dtf, dtg, embroidery,
-cap-embroidery, digitizing, monogram and laser-manual carried 1,000-line inline `<style>` blocks and up to
-1,416-line inline `<script>` blocks; six shared calculator scripts and three page scripts had the proxy host
-hardcoded (pricing-pages even kept an unused "backup host"); `pricing-pages.js` chain-loaded `cart.js` at runtime
-through a loader that force-skipped it and pointed at three files that no longer existed, and carried a full
-duplicate of `calculator-inventory.js`; `app.config.js` was loaded AFTER the scripts that read it on four pages.
-
-**Root cause.** Pages were built by copy-paste in 2025; nothing locked them; the config script was appended
-where it was convenient, not where parse-time reads needed it.
-
-**Solution.** Verbatim extraction (CSS → `calculators/css/<page>.css`, JS → `calculators/js/<page>-page.js` at the
-same script position, global scope preserved because shared scripts call page functions by name), hosts from
-`APP_CONFIG` with a visible console.error when missing, one config tag in `<head>`, injected `<style>` blocks
-→ real stylesheets, delegated handlers via `data-call-delegator.js`, gated logging. Locks:
-`screen-print-pricing-page`, `calculator-pages-rule3`, `calculator-shared-components`, `calculator-hygiene`,
-`pricing-pages-no-legacy-loader`. Sections in `memory/DASHBOARD_REVIEWS_2026-09.md` § CALCULATORS.
-
-**Prevention.**
-- 🔴 **`app.config.js` goes in `<head>`.** A module-level `const HOST = APP_CONFIG…` reads at parse time; a
-  config tag placed later in `<body>` leaves it empty. The lock asserts config precedes every shared script.
-- 🔴 **`data-call="x.fn"` resolves `window.x`** — a top-level `let`/`const` is NOT a window property (inline
-  `onclick` saw it through lexical scope). Expose it (`window.compareCalc = compareCalc`) when converting.
-- 🔴 A runtime `loadScript('/cart.js')` string is a reference a `<script>`-tag scan will miss — grep the string,
-  not just the tag, before calling a file dead (cart.js was "dead" for 3 months while still referenced).
-- 🔑 Keep extracted page scripts at GLOBAL scope when shared scripts call their functions by name; an IIFE
-  wrapper silently breaks `showLoading`/`loadProduct`-style cross-calls.
-- 🔑 A shared script that injects `<style>` on render is Rule 3 by another route; extract and link.
-- 🔑 The icon-hiding regex must tolerate extra attributes (`id=`) after `class=` and the `fa-${…}` dynamic form.
-- 🔑 A page that 301s live (compare-pricing → quick-quote, webstore-info → company-webstores) still passes every
-  static-dist smoke — check the live URL before trusting a smoke on a retired page.
 
 ## 2026-09-06 — Quote builders: finishing Rule 3 meant teaching the shared delegator four more events (`v2026.09.06.19`–`.22`)
 
@@ -273,3 +240,24 @@ Merge INTO a fresh object. 🔑 Never persist a zero price; a stored 0 is a bug 
 🔑 A parity check must read the PAGE (what the customer sees), not just the engine; do it after
 any deploy that touches a calculator, an adapter or a Caspio tier. 🔑 Test with a warm
 sessionStorage as well as a cold one — the two code paths differ.
+
+## 2026-09-06 — Adding `<main>` to 96 pages found two markup bugs a browser had been hiding (`v2026.09.06.51`)
+
+**Problem.** To place a landmark I had to parse each page's top-level body structure. Two pages
+did not balance: `calculators/embroidery-pricing.html` never closed its `.main-container` (the
+browser auto-closed it at `</body>`, so the script tags were inside the content container), and
+`training/thank-you-card-guide.html` had `<<Contact First Name>>` / `<<Order Number>>` as literal
+text — the parser treats `<Contact First Name>` as a start tag, so staff saw "Dear <>" with the
+placeholder gone.
+**Root cause.** Browsers recover silently from both; nothing in the repo parsed markup structurally,
+so the locks (regex-based) never saw either.
+**Solution.** Closed the container before the script block; escaped the placeholders as
+`&lt;&lt;…&gt;&gt;`. Landmark: swap the single content wrapper's tag (classes/ids kept → zero
+selector risk) or wrap a sibling range in a bare `<main>`; verified by full-page before/after
+screenshots of all 96 pages and the unit + e2e suites.
+**Prevention.** 🔑 Prose that shows angle brackets must be entity-escaped — `<<Name>>` is a tag to
+the browser, whatever it looks like in the editor. 🔑 When adding a landmark prefer swapping the
+existing wrapper's tag over inserting a new element: nothing in CSS or JS targets `div` by tag.
+🔑 Grep a stylesheet for bare `main {` BEFORE introducing a `<main>` — a themed reset would restyle
+the swapped element (none of these 96 pages had one; 47 other stylesheets in the repo do).
+🔑 A page list built from repo paths is not a URL list: server.js serves some pages at other paths.
