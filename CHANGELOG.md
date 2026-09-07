@@ -1,3 +1,7 @@
+## v2026.09.07.18 (2026.09.07)
+
+- Deploy v2026.09.07.18: CSS standardization — tail batch (12 sheets, 12 pages: admin, production shifts, price audit report, employee bundles, tools, vendor-portal css, DTF prototype; all pixel-identical) + 18 dead stylesheets and 2 dead fixtures deleted (~17,000 lines nothing referenced)
+
 ## v2026.09.07.16 (2026.09.07)
 
 - Deploy v2026.09.07.16: CSS standardization — quote builders family, the last (22 sheets, 20 pages: every hex a token or a sheet-scoped variable; the generated quote-builder-inline.css retired into the readable quote-builder-utilities.css; the builders' palettes alias tokens only where exact; 15/21 shots identical, 2 async, the rest the safety-apparel recommendations panel finally rendering with resolved tokens on the builders; parity 84/84 + surfaces green)
