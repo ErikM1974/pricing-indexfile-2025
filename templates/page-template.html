@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<!--
+    PAGE TEMPLATE (CSS standardization Step 3, 2026-09-07) — copy this file, never edit it in place.
+
+    A new page = this skeleton + ONE page stylesheet + ONE page script. Everything the repo's locks demand
+    is already in it (tests/unit/repo-hygiene-final.test.js runs on every served page):
+      - no <style> block, no inline <script> body, no on*= handlers  → styles in the page .css, behaviour in the page .js,
+        clicks through data-call="fn" (shared_components/js/data-call-delegator.js → window.fn)
+      - every local .css/.js carries ?v= (the deploy skill bumps it); /config/app.config.js is the one exception
+      - <html lang>, one <title>, exactly ONE <main>, every control labelled, every icon aria-hidden
+      - API host from APP_CONFIG.API.BASE_URL (config/app.config.js) — never a typed proxy URL
+    Stylesheet order is the cascade: tokens.css FIRST (it declares the @layer order), then the shared components
+    and utilities (Step 2 of memory/CSS_STANDARDIZATION_PLAN_2026-09.md), then this page's own stylesheet — which
+    should hold only what is specific to this page, written with var(--…) tokens (stylelint rejects raw hex).
+
+    Replace every {{PLACEHOLDER}}, then: register the three files in ACTIVE_FILES.md; a staff page that should be
+    restricted gets a Staff_Page_Access row (CLAUDE.md § Security); a page that belongs to a person/department
+    takes that colour family, not a new one (memory/DESIGN_COLOUR_CODE.md).
+-->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Staff page: keep noindex. Public page: index,follow + a <meta name="description"> + <link rel="canonical"> -->
+    <meta name="robots" content="noindex, nofollow">
+    <title>{{PAGE_TITLE}} - Northwest Custom Apparel</title>
+    <link rel="icon" href="/favicon.png" type="image/png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- 1. Tokens first — carries the @layer order. 2. Shared components + utilities. 3. This page only. -->
+    <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.07.3">
+    <!-- Step 2 (components.css + utilities.css) links go here when that layer ships -->
+    <link rel="stylesheet" href="/{{DIRECTORY}}/css/{{page-slug}}.css?v=2026.09.07.2">
+</head>
+<body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <header class="page-header">
+        <div class="page-header-inner">
+            <a href="/staff-dashboard.html" class="page-header-brand" title="Staff Dashboard">
+                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                     alt="Northwest Custom Apparel" class="page-header-logo">
+            </a>
+            <h1 class="page-title">{{PAGE_TITLE}}</h1>
+            <nav class="page-nav" aria-label="Page">
+                <a href="/staff-dashboard.html" class="page-nav-link">
+                    <i class="fas fa-arrow-left" aria-hidden="true"></i> Dashboard
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <main id="main" class="page-main">
+        <!-- A visible failure is mandatory (CLAUDE.md API Error Handling): show this, never a stale fallback -->
+        <div id="page-error" class="alert alert-error" role="alert" hidden>
+            <strong class="alert-title">Unable to load data</strong>
+            <p class="alert-body">Please refresh the page. If it keeps failing, tell Erik.</p>
+        </div>
+
+        <section class="card" aria-labelledby="section-one-title">
+            <h2 id="section-one-title" class="card-title">{{SECTION_TITLE}}</h2>
+            <p class="text-muted">{{SECTION_INTRO}}</p>
+
+            <form class="form-row" id="page-form">
+                <div class="field">
+                    <label class="field-label" for="page-search">Search</label>
+                    <input class="field-input" id="page-search" name="q" type="search" placeholder="Style number">
+                </div>
+                <button type="button" class="btn btn-primary" data-call="{{PageObject}}.search">
+                    <i class="fas fa-search" aria-hidden="true"></i> Search
+                </button>
+            </form>
+
+            <div class="table-wrap">
+                <table class="data-table" id="page-table">
+                    <thead>
+                        <tr><th scope="col">Column</th><th scope="col" class="num">Amount</th></tr>
+                    </thead>
+                    <tbody><!-- rendered by {{page-slug}}.js — escapeHTML() every external value --></tbody>
+                </table>
+            </div>
+
+            <div class="empty-state" id="page-empty" hidden>
+                <h3 class="empty-state-title">Nothing here yet</h3>
+                <p class="empty-state-sub">{{EMPTY_STATE_TEXT}}</p>
+            </div>
+        </section>
+    </main>
+
+    <footer class="page-footer">
+        <p>Northwest Custom Apparel &middot; 2025 Freeman Rd E, Milton, WA 98354 &middot; 253-922-5793</p>
+    </footer>
+
+    <script src="/config/app.config.js"></script>
+    <script src="/shared_components/js/data-call-delegator.js?v=2026.09.07.2"></script>
+    <script src="/{{DIRECTORY}}/js/{{page-slug}}.js?v=2026.09.07.2"></script>
+</body>
+</html>

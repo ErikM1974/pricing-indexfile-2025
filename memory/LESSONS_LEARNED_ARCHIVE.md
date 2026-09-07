@@ -4,6 +4,34 @@ Resolved entries aged out of `LESSONS_LEARNED.md` (300-line cap). Newest first. 
 
 ---
 
+## Archived 2026-09-07
+
+## 2026-09-06 — Quote builders: finishing Rule 3 meant teaching the shared delegator four more events (`v2026.09.06.19`–`.22`)
+
+**Problem.** The 2026-09-05 review had converted the builders' `onclick=` to `data-call`, but 185 `onchange=` /
+`oninput=` / `onblur=` / `onkeydown=` / `onerror=` handlers remained across the three builder pages and their
+row templates, plus a 540-line inline style/script pair on the fast-quote page and 79 bare icons in the shared
+classic scripts every builder loads.
+
+**Solution.** ONE change to `quote-builder-utils.js` (Rule 8: shared, not four copies): `data-change` /
+`data-input` / `data-blur` (focusout) / `data-keydown` with comma lists, `?optional` names, `data-*-args`
+(`$this`/`$event`), `data-keyclick`, `data-enter` (+`-args`, `-unless`), `<img data-onerror>`; a parser rewrote
+every inline form mechanically (dry run reviewed first). Locks: `quote-builders-hygiene.test.js` (jsdom exercises
+every new path) + the parity suites untouched and green.
+
+**Prevention.**
+- 🔴 **Do not add an `sr-only` h1 to the four builders** — axe `heading-order` + `region` baselines
+  (`tests/a11y/builders.a11y.test.js`) fail; they carry no h1 by design.
+- 🔴 A top-of-file `window.location.hostname` read breaks any test that evals the file without a window
+  (`scp-dark-garment-parity`) — gate with `typeof window !== 'undefined' && !!window.location`.
+- 🔑 The old inline guard `if(window.x)x()` is the delegator's `?x` — keep it for functions a page may not define
+  (`renderOrderRecap`, the push-button state updaters).
+- 🔑 Icon regexes must also catch `class="fas ' + var + '"` (concatenation) and `fa-${expr}` forms; grep at
+  runtime (`i.fas:not([aria-hidden])`) after the static pass.
+- 🔑 Builders are staff-gated: an expired Chrome session redirects to the Caspio login silently (the probe
+  returns empty counts). Verify wiring on static-dist (no auth) and ask Erik to sign in for the live pass.
+
+
 ## Archived 2026-09-06
 
 ## 2026-09-06 — Calculator sweep (`v2026.09.06.9` → `.16`): 8 pages of inline code, 5 shared scripts with hardcoded hosts, and a dead loader

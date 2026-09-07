@@ -75,7 +75,7 @@ jobs:
       - run: npm run test:e2e
 
   lint:
-    name: ESLint (new-code scope)
+    name: ESLint (strict new-code scope + legacy warning cap) and stylelint (token-system scope)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -85,6 +85,8 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run lint
+      # CSS standardization (2026-09-07): scripts/lint-css.js CSS_LINT_SCOPE is the ratchet; also runs under test:unit
+      - run: npm run lint:css
 
   typecheck:
     name: tsc checkJs (builders scope)
