@@ -12,6 +12,7 @@
  *      "Have Signed In" / "Last Sign-In" had been 0 / Never for every customer since launch.
  */
 const fs = require('fs');
+const { serverSource } = require('../helpers/server-source');
 const path = require('path');
 const ROOT = path.join(__dirname, '..', '..');
 const read = (rel) => fs.readFileSync(path.join(ROOT, rel), 'utf8');
@@ -19,7 +20,7 @@ const read = (rel) => fs.readFileSync(path.join(ROOT, rel), 'utf8');
 const html = read('dashboards/customer-portal-admin.html').replace(/<!--[\s\S]*?-->/g, '');
 const js = read('dashboards/js/customer-portal-admin.js');
 const css = read('dashboards/css/customer-portal-admin.css');
-const server = read('server.js');
+const server = serverSource();
 
 describe('customer portal admin — Rule 3 + hidden', () => {
     test('no inline style=, no style.display, no inline handlers', () => {

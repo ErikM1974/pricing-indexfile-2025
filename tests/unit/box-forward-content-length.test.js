@@ -35,6 +35,7 @@
  */
 
 const fs = require('fs');
+const { serverSource } = require('../helpers/server-source');
 const path = require('path');
 const http = require('http');
 const net = require('net');
@@ -44,7 +45,7 @@ const compression = require('compression');
 const fetch = require('node-fetch');
 
 const REPO = path.join(__dirname, '..', '..');
-const SERVER = fs.readFileSync(path.join(REPO, 'server.js'), 'utf8');
+const SERVER = serverSource();
 
 /** The literal header array the named forwarder actually ships. */
 function shippedHeaderList(fnName) {

@@ -14,6 +14,9 @@ const path = require('path');
 const { execSync } = require('child_process');
 const ROOT = path.join(__dirname, '..', '..');
 const read = (rel) => fs.readFileSync(path.join(ROOT, rel), 'utf8');
+const { serverSource } = require('../helpers/server-source');
+// server split (2026-09-07): 'server.js' means the whole server — routes/ modules inlined at their call sites
+const readSource = (rel) => (rel === 'server.js' ? serverSource() : read(rel));
 const exists = (rel) => fs.existsSync(path.join(ROOT, rel));
 const tracked = execSync('git ls-files', { cwd: ROOT, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 }).split(/\r?\n/).filter(Boolean).map((f) => f.replace(/\\/g, '/'));
 
@@ -92,7 +95,7 @@ const JS_SKIP = /^(dist|tests|node_modules|memory|docs|scripts|templates|lib|con
 const BROWSER_JS = tracked.filter((f) => f.endsWith('.js') && !JS_SKIP.test(f));
 // Referrers that count: served pages, browser scripts, server.js and the build. Not: tests, one-off Node scripts, archives.
 const CORPUS = tracked.filter((f) => (f.endsWith('.html') || f.endsWith('.js') || f.endsWith('.jsx')) && !/^(dist|node_modules|tests)\/|\/archive\/|archive-working-files\//.test(f) && (!f.startsWith('scripts/') || f === 'scripts/build.js'));
-const TEXT = new Map(CORPUS.map((f) => [f, read(f)]));
+const TEXT = new Map(CORPUS.map((f) => [f, readSource(f)]));
 // A basename shared by two tracked scripts (utils.js, dp5-helper.js, pricing-matrix-api.js…) hid stale root-level
 // copies from the first census: for those, a referrer must name the file by its directory ("shared_components/js/utils.js")
 // or, for a root-level file, as a quoted "/name.js" / "name.js" — a bare basename anywhere no longer counts.

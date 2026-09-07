@@ -25,9 +25,10 @@
  */
 
 const fs = require('fs');
+const { serverSource } = require('../helpers/server-source');
 const path = require('path');
 
-const SERVER = fs.readFileSync(path.join(__dirname, '..', '..', 'server.js'), 'utf8');
+const SERVER = serverSource();
 
 /** Extract a top-level `function name(...) { ... }` by brace matching. */
 function extractFn(src, name) {

@@ -29,7 +29,7 @@ const readRepo = (rel) => fs.readFileSync(path.join(ROOT, rel), 'utf8');
 
 const dashboardHtml = readRepo('staff-dashboard-v3/index.html');
 const numbersHtml = readRepo('dashboards/company-numbers.html');
-const serverSrc = readRepo('server.js');
+const serverSrc = require('../helpers/server-source').serverSource();
 const controllerSrc = readRepo('shared_components/js/staff-dashboard/controllers/workspace-controller.js');
 
 const parse = (html) => new DOMParser().parseFromString(html, 'text/html');

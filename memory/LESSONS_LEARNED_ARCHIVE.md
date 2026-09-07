@@ -202,6 +202,25 @@ Quote. 🔑 A tier label in a template is a price. 🔑 The dev server serves `/
 before a local probe; the Browser pane's console log is cumulative across pages, read the page's
 own behaviour (a constructed calculator) not the log.
 
+## 2026-09-06 — Erik asked "is pricing the same everywhere?" — two of five customer calculators were not (`v2026.09.06.44`)
+
+**Problem.** The parity suites were green, yet a cross-surface run (engine on the Quick Quote page
+vs what each calculator page displays) found: DTG under 24 pieces off by $1–$2.33 (fixed `.43`),
+and DTF showing **$0.00** for every tier on any load after the first in a tab.
+**Root cause (DTF).** `dtf-adapter` merged its sessionStorage copy over the fresh API cost with an
+`Object.assign(target, stored, target)` — the target is overwritten first, then "restored" from
+itself; and the adapter persists `garmentCost: 0` from its initial state, so the stale zero always
+won. The first-ever load in a tab worked, which is why nobody saw it.
+**Root cause (general).** Rule 9 parity is tested at the ENGINE seam. A calculator page adds a
+DOM, adapters, sessionStorage and typed tier UI on top, and none of that was compared to the engine.
+**Solution.** Merge order fixed (fresh wins; stored 0 or another style's cost dropped); locked.
+The run itself is recorded as a table in `DASHBOARD_REVIEWS` § CROSS-SURFACE.
+**Prevention.** 🔑 `Object.assign(a, b, a)` never restores `a` — it is `Object.assign(a, b)`.
+Merge INTO a fresh object. 🔑 Never persist a zero price; a stored 0 is a bug waiting for a reload.
+🔑 A parity check must read the PAGE (what the customer sees), not just the engine; do it after
+any deploy that touches a calculator, an adapter or a Caspio tier. 🔑 Test with a warm
+sessionStorage as well as a cold one — the two code paths differ.
+
 ## Archived 2026-09-06
 
 ## 2026-09-06 — Calculator sweep (`v2026.09.06.9` → `.16`): 8 pages of inline code, 5 shared scripts with hardcoded hosts, and a dead loader

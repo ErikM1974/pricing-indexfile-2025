@@ -21,7 +21,8 @@ const {
 } = require('../../../lib/hashed-pages');
 
 const ROOT = path.join(__dirname, '..', '..', '..');
-const serverSrc = fs.readFileSync(path.join(ROOT, 'server.js'), 'utf8');
+// server split (2026-09-07): the server as one text — routes/ modules inlined at their call sites
+const serverSrc = require('../../helpers/server-source').serverSource();
 const buildSrc = fs.readFileSync(path.join(ROOT, 'scripts', 'build.js'), 'utf8');
 
 describe('hashed page list', () => {

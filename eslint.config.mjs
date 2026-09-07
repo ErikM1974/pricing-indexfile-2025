@@ -47,6 +47,9 @@ export default [
             '**/archive-working-files/**',
             '**/*.jsx',
             'server.js',
+            // routes/<domain>.js = sections of server.js moved verbatim (server split, 2026-09-07): same code, same review
+            // process, until the split is done and the whole server enters a Node strict scope together.
+            'routes/**/*.js',
             'tools/seed-top-sellers.js',
             'scripts/**/*.js',
             '!scripts/build.js',

@@ -34,26 +34,8 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 ### 700 console.logs in production, and a basename match that hid four stale root copies (2026-09-06, ARCHIVED 2026-09-07, `v2026.09.06.37`): `console.log` in served scripts is gated behind localhost / `?debug=1` (lock in `repo-hygiene-final`); an orphan census must match the PATH, not the basename. Full entry in archive.
 ### My own host sweep broke the DTF calculator for four deploys, and only a console read caught it (2026-09-06, ARCHIVED 2026-09-07, `v2026.09.06.40`): a scripted rewrite must preserve the ORIGINAL quote character (a template literal lost its backticks and fetched `${…}` literally; 182 suites stayed green); after any sweep that touches fetch URLs, read the live console and `performance.getEntriesByType('resource')` for `responseStatus >= 400` on the pages that use them. Full entry in archive.
 ### The screen-print tier buttons promised a fee Caspio no longer charges (2026-09-06, ARCHIVED 2026-09-07, `v2026.09.06.42`): every dollar or range a customer can READ is pricing — render tier strips, clamps and hints from the API tiers, never type them; after any Caspio tier change compare each calculator's labels with `GET /api/pricing-bundle`; a marker-based `cut()` in a refactor script must assert the method count before/after. Full entry in archive.
-### Two customer calculators drifted from Caspio\x27s tiers while the engine followed them (2026-09-06, ARCHIVED 2026-09-07, `v2026.09.06.42`–`.43`): a tier label in a template is a price — generate every tier strip from `pricing-bundle`, price sub-minimum quantities through the canonical engine, and after ANY Caspio tier change diff each calculator\x27s buttons against `/api/pricing-bundle?method=X` and its sub-minimum price against Quick Quote. Full entry in archive.
-
-## 2026-09-06 — Erik asked "is pricing the same everywhere?" — two of five customer calculators were not (`v2026.09.06.44`)
-
-**Problem.** The parity suites were green, yet a cross-surface run (engine on the Quick Quote page
-vs what each calculator page displays) found: DTG under 24 pieces off by $1–$2.33 (fixed `.43`),
-and DTF showing **$0.00** for every tier on any load after the first in a tab.
-**Root cause (DTF).** `dtf-adapter` merged its sessionStorage copy over the fresh API cost with an
-`Object.assign(target, stored, target)` — the target is overwritten first, then "restored" from
-itself; and the adapter persists `garmentCost: 0` from its initial state, so the stale zero always
-won. The first-ever load in a tab worked, which is why nobody saw it.
-**Root cause (general).** Rule 9 parity is tested at the ENGINE seam. A calculator page adds a
-DOM, adapters, sessionStorage and typed tier UI on top, and none of that was compared to the engine.
-**Solution.** Merge order fixed (fresh wins; stored 0 or another style's cost dropped); locked.
-The run itself is recorded as a table in `DASHBOARD_REVIEWS` § CROSS-SURFACE.
-**Prevention.** 🔑 `Object.assign(a, b, a)` never restores `a` — it is `Object.assign(a, b)`.
-Merge INTO a fresh object. 🔑 Never persist a zero price; a stored 0 is a bug waiting for a reload.
-🔑 A parity check must read the PAGE (what the customer sees), not just the engine; do it after
-any deploy that touches a calculator, an adapter or a Caspio tier. 🔑 Test with a warm
-sessionStorage as well as a cold one — the two code paths differ.
+### Two customer calculators drifted from Caspio's tiers while the engine followed them (2026-09-06, ARCHIVED 2026-09-07, `v2026.09.06.42`–`.43`): a tier label in a template is a price — generate every tier strip from `pricing-bundle`, price sub-minimum quantities through the canonical engine, and after ANY Caspio tier change diff each calculator's buttons against `/api/pricing-bundle?method=X` and its sub-minimum price against Quick Quote. Full entry in archive.
+### Erik asked "is pricing the same everywhere?" — two of five customer calculators were not (2026-09-06, ARCHIVED 2026-09-07, `v2026.09.06.44`): every customer-facing price surface is compared against the canonical engine by `npm run test:parity:surfaces` (Playwright, every live tier); a calculator that renders its own tiers drifts the day Caspio changes. Full entry in archive.
 
 ## 2026-09-06 — Adding `<main>` to 96 pages found two markup bugs a browser had been hiding (`v2026.09.06.51`)
 
@@ -285,3 +267,28 @@ verified gone, and only then is the directory deleted.
 the link with `rmdir` (cmd) first and check it is gone. 🔑 Prefer `NODE_PATH=<repo>/node_modules` over a
 junction when a scratch tree needs the repo's packages. 🔑 When 184 suites fail at once with "Cannot find
 module", suspect the install, not the change — `npm ci` before debugging anything.
+
+## 2026-09-07 — Server split, first cut: three ways "moved verbatim" was not the same server
+
+**Problem.** Six sections of the 15,947-line `server.js` moved byte for byte into `routes/*.js`, the registration-order
+lock passed, and the server did not boot — then, once it booted, it would have served the static mounts from the
+wrong folder. (a) `requireStaff` was missing from the module's ctx: eslint-scope leaves references to top-level
+`function`/`var` declarations unresolved in a classic script (they are global-object properties), so the dependency
+analysis, built on `variable.references`, saw only the `const` bindings. (b) A later cut's line range began on the
+previous cut's call-site line, so `require('./routes/ai-chat')(app, ctx)` moved INTO `routes/gear-publisher.js`, where
+it resolves relative to `routes/`. The order lock still passed because the walker followed the include wherever it sat.
+(c) `require('./lib/blog')` and `path.join(__dirname, 'staff-dashboard-v3')` inside moved code now named `routes/…`:
+the first threw at boot, the second would have 404'd every static mount without any test noticing. Separately, the
+first attempt collided with another assistant's uncommitted change in the same tree.
+**Root cause.** Textual moves preserve bytes, not meaning: scope resolution, module-relative paths and the cut's
+own artefacts all changed meaning silently.
+**Solution.** References matched by name against module-scope declarations (ignoring references resolved to inner
+bindings); `check-undef.js` (ESLint no-undef with Node globals over `routes/`) after every cut; the walker errors on a
+call site inside a module; the extractor rewrites `require('./…')` → `require('../…')` and `__dirname`/`__filename` →
+`SERVER_DIR`/`SERVER_FILE` passed through ctx, and the lock forbids the raw forms; a boot smoke (`PORT=3999 timeout 15
+node server.js`) plus real requests to moved routes before any gate. The other agent's change went into a git stash
+for the duration and came back after the deploy.
+**Prevention.** 🔑 After any code move, boot the server and hit one moved route: a passing order lock proves order,
+not resolution. 🔑 Derive a cut's range from the section banner every time — never from arithmetic on stale numbers —
+and check the first line is the rule line, not a neighbour's call site. 🔑 Treat `__dirname` and `require('./…')` as
+part of a file's address, not its code. 🔑 One agent in `server.js` at a time; `git stash -u` is the tool when it is not.

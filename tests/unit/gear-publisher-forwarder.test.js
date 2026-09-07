@@ -9,9 +9,10 @@
 // asserted rather than trusted.
 
 const fs = require('fs');
+const { serverSource } = require('../helpers/server-source');
 const path = require('path');
 
-const SERVER = fs.readFileSync(path.join(__dirname, '..', '..', 'server.js'), 'utf8');
+const SERVER = serverSource();
 
 /** The forwarder block, so assertions cannot accidentally pass on unrelated code. */
 const BLOCK = (() => {

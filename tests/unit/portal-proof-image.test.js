@@ -18,6 +18,7 @@
 process.env.SESSION_SECRET = 'test-session-secret-for-proof-tokens';
 
 const fs = require('fs');
+const { serverSource } = require('../helpers/server-source');
 const path = require('path');
 const crypto = require('crypto');
 const ml = require('../../lib/customer-magic-link');
@@ -95,7 +96,7 @@ describe('proof token — integrity', () => {
  * shipped in the first place.
  */
 describe('every customer-facing Box field is minted, never passed through raw', () => {
-    const src = fs.readFileSync(path.join(REPO, 'server.js'), 'utf8');
+    const src = serverSource();
 
     const sliceFn = (name) => {
         const start = src.indexOf(`function ${name}(`);
@@ -139,7 +140,7 @@ describe('every customer-facing Box field is minted, never passed through raw', 
 });
 
 describe('the image route cannot be turned into an arbitrary Box reader', () => {
-    const src = fs.readFileSync(path.join(REPO, 'server.js'), 'utf8');
+    const src = serverSource();
 
     test('mounted with the token guard, and the id comes from the token only', () => {
         expect(src).toContain("app.get('/api/portal/proof-image/:token', portalImageLimiter, requireProofToken,");

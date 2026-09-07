@@ -24,10 +24,11 @@
  */
 
 const fs = require('fs');
+const { serverSource } = require('../helpers/server-source');
 const path = require('path');
 
 const REPO = path.join(__dirname, '..', '..');
-const SERVER = fs.readFileSync(path.join(REPO, 'server.js'), 'utf8');
+const SERVER = serverSource();
 
 /** Pull a top-level function's real source out of server.js by brace matching. */
 function extractFunction(source, name) {

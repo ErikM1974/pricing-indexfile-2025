@@ -15,10 +15,11 @@
  * portal-proof-image.test.js — and evaluates them with the few dependencies stubbed.
  */
 const fs = require('fs');
+const { serverSource } = require('../helpers/server-source');
 const path = require('path');
 
 const REPO = path.join(__dirname, '..', '..');
-const src = fs.readFileSync(path.join(REPO, 'server.js'), 'utf8').replace(/\r\n/g, '\n');
+const src = serverSource().replace(/\r\n/g, '\n');
 
 function liftFunction(name, kind) {
     const re = new RegExp('^' + (kind || 'function') + ' ' + name + '\\([^)]*\\) \\{[\\s\\S]*?^\\}', 'm');

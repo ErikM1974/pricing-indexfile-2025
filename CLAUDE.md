@@ -248,6 +248,10 @@ when, and why the repo copy beats machine-local auto-memory.
 For anything CSS: `scripts/css/README.md` (the toolkit and the verify loop), then
 `memory/CSS_STANDARDIZATION_PLAN_2026-09.md` (plan, decisions, per-family log, final census).
 
+For `server.js` and `routes/`: `memory/SERVER_SPLIT_2026-09.md` (the split in progress — section map, what each cut
+needs first, the coordination rule) and `scripts/server/README.md` (the route-table lock and the extraction tool).
+🔑 Only one agent edits `server.js` at a time, and a cut is never committed without its `routes/` file.
+
 For deep research, use the Task tool with `subagent_type='Explore'`.
 
 ---
