@@ -27,12 +27,12 @@ below the section). `tests/helpers/server-source.js` gives the text locks the se
 | Quote delete + push previews + quote_items/analytics relays | 12804-13180 | 14 | ✅ `routes/quote-delete.js` (`.22`) |
 | Public quote view | 13181-13252 | 6 | ✅ `routes/public-quote.js` (`.22`) |
 | Banner presets | 13253-13324 | 1 | ✅ `routes/banner-presets.js` (`.22`) |
-| Staff SAML | 3268-3419 | 16 | ⏳ refused: `PORTAL_ADMIN_ROLES` declared inside, used by 6 later sections → hoist to a config block first |
-| CRM API proxy | 3420-4481 | 60 | ⏳ refused: `CRM_API_BASE` / `CRM_API_SECRET` declared inside, used everywhere → hoist |
-| Vendor portal | 6555-7090 | 12 | ⏳ refused: `BOX_THUMB_RE`, `PORTAL_FETCH_TIMEOUT_MS` declared below it (in the customer portal) → hoist |
-| Customer portal | 7091-10407 | 58 | ⏳ refused: the two above + `API_BASE_URL` (used by the order form) → hoist |
-| Online order form + ShopWorks | 10408-12626 | 45 | ⏳ refused: `SYNC_PROXY_BASE` declared below → hoist |
-| Quote data plane relays | 12627-12803 | 6 | ⏳ refused: `quotePlaneWriteLimiter` used by quote-delete → cut both together or hoist |
+| Staff SAML | 3268-3419 | 16 | ✅ `routes/staff-saml.js` (`.23`) after hoisting `PORTAL_ADMIN_ROLES` |
+| CRM API proxy | 3420-4481 | 60 | ⏳ the other agent's uncommitted hardening edits this section — cut after it lands (`CRM_API_BASE` / `CRM_API_SECRET` already hoisted) |
+| Vendor portal | 6555-7090 | 12 | ✅ `routes/vendor-portal.js` (`.23`) after hoisting `BOX_THUMB_RE`, `PORTAL_FETCH_TIMEOUT_MS`, `PORTAL_PROXY`, `portalProxyGet` |
+| Customer portal | 7091-10407 | 58 | ✅ `routes/customer-portal.js` (`.23`, 3,242 lines) after hoisting `API_BASE_URL`, `makeApiRequest` |
+| Online order form + ShopWorks | 10408-12626 | 45 | ⏳ the other agent's hardening edits the cart routes here — cut after it lands (`SYNC_PROXY_BASE` already hoisted) |
+| Quote data plane relays | 12627-12803 | 6 | ✅ `routes/quote-plane.js` (`.23`) after hoisting `quotePlaneWriteLimiter`, `quoteScopedOrStaff`, `originalQueryString` |
 | 3-Day Tees / custom tees / caps helpers + routes | 1956-3220 | many | ⏳ not yet analysed |
 | Infrastructure (security, session, limiters, health) | 1-1955 | ~40 | stays in server.js (it IS the composition root) |
 | Everything after 13324 (quote sessions, ShipStation, cart, pricing pages, static) | 13325-15947 | ~170 | ⏳ not yet analysed |
@@ -50,6 +50,17 @@ clean tree, and the stash restored after the deploy. Two agents committing from 
 half-finished work — and a `server.js` committed with call sites but without `routes/` would not boot.
 
 ## 8. Progress log (newest first)
+
+### 2026-09-07 — second cut LIVE (`v2026.09.07.23`): 4 more modules, 92 registrations, `server.js` 14,600 → 10,561 lines
+
+- `routes/staff-saml.js` (16), `routes/vendor-portal.js` (12), `routes/customer-portal.js` (58, 3,242 lines — the
+  biggest section in the file), `routes/quote-plane.js` (6). Eleven shared declarations were hoisted first with
+  `hoist-declaration.js` (constants, limiters and four helper functions the rest of the file calls); a literal
+  initializer may always move up, everything else only past code that does not evaluate it at load time.
+- The CRM proxy and the order form were left alone on purpose: the other assistant's uncommitted hardening edits both.
+  Its change was stashed for the cut and restored after the deploy (the lessons file merged by hand once more).
+- Route table identical (455); no undefined names in 10 modules; boot + request smoke (SAML login, portal and vendor
+  routes answering their gates, quote relays 401 anonymous); gates + e2e + both parity suites green.
 
 ### 2026-09-07 — first cut LIVE (`v2026.09.07.22`): 6 modules, 89 registrations, 1,347 lines out
 

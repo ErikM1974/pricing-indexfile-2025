@@ -40,9 +40,11 @@ if (bannerIdx < 0) { console.error(`banner not found: ${ABOVE}`); process.exit(1
 // the banner is usually preceded by a "// ====" rule line: insert above that rule
 let insertAt = bannerIdx; if (insertAt > 0 && /^\/\/ ?={5,}/.test(lines[insertAt - 1])) insertAt--;
 if (insertAt >= start - 1) { console.error(`REFUSED: ${NAME} (lines ${start}-${end}) is already above the banner (line ${bannerIdx + 1})`); process.exit(1); }
-if (decl.type === 'VariableDeclaration') {
+const literalInit = decl.type === 'VariableDeclaration' && decl.declarations.every((d) => d.init && (d.init.type === 'Literal' || (d.init.type === 'UnaryExpression' && d.init.argument.type === 'Literal')));
+if (decl.type === 'VariableDeclaration' && !literalInit) {
     // A const may only move up past code that does not EVALUATE it at load time: a reference inside a function
     // body between the two positions runs later and is fine; a top-level statement that reads it is not.
+    // (A literal initializer — 12000, 'text', /re/ — depends on nothing, so moving it UP can only make it defined earlier.)
     const loadTime = ast.body.filter((s) => s.type !== 'FunctionDeclaration' && s.loc.start.line > insertAt && s.loc.end.line < start)
         .map((s) => lines.slice(s.loc.start.line - 1, s.loc.end.line).join('\n')).join('\n');
     if (new RegExp(`\\b${NAME}\\b`).test(loadTime)) { console.error(`REFUSED: ${NAME} is evaluated at load time between the new position and its declaration`); process.exit(1); }
