@@ -1,3 +1,7 @@
+## v2026.09.07.3 (2026.09.07)
+
+- Deploy v2026.09.07.3: CSS standardization Step 1+3 — app-wide tokens.css (promoted from the dashboard seed), page template, stylelint + scope ratchet, ESLint over all browser JS; zero visual change (15/15 pixel-identical)
+
 ## v2026.09.07.2 (2026.09.07)
 
 - Customer-supplied quoting: design + decisions doc; ACTIVE_FILES no longer cites the two memory docs removed in the dead-files sweep
