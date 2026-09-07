@@ -6,6 +6,15 @@
    Page-specific styles only. NEVER redefine tokens or hardcode palette values.
    ========================================================================== */
 
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue so the page
+   keeps its exact look. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   every rule below uses var(). Raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
+:root {
+    --page-green-tint: #d1e7dd;
+}
+/* stylelint-enable color-no-hex */
+
 .tc-intro {
     max-width: 900px;
     margin: 0 0 1.25rem;
@@ -21,7 +30,7 @@
 }
 
 .tc-track {
-    background: var(--surface-card, #fff);
+    background: var(--surface-card, var(--color-surface));
     border: 1px solid var(--gray-200);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-sm);
@@ -81,8 +90,8 @@
 }
 
 .tc-chip--hub {
-    background: var(--state-success-bg, #d1e7dd);
-    color: var(--state-success-text, #0f5132);
+    background: var(--state-success-bg, var(--page-green-tint));
+    color: var(--state-success-text, var(--brand-800));
 }
 
 .tc-hub-list {

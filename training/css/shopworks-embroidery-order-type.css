@@ -1,6 +1,28 @@
-/* shopworks-embroidery-order-type.css — page styles (extracted from inline <style>, 2026.09.05.11) */
+/* shopworks-embroidery-order-type.css — page styles (extracted from inline \3c style>, 2026.09.05.11) */
 
-/* ── moved from inline <style> in training/shopworks-embroidery-order-type.html (Rule 3, 2026.09.05.11) ── */
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue so the page
+   keeps its exact look. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   every rule below uses var(). Raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
+:root {
+    --page-blue: #1e3c72;
+    --page-cyan: #2196f3;
+    --page-blue-2: #2a5298;
+    --page-yellow: #ffc107;
+    --page-red: #dc3545;
+    --page-blue-3: #667eea;
+    --page-indigo: #764ba2;
+    --page-gray-dark: #333;
+    --page-cyan-2: #1976d2;
+    --page-violet: #9c27b0;
+    --page-yellow-2: #856404;
+    --page-green: #28a745;
+    --page-green-2: #2e7d32;
+    --page-yellow-3: #ffd700;
+}
+/* stylelint-enable color-no-hex */
+
+/* ── moved from inline \3c style> in training/shopworks-embroidery-order-type.html (Rule 3, 2026.09.05.11) ── */
 * {
             margin: 0;
             padding: 0;
@@ -8,78 +30,10 @@
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, var(--page-blue) 0%, var(--page-blue-2) 100%);
             min-height: 100vh;
             line-height: 1.6;
-        }
-
-        /* Navigation Header - NWCA Style */
-        .nav-header {
-            background: linear-gradient(135deg, #981e32 0%, #b82940 100%);
-            color: white;
-            padding: 1rem 2rem;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            position: sticky;
-            top: 0;
-            z-index: 999;
-        }
-
-        .nav-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .nav-left {
-            display: flex;
-            align-items: center;
-            gap: 1.5rem;
-        }
-
-        .back-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem 1rem;
-            background: rgba(255,255,255,0.1);
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 6px;
-            color: white;
-            text-decoration: none;
-            transition: all 0.3s;
-            font-weight: 500;
-        }
-
-        .back-btn:hover {
-            background: rgba(255,255,255,0.2);
-            transform: translateX(-2px);
-        }
-
-        .page-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .nav-right {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .logo-container {
-            height: 35px;
-            opacity: 0.95;
-        }
-
-        .logo-container img {
-            height: 100%;
-            width: auto;
         }
 
         .container {
@@ -94,7 +48,7 @@
             border-radius: 20px;
             padding: 40px;
             margin-bottom: 30px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            box-shadow: 0 20px 40px rgb(0 0 0 / 10%);
             text-align: center;
             position: relative;
             overflow: hidden;
@@ -107,11 +61,11 @@
             left: 0;
             right: 0;
             height: 5px;
-            background: linear-gradient(90deg, #4CAF50, #2196F3, #9C27B0);
+            background: linear-gradient(90deg, var(--brand-500), var(--page-cyan), var(--page-violet));
         }
 
         .header h1 {
-            color: #1e3c72;
+            color: var(--page-blue);
             font-size: 2.5em;
             margin-bottom: 10px;
             font-weight: 700;
@@ -119,7 +73,7 @@
 
         .effective-date {
             display: inline-block;
-            background: #4CAF50;
+            background: var(--brand-500);
             color: white;
             padding: 8px 20px;
             border-radius: 25px;
@@ -130,13 +84,13 @@
 
         /* Alert Box */
         .alert-box {
-            background: #FFF3CD;
-            border: 2px solid #FFC107;
+            background: var(--amber-100);
+            border: 2px solid var(--page-yellow);
             border-radius: 15px;
             padding: 25px;
             margin-bottom: 30px;
             position: relative;
-            box-shadow: 0 10px 30px rgba(255, 193, 7, 0.2);
+            box-shadow: 0 10px 30px rgb(255 193 7 / 20%);
         }
 
         .alert-box::before {
@@ -150,19 +104,19 @@
         }
 
         .alert-box h2 {
-            color: #856404;
+            color: var(--page-yellow-2);
             margin-bottom: 15px;
             font-size: 1.5em;
         }
 
         .removed-text {
-            color: #dc3545;
+            color: var(--page-red);
             font-weight: bold;
             text-decoration: line-through;
         }
 
         .new-text {
-            color: #28a745;
+            color: var(--page-green);
             font-weight: bold;
         }
 
@@ -172,13 +126,13 @@
             border-radius: 15px;
             padding: 30px;
             margin-bottom: 25px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 30px rgb(0 0 0 / 10%);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
         .card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+            box-shadow: 0 15px 40px rgb(0 0 0 / 15%);
         }
 
         .card-header {
@@ -186,11 +140,11 @@
             align-items: center;
             margin-bottom: 20px;
             padding-bottom: 15px;
-            border-bottom: 3px solid #f0f0f0;
+            border-bottom: 3px solid var(--gray-100);
         }
 
         .card-number {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--page-blue-3) 0%, var(--page-indigo) 100%);
             color: white;
             width: 40px;
             height: 40px;
@@ -208,26 +162,26 @@
         }
 
         .card-title h2 {
-            color: #333;
+            color: var(--page-gray-dark);
             font-size: 1.6em;
             margin: 0;
         }
 
         .card-content {
-            color: #555;
+            color: var(--print-ink-soft);
             font-size: 1.1em;
         }
 
         .highlight-box {
-            background: #f8f9fa;
-            border-left: 5px solid #2196F3;
+            background: var(--gray-50);
+            border-left: 5px solid var(--page-cyan);
             padding: 20px;
             margin: 20px 0;
             border-radius: 8px;
         }
 
         .highlight-box strong {
-            color: #1976D2;
+            color: var(--page-cyan-2);
         }
 
         /* Examples Section */
@@ -239,7 +193,7 @@
         }
 
         .example-card {
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            background: linear-gradient(135deg, var(--color-bradley-tint) 0%, var(--gray-300) 100%);
             padding: 20px;
             border-radius: 12px;
             border: 2px solid transparent;
@@ -247,12 +201,12 @@
         }
 
         .example-card:hover {
-            border-color: #2196F3;
+            border-color: var(--page-cyan);
             transform: scale(1.02);
         }
 
         .example-card h3 {
-            color: #1e3c72;
+            color: var(--page-blue);
             margin-bottom: 15px;
             font-size: 1.2em;
             display: flex;
@@ -278,7 +232,7 @@
 
         .order-items li {
             padding: 8px 0;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid var(--brand-100);
             display: flex;
             justify-content: space-between;
         }
@@ -288,14 +242,14 @@
         }
 
         .pricing-method {
-            background: #e8f5e9;
+            background: var(--brand-100);
             padding: 15px;
             border-radius: 8px;
-            border: 2px solid #4CAF50;
+            border: 2px solid var(--brand-500);
         }
 
         .pricing-method h4 {
-            color: #2e7d32;
+            color: var(--page-green-2);
             margin-bottom: 10px;
         }
 
@@ -311,23 +265,23 @@
 
         .price-group .quantity {
             font-weight: bold;
-            color: #1976D2;
+            color: var(--page-cyan-2);
         }
 
         .price-group .price-break {
-            color: #4CAF50;
+            color: var(--brand-500);
             font-weight: 600;
         }
 
         /* Special Note */
         .special-note {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--page-blue-3) 0%, var(--page-indigo) 100%);
             color: white;
             padding: 30px;
             border-radius: 15px;
             margin-top: 30px;
             text-align: center;
-            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 10px 30px rgb(102 126 234 / 30%);
         }
 
         .special-note h2 {
@@ -336,7 +290,7 @@
         }
 
         .special-note .beanie-rule {
-            background: rgba(255, 255, 255, 0.2);
+            background: rgb(255 255 255 / 20%);
             padding: 20px;
             border-radius: 10px;
             margin-top: 20px;
@@ -344,7 +298,7 @@
         }
 
         .special-note .beanie-rule h3 {
-            color: #FFD700;
+            color: var(--page-yellow-3);
             margin-bottom: 10px;
             font-size: 1.4em;
         }
@@ -355,11 +309,11 @@
             border-radius: 15px;
             padding: 30px;
             margin-top: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 30px rgb(0 0 0 / 10%);
         }
 
         .reference-table h2 {
-            color: #333;
+            color: var(--page-gray-dark);
             margin-bottom: 20px;
             text-align: center;
             font-size: 1.8em;
@@ -372,7 +326,7 @@
         }
 
         th {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            background: linear-gradient(135deg, var(--page-blue) 0%, var(--page-blue-2) 100%);
             color: white;
             padding: 15px;
             text-align: left;
@@ -381,30 +335,30 @@
 
         td {
             padding: 15px;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid var(--brand-100);
         }
 
         tr:hover {
-            background: #f8f9fa;
+            background: var(--gray-50);
         }
 
         .yes {
-            color: #4CAF50;
+            color: var(--brand-500);
             font-weight: bold;
         }
 
         .no {
-            color: #dc3545;
+            color: var(--page-red);
             font-weight: bold;
         }
 
         .note {
-            color: #FFC107;
+            color: var(--page-yellow);
             font-weight: bold;
         }
 
         /* Responsive Design */
-        @media (max-width: 768px) {
+        @media (width <= 768px) {
             .header h1 {
                 font-size: 1.8em;
             }
@@ -447,6 +401,6 @@
             
             .card, .alert-box, .reference-table {
                 box-shadow: none;
-                border: 1px solid #ddd;
+                border: 1px solid var(--gray-300);
             }
         }

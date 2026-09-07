@@ -20,6 +20,11 @@ const CSS_LINT_SCOPE = [
     'shared_components/css/staff-dashboard/tokens.css',
     // Forms family (2026-09-07): the shared form framework + 17 per-form sheets
     'pages/forms/*.css',
+    // Brand Standards page (2026-09-07): the first page built from templates/page-template.html
+    'dashboards/css/brand-standards.css',
+    // Training family (2026-09-07): the shared chrome + 26 page sheets (page themes in one :root block each)
+    'training/css/*.css',
+    'training/*.css',
 ];
 
 async function run() {

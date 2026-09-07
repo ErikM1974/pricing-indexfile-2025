@@ -1,6 +1,26 @@
-/* team-match-game.css — page styles (extracted from inline <style>, 2026.09.05.11) */
+/* team-match-game.css — page styles (extracted from inline \3c style>, 2026.09.05.11) */
 
-/* ── moved from inline <style> in training/team-match-game.html (Rule 3, 2026.09.05.11) ── */
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue so the page
+   keeps its exact look. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   every rule below uses var(). Raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
+:root {
+    --page-blue: #1e3c72;
+    --page-cyan: #2196f3;
+    --page-red: #f44336;
+    --page-gray-dark: #333;
+    --page-blue-2: #2a5298;
+    --page-yellow: #ffeb3b;
+    --page-orange: #f57c00;
+    --page-cyan-2: #1976d2;
+    --page-green: #c8e6c9;
+    --page-green-2: #a5d6a7;
+    --page-gray: #666;
+    --page-red-2: #e53935;
+}
+/* stylelint-enable color-no-hex */
+
+/* ── moved from inline \3c style> in training/team-match-game.html (Rule 3, 2026.09.05.11) ── */
 * {
         margin: 0;
         padding: 0;
@@ -8,92 +28,22 @@
     }
 
     body {
-        font-family: 'Inter', sans-serif;
-        background: #f5f5f5;
-        color: #333;
+        font-family: Inter, sans-serif;
+        background: var(--gray-100);
+        color: var(--page-gray-dark);
         min-height: 100vh;
         overflow-x: hidden;
-    }
-
-    /* Navigation Header */
-    .nav-header {
-        background: linear-gradient(135deg, #981e32 0%, #b82940 100%);
-        color: white;
-        padding: 1rem 2rem;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        position: sticky;
-        top: 0;
-        z-index: 999;
-    }
-
-    .nav-container {
-        max-width: 1400px;
-        margin: 0 auto;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-    }
-
-    .nav-left {
-        display: flex;
-        align-items: center;
-        gap: 1.5rem;
-    }
-
-    .back-btn {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        padding: 0.5rem 1rem;
-        background: rgba(255,255,255,0.1);
-        border: 1px solid rgba(255,255,255,0.2);
-        border-radius: 6px;
-        color: white;
-        text-decoration: none;
-        transition: all 0.3s;
-        font-weight: 500;
-    }
-
-    .back-btn:hover {
-        background: rgba(255,255,255,0.2);
-        transform: translateX(-2px);
-    }
-
-    .page-title {
-        font-size: 1.5rem;
-        font-weight: 600;
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
     }
 
     .page-title i {
         font-size: 1.25rem;
         opacity: 0.9;
-    }
-
-    .nav-right {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-    }
-
-    .logo-container {
-        height: 35px;
-        opacity: 0.95;
-    }
-
-    .logo-container img {
-        height: 100%;
-        width: auto;
-    }
-
-    /* Breadcrumb */
+    }    /* Breadcrumb */
     .breadcrumb {
         background: white;
         padding: 0.75rem 2rem;
-        border-bottom: 1px solid #e5e7eb;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        border-bottom: 1px solid var(--gray-200);
+        box-shadow: 0 1px 3px rgb(0 0 0 / 5%);
     }
 
     .breadcrumb-container {
@@ -106,24 +56,24 @@
     }
 
     .breadcrumb a {
-        color: #981e32;
+        color: var(--color-ae);
         text-decoration: none;
         font-weight: 500;
         transition: color 0.2s;
     }
 
     .breadcrumb a:hover {
-        color: #b82940;
+        color: var(--color-ae-light);
         text-decoration: underline;
     }
 
     .breadcrumb span {
-        color: #6b7280;
+        color: var(--gray-500);
     }
 
     /* Game Container */
     .game-wrapper {
-        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        background: linear-gradient(135deg, var(--page-blue) 0%, var(--page-blue-2) 100%);
         color: white;
         min-height: calc(100vh - 120px);
         padding: 20px;
@@ -144,18 +94,18 @@
     h1 {
         font-size: 2.5em;
         margin-bottom: 10px;
-        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        text-shadow: 2px 2px 4px rgb(0 0 0 / 30%);
     }
 
     .subtitle {
-        color: #4CAF50;
+        color: var(--brand-500);
         font-size: 1.2em;
         letter-spacing: 2px;
         margin-bottom: 20px;
     }
 
     .date-notice {
-        color: #ffeb3b;
+        color: var(--page-yellow);
         font-size: 0.9em;
         margin-bottom: 15px;
         opacity: 0.9;
@@ -172,23 +122,23 @@
     .mode-btn {
         padding: 12px 25px;
         font-size: 1em;
-        background: linear-gradient(135deg, #4CAF50, #45a049);
+        background: linear-gradient(135deg, var(--brand-500), var(--brand-600));
         border: none;
         border-radius: 30px;
         color: white;
         cursor: pointer;
         transition: all 0.3s;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        box-shadow: 0 4px 15px rgb(0 0 0 / 20%);
         font-weight: 600;
     }
 
     .mode-btn:hover {
         transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        box-shadow: 0 6px 20px rgb(0 0 0 / 30%);
     }
 
     .mode-btn.active {
-        background: linear-gradient(135deg, #ff9800, #f57c00);
+        background: linear-gradient(135deg, var(--amber-500), var(--page-orange));
     }
 
     .game-info {
@@ -200,7 +150,7 @@
     }
 
     .info-item {
-        background: rgba(255,255,255,0.1);
+        background: rgb(255 255 255 / 10%);
         padding: 12px 25px;
         border-radius: 15px;
         font-size: 1.1em;
@@ -216,23 +166,23 @@
     }
 
     .employees-column {
-        background: rgba(255,255,255,0.95);
+        background: rgb(255 255 255 / 95%);
         border-radius: 15px;
         padding: 20px;
         width: 300px;
         min-height: 500px;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        box-shadow: 0 10px 40px rgb(0 0 0 / 30%);
     }
 
     .employees-column h3 {
-        color: #1e3c72;
+        color: var(--page-blue);
         margin-bottom: 15px;
         text-align: center;
         font-size: 1.3em;
     }
 
     .employee-card {
-        background: linear-gradient(135deg, #2196F3, #1976D2);
+        background: linear-gradient(135deg, var(--page-cyan), var(--page-cyan-2));
         color: white;
         padding: 12px;
         margin: 10px 0;
@@ -243,12 +193,12 @@
         text-align: center;
         position: relative;
         user-select: none;
-        box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+        box-shadow: 0 3px 10px rgb(0 0 0 / 20%);
     }
 
     .employee-card:hover {
         transform: translateX(5px);
-        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        box-shadow: 0 5px 15px rgb(0 0 0 / 30%);
     }
 
     .employee-card.dragging {
@@ -258,7 +208,7 @@
     }
 
     .employee-card.matched {
-        background: linear-gradient(135deg, #4CAF50, #45a049);
+        background: linear-gradient(135deg, var(--brand-500), var(--brand-600));
         cursor: default;
         animation: matchSuccess 0.6s ease;
     }
@@ -270,24 +220,24 @@
     }
 
     .drop-zones {
-        background: rgba(255,255,255,0.95);
+        background: rgb(255 255 255 / 95%);
         border-radius: 15px;
         padding: 20px;
         width: 400px;
         min-height: 500px;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        box-shadow: 0 10px 40px rgb(0 0 0 / 30%);
     }
 
     .drop-zones h3 {
-        color: #1e3c72;
+        color: var(--page-blue);
         margin-bottom: 15px;
         text-align: center;
         font-size: 1.3em;
     }
 
     .drop-zone {
-        background: #f5f5f5;
-        border: 2px dashed #ccc;
+        background: var(--gray-100);
+        border: 2px dashed var(--gray-300);
         padding: 12px;
         margin: 10px 0;
         border-radius: 10px;
@@ -297,21 +247,21 @@
     }
 
     .drop-zone.drag-over {
-        background: #e3f2fd;
-        border-color: #2196F3;
+        background: var(--sky-100);
+        border-color: var(--page-cyan);
         transform: scale(1.02);
-        box-shadow: 0 0 20px rgba(33, 150, 243, 0.3);
+        box-shadow: 0 0 20px rgb(33 150 243 / 30%);
     }
 
     .drop-zone.correct {
-        background: linear-gradient(135deg, #c8e6c9, #a5d6a7);
-        border: 2px solid #4CAF50;
+        background: linear-gradient(135deg, var(--page-green), var(--page-green-2));
+        border: 2px solid var(--brand-500);
     }
 
     .drop-zone.incorrect {
         animation: shake 0.5s;
-        background: #ffebee;
-        border-color: #f44336;
+        background: var(--red-50);
+        border-color: var(--page-red);
     }
 
     @keyframes shake {
@@ -321,13 +271,13 @@
     }
 
     .drop-zone-label {
-        color: #666;
+        color: var(--page-gray);
         font-size: 0.95em;
         margin-bottom: 5px;
     }
 
     .dropped-employee {
-        background: linear-gradient(135deg, #4CAF50, #45a049);
+        background: linear-gradient(135deg, var(--brand-500), var(--brand-600));
         color: white;
         padding: 10px;
         border-radius: 8px;
@@ -341,6 +291,7 @@
             opacity: 0;
             transform: translateY(-10px);
         }
+
         to {
             opacity: 1;
             transform: translateY(0);
@@ -350,11 +301,8 @@
     .completion-overlay {
         display: none;
         position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(0,0,0,0.8);
+        inset: 0;
+        background: rgb(0 0 0 / 80%);
         z-index: 1000;
         animation: fadeIn 0.5s;
     }
@@ -369,11 +317,11 @@
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        background: linear-gradient(135deg, #4CAF50, #45a049);
+        background: linear-gradient(135deg, var(--brand-500), var(--brand-600));
         padding: 40px;
         border-radius: 20px;
         text-align: center;
-        box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+        box-shadow: 0 20px 60px rgb(0 0 0 / 40%);
         animation: slideIn 0.5s ease;
     }
 
@@ -382,6 +330,7 @@
             opacity: 0;
             transform: translate(-50%, -60%);
         }
+
         to {
             opacity: 1;
             transform: translate(-50%, -50%);
@@ -402,7 +351,7 @@
         padding: 12px 30px;
         font-size: 1.1em;
         background: white;
-        color: #4CAF50;
+        color: var(--brand-500);
         border: none;
         border-radius: 25px;
         cursor: pointer;
@@ -413,11 +362,11 @@
 
     .btn:hover {
         transform: scale(1.05);
-        box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        box-shadow: 0 5px 20px rgb(0 0 0 / 20%);
     }
 
     .instructions {
-        background: rgba(255,255,255,0.1);
+        background: rgb(255 255 255 / 10%);
         padding: 15px;
         border-radius: 10px;
         margin-bottom: 20px;
@@ -440,12 +389,12 @@
     }
 
     .feedback.correct {
-        background: linear-gradient(135deg, #4CAF50, #45a049);
+        background: linear-gradient(135deg, var(--brand-500), var(--brand-600));
         color: white;
     }
 
     .feedback.incorrect {
-        background: linear-gradient(135deg, #f44336, #e53935);
+        background: linear-gradient(135deg, var(--page-red), var(--page-red-2));
         color: white;
     }
 
@@ -460,13 +409,14 @@
             opacity: 0;
             transform: translateY(-30px);
         }
+
         to {
             opacity: 1;
             transform: translateY(0);
         }
     }
 
-    @media (max-width: 768px) {
+    @media (width <= 768px) {
         .nav-header {
             padding: 0.75rem 1rem;
         }

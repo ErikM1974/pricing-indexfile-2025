@@ -1,6 +1,16 @@
-/* cap-training.css — page styles (extracted from inline <style>, 2026.09.05.11) */
+/* cap-training.css — page styles (extracted from inline \3c style>, 2026.09.05.11) */
 
-/* ── moved from inline <style> in training/cap-training.html (Rule 3, 2026.09.05.11) ── */
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue so the page
+   keeps its exact look. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   every rule below uses var(). Raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
+:root {
+    --page-green-tint: #d1fae5;
+    --page-teal-dark: #065f46;
+}
+/* stylelint-enable color-no-hex */
+
+/* ── moved from inline \3c style> in training/cap-training.html (Rule 3, 2026.09.05.11) ── */
 * {
             margin: 0;
             padding: 0;
@@ -8,18 +18,18 @@
         }
 
         body {
-            font-family: 'Inter', sans-serif;
-            background: #f5f7fa;
-            color: #1f2937;
+            font-family: Inter, sans-serif;
+            background: var(--color-bradley-tint);
+            color: var(--gray-800);
             line-height: 1.6;
         }
 
         /* Header */
         .header {
             background: white;
-            border-bottom: 3px solid #4cb354;
+            border-bottom: 3px solid var(--brand-500);
             padding: 1.5rem 0;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 10px rgb(0 0 0 / 10%);
             position: sticky;
             top: 0;
             z-index: 100;
@@ -42,18 +52,18 @@
         .header-title {
             font-size: 1.5rem;
             font-weight: 700;
-            color: #1f2937;
+            color: var(--gray-800);
             text-align: center;
             flex: 1;
         }
 
         .breadcrumb {
-            color: #6b7280;
+            color: var(--gray-500);
             font-size: 0.875rem;
         }
 
         .breadcrumb a {
-            color: #4cb354;
+            color: var(--brand-500);
             text-decoration: none;
         }
 
@@ -66,13 +76,13 @@
 
         /* Stats Summary */
         .stats-summary {
-            background: linear-gradient(135deg, #4cb354, #409a47);
+            background: linear-gradient(135deg, var(--brand-500), var(--brand-600));
             color: white;
             padding: 2rem;
             border-radius: 12px;
             margin-bottom: 3rem;
             text-align: center;
-            box-shadow: 0 10px 30px rgba(76, 179, 84, 0.3);
+            box-shadow: 0 10px 30px rgb(76 179 84 / 30%);
         }
 
         .stats-summary h2 {
@@ -89,7 +99,7 @@
         }
 
         .stat-item {
-            background: rgba(255, 255, 255, 0.2);
+            background: rgb(255 255 255 / 20%);
             padding: 1rem;
             border-radius: 8px;
             backdrop-filter: blur(10px);
@@ -119,17 +129,17 @@
             background: white;
             border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 6px rgb(0 0 0 / 10%);
             transition: transform 0.3s, box-shadow 0.3s;
         }
 
         .cap-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 12px 24px rgb(0 0 0 / 15%);
         }
 
         .cap-card.best-seller {
-            border: 3px solid #f59e0b;
+            border: 3px solid var(--amber-500);
             position: relative;
         }
 
@@ -137,7 +147,7 @@
             position: absolute;
             top: 1rem;
             right: 1rem;
-            background: #f59e0b;
+            background: var(--amber-500);
             color: white;
             padding: 0.5rem 1rem;
             border-radius: 20px;
@@ -155,7 +165,7 @@
         .cap-image-container {
             position: relative;
             height: 300px;
-            background: #f8f9fa;
+            background: var(--gray-50);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -185,13 +195,13 @@
         }
 
         .status-active {
-            background: #d1fae5;
-            color: #065f46;
+            background: var(--page-green-tint);
+            color: var(--page-teal-dark);
         }
 
         .status-discontinued {
-            background: #fee2e2;
-            color: #dc2626;
+            background: var(--red-100);
+            color: var(--red-600);
         }
 
         .cap-content {
@@ -199,7 +209,7 @@
         }
 
         .cap-header {
-            border-bottom: 2px solid #f3f4f6;
+            border-bottom: 2px solid var(--gray-100);
             padding-bottom: 1rem;
             margin-bottom: 1rem;
         }
@@ -207,25 +217,25 @@
         .cap-style {
             font-size: 1.5rem;
             font-weight: 700;
-            color: #4cb354;
+            color: var(--brand-500);
             margin-bottom: 0.25rem;
         }
 
         .cap-name {
             font-size: 1.125rem;
             font-weight: 600;
-            color: #1f2937;
+            color: var(--gray-800);
             margin-bottom: 0.5rem;
         }
 
         .cap-description {
             font-size: 0.875rem;
-            color: #6b7280;
+            color: var(--gray-500);
             line-height: 1.5;
         }
 
         .sales-stats {
-            background: #f8f9fa;
+            background: var(--gray-50);
             padding: 1rem;
             border-radius: 8px;
             margin-top: 1rem;
@@ -241,13 +251,13 @@
         .sales-number {
             font-size: 1.5rem;
             font-weight: 700;
-            color: #4cb354;
+            color: var(--brand-500);
             margin-bottom: 0.25rem;
         }
 
         .sales-label {
             font-size: 0.75rem;
-            color: #6b7280;
+            color: var(--gray-500);
             text-transform: uppercase;
             letter-spacing: 0.05em;
         }
@@ -260,25 +270,25 @@
         .category-header {
             background: white;
             padding: 1rem 1.5rem;
-            border-left: 4px solid #4cb354;
+            border-left: 4px solid var(--brand-500);
             margin-bottom: 1.5rem;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 2px 4px rgb(0 0 0 / 5%);
         }
 
         .category-title {
             font-size: 1.25rem;
             font-weight: 600;
-            color: #1f2937;
+            color: var(--gray-800);
             margin-bottom: 0.25rem;
         }
 
         .category-description {
             font-size: 0.875rem;
-            color: #6b7280;
+            color: var(--gray-500);
         }
 
         /* Responsive */
-        @media (max-width: 768px) {
+        @media (width <= 768px) {
             .cap-grid {
                 grid-template-columns: 1fr;
             }
@@ -296,7 +306,7 @@
             }
         }
 
-        @media (max-width: 480px) {
+        @media (width <= 480px) {
             .container {
                 padding: 1rem;
             }

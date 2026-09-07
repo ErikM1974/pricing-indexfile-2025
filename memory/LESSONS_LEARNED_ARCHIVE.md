@@ -61,6 +61,34 @@ every new path) + the parity suites untouched and green.
   returns empty counts). Verify wiring on static-dist (no auth) and ask Erik to sign in for the live pass.
 
 
+## 2026-09-06 — Rule 6 sweep S3 (`v2026.09.06.31`): 118 scripts still guessed the proxy host, and two unit tests had been hitting the live API
+
+**Problem.** After every sweep, `no-hardcoded-hosts` still counted 222 proxy-host literals. 118
+browser scripts carried `|| 'https://caspio-pricing-proxy…'` (or a ternary, a direct
+`fetch('https://…')`, an object property, or a `return 'https://…'` accessor) — so a page that
+forgot `/config/app.config.js` silently worked against the literal and nobody noticed the config
+was missing. Two embroidery unit suites had passed for months only because the calculator's
+constructor fetched the LIVE proxy from Node.
+**Root cause.** Rule 6 was applied per-file when a file was touched; nothing swept the tree, and
+the fallback made the missing config invisible. The tests constructed `new Calc()` without
+`skipInit`, and the fallback host made that a real network call that happened to succeed.
+**Solution.** One script rewrote every fallback form to read `APP_CONFIG.API.BASE_URL` and log
+`[file] APP_CONFIG.API.BASE_URL missing` when absent (accessors return `''`); 18 forms the regex
+could not classify were rewritten by hand; `app.config.js` added in `<head>` of 32 consumer pages
+and moved ahead of the first script on 5 more (the homepage tag was `defer`, but `brands-flyout.js`
+instantiates at parse time). Baseline 222 → 42 (Node-side `lib/`, `scripts/`, the two sanctioned
+`EXACT_ONE` literals, three `preconnect` hints). Tests construct with `{ skipInit: true }`.
+**Prevention.** 🔑 A colon is not a ternary: `key: 'https://…'` inside an object literal matched
+the `[?:]` regex and became `key: ''` — a SILENT empty base; grep the diff for `: ''` after any
+regex rewrite. 🔑 Whole-file diffs after a scripted edit = line endings, not content: this repo
+mixes CRLF files, LF files and MIXED files (`dtg-pricing-service.js`); rebuild from `git show
+HEAD:` with `difflib` keeping each original line's ending, never `replace('\n','\r\n')`.
+🔑 A script that reads config at parse time needs the config tag BEFORE it, and `defer` on the
+config tag re-orders it after every non-deferred script. 🔑 A unit test that only passes with
+network access is an integration test in disguise — `skipInit` exists for exactly this.
+🔑 `git diff` on this OneDrive checkout warns "LF will be replaced by CRLF" for every touched
+file; silence it with `-c core.safecrlf=false`, it is not a content change.
+
 ## Archived 2026-09-06
 
 ## 2026-09-06 — Calculator sweep (`v2026.09.06.9` → `.16`): 8 pages of inline code, 5 shared scripts with hardcoded hosts, and a dead loader

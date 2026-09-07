@@ -1,91 +1,43 @@
-/* lead-email-templates.css — page styles (extracted from inline <style>, 2026.09.05.11) */
+/* lead-email-templates.css — page styles (extracted from inline \3c style>, 2026.09.05.11) */
 
-/* ── moved from inline <style> in training/lead-email-templates.html (Rule 3, 2026.09.05.11) ── */
+/* ── moved from inline \3c style> in training/lead-email-templates.html (Rule 3, 2026.09.05.11) ── */
 * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue, merged into its
+   existing :root. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
         :root {
-            --primary-color: #4cb354;
-            --primary-dark: #409a47;
-            --primary-light: #5bc85f;
-            --wsu-crimson: #981e32;
-            --wsu-crimson-dark: #7a182a;
-            --bg-color: #f5f7fa;
-            --card-bg: #ffffff;
-            --border-color: #e5e7eb;
-            --text-primary: #1f2937;
-            --text-secondary: #6b7280;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --info: #3b82f6;
+    --page-green: #5bc85f;
+    --page-teal: #10b981;
+    --page-red: #ef4444;
+    --page-green-tint: #d1fae5;
+            --primary-color: var(--brand-500);
+            --primary-dark: var(--brand-600);
+            --primary-light: var(--page-green);
+            --wsu-crimson: var(--color-ae);
+            --wsu-crimson-dark: var(--color-ae-dark);
+            --bg-color: var(--color-bradley-tint);
+            --card-bg: var(--color-surface);
+            --border-color: var(--gray-200);
+            --text-primary: var(--gray-800);
+            --text-secondary: var(--gray-500);
+            --success: var(--page-teal);
+            --warning: var(--amber-500);
+            --danger: var(--page-red);
+            --info: var(--color-floor-light);
         }
+/* stylelint-enable color-no-hex */
 
         body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            font-family: Inter, sans-serif;
+            background: linear-gradient(135deg, var(--color-bradley-tint) 0%, var(--gray-300) 100%);
             min-height: 100vh;
             line-height: 1.6;
-        }
-
-        /* Navigation Header */
-        .nav-header {
-            background: linear-gradient(135deg, var(--wsu-crimson) 0%, #b82940 100%);
-            color: white;
-            padding: 1rem 2rem;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            position: sticky;
-            top: 0;
-            z-index: 999;
-        }
-
-        .nav-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .nav-left {
-            display: flex;
-            align-items: center;
-            gap: 1.5rem;
-        }
-
-        .back-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem 1rem;
-            background: rgba(255,255,255,0.1);
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 6px;
-            color: white;
-            text-decoration: none;
-            transition: all 0.3s;
-            font-weight: 500;
-        }
-
-        .back-btn:hover {
-            background: rgba(255,255,255,0.2);
-            transform: translateX(-2px);
-        }
-
-        .page-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .nav-right {
-            display: flex;
-            gap: 1rem;
         }
 
         .nav-btn {
@@ -93,8 +45,8 @@
             align-items: center;
             gap: 0.5rem;
             padding: 0.5rem 1rem;
-            background: rgba(255,255,255,0.15);
-            border: 1px solid rgba(255,255,255,0.25);
+            background: rgb(255 255 255 / 15%);
+            border: 1px solid rgb(255 255 255 / 25%);
             border-radius: 6px;
             color: white;
             text-decoration: none;
@@ -104,7 +56,7 @@
         }
 
         .nav-btn:hover {
-            background: rgba(255,255,255,0.25);
+            background: rgb(255 255 255 / 25%);
             transform: translateY(-1px);
         }
 
@@ -120,7 +72,7 @@
             background: white;
             padding: 1.5rem;
             border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            box-shadow: 0 2px 8px rgb(0 0 0 / 8%);
             margin-bottom: 2rem;
             display: flex;
             flex-wrap: wrap;
@@ -187,7 +139,7 @@
         .template-card {
             background: white;
             border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            box-shadow: 0 2px 8px rgb(0 0 0 / 8%);
             overflow: hidden;
             transition: all 0.3s;
             border: 2px solid transparent;
@@ -195,7 +147,7 @@
 
         .template-card:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+            box-shadow: 0 4px 12px rgb(0 0 0 / 12%);
             border-color: var(--primary-color);
         }
 
@@ -219,27 +171,27 @@
 
         .template-category.initial {
             color: var(--info);
-            background: #dbeafe;
+            background: var(--sky-100);
         }
 
         .template-category.followup {
             color: var(--warning);
-            background: #fef3c7;
+            background: var(--amber-100);
         }
 
         .template-category.nurture {
             color: var(--success);
-            background: #d1fae5;
+            background: var(--page-green-tint);
         }
 
         .template-category.closing {
             color: var(--danger);
-            background: #fee2e2;
+            background: var(--red-100);
         }
 
         .template-category.industry {
             color: var(--primary-color);
-            background: #dcfce7;
+            background: var(--brand-100);
         }
 
         .template-title {
@@ -334,7 +286,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.5);
+            background: rgb(0 0 0 / 50%);
             z-index: 9999;
             align-items: center;
             justify-content: center;
@@ -398,7 +350,7 @@
             border: 1px solid var(--border-color);
             border-radius: 6px;
             font-size: 0.875rem;
-            font-family: 'Inter', sans-serif;
+            font-family: Inter, sans-serif;
             transition: all 0.3s;
         }
 
@@ -406,7 +358,7 @@
         .form-textarea:focus {
             outline: none;
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(76, 179, 84, 0.1);
+            box-shadow: 0 0 0 3px rgb(76 179 84 / 10%);
         }
 
         .form-textarea {
@@ -462,7 +414,7 @@
             color: white;
             padding: 1rem 1.5rem;
             border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            box-shadow: 0 4px 12px rgb(0 0 0 / 15%);
             animation: slideIn 0.3s ease-out;
             z-index: 10000;
         }
@@ -478,6 +430,7 @@
                 transform: translateX(100%);
                 opacity: 0;
             }
+
             to {
                 transform: translateX(0);
                 opacity: 1;
@@ -485,7 +438,7 @@
         }
 
         /* Responsive */
-        @media (max-width: 768px) {
+        @media (width <= 768px) {
             .container {
                 padding: 1rem;
             }

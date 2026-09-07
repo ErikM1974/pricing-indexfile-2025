@@ -127,6 +127,32 @@
         --print-red: #7a1c16; /* waiver / urgent text (absorbs #7f1d1d) */
         --print-gold: #8a6d1a; /* PCI / tax-certificate notices */
 
+        /* People & departments — colour = the PERSON or DEPARTMENT a page belongs to, never the page
+           type (Erik, 2026-09-04; memory/DESIGN_COLOUR_CODE.md is the key). Values equal the ones the
+           pages define today (workspaces.css --f-*, ae-nav-v2.css, art-hub-steve, mockup-submit-form);
+           each family migrates by aliasing its own variable to these. Never "tidy" two of them into one. */
+        --color-steve: #0a8a1f; /* Steve, graphic arts: Art Queue, Design Queue, art requests */
+        --color-steve-dark: #060;
+        --color-steve-light: #3b3;
+        --color-steve-tint: #ecfdf0;
+        --color-ruth: #6b46c1; /* Ruth, digitizing: Mockup Queue, mockup detail */
+        --color-ruth-dark: #4c3391;
+        --color-ruth-light: #8b5cf6;
+        --color-ruth-tint: #f5f3ff;
+        --color-bradley: #4a6fa5; /* Bradley, purchasing + transfers */
+        --color-bradley-dark: #33537d;
+        --color-bradley-tint: #f4f7fb;
+        --color-floor: #2563eb; /* personalization / shop floor: Names & Numbers, monogram, box labels */
+        --color-floor-dark: #1d4ed8;
+        --color-floor-light: #3b82f6;
+        --color-floor-tint: #eff6ff;
+        --color-ae: #981e32; /* the AE dashboard's own chrome (maroon) — the reps' container */
+        --color-ae-dark: #7a1828;
+        --color-ae-light: #b92c43;
+        --color-dash-theme: #090; /* staff sub-page chrome: dash-shell.css --dash-theme (Training Center, hubs) */
+        --color-dash-theme-dark: #060;
+        --color-dash-theme-bg: #f0f9f0;
+
         /* Semantic colour — what page rules should reference */
         --color-brand: var(--brand-500);
         --color-brand-hover: var(--brand-600);

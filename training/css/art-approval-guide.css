@@ -1,21 +1,38 @@
-/* art-approval-guide.css — page styles (extracted from inline <style>, 2026.09.05.11) */
+/* art-approval-guide.css — page styles (extracted from inline \3c style>, 2026.09.05.11) */
 
-/* ── moved from inline <style> in training/art-approval-guide.html (Rule 3, 2026.09.05.11) ── */
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue so the page
+   keeps its exact look. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   every rule below uses var(). Raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
+:root {
+    --page-red: #ff6b6b;
+    --page-gray-dark: #333;
+    --page-teal: #4ecdc4;
+    --page-yellow: #f6d365;
+    --page-red-2: #fda085;
+    --page-blue: #667eea;
+    --page-indigo: #764ba2;
+    --page-orange: #ffa726;
+    --page-teal-2: #45b7af;
+}
+/* stylelint-enable color-no-hex */
+
+/* ── moved from inline \3c style> in training/art-approval-guide.html (Rule 3, 2026.09.05.11) ── */
 body {
-            font-family: 'Poppins', sans-serif;
+            font-family: Poppins, sans-serif;
             margin: 0;
             padding: 0;
-            background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
-            color: #333;
+            background: linear-gradient(135deg, var(--page-yellow) 0%, var(--page-red-2) 100%);
+            color: var(--page-gray-dark);
             line-height: 1.6;
         }
         
         /* Navigation Styles */
         .nav-header {
-            background: rgba(255, 255, 255, 0.95);
+            background: rgb(255 255 255 / 95%);
             backdrop-filter: blur(10px);
             padding: 15px 20px;
-            border-bottom: 2px solid #ff6b6b;
+            border-bottom: 2px solid var(--page-red);
             position: sticky;
             top: 0;
             z-index: 1000;
@@ -27,7 +44,7 @@ body {
         }
         
         .back-button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--page-blue) 0%, var(--page-indigo) 100%);
             color: white;
             border: none;
             padding: 12px 20px;
@@ -44,11 +61,11 @@ body {
         
         .back-button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 5px 15px rgb(102 126 234 / 40%);
         }
         
         .daily-report-link {
-            background: linear-gradient(135deg, #ff6b6b 0%, #ffa726 100%);
+            background: linear-gradient(135deg, var(--page-red) 0%, var(--page-orange) 100%);
             color: white;
             text-decoration: none;
             padding: 12px 20px;
@@ -63,7 +80,7 @@ body {
         
         .daily-report-link:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+            box-shadow: 0 5px 15px rgb(255 107 107 / 40%);
         }
         
         .container {
@@ -72,87 +89,102 @@ body {
             padding: 20px;
             background: white;
             border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 30px rgb(0 0 0 / 10%);
         }
+
         h1 {
             text-align: center;
-            color: #ff6b6b;
+            color: var(--page-red);
             font-size: 2.5em;
             margin-bottom: 20px;
             animation: fadeIn 1s ease-in;
         }
+
         h2 {
-            color: #4ecdc4;
-            border-bottom: 2px solid #45b7af;
+            color: var(--page-teal);
+            border-bottom: 2px solid var(--page-teal-2);
             padding-bottom: 10px;
             cursor: pointer;
             transition: color 0.3s;
         }
-        h2:hover { color: #ff6b6b; }
+        h2:hover { color: var(--page-red); }
         section { margin-bottom: 40px; }
+
         .step-example {
             position: relative;
             width: 80%;
             max-width: 500px;
             margin: 20px auto;
             padding: 20px;
-            background: #f9f9f9;
-            border: 1px solid #ddd;
+            background: var(--gray-50);
+            border: 1px solid var(--gray-300);
             border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 8px rgb(0 0 0 / 10%);
             transition: transform 0.3s;
         }
+
         .step-example:hover {
             transform: translateY(-5px);
         }
+
         .step-example p {
-            font-family: 'Caveat', cursive;
+            font-family: Caveat, cursive;
             font-size: 1.2em;
-            color: #333;
+            color: var(--page-gray-dark);
         }
+
         table {
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 20px;
         }
+
         th, td {
-            border: 1px solid #ddd;
+            border: 1px solid var(--gray-300);
             padding: 12px;
             text-align: left;
         }
+
         th {
-            background: #4ecdc4;
+            background: var(--page-teal);
             color: white;
         }
         ol { padding-left: 20px; }
+
         img {
             max-width: 100%;
             height: auto;
             display: block;
             margin: 10px auto;
             border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 10px rgb(0 0 0 / 10%);
         }
+
         .intro-message {
-            background: #fff0f0;
-            border: 2px solid #ff6b6b;
+            background: var(--red-50);
+            border: 2px solid var(--page-red);
             border-radius: 10px;
             padding: 15px;
             margin-bottom: 30px;
             font-style: italic;
-            color: #d62828;
+            color: var(--red-600);
             text-align: center;
         }
+
         .accordion-content {
             display: none;
             animation: slideDown 0.5s ease;
         }
         .active + .accordion-content { display: block; }
+
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
         @keyframes slideDown { from { height: 0; opacity: 0; } to { height: auto; opacity: 1; } }
-        @media (max-width: 768px) { 
+
+        @media (width <= 768px) { 
             .container { margin: 20px; padding: 15px; } 
             .step-example { width: 100%; }
+
             .nav-header {
                 flex-direction: column;
                 text-align: center;

@@ -114,6 +114,44 @@ three gap sizes, `opacity:.5;cursor:not-allowed` ×26 (disabled). These become u
 
 ## 8. Progress log (newest first)
 
+### 2026-09-07 — Training family + Brand Standards page LIVE (`v2026.09.07.6`)
+
+- **Erik's mid-course instructions (2026-09-07):** "you have permission to make the CSS better", "a brand standards
+  page you can follow", "save the brand standards under the Administration section … apply them as you improve the
+  CSS … a working document, update as necessary." So from this family on the loop has THREE diff classes named
+  up front: identical, threshold-neutral (≤16/channel), and **deliberate standard-driven changes** — each of those
+  is recorded in the page's Decisions log and here.
+- **Brand Standards page** `dashboards/brand-standards.html` (+ `css/brand-standards.css`, `js/brand-standards.js`):
+  Administration → Marketing card; in `ADMIN_DEFAULT_PAGES` (admin-only by default); first page built from
+  `templates/page-template.html`. Rendered LIVE from `tokens.css` (fetches the SOURCE path — the hashed copy is
+  minified, comments gone): colour ramps + semantic names, people/department colours, type, space/radius/shadow,
+  motion/z-index, plus static Rules, Building-a-page and a dated DECISIONS LOG. 🔑 The e2e staff session is role
+  `staff`, so admin pages cannot be screenshotted by the spec — verify admin pages live in Chrome.
+- **Tokens added:** people/department colours (`--color-steve/-ruth/-bradley/-floor/-ae` + dark/light/tint) and
+  the staff sub-page chrome `--color-dash-theme/-dark/-bg` (= dash-shell.css `--dash-theme`, #090/#060/#f0f9f0).
+- **Training (26 sheets, 27 pages):** every page links tokens.css first. Ten pages shared a byte-identical
+  nine-rule nav chrome → `training/css/training-shared.css` (extracted; four maroon variants unified by force);
+  **brand pass applied**: that chrome is now the Training Center's green gradient (`--color-dash-theme` →
+  `-dark`) instead of the AE dashboard's maroon — one rule re-themes ten pages. Three coral-styled guides
+  (art-approval, google-review, lead-sheet) keep their own chrome (different markup). Every other hex became a
+  token (exact/near) or a page-scoped `--page-<hue>` variable declared once in the page's `:root`
+  (stylelint-disable block) — 190 distinct colours, 528 "far" uses, now named in one place per page; the
+  consolidation to the palette is a design pass Erik can do one block at a time.
+- **`!important` 120 → 15.** `nwca-language-reference.css`'s 117-flag print block moved to the END of the
+  file (source order now wins); the 15 that remain override inline `style=""` attributes in that page's markup
+  (`[style*=…]` selectors) — nothing but `!important` beats an inline style; documented with a disable/enable
+  pair. get-to-know-erik's 2 and sales-coordinator-manual's 1 were plain source-order fixes.
+- **stylelint.** Three more rules off with reasons: `keyframes-name-pattern` (names referenced from animation
+  shorthands/JS), and `no-duplicate-selectors` disabled per FILE on three legacy sheets whose duplicates predate
+  this work (merging would reorder the cascade). `--fix` reviewed as before. Scope now 48 files.
+- **Verification.** 27 pages × screen + print: 36/54 identical; the 18 that differ = the ten re-themed nav
+  headers (bounding boxes 0–76px from the top, eyeballed), team-match-game's random shuffle (two "after" shots
+  differ from each other by 22k px), and the language-reference print view after the `!important` repair
+  (0 differing pixels once the 15 inline-style overrides kept their flag). Unit 188 suites, dom, a11y, lint 0 errors / 99 warnings, e2e a11y + money-path green.
+- **Step 2 status:** `training-shared.css` is the family's component layer; the app-wide `components.css` still
+  waits for the webstore family (where `nwca-2026-core.css`'s primitives live).
+- **Census after:** 298 sheets · 4594 KB · 240 use var(--) · 252 raw-hex files · 1332 distinct hex · 3073 !important · 216 duplicated bodies
+
 ### 2026-09-07 — Forms family LIVE (`v2026.09.07.4`): 18 stylesheets, 0 raw hex, 3 documented `!important`
 
 - **What moved.** 17 forms + `nwca-form-shared.css` link `tokens.css` first; every hex became `var(--…)` (93 uses

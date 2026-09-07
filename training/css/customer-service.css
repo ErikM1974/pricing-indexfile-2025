@@ -1,21 +1,32 @@
-/* customer-service.css — page styles (extracted from inline <style>, 2026.09.05.7) */
+/* customer-service.css — page styles (extracted from inline \3c style>, 2026.09.05.7) */
 
-/* ── moved from inline <style> in training/customer-service.html (Rule 3, 2026.09.05.7) ── */
+/* ── moved from inline \3c style> in training/customer-service.html (Rule 3, 2026.09.05.7) ── */
+
+/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue, merged into its
+   existing :root. Map them to shared_components/css/tokens.css names when the page is redesigned;
+   raw hex is allowed ONLY in this block. */
+/* stylelint-disable color-no-hex */
 :root {
-            --primary-color: #4cb354;
-            --primary-dark: #409a47;
-            --primary-light: #5bc85f;
-            --bg-color: #f5f7fa;
-            --card-bg: #ffffff;
-            --border-color: #e5e7eb;
-            --text-primary: #1f2937;
-            --text-secondary: #6b7280;
-            --hover-bg: #f3f4f6;
-            --success-bg: #d1fae5;
-            --success-text: #065f46;
-            --warning-bg: #fef3c7;
-            --warning-text: #92400e;
+    --page-green: #5bc85f;
+    --page-green-tint: #d1fae5;
+    --page-teal-dark: #065f46;
+    --page-green-2: #2e7d32;
+    --page-green-dark: #1b5e20;
+            --primary-color: var(--brand-500);
+            --primary-dark: var(--brand-600);
+            --primary-light: var(--page-green);
+            --bg-color: var(--color-bradley-tint);
+            --card-bg: var(--color-surface);
+            --border-color: var(--gray-200);
+            --text-primary: var(--gray-800);
+            --text-secondary: var(--gray-500);
+            --hover-bg: var(--gray-100);
+            --success-bg: var(--page-green-tint);
+            --success-text: var(--page-teal-dark);
+            --warning-bg: var(--amber-100);
+            --warning-text: var(--amber-800);
         }
+/* stylelint-enable color-no-hex */
 
         * {
             margin: 0;
@@ -24,7 +35,7 @@
         }
 
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: Inter, sans-serif;
             background: var(--bg-color);
             color: var(--text-primary);
             line-height: 1.6;
@@ -38,7 +49,7 @@
             position: sticky;
             top: 0;
             z-index: 100;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            box-shadow: 0 1px 3px rgb(0 0 0 / 5%);
         }
 
         .header-container {
@@ -84,7 +95,7 @@
             background: var(--card-bg);
             border-radius: 8px;
             padding: 1.5rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            box-shadow: 0 1px 3px rgb(0 0 0 / 10%);
             position: sticky;
             top: 100px;
             height: fit-content;
@@ -134,7 +145,7 @@
             background: var(--card-bg);
             border-radius: 8px;
             padding: 2rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            box-shadow: 0 1px 3px rgb(0 0 0 / 10%);
         }
 
         h1 {
@@ -197,7 +208,7 @@
 
         .warning-box {
             background: var(--warning-bg);
-            border-left: 4px solid #f59e0b;
+            border-left: 4px solid var(--amber-500);
             padding: 1rem;
             margin: 1rem 0;
             border-radius: 4px;
@@ -226,7 +237,7 @@
         }
 
         /* Responsive */
-        @media (max-width: 768px) {
+        @media (width <= 768px) {
             .container {
                 grid-template-columns: 1fr;
             }
@@ -243,16 +254,16 @@
 
         /* Industry Wisdom Callouts */
         .industry-wisdom {
-            background: linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 100%);
-            border-left: 4px solid #4caf50;
+            background: linear-gradient(135deg, var(--brand-100) 0%, var(--color-steve-tint) 100%);
+            border-left: 4px solid var(--brand-500);
             padding: 1.5rem;
             margin: 2rem 0;
             border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(76, 175, 80, 0.1);
+            box-shadow: 0 2px 8px rgb(76 175 80 / 10%);
         }
 
         .industry-wisdom h4 {
-            color: #2e7d32;
+            color: var(--page-green-2);
             margin-top: 0;
             display: flex;
             align-items: center;
@@ -261,7 +272,7 @@
 
         .industry-wisdom p {
             font-style: italic;
-            color: #1b5e20;
+            color: var(--page-green-dark);
             margin: 0;
             font-size: 1.1rem;
         }
@@ -278,7 +289,7 @@
             background: white;
             padding: 1.5rem;
             border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 8px rgb(0 0 0 / 10%);
         }
 
         .comparison-column h5 {
@@ -293,7 +304,7 @@
 
         .comparison-column li {
             padding: 0.5rem 0;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid var(--brand-100);
         }
 
         .comparison-column li:last-child {
@@ -339,14 +350,14 @@
             background: white;
             border-radius: 12px;
             padding: 1.5rem;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 4px 12px rgb(0 0 0 / 8%);
             border-top: 4px solid var(--primary-color);
             transition: transform 0.2s, box-shadow 0.2s;
         }
 
         .value-card:hover {
             transform: translateY(-4px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+            box-shadow: 0 8px 20px rgb(0 0 0 / 12%);
         }
 
         .value-number {
@@ -415,17 +426,17 @@
         }
 
         .vision-card {
-            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            background: linear-gradient(135deg, var(--color-surface) 0%, var(--gray-50) 100%);
             border-radius: 12px;
             padding: 2rem;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 4px 12px rgb(0 0 0 / 8%);
             transition: all 0.3s ease;
             border: 1px solid var(--border-color);
         }
 
         .vision-card:hover {
             transform: translateY(-4px);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+            box-shadow: 0 8px 24px rgb(0 0 0 / 12%);
         }
 
         .vision-icon {
@@ -507,13 +518,13 @@
             border-radius: 12px;
             padding: 2rem;
             margin-bottom: 2rem;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 2px 8px rgb(0 0 0 / 5%);
             transition: all 0.3s ease;
         }
 
         .role-card:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 16px rgb(0 0 0 / 10%);
         }
 
         .role-header {
@@ -560,7 +571,7 @@
         }
 
         .workflow-diagram {
-            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+            background: linear-gradient(135deg, var(--gray-50) 0%, var(--color-surface) 100%);
             border-radius: 12px;
             padding: 2rem;
             margin: 2rem 0;
@@ -586,7 +597,7 @@
         }
 
         .impact-metric {
-            background: linear-gradient(135deg, var(--success-bg) 0%, #ffffff 100%);
+            background: linear-gradient(135deg, var(--success-bg) 0%, var(--color-surface) 100%);
             border-left: 4px solid var(--primary-color);
             padding: 1rem 1.5rem;
             margin: 1rem 0;
@@ -599,8 +610,8 @@
         }
 
         .team-philosophy {
-            background: linear-gradient(135deg, #fff9e6 0%, #fffdf7 100%);
-            border: 1px solid #f0e6d2;
+            background: linear-gradient(135deg, var(--red-50) 0%, var(--gray-50) 100%);
+            border: 1px solid var(--amber-100);
             border-radius: 12px;
             padding: 2rem;
             margin: 2rem 0;
@@ -651,7 +662,7 @@
             background: var(--primary-color);
             border-radius: 50%;
             border: 3px solid white;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            box-shadow: 0 2px 4px rgb(0 0 0 / 20%);
         }
 
         .timeline-date {
@@ -679,7 +690,7 @@
             color: var(--text-secondary);
         }
 
-        @media (max-width: 768px) {
+        @media (width <= 768px) {
             .comparison-table {
                 grid-template-columns: 1fr;
             }
@@ -691,17 +702,17 @@
 
 /* Phone (≤640px) — 2026-09-05 staff-dashboard sweep: the page measured wider than the
    viewport at 375px and panned sideways. */
-@media (max-width: 640px) {
+@media (width <= 640px) {
     .toc { position: static; width: auto; max-width: 100%; max-height: none; }
 }
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
     /* The page grid track was sized by the TOC's nowrap title (521px) and widened the phone viewport. */
     .container { grid-template-columns: minmax(0, 1fr); }
     .toc-title, .toc-link { white-space: normal; }
 }
 
-@media (max-width: 768px) {
+@media (width <= 768px) {
     /* Reference tables inside the article scroll in place instead of widening the page. */
     .content table { display: block; overflow-x: auto; max-width: 100%; -webkit-overflow-scrolling: touch; }
 }

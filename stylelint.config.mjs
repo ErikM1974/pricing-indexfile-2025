@@ -33,6 +33,9 @@ export default {
         // ids are camelCase across the legacy pages AND their scripts (getElementById); renaming is an HTML+JS
         // change, not a CSS one. New pages use kebab-case ids by convention (templates/page-template.html).
         'selector-id-pattern': null,
+        // keyframe names (fadeIn, slideDown…) are referenced from animation shorthands across the legacy sheets and
+        // sometimes from JS (`el.style.animation`); renaming them is churn with a runtime risk, not consistency.
+        'keyframes-name-pattern': null,
         // `clip: rect(0 0 0 0)` is the canonical visually-hidden (.sr-only) pattern; clip-path is not a byte-identical swap
         'property-no-deprecated': [true, { ignoreProperties: ['clip'] }],
         // kebab-case classes, BEM block__element--modifier allowed (the dashboard already uses ws-card--wide)
