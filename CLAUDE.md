@@ -110,6 +110,26 @@ eyes on something risky), never the default.
 - `/deploy` **aborts unless you are on `develop`** (Step 0.2), and its cache-bust baseline is
   `origin/main` — what is LIVE — never `origin/develop`.
 
+### 🎨 CSS = one token file + a stylelint ratchet (2026-09-07, every served page)
+
+- **`shared_components/css/tokens.css` is the only home for colour, type, space, radius, shadow, motion and
+  z-index.** Every served page links it BEFORE its first local stylesheet (it declares the `@layer` order).
+  A page never types a hex colour: `npm run lint:css` (stylelint, `stylelint.config.mjs`) rejects raw hex
+  outside the two token files and any `!important` without a `stylelint-disable-next-line … -- why` reason.
+- **The lint scope is a ratchet** — `CSS_LINT_SCOPE` in `scripts/lint-css.js` lists every migrated sheet and
+  a sheet never leaves. `tests/unit/css-lint.test.js` runs the same lint under jest; `tests/unit/css-tokens.test.js`
+  locks the token file's shape AND that no page loads a migrated sheet without `tokens.css` (a sheet on bare
+  `var(--gray-…)` renders transparent on a page without it — it happened once).
+- **A page's own colours are declared once** in a `:root` block at the top of its stylesheet, wrapped in
+  `/* stylelint-disable color-no-hex */ … enable`. Colour means a person or a department (Steve green, Ruth
+  purple, Bradley slate, floor blue, AE maroon; storefront = `--store-*`); see `memory/DESIGN_COLOUR_CODE.md`.
+- **Any CSS change ships pixel-verified:** before/after screenshots (`tests/e2e/builder-screenshots.spec.js`)
+  + `python scripts/screenshot-diff.py`; the toolkit and the loop are in `scripts/css/README.md`.
+- New pages start from `templates/page-template.html` and the shared `components.css` / `utilities.css`.
+  The staff-facing reference is **`/dashboards/brand-standards.html`** (Administration → Marketing), rendered
+  live from the token file; its Decisions log is the working record of every look change.
+- Plan, census baseline and the per-family log: `memory/CSS_STANDARDIZATION_PLAN_2026-09.md` (§ 9 = final census).
+
 ### 💵 Pricing = API, never hardcoded (Erik's rule, 2026-06-03) — ALL quote builders
 
 **Every price, fee, charge, upcharge, percentage, and config value in EVERY quote builder
@@ -224,6 +244,9 @@ summary each, plus a § Known backlog of docs still unrecovered from the 2026-07
 (the ManageOrders references the routing table above points at, and the WA sales-tax rules).
 `memory/MEMORY_SYSTEM.md` explains the tree itself: where a new fact goes, which surface loads
 when, and why the repo copy beats machine-local auto-memory.
+
+For anything CSS: `scripts/css/README.md` (the toolkit and the verify loop), then
+`memory/CSS_STANDARDIZATION_PLAN_2026-09.md` (plan, decisions, per-family log, final census).
 
 For deep research, use the Task tool with `subagent_type='Explore'`.
 
