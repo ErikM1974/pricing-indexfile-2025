@@ -113,31 +113,5 @@ describe('SCP calculator dark-garment underbase parity (Rule 7 lock)', () => {
   });
 });
 
-describe('SCP manual calculator stays synced (same underbase rule)', () => {
-  test('automated mode: dark per-piece equals light, setup +$30/location', () => {
-    const ScreenPrintManualPricing = loadClass('screenprint-manual-pricing.js', 'ScreenPrintManualPricing');
-    const back = [{ location: 'back', colors: 1, hasSafetyStripes: false }];
-    const light = mkCalc(ScreenPrintManualPricing, { additionalLocations: back }).calculatePricing();
-    const dark = mkCalc(ScreenPrintManualPricing, { additionalLocations: back, isDarkGarment: true }).calculatePricing();
-
-    expect(dark.basePrice).toBeCloseTo(14.5, 2);
-    expect(dark.basePrice).toBe(light.basePrice);
-    expect(dark.additionalCost).toBeCloseTo(5.5, 2);
-    expect(light.setupFee).toBeCloseTo(90, 2);
-    expect(dark.setupFee).toBeCloseTo(150, 2);
-  });
-
-  test('manual mode: raw-color print cost + flash × raw colors; underbase is setup-only', () => {
-    // document stub feeds the manual garment cost ($3.53 = PC61 S)
-    const doc = { getElementById: (id) => (id === 'manual-base-cost' ? { value: '3.53' } : null), querySelector: () => null, querySelectorAll: () => [] };
-    const ScreenPrintManualPricing = loadClass('screenprint-manual-pricing.js', 'ScreenPrintManualPricing', doc);
-    const light = mkCalc(ScreenPrintManualPricing, {}, { isManualMode: true }).calculatePricing();
-    const dark = mkCalc(ScreenPrintManualPricing, { isDarkGarment: true }, { isManualMode: true }).calculatePricing();
-
-    // ceil((3.53/0.48 + (2.65 + 0.35×2)/0.48) × 2)/2 = ceil(14.3333×2)/2 = 14.50
-    expect(light.basePrice).toBeCloseTo(14.5, 2);
-    expect(dark.basePrice).toBeCloseTo(14.5, 2);  // NOT priced off ColorCount 3 / flash ×3
-    expect(light.setupFee).toBeCloseTo(60, 2);
-    expect(dark.setupFee).toBeCloseTo(90, 2);
-  });
-});
+// (The 'SCP manual calculator stays synced' describe was removed 2026-09-06: screenprint-manual-pricing.js
+// only ever loaded on calculators/archive/manual-pricing-deprecated/ and was deleted with the orphan sweep.)

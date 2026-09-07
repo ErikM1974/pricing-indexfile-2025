@@ -42,15 +42,26 @@ const DELETED_2026_09_06 = [
     'policies/ltm-order-decision-algorithm.html', 'policies/payment-terms.html', 'policies/retail-vs-wholesale-pricing-policy.html', 'policies/sales-office-procedures.html',
     'pages/policies-hub-legacy.html', 'pages/policies/dtg-artwork-checklist.html', 'richardson-caps/view-combination-caps.html',
     'art-tools/art-approval.html', 'art-tools/ae-art-dashboard.html', 'art-tools/ae-submit-art.html', 'tests/order-service-test-harness.html',
+    // second pass (Erik: "get rid of the orphan files"): stale root copies, the tombstone, the archive-only manual calculator,
+    // and the unlinked staff tools / developer diagnostics / pre-Workspaces portal indexes with their extracted assets
+    'pricing-matrix-api.js', 'dp5-helper.js', 'utils.js', 'app-new.js', 'shared_components/js/quote-builder-base.js', 'shared_components/js/screenprint-manual-pricing.js',
+    'dashboards/bundle-orders-dashboard.html', 'dashboards/bundle-orders.js', 'dashboards/css/bundle-orders-dashboard.css',
+    'dashboards/finished-photos-poster.html', 'dashboards/js/finished-photos-poster.js', 'training/bonus-policy.html', 'training/css/bonus-policy.css', 'training/js/bonus-policy.js',
+    'tools/art-search.html', 'tools/art-search.css', 'tools/art-search.js', 'dashboards/staff-portal-simple.html', 'dashboards/css/staff-portal-simple.css',
+    'dashboards/staff-portal-final.html', 'dashboards/js/staff-portal-final-page.js', 'tools/cap-layout-mockup.html', 'tools/css/cap-layout-mockup.css',
+    'tools/diagnose-css-override.html', 'tools/css/diagnose-css-override.css', 'tools/css-diagnostic.html', 'tools/css/css-diagnostic.css', 'tools/js/css-diagnostic-page.js',
+    'tools/decoration-selector-mockup.html', 'tools/css/decoration-selector-mockup.css', 'tools/js/decoration-selector-mockup-page.js',
+    'tools/diagnose-search-issue.html', 'tools/css/diagnose-search-issue.css', 'tools/js/diagnose-search-issue-page.js', 'training/test.html',
+    'training/shopworks-customer-setup-working.html', 'training/css/shopworks-customer-setup-working.css', 'training/js/shopworks-customer-setup-working.js', 'training/css/api-test-runner.css',
+    // only the deleted diagnostics loaded these three
+    'shared_components/js/product-filters.js', 'shared_components/js/product-grid.js', 'shared_components/js/product-search.js',
 ];
 const DELETED = new Set(DELETED_2026_09_06);
 // Stale root-level copies found by the path-aware referrer check (2026-09-06, second pass): nothing loads them —
 // the pages load the shared_components/js twins (dp5-helper is an older 632-line version, pricing-matrix-api is
 // byte-identical, utils.js diverged in 2025-07) and no page ever requested /app-new.js. Removal is Erik's `git rm`
 // (memory/DEAD_FILES_2026-09-06.md § root duplicates); until then they are skipped below and must stay unreferenced.
-const PENDING_DELETION = ['pricing-matrix-api.js', 'dp5-helper.js', 'utils.js', 'app-new.js',
-    'shared_components/js/quote-builder-base.js', // a comment-only tombstone since 2026-07-08 — the real base is builders/shared/quote-builder-base.js
-    'shared_components/js/screenprint-manual-pricing.js']; // loaded only by calculators/archive/manual-pricing-deprecated/ (retired 2026-08-05); named elsewhere only in comments
+const PENDING_DELETION = []; // nothing pending — everything the census verified dead is in DELETED_2026_09_06 above
 const PENDING = new Set(PENDING_DELETION);
 
 // Not served pages: build output, tests, Node-side code, documentation, email/HTML templates, archives, vendored code.
@@ -166,8 +177,8 @@ describe('no orphan browser script', () => {
         const revived = PENDING_DELETION.filter((f) => exists(f) && referrers(f).length > 0).map((f) => ({ file: f, referrers: referrers(f) }));
         expect(revived).toEqual([]);
     });
-    test('the 69 files deleted on 2026-09-06 stay deleted', () => {
-        expect(DELETED_2026_09_06.length).toBe(69);
+    test('the 111 files deleted on 2026-09-06 stay deleted', () => {
+        expect(DELETED_2026_09_06.length).toBe(111);
         expect(DELETED_2026_09_06.filter(exists)).toEqual([]);
     });
 });
