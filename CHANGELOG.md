@@ -1,3 +1,7 @@
+## v2026.09.07.22 (2026.09.07)
+
+- Deploy v2026.09.07.22: server split, first cut — 6 sections of server.js moved verbatim into routes/ (ai-chat, gear-publisher, blog, quote-delete, public-quote, banner-presets: 89 registrations, 1,347 lines; registration order proved unchanged by the new route-table lock; a booted server answered every moved route)
+
 ## v2026.09.07.21 (2026.09.07)
 
 - Deploy v2026.09.07.21: CSS handover — scripts/css toolkit (15 tools + README), CLAUDE.md CSS section and entry point, ACTIVE_FILES row, memory/INDEX one-liner (no served asset changed)
