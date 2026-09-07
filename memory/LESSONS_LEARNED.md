@@ -34,24 +34,7 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 ### 700 console.logs in production, and a basename match that hid four stale root copies (2026-09-06, ARCHIVED 2026-09-07, `v2026.09.06.37`): `console.log` in served scripts is gated behind localhost / `?debug=1` (lock in `repo-hygiene-final`); an orphan census must match the PATH, not the basename. Full entry in archive.
 ### My own host sweep broke the DTF calculator for four deploys, and only a console read caught it (2026-09-06, ARCHIVED 2026-09-07, `v2026.09.06.40`): a scripted rewrite must preserve the ORIGINAL quote character (a template literal lost its backticks and fetched `${…}` literally; 182 suites stayed green); after any sweep that touches fetch URLs, read the live console and `performance.getEntriesByType('resource')` for `responseStatus >= 400` on the pages that use them. Full entry in archive.
 ### The screen-print tier buttons promised a fee Caspio no longer charges (2026-09-06, ARCHIVED 2026-09-07, `v2026.09.06.42`): every dollar or range a customer can READ is pricing — render tier strips, clamps and hints from the API tiers, never type them; after any Caspio tier change compare each calculator's labels with `GET /api/pricing-bundle`; a marker-based `cut()` in a refactor script must assert the method count before/after. Full entry in archive.
-
-## 2026-09-06 — Two customer calculators drifted from Caspio's tiers while the engine followed them (`v2026.09.06.42`–`.43`)
-
-**Problem.** Erik re-cut the ScreenPrint tiers (24-47/$50, 48-71/$0) and split the DTG LTM row
-(1-11/$50, 12-23/$0) in Caspio. Quick Quote and the builders followed at once (the canonical
-engines resolve the row by quantity). The two customer calculators did not: screen print typed
-its buttons and fees; DTG typed "Less than 24 + $50" and mapped every sub-24 quantity to 24-47
-costs + $50 — $1 under the engine at 8 pieces, $2.33 over at 15.
-**Root cause.** Rule 9 was enforced on the engines, not on the pages that render tier buttons:
-a page can read `LTM_Fee` for the total and still type the tier ranges, fees and sub-24 mapping.
-**Solution.** Both strips are generated from `pricing-bundle` tiers; DTG sub-24 prices through
-`DTGCanonicalPricing` (cost-row fallback + `ltmPerUnit`), verified against the engine computed
-from the live bundle on the local dev server and live.
-**Prevention.** 🔑 After ANY Caspio tier change, diff every calculator's tier buttons against
-`/api/pricing-bundle?method=X` tiers AND compare its price at a sub-minimum quantity with Quick
-Quote. 🔑 A tier label in a template is a price. 🔑 The dev server serves `/dist` — rebuild
-before a local probe; the Browser pane's console log is cumulative across pages, read the page's
-own behaviour (a constructed calculator) not the log.
+### Two customer calculators drifted from Caspio\x27s tiers while the engine followed them (2026-09-06, ARCHIVED 2026-09-07, `v2026.09.06.42`–`.43`): a tier label in a template is a price — generate every tier strip from `pricing-bundle`, price sub-minimum quantities through the canonical engine, and after ANY Caspio tier change diff each calculator\x27s buttons against `/api/pricing-bundle?method=X` and its sub-minimum price against Quick Quote. Full entry in archive.
 
 ## 2026-09-06 — Erik asked "is pricing the same everywhere?" — two of five customer calculators were not (`v2026.09.06.44`)
 
@@ -285,3 +268,20 @@ near-mapped. (c) Verify a release through the `herokuapp.com` URL or the browser
 that need it. 🔑 A "near" colour rule must exempt the page's ink (`--text`, `--ink`, `--text-primary`): a
 shade on the body text is a look change even when no pixel crosses the threshold. 🔑 curl exit 35 from the
 office to teamnwca.com is the FortiGate, not the site — check `openssl s_client -connect … | grep issuer`.
+
+## 2026-09-07 — `git worktree remove --force` followed a node_modules junction and deleted the real packages
+
+**Problem.** A HEAD worktree at `C:/tmp/pi-before` (for before-screenshots) had the main tree's `node_modules`
+JUNCTIONED in so `scripts/build.js` could find esbuild. `git worktree remove --force` deleted the worktree
+recursively, followed the junction into the real `node_modules`, removed packages alphabetically (`@asamuzakjp`,
+`@babel`, …) and stopped with "Invalid argument". Nothing said so; the next full gate run failed 184 of 188 unit
+suites with `Cannot find module '@babel/code-frame'` and e2e/parity could not start.
+**Root cause.** Windows junctions look like directories to recursive deletes (git's, and MSYS `rm -rf`);
+the link was inside the thing being deleted.
+**Solution.** `npm ci` (lockfile reinstall) restored everything in one pass; the gates were re-run green before
+the deploy. The junction is now removed FIRST with `cmd /c rmdir <junction>` (which removes only the link),
+verified gone, and only then is the directory deleted.
+**Prevention.** 🔑 Never delete a directory that contains a junction or symlink to something you keep — remove
+the link with `rmdir` (cmd) first and check it is gone. 🔑 Prefer `NODE_PATH=<repo>/node_modules` over a
+junction when a scratch tree needs the repo's packages. 🔑 When 184 suites fail at once with "Cannot find
+module", suspect the install, not the change — `npm ci` before debugging anything.
