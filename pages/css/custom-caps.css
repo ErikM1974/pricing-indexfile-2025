@@ -17,9 +17,6 @@
    raw hex is allowed ONLY in this block. */
 /* stylelint-disable color-no-hex */
 :root {
-    --custom-caps-green: #9be3a8;
-    --custom-caps-orange: #ffd9a8;
-
     /* Ground + ink */
     --paper: var(--store-paper);
     --paper-deep: var(--store-paper-deep);
@@ -661,10 +658,10 @@ input, select, textarea { font-family: var(--font-body); font-size: 15px; }
     background: var(--green-950); color: var(--color-on-brand); border-radius: 16px; padding: 22px 24px;
     box-shadow: var(--shadow-pop);
 }
-.guarantee-tag i { font-size: 26px; color: var(--custom-caps-green); margin-top: 3px; }
+.guarantee-tag i { font-size: 26px; color: var(--store-green-200); margin-top: 3px; }
 .guarantee-tag strong { font-family: var(--font-display); font-size: 18px; display: block; margin-bottom: 4px; }
 .guarantee-tag p { margin: 0; font-size: 14px; opacity: 0.85; }
-.guarantee-tag a { color: var(--custom-caps-green); font-weight: 700; }
+.guarantee-tag a { color: var(--store-green-200); font-weight: 700; }
 
 .site-foot { text-align: center; padding: 26px 16px 40px; font-size: 13px; color: var(--ink-faint); }
 
@@ -682,7 +679,7 @@ input, select, textarea { font-family: var(--font-body); font-size: 15px; }
 .order-bar-summary { background: none; border: none; color: var(--color-on-brand); text-align: left; display: grid; gap: 1px; min-height: 44px; }
 .order-bar-summary strong { font-family: var(--font-display); font-size: 19px; }
 .order-bar-summary span { font-size: 12px; opacity: 0.8; }
-.bar-min-note { font-size: 11px; font-weight: 600; color: var(--custom-caps-orange); }
+.bar-min-note { font-size: 11px; font-weight: 600; color: var(--store-rush-tint); }
 
 /* ── Summary sheet ───────────────────────────────────────────────── */
 .sheet-backdrop, .modal-backdrop {
@@ -731,7 +728,7 @@ input, select, textarea { font-family: var(--font-body); font-size: 15px; }
 }
 .tdt-toast.is-error { background: var(--bad); }
 .tdt-toast.is-success { background: var(--green-900); }
-.tdt-toast .link-btn { color: var(--custom-caps-orange); font-weight: 700; text-decoration: none; }
+.tdt-toast .link-btn { color: var(--store-rush-tint); font-weight: 700; text-decoration: none; }
 
 @keyframes toast-in { from { opacity: 0; transform: translateY(8px); } }
 

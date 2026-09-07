@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <!-- Built from templates/page-template.html: tokens first (the @layer order), then this page only. -->
-    <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.07.19">
+    <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.07.20">
     <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.07.8">
     <link rel="stylesheet" href="/shared_components/css/utilities.css?v=2026.09.07.18">
     <link rel="stylesheet" href="/dashboards/css/brand-standards.css?v=2026.09.07.8">
@@ -74,8 +74,10 @@
                 <li><strong>A page's own colours are declared once.</strong> If a page genuinely needs a colour that is not
                     a token, it goes in ONE <code>:root</code> block at the top of that page's stylesheet — and nowhere else —
                     so re-theming the page is one edit.</li>
-                <li><strong>No <code>!important</code></strong> except the generated <code>quote-builder-inline.css</code> and
-                    a print rule that must beat JS-toggled state, which carries a written reason.</li>
+                <li><strong>No <code>!important</code> without a written reason.</strong> A flag carries a
+                    <code>stylelint-disable-next-line … -- why</code> comment (the hidden attribute, a reduced-motion kill switch,
+                    Caspio markup we do not own, an inline-style precedence a builder still needs); a legacy override stack
+                    carries one file-level reason and retires page by page as that page is redesigned. Nothing is exempt.</li>
                 <li><strong>Tokens load first.</strong> The token file declares the cascade layers
                     (<code>reset → tokens → base → components → utilities → overrides</code>); a page stylesheet is linked after
                     it and holds only what is specific to that page.</li>
@@ -130,6 +132,15 @@
             <p class="text-muted">This page is a working document. Every standard that changed how a page looks is
                 recorded here, newest first, with the release that shipped it.</p>
             <ul class="rules decisions">
+                <li><strong>2026-09-07 · palette pass 2 — the storefront and catalog.</strong> Reviewed page by page with
+                    Erik's authority to make the customer-facing pages look better. Verdict: the 2026 storefront is already a
+                    coherent system (cream paper, forest green, rush orange, Bricolage display), so the changes are small
+                    and deliberate. The closed sample-cart drawer is now hidden as well as slid away — it used to sit in the
+                    scrollbar gutter and stay keyboard-focusable off-screen — and its text uses the storefront inks instead of
+                    generic greys. Three accent tints the storefront pages shared are named once (<code>--store-green-300</code>,
+                    <code>--store-green-200</code>, <code>--store-rush-tint</code>) and thirteen near-token page colours were
+                    folded into the ramps. Kept on purpose: the catalog's colour-family swatches, the hi-vis safety colours, the
+                    home hero accents and the customer portal's gold — they stand for products or a chosen accent, not the brand.</li>
                 <li><strong>2026-09-07 · palette pass 1 — the ramps grow, 604 page colours go.</strong> Thirty colours that
                     between eight and thirty-five sheets each declared as their own page variable are now named once as
                     ramp steps (<code>--red-500</code>, <code>--amber-200</code>, <code>--emerald-800</code>,

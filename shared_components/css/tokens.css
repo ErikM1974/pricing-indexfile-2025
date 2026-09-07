@@ -209,6 +209,9 @@
         --store-rush-deep: #c2410c;
         --store-rush-deeper: #9a3412; /* hover step for white-on-orange (AA) */
         --store-rush-soft: #fff1e6;
+        --store-green-300: #7ed08c; /* storefront accent green — home hero + fall catalog (palette pass 2) */
+        --store-green-200: #9be3a8; /* pale accent green — custom tees, caps, 3-day tees tags */
+        --store-rush-tint: #ffd9a8; /* peach rush tint — the same three pages */
         --font-store-display: "Bricolage Grotesque", "Public Sans", sans-serif;
         --font-store-body: "Public Sans", system-ui, sans-serif;
 

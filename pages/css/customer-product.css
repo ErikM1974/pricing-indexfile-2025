@@ -10,11 +10,6 @@
    keeps its exact look. Map them to shared_components/css/tokens.css names when the page is redesigned;
    every rule below uses var(). Raw hex is allowed ONLY in this block. */
 /* stylelint-disable color-no-hex */
-:root {
-    --customer-product-orange: #8a5a00;
-    --customer-product-yellow: #f0d79a;
-    --customer-product-red: #f3c0bb;
-}
 /* stylelint-enable color-no-hex */
 
 .pp-back {
@@ -36,7 +31,7 @@
 
 .pp-closeout {
     display: flex; gap: 8px; align-items: center; margin-bottom: 16px;
-    font-size: 13px; color: var(--customer-product-orange); background: var(--store-rush-soft); border: 1px solid var(--customer-product-yellow);
+    font-size: 13px; color: var(--bs-warning-ink); background: var(--store-rush-soft); border: 1px solid var(--amber-200);
     border-radius: var(--cp-radius-sm); padding: 10px 12px;
 }
 .pp-closeout i { font-style: normal; font-size: 16px; }
@@ -82,8 +77,8 @@
     border: 1px solid transparent;
 }
 .pp-dot--in  { background: var(--cp-theme-bg-hover); color: var(--cp-theme-dark); border-color: var(--cp-theme-light); }
-.pp-dot--low { background: var(--store-rush-soft); color: var(--customer-product-orange); border-color: var(--customer-product-yellow); }
-.pp-dot--out { background: var(--store-rush-soft); color: var(--red-700); border-color: var(--customer-product-red); text-decoration: line-through; }
+.pp-dot--low { background: var(--store-rush-soft); color: var(--bs-warning-ink); border-color: var(--amber-200); }
+.pp-dot--out { background: var(--store-rush-soft); color: var(--red-700); border-color: var(--red-200); text-decoration: line-through; }
 .pp-dot--na  { background: var(--cp-gray-100); color: var(--cp-ink-mute); }
 
 /* Sections (card-like, matching the portal) */
@@ -150,12 +145,12 @@
     position: absolute; top: -8px; right: 8px; font-size: 9px; font-weight: 700; letter-spacing: .02em;
     background: var(--cp-theme); color: var(--color-on-brand); padding: 1px 6px; border-radius: 999px;
 }
-.pp-method-note { flex-basis: 100%; font-size: 12px; color: var(--customer-product-orange); margin-top: 4px; }
+.pp-method-note { flex-basis: 100%; font-size: 12px; color: var(--bs-warning-ink); margin-top: 4px; }
 .pp-method-min { font-size: 12.5px; line-height: 1.5; margin-top: 8px; }
 
 .pp-method-min--warn {
-    display: flex; gap: 8px; align-items: flex-start; color: var(--customer-product-orange);
-    background: var(--store-rush-soft); border: 1px solid var(--customer-product-yellow); border-radius: var(--cp-radius-sm); padding: 9px 11px;
+    display: flex; gap: 8px; align-items: flex-start; color: var(--bs-warning-ink);
+    background: var(--store-rush-soft); border: 1px solid var(--amber-200); border-radius: var(--cp-radius-sm); padding: 9px 11px;
 }
 .pp-method-min--warn i { font-style: normal; font-size: 15px; line-height: 1.2; }
 
@@ -184,7 +179,7 @@
 .pp-up-mxtable th, .pp-up-mxtable td { border: 1px solid var(--cp-border-soft); padding: 6px 8px; text-align: center; }
 .pp-up-mxtable th.lbl, .pp-up-mxtable td.lbl { text-align: left; color: var(--cp-ink-soft); }
 .pp-up-mxtable thead th { background: var(--cp-zebra); color: var(--cp-ink-soft); font-weight: 700; }
-.pp-up-mxtable td.warn { color: var(--customer-product-orange); }
+.pp-up-mxtable td.warn { color: var(--bs-warning-ink); }
 .pp-up-mxfoot { font-size: 11px; color: var(--cp-ink-mute); margin-top: 6px; line-height: 1.5; }
 .pp-up-btn { margin-top: 8px; }
 .pp-req-hint { font-weight: 400; font-size: 12px; color: var(--cp-ink-mute); }
