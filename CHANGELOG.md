@@ -1,3 +1,8 @@
+## v2026.09.07.16 (2026.09.07)
+
+- Deploy v2026.09.07.16: CSS standardization — quote builders family, the last (22 sheets, 20 pages: every hex a token or a sheet-scoped variable; the generated quote-builder-inline.css retired into the readable quote-builder-utilities.css; the builders' palettes alias tokens only where exact; 15/21 shots identical, 2 async, the rest the safety-apparel recommendations panel finally rendering with resolved tokens on the builders; parity 84/84 + surfaces green)
+- Lock: no page may load a CSS_LINT_SCOPE stylesheet without shared_components/css/tokens.css (the recommendations panel had rendered with undefined tokens on the four builders since v2026.09.07.8)
+
 ## v2026.09.07.14 (2026.09.07)
 
 - Deploy v2026.09.07.14: CSS standardization — staff pages + customer portal batch (45 sheets, 46 pages: every hex a token or a sheet-scoped variable, 15 duplicate token definitions dropped, 298 !important flags documented as 7 override stacks; 46/49 shots identical, the rest a load timestamp, a product photo and the mockup-library header on the brand greens; the garment designer's page ink kept exact; tokenizer made idempotent)
