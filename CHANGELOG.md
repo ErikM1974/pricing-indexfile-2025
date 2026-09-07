@@ -1,3 +1,7 @@
+## v2026.09.07.20 (2026.09.07)
+
+- Deploy v2026.09.07.20: CSS palette pass 2 — storefront + catalog (closed sample-cart drawer hidden from the scrollbar gutter and the tab order; drawer text on the storefront inks; three shared storefront tints named as --store-* tokens; 13 near-threshold page variables mapped to tokens; swatch, hi-vis and gold accents kept)
+
 ## v2026.09.07.19 (2026.09.07)
 
 - Deploy v2026.09.07.19: CSS palette pass 1 — 30 shared ramp steps named in tokens.css, 604 page-scoped colour variables collapsed into them across 147 sheets (value-identical; 31-page sample pixel-identical, unresolved var() count unchanged at 434)
