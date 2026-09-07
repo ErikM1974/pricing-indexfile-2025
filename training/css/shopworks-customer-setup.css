@@ -10,11 +10,9 @@
     --page-gray-dark: #333;
     --page-red: #f44336;
     --page-indigo: #764ba2;
-    --page-yellow: #856404;
     --page-cyan: #2196f3;
     --page-blue-2: #5a67d8;
     --page-green: #2e7d32;
-    --page-yellow-2: #ffc107;
 }
 /* stylelint-enable color-no-hex */
 
@@ -405,7 +403,7 @@
 
         .hint-box {
             background: var(--amber-100);
-            border: 2px solid var(--page-yellow-2);
+            border: 2px solid var(--bs-warning);
             border-radius: 10px;
             padding: 15px;
             margin-bottom: 20px;
@@ -417,12 +415,12 @@
         }
 
         .hint-box h4 {
-            color: var(--page-yellow);
+            color: var(--bs-warning-ink);
             margin-bottom: 10px;
         }
 
         .hint-box p {
-            color: var(--page-yellow);
+            color: var(--bs-warning-ink);
         }
 
         .shopworks-form {

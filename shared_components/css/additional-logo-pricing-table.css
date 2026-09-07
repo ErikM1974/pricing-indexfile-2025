@@ -11,9 +11,7 @@
 /* stylelint-disable color-no-hex */
 :root {
     --additional-logo-pricing-table-gray: #666;
-    --additional-logo-pricing-table-yellow: #ffc107;
     --additional-logo-pricing-table-gray-dark: #333;
-    --additional-logo-pricing-table-yellow-2: #856404;
 }
 /* stylelint-enable color-no-hex */
 
@@ -146,7 +144,7 @@
 .additional-logo-error {
     padding: 16px;
     background: var(--amber-100);
-    border-left: 4px solid var(--additional-logo-pricing-table-yellow);
+    border-left: 4px solid var(--bs-warning);
     border-radius: 8px;
     margin-bottom: 16px;
 }
@@ -154,11 +152,11 @@
 .additional-logo-error p {
     margin: 0;
     font-size: 14px;
-    color: var(--additional-logo-pricing-table-yellow-2);
+    color: var(--bs-warning-ink);
 }
 
 .additional-logo-error i {
-    color: var(--additional-logo-pricing-table-yellow);
+    color: var(--bs-warning);
     margin-right: 8px;
 }
 

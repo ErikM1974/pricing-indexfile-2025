@@ -4,10 +4,6 @@
    keeps its exact look. Map them to shared_components/css/tokens.css names when the page is redesigned;
    every rule below uses var(). Raw hex is allowed ONLY in this block. */
 /* stylelint-disable color-no-hex */
-:root {
-    --screenprint-customer-fix-yellow: #fcd34d;
-    --screenprint-customer-fix-yellow-2: #fde68a;
-}
 /* stylelint-enable color-no-hex */
 
 /* CUSTOMER SCREEN PRINT CALCULATOR FIX CSS  */
@@ -266,7 +262,7 @@ input:checked + .slider::before {
     color: var(--warning-text);
     padding: 1rem;
     border-radius: 6px;
-    border: 1px solid var(--screenprint-customer-fix-yellow);
+    border: 1px solid var(--amber-300);
     margin-bottom: 1rem;
 }
 
@@ -346,7 +342,7 @@ input:checked + .slider::before {
 
 /* Notice section styling */
 .notice-section {
-    background: linear-gradient(135deg, var(--amber-100) 0%, var(--screenprint-customer-fix-yellow-2) 100%);
+    background: linear-gradient(135deg, var(--amber-100) 0%, var(--amber-200) 100%);
     border: 1px solid var(--amber-500);
     color: var(--amber-800);
     padding: 2rem;

@@ -40,17 +40,14 @@
     --workspaces-red: #b91c5c;
     --workspaces-green: #4ade80;
     --workspaces-teal: #45d6c5;
-    --workspaces-green-tint: #bbf7d0;
-    --workspaces-green-2: #22c55e;
     --workspaces-cyan: #2e4a62;
-    --workspaces-red-tint: #fecaca;
     --workspaces-orange: #c9b99c;
     --workspaces-magenta: #8e1147;
     --workspaces-orange-2: #cd7f32;
     --workspaces-cyan-2: #9fb3c8;
     --workspaces-green-3: #86c99a;
     --workspaces-green-4: #8fd19f;
-    --f-money: var(--accent, var(--workspaces-green-2));   --f-money-fg: var(--store-green-950);
+    --f-money: var(--accent, var(--green-500));   --f-money-fg: var(--store-green-950);
     --f-steel: var(--workspaces-cyan);                  --f-steel-fg: var(--slate-200);
     --f-crm:   var(--gray-800);                  --f-crm-fg: var(--amber-500);   --f-crm-ring: var(--amber-500);
     --f-purch: var(--color-bradley);                  --f-purch-fg: var(--color-surface);
@@ -60,8 +57,8 @@
     --f-floor: var(--blue-600);                  --f-floor-fg: var(--color-surface);
     --f-photo: var(--store-green-950);                  --f-photo-fg: var(--workspaces-green); --f-photo-ring: var(--store-green-700);
     --f-arch:  var(--amber-600);                  --f-arch-fg: var(--color-surface);
-    --f-ox:    var(--print-red);                  --f-ox-fg: var(--workspaces-red-tint);
-    --f-vault: var(--brand-700);                  --f-vault-fg: var(--workspaces-green-tint);
+    --f-ox:    var(--print-red);                  --f-ox-fg: var(--red-200);
+    --f-vault: var(--brand-700);                  --f-vault-fg: var(--green-200);
     --f-ref:   var(--line, var(--gray-700));     --f-ref-fg: var(--text, var(--slate-200));
     --f-store: var(--store-green-700);                  --f-store-fg: var(--store-paper);
     --f-menu:  var(--color-ae-dark);                  --f-menu-fg: var(--store-paper-deep);
@@ -341,7 +338,7 @@ details.ws-more > summary .ws-n { margin-left: auto; font-family: var(--font-mon
 
 /* Design Vault — forest green with the vault door */
 .ws-tile.bs-vault { background: var(--store-ink); border-color: var(--brand-700); }
-.ws-tile.bs-vault .ws-chip-mk { background: var(--brand-700); color: var(--workspaces-green-tint); border-radius: 50%; box-shadow: none; }
+.ws-tile.bs-vault .ws-chip-mk { background: var(--brand-700); color: var(--green-200); border-radius: 50%; box-shadow: none; }
 .ws-tile.bs-vault .ws-tile__tx .ws-d { color: var(--workspaces-green-3); }
 .ws-tile.bs-vault:hover { border-color: var(--workspaces-green); }
 

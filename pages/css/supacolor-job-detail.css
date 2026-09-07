@@ -14,7 +14,6 @@
     --supacolor-job-detail-red-tint: #ffc9c9;
     --supacolor-job-detail-red-2: #ff8787;
     --supacolor-job-detail-yellow: #ffe082;
-    --supacolor-job-detail-yellow-2: #856404;
 }
 /* stylelint-enable color-no-hex */
 
@@ -660,7 +659,7 @@
     border-radius: 6px;
     padding: 10px 14px;
     font-size: 13px;
-    color: var(--supacolor-job-detail-yellow-2);
+    color: var(--bs-warning-ink);
     margin-bottom: 12px;
 }
 .sjd-delete-open-warning i { margin-right: 6px; }

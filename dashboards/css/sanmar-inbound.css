@@ -38,10 +38,8 @@
 :root {
     --sanmar-inbound-gray-dark: #000;
     --sanmar-inbound-gray-dark-2: #333;
-    --sanmar-inbound-yellow: #fcd34d;
     --sanmar-inbound-gray: #8a9097;
     --sanmar-inbound-gray-2: #888;
-    --sanmar-inbound-red: #fca5a5;
     --sanmar-inbound-orange: #f0c9a8;
     --sanmar-inbound-green: #4a7a58;
     --sanmar-inbound-cyan-dark: #245;
@@ -52,8 +50,6 @@
     --sanmar-inbound-gray-4: #b9c0b9;
     --sanmar-inbound-orange-2: #fdba74;
     --sanmar-inbound-magenta: #b08;
-    --sanmar-inbound-green-3: #86efac;
-    --sanmar-inbound-green-tint-2: #bbf7d0;
     --sanmar-inbound-red-2: #b4232f;
     --sanmar-inbound-red-3: #e0a3a3;
 }
@@ -240,12 +236,12 @@
    normally run off on a mono laser. */
 .sit-rush {
     display: inline-flex; align-items: center; gap: 4px;
-    background: var(--red-100); color: var(--red-800); border: 1px solid var(--sanmar-inbound-red);
+    background: var(--red-100); color: var(--red-800); border: 1px solid var(--red-300);
     border-radius: 5px; padding: 2px 8px; font-size: 12px; font-weight: 800;
     letter-spacing: .01em; white-space: nowrap;
 }
 .sit-rush--past { background: var(--red-800); color: var(--color-on-brand); border-color: var(--print-red); }
-.sit-stat--rush { background: var(--red-100); border-color: var(--sanmar-inbound-red); }
+.sit-stat--rush { background: var(--red-100); border-color: var(--red-300); }
 .sit-stat--rush .sit-stat-num { color: var(--red-800); }
 .sit-stat--cost { background: var(--color-dash-theme-bg); border-color: var(--sanmar-inbound-green-tint); }
 .sit-stat--cost .sit-stat-num { color: var(--print-green); }
@@ -254,7 +250,7 @@
 /* UPS live-arrival chip */
 .sit-ups { font-weight: 700; padding: 1px 8px; border-radius: 10px; border: 1px solid; white-space: nowrap; }
 .sit-ups--ok { background: var(--color-floor-tint); color: var(--sky-900); border-color: var(--sanmar-inbound-cyan); }
-.sit-ups--resched { background: var(--amber-100); color: var(--amber-800); border-color: var(--sanmar-inbound-yellow); }
+.sit-ups--resched { background: var(--amber-100); color: var(--amber-800); border-color: var(--amber-300); }
 .sit-ups--est { background: var(--gray-100); color: var(--gray-500); border-color: var(--gray-300); font-weight: 600; }
 .sit-cost-cell { color: var(--brand-800); font-variant-numeric: tabular-nums; white-space: nowrap; }
 .sit-costnote { font-size: 11px; color: var(--sanmar-inbound-green-2); margin: 12px 0 0; line-height: 1.5; }
@@ -286,8 +282,8 @@
 .sit-wo { font-size: 12px; color: var(--blue-600); }
 .sit-chip { color: var(--color-on-brand); font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 10px; }
 .sit-issue { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 10px; border: 1px solid; cursor: help; }
-.sit-issue--bo { background: var(--red-100); color: var(--red-800); border-color: var(--sanmar-inbound-red); }
-.sit-issue--hold { background: var(--amber-100); color: var(--amber-800); border-color: var(--sanmar-inbound-yellow); }
+.sit-issue--bo { background: var(--red-100); color: var(--red-800); border-color: var(--red-300); }
+.sit-issue--hold { background: var(--amber-100); color: var(--amber-800); border-color: var(--amber-300); }
 .sit-issue--urgent { background: var(--red-100); color: var(--store-rush-deeper); border-color: var(--sanmar-inbound-orange-2); }
 .sit-issue--other { background: var(--slate-100); color: var(--slate-600); border-color: var(--gray-300); }
 
@@ -308,13 +304,13 @@
 .sit-card--received { opacity: 0.66; }
 .sit-card--received .sit-card-main { background: var(--gray-100); border-bottom: none; }
 .sit-card--received .sit-logo { width: 46px; height: 46px; font-size: 20px; }
-.sit-recv { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 10px; background: var(--store-green-100); color: var(--print-green); border: 1px solid var(--sanmar-inbound-green-3); white-space: nowrap; cursor: help; }
+.sit-recv { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 10px; background: var(--store-green-100); color: var(--print-green); border: 1px solid var(--green-300); white-space: nowrap; cursor: help; }
 
 /* Follow-on shipment — the PO was counted in, but SanMar shipped ANOTHER carton afterwards, so
    these pieces are still inbound. Amber (not the green "received" treatment) because the row
    looks like a duplicate of shelf stock and would otherwise be waved through at the dock. */
-.sit-followon { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 10px; background: var(--amber-100); color: var(--amber-800); border: 1px solid var(--sanmar-inbound-yellow); white-space: nowrap; cursor: help; }
-.sit-stat--recv { background: var(--brand-50); border-color: var(--sanmar-inbound-green-tint-2); }
+.sit-followon { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 10px; background: var(--amber-100); color: var(--amber-800); border: 1px solid var(--amber-300); white-space: nowrap; cursor: help; }
+.sit-stat--recv { background: var(--brand-50); border-color: var(--green-200); }
 .sit-stat--recv .sit-stat-num { color: var(--print-green); }
 
 .sit-lines { width: 100%; border-collapse: collapse; font-size: 13px; }
@@ -408,7 +404,7 @@
     border-radius: 3px; padding: 0 4px; margin-left: 4px; vertical-align: middle;
 }
 .sit-rt-rush-cell { font-weight: 900; color: var(--print-red); }
-.sit-ps-followon { font-size: 9.5px; font-weight: 800; color: var(--amber-800); background: var(--amber-100); border: 1px solid var(--sanmar-inbound-yellow); border-radius: 3px; padding: 1px 5px; margin-top: 3px; display: inline-block; }
+.sit-ps-followon { font-size: 9.5px; font-weight: 800; color: var(--amber-800); background: var(--amber-100); border: 1px solid var(--amber-300); border-radius: 3px; padding: 1px 5px; margin-top: 3px; display: inline-block; }
 
 /* DROP-SHIP on paper. Solid dark fill, reversed text, no emoji -- these sheets go to the
    mono laser and get handed to Ruthie, Nika and Taneisha, so the one line that says

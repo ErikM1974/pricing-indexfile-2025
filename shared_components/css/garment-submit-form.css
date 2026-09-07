@@ -14,22 +14,12 @@
    every rule below uses var(). Raw hex is allowed ONLY in this block. */
 /* stylelint-disable color-no-hex */
 :root {
-    --garment-submit-form-yellow: #fde68a;
-    --garment-submit-form-teal-dark: #047857;
-    --garment-submit-form-red-tint: #fecaca;
     --garment-submit-form-green-tint: #cdf3d6;
-    --garment-submit-form-red: #ef4444;
     --garment-submit-form-teal-dark-2: #064e3b;
     --garment-submit-form-orange: #6b4423;
     --garment-submit-form-orange-2: #a1703f;
-    --garment-submit-form-yellow-2: #fcd34d;
-    --garment-submit-form-orange-3: #fed7aa;
     --garment-submit-form-orange-4: #7c2d12;
     --garment-submit-form-orange-5: #f97316;
-    --garment-submit-form-teal-dark-3: #065f46;
-    --garment-submit-form-green: #a7f3d0;
-    --garment-submit-form-green-2: #86efac;
-    --garment-submit-form-orange-6: #78350f;
 }
 /* stylelint-enable color-no-hex */
 
@@ -442,7 +432,7 @@
 
 .gsf-rush-toggle--active,
 .gsf-rush-toggle--active:hover {
-    background: linear-gradient(135deg, var(--garment-submit-form-red) 0%, var(--red-700) 100%);
+    background: linear-gradient(135deg, var(--red-500) 0%, var(--red-700) 100%);
     border: 1.5px solid var(--red-800);
     color: var(--color-on-brand);
     box-shadow: 0 10px 22px -10px rgb(220 38 38 / 75%), 0 0 0 4px rgb(220 38 38 / 15%);
@@ -580,7 +570,7 @@
     box-shadow: 0 8px 18px -8px rgb(5 150 105 / 70%);
     transition: background .15s ease, transform .15s ease;
 }
-.gsf-success-link:hover { background: var(--garment-submit-form-teal-dark); transform: translateY(-1px); }
+.gsf-success-link:hover { background: var(--emerald-700); transform: translateY(-1px); }
 
 .gsf-success-another {
     padding: 11px 22px;
@@ -699,13 +689,13 @@
 /* Section that becomes required (repeat / revision) — amber spotlight */
 .gsf-section--required {
     background: linear-gradient(180deg, var(--store-paper) 0%, var(--store-rush-soft) 100%);
-    border: 1px solid var(--garment-submit-form-yellow);
+    border: 1px solid var(--amber-200);
     border-radius: 14px;
     margin: 6px -16px;
     padding: 22px 16px 22px 64px;
     box-shadow: 0 0 0 4px rgb(245 158 11 / 8%);
 }
-.gsf-section--required .gsf-section-num { left: 16px; background: linear-gradient(135deg, var(--amber-700), var(--amber-500)); box-shadow: 0 0 0 4px var(--store-paper), 0 0 0 5px var(--garment-submit-form-yellow); }
+.gsf-section--required .gsf-section-num { left: 16px; background: linear-gradient(135deg, var(--amber-700), var(--amber-500)); box-shadow: 0 0 0 4px var(--store-paper), 0 0 0 5px var(--amber-200); }
 .gsf-section--required::before { left: 30px; }
 
 .gsf-section--required .gsf-section-title::after {
@@ -716,7 +706,7 @@
     letter-spacing: .06em;
     text-transform: uppercase;
     color: var(--amber-800);
-    background: var(--garment-submit-form-yellow);
+    background: var(--amber-200);
     padding: 3px 8px;
     border-radius: 999px;
     vertical-align: middle;
@@ -753,7 +743,7 @@
 .gsf-warn {
     color: var(--amber-800);
     background: var(--amber-100);
-    border: 1px solid var(--garment-submit-form-yellow-2);
+    border: 1px solid var(--amber-300);
     border-radius: 8px;
     padding: 7px 10px;
     font-weight: 500;
@@ -764,7 +754,7 @@
     padding: 14px 16px 14px 46px;
     position: relative;
     background: linear-gradient(180deg, var(--red-50) 0%, var(--red-100) 100%);
-    border: 1px solid var(--garment-submit-form-orange-3);
+    border: 1px solid var(--orange-200);
     border-radius: 12px;
     font-size: 13px;
     color: var(--garment-submit-form-orange-4);
@@ -1015,8 +1005,8 @@
     color: var(--gray-700);
     border: 1px solid var(--slate-200);
 }
-.gsf-carried-status--ok    { background: var(--brand-50); color: var(--garment-submit-form-teal-dark-3); border-color: var(--garment-submit-form-green); }
-.gsf-carried-status--error { background: var(--red-50); color: var(--red-800); border-color: var(--garment-submit-form-red-tint); }
+.gsf-carried-status--ok    { background: var(--brand-50); color: var(--emerald-800); border-color: var(--emerald-200); }
+.gsf-carried-status--error { background: var(--red-50); color: var(--red-800); border-color: var(--red-200); }
 
 /* Rush toggle sits beside the Art Estimate select */
 .gsf-rush-field { justify-content: flex-end; }
@@ -1033,7 +1023,7 @@
     font-weight: 500;
     color: var(--red-800);
     background: var(--red-50);
-    border: 1px solid var(--garment-submit-form-red-tint);
+    border: 1px solid var(--red-200);
     border-radius: 10px;
     padding: 6px 10px;
 }
@@ -1049,8 +1039,8 @@
     cursor: pointer;
     font-family: inherit;
 }
-.gsf-color-retry:hover { background: var(--garment-submit-form-teal-dark); }
-.gsf-color-retry:focus-visible { outline: 2px solid var(--garment-submit-form-teal-dark); outline-offset: 2px; }
+.gsf-color-retry:hover { background: var(--emerald-700); }
+.gsf-color-retry:focus-visible { outline: 2px solid var(--emerald-700); outline-offset: 2px; }
 
 /* ── Sticky progress bar (2026-09-04) ──────────────────────────────────
    The form is ~11,000px tall. This floats at the bottom of the viewport while
@@ -1087,7 +1077,7 @@
     text-align: left; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .gsf-progress__left:hover { text-decoration: underline; }
-.gsf-progress--ready .gsf-progress__left { color: var(--garment-submit-form-green-2); cursor: default; text-decoration: none; }
+.gsf-progress--ready .gsf-progress__left { color: var(--green-300); cursor: default; text-decoration: none; }
 
 .gsf-progress__btn {
     flex: 0 0 auto; padding: 10px 20px; border: none; border-radius: 10px;
@@ -1102,7 +1092,7 @@
 .gsf-draft-note {
     display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
     margin: 0 0 14px; padding: 12px 16px; border-radius: 12px;
-    background: var(--store-paper); border: 1px solid var(--garment-submit-form-yellow); color: var(--garment-submit-form-orange-6); font-size: 13.5px;
+    background: var(--store-paper); border: 1px solid var(--amber-200); color: var(--amber-900); font-size: 13.5px;
 }
 
 .gsf-draft-note__discard {

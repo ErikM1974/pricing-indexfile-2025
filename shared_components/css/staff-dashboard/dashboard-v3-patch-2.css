@@ -18,17 +18,12 @@
 /* stylelint-disable color-no-hex */
 :root {
     --dashboard-v3-patch-2-blue-tint: #c7d2fe;
-    --dashboard-v3-patch-2-green: #22c55e;
-    --dashboard-v3-patch-2-green-2: #a7f3d0;
     --dashboard-v3-patch-2-green-3: #1f9d4d;
     --dashboard-v3-patch-2-teal: #1de9b6;
     --dashboard-v3-patch-2-cyan: #29b6f6;
     --dashboard-v3-patch-2-cyan-2: #2196f3;
     --dashboard-v3-patch-2-teal-2: #5eead4;
     --dashboard-v3-patch-2-cyan-3: #38bdf8;
-    --dashboard-v3-patch-2-yellow: #fcd34d;
-    --dashboard-v3-patch-2-green-tint: #d1fae5;
-    --dashboard-v3-patch-2-yellow-2: #fde68a;
     --dashboard-v3-patch-2-cyan-4: #8aa0b6;
 }
 /* stylelint-enable color-no-hex */
@@ -321,7 +316,7 @@
 }
 
 .pinned-row--frequent .tool-workflow-label {
-  color: var(--nw-green, var(--dashboard-v3-patch-2-green));
+  color: var(--nw-green, var(--green-500));
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.06em;
@@ -339,7 +334,7 @@
 }
 
 .pinned-row--frequent .tool-workflow-arrow {
-  color: var(--nw-green, var(--dashboard-v3-patch-2-green));
+  color: var(--nw-green, var(--green-500));
   display: inline-flex;
   align-items: center;
   font-size: 14px;
@@ -606,7 +601,7 @@
      punching a beige rectangle into it. amber-400 (#fbbf24) reads ~5:1
      contrast against the card bg → WCAG AA pass. */
   background: rgb(251 191 36 / 14%);
-  color: var(--dashboard-v3-patch-2-yellow);                            /* amber-300 */
+  color: var(--amber-300);                            /* amber-300 */
   border: 1px solid rgb(251 191 36 / 38%);
   border-radius: 6px;
   white-space: nowrap;
@@ -745,7 +740,7 @@
   letter-spacing: 0.08em;
   text-transform: uppercase;
   background: rgb(52 211 153 / 16%);      /* emerald-400 @ 16% */
-  color: var(--dashboard-v3-patch-2-green-2);                            /* emerald-200 — readable on dark */
+  color: var(--emerald-200);                            /* emerald-200 — readable on dark */
   border: 1px solid rgb(52 211 153 / 42%);
   border-radius: 6px;
   white-space: nowrap;
@@ -754,7 +749,7 @@
 
 .tool-btn--new:hover::after {
   background: rgb(52 211 153 / 24%);
-  color: var(--dashboard-v3-patch-2-green-tint);                            /* emerald-100 */
+  color: var(--emerald-100);                            /* emerald-100 */
   border-color: rgb(52 211 153 / 55%);
 }
 
@@ -782,7 +777,7 @@
   letter-spacing: 0.06em;
   text-transform: uppercase;
   background: rgb(251 191 36 / 16%);      /* amber-400 @ 16% */
-  color: var(--dashboard-v3-patch-2-yellow-2);                            /* amber-200 — readable on dark */
+  color: var(--amber-200);                            /* amber-200 — readable on dark */
   border: 1px solid rgb(251 191 36 / 45%);
   border-radius: 6px;
   white-space: nowrap;
@@ -809,7 +804,7 @@
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: var(--dashboard-v3-patch-2-green-2);                            /* emerald-200 */
+  color: var(--emerald-200);                            /* emerald-200 */
   background: rgb(52 211 153 / 12%);
   border: 1px solid rgb(52 211 153 / 28%);
   border-radius: 6px;

@@ -7,45 +7,31 @@
    raw hex is allowed ONLY in this block. */
 /* stylelint-disable color-no-hex */
 :root {
-    --page-cyan-tint: #bfdbfe;
-    --page-green: #15803d;
-    --page-green-tint: #bbf7d0;
     --page-orange: #a16207;
-    --page-yellow: #fde68a;
     --page-green-2: #2e7d32;
-    --page-green-dark: #1b5e20;
-    --page-blue: #4338ca;
     --page-blue-tint: #c7d2fe;
-    --page-orange-2: #c2410c;
-    --page-orange-3: #fed7aa;
     --page-teal: #0f766e;
     --page-teal-2: #99f6e4;
-    --page-indigo: #7c3aed;
     --page-indigo-tint: #ddd6fe;
-    --page-red-tint: #fecaca;
-    --page-blue-2: #1e40af;
     --page-cyan: #7dd3fc;
-    --page-green-3: #86efac;
-    --page-yellow-2: #fcd34d;
     --page-cyan-2: #38bdf8;
     --page-green-4: #4ade80;
-    --page-yellow-3: #fbbf24;
     --primary-green: var(--page-green-2);
-    --primary-green-dark: var(--page-green-dark);
+    --primary-green-dark: var(--material-green-900);
     --bg-light: var(--slate-50);
     --text-primary: var(--gray-800);
     --text-secondary: var(--slate-500);
     --border-color: var(--slate-200);
     --card-shadow: 0 1px 3px rgb(0 0 0 / 8%);
     --overview-color: var(--gray-700);  --overview-bg: var(--slate-100);  --overview-border: var(--gray-300);
-    --cost-color:     var(--color-floor-dark);  --cost-bg:     var(--color-floor-tint);  --cost-border:     var(--page-cyan-tint);
-    --sizes-color:    var(--page-blue);  --sizes-bg:    var(--color-floor-tint);  --sizes-border:    var(--page-blue-tint);
-    --po-color:       var(--page-green);  --po-bg:       var(--brand-50);  --po-border:       var(--page-green-tint);
-    --notes-color:    var(--page-orange);  --notes-bg:    var(--red-50);  --notes-border:    var(--page-yellow);
-    --vendors-color:  var(--page-orange-2);  --vendors-bg:  var(--red-50);  --vendors-border:  var(--page-orange-3);
+    --cost-color:     var(--color-floor-dark);  --cost-bg:     var(--color-floor-tint);  --cost-border:     var(--blue-200);
+    --sizes-color:    var(--indigo-700);  --sizes-bg:    var(--color-floor-tint);  --sizes-border:    var(--page-blue-tint);
+    --po-color:       var(--green-700);  --po-bg:       var(--brand-50);  --po-border:       var(--green-200);
+    --notes-color:    var(--page-orange);  --notes-bg:    var(--red-50);  --notes-border:    var(--amber-200);
+    --vendors-color:  var(--store-rush-deep);  --vendors-bg:  var(--red-50);  --vendors-border:  var(--orange-200);
     --check-color:    var(--page-teal);  --check-bg:    var(--brand-50);  --check-border:    var(--page-teal-2);
-    --videos-color:   var(--page-indigo);  --videos-bg:   var(--color-ruth-tint);  --videos-border:   var(--page-indigo-tint);
-    --warn-red: var(--red-600);        --warn-bg: var(--red-50);      --warn-border: var(--page-red-tint);
+    --videos-color:   var(--violet-600);  --videos-bg:   var(--color-ruth-tint);  --videos-border:   var(--page-indigo-tint);
+    --warn-red: var(--red-600);        --warn-bg: var(--red-50);      --warn-border: var(--red-200);
 }
 /* stylelint-enable color-no-hex */
 
@@ -305,10 +291,10 @@ body {
 .callout i { margin-right: 6px; }
 .callout strong { color: inherit; }
 .callout a { color: inherit; font-weight: 600; }
-.callout-do   { background: var(--brand-50); border-color: var(--page-green-tint); color: var(--print-green); }
+.callout-do   { background: var(--brand-50); border-color: var(--green-200); color: var(--print-green); }
 .callout-warn { background: var(--warn-bg); border-color: var(--warn-border); color: var(--red-800); }
-.callout-info { background: var(--color-floor-tint); border-color: var(--page-cyan-tint); color: var(--page-blue-2); }
-.callout-tip  { background: var(--red-50); border-color: var(--page-yellow); color: var(--amber-800); }
+.callout-info { background: var(--color-floor-tint); border-color: var(--blue-200); color: var(--blue-800); }
+.callout-tip  { background: var(--red-50); border-color: var(--amber-200); color: var(--amber-800); }
 .callout-key  { background: var(--sizes-bg); border-color: var(--sizes-border); color: var(--sizes-color); }
 
 /* ── Screenshots ────────────────────────────────────────────────────── */
@@ -398,8 +384,8 @@ body {
 }
 .note-example .seg { padding: 1px 2px; border-radius: 3px; }
 .note-example .seg-who    { color: var(--page-cyan); }
-.note-example .seg-status { color: var(--page-green-3); }
-.note-example .seg-bo     { color: var(--page-yellow-2); }
+.note-example .seg-status { color: var(--green-300); }
+.note-example .seg-bo     { color: var(--amber-300); }
 
 .note-decode {
     display: flex;
@@ -418,7 +404,7 @@ body {
 }
 .note-decode .dot-who    { background: var(--page-cyan-2); }
 .note-decode .dot-status { background: var(--page-green-4); }
-.note-decode .dot-bo     { background: var(--page-yellow-3); }
+.note-decode .dot-bo     { background: var(--amber-400); }
 
 /* ── Contacts grid ──────────────────────────────────────────────────── */
 .contacts {
@@ -582,7 +568,7 @@ body {
     .screenshot a { border-color: var(--gray-300); }
     .note-example { background: var(--slate-100); }
     .note-example .seg-who    { color: var(--sky-700); }
-    .note-example .seg-status { color: var(--page-green); }
+    .note-example .seg-status { color: var(--green-700); }
     .note-example .seg-bo     { color: var(--page-orange); }
 }
 

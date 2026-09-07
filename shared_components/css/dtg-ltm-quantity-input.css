@@ -4,9 +4,6 @@
    keeps its exact look. Map them to shared_components/css/tokens.css names when the page is redesigned;
    every rule below uses var(). Raw hex is allowed ONLY in this block. */
 /* stylelint-disable color-no-hex */
-:root {
-    --dtg-ltm-quantity-input-red: #ef4444;
-}
 /* stylelint-enable color-no-hex */
 
 /*
@@ -92,7 +89,7 @@
 
 /* Invalid state */
 .dtg-quantity-input:invalid {
-    border-color: var(--dtg-ltm-quantity-input-red);
+    border-color: var(--red-500);
 }
 
 /* Hint text */

@@ -7,17 +7,9 @@
    every rule below uses var(). Raw hex is allowed ONLY in this block. */
 /* stylelint-disable color-no-hex */
 :root {
-    --transfer-detail-orange: #78350f;
-    --transfer-detail-blue: #1e40af;
     --transfer-detail-teal-dark: #064e3b;
-    --transfer-detail-teal-dark-2: #047857;
-    --transfer-detail-green: #22c55e;
-    --transfer-detail-teal-dark-3: #065f46;
-    --transfer-detail-green-tint: #d1fae5;
-    --transfer-detail-yellow: #fcd34d;
     --transfer-detail-green-2: #6ee7b7;
     --transfer-detail-indigo: #6b21a8;
-    --transfer-detail-red-tint: #fecaca;
     --transfer-detail-indigo-2: #5b21b6;
     --transfer-detail-blue-2: #6366f1;
 }
@@ -60,7 +52,7 @@
 .td-status-dot--active { background: var(--color-floor-light); box-shadow: 0 0 0 3px rgb(59 130 246 / 20%); }
 
 .td-status-dot--shipped {
-    background: var(--transfer-detail-green);
+    background: var(--green-500);
     box-shadow: 0 0 0 3px rgb(34 197 94 / 20%);
     animation: td-status-pulse 2s ease-in-out infinite;
 }
@@ -146,13 +138,13 @@
 
 .td-paste-status--loading {
     background: var(--color-floor-tint);
-    color: var(--transfer-detail-blue);
+    color: var(--blue-800);
     border-left: 3px solid var(--color-floor-light);
 }
 
 .td-paste-status--success {
     background: var(--brand-50);
-    color: var(--transfer-detail-teal-dark-3);
+    color: var(--emerald-800);
     border-left: 3px solid var(--emerald-600);
 }
 
@@ -391,7 +383,7 @@
 }
 
 .td-po-banner--empty .td-po-preview--match {
-    color: var(--transfer-detail-green-tint);
+    color: var(--emerald-100);
 }
 
 .td-po-banner--empty .td-po-preview--match::before {
@@ -452,8 +444,8 @@
 /* PENDING state — amber, awaiting auto-link */
 .td-po-banner--pending {
     background: var(--amber-100);
-    border: 1px solid var(--transfer-detail-yellow);
-    color: var(--transfer-detail-orange);
+    border: 1px solid var(--amber-300);
+    color: var(--amber-900);
     display: flex;
     align-items: center;
     gap: 14px;
@@ -468,7 +460,7 @@
     margin: 0;
     font-size: 16px;
     font-weight: 700;
-    color: var(--transfer-detail-orange);
+    color: var(--amber-900);
 }
 
 .td-po-banner--pending .td-po-banner-help {
@@ -483,7 +475,7 @@
     border-radius: 4px;
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     font-weight: 700;
-    color: var(--transfer-detail-orange);
+    color: var(--amber-900);
 }
 
 /* LINKED state — green, fully linked */
@@ -519,11 +511,11 @@
 .td-po-banner--linked .td-po-banner-help {
     margin: 2px 0 0;
     font-size: 13px;
-    color: var(--transfer-detail-teal-dark-2);
+    color: var(--emerald-700);
 }
 
 .td-po-banner--linked .td-po-banner-help a {
-    color: var(--transfer-detail-teal-dark-2);
+    color: var(--emerald-700);
     font-weight: 700;
     text-decoration: underline;
 }
@@ -815,7 +807,7 @@
     font-size: 13px;
     white-space: pre-wrap;
 }
-.td-specs-notes strong { display: block; margin-bottom: 4px; font-size: 11px; text-transform: uppercase; color: var(--transfer-detail-orange); letter-spacing: .03em; }
+.td-specs-notes strong { display: block; margin-bottom: 4px; font-size: 11px; text-transform: uppercase; color: var(--amber-900); letter-spacing: .03em; }
 
 /* ── Tracking Panel ──────────────────────────────────────────── */
 .td-tracking-row {
@@ -896,7 +888,7 @@
 
 .td-action-btn--danger {
     color: var(--bt-rush);
-    border-color: var(--transfer-detail-red-tint);
+    border-color: var(--red-200);
 }
 
 .td-action-btn--danger:hover {
@@ -1002,7 +994,7 @@
     color: var(--bt-theme);
     font-size: 12px;
 }
-.td-timeline-icon--status { background: var(--sky-100); color: var(--transfer-detail-blue); }
+.td-timeline-icon--status { background: var(--sky-100); color: var(--blue-800); }
 .td-timeline-icon--rush { background: var(--red-100); color: var(--bt-rush); }
 .td-timeline-icon--cancel { background: var(--gray-100); color: var(--gray-500); }
 .td-timeline-icon--comment { background: var(--color-ruth-tint); color: var(--transfer-detail-indigo-2); }

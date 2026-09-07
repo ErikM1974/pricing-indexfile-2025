@@ -4,10 +4,6 @@
    keeps its exact look. Map them to shared_components/css/tokens.css names when the page is redesigned;
    every rule below uses var(). Raw hex is allowed ONLY in this block. */
 /* stylelint-disable color-no-hex */
-:root {
-    --screenprint-fast-quote-green: #3a7c52;
-    --screenprint-fast-quote-green-2: #28a745;
-}
 /* stylelint-enable color-no-hex */
 
 * {
@@ -34,7 +30,7 @@ body {
 
 /* Header */
 .header {
-    background: linear-gradient(135deg, var(--screenprint-fast-quote-green) 0%, var(--print-green) 100%);
+    background: linear-gradient(135deg, var(--brand-mid) 0%, var(--print-green) 100%);
     color: white;
     padding: 30px;
     text-align: center;
@@ -77,7 +73,7 @@ body {
 }
 
 .progress-step.active:not(:last-child)::after {
-    background: var(--screenprint-fast-quote-green);
+    background: var(--brand-mid);
 }
 
 .progress-circle {
@@ -97,13 +93,13 @@ body {
 }
 
 .progress-step.active .progress-circle {
-    background: var(--screenprint-fast-quote-green);
+    background: var(--brand-mid);
     color: white;
     transform: scale(1.1);
 }
 
 .progress-step.completed .progress-circle {
-    background: var(--screenprint-fast-quote-green-2);
+    background: var(--bs-success);
     color: white;
 }
 
@@ -115,7 +111,7 @@ body {
 }
 
 .progress-step.active .progress-label {
-    color: var(--screenprint-fast-quote-green);
+    color: var(--brand-mid);
     font-weight: 600;
 }
 
@@ -176,7 +172,7 @@ body {
 .form-input:focus,
 .form-select:focus {
     outline: none;
-    border-color: var(--screenprint-fast-quote-green);
+    border-color: var(--brand-mid);
     box-shadow: 0 0 0 3px rgb(58 124 82 / 10%);
 }
 
@@ -209,13 +205,13 @@ body {
 }
 
 .option-card:hover {
-    border-color: var(--screenprint-fast-quote-green);
+    border-color: var(--brand-mid);
     background: var(--brand-50);
     transform: translateY(-2px);
 }
 
 .option-card.selected {
-    border-color: var(--screenprint-fast-quote-green);
+    border-color: var(--brand-mid);
     background: linear-gradient(135deg, var(--brand-100) 0%, var(--gray-100) 100%);
     box-shadow: 0 4px 12px rgb(58 124 82 / 20%);
 }
@@ -223,7 +219,7 @@ body {
 .option-card-icon {
     font-size: 32px;
     margin-bottom: 10px;
-    color: var(--screenprint-fast-quote-green);
+    color: var(--brand-mid);
 }
 
 .option-card-label {
@@ -257,7 +253,7 @@ body {
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, var(--screenprint-fast-quote-green) 0%, var(--print-green) 100%);
+    background: linear-gradient(135deg, var(--brand-mid) 0%, var(--print-green) 100%);
     color: white;
 }
 
@@ -286,7 +282,7 @@ body {
 .success-icon {
     text-align: center;
     font-size: 64px;
-    color: var(--screenprint-fast-quote-green-2);
+    color: var(--bs-success);
     margin-bottom: 20px;
 }
 
@@ -308,7 +304,7 @@ body {
 
 .quote-id-display {
     background: var(--slate-50);
-    border: 2px solid var(--screenprint-fast-quote-green);
+    border: 2px solid var(--brand-mid);
     border-radius: 12px;
     padding: 20px;
     margin: 30px 0;
@@ -324,13 +320,13 @@ body {
 .quote-id-value {
     font-size: 32px;
     font-weight: 700;
-    color: var(--screenprint-fast-quote-green);
+    color: var(--brand-mid);
 }
 
 /* Estimate Display */
 .estimate-box {
     background: linear-gradient(135deg, var(--brand-100) 0%, var(--gray-100) 100%);
-    border: 2px solid var(--screenprint-fast-quote-green);
+    border: 2px solid var(--brand-mid);
     border-radius: 12px;
     padding: 25px;
     margin: 30px 0;
@@ -348,7 +344,7 @@ body {
 .estimate-range {
     font-size: 36px;
     font-weight: 700;
-    color: var(--screenprint-fast-quote-green);
+    color: var(--brand-mid);
     margin-bottom: 10px;
 }
 

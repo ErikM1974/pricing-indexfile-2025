@@ -4,19 +4,16 @@
 /* stylelint-disable color-no-hex */
 :root {
     --pricing-negotiation-policy-green: #4a7c59;
-    --pricing-negotiation-policy-red: #dc3545;
-    --pricing-negotiation-policy-green-2: #28a745;
     --pricing-negotiation-policy-teal: #17a2b8;
-    --pricing-negotiation-policy-yellow: #ffc107;
     --pricing-negotiation-policy-red-2: #ff6b6b;
     --pricing-negotiation-policy-red-3: #ff5252;
     --nwca-green: var(--print-green);
     --nwca-dark-green: var(--store-green-900);
     --nwca-light-green: var(--pricing-negotiation-policy-green);
-    --warning-red: var(--pricing-negotiation-policy-red);
-    --success-green: var(--pricing-negotiation-policy-green-2);
+    --warning-red: var(--bs-danger);
+    --success-green: var(--bs-success);
     --info-blue: var(--pricing-negotiation-policy-teal);
-    --warning-yellow: var(--pricing-negotiation-policy-yellow);
+    --warning-yellow: var(--bs-warning);
 }
 /* stylelint-enable color-no-hex */
 

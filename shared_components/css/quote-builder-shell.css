@@ -34,7 +34,6 @@
     --quote-builder-shell-green-2: #a8c39e;
     --quote-builder-shell-orange: #8b6f4e;
     --quote-builder-shell-orange-dark: #3a2e1f;
-    --quote-builder-shell-green-3: #22c55e;
 
     /* --- Forest greens (primary brand) --- */
     --pnw-forest-deep: #1f4922;  /* Deepest forest — borders, strong accents */
@@ -652,7 +651,7 @@ body.qb-shell-body {
 .inv-badge--good {
     background: var(--pnw-mist, var(--store-green-100));
     color: var(--pnw-forest-deep, var(--print-green));
-    border-color: var(--pnw-forest, var(--quote-builder-shell-green-3));
+    border-color: var(--pnw-forest, var(--green-500));
 }
 
 .inv-badge--low {

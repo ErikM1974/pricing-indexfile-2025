@@ -47,27 +47,15 @@
 :root {
     --embroidery-pricing-all-gray-dark: #333;
     --embroidery-pricing-all-blue: #6366f1;
-    --embroidery-pricing-all-teal: #10b981;
     --embroidery-pricing-all-gray: #666;
     --embroidery-pricing-all-yellow: #fde047;
     --embroidery-pricing-all-yellow-2: #fef08a;
-    --embroidery-pricing-all-indigo: #7c3aed;
     --embroidery-pricing-all-green: #86d98e;
-    --embroidery-pricing-all-green-2: #16a34a;
-    --embroidery-pricing-all-yellow-3: #fcd34d;
-    --embroidery-pricing-all-cyan-tint: #bfdbfe;
-    --embroidery-pricing-all-blue-2: #1e40af;
     --embroidery-pricing-all-blue-3: #1e3a8a;
-    --embroidery-pricing-all-green-3: #86efac;
-    --embroidery-pricing-all-red-tint: #fecaca;
     --embroidery-pricing-all-magenta: #db2777;
-    --embroidery-pricing-all-yellow-4: #fde68a;
-    --embroidery-pricing-all-yellow-5: #fbbf24;
     --embroidery-pricing-all-red: #f87171;
-    --embroidery-pricing-all-red-2: #fca5a5;
     --embroidery-pricing-all-indigo-tint: #c4b5fd;
     --embroidery-pricing-all-yellow-6: #ca8a04;
-    --embroidery-pricing-all-orange: #78350f;
 
     /* ---- 2026 system (mirrors art-hub.css :root) ---- */
 
@@ -102,7 +90,7 @@
     --state-success: var(--emerald-600); --state-success-bg: var(--brand-50);
     --state-warning: var(--amber-600); --state-warning-bg: var(--store-paper);
     --state-danger:  var(--red-600); --state-danger-bg:  var(--red-50);
-    --state-violet:  var(--embroidery-pricing-all-indigo); --state-violet-bg:  var(--color-ruth-tint);
+    --state-violet:  var(--violet-600); --state-violet-bg:  var(--color-ruth-tint);
 
     /* Motion */
     --ease-out: cubic-bezier(.2,.8,.2,1);
@@ -120,25 +108,25 @@
     --brand-tint-2: var(--store-green-100);   /* deeper fill (part badges)             */
     --brand-border: var(--embroidery-pricing-all-green);
     --brand-glow:   0 0 0 4px color-mix(in srgb, var(--brand) 16%, transparent);
-    --success:      var(--embroidery-pricing-all-green-2);   /* positive-price emphasis               */
+    --success:      var(--green-600);   /* positive-price emphasis               */
 
     /* LTM amber (distinct yellow semantic, softer than --state-warning) */
     --ltm-bg:     var(--amber-100);
     --ltm-border: var(--embroidery-pricing-all-yellow);
     --ltm-text:   var(--amber-800);
     --warn-amber-bg:     var(--amber-100);
-    --warn-amber-border: var(--embroidery-pricing-all-yellow-3);
+    --warn-amber-border: var(--amber-300);
 
     /* Info blue (helper + cross-reference callouts) */
     --info-blue:        var(--blue-600);
     --info-blue-bg:     var(--color-floor-tint);
-    --info-blue-border: var(--embroidery-pricing-all-cyan-tint);
-    --info-blue-text:   var(--embroidery-pricing-all-blue-2);
+    --info-blue-border: var(--blue-200);
+    --info-blue-text:   var(--blue-800);
     --info-blue-strong: var(--embroidery-pricing-all-blue-3);
 
     /* Best/positive tints (pricing-matrix highlights) */
     --best-bg:     var(--store-green-100);
-    --best-border: var(--embroidery-pricing-all-green-3);
+    --best-border: var(--green-300);
 
     /* Typography */
     --font-sans:    'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -157,7 +145,7 @@
     --text-muted:     var(--gray-400);
     --warning-text:   var(--ltm-text);
     --error-bg:       var(--state-danger-bg);
-    --error-border:   var(--embroidery-pricing-all-red-tint);
+    --error-border:   var(--red-200);
     --error-text:     var(--state-danger);
     --info-bg:        var(--brand-tint);
     --info-border:    var(--brand-border);
@@ -1109,7 +1097,7 @@ body {
 .es-fb-ltm {
     margin-top: var(--space-3);
     padding: 10px var(--space-4);
-    background: var(--state-warning-bg); border: 1px solid var(--embroidery-pricing-all-yellow-4);
+    background: var(--state-warning-bg); border: 1px solid var(--amber-200);
     border-radius: var(--radius-md);
     font-size: 0.8125rem; color: var(--gray-500);
 }
@@ -1276,7 +1264,7 @@ body {
 .sc-modal-stats { display: flex; gap: var(--space-5); margin-left: auto; }
 .sc-stat { text-align: right; }
 .sc-stat-num { font-family: var(--font-mono); font-size: 1.375rem; font-weight: 500; line-height: 1; color: var(--color-on-brand); }
-.sc-stat-mid { color: var(--embroidery-pricing-all-yellow-5); }
+.sc-stat-mid { color: var(--amber-400); }
 .sc-stat-large { color: var(--embroidery-pricing-all-red); }
 .sc-stat-label { margin-top: 2px; font-size: 0.625rem; text-transform: uppercase; letter-spacing: 0.8px; color: var(--gray-400); }
 
@@ -1330,7 +1318,7 @@ body {
 .sc-filter-btn[data-filter="Large"].active  { background: var(--state-danger);  border-color: var(--state-danger); }
 .sc-filter-btn[data-filter="Both"].active   { background: var(--state-violet);  border-color: var(--state-violet); }
 .sc-filter-btn[data-rep="Nika Lao"].active       { background: var(--embroidery-pricing-all-blue); border-color: var(--embroidery-pricing-all-blue); }
-.sc-filter-btn[data-rep="Taneisha Clark"].active { background: var(--embroidery-pricing-all-teal); border-color: var(--embroidery-pricing-all-teal); }
+.sc-filter-btn[data-rep="Taneisha Clark"].active { background: var(--emerald-500); border-color: var(--emerald-500); }
 .sc-filter-btn[data-rep="unassigned"].active     { background: var(--gray-500); border-color: var(--gray-500); }
 .sc-results-count { margin-left: auto; font-family: var(--font-mono); font-size: 0.75rem; color: var(--gray-500); white-space: nowrap; }
 
@@ -1369,7 +1357,7 @@ body {
     font-family: var(--font-mono); font-size: 0.6875rem; font-weight: 600;
 }
 .sc-tier-mid   { background: var(--state-warning-bg); color: var(--state-warning); border: 1px solid var(--warn-amber-border); }
-.sc-tier-large { background: var(--red-50); color: var(--state-danger); border: 1px solid var(--embroidery-pricing-all-red-2); }
+.sc-tier-large { background: var(--red-50); color: var(--state-danger); border: 1px solid var(--red-300); }
 .sc-tier-both  { background: var(--state-violet-bg); color: var(--state-violet); border: 1px solid var(--embroidery-pricing-all-indigo-tint); }
 
 /* Rep chips */
@@ -1381,8 +1369,8 @@ body {
 .sc-rep-dot { width: 7px; height: 7px; flex-shrink: 0; border-radius: 50%; }
 .sc-rep-nika { background: var(--color-floor-tint); color: var(--embroidery-pricing-all-blue); }
 .sc-rep-nika .sc-rep-dot { background: var(--embroidery-pricing-all-blue); }
-.sc-rep-taneisha { background: var(--brand-50); color: var(--embroidery-pricing-all-teal); }
-.sc-rep-taneisha .sc-rep-dot { background: var(--embroidery-pricing-all-teal); }
+.sc-rep-taneisha { background: var(--brand-50); color: var(--emerald-500); }
+.sc-rep-taneisha .sc-rep-dot { background: var(--emerald-500); }
 .sc-rep-house { color: var(--gray-500); }
 .sc-rep-house .sc-rep-dot { background: var(--gray-500); }
 
@@ -1498,7 +1486,7 @@ body {
         font-size: 9px; color: var(--amber-800); background: var(--amber-100);
         padding: 4px 8px; border-radius: 4px; margin: 6px 0; border-left: 3px solid var(--embroidery-pricing-all-yellow);
     }
-    .print-ltm-note strong { color: var(--embroidery-pricing-all-orange); }
+    .print-ltm-note strong { color: var(--amber-900); }
 
     .print-laser-section { margin-top: 8px; padding-top: 6px; border-top: 1px dashed var(--gray-300); }
     .print-laser-section h3 { font-size: 12px; font-weight: 600; color: var(--embroidery-pricing-all-gray-dark); margin: 0 0 4px; }

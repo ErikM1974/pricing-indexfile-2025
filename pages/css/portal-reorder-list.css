@@ -9,7 +9,6 @@
    every rule below uses var(). Raw hex is allowed ONLY in this block. */
 /* stylelint-disable color-no-hex */
 :root {
-    --portal-reorder-list-green-dark: #1b5e20;
     --portal-reorder-list-gray: #888;
     --portal-reorder-list-gray-2: #5c6b5e;
     --portal-reorder-list-orange: #8a5a00;
@@ -27,7 +26,7 @@
 .rl-fab:hover { filter: brightness(1.05); }
 
 .rl-fab-badge {
-    background: var(--color-surface); color: var(--cp-theme-dark, var(--portal-reorder-list-green-dark)); border-radius: 999px;
+    background: var(--color-surface); color: var(--cp-theme-dark, var(--material-green-900)); border-radius: 999px;
     padding: 1px 8px; font-size: 12px; font-weight: 800;
 }
 
@@ -67,7 +66,7 @@
     padding: 12px; font-size: 15px; font-weight: 700; font-family: inherit; cursor: pointer; margin-top: 8px;
 }
 .rl-send:disabled { opacity: .6; cursor: default; }
-.rl-cont { background: none; border: none; color: var(--cp-theme-dark, var(--portal-reorder-list-green-dark)); font-size: 13px; font-family: inherit; cursor: pointer; margin-top: 8px; padding: 8px; }
+.rl-cont { background: none; border: none; color: var(--cp-theme-dark, var(--material-green-900)); font-size: 13px; font-family: inherit; cursor: pointer; margin-top: 8px; padding: 8px; }
 
 .rl-flash {
     position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%) translateY(20px);

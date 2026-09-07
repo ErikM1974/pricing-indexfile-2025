@@ -11,10 +11,8 @@
    every rule below uses var(). Raw hex is allowed ONLY in this block. */
 /* stylelint-disable color-no-hex */
 :root {
-    --universal-calculator-theme-green: #3a7c52;
     --universal-calculator-theme-gray-dark: #333;
     --universal-calculator-theme-gray: #666;
-    --universal-calculator-theme-red: #dc3545;
 }
 /* stylelint-enable color-no-hex */
 
@@ -51,7 +49,7 @@
     flex-shrink: 0;
     width: 32px;
     height: 32px;
-    background: var(--universal-calculator-theme-green);
+    background: var(--brand-mid);
     color: white;
     border-radius: 50%;
     display: flex;
@@ -93,7 +91,7 @@
 .universal-theme .sp-input:focus,
 .universal-theme .sp-select:focus {
     outline: none !important;
-    border-color: var(--universal-calculator-theme-green) !important;
+    border-color: var(--brand-mid) !important;
     box-shadow: 0 0 0 3px rgb(58 124 82 / 10%) !important;
 }
 
@@ -103,7 +101,7 @@
 .universal-theme .sp-btn,
 .universal-theme .dtf-btn,
 .universal-theme .action-btn {
-    background: var(--universal-calculator-theme-green) !important;
+    background: var(--brand-mid) !important;
     color: white !important;
     border: none !important;
     border-radius: 4px !important;
@@ -127,7 +125,7 @@
 .universal-theme .btn-secondary,
 .universal-theme .sp-btn-remove,
 .universal-theme .remove-btn {
-    background: var(--universal-calculator-theme-red) !important;
+    background: var(--bs-danger) !important;
 }
 
 .universal-theme .btn-secondary:hover,
@@ -155,20 +153,20 @@
 }
 
 .universal-quantity-btn:hover {
-    border-color: var(--universal-calculator-theme-green);
+    border-color: var(--brand-mid);
     background: var(--brand-100);
 }
 
 .universal-quantity-btn.active {
-    background: var(--universal-calculator-theme-green);
+    background: var(--brand-mid);
     color: white;
-    border-color: var(--universal-calculator-theme-green);
+    border-color: var(--brand-mid);
 }
 
 /* Pricing Display Box - Matching mockup */
 .universal-price-display {
     background: white;
-    border: 2px solid var(--universal-calculator-theme-green);
+    border: 2px solid var(--brand-mid);
     border-radius: 8px;
     padding: 25px;
     text-align: center;
@@ -187,13 +185,13 @@
 .universal-price-currency {
     font-size: 28px;
     font-weight: 600;
-    color: var(--universal-calculator-theme-green);
+    color: var(--brand-mid);
 }
 
 .universal-price-value {
     font-size: 42px;
     font-weight: bold;
-    color: var(--universal-calculator-theme-green);
+    color: var(--brand-mid);
     line-height: 1;
 }
 
@@ -249,7 +247,7 @@
 }
 
 .universal-summary-total {
-    border-top: 2px solid var(--universal-calculator-theme-green);
+    border-top: 2px solid var(--brand-mid);
     padding-top: 15px;
     margin-top: 15px;
 }
@@ -259,7 +257,7 @@
 }
 
 .universal-summary-total .universal-summary-value {
-    color: var(--universal-calculator-theme-green);
+    color: var(--brand-mid);
 }
 
 /* Action Buttons */
@@ -286,9 +284,9 @@
 }
 
 .universal-action-primary {
-    background: var(--universal-calculator-theme-green);
+    background: var(--brand-mid);
     color: white;
-    border: 2px solid var(--universal-calculator-theme-green);
+    border: 2px solid var(--brand-mid);
 }
 
 .universal-action-primary:hover {
@@ -300,8 +298,8 @@
 
 .universal-action-secondary {
     background: white;
-    color: var(--universal-calculator-theme-green);
-    border: 2px solid var(--universal-calculator-theme-green);
+    color: var(--brand-mid);
+    border: 2px solid var(--brand-mid);
 }
 
 .universal-action-secondary:hover {
@@ -324,7 +322,7 @@
     width: 20px;
     height: 20px;
     border: 3px solid var(--gray-100);
-    border-top: 3px solid var(--universal-calculator-theme-green);
+    border-top: 3px solid var(--brand-mid);
     border-radius: 50%;
     animation: universal-spin 1s linear infinite;
 }

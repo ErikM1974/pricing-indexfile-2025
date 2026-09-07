@@ -8,9 +8,6 @@
    keeps its exact look. Map them to shared_components/css/tokens.css names when the page is redesigned;
    every rule below uses var(). Raw hex is allowed ONLY in this block. */
 /* stylelint-disable color-no-hex */
-:root {
-    --sanmar-shopworks-converter-green: #16a34a;
-}
 /* stylelint-enable color-no-hex */
 
 .sw-subhead { font-weight: 400; font-size: 0.68em; opacity: 0.85; }
@@ -33,7 +30,7 @@
 .sw-btn[disabled] { opacity: 0.5; pointer-events: none; }
 .sw-btn--ghost { background: var(--surface-inset); color: var(--gray-700); border-color: var(--gray-300); }
 .sw-btn--ghost:hover { background: var(--surface-card); filter: none; }
-.sw-btn--go { background: var(--state-success, var(--sanmar-shopworks-converter-green)); }
+.sw-btn--go { background: var(--state-success, var(--green-600)); }
 
 /* ---------- file picker row ---------- */
 .sw-drop {

@@ -10,19 +10,12 @@
    raw hex is allowed ONLY in this block. */
 /* stylelint-disable color-no-hex */
 :root {
-    --bradley-transfers-blue: #1e40af;
-    --bradley-transfers-indigo: #7c3aed;
     --bradley-transfers-cyan: #0891b2;
-    --bradley-transfers-yellow: #fcd34d;
     --bradley-transfers-cyan-2: #93c5fd;
     --bradley-transfers-indigo-2: #5b21b6;
     --bradley-transfers-teal-tint: #cffafe;
     --bradley-transfers-cyan-3: #0e7490;
-    --bradley-transfers-green-tint: #d1fae5;
-    --bradley-transfers-teal-dark: #065f46;
     --bradley-transfers-blue-tint: #c7d6ec;
-    --bradley-transfers-red: #fca5a5;
-    --bradley-transfers-red-tint: #fecaca;
     --bt-theme: var(--color-bradley);
     --bt-theme-dark: var(--color-bradley-dark);
     --bt-theme-light: var(--color-floor-tint);
@@ -43,7 +36,7 @@
     --art-theme-rgba-15: rgb(74 111 165 / 15%);
     --bt-status-requested: var(--amber-600);     /* amber — awaiting Bradley */
     --bt-status-ordered: var(--blue-600);       /* blue — sent to Supacolor */
-    --bt-status-po: var(--bradley-transfers-indigo);            /* purple — PO created */
+    --bt-status-po: var(--violet-600);            /* purple — PO created */
     --bt-status-shipped: var(--bradley-transfers-cyan);       /* teal — in transit */
     --bt-status-received: var(--emerald-600);      /* green — complete */
     --bt-status-cancelled: var(--gray-400);     /* gray */
@@ -402,7 +395,7 @@
     font-weight: 500;
     color: var(--amber-800);
     background: var(--amber-100);
-    border: 1px solid var(--bradley-transfers-yellow);
+    border: 1px solid var(--amber-300);
     padding: 2px 8px;
     border-radius: 10px;
     font-family: inherit;
@@ -523,7 +516,7 @@ button.bt-card-po--empty:focus {
 
 .bt-pill--files {
     background: var(--color-floor-tint);
-    color: var(--bradley-transfers-blue);
+    color: var(--blue-800);
     border-color: var(--bradley-transfers-cyan-2);
 }
 
@@ -540,10 +533,10 @@ button.bt-card-po--empty:focus {
     letter-spacing: .03em;
 }
 .bt-badge--requested { background: var(--amber-100); color: var(--amber-800); }
-.bt-badge--ordered { background: var(--sky-100); color: var(--bradley-transfers-blue); }
+.bt-badge--ordered { background: var(--sky-100); color: var(--blue-800); }
 .bt-badge--po { background: var(--color-ruth-tint); color: var(--bradley-transfers-indigo-2); }
 .bt-badge--shipped { background: var(--bradley-transfers-teal-tint); color: var(--bradley-transfers-cyan-3); }
-.bt-badge--received { background: var(--bradley-transfers-green-tint); color: var(--bradley-transfers-teal-dark); }
+.bt-badge--received { background: var(--emerald-100); color: var(--emerald-800); }
 .bt-badge--cancelled { background: var(--gray-100); color: var(--gray-500); }
 .bt-badge--hold { background: var(--amber-100); color: var(--amber-800); }
 
@@ -721,7 +714,7 @@ button.bt-card-po--empty:focus {
 .bt-card-sc-link--stale {
     background: var(--red-50);
     color: var(--red-700);
-    border-color: var(--bradley-transfers-red);
+    border-color: var(--red-300);
 }
 
 .bt-card-sc-link--stale:hover {
@@ -932,7 +925,7 @@ button.bt-card-po--empty:focus {
 .bt-checkline { font-weight: normal; display: flex; align-items: flex-start; gap: 8px; cursor: pointer; }
 .bt-checkline input { margin-top: 3px; }
 .bt-toast.is-leaving { opacity: 0; transition: opacity .3s; }
-.bt-error { grid-column: 1 / -1; text-align: center; padding: 40px 20px; color: var(--red-800); background: var(--red-100); border: 1px solid var(--bradley-transfers-red-tint); border-radius: 8px; }
+.bt-error { grid-column: 1 / -1; text-align: center; padding: 40px 20px; color: var(--red-800); background: var(--red-100); border: 1px solid var(--red-200); border-radius: 8px; }
 .bt-error .bt-btn { margin-top: 12px; }
 
 @media (width <= 600px) {

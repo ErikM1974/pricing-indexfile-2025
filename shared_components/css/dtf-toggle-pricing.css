@@ -11,13 +11,7 @@
    every rule below uses var(). Raw hex is allowed ONLY in this block. */
 /* stylelint-disable color-no-hex */
 :root {
-    --dtf-toggle-pricing-yellow: #fbbf24;
-    --dtf-toggle-pricing-green: #22c55e;
-    --dtf-toggle-pricing-green-2: #15803d;
-    --dtf-toggle-pricing-green-3: #3a7c52;
-    --dtf-toggle-pricing-green-4: #c8e6c9;
     --dtf-toggle-pricing-green-5: #4ade80;
-    --dtf-toggle-pricing-cyan-tint: #bfdbfe;
     --dtf-toggle-pricing-blue: #1e3a8a;
 }
 /* stylelint-enable color-no-hex */
@@ -107,7 +101,7 @@
 .dtf-size-category-header {
     font-size: 1rem;
     font-weight: 600;
-    color: var(--dtf-toggle-pricing-green-3);
+    color: var(--brand-mid);
     margin-bottom: 16px;
     padding-bottom: 8px;
     border-bottom: 1px solid var(--brand-100);
@@ -119,7 +113,7 @@
 .dtf-size-badge {
     display: inline-block;
     padding: 4px 12px;
-    background: linear-gradient(135deg, var(--brand-100) 0%, var(--dtf-toggle-pricing-green-4) 100%);
+    background: linear-gradient(135deg, var(--brand-100) 0%, var(--material-green-100) 100%);
     border-radius: 12px;
     font-size: 0.75rem;
     font-weight: 600;
@@ -262,7 +256,7 @@
     margin-top: 12px;
     padding: 16px;
     background: var(--amber-100);
-    border: 2px solid var(--dtf-toggle-pricing-yellow);
+    border: 2px solid var(--amber-400);
     border-radius: 10px;
 }
 
@@ -295,7 +289,7 @@
     width: 100%;
     padding: 10px 14px;
     font-size: 1rem;
-    border: 2px solid var(--dtf-toggle-pricing-yellow);
+    border: 2px solid var(--amber-400);
     border-radius: 8px;
     background: white;
     color: var(--gray-800);
@@ -317,7 +311,7 @@
 /* Info Box Below Tiers */
 .dtf-info-box {
     padding: 16px;
-    background: linear-gradient(135deg, var(--sky-100) 0%, var(--dtf-toggle-pricing-cyan-tint) 100%);
+    background: linear-gradient(135deg, var(--sky-100) 0%, var(--blue-200) 100%);
     border: 2px solid var(--color-floor-light);
     border-radius: 10px;
     font-size: 0.875rem;
@@ -376,7 +370,7 @@
     margin-top: 12px;
     padding: 12px;
     background: var(--amber-100);
-    border: 2px solid var(--dtf-toggle-pricing-yellow);
+    border: 2px solid var(--amber-400);
     border-radius: 8px;
     font-size: 0.85rem;
     color: var(--amber-800);
@@ -462,7 +456,7 @@
     left: 50%;
     transform: translateX(-50%);
     background: white;
-    border: 2px solid var(--dtf-toggle-pricing-green);
+    border: 2px solid var(--green-500);
     border-radius: 12px;
     box-shadow: 0 8px 24px rgb(34 197 94 / 25%);
     padding: 16px;
@@ -491,7 +485,7 @@
     left: 50%;
     transform: translateX(-50%);
     border: 10px solid transparent;
-    border-top-color: var(--dtf-toggle-pricing-green);
+    border-top-color: var(--green-500);
 }
 
 .dtf-upcharge-tooltip-content {
@@ -502,7 +496,7 @@
 .dtf-upcharge-tooltip-header {
     font-size: 16px;
     font-weight: 700;
-    color: var(--dtf-toggle-pricing-green-2);
+    color: var(--green-700);
     margin-bottom: 12px;
     padding-bottom: 10px;
     border-bottom: 2px solid var(--store-green-100);
@@ -531,12 +525,12 @@
 
 .dtf-upcharge-item-size {
     font-weight: 600;
-    color: var(--dtf-toggle-pricing-green-2);
+    color: var(--green-700);
 }
 
 .dtf-upcharge-item-price {
     font-weight: 600;
-    color: var(--dtf-toggle-pricing-green);
+    color: var(--green-500);
 }
 
 /* Mobile responsive */

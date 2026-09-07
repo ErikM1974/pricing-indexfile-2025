@@ -10,9 +10,6 @@
 /* stylelint-disable color-no-hex */
         :root {
     --purchasingform-blue: #7d9bc9;
-    --purchasingform-green-tint: #d1fae5;
-    --purchasingform-teal-dark: #065f46;
-    --purchasingform-green: #a7f3d0;
             --primary-color: var(--color-bradley); /* Purchasing family slate blue (2026-09-03) — matches Transfer Queue + Purchase Tracking */
             --primary-dark: var(--color-bradley-dark);
             --primary-light: var(--purchasingform-blue);
@@ -22,8 +19,8 @@
             --text-primary: var(--gray-800);
             --text-secondary: var(--gray-500);
             --hover-bg: var(--gray-100);
-            --success-bg: var(--purchasingform-green-tint);
-            --success-text: var(--purchasingform-teal-dark);
+            --success-bg: var(--emerald-100);
+            --success-text: var(--emerald-800);
             --warning-bg: var(--amber-100);
             --warning-text: var(--amber-800);
             --focus-shadow: 0 0 0 0.25rem rgb(58 124 82 / 25%);
@@ -202,7 +199,7 @@
 
         .info-card {
             background: linear-gradient(135deg, var(--success-bg), var(--color-floor-tint));
-            border: 1px solid var(--purchasingform-green);
+            border: 1px solid var(--emerald-200);
             border-radius: 0.5rem;
             padding: 1.5rem;
             text-align: center;

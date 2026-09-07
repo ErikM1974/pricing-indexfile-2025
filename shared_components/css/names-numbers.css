@@ -9,16 +9,9 @@
    raw hex is allowed ONLY in this block. */
 /* stylelint-disable color-no-hex */
 :root {
-    --names-numbers-blue: #1e40af;
-    --names-numbers-green-tint: #d1fae5;
-    --names-numbers-teal-dark: #065f46;
-    --names-numbers-teal-dark-2: #047857;
     --names-numbers-cyan: #93c5fd;
-    --names-numbers-yellow: #fcd34d;
-    --names-numbers-green: #86efac;
     --names-numbers-magenta: #f9a8d4;
     --names-numbers-red: #9d174d;
-    --names-numbers-red-2: #fca5a5;
     --nn-primary: var(--blue-600);
     --nn-primary-dark: var(--color-floor-dark);
     --nn-primary-light: var(--color-floor-light);
@@ -28,8 +21,8 @@
     --nn-text: var(--gray-800);
     --nn-text-secondary: var(--gray-500);
     --nn-hover-bg: var(--gray-100);
-    --nn-success-bg: var(--names-numbers-green-tint);
-    --nn-success-text: var(--names-numbers-teal-dark);
+    --nn-success-bg: var(--emerald-100);
+    --nn-success-text: var(--emerald-800);
     --nn-warning-bg: var(--amber-100);
     --nn-warning-text: var(--amber-800);
     --nn-error-bg: var(--red-100);
@@ -194,7 +187,7 @@ body {
     align-items: center;
     gap: 0.5rem;
 }
-.btn-success:hover { background: var(--names-numbers-teal-dark-2); }
+.btn-success:hover { background: var(--emerald-700); }
 
 .btn-danger {
     background: var(--red-600);
@@ -658,9 +651,9 @@ body {
 }
 
 /* Garment band colors — repeating 4-color palette for up to many garments */
-.garment-band-0 { --band-bg: var(--color-floor-tint); --band-border: var(--names-numbers-cyan); --band-text: var(--names-numbers-blue); }
-.garment-band-1 { --band-bg: var(--amber-100); --band-border: var(--names-numbers-yellow); --band-text: var(--amber-800); }
-.garment-band-2 { --band-bg: var(--store-green-100); --band-border: var(--names-numbers-green); --band-text: var(--print-green); }
+.garment-band-0 { --band-bg: var(--color-floor-tint); --band-border: var(--names-numbers-cyan); --band-text: var(--blue-800); }
+.garment-band-1 { --band-bg: var(--amber-100); --band-border: var(--amber-300); --band-text: var(--amber-800); }
+.garment-band-2 { --band-bg: var(--store-green-100); --band-border: var(--green-300); --band-text: var(--print-green); }
 .garment-band-3 { --band-bg: var(--red-50); --band-border: var(--names-numbers-magenta); --band-text: var(--names-numbers-red); }
 
 .roster-table thead th.col-garment-band {
@@ -952,7 +945,7 @@ body {
     padding: 0.85rem 1rem;
     margin-top: 1rem;
     background: var(--red-50);
-    border: 1px solid var(--names-numbers-red-2);
+    border: 1px solid var(--red-300);
     border-radius: 0.5rem;
     color: var(--red-800);
 }
@@ -1007,7 +1000,7 @@ body {
     letter-spacing: 0.03em;
 }
 .status-draft { background: var(--gray-200); color: var(--gray-600); }
-.status-submitted { background: var(--sky-100); color: var(--names-numbers-blue); }
+.status-submitted { background: var(--sky-100); color: var(--blue-800); }
 .status-in-production { background: var(--nn-warning-bg); color: var(--nn-warning-text); }
 .status-completed { background: var(--nn-success-bg); color: var(--nn-success-text); }
 

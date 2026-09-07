@@ -19,7 +19,6 @@
 :root {
     --past-due-orders-gray-dark: #000;
     --past-due-orders-gray-dark-2: #333;
-    --past-due-orders-green: #15803d;
     --past-due-orders-gray: #666;
     --past-due-orders-green-dark: #0a6b2a;
 }
@@ -168,7 +167,7 @@
 }
 
 .pdo-none i {
-    color: var(--state-success-fg, var(--past-due-orders-green));
+    color: var(--state-success-fg, var(--green-700));
     margin-right: 6px;
 }
 

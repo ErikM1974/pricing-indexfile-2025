@@ -6,10 +6,9 @@
 /* stylelint-disable color-no-hex */
 :root {
     --wcttr-bundle-orange: #f97316;
-    --wcttr-bundle-red: #ef4444;
     --primary-color: var(--gray-800);
     --secondary-color: var(--wcttr-bundle-orange);
-    --accent-color: var(--wcttr-bundle-red);
+    --accent-color: var(--red-500);
     --dark-text: var(--gray-700);
     --light-text: var(--gray-400);
 }

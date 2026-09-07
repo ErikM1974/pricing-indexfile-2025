@@ -12,17 +12,13 @@
    raw hex is allowed ONLY in this block. */
 /* stylelint-disable color-no-hex */
 :root {
-    --product-red: #dc3545;
     --product-green-dark: #1e4d0f;
     --product-gray-dark: #333;
     --product-gray: #666;
-    --product-green: #28a745;
-    --product-yellow: #ffc107;
     --product-teal: #17a2b8;
     --product-yellow-2: #d4a017;
     --product-cyan: #0078d4;
     --product-cyan-2: #106ebe;
-    --product-yellow-3: #856404;
 
     /* NW Custom Apparel Green Theme */
     --primary-color: var(--brand-700);
@@ -38,9 +34,9 @@
     --background-light: var(--gray-50);
     
     /* UI Colors */
-    --error-color: var(--product-red);
-    --success-color: var(--product-green);
-    --warning-color: var(--product-yellow);
+    --error-color: var(--bs-danger);
+    --success-color: var(--bs-success);
+    --warning-color: var(--bs-warning);
     --info-color: var(--product-teal);
     
     /* Shadows & Effects */
@@ -620,7 +616,7 @@ button {
 }
 
 .stock-indicator.out-of-stock {
-    color: var(--product-red);
+    color: var(--bs-danger);
 }
 
 .stock-details {
@@ -732,7 +728,7 @@ button {
 
 .stock-low {
     background: var(--amber-100);
-    color: var(--product-yellow-3);
+    color: var(--bs-warning-ink);
 }
 
 .stock-out {

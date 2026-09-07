@@ -9,8 +9,6 @@
    raw hex is allowed ONLY in this block. */
 /* stylelint-disable color-no-hex */
 :root {
-    --portal-directory-teal: #10b981;
-    --portal-directory-red: #ef4444;
     --pd-bg: var(--gray-800);
     --pd-bg-darker: var(--gray-900);
     --pd-card: var(--gray-800);
@@ -19,12 +17,12 @@
     --pd-text: var(--color-surface);
     --pd-text-secondary: var(--gray-400);
     --pd-text-muted: var(--slate-500);
-    --pd-accent: var(--portal-directory-teal);
+    --pd-accent: var(--emerald-500);
     --pd-accent-dark: var(--emerald-600);
     --pd-blue: var(--color-floor-light);
-    --pd-success: var(--portal-directory-teal);
+    --pd-success: var(--emerald-500);
     --pd-warning: var(--amber-500);
-    --pd-error: var(--portal-directory-red);
+    --pd-error: var(--red-500);
 }
 /* stylelint-enable color-no-hex */
 

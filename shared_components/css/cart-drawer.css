@@ -11,9 +11,6 @@
 :root {
     --cart-gray-dark: #333;
     --cart-gray: #666;
-    --cart-green: #28a745;
-    --cart-yellow: #ffc107;
-    --cart-red: #dc3545;
 }
 /* stylelint-enable color-no-hex */
 
@@ -154,12 +151,12 @@
 }
 
 .badge-free {
-    background: var(--cart-green);
+    background: var(--bs-success);
     color: white;
 }
 
 .badge-paid {
-    background: var(--cart-yellow);
+    background: var(--bs-warning);
     color: var(--cart-gray-dark);
 }
 
@@ -346,7 +343,7 @@
 .cart-item-remove {
     background: none;
     border: none;
-    color: var(--cart-red);
+    color: var(--bs-danger);
     cursor: pointer;
     padding: 8px;
     font-size: 16px;
@@ -417,7 +414,7 @@
     bottom: 24px;
     left: 50%;
     transform: translateX(-50%) translateY(100px);
-    background: var(--cart-green);
+    background: var(--bs-success);
     color: white;
     padding: 12px 24px;
     border-radius: 8px;

@@ -35,9 +35,7 @@
    raw hex is allowed ONLY in this block. */
 /* stylelint-disable color-no-hex */
 :root {
-    --dtg-quote-page-orange: #78350f;
     --dtg-quote-page-yellow: #ffe8a0;
-    --dtg-quote-page-teal-dark: #065f46;
     --dtg-quote-page-green: #6b8e60;
     --dtg-quote-page-green-2: #a8c39e;
     --dtg-quote-page-orange-2: #8b6f4e;
@@ -48,12 +46,9 @@
     --dtg-quote-page-yellow-dark: #6b4a05;
     --dtg-quote-page-cyan: #38bdf8;
     --dtg-quote-page-cyan-2: #0284c7;
-    --dtg-quote-page-blue: #1e40af;
     --dtg-quote-page-yellow-3: #4b4538;
-    --dtg-quote-page-green-tint: #d1fae5;
     --dtg-quote-page-green-4: #34d399;
     --dtg-quote-page-teal-dark-2: #064e3b;
-    --dtg-quote-page-green-5: #16a34a;
 
     /* --- Forest greens (replaces hardcoded #2e5827 across all DTG CSS) --- */
     --pnw-forest-deep: var(--store-green-900);  /* Deepest forest — borders, strong accents */
@@ -209,7 +204,7 @@ body {
 
 .dtg-quote-card .dtg-tier-pill.ltm {
     background: var(--amber-100);
-    color: var(--dtg-quote-page-orange);
+    color: var(--amber-900);
 }
 
 .dtg-quote-card .dtg-sizes {
@@ -465,7 +460,7 @@ body {
     border-left: 3px solid var(--amber-600);
     border-radius: 3px;
     font-size: 11px;
-    color: var(--dtg-quote-page-orange);
+    color: var(--amber-900);
 }
 
 /* -- Product details (catalog colors + sizes) -------------------------- */
@@ -698,7 +693,7 @@ body {
     margin-bottom: 8px;
     font-size: 11px;
     font-weight: 700;
-    color: var(--dtg-quote-page-orange);
+    color: var(--amber-900);
     text-transform: uppercase;
     letter-spacing: 0.04em;
 }
@@ -766,7 +761,7 @@ body {
 .product-details-card .pd-top-pick-name {
     font-size: 10px;
     line-height: 1.2;
-    color: var(--dtg-quote-page-orange);
+    color: var(--amber-900);
     font-weight: 600;
     /* stylelint-disable-next-line declaration-property-value-keyword-no-deprecated -- overflow-wrap: anywhere is not a byte-identical swap; legacy */
     word-break: break-word;
@@ -854,7 +849,7 @@ body {
     letter-spacing: 0.04em;
     line-height: 1;
 }
-.product-details-card .pd-sm-cell.has-upcharge .pd-sm-label { color: var(--dtg-quote-page-orange); }
+.product-details-card .pd-sm-cell.has-upcharge .pd-sm-label { color: var(--amber-900); }
 
 .product-details-card .pd-sm-up {
     font-size: 9px;
@@ -999,7 +994,7 @@ body {
     border-left: 3px solid var(--amber-600);
     border-radius: 4px;
     font-size: 11px;
-    color: var(--dtg-quote-page-orange);
+    color: var(--amber-900);
     line-height: 1.4;
 }
 
@@ -1078,7 +1073,7 @@ body {
 .web-search-results .wsr-result:first-of-type { border-top: none; }
 
 .web-search-results .wsr-result a {
-    color: var(--dtg-quote-page-blue);
+    color: var(--blue-800);
     text-decoration: none;
     font-weight: 600;
     font-size: 12px;
@@ -1120,8 +1115,8 @@ body {
 .shopworks-success-card {
     margin-top: 12px;
     padding: 14px 16px;
-    background: linear-gradient(135deg, var(--brand-50) 0%, var(--dtg-quote-page-green-tint) 100%);
-    color: var(--dtg-quote-page-teal-dark);
+    background: linear-gradient(135deg, var(--brand-50) 0%, var(--emerald-100) 100%);
+    color: var(--emerald-800);
     border: 1px solid var(--dtg-quote-page-green-4);
     border-radius: 10px;
     font-size: 13px;
@@ -1133,7 +1128,7 @@ body {
     font-size: 11px;
     text-transform: uppercase;
     letter-spacing: 0.04em;
-    color: var(--dtg-quote-page-teal-dark);
+    color: var(--emerald-800);
     margin-bottom: 4px;
 }
 
@@ -1390,7 +1385,7 @@ body > .header::after,
 .toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 10000; pointer-events: none; }
 .toast { min-width: 250px; max-width: 350px; padding: 15px 20px; border-radius: 8px; color: var(--color-on-brand); font-weight: 500; box-shadow: 0 4px 12px rgb(0 0 0 / 15%); transform: translateX(400px); transition: transform .3s ease, opacity .3s ease; margin-top: 10px; display: flex; align-items: center; gap: 10px; pointer-events: all; background: var(--gray-800); }
 .toast.show { transform: translateX(0); }
-.toast-success { background: var(--dtg-quote-page-green-5); } .toast-error { background: var(--red-600); } .toast-warning { background: var(--amber-600); } .toast-info { background: var(--blue-600); }
+.toast-success { background: var(--green-600); } .toast-error { background: var(--red-600); } .toast-warning { background: var(--amber-600); } .toast-info { background: var(--blue-600); }
 
 /* ============================================================
    PHONE LAYOUT (≤640px) — mirrors quote-builder-shell.css (Rule 8), 2026-09-05

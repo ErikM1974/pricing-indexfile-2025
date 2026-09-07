@@ -8,9 +8,7 @@
     --universal-quick-quote-cyan: #06c;
     --universal-quick-quote-cyan-2: #0052a3;
     --universal-quick-quote-yellow: #ffeaa7;
-    --universal-quick-quote-yellow-2: #856404;
     --universal-quick-quote-red-tint: #f5c6cb;
-    --universal-quick-quote-red: #dc3545;
 }
 /* stylelint-enable color-no-hex */
 
@@ -202,7 +200,7 @@
     border-radius: 4px;
     margin-top: 15px;
     font-size: 14px;
-    color: var(--universal-quick-quote-yellow-2);
+    color: var(--bs-warning-ink);
 }
 
 .savings-tip-icon {
@@ -339,7 +337,7 @@
 }
 
 .remove-logo-btn {
-    background: var(--universal-quick-quote-red);
+    background: var(--bs-danger);
     color: white;
     border: none;
     border-radius: 4px;

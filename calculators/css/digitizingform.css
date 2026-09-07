@@ -7,11 +7,7 @@
    raw hex is allowed ONLY in this block. */
 /* stylelint-disable color-no-hex */
 :root {
-    --digitizingform-green: #3a7c52;
-    --digitizingform-green-tint: #d1fae5;
-    --digitizingform-teal-dark: #065f46;
-    --digitizingform-green-2: #a7f3d0;
-    --primary-color: var(--digitizingform-green); /* Standardized NWCA Green */
+    --primary-color: var(--brand-mid); /* Standardized NWCA Green */
     --primary-dark: var(--print-green);
     --primary-light: var(--brand-500);
     --bg-color: var(--color-bradley-tint);
@@ -20,8 +16,8 @@
     --text-primary: var(--gray-800);
     --text-secondary: var(--gray-500);
     --hover-bg: var(--gray-100);
-    --success-bg: var(--digitizingform-green-tint);
-    --success-text: var(--digitizingform-teal-dark);
+    --success-bg: var(--emerald-100);
+    --success-text: var(--emerald-800);
     --warning-bg: var(--amber-100);
     --warning-text: var(--amber-800);
     --focus-shadow: 0 0 0 0.25rem rgb(58 124 82 / 25%);
@@ -235,7 +231,7 @@ body {
 
 .info-card {
     background: linear-gradient(135deg, var(--success-bg), var(--color-floor-tint));
-    border: 1px solid var(--digitizingform-green-2);
+    border: 1px solid var(--emerald-200);
     border-radius: 0.5rem;
     padding: 1.5rem;
     text-align: center;

@@ -10,11 +10,10 @@
 /* stylelint-disable color-no-hex */
 :root {
     --universal-pricing-layout-gray-dark: #333;
-    --universal-pricing-layout-green: #3a7c52;
     --universal-pricing-layout-green-2: #4a9c62;
 
     /* Universal brand colors */
-    --nwca-primary: var(--universal-pricing-layout-green);
+    --nwca-primary: var(--brand-mid);
     --nwca-primary-dark: var(--print-green);
     --nwca-primary-light: var(--universal-pricing-layout-green-2);
     --nwca-primary-lighter: var(--brand-100);

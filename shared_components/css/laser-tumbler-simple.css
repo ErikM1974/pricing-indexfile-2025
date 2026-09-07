@@ -10,8 +10,6 @@
 :root {
     --laser-tumbler-simple-gray: #666;
     --laser-tumbler-simple-gray-dark: #333;
-    --laser-tumbler-simple-yellow: #856404;
-    --laser-tumbler-simple-yellow-2: #ffc107;
     --laser-tumbler-simple-cyan: #06c;
     --laser-tumbler-simple-yellow-3: #f0d9a8;
     --laser-tumbler-simple-green: #c4d4ca;
@@ -257,7 +255,7 @@ body {
 
 .inventory-badge.low-stock {
     background: var(--amber-100);
-    color: var(--laser-tumbler-simple-yellow);
+    color: var(--bs-warning-ink);
 }
 
 .inventory-badge.out-of-stock {
@@ -484,7 +482,7 @@ body {
 /* ===== Pricing Warning Row ===== */
 .pricing-warning-row {
     background: var(--amber-100);
-    border-left: 4px solid var(--laser-tumbler-simple-yellow-2);
+    border-left: 4px solid var(--bs-warning);
 }
 
 .pricing-warning-row:hover {
@@ -493,7 +491,7 @@ body {
 }
 
 .pricing-warning {
-    color: var(--laser-tumbler-simple-yellow);
+    color: var(--bs-warning-ink);
     font-weight: 500;
     /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
     padding: 12px 15px !important;
@@ -503,7 +501,7 @@ body {
 
 .pricing-warning i {
     margin-right: 8px;
-    color: var(--laser-tumbler-simple-yellow-2);
+    color: var(--bs-warning);
     font-size: 16px;
 }
 
@@ -574,13 +572,13 @@ body {
     margin-top: 25px;
     padding: 20px;
     background: var(--amber-100);
-    border-left: 4px solid var(--laser-tumbler-simple-yellow-2);
+    border-left: 4px solid var(--bs-warning);
     border-radius: 4px;
 }
 
 .pricing-additional-charges h4 {
     margin: 0 0 10px;
-    color: var(--laser-tumbler-simple-yellow);
+    color: var(--bs-warning-ink);
     font-size: 16px;
 }
 
@@ -591,7 +589,7 @@ body {
 
 .pricing-additional-charges li {
     margin: 8px 0;
-    color: var(--laser-tumbler-simple-yellow);
+    color: var(--bs-warning-ink);
     font-size: 14px;
     font-weight: 500;
 }

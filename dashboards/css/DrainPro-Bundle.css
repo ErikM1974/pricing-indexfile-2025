@@ -5,10 +5,7 @@
    every rule below uses var(). Raw hex is allowed ONLY in this block. */
 /* stylelint-disable color-no-hex */
 :root {
-    --rainro-undle-red: #ef4444;
     --rainro-undle-gray-dark: #32373c;
-    --rainro-undle-yellow: #fde68a;
-    --rainro-undle-orange: #78350f;
 }
 /* stylelint-enable color-no-hex */
 
@@ -28,7 +25,7 @@
 
         /* Header - Fire Engine Red matching Drain-Pro brand */
         .drain-pro-header {
-            background: linear-gradient(135deg, var(--rainro-undle-red) 0%, var(--red-600) 100%);
+            background: linear-gradient(135deg, var(--red-500) 0%, var(--red-600) 100%);
             padding: 3rem 2rem;
             text-align: center;
             color: white;
@@ -75,7 +72,7 @@
             border-radius: 5px;
             padding: 2.5rem;
             box-shadow: 0 1px 3px rgb(0 0 0 / 10%);
-            border-left: 5px solid var(--rainro-undle-red);
+            border-left: 5px solid var(--red-500);
         }
 
         .section-header {
@@ -87,11 +84,11 @@
             font-weight: 700;
             margin-bottom: 1.5rem;
             padding-bottom: 0.75rem;
-            border-bottom: 2px solid var(--rainro-undle-red);
+            border-bottom: 2px solid var(--red-500);
         }
 
         .section-header i {
-            color: var(--rainro-undle-red);
+            color: var(--red-500);
         }
 
         /* Caspio Table Container */
@@ -152,7 +149,7 @@
 
         /* Info Banner */
         .info-banner {
-            background: linear-gradient(135deg, var(--amber-100) 0%, var(--rainro-undle-yellow) 100%);
+            background: linear-gradient(135deg, var(--amber-100) 0%, var(--amber-200) 100%);
             border-left: 4px solid var(--amber-500);
             padding: 1rem 1.5rem;
             border-radius: 5px;
@@ -176,7 +173,7 @@
         }
 
         .info-banner-content {
-            color: var(--rainro-undle-orange);
+            color: var(--amber-900);
             font-size: 0.95rem;
         }
 
@@ -199,7 +196,7 @@
         .stat-value {
             font-size: 2rem;
             font-weight: 700;
-            color: var(--rainro-undle-red);
+            color: var(--red-500);
             margin-bottom: 0.25rem;
         }
 
@@ -278,13 +275,13 @@
         }
 
         .tab-button:hover {
-            color: var(--rainro-undle-red);
+            color: var(--red-500);
             background: var(--red-50);
         }
 
         .tab-button.active {
-            color: var(--rainro-undle-red);
-            border-bottom-color: var(--rainro-undle-red);
+            color: var(--red-500);
+            border-bottom-color: var(--red-500);
             background: var(--red-50);
         }
 
@@ -316,7 +313,7 @@
         /* Instructions Box */
         .instructions-box {
             background: var(--gray-50);
-            border-left: 4px solid var(--rainro-undle-red);
+            border-left: 4px solid var(--red-500);
             border-radius: 5px;
             padding: 1.5rem;
             margin-bottom: 2rem;
@@ -333,7 +330,7 @@
         }
 
         .instructions-title i {
-            color: var(--rainro-undle-red);
+            color: var(--red-500);
         }
 
         .instructions-list {
@@ -358,7 +355,7 @@
             justify-content: center;
             min-width: 28px;
             height: 28px;
-            background: var(--rainro-undle-red);
+            background: var(--red-500);
             color: white;
             border-radius: 50%;
             font-weight: 700;
@@ -379,7 +376,7 @@
                 color: var(--gray-800) !important;
                 /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
                 padding: 1rem !important;
-                border-bottom: 3px solid var(--rainro-undle-red);
+                border-bottom: 3px solid var(--red-500);
             }
 
             .logo-container {

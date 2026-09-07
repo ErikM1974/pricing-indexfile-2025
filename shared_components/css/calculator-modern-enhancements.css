@@ -14,8 +14,6 @@
    raw hex is allowed ONLY in this block. */
 /* stylelint-disable color-no-hex */
   :root {
-    --calculator-modern-enhancements-red: #ef4444;
-
     /* Fluid Typography Scale */
     --fluid-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
     --fluid-sm: clamp(0.875rem, 0.8rem + 0.3vw, 1rem);
@@ -170,7 +168,7 @@
   /* Highlight form groups with errors */
   .form-group:has(.error) {
     background: linear-gradient(to right, rgb(239 68 68 / 5%), transparent);
-    border-left: 3px solid var(--calculator-modern-enhancements-red);
+    border-left: 3px solid var(--red-500);
     padding-left: 1rem;
     margin-left: -1rem;
   }
@@ -274,7 +272,7 @@ body.enable-glass .results-section.glass {
     /* Semantic color tokens */
     --success-subtle: color-mix(in srgb, var(--primary-green) 10%, white);
     --warning-subtle: color-mix(in srgb, var(--amber-500) 10%, white);
-    --error-subtle: color-mix(in srgb, var(--calculator-modern-enhancements-red) 10%, white);
+    --error-subtle: color-mix(in srgb, var(--red-500) 10%, white);
   }
 }
 

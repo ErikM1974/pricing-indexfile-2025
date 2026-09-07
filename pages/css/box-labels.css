@@ -7,16 +7,10 @@
    raw hex is allowed ONLY in this block. */
 /* stylelint-disable color-no-hex */
 :root {
-    --box-labels-green: #16a34a;
     --box-labels-blue: #1e3a8a;
-    --box-labels-green-2: #15803d;
-    --box-labels-teal: #10b981;
-    --box-labels-red: #ef4444;
     --box-labels-magenta: #ec4899;
     --box-labels-teal-2: #14b8a6;
     --box-labels-orange: #f97316;
-    --box-labels-red-tint: #fecaca;
-    --box-labels-cyan-tint: #bfdbfe;
     --box-labels-yellow: #d9a406;
     --box-labels-orange-2: #7c2d12;
     --box-labels-gray-dark: #333;
@@ -24,8 +18,8 @@
     --box-labels-cyan: #93c5fd;
   --bl-primary: var(--blue-600);
   --bl-primary-dark: var(--color-floor-dark);
-  --bl-success: var(--box-labels-green);
-  --bl-success-dark: var(--box-labels-green-2);
+  --bl-success: var(--green-600);
+  --bl-success-dark: var(--green-700);
   --bl-warning: var(--amber-500);
   --bl-danger: var(--red-600);
   --bl-gray-50: var(--gray-50);
@@ -41,7 +35,7 @@
   --bl-radius: 8px;
   --bl-shadow: 0 1px 3px rgb(0 0 0 / 12%), 0 1px 2px rgb(0 0 0 / 8%);
   --bl-shadow-lg: 0 4px 12px rgb(0 0 0 / 15%);
-  --bl-box-colors: var(--color-floor-light), var(--box-labels-teal), var(--amber-500), var(--box-labels-red), var(--color-ruth-light), var(--box-labels-magenta), var(--box-labels-teal-2), var(--box-labels-orange);
+  --bl-box-colors: var(--color-floor-light), var(--emerald-500), var(--amber-500), var(--red-500), var(--color-ruth-light), var(--box-labels-magenta), var(--box-labels-teal-2), var(--box-labels-orange);
 }
 /* stylelint-enable color-no-hex */
 
@@ -305,7 +299,7 @@ body {
 
 .bl-error {
   background: var(--red-50);
-  border: 2px solid var(--box-labels-red-tint);
+  border: 2px solid var(--red-200);
   border-radius: var(--bl-radius);
   padding: 20px 24px;
   margin: 20px;
@@ -602,7 +596,7 @@ body {
 
 .bl-size-cell--has-value {
   background: var(--color-floor-tint);
-  border-color: var(--box-labels-cyan-tint);
+  border-color: var(--blue-200);
 }
 
 /* Box actions row */
@@ -843,7 +837,7 @@ body {
   display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: 700;
   color: var(--amber-800); background: var(--amber-100); border: 1px solid var(--box-labels-yellow);
 }
-.bl-received-chip { font-size: 12px; font-weight: 700; color: var(--box-labels-green); }
+.bl-received-chip { font-size: 12px; font-weight: 700; color: var(--green-600); }
 
 .bl-nowo-chip {
   display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 700;

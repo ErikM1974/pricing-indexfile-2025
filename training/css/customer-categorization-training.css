@@ -7,7 +7,6 @@
 :root {
     --page-gray-dark: #333;
     --page-blue: #1e3c72;
-    --page-green: #c8e6c9;
     --page-cyan: #2196f3;
     --page-red: #f44336;
     --page-blue-2: #2a5298;
@@ -182,7 +181,7 @@
 
     .category-card.selected {
         border: 3px solid var(--brand-500);
-        background: linear-gradient(135deg, var(--brand-100), var(--page-green));
+        background: linear-gradient(135deg, var(--brand-100), var(--material-green-100));
     }
 
     .category-icon {
@@ -298,7 +297,7 @@
     }
 
     .category-drop-zone.correct {
-        background: linear-gradient(135deg, var(--page-green), var(--page-green-2));
+        background: linear-gradient(135deg, var(--material-green-100), var(--page-green-2));
         border: 2px solid var(--brand-500);
         animation: correctPulse 0.6s ease;
     }
@@ -393,7 +392,7 @@
     }
 
     .option-btn.correct {
-        background: var(--page-green);
+        background: var(--material-green-100);
         border-color: var(--brand-500);
     }
 
@@ -410,7 +409,7 @@
     }
 
     .feedback.correct {
-        background: var(--page-green);
+        background: var(--material-green-100);
         color: var(--page-green-3);
     }
 

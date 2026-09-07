@@ -12,13 +12,9 @@
    raw hex is allowed ONLY in this block. */
 /* stylelint-disable color-no-hex */
         :root {
-    --page-green: #5bc85f;
-    --page-teal: #10b981;
-    --page-red: #ef4444;
-    --page-green-tint: #d1fae5;
             --primary-color: var(--brand-500);
             --primary-dark: var(--brand-600);
-            --primary-light: var(--page-green);
+            --primary-light: var(--brand-400);
             --wsu-crimson: var(--color-ae);
             --wsu-crimson-dark: var(--color-ae-dark);
             --bg-color: var(--color-bradley-tint);
@@ -26,9 +22,9 @@
             --border-color: var(--gray-200);
             --text-primary: var(--gray-800);
             --text-secondary: var(--gray-500);
-            --success: var(--page-teal);
+            --success: var(--emerald-500);
             --warning: var(--amber-500);
-            --danger: var(--page-red);
+            --danger: var(--red-500);
             --info: var(--color-floor-light);
         }
 /* stylelint-enable color-no-hex */
@@ -181,7 +177,7 @@
 
         .template-category.nurture {
             color: var(--success);
-            background: var(--page-green-tint);
+            background: var(--emerald-100);
         }
 
         .template-category.closing {

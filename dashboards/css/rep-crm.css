@@ -15,14 +15,10 @@
    raw hex is allowed ONLY in this block. */
 /* stylelint-disable color-no-hex */
 :root {
-    --rep-crm-teal: #10b981;
-    --rep-crm-yellow: #fbbf24;
     --rep-crm-green: #34d399;
     --rep-crm-cyan: #60a5fa;
     --rep-crm-orange: #cd7f32;
-    --rep-crm-red: #ef4444;
     --rep-crm-red-2: #f87171;
-    --rep-crm-blue: #1e40af;
     --rep-crm-orange-2: #e5a55d;
     --rep-crm-yellow-2: #eab308;
 
@@ -39,7 +35,7 @@
     --tier-gold: var(--amber-500);
     --tier-gold-bg: rgb(245 158 11 / 15%);
     --tier-gold-border: var(--amber-500);
-    --tier-gold-text: var(--rep-crm-yellow);
+    --tier-gold-text: var(--amber-400);
     --tier-silver: var(--gray-400);
     --tier-silver-bg: rgb(148 163 184 / 15%);
     --tier-silver-border: var(--gray-400);
@@ -48,19 +44,19 @@
     --tier-bronze-bg: rgb(205 127 50 / 15%);
     --tier-bronze-border: var(--rep-crm-orange);
     --tier-bronze-text: var(--rep-crm-orange-2);
-    --tier-winback: var(--rep-crm-teal);
+    --tier-winback: var(--emerald-500);
     --tier-winback-bg: rgb(16 185 129 / 15%);
-    --tier-winback-border: var(--rep-crm-teal);
+    --tier-winback-border: var(--emerald-500);
     --tier-winback-text: var(--rep-crm-green);
 
     /* Action Colors */
     --accent-blue: var(--color-floor-light);
-    --success: var(--rep-crm-teal);
-    --error: var(--rep-crm-red);
+    --success: var(--emerald-500);
+    --error: var(--red-500);
     --warning: var(--amber-500);
 
     /* Priority Colors */
-    --priority-a: var(--rep-crm-red);
+    --priority-a: var(--red-500);
     --priority-b: var(--amber-500);
     --priority-c: var(--rep-crm-yellow-2);
     --priority-d: var(--gray-500);
@@ -70,7 +66,7 @@
     --health-good-bg: rgb(16 185 129 / 20%);
     --health-good-text: var(--rep-crm-green);
     --health-warning-bg: rgb(245 158 11 / 20%);
-    --health-warning-text: var(--rep-crm-yellow);
+    --health-warning-text: var(--amber-400);
     --health-danger-bg: rgb(239 68 68 / 20%);
     --health-danger-text: var(--rep-crm-red-2);
 
@@ -78,7 +74,7 @@
     --at-risk-bg: rgb(239 68 68 / 20%);
     --at-risk-text: var(--rep-crm-red-2);
     --overdue-bg: rgb(245 158 11 / 20%);
-    --overdue-text: var(--rep-crm-yellow);
+    --overdue-text: var(--amber-400);
 }
 /* stylelint-enable color-no-hex */
 
@@ -745,7 +741,7 @@ body {
 
 .status-badge.contact-status {
     background: var(--sky-100);
-    color: var(--rep-crm-blue);
+    color: var(--blue-800);
 }
 
 /* Contact Info */
@@ -1057,7 +1053,7 @@ body {
     bottom: 2rem;
     left: 50%;
     transform: translateX(-50%) translateY(100px);
-    background: linear-gradient(135deg, var(--rep-crm-teal), var(--emerald-600));
+    background: linear-gradient(135deg, var(--emerald-500), var(--emerald-600));
     color: white;
     padding: 1rem 2rem;
     border-radius: 12px;
@@ -1191,7 +1187,7 @@ body {
 
 .trend-badge.stable {
     background: var(--sky-100);
-    color: var(--rep-crm-blue);
+    color: var(--blue-800);
 }
 
 .trend-badge.declining {

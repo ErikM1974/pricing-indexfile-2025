@@ -19,7 +19,6 @@
    raw hex is allowed ONLY in this block. */
 /* stylelint-disable color-no-hex */
 :root {
-    --customer-portal-admin-green: #3a7c52;
     --customer-portal-admin-red-tint: #f3c5c2;
     --customer-portal-admin-red-tint-2: #f3c5cf;
     --customer-portal-admin-orange: #8a5300;
@@ -29,7 +28,7 @@
     --customer-portal-admin-yellow: #f0d79a;
     --customer-portal-admin-yellow-dark: #6b4e00;
     --customer-portal-admin-green-2: #bfe0c9;
-  --cpa-green: var(--customer-portal-admin-green);
+  --cpa-green: var(--brand-mid);
   --cpa-green-dark: var(--brand-800);
   --cpa-green-soft: var(--brand-100);
 }

@@ -6,7 +6,6 @@
     --dtg-compatible-products-cyan: #0ea5e9;
     --dtg-compatible-products-teal: #06b6d4;
     --dtg-compatible-products-gray: #666;
-    --dtg-compatible-products-blue: #1e40af;
     --primary-color: var(--print-green);
     --secondary-color: var(--dtg-compatible-products-cyan);
     --text-primary: var(--print-ink);
@@ -345,5 +344,5 @@ body {
 .dtg-empty { grid-column: 1 / -1; text-align: center; padding: 2rem; color: var(--red-700); }
 .dtg-retry { margin-left: 8px; }
 .info-lead { margin-bottom: 1rem; color: var(--text-secondary); line-height: 1.6; }
-.info-note { margin-top: 1rem; padding: 1rem; background: var(--color-floor-tint); border-left: 4px solid var(--dtg-compatible-products-cyan); border-radius: 0.5rem; color: var(--dtg-compatible-products-blue); }
+.info-note { margin-top: 1rem; padding: 1rem; background: var(--color-floor-tint); border-left: 4px solid var(--dtg-compatible-products-cyan); border-radius: 0.5rem; color: var(--blue-800); }
 .loading-text { margin-top: 1rem; color: var(--text-secondary); }

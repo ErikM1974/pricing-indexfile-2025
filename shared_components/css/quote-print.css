@@ -28,14 +28,6 @@
    keeps its exact look. Map them to shared_components/css/tokens.css names when the page is redesigned;
    every rule below uses var(). Raw hex is allowed ONLY in this block. */
 /* stylelint-disable color-no-hex */
-:root {
-    --quote-print-green: #86efac;
-    --quote-print-red: #fca5a5;
-    --quote-print-yellow: #fcd34d;
-    --quote-print-green-tint: #bbf7d0;
-    --quote-print-yellow-2: #fde68a;
-    --quote-print-orange: #78350f;
-}
 /* stylelint-enable color-no-hex */
 
 /* Phase 11.1 (2026-05-14): print-only terms paragraph.
@@ -195,20 +187,20 @@
         text-transform: uppercase !important;
         background: var(--amber-100) !important;
         color: var(--amber-800) !important;
-        border: 1pt solid var(--quote-print-yellow) !important;
+        border: 1pt solid var(--amber-300) !important;
     }
 
     .status-badge.status-accepted {
         background: var(--store-green-100) !important;
         color: var(--print-green) !important;
-        border-color: var(--quote-print-green) !important;
+        border-color: var(--green-300) !important;
     }
 
     .status-badge.status-expired,
     .status-badge.status-rejected {
         background: var(--red-100) !important;
         color: var(--red-800) !important;
-        border-color: var(--quote-print-red) !important;
+        border-color: var(--red-300) !important;
     }
 
     /* PO number row (when present) */
@@ -378,7 +370,7 @@
         font-size: 8pt !important;        /* Phase 11.2: 9pt → 8pt */
         break-inside: avoid;
         background: var(--brand-50) !important;
-        border: 0.5pt solid var(--quote-print-green) !important;  /* Phase 11.2: 1pt → 0.5pt */
+        border: 0.5pt solid var(--green-300) !important;  /* Phase 11.2: 1pt → 0.5pt */
         color: var(--print-green) !important;
         align-items: center;
         gap: 6pt;
@@ -386,7 +378,7 @@
 
     .expired-banner {
         background: var(--red-50) !important;
-        border-color: var(--quote-print-red) !important;
+        border-color: var(--red-300) !important;
         color: var(--red-800) !important;
     }
 
@@ -435,7 +427,7 @@
 
     .embroidery-info {
         background: var(--brand-50) !important;
-        border: 1pt solid var(--quote-print-green-tint) !important;
+        border: 1pt solid var(--green-200) !important;
         border-radius: 4pt !important;
         padding: 5pt 10pt !important;        /* Phase 11.4: 6pt → 5pt */
         margin: 0 0 5pt !important;        /* Phase 11.4: 8pt → 5pt */
@@ -571,7 +563,7 @@
 
     .special-notes-card {
         background: var(--red-50) !important;
-        border: 1pt solid var(--quote-print-yellow-2) !important;
+        border: 1pt solid var(--amber-200) !important;
         border-radius: 4pt !important;
         padding: 6pt 10pt !important;
     }
@@ -589,7 +581,7 @@
     #special-notes-content {
         font-family: inherit !important;
         font-size: 8.5pt !important;
-        color: var(--quote-print-orange) !important;
+        color: var(--amber-900) !important;
         white-space: pre-wrap;
         overflow-wrap: break-word;
         line-height: 1.4;

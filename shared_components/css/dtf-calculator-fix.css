@@ -15,18 +15,11 @@
    raw hex is allowed ONLY in this block. */
 /* stylelint-disable color-no-hex */
 :root {
-    --dtf-calculator-fix-red: #ef4444;
-    --dtf-calculator-fix-green-tint: #d1fae5;
-    --dtf-calculator-fix-teal-dark: #065f46;
-    --dtf-calculator-fix-green: #5bc85f;
-    --dtf-calculator-fix-cyan-tint: #bfdbfe;
     --dtf-calculator-fix-cyan: #60a5fa;
-    --dtf-calculator-fix-blue: #1e40af;
-    --dtf-calculator-fix-green-tint-2: #bbf7d0;
     --primary-color: var(--brand-500) !important;
     --primary: var(--brand-500) !important;
     --primary-dark: var(--brand-600) !important;
-    --primary-light: var(--dtf-calculator-fix-green) !important;
+    --primary-light: var(--brand-400) !important;
     --nwca-primary: var(--brand-500) !important;
     --primary-hover: var(--brand-600) !important;
     --bs-primary: var(--brand-500) !important;
@@ -75,12 +68,12 @@ body.dtf-pricing-page {
    ============================================ */
 .alert-info,
 .info-box {
-    background: linear-gradient(135deg, var(--sky-100) 0%, var(--dtf-calculator-fix-cyan-tint) 100%) !important;
+    background: linear-gradient(135deg, var(--sky-100) 0%, var(--blue-200) 100%) !important;
     border: 1px solid var(--dtf-calculator-fix-cyan) !important;
     border-radius: 8px;
     padding: 0.875rem 1.25rem;
     margin-bottom: 1.5rem;
-    color: var(--dtf-calculator-fix-blue);
+    color: var(--blue-800);
     font-size: 0.9rem;
     display: flex;
     align-items: center;
@@ -184,7 +177,7 @@ small {
     padding: 1.25rem;
     border-radius: 8px;
     margin-bottom: 1.5rem;
-    border: 1px solid var(--dtf-calculator-fix-green-tint);
+    border: 1px solid var(--emerald-100);
 }
 
 .quantity-input-group {
@@ -256,8 +249,8 @@ small {
     right: 1rem;
     top: 1rem;
     background: white;
-    border: 2px solid var(--dtf-calculator-fix-red);
-    color: var(--dtf-calculator-fix-red);
+    border: 2px solid var(--red-500);
+    color: var(--red-500);
     width: 32px;
     height: 32px;
     border-radius: 50%;
@@ -270,7 +263,7 @@ small {
 }
 
 .btn-remove-transfer:hover {
-    background: var(--dtf-calculator-fix-red);
+    background: var(--red-500);
     color: white;
     transform: scale(1.1);
 }
@@ -347,7 +340,7 @@ button[type="submit"] {
 /* Specific styling for the DTF sizes info box */
 #dtf-calculator-container > .dtf-calculator-main + div,
 .transfers-section + div[style*="background"] {
-    background: linear-gradient(135deg, var(--dtf-calculator-fix-green-tint) 0%, var(--dtf-calculator-fix-green-tint-2) 100%) !important;
+    background: linear-gradient(135deg, var(--emerald-100) 0%, var(--green-200) 100%) !important;
     border: 2px solid var(--brand-500) !important;
     border-radius: 10px !important;
     padding: 1.5rem !important;
@@ -356,7 +349,7 @@ button[type="submit"] {
 
 .size-guide h4,
 .dtf-sizes-box h4 {
-    color: var(--dtf-calculator-fix-teal-dark);
+    color: var(--emerald-800);
     font-size: 1.125rem;
     font-weight: 600;
     margin-bottom: 1rem;
@@ -384,7 +377,7 @@ button[type="submit"] {
     background: white;
     padding: 1rem;
     border-radius: 8px;
-    border: 1px solid var(--dtf-calculator-fix-green-tint);
+    border: 1px solid var(--emerald-100);
     text-align: center;
 }
 
@@ -533,7 +526,7 @@ button[type="submit"] {
 
 .accordion-button:not(.collapsed) {
     background: linear-gradient(135deg, var(--brand-50) 0%, var(--store-green-100) 100%) !important;
-    color: var(--dtf-calculator-fix-teal-dark) !important;
+    color: var(--emerald-800) !important;
     border-color: var(--brand-500);
 }
 
@@ -576,7 +569,7 @@ button[type="submit"] {
     color: var(--red-800) !important;
     padding: 1.5rem;
     border-radius: 10px;
-    border: 2px solid var(--dtf-calculator-fix-red) !important;
+    border: 2px solid var(--red-500) !important;
 }
 
 /* ============================================

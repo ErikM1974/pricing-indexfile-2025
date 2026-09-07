@@ -16,11 +16,7 @@
 :root {
     --monogram-form-gray-dark: #000;
     --monogram-form-cyan-dark: #1a3a5c;
-    --monogram-form-red: #dc3545;
     --monogram-form-gray: #666;
-    --monogram-form-green: #3a7c52;
-    --monogram-form-green-tint: #d1fae5;
-    --monogram-form-teal-dark: #065f46;
     --monogram-form-cyan: #4a90a4;
     --monogram-form-yellow: #f0d78c;
     --monogram-form-yellow-2: #8a6d00;
@@ -29,7 +25,7 @@
     --monogram-form-yellow-dark: #5a4a00;
     --monogram-form-yellow-5: #e5c66d;
     --monogram-form-gray-dark-2: #333;
-    --primary-color: var(--monogram-form-green);
+    --primary-color: var(--brand-mid);
     --primary-dark: var(--print-green);
     --primary-light: var(--brand-500);
     --bg-color: var(--color-bradley-tint);
@@ -38,8 +34,8 @@
     --text-primary: var(--gray-800);
     --text-secondary: var(--gray-500);
     --hover-bg: var(--gray-100);
-    --success-bg: var(--monogram-form-green-tint);
-    --success-text: var(--monogram-form-teal-dark);
+    --success-bg: var(--emerald-100);
+    --success-text: var(--emerald-800);
     --warning-bg: var(--amber-100);
     --warning-text: var(--amber-800);
     --error-bg: var(--red-100);
@@ -468,7 +464,7 @@ body {
 }
 
 .form-group .required {
-    color: var(--monogram-form-red);
+    color: var(--bs-danger);
 }
 
 .form-group input,
@@ -1127,7 +1123,7 @@ body {
 
 .btn-delete-row:hover {
     background: var(--error-bg);
-    border-color: var(--monogram-form-red);
+    border-color: var(--bs-danger);
 }
 
 .table-footer {

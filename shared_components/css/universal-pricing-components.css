@@ -9,12 +9,8 @@
    every rule below uses var(). Raw hex is allowed ONLY in this block. */
 /* stylelint-disable color-no-hex */
 :root {
-    --universal-pricing-components-green: #3a7c52;
     --universal-pricing-components-gray: #666;
     --universal-pricing-components-gray-dark: #333;
-    --universal-pricing-components-green-2: #c8e6c9;
-    --universal-pricing-components-red: #dc3545;
-    --universal-pricing-components-yellow: #856404;
     --universal-pricing-components-teal: #bee5eb;
     --universal-pricing-components-green-3: #c3e6cb;
     --universal-pricing-components-teal-2: #17a2b8;
@@ -39,7 +35,7 @@
 }
 
 .universal-product-back-link:hover {
-    color: var(--universal-pricing-components-green);
+    color: var(--brand-mid);
 }
 
 .universal-product-name {
@@ -99,11 +95,11 @@
 
 .universal-color-swatch:hover {
     transform: scale(1.1);
-    border-color: var(--universal-pricing-components-green);
+    border-color: var(--brand-mid);
 }
 
 .universal-color-swatch.selected {
-    border-color: var(--universal-pricing-components-green);
+    border-color: var(--brand-mid);
     box-shadow: 0 0 0 3px rgb(58 124 82 / 20%);
 }
 
@@ -117,7 +113,7 @@
 .universal-info-box {
     padding: 20px;
     background: var(--brand-100);
-    border-top: 1px solid var(--universal-pricing-components-green-2);
+    border-top: 1px solid var(--material-green-100);
 }
 
 .universal-info-text {
@@ -188,7 +184,7 @@
 .universal-add-location-btn {
     width: 100%;
     padding: 12px;
-    background: var(--universal-pricing-components-green);
+    background: var(--brand-mid);
     color: white;
     border: none;
     border-radius: 4px;
@@ -210,7 +206,7 @@
     width: 40px;
     height: 40px;
     padding: 0;
-    background: var(--universal-pricing-components-red);
+    background: var(--bs-danger);
     color: white;
     border: none;
     border-radius: 4px;
@@ -239,7 +235,7 @@
 .universal-alert-warning {
     background: var(--amber-100);
     border: 1px solid var(--amber-100);
-    color: var(--universal-pricing-components-yellow);
+    color: var(--bs-warning-ink);
 }
 
 .universal-alert-info {
@@ -290,7 +286,7 @@
 }
 
 .universal-badge-primary {
-    background: var(--universal-pricing-components-green);
+    background: var(--brand-mid);
     color: white;
 }
 
@@ -325,12 +321,12 @@
 }
 
 .universal-tab:hover {
-    color: var(--universal-pricing-components-green);
+    color: var(--brand-mid);
 }
 
 .universal-tab.active {
-    color: var(--universal-pricing-components-green);
-    border-bottom-color: var(--universal-pricing-components-green);
+    color: var(--brand-mid);
+    border-bottom-color: var(--brand-mid);
 }
 
 /* Tooltip Helper */

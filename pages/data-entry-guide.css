@@ -7,13 +7,7 @@
    raw hex is allowed ONLY in this block. */
 /* stylelint-disable color-no-hex */
 :root {
-    --data-entry-guide-red-tint: #fecaca;
-    --data-entry-guide-green: #16a34a;
-    --data-entry-guide-green-tint: #bbf7d0;
-    --data-entry-guide-cyan-tint: #bfdbfe;
     --data-entry-guide-orange: #a16207;
-    --data-entry-guide-yellow: #fde68a;
-    --data-entry-guide-blue: #1e40af;
     --primary-green: var(--store-green-700);
     --bg-light: var(--slate-50);
     --text-primary: var(--gray-800);
@@ -22,10 +16,10 @@
     --card-shadow: 0 1px 3px rgb(0 0 0 / 8%);
     --stop-red: var(--red-600);
     --stop-bg: var(--red-50);
-    --stop-border: var(--data-entry-guide-red-tint);
-    --start-green: var(--data-entry-guide-green);
+    --stop-border: var(--red-200);
+    --start-green: var(--green-600);
     --start-bg: var(--brand-50);
-    --start-border: var(--data-entry-guide-green-tint);
+    --start-border: var(--green-200);
 }
 /* stylelint-enable color-no-hex */
 
@@ -134,13 +128,13 @@ body {
 .ref-theme {
     background: var(--color-floor-tint);
     color: var(--color-floor-dark);
-    border: 1px solid var(--data-entry-guide-cyan-tint);
+    border: 1px solid var(--blue-200);
 }
 
 .checklist-theme {
     background: var(--red-50);
     color: var(--data-entry-guide-orange);
-    border: 1px solid var(--data-entry-guide-yellow);
+    border: 1px solid var(--amber-200);
 }
 
 /* Cards */
@@ -208,7 +202,7 @@ body {
 /* Content blocks */
 .bad-example {
     background: var(--red-50);
-    border: 1px solid var(--data-entry-guide-red-tint);
+    border: 1px solid var(--red-200);
     border-radius: 6px;
     padding: 10px 14px;
     font-size: 13px;
@@ -228,13 +222,13 @@ body {
 
 .do-this {
     background: var(--brand-50);
-    border: 1px solid var(--data-entry-guide-green-tint);
+    border: 1px solid var(--green-200);
     border-radius: 6px;
     padding: 10px 14px;
     font-size: 13px;
     color: var(--print-green);
 }
-.do-this i { color: var(--data-entry-guide-green); margin-right: 4px; }
+.do-this i { color: var(--green-600); margin-right: 4px; }
 
 .notes-list {
     margin: 6px 0 6px 18px;
@@ -315,10 +309,10 @@ body {
     margin-top: 12px;
     padding: 8px 12px;
     background: var(--color-floor-tint);
-    border: 1px solid var(--data-entry-guide-cyan-tint);
+    border: 1px solid var(--blue-200);
     border-radius: 6px;
     font-size: 12px;
-    color: var(--data-entry-guide-blue);
+    color: var(--blue-800);
 }
 .tier-note i { margin-right: 6px; }
 

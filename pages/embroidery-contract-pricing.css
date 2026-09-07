@@ -19,8 +19,6 @@
     --embroidery-contract-pricing-gray: #666;
     --embroidery-contract-pricing-yellow-2: #fef08a;
     --embroidery-contract-pricing-yellow-3: #ca8a04;
-    --embroidery-contract-pricing-orange: #78350f;
-    --embroidery-contract-pricing-red: #ef4444;
     --primary-color: var(--brand-500);
     --primary-dark: var(--brand-600);
     --text-primary: var(--embroidery-contract-pricing-gray-dark);
@@ -284,7 +282,7 @@ body {
 }
 
 .ltm-note strong {
-    color: var(--embroidery-contract-pricing-orange);
+    color: var(--amber-900);
 }
 
 /* ============================================
@@ -367,7 +365,7 @@ body {
     padding: 16px 20px;
     border-radius: 8px;
     margin-bottom: 20px;
-    border-left: 4px solid var(--embroidery-contract-pricing-red);
+    border-left: 4px solid var(--red-500);
     display: none;
 }
 

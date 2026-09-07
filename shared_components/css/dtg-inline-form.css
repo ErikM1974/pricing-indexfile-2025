@@ -9,19 +9,11 @@
    every rule below uses var(). Raw hex is allowed ONLY in this block. */
 /* stylelint-disable color-no-hex */
 :root {
-    --dtg-inline-form-orange: #78350f;
-    --dtg-inline-form-green: #16a34a;
-    --dtg-inline-form-green-2: #15803d;
-    --dtg-inline-form-green-tint: #d1fae5;
     --dtg-inline-form-green-3: #98c98a;
     --dtg-inline-form-orange-2: #bdb097;
     --dtg-inline-form-cyan: #93c5fd;
     --dtg-inline-form-cyan-2: #60a5fa;
-    --dtg-inline-form-blue: #1e40af;
-    --dtg-inline-form-yellow: #fde68a;
     --dtg-inline-form-orange-3: #c8b08a;
-    --dtg-inline-form-teal-dark: #065f46;
-    --dtg-inline-form-green-4: #22c55e;
     --dtg-inline-form-green-5: #a5d6a7;
 }
 /* stylelint-enable color-no-hex */
@@ -51,7 +43,7 @@
     align-items: center;
     gap: 12px;
     font-size: 12.5px;
-    color: var(--dtg-inline-form-orange);
+    color: var(--amber-900);
     line-height: 1.4;
     animation: drbi-slide 0.25s ease;
 }
@@ -67,7 +59,7 @@
 .dtg-resume-banner-inline .drbi-msg {
     flex: 1 1 auto;
     font-weight: 500;
-    color: var(--dtg-inline-form-orange);
+    color: var(--amber-900);
 }
 .dtg-resume-banner-inline .drbi-msg strong { color: var(--amber-800); font-weight: 700; }
 
@@ -850,7 +842,7 @@
     color: var(--pnw-stone-strong, var(--gray-600)) /* 1.8: stone on tinted washes */;
     transition: opacity 0.15s ease;
 }
-.dtg-rows-table td .sz-inv-good     { color: var(--dtg-inline-form-green-2); }     /* green — plenty */
+.dtg-rows-table td .sz-inv-good     { color: var(--green-700); }     /* green — plenty */
 .dtg-rows-table td .sz-inv-low      { color: var(--amber-800) /* 1.8: amber text on tan wash was 4.0:1 */; }     /* amber — qty close to available */
 .dtg-rows-table td .sz-inv-over     { color: var(--red-700); font-weight: 700; }  /* red — qty > available */
 .dtg-rows-table td .sz-inv-oos      { color: var(--red-700); font-weight: 700; }  /* red — out of stock */
@@ -877,7 +869,7 @@
     text-indent: 0;
     font-size: 6px;
     line-height: 1;
-    color: var(--dtg-inline-form-green-2);
+    color: var(--green-700);
 }
 
 .dtg-rows-table td:not(:focus-within, :hover) .sz-inv-unknown {
@@ -953,7 +945,7 @@
     padding: 8px 12px;
     background: linear-gradient(180deg, var(--store-rush-soft) 0%, var(--amber-100) 100%);
     border-bottom: 1px solid rgb(217 119 6 / 25%);
-    color: var(--dtg-inline-form-orange);
+    color: var(--amber-900);
     font-size: 11.5px;
     line-height: 1.4;
 }
@@ -1431,7 +1423,7 @@
 #dtgEmailBtn:hover {
     background: var(--sky-100);
     border-color: var(--dtg-inline-form-cyan-2);
-    color: var(--dtg-inline-form-blue);
+    color: var(--blue-800);
 }
 
 /* Stock-confirm modal — shown at Submit time when one or more sizes
@@ -1617,7 +1609,7 @@
     border-left: 3px solid var(--amber-600);
     border-radius: 5px;
     font-size: 12px;
-    color: var(--dtg-inline-form-orange);
+    color: var(--amber-900);
     line-height: 1.45;
 }
 .dtg-validation-banner i { margin-right: 6px; color: var(--amber-800) /* 1.8: amber text on tan wash was 4.0:1 */; }
@@ -1674,15 +1666,15 @@
 }
 
 .dpp-header--ready {
-    background: linear-gradient(180deg, var(--brand-50) 0%, var(--dtg-inline-form-green-tint) 100%);
+    background: linear-gradient(180deg, var(--brand-50) 0%, var(--emerald-100) 100%);
     color: var(--print-green-dark);
     border-bottom: 1px solid rgb(20 83 45 / 15%);
 }
-.dpp-header--ready > i { color: var(--dtg-inline-form-green); }
+.dpp-header--ready > i { color: var(--green-600); }
 
 .dpp-header--blocked {
-    background: linear-gradient(180deg, var(--amber-100) 0%, var(--dtg-inline-form-yellow) 100%);
-    color: var(--dtg-inline-form-orange);
+    background: linear-gradient(180deg, var(--amber-100) 0%, var(--amber-200) 100%);
+    color: var(--amber-900);
     border-bottom: 1px solid rgb(120 53 15 / 15%);
 }
 .dpp-header--blocked > i { color: var(--amber-600); }
@@ -1739,7 +1731,7 @@
 }
 
 /* State icons */
-.dpp-i--ok    { color: var(--dtg-inline-form-green); }
+.dpp-i--ok    { color: var(--green-600); }
 .dpp-i--warn  { color: var(--amber-600); }
 .dpp-i--block { color: var(--red-600); }
 .dpp-i--tip   { color: var(--blue-600); }
@@ -2092,7 +2084,7 @@
     color: var(--slate-500);
     min-height: 1.4em;
 }
-.dcp-tax-status--success { color: var(--dtg-inline-form-green); font-weight: 500; }
+.dcp-tax-status--success { color: var(--green-600); font-weight: 500; }
 .dcp-tax-status--info    { color: var(--slate-500); }
 .dcp-tax-status--warning { color: var(--amber-600); }
 .dcp-tax-status--error   { color: var(--red-600); }
@@ -2247,8 +2239,8 @@
 .dhp-applied {
     flex: 0 0 auto;
     padding: 3px 8px;
-    background: var(--dtg-inline-form-green-tint);
-    color: var(--dtg-inline-form-teal-dark);
+    background: var(--emerald-100);
+    color: var(--emerald-800);
     font-size: 11px;
     font-weight: 600;
     border-radius: 4px;
@@ -2577,7 +2569,7 @@
     color: var(--pnw-stone-strong, var(--gray-600)); /* 1.8 */
     min-height: 1.4em;
 }
-.dcp-newart-status--success { color: var(--dtg-inline-form-green); font-weight: 500; }
+.dcp-newart-status--success { color: var(--green-600); font-weight: 500; }
 .dcp-newart-status--error   { color: var(--red-600); font-weight: 500; }
 .dcp-newart-status--loading { color: var(--pnw-forest); font-style: italic; }
 
@@ -2739,14 +2731,14 @@
 .ship-to-card .st-btn { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 6px; border: 1px solid var(--gray-300); background: var(--slate-50); color: var(--gray-700); cursor: pointer; }
 .ship-to-card .st-btn:hover { background: var(--slate-100); }
 .ship-to-card .st-btn:disabled { opacity: .6; cursor: default; }
-.ship-to-card .st-btn-reest { border-color: var(--dtg-inline-form-green); color: var(--print-green); background: var(--brand-50); }
+.ship-to-card .st-btn-reest { border-color: var(--green-600); color: var(--print-green); background: var(--brand-50); }
 .ship-to-card .st-btn-reest:hover { background: var(--store-green-100); }
 
 /* [2026-06-08] Phase 1 tax controls (include-tax / manual rate / wholesale) under the ship-to tax status */
 .dtg-tax-controls { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; margin-top: 8px; font-size: 12px; color: var(--slate-600); }
 .dtg-tax-ctl { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; margin: 0; }
 .dtg-tax-ctl input[type="number"] { width: 56px; padding: 2px 4px; border: 1px solid var(--gray-300); border-radius: 4px; font-size: 12px; text-align: center; }
-.dtg-tax-ctl input[type="checkbox"] { accent-color: var(--dtg-inline-form-green-4); }
+.dtg-tax-ctl input[type="checkbox"] { accent-color: var(--green-500); }
 
 /* [2026-06-09] Phase 2 — billed shipping charge + UPS-Ground estimator (inside #dtgShipToBlock) */
 .dcp-shipfee-wrap { margin-top: 10px; }

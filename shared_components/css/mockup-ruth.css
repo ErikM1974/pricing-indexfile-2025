@@ -14,20 +14,11 @@
 /* stylelint-disable color-no-hex */
 :root {
     --mockup-ruth-gray-dark: #333;
-    --mockup-ruth-indigo: #7c3aed;
     --mockup-ruth-gray: #666;
     --mockup-ruth-gray-2: #888;
-    --mockup-ruth-red-tint: #fecaca;
-    --mockup-ruth-green: #22c55e;
-    --mockup-ruth-green-2: #16a34a;
     --mockup-ruth-red: #9d174d;
-    --mockup-ruth-blue: #1e40af;
     --mockup-ruth-blue-2: #3730a3;
-    --mockup-ruth-teal-dark: #065f46;
-    --mockup-ruth-teal: #10b981;
-    --mockup-ruth-yellow: #ffc107;
     --mockup-ruth-orange: #f57c00;
-    --mockup-ruth-red-2: #fca5a5;
     --art-theme: var(--color-ruth);
     --art-theme-dark: var(--color-ruth-dark);
     --art-theme-light: var(--color-ruth-light);
@@ -271,7 +262,7 @@ body {
     flex: 0 0 7px;
     transition: background var(--dur-base, 200ms) var(--ease-out, cubic-bezier(.2,.8,.2,1));
 }
-.status-stat--submitted::before          { background: var(--state-violet,  var(--mockup-ruth-indigo)); }
+.status-stat--submitted::before          { background: var(--state-violet,  var(--violet-600)); }
 .status-stat--in-progress::before        { background: var(--state-info,    var(--blue-600)); }
 .status-stat--awaiting-approval::before  { background: var(--state-warning, var(--amber-600)); }
 .status-stat--revision-requested::before { background: var(--state-danger,  var(--red-600)); }
@@ -353,12 +344,12 @@ body {
     height: 3px;
     background: var(--gray-200, var(--gray-200));
 }
-.mockup-card--submitted::before          { background: var(--state-violet,  var(--mockup-ruth-indigo)); }
+.mockup-card--submitted::before          { background: var(--state-violet,  var(--violet-600)); }
 .mockup-card--in-progress::before        { background: var(--state-info,    var(--blue-600)); }
 .mockup-card--awaiting-approval::before  { background: var(--state-warning, var(--amber-600)); }
 .mockup-card--revision-requested::before { background: var(--state-danger,  var(--red-600)); }
 .mockup-card--approved::before           { background: var(--state-success, var(--emerald-600)); }
-.mockup-card--completed::before          { background: var(--state-success, var(--mockup-ruth-green)); }
+.mockup-card--completed::before          { background: var(--state-success, var(--green-500)); }
 .mockup-card--completed                  { opacity: 0.85; }
 
 /* ---------- Card Hover Lift + Status Glow ---------- */
@@ -513,7 +504,7 @@ body {
 
 /* ---------- Approval Elapsed ---------- */
 .approval-elapsed { font-size: 12px; padding: 4px 0; }
-.approval-elapsed--fresh { color: var(--mockup-ruth-green-2); }
+.approval-elapsed--fresh { color: var(--green-600); }
 .approval-elapsed--waiting { color: var(--amber-600); }
 .approval-elapsed--overdue { color: var(--red-600); }
 
@@ -581,7 +572,7 @@ body {
     flex: 0 0 6px;
 }
 
-.status-pill--submitted          { color: var(--state-violet,  var(--mockup-ruth-indigo)); }
+.status-pill--submitted          { color: var(--state-violet,  var(--violet-600)); }
 .status-pill--in-progress        { color: var(--state-info,    var(--blue-600)); }
 .status-pill--awaiting-approval  { color: var(--state-warning, var(--amber-600)); }
 
@@ -667,7 +658,7 @@ body {
 
 .card-badge--banner {
     background: var(--sky-100);
-    color: var(--mockup-ruth-blue);
+    color: var(--blue-800);
     font-weight: 600;
 }
 
@@ -734,7 +725,7 @@ body {
 /* Structured garment-form status badges (2026-06-17) — Steve + AE galleries */
 .card-badge--artwork { background: var(--color-floor-tint); color: var(--mockup-ruth-blue-2); font-weight: 700; }
 .card-badge--approval { background: var(--red-50); color: var(--store-rush-deeper); font-weight: 700; }
-.card-badge--approved { background: var(--brand-50); color: var(--mockup-ruth-teal-dark); font-weight: 700; }
+.card-badge--approved { background: var(--brand-50); color: var(--emerald-800); font-weight: 700; }
 
 /* At-a-glance art-spec line on gallery cards (placement/size · color · text) */
 .card-artspec {
@@ -841,7 +832,7 @@ body {
 .card-action-btn--send:hover { background: var(--amber-600); }
 
 .card-action-btn--complete {
-    background: var(--mockup-ruth-teal);
+    background: var(--emerald-500);
     color: white;
 }
 .card-action-btn--complete:hover { background: var(--emerald-600); }
@@ -889,7 +880,7 @@ body {
     color: var(--red-600);
     background: var(--red-50);
     border-radius: 8px;
-    border: 1px solid var(--mockup-ruth-red-tint);
+    border: 1px solid var(--red-200);
 }
 
 /* ---------- Billing Codes (reused from old Ruth page) ---------- */
@@ -950,7 +941,7 @@ body {
 }
 
 .billing-card-header--purple { background: var(--art-theme-light); }
-.billing-card-header--dark { background: var(--mockup-ruth-indigo); }
+.billing-card-header--dark { background: var(--violet-600); }
 
 .billing-card-pn { font-size: 24px; font-weight: bold; }
 .billing-card-subtitle { font-size: 14px; opacity: 0.95; margin-top: 2px; }
@@ -972,7 +963,7 @@ body {
 
 .billing-callout--amber {
     background: var(--store-rush-soft);
-    border-left: 3px solid var(--mockup-ruth-yellow);
+    border-left: 3px solid var(--bs-warning);
 }
 
 .billing-callout-label { font-weight: 600; font-size: 13px; margin-bottom: 5px; }
@@ -1131,7 +1122,7 @@ body {
    programmatically opens the bulk-recover modal owned by art-hub-steve.js. */
 .status-stat--broken {
     background: var(--red-50);
-    border-color: var(--mockup-ruth-red-tint);
+    border-color: var(--red-200);
     color: var(--red-700);
 }
 
@@ -1142,7 +1133,7 @@ body {
 
 .status-stat--broken:hover {
     background: var(--red-100);
-    border-color: var(--mockup-ruth-red-2);
+    border-color: var(--red-300);
     color: var(--red-800);
 }
 

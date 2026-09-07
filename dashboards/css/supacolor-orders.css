@@ -11,7 +11,6 @@
 :root {
     --supacolor-orders-gray: #adb5bd;
     --supacolor-orders-red: #c0392b;
-    --supacolor-orders-blue: #4338ca;
     --supacolor-orders-green: #198754;
     --supacolor-orders-blue-tint: #c7d2fe;
     --supacolor-orders-blue-2: #3730a3;
@@ -20,7 +19,6 @@
     --supacolor-orders-cyan: #1971c2;
     --supacolor-orders-teal-tint: #c3fae8;
     --supacolor-orders-red-2: #e74c3c;
-    --supacolor-orders-red-tint: #fecaca;
 }
 /* stylelint-enable color-no-hex */
 
@@ -292,7 +290,7 @@
     font-size: 11px;
     font-weight: 500;
     background: var(--color-floor-tint);
-    color: var(--supacolor-orders-blue);
+    color: var(--indigo-700);
     font-variant-numeric: tabular-nums;
     max-width: 100%;
     overflow: hidden;
@@ -337,11 +335,11 @@
     /* Pill already has its own hover — reset to base so the pill doesn't
        look "double-hovered" when the parent cell is also highlighted. */
     background: var(--color-floor-tint);
-    color: var(--supacolor-orders-blue);
+    color: var(--indigo-700);
 }
 
 .sc-cell--shipped--track:hover .sc-ship-date {
-    color: var(--supacolor-orders-blue);
+    color: var(--indigo-700);
 }
 
 .sc-cell--chevron {
@@ -573,7 +571,7 @@
 /* View chips are real <button>s now (aria-pressed replaces the .selected class as the state). */
 .bt-stat-chip[aria-pressed="true"] { background: var(--slate-100); border-color: var(--color-bradley); box-shadow: 0 0 0 2px rgb(74 111 165 / 25%); }
 .sc-preview-note { margin-top: 12px; font-size: 13px; color: var(--slate-600); }
-.sc-error { text-align: center; padding: 40px 20px; color: var(--red-800); background: var(--red-100); border: 1px solid var(--supacolor-orders-red-tint); border-radius: 8px; }
+.sc-error { text-align: center; padding: 40px 20px; color: var(--red-800); background: var(--red-100); border: 1px solid var(--red-200); border-radius: 8px; }
 .sc-error .bt-btn { margin-top: 12px; }
 .sc-page-btn:focus-visible, .sc-fallback-btn:focus-visible, .sc-paste-zone:focus-visible, .sc-row:focus-visible { outline: 2px solid var(--color-bradley); outline-offset: 2px; }
 

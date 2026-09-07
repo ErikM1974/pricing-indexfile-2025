@@ -20,37 +20,19 @@
 /* stylelint-disable color-no-hex */
 :root {
     --quote-builder-common-gray: #666;
-    --quote-builder-common-green: #22c55e;
     --quote-builder-common-blue: #6366f1;
-    --quote-builder-common-green-2: #16a34a;
     --quote-builder-common-cyan-dark: #003f7f;
-    --quote-builder-common-red: #dc3545;
-    --quote-builder-common-yellow: #ffc107;
     --quote-builder-common-gray-dark: #333;
-    --quote-builder-common-yellow-2: #856404;
-    --quote-builder-common-green-3: #15803d;
     --quote-builder-common-gray-2: #888;
     --quote-builder-common-teal: #17a2b8;
-    --quote-builder-common-green-4: #86efac;
-    --quote-builder-common-yellow-3: #fde68a;
-    --quote-builder-common-green-5: #3a7c52;
-    --quote-builder-common-cyan-tint: #bfdbfe;
-    --quote-builder-common-blue-2: #1e40af;
     --quote-builder-common-blue-3: #3730a3;
     --quote-builder-common-green-6: #6fcf7b;
     --quote-builder-common-green-7: #1e8449;
     --quote-builder-common-gray-3: #7f8c8d;
-    --quote-builder-common-yellow-4: #fbbf24;
     --quote-builder-common-indigo: #5b21b6;
     --quote-builder-common-cyan: #1976d2;
     --quote-builder-common-gray-4: #bbb;
-    --quote-builder-common-red-2: #ef4444;
-    --quote-builder-common-green-8: #c8e6c9;
-    --quote-builder-common-yellow-5: #fcd34d;
-    --quote-builder-common-green-tint: #d1fae5;
-    --quote-builder-common-teal-dark: #047857;
     --quote-builder-common-cyan-dark-2: #002a56;
-    --quote-builder-common-indigo-2: #7c3aed;
     --quote-builder-common-green-9: #20c24c;
     --quote-builder-common-teal-2: #138496;
     --quote-builder-common-yellow-6: #e0a800;
@@ -61,14 +43,10 @@
     --quote-builder-common-yellow-9: #ffd666;
     --quote-builder-common-green-11: #a5d6a7;
     --quote-builder-common-lime-dark: #3f6212;
-    --quote-builder-common-red-3: #fca5a5;
-    --quote-builder-common-green-tint-2: #bbf7d0;
     --quote-builder-common-gray-dark-2: #343a40;
     --quote-builder-common-yellow-tint: #ffecb5;
-    --quote-builder-common-orange: #78350f;
     --quote-builder-common-cyan-2: #93c5fd;
     --quote-builder-common-blue-4: #4f46e5;
-    --quote-builder-common-blue-5: #4338ca;
     --quote-builder-common-blue-tint: #c7d2fe;
     --quote-builder-common-green-12: #34d399;
 
@@ -157,7 +135,7 @@
        ============================================ */
     --nwca-blue: var(--quote-builder-common-cyan-dark);
     --nwca-green: var(--brand-500);
-    --nwca-red: var(--quote-builder-common-red);
+    --nwca-red: var(--bs-danger);
     --border-color: #dee2e6;
     --bg-light: #f8f9fa;
     --bg-sidebar: #f1f3f5;
@@ -183,18 +161,18 @@ body {
    ============================================ */
 #min-order-warning {
     background: var(--amber-100);
-    border: 1px solid var(--quote-builder-common-yellow);
+    border: 1px solid var(--bs-warning);
     border-radius: 8px;
     padding: 12px 16px;
     margin-bottom: 16px;
-    color: var(--quote-builder-common-yellow-2);
+    color: var(--bs-warning-ink);
     display: flex;
     align-items: center;
     gap: 8px;
 }
 
 #min-order-warning i {
-    color: var(--quote-builder-common-yellow);
+    color: var(--bs-warning);
     font-size: 1.2em;
 }
 
@@ -242,7 +220,7 @@ body {
     /* Light cream button on the deep-forest header — high contrast for the
        primary "New Quote" CTA, on-palette with PNW birch + sage tones. */
     background: var(--pnw-birch, var(--store-paper-deep));
-    color: var(--pnw-forest-deep, var(--quote-builder-common-green-3)) !important;
+    color: var(--pnw-forest-deep, var(--green-700)) !important;
     border: 1px solid var(--pnw-sage, transparent);
     box-shadow: 0 2px 6px rgb(0 0 0 / 15%);
     font-weight: 600;
@@ -250,7 +228,7 @@ body {
 
 .power-header .btn-new-quote:hover {
     background: var(--pnw-paper, var(--color-surface));
-    color: var(--pnw-pine, var(--quote-builder-common-green-3)) !important;
+    color: var(--pnw-pine, var(--green-700)) !important;
     box-shadow: 0 4px 12px rgb(0 0 0 / 20%);
     transform: translateY(-1px);
 }
@@ -258,7 +236,7 @@ body {
 /* Unsaved Changes Badge (in header) */
 .unsaved-badge {
     font-size: 11px;
-    color: var(--quote-builder-common-yellow-4);
+    color: var(--amber-400);
     margin-left: 8px;
     animation: unsaved-pulse 2s infinite;
 }
@@ -523,11 +501,11 @@ body {
 
 .product-table tr.child-row.different-color {
     background: var(--amber-100);
-    border-left: 3px solid var(--quote-builder-common-yellow);
+    border-left: 3px solid var(--bs-warning);
 }
 
 .product-table tr.child-row.different-color td:first-child {
-    color: var(--quote-builder-common-yellow-2);
+    color: var(--bs-warning-ink);
     font-weight: 600;
 }
 
@@ -616,12 +594,12 @@ body {
 
 /* Size Input Validation States */
 .size-input.size-available {
-    border-color: var(--quote-builder-common-green);
+    border-color: var(--green-500);
     background: var(--brand-50);
 }
 
 .size-input.size-available:focus {
-    box-shadow: inset 0 0 0 2px var(--quote-builder-common-green);
+    box-shadow: inset 0 0 0 2px var(--green-500);
 }
 
 .size-input.size-unavailable {
@@ -637,7 +615,7 @@ body {
 
 /* Inventory Status Indicators */
 .size-input.inventory-ok {
-    border-left: 3px solid var(--quote-builder-common-green);
+    border-left: 3px solid var(--green-500);
 }
 
 .size-input.inventory-low {
@@ -645,7 +623,7 @@ body {
 }
 
 .size-input.inventory-out {
-    border-left: 3px solid var(--quote-builder-common-red-2);
+    border-left: 3px solid var(--red-500);
     background: var(--red-50);
 }
 
@@ -684,7 +662,7 @@ body {
     text-align: right;
     padding: 0 10px;
     color: var(--print-green-dark);
-    background: var(--quote-builder-common-green-8);
+    background: var(--material-green-100);
 }
 
 .cell-actions {
@@ -961,7 +939,7 @@ details.customer-manual > summary .cm-hint {
     padding: 6px 10px;
     border-radius: 6px;
     margin: 4px 0 6px;
-    border: 1px solid var(--quote-builder-common-yellow-5);
+    border: 1px solid var(--amber-300);
     line-height: 1.4;
 }
 .quantity-nudge i { color: var(--amber-600); }
@@ -1113,8 +1091,8 @@ details.customer-manual > summary .cm-hint {
 }
 
 .btn-action.btn-share-link:hover {
-    background: var(--quote-builder-common-green-tint);
-    color: var(--quote-builder-common-teal-dark);
+    background: var(--emerald-100);
+    color: var(--emerald-700);
 }
 
 .btn-action.btn-push-shopworks {
@@ -1213,7 +1191,7 @@ details.customer-manual > summary .cm-hint {
 }
 .push-readiness .pr-item { display: flex; align-items: center; gap: 8px; padding: 2px 0; }
 .push-readiness .pr-item i { width: 14px; text-align: center; }
-.push-readiness .pr-ok { color: var(--quote-builder-common-green-2); }
+.push-readiness .pr-ok { color: var(--green-600); }
 .push-readiness .pr-no { color: var(--amber-700); }
 .push-readiness .pr-no i { color: var(--gray-300); }
 
@@ -1635,7 +1613,7 @@ details.customer-manual > summary .cm-hint {
 .pricing-breakdown .breakdown-eq { color: var(--gray-400); }
 .pricing-breakdown .breakdown-base { color: var(--blue-600); }
 .pricing-breakdown .breakdown-extra { color: var(--emerald-600); }
-.pricing-breakdown .breakdown-al { color: var(--quote-builder-common-indigo-2); }
+.pricing-breakdown .breakdown-al { color: var(--violet-600); }
 .pricing-breakdown .breakdown-total { color: var(--print-ink); font-weight: 600; }
 
 /* ============================================
@@ -1745,7 +1723,7 @@ details.customer-manual > summary .cm-hint {
 }
 
 .toast-error {
-    background: linear-gradient(135deg, var(--quote-builder-common-red) 0%, var(--color-ae-light) 100%);
+    background: linear-gradient(135deg, var(--bs-danger) 0%, var(--color-ae-light) 100%);
 }
 
 .toast-info {
@@ -1753,7 +1731,7 @@ details.customer-manual > summary .cm-hint {
 }
 
 .toast-warning {
-    background: linear-gradient(135deg, var(--quote-builder-common-yellow) 0%, var(--quote-builder-common-yellow-6) 100%);
+    background: linear-gradient(135deg, var(--bs-warning) 0%, var(--quote-builder-common-yellow-6) 100%);
     color: var(--quote-builder-common-gray-dark);
 }
 
@@ -1769,7 +1747,7 @@ details.customer-manual > summary .cm-hint {
     position: fixed;
     top: 70px;
     right: 20px;
-    background: linear-gradient(135deg, var(--quote-builder-common-yellow) 0%, var(--quote-builder-common-yellow-7) 100%);
+    background: linear-gradient(135deg, var(--bs-warning) 0%, var(--quote-builder-common-yellow-7) 100%);
     color: var(--quote-builder-common-gray-dark);
     padding: 8px 16px;
     border-radius: 20px;
@@ -1825,7 +1803,7 @@ details.customer-manual > summary .cm-hint {
    ============================================ */
 
 .form-control.is-invalid {
-    border-color: var(--quote-builder-common-red) !important;
+    border-color: var(--bs-danger) !important;
     padding-right: calc(1.5em + 0.75rem);
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%23dc3545' viewBox='0 0 12 12'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
     background-repeat: no-repeat;
@@ -1848,7 +1826,7 @@ details.customer-manual > summary .cm-hint {
     width: 100%;
     margin-top: 0.25rem;
     font-size: 0.875em;
-    color: var(--quote-builder-common-red);
+    color: var(--bs-danger);
     animation: shake 0.3s;
 }
 
@@ -1865,7 +1843,7 @@ details.customer-manual > summary .cm-hint {
 /* Required field indicator */
 label.required::after {
     content: ' *';
-    color: var(--quote-builder-common-red);
+    color: var(--bs-danger);
     font-weight: bold;
 }
 
@@ -1902,7 +1880,7 @@ label.required::after {
 .warning-message {
     background: var(--amber-100);
     border: 1px solid var(--amber-100);
-    color: var(--quote-builder-common-yellow-2);
+    color: var(--bs-warning-ink);
     padding: 12px 16px;
     border-radius: 6px;
     margin: 10px 0;
@@ -2373,7 +2351,7 @@ textarea:disabled {
     border-radius: 8px;
     padding: 12px 16px;
     margin-bottom: 16px;
-    border: 1px solid var(--quote-builder-common-green-4);
+    border: 1px solid var(--green-300);
 }
 
 .charges-header {
@@ -2391,7 +2369,7 @@ textarea:disabled {
 }
 
 .charges-badge {
-    background: var(--quote-builder-common-green);
+    background: var(--green-500);
     color: white;
     padding: 2px 8px;
     border-radius: 12px;
@@ -2402,7 +2380,7 @@ textarea:disabled {
 .charges-content {
     margin-top: 12px;
     padding-top: 12px;
-    border-top: 1px dashed var(--quote-builder-common-green-4);
+    border-top: 1px dashed var(--green-300);
 }
 
 .charge-field {
@@ -2418,7 +2396,7 @@ textarea:disabled {
     background: var(--red-50);
     padding: 10px;
     border-radius: 6px;
-    border: 1px solid var(--quote-builder-common-red-3);
+    border: 1px solid var(--red-300);
 }
 
 /* Input with $ prefix */
@@ -2461,14 +2439,14 @@ textarea:disabled {
     width: 16px;
     height: 16px;
     cursor: pointer;
-    accent-color: var(--quote-builder-common-green);
+    accent-color: var(--green-500);
 }
 
 .grand-total-row {
-    background: linear-gradient(135deg, var(--store-green-100) 0%, var(--quote-builder-common-green-tint-2) 100%);
+    background: linear-gradient(135deg, var(--store-green-100) 0%, var(--green-200) 100%);
     margin: 12px -16px -12px;
     padding: 12px 16px !important;
-    border-top: 2px solid var(--quote-builder-common-green);
+    border-top: 2px solid var(--green-500);
     border-radius: 0 0 8px 8px;
 }
 
@@ -2521,15 +2499,15 @@ textarea:disabled {
 /* Colors */
 .text-primary { color: var(--nwca-blue, var(--quote-builder-common-cyan-dark)) !important; }
 .text-success { color: var(--pnw-forest, var(--brand-700)) !important; }
-.text-danger { color: var(--quote-builder-common-red) !important; }
-.text-warning { color: var(--quote-builder-common-yellow) !important; }
+.text-danger { color: var(--bs-danger) !important; }
+.text-warning { color: var(--bs-warning) !important; }
 .text-info { color: var(--quote-builder-common-teal) !important; }
 .text-muted { color: var(--gray-500) !important; }
 
 .bg-primary { background-color: var(--nwca-blue, var(--quote-builder-common-cyan-dark)) !important; }
 .bg-success { background-color: var(--pnw-forest, var(--brand-700)) !important; }
-.bg-danger { background-color: var(--quote-builder-common-red) !important; }
-.bg-warning { background-color: var(--quote-builder-common-yellow) !important; }
+.bg-danger { background-color: var(--bs-danger) !important; }
+.bg-warning { background-color: var(--bs-warning) !important; }
 .bg-info { background-color: var(--quote-builder-common-teal) !important; }
 .bg-light { background-color: var(--gray-50) !important; }
 .bg-dark { background-color: var(--quote-builder-common-gray-dark-2) !important; }
@@ -2541,7 +2519,7 @@ textarea:disabled {
 .border-bottom { border-bottom: 1px solid var(--gray-200) !important; }
 .border-primary { border-color: var(--nwca-blue, var(--quote-builder-common-cyan-dark)) !important; }
 .border-success { border-color: var(--pnw-forest, var(--brand-700)) !important; }
-.border-danger { border-color: var(--quote-builder-common-red) !important; }
+.border-danger { border-color: var(--bs-danger) !important; }
 
 .rounded { border-radius: 0.25rem !important; }
 .rounded-0 { border-radius: 0 !important; }
@@ -2715,13 +2693,13 @@ textarea:disabled {
 }
 
 .qb-btn-primary {
-    background: linear-gradient(135deg, var(--quote-builder-common-green-5) 0%, var(--print-green) 100%);
+    background: linear-gradient(135deg, var(--brand-mid) 0%, var(--print-green) 100%);
     color: white;
     box-shadow: 0 2px 8px rgb(58 124 82 / 30%);
 }
 
 .qb-btn-primary:hover {
-    background: linear-gradient(135deg, var(--print-green) 0%, var(--quote-builder-common-green-5) 100%);
+    background: linear-gradient(135deg, var(--print-green) 0%, var(--brand-mid) 100%);
     box-shadow: 0 4px 12px rgb(58 124 82 / 40%);
     transform: translateY(-1px);
 }
@@ -2849,7 +2827,7 @@ textarea:disabled {
 
 .form-label.required::after {
     content: ' *';
-    color: var(--quote-builder-common-red);
+    color: var(--bs-danger);
 }
 
 /* Panel/card container */
@@ -2891,7 +2869,7 @@ textarea:disabled {
    ============================================ */
 
 .fee-summary-section {
-    border-top: 2px solid var(--quote-builder-common-yellow);
+    border-top: 2px solid var(--bs-warning);
 }
 
 .fee-row {
@@ -2911,7 +2889,7 @@ textarea:disabled {
 .fee-row .fee-label {
     text-align: right;
     padding-right: 16px;
-    color: var(--quote-builder-common-yellow-2);
+    color: var(--bs-warning-ink);
     font-size: 14px;
 }
 
@@ -2923,7 +2901,7 @@ textarea:disabled {
 .fee-row .cell-qty,
 .fee-row .cell-price,
 .fee-row .cell-total {
-    color: var(--quote-builder-common-yellow-2);
+    color: var(--bs-warning-ink);
     font-weight: 600;
 }
 
@@ -2938,7 +2916,7 @@ textarea:disabled {
 
 .ltm-control-panel {
     background: var(--store-paper);
-    border: 1px solid var(--quote-builder-common-yellow-3);
+    border: 1px solid var(--amber-200);
     border-radius: 6px;
     margin-bottom: 10px;
     overflow: hidden;
@@ -3004,7 +2982,7 @@ textarea:disabled {
     gap: 6px;
     cursor: pointer;
     font-size: 12px;
-    color: var(--quote-builder-common-orange);
+    color: var(--amber-900);
 }
 
 .ltm-radio-label input[type="radio"] {
@@ -3026,7 +3004,7 @@ textarea:disabled {
 
 .order-shipping-panel .charges-header {
     background: var(--color-floor-tint);
-    border: 1px solid var(--quote-builder-common-cyan-tint);
+    border: 1px solid var(--blue-200);
 }
 
 .order-shipping-panel .charges-header:hover {
@@ -3045,7 +3023,7 @@ textarea:disabled {
     color: var(--print-green);
     margin-bottom: 6px;
     padding-bottom: 4px;
-    border-bottom: 1px dashed var(--quote-builder-common-green-4);
+    border-bottom: 1px dashed var(--green-300);
 }
 
 .btn-tax-lookup {
@@ -3607,10 +3585,10 @@ input[type="radio"] {
 .ship-mode-btn:hover { border-color: var(--gray-400); }
 
 .ship-mode-btn.active {
-    border-color: var(--quote-builder-common-green-2);
+    border-color: var(--green-600);
     background: var(--brand-50);
     color: var(--print-green);
-    box-shadow: 0 0 0 1px var(--quote-builder-common-green-2) inset;
+    box-shadow: 0 0 0 1px var(--green-600) inset;
 }
 .ship-mode-btn i { font-size: 14px; }
 
@@ -3670,7 +3648,7 @@ input[type="radio"] {
     margin: 10px -14px -12px;
     padding: 12px 14px;
     background: linear-gradient(135deg, var(--brand-50), var(--store-green-100));
-    border-top: 2px solid var(--quote-builder-common-green);
+    border-top: 2px solid var(--green-500);
 }
 .invoice-grand .lbl { font-weight: 700; font-size: 15px; color: var(--print-green); }
 .invoice-grand .amt { font-weight: 700; font-size: 18px; color: var(--print-green); font-variant-numeric: tabular-nums; }
@@ -3745,14 +3723,14 @@ input[type="radio"] {
 .ship-to-card .st-btn { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 6px; border: 1px solid var(--gray-300); background: var(--slate-50); color: var(--gray-700); cursor: pointer; }
 .ship-to-card .st-btn:hover { background: var(--slate-100); }
 .ship-to-card .st-btn:disabled { opacity: .6; cursor: default; }
-.ship-to-card .st-btn-reest { border-color: var(--quote-builder-common-green-2); color: var(--print-green); background: var(--brand-50); }
+.ship-to-card .st-btn-reest { border-color: var(--green-600); color: var(--print-green); background: var(--brand-50); }
 .ship-to-card .st-btn-reest:hover { background: var(--store-green-100); }
 
 /* [2026-06-08] Shared shipping-estimator chrome (DTF/SCP) — extracted from byte-identical inline styles so the
    mobile tap-target, the sentence-case residential label, and the green theme live in ONE place (audit w2g7bwyss). */
 .estimate-ship-row { margin-top: 6px; }
 .estimate-ship-row label { display: flex; align-items: center; gap: 8px; margin: 0; font-size: 11px; font-weight: 400; color: var(--slate-600); cursor: pointer; text-transform: none; letter-spacing: 0; }
-.estimate-ship-btn { display: inline-flex; align-items: center; gap: 6px; margin-top: 5px; cursor: pointer; font-size: 12px; font-weight: 600; padding: 6px 12px; background: var(--brand-50); border: 1px solid var(--quote-builder-common-green-2); color: var(--print-green); border-radius: 6px; }
+.estimate-ship-btn { display: inline-flex; align-items: center; gap: 6px; margin-top: 5px; cursor: pointer; font-size: 12px; font-weight: 600; padding: 6px 12px; background: var(--brand-50); border: 1px solid var(--green-600); color: var(--print-green); border-radius: 6px; }
 .estimate-ship-btn:hover { background: var(--store-green-100); }
 .estimate-ship-result { font-size: 11px; min-height: 14px; margin-top: 4px; line-height: 1.35; color: var(--print-green); }
 
@@ -3760,7 +3738,7 @@ input[type="radio"] {
 
 /* [2026-06-08] Wholesale/reseller row (DTF/SCP #wholesale-row) — match EMB's .it-wholesale-row weight + green accent */
 #wholesale-row label { font-size: 12px; text-transform: none; }
-#wholesale-row input[type="checkbox"] { accent-color: var(--quote-builder-common-green); }
+#wholesale-row input[type="checkbox"] { accent-color: var(--green-500); }
 
 .it-row {
     display: flex;
@@ -3789,13 +3767,13 @@ input[type="radio"] {
     color: var(--slate-600);
     font-size: 14px;
 }
-.it-tax-label input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--quote-builder-common-green); cursor: pointer; }
+.it-tax-label input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--green-500); cursor: pointer; }
 .it-tax-rate { width: 54px; padding: 2px 5px; border: 1px solid var(--gray-300); border-radius: 4px; font-size: 13px; text-align: right; }
 
 .it-total-row {
     margin: 6px -16px -14px;
     padding: 12px 16px;
-    border-top: 2px solid var(--quote-builder-common-green);
+    border-top: 2px solid var(--green-500);
     background: linear-gradient(135deg, var(--brand-50), var(--store-green-100));
     border-radius: 0 0 8px 8px;
 }
@@ -3833,8 +3811,8 @@ input[type="radio"] {
 .shipping-change-btn {
     flex: 0 0 auto;
     background: var(--color-floor-tint);
-    color: var(--quote-builder-common-blue-2);
-    border: 1px solid var(--quote-builder-common-cyan-tint);
+    color: var(--blue-800);
+    border: 1px solid var(--blue-200);
     border-radius: 6px;
     padding: 5px 10px;
     font-size: 12px;
@@ -3885,8 +3863,8 @@ input[type="radio"] {
     justify-content: flex-end;
 }
 .ship-modal-close { background: none; border: none; font-size: 22px; line-height: 1; cursor: pointer; color: var(--slate-500); }
-.ship-modal-done { background: var(--quote-builder-common-green-2); color: var(--color-on-brand); border: none; border-radius: 6px; padding: 9px 20px; font-weight: 600; cursor: pointer; }
-.ship-modal-done:hover { background: var(--quote-builder-common-green-3); }
+.ship-modal-done { background: var(--green-600); color: var(--color-on-brand); border: none; border-radius: 6px; padding: 9px 20px; font-weight: 600; cursor: pointer; }
+.ship-modal-done:hover { background: var(--green-700); }
 
 /* Persistent, catalog-driven Services bar (2026-06-03) — click a chip to add a
    service as a line item. Shared by EMB / SCP / DTG / DTF (rendered by
@@ -3939,7 +3917,7 @@ input[type="radio"] {
 
 .service-chip-price {
     font-size: 11px;
-    color: var(--quote-builder-common-green-2);
+    color: var(--green-600);
     background: var(--brand-50);
     border-radius: 6px;
     padding: 1px 6px;
@@ -3999,12 +3977,12 @@ input[type="radio"] {
 button.service-cat-item:hover { background: var(--color-floor-tint); }
 .service-cat-item .sci-name { display: inline-flex; align-items: center; gap: 8px; }
 .service-cat-item .sci-name i { color: var(--quote-builder-common-blue); width: 15px; text-align: center; }
-.sci-hint { font-size: 11px; color: var(--quote-builder-common-green-2); background: var(--brand-50); border-radius: 6px; padding: 1px 7px; white-space: nowrap; }
+.sci-hint { font-size: 11px; color: var(--green-600); background: var(--brand-50); border-radius: 6px; padding: 1px 7px; white-space: nowrap; }
 .sci-prompt { cursor: default; }
 .sci-amt-wrap { display: inline-flex; align-items: center; gap: 4px; color: var(--slate-500); }
 .sci-amt { width: 72px; padding: 4px 6px; border: 1px solid var(--gray-300); border-radius: 5px; font-size: 12px; text-align: right; }
-.sci-add { padding: 4px 12px; background: var(--quote-builder-common-green-2); color: var(--color-on-brand); border: none; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; }
-.sci-add:hover { background: var(--quote-builder-common-green-3); }
+.sci-add { padding: 4px 12px; background: var(--green-600); color: var(--color-on-brand); border: none; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; }
+.sci-add:hover { background: var(--green-700); }
 
 /* Picker (fields) item — e.g. Additional Logo: Garment/Cap + stitch size */
 .service-cat-menu:has(.sci-config) { min-width: 290px; }
@@ -4019,11 +3997,11 @@ button.service-cat-item:hover { background: var(--color-floor-tint); }
 .sci-fl { min-width: 58px; color: var(--slate-500); }
 input.sci-num { width: 92px; cursor: text; }
 .sci-presets { display: inline-flex; gap: 4px; }
-.sci-preset { padding: 2px 8px; font-size: 11px; background: var(--color-floor-tint); color: var(--quote-builder-common-blue-5); border: 1px solid var(--quote-builder-common-blue-tint); border-radius: 5px; cursor: pointer; font-weight: 600; }
+.sci-preset { padding: 2px 8px; font-size: 11px; background: var(--color-floor-tint); color: var(--indigo-700); border: 1px solid var(--quote-builder-common-blue-tint); border-radius: 5px; cursor: pointer; font-weight: 600; }
 
 /* checkbox field (e.g. DECG/DECC Heavyweight +$10/pc) — override the .sci-field input styling */
 .sci-check-lbl { cursor: pointer; white-space: nowrap; }
-.sci-check { padding: 0; border: none; max-width: none; width: auto; cursor: pointer; accent-color: var(--quote-builder-common-green-2); }
+.sci-check { padding: 0; border: none; max-width: none; width: auto; cursor: pointer; accent-color: var(--green-600); }
 .sci-preset:hover { background: var(--sky-100); }
 
 /* Accepted-quote edit banner (expert audit 2026-07-07) — rendered by
@@ -4402,8 +4380,8 @@ h1.power-header-title {
 .qb-row-line { border-bottom: 1px solid var(--slate-100); }
 .qb-td--b { padding: 4px; font-weight: 600; }
 .qb-total-line { text-align: right; margin-top: 10px; font-size: 14px; font-weight: 700; }
-.qb-warn-box--mt { margin-top: 10px; padding: 8px 10px; background: var(--store-paper); border: 1px solid var(--quote-builder-common-yellow-3); border-radius: 6px; font-size: 12px; color: var(--amber-800); }
-.qb-warn-box { padding: 8px; color: var(--amber-800); background: var(--store-paper); border: 1px solid var(--quote-builder-common-yellow-3); border-radius: 6px; }
+.qb-warn-box--mt { margin-top: 10px; padding: 8px 10px; background: var(--store-paper); border: 1px solid var(--amber-200); border-radius: 6px; font-size: 12px; color: var(--amber-800); }
+.qb-warn-box { padding: 8px; color: var(--amber-800); background: var(--store-paper); border: 1px solid var(--amber-200); border-radius: 6px; }
 .qb-dim { opacity: 0.85; }
 .qb-hint-indigo { font-size: 11px; color: var(--quote-builder-common-blue); }
 .qb-fs10-mr3 { font-size: 10px; margin-right: 3px; }
@@ -4413,7 +4391,7 @@ h1.power-header-title {
 .qb-mt12 { margin-top: 12px; }
 .qb-pl18 { padding-left: 18px; }
 .qb-mr4 { margin-right: 4px; }
-.qb-blue-bold { color: var(--quote-builder-common-blue-2); font-weight: 600; }
+.qb-blue-bold { color: var(--blue-800); font-weight: 600; }
 .qb-pill-red { background: var(--red-600); color: var(--color-on-brand); padding: 1px 6px; border-radius: 3px; font-size: 11px; font-weight: 600; margin-left: 4px; }
 .qb-pill-amber { background: var(--amber-500); color: var(--color-on-brand); padding: 1px 6px; border-radius: 3px; font-size: 11px; font-weight: 600; margin-left: 4px; }
-.qb-pill-green { background: var(--quote-builder-common-green); color: var(--color-on-brand); padding: 1px 6px; border-radius: 3px; font-size: 11px; font-weight: 600; margin-left: 4px; }
+.qb-pill-green { background: var(--green-500); color: var(--color-on-brand); padding: 1px 6px; border-radius: 3px; font-size: 11px; font-weight: 600; margin-left: 4px; }

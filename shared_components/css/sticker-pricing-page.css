@@ -30,7 +30,6 @@
 :root {
     --sticker-pricing-page-gray-dark: #000;
     --sticker-pricing-page-red: #e8b5b1;
-    --sticker-pricing-page-green: #5bc85f;
     --sticker-pricing-page-yellow: #c9be9f;
     --sticker-pricing-page-red-2: #c9543b;
     --sticker-pricing-page-yellow-2: #f0d089;
@@ -38,7 +37,7 @@
     /* ---- Brand (constraints — do not invent new primary) ---- */
     --primary-color: var(--brand-500);
     --primary-dark:  var(--brand-600);
-    --primary-light: var(--sticker-pricing-page-green);
+    --primary-light: var(--brand-400);
     --brand-deep:    var(--print-green);
     --brand-darker:  var(--store-green-900);
     --brand-tint:    var(--store-green-100);

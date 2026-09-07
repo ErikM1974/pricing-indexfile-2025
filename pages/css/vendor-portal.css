@@ -9,16 +9,10 @@
    raw hex is allowed ONLY in this block. */
 /* stylelint-disable color-no-hex */
 :root {
-    --vendor-portal-blue: #1e40af;
-    --vendor-portal-green: #3a7c52;
-    --vendor-portal-red-tint: #fecaca;
     --vendor-portal-indigo: #5b21b6;
-    --vendor-portal-green-tint: #d1fae5;
-    --vendor-portal-teal-dark: #065f46;
-    --vendor-portal-yellow: #fde68a;
     --vendor-portal-cyan: #93c5fd;
   --vp-green-dark: var(--brand-800);
-  --vp-green: var(--vendor-portal-green);
+  --vp-green: var(--brand-mid);
   --vp-green-pale: var(--brand-100);
   --vp-ink: var(--gray-800);
   --vp-muted: var(--gray-500);
@@ -169,7 +163,7 @@ body {
 
 .vp-error {
   background: var(--red-100);
-  border: 1px solid var(--vendor-portal-red-tint);
+  border: 1px solid var(--red-200);
   border-left: 4px solid var(--vp-rush);
   color: var(--red-800);
   border-radius: 8px;
@@ -241,9 +235,9 @@ body {
 }
 .vp-badge--rush { background: var(--red-100); color: var(--vp-rush); }
 .vp-badge--status-Requested { background: var(--amber-100); color: var(--amber-800); }
-.vp-badge--status-Ordered { background: var(--sky-100); color: var(--vendor-portal-blue); }
+.vp-badge--status-Ordered { background: var(--sky-100); color: var(--blue-800); }
 .vp-badge--status-PO_Created { background: var(--color-ruth-tint); color: var(--vendor-portal-indigo); }
-.vp-badge--status-Shipped { background: var(--vendor-portal-green-tint); color: var(--vendor-portal-teal-dark); }
+.vp-badge--status-Shipped { background: var(--emerald-100); color: var(--emerald-800); }
 .vp-badge--status-Received { background: var(--vp-green-pale); color: var(--vp-green-dark); }
 .vp-badge--status-Cancelled { background: var(--gray-100); color: var(--vp-muted); }
 .vp-badge--status-On_Hold { background: var(--red-100); color: var(--store-rush-deeper); }
@@ -309,7 +303,7 @@ body {
 .vp-instructions {
   margin-top: 14px;
   background: var(--store-paper);
-  border: 1px solid var(--vendor-portal-yellow);
+  border: 1px solid var(--amber-200);
   border-left: 4px solid var(--amber-500);
   border-radius: 8px;
   padding: 10px 14px;
@@ -386,7 +380,7 @@ body {
   border-radius: 4px;
   padding: 1px 6px;
 }
-.vp-file-type--mockup { background: var(--sky-100); color: var(--vendor-portal-blue); }
+.vp-file-type--mockup { background: var(--sky-100); color: var(--blue-800); }
 
 /* Mockup panel */
 .vp-mockup-img {

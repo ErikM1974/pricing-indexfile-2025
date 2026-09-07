@@ -22,7 +22,6 @@
 /* stylelint-disable color-no-hex */
 :root {
     --customer-portal-yellow: #e6bb4a;
-    --customer-portal-green-dark: #1b5e20;
     --customer-portal-green: #bfe0c1;
     --customer-portal-yellow-2: #b8912a;
     --customer-portal-yellow-3: #d9ad3c;
@@ -39,7 +38,7 @@
     --cp-green-950: var(--store-green-950);
     --cp-green-900: var(--store-green-950);
     --cp-green-800: var(--store-green-900);
-    --cp-green-700: var(--customer-portal-green-dark);
+    --cp-green-700: var(--material-green-900);
     --cp-green-600: var(--store-green-700);
     --cp-green-500: var(--brand-600);
     --cp-green-200: var(--customer-portal-green);

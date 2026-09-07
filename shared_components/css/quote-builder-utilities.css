@@ -16,14 +16,9 @@
     --qb-blue: #4f46e5;
     --qb-cyan: #0284c7;
     --qb-cyan-2: #0ea5e9;
-    --qb-yellow: #fde68a;
     --qb-indigo: #5b21b6;
     --qb-orange: #f9a825;
-    --qb-green: #22c55e;
     --qb-gray-dark: #333;
-    --qb-cyan-tint: #bfdbfe;
-    --qb-blue-2: #1e40af;
-    --qb-green-2: #28a745;
     --qb-green-3: #a5d6a7;
 }
 /* stylelint-enable color-no-hex */
@@ -58,7 +53,7 @@
 .qb-fs-12-c-gray-500-bb-none-p-2-0 { font-size: 12px !important; color: var(--gray-500) !important; border-bottom: none !important; padding: 2px 0 !important; }
 .qb-fst-italic { font-style: italic !important; }
 .qb-fst-italic-fw-500 { font-style: italic !important; font-weight: 500 !important; }
-.qb-ml-auto-bg-qb-green-c-white-p-2-8-r-12-fs-11-fw-600 { margin-left: auto !important; background: var(--qb-green) !important; color: white !important; padding: 2px 8px !important; border-radius: 12px !important; font-size: 11px !important; font-weight: 600 !important; }
+.qb-ml-auto-bg-qb-green-c-white-p-2-8-r-12-fs-11-fw-600 { margin-left: auto !important; background: var(--green-500) !important; color: white !important; padding: 2px 8px !important; border-radius: 12px !important; font-size: 11px !important; font-weight: 600 !important; }
 .qb-mb-10 { margin-bottom: 10px !important; }
 .qb-ai-center-gap-8-cur-pointer-fs-13-c-qb-gray-dark-mb-0 { align-items: center !important; gap: 8px !important; cursor: pointer !important; font-size: 13px !important; color: var(--qb-gray-dark) !important; margin-bottom: 0 !important; }
 .qb-w-16-h-16-cur-pointer { width: 16px !important; height: 16px !important; cursor: pointer !important; }
@@ -74,7 +69,7 @@
 .qb-maxw-760 { max-width: 760px !important; }
 .qb-maxw-800 { max-width: 800px !important; }
 .qb-bg-linear-gradient-135deg-qb-cyan-2-0-qb-cy { background: linear-gradient(135deg, var(--qb-cyan-2) 0%, var(--qb-cyan) 100%) !important; }
-.qb-p-6-12-bg-color-floor-tint-b-1-solid-qb-cyan-tint-r-6-mb-10-f-ce2f { padding: 6px 12px !important; background: var(--color-floor-tint) !important; border: 1px solid var(--qb-cyan-tint) !important; border-radius: 6px !important; margin-bottom: 10px !important; font-size: 12px !important; color: var(--qb-blue-2) !important; }
+.qb-p-6-12-bg-color-floor-tint-b-1-solid-qb-cyan-tint-r-6-mb-10-f-ce2f { padding: 6px 12px !important; background: var(--color-floor-tint) !important; border: 1px solid var(--blue-200) !important; border-radius: 6px !important; margin-bottom: 10px !important; font-size: 12px !important; color: var(--blue-800) !important; }
 .qb-mr-6 { margin-right: 6px !important; }
 .qb-b-1-solid-slate-200-r-8-ov-hidden { border: 1px solid var(--slate-200) !important; border-radius: 8px !important; overflow: hidden !important; }
 .qb-p-12-bb-1-solid-slate-200 { padding: 12px !important; border-bottom: 1px solid var(--slate-200) !important; }
@@ -83,7 +78,7 @@
 .qb-ai-flex-end-pb-2 { align-items: flex-end !important; padding-bottom: 2px !important; }
 .qb-fs-12-c-slate-600-ai-center-gap-5-cur-pointer { font-size: 12px !important; color: var(--slate-600) !important; align-items: center !important; gap: 5px !important; cursor: pointer !important; }
 .qb-w-14-h-14-accent-color-color-floor-light { width: 14px !important; height: 14px !important; accent-color: var(--color-floor-light) !important; }
-.qb-p-10-12-bg-store-paper-bt-1-solid-qb-yellow { padding: 10px 12px !important; background: var(--store-paper) !important; border-top: 1px solid var(--qb-yellow) !important; }
+.qb-p-10-12-bg-store-paper-bt-1-solid-qb-yellow { padding: 10px 12px !important; background: var(--store-paper) !important; border-top: 1px solid var(--amber-200) !important; }
 .qb-ai-center-gap-8-cur-pointer-fs-13-c-amber-800 { align-items: center !important; gap: 8px !important; cursor: pointer !important; font-size: 13px !important; color: var(--amber-800) !important; }
 .qb-w-15-h-15-accent-color-amber-500 { width: 15px !important; height: 15px !important; accent-color: var(--amber-500) !important; }
 .qb-c-amber-500 { color: var(--amber-500) !important; }
@@ -91,7 +86,7 @@
 .qb-bg-linear-gradient-135deg-qb-cyan-2-0-sky-7 { background: linear-gradient(135deg, var(--qb-cyan-2) 0%, var(--sky-700) 100%) !important; }
 .qb-p-16 { padding: 16px !important; }
 .qb-mr-8 { margin-right: 8px !important; }
-.qb-p-8-10-bg-amber-100-b-1-solid-qb-yellow-r-4-fs-12-c-amber-800 { padding: 8px 10px !important; background: var(--amber-100) !important; border: 1px solid var(--qb-yellow) !important; border-radius: 4px !important; font-size: 12px !important; color: var(--amber-800) !important; }
+.qb-p-8-10-bg-amber-100-b-1-solid-qb-yellow-r-4-fs-12-c-amber-800 { padding: 8px 10px !important; background: var(--amber-100) !important; border: 1px solid var(--amber-200) !important; border-radius: 4px !important; font-size: 12px !important; color: var(--amber-800) !important; }
 .qb-mr-4 { margin-right: 4px !important; }
 .qb-w-100-p-8-10-b-1-solid-store-line-r-4-fs-13-box-sizing-border-9704 { width: 100% !important; padding: 8px 10px !important; border: 1px solid var(--store-line) !important; border-radius: 4px !important; font-size: 13px !important; box-sizing: border-box !important; background: white !important; margin-bottom: 10px !important; }
 .qb-w-100-p-8-10-b-1-solid-store-line-r-4-fs-13-box-sizing-border-3e84 { width: 100% !important; padding: 8px 10px !important; border: 1px solid var(--store-line) !important; border-radius: 4px !important; font-size: 13px !important; box-sizing: border-box !important; margin-bottom: 10px !important; }
@@ -105,7 +100,7 @@
 .qb-mt-6-fs-12-c-slate-600 { margin-top: 6px !important; font-size: 12px !important; color: var(--slate-600) !important; }
 .qb-fs-11-c-slate-500-mt-6-minh-14 { font-size: 11px !important; color: var(--slate-500) !important; margin-top: 6px !important; min-height: 14px !important; }
 .qb-fs-12-mt-10-c-slate-500-minh-18 { font-size: 12px !important; margin-top: 10px !important; color: var(--slate-500) !important; min-height: 18px !important; }
-.qb-c-qb-green-2 { color: var(--qb-green-2) !important; }
+.qb-c-qb-green-2 { color: var(--bs-success) !important; }
 .qb-pt-10 { padding-top: 10px !important; }
 .qb-c-qb-gray { color: var(--qb-gray) !important; }
 .qb-fw-400-c-qb-gray { font-weight: 400 !important; color: var(--qb-gray) !important; }

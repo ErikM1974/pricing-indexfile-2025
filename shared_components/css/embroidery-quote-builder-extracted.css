@@ -20,30 +20,13 @@
    every rule below uses var(). Raw hex is allowed ONLY in this block. */
 /* stylelint-disable color-no-hex */
 :root {
-    --embroidery-quote-builder-extracted-green: #22c55e;
     --embroidery-quote-builder-extracted-cyan: #93c5fd;
-    --embroidery-quote-builder-extracted-blue: #1e40af;
-    --embroidery-quote-builder-extracted-green-2: #16a34a;
-    --embroidery-quote-builder-extracted-indigo: #7c3aed;
-    --embroidery-quote-builder-extracted-green-3: #86efac;
-    --embroidery-quote-builder-extracted-yellow: #fde68a;
-    --embroidery-quote-builder-extracted-yellow-2: #fcd34d;
     --embroidery-quote-builder-extracted-gray: #666;
     --embroidery-quote-builder-extracted-gray-dark: #333;
-    --embroidery-quote-builder-extracted-red: #fca5a5;
-    --embroidery-quote-builder-extracted-teal-dark: #065f46;
     --embroidery-quote-builder-extracted-red-2: #9d174d;
     --embroidery-quote-builder-extracted-indigo-2: #6d28d9;
-    --embroidery-quote-builder-extracted-cyan-tint: #bfdbfe;
     --embroidery-quote-builder-extracted-indigo-tint: #e9d5ff;
-    --embroidery-quote-builder-extracted-green-tint: #bbf7d0;
     --embroidery-quote-builder-extracted-yellow-3: #fef08a;
-    --embroidery-quote-builder-extracted-yellow-4: #fbbf24;
-    --embroidery-quote-builder-extracted-red-3: #dc3545;
-    --embroidery-quote-builder-extracted-green-4: #c8e6c9;
-    --embroidery-quote-builder-extracted-green-5: #15803d;
-    --embroidery-quote-builder-extracted-green-6: #a7f3d0;
-    --embroidery-quote-builder-extracted-green-tint-2: #d1fae5;
     --embroidery-quote-builder-extracted-indigo-3: #6b21a8;
     --embroidery-quote-builder-extracted-teal-tint: #cffafe;
     --embroidery-quote-builder-extracted-cyan-2: #155e75;
@@ -159,7 +142,7 @@
 .pricing-total-sticky {
     background: var(--color-surface);
     padding: 12px 16px;
-    border-top: 2px solid var(--pnw-forest, var(--embroidery-quote-builder-extracted-green));
+    border-top: 2px solid var(--pnw-forest, var(--green-500));
     box-shadow: 0 -4px 12px rgb(0 0 0 / 8%);
 }
 
@@ -283,13 +266,13 @@
 }
 
 .logo-card-icon.garment {
-    background: linear-gradient(135deg, var(--sky-100) 0%, var(--embroidery-quote-builder-extracted-cyan-tint) 100%);
+    background: linear-gradient(135deg, var(--sky-100) 0%, var(--blue-200) 100%);
     color: var(--blue-600);
 }
 
 .logo-card-icon.cap {
     background: linear-gradient(135deg, var(--color-ruth-tint) 0%, var(--embroidery-quote-builder-extracted-indigo-tint) 100%);
-    color: var(--embroidery-quote-builder-extracted-indigo);
+    color: var(--violet-600);
 }
 
 .logo-card-title {
@@ -385,7 +368,7 @@
     gap: 10px;
     padding: 10px 14px;
     background: var(--brand-50);
-    border: 1px solid var(--embroidery-quote-builder-extracted-green-tint);
+    border: 1px solid var(--green-200);
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.2s;
@@ -393,12 +376,12 @@
 
 .digitizing-checkbox:hover {
     background: var(--store-green-100);
-    border-color: var(--embroidery-quote-builder-extracted-green-3);
+    border-color: var(--green-300);
 }
 
 .digitizing-checkbox.checked {
-    background: var(--pnw-forest, var(--embroidery-quote-builder-extracted-green));
-    border-color: var(--pnw-forest, var(--embroidery-quote-builder-extracted-green));
+    background: var(--pnw-forest, var(--green-500));
+    border-color: var(--pnw-forest, var(--green-500));
 }
 
 .digitizing-checkbox.checked .digitizing-checkbox-label {
@@ -416,7 +399,7 @@
 .digitizing-checkbox-indicator {
     width: 20px;
     height: 20px;
-    border: 2px solid var(--pnw-forest, var(--embroidery-quote-builder-extracted-green));
+    border: 2px solid var(--pnw-forest, var(--green-500));
     border-radius: 4px;
     display: flex;
     align-items: center;
@@ -432,7 +415,7 @@
 
 .digitizing-checkbox-indicator i {
     font-size: 12px;
-    color: var(--pnw-forest, var(--embroidery-quote-builder-extracted-green));
+    color: var(--pnw-forest, var(--green-500));
     opacity: 0;
     transition: opacity 0.2s;
 }
@@ -449,7 +432,7 @@
 
 .digitizing-checkbox-price {
     font-size: 12px;
-    color: var(--pnw-forest-deep, var(--embroidery-quote-builder-extracted-green-2));
+    color: var(--pnw-forest-deep, var(--green-600));
     margin-left: auto;
 }
 
@@ -542,7 +525,7 @@
 }
 
 .toggle-switch.active {
-    background: var(--pnw-forest, var(--embroidery-quote-builder-extracted-green));
+    background: var(--pnw-forest, var(--green-500));
 }
 
 .toggle-switch-handle {
@@ -576,15 +559,15 @@
     align-items: center;
     gap: 10px;
     padding: 14px 16px;
-    background: linear-gradient(135deg, var(--amber-100) 0%, var(--embroidery-quote-builder-extracted-yellow) 100%);
-    border-bottom: 1px solid var(--embroidery-quote-builder-extracted-yellow-2);
+    background: linear-gradient(135deg, var(--amber-100) 0%, var(--amber-200) 100%);
+    border-bottom: 1px solid var(--amber-300);
 }
 
 .artwork-services-icon {
     width: 36px;
     height: 36px;
     border-radius: 8px;
-    background: linear-gradient(135deg, var(--embroidery-quote-builder-extracted-yellow-4) 0%, var(--amber-500) 100%);
+    background: linear-gradient(135deg, var(--amber-400) 0%, var(--amber-500) 100%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -727,7 +710,7 @@
 }
 
 .artwork-toggle input:checked + .artwork-toggle-indicator {
-    background: var(--pnw-forest, var(--embroidery-quote-builder-extracted-green));
+    background: var(--pnw-forest, var(--green-500));
 }
 
 .artwork-toggle input:checked + .artwork-toggle-indicator::after {
@@ -858,7 +841,7 @@
 .remove-al-btn {
     background: none;
     border: none;
-    color: var(--embroidery-quote-builder-extracted-red-3);
+    color: var(--bs-danger);
     cursor: pointer;
     padding: 4px 8px;
     font-size: 14px;
@@ -966,7 +949,7 @@
 }
 
 .cell-price:hover {
-    background: var(--embroidery-quote-builder-extracted-green-4);
+    background: var(--material-green-100);
 }
 
 .cell-price.price-overridden {
@@ -976,7 +959,7 @@
 }
 
 .cell-price.price-overridden:hover {
-    background: var(--embroidery-quote-builder-extracted-yellow);
+    background: var(--amber-200);
 }
 
 .cell-price .price-override-wrapper {
@@ -1055,17 +1038,17 @@
     gap: 4px;
     padding: 2px 8px;
     background: var(--brand-50);
-    border: 1px solid var(--pnw-forest, var(--embroidery-quote-builder-extracted-green));
+    border: 1px solid var(--pnw-forest, var(--green-500));
     border-radius: 12px;
     font-size: 11px;
-    color: var(--pnw-forest-deep, var(--embroidery-quote-builder-extracted-green-2));
+    color: var(--pnw-forest-deep, var(--green-600));
     cursor: pointer;
     margin-top: 4px;
     transition: all 0.15s ease;
 }
 
 .al-btn:hover {
-    background: var(--pnw-forest, var(--embroidery-quote-builder-extracted-green));
+    background: var(--pnw-forest, var(--green-500));
     color: white;
 }
 
@@ -1187,10 +1170,10 @@
     gap: 4px;
     padding: 4px 12px;
     background: var(--brand-50);
-    border: 1px dashed var(--pnw-forest, var(--embroidery-quote-builder-extracted-green));
+    border: 1px dashed var(--pnw-forest, var(--green-500));
     border-radius: 4px;
     font-size: 11px;
-    color: var(--pnw-forest-deep, var(--embroidery-quote-builder-extracted-green-2));
+    color: var(--pnw-forest-deep, var(--green-600));
     cursor: pointer;
 }
 
@@ -1571,7 +1554,7 @@ td.size-disabled input {
 }
 .push-readiness .pr-item { display: flex; align-items: center; gap: 8px; padding: 2px 0; }
 .push-readiness .pr-item i { width: 14px; text-align: center; }
-.push-readiness .pr-ok { color: var(--embroidery-quote-builder-extracted-green-2); }
+.push-readiness .pr-ok { color: var(--green-600); }
 .push-readiness .pr-no { color: var(--amber-700); }
 .push-readiness .pr-no i { color: var(--gray-300); }
 
@@ -1662,8 +1645,8 @@ td.size-disabled input {
 
 .design-btn-search {
     background: var(--brand-50);
-    color: var(--embroidery-quote-builder-extracted-green-5);
-    border-color: var(--embroidery-quote-builder-extracted-green-3);
+    color: var(--green-700);
+    border-color: var(--green-300);
 }
 
 .design-btn-search:hover {
@@ -1673,7 +1656,7 @@ td.size-disabled input {
 .design-btn-clear {
     background: var(--red-50);
     color: var(--red-600);
-    border-color: var(--embroidery-quote-builder-extracted-red);
+    border-color: var(--red-300);
     padding: 5px 8px;
 }
 
@@ -1700,25 +1683,25 @@ td.size-disabled input {
 
 .design-info-found {
     background: var(--brand-50);
-    color: var(--embroidery-quote-builder-extracted-teal-dark);
-    border: 1px solid var(--embroidery-quote-builder-extracted-green-6);
+    color: var(--emerald-800);
+    border: 1px solid var(--emerald-200);
 }
 
 .design-info-warning {
     background: var(--store-paper);
     color: var(--amber-800);
-    border: 1px solid var(--embroidery-quote-builder-extracted-yellow-2);
+    border: 1px solid var(--amber-300);
 }
 
 .design-info-error {
     background: var(--red-50);
     color: var(--red-800);
-    border: 1px solid var(--embroidery-quote-builder-extracted-red);
+    border: 1px solid var(--red-300);
 }
 
 .design-info-loading {
     background: var(--color-floor-tint);
-    color: var(--embroidery-quote-builder-extracted-blue);
+    color: var(--blue-800);
     border: 1px solid var(--embroidery-quote-builder-extracted-cyan);
 }
 
@@ -2004,7 +1987,7 @@ td.size-disabled input {
 
 .design-source-badge.source-master {
     background: var(--sky-100);
-    color: var(--embroidery-quote-builder-extracted-blue);
+    color: var(--blue-800);
 }
 
 .design-source-badge.source-art {
@@ -2013,8 +1996,8 @@ td.size-disabled input {
 }
 
 .design-source-badge.source-image {
-    background: var(--embroidery-quote-builder-extracted-green-tint-2);
-    color: var(--embroidery-quote-builder-extracted-teal-dark);
+    background: var(--emerald-100);
+    color: var(--emerald-800);
 }
 
 .design-source-badge.source-customer {
@@ -2026,7 +2009,7 @@ td.size-disabled input {
 /* Fuzzy search indicator */
 .design-search-fuzzy-note {
     font-size: 11px;
-    color: var(--embroidery-quote-builder-extracted-indigo);
+    color: var(--violet-600);
     background: var(--color-ruth-tint);
     border: 1px solid var(--color-ruth-tint);
     border-radius: 6px;
@@ -2223,7 +2206,7 @@ td.size-disabled input {
     align-items: center;
     gap: 8px;
     font-size: 13px;
-    color: var(--embroidery-quote-builder-extracted-blue);
+    color: var(--blue-800);
 }
 
 .gallery-header-info i {
@@ -2648,7 +2631,7 @@ td.size-disabled input {
     text-transform: uppercase;
 }
 .decg-stitch-item .badge-decg { background: var(--amber-100); color: var(--amber-800); }
-.decg-stitch-item .badge-decc { background: var(--sky-100); color: var(--embroidery-quote-builder-extracted-blue); }
+.decg-stitch-item .badge-decc { background: var(--sky-100); color: var(--blue-800); }
 .decg-stitch-item .item-info { flex: 1; }
 .decg-stitch-item .item-desc { font-size: 13px; color: var(--gray-700); margin-bottom: 2px; }
 .decg-stitch-item .item-qty { font-size: 11px; color: var(--slate-500); }
@@ -2694,13 +2677,13 @@ td.size-disabled input {
     font-weight: 600;
     text-transform: uppercase;
 }
-.spr-type-al { background: var(--sky-100); color: var(--embroidery-quote-builder-extracted-blue); }
+.spr-type-al { background: var(--sky-100); color: var(--blue-800); }
 .spr-type-fb { background: var(--red-50); color: var(--embroidery-quote-builder-extracted-red-2); }
 .spr-type-monogram { background: var(--color-ruth-tint); color: var(--embroidery-quote-builder-extracted-indigo-3); }
 .spr-type-decg { background: var(--amber-100); color: var(--amber-800); }
 .spr-type-decc { background: var(--embroidery-quote-builder-extracted-teal-tint); color: var(--embroidery-quote-builder-extracted-cyan-2); }
-.spr-type-cb { background: var(--sky-100); color: var(--embroidery-quote-builder-extracted-blue); }
-.spr-type-cs { background: var(--sky-100); color: var(--embroidery-quote-builder-extracted-blue); }
+.spr-type-cb { background: var(--sky-100); color: var(--blue-800); }
+.spr-type-cs { background: var(--sky-100); color: var(--blue-800); }
 .spr-delta-badge { font-size: 10px; padding: 1px 6px; border-radius: 10px; font-weight: 600; margin-left: 6px; white-space: nowrap; }
 .spr-delta-badge.ok { background: var(--store-green-100); color: var(--print-green); }
 .spr-delta-badge.review { background: var(--amber-100); color: var(--amber-800); }
@@ -2708,7 +2691,7 @@ td.size-disabled input {
 
 .spr-delta-warning {
     padding: 8px 12px; margin-bottom: 10px; border-radius: 6px;
-    background: var(--store-paper); border: 1px solid var(--embroidery-quote-builder-extracted-yellow);
+    background: var(--store-paper); border: 1px solid var(--amber-200);
     font-size: 12px; color: var(--amber-800);
     display: flex; align-items: center; gap: 8px;
 }
@@ -2756,7 +2739,7 @@ td.size-disabled input {
    ============================================ */
 .btn-add-nonsanmar {
     display: inline-flex; align-items: center; gap: 5px; padding: 5px 12px;
-    background: var(--embroidery-quote-builder-extracted-indigo); color: white; border: none; border-radius: 5px;
+    background: var(--violet-600); color: white; border: none; border-radius: 5px;
     font-size: 13px; font-weight: 600; cursor: pointer;
 }
 .btn-add-nonsanmar:hover { background: var(--embroidery-quote-builder-extracted-indigo-2); }
@@ -2764,7 +2747,7 @@ td.size-disabled input {
 
 .non-sanmar-badge {
     display: inline-block; padding: 1px 6px; margin-left: 4px;
-    background: var(--color-ruth-tint); color: var(--embroidery-quote-builder-extracted-indigo); border-radius: 3px;
+    background: var(--color-ruth-tint); color: var(--violet-600); border-radius: 3px;
     font-size: 10px; font-weight: 600; text-transform: uppercase; vertical-align: middle;
 }
 
@@ -2778,13 +2761,13 @@ td.size-disabled input {
     from { opacity: 0; transform: translateY(-8px); }
     to { opacity: 1; transform: translateY(0); }
 }
-.import-summary-banner.banner-success { background: var(--brand-50); border-color: var(--embroidery-quote-builder-extracted-green-3); }
-.import-summary-banner.banner-warning { background: var(--store-paper); border-color: var(--embroidery-quote-builder-extracted-yellow-2); }
+.import-summary-banner.banner-success { background: var(--brand-50); border-color: var(--green-300); }
+.import-summary-banner.banner-warning { background: var(--store-paper); border-color: var(--amber-300); }
 .import-summary-banner .banner-title { font-weight: 700; margin-bottom: 4px; color: var(--gray-800); }
 .import-summary-banner .banner-detail { color: var(--slate-600); font-size: 12px; }
 .import-summary-banner .banner-ns-item { display: flex; align-items: center; gap: 6px; padding: 2px 0; cursor: pointer; }
 .import-summary-banner .banner-ns-item:hover { text-decoration: underline; }
-.import-summary-banner .banner-ns-item .ns-price-ok { color: var(--pnw-forest-deep, var(--embroidery-quote-builder-extracted-green-2)); }
+.import-summary-banner .banner-ns-item .ns-price-ok { color: var(--pnw-forest-deep, var(--green-600)); }
 .import-summary-banner .banner-ns-item .ns-price-warn { color: var(--red-600); }
 
 .import-summary-banner .btn-dismiss-banner {
@@ -2795,7 +2778,7 @@ td.size-disabled input {
 .import-summary-banner .btn-dismiss-banner:hover { background: rgb(0 0 0 / 5%); color: var(--slate-600); }
 .ns-price-display { display: inline-flex; align-items: center; gap: 5px; cursor: pointer; }
 .ns-price-display .fa-pencil-alt { font-size: 10px; color: var(--slate-500); opacity: 0; transition: opacity 0.15s; }
-.ns-price-display:hover .fa-pencil-alt { opacity: 1; color: var(--embroidery-quote-builder-extracted-indigo); }
+.ns-price-display:hover .fa-pencil-alt { opacity: 1; color: var(--violet-600); }
 /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
 .ns-price-zero { background: var(--red-50) !important; }
 .ns-price-zero .ns-price-display { color: var(--red-600); font-weight: 600; }
@@ -2930,7 +2913,7 @@ td.size-disabled input {
 .stitch-estimator-pop .se-result {
     margin: 6px 0;
 }
-.stitch-estimator-pop .se-result strong { color: var(--embroidery-quote-builder-extracted-green-2); }
+.stitch-estimator-pop .se-result strong { color: var(--green-600); }
 
 .stitch-estimator-pop .se-actions {
     display: flex;

@@ -16,8 +16,6 @@
     --screen-print-pricing-gray-dark: #333;
     --screen-print-pricing-orange: #ff6b35;
     --screen-print-pricing-gray-2: #bdbdbd;
-    --screen-print-pricing-red: #dc3545;
-    --screen-print-pricing-yellow: #856404;
     --screen-print-pricing-red-2: #d64520;
     --screen-print-pricing-red-3: #f87171;
     --primary-color: var(--pnw-forest, var(--brand-500)) !important;
@@ -523,7 +521,7 @@
 }
 
 .sp-btn-remove {
-    background: var(--screen-print-pricing-red);
+    background: var(--bs-danger);
     color: white;
     width: 36px;
     height: 36px;
@@ -686,7 +684,7 @@
 .sp-ltm-warning {
     background: var(--amber-100);
     border: 1px solid var(--amber-100);
-    color: var(--screen-print-pricing-yellow);
+    color: var(--bs-warning-ink);
     padding: 12px;
     border-radius: 4px;
     display: flex;

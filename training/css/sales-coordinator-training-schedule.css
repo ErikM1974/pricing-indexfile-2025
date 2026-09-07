@@ -13,29 +13,22 @@
         :root {
     --page-gray-dark: #333;
     --page-gray: #666;
-    --page-yellow: #856404;
-    --page-red: #dc3545;
-    --page-green: #5bc85f;
-    --page-green-tint: #d1fae5;
-    --page-teal-dark: #065f46;
-    --page-red-2: #ef4444;
     --page-red-3: #f44336;
-    --page-yellow-2: #ffc107;
     --page-green-2: #48bb78;
     --page-green-3: #38a169;
     --page-green-4: #c3e6cb;
     --page-red-tint: #f5c6cb;
             --primary-color: var(--brand-500);
             --primary-dark: var(--brand-600);
-            --primary-light: var(--page-green);
+            --primary-light: var(--brand-400);
             --bg-color: var(--color-bradley-tint);
             --card-bg: var(--color-surface);
             --border-color: var(--gray-200);
             --text-primary: var(--gray-800);
             --text-secondary: var(--gray-500);
             --hover-bg: var(--gray-100);
-            --success-bg: var(--page-green-tint);
-            --success-text: var(--page-teal-dark);
+            --success-bg: var(--emerald-100);
+            --success-text: var(--emerald-800);
             --warning-bg: var(--amber-100);
             --warning-text: var(--amber-800);
             --focus-shadow: 0 0 0 0.25rem rgb(76 179 84 / 25%);
@@ -587,7 +580,7 @@
         .feedback.error {
             background: var(--red-100);
             color: var(--red-800);
-            border: 1px solid var(--page-red-2);
+            border: 1px solid var(--red-500);
         }
 
         /* Space utilities for content */
@@ -754,7 +747,7 @@
 
         .hall-of-shame {
             background: var(--amber-100);
-            border: 2px solid var(--page-yellow-2);
+            border: 2px solid var(--bs-warning);
             border-radius: 15px;
             padding: 30px;
             margin-bottom: 30px;
@@ -762,14 +755,14 @@
         }
 
         .hall-of-shame h2 {
-            color: var(--page-yellow);
+            color: var(--bs-warning-ink);
             text-align: center;
             margin-bottom: 10px;
         }
 
         .hall-of-shame > p {
             text-align: center;
-            color: var(--page-yellow);
+            color: var(--bs-warning-ink);
             margin-bottom: 30px;
         }
 
@@ -783,11 +776,11 @@
             background: var(--red-100);
             padding: 20px;
             border-radius: 10px;
-            border-left: 4px solid var(--page-red);
+            border-left: 4px solid var(--bs-danger);
         }
 
         .shame-box h3 {
-            color: var(--page-red);
+            color: var(--bs-danger);
             margin-bottom: 15px;
         }
 

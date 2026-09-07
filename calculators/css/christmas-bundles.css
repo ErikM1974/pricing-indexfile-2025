@@ -10,19 +10,12 @@
 /* stylelint-disable color-no-hex */
 :root {
     --christmas-bundles-gray: #666;
-    --christmas-bundles-teal: #10b981;
     --christmas-bundles-gray-dark: #333;
     --christmas-bundles-yellow: #ffd700;
-    --christmas-bundles-green: #28a745;
-    --christmas-bundles-red: #dc3545;
     --christmas-bundles-cyan: #0284c7;
     --christmas-bundles-orange: #f57c00;
-    --christmas-bundles-yellow-2: #ffc107;
     --christmas-bundles-green-2: #81c784;
     --christmas-bundles-red-2: #f44336;
-    --christmas-bundles-green-dark: #1b5e20;
-    --christmas-bundles-teal-dark: #065f46;
-    --christmas-bundles-red-3: #ef4444;
 }
 /* stylelint-enable color-no-hex */
 
@@ -267,7 +260,7 @@
 
         /* Deadline Banner */
         .deadline-banner {
-            background: linear-gradient(135deg, var(--christmas-bundles-yellow-2) 0%, var(--amber-500) 100%);
+            background: linear-gradient(135deg, var(--bs-warning) 0%, var(--amber-500) 100%);
             color: var(--brand-800);
             padding: 15px 20px;
             text-align: center;
@@ -831,7 +824,7 @@
         /* Value Summary Banner */
         .value-summary-banner {
             background: linear-gradient(135deg, var(--amber-100) 0%, var(--sky-100) 100%);
-            border: 2px solid var(--christmas-bundles-green);
+            border: 2px solid var(--bs-success);
             border-radius: 12px;
             padding: 15px;
             margin: 20px auto;
@@ -881,12 +874,12 @@
         }
 
         .value-item.highlight .value-amount {
-            color: var(--christmas-bundles-green);
+            color: var(--bs-success);
             font-size: 28px;
         }
 
         .value-item.savings .value-amount {
-            color: var(--christmas-bundles-red);
+            color: var(--bs-danger);
             font-size: 28px;
         }
 
@@ -1013,7 +1006,7 @@
         }
 
         .submission-step.complete {
-            color: var(--christmas-bundles-teal);
+            color: var(--emerald-500);
         }
 
         .submission-step.warning {
@@ -1040,8 +1033,8 @@
         }
 
         .submission-step.complete .submission-step-icon {
-            background: var(--christmas-bundles-teal);
-            border-color: var(--christmas-bundles-teal);
+            background: var(--emerald-500);
+            border-color: var(--emerald-500);
             color: white;
         }
 
@@ -1064,7 +1057,7 @@
 
         /* Processing state for submit button */
         .submit-btn.processing {
-            background: linear-gradient(135deg, var(--color-ae-light), var(--christmas-bundles-red)) !important;
+            background: linear-gradient(135deg, var(--color-ae-light), var(--bs-danger)) !important;
             opacity: 0.9;
             cursor: wait !important;
             animation: subtlePulse 2s infinite;
@@ -1230,7 +1223,7 @@
         }
 
         .select-btn.selected:hover {
-            background: linear-gradient(135deg, var(--store-green-700), var(--christmas-bundles-green-dark));
+            background: linear-gradient(135deg, var(--store-green-700), var(--material-green-900));
         }
 
         /* Logo Upload Section */
@@ -1308,7 +1301,7 @@
         }
 
         .form-label .required {
-            color: var(--christmas-bundles-red);
+            color: var(--bs-danger);
         }
 
         .form-input {
@@ -1349,7 +1342,7 @@
         }
 
         .delivery-option:hover {
-            border-color: var(--christmas-bundles-teal);
+            border-color: var(--emerald-500);
             background: var(--brand-50);
         }
 
@@ -1358,12 +1351,12 @@
         }
 
         .delivery-option input[type="radio"]:checked + .option-content {
-            color: var(--christmas-bundles-teal);
+            color: var(--emerald-500);
             font-weight: 600;
         }
 
         .delivery-option input[type="radio"]:checked ~ * {
-            color: var(--christmas-bundles-teal);
+            color: var(--emerald-500);
         }
 
         .option-content {
@@ -1379,14 +1372,14 @@
         /* Pickup Info Box */
         .pickup-info-box {
             background: var(--brand-50);
-            border: 2px solid var(--christmas-bundles-teal);
+            border: 2px solid var(--emerald-500);
             border-radius: 8px;
             padding: 1.5rem;
             margin-top: 1rem;
         }
 
         .pickup-info-box h4 {
-            color: var(--christmas-bundles-teal-dark);
+            color: var(--emerald-800);
             margin-bottom: 1rem;
             font-size: 1.125rem;
         }
@@ -1406,7 +1399,7 @@
         }
 
         .info-note i {
-            color: var(--christmas-bundles-teal);
+            color: var(--emerald-500);
             margin-top: 0.125rem;
         }
 
@@ -1567,7 +1560,7 @@
         }
 
         .free-tag {
-            background: var(--christmas-bundles-teal);
+            background: var(--emerald-500);
             color: white;
             padding: 2px 8px;
             border-radius: 4px;
@@ -1610,7 +1603,7 @@
         }
 
         .summary-value.free {
-            color: var(--christmas-bundles-teal);
+            color: var(--emerald-500);
             font-size: 20px;
         }
 
@@ -1813,7 +1806,7 @@
         }
 
         .summary-item-remove {
-            color: var(--christmas-bundles-red);
+            color: var(--bs-danger);
             cursor: pointer;
             font-size: 18px;
             padding: 5px;
@@ -1857,7 +1850,7 @@
         .submit-btn {
             width: 100%;
             padding: 16px;
-            background: linear-gradient(135deg, var(--color-ae-light), var(--christmas-bundles-red));
+            background: linear-gradient(135deg, var(--color-ae-light), var(--bs-danger));
             color: white;
             border: none;
             border-radius: 10px;
@@ -2591,7 +2584,7 @@
         /* Pickup Info Box */
         .pickup-info {
             background: var(--gray-50);
-            border: 2px solid var(--christmas-bundles-green);
+            border: 2px solid var(--bs-success);
             border-radius: 8px;
             padding: 20px;
             margin-top: 20px;
@@ -2599,7 +2592,7 @@
         }
 
         .pickup-info h3 {
-            color: var(--christmas-bundles-green);
+            color: var(--bs-success);
             margin-bottom: 15px;
             font-size: 1.2em;
         }
@@ -2613,7 +2606,7 @@
         }
 
         .pickup-info .info-item i {
-            color: var(--christmas-bundles-green);
+            color: var(--bs-success);
             width: 20px;
         }
 
@@ -2637,7 +2630,7 @@
         }
 
         .date-validation-message {
-            color: var(--christmas-bundles-red-3);
+            color: var(--red-500);
             font-size: 12px;
             margin-top: 5px;
             display: none;

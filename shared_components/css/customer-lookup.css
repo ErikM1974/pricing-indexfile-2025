@@ -12,7 +12,6 @@
     --customer-lookup-gray-2: #666;
     --customer-lookup-gray-dark: #3d3d3d;
     --customer-lookup-gray-dark-2: #333;
-    --customer-lookup-green: #c8e6c9;
 }
 /* stylelint-enable color-no-hex */
 
@@ -222,7 +221,7 @@
     gap: 6px;
     padding: 4px 10px;
     background: var(--brand-100);
-    border: 1px solid var(--customer-lookup-green);
+    border: 1px solid var(--material-green-100);
     border-radius: 16px;
     font-size: 12px;
     color: var(--store-green-700);

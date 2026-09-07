@@ -8,7 +8,6 @@
     --inventory-details-gray: #666;
     --inventory-details-gray-dark: #333;
     --inventory-details-green-dark: #1e4d0f;
-    --inventory-details-red: #dc3545;
 }
 /* stylelint-enable color-no-hex */
 
@@ -525,7 +524,7 @@ body {
 [hidden] { display: none !important; }
 .inventory-section--rel { position: relative; }
 .search-msg { padding: 10px; text-align: center; color: var(--inventory-details-gray); }
-.search-msg--error { color: var(--inventory-details-red); }
+.search-msg--error { color: var(--bs-danger); }
 button.search-result-item { display: block; width: 100%; text-align: left; font: inherit; background: none; border: 0; cursor: pointer; }
 .search-result-style { font-weight: 600; color: var(--brand-700); }
 .search-result-name { font-size: 14px; color: var(--inventory-details-gray); }

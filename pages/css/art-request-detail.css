@@ -10,48 +10,28 @@
 /* stylelint-disable color-no-hex */
 :root {
     --art-request-detail-gray: #666;
-    --art-request-detail-red: #dc3545;
     --art-request-detail-gray-dark: #333;
-    --art-request-detail-green: #16a34a;
     --art-request-detail-orange: #e67e22;
-    --art-request-detail-green-2: #28a745;
-    --art-request-detail-green-3: #15803d;
     --art-request-detail-red-2: #c0392b;
-    --art-request-detail-teal-dark: #065f46;
     --art-request-detail-blue: #3730a3;
-    --art-request-detail-indigo: #7c3aed;
     --art-request-detail-cyan: #06c;
-    --art-request-detail-yellow: #fbbf24;
     --art-request-detail-gray-2: #888;
-    --art-request-detail-teal-dark-2: #047857;
-    --art-request-detail-teal: #10b981;
-    --art-request-detail-green-4: #a7f3d0;
     --art-request-detail-green-5: #4a7c59;
     --art-request-detail-indigo-2: #6d28d9;
-    --art-request-detail-red-3: #ef4444;
     --art-request-detail-blue-tint: #c7d2fe;
-    --art-request-detail-red-tint: #fecaca;
     --art-request-detail-red-4: #f1c7be;
     --art-request-detail-green-6: #3d6849;
     --art-request-detail-yellow-2: #d0b300;
-    --art-request-detail-red-5: #fca5a5;
     --art-request-detail-green-7: #1e7e34;
-    --art-request-detail-green-tint: #bbf7d0;
     --art-request-detail-gray-3: #bbb;
     --art-request-detail-cyan-2: #0891b2;
-    --art-request-detail-green-tint-2: #d1fae5;
     --art-request-detail-indigo-tint: #c4b5fd;
     --art-request-detail-indigo-3: #5b21b6;
     --art-request-detail-indigo-4: #4c1d95;
     --art-request-detail-green-8: #2d6a2e;
     --art-request-detail-cyan-3: #00d4ff;
     --art-request-detail-indigo-5: #c084fc;
-    --art-request-detail-green-9: #22c55e;
-    --art-request-detail-yellow-3: #fcd34d;
     --art-request-detail-red-6: #9d174d;
-    --art-request-detail-blue-2: #1e40af;
-    --art-request-detail-orange-2: #fed7aa;
-    --art-request-detail-yellow-4: #fde68a;
     --art-request-detail-green-10: #3d7a26;
     --art-request-detail-yellow-5: #f0c000;
 }
@@ -156,7 +136,7 @@ body {
     height: 60px;
     border-radius: 50%;
     background: var(--red-50);
-    color: var(--art-request-detail-red);
+    color: var(--bs-danger);
     font-size: 32px;
     font-weight: bold;
     line-height: 60px;
@@ -271,7 +251,7 @@ body {
     animation: ard-rush-pulse 1.6s ease-in-out infinite;
 }
 
-.ard-rush-toggle--active .ard-rush-toggle-hint { color: var(--art-request-detail-red-tint); }
+.ard-rush-toggle--active .ard-rush-toggle-hint { color: var(--red-200); }
 
 @keyframes ard-rush-pulse {
     0%, 100% { box-shadow: 0 0 0 3px rgb(220 38 38 / 20%); }
@@ -287,7 +267,7 @@ body {
     letter-spacing: 0.04em;
     background: var(--amber-100);
     color: var(--amber-700);
-    border: 1px solid var(--art-request-detail-yellow);
+    border: 1px solid var(--amber-400);
     margin-left: 8px;
     vertical-align: middle;
 }
@@ -316,7 +296,7 @@ body {
     font-weight: 600;
 }
 
-.ard-card-header--green { background: var(--art-request-detail-green-2); }
+.ard-card-header--green { background: var(--bs-success); }
 .ard-card-header--amber { background: var(--amber-600); }
 
 .ard-card-body {
@@ -385,7 +365,7 @@ body {
     gap: 6px;
     margin-top: auto;
     padding: 8px 14px;
-    background: var(--art-request-detail-green);
+    background: var(--green-600);
     color: var(--color-on-brand);
     border-radius: 6px;
     font-size: 13px;
@@ -396,7 +376,7 @@ body {
 }
 
 .ard-jds-product-download:hover {
-    background: var(--art-request-detail-green-3);
+    background: var(--green-700);
     color: var(--color-on-brand);
 }
 
@@ -453,7 +433,7 @@ body {
 .ard-billing-value {
     font-size: 22px;
     font-weight: 700;
-    color: var(--art-request-detail-green-2);
+    color: var(--bs-success);
 }
 
 .ard-billing-label {
@@ -570,12 +550,12 @@ body {
 }
 
 .ard-gallery-remove:hover {
-    background: var(--art-request-detail-red);
+    background: var(--bs-danger);
 }
 
 /* Broken state — shown when Box proxy returns 404 for a mockup file */
 .ard-gallery-thumb.is-broken {
-    border: 2px solid var(--art-request-detail-red);
+    border: 2px solid var(--bs-danger);
     background: var(--red-50);
     cursor: default;
     display: flex;
@@ -588,7 +568,7 @@ body {
 
 .ard-gallery-broken-icon {
     font-size: 28px;
-    color: var(--art-request-detail-red);
+    color: var(--bs-danger);
     margin-bottom: 6px;
 }
 
@@ -1074,7 +1054,7 @@ body {
 }
 
 .ard-box-file-card:hover {
-    border-color: var(--art-request-detail-yellow);
+    border-color: var(--amber-400);
     box-shadow: 0 1px 4px rgb(245 158 11 / 15%);
 }
 
@@ -1106,7 +1086,7 @@ body {
     font-weight: 600;
 }
 .ard-box-file-placeholder.ph-image { background: var(--sky-100); color: var(--blue-600); }
-.ard-box-file-placeholder.ph-design { background: var(--color-ruth-tint); color: var(--art-request-detail-indigo); }
+.ard-box-file-placeholder.ph-design { background: var(--color-ruth-tint); color: var(--violet-600); }
 .ard-box-file-placeholder.ph-pdf { background: var(--red-100); color: var(--red-600); }
 
 .ard-box-file-name {
@@ -1236,7 +1216,7 @@ body {
 
 .ard-box-error {
     background: var(--red-50);
-    border: 1px solid var(--art-request-detail-red-5);
+    border: 1px solid var(--red-300);
     border-radius: 8px;
     padding: 14px;
     color: var(--red-800);
@@ -1309,7 +1289,7 @@ body {
     border-radius: 8px;
     cursor: pointer;
     transition: background 0.2s, opacity 0.2s, transform 0.1s;
-    background: linear-gradient(135deg, var(--art-request-detail-green-2), var(--store-green-700));
+    background: linear-gradient(135deg, var(--bs-success), var(--store-green-700));
     color: white;
 }
 
@@ -1547,12 +1527,12 @@ body {
    identity and the summary chip are new. These modifiers share specificity with
    the base .ard-changes-* rules, so they MUST stay below them in source order. */
 .ard-changes-header--approve {
-    background: linear-gradient(135deg, var(--art-request-detail-green), var(--art-request-detail-green-3));
+    background: linear-gradient(135deg, var(--green-600), var(--green-700));
 }
 
 .ard-approve-summary {
     background: var(--brand-50);
-    border: 1px solid var(--art-request-detail-green-tint);
+    border: 1px solid var(--green-200);
     border-radius: 6px;
     padding: 10px 12px;
     font-size: 14px;
@@ -1563,7 +1543,7 @@ body {
 /* Scoped to the approve modal so it outranks .ard-changes-textarea:focus on
    specificity (0,3,0 vs 0,2,0) rather than relying on source order. */
 .ard-approve-modal .ard-changes-textarea:focus {
-    border-color: var(--art-request-detail-green);
+    border-color: var(--green-600);
     box-shadow: 0 0 0 3px rgb(22 163 74 / 15%);
 }
 
@@ -1574,11 +1554,11 @@ body {
 }
 
 .ard-changes-btn-submit--approve {
-    background: linear-gradient(135deg, var(--art-request-detail-green), var(--art-request-detail-green-3));
+    background: linear-gradient(135deg, var(--green-600), var(--green-700));
 }
 
 .ard-changes-btn-submit--approve:hover {
-    background: linear-gradient(135deg, var(--art-request-detail-green-3), var(--print-green));
+    background: linear-gradient(135deg, var(--green-700), var(--print-green));
 }
 
 /* ── Success Message ─────────────────────────────────── */
@@ -1587,7 +1567,7 @@ body {
     top: 80px;
     left: 50%;
     transform: translateX(-50%);
-    background: var(--art-request-detail-green-2);
+    background: var(--bs-success);
     color: white;
     padding: 14px 28px;
     border-radius: 8px;
@@ -1690,7 +1670,7 @@ body {
 
 .ard-add-note-form select.error,
 .ard-add-note-form textarea.error {
-    border-color: var(--art-request-detail-red);
+    border-color: var(--bs-danger);
 }
 
 /* Posting-as indicator */
@@ -1710,7 +1690,7 @@ body {
 }
 
 .ard-posting-as-check {
-    color: var(--art-request-detail-green);
+    color: var(--green-600);
     font-weight: 700;
 }
 
@@ -1852,8 +1832,8 @@ body {
 }
 
 .ard-step--done .ard-step-dot {
-    background: var(--art-request-detail-green-2);
-    border-color: var(--art-request-detail-green-2);
+    background: var(--bs-success);
+    border-color: var(--bs-success);
 }
 
 .ard-step--current .ard-step-dot {
@@ -2131,7 +2111,7 @@ body {
 .ard-action-btn:hover { filter: brightness(1.12); transform: translateY(-1px); }
 .ard-action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-.ard-action-working  { background: var(--art-request-detail-green); }
+.ard-action-working  { background: var(--green-600); }
 .ard-action-log-time { background: var(--art-request-detail-cyan-2); }
 .ard-action-complete { background: var(--red-600); }
 .ard-action-mockup   { background: var(--store-rush); }
@@ -2349,10 +2329,10 @@ body {
 .ard-modal-btn--cancel:hover { background: var(--slate-200); }
 
 .ard-modal-btn--save {
-    background: var(--art-request-detail-green);
+    background: var(--green-600);
     color: var(--color-on-brand);
 }
-.ard-modal-btn--save:hover { background: var(--art-request-detail-green-3); }
+.ard-modal-btn--save:hover { background: var(--green-700); }
 
 .ard-modal-btn--save:disabled {
     background: var(--gray-400);
@@ -2430,7 +2410,7 @@ body {
     margin-bottom: 8px;
 }
 .ard-audit-status:last-child { margin-bottom: 0; }
-.ard-audit-status--green { background: var(--brand-50); border-left: 3px solid var(--emerald-600); color: var(--art-request-detail-teal-dark); }
+.ard-audit-status--green { background: var(--brand-50); border-left: 3px solid var(--emerald-600); color: var(--emerald-800); }
 .ard-audit-status--red { background: var(--red-50); border-left: 3px solid var(--red-600); color: var(--red-800); }
 .ard-audit-status--amber { background: var(--store-paper); border-left: 3px solid var(--amber-600); color: var(--amber-800); }
 .ard-audit-status--gray { background: var(--slate-50); border-left: 3px solid var(--gray-400); color: var(--slate-500); }
@@ -2805,7 +2785,7 @@ body {
     font-family: inherit;
     transition: background 0.15s;
 }
-.ard-link-order-btn:hover { background: var(--art-request-detail-teal-dark-2); }
+.ard-link-order-btn:hover { background: var(--emerald-700); }
 
 /* Line items table (inside order cards) */
 .ard-line-items-table {
@@ -2842,8 +2822,8 @@ body {
 
 /* ── Final Approved Mockup ──────────────────────────────────────────── */
 .ard-final-mockup-section {
-    background: linear-gradient(135deg, var(--brand-50), var(--art-request-detail-green-tint-2));
-    border: 2px solid var(--art-request-detail-teal);
+    background: linear-gradient(135deg, var(--brand-50), var(--emerald-100));
+    border: 2px solid var(--emerald-500);
     border-radius: 12px;
     padding: 16px;
     margin-bottom: 16px;
@@ -2863,7 +2843,7 @@ body {
     border-radius: 10px;
     overflow: hidden;
     background: var(--color-surface);
-    border: 2px solid var(--art-request-detail-teal);
+    border: 2px solid var(--emerald-500);
     box-shadow: 0 4px 12px rgb(16 185 129 / 20%);
 }
 
@@ -2954,7 +2934,7 @@ body {
 }
 
 .ard-rep-mockup-badge {
-    background: var(--art-request-detail-indigo);
+    background: var(--violet-600);
     color: var(--color-on-brand);
     padding: 5px 14px;
     font-size: 12px;
@@ -3003,7 +2983,7 @@ body {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    background: linear-gradient(135deg, var(--art-request-detail-indigo) 0%, var(--color-ruth-light) 100%);
+    background: linear-gradient(135deg, var(--violet-600) 0%, var(--color-ruth-light) 100%);
     color: var(--color-on-brand);
     text-decoration: none;
     border-radius: 8px;
@@ -3013,7 +2993,7 @@ body {
 }
 
 .ard-rep-mockup-open:hover {
-    background: linear-gradient(135deg, var(--art-request-detail-indigo-2) 0%, var(--art-request-detail-indigo) 100%);
+    background: linear-gradient(135deg, var(--art-request-detail-indigo-2) 0%, var(--violet-600) 100%);
     color: var(--color-on-brand);
     text-decoration: none;
 }
@@ -3026,7 +3006,7 @@ body {
     transform: translateX(-50%);
     padding: 4px 12px;
     background: rgb(255 255 255 / 95%);
-    border: 1px solid var(--art-request-detail-teal);
+    border: 1px solid var(--emerald-500);
     border-radius: 20px;
     color: var(--emerald-600);
     font-size: 11px;
@@ -3134,7 +3114,7 @@ body {
     cursor: pointer;
     font-family: inherit;
 }
-.ard-checklist-confirm:hover { background: var(--art-request-detail-teal-dark-2); }
+.ard-checklist-confirm:hover { background: var(--emerald-700); }
 
 /* ── Customer View ────────────────────────────────────────────────── */
 body.ard-customer-view {
@@ -3201,7 +3181,7 @@ body.ard-customer-view .ard-footer {
     font-family: inherit;
     transition: background 0.2s;
 }
-.ard-btn-customer-approve:hover:not(:disabled) { background: var(--art-request-detail-teal-dark-2); }
+.ard-btn-customer-approve:hover:not(:disabled) { background: var(--emerald-700); }
 
 .ard-btn-customer-approve:disabled {
     background: var(--gray-400);
@@ -3212,15 +3192,15 @@ body.ard-customer-view .ard-footer {
     padding: 12px 32px;
     font-size: 16px;
     font-weight: 600;
-    border: 2px solid var(--art-request-detail-red);
+    border: 2px solid var(--bs-danger);
     border-radius: 8px;
     background: var(--color-surface);
-    color: var(--art-request-detail-red);
+    color: var(--bs-danger);
     cursor: pointer;
     font-family: inherit;
     transition: all 0.2s;
 }
-.ard-btn-customer-revise:hover { background: var(--art-request-detail-red); color: var(--color-on-brand); }
+.ard-btn-customer-revise:hover { background: var(--bs-danger); color: var(--color-on-brand); }
 
 /* Customer mockup selection */
 .ard-customer-selectable,
@@ -3395,7 +3375,7 @@ body.ard-customer-view .ard-footer {
     margin-bottom: 16px;
     padding: 16px 20px;
     background: var(--red-50);
-    border-left: 4px solid var(--art-request-detail-red-3);
+    border-left: 4px solid var(--red-500);
     border-radius: 10px;
     box-shadow: 0 1px 4px rgb(0 0 0 / 8%);
 }
@@ -3575,7 +3555,7 @@ body.ard-customer-view .ard-footer {
 }
 
 .ard-changes-file-chip-remove:hover {
-    color: var(--art-request-detail-red);
+    color: var(--bs-danger);
 }
 
 /* ── AI Vision Analysis Section ──────────────────────────── */
@@ -3855,7 +3835,7 @@ body.ard-customer-view .ard-footer {
 
 .ard-vision-warning {
     background: var(--amber-100);
-    border: 1px solid var(--art-request-detail-yellow);
+    border: 1px solid var(--amber-400);
     border-radius: 5px;
     padding: 6px 10px;
     font-size: 0.78rem;
@@ -3901,12 +3881,12 @@ body.ard-customer-view .ard-footer {
 }
 
 .ard-mockup-note-input.ard-note-saved {
-    border-color: var(--art-request-detail-green-9);
+    border-color: var(--green-500);
     background: var(--brand-50);
 }
 
 .ard-mockup-note-input.ard-note-error {
-    border-color: var(--art-request-detail-red-3);
+    border-color: var(--red-500);
     background: var(--red-50);
 }
 
@@ -3971,7 +3951,7 @@ body.ard-customer-view .ard-footer {
 
 .ard-on-hold-bar--active {
     background: var(--store-paper);
-    border-color: var(--art-request-detail-yellow-3);
+    border-color: var(--amber-300);
 }
 
 .ard-on-hold-toggle {
@@ -4118,7 +4098,7 @@ body.ard-customer-view .ard-footer {
 
 .ard-item-type-badge--banner {
     background: var(--sky-100);
-    color: var(--art-request-detail-blue-2);
+    color: var(--blue-800);
 }
 
 .ard-item-type-badge--jds {
@@ -4155,13 +4135,13 @@ body.ard-customer-view .ard-footer {
 .ard-approval-status-pill {
     background: var(--red-50);
     color: var(--store-rush-deeper);
-    border-color: var(--art-request-detail-orange-2);
+    border-color: var(--orange-200);
 }
 
 .ard-approval-status-pill--approved {
     background: var(--brand-50);
-    color: var(--art-request-detail-teal-dark);
-    border-color: var(--art-request-detail-green-4);
+    color: var(--emerald-800);
+    border-color: var(--emerald-200);
 }
 
 .ard-artspec-subhead {
@@ -4201,7 +4181,7 @@ body.ard-customer-view .ard-footer {
 
 .ard-exact-text {
     background: var(--store-paper);
-    border: 1px solid var(--art-request-detail-yellow-4);
+    border: 1px solid var(--amber-200);
     border-left: 4px solid var(--amber-500);
     border-radius: 8px;
     padding: 10px 12px;
@@ -4217,11 +4197,11 @@ body.ard-customer-view .ard-footer {
     margin-top: 12px;
     padding: 8px 12px;
     background: var(--brand-50);
-    border: 1px solid var(--art-request-detail-green-4);
+    border: 1px solid var(--emerald-200);
     border-radius: 8px;
     font-size: 13px;
     font-weight: 600;
-    color: var(--art-request-detail-teal-dark);
+    color: var(--emerald-800);
 }
 
 /* ── Printable one-page Art Job Sheet (2026-06-17) ─────────────────────── */
@@ -4276,7 +4256,7 @@ body.ard-customer-view .ard-footer {
 .ps-chips { margin-left: auto; display: flex; gap: 5px; flex-wrap: wrap; justify-content: flex-end; max-width: 48%; }
 .ps-chip { border: 1px solid var(--print-line); border-radius: 10px; padding: 1px 8px; font-size: 8.5pt; font-weight: 700; }
 .ps-chip--rush { border-color: var(--red-600); }
-.ps-chip--green { border-color: var(--emerald-600); color: var(--art-request-detail-teal-dark); background: var(--brand-50); }
+.ps-chip--green { border-color: var(--emerald-600); color: var(--emerald-800); background: var(--brand-50); }
 .ps-chip--amber { border-color: var(--amber-600); color: var(--store-rush-deeper); background: var(--red-50); }
 .ps-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0 18px; }
 .ps-sec { font-size: 8.5pt; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; color: var(--color-ae); border-bottom: 1px solid var(--gray-200); margin: 8px 0 3px; }
@@ -4289,7 +4269,7 @@ body.ard-customer-view .ard-footer {
 .ps-exact { border: 1px solid var(--art-request-detail-yellow-5); background: var(--red-50); padding: 5px 8px; font-weight: 700; white-space: pre-wrap; overflow-wrap: break-word; }
 .ps-notes { white-space: pre-wrap; overflow-wrap: break-word; }
 .ps-line { padding: 1px 0; }
-.ps-check { margin-top: 8px; padding: 4px 8px; border: 1px solid var(--art-request-detail-green-4); background: var(--brand-50); color: var(--art-request-detail-teal-dark); font-weight: 700; font-size: 9pt; display: inline-block; }
+.ps-check { margin-top: 8px; padding: 4px 8px; border: 1px solid var(--emerald-200); background: var(--brand-50); color: var(--emerald-800); font-weight: 700; font-size: 9pt; display: inline-block; }
 .ps-foot { margin-top: 10px; padding-top: 5px; border-top: 1px solid var(--store-line); font-size: 7.5pt; color: var(--art-request-detail-gray-2); text-align: center; }
 .ps-art { display: flex; gap: 14px; margin: 4px 0 2px; flex-wrap: wrap; }
 .ps-art-fig { margin: 0; text-align: center; }

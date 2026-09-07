@@ -12,13 +12,8 @@
    every rule below uses var(). Raw hex is allowed ONLY in this block. */
 /* stylelint-disable color-no-hex */
 :root {
-    --jds-submit-form-teal-dark: #047857;
-    --jds-submit-form-orange: #78350f;
-    --jds-submit-form-yellow: #fde68a;
     --jds-submit-form-green-tint: #cdf3d6;
-    --jds-submit-form-red: #ef4444;
     --jds-submit-form-teal-dark-2: #064e3b;
-    --jds-submit-form-red-tint: #fecaca;
 }
 /* stylelint-enable color-no-hex */
 
@@ -455,7 +450,7 @@
 
 .jds-rush-toggle--active,
 .jds-rush-toggle--active:hover {
-    background: linear-gradient(135deg, var(--jds-submit-form-red) 0%, var(--red-700) 100%);
+    background: linear-gradient(135deg, var(--red-500) 0%, var(--red-700) 100%);
     border: 1.5px solid var(--red-800);
     color: var(--color-on-brand);
     box-shadow: 0 10px 22px -10px rgb(220 38 38 / 75%), 0 0 0 4px rgb(220 38 38 / 15%);
@@ -593,7 +588,7 @@
     box-shadow: 0 8px 18px -8px rgb(5 150 105 / 70%);
     transition: background .15s ease, transform .15s ease;
 }
-.jds-success-link:hover { background: var(--jds-submit-form-teal-dark); transform: translateY(-1px); }
+.jds-success-link:hover { background: var(--emerald-700); transform: translateY(-1px); }
 
 .jds-success-another {
     padding: 11px 22px;
@@ -654,7 +649,7 @@
     border: 1.5px dashed var(--gray-200, var(--gray-200));
     border-radius: 14px;
 }
-.jds-empty--error { color: var(--red-700); background: var(--red-50); border-color: var(--jds-submit-form-red-tint); }
+.jds-empty--error { color: var(--red-700); background: var(--red-50); border-color: var(--red-200); }
 
 /* ── Section eyebrow ────────────────────────────────────────────────── */
 .jds-section-header {
@@ -826,7 +821,7 @@
 .jds-card-imprint {
     align-self: flex-start;
     font-size: 11px;
-    color: var(--jds-submit-form-orange);
+    color: var(--amber-900);
     background: var(--fx-tint-2);
     border-radius: 6px;
     padding: 3px 7px;
@@ -919,7 +914,7 @@
 }
 .jds-live-loading { color: var(--gray-500, var(--gray-500)); font-style: italic; }
 .jds-live-warn { color: var(--amber-800); font-size: 12.5px; line-height: 1.45; }
-.jds-live-stock { font-weight: 700; color: var(--jds-submit-form-teal-dark); margin-bottom: 8px; }
+.jds-live-stock { font-weight: 700; color: var(--emerald-700); margin-bottom: 8px; }
 .jds-out { color: var(--red-700); font-weight: 700; }
 .jds-live-tier-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
 
@@ -946,9 +941,9 @@
     gap: 12px;
     padding: 12px 14px;
     background: linear-gradient(180deg, var(--store-paper) 0%, var(--amber-100) 100%);
-    border: 1px solid var(--jds-submit-form-yellow);
+    border: 1px solid var(--amber-200);
     border-radius: 12px;
-    color: var(--jds-submit-form-orange);
+    color: var(--amber-900);
     font-size: 13px;
     line-height: 1.55;
     margin: 4px 0 18px;
@@ -963,7 +958,7 @@
     align-items: center;
     justify-content: center;
     background: var(--color-surface);
-    border: 1px solid var(--jds-submit-form-yellow);
+    border: 1px solid var(--amber-200);
     font-size: 15px;
 }
 .jds-rush-row { margin: 4px 0 18px; }

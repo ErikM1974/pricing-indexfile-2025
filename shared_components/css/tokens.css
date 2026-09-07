@@ -80,6 +80,8 @@
         --brand-600: #409a47; /* :hover of --brand-500 (80) */
         --brand-700: #2e5827; /* header bands, active nav (146) */
         --brand-800: #1a472a; /* darkest — gradient ends, footers (116) */
+        --brand-400: #5bc85f; /* lighter brand green — hover of light buttons, chips (11 sheets, palette pass 2026-09-07) */
+        --brand-mid: #3a7c52; /* the house "mid" green between 600 and 700: 1a472a dark, 3a7c52 mid, 4cb354 light (20 sheets) */
 
         /* Neutral ramp — 9 of the 12 most-used colours were already this grey scale */
         --gray-50: #f9fafb; /* raised surfaces (117) */
@@ -116,6 +118,39 @@
         --sky-100: #e0f2fe; /* info banner background */
         --sky-700: #0369a1; /* info banner border */
         --sky-900: #0c4a6e; /* info banner text */
+
+        /* Ramp steps the pages already shared (palette pass 2026-09-07): each of these hexes was declared as a
+           page-scoped variable in 8 to 35 sheets. Naming them once collapsed those variables with no visual change.
+           Tailwind names where the value is a Tailwind step; the legacy Bootstrap 4 and Material greens are named
+           for what they are so a redesign can retire them on purpose. */
+        --red-200: #fecaca; /* (30 sheets) */
+        --red-300: #fca5a5; /* (21) */
+        --red-500: #ef4444; /* (31) */
+        --amber-200: #fde68a; /* (29) */
+        --amber-300: #fcd34d; /* (22) */
+        --amber-400: #fbbf24; /* (21) */
+        --amber-900: #78350f; /* (28) */
+        --orange-200: #fed7aa; /* (10) */
+        --green-200: #bbf7d0; /* (19) */
+        --green-300: #86efac; /* (17) */
+        --green-500: #22c55e; /* (19) */
+        --green-600: #16a34a; /* (25) */
+        --green-700: #15803d; /* (20) */
+        --emerald-100: #d1fae5; /* (33) */
+        --emerald-200: #a7f3d0; /* (9) */
+        --emerald-500: #10b981; /* (18) */
+        --emerald-700: #047857; /* (12) */
+        --emerald-800: #065f46; /* (35) */
+        --blue-200: #bfdbfe; /* (14) */
+        --blue-800: #1e40af; /* (29) */
+        --violet-600: #7c3aed; /* (15) */
+        --indigo-700: #4338ca; /* (9) */
+        --bs-danger: #dc3545; /* legacy Bootstrap 4 danger (27) */
+        --bs-success: #28a745; /* legacy Bootstrap 4 success (16) */
+        --bs-warning: #ffc107; /* legacy Bootstrap 4 warning (21) */
+        --bs-warning-ink: #856404; /* legacy Bootstrap 4 warning text (21) */
+        --material-green-100: #c8e6c9; /* legacy Material green 100 (12) */
+        --material-green-900: #1b5e20; /* legacy Material green 900 (8) */
 
         /* Print collateral — the fillable forms (pages/forms/) are printed at the counter and their
            colours were sampled from the official PDF forms (nwca-form-shared.css, 2026-07-11). A screen

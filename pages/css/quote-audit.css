@@ -8,14 +8,11 @@
 /* stylelint-disable color-no-hex */
 :root {
     --quote-audit-cyan-dark: #1e3a5f;
-    --quote-audit-green: #16a34a;
     --quote-audit-gray-dark: #333;
-    --quote-audit-yellow: #fde68a;
-    --quote-audit-orange: #78350f;
     --primary-color: var(--quote-audit-cyan-dark);
     --text-primary: var(--gray-900);
     --text-muted: var(--slate-500);
-    --success-color: var(--quote-audit-green);
+    --success-color: var(--green-600);
     --success-light: var(--store-green-100);
     --warning-color: var(--amber-500);
     --warning-light: var(--amber-100);
@@ -384,7 +381,7 @@ body {
     margin-top: 20px;
     padding: 16px;
     background: var(--amber-100);
-    border: 1px solid var(--quote-audit-yellow);
+    border: 1px solid var(--amber-200);
     border-radius: var(--radius-sm);
 }
 
@@ -402,7 +399,7 @@ body {
 
 .import-notes-list li {
     font-size: 13px;
-    color: var(--quote-audit-orange);
+    color: var(--amber-900);
     margin-bottom: 4px;
 }
 

@@ -156,7 +156,7 @@ body {
 }
 
 .stat-card.active {
-    border-left: 4px solid var(--quote-management-green-2);
+    border-left: 4px solid var(--bs-success);
 }
 
 .stat-card.accepted {
@@ -164,7 +164,7 @@ body {
 }
 
 .stat-card.expiring {
-    border-left: 4px solid var(--quote-management-yellow-3);
+    border-left: 4px solid var(--bs-warning);
 }
 
 .stat-card.cancelled {
@@ -195,7 +195,7 @@ body {
     gap: 6px;
     padding: 5px 10px;
     background: var(--red-50);
-    border: 1px solid var(--quote-management-red-tint);
+    border: 1px solid var(--red-200);
     color: var(--red-700);
     font-weight: 700;
     font-size: 12px;
@@ -218,7 +218,7 @@ body {
     gap: 6px;
     padding: 5px 10px;
     background: var(--store-green-100);
-    border: 1px solid var(--quote-management-green-tint);
+    border: 1px solid var(--green-200);
     color: var(--print-green);
     font-weight: 700;
     font-size: 12px;
@@ -237,7 +237,7 @@ body {
     gap: 6px;
     padding: 5px 10px;
     background: var(--amber-100);
-    border: 1px solid var(--quote-management-yellow-2);
+    border: 1px solid var(--amber-200);
     color: var(--amber-800);
     font-weight: 700;
     font-size: 12px;
@@ -256,7 +256,7 @@ body {
     gap: 6px;
     padding: 5px 10px;
     background: var(--store-paper);
-    border: 1px solid var(--quote-management-yellow-2);
+    border: 1px solid var(--amber-200);
     color: var(--amber-700);
     font-weight: 700;
     font-size: 12px;
@@ -298,7 +298,7 @@ body {
     gap: 6px;
     padding: 5px 10px;
     background: var(--red-100);
-    border: 1px solid var(--quote-management-red-tint);
+    border: 1px solid var(--red-200);
     color: var(--red-800);
     font-weight: 700;
     font-size: 12px;
@@ -335,7 +335,7 @@ body {
 .milestone-pill--done {
     background: var(--store-green-100);
     color: var(--print-green-dark);
-    border-color: var(--quote-management-green);
+    border-color: var(--green-300);
 }
 
 .milestone-pill--pending {
@@ -349,7 +349,7 @@ body {
 .milestone-pill--partial {
     background: var(--amber-100);
     color: var(--amber-800);
-    border-color: var(--quote-management-yellow);
+    border-color: var(--amber-300);
 }
 
 .milestone-pill--na,
@@ -558,9 +558,9 @@ body {
     border: 1px solid transparent;
 }
 .inbound-confirmed { background: var(--slate-100); color: var(--slate-500); border-color: var(--slate-200); }
-.inbound-partial   { background: var(--amber-100); color: var(--amber-800); border-color: var(--quote-management-yellow); }
-.inbound-shipped   { background: var(--store-green-100); color: var(--print-green); border-color: var(--quote-management-green); }
-.inbound-canceled  { background: var(--red-100); color: var(--red-800); border-color: var(--quote-management-red-2); }
+.inbound-partial   { background: var(--amber-100); color: var(--amber-800); border-color: var(--amber-300); }
+.inbound-shipped   { background: var(--store-green-100); color: var(--print-green); border-color: var(--green-300); }
+.inbound-canceled  { background: var(--red-100); color: var(--red-800); border-color: var(--red-300); }
 a.inbound-pill:hover { filter: brightness(0.95); }
 
 /* SanMar backorder / hold alert pill (next to the inbound dot) */
@@ -576,8 +576,8 @@ a.inbound-pill:hover { filter: brightness(0.95); }
     cursor: help;
     white-space: nowrap;
 }
-.inbound-backorder { background: var(--red-100); color: var(--red-800); border-color: var(--quote-management-red-2); }
-.inbound-hold      { background: var(--amber-100); color: var(--amber-800); border-color: var(--quote-management-yellow); }
+.inbound-backorder { background: var(--red-100); color: var(--red-800); border-color: var(--red-300); }
+.inbound-hold      { background: var(--amber-100); color: var(--amber-800); border-color: var(--amber-300); }
 
 .quote-amount {
     font-weight: 600;
@@ -611,7 +611,7 @@ a.inbound-pill:hover { filter: brightness(0.95); }
 
 .status-badge.expiring-soon {
     background: var(--amber-100);
-    color: var(--quote-management-yellow-4);
+    color: var(--bs-warning-ink);
 }
 
 /* Created/Expires Date */
@@ -759,7 +759,7 @@ a.inbound-pill:hover { filter: brightness(0.95); }
 
 .status-dropdown.status-open {
     background: var(--store-green-100);
-    border-color: var(--quote-management-green-2);
+    border-color: var(--bs-success);
     color: var(--print-green-dark);
 }
 
@@ -771,7 +771,7 @@ a.inbound-pill:hover { filter: brightness(0.95); }
 
 .status-dropdown.status-lost {
     background: var(--red-100);
-    border-color: var(--quote-management-red);
+    border-color: var(--bs-danger);
     color: var(--color-ae-dark);
 }
 
@@ -814,7 +814,7 @@ a.inbound-pill:hover { filter: brightness(0.95); }
 
 /* Bulk Delete Button */
 .btn-bulk-delete {
-    background: var(--quote-management-red);
+    background: var(--bs-danger);
     color: white;
     border: none;
     padding: 8px 16px;
@@ -839,7 +839,7 @@ a.inbound-pill:hover { filter: brightness(0.95); }
 
 /* Audit Action Button */
 .action-audit {
-    color: var(--quote-management-indigo);
+    color: var(--violet-600);
 }
 
 .action-audit:hover {
@@ -848,11 +848,11 @@ a.inbound-pill:hover { filter: brightness(0.95); }
 
 /* Delete Action Button */
 .action-delete {
-    color: var(--quote-management-red);
+    color: var(--bs-danger);
 }
 
 .action-delete:hover {
-    background: var(--quote-management-red);
+    background: var(--bs-danger);
     color: white;
 }
 
@@ -911,7 +911,7 @@ a.inbound-pill:hover { filter: brightness(0.95); }
 }
 
 .btn-confirm-delete {
-    background: var(--quote-management-red);
+    background: var(--bs-danger);
     color: white;
     border: none;
     padding: 10px 20px;
@@ -936,7 +936,7 @@ a.inbound-pill:hover { filter: brightness(0.95); }
 
 /* Warning text in modal */
 .warning-text {
-    color: var(--quote-management-red);
+    color: var(--bs-danger);
     font-weight: 600;
 }
 
@@ -1009,14 +1009,14 @@ a.inbound-pill:hover { filter: brightness(0.95); }
 
 .status-badge.deposit-chip--live {
     background: var(--color-floor-tint);
-    color: var(--quote-management-blue);
+    color: var(--indigo-700);
     border: 1px solid var(--quote-management-blue-2);
 }
 
 .status-badge.deposit-chip--paid {
     background: var(--store-green-100);
     color: var(--print-green);
-    border: 1px solid var(--quote-management-green);
+    border: 1px solid var(--green-300);
 }
 .status-badge.deposit-chip i { font-size: 11px; }
 
@@ -1032,24 +1032,12 @@ a.inbound-pill:hover { filter: brightness(0.95); }
 :root {
     --quote-management-cyan: #2e4a62;
     --quote-management-gray: #666;
-    --quote-management-red: #dc3545;
     --quote-management-gray-dark: #333;
-    --quote-management-yellow: #fcd34d;
-    --quote-management-green: #86efac;
-    --quote-management-green-2: #28a745;
     --quote-management-teal: #17a2b8;
-    --quote-management-red-tint: #fecaca;
-    --quote-management-yellow-2: #fde68a;
     --quote-management-gray-2: #888;
-    --quote-management-red-2: #fca5a5;
-    --quote-management-yellow-3: #ffc107;
-    --quote-management-green-tint: #bbf7d0;
     --quote-management-teal-tint: #ccfbf1;
     --quote-management-teal-2: #99f6e4;
     --quote-management-teal-dark: #115e59;
-    --quote-management-yellow-4: #856404;
-    --quote-management-indigo: #7c3aed;
-    --quote-management-blue: #4338ca;
     --quote-management-blue-2: #a5b4fc;
     --quote-management-cyan-2: #3d6584;
  --pnw-forest: var(--quote-management-cyan); --pnw-forest-deep: var(--gray-800); --pnw-forest-mid: var(--quote-management-cyan-2); }
@@ -1104,7 +1092,7 @@ a.inbound-pill:hover { filter: brightness(0.95); }
 .date-relative.qm-purge { color: var(--red-700); }
 
 /* Error state icon (was style="color:#dc3545") */
-.empty-state .qm-error-icon { color: var(--quote-management-red); }
+.empty-state .qm-error-icon { color: var(--bs-danger); }
 
 /* Phone: hide the low-value columns; the rest stays readable. */
 @media (width <= 768px) {
@@ -1137,7 +1125,7 @@ button.stat-card.is-active { box-shadow: 0 0 0 3px rgb(46 74 98 / 18%); transfor
     border-radius: 8px;
     background: var(--store-paper);
     color: var(--amber-800);
-    border: 1px solid var(--quote-management-yellow);
+    border: 1px solid var(--amber-300);
     font-size: 13px;
 }
 .qm-notice i { margin-right: 6px; }

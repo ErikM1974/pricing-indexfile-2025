@@ -5,10 +5,8 @@
    every rule below uses var(). Raw hex is allowed ONLY in this block. */
 /* stylelint-disable color-no-hex */
 :root {
-    --custom-tees-calibrate-green: #15803d;
     --custom-tees-calibrate-gray: #66735f;
     --custom-tees-calibrate-gray-2: #8a8f7f;
-    --custom-tees-calibrate-green-2: #16a34a;
     --custom-tees-calibrate-green-tint: #c9ebd4;
     --custom-tees-calibrate-green-dark: #136c34;
 }
@@ -47,7 +45,7 @@ body {
 .style-item-name { flex: 1; font-weight: 700; font-size: 13px; }
 .style-item-name small { display: block; font-weight: 400; color: var(--custom-tees-calibrate-gray); font-size: 11.5px; }
 .style-item-state { font-size: 11px; color: var(--custom-tees-calibrate-gray-2); white-space: nowrap; }
-.style-item-state.is-saved { color: var(--custom-tees-calibrate-green); font-weight: 700; }
+.style-item-state.is-saved { color: var(--green-700); font-weight: 700; }
 .style-item.is-active { border-color: var(--store-green-700); box-shadow: 0 0 0 2px rgb(47 125 59 / 18%); }
 .cal-loading { padding: 14px; color: var(--custom-tees-calibrate-gray); font-size: 13px; }
 
@@ -75,19 +73,19 @@ body {
 .cal-empty[hidden] { display: none; }
 
 .cal-box {
-    position: absolute; border: 2px dashed var(--custom-tees-calibrate-green-2); border-radius: 4px;
+    position: absolute; border: 2px dashed var(--green-600); border-radius: 4px;
     background: rgb(22 163 74 / 8%); cursor: move;
 }
 
 .cal-box-label {
     position: absolute; top: -22px; left: 0; font-size: 11px; font-weight: 700;
-    color: var(--custom-tees-calibrate-green); white-space: nowrap;
+    color: var(--green-700); white-space: nowrap;
 }
 
 .cal-box-handle {
     position: absolute; right: -13px; bottom: -13px; width: 26px; height: 26px;
-    display: grid; place-items: center; background: var(--color-surface); color: var(--custom-tees-calibrate-green);
-    border: 2px solid var(--custom-tees-calibrate-green-2); border-radius: 50%; cursor: nwse-resize; font-size: 11px;
+    display: grid; place-items: center; background: var(--color-surface); color: var(--green-700);
+    border: 2px solid var(--green-600); border-radius: 50%; cursor: nwse-resize; font-size: 11px;
     box-shadow: 0 2px 6px rgb(0 0 0 / 18%);
 }
 
@@ -101,7 +99,7 @@ body {
     background: var(--color-surface); font: inherit; font-weight: 600; cursor: pointer;
 }
 .cal-btn:hover { border-color: var(--store-green-700); }
-.cal-btn-primary { background: var(--custom-tees-calibrate-green); border-color: var(--custom-tees-calibrate-green); color: var(--color-on-brand); }
+.cal-btn-primary { background: var(--green-700); border-color: var(--green-700); color: var(--color-on-brand); }
 .cal-btn-primary:hover { background: var(--custom-tees-calibrate-green-dark); }
 .cal-btn-primary:disabled { opacity: 0.6; cursor: wait; }
 .cal-btn-danger { color: var(--red-700); }
@@ -115,7 +113,7 @@ body {
     font-size: 13px; box-shadow: 0 6px 18px rgb(0 0 0 / 25%);
 }
 .cal-toast.is-error { background: var(--print-red); }
-.cal-toast.is-ok { background: var(--custom-tees-calibrate-green); }
+.cal-toast.is-ok { background: var(--green-700); }
 
 @media (width <= 900px) {
     .cal-main { grid-template-columns: 1fr; }
