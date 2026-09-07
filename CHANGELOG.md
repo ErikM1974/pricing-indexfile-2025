@@ -1,3 +1,7 @@
+## v2026.09.07.4 (2026.09.07)
+
+- Deploy v2026.09.07.4: CSS standardization — forms family (18 sheets → 0 raw hex, print palette as tokens, !important 6→3 with reasons, stylelint scope widened; 32/36 shots identical + 4 deliberate ink consolidations, screen and print)
+
 ## v2026.09.07.3 (2026.09.07)
 
 - Deploy v2026.09.07.3: CSS standardization Step 1+3 — app-wide tokens.css (promoted from the dashboard seed), page template, stylelint + scope ratchet, ESLint over all browser JS; zero visual change (15/15 pixel-identical)
