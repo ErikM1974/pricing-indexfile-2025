@@ -235,8 +235,18 @@ var dtfadapLog = DTFADAP_LOG_ON ? console.log.bind(console) : function () {}; //
                     const parsedData = JSON.parse(storedData);
                     this.log('DTF Adapter: Found stored data', parsedData);
                     
-                    // Merge stored data with URL data (URL data takes precedence)
-                    Object.assign(data, parsedData, data);
+                    // Merge stored data UNDER the fresh URL/API data. The old line assigned the stored
+                    // copy onto the target and then the target onto itself — the stored copy won, so
+                    // a stored garmentCost of 0
+                    // beat the $3 the API had just returned and the calculator priced at $0.00
+                    // (2026-09-06). A stored cost of 0 is never a price: drop it.
+                    const stored = Object.assign({}, parsedData);
+                    if (!(parseFloat(stored.garmentCost) > 0)) delete stored.garmentCost;
+                    // …and a cost remembered for a DIFFERENT style is not this style's price either.
+                    const storedSku = stored.productInfo && stored.productInfo.sku;
+                    if (styleNumber && storedSku && String(storedSku).toUpperCase() !== String(styleNumber).toUpperCase()) delete stored.garmentCost;
+                    const fresh = Object.assign({}, data);
+                    Object.assign(data, stored, fresh);
                     hasData = true;
                 } catch (e) {
                     this.log('DTF Adapter: Error parsing stored data', e);

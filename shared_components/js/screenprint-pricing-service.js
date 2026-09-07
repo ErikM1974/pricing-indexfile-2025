@@ -7,7 +7,7 @@
  *
  * This service is used by BOTH:
  * - /calculators/screen-print-pricing.html (Source of Truth)
- * - /calculators/screenprint-manual-pricing.html (Manual Calculator)
+ * - the retired manual screen-print calculator page (archived 2026-08-05)
  *
  * Changes to pricing calculations here affect both pages.
  *

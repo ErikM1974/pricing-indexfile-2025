@@ -49,7 +49,8 @@ const DELETED = new Set(DELETED_2026_09_06);
 // byte-identical, utils.js diverged in 2025-07) and no page ever requested /app-new.js. Removal is Erik's `git rm`
 // (memory/DEAD_FILES_2026-09-06.md § root duplicates); until then they are skipped below and must stay unreferenced.
 const PENDING_DELETION = ['pricing-matrix-api.js', 'dp5-helper.js', 'utils.js', 'app-new.js',
-    'shared_components/js/quote-builder-base.js']; // a comment-only tombstone since 2026-07-08 — the real base is builders/shared/quote-builder-base.js
+    'shared_components/js/quote-builder-base.js', // a comment-only tombstone since 2026-07-08 — the real base is builders/shared/quote-builder-base.js
+    'shared_components/js/screenprint-manual-pricing.js']; // loaded only by calculators/archive/manual-pricing-deprecated/ (retired 2026-08-05); named elsewhere only in comments
 const PENDING = new Set(PENDING_DELETION);
 
 // Not served pages: build output, tests, Node-side code, documentation, email/HTML templates, archives, vendored code.

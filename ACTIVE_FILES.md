@@ -989,7 +989,7 @@
 ### Screen Print Extended Services
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|
-| `/shared_components/js/screenprint-manual-pricing.js` | Screen print manual pricing service (used by unified manual calculator) | screenprint-pricing-service.js | ✅ Active |
+| `/shared_components/js/screenprint-manual-pricing.js` | ⛔ **DEAD (2026-09-06: only loaded by an archived page — pending Erik\'s `git rm`, see `memory/DEAD_FILES_2026-09-06.md` § root duplicates)** Screen print manual pricing service (used by unified manual calculator) | screenprint-pricing-service.js | ✅ Active |
 | `/shared_components/js/screenprint-quote-builder.js` | **TOMBSTONE (2026-07-08)** — the SCP monolith is fully decomposed into `builders/scp/*` (state/adapter + 7 domain modules + index boot); the page loads ONLY the bundle. Kept so stale references fail loudly. | (none — do not add code) | 🪦 Tombstone |
 
 ### Universal Components (header, gallery, grid)

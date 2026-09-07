@@ -8,7 +8,7 @@
  * This file is the SOURCE OF TRUTH for Screen Print pricing calculations.
  *
  * If you modify pricing logic here, you MUST update:
- * - /shared_components/js/screenprint-manual-pricing.js (Manual Calculator)
+ * - the retired manual screen-print calculator script (archive-only, pending deletion)
  *
  * Key areas that must stay synchronized:
  * 1. Flash charge application (per color, to ALL colors)

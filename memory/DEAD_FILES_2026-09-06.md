@@ -117,9 +117,10 @@ twin. The lock is now path-aware (`referrers()` in `repo-hygiene-final.test.js`)
 - `utils.js` — diverged from `shared_components/js/utils.js` in 2025-07; the DTG builder's `./utils.js` imports resolve to `builders/dtg/utils.js`, not this.
 - `app-new.js` — only ever served by an explicit `/app-new.js` route that no page requested (removed from `server.js` in `v2026.09.06.37`); `index.html` loads `app-modern.js`.
 - `shared_components/js/quote-builder-base.js` — a comment-only tombstone since 2026-07-08 pointing at `builders/shared/quote-builder-base.js`; no page or script loads it.
+- `shared_components/js/screenprint-manual-pricing.js` — the manual screen-print calculator; its only page is `calculators/archive/manual-pricing-deprecated/screenprint-manual-pricing.html` (retired 2026-08-05); two shared scripts name it in comments only. It still carries the typed 24-36/$75 tier strip the live v2 lost in `.42`.
 
 ```bash
-git rm -q -- pricing-matrix-api.js dp5-helper.js utils.js app-new.js shared_components/js/quote-builder-base.js
+git rm -q -- pricing-matrix-api.js dp5-helper.js utils.js app-new.js shared_components/js/quote-builder-base.js shared_components/js/screenprint-manual-pricing.js
 ```
 
 Then drop the four rows from `ACTIVE_FILES.md` and move them from `PENDING_DELETION` to `DELETED_2026_09_06` in the lock.
