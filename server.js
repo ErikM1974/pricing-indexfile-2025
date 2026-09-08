@@ -74,6 +74,8 @@ dotenv.config();
 // ORDER-FORM SECTION: routes/order-form.js owns submission plus legacy cart/catalog/pricing relays.
 // The 3-Day Tees submit handler already lives in routes/customer-portal.js.
 // QUOTE SYNC: routes/quote-sync.js owns ShopWorks sync and ShipStation submission.
+// Staff gates protect operational routes; shared-secret gates admit scheduled jobs/callbacks.
+// Customer sync/vendor reads use the quote share link and cannot override the work order.
 // QUOTE LIFECYCLE: routes/quote-lifecycle.js owns tracking, change log, acceptance and deposits.
 // PUBLIC QUOTES: routes/public-quotes.js owns sticker quotes and token-gated quote retrieval.
 // WATCHDOG: one lib/quote-sync-health.js instance is shared by sync and health routes.
@@ -1442,8 +1444,9 @@ function shareTokenOk(req, session) {
   if (!stored) return true;                              // legacy quote
 
   const supplied = String(req.query.k || '');
-  if (supplied.length !== stored.length) return false;
-  return crypto.timingSafeEqual(Buffer.from(supplied), Buffer.from(stored));
+  const actual = Buffer.from(supplied);
+  const expected = Buffer.from(stored);
+  return actual.length === expected.length && crypto.timingSafeEqual(actual, expected);
 }
 
 // Binds a payment link to the exact numbers the rep enabled. Recomputed from
@@ -3215,6 +3218,7 @@ const CRM_API_BASE = CASPIO_PROXY_BASE;
 
 // CRM_API_SECRET — hoisted here from lines 3428-3428 on 2026-09-07 (server split): the section below is moved into routes/ and this helper is shared.
 const CRM_API_SECRET = process.env.CRM_API_SECRET;
+const { isStaffOrSync, requireStaffOrSync } = require('./lib/quote-sync-access')({ sharedSecret: CRM_API_SECRET, requireStaff });
 
 // PORTAL_ADMIN_ROLES — hoisted here from lines 3416-3420 on 2026-09-07 (server split): the section below is moved into routes/ and this helper is shared.
 // Customer Portal admin console — manage who can log into the customer portal
@@ -3912,9 +3916,9 @@ function nowPacificNaiveIso() {
 const { recordQuoteSyncRun, computeQuoteSyncHealth, notifyQuoteSyncHealth } = require('./lib/quote-sync-health')({ fetch });
 
 // Quote and ShopWorks synchronization — extracted to routes/quote-sync.js (server split, 2026-09-07); registered here so the order is unchanged.
-{ const ctx = { CASPIO_PROXY_BASE, CRM_API_SECRET, SOFT_DELETE_RETENTION_DAYS, SYNC_PROXY_BASE, buildOrderStatusUrl, channelConfigExact, escapeHTMLSrv, fetch, makeApiRequest, nowPacificNaiveIso, parseCaspioPacificMs, recordQuoteSyncRun, sanitizeFilterInput, sendEmailJSTemplate, shareTokenOk, withProxySecret }; require('./routes/quote-sync')(app, ctx); }
+{ const ctx = { CASPIO_PROXY_BASE, CRM_API_SECRET, SOFT_DELETE_RETENTION_DAYS, SYNC_PROXY_BASE, buildOrderStatusUrl, channelConfigExact, escapeHTMLSrv, fetch, makeApiRequest, nowPacificNaiveIso, parseCaspioPacificMs, recordQuoteSyncRun, isStaffOrSync, requireStaff, requireStaffOrSync, sanitizeFilterInput, sendEmailJSTemplate, shareTokenOk, withProxySecret }; require('./routes/quote-sync')(app, ctx); }
 // Quote sync health, tracking, change log and customer deposits — extracted to routes/quote-lifecycle.js (server split, 2026-09-07); registered here so the order is unchanged.
-{ const ctx = { CASPIO_PROXY_BASE, PUBLIC_SITE_ORIGIN, QUOTE_TOTALS_HASH_VERSION, QuoteDepositMath, alertQuotePay, autoEnablePickupDeposit, computeQuoteSyncHealth, computeQuoteTotalsHash, fetch, fetchQuoteSessionRow, getDepositPct, makeApiRequest, notifyQuoteSyncHealth, nowPacificNaiveIso, parseNotesJson, quoteShareUrl, requireStaff, sanitizeFilterInput, sendQuoteAcceptedEmails, shareTokenOk, strictLimiter, stripe, totalsHashMatches, withProxySecret }; require('./routes/quote-lifecycle')(app, ctx); }
+{ const ctx = { CASPIO_PROXY_BASE, PUBLIC_SITE_ORIGIN, QUOTE_TOTALS_HASH_VERSION, QuoteDepositMath, alertQuotePay, autoEnablePickupDeposit, computeQuoteSyncHealth, computeQuoteTotalsHash, fetch, fetchQuoteSessionRow, getDepositPct, makeApiRequest, notifyQuoteSyncHealth, nowPacificNaiveIso, parseNotesJson, quoteShareUrl, requireStaff, requireStaffOrSync, sanitizeFilterInput, sendQuoteAcceptedEmails, shareTokenOk, strictLimiter, stripe, totalsHashMatches, withProxySecret }; require('./routes/quote-lifecycle')(app, ctx); }
 // Box Label Management block DELETED 2026-08-27 (~430 lines): the legacy half of
 // the box-labels rebuild. Its /api/box-label-data route had ZERO callers (the
 // rebuilt /pages/box-labels.html reads proxy /api/sanmar-orders/label-data) and

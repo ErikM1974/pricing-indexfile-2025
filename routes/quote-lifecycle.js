@@ -3,7 +3,7 @@
 // what the monolith had, at the same indentation, so every handler body and the registration order are unchanged
 // (tests/unit/server-route-table.test.js). Everything it needs from server.js arrives in ctx; nothing is global.
 module.exports = function register(app, ctx) {
-const { CASPIO_PROXY_BASE, PUBLIC_SITE_ORIGIN, QUOTE_TOTALS_HASH_VERSION, QuoteDepositMath, alertQuotePay, autoEnablePickupDeposit, computeQuoteSyncHealth, computeQuoteTotalsHash, fetch, fetchQuoteSessionRow, getDepositPct, makeApiRequest, notifyQuoteSyncHealth, nowPacificNaiveIso, parseNotesJson, quoteShareUrl, requireStaff, sanitizeFilterInput, sendQuoteAcceptedEmails, shareTokenOk, strictLimiter, stripe, totalsHashMatches, withProxySecret } = ctx;
+const { CASPIO_PROXY_BASE, PUBLIC_SITE_ORIGIN, QUOTE_TOTALS_HASH_VERSION, QuoteDepositMath, alertQuotePay, autoEnablePickupDeposit, computeQuoteSyncHealth, computeQuoteTotalsHash, fetch, fetchQuoteSessionRow, getDepositPct, makeApiRequest, notifyQuoteSyncHealth, nowPacificNaiveIso, parseNotesJson, quoteShareUrl, requireStaff, requireStaffOrSync, sanitizeFilterInput, sendQuoteAcceptedEmails, shareTokenOk, strictLimiter, stripe, totalsHashMatches, withProxySecret } = ctx;
 
 // ============================================================================
 // QUOTE-SYNC FRESHNESS WATCHDOG (2026-06-15)
@@ -32,7 +32,7 @@ app.get('/api/quote-sync-health', (req, res) => {
   res.json({ success: true, ...computeQuoteSyncHealth() });
 });
 
-app.post('/api/quote-sync-health/alert', async (req, res) => {
+app.post('/api/quote-sync-health/alert', requireStaffOrSync, async (req, res) => {
   const health = computeQuoteSyncHealth();
   let notify = { sent: false, skipped: 'healthy' };
   if (!health.ok) {
@@ -60,7 +60,7 @@ app.post('/api/quote-sync-health/alert', async (req, res) => {
  *
  * Body: { daysBack?, dryRun? }
  */
-app.post('/api/quote-sessions/bulk-sync-shipstation-tracking', async (req, res) => {
+app.post('/api/quote-sessions/bulk-sync-shipstation-tracking', requireStaffOrSync, async (req, res) => {
   const startedAt = Date.now();
   try {
     const daysBack = Math.min(Math.max(Number(req.body?.daysBack) || 30, 1), 90);
@@ -145,7 +145,7 @@ app.post('/api/quote-sessions/bulk-sync-shipstation-tracking', async (req, res) 
           // See sync-from-shopworks self-call above — internal loopback call,
           // x-forwarded-proto keeps the force-HTTPS middleware from 302-ing it
           // to https://localhost (→ ECONNREFUSED). 2026-06-15
-          headers: { 'Content-Type': 'application/json', 'x-forwarded-proto': 'https' },
+          headers: withProxySecret({ 'Content-Type': 'application/json', 'x-forwarded-proto': 'https' }),
           body: JSON.stringify({
             trackingNumber:   ship.trackingNumber,
             trackingCarrier:  ship.carrierCode,
@@ -181,7 +181,7 @@ app.post('/api/quote-sessions/bulk-sync-shipstation-tracking', async (req, res) 
  * Returns up to N most-recent changes for a single quote (newest first).
  * Used by the "what changed" banner on /quote/:id (Phase 2).
  */
-app.get('/api/quote-change-log/:quoteId', async (req, res) => {
+app.get('/api/quote-change-log/:quoteId', requireStaff, async (req, res) => {
   try {
     const safeQuoteId = sanitizeFilterInput(req.params.quoteId);
     const limit = Math.min(Math.max(Number(req.query.limit) || 50, 1), 500);
@@ -207,7 +207,7 @@ app.get('/api/quote-change-log/:quoteId', async (req, res) => {
  * Activity feed across ALL quotes for the dashboard (Phase 3).
  * Filterable by hoursAgo, salesRepEmail, severity, unacknowledged.
  */
-app.get('/api/quote-change-log-recent', async (req, res) => {
+app.get('/api/quote-change-log-recent', requireStaff, async (req, res) => {
   try {
     const hours = Math.min(Math.max(Number(req.query.hours) || 24, 1), 720);
     const limit = Math.min(Math.max(Number(req.query.limit) || 100, 1), 500);
@@ -231,7 +231,7 @@ app.get('/api/quote-change-log-recent', async (req, res) => {
  * Mark a single change record as seen by a user. Used by the change banner's
  * "mark as seen" button (Phase 2) and dashboard activity feed (Phase 3).
  */
-app.put('/api/quote-change-log/:id/acknowledge', async (req, res) => {
+app.put('/api/quote-change-log/:id/acknowledge', requireStaff, async (req, res) => {
   try {
     const pkId = parseInt(req.params.id, 10);
     if (!Number.isInteger(pkId) || pkId <= 0) {

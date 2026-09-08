@@ -2256,7 +2256,7 @@ class QuoteViewPage {
             if (shopWorksOrderNumber) {
                 opts.body = JSON.stringify({ shopWorksOrderNumber });
             }
-            const r = await fetch(`/api/quote-sessions/${this.quoteId}/sync-from-shopworks`, opts);
+            const r = await fetch(`/api/quote-sessions/${this.quoteId}/sync-from-shopworks${this.shareTokenParam()}`, opts);
             if (!r.ok) {
                 throw new Error(`HTTP ${r.status}`);
             }
@@ -2387,6 +2387,7 @@ class QuoteViewPage {
     }
 
     _setupManualWoStrip() {
+        if (!this.isStaff) return;
         const btn = document.getElementById('sw-manual-wo-btn');
         const input = document.getElementById('sw-manual-wo-input');
         if (!btn || !input) return;
@@ -2429,7 +2430,7 @@ class QuoteViewPage {
         const status = this.fullData?.status || '';
         const isProcessed = status === 'Processed' || status === 'Processed - ShopWorks Failed';
         const hasWoNumber = !!(sw?.orderNumber);
-        strip.style.display = (isProcessed && !hasWoNumber) ? 'block' : 'none';
+        strip.style.display = (this.isStaff && isProcessed && !hasWoNumber) ? 'block' : 'none';
     }
 
     _formatRelativeTime(isoOrDate) {
@@ -3122,7 +3123,7 @@ class QuoteViewPage {
         section.style.display = '';
         body.innerHTML = '<span class="sw-vendor-loading">Checking SanMar…</span>';
         try {
-            const r = await fetch(`/api/quote-sessions/${encodeURIComponent(this.quoteId)}/vendor-shipment?woId=${encodeURIComponent(woId)}`);
+            const r = await fetch(`/api/quote-sessions/${encodeURIComponent(this.quoteId)}/vendor-shipment?woId=${encodeURIComponent(woId)}${this.shareTokenParam('&')}`);
             const data = await r.json().catch(() => ({}));
             if (!r.ok) throw new Error(data.error || `HTTP ${r.status}`);
             body.innerHTML = this._vendorShipmentHtml(data);
