@@ -65,3 +65,5 @@ The report distinguishes application pages, served archives, email artifacts, fi
 Design Vault and Gear Publisher replace Art Hub and dash-shell imports with the scoped shared entry point. Vault also uses its shared toast implementation through a presentation class added by the existing toast service; other consumers retain their stylesheet until migrated. Dynamic sizing variables --h/--w are explicit per-page manifest exceptions, not theme variables.
 
 The Bradley family adds five reviewed consumers and mocked transfer/order/image/import/sender states in css-unification-bradley.spec.js. That spec also exercises the legacy Steve sender and the three existing product-thumbnail modal consumers. Budgets are raw source bytes, measured again when a common owner grows; compressed transfer is a separate deployment observation.
+
+Ruth and Saved Mockups are the first two art-family consumers. Their mocked browser contract is css-unification-art.spec.js; Ruth's board/recovery patterns live in art-workflow.css. Source budgets normalize CRLF to committed LF and retain a 2 KB allowance. This does not certify the remaining Steve/AE/detail consumers.

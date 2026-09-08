@@ -54,3 +54,17 @@ describe('mockup-library: filterRows', () => {
     expect(L.filterRows(rows, null)).toHaveLength(2);
   });
 });
+
+
+describe('mockup-library: calendar dates', () => {
+  test.each(['America/Los_Angeles', 'UTC', 'Asia/Tokyo'])('keeps the recorded calendar day in %s', timezone => {
+    const { execFileSync } = require('node:child_process');
+    const file = require.resolve('../../pages/js/mockup-library.js');
+    const result = execFileSync(process.execPath, ['-e', 'process.stdout.write(require(' + JSON.stringify(file) + ').fmtDate("2026-09-08"))'], { env: { ...process.env, TZ: timezone }, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
+    expect(result).toBe('Sep 8, 2026');
+  });
+  test('does not display missing or invalid dates', () => {
+    expect(L.fmtDate(null)).toBe('');
+    expect(L.fmtDate('invalid')).toBe('');
+  });
+});

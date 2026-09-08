@@ -1,0 +1,808 @@
+/* Art workflow patterns. Opt in per page; controls use components.css. */
+@layer components.patterns {
+    :where([data-ui="unified"]) .tab-group {
+        display: contents;
+    }
+
+    :where([data-ui="unified"]) .tab-content {
+        padding-block: var(--space-4);
+    }
+
+    :where([data-ui="unified"]) .tab-pane {
+        display: none;
+    }
+
+    :where([data-ui="unified"]) .tab-pane.active {
+        display: block;
+    }
+
+    :where([data-ui="unified"]) .tab-badge {
+        padding: var(--space-1) var(--space-2);
+        border-radius: var(--radius-pill);
+        background: var(--ui-tint);
+        color: var(--ui-accent);
+        font-size: var(--font-size-sm);
+        font-variant-numeric: tabular-nums;
+    }
+
+    :where([data-ui="unified"]) .tab-button.active .tab-badge {
+        background: var(--ui-surface);
+        color: var(--ui-accent);
+    }
+
+    :where([data-ui="unified"]) :is(.status-summary, .view-toggle) {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-2);
+    }
+
+    :where([data-ui="unified"]) .status-summary {
+        margin-bottom: var(--space-5);
+    }
+
+    :where([data-ui="unified"]) :is(.status-stat.active, .view-toggle-btn.active) {
+        background: var(--ui-tint);
+        border-color: var(--ui-accent);
+        color: var(--ui-accent);
+    }
+
+    :where([data-ui="unified"]) .status-stat-count {
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+    }
+
+    :where([data-ui="unified"]) .status-stat::before {
+        content: "";
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"]) .status-stat--submitted::before {
+        background: var(--violet-600);
+    }
+
+    :where([data-ui="unified"]) .status-stat--in-progress::before {
+        background: var(--blue-600);
+    }
+
+    :where([data-ui="unified"])
+        :is(.status-stat--awaiting-approval, .status-stat--needs-review)::before {
+        background: var(--amber-800);
+    }
+
+    :where([data-ui="unified"]) .status-stat--revision-requested::before {
+        background: var(--red-800);
+    }
+
+    :where([data-ui="unified"]) .status-stat--completed::before {
+        background: var(--emerald-800);
+    }
+
+    :where([data-ui="unified"]) .mockup-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
+        gap: var(--space-5);
+    }
+
+    :where([data-ui="unified"]) .mockup-span {
+        grid-column: 1 / -1;
+    }
+
+    :where([data-ui="unified"]) .mockup-card {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+        background: var(--ui-surface);
+        border: 1px solid var(--ui-line);
+        border-top: 3px solid var(--ui-line-strong);
+        border-radius: var(--radius-md);
+        overflow: hidden;
+        box-shadow: var(--shadow-sm);
+        cursor: pointer;
+    }
+
+    :where([data-ui="unified"]) .mockup-card:hover {
+        border-color: var(--ui-line-strong);
+    }
+
+    :where([data-ui="unified"]) .mockup-card--submitted {
+        border-top-color: var(--violet-600);
+    }
+
+    :where([data-ui="unified"]) .mockup-card--in-progress {
+        border-top-color: var(--blue-600);
+    }
+
+    :where([data-ui="unified"]) .mockup-card--awaiting-approval {
+        border-top-color: var(--amber-800);
+    }
+
+    :where([data-ui="unified"]) .mockup-card--revision-requested {
+        border-top-color: var(--red-800);
+    }
+
+    :where([data-ui="unified"]) :is(.mockup-card--approved, .mockup-card--completed) {
+        border-top-color: var(--emerald-800);
+    }
+
+    :where([data-ui="unified"]) .mockup-card--rush {
+        border-top-color: var(--red-800);
+    }
+
+    :where([data-ui="unified"]) .mockup-card--on-hold {
+        background: var(--gray-50);
+        border-top-color: var(--gray-600);
+    }
+
+    :where([data-ui="unified"]) .card-header {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-start;
+        gap: var(--space-3);
+        padding: var(--space-4);
+    }
+
+    :where([data-ui="unified"]) .card-header-left {
+        flex: 1 1 150px;
+        min-width: 0;
+    }
+
+    :where([data-ui="unified"]) .card-header-right {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-1);
+    }
+
+    :where([data-ui="unified"]) .card-company {
+        color: var(--ui-ink);
+        font-size: var(--font-size-lg);
+        font-weight: 700;
+        line-height: 1.35;
+        overflow-wrap: anywhere;
+    }
+
+    :where([data-ui="unified"]) .card-design-number {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: var(--space-2);
+        color: var(--ui-muted);
+        font-size: var(--font-size-sm);
+        margin-top: var(--space-1);
+    }
+
+    :where([data-ui="unified"]) .card-rep-name {
+        border: 0;
+        background: transparent;
+        padding: var(--space-2);
+        min-height: 44px;
+        color: var(--ui-accent);
+        font: inherit;
+        text-decoration: underline;
+        text-underline-offset: 3px;
+        cursor: pointer;
+    }
+
+    :where([data-ui="unified"]) .card-thumb {
+        display: flex;
+        justify-content: center;
+        background: var(--gray-50);
+        padding: var(--space-3);
+    }
+
+    :where([data-ui="unified"]) .card-thumb img {
+        width: 100%;
+        height: 190px;
+        object-fit: contain;
+    }
+
+    :where([data-ui="unified"]) .card-body {
+        flex: 1;
+        padding: var(--space-4);
+    }
+
+    :where([data-ui="unified"]) .card-design-name {
+        font-size: var(--font-size-base);
+        font-weight: 600;
+        margin-bottom: var(--space-3);
+        overflow-wrap: anywhere;
+    }
+
+    :where([data-ui="unified"]) .card-meta {
+        display: grid;
+        gap: var(--space-2);
+        color: var(--ui-muted);
+        font-size: var(--font-size-md);
+    }
+
+    :where([data-ui="unified"]) .card-meta-row {
+        overflow-wrap: anywhere;
+    }
+
+    :where([data-ui="unified"]) .card-meta-label {
+        color: var(--ui-ink);
+        font-weight: 600;
+    }
+
+    :where([data-ui="unified"]) :is(.card-badges, .kanban-card-badges) {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-2);
+        margin-top: var(--space-3);
+    }
+
+    :where([data-ui="unified"])
+        :is(
+            .status-pill,
+            .card-badge,
+            .elapsed-badge,
+            .kanban-elapsed,
+            .kanban-card-badge,
+            .kanban-card-due,
+            .audit-badge,
+            .broken-status-pill
+        ) {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-1);
+        max-width: 100%;
+        padding: var(--space-1) var(--space-2);
+        border-radius: var(--radius-sm);
+        background: var(--gray-100);
+        color: var(--ui-muted);
+        font-size: var(--font-size-sm);
+        font-weight: 600;
+        line-height: 1.4;
+        overflow-wrap: anywhere;
+    }
+
+    :where([data-ui="unified"]) :is(.status-pill--submitted, .broken-status--submitted) {
+        background: var(--color-ruth-tint);
+        color: var(--color-ruth-dark);
+    }
+
+    :where([data-ui="unified"]) :is(.status-pill--in-progress, .broken-status--in-progress) {
+        background: var(--color-info-bg);
+        color: var(--color-info-ink);
+    }
+
+    :where([data-ui="unified"])
+        :is(
+            .status-pill--awaiting-approval,
+            .broken-status--awaiting-approval,
+            .elapsed--waiting,
+            .card-badge--due-soon,
+            .kanban-card-due--soon,
+            .audit-badge--amber
+        ) {
+        background: var(--color-warning-bg);
+        color: var(--color-warning-ink);
+    }
+
+    :where([data-ui="unified"])
+        :is(
+            .status-pill--completed,
+            .status-pill--approved,
+            .broken-status--completed,
+            .broken-status--approved,
+            .elapsed--fresh,
+            .kanban-card-due--ok,
+            .audit-badge--green
+        ) {
+        background: var(--color-success-bg);
+        color: var(--emerald-800);
+    }
+
+    :where([data-ui="unified"])
+        :is(
+            .status-pill--revision-requested,
+            .broken-status--revision-requested,
+            .elapsed--overdue,
+            .card-badge--revision,
+            .card-badge--overdue,
+            .kanban-card-due--overdue,
+            .kanban-card-badge--rev
+        ) {
+        background: var(--color-danger-bg);
+        color: var(--color-danger-ink);
+    }
+
+    :where([data-ui="unified"]) :is(.card-badge--rush, .kanban-card-badge--rush) {
+        background: var(--color-danger-ink);
+        color: var(--color-on-brand);
+    }
+
+    :where([data-ui="unified"]) :is(.status-pill--on-hold, .broken-status--on-hold) {
+        background: var(--gray-200);
+        color: var(--gray-800);
+    }
+
+    :where([data-ui="unified"]) .card-footer {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-2);
+        padding: var(--space-3) var(--space-4);
+        border-top: 1px solid var(--ui-line);
+    }
+
+    :where([data-ui="unified"]) .card-date {
+        color: var(--ui-muted);
+        font-size: var(--font-size-sm);
+    }
+
+    :where([data-ui="unified"]) .card-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-2);
+        padding: var(--space-3) var(--space-4);
+        border-top: 1px solid var(--ui-line);
+    }
+
+    :where([data-ui="unified"]) :is(.mockup-loading, .mockup-empty, .mockup-error) {
+        text-align: center;
+        padding: var(--space-7) var(--space-4);
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"]) .mockup-error {
+        color: var(--color-danger-ink);
+    }
+
+    :where([data-ui="unified"]) .mockup-empty-icon {
+        font-size: var(--font-size-display);
+        margin-bottom: var(--space-3);
+    }
+
+    :where([data-ui="unified"])
+        :is(.mockup-loading-spinner, .broken-mockups-spinner, .bml-spinner) {
+        display: inline-block;
+        width: 22px;
+        height: 22px;
+        border: 3px solid var(--ui-line);
+        border-top-color: var(--ui-accent);
+        border-radius: 50%;
+        vertical-align: middle;
+        animation: art-workflow-spin 0.8s linear infinite;
+    }
+
+    :where([data-ui="unified"]) .mockup-loading-spinner {
+        display: block;
+        width: 32px;
+        height: 32px;
+        margin: 0 auto var(--space-4);
+    }
+
+    :where([data-ui="unified"]) .skeleton-card {
+        min-height: 250px;
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-md);
+        background: var(--ui-surface);
+        overflow: hidden;
+    }
+
+    :where([data-ui="unified"]) .skeleton-header {
+        height: 56px;
+        background: var(--ui-tint);
+    }
+
+    :where([data-ui="unified"]) .skeleton-body {
+        padding: var(--space-4);
+    }
+
+    :where([data-ui="unified"]) .skeleton-line {
+        height: 14px;
+        background: var(--gray-100);
+        border-radius: var(--radius-sm);
+        margin-bottom: var(--space-3);
+    }
+
+    :where([data-ui="unified"]) .skeleton-line--short {
+        width: 60%;
+    }
+
+    :where([data-ui="unified"]) .skeleton-line--medium {
+        width: 80%;
+    }
+
+    :where([data-ui="unified"]) .skeleton-line--pill {
+        width: 30%;
+    }
+
+    :where([data-ui="unified"]) .mockup-toast {
+        position: fixed;
+        z-index: 1300;
+        inset: auto var(--space-4) var(--space-4) auto;
+        max-width: min(440px, calc(100% - 32px));
+        padding: var(--space-4);
+        border: 1px solid var(--ui-line);
+        border-left: 4px solid var(--ui-accent);
+        border-radius: var(--radius-sm);
+        background: var(--ui-surface);
+        color: var(--ui-ink);
+        box-shadow: var(--shadow-md);
+    }
+
+    :where([data-ui="unified"]) .mockup-toast--error {
+        border-left-color: var(--color-danger-ink);
+    }
+
+    /* Horizontal board keeps labels readable; only this named region scrolls. */
+    :where([data-ui="unified"]) .kanban-board {
+        display: none;
+        gap: var(--space-3);
+        overflow-x: auto;
+        padding: var(--space-1) var(--space-1) var(--space-4);
+        align-items: flex-start;
+    }
+
+    :where([data-ui="unified"]) .kanban-board.active {
+        display: flex;
+    }
+
+    :where([data-ui="unified"]) .kanban-column {
+        flex: 1 0 230px;
+        min-width: 230px;
+        max-width: 330px;
+        background: var(--gray-50);
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-md);
+    }
+
+    :where([data-ui="unified"]) .kanban-column-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-2);
+        width: 100%;
+        min-height: 52px;
+        border: 0;
+        border-bottom: 2px solid var(--ui-line-strong);
+        border-radius: var(--radius-md) var(--radius-md) 0 0;
+        padding: var(--space-3);
+        background: var(--ui-surface);
+        color: var(--ui-ink);
+        font: inherit;
+        font-size: var(--font-size-md);
+        font-weight: 700;
+        text-align: left;
+    }
+
+    :where([data-ui="unified"]) button.kanban-column-header {
+        cursor: pointer;
+    }
+
+    :where([data-ui="unified"]) .kanban-column--submitted .kanban-column-header {
+        border-bottom-color: var(--violet-600);
+    }
+
+    :where([data-ui="unified"]) .kanban-column--in-progress .kanban-column-header {
+        border-bottom-color: var(--blue-600);
+    }
+
+    :where([data-ui="unified"]) .kanban-column--awaiting .kanban-column-header {
+        border-bottom-color: var(--amber-800);
+    }
+
+    :where([data-ui="unified"]) .kanban-column--revision .kanban-column-header {
+        border-bottom-color: var(--red-800);
+    }
+
+    :where([data-ui="unified"])
+        :is(.kanban-column--approved, .kanban-column--completed)
+        .kanban-column-header {
+        border-bottom-color: var(--emerald-800);
+    }
+
+    :where([data-ui="unified"]) .kanban-column-count {
+        background: var(--gray-100);
+        color: var(--ui-ink);
+        border-radius: var(--radius-pill);
+        padding: var(--space-1) var(--space-2);
+        font-size: var(--font-size-sm);
+    }
+
+    :where([data-ui="unified"]) .kanban-column-body {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-3);
+        max-height: 70vh;
+        overflow-y: auto;
+        padding: var(--space-3);
+    }
+
+    :where([data-ui="unified"]) .kanban-column-body:empty::after {
+        content: "No mockups";
+        text-align: center;
+        color: var(--ui-muted);
+        font-size: var(--font-size-md);
+        padding: var(--space-4);
+    }
+
+    :where([data-ui="unified"]) .kanban-column--collapsed .kanban-column-body {
+        display: none;
+    }
+
+    :where([data-ui="unified"]) .kanban-column--collapsed .kanban-collapse-chevron {
+        transform: rotate(-90deg);
+    }
+
+    :where([data-ui="unified"]) .kanban-card {
+        padding: var(--space-3);
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-sm);
+        background: var(--ui-surface);
+        color: var(--ui-ink);
+        cursor: pointer;
+    }
+
+    :where([data-ui="unified"]) .kanban-card:hover {
+        border-color: var(--ui-accent);
+    }
+
+    :where([data-ui="unified"]) .kanban-card--rush {
+        border-left: 3px solid var(--color-danger-ink);
+    }
+
+    :where([data-ui="unified"]) .kanban-card-company {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: var(--space-2);
+        font-size: var(--font-size-base);
+        font-weight: 700;
+        overflow-wrap: anywhere;
+    }
+
+    :where([data-ui="unified"]) :is(.kanban-card-design, .kanban-card-rep) {
+        color: var(--ui-muted);
+        font-size: var(--font-size-sm);
+        overflow-wrap: anywhere;
+    }
+
+    :where([data-ui="unified"]) .kanban-card-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-2);
+        align-items: center;
+        justify-content: space-between;
+        margin-block: var(--space-2);
+    }
+
+    :where([data-ui="unified"]) .kanban-card-thumb {
+        display: block;
+        width: 100%;
+        height: 130px;
+        object-fit: contain;
+        background: var(--gray-50);
+        margin-top: var(--space-3);
+    }
+
+    /* Broken-image recovery is shared by art queues. */
+    :where([data-ui="unified"]) :is(.broken-mockups-loading, .broken-mockups-error) {
+        padding: var(--space-3) 0;
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"]) .broken-mockups-pill {
+        flex-wrap: wrap;
+        margin-bottom: var(--space-4);
+        background: var(--color-warning-bg);
+        border-color: var(--color-warning-ink);
+        color: var(--color-warning-ink);
+    }
+
+    :where([data-ui="unified"]) .broken-mockups-pill-cta {
+        font-weight: 600;
+    }
+
+    :where([data-ui="unified"]) .broken-mockups-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 1200;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: var(--space-4);
+        background: rgb(15 23 42 / 65%);
+    }
+
+    :where([data-ui="unified"]) .broken-mockups-modal {
+        width: min(960px, 100%);
+        max-height: calc(100dvh - 32px);
+        display: flex;
+        flex-direction: column;
+        background: var(--ui-surface);
+        color: var(--ui-ink);
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-md);
+        overflow: hidden;
+    }
+
+    :where([data-ui="unified"]) .broken-mockups-modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-3);
+        padding: var(--space-4) var(--space-5);
+        border-bottom: 1px solid var(--ui-line);
+    }
+
+    :where([data-ui="unified"]) .broken-mockups-modal-header h3 {
+        margin: 0;
+        font-size: var(--font-size-xl);
+    }
+
+    :where([data-ui="unified"]) .broken-mockups-modal-close {
+        flex: 0 0 44px;
+        width: 44px;
+        padding: 0;
+        font-size: var(--font-size-2xl);
+    }
+
+    :where([data-ui="unified"]) .broken-mockups-modal-sub {
+        padding: var(--space-3) var(--space-5);
+        font-size: var(--font-size-md);
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"]) .bml-toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-2);
+        padding: var(--space-3) var(--space-5);
+        border-bottom: 1px solid var(--ui-line);
+    }
+
+    :where([data-ui="unified"]) .bml-row-list {
+        padding: var(--space-4) var(--space-5);
+        overflow-y: auto;
+        min-height: 0;
+    }
+
+    :where([data-ui="unified"]) .bml-row {
+        padding: var(--space-4);
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-sm);
+        margin-bottom: var(--space-3);
+    }
+
+    :where([data-ui="unified"]) .bml-row__head {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-2);
+    }
+
+    :where([data-ui="unified"]) .bml-row__title {
+        display: inline-flex;
+        flex-wrap: wrap;
+        gap: var(--space-2);
+        align-items: center;
+        min-height: 44px;
+        font-weight: 700;
+    }
+
+    :where([data-ui="unified"]) .bml-row__company {
+        overflow-wrap: anywhere;
+    }
+
+    :where([data-ui="unified"]) .bml-row__design {
+        color: var(--ui-muted);
+        font-size: var(--font-size-sm);
+    }
+
+    :where([data-ui="unified"]) .bml-row__meta {
+        font-size: var(--font-size-sm);
+        color: var(--ui-muted);
+        overflow-wrap: anywhere;
+    }
+
+    :where([data-ui="unified"]) .bml-copy {
+        width: 44px;
+        padding: 0;
+    }
+
+    :where([data-ui="unified"]) .bml-row__actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-2);
+        margin-block: var(--space-3);
+    }
+
+    :where([data-ui="unified"]) .bml-row__dropzone {
+        padding: var(--space-4);
+        border: 2px dashed var(--ui-line-strong);
+        border-radius: var(--radius-sm);
+        text-align: center;
+        cursor: pointer;
+    }
+
+    :where([data-ui="unified"]) .bml-row__dropzone.is-dragover {
+        border-color: var(--ui-accent);
+        background: var(--ui-tint);
+    }
+
+    :where([data-ui="unified"]) .bml-dropzone-hint {
+        color: var(--ui-muted);
+        font-size: var(--font-size-sm);
+        margin-top: var(--space-2);
+    }
+
+    :where([data-ui="unified"]) .bml-row__result {
+        margin-top: var(--space-3);
+        font-size: var(--font-size-md);
+        overflow-wrap: anywhere;
+    }
+
+    :where([data-ui="unified"]) .bml-result--ok {
+        color: var(--emerald-800);
+    }
+
+    :where([data-ui="unified"]) .bml-result--warn {
+        color: var(--color-warning-ink);
+    }
+
+    :where([data-ui="unified"]) .bml-result--error {
+        color: var(--color-danger-ink);
+    }
+
+    :where([data-ui="unified"]) .bml-empty-state {
+        padding: var(--space-6) var(--space-4);
+        text-align: center;
+    }
+
+    :where([data-ui="unified"]) .bml-empty-state-title {
+        font-weight: 700;
+        margin-block: var(--space-2);
+    }
+
+    :where([data-ui="unified"]) .bml-empty-state-sub {
+        color: var(--ui-muted);
+    }
+}
+
+@keyframes art-workflow-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@media (width <= 560px) {
+    @layer components.patterns {
+        :where([data-ui="unified"]) .broken-mockups-overlay {
+            padding: var(--space-2);
+        }
+
+        :where([data-ui="unified"]) .broken-mockups-modal {
+            max-height: calc(100dvh - 16px);
+        }
+
+        :where([data-ui="unified"])
+            :is(
+                .broken-mockups-modal-header,
+                .broken-mockups-modal-sub,
+                .bml-toolbar,
+                .bml-row-list
+            ) {
+            padding-inline: var(--space-3);
+        }
+
+        :where([data-ui="unified"]) .bml-row {
+            padding: var(--space-3);
+        }
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    @layer components.patterns {
+        :where([data-ui="unified"])
+            :is(.mockup-loading-spinner, .broken-mockups-spinner, .bml-spinner) {
+            animation: none;
+        }
+    }
+}

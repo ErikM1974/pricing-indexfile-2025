@@ -366,6 +366,75 @@
       },
       "measuredRawCssBytes": 109145,
       "maxCssBytes": 111241
+    },
+    {
+      "source": "pages/mockup-library.html",
+      "family": "staff-art",
+      "status": "migrated",
+      "route": "/pages/mockup-library.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "pages/css/mockup-library.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "failed-retry",
+        "search",
+        "malformed-metadata",
+        "image-preview",
+        "image-failed",
+        "keyboard",
+        "mobile"
+      ],
+      "test": "tests/e2e/css-unification-art.spec.js",
+      "maxCssBytes": 64394,
+      "baseline": {
+        "commit": "30ed9e519ab2845a9c54bc3ed6f3cd3c76b061d4",
+        "rawCssBytes": 153935,
+        "localCssRequests": 3
+      },
+      "measuredRawCssBytes": 62346
+    },
+    {
+      "source": "dashboards/art-hub-ruth.html",
+      "family": "staff-art",
+      "status": "migrated",
+      "route": "/dashboards/art-hub-ruth.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/art-workflow.css",
+        "dashboards/css/art-hub-ruth.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "loading",
+        "populated",
+        "empty",
+        "failed-retry",
+        "search",
+        "status-filter",
+        "four-tabs",
+        "board",
+        "collapsed-completed",
+        "billing",
+        "recovery-dialog",
+        "recovery-failed-retry",
+        "keyboard",
+        "mobile"
+      ],
+      "test": "tests/e2e/css-unification-art.spec.js",
+      "maxCssBytes": 85098,
+      "baseline": {
+        "commit": "30ed9e519ab2845a9c54bc3ed6f3cd3c76b061d4",
+        "rawCssBytes": 195318,
+        "localCssRequests": 6
+      },
+      "measuredRawCssBytes": 83050
     }
   ],
   "billingContentSha256": "d85f8530e03a1863d1b8bb2ebe97ba332d5c9e3411887d1eb2d02dcdb14c0863",
@@ -434,5 +503,6 @@
       ],
       "note": "These sources execute Caspio /emb scripts. Bradley and the current Steve/Ruth/AE workflow use app-rendered markup; historical DataPage comments, CDN images and date utilities are not embedded UI."
     }
-  ]
+  ],
+  "ruthBillingContentSha256": "153e67f628dc0f0d45cededc8b1eb4923d90363f4a056b5ad01b14d7ae46ca68"
 }

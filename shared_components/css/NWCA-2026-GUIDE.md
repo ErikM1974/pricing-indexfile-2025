@@ -256,3 +256,9 @@ The five Bradley pages use tokens.css → components.css → bradley-transfers.c
 Load ui-dialog.js before controllers for existing custom overlay markup. Call UiDialog.open(host, { focus, onDismiss }) and UiDialog.close(host); the helper owns focus trapping, Escape, background inert state and scroll/focus restoration. Keep business state cleanup in onDismiss. New dialogs may continue to use the native dialog API demonstrated in Brand Standards.
 
 The sender and thumbnail helpers opt in to hidden state only on migrated bodies. Legacy Steve/art-detail and three builder thumbnail callers retain their current display behavior until their family migrates. transfer-actions.css remains for those old consumers. Its two dynamic badge colors are documented manifest exceptions; all fixed styling lives in the owning sheet.
+
+## Art workflow owners (2026-09-08)
+
+Ruth uses tokens.css → components.css → art-workflow.css → art-hub-ruth.css. The shared art owner covers status filters, artwork cards, boards, elapsed/audit badges and file recovery. Existing business hooks carry canonical btn/field-input classes. Page-specific search and billing arrangement remain in Ruth’s sheet. Saved Mockups uses tokens → components → its page sheet and UiDialog for image preview. Art Hub, mockup-ruth.css, kanban.css and elapsed-time-utils.css remain for other consumers until their coordinated migration.
+
+Keep board search/status filters aligned with the grid and paused work in the On Hold tab. Give a horizontally scrolling board an accessible name and keyboard focus. Recovery overlays use UiDialog; after a refresh replaces the opening button, return focus to its new element or the Queue tab. A failed request must not show success or leave stale results in another tab. Source-byte budgets measure committed LF source, independent of checkout line endings.

@@ -1,30 +1,194 @@
-/* art-hub-ruth.css — page styles (extracted from inline \3c style>, 2026.09.05.7) */
+/* Ruth-specific search and billing layout; queue patterns live in art-workflow.css. */
+@layer components.pages {
+    :where([data-ui="unified"]) .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+        border: 0;
+    }
 
-/* ── moved from inline \3c style> in dashboards/art-hub-ruth.html (Rule 3, 2026.09.05.7) ── */
-:root { --art-theme: var(--color-ruth); --art-theme-dark: var(--color-ruth-dark); --art-theme-light: var(--color-ruth-light); --art-theme-bg: var(--color-ruth-tint); --art-theme-bg-hover: var(--color-ruth-tint); --art-theme-bg-selected: var(--color-ruth-tint); --art-theme-rgba-15: rgb(107 70 193 / 15%); --art-theme-rgba-10: rgb(107 70 193 / 10%); }
+    :where([data-ui="unified"]) .rq-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: var(--space-4);
+        margin-bottom: var(--space-5);
+    }
 
-/* ── 2026-09-05 review ─────────────────────────────────────────── */
-/* stylelint-disable-next-line declaration-no-important -- the hidden attribute must beat any display rule */
-[hidden] { display: none !important; }
-body.is-modal-open { overflow: hidden; }
-.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
-.tab-group { display: contents; }
-.rq-head { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
-.rq-head .tab-title { margin-bottom: 0; }
-.rq-head-note { margin: 0; font-size: 13px; color: var(--gray-500); font-style: italic; }
-.rq-search-bar { display: flex; align-items: center; gap: 10px; padding: 10px 16px; margin: 0 0 12px; background: var(--color-surface); border-radius: 8px; box-shadow: 0 1px 3px rgb(0 0 0 / 8%); }
-.rq-search-input { padding: 6px 10px; border: 1px solid var(--gray-300); border-radius: 6px; font-size: 13px; font-family: inherit; color: var(--gray-800); width: 260px; max-width: 100%; }
-.rq-search-input:focus { outline: none; border-color: var(--art-theme); box-shadow: 0 0 0 3px var(--art-theme-rgba-15); }
-.rq-search-count { font-size: 12px; color: var(--gray-400); margin-left: auto; }
-.mockup-span { grid-column: 1 / -1; }
-.mockup-card { animation-delay: var(--delay, 0s); }
-button.status-stat { font-family: inherit; line-height: normal; text-align: left; }
+    :where([data-ui="unified"]) .rq-head .tab-title {
+        margin: 0;
+    }
 
-.status-stat:focus-visible, .tab-button:focus-visible, .view-toggle-btn:focus-visible, .card-action-btn:focus-visible,
-.card-action-link:focus-visible, .kanban-card:focus-visible, .kanban-show-all:focus-visible, .rq-retry-btn:focus-visible { outline: 2px solid var(--art-theme); outline-offset: 2px; }
-.mockup-card button.card-rep-name { background: none; border: 0; padding: 0; font: inherit; cursor: pointer; }
-.mockup-card button.card-rep-name:focus-visible { outline: 2px solid var(--art-theme); outline-offset: 1px; border-radius: 4px; }
-.rq-retry-btn { margin-top: 10px; padding: 8px 16px; border: none; border-radius: 4px; background: var(--art-theme); color: var(--color-on-brand); cursor: pointer; font: inherit; }
-.rq-link { background: none; border: 0; padding: 0; color: var(--art-theme); text-decoration: underline; cursor: pointer; font: inherit; }
-.rq-rate-note { font-size: 12.5px; color: var(--gray-500); margin: -4px 0 14px; }
-button.kanban-show-all { font: inherit; width: 100%; }
+    :where([data-ui="unified"]) :is(.rq-head-note, .rq-rate-note) {
+        max-width: 70ch;
+        color: var(--ui-muted);
+        font-size: var(--font-size-md);
+        margin: 0 0 var(--space-4);
+    }
+
+    :where([data-ui="unified"]) .rq-search-bar {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: var(--space-3);
+        margin-bottom: var(--space-5);
+    }
+
+    :where([data-ui="unified"]) .rq-search-input {
+        flex: 1 1 260px;
+        max-width: 520px;
+    }
+
+    :where([data-ui="unified"]) .rq-search-count {
+        color: var(--ui-muted);
+        font-size: var(--font-size-md);
+    }
+
+    :where([data-ui="unified"]) .rq-retry-btn {
+        margin-top: var(--space-3);
+    }
+
+    :where([data-ui="unified"]) .billing-codes-section {
+        max-width: 1000px;
+    }
+
+    :where([data-ui="unified"]) .billing-codes-header {
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+        margin-block: var(--space-5);
+    }
+
+    :where([data-ui="unified"]) .billing-codes-icon {
+        color: var(--ui-accent);
+    }
+
+    :where([data-ui="unified"]) .billing-codes-title {
+        margin: 0;
+        font-size: var(--font-size-xl);
+    }
+
+    :where([data-ui="unified"]) .billing-codes-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: var(--space-5);
+    }
+
+    :where([data-ui="unified"]) .billing-card {
+        background: var(--ui-surface);
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-md);
+        overflow: hidden;
+    }
+
+    :where([data-ui="unified"]) .billing-card-header {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-3);
+        padding: var(--space-5);
+        background: var(--ui-tint);
+        color: var(--ui-accent);
+    }
+
+    :where([data-ui="unified"]) .billing-card-pn {
+        font-size: var(--font-size-xl);
+        font-weight: 700;
+    }
+
+    :where([data-ui="unified"]) .billing-card-subtitle {
+        font-size: var(--font-size-sm);
+        margin-top: var(--space-1);
+    }
+
+    :where([data-ui="unified"]) .billing-card-price {
+        font-size: var(--font-size-2xl);
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+    }
+
+    :where([data-ui="unified"]) .billing-card-body {
+        padding: var(--space-5);
+    }
+
+    :where([data-ui="unified"]) .billing-card-body-title {
+        font-size: var(--font-size-lg);
+        font-weight: 700;
+        margin-bottom: var(--space-3);
+    }
+
+    :where([data-ui="unified"]) .billing-card-body-desc {
+        color: var(--ui-muted);
+        font-size: var(--font-size-md);
+    }
+
+    :where([data-ui="unified"]) .billing-callout {
+        margin-top: var(--space-5);
+        padding-top: var(--space-4);
+        border-top: 1px solid var(--ui-line);
+        font-size: var(--font-size-md);
+    }
+
+    :where([data-ui="unified"]) .billing-callout-label {
+        color: var(--ui-ink);
+        font-weight: 600;
+    }
+
+    :where([data-ui="unified"]) .billing-callout ul {
+        padding-left: var(--space-5);
+        margin-bottom: 0;
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"]) .billing-callout li + li {
+        margin-top: var(--space-2);
+    }
+
+    :where([data-ui="unified"]) .billing-increments-grid {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: var(--space-3);
+        margin-top: var(--space-4);
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"]) .billing-increments-grid .amount {
+        color: var(--ui-ink);
+        font-weight: 600;
+        font-variant-numeric: tabular-nums;
+    }
+
+    :where([data-ui="unified"]) .billing-pro-tip {
+        margin-top: var(--space-5);
+        background: var(--ui-tint);
+        color: var(--ui-accent);
+        padding: var(--space-4);
+        border-radius: var(--radius-sm);
+        font-size: var(--font-size-md);
+    }
+
+    :where([data-ui="unified"]) .billing-pro-tip-inner {
+        display: flex;
+        gap: var(--space-3);
+        align-items: flex-start;
+    }
+
+    :where([data-ui="unified"]) .billing-pro-tip-inner svg {
+        flex-shrink: 0;
+    }
+}
+
+@media (width <= 768px) {
+    @layer components.pages {
+        :where([data-ui="unified"]) .billing-codes-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+}

@@ -57,6 +57,7 @@ const CSS_LINT_SCOPE = [
     'dashboards/css/*.css',
     'shared_components/css/transfer-actions.css',
     'shared_components/css/transfer-workflow.css',
+    'shared_components/css/art-workflow.css',
     'shared_components/css/sanmar-invoice-viewer.css',
     'shared_components/css/mockup-ruth.css',
     'shared_components/css/kanban.css',

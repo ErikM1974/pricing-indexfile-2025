@@ -16,7 +16,7 @@ Storefront and sample webhooks continued after a rejected Payment Confirmed writ
 ### A customer's real size request was shown to nobody (2026-08-19, ARCHIVED 2026-08-27): render every field you persist — a saved-but-unshown field is data loss with extra steps. Full entry in archive.
 ### SAM quotes rendered “No items” (2026-08-19, ARCHIVED 2026-08-27): a channel that opts out of a shared fix re-inherits the bug it fixed; SW-snapshot overlay repaints EXISTING rows only. Full entry in archive.
 
-### Staff dashboard full review — 5 UTC/Pacific bugs on ONE page + the error renderer silently no-oping (2026-08-26, ARCHIVED 2026-09-01): calendar-day math never via toISOString()/new Date("YYYY-MM-DD")+local getters; register the ERROR_AREAS entry in the same commit as showApiError(); clone a deduped fetch Response per caller; derive quote prefixes from config, never a hand list. Full entry in archive.
+### Staff dashboard full review — 5 UTC/Pacific bugs on ONE page + the error renderer silently no-oping (2026-08-26, ARCHIVED 2026-09-01): calendar-day math never via toISOString()/new Date("YYYY-MM-DD")+local getters (Saved Mockups and recovery dates needed the same fix on 2026-09-08); register the ERROR_AREAS entry in the same commit as showApiError(); clone a deduped fetch Response per caller; derive quote prefixes from config, never a hand list. Full entry in archive.
 ### Quote data plane locked down — 44 caller files, 2 repos (2026-08-26, ARCHIVED 2026-09-02): a gate you cannot flip without a deploy ships scared — mode-switch by config var (off→log→enforce); migrate by ENDPOINT grep never a base swap; a relay must forward the query string verbatim; postures jest-locked in both repos; stage explicit file lists, never `git add -u`, on a shared checkout. Full entry in archive.
 ### Staff-dashboard hardening — PII roster, proxy-direct reads, auth embed (2026-08-26, ARCHIVED 2026-09-03): a staff page gate is `.html`-only, so secrets live in `lib/` behind a route (`lib/staff-roster.js` → `GET /api/staff/employees`); identity = `/api/crm-session/me` (returns `role`), never a third-party auth embed; every proxy-direct read from a staff page is relayed same-origin so the quote-plane gate covers it. Full entry in archive.
 ### /inventorylevels leaked wholesale cost + supplier anonymously (2026-08-27, ARCHIVED 2026-09-03): an anonymous route that must stay open for one public caller gets a field PROJECTION (`INVENTORY_PUBLIC_FIELDS` whitelist), not a gate; jest-lock the projection red-first. Full entry in archive.
@@ -231,7 +231,7 @@ Native Node22.23 runs Puppeteer25; invoke its capture CLI outside Jest, and repo
 
 ## Shared workflow state must match its visibility owner (2026-09-08)
 - Problem/root cause: migrating hidden state left paste guards on inline display; queues showed success before awaiting refresh, and failed file links left a success icon.
-- Solution: keep visibility checks aligned with the migrated owner, centralize custom-dialog focus/scroll state and update success indicators only after the operation settles.
+- Solution: keep visibility checks aligned with the migrated owner, centralize custom-dialog focus/scroll state, preserve keyboard focus when filters or expansion buttons are replaced, and update success indicators only after the operation settles.
 - Prevention: exercise populated, failed, retry and cancelled states with mocked writes; check old consumers when a shared helper opts into new presentation.
 
 ## A visible quantity grid does not prove pricing is ready (2026-09-08)
@@ -240,5 +240,10 @@ Native Node22.23 runs Puppeteer25; invoke its capture CLI outside Jest, and repo
 - Prevention: controlled pending/failure/out-of-order tests plus browser assertions on actual readiness and posted money. Keep Save independent of customer/Push completeness; unused blank rows are allowed. EMB/SCP already recalculate before save; DTF computes from state.
 
 ## Dialog text must stay readable during entrance motion (2026-09-08)
-- Problem/root cause: a whole-dialog opacity animation blended white Download text into its dark button; faster CI sampled a 3.9:1 contrast frame that local checks missed.
-- Solution/prevention: animate position/scale only, and pause the real preview animation mid-frame during the browser contrast check. Do not hide the failure with a fixed delay or weaken the accessibility assertion.
+- Problem/root cause: whole-dialog and toast opacity animations briefly blended text into its background; CI and the full local suite sampled low-contrast frames that focused runs missed.
+- Solution/prevention: animate position/scale only, and pause real preview/toast entry and dismissal animations mid-frame during the browser contrast check. Do not hide the failure with a fixed delay or weaken the accessibility assertion.
+
+## Style/build checks must distinguish source from platform artifacts (2026-09-08)
+- Problem/root cause: a clean Windows checkout restored CRLF and inflated CSS budgets; esbuild linked-map hashes differed from Linux although executable code matched.
+- Solution: measure committed LF source bytes. Resolve production bundles from the production manifest and compare executable bytes excluding only the source-map filename.
+- Prevention: keep exact source-asset/live-SHA checks and do not increase budgets or claim missing deployment from a local bundle filename alone.

@@ -753,13 +753,11 @@
 
     @keyframes bt-toast-in {
         from {
-            transform: translateX(100%);
-            opacity: 0;
+            transform: translateY(8px);
         }
 
         to {
-            transform: translateX(0);
-            opacity: 1;
+            transform: translateY(0);
         }
     }
 
@@ -921,8 +919,8 @@
     }
 
     :where([data-ui="unified"]) .bt-toast.is-leaving {
-        opacity: 0;
-        transition: opacity 0.3s;
+        transform: translateY(8px);
+        transition: transform 0.3s;
     }
 
     :where([data-ui="unified"]) .bt-error {

@@ -209,3 +209,27 @@ Forty-four focused DTG unit checks and 19 targeted browser checks pass, includin
 ## Bradley release record — v2026.09.08.5
 
 Exact-source CI 34223103534 passed on eff0bfef251a57b15477ef43b123161cec7a4e3f. Local verification: 206 unit suites / 4,907 passing tests (four existing skips), 88 DOM tests, four axe unit tests, 84 fixture-parity cases, 51 browser tests passed (three optional screenshot skips), including all five calculator surfaces and 35 CSS/compatibility checks. The DTG regression gate blocks pending, failed, partial and stale pricing before saving or printing; the positive browser path saves real live-engine prices. After CI exposed transient contrast during the image-preview fade, the shared animation keeps text opaque and all 35 CSS checks pass with a midpoint assertion. CSS scope 285 files clean; JavaScript lint, types and build clean; 456 server registrations unchanged. Production rollout requires the matching live SHA and changed-asset byte checks. Eleven application pages now use the shared owner. The all-family rollout remains open; next is the six-page Steve/Ruth/AE, detail and Saved Mockups group.
+
+## Art workflow plan — 2026-09-08
+
+Bradley is live as v2026.09.08.5 / Heroku 2064, full SHA 7eccb599b7bc208a032d1c7918be4e0d17b9c9ae. Twenty source assets match committed bytes, the DTG compiled executable matches the tested build, five existing staff gates and three public HTML shells are verified. The compiled filename was resolved from production's own manifest because source-map line endings produce different Windows/Linux bundle hashes. Source CI 34223103534 is green; release-branch CI is finishing separately.
+
+Erik reiterated authorization to continue until the application-wide work is complete. The six-page art family is Ruth, Saved Mockups, Steve, AE, Art Request Detail and Mockup Detail. Ruth and Saved Mockups are the first implementation pair.
+
+- [ ] Replace Ruth's four competing legacy shared imports with one scoped art-workflow owner, preserving status/hold/rush/due/revision and billing meaning. Use existing shared controls, Public Sans, neutral surfaces and purple accents. Port grid, board and recovery patterns for later Steve/AE adoption.
+- [ ] Move Saved Mockups onto shared staff controls with readable metadata and one artwork card per phone row. Preserve search and Designer/Request destinations; make image preview keyboard-accessible and request/image failures visible with recovery.
+- [ ] Test real rendered normal/loading/empty/error/retry/filter/tab/board/dialog states at 1440/768/390/320. Mock all writes, OCR, Box shared links, recovery and notifications. Baselines were captured at 1440/390 before editing.
+- [ ] Register new owners and tests immediately; replace dead consumer imports, measure bytes and update the ownership manifest. Complete all local gates, exact-source CI, deployment and live verification.
+- [ ] Continue Steve/AE and both detail consumers, then remaining staff/customer/calculator/builder/document families. Full rollout remains open.
+
+## Art first-pair checkpoint — 2026-09-08
+
+Bradley release-branch CI is green on main (34223767617) and develop (34224009251), matching the verified live v2026.09.08.5. Ruth and Saved Mockups now use shared controls and scoped art/page owners locally. First browser pass: ten tests passed at four widths; 37 focused unit checks passed. Additional failed-refresh/bulk-recovery cases, billing-content preservation and the final full gates are still pending. No art-family deployment has occurred.
+
+Ruth removes four competing shared legacy imports; Saved Mockups removes Art Hub. The board now retains search, respects status filters and excludes paused work; completed expansion and recovery dialogs have keyboard paths. Error states expose retry and clear stale records. Saved Mockups uses one card per phone row and preserves calendar dates. Stylesheet budgets use committed LF source bytes, because checkout CRLF otherwise caused false growth after a clean release checkout.
+
+## Art release-gate follow-through — 2026-09-08
+
+All 12 Ruth/Saved Mockups browser cases passed, including failed-refresh, recovery/upload/bulk failures, retry, cancellation, keyboard dialogs, and four widths. The full local gate passed 206 unit suites / 4,915 tests, 88 DOM tests, four axe unit tests, 84 fixture-parity cases, and CSS lint on 286 files before catching a Bradley error-toast opacity frame. The release remains held until the corrected full gate and exact-source CI pass. The toast now keeps text opaque through entry/dismissal; the two existing retry tests sample real animation midpoints. Ruth also retains keyboard focus after rebuilding filters and expanding completed work. Reviewed final Saved Mockups desktop, Ruth phone recovery and phone billing screenshots.
+
+After this pair ships, prioritize the confirmed transfer/Supacolor authentication boundary below, then resume Steve/AE and both art detail pages. The application-wide CSS work is still open.

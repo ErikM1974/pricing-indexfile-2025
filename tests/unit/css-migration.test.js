@@ -18,7 +18,8 @@ describe('unified CSS ownership and preserved content', () => {
         const assets = [...document.querySelectorAll('link[rel="stylesheet"]')]
             .map(el => el.getAttribute('href').split('?')[0]).filter(href => href.startsWith('/'));
         expect(assets).toEqual(pilot.styles.map(file => '/' + file));
-        const bytes = pilot.styles.reduce((sum, file) => sum + Buffer.byteLength(read(file)), 0);
+        // Match committed source bytes across Windows CRLF and Linux LF checkouts.
+        const bytes = pilot.styles.reduce((sum, file) => sum + Buffer.byteLength(read(file).replace(/\r\n/g, '\n')), 0);
         expect(bytes).toBeLessThanOrEqual(pilot.maxCssBytes);
         expect(pilot.states.length).toBeGreaterThan(0);
     });
@@ -54,4 +55,11 @@ describe('unified CSS ownership and preserved content', () => {
         const digest = crypto.createHash('sha256').update(JSON.stringify(content)).digest('hex');
         expect(digest).toBe(manifest.billingContentSha256);
     });
+});
+
+
+test('Ruth billing reference preserves its prices, explanatory text and field IDs', () => {
+  const main = new JSDOM(read('dashboards/art-hub-ruth.html')).window.document.querySelector('#billing-tab');
+  const content = { text: main.textContent.replace(/\s+/g, ' ').trim(), ids: [...main.querySelectorAll('[id]')].map(el => el.id), links: [...main.querySelectorAll('a')].map(el => [el.getAttribute('href'), el.textContent.replace(/\s+/g, ' ').trim()]) };
+  expect(crypto.createHash('sha256').update(JSON.stringify(content)).digest('hex')).toBe(manifest.ruthBillingContentSha256);
 });
