@@ -1,3 +1,10 @@
+## v2026.09.08.11 (2026.09.08)
+
+- Record verified training release and next shared guide batch
+- Record service guide migration and rendered verification
+- Record full service guide release gates
+- Consolidate service training guides and keyboard controls
+
 ## v2026.09.08.10 (2026.09.08)
 
 - Record live art CSS family and the measured validation speedup
