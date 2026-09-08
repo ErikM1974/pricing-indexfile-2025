@@ -1,16 +1,17 @@
 # Handover follow-ups — 2026-09-07
 
-## Active CSS batch — four service training guides — 2026-09-08
+## Active CSS batch — seventeen printable forms — 2026-09-08
 
-Frontend v2026.09.08.10 / Heroku 2068 is verified live on d65ccce189c969b8b8baed56d755c7ee6e82b58f. Twenty reviewed pages use unified owners. Exact-source CI 34269638273 passed all four jobs; eight deployed runtime assets, four anonymous staff gates and five public shells passed. Local checks passed 4,972 unit tests and 98 browser tests. Main/develop release CI is tracked separately. The application-wide migration remains open; Erik authorizes continued edits/deployments without repeated permission questions.
+Frontend v2026.09.08.11 / Heroku 2069 is verified live on 4087810dc7fadb68d2cf5a1d00aebad073faa8c7. Twenty-four reviewed pages use unified owners. Exact-source CI 34273774152 passed all four jobs; four changed runtime assets, four anonymous staff gates and seven public shells passed. Local checks passed 207 unit suites / 4,980 tests (four existing skips), 88 DOM, four accessibility unit, 84 quote-parity cases and 110 browser tests (three optional screenshot skips). All five calculator surfaces passed. Main/develop release CI is tracked separately. The full-app migration stays open; Erik authorizes continued edits/deployments without repeated permission questions.
 
-- [x] Capture the original art-approval, thank-you-card, lead-sheet and Google-review guides at desktop/phone widths; retain source content/field values for regression checks.
-- [ ] Reuse Public Sans, neutral white/gray surfaces, restrained NWCA green wayfinding and the shared training reading/table/print owner. Keep the thank-you examples handwritten. Consolidate four duplicate disclosure/navigation scripts into a shared controller; preserve all prose, examples, IDs, destinations and local exercise values. Make field help usable on phones and keyboards.
-- [ ] Verify all fourteen disclosures, four widths, keyboard navigation, image failure/retry, practice-field help and complete print output. Mock business writes and external services. Update source ownership and measured LF byte budgets.
-- [ ] Run all release gates, exact-source CI, cache invalidation, deploy and verify live files. Continue compatible training/reference families afterwards; remaining calculators/builders/documents require their own state coverage.
+- [x] Capture source/desktop/phone/print baselines for all 17 pages/forms/*.html. Source includes original prose, field values/IDs and navigation. Initial captures made no business writes and reported no page errors.
+- [x] Draft one scoped printable-forms.css owner plus 17 scoped page sheets and 17 opt-in HTML graphs in the artifact directory. Public request-a-quote.html is the eighteenth consumer of the old shared stylesheet, so retain nwca-form-shared.css for it until its own migration. Tokens/components remain unchanged.
+- [ ] Resolve preview issues (320px AE/sample overflow, QC signature/date target) and validate all page-specific fields, tables, lookups/swatches/dates, clear/cancel, save failure/retry/success, drafts, money/provenance and complete print. Mock all business writes/services. The draft has not been installed into the checkout at this checkpoint.
+- [ ] Install/register reviewed owners and source contracts, run all gates/exact-source CI, deploy and verify. These forms would bring the reviewed page count to 41 after rollout; they are not live yet.
 
-The mocked CSS/browser checks now run with three workers (82 cases in 207.9 seconds locally); live pricing remains serial. The former CSS Factor task is archived and its worktree remains clean at c20d424b; no pending forms CSS implementation was found. Concurrent employee-form commit fe794c6f shipped with original attribution; both blank PDFs were visually reviewed and verified byte-for-byte live. This task made no Caspio writes or notifications.
+The first draft was checked at 1440/768/390/320 and printed with real images. The three identified issues above remain to fix; do not call the draft complete. The 17 blank PDF page counts match their baselines so far, but populated-state print still needs review. Templates retain their original legal/HR/payment prose and examples; this CSS work does not review or change those policies.
 
+Artifacts: printable-forms-baseline.json and forms-before-*; printable-forms-draft.json (35 prepared files); printable-forms-preview.json and forms-preview-*; draft-printable-forms.cjs / preview-printable-forms.cjs. The prior training source/release/live/CI records use training-service-*.json. Backend security remains live v2026.09.08.1 / Heroku 1130; no new proxy changes. LESSONS_LEARNED.md is 252 lines: archive an old resolved entry before adding the next lesson.
 
 ## Coordinated transfer authentication LIVE — 2026-09-08
 
