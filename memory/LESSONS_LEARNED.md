@@ -53,30 +53,7 @@ Storefront and sample webhooks continued after a rejected Payment Confirmed writ
 
 ### Dashboards family (2026-09-07, archived): inspect both staff design systems before replacing their tokens. Full entry in LESSONS_LEARNED_ARCHIVE.md.
 
-## 2026-09-07 — Dashboards + calculators families: six ways a mechanical CSS migration bit back
-
-**Problem.** (a) The hex tokenizer matched `#add` in `#add-to-cart-button {` — three letters that happen to
-be hex — and rewrote the id selector to `var(--…-teal)-to-cart-button`, silently dropping the rule. Three
-selectors in the calculators family; a scan of every migrated sheet found no other case. (b) A `!important`
-annotation perl inserted `/* stylelint-disable-next-line … */` before every line containing `!important`,
-including lines inside comment blocks that merely mention it, nesting a comment in a comment and breaking
-four staff-dashboard sheets at parse time. (c) A consecutive-duplicate dedupe assumed declarations end with
-`;` on their own line; SVG data URIs contain `;`. (d) Five page locks pinned incidental CSS text
-(`max-width: 760px`, `0px`, `#9ca3af` as a `var()` fallback) that the standard config rewrites
-value-identically. (e) The generated Pricing Analysis page carries its stylesheet `?v=` in a Python constant;
-the deploy's cache-bust bumps the HTML, not the generator, and a lock compares the two. (f) `node lint |
-grep | head -8` on Windows Git Bash hung the chain — `head` closed the pipe and nothing upstream got SIGPIPE.
-**Root cause.** Regexes that are not comment-aware, value-aware or selector-aware; locks that assert bytes
-instead of meaning; a version that lives in two places; MSYS pipe semantics.
-**Solution.** (a) A hex is a colour only when a `:` precedes it on its line and no identifier char follows;
-the damage signature `var(--x)<letter or dash>` is now part of the post-run scan. (b) A comment-aware
-scanner (`fix-nested-annotations.py`) drops nested annotations. (c) Whole-line dedupe with a property
-lookahead. (d) Locks accept both forms. (e) Bump `CSS_VER` in `scripts/build-pricing-analysis.py` with its
-stylesheet. (f) Write lint output to a file and read it.
-**Prevention.** 🔑 Every text transform over CSS must skip comments AND selectors — only a declaration
-value is a colour. 🔑 After every automated pass, run the full lint and grep for `var(--[a-z0-9-]+)[A-Za-z_-]`
-before the screenshots; a dropped rule is silent in a browser. 🔑 A substring lock on CSS should pin the
-MEANING (a selector exists, a value is a custom property), not the exact bytes. 🔑 `stylelint --fix` (number-no-trailing-zeros) rewrote `oklch(55.0% …)` as `oklch(55.% …)`, an invalid value that silently drops the declaration — after every `--fix`, grep the touched sheets for `[0-9]\.[%)]` and re-lint (the parser reports it as declaration-property-value-no-unknown).
+### Dashboard/calculator CSS transforms (2026-09-07, archived): parse selectors and values separately, inspect semantic changes and verify generated asset versions. Full entry in LESSONS_LEARNED_ARCHIVE.md.
 
 ## 2026-09-07 — Pages batch: a re-run tokenizer turned its own variables into `--x: var(--x)`
 
@@ -251,3 +228,8 @@ Native Node22.23 runs Puppeteer25; invoke its capture CLI outside Jest, and repo
 - Problem/root cause: legacy unlayered sheets outrank layered components; print-form date helpers attach to the whole field, including its label.
 - Solution: opt in per consumer, remove its competing styles and anchor the calendar button to the input bottom. A later utilities layer owns hidden state without important flags.
 - Prevention: exercise loading/error/success and mobile states, assert the date button stays inside its input, and lock actual stylesheet owners plus unchanged billing content.
+
+## Shared workflow state must match its visibility owner (2026-09-08)
+- Problem/root cause: migrating hidden state left paste guards on inline display; queues showed success before awaiting refresh, and failed file links left a success icon.
+- Solution: keep visibility checks aligned with the migrated owner, centralize custom-dialog focus/scroll state and update success indicators only after the operation settles.
+- Prevention: exercise populated, failed, retry and cancelled states with mocked writes; check old consumers when a shared helper opts into new presentation.

@@ -180,8 +180,22 @@ Exact-source CI 34216155948 passed on 03b4f3c5857c43b3d7ab0ebb08121c7ec8454b26. 
 
 The workspace release is live as v2026.09.08.3 / Heroku 2063, full SHA 6f4a326ce94f4d4c1f6f15ec9e67f98825802b16. Nine changed assets match committed bytes; both staff access gates and both earlier public pilots respond correctly.
 
-- [ ] Move Bradley Transfers, Bradley Screen Print, Supacolor Orders, Transfer Detail and Supacolor Job Detail together onto the shared staff shell and Bradley slate accents. Remove their Art Hub imports and keep operational status colors distinct.
-- [ ] Keep reusable sender, status, screenshot-import and image-viewer patterns in shared owners. The replacement sender entry point will serve opted-in queues; the old entry point remains temporarily for Steve and the two art-detail consumers until their next coordinated migration. Retired sender selectors must have no runtime template before being dropped.
-- [ ] Replace static inline presentation and visibility mutations with owned classes/hidden states; preserve paste guards. Use a shared dialog helper for keyboard focus, dismissal and scroll restoration. Correct the clipped mobile Job Detail actions and the PO input flex basis that creates excess vertical space after its layout turns into a column.
-- [ ] Add mocked normal/loading/empty/error/filter/dialog/image/import coverage at desktop, tablet and phone widths; mock sync, Box shared-link creation, OCR, notifications and all business writes. Verify old thumbnail callers through the full existing browser gates.
+- [x] Move Bradley Transfers, Bradley Screen Print, Supacolor Orders, Transfer Detail and Supacolor Job Detail together onto the shared staff shell and Bradley slate accents. Remove their Art Hub imports and keep operational status colors distinct.
+- [x] Keep reusable sender, status, screenshot-import and image-viewer patterns in shared owners. The replacement sender entry point will serve opted-in queues; the old entry point remains temporarily for Steve and the two art-detail consumers until their next coordinated migration. Retired sender selectors must have no runtime template before being dropped.
+- [x] Replace static inline presentation and visibility mutations with owned classes/hidden states; preserve paste guards. Use a shared dialog helper for keyboard focus, dismissal and scroll restoration. Correct the clipped mobile Job Detail actions and the PO input flex basis that creates excess vertical space after its layout turns into a column.
+- [x] Add mocked normal/loading/empty/error/filter/dialog/image/import coverage at desktop, tablet and phone widths; mock sync, Box shared-link creation, OCR, notifications and all business writes. Verify old thumbnail callers through the full existing browser gates.
 - [ ] Register new owners, update per-page CSS budgets and runtime evidence, pass the complete local and exact-source CI gates, deploy and verify the live release. Continue with the Steve/Ruth/AE family afterwards.
+
+## Bradley implementation checkpoint — 2026-09-08
+
+Five more pages use the shared staff shell, slate accents, owned control/layout layers and Public Sans. Their targeted browser states now pass, including populated file picking, screenshot review and existing Steve/builder compatibility. Full local gates, exact-source CI and deployment remain pending.
+
+- dashboards/bradley-transfers.html: 216,211 → 118,544 raw local CSS bytes; 4 → 4 local stylesheets.
+- dashboards/bradley-screenprint.html: 216,211 → 118,544 raw local CSS bytes; 4 → 4 local stylesheets.
+- dashboards/supacolor-orders.html: 197,054 → 106,441 raw local CSS bytes; 4 → 4 local stylesheets.
+- pages/transfer-detail.html: 216,465 → 133,999 raw local CSS bytes; 5 → 4 local stylesheets.
+- pages/supacolor-job-detail.html: 217,378 → 109,160 raw local CSS bytes; 6 → 4 local stylesheets.
+
+Common-owner growth and source formatting also increased the six earlier pages' source-byte totals; their budgets were remeasured explicitly. These are uncompressed source bytes, not transfer savings. The migrated sheets have no important declarations, CSS IDs or local overrides of global scales. Shared UiDialog owns focus, Escape, inert background and scroll restoration. Visibility guards use the same hidden state as the migrated markup.
+
+Runtime checks corrected premature refresh success notices, stale file-picker checkmarks after failed links, inaccessible scrollable screenshot summaries and unreadable/clipped phone controls. No live business writes were used. The complete application rollout remains open; next is the coordinated Steve/Ruth/AE workflow family.
