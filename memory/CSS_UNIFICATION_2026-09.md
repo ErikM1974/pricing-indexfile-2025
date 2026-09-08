@@ -221,3 +221,9 @@ Erik reiterated authorization to continue until the application-wide work is com
 - [ ] Test real rendered normal/loading/empty/error/retry/filter/tab/board/dialog states at 1440/768/390/320. Mock all writes, OCR, Box shared links, recovery and notifications. Baselines were captured at 1440/390 before editing.
 - [ ] Register new owners and tests immediately; replace dead consumer imports, measure bytes and update the ownership manifest. Complete all local gates, exact-source CI, deployment and live verification.
 - [ ] Continue Steve/AE and both detail consumers, then remaining staff/customer/calculator/builder/document families. Full rollout remains open.
+
+## Art first-pair checkpoint — 2026-09-08
+
+Bradley release-branch CI is green on main (34223767617) and develop (34224009251), matching the verified live v2026.09.08.5. Ruth and Saved Mockups now use shared controls and scoped art/page owners locally. First browser pass: ten tests passed at four widths; 37 focused unit checks passed. Additional failed-refresh/bulk-recovery cases, billing-content preservation and the final full gates are still pending. No art-family deployment has occurred.
+
+Ruth removes four competing shared legacy imports; Saved Mockups removes Art Hub. The board now retains search, respects status filters and excludes paused work; completed expansion and recovery dialogs have keyboard paths. Error states expose retry and clear stale records. Saved Mockups uses one card per phone row and preserves calendar dates. Stylesheet budgets use committed LF source bytes, because checkout CRLF otherwise caused false growth after a clean release checkout.
