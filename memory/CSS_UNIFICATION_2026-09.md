@@ -156,3 +156,18 @@ Erik approved implementation ("go for it"). Four local pilots now use the shared
 ## Pilot release record — v2026.09.08.2
 
 Exact-source CI 34211413665 passed on 2360d4b1006587a78388eeacb24f919335dd5394. Local verification: 204 unit suites / 4,881 passing tests (four existing skips), 88 DOM tests, four axe unit tests, 84 fixture-parity cases, all five calculator surfaces and the nine CSS state tests. CSS scope 284 files clean; JavaScript lint and types clean. Production rollout uses this tag and requires the matching live SHA. The all-family rollout and complete runtime census remain open.
+
+## Staff workspace checkpoint — 2026-09-08
+
+Erik authorized continuing the entire migration to completion. Design Vault and Gear Publisher now use the scoped shared controls and neutral staff shell. Their Art Hub/dash-shell imports are removed; Vault also moves toast presentation onto the shared entry point. Page-owned layout retains artwork identity, photo bindings, search and publishing hooks.
+
+- dashboards/design-gallery.html: 212,483 → 89,746 raw local CSS bytes; 5 → 3 local stylesheets.
+- dashboards/gear-publisher.html: 170,944 → 43,968 raw local CSS bytes; 4 → 3 local stylesheets.
+
+The wider shared control owner also adds a small source-byte cost to the first four pilots; their budgets were remeasured for the added dashboard/publisher/toast adapters. These figures are source bytes, not compressed transfer.
+
+Browser review exposed existing behavior defects addressed in the same family: overlay Escape/focus and history cleanup; mobile drawer metadata/hero layout; keyboard photo selection; saved draft field/color/photo restoration; known-job resume through GET; saved publication receipt; and Next no longer skipping review into an empty Live panel. No production business writes were used to test these paths.
+
+The runtime census accounts for 304 tracked HTML sources. It records literal route aliases, CSS imports, script dependencies, dynamic owners and explicit email/archive boundaries. The seasonal breast-cancer bundle remains in scope because a root route still serves it. Family-specific runtime/state coverage remains unfinished; the source census does not certify all application screens.
+
+Before release: complete all local gates, verify exact-source CI, invalidate changed assets, deploy and check live bytes/access gates. Continue next with the five Bradley transfer consumers together, then the coordinated Steve/Ruth/AE art-workflow family. Full application completion remains open.
