@@ -1,3 +1,7 @@
+## v2026.09.07.35 (2026.09.07)
+
+- Authenticate quote operations and scope customer refreshes
+
 ## v2026.09.07.34 (2026.09.07)
 
 - Extract quote synchronization and shared watchdog state
