@@ -1,3 +1,7 @@
+## v2026.09.07.37 (2026.09.07)
+
+- Extract payment stages and stop fulfillment after rejected status writes
+
 ## v2026.09.07.36 (2026.09.07)
 
 - Extract storefront services with shared cache ownership
