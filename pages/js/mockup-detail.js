@@ -360,16 +360,8 @@ var mockdetaLog = MOCKDETA_LOG_ON ? console.log.bind(console) : function () {}; 
         if (headerTitle) headerTitle.textContent = 'Mockup Approval';
         if (backLink) backLink.style.display = 'none';
         document.body.classList.add('pmd-customer-view');
-        // Set green theme CSS variables for customer view
-        var root = document.documentElement;
-        root.style.setProperty('--art-theme', '#2e7d32');
-        root.style.setProperty('--art-theme-dark', '#1b5e20');
-        root.style.setProperty('--art-theme-light', '#4caf50');
-        root.style.setProperty('--art-theme-bg', '#f1f8e9');
-        root.style.setProperty('--art-theme-bg-hover', '#e8f5e9');
-        root.style.setProperty('--art-theme-bg-selected', '#c8e6c9');
-        root.style.setProperty('--art-theme-rgba-15', 'rgba(46,125,50,0.15)');
-        root.style.setProperty('--art-theme-rgba-10', 'rgba(46,125,50,0.1)');
+        document.body.dataset.department = 'steve';
+        document.body.dataset.surface = 'storefront';
     }
 
     // ── Fetch & Render ─────────────────────────────────────────────────────
@@ -1047,6 +1039,14 @@ var mockdetaLog = MOCKDETA_LOG_ON ? console.log.bind(console) : function () {}; 
         var btn = document.getElementById('pmd-rush-toggle');
         if (!btn) return;
         var isRush = isRushy(mockup.Is_Rush);
+        if (isCustomerView) {
+            btn.textContent = 'Rush order';
+            btn.title = 'Rush order';
+            btn.disabled = true;
+            btn.classList.toggle('pmd-rush-toggle--active', isRush);
+            btn.style.display = isRush ? 'inline-flex' : 'none';
+            return;
+        }
         btn.innerHTML = isRush
             ? '\uD83D\uDD25 RUSH ACTIVE <span class="pmd-rush-toggle-hint">(click to clear)</span>'
             : '\uD83D\uDD25 Mark as Rush';
@@ -1987,7 +1987,7 @@ var mockdetaLog = MOCKDETA_LOG_ON ? console.log.bind(console) : function () {}; 
                         + (showRemove ? '<button type="button" class="pmd-slot-remove" data-field-key="' + escapeHtml(slot.key) + '">&times;</button>' : '')
                         + (showReplace ? '<button type="button" class="pmd-slot-replace" data-field-key="' + escapeHtml(slot.key) + '">&#9998; Replace</button>' : '')
                         + (showSelectBadge ? '<div class="pmd-slot-select-badge">' + (isCustomerView ? 'Click to view & select' : 'Click to select') + '</div>' : '')
-                        + '<button type="button" class="pmd-slot-download" data-download-url="' + escapeHtml(url) + '" data-download-name="' + escapeHtml(slot.label) + '">'
+                        + '<button type="button" class="pmd-slot-download" aria-label="Download mockup" data-download-url="' + escapeHtml(url) + '" data-download-name="' + escapeHtml(slot.label) + '">'
                         + '<svg viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">'
                         + '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>'
                         + '<polyline points="7 10 12 15 17 10"></polyline>'
@@ -2072,7 +2072,7 @@ var mockdetaLog = MOCKDETA_LOG_ON ? console.log.bind(console) : function () {}; 
                         + '<div class="pmd-slot-label">' + escapeHtml(slot.label) + '</div>'
                         + (showRemoveNonImg ? '<button type="button" class="pmd-slot-remove" data-field-key="' + slot.key + '">&times;</button>' : '')
                         + (showReplaceNonImg ? '<button type="button" class="pmd-slot-replace" data-field-key="' + slot.key + '">&#9998; Replace</button>' : '')
-                        + '<button type="button" class="pmd-slot-download" data-download-url="' + escapeHtml(url) + '" data-download-name="' + escapeHtml(slot.label) + '">'
+                        + '<button type="button" class="pmd-slot-download" aria-label="Download mockup" data-download-url="' + escapeHtml(url) + '" data-download-name="' + escapeHtml(slot.label) + '">'
                         + '<svg viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">'
                         + '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>'
                         + '<polyline points="7 10 12 15 17 10"></polyline>'
@@ -3949,18 +3949,18 @@ var mockdetaLog = MOCKDETA_LOG_ON ? console.log.bind(console) : function () {}; 
         // Thread rows
         html += '<div id="pmd-te-rows">';
         if (editorThreads.length === 0) {
-            html += '<div style="padding:16px 12px;color:#9ca3af;font-size:0.8rem;text-align:center;">'
+            html += '<div style="padding:16px 12px;color:var(--gray-600);font-size:0.8rem;text-align:center;">'
                 + 'No threads yet. Click "+ Add Run" to start.</div>';
         } else {
             editorThreads.forEach(function (t, idx) {
-                html += '<div class="pmd-thread-editor-row' + (hasElements ? ' pmd-te-has-elements' : '') + '" data-run-index="' + idx + '">'
+                html += '<button type="button" class="pmd-thread-editor-row' + (hasElements ? ' pmd-te-has-elements' : '') + '" data-run-index="' + idx + '">'
                     + '<span class="pmd-te-run">' + (t.run || (idx + 1)) + '</span>'
                     + '<span class="pmd-te-swatch" style="background:' + escapeHtml(t.hex || '#888') + ';"></span>'
                     + '<span class="pmd-te-name">' + escapeHtml(t.name || 'Click to set') + '</span>'
                     + (hasElements ? '<span class="pmd-te-element">' + escapeHtml(t.element || '') + '</span>' : '')
                     + '<span class="pmd-te-edit-icon">&#9998;</span>'
                     + '<span class="pmd-te-catalog">' + escapeHtml(t.catalog || '') + '</span>'
-                    + '</div>';
+                    + '</button>';
             });
         }
         html += '</div>';

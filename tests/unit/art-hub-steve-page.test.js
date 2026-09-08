@@ -18,7 +18,7 @@ const html = read('dashboards/art-hub-steve.html').replace(/<!--[\s\S]*?-->/g, '
 const gallery = read('shared_components/js/art-hub-steve-gallery.js');
 const steve = read('shared_components/js/art-hub-steve.js');
 const shared = read('shared_components/js/art-actions-shared.js');
-const css = read('dashboards/css/art-hub-steve.css');
+const components = read('shared_components/css/components.css');
 
 describe('steve queue — Rule 3 + structure', () => {
     test('no inline handlers; inline style only inside the shared-module-owned approval internals', () => {
@@ -31,7 +31,10 @@ describe('steve queue — Rule 3 + structure', () => {
         expect((html.match(/style="display:none;"/g) || []).length).toBeLessThanOrEqual(11);
         expect(html).not.toMatch(/style="(?!display:none;")/);
         expect(html).not.toMatch(/<i class="fa[^"]*"><\/i>/);
-        expect(css).toMatch(/^\[hidden\] \{ display: none !important; \}/m);
+        // The scoped utilities layer now owns hidden state; grid/board visibility
+        // is exercised in css-unification-art-details.spec.js.
+        expect(html).toContain('/shared_components/css/components.css?v=');
+        expect(components).toMatch(/:where\(\[data-ui="unified"\]\) \[hidden\]\s*\{\s*display: none;/);
         expect(gallery).toMatch(/document\.addEventListener\('error', function \(e\)/);
         expect(gallery).toMatch(/data-onerror="thumb"/);
         expect(gallery).toMatch(/data-onerror="hide-parent"/);

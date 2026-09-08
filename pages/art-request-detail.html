@@ -7,13 +7,16 @@
     <title>Art Request Detail - Northwest Custom Apparel</title>
     <link rel="icon" href="/favicon.png" type="image/png">
     <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/pages/css/art-request-detail.css?v=2026.09.07.19">
-    <link rel="stylesheet" href="/shared_components/css/art-hub.css?v=2026.09.07.19">
-    <link rel="stylesheet" href="/shared_components/css/transfer-actions.css?v=2026.09.08.5">
-    <link rel="stylesheet" href="/shared_components/css/toast-notifications.css?v=2026.09.07.10">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap">
+    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.08.8">
+    <link rel="stylesheet" href="/shared_components/css/art-theme.css?v=2026.09.08.9">
+    <link rel="stylesheet" href="/shared_components/css/art-actions.css?v=2026.09.08.9">
+    <link rel="stylesheet" href="/shared_components/css/art-detail.css?v=2026.09.08.9">
+    <link rel="stylesheet" href="/shared_components/css/transfer-workflow.css?v=2026.09.08.8">
+    <link rel="stylesheet" href="/pages/css/art-request-detail.css?v=2026.09.08.9">
     <script src="/config/app.config.js"></script>
 </head>
-<body>
+<body class="art-detail-page ard-page" data-ui="unified" data-surface="staff" data-department="steve" data-art-workflow>
     <!-- Header -->
     <header class="ard-header">
         <div class="ard-header-inner">
@@ -69,7 +72,7 @@
         </div>
 
         <!-- Status Timeline -->
-        <div class="ard-timeline-container" id="ard-timeline" style="display:none;">
+        <div class="ard-timeline-container" id="ard-timeline" role="region" aria-label="Request progress" tabindex="0" style="display:none;">
             <div class="ard-timeline-steps" id="ard-timeline-steps"></div>
         </div>
 
@@ -91,7 +94,7 @@
             <div class="ard-modal ard-edit-modal">
                 <div class="ard-modal-header">
                     <h3>Edit Art Request</h3>
-                    <button type="button" class="ard-modal-close" id="ard-edit-modal-close">&times;</button>
+                    <button type="button" class="ard-modal-close" id="ard-edit-modal-close" aria-label="Close">&times;</button>
                 </div>
                 <div class="ard-modal-body">
                     <div class="ard-edit-grid">
@@ -387,7 +390,7 @@
                 <div class="ard-box-modal" id="ard-box-modal" style="display:none;">
                     <div class="ard-box-modal-header">
                         <span>Browse Box Files</span>
-                        <button type="button" id="ard-box-modal-close">&times;</button>
+                        <button type="button" id="ard-box-modal-close" aria-label="Close">&times;</button>
                     </div>
                     <div class="ard-box-modal-body">
                         <div class="ard-box-loading" id="ard-box-loading" style="display:none;">
@@ -499,7 +502,7 @@
     <div class="ard-fo-modal" id="find-order-modal" style="display:none;">
         <div class="ard-fo-modal-header">
             <span>Find ShopWorks Order</span>
-            <button type="button" class="ard-fo-modal-close" id="find-order-close">&times;</button>
+            <button type="button" class="ard-fo-modal-close" id="find-order-close" aria-label="Close">&times;</button>
         </div>
         <div class="ard-fo-modal-body" id="find-order-body">
             <div class="ard-fo-loading">Searching ShopWorks...</div>
@@ -518,7 +521,7 @@
     <div class="ard-lightbox" id="ard-lightbox" style="display:none;">
         <div class="ard-lightbox-backdrop" id="ard-lightbox-backdrop"></div>
         <div class="ard-lightbox-content">
-            <button class="ard-lightbox-close" id="ard-lightbox-close">&times;</button>
+            <button class="ard-lightbox-close" id="ard-lightbox-close" aria-label="Close">&times;</button>
             <img class="ard-lightbox-img" id="ard-lightbox-img" src="" alt="Full-size preview">
             <button class="ard-lightbox-download" id="ard-lightbox-download" type="button" title="Save this image with a sensible filename">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -582,13 +585,13 @@
 
     <!-- Send Mockup Modal (shared with Art Hub — used by Steve's action bar) -->
     <div id="approval-overlay" class="art-modal-overlay" style="display:none;"></div>
-    <div id="approval-modal" class="approval-modal" style="display:none;">
+    <div id="approval-modal" class="approval-modal" role="dialog" aria-modal="true" aria-labelledby="approval-modal-title" style="display:none;">
         <div class="approval-modal-header">
             <div class="approval-modal-header-info">
-                <span>Send Mockup</span>
+                <span id="approval-modal-title">Send Mockup</span>
                 <span id="approval-modal-rev" class="approval-rev-badge"></span>
             </div>
-            <button class="approval-modal-close" id="approval-modal-close">&times;</button>
+            <button class="approval-modal-close" id="approval-modal-close" aria-label="Close">&times;</button>
         </div>
         <div class="approval-modal-body">
             <div id="approval-company" class="approval-company"></div>
@@ -649,7 +652,7 @@
     <div id="share-customer-modal" class="share-customer-modal" style="display:none;">
         <div class="share-customer-modal__header">
             <span>Share Mockup with Customer</span>
-            <button type="button" class="share-customer-modal__close" id="share-customer-close">&times;</button>
+            <button type="button" class="share-customer-modal__close" id="share-customer-close" aria-label="Close">&times;</button>
         </div>
         <div class="share-customer-modal__body">
             <div class="share-customer-modal__field">
@@ -690,12 +693,13 @@
     <script src="/shared_components/js/mo-fetch.js?v=2026.08.10.4"></script>
     <script src="/shared_components/js/confetti.js?v=1"></script>
     <script src="/shared_components/js/box-url.js?v=2026.08.05.23"></script>
-    <script src="/shared_components/js/art-actions-shared.js?v=2026.09.06.36"></script>
+    <script src="/shared_components/js/art-actions-shared.js?v=2026.09.08.9"></script>
+    <script src="/shared_components/js/ui-dialog.js?v=2026.09.08.5"></script>
     <script src="/shared_components/js/transfer-actions-shared.js?v=2026.09.08.7"></script>
     <!-- SAML identity → legacy nwca_user_* keys (StaffAuthHelper.ready(), 2026-09-05) -->
     <script src="/shared_components/js/staff-auth-helper.js?v=2026.09.06.37"></script>
     <!-- Shared toasts replace the page's browser alert() calls (2026-09-05) -->
     <script src="/shared_components/js/toast-notifications.js?v=2026.09.08.3"></script>
-    <script src="/pages/js/art-request-detail.js?v=2026.09.07.33"></script>
+    <script src="/pages/js/art-request-detail.js?v=2026.09.08.9"></script>
 </body>
 </html>

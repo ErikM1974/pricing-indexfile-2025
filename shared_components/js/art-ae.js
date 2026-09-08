@@ -235,7 +235,7 @@ var ArtAeGallery = (function () {
         if (!container) return;
 
         if (allRequests.length === 0) {
-            container.innerHTML = '<div style="text-align:center;padding:60px 20px;color:#999;">'
+            container.innerHTML = '<div style="text-align:center;padding:60px 20px;color:var(--gray-600);">'
                 + '<div style="font-size:48px;margin-bottom:12px;">&#127912;</div>'
                 + '<div style="font-size:16px;font-weight:500;">No art requests found</div>'
                 + '</div>';
@@ -296,10 +296,10 @@ var ArtAeGallery = (function () {
         html += '<div class="status-summary">';
         bucketChips.forEach(function (c) {
             var active = currentBucketFilter === c.key ? ' active' : '';
-            html += '<div class="status-stat status-stat--' + c.modifier + active + '" '
+            html += '<button type="button" class="status-stat status-stat--' + c.modifier + active + '" '
                 + 'data-bucket="' + c.key + '" title="' + escapeHtml(c.label) + '">'
                 + '<span class="status-stat-count">' + c.count + '</span>'
-                + '<span class="status-stat-label">' + escapeHtml(c.label) + '</span></div>';
+                + '<span class="status-stat-label">' + escapeHtml(c.label) + '</span></button>';
         });
         html += '</div>';
 
@@ -307,7 +307,7 @@ var ArtAeGallery = (function () {
         var filtered = getFilteredRequests();
         html += '<div class="mockup-grid">';
         if (filtered.length === 0) {
-            html += '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#999;">No matching requests</div>';
+            html += '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--gray-600);">No matching requests</div>';
         }
         filtered.forEach(function (r) {
             html += buildCard(r);
@@ -353,7 +353,7 @@ var ArtAeGallery = (function () {
         var filtered = getFilteredRequests();
         var html = '';
         if (filtered.length === 0) {
-            html = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#999;">No matching requests</div>';
+            html = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--gray-600);">No matching requests</div>';
         }
         filtered.forEach(function (r) { html += buildCard(r); });
         grid.innerHTML = html;
@@ -412,9 +412,9 @@ var ArtAeGallery = (function () {
         var clickAttr = filterValue
             ? ' data-call="ArtAeGallery.filterByStatus" data-args="[&quot;' + filterValue + '&quot;]"'
             : '';
-        return '<div class="status-stat status-stat--' + modifier + '" title="' + label + '"' + clickAttr + '>'
+        return '<button type="button" class="status-stat status-stat--' + modifier + '" title="' + label + '"' + clickAttr + '>'
             + '<span class="status-stat-count">' + count + '</span>'
-            + '<span class="status-stat-label">' + label + '</span></div>';
+            + '<span class="status-stat-label">' + label + '</span></button>';
     }
 
     // Compact labels for the structured status badges so they fit on cards.
@@ -576,7 +576,7 @@ var ArtAeGallery = (function () {
             : '';
 
         return '<div class="mockup-card art-card' + onHoldClass + '" data-design-id="' + designId + '" style="cursor:pointer;">'
-            + '<div class="card-header" style="background:var(--art-theme, #981e32);">'
+            + '<div class="card-header">'
             + '  <div class="card-header-left">'
             + '    <div class="card-company">' + company + '</div>'
             + '    <div class="card-design-number">#' + designNum

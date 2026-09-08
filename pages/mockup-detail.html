@@ -7,13 +7,15 @@
     <title>Mockup Detail - Northwest Custom Apparel</title>
     <link rel="icon" href="/favicon.png" type="image/png">
     <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/pages/css/mockup-detail.css?v=2026.09.07.19">
-    <link rel="stylesheet" href="/pages/css/thread-color-picker.css?v=2026.09.07.14">
-    <link rel="stylesheet" href="/shared_components/css/transfer-actions.css?v=2026.09.08.5">
-    <link rel="stylesheet" href="/shared_components/css/elapsed-time-utils.css?v=2026.09.07.19">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap">
+    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.08.8">
+    <link rel="stylesheet" href="/shared_components/css/art-theme.css?v=2026.09.08.9">
+    <link rel="stylesheet" href="/shared_components/css/art-detail.css?v=2026.09.08.9">
+    <link rel="stylesheet" href="/shared_components/css/transfer-workflow.css?v=2026.09.08.8">
+    <link rel="stylesheet" href="/pages/css/mockup-detail.css?v=2026.09.08.9">
     <script src="/config/app.config.js"></script>
 </head>
-<body>
+<body class="art-detail-page pmd-page" data-ui="unified" data-surface="staff" data-department="ruth" data-art-workflow>
     <!-- Header -->
     <header class="pmd-header">
         <div class="pmd-header-inner">
@@ -74,7 +76,7 @@
         </div>
 
         <!-- Status Timeline -->
-        <div class="pmd-timeline-container" id="pmd-timeline" style="display:none;">
+        <div class="pmd-timeline-container" id="pmd-timeline" role="region" aria-label="Request progress" tabindex="0" style="display:none;">
             <div class="pmd-timeline-steps" id="pmd-timeline-steps"></div>
         </div>
 
@@ -160,7 +162,7 @@
 
     <!-- Lightbox -->
     <div class="pmd-lightbox" id="pmd-lightbox">
-        <button class="pmd-lightbox-close" id="pmd-lightbox-close">&times;</button>
+        <button class="pmd-lightbox-close" id="pmd-lightbox-close" aria-label="Close">&times;</button>
         <button class="pmd-lightbox-download" id="pmd-lightbox-download" title="Download image">
             <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
@@ -177,7 +179,7 @@
     <div class="pmd-box-modal" id="pmd-box-modal" style="display:none;">
         <div class="pmd-box-modal-header">
             <h3>Browse Box Files</h3>
-            <button class="pmd-box-modal-close" id="pmd-box-modal-close">&times;</button>
+            <button class="pmd-box-modal-close" id="pmd-box-modal-close" aria-label="Close">&times;</button>
         </div>
         <div class="pmd-box-modal-body">
             <div class="pmd-box-breadcrumb" id="pmd-box-breadcrumb"></div>
@@ -296,7 +298,7 @@
     <div class="pmd-fo-modal" id="pmd-fo-modal" style="display:none;">
         <div class="pmd-fo-modal-header">
             <span>Find ShopWorks Order</span>
-            <button type="button" class="pmd-fo-modal-close" id="pmd-fo-close">&times;</button>
+            <button type="button" class="pmd-fo-modal-close" id="pmd-fo-close" aria-label="Close">&times;</button>
         </div>
         <div class="pmd-fo-modal-body" id="pmd-fo-body">
             <div class="pmd-fo-loading">Searching ShopWorks...</div>
@@ -316,7 +318,7 @@
         <div class="pmd-edit-modal">
             <div class="pmd-edit-header">
                 <h3>Edit Mockup Request</h3>
-                <button type="button" class="pmd-edit-close" id="pmd-edit-close">&times;</button>
+                <button type="button" class="pmd-edit-close" id="pmd-edit-close" aria-label="Close">&times;</button>
             </div>
             <div class="pmd-edit-body">
                 <div class="pmd-edit-grid">
@@ -378,15 +380,16 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="/shared_components/js/app-config.js?v=2026.09.06.26"></script>
     <script src="/shared_components/js/mo-fetch.js?v=2026.08.10.4"></script>
-    <script src="/pages/js/thread-color-picker.js?v=2026.09.06.27"></script>
+    <script src="/pages/js/thread-color-picker.js?v=2026.09.08.9"></script>
     <script src="/shared_components/js/confetti.js?v=1"></script>
     <script src="/shared_components/js/box-url.js?v=2026.08.05.23"></script>
-    <script src="/shared_components/js/art-actions-shared.js?v=2026.09.06.36"></script>
+    <script src="/shared_components/js/art-actions-shared.js?v=2026.09.08.9"></script>
+    <script src="/shared_components/js/ui-dialog.js?v=2026.09.08.5"></script>
     <script src="/shared_components/js/transfer-actions-shared.js?v=2026.09.08.7"></script>
     <script src="/shared_components/js/caspio-date-utils.js?v=2026.09.06.46"></script>
     <script src="/shared_components/js/elapsed-time-utils.js?v=2026.09.06.46"></script>
     <!-- SAML identity → legacy nwca_user_* keys (StaffAuthHelper.ready(), 2026-09-05) -->
     <script src="/shared_components/js/staff-auth-helper.js?v=2026.09.06.37"></script>
-    <script src="/pages/js/mockup-detail.js?v=2026.09.07.33"></script>
+    <script src="/pages/js/mockup-detail.js?v=2026.09.08.9"></script>
 </body>
 </html>

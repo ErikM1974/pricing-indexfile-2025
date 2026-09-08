@@ -327,13 +327,15 @@ test('CSS Bradley: broken image preview reports failure and recovers on the next
     expect(state.errors).toEqual([]);
 });
 
-test('CSS Bradley: shared sender retains legacy Steve visibility and dismissal', async ({ page }) => {
+test('CSS Bradley: shared sender retains Steve visibility and dismissal after migration', async ({ page }) => {
     const state = await fixture(page, 'dashboards/art-hub-steve.html');
     await page.goto('/dashboards/art-hub-steve.html');
     await page.locator('#steve-send-supacolor-btn').click();
     await expect(page.locator('#tas-modal')).toBeVisible();
     await expect(page.locator('#tas-picker-search-input')).toBeFocused();
     await expect(page.locator('#tas-mockup-summary')).toBeHidden();
+    await layouts(page, 'steve-transfer-sender');
+    expect(state.errors).toEqual([]);
     await page.keyboard.press('Escape');
     await expect(page.locator('#tas-modal')).toBeHidden();
     await expect(page.locator('body')).not.toHaveCSS('overflow', 'hidden');

@@ -1,0 +1,79 @@
+/* Art family semantic aliases, input sizing and elapsed-time badges. Queue and dialog layout have separate owners. */
+@layer components.patterns {
+    :where([data-ui="unified"][data-art-workflow]) {
+        --art-theme: var(--ui-accent);
+        --art-theme-dark: var(--ui-accent-hover);
+        --art-theme-light: var(--ui-accent);
+        --art-theme-hover: var(--ui-accent-hover);
+        --art-theme-bg: var(--ui-tint);
+        --art-theme-bg-hover: var(--ui-tint);
+        --art-theme-bg-selected: var(--ui-tint);
+        --surface-card: var(--ui-surface);
+        --text-primary: var(--ui-ink);
+        --text-secondary: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-art-workflow])
+        :is(input:not([type="checkbox"], [type="radio"], [type="file"]), select, textarea) {
+        font-size: var(--font-size-base);
+    }
+
+    :where([data-ui="unified"])[data-art-workflow] {
+        --surface-page: var(--ui-canvas);
+        --surface-elevated: var(--gray-50);
+        --surface-inset: var(--gray-100);
+        --surface-hover: var(--gray-50);
+        --state-info: var(--color-floor-dark);
+        --state-info-bg: var(--color-floor-tint);
+        --state-success: var(--emerald-800);
+        --state-success-bg: var(--brand-50);
+        --state-warning: var(--amber-800);
+        --state-warning-bg: var(--store-paper);
+        --state-danger: var(--red-700);
+        --state-danger-bg: var(--red-50);
+        --state-violet: var(--color-ruth-dark);
+        --state-violet-bg: var(--color-ruth-tint);
+        --art-theme-rgba-15: var(--ui-tint);
+        --art-theme-rgba-10: var(--ui-tint);
+        --art-focus-ring: 0 0 0 3px var(--ui-tint);
+        --dur-fast: var(--motion-fast);
+        --dur-base: var(--motion-base);
+    }
+
+    :where([data-ui="unified"][data-art-workflow]) .elapsed-badge.elapsed--fresh {
+        color: var(--emerald-800);
+    }
+
+    :where([data-ui="unified"][data-art-workflow]) .elapsed-badge {
+        display: inline-block;
+        font-size: var(--font-size-sm);
+        padding: var(--space-1) var(--space-2);
+        border-radius: var(--radius-sm);
+        margin-top: var(--space-1);
+    }
+
+    :where([data-ui="unified"][data-art-workflow]) .elapsed--fresh {
+        color: var(--emerald-800);
+        background: var(--brand-50);
+    }
+
+    :where([data-ui="unified"][data-art-workflow]) .elapsed--waiting {
+        color: var(--amber-800);
+        background: var(--store-paper);
+    }
+
+    :where([data-ui="unified"][data-art-workflow]) .elapsed--overdue {
+        color: var(--red-700);
+        background: var(--red-50);
+        font-weight: 600;
+    }
+
+    :where([data-ui="unified"][data-art-workflow]) .kanban-elapsed {
+        display: inline-block;
+        font-size: var(--font-size-sm);
+        padding: var(--space-1);
+        border-radius: var(--radius-sm);
+        margin-left: var(--space-1);
+        font-weight: 600;
+    }
+}

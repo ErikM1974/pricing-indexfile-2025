@@ -1,6 +1,6 @@
 # Active Files Registry
 
-Last updated: 2026-09-08 (Staff transfer/Supacolor relay and authentication coverage registered in area documents).
+Last updated: 2026-09-08 — shared artwork theme/detail/intake/action owners and family browser coverage.
 
 | Area | Registry |
 |---|---|
