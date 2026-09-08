@@ -5,8 +5,8 @@ Source: Erik's Claude handover (2026-09-08). Work on develop; one server editor;
 ## Checklist
 - [x] Read project rules, index and split toolkit; verify no foreign tracked edits.
 - [x] Confirm paired proxy gates shipped: proxy v2026.09.07.3 / Heroku 1128, frontend v.25.
-- [ ] Upgrade Node runtime and CI to 22.x; patch compatible dependencies; full gates and deploy.
-- [ ] Configure repository CRM_API_SECRET and verify CI executes the money-path and parity specs.
+- [x] Upgrade Node runtime and CI to 22.x; patch compatible dependencies; full gates and deploy.
+- [x] Configure repository CRM_API_SECRET and verify CI executes the money-path and parity specs.
 - [ ] Review and integrate dependency PRs individually with gates: tooling #37, Stripe #34, rate-limit #33, csv-parse #32, Puppeteer #31.
 - [ ] Finish server split: CRM first; order form, quote sync/watchdog, storefront helpers and payments; preserve route table.
 - [ ] Extract and test long order/push handlers; add Node ESLint scope once split completes.
@@ -31,3 +31,7 @@ Source: Erik's Claude handover (2026-09-08). Work on develop; one server editor;
 - Local verification passed: route lock456, undefined names0, bootHTTP200, build, lint99 baseline warnings/0errors, CSS283files, typecheck, unit4695passed/4skips, DOM88, axe4, fixture parity84, browser15passed/3opt-in screenshot skips (all five surface parity tests included). Release target v2026.09.07.27; CI and Heroku verification pending.
 
 - First secret-enabled CI run exercised all live specs and exposed the proxy's existing100requests/minute pricing limit (CAP429; one EMB retry). Pace live preview scenarios and wait for the real60second reset on429; direct tier reads use the same bounded retry. No production limit or pricing assertion changes.
+
+## Verified releases and dependency follow-up
+- Runtime/security release v2026.09.07.27 / Heroku2050: Node22.23.2, live SHA f796510c, homepage200, staff relays401. CI34176404389 ran the live-engine specs and passed all jobs after pacing correction.
+- CSV PR32 integrates7.0.2; isolated checks cover quoted/BOM/uneven-column input and prototype handling. Full gate results recorded before the merge commit.
