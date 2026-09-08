@@ -5224,7 +5224,7 @@ var mockdetaLog = MOCKDETA_LOG_ON ? console.log.bind(console) : function () {}; 
         var nameInput = document.getElementById('pmd-send-contact-name');
         var emailInput = document.getElementById('pmd-send-contact-email');
 
-        fetch(API_BASE + '/api/company-contacts/by-company?company=' + encodeURIComponent(companyName))
+        fetch('/api/company-contacts/by-company?company=' + encodeURIComponent(companyName))
             .then(function (resp) {
                 if (!resp.ok) throw new Error('Contact lookup failed');
                 return resp.json();

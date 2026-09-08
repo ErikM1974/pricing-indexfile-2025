@@ -102,10 +102,7 @@
 
     function CompanyContactPicker(options) {
         options = options || {};
-        this.baseURL = options.baseURL
-            || (global.APP_CONFIG && global.APP_CONFIG.API && global.APP_CONFIG.API.BASE_URL)
-            || '';
-        if (!this.baseURL) console.error('[company-contact-picker] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
+        // Customer directory requests use the staff-authenticated same-origin relay.
         this.minSearchLength = options.minSearchLength || 3;
         this.debounceMs = options.debounceMs || 250;
         this.maxResults = options.maxResults || 25; // contacts per /search call
@@ -125,7 +122,7 @@
         if (cached && Date.now() - cached.timestamp < this._cacheTTL) {
             return Promise.resolve(cached.data);
         }
-        var url = this.baseURL + '/api/company-contacts/search?q=' + encodeURIComponent(query) + '&limit=' + this.maxResults;
+        var url = '/api/company-contacts/search?q=' + encodeURIComponent(query) + '&limit=' + this.maxResults;
         return fetch(url)
             .then(function (r) {
                 if (!r.ok) throw new Error('search ' + r.status);
@@ -154,7 +151,7 @@
         }
         // limit=25 matches the backend's max — covers companies like NWCA
         // with 10+ contacts. Cap was raised from 10 → 25 on 2026-05-08.
-        var url = this.baseURL + '/api/company-contacts/by-company?company=' + encodeURIComponent(companyName) + '&limit=25';
+        var url = '/api/company-contacts/by-company?company=' + encodeURIComponent(companyName) + '&limit=25';
         return fetch(url)
             .then(function (r) {
                 if (!r.ok) throw new Error('by-company ' + r.status);

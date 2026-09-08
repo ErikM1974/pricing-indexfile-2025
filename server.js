@@ -289,7 +289,8 @@ dotenv.config();
 //   L2158 GET  /api/pricing-matrix/lookup
 //   L2244 GET  /api/pricing-matrix/:id
 //
-// CART SYSTEM
+// CART SYSTEM — legacy CRUD is requireStaff-gated (retired public cart).
+// CUSTOMER DIRECTORY — /api/company-contacts[-2026]/*: requireStaff, secret-forwarding relay
 //   L1616 GET  /cart
 //   L1657 CRUD /api/cart-sessions
 //   L1703 CRUD /api/cart-items
@@ -1938,6 +1939,8 @@ app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), async
 // Parse JSON and URL-encoded bodies
 // Body parser limit bumped to 5mb to accommodate TipTap policy bodies (Policies Hub).
 // Default 100kb silently 413s on policies with embedded image references.
+// Authenticate payroll before accepting its larger JSON body. Must precede the global parser.
+app.use('/api/crm-proxy/payroll/parse', requirePageAccess('payroll.html'), bodyParser.json({ limit: '40mb' }));
 app.use(bodyParser.json({ limit: '5mb' }));
 app.use(bodyParser.urlencoded({ extended: true, limit: '5mb' }));
 
@@ -3421,6 +3424,24 @@ function createCrmProxy(endpoint, allowedRoles) {
   ];
 }
 
+// Customer-directory access is staff-only. Preserve the query and keep the
+// CRM secret on the server; public forms can still accept manually typed details.
+async function staffContactProxy(req, res) {
+  try {
+    const upstream = await fetch(CRM_API_BASE + req.originalUrl, {
+      method: req.method,
+      headers: withProxySecret({ 'Content-Type': 'application/json' }),
+      ...(['POST', 'PUT', 'PATCH'].includes(req.method) ? { body: JSON.stringify(req.body || {}) } : {})
+    });
+    if (upstream.status === 204) return res.sendStatus(204);
+    res.status(upstream.status).json(await upstream.json());
+  } catch (error) {
+    console.error('[Contact Proxy]', error.message);
+    res.status(502).json({ error: 'Unable to load customer contacts' });
+  }
+}
+app.all(['/api/company-contacts', '/api/company-contacts/*', '/api/company-contacts-2026', '/api/company-contacts-2026/*'], requireStaff, staffContactProxy);
+
 // Taneisha accounts proxy - requires 'taneisha' role
 app.all('/api/crm-proxy/taneisha-accounts*', ...createCrmProxy('taneisha-accounts', ['taneisha']));
 
@@ -3446,8 +3467,7 @@ app.all('/api/crm-proxy/assignment-history*', ...createCrmProxy('assignment-hist
 // moment a second admin is added. One table row now controls the page and its data
 // together — Erik changes who sees payroll without a deploy.
 // The parse route carries a base64 PDF, so it needs a bigger body parser than the 5mb
-// global — scoped to that one path, and mounted BEFORE the forwarder so it applies.
-app.use('/api/crm-proxy/payroll/parse', bodyParser.json({ limit: '40mb' }));
+// global — its authenticated parser is registered BEFORE the global parser above.
 app.all('/api/crm-proxy/payroll*', requirePageAccess('payroll.html'), createCrmProxy('payroll', ['admin'])[1]);
 
 // Policies Hub admin proxy - requires 'policies-admin' role (currently Erik only).
@@ -3479,7 +3499,7 @@ app.all('/api/crm-proxy/admin/usage*', ...createCrmProxy('admin/usage', ['admin'
 // "Customer Portals" staff console. Role-gated (the management team) + the proxy's secret.
 app.all('/api/crm-proxy/customer-portal-access*', ...createCrmProxy('customer-portal-access', PORTAL_ADMIN_ROLES));
 // Customer lookup for the "add customer" search (resolve a contact → id_Customer + company).
-// company-contacts/search is already public (the quote builders use it), but proxying it
+// company-contacts/search is secret-gated; staff builders use the relay above, while proxying it
 // keeps the admin page same-origin + role-gated + carries the secret harmlessly.
 app.all('/api/crm-proxy/company-contacts*', ...createCrmProxy('company-contacts', PORTAL_ADMIN_ROLES));
 // Re-order request work-queue (Phase 4) — the console's "Requests" tab lists/updates/deletes
@@ -6138,7 +6158,7 @@ app.get('/pricing/dtf', (req, res) => {
 // runs. Search for "STAFF-GATED CALCULATOR PAGES".
 
 // Cart Sessions API
-app.get('/api/cart-sessions', async (req, res) => {
+app.get('/api/cart-sessions', requireStaff, async (req, res) => {
   try {
     const data = await makeApiRequest('/cart-sessions');
     res.json(data);
@@ -6147,7 +6167,7 @@ app.get('/api/cart-sessions', async (req, res) => {
   }
 });
 
-app.get('/api/cart-sessions/:id', async (req, res) => {
+app.get('/api/cart-sessions/:id', requireStaff, async (req, res) => {
   try {
     const data = await makeApiRequest(`/cart-sessions/${req.params.id}`);
     res.json(data);
@@ -6156,7 +6176,7 @@ app.get('/api/cart-sessions/:id', async (req, res) => {
   }
 });
 
-app.post('/api/cart-sessions', async (req, res) => {
+app.post('/api/cart-sessions', requireStaff, async (req, res) => {
   try {
     const data = await makeApiRequest('/cart-sessions', 'POST', req.body);
     res.status(201).json(data);
@@ -6165,7 +6185,7 @@ app.post('/api/cart-sessions', async (req, res) => {
   }
 });
 
-app.put('/api/cart-sessions/:id', async (req, res) => {
+app.put('/api/cart-sessions/:id', requireStaff, async (req, res) => {
   try {
     const data = await makeApiRequest(`/cart-sessions/${req.params.id}`, 'PUT', req.body);
     res.json(data);
@@ -6174,7 +6194,7 @@ app.put('/api/cart-sessions/:id', async (req, res) => {
   }
 });
 
-app.delete('/api/cart-sessions/:id', async (req, res) => {
+app.delete('/api/cart-sessions/:id', requireStaff, async (req, res) => {
   try {
     await makeApiRequest(`/cart-sessions/${req.params.id}`, 'DELETE');
     res.json({ success: true });
@@ -6184,7 +6204,7 @@ app.delete('/api/cart-sessions/:id', async (req, res) => {
 });
 
 // Cart Items API
-app.get('/api/cart-items', async (req, res) => {
+app.get('/api/cart-items', requireStaff, async (req, res) => {
   try {
     const data = await makeApiRequest('/cart-items');
     res.json(data);
@@ -6193,7 +6213,7 @@ app.get('/api/cart-items', async (req, res) => {
   }
 });
 
-app.get('/api/cart-items/session/:sessionId', async (req, res) => {
+app.get('/api/cart-items/session/:sessionId', requireStaff, async (req, res) => {
   try {
     // SECURITY: Sanitize input
     const sessionId = sanitizeFilterInput(req.params.sessionId);
@@ -6274,7 +6294,7 @@ app.get('/api/cart-items/session/:sessionId', async (req, res) => {
   }
 });
 
-app.post('/api/cart-items', async (req, res) => {
+app.post('/api/cart-items', requireStaff, async (req, res) => {
   try {
     // Clone the request body to avoid modifying the original
     const modifiedBody = { ...req.body };
@@ -6328,7 +6348,7 @@ app.post('/api/cart-items', async (req, res) => {
   }
 });
 
-app.put('/api/cart-items/:id', async (req, res) => {
+app.put('/api/cart-items/:id', requireStaff, async (req, res) => {
   try {
     // Clone the request body to avoid modifying the original
     const modifiedBody = { ...req.body };
@@ -6382,7 +6402,7 @@ app.put('/api/cart-items/:id', async (req, res) => {
   }
 });
 
-app.delete('/api/cart-items/:id', async (req, res) => {
+app.delete('/api/cart-items/:id', requireStaff, async (req, res) => {
   try {
     await makeApiRequest(`/cart-items/${req.params.id}`, 'DELETE');
     res.json({ success: true });
@@ -6392,7 +6412,7 @@ app.delete('/api/cart-items/:id', async (req, res) => {
 });
 
 // Cart Item Sizes API
-app.get('/api/cart-item-sizes', async (req, res) => {
+app.get('/api/cart-item-sizes', requireStaff, async (req, res) => {
   try {
     const data = await makeApiRequest('/cart-item-sizes');
     res.json(data);
@@ -6401,7 +6421,7 @@ app.get('/api/cart-item-sizes', async (req, res) => {
   }
 });
 
-app.get('/api/cart-item-sizes/cart-item/:cartItemId', async (req, res) => {
+app.get('/api/cart-item-sizes/cart-item/:cartItemId', requireStaff, async (req, res) => {
   try {
     // SECURITY: Sanitize input
     const cartItemId = sanitizeFilterInput(req.params.cartItemId);
@@ -6412,7 +6432,7 @@ app.get('/api/cart-item-sizes/cart-item/:cartItemId', async (req, res) => {
   }
 });
 
-app.post('/api/cart-item-sizes', async (req, res) => {
+app.post('/api/cart-item-sizes', requireStaff, async (req, res) => {
   try {
     const data = await makeApiRequest('/cart-item-sizes', 'POST', req.body);
     res.status(201).json(data);
@@ -6421,7 +6441,7 @@ app.post('/api/cart-item-sizes', async (req, res) => {
   }
 });
 
-app.put('/api/cart-item-sizes/:id', async (req, res) => {
+app.put('/api/cart-item-sizes/:id', requireStaff, async (req, res) => {
   try {
     const data = await makeApiRequest(`/cart-item-sizes/${req.params.id}`, 'PUT', req.body);
     res.json(data);
@@ -6430,7 +6450,7 @@ app.put('/api/cart-item-sizes/:id', async (req, res) => {
   }
 });
 
-app.delete('/api/cart-item-sizes/:id', async (req, res) => {
+app.delete('/api/cart-item-sizes/:id', requireStaff, async (req, res) => {
   try {
     await makeApiRequest(`/cart-item-sizes/${req.params.id}`, 'DELETE');
     res.json({ success: true });
@@ -7673,7 +7693,7 @@ app.get('/api/quote-sessions/:quoteId/full', async (req, res) => {
         const PROXY_BASE = CASPIO_PROXY_BASE;
         const resp = await fetch(
           `${PROXY_BASE}/api/company-contacts/by-customer/${encodeURIComponent(idCustomer)}`,
-          { method: 'GET' }
+          { method: 'GET', headers: withProxySecret() }
         );
         if (resp.ok) {
           const data = await resp.json();
@@ -8120,7 +8140,7 @@ app.post('/api/quote-sessions/:quoteId/send-to-shipstation', async (req, res) =>
     if (idCustomer) {
       try {
         const PROXY_BASE = CASPIO_PROXY_BASE;
-        const resp = await fetch(`${PROXY_BASE}/api/company-contacts/by-customer/${encodeURIComponent(idCustomer)}`);
+        const resp = await fetch(`${PROXY_BASE}/api/company-contacts/by-customer/${encodeURIComponent(idCustomer)}`, { headers: withProxySecret() });
         if (resp.ok) {
           const data = await resp.json();
           const contacts = Array.isArray(data?.contacts) ? data.contacts : [];
@@ -9049,7 +9069,7 @@ app.post('/api/quote-sessions/bulk-sync-shipstation-tracking', async (req, res) 
       stats.checked++;
       try {
         const shipmentsUrl = `${SYNC_PROXY_BASE_LOCAL}/api/shipstation/shipments?orderId=${encodeURIComponent(s.ShipStation_Order_ID)}`;
-        const r = await fetch(shipmentsUrl);
+        const r = await fetch(shipmentsUrl, { headers: withProxySecret() });
         if (!r.ok) throw new Error(`proxy returned ${r.status}`);
         const data = await r.json();
         const shipments = (data?.shipments || []).filter(ship => !ship.voided);

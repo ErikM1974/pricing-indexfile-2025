@@ -4,8 +4,7 @@
  */
 class CustomerLookupService {
     constructor(options = {}) {
-        this.baseURL = options.baseURL || window.APP_CONFIG?.API?.BASE_URL || '';
-        if (!this.baseURL) console.error('[customer-lookup-service] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
+        // Customer directory requests use the staff-authenticated same-origin relay.
         this.minSearchLength = options.minSearchLength || 3;
         this.debounceMs = options.debounceMs || 300;
         this.maxResults = options.maxResults || 25;  // 25 = proxy max; shows all contacts for larger accounts (e.g. Aaberg's has 17) (Erik 2026-06-05)
@@ -37,7 +36,7 @@ class CustomerLookupService {
         }
 
         try {
-            const url = `${this.baseURL}/api/company-contacts/search?q=${encodeURIComponent(query)}&limit=${this.maxResults}`;
+            const url = `/api/company-contacts/search?q=${encodeURIComponent(query)}&limit=${this.maxResults}`;
             const response = await fetch(url);
 
             if (!response.ok) {
@@ -89,7 +88,7 @@ class CustomerLookupService {
      */
     async getById(contactId) {
         try {
-            const url = `${this.baseURL}/api/company-contacts/${contactId}`;
+            const url = `/api/company-contacts/${contactId}`;
             const response = await fetch(url);
 
             if (!response.ok) {
@@ -117,7 +116,7 @@ class CustomerLookupService {
         const id = String(customerId || '').trim();
         if (!id) return null;
         try {
-            const resp = await fetch(`${this.baseURL}/api/company-contacts/by-customer/${encodeURIComponent(id)}`);
+            const resp = await fetch(`/api/company-contacts/by-customer/${encodeURIComponent(id)}`);
             if (!resp.ok) return null;
             const data = await resp.json();
             return (data.contacts && data.contacts[0]) || null;

@@ -211,7 +211,7 @@ export async function fetchCompanies(q) {
     if (_companySearchCache.has(key)) return _companySearchCache.get(key);
 
     const hitApi = async (query) => {
-        const r = await fetch(`${API_BASE}/api/company-contacts-2026/search?q=${encodeURIComponent(query)}&limit=10`);
+        const r = await fetch(`/api/company-contacts-2026/search?q=${encodeURIComponent(query)}&limit=10`);
         if (!r.ok) throw new Error('HTTP ' + r.status);
         const data = await r.json();
         return Array.isArray(data && data.companies) ? data.companies : [];

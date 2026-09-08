@@ -213,7 +213,7 @@
     searchInput.addEventListener('input', debounce(function () {
         var q = searchInput.value.trim();
         if (q.length < 2) { results.hidden = true; results.innerHTML = ''; return; }
-        fetch(apiBase() + '/api/company-contacts/search?q=' + encodeURIComponent(q) + '&limit=25')
+        fetch('/api/company-contacts/search?q=' + encodeURIComponent(q) + '&limit=25')
             .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
             .then(function (d) {
                 var seen = {}, rows = [];

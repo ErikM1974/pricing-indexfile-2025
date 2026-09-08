@@ -5,6 +5,27 @@ Resolved entries aged out of `LESSONS_LEARNED.md` (300-line cap). Newest first. 
 ---
 
 ## Archived 2026-09-07
+## 2026-09-06 — Adding `<main>` to 96 pages found two markup bugs a browser had been hiding (`v2026.09.06.51`)
+
+**Problem.** To place a landmark I had to parse each page's top-level body structure. Two pages
+did not balance: `calculators/embroidery-pricing.html` never closed its `.main-container` (the
+browser auto-closed it at `</body>`, so the script tags were inside the content container), and
+`training/thank-you-card-guide.html` had `<<Contact First Name>>` / `<<Order Number>>` as literal
+text — the parser treats `<Contact First Name>` as a start tag, so staff saw "Dear <>" with the
+placeholder gone.
+**Root cause.** Browsers recover silently from both; nothing in the repo parsed markup structurally,
+so the locks (regex-based) never saw either.
+**Solution.** Closed the container before the script block; escaped the placeholders as
+`&lt;&lt;…&gt;&gt;`. Landmark: swap the single content wrapper's tag (classes/ids kept → zero
+selector risk) or wrap a sibling range in a bare `<main>`; verified by full-page before/after
+screenshots of all 96 pages and the unit + e2e suites.
+**Prevention.** 🔑 Prose that shows angle brackets must be entity-escaped — `<<Name>>` is a tag to
+the browser, whatever it looks like in the editor. 🔑 When adding a landmark prefer swapping the
+existing wrapper's tag over inserting a new element: nothing in CSS or JS targets `div` by tag.
+🔑 Grep a stylesheet for bare `main {` BEFORE introducing a `<main>` — a themed reset would restyle
+the swapped element (none of these 96 pages had one; 47 other stylesheets in the repo do).
+🔑 A page list built from repo paths is not a URL list: server.js serves some pages at other paths.
+
 
 ## 2026-09-06 — Staff pages, the LIVE pass: what a signed-in runtime walk found that 80 static locks had not (`v2026.09.06.26`–`.28`)
 
