@@ -111,3 +111,7 @@ half-finished work — and a `server.js` committed with call sites but without `
 ### Order submission stages (2026-09-07, following v2026.09.07.31)
 
 The DTG order submission is decomposed into garments, services, artwork, notes, payload, drafts and completion stages under lib/order-form, coordinated by submit.js (247 lines). A17-case route-level harness passed on the original and on the staged code. It covers dry-run reads, distinct size prices/colors, design links, tax/rep/shipping data, fees, rejected lines, processed drafts, response replay, upstream rejection and nonfatal audit failures. Validation remains at its original position relative to draft writes. Three switch-case scopes and unused note parameters were cleaned when entering the existing strict library lint scope.
+
+### Quote synchronization, lifecycle and public quotes (2026-09-07)
+
+Three contiguous route cuts move20 registrations: quote-sync9, quote-lifecycle9, public-quotes2. The Pacific timestamp helper remains shared in the root. The watchdog moves to one lib/quote-sync-health instance created before both consumers; its mutable timestamps, results and dedup map stay together. An original/extracted contract comparison covers thresholds, counters, reason order, dedup, retries and instance isolation. All279 other original top-level statements survive unchanged (relative paths normalized); the456-route fixture remains the required lock.
