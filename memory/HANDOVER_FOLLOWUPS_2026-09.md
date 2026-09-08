@@ -1,5 +1,17 @@
 # Handover follow-ups — 2026-09-07
 
+## Active CSS batch — four service training guides — 2026-09-08
+
+Frontend v2026.09.08.10 / Heroku 2068 is verified live on d65ccce189c969b8b8baed56d755c7ee6e82b58f. Twenty reviewed pages use unified owners. Exact-source CI 34269638273 passed all four jobs; eight deployed runtime assets, four anonymous staff gates and five public shells passed. Local checks passed 4,972 unit tests and 98 browser tests. Main/develop release CI is tracked separately. The application-wide migration remains open; Erik authorizes continued edits/deployments without repeated permission questions.
+
+- [x] Capture the original art-approval, thank-you-card, lead-sheet and Google-review guides at desktop/phone widths; retain source content/field values for regression checks.
+- [ ] Reuse Public Sans, neutral white/gray surfaces, restrained NWCA green wayfinding and the shared training reading/table/print owner. Keep the thank-you examples handwritten. Consolidate four duplicate disclosure/navigation scripts into a shared controller; preserve all prose, examples, IDs, destinations and local exercise values. Make field help usable on phones and keyboards.
+- [ ] Verify all fourteen disclosures, four widths, keyboard navigation, image failure/retry, practice-field help and complete print output. Mock business writes and external services. Update source ownership and measured LF byte budgets.
+- [ ] Run all release gates, exact-source CI, cache invalidation, deploy and verify live files. Continue compatible training/reference families afterwards; remaining calculators/builders/documents require their own state coverage.
+
+The mocked CSS/browser checks now run with three workers (82 cases in 207.9 seconds locally); live pricing remains serial. The former CSS Factor task is archived and its worktree remains clean at c20d424b; no pending forms CSS implementation was found. Concurrent employee-form commit fe794c6f shipped with original attribution; both blank PDFs were visually reviewed and verified byte-for-byte live. This task made no Caspio writes or notifications.
+
+
 ## Coordinated transfer authentication LIVE — 2026-09-08
 
 Frontend v2026.09.08.7 / Heroku 2066 / c20d424b142c3e5e275cab891c8ad13e0be22fc2 was deployed FIRST and verified against the actual slug, live /api/version and six changed source assets. Five staff page gates and six safe anonymous GET API boundaries passed; the two public inquiry/reference pages still load. Exact-source CI 34250102640 passed, including the new real-server authentication checks and live-engine pricing parity. Release-branch CI is tracked separately.
