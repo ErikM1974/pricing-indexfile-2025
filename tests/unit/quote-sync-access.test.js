@@ -13,7 +13,7 @@ function productionFunction(name, globals = {}) {
     return vm.runInNewContext(`(${source.slice(...node.range)})`, { Buffer, crypto, ...globals });
 }
 const requireStaff = productionFunction('requireStaff');
-const shareTokenOk = productionFunction('shareTokenOk');
+const { shareTokenOk } = require('../../lib/payments/quote-links')({ crypto });
 const SECRET = 'test-sync-credential';
 const withProxySecret = productionFunction('withProxySecret', { CRM_API_SECRET: SECRET });
 const staffRoutes = [

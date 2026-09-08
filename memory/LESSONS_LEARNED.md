@@ -5,6 +5,10 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 
 ---
 
+### Paid-order status writes must succeed before fulfillment (2026-09-07)
+
+Storefront and sample webhooks continued after a rejected Payment Confirmed write; storefront final writes also omitted authentication. Require a successful authenticated marker before pushing. If fulfillment succeeds but the final Processed write fails, acknowledge and alert for bookkeeping without labeling the push failed or repeating it. Exercise HTTP/transport failures and redelivery with mocked APIs, plus signed HTTP dispatch; source-string checks alone missed variable-based URLs. Status markers are not an atomic cross-dyno lock.
+
 ### Bonus hero dial + CTA wrap-hole (2026-09-01, ARCHIVED 2026-09-03): variable-width money never lives inside a fixed ring (ring holds the %, dollars beside it); flex-wrap breaks lines on MAX-CONTENT width, not post-shrink width — give the sibling `flex:1 1 0`. Full entry in archive.
 ### First real custom-tees order: proforma hid data the session already had; ShopWorks dates were UTC days (2026-09-01, ARCHIVED 2026-09-05): a blank pre-import field is usually a READER gap (parse the session's JSON blob columns); every date written to ShopWorks/Caspio is the PACIFIC day (`nowPacificNaiveIso()`); a session stuck in `Payment Confirmed` NEVER self-links — manual `POST sync-from-shopworks` with the WO#. Full entry in archive.
 ### An audit reported a clean manifest as 26 missing POs (2026-08-26, ARCHIVED 2026-09-02): a check must distinguish "I looked and it isn't there" from "I never looked" and SAY WHICH — refresh the arrival span itself, compare mirror lastSync <= manifest date, and a failed fetch marks the run INCONCLUSIVE, never missing. Full entry in archive.

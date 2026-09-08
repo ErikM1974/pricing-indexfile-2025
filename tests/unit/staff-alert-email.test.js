@@ -1,40 +1,29 @@
 /**
  * Staff alert pipe (2026-09-07): every money-path alert (alert3DT / alertQuotePay) must also EMAIL the shop
  * through EmailJS `template_staff_alert`, because no Slack webhook was ever configured on Heroku and a failed
- * payment reached nobody. Runs the real helper source out of server.js with fetch mocked.
+ * payment reached nobody. Runs the real payment factories with fetch mocked.
  */
 const fs = require('fs');
-const { serverSource } = require('../helpers/server-source');
 const path = require('path');
-const src = serverSource();
-
-function slice(from, to) {
-    const a = src.indexOf(from); const b = src.indexOf(to, a);
-    if (a < 0 || b < 0) throw new Error('anchor missing: ' + from);
-    return src.slice(a, b);
-}
-// the three helpers + the sender, evaluated in a sandbox with a mock fetch
-const body = [
-    slice('function alert3DT(text)', '// ── Shared quote_sessions row fetch'),
-    slice('async function sendEmailJSTemplate(templateId, templateParams)', '// Sends BOTH confirmation emails'),
-    slice('function alertQuotePay(text)', '// Append-only Order_Payments ledger'),
-].join('\n');
+const src = fs.readFileSync(path.join(__dirname, '../../lib/payments/alerts.js'), 'utf8');
+const senderSource = fs.readFileSync(path.join(__dirname, '../../lib/payments/email-transport.js'), 'utf8');
 
 function load(env, fetchImpl) {
-    const calls = [];
-    const errors = [];
-    const fn = new Function('process', 'fetch', 'console', 'EMAILJS_SEND_URL', 'ORDER_EMAILJS_SERVICE', 'AbortController', 'setTimeout', 'clearTimeout',
-        body + '\nreturn { alert3DT, alertQuotePay, staffAlert, staffAlertEmail, STAFF_ALERT_TEMPLATE, STAFF_ALERT_DEFAULT_TO };');
-    const api = fn({ env }, async (url, opts) => { calls.push({ url, body: JSON.parse(opts.body) }); return fetchImpl ? fetchImpl(url, opts) : { ok: true }; },
-        { error: (m) => errors.push(m) }, 'https://api.emailjs.com/api/v1.0/email/send', 'service_1c4k67j', AbortController, setTimeout, clearTimeout);
-    return { api, calls, errors };
+ const calls = [], errors = [];
+ const fetch = async (url, opts) => { calls.push({ url, body: JSON.parse(opts.body) }); return fetchImpl ? fetchImpl(url, opts) : { ok: true }; };
+ // Evaluate the actual factories with isolated test credentials and mocked delivery.
+ const factory = source => new Function('module', 'process', 'console', 'AbortController', 'setTimeout', 'clearTimeout', source + '\nreturn module.exports;')
+   ({exports:{}}, {env}, {error: m => errors.push(m)}, AbortController, setTimeout, clearTimeout);
+ const {sendEmailJSTemplate} = factory(senderSource)({fetch});
+ const api = factory(src)({fetch,sendEmailJSTemplate});
+ return {api,calls,errors};
 }
 const tick = () => new Promise((r) => setImmediate(r));
 
 test('both alert functions route through the one staffAlert pipe', () => {
     expect(src).toMatch(/function alert3DT\(text\) \{\s*staffAlert\(/);
     expect(src).toMatch(/function alertQuotePay\(text\) \{\s*staffAlert\(/);
-    expect(src.match(/const hook = process\.env\.SLACK_ORDER_ALERT_WEBHOOK_URL/g)).toHaveLength(1);
+    expect(src.match(/const hook =\s*process\.env\.SLACK_ORDER_ALERT_WEBHOOK_URL/g)).toHaveLength(1);
 });
 
 test('with EmailJS keys and no Slack hook, an alert emails the shop through template_staff_alert', async () => {
