@@ -23,13 +23,6 @@
     var DEBOUNCE_MS = 250;
     var MIN_CHARS = 2;
 
-    function apiBase() {
-        if (global.APP_CONFIG && global.APP_CONFIG.API && global.APP_CONFIG.API.BASE_URL) {
-            return global.APP_CONFIG.API.BASE_URL.replace(/\/+$/, '');
-        }
-        return null; // config missing — lookup disabled, manual typing unaffected
-    }
-
     // "(253) 555-0142" from whatever digits arrive; non-10-digit strings pass through
     function formatPhone(value) {
         var digits = String(value || '').replace(/\D/g, '');
@@ -174,10 +167,8 @@
         });
 
         function search(q) {
-            var base = apiBase();
-            if (!base) { hide(); return; }
             lastQuery = q;
-            fetch(base + '/api/company-contacts-2026/search?q=' + encodeURIComponent(q) + '&limit=8')
+            fetch('/api/company-contacts-2026/search?q=' + encodeURIComponent(q) + '&limit=8')
                 .then(function (resp) {
                     if (!resp.ok) throw new Error('HTTP ' + resp.status);
                     return resp.json();

@@ -36,27 +36,7 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 ### The screen-print tier buttons promised a fee Caspio no longer charges (2026-09-06, ARCHIVED 2026-09-07, `v2026.09.06.42`): every dollar or range a customer can READ is pricing — render tier strips, clamps and hints from the API tiers, never type them; after any Caspio tier change compare each calculator's labels with `GET /api/pricing-bundle`; a marker-based `cut()` in a refactor script must assert the method count before/after. Full entry in archive.
 ### Two customer calculators drifted from Caspio's tiers while the engine followed them (2026-09-06, ARCHIVED 2026-09-07, `v2026.09.06.42`–`.43`): a tier label in a template is a price — generate every tier strip from `pricing-bundle`, price sub-minimum quantities through the canonical engine, and after ANY Caspio tier change diff each calculator's buttons against `/api/pricing-bundle?method=X` and its sub-minimum price against Quick Quote. Full entry in archive.
 ### Erik asked "is pricing the same everywhere?" — two of five customer calculators were not (2026-09-06, ARCHIVED 2026-09-07, `v2026.09.06.44`): every customer-facing price surface is compared against the canonical engine by `npm run test:parity:surfaces` (Playwright, every live tier); a calculator that renders its own tiers drifts the day Caspio changes. Full entry in archive.
-
-## 2026-09-06 — Adding `<main>` to 96 pages found two markup bugs a browser had been hiding (`v2026.09.06.51`)
-
-**Problem.** To place a landmark I had to parse each page's top-level body structure. Two pages
-did not balance: `calculators/embroidery-pricing.html` never closed its `.main-container` (the
-browser auto-closed it at `</body>`, so the script tags were inside the content container), and
-`training/thank-you-card-guide.html` had `<<Contact First Name>>` / `<<Order Number>>` as literal
-text — the parser treats `<Contact First Name>` as a start tag, so staff saw "Dear <>" with the
-placeholder gone.
-**Root cause.** Browsers recover silently from both; nothing in the repo parsed markup structurally,
-so the locks (regex-based) never saw either.
-**Solution.** Closed the container before the script block; escaped the placeholders as
-`&lt;&lt;…&gt;&gt;`. Landmark: swap the single content wrapper's tag (classes/ids kept → zero
-selector risk) or wrap a sibling range in a bare `<main>`; verified by full-page before/after
-screenshots of all 96 pages and the unit + e2e suites.
-**Prevention.** 🔑 Prose that shows angle brackets must be entity-escaped — `<<Name>>` is a tag to
-the browser, whatever it looks like in the editor. 🔑 When adding a landmark prefer swapping the
-existing wrapper's tag over inserting a new element: nothing in CSS or JS targets `div` by tag.
-🔑 Grep a stylesheet for bare `main {` BEFORE introducing a `<main>` — a themed reset would restyle
-the swapped element (none of these 96 pages had one; 47 other stylesheets in the repo do).
-🔑 A page list built from repo paths is not a URL list: server.js serves some pages at other paths.
+### Adding `<main>` to 96 pages found two markup bugs a browser had been hiding (2026-09-06, ARCHIVED 2026-09-07, `v2026.09.06.51`): a landmark sweep is also a markup audit — validate every page after a structural edit; Full entry in archive.
 
 ## 2026-09-07 — Every money-path alert had gone to a log nobody reads (`v2026.09.07.1`)
 
@@ -292,3 +272,13 @@ for the duration and came back after the deploy.
 not resolution. 🔑 Derive a cut's range from the section banner every time — never from arithmetic on stale numbers —
 and check the first line is the rule line, not a neighbour's call site. 🔑 Treat `__dirname` and `require('./…')` as
 part of a file's address, not its code. 🔑 One agent in `server.js` at a time; `git stash -u` is the tool when it is not.
+
+## 2026-09-07 — Proxy review: contact and shipping authentication
+**Problem:** Customer-directory reads/updates and shipping reads were reachable without credentials.
+**Root cause:** Browser callers went directly to the proxy; shipping sync omitted the secret.
+**Solution:** Contact lookups now use staff-authenticated same-origin relays; server reads send
+withProxySecret(). Legacy cart CRUD is staff-only (the public cart was retired).
+**Prevention:** Test anonymous and authenticated calls at both layers. Deploy the app BEFORE
+proxy gates. Public forms retain manual entry; directory autocomplete requires staff login.
+Regression coverage: tests/unit/proxy-review-relays.test.js. The payroll relay also needs its 40 MB parser BEFORE the global 5 MB parser; moving it only before the forwarder does not work.
+Validation after v2026.09.07.24: full unit 4,695 passed / 4 skipped; fixture parity 84 passed; browser E2E 15 passed / 3 opt-in screenshot skips (includes all five calculator-parity checks). Route lock updated to 456 registrations. Commit tests/fixtures/server-route-table.json with the hardening and explicitly add tests/unit/proxy-review-relays.test.js.

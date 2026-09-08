@@ -470,8 +470,6 @@ async function autoFillCustomerFromCompany(companyName) {
     if (!customerInput || customerInput.value.trim()) return; // Already has value
 
     try {
-        const apiBase = window.APP_CONFIG.API.BASE_URL;
-
         // The contacts search API strips apostrophes from the query,
         // so "Aaberg's Rentals" → "Aabergs Rentals" which won't match.
         // Use the first word as search term for reliable matching.
@@ -479,7 +477,7 @@ async function autoFillCustomerFromCompany(companyName) {
         const searchTerm = firstWord.length >= 2 ? firstWord : companyName.replace(/'/g, '');
         if (searchTerm.length < 2) return;
 
-        const resp = await fetch(`${apiBase}/api/company-contacts/search?q=${encodeURIComponent(searchTerm)}&limit=5`);
+        const resp = await fetch(`/api/company-contacts/search?q=${encodeURIComponent(searchTerm)}&limit=5`);
         if (!resp.ok) return; // Silent fail — user can fill manually
 
         const data = await resp.json();

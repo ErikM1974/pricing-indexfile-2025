@@ -54,7 +54,9 @@
     }
 
     async function fetchJson(path, options) {
-        const url = path.startsWith('http') ? path : apiUrl(path);
+        // Contact data uses the staff session on this origin, never the public proxy.
+        const contactPath = /^\/api\/company-contacts(?:-2026)?(?:\/|\?|$)/.test(path);
+        const url = contactPath ? path : (path.startsWith('http') ? path : apiUrl(path));
         const resp = await fetch(url, options);
         if (!resp.ok) {
             const detail = resp.status + ' ' + (resp.statusText || '');
