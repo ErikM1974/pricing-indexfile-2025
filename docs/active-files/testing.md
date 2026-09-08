@@ -7,6 +7,7 @@
 
 | File | Purpose | Status |
 |------|---------|--------|
+| `/tests/e2e/css-unification-art-details.spec.js` | Mocked Steve/AE/art-detail/customer layouts and workflow state checks; no live writes. | Active |
 | `/tests/unit/transfer-relays.test.js` | Real relay/session/parser contracts with mocked upstream services; browser caller boundary and downloads. | Active |
 | `/tests/e2e/transfer-auth.spec.js` | Actual-server staff HTML and anonymous API authentication checks; no business writes. | Active |
 | /tests/e2e/css-unification-art.spec.js | Mocked art workflow migration states, responsive layouts, request recovery and keyboard previews (2026-09-08). | Active |

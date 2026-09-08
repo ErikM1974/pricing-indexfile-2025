@@ -596,7 +596,7 @@ var aasLog = AAS_LOG_ON ? console.log.bind(console) : function () {};
                 '<div id="at-new-total" class="art-new-total"></div>' +
                 '<label class="art-waive-label" style="display:flex;align-items:center;gap:8px;margin:10px 0 4px;cursor:pointer;font-size:13px;color:#555;">' +
                     '<input type="checkbox" id="at-waive" style="width:16px;height:16px;cursor:pointer;" />' +
-                    'Waive art fee <span style="color:#999;font-size:12px;">(no charge to customer)</span>' +
+                    'Waive art fee <span style="color:var(--gray-600);font-size:12px;">(no charge to customer)</span>' +
                 '</label>' +
                 '<div class="art-modal-actions">' +
                     '<button type="button" id="at-cancel" class="art-modal-btn-cancel">Cancel</button>' +

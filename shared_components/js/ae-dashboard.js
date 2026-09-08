@@ -145,7 +145,7 @@
         var moreDropdown = subRow.querySelector('.more-dropdown');
 
         // Build sub-tabs HTML
-        var html = sec.pages.map(function (p) {
+        var html = sec.pages.filter(function (p) { return !p.href; }).map(function (p) {
             var isActive = (!p.href && p.id === activePageId) ? ' is-active' : '';
             var external = p.href ? ' ae-nav__sub-tab--external' : '';
             if (p.href) {
@@ -156,7 +156,10 @@
                    escapeHtmlSafe(p.label) + '</button>';
         }).join('');
 
-        subRow.innerHTML = html + '<span class="ae-nav__sub-spacer"></span>';
+        var links = sec.pages.filter(function (p) { return p.href; }).map(function (p) {
+            return '<a class="ae-nav__sub-tab ae-nav__sub-tab--external" href="' + escapeHtmlSafe(p.href) + '" data-page="' + escapeHtmlSafe(p.id) + '">' + escapeHtmlSafe(p.label) + '</a>';
+        }).join('');
+        subRow.innerHTML = '<div class="ae-nav__sub-tabs" role="tablist" aria-label="Department pages">' + html + '</div>' + links + '<span class="ae-nav__sub-spacer"></span>';
         if (moreDropdown) subRow.appendChild(moreDropdown);
     }
 

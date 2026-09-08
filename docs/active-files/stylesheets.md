@@ -3,7 +3,11 @@
 ### Core CSS Files
 | File | Purpose | Used By | Status |
 |------|---------|---------|--------|
-| /shared_components/css/art-workflow.css | Scoped art queue, status, board and file-recovery patterns. Ruth first; Steve/AE migration follows. | Ruth workspace | Active |
+| /shared_components/css/art-theme.css | Small art-family semantic aliases and elapsed-time badges; shared by queues and details. | Steve, AE, Art Request Detail and Mockup Detail | Active |
+| /shared_components/css/art-intake.css | Common request form, upload and customer lookup patterns for four art request types. | AE Dashboard | Active |
+| /shared_components/css/art-actions.css | Shared ArtActions time, notes, approval and file dialogs. Separate from the smaller queue owner. | Steve, AE and Art Request Detail | Active |
+| /shared_components/css/art-detail.css | Shared artwork detail shell, panels, dialogs and customer theme adapters. | Art Request Detail and Mockup Detail | Active |
+| /shared_components/css/art-workflow.css | Scoped art queue, board, recovery and action dialog patterns. | Ruth, Steve, AE and art detail pages | Active |
 | `/shared_components/css/transfer-workflow.css` | Shared scoped sender patterns for migrated staff workflows (2026-09-08); legacy sender entry point remains for unmigrated art consumers. | Bradley Transfer / Screen Print queues | Active |
 | `/scripts/css/runtime-inventory.js` | Runtime style census: tracked pages, literal route aliases, CSS imports and script-generated owners; source evidence is distinct from browser coverage (2026-09-08). | CSS migration maintenance | Active |
 | `/shared_components/css/tokens.css` | **App-wide design tokens (2026-09-07)** — `@layer` order + palette/type/space/radius/shadow/motion/z-index; load FIRST on every page | staff dashboard, company numbers; every migrated family | ✅ Active |

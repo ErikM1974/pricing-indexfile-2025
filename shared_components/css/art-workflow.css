@@ -806,3 +806,107 @@
         }
     }
 }
+
+@layer components.patterns {
+    :where([data-ui="unified"][data-art-workflow]) :is(.sg-btn--primary, .sg-btn--active) {
+        background: var(--ui-accent);
+        border-color: var(--ui-accent);
+        color: var(--color-on-brand);
+    }
+}
+
+@layer components.patterns {
+    :where([data-ui="unified"])[data-art-workflow]
+        :is(.tool-btn, .sg-btn, .status-stat, .view-toggle-btn) {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--space-2);
+        min-height: var(--ui-control-height);
+        padding: var(--space-2) var(--space-3);
+        border: 1px solid var(--ui-line-strong);
+        border-radius: var(--radius-sm);
+        background: var(--ui-surface);
+        color: var(--ui-ink);
+        font: 600 var(--font-size-md)/1.3 var(--ui-font);
+        text-decoration: none;
+        cursor: pointer;
+        box-shadow: none;
+    }
+
+    :where([data-ui="unified"])[data-art-workflow]
+        :is(.tool-btn, .sg-btn, .status-stat, .view-toggle-btn):hover {
+        background: var(--ui-tint);
+        border-color: var(--ui-accent);
+    }
+
+    :where([data-ui="unified"])[data-art-workflow]
+        :is(
+            .sg-btn--primary,
+            .sg-btn--active,
+            .tool-btn--green,
+            .status-stat.active,
+            .view-toggle-btn.active
+        ) {
+        background: var(--ui-accent);
+        border-color: var(--ui-accent);
+        color: var(--color-on-brand);
+    }
+
+    :where([data-ui="unified"])[data-art-workflow] .status-stat.active::before {
+        background: var(--color-on-brand);
+    }
+
+    :where([data-ui="unified"])[data-art-workflow] .tool-workflow {
+        background: var(--ui-surface);
+        border: 1px solid var(--ui-line);
+        border-left: 3px solid var(--ui-accent);
+        border-radius: var(--radius-md);
+        padding: var(--space-4);
+        margin-bottom: var(--space-5);
+    }
+
+    :where([data-ui="unified"])[data-art-workflow] .tool-workflow-label {
+        color: var(--ui-muted);
+        font-size: var(--font-size-md);
+        font-weight: 600;
+        margin-bottom: var(--space-3);
+    }
+
+    :where([data-ui="unified"])[data-art-workflow] .tool-workflow-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-2);
+        align-items: center;
+    }
+
+    :where([data-ui="unified"])[data-art-workflow] .tool-workflow-arrow {
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"])[data-art-workflow]
+        :is(.tool-btn, .status-stat, .view-toggle-btn):focus-visible {
+        outline: 2px solid var(--ui-accent);
+        outline-offset: 3px;
+    }
+
+    :where([data-ui="unified"])[data-art-workflow] .sg-head-right {
+        flex-wrap: wrap;
+    }
+
+    :where([data-ui="unified"])[data-art-workflow] .sg-toolbar input {
+        min-width: min(100%, 220px);
+        max-width: 100%;
+        min-height: 44px;
+    }
+
+    @media (width <= 600px) {
+        :where([data-ui="unified"])[data-art-workflow] .tool-workflow-arrow {
+            display: none;
+        }
+
+        :where([data-ui="unified"])[data-art-workflow] .status-summary {
+            gap: var(--space-2);
+        }
+    }
+}

@@ -23,7 +23,19 @@ describe('unified CSS ownership and preserved content', () => {
         expect(bytes).toBeLessThanOrEqual(pilot.maxCssBytes);
         expect(pilot.states.length).toBeGreaterThan(0);
     });
-    test('migrated styles have resolved tokens, no important rules, no CSS IDs or shadowed global scales', () => {
+    test('migrated styles resolve tokens in every consuming page and keep bounded visibility exceptions', () => {
+        const normalize = value => value.replace(/\s+/g, ' ').trim();
+        const declaredByFile = new Map();
+        for (const file of new Set(manifest.pilots.flatMap(p => p.styles))) {
+            const names = new Set();
+            postcss.parse(read(file)).walkDecls(d => { if (d.prop.startsWith('--')) names.add(d.prop); });
+            declaredByFile.set(file, names);
+        }
+        const tokensByPage = new Map(manifest.pilots.map(pilot => [pilot.source,
+            new Set([...knownTokens, ...(pilot.dynamicTokens || []), ...pilot.styles.flatMap(file => [...declaredByFile.get(file)])])
+        ]));
+        const exceptions = manifest.importantExceptions || [];
+        const usedExceptions = [];
         const files = new Set(manifest.pilots.flatMap(p => p.styles));
         files.delete('shared_components/css/tokens.css');
         // Existing utility animations/sr-only remain independently maintained and linted.
@@ -36,12 +48,37 @@ describe('unified CSS ownership and preserved content', () => {
                 expect(rule.selector).toContain('[data-ui="unified"]');
             });
             css.walkDecls(d => {
-                expect({ file, property: d.prop, important: Boolean(d.important) }).toMatchObject({ important: false });
+                if (d.important) {
+                    const exception = exceptions.find(item => item.file === file && item.selector === normalize(d.parent.selector) && item.property === d.prop && item.value === d.value);
+                    expect({ file, selector: d.parent.selector, property: d.prop, documented: Boolean(exception) }).toMatchObject({ documented: true });
+                    expect(exception.reason.length).toBeGreaterThan(20);
+                    if (exception.context === 'print') {
+                        let parent = d.parent;
+                        while (parent && !(parent.type === 'atrule' && parent.name === 'media' && parent.params === 'print')) parent = parent.parent;
+                        expect(Boolean(parent)).toBe(true);
+                    }
+                    usedExceptions.push(exception);
+                }
                 expect(d.prop).not.toMatch(/^--(?:space-|font-size-|radius-|shadow-)/);
                 for (const token of d.value.matchAll(/var\((--[\w-]+)/g)) {
-                    expect({ file, token: token[1], defined: knownTokens.has(token[1]) || manifest.pilots.some(p => p.styles.includes(file) && (p.dynamicTokens || []).includes(token[1])) }).toMatchObject({ defined: true });
+                    for (const pilot of manifest.pilots.filter(p => p.styles.includes(file))) {
+                        expect({ page: pilot.source, file, token: token[1], defined: tokensByPage.get(pilot.source).has(token[1]) }).toMatchObject({ defined: true });
+                    }
                 }
             });
+        }
+        expect(usedExceptions).toHaveLength(exceptions.length);
+        expect(exceptions).toHaveLength(4);
+        expect(exceptions.every(item => item.file === 'pages/css/art-request-detail.css')).toBe(true);
+    });
+    test('unified transfer consumers load the dialog dependency before the sender', () => {
+        for (const pilot of manifest.pilots) {
+            const document = new JSDOM(read(pilot.source)).window.document;
+            const scripts = [...document.querySelectorAll('script[src]')].map(el => el.getAttribute('src').split('?')[0]);
+            const sender = scripts.indexOf('/shared_components/js/transfer-actions-shared.js');
+            if (sender < 0) continue;
+            const dialog = scripts.indexOf('/shared_components/js/ui-dialog.js');
+            expect({ page: pilot.source, ready: dialog >= 0 && dialog < sender }).toMatchObject({ ready: true });
         }
     });
     test('billing prices, prose, anchors and navigation match the pre-migration content', () => {

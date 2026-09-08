@@ -428,13 +428,178 @@
         "mobile"
       ],
       "test": "tests/e2e/css-unification-art.spec.js",
-      "maxCssBytes": 85098,
+      "maxCssBytes": 88279,
       "baseline": {
         "commit": "30ed9e519ab2845a9c54bc3ed6f3cd3c76b061d4",
         "rawCssBytes": 195318,
         "localCssRequests": 6
       },
-      "measuredRawCssBytes": 83050
+      "measuredRawCssBytes": 86231,
+      "budgetNote": "Shared opt-in art workflow controls and age badges now serve the Steve/AE family; Ruth visuals are regression checked."
+    },
+    {
+      "source": "dashboards/art-hub-steve.html",
+      "route": "/dashboards/art-hub-steve.html",
+      "family": "art-workflow",
+      "status": "migrated",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/art-theme.css",
+        "shared_components/css/art-workflow.css",
+        "shared_components/css/art-actions.css",
+        "shared_components/css/transfer-workflow.css",
+        "dashboards/css/art-hub-steve.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "queue",
+        "search",
+        "empty",
+        "selection-cancel",
+        "board",
+        "service-failure-retry",
+        "time-dialog-escape",
+        "keyboard",
+        "mobile",
+        "transfer-sender-dialog"
+      ],
+      "test": "tests/e2e/css-unification-art-details.spec.js",
+      "dynamicTokens": [
+        "--badge-bg",
+        "--badge-color"
+      ],
+      "baseline": {
+        "commit": "6f86e1e94666cde75c0855c9bf1d39138785131a",
+        "rawCssBytes": 235880,
+        "localCssRequests": 7
+      },
+      "measuredRawCssBytes": 157571,
+      "maxCssBytes": 159619,
+      "estimatedGzipCssBytes": 26062
+    },
+    {
+      "source": "dashboards/ae-dashboard.html",
+      "route": "/dashboards/ae-dashboard.html",
+      "family": "art-workflow",
+      "status": "migrated",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/art-theme.css",
+        "shared_components/css/art-workflow.css",
+        "shared_components/css/art-actions.css",
+        "shared_components/css/art-intake.css",
+        "dashboards/css/ae-dashboard.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "art-gallery",
+        "ruth-gallery",
+        "department-keyboard-navigation",
+        "more-menu",
+        "garment-intake",
+        "sticker-intake",
+        "banner-intake",
+        "jds-product-intake",
+        "ruth-intake",
+        "validation",
+        "file-queue-remove",
+        "mobile"
+      ],
+      "test": "tests/e2e/css-unification-art-details.spec.js",
+      "baseline": {
+        "commit": "6f86e1e94666cde75c0855c9bf1d39138785131a",
+        "rawCssBytes": 352636,
+        "localCssRequests": 12
+      },
+      "measuredRawCssBytes": 278859,
+      "maxCssBytes": 280907,
+      "estimatedGzipCssBytes": 37576
+    },
+    {
+      "source": "pages/art-request-detail.html",
+      "route": "/art-request/10001",
+      "family": "art-workflow",
+      "status": "migrated",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/art-theme.css",
+        "shared_components/css/art-actions.css",
+        "shared_components/css/art-detail.css",
+        "shared_components/css/transfer-workflow.css",
+        "pages/css/art-request-detail.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "staff",
+        "customer",
+        "loading",
+        "service-failure",
+        "customer-preview",
+        "revision-cancel",
+        "rush-readonly",
+        "sender-empty-cancel",
+        "staff-print",
+        "customer-print-privacy",
+        "mobile",
+        "transfer-sender-dialog"
+      ],
+      "test": "tests/e2e/css-unification-art-details.spec.js",
+      "dynamicTokens": [
+        "--badge-bg",
+        "--badge-color"
+      ],
+      "baseline": {
+        "commit": "6f86e1e94666cde75c0855c9bf1d39138785131a",
+        "rawCssBytes": 288866,
+        "localCssRequests": 5
+      },
+      "measuredRawCssBytes": 266717,
+      "maxCssBytes": 268765,
+      "estimatedGzipCssBytes": 37319
+    },
+    {
+      "source": "pages/mockup-detail.html",
+      "route": "/mockup/101",
+      "family": "art-workflow",
+      "status": "migrated",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/art-theme.css",
+        "shared_components/css/art-detail.css",
+        "shared_components/css/transfer-workflow.css",
+        "pages/css/mockup-detail.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "staff",
+        "customer",
+        "loading",
+        "service-failure",
+        "revision-cancel",
+        "rush-readonly",
+        "thread-picker",
+        "thread-search-empty",
+        "thread-keyboard-choice",
+        "thread-escape",
+        "mobile"
+      ],
+      "test": "tests/e2e/css-unification-art-details.spec.js",
+      "dynamicTokens": [
+        "--badge-bg",
+        "--badge-color"
+      ],
+      "baseline": {
+        "commit": "6f86e1e94666cde75c0855c9bf1d39138785131a",
+        "rawCssBytes": 141469,
+        "localCssRequests": 5
+      },
+      "measuredRawCssBytes": 211674,
+      "maxCssBytes": 213722,
+      "estimatedGzipCssBytes": 30962
     }
   ],
   "billingContentSha256": "d85f8530e03a1863d1b8bb2ebe97ba332d5c9e3411887d1eb2d02dcdb14c0863",
@@ -504,5 +669,39 @@
       "note": "These sources execute Caspio /emb scripts. Bradley and the current Steve/Ruth/AE workflow use app-rendered markup; historical DataPage comments, CDN images and date utilities are not embedded UI."
     }
   ],
-  "ruthBillingContentSha256": "153e67f628dc0f0d45cededc8b1eb4923d90363f4a056b5ad01b14d7ae46ca68"
+  "ruthBillingContentSha256": "153e67f628dc0f0d45cededc8b1eb4923d90363f4a056b5ad01b14d7ae46ca68",
+  "importantExceptions": [
+    {
+      "file": "pages/css/art-request-detail.css",
+      "selector": ":where([data-ui=\"unified\"]).ard-page.ard-customer-view .ard-steve-actions, :where([data-ui=\"unified\"]).ard-page.ard-customer-view .ard-action-bar, :where([data-ui=\"unified\"]).ard-page.ard-customer-view [id=\"ard-invoice-section\"], :where([data-ui=\"unified\"]).ard-page.ard-customer-view .ard-add-note-form, :where([data-ui=\"unified\"]).ard-page.ard-customer-view .ard-add-note-toggle",
+      "property": "display",
+      "value": "none",
+      "context": "screen-and-print",
+      "reason": "Keep internal staff actions hidden when runtime inline display styles are present in customer view."
+    },
+    {
+      "file": "pages/css/art-request-detail.css",
+      "selector": ":where([data-ui=\"unified\"]).ard-page.ard-has-print-sheet .ard-header, :where([data-ui=\"unified\"]).ard-page.ard-has-print-sheet [id=\"ard-loading\"], :where([data-ui=\"unified\"]).ard-page.ard-has-print-sheet [id=\"ard-error\"], :where([data-ui=\"unified\"]).ard-page.ard-has-print-sheet .ard-content, :where([data-ui=\"unified\"]).ard-page.ard-has-print-sheet .ard-footer, :where([data-ui=\"unified\"]).ard-page.ard-has-print-sheet .ard-modal-overlay, :where([data-ui=\"unified\"]).ard-page.ard-has-print-sheet .art-modal-overlay, :where([data-ui=\"unified\"]).ard-page.ard-has-print-sheet .ard-lightbox, :where([data-ui=\"unified\"]).ard-page.ard-has-print-sheet .approval-modal-overlay, :where([data-ui=\"unified\"]).ard-page.ard-has-print-sheet .share-customer-modal, :where([data-ui=\"unified\"]).ard-page.ard-has-print-sheet [id=\"share-customer-overlay\"], :where([data-ui=\"unified\"]).ard-page.ard-has-print-sheet .ard-print-btn",
+      "property": "display",
+      "value": "none",
+      "context": "print",
+      "reason": "The staff-only print sheet must override runtime inline visibility and screen background styles."
+    },
+    {
+      "file": "pages/css/art-request-detail.css",
+      "selector": ":where([data-ui=\"unified\"]).ard-page.ard-has-print-sheet .ard-print-sheet",
+      "property": "display",
+      "value": "block",
+      "context": "print",
+      "reason": "The staff-only print sheet must override runtime inline visibility and screen background styles."
+    },
+    {
+      "file": "pages/css/art-request-detail.css",
+      "selector": ":where([data-ui=\"unified\"]).ard-page.ard-has-print-sheet",
+      "property": "background",
+      "value": "var(--color-surface)",
+      "context": "print",
+      "reason": "The staff-only print sheet must override runtime inline visibility and screen background styles."
+    }
+  ]
 }

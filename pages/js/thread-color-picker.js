@@ -12,6 +12,7 @@ var ThreadColorPicker = (function() {
     var currentRunIndex = -1;
     var activeFamily = 'All';
     var searchQuery = '';
+    var returnFocus = null;
 
     // DOM refs (created once)
     var overlay, container, searchInput, familyBar, grid, currentLabel;
@@ -42,6 +43,7 @@ var ThreadColorPicker = (function() {
 
     function open(runIndex, currentColor, onSelect) {
         if (!modal) return;
+        returnFocus = document.activeElement;
         currentRunIndex = runIndex;
         onSelectCallback = onSelect;
         activeFamily = 'All';
@@ -62,15 +64,19 @@ var ThreadColorPicker = (function() {
         var tabs = familyBar.querySelectorAll('.tcp-tab');
         for (var i = 0; i < tabs.length; i++) {
             tabs[i].classList.toggle('active', tabs[i].dataset.family === 'All');
+            tabs[i].setAttribute('aria-pressed', String(tabs[i].dataset.family === 'All'));
         }
 
         _renderGrid();
         overlay.classList.add('visible');
+        searchInput.focus();
     }
 
     function close() {
         if (overlay) overlay.classList.remove('visible');
         onSelectCallback = null;
+        if (returnFocus && returnFocus.isConnected) returnFocus.focus();
+        returnFocus = null;
     }
 
     function _buildModal() {
@@ -82,15 +88,29 @@ var ThreadColorPicker = (function() {
 
         container = document.createElement('div');
         container.className = 'tcp-modal';
+        container.setAttribute('role', 'dialog');
+        container.setAttribute('aria-modal', 'true');
+        container.setAttribute('aria-labelledby', 'tcp-title');
+        overlay.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); close(); return; }
+            if (e.key !== 'Tab') return;
+            var controls = Array.from(container.querySelectorAll('button:not(:disabled), input:not(:disabled)'));
+            var first = controls[0], last = controls[controls.length - 1];
+            if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+            else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+        });
 
         // Header
         var header = document.createElement('div');
         header.className = 'tcp-header';
         var title = document.createElement('h3');
         title.textContent = 'Choose Thread Color';
+        title.id = 'tcp-title';
         var closeBtn = document.createElement('button');
         closeBtn.className = 'tcp-close';
-        closeBtn.innerHTML = '<i class="fas fa-times" aria-hidden="true"></i>';
+        closeBtn.type = 'button';
+        closeBtn.setAttribute('aria-label', 'Close thread color picker');
+        closeBtn.textContent = '\u00d7';
         closeBtn.addEventListener('click', close);
         header.appendChild(title);
         header.appendChild(closeBtn);
@@ -110,6 +130,7 @@ var ThreadColorPicker = (function() {
         searchInput = document.createElement('input');
         searchInput.type = 'text';
         searchInput.className = 'tcp-search';
+        searchInput.setAttribute('aria-label', 'Search thread colors');
         searchInput.placeholder = 'Search by name or catalog #...';
         var debounceTimer = null;
         searchInput.addEventListener('input', function() {
@@ -129,11 +150,14 @@ var ThreadColorPicker = (function() {
             tab.className = 'tcp-tab' + (fam === 'All' ? ' active' : '');
             tab.textContent = fam;
             tab.dataset.family = fam;
+            tab.type = 'button';
+            tab.setAttribute('aria-pressed', String(fam === 'All'));
             tab.addEventListener('click', function() {
                 activeFamily = fam;
                 var tabs = familyBar.querySelectorAll('.tcp-tab');
                 for (var i = 0; i < tabs.length; i++) {
                     tabs[i].classList.toggle('active', tabs[i].dataset.family === fam);
+                    tabs[i].setAttribute('aria-pressed', String(tabs[i].dataset.family === fam));
                 }
                 _renderGrid();
             });
@@ -171,9 +195,17 @@ var ThreadColorPicker = (function() {
             return true;
         });
 
+        if (filtered.length === 0) {
+            var empty = document.createElement('p');
+            empty.className = 'tcp-empty';
+            empty.setAttribute('role', 'status');
+            empty.textContent = 'No matching thread colors. Try a different name or catalog number.';
+            grid.appendChild(empty);
+        }
         var frag = document.createDocumentFragment();
         filtered.forEach(function(color) {
-            var cell = document.createElement('div');
+            var cell = document.createElement('button');
+            cell.type = 'button';
             cell.className = 'tcp-cell';
             cell.addEventListener('click', function() {
                 if (onSelectCallback) {

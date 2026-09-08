@@ -206,6 +206,7 @@ var artrequdetaLog = ARTREQUDETA_LOG_ON ? console.log.bind(console) : function (
     // Customer view — set up header before data loads
     if (isCustomerView) {
         document.body.classList.add('ard-customer-view');
+        document.body.dataset.surface = 'storefront';
         var headerTitle = document.querySelector('.ard-header-text h1');
         if (headerTitle) headerTitle.textContent = 'Mockup Approval';
         var backLink = document.querySelector('.ard-back-link');
@@ -714,6 +715,14 @@ var artrequdetaLog = ARTREQUDETA_LOG_ON ? console.log.bind(console) : function (
         const btn = document.getElementById('ard-rush-toggle');
         if (!btn) return;
         const isRush = isRushy(req.Is_Rush);
+        if (isCustomerView) {
+            btn.textContent = 'Rush order';
+            btn.title = 'Rush order';
+            btn.disabled = true;
+            btn.classList.toggle('ard-rush-toggle--active', isRush);
+            btn.style.display = isRush ? 'inline-flex' : 'none';
+            return;
+        }
         btn.innerHTML = isRush
             ? '\uD83D\uDD25 RUSH ACTIVE <span class="ard-rush-toggle-hint">(click to clear)</span>'
             : '\uD83D\uDD25 Mark as Rush';

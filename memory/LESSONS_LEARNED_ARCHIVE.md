@@ -3929,3 +3929,25 @@ stylesheet. (f) Write lint output to a file and read it.
 value is a colour. 🔑 After every automated pass, run the full lint and grep for `var(--[a-z0-9-]+)[A-Za-z_-]`
 before the screenshots; a dropped rule is silent in a browser. 🔑 A substring lock on CSS should pin the
 MEANING (a selector exists, a value is a custom property), not the exact bytes. 🔑 `stylelint --fix` (number-no-trailing-zeros) rewrote `oklch(55.0% …)` as `oklch(55.% …)`, an invalid value that silently drops the declaration — after every `--fix`, grep the touched sheets for `[0-9]\.[%)]` and re-lint (the parser reports it as declaration-property-value-no-unknown).
+
+
+## 2026-09-07 — Pages batch: a re-run tokenizer turned its own variables into `--x: var(--x)`
+
+**Problem.** Two sheets had gradient values wrapped onto continuation lines, which the tokenizer's
+"a `:` must precede the hex on its line" guard skips. Joining the lines and re-running the tokenizer on
+those two sheets rewrote the page-theme `:root` block it had written on the first pass: every
+`--customer-portal-yellow: #e6bb4a` became `--customer-portal-yellow: var(--customer-portal-yellow)`,
+a new block re-declared the hexes above it, and the last declaration wins — a self-reference, which a
+browser treats as invalid at computed-value time. Three pages (customer portal, customer product, garment
+designer) would have lost every one-off colour. The lint caught it as `declaration-block-no-duplicate-custom-properties`;
+the screenshot diff would have too.
+**Root cause.** The tokenizer skipped comments but not the `stylelint-disable color-no-hex … enable`
+region it writes, and it named variables fresh on every run instead of reusing the ones already declared.
+**Solution.** The disable/enable region is now skipped like a comment, existing `--<prefix>-*` declarations
+are read first and reused by value, and new names avoid the existing ones; a dry run over a migrated sheet
+reports `0 page vars`. Continuation lines are joined onto their declaration line (`join-continuations.py`)
+before tokenizing — a declaration can span three lines, so join until the line carries the `:`.
+**Prevention.** 🔑 Any script that rewrites a file it may run over again must recognise its own output. 🔑
+Run the tokenizer with `--dry` on an already-migrated sheet before a re-run: the expected report is
+`exact 0 · near 0 · far 0 → 0 page vars`. 🔑 After a re-run, grep `^\s*(--[a-z0-9-]+):\s*var\(\1\)` — a
+self-referencing custom property is silent in the browser and blanks every use of the variable.

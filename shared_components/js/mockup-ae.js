@@ -106,7 +106,7 @@ var MockupAeGallery = (function () {
         if (!container) return;
 
         if (allMockups.length === 0) {
-            container.innerHTML = '<div style="text-align:center;padding:60px 20px;color:#999;">'
+            container.innerHTML = '<div style="text-align:center;padding:60px 20px;color:var(--gray-600);">'
                 + '<div style="font-size:48px;margin-bottom:12px;">&#128194;</div>'
                 + '<div style="font-size:16px;font-weight:500;">No mockup requests yet</div>'
                 + '</div>';
@@ -142,7 +142,7 @@ var MockupAeGallery = (function () {
             html += '<option value="' + name + '"' + (name === currentRepFilter ? ' selected' : '') + '>' + name + '</option>';
         });
         html += '</select>';
-        html += '<span id="mockup-ae-rep-count" style="font-size:12px;color:#94a3b8;margin-left:auto;"></span>';
+        html += '<span id="mockup-ae-rep-count" style="font-size:12px;color:var(--gray-600);margin-left:auto;"></span>';
         html += '</div>';
 
         // Card grid — filter by rep + search
@@ -156,7 +156,7 @@ var MockupAeGallery = (function () {
             var msg = (currentBucketFilter === 'needs-review')
                 ? "You're all caught up — nothing waiting for your review."
                 : 'No mockups match this filter.';
-            html += '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#999;">'
+            html += '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--gray-600);">'
                 + msg + '</div>';
         } else {
             displayMockups.forEach(function (m) {
@@ -319,10 +319,10 @@ var MockupAeGallery = (function () {
         var html = '<div class="status-summary">';
         chips.forEach(function (c) {
             var active = currentBucketFilter === c.key ? ' active' : '';
-            html += '<div class="status-stat status-stat--' + c.modifier + active + '" '
+            html += '<button type="button" class="status-stat status-stat--' + c.modifier + active + '" '
                 + 'data-bucket="' + c.key + '" title="' + escapeHtml(c.label) + '">'
                 + '<span class="status-stat-count" data-stat="' + c.key + '">' + c.count + '</span>'
-                + '<span class="status-stat-label">' + escapeHtml(c.label) + '</span></div>';
+                + '<span class="status-stat-label">' + escapeHtml(c.label) + '</span></button>';
         });
         html += '</div>';
         return html;
@@ -352,7 +352,7 @@ var MockupAeGallery = (function () {
             var msg = (currentBucketFilter === 'needs-review')
                 ? "You're all caught up — nothing waiting for your review."
                 : 'No mockups match this filter.';
-            html = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#999;">'
+            html = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--gray-600);">'
                 + msg + '</div>';
         } else {
             displayMockups.forEach(function (m) { html += buildCard(m); });
@@ -445,7 +445,7 @@ var MockupAeGallery = (function () {
         var ctaHtml = '';
         if (status === 'Awaiting Approval') {
             ctaHtml = '<div class="card-actions">'
-                + '<span style="font-size:12px;color:#d97706;font-weight:600;padding:6px 0;">&#9888; Needs your review</span>'
+                + '<span style="font-size:12px;color:var(--amber-800);font-weight:600;padding:6px 0;">&#9888; Needs your review</span>'
                 + (elapsedBadge ? '<div>' + elapsedBadge + '</div>' : '')
                 + '</div>';
         } else if (elapsedBadge) {
