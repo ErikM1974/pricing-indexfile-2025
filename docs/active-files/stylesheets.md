@@ -3,6 +3,7 @@
 ### Core CSS Files
 | File | Purpose | Used By | Status |
 |------|---------|---------|--------|
+| `/scripts/css/runtime-inventory.js` | Runtime style census: tracked pages, literal route aliases, CSS imports and script-generated owners; source evidence is distinct from browser coverage (2026-09-08). | CSS migration maintenance | Active |
 | `/shared_components/css/tokens.css` | **App-wide design tokens (2026-09-07)** — `@layer` order + palette/type/space/radius/shadow/motion/z-index; load FIRST on every page | staff dashboard, company numbers; every migrated family | ✅ Active |
 | `/shared_components/css/universal-header.css` | Header styles | All pages | ✅ Active |
 | `/shared_components/css/universal-calculator-theme.css` | Calculator theme | All calculators | ✅ Active |

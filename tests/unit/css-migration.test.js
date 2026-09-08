@@ -30,6 +30,7 @@ describe('unified CSS ownership and preserved content', () => {
         for (const file of files) {
             const css = postcss.parse(read(file));
             css.walkRules(rule => {
+                if (rule.parent.type === 'atrule' && rule.parent.name.endsWith('keyframes')) return;
                 expect({ file, selector: rule.selector }).not.toMatchObject({ selector: expect.stringMatching(/#[\w-]+/) });
                 expect(rule.selector).toContain('[data-ui="unified"]');
             });
@@ -37,7 +38,7 @@ describe('unified CSS ownership and preserved content', () => {
                 expect({ file, property: d.prop, important: Boolean(d.important) }).toMatchObject({ important: false });
                 expect(d.prop).not.toMatch(/^--(?:space-|font-size-|radius-|shadow-)/);
                 for (const token of d.value.matchAll(/var\((--[\w-]+)/g)) {
-                    expect({ file, token: token[1], defined: knownTokens.has(token[1]) }).toMatchObject({ defined: true });
+                    expect({ file, token: token[1], defined: knownTokens.has(token[1]) || manifest.pilots.some(p => p.styles.includes(file) && (p.dynamicTokens || []).includes(token[1])) }).toMatchObject({ defined: true });
                 }
             });
         }

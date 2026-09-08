@@ -91,15 +91,16 @@
                 '<button type="button" class="gp-cell-btn" data-act="retry">Try again</button>';
         } else {
             body = '<div class="gp-cell-empty"><span class="gp-cell-plus">+</span>' +
-                '<span class="gp-cell-hint">Drop a photo</span></div>';
+                '<span class="gp-cell-hint">Drop a photo</span></div>' +
+                '<button type="button" class="gp-cell-btn" data-act="choose">Choose photo</button>';
         }
 
         return '<div class="gp-cell gp-cell--' + state + (isHero ? ' gp-cell--hero' : '') + '"' +
-            ' data-key="' + esc(cell.key) + '" tabindex="0" role="button"' +
+            ' data-key="' + esc(cell.key) + '" role="group"' +
             ' aria-label="Photo for ' + esc(cell.styleOption) + ', ' + esc(cell.colorName) + '">' +
             '<div class="gp-cell-label">' + esc(cell.styleOption) + ' · ' + esc(cell.colorName) + '</div>' +
             body +
-            '<label class="gp-cell-hero"><input type="radio" name="gp-hero" value="' + esc(cell.key) + '"' +
+            '<label class="gp-cell-hero choice"><input type="radio" name="gp-hero" value="' + esc(cell.key) + '"' +
             (isHero ? ' checked' : '') + '> Main photo</label>' +
             '</div>';
     }
@@ -128,7 +129,7 @@
                 return cellMarkup(cell, draft.images[cell.key], draft.heroKey === cell.key);
             }).join('') +
             '</div>' +
-            '<details class="gp-binding"><summary>Show which photo each variant uses</summary>' +
+            '<details class="gp-binding" role="region" aria-label="Variant image bindings" tabindex="0"><summary>Show which photo each variant uses</summary>' +
             bindingTable(draft, plan) + '</details>';
     }
 

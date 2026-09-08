@@ -94,7 +94,7 @@
         let glyphs = '';
         for (let i = 0; i < SRC_GLYPHS.length; i++) {
             if (d.srcBits & SRC_GLYPHS[i][0]) {
-                glyphs += '<i class="dg-src fas ' + SRC_GLYPHS[i][1] + '" title="' + SRC_GLYPHS[i][2] + '" aria-label="' + SRC_GLYPHS[i][2] + '"></i>';
+                glyphs += '<i role="img" class="dg-src fas ' + SRC_GLYPHS[i][1] + '" title="' + SRC_GLYPHS[i][2] + '" aria-label="' + SRC_GLYPHS[i][2] + '"></i>';
             }
         }
         let dup = '';
@@ -103,21 +103,21 @@
                 .filter(function (n) { return +n !== dn; })
                 .map(function (n) { return '#' + (+n || 0); })
                 .join(', ');
-            dup = '<span class="dg-dup" title="' + DG.esc('Possible duplicate of ' + others) + '" aria-label="' + DG.esc('Possible duplicate of ' + others) + '"><i class="fas fa-clone" aria-hidden="true"></i></span>';
+            dup = '<span role="img" class="dg-dup" title="' + DG.esc('Possible duplicate of ' + others) + '" aria-label="' + DG.esc('Possible duplicate of ' + others) + '"><i class="fas fa-clone" aria-hidden="true"></i></span>';
         }
         const custAttr = +d.customerId ? ' data-customer="' + (+d.customerId) + '" title="Open customer portfolio"' : '';
         return '<article class="dg-card' + (density === 'wall' ? ' dg-card--wall' : '') + '"'
             + ' data-dn="' + dn + '"' + (hasIdx ? ' data-idx="' + idx + '"' : '') + (needsThumb ? ' data-thumb="1"' : '')
             + ' tabindex="-1" aria-label="' + DG.esc('Design #' + dn + (d.company ? ' — ' + d.company : '') + (d.name ? ' — ' + d.name : '')) + '">'
             + '<div class="dg-card-thumb">' + thumb + '</div>'
-            + '<div class="dg-card-number">#' + dn + '</div>'
+            + '<div class="dg-card-body"><div class="dg-card-number">#' + dn + '</div>'
             + '<div class="dg-card-company"' + custAttr + '>' + (d.company ? DG.esc(d.company) : '&mdash;') + '</div>'
             + '<div class="dg-card-name">' + DG.esc(d.name || '') + '</div>'
             + '<div class="dg-card-meta">' + badge
             + (st ? '<span>' + st + '</span>' : '')
             + (glyphs ? '<span class="dg-src-row">' + glyphs + '</span>' : '')
             + (d.variantCount > 1 ? '<span class="dg-variants">&times;' + (+d.variantCount) + '</span>' : '')
-            + dup + '</div>'
+            + dup + '</div></div>'
             + '<button type="button" class="dg-copy" data-copy-dn="' + dn + '" tabindex="-1"'
             + ' title="Copy design number" aria-label="' + DG.esc('Copy design number ' + dn) + '"><i class="fas fa-copy" aria-hidden="true"></i></button>'
             + '</article>';
@@ -387,7 +387,7 @@
         cbs.onOpen = opts.onOpen || null;
         cbs.onCustomerClick = opts.onCustomerClick || null;
         if (!els.grid || !els.topSpacer || !els.bottomSpacer) return;
-        els.viewport = els.grid.closest('[role="grid"]') || els.grid.parentElement;
+        els.viewport = els.grid.closest('.dg-grid-viewport') || els.grid.parentElement;
 
         density = lsGet('dg-density') === 'wall' ? 'wall' : 'comfortable';
         els.grid.classList.toggle('dg-grid--wall', density === 'wall');

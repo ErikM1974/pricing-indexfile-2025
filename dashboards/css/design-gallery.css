@@ -1,103 +1,77 @@
-/* stylelint-disable no-duplicate-selectors -- legacy sheet: rules were appended over time; merging them would reorder the cascade (2026-09-07) */
-
-/* ==========================================================================
-   design-gallery.css — Design Vault (Design Gallery v3)
-   Page: dashboards/design-gallery.html
-
-   Contract: scratchpad DG-CONTRACTS.md (CSS section). Loads AFTER
-   shared_components/css/art-hub.css (2026 tokens) and dash-shell.css
-   (shell classes). Tokens ONLY — the sole hex values in this file are the
-   3-line page theme override below. The artwork provides the color; the
-   chrome stays calm: light surfaces, generous --space-6 gutters, Inter
-   body, JetBrains Mono for design numbers and counts.
-
-   JS emits the .dg-* classes styled here (grid/rails/drawer agents) —
-   renaming a class here breaks their markup contract.
-   ========================================================================== */
-
-/* File-wide [hidden] guard — REQUIRED first rule. An author display rule
-   (grid/flex) beats the UA [hidden]{display:none}; this keeps JS `hidden`
-   toggles honest (LESSONS 2026-07-19, recurrence #5). */
-/* stylelint-disable-next-line declaration-no-important -- the hidden attribute must beat any display rule */
-[hidden] { display: none !important; }
-
-/* ---------- Page theme (the ONLY hex in this file) ---------- */
-:root {
-    --dash-theme:      var(--brand-700);
-    --dash-theme-dark: var(--store-green-900);
-    --dash-theme-bg:   var(--store-green-50);
-}
+/* design-gallery: scoped workspace layout. Shared controls, tokens, hidden state and shell live in components.css. Business hooks and virtualization sizes remain page-owned. */
+@layer components.pages {:where([data-ui="unified"]).dg-drawer-open { overflow: hidden; }
+:where([data-ui="unified"]) .dg-drawer-body > * { flex-shrink: 0; }/* stylelint-disable no-duplicate-selectors -- legacy sheet: rules were appended over time; merging them would reorder the cascade (2026-09-07) */
 
 /* ==========================================================================
    Base / layout
    ========================================================================== */
-.dg-body {
+:where([data-ui="unified"]).dg-body {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    background: var(--surface-page);
+    background: var(--ui-canvas);
     color: var(--gray-800);
 }
 
-.dg-main {
+:where([data-ui="unified"]) .dg-main {
     width: 100%;
 }
 
-.dg-body :focus-visible {
-    outline: 2px solid var(--dash-theme);
+:where([data-ui="unified"]).dg-body :focus-visible {
+    outline: 2px solid var(--ui-accent);
     outline-offset: 2px;
     border-radius: var(--radius-sm);
 }
 
 /* Shared monospace voice for design numbers, counts, timings */
-.dg-mono,
-.dg-card-number,
-.dg-results-count,
-.dg-dst-list,
-.dg-variants,
-.dg-omnibox-kbd,
-.dg-lightbox-cap {
-    font-family: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+:where([data-ui="unified"]) .dg-mono,
+:where([data-ui="unified"]) .dg-card-number,
+:where([data-ui="unified"]) .dg-results-count,
+:where([data-ui="unified"]) .dg-dst-list,
+:where([data-ui="unified"]) .dg-variants,
+:where([data-ui="unified"]) .dg-omnibox-kbd,
+:where([data-ui="unified"]) .dg-lightbox-cap {
+    font-family: var(--font-mono);
     font-variant-numeric: tabular-nums;
 }
 
 /* ==========================================================================
    Boot overlay — first-visit index download / build-wait
    ========================================================================== */
-.dg-boot {
+:where([data-ui="unified"]) .dg-boot {
     position: fixed;
     inset: 0;
     z-index: 500;
     display: grid;
     place-items: center;
     background:
-        radial-gradient(1100px 560px at 50% 28%, var(--dash-theme-bg), transparent 70%),
-        var(--surface-page);
+        radial-gradient(1100px 560px at 50% 28%, var(--ui-tint), transparent 70%),
+        var(--ui-canvas);
 }
 
-.dg-boot-card {
-    width: min(420px, calc(100vw - var(--space-8)));
-    padding: var(--space-8);
-    background: var(--surface-card);
+:where([data-ui="unified"]) .dg-boot-card {
+    width: min(420px, calc(100vw - var(--space-6)));
+    padding: var(--space-6);
+    background: var(--ui-surface);
     border: 1px solid var(--gray-200);
     border-radius: var(--radius-xl);
-    box-shadow: var(--shadow-lg);
+    box-shadow: var(--shadow-md);
     text-align: center;
 }
 
-.dg-boot-logo {
+:where([data-ui="unified"]) .dg-boot-logo {
     width: 56px;
     height: 56px;
     margin: 0 auto var(--space-4);
     display: grid;
     place-items: center;
     font-size: 1.4rem;
-    color: var(--dash-theme);
-    background: var(--dash-theme-bg);
+    color: var(--ui-accent);
+    background: var(--ui-tint);
     border-radius: var(--radius-lg);
 }
 
-.dg-boot-title {
+:where([data-ui="unified"]) .dg-boot-title {
     margin: 0 0 var(--space-2);
     font-size: 1.25rem;
     font-weight: 700;
@@ -105,37 +79,37 @@
     color: var(--gray-900);
 }
 
-.dg-boot-msg {
+:where([data-ui="unified"]) .dg-boot-msg {
     margin: 0 0 var(--space-5);
     font-size: 0.9rem;
-    color: var(--gray-500);
+    color: var(--ui-muted);
     min-height: 1.3em;
 }
 
-.dg-boot-track {
+:where([data-ui="unified"]) .dg-boot-track {
     height: 6px;
-    background: var(--surface-inset);
+    background: var(--gray-100);
     border-radius: var(--radius-pill);
     overflow: hidden;
 }
 
 /* Width % is set inline by JS (store progress events) */
-.dg-boot-bar {
+:where([data-ui="unified"]) .dg-boot-bar {
     height: 100%;
     width: 0;
-    background: linear-gradient(90deg, var(--dash-theme), var(--dash-theme-dark));
+    background: linear-gradient(90deg, var(--ui-accent), var(--ui-accent-hover));
     border-radius: var(--radius-pill);
     transition: width 280ms var(--ease-out);
 }
 
-.dg-boot-retry {
+:where([data-ui="unified"]) .dg-boot-retry {
     margin-top: var(--space-5);
 }
 
 /* ==========================================================================
    Header — dash-shell green band + freshness pill
    ========================================================================== */
-.dash-header-inner {
+:where([data-ui="unified"]) .dash-header-inner {
     width: 100%;
     max-width: 1400px;
     margin: 0 auto;
@@ -146,7 +120,7 @@
     flex-wrap: wrap;
 }
 
-.dg-header-title {
+:where([data-ui="unified"]) .dg-header-title {
     flex: 1;
     display: flex;
     align-items: baseline;
@@ -155,25 +129,25 @@
     min-width: 0;
 }
 
-.dg-header-title h1 {
+:where([data-ui="unified"]) .dg-header-title h1 {
     margin: 0;
     font-size: 1.2rem;
     font-weight: 650;
     letter-spacing: -0.01em;
-    color: var(--surface-card);
+    color: var(--ui-ink);
     display: inline-flex;
     align-items: center;
     gap: var(--space-2);
 }
 
-.dg-subtitle {
+:where([data-ui="unified"]) .dg-subtitle {
     font-size: 0.8rem;
     font-weight: 500;
-    color: color-mix(in srgb, var(--surface-card) 72%, transparent);
+    color: var(--ui-muted);
 }
 
 /* Freshness pill: quiet gray glass while fresh, amber when the index ages */
-.dg-freshness {
+:where([data-ui="unified"]) .dg-freshness {
     display: inline-flex;
     align-items: center;
     gap: 6px;
@@ -181,33 +155,35 @@
     font: inherit;
     font-size: 0.78rem;
     font-weight: 600;
-    color: var(--surface-card);
-    background: color-mix(in srgb, var(--surface-card) 14%, transparent);
-    border: 1px solid color-mix(in srgb, var(--surface-card) 30%, transparent);
+    color: var(--ui-accent);
+    background: var(--ui-tint);
+    border: 1px solid var(--ui-line);
     border-radius: var(--radius-pill);
     cursor: pointer;
-    transition: background var(--dur-base) var(--ease-out), color var(--dur-base) var(--ease-out);
+    transition: background var(--motion-base) var(--ease-out), color var(--motion-base) var(--ease-out);
+    min-height: var(--ui-control-height);
+    min-width: var(--ui-control-height);
 }
 
-.dg-freshness:hover {
-    background: color-mix(in srgb, var(--surface-card) 24%, transparent);
+:where([data-ui="unified"]) .dg-freshness:hover {
+    background: color-mix(in srgb, var(--ui-surface) 24%, transparent);
 }
 
-.dg-freshness.is-fresh {
-    color: color-mix(in srgb, var(--surface-card) 85%, transparent);
+:where([data-ui="unified"]) .dg-freshness.is-fresh {
+    color: var(--ui-accent);
 }
 
-.dg-freshness.is-stale {
-    color: var(--state-warning);
-    background: var(--state-warning-bg);
-    border-color: color-mix(in srgb, var(--state-warning) 45%, transparent);
+:where([data-ui="unified"]) .dg-freshness.is-stale {
+    color: var(--color-warning-ink);
+    background: var(--color-warning-bg);
+    border-color: color-mix(in srgb, var(--color-warning-ink) 45%, transparent);
 }
 
 /* ==========================================================================
    Toolbar — omnibox, customer #, filters
    ========================================================================== */
-.dg-toolbar {
-    background: var(--surface-card);
+:where([data-ui="unified"]) .dg-toolbar {
+    background: var(--ui-surface);
     border: 1px solid var(--gray-200);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-sm);
@@ -215,14 +191,14 @@
     margin-bottom: var(--space-6);
 }
 
-.dg-toolbar-row {
+:where([data-ui="unified"]) .dg-toolbar-row {
     display: flex;
     align-items: center;
     gap: var(--space-4);
     flex-wrap: wrap;
 }
 
-.dg-toolbar-row--filters {
+:where([data-ui="unified"]) .dg-toolbar-row--filters {
     margin-top: var(--space-3);
     padding-top: var(--space-3);
     border-top: 1px solid var(--gray-100);
@@ -230,47 +206,48 @@
 }
 
 /* -- omnibox -- */
-.dg-omnibox-wrap {
+:where([data-ui="unified"]) .dg-omnibox-wrap {
     position: relative;
     flex: 1 1 340px;
     min-width: 240px;
 }
 
-.dg-omnibox-icon {
+:where([data-ui="unified"]) .dg-omnibox-icon {
     position: absolute;
     left: 14px;
     top: 50%;
     transform: translateY(-50%);
-    color: var(--gray-400);
+    color: var(--ui-muted);
     font-size: 0.9rem;
     pointer-events: none;
 }
 
-.dg-omnibox {
+:where([data-ui="unified"]) .dg-omnibox {
     width: 100%;
     box-sizing: border-box;
     padding: 0.65rem 4.4rem 0.65rem 2.5rem;
     font: inherit;
-    font-size: 0.95rem;
+    font-size: var(--font-size-base);
     color: var(--gray-900);
-    background: var(--surface-inset);
+    background: var(--gray-100);
     border: 1px solid var(--gray-200);
     border-radius: var(--radius-md);
-    transition: background var(--dur-base) var(--ease-out), border-color var(--dur-base) var(--ease-out), box-shadow var(--dur-base) var(--ease-out);
+    transition: background var(--motion-base) var(--ease-out), border-color var(--motion-base) var(--ease-out), box-shadow var(--motion-base) var(--ease-out);
+    min-height: var(--ui-control-height);
 }
 
-.dg-omnibox::placeholder { color: var(--gray-400); }
+:where([data-ui="unified"]) .dg-omnibox::placeholder { color: var(--ui-muted); }
 
-.dg-omnibox:focus {
+:where([data-ui="unified"]) .dg-omnibox:focus {
     outline: none;
-    background: var(--surface-card);
-    border-color: var(--dash-theme);
-    box-shadow: 0 0 0 4px color-mix(in srgb, var(--dash-theme) 14%, transparent);
+    background: var(--ui-surface);
+    border-color: var(--ui-accent);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--ui-accent) 14%, transparent);
 }
 
-.dg-omnibox::-webkit-search-cancel-button { display: none; }
+:where([data-ui="unified"]) .dg-omnibox::-webkit-search-cancel-button { display: none; }
 
-.dg-omnibox-clear {
+:where([data-ui="unified"]) .dg-omnibox-clear {
     position: absolute;
     right: 42px;
     top: 50%;
@@ -285,76 +262,79 @@
     color: var(--gray-600);
     font-size: 0.75rem;
     cursor: pointer;
-    transition: background var(--dur-fast) var(--ease-out);
+    transition: background var(--motion-fast) var(--ease-out);
+    min-height: var(--ui-control-height);
+    min-width: var(--ui-control-height);
 }
 
-.dg-omnibox-clear:hover { background: var(--gray-300); color: var(--gray-800); }
+:where([data-ui="unified"]) .dg-omnibox-clear:hover { background: var(--gray-300); color: var(--gray-800); }
 
-.dg-omnibox-kbd {
+:where([data-ui="unified"]) .dg-omnibox-kbd {
     position: absolute;
     right: 12px;
     top: 50%;
     transform: translateY(-50%);
     padding: 1px 7px;
-    font-size: 0.72rem;
+    font-size: var(--font-size-sm);
     font-weight: 600;
-    color: var(--gray-400);
-    background: var(--surface-card);
+    color: var(--ui-muted);
+    background: var(--ui-surface);
     border: 1px solid var(--gray-300);
     border-bottom-width: 2px;
     border-radius: var(--radius-sm);
     pointer-events: none;
-    transition: opacity var(--dur-fast) var(--ease-out);
+    transition: opacity var(--motion-fast) var(--ease-out);
 }
 
-.dg-omnibox:focus ~ .dg-omnibox-kbd { opacity: 0; }
+:where([data-ui="unified"]) .dg-omnibox:focus ~ .dg-omnibox-kbd { opacity: 0; }
 
 /* -- customer # -- */
-.dg-customer-wrap {
+:where([data-ui="unified"]) .dg-customer-wrap {
     display: inline-flex;
     align-items: center;
     gap: var(--space-2);
 }
 
-.dg-customer-label {
+:where([data-ui="unified"]) .dg-customer-label {
     font-size: 0.8rem;
     font-weight: 600;
-    color: var(--gray-500);
+    color: var(--ui-muted);
     white-space: nowrap;
 }
 
-.dg-customer-input {
+:where([data-ui="unified"]) .dg-customer-input {
     width: 96px;
     box-sizing: border-box;
     padding: 0.55rem 0.7rem;
-    font-family: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
-    font-size: 0.85rem;
+    font-family: var(--font-mono);
+    font-size: var(--font-size-base);
     color: var(--gray-900);
-    background: var(--surface-inset);
+    background: var(--gray-100);
     border: 1px solid var(--gray-200);
     border-radius: var(--radius-md);
-    transition: border-color var(--dur-base) var(--ease-out), background var(--dur-base) var(--ease-out);
+    transition: border-color var(--motion-base) var(--ease-out), background var(--motion-base) var(--ease-out);
+    min-height: var(--ui-control-height);
 }
 
-.dg-customer-input:focus {
+:where([data-ui="unified"]) .dg-customer-input:focus {
     outline: none;
-    background: var(--surface-card);
-    border-color: var(--dash-theme);
+    background: var(--ui-surface);
+    border-color: var(--ui-accent);
 }
 
-.dg-customer-btn { padding: 8px 12px; }
+:where([data-ui="unified"]) .dg-customer-btn { padding: 8px 12px; }
 
 /* -- tier pills -- */
-.dg-pills {
+:where([data-ui="unified"]) .dg-pills {
     display: inline-flex;
     flex-wrap: wrap;
     gap: var(--space-1);
     padding: 3px;
-    background: var(--surface-inset);
+    background: var(--gray-100);
     border-radius: var(--radius-pill);
 }
 
-.dg-pill {
+:where([data-ui="unified"]) .dg-pill {
     padding: 0.3rem 0.85rem;
     font: inherit;
     font-size: 0.8rem;
@@ -365,25 +345,27 @@
     border-radius: var(--radius-pill);
     cursor: pointer;
     white-space: nowrap;
-    transition: background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+    transition: background var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out);
+    min-height: var(--ui-control-height);
+    min-width: var(--ui-control-height);
 }
 
-.dg-pill:hover { color: var(--gray-900); }
+:where([data-ui="unified"]) .dg-pill:hover { color: var(--gray-900); }
 
-.dg-pill--active {
-    background: var(--dash-theme);
-    color: var(--surface-card);
+:where([data-ui="unified"]) .dg-pill--active {
+    background: var(--ui-accent);
+    color: var(--ui-surface);
     box-shadow: var(--shadow-sm);
 }
 
 /* -- source chips -- */
-.dg-chips {
+:where([data-ui="unified"]) .dg-chips {
     display: inline-flex;
     flex-wrap: wrap;
     gap: var(--space-2);
 }
 
-.dg-chip {
+:where([data-ui="unified"]) .dg-chip {
     display: inline-flex;
     align-items: center;
     gap: 6px;
@@ -392,24 +374,26 @@
     font-size: 0.78rem;
     font-weight: 600;
     color: var(--gray-600);
-    background: var(--surface-card);
+    background: var(--ui-surface);
     border: 1px solid var(--gray-300);
     border-radius: var(--radius-pill);
     cursor: pointer;
     white-space: nowrap;
-    transition: border-color var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+    transition: border-color var(--motion-fast) var(--ease-out), background var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out);
+    min-height: var(--ui-control-height);
+    min-width: var(--ui-control-height);
 }
 
-.dg-chip:hover { border-color: var(--gray-400); }
+:where([data-ui="unified"]) .dg-chip:hover { border-color: var(--gray-400); }
 
-.dg-chip--active {
-    background: var(--dash-theme-bg);
-    border-color: var(--dash-theme);
-    color: var(--dash-theme-dark);
+:where([data-ui="unified"]) .dg-chip--active {
+    background: var(--ui-tint);
+    border-color: var(--ui-accent);
+    color: var(--ui-accent-hover);
 }
 
 /* -- has-image toggle + year -- */
-.dg-toggle {
+:where([data-ui="unified"]) .dg-toggle {
     display: inline-flex;
     align-items: center;
     gap: 6px;
@@ -420,78 +404,81 @@
     user-select: none;
 }
 
-.dg-toggle input {
-    accent-color: var(--dash-theme);
+:where([data-ui="unified"]) .dg-toggle input {
+    accent-color: var(--ui-accent);
     width: 15px;
     height: 15px;
     cursor: pointer;
 }
 
-.dg-year {
+:where([data-ui="unified"]) .dg-year {
     font: inherit;
-    font-size: 0.82rem;
+    font-size: var(--font-size-base);
     color: var(--gray-700);
-    background: var(--surface-card);
+    background: var(--ui-surface);
     border: 1px solid var(--gray-300);
     border-radius: var(--radius-md);
     padding: 0.35rem 0.5rem;
     cursor: pointer;
+    min-height: var(--ui-control-height);
 }
 
 /* -- density segmented control -- */
-.dg-density {
+:where([data-ui="unified"]) .dg-density {
     display: inline-flex;
     margin-left: auto;
-    background: var(--surface-card);
+    background: var(--ui-surface);
     border: 1px solid var(--gray-300);
     border-radius: var(--radius-md);
     overflow: hidden;
 }
 
-.dg-density-btn {
+:where([data-ui="unified"]) .dg-density-btn {
     padding: 6px 11px;
     font-size: 0.8rem;
-    color: var(--gray-500);
+    color: var(--ui-muted);
     background: transparent;
     border: 0;
     cursor: pointer;
-    transition: background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+    transition: background var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out);
+    min-height: var(--ui-control-height);
+    min-width: var(--ui-control-height);
 }
 
-.dg-density-btn + .dg-density-btn { border-left: 1px solid var(--gray-200); }
+:where([data-ui="unified"]) .dg-density-btn + .dg-density-btn { border-left: 1px solid var(--gray-200); }
 
-.dg-density-btn:hover { color: var(--gray-800); }
+:where([data-ui="unified"]) .dg-density-btn:hover { color: var(--gray-800); }
 
-.dg-density-btn.is-active,
-.dg-density-btn[aria-pressed="true"] {
-    background: var(--dash-theme-bg);
-    color: var(--dash-theme);
+:where([data-ui="unified"]) .dg-density-btn.is-active,
+:where([data-ui="unified"]) .dg-density-btn[aria-pressed="true"] {
+    background: var(--ui-tint);
+    color: var(--ui-accent);
 }
 
 /* -- active-filter tokens -- */
-.dg-tokens {
+:where([data-ui="unified"]) .dg-tokens {
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-2);
     margin-top: var(--space-3);
 }
 
-.dg-tokens:empty { display: none; margin: 0; }
+:where([data-ui="unified"]) .dg-tokens:empty { display: none; margin: 0; }
 
-.dg-token {
+:where([data-ui="unified"]) .dg-token {
     display: inline-flex;
     align-items: center;
     gap: 6px;
     padding: 0.22rem 0.4rem 0.22rem 0.7rem;
     font-size: 0.76rem;
     font-weight: 600;
-    color: var(--dash-theme-dark);
-    background: var(--dash-theme-bg);
-    border: 1px solid color-mix(in srgb, var(--dash-theme) 30%, transparent);
+    color: var(--ui-accent-hover);
+    background: var(--ui-tint);
+    border: 1px solid color-mix(in srgb, var(--ui-accent) 30%, transparent);
     border-radius: var(--radius-pill);
 }
 
-.dg-token button {
+:where([data-ui="unified"]) .dg-token button {
     display: grid;
     place-items: center;
     width: 18px;
@@ -502,17 +489,17 @@
     color: inherit;
     font-size: 0.7rem;
     cursor: pointer;
-    transition: background var(--dur-fast) var(--ease-out);
+    transition: background var(--motion-fast) var(--ease-out);
 }
 
-.dg-token button:hover {
-    background: color-mix(in srgb, var(--dash-theme) 18%, transparent);
+:where([data-ui="unified"]) .dg-token button:hover {
+    background: color-mix(in srgb, var(--ui-accent) 18%, transparent);
 }
 
 /* ==========================================================================
    Banners — offline / cached-index / customer match
    ========================================================================== */
-.dg-banner {
+:where([data-ui="unified"]) .dg-banner {
     display: flex;
     align-items: center;
     gap: var(--space-3);
@@ -521,32 +508,32 @@
     font-size: 0.875rem;
     border-radius: var(--radius-md);
     border: 1px solid var(--gray-200);
-    background: var(--surface-card);
+    background: var(--ui-surface);
     color: var(--gray-700);
 }
 
-.dg-banner--warn {
-    background: var(--state-warning-bg);
-    border-color: color-mix(in srgb, var(--state-warning) 40%, transparent);
-    color: var(--state-warning);
+:where([data-ui="unified"]) .dg-banner--warn {
+    background: var(--color-warning-bg);
+    border-color: color-mix(in srgb, var(--color-warning-ink) 40%, transparent);
+    color: var(--color-warning-ink);
 }
 
-.dg-banner--info {
-    background: var(--state-info-bg);
-    border-color: color-mix(in srgb, var(--state-info) 35%, transparent);
-    color: var(--state-info);
+:where([data-ui="unified"]) .dg-banner--info {
+    background: var(--color-info-bg);
+    border-color: color-mix(in srgb, var(--color-info-ink) 35%, transparent);
+    color: var(--color-info-ink);
 }
 
-.dg-customer-banner {
+:where([data-ui="unified"]) .dg-customer-banner {
     display: inline-flex;
     align-items: center;
     gap: 6px;
     padding: 0.25rem 0.75rem;
     font-size: 0.8rem;
     font-weight: 600;
-    color: var(--state-info);
-    background: var(--state-info-bg);
-    border: 1px solid color-mix(in srgb, var(--state-info) 35%, transparent);
+    color: var(--color-info-ink);
+    background: var(--color-info-bg);
+    border: 1px solid color-mix(in srgb, var(--color-info-ink) 35%, transparent);
     border-radius: var(--radius-pill);
     cursor: pointer;
 }
@@ -554,24 +541,24 @@
 /* ==========================================================================
    Browse mode — rails, stat strip, collage, daily wall
    ========================================================================== */
-.dg-browse,
-.dg-results {
+:where([data-ui="unified"]) .dg-browse,
+:where([data-ui="unified"]) .dg-results {
     display: block;
     min-width: 0;
 }
 
-.dg-rail {
-    margin-bottom: var(--space-8);
+:where([data-ui="unified"]) .dg-rail {
+    margin-bottom: var(--space-6);
 }
 
-.dg-rail-head {
+:where([data-ui="unified"]) .dg-rail-head {
     display: flex;
     align-items: baseline;
     gap: var(--space-3);
     margin-bottom: var(--space-3);
 }
 
-.dg-rail-head h2 {
+:where([data-ui="unified"]) .dg-rail-head h2 {
     margin: 0;
     font-size: 1.05rem;
     font-weight: 650;
@@ -579,36 +566,38 @@
     color: var(--gray-900);
 }
 
-.dg-rail-sub {
+:where([data-ui="unified"]) .dg-rail-sub {
     font-size: 0.8rem;
-    color: var(--gray-500);
+    color: var(--ui-muted);
 }
 
-.dg-rail-nav {
+:where([data-ui="unified"]) .dg-rail-nav {
     margin-left: auto;
     display: inline-flex;
     gap: var(--space-2);
 }
 
-.dg-rail-btn {
+:where([data-ui="unified"]) .dg-rail-btn {
     width: 32px;
     height: 32px;
     display: grid;
     place-items: center;
     font-size: 0.8rem;
     color: var(--gray-600);
-    background: var(--surface-card);
+    background: var(--ui-surface);
     border: 1px solid var(--gray-300);
     border-radius: var(--radius-pill);
     cursor: pointer;
-    transition: background var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out);
+    transition: background var(--motion-fast) var(--ease-out), border-color var(--motion-fast) var(--ease-out);
+    min-height: var(--ui-control-height);
+    min-width: var(--ui-control-height);
 }
 
-.dg-rail-btn:hover { background: var(--gray-100); border-color: var(--gray-400); }
-.dg-rail-btn:disabled { opacity: 0.35; cursor: default; }
+:where([data-ui="unified"]) .dg-rail-btn:hover { background: var(--gray-100); border-color: var(--gray-400); }
+:where([data-ui="unified"]) .dg-rail-btn:disabled { opacity: 0.35; cursor: default; }
 
 /* Horizontal snap track with soft edge fade */
-.dg-rail-track {
+:where([data-ui="unified"]) .dg-rail-track {
     display: flex;
     gap: var(--space-4);
     overflow-x: auto;
@@ -620,60 +609,60 @@
     mask-image: linear-gradient(to right, transparent, black 26px, black calc(100% - 26px), transparent);
 }
 
-.dg-rail-track > * {
+:where([data-ui="unified"]) .dg-rail-track > * {
     flex: 0 0 auto;
     scroll-snap-align: start;
 }
 
-.dg-rail-track .dg-card { width: 196px; }
+:where([data-ui="unified"]) .dg-rail-track .dg-card { width: 196px; }
 
-.dg-rail-track::-webkit-scrollbar { height: 8px; }
+:where([data-ui="unified"]) .dg-rail-track::-webkit-scrollbar { height: 8px; }
 
-.dg-rail-track::-webkit-scrollbar-thumb {
+:where([data-ui="unified"]) .dg-rail-track::-webkit-scrollbar-thumb {
     background: var(--gray-300);
     border-radius: var(--radius-pill);
 }
-.dg-rail-track::-webkit-scrollbar-track { background: transparent; }
+:where([data-ui="unified"]) .dg-rail-track::-webkit-scrollbar-track { background: transparent; }
 
 /* -- stat strip (uses dash-shell .dash-stat-card) -- */
-.dg-stat-strip {
+:where([data-ui="unified"]) .dg-stat-strip {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
     gap: var(--space-4);
-    margin-bottom: var(--space-8);
+    margin-bottom: var(--space-6);
 }
 
-.dg-stat-strip .dash-stat-card {
+:where([data-ui="unified"]) .dg-stat-strip .dash-stat-card {
     padding: var(--space-4) var(--space-5);
 }
 
-.dg-stat-strip .dash-stat-value { color: var(--dash-theme-dark); }
+:where([data-ui="unified"]) .dg-stat-strip .dash-stat-value { color: var(--ui-accent-hover); }
 
 /* -- top-clients 2×2 collage tile -- */
-.dg-collage {
+:where([data-ui="unified"]) .dg-collage {
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-template-rows: 1fr 1fr;
     gap: 2px;
     aspect-ratio: 1 / 1;
-    background: var(--surface-inset);
+    background: var(--gray-100);
     border-radius: calc(var(--radius-lg) - 2px) calc(var(--radius-lg) - 2px) 0 0;
     overflow: hidden;
 }
 
-.dg-collage img,
-.dg-collage .dg-card-tile {
+:where([data-ui="unified"]) .dg-collage img,
+:where([data-ui="unified"]) .dg-collage .dg-card-tile {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    background: var(--surface-card);
+    background: var(--ui-surface);
     display: block;
     border-radius: 0;
     aspect-ratio: auto;
 }
 
 /* -- daily wall -- */
-.dg-wall-grid {
+:where([data-ui="unified"]) .dg-wall-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
     gap: var(--space-3);
@@ -682,17 +671,17 @@
 /* ==========================================================================
    Customer portfolio band
    ========================================================================== */
-.dg-portfolio {
-    background: var(--surface-card);
+:where([data-ui="unified"]) .dg-portfolio {
+    background: var(--ui-surface);
     border: 1px solid var(--gray-200);
-    border-left: 4px solid var(--dash-theme);
+    border-left: 4px solid var(--ui-accent);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-sm);
     padding: var(--space-5) var(--space-6);
     margin-bottom: var(--space-6);
 }
 
-.dg-portfolio h2 {
+:where([data-ui="unified"]) .dg-portfolio h2 {
     margin: 0 0 var(--space-1);
     font-size: 1.15rem;
     font-weight: 700;
@@ -700,19 +689,19 @@
     color: var(--gray-900);
 }
 
-.dg-portfolio-meta {
+:where([data-ui="unified"]) .dg-portfolio-meta {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     gap: var(--space-3);
     font-size: 0.82rem;
-    color: var(--gray-500);
+    color: var(--ui-muted);
 }
 
 /* ==========================================================================
    Results — header, deep row, windowed grid
    ========================================================================== */
-.dg-results-header {
+:where([data-ui="unified"]) .dg-results-header {
     display: flex;
     align-items: center;
     flex-wrap: wrap;
@@ -721,18 +710,18 @@
     min-height: 30px;
 }
 
-.dg-results-count {
+:where([data-ui="unified"]) .dg-results-count {
     font-size: 0.82rem;
-    color: var(--gray-500);
+    color: var(--ui-muted);
 }
 
-.dg-results-count strong {
+:where([data-ui="unified"]) .dg-results-count strong {
     color: var(--gray-900);
     font-weight: 600;
 }
 
 /* Deep-search escalation row */
-.dg-deep-row {
+:where([data-ui="unified"]) .dg-deep-row {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -741,44 +730,44 @@
     margin-bottom: var(--space-4);
     font-size: 0.85rem;
     color: var(--gray-600);
-    background: var(--surface-card);
+    background: var(--ui-surface);
     border: 1px dashed var(--gray-300);
     border-radius: var(--radius-lg);
 }
 
-.dg-deep-badge {
+:where([data-ui="unified"]) .dg-deep-badge {
     display: inline-flex;
     align-items: center;
     gap: 5px;
     padding: 0.14rem 0.55rem;
-    font-size: 0.68rem;
+    font-size: var(--font-size-sm);
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.04em;
-    color: var(--state-info);
-    background: var(--state-info-bg);
+    color: var(--color-info-ink);
+    background: var(--color-info-bg);
     border-radius: var(--radius-pill);
 }
 
 /* Grid viewport (roving-focus container) */
-.dg-grid-viewport { outline: none; }
+:where([data-ui="unified"]) .dg-grid-viewport { outline: none; }
 
-.dg-grid-viewport:focus-visible {
-    outline: 2px solid var(--dash-theme);
+:where([data-ui="unified"]) .dg-grid-viewport:focus-visible {
+    outline: 2px solid var(--ui-accent);
     outline-offset: 4px;
     border-radius: var(--radius-md);
 }
 
-.dg-sentinel { height: 2px; }
-.dg-spacer { width: 100%; }
+:where([data-ui="unified"]) .dg-sentinel { height: 2px; }
+:where([data-ui="unified"]) .dg-spacer { width: 100%; }
 
-.dg-grid {
+:where([data-ui="unified"]) .dg-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(196px, 1fr));
     gap: var(--space-4);
 }
 
-.dg-grid--wall {
+:where([data-ui="unified"]) .dg-grid--wall {
     grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
     gap: var(--space-3);
 }
@@ -786,54 +775,54 @@
 /* ==========================================================================
    Cards
    ========================================================================== */
-.dg-card {
+:where([data-ui="unified"]) .dg-card {
     position: relative;
     display: flex;
     flex-direction: column;
-    background: var(--surface-card);
+    background: var(--ui-surface);
     border: 1px solid var(--gray-200);
     border-radius: var(--radius-lg);
     overflow: hidden;
     cursor: pointer;
     content-visibility: auto;
     contain-intrinsic-size: auto 300px;
-    transition: transform var(--dur-base) var(--ease-out), box-shadow var(--dur-base) var(--ease-out), border-color var(--dur-base) var(--ease-out);
+    transition: transform var(--motion-base) var(--ease-out), box-shadow var(--motion-base) var(--ease-out), border-color var(--motion-base) var(--ease-out);
 }
 
-.dg-card:hover {
+:where([data-ui="unified"]) .dg-card:hover {
     transform: translateY(-2px);
     box-shadow: var(--shadow-md);
     border-color: var(--gray-300);
 }
 
-.dg-card:focus-visible {
-    outline: 2px solid var(--dash-theme);
+:where([data-ui="unified"]) .dg-card:focus-visible {
+    outline: 2px solid var(--ui-accent);
     outline-offset: 2px;
 }
 
 /* Thumb: uniform square mat, artwork letterboxed on the inset surface */
-.dg-card-thumb {
+:where([data-ui="unified"]) .dg-card-thumb {
     position: relative;
     aspect-ratio: 1 / 1;
     display: grid;
     place-items: center;
-    background: var(--surface-inset);
+    background: var(--gray-100);
     overflow: hidden;
 }
 
-.dg-card-thumb img {
+:where([data-ui="unified"]) .dg-card-thumb img {
     width: 100%;
     height: 100%;
     object-fit: contain;
     padding: var(--space-2);
     box-sizing: border-box;
-    transition: transform var(--dur-base) var(--ease-out);
+    transition: transform var(--motion-base) var(--ease-out);
 }
 
-.dg-card:hover .dg-card-thumb img { transform: scale(1.03); }
+:where([data-ui="unified"]) .dg-card:hover .dg-card-thumb img { transform: scale(1.03); }
 
 /* Placeholder tile — deterministic initials on state-bg pairs (dn % 8) */
-.dg-card-tile {
+:where([data-ui="unified"]) .dg-card-tile {
     aspect-ratio: 1 / 1;
     display: grid;
     place-items: center;
@@ -843,30 +832,30 @@
     user-select: none;
 }
 
-.dg-tile-0 { background: var(--state-info-bg);    color: var(--state-info); }
-.dg-tile-1 { background: var(--state-success-bg); color: var(--state-success); }
-.dg-tile-2 { background: var(--state-warning-bg); color: var(--state-warning); }
-.dg-tile-3 { background: var(--state-danger-bg);  color: var(--state-danger); }
-.dg-tile-4 { background: var(--state-violet-bg);  color: var(--state-violet); }
-.dg-tile-5 { background: var(--dash-theme-bg);    color: var(--dash-theme); }
-.dg-tile-6 { background: var(--gray-100);         color: var(--gray-600); }
-.dg-tile-7 { background: var(--surface-inset);    color: var(--gray-500); }
+:where([data-ui="unified"]) .dg-tile-0 { background: var(--color-info-bg);    color: var(--color-info-ink); }
+:where([data-ui="unified"]) .dg-tile-1 { background: var(--color-success-bg); color: var(--color-brand-deep); }
+:where([data-ui="unified"]) .dg-tile-2 { background: var(--color-warning-bg); color: var(--color-warning-ink); }
+:where([data-ui="unified"]) .dg-tile-3 { background: var(--color-danger-bg);  color: var(--color-danger-ink); }
+:where([data-ui="unified"]) .dg-tile-4 { background: var(--color-ruth-tint);  color: var(--color-ruth-dark); }
+:where([data-ui="unified"]) .dg-tile-5 { background: var(--ui-tint);    color: var(--ui-accent); }
+:where([data-ui="unified"]) .dg-tile-6 { background: var(--gray-100);         color: var(--gray-600); }
+:where([data-ui="unified"]) .dg-tile-7 { background: var(--gray-100);    color: var(--ui-muted); }
 
 /* Card body */
-.dg-card-body {
+:where([data-ui="unified"]) .dg-card-body {
     display: flex;
     flex-direction: column;
     gap: 3px;
     padding: var(--space-3);
 }
 
-.dg-card-number {
-    font-size: 0.72rem;
+:where([data-ui="unified"]) .dg-card-number {
+    font-size: var(--font-size-sm);
     font-weight: 600;
-    color: var(--gray-500);
+    color: var(--ui-muted);
 }
 
-.dg-card-company {
+:where([data-ui="unified"]) .dg-card-company {
     font-size: 0.86rem;
     font-weight: 600;
     color: var(--gray-900);
@@ -875,7 +864,7 @@
     text-overflow: ellipsis;
 }
 
-.dg-card-name {
+:where([data-ui="unified"]) .dg-card-name {
     font-size: 0.78rem;
     color: var(--gray-600);
     white-space: nowrap;
@@ -883,71 +872,71 @@
     text-overflow: ellipsis;
 }
 
-.dg-card-meta {
+:where([data-ui="unified"]) .dg-card-meta {
     display: flex;
     align-items: center;
     flex-wrap: wrap;
     gap: var(--space-2);
     margin-top: var(--space-1);
-    font-size: 0.72rem;
-    color: var(--gray-500);
+    font-size: var(--font-size-sm);
+    color: var(--ui-muted);
 }
 
 /* Tier badges — Standard/Mid/Large/Full Back on state pairs */
-.dg-badge {
+:where([data-ui="unified"]) .dg-badge {
     display: inline-flex;
     align-items: center;
     padding: 0.1rem 0.5rem;
-    font-size: 0.68rem;
+    font-size: var(--font-size-sm);
     font-weight: 700;
     letter-spacing: 0.02em;
     border-radius: var(--radius-sm);
     white-space: nowrap;
 }
 
-.dg-badge--std { background: var(--state-success-bg); color: var(--state-success); }
-.dg-badge--mid { background: var(--state-warning-bg); color: var(--state-warning); }
-.dg-badge--lg  { background: var(--state-danger-bg);  color: var(--state-danger); }
-.dg-badge--fb  { background: var(--state-violet-bg);  color: var(--state-violet); }
+:where([data-ui="unified"]) .dg-badge--std { background: var(--color-success-bg); color: var(--color-brand-deep); }
+:where([data-ui="unified"]) .dg-badge--mid { background: var(--color-warning-bg); color: var(--color-warning-ink); }
+:where([data-ui="unified"]) .dg-badge--lg  { background: var(--color-danger-bg);  color: var(--color-danger-ink); }
+:where([data-ui="unified"]) .dg-badge--fb  { background: var(--color-ruth-tint);  color: var(--color-ruth-dark); }
 
 /* Source glyph row */
-.dg-src-row {
+:where([data-ui="unified"]) .dg-src-row {
     display: inline-flex;
     align-items: center;
     gap: 7px;
-    color: var(--gray-400);
-    font-size: 0.68rem;
+    color: var(--ui-muted);
+    font-size: var(--font-size-sm);
 }
 
-.dg-src { display: inline-flex; }
+:where([data-ui="unified"]) .dg-src { display: inline-flex; }
 
 /* Variants ×N + duplicate hint */
-.dg-variants {
+:where([data-ui="unified"]) .dg-variants {
     display: inline-flex;
     align-items: center;
     padding: 0.08rem 0.45rem;
-    font-size: 0.68rem;
+    font-size: var(--font-size-sm);
     font-weight: 600;
     color: var(--gray-600);
     background: var(--gray-100);
     border-radius: var(--radius-pill);
 }
 
-.dg-dup {
+:where([data-ui="unified"]) .dg-dup {
     display: inline-flex;
     align-items: center;
     gap: 4px;
     padding: 0.08rem 0.5rem;
-    font-size: 0.66rem;
+    font-size: var(--font-size-sm);
     font-weight: 600;
-    color: var(--state-warning);
-    background: var(--state-warning-bg);
+    color: var(--color-warning-ink);
+    background: var(--color-warning-bg);
     border-radius: var(--radius-pill);
     cursor: help;
 }
 
 /* Hover-revealed copy button over the thumb */
-.dg-copy {
+:where([data-ui="unified"]) .dg-copy {
     position: absolute;
     top: var(--space-2);
     right: var(--space-2);
@@ -956,40 +945,42 @@
     height: 28px;
     display: grid;
     place-items: center;
-    font-size: 0.72rem;
+    font-size: var(--font-size-sm);
     color: var(--gray-600);
-    background: color-mix(in srgb, var(--surface-card) 92%, transparent);
+    background: color-mix(in srgb, var(--ui-surface) 92%, transparent);
     border: 1px solid var(--gray-200);
     border-radius: var(--radius-md);
     box-shadow: var(--shadow-sm);
     cursor: pointer;
     opacity: 0;
-    transition: opacity var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out);
+    transition: opacity var(--motion-fast) var(--ease-out), background var(--motion-fast) var(--ease-out);
+    min-height: var(--ui-control-height);
+    min-width: var(--ui-control-height);
 }
 
-.dg-card:hover .dg-copy,
-.dg-card:focus-within .dg-copy,
-.dg-copy:focus-visible { opacity: 1; }
+:where([data-ui="unified"]) .dg-card:hover .dg-copy,
+:where([data-ui="unified"]) .dg-card:focus-within .dg-copy,
+:where([data-ui="unified"]) .dg-copy:focus-visible { opacity: 1; }
 
-.dg-copy:hover { background: var(--surface-card); color: var(--dash-theme); }
+:where([data-ui="unified"]) .dg-copy:hover { background: var(--ui-surface); color: var(--ui-accent); }
 
 @media (hover: none) {
-    .dg-copy { opacity: 1; }
+    :where([data-ui="unified"]) .dg-copy { opacity: 1; min-height: var(--ui-control-height); min-width: var(--ui-control-height); }
 }
 
 /* Wall density card — thumb-forward, quiet text */
-.dg-card--wall .dg-card-body { padding: var(--space-2) var(--space-3); gap: 2px; }
+:where([data-ui="unified"]) .dg-card--wall .dg-card-body { padding: var(--space-2) var(--space-3); gap: 2px; }
 
-.dg-card--wall .dg-card-name,
-.dg-card--wall .dg-src-row,
-.dg-card--wall .dg-card-meta { display: none; }
-.dg-card--wall .dg-card-company { font-size: 0.78rem; }
-.dg-card--wall .dg-card-number { font-size: 0.68rem; }
+:where([data-ui="unified"]) .dg-card--wall .dg-card-name,
+:where([data-ui="unified"]) .dg-card--wall .dg-src-row,
+:where([data-ui="unified"]) .dg-card--wall .dg-card-meta { display: none; }
+:where([data-ui="unified"]) .dg-card--wall .dg-card-company { font-size: 0.78rem; }
+:where([data-ui="unified"]) .dg-card--wall .dg-card-number { font-size: var(--font-size-sm); }
 
 /* Search-term highlight */
-.dg-mark,
-mark.dg-mark {
-    background: color-mix(in srgb, var(--dash-theme) 16%, transparent);
+:where([data-ui="unified"]) .dg-mark,
+:where([data-ui="unified"]) mark.dg-mark {
+    background: color-mix(in srgb, var(--ui-accent) 16%, transparent);
     color: inherit;
     font-weight: 650;
     border-radius: 2px;
@@ -999,21 +990,21 @@ mark.dg-mark {
 /* ==========================================================================
    Skeleton shimmer
    ========================================================================== */
-.dg-skel {
+:where([data-ui="unified"]) .dg-skel {
     position: relative;
     overflow: hidden;
-    background: var(--surface-inset);
+    background: var(--gray-100);
     border-radius: var(--radius-md);
     min-height: 14px;
 }
 
-.dg-skel::after {
+:where([data-ui="unified"]) .dg-skel::after {
     content: '';
     position: absolute;
     inset: 0;
     background: linear-gradient(90deg,
         transparent,
-        color-mix(in srgb, var(--surface-card) 70%, transparent),
+        color-mix(in srgb, var(--ui-surface) 70%, transparent),
         transparent);
     transform: translateX(-100%);
     animation: dg-shimmer 1.4s var(--ease-out) infinite;
@@ -1024,38 +1015,38 @@ mark.dg-mark {
 }
 
 /* Per-section inline error (drawer hydration failures) */
-.dg-section-err {
+:where([data-ui="unified"]) .dg-section-err {
     display: flex;
     align-items: center;
     gap: var(--space-3);
     padding: var(--space-3) var(--space-4);
     font-size: 0.82rem;
-    color: var(--state-danger);
-    background: var(--state-danger-bg);
-    border: 1px solid color-mix(in srgb, var(--state-danger) 35%, transparent);
+    color: var(--color-danger-ink);
+    background: var(--color-danger-bg);
+    border: 1px solid color-mix(in srgb, var(--color-danger-ink) 35%, transparent);
     border-radius: var(--radius-md);
 }
 
-.dg-section-err button {
+:where([data-ui="unified"]) .dg-section-err button {
     margin-left: auto;
     padding: 0.25rem 0.7rem;
     font: inherit;
     font-size: 0.78rem;
     font-weight: 600;
-    color: var(--state-danger);
-    background: var(--surface-card);
-    border: 1px solid color-mix(in srgb, var(--state-danger) 45%, transparent);
+    color: var(--color-danger-ink);
+    background: var(--ui-surface);
+    border: 1px solid color-mix(in srgb, var(--color-danger-ink) 45%, transparent);
     border-radius: var(--radius-md);
     cursor: pointer;
-    transition: background var(--dur-fast) var(--ease-out);
+    transition: background var(--motion-fast) var(--ease-out);
 }
 
-.dg-section-err button:hover { background: var(--state-danger-bg); }
+:where([data-ui="unified"]) .dg-section-err button:hover { background: var(--color-danger-bg); }
 
 /* ==========================================================================
    Inspector drawer
    ========================================================================== */
-.dg-drawer-overlay {
+:where([data-ui="unified"]) .dg-drawer-overlay {
     position: fixed;
     inset: 0;
     z-index: 310;
@@ -1065,10 +1056,10 @@ mark.dg-mark {
 }
 
 @starting-style {
-    .dg-drawer-overlay { opacity: 0; }
+    :where([data-ui="unified"]) .dg-drawer-overlay { opacity: 0; }
 }
 
-.dg-drawer {
+:where([data-ui="unified"]) .dg-drawer {
     position: fixed;
     top: 0;
     right: 0;
@@ -1078,21 +1069,21 @@ mark.dg-mark {
     max-width: 100vw;
     display: flex;
     flex-direction: column;
-    background: var(--surface-card);
+    background: var(--ui-surface);
     border-left: 1px solid var(--gray-200);
-    box-shadow: var(--shadow-lg);
+    box-shadow: var(--shadow-md);
     transform: translateX(0);
     transition: transform 240ms var(--ease-out), display 240ms allow-discrete;
 }
 
 /* Slide-in on un-hide (no JS class needed); .is-closing supports an exit slide */
 @starting-style {
-    .dg-drawer { transform: translateX(100%); }
+    :where([data-ui="unified"]) .dg-drawer { transform: translateX(100%); }
 }
 
-.dg-drawer.is-closing { transform: translateX(100%); }
+:where([data-ui="unified"]) .dg-drawer.is-closing { transform: translateX(100%); }
 
-.dg-drawer-body {
+:where([data-ui="unified"]) .dg-drawer-body {
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -1100,17 +1091,18 @@ mark.dg-mark {
     overscroll-behavior: contain;
     scrollbar-width: thin;
     scrollbar-color: var(--gray-300) transparent;
+    min-height: 0;
 }
 
 /* Drawer sections — generous, separated panels */
-.dg-drawer-section {
+:where([data-ui="unified"]) .dg-drawer-section {
     padding: var(--space-5) var(--space-6);
     border-top: 1px solid var(--gray-100);
 }
 
-.dg-drawer-section:first-child { border-top: 0; }
+:where([data-ui="unified"]) .dg-drawer-section:first-child { border-top: 0; }
 
-.dg-drawer-body h2 {
+:where([data-ui="unified"]) .dg-drawer-body h2 {
     margin: 0 0 var(--space-2);
     font-size: 1.15rem;
     font-weight: 700;
@@ -1118,16 +1110,16 @@ mark.dg-mark {
     color: var(--gray-900);
 }
 
-.dg-drawer-body h3 {
+:where([data-ui="unified"]) .dg-drawer-body h3 {
     margin: 0 0 var(--space-3);
     font-size: 0.78rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    color: var(--gray-500);
+    color: var(--ui-muted);
 }
 
-.dg-drawer-close {
+:where([data-ui="unified"]) .dg-drawer-close {
     position: absolute;
     top: var(--space-4);
     right: var(--space-4);
@@ -1138,27 +1130,31 @@ mark.dg-mark {
     place-items: center;
     font-size: 0.85rem;
     color: var(--gray-600);
-    background: color-mix(in srgb, var(--surface-card) 92%, transparent);
+    background: color-mix(in srgb, var(--ui-surface) 92%, transparent);
     border: 1px solid var(--gray-200);
     border-radius: var(--radius-pill);
     cursor: pointer;
-    transition: background var(--dur-fast) var(--ease-out);
+    transition: background var(--motion-fast) var(--ease-out);
+    min-height: var(--ui-control-height);
+    min-width: var(--ui-control-height);
 }
 
-.dg-drawer-close:hover { background: var(--gray-100); color: var(--gray-900); }
+:where([data-ui="unified"]) .dg-drawer-close:hover { background: var(--gray-100); color: var(--gray-900); }
 
 /* Hero image — click to zoom */
-.dg-drawer-hero {
+:where([data-ui="unified"]) .dg-drawer-hero {
     position: relative;
     display: grid;
     place-items: center;
     aspect-ratio: 4 / 3;
-    background: var(--surface-inset);
+    background: var(--gray-100);
     cursor: zoom-in;
     overflow: hidden;
 }
 
-.dg-drawer-hero img {
+:where([data-ui="unified"]) .dg-hero-button { display: block; width: 100%; height: 100%; border: 0; padding: 0; background: transparent; cursor: zoom-in; position: absolute; inset: 0; }
+
+:where([data-ui="unified"]) .dg-drawer-hero img {
     width: 100%;
     height: 100%;
     object-fit: contain;
@@ -1167,18 +1163,18 @@ mark.dg-mark {
 }
 
 /* Labeled thumbnail strip */
-.dg-drawer-strip {
+:where([data-ui="unified"]) .dg-drawer-strip {
     display: flex;
     gap: var(--space-2);
     overflow-x: auto;
     padding: var(--space-3) var(--space-6);
-    background: var(--surface-elevated);
+    background: var(--gray-50);
     border-bottom: 1px solid var(--gray-100);
     scrollbar-width: thin;
     scrollbar-color: var(--gray-300) transparent;
 }
 
-.dg-strip-thumb {
+:where([data-ui="unified"]) .dg-strip-thumb {
     flex: 0 0 auto;
     width: 64px;
     display: flex;
@@ -1191,70 +1187,70 @@ mark.dg-mark {
     cursor: pointer;
     font-size: 0.6rem;
     font-weight: 600;
-    color: var(--gray-500);
+    color: var(--ui-muted);
 }
 
-.dg-strip-thumb img,
-.dg-strip-thumb .dg-strip-img {
+:where([data-ui="unified"]) .dg-strip-thumb img,
+:where([data-ui="unified"]) .dg-strip-thumb .dg-strip-img {
     width: 64px;
     height: 64px;
     object-fit: contain;
-    background: var(--surface-inset);
+    background: var(--gray-100);
     border: 2px solid var(--gray-200);
     border-radius: var(--radius-md);
     box-sizing: border-box;
-    transition: border-color var(--dur-fast) var(--ease-out);
+    transition: border-color var(--motion-fast) var(--ease-out);
 }
 
-.dg-strip-thumb:hover img { border-color: var(--gray-400); }
+:where([data-ui="unified"]) .dg-strip-thumb:hover img { border-color: var(--gray-400); }
 
-.dg-strip-thumb--active { color: var(--dash-theme-dark); }
+:where([data-ui="unified"]) .dg-strip-thumb--active { color: var(--ui-accent-hover); }
 
-.dg-strip-thumb--active img,
-.dg-strip-thumb--active .dg-strip-img {
-    border-color: var(--dash-theme);
+:where([data-ui="unified"]) .dg-strip-thumb--active img,
+:where([data-ui="unified"]) .dg-strip-thumb--active .dg-strip-img {
+    border-color: var(--ui-accent);
 }
 
 /* Metadata rows — label / value grid */
-.dg-meta-rows {
-    display: grid;
-    grid-template-columns: minmax(96px, 130px) 1fr;
+:where([data-ui="unified"]) .dg-meta-rows {
+    display: block;
     gap: var(--space-2) var(--space-4);
     font-size: 0.86rem;
     margin: 0;
+    padding: var(--space-4);
 }
 
-.dg-meta-rows dt,
-.dg-meta-rows .dg-meta-label {
+:where([data-ui="unified"]) .dg-meta-rows dt,
+:where([data-ui="unified"]) .dg-meta-rows .dg-meta-label {
     margin: 0;
-    font-size: 0.72rem;
+    font-size: var(--font-size-sm);
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.04em;
-    color: var(--gray-500);
+    color: var(--ui-muted);
     align-self: baseline;
     padding-top: 2px;
 }
 
-.dg-meta-rows dd,
-.dg-meta-rows .dg-meta-value {
+:where([data-ui="unified"]) .dg-meta-rows dd,
+:where([data-ui="unified"]) .dg-meta-rows .dg-meta-value {
     margin: 0;
     color: var(--gray-800);
     overflow-wrap: anywhere;
 }
 
 /* DST file list — mono, copy-friendly */
-.dg-dst-list {
+:where([data-ui="unified"]) .dg-dst-list {
     margin: 0;
     padding: var(--space-2) var(--space-3);
     list-style: none;
     font-size: 0.76rem;
     color: var(--gray-700);
-    background: var(--surface-inset);
+    background: var(--gray-100);
     border-radius: var(--radius-md);
 }
 
-.dg-dst-list li {
+:where([data-ui="unified"]) .dg-dst-list li {
     display: flex;
     align-items: center;
     gap: var(--space-2);
@@ -1262,25 +1258,25 @@ mark.dg-mark {
     overflow-wrap: anywhere;
 }
 
-.dg-dst-list li + li { border-top: 1px solid var(--gray-200); }
+:where([data-ui="unified"]) .dg-dst-list li + li { border-top: 1px solid var(--gray-200); }
 
-.dg-dst-list button {
+:where([data-ui="unified"]) .dg-dst-list button {
     margin-left: auto;
     flex: 0 0 auto;
     padding: 2px 7px;
-    font-size: 0.68rem;
-    color: var(--gray-500);
-    background: var(--surface-card);
+    font-size: var(--font-size-sm);
+    color: var(--ui-muted);
+    background: var(--ui-surface);
     border: 1px solid var(--gray-300);
     border-radius: var(--radius-sm);
     cursor: pointer;
-    transition: color var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out);
+    transition: color var(--motion-fast) var(--ease-out), border-color var(--motion-fast) var(--ease-out);
 }
 
-.dg-dst-list button:hover { color: var(--dash-theme); border-color: var(--dash-theme); }
+:where([data-ui="unified"]) .dg-dst-list button:hover { color: var(--ui-accent); border-color: var(--ui-accent); }
 
 /* Sticky actions bar */
-.dg-actions {
+:where([data-ui="unified"]) .dg-actions {
     position: sticky;
     bottom: 0;
     z-index: 2;
@@ -1289,24 +1285,22 @@ mark.dg-mark {
     align-items: center;
     gap: var(--space-2);
     padding: var(--space-3) var(--space-6);
-    background: var(--surface-card);
+    background: var(--ui-surface);
     border-top: 1px solid var(--gray-200);
     box-shadow: 0 -4px 12px color-mix(in srgb, var(--gray-900) 5%, transparent);
 }
 
-.dg-actions .dash-btn { padding: 7px 12px; font-size: 0.82rem; }
-
-.dg-actions-pos {
+:where([data-ui="unified"]) .dg-actions-pos {
     margin-left: auto;
     font-size: 0.76rem;
-    color: var(--gray-500);
+    color: var(--ui-muted);
     white-space: nowrap;
 }
 
 /* ==========================================================================
    Lightbox — fullscreen dark
    ========================================================================== */
-.dg-lightbox {
+:where([data-ui="unified"]) .dg-lightbox {
     position: fixed;
     inset: 0;
     z-index: 400;
@@ -1318,19 +1312,19 @@ mark.dg-mark {
 }
 
 @starting-style {
-    .dg-lightbox { opacity: 0; }
+    :where([data-ui="unified"]) .dg-lightbox { opacity: 0; }
 }
 
-.dg-lightbox-img {
+:where([data-ui="unified"]) .dg-lightbox-img {
     max-width: 92vw;
     max-height: 84vh;
     object-fit: contain;
     border-radius: var(--radius-md);
-    box-shadow: var(--shadow-lg);
-    background: var(--surface-card);
+    box-shadow: var(--shadow-md);
+    background: var(--ui-surface);
 }
 
-.dg-lightbox-cap {
+:where([data-ui="unified"]) .dg-lightbox-cap {
     position: fixed;
     left: 50%;
     bottom: var(--space-6);
@@ -1338,7 +1332,7 @@ mark.dg-mark {
     max-width: 88vw;
     padding: 0.35rem 1rem;
     font-size: 0.8rem;
-    color: color-mix(in srgb, var(--surface-card) 88%, transparent);
+    color: color-mix(in srgb, var(--ui-surface) 88%, transparent);
     background: color-mix(in srgb, var(--gray-900) 65%, transparent);
     border-radius: var(--radius-pill);
     white-space: nowrap;
@@ -1346,7 +1340,7 @@ mark.dg-mark {
     text-overflow: ellipsis;
 }
 
-.dg-lightbox-close {
+:where([data-ui="unified"]) .dg-lightbox-close {
     position: fixed;
     top: var(--space-5);
     right: var(--space-5);
@@ -1355,111 +1349,108 @@ mark.dg-mark {
     display: grid;
     place-items: center;
     font-size: 1rem;
-    color: var(--surface-card);
-    background: color-mix(in srgb, var(--surface-card) 14%, transparent);
-    border: 1px solid color-mix(in srgb, var(--surface-card) 25%, transparent);
+    color: var(--ui-surface);
+    background: color-mix(in srgb, var(--ui-surface) 14%, transparent);
+    border: 1px solid color-mix(in srgb, var(--ui-surface) 25%, transparent);
     border-radius: var(--radius-pill);
     cursor: pointer;
-    transition: background var(--dur-fast) var(--ease-out);
+    transition: background var(--motion-fast) var(--ease-out);
+    min-height: var(--ui-control-height);
+    min-width: var(--ui-control-height);
 }
 
-.dg-lightbox-close:hover {
-    background: color-mix(in srgb, var(--surface-card) 28%, transparent);
+:where([data-ui="unified"]) .dg-lightbox-close:hover {
+    background: color-mix(in srgb, var(--ui-surface) 28%, transparent);
 }
 
 /* ==========================================================================
    Responsive
    ========================================================================== */
 @media (width <= 900px) {
-    .dg-toolbar-row--search { flex-direction: column; align-items: stretch; }
-    .dg-omnibox-wrap { flex: 1 1 auto; min-width: 0; }
-    .dg-customer-wrap { justify-content: flex-start; }
-    .dg-toolbar-row--filters { gap: var(--space-2); }
-    .dg-density { margin-left: 0; }
-    .dg-omnibox-kbd { display: none; }
+    :where([data-ui="unified"]) .dg-toolbar-row--search { flex-direction: column; align-items: stretch; }
+    :where([data-ui="unified"]) .dg-omnibox-wrap { flex: 1 1 auto; min-width: 0; }
+    :where([data-ui="unified"]) .dg-customer-wrap { justify-content: flex-start; }
+    :where([data-ui="unified"]) .dg-toolbar-row--filters { gap: var(--space-2); }
+    :where([data-ui="unified"]) .dg-density { margin-left: 0; }
+    :where([data-ui="unified"]) .dg-omnibox-kbd { display: none; }
 }
 
 @media (width <= 640px) {
-    .dg-main { padding: var(--space-4); }
-    .dg-toolbar { padding: var(--space-3) var(--space-4); margin-bottom: var(--space-4); }
-    .dg-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: var(--space-3); }
-    .dg-grid--wall { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); }
-    .dg-wall-grid { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); }
-    .dg-rail-track .dg-card { width: 160px; }
-    .dg-stat-strip { grid-template-columns: repeat(2, 1fr); gap: var(--space-3); margin-bottom: var(--space-6); }
-    .dg-rail { margin-bottom: var(--space-6); }
+    :where([data-ui="unified"]) .dg-main { padding: var(--space-4); }
+    :where([data-ui="unified"]) .dg-toolbar { padding: var(--space-3) var(--space-4); margin-bottom: var(--space-4); }
+    :where([data-ui="unified"]) .dg-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: var(--space-3); }
+    :where([data-ui="unified"]) .dg-grid--wall { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); }
+    :where([data-ui="unified"]) .dg-wall-grid { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); }
+    :where([data-ui="unified"]) .dg-rail-track .dg-card { width: 160px; }
+    :where([data-ui="unified"]) .dg-stat-strip { grid-template-columns: repeat(2, 1fr); gap: var(--space-3); margin-bottom: var(--space-6); }
+    :where([data-ui="unified"]) .dg-rail { margin-bottom: var(--space-6); }
 
     /* Drawer becomes a full sheet */
-    .dg-drawer { width: 100vw; border-left: 0; }
-    .dg-drawer-section { padding: var(--space-4) var(--space-4); }
-    .dg-drawer-strip { padding: var(--space-3) var(--space-4); }
-    .dg-actions { padding: var(--space-3) var(--space-4); flex-wrap: wrap; }
+    :where([data-ui="unified"]) .dg-drawer { width: 100vw; border-left: 0; }
+    :where([data-ui="unified"]) .dg-drawer-section { padding: var(--space-4) var(--space-4); }
+    :where([data-ui="unified"]) .dg-drawer-strip { padding: var(--space-3) var(--space-4); }
+    :where([data-ui="unified"]) .dg-actions { padding: var(--space-3) var(--space-4); flex-wrap: wrap; }
 
-    .dg-lightbox-img { max-width: 96vw; max-height: 80vh; }
+    :where([data-ui="unified"]) .dg-lightbox-img { max-width: 96vw; max-height: 80vh; }
 }
 
 /* ==========================================================================
    Reduced motion — kill lifts, slides, shimmer
    ========================================================================== */
 @media (prefers-reduced-motion: reduce) {
-    .dg-body *,
-    .dg-body *::before,
-    .dg-body *::after,
-    .dg-drawer,
-    .dg-drawer-overlay,
-    .dg-lightbox {
-        /* stylelint-disable-next-line declaration-no-important -- prefers-reduced-motion kill switch must beat every animation */
-        animation-duration: 0.01ms !important;
-        /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
-        animation-iteration-count: 1 !important;
-        /* stylelint-disable-next-line declaration-no-important -- prefers-reduced-motion kill switch must beat every animation */
-        transition-duration: 0.01ms !important;
-        /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
-        scroll-behavior: auto !important;
+    :where([data-ui="unified"]).dg-body *,
+    :where([data-ui="unified"]).dg-body *::before,
+    :where([data-ui="unified"]).dg-body *::after,
+    :where([data-ui="unified"]) .dg-drawer,
+    :where([data-ui="unified"]) .dg-drawer-overlay,
+    :where([data-ui="unified"]) .dg-lightbox {
+        animation-duration: 0.01ms;
+        animation-iteration-count: 1;
+        transition-duration: 0.01ms;
+        scroll-behavior: auto;
     }
-    .dg-card:hover { transform: none; }
-    .dg-card:hover .dg-card-thumb img { transform: none; }
-    .dg-skel::after { animation: none; }
-    .dg-rail-track { scroll-snap-type: none; }
+    :where([data-ui="unified"]) .dg-card:hover { transform: none; }
+    :where([data-ui="unified"]) .dg-card:hover .dg-card-thumb img { transform: none; }
+    :where([data-ui="unified"]) .dg-skel::after { animation: none; }
+    :where([data-ui="unified"]) .dg-rail-track { scroll-snap-type: none; }
 }
 
 /* ==========================================================================
    Print — the grid is the record; chrome disappears
    ========================================================================== */
 @media print {
-    .dg-boot,
-    .dg-toolbar,
-    .dg-drawer,
-    .dg-drawer-overlay,
-    .dg-lightbox,
-    .dg-freshness,
-    .dg-deep-row,
-    .dg-rail-btn,
-    .dg-copy,
-    .dg-banner,
-    .dash-back-link {
-        /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
-        display: none !important;
+    :where([data-ui="unified"]) .dg-boot,
+    :where([data-ui="unified"]) .dg-toolbar,
+    :where([data-ui="unified"]) .dg-drawer,
+    :where([data-ui="unified"]) .dg-drawer-overlay,
+    :where([data-ui="unified"]) .dg-lightbox,
+    :where([data-ui="unified"]) .dg-freshness,
+    :where([data-ui="unified"]) .dg-deep-row,
+    :where([data-ui="unified"]) .dg-rail-btn,
+    :where([data-ui="unified"]) .dg-copy,
+    :where([data-ui="unified"]) .dg-banner,
+    :where([data-ui="unified"]) .dash-back-link {
+        display: none;
     }
 
-    .dg-body { background: var(--surface-card); }
+    :where([data-ui="unified"]).dg-body { background: var(--ui-surface); }
 
-    .dash-header {
+    :where([data-ui="unified"]) .dash-header {
         background: none;
         box-shadow: none;
         border-bottom: 1px solid var(--gray-300);
     }
 
-    .dg-header-title h1,
-    .dg-subtitle { color: var(--gray-900); }
+    :where([data-ui="unified"]) .dg-header-title h1,
+    :where([data-ui="unified"]) .dg-subtitle { color: var(--gray-900); }
 
-    .dg-card {
+    :where([data-ui="unified"]) .dg-card {
         content-visibility: visible;
         break-inside: avoid;
         box-shadow: none;
     }
 
-    .dg-rail-track {
+    :where([data-ui="unified"]) .dg-rail-track {
         flex-wrap: wrap;
         overflow: visible;
         mask-image: none;
@@ -1481,7 +1472,7 @@ mark.dg-mark {
    so it sized to its natural image content and rendered ONE full-page-wide
    thumbnail (seen in production 2026-08-05). Width is pinned to match
    `.dg-rail-track .dg-card`, and aspect-ratio is handed back to the grid child. */
-.dg-collage {
+:where([data-ui="unified"]) .dg-collage {
     display: flex;
     flex-direction: column;
     gap: 0;
@@ -1497,19 +1488,19 @@ mark.dg-mark {
     overflow: hidden;
 }
 
-.dg-collage:hover,
-.dg-collage:focus-visible {
+:where([data-ui="unified"]) .dg-collage:hover,
+:where([data-ui="unified"]) .dg-collage:focus-visible {
     box-shadow: var(--shadow-md);
 }
 
 /* Belt-and-braces: no image inside a collage may ever exceed its cell, whatever
    else changes above. This is the rule that would have contained the blow-up. */
-.dg-collage img {
+:where([data-ui="unified"]) .dg-collage img {
     max-width: 100%;
     max-height: 100%;
 }
 
-.dg-collage-grid {
+:where([data-ui="unified"]) .dg-collage-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-template-rows: 1fr 1fr;
@@ -1521,15 +1512,15 @@ mark.dg-mark {
     overflow: hidden;
 }
 
-.dg-collage-grid img,
-.dg-collage-grid .dg-card-tile {
+:where([data-ui="unified"]) .dg-collage-grid img,
+:where([data-ui="unified"]) .dg-collage-grid .dg-card-tile {
     width: 100%;
     height: 100%;
     object-fit: cover;
     display: block;
 }
 
-.dg-collage-name {
+:where([data-ui="unified"]) .dg-collage-name {
     display: block;
     margin-top: var(--space-2);
     font-weight: 600;
@@ -1540,96 +1531,96 @@ mark.dg-mark {
     white-space: nowrap;
 }
 
-.dg-collage-count {
+:where([data-ui="unified"]) .dg-collage-count {
     display: block;
     font-size: 0.75rem;
-    color: var(--gray-500);
+    color: var(--ui-muted);
 }
 
-.dg-rail-shuffle {
+:where([data-ui="unified"]) .dg-rail-shuffle {
     margin-left: auto;
     font-size: 0.8125rem;
 }
 
 /* ── portfolio band ─────────────────────────────────────────────────────── */
-.dg-portfolio-head {
+:where([data-ui="unified"]) .dg-portfolio-head {
     display: flex;
     align-items: center;
     gap: var(--space-3);
     flex-wrap: wrap;
 }
 
-.dg-portfolio-head h2 {
+:where([data-ui="unified"]) .dg-portfolio-head h2 {
     margin: 0;
     font-size: 1.25rem;
     color: var(--gray-900);
 }
 
-.dg-portfolio-head .dash-btn {
+:where([data-ui="unified"]) .dg-portfolio-head .dash-btn {
     margin-left: auto;
 }
 
 /* ── filter tokens ──────────────────────────────────────────────────────── */
-.dg-token--clear {
+:where([data-ui="unified"]) .dg-token--clear {
     background: transparent;
     border-style: dashed;
     color: var(--gray-600);
 }
 
 /* ── deep-search row ────────────────────────────────────────────────────── */
-.dg-deep-hint {
-    color: var(--gray-500);
+:where([data-ui="unified"]) .dg-deep-hint {
+    color: var(--ui-muted);
     font-size: 0.75rem;
 }
 
 /* ── drawer header ──────────────────────────────────────────────────────── */
-.dg-drawer-head {
+:where([data-ui="unified"]) .dg-drawer-head {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
     gap: var(--space-3);
-    padding-bottom: var(--space-4);
     border-bottom: 1px solid var(--gray-200);
+    padding: var(--space-4) 68px var(--space-4) var(--space-4);
 }
 
-.dg-drawer-head h2 {
+:where([data-ui="unified"]) .dg-drawer-head h2 {
     margin: 0;
     font-size: 1.5rem;
     color: var(--gray-900);
 }
 
-.dg-drawer-company {
+:where([data-ui="unified"]) .dg-drawer-company {
     margin: var(--space-1) 0 0;
     font-weight: 600;
     color: var(--gray-800);
 }
 
-.dg-drawer-name {
+:where([data-ui="unified"]) .dg-drawer-name {
     margin: 0;
     font-size: 0.875rem;
-    color: var(--gray-500);
+    color: var(--ui-muted);
 }
 
 /* ── drawer sections ────────────────────────────────────────────────────── */
-.dg-section-body {
+:where([data-ui="unified"]) .dg-section-body {
     font-size: 0.875rem;
     color: var(--gray-700);
 }
 
-.dg-meta-row {
+:where([data-ui="unified"]) .dg-meta-row {
     display: grid;
-    grid-template-columns: 8.5rem 1fr;
+    grid-template-columns: minmax(90px, 0.8fr) minmax(0, 1.2fr);
     gap: var(--space-2);
     padding: var(--space-2) 0;
     border-bottom: 1px solid var(--gray-100);
 }
 
-.dg-meta-row dt {
-    color: var(--gray-500);
+:where([data-ui="unified"]) .dg-meta-row dt {
+    color: var(--ui-muted);
     font-size: 0.8125rem;
 }
 
-.dg-meta-row dd {
+:where([data-ui="unified"]) .dg-meta-row dd {
     margin: 0;
     color: var(--gray-800);
     display: flex;
@@ -1638,7 +1629,7 @@ mark.dg-mark {
     align-items: center;
 }
 
-.dg-mini-list {
+:where([data-ui="unified"]) .dg-mini-list {
     list-style: none;
     margin: 0;
     padding: 0;
@@ -1647,43 +1638,45 @@ mark.dg-mark {
     gap: var(--space-2);
 }
 
-.dg-mini-list li {
+:where([data-ui="unified"]) .dg-mini-list li {
     padding: var(--space-2);
-    background: var(--surface-inset);
+    background: var(--gray-100);
     border-radius: var(--radius-sm);
     font-size: 0.8125rem;
     color: var(--gray-700);
 }
 
-.dg-mini-list em {
-    color: var(--gray-500);
+:where([data-ui="unified"]) .dg-mini-list em {
+    color: var(--ui-muted);
     font-style: normal;
 }
 
-.dg-empty {
+:where([data-ui="unified"]) .dg-empty {
     margin: 0;
-    color: var(--gray-500);
+    color: var(--ui-muted);
     font-size: 0.8125rem;
     font-style: italic;
 }
 
-.dg-copy-inline {
+:where([data-ui="unified"]) .dg-copy-inline {
     background: none;
     border: 0;
     padding: var(--space-1);
-    color: var(--gray-400);
+    color: var(--ui-muted);
     cursor: pointer;
     border-radius: var(--radius-sm);
+    min-height: var(--ui-control-height);
+    min-width: var(--ui-control-height);
 }
 
-.dg-copy-inline:hover,
-.dg-copy-inline:focus-visible {
-    color: var(--dash-theme);
-    background: var(--dash-theme-bg);
+:where([data-ui="unified"]) .dg-copy-inline:hover,
+:where([data-ui="unified"]) .dg-copy-inline:focus-visible {
+    color: var(--ui-accent);
+    background: var(--ui-tint);
 }
 
 /* ── drawer action bar ──────────────────────────────────────────────────── */
-.dg-actions-nav {
+:where([data-ui="unified"]) .dg-actions-nav {
     margin-left: auto;
     display: flex;
     align-items: center;
@@ -1691,15 +1684,16 @@ mark.dg-mark {
 }
 
 /* ── skeleton variant for hydrating sections ────────────────────────────── */
-.dg-skel--rows {
+:where([data-ui="unified"]) .dg-skel--rows {
     height: 4.5rem;
     width: 100%;
     border-radius: var(--radius-sm);
 }
 
 /* 2026-09-05 review — layout values via custom properties (no inline style=), pressed-state chrome */
-.dg-boot-bar { width: var(--w, 8%); }
-.dg-spacer { height: var(--h, 0); }
-.dg-grid-viewport { overflow-anchor: none; }
-.dg-grid img.is-blank { visibility: hidden; }
-.dg-pill:focus-visible, .dg-chip:focus-visible, .dg-density-btn:focus-visible, .dg-customer-btn:focus-visible, .dg-freshness:focus-visible { outline: 2px solid var(--dash-theme, var(--color-steve)); outline-offset: 2px; }
+:where([data-ui="unified"]) .dg-boot-bar { width: var(--w, 8%); }
+:where([data-ui="unified"]) .dg-spacer { height: var(--h, 0); }
+:where([data-ui="unified"]) .dg-grid-viewport { overflow-anchor: none; }
+:where([data-ui="unified"]) .dg-grid img.is-blank { visibility: hidden; }
+:where([data-ui="unified"]) .dg-pill:focus-visible, :where([data-ui="unified"]) .dg-chip:focus-visible, :where([data-ui="unified"]) .dg-density-btn:focus-visible, :where([data-ui="unified"]) .dg-customer-btn:focus-visible, :where([data-ui="unified"]) .dg-freshness:focus-visible { outline: 2px solid var(--ui-accent, var(--color-steve)); outline-offset: 2px; }
+}

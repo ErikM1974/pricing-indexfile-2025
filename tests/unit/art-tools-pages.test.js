@@ -55,7 +55,7 @@ describe('253gear publisher', () => {
         expect(images).not.toMatch(/style="width:/);
         expect(images).toMatch(/role="progressbar" aria-valuemin="0" aria-valuemax="100"/);
         expect(css).toMatch(/\.gp-cell-progress-bar \{ height: 100%; width: var\(--w, 0%\);/);
-        expect(css).toMatch(/^\[hidden\] \{ display: none !important; \}/m);
+        expect(read('shared_components/css/components.css')).toContain(':where([data-ui="unified"]) [hidden] { display: none; }');
         expect(html).not.toMatch(BARE);
         expect(html).toMatch(/gear-publisher\.js\?v=\d{4}\.\d{2}\.\d{2}\.\d+/);
         expect(html).not.toMatch(/<button class=/);

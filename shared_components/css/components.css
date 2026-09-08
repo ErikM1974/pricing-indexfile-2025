@@ -1,6 +1,6 @@
 /* Unified UI. Load tokens first and opt in on body: data-ui="unified".
  * Department/surface/density change semantic aliases only. Old pages remain on their current entry point.
- * Temporary adapters: Design Queue's dash/dq classes and public form/date hooks share primitives here.
+ * Temporary adapters: dashboard, queue, publisher and public form/date hooks share primitives here.
  * Remove adapters as each family adopts canonical classes; do not copy them into page stylesheets.
  * Sublayers: primitives -> patterns -> pages. No normal rules directly in the parent components layer.
  */
@@ -37,43 +37,70 @@
 :where([data-ui="unified"]) .dq-refresh,
 :where([data-ui="unified"]) .quick-nav-btn,
 :where([data-ui="unified"]) .date-pick-btn,
-:where([data-ui="unified"]) .dash-error-banner-close {
+:where([data-ui="unified"]) .dash-error-banner-close,
+:where([data-ui="unified"]) .dash-btn,
+:where([data-ui="unified"]) .gp-cell-btn {
  display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2); min-height: var(--ui-control-height);
  padding: var(--space-2) var(--space-4); border: 1px solid var(--ui-line-strong); border-radius: var(--radius-sm);
  background: var(--ui-surface); color: var(--ui-ink); font: inherit; font-size: var(--font-size-md); font-weight: 600; line-height: 1.3; text-decoration: none; cursor: pointer;
  transition: background var(--motion-fast) var(--ease-out), border-color var(--motion-fast) var(--ease-out);
 }
-:where([data-ui="unified"]) :is(.btn, .page-nav-link, .dash-back-link, .dq-filter, .dq-refresh, .quick-nav-btn, .date-pick-btn):hover { background: var(--ui-tint); border-color: var(--ui-accent); }
+:where([data-ui="unified"]) :is(.btn, .page-nav-link, .dash-back-link, .dq-filter, .dq-refresh, .quick-nav-btn, .date-pick-btn):hover, :where([data-ui="unified"]) :is(.dash-btn, .page-nav-link, .dash-back-link, .dq-filter, .dq-refresh, .quick-nav-btn, .date-pick-btn):hover, :where([data-ui="unified"]) :is(.gp-cell-btn, .page-nav-link, .dash-back-link, .dq-filter, .dq-refresh, .quick-nav-btn, .date-pick-btn):hover { background: var(--ui-tint); border-color: var(--ui-accent); }
 
 :where([data-ui="unified"]) .btn-primary,
-:where([data-ui="unified"]) .dq-filter[aria-pressed="true"] { background: var(--ui-accent); border-color: var(--ui-accent); color: var(--color-on-brand); }
-:where([data-ui="unified"]) .btn-primary:hover { background: var(--ui-accent-hover); border-color: var(--ui-accent-hover); }
+:where([data-ui="unified"]) .dq-filter[aria-pressed="true"],
+:where([data-ui="unified"]) .dash-btn--primary { background: var(--ui-accent); border-color: var(--ui-accent); color: var(--color-on-brand); }
+
+:where([data-ui="unified"]) .btn-primary:hover,
+:where([data-ui="unified"]) .dash-btn--primary:hover { background: var(--ui-accent-hover); border-color: var(--ui-accent-hover); }
 :where([data-ui="unified"]) .dq-filter[aria-pressed="true"]:hover { background: var(--ui-accent-hover); }
-:where([data-ui="unified"]) .btn-ghost { background: transparent; border-color: transparent; color: var(--ui-accent); }
+
+:where([data-ui="unified"]) .btn-ghost,
+:where([data-ui="unified"]) .dash-btn--ghost { background: transparent; border-color: transparent; color: var(--ui-accent); }
 :where([data-ui="unified"]) .btn-danger { background: var(--color-danger-ink); border-color: var(--color-danger-ink); color: var(--color-on-brand); }
 :where([data-ui="unified"]) .btn-danger:hover { background: var(--color-danger-ink); }
-:where([data-ui="unified"]) :is(.btn, .dq-refresh):disabled { background: var(--gray-100); border-color: var(--ui-line-strong); color: var(--ui-muted); cursor: not-allowed; }
-:where([data-ui="unified"]) .field { display: flex; flex-direction: column; gap: var(--space-2); min-width: 0; }
-:where([data-ui="unified"]) .field-label { font-size: var(--font-size-md); font-weight: 600; }
+:where([data-ui="unified"]) :is(.btn, .dq-refresh):disabled, :where([data-ui="unified"]) :is(.dash-btn, .dq-refresh):disabled, :where([data-ui="unified"]) :is(.gp-cell-btn, .dq-refresh):disabled { background: var(--gray-100); border-color: var(--ui-line-strong); color: var(--ui-muted); cursor: not-allowed; }
+
+:where([data-ui="unified"]) .field,
+:where([data-ui="unified"]) .gp-field { display: flex; flex-direction: column; gap: var(--space-2); min-width: 0; }
+
+:where([data-ui="unified"]) .field-label,
+:where([data-ui="unified"]) .gp-field > span { font-size: var(--font-size-md); font-weight: 600; }
 
 :where([data-ui="unified"]) .req,
 :where([data-ui="unified"]) .field-msg { color: var(--color-danger-ink); }
 
 :where([data-ui="unified"]) .field-input,
 :where([data-ui="unified"]) .field-select,
-:where([data-ui="unified"]) .field-textarea { width: 100%; min-width: 0; min-height: var(--ui-control-height); border: 1px solid var(--ui-line-strong); border-radius: var(--radius-sm); background: var(--ui-surface); color: var(--ui-ink); padding: var(--space-2) var(--space-3); font: inherit; font-size: var(--font-size-base); }
-:where([data-ui="unified"]) .field-textarea { min-height: 112px; resize: vertical; }
-:where([data-ui="unified"]) :is(.field-input, .field-select, .field-textarea):focus { outline: 2px solid var(--ui-accent); outline-offset: 2px; border-color: var(--ui-accent); }
+:where([data-ui="unified"]) .field-textarea,
+:where([data-ui="unified"]) .gp-field input[type="text"],
+:where([data-ui="unified"]) .gp-field input[type="file"],
+:where([data-ui="unified"]) .gp-field textarea { width: 100%; min-width: 0; min-height: var(--ui-control-height); border: 1px solid var(--ui-line-strong); border-radius: var(--radius-sm); background: var(--ui-surface); color: var(--ui-ink); padding: var(--space-2) var(--space-3); font: inherit; font-size: var(--font-size-base); }
+
+:where([data-ui="unified"]) .field-textarea,
+:where([data-ui="unified"]) .gp-field textarea { min-height: 112px; resize: vertical; }
+:where([data-ui="unified"]) :is(.field-input, .field-select, .field-textarea):focus, :where([data-ui="unified"]) :is(.gp-field input[type="text"], .field-select, .field-textarea):focus, :where([data-ui="unified"]) :is(.gp-field input[type="file"], .field-select, .field-textarea):focus, :where([data-ui="unified"]) :is(.field-input, .field-select, .gp-field textarea):focus { outline: 2px solid var(--ui-accent); outline-offset: 2px; border-color: var(--ui-accent); }
 
 :where([data-ui="unified"]) .field-input[aria-invalid="true"],
-:where([data-ui="unified"]) .field.is-error .field-input { border-color: var(--color-danger-ink); }
+:where([data-ui="unified"]) .field.is-error .field-input,
+:where([data-ui="unified"]) .gp-field.is-error .field-input,
+:where([data-ui="unified"]) .gp-field input[type="text"][aria-invalid="true"],
+:where([data-ui="unified"]) .field.is-error .gp-field input[type="text"],
+:where([data-ui="unified"]) .gp-field input[type="file"][aria-invalid="true"],
+:where([data-ui="unified"]) .field.is-error .gp-field input[type="file"] { border-color: var(--color-danger-ink); }
 
 :where([data-ui="unified"]) .field-help,
 :where([data-ui="unified"]) .field-msg { font-size: var(--font-size-sm); margin: 0; }
 :where([data-ui="unified"]) .field-help { color: var(--ui-muted); }
-:where([data-ui="unified"]) .choice { display: flex; align-items: center; gap: var(--space-3); min-height: var(--ui-control-height); padding: var(--space-2) var(--space-3); border: 1px solid var(--ui-line-strong); border-radius: var(--radius-sm); cursor: pointer; }
-:where([data-ui="unified"]) .choice:has(input:checked) { background: var(--ui-tint); border-color: var(--ui-accent); }
-:where([data-ui="unified"]) .choice input { accent-color: var(--ui-accent); width: 20px; height: 20px; flex: 0 0 20px; margin: 0; }
+
+:where([data-ui="unified"]) .choice,
+:where([data-ui="unified"]) .gp-check { display: flex; align-items: center; gap: var(--space-3); min-height: var(--ui-control-height); padding: var(--space-2) var(--space-3); border: 1px solid var(--ui-line-strong); border-radius: var(--radius-sm); cursor: pointer; }
+
+:where([data-ui="unified"]) .choice:has(input:checked),
+:where([data-ui="unified"]) .gp-check:has(input:checked) { background: var(--ui-tint); border-color: var(--ui-accent); }
+
+:where([data-ui="unified"]) .choice input,
+:where([data-ui="unified"]) .gp-check input { accent-color: var(--ui-accent); width: 20px; height: 20px; flex: 0 0 20px; margin: 0; }
 
 :where([data-ui="unified"]) .card,
 :where([data-ui="unified"]) .dash-card,
@@ -119,13 +146,17 @@
 :where([data-ui="unified"]) .dq-metrics-scroll { max-width: 100%; overflow: auto; }
 
 :where([data-ui="unified"]) .data-table,
-:where([data-ui="unified"]) .dq-metrics-table { width: 100%; border-collapse: collapse; font-size: var(--font-size-md); }
-:where([data-ui="unified"]) :is(.data-table, .dq-metrics-table) :is(th, td) { text-align: left; padding: var(--ui-row-space) var(--space-3); border-bottom: 1px solid var(--ui-line); vertical-align: top; }
-:where([data-ui="unified"]) :is(.data-table, .dq-metrics-table) th { font-size: var(--font-size-sm); font-weight: 600; color: var(--ui-muted); }
+:where([data-ui="unified"]) .dq-metrics-table,
+:where([data-ui="unified"]) .gp-binding-table { width: 100%; border-collapse: collapse; font-size: var(--font-size-md); }
+:where([data-ui="unified"]) :is(.data-table, .dq-metrics-table) :is(th, td), :where([data-ui="unified"]) :is(.gp-binding-table, .dq-metrics-table) :is(th, td) { text-align: left; padding: var(--ui-row-space) var(--space-3); border-bottom: 1px solid var(--ui-line); vertical-align: top; }
+:where([data-ui="unified"]) :is(.data-table, .dq-metrics-table) th, :where([data-ui="unified"]) :is(.gp-binding-table, .dq-metrics-table) th { font-size: var(--font-size-sm); font-weight: 600; color: var(--ui-muted); }
 
 :where([data-ui="unified"]) .data-table .num,
-:where([data-ui="unified"]) .dq-metrics-table td:last-child { font-variant-numeric: tabular-nums; }
-:where([data-ui="unified"]) .data-table .num { text-align: right; }
+:where([data-ui="unified"]) .dq-metrics-table td:last-child,
+:where([data-ui="unified"]) .gp-binding-table .num { font-variant-numeric: tabular-nums; }
+
+:where([data-ui="unified"]) .data-table .num,
+:where([data-ui="unified"]) .gp-binding-table .num { text-align: right; }
 :where([data-ui="unified"]) .ui-dialog { width: min(560px, calc(100% - 32px)); max-height: calc(100% - 32px); padding: var(--ui-panel-space); border: 1px solid var(--ui-line); border-radius: var(--radius-lg); background: var(--ui-surface); color: var(--ui-ink); box-shadow: var(--shadow-md); }
 :where([data-ui="unified"]) .ui-dialog::backdrop { background: rgb(0 0 0 / 45%); }
 :where([data-ui="unified"]) .ui-dialog h2 { margin-top: 0; }
@@ -134,6 +165,21 @@
 }
 
 @layer components.patterns {
+:where([data-ui="unified"]) .dash-shell { min-height: 100vh; display: flex; flex-direction: column; }
+:where([data-ui="unified"]) .dash-shell > .dash-content { flex: 1; }
+:where([data-ui="unified"]) .gp-field { margin: var(--space-4) 0; }
+:where([data-ui="unified"]) .gp-field > span em { font-style: normal; color: var(--color-danger-ink); }
+:where([data-ui="unified"]) .gp-check { flex-wrap: wrap; }
+:where([data-ui="unified"]) .gp-check input { flex: 0 0 20px; }
+:where([data-ui="unified"]) .gp-binding { max-width: 100%; overflow: auto; }
+:where([data-ui="unified"]) .nwca-toast-container { position: fixed; left: 50%; bottom: var(--space-5); transform: translateX(-50%); z-index: var(--z-toast); display: flex; flex-direction: column; gap: var(--space-2); align-items: center; pointer-events: none; width: max-content; max-width: min(92vw, 640px); }
+:where([data-ui="unified"]) .nwca-toast { display: flex; align-items: flex-start; gap: var(--space-2); padding: var(--space-3) var(--space-4); border-radius: var(--radius-md); background: var(--ui-ink); color: var(--color-on-brand); font: inherit; font-size: var(--font-size-md); box-shadow: var(--shadow-md); opacity: 0; transform: translateY(8px); transition: opacity var(--motion-fast) var(--ease-out), transform var(--motion-fast) var(--ease-out); pointer-events: auto; white-space: pre-line; overflow-wrap: anywhere; }
+:where([data-ui="unified"]) .nwca-toast.show { opacity: 1; transform: translateY(0); }
+:where([data-ui="unified"]) .nwca-toast-success { background: var(--color-brand-deep); }
+:where([data-ui="unified"]) .nwca-toast-error { background: var(--color-danger-ink); }
+:where([data-ui="unified"]) .nwca-toast-warning { background: var(--color-warning-ink); }
+:where([data-ui="unified"]) .nwca-toast-info { background: var(--color-info-ink); }
+:where([data-ui="unified"]) .nwca-toast-icon { margin-top: 2px; flex: none; }
 
 :where([data-ui="unified"]) .skip-link { position: absolute; top: -100px; left: var(--space-3); z-index: var(--z-toast); padding: var(--space-3); background: var(--ui-surface); }
 :where([data-ui="unified"]) .skip-link:focus { top: var(--space-2); }
@@ -185,7 +231,10 @@
 :where([data-ui="unified"]) .dash-loading,
 :where([data-ui="unified"]) .empty-state { padding: var(--space-5); color: var(--ui-muted); }
 :where([data-ui="unified"]) .date-anchor { position: relative; display: flex; align-items: stretch; }
-:where([data-ui="unified"]) .date-anchor .field-input { padding-right: 52px; }
+
+:where([data-ui="unified"]) .date-anchor .field-input,
+:where([data-ui="unified"]) .date-anchor .gp-field input[type="text"],
+:where([data-ui="unified"]) .date-anchor .gp-field input[type="file"] { padding-right: 52px; }
 :where([data-ui="unified"]) .date-pick-btn { position: absolute; right: 1px; bottom: 1px; min-width: var(--ui-control-height); padding: var(--space-2); border: 0; background: transparent; }
 :where([data-ui="unified"]) .date-pick-native { position: absolute; bottom: 0; right: 0; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
 :where([data-ui="unified"]) .hp-wrap { display: none; }
@@ -222,7 +271,7 @@
 
 @layer utilities {
 @media (prefers-reduced-motion: reduce) {
-:where([data-ui="unified"]) *, :where([data-ui="unified"]) *::before, :where([data-ui="unified"]) *::after { transition: none; scroll-behavior: auto; }
+:where([data-ui="unified"]) *, :where([data-ui="unified"]) *::before, :where([data-ui="unified"]) *::after { transition: none; scroll-behavior: auto; animation: none; }
 }
 
 :where([data-ui="unified"]) [hidden] { display: none; }

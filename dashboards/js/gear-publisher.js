@@ -93,6 +93,7 @@
             if (out.designName) { state.draft.designName = String(out.designName); found.push('name'); }
             if (out.designDescription) { state.draft.designDescription = String(out.designDescription); found.push('description'); }
             state.draft.identitySource = 'screenshot';
+            hydrateFields();
 
             status.textContent = found.length
                 ? 'Read the ' + found.join(', ') + '. Check them below before continuing.'
@@ -338,7 +339,9 @@
                 headers: { 'Content-Type': 'application/json', 'Idempotency-Key': state.draft.idempotencyKey },
                 body: JSON.stringify(createPayload())
             }, 45000);
-            startPolling(out.jobId || state.draft.designNumber);
+            state.draft.jobId = out.jobId || state.draft.designNumber;
+            global.GearStore.save(state.draft);
+            startPolling(state.draft.jobId);
         } catch (e) {
             $('gp-create-btn').disabled = false;
             fail('Could not start the build: ' + e.message);
@@ -397,7 +400,7 @@
             : '';
 
         $('gp-job-body').innerHTML =
-            '<p><strong>' + esc(job.status || 'working') + '</strong>' +
+            '<p><strong>' + esc(({ awaiting_review: 'Ready for review', published: 'Published', failed: 'Build failed', needs_attention: 'Needs attention', running: 'Building your draft', queued: 'Waiting to start' })[job.status] || 'Working') + '</strong>' +
             (job.stalled ? ' <span class="gp-inline-warn">(stalled — safe to resume)</span>' : '') + '</p>' +
             '<ul class="gp-steps">' + steps + current + '</ul>' + binding +
             (errors ? '<ul class="gp-errors">' + errors + '</ul>' : '') +
@@ -434,6 +437,7 @@
 
             state.draft.publishedAt = out.publishedAt;
             state.draft.step = 'live';
+            state.draft.publishReceipt = { storefrontUrl: out.storefrontUrl, verified: out.verified };
             global.GearStore.save(state.draft);
 
             $('gp-live').hidden = false;
@@ -449,6 +453,8 @@
         } catch (e) {
             $('gp-publish-btn').disabled = false;
             if (e.status === 409 && e.body && e.body.audit) {
+                $('gp-publish-btn').disabled = true;
+                $('gp-publish-reason').textContent = 'Publish is blocked until the checks below pass.';
                 $('gp-job-body').innerHTML = auditMarkup(e.body.audit);
                 fail('Publish blocked — the checks below have to pass first.');
             } else {
@@ -461,6 +467,9 @@
 
     function renderStep() {
         var d = state.draft;
+        if (d.step === 'live' && !d.publishedAt) d.step = 'review';
+        $('gp-next-btn').hidden = d.step === 'review' || d.step === 'live';
+        $('gp-back-btn').disabled = d.step === 'identity';
         global.GearStore.STEPS.forEach(function (s) {
             var pane = $('gp-step-' + s);
             if (pane) pane.hidden = s !== d.step;
@@ -561,12 +570,7 @@
                 var def = state.config.styles.filter(function (s) { return s.option === d.styles[0]; })[0];
                 try {
                     var colors = await loadColors(def.sanmarStyle);
-                    $('gp-color-list').innerHTML = colors.slice(0, 40).map(function (c) {
-                        return '<label class="gp-check gp-swatch"><input type="checkbox" data-color="' +
-                            esc(c.catalogColor) + '"> <img src="' + esc(c.swatchImage) + '" alt="" class="gp-swatch-img">' +
-                            esc(c.colorName) + '</label>';
-                    }).join('');
-                    $('gp-color-list').dataset.loaded = JSON.stringify(colors);
+                    renderColors(colors);
                 } catch (err) { fail('Could not load colours: ' + err.message); }
             }
             persist();
@@ -607,7 +611,7 @@
                 persist();
                 return;
             }
-            if (e.target.type === 'radio') return;
+            if (e.target.closest('label')) return;
             pickFile(key);
         });
         host.addEventListener('change', function (e) {
@@ -621,7 +625,14 @@
             global.GearImages.accept(state.draft, cell.getAttribute('data-key'), e.dataTransfer.files[0], persist);
         });
 
-        $('gp-alt').addEventListener('input', function () { state.draft.altText = this.value; global.GearStore.save(state.draft); });
+        var factFields = { 'gp-facts': 'raw', 'gp-fact-landmark': 'landmark', 'gp-fact-years': 'years', 'gp-fact-who': 'whoRanIt', 'gp-fact-sources': 'sources' };
+        Object.keys(factFields).forEach(function (id) {
+            $(id).addEventListener('input', function () {
+                state.draft.facts[factFields[id]] = this.value;
+                global.GearStore.save(state.draft);
+            });
+        });
+        $('gp-alt').addEventListener('input', function () { state.draft.altText = this.value; global.GearStore.save(state.draft); renderStep(); });
         $('gp-classify-btn').addEventListener('click', classify);
         $('gp-draft-btn').addEventListener('click', draftCopy);
         $('gp-hook').addEventListener('input', function () { state.draft.hook = this.value; global.GearStore.save(state.draft); renderStep(); });
@@ -652,15 +663,71 @@
         input.click();
     }
 
+    // Restore a saved model only at boot or OCR completion, never on every keystroke.
+    function hydrateFields() {
+        var d = state.draft;
+        ['designNumber', 'designName', 'designDescription', 'hook', 'body'].forEach(function (name) {
+            $('gp-' + name).value = d[name] || '';
+        });
+        $('gp-alt').value = d.altText || '';
+        ['landmark', 'years', 'who', 'sources'].forEach(function (name) {
+            $('gp-fact-' + name).value = (d.facts && d.facts[name === 'who' ? 'whoRanIt' : name]) || '';
+        });
+        $('gp-facts').value = (d.facts && d.facts.raw) || '';
+        updateWordCount();
+    }
+
+    function renderColors(colors) {
+        var selected = state.draft.colors.map(function (c) { return c.catalogColor; });
+        // Keep saved colors selectable even if they are outside the first 40 catalogue results.
+        var shown = colors.slice(0, 40);
+        state.draft.colors.forEach(function (c) {
+            if (!shown.some(function (item) { return item.catalogColor === c.catalogColor; })) shown.push(c);
+        });
+        $('gp-color-list').innerHTML = shown.map(function (c) {
+            return '<label class="gp-check gp-swatch"><input type="checkbox" data-color="' + esc(c.catalogColor) + '"' +
+                (selected.indexOf(c.catalogColor) >= 0 ? ' checked' : '') + '> ' +
+                (c.swatchImage ? '<img src="' + esc(c.swatchImage) + '" alt="" class="gp-swatch-img">' : '') + esc(c.colorName) + '</label>';
+        }).join('');
+        $('gp-color-list').dataset.loaded = JSON.stringify(shown);
+    }
+
+    function restoreLiveReceipt() {
+        var d = state.draft, receipt = d.publishReceipt || {};
+        $('gp-live').hidden = false;
+        $('gp-live-body').innerHTML = '<p class="gp-inline-ok"><strong>This draft was published.</strong></p>' +
+            '<p>Saved publication time: ' + esc(d.publishedAt || 'unavailable') + '.</p>' +
+            (receipt.storefrontUrl ? '<p><a href="' + esc(receipt.storefrontUrl) + '" target="_blank" rel="noopener">Open the published page</a></p>' : '') +
+            '<p class="gp-muted">This is the saved publication record; the live page has not been checked again.</p>';
+    }
+
     async function boot() {
         var params = new URLSearchParams(location.search);
         var draftId = params.get('draft') || String(Date.now());
-        state.draft = global.GearStore.load(draftId) || global.GearStore.newDraft(draftId);
+        state.draft = Object.assign(global.GearStore.newDraft(draftId), global.GearStore.load(draftId) || {});
+        Object.keys(state.draft.images).forEach(function (key) {
+            var image = state.draft.images[key];
+            if (image.hostedUrl && image.state === 'uploaded') image.previewUrl = image.hostedUrl;
+        });
+        hydrateFields();
+        renderColors(state.draft.colors);
 
         bindEvents();
         renderStep();
         await loadConfig();
         renderStep();
+        if (state.draft.styles.length && state.config) {
+            var style = state.config.styles.find(function (item) { return item.option === state.draft.styles[0]; });
+            if (style) {
+                try { renderColors(await loadColors(style.sanmarStyle)); }
+                catch (error) { fail('Could not refresh saved colours: ' + error.message); }
+            }
+        }
+        if (state.draft.step === 'review' && (state.draft.jobId || state.draft.productGid)) {
+            $('gp-job-panel').hidden = false;
+            startPolling(state.draft.jobId || state.draft.designNumber);
+        }
+        if (state.draft.step === 'live' && state.draft.publishedAt) restoreLiveReceipt();
     }
 
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);

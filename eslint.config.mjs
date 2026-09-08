@@ -12,6 +12,7 @@ const STRICT_FILES = [
     'lib/**/*.js',
     'scripts/build.js',
     'scripts/lint-css.js',
+    'scripts/css/runtime-inventory.js',
     'config/tenant.js',
     'server.js',
     'routes/**/*.js',
@@ -46,6 +47,7 @@ export default [
             'scripts/**/*.js',
             '!scripts/build.js',
             '!scripts/lint-css.js',
+            '!scripts/css/runtime-inventory.js',
         ],
     },
     {
@@ -188,7 +190,7 @@ export default [
     },
     {
         // Node-side build/server helpers — CommonJS, not ESM.
-        files: ['server.js', 'routes/**/*.js', 'lib/**/*.js', 'scripts/build.js', 'scripts/lint-css.js'],
+        files: ['server.js', 'routes/**/*.js', 'lib/**/*.js', 'scripts/build.js', 'scripts/lint-css.js', 'scripts/css/runtime-inventory.js'],
         languageOptions: {
             sourceType: 'commonjs',
             globals: { ...globals.node },

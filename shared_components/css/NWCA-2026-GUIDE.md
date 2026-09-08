@@ -240,3 +240,11 @@ Generic modal (the homepage quick-view/compare keep their own classes; `.modal-c
 `--paper` `--paper-deep` `--card` · `--ink` `--ink-soft` (`--ink-faint` decorative only) · `--green-950/900/700/600/100/50` · `--rush` `--rush-deep` `--rush-deeper` `--rush-soft` · `--ok` `--warn(-soft)` `--bad(-soft)` · `--radius` `--radius-sm` · `--shadow-card` `--shadow-pop` · `--font-display` `--font-body` · `--wrap` (1240px, via `.wrap`)
 
 Breakpoints: 1100 / 960 (drawer nav) / **768 (primitives collapse: form-row, page-head-row, table density, toast full-width)** / 560. Z-index map: nav 90, compare-bar 220, drawer 230–245, modals 260, **toasts 290**, skip-link 300.
+
+## Staff workspace adapters (2026-09-08)
+
+Design Vault and Gear Publisher use components.css as their only common control/shell owner. Existing dash-btn, gp-field, gp-check and gp-binding-table hooks temporarily share the canonical button/field/choice/table implementations. New markup should use the canonical classes. Keep dg-* artwork/windowing and gp-* photo-binding arrangement in their scoped page files.
+
+The toast service now supplies .nwca-toast-container as well as its existing ID. Migrated pages use the scoped toast pattern in components.css and omit toast-notifications.css; unmigrated consumers continue loading that sheet. No browser stylesheet injection is added.
+
+Drawers need a nonshrinking content flow inside an independently scrollable body. Nested overlays consume Escape once, trap focus at the active level and return focus to a visible connected trigger. Windowed galleries use viewport screenshots; a full-page capture cannot represent unmounted rows. Publisher review fixtures mock the complete service path, including XHR photo uploads, job polling and publish responses.
