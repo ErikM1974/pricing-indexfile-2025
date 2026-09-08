@@ -107,3 +107,7 @@ half-finished work — and a `server.js` committed with call sites but without `
   `SERVER_DIR`/`SERVER_FILE` through ctx) and the lock forbids the raw forms in `routes/`.
 - Gates: unit, e2e (a11y + money path), `test:parity` and `test:parity:surfaces` green (quote relays moved); a booted
   server answered robots, the blog sitemap, banner presets and the static mounts before the deploy.
+
+### Order submission stages (2026-09-07, following v2026.09.07.31)
+
+The DTG order submission is decomposed into garments, services, artwork, notes, payload, drafts and completion stages under lib/order-form, coordinated by submit.js (247 lines). A17-case route-level harness passed on the original and on the staged code. It covers dry-run reads, distinct size prices/colors, design links, tax/rep/shipping data, fees, rejected lines, processed drafts, response replay, upstream rejection and nonfatal audit failures. Validation remains at its original position relative to draft writes. Three switch-case scopes and unused note parameters were cleaned when entering the existing strict library lint scope.
