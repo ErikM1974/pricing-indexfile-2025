@@ -1,3 +1,12 @@
+## v2026.09.08.5 (2026.09.08)
+
+- Record Bradley family CSS migration plan
+- Record Bradley migration evidence and shared workflow lessons
+- Record DTG pricing-readiness release guard and regression evidence
+- Unify Bradley workflows and block incomplete DTG quote saves
+- Record image-preview contrast failure during entrance motion
+- Keep image-preview text readable throughout entrance motion
+
 ## v2026.09.08.3 (2026.09.08)
 
 - Record staff workspace CSS migration checkpoint
