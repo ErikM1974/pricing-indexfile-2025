@@ -3866,3 +3866,21 @@ screen shots were clean. 🔑 A byte-identical rule shared by N pages is a compo
 family sheet linked before the page sheet, then re-theme it ONCE (ten maroon training headers → the
 Training Center's green in one rule). 🔑 Admin pages cannot be screenshotted by the e2e spec (its session
 is role `staff`) — verify them live.
+
+## 2026-09-07 — Webstore family (`v2026.09.07.8`): a push that "succeeded", and variables a sheet did not need
+
+**Problem.** (a) My deploy helper ran `git push … 2>&1 | tail -2` and tested the pipeline's status — `tail`'s.
+A reset connection printed `fatal:` and the helper reported success; `origin/main` was a release behind while
+Heroku and the tag were current. Caught by asking the remote (`git ls-remote origin refs/heads/main`) before
+the next step. (b) `golf-tournament-showcase.css` (15 SEO pages) declared its own `--gray-50…900`; with
+`tokens.css` now loading first, a same-named token silently loses to the page's copy on those pages — a
+latent trap for every semantic alias built on `--gray-*`. (c) `stylelint --fix` dropped `-webkit-` prefixes
+and left `backdrop-filter`/`appearance`/`background-clip` declared twice.
+**Root cause.** (a) A pipe returns the LAST command's status. (b) Every sheet minted its own palette; the
+names collided with the canonical ones. (c) The prefix fixer does not dedupe.
+**Solution.** (a) `if git push … > log 2>&1; then` — or `set -o pipefail`; the deploy skill's own steps
+have no pipe. (b) Compare values: identical → delete the page copy; different → rename with the sheet's
+prefix (`--gts-*`). (c) A dedupe pass after every `--fix`.
+**Prevention.** 🔑 Verify a push by reading the remote, never by the push's printed lines. 🔑 Before linking
+`tokens.css` to a page, grep its sheets for `--gray-|--space-|--radius-|--font-` definitions — a same-named
+local variable shadows the token on that page. 🔑 `--fix` then dedupe then lint again.

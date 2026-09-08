@@ -43,6 +43,14 @@ async function mockWrites(page, prefix) {
 async function openBuilder(page, path) {
     await page.goto(path);
     await page.waitForSelector('#product-search', { timeout: 30000 });
+    if (path.includes('dtf-quote-builder')) {
+        // DTF attaches search listeners AFTER its pricing read. The overlay
+        // is hidden by CSS initially; its inline display is set only at the
+        // end of init, after listeners bind. Typing before that loses input.
+        await page.waitForFunction(() =>
+            document.getElementById('loading-overlay')?.style.display === 'none',
+        null, { timeout: 30000 });
+    }
 }
 
 /** Set an input that may be HIDDEN behind the guided step rail (customer
