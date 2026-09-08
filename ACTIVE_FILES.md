@@ -1,6 +1,6 @@
 # Active Files Registry
 
-Last updated: 2026-09-07. The registry is split by area; all existing file annotations and removal history are preserved. The five portal rows formerly concatenated ahead of the heading are repaired in Entry Points.
+Last updated: 2026-09-07 (CSS unification plan added to Documentation & Guides). The registry is split by area; all existing file annotations and removal history are preserved. The five portal rows formerly concatenated ahead of the heading are repaired in Entry Points.
 
 | Area | Registry |
 |---|---|
