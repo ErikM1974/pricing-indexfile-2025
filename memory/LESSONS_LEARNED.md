@@ -238,3 +238,7 @@ Native Node22.23 runs Puppeteer25; invoke its capture CLI outside Jest, and repo
 - Problem/root cause: DTG rendered sizes before its bundle request completed; Save accepted zero/partial prices, and an older request could overwrite edits. A six-second browser delay hid the readiness gap.
 - Solution: require every entered row/positive size to have current pricing; invalidate on edits, discard old responses, copy size maps, and use the same guard for Save and Print. Pending manual rows throw a visible error instead of falling back to AI data.
 - Prevention: controlled pending/failure/out-of-order tests plus browser assertions on actual readiness and posted money. Keep Save independent of customer/Push completeness; unused blank rows are allowed. EMB/SCP already recalculate before save; DTF computes from state.
+
+## Dialog text must stay readable during entrance motion (2026-09-08)
+- Problem/root cause: a whole-dialog opacity animation blended white Download text into its dark button; faster CI sampled a 3.9:1 contrast frame that local checks missed.
+- Solution/prevention: animate position/scale only, and pause the real preview animation mid-frame during the browser contrast check. Do not hide the failure with a fixed delay or weaken the accessibility assertion.
