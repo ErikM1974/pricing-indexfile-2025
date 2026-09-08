@@ -1,3 +1,11 @@
+## v2026.09.08.7 (2026.09.08)
+
+- Record live art pages and next authenticated relay rollout
+- Record tested staff relay and vendor boundary migration
+- Save tested transfer relay rollout and resume checkpoint
+- Resume tested transfer rollout and record family batching plan
+- Route transfer and Supacolor workflows through authenticated staff relays
+
 ## v2026.09.08.6 (2026.09.08)
 
 - Record Bradley live verification and art workflow migration plan
