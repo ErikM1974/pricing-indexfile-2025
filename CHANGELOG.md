@@ -1,3 +1,8 @@
+## v2026.09.08.3 (2026.09.08)
+
+- Record staff workspace CSS migration checkpoint
+- Unify Design Vault and Publisher styles and restore workspace interactions
+
 ## v2026.09.08.2 (2026.09.08)
 
 - Document unified CSS direction and phased component migration
