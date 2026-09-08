@@ -3951,3 +3951,32 @@ before tokenizing — a declaration can span three lines, so join until the line
 Run the tokenizer with `--dry` on an already-migrated sheet before a re-run: the expected report is
 `exact 0 · near 0 · far 0 → 0 page vars`. 🔑 After a re-run, grep `^\s*(--[a-z0-9-]+):\s*var\(\1\)` — a
 self-referencing custom property is silent in the browser and blanks every use of the variable.
+
+
+## 2026-09-07 — Quote builders family: retiring a generated sheet by renaming, a near-mapped ink, and curl vs the office firewall
+
+**Problem.** (a) The generated `quote-builder-inline.css` (127 `.qbi-<hash>` classes, all `!important`) could not
+simply lose its flags: each flag reproduces the precedence an inline `style=""` had over the builders' id-based
+rules, and a screenshot only proves the default state of a page — modals, later steps and error states never
+render in a shot, so a dropped flag could regress a state nobody sees until a customer does. (b) On the garment
+designer the page ink `--text: #22301c` was within the "near" threshold of the storefront ink and got mapped to it;
+every heading on the page came out a shade darker (the diff caught 351 px on one heading only — small text stays
+under the per-channel threshold). (c) Both curls on this machine (Git Bash's and Windows' `curl.exe`) failed the
+TLS handshake to `www.teamnwca.com` (exit 35) minutes after a verified Heroku release; `openssl s_client` showed
+the certificate was issued by a FortiGate (`CN=FGT61FTK22016247`) — the office firewall inspects TLS for that
+domain and curl does not trust its CA. The app was fine: the direct `*.herokuapp.com` URL answered and the
+in-app browser loaded the page with the new stylesheet.
+**Root cause.** (a) A flag is a cascade fact, not a lint problem. (b) The near threshold is a colour-distance
+rule; it has no idea which colour is the page's body ink. (c) A corporate TLS proxy in the path.
+**Solution.** (a) The sheet was retired as a GENERATED artifact, not as a set of flags: the same 127 declaration
+sets became `quote-builder-utilities.css` with names that are their declarations (`.qb-mt-4`,
+`.qb-bg-amber-100-p-2-8-r-4-c-amber-800`) — tokenize the source sheet first so the names carry token names —
+the markup's classes were rewritten in the three builders, and the flags stay with a file-level reason until the
+id rules are refactored builder by builder (recorded on the Brand Standards page). (b) Kept the page's exact ink;
+the tokenizer's near rule now has a documented exception: a sheet's body ink / page text variable is never
+near-mapped. (c) Verify a release through the `herokuapp.com` URL or the browser when curl exits 35 here.
+**Prevention.** 🔑 Never delete `!important` on the money path by script — a screenshot cannot see the states
+that need it. 🔑 A "near" colour rule must exempt the page's ink (`--text`, `--ink`, `--text-primary`): a
+shade on the body text is a look change even when no pixel crosses the threshold. 🔑 curl exit 35 from the
+office to teamnwca.com is the FortiGate, not the site — check `openssl s_client -connect … | grep issuer`.
+
