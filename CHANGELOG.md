@@ -1,3 +1,11 @@
+## v2026.09.07.29 (2026.09.07)
+
+- Bump puppeteer from 24.43.1 to 25.10.0
+- Bump the dev-tooling group across 1 directory with 16 updates
+- Merge Puppeteer 25 with native capture loading and honest baseline skips
+- Merge compatible tooling updates with verified calculator and type contracts
+- Clear production dependency audit and enforce its CI gate
+
 ## v2026.09.07.28 (2026.09.07)
 
 - Bump csv-parse from 6.1.0 to 7.0.2
