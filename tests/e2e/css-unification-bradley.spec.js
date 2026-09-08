@@ -210,6 +210,10 @@ test('CSS Bradley: Job Detail, native image preview, status dialog and focus ret
     const thumb = page.locator('.sjd-line-thumb--clickable').first();
     await thumb.focus();
     await page.keyboard.press('Enter');
+    // Text must remain readable during entrance motion, including on fast CI runners.
+    await page.locator('.product-image-modal-content').evaluate(node => {
+        for (const animation of node.getAnimations()) { animation.pause(); animation.currentTime = 100; }
+    });
     await layouts(page, 'job-image-preview');
     await dismiss(page, '#product-image-modal', thumb);
     const status = page.locator('#sjd-status-btn');

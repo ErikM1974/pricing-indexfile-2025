@@ -37,7 +37,7 @@
         "rawCssBytes": 34377,
         "localCssRequests": 4
       },
-      "measuredRawCssBytes": 62411
+      "measuredRawCssBytes": 62363
     },
     {
       "source": "dashboards/design-queue.html",
@@ -67,7 +67,7 @@
         "rawCssBytes": 173704,
         "localCssRequests": 4
       },
-      "measuredRawCssBytes": 69398
+      "measuredRawCssBytes": 69350
     },
     {
       "source": "pages/art-billing-reference.html",
@@ -93,7 +93,7 @@
         "rawCssBytes": 149859,
         "localCssRequests": 3
       },
-      "measuredRawCssBytes": 63010
+      "measuredRawCssBytes": 62962
     },
     {
       "source": "pages/webstore-inquiry.html",
@@ -123,7 +123,7 @@
         "rawCssBytes": 33091,
         "localCssRequests": 3
       },
-      "measuredRawCssBytes": 58821
+      "measuredRawCssBytes": 58773
     },
     {
       "source": "dashboards/design-gallery.html",
@@ -150,7 +150,7 @@
       ],
       "test": "tests/e2e/css-unification-workspaces.spec.js",
       "maxCssBytes": 113293,
-      "measuredRawCssBytes": 111245,
+      "measuredRawCssBytes": 111197,
       "dynamicTokens": [
         "--w",
         "--h"
@@ -190,7 +190,7 @@
       ],
       "test": "tests/e2e/css-unification-workspaces.spec.js",
       "maxCssBytes": 65949,
-      "measuredRawCssBytes": 63901,
+      "measuredRawCssBytes": 63853,
       "dynamicTokens": [
         "--w"
       ],
@@ -235,7 +235,7 @@
         "rawCssBytes": 216211,
         "localCssRequests": 4
       },
-      "measuredRawCssBytes": 118577,
+      "measuredRawCssBytes": 118529,
       "maxCssBytes": 120625
     },
     {
@@ -269,7 +269,7 @@
         "rawCssBytes": 216211,
         "localCssRequests": 4
       },
-      "measuredRawCssBytes": 118577,
+      "measuredRawCssBytes": 118529,
       "maxCssBytes": 120625
     },
     {
@@ -300,7 +300,7 @@
         "rawCssBytes": 197054,
         "localCssRequests": 4
       },
-      "measuredRawCssBytes": 106202,
+      "measuredRawCssBytes": 106154,
       "maxCssBytes": 108250
     },
     {
@@ -333,7 +333,7 @@
         "rawCssBytes": 216465,
         "localCssRequests": 5
       },
-      "measuredRawCssBytes": 134032,
+      "measuredRawCssBytes": 133984,
       "maxCssBytes": 136080
     },
     {
@@ -364,7 +364,7 @@
         "rawCssBytes": 217378,
         "localCssRequests": 6
       },
-      "measuredRawCssBytes": 109193,
+      "measuredRawCssBytes": 109145,
       "maxCssBytes": 111241
     }
   ],
