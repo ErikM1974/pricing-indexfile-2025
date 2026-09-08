@@ -66,3 +66,8 @@ Source: Erik's Claude handover (2026-09-08). Work on develop; one server editor;
 - First cut: routes/order-form.js, 48 registrations and 2,219 source lines moved unchanged; server.js is 6,525 lines. All 61 statements match in order, route fixture456 unchanged and undefined0. The 3-Day Tees submit handler is already in customer-portal.js and will be covered there.
 
 - Browser gate initially exposed a DTF test race: typing preceded async search-listener binding (trace showed no product request). The harness now waits for the existing end-of-init overlay state. Production handler code remains identical; both DTF save lanes and the full browser suite are rerun. The oldest resolved webstore lesson was archived before recording this finding.
+
+- Order-form extraction v2026.09.07.31 / Heroku2054 verified live at8c18e68a. Source CI34185104267 passed; full local browser rerun15 passed/3optional skips including all5surface parity tests; all other gates remained green.
+- Next step: 17 order-form behavior tests passed before and after decomposing its978-line handler into eight lib/order-form stages and a247-line orchestrator. Eleven paid-storefront contract tests cover existing behavior before its extraction. A lessons-cap unit check enforces300 lines. All services are mocked in these tests; no real order/payment writes.
+
+- Paid storefront submission keeps Stripe verification and response handling in customer-portal; its payload now passes through four tested lib/storefront-order stages. The11-case contract suite passed on both versions. Order-form getTaxAccount was an unused legacy helper and is omitted from the extracted stages; active tax-account resolution/cache stays intact.
