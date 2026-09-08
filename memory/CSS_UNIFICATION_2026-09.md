@@ -1,5 +1,17 @@
 # CSS unification — design direction and implementation plan
 
+## Active CSS batch — Steve, AE and art detail pages — 2026-09-08
+
+The coordinated transfer authentication release is live on both apps; details and exact versions are in HANDOVER_FOLLOWUPS_2026-09.md. Thirteen pages are live on unified style owners. Erik authorized continued edits without additional permission requests and asked for a faster whole-app rollout.
+
+- [ ] Capture fixture-driven baseline states for Steve, AE, Art Request Detail and Mockup Detail, including customer mode and embedded submission panes.
+- [ ] Reuse shared controls and art-workflow patterns; replace competing Art Hub/Ruth/Kanban imports and global scale overrides on the migrated consumers. Keep Steve green, Ruth purple, AE maroon and customer storefront semantics. Consolidate duplicated controls while preserving business IDs, URLs, tab/hash/localStorage state and navigation.
+- [ ] Cover loading, empty, failure/retry, filters, board, dialogs, hold/rush, approval/revision, uploads/recovery and vendor sender states as applicable. Mock every business write, Box shared-link creation, PDF/email notification and recovery call. Review desktop/tablet/phone, keyboard focus, zoom and customer mode.
+- [ ] Update the dependency/state manifest and per-page LF source budgets; run focused checks while editing, then full release gates and exact-source CI, cache invalidation, deploy and live verification.
+- [ ] Follow with larger batches of compatible simple staff forms/reference/training pages, then remaining customer, calculator, builder and document families. Whole-app completion requires covering all in-scope surfaces, not merely replacing their stylesheet links.
+
+Planning estimate remains several focused working days for the full remaining rollout and verification, with a tighter estimate after the next measured batch. Shared-family implementation and fewer release cycles provide the main speedup; critical pricing/approval/document state checks remain required.
+
 ## Resumed — 2026-09-08
 
 Erik explicitly resumed from the checkpoint and reiterated permission to continue. The historical pause below is superseded. The unchanged saved frontend passed the actual HTTP boot probe on port 3113 with status 200; the earlier timeout did not recur and its cause is unconfirmed. All previously completed local checks remain recorded below. Continue the exact-source CI/release process, frontend callers FIRST and backend gates second, then the remaining CSS families.
