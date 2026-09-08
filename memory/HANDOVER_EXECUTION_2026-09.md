@@ -29,3 +29,5 @@ Source: Erik's Claude handover (2026-09-08). Work on develop; one server editor;
 - CRM_API_SECRET added to the specified GitHub repository after Erik explicitly authorized it. CI execution proof pending next push.
 
 - Local verification passed: route lock456, undefined names0, bootHTTP200, build, lint99 baseline warnings/0errors, CSS283files, typecheck, unit4695passed/4skips, DOM88, axe4, fixture parity84, browser15passed/3opt-in screenshot skips (all five surface parity tests included). Release target v2026.09.07.27; CI and Heroku verification pending.
+
+- First secret-enabled CI run exercised all live specs and exposed the proxy's existing100requests/minute pricing limit (CAP429; one EMB retry). Pace live preview scenarios and wait for the real60second reset on429; direct tier reads use the same bounded retry. No production limit or pricing assertion changes.

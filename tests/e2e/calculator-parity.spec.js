@@ -25,7 +25,7 @@ const TOL = 0.011;
 // tier change re-shapes the table instead of breaking it.
 async function fetchTiers(request, method) {
     const base = process.env.CASPIO_PROXY_BASE || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
-    const res = await request.get(`${base}/api/pricing-bundle?method=${method}&styleNumber=PC54`);
+    const res = await readLivePricing(request, `${base}/api/pricing-bundle?method=${method}&styleNumber=PC54`);
     expect(res.ok(), `pricing-bundle ${method}`).toBeTruthy();
     const d = await res.json();
     const raw = d.tiersR || d.tierData || d.tiers || [];
@@ -40,10 +40,20 @@ function qtyFor(tier) {
 const money = (text) => { const m = String(text || '').replace(/\s+/g, ' ').match(/\$\s?(\d+(?:\.\d{2})?)/); return m ? parseFloat(m[1]) : NaN; };
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+// The live pricing router permits 100 reads/minute. CI is fast enough to fill that
+// window; retrying after 8s/12s simply re-enters the same exhausted bucket.
+async function readLivePricing(request, url) {
+    for (let attempt = 1; attempt <= 3; attempt++) {
+        const res = await request.get(url);
+        if (res.status() !== 429 || attempt === 3) return res;
+        await sleep(61000); // allow the actual 60-second pricing window to reset
+    }
+}
+
 async function engine(page, item, groups) {
     // paced: every preview re-reads the pricing bundle through the live proxy, and a tight loop trips its 429 limiter
     for (let attempt = 1; attempt <= 3; attempt++) {
-        await sleep(attempt === 1 ? 350 : 4000 * attempt);
+        await sleep(attempt === 1 ? 2500 : 61000);
         const r = await page.evaluate(async ({ item, groups }) => {
             let shared = null;
             const deps = { EmbroideryPricingCalculator: function (opts) { if (!shared) shared = new window.EmbroideryPricingCalculator(opts || { skipInit: true }); return shared; } };
@@ -172,7 +182,7 @@ test.describe('customer calculators price like the engine', () => {
 
     test('cap embroidery — C112 front, 8,000 stitches (OSFA row)', async ({ page, request }) => {
         const base = process.env.CASPIO_PROXY_BASE || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
-        const res = await request.get(`${base}/api/pricing-bundle?method=CAP&styleNumber=C112`);
+        const res = await readLivePricing(request, `${base}/api/pricing-bundle?method=CAP&styleNumber=C112`);
         expect(res.ok()).toBeTruthy();
         const d = await res.json(); const raw = d.tiersR || d.tierData || d.tiers || [];
         const tiers = (Array.isArray(raw) ? raw : Object.values(raw)).map((t) => ({ label: t.TierLabel, min: Number(t.MinQuantity), max: Number(t.MaxQuantity), ltm: parseFloat(t.LTM_Fee) || 0 })).sort((a, b) => a.min - b.min);
