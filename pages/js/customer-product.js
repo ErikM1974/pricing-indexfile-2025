@@ -11,7 +11,7 @@
     'use strict';
 
     var PREVIEW = (function () { var m = location.pathname.match(/^\/portal-admin\/preview\/(\d+)\/product\//); return m ? m[1] : null; })();
-    var STYLE = (function () { var m = location.pathname.match(/\/product\/([^\/?#]+)/); return m ? decodeURIComponent(m[1]) : ''; })();
+    var STYLE = (function () { var m = location.pathname.match(/\/product\/([^/?#]+)/); return m ? decodeURIComponent(m[1]) : ''; })();
     var BASE = PREVIEW ? ('/api/portal-admin/preview/' + PREVIEW + '/product/' + encodeURIComponent(STYLE)) : ('/api/portal/product/' + encodeURIComponent(STYLE));
     var AVAIL = BASE + '/availability';
     var BACK = PREVIEW ? ('/portal-admin/preview/' + PREVIEW) : '/portal';

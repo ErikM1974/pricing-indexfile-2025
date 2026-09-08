@@ -1076,7 +1076,7 @@
                 return;
             }
             // Card-level click (not on a button) → open detail page
-            var card = e.target.closest('.mockup-card');
+            card = e.target.closest('.mockup-card');
             if (card && card.dataset.designId) {
                 try { sessionStorage.setItem('artHubReturnTo', '/dashboards/art-hub-steve.html'); } catch (err) {}
                 window.open('/art-request/' + encodeURIComponent(card.dataset.designId), '_blank');

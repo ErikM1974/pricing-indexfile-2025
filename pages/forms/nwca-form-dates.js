@@ -26,7 +26,7 @@
         if (base instanceof Date) d = new Date(base);
         else {
             var s = String(base || '').trim();
-            var m = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})$/);
+            var m = s.match(/^(\d{1,2})[/-](\d{1,2})[/-](\d{2,4})$/);
             var iso = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
             if (m) d = new Date(m[3].length === 2 ? 2000 + +m[3] : +m[3], +m[1] - 1, +m[2]);
             else if (iso) d = new Date(+iso[1], +iso[2] - 1, +iso[3]);

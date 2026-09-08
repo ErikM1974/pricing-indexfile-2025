@@ -672,26 +672,14 @@ function setMainProductImage(product, colorSpecific = false) {
 
 // Load colors
 async function loadColors(styleNumber) {
-
-    try {
-        const response = await fetch(`${CAPEMB_API_BASE}/api/color-swatches?styleNumber=${styleNumber}`);
-
-        if (response.ok) {
-            const colorsArray = await response.json();
-
-            // API returns array directly
-            const colors = Array.isArray(colorsArray) ? colorsArray : [];
-            currentColors = colors;
-
-            if (colors.length > 0) {
-                // Set first color as selected
-                selectedColor = colors[0];
-                displayColorSwatches(colors);
-            } else {
-            }
-        } else {
-        }
-    } catch (error) {
+    const response = await fetch(`${CAPEMB_API_BASE}/api/color-swatches?styleNumber=${styleNumber}`);
+    if (!response.ok) throw new Error('Unable to load product colors. Please refresh or try again later.');
+    const colorsArray = await response.json();
+    const colors = Array.isArray(colorsArray) ? colorsArray : [];
+    currentColors = colors;
+    if (colors.length > 0) {
+        selectedColor = colors[0];
+        displayColorSwatches(colors);
     }
 }
 

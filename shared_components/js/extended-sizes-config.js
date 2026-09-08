@@ -356,7 +356,7 @@ function extractExtendedSizesFromData(data) {
         });
     }
     const extendedSizes = [...allSizes].filter(size => isExtendedSize(size));
-    const supportedSizes = extendedSizes.filter(size => SIZE_TO_SUFFIX.hasOwnProperty(size));
+    const supportedSizes = extendedSizes.filter(size => Object.prototype.hasOwnProperty.call(SIZE_TO_SUFFIX, size));
     return sortSizes(supportedSizes);
 }
 

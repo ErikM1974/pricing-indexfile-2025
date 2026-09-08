@@ -67,7 +67,7 @@
         if (letters.length < 2) return 'short';
         if (letters === letters.toUpperCase()) return 'upper';
         if (letters === letters.toLowerCase()) return 'lower';
-        var words = String(name).split(/[\s\-]+/).filter(Boolean);
+        var words = String(name).split(/[\s-]+/).filter(Boolean);
         var allTitle = words.every(function (w) {
             var ls = w.replace(/[^A-Za-zÀ-ɏ]/g, '');
             if (!ls.length) return true;

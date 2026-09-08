@@ -9,7 +9,7 @@
     "build": "node scripts/build.js",
     "build:watch": "node scripts/build.js --watch",
     "heroku-postbuild": "npm run build",
-    "lint": "eslint . --max-warnings 99",
+    "lint": "eslint . --max-warnings 0",
     "lint:css": "node scripts/lint-css.js",
     "typecheck": "tsc -p tsconfig.json",
     "test:parity": "jest tests/unit/web-quote-cart-parity.test.js tests/unit/quick-quote-parity.test.js --verbose",

@@ -433,7 +433,7 @@
         }
         if (locs) {
             var codes = locs.split(',').map(function (c) { return c.trim().toUpperCase(); });
-            state.locs = codes.filter(function (c) { return LOC_META.hasOwnProperty(c); });
+            state.locs = codes.filter(function (c) { return Object.prototype.hasOwnProperty.call(LOC_META, c); });
         }
         if (hw === '1' || hw === 'true') state.heavyweight = true;
     }

@@ -1202,12 +1202,14 @@ class ShopWorksImportParser {
 
             case 'graphic-design':
                 // GRT-75 rate from API (fallback to $75/hr)
-                const hours = item.quantity || 1;
-                result.services.graphicDesign = {
-                    hours: hours,
-                    amount: hours * (this.GRT75_RATE || 75)
-                };
-                break;
+                {
+                    const hours = item.quantity || 1;
+                    result.services.graphicDesign = {
+                        hours: hours,
+                        amount: hours * (this.GRT75_RATE || 75)
+                    };
+                    break;
+                }
 
             case 'discount': {
                 // ShopWorks writes a reduction as a NEGATIVE unit price ('Unit Price: $-100.00'),
@@ -1268,60 +1270,62 @@ class ShopWorksImportParser {
 
             case 'al':
                 // Additional Logo - parse position from description
-                const position = this._parseALPosition(item.description);
-                if (!result.services.additionalLogos) {
-                    result.services.additionalLogos = [];
-                }
+                {
+                    const position = this._parseALPosition(item.description);
+                    if (!result.services.additionalLogos) {
+                        result.services.additionalLogos = [];
+                    }
 
-                // Detect potential Full Back mislabeled as AL
-                // "Back" position at ≥$40 → auto-reclassify as DECG-FB
-                // "Back" position at ≥$10 → warning only, keep as AL
-                //
-                // `_parseALPosition` returns the MORE SPECIFIC 'Full Back' when the description
-                // actually says so, and only falls back to 'Back' otherwise — so testing
-                // `position === 'Back'` alone meant an AL line reading "Additional Logo Full
-                // Back" was never reclassified. The most explicit spelling of a full back was
-                // the one spelling the full-back detector could not see. (2026-08-16)
-                const looksLikeBack = position === 'Back' || position === 'Full Back';
+                    // Detect potential Full Back mislabeled as AL
+                    // "Back" position at ≥$40 → auto-reclassify as DECG-FB
+                    // "Back" position at ≥$10 → warning only, keep as AL
+                    //
+                    // `_parseALPosition` returns the MORE SPECIFIC 'Full Back' when the description
+                    // actually says so, and only falls back to 'Back' otherwise — so testing
+                    // `position === 'Back'` alone meant an AL line reading "Additional Logo Full
+                    // Back" was never reclassified. The most explicit spelling of a full back was
+                    // the one spelling the full-back detector could not see. (2026-08-16)
+                    const looksLikeBack = position === 'Back' || position === 'Full Back';
 
-                if (looksLikeBack && item.unitPrice >= 40) {
-                    result.warnings.push(
-                        `AL item "${item.description}" at $${item.unitPrice}/pc reclassified as Full Back (DECG-FB). ` +
-                        `Price exceeds $40 threshold for standard AL.`
-                    );
+                    if (looksLikeBack && item.unitPrice >= 40) {
+                        result.warnings.push(
+                            `AL item "${item.description}" at $${item.unitPrice}/pc reclassified as Full Back (DECG-FB). ` +
+                            `Price exceeds $40 threshold for standard AL.`
+                        );
+                        result.services.additionalLogos.push({
+                            position: 'Full Back',
+                            type: 'fb',
+                            quantity: item.quantity,
+                            description: item.description,
+                            unitPrice: item.unitPrice || 0,
+                            reclassifiedFromAL: true
+                        });
+                        break;
+                    }
+
+                    if (looksLikeBack && item.unitPrice >= 10) {
+                        result.warnings.push(
+                            `AL item "${item.description}" at $${item.unitPrice}/pc may be Full Back (DECG-FB). ` +
+                            `Standard AL tier price is $5-$8. Review in import modal.`
+                        );
+                    }
+
                     result.services.additionalLogos.push({
-                        position: 'Full Back',
-                        type: 'fb',
+                        position: position,
+                        type: 'al',
                         quantity: item.quantity,
                         description: item.description,
-                        unitPrice: item.unitPrice || 0,
-                        reclassifiedFromAL: true
+                        unitPrice: item.unitPrice || 0
                     });
+                    // Keep backward compatibility with single additionalLogo
+                    result.services.additionalLogo = {
+                        position: position,
+                        quantity: item.quantity,
+                        description: item.description,
+                        unitPrice: item.unitPrice || 0
+                    };
                     break;
                 }
-
-                if (looksLikeBack && item.unitPrice >= 10) {
-                    result.warnings.push(
-                        `AL item "${item.description}" at $${item.unitPrice}/pc may be Full Back (DECG-FB). ` +
-                        `Standard AL tier price is $5-$8. Review in import modal.`
-                    );
-                }
-
-                result.services.additionalLogos.push({
-                    position: position,
-                    type: 'al',
-                    quantity: item.quantity,
-                    description: item.description,
-                    unitPrice: item.unitPrice || 0
-                });
-                // Keep backward compatibility with single additionalLogo
-                result.services.additionalLogo = {
-                    position: position,
-                    quantity: item.quantity,
-                    description: item.description,
-                    unitPrice: item.unitPrice || 0
-                };
-                break;
 
             case 'monogram':
                 result.services.monograms.push({
@@ -1369,63 +1373,69 @@ class ShopWorksImportParser {
 
             case 'decg':
                 // Customer-supplied garment - uses DECG API pricing with stitch count
-                const isCapDecg = this._isCapFromDescription(item.description);
-                const isHeavyweight = this._isHeavyweightFromDescription(item.description);
-                // Default to 8K stitches - user can update via modal after import
-                const decgStitchCount = 8000;
-                const decgPricing = this.calculateDECGPrice(item.quantity, isCapDecg, isHeavyweight, decgStitchCount);
+                {
+                    const isCapDecg = this._isCapFromDescription(item.description);
+                    const isHeavyweight = this._isHeavyweightFromDescription(item.description);
+                    // Default to 8K stitches - user can update via modal after import
+                    const decgStitchCount = 8000;
+                    const decgPricing = this.calculateDECGPrice(item.quantity, isCapDecg, isHeavyweight, decgStitchCount);
 
-                result.decgItems.push({
-                    ...item,
-                    serviceType: 'decg',
-                    isCap: isCapDecg,
-                    isHeavyweight: isHeavyweight,
-                    stitchCount: decgStitchCount,
-                    calculatedUnitPrice: decgPricing.unitPrice,
-                    ltmFee: decgPricing.ltmFee,
-                    tier: decgPricing.tier,
-                    pricingSource: decgPricing.pricingSource,
-                    breakdown: decgPricing.breakdown,
-                    needsStitchCountConfirmation: true  // Flag for post-import modal
-                });
-                break;
+                    result.decgItems.push({
+                        ...item,
+                        serviceType: 'decg',
+                        isCap: isCapDecg,
+                        isHeavyweight: isHeavyweight,
+                        stitchCount: decgStitchCount,
+                        calculatedUnitPrice: decgPricing.unitPrice,
+                        ltmFee: decgPricing.ltmFee,
+                        tier: decgPricing.tier,
+                        pricingSource: decgPricing.pricingSource,
+                        breakdown: decgPricing.breakdown,
+                        needsStitchCountConfirmation: true  // Flag for post-import modal
+                    });
+                    break;
+                }
 
             case 'decc':
                 // Customer-supplied caps (DECC) - uses DECG API pricing (caps table)
                 // Default to 8K stitches - user can update via modal after import
-                const deccStitchCount = 8000;
-                const deccPricing = this.calculateDECCPrice(item.quantity, deccStitchCount);
+                {
+                    const deccStitchCount = 8000;
+                    const deccPricing = this.calculateDECCPrice(item.quantity, deccStitchCount);
 
-                result.decgItems.push({
-                    ...item,
-                    serviceType: 'decc',
-                    isCap: true,
-                    isHeavyweight: false,
-                    stitchCount: deccStitchCount,
-                    calculatedUnitPrice: deccPricing.unitPrice,
-                    ltmFee: deccPricing.ltmFee,
-                    tier: deccPricing.tier,
-                    pricingSource: deccPricing.pricingSource,
-                    breakdown: deccPricing.breakdown,
-                    needsStitchCountConfirmation: true  // Flag for post-import modal
-                });
-                break;
+                    result.decgItems.push({
+                        ...item,
+                        serviceType: 'decc',
+                        isCap: true,
+                        isHeavyweight: false,
+                        stitchCount: deccStitchCount,
+                        calculatedUnitPrice: deccPricing.unitPrice,
+                        ltmFee: deccPricing.ltmFee,
+                        tier: deccPricing.tier,
+                        pricingSource: deccPricing.pricingSource,
+                        breakdown: deccPricing.breakdown,
+                        needsStitchCountConfirmation: true  // Flag for post-import modal
+                    });
+                    break;
+                }
 
             case 'sewing':
                 // Sewing service (SEG/SECC) - $10.00 sell price (API-driven)
-                if (!result.services.sewing) {
-                    result.services.sewing = [];
+                {
+                    if (!result.services.sewing) {
+                        result.services.sewing = [];
+                    }
+                    const isSewCap = item.partNumber.toUpperCase() === 'SECC';
+                    result.services.sewing.push({
+                        quantity: item.quantity,
+                        description: item.description,
+                        unitPrice: this.SEWING_PRICE,
+                        total: item.quantity * this.SEWING_PRICE,
+                        isCap: isSewCap,
+                        partNumber: isSewCap ? 'SECC' : 'SEG'
+                    });
+                    break;
                 }
-                const isSewCap = item.partNumber.toUpperCase() === 'SECC';
-                result.services.sewing.push({
-                    quantity: item.quantity,
-                    description: item.description,
-                    unitPrice: this.SEWING_PRICE,
-                    total: item.quantity * this.SEWING_PRICE,
-                    isCap: isSewCap,
-                    partNumber: isSewCap ? 'SECC' : 'SEG'
-                });
-                break;
 
             case 'cs':
                 // Cap Side logo - same pricing as Cap Back
@@ -1450,18 +1460,20 @@ class ShopWorksImportParser {
 
             case 'additional-stitches':
                 // Additional stitches (AS-Garm or AS-CAP) - manual pricing
-                if (!result.services.additionalStitches) {
-                    result.services.additionalStitches = [];
+                {
+                    if (!result.services.additionalStitches) {
+                        result.services.additionalStitches = [];
+                    }
+                    const stitchType = item.partNumber.toUpperCase().includes('CAP') ? 'cap' : 'garment';
+                    result.services.additionalStitches.push({
+                        type: stitchType,
+                        quantity: item.quantity,
+                        description: item.description,
+                        unitPrice: item.unitPrice || 0,
+                        needsManualPricing: true
+                    });
+                    break;
                 }
-                const stitchType = item.partNumber.toUpperCase().includes('CAP') ? 'cap' : 'garment';
-                result.services.additionalStitches.push({
-                    type: stitchType,
-                    quantity: item.quantity,
-                    description: item.description,
-                    unitPrice: item.unitPrice || 0,
-                    needsManualPricing: true
-                });
-                break;
 
             case 'design-transfer':
                 // DT — Transfer customer design / run sample ($50 sell)
@@ -1551,36 +1563,38 @@ class ShopWorksImportParser {
             default:
                 // Guard: zero-price + zero-quantity items are descriptive notes, not real products
                 // e.g., "Left Chest" (placement used as PN), info-only lines
-                if (!item.unitPrice && !item.quantity) {
-                    if (item.description) {
-                        result.notes.push(item.description);
+                {
+                    if (!item.unitPrice && !item.quantity) {
+                        if (item.description) {
+                            result.notes.push(item.description);
+                        }
+                        break;
+                    }
+
+                    // Regular product - check if non-SanMar first
+                    const cleanedPartNumber = this.cleanPartNumber(item.partNumber);
+                    const isNonSanMar = this._isNonSanMarProduct(cleanedPartNumber);
+
+                    if (isNonSanMar) {
+                        // Non-SanMar product - requires manual pricing
+                        result.customProducts.push({
+                            ...item,
+                            originalPartNumber: item.partNumber,
+                            partNumber: cleanedPartNumber,
+                            needsManualPricing: true,
+                            reason: 'Non-SanMar product'
+                        });
+                    } else {
+                        // Regular product - try SanMar lookup
+                        result.products.push({
+                            ...item,
+                            originalPartNumber: item.partNumber,
+                            partNumber: cleanedPartNumber,
+                            needsLookup: true
+                        });
                     }
                     break;
                 }
-
-                // Regular product - check if non-SanMar first
-                const cleanedPartNumber = this.cleanPartNumber(item.partNumber);
-                const isNonSanMar = this._isNonSanMarProduct(cleanedPartNumber);
-
-                if (isNonSanMar) {
-                    // Non-SanMar product - requires manual pricing
-                    result.customProducts.push({
-                        ...item,
-                        originalPartNumber: item.partNumber,
-                        partNumber: cleanedPartNumber,
-                        needsManualPricing: true,
-                        reason: 'Non-SanMar product'
-                    });
-                } else {
-                    // Regular product - try SanMar lookup
-                    result.products.push({
-                        ...item,
-                        originalPartNumber: item.partNumber,
-                        partNumber: cleanedPartNumber,
-                        needsLookup: true
-                    });
-                }
-                break;
         }
     }
 

@@ -492,7 +492,7 @@
                     + '<td class="w">' + esc(x.why) + '</td>'
                     + '<td class="n">' + money2(x.bounty) + '</td></tr>';
             }).join('')
-            + '</tbody></table><script>window.onload=function(){window.print()}<\/script></body></html>';
+            + '</tbody></table><script>window.onload=function(){window.print()}</script></body></html>';
         var w = window.open('', '_blank');
         if (!w) { DashPage.showError('Your browser blocked the print window. Allow pop-ups for this page and try again.'); return; }
         w.document.write(html);

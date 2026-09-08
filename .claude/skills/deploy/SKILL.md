@@ -190,33 +190,13 @@ genuine emergency lever (prod is down and the fix is verified another way), not 
 inconvenient red check. A red ratchet, parity or guard suite is exactly what this gate exists
 to stop.
 
-### Step 0.7 — CI conclusion for this commit (advisory)
+### Step 0.7 — CI is a required release gate
 
-The one CI job Step 0.6 cannot reproduce is **Playwright E2E**: it needs a browser download and
-it reads live Caspio through the proxy. Running it here would put a vendor outage directly in
-the deploy path — which this repo deliberately refuses to do (same reasoning as the diagnostic
-capture job in `.github/workflows/ci.yml`). So check what CI already concluded instead of
-re-running it:
-
-```bash
-if command -v gh >/dev/null 2>&1; then
-  CONC=$(gh run list --branch develop --workflow ci.yml --limit 1 --json conclusion \
-         --jq '.[0].conclusion' 2>/dev/null)
-  case "$CONC" in
-    success) echo "CI: ✅ green on develop" ;;
-    "")      echo "⚠ CI: no run found for develop (or gh not authenticated) — E2E unverified." ;;
-    *)       echo "⚠ CI: last develop run concluded '$CONC'. Step 0.6 covers everything EXCEPT"
-             echo "  Playwright E2E — open the Actions tab and confirm the failure is not the"
-             echo "  money path before shipping." ;;
-  esac
-else
-  echo "⚠ gh CLI not installed — skipping the CI conclusion check (E2E unverified)."
-fi
-```
-
-**Advisory, never an abort.** E2E depends on a third party being up, and a Caspio wobble must
-not be able to block a release. A loud warning is enough: everything deterministic already had
-its own hard gate one step above, so the only thing this can be warning about is E2E.
+Step 0.6 verifies the current working tree locally. The exact source commit must also
+pass every required CI job, including Playwright and pricing parity, after Step 5
+pushes it. Step 5.1 enforces that gate before any release merge or Heroku push.
+A missing, running, failed or inaccessible run is not a pass. Wait or resolve the
+failure; do not treat an earlier green branch run as evidence for new source.
 
 ### Step 1 — Compute single deploy version
 
@@ -477,6 +457,28 @@ git commit -m "Deploy ${DEPLOY_TAG}: ${N_FILES} files (${TOP3}...)"
 ```bash
 git push origin develop
 ```
+
+### Step 5.1 — Require green CI on the exact pushed source commit
+
+~~~bash
+SOURCE_SHA=$(git rev-parse develop)
+RUN_ID=$(gh run list --branch develop --workflow ci.yml --commit "$SOURCE_SHA" --limit 1 \
+  --json databaseId --jq '.[0].databaseId') || exit 1
+if [ -z "$RUN_ID" ] || [ "$RUN_ID" = "null" ]; then
+  echo "CI has not indexed this commit yet. Retry this check before continuing."
+  exit 1
+fi
+gh run watch "$RUN_ID" --exit-status || exit 1
+VERDICT=$(gh run view "$RUN_ID" --json headSha,status,conclusion \
+  --jq '[.headSha,.status,.conclusion] | join(" ")') || exit 1
+[ "$VERDICT" = "$SOURCE_SHA completed success" ] || exit 1
+[ "$(git rev-parse develop)" = "$SOURCE_SHA" ] || exit 1
+~~~
+
+If the CLI is unavailable, the authenticated GitHub API may provide the same exact-SHA,
+completed-success evidence. Network errors do not authorize bypassing this gate.
+After release and branch synchronization, verify the release commit's main/develop
+runs too. Keep any failed deployment pending until the cause is resolved.
 
 ### Step 6 — Switch to main, hard pull
 

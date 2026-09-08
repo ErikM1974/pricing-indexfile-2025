@@ -355,8 +355,8 @@ var mockdetaLog = MOCKDETA_LOG_ON ? console.log.bind(console) : function () {}; 
 
     // Adjust header and theme for customer view — NWCA green
     if (isCustomerView) {
-        var headerTitle = document.getElementById('pmd-header-title');
-        var backLink = document.getElementById('pmd-back-link');
+        headerTitle = document.getElementById('pmd-header-title');
+        backLink = document.getElementById('pmd-back-link');
         if (headerTitle) headerTitle.textContent = 'Mockup Approval';
         if (backLink) backLink.style.display = 'none';
         document.body.classList.add('pmd-customer-view');
@@ -3674,7 +3674,7 @@ var mockdetaLog = MOCKDETA_LOG_ON ? console.log.bind(console) : function () {}; 
             // (not inside it — .pmd-gallery-slot has overflow:hidden + aspect-ratio:1 which clips children)
             if (isCustomerView) {
                 strip.style.display = 'none';
-                var slotEl = strip.parentElement; // .pmd-gallery-slot
+                slotEl = strip.parentElement; // .pmd-gallery-slot
                 var gridEl = slotEl ? slotEl.parentElement : null; // .pmd-gallery-grid
 
                 // Remove any existing inline box for this slot
@@ -5457,8 +5457,8 @@ var mockdetaLog = MOCKDETA_LOG_ON ? console.log.bind(console) : function () {}; 
 
         var slotLabel = MOCKUP_SLOTS.filter(function (s) { return s.key === fieldKey; })[0];
         var slotName = slotLabel ? slotLabel.label : fieldKey;
-        var company = currentMockup.Company_Name || 'Unknown';
-        var design = currentMockup.Design_Number || currentMockup.ID;
+        company = currentMockup.Company_Name || 'Unknown';
+        design = currentMockup.Design_Number || currentMockup.ID;
 
         sendMockupNotification({
             to_email: aeEmail,

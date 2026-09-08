@@ -99,7 +99,7 @@ if (!CB_API_BASE) console.error('[christmas-bundles] APP_CONFIG.API.BASE_URL mis
                 // Sanitize helper function for names and text fields
                 const sanitizeText = (text) => {
                     if (!text) return '';
-                    return String(text).replace(/[<>\"'&]/g, '').trim();
+                    return String(text).replace(/[<>"'&]/g, '').trim();
                 };
 
                 // Prepare email template parameters - simplified for Outlook
@@ -3326,45 +3326,53 @@ You will receive a confirmation email shortly.`);
         function validateCurrentStep() {
             switch(currentStep) {
                 case 1: // Jacket step - REQUIRED
-                    if (!selectedItems.jacket) return false;
-                    // Check if we have the required fields OR if the card is properly selected in DOM
-                    const jacketCard = document.querySelector('[data-product-type="jacket"].selected');
-                    if (jacketCard) {
-                        // If card is selected, ensure we have color and size
-                        const hasColor = selectedItems.jacket.selectedColor || jacketCard.querySelector('.color-swatch.selected');
-                        const hasSize = selectedItems.jacket.selectedSize || jacketCard.querySelector('.size-btn.selected');
-                        return hasColor && hasSize;
+                    {
+                        if (!selectedItems.jacket) return false;
+                        // Check if we have the required fields OR if the card is properly selected in DOM
+                        const jacketCard = document.querySelector('[data-product-type="jacket"].selected');
+                        if (jacketCard) {
+                            // If card is selected, ensure we have color and size
+                            const hasColor = selectedItems.jacket.selectedColor || jacketCard.querySelector('.color-swatch.selected');
+                            const hasSize = selectedItems.jacket.selectedSize || jacketCard.querySelector('.size-btn.selected');
+                            return hasColor && hasSize;
+                        }
+                        return selectedItems.jacket.selectedColor && selectedItems.jacket.selectedSize;
                     }
-                    return selectedItems.jacket.selectedColor && selectedItems.jacket.selectedSize;
 
                 case 2: // Hoodie step - NOW REQUIRED (no skipping)
-                    if (!selectedItems.hoodie) return false;
-                    const hoodieCard = document.querySelector('[data-product-type="hoodie"].selected');
-                    if (hoodieCard) {
-                        const hasColor = selectedItems.hoodie.selectedColor || hoodieCard.querySelector('.color-swatch.selected');
-                        const hasSize = selectedItems.hoodie.selectedSize || hoodieCard.querySelector('.size-btn.selected');
-                        return hasColor && hasSize;
+                    {
+                        if (!selectedItems.hoodie) return false;
+                        const hoodieCard = document.querySelector('[data-product-type="hoodie"].selected');
+                        if (hoodieCard) {
+                            const hasColor = selectedItems.hoodie.selectedColor || hoodieCard.querySelector('.color-swatch.selected');
+                            const hasSize = selectedItems.hoodie.selectedSize || hoodieCard.querySelector('.size-btn.selected');
+                            return hasColor && hasSize;
+                        }
+                        return selectedItems.hoodie.selectedColor && selectedItems.hoodie.selectedSize;
                     }
-                    return selectedItems.hoodie.selectedColor && selectedItems.hoodie.selectedSize;
 
                 case 3: // Beanie step - REQUIRED
-                    if (!selectedItems.beanie) return false;
-                    const beanieCard = document.querySelector('[data-product-type="beanie"].selected');
-                    if (beanieCard) {
-                        const hasColor = selectedItems.beanie.selectedColor || beanieCard.querySelector('.color-swatch.selected');
-                        return hasColor;
+                    {
+                        if (!selectedItems.beanie) return false;
+                        const beanieCard = document.querySelector('[data-product-type="beanie"].selected');
+                        if (beanieCard) {
+                            const hasColor = selectedItems.beanie.selectedColor || beanieCard.querySelector('.color-swatch.selected');
+                            return hasColor;
+                        }
+                        // Beanies usually have OSFA, so just check color
+                        return selectedItems.beanie.selectedColor;
                     }
-                    // Beanies usually have OSFA, so just check color
-                    return selectedItems.beanie.selectedColor;
 
                 case 4: // Gloves step - NOW REQUIRED (no skipping)
-                    if (!selectedItems.gloves) return false;
-                    const glovesCard = document.querySelector('[data-product-type="gloves"].selected');
-                    if (glovesCard) {
-                        const hasSize = selectedItems.gloves.selectedSize || glovesCard.querySelector('.size-btn.selected');
-                        return hasSize;
+                    {
+                        if (!selectedItems.gloves) return false;
+                        const glovesCard = document.querySelector('[data-product-type="gloves"].selected');
+                        if (glovesCard) {
+                            const hasSize = selectedItems.gloves.selectedSize || glovesCard.querySelector('.size-btn.selected');
+                            return hasSize;
+                        }
+                        return selectedItems.gloves.selectedSize;
                     }
-                    return selectedItems.gloves.selectedSize;
 
                 default:
                     return true; // Other steps don't require product validation

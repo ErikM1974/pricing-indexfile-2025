@@ -415,7 +415,7 @@ class ChristmasBundleQuoteService {
                             window.close();
                         };
                     };
-                <\/script>
+                </script>
             </body>
             </html>
         `);

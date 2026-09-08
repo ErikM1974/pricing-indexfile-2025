@@ -3,7 +3,7 @@
 // what the monolith had, at the same indentation, so every handler body and the registration order are unchanged
 // (tests/unit/server-route-table.test.js). Everything it needs from server.js arrives in ctx; nothing is global.
 module.exports = function register(app, ctx) {
-const { CRM_API_BASE, CRM_API_SECRET, SERVER_DIR, express, fetch, path, requirePageAccess, requireStaff } = ctx;
+const { CRM_API_BASE, CRM_API_SECRET, SERVER_DIR, express, fetch, path, requirePageAccess } = ctx;
 
 // 253GEAR PUBLISHER FORWARDERS — same-origin, page-gated proxies to the
 // caspio-pricing-proxy /api/shopify/* surface.

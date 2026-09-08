@@ -295,7 +295,7 @@ class SampleInventoryService {
             message = `${totalLowStock} size(s) low in stock`;
         } else if (totalAvailable === requestedSizeCount) {
             status = 'in_stock';
-            message: 'All sizes in stock';
+            message = 'All sizes in stock';
         } else {
             status = 'unknown';
             message = 'Unable to verify all sizes';

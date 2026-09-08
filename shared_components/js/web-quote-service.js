@@ -99,7 +99,7 @@ var webquotservLog = WEBQUOTSERV_LOG_ON ? console.log.bind(console) : function (
     function parseLabelToSizeBreakdown(label) {
         var out = {};
         if (!label) return out;
-        var re = /([A-Z0-9\/]+)\((\d+)\)/gi;
+        var re = /([A-Z0-9/]+)\((\d+)\)/gi;
         var m;
         while ((m = re.exec(label)) !== null) {
             var qty = parseInt(m[2], 10);

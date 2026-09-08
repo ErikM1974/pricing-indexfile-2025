@@ -1127,7 +1127,7 @@ function printQuote() {
                     window.print();
                     setTimeout(() => window.close(), 500);
                 };
-            <\/script>
+            </script>
         </body>
         </html>
     `;

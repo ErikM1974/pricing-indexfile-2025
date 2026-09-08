@@ -135,8 +135,8 @@ const AI_ENDPOINT = '/api/emb-quote-ai/chat';
         s = s.replace(/^## (.+)$/gm, '<h2>$1</h2>');
 
         // 6. Lists (simple — group consecutive list items)
-        s = s.replace(/(^|\n)((?:[\-*] .+(?:\n|$))+)/g, (m, lead, block) => {
-            const items = block.trim().split('\n').map(l => l.replace(/^[\-*] /, ''));
+        s = s.replace(/(^|\n)((?:[-*] .+(?:\n|$))+)/g, (m, lead, block) => {
+            const items = block.trim().split('\n').map(l => l.replace(/^[-*] /, ''));
             return lead + '<ul>' + items.map(it => `<li>${it}</li>`).join('') + '</ul>';
         });
         s = s.replace(/(^|\n)((?:\d+\. .+(?:\n|$))+)/g, (m, lead, block) => {
@@ -162,7 +162,9 @@ const AI_ENDPOINT = '/api/emb-quote-ai/chat';
         });
 
         // 10. Restore code blocks + inline code
+        // eslint-disable-next-line no-control-regex -- Match the NUL sentinels generated above to protect code while parsing Markdown.
         s = s.replace(/\x00CODEBLOCK(\d+)\x00/g, (_, idx) => `<pre><code>${codeBlocks[+idx]}</code></pre>`);
+        // eslint-disable-next-line no-control-regex -- Match the NUL sentinels generated above to protect code while parsing Markdown.
         s = s.replace(/\x00INLINECODE(\d+)\x00/g, (_, idx) => `<code>${inlineCodes[+idx]}</code>`);
 
         // 11. Convert remaining newlines to <br> (skip lines that are already block elements)
@@ -184,7 +186,7 @@ const AI_ENDPOINT = '/api/emb-quote-ai/chat';
                                'h2', 'h3', 'ul', 'ol', 'li',
                                'table', 'thead', 'tbody', 'tr', 'th', 'td'],
                 ALLOWED_ATTR: ['href', 'target', 'rel'],
-                ALLOWED_URI_REGEXP: /^(?:(?:https?|mailto|tel):|[^a-z]|[a-z+.\-]+(?:[^a-z+.\-:]|$))/i,
+                ALLOWED_URI_REGEXP: /^(?:(?:https?|mailto|tel):|[^a-z]|[a-z+.-]+(?:[^a-z+.\-:]|$))/i,
             });
         }
         return s;

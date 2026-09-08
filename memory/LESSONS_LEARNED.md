@@ -47,24 +47,7 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 
 ### Webstore deployment and token migration (2026-09-07, archived): check each push exit code and remote SHA; avoid token-name collisions; dedupe after prefix fixes. Full entry in LESSONS_LEARNED_ARCHIVE.md.
 
-## 2026-09-07 — Dashboards family (`v2026.09.07.10`): two staff design systems, one token file
-
-**Problem.** The 41 queue dashboards run on `art-hub.css`'s "2026 design tokens" (spacing to 32, radius
-4/8/12/16, stacked shadows, `--state-*`), the Staff Dashboard runs on `staff-dashboard/tokens.css` (spacing
-to 96, radius 6/10/14/20, oklch), and the app-wide `tokens.css` was seeded from the second. Linking the token
-file first on an art-hub page therefore puts two definitions of `--space-5`, `--radius-md` and `--shadow-md`
-on the same page.
-**Root cause.** Both systems were built one page-family at a time, each minting the same names with
-different values; the census counted colours, not variable names.
-**Solution.** Values that were byte-identical (`--gray-50…900`) were deleted from art-hub so the token file
-is their one home; values that differ stay in art-hub, which loads AFTER tokens and therefore wins on its
-pages — zero pixels moved. The choice of ONE scale is a visible layout change across 41 staff pages and is
-logged on the Brand Standards page as an open decision for Erik, not decided by a script.
-**Prevention.** 🔑 Before a family links `tokens.css`, list every custom property its sheets DEFINE and diff
-the values against the token file: identical → delete the copy; different → keep it (it shadows) and log
-the conflict; never silently switch a page to the token value. 🔑 Colour = person/department is now checkable
-in code: `--art-theme: var(--color-ruth)` reads as the rule it implements — grep for a person's token to find
-every page that wears their colour.
+### Dashboards family (2026-09-07, archived): inspect both staff design systems before replacing their tokens. Full entry in LESSONS_LEARNED_ARCHIVE.md.
 
 ## 2026-09-07 — Dashboards + calculators families: six ways a mechanical CSS migration bit back
 
@@ -242,3 +225,14 @@ Native Node22.23 runs Puppeteer25; invoke its capture CLI outside Jest, and repo
 **Root cause:** The search box is visible before async pricing initialization binds listeners.
 **Solution:** In the browser test, await the existing end-of-init inline overlay state before typing. Production code and money assertions are unchanged.
 **Prevention:** Wait for functional readiness, not merely static HTML visibility; retain both blocked-save and successful-save coverage.
+
+## Calculator prerequisite failures must stop pricing (2026-09-07)
+- Problem: color/size failures were swallowed; the next pricing stage could hide the error or reuse another style's size data.
+- Root cause: empty error branches and catch blocks inside prerequisite loaders.
+- Solution: propagate errors to the product loader's existing error UI; clear size data before requesting it.
+- Prevention: calculator-api-errors.test.js covers HTTP, transport, malformed/empty responses and successful API data.
+
+## A JavaScript label silently dropped an inventory message (2026-09-07)
+- Problem/root cause: `message:` was a label, not assignment, so in-stock samples had no message.
+- Solution: assign the message; no-unused-labels is now an error.
+- Prevention: test returned stock status and customer message together for available, low-stock and unavailable inventory.
