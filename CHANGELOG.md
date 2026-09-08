@@ -1,3 +1,10 @@
+## v2026.09.08.6 (2026.09.08)
+
+- Record Bradley live verification and art workflow migration plan
+- Record art migration checkpoint and platform-aware verification lessons
+- Record art gate repair and confirmed transfer authentication follow-through
+- Unify Ruth and Saved Mockups with shared art workflow styles
+
 ## v2026.09.08.5 (2026.09.08)
 
 - Record Bradley family CSS migration plan
