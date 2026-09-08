@@ -52,7 +52,7 @@ class EmbroideryQuoteService {
 
         // Match any alphanumeric size pattern followed by (qty)
         // Handles: XS, S, M, L, XL, 2XL, 3XL, 4XL, 5XL, 6XL, OSFA, S/M, L/XL, etc.
-        const sizeRegex = /([A-Z0-9\/]+)\((\d+)\)/gi;
+        const sizeRegex = /([A-Z0-9/]+)\((\d+)\)/gi;
         let match;
         while ((match = sizeRegex.exec(description)) !== null) {
             const size = match[1].toUpperCase();

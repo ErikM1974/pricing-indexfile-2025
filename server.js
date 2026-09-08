@@ -77,7 +77,7 @@ dotenv.config();
 // =============================================================================
 //
 // INFRASTRUCTURE
-//   L17   Security: Input sanitization (sanitizeFilterInput, isValidIdentifier)
+//   L17   Security: Input sanitization (sanitizeFilterInput)
 //   L67   Security: helmet headers + CSP report-only (roadmap 1.1)
 //   L67   Security: CORS exact-match allowlist (lib/cors-allowlist.js, roadmap 1.2)
 //   ~L520 Health/observability: GET /healthz, GET /readyz (pricing-proxy probe),
@@ -371,15 +371,6 @@ function sanitizeFilterInput(input) {
     .replace(/\b(DROP|DELETE|INSERT|UPDATE|UNION|SELECT)\b/gi, '') // Remove SQL keywords
     .trim()
     .slice(0, 500);                // Limit length
-}
-
-/**
- * Validate that input matches expected pattern (alphanumeric + limited special chars)
- */
-function isValidIdentifier(input) {
-  if (!input) return false;
-  // Allow alphanumeric, hyphens, underscores, dots, spaces
-  return /^[a-zA-Z0-9\-_.\s]+$/.test(input);
 }
 
 /**
@@ -890,13 +881,6 @@ app.use(function loadVendorSession(req, res, next) {
 // =============================================================================
 // CRM ROLE-BASED ACCESS CONTROL
 // =============================================================================
-// Role permissions configuration - Erik has full access, others restricted to their dashboards
-const CRM_PERMISSIONS = {
-  'Erik': ['taneisha', 'nika', 'house', 'policies-admin'],  // Full admin access + policies CMS
-  'Taneisha': ['taneisha'],                // Own dashboard only
-  'Nika': ['nika']                         // Own dashboard only
-};
-
 // Role-based middleware factory - replaces old password-based requireCrmAuth
 function requireCrmRole(allowedRoles) {
   return (req, res, next) => {
@@ -1949,7 +1933,7 @@ app.use(bodyParser.urlencoded({ extended: true, limit: '5mb' }));
 // Serve static files from specific directories
 const staticOptions = {
   maxAge: '0', // Don't cache static assets
-  setHeaders: (res, path) => {
+  setHeaders: (res) => {
     // Set no-cache for all files to ensure changes are immediately visible
     res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
     res.setHeader('Pragma', 'no-cache');
@@ -3573,7 +3557,7 @@ console.log('✓ Policies AI Assist proxy loaded (forwards to caspio-pricing-pro
 // AI chat forwarders (session-gated streaming proxies) — extracted to routes/ai-chat.js (server split, 2026-09-07); registered here so the order is unchanged.
 { const ctx = { CRM_API_BASE, CRM_API_SECRET, express, fetch, requireStaff }; require('./routes/ai-chat')(app, ctx); }
 // 253GEAR publisher forwarders (page-gated Shopify proxies) — extracted to routes/gear-publisher.js (server split, 2026-09-07); registered here so the order is unchanged.
-{ const ctx = { CRM_API_BASE, CRM_API_SECRET, express, fetch, path, requirePageAccess, requireStaff, SERVER_DIR: __dirname }; require('./routes/gear-publisher')(app, ctx); }
+{ const ctx = { CRM_API_BASE, CRM_API_SECRET, express, fetch, path, requirePageAccess, SERVER_DIR: __dirname }; require('./routes/gear-publisher')(app, ctx); }
 // sendHashedHtml — hoisted here from lines 4857-4897 on 2026-09-07 (server split): the section below is moved into routes/ and this helper is shared.
 /**
  * Serve an HTML page with its asset tags rewritten to hashed /dist URLs.

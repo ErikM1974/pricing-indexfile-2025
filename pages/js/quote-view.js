@@ -841,7 +841,7 @@ class QuoteViewPage {
             // Normalize function for color matching
             const normalizeColor = (str) => (str || '').toLowerCase()
                 .replace(/\s+/g, '')     // Remove spaces
-                .replace(/[\/\-]/g, ''); // Remove slashes and dashes
+                .replace(/[/-]/g, ''); // Remove slashes and dashes
 
             // Normalized search color
             const colorNorm = normalizeColor(colorName);
@@ -1740,7 +1740,7 @@ class QuoteViewPage {
             // "Atlantic Blue/ Chrome" and "AtlBlChrome" should group together
             const normalizedColor = displayColor.toLowerCase()
                 .replace(/\s+/g, '')   // Remove all spaces
-                .replace(/[\/\-]/g, ''); // Remove slashes and dashes
+                .replace(/[/-]/g, ''); // Remove slashes and dashes
 
             const key = `${item.StyleNumber}-${normalizedColor}`;
 

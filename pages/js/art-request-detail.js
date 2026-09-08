@@ -2049,7 +2049,7 @@ var artrequdetaLog = ARTREQUDETA_LOG_ON ? console.log.bind(console) : function (
         }
 
         // Dim draft mockup slots
-        var mockupsSection = document.getElementById('ard-mockups-section');
+        mockupsSection = document.getElementById('ard-mockups-section');
         if (mockupsSection) mockupsSection.classList.add('ard-drafts-dimmed');
     }
 
@@ -3467,7 +3467,7 @@ var artrequdetaLog = ARTREQUDETA_LOG_ON ? console.log.bind(console) : function (
     // ── Download helpers (for lightbox Download button) ─────────────────
     function sanitizeForFilename(s) {
         return String(s)
-            .replace(/[,.\/\\:*?"<>|]/g, '')   // strip filesystem-unfriendly chars
+            .replace(/[,./\\:*?"<>|]/g, '')   // strip filesystem-unfriendly chars
             .replace(/\s+/g, '_')                // spaces → underscores
             .replace(/_+/g, '_')                 // collapse repeats
             .replace(/^_+|_+$/g, '')             // trim leading/trailing

@@ -776,7 +776,6 @@ class EmbroideryPricingCalculator {
             puffUpcharge = this.puffUpchargePerCap;
         } else if (embellishmentType === 'laser-patch') {
             patchUpcharge = this.patchUpchargePerCap;
-        } else {
         }
 
         // Fetch size pricing for this cap style. A vendor (non-SanMar) cap carries a

@@ -599,7 +599,7 @@
         root.innerHTML =
             '<div class="lw-outreach-btns">' + OUTREACH_TEMPLATES.map(function (t, i) {
                 return '<button type="button" class="ld-btn lw-outreach-btn" data-tpl="' + i + '">' +
-                    '<i class=\"fas ' + t.icon + '\" aria-hidden=\"true\"></i> ' + t.label + '</button>';
+                    '<i class="fas ' + t.icon + '" aria-hidden="true"></i> ' + t.label + '</button>';
             }).join('') + '</div>' +
             '<div id="lw-outreach-preview"></div>';
         Array.prototype.forEach.call(root.querySelectorAll('[data-tpl]'), function (b) {
@@ -983,7 +983,7 @@
             '<div class="lw-intel-title">Start a quote — prefilled with this lead</div>' +
             '<div class="lw-method-grid">' + QUOTE_BUILDERS.map(function (b, i) {
                 return '<button type="button" class="ld-btn lw-method-btn" data-builder="' + i + '">' +
-                    '<i class=\"fas ' + b.icon + '\" aria-hidden=\"true\"></i> ' + b.label + '</button>';
+                    '<i class="fas ' + b.icon + '" aria-hidden="true"></i> ' + b.label + '</button>';
             }).join('') + '</div>' +
             '<div class="lw-intel-title">Recent quotes for this email</div>' +
             '<div id="lw-quote-suggest"></div>' +

@@ -477,7 +477,6 @@ function setMainProductImage(product, colorSpecific = false) {
         if (images.length > 1) {
             createImageThumbnails(images);
         }
-    } else {
     }
 }
 
@@ -518,31 +517,15 @@ function createImageThumbnails(images) {
 
 // Load colors and images
 async function loadColors(styleNumber) {
-    try {
-        const colorsResponse = await fetch(`${EMB_API_BASE}/api/color-swatches?styleNumber=${styleNumber}`);
-        if (colorsResponse.ok) {
-            const colorsArray = await colorsResponse.json();
-
-            // API returns array directly
-            const colors = Array.isArray(colorsArray) ? colorsArray : [];
-            currentColors = colors;
-
-            if (colors.length > 0) {
-                // Set first color as selected
-                selectedColor = colors[0];
-                updateSelectedColor(selectedColor);
-
-                // Show color swatches if we have more than one
-                if (colors.length > 1) {
-                    displayColorSwatches(colors);
-                }
-
-            } else {
-            }
-        } else {
-        }
-    } catch (error) {
-        // Use default image placeholder
+    const response = await fetch(`${EMB_API_BASE}/api/color-swatches?styleNumber=${styleNumber}`);
+    if (!response.ok) throw new Error('Unable to load product colors. Please refresh or try again later.');
+    const colorsArray = await response.json();
+    const colors = Array.isArray(colorsArray) ? colorsArray : [];
+    currentColors = colors;
+    if (colors.length > 0) {
+        selectedColor = colors[0];
+        updateSelectedColor(selectedColor);
+        if (colors.length > 1) displayColorSwatches(colors);
     }
 }
 
@@ -579,22 +562,14 @@ function displayColorSwatches(colors) {
 
 // Load size pricing for upcharges
 async function loadSizePricing(styleNumber) {
-    try {
-        const sizePricingResponse = await fetch(`${EMB_API_BASE}/api/size-pricing?styleNumber=${styleNumber}`);
-        if (sizePricingResponse.ok) {
-            const sizePricingArray = await sizePricingResponse.json();
-
-            // API returns array - use first item or find by color
-            if (sizePricingArray && sizePricingArray.length > 0) {
-                const sizePricingData = sizePricingArray[0]; // Use first item
-
-                // Store for use in pricing table
-                window.currentSizePricing = sizePricingData;
-            }
-        } else {
-        }
-    } catch (error) {
+    window.currentSizePricing = null;
+    const response = await fetch(`${EMB_API_BASE}/api/size-pricing?styleNumber=${styleNumber}`);
+    if (!response.ok) throw new Error('Unable to load size pricing. Please refresh or try again later.');
+    const sizePricing = await response.json();
+    if (!Array.isArray(sizePricing) || !sizePricing.length || !sizePricing[0]) {
+        throw new Error('Size pricing is unavailable for this product. Please try another style or contact support.');
     }
+    window.currentSizePricing = sizePricing[0];
 }
 
 // Update selected color

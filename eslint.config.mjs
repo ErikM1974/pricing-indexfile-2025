@@ -1,12 +1,7 @@
-// ESLint flat config (roadmap 0.6). Two scopes, one ratchet — never loosen a rule to admit a file:
-//   STRICT  — the NEW Phase-0+ code (builders, lib, build, tenant config, lint-css): the full ruleset below.
-//   LEGACY  — every other browser script (widened 2026-09-07, CSS standardization Step 3): parsed, and
-//             checked with js.configs.recommended MINUS the two rules that only a per-file `/* global */`
-//             audit can satisfy for classic scripts sharing window globals (no-undef 1,088 findings in
-//             146 files, no-unused-vars 843 in 206 — measured 2026-09-07). The rules that DID fire are
-//             `warn`, capped by `--max-warnings` in package.json `lint` (99 at the time of writing):
-//             fix some, lower the cap, never raise it. A file that moves into the strict scope gets the
-//             strict rules automatically — that is how legacy code graduates.
+// ESLint flat config: strict modules plus legacy classic browser scripts.
+// Browser no-undef/no-unused-vars still require a separate per-file global audit
+// (2026-09-07 baseline: 1,088 and 843 findings). All enabled rules are errors,
+// and the command permits zero warnings. New modules use the strict scope.
 import js from '@eslint/js';
 import globals from 'globals';
 import noUnsanitized from 'eslint-plugin-no-unsanitized';
@@ -18,6 +13,8 @@ const STRICT_FILES = [
     'scripts/build.js',
     'scripts/lint-css.js',
     'config/tenant.js',
+    'server.js',
+    'routes/**/*.js',
 ];
 
 // Browser scripts written as ES modules (import/export) — everything else is a classic script.
@@ -31,8 +28,7 @@ const LEGACY_ESM = [
 export default [
     {
         // Global ignores — what `eslint .` never reads: build output, deps, tests, Node-side scripts
-        // (except the two in STRICT_FILES), docs/memory, vendored + archived code, the in-browser-Babel .jsx,
-        // and server.js (Node, 5,600 lines, its own review process).
+        // (except the two in STRICT_FILES), docs/memory, vendored + archived code.
         ignores: [
             'dist/**',
             'node_modules/**',
@@ -46,10 +42,6 @@ export default [
             '**/archive/**',
             '**/archive-working-files/**',
             '**/*.jsx',
-            'server.js',
-            // routes/<domain>.js = sections of server.js moved verbatim (server split, 2026-09-07): same code, same review
-            // process, until the split is done and the whole server enters a Node strict scope together.
-            'routes/**/*.js',
             'tools/seed-top-sellers.js',
             'scripts/**/*.js',
             '!scripts/build.js',
@@ -69,16 +61,16 @@ export default [
             ...js.configs.recommended.rules,
             'no-undef': 'off',
             'no-unused-vars': 'off',
-            // What fired on 2026-09-07 (count): warnings under the --max-warnings cap until fixed.
-            'no-useless-escape': 'warn', // 43
-            'no-case-declarations': 'warn', // 19
-            'no-prototype-builtins': 'warn', // 12
-            'no-redeclare': 'warn', // 9
-            'no-empty': ['warn', { allowEmptyCatch: true }], // 8
-            'no-unreachable': 'warn', // 3
-            'no-control-regex': 'warn', // 2
-            'no-irregular-whitespace': 'warn', // 1
-            'no-unused-labels': 'warn', // 1
+            // Former warning debt is fixed; these rules now block regressions.
+            'no-useless-escape': 'error',
+            'no-case-declarations': 'error',
+            'no-prototype-builtins': 'error',
+            'no-redeclare': 'error',
+            'no-empty': ['error', { allowEmptyCatch: true }],
+            'no-unreachable': 'error',
+            'no-control-regex': 'error',
+            'no-irregular-whitespace': 'error',
+            'no-unused-labels': 'error',
         },
     },
     {
@@ -196,9 +188,10 @@ export default [
     },
     {
         // Node-side build/server helpers — CommonJS, not ESM.
-        files: ['lib/**/*.js', 'scripts/build.js', 'scripts/lint-css.js'],
+        files: ['server.js', 'routes/**/*.js', 'lib/**/*.js', 'scripts/build.js', 'scripts/lint-css.js'],
         languageOptions: {
             sourceType: 'commonjs',
+            globals: { ...globals.node },
         },
     },
     {

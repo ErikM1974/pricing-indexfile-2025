@@ -34,13 +34,13 @@ priccalcLog("[PRICING-CALC:LOAD] Pricing calculator module loaded (v2.0 - Standa
         if (typeof pricingData === 'object' && pricingData !== null) {
             priccalcLog("[PRICING-CALC:DEBUG] pricingData is an object.");
             priccalcLog("[PRICING-CALC:DEBUG] Keys in pricingData:", Object.keys(pricingData));
-            priccalcLog("[PRICING-CALC:DEBUG] pricingData.prices exists:", pricingData.hasOwnProperty('prices'));
-            priccalcLog("[PRICING-CALC:DEBUG] pricingData.tierData exists:", pricingData.hasOwnProperty('tierData'));
-            if (pricingData.hasOwnProperty('prices')) {
+            priccalcLog("[PRICING-CALC:DEBUG] pricingData.prices exists:", Object.prototype.hasOwnProperty.call(pricingData, 'prices'));
+            priccalcLog("[PRICING-CALC:DEBUG] pricingData.tierData exists:", Object.prototype.hasOwnProperty.call(pricingData, 'tierData'));
+            if (Object.prototype.hasOwnProperty.call(pricingData, 'prices')) {
                 priccalcLog("[PRICING-CALC:DEBUG] typeof pricingData.prices:", typeof pricingData.prices, "Is Array:", Array.isArray(pricingData.prices));
                 priccalcLog("[PRICING-CALC:DEBUG] pricingData.prices content (first few keys):", pricingData.prices ? JSON.stringify(Object.keys(pricingData.prices).slice(0,5)) : 'null/undefined');
             }
-            if (pricingData.hasOwnProperty('tierData')) {
+            if (Object.prototype.hasOwnProperty.call(pricingData, 'tierData')) {
                 priccalcLog("[PRICING-CALC:DEBUG] typeof pricingData.tierData:", typeof pricingData.tierData, "Is Array:", Array.isArray(pricingData.tierData));
                 priccalcLog("[PRICING-CALC:DEBUG] pricingData.tierData content (first few keys):", pricingData.tierData ? JSON.stringify(Object.keys(pricingData.tierData).slice(0,5)) : 'null/undefined');
             }

@@ -1996,3 +1996,6 @@ Fifteen staff-dashboard pages still carried inline code (found by the 2026-09-05
 
 | lib/stripe-client.js | Shared Stripe client, explicitly preserves API version across SDK upgrades | Server and portal ctx | Active |
 | tests/unit/stripe-sdk-contract.test.js | Intercepted checkout APIs and signed HTTP webhook regression coverage | Fake keys, no external writes | Active |
+
+| `/tests/unit/calculator-api-errors.test.js` | Product loader behavior: failed color/size APIs keep pricing hidden and show the existing error banner; stale size pricing cleared; successful API data preserved | EMB + cap calculators | Active |
+| `/tests/unit/sample-inventory-status.test.js` | Vendor inventory status/messages for available, unavailable and low-stock sizes; mocked API response | Sample inventory service | Active |

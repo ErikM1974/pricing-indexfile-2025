@@ -200,7 +200,7 @@
             if (moreBtn2) moreBtn2.classList.add('active');
         }
 
-        if (TAB_PANE_MAP.hasOwnProperty(tabName)) {
+        if (Object.prototype.hasOwnProperty.call(TAB_PANE_MAP, tabName)) {
             var pane = document.getElementById(TAB_PANE_MAP[tabName]);
             if (pane) pane.classList.add('active');
         }
@@ -289,7 +289,7 @@
                     // External link — let the browser navigate.
                     return;
                 }
-                if (TAB_PANE_MAP.hasOwnProperty(pageId)) {
+                if (Object.prototype.hasOwnProperty.call(TAB_PANE_MAP, pageId)) {
                     showTab(pageId);
                 }
             });
@@ -304,10 +304,10 @@
         // A shared/bookmarked #hash link wins over the local last-tab memory so
         // teammates land on the tab the sender intended, not their own last tab.
         var hashTab = (location.hash || '').replace(/^#/, '');
-        var savedTab = (hashTab && TAB_PANE_MAP.hasOwnProperty(hashTab))
+        var savedTab = (hashTab && Object.prototype.hasOwnProperty.call(TAB_PANE_MAP, hashTab))
             ? hashTab
             : localStorage.getItem('aeDashboardTab');
-        if (!savedTab || !TAB_PANE_MAP.hasOwnProperty(savedTab)) {
+        if (!savedTab || !Object.prototype.hasOwnProperty.call(TAB_PANE_MAP, savedTab)) {
             savedTab = 'submit';
             localStorage.setItem('aeDashboardTab', savedTab);
         }

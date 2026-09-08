@@ -106,7 +106,6 @@ async function migrateCartUpcharges(cart) {
                 // Add empty upcharges object to prevent repeated attempts
                 cart[i].upcharges = {};
             }
-        } else {
         }
     }
 

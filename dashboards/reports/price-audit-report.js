@@ -16,8 +16,8 @@
                         let aVal = a.children[idx]?.textContent?.trim() || '';
                         let bVal = b.children[idx]?.textContent?.trim() || '';
                         if (isNum) {
-                            aVal = parseFloat(aVal.replace(/[^\d.\-]/g, '')) || 0;
-                            bVal = parseFloat(bVal.replace(/[^\d.\-]/g, '')) || 0;
+                            aVal = parseFloat(aVal.replace(/[^\d.-]/g, '')) || 0;
+                            bVal = parseFloat(bVal.replace(/[^\d.-]/g, '')) || 0;
                             return dir === 'asc' ? aVal - bVal : bVal - aVal;
                         }
                         return dir === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);

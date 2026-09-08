@@ -145,7 +145,7 @@
         /* Copy button */
         var copyBtn = e.target.closest('.card-copy-btn');
         if (copyBtn) {
-            var card = copyBtn.closest('[data-cb-name="data-row"]');
+            card = copyBtn.closest('[data-cb-name="data-row"]');
             if (card) copyDesignNumber(card);
             return;
         }

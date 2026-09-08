@@ -1414,7 +1414,7 @@ var MockupSubmitForm = (function () {
         var email = getSubmitterEmail();
         if (!email) return '';
         var atIdx = email.indexOf('@');
-        var name = atIdx > 0 ? email.substring(0, atIdx) : email;
+        name = atIdx > 0 ? email.substring(0, atIdx) : email;
         return name.charAt(0).toUpperCase() + name.slice(1);
     }
 

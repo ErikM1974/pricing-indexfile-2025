@@ -102,7 +102,7 @@
     }
     function downloadCsvFile(rows, filename) {
         var lines = [CSV_HEADER.map(csvCell).join(',')].concat(rows);
-        var blob = new Blob(['﻿' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8' });
+        var blob = new Blob(['\uFEFF' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8' });
         var url = URL.createObjectURL(blob);
         var a = document.createElement('a');
         a.href = url; a.download = filename;
@@ -429,7 +429,7 @@
     // Minimal RFC-4180 parser — the ShopWorks export quotes money like "$1,189.96 ".
     function parseCsv(text) {
         var rows = [], row = [], cur = '', q = false;
-        text = String(text).replace(/^﻿/, '');
+        text = String(text).replace(/^\uFEFF/, '');
         for (var i = 0; i < text.length; i++) {
             var c = text[i];
             if (q) {

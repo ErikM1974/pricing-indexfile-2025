@@ -146,36 +146,40 @@ function initGame() {
             break;
             
         case 'birthday':
-            dropZoneTitle.textContent = 'Birthdays';
-            const withBirthdays = activeEmployees.filter(e => e.birthday);
-            withBirthdays.forEach(emp => {
-                const name = `${emp.firstName} ${emp.lastName}`;
-                const bday = formatBirthday(emp.birthday);
-                gameData[name] = bday;
-                dropZoneData.push({ label: bday, value: bday });
-            });
-            break;
-            
-        case 'mix':
-            dropZoneTitle.textContent = 'Mixed Information';
-            const mixEmployees = shuffle(activeEmployees).slice(0, 12);
-            mixEmployees.forEach(emp => {
-                const name = `${emp.firstName} ${emp.lastName}`;
-                const random = Math.random();
-                if (random < 0.33) {
-                    const timeText = calculateTimeOfService(emp.startDate);
-                    gameData[name] = timeText;
-                    dropZoneData.push({ label: timeText, value: timeText });
-                } else if (random < 0.66 && emp.birthday) {
+            {
+                dropZoneTitle.textContent = 'Birthdays';
+                const withBirthdays = activeEmployees.filter(e => e.birthday);
+                withBirthdays.forEach(emp => {
+                    const name = `${emp.firstName} ${emp.lastName}`;
                     const bday = formatBirthday(emp.birthday);
                     gameData[name] = bday;
                     dropZoneData.push({ label: bday, value: bday });
-                } else {
-                    gameData[name] = emp.position;
-                    dropZoneData.push({ label: emp.position, value: emp.position });
-                }
-            });
-            break;
+                });
+                break;
+            }
+
+        case 'mix':
+            {
+                dropZoneTitle.textContent = 'Mixed Information';
+                const mixEmployees = shuffle(activeEmployees).slice(0, 12);
+                mixEmployees.forEach(emp => {
+                    const name = `${emp.firstName} ${emp.lastName}`;
+                    const random = Math.random();
+                    if (random < 0.33) {
+                        const timeText = calculateTimeOfService(emp.startDate);
+                        gameData[name] = timeText;
+                        dropZoneData.push({ label: timeText, value: timeText });
+                    } else if (random < 0.66 && emp.birthday) {
+                        const bday = formatBirthday(emp.birthday);
+                        gameData[name] = bday;
+                        dropZoneData.push({ label: bday, value: bday });
+                    } else {
+                        gameData[name] = emp.position;
+                        dropZoneData.push({ label: emp.position, value: emp.position });
+                    }
+                });
+                break;
+            }
     }
     
     // Create employee cards

@@ -33,7 +33,7 @@
         if (!s) return '';
         var m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
         if (m) return m[1] + '-' + pad(m[2]) + '-' + pad(m[3]);
-        m = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})$/);
+        m = s.match(/^(\d{1,2})[/-](\d{1,2})[/-](\d{2,4})$/);
         if (m) {
             var year = m[3].length === 2 ? '20' + m[3] : m[3];
             var month = parseInt(m[1], 10);

@@ -48,7 +48,7 @@ let ytdFailed = false;
  *   chip renders no source/staleness detail (the projected-EOY line that
  *   used it was removed with the big banner).
  */
-export function setYtdTotal(ytdAmount, meta = {}) { // eslint-disable-line no-unused-vars
+export function setYtdTotal(ytdAmount, meta = {}) {
     lastYtd = Number(ytdAmount) || 0;
     ytdFailed = false;
     render();

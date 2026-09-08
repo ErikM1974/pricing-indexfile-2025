@@ -600,8 +600,8 @@ const NWCAProductPricingUI = (function() {
             event.detail.embellishmentType === 'screen-print' &&
             Array.isArray(event.detail.tiers) && // screenprint-adapter dispatches 'tiers' as an array
             typeof event.detail.fees === 'object' && // screenprint-adapter dispatches 'fees' as an object
-            !event.detail.hasOwnProperty('prices') && // pricing-matrix-capture dispatches 'prices'
-            !event.detail.hasOwnProperty('tierData'))   // pricing-matrix-capture dispatches 'tierData'
+            !Object.prototype.hasOwnProperty.call(event.detail, 'prices') && // pricing-matrix-capture dispatches 'prices'
+            !Object.prototype.hasOwnProperty.call(event.detail, 'tierData'))   // pricing-matrix-capture dispatches 'tierData'
         {
             debugProductUI("INFO", "Processing 'pricingDataLoaded' event (likely from screenprint-adapter) for screen-print table.", event.detail);
             const { uniqueSizes, tiers, fees } = event.detail;
