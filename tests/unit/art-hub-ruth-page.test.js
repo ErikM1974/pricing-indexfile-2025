@@ -13,7 +13,8 @@ const noComments = (s) => s.replace(/\/\/[^\n]*/g, '');
 
 const html = read('dashboards/art-hub-ruth.html').replace(/<!--[\s\S]*?-->/g, '');
 const js = read('shared_components/js/mockup-ruth.js');
-const css = read('dashboards/css/art-hub-ruth.css');
+const css = read('shared_components/css/art-workflow.css');
+const components = read('shared_components/css/components.css');
 
 describe('ruth queue — structure + Rule 3', () => {
     test('one h1, tablist + panels, no inline style/handlers, hidden guard', () => {
@@ -30,9 +31,9 @@ describe('ruth queue — structure + Rule 3', () => {
         expect(noComments(js)).not.toMatch(/(?<!data-)onerror=/);
         expect(js).not.toMatch(/style="/);
         expect(js).not.toMatch(/\.style\.(display|cssText|animationDelay)/);
-        expect(js).toMatch(/card\.style\.setProperty\('--delay'/);
-        expect(css).toMatch(/^\[hidden\] \{ display: none !important; \}/m);
-        expect(css).toMatch(/\.tab-group \{ display: contents; \}/);
+        expect(js).not.toMatch(/card\.style\.setProperty\('--delay'/);
+        expect(components).toMatch(/\[hidden\]\s*\{\s*display: none;/);
+        expect(css).toMatch(/\.tab-group\s*\{\s*display: contents;/);
     });
     test('dates are calendar dates; overdue is day-granular', () => {
         expect(js).toMatch(/function parseCalendarDate\(value\)/);
@@ -63,7 +64,7 @@ describe('ruth queue — controls + behaviour', () => {
         expect(js).toMatch(/if \(e\.key === 'Enter' \|\| e\.key === ' '\) openKanbanCard\(e\);/);
         expect(js).toMatch(/role="link" tabindex="0" aria-label="Open ' \+ company \+ '"/);
         expect(js).toMatch(/\.kanban-card\[hidden\]/);
-        expect(js).toMatch(/<button type="button" class="kanban-show-all"/);
+        expect(js).toMatch(/<button type="button" class="kanban-show-all\b/);
     });
     test('honest failures + Retry; identity from the session; rep filter is a button', () => {
         expect(js).toMatch(/showError\('Unable to load mockups \(' \+ \(err\.message \|\| 'request failed'\) \+ '\)\.'\);/);

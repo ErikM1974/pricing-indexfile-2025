@@ -1,6 +1,6 @@
 # Active Files Registry
 
-Last updated: 2026-09-08 (Bradley shared sender/dialog behavior and DTG pricing-readiness regression coverage registered in the area documents).
+Last updated: 2026-09-08 (Art workflow shared CSS and browser coverage registered in the area documents).
 
 | Area | Registry |
 |---|---|

@@ -4,7 +4,7 @@
  * Fetches mockups from our API (no Caspio DataPages) and renders card gallery.
  * Handles tab switching, status filtering, quick actions, and toast notifications.
  *
- * Depends on: mockup-ruth.css, app-config.js
+ * Depends on: components.css, art-workflow.css, ui-dialog.js, app-config.js
  */
 (function () {
     'use strict';
@@ -169,6 +169,12 @@
             if (kanbanActive) buildKanbanBoard();
         } catch (err) {
             console.error('Failed to fetch mockups:', err);
+            allMockups = [];
+            updateStatusCounts();
+            renderCards();
+            if (kanbanActive) buildKanbanBoard();
+            window.toggleKanbanView('grid');
+            showTab('queue');
             showError('Unable to load mockups (' + (err.message || 'request failed') + ').');
         } finally {
             showLoading(false);
@@ -216,9 +222,12 @@
         // chip jumps to the On Hold tab. They were display-only divs until 2026-09-05.
         const summaryEl = document.getElementById('status-summary');
         if (summaryEl) {
+            const focused = summaryEl.contains(document.activeElement) ? document.activeElement : null;
+            const focusStatus = focused && focused.dataset.status;
+            const focusTab = focused && focused.dataset.tab;
             const chip = (mod, stat, status, label, n) => {
                 const on = status && queueStatusFilter === status;
-                return `<button type="button" class="status-stat status-stat--${mod}${on ? ' active' : ''}" data-status="${escapeHtml(status)}" aria-pressed="${on ? 'true' : 'false'}" title="${escapeHtml(label)}">
+                return `<button type="button" class="status-stat status-stat--${mod}${on ? ' active' : ''} btn" data-status="${escapeHtml(status)}" aria-pressed="${on ? 'true' : 'false'}" title="${escapeHtml(label)}">
                     <span class="status-stat-count" data-stat="${stat}">${n}</span>
                     <span class="status-stat-label">${label}</span>
                 </button>`;
@@ -228,11 +237,16 @@
                 chip('in-progress', 'inProgress', 'In Progress', 'In Progress', counts.inProgress) +
                 chip('awaiting-approval', 'awaitingApproval', 'Awaiting Approval', 'Awaiting Approval', counts.awaitingApproval) +
                 chip('revision-requested', 'revisionRequested', 'Revision Requested', 'Revisions', counts.revisionRequested) +
-                `<button type="button" class="status-stat status-stat--on-hold" data-tab="on-hold" aria-pressed="false" title="Open the On Hold tab">
+                `<button type="button" class="status-stat status-stat--on-hold btn" data-tab="on-hold" aria-pressed="false" title="Open the On Hold tab">
                     <span class="status-stat-count" data-stat="onHold">${counts.onHold}</span>
                     <span class="status-stat-label">On Hold</span>
                 </button>`;
             popChangedCounts(counts);
+            if (focused) {
+                const replacement = Array.from(summaryEl.querySelectorAll('button')).find(button =>
+                    focusStatus ? button.dataset.status === focusStatus : button.dataset.tab === focusTab);
+                if (replacement) replacement.focus({ preventScroll: true });
+            }
         }
     }
 
@@ -269,7 +283,7 @@
         const input = document.createElement('input');
         input.type = 'search';
         input.id = 'ruth-search-input';
-        input.className = 'rq-search-input';
+        input.className = 'rq-search-input field-input';
         input.setAttribute('aria-label', 'Search mockups');
         input.setAttribute('autocomplete', 'off');
         input.placeholder = 'Search company, design #, rep, or ID...';
@@ -292,7 +306,8 @@
 
         bar.appendChild(input);
         bar.appendChild(countSpan);
-        queueGrid.parentNode.insertBefore(bar, queueGrid);
+        const gridView = queueGrid.parentNode;
+        gridView.parentNode.insertBefore(bar, gridView);
     }
 
     // ── Render Cards ─────────────────────────────────────────────────────
@@ -340,7 +355,7 @@
 
         // Render queue
         if (queueMockups.length === 0) {
-            const why = queueStatusFilter ? `No “${escapeHtml(queueStatusFilter)}” mockups${ruthSearchText ? ' match your search' : ''}. <button type="button" class="rq-link" data-call="ruthClearStatusFilter">Show all</button>`
+            const why = queueStatusFilter ? `No “${escapeHtml(queueStatusFilter)}” mockups${ruthSearchText ? ' match your search' : ''}. <button type="button" class="rq-link btn" data-call="ruthClearStatusFilter">Show all</button>`
                 : (ruthSearchText ? `No mockups match “${escapeHtml(ruthSearchText)}”.` : `No pending mockups - you're all caught up!`);
             queueGrid.innerHTML = `
                 <div class="mockup-empty mockup-span">
@@ -376,11 +391,6 @@
                 onHoldGrid.innerHTML = onHoldMockups.map(m => buildCard(m, false)).join('');
             }
         }
-
-        // Stagger card entry animations
-        document.querySelectorAll('.mockup-card').forEach((card, idx) => {
-            card.style.setProperty('--delay', (Math.min(idx, 12) * 0.05) + 's');
-        });
 
         // Attach event listeners to cards
         attachCardListeners();
@@ -432,13 +442,13 @@
             if (statusLower === 'submitted') {
                 actionsHtml = `
                     <div class="card-actions">
-                        <button type="button" class="card-action-btn card-action-btn--start" data-id="${id}" data-action="start" aria-label="Start working on ${company}">Start Working</button>
+                        <button type="button" class="card-action-btn card-action-btn--start btn btn-primary" data-id="${id}" data-action="start" aria-label="Start working on ${company}">Start Working</button>
                         ${elapsedBadge}
                     </div>`;
             } else if (statusLower === 'in progress' || statusLower === 'revision requested') {
                 actionsHtml = `
                     <div class="card-actions">
-                        <button type="button" class="card-action-btn card-action-btn--send" data-id="${id}" data-action="send-approval" aria-label="Send ${company} for approval">Send for Approval</button>
+                        <button type="button" class="card-action-btn card-action-btn--send btn btn-primary" data-id="${id}" data-action="send-approval" aria-label="Send ${company} for approval">Send for Approval</button>
                         ${elapsedBadge}
                     </div>`;
             } else if (statusLower === 'awaiting approval') {
@@ -542,7 +552,7 @@
             </div>
             <div class="card-footer">
                 <span class="card-date">${submittedDate}</span>
-                <a href="/mockup/${id}" class="card-action-link" data-stop="1" aria-label="View details for ${company}">View Details &rarr;</a>
+                <a href="/mockup/${id}" class="card-action-link btn" data-stop="1" aria-label="View details for ${company}">View Details &rarr;</a>
             </div>
             ${actionsHtml}
         </div>`;
@@ -647,12 +657,12 @@
             queueGrid.innerHTML = `
                 <div class="mockup-error mockup-span" role="alert">
                     <strong>Error:</strong> ${escapeHtml(message)}
-                    <br><button type="button" class="rq-retry-btn" data-call="ruthRetryFetch">Retry</button>
+                    <br><button type="button" class="rq-retry-btn btn btn-primary" data-call="ruthRetryFetch">Retry</button>
                 </div>`;
         }
     }
     window.ruthRetryFetch = function () { fetchMockups(); };
-    window.ruthClearStatusFilter = function () { queueStatusFilter = ''; updateStatusCounts(); renderCards(); };
+    window.ruthClearStatusFilter = function () { queueStatusFilter = ''; updateStatusCounts(); renderCards(); if (kanbanActive) buildKanbanBoard(); };
 
     // ── Toast Notification ───────────────────────────────────────────────
     function showToast(message, type) {
@@ -778,11 +788,12 @@
 
     function buildKanbanBoard() {
         var board = document.getElementById('ruth-kanban-board');
-        if (!board || !allMockups.length) return;
+        if (!board) return;
 
         // Filter to March 15+ (new status system) for all statuses
         var kanbanMockups = allMockups.filter(function (m) {
-            if (!m.Submitted_Date) return false;
+            if (!m.Submitted_Date || m.Is_On_Hold) return false;
+            if (queueStatusFilter && m.Status !== queueStatusFilter) return false;
             var submitted = new Date(m.Submitted_Date);
             return submitted >= KANBAN_DATE_CUTOFF;
         });
@@ -804,13 +815,18 @@
             if (!col) return;
             col.classList.toggle('kanban-column--collapsed');
             localStorage.setItem(storageKey, col.classList.contains('kanban-column--collapsed') ? '1' : '0');
+            const toggle = col.querySelector('button.kanban-column-header');
+            if (toggle) toggle.setAttribute('aria-expanded', String(!col.classList.contains('kanban-column--collapsed')));
         };
         window.kanbanShowAll = window.kanbanShowAll || function (colId) {
             var col = document.querySelector('.kanban-column--' + colId);
             if (!col) return;
+            const firstRevealed = col.querySelector('.kanban-card[hidden]');
             col.querySelectorAll('.kanban-card[hidden]').forEach(function (c) { c.hidden = false; });
             var link = col.querySelector('.kanban-show-all');
+            const returnFocus = link === document.activeElement;
             if (link) link.remove();
+            if (returnFocus && firstRevealed) firstRevealed.focus();
         };
 
         board.innerHTML = KANBAN_COLUMNS.map(function (col) {
@@ -899,7 +915,7 @@
             if (isCompleted && colCards.length > COMPLETED_SHOW_LIMIT) {
                 cardsHtml = colCards.slice(0, COMPLETED_SHOW_LIMIT).map(function (m) { return renderCard(m, false); }).join('');
                 cardsHtml += colCards.slice(COMPLETED_SHOW_LIMIT).map(function (m) { return renderCard(m, true); }).join('');
-                cardsHtml += '<button type="button" class="kanban-show-all" data-stop="1" data-call="kanbanShowAll" data-args="' + JSON.stringify([col.id]).replace(/"/g, '&quot;') + '">Show all ' + colCards.length + ' items</button>';
+                cardsHtml += '<button type="button" class="kanban-show-all btn" data-stop="1" data-call="kanbanShowAll" data-args="' + JSON.stringify([col.id]).replace(/"/g, '&quot;') + '">Show all ' + colCards.length + ' items</button>';
             } else {
                 cardsHtml = colCards.map(function (m) { return renderCard(m, false); }).join('');
             }
@@ -913,11 +929,11 @@
                 : '';
 
             return '<div class="kanban-column kanban-column--' + col.id + collapseClass + '">'
-                + '<div class="kanban-column-header"' + clickHandler + '>'
+                + (isCompleted ? '<button type="button" aria-expanded="' + !completedCollapsed + '"' : '<div') + ' class="kanban-column-header"' + clickHandler + '>'
                 + chevron
                 + '<span>' + col.label + '</span>'
                 + '<span class="kanban-column-count">' + colCards.length + '</span>'
-                + '</div>'
+                + (isCompleted ? '</button>' : '</div>')
                 + '<div class="kanban-column-body">' + cardsHtml + '</div>'
                 + '</div>';
         }).join('');
@@ -1024,7 +1040,7 @@
         }
         widget.hidden = false;
         var label = data.broken === 1 ? 'broken Box mockup' : 'broken Box mockups';
-        widget.innerHTML = '<button type="button" class="broken-mockups-pill" id="ruth-broken-pill"'
+        widget.innerHTML = '<button type="button" class="broken-mockups-pill btn" id="ruth-broken-pill"'
             + ' aria-label="Review broken Box mockups">'
             +   '<span class="broken-mockups-pill-icon" aria-hidden="true">⚠</span>'
             +   '<span class="broken-mockups-pill-text">'
@@ -1041,7 +1057,7 @@
         if (rows.length === 0) return;
 
         var existing = document.getElementById('broken-mockups-modal');
-        if (existing) existing.remove();
+        if (existing) { window.UiDialog.close(existing); existing.remove(); }
 
         var overlay = document.createElement('div');
         overlay.id = 'broken-mockups-modal';
@@ -1049,11 +1065,8 @@
         overlay.innerHTML = bmlBuildModalHtml(brokenMockupsData, rows);
         overlay.__returnFocus = document.activeElement;
         document.body.appendChild(overlay);
-        document.body.classList.add('is-modal-open');
-
-        bmlWireEvents(overlay);
-        var firstBtn = overlay.querySelector('#broken-mockups-modal-close');
-        if (firstBtn) setTimeout(function () { firstBtn.focus(); }, 30);
+        var closeModal = bmlWireEvents(overlay);
+        window.UiDialog.open(overlay, { focus: '#broken-mockups-modal-close', onDismiss: closeModal });
     }
 
     function bmlBuildModalHtml(data, rows) {
@@ -1064,15 +1077,15 @@
         return '<div class="broken-mockups-modal" role="dialog" aria-modal="true" aria-labelledby="bml-title">'
             + '<div class="broken-mockups-modal-header">'
             +   '<h3 id="bml-title">🚫 Broken Box Mockups (' + rows.length + ')</h3>'
-            +   '<button type="button" class="broken-mockups-modal-close" id="broken-mockups-modal-close" aria-label="Close">&times;</button>'
+            +   '<button type="button" class="broken-mockups-modal-close btn" id="broken-mockups-modal-close" aria-label="Close">&times;</button>'
             + '</div>'
             + '<div class="broken-mockups-modal-sub">'
             +   'Scanned ' + data.checked + ' active mockups · ' + data.uniqueFileIds + ' Box files checked. '
             +   'Try <strong>Auto-recover</strong> first — it usually finds a replacement in the same Box folder.'
             + '</div>'
             + '<div class="bml-toolbar">'
-            +   '<button type="button" class="bml-bulk-btn" id="bml-bulk-recover">⚡ ' + escapeHtml(bulkLabel) + '</button>'
-            +   '<button type="button" class="bml-refresh-btn" id="bml-refresh">↻ Refresh list</button>'
+            +   '<button type="button" class="bml-bulk-btn btn btn-primary" id="bml-bulk-recover">⚡ ' + escapeHtml(bulkLabel) + '</button>'
+            +   '<button type="button" class="bml-refresh-btn btn" id="bml-refresh">↻ Refresh list</button>'
             + '</div>'
             + '<div class="broken-mockups-modal-body bml-row-list">' + rowsHtml + '</div>'
             + '</div>';
@@ -1082,8 +1095,8 @@
         var dateStr = '';
         if (row.submittedDate) {
             try {
-                var d = new Date(row.submittedDate);
-                if (!isNaN(d.getTime())) {
+                var d = parseCalendarDate(row.submittedDate);
+                if (d) {
                     dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
                 }
             } catch (e) { /* ignore */ }
@@ -1097,7 +1110,7 @@
 
         var fileIdLine = fileId
             ? ' · fileId: <code class="bml-fileid-code">' + escapeHtml(fileId) + '</code>'
-                + ' <button type="button" class="bml-copy" data-copy="' + escapeHtml(fileId)
+                + ' <button type="button" class="bml-copy btn" data-copy="' + escapeHtml(fileId)
                 + '" title="Copy fileId" aria-label="Copy fileId">📋</button>'
             : '';
         var boxUrl = fileId ? 'https://app.box.com/file/' + encodeURIComponent(fileId) : '';
@@ -1123,35 +1136,35 @@
             +     fileIdLine
             +   '</div>'
             +   '<div class="bml-row__actions">'
-            +     '<button type="button" class="bml-action bml-action--recover" data-action="recover">⚡ Auto-recover</button>'
-            +     (boxUrl ? '<a class="bml-action bml-action--box" href="' + boxUrl + '" target="_blank" rel="noopener" title="Opens Box — lands on Restore screen if file is in trash">🔗 Open in Box</a>' : '')
-            +     '<button type="button" class="bml-action bml-action--reupload" data-action="reupload">📤 Re-upload</button>'
+            +     '<button type="button" class="bml-action bml-action--recover btn btn-primary" data-action="recover">⚡ Auto-recover</button>'
+            +     (boxUrl ? '<a class="bml-action bml-action--box btn" href="' + boxUrl + '" target="_blank" rel="noopener" title="Opens Box — lands on Restore screen if file is in trash">🔗 Open in Box</a>' : '')
+            +     '<button type="button" class="bml-action bml-action--reupload btn" data-action="reupload">📤 Re-upload</button>'
             +   '</div>'
             +   '<div class="bml-row__dropzone" hidden>'
             +     '<input type="file" class="bml-file-input" accept="image/*,application/pdf,.svg,.eps,.ai" hidden>'
-            +     '<div class="bml-dropzone-prompt">📥 Drop file here or <span class="bml-dropzone-link">click to choose</span></div>'
+            +     '<div class="bml-dropzone-prompt">📥 Drop file here or <button type="button" class="bml-dropzone-link btn">Choose file</button></div>'
             +     '<div class="bml-dropzone-hint">Will overwrite the broken slot. Image, PDF, SVG, AI, or EPS.</div>'
             +   '</div>'
-            +   '<div class="bml-row__result" hidden></div>'
+            +   '<div class="bml-row__result" role="status" hidden></div>'
             + '</article>';
     }
 
     function bmlWireEvents(overlay) {
         function close() {
             var back = overlay.__returnFocus;
+            window.UiDialog.close(overlay);
             overlay.remove();
-            document.body.classList.remove('is-modal-open');
-            document.removeEventListener('keydown', escListener);
-            if (back && document.body.contains(back)) { try { back.focus(); } catch (e) { /* gone */ } }
+            if (!back || !back.isConnected) {
+                const fallback = document.getElementById('ruth-broken-pill') || document.getElementById('tab-queue');
+                if (fallback) fallback.focus();
+            }
         }
-        function escListener(e) { if (e.key === 'Escape') close(); }
 
         overlay.addEventListener('click', function (e) {
             if (e.target === overlay) close();
         });
         var closeBtn = overlay.querySelector('#broken-mockups-modal-close');
         if (closeBtn) closeBtn.addEventListener('click', close);
-        document.addEventListener('keydown', escListener);
 
         var bulkBtn = overlay.querySelector('#bml-bulk-recover');
         if (bulkBtn) bulkBtn.addEventListener('click', function () {
@@ -1166,9 +1179,10 @@
             bmlReloadFromServer().then(function () {
                 close();
                 if (brokenMockupsData && brokenMockupsData.broken > 0) openBrokenMockupsModal();
-            }).catch(function () {
+            }).catch(function (error) {
                 refreshBtn.disabled = false;
                 refreshBtn.innerHTML = orig;
+                showToast('Could not refresh the broken mockup list (' + error.message + '). Try again.', 'error');
             });
         });
 
@@ -1178,11 +1192,12 @@
                 e.preventDefault(); e.stopPropagation();
                 var text = copyBtn.dataset.copy || '';
                 try {
-                    navigator.clipboard.writeText(text);
-                    var orig = copyBtn.innerHTML;
-                    copyBtn.innerHTML = '✓';
-                    setTimeout(function () { copyBtn.innerHTML = orig; }, 1200);
-                } catch (err) { /* ignore */ }
+                    navigator.clipboard.writeText(text).then(function () {
+                        var orig = copyBtn.innerHTML;
+                        copyBtn.innerHTML = '✓';
+                        setTimeout(function () { copyBtn.innerHTML = orig; }, 1200);
+                    }).catch(function () { showToast('Could not copy the file ID. Select the ID and copy it manually.', 'error'); });
+                } catch (err) { showToast('Could not copy the file ID. Select the ID and copy it manually.', 'error'); }
                 return;
             }
             var actionBtn = e.target.closest('.bml-action[data-action]');
@@ -1228,6 +1243,7 @@
             var file = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
             if (row && file) bmlPerformUpload(row, file);
         });
+        return close;
     }
 
     function bmlActionRecover(row) {
@@ -1249,7 +1265,10 @@
             body: JSON.stringify({ slotField: slotField, designNumber: designNumber, companyName: companyName })
         })
         .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, body: j }; }); })
-        .then(function (resp) { bmlApplyResultToRow(row, resp.body); })
+        .then(function (resp) {
+            if (!resp.ok) throw new Error((resp.body && resp.body.error) || 'Recovery request failed');
+            bmlApplyResultToRow(row, resp.body);
+        })
         .catch(function (err) { bmlSetRowState(row, 'error', err.message || String(err)); });
     }
 
@@ -1324,9 +1343,13 @@
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ entries: entries })
         })
-        .then(function (r) { return r.json(); })
+        .then(function (r) {
+            if (!r.ok) throw new Error('Recovery request failed (' + r.status + ')');
+            return r.json();
+        })
         .then(function (data) {
-            (data.results || []).forEach(function (result, idx) {
+            if (!data || !Array.isArray(data.results) || data.results.length !== rows.length) throw new Error('The recovery result was incomplete. Refresh the list before trying again.');
+            data.results.forEach(function (result, idx) {
                 // Match results to rows by index — same order, same length.
                 var row = rows[idx];
                 if (row) bmlApplyResultToRow(row, result);
@@ -1508,6 +1531,7 @@
             var status = chip.dataset.status || '';
             queueStatusFilter = (queueStatusFilter === status) ? '' : status;
             if (currentFilter !== 'queue') showTab('queue'); else renderCards();
+            if (kanbanActive) buildKanbanBoard();
             updateStatusCounts();
         });
 

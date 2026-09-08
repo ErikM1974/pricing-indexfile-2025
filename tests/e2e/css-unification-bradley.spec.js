@@ -137,6 +137,21 @@ for (const [file, method] of [['bradley-transfers.html', 'Supacolor'], ['bradley
         const state = await fixture(page, 'dashboards/' + file, { failure: true, record: { ...transfer, Method: method } });
         await page.goto('/dashboards/' + file);
         await expect(page.locator('.bt-error')).toBeVisible();
+        const toast = page.locator('.bt-toast--error').first();
+        // Sample the actual entry and dismissal animations while text remains visible.
+        for (const leaving of [false, true]) {
+            const opacity = await toast.evaluate((el, isLeaving) => {
+                el.classList.toggle('is-leaving', isLeaving);
+                getComputedStyle(el).transform;
+                for (const animation of el.getAnimations()) {
+                    animation.pause();
+                    const duration = Number(animation.effect.getComputedTiming().duration);
+                    animation.currentTime = duration / 2;
+                }
+                return getComputedStyle(el).opacity;
+            }, leaving);
+            expect(opacity).toBe('1');
+        }
         await layouts(page, method + '-queue-error');
         state.failure = false;
         await page.locator('.bt-error button').click();

@@ -7,19 +7,15 @@
     <title>Digitizing Mockup Dashboard - Northwest Custom Apparel</title>
     <link rel="icon" href="/favicon.png" type="image/png">
     <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/dashboards/css/art-hub-ruth.css?v=2026.09.07.10">
+    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.08.5">
+    <link rel="stylesheet" href="/shared_components/css/art-workflow.css?v=2026.09.08.6">
+    <link rel="stylesheet" href="/dashboards/css/art-hub-ruth.css?v=2026.09.08.6">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
-    <link rel="stylesheet" href="/shared_components/css/mockup-ruth.css?v=2026.09.07.19">
-    <!-- art-hub.css loaded after mockup-ruth.css so the unified .minimal-header
-         + .bt-breadcrumb pattern applies (Steve / Bradley / Supacolor match). -->
-    <link rel="stylesheet" href="/shared_components/css/art-hub.css?v=2026.09.07.19">
-    <link rel="stylesheet" href="/shared_components/css/kanban.css?v=2026.09.07.19">
-    <link rel="stylesheet" href="/shared_components/css/elapsed-time-utils.css?v=2026.09.07.19">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap">
     <script src="/config/app.config.js"></script>
 </head>
-<body>
+<body data-ui="unified" data-surface="staff" data-department="ruth">
     <!-- Header — unified .minimal-header + breadcrumb pattern (matches
          Steve's hub + Bradley/Supacolor pages). Logo on left, breadcrumb
          center/right. Photo + role text removed (2026-04-25 polish pass). -->
@@ -66,10 +62,10 @@
                 <div class="rq-head">
                     <h2 class="tab-title">Mockup Queue</h2>
                     <div class="view-toggle" id="ruth-view-toggle" role="group" aria-label="Queue layout">
-                        <button type="button" class="view-toggle-btn active" data-view="grid" aria-pressed="true" data-call="toggleKanbanView" data-args='["grid"]'>
+                        <button type="button" class="view-toggle-btn btn active" data-view="grid" aria-pressed="true" data-call="toggleKanbanView" data-args='["grid"]'>
                             <span class="view-toggle-icon" aria-hidden="true">&#9638;</span> Grid
                         </button>
-                        <button type="button" class="view-toggle-btn" data-view="board" aria-pressed="false" data-call="toggleKanbanView" data-args='["board"]'>
+                        <button type="button" class="view-toggle-btn btn" data-view="board" aria-pressed="false" data-call="toggleKanbanView" data-args='["board"]'>
                             <span class="view-toggle-icon" aria-hidden="true">&#9783;</span> Board
                         </button>
                     </div>
@@ -93,7 +89,7 @@
                     <div id="queue-grid" class="mockup-grid"></div>
                 </div>
                 <!-- Kanban Board View -->
-                <div id="ruth-kanban-board" class="kanban-board"></div>
+                <div id="ruth-kanban-board" class="kanban-board" role="region" aria-label="Mockup status board, scroll horizontally for more columns" tabindex="0"></div>
             </div>
 
             <!-- Completed Tab -->
@@ -184,7 +180,7 @@
 
                     <div class="billing-pro-tip">
                         <div class="billing-pro-tip-inner">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6B46C1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                 <path d="M9 11l3 3L22 4"></path>
                                 <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"></path>
                             </svg>
@@ -206,6 +202,7 @@
     <script src="/shared_components/js/elapsed-time-utils.js?v=2026.09.06.46"></script>
     <script src="/shared_components/js/box-url.js?v=2026.08.05.23"></script>
     <script src="/shared_components/js/data-call-delegator.js?v=2026.09.06.27"></script>
-    <script src="/shared_components/js/mockup-ruth.js?v=2026.09.06.31"></script>
+    <script src="/shared_components/js/ui-dialog.js?v=2026.09.08.5"></script>
+    <script src="/shared_components/js/mockup-ruth.js?v=2026.09.08.6"></script>
 </body>
 </html>

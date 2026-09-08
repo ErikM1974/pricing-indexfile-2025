@@ -7,31 +7,34 @@
     <title>Saved Mockups - Northwest Custom Apparel</title>
     <link rel="icon" href="/favicon.png" type="image/png">
     <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/shared_components/css/art-hub.css?v=2026.09.07.19">
-    <link rel="stylesheet" href="/pages/css/mockup-library.css?v=2026.09.07.14">
+    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.08.5">
+    <link rel="stylesheet" href="/pages/css/mockup-library.css?v=2026.09.08.6">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap">
 </head>
-<body>
+<body data-ui="unified" data-surface="staff" data-department="steve">
     <header class="ml-header">
         <div class="ml-header-inner">
             <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
                  alt="Northwest Custom Apparel" class="ml-logo">
             <div class="ml-header-text">
-                <h1>🧵 Saved Mockups</h1>
+                <h1>Saved Mockups</h1>
                 <a href="/dashboards/ae-dashboard.html" class="ml-back-link">Back to AE Dashboard</a>
             </div>
-            <a class="ml-new-btn" href="/pages/garment-designer.html">+ New Mockup</a>
+            <a class="ml-new-btn btn btn-primary" href="/pages/garment-designer.html">+ New Mockup</a>
         </div>
     </header>
 
     <div class="ml-toolbar">
-        <input type="search" id="ml-search" class="ml-search" placeholder="Search by company or design #…" autocomplete="off" aria-label="Search saved mockups">
-        <span class="ml-count" id="ml-count"></span>
+        <input type="search" id="ml-search" class="ml-search field-input" placeholder="Search by company or design #…" autocomplete="off" aria-label="Search saved mockups">
+        <span class="ml-count" id="ml-count" role="status"></span>
     </div>
 
     <main>
-    <div class="ml-state" id="ml-loading"><div class="ml-spinner"></div><p>Loading saved mockups…</p></div>
-    <div class="ml-state" id="ml-error" style="display:none;"></div>
-    <div class="ml-state" id="ml-empty" style="display:none;">
+    <div class="ml-state" id="ml-loading" role="status"><div class="ml-spinner"></div><p>Loading saved mockups…</p></div>
+    <div class="ml-state ml-error" id="ml-error" role="alert" hidden><p id="ml-error-text"></p><button type="button" class="btn" id="ml-retry">Try again</button></div>
+    <div class="ml-state" id="ml-empty" hidden>
         <p>No saved mockups yet.</p>
         <p class="ml-sub">Build one in the <a href="/pages/garment-designer.html">Shirt Designer</a> and use <b>Send to Steve</b>, <b>Send to Customer</b>, or <b>Save to Art Request</b> — it'll show up here.</p>
     </div>
@@ -40,12 +43,15 @@
     </main>
 
     <!-- Lightbox -->
-    <div id="ml-lightbox" class="ml-lightbox" role="dialog" aria-modal="true" aria-label="Mockup preview">
-        <button type="button" class="ml-lightbox-close" id="ml-lightbox-close" aria-label="Close">×</button>
-        <img id="ml-lightbox-img" alt="Mockup preview">
+    <div id="ml-lightbox" class="ml-lightbox" role="dialog" aria-modal="true" aria-label="Mockup preview" hidden>
+        <button type="button" class="ml-lightbox-close btn" id="ml-lightbox-close" aria-label="Close">×</button>
+        <p id="ml-lightbox-status" class="ml-lightbox-status" role="status">Loading preview…</p>
+        <img id="ml-lightbox-img" alt="Mockup preview" hidden>
     </div>
 
     <script src="/config/app.config.js"></script>
-    <script src="/pages/js/mockup-library.js?v=2026.09.06.31"></script>
+    <script src="/shared_components/js/box-url.js?v=2026.08.05.23"></script>
+    <script src="/shared_components/js/ui-dialog.js?v=2026.09.08.5"></script>
+    <script src="/pages/js/mockup-library.js?v=2026.09.08.6"></script>
 </body>
 </html>
