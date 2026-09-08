@@ -59,7 +59,8 @@ test('every legacy cart relay requires a staff session', () => {
 });
 test('server contact and shipment reads include the secret', () => {
     expect(source).toMatch(/fetch\(shipmentsUrl,\s*\{ headers: withProxySecret\(\) \}\)/);
-    const calls = [...source.matchAll(/fetch\(\s*`\$\{PROXY_BASE\}\/api\/company-contacts[^;]+;/g)];
+    const shippingSource = source + fs.readFileSync(path.join(root, 'lib/shipstation/billing.js'), 'utf8');
+    const calls = [...shippingSource.matchAll(/fetch\(\s*`\$\{PROXY_BASE\}\/api\/company-contacts[^;]+;/g)];
     expect(calls).toHaveLength(2);
     calls.forEach(call => expect(call[0]).toContain('headers: withProxySecret()'));
 });

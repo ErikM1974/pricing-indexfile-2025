@@ -113,3 +113,4 @@ Last Updated: 2026-09-03 (/memory-maintain: MEMORY.md 24.0→~19 KB — Sept shi
 - `DEAD_FILES_2026-09-06.md` — the 69 files the 2026-09-06 census verified dead (zero references), why each group is dead, and the one `git rm` command Erik runs to remove them.
 
 - [`HANDOVER_EXECUTION_2026-09.md`](HANDOVER_EXECUTION_2026-09.md) — active handover execution checklist and release evidence.
+- [`HANDOVER_FOLLOWUPS_2026-09.md`](HANDOVER_FOLLOWUPS_2026-09.md) — dispositions for remaining markers and separate design/runtime backlogs.

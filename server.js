@@ -71,78 +71,11 @@ const staffSaml = require('./lib/staff-saml.js');
 dotenv.config();
 
 // =============================================================================
-// ORDER-FORM SECTION: routes/order-form.js owns submission plus legacy cart/catalog/pricing relays.
-// The 3-Day Tees submit handler already lives in routes/customer-portal.js.
-// QUOTE SYNC: routes/quote-sync.js owns ShopWorks sync and ShipStation submission.
-// Staff gates protect operational routes; shared-secret gates admit scheduled jobs/callbacks.
-// Customer sync/vendor reads use the quote share link and cannot override the work order.
-// QUOTE LIFECYCLE: routes/quote-lifecycle.js owns tracking, change log, acceptance and deposits.
-// PUBLIC QUOTES: routes/public-quotes.js owns sticker quotes and token-gated quote retrieval.
-// WATCHDOG: one lib/quote-sync-health.js instance is shared by sync and health routes.
-// STOREFRONTS: lib/storefront composes tax, stock, channel and pricing services once.
-// GALLERY: routes/storefront-gallery.js retains the public gallery aggregate and caches.
-// ROUTE TABLE OF CONTENTS (order locked by tests/fixtures/server-route-table.json)
-// =============================================================================
-//
-// INFRASTRUCTURE
-//   L17   Security: Input sanitization (sanitizeFilterInput)
-//   L67   Security: helmet headers + CSP report-only (roadmap 1.1)
-//   L67   Security: CORS exact-match allowlist (lib/cors-allowlist.js, roadmap 1.2)
-//   ~L520 Health/observability: GET /healthz, GET /readyz (pricing-proxy probe),
-//         GET /api/version, POST /api/csp-report (roadmap 1.11/1.1)
-//   L146  Session management (cookie-session — durable across deploys, #8)
-//   L166  Rate limiting (apiLimiter, strictLimiter)
-//   L414  Body parsing (JSON, urlencoded)
-//
-// STRIPE & PAYMENTS
-//   L530  POST /api/stripe/webhook          — signature-verified; metadata.kind branch records quote deposit/balance payments; else pushes paid 3DT orders to ShopWorks
-//   L1490 GET  /api/stripe-config
-//   L1510 POST /api/create-payment-intent
-//   L1585 POST /api/create-checkout-session — 3DT studio: server-side authoritative reprice + unique QuoteID + promise stamp
-//   L1800 POST /api/verify-checkout-session
-//   POST /api/quotes/:quoteId/enable-deposit        — STAFF: rep confirms shipping+tax, freezes deposit terms (Service_Codes DEPOSIT-PCT) into Notes JSON (Phase 1, 2026-07-05)
-//   POST /api/public/quote/:quoteId/deposit-checkout — PUBLIC: Stripe hosted Checkout for a rep-enabled deposit (server-stored amount + totals-hash re-verify)
-//
-// 3-DAY TEES (studio rebuild 2026-06-09 — helpers ~L770: getTdtPricingConfig/resolveTdtTax/rebuildTdtQuote)
-//   L1860 POST /api/submit-3day-order       — ManageOrders push: placement spec + mockups + dynamic tax labels (channel/rush-aware 2026-06-10)
-//   3DT entry URLs (/pages/3-day-tees.html, /3-day-tees[.html]) → 301 /custom-tees (cutover 2026-06-10, registered BEFORE /pages static; success page NOT redirected)
-//   GET /pages/{box-labels,jds-mockup-creator,dst-viewer,garment-designer,mockup-library}.html — staff-gated (2026-09-03), registered BEFORE the /pages static mount (~L5343)
-//
-// CATALOG (customer redesign P2, 2026-06-11)
-//   GET /catalog[.html]                     — URL-driven product discovery page (pages/catalog.html)
-//   Top-sellers consolidation (2026-07-06): /[pages/]top-sellers-showcase.html → 301 /catalog?topSellers=1;
-//   /[pages/]top-sellers-product.html?style=X → 301 /product.html?style=X; /[pages/]richardson-112-product.html → 301 /product.html?style=112
-//   (legacy showcase/product/richardson pages deleted; sample program now = catalog Top Sellers view + PDP CTA via shared sample-cart-service.js)
-//
-// STAFF DASHBOARD FORWARDERS (SAML-gated same-origin reads of secret-gated proxy data)
-//   GET /api/mo/orders[...]              — ManageOrders reads (PII airtight path, 2026-07-05)
-//   GET /api/staff/payments/recent       — Order_Payments ledger for the Money Collected widget (2026-07-06)
-//   GET /api/staff/quote-sessions        — Orders Inbox quote_sessions read (any staff; 2026-08-27)
-//   GET /api/staff/daily-sales-by-rep-ytd — Caspio archive per-rep YTD for team performance (any staff; 2026-08-27)
-//   GET /api/staff/artrequests           — Art Aging widget ArtRequests read (any staff; 2026-08-27)
-//   GET /api/staff/service-codes         — Service_Codes read (CO-ANNUAL-GOAL for the goal chip / Company Numbers; any staff; 2026-09-04)
-//   GET /api/staff/employees             — staff roster from lib/staff-roster.js (any staff; 2026-08-27 — was hardcoded in anonymously-served JS)
-//   GET /api/staff/finished-photos/library — company-wide finished-photo library w/ rep names (any staff; ~L4356, 2026-07-19)
-//   GET /api/staff/command-search        — proxy fan-out search across customers/orders/quotes/designs (any staff; 2026-07-20). UNUSED by the dashboard since 2026-09-03 (its search is tools-only); kept for any other caller
-//   ALL /api/crm-proxy/form-submissions* — Forms Inbox reads/updates (any staff; ~L3230, 2026-07-11)
-//   ALL /api/crm-proxy/order-odbc*       — ORDER_ODBC order history for the Leads board (any staff; 2026-07-18)
-//   ALL /api/crm-proxy/lead-activity*    — Leads CRM timeline reads/appends (any staff; 2026-07-18)
-//   GET /api/crm-proxy/ae-dashboard/summary — AE Mission Control aggregate (taneisha/nika/admin;
-//     rep email derived from session, admin-only ?viewAs=; ~L3390, 2026-07-19)
-//   GET /api/crm-proxy/ae-dashboard/{growth,purchasing,data-quality,due-dates} — the four per-card
-//     MC radars, same aeDashboardForwarder identity rules (~L3596-3612). ⚠️ All five must stay
-//     listed here: due-dates was silently dropped by a revert and 404'd for a week unnoticed.
-//   GET /dashboards/ae-mission-control.html — per-AE cockpit page (role-gated taneisha/nika; ~L3059)
-//     + AE post-login landing redirect in the SAML ACS (default relay → mission control; ~L3033)
-//   GET /api/mockups[?…], /api/mockups/:id, /api/mockups/broken-mockups,
-//   GET /api/mockup-notes/:id, /api/mockup-versions/:id, /api/mockup-notifications
-//                                        — mockup record data (mockupForward, ~L3917, 2026-08-11).
-//     READS ONLY: the customer approval view writes these paths with no staff session, so
-//     PUT/POST stay on the proxy. Replaced a proxy gate that accepted a browser Origin —
-//     which is caller-supplied, so one curl flag returned Company_Name/Id_Customer/AE_Notes
-//     500 rows at a time. Callers: mockup-detail, art-hub-ruth, ae-dashboard,
-//     portal-directory, design-gallery drawer — all repointed same-origin.
-//
+// Composition root: environment, shared infrastructure and ordered route registration.
+// Payment/storefront/order/ShipStation behavior lives in focused libraries.
+// Current route inventory: node scripts/server/route-table.js (456 registrations locked).
+// Infrastructure stays here per the handover; security and session behavior is unchanged.
+
 // 253GEAR PUBLISHER (2026-08-08) — Steve's tab drafts products on the retail storefront.
 //   ALL /api/gear/*                      — page-gated forwarders to proxy /api/shopify/* (~L4361)
 //   GET /api/gear/store-metrics          — 253gear store metrics for the Design Queue (~L4491)
@@ -161,196 +94,7 @@ dotenv.config();
 //     write_products is catalogue-wide, so this must not be open to every staffer.
 //   ⚠️ All nine must stay listed here — see the due-dates note above.
 //
-// SAMPLE PROGRAM ('samples' channel, 2026-07-06 — SAM{MMDD}-{rand4} QuoteIDs; handleSamplesOrderPaid ~L1400)
-//   POST /api/samples/create-checkout-session — PAID blank samples: dedicated multi-style route (shared
-//     sample-pricing.js reprice, DOR tax on ship address, free shipping, free items ride as $0 lines);
-//     webhook metadata.kind==='samples-order' → ManageOrders push (payments block = PAID) + sales alert.
-//     Free-only carts skip this entirely (direct push via sample-order-service.js, unchanged).
-//
-// CUSTOM HATS (custom-caps storefront, 2026-06-11 — registry entry + rebuildCapsQuote; CAP{MMDD}-{rand4} QuoteIDs)
-//   GET /custom-caps[.html]                 — embroidered caps storefront (pages/custom-caps.html); success page via /pages static
-//
-// QUOTE CART (customer quote-cart Phase 2, 2026-06-11)
-//   GET /quote-cart[.html]                  — Add-to-Quote cart page (pages/quote-cart.html; sessionStorage store, engine-priced)
-//
-// CUSTOM STICKERS (public storefront, 2026-07-24)
-//   POST /api/public/sticker-quote           — Phase 2: config in → real STK quote + tokenised share link out.
-//                                              Price is RE-QUOTED server-side (browser sends size+qty only);
-//                                              the STK sequence is minted only after validation. Honeypot + strictLimiter.
-//   GET /custom-stickers[.html] · /stickers  — zero-click sticker configurator (pages/custom-stickers.html)
-//                                              One GET /api/sticker-pricing on boot; the ladder re-prices from
-//                                              memory, so a size change costs ZERO further calls. Ends in a
-//                                              quote-request lead (POST /api/form-submissions, formId
-//                                              'quote-request'). Calls NO AI endpoint.
-//   (the STAFF sticker tool with the AI drawer was /pricing/stickers — RETIRED 2026-07-29, now a 410 signpost.
-//    Its oversize-decal calculator lives on at /pricing/decals — requireStaff, see "STAFF-GATED CALCULATOR PAGES")
-//
-// CUSTOM T-SHIRTS (multi-style DTG storefront, 2026-06-10 — helpers ~L900: getCtsPricingConfig/getCtsCatalog/resolveCtsShipping/rebuildCtsQuote + stock gate getCtsStock/ctsStockConflicts ~L1135)
-//   GET  /custom-tees[.html]                — storefront page (gallery of 20 DTG top sellers + designer + Stripe)
-//   POST /api/create-checkout-session       — SHARED with 3DT; orderSettings.channel='custom-tees' selects per-style reprice + DTG-prefix QuoteIDs
-//   POST /api/three-day-tees/shipping-estimate — SHARED; accepts styleNumber for per-style UPS weight
-//   GET  /api/cts/gallery-extras            — SanMar-card gallery data (2026-06-12): per-style blurb+fabric (parsed PRODUCT_DESCRIPTION) + per-piece ref prices @12/24/48/72 FF via the SAME CTS_PRICING.quote engine (fail-closed; 5-min cache)
-//   (webhook above ALSO sends the customer+sales confirmation emails server-side via EmailJS REST
-//    and stamps statusToken/emailsSentAt into OrderSettingsJSON — browser sends are fallback, 2026-06-10)
-//   GET  /order-status[.html]               — customer order-status page (HMAC-token link from the confirmation email, no login)
-//   GET  /api/order-status/:quoteId?t=      — token-gated customer-safe status JSON (timing-safe HMAC check; 404 on bad token)
-//
-// CUSTOM HATS ('custom-caps' channel — server core 2026-06-11, pages pending;
-//   helpers next to the CTS ones: getCapsPricingConfig/getCapsCatalog/
-//   capsStockConflicts/rebuildCapsQuote)
-//   POST /api/create-checkout-session       — SHARED; orderSettings.channel='custom-caps' selects the caps
-//                                             reprice (CAP+CAP-AL bundles + CAPS-SHIP-* fail-closed, qty≥8 → 400)
-//   (NO /custom-caps page route yet — add the clean-URL sendFile WITH the page
-//    wave; registering it now would be a zombie route, P0 lesson 2026-06-11)
-//
-// ONLINE ORDER FORM (UI retired 2026-07-11 — /pages/order-form deleted; drafts/approve/share-link routes removed)
-//   L1710 POST /api/submit-order-form    — push to ShopWorks (ExtSource: NWCA-OrderForm). RETAINED:
-//                                          the DTG builder's submitToShopWorks() pushes through this route.
-//
-// CRM & AUTH
-//   L508  POST /api/crm-session
-//   L543  GET  /crm-logout
-//   L553  GET  /dashboards/{taneisha,nika,house}-*.html (role-gated)
-//
-// VENDOR PORTAL (subcontractor magic-link — L&P Screen Printing / Ed Lacey, 2026-07-19)
-//   ~L4470 GET  /vendor/login · POST /auth/vendor/request-link · GET /auth/vendor/verify · GET /auth/vendor/logout
-//          GET  /vendor                    — portal page (requireVendor; nwca_vendor cookie via lib/vendor-magic-link)
-//          GET  /api/vendor/jobs[/:id]     — session-scoped Screen Print transfer orders (allowlist projection)
-//          POST /api/vendor/jobs/:id/notes — vendor comment onto the job timeline
-//          GET  /vendor/access/:token      — PERMANENT bookmarkable access link (no email round-trip; live Enabled re-check)
-//          GET  /api/vendor-admin/access-link?email= — staff-only (portal-admin roles): mint a vendor's permanent link
-//          Invite registry: proxy Vendor_Portal_Access (secret-gated /api/vendor-portal-access)
-//
-// CUSTOMER PORTAL (magic-link; nwca_customer cookie via lib/customer-magic-link) — pages/customer-portal.html
-//   ~L5495 GET  /portal · /portal/invoice/:orderNo · /portal/product/:style — session-gated pages (requireCustomer)
-//   ~L7230 GET  /api/portal — aggregate (company + mockups + art + logo library + finished photos, allowlist-projected)
-//          GET  /api/portal/orders · /api/portal/invoice/:orderNo — ManageOrders orders/balances (ownership-checked)
-//          GET  /api/portal/my-products · /recommendations · /product-colors/:style · /product/:style[/availability]
-//          POST /api/portal/reorder-request · /reorder-batch — rep-queue requests (Portal_Reorder_Requests, no price)
-//          GET  /api/portal/rewards · POST /api/portal/rewards/redeem-request
-//   ~L8072 GET  /api/portal/me — sign-in identity (2026-09-01 redesign)
-//          GET  /api/portal/quotes — quote sessions for the sign-in email (customer-safe status ladder)
-//          GET  /api/portal/order/:orderNo/tracking — ManageOrders /tracking for ONE owned order (drawer, lazy)
-//          POST /api/portal/request — general request (quote / new logo / logo change / account update) → rep queue
-//   ~L8100 /api/portal-admin/* + /portal-admin/preview/:id/* — staff READ-ONLY mirrors of everything above
-//          GET  /api/portal-admin/rewards/accrual/:id — EARNED reward $ from paid+invoiced garment lines (12-mo window,
-//               SanMar piece-cost bands from Service_Codes REWARD/RWD-EARN) · POST …/accrual/:id/post — grant per order (Order_Ref)
-//               · POST …/accrual/:id/reverse — staff reverses an over-grant after a re-invoice (capped at the unspent balance)
-//
-// PRODUCT SEO (2026-07-12): /product[.html]?style= = hybrid-SSR head injection
-//   (per-product title/meta/canonical/OG/JSON-LD, fail-open) ~L2882;
-//   GET /sitemap-products.xml — one URL per unique style (proxy /api/all-styles)
-//
-// BLOG (server-rendered for SEO; posts = Caspio Blog_Posts via proxy) (2026-07-12)
-//   L~3300 GET  /blog · /blog/:slug — SSR pages (5-min cache, marked+xss)
-//          GET  /blog/feed.xml · /sitemap-blog.xml
-//          GET  /api/blog-product-map — style→posts map for PDP "From our blog" (2026-07-12)
-//   GET /custom-carhartt[.html] — static SEO brand landing page (pages/custom-carhartt.html, 2026-07-12)
-//   GET /sitemap-pages.xml — core landing/tool pages sitemap (2026-07-12)
-//          POST /api/blog-preview (requireStaff — Blog Editor live preview)
-//          ALL  /api/crm-proxy/blog-posts* — editor writes/drafts (any staff; ~L3236)
-//
-// STATIC FILE SERVING
-//   /robots.txt — staff/internal dirs + credential share-links disallowed (2026-06-11)
-//   GET /api/tenants/:id/config — runtime tenant config for config/tenant.js
-//        (backed by config/tenants/<id>.json; strict id allowlist) (2026-07-07)
-//   /dist/* — content-hashed build output (scripts/build.js), Cache-Control immutable (2026-07-07)
-//   GET /quote-builders/:page — the 3 builder HTMLs served with script/link tags
-//        rewritten to hashed /dist assets via dist/asset-manifest.json; falls
-//        through to the plain static mount when no build exists (2026-07-07)
-//   L567  Static directories (calculators, dashboards, quote-builders, etc.)
-//   L624  Directory-to-static mappings (20+ directories)
-//
-// STAFF DASHBOARD ROUTING (v3 sole survivor — 2026-05-28 cleanup)
-//   L770  /staff-dashboard.html         → v3 canonical (serves staff-dashboard-v3/index.html via
-//                                          sendHashedHtml — assets content-hashed since 2026-09-04)
-//   L775  /staff-dashboard-v2.html      → 301 redirect → /staff-dashboard.html
-//   L780  /staff-dashboard-legacy.html  → 301 redirect → /staff-dashboard.html
-//   L786  /staff-dashboard-v3/          → v3 dedicated URL (kept for old bookmarks)
-//   /quote-builders/dtg-quote-builder-legacy.html → 301 → dtg-quote-builder.html (legacy deleted 2026-06-08)
-//
-// LEGACY REDIRECTS
-//   /cart → 301 /pages/sample-cart.html (legacy Bootstrap cart retired 2026-06-11; cart.html + pages/order-confirmation.html deleted; 7 zombie sendFile routes to missing files removed same day)
-//   L657  /calculators/embroidery-contract* → embroidery-pricing-all
-//   L662  /staff-dashboard.html → /dashboards/
-//   L783  /ae-dashboard.html → /dashboards/
-//   L791  /digitizingform.html → /calculators/
-//   L806  /christmas-bundles.html → /calculators/
-//   L858  /{page}.html → /pages/ (inventory, policies, resources, etc.)
-//
-// PRODUCT & CATALOG APIs
-//   L489  GET  /product (→ product/index.html)
-//   L980  GET  / (→ index.html)
-//   L992  GET  /api/status
-//   L2035 GET  /api/stylesearch
-//   L2051 GET  /api/product-colors
-//   L2067 GET  /api/sizes-by-style-color
-//   L2083 GET  /api/base-item-costs
-//   L2099 GET  /api/inventory
-//         GET  /api/christmas-products — DELETED 2026-08-17 (anonymous vendor-cost leak)
-//   L2328 GET  /api/embroidery-pricing
-//   L2346 GET  /api/size-pricing
-//   L2397 GET  /api/image-proxy
-//
-// PRICING MATRIX CRUD
-//   L2119 GET  /api/pricing-matrix
-//   L2139 POST /api/pricing-matrix
-//   L2148 PUT  /api/pricing-matrix/:id
-//   L2158 GET  /api/pricing-matrix/lookup
-//   L2244 GET  /api/pricing-matrix/:id
-//
-// CART SYSTEM — legacy CRUD is requireStaff-gated (retired public cart).
-// CUSTOMER DIRECTORY — /api/company-contacts[-2026]/*: requireStaff, secret-forwarding relay
-//   L1616 GET  /cart
-//   L1657 CRUD /api/cart-sessions
-//   L1703 CRUD /api/cart-items
-//   L1911 CRUD /api/cart-item-sizes
-//
-// CUSTOMER & ORDER APIS
-//   L1959 CRUD /api/customers
-//   L1998 CRUD /api/orders
-//
-// QUOTE SYSTEM (postures HARDENED 2026-08-26 — quote-plane lockdown; the proxy
-// side is secret-gated, these same-origin relays are the only browser path.
-// Drift-locked by tests/unit/quote-plane-postures.test.js.)
-//   CRUD /api/quote_sessions — GET list: staff or quoteID/sessionID-scoped ·
-//        GET :id / PUT: requireStaff · POST: quotePlaneWriteLimiter ·
-//        DELETE: owner/master session gate
-//   CRUD /api/quote_items    — GET list: staff or QuoteID-scoped (query now
-//        forwarded verbatim) · GET :id / PUT / DELETE: requireStaff ·
-//        POST: quotePlaneWriteLimiter
-//   CRUD /api/quote_analytics — reads/PUT/DELETE: requireStaff · POST (view
-//        beacon): quotePlaneWriteLimiter
-//   GET  /api/quote-sequence/:prefix — anonymous mint relay, quoteSequenceLimiter
-//   POST /api/{embroidery,dtf,scp}-push/push-quote + GET …/preview/:quoteId —
-//        requireStaff relays (builders + quote-view staff mode)
-//
-// PUBLIC QUOTE & DESIGN ROUTES
-//   GET  /api/quote_items/quote/:quoteId (anonymous capability read)
-//   L2789 GET  /design/:designNumber (→ design-view.html)
-//   L2896 GET  /art-request/:designId (→ art-request-detail.html)
-//   L2798 GET  /quote/:quoteId (→ quote-view.html)
-//   L2810 GET  /api/public/quote/:quoteId
-//   L2852 POST /api/public/quote/:quoteId/accept
-//   L4272 GET  /invoice/:quoteId (→ invoice.html)  — clean PDF-style one-pager, auto-syncs from ShopWorks
-//
-// SHOPWORKS SYNC (2026-05-21) — quote-view mirrors live ShopWorks state
-//   L4308 POST /api/quote-sessions/:quoteId/sync-from-shopworks   — pulls fresh state from MO + writes Caspio (soft-deletes on missing → 30d retention → bulk-sync cron purges)
-//   L4445 GET  /api/quote-sessions/:quoteId/full                  — quote_sessions row + parsed ShopWorks_Snapshot for the UI
-//   L4520 POST /api/quote-sessions/bulk-sync-from-shopworks       — staff dashboard + hourly cron entry point (sync all stale Processed quotes from last 30d)
-//
-// FRIENDLY URL ROUTES
-//   L1623 /calculators/embroidery-pricing-all → index.html
-//   L1628 /pricing/embroidery → embroidery-pricing-all
-//   L1634 /pricing/cap-embroidery → cap-embroidery-pricing-integrated
-//   L1640 /pricing/dtg → dtg-pricing.html
-//   L1644 /pricing/screen-print → screen-print-pricing.html
-//   L1648 /pricing/dtf → /pricing/dtf/index.html
-//   /pricing/stickers → 410 signpost (retired 2026-07-29)
-//   /pricing/decals   → custom-decal-pricing.html (requireStaff)
-//   /pages/mockup-generator.html → 301 /pages/dst-viewer.html (retired 2026-08-05;
-//     MUST stay above the /pages static mount — see the block at the redirect)
-// =============================================================================
+// SAMPLE PROGRAM: routes/customer-portal.js and lib/payments/samples-fulfillment.js.
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -1033,11 +777,6 @@ app.use('/api/submit-order-form', strictLimiter);
 app.use('/api/create-checkout-session', strictLimiter);
 app.use('/api/samples/create-checkout-session', strictLimiter);
 
-
-
-
-
-
 // ── Shared quote_sessions row fetch (webhook + order-status page) ───────────
 // refresh=true bypasses the proxy's 5-min lookup cache — a stale [] would
 // orphan a PAID order and a stale Status would break idempotency. Exact-match
@@ -1056,7 +795,6 @@ app.use('/api/samples/create-checkout-session', strictLimiter);
 // Storefront services share one instance; the channel registry binds the same browser pricing modules.
 const { TDT_PROXY, channelConfig, channelConfigExact, getCtsCatalog, getCtsPricingConfig, getCtsStock, resolveCtsShipping, resolveTdtShipping, resolveTdtTax } = require('./lib/storefront')({ CAPS_PRICING, CASPIO_PROXY_BASE, CTS_PRICING, CTS_SHIPDATE, STOREFRONT_CHANNEL_CONFIG, TDT_PRICING, TDT_SHIPDATE, fetch });
 
-
 const CRM_API_SECRET = process.env.CRM_API_SECRET;
 // Payment services share one instance; signature verification stays in the raw-body route.
 const { handleQuotePayment, handleStorefrontOrderPaid, PUBLIC_SITE_ORIGIN, QUOTE_TOTALS_HASH_VERSION, QuoteDepositMath, alertQuotePay, autoEnablePickupDeposit, buildOrderStatusUrl, computeOrderStatusToken, computeQuoteTotalsHash, escapeHTMLSrv, fetchQuoteSessionRow, getDepositPct, mintShareToken, parseNotesJson, quoteShareUrl, save3DTQuoteSession, sendEmailJSTemplate, sendQuoteAcceptedEmails, shareTokenOk, totalsHashMatches } = require('./lib/payments')({ PORT, INTERNAL_CALL_KEY, CASPIO_PROXY_BASE, CRM_API_SECRET, TDT_PROXY, buildSamplesPushPayload, buildStorefrontQuoteItems, channelConfig, crypto, fetch, nowPacificNaiveIso, resolveTdtTax, withProxySecret });
@@ -1064,38 +802,6 @@ const { handleQuotePayment, handleStorefrontOrderPaid, PUBLIC_SITE_ORIGIN, QUOTE
 function withProxySecret(headers = {}) {
   return CRM_API_SECRET ? { ...headers, 'X-CRM-API-Secret': CRM_API_SECRET } : headers;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // CRITICAL: Stripe webhook needs raw body for signature verification
 // This route MUST be defined BEFORE bodyParser.json() middleware
@@ -1121,42 +827,11 @@ const staticOptions = {
   }
 };
 
-
-
 // ── 3-Day Tees server-side authoritative pricing ────────────────────────────
 // The browser quote is advisory; the money Stripe charges is recomputed HERE
 // from the same Caspio sources (pricing-bundle + Service_Codes 3DT-*) via the
 // same TDT_PRICING module the page runs. A client/server mismatch over 1¢
 // rejects the checkout visibly — never charge a number we didn't derive.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // ── Custom-Tees gallery extras: card blurbs + reference prices (2026-06-12) ─
 // ONE fetch powers the SanMar-style gallery cards (Erik's card upgrade): per
@@ -1173,76 +848,21 @@ const staticOptions = {
 // Storefront gallery pricing and merchandising — extracted to routes/storefront-gallery.js (server split, 2026-09-07); registered here so the order is unchanged.
 { const ctx = { CTS_MERCH, CTS_PRICING, TDT_PROXY, fetch, getCtsCatalog, getCtsPricingConfig }; require('./routes/storefront-gallery')(app, ctx); }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 // Serve product.html routes BEFORE static middleware to avoid conflicts.
 // SEO hybrid-SSR (2026-07-12): when ?style= is present, the static file goes
 // out with a per-product <title>/meta/canonical/OG + Product JSON-LD injected
 // (lib/product-seo.js, 60-min cache over the proxy's /api/product-heads catalog
 // map — see that file for why) — same pattern as /blog. The client JS
 // runs unchanged. ANY failure serves the untouched static file (fail-open).
-const productSeo = require('./lib/product-seo');
-const productHtmlPath = path.join(__dirname, 'product.html');
-
-async function serveProductPage(req, res) {
-  const style = String(req.query.style || req.query.StyleNumber || '').trim();
-  if (style) {
-    try {
-      const head = await productSeo.headForStyle(style);
-      if (head) {
-        const html = await fs.promises.readFile(productHtmlPath, 'utf8');
-        res.set('Cache-Control', 'public, max-age=300');
-        // SEO head first, THEN the asset rewrite — the injected <head> must be
-        // in the string the rewriter sees, and its 5-min cache header is kept
-        // (sendHashedHtml leaves headers alone when given pre-rendered HTML).
-        return sendHashedHtml(res, productHtmlPath, productSeo.injectHead(html, head));
-      }
-    } catch (e) {
-      console.error('[product-seo] injection failed (serving static):', e.message);
-    }
-  }
-  sendHashedHtml(res, productHtmlPath);
-}
-
-app.get('/product', serveProductPage);
-app.get('/product.html', serveProductPage);
-
-// Product sitemap — one URL per unique style (proxy /api/all-styles, cached).
-// Referenced from robots.txt; submitted in Google Search Console.
-app.get('/sitemap-products.xml', async (req, res) => {
-  try {
-    const styles = await productSeo.listStyles();
-    res.type('application/xml').send(productSeo.renderProductSitemap(styles));
-  } catch (e) {
-    console.error('[product-seo] sitemap failed:', e.message);
-    res.status(503).send('sitemap unavailable');
-  }
-});
+// product-pages — extracted to routes/product-pages.js (server split, 2026-09-07); registered here so the order is unchanged.
+{ const ctx = { SERVER_DIR: __dirname, fs, path, sendHashedHtml }; require('./routes/product-pages')(app, ctx); }
 
 // Removed duplicate routes - these pages are now served from /pages/ directory (see lines 342-347)
 
-// CRM_API_BASE — hoisted here from lines 3425-3425 on 2026-09-07 (server split): the section below is moved into routes/ and this helper is shared.
 const CRM_API_BASE = CASPIO_PROXY_BASE;
-
-// CRM_API_SECRET — hoisted here from lines 3428-3428 on 2026-09-07 (server split): the section below is moved into routes/ and this helper is shared.
 
 const { isStaffOrSync, requireStaffOrSync } = require('./lib/quote-sync-access')({ sharedSecret: CRM_API_SECRET, requireStaff });
 
-// PORTAL_ADMIN_ROLES — hoisted here from lines 3416-3420 on 2026-09-07 (server split): the section below is moved into routes/ and this helper is shared.
 // Customer Portal admin console — manage who can log into the customer portal
 // (Customer_Portal_Access invites). Open to the management team by ROLE (Erik=admin,
 // Bradley=accountant, Ruth=art, Taneisha/Nika=sales). The two rep tags are included so
@@ -1253,7 +873,6 @@ const PORTAL_ADMIN_ROLES = ['admin', 'accountant', 'art', 'sales', 'taneisha', '
 { const ctx = { express }; require('./routes/crm-auth')(app, ctx); }
 // Staff SAML SSO — server-verified login (Caspio Staff directory = IdP) + staff page gates — extracted to routes/staff-saml.js (server split, 2026-09-07); registered here so the order is unchanged.
 { const ctx = { PORTAL_ADMIN_ROLES, SERVER_DIR: __dirname, express, fetchStaffRole, path, requireCrmEmail, requireCrmRole, staffSaml }; require('./routes/staff-saml')(app, ctx); }
-// fetchStaffRole — hoisted here from lines 3247-3262 on 2026-09-07 (server split): the section below is moved into routes/ and this helper is shared.
 // Fetch a staff member's app-RBAC role from Caspio (Staff_App_Roles via the proxy),
 // server-side with the CRM secret. Returns the role string or null. Fail-safe: on any
 // error returns null (→ no elevated permissions), never throws into the login flow.
@@ -1271,17 +890,14 @@ async function fetchStaffRole(email) {
   }
 }
 
-// _pageAccessCache — hoisted here from lines 3266-3270 on 2026-09-07 (server split): the section below is moved into routes/ and this helper is shared.
 // Cached Staff_Page_Access rules (Page → Allowed_Roles/Allowed_Emails), refetched on a
 // TTL. STALE-ON-ERROR: a transient proxy failure keeps the last-known rules so a
 // restricted page stays restricted (never silently opened). Cold-start + immediate
 // fetch failure → empty rules (every page falls back to any-logged-in-staff).
 let _pageAccessCache = { at: 0, rules: {} };
 
-// PAGE_ACCESS_TTL_MS — hoisted here from lines 3273-3273 on 2026-09-07 (server split): the section below is moved into routes/ and this helper is shared.
 const PAGE_ACCESS_TTL_MS = 60 * 1000;
 
-// getPageAccessRules — hoisted here from lines 3276-3289 on 2026-09-07 (server split): the section below is moved into routes/ and this helper is shared.
 async function getPageAccessRules() {
   const now = Date.now();
   if (now - _pageAccessCache.at < PAGE_ACCESS_TTL_MS) return _pageAccessCache.rules;
@@ -1297,14 +913,12 @@ async function getPageAccessRules() {
   return _pageAccessCache.rules;
 }
 
-// ADMIN_DEFAULT_PAGES — hoisted here from lines 3293-3297 on 2026-09-07 (server split): the section below is moved into routes/ and this helper is shared.
 // Page-access decision (who may open a gated staff page) lives in lib/page-access.js so it
 // can be jest-locked — tests/unit/admin-page-access.test.js. Read the header there for the
 // full rule; the short version is: exclusive email allowlist > admin override > "unlisted
 // page = any logged-in staff, EXCEPT the Administration set, which defaults to admin-only".
 const { ADMIN_DEFAULT_PAGES, userMayAccessPage } = require('./lib/page-access');
 
-// requirePageAccess — hoisted here from lines 3301-3322 on 2026-09-07 (server split): the section below is moved into routes/ and this helper is shared.
 // API-side twin of gateStaffPage: gate a data route by the SAME Staff_Page_Access row as
 // the page it feeds, so one table row controls both and they can never drift apart.
 // Unlike gateStaffPage this fails CLOSED — for payroll, "the access check is down" must
@@ -1328,7 +942,6 @@ function requirePageAccess(page) {
   };
 }
 
-// accessRestrictedPage — hoisted here from lines 3326-3343 on 2026-09-07 (server split): the section below is moved into routes/ and this helper is shared.
 // Branded 403 page shown when a logged-in staffer opens a page they're not allowed on.
 // Self-contained (only the logo is external) so it renders even if assets are down.
 function accessRestrictedPage(firstName) {
@@ -1348,7 +961,6 @@ function accessRestrictedPage(firstName) {
 </div></body></html>`;
 }
 
-// gateStaffPage — hoisted here from lines 3347-3380 on 2026-09-07 (server split): the section below is moved into routes/ and this helper is shared.
 // Reusable page gate: require a verified staff session + enforce the Staff_Page_Access
 // rule for this page (matched by filename). Used by the /dashboards middleware AND by
 // explicit root routes (e.g. the SanMar vendor-portal pages) so EVERY gated page is
@@ -1384,7 +996,6 @@ async function gateStaffPage(req, res, next) {
   return next();
 }
 
-// gateStaffDetailPage — hoisted here from lines 3384-3404 on 2026-09-07 (server split): the section below is moved into routes/ and this helper is shared.
 // Gate for the id-addressed detail pages (/mockup/:id, /art-request/:designId).
 // These render a shell whose images and Box files ALL ride the staff session
 // (requireStaff on /api/box/*), while the record itself loads anonymously — so
@@ -1407,7 +1018,6 @@ function gateStaffDetailPage(req, res, next) {
   return res.redirect('/auth/saml/login?next=' + encodeURIComponent(req.originalUrl));
 }
 
-// BOX_FORWARD_QUERY — hoisted here from lines 3700-3723 on 2026-09-07 (server split): the section below is moved into routes/ and this helper is shared.
 // ── Box asset forwarder (session-gated) ──────────────────────────────────────
 // The proxy's Box routes are ANONYMOUS in production: /api/box/download/:fileId
 // serves any file the Box service account can see, /api/box/thumbnail/:fileId
@@ -1433,7 +1043,6 @@ const BOX_FORWARD_QUERY = new Set([
   'size', 'folderId', 'designNumber', 'limit', 'offset', 'query', 'type', 'url', 'full',
 ]);
 
-// boxForward — hoisted here from lines 3727-3797 on 2026-09-07 (server split): the section below is moved into routes/ and this helper is shared.
 // opts.query        — narrower param allowlist than the staff default (a customer
 //                     route should forward only what it actually needs).
 // opts.cacheControl  — force this Cache-Control instead of echoing upstream's.
@@ -1506,7 +1115,6 @@ function boxForward(buildPath, opts) {
   };
 }
 
-// boxFileId — hoisted here from lines 3801-3806 on 2026-09-07 (server split): the section below is moved into routes/ and this helper is shared.
 // Box file IDs are numeric; anything else is rejected rather than forwarded.
 function boxFileId(req) {
   const id = String(req.params.fileId || '');
@@ -1523,72 +1131,15 @@ function boxFileId(req) {
 // SSE response body straight through to the browser. Same client-facing
 // contract as before: POST /api/policies/ai-assist returns text/event-stream.
 // =============================================================================
-app.post(
-  '/api/policies/ai-assist',
-  requireCrmRole(['policies-admin']),
-  express.json({ limit: '1mb' }),
-  async (req, res) => {
-    const target = `${CRM_API_BASE}/api/policies-ai-assist`;
-    try {
-      const upstream = await fetch(target, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'text/event-stream',
-          'X-CRM-API-Secret': CRM_API_SECRET
-        },
-        body: JSON.stringify(req.body || {})
-      });
-
-      // Forward upstream status + the SSE headers
-      res.status(upstream.status);
-      res.setHeader('Content-Type', upstream.headers.get('content-type') || 'text/event-stream');
-      res.setHeader('Cache-Control', 'no-cache, no-transform');
-      res.setHeader('Connection', 'keep-alive');
-      res.setHeader('X-Accel-Buffering', 'no');
-
-      if (!upstream.body) {
-        res.end();
-        return;
-      }
-      // Pipe the SSE chunks straight through — no buffering, no re-parsing
-      for await (const chunk of upstream.body) {
-        res.write(chunk);
-      }
-      res.end();
-    } catch (e) {
-      console.error('[ai-assist proxy] error:', e.message);
-      if (!res.headersSent) {
-        res.status(502).json({ error: 'Upstream AI service unavailable', detail: e.message });
-      } else {
-        res.end();
-      }
-    }
-  }
-);
+// policies-assist — extracted to routes/policies-assist.js (server split, 2026-09-07); registered here so the order is unchanged.
+{ const ctx = { CRM_API_BASE, CRM_API_SECRET, express, fetch, requireCrmRole }; require('./routes/policies-assist')(app, ctx); }
 console.log('✓ Policies AI Assist proxy loaded (forwards to caspio-pricing-proxy/api/policies-ai-assist)');
-
-// STICKER / BANNER AI ASSIST — REMOVED 2026-07-29.
-//
-// This was `POST /api/sticker-ai/chat`, a session-gated streaming forwarder to
-// the proxy's /api/contract-sticker-ai/chat. It existed only to serve the AI
-// quote drawer on /calculators/sticker-manual-pricing.html; that page was
-// retired the same day (its URLs now 410), leaving the endpoint with zero
-// callers while still able to reach a lookup_customer tool that returns
-// customer name, email, phone, address, sales rep and payment terms. A
-// PII-capable endpoint nobody calls is attack surface, not a spare part.
-//
-// The proxy's /api/contract-sticker-ai/chat still exists and is still gated by
-// CRM_API_SECRET, so removing this hop closes the browser-reachable path
-// without touching the proxy. Restore from git history if the AI drawer ever
-// comes back — and if it doesn't, drop the proxy route too.
 
 // =============================================================================
 // AI chat forwarders (session-gated streaming proxies) — extracted to routes/ai-chat.js (server split, 2026-09-07); registered here so the order is unchanged.
 { const ctx = { CRM_API_BASE, CRM_API_SECRET, express, fetch, requireStaff }; require('./routes/ai-chat')(app, ctx); }
 // 253GEAR publisher forwarders (page-gated Shopify proxies) — extracted to routes/gear-publisher.js (server split, 2026-09-07); registered here so the order is unchanged.
 { const ctx = { CRM_API_BASE, CRM_API_SECRET, express, fetch, path, requirePageAccess, SERVER_DIR: __dirname }; require('./routes/gear-publisher')(app, ctx); }
-// sendHashedHtml — hoisted here from lines 4857-4897 on 2026-09-07 (server split): the section below is moved into routes/ and this helper is shared.
 /**
  * Serve an HTML page with its asset tags rewritten to hashed /dist URLs.
  *
@@ -1631,7 +1182,6 @@ function sendHashedHtml(res, absPath, preRenderedHtml) {
   }
 }
 
-// noCacheHeaders — hoisted here from lines 5357-5363 on 2026-09-07 (server split): the section below is moved into routes/ and this helper is shared.
 // No-cache helper used by every staff-dashboard route below so the live
 // dashboard always fetches fresh CSS/JS after a deploy.
 function noCacheHeaders(res) {
@@ -1640,20 +1190,16 @@ function noCacheHeaders(res) {
   res.setHeader('Expires', '0');
 }
 
-// rewriteHtmlAssets — hoisted here from lines 4708-4712 on 2026-09-07 (server split): the section below is moved into routes/ and this helper is shared.
 // Serve the three builder pages with script/link tags rewritten to the hashed
 // /dist assets. No manifest (build not run) → fall through to the plain
 // static mount below and serve the original source paths — the build is an
 // overlay, never a requirement.
 const { rewriteHtmlAssets, createManifestLoader, createHtmlLoader } = require('./lib/asset-manifest');
 
-// HASHED_PAGES — hoisted here from lines 4715-4715 on 2026-09-07 (server split): the section below is moved into routes/ and this helper is shared.
 const { HASHED_PAGES, HASHED_PAGES_UNDER_PAGES_MOUNT, HASHED_STAFF_UNDER_MOUNT, HASHED_CALCULATOR_PATHS } = require('./lib/hashed-pages');
 
-// loadAssetManifest — hoisted here from lines 4718-4718 on 2026-09-07 (server split): the section below is moved into routes/ and this helper is shared.
 const loadAssetManifest = createManifestLoader(path.join(__dirname, 'dist', 'asset-manifest.json'));
 
-// loadBuilderHtml — hoisted here from lines 4721-4721 on 2026-09-07 (server split): the section below is moved into routes/ and this helper is shared.
 const loadBuilderHtml = createHtmlLoader();
 
 // Blog — server-rendered for SEO, sitemaps, robots, static mounts — extracted to routes/blog.js (server split, 2026-09-07); registered here so the order is unchanged.
@@ -1774,7 +1320,6 @@ function safeLoginNext(raw, prefix) {
 
 // Customer magic-link login (email entry, request link, verify, logout) — extracted to routes/customer-auth.js (server split, 2026-09-07); registered here so the order is unchanged.
 { const ctx = { CRM_API_BASE, CRM_API_SECRET, CUSTOMER_MAGIC_LINK_TEMPLATE, PUBLIC_SITE_ORIGIN, SERVER_DIR: __dirname, customerLoginLimiter, customerMagicLink, express, fetch, fetchPortalAccess, path, safeLoginNext, sendEmailJSTemplate }; require('./routes/customer-auth')(app, ctx); }
-// BOX_THUMB_RE — hoisted here from lines 6324-6340 on 2026-09-07 (server split): the section below is moved into routes/ and this helper is shared.
 // ── Customer-safe Box proof images (2026-08-05) ─────────────────────────────
 // Stored artwork URLs point at the proxy's /api/box/thumbnail/<fileId>, which is
 // requireStaff — so since the Box surface was gated a CUSTOMER's <img> 401s and
@@ -1793,17 +1338,14 @@ function safeLoginNext(raw, prefix) {
 // anyway, not an escalation. A CUSTOMER never reaches this function.
 const BOX_THUMB_RE = /\/api\/box\/thumbnail\/(\d+)/;
 
-// API_BASE_URL — hoisted here from lines 8355-8356 on 2026-09-07 (server split): the section below is moved into routes/ and this helper is shared.
 // API configuration
 const API_BASE_URL = process.env.API_BASE_URL || `${CASPIO_PROXY_BASE}/api`;
 
-// PORTAL_FETCH_TIMEOUT_MS — hoisted here from lines 6397-6400 on 2026-09-07 (server split): the section below is moved into routes/ and this helper is shared.
 // Bound customer-portal upstream fetches: a stalled MO/proxy ABORTS to a visible 503 instead of
 // hanging the tab forever (generous 12s — under Heroku's 30s H12, still allows a slow-but-valid
 // response). AbortSignal.timeout rejects the fetch → the handler's existing try/catch → 503.
 const PORTAL_FETCH_TIMEOUT_MS = 12000;
 
-// portalProxyGet — hoisted here from lines 6403-6410 on 2026-09-07 (server split): the section below is moved into routes/ and this helper is shared.
 async function portalProxyGet(pathAndQuery) {
   // Server-to-server: always send the CRM secret so the proxy's PII-read gate
   // (artrequests/mockups) admits us. These calls carry no browser Origin.
@@ -1813,7 +1355,6 @@ async function portalProxyGet(pathAndQuery) {
   return r.json();
 }
 
-// makeApiRequest — hoisted here from lines 8364-8399 on 2026-09-07 (server split): the section below is moved into routes/ and this helper is shared.
 // Helper function to make requests to the API
 async function makeApiRequest(endpoint, method = 'GET', body = null) {
   const url = `${API_BASE_URL}${endpoint}`;
@@ -1851,7 +1392,6 @@ async function makeApiRequest(endpoint, method = 'GET', body = null) {
   }
 }
 
-// PORTAL_PROXY — hoisted here from lines 6344-6351 on 2026-09-07 (server split): the section below is moved into routes/ and this helper is shared.
 // The portal pages used to read raw rows straight from the public proxy
 // (leaking YTD sales, staff emails, art charges, internal notes, and — via a
 // broken `searchById` — other companies' data). These app-server endpoints
@@ -1865,12 +1405,10 @@ const PORTAL_PROXY = TDT_PROXY; // same caspio-pricing-proxy base
 { const ctx = { BOX_THUMB_RE, CRM_API_BASE, CRM_API_SECRET, CUSTOMER_MAGIC_LINK_TEMPLATE, PORTAL_ADMIN_ROLES, PORTAL_FETCH_TIMEOUT_MS, PUBLIC_SITE_ORIGIN, SERVER_DIR: __dirname, boxFileId, boxForward, channelConfig, computeOrderStatusToken, crypto, express, fetch, fetchQuoteSessionRow, path, portalProxyGet, rateLimit, requireCrmRole, safeLoginNext, sendEmailJSTemplate, vendorMagicLink }; require('./routes/vendor-portal')(app, ctx); }
 // Customer Portal — gated, customer-safe data (magic-link login, orders, invoices, proofs, rewards, reorder) — extracted to routes/customer-portal.js (server split, 2026-09-07); registered here so the order is unchanged.
 { const ctx = { API_BASE_URL, BOX_THUMB_RE, CASPIO_PROXY_BASE, CRM_API_BASE, CRM_API_SECRET, CUSTOMER_MAGIC_LINK_TEMPLATE, INTERNAL_CALL_KEY, PORTAL_ADMIN_ROLES, PORTAL_FETCH_TIMEOUT_MS, PUBLIC_SITE_ORIGIN, SAMPLE_PRICING, SERVER_DIR: __dirname, TDT_PROXY, boxFileId, boxForward, channelConfig, customerMagicLink, express, fetch, fetchPortalAccess, getCtsStock, nowPacificNaiveIso, path, portalProxyGet, rateLimit, requireCrmRole, requireCustomer, resolveCtsShipping, resolveTdtShipping, resolveTdtTax, save3DTQuoteSession, sendEmailJSTemplate, sendHashedHtml, stripe, withProxySecret }; require('./routes/customer-portal')(app, ctx); }
-// SYNC_PROXY_BASE — hoisted here from lines 12241-12241 on 2026-09-07 (server split): the section below is moved into routes/ and this helper is shared.
 const SYNC_PROXY_BASE = CASPIO_PROXY_BASE;
 
 // Order-form submission and legacy cart, catalog and pricing relays — extracted to routes/order-form.js (server split, 2026-09-07); registered here so the order is unchanged.
 { const ctx = { API_BASE_URL, CASPIO_PROXY_BASE, CRM_API_SECRET, NWCA_LOCATIONS, SERVER_DIR: __dirname, SYNC_PROXY_BASE, cacheSubmitResponse, fetch, fs, getCachedSubmitResponse, makeApiRequest, monitor, path, requireStaff, sanitizeFilterInput, withProxySecret }; require('./routes/order-form')(app, ctx); }
-// quotePlaneWriteLimiter — hoisted here from lines 11841-11851 on 2026-09-07 (server split): the section below is moved into routes/ and this helper is shared.
 // Anonymous quote WRITES (create-only) share the proxy's historical budget
 // (120 writes / 15 min / IP). Staff sessions skip it — the whole office shares
 // one egress IP, and a builder save legitimately fires a dozen POSTs.
@@ -1883,7 +1421,6 @@ const quotePlaneWriteLimiter = rateLimit({
   message: { error: 'Too many quote saves from this address — try again in a few minutes.' },
 });
 
-// quoteScopedOrStaff — hoisted here from lines 11850-11860 on 2026-09-07 (server split): the section below is moved into routes/ and this helper is shared.
 // Anonymous callers must scope the read to a quote/session they already know.
 function quoteScopedOrStaff(req, res, next) {
   if (req.session && req.session.crmUser) return next();
@@ -1896,7 +1433,6 @@ function quoteScopedOrStaff(req, res, next) {
   });
 }
 
-// originalQueryString — hoisted here from lines 11865-11871 on 2026-09-07 (server split): the section below is moved into routes/ and this helper is shared.
 // Forward the original query string byte-for-byte (both QuoteID spellings,
 // refresh=true, staff filters, q.orderBy…) — reconstructing from req.query
 // silently dropped params for years.
@@ -1916,7 +1452,6 @@ function originalQueryString(req) {
 { const ctx = { CASPIO_PROXY_BASE, fetch }; require('./routes/banner-presets')(app, ctx); }
 // Public sticker quotes and quote retrieval — extracted to routes/public-quotes.js (server split, 2026-09-07); registered here so the order is unchanged.
 { const ctx = { CASPIO_PROXY_BASE, PUBLIC_SITE_ORIGIN, express, fetch, makeApiRequest, mintShareToken, sanitizeFilterInput, shareTokenOk, strictLimiter, withProxySecret }; require('./routes/public-quotes')(app, ctx); }
-// nowPacificNaiveIso — hoisted here from lines 4168-4183 on 2026-09-07 (server split): the section below is moved into routes/ and this helper is shared.
 // Format "now" as a Pacific naive-wall-clock timestamp matching Caspio's
 // expectation (no Z, no offset). Mirrors parseCaspioPacificMs's understanding.
 function nowPacificNaiveIso() {
@@ -1946,7 +1481,6 @@ const { recordQuoteSyncRun, computeQuoteSyncHealth, notifyQuoteSyncHealth } = re
 // rebuilt /pages/box-labels.html reads proxy /api/sanmar-orders/label-data) and
 // its only upstream, the proxy's /api/box-labels/* routes, was deleted the same
 // day (they served ContactEmail/Phone + balances anonymously).
-
 
 // Start the server
 // Sentry express error handler — AFTER all routes, so route throws/rejections

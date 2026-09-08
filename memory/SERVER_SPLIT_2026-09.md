@@ -17,25 +17,36 @@ espree + eslint-scope, computes the section's real dependency surface as `ctx`, 
 behaviour: a helper the rest of the file uses, a mutable variable assigned across the boundary, a constant declared
 below the section). `tests/helpers/server-source.js` gives the text locks the server as one text again.
 
-## Section map (line numbers as of the start; the ROUTE TABLE OF CONTENTS at the top of server.js is the source)
+## Current section map (2026-09-07, final local gates passed)
 
-| Section | Lines | Registrations | Status |
-|---|---|---|---|
-| AI chat forwarders | 4549-4642 | 3 (one loop) | ✅ `routes/ai-chat.js` (`.22`) |
-| 253GEAR publisher | 4643-4837 | 14 | ✅ `routes/gear-publisher.js` (`.22`) |
-| Blog + sitemaps + static | 4838-5455 | 51 | ✅ `routes/blog.js` (`.22`) |
-| Quote delete + push previews + quote_items/analytics relays | 12804-13180 | 14 | ✅ `routes/quote-delete.js` (`.22`) |
-| Public quote view | 13181-13252 | 6 | ✅ `routes/public-quote.js` (`.22`) |
-| Banner presets | 13253-13324 | 1 | ✅ `routes/banner-presets.js` (`.22`) |
-| Staff SAML | 3268-3419 | 16 | ✅ `routes/staff-saml.js` (`.23`) after hoisting `PORTAL_ADMIN_ROLES` |
-| CRM API proxy | 3420-4481 originally | 60 | Extracted to `routes/crm-proxy.js`; shared access/cache and Box helpers remain in server.js. See the CRM cut below. |
-| Vendor portal | 6555-7090 | 12 | ✅ `routes/vendor-portal.js` (`.23`) after hoisting `BOX_THUMB_RE`, `PORTAL_FETCH_TIMEOUT_MS`, `PORTAL_PROXY`, `portalProxyGet` |
-| Customer portal | 7091-10407 | 58 | ✅ `routes/customer-portal.js` (`.23`, 3,242 lines) after hoisting `API_BASE_URL`, `makeApiRequest` |
-| Online order form + ShopWorks | 10408-12626 | 45 | ⏳ the other agent's hardening edits the cart routes here — cut after it lands (`SYNC_PROXY_BASE` already hoisted) |
-| Quote data plane relays | 12627-12803 | 6 | ✅ `routes/quote-plane.js` (`.23`) after hoisting `quotePlaneWriteLimiter`, `quoteScopedOrStaff`, `originalQueryString` |
-| 3-Day Tees / custom tees / caps helpers + routes | 1956-3220 | many | ⏳ not yet analysed |
-| Infrastructure (security, session, limiters, health) | 1-1955 | ~40 | stays in server.js (it IS the composition root) |
-| Everything after 13324 (quote sessions, ShipStation, cart, pricing pages, static) | 13325-15947 | ~170 | ⏳ not yet analysed |
+The root is1,499lines. It retains only the22 infrastructure registrations specified by the handover: health/version/CSP intake, security/session/logging, rate limiting and parsers. Twenty-three route modules own434 business/page registrations. The committed fixture totals456. Order-form, storefront submission, payments and ShipStation use tested library stages; cache-owning helpers stay with their consumers.
+
+| Owner | Registrations |
+|---|---|
+| `server.js` | 22 |
+| `routes/stripe-webhook.js` | 1 |
+| `routes/storefront-gallery.js` | 1 |
+| `routes/product-pages.js` | 3 |
+| `routes/crm-auth.js` | 3 |
+| `routes/staff-saml.js` | 16 |
+| `routes/crm-proxy.js` | 60 |
+| `routes/policies-assist.js` | 1 |
+| `routes/ai-chat.js` | 1 |
+| `routes/gear-publisher.js` | 14 |
+| `routes/blog.js` | 51 |
+| `routes/pages.js` | 83 |
+| `routes/staff-api.js` | 29 |
+| `routes/customer-auth.js` | 4 |
+| `routes/vendor-portal.js` | 12 |
+| `routes/customer-portal.js` | 58 |
+| `routes/order-form.js` | 48 |
+| `routes/quote-plane.js` | 6 |
+| `routes/quote-delete.js` | 16 |
+| `routes/public-quote.js` | 6 |
+| `routes/banner-presets.js` | 1 |
+| `routes/public-quotes.js` | 2 |
+| `routes/quote-sync.js` | 9 |
+| `routes/quote-lifecycle.js` | 9 |
 
 **Prep the refusals need** (one small, behaviour-neutral commit): move the shared constants (`CRM_API_BASE`,
 `CRM_API_SECRET`, `PORTAL_ADMIN_ROLES`, `BOX_THUMB_RE`, `PORTAL_FETCH_TIMEOUT_MS`, `API_BASE_URL`,
@@ -123,3 +134,7 @@ Forty-three shared declarations now belong to six focused lib/storefront factori
 ### Payment stages (2026-09-07)
 
 Thirty-nine shared declarations move into focused lib/payments factories for links, integrity, email transport/templates, alerts, deposits, records and sample fulfillment. The raw Stripe route remains before body parsers and now awaits separate quote and storefront stages inside its error boundary. Original declarations were syntax-tree compared before the deliberate payment fixes: rejected Payment Confirmed writes stop fulfillment with a retryable response; all final storefront writes authenticate; a failed Processed write after a successful push is acknowledged and alerted for manual bookkeeping, without labeling fulfillment failed. Status markers preserve existing redelivery behavior; they are not a cross-dyno atomic claim. Route456 remains unchanged.
+
+### Final business-route cuts and ShipStation stages (2026-09-07)
+
+The remaining product/SEO and policy-streaming registrations move verbatim through the extractor. Security, sessions, limiters and shared infrastructure stay in server.js as specified in the handover. Obsolete numeric TOC pointers, hoist logs and empty gaps are removed with identical executable syntax trees. ShipStation submission is now six lib/shipstation stages: selection, billing, items/cache, payload, delivery and HTTP orchestration. All22 original/extracted behavior cases pass using mocked upstreams, including retry, cache expiry and post-delivery write failure. Fixture456 remains unchanged. The broader infrastructure preview was not applied after approval review rejected its scope.

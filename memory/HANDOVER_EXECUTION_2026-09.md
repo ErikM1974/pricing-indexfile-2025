@@ -8,13 +8,17 @@ Source: Erik's Claude handover (2026-09-08). Work on develop; one server editor;
 - [x] Upgrade Node runtime and CI to 22.x; patch compatible dependencies; full gates and deploy.
 - [x] Configure repository CRM_API_SECRET and verify CI executes the money-path and parity specs.
 - [x] Review and integrate dependency PRs individually with gates: tooling #38 (replaces #37), Stripe #34, rate-limit #33, csv-parse #32, Puppeteer #31.
-- [ ] Finish server split: CRM first; order form, quote sync/watchdog, storefront helpers and payments; preserve route table.
+- [x] Finish server split: CRM first; order form, quote sync/watchdog, storefront helpers and payments; preserve route table.
 - [x] Decompose both order submission handlers into tested stages; add strict Node lint for server/routes/lib.
-- [ ] Decompose ShipStation submission while finishing the remaining server sections.
+- [x] Decompose ShipStation submission while finishing the remaining server sections.
 - [x] Lower browser warning cap to zero in verified batches.
 - [x] Add lessons-length lock and CI/foreign-edit deploy checks.
-- [ ] Complete housekeeping: empty accidental file, active-file index, TODO markers and superseded memory.
+- [x] Complete housekeeping: empty accidental file, active-file index, TODO markers and superseded memory.
 - [ ] Review visual changes with Erik, one surface at a time.
+
+## Current verification
+
+The code-grade implementation is complete locally; the final source CI and production release are the remaining gates. Server1499lines,23route modules,456registrations (22 infrastructure +434 module registrations),203unit suites/4875passed (4existing skips), DOM88, accessibility4, quote parity84, browser15passed/3optional skips including5calculator surfaces, strict lint0, CSS283clean, types/build/boot passed. CSS design remains an explicitly separate track.
 
 ## Baseline
 - Frontend develop: 1e0dd7b6, following v2026.09.07.26 (CI fix).
@@ -100,3 +104,9 @@ Source: Erik's Claude handover (2026-09-08). Work on develop; one server editor;
 - Storefront release v2026.09.07.36 / Heroku2059 is live atb24aac66; source CI34190758128 and main CI34191138428 passed; live gallery20styles/0pricing errors.
 - Payment extraction applied after original/extracted helper comparison. Seventeen mocked fulfillment cases cover rejected marker writes, HTTP/transport failures after push, authenticated final writes, retry and redelivery; a signed HTTP regression confirms async samples rejection becomes500. Customer-link, HMAC, lookup and deposit-configuration contracts accompany the helper move.
 - Payment verification:202unit suites/4853passed (4existing skips), DOM88, accessibility4, quote parity84, browser15passed/3optional skips including5calculator surfaces; build/lint0/types/CSS283/route456/undefined0 passed. v.36 develop CI34191372902 also passed.
+
+- Payment release v2026.09.07.37 / Heroku2060 verified live atd47f5f32; exact-source CI34192330279 passed. Full SHA/homepage/access/invalid-webhook checks passed; branches synchronized.
+- Final scoped cut: security/session infrastructure stays in server.js per the handover. Broader infrastructure preparation was rejected by automatic review and remains unapplied. Product/SEO and policy routes moved through dry-run guarded extraction; ShipStation has six tested stages,22 original/extracted cases. Root now1499lines and fixture456 unchanged.
+- Housekeeping: ACTIVE_FILES is now a25-line index over14 docs/active-files area files; all1337 annotated row keys retained, including five repaired portal rows. Historical counts are explicitly labeled. Five remaining marker dispositions are tracked in HANDOVER_FOLLOWUPS_2026-09.md. Memory index named no current superseded deletion candidate.
+
+- Final local gates:203unit suites/4875passed (4existing skips), DOM88, accessibility4, quote parity84, browser15passed/3optional skips including5calculator surfaces; build/lint0/types/CSS283/route456/undefined0/boot200 passed. Payment release main/develop CI34192741076/34192896564 both passed.
