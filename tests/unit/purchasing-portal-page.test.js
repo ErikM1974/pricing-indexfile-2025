@@ -58,7 +58,12 @@ describe('honesty', () => {
         expect(js).toMatch(/load\(true\)/);
         expect(js).toMatch(/\?refresh=1/);
         expect(serverSrc).toMatch(/purchasing-all\$\{refresh\}/);
-        const proxy = fs.readFileSync(path.join(ROOT, '..', 'caspio-pricing-proxy', 'src', 'routes', 'ae-dashboard.js'), 'utf8');
+        // The proxy half lives in the SIBLING repo. CI checks out this repo only, so that assertion can run
+        // only where the sibling exists (a developer machine, the /deploy pre-flight) — it kept the CI unit job
+        // red from 2026-09-07 15:54 until this guard (2026-09-08).
+        const proxyPath = path.join(ROOT, '..', 'caspio-pricing-proxy', 'src', 'routes', 'ae-dashboard.js');
+        if (!fs.existsSync(proxyPath)) { console.warn('[purchasing-portal] sibling caspio-pricing-proxy checkout absent — proxy-side refresh assertion skipped'); return; }
+        const proxy = fs.readFileSync(proxyPath, 'utf8');
         expect(proxy).toMatch(/router\.get\('\/purchasing-all'[\s\S]{0,600}req\.query\.refresh === '1'/);
     });
 });
