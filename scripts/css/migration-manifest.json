@@ -600,6 +600,92 @@
       "measuredRawCssBytes": 211674,
       "maxCssBytes": 213722,
       "estimatedGzipCssBytes": 30962
+    },
+    {
+      "source": "training/lead-follow-up-guide.html",
+      "family": "training-reference",
+      "status": "migrated",
+      "route": "/training/lead-follow-up-guide.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/training-guide.css",
+        "training/css/lead-follow-up-guide.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "reading",
+        "keyboard-table-scroll",
+        "print-expanded-content",
+        "unchanged-content",
+        "keyboard-accordion",
+        "clipboard-pending",
+        "clipboard-failed",
+        "clipboard-retry"
+      ],
+      "test": "tests/e2e/css-unification-training.spec.js",
+      "maxCssBytes": 74545,
+      "baseline": {
+        "commit": "c5f25ded",
+        "rawCssBytes": 30698,
+        "localCssRequests": 3
+      },
+      "measuredRawCssBytes": 72497
+    },
+    {
+      "source": "training/shopworks-embroidery-order-type.html",
+      "family": "training-reference",
+      "status": "migrated",
+      "route": "/training/shopworks-embroidery-order-type.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/training-guide.css",
+        "training/css/shopworks-embroidery-order-type.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "reading",
+        "mobile",
+        "print-complete",
+        "unchanged-content",
+        "keyboard-table-scroll"
+      ],
+      "test": "tests/e2e/css-unification-training.spec.js",
+      "maxCssBytes": 72419,
+      "baseline": {
+        "commit": "c5f25ded",
+        "rawCssBytes": 27575,
+        "localCssRequests": 3
+      },
+      "measuredRawCssBytes": 70371
+    },
+    {
+      "source": "training/nwca-language-reference.html",
+      "family": "training-reference",
+      "status": "migrated",
+      "route": "/training/nwca-language-reference.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/training-guide.css",
+        "training/css/nwca-language-reference.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "reading",
+        "mobile",
+        "print-complete",
+        "unchanged-content"
+      ],
+      "test": "tests/e2e/css-unification-training.spec.js",
+      "maxCssBytes": 73684,
+      "baseline": {
+        "commit": "c5f25ded",
+        "rawCssBytes": 31727,
+        "localCssRequests": 3
+      },
+      "measuredRawCssBytes": 71636
     }
   ],
   "billingContentSha256": "d85f8530e03a1863d1b8bb2ebe97ba332d5c9e3411887d1eb2d02dcdb14c0863",
@@ -702,6 +788,20 @@
       "value": "var(--color-surface)",
       "context": "print",
       "reason": "The staff-only print sheet must override runtime inline visibility and screen background styles."
+    }
+  ],
+  "trainingContent": [
+    {
+      "source": "training/lead-follow-up-guide.html",
+      "sha256": "25ee1f716e340f77f372a38ba2b72b8e4698baa818ba0d3c0225642b95ddbba6"
+    },
+    {
+      "source": "training/shopworks-embroidery-order-type.html",
+      "sha256": "c638055808c92d43c3ab6858d41cabc1b447b9e4af952826ffbdbe74a2449578"
+    },
+    {
+      "source": "training/nwca-language-reference.html",
+      "sha256": "ce88cf45bfec446ad29e01c6f7ca37282716da8d44dfc21ceb0719f3ec2bc020"
     }
   ]
 }

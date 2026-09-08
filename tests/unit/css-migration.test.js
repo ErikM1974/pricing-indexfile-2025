@@ -100,3 +100,18 @@ test('Ruth billing reference preserves its prices, explanatory text and field ID
   const content = { text: main.textContent.replace(/\s+/g, ' ').trim(), ids: [...main.querySelectorAll('[id]')].map(el => el.id), links: [...main.querySelectorAll('a')].map(el => [el.getAttribute('href'), el.textContent.replace(/\s+/g, ' ').trim()]) };
   expect(crypto.createHash('sha256').update(JSON.stringify(content)).digest('hex')).toBe(manifest.ruthBillingContentSha256);
 });
+
+
+describe('training document content and CSS ownership', () => {
+    test.each(manifest.trainingContent)('$source retains its original prose, examples and destinations', entry => {
+        const document = new JSDOM(read(entry.source)).window.document;
+        const main = document.querySelector('main');
+        const content = {
+            text: main.textContent.replace(/\s+/g, ' ').trim(),
+            ids: [...main.querySelectorAll('[id]')].map(el => el.id).filter(id => !id.startsWith('training-panel-')),
+            links: [...document.querySelectorAll('a')].map(el => [el.getAttribute('href'), el.textContent.replace(/\s+/g, ' ').trim()]),
+        };
+        expect(crypto.createHash('sha256').update(JSON.stringify(content)).digest('hex')).toBe(entry.sha256);
+        expect(document.querySelectorAll('[style], style, script:not([src])')).toHaveLength(0);
+    });
+});

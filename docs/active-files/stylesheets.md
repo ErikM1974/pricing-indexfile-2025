@@ -169,3 +169,5 @@ cap-embroidery-fix.css
 
 - `scripts/css/migration-manifest.json`: first four pilot style owners, state fixtures, source-byte budgets and pending generated/dynamic surfaces. Pending means not yet migrated or verified.
 - `pages/css/webstore-inquiry.css`: storefront inquiry arrangement; shared controls belong to `components.css`.
+
+- `shared_components/css/training-guide.css`: scoped navigation, reading, table, callout and print owner for reviewed training guides. Legacy training-shared.css remains for unmigrated consumers.

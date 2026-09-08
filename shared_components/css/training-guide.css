@@ -1,0 +1,339 @@
+/* Training documents: navigation, reading rhythm, callouts, tables and print.
+ * Page files own domain-specific examples. Opt in only with data-training.
+ */
+@layer components.patterns {
+    :where([data-ui="unified"][data-training]) {
+        min-height: 100vh;
+    }
+
+    :where([data-ui="unified"][data-training]) :is(h1, h2, h3, h4, p, ul, ol) {
+        margin-block: 0;
+    }
+
+    :where([data-ui="unified"][data-training]) :is(p, ul, ol) {
+        line-height: var(--line-height-loose);
+    }
+
+    :where([data-ui="unified"][data-training]) :is(ul, ol) {
+        padding-inline-start: var(--space-6);
+    }
+
+    :where([data-ui="unified"][data-training]) li + li {
+        margin-block-start: var(--space-2);
+    }
+
+    :where([data-ui="unified"][data-training]) .nav-header {
+        background: var(--ui-surface);
+        border-block-start: 4px solid var(--ui-accent);
+        border-block-end: 1px solid var(--ui-line);
+    }
+
+    :where([data-ui="unified"][data-training]) .nav-container {
+        max-width: 1200px;
+        margin-inline: auto;
+        padding: var(--space-5) var(--space-6);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-5);
+    }
+
+    :where([data-ui="unified"][data-training]) :is(.nav-left, .nav-right) {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: var(--space-3);
+        min-width: 0;
+    }
+
+    :where([data-ui="unified"][data-training]) .page-title {
+        font-size: var(--font-size-xl);
+        font-weight: var(--font-weight-semibold);
+        margin: 0;
+    }
+
+    :where([data-ui="unified"][data-training]) .page-title > i {
+        color: var(--ui-accent);
+        margin-inline-end: var(--space-2);
+    }
+
+    :where([data-ui="unified"][data-training]) :is(.back-btn, .nav-btn) {
+        white-space: normal;
+        flex-shrink: 0;
+    }
+
+    :where([data-ui="unified"][data-training]) .logo-container {
+        width: 150px;
+        flex-shrink: 0;
+    }
+
+    :where([data-ui="unified"][data-training]) .logo-container img {
+        display: block;
+        width: 100%;
+        height: auto;
+    }
+
+    :where([data-ui="unified"][data-training]) main.container {
+        width: min(1120px, calc(100% - var(--space-8)));
+        margin: var(--space-8) auto;
+        padding: clamp(1rem, 4vw, 3rem);
+        background: var(--ui-surface);
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-md);
+    }
+
+    :where([data-ui="unified"][data-training]) main :is(h2, h3, h4) {
+        color: var(--ui-ink);
+        font-weight: var(--font-weight-semibold);
+    }
+
+    :where([data-ui="unified"][data-training]) main h2 {
+        font-size: var(--font-size-2xl);
+        margin-block-end: var(--space-5);
+    }
+
+    :where([data-ui="unified"][data-training]) main h3 {
+        font-size: var(--font-size-lg);
+        margin-block: var(--space-6) var(--space-3);
+    }
+
+    :where([data-ui="unified"][data-training]) main h4 {
+        font-size: var(--font-size-base);
+        margin-block-end: var(--space-3);
+    }
+
+    :where([data-ui="unified"][data-training]) main :is(p, ul, ol) + :is(p, ul, ol) {
+        margin-block-start: var(--space-4);
+    }
+
+    :where([data-ui="unified"][data-training]) :is(.training-section, .header) > p,
+    :where([data-ui="unified"][data-training]) .executive-summary > p {
+        max-width: 76ch;
+    }
+
+    :where([data-ui="unified"][data-training]) .training-section {
+        border-block-start: 1px solid var(--ui-line);
+        padding-block-start: var(--space-8);
+        margin-block-start: var(--space-8);
+    }
+
+    :where([data-ui="unified"][data-training]) :is(.subtitle, .version, .training-muted) {
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-training]) .subtitle {
+        font-size: var(--font-size-lg);
+    }
+
+    :where([data-ui="unified"][data-training]) .version {
+        margin-block-start: var(--space-2);
+        font-size: var(--font-size-md);
+    }
+
+    :where([data-ui="unified"][data-training])
+        :is(.alert, .alert-box, .highlight-box, .training-callout) {
+        padding: var(--space-5);
+        margin-block: var(--space-5);
+        border-inline-start: 3px solid var(--ui-accent);
+        background: var(--ui-tint);
+    }
+
+    :where([data-ui="unified"][data-training]) .alert {
+        display: flex;
+        align-items: flex-start;
+        gap: var(--space-3);
+    }
+
+    :where([data-ui="unified"][data-training]) :is(.alert-warning, .alert-box) {
+        background: var(--amber-100);
+        color: var(--amber-800);
+        border-color: var(--amber-700);
+    }
+
+    :where([data-ui="unified"][data-training]) .alert-info {
+        background: var(--sky-100);
+        color: var(--blue-800);
+        border-color: var(--blue-800);
+    }
+
+    :where([data-ui="unified"][data-training]) .alert-success {
+        background: var(--emerald-100);
+        color: var(--emerald-800);
+        border-color: var(--emerald-800);
+    }
+
+    :where([data-ui="unified"][data-training]) .alert-danger {
+        background: var(--red-100);
+        color: var(--red-800);
+        border-color: var(--red-800);
+    }
+
+    :where([data-ui="unified"][data-training]) .training-table-scroll {
+        overflow-x: auto;
+        margin-block: var(--space-5);
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-sm);
+    }
+
+    :where([data-ui="unified"][data-training]) table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: var(--font-size-md);
+    }
+
+    :where([data-ui="unified"][data-training]) :is(th, td) {
+        padding: var(--space-3);
+        text-align: start;
+        vertical-align: top;
+        border-block-end: 1px solid var(--ui-line);
+    }
+
+    :where([data-ui="unified"][data-training]) th {
+        background: var(--gray-100);
+        color: var(--ui-ink);
+        font-weight: var(--font-weight-semibold);
+    }
+
+    :where([data-ui="unified"][data-training]) tbody tr:nth-child(even) {
+        background: var(--gray-50);
+    }
+
+    :where([data-ui="unified"][data-training]) tbody tr:last-child td {
+        border-block-end: 0;
+    }
+
+    :where([data-ui="unified"][data-training]) .training-checklist {
+        list-style: none;
+        padding: 0;
+    }
+
+    :where([data-ui="unified"][data-training]) .footer {
+        color: var(--ui-muted);
+        margin-block-start: var(--space-8);
+        font-size: var(--font-size-md);
+    }
+
+    @media (width <= 768px) {
+        :where([data-ui="unified"][data-training]) .nav-container {
+            flex-wrap: wrap;
+            padding: var(--space-4);
+            gap: var(--space-3);
+        }
+
+        :where([data-ui="unified"][data-training]) .nav-left {
+            flex-basis: 100%;
+        }
+
+        :where([data-ui="unified"][data-training]) .page-title {
+            flex-basis: 100%;
+        }
+
+        :where([data-ui="unified"][data-training]) .logo-container {
+            width: 120px;
+        }
+
+        :where([data-ui="unified"][data-training]) main.container {
+            width: calc(100% - var(--space-6));
+            margin-block: var(--space-4);
+        }
+
+        :where([data-ui="unified"][data-training]) main h2 {
+            font-size: var(--font-size-xl);
+        }
+
+        :where([data-ui="unified"][data-training]) table {
+            min-width: 580px;
+        }
+    }
+}
+
+@layer components.pages {
+    @media print {
+        @page {
+            size: letter portrait;
+            margin: 0.45in;
+        }
+
+        :where([data-ui="unified"][data-training]) {
+            background: var(--ui-surface);
+            font-size: 10pt;
+        }
+
+        :where([data-ui="unified"][data-training]) :is(.nav-header, .no-print, .copy-btn) {
+            display: none;
+        }
+
+        :where([data-ui="unified"][data-training]) main.container {
+            width: 100%;
+            max-width: none;
+            margin: 0;
+            padding: 0;
+            border: 0;
+        }
+
+        :where([data-ui="unified"][data-training]) .training-section {
+            margin-block-start: 12pt;
+            padding-block-start: 8pt;
+        }
+
+        :where([data-ui="unified"][data-training]) :is(h2, h3, h4) {
+            break-after: avoid;
+        }
+
+        :where([data-ui="unified"][data-training]) .training-table-scroll {
+            overflow: visible;
+            border: 0;
+            margin-block: 8pt;
+        }
+
+        :where([data-ui="unified"][data-training]) table {
+            min-width: 0;
+            font-size: inherit;
+        }
+
+        :where([data-ui="unified"][data-training]) :is(tr, .alert, .highlight-box) {
+            break-inside: avoid;
+        }
+
+        :where([data-ui="unified"][data-training]) :is(a, button) {
+            color: inherit;
+        }
+
+        :where([data-ui="unified"][data-training]) :is(p, ul, ol) {
+            line-height: 1.4;
+        }
+
+        :where([data-ui="unified"][data-training]) main h2 {
+            font-size: 14pt;
+            margin-block-end: 8pt;
+        }
+
+        :where([data-ui="unified"][data-training]) main h3 {
+            font-size: 11pt;
+            margin-block: 10pt 5pt;
+        }
+
+        :where([data-ui="unified"][data-training]) main h4 {
+            font-size: 10pt;
+            margin-block-end: 5pt;
+        }
+
+        :where([data-ui="unified"][data-training])
+            :is(.alert, .alert-box, .highlight-box, .training-callout) {
+            padding: 8pt;
+            margin-block: 8pt;
+        }
+
+        :where([data-ui="unified"][data-training]) :is(th, td) {
+            padding: 5pt;
+        }
+
+        :where([data-ui="unified"][data-training]) :is(ul, ol) {
+            padding-inline-start: 14pt;
+        }
+
+        :where([data-ui="unified"][data-training]) li + li {
+            margin-block-start: 3pt;
+        }
+    }
+}

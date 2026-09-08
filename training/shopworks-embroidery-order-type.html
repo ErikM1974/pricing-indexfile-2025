@@ -5,18 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Embroidery Order Process - Northwest Custom Apparel</title>
     <link rel="icon" href="/favicon.png" type="image/png">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/training/css/training-shared.css?v=2026.09.07.6">
-    <link rel="stylesheet" href="/training/css/shopworks-embroidery-order-type.css?v=2026.09.07.19">
+    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.08.2">
+    <link rel="stylesheet" href="/shared_components/css/training-guide.css?v=2026.09.08.10">
+    <link rel="stylesheet" href="/training/css/shopworks-embroidery-order-type.css?v=2026.09.08.10">
 </head>
-<body>
+<body data-ui="unified" data-training="guide" class="training-embroidery">
     <!-- Navigation Header -->
     <nav class="nav-header">
         <div class="nav-container">
             <div class="nav-left">
-                <a href="training-games-hub.html" class="back-btn">
+                <a href="training-games-hub.html" class="back-btn page-nav-link">
                     <i class="fas fa-arrow-left" aria-hidden="true"></i>
                     Back to Training Hub
                 </a>
@@ -37,21 +38,21 @@
         <!-- Header -->
         <div class="header">
             <h2>📋 New Embroidery Order Process</h2>
-            <p style="color: #666; font-size: 1.2em; margin-top: 10px;">Simplified system for all embroidered items</p>
+            <p class="subtitle">Simplified system for all embroidered items</p>
             <div class="effective-date">✨ Effective: August 15, 2025</div>
         </div>
 
         <!-- Important Alert -->
         <div class="alert-box">
             <h2>Important Change!</h2>
-            <p style="font-size: 1.15em; color: #856404;">
+            <p>
                 The <span class="removed-text">"Caps" order type has been REMOVED</span> from Shopworks.<br>
                 All embroidered items now use the <span class="new-text">"Embroidery" order type</span> only.
             </p>
         </div>
 
         <!-- Rule 1 -->
-        <div class="card">
+        <div class="training-section">
             <div class="card-header">
                 <div class="card-number">1</div>
                 <div class="card-title">
@@ -63,7 +64,7 @@
                 
                 <div class="highlight-box">
                     <strong>What this means:</strong>
-                    <ul style="margin-left: 20px; margin-top: 10px;">
+                    <ul>
                         <li>✅ Caps → Use "Embroidery"</li>
                         <li>✅ Jackets → Use "Embroidery"</li>
                         <li>✅ Polos → Use "Embroidery"</li>
@@ -75,7 +76,7 @@
         </div>
 
         <!-- Rule 2 -->
-        <div class="card">
+        <div class="training-section">
             <div class="card-header">
                 <div class="card-number">2</div>
                 <div class="card-title">
@@ -94,14 +95,14 @@
                         <h3><span class="icon">❌</span> Wrong Way</h3>
                         <div class="order-items">
                             <ul>
-                                <li>12 Caps + 12 Jackets = <span style="color: #dc3545; font-weight: bold;">24 pieces total</span></li>
+                                <li>12 Caps + 12 Jackets = <span class="incorrect-text">24 pieces total</span></li>
                             </ul>
                         </div>
-                        <div class="pricing-method" style="border-color: #dc3545; background: #ffebee;">
-                            <h4 style="color: #c62828;">Incorrect Pricing:</h4>
-                            <div class="price-group" style="background: #ffcdd2;">
+                        <div class="pricing-method is-incorrect">
+                            <h4 class="incorrect-text">Incorrect Pricing:</h4>
+                            <div class="price-group">
                                 <span>Using 24-piece price break</span>
-                                <span style="color: #c62828;">❌ WRONG</span>
+                                <span class="incorrect-text">❌ WRONG</span>
                             </div>
                         </div>
                     </div>
@@ -110,8 +111,8 @@
                         <h3><span class="icon">✅</span> Right Way</h3>
                         <div class="order-items">
                             <ul>
-                                <li>12 Caps <span style="color: #666;">(separate group)</span></li>
-                                <li>12 Jackets <span style="color: #666;">(separate group)</span></li>
+                                <li>12 Caps <span class="training-muted">(separate group)</span></li>
+                                <li>12 Jackets <span class="training-muted">(separate group)</span></li>
                             </ul>
                         </div>
                         <div class="pricing-method">
@@ -131,14 +132,14 @@
         </div>
 
         <!-- Rule 3 - Special Note about Beanies -->
-        <div class="special-note">
+        <div class="special-note training-section">
             <h2>🎩 Special Rule: Beanies are "Flats"</h2>
             <div class="beanie-rule">
                 <h3>Important Exception!</h3>
-                <p style="font-size: 1.15em; line-height: 1.8;">
+                <p>
                     Beanies are embroidered on our <strong>flat machines</strong>, not cap drivers.<br>
                     This means beanies are priced as <strong>"Flats" (regular Embroidery)</strong>.<br><br>
-                    <span style="background: rgba(255,255,255,0.3); padding: 10px 20px; border-radius: 8px; display: inline-block; margin-top: 10px;">
+                    <span class="beanie-hint">
                         💡 <strong>You CAN combine</strong> beanies with other flat embroidery items for quantity price breaks!
                     </span>
                 </p>
@@ -146,9 +147,9 @@
         </div>
 
         <!-- Quick Reference Table -->
-        <div class="reference-table">
+        <div class="reference-table training-section">
             <h2>🔍 Quick Reference Guide</h2>
-            <table>
+            <div class="training-table-scroll" tabindex="0" role="region" aria-label="🔍 Quick Reference Guide"><table>
                 <thead>
                     <tr>
                         <th>Item Type</th>
@@ -189,16 +190,16 @@
                         <td class="yes">Yes - With other flats</td>
                     </tr>
                 </tbody>
-            </table>
+            </table></div>
             
-            <div style="margin-top: 30px; padding: 20px; background: #e3f2fd; border-radius: 10px; text-align: center;">
-                <h3 style="color: #1565C0; margin-bottom: 15px;">📌 Example Scenario</h3>
-                <p style="font-size: 1.1em; color: #333;">
+            <div class="scenario-example">
+                <h3>📌 Example Scenario</h3>
+                <p>
                     <strong>Order:</strong> 12 caps + 12 beanies + 12 jackets<br><br>
-                    <span style="display: inline-block; background: white; padding: 10px 20px; border-radius: 8px; margin: 5px;">
+                    <span class="scenario-group">
                         <strong>Caps:</strong> 12-piece price (separate)
                     </span>
-                    <span style="display: inline-block; background: #e8f5e9; padding: 10px 20px; border-radius: 8px; margin: 5px;">
+                    <span class="scenario-group">
                         <strong>Beanies + Jackets:</strong> 24-piece price (combined)
                     </span>
                 </p>

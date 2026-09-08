@@ -1,53 +1,45 @@
-/* lead-follow-up-guide.js — page script (extracted from inline <script>, 2026.09.05.11) */
+/* Training guide interactions. Clipboard feedback stays with its template. */
+async function copyTemplate(templateId, button) {
+    const template = document.getElementById('template-' + templateId);
+    if (!template || !button || button.disabled) return;
+    const example = template.closest('.template-example');
+    let status = example.querySelector('.copy-status');
+    if (!status) {
+        status = document.createElement('p');
+        status.className = 'copy-status';
+        status.setAttribute('role', 'status');
+        example.appendChild(status);
+    }
+    button.disabled = true;
+    status.classList.remove('is-error');
+    status.textContent = 'Copying template…';
+    try {
+        await navigator.clipboard.writeText(template.textContent);
+        status.textContent = 'Template copied.';
+    } catch (_error) {
+        status.classList.add('is-error');
+        status.textContent = 'Copy failed. Select the template text and copy it manually, or try again.';
+    } finally {
+        button.disabled = false;
+    }
+}
 
-// ── moved from inline <script> in training/lead-follow-up-guide.html (Rule 3, 2026.09.05.11) ──
-// Copy template function
-        function copyTemplate(templateId) {
-            const template = document.getElementById('template-' + templateId);
-            const text = template.textContent;
-            
-            navigator.clipboard.writeText(text).then(() => {
-                // Change button text temporarily
-                const btn = event.target;
-                const originalText = btn.textContent;
-                btn.textContent = 'Copied!';
-                btn.style.background = 'var(--success)';
-                
-                setTimeout(() => {
-                    btn.textContent = originalText;
-                    btn.style.background = '';
-                }, 2000);
-            });
-        }
+function toggleAccordion(header) {
+    const opening = header.getAttribute('aria-expanded') !== 'true';
+    document.querySelectorAll('.accordion-header').forEach(button => {
+        const open = button === header && opening;
+        button.setAttribute('aria-expanded', String(open));
+        button.nextElementSibling.classList.toggle('active', open);
+    });
+}
 
-        // Accordion toggle
-        function toggleAccordion(header) {
-            const content = header.nextElementSibling;
-            const isActive = header.classList.contains('active');
-            
-            // Close all accordions
-            document.querySelectorAll('.accordion-header').forEach(h => {
-                h.classList.remove('active');
-                h.nextElementSibling.classList.remove('active');
-            });
-            
-            // Open clicked accordion if it wasn't active
-            if (!isActive) {
-                header.classList.add('active');
-                content.classList.add('active');
-            }
-        }
-
-        // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
-            // Add smooth scrolling
-            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-                anchor.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    const target = document.querySelector(this.getAttribute('href'));
-                    if (target) {
-                        target.scrollIntoView({ behavior: 'smooth' });
-                    }
-                });
-            });
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', event => {
+            const target = document.getElementById(anchor.getAttribute('href').slice(1));
+            if (!target) return;
+            event.preventDefault();
+            target.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
         });
+    });
+});

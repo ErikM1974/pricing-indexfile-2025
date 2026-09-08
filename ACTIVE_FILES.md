@@ -1,6 +1,6 @@
 # Active Files Registry
 
-Last updated: 2026-09-08 — shared artwork theme/detail/intake/action owners and family browser coverage.
+Last updated: 2026-09-08 — shared training document owner and mocked guide browser checks.
 
 | Area | Registry |
 |---|---|

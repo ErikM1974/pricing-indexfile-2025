@@ -98,3 +98,5 @@
 - **`update-ctr-pricing-linear.js`:** Updates CTR-Garmt, CTR-Cap, CTR-FB with linear $/1K pricing (Feb 2026)
 
 [Back to the registry index](../../ACTIVE_FILES.md)
+
+- `tests/e2e/css-unification-training.spec.js`: training guide layouts, keyboard tables/accordions, clipboard feedback and complete print output. All business services/writes blocked.
