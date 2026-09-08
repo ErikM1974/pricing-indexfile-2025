@@ -21,6 +21,34 @@
     var DEBOUNCE_MS = 250;
     var MIN_CHARS = 2;
     var colorsCache = {};
+    var colorRequests = new WeakMap();
+    var pickerSequence = 0;
+    var floatingPickers = [];
+
+    // Table scrolling must not clip a menu in the final row. Fixed menus stay
+    // in the viewport; reposition on either page or table scroll.
+    function placePicker(box, anchor) {
+        if (box.hidden) return;
+        var rect = anchor.getBoundingClientRect();
+        var width = Math.min(330, window.innerWidth - 24);
+        var below = window.innerHeight - rect.bottom - 12;
+        var above = rect.top - 12;
+        var height = Math.max(44, Math.min(280, Math.max(below, above)));
+        box.classList.add('form-picker-floating');
+        box.style.width = width + 'px';
+        box.style.left = Math.max(12, Math.min(rect.left, window.innerWidth - width - 12)) + 'px';
+        box.style.maxHeight = height + 'px';
+        box.style.top = (below >= Math.min(280, box.scrollHeight) || below >= above
+            ? rect.bottom + 4 : Math.max(12, rect.top - Math.min(height, box.scrollHeight) - 4)) + 'px';
+    }
+
+    function trackPicker(box, anchor) { floatingPickers.push({ box: box, anchor: anchor }); }
+    function positionOpenPickers() {
+        floatingPickers = floatingPickers.filter(function (item) { return item.box.isConnected; });
+        floatingPickers.forEach(function (item) { placePicker(item.box, item.anchor); });
+    }
+    document.addEventListener('scroll', positionOpenPickers, true);
+    window.addEventListener('resize', positionOpenPickers);
 
     function apiBase() {
         if (global.APP_CONFIG && global.APP_CONFIG.API && global.APP_CONFIG.API.BASE_URL) {
@@ -35,6 +63,10 @@
 
         var box = document.createElement('div');
         box.className = 'contacts-dropdown styles-dropdown';
+        box.id = 'form-style-options-' + (++pickerSequence);
+        box.setAttribute('role', 'listbox');
+        box.setAttribute('aria-label', 'Matching garment styles');
+        trackPicker(box, styleInput);
         box.hidden = true;
         var parent = styleInput.parentNode;
         parent.classList.add('contacts-anchor');
@@ -47,9 +79,22 @@
         var suppressNext = false;
 
         styleInput.setAttribute('autocomplete', 'off');
+        styleInput.setAttribute('role', 'combobox');
+        styleInput.setAttribute('aria-autocomplete', 'list');
+        styleInput.setAttribute('aria-controls', box.id);
+        styleInput.setAttribute('aria-expanded', 'false');
 
         styleInput.addEventListener('input', function () {
             if (suppressNext) { suppressNext = false; return; }
+            // Hand-typed styles are allowed too. A previous product's catalog
+            // color is no longer verified as soon as its style is edited.
+            if (opts.colorCell) {
+                colorRequests.set(opts.colorCell, {});
+                opts.colorCell.querySelectorAll('.swatch-btn, .swatch-grid').forEach(function (el) { el.remove(); });
+                var colorInput = opts.colorCell.querySelector('input');
+                if (colorInput) { colorInput.hidden = false; delete colorInput.dataset.catalogColor; }
+                colorMessage(opts.colorCell, '');
+            }
             var q = styleInput.value.trim();
             if (timer) clearTimeout(timer);
             if (q.length < MIN_CHARS) { hide(); return; }
@@ -78,16 +123,18 @@
                     return resp.json();
                 })
                 .then(function (data) {
-                    if (q !== lastQuery) return;
+                    if (q !== lastQuery || document.activeElement !== styleInput) return;
                     render(data || []);
                 })
                 .catch(function (err) {
+                    if (q !== lastQuery || document.activeElement !== styleInput) return;
                     console.error('[form-styles] style search failed:', err);
                     renderMessage('Style lookup unavailable — keep typing manually.');
                 });
         }
 
         function render(results) {
+            box.setAttribute('role', 'listbox');
             box.innerHTML = '';
             items = [];
             active = -1;
@@ -95,6 +142,9 @@
             results.slice(0, 10).forEach(function (r, i) {
                 var el = document.createElement('div');
                 el.className = 'contacts-row';
+                el.id = box.id + '-' + i;
+                el.setAttribute('role', 'option');
+                el.setAttribute('aria-selected', 'false');
                 el.innerHTML = '<strong>' + escapeHtml(r.value) + '</strong> <span class="contacts-muted">' + escapeHtml(r.label || '') + '</span>';
                 el.addEventListener('mousedown', function (e) { e.preventDefault(); pick(items[i]); });
                 el.addEventListener('mousemove', function () { setActive(i); });
@@ -102,9 +152,12 @@
                 box.appendChild(el);
             });
             box.hidden = false;
+            styleInput.setAttribute('aria-expanded', 'true');
+            placePicker(box, styleInput);
         }
 
         function renderMessage(text) {
+            box.setAttribute('role', 'status');
             box.innerHTML = '';
             items = [];
             active = -1;
@@ -113,6 +166,8 @@
             el.textContent = text;
             box.appendChild(el);
             box.hidden = false;
+            styleInput.setAttribute('aria-expanded', 'true');
+            placePicker(box, styleInput);
         }
 
         function move(delta) {
@@ -124,6 +179,8 @@
             if (active >= 0 && items[active]) items[active].el.classList.remove('is-active');
             active = i;
             if (items[active]) {
+                items.forEach(function (item, index) { item.el.setAttribute('aria-selected', String(index === active)); });
+                styleInput.setAttribute('aria-activedescendant', items[active].el.id);
                 items[active].el.classList.add('is-active');
                 items[active].el.scrollIntoView({ block: 'nearest' });
             }
@@ -145,6 +202,8 @@
         }
 
         function hide() {
+            styleInput.setAttribute('aria-expanded', 'false');
+            styleInput.removeAttribute('aria-activedescendant');
             box.hidden = true;
             items = [];
             active = -1;
@@ -155,10 +214,18 @@
         var base = apiBase();
         var colorCell = opts.colorCell;
         if (!base || !colorCell) return;
+        var request = {};
+        colorRequests.set(colorCell, request);
+        colorCell.querySelectorAll('.swatch-btn, .swatch-grid').forEach(function (el) { el.remove(); });
+        var colorInput = colorCell.querySelector('input');
+        if (colorInput) { colorInput.hidden = false; delete colorInput.dataset.catalogColor; }
+        colorMessage(colorCell, '');
 
         var apply = function (data) {
+            if (colorRequests.get(colorCell) !== request) return;
             var colors = (data && data.colors) || [];
-            if (!colors.length) return;
+            if (!colors.length) { colorMessage(colorCell, 'No catalog colors — type color manually.'); return; }
+            colorMessage(colorCell, '');
             buildColorSelect(colorCell, colors);
         };
 
@@ -169,11 +236,13 @@
                 return resp.json();
             })
             .then(function (data) {
-                colorsCache[styleNumber] = data;
+                if (data && data.colors && data.colors.length) colorsCache[styleNumber] = data;
                 apply(data);
             })
             .catch(function (err) {
-                console.error('[form-styles] colors failed:', err); // text input stays — never blocks
+                if (colorRequests.get(colorCell) !== request) return;
+                console.error('[form-styles] colors failed:', err);
+                colorMessage(colorCell, 'Color lookup unavailable — type color manually or select the style to retry.');
             });
     }
 
@@ -181,6 +250,18 @@
     // the picked swatch+name; clicking opens a swatch grid. Built ONCE per
     // colors load and toggled — never regenerated on hover (archived combobox
     // lesson: regenerating DOM mid-hover eats the click).
+    function colorMessage(colorCell, text) {
+        var message = colorCell.querySelector('.form-lookup-status');
+        if (!text) { if (message) message.remove(); return; }
+        if (!message) {
+            message = document.createElement('div');
+            message.className = 'form-lookup-status no-print';
+            message.setAttribute('role', 'status');
+            colorCell.appendChild(message);
+        }
+        message.textContent = text;
+    }
+
     function buildColorSelect(colorCell, colors) {
         var textInput = colorCell.querySelector('input');
         var oldBtn = colorCell.querySelector('.swatch-btn');
@@ -194,10 +275,14 @@
         btn.type = 'button';
         btn.className = 'swatch-btn';
         btn.setAttribute('aria-label', 'Pick color');
+        btn.setAttribute('aria-expanded', 'false');
         btn.innerHTML = '<span class="swatch-chip"></span><span class="swatch-name">— pick color —</span>';
 
         var grid = document.createElement('div');
         grid.className = 'swatch-grid';
+        grid.id = 'form-color-options-' + (++pickerSequence);
+        btn.setAttribute('aria-controls', grid.id);
+        trackPicker(grid, btn);
         grid.hidden = true;
 
         function choose(colorName, catalogColor, img) {
@@ -207,11 +292,13 @@
             var chip = btn.querySelector('.swatch-chip');
             chip.style.backgroundImage = img ? 'url("' + img + '")' : 'none';
             grid.hidden = true;
+            btn.setAttribute('aria-expanded', 'false');
+            btn.setAttribute('aria-label', 'Change color: ' + colorName);
+            btn.focus();
             textInput.dispatchEvent(new Event('input', { bubbles: true }));
         }
 
-        // mousedown (not click) throughout — matches every other dropdown in the
-        // form suite; trusted-click synthesis was double-toggling the grid.
+        // Native click handles pointer, Enter and Space once each.
         colors.forEach(function (c) {
             var cell = document.createElement('button');
             cell.type = 'button';
@@ -220,7 +307,7 @@
             var img = c.COLOR_SQUARE_IMAGE || '';
             cell.innerHTML = '<span class="swatch-chip"' + (img ? ' style="background-image:url(&quot;' + img + '&quot;)"' : '') + '></span>' +
                 '<span class="swatch-cell-name">' + escapeHtml(c.COLOR_NAME || '') + '</span>';
-            cell.addEventListener('mousedown', function (e) {
+            cell.addEventListener('click', function (e) {
                 e.preventDefault();
                 e.stopPropagation();
                 choose(c.COLOR_NAME || '', c.CATALOG_COLOR || '', img);
@@ -232,7 +319,7 @@
         manual.type = 'button';
         manual.className = 'swatch-cell swatch-cell--manual';
         manual.textContent = '⌨ type color manually';
-        manual.addEventListener('mousedown', function (e) {
+        manual.addEventListener('click', function (e) {
             e.preventDefault();
             e.stopPropagation();
             btn.remove();
@@ -243,13 +330,22 @@
         });
         grid.appendChild(manual);
 
-        btn.addEventListener('mousedown', function (e) {
+        btn.addEventListener('click', function (e) {
             e.preventDefault();
             e.stopPropagation();
             grid.hidden = !grid.hidden;
+            btn.setAttribute('aria-expanded', String(!grid.hidden));
+            placePicker(grid, btn);
+            if (!grid.hidden) grid.querySelector('button').focus();
         });
         document.addEventListener('mousedown', function (e) {
-            if (!colorCell.contains(e.target)) grid.hidden = true;
+            if (!colorCell.contains(e.target)) { grid.hidden = true; btn.setAttribute('aria-expanded', 'false'); }
+        });
+
+        grid.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') {
+                e.preventDefault(); grid.hidden = true; btn.setAttribute('aria-expanded', 'false'); btn.focus();
+            }
         });
 
         textInput.hidden = true;

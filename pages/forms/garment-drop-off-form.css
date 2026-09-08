@@ -1,4 +1,4 @@
-/* ==========================================================================
+@layer components.pages {/* ==========================================================================
    garment-drop-off-form.css — pages/forms/garment-drop-off-form.html
    Page-specific layout on top of nwca-form-shared.css (framework extracted
    2026-07-11 when the other form twins were added). Portrait print.
@@ -9,9 +9,10 @@
 }
 
 /* Garment table column widths */
-.col-style { width: 13%; }
-.col-color { width: 10%; }
-.col-desc  { width: 23%; }
-.col-size  { width: 5.4%; }
-.col-other { width: 9%; }
-.col-total { width: 9.5%; }
+:where([data-ui="unified"][data-form="printable"]) .col-style { width: 13%; }
+:where([data-ui="unified"][data-form="printable"]) .col-color { width: 10%; }
+:where([data-ui="unified"][data-form="printable"]) .col-desc  { width: 23%; }
+:where([data-ui="unified"][data-form="printable"]) .col-size  { width: 5.4%; }
+:where([data-ui="unified"][data-form="printable"]) .col-other { width: 9%; }
+:where([data-ui="unified"][data-form="printable"]) .col-total { width: 9.5%; }
+}

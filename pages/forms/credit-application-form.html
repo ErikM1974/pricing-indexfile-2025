@@ -6,13 +6,14 @@
     <meta name="robots" content="noindex, nofollow">
     <title>Net-Terms Credit Application - Northwest Custom Apparel</title>
     <link rel="icon" href="/favicon.png" type="image/png">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/pages/forms/nwca-form-shared.css?v=2026.09.07.4">
-    <link rel="stylesheet" href="/pages/forms/credit-application-form.css?v=2026.09.07.4">
+    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.08.2">
+    <link rel="stylesheet" href="/shared_components/css/printable-forms.css?v=2026.09.08.12">
+    <link rel="stylesheet" href="/pages/forms/credit-application-form.css?v=2026.09.08.12">
 </head>
-<body>
+<body data-ui="unified" data-form="printable">
     <div class="form-toolbar no-print">
         <a href="/dashboards/forms-library.html" class="toolbar-link">
             <i class="fas fa-arrow-left" aria-hidden="true"></i> Forms Library
@@ -122,7 +123,7 @@
 
         <section class="form-section">
             <div class="section-bar">4. Trade References (3)</div>
-            <table class="form-table ref-table" id="refTable">
+            <div class="form-table-scroll" tabindex="0" role="region" aria-label="4. Trade References (3) table"><table class="form-table ref-table" id="refTable">
                 <thead>
                     <tr>
                         <th class="col-refco">Company</th>
@@ -134,7 +135,7 @@
                 <tbody id="refRows">
                     <!-- rows injected by credit-application-form.js -->
                 </tbody>
-            </table>
+            </table></div>
         </section>
 
         <section class="form-section">
@@ -184,8 +185,8 @@
     </main>
 
     <script src="/config/app.config.js"></script>
-    <script src="/pages/forms/nwca-form-shared.js?v=2026.09.06.34"></script>
-    <script src="/pages/forms/nwca-form-contacts.js?v=2026.09.07.25"></script>
+    <script src="/pages/forms/nwca-form-shared.js?v=2026.09.08.12"></script>
+    <script src="/pages/forms/nwca-form-contacts.js?v=2026.09.08.12"></script>
     <script src="/pages/forms/nwca-form-save.js?v=2026.09.07.33"></script>
     <script src="/pages/forms/credit-application-form.js?v=2026.09.06.32"></script>
 </body>

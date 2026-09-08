@@ -1,4 +1,4 @@
-/* ==========================================================================
+@layer components.pages {/* ==========================================================================
    spoilage-report-form.css — pages/forms/spoilage-report-form.html
    Spoilage / damage / reprint report twin. Portrait print.
    ========================================================================== */
@@ -7,27 +7,27 @@
     @page { size: letter portrait; margin: 0.35in; }
 }
 
-.assist-hint {
+:where([data-ui="unified"][data-form="printable"]) .assist-hint {
     margin: 6px 0 8px;
     font-size: 0.8rem;
     color: var(--ink-soft);
 }
 
-.assist-hint .fa-wand-magic-sparkles { color: var(--form-green); }
+:where([data-ui="unified"][data-form="printable"]) .assist-hint .fa-wand-magic-sparkles { color: var(--form-green); }
 
 /* items table */
-.col-style { width: 9%; }
-.col-desc  { width: 20%; }
-.col-color { width: 10%; }
-.col-size  { width: 6%; }
-.col-qty   { width: 5.5%; }
-.col-cost  { width: 10%; }
-.col-loss  { width: 10%; }
-.col-disp  { width: 13%; }
+:where([data-ui="unified"][data-form="printable"]) .col-style { width: 9%; }
+:where([data-ui="unified"][data-form="printable"]) .col-desc  { width: 20%; }
+:where([data-ui="unified"][data-form="printable"]) .col-color { width: 10%; }
+:where([data-ui="unified"][data-form="printable"]) .col-size  { width: 6%; }
+:where([data-ui="unified"][data-form="printable"]) .col-qty   { width: 5.5%; }
+:where([data-ui="unified"][data-form="printable"]) .col-cost  { width: 10%; }
+:where([data-ui="unified"][data-form="printable"]) .col-loss  { width: 10%; }
+:where([data-ui="unified"][data-form="printable"]) .col-disp  { width: 13%; }
 
-.spoil-table td input { padding: 6px 3px; font-size: 0.8rem; }
+:where([data-ui="unified"][data-form="printable"]) .spoil-table td input { padding: 6px 3px; font-size: 0.8rem; }
 
-.spoil-table .color-select {
+:where([data-ui="unified"][data-form="printable"]) .spoil-table .color-select {
     width: 100%;
     border: none;
     background: transparent;
@@ -36,9 +36,9 @@
     padding: 6px 2px;
 }
 
-.spoil-table .color-select:focus { outline: none; background: var(--brand-50); }
+:where([data-ui="unified"][data-form="printable"]) .spoil-table .color-select:focus { outline: 2px solid var(--ui-accent); outline-offset: 2px; background: var(--brand-50); }
 
-.loss-total-row {
+:where([data-ui="unified"][data-form="printable"]) .loss-total-row {
     display: flex;
     justify-content: flex-end;
     align-items: baseline;
@@ -46,9 +46,9 @@
     margin-top: 8px;
 }
 
-.loss-total-row label { font-weight: 800; font-size: 0.95rem; }
+:where([data-ui="unified"][data-form="printable"]) .loss-total-row label { font-weight: 800; font-size: 0.95rem; }
 
-.loss-total-row input {
+:where([data-ui="unified"][data-form="printable"]) .loss-total-row input {
     width: 140px;
     border: none;
     border-bottom: 2px solid var(--ink);
@@ -60,12 +60,13 @@
     background: transparent;
 }
 
-.loss-total-row input:focus { outline: none; background: var(--brand-50); }
+:where([data-ui="unified"][data-form="printable"]) .loss-total-row input:focus { outline: 2px solid var(--ui-accent); outline-offset: 2px; background: var(--brand-50); }
 
 @media print {
-    .form-logo { height: 44px; }
-    .form-title { font-size: 1.3rem; }
-    .form-section { margin-top: 9px; }
-    .spoil-table td input { padding: 4px 2px; font-size: 0.74rem; }
-    .notes-area { min-height: 0.5in; }
+    :where([data-ui="unified"][data-form="printable"]) .form-logo { height: 44px; }
+    :where([data-ui="unified"][data-form="printable"]) .form-title { font-size: 1.3rem; }
+    :where([data-ui="unified"][data-form="printable"]) .form-section { margin-top: 9px; }
+    :where([data-ui="unified"][data-form="printable"]) .spoil-table td input { padding: 4px 2px; font-size: 0.74rem; }
+    :where([data-ui="unified"][data-form="printable"]) .notes-area { min-height: 0.5in; }
+}
 }

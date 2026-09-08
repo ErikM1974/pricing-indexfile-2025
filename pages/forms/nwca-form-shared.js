@@ -2,7 +2,7 @@
  * nwca-form-shared.js — shared behaviors for the fillable form twins in
  * /pages/forms/. Extracted 2026-07-11 from garment-drop-off-form.js.
  *
- * Nothing is saved anywhere — these forms are fill → Print / Save as PDF only.
+ * Forms can print, save to NWCA through nwca-form-save.js, and keep a local draft when autosave is enabled.
  *
  * Each form page calls NWCAForm.init({ onAfterClear }) after building its DOM:
  *   - wires #printFormBtn → window.print()
@@ -42,7 +42,28 @@
             e.preventDefault();
             e.returnValue = '';
         });
-        window.addEventListener('afterprint', function () { dirty = false; });
+        window.addEventListener('beforeprint', preparePrintValues);
+        window.addEventListener('afterprint', function () { restorePrintValues(); dirty = false; });
+    }
+
+    // Native single-line controls and scrollable textareas can truncate paper.
+    // Temporary text mirrors wrap the full entered value; saving still reads
+    // the original controls, which are restored after print/cancel.
+    function restorePrintValues() {
+        document.querySelectorAll('.form-print-value').forEach(function (el) { el.remove(); });
+        document.querySelectorAll('.form-print-source').forEach(function (el) { el.classList.remove('form-print-source'); });
+    }
+
+    function preparePrintValues() {
+        restorePrintValues();
+        document.querySelectorAll('[data-form="printable"] .form-sheet input, [data-form="printable"] .form-sheet textarea').forEach(function (el) {
+            if (el.hidden || !el.value || ['checkbox', 'radio', 'date', 'hidden', 'button'].indexOf(el.type) >= 0) return;
+            var text = document.createElement('span');
+            text.className = 'form-print-value' + (el.tagName === 'TEXTAREA' ? ' form-print-textarea' : '');
+            text.textContent = el.value;
+            el.classList.add('form-print-source');
+            el.insertAdjacentElement('afterend', text);
+        });
     }
 
     // Successful Save-to-NWCA clears the leave-warning (nwca-form-save.js)

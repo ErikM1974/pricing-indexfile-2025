@@ -1,4 +1,4 @@
-/* ==========================================================================
+@layer components.pages {/* ==========================================================================
    ae-order-intake-form.css — pages/forms/ae-order-intake-form.html
    Page-specific layout on top of nwca-form-shared.css. Portrait print.
    13-column order table needs the tightest type of any twin.
@@ -8,27 +8,27 @@
     @page { size: letter portrait; margin: 0.35in; }
 }
 
-.assist-hint {
+:where([data-ui="unified"][data-form="printable"]) .assist-hint {
     margin: 6px 0 8px;
     font-size: 0.8rem;
     color: var(--ink-soft);
 }
 
-.assist-hint .fa-wand-magic-sparkles { color: var(--form-green); }
+:where([data-ui="unified"][data-form="printable"]) .assist-hint .fa-wand-magic-sparkles { color: var(--form-green); }
 
 /* Order table column widths (8 cols — sizes live in one chip cell) */
-.col-style { width: 9%; }
-.col-color { width: 11%; }
-.col-desc  { width: 17%; }
-.col-sizes { width: 33%; }
-.col-other { width: 7%; }
-.col-qty   { width: 5.5%; }
-.col-price { width: 8%; }
-.col-total { width: 9.5%; }
+:where([data-ui="unified"][data-form="printable"]) .col-style { width: 9%; }
+:where([data-ui="unified"][data-form="printable"]) .col-color { width: 11%; }
+:where([data-ui="unified"][data-form="printable"]) .col-desc  { width: 17%; }
+:where([data-ui="unified"][data-form="printable"]) .col-sizes { width: 33%; }
+:where([data-ui="unified"][data-form="printable"]) .col-other { width: 7%; }
+:where([data-ui="unified"][data-form="printable"]) .col-qty   { width: 5.5%; }
+:where([data-ui="unified"][data-form="printable"]) .col-price { width: 8%; }
+:where([data-ui="unified"][data-form="printable"]) .col-total { width: 9.5%; }
 
-.cell-sizes { vertical-align: middle; }
+:where([data-ui="unified"][data-form="printable"]) .cell-sizes { vertical-align: middle; }
 
-.qq-link {
+:where([data-ui="unified"][data-form="printable"]) .qq-link {
     display: inline-flex;
     align-items: center;
     gap: 4px;
@@ -42,13 +42,13 @@
     padding: 1px 8px;
 }
 
-.qq-link:hover { background: var(--brand-100); }
+:where([data-ui="unified"][data-form="printable"]) .qq-link:hover { background: var(--brand-100); }
 
-.order-table td input { padding: 6px 3px; font-size: 0.8rem; }
-.order-table th { font-size: 0.66rem; padding: 5px 2px; }
+:where([data-ui="unified"][data-form="printable"]) .order-table td input { padding: 6px 3px; font-size: 0.8rem; }
+:where([data-ui="unified"][data-form="printable"]) .order-table th { font-size: 0.66rem; padding: 5px 2px; }
 
 /* per-row color select swaps in over the text input */
-.order-table .color-select {
+:where([data-ui="unified"][data-form="printable"]) .order-table .color-select {
     width: 100%;
     border: none;
     background: transparent;
@@ -57,12 +57,12 @@
     padding: 6px 2px;
 }
 
-.order-table .color-select:focus { outline: none; background: var(--brand-50); }
+:where([data-ui="unified"][data-form="printable"]) .order-table .color-select:focus { outline: 2px solid var(--ui-accent); outline-offset: 2px; background: var(--brand-50); }
 
-.order-table td { position: relative; }
+:where([data-ui="unified"][data-form="printable"]) .order-table td { position: relative; }
 
 /* rows with a verified SanMar color get a subtle tick */
-.order-table td.cell-color.is-verified::after {
+:where([data-ui="unified"][data-form="printable"]) .order-table td.cell-color.is-verified::after {
     content: '✓';
     position: absolute;
     right: 2px;
@@ -73,18 +73,18 @@
 
 /* ---------- Fulfillment + money stack ---------- */
 
-.fulfillment-grid {
+:where([data-ui="unified"][data-form="printable"]) .fulfillment-grid {
     display: grid;
-    grid-template-columns: 1.5fr 1fr;
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
     gap: 12px 24px;
     border: 1.5px solid var(--form-green);
     border-radius: 0 4px 4px;
     padding: 12px 14px;
 }
 
-.fulfillment-left { display: flex; flex-direction: column; gap: 10px; }
+:where([data-ui="unified"][data-form="printable"]) .fulfillment-left { display: flex; flex-direction: column; gap: 10px; }
 
-.money-stack {
+:where([data-ui="unified"][data-form="printable"]) .money-stack {
     display: flex;
     flex-direction: column;
     gap: 8px;
@@ -92,19 +92,19 @@
     padding-left: 18px;
 }
 
-.money-row {
+:where([data-ui="unified"][data-form="printable"]) .money-row {
     display: flex;
     align-items: baseline;
     gap: 8px;
 }
 
-.money-row label {
+:where([data-ui="unified"][data-form="printable"]) .money-row label {
     flex: 0 0 90px;
     font-weight: 600;
     font-size: 0.875rem;
 }
 
-.money-row input {
+:where([data-ui="unified"][data-form="printable"]) .money-row input {
     flex: 1;
     border: none;
     border-bottom: 1px solid var(--ink);
@@ -116,18 +116,18 @@
     min-width: 0;
 }
 
-.money-row input:focus { outline: none; background: var(--brand-50); }
+:where([data-ui="unified"][data-form="printable"]) .money-row input:focus { outline: 2px solid var(--ui-accent); outline-offset: 2px; background: var(--brand-50); }
 
-.money-strong { font-weight: 700; }
+:where([data-ui="unified"][data-form="printable"]) .money-strong { font-weight: 700; }
 
-.tax-lookup {
+:where([data-ui="unified"][data-form="printable"]) .tax-lookup {
     display: flex;
     align-items: center;
     gap: 6px;
     flex-wrap: wrap;
 }
 
-.tax-lookup input {
+:where([data-ui="unified"][data-form="printable"]) .tax-lookup input {
     width: 64px;
     border: 1px solid var(--line);
     border-radius: 4px;
@@ -136,41 +136,42 @@
     padding: 3px 6px;
 }
 
-.tax-btn {
+:where([data-ui="unified"][data-form="printable"]) .tax-btn {
     border-color: var(--form-green);
     color: var(--form-green);
     padding: 4px 10px;
     font-size: 0.78rem;
 }
 
-.tax-btn:hover { background: var(--brand-100); }
+:where([data-ui="unified"][data-form="printable"]) .tax-btn:hover { background: var(--brand-100); }
 
-.tax-hint { font-size: 0.75rem; color: var(--ink-soft); }
-.tax-hint.is-ok { color: var(--form-green-dark); font-weight: 600; }
-.tax-hint.is-warn { color: var(--amber-700); font-weight: 600; }
+:where([data-ui="unified"][data-form="printable"]) .tax-hint { font-size: 0.75rem; color: var(--ink-soft); }
+:where([data-ui="unified"][data-form="printable"]) .tax-hint.is-ok { color: var(--form-green-dark); font-weight: 600; }
+:where([data-ui="unified"][data-form="printable"]) .tax-hint.is-warn { color: var(--amber-700); font-weight: 600; }
 
 @media (width <= 700px) {
-    .fulfillment-grid { grid-template-columns: 1fr; }
-    .money-stack { border-left: none; padding-left: 0; }
+    :where([data-ui="unified"][data-form="printable"]) .fulfillment-grid { grid-template-columns: minmax(0, 1fr); }
+    :where([data-ui="unified"][data-form="printable"]) .money-stack { border-left: none; padding-left: 0; }
 }
 
 @media print {
-    .form-logo { height: 46px; }
-    .form-title { font-size: 1.35rem; }
-    .form-section { margin-top: 10px; }
-    .order-table td input { padding: 4px 2px; font-size: 0.74rem; }
-    .waiver-text { font-size: 0.8rem; }
+    :where([data-ui="unified"][data-form="printable"]) .form-logo { height: 46px; }
+    :where([data-ui="unified"][data-form="printable"]) .form-title { font-size: 1.35rem; }
+    :where([data-ui="unified"][data-form="printable"]) .form-section { margin-top: 10px; }
+    :where([data-ui="unified"][data-form="printable"]) .order-table td input { padding: 4px 2px; font-size: 0.74rem; }
+    :where([data-ui="unified"][data-form="printable"]) .waiver-text { font-size: 0.8rem; }
 }
 
 /* Quick Quote round-trip (2026-07-11): provenance chip + arrival flash */
-.price-prov { font-size: 10px; line-height: 1.3; color: var(--print-green); background: var(--brand-50); border-radius: 4px; padding: 2px 6px; margin-top: 3px; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+:where([data-ui="unified"][data-form="printable"]) .price-prov { font-size: 10px; line-height: 1.3; color: var(--print-green); background: var(--brand-50); border-radius: 4px; padding: 2px 6px; margin-top: 3px; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 @keyframes qq-row-arrive { from { background: var(--brand-50); } to { background: transparent; } }
-.qq-row-flash td { animation: qq-row-arrive 1.2s ease-out; }
+:where([data-ui="unified"][data-form="printable"]) .qq-row-flash td { animation: qq-row-arrive 1.2s ease-out; }
 
 /* Per-size price line (base + upcharge) — PRINTS, so the paper math is auditable */
-.size-price-note { font-size: 10.5px; color: var(--print-ink); margin-top: 3px; }
+:where([data-ui="unified"][data-form="printable"]) .size-price-note { font-size: 10.5px; color: var(--print-ink); margin-top: 3px; }
 
 @media print {
-    .size-price-note { font-size: 8.5px; color: var(--print-ink); }
+    :where([data-ui="unified"][data-form="printable"]) .size-price-note { font-size: 8.5px; color: var(--print-ink); }
+}
 }

@@ -1,4 +1,4 @@
-/* ==========================================================================
+@layer components.pages {/* ==========================================================================
    sample-checkout-form.css — pages/forms/sample-checkout-form.html
    Page-specific layout on top of nwca-form-shared.css. LANDSCAPE print.
    ========================================================================== */
@@ -8,46 +8,46 @@
 }
 
 /* Sample items column widths */
-.col-num { width: 3%; }
-.col-source { width: 7%; }
-.col-brand { width: 8%; }
-.col-style { width: 7.5%; }
-.col-desc { width: 17.5%; }
-.col-color { width: 8%; }
-.col-size { width: 5%; }
-.col-qty { width: 4.5%; }
-.col-retail { width: 8%; }
-.col-charge { width: 9%; }
-.col-returned { width: 9%; }
-.col-condition { width: 13.5%; }
+:where([data-ui="unified"][data-form="printable"]) .col-num { width: 3%; }
+:where([data-ui="unified"][data-form="printable"]) .col-source { width: 7%; }
+:where([data-ui="unified"][data-form="printable"]) .col-brand { width: 8%; }
+:where([data-ui="unified"][data-form="printable"]) .col-style { width: 7.5%; }
+:where([data-ui="unified"][data-form="printable"]) .col-desc { width: 17.5%; }
+:where([data-ui="unified"][data-form="printable"]) .col-color { width: 8%; }
+:where([data-ui="unified"][data-form="printable"]) .col-size { width: 5%; }
+:where([data-ui="unified"][data-form="printable"]) .col-qty { width: 4.5%; }
+:where([data-ui="unified"][data-form="printable"]) .col-retail { width: 8%; }
+:where([data-ui="unified"][data-form="printable"]) .col-charge { width: 9%; }
+:where([data-ui="unified"][data-form="printable"]) .col-returned { width: 9%; }
+:where([data-ui="unified"][data-form="printable"]) .col-condition { width: 13.5%; }
 
-.sample-table td input { padding: 6px 4px; font-size: 0.82rem; }
+:where([data-ui="unified"][data-form="printable"]) .sample-table td input { padding: 6px 4px; font-size: 0.82rem; }
 
 /* Sections 3 + 4 side-by-side like the PDF */
-.checkout-two-col {
+:where([data-ui="unified"][data-form="printable"]) .checkout-two-col {
     display: grid;
-    grid-template-columns: 1fr 1.2fr;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
     column-gap: 20px;
     align-items: start;
 }
 
-.condition-box {
+:where([data-ui="unified"][data-form="printable"]) .condition-box {
     border: 1.5px solid var(--form-green);
     border-radius: 0 4px 4px;
     padding: 12px 14px;
 }
 
-.condition-intro {
+:where([data-ui="unified"][data-form="printable"]) .condition-intro {
     flex-basis: 100%;
     font-weight: 700;
     font-size: 0.85rem;
 }
 
-.card-box .condition-intro { flex-basis: auto; }
+:where([data-ui="unified"][data-form="printable"]) .card-box .condition-intro { flex-basis: auto; }
 
 /* reuse spec-field inline label+line pairs (defined per-form; duplicated from
    name-personalization because each page loads only its own css) */
-.spec-field {
+:where([data-ui="unified"][data-form="printable"]) .spec-field {
     display: inline-flex;
     align-items: baseline;
     gap: 6px;
@@ -55,13 +55,13 @@
     flex: 1;
 }
 
-.spec-field label {
+:where([data-ui="unified"][data-form="printable"]) .spec-field label {
     font-weight: 600;
     font-size: 0.875rem;
     white-space: nowrap;
 }
 
-.spec-field input {
+:where([data-ui="unified"][data-form="printable"]) .spec-field input {
     flex: 1;
     border: none;
     border-bottom: 1px solid var(--ink);
@@ -72,21 +72,22 @@
     min-width: 40px;
 }
 
-.spec-field input:focus { outline: none; background: var(--brand-50); }
+:where([data-ui="unified"][data-form="printable"]) .spec-field input:focus { outline: 2px solid var(--ui-accent); outline-offset: 2px; background: var(--brand-50); }
 
-.spec-field--wide { min-width: 200px; }
-.spec-field--last4 { min-width: 90px; flex: 0 1 110px; }
+:where([data-ui="unified"][data-form="printable"]) .spec-field--wide { min-width: 200px; }
+:where([data-ui="unified"][data-form="printable"]) .spec-field--last4 { min-width: 90px; flex: 0 1 110px; }
 
 @media (width <= 900px) {
-    .checkout-two-col { grid-template-columns: 1fr; }
+    :where([data-ui="unified"][data-form="printable"]) .checkout-two-col { grid-template-columns: minmax(0, 1fr); }
 }
 
 @media print {
-    .form-logo { height: 44px; }
-    .form-title { font-size: 1.3rem; }
-    .form-section { margin-top: 8px; }
-    .sample-table td input { padding: 4px 3px; font-size: 0.78rem; }
-    .checkout-two-col { grid-template-columns: 1fr 1.2fr; }
-    .waiver-box { margin-top: 10px; }
-    .waiver-text { font-size: 0.78rem; }
+    :where([data-ui="unified"][data-form="printable"]) .form-logo { height: 44px; }
+    :where([data-ui="unified"][data-form="printable"]) .form-title { font-size: 1.3rem; }
+    :where([data-ui="unified"][data-form="printable"]) .form-section { margin-top: 8px; }
+    :where([data-ui="unified"][data-form="printable"]) .sample-table td input { padding: 4px 3px; font-size: 0.78rem; }
+    :where([data-ui="unified"][data-form="printable"]) .checkout-two-col { grid-template-columns: 1fr 1.2fr; }
+    :where([data-ui="unified"][data-form="printable"]) .waiver-box { margin-top: 10px; }
+    :where([data-ui="unified"][data-form="printable"]) .waiver-text { font-size: 0.78rem; }
+}
 }

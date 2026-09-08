@@ -1,21 +1,23 @@
-/* credit-application-form.css — Net-Terms Credit Application twin (portrait) */
+@layer components.pages {/* credit-application-form.css — Net-Terms Credit Application twin (portrait) */
 
-.info-field--wide { grid-column: span 2; }
+:where([data-ui="unified"][data-form="printable"]) .info-field--wide { grid-column: span 2; }
 
-.waiver-box--nocard {
+:where([data-ui="unified"][data-form="printable"]) .waiver-box--nocard {
     border-color: var(--red-700);
     background: var(--red-50);
     margin-bottom: 12px;
 }
-.waiver-box--nocard .waiver-text { color: var(--print-red); }
-.waiver-box--nocard .fa-shield-halved { margin-right: 5px; }
+:where([data-ui="unified"][data-form="printable"]) .waiver-box--nocard .waiver-text { color: var(--print-red); }
+:where([data-ui="unified"][data-form="printable"]) .waiver-box--nocard .fa-shield-halved { margin-right: 5px; }
 
-.ref-table .col-refco { width: 30%; }
-.ref-table .col-refname { width: 24%; }
-.ref-table .col-refphone { width: 20%; }
-.ref-table .col-refemail { width: 26%; }
+:where([data-ui="unified"][data-form="printable"]) .ref-table .col-refco { width: 30%; }
+:where([data-ui="unified"][data-form="printable"]) .ref-table .col-refname { width: 24%; }
+:where([data-ui="unified"][data-form="printable"]) .ref-table .col-refphone { width: 20%; }
+:where([data-ui="unified"][data-form="printable"]) .ref-table .col-refemail { width: 26%; }
 
 @media print {
-    .form-section { margin-top: 10px; }
-    .ref-table td input { padding: 5px 3px; }
+    :where([data-ui="unified"][data-form="printable"]) .form-section { margin-top: 10px; }
+    :where([data-ui="unified"][data-form="printable"]) .ref-table td input { padding: 5px 3px; }
 }
+
+@media screen and (width <= 700px) { :where([data-ui="unified"][data-form="printable"]) .info-field--wide { grid-column: auto; } } }

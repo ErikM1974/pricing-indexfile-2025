@@ -1,27 +1,27 @@
-/* team-roster-form.css — Team Roster (Names & Numbers) twin (portrait) */
+@layer components.pages {/* team-roster-form.css — Team Roster (Names & Numbers) twin (portrait) */
 
-.info-field--wide { grid-column: span 2; }
+:where([data-ui="unified"][data-form="printable"]) .info-field--wide { grid-column: span 2; }
 
-.assist-hint {
+:where([data-ui="unified"][data-form="printable"]) .assist-hint {
     font-size: 0.82rem;
     color: var(--print-ink-soft);
     margin: 6px 0 8px;
 }
-.assist-hint .fa-wand-magic-sparkles { color: var(--print-green); margin-right: 4px; }
+:where([data-ui="unified"][data-form="printable"]) .assist-hint .fa-wand-magic-sparkles { color: var(--print-green); margin-right: 4px; }
 
-.roster-table .col-n { width: 5%; }
-.roster-table .col-name { width: 40%; }
-.roster-table .col-number { width: 12%; }
-.roster-table .col-size { width: 13%; }
-.roster-table .col-notes { width: 30%; }
+:where([data-ui="unified"][data-form="printable"]) .roster-table .col-n { width: 5%; }
+:where([data-ui="unified"][data-form="printable"]) .roster-table .col-name { width: 40%; }
+:where([data-ui="unified"][data-form="printable"]) .roster-table .col-number { width: 12%; }
+:where([data-ui="unified"][data-form="printable"]) .roster-table .col-size { width: 13%; }
+:where([data-ui="unified"][data-form="printable"]) .roster-table .col-notes { width: 30%; }
 
-.roster-table .cell-n {
+:where([data-ui="unified"][data-form="printable"]) .roster-table .cell-n {
     text-align: center;
     font-size: 0.8rem;
     color: var(--print-ink-soft);
 }
 
-.roster-tally {
+:where([data-ui="unified"][data-form="printable"]) .roster-tally {
     margin-top: 8px;
     font-size: 0.92rem;
     font-weight: 600;
@@ -29,6 +29,8 @@
 }
 
 @media print {
-    .roster-table td input { padding: 4px 3px; font-size: 0.78rem; }
-    .roster-tally { font-size: 0.85rem; }
+    :where([data-ui="unified"][data-form="printable"]) .roster-table td input { padding: 4px 3px; font-size: 0.78rem; }
+    :where([data-ui="unified"][data-form="printable"]) .roster-tally { font-size: 0.85rem; }
 }
+
+@media screen and (width <= 700px) { :where([data-ui="unified"][data-form="printable"]) .info-field--wide { grid-column: auto; } } }

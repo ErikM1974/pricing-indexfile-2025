@@ -102,3 +102,5 @@
 - `tests/e2e/css-unification-training.spec.js`: training guide layouts, keyboard tables/accordions, clipboard feedback and complete print output. All business services/writes blocked.
 
 - `tests/e2e/css-unification-training-service.spec.js`: four service guides, fourteen keyboard disclosures, phone tables/help, image loading/failure/retry, no-controller reading and print. All business services/writes mocked.
+
+- `tests/e2e/css-unification-printable-forms.spec.js`: 17 printable twins at four widths, keyboard table regions, clear/cancel, paper pages and shared lookup/save/date state checks. All business services/writes mocked. Source text/field contracts live in css-migration.test.js.

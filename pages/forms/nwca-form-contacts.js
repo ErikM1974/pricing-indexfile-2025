@@ -132,6 +132,7 @@
         var box = document.createElement('div');
         box.className = 'contacts-dropdown';
         box.setAttribute('role', 'listbox');
+        box.setAttribute('aria-label', 'Matching companies and contacts');
         box.hidden = true;
         // anchor the dropdown to the field's positioned wrapper
         var parent = input.parentNode;
@@ -174,10 +175,11 @@
                     return resp.json();
                 })
                 .then(function (data) {
-                    if (q !== lastQuery) return; // stale response
+                    if (q !== lastQuery || document.activeElement !== input) return; // stale or unfocused response
                     render(data.companies || []);
                 })
                 .catch(function (err) {
+                    if (q !== lastQuery || document.activeElement !== input) return;
                     console.error('[form-contacts] lookup failed:', err);
                     renderMessage('Customer lookup unavailable — keep typing manually.');
                 });

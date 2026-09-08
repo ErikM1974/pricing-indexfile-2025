@@ -1,4 +1,4 @@
-/* ==========================================================================
+@layer components.pages {/* ==========================================================================
    maintenance-log-form.css — pages/forms/maintenance-log-form.html
    Shared page for all six equipment maintenance logs. Portrait print.
    ========================================================================== */
@@ -8,7 +8,7 @@
 }
 
 /* Equipment-type switcher (screen only) */
-.type-switch {
+:where([data-ui="unified"][data-form="printable"]) .type-switch {
     display: flex;
     gap: 6px;
     flex-wrap: wrap;
@@ -16,7 +16,7 @@
     justify-content: center;
 }
 
-.type-chip {
+:where([data-ui="unified"][data-form="printable"]) .type-chip {
     border: 1.5px solid var(--form-green);
     background: transparent;
     color: var(--form-green-dark);
@@ -28,42 +28,43 @@
     cursor: pointer;
 }
 
-.type-chip.is-active {
+:where([data-ui="unified"][data-form="printable"]) .type-chip.is-active {
     background: var(--form-green);
     color: var(--color-on-brand);
 }
 
 /* Task checklist */
-.col-task { width: 84%; text-align: left; }
-.col-check { width: 8%; }
+:where([data-ui="unified"][data-form="printable"]) .col-task { width: 84%; text-align: left; }
+:where([data-ui="unified"][data-form="printable"]) .col-check { width: 8%; }
 
-.task-table .cell-task {
+:where([data-ui="unified"][data-form="printable"]) .task-table .cell-task {
     font-size: 0.85rem;
     padding: 7px 10px;
     text-align: left;
 }
 
-.task-table .cell-check {
+:where([data-ui="unified"][data-form="printable"]) .task-table .cell-check {
     text-align: center;
     padding: 4px;
 }
 
-.task-table input[type="checkbox"] {
+:where([data-ui="unified"][data-form="printable"]) .task-table input[type="checkbox"] {
     width: 17px;
     height: 17px;
     accent-color: var(--form-green);
 }
 
-.signoff-grid { margin-top: 12px; grid-template-columns: repeat(3, 1fr); }
+:where([data-ui="unified"][data-form="printable"]) .signoff-grid { margin-top: 12px; grid-template-columns: repeat(3, 1fr); }
 
 @media (width <= 700px) {
-    .signoff-grid { grid-template-columns: 1fr; }
+    :where([data-ui="unified"][data-form="printable"]) .signoff-grid { grid-template-columns: 1fr; }
 }
 
 @media print {
-    .form-logo { height: 44px; }
-    .form-title { font-size: 1.3rem; }
-    .form-section { margin-top: 9px; }
-    .task-table .cell-task { padding: 4px 8px; font-size: 0.78rem; }
-    .notes-area { min-height: 0.55in; }
+    :where([data-ui="unified"][data-form="printable"]) .form-logo { height: 44px; }
+    :where([data-ui="unified"][data-form="printable"]) .form-title { font-size: 1.3rem; }
+    :where([data-ui="unified"][data-form="printable"]) .form-section { margin-top: 9px; }
+    :where([data-ui="unified"][data-form="printable"]) .task-table .cell-task { padding: 4px 8px; font-size: 0.78rem; }
+    :where([data-ui="unified"][data-form="printable"]) .notes-area { min-height: 0.55in; }
+}
 }

@@ -1,15 +1,15 @@
-/* pto-request-form.css — PTO / Time-Off Request twin (portrait) */
+@layer components.pages {/* pto-request-form.css — PTO / Time-Off Request twin (portrait) */
 
-.info-field--wide { grid-column: span 2; }
+:where([data-ui="unified"][data-form="printable"]) .info-field--wide { grid-column: span 2; }
 
-.assist-hint {
+:where([data-ui="unified"][data-form="printable"]) .assist-hint {
     font-size: 0.82rem;
     color: var(--print-ink-soft);
     margin: 8px 0 0;
 }
-.assist-hint .fa-circle-info { color: var(--print-green); margin-right: 4px; }
+:where([data-ui="unified"][data-form="printable"]) .assist-hint .fa-circle-info { color: var(--print-green); margin-right: 4px; }
 
-.approval-strip {
+:where([data-ui="unified"][data-form="printable"]) .approval-strip {
     display: flex;
     align-items: flex-end;
     gap: 18px;
@@ -19,21 +19,23 @@
     border-top: 1px solid var(--gray-300);
 }
 
-.approval-title {
+:where([data-ui="unified"][data-form="printable"]) .approval-title {
     font-weight: 700;
     font-size: 0.9rem;
 }
 
-.approval-sig {
+:where([data-ui="unified"][data-form="printable"]) .approval-sig {
     flex: 1;
     min-width: 220px;
     display: flex;
     flex-direction: column;
 }
-.approval-sig label { font-size: 0.72rem; color: var(--print-ink-soft); }
+:where([data-ui="unified"][data-form="printable"]) .approval-sig label { font-size: 0.72rem; color: var(--print-ink-soft); }
 
-.signature-line--inline {
+:where([data-ui="unified"][data-form="printable"]) .signature-line--inline {
     display: block;
     border-bottom: 1px solid var(--print-ink);
     height: 22px;
 }
+
+@media screen and (width <= 700px) { :where([data-ui="unified"][data-form="printable"]) .info-field--wide { grid-column: auto; } } }

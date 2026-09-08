@@ -780,6 +780,380 @@
         "practice field help where present"
       ],
       "test": "tests/e2e/css-unification-training-service.spec.js"
+    },
+    {
+      "source": "pages/forms/ae-order-intake-form.html",
+      "family": "printable-forms",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/printable-forms.css",
+        "pages/forms/ae-order-intake-form.css"
+      ],
+      "baselineCssBytes": 35657,
+      "currentCssBytes": 95284,
+      "maxCssBytes": 99380,
+      "states": [
+        "blank",
+        "keyboard",
+        "phone fields/tables",
+        "clear/cancel",
+        "populated print",
+        "lookup/save/draft states where present"
+      ],
+      "test": "tests/e2e/css-unification-printable-forms.spec.js"
+    },
+    {
+      "source": "pages/forms/artwork-request-form.html",
+      "family": "printable-forms",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/printable-forms.css",
+        "pages/forms/artwork-request-form.css"
+      ],
+      "baselineCssBytes": 32418,
+      "currentCssBytes": 90294,
+      "maxCssBytes": 94390,
+      "states": [
+        "blank",
+        "keyboard",
+        "phone fields/tables",
+        "clear/cancel",
+        "populated print",
+        "lookup/save/draft states where present"
+      ],
+      "test": "tests/e2e/css-unification-printable-forms.spec.js"
+    },
+    {
+      "source": "pages/forms/box-label-form.html",
+      "family": "printable-forms",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/printable-forms.css",
+        "pages/forms/box-label-form.css"
+      ],
+      "baselineCssBytes": 33764,
+      "currentCssBytes": 92456,
+      "maxCssBytes": 96552,
+      "states": [
+        "blank",
+        "keyboard",
+        "phone fields/tables",
+        "clear/cancel",
+        "populated print",
+        "lookup/save/draft states where present"
+      ],
+      "test": "tests/e2e/css-unification-printable-forms.spec.js"
+    },
+    {
+      "source": "pages/forms/credit-application-form.html",
+      "family": "printable-forms",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/printable-forms.css",
+        "pages/forms/credit-application-form.css"
+      ],
+      "baselineCssBytes": 31598,
+      "currentCssBytes": 89453,
+      "maxCssBytes": 93549,
+      "states": [
+        "blank",
+        "keyboard",
+        "phone fields/tables",
+        "clear/cancel",
+        "populated print",
+        "lookup/save/draft states where present"
+      ],
+      "test": "tests/e2e/css-unification-printable-forms.spec.js"
+    },
+    {
+      "source": "pages/forms/credit-card-auth-form.html",
+      "family": "printable-forms",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/printable-forms.css",
+        "pages/forms/credit-card-auth-form.css"
+      ],
+      "baselineCssBytes": 34448,
+      "currentCssBytes": 94151,
+      "maxCssBytes": 98247,
+      "states": [
+        "blank",
+        "keyboard",
+        "phone fields/tables",
+        "clear/cancel",
+        "populated print",
+        "lookup/save/draft states where present"
+      ],
+      "test": "tests/e2e/css-unification-printable-forms.spec.js"
+    },
+    {
+      "source": "pages/forms/customer-onboarding-form.html",
+      "family": "printable-forms",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/printable-forms.css",
+        "pages/forms/customer-onboarding-form.css"
+      ],
+      "baselineCssBytes": 31436,
+      "currentCssBytes": 89138,
+      "maxCssBytes": 93234,
+      "states": [
+        "blank",
+        "keyboard",
+        "phone fields/tables",
+        "clear/cancel",
+        "populated print",
+        "lookup/save/draft states where present"
+      ],
+      "test": "tests/e2e/css-unification-printable-forms.spec.js"
+    },
+    {
+      "source": "pages/forms/garment-drop-off-form.html",
+      "family": "printable-forms",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/printable-forms.css",
+        "pages/forms/garment-drop-off-form.css"
+      ],
+      "baselineCssBytes": 31612,
+      "currentCssBytes": 89131,
+      "maxCssBytes": 93227,
+      "states": [
+        "blank",
+        "keyboard",
+        "phone fields/tables",
+        "clear/cancel",
+        "populated print",
+        "lookup/save/draft states where present"
+      ],
+      "test": "tests/e2e/css-unification-printable-forms.spec.js"
+    },
+    {
+      "source": "pages/forms/injury-report-form.html",
+      "family": "printable-forms",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/printable-forms.css",
+        "pages/forms/injury-report-form.css"
+      ],
+      "baselineCssBytes": 31506,
+      "currentCssBytes": 89025,
+      "maxCssBytes": 93121,
+      "states": [
+        "blank",
+        "keyboard",
+        "phone fields/tables",
+        "clear/cancel",
+        "populated print",
+        "lookup/save/draft states where present"
+      ],
+      "test": "tests/e2e/css-unification-printable-forms.spec.js"
+    },
+    {
+      "source": "pages/forms/maintenance-log-form.html",
+      "family": "printable-forms",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/printable-forms.css",
+        "pages/forms/maintenance-log-form.css"
+      ],
+      "baselineCssBytes": 32625,
+      "currentCssBytes": 90603,
+      "maxCssBytes": 94699,
+      "states": [
+        "blank",
+        "keyboard",
+        "phone fields/tables",
+        "clear/cancel",
+        "populated print",
+        "lookup/save/draft states where present"
+      ],
+      "test": "tests/e2e/css-unification-printable-forms.spec.js"
+    },
+    {
+      "source": "pages/forms/name-personalization-form.html",
+      "family": "printable-forms",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/printable-forms.css",
+        "pages/forms/name-personalization-form.css"
+      ],
+      "baselineCssBytes": 33006,
+      "currentCssBytes": 91435,
+      "maxCssBytes": 95531,
+      "states": [
+        "blank",
+        "keyboard",
+        "phone fields/tables",
+        "clear/cancel",
+        "populated print",
+        "lookup/save/draft states where present"
+      ],
+      "test": "tests/e2e/css-unification-printable-forms.spec.js"
+    },
+    {
+      "source": "pages/forms/pto-request-form.html",
+      "family": "printable-forms",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/printable-forms.css",
+        "pages/forms/pto-request-form.css"
+      ],
+      "baselineCssBytes": 31804,
+      "currentCssBytes": 89557,
+      "maxCssBytes": 93653,
+      "states": [
+        "blank",
+        "keyboard",
+        "phone fields/tables",
+        "clear/cancel",
+        "populated print",
+        "lookup/save/draft states where present"
+      ],
+      "test": "tests/e2e/css-unification-printable-forms.spec.js"
+    },
+    {
+      "source": "pages/forms/qc-checklist-form.html",
+      "family": "printable-forms",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/printable-forms.css",
+        "pages/forms/qc-checklist-form.css"
+      ],
+      "baselineCssBytes": 32417,
+      "currentCssBytes": 90753,
+      "maxCssBytes": 94849,
+      "states": [
+        "blank",
+        "keyboard",
+        "phone fields/tables",
+        "clear/cancel",
+        "populated print",
+        "lookup/save/draft states where present"
+      ],
+      "test": "tests/e2e/css-unification-printable-forms.spec.js"
+    },
+    {
+      "source": "pages/forms/sample-checkout-form.html",
+      "family": "printable-forms",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/printable-forms.css",
+        "pages/forms/sample-checkout-form.css"
+      ],
+      "baselineCssBytes": 33360,
+      "currentCssBytes": 92230,
+      "maxCssBytes": 96326,
+      "states": [
+        "blank",
+        "keyboard",
+        "phone fields/tables",
+        "clear/cancel",
+        "populated print",
+        "lookup/save/draft states where present"
+      ],
+      "test": "tests/e2e/css-unification-printable-forms.spec.js"
+    },
+    {
+      "source": "pages/forms/spoilage-report-form.html",
+      "family": "printable-forms",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/printable-forms.css",
+        "pages/forms/spoilage-report-form.css"
+      ],
+      "baselineCssBytes": 32783,
+      "currentCssBytes": 91204,
+      "maxCssBytes": 95300,
+      "states": [
+        "blank",
+        "keyboard",
+        "phone fields/tables",
+        "clear/cancel",
+        "populated print",
+        "lookup/save/draft states where present"
+      ],
+      "test": "tests/e2e/css-unification-printable-forms.spec.js"
+    },
+    {
+      "source": "pages/forms/tax-exempt-cert-form.html",
+      "family": "printable-forms",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/printable-forms.css",
+        "pages/forms/tax-exempt-cert-form.css"
+      ],
+      "baselineCssBytes": 31445,
+      "currentCssBytes": 89096,
+      "maxCssBytes": 93192,
+      "states": [
+        "blank",
+        "keyboard",
+        "phone fields/tables",
+        "clear/cancel",
+        "populated print",
+        "lookup/save/draft states where present"
+      ],
+      "test": "tests/e2e/css-unification-printable-forms.spec.js"
+    },
+    {
+      "source": "pages/forms/team-roster-form.html",
+      "family": "printable-forms",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/printable-forms.css",
+        "pages/forms/team-roster-form.css"
+      ],
+      "baselineCssBytes": 31834,
+      "currentCssBytes": 89791,
+      "maxCssBytes": 93887,
+      "states": [
+        "blank",
+        "keyboard",
+        "phone fields/tables",
+        "clear/cancel",
+        "populated print",
+        "lookup/save/draft states where present"
+      ],
+      "test": "tests/e2e/css-unification-printable-forms.spec.js"
+    },
+    {
+      "source": "pages/forms/webstore-request-form.html",
+      "family": "printable-forms",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/printable-forms.css",
+        "pages/forms/webstore-request-form.css"
+      ],
+      "baselineCssBytes": 31568,
+      "currentCssBytes": 89372,
+      "maxCssBytes": 93468,
+      "states": [
+        "blank",
+        "keyboard",
+        "phone fields/tables",
+        "clear/cancel",
+        "populated print",
+        "lookup/save/draft states where present"
+      ],
+      "test": "tests/e2e/css-unification-printable-forms.spec.js"
     }
   ],
   "billingContentSha256": "d85f8530e03a1863d1b8bb2ebe97ba332d5c9e3411887d1eb2d02dcdb14c0863",
@@ -979,6 +1353,93 @@
       "source": "training/google-review-guide.html",
       "sha256": "fd22714d635fc46dceef137a60a4e2b0f23f0e5c3723f31344ab268f24aeebac",
       "fields": []
+    }
+  ],
+  "printableFormsContent": [
+    {
+      "source": "pages/forms/ae-order-intake-form.html",
+      "sha256": "302bd92f87568c3c29fec4ae620741e372d6012d3a61b3fbefc1b4890033977d",
+      "blankPrintPages": 2
+    },
+    {
+      "source": "pages/forms/artwork-request-form.html",
+      "sha256": "77f275795312ad350b3f89e30cd3e60075a68b36979a37186468a8c1b6a1d48d",
+      "blankPrintPages": 2
+    },
+    {
+      "source": "pages/forms/box-label-form.html",
+      "sha256": "225b2d1c7efe449876f341f2bf1c8c76df0ad8c559818acc84eb6a6a8253df0e",
+      "blankPrintPages": 1
+    },
+    {
+      "source": "pages/forms/credit-application-form.html",
+      "sha256": "6090288ad342f4d10b8c7dd2cbab43ed0599900d8bd6f27ee5a91dc750ca7e8a",
+      "blankPrintPages": 2
+    },
+    {
+      "source": "pages/forms/credit-card-auth-form.html",
+      "sha256": "378cba47917e6262a8ad91db54915f3c8b6afcfad4aa7dcbe964643c700c7923",
+      "blankPrintPages": 1
+    },
+    {
+      "source": "pages/forms/customer-onboarding-form.html",
+      "sha256": "e85d25f308f8de0e056a83a1d6c319832cfb47014bcf72a6876b79a624c00997",
+      "blankPrintPages": 2
+    },
+    {
+      "source": "pages/forms/garment-drop-off-form.html",
+      "sha256": "3fc159d64e6f5851d4b6238acb634a0fac639c2e9204c202f42d2cfeb7fa2c57",
+      "blankPrintPages": 2
+    },
+    {
+      "source": "pages/forms/injury-report-form.html",
+      "sha256": "d194ff6934a01b30c17338eeda3cb6b826601b1460d6f24608235654d8bbc022",
+      "blankPrintPages": 2
+    },
+    {
+      "source": "pages/forms/maintenance-log-form.html",
+      "sha256": "9ddc7aede82d53aada0e334033fc87160db5ff42614e3b9ab917731b407a6dba",
+      "blankPrintPages": 2
+    },
+    {
+      "source": "pages/forms/name-personalization-form.html",
+      "sha256": "37e632d03f8a161a4280141115c1f9cb88f4c411cac890213c850bb5cdd26af5",
+      "blankPrintPages": 2
+    },
+    {
+      "source": "pages/forms/pto-request-form.html",
+      "sha256": "d48deb3bda8198237c3764c97de29e549b658cee142709a647ae2e85b3e9ebc0",
+      "blankPrintPages": 1
+    },
+    {
+      "source": "pages/forms/qc-checklist-form.html",
+      "sha256": "9851a1bc28dc3b28270c84239794cb110655b453f6ad1b051cee9b40d9c936c8",
+      "blankPrintPages": 2
+    },
+    {
+      "source": "pages/forms/sample-checkout-form.html",
+      "sha256": "ed5dcccf80df6d2f2ff09a81ae239dea94b0cda6587417fae4a8ac94df29042b",
+      "blankPrintPages": 2
+    },
+    {
+      "source": "pages/forms/spoilage-report-form.html",
+      "sha256": "edd6aa2f0509c62385c5c93a724dfaed9d43fe611319f2615a979e369dd8f5dc",
+      "blankPrintPages": 2
+    },
+    {
+      "source": "pages/forms/tax-exempt-cert-form.html",
+      "sha256": "2fb8372a1a83a5b4660f77d71605c0821abffa1f728b2f3dd9ff9ed156030f14",
+      "blankPrintPages": 1
+    },
+    {
+      "source": "pages/forms/team-roster-form.html",
+      "sha256": "c3664643c328be731064a7c75f77040a68752c775d98fcc04b042f4664027619",
+      "blankPrintPages": 2
+    },
+    {
+      "source": "pages/forms/webstore-request-form.html",
+      "sha256": "75dc14b98c9f5fd7cd1643fa16738a6d3a4d4cdd6227e782ab0365e71fc42ac5",
+      "blankPrintPages": 2
     }
   ]
 }

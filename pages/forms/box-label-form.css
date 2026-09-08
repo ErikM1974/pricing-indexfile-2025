@@ -1,4 +1,4 @@
-/* ==========================================================================
+@layer components.pages {/* ==========================================================================
    box-label-form.css — pages/forms/box-label-form.html
 
    8.5×11 BOX LABEL taped to the front of a shirt box — factory staff read it
@@ -10,22 +10,22 @@
     @page { size: letter portrait; margin: 0.35in; }
 }
 
-.label-sheet {
+:where([data-ui="unified"][data-form="printable"]) .label-sheet {
     border: 3px solid var(--form-green);
     border-radius: 14px;
 }
 
-.label-row {
+:where([data-ui="unified"][data-form="printable"]) .label-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 18px;
 }
 
-.label-row--design { grid-template-columns: 0.6fr 1.4fr; }
+:where([data-ui="unified"][data-form="printable"]) .label-row--design { grid-template-columns: 0.6fr 1.4fr; }
 
-.label-field { margin-top: 14px; }
+:where([data-ui="unified"][data-form="printable"]) .label-field { margin-top: 14px; }
 
-.label-field label {
+:where([data-ui="unified"][data-form="printable"]) .label-field label {
     display: block;
     font-size: 1.15rem;
     font-weight: 800;
@@ -35,7 +35,7 @@
     margin-bottom: 6px;
 }
 
-.label-field input {
+:where([data-ui="unified"][data-form="printable"]) .label-field input {
     width: 100%;
     border: 2px solid var(--ink);
     border-radius: 4px;
@@ -47,63 +47,64 @@
     height: 68px;
 }
 
-.label-field input:focus { outline: 3px solid var(--color-brand); background: var(--brand-50); }
+:where([data-ui="unified"][data-form="printable"]) .label-field input:focus { outline: 3px solid var(--color-brand); background: var(--brand-50); }
 
 /* Drop-dead date pops in orange like the PDF */
-.label-field--dropdead label { color: var(--amber-700); }
-.label-field--dropdead input { border-color: var(--amber-700); }
+:where([data-ui="unified"][data-form="printable"]) .label-field--dropdead label { color: var(--amber-700); }
+:where([data-ui="unified"][data-form="printable"]) .label-field--dropdead input { border-color: var(--amber-700); }
 
 /* Customer is the biggest read-from-across-the-room field */
-.label-field--customer input {
+:where([data-ui="unified"][data-form="printable"]) .label-field--customer input {
     font-size: 2.6rem;
     font-weight: 800;
     height: 88px;
 }
 
-.label-divider {
+:where([data-ui="unified"][data-form="printable"]) .label-divider {
     border: none;
     border-top: 3px solid var(--form-green);
     margin: 20px 0 4px;
 }
 
 /* Style grid — bigger than the intake forms' tables */
-.label-table { margin-top: 22px; }
+:where([data-ui="unified"][data-form="printable"]) .label-table { margin-top: 22px; }
 
-.label-table th {
+:where([data-ui="unified"][data-form="printable"]) .label-table th {
     background: var(--brand-100);
     color: var(--form-green-dark);
     font-size: 0.9rem;
     padding: 8px 4px;
 }
 
-.label-table td input {
+:where([data-ui="unified"][data-form="printable"]) .label-table td input {
     font-size: 1.15rem;
     font-weight: 600;
     padding: 12px 6px;
 }
 
-.col-style { width: 10%; }
-.col-desc  { width: 26%; }
-.col-color { width: 12%; }
-.col-size  { width: 5.8%; }
-.col-other { width: 8.5%; }
-.col-total { width: 8.7%; }
+:where([data-ui="unified"][data-form="printable"]) .col-style { width: 10%; }
+:where([data-ui="unified"][data-form="printable"]) .col-desc  { width: 26%; }
+:where([data-ui="unified"][data-form="printable"]) .col-color { width: 12%; }
+:where([data-ui="unified"][data-form="printable"]) .col-size  { width: 5.8%; }
+:where([data-ui="unified"][data-form="printable"]) .col-other { width: 8.5%; }
+:where([data-ui="unified"][data-form="printable"]) .col-total { width: 8.7%; }
 
-.label-logo {
+:where([data-ui="unified"][data-form="printable"]) .label-logo {
     margin-top: 26px;
     text-align: center;
 }
 
-.label-logo img { height: 58px; }
+:where([data-ui="unified"][data-form="printable"]) .label-logo img { height: 58px; }
 
 @media (width <= 700px) {
-    .label-row, .label-row--design { grid-template-columns: 1fr; }
-    .label-field input { font-size: 1.3rem; height: 54px; }
-    .label-field--customer input { font-size: 1.6rem; height: 64px; }
+    :where([data-ui="unified"][data-form="printable"]) .label-row, :where([data-ui="unified"][data-form="printable"]) .label-row--design { grid-template-columns: 1fr; }
+    :where([data-ui="unified"][data-form="printable"]) .label-field input { font-size: 1.3rem; height: 54px; }
+    :where([data-ui="unified"][data-form="printable"]) .label-field--customer input { font-size: 1.6rem; height: 64px; }
 }
 
 @media print {
-    .label-sheet { border-width: 4px; }
-    .label-field input { background: var(--color-surface); }
-    .label-table th { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+    :where([data-ui="unified"][data-form="printable"]) .label-sheet { border-width: 4px; }
+    :where([data-ui="unified"][data-form="printable"]) .label-field input { background: var(--color-surface); }
+    :where([data-ui="unified"][data-form="printable"]) .label-table th { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+}
 }
