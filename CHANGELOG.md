@@ -1,3 +1,7 @@
+## v2026.09.07.25 (2026.09.07)
+
+- Harden staff contact and cart relays, shipping authentication, and payroll parsing
+
 ## v2026.09.07.24 (2026.09.07)
 
 - Deploy v2026.09.07.24: server split, third cut — site pages, staff API forwarders, customer magic-link login and CRM auth moved verbatim into routes/ (4 modules, 119 registrations; server.js 10,561 → 9,529 lines; registration order unchanged by the route-table lock; boot + request smoke on the moved routes)
