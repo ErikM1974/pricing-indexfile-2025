@@ -55,26 +55,9 @@ Storefront and sample webhooks continued after a rejected Payment Confirmed writ
 
 ### Dashboard/calculator CSS transforms (2026-09-07, archived): parse selectors and values separately, inspect semantic changes and verify generated asset versions. Full entry in LESSONS_LEARNED_ARCHIVE.md.
 
-## 2026-09-07 — Pages batch: a re-run tokenizer turned its own variables into `--x: var(--x)`
+## CSS tokenizers must recognize their own output (2026-09-07, archived)
 
-**Problem.** Two sheets had gradient values wrapped onto continuation lines, which the tokenizer's
-"a `:` must precede the hex on its line" guard skips. Joining the lines and re-running the tokenizer on
-those two sheets rewrote the page-theme `:root` block it had written on the first pass: every
-`--customer-portal-yellow: #e6bb4a` became `--customer-portal-yellow: var(--customer-portal-yellow)`,
-a new block re-declared the hexes above it, and the last declaration wins — a self-reference, which a
-browser treats as invalid at computed-value time. Three pages (customer portal, customer product, garment
-designer) would have lost every one-off colour. The lint caught it as `declaration-block-no-duplicate-custom-properties`;
-the screenshot diff would have too.
-**Root cause.** The tokenizer skipped comments but not the `stylelint-disable color-no-hex … enable`
-region it writes, and it named variables fresh on every run instead of reusing the ones already declared.
-**Solution.** The disable/enable region is now skipped like a comment, existing `--<prefix>-*` declarations
-are read first and reused by value, and new names avoid the existing ones; a dry run over a migrated sheet
-reports `0 page vars`. Continuation lines are joined onto their declaration line (`join-continuations.py`)
-before tokenizing — a declaration can span three lines, so join until the line carries the `:`.
-**Prevention.** 🔑 Any script that rewrites a file it may run over again must recognise its own output. 🔑
-Run the tokenizer with `--dry` on an already-migrated sheet before a re-run: the expected report is
-`exact 0 · near 0 · far 0 → 0 page vars`. 🔑 After a re-run, grep `^\s*(--[a-z0-9-]+):\s*var\(\1\)` — a
-self-referencing custom property is silent in the browser and blanks every use of the variable.
+Never rewrite a variable declaration into a self-reference; dry-run reruns and check cyclic aliases. Full resolved migration record is in LESSONS_LEARNED_ARCHIVE.md.
 
 ## 2026-09-07 — Quote builders family: retiring a generated sheet by renaming, a near-mapped ink, and curl vs the office firewall
 
@@ -252,3 +235,8 @@ Native Node22.23 runs Puppeteer25; invoke its capture CLI outside Jest, and repo
 - Problem/root cause: transfer/Supacolor routers were open; separate notes, image downloads, vision extraction and two scheduler jobs used different call paths. The app's smaller global parser would also reject previously valid screenshots.
 - Solution: staff-session relays keep the credential server-side, authenticate before the 10 MB screenshot parser, allowlist paths/queries and preserve binary downloads. Vendor sessions retain ownership checks; public customer mockups do not request staff transfers.
 - Prevention: test actual mounts/page gates, allowed and denied identities, large/malformed requests, vendor notes and customer rendering. Deploy browser relays first, then backend gates and authenticated cron callers; never infer identity from Origin.
+
+## Art-family themes and dialogs need runtime state coverage (2026-09-08)
+- Problem/root cause: department-scoped layout vanished in customer mode, guessed palette names had no definition, tablists mixed navigation links with tabs, and selection/toast opacity reduced text contrast. Icon-only controls also depended on an unloaded font.
+- Solution: stable page scope, actual shared aliases, separate tablists, opaque text, native named keyboard controls and a visible close glyph. Customer rush indicators are read-only; print keeps its existing staff-only job sheet.
+- Prevention: resolve tokens per real style graph, inspect screenshots as well as axe, and exercise intake/error/dialog/print states at four widths with writes mocked. Keep exact visibility exceptions rather than deleting important flags by script.
