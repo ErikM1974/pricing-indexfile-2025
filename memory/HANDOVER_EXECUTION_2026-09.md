@@ -26,9 +26,9 @@ Source: Erik's Claude handover (2026-09-08). Work on develop; one server editor;
 - Node engines and all four CI jobs now select 22.x.
 - Resolved Express 4.22.2, Axios 1.20.0, body-parser 1.20.6, path-to-regexp 0.1.13 and qs 6.16.0.
 - Compatible updates reduce audit from 41 (17 high) to 25 (6 high / 19 moderate). Remaining chains: Puppeteer/extract-zip, pptxgenjs/image-size, Sentry/OpenTelemetry; major migrations are separate review items.
-- CRM_API_SECRET added to the specified GitHub repository after Erik explicitly authorized it. CI execution proof pending next push.
+- CRM_API_SECRET added to the specified GitHub repository after Erik explicitly authorized it. CI live-engine execution verified in runs 34176404389 and 34177871062.
 
-- Local verification passed: route lock456, undefined names0, bootHTTP200, build, lint99 baseline warnings/0errors, CSS283files, typecheck, unit4695passed/4skips, DOM88, axe4, fixture parity84, browser15passed/3opt-in screenshot skips (all five surface parity tests included). Release target v2026.09.07.27; CI and Heroku verification pending.
+- Local verification passed: route lock456, undefined names0, bootHTTP200, build, lint99 baseline warnings/0errors, CSS283files, typecheck, unit4695passed/4skips, DOM88, axe4, fixture parity84, browser15passed/3opt-in screenshot skips (all five surface parity tests included). Shipped as v2026.09.07.27; CI and Heroku verification recorded below.
 
 - First secret-enabled CI run exercised all live specs and exposed the proxy's existing100requests/minute pricing limit (CAP429; one EMB retry). Pace live preview scenarios and wait for the real60second reset on429; direct tier reads use the same bounded retry. No production limit or pricing assertion changes.
 
@@ -40,3 +40,6 @@ Source: Erik's Claude handover (2026-09-08). Work on develop; one server editor;
 - Rate-limit verification: 191 unit suites / 4,698 passed, DOM88, accessibility4, fixture parity84, browser15 passed / 3 optional screenshot skips, all five surface parity specs, route456 unchanged, undefined names0 and boot200. A legacy image-quota spelling lock now evaluates limiter options instead.
 
 - Stripe pre-upgrade: verified installed SDK19.3 uses API2025-10-29.clover; pinned that contract in lib/stripe-client.js for all seven constructors. Five tests passed BEFORE upgrading: checkout header/encoding/retrieve/expire, tampered signature rejection, signed samples dispatch, lookup503 retry, deposit duplicate acknowledgment.
+
+- Compatibility review for remaining PRs: Puppeteer25 works with native Node22.23.2 and Chrome152, but Jest must invoke its capture script in a child process. ESLint10 adds 66 errors in 47 files; retain ESLint9 during this dependency release. Direct jsdom30 fails Jest module loading on Node22; Jest30.5/environment30.5 with its nested jsdom26 and jest-axe11 passed the four static accessibility checks. TypeScript7 needs four narrow JSDoc/mixin-type corrections.
+- Stripe22 verification: 192 unit suites / 4,703 passed (including all five payment contract checks), DOM88, accessibility4, fixture parity84, browser15 passed / 3 optional screenshot skips with all five surface parity specs. Route456 unchanged, undefined names0, boot200. CSV and limiter CI runs34177227765 and34177871062 passed.
