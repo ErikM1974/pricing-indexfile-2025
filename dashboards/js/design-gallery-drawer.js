@@ -26,6 +26,7 @@
     var cbs = { onNavigate: null, onCustomerClick: null };
     var state = { dn: 0, list: [], idx: -1, images: [], active: 0, lastFocus: null, token: 0 };
     var wired = false;
+    var lightboxReturnFocus = null;
 
     var ART_SLOTS = ['Box_File_Mockup', 'BoxFileLink', 'Company_Mockup', 'Mockup_4', 'Mockup_5', 'Mockup_6'];
     var RUTH_SLOTS = ['Box_Mockup_1', 'Box_Mockup_2', 'Box_Mockup_3', 'Box_Mockup_4', 'Box_Mockup_5', 'Box_Mockup_6'];
@@ -112,7 +113,7 @@
         }
         var img = state.images[state.active] || state.images[0];
         var hero = els.body.querySelector('[data-hero]');
-        hero.innerHTML = '<img src="' + DG.esc(resolveBoxUrl(img.url)) + '" alt="' + DG.esc(img.label + ' for design ' + state.dn) + '" data-hero-img>';
+        hero.innerHTML = '<button type="button" class="dg-hero-button" aria-label="Zoom design image"><img src="' + DG.esc(resolveBoxUrl(img.url)) + '" alt="' + DG.esc(img.label + ' for design ' + state.dn) + '" data-hero-img></button>';
 
         var strip = '';
         for (var i = 0; i < state.images.length; i++) {
@@ -328,11 +329,19 @@
 
     function close() {
         if (!els.drawer || els.drawer.hidden) return;
+        closeLightbox();
         state.token++;                       // orphan any in-flight hydration
         els.drawer.hidden = true;
         els.overlay.hidden = true;
         document.body.classList.remove('dg-drawer-open');
-        if (state.lastFocus && state.lastFocus.focus) state.lastFocus.focus();
+        if (state.lastFocus && state.lastFocus.isConnected) state.lastFocus.focus();
+        else {
+            if (DG.grid && DG.grid.focusDn) DG.grid.focusDn(state.dn);
+            if (!document.activeElement || els.drawer.contains(document.activeElement)) {
+                var search = document.getElementById('dg-omnibox');
+                if (search) search.focus();
+            }
+        }
         state.lastFocus = null;
     }
 
@@ -353,6 +362,7 @@
         var displayUrl = resolveBoxUrl(img.url);
         els.lightboxImg.src = displayUrl;
         els.lightboxCap.textContent = img.label + ' · design ' + state.dn;
+        lightboxReturnFocus = document.activeElement;
         els.lightbox.hidden = false;
         // Upgrade to the large Box render only once it has actually decoded —
         // a failed upgrade must never blank a working image.
@@ -371,6 +381,10 @@
         if (!els.lightbox || els.lightbox.hidden) return;
         els.lightbox.hidden = true;
         els.lightboxImg.removeAttribute('src');
+        var target = lightboxReturnFocus && lightboxReturnFocus.isConnected && lightboxReturnFocus.getClientRects().length
+            ? lightboxReturnFocus : els.body.querySelector('[data-close]');
+        if (target) target.focus();
+        lightboxReturnFocus = null;
     }
 
     function lightboxOpen() { return !!(els.lightbox && !els.lightbox.hidden); }
@@ -427,6 +441,7 @@
     function onKeydown(e) {
         if (lightboxOpen()) {
             if (e.key === 'Escape') { e.preventDefault(); closeLightbox(); }
+            else if (e.key === 'Tab') { e.preventDefault(); els.lightboxClose.focus(); }
             return;
         }
         if (!isOpen()) return;

@@ -7,15 +7,13 @@
     <title>Design Vault — Northwest Custom Apparel</title>
     <link rel="icon" type="image/png" href="/assets/favicon-32.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/shared_components/css/art-hub.css?v=2026.09.07.19">
-    <link rel="stylesheet" href="/shared_components/css/dash-shell.css?v=2026.09.07.10">
-    <link rel="stylesheet" href="/dashboards/css/design-gallery.css?v=2026.09.07.10">
-    <link rel="stylesheet" href="/shared_components/css/toast-notifications.css?v=2026.09.07.10">
+    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.08.3">
+    <link rel="stylesheet" href="/dashboards/css/design-gallery.css?v=2026.09.08.3">
 </head>
-<body class="dg-body">
+<body class="dg-body" data-ui="unified" data-surface="staff" data-department="brand" data-density="comfortable">
 
     <!-- Boot surface: first-visit index download / build-wait / hard error -->
     <div id="dg-boot" class="dg-boot" hidden>
@@ -92,7 +90,7 @@
                 <span id="dg-customer-banner" class="dg-customer-banner" hidden></span>
             </div>
             <div id="dg-deep-row" class="dg-deep-row" hidden></div>
-            <div id="dg-grid-viewport" class="dg-grid-viewport" tabindex="0" role="grid" aria-label="Design results">
+            <div id="dg-grid-viewport" class="dg-grid-viewport" tabindex="0" role="region" aria-label="Design results">
                 <div id="dg-sentinel-top" class="dg-sentinel" aria-hidden="true"></div>
                 <div id="dg-spacer-top" class="dg-spacer" aria-hidden="true"></div>
                 <div id="dg-grid" class="dg-grid"></div>
@@ -119,14 +117,14 @@
     <script src="/config/app.config.js?v=2026.09.03.11"></script>
     <script src="/shared_components/js/fetch-timeout.js?v=2026.08.05.1"></script>
     <script src="/shared_components/js/dash-page-helpers.js?v=2026.09.07.25"></script>
-    <script src="/shared_components/js/toast-notifications.js?v=2026.09.06.27"></script>
+    <script src="/shared_components/js/toast-notifications.js?v=2026.09.08.3"></script>
     <script src="/shared_components/js/design-thumbnail-service.js?v=2026.09.06.31"></script>
     <script src="/dashboards/js/design-gallery-search.js?v=2026.08.05.17"></script>
     <script src="/dashboards/js/design-gallery-store.js?v=2026.08.05.1"></script>
-    <script src="/dashboards/js/design-gallery-grid.js?v=2026.09.05.61"></script>
+    <script src="/dashboards/js/design-gallery-grid.js?v=2026.09.08.3"></script>
     <script src="/dashboards/js/design-gallery-rails.js?v=2026.09.05.61"></script>
     <script src="/shared_components/js/box-url.js?v=2026.08.05.23"></script>
-    <script src="/dashboards/js/design-gallery-drawer.js?v=2026.09.05.61"></script>
-    <script src="/dashboards/js/design-gallery.js?v=2026.09.05.61"></script>
+    <script src="/dashboards/js/design-gallery-drawer.js?v=2026.09.08.3"></script>
+    <script src="/dashboards/js/design-gallery.js?v=2026.09.08.3"></script>
 </body>
 </html>

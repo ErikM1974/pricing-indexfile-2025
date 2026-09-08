@@ -51,6 +51,7 @@ class ToastNotifications {
         if (!container) {
             container = document.createElement('div');
             container.id = 'nwca-toast-container';
+            container.classList.add('nwca-toast-container');
             document.body.appendChild(container);
         }
         container.appendChild(toast);

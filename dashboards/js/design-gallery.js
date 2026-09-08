@@ -389,6 +389,7 @@
     }
 
     function onKeydown(e) {
+        if (e.defaultPrevented) return;
         if ((e.key === '/' && !isTyping(e.target)) || ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k')) {
             e.preventDefault();
             els.omnibox.focus();

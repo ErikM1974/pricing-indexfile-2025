@@ -7,6 +7,8 @@
 
 | File | Purpose | Status |
 |------|---------|--------|
+| `/tests/e2e/css-unification-workspaces.spec.js` | Mocked Vault and Publisher states: windowed scrolling, overlays, saved drafts, failed uploads and publication gates (2026-09-08). | Active |
+| `/tests/unit/css-runtime-inventory.test.js` | Census guard for route aliases, dynamic CSS, generated documents, served archives and tracked HTML coverage (2026-09-08). | Active |
 | `/tests/unit/css-migration.test.js` | CSS ownership, byte budgets, token resolution and pre-migration billing content lock | Active |
 | `/tests/e2e/css-unification.spec.js` | Mocked queue, inquiry, component reference and billing states; never submits live business data | Active |
 

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "scope": "First four production pilots. Remaining families and runtime owners below are pending, not certified coverage.",
+  "scope": "Reviewed production migrations plus pending runtime owners. The runtime census reports remaining surfaces separately; presence in the census is not visual certification.",
   "viewports": [
     1440,
     768,
@@ -31,13 +31,13 @@
         "disabled-example"
       ],
       "test": "tests/e2e/css-unification.spec.js",
-      "maxCssBytes": 40960,
+      "maxCssBytes": 44718,
       "baseline": {
         "commit": "2ca502a1",
         "rawCssBytes": 34377,
         "localCssRequests": 4
       },
-      "measuredRawCssBytes": 37950
+      "measuredRawCssBytes": 42670
     },
     {
       "source": "dashboards/design-queue.html",
@@ -61,13 +61,13 @@
         "metrics-unavailable"
       ],
       "test": "tests/e2e/css-unification.spec.js",
-      "maxCssBytes": 47104,
+      "maxCssBytes": 51705,
       "baseline": {
         "commit": "2ca502a1",
         "rawCssBytes": 173704,
         "localCssRequests": 4
       },
-      "measuredRawCssBytes": 44482
+      "measuredRawCssBytes": 49657
     },
     {
       "source": "pages/art-billing-reference.html",
@@ -87,13 +87,13 @@
         "unchanged-content"
       ],
       "test": "tests/e2e/css-unification.spec.js",
-      "maxCssBytes": 40960,
+      "maxCssBytes": 45317,
       "baseline": {
         "commit": "2ca502a1",
         "rawCssBytes": 149859,
         "localCssRequests": 3
       },
-      "measuredRawCssBytes": 38545
+      "measuredRawCssBytes": 43269
     },
     {
       "source": "pages/webstore-inquiry.html",
@@ -117,13 +117,88 @@
         "success"
       ],
       "test": "tests/e2e/css-unification.spec.js",
-      "maxCssBytes": 36864,
+      "maxCssBytes": 41128,
       "baseline": {
         "commit": "2ca502a1",
         "rawCssBytes": 33091,
         "localCssRequests": 3
       },
-      "measuredRawCssBytes": 34443
+      "measuredRawCssBytes": 39080
+    },
+    {
+      "source": "dashboards/design-gallery.html",
+      "family": "staff-gallery",
+      "status": "migrated",
+      "route": "/dashboards/design-gallery.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "dashboards/css/design-gallery.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "boot-loading",
+        "boot-error-retry",
+        "search-empty",
+        "search-populated",
+        "virtualized-scroll",
+        "two-card-densities",
+        "drawer",
+        "lightbox",
+        "keyboard",
+        "mobile"
+      ],
+      "test": "tests/e2e/css-unification-workspaces.spec.js",
+      "maxCssBytes": 91794,
+      "measuredRawCssBytes": 89746,
+      "dynamicTokens": [
+        "--w",
+        "--h"
+      ],
+      "baseline": {
+        "commit": "fecb6982443103869b6d5ec73ccbf614cf5b51f4",
+        "rawCssBytes": 212483,
+        "localCssRequests": 5
+      }
+    },
+    {
+      "source": "dashboards/gear-publisher.html",
+      "family": "staff-editor",
+      "status": "migrated",
+      "route": "/dashboards/gear-publisher.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "dashboards/css/gear-publisher.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "identity",
+        "products",
+        "photo-missing",
+        "photo-uploaded",
+        "photo-failed",
+        "story",
+        "review-blocked",
+        "mock-publish",
+        "live",
+        "settings-error",
+        "mobile",
+        "saved-draft-resume",
+        "keyboard-file-picker",
+        "publication-receipt-reload"
+      ],
+      "test": "tests/e2e/css-unification-workspaces.spec.js",
+      "maxCssBytes": 46016,
+      "measuredRawCssBytes": 43968,
+      "dynamicTokens": [
+        "--w"
+      ],
+      "baseline": {
+        "commit": "fecb6982443103869b6d5ec73ccbf614cf5b51f4",
+        "rawCssBytes": 170944,
+        "localCssRequests": 4
+      }
     }
   ],
   "billingContentSha256": "d85f8530e03a1863d1b8bb2ebe97ba332d5c9e3411887d1eb2d02dcdb14c0863",

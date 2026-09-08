@@ -55,3 +55,11 @@ Every script runs from the repo root (`python scripts/css/<tool>.py …`) and wo
 ## Unified component migration
 
 `migration-manifest.json` records the four pilot consumers, exact local stylesheet dependencies, measured raw-source bytes, budgets and fixture states. It also lists known pending dynamic/generated/email/embed owners; it is explicitly not a completed all-route inventory. Tests: `tests/unit/css-migration.test.js` and `tests/e2e/css-unification.spec.js`. Increase budgets only for a reviewed change; do not reintroduce Art Hub/print-form dependencies to the migrated pages.
+
+## Runtime ownership census
+
+Run `node scripts/css/runtime-inventory.js --out <report.json>` from the repository root. It reads tracked HTML, literal GET route aliases, CSS imports, local script/module dependencies and candidate injected/generated style owners. It never executes the server or calls business services. The regression test verifies catalog/dashboard aliases, dynamically loaded garment styles, generated invoices and the explicitly served seasonal archive.
+
+The report distinguishes application pages, served archives, email artifacts, fixtures/templates and retired sources. It flags missing styles and parse errors. Variable-built routes, runtime class/style mutations and external embeds still require family review. Its page count is not browser-state coverage; only entries and fixtures in migration-manifest.json carry reviewed state coverage.
+
+Design Vault and Gear Publisher replace Art Hub and dash-shell imports with the scoped shared entry point. Vault also uses its shared toast implementation through a presentation class added by the existing toast service; other consumers retain their stylesheet until migrated. Dynamic sizing variables --h/--w are explicit per-page manifest exceptions, not theme variables.

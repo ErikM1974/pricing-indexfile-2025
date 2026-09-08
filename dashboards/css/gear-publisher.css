@@ -1,12 +1,8 @@
-/* gear-publisher.css — 253gear publisher wizard.
- *
- * Tokens only. Every colour, radius, shadow and space comes from
- * shared_components/css/art-hub.css; the shell classes come from dash-shell.css,
- * which already defaults --dash-theme to NW green, so no theme override is needed.
+/* gear-publisher: scoped workspace layout. Shared controls, tokens, hidden state and shell live in components.css. Business hooks and virtualization sizes remain page-owned.
  */
-
+@layer components.pages {/* Publisher-only arrangement and photo-binding workflow. Tokens and control styles are owned by tokens.css and components.css. */
 /* ── Step rail ─────────────────────────────────────────────────────────────── */
-.gp-rail {
+:where([data-ui="unified"]) .gp-rail {
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-2);
@@ -15,67 +11,32 @@
     padding: 0;
 }
 
-.gp-rail li {
+:where([data-ui="unified"]) .gp-rail li {
     padding: var(--space-2) var(--space-3);
     border-radius: var(--radius-pill);
-    background: var(--surface-inset);
-    color: var(--gray-500);
+    background: var(--gray-100);
+    color: var(--ui-muted);
     font-size: 13px;
     font-weight: 500;
 }
 
-.gp-rail li.is-current {
-    background: var(--dash-theme);
+:where([data-ui="unified"]) .gp-rail li.is-current {
+    background: var(--ui-accent);
     color: var(--color-on-brand);
 }
 
 /* ── Fields ────────────────────────────────────────────────────────────────── */
-.gp-step h2 { margin-top: 0; }
+:where([data-ui="unified"]) .gp-step h2 { margin-top: 0; }
 
-.gp-step h3 {
+:where([data-ui="unified"]) .gp-step h3 {
     margin: var(--space-5) 0 var(--space-2);
     font-size: 14px;
     color: var(--gray-700);
 }
 
-.gp-field { display: block; margin: var(--space-4) 0; }
+:where([data-ui="unified"]) .gp-field--sm { flex: 1 1 180px; margin: 0; }
 
-.gp-field > span {
-    display: block;
-    margin-bottom: var(--space-1);
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--gray-700);
-}
-
-.gp-field > span em {
-    font-style: normal;
-    font-weight: 500;
-    color: var(--state-danger);
-}
-
-.gp-field input[type="text"],
-.gp-field input[type="file"],
-.gp-field textarea {
-    width: 100%;
-    padding: var(--space-2) var(--space-3);
-    border: 1px solid var(--gray-200);
-    border-radius: var(--radius-md);
-    background: var(--surface-card);
-    font: inherit;
-    font-size: 14px;
-}
-
-.gp-field input[type="text"]:focus,
-.gp-field textarea:focus {
-    outline: none;
-    border-color: var(--dash-theme);
-    box-shadow: var(--shadow-glow-theme);
-}
-
-.gp-field--sm { flex: 1 1 180px; margin: 0; }
-
-.gp-row {
+:where([data-ui="unified"]) .gp-row {
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-3);
@@ -83,66 +44,52 @@
     margin: var(--space-4) 0;
 }
 
-.gp-muted { color: var(--gray-500); font-size: 13px; }
-.gp-inline-ok { color: var(--state-success); font-size: 13px; }
-.gp-inline-warn { color: var(--state-warning); font-size: 13px; }
-.gp-inline-fail { color: var(--state-danger); font-size: 13px; }
+:where([data-ui="unified"]) .gp-muted { color: var(--ui-muted); font-size: 13px; }
+:where([data-ui="unified"]) .gp-inline-ok { color: var(--color-brand-deep); font-size: 13px; }
+:where([data-ui="unified"]) .gp-inline-warn { color: var(--color-warning-ink); font-size: 13px; }
+:where([data-ui="unified"]) .gp-inline-fail { color: var(--color-danger-ink); font-size: 13px; }
 
 /* ── Checkbox grids ────────────────────────────────────────────────────────── */
-.gp-check-grid {
+:where([data-ui="unified"]) .gp-check-grid {
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-2);
 }
 
-.gp-check {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-1);
-    padding: var(--space-2) var(--space-3);
-    border: 1px solid var(--gray-200);
-    border-radius: var(--radius-md);
-    background: var(--surface-card);
-    font-size: 13px;
-    cursor: pointer;
-}
-
-.gp-check:hover { border-color: var(--dash-theme); }
-
-.gp-swatch-img {
+:where([data-ui="unified"]) .gp-swatch-img {
     width: 18px;
     height: 18px;
     border-radius: var(--radius-sm);
     object-fit: cover;
 }
 
-.gp-counter {
+:where([data-ui="unified"]) .gp-counter {
     margin-top: var(--space-4);
     padding: var(--space-3);
     border-radius: var(--radius-md);
-    background: var(--surface-inset);
+    background: var(--gray-100);
     font-size: 14px;
     font-weight: 600;
 }
 
 /* ── Photo grid — the binding surface ──────────────────────────────────────── */
-.gp-grid-summary {
+:where([data-ui="unified"]) .gp-grid-summary {
     padding: var(--space-3);
     border-radius: var(--radius-md);
     margin-bottom: var(--space-4);
     font-size: 14px;
 }
 
-.gp-grid-summary--ok { background: var(--state-success-bg); color: var(--state-success); }
-.gp-grid-summary--blocked { background: var(--state-warning-bg); color: var(--state-warning); }
+:where([data-ui="unified"]) .gp-grid-summary--ok { background: var(--color-success-bg); color: var(--color-brand-deep); }
+:where([data-ui="unified"]) .gp-grid-summary--blocked { background: var(--color-warning-bg); color: var(--color-warning-ink); }
 
-.gp-grid {
+:where([data-ui="unified"]) .gp-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: var(--space-3);
 }
 
-.gp-cell {
+:where([data-ui="unified"]) .gp-cell {
     position: relative;
     display: flex;
     flex-direction: column;
@@ -151,26 +98,26 @@
     padding: var(--space-3);
     border: 2px dashed var(--gray-200);
     border-radius: var(--radius-lg);
-    background: var(--surface-card);
+    background: var(--ui-surface);
     cursor: pointer;
-    transition: border-color var(--dur-base) var(--ease-out);
+    transition: border-color var(--motion-base) var(--ease-out);
 }
 
-.gp-cell:hover,
-.gp-cell:focus-visible { border-color: var(--dash-theme); outline: none; }
+:where([data-ui="unified"]) .gp-cell:hover,
+:where([data-ui="unified"]) .gp-cell:focus-visible { border-color: var(--ui-accent); outline: none; }
 
-.gp-cell--uploaded { border-style: solid; border-color: var(--state-success); }
-.gp-cell--failed { border-style: solid; border-color: var(--state-danger); background: var(--state-danger-bg); }
-.gp-cell--hero { box-shadow: var(--shadow-glow-theme); }
+:where([data-ui="unified"]) .gp-cell--uploaded { border-style: solid; border-color: var(--color-brand-deep); }
+:where([data-ui="unified"]) .gp-cell--failed { border-style: solid; border-color: var(--color-danger-ink); background: var(--color-danger-bg); }
+:where([data-ui="unified"]) .gp-cell--hero { box-shadow: 0 0 0 3px var(--ui-tint); }
 
-.gp-cell-label {
+:where([data-ui="unified"]) .gp-cell-label {
     font-size: 12px;
     font-weight: 700;
     color: var(--gray-700);
     letter-spacing: 0.02em;
 }
 
-.gp-cell-thumb {
+:where([data-ui="unified"]) .gp-cell-thumb {
     width: 100%;
     height: 120px;
     object-fit: contain;
@@ -178,84 +125,69 @@
     background: var(--gray-50);
 }
 
-.gp-cell-empty {
+:where([data-ui="unified"]) .gp-cell-empty {
     display: flex;
     flex: 1;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    color: var(--gray-400);
+    color: var(--ui-muted);
 }
 
-.gp-cell-plus { font-size: 28px; line-height: 1; }
-.gp-cell-hint { font-size: 12px; }
+:where([data-ui="unified"]) .gp-cell-plus { font-size: 28px; line-height: 1; }
+:where([data-ui="unified"]) .gp-cell-hint { font-size: 12px; }
 
-.gp-cell-actions { display: flex; gap: var(--space-1); }
+:where([data-ui="unified"]) .gp-cell-actions { display: flex; gap: var(--space-1); }
 
-.gp-cell-btn {
-    padding: var(--space-1) var(--space-2);
-    border: 1px solid var(--gray-200);
-    border-radius: var(--radius-sm);
-    background: var(--surface-card);
-    font: inherit;
-    font-size: 11px;
-    cursor: pointer;
-}
-
-.gp-cell-progress {
+:where([data-ui="unified"]) .gp-cell-progress {
     height: 6px;
     border-radius: var(--radius-pill);
     background: var(--gray-100);
     overflow: hidden;
 }
 
-.gp-cell-progress-bar { height: 100%; width: var(--w, 0%); background: var(--dash-theme); }
-.gp-cell-status { font-size: 11px; color: var(--gray-500); }
+:where([data-ui="unified"]) .gp-cell-progress-bar { height: 100%; width: var(--w, 0%); background: var(--ui-accent); }
+:where([data-ui="unified"]) .gp-cell-status { font-size: var(--font-size-sm); color: var(--ui-muted); }
 
 /* The real reason, always — never "something went wrong". */
-.gp-cell-error { font-size: 11px; color: var(--state-danger); line-height: 1.4; }
+:where([data-ui="unified"]) .gp-cell-error { font-size: var(--font-size-sm); color: var(--color-danger-ink); line-height: 1.4; }
 
-.gp-cell-hero { font-size: 11px; color: var(--gray-500); }
+:where([data-ui="unified"]) .gp-cell-hero { font-size: var(--font-size-sm); color: var(--ui-muted); }
 
-.gp-binding { margin-top: var(--space-4); }
-.gp-binding-table { width: 100%; border-collapse: collapse; font-size: 12px; }
-
-.gp-binding-table th,
-.gp-binding-table td { padding: var(--space-1) var(--space-2); border-bottom: 1px solid var(--gray-100); text-align: left; }
-.gp-row-unbound { background: var(--state-danger-bg); color: var(--state-danger); }
+:where([data-ui="unified"]) .gp-binding { margin-top: var(--space-4); }
+:where([data-ui="unified"]) .gp-row-unbound { background: var(--color-danger-bg); color: var(--color-danger-ink); }
 
 /* ── Job panel + audit ─────────────────────────────────────────────────────── */
-.gp-job {
+:where([data-ui="unified"]) .gp-job {
     margin-top: var(--space-5);
     padding: var(--space-4);
     border-radius: var(--radius-lg);
-    background: var(--surface-inset);
+    background: var(--gray-100);
 }
 
-.gp-steps, .gp-errors, .gp-audit { margin: var(--space-2) 0; padding-left: var(--space-4); font-size: 13px; }
-.gp-step-done { color: var(--state-success); }
-.gp-step-current { color: var(--gray-700); font-weight: 600; }
-.gp-audit { list-style: none; padding-left: 0; }
-.gp-audit li { padding: var(--space-1) 0; border-bottom: 1px solid var(--gray-100); }
+:where([data-ui="unified"]) .gp-steps, :where([data-ui="unified"]) .gp-errors, :where([data-ui="unified"]) .gp-audit { margin: var(--space-2) 0; padding-left: var(--space-4); font-size: 13px; }
+:where([data-ui="unified"]) .gp-step-done { color: var(--color-brand-deep); }
+:where([data-ui="unified"]) .gp-step-current { color: var(--gray-700); font-weight: 600; }
+:where([data-ui="unified"]) .gp-audit { list-style: none; padding-left: 0; }
+:where([data-ui="unified"]) .gp-audit li { padding: var(--space-1) 0; border-bottom: 1px solid var(--gray-100); }
 
 /* ── Blockers + nav ────────────────────────────────────────────────────────── */
-.gp-blockers { margin: var(--space-4) 0; font-size: 13px; color: var(--state-warning); }
-.gp-blockers ul { margin: 0; padding-left: var(--space-4); }
+:where([data-ui="unified"]) .gp-blockers { margin: var(--space-4) 0; font-size: 13px; color: var(--color-warning-ink); }
+:where([data-ui="unified"]) .gp-blockers ul { margin: 0; padding-left: var(--space-4); }
 
-.gp-nav {
+:where([data-ui="unified"]) .gp-nav {
     display: flex;
     gap: var(--space-3);
     justify-content: flex-end;
-    margin: var(--space-5) 0 var(--space-8);
+    margin: var(--space-5) 0 var(--space-6);
 }
 
-.gp-empty { padding: var(--space-6); text-align: center; color: var(--gray-500); }
+:where([data-ui="unified"]) .gp-empty { padding: var(--space-6); text-align: center; color: var(--ui-muted); }
 
 @media (width <= 640px) {
-    .gp-grid { grid-template-columns: 1fr; }
-    .gp-rail li { font-size: 12px; padding: var(--space-1) var(--space-2); }
+    :where([data-ui="unified"]) .gp-grid { grid-template-columns: 1fr; }
+    :where([data-ui="unified"]) .gp-rail li { font-size: 12px; padding: var(--space-1) var(--space-2); }
 }
 
 /* 2026-09-05 review */
-/* stylelint-disable-next-line declaration-no-important -- the hidden attribute must beat any display rule */
-[hidden] { display: none !important; }
+}

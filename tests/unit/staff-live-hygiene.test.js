@@ -89,9 +89,15 @@ describe('injected styles moved to stylesheets', () => {
         expect(exists(MOVED_STYLES[js])).toBe(true);
         expect(read(MOVED_STYLES[js]).length).toBeGreaterThan(50);
     });
-    test('the four direct toast-notifications consumers link its stylesheet', () => {
+    test('toast consumers link the stylesheet that owns their presentation', () => {
         for (const p of ['dashboards/design-gallery.html', 'pages/art-request-detail.html', 'pages/invoice.html', 'pages/quote-view.html']) {
-            expect(read(p)).toContain('/shared_components/css/toast-notifications.css?v=');
+            if (read(p).includes('data-ui="unified"')) {
+                expect(read(p)).toContain('/shared_components/css/components.css?v=');
+                expect(read('shared_components/css/components.css')).toContain('.nwca-toast-container');
+                expect(read('shared_components/js/toast-notifications.js')).toContain("classList.add('nwca-toast-container')");
+            } else {
+                expect(read(p)).toContain('/shared_components/css/toast-notifications.css?v=');
+            }
         }
     });
     test('data-entry-guide has an h1', () => {
