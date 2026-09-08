@@ -8,15 +8,13 @@
     <link rel="icon" href="/favicon.png" type="image/png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
-    <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.07.20">
-    <link rel="stylesheet" href="/shared_components/css/art-hub.css?v=2026.09.07.19">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap">
+    <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
+    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.08.2">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Inline theme :root must come AFTER any imports of mockup-ruth.css; here we
-         have no mockup-ruth.css so order is moot — kept for parity with the dashboards. -->
-    <link rel="stylesheet" href="/pages/css/art-billing-reference.css?v=2026.09.07.14">
+    <link rel="stylesheet" href="/pages/css/art-billing-reference.css?v=2026.09.08.2">
 </head>
-<body>
+<body data-ui="unified" data-surface="staff" data-department="brand" data-density="comfortable">
     <div class="minimal-header">
         <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
              alt="Northwest Custom Apparel" class="logo">
@@ -37,20 +35,20 @@
         </p>
 
         <!-- ShopWorks Billing Codes Section -->
-        <div class="billing-codes-section">
+        <div class="billing-codes-section card">
             <div class="billing-codes-header">
                 <div class="billing-codes-icon">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
                         <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
                     </svg>
                 </div>
-                <h3 class="billing-codes-title">ShopWorks Billing Codes - Quick Reference</h3>
+                <h2 class="billing-codes-title">ShopWorks Billing Codes - Quick Reference</h2>
             </div>
 
             <div class="billing-codes-grid">
                 <!-- GRT-50 Card -->
-                <div class="billing-code-card">
+                <div class="billing-code-card card">
                     <div class="billing-code-header billing-code-header--green">
                         <div>
                             <div class="billing-code-pn">GRT-50</div>
@@ -63,7 +61,7 @@
                         <div class="billing-code-body-desc">
                             Includes a mockup of your logo on the ordered products for preview, and a print readiness check for clarity and sizing.
                         </div>
-                        <div class="callout callout--blue">
+                        <div class="callout callout--blue alert">
                             <div class="callout-label callout-label--blue">When to Use:</div>
                             <ul>
                                 <li>Customer supplied art needs re-work</li>
@@ -75,7 +73,7 @@
                 </div>
 
                 <!-- GRT-75 Card -->
-                <div class="billing-code-card">
+                <div class="billing-code-card card">
                     <div class="billing-code-header billing-code-header--blue">
                         <div>
                             <div class="billing-code-pn">GRT-75</div>
@@ -88,7 +86,7 @@
                         <div class="billing-code-body-desc">
                             Billed in 15-minute increments. Covers essential tasks like T-shirt graphic design, custom artwork and creative work.
                         </div>
-                        <div class="callout callout--amber">
+                        <div class="callout callout--amber alert">
                             <div class="callout-label callout-label--amber">Billing Increments:</div>
                             <div class="increments-grid">
                                 <span>15 minutes:</span><span class="amount">$18.75</span>
@@ -101,9 +99,9 @@
                 </div>
             </div>
 
-            <div class="pro-tip-box">
+            <div class="pro-tip-box alert">
                 <div class="pro-tip-inner">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#009900" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M9 11l3 3L22 4"></path>
                         <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"></path>
                     </svg>
@@ -123,11 +121,11 @@
 
         <!-- Section 1: File Requirements by Method -->
         <div id="file-requirements" class="req-section">
-            <h3 class="req-section-title">Art File Requirements by Decoration Method</h3>
+            <h2 class="req-section-title">Art File Requirements by Decoration Method</h2>
 
             <div class="file-req-grid">
                 <!-- DTG Card -->
-                <div class="file-req-card">
+                <div class="file-req-card card">
                     <div class="file-req-card-header">DTG</div>
                     <div class="file-req-card-body">
                         <h4>1. Vector Art</h4>
@@ -136,7 +134,7 @@
                             <li><strong>.AI</strong> (Adobe Illustrator) Any Version</li>
                             <li><strong>.EPS</strong> (Encapsulated Postscript) File</li>
                         </ul>
-                        <div class="file-req-highlight">
+                        <div class="file-req-highlight alert">
                             <strong>2. .PNG</strong> 300 DPI <span class="highlight-blue">(Transparent Background)</span>
                         </div>
                         <div class="file-req-item">
@@ -149,7 +147,7 @@
                 </div>
 
                 <!-- Screenprint Card -->
-                <div class="file-req-card">
+                <div class="file-req-card card">
                     <div class="file-req-card-header">Screenprint</div>
                     <div class="file-req-card-body">
                         <h4>1. Vector Art</h4>
@@ -162,7 +160,7 @@
                 </div>
 
                 <!-- Transfers Card -->
-                <div class="file-req-card">
+                <div class="file-req-card card">
                     <div class="file-req-card-header">Transfers</div>
                     <div class="file-req-card-body">
                         <h4>1. Vector Art</h4>
@@ -171,7 +169,7 @@
                             <li><strong>.AI</strong> (Adobe Illustrator) Any Version</li>
                             <li><strong>.EPS</strong> (Encapsulated Postscript) File</li>
                         </ul>
-                        <div class="file-req-highlight">
+                        <div class="file-req-highlight alert">
                             <strong>2. .PNG</strong> 300 DPI <span class="highlight-blue">(Transparent Background)</span>
                         </div>
                         <div class="file-req-item">
@@ -184,7 +182,7 @@
                 </div>
 
                 <!-- Embroidery Card -->
-                <div class="file-req-card">
+                <div class="file-req-card card">
                     <div class="file-req-card-header">Embroidery</div>
                     <div class="file-req-card-body">
                         <h4>1. Vector Art</h4>
@@ -193,7 +191,7 @@
                             <li><strong>.AI</strong> (Adobe Illustrator) Any Version</li>
                             <li><strong>.EPS</strong> (Encapsulated Postscript) File</li>
                         </ul>
-                        <div class="file-req-highlight">
+                        <div class="file-req-highlight alert">
                             <strong>2. .PNG</strong> 300 DPI <span class="highlight-blue">(Transparent Background)</span>
                         </div>
                         <div class="file-req-item">
@@ -209,16 +207,16 @@
 
         <!-- Section 2: File Definitions -->
         <div id="file-definitions" class="req-section">
-            <h3 class="req-section-title">Art File Definitions</h3>
+            <h2 class="req-section-title">Art File Definitions</h2>
 
             <div class="file-def-grid">
                 <!-- Picture Files Column -->
                 <div>
                     <h4 class="file-def-column-header">Picture Files</h4>
 
-                    <div class="file-def-card">
+                    <div class="file-def-card card">
                         <div class="file-def-card-header">
-                            <span class="file-def-badge file-def-badge--png">.PNG</span>
+                            <span class="file-def-badge file-def-badge--png badge">.PNG</span>
                             <span class="file-def-type-label">(Portable Network Graphic)</span>
                         </div>
                         <p class="file-def-desc">
@@ -226,9 +224,9 @@
                         </p>
                     </div>
 
-                    <div class="file-def-card">
+                    <div class="file-def-card card">
                         <div class="file-def-card-header">
-                            <span class="file-def-badge file-def-badge--jpg">.JPG</span>
+                            <span class="file-def-badge file-def-badge--jpg badge">.JPG</span>
                             <span class="file-def-type-label">(Joint Photographic Group)</span>
                         </div>
                         <p class="file-def-desc">
@@ -236,9 +234,9 @@
                         </p>
                     </div>
 
-                    <div class="file-def-card">
+                    <div class="file-def-card card">
                         <div class="file-def-card-header">
-                            <span class="file-def-badge file-def-badge--psd">.PSD</span>
+                            <span class="file-def-badge file-def-badge--psd badge">.PSD</span>
                             <span class="file-def-type-label">(Photoshop Document)</span>
                         </div>
                         <p class="file-def-desc">
@@ -251,31 +249,31 @@
                 <div>
                     <h4 class="file-def-column-header">Vector Files</h4>
 
-                    <div class="file-def-card">
+                    <div class="file-def-card card">
                         <div class="file-def-card-header">
-                            <span class="file-def-badge file-def-badge--ai">.AI</span>
+                            <span class="file-def-badge file-def-badge--ai badge">.AI</span>
                             <span class="file-def-type-label">(Adobe Illustrator)</span>
-                            <span class="vector-tag">Vector</span>
+                            <span class="vector-tag badge">Vector</span>
                         </div>
                         <p class="file-def-desc">
                             File created in Adobe Illustrator with layers. All Layers are editable and can be saved in layers or combined into a single image.
                         </p>
                     </div>
 
-                    <div class="file-def-card">
+                    <div class="file-def-card card">
                         <div class="file-def-card-header">
-                            <span class="file-def-badge file-def-badge--cdr">.CDR</span>
+                            <span class="file-def-badge file-def-badge--cdr badge">.CDR</span>
                             <span class="file-def-type-label">(Coreldraw)</span>
-                            <span class="vector-tag">Vector</span>
+                            <span class="vector-tag badge">Vector</span>
                         </div>
                         <p class="file-def-desc">
                             File created in Coreldraw with layers. All Layers are editable and can be saved in layers or combined into a single image.
                         </p>
                     </div>
 
-                    <div class="file-def-card">
+                    <div class="file-def-card card">
                         <div class="file-def-card-header">
-                            <span class="file-def-badge file-def-badge--pdf">.PDF</span>
+                            <span class="file-def-badge file-def-badge--pdf badge">.PDF</span>
                             <span class="file-def-type-label">(Portable Document File)</span>
                         </div>
                         <p class="file-def-desc">
@@ -283,9 +281,9 @@
                         </p>
                     </div>
 
-                    <div class="file-def-card">
+                    <div class="file-def-card card">
                         <div class="file-def-card-header">
-                            <span class="file-def-badge file-def-badge--eps">.EPS</span>
+                            <span class="file-def-badge file-def-badge--eps badge">.EPS</span>
                             <span class="file-def-type-label">(Encapsulated Postscript)</span>
                         </div>
                         <p class="file-def-desc">
@@ -298,11 +296,11 @@
 
         <!-- Section 3: Fee Structure -->
         <div id="fee-structure" class="req-section">
-            <h3 class="req-section-title">Art Fee Structure</h3>
+            <h2 class="req-section-title">Art Fee Structure</h2>
 
             <div class="fee-grid">
                 <!-- Base Fee Card -->
-                <div class="fee-card-primary">
+                <div class="fee-card-primary card">
                     <div class="fee-amount">$50.00</div>
                     <div class="fee-label">Base Art Fee</div>
                     <div class="fee-includes">
@@ -323,12 +321,12 @@
                 </div>
 
                 <!-- Hourly Rate Card -->
-                <div class="fee-card-secondary">
+                <div class="fee-card-secondary card">
                     <div class="fee-amount">$75.00</div>
                     <div class="fee-label">Per Hour Rate</div>
                     <div class="fee-desc">Art fee per hour. Charged per 1/4 hour increments above initial art fee.</div>
 
-                    <div class="fee-increments-box">
+                    <div class="fee-increments-box alert">
                         <div class="fee-increments-title">Time Increment Pricing:</div>
                         <div class="fee-increments-grid">
                             <span class="time-label">15 min:</span>
@@ -340,7 +338,7 @@
                         </div>
                     </div>
 
-                    <div class="callout callout--orange callout--spaced">
+                    <div class="callout callout--orange callout--spaced alert">
                         <div class="callout-label callout-label--orange">Additional Work Includes:</div>
                         <div class="callout-text">Additional Mockups, Edits, Complex Revisions, etc.</div>
                     </div>
@@ -348,10 +346,10 @@
             </div>
 
             <!-- Important Note -->
-            <div class="important-note">
+            <div class="important-note alert">
                 <div class="important-note-inner">
                     <div class="important-note-icon">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <circle cx="12" cy="12" r="10"></circle>
                             <line x1="12" y1="8" x2="12" y2="12"></line>
                             <line x1="12" y1="16" x2="12.01" y2="16"></line>

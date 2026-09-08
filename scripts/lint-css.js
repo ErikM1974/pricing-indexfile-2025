@@ -39,6 +39,7 @@ const CSS_LINT_SCOPE = [
     'shared_components/css/embroidery-quote-pricing.css',
     'pages/css/custom-carhartt.css',
     'pages/css/company-webstores.css',
+    'pages/css/webstore-inquiry.css',
     'pages/css/instant-quote.css',
     'pages/css/sample-cart.css',
     'pages/css/quote-cart.css',

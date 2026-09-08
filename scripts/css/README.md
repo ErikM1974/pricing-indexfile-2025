@@ -51,3 +51,7 @@ Every script runs from the repo root (`python scripts/css/<tool>.py …`) and wo
 - `stylelint --fix` (number fixer) once wrote `oklch(55.% …)` from `55.0%` — grep `[0-9]\.[%)]` after `--fix`.
 - A sheet migrated to bare `var(--gray-…)` tokens renders **transparent** on any page that does not load `tokens.css` — the audit above exists because that happened to the four quote builders for a day.
 - `curl` exits 35 to `www.teamnwca.com` from the office (FortiGate TLS inspection): verify a release via the `herokuapp.com` URL or a browser.
+
+## Unified component migration
+
+`migration-manifest.json` records the four pilot consumers, exact local stylesheet dependencies, measured raw-source bytes, budgets and fixture states. It also lists known pending dynamic/generated/email/embed owners; it is explicitly not a completed all-route inventory. Tests: `tests/unit/css-migration.test.js` and `tests/e2e/css-unification.spec.js`. Increase budgets only for a reviewed change; do not reintroduce Art Hub/print-form dependencies to the migrated pages.

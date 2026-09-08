@@ -6,19 +6,20 @@
     <title>Company Store Inquiry - Northwest Custom Apparel</title>
     <meta name="description" content="Tell us about the online company store you want — window or always-on, who pays, what products. We'll design it with you.">
     <link rel="icon" href="/favicon.png" type="image/png">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Bricolage+Grotesque:wght@500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.07.20">
-    <link rel="stylesheet" href="/pages/forms/nwca-form-shared.css?v=2026.09.07.4">
-    <link rel="stylesheet" href="/pages/request-a-quote.css?v=2026.09.07.14">
+    <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
+    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.08.2">
+    <link rel="stylesheet" href="/pages/css/webstore-inquiry.css?v=2026.09.08.2">
 </head>
-<body>
+<body data-ui="unified" data-surface="storefront" data-department="brand" data-density="comfortable">
+    <a class="skip-link" href="#main">Skip to inquiry</a>
     <div class="public-topbar">
         <a href="/company-webstores" class="public-home"><i class="fas fa-arrow-left" aria-hidden="true"></i> About company stores</a>
         <span class="public-phone"><i class="fas fa-phone" aria-hidden="true"></i> 253-922-5793</span>
     </div>
 
-    <main class="form-sheet">
+    <main class="form-sheet" id="main">
         <header class="form-header">
             <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
                  alt="Northwest Custom Apparel" class="form-logo">
@@ -30,71 +31,71 @@
         <div class="hp-wrap" aria-hidden="true"><label for="hpWebsite">Website</label><input type="text" id="hpWebsite" tabindex="-1" autocomplete="off"></div>
 
         <section class="form-section">
-            <div class="section-bar">1. How do we reach you?</div>
+            <h2 class="section-bar">1. How do we reach you?</h2>
             <div class="info-grid">
-                <div class="info-field">
-                    <label for="fldName">Your name <span class="req">*</span></label>
-                    <input type="text" id="fldName" autocomplete="name">
+                <div class="info-field field">
+                    <label class="field-label" for="fldName">Your name <span class="req">*</span></label>
+                    <input class="field-input" type="text" id="fldName" aria-required="true" autocomplete="name">
                 </div>
-                <div class="info-field">
-                    <label for="fldCompany">Company / Organization <span class="req">*</span></label>
-                    <input type="text" id="fldCompany" autocomplete="organization">
+                <div class="info-field field">
+                    <label class="field-label" for="fldCompany">Company / Organization <span class="req">*</span></label>
+                    <input class="field-input" type="text" id="fldCompany" aria-required="true" autocomplete="organization">
                 </div>
-                <div class="info-field">
-                    <label for="fldEmail">Email <span class="req">*</span></label>
-                    <input type="text" id="fldEmail" inputmode="email" autocomplete="email">
+                <div class="info-field field">
+                    <label class="field-label" for="fldEmail">Email <span class="req">*</span></label>
+                    <input class="field-input" type="text" id="fldEmail" aria-required="true" inputmode="email" autocomplete="email">
                 </div>
-                <div class="info-field">
-                    <label for="fldPhone">Phone</label>
-                    <input type="text" id="fldPhone" inputmode="tel" autocomplete="tel">
+                <div class="info-field field">
+                    <label class="field-label" for="fldPhone">Phone</label>
+                    <input class="field-input" type="text" id="fldPhone" inputmode="tel" autocomplete="tel">
                 </div>
             </div>
         </section>
 
         <section class="form-section">
-            <div class="section-bar">2. The store you're picturing</div>
+            <h2 class="section-bar">2. The store you're picturing</h2>
             <div class="decoration-row">
                 <span class="type-label">Type:</span>
-                <label class="deco-check"><input type="checkbox" id="stWindow"> Order window (opens, then closes)</label>
-                <label class="deco-check"><input type="checkbox" id="stAlwaysOn"> Always-open store</label>
-                <label class="deco-check"><input type="checkbox" id="stNotSure"> Not sure yet</label>
+                <label class="deco-check choice"><input type="checkbox" id="stWindow"> Order window (opens, then closes)</label>
+                <label class="deco-check choice"><input type="checkbox" id="stAlwaysOn"> Always-open store</label>
+                <label class="deco-check choice"><input type="checkbox" id="stNotSure"> Not sure yet</label>
             </div>
             <div class="decoration-row">
                 <span class="type-label">Who pays:</span>
-                <label class="deco-check"><input type="checkbox" id="payCompany"> Company pays</label>
-                <label class="deco-check"><input type="checkbox" id="payEmployee"> Employees pay at checkout</label>
-                <label class="deco-check"><input type="checkbox" id="paySplit"> Mix (company allowance)</label>
+                <label class="deco-check choice"><input type="checkbox" id="payCompany"> Company pays</label>
+                <label class="deco-check choice"><input type="checkbox" id="payEmployee"> Employees pay at checkout</label>
+                <label class="deco-check choice"><input type="checkbox" id="paySplit"> Mix (company allowance)</label>
             </div>
             <div class="info-grid">
-                <div class="info-field">
-                    <label for="fldHeadcount">Roughly how many people would order?</label>
-                    <input type="text" id="fldHeadcount" inputmode="numeric" placeholder="e.g. 45">
+                <div class="info-field field">
+                    <label class="field-label" for="fldHeadcount">Roughly how many people would order?</label>
+                    <input class="field-input" type="text" id="fldHeadcount" inputmode="numeric" placeholder="e.g. 45">
                 </div>
-                <div class="info-field">
-                    <label for="fldLaunch">When would you like it live?</label>
-                    <input type="text" id="fldLaunch" placeholder="date or 'flexible'">
+                <div class="info-field field">
+                    <label class="field-label" for="fldLaunch">When would you like it live?</label>
+                    <input class="field-input" type="text" id="fldLaunch" placeholder="date or 'flexible'">
                 </div>
             </div>
         </section>
 
         <section class="form-section">
-            <div class="section-bar">3. Products &amp; logos</div>
-            <div class="info-field info-field--full">
-                <label for="fldProducts">What would you like in the store? <span class="hint">(rough list is perfect — polos, hoodies, caps…)</span></label>
-                <textarea id="fldProducts" class="notes-area" rows="2" placeholder="e.g. polos and quarter-zips with the company logo, maybe beanies for winter"></textarea>
+            <h2 class="section-bar">3. Products &amp; logos</h2>
+            <div class="info-field field info-field--full">
+                <label class="field-label" for="fldProducts">What would you like in the store? <span class="hint field-help">(rough list is perfect — polos, hoodies, caps…)</span></label>
+                <textarea id="fldProducts" class="notes-area field-textarea" rows="2" placeholder="e.g. polos and quarter-zips with the company logo, maybe beanies for winter"></textarea>
             </div>
-            <div class="info-field info-field--full">
-                <label for="fldNotes">Anything else we should know? <span class="hint">(logos you have, sizes to stock, questions)</span></label>
-                <textarea id="fldNotes" class="notes-area" rows="2"></textarea>
+            <div class="info-field field info-field--full">
+                <label class="field-label" for="fldNotes">Anything else we should know? <span class="hint">(logos you have, sizes to stock, questions)</span></label>
+                <textarea id="fldNotes" class="notes-area field-textarea" rows="2"></textarea>
             </div>
         </section>
 
         <div class="public-submit-row">
-            <button type="button" id="submitStoreBtn" class="public-submit"><i class="fas fa-paper-plane" aria-hidden="true"></i> Send my store inquiry</button>
+            <button type="button" id="submitStoreBtn" class="public-submit btn btn-primary"><i class="fas fa-paper-plane" aria-hidden="true"></i> Send my store inquiry</button>
             <p class="public-privacy">We only use this to reply about your store — no mailing lists, no spam.</p>
         </div>
 
-        <div class="public-success" hidden>
+        <div class="public-success" role="status" tabindex="-1" hidden>
             <i class="fas fa-circle-check success-icon" aria-hidden="true"></i>
             <h2>Got it — thank you!</h2>
             <p>Your inquiry is in (reference <strong class="public-success-ref"></strong>) and we'll get back to you
@@ -105,7 +106,7 @@
 
     <script src="/config/app.config.js"></script>
     <script src="/pages/forms/nwca-form-dates.js?v=2026.09.07.33"></script>
-    <script src="/pages/forms/nwca-public-form.js?v=2026.09.07.33"></script>
+    <script src="/pages/forms/nwca-public-form.js?v=2026.09.08.2"></script>
     <script src="/pages/webstore-inquiry.js?v=2026.07.12.3"></script>
 </body>
 </html>

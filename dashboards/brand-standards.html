@@ -9,16 +9,16 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <!-- Built from templates/page-template.html: tokens first (the @layer order), then this page only. -->
-    <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.07.20">
-    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.07.8">
+    <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
+    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.08.2">
     <link rel="stylesheet" href="/shared_components/css/utilities.css?v=2026.09.07.18">
-    <link rel="stylesheet" href="/dashboards/css/brand-standards.css?v=2026.09.07.8">
+    <link rel="stylesheet" href="/dashboards/css/brand-standards.css?v=2026.09.08.2">
 </head>
-<body>
+<body data-ui="unified" data-surface="staff" data-department="brand" data-density="comfortable">
     <a class="skip-link" href="#main">Skip to content</a>
 
     <header class="page-header">
@@ -38,9 +38,9 @@
 
     <main id="main" class="page-main">
         <p class="lede">
-            Every colour, type size, spacing step, radius, shadow and layer on this page is read <strong>live</strong> from
+            The token catalogue below is read <strong>live</strong> from
             <code>shared_components/css/tokens.css</code> — the one file every page loads first. If a value here looks wrong,
-            fix it there; nothing on this page is typed by hand.
+            check the token definition. The component examples show the shared controls now being piloted across the app.
         </p>
 
         <div id="page-error" class="alert alert-error" role="alert" hidden>
@@ -49,14 +49,29 @@
         </div>
 
         <nav class="toc" aria-label="Sections">
-            <a href="#rules">Rules</a>
-            <a href="#colour">Colour</a>
-            <a href="#people">People &amp; departments</a>
-            <a href="#type">Type</a>
-            <a href="#space">Space, radius, shadow</a>
-            <a href="#motion">Motion &amp; layers</a>
-            <a href="#new-page">Building a page</a>
+            <a class="btn" href="#components">Shared controls</a>
+            <a class="btn" href="#rules">Rules</a>
+            <a class="btn" href="#colour">Colour</a>
+            <a class="btn" href="#people">People &amp; departments</a>
+            <a class="btn" href="#type">Type</a>
+            <a class="btn" href="#space">Space, radius, shadow</a>
+            <a class="btn" href="#motion">Motion &amp; layers</a>
+            <a class="btn" href="#new-page">Building a page</a>
         </nav>
+
+        <section class="card" id="components" aria-labelledby="components-title">
+            <h2 class="card-title" id="components-title">One set of controls. Every department.</h2>
+            <p class="card-sub">These are the real shared components used by the first migrated pages. Try a department and density; the numeric spacing scale stays the same.</p>
+            <div class="form-row reference-settings">
+                <div class="field"><label class="field-label" for="demo-department">Department</label><select id="demo-department" class="field-select"><option value="brand">Northwest Custom Apparel</option><option value="steve">Steve · Art</option><option value="ruth">Ruth · Digitizing</option><option value="bradley">Bradley · Purchasing</option><option value="floor">Shop floor</option><option value="ae">Account executives</option></select></div>
+                <div class="field"><label class="field-label" for="demo-density">Density</label><select id="demo-density" class="field-select"><option value="comfortable">Comfortable</option><option value="compact">Compact</option></select></div>
+            </div>
+            <div class="reference-actions"><button class="btn btn-primary" type="button" id="demo-open">Preview confirmation</button><button class="btn" type="button" disabled>Saving…</button><span class="badge badge-ok">Ready</span><span class="badge badge-warn">Needs review</span></div>
+            <div class="form-row reference-fields"><div class="field"><label class="field-label" for="demo-name">Project name</label><input id="demo-name" class="field-input" value="Milton team apparel"><p class="field-help">A label, a field and useful help.</p></div><div class="field is-error"><label class="field-label" for="demo-email">Email example</label><input id="demo-email" class="field-input" value="alex@" aria-invalid="true" aria-describedby="demo-email-error"><p id="demo-email-error" class="field-msg">Enter a complete email address.</p></div></div>
+            <div class="alert alert-info"><strong>Example only.</strong> These controls do not save or send anything.</div>
+            <p id="demo-result" role="status" hidden>Confirmation preview completed. No records were changed.</p>
+            <dialog id="demo-dialog" class="ui-dialog" aria-labelledby="demo-dialog-title"><h2 id="demo-dialog-title">Ready to continue?</h2><p>This demonstrates the common confirmation pattern. Escape or Cancel returns you to the page.</p><div class="dialog-actions"><button type="button" class="btn" id="demo-cancel">Cancel</button><button type="button" class="btn btn-primary" id="demo-confirm">Confirm example</button></div></dialog>
+        </section>
 
         <section class="card" id="rules" aria-labelledby="rules-title">
             <h2 class="card-title" id="rules-title">The rules that do not bend</h2>
@@ -67,13 +82,11 @@
                     Bradley is slate, the shop floor is blue, the AE dashboard is maroon. Money and quoting is NW green.
                     Two greens and two blues exist on purpose — never merge them.</li>
                 <li><strong>Reference pages wear the staff chrome, not a person's colour.</strong> Training, policies and
-                    the handbook use the Training Center's green header (<code>--color-dash-theme</code>) and a neutral
+                    the handbook use neutral shared chrome with a brand ownership marker and a neutral
                     tile on the staff dashboard. Customer-facing pages use the brand green (<code>--color-brand</code>).</li>
                 <li><strong>Printed sheets use the print palette.</strong> The fillable forms are printed at the counter;
                     their colours were sampled from the official PDFs and stay exact (<code>--print-*</code>).</li>
-                <li><strong>A page's own colours are declared once.</strong> If a page genuinely needs a colour that is not
-                    a token, it goes in ONE <code>:root</code> block at the top of that page's stylesheet — and nowhere else —
-                    so re-theming the page is one edit.</li>
+                <li><strong>A page's own colours are declared once.</strong> Add a missing color to <code>tokens.css</code>. Migrated pages select supported semantic theme aliases; they never shadow the numeric spacing or radius scale.</li>
                 <li><strong>No <code>!important</code> without a written reason.</strong> A flag carries a
                     <code>stylelint-disable-next-line … -- why</code> comment (the hidden attribute, a reduced-motion kill switch,
                     Caspio markup we do not own, an inline-style precedence a builder still needs); a legacy override stack
@@ -118,13 +131,13 @@
             <ol class="rules">
                 <li>Copy <code>templates/page-template.html</code>; replace the placeholders; one page stylesheet, one page script.</li>
                 <li>Write the stylesheet with <code>var(--…)</code> names from this page. Need a colour that is not here?
-                    Add it to <code>tokens.css</code> with a comment, or declare it once in the page's <code>:root</code> block.</li>
+                    Add it to <code>tokens.css</code> with a comment. Put unique arrangements in the scoped <code>components.pages</code> layer.</li>
                 <li>Run <code>npm run lint:css</code> and <code>npm test</code>. Register the files in <code>ACTIVE_FILES.md</code>.
                     A staff page that should be restricted gets a <code>Staff_Page_Access</code> row.</li>
                 <li>Give the page the colour family of the person or department it belongs to, and the matching family
                     class on its staff-dashboard tile.</li>
             </ol>
-            <p class="text-muted">Plan, progress and decisions: <code>memory/CSS_STANDARDIZATION_PLAN_2026-09.md</code>.</p>
+            <p class="text-muted">Current migration: <code>memory/CSS_UNIFICATION_2026-09.md</code>. Token migration history: <code>memory/CSS_STANDARDIZATION_PLAN_2026-09.md</code>.</p>
         </section>
 
         <section class="card" id="decisions" aria-labelledby="decisions-title">
@@ -132,6 +145,10 @@
             <p class="text-muted">This page is a working document. Every standard that changed how a page looks is
                 recorded here, newest first, with the release that shipped it.</p>
             <ul class="rules decisions">
+                <li><strong>2026-09-08 · shared components, first pilots.</strong> Public Sans, neutral staff surfaces, cream customer surfaces,
+                    44px controls and semantic density now share one scoped component layer. Steve, Ruth, Bradley, shop-floor and AE colors
+                    remain distinct. Design Queue, Art Billing &amp; File Reference and Company Store Inquiry replace their competing legacy sheets.
+                    The rest of the application migrates by family; the component examples above are the maintained reference.</li>
                 <li><strong>2026-09-07 · palette pass 2 — the storefront and catalog.</strong> Reviewed page by page with
                     Erik's authority to make the customer-facing pages look better. Verdict: the 2026 storefront is already a
                     coherent system (cream paper, forest green, rush orange, Bricolage display), so the changes are small
@@ -188,7 +205,7 @@
                     script — listed here as follow-up. The two sheets the quote builders also load wait for that family.</li>
                 <li><strong>2026-09-07 · dashboards.</strong> Sixty dashboards and the queue-dashboard system they share now read the token
                     file; the person/department colours those pages already wore are code (<code>--art-theme: var(--color-ruth)</code>).
-                    <strong>Open for Erik:</strong> two spacing/radius scales exist — <code>art-hub.css</code> (4 → 32, radius 4/8/12/16, used by 41
+                    <strong>Decision approved 2026-09-08, rollout in progress:</strong> retain the global numeric scale and use semantic density. Two legacy spacing/radius scales still exist — <code>art-hub.css</code> (4 → 32, radius 4/8/12/16, used by 41
                     queue pages) and the token file's (4 → 96, radius 6/10/14/20, from the Staff Dashboard seed). Nothing moved: on
                     art-hub pages the page copy still wins. Choosing one scale re-lays out 41 staff pages, so it stays a decision, not a script.</li>
                 <li><strong>2026-09-07 · storefront + components.</strong> The customer-facing 2026 storefront palette (cream paper, forest
@@ -217,6 +234,6 @@
 
     <script src="/config/app.config.js"></script>
     <script src="/shared_components/js/data-call-delegator.js?v=2026.09.07.5"></script>
-    <script src="/dashboards/js/brand-standards.js?v=2026.09.07.6"></script>
+    <script src="/dashboards/js/brand-standards.js?v=2026.09.08.2"></script>
 </body>
 </html>

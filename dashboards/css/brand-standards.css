@@ -1,151 +1,110 @@
-/* brand-standards.css — the Brand Standards page (2026-09-07). Every value is a token; this file is the first
-   page built from templates/page-template.html and doubles as the reference for what a page stylesheet looks like. */
-
-body {
-    margin: 0;
-    font-family: var(--font-sans);
-    font-size: var(--font-size-base);
-    line-height: var(--line-height-base);
-    color: var(--color-ink);
-    background: var(--color-surface-alt);
-}.skip-link:focus { top: var(--space-2); }.page-nav-link:hover { background: rgb(255 255 255 / 12%); }
-
-.lede {
+/* Live token catalogue and shared component examples. Shared visual primitives belong to components.css. */
+@layer components.pages {
+:where([data-ui="unified"]) .lede {
     font-size: var(--font-size-lg);
     color: var(--color-ink-soft);
     max-width: 70ch;
 }
 
-.toc {
+:where([data-ui="unified"]) .toc {
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-2);
     margin: var(--space-4) 0 var(--space-5);
 }
 
-.toc a {
-    padding: var(--space-1) var(--space-3);
-    border: 1px solid var(--color-line);
-    border-radius: var(--radius-pill);
-    background: var(--color-surface);
-    color: var(--color-ink);
-    text-decoration: none;
-    font-size: var(--font-size-md);
-}
-
-.toc a:hover { border-color: var(--color-brand); color: var(--color-brand-dark); }
-
-code {
+:where([data-ui="unified"]) code {
     font-family: var(--font-mono);
     font-size: 0.92em;
     background: var(--color-surface-raised);
     border: 1px solid var(--color-line);
     border-radius: var(--radius-sm);
     padding: 0 0.3em;
-}.text-muted { color: var(--color-muted); }
+}:where([data-ui="unified"]) .text-muted { color: var(--color-muted); }
 
-.rules { padding-left: var(--space-5); }
-.rules li { margin-bottom: var(--space-2); }/* ---------- Token groups ---------- */
+:where([data-ui="unified"]) .rules { padding-left: var(--space-5); }
+:where([data-ui="unified"]) .rules li { margin-bottom: var(--space-2); }
 
-.group { margin-top: var(--space-5); }
+:where([data-ui="unified"]) .group { margin-top: var(--space-5); min-width: 0; }
 
-.group-title {
+:where([data-ui="unified"]) .group-title {
     margin: 0 0 var(--space-1);
     font-size: var(--font-size-lg);
     font-weight: var(--font-weight-semibold);
 }
 
-.group-note {
+:where([data-ui="unified"]) .group-note {
     margin: 0 0 var(--space-3);
     color: var(--color-muted);
     font-size: var(--font-size-md);
     max-width: 90ch;
 }
 
-.swatches {
+:where([data-ui="unified"]) .swatches {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
     gap: var(--space-3);
 }
 
-.swatch {
+:where([data-ui="unified"]) .swatch {
     border: 1px solid var(--color-line);
     border-radius: var(--radius-md);
     overflow: hidden;
     background: var(--color-surface);
 }
 
-.swatch-chip {
+:where([data-ui="unified"]) .swatch-chip {
     height: 64px;
     border-bottom: 1px solid var(--color-line);
 }
 
-.swatch-body {
+:where([data-ui="unified"]) .swatch-body {
     padding: var(--space-2) var(--space-3);
     font-size: var(--font-size-sm);
 }
 
-.swatch-name {
+:where([data-ui="unified"]) .swatch-name {
     font-family: var(--font-mono);
     font-weight: var(--font-weight-semibold);
     color: var(--color-ink);
     word-break: break-all;
 }
 
-.swatch-value {
+:where([data-ui="unified"]) .swatch-value {
     font-family: var(--font-mono);
     color: var(--color-muted);
 }
 
-.swatch-note { color: var(--color-ink-soft); margin-top: var(--space-1); }
+:where([data-ui="unified"]) .swatch-note { color: var(--color-ink-soft); margin-top: var(--space-1); }
 
-.token-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: var(--font-size-md);
-}
+:where([data-ui="unified"]) .sample-text { line-height: var(--line-height-tight); }
+:where([data-ui="unified"]) .sample-mono { font-family: var(--font-mono); }
 
-.token-table th,
-.token-table td {
-    text-align: left;
-    padding: var(--space-2) var(--space-3);
-    border-bottom: 1px solid var(--color-line);
-    vertical-align: middle;
-}
-
-.token-table th {
-    color: var(--color-muted);
-    font-weight: var(--font-weight-medium);
-    font-size: var(--font-size-sm);
-}
-
-.token-table code { white-space: nowrap; }
-
-.sample-text { line-height: var(--line-height-tight); }
-.sample-mono { font-family: var(--font-mono); }
-
-.sample-bar {
+:where([data-ui="unified"]) .sample-bar {
     height: 12px;
     background: var(--color-brand);
     border-radius: var(--radius-sm);
 }
 
-.sample-box {
+:where([data-ui="unified"]) .sample-box {
     width: 72px;
     height: 44px;
     background: var(--color-surface);
     border: 1px solid var(--color-line-strong);
 }
 
-.sample-shadow {
+:where([data-ui="unified"]) .sample-shadow {
     width: 120px;
     height: 44px;
     background: var(--color-surface);
     border-radius: var(--radius-md);
 }
 
-@media (width <= 700px) {
-    .page-header-inner { flex-wrap: wrap; }
-    .page-main { padding: var(--space-3); }
-    .card { padding: var(--space-4); }
+:where([data-ui="unified"]) .reference-settings,
+:where([data-ui="unified"]) .reference-fields { margin-bottom: var(--space-5); }
+:where([data-ui="unified"]) .reference-actions { display: flex; flex-wrap: wrap; gap: var(--space-3); align-items: center; margin: var(--space-5) 0; }
+:where([data-ui="unified"]) .token-table code { white-space: normal; overflow-wrap: anywhere; }
+:where([data-ui="unified"]) .token-table { min-width: 560px; }
+:where([data-ui="unified"]) .token-table-region { max-width: 100%; overflow: auto; margin-top: var(--space-3); }
+
 }

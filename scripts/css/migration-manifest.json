@@ -1,0 +1,195 @@
+{
+  "version": 1,
+  "scope": "First four production pilots. Remaining families and runtime owners below are pending, not certified coverage.",
+  "viewports": [
+    1440,
+    768,
+    390,
+    320
+  ],
+  "pilots": [
+    {
+      "source": "dashboards/brand-standards.html",
+      "family": "reference",
+      "status": "pilot",
+      "route": "/dashboards/brand-standards.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/utilities.css",
+        "dashboards/css/brand-standards.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "tokens-loaded",
+        "tokens-failed",
+        "six-departments",
+        "two-densities",
+        "dialog-confirm",
+        "dialog-escape",
+        "invalid-example",
+        "disabled-example"
+      ],
+      "test": "tests/e2e/css-unification.spec.js",
+      "maxCssBytes": 40960,
+      "baseline": {
+        "commit": "2ca502a1",
+        "rawCssBytes": 34377,
+        "localCssRequests": 4
+      },
+      "measuredRawCssBytes": 37950
+    },
+    {
+      "source": "dashboards/design-queue.html",
+      "family": "staff-queue",
+      "status": "pilot",
+      "route": "/dashboards/design-queue.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "dashboards/css/design-queue.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "loading",
+        "populated",
+        "filtered",
+        "research-expanded",
+        "empty",
+        "failed",
+        "retry",
+        "metrics-unavailable"
+      ],
+      "test": "tests/e2e/css-unification.spec.js",
+      "maxCssBytes": 47104,
+      "baseline": {
+        "commit": "2ca502a1",
+        "rawCssBytes": 173704,
+        "localCssRequests": 4
+      },
+      "measuredRawCssBytes": 44482
+    },
+    {
+      "source": "pages/art-billing-reference.html",
+      "family": "reference",
+      "status": "pilot",
+      "route": "/pages/art-billing-reference.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "pages/css/art-billing-reference.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "reading",
+        "mobile",
+        "print",
+        "unchanged-content"
+      ],
+      "test": "tests/e2e/css-unification.spec.js",
+      "maxCssBytes": 40960,
+      "baseline": {
+        "commit": "2ca502a1",
+        "rawCssBytes": 149859,
+        "localCssRequests": 3
+      },
+      "measuredRawCssBytes": 38545
+    },
+    {
+      "source": "pages/webstore-inquiry.html",
+      "family": "customer-form",
+      "status": "pilot",
+      "route": "/pages/webstore-inquiry.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "pages/css/webstore-inquiry.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "empty",
+        "validation",
+        "date-entry",
+        "multiple-choices",
+        "sending",
+        "failed",
+        "retry",
+        "success"
+      ],
+      "test": "tests/e2e/css-unification.spec.js",
+      "maxCssBytes": 36864,
+      "baseline": {
+        "commit": "2ca502a1",
+        "rawCssBytes": 33091,
+        "localCssRequests": 3
+      },
+      "measuredRawCssBytes": 34443
+    }
+  ],
+  "billingContentSha256": "d85f8530e03a1863d1b8bb2ebe97ba332d5c9e3411887d1eb2d02dcdb14c0863",
+  "pendingRuntimeOwners": [
+    {
+      "kind": "dynamic-css",
+      "owners": [
+        "shared_components/js/sample-cart-service.js",
+        "dashboards/js/lead-workspace.js",
+        "pages/js/quote-view.js"
+      ],
+      "note": "Record trigger states before migrating their consumers."
+    },
+    {
+      "kind": "style-injection",
+      "owners": [
+        "calculators/js/christmas-bundles.js"
+      ],
+      "note": "Error and inventory states."
+    },
+    {
+      "kind": "generated-document",
+      "owners": [
+        "shared_components/js/embroidery-quote-invoice.js",
+        "shared_components/js/quote-formatter.js",
+        "calculators/christmas-bundle-service.js",
+        "calculators/screenprint-customer/screenprint-customer-calculator.js",
+        "dashboards/js/ae-mission-control.js",
+        "dashboards/js/jim-mailing-list.js",
+        "pages/js/mockup-detail.js"
+      ],
+      "note": "Own print/PDF fixtures required; static HTML inventory cannot cover these."
+    },
+    {
+      "kind": "server-generated",
+      "owners": [
+        "lib/blog-templates.js",
+        "server.js",
+        "routes/blog.js"
+      ],
+      "note": "Blog, denied-access and retirement responses."
+    },
+    {
+      "kind": "served-archive",
+      "owners": [
+        "calculators/archive/seasonal-2025/breast-cancer-awareness-bundle.html"
+      ],
+      "note": "Still served by a root route; do not count as an excluded archive."
+    },
+    {
+      "kind": "non-page",
+      "owners": [
+        "calculators/christmas-bundle-emailjs-template.html",
+        "emailjs-template-mockup-customer-approval.html",
+        "pages/golf-tournament-customer-emailjs-template.html",
+        "pages/golf-tournament-lead-emailjs-template.html"
+      ],
+      "note": "Email rendering is a separate compatibility contract."
+    },
+    {
+      "kind": "external-embed",
+      "owners": [
+        "dashboards/bradley-transfers.html",
+        "dashboards/supacolor-orders.html"
+      ],
+      "note": "App owns the surrounding page, Caspio owns embedded markup. Audit frame boundaries and loaded styles before changes."
+    }
+  ]
+}

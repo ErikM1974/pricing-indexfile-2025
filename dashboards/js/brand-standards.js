@@ -98,12 +98,12 @@
     function renderTableSection(section) {
         var html = '<div class="group"><h3 class="group-title">' + escapeHTML(section.title) + '</h3>';
         if (section.note) html += '<p class="group-note">' + escapeHTML(section.note) + '</p>';
-        html += '<table class="token-table"><thead><tr><th scope="col">Token</th><th scope="col">Value</th><th scope="col">Use</th><th scope="col">Sample</th></tr></thead><tbody>';
+        html += '<div class="token-table-region" role="region" aria-label="Token values; scroll for all columns" tabindex="0"><table class="token-table data-table"><thead><tr><th scope="col">Token</th><th scope="col">Value</th><th scope="col">Use</th><th scope="col">Sample</th></tr></thead><tbody>';
         section.tokens.forEach(function (t) {
             html += '<tr><td><code>' + escapeHTML(t.name) + '</code></td><td><code>' + escapeHTML(t.value) + '</code></td>'
                 + '<td>' + escapeHTML(t.note) + '</td><td>' + sampleFor(t) + '</td></tr>';
         });
-        return html + '</tbody></table></div>';
+        return html + '</tbody></table></div></div>';
     }
 
     /** Apply sample styles from data attributes (no inline style attributes in the markup — Rule 3). */
@@ -151,6 +151,17 @@
     }
 
     function init() {
+        var department = document.getElementById('demo-department');
+        var density = document.getElementById('demo-density');
+        var dialog = document.getElementById('demo-dialog');
+        department.addEventListener('change', function () { document.body.dataset.department = department.value; });
+        density.addEventListener('change', function () { document.body.dataset.density = density.value; });
+        document.getElementById('demo-open').addEventListener('click', function () { dialog.showModal(); });
+        document.getElementById('demo-cancel').addEventListener('click', function () { dialog.close(); });
+        document.getElementById('demo-confirm').addEventListener('click', function () {
+            document.getElementById('demo-result').hidden = false;
+            dialog.close();
+        });
         // The canonical SOURCE file, not the page's own <link>: staff pages are content-hashed, and the hashed
         // copy is minified with its comments (the notes rendered here) stripped. The static mount serves this
         // path un-minified with no-store, so it is always the current file.

@@ -3,6 +3,13 @@
 **Created:** 2025-10-03
 **Purpose:** Comprehensive automated testing for all screen print calculators
 
+### CSS migration browser contracts (2026-09-08)
+
+| File | Purpose | Status |
+|------|---------|--------|
+| `/tests/unit/css-migration.test.js` | CSS ownership, byte budgets, token resolution and pre-migration billing content lock | Active |
+| `/tests/e2e/css-unification.spec.js` | Mocked queue, inquiry, component reference and billing states; never submits live business data | Active |
+
 ### Test Suite Files
 | File | Purpose | Status |
 |------|---------|--------|

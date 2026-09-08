@@ -307,6 +307,9 @@
 
     function rowsTable(cols, rows) {
         var scroll = el('div', 'dq-metrics-scroll');
+        scroll.setAttribute('role', 'region');
+        scroll.setAttribute('aria-label', 'Store metrics; scroll for all columns');
+        scroll.tabIndex = 0;
         var t = document.createElement('table');
         t.className = 'dq-metrics-table';
         var thead = document.createElement('thead');
