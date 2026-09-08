@@ -28,7 +28,8 @@
     // Table scrolling must not clip a menu in the final row. Fixed menus stay
     // in the viewport; reposition on either page or table scroll.
     function placePicker(box, anchor) {
-        if (box.hidden) return;
+        // The public quote-request form still owns its legacy popup CSS.
+        if (box.hidden || !anchor.closest('[data-ui="unified"][data-form="printable"]')) return;
         var rect = anchor.getBoundingClientRect();
         var width = Math.min(330, window.innerWidth - 24);
         var below = window.innerHeight - rect.bottom - 12;

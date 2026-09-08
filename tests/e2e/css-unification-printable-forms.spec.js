@@ -280,3 +280,18 @@ test('CSS printable: changing styles clears old color verification before a fail
     await color.fill('Manual color');
     expect(state.errors).toEqual([]); expect(state.unexpectedWrites).toEqual([]);
 });
+
+test('CSS printable: the shared style helper preserves the public quote form menu',async ({page})=>{
+    const state=await fixture(page,'pages/request-a-quote.html');
+    for(const width of [1440,390,320]){
+        await page.setViewportSize({width,height:900});
+        await page.locator('#fldStyle').fill(''); await page.locator('#fldStyle').fill('PC54');
+        await expect(page.locator('.styles-dropdown [role="option"]')).toBeVisible();
+        const input=await page.locator('#fldStyle').boundingBox(),box=await page.locator('.styles-dropdown').boundingBox();
+        expect(Math.abs(box.y-(input.y+input.height))).toBeLessThan(12);
+        await page.keyboard.press('ArrowDown'); await page.keyboard.press('Enter');
+        await expect(page.locator('#fldProduct')).toHaveValue('Fixture Cotton Tee');
+        await expect(page.locator('#fldStyle')).toHaveValue('PC54');
+    }
+    expect(state.errors).toEqual([]); expect(state.unexpectedWrites).toEqual([]); expect(state.submissions).toEqual([]);
+});
