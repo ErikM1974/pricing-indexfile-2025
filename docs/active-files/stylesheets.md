@@ -157,3 +157,8 @@ cap-embroidery-fix.css
 **DO NOT:** Try to "fix" existing calculators unless there's a bug. They work.
 
 [Back to the registry index](../../ACTIVE_FILES.md)
+
+## Unified UI migration (2026-09-08)
+
+- `scripts/css/migration-manifest.json`: first four pilot style owners, state fixtures, source-byte budgets and pending generated/dynamic surfaces. Pending means not yet migrated or verified.
+- `pages/css/webstore-inquiry.css`: storefront inquiry arrangement; shared controls belong to `components.css`.

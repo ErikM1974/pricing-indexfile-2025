@@ -1,0 +1,27 @@
+/* Company store inquiry arrangement; fields, choices and date control use shared components. Shared visual primitives belong to components.css. */
+@layer components.pages {
+
+:where([data-ui="unified"]) .public-topbar { font-size: var(--font-size-md); }
+:where([data-ui="unified"]) .public-home { display: inline-flex; align-items: center; gap: var(--space-2); min-height: var(--ui-control-height); font-weight: 600; text-decoration: none; }
+:where([data-ui="unified"]) .public-phone { color: var(--ui-muted); white-space: nowrap; }
+:where([data-ui="unified"]) .form-sheet { max-width: 848px; margin: var(--space-7) auto; padding: 0 var(--space-5); }
+:where([data-ui="unified"]) .form-header { margin-bottom: var(--space-6); }
+:where([data-ui="unified"]) .form-logo { width: 128px; height: auto; margin-bottom: var(--space-5); }
+:where([data-ui="unified"]) .form-title { font-family: var(--font-store-display); font-size: clamp(2rem, 5vw, 2.75rem); font-weight: 600; letter-spacing: -0.03em; margin: 0 0 var(--space-3); }
+:where([data-ui="unified"]) .form-subtitle { font-size: var(--font-size-lg); color: var(--ui-muted); max-width: 62ch; margin: 0 0 var(--space-4); }
+:where([data-ui="unified"]) .form-contact { font-size: var(--font-size-sm); color: var(--ui-muted); margin: 0; }
+:where([data-ui="unified"]) .form-section { padding: var(--space-6) 0; border-top: 1px solid var(--ui-line-strong); }
+:where([data-ui="unified"]) .section-bar { font-size: var(--font-size-xl); margin: 0 0 var(--space-5); font-weight: 600; }
+:where([data-ui="unified"]) .info-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-5); }
+:where([data-ui="unified"]) .info-field--full + .info-field--full { margin-top: var(--space-5); }
+:where([data-ui="unified"]) .decoration-row { display: grid; gap: var(--space-2); margin-bottom: var(--space-5); }
+:where([data-ui="unified"]) .type-label { font-size: var(--font-size-md); font-weight: 600; margin-bottom: var(--space-1); }
+:where([data-ui="unified"]) .hint { display: block; font-weight: 400; margin-top: var(--space-1); }
+:where([data-ui="unified"]) .public-submit-row { border-top: 1px solid var(--ui-line-strong); padding-top: var(--space-5); }
+:where([data-ui="unified"]) .public-privacy { font-size: var(--font-size-sm); color: var(--ui-muted); max-width: 65ch; }
+:where([data-ui="unified"]) .public-success { padding: var(--space-6); background: var(--ui-surface); border: 1px solid var(--ui-line); border-radius: var(--radius-card); }
+:where([data-ui="unified"]) .success-icon { color: var(--ui-accent); font-size: var(--font-size-display); }
+
+@media (width <= 600px) { :where([data-ui="unified"]) .info-grid { grid-template-columns: 1fr; } :where([data-ui="unified"]) .form-sheet { margin: var(--space-5) auto; padding: 0 var(--space-4); } :where([data-ui="unified"]) .public-submit { width: 100%; } :where([data-ui="unified"]) .form-section { padding: var(--space-5) 0; } }
+
+}

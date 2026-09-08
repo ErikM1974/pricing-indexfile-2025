@@ -1,5 +1,31 @@
 # NWCA 2026 Design System — Interior-Page Class Reference
 
+## Unified component pilots (2026-09-08)
+
+For new staff pages, start with `templates/page-template.html`. The living examples are
+`dashboards/brand-standards.html#components`. The first migrated consumers are Brand Standards,
+Design Queue, Art Billing & File Reference and Company Store Inquiry.
+
+- Load `tokens.css`, then `components.css`, optional `utilities.css`, then the page stylesheet.
+- Put `data-ui="unified"`, `data-surface="staff|storefront"`, `data-department="brand|steve|ruth|bradley|floor|ae"`
+  and `data-density="comfortable|compact"` on the body. Public Sans is loaded by the page; customer headings may use Bricolage.
+- Numeric space/radius/type/shadow tokens never change by page. Density changes only `--ui-panel-space` and `--ui-row-space`.
+- Components use `components.primitives` and `components.patterns`; unique page arrangements use `components.pages`.
+  Every selector is scoped to the opted-in body. The utilities layer owns `[hidden]`; migrated pages need no important flag.
+- Shared vocabulary: `btn`, `btn-primary`, `btn-ghost`, `btn-danger`; `field`, `field-label`, `field-input/select/textarea`,
+  `field-help/msg`, `choice`; `card`, `card-title`; `alert-info/success/warn/error`; `badge-ok/warn/bad`;
+  `table-wrap`, `data-table`; native `dialog.ui-dialog` and `dialog-actions`.
+- Use native disabled controls. Label fields and errors. A scrollable table needs a named focusable region.
+  Use native dialog.showModal()/close() and restore opener focus; the reference demonstrates Escape and confirmation.
+- Temporary Design Queue `dash-*` / `dq-*` and public-form/date selectors adapt existing behavior hooks to these same rules.
+  Remove adapters as siblings adopt canonical presentation classes; never copy the visual rules into another page file.
+- Add each migrated consumer, styles, fixtures and byte budget to `scripts/css/migration-manifest.json`.
+  Unit guards reject unresolved tokens, important declarations, CSS IDs, global-scale shadows and changed billing content.
+  Browser fixtures exercise states without contacting production business endpoints.
+
+The rest of this guide describes the existing storefront entry point. Its consumers remain on that entry point until their family migrates.
+Do not link both shared entry points onto an existing storefront page; replace competing ownership under state tests.
+
 Quick reference for the primitives in `nwca-2026-core.css` (layer 7). Build interior pages from these without reading the CSS.
 
 **Load order (required):**

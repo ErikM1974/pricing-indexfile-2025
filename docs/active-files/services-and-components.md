@@ -444,3 +444,7 @@
 > 🗑️ **2026-06-11 legacy ES-module tree deleted** (dead since the product.html configurator rewrite; zero references verified): `app.js`, `components/{search,gallery,pricing,inventory-summary,info,swatches,decoration-selector,quote-modal,image-zoom}.js`, `services/{state,quote-service,email-service}.js`, `styles/{product-2025,product-redesign,quote-modal}.css`. Recovery: `git show <pre-cleanup-commit>:product/app.js`.
 
 [Back to the registry index](../../ACTIVE_FILES.md)
+
+### Scoped component pilots (2026-09-08)
+
+`components.css` now owns scoped staff/storefront primitives, semantic density and department themes. Its four migrated consumers are Brand Standards, Design Queue, Art Billing & File Reference and Company Store Inquiry. Design Queue and billing no longer load Art Hub; inquiry no longer loads the print-form pair. `utilities.css` is unchanged. The Brand Standards script now demonstrates the real controls and native dialog while preserving the live token catalogue. See `scripts/css/migration-manifest.json` and the updated guide for the maintained contract; older rows above describe migration history.

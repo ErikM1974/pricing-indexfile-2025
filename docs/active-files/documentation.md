@@ -3,6 +3,7 @@
 ### Memory/Reference Documentation
 | File | Purpose | Status |
 |------|---------|--------|
+| `/memory/CSS_UNIFICATION_2026-09.md` | Application-wide CSS architecture, visual concept, measured adoption and phased migration plan | Active plan |
 | `/memory/CUSTOMER_SITE_REDESIGN_2026-06.md` | **NEW** Customer-facing redesign master plan + Custom Hats store spec (2026-06-11) | ✅ Active |
 | `/memory/CUSTOMER_SITE_REDESIGN_2026-06_FINDINGS.md` | **NEW** Full 8-agent discovery audit evidence for the redesign (2026-06-11) | ✅ Active |
 | `/memory/CUSTOMER_QUOTE_CART_DESIGN_2026-06.md` | **NEW** Customer quote-cart: builder parity rules EMB/DTG/SCP/DTF (worked examples = jest fixtures) + architect design + 5-phase plan (2026-06-11) | ✅ Active |

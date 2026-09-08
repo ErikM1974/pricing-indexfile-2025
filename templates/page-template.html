@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!--
-    PAGE TEMPLATE (CSS standardization Step 3, 2026-09-07) — copy this file, never edit it in place.
+    PAGE TEMPLATE (CSS standardization Step 3, 2026-09-07) — copy this file for a new page; maintain the template when the shared contract changes.
 
     A new page = this skeleton + ONE page stylesheet + ONE page script. Everything the repo's locks demand
     is already in it (tests/unit/repo-hygiene-final.test.js runs on every served page):
@@ -10,8 +10,8 @@
       - <html lang>, one <title>, exactly ONE <main>, every control labelled, every icon aria-hidden
       - API host from APP_CONFIG.API.BASE_URL (config/app.config.js) — never a typed proxy URL
     Stylesheet order is the cascade: tokens.css FIRST (it declares the @layer order), then the shared components
-    and utilities (Step 2 of memory/CSS_STANDARDIZATION_PLAN_2026-09.md), then this page's own stylesheet — which
-    should hold only what is specific to this page, written with var(--…) tokens (stylelint rejects raw hex).
+    and utilities (memory/CSS_UNIFICATION_2026-09.md), then this page's own stylesheet — which
+    uses @layer components.pages and scopes selectors under :where([data-ui="unified"]); it holds only unique arrangements, written with var(--…) tokens (stylelint rejects raw hex).
 
     Replace every {{PLACEHOLDER}}, then: register the three files in ACTIVE_FILES.md; a staff page that should be
     restricted gets a Staff_Page_Access row (CLAUDE.md § Security); a page that belongs to a person/department
@@ -28,16 +28,16 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <!-- 1. Tokens first — carries the @layer order. 2. Shared components + utilities. 3. This page only. -->
-    <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.07.20">
-    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.07.8">
+    <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
+    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.08.2">
     <link rel="stylesheet" href="/shared_components/css/utilities.css?v=2026.09.07.18">
     <link rel="stylesheet" href="/{{DIRECTORY}}/css/{{page-slug}}.css?v=2026.09.07.2">
 </head>
-<body>
+<body data-ui="unified" data-surface="staff" data-department="brand" data-density="comfortable">
     <a class="skip-link" href="#main">Skip to content</a>
 
     <header class="page-header">
@@ -76,7 +76,7 @@
                 </button>
             </form>
 
-            <div class="table-wrap">
+            <div class="table-wrap" role="region" aria-label="Results; scroll for all columns" tabindex="0">
                 <table class="data-table" id="page-table">
                     <thead>
                         <tr><th scope="col">Column</th><th scope="col" class="num">Amount</th></tr>

@@ -38,6 +38,21 @@
 
 @layer tokens {
     :root {
+        /* Unified UI — scoped component defaults (2026-09-08 pilots) */
+        --ui-font: var(--font-store-body);
+        --ui-canvas: var(--gray-100);
+        --ui-surface: var(--color-surface);
+        --ui-ink: var(--gray-800);
+        --ui-muted: var(--gray-600);
+        --ui-line: var(--gray-200);
+        --ui-line-strong: var(--gray-300);
+        --ui-accent: var(--store-green-700);
+        --ui-accent-hover: var(--store-green-900);
+        --ui-tint: var(--brand-50);
+        --ui-panel-space: var(--space-5);
+        --ui-row-space: var(--space-4);
+        --ui-control-height: 44px;
+
         /* Type families — the two stacks the app standardizes on
            (Inter 83 files, JetBrains Mono 135; Poppins is a per-page legacy) */
         --font-sans: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;

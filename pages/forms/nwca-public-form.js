@@ -36,6 +36,7 @@
         if (!el) {
             el = document.createElement('div');
             el.className = 'public-form-banner';
+            el.setAttribute('role', 'alert');
             var sheet = document.querySelector('.form-sheet');
             sheet.insertBefore(el, sheet.firstChild);
         }
@@ -73,7 +74,7 @@
                 var v = el ? el.value.trim() : '';
                 var bad = !v || (/email/i.test(id) && !/.+@.+\..+/.test(v));
                 if (bad) {
-                    banner('error', '<i class="fas fa-circle-exclamation"></i> Please enter ' + label + ' so we can get back to you.');
+                    banner('error', '<i class="fas fa-circle-exclamation" aria-hidden="true"></i> Please enter ' + label + ' so we can get back to you.');
                     if (el) el.focus();
                     return;
                 }
@@ -83,19 +84,19 @@
             try { data = opts.build(); }
             catch (e) {
                 console.error('[public-form] build failed:', e);
-                banner('error', '<i class="fas fa-circle-exclamation"></i> Something went wrong reading the form — call us at 253-922-5793 and we\'ll take it by phone.');
+                banner('error', '<i class="fas fa-circle-exclamation" aria-hidden="true"></i> Something went wrong reading the form — call us at 253-922-5793 and we\'ll take it by phone.');
                 return;
             }
 
             var base = apiBase();
             if (!base) {
-                banner('error', '<i class="fas fa-circle-exclamation"></i> We couldn\'t load our connection — call 253-922-5793 or email sales@nwcustomapparel.com.');
+                banner('error', '<i class="fas fa-circle-exclamation" aria-hidden="true"></i> We couldn\'t load our connection — call 253-922-5793 or email sales@nwcustomapparel.com.');
                 return;
             }
 
             btn.disabled = true;
             var oldLabel = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending…';
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Sending…';
 
             fetch(base + '/api/form-submissions', {
                 method: 'POST',
@@ -125,6 +126,8 @@
                     var ok = document.querySelector('.public-success');
                     if (ok) {
                         ok.hidden = false;
+                        ok.setAttribute('tabindex', '-1');
+                        ok.focus({ preventScroll: true });
                         var ref = ok.querySelector('.public-success-ref');
                         if (ref) ref.textContent = body.submissionId || '';
                     }
@@ -134,7 +137,7 @@
                 })
                 .catch(function (err) {
                     console.error('[public-form] submit failed:', err);
-                    banner('error', '<i class="fas fa-circle-exclamation"></i> <strong>That didn\'t go through.</strong> Nothing you typed was lost — try again in a minute, or call 253-922-5793 / email sales@nwcustomapparel.com.');
+                    banner('error', '<i class="fas fa-circle-exclamation" aria-hidden="true"></i> <strong>That didn\'t go through.</strong> Nothing you typed was lost — try again in a minute, or call 253-922-5793 / email sales@nwcustomapparel.com.');
                 })
                 .finally(function () {
                     btn.disabled = false;

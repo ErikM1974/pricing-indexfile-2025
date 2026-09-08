@@ -83,6 +83,8 @@ jobs:
       # Boots server.js on :3400 (stripe/emailjs init lazily); all WRITES are route-mocked in the specs.
       - name: Rendered axe ratchet (no secret needed)
         run: npx playwright test --config tests/e2e/playwright.config.js a11y
+      - name: Unified CSS pilot states (mocked services)
+        run: npx playwright test --config tests/e2e/playwright.config.js css-unification
       - name: Money path + calculator parity (live engine — needs CRM_API_SECRET)
         if: ${{ env.CRM_API_SECRET != '' }}
         run: npx playwright test --config tests/e2e/playwright.config.js money-path calculator-parity

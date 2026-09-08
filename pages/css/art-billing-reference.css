@@ -1,30 +1,114 @@
-/* art-billing-reference.css — extracted 2026-09-06 from the two inline \3c style> blocks in pages/art-billing-reference.html (Rule 3). */
-:root { --art-theme: var(--color-dash-theme); --art-theme-dark: var(--color-steve-dark); --art-theme-light: var(--color-dash-theme-bg); --art-theme-hover: var(--color-dash-theme); --art-theme-bg: var(--color-dash-theme-bg); --art-theme-bg-hover: var(--brand-100); --art-theme-bg-selected: var(--store-green-100); --art-theme-rgba-15: rgb(0 153 0 / 15%); --art-theme-rgba-10: rgb(0 153 0 / 10%); }
+/* Billing/file-reference arrangement only. Panels, callouts, badges, navigation and type inherit components.css. */
+@layer components.pages {
 
-/* Standalone page wrapper. Reuses art-hub.css for the actual reference
-   content (.billing-code-card, .file-req-card, .file-def-card, .fee-card-*) —
-   those styles already exist; we just need a page chrome around them. */
-body { background: var(--slate-50); font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif; margin: 0; }
+:where([data-ui="unified"]) .art-billing-reference { max-width: 1200px; margin: auto; padding: var(--space-6) var(--space-5); }
+:where([data-ui="unified"]) .art-billing-reference > h1 { margin-top: 0; font-size: 2rem; }
+:where([data-ui="unified"]) .page-intro { color: var(--ui-muted); max-width: 78ch; margin-bottom: var(--space-6); }
 
-main.art-billing-reference {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 28px 20px 60px;
+:where([data-ui="unified"]) .billing-codes-header,
+:where([data-ui="unified"]) .billing-code-header,
+:where([data-ui="unified"]) .file-def-card-header,
+:where([data-ui="unified"]) .pro-tip-inner,
+:where([data-ui="unified"]) .important-note-inner { display: flex; align-items: center; gap: var(--space-3); }
+:where([data-ui="unified"]) .billing-codes-header { margin-bottom: var(--space-5); }
+
+:where([data-ui="unified"]) .billing-codes-title,
+:where([data-ui="unified"]) .req-section-title { font-size: var(--font-size-xl); margin: 0 0 var(--space-4); }
+:where([data-ui="unified"]) .billing-codes-header .billing-codes-title { margin: 0; }
+
+:where([data-ui="unified"]) .billing-codes-icon,
+:where([data-ui="unified"]) .important-note-icon { color: var(--ui-accent); flex: 0 0 24px; }
+
+:where([data-ui="unified"]) .billing-codes-grid,
+:where([data-ui="unified"]) .file-req-grid,
+:where([data-ui="unified"]) .file-def-grid,
+:where([data-ui="unified"]) .fee-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-5); }
+
+:where([data-ui="unified"]) .billing-code-card,
+:where([data-ui="unified"]) .file-req-card { padding: 0; overflow: hidden; }
+:where([data-ui="unified"]) .billing-code-header { justify-content: space-between; flex-wrap: wrap; }
+
+:where([data-ui="unified"]) .billing-code-header,
+:where([data-ui="unified"]) .file-req-card-header { padding: var(--space-4) var(--space-5); background: var(--ui-tint); color: var(--ui-ink); border-bottom: 1px solid var(--ui-line); }
+:where([data-ui="unified"]) .billing-code-pn { font-family: var(--font-mono); font-size: var(--font-size-xl); font-weight: 600; }
+:where([data-ui="unified"]) .billing-code-price { font-size: var(--font-size-2xl); font-weight: 600; white-space: nowrap; font-variant-numeric: tabular-nums; }
+
+:where([data-ui="unified"]) .billing-code-subtitle,
+:where([data-ui="unified"]) .file-def-type-label { font-size: var(--font-size-sm); color: var(--ui-muted); }
+
+:where([data-ui="unified"]) .billing-code-body,
+:where([data-ui="unified"]) .file-req-card-body { padding: var(--ui-panel-space); }
+
+:where([data-ui="unified"]) .billing-code-body-title,
+:where([data-ui="unified"]) .callout-label,
+:where([data-ui="unified"]) .important-note-title,
+:where([data-ui="unified"]) .fee-increments-title { font-weight: 600; margin-bottom: var(--space-2); }
+
+:where([data-ui="unified"]) .billing-code-body-desc,
+:where([data-ui="unified"]) .callout-text,
+:where([data-ui="unified"]) .file-def-desc,
+:where([data-ui="unified"]) .file-req-item,
+:where([data-ui="unified"]) .important-note-text,
+:where([data-ui="unified"]) .fee-desc { font-size: var(--font-size-md); color: var(--ui-muted); }
+:where([data-ui="unified"]) .billing-code-body-desc { margin-bottom: var(--space-4); }
+:where([data-ui="unified"]) .callout { margin-bottom: 0; background: var(--gray-50); }
+:where([data-ui="unified"]) .callout--spaced { margin-top: var(--space-5); }
+
+:where([data-ui="unified"]) .callout ul,
+:where([data-ui="unified"]) .file-req-card-body ul { padding-left: var(--space-5); margin: var(--space-2) 0 0; font-size: var(--font-size-md); }
+
+:where([data-ui="unified"]) .increments-grid,
+:where([data-ui="unified"]) .fee-increments-grid { display: grid; grid-template-columns: 1fr auto; gap: var(--space-2) var(--space-4); font-size: var(--font-size-md); }
+
+:where([data-ui="unified"]) .amount,
+:where([data-ui="unified"]) .time-price { font-weight: 600; font-variant-numeric: tabular-nums; text-align: right; }
+:where([data-ui="unified"]) .pro-tip-box { margin-bottom: 0; }
+:where([data-ui="unified"]) .pro-tip-inner svg { flex: 0 0 20px; color: var(--ui-accent); }
+:where([data-ui="unified"]) .pro-tip-text { font-size: var(--font-size-md); }
+:where([data-ui="unified"]) .quick-nav { display: flex; flex-wrap: wrap; gap: var(--space-2); margin: var(--space-6) 0; }
+:where([data-ui="unified"]) .req-section { margin: var(--space-6) 0; scroll-margin-top: var(--space-5); }
+:where([data-ui="unified"]) .file-req-card-header { font-weight: 600; font-size: var(--font-size-lg); }
+:where([data-ui="unified"]) .file-req-card-body h4 { font-size: var(--font-size-base); margin: 0; }
+:where([data-ui="unified"]) .file-req-highlight { margin: var(--space-4) 0; background: var(--ui-tint); font-size: var(--font-size-md); }
+:where([data-ui="unified"]) .file-req-item { margin-top: var(--space-3); }
+:where([data-ui="unified"]) .file-def-column-header { margin: 0 0 var(--space-4); font-size: var(--font-size-lg); }
+:where([data-ui="unified"]) .file-def-card-header { margin-bottom: var(--space-3); flex-wrap: wrap; }
+
+:where([data-ui="unified"]) .file-def-badge,
+:where([data-ui="unified"]) .vector-tag { color: var(--ui-accent); background: var(--ui-tint); }
+:where([data-ui="unified"]) .file-def-desc { margin: 0; }
+
+:where([data-ui="unified"]) .highlight-blue,
+:where([data-ui="unified"]) .highlight-pink { font-weight: 600; color: var(--ui-ink); }
+:where([data-ui="unified"]) .fee-amount { font-size: var(--font-size-display); font-weight: 600; font-variant-numeric: tabular-nums; }
+:where([data-ui="unified"]) .fee-label { font-size: var(--font-size-lg); font-weight: 600; margin-bottom: var(--space-5); }
+
+:where([data-ui="unified"]) .fee-desc,
+:where([data-ui="unified"]) .fee-includes-title { margin-bottom: var(--space-4); }
+:where([data-ui="unified"]) .fee-includes { font-size: var(--font-size-md); }
+:where([data-ui="unified"]) .fee-includes-item { display: flex; align-items: start; gap: var(--space-3); margin-bottom: var(--space-3); }
+:where([data-ui="unified"]) .numbered-circle { flex: 0 0 24px; color: var(--ui-accent); font-weight: 600; }
+:where([data-ui="unified"]) .fee-increments-box { background: var(--gray-50); }
+
+@media (width <= 700px) {
+ :where([data-ui="unified"]) .billing-codes-grid,
+:where([data-ui="unified"]) .file-req-grid,
+:where([data-ui="unified"]) .file-def-grid,
+:where([data-ui="unified"]) .fee-grid { grid-template-columns: 1fr; }
+ :where([data-ui="unified"]) .art-billing-reference { padding: var(--space-5) var(--space-4); }
 }
 
-.art-billing-reference > h1 {
-    font-size: 28px;
-    margin: 0 0 8px;
-    color: var(--gray-900);
-    font-weight: 700;
+@media print {
+ :where([data-ui="unified"]) .art-billing-reference { padding: 0; max-width: none; }
+
+ :where([data-ui="unified"]) .billing-codes-grid,
+:where([data-ui="unified"]) .file-req-grid,
+:where([data-ui="unified"]) .fee-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+ :where([data-ui="unified"]) .billing-codes-section { break-inside: auto; }
+
+ :where([data-ui="unified"]) .billing-code-card,
+:where([data-ui="unified"]) .file-req-card,
+:where([data-ui="unified"]) .file-def-card { break-inside: avoid; }
 }
 
-.art-billing-reference .page-intro {
-    font-size: 14px;
-    color: var(--gray-600);
-    margin: 0 0 28px;
-    line-height: 1.55;
-    max-width: 760px;
 }
-
-html { scroll-behavior: smooth; } /* the quick-nav links replaced scrollIntoView({behavior:"smooth"}) handlers */

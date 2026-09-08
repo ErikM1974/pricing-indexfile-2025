@@ -1,28 +1,15 @@
-/* ==========================================================================
-   design-queue.css — page-specific styles for dashboards/design-queue.html
-
-   Shell classes (.dash-header, .dash-card, .dash-stat-card…) come from
-   shared_components/css/dash-shell.css. Tokens (--surface-*, --gray-*,
-   --shadow-*, --radius-*, --state-*) come from shared_components/css/art-hub.css.
-
-   No tokens are redefined here and no colour, shadow or radius is hardcoded —
-   the page inherits the 2026 system so it restyles with everything else.
-   ========================================================================== */
-
-/* ── The thesis block ──────────────────────────────────────────────────────
-   Steve reads this first and possibly only this, so it is the one element
-   allowed to shout. Everything below it is reference. */
-.dq-thesis {
-    background: var(--surface-card);
+/* Design Queue domain rows, research briefs, image credits and unavailable metrics. Shared visual primitives belong to components.css. */
+@layer components.pages {
+:where([data-ui="unified"]) .dq-thesis {
+    background: var(--ui-surface);
     border: 1px solid var(--gray-200);
-    border-left: 4px solid var(--art-theme, var(--state-info));
+    border-left: 4px solid var(--ui-accent);
     border-radius: var(--radius-lg);
     padding: 20px 24px;
     margin-bottom: 24px;
-    box-shadow: var(--shadow-sm);
 }
 
-.dq-thesis-lead {
+:where([data-ui="unified"]) .dq-thesis-lead {
     margin: 0 0 12px;
     font-size: 20px;
     font-weight: 700;
@@ -31,7 +18,7 @@
     text-wrap: balance;
 }
 
-.dq-thesis-body {
+:where([data-ui="unified"]) .dq-thesis-body {
     margin: 0 0 8px;
     max-width: 76ch;
     font-size: 15px;
@@ -39,86 +26,43 @@
     color: var(--gray-600);
 }
 
-.dq-thesis-body:last-child { margin-bottom: 0; }
+:where([data-ui="unified"]) .dq-thesis-body:last-child { margin-bottom: 0; }
 
-/* ── Filters ───────────────────────────────────────────────────────────── */
-.dq-filters {
+:where([data-ui="unified"]) .dq-filters {
     display: flex;
     gap: 8px;
     flex-wrap: wrap;
 }
+:where([data-ui="unified"]) .dq-list { display: flex; flex-direction: column; }
 
-.dq-filter {
-    font: inherit;
-    font-size: 13px;
-    font-weight: 600;
-    padding: 5px 12px;
-    border: 1px solid var(--gray-300);
-    border-radius: var(--radius-sm);
-    background: var(--surface-card);
-    color: var(--gray-600);
-    cursor: pointer;
-}
-
-.dq-filter:hover { background: var(--gray-50); }
-
-.dq-filter[aria-pressed="true"] {
-    background: var(--gray-800);
-    border-color: var(--gray-800);
-    color: var(--surface-card);
-}
-
-.dq-filter:focus-visible {
-    outline: 2px solid var(--state-info);
-    outline-offset: 2px;
-}
-
-/* ── Subject rows ──────────────────────────────────────────────────────────
-   A row, not a card: Steve is scanning a list to pick one, and cards at this
-   density read as clutter. The verdict chip carries the decision; the reason
-   line carries the why. */
-.dq-list { display: flex; flex-direction: column; }
-
-.dq-row {
+:where([data-ui="unified"]) .dq-row {
     display: grid;
-    grid-template-columns: 108px 1fr auto;
+    grid-template-columns: 120px minmax(0, 1fr) auto;
     gap: 4px 16px;
     align-items: start;
     padding: 14px 4px;
     border-top: 1px solid var(--gray-200);
 }
 
-.dq-row:first-child { border-top: 0; }
+:where([data-ui="unified"]) .dq-row:first-child { border-top: 0; }
 
-.dq-chip {
+:where([data-ui="unified"]) .dq-chip {
     grid-row: span 2;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    text-align: center;
-    padding: 5px 8px;
-    border-radius: var(--radius-sm);
-    white-space: nowrap;
 }
 
-.dq-chip--draw     { background: var(--state-success-bg, var(--gray-100)); color: var(--state-success); }
-.dq-chip--research { background: var(--state-warning-bg, var(--gray-100)); color: var(--state-warning); }
-.dq-chip--skip     { background: var(--gray-100); color: var(--gray-500); }
-
-.dq-subject {
+:where([data-ui="unified"]) .dq-subject {
     font-size: 15.5px;
     font-weight: 600;
     color: var(--gray-900);
     line-height: 1.35;
 }
 
-.dq-subject .dq-city {
+:where([data-ui="unified"]) .dq-subject .dq-city {
     font-weight: 400;
-    color: var(--gray-400);
+    color: var(--ui-muted);
 }
 
-.dq-reason {
+:where([data-ui="unified"]) .dq-reason {
     grid-column: 2;
     font-size: 14px;
     line-height: 1.5;
@@ -126,7 +70,7 @@
     max-width: 80ch;
 }
 
-.dq-flags {
+:where([data-ui="unified"]) .dq-flags {
     grid-column: 2;
     display: flex;
     gap: 6px;
@@ -134,63 +78,45 @@
     margin-top: 4px;
 }
 
-.dq-flag {
-    font-size: 11px;
-    font-weight: 600;
-    padding: 2px 7px;
-    border-radius: var(--radius-sm);
-    background: var(--gray-100);
-    color: var(--gray-600);
-}
-
-.dq-flag--warn { background: var(--state-warning-bg, var(--gray-100)); color: var(--state-warning); }
-
-/* Vacancy is the number that decides, so it gets the visual weight and
-   tabular figures so the column reads as a column. */
-.dq-score {
+:where([data-ui="unified"]) .dq-score {
     grid-row: span 2;
     text-align: right;
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
 }
 
-.dq-score-value {
+:where([data-ui="unified"]) .dq-score-value {
     font-size: 22px;
     font-weight: 700;
     line-height: 1;
     color: var(--gray-900);
 }
 
-.dq-score-label {
-    font-size: 10px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--gray-400);
+:where([data-ui="unified"]) .dq-score-label {
+    font-size: var(--font-size-sm);
+    color: var(--ui-muted);
 }
 
-.dq-row--skip .dq-subject,
-.dq-row--skip .dq-score-value { color: var(--gray-500); }
+:where([data-ui="unified"]) .dq-row--skip .dq-subject,
+:where([data-ui="unified"]) .dq-row--skip .dq-score-value { color: var(--ui-muted); }
 
-/* ── Design briefs ─────────────────────────────────────────────────────────
-   The working end of the page. A card per subject, because Steve reads ONE
-   of these at a time and then goes and draws — unlike the queue above it,
-   which is scanned. */
-.dq-brief-card {
+:where([data-ui="unified"]) .dq-brief-card {
     border: 1px solid var(--gray-200);
     border-radius: var(--radius-lg);
     padding: 18px 20px;
     margin-bottom: 16px;
-    background: var(--surface-card, var(--color-surface));
+    background: var(--ui-surface);
 }
 
-.dq-brief-head {
+:where([data-ui="unified"]) .dq-brief-head {
+    flex-wrap: wrap;
     display: flex;
     align-items: center;
     gap: 12px;
     margin-bottom: 10px;
 }
 
-.dq-brief-rank {
+:where([data-ui="unified"]) .dq-brief-rank {
     flex: 0 0 auto;
     width: 30px;
     height: 30px;
@@ -198,38 +124,28 @@
     place-items: center;
     border-radius: 50%;
     background: var(--gray-800);
-    color: var(--surface-card, var(--color-surface));
+    color: var(--ui-surface);
     font-size: 14px;
     font-weight: 700;
 }
 
-.dq-brief-subject {
+:where([data-ui="unified"]) .dq-brief-subject {
     font-size: 17px;
     font-weight: 700;
     color: var(--gray-900);
     line-height: 1.25;
 }
 
-.dq-brief-where {
-    font-size: 13px;
-    color: var(--gray-500);
+:where([data-ui="unified"]) .dq-brief-where {
+    font-size: var(--font-size-md);
+    color: var(--ui-muted);
 }
 
-.dq-conf {
+:where([data-ui="unified"]) .dq-conf {
     margin-left: auto;
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    padding: 4px 9px;
-    border-radius: var(--radius-sm);
-    white-space: nowrap;
 }
 
-.dq-conf--confirmed { background: var(--state-success-bg, var(--gray-100)); color: var(--state-success); }
-.dq-conf--memory    { background: var(--state-warning-bg, var(--gray-100)); color: var(--state-warning); }
-
-.dq-brief-why {
+:where([data-ui="unified"]) .dq-brief-why {
     margin: 0 0 14px;
     font-size: 14px;
     line-height: 1.55;
@@ -237,9 +153,7 @@
     max-width: 82ch;
 }
 
-/* The shirt block is styled AS a shirt layout so the hierarchy is obvious
-   without reading the labels. */
-.dq-shirt {
+:where([data-ui="unified"]) .dq-shirt {
     text-align: center;
     padding: 18px 14px;
     border: 1px dashed var(--gray-300);
@@ -248,76 +162,67 @@
     margin-bottom: 14px;
 }
 
-.dq-shirt-label {
-    font-size: 10px;
+:where([data-ui="unified"]) .dq-shirt-label {
+    font-size: var(--font-size-sm);
     font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--gray-400);
+    color: var(--ui-muted);
     margin-bottom: 10px;
 }
 
-.dq-shirt-main {
+:where([data-ui="unified"]) .dq-shirt-main {
     font-size: 22px;
     font-weight: 800;
-    letter-spacing: 0.02em;
     color: var(--gray-900);
     line-height: 1.15;
     text-wrap: balance;
 }
 
-.dq-shirt-sec {
+:where([data-ui="unified"]) .dq-shirt-sec {
     margin-top: 6px;
-    font-size: 13.5px;
+    font-size: var(--font-size-md);
     font-weight: 600;
     color: var(--gray-600);
 }
 
-.dq-shirt-small {
+:where([data-ui="unified"]) .dq-shirt-small {
     margin-top: 4px;
-    font-size: 11.5px;
-    letter-spacing: 0.06em;
-    color: var(--gray-500);
+    font-size: var(--font-size-sm);
+    color: var(--ui-muted);
 }
 
-.dq-row-block { margin-bottom: 12px; }
+:where([data-ui="unified"]) .dq-row-block { margin-bottom: 12px; }
 
-.dq-row-block--warn {
+:where([data-ui="unified"]) .dq-row-block--warn {
     padding: 10px 12px;
-    border-left: 3px solid var(--state-warning, var(--gray-300));
-    background: var(--state-warning-bg, var(--gray-50));
+    border-left: 3px solid var(--color-warning-ink);
+    background: var(--color-warning-bg);
     border-radius: var(--radius-sm);
 }
 
-.dq-row-label {
-    font-size: 10px;
+:where([data-ui="unified"]) .dq-row-label {
+    font-size: var(--font-size-sm);
     font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--gray-400);
+    color: var(--ui-muted);
     margin-bottom: 4px;
 }
 
-.dq-row-text {
+:where([data-ui="unified"]) .dq-row-text {
     margin: 0;
-    font-size: 13.5px;
+    font-size: var(--font-size-md);
     line-height: 1.6;
     color: var(--gray-700);
     max-width: 84ch;
 }
+:where([data-ui="unified"]) .dq-gallery { margin: 14px 0 16px; }
 
-/* Reference photographs. The credit sits under the picture and is not optional —
-   it is the library's licence condition, so it must survive any restyling. */
-.dq-gallery { margin: 14px 0 16px; }
-
-.dq-gallery-grid {
+:where([data-ui="unified"]) .dq-gallery-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 190px), 1fr));
     gap: 12px;
     margin-top: 6px;
 }
 
-.dq-fig {
+:where([data-ui="unified"]) .dq-fig {
     margin: 0;
     border: 1px solid var(--gray-200);
     border-radius: var(--radius-md);
@@ -325,7 +230,7 @@
     background: var(--gray-50);
 }
 
-.dq-fig img {
+:where([data-ui="unified"]) .dq-fig img {
     display: block;
     width: 100%;
     height: 140px;
@@ -333,71 +238,70 @@
     background: var(--gray-100);
 }
 
-.dq-fig-cap {
+:where([data-ui="unified"]) .dq-fig-cap {
     display: block;
     padding: 7px 9px 8px;
 }
 
-.dq-fig-note {
+:where([data-ui="unified"]) .dq-fig-note {
     display: block;
-    font-size: 11.5px;
+    font-size: var(--font-size-sm);
     line-height: 1.4;
     color: var(--gray-700);
     margin-bottom: 3px;
 }
 
-.dq-fig-credit {
+:where([data-ui="unified"]) .dq-fig-credit {
     display: block;
-    font-size: 10px;
+    font-size: var(--font-size-sm);
     line-height: 1.35;
-    color: var(--gray-500);
+    color: var(--ui-muted);
 }
 
-.dq-refs { margin: 14px 0 12px; }
+:where([data-ui="unified"]) .dq-refs { margin: 14px 0 12px; }
 
-.dq-ref { margin-bottom: 8px; }
+:where([data-ui="unified"]) .dq-ref { margin-bottom: 8px; }
 
-.dq-ref-link {
-    font-size: 13.5px;
+:where([data-ui="unified"]) .dq-ref-link {
+    font-size: var(--font-size-md);
     font-weight: 600;
-    color: var(--state-info, var(--gray-700));
+    color: var(--color-info-ink);
 }
 
-.dq-ref-what {
+:where([data-ui="unified"]) .dq-ref-what {
     margin: 2px 0 0;
-    font-size: 12.5px;
+    font-size: var(--font-size-md);
     line-height: 1.5;
-    color: var(--gray-500);
+    color: var(--ui-muted);
     max-width: 84ch;
 }
 
-/* Deliberately loud: this is a copyright rule, not a style note. */
-.dq-ref-rule {
+:where([data-ui="unified"]) .dq-ref-rule {
     margin: 10px 0 0;
-    font-size: 12.5px;
+    font-size: var(--font-size-md);
     font-weight: 600;
     line-height: 1.5;
-    color: var(--state-warning, var(--gray-600));
+    color: var(--color-warning-ink);
 }
 
-.dq-list-block { margin-bottom: 12px; }
+:where([data-ui="unified"]) .dq-list-block { margin-bottom: 12px; }
 
-.dq-ul {
+:where([data-ui="unified"]) .dq-ul {
     margin: 0;
     padding-left: 20px;
     max-width: 84ch;
 }
 
-.dq-ul li {
-    font-size: 13px;
+:where([data-ui="unified"]) .dq-ul li {
+    font-size: var(--font-size-md);
     line-height: 1.55;
     color: var(--gray-600);
     margin-bottom: 4px;
 }
 
-.dq-blocked-list { margin-top: 8px; }
+:where([data-ui="unified"]) .dq-blocked-list { margin-top: 8px; }
 
-.dq-blocked {
+:where([data-ui="unified"]) .dq-blocked {
     padding: 12px 14px;
     border-left: 3px solid var(--gray-300);
     background: var(--gray-50);
@@ -405,60 +309,40 @@
     margin-bottom: 10px;
 }
 
-.dq-blocked-subject {
+:where([data-ui="unified"]) .dq-blocked-subject {
     font-size: 14px;
     font-weight: 700;
     color: var(--gray-700);
 }
 
-/* ── Store metrics ─────────────────────────────────────────────────────────
-   A LOCKED block must not look like a block reporting zero. The tiles carry
-   figures; the notices carry prose. They are deliberately different objects,
-   because "0 visitors" and "we cannot see visitors" are different facts and
-   only one of them is a measurement. */
-.dq-refresh {
-    font-size: 12px;
-    font-weight: 600;
-    padding: 5px 12px;
-    border: 1px solid var(--gray-300);
-    border-radius: var(--radius-sm);
-    background: var(--surface-card, var(--color-surface));
-    color: var(--gray-600);
-    cursor: pointer;
-}
+:where([data-ui="unified"]) .dq-metrics-block { margin-bottom: 20px; }
+:where([data-ui="unified"]) .dq-metrics-block:last-of-type { margin-bottom: 0; }
 
-.dq-refresh:hover { background: var(--gray-50); color: var(--gray-800); }
-
-.dq-metrics-block { margin-bottom: 20px; }
-.dq-metrics-block:last-of-type { margin-bottom: 0; }
-
-.dq-metrics-title {
+:where([data-ui="unified"]) .dq-metrics-title {
     margin: 0 0 10px;
-    font-size: 13px;
+    font-size: var(--font-size-md);
     font-weight: 700;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    color: var(--gray-500);
+    color: var(--ui-muted);
 }
 
-.dq-metrics-grid {
+:where([data-ui="unified"]) .dq-metrics-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
     gap: 10px;
     margin-bottom: 12px;
 }
 
-.dq-metric {
+:where([data-ui="unified"]) .dq-metric {
     padding: 12px 14px;
     border: 1px solid var(--gray-200);
     border-radius: var(--radius-md);
     background: var(--gray-50);
 }
 
-.dq-metric--warn { border-color: var(--state-warning, var(--gray-300)); }
-.dq-metric--good { border-color: var(--state-success, var(--gray-300)); }
+:where([data-ui="unified"]) .dq-metric--warn { border-color: var(--color-warning-ink); }
+:where([data-ui="unified"]) .dq-metric--good { border-color: var(--color-brand-deep); }
 
-.dq-metric-value {
+:where([data-ui="unified"]) .dq-metric-value {
     font-size: 24px;
     font-weight: 700;
     line-height: 1;
@@ -466,16 +350,13 @@
     font-variant-numeric: tabular-nums;
 }
 
-.dq-metric-label {
+:where([data-ui="unified"]) .dq-metric-label {
     margin-top: 4px;
-    font-size: 11px;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--gray-500);
+    font-size: var(--font-size-sm);
+    color: var(--ui-muted);
 }
 
-/* Prose, never a figure — this is what an unreadable block looks like. */
-.dq-notice {
+:where([data-ui="unified"]) .dq-notice {
     padding: 12px 14px;
     border-radius: var(--radius-md);
     border-left: 3px solid var(--gray-300);
@@ -483,92 +364,64 @@
     margin-bottom: 10px;
 }
 
-.dq-notice--locked { border-left-color: var(--state-info, var(--gray-400)); }
-.dq-notice--warn   { border-left-color: var(--state-warning, var(--gray-400)); }
+:where([data-ui="unified"]) .dq-notice--locked { border-left-color: var(--color-info-ink); }
+:where([data-ui="unified"]) .dq-notice--warn   { border-left-color: var(--color-warning-ink); }
 
-.dq-notice-head {
-    font-size: 13.5px;
+:where([data-ui="unified"]) .dq-notice-head {
+    font-size: var(--font-size-md);
     font-weight: 700;
     color: var(--gray-800);
 }
 
-.dq-notice-line {
+:where([data-ui="unified"]) .dq-notice-line {
     margin: 6px 0 0;
-    font-size: 13px;
+    font-size: var(--font-size-md);
     line-height: 1.55;
     color: var(--gray-600);
     max-width: 84ch;
 }
 
-.dq-metrics-sub {
+:where([data-ui="unified"]) .dq-metrics-sub {
     margin: 14px 0 6px;
-    font-size: 12px;
+    font-size: var(--font-size-md);
     font-weight: 600;
-    color: var(--gray-500);
+    color: var(--ui-muted);
 }
 
-.dq-metrics-scroll { overflow-x: auto; }
+:where([data-ui="unified"]) .dq-metrics-scroll { overflow-x: auto; }
 
-.dq-metrics-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 13px;
-}
+:where([data-ui="unified"]) .dq-metrics-foot { margin-top: 14px; margin-bottom: 0; font-size: var(--font-size-md); color: var(--ui-muted); }
 
-.dq-metrics-table th {
-    text-align: left;
-    font-size: 10px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--gray-400);
-    padding: 6px 10px 6px 0;
-    border-bottom: 1px solid var(--gray-200);
-    white-space: nowrap;
-}
-
-.dq-metrics-table td {
-    padding: 7px 10px 7px 0;
-    border-bottom: 1px solid var(--gray-100);
-    color: var(--gray-700);
-}
-
-.dq-metrics-table td:last-child { font-variant-numeric: tabular-nums; }
-
-.dq-metrics-foot { margin-top: 14px; margin-bottom: 0; font-size: 12px; color: var(--gray-400); }
-
-/* ── The brief ─────────────────────────────────────────────────────────────
-   Collapsed by default. 23 open research notes is a wall nobody reads; one
-   open note on the row Steve has chosen is the thing he works from. */
-.dq-brief {
+:where([data-ui="unified"]) .dq-brief {
     grid-column: 2;
     margin-top: 8px;
     max-width: 80ch;
 }
 
-.dq-brief-summary {
+:where([data-ui="unified"]) .dq-brief-summary {
     cursor: pointer;
     display: inline-block;
-    font-size: 12.5px;
+    font-size: var(--font-size-md);
     font-weight: 600;
-    color: var(--state-info, var(--gray-600));
+    color: var(--color-info-ink);
     padding: 3px 0;
     list-style: none;
 }
 
-.dq-brief-summary::-webkit-details-marker { display: none; }
+:where([data-ui="unified"]) .dq-brief-summary::-webkit-details-marker { display: none; }
 
-.dq-brief-summary::before {
-    content: '\25B8';           /* right-pointing triangle; rotates when open */
+:where([data-ui="unified"]) .dq-brief-summary::before {
+    content: '\25B8';
     display: inline-block;
     margin-right: 6px;
     transition: transform 0.12s ease;
 }
 
-.dq-brief[open] > .dq-brief-summary::before { transform: rotate(90deg); }
+:where([data-ui="unified"]) .dq-brief[open] > .dq-brief-summary::before { transform: rotate(90deg); }
 
-.dq-brief-summary:hover { text-decoration: underline; }
+:where([data-ui="unified"]) .dq-brief-summary:hover { text-decoration: underline; }
 
-.dq-brief-query {
+:where([data-ui="unified"]) .dq-brief-query {
     display: flex;
     flex-wrap: wrap;
     align-items: baseline;
@@ -576,41 +429,38 @@
     margin: 8px 0 10px;
 }
 
-.dq-brief-label {
-    font-size: 10px;
+:where([data-ui="unified"]) .dq-brief-label {
+    font-size: var(--font-size-sm);
     font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--gray-400);
+    color: var(--ui-muted);
 }
 
-.dq-brief-code {
-    font-family: 'JetBrains Mono', ui-monospace, monospace;
-    font-size: 13px;
+:where([data-ui="unified"]) .dq-brief-code {
+    font-family: var(--font-mono);
+    font-size: var(--font-size-md);
     padding: 3px 8px;
     border-radius: var(--radius-sm);
     background: var(--gray-100);
     color: var(--gray-800);
 }
 
-.dq-brief-body {
+:where([data-ui="unified"]) .dq-brief-body {
     margin: 0 0 10px;
-    font-size: 13.5px;
+    font-size: var(--font-size-md);
     line-height: 1.6;
     color: var(--gray-600);
 }
 
-.dq-brief-link {
-    font-size: 12.5px;
+:where([data-ui="unified"]) .dq-brief-link {
+    font-size: var(--font-size-md);
     font-weight: 600;
-    color: var(--state-info, var(--gray-600));
+    color: var(--color-info-ink);
     text-decoration: none;
 }
 
-.dq-brief-link:hover { text-decoration: underline; }
+:where([data-ui="unified"]) .dq-brief-link:hover { text-decoration: underline; }
 
-/* ── Supporting copy ───────────────────────────────────────────────────── */
-.dq-note {
+:where([data-ui="unified"]) .dq-note {
     margin: 0 0 16px;
     font-size: 14px;
     line-height: 1.55;
@@ -618,74 +468,66 @@
     max-width: 82ch;
 }
 
-.dq-note--warn {
+:where([data-ui="unified"]) .dq-note--warn {
     margin-top: 16px;
     margin-bottom: 0;
     padding: 12px 14px;
-    background: var(--state-warning-bg, var(--gray-50));
+    background: var(--color-warning-bg);
     border-radius: var(--radius-md);
     color: var(--gray-700);
 }
 
-.dq-checklist {
+:where([data-ui="unified"]) .dq-checklist {
     margin: 0;
     padding-left: 22px;
     max-width: 84ch;
 }
 
-.dq-checklist li {
+:where([data-ui="unified"]) .dq-checklist li {
     margin-bottom: 10px;
     font-size: 14.5px;
     line-height: 1.55;
     color: var(--gray-700);
 }
 
-.dq-checklist li:last-child { margin-bottom: 0; }
+:where([data-ui="unified"]) .dq-checklist li:last-child { margin-bottom: 0; }
 
-.dq-empty {
+:where([data-ui="unified"]) .dq-empty {
     padding: 20px 4px;
-    color: var(--gray-500);
+    color: var(--ui-muted);
     font-size: 14px;
 }
 
-.dq-provenance {
+:where([data-ui="unified"]) .dq-provenance {
     margin: 20px 0 0;
-    font-size: 12px;
+    font-size: var(--font-size-md);
     line-height: 1.5;
-    color: var(--gray-400);
+    color: var(--ui-muted);
     max-width: 84ch;
 }
 
-/* ── Narrow screens ────────────────────────────────────────────────────────
-   The score column drops below the subject rather than squeezing — Steve
-   opens this on a phone at the shop. */
 @media (width <= 640px) {
-    .dq-row {
+    :where([data-ui="unified"]) .dq-row {
         grid-template-columns: 1fr auto;
     }
 
-    .dq-chip {
+    :where([data-ui="unified"]) .dq-chip {
         grid-row: auto;
-        grid-column: 1;
-        justify-self: start;
-        margin-bottom: 4px;
     }
-    .dq-subject { grid-column: 1 / -1; }
+    :where([data-ui="unified"]) .dq-subject { grid-column: 1 / -1; }
 
-    .dq-reason,
-    .dq-brief,
-    .dq-flags { grid-column: 1 / -1; }
+    :where([data-ui="unified"]) .dq-reason,
+:where([data-ui="unified"]) .dq-brief,
+:where([data-ui="unified"]) .dq-flags { grid-column: 1 / -1; }
 
-    .dq-score {
+    :where([data-ui="unified"]) .dq-score {
         grid-row: 1;
         grid-column: 2;
     }
 }
 
-/* 2026-09-05 review — verdict tiles are filter buttons */
-/* stylelint-disable-next-line declaration-no-important -- the hidden attribute must beat any display rule */
-[hidden] { display: none !important; }
-.dq-stat-btn { font: inherit; text-align: left; cursor: pointer; color: inherit; }
-.dq-stat-btn[aria-pressed="true"] { outline: 2px solid var(--art-theme, var(--color-steve)); outline-offset: -2px; }
-.dq-stat-btn:focus-visible { outline: 2px solid var(--art-theme, var(--color-steve)); outline-offset: 2px; }
-.dq-empty .dq-refresh, .dq-note .dq-refresh, .dq-notice .dq-refresh { margin-left: 8px; }
+:where([data-ui="unified"]) .dq-empty .dq-refresh,
+:where([data-ui="unified"]) .dq-note .dq-refresh,
+:where([data-ui="unified"]) .dq-notice .dq-refresh { margin-left: 8px; }
+
+}

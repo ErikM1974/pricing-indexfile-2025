@@ -14,7 +14,7 @@ const html = read('dashboards/design-queue.html').replace(/<!--[\s\S]*?-->/g, ''
 const queue = read('dashboards/js/design-queue.js');
 const briefs = read('dashboards/js/design-queue-briefs.js');
 const metrics = read('dashboards/js/design-queue-metrics.js');
-const css = read('dashboards/css/design-queue.css');
+const css = read('shared_components/css/components.css');
 
 test('design queue — structure', () => {
     expect((html.match(/<h1\b/g) || []).length).toBe(1);
@@ -23,8 +23,8 @@ test('design queue — structure', () => {
     expect(html).toMatch(/<button type="button" class="dash-error-banner-close" aria-label="Dismiss">/);
     expect((html.match(/class="dash-stat-card[^"]*dq-stat-btn" data-filter="(draw|research|skip)" aria-pressed="false"/g) || []).length).toBe(3);
     expect(html).toMatch(/id="queue-root" class="dash-loading" role="status"/);
-    expect(css).toMatch(/^\[hidden\] \{ display: none !important; \}/m);
-    expect(css).toMatch(/\.dq-stat-btn\[aria-pressed="true"\]/);
+    expect(css).toMatch(/\[hidden\] \{ display: none; \}/);
+    expect(css).toMatch(/\.dash-stat-card\[aria-pressed="true"\]/);
 });
 
 test('design queue — tiles filter and stay in sync; retries everywhere; no dead code', () => {
