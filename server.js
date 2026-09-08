@@ -1,5 +1,5 @@
 // =============================================================================
-// OBSERVABILITY: Sentry (roadmap 1.10) — MUST be the first require: v8
+// OBSERVABILITY: Sentry (roadmap 1.10) — MUST load before Express: v10
 // auto-instruments express only if Sentry.init runs before express loads.
 // dotenv first so a local .env SENTRY_DSN works; env-gated no-op otherwise.
 // =============================================================================
