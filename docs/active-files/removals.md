@@ -51,3 +51,12 @@
 | None currently | - | - | - |
 
 [Back to the registry index](../../ACTIVE_FILES.md)
+
+### Training service consolidation — 2026-09-08
+
+- `training/css/art-approval-guide.css`: replaced by shared training-service.css / training-guide.js after checking all consumers.
+- `training/css/google-review-guide.css`: replaced by shared training-service.css / training-guide.js after checking all consumers.
+- `training/js/art-approval-guide.js`: replaced by shared training-service.css / training-guide.js after checking all consumers.
+- `training/js/thank-you-card-guide.js`: replaced by shared training-service.css / training-guide.js after checking all consumers.
+- `training/js/lead-sheet-guide.js`: replaced by shared training-service.css / training-guide.js after checking all consumers.
+- `training/js/google-review-guide.js`: replaced by shared training-service.css / training-guide.js after checking all consumers.

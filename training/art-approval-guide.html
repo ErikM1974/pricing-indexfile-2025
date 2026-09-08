@@ -5,31 +5,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="/favicon.png" type="image/png">
     <title>Adriyella's Art Approval Guide 🎨</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Caveat:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/training/css/art-approval-guide.css?v=2026.09.07.6">
+    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.08.2">
+    <link rel="stylesheet" href="/shared_components/css/training-guide.css?v=2026.09.08.10">
+    <link rel="stylesheet" href="/shared_components/css/training-service.css?v=2026.09.08.11">
 </head>
-<body>
+<body data-ui="unified" data-training="service" class="training-art-approval-guide">
     <!-- Navigation Header -->
-    <div class="nav-header">
-        <button class="back-button" data-call="goToDashboard">
+    <header class="nav-header"><div class="nav-container">
+        <button type="button" class="back-button btn btn-secondary" data-training-back>
             <i class="fas fa-arrow-left" aria-hidden="true"></i>
             Back to Dashboard
         </button>
-        
-    </div>
+        </div></header>
 
     <main class="container">
         <h1>Adriyella's Art Approval Guide <i class="fas fa-paint-brush" aria-hidden="true"></i></h1>
         <div class="intro-message">
             <p>Hey Adriyella! Erik here—taking on art approvals is huge because it frees up Nika and the AEs to focus on what they do best: selling and growing our business. By owning this from start to customer sign-off, you keep things moving smoothly and earn your $10 bonus each time. Remember, it's key to remind AEs to hand off artwork to you—otherwise, if they handle it themselves, it impacts your bonuses (deducted $10 per piece). Let's stay proactive and team-oriented to make this win-win!</p>
         </div>
-        <p style="text-align: center; font-size: 1.2em;">Streamline the process, free up the AE, and speed up production—win-win! Update your bonus app after each approval. 🎉</p>
+        <p class="training-callout">Streamline the process, free up the AE, and speed up production—win-win! Update your bonus app after each approval. 🎉</p>
 
-        <section>
-            <h2 data-call="toggleAccordion" data-args='["$this"]'><i class="fas fa-list-ol" aria-hidden="true"></i> How to Handle Art Approvals</h2>
-            <div class="accordion-content">
+        <section class="training-section training-disclosure">
+            <h2><button type="button" class="training-toggle" id="training-heading-1" aria-expanded="false" aria-controls="training-panel-1"><span><i class="fas fa-list-ol" aria-hidden="true"></i> How to Handle Art Approvals</span></button></h2>
+            <div class="accordion-content" id="training-panel-1" role="region" aria-labelledby="training-heading-1">
                 <ol>
                     <li><strong>Receive from AE:</strong> When a new artwork or mockup comes in, the AE hands it off to you (via email, Shopworks, or in-person).</li>
                     <li><strong>Coordinate with Team:</strong> Send to Steve (graphic artist) for design tweaks, then Ruthie (digitizing/plant manager) for production prep.</li>
@@ -41,25 +42,24 @@
             </div>
         </section>
 
-        <section>
-            <h2 data-call="toggleAccordion" data-args='["$this"]'><i class="fas fa-ruler" aria-hidden="true"></i> Step-by-Step Workflow</h2>
-            <div class="accordion-content">
-                <table>
-                    <tr><th>Step</th><th>What to Do</th><th>Tips/Examples</th></tr>
+        <section class="training-section training-disclosure">
+            <h2><button type="button" class="training-toggle" id="training-heading-2" aria-expanded="false" aria-controls="training-panel-2"><span><i class="fas fa-ruler" aria-hidden="true"></i> Step-by-Step Workflow</span></button></h2>
+            <div class="accordion-content" id="training-panel-2" role="region" aria-labelledby="training-heading-2">
+                <div class="training-table-scroll" tabindex="0" role="region" aria-label="Reference table"><table><thead><tr><th>Step</th><th>What to Do</th><th>Tips/Examples</th></tr></thead><tbody>
                     <tr><td>1. Get Artwork from AE</td><td>Review the order details/mockup provided by AE.</td><td>Ask: "Any specific instructions?" Log start in Shopworks.</td></tr>
                     <tr><td>2. Send to Steve (Graphics)</td><td>Email/assign to Steve for artwork creation or edits.</td><td>Subject: "Art for Order #[Number] - [Customer]". Follow up if needed.</td></tr>
                     <tr><td>3. Forward to Ruthie (Digitizing)</td><td>Once Steve's done, pass to Ruthie for digitizing/production check.</td><td>Include notes: "Ready for digitizing—customer needs [embroidery/screen print]."</td></tr>
                     <tr><td>4. Get Customer Approval</td><td>Share final mockup via email/call: "Here's the art—approve or changes?"</td><td>Script: "Hi [Name], attached is the mockup for your order. Looks good? Reply 'Approved'!"</td></tr>
                     <tr><td>5. Handle Revisions</td><td>If changes, loop back to Steve/Ruthie until approved.</td><td>Track revisions in notes to avoid delays.</td></tr>
                     <tr><td>6. Finalize & Log</td><td>Once approved, notify AE and log in Shopworks.</td><td>Notes: "Approved by customer on [Date]; sent to production."</td></tr>
-                </table>
+                </tbody></table></div>
                 <p><strong>Tip:</strong> Use Shopworks for all tracking—keeps everyone in the loop. If stuck, ping the team!</p>
             </div>
         </section>
 
-        <section>
-            <h2 data-call="toggleAccordion" data-args='["$this"]'><i class="fas fa-comment-dots" aria-hidden="true"></i> Communication Scripts</h2>
-            <div class="accordion-content">
+        <section class="training-section training-disclosure">
+            <h2><button type="button" class="training-toggle" id="training-heading-3" aria-expanded="false" aria-controls="training-panel-3"><span><i class="fas fa-comment-dots" aria-hidden="true"></i> Communication Scripts</span></button></h2>
+            <div class="accordion-content" id="training-panel-3" role="region" aria-labelledby="training-heading-3">
                 <p>Keep it pro and clear—examples for team and customers.</p>
                 
                 <div class="step-example">
@@ -80,7 +80,6 @@
         </section>
     </main>
 
-    <script src="/shared_components/js/data-call-delegator.js?v=2026.09.06.29"></script>
-    <script src="/training/js/art-approval-guide.js?v=2026.09.05.12"></script>
+    <script src="/shared_components/js/training-guide.js?v=2026.09.08.11"></script>
 </body>
 </html>
