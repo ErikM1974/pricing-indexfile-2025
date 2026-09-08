@@ -137,7 +137,7 @@ Production releases continue through the existing exact-source CI and deployment
 - [x] Recommend the palette, type, density, component boundaries and three open design decisions.
 - [x] Define family order, retirement rules and verification gates.
 - [ ] Complete the runtime/state coverage manifest and production component reference.
-- [ ] Implement and verify the three small pilots.
+- [x] Implement and verify the three small pilots (plus the component reference).
 - [ ] Migrate all families and retire their superseded styles.
 
 **First implementation target:** the component reference plus a single staff queue pilot. Establish the shared button/field/status/table/panel patterns there, then prove the same primitives on a customer inquiry page before broad rollout.
@@ -152,3 +152,7 @@ Erik approved implementation ("go for it"). Four local pilots now use the shared
 - All eight pilot browser tests pass: original queue/form contracts; 1440/768/390/320 layouts; six department contrasts; density without scale changes; keyboard dialog; loading/empty/error/retry; success focus on both customer forms; print-visible amounts. Seventeen focused unit tests pass, including unchanged billing prose/prices/links. JS lint zero and CSS lint 284 files clean.
 - `scripts/css/migration-manifest.json` locks pilot owners, state coverage and budgets, and records known pending dynamic/generated/email/embed sources. It is not a completed runtime census.
 - Remaining before release: full unit/DOM/a11y/browser and pricing gates, cache invalidation, exact-source CI, deploy and live verification. Next family: staff queues/details under the same contract, including AE panes and Caspio ownership boundaries.
+
+## Pilot release record — v2026.09.08.2
+
+Exact-source CI 34211413665 passed on 2360d4b1006587a78388eeacb24f919335dd5394. Local verification: 204 unit suites / 4,881 passing tests (four existing skips), 88 DOM tests, four axe unit tests, 84 fixture-parity cases, all five calculator surfaces and the nine CSS state tests. CSS scope 284 files clean; JavaScript lint and types clean. Production rollout uses this tag and requires the matching live SHA. The all-family rollout and complete runtime census remain open.

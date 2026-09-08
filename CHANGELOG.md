@@ -1,3 +1,10 @@
+## v2026.09.08.2 (2026.09.08)
+
+- Document unified CSS direction and phased component migration
+- Record scoped CSS pilot implementation and remaining rollout gates
+- Unify shared controls and migrate four CSS pilot pages
+- Gate scoped CSS pilot states in CI
+
 ## v2026.09.07.38 (2026.09.07)
 
 - Finish server business-route split and tested ShipStation stages
