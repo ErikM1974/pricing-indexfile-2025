@@ -1,3 +1,7 @@
+## v2026.09.07.38 (2026.09.07)
+
+- Finish server business-route split and tested ShipStation stages
+
 ## v2026.09.07.37 (2026.09.07)
 
 - Extract payment stages and stop fulfillment after rejected status writes

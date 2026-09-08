@@ -18,7 +18,7 @@ Source: Erik's Claude handover (2026-09-08). Work on develop; one server editor;
 
 ## Current verification
 
-The code-grade implementation is complete locally; the final source CI and production release are the remaining gates. Server1499lines,23route modules,456registrations (22 infrastructure +434 module registrations),203unit suites/4875passed (4existing skips), DOM88, accessibility4, quote parity84, browser15passed/3optional skips including5calculator surfaces, strict lint0, CSS283clean, types/build/boot passed. CSS design remains an explicitly separate track.
+The code-grade implementation is complete. Exact-source CI34193800629 passed onb4e16608; the final release is identified by tagv2026.09.07.38 and its corresponding Heroku build. Server1499lines,23route modules,456registrations (22 infrastructure +434 module registrations),203unit suites/4875passed (4existing skips), DOM88, accessibility4, quote parity84, browser15passed/3optional skips including5calculator surfaces, strict lint0, CSS283clean, types/build/boot passed. CSS design remains an explicitly separate track.
 
 ## Baseline
 - Frontend develop: 1e0dd7b6, following v2026.09.07.26 (CI fix).
