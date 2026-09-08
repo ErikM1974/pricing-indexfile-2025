@@ -1,3 +1,12 @@
+## v2026.09.08.10 (2026.09.08)
+
+- Record live art CSS family and the measured validation speedup
+- Run isolated CSS browser checks with three workers
+- Record training guide validation and the next release gates
+- Add New Employee forms: Direct Deposit Authorization and New Hire Information Sheet
+- Record training release gates and review concurrent employee forms
+- Unify training guides with shared reading styles and accessible controls
+
 ## v2026.09.08.9 (2026.09.08)
 
 - Record live transfer authentication and next CSS family batch
