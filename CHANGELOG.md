@@ -1,3 +1,7 @@
+## v2026.09.07.34 (2026.09.07)
+
+- Extract quote synchronization and shared watchdog state
+
 ## v2026.09.07.33 (2026.09.07)
 
 - Eliminate lint warnings and enforce strict server checks
