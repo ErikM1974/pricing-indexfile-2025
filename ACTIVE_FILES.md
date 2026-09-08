@@ -2004,3 +2004,6 @@ Fifteen staff-dashboard pages still carried inline code (found by the 2026-09-05
 
 | `/tests/unit/calculator-api-errors.test.js` | Product loader behavior: failed color/size APIs keep pricing hidden and show the existing error banner; stale size pricing cleared; successful API data preserved | EMB + cap calculators | Active |
 | `/tests/unit/sample-inventory-status.test.js` | Vendor inventory status/messages for available, unavailable and low-stock sizes; mocked API response | Sample inventory service | Active |
+
+| `/lib/quote-sync-access.js` | Shared-secret/staff gate for scheduled quote sync and tracking callbacks | Server and quote routes | Active |
+| `/tests/unit/quote-sync-access.test.js` | Real route access checks, scoped customer links and authenticated internal calls with mocked upstreams | Jest | Active |

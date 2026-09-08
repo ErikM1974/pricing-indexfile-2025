@@ -9,9 +9,10 @@ Source: Erik's Claude handover (2026-09-08). Work on develop; one server editor;
 - [x] Configure repository CRM_API_SECRET and verify CI executes the money-path and parity specs.
 - [x] Review and integrate dependency PRs individually with gates: tooling #38 (replaces #37), Stripe #34, rate-limit #33, csv-parse #32, Puppeteer #31.
 - [ ] Finish server split: CRM first; order form, quote sync/watchdog, storefront helpers and payments; preserve route table.
-- [ ] Extract and test long order/push handlers; add Node ESLint scope once split completes.
-- [ ] Lower browser warning cap to zero in verified batches.
-- [ ] Add lessons-length lock and CI/foreign-edit deploy checks.
+- [x] Decompose both order submission handlers into tested stages; add strict Node lint for server/routes/lib.
+- [ ] Decompose ShipStation submission while finishing the remaining server sections.
+- [x] Lower browser warning cap to zero in verified batches.
+- [x] Add lessons-length lock and CI/foreign-edit deploy checks.
 - [ ] Complete housekeeping: empty accidental file, active-file index, TODO markers and superseded memory.
 - [ ] Review visual changes with Erik, one surface at a time.
 
@@ -84,3 +85,8 @@ Source: Erik's Claude handover (2026-09-08). Work on develop; one server editor;
 
 - Quote-cut verification: route456 unchanged, undefined0 in19modules, strict lint0,198unit suites/4757passed (4skips), DOM88, accessibility4, parity84, browser15passed/3optional skips including5surfaces, CSS283clean, typecheck and boot200. Five safe local health/quote-read/validation probes passed.
 - Access-control follow-up discovered by smoke: sync-from-shopworks and bulk/tracking/change-log operations lacked a frontend gate; anonymous nonexistent-quote sync reached the handler and returned404. Stopped bulk probes before execution. Both deployed apps already share CRM_API_SECRET; proxy scheduled jobs and tracking callbacks need to send it before frontend enforcement. No live bulk mutation was tested. Customer quote-link access must be preserved, while staff-only overrides/operations require authentication.
+
+- Quote extraction v2026.09.07.34 / Heroku2057 is live at4758a8f1; source CI34188045298 and main CI34188356984 passed. Proxy caller-auth v2026.09.07.4 / Heroku1129 is live atcc8eda5c; full144suites/1822tests and safe health/auth validation passed; branches synchronized.
+- Quote access follow-up: 42 new regression cases cover all eleven operation gates, constant-time credentials, preserved customer/legacy links, blocked work-order substitution and authenticated internal writes. Fixture456 deliberately updated for exactly eleven middleware additions, with no registration reorder. Seven operations require staff; four admit staff or the proxy secret.
+- Separate backend dependency backlog observed during its build: Node is unpinned (Heroku selected24.20.0), production audit15 findings (9high/6moderate), unlike the frontend's zero-production-audit gate. The caller-auth patch does not upgrade backend dependencies.
+- Access-gate verification:199unit suites/4799passed (4existing skips), DOM88, accessibility4, quote parity84, browser15passed/3optional skips including all5calculator surfaces; build, lint0, types, CSS283 and boot200 passed. Prior release main/develop CI34188356984/34188668244 both passed.

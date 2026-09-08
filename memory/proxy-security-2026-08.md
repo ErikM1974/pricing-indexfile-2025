@@ -290,3 +290,12 @@ created in Box.
   thing. Say "status codes only, never retrieve customer content".
 - 🔑 **Check who calls a route before gating it.** Two of the four findings could not be
   fixed the obvious way precisely because browsers call them directly.
+
+## Quote sync and tracking gates (2026-09-07)
+The proxy release v2026.09.07.4 / Heroku1129 sends CRM_API_SECRET on all three Pricing Index scheduled jobs and the ShipStation tracking callback. Deploy this compatible caller change BEFORE enabling the app gates; both apps already share the configured secret.
+
+The app now gates seven staff operations (SanMar sync/status, ShipStation submission and change-log reads/acknowledgment). Four scheduler/callback operations accept either a verified staff session or a constant-time shared-secret match: both bulk syncs, tracking writes and health alerting. Internal bulk loopback requests also carry the secret and retain the HTTPS-forwarding header. Origin is never an identity check; absent configuration cannot authenticate an absent header.
+
+Customer per-quote refresh and vendor shipment reads follow the existing shareTokenOk contract, including legacy rows without a share token. These legacy links remain a known-ID capability, as before; this change does not revoke them. Token-protected quotes require their token and browsers now forward it on both calls. Customer refresh cannot change shopWorksOrderNumber; vendor lookup ignores customer woId overrides and uses that quote's stored number/snapshot. Staff retain their repair/override controls. Vendor lookup failures surface as errors.
+
+Verification uses actual registered handlers with mocked API/vendor calls, including rejection before any operation and successful internal forwarding. Live checks must use anonymous gates only after local verification; never run authenticated bulk jobs, tracking updates or alert POSTs as a deployment probe.

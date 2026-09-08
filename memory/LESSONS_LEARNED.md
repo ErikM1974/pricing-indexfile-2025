@@ -236,3 +236,9 @@ Native Node22.23 runs Puppeteer25; invoke its capture CLI outside Jest, and repo
 - Problem/root cause: `message:` was a label, not assignment, so in-stock samples had no message.
 - Solution: assign the message; no-unused-labels is now an error.
 - Prevention: test returned stock status and customer message together for available, low-stock and unavailable inventory.
+
+## Quote operations need caller and quote scope checks (2026-09-07)
+- Problem/root cause: bulk sync, tracking writes and change-log operations trusted their expected caller without authenticating it.
+- Solution: deploy credentials in proxy jobs/callbacks first; gate app operations with staff/shared-secret checks and authenticate loopback writes.
+- Customer refresh/vendor reads preserve existing share-token/legacy links, but resolve only that quote's work order; overrides require staff/trusted sync. Compare token byte lengths before timingSafeEqual.
+- Prevention: quote-sync-access.test.js exercises actual route chains, rejected callers, customer scope and internal forwarding; never probe live bulk mutations to test a gate.

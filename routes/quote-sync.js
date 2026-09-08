@@ -3,7 +3,7 @@
 // what the monolith had, at the same indentation, so every handler body and the registration order are unchanged
 // (tests/unit/server-route-table.test.js). Everything it needs from server.js arrives in ctx; nothing is global.
 module.exports = function register(app, ctx) {
-const { CASPIO_PROXY_BASE, CRM_API_SECRET, SOFT_DELETE_RETENTION_DAYS, SYNC_PROXY_BASE, buildOrderStatusUrl, channelConfigExact, escapeHTMLSrv, fetch, makeApiRequest, nowPacificNaiveIso, parseCaspioPacificMs, recordQuoteSyncRun, sanitizeFilterInput, sendEmailJSTemplate, shareTokenOk, withProxySecret } = ctx;
+const { CASPIO_PROXY_BASE, CRM_API_SECRET, SOFT_DELETE_RETENTION_DAYS, SYNC_PROXY_BASE, buildOrderStatusUrl, channelConfigExact, escapeHTMLSrv, fetch, makeApiRequest, nowPacificNaiveIso, parseCaspioPacificMs, recordQuoteSyncRun, isStaffOrSync, requireStaff, requireStaffOrSync, sanitizeFilterInput, sendEmailJSTemplate, shareTokenOk, withProxySecret } = ctx;
 
 // ============================================================================
 // QUOTE ↔ SHOPWORKS SYNC ENDPOINTS (Erik 2026-05-21)
@@ -142,6 +142,15 @@ app.post('/api/quote-sessions/:quoteId/sync-from-shopworks', async (req, res) =>
     // stamped, not an oldest/unpushed duplicate (→ split-brain → a second ShopWorks order).
     const session = sessions.find(s => s.PushedToShopWorks)
       || [...sessions].sort((a, b) => (Number(b.PK_ID) || 0) - (Number(a.PK_ID) || 0))[0];
+    // Customer links may refresh only their selected quote. Staff and scheduled jobs
+    // may use the existing manual work-order repair path.
+    const trusted = isStaffOrSync(req);
+    if (!trusted && !shareTokenOk(req, session)) {
+      return res.status(404).json({ success: false, error: 'Quote not found' });
+    }
+    if (!trusted && req.body?.shopWorksOrderNumber) {
+      return res.status(403).json({ success: false, error: 'Staff access required to change the work order' });
+    }
     const pkId = session.PK_ID;
     const previousStatus = session.ShopWorks_Status || '';
 
@@ -642,7 +651,7 @@ function mapVendorState(statusRaw) {
  * to "Shipped" (with tracking) and STAY that way across reloads. Bounded by the
  * proxy (≤15 POs) to stay under the 30s request limit.
  */
-app.post('/api/sanmar-orders/sync-shipments', async (req, res) => {
+app.post('/api/sanmar-orders/sync-shipments', requireStaff, async (req, res) => {
   try {
     const secret = process.env.CRM_API_SECRET;
     if (!secret) return res.status(500).json({ success: false, error: 'CRM_API_SECRET not configured' });
@@ -676,7 +685,7 @@ app.post('/api/sanmar-orders/sync-shipments', async (req, res) => {
  * poSearch + shipment SOAP is heavier than /sync-shipments. Returns `remaining` so
  * the UI can prompt to run again for a larger backlog.
  */
-app.post('/api/sanmar-orders/sync-recent-completed', async (req, res) => {
+app.post('/api/sanmar-orders/sync-recent-completed', requireStaff, async (req, res) => {
   try {
     const secret = process.env.CRM_API_SECRET;
     if (!secret) return res.status(500).json({ success: false, error: 'CRM_API_SECRET not configured' });
@@ -704,7 +713,7 @@ app.post('/api/sanmar-orders/sync-recent-completed', async (req, res) => {
  * "Refresh Inbound" button can poll until the async job finishes (the POST above
  * returns 202 immediately). Read-only; no secret needed on the proxy GET.
  */
-app.get('/api/sanmar-orders/sync-recent-completed-status', async (req, res) => {
+app.get('/api/sanmar-orders/sync-recent-completed-status', requireStaff, async (req, res) => {
   try {
     const r = await fetch(`${SYNC_PROXY_BASE}/api/sanmar-orders/sync-recent-completed-status`);
     const data = await r.json().catch(() => ({}));
@@ -734,18 +743,26 @@ app.get('/api/quote-sessions/:quoteId/vendor-shipment', async (req, res) => {
   try {
     const safeQuoteId = sanitizeFilterInput(req.params.quoteId);
 
-    // Resolve the work order number.
+    // Customer links must resolve the work order from their own quote; a query
+    // parameter is an override available only to authenticated staff/jobs.
+    const trusted = isStaffOrSync(req);
     let woId = null;
     const qWo = Number(req.query.woId);
-    if (Number.isInteger(qWo) && qWo > 0 && qWo < 100000000) {
+    if (trusted && Number.isInteger(qWo) && qWo > 0 && qWo < 100000000) {
       woId = qWo;
     } else {
-      try {
-        const sessions = await makeApiRequest(`/quote_sessions?filter=QuoteID='${safeQuoteId}'`);
-        const session = Array.isArray(sessions) ? sessions[0] : null;
-        const colWo = Number(session && session.ShopWorks_Order_Number);
-        if (Number.isInteger(colWo) && colWo > 0) woId = colWo;
-      } catch (_) { /* fall through to not-linked */ }
+      const sessions = await makeApiRequest(`/quote_sessions?filter=QuoteID='${safeQuoteId}'&q.orderBy=PK_ID DESC`);
+      const rows = Array.isArray(sessions) ? sessions : [];
+      const session = rows.find(s => s.PushedToShopWorks)
+        || [...rows].sort((a, b) => (Number(b.PK_ID) || 0) - (Number(a.PK_ID) || 0))[0];
+      if (!session || (!trusted && !shareTokenOk(req, session))) {
+        return res.status(404).json({ error: 'Quote not found' });
+      }
+      let snapshot = {};
+      try { snapshot = typeof session.ShopWorks_Snapshot === 'string' ? JSON.parse(session.ShopWorks_Snapshot) : (session.ShopWorks_Snapshot || {}); }
+      catch (_) { /* the stored order-number column remains authoritative */ }
+      const colWo = Number(session.ShopWorks_Order_Number || snapshot.order?.id_Order);
+      if (Number.isInteger(colWo) && colWo > 0) woId = colWo;
     }
     if (!woId) return res.json({ woId: null, linked: false, pos: [] });
 
@@ -852,7 +869,7 @@ app.get('/api/quote-sessions/:quoteId/vendor-shipment', async (req, res) => {
  *   { skipped: true, reason: 'pickup' }              // Customer Pickup orders
  *   { success: false, error: '...' }                 // 4xx/5xx pass-through
  */
-app.post('/api/quote-sessions/:quoteId/send-to-shipstation', async (req, res) => {
+app.post('/api/quote-sessions/:quoteId/send-to-shipstation', requireStaff, async (req, res) => {
   try {
     const safeQuoteId = sanitizeFilterInput(req.params.quoteId);
 
@@ -1465,10 +1482,9 @@ async function sendOrderShippedEmail(quoteSession, payload) {
  * Body: { quoteId, trackingNumber, trackingCarrier, trackingUrl, shippedAt,
  *         labelCost, shipstationOrderId, shipstationStatus }
  *
- * No auth required currently — proxy is the only caller. Future hardening:
- * add a shared secret or restrict by source IP.
+ * Requires a staff session or the shared CRM secret sent by the proxy callback.
  */
-app.post('/api/quote-sessions/:quoteId/shipstation-tracking', async (req, res) => {
+app.post('/api/quote-sessions/:quoteId/shipstation-tracking', requireStaffOrSync, async (req, res) => {
   try {
     const safeQuoteId = sanitizeFilterInput(req.params.quoteId);
     const payload = req.body || {};
@@ -1509,7 +1525,7 @@ app.post('/api/quote-sessions/:quoteId/shipstation-tracking', async (req, res) =
   }
 });
 
-app.post('/api/quote-sessions/bulk-sync-from-shopworks', async (req, res) => {
+app.post('/api/quote-sessions/bulk-sync-from-shopworks', requireStaffOrSync, async (req, res) => {
   const startedAt = Date.now();
   try {
     const daysBack = Math.min(Math.max(Number(req.body?.daysBack) || 30, 1), 90);
@@ -1617,7 +1633,7 @@ app.post('/api/quote-sessions/bulk-sync-from-shopworks', async (req, res) => {
           // x-forwarded-proto marks this as an already-secure internal call so
           // the force-HTTPS middleware never 302s it to https://localhost
           // (the loopback bypass also covers this; belt-and-suspenders). 2026-06-15
-          headers: { 'Content-Type': 'application/json', 'x-forwarded-proto': 'https' },
+          headers: withProxySecret({ 'Content-Type': 'application/json', 'x-forwarded-proto': 'https' }),
           body: JSON.stringify({}),
         });
         const data = await r.json().catch(() => ({}));
