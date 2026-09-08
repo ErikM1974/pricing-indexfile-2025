@@ -2007,3 +2007,13 @@ Fifteen staff-dashboard pages still carried inline code (found by the 2026-09-05
 
 | `/lib/quote-sync-access.js` | Shared-secret/staff gate for scheduled quote sync and tracking callbacks | Server and quote routes | Active |
 | `/tests/unit/quote-sync-access.test.js` | Real route access checks, scoped customer links and authenticated internal calls with mocked upstreams | Jest | Active |
+
+| `lib/storefront/channels.js` | Storefront service factory; one cache/state owner per app | Server context | Active |
+| `lib/storefront/custom-caps.js` | Storefront service factory; one cache/state owner per app | Server context | Active |
+| `lib/storefront/custom-tees.js` | Storefront service factory; one cache/state owner per app | Server context | Active |
+| `lib/storefront/index.js` | Storefront service factory; one cache/state owner per app | Server context | Active |
+| `lib/storefront/inventory.js` | Storefront service factory; one cache/state owner per app | Server context | Active |
+| `lib/storefront/tax.js` | Storefront service factory; one cache/state owner per app | Server context | Active |
+| `lib/storefront/three-day-tees.js` | Storefront service factory; one cache/state owner per app | Server context | Active |
+| `routes/storefront-gallery.js` | Public gallery pricing and merchandising route; registration order retained | Server context | Active |
+| `tests/unit/storefront-services.test.js` | Fifteen original/extracted contracts for cache scope/expiry, failures, tax and pricing inputs | Mocked APIs and pricing boundaries; pure pricing parity remains separate | Active |
