@@ -2017,3 +2017,23 @@ Fifteen staff-dashboard pages still carried inline code (found by the 2026-09-05
 | `lib/storefront/three-day-tees.js` | Storefront service factory; one cache/state owner per app | Server context | Active |
 | `routes/storefront-gallery.js` | Public gallery pricing and merchandising route; registration order retained | Server context | Active |
 | `tests/unit/storefront-services.test.js` | Fifteen original/extracted contracts for cache scope/expiry, failures, tax and pricing inputs | Mocked APIs and pricing boundaries; pure pricing parity remains separate | Active |
+
+### Payment services (2026-09-07)
+
+| File | Purpose | Owner | Status |
+|---|---|---|---|
+| `routes/stripe-webhook.js` | Payment verification, quote records or fulfillment stage | Server payment composition | Active |
+| `lib/payments/alerts.js` | Payment verification, quote records or fulfillment stage | Server payment composition | Active |
+| `lib/payments/deposits.js` | Payment verification, quote records or fulfillment stage | Server payment composition | Active |
+| `lib/payments/email-transport.js` | Payment verification, quote records or fulfillment stage | Server payment composition | Active |
+| `lib/payments/index.js` | Payment verification, quote records or fulfillment stage | Server payment composition | Active |
+| `lib/payments/order-emails.js` | Payment verification, quote records or fulfillment stage | Server payment composition | Active |
+| `lib/payments/order-records.js` | Payment verification, quote records or fulfillment stage | Server payment composition | Active |
+| `lib/payments/quote-emails.js` | Payment verification, quote records or fulfillment stage | Server payment composition | Active |
+| `lib/payments/quote-integrity.js` | Payment verification, quote records or fulfillment stage | Server payment composition | Active |
+| `lib/payments/quote-links.js` | Payment verification, quote records or fulfillment stage | Server payment composition | Active |
+| `lib/payments/quote-payment.js` | Payment verification, quote records or fulfillment stage | Server payment composition | Active |
+| `lib/payments/samples-fulfillment.js` | Payment verification, quote records or fulfillment stage | Server payment composition | Active |
+| `lib/payments/storefront-payment.js` | Payment verification, quote records or fulfillment stage | Server payment composition | Active |
+| `tests/unit/payment-fulfillment.test.js` | Failed payment writes, redelivery and fulfillment outcomes | Mocked APIs and notifications | Active |
+| `tests/unit/payment-integrity.test.js` | Payment HMAC, customer links, exact lookup and authoritative deposit configuration | Mocked services and test secrets | Active |

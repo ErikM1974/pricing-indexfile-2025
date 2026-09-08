@@ -23,7 +23,8 @@ const fs = require('fs');
 const { serverSource } = require('../helpers/server-source');
 const path = require('path');
 
-const serverSrc = serverSource();
+const paymentDir = path.join(__dirname, '../../lib/payments');
+const serverSrc = serverSource() + '\n' + fs.readdirSync(paymentDir).filter(name => name.endsWith('.js')).map(name => fs.readFileSync(path.join(paymentDir, name), 'utf8')).join('\n');
 
 function assertRegistration(pattern, description) {
     test(description, () => {
