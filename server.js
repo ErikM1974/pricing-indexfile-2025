@@ -73,8 +73,8 @@ dotenv.config();
 // =============================================================================
 // Composition root: environment, shared infrastructure and ordered route registration.
 // Payment/storefront/order/ShipStation behavior lives in focused libraries.
-// Current route inventory: node scripts/server/route-table.js (456 registrations locked).
-// Infrastructure stays here per the handover; security and session behavior is unchanged.
+// Current route inventory: node scripts/server/route-table.js (485 registrations locked, 24 modules).
+// Infrastructure stays here per the handover; transfer relays use the existing staff session gate.
 
 // 253GEAR PUBLISHER (2026-08-08) — Steve's tab drafts products on the retail storefront.
 //   ALL /api/gear/*                      — page-gated forwarders to proxy /api/shopify/* (~L4361)
