@@ -3795,3 +3795,26 @@ prompt and an API is three prices; only the API may hold it. 🔑 Test a Caspio-
 CHANGING it in Caspio and watching the page, not by reading the code. 🔑 One rule beats two: a
 fee PLUS a minimum produced a price cliff (23 pcs $302, 24 pcs $192) — a single order minimum is
 monotonic and explainable; reach for the minimum first.
+
+
+## 2026-09-07 — CSS standardization Step 1+3 (`v2026.09.07.3`): three traps in a zero-change deploy
+
+**Problem.** (a) A Bash heredoc that was to write the two token files died at parse time and wrote
+nothing — the CSS comments contain apostrophes. (b) The three `tests/ui/*.html` token fixtures could
+not be screenshotted through `server.js` (no `/tests` mount), so "the five pages that load the
+dashboard tokens" were only two served pages. (c) stylelint-config-standard's `value-keyword-case`
+demanded `inter`, `menlo`, `blinkmacsystemfont` inside the `--font-*` tokens.
+**Root cause.** (a) The harness hands the whole command to `bash -c`; a quoted heredoc is not immune.
+(b) `tests/` is deliberately outside every static mount. (c) The rule checks custom-property values
+too, and font names are proper nouns.
+**Solution.** (a) Write tool for any multi-line file; Bash only for one-line edits (`perl -pi`, CRLF
+kept with `\r\n` in the replacement). (b) `node scripts/qa-static-server.js <repo> 8098` serves the
+whole tree; a scratch Playwright config (`baseURL` :8098, `testDir` tests/e2e, `testMatch`
+builder-screenshots) reuses the spec unchanged — 3 fixtures screenshotted and diffed with the rest.
+(c) `'value-keyword-case': ['lower', { ignoreProperties: ['font-family', 'font', '/^--font-/'] }]`.
+**Prevention.** 🔑 Write tool for files, perl for lines. 🔑 A page is only screenshot-able if something
+SERVES it — check the mount before counting it. 🔑 Lint the token file BEFORE settling the config:
+config-standard rewrites are value-identical (hue `deg`, `rgb(… / 12%)`, `#fff`, one declaration per
+line) but prove it with the pixel diff, not by eye. 🔑 Another session deployed `v2026.09.07.2` into
+this checkout between my first read and my first edit — `git log -1` + `git status` before the first
+commit is what caught that develop had moved (DURABLE_GOTCHAS § Repo/deploy, again).
