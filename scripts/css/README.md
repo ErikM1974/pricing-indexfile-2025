@@ -69,3 +69,7 @@ The Bradley family adds five reviewed consumers and mocked transfer/order/image/
 Ruth and Saved Mockups are the first two art-family consumers. Their mocked browser contract is css-unification-art.spec.js; Ruth's board/recovery patterns live in art-workflow.css. Source budgets normalize CRLF to committed LF and retain a 2 KB allowance. This does not certify the remaining Steve/AE/detail consumers.
 
 The four Steve/AE/detail consumers now have 24 mocked browser tests in css-unification-art-details.spec.js, including five rendered intake variants, queued files, invalid fields, print privacy, sender cancellation and thread selection. art-theme.css prevents details from loading the queue owner. The migration guard resolves local aliases in every actual consuming page, and locks the four explicit Art Request Detail visibility/print exceptions. See the style guide for ownership; this still does not certify other application families.
+
+## Faster iteration on reviewed families
+
+`npm run test:css` runs the fully mocked CSS and transfer-auth browser specs with three workers. The first measured trial passed all 74 cases in 156.8 seconds on the office laptop. Append a Playwright `--grep` filter while changing one family, then run the complete mocked set before release. CI uses this same command. The default `test:e2e` configuration and live money/calculator checks remain serial because parallel proxy cold starts have been flaky. Final release checks still include the unit, DOM, accessibility, parity, lint, types, build and live-price browser gates.

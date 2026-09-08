@@ -23,6 +23,7 @@
     "test:dom": "jest tests/dom/",
     "test:a11y": "jest tests/a11y/",
     "test:e2e": "playwright test --config tests/e2e/playwright.config.js",
+    "test:css": "playwright test --config tests/e2e/playwright.config.js css-unification transfer-auth --workers=3",
     "test:integration": "jest tests/integration/ --verbose",
     "test:parser": "jest tests/unit/parser --verbose",
     "test:pricing": "jest tests/unit/pricing --verbose",
