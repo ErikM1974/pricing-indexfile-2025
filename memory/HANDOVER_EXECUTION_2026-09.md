@@ -60,3 +60,9 @@ Source: Erik's Claude handover (2026-09-08). Work on develop; one server editor;
 - Dependency release v2026.09.07.29 / Heroku2052 is verified at85d57bf7; both main/develop CI runs34181654283 and34181786791 passed. Production audit0; development-only audit2high.
 - User explicitly approved the CRM refactor. routes/crm-proxy.js now owns60 registrations; shared gates/cache/Box helpers stay in server.js. All95 original statements match at the syntax-tree level, route456 unchanged, undefined0, and12 booted anonymous route-family checks return401. See SERVER_SPLIT_2026-09.md section8 for the cut.
 - CRM verification: Full gates passed:192 unit suites /4,703 tests (4 established skips), DOM88, accessibility4, fixture parity84, browser15 passed /3 optional screenshot skips, including all five live pricing surfaces. Lint99 existing warnings, CSS283 clean, typecheck and boot200 passed. Route fixture unchanged.
+
+## Remaining server and lint work approved by Erik
+- Start with the order-form section, then test and decompose submission stages, finish the remaining server sections, add Node lint coverage and reduce tolerated browser warnings to zero. CSS design remains a separate track.
+- First cut: routes/order-form.js, 48 registrations and 2,219 source lines moved unchanged; server.js is 6,525 lines. All 61 statements match in order, route fixture456 unchanged and undefined0. The 3-Day Tees submit handler is already in customer-portal.js and will be covered there.
+
+- Browser gate initially exposed a DTF test race: typing preceded async search-listener binding (trace showed no product request). The harness now waits for the existing end-of-init overlay state. Production handler code remains identical; both DTF save lanes and the full browser suite are rerun. The oldest resolved webstore lesson was archived before recording this finding.

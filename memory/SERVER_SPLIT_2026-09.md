@@ -51,6 +51,12 @@ half-finished work — and a `server.js` committed with call sites but without `
 
 ## 8. Progress log (newest first)
 
+### 2026-09-07 — Order-form section: 48 registrations, server.js 8,740 → 6,525 lines
+
+- Moved 2,219 lines into routes/order-form.js at the same call site. All 61 original statements match in sequence at the syntax-tree level after normalizing module-relative paths. No shared declarations needed moving.
+- The section contains the 978-line submit-order-form handler plus monitoring and legacy cart/catalog/pricing relays. Fresh inspection corrects the handover: submit-3day-order already lives in routes/customer-portal.js (422 lines). Its behavior needs separate tests; it was not in this cut.
+- Route table remains 456 registrations; undefined names zero in 16 modules. Full release gates and live verification follow this initial extraction before any handler logic is decomposed.
+
 ### 2026-09-07 — CRM cut: 60 registrations, server.js 9,554 → 8,740 lines
 
 - Erik explicitly approved the reviewed CRM extraction after the dependency release v2026.09.07.29 / Heroku2052. The tree was clean at85d57bf7.
