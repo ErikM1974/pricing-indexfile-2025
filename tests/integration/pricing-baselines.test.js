@@ -19,13 +19,23 @@
 
 const fs = require('fs');
 const path = require('path');
-const { captureAll } = require('../../scripts/capture-pricing-baselines');
+const { execFile, spawnSync } = require('child_process');
+const { promisify } = require('util');
+const runNode = promisify(execFile);
 
 const LOCKED_PATH = path.join(__dirname, '..', 'pricing-baselines', 'baselines.locked.json');
 const CAPTURED_PATH = path.join(__dirname, '..', 'pricing-baselines', 'baselines.captured.json');
 
-// Skip the whole suite if no server running AND not in CI (CI is expected to start its own)
-const SKIP_IF_NO_SERVER = !process.env.CI;
+// Register actual skipped tests when an optional local prerequisite is absent.
+// Capture failures after this check are errors, never misreported as a missing server.
+const hasBaseline = fs.existsSync(LOCKED_PATH);
+const localServerReady = !!process.env.CI || spawnSync(process.execPath, ['-e',
+  "const http=require('http');const req=http.get('http://localhost:3000/api/version',res=>{res.resume();process.exit(res.statusCode===200?0:1)});req.on('error',()=>process.exit(1));req.setTimeout(1500,()=>process.exit(1));"
+], { timeout: 2500, windowsHide: true, stdio: 'ignore' }).status === 0;
+const captureSuite = hasBaseline && localServerReady ? describe : describe.skip;
+if (!hasBaseline || !localServerReady) {
+  console.warn('Pricing baseline comparisons SKIPPED: ' + (!hasBaseline ? 'no locked baseline' : 'no local server on port 3000') + '. Live calculator parity is a separate suite.');
+}
 
 function readJSON(filePath) {
   if (!fs.existsSync(filePath)) return null;
@@ -80,10 +90,9 @@ function diffScenario(locked, captured) {
   return diffs;
 }
 
-describe('Pricing baselines — regression gate', () => {
+captureSuite('Pricing baselines — regression gate', () => {
   let lockedData = null;
   let capturedData = null;
-  let serverReachable = true;
 
   beforeAll(async () => {
     lockedData = readJSON(LOCKED_PATH);
@@ -99,19 +108,18 @@ describe('Pricing baselines — regression gate', () => {
 
     // Run a fresh capture (uses existing server unless CI=true → spawn own)
     try {
-      await captureAll({
-        startServer: !!process.env.CI,
-        headless: true
+      // Puppeteer25 is ESM. Native Node22 loads it; Jest's VM loader cannot.
+      // Keep capture in its own process and compare the same captured JSON below.
+      const args = [path.join(__dirname, '../../scripts/capture-pricing-baselines.js')];
+      if (process.env.CI) args.push('--start-server');
+      await runNode(process.execPath, args, {
+        cwd: path.join(__dirname, '../..'), timeout: 170000, maxBuffer: 8 * 1024 * 1024,
+        windowsHide: true,
       });
       capturedData = readJSON(CAPTURED_PATH);
     } catch (err) {
       console.error('Capture failed:', err.message);
-      serverReachable = false;
-      if (SKIP_IF_NO_SERVER) {
-        console.log('⏭  Skipping regression checks — local server not running. CI runs with --start-server.');
-      } else {
-        throw err;
-      }
+      throw err;
     }
   }, 180000); // 3min timeout for puppeteer + 22 scenarios
 
@@ -127,7 +135,7 @@ describe('Pricing baselines — regression gate', () => {
   });
 
   test('capture produced output', () => {
-    if (!lockedData || !serverReachable) return;
+    if (!lockedData) return;
     expect(capturedData).toBeTruthy();
     expect(capturedData._meta).toBeTruthy();
     expect(capturedData._meta.errors).toBe(0);
@@ -137,7 +145,7 @@ describe('Pricing baselines — regression gate', () => {
   const scenarioIds = (readJSON(LOCKED_PATH) || {});
   Object.keys(scenarioIds).filter(k => !k.startsWith('_')).forEach(scenarioId => {
     test(`${scenarioId} matches locked baseline`, () => {
-      if (!lockedData || !serverReachable) return;
+      if (!lockedData) return;
       const locked = lockedData[scenarioId]?.expected;
       const captured = capturedData?.[scenarioId]?.expected;
 
