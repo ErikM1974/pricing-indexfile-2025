@@ -115,3 +115,7 @@ The DTG order submission is decomposed into garments, services, artwork, notes, 
 ### Quote synchronization, lifecycle and public quotes (2026-09-07)
 
 Three contiguous route cuts move20 registrations: quote-sync9, quote-lifecycle9, public-quotes2. The Pacific timestamp helper remains shared in the root. The watchdog moves to one lib/quote-sync-health instance created before both consumers; its mutable timestamps, results and dedup map stay together. An original/extracted contract comparison covers thresholds, counters, reason order, dedup, retries and instance isolation. All279 other original top-level statements survive unchanged (relative paths normalized); the456-route fixture remains the required lock.
+
+### Storefront service factories (2026-09-07)
+
+Forty-three shared declarations now belong to six focused lib/storefront factories: tax, inventory, 3-Day Tees, custom tees, custom caps and channel bindings. An index composes them once in dependency order; caches and their loaders stay in the same closure. All43 moved declarations and206 remaining statements matched at the syntax-tree level before the gallery cut. The public gallery keeps its aggregate/style-copy caches in routes/storefront-gallery.js, registered in its original position. Fixture456 remains unchanged. Fifteen contracts passed against both the original helpers and extracted factories; they test authoritative pricing inputs, not a replacement pricing engine.
