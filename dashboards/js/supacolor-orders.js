@@ -12,10 +12,7 @@
 (function () {
     'use strict';
 
-    // Rule 6: the proxy base comes from APP_CONFIG (config/app.config.js), never a hardcoded host.
-    var API_BASE = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL)
-        || '';
-    if (!API_BASE) console.error('[supacolor-orders] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
+    // Workflow requests use this app's authenticated staff relays.
     var POLL_INTERVAL_MS = 60 * 1000;
     var PAGE_SIZE = 25;
 
@@ -253,7 +250,7 @@
     // ── API ────────────────────────────────────────────────────────────
     async function fetchJobs() {
         try {
-            var resp = await fetch(API_BASE + '/api/supacolor-jobs?pageSize=500&orderBy=' +
+            var resp = await fetch('/api/supacolor-jobs?pageSize=500&orderBy=' +
                 encodeURIComponent('Date_Shipped DESC'));
             if (!resp.ok) throw new Error('HTTP ' + resp.status);
             var data = await resp.json();
@@ -269,7 +266,7 @@
 
     async function fetchStats() {
         try {
-            var resp = await fetch(API_BASE + '/api/supacolor-jobs/stats');
+            var resp = await fetch('/api/supacolor-jobs/stats');
             if (!resp.ok) throw new Error('HTTP ' + resp.status);
             var data = await resp.json();
             if (!data.success) return;
@@ -280,7 +277,7 @@
     }
 
     async function extractJobsList(base64Image) {
-        var resp = await fetch(API_BASE + '/api/vision/extract-supacolor-jobs-list', {
+        var resp = await fetch('/api/vision/extract-supacolor-jobs-list', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ image: base64Image })
@@ -291,7 +288,7 @@
     }
 
     async function bulkUpsertJobs(jobs) {
-        var resp = await fetch(API_BASE + '/api/supacolor-jobs/bulk-upsert', {
+        var resp = await fetch('/api/supacolor-jobs/bulk-upsert', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ jobs: jobs })
@@ -303,7 +300,7 @@
 
     // Single-job detail extraction + save — mirrors the flow in supacolor-job-detail.js
     async function extractJobDetail(base64Image) {
-        var resp = await fetch(API_BASE + '/api/vision/extract-supacolor-job-detail', {
+        var resp = await fetch('/api/vision/extract-supacolor-job-detail', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ image: base64Image })
@@ -314,7 +311,7 @@
     }
 
     async function upsertJob(payload, force) {
-        var url = API_BASE + '/api/supacolor-jobs/upsert' + (force ? '?force=true' : '');
+        var url = '/api/supacolor-jobs/upsert' + (force ? '?force=true' : '');
         var resp = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -326,7 +323,7 @@
     }
 
     async function replaceJoblines(idJob, joblines) {
-        var resp = await fetch(API_BASE + '/api/supacolor-jobs/' + idJob + '/joblines', {
+        var resp = await fetch('/api/supacolor-jobs/' + idJob + '/joblines', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ joblines: joblines })
@@ -337,7 +334,7 @@
     }
 
     async function replaceHistory(idJob, history) {
-        var resp = await fetch(API_BASE + '/api/supacolor-jobs/' + idJob + '/history/replace', {
+        var resp = await fetch('/api/supacolor-jobs/' + idJob + '/history/replace', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ history: history })

@@ -1,5 +1,11 @@
 # CSS unification — design direction and implementation plan
 
+## User-requested stopping point — 2026-09-08
+
+Final boot probe FAILED: the local server did not answer /api/version on port 3113 within 45 seconds. The preceding build/lint/types/unit/DOM/axe/parity/CSS/browser checks passed, but the overall gate exited 1. Startup was not investigated because Erik requested a stop. Diagnose and rerun the boot probe before preparing a release; do not claim all release gates passed.
+
+PAUSED so Erik can shut down and return later. The authoritative resume record is [HANDOVER_FOLLOWUPS_2026-09.md](HANDOVER_FOLLOWUPS_2026-09.md), first section. Live frontend is v2026.09.08.6 / Heroku 2065: thirteen unified pages, including Ruth and Saved Mockups. Main/develop release CI is green. The tested transfer/Supacolor relay and backend auth changes are saved but NOT deployed; frontend release must go first. Latest local frontend checks: 4,961 unit tests and 66 browser cases passed, with the final boot outcome in the companion checkpoint JSON. After the coordinated security release, continue Steve/AE/details, then the remaining application families. No additional deployment was started for this pause.
+
 Prepared 2026-09-07 against frontend v2026.09.07.38, commit `2ca502a1`.
 
 Erik's brief: unify CSS throughout the application so pages look modern, sleek and easy to maintain.

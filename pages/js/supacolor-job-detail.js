@@ -13,8 +13,6 @@ var supajobdetaLog = SUPAJOBDETA_LOG_ON ? console.log.bind(console) : function (
 (function () {
     'use strict';
 
-    var API_BASE = (typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) || '';
-    if (!API_BASE) console.error('[supacolor-job-detail] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
 
     var state = {
         idJob: null,
@@ -101,7 +99,7 @@ var supajobdetaLog = SUPAJOBDETA_LOG_ON ? console.log.bind(console) : function (
 
     // ── API ────────────────────────────────────────────────────────────
     async function fetchJob(idJob) {
-        var resp = await fetch(API_BASE + '/api/supacolor-jobs/' + encodeURIComponent(idJob));
+        var resp = await fetch('/api/supacolor-jobs/' + encodeURIComponent(idJob));
         if (!resp.ok) {
             if (resp.status === 404) throw new Error('Job not found');
             throw new Error('HTTP ' + resp.status);
@@ -127,7 +125,7 @@ var supajobdetaLog = SUPAJOBDETA_LOG_ON ? console.log.bind(console) : function (
      */
     async function fetchLinkedTransfers(jobNumber) {
         if (!jobNumber) return [];
-        var url = API_BASE + '/api/transfer-orders?supacolorOrderNumber=' +
+        var url = '/api/transfer-orders?supacolorOrderNumber=' +
             encodeURIComponent(jobNumber);
         var resp = await fetch(url);
         if (!resp.ok) throw new Error('HTTP ' + resp.status);
@@ -137,7 +135,7 @@ var supajobdetaLog = SUPAJOBDETA_LOG_ON ? console.log.bind(console) : function (
     }
 
     async function extractJobDetail(base64Image) {
-        var resp = await fetch(API_BASE + '/api/vision/extract-supacolor-job-detail', {
+        var resp = await fetch('/api/vision/extract-supacolor-job-detail', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ image: base64Image })
@@ -148,7 +146,7 @@ var supajobdetaLog = SUPAJOBDETA_LOG_ON ? console.log.bind(console) : function (
     }
 
     async function upsertJob(payload, force) {
-        var url = API_BASE + '/api/supacolor-jobs/upsert' + (force ? '?force=true' : '');
+        var url = '/api/supacolor-jobs/upsert' + (force ? '?force=true' : '');
         var resp = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -160,7 +158,7 @@ var supajobdetaLog = SUPAJOBDETA_LOG_ON ? console.log.bind(console) : function (
     }
 
     async function replaceJoblines(idJob, joblines) {
-        var resp = await fetch(API_BASE + '/api/supacolor-jobs/' + idJob + '/joblines', {
+        var resp = await fetch('/api/supacolor-jobs/' + idJob + '/joblines', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ joblines: joblines })
@@ -171,7 +169,7 @@ var supajobdetaLog = SUPAJOBDETA_LOG_ON ? console.log.bind(console) : function (
     }
 
     async function replaceHistory(idJob, history) {
-        var resp = await fetch(API_BASE + '/api/supacolor-jobs/' + idJob + '/history/replace', {
+        var resp = await fetch('/api/supacolor-jobs/' + idJob + '/history/replace', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ history: history })
@@ -182,7 +180,7 @@ var supajobdetaLog = SUPAJOBDETA_LOG_ON ? console.log.bind(console) : function (
     }
 
     async function deleteJob(idJob) {
-        var resp = await fetch(API_BASE + '/api/supacolor-jobs/' + encodeURIComponent(idJob), {
+        var resp = await fetch('/api/supacolor-jobs/' + encodeURIComponent(idJob), {
             method: 'DELETE'
         });
         var data = await resp.json();
@@ -191,7 +189,7 @@ var supajobdetaLog = SUPAJOBDETA_LOG_ON ? console.log.bind(console) : function (
     }
 
     async function updateJobStatus(idJob, status) {
-        var resp = await fetch(API_BASE + '/api/supacolor-jobs/' + encodeURIComponent(idJob), {
+        var resp = await fetch('/api/supacolor-jobs/' + encodeURIComponent(idJob), {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ Status: status })
@@ -203,7 +201,7 @@ var supajobdetaLog = SUPAJOBDETA_LOG_ON ? console.log.bind(console) : function (
 
     // Direct OAuth2 API sync for a single job — replaces paste-OCR for normal refreshes.
     async function syncJobFromSupacolorApi(jobNumber) {
-        var resp = await fetch(API_BASE + '/api/supacolor-jobs/sync/' + encodeURIComponent(jobNumber), {
+        var resp = await fetch('/api/supacolor-jobs/sync/' + encodeURIComponent(jobNumber), {
             method: 'POST'
         });
         var data = await resp.json();
@@ -380,7 +378,7 @@ var supajobdetaLog = SUPAJOBDETA_LOG_ON ? console.log.bind(console) : function (
                 // with Content-Disposition: attachment and honors the <a download> attr.
                 // Supacolor's CDN blocks direct fetch (CORS) and serves Content-Disposition:
                 // inline, which made the old direct-URL path fall back to a new-tab open.
-                var downloadUrl = API_BASE + '/api/supacolor-jobs/proxy-image' +
+                var downloadUrl = '/api/supacolor-jobs/proxy-image' +
                     '?url=' + encodeURIComponent(url) +
                     '&name=' + encodeURIComponent(filename);
 

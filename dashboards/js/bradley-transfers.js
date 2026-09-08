@@ -13,10 +13,7 @@ var bradtranLog = BRADTRAN_LOG_ON ? console.log.bind(console) : function () {}; 
     'use strict';
 
     // ── Config ───────────────────────────────────────────────────────
-    // Rule 6: the proxy base comes from APP_CONFIG (config/app.config.js), never a hardcoded host.
-    var API_BASE = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL)
-        || '';
-    if (!API_BASE) console.error('[bradley-transfers] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
+    // Workflow requests use this app's authenticated staff relays.
     var POLL_INTERVAL_MS = 60 * 1000;
     var AGE_WARN_HOURS = 24;      // yellow after 1 day
     var AGE_CRITICAL_HOURS = 72;  // red after 3 days
@@ -68,7 +65,7 @@ var bradtranLog = BRADTRAN_LOG_ON ? console.log.bind(console) : function () {}; 
     // ── API ──────────────────────────────────────────────────────────
     async function fetchTransfers() {
         try {
-            var resp = await fetch(API_BASE + '/api/transfer-orders?pageSize=500&orderBy=Requested_At%20DESC&includeLineCount=true');
+            var resp = await fetch('/api/transfer-orders?pageSize=500&orderBy=Requested_At%20DESC&includeLineCount=true');
             if (!resp.ok) throw new Error('HTTP ' + resp.status);
             var data = await resp.json();
             if (!data.success) throw new Error(data.error || 'API returned success=false');
@@ -100,7 +97,7 @@ var bradtranLog = BRADTRAN_LOG_ON ? console.log.bind(console) : function () {}; 
 
     async function fetchStats() {
         try {
-            var resp = await fetch(API_BASE + '/api/transfer-orders/stats');
+            var resp = await fetch('/api/transfer-orders/stats');
             if (!resp.ok) throw new Error('HTTP ' + resp.status);
             var data = await resp.json();
             if (!data.success) throw new Error(data.error || 'Stats API returned success=false');
@@ -117,7 +114,7 @@ var bradtranLog = BRADTRAN_LOG_ON ? console.log.bind(console) : function () {}; 
         // + cascade Transfer_Notes. Does NOT touch Supacolor_Jobs (separate API-owned table).
         // Backend enforces status guard (Requested / On_Hold only).
         var resp = await fetch(
-            API_BASE + '/api/transfer-orders/' + encodeURIComponent(idTransfer) + '?hard=true',
+            '/api/transfer-orders/' + encodeURIComponent(idTransfer) + '?hard=true',
             {
                 method: 'DELETE',
                 headers: { 'Content-Type': 'application/json' },
@@ -539,7 +536,7 @@ var bradtranLog = BRADTRAN_LOG_ON ? console.log.bind(console) : function () {}; 
             if (num === lastValidatedNumber) return;
             feedback.textContent = 'Checking…';
             feedback.className = 'bt-lscm-feedback';
-            fetch(API_BASE + '/api/supacolor-jobs/by-number/' + encodeURIComponent(num))
+            fetch('/api/supacolor-jobs/by-number/' + encodeURIComponent(num))
                 .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, status: r.status, data: j }; }); })
                 .then(function (res) {
                     if (String(input.value || '').trim() !== num) return; // user kept typing
@@ -580,7 +577,7 @@ var bradtranLog = BRADTRAN_LOG_ON ? console.log.bind(console) : function () {}; 
             saveBtn.disabled = true;
             saveBtn.textContent = 'Saving…';
             try {
-                var resp = await fetch(API_BASE + '/api/transfer-orders/' + encodeURIComponent(idTransfer), {
+                var resp = await fetch('/api/transfer-orders/' + encodeURIComponent(idTransfer), {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ Supacolor_Order_Number: num })
@@ -619,7 +616,7 @@ var bradtranLog = BRADTRAN_LOG_ON ? console.log.bind(console) : function () {}; 
         btnEl.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> ' + escapeHtml(jobNumber);
         btnEl.disabled = true;
         try {
-            var resp = await fetch(API_BASE + '/api/supacolor-jobs/by-number/' + encodeURIComponent(jobNumber));
+            var resp = await fetch('/api/supacolor-jobs/by-number/' + encodeURIComponent(jobNumber));
             var data = await resp.json();
             // Endpoint returns data.job (not data.record — verified 2026-04-25).
             // Defensively check both shapes in case the contract changes.

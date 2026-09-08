@@ -20,8 +20,6 @@ var trandetaLog = TRANDETA_LOG_ON ? console.log.bind(console) : function () {}; 
     'use strict';
 
     // ── Config ───────────────────────────────────────────────────────
-    var API_BASE = (typeof window !== 'undefined' && window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) || '';
-    if (!API_BASE) console.error('[transfer-detail] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
 
     // ── State ────────────────────────────────────────────────────────
     var state = {
@@ -126,7 +124,7 @@ var trandetaLog = TRANDETA_LOG_ON ? console.log.bind(console) : function () {}; 
 
     // ── API ──────────────────────────────────────────────────────────
     async function apiGet(path) {
-        var resp = await fetch(API_BASE + path);
+        var resp = await fetch(path);
         if (!resp.ok) {
             if (resp.status === 404) throw new Error('NOT_FOUND');
             throw new Error('HTTP ' + resp.status);
@@ -137,7 +135,7 @@ var trandetaLog = TRANDETA_LOG_ON ? console.log.bind(console) : function () {}; 
     }
 
     async function apiPut(path, body) {
-        var resp = await fetch(API_BASE + path, {
+        var resp = await fetch(path, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(body)
@@ -148,7 +146,7 @@ var trandetaLog = TRANDETA_LOG_ON ? console.log.bind(console) : function () {}; 
     }
 
     async function apiPost(path, body) {
-        var resp = await fetch(API_BASE + path, {
+        var resp = await fetch(path, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(body)
@@ -159,7 +157,7 @@ var trandetaLog = TRANDETA_LOG_ON ? console.log.bind(console) : function () {}; 
     }
 
     async function apiDelete(path, body) {
-        var resp = await fetch(API_BASE + path, {
+        var resp = await fetch(path, {
             method: 'DELETE',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(body)
@@ -544,7 +542,7 @@ var trandetaLog = TRANDETA_LOG_ON ? console.log.bind(console) : function () {}; 
                 var slug = description.replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, '').slice(0, 50);
                 var filename = (itemCode || 'supacolor-image') + (slug ? '-' + slug : '') + '.' + ext;
 
-                var downloadUrl = API_BASE + '/api/supacolor-jobs/proxy-image' +
+                var downloadUrl = '/api/supacolor-jobs/proxy-image' +
                     '?url=' + encodeURIComponent(url) +
                     '&name=' + encodeURIComponent(filename);
 
@@ -582,7 +580,7 @@ var trandetaLog = TRANDETA_LOG_ON ? console.log.bind(console) : function () {}; 
         panel.innerHTML = '<div class="td-empty-panel td-status-message"><i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Loading live status...</div>';
 
         try {
-            var resp = await fetch(API_BASE + '/api/supacolor-jobs/by-number/' + encodeURIComponent(num));
+            var resp = await fetch('/api/supacolor-jobs/by-number/' + encodeURIComponent(num));
             if (resp.status === 404) {
                 panel.innerHTML = '<div class="td-empty-panel td-warning-message">' +
                     '<i class="fas fa-info-circle" aria-hidden="true"></i> Supacolor job <strong>#' + escapeHtml(num) + '</strong> not yet synced. ' +
@@ -642,7 +640,7 @@ var trandetaLog = TRANDETA_LOG_ON ? console.log.bind(console) : function () {}; 
                 var slot = $('td-supacolor-detail-slot');
                 if (slot) {
                     slot.innerHTML = '<div class="td-empty-panel td-status-caption"><i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Loading joblines & shipping...</div>';
-                    fetch(API_BASE + '/api/supacolor-jobs/' + encodeURIComponent(caspioId))
+                    fetch('/api/supacolor-jobs/' + encodeURIComponent(caspioId))
                         .then(function (r2) {
                             if (!r2.ok) throw new Error('HTTP ' + r2.status);
                             return r2.json();
@@ -1088,7 +1086,7 @@ var trandetaLog = TRANDETA_LOG_ON ? console.log.bind(console) : function () {}; 
      * extracted fields. Any error rejects so callers can show a status message.
      */
     async function extractSupacolor(dataUri) {
-        var resp = await fetch(API_BASE + '/api/vision/extract-supacolor', {
+        var resp = await fetch('/api/vision/extract-supacolor', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ image: dataUri })
@@ -1289,7 +1287,7 @@ var trandetaLog = TRANDETA_LOG_ON ? console.log.bind(console) : function () {}; 
         }
 
         try {
-            var resp = await fetch(API_BASE + '/api/supacolor-jobs/upsert', {
+            var resp = await fetch('/api/supacolor-jobs/upsert', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
@@ -1366,7 +1364,7 @@ var trandetaLog = TRANDETA_LOG_ON ? console.log.bind(console) : function () {}; 
             // the existing 10-min active-sync cron will eventually catch it.
             var supaNum = (fd.get('supacolorOrderNumber') || '').trim();
             if (supaNum) {
-                fetch(API_BASE + '/api/supacolor-jobs/sync/' + encodeURIComponent(supaNum), { method: 'POST' })
+                fetch('/api/supacolor-jobs/sync/' + encodeURIComponent(supaNum), { method: 'POST' })
                     .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, data: d }; }); })
                     .then(function (res) {
                         if (!res.ok) {

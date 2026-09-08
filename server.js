@@ -813,6 +813,8 @@ function withProxySecret(headers = {}) {
 // Default 100kb silently 413s on policies with embedded image references.
 // Authenticate payroll before accepting its larger JSON body. Must precede the global parser.
 app.use('/api/crm-proxy/payroll/parse', requirePageAccess('payroll.html'), bodyParser.json({ limit: '40mb' }));
+// Supacolor screenshots retain the proxy's 10 MB limit; staff auth runs before parsing.
+app.use(['/api/vision/extract-supacolor', '/api/vision/extract-supacolor-jobs-list', '/api/vision/extract-supacolor-job-detail'], requireStaff, bodyParser.json({ limit: '10mb' }));
 app.use(bodyParser.json({ limit: '5mb' }));
 app.use(bodyParser.urlencoded({ extended: true, limit: '5mb' }));
 
@@ -1124,6 +1126,9 @@ function boxFileId(req) {
 
 // CRM API proxy — extracted to routes/crm-proxy.js (server split, 2026-09-07); registered here so the order is unchanged.
 { const ctx = { CRM_API_BASE, CRM_API_SECRET, PORTAL_ADMIN_ROLES, SAMPLE_PRICING, TDT_PROXY, boxFileId, boxForward, express, fetch, requireCrmRole, requirePageAccess, requireStaff, strictLimiter, withProxySecret }; require('./routes/crm-proxy')(app, ctx); }
+
+// Transfer purchasing and Supacolor staff relays; vendor/customer boundaries stay in their own modules.
+{ const ctx = { CRM_API_BASE, CRM_API_SECRET, fetch, requireStaff }; require('./routes/transfers')(app, ctx); }
 // =============================================================================
 // POLICIES HUB AI ASSIST — streaming proxy to caspio-pricing-proxy.
 // The actual Claude API call lives on the proxy (where ANTHROPIC_API_KEY is

@@ -1374,7 +1374,7 @@ var tranactisharLog = TRANACTISHAR_LOG_ON ? console.log.bind(console) : function
             // Pass current modal method so backend swaps the Claude vision prompt:
             // 'Supacolor' → existing prompt (transfer type, garment, etc.)
             // 'Screen Print' → SP prompt (per-location ink chart, screens/prints/flashes)
-            var resp = await fetch(API_BASE + '/api/transfer-orders/analyze-link', {
+            var resp = await fetch('/api/transfer-orders/analyze-link', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ url: row.url, method: modalState.method || 'Supacolor' })
@@ -1783,7 +1783,7 @@ var tranactisharLog = TRANACTISHAR_LOG_ON ? console.log.bind(console) : function
                 return;
             }
 
-            var createResp = await fetch(API_BASE + '/api/transfer-orders', {
+            var createResp = await fetch('/api/transfer-orders', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
@@ -1836,7 +1836,7 @@ var tranactisharLog = TRANACTISHAR_LOG_ON ? console.log.bind(console) : function
     // ── Read helpers (for status badge on mockup-detail etc.) ────────
     async function getTransferForMockup(mockupId) {
         try {
-            var resp = await fetch(API_BASE + '/api/transfer-orders?mockupId=' + encodeURIComponent(mockupId) + '&pageSize=10');
+            var resp = await fetch('/api/transfer-orders?mockupId=' + encodeURIComponent(mockupId) + '&pageSize=10');
             if (!resp.ok) return null;
             var data = await resp.json();
             if (!data.success) return null;
@@ -1852,7 +1852,7 @@ var tranactisharLog = TRANACTISHAR_LOG_ON ? console.log.bind(console) : function
 
     async function getTransferById(idTransfer) {
         try {
-            var resp = await fetch(API_BASE + '/api/transfer-orders/' + encodeURIComponent(idTransfer));
+            var resp = await fetch('/api/transfer-orders/' + encodeURIComponent(idTransfer));
             if (!resp.ok) return null;
             var data = await resp.json();
             return data.success ? data.record : null;
@@ -1906,7 +1906,7 @@ var tranactisharLog = TRANACTISHAR_LOG_ON ? console.log.bind(console) : function
         }
         if (opts.designNumber) {
             try {
-                var resp = await fetch(API_BASE + '/api/transfer-orders?designNumber=' + encodeURIComponent(opts.designNumber) + '&pageSize=5&orderBy=Requested_At%20DESC');
+                var resp = await fetch('/api/transfer-orders?designNumber=' + encodeURIComponent(opts.designNumber) + '&pageSize=5&orderBy=Requested_At%20DESC');
                 if (!resp.ok) return null;
                 var data = await resp.json();
                 if (!data.success) return null;

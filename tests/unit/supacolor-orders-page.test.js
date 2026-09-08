@@ -17,11 +17,11 @@ const js = read('dashboards/js/supacolor-orders.js');
 const css = read('dashboards/css/supacolor-orders.css');
 
 describe('supacolor orders — config + Rule 3', () => {
-    test('API base from APP_CONFIG; config loaded before the controller', () => {
+    test('workflow calls use same-origin staff relays; config loaded before the controller', () => {
         expect(html).toMatch(/<script src="\/config\/app\.config\.js"><\/script>/);
         expect(html.indexOf('/config/app.config.js')).toBeLessThan(html.indexOf('/dashboards/js/supacolor-orders.js'));
-        expect(js).toMatch(/var API_BASE = \(window\.APP_CONFIG && window\.APP_CONFIG\.API && window\.APP_CONFIG\.API\.BASE_URL\)/);
-        expect(js).not.toMatch(/var API_BASE = 'https/);
+        expect(js).not.toMatch(/\bAPI_BASE\b/);
+        expect(js).toContain("'/api/supacolor-jobs");
     });
     test('no inline style; hidden rule; icons decorative; versions bumped', () => {
         expect(html).not.toMatch(/style="/);
