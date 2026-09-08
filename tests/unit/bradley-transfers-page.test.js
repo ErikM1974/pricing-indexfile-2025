@@ -18,11 +18,11 @@ const js = read('dashboards/js/bradley-transfers.js');
 const css = read('dashboards/css/bradley-transfers.css');
 
 describe('bradley transfers — config + Rule 3', () => {
-    test('API base from APP_CONFIG; app.config.js loaded before the controller', () => {
+    test('workflow calls use same-origin staff relays; app.config.js loaded before the controller', () => {
         expect(html).toMatch(/<script src="\/config\/app\.config\.js"><\/script>/);
         expect(html.indexOf('/config/app.config.js')).toBeLessThan(html.indexOf('/dashboards/js/bradley-transfers.js'));
-        expect(js).toMatch(/var API_BASE = \(window\.APP_CONFIG && window\.APP_CONFIG\.API && window\.APP_CONFIG\.API\.BASE_URL\)/);
-        expect(js).not.toMatch(/var API_BASE = 'https/);
+        expect(js).not.toMatch(/\bAPI_BASE\b/);
+        expect(js).toContain("'/api/transfer-orders");
     });
     test('no inline style / onerror; hidden rule; icons decorative', () => {
         expect(html).not.toMatch(/style="/);

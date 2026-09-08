@@ -14,13 +14,13 @@ const js = read('dashboards/js/bradley-screenprint.js');
 const jsNoComments = js.replace(/\/\/[^\n]*/g, '');
 
 describe('bradley screen print — structure + config', () => {
-    test('exactly one h1; API base from APP_CONFIG; config loaded first', () => {
+    test('exactly one h1; workflow calls use same-origin staff relays; config loaded first', () => {
         expect((html.match(/<h1\b/g) || []).length).toBe(1);
         expect(html).toMatch(/<h1 class="tab-title bt-title">/);
         expect(html).toMatch(/<script src="\/config\/app\.config\.js"><\/script>/);
         expect(html.indexOf('/config/app.config.js')).toBeLessThan(html.indexOf('/dashboards/js/bradley-screenprint.js'));
-        expect(js).toMatch(/var API_BASE = \(window\.APP_CONFIG && window\.APP_CONFIG\.API && window\.APP_CONFIG\.API\.BASE_URL\)/);
-        expect(js).not.toMatch(/var API_BASE = 'https/);
+        expect(js).not.toMatch(/\bAPI_BASE\b/);
+        expect(js).toContain("'/api/transfer-orders");
     });
     test('Rule 3 + decorative icons', () => {
         expect(html).not.toMatch(/style="/);

@@ -7,6 +7,8 @@
 
 | File | Purpose | Status |
 |------|---------|--------|
+| `/tests/unit/transfer-relays.test.js` | Real relay/session/parser contracts with mocked upstream services; browser caller boundary and downloads. | Active |
+| `/tests/e2e/transfer-auth.spec.js` | Actual-server staff HTML and anonymous API authentication checks; no business writes. | Active |
 | /tests/e2e/css-unification-art.spec.js | Mocked art workflow migration states, responsive layouts, request recovery and keyboard previews (2026-09-08). | Active |
 | `/tests/unit/dtg-pricing-readiness.test.js` | Controlled pending, partial, stale response and immutable snapshot pricing regressions; no network (2026-09-08). | Active |
 | `/tests/e2e/css-unification-bradley.spec.js` | Mocked Bradley queues/details, keyboard dialogs, image previews and screenshot import at four widths (2026-09-08). | Active |

@@ -501,6 +501,7 @@ app.get([
   '/pages/art-request-detail.html',
   '/pages/mockup-detail.html',
   '/pages/transfer-detail.html',
+  '/pages/supacolor-job-detail.html',
   // 2026-09-03 (dashboard Workspaces audit): five more staff tools that only ever
   // hung off the staff dashboard but sat on the anonymous /pages static mount.
   '/pages/box-labels.html',

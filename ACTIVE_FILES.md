@@ -1,6 +1,6 @@
 # Active Files Registry
 
-Last updated: 2026-09-08 (Art workflow shared CSS and browser coverage registered in the area documents).
+Last updated: 2026-09-08 (Staff transfer/Supacolor relay and authentication coverage registered in area documents).
 
 | Area | Registry |
 |---|---|

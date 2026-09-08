@@ -1,5 +1,19 @@
 # CSS unification — design direction and implementation plan
 
+## Resumed — 2026-09-08
+
+Erik explicitly resumed from the checkpoint and reiterated permission to continue. The historical pause below is superseded. The unchanged saved frontend passed the actual HTTP boot probe on port 3113 with status 200; the earlier timeout did not recur and its cause is unconfirmed. All previously completed local checks remain recorded below. Continue the exact-source CI/release process, frontend callers FIRST and backend gates second, then the remaining CSS families.
+
+### Faster rollout plan
+
+Migrate complete related page families using the existing shared controls and reusable layout owners. Keep one design direction, automate mechanical dependency/class changes with explicit ownership checks, and use focused mocked state checks during editing. Run the full required suite at release boundaries and review actual desktop/mobile rendering. Group compatible small pages into larger releases; retain separate verification for pricing, approvals and generated documents. The current planning estimate is several working days for the remaining rollout and verification, to be tightened from the next measured family. This is an estimate, not a completion promise or a reason to skip coverage.
+
+## User-requested stopping point — 2026-09-08
+
+Final boot probe FAILED: the local server did not answer /api/version on port 3113 within 45 seconds. The preceding build/lint/types/unit/DOM/axe/parity/CSS/browser checks passed, but the overall gate exited 1. Startup was not investigated because Erik requested a stop. Diagnose and rerun the boot probe before preparing a release; do not claim all release gates passed.
+
+PAUSED so Erik can shut down and return later. The authoritative resume record is [HANDOVER_FOLLOWUPS_2026-09.md](HANDOVER_FOLLOWUPS_2026-09.md), first section. Live frontend is v2026.09.08.6 / Heroku 2065: thirteen unified pages, including Ruth and Saved Mockups. Main/develop release CI is green. The tested transfer/Supacolor relay and backend auth changes are saved but NOT deployed; frontend release must go first. Latest local frontend checks: 4,961 unit tests and 66 browser cases passed, with the final boot outcome in the companion checkpoint JSON. After the coordinated security release, continue Steve/AE/details, then the remaining application families. No additional deployment was started for this pause.
+
 Prepared 2026-09-07 against frontend v2026.09.07.38, commit `2ca502a1`.
 
 Erik's brief: unify CSS throughout the application so pages look modern, sleek and easy to maintain.
@@ -219,7 +233,7 @@ Erik reiterated authorization to continue until the application-wide work is com
 - [x] Replace Ruth's four competing legacy shared imports with one scoped art-workflow owner, preserving status/hold/rush/due/revision and billing meaning. Use existing shared controls, Public Sans, neutral surfaces and purple accents. Port grid, board and recovery patterns for later Steve/AE adoption.
 - [x] Move Saved Mockups onto shared staff controls with readable metadata and one artwork card per phone row. Preserve search and Designer/Request destinations; make image preview keyboard-accessible and request/image failures visible with recovery.
 - [x] Test real rendered normal/loading/empty/error/retry/filter/tab/board/dialog states at 1440/768/390/320. Mock all writes, OCR, Box shared links, recovery and notifications. Baselines were captured at 1440/390 before editing.
-- [ ] Register new owners and tests immediately; replace dead consumer imports, measure bytes and update the ownership manifest. Complete all local gates, exact-source CI, deployment and live verification.
+- [x] Register new owners and tests immediately; replace dead consumer imports, measure bytes and update the ownership manifest. Complete all local gates, exact-source CI, deployment and live verification.
 - [ ] Continue Steve/AE and both detail consumers, then remaining staff/customer/calculator/builder/document families. Full rollout remains open.
 
 ## Art first-pair checkpoint — 2026-09-08
@@ -239,3 +253,9 @@ After this pair ships, prioritize the confirmed transfer/Supacolor authenticatio
 Exact-source CI 34228004194 passed on ba9305807615977e3c1051162abeec6f41d365c4. Ruth and Saved Mockups have scoped shared controls, readable responsive layouts and keyboard-accessible filters, cards, board expansion and recovery dialogs. Their local CSS sources dropped from 195,318 to 83,050 bytes and 153,935 to 62,346 bytes respectively, measured with committed LF line endings. Existing billing content and workflow destinations are preserved. Loading, empty, request/image errors, recovery, retry and cancelled operations have rendered coverage. The Bradley toast regression now preserves opaque text through actual entry/dismissal animation midpoints.
 
 Verification: 206 unit suites / 4,915 passing tests (four existing skips), 88 DOM tests, four axe unit tests, 84 fixture-parity cases, JavaScript lint and types clean, CSS lint on 286 files, build and boot checks, and the full browser gate including all five live-price calculator surfaces. Business writes and notifications were mocked. Route table remains 456 registrations / 23 modules. Thirteen pages use the unified design owners after this rollout; deployment requires matching live SHA and source-asset bytes. Next priority is the confirmed transfer/Supacolor caller/authentication boundary, then Steve/AE and both detail pages. The application-wide rollout remains open.
+
+## Art first-pair live verification — v2026.09.08.6
+
+Heroku 2065 succeeded on 5d547dca8dae53493a8caa0cb0392ac00f899e11. Six changed source assets match the committed bytes, four existing staff HTML gates refuse anonymous access, and the two public reference/inquiry pages still return the unified shell. Exact-source CI 34228004194 is green; main/develop release-branch checks run separately. Local gates passed 4,915 unit tests, 88 DOM tests, four axe unit tests, 84 fixture-parity cases and 63 browser tests (three optional screenshot skips), including 47 CSS/compatibility cases and five calculator surfaces. Thirteen pages are now live on unified owners.
+
+Next: implement the staff transfer/Supacolor relay module and six browser callers, preserving the proxy's 10 MB screenshot limit behind staff authentication; cover actual-server HTML/API gates and vendor/customer exceptions. Backend source d5fd4f242f17926da88ac5e881106fb89135466f has 1,777 passing unit tests and stays undeployed until the frontend callers are live. Existing CRM credentials match across both apps and proxy scheduler configuration without any secret change. Then resume Steve/AE and both detail-page CSS migrations.

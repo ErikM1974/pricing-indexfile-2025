@@ -18,10 +18,7 @@ var bradscreLog = BRADSCRE_LOG_ON ? console.log.bind(console) : function () {}; 
     'use strict';
 
     // ── Config ───────────────────────────────────────────────────────
-    // Rule 6: the proxy base comes from APP_CONFIG (config/app.config.js), never a hardcoded host.
-    var API_BASE = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL)
-        || '';
-    if (!API_BASE) console.error('[bradley-screenprint] APP_CONFIG.API.BASE_URL missing — the proxy host is not configured');
+    // Workflow requests use this app's authenticated staff relays.
     var POLL_INTERVAL_MS = 60 * 1000;
     var AGE_WARN_HOURS = 24;
     var AGE_CRITICAL_HOURS = 72;
@@ -76,7 +73,7 @@ var bradscreLog = BRADSCRE_LOG_ON ? console.log.bind(console) : function () {}; 
             // client-side filter if backend ignores the param. Any row whose
             // Method is 'Supacolor' or null is treated as Supacolor and
             // excluded from this dashboard.
-            var url = API_BASE + '/api/transfer-orders?pageSize=500&orderBy=Requested_At%20DESC&includeLineCount=true' +
+            var url = '/api/transfer-orders?pageSize=500&orderBy=Requested_At%20DESC&includeLineCount=true' +
                 '&method=' + encodeURIComponent(METHOD_FILTER);
             var resp = await fetch(url);
             if (!resp.ok) throw new Error('HTTP ' + resp.status);
@@ -123,7 +120,7 @@ var bradscreLog = BRADSCRE_LOG_ON ? console.log.bind(console) : function () {}; 
 
     async function hardDeleteTransfer(idTransfer, body) {
         var resp = await fetch(
-            API_BASE + '/api/transfer-orders/' + encodeURIComponent(idTransfer) + '?hard=true',
+            '/api/transfer-orders/' + encodeURIComponent(idTransfer) + '?hard=true',
             {
                 method: 'DELETE',
                 headers: { 'Content-Type': 'application/json' },
