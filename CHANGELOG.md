@@ -1,3 +1,7 @@
+## v2026.09.07.30 (2026.09.07)
+
+- Extract CRM proxy routes with shared access helpers preserved
+
 ## v2026.09.07.29 (2026.09.07)
 
 - Bump puppeteer from 24.43.1 to 25.10.0
