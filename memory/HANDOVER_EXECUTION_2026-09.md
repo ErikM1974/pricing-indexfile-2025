@@ -35,3 +35,6 @@ Source: Erik's Claude handover (2026-09-08). Work on develop; one server editor;
 ## Verified releases and dependency follow-up
 - Runtime/security release v2026.09.07.27 / Heroku2050: Node22.23.2, live SHA f796510c, homepage200, staff relays401. CI34176404389 ran the live-engine specs and passed all jobs after pacing correction.
 - CSV PR32 integrates7.0.2; isolated checks cover quoted/BOM/uneven-column input and prototype handling. Full gate results recorded before the merge commit.
+
+- Rate-limit PR33: 8.7.0, all thirteen configurations use limit with existing budgets. Regression tests exercise production login and quote options against Express. Follow-up discovered: global apiLimiter skip checks req.path for /api after Express strips the mount prefix; assess intended general/staff quota before changing that existing behavior. Dedicated login/order/quote limiters remain separately applied.
+- Rate-limit verification: 191 unit suites / 4,698 passed, DOM88, accessibility4, fixture parity84, browser15 passed / 3 optional screenshot skips, all five surface parity specs, route456 unchanged, undefined names0 and boot200. A legacy image-quota spelling lock now evaluates limiter options instead.

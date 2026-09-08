@@ -326,7 +326,7 @@ app.delete('/api/quote_analytics/:id', requireStaff, async (req, res) => {
 // budget, staff sessions skipped) and prefix-validated like the proxy.
 const quoteSequenceLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 60,
+  limit: 60,
   standardHeaders: true,
   legacyHeaders: false,
   skip: (req) => !!(req.session && req.session.crmUser),

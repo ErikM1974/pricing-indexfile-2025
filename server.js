@@ -737,7 +737,7 @@ app.get('/api/version', (req, res) => {
 
 // CSP violation intake (roadmap 1.1 — report-only phase). Own tiny limiter so
 // a noisy page can't eat the shared /api budget; logs a compact single line.
-const cspReportLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 100, standardHeaders: false, legacyHeaders: false });
+const cspReportLimiter = rateLimit({ windowMs: 15 * 60 * 1000, limit: 100, standardHeaders: false, legacyHeaders: false });
 app.post(
   '/api/csp-report',
   cspReportLimiter,
@@ -1001,7 +1001,7 @@ function requireStaff(req, res, next) {
 // =============================================================================
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 200, // Limit each IP to 200 requests per windowMs
+  limit: 200, // Limit each IP to 200 requests per windowMs
   message: {
     error: 'Too many requests from this IP, please try again after 15 minutes'
   },
@@ -1024,7 +1024,7 @@ const INTERNAL_CALL_KEY = require('crypto').randomBytes(24).toString('hex');
 // Stricter limit for sensitive endpoints
 const strictLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
-  max: 20, // 20 requests per hour
+  limit: 20, // 20 requests per hour
   message: {
     error: 'Too many requests to this endpoint, please try again later'
   },
@@ -4468,7 +4468,7 @@ const CUSTOMER_MAGIC_LINK_TEMPLATE = 'template_utvx9iw'; // EmailJS "Magic Link"
 // Rate-limit link requests per IP — blunts email-bombing + email enumeration probing.
 const customerLoginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 5,
+  limit: 5,
   message: { error: 'Too many sign-in requests. Please wait a few minutes and try again.' },
 });
 
@@ -6891,7 +6891,7 @@ app.get('/api/cart-integration.js', (req, res) => {
 // one egress IP, and a builder save legitimately fires a dozen POSTs.
 const quotePlaneWriteLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 120,
+  limit: 120,
   standardHeaders: true,
   legacyHeaders: false,
   skip: (req) => !!(req.session && req.session.crmUser),

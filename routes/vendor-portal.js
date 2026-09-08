@@ -22,12 +22,12 @@ const VENDOR_MAGIC_LINK_TEMPLATE = process.env.EMAILJS_TEMPLATE_VENDOR_LOGIN || 
 
 const vendorLoginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 5,
+  limit: 5,
   message: { error: 'Too many sign-in requests, please try again shortly' },
 });
 const vendorApiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 120,
+  limit: 120,
   message: { error: 'Too many requests, please try again shortly' },
 });
 
@@ -369,7 +369,7 @@ app.get('/api/vendor/jobs/:id', vendorApiLimiter, requireVendor, async (req, res
 // happened to the CUSTOMER portal on 2026-08-05 (60/15min vs 53 images).
 const vendorImageLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 600,
+  limit: 600,
   message: { error: 'Too many requests, please try again shortly' },
 });
 
@@ -438,7 +438,7 @@ app.post('/api/vendor/jobs/:id/notes', vendorApiLimiter, requireVendor, express.
 // rate-limit real checkouts from the same IP.
 const orderStatusLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 60,
+  limit: 60,
   message: { error: 'Too many requests, please try again shortly' },
 });
 

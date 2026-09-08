@@ -18,7 +18,7 @@ app.use(['/api/portal', '/api/portal-admin'], (req, res, next) => { res.set('Cac
 
 const portalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 120, // 2026-09-01: portal home = 7 reads/load + per-order drawer reads; 60 tripped inside ~8 page views
+  limit: 120, // 2026-09-01: portal home = 7 reads/load + per-order drawer reads; 60 tripped inside ~8 page views
   message: { error: 'Too many requests, please try again shortly' },
 });
 
@@ -30,7 +30,7 @@ const portalLimiter = rateLimit({
 // inside five minutes costs nothing.
 const portalImageLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 600,
+  limit: 600,
   message: { error: 'Too many requests, please try again shortly' },
 });
 
@@ -896,7 +896,7 @@ app.get('/api/portal/product/:style/availability', portalLimiter, requireCustome
 // Routes to the rep as a saved request + Slack ping. NO price/payment. The id_Customer,
 // company, and email come from the verified SESSION — the client cannot spoof another company.
 const reorderRequestLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, max: 20,
+  windowMs: 15 * 60 * 1000, limit: 20,
   message: { error: 'Too many requests — please wait a few minutes.' },
 });
 app.post('/api/portal/reorder-request', reorderRequestLimiter, requireCustomer, express.json(), async (req, res) => {

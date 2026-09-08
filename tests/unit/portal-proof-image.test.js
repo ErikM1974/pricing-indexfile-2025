@@ -167,8 +167,8 @@ describe('the image route cannot be turned into an arbitrary Box reader', () => 
         // Regression: mounted on portalLimiter (60/15min) the customer 429s out
         // of their own portal partway down the page. Caught only by loading a
         // real customer's portal end to end (Binford Metals: 53 images).
-        const lim = src.slice(src.indexOf('const portalImageLimiter'), src.indexOf('});', src.indexOf('const portalImageLimiter')));
-        expect(Number((lim.match(/max:\s*(\d+)/) || [])[1])).toBeGreaterThanOrEqual(300);
+        const options = require('../helpers/server-source').rateLimitOptions('portalImageLimiter');
+        expect(options.limit ?? options.max).toBeGreaterThanOrEqual(300);
         expect(src).not.toContain("proof-image/:token', portalLimiter");
     });
 

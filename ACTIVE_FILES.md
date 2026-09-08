@@ -1974,3 +1974,5 @@ Fifteen staff-dashboard pages still carried inline code (found by the 2026-09-05
 | `/tests/unit/proxy-review-relays.test.js` | Proxy review regression coverage: staff contact relays, secret forwarding, legacy cart gates, same-origin browser lookups | Jest; local mocked upstream | Active |
 
 | `/memory/HANDOVER_EXECUTION_2026-09.md` | Execution checklist and verification record for the 2026-09-08 handover | Dependencies, server split, lint, CI, housekeeping | Active |
+
+| tests/unit/rate-limit-behavior.test.js | Actual limiter middleware: login quota, IPv6 subnet grouping and staff exemption | Dependency upgrade regression | Active |
