@@ -1,3 +1,7 @@
+## v2026.09.07.31 (2026.09.07)
+
+- Extract order-form routes and await DTF browser initialization
+
 ## v2026.09.07.30 (2026.09.07)
 
 - Extract CRM proxy routes with shared access helpers preserved
