@@ -233,3 +233,8 @@ Native Node22.23 runs Puppeteer25; invoke its capture CLI outside Jest, and repo
 - Problem/root cause: migrating hidden state left paste guards on inline display; queues showed success before awaiting refresh, and failed file links left a success icon.
 - Solution: keep visibility checks aligned with the migrated owner, centralize custom-dialog focus/scroll state and update success indicators only after the operation settles.
 - Prevention: exercise populated, failed, retry and cancelled states with mocked writes; check old consumers when a shared helper opts into new presentation.
+
+## A visible quantity grid does not prove pricing is ready (2026-09-08)
+- Problem/root cause: DTG rendered sizes before its bundle request completed; Save accepted zero/partial prices, and an older request could overwrite edits. A six-second browser delay hid the readiness gap.
+- Solution: require every entered row/positive size to have current pricing; invalidate on edits, discard old responses, copy size maps, and use the same guard for Save and Print. Pending manual rows throw a visible error instead of falling back to AI data.
+- Prevention: controlled pending/failure/out-of-order tests plus browser assertions on actual readiness and posted money. Keep Save independent of customer/Push completeness; unused blank rows are allowed. EMB/SCP already recalculate before save; DTF computes from state.

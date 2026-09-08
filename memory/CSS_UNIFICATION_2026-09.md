@@ -199,3 +199,9 @@ Five more pages use the shared staff shell, slate accents, owned control/layout 
 Common-owner growth and source formatting also increased the six earlier pages' source-byte totals; their budgets were remeasured explicitly. These are uncompressed source bytes, not transfer savings. The migrated sheets have no important declarations, CSS IDs or local overrides of global scales. Shared UiDialog owns focus, Escape, inert background and scroll restoration. Visibility guards use the same hidden state as the migrated markup.
 
 Runtime checks corrected premature refresh success notices, stale file-picker checkmarks after failed links, inaccessible scrollable screenshot summaries and unreadable/clipped phone controls. No live business writes were used. The complete application rollout remains open; next is the coordinated Steve/Ruth/AE workflow family.
+
+## Bradley release gate repair — 2026-09-08
+
+The first full browser gate caught an existing DTG save bug: both pricing requests were pending when a fixed six-second delay expired, yet a 24-piece quote posted zero dollars to the test mocks. The release was held. DTG now blocks incomplete, unsupported-size and stale pricing before any save write; Print uses the same readiness check. Late responses cannot overwrite newer inputs, and size maps are copied into the save snapshot. No pricing formula or production business data changed.
+
+Forty-four focused DTG unit checks and 19 targeted browser checks pass, including the negative pending/failed save, the positive live-price save, all 17 Bradley/legacy compatibility cases, file-picker busy/retry states and keyboard-scrolled mobile screenshot review. The full application gates are running again before source CI and deployment.
