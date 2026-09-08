@@ -7,7 +7,7 @@ Source: Erik's Claude handover (2026-09-08). Work on develop; one server editor;
 - [x] Confirm paired proxy gates shipped: proxy v2026.09.07.3 / Heroku 1128, frontend v.25.
 - [x] Upgrade Node runtime and CI to 22.x; patch compatible dependencies; full gates and deploy.
 - [x] Configure repository CRM_API_SECRET and verify CI executes the money-path and parity specs.
-- [ ] Review and integrate dependency PRs individually with gates: tooling #38 (replaces #37), Stripe #34, rate-limit #33, csv-parse #32, Puppeteer #31.
+- [x] Review and integrate dependency PRs individually with gates: tooling #38 (replaces #37), Stripe #34, rate-limit #33, csv-parse #32, Puppeteer #31.
 - [ ] Finish server split: CRM first; order form, quote sync/watchdog, storefront helpers and payments; preserve route table.
 - [ ] Extract and test long order/push handlers; add Node ESLint scope once split completes.
 - [ ] Lower browser warning cap to zero in verified batches.
@@ -55,3 +55,8 @@ Source: Erik's Claude handover (2026-09-08). Work on develop; one server editor;
 
 - Final audit cleanup: Sentry10.73.0 replaces8.55.2; installed SDK captures a real Express500 through intercepted transport and scrubs email/phone before delivery. Initialization remains before Express. pptxgenjs4.0.1 is used only by three tests/ui presentation utilities and now lives in devDependencies. Production audit0; complete audit2high remain in pptxgenjs/image-size with no compatible fixed release. CI now hard-gates the production audit and reports the development audit separately.
 - Final audit verification: installed-Sentry capture/scrub probe passed; route456/undefined0/boot200; full unit192 suites and4,703 tests, DOM88, accessibility4, fixture parity84, browser15 passed/3 optional skips. Tooling CI34180943167 passed. Verified and removed the handover's untracked empty accidental file.
+
+## CRM extraction approved by Erik
+- Dependency release v2026.09.07.29 / Heroku2052 is verified at85d57bf7; both main/develop CI runs34181654283 and34181786791 passed. Production audit0; development-only audit2high.
+- User explicitly approved the CRM refactor. routes/crm-proxy.js now owns60 registrations; shared gates/cache/Box helpers stay in server.js. All95 original statements match at the syntax-tree level, route456 unchanged, undefined0, and12 booted anonymous route-family checks return401. See SERVER_SPLIT_2026-09.md section8 for the cut.
+- CRM verification: Full gates passed:192 unit suites /4,703 tests (4 established skips), DOM88, accessibility4, fixture parity84, browser15 passed /3 optional screenshot skips, including all five live pricing surfaces. Lint99 existing warnings, CSS283 clean, typecheck and boot200 passed. Route fixture unchanged.

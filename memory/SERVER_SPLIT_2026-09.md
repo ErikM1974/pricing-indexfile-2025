@@ -28,7 +28,7 @@ below the section). `tests/helpers/server-source.js` gives the text locks the se
 | Public quote view | 13181-13252 | 6 | ✅ `routes/public-quote.js` (`.22`) |
 | Banner presets | 13253-13324 | 1 | ✅ `routes/banner-presets.js` (`.22`) |
 | Staff SAML | 3268-3419 | 16 | ✅ `routes/staff-saml.js` (`.23`) after hoisting `PORTAL_ADMIN_ROLES` |
-| CRM API proxy | 3420-4481 | 60 | ⏳ the other agent's uncommitted hardening edits this section — cut after it lands (`CRM_API_BASE` / `CRM_API_SECRET` already hoisted) |
+| CRM API proxy | 3420-4481 originally | 60 | Extracted to `routes/crm-proxy.js`; shared access/cache and Box helpers remain in server.js. See the CRM cut below. |
 | Vendor portal | 6555-7090 | 12 | ✅ `routes/vendor-portal.js` (`.23`) after hoisting `BOX_THUMB_RE`, `PORTAL_FETCH_TIMEOUT_MS`, `PORTAL_PROXY`, `portalProxyGet` |
 | Customer portal | 7091-10407 | 58 | ✅ `routes/customer-portal.js` (`.23`, 3,242 lines) after hoisting `API_BASE_URL`, `makeApiRequest` |
 | Online order form + ShopWorks | 10408-12626 | 45 | ⏳ the other agent's hardening edits the cart routes here — cut after it lands (`SYNC_PROXY_BASE` already hoisted) |
@@ -50,6 +50,14 @@ clean tree, and the stash restored after the deploy. Two agents committing from 
 half-finished work — and a `server.js` committed with call sites but without `routes/` would not boot.
 
 ## 8. Progress log (newest first)
+
+### 2026-09-07 — CRM cut: 60 registrations, server.js 9,554 → 8,740 lines
+
+- Erik explicitly approved the reviewed CRM extraction after the dependency release v2026.09.07.29 / Heroku2052. The tree was clean at85d57bf7.
+- Moved the CRM section into routes/crm-proxy.js at its original registration point. Twelve shared declarations stay above it: role lookup; page-access cache, lifetime, loader, imports and gates; Box allowlist, forwarder and ID validator. Cache replacement remains with its loader.
+- A syntax-tree comparison verifies all95 original section statements still exist unchanged in the new module or shared helpers (only relative require paths normalized). Route table456 unchanged; undefined names0 in15 modules; actual server boot and12 anonymous read-only route-family checks returned401.
+- Full gates passed:192 unit suites /4,703 tests (4 established skips), DOM88, accessibility4, fixture parity84, browser15 passed /3 optional screenshot skips, including all five live pricing surfaces. Lint99 existing warnings, CSS283 clean, typecheck and boot200 passed. Route fixture unchanged. Release target:v2026.09.07.30; CI is checked before deployment.
+
 
 ### 2026-09-07 — third cut LIVE (`v2026.09.07.24`): 4 more modules, 119 registrations, `server.js` 10,561 → 9,529 lines
 
