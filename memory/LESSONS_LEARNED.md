@@ -231,7 +231,7 @@ Native Node22.23 runs Puppeteer25; invoke its capture CLI outside Jest, and repo
 
 ## Shared workflow state must match its visibility owner (2026-09-08)
 - Problem/root cause: migrating hidden state left paste guards on inline display; queues showed success before awaiting refresh, and failed file links left a success icon.
-- Solution: keep visibility checks aligned with the migrated owner, centralize custom-dialog focus/scroll state and update success indicators only after the operation settles.
+- Solution: keep visibility checks aligned with the migrated owner, centralize custom-dialog focus/scroll state, preserve keyboard focus when filters or expansion buttons are replaced, and update success indicators only after the operation settles.
 - Prevention: exercise populated, failed, retry and cancelled states with mocked writes; check old consumers when a shared helper opts into new presentation.
 
 ## A visible quantity grid does not prove pricing is ready (2026-09-08)
@@ -240,8 +240,8 @@ Native Node22.23 runs Puppeteer25; invoke its capture CLI outside Jest, and repo
 - Prevention: controlled pending/failure/out-of-order tests plus browser assertions on actual readiness and posted money. Keep Save independent of customer/Push completeness; unused blank rows are allowed. EMB/SCP already recalculate before save; DTF computes from state.
 
 ## Dialog text must stay readable during entrance motion (2026-09-08)
-- Problem/root cause: a whole-dialog opacity animation blended white Download text into its dark button; faster CI sampled a 3.9:1 contrast frame that local checks missed.
-- Solution/prevention: animate position/scale only, and pause the real preview animation mid-frame during the browser contrast check. Do not hide the failure with a fixed delay or weaken the accessibility assertion.
+- Problem/root cause: whole-dialog and toast opacity animations briefly blended text into its background; CI and the full local suite sampled low-contrast frames that focused runs missed.
+- Solution/prevention: animate position/scale only, and pause real preview/toast entry and dismissal animations mid-frame during the browser contrast check. Do not hide the failure with a fixed delay or weaken the accessibility assertion.
 
 ## Style/build checks must distinguish source from platform artifacts (2026-09-08)
 - Problem/root cause: a clean Windows checkout restored CRLF and inflated CSS budgets; esbuild linked-map hashes differed from Linux although executable code matched.
