@@ -242,6 +242,22 @@ Merge INTO a fresh object. 🔑 Never persist a zero price; a stored 0 is a bug 
 any deploy that touches a calculator, an adapter or a Caspio tier. 🔑 Test with a warm
 sessionStorage as well as a cold one — the two code paths differ.
 
+## 2026-09-07 — Every money-path alert had gone to a log nobody reads (`v2026.09.07.1`)
+
+**Problem.** `alert3DT` / `alertQuotePay` (paid order never reached ShopWorks, payment with no
+ledger row) posted to a Slack webhook that a memory errand said was "still to set". A
+`heroku config:get` showed NEITHER Slack var was ever set — so since the day they were written
+these alerts went to Papertrail and nowhere else.
+**Root cause.** The fallback was designed as "log, then Slack if configured", and nobody
+verified the "if configured" half on the live app. A read of the code says "alerts exist"; only
+the config says whether they reach a human.
+**Solution.** One `staffAlert` pipe: log + Slack-if-set + EMAIL through EmailJS
+`template_staff_alert` (keys already live for order confirmations). Verified by an actual send
+from a Heroku one-off dyno. Locked by `staff-alert-email.test.js`.
+**Prevention.** 🔑 An alert path is not verified until a test message has ARRIVED. 🔑 When a
+feature depends on a config var, check `heroku config:get` (presence only) before assuming the
+errand was done. 🔑 This LAN blocks `api.emailjs.com` (TLS interception): prove sends from Heroku.
+
 ## Archived 2026-09-06
 
 ## 2026-09-06 — Calculator sweep (`v2026.09.06.9` → `.16`): 8 pages of inline code, 5 shared scripts with hardcoded hosts, and a dead loader
@@ -3779,3 +3795,26 @@ prompt and an API is three prices; only the API may hold it. 🔑 Test a Caspio-
 CHANGING it in Caspio and watching the page, not by reading the code. 🔑 One rule beats two: a
 fee PLUS a minimum produced a price cliff (23 pcs $302, 24 pcs $192) — a single order minimum is
 monotonic and explainable; reach for the minimum first.
+
+
+## 2026-09-07 — CSS standardization Step 1+3 (`v2026.09.07.3`): three traps in a zero-change deploy
+
+**Problem.** (a) A Bash heredoc that was to write the two token files died at parse time and wrote
+nothing — the CSS comments contain apostrophes. (b) The three `tests/ui/*.html` token fixtures could
+not be screenshotted through `server.js` (no `/tests` mount), so "the five pages that load the
+dashboard tokens" were only two served pages. (c) stylelint-config-standard's `value-keyword-case`
+demanded `inter`, `menlo`, `blinkmacsystemfont` inside the `--font-*` tokens.
+**Root cause.** (a) The harness hands the whole command to `bash -c`; a quoted heredoc is not immune.
+(b) `tests/` is deliberately outside every static mount. (c) The rule checks custom-property values
+too, and font names are proper nouns.
+**Solution.** (a) Write tool for any multi-line file; Bash only for one-line edits (`perl -pi`, CRLF
+kept with `\r\n` in the replacement). (b) `node scripts/qa-static-server.js <repo> 8098` serves the
+whole tree; a scratch Playwright config (`baseURL` :8098, `testDir` tests/e2e, `testMatch`
+builder-screenshots) reuses the spec unchanged — 3 fixtures screenshotted and diffed with the rest.
+(c) `'value-keyword-case': ['lower', { ignoreProperties: ['font-family', 'font', '/^--font-/'] }]`.
+**Prevention.** 🔑 Write tool for files, perl for lines. 🔑 A page is only screenshot-able if something
+SERVES it — check the mount before counting it. 🔑 Lint the token file BEFORE settling the config:
+config-standard rewrites are value-identical (hue `deg`, `rgb(… / 12%)`, `#fff`, one declaration per
+line) but prove it with the pixel diff, not by eye. 🔑 Another session deployed `v2026.09.07.2` into
+this checkout between my first read and my first edit — `git log -1` + `git status` before the first
+commit is what caught that develop had moved (DURABLE_GOTCHAS § Repo/deploy, again).

@@ -37,44 +37,9 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 ### Two customer calculators drifted from Caspio's tiers while the engine followed them (2026-09-06, ARCHIVED 2026-09-07, `v2026.09.06.42`–`.43`): a tier label in a template is a price — generate every tier strip from `pricing-bundle`, price sub-minimum quantities through the canonical engine, and after ANY Caspio tier change diff each calculator's buttons against `/api/pricing-bundle?method=X` and its sub-minimum price against Quick Quote. Full entry in archive.
 ### Erik asked "is pricing the same everywhere?" — two of five customer calculators were not (2026-09-06, ARCHIVED 2026-09-07, `v2026.09.06.44`): every customer-facing price surface is compared against the canonical engine by `npm run test:parity:surfaces` (Playwright, every live tier); a calculator that renders its own tiers drifts the day Caspio changes. Full entry in archive.
 ### Adding `<main>` to 96 pages found two markup bugs a browser had been hiding (2026-09-06, ARCHIVED 2026-09-07, `v2026.09.06.51`): a landmark sweep is also a markup audit — validate every page after a structural edit; Full entry in archive.
+### Every money-path alert had gone to a log nobody reads (2026-09-07, ARCHIVED 2026-09-08, `v2026.09.07.1`): an alert that only lands in a log is not an alert — money-path failures page a person (email + Slack) and the delivery itself is locked; a silent alerting path is the one failure mode nobody notices. Full entry in archive.
 
-## 2026-09-07 — Every money-path alert had gone to a log nobody reads (`v2026.09.07.1`)
-
-**Problem.** `alert3DT` / `alertQuotePay` (paid order never reached ShopWorks, payment with no
-ledger row) posted to a Slack webhook that a memory errand said was "still to set". A
-`heroku config:get` showed NEITHER Slack var was ever set — so since the day they were written
-these alerts went to Papertrail and nowhere else.
-**Root cause.** The fallback was designed as "log, then Slack if configured", and nobody
-verified the "if configured" half on the live app. A read of the code says "alerts exist"; only
-the config says whether they reach a human.
-**Solution.** One `staffAlert` pipe: log + Slack-if-set + EMAIL through EmailJS
-`template_staff_alert` (keys already live for order confirmations). Verified by an actual send
-from a Heroku one-off dyno. Locked by `staff-alert-email.test.js`.
-**Prevention.** 🔑 An alert path is not verified until a test message has ARRIVED. 🔑 When a
-feature depends on a config var, check `heroku config:get` (presence only) before assuming the
-errand was done. 🔑 This LAN blocks `api.emailjs.com` (TLS interception): prove sends from Heroku.
-
-## 2026-09-07 — CSS standardization Step 1+3 (`v2026.09.07.3`): three traps in a zero-change deploy
-
-**Problem.** (a) A Bash heredoc that was to write the two token files died at parse time and wrote
-nothing — the CSS comments contain apostrophes. (b) The three `tests/ui/*.html` token fixtures could
-not be screenshotted through `server.js` (no `/tests` mount), so "the five pages that load the
-dashboard tokens" were only two served pages. (c) stylelint-config-standard's `value-keyword-case`
-demanded `inter`, `menlo`, `blinkmacsystemfont` inside the `--font-*` tokens.
-**Root cause.** (a) The harness hands the whole command to `bash -c`; a quoted heredoc is not immune.
-(b) `tests/` is deliberately outside every static mount. (c) The rule checks custom-property values
-too, and font names are proper nouns.
-**Solution.** (a) Write tool for any multi-line file; Bash only for one-line edits (`perl -pi`, CRLF
-kept with `\r\n` in the replacement). (b) `node scripts/qa-static-server.js <repo> 8098` serves the
-whole tree; a scratch Playwright config (`baseURL` :8098, `testDir` tests/e2e, `testMatch`
-builder-screenshots) reuses the spec unchanged — 3 fixtures screenshotted and diffed with the rest.
-(c) `'value-keyword-case': ['lower', { ignoreProperties: ['font-family', 'font', '/^--font-/'] }]`.
-**Prevention.** 🔑 Write tool for files, perl for lines. 🔑 A page is only screenshot-able if something
-SERVES it — check the mount before counting it. 🔑 Lint the token file BEFORE settling the config:
-config-standard rewrites are value-identical (hue `deg`, `rgb(… / 12%)`, `#fff`, one declaration per
-line) but prove it with the pixel diff, not by eye. 🔑 Another session deployed `v2026.09.07.2` into
-this checkout between my first read and my first edit — `git log -1` + `git status` before the first
-commit is what caught that develop had moved (DURABLE_GOTCHAS § Repo/deploy, again).
+### CSS standardization Step 1+3 (2026-09-07, archived): keep token loading and screenshot parity tied to the served page. Full entry in LESSONS_LEARNED_ARCHIVE.md.
 
 ## 2026-09-07 — Forms family migration (`v2026.09.07.4`): the family list was wrong, and `--fix` is not cosmetic
 
@@ -300,3 +265,13 @@ skip never means untested).
 **Prevention.** 🔑 A test that reads outside the repository or needs a secret must guard for its absence and SAY
 it skipped. 🔑 `gh run list -L 5` belongs in the deploy pre-flight: local green is not CI green. 🔑 To switch the
 live-engine specs back on in CI, add `CRM_API_SECRET` under Settings → Secrets → Actions.
+
+## 2026-09-08 — Node runtime and dependency audit must match CI
+
+**Problem.** Production and CI selected Node 18 while local checks ran Node 22; 17 high audit findings remained.
+**Root cause.** Old lockfile resolutions and exact transitive pins kept vulnerable packages installed.
+**Solution.** Select Node 22 in engines and all CI jobs; Express 4.22.2, Axios 1.20.0, compatible audit fixes,
+and a qs 6.16 override (Express/body-parser pin an older minor). The repository Actions secret is now configured
+with Erik's explicit approval; verify the live-engine step actually runs on the next CI push.
+**Prevention.** Audit the resolved tree after updating: a green install is not a clean audit. Preserve CRLF in
+these two already-CRLF-tracked package files to avoid hiding the dependency diff. Major upgrades stay separate.

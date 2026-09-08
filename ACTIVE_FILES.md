@@ -1972,3 +1972,5 @@ Fifteen staff-dashboard pages still carried inline code (found by the 2026-09-05
 | `/tests/unit/quote-builders-page.test.js` | **NEW (2026-09-05)** Structural lock for the 4 quote builders (pricing math is covered by parity + per-method tests): no `onclick=` in the 4 pages, the builder modules, or the classic shared scripts they load (utils, order-summary, extended-sizes); the data-call delegator exists and behaves in jsdom (args, `$this`, data-stop, data-toggle-hidden, missing-fn toast); no `alert()`/`console.log` in builder modules; `.os-*` + DTG form inputs labelled; every page has `#toast-container` | jest; quote-builder-utils.js, builders/* | ✅ Active |
 
 | `/tests/unit/proxy-review-relays.test.js` | Proxy review regression coverage: staff contact relays, secret forwarding, legacy cart gates, same-origin browser lookups | Jest; local mocked upstream | Active |
+
+| `/memory/HANDOVER_EXECUTION_2026-09.md` | Execution checklist and verification record for the 2026-09-08 handover | Dependencies, server split, lint, CI, housekeeping | Active |
