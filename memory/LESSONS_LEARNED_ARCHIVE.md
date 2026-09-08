@@ -242,6 +242,22 @@ Merge INTO a fresh object. 🔑 Never persist a zero price; a stored 0 is a bug 
 any deploy that touches a calculator, an adapter or a Caspio tier. 🔑 Test with a warm
 sessionStorage as well as a cold one — the two code paths differ.
 
+## 2026-09-07 — Every money-path alert had gone to a log nobody reads (`v2026.09.07.1`)
+
+**Problem.** `alert3DT` / `alertQuotePay` (paid order never reached ShopWorks, payment with no
+ledger row) posted to a Slack webhook that a memory errand said was "still to set". A
+`heroku config:get` showed NEITHER Slack var was ever set — so since the day they were written
+these alerts went to Papertrail and nowhere else.
+**Root cause.** The fallback was designed as "log, then Slack if configured", and nobody
+verified the "if configured" half on the live app. A read of the code says "alerts exist"; only
+the config says whether they reach a human.
+**Solution.** One `staffAlert` pipe: log + Slack-if-set + EMAIL through EmailJS
+`template_staff_alert` (keys already live for order confirmations). Verified by an actual send
+from a Heroku one-off dyno. Locked by `staff-alert-email.test.js`.
+**Prevention.** 🔑 An alert path is not verified until a test message has ARRIVED. 🔑 When a
+feature depends on a config var, check `heroku config:get` (presence only) before assuming the
+errand was done. 🔑 This LAN blocks `api.emailjs.com` (TLS interception): prove sends from Heroku.
+
 ## Archived 2026-09-06
 
 ## 2026-09-06 — Calculator sweep (`v2026.09.06.9` → `.16`): 8 pages of inline code, 5 shared scripts with hardcoded hosts, and a dead loader

@@ -37,22 +37,7 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 ### Two customer calculators drifted from Caspio's tiers while the engine followed them (2026-09-06, ARCHIVED 2026-09-07, `v2026.09.06.42`–`.43`): a tier label in a template is a price — generate every tier strip from `pricing-bundle`, price sub-minimum quantities through the canonical engine, and after ANY Caspio tier change diff each calculator's buttons against `/api/pricing-bundle?method=X` and its sub-minimum price against Quick Quote. Full entry in archive.
 ### Erik asked "is pricing the same everywhere?" — two of five customer calculators were not (2026-09-06, ARCHIVED 2026-09-07, `v2026.09.06.44`): every customer-facing price surface is compared against the canonical engine by `npm run test:parity:surfaces` (Playwright, every live tier); a calculator that renders its own tiers drifts the day Caspio changes. Full entry in archive.
 ### Adding `<main>` to 96 pages found two markup bugs a browser had been hiding (2026-09-06, ARCHIVED 2026-09-07, `v2026.09.06.51`): a landmark sweep is also a markup audit — validate every page after a structural edit; Full entry in archive.
-
-## 2026-09-07 — Every money-path alert had gone to a log nobody reads (`v2026.09.07.1`)
-
-**Problem.** `alert3DT` / `alertQuotePay` (paid order never reached ShopWorks, payment with no
-ledger row) posted to a Slack webhook that a memory errand said was "still to set". A
-`heroku config:get` showed NEITHER Slack var was ever set — so since the day they were written
-these alerts went to Papertrail and nowhere else.
-**Root cause.** The fallback was designed as "log, then Slack if configured", and nobody
-verified the "if configured" half on the live app. A read of the code says "alerts exist"; only
-the config says whether they reach a human.
-**Solution.** One `staffAlert` pipe: log + Slack-if-set + EMAIL through EmailJS
-`template_staff_alert` (keys already live for order confirmations). Verified by an actual send
-from a Heroku one-off dyno. Locked by `staff-alert-email.test.js`.
-**Prevention.** 🔑 An alert path is not verified until a test message has ARRIVED. 🔑 When a
-feature depends on a config var, check `heroku config:get` (presence only) before assuming the
-errand was done. 🔑 This LAN blocks `api.emailjs.com` (TLS interception): prove sends from Heroku.
+### Every money-path alert had gone to a log nobody reads (2026-09-07, ARCHIVED 2026-09-08, `v2026.09.07.1`): an alert that only lands in a log is not an alert — money-path failures page a person (email + Slack) and the delivery itself is locked; a silent alerting path is the one failure mode nobody notices. Full entry in archive.
 
 ## 2026-09-07 — CSS standardization Step 1+3 (`v2026.09.07.3`): three traps in a zero-change deploy
 
