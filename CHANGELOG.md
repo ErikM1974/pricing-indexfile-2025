@@ -1,3 +1,7 @@
+## v2026.09.07.26 (2026.09.08)
+
+- Deploy v2026.09.07.26: CI made meaningful again — the cross-repo purchasing-portal assertion skips when the sibling checkout is absent; the Playwright job runs the axe ratchet always and the live-engine specs only when CRM_API_SECRET is configured (CI had been red since 2026-09-07 15:54 for those two environmental reasons; no served code changes)
+
 ## v2026.09.07.25 (2026.09.07)
 
 - Harden staff contact and cart relays, shipping authentication, and payroll parsing
