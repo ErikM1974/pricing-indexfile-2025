@@ -175,3 +175,13 @@ Before release: complete all local gates, verify exact-source CI, invalidate cha
 ## Staff workspace release record — v2026.09.08.3
 
 Exact-source CI 34216155948 passed on 03b4f3c5857c43b3d7ab0ebb08121c7ec8454b26. Local verification: 205 unit suites / 4,884 passing tests (four existing skips), 88 DOM tests, four axe unit tests, 84 fixture-parity cases, 33 browser tests passed (three optional screenshot skips), including all five calculator surfaces and 18 CSS state tests. CSS scope 284 files clean; JavaScript lint, types and build clean; 456 server registrations unchanged. Screenshot review also restored the Vault card body wrapper and readable Publisher progress labels. Production rollout requires the matching live SHA and changed-asset byte checks. Six application pages now use the shared owner; the complete runtime/state coverage and all remaining families remain open. Next: all five Bradley transfer consumers.
+
+## Bradley family plan — 2026-09-08
+
+The workspace release is live as v2026.09.08.3 / Heroku 2063, full SHA 6f4a326ce94f4d4c1f6f15ec9e67f98825802b16. Nine changed assets match committed bytes; both staff access gates and both earlier public pilots respond correctly.
+
+- [ ] Move Bradley Transfers, Bradley Screen Print, Supacolor Orders, Transfer Detail and Supacolor Job Detail together onto the shared staff shell and Bradley slate accents. Remove their Art Hub imports and keep operational status colors distinct.
+- [ ] Keep reusable sender, status, screenshot-import and image-viewer patterns in shared owners. The replacement sender entry point will serve opted-in queues; the old entry point remains temporarily for Steve and the two art-detail consumers until their next coordinated migration. Retired sender selectors must have no runtime template before being dropped.
+- [ ] Replace static inline presentation and visibility mutations with owned classes/hidden states; preserve paste guards. Use a shared dialog helper for keyboard focus, dismissal and scroll restoration. Correct the clipped mobile Job Detail actions and the PO input flex basis that creates excess vertical space after its layout turns into a column.
+- [ ] Add mocked normal/loading/empty/error/filter/dialog/image/import coverage at desktop, tablet and phone widths; mock sync, Box shared-link creation, OCR, notifications and all business writes. Verify old thumbnail callers through the full existing browser gates.
+- [ ] Register new owners, update per-page CSS budgets and runtime evidence, pass the complete local and exact-source CI gates, deploy and verify the live release. Continue with the Steve/Ruth/AE family afterwards.
