@@ -1,3 +1,7 @@
+## v2026.09.07.32 (2026.09.07)
+
+- Decompose order submissions into tested stages and enforce lessons cap
+
 ## v2026.09.07.31 (2026.09.07)
 
 - Extract order-form routes and await DTF browser initialization
