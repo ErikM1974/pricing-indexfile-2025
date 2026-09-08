@@ -5,31 +5,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="/favicon.png" type="image/png">
     <title>Adriyella's Google Review Guide 🌟</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Caveat:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/training/css/google-review-guide.css?v=2026.09.07.6">
+    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.08.2">
+    <link rel="stylesheet" href="/shared_components/css/training-guide.css?v=2026.09.08.10">
+    <link rel="stylesheet" href="/shared_components/css/training-service.css?v=2026.09.08.11">
 </head>
-<body>
+<body data-ui="unified" data-training="service" class="training-google-review-guide">
     <!-- Navigation Header -->
-    <div class="nav-header">
-        <button class="back-button" data-call="goToDashboard">
+    <header class="nav-header"><div class="nav-container">
+        <button type="button" class="back-button btn btn-secondary" data-training-back>
             <i class="fas fa-arrow-left" aria-hidden="true"></i>
             Back to Dashboard
         </button>
-        
-    </div>
+        </div></header>
 
     <main class="container">
         <h1>Adriyella's Google Review Guide <i class="fas fa-star" aria-hidden="true"></i></h1>
         <div class="intro-message">
             <p>Hey Adriyella! Erik here—this guide is your key to nailing those $20 bonuses for Google Reviews. We'll keep it simple, fun, and effective. Let's team up to refine it as you try it out—your feedback will make it gold!</p>
         </div>
-        <p style="text-align: center; font-size: 1.2em;">Pro tip: Aim for genuine chats—happy customers love sharing! Track your wins in the bonus app. 🚀</p>
+        <p class="training-callout">Pro tip: Aim for genuine chats—happy customers love sharing! Track your wins in the bonus app. 🚀</p>
 
-        <section>
-            <h2 data-call="toggleAccordion" data-args='["$this"]'><i class="fas fa-list-ol" aria-hidden="true"></i> Asking for the Review (In-Person Pickup)</h2>
-            <div class="accordion-content">
+        <section class="training-section training-disclosure">
+            <h2><button type="button" class="training-toggle" id="training-heading-1" aria-expanded="false" aria-controls="training-panel-1"><span><i class="fas fa-list-ol" aria-hidden="true"></i> Asking for the Review (In-Person Pickup)</span></button></h2>
+            <div class="accordion-content" id="training-panel-1" role="region" aria-labelledby="training-heading-1">
                 <ol>
                     <li><strong>Present the Google Review Card:</strong> When the customer arrives to pick up their completed apparel, have the review card ready.</li>
                     <li><strong>Explain the Free Tumbler Offer:</strong> Briefly say: "Would you mind leaving us a quick Google review? We'll give you a free custom tumbler—scan this code!"</li>
@@ -39,9 +40,9 @@
             </div>
         </section>
 
-        <section>
-            <h2 data-call="toggleAccordion" data-args='["$this"]'><i class="fas fa-check-circle" aria-hidden="true"></i> Ensure They Leave a Review</h2>
-            <div class="accordion-content">
+        <section class="training-section training-disclosure">
+            <h2><button type="button" class="training-toggle" id="training-heading-2" aria-expanded="false" aria-controls="training-panel-2"><span><i class="fas fa-check-circle" aria-hidden="true"></i> Ensure They Leave a Review</span></button></h2>
+            <div class="accordion-content" id="training-panel-2" role="region" aria-labelledby="training-heading-2">
                 <ol>
                     <li><strong>Encourage On-the-Spot:</strong> Suggest they do it right there via the QR code, or later from their phone.</li>
                     <li><strong>Logo Instructions:</strong> Explain they must email their logo to sales@nwcustomapparel.com and mention their review for the free Tumbler.</li>
@@ -50,9 +51,9 @@
             </div>
         </section>
 
-        <section>
-            <h2 data-call="toggleAccordion" data-args='["$this"]'><i class="fas fa-search" aria-hidden="true"></i> Confirming the Google Review</h2>
-            <div class="accordion-content">
+        <section class="training-section training-disclosure">
+            <h2><button type="button" class="training-toggle" id="training-heading-3" aria-expanded="false" aria-controls="training-panel-3"><span><i class="fas fa-search" aria-hidden="true"></i> Confirming the Google Review</span></button></h2>
+            <div class="accordion-content" id="training-panel-3" role="region" aria-labelledby="training-heading-3">
                 <ol>
                     <li><strong>Check Google Reviews:</strong> Once they say they've submitted a 5-star review, head to our Google Business Profile and verify it's posted.</li>
                     <li><strong>Follow Up if Needed:</strong> If no review shows, politely reach out by phone or email: "Hey [Name], just checking on that review for your free Tumbler—let me know if you need help!"</li>
@@ -61,21 +62,20 @@
             </div>
         </section>
 
-        <section>
-            <h2 data-call="toggleAccordion" data-args='["$this"]'><i class="fas fa-desktop" aria-hidden="true"></i> How to Log in Shopworks</h2>
-            <div class="accordion-content">
+        <section class="training-section training-disclosure">
+            <h2><button type="button" class="training-toggle" id="training-heading-4" aria-expanded="false" aria-controls="training-panel-4"><span><i class="fas fa-desktop" aria-hidden="true"></i> How to Log in Shopworks</span></button></h2>
+            <div class="accordion-content" id="training-panel-4" role="region" aria-labelledby="training-heading-4">
                 <p>Log every successful review for bonuses.</p>
-                <h3>Step 1: Quick Add from Customer Screen</h3>
-                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/Quick%20Add%20from%20Customer%20Screen%20Shopworks.png?ver=1" alt="Quick Add from Customer Screen">
+                <div class="training-figure-step"><h3>Step 1: Quick Add from Customer Screen</h3>
+                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/Quick%20Add%20from%20Customer%20Screen%20Shopworks.png?ver=1" alt="Quick Add from Customer Screen"></div>
                 
-                <h3>Step 2: Enter Details</h3>
+                <div class="training-figure-step"><h3>Step 2: Enter Details</h3>
                 <p>Type: "Google Review Obtained". Notes: Customer name, review date, Tumbler offer confirmed.</p>
-                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/Activity%20shopworks.png?ver=1" alt="Activity Entry Window">
+                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/Activity%20shopworks.png?ver=1" alt="Activity Entry Window"></div>
             </div>
         </section>
     </main>
 
-    <script src="/shared_components/js/data-call-delegator.js?v=2026.09.06.29"></script>
-    <script src="/training/js/google-review-guide.js?v=2026.09.05.12"></script>
+    <script src="/shared_components/js/training-guide.js?v=2026.09.08.11"></script>
 </body>
 </html>

@@ -100,3 +100,5 @@
 [Back to the registry index](../../ACTIVE_FILES.md)
 
 - `tests/e2e/css-unification-training.spec.js`: training guide layouts, keyboard tables/accordions, clipboard feedback and complete print output. All business services/writes blocked.
+
+- `tests/e2e/css-unification-training-service.spec.js`: four service guides, fourteen keyboard disclosures, phone tables/help, image loading/failure/retry, no-controller reading and print. All business services/writes mocked.

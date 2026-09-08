@@ -5,16 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="/favicon.png" type="image/png">
     <title>Adriyella's Thank-You Card Hub 🚀</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Caveat:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=Caveat:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/training/css/thank-you-card-guide.css?v=2026.09.07.6">
+    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.08.2">
+    <link rel="stylesheet" href="/shared_components/css/training-guide.css?v=2026.09.08.10">
+    <link rel="stylesheet" href="/shared_components/css/training-service.css?v=2026.09.08.11">
+    <link rel="stylesheet" href="/training/css/thank-you-card-guide.css?v=2026.09.08.11">
 </head>
-<body>
-    <button class="back-button" data-call="goToDashboard">
+<body data-ui="unified" data-training="service" class="training-thank-you-card-guide">
+    <header class="nav-header"><div class="nav-container"><button type="button" class="back-button btn btn-secondary" data-training-back>
         <i class="fas fa-arrow-left" aria-hidden="true"></i>
         Back to Dashboard
-    </button>
+    </button></div></header>
     
     <main class="container">
         <h1>Adriyella's Thank-You Card Hub <i class="fas fa-heart" aria-hidden="true"></i></h1>
@@ -22,11 +25,11 @@
             <p>Hey Adriyella!<br><br>
 This is Erik here—I've put this guide together to kick off our thank-you card process, but I know it's not perfect since I threw it together in my office without testing it out in the real world with you. And hey, I mess up sometimes (who doesn't?), but that's why we're a team! Let's collaborate to make this even better—your hands-on experience is what will really make it shine. If you spot anything off, have ideas to improve it, or see tweaks needed after trying it live, please let me know right away. I'm excited to work on this with you and iterate based on what actually works. You've got great insights—let's make this process awesome together! 🚀</p>
         </div>
-        <p style="text-align: center; font-size: 1.2em;">Hey Adriyella! Let's make customers smile with these cards. Follow the guide, log in Shopworks, and track your wins. You've got this! 🌟</p>
+        <p class="training-callout">Hey Adriyella! Let's make customers smile with these cards. Follow the guide, log in Shopworks, and track your wins. You've got this! 🌟</p>
 
-        <section>
-            <h2 data-call="toggleAccordion" data-args='["$this"]'><i class="fas fa-list-ol" aria-hidden="true"></i> Daily Process for Thank-You Cards</h2>
-            <div class="accordion-content">
+        <section class="training-section training-disclosure">
+            <h2><button type="button" class="training-toggle" id="training-heading-1" aria-expanded="false" aria-controls="training-panel-1"><span><i class="fas fa-list-ol" aria-hidden="true"></i> Daily Process for Thank-You Cards</span></button></h2>
+            <div class="accordion-content" id="training-panel-1" role="region" aria-labelledby="training-heading-1">
                 <ol>
                     <li><strong>Late Afternoon (Around 4 PM):</strong> Grab the stack of completed invoices from Bradley. Scan and sort them quickly (e.g., by type). Prep for tomorrow—no writing yet!</li>
                     <li><strong>Next Morning (Around 9-11 AM):</strong> Handle notifications first: Call, text, or email for pickups/shipments. Log as "Order Notification" in Shopworks with who you contacted and details.</li>
@@ -40,38 +43,36 @@ This is Erik here—I've put this guide together to kick off our thank-you card 
             </div>
         </section>
 
-        <section>
-            <h2 data-call="toggleAccordion" data-args='["$this"]'><i class="fas fa-ruler" aria-hidden="true"></i> Rules for Who Gets a Card</h2>
-            <div class="accordion-content">
+        <section class="training-section training-disclosure">
+            <h2><button type="button" class="training-toggle" id="training-heading-2" aria-expanded="false" aria-controls="training-panel-2"><span><i class="fas fa-ruler" aria-hidden="true"></i> Rules for Who Gets a Card</span></button></h2>
+            <div class="accordion-content" id="training-panel-2" role="region" aria-labelledby="training-heading-2">
                 <p>Send to most everyone—except individual webstore employee orders (main contact only for milestones). When in doubt, send!</p>
-                <table>
-                    <tr><th>Scenario</th><th>Send?</th><th>To Whom?</th><th>Why?</th></tr>
+                <div class="training-table-scroll" tabindex="0" role="region" aria-label="Reference table"><table><thead><tr><th>Scenario</th><th>Send?</th><th>To Whom?</th><th>Why?</th></tr></thead><tbody>
                     <tr><td>In-person/phone orders</td><td>Yes!</td><td>Main contact.</td><td>Boosts loyalty.</td></tr>
                     <tr><td>Non-webstore online</td><td>Yes.</td><td>Buyer.</td><td>Encourages repeats.</td></tr>
                     <tr><td>Webstore orders</td><td>No to employees; Yes to main for milestones.</td><td>HR/admin contact.</td><td>Target decision-makers.</td></tr>
                     <tr><td>High-value/milestone</td><td>Yes, top priority.</td><td>Main contact.</td><td>Maximizes growth.</td></tr>
                     <tr><td>Exceptions (returns, etc.)</td><td>No, unless positive.</td><td>N/A</td><td>Focus on wins.</td></tr>
-                </table>
+                </tbody></table></div>
                 <p><strong>Avoid Duplicates:</strong> Check Shopworks for recent cards (30-60 days). Limit 1 per 30 days. Note "Card #X".</p>
             </div>
         </section>
 
-        <section>
-            <h2 data-call="toggleAccordion" data-args='["$this"]'><i class="fas fa-signature" aria-hidden="true"></i> Signature Guidelines</h2>
-            <div class="accordion-content">
-                <table>
-                    <tr><th>Scenario</th><th>Who Signs?</th><th>Why?</th></tr>
+        <section class="training-section training-disclosure">
+            <h2><button type="button" class="training-toggle" id="training-heading-3" aria-expanded="false" aria-controls="training-panel-3"><span><i class="fas fa-signature" aria-hidden="true"></i> Signature Guidelines</span></button></h2>
+            <div class="accordion-content" id="training-panel-3" role="region" aria-labelledby="training-heading-3">
+                <div class="training-table-scroll" tabindex="0" role="region" aria-label="Reference table"><table><thead><tr><th>Scenario</th><th>Who Signs?</th><th>Why?</th></tr></thead><tbody>
                     <tr><td>AE-handled (repeats, sales)</td><td>AE (get their quick sign-off).</td><td>Keeps client bond strong.</td></tr>
                     <tr><td>General/your interaction</td><td>You (Adriyella or "team").</td><td>Fast & empowering.</td></tr>
                     <tr><td>Upsell cards</td><td>AE if they lead; else you.</td><td>Links to sales.</td></tr>
-                </table>
+                </tbody></table></div>
                 <p>Fallback: Your sign with "From the Team". Log in Shopworks.</p>
             </div>
         </section>
 
-        <section>
-            <h2 data-call="toggleAccordion" data-args='["$this"]'><i class="fas fa-envelope-open-text" aria-hidden="true"></i> Card Templates</h2>
-            <div class="accordion-content">
+        <section class="training-section training-disclosure">
+            <h2><button type="button" class="training-toggle" id="training-heading-4" aria-expanded="false" aria-controls="training-panel-4"><span><i class="fas fa-envelope-open-text" aria-hidden="true"></i> Card Templates</span></button></h2>
+            <div class="accordion-content" id="training-panel-4" role="region" aria-labelledby="training-heading-4">
                 <p>Handwrite & personalize! Vary for repeats. Add review nudge: "If thrilled, share a Google review!"</p>
                 
                 <div class="template">
@@ -130,21 +131,20 @@ This is Erik here—I've put this guide together to kick off our thank-you card 
             </div>
         </section>
 
-        <section>
-            <h2 data-call="toggleAccordion" data-args='["$this"]'><i class="fas fa-desktop" aria-hidden="true"></i> How to Add an Activity in Shopworks</h2>
-            <div class="accordion-content">
+        <section class="training-section training-disclosure">
+            <h2><button type="button" class="training-toggle" id="training-heading-5" aria-expanded="false" aria-controls="training-panel-5"><span><i class="fas fa-desktop" aria-hidden="true"></i> How to Add an Activity in Shopworks</span></button></h2>
+            <div class="accordion-content" id="training-panel-5" role="region" aria-labelledby="training-heading-5">
                 <p>Follow these steps to log activities like "Thank You Sent" or "Order Notification". Use the Quick Add from the customer screen for fast entry!</p>
-                <h3>Step 1: Quick Add from Customer Screen</h3>
-                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/Quick%20Add%20from%20Customer%20Screen%20Shopworks.png?ver=1" alt="Quick Add from Customer Screen">
+                <div class="training-figure-step"><h3>Step 1: Quick Add from Customer Screen</h3>
+                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/Quick%20Add%20from%20Customer%20Screen%20Shopworks.png?ver=1" alt="Quick Add from Customer Screen"></div>
                 
-                <h3>Step 2: Enter Activity Details</h3>
+                <div class="training-figure-step"><h3>Step 2: Enter Activity Details</h3>
                 <p>Fill in the activity type (e.g., Thank You Sent), contact, date/time, notes (e.g., "Adriyella - Card sent using Repeat Loyalty template"), and mark as completed.</p>
-                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/Activity%20shopworks.png?ver=1" alt="Activity Entry Window">
+                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/Activity%20shopworks.png?ver=1" alt="Activity Entry Window"></div>
             </div>
         </section>
     </main>
 
-    <script src="/shared_components/js/data-call-delegator.js?v=2026.09.06.29"></script>
-    <script src="/training/js/thank-you-card-guide.js?v=2026.09.05.12"></script>
+    <script src="/shared_components/js/training-guide.js?v=2026.09.08.11"></script>
 </body>
 </html>

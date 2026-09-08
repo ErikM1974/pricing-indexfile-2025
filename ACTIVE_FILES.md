@@ -1,6 +1,6 @@
 # Active Files Registry
 
-Last updated: 2026-09-08 — shared training document owner and mocked guide browser checks.
+Last updated: 2026-09-08 — service training styles/controller, consolidated guide owners and browser coverage.
 
 | Area | Registry |
 |---|---|

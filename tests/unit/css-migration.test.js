@@ -115,3 +115,18 @@ describe('training document content and CSS ownership', () => {
         expect(document.querySelectorAll('[style], style, script:not([src])')).toHaveLength(0);
     });
 });
+
+describe('service training guide preservation', () => {
+    test.each(manifest.trainingServiceContent)('$source preserves prose, destinations and practice values', entry => {
+        const document = new JSDOM(read(entry.source)).window.document;
+        const main = document.querySelector('main');
+        const content = {
+            text: main.textContent.replace(/\s+/g, ' ').trim(),
+            ids: [...main.querySelectorAll('[id]')].map(el => el.id).filter(id => !id.startsWith('training-')),
+            links: [...document.querySelectorAll('a')].map(el => [el.getAttribute('href'), el.textContent.replace(/\s+/g, ' ').trim()]),
+        };
+        expect(crypto.createHash('sha256').update(JSON.stringify(content)).digest('hex')).toBe(entry.sha256);
+        expect([...document.querySelectorAll('input,textarea,select')].map(el => ({ id: el.id, value: el.value }))).toEqual(entry.fields);
+        expect(document.querySelectorAll('[style], style, script:not([src]), [data-call]')).toHaveLength(0);
+    });
+});

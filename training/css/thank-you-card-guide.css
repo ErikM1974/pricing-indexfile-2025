@@ -1,225 +1,37 @@
-/* thank-you-card-guide.css — page styles (extracted from inline \3c style>, 2026.09.05.11) */
+/* Handwritten specimens belong to the thank-you card guide only. */
+@layer components.pages {
+    :where([data-ui="unified"].training-thank-you-card-guide) .template {
+        max-width: 70ch;
+        margin-block: var(--space-6);
+        padding: var(--space-6);
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-sm);
+    }
 
-/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue so the page
-   keeps its exact look. Map them to shared_components/css/tokens.css names when the page is redesigned;
-   every rule below uses var(). Raw hex is allowed ONLY in this block. */
-/* stylelint-disable color-no-hex */
-:root {
-    --page-gray-dark: #333;
-    --page-red: #ff6b6b;
-    --page-teal: #4ecdc4;
-    --page-yellow: #f6d365;
-    --page-red-2: #fda085;
-    --page-teal-2: #45b7af;
-    --page-gray: #888;
+    :where([data-ui="unified"].training-thank-you-card-guide) .template h3 {
+        margin-block-start: 0;
+    }
+
+    :where([data-ui="unified"].training-thank-you-card-guide) .template p {
+        font-family: Caveat, cursive;
+        font-size: var(--font-size-2xl);
+        line-height: 1.45;
+    }
+
+    :where([data-ui="unified"].training-thank-you-card-guide) .placeholder {
+        color: var(--ui-accent);
+        font-weight: var(--font-weight-semibold);
+    }
+
+    @media print {
+        :where([data-ui="unified"].training-thank-you-card-guide) .template {
+            break-inside: avoid;
+            margin-block: 10pt;
+            padding: 10pt;
+        }
+
+        :where([data-ui="unified"].training-thank-you-card-guide) .template p {
+            font-size: 14pt;
+        }
+    }
 }
-/* stylelint-enable color-no-hex */
-
-/* ── moved from inline \3c style> in training/thank-you-card-guide.html (Rule 3, 2026.09.05.11) ── */
-body {
-            font-family: Poppins, sans-serif;
-            margin: 0;
-            padding: 0;
-            background: linear-gradient(135deg, var(--page-yellow) 0%, var(--page-red-2) 100%);
-            color: var(--page-gray-dark);
-            line-height: 1.6;
-        }
-        
-        .back-button {
-            position: fixed;
-            top: 25px;
-            left: 25px;
-            background: rgb(255 255 255 / 90%);
-            border: none;
-            border-radius: 25px;
-            padding: 12px 20px;
-            cursor: pointer;
-            font-size: 14px;
-            color: var(--page-gray-dark);
-            font-weight: 500;
-            box-shadow: 0 3px 10px rgb(0 0 0 / 10%);
-            transition: all 0.3s ease;
-            z-index: 1000;
-        }
-        
-        .back-button:hover {
-            background: white;
-            transform: translateX(-5px);
-            box-shadow: 0 5px 15px rgb(0 0 0 / 10%);
-        }
-        
-        .daily-report-link {
-            position: fixed;
-            top: 25px;
-            right: 25px;
-            background: rgb(255 107 157 / 90%);
-            border: none;
-            border-radius: 25px;
-            padding: 12px 20px;
-            cursor: pointer;
-            font-size: 14px;
-            color: white;
-            font-weight: 500;
-            box-shadow: 0 3px 10px rgb(0 0 0 / 10%);
-            transition: all 0.3s ease;
-            z-index: 1000;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .daily-report-link:hover {
-            background: rgb(255 107 157 / 100%);
-            transform: translateX(5px);
-            box-shadow: 0 5px 15px rgb(255 107 157 / 30%);
-            color: white;
-            text-decoration: none;
-        }
-        
-        .container {
-            max-width: 1200px;
-            margin: 40px auto;
-            padding: 20px;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgb(0 0 0 / 10%);
-            position: relative;
-        }
-
-        h1 {
-            text-align: center;
-            color: var(--page-red);
-            font-size: 2.5em;
-            margin-bottom: 20px;
-            animation: fadeIn 1s ease-in;
-        }
-
-        h2 {
-            color: var(--page-teal);
-            border-bottom: 2px solid var(--page-teal-2);
-            padding-bottom: 10px;
-            cursor: pointer;
-            transition: color 0.3s;
-        }
-        h2:hover { color: var(--page-red); }
-        section { margin-bottom: 40px; }
-
-        .template {
-            position: relative;
-            width: 80%;
-            max-width: 400px;
-            margin: 20px auto;
-            padding: 20px;
-            background: var(--red-50); /* Soft card background */
-            border: 1px solid var(--gray-300);
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgb(0 0 0 / 10%), inset 0 0 10px rgb(0 0 0 / 5%); /* Subtle shadow for depth */
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
-
-        .template:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 6px 12px rgb(0 0 0 / 15%);
-        }
-
-        .template::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 50%;
-            width: 100%;
-            height: 2px;
-            background: linear-gradient(to right, transparent 0%, var(--gray-300) 50%, transparent 100%); /* Simulated fold line */
-            transform: translateX(-50%);
-        }
-
-        .template p {
-            font-family: Caveat, cursive; /* Handwritten font */
-            font-size: 1.2em;
-            color: var(--page-gray-dark);
-            margin: 0;
-            white-space: pre-wrap; /* Preserve line breaks */
-        }
-
-        .template h3 {
-            font-family: Poppins, sans-serif; /* Keep title clean */
-            text-align: center;
-            margin-bottom: 15px;
-        }
-
-        .placeholder {
-            font-family: Poppins, sans-serif; /* Placeholders in typed font for clarity */
-            color: var(--page-gray);
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-
-        th, td {
-            border: 1px solid var(--gray-300);
-            padding: 12px;
-            text-align: left;
-        }
-
-        th {
-            background: var(--page-teal);
-            color: white;
-        }
-        ol { padding-left: 20px; }
-
-        img {
-            max-width: 100%;
-            height: auto;
-            display: block;
-            margin: 10px auto;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgb(0 0 0 / 10%);
-        }
-
-        .intro-message {
-            position: relative;
-            width: 80%;
-            max-width: 500px;
-            margin: 20px auto 30px;
-            padding: 20px;
-            background: var(--red-50); /* Soft card background */
-            border: 1px solid var(--gray-300);
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgb(0 0 0 / 10%), inset 0 0 10px rgb(0 0 0 / 5%); /* Subtle shadow for depth */
-            text-align: left;
-        }
-
-        .intro-message::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 50%;
-            width: 100%;
-            height: 2px;
-            background: linear-gradient(to right, transparent 0%, var(--gray-300) 50%, transparent 100%); /* Simulated fold line */
-            transform: translateX(-50%);
-        }
-
-        .intro-message p {
-            font-family: Caveat, cursive; /* Handwritten font */
-            font-size: 1.3em;
-            color: var(--red-600);
-            margin: 0;
-            white-space: pre-wrap;
-        }
-
-        .accordion-content {
-            display: none;
-            animation: slideDown 0.5s ease;
-        }
-        .active + .accordion-content { display: block; }
-
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        @keyframes slideDown { from { height: 0; opacity: 0; } to { height: auto; opacity: 1; } }
-
-        @media (width <= 768px) { .container { margin: 20px; padding: 15px; } .template, .intro-message { width: 100%; } }

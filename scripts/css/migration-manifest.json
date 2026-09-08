@@ -686,6 +686,100 @@
         "localCssRequests": 3
       },
       "measuredRawCssBytes": 71636
+    },
+    {
+      "source": "training/art-approval-guide.html",
+      "family": "training-service",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/training-guide.css",
+        "shared_components/css/training-service.css"
+      ],
+      "baselineCssBytes": 20919,
+      "currentCssBytes": 70310,
+      "maxCssBytes": 72358,
+      "states": [
+        "collapsed",
+        "all disclosures expanded",
+        "keyboard",
+        "mobile",
+        "print",
+        "image loading/failure/retry where present",
+        "practice field help where present"
+      ],
+      "test": "tests/e2e/css-unification-training-service.spec.js"
+    },
+    {
+      "source": "training/thank-you-card-guide.html",
+      "family": "training-service",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/training-guide.css",
+        "shared_components/css/training-service.css",
+        "training/css/thank-you-card-guide.css"
+      ],
+      "baselineCssBytes": 22282,
+      "currentCssBytes": 71463,
+      "maxCssBytes": 73511,
+      "states": [
+        "collapsed",
+        "all disclosures expanded",
+        "keyboard",
+        "mobile",
+        "print",
+        "image loading/failure/retry where present",
+        "practice field help where present"
+      ],
+      "test": "tests/e2e/css-unification-training-service.spec.js"
+    },
+    {
+      "source": "training/lead-sheet-guide.html",
+      "family": "training-service",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/training-guide.css",
+        "shared_components/css/training-service.css",
+        "training/css/lead-sheet-guide.css"
+      ],
+      "baselineCssBytes": 22714,
+      "currentCssBytes": 71931,
+      "maxCssBytes": 73979,
+      "states": [
+        "collapsed",
+        "all disclosures expanded",
+        "keyboard",
+        "mobile",
+        "print",
+        "image loading/failure/retry where present",
+        "practice field help where present"
+      ],
+      "test": "tests/e2e/css-unification-training-service.spec.js"
+    },
+    {
+      "source": "training/google-review-guide.html",
+      "family": "training-service",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/training-guide.css",
+        "shared_components/css/training-service.css"
+      ],
+      "baselineCssBytes": 20929,
+      "currentCssBytes": 70310,
+      "maxCssBytes": 72358,
+      "states": [
+        "collapsed",
+        "all disclosures expanded",
+        "keyboard",
+        "mobile",
+        "print",
+        "image loading/failure/retry where present",
+        "practice field help where present"
+      ],
+      "test": "tests/e2e/css-unification-training-service.spec.js"
     }
   ],
   "billingContentSha256": "d85f8530e03a1863d1b8bb2ebe97ba332d5c9e3411887d1eb2d02dcdb14c0863",
@@ -802,6 +896,89 @@
     {
       "source": "training/nwca-language-reference.html",
       "sha256": "ce88cf45bfec446ad29e01c6f7ca37282716da8d44dfc21ceb0719f3ec2bc020"
+    }
+  ],
+  "trainingServiceContent": [
+    {
+      "source": "training/art-approval-guide.html",
+      "sha256": "d95647bd2a7ef4db4c39e9feef4710ca3c08e88b250443fa4f1c7f6f1d1631a8",
+      "fields": []
+    },
+    {
+      "source": "training/thank-you-card-guide.html",
+      "sha256": "11f33a7a8e8dc40a0d33b80fd6a999333aa6eda6446582a3efc042c2d99744da",
+      "fields": []
+    },
+    {
+      "source": "training/lead-sheet-guide.html",
+      "sha256": "12dbeba92614936b9177145484c8970abe046858ecc21c51f6655a7c0f2efc4d",
+      "fields": [
+        {
+          "id": "contact_owner",
+          "value": "Brianna Gillespie"
+        },
+        {
+          "id": "first_name",
+          "value": "Brianna"
+        },
+        {
+          "id": "last_name",
+          "value": "Gillespie"
+        },
+        {
+          "id": "company_name",
+          "value": "Region 6 Systems Integration"
+        },
+        {
+          "id": "email",
+          "value": "Brianna@region6systems.com"
+        },
+        {
+          "id": "phone",
+          "value": "253-222-2382"
+        },
+        {
+          "id": "street_address",
+          "value": "1700 Westlake Ave N Suite 200"
+        },
+        {
+          "id": "city",
+          "value": "Seattle"
+        },
+        {
+          "id": "state",
+          "value": "WA"
+        },
+        {
+          "id": "zip",
+          "value": "98109"
+        },
+        {
+          "id": "service_rep",
+          "value": "Nika Lao"
+        },
+        {
+          "id": "lead_source",
+          "value": "Referral from Hart's Service"
+        },
+        {
+          "id": "google_search_terms",
+          "value": ""
+        },
+        {
+          "id": "customer_type",
+          "value": "Corporate"
+        },
+        {
+          "id": "notes",
+          "value": "Referred by Hart's Service for potential apparel needs."
+        }
+      ]
+    },
+    {
+      "source": "training/google-review-guide.html",
+      "sha256": "fd22714d635fc46dceef137a60a4e2b0f23f0e5c3723f31344ab268f24aeebac",
+      "fields": []
     }
   ]
 }

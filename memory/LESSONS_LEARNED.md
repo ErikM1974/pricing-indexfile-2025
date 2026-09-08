@@ -245,3 +245,7 @@ Native Node22.23 runs Puppeteer25; invoke its capture CLI outside Jest, and repo
 - Problem/root cause: clipboard feedback depended on the global event after an asynchronous operation, clickable divs excluded keyboard users, and fixed-height print rules could clip text. Generic card adapters also added unwanted document padding.
 - Solution: pass the originating button explicitly, show local pending/error/retry feedback, use native disclosure buttons and owned document sections, and let print flow through readable columns.
 - Prevention: lock unchanged training text/examples/links, test keyboard and denied clipboard states, and inspect actual PDFs. A two-sheet language-handout guard catches blank-page regressions that a print-media screenshot misses.
+
+### Shared form styles and print pseudo-elements need rendered checks (2026-09-08)
+
+Problem: migrated training fields retained browser-default styling, and paper chevrons remained visible. Root cause: shared controls require their canonical field classes; pseudo-elements cannot be selected inside `:is()`. Solution: use `.field-input`/`.field-textarea` and a separate `::after` selector. Prevention: check rendered control size/font and print pseudo-element display, then inspect actual pages/PDFs; CSS lint and behavior checks alone do not catch these.

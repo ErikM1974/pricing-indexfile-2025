@@ -1,0 +1,159 @@
+/* Four service guides share disclosure, image and example styling. */
+@layer components.patterns {
+    :where([data-ui="unified"][data-training="service"]) main.container {
+        max-width: 1000px;
+    }
+
+    :where([data-ui="unified"][data-training="service"]) main h1 {
+        max-width: 24ch;
+        font-size: clamp(1.75rem, 4vw, 2.5rem);
+        line-height: 1.2;
+        font-weight: var(--font-weight-semibold);
+        margin-block-end: var(--space-6);
+    }
+
+    :where([data-ui="unified"][data-training="service"]) h1 > i {
+        color: var(--ui-accent);
+        font-size: 0.7em;
+    }
+
+    :where([data-ui="unified"][data-training="service"])
+        :is(.intro-message, .accordion-content > p, .accordion-content > ol) {
+        max-width: 76ch;
+    }
+
+    :where([data-ui="unified"][data-training="service"]) .intro-message {
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-training="service"]) .training-disclosure {
+        margin-block-start: var(--space-4);
+        padding-block-start: 0;
+    }
+
+    :where([data-ui="unified"][data-training="service"]) .training-disclosure > h2 {
+        margin: 0;
+    }
+
+    :where([data-ui="unified"][data-training="service"]) .training-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-4);
+        width: 100%;
+        padding: var(--space-5) 0;
+        border: 0;
+        background: transparent;
+        color: var(--ui-ink);
+        text-align: start;
+        font: inherit;
+        cursor: pointer;
+    }
+
+    :where([data-ui="unified"][data-training="service"]) .training-toggle::after {
+        content: "";
+        width: 8px;
+        height: 8px;
+        flex-shrink: 0;
+        margin-inline-end: var(--space-2);
+        border-inline-end: 2px solid currentcolor;
+        border-block-end: 2px solid currentcolor;
+        transform: rotate(45deg);
+    }
+
+    :where([data-ui="unified"][data-training="service"]) .training-toggle[aria-expanded="true"] {
+        color: var(--ui-accent);
+    }
+
+    :where([data-ui="unified"][data-training="service"]) .training-toggle[aria-expanded="true"]::after {
+        transform: rotate(225deg);
+    }
+
+    :where([data-ui="unified"][data-training="service"]) .training-toggle i {
+        margin-inline-end: var(--space-2);
+        color: var(--ui-accent);
+    }
+
+    :where([data-ui="unified"][data-training="service"].training-ready)
+        .training-disclosure:not(.is-open) .accordion-content {
+        display: none;
+    }
+
+    :where([data-ui="unified"][data-training="service"]) .accordion-content {
+        padding-block: var(--space-2) var(--space-5);
+    }
+
+    :where([data-ui="unified"][data-training="service"]) .step-example {
+        margin-block: var(--space-5);
+        padding: var(--space-4) var(--space-5);
+        border-inline-start: 2px solid var(--ui-accent);
+        background: var(--gray-50);
+    }
+
+    :where([data-ui="unified"][data-training="service"]) .step-example h3 {
+        margin-block-start: 0;
+    }
+
+    :where([data-ui="unified"][data-training="service"]) main img {
+        display: block;
+        width: auto;
+        max-width: 100%;
+        max-height: 480px;
+        object-fit: contain;
+        margin-block: var(--space-4);
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-sm);
+    }
+
+    :where([data-ui="unified"][data-training="service"]) .training-image-status {
+        color: var(--ui-muted);
+        font-size: var(--font-size-md);
+    }
+
+    :where([data-ui="unified"][data-training="service"]) .training-image-status:empty {
+        display: none;
+    }
+
+    :where([data-ui="unified"][data-training="service"]) .training-image-status.is-error {
+        color: var(--red-800);
+    }
+
+    :where([data-ui="unified"][data-training="service"]) .training-image-retry {
+        margin-block: var(--space-3);
+    }
+
+    @media print {
+        :where([data-ui="unified"][data-training="service"].training-ready)
+            .training-disclosure:not(.is-open) .accordion-content {
+            display: block;
+        }
+
+        :where([data-ui="unified"][data-training="service"]) main h1 {
+            max-width: none;
+            font-size: 20pt;
+            margin-block-end: 12pt;
+        }
+
+        :where([data-ui="unified"][data-training="service"]) .training-toggle::after,
+        :where([data-ui="unified"][data-training="service"]) .training-image-retry {
+            display: none;
+        }
+
+        :where([data-ui="unified"][data-training="service"]) .training-toggle {
+            padding-block: 8pt;
+        }
+
+        :where([data-ui="unified"][data-training="service"]) .accordion-content {
+            padding-block: 3pt 8pt;
+        }
+
+        :where([data-ui="unified"][data-training="service"]) main img {
+            max-height: 220pt;
+            break-inside: avoid;
+        }
+
+        :where([data-ui="unified"][data-training="service"]) :is(.step-example, .training-figure-step) {
+            break-inside: avoid;
+        }
+    }
+}

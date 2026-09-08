@@ -171,3 +171,5 @@ cap-embroidery-fix.css
 - `pages/css/webstore-inquiry.css`: storefront inquiry arrangement; shared controls belong to `components.css`.
 
 - `shared_components/css/training-guide.css`: scoped navigation, reading, table, callout and print owner for reviewed training guides. Legacy training-shared.css remains for unmigrated consumers.
+
+- `shared_components/css/training-service.css`: shared service-guide disclosures, examples, images and print; replaces art-approval/google-review page CSS. Thank-you specimens and lead practice fields retain their two small page sheets.
