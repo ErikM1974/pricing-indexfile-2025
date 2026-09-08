@@ -1,3 +1,9 @@
+## v2026.09.08.9 (2026.09.08)
+
+- Record live transfer authentication and next CSS family batch
+- Document the verified art CSS checkpoint and remaining release gates
+- Unify Steve, AE and artwork detail styles with tested shared owners
+
 ## v2026.09.08.7 (2026.09.08)
 
 - Record live art pages and next authenticated relay rollout
