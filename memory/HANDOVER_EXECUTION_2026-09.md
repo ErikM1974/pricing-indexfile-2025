@@ -7,7 +7,7 @@ Source: Erik's Claude handover (2026-09-08). Work on develop; one server editor;
 - [x] Confirm paired proxy gates shipped: proxy v2026.09.07.3 / Heroku 1128, frontend v.25.
 - [x] Upgrade Node runtime and CI to 22.x; patch compatible dependencies; full gates and deploy.
 - [x] Configure repository CRM_API_SECRET and verify CI executes the money-path and parity specs.
-- [ ] Review and integrate dependency PRs individually with gates: tooling #37, Stripe #34, rate-limit #33, csv-parse #32, Puppeteer #31.
+- [ ] Review and integrate dependency PRs individually with gates: tooling #38 (replaces #37), Stripe #34, rate-limit #33, csv-parse #32, Puppeteer #31.
 - [ ] Finish server split: CRM first; order form, quote sync/watchdog, storefront helpers and payments; preserve route table.
 - [ ] Extract and test long order/push handlers; add Node ESLint scope once split completes.
 - [ ] Lower browser warning cap to zero in verified batches.
@@ -47,3 +47,8 @@ Source: Erik's Claude handover (2026-09-08). Work on develop; one server editor;
 - Dependency release v2026.09.07.28 / Heroku2051 is live at5453a30196e65645d404de5053bd7ea725ac633e; homepage200, contacts/cart401, invalid webhook signature400. CI34178342105 (develop dependency commit) and34178655552 (main release) passed. Both branches synchronized.
 - Puppeteer PR31:25.10.0 moved to devDependencies; engines now require Node22.12+ within22.x (verified22.23.2). Real Chrome152 smoke includes navigation, script evaluation, events, storage and PNG capture. Audit21 total:19 moderate /2 high. Native capture --help loads; Jest invokes capture as a child process to avoid its ESM-loader limitation. Missing local capture server now reports25 actual skips; deliberately failed local capture correctly fails Jest. The older full capture harness still needs staff-session support before refreshing signed-off baselines; live calculator parity remains the release gate.
 - Puppeteer verification: route456 unchanged, undefined names0, boot200, unit192 suites /4,703 passed, DOM88, accessibility4, fixture parity84, browser15 passed /3 optional screenshot skips including all five live surface parity specs.
+
+- Tooling PR38 replaces closed PR37: Jest30.5.1, TypeScript7.0.2, Stylelint17.15/config40, Playwright1.63 and compatible companions. Node minimum22.13. Two DTF type annotations/prototype alias preserve runtime behavior.
+- Held upgrades: ESLint10 adds66 errors/47files; jsdom30 fails the Jest loader; browser axe4.13 flags existing dimmed #dtgArtSetupRate and #dtgArtSetupTotal at1.79/2.03 contrast. Keep axe4.12.1 pinned for this release; fix the inactive-fee appearance with Erik before advancing. Baselines and rule caps unchanged.
+- CSS: removed24 redundant declarations across four calculator sheets. Built before/after product screenshots: DTF and archived screen-print0 exact pixels; screen-print second after-shot also0. First after-shot had850 pixels only inside the async back-shirt thumbnail. Screenshot helper now normalizes focus/scroll; accessibility failures retain selectors and detailed evidence.
+- Tooling verification: 192 unit suites /4,703 passed, DOM88, accessibility4, fixture parity84, browser15 passed /3 optional screenshots skipped; five live calculator surfaces included. Route456 unchanged, undefined names0, boot200, lint99 and CSS283 clean.

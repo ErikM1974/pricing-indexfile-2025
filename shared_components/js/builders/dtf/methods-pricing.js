@@ -463,7 +463,7 @@ export const pricingMethods = {
     /**
      * Calculate subtotal from internal state (not DOM).
      * Mirrors updatePricing() math but returns numbers for save/print.
-     * @returns {{ subtotal: number, productTotals: Map<id, { standardTotal: number, standardUnitPrice: number }>, childTotals: Map<childRowId, { total: number, unitPrice: number }> }}
+     * @returns {{ subtotal: number, productTotals: Map<number, { standardTotal: number, standardUnitPrice: number }>, childTotals: Map<string, { total: number, unitPrice: number }> }}
      */
     calculateFromState() {
         if (!this.currentPricingData || !this.pricingCalculator) {

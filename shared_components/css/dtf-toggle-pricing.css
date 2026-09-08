@@ -149,8 +149,6 @@
 
 .dtf-toggle-item.active {
     background: white !important;
-    background-color: white !important;
-    background-image: none !important;
     border: 3px solid var(--brand-500) !important;
     color: var(--brand-500) !important;
     transform: translateX(4px);
@@ -242,8 +240,6 @@
 
 .dtf-tier-button.selected {
     background: white !important;
-    background-color: white !important;
-    background-image: none !important;
     border: 3px solid var(--brand-500) !important;
     color: var(--brand-500) !important;
     font-weight: 600;

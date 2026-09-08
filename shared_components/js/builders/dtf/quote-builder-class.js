@@ -91,7 +91,7 @@ export class DTFQuoteBuilder {
 // ── Prototype assembly (Batch 4.2): the 69 methods live in 5 cluster mixins;
 //    bodies are verbatim, so `this.` state and the childRows money contract
 //    (dtf-childrow-state.test.js locks prototype methods) are untouched. ──
-Object.assign(DTFQuoteBuilder.prototype, pricingMethods, rowsMethods, locationsMethods, lifecycleMethods, outputMethods);
+const dtfPrototype = Object.assign(DTFQuoteBuilder.prototype, pricingMethods, rowsMethods, locationsMethods, lifecycleMethods, outputMethods);
 
 
 // [2026-06-08] Shared order-summary band (Order Recap + Ship-To card) — DTF/SCP parity Phase 2.
@@ -137,5 +137,5 @@ if (typeof QuoteOrderSummary !== 'undefined') {
 
 // In-flight reprice pill (old-audit price-display #5, 2026-07-07) — see utils.
 if (typeof wrapWithRepricingIndicator === 'function') {
-    DTFQuoteBuilder.prototype.updatePricing = wrapWithRepricingIndicator(DTFQuoteBuilder.prototype.updatePricing);
+    dtfPrototype.updatePricing = wrapWithRepricingIndicator(dtfPrototype.updatePricing);
 }

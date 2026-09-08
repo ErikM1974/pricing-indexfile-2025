@@ -15,8 +15,6 @@ body .dtf-toggle-item.active,
 .dtf-toggle-item.selected,
 .dtf-toggle-item.on {
     background: white !important;
-    background-color: white !important;
-    background-image: none !important;
     border: 3px solid var(--brand-500) !important;
     color: var(--brand-500) !important;
     box-shadow: 0 0 0 2px rgb(76 179 84 / 20%) !important;
@@ -39,10 +37,7 @@ body .dtf-tier-button.selected,
 .dtf-tier-button.active,
 .dtf-tier-button.on {
     background: white !important;
-    background-color: white !important;
-    background-image: none !important;
     border: 3px solid var(--brand-500) !important;
-    border-width: 3px !important;
     color: var(--brand-500) !important;
     font-weight: 600 !important;
     box-shadow: 0 0 0 2px rgb(76 179 84 / 20%) !important;
@@ -60,7 +55,6 @@ body .dtf-tier-button.selected,
 .dtf-tier-button.selected::before,
 .dtf-tier-button.selected::after {
     background: none !important;
-    background-image: none !important;
 }
 
 /* Ensure the toggle switch itself stays green when ON */
@@ -71,8 +65,6 @@ body .dtf-tier-button.selected,
 /* Universal toggle and tier overrides for DTF page */
 .universal-toggle-item.active {
     background: white !important;
-    background-color: white !important;
-    background-image: none !important;
     border: 3px solid var(--brand-500) !important;
     box-shadow: 0 0 0 2px rgb(76 179 84 / 20%) !important;
 }
@@ -83,8 +75,6 @@ body .dtf-tier-button.selected,
 
 .universal-tier-button.selected {
     background: white !important;
-    background-color: white !important;
-    background-image: none !important;
     border: 3px solid var(--brand-500) !important;
     color: var(--brand-500) !important;
     box-shadow: 0 0 0 2px rgb(76 179 84 / 20%) !important;

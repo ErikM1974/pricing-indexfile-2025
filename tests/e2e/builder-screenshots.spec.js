@@ -34,6 +34,10 @@ test.describe('page screenshots', () => {
             await page.addStyleTag({ content: '*, *::before, *::after { animation: none !important; transition: none !important; caret-color: transparent !important; }' });
             // open the collapsed/optional regions a reader would see so hidden-by-default blocks are exercised too
             await page.evaluate(() => { document.querySelectorAll('details').forEach((d) => { d.open = true; }); });
+            // Autofocused calculator inputs can scroll a sticky header mid-capture.
+            // Normalize focus and scroll so pixel diffs compare the same viewport.
+            await page.evaluate(() => { document.activeElement?.blur(); window.scrollTo(0, 0); });
+            await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
             await page.screenshot({ path: path.join(OUT, `${process.env.SHOT_TAG}-${slug(p)}${process.env.SHOT_MEDIA ? "-" + process.env.SHOT_MEDIA : ""}.png`), fullPage: true });
         });
     }
