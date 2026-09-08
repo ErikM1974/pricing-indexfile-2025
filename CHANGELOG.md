@@ -1,3 +1,7 @@
+## v2026.09.07.36 (2026.09.07)
+
+- Extract storefront services with shared cache ownership
+
 ## v2026.09.07.35 (2026.09.07)
 
 - Authenticate quote operations and scope customer refreshes
