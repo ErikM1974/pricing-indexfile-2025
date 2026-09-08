@@ -7,15 +7,15 @@
     <title>Supacolor Job — Northwest Custom Apparel</title>
     <link rel="icon" href="/favicon.png" type="image/png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&amp;display=swap">
     <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/shared_components/css/art-hub.css?v=2026.09.07.19">
-    <link rel="stylesheet" href="/dashboards/css/bradley-transfers.css?v=2026.09.07.19">
-    <link rel="stylesheet" href="/dashboards/css/supacolor-orders.css?v=2026.09.07.19">
-    <link rel="stylesheet" href="/pages/css/supacolor-job-detail.css?v=2026.09.07.19">
-    <link rel="stylesheet" href="/shared_components/css/product-thumbnail-modal.css?v=2026.09.07.14">
+    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.08.4">
+    <link rel="stylesheet" href="/dashboards/css/bradley-transfers.css?v=2026.09.08.4">
+    <link rel="stylesheet" href="/pages/css/supacolor-job-detail.css?v=2026.09.08.4">
+    <script src="/shared_components/js/ui-dialog.js?v=2026.09.08.4"></script>
     <script src="/config/app.config.js"></script>
 </head>
-<body>
+<body data-ui="unified" data-surface="staff" data-department="bradley" data-density="comfortable">
     <div class="minimal-header">
         <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
              alt="Northwest Custom Apparel" class="logo">
@@ -33,7 +33,7 @@
         <div class="sjd-brand-stripe">
             <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/supacolor-mark.png?ver=1"
                  alt="Supacolor"
-                 style="height:28px; width:auto;">
+                 class="sjd-brand-logo">
             <span class="sjd-brand-stripe-label">Heat Transfer Job</span>
         </div>
 
@@ -71,7 +71,7 @@
             <i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Loading job…
         </div>
 
-        <div id="sjd-content" style="display:none;">
+        <div id="sjd-content" hidden>
             <!-- Job Details Card -->
             <section class="sjd-card">
                 <div class="sjd-card-header">Job Details</div>
@@ -130,7 +130,7 @@
                     <div id="sjd-joblines" class="sjd-joblines">
                         <div class="sjd-empty-mini">No joblines captured yet.</div>
                     </div>
-                    <div class="sjd-totals" id="sjd-totals" style="display:none;">
+                    <div class="sjd-totals" id="sjd-totals" hidden>
                         <div class="sjd-total-row">
                             <span>Subtotal</span>
                             <span id="sjd-subtotal">—</span>
@@ -161,7 +161,7 @@
                         <div id="sjd-ship-phone">—</div>
                         <div id="sjd-ship-email">—</div>
                     </div>
-                    <div class="sjd-ship-section" id="sjd-tracking-section" style="display:none;">
+                    <div class="sjd-ship-section" id="sjd-tracking-section" hidden>
                         <div class="sjd-ship-label">Tracking</div>
                         <a id="sjd-tracking-link" href="#" target="_blank" rel="noopener" aria-labelledby="sjd-tracking-number">
                             <span id="sjd-tracking-number"></span>
@@ -173,7 +173,7 @@
             </section>
 
             <!-- Linked Transfer Orders Card -->
-            <section class="sjd-card" id="sjd-linked-card" style="display:none;">
+            <section class="sjd-card" id="sjd-linked-card" hidden>
                 <div class="sjd-card-header">
                     <i class="fas fa-link" aria-hidden="true"></i> Linked Transfer Orders
                 </div>
@@ -203,7 +203,7 @@
     </main>
 
     <!-- Paste Detail Screenshot Modal -->
-    <div id="sjd-paste-modal" class="bt-modal" style="display:none;">
+    <div id="sjd-paste-modal" class="bt-modal" hidden>
         <div class="bt-modal-content">
             <div class="bt-modal-header">
                 <h3><i class="fas fa-paste" aria-hidden="true"></i> Paste Job Detail Screenshot</h3>
@@ -214,27 +214,27 @@
                     Paste a screenshot of the Supacolor <strong>job detail page</strong> (integrate.supacolor.com/dashboard/jobs/<em>number</em>).
                     All visible fields — joblines, timeline, shipping, payment, history — will be extracted and filled in.
                 </div>
-                <div class="bt-modal-intro" style="background:#fff8e1; border-left:4px solid #ffc107; color:#856404;">
+                <div class="bt-modal-intro bt-modal-intro--warning">
                     <i class="fas fa-info-circle" aria-hidden="true"></i>
                     <strong>By default, only empty fields are filled.</strong> Check the box below to overwrite manually-edited values.
-                    <label style="display:block; margin-top:8px; font-weight:normal;">
+                    <label class="bt-label-note bt-label-note--normal">
                         <input type="checkbox" id="sjd-overwrite"> Overwrite existing fields with extracted values
                     </label>
                 </div>
 
-                <div class="sc-paste-zone" id="sjd-paste-zone" tabindex="0">
+                <div class="sc-paste-zone" id="sjd-paste-zone" role="button" tabindex="0" aria-label="Choose a screenshot, or paste an image with Ctrl+V">
                     <div class="sc-paste-empty" id="sjd-paste-empty">
                         <i class="fas fa-image" aria-hidden="true"></i>
                         <p><strong>Click here, then press Ctrl+V</strong> to paste your screenshot</p>
                         <p class="sc-paste-hint">Or drag &amp; drop an image file</p>
                     </div>
-                    <img id="sjd-paste-preview" class="sc-paste-preview" style="display:none;" alt="Pasted screenshot preview">
-                    <input type="file" id="sjd-paste-file" accept="image/*" style="display:none;" aria-label="Choose a file">
+                    <img id="sjd-paste-preview" class="sc-paste-preview" alt="Pasted screenshot preview" hidden>
+                    <input type="file" id="sjd-paste-file" accept="image/*" aria-label="Choose a file" hidden>
                 </div>
 
-                <div id="sjd-extract-status" class="sc-extract-status" style="display:none;"></div>
+                <div id="sjd-extract-status" class="sc-extract-status" hidden></div>
 
-                <div id="sjd-extract-summary" class="sjd-extract-summary" style="display:none;"></div>
+                <div id="sjd-extract-summary" class="sjd-extract-summary" tabindex="0" role="region" aria-label="Extracted order details" hidden></div>
 
                 <div class="bt-form-actions">
                     <button type="button" class="bt-btn bt-btn--secondary" id="sjd-paste-cancel">Cancel</button>
@@ -247,10 +247,10 @@
     </div>
 
     <!-- Delete Confirmation Modal -->
-    <div id="sjd-delete-modal" class="bt-modal" style="display:none;">
+    <div id="sjd-delete-modal" class="bt-modal" hidden>
         <div class="bt-modal-content sjd-delete-modal-content">
             <div class="bt-modal-header">
-                <h3><i class="fas fa-exclamation-triangle" style="color:#c92a2a;" aria-hidden="true"></i> Delete Job</h3>
+                <h3><i class="fas fa-exclamation-triangle text-danger" aria-hidden="true"></i> Delete Job</h3>
                 <button class="bt-modal-close" id="sjd-delete-modal-close">&times;</button>
             </div>
             <div class="bt-modal-body">
@@ -269,10 +269,10 @@
                     Linked Transfer Orders are <strong>not</strong> affected — they live in a separate table.
                     The Supacolor.com record is also untouched. You can re-import this job by pasting its detail screenshot again.
                 </div>
-                <div id="sjd-delete-open-warning" class="sjd-delete-open-warning" style="display:none;">
+                <div id="sjd-delete-open-warning" class="sjd-delete-open-warning" hidden>
                     <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
                     This job is still <strong>Open</strong>. Confirm to delete anyway:
-                    <label style="display:block; margin-top:8px;">
+                    <label class="bt-label-note">
                         <input type="checkbox" id="sjd-delete-open-confirm"> Yes, I want to delete this open job
                     </label>
                 </div>
@@ -287,8 +287,8 @@
     </div>
 
     <!-- Change Status Modal -->
-    <div id="sjd-status-modal" class="bt-modal" style="display:none;">
-        <div class="bt-modal-content" style="max-width: 440px;">
+    <div id="sjd-status-modal" class="bt-modal" hidden>
+        <div class="bt-modal-content bt-modal-content--status">
             <div class="bt-modal-header">
                 <h3><i class="fas fa-exchange-alt" aria-hidden="true"></i> Change Status</h3>
                 <button class="bt-modal-close" id="sjd-status-modal-close">&times;</button>
@@ -328,11 +328,11 @@
     <!-- Toast container -->
     <div id="sjd-toast-container" class="bt-toast-container"></div>
 
-    <script src="/shared_components/js/product-thumbnail-modal.js?v=2026.09.06.22"></script>
+    <script src="/shared_components/js/product-thumbnail-modal.js?v=2026.09.08.4"></script>
     <script src="/shared_components/js/caspio-date-utils.js?v=2026.09.06.46"></script>
     <!-- Normalises Box READ urls stored as absolute proxy links onto this origin,
          so the session-gated forwarder authorises them. Must load first. -->
     <script src="/shared_components/js/box-url.js?v=2026.08.05.23"></script>
-    <script src="/pages/js/supacolor-job-detail.js?v=2026.09.06.37"></script>
+    <script src="/pages/js/supacolor-job-detail.js?v=2026.09.08.4"></script>
 </body>
 </html>

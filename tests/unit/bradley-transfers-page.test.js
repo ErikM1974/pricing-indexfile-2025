@@ -32,7 +32,8 @@ describe('bradley transfers — config + Rule 3', () => {
         expect(js).not.toMatch(/style="/);
         expect(js).toMatch(/document\.addEventListener\('error', function \(e\)[\s\S]*?\}, true\);/);
         expect(js).toMatch(/data-onerror="thumb"/);
-        expect(css).toMatch(/^\[hidden\] \{ display: none !important; \}/m);
+        expect(html).toContain('/shared_components/css/components.css?v=');
+        expect(read('shared_components/css/components.css')).toMatch(/@layer utilities[\s\S]*?\[hidden\]\s*\{\s*display: none;/);
         expect(html).not.toMatch(/<i class="fa[^"]*"><\/i>/);
         expect(js).not.toMatch(/<i class="fa[^"]*"><\/i>/);
         expect(html).toMatch(/bradley-transfers\.js\?v=2026\.\d{2}\.\d{2}\.\d+/);
@@ -69,7 +70,10 @@ describe('bradley transfers — a11y', () => {
         expect(html).toMatch(/id="bt-delete-modal-close" aria-label="Close"/);
         expect(js).toMatch(/role="link" tabindex="0" aria-label="Open transfer /);
         expect(js).toMatch(/card\.addEventListener\('keydown'/);
-        expect(js).toMatch(/deleteReturnFocus = document\.activeElement;/);
+        expect(html.indexOf('/shared_components/js/ui-dialog.js')).toBeGreaterThan(0);
+        expect(html.indexOf('/shared_components/js/ui-dialog.js')).toBeLessThan(html.indexOf('/dashboards/js/'));
+        expect(js).toContain("window.UiDialog.open('bt-delete-modal'");
+        expect(js).toContain('window.UiDialog.close('); // Focus/escape/scroll behavior is exercised in css-unification-bradley.spec.js.
         expect(js).toMatch(/if \(e\.key === 'Escape'\) closeDeleteModal\(\);/);
         expect(js).toMatch(/document\.removeEventListener\('keydown', escHandler\);\s*\/\/ was only removed on Esc/);
         expect(html).toMatch(/id="bt-toast-container" class="bt-toast-container" role="status" aria-live="polite"/);

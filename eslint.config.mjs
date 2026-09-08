@@ -9,6 +9,7 @@ import noUnsanitized from 'eslint-plugin-no-unsanitized';
 // The strict-scope files; the legacy block ignores exactly these so the two never merge.
 const STRICT_FILES = [
     'shared_components/js/builders/**/*.js',
+    'shared_components/js/ui-dialog.js',
     'lib/**/*.js',
     'scripts/build.js',
     'scripts/lint-css.js',

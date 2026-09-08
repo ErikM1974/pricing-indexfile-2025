@@ -3,6 +3,7 @@
 ### Core JavaScript Services
 | File | Purpose | Used By | Status |
 |------|---------|---------|--------|
+| `/shared_components/js/ui-dialog.js` | Shared keyboard focus, dismissal and scroll behavior for migrated dialogs (2026-09-08). | Bradley transfer family | Active |
 | `/config/app.config.js` | Central configuration - ALL hardcoded values | All pages | ✅ Active |
 | `/shared_components/js/base-quote-service.js` | Base quote class | All quote builders | ✅ Active |
 | `/shared_components/js/calculator-utilities.js` | Shared utilities | All calculators | ✅ Active |

@@ -7,7 +7,7 @@
 import { artFeeAddOns, artFeeTotals } from './fees.js';
 import { effectiveLocationCode, effectiveLocationLabel, isRowColorInvalid, updateSubmitEnabled } from './form-core.js';
 import { clearSessionState, getQuoteID } from './persistence.js';
-import { computePriceQuoteFromState } from './pricing.js';
+import { assertPricingReady, computePriceQuoteFromState } from './pricing.js';
 import { API_BASE, LOCATION_LABELS, SUBMIT_URL, state } from './state.js';
 import { effectiveShipFee } from './tax-shipping.js';
 import { escapeHtml, fmtMoney, isPickupMethod, isoDate, repByCode, shipLabel, showToastSafe } from './utils.js';
@@ -158,7 +158,8 @@ export async function dtgPrintQuote() {
             showToast('Add at least one product with a size before printing.', 'error', 6000);            return;
         }
 
-        // Trigger a fresh price calculation so the invoice reads current numbers
+        // Print uses the same complete, current prices as Save.
+        assertPricingReady();
         const priceQuote = computePriceQuoteFromState();
         if (!priceQuote || !Array.isArray(priceQuote.lineItems) || priceQuote.lineItems.length === 0) {
             showToast('Could not compute pricing. Make sure all rows have a style + color + at least one filled size.', 'error', 6000);            return;

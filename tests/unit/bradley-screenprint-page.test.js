@@ -53,7 +53,10 @@ describe('bradley screen print — states + a11y', () => {
         expect(html).toMatch(/id="bt-delete-modal-close" aria-label="Close"/);
         expect(js).toMatch(/role="link" tabindex="0" aria-label="Open order /);
         expect(js).toMatch(/card\.addEventListener\('keydown'/);
-        expect(js).toMatch(/deleteReturnFocus = document\.activeElement;/);
+        expect(html.indexOf('/shared_components/js/ui-dialog.js')).toBeGreaterThan(0);
+        expect(html.indexOf('/shared_components/js/ui-dialog.js')).toBeLessThan(html.indexOf('/dashboards/js/'));
+        expect(js).toContain("window.UiDialog.open('bt-delete-modal'");
+        expect(js).toContain('window.UiDialog.close('); // Focus/escape/scroll behavior is exercised in css-unification-bradley.spec.js.
         expect(js).toMatch(/if \(e\.key === 'Escape'\) closeDeleteModal\(\);/);
         expect(js).toMatch(/\(state\.me && state\.me\.email\) \|\| localStorage\.getItem\('transfer_user_email'\)/);
         expect(html).toMatch(/id="bt-toast-container" class="bt-toast-container" role="status" aria-live="polite"/);

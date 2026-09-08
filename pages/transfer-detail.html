@@ -7,14 +7,15 @@
     <title>Transfer Order Details</title>
     <link rel="icon" href="/favicon.png" type="image/png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&amp;display=swap">
     <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/shared_components/css/art-hub.css?v=2026.09.07.19">
-    <link rel="stylesheet" href="/dashboards/css/bradley-transfers.css?v=2026.09.07.19">
-    <link rel="stylesheet" href="/pages/css/transfer-detail.css?v=2026.09.07.19">
-    <link rel="stylesheet" href="/shared_components/css/product-thumbnail-modal.css?v=2026.09.07.14">
+    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.08.4">
+    <link rel="stylesheet" href="/dashboards/css/bradley-transfers.css?v=2026.09.08.4">
+    <link rel="stylesheet" href="/pages/css/transfer-detail.css?v=2026.09.08.4">
+    <script src="/shared_components/js/ui-dialog.js?v=2026.09.08.4"></script>
     <script src="/config/app.config.js"></script>
 </head>
-<body>
+<body data-ui="unified" data-surface="staff" data-department="bradley" data-density="comfortable">
     <div class="minimal-header">
         <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
              alt="Northwest Custom Apparel" class="logo">
@@ -39,15 +40,15 @@
         </div>
 
         <!-- Error state -->
-        <div id="td-error" class="td-error" style="display:none;">
+        <div id="td-error" class="td-error" hidden>
             <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
             <h2>Unable to load transfer</h2>
-            <div id="td-error-message"></div>
+            <div id="td-error-message" class="td-error-message"></div>
             <a href="/dashboards/bradley-transfers.html" class="bt-btn bt-btn--primary">Back to Queue</a>
         </div>
 
         <!-- Main detail view -->
-        <div id="td-main" class="td-main" style="display:none;">
+        <div id="td-main" class="td-main" hidden>
             <!-- Header Card -->
             <div class="td-header-card">
                 <div class="td-header-top">
@@ -72,7 +73,7 @@
                  Banner is hidden for Shipped/Received/Cancelled (status-past-Ordered) cards
                  unless the PO + Supacolor are present (then show LINKED state for transparency).
                  -->
-            <div class="td-po-banner" id="td-po-banner" style="display:none;"></div>
+            <div class="td-po-banner" id="td-po-banner" hidden></div>
 
             <!-- Two-column layout -->
             <div class="td-grid">
@@ -94,15 +95,15 @@
                          card below shows what Bradley actually placed. Kept hidden
                          div with the original ID so any leftover JS targeting it
                          doesn't crash. -->
-                    <div id="td-specs-panel" style="display:none;"></div>
+                    <div id="td-specs-panel" hidden></div>
 
                     <!-- Tracking Panel removed in v3.1 — merged into Live Supacolor
                          Status card. Tracking#/Carrier/Ship Method are auto-populated
                          by transfer-status-mirror.js from the Supacolor API sync. -->
-                    <div id="td-tracking-panel" style="display:none;"></div>
+                    <div id="td-tracking-panel" hidden></div>
 
                     <!-- Live Supacolor Status (populated from Supacolor_Jobs once linked) -->
-                    <div class="td-card" id="td-supacolor-live-card" style="display:none;">
+                    <div class="td-card" id="td-supacolor-live-card" hidden>
                         <div class="td-card-header">
                             <h3><i class="fas fa-satellite-dish" aria-hidden="true"></i> Live Supacolor Status</h3>
                             <span class="td-card-header-hint">Synced from Supacolor API</span>
@@ -144,8 +145,8 @@
     <!-- ── Modals ───────────────────────────────────────────────── -->
 
     <!-- User Identification Modal -->
-    <div id="td-user-modal" class="bt-modal" style="display:none;">
-        <div class="bt-modal-content" style="max-width:400px;">
+    <div id="td-user-modal" class="bt-modal" hidden>
+        <div class="bt-modal-content bt-modal-content--identity">
             <div class="bt-modal-header">
                 <h3><i class="fas fa-user-circle" aria-hidden="true"></i> Who are you?</h3>
             </div>
@@ -155,13 +156,13 @@
                     Saved in your browser — ask once per device.
                 </div>
                 <form id="td-user-form" class="bt-form">
-                    <div class="bt-form-row" style="grid-template-columns:1fr;">
+                    <div class="bt-form-row bt-form-row--single">
                         <div class="bt-form-field">
                             <label for="username">Your Name *</label>
                             <input type="text" name="userName" required placeholder="e.g. Bradley" id="username">
                         </div>
                     </div>
-                    <div class="bt-form-row" style="grid-template-columns:1fr;">
+                    <div class="bt-form-row bt-form-row--single">
                         <div class="bt-form-field">
                             <label for="useremail">Your Email *</label>
                             <input type="email" name="userEmail" required placeholder="you@nwcustomapparel.com" id="useremail">
@@ -176,8 +177,8 @@
     </div>
 
     <!-- Mark Ordered Modal -->
-    <div id="td-ordered-modal" class="bt-modal" style="display:none;">
-        <div class="bt-modal-content" style="max-width:500px;">
+    <div id="td-ordered-modal" class="bt-modal" hidden>
+        <div class="bt-modal-content bt-modal-content--form">
             <div class="bt-modal-header">
                 <h3><i class="fas fa-paper-plane" aria-hidden="true"></i> Mark as Ordered</h3>
                 <button class="bt-modal-close" data-close="td-ordered-modal">&times;</button>
@@ -195,28 +196,28 @@
                         <span class="td-paste-hint">Claude will auto-fill Job # and Ship Date</span>
                     </div>
                 </div>
-                <div id="td-ordered-paste-status" class="td-paste-status" style="display:none;"></div>
+                <div id="td-ordered-paste-status" class="td-paste-status" hidden></div>
 
                 <form id="td-ordered-form" class="bt-form">
-                    <div class="bt-form-row" style="grid-template-columns:1fr;">
+                    <div class="bt-form-row bt-form-row--single">
                         <div class="bt-form-field">
                             <label for="supacolorordernumber">Supacolor Order # *</label>
                             <input type="text" name="supacolorOrderNumber" required placeholder="e.g. 637713" id="supacolorordernumber">
                         </div>
                     </div>
-                    <div class="bt-form-row" style="grid-template-columns:1fr;">
+                    <div class="bt-form-row bt-form-row--single">
                         <div class="bt-form-field">
                             <label for="supacolororderurl">Supacolor Order URL (optional)</label>
                             <input type="url" name="supacolorOrderUrl" placeholder="https://supacolor.com/..." id="supacolororderurl">
                         </div>
                     </div>
-                    <div class="bt-form-row" style="grid-template-columns:1fr;">
+                    <div class="bt-form-row bt-form-row--single">
                         <div class="bt-form-field">
                             <label for="estimatedshipdate">Estimated Ship Date (optional)</label>
                             <input type="date" name="estimatedShipDate" id="estimatedshipdate">
                         </div>
                     </div>
-                    <div class="bt-form-row" style="grid-template-columns:1fr;">
+                    <div class="bt-form-row bt-form-row--single">
                         <div class="bt-form-field">
                             <label for="notes">Notes (optional)</label>
                             <textarea name="notes" rows="2" placeholder="Any extra context..." id="notes"></textarea>
@@ -232,8 +233,8 @@
     </div>
 
     <!-- Add PO Number Modal -->
-    <div id="td-po-modal" class="bt-modal" style="display:none;">
-        <div class="bt-modal-content" style="max-width:500px;">
+    <div id="td-po-modal" class="bt-modal" hidden>
+        <div class="bt-modal-content bt-modal-content--form">
             <div class="bt-modal-header">
                 <h3><i class="fas fa-file-invoice-dollar" aria-hidden="true"></i> Add ShopWorks PO</h3>
                 <button class="bt-modal-close" data-close="td-po-modal">&times;</button>
@@ -243,13 +244,13 @@
                     Enter the PO number you created in ShopWorks for this transfer order.
                 </div>
                 <form id="td-po-form" class="bt-form">
-                    <div class="bt-form-row" style="grid-template-columns:1fr;">
+                    <div class="bt-form-row bt-form-row--single">
                         <div class="bt-form-field">
                             <label for="shopworkspo">ShopWorks PO # *</label>
                             <input type="text" name="shopworksPO" required placeholder="e.g. 41000" id="shopworkspo">
                         </div>
                     </div>
-                    <div class="bt-form-row" style="grid-template-columns:1fr;">
+                    <div class="bt-form-row bt-form-row--single">
                         <div class="bt-form-field">
                             <label for="notes-2">Notes (optional)</label>
                             <textarea name="notes" rows="2" id="notes-2"></textarea>
@@ -265,8 +266,8 @@
     </div>
 
     <!-- Mark Shipped Modal -->
-    <div id="td-shipped-modal" class="bt-modal" style="display:none;">
-        <div class="bt-modal-content" style="max-width:500px;">
+    <div id="td-shipped-modal" class="bt-modal" hidden>
+        <div class="bt-modal-content bt-modal-content--form">
             <div class="bt-modal-header">
                 <h3><i class="fas fa-truck" aria-hidden="true"></i> Mark as Shipped</h3>
                 <button class="bt-modal-close" data-close="td-shipped-modal">&times;</button>
@@ -280,22 +281,22 @@
                         <span class="td-paste-hint">Claude will auto-fill Tracking # and Delivery Date</span>
                     </div>
                 </div>
-                <div id="td-shipped-paste-status" class="td-paste-status" style="display:none;"></div>
+                <div id="td-shipped-paste-status" class="td-paste-status" hidden></div>
 
                 <form id="td-shipped-form" class="bt-form">
-                    <div class="bt-form-row" style="grid-template-columns:1fr;">
+                    <div class="bt-form-row bt-form-row--single">
                         <div class="bt-form-field">
                             <label for="trackingnumber">Tracking Number (optional)</label>
                             <input type="text" name="trackingNumber" placeholder="UPS / FedEx / USPS tracking" id="trackingnumber">
                         </div>
                     </div>
-                    <div class="bt-form-row" style="grid-template-columns:1fr;">
+                    <div class="bt-form-row bt-form-row--single">
                         <div class="bt-form-field">
                             <label for="estimatedshipdate-2">Estimated Delivery (optional)</label>
                             <input type="date" name="estimatedShipDate" id="estimatedshipdate-2">
                         </div>
                     </div>
-                    <div class="bt-form-row" style="grid-template-columns:1fr;">
+                    <div class="bt-form-row bt-form-row--single">
                         <div class="bt-form-field">
                             <label for="notes-3">Notes (optional)</label>
                             <textarea name="notes" rows="2" id="notes-3"></textarea>
@@ -311,18 +312,18 @@
     </div>
 
     <!-- Cancel Modal -->
-    <div id="td-cancel-modal" class="bt-modal" style="display:none;">
-        <div class="bt-modal-content" style="max-width:500px;">
+    <div id="td-cancel-modal" class="bt-modal" hidden>
+        <div class="bt-modal-content bt-modal-content--form">
             <div class="bt-modal-header">
                 <h3><i class="fas fa-times-circle" aria-hidden="true"></i> Cancel Transfer</h3>
                 <button class="bt-modal-close" data-close="td-cancel-modal">&times;</button>
             </div>
             <div class="bt-modal-body">
-                <div class="bt-modal-intro" style="background:#fee2e2; border-left-color:#dc2626; color:#991b1b;">
+                <div class="bt-modal-intro bt-modal-intro--danger">
                     <strong>This cannot be undone via the UI.</strong> Cancellation is logged in the activity timeline.
                 </div>
                 <form id="td-cancel-form" class="bt-form">
-                    <div class="bt-form-row" style="grid-template-columns:1fr;">
+                    <div class="bt-form-row bt-form-row--single">
                         <div class="bt-form-field">
                             <label for="reason">Cancel Reason *</label>
                             <textarea name="reason" rows="3" required placeholder="Why is this being cancelled?" id="reason"></textarea>
@@ -338,27 +339,27 @@
     </div>
 
     <!-- Delete Modal (hard-delete, for mistakes) -->
-    <div id="td-delete-modal" class="bt-modal" style="display:none;">
-        <div class="bt-modal-content" style="max-width:500px;">
+    <div id="td-delete-modal" class="bt-modal" hidden>
+        <div class="bt-modal-content bt-modal-content--form">
             <div class="bt-modal-header">
                 <h3><i class="fas fa-trash" aria-hidden="true"></i> Permanently Delete Transfer</h3>
                 <button class="bt-modal-close" data-close="td-delete-modal">&times;</button>
             </div>
             <div class="bt-modal-body">
-                <div class="bt-modal-intro" style="background:#fee2e2; border-left-color:#dc2626; color:#991b1b;">
+                <div class="bt-modal-intro bt-modal-intro--danger">
                     <strong>This removes the transfer entirely.</strong> No audit trail is kept. Use this only for test entries, duplicates, or mistakes. For real cancellations, use "Cancel Transfer" instead.
                 </div>
                 <form id="td-delete-form" class="bt-form">
-                    <div class="bt-form-row" style="grid-template-columns:1fr;">
+                    <div class="bt-form-row bt-form-row--single">
                         <div class="bt-form-field">
                             <label for="reason-2">Reason (for your records) *</label>
                             <textarea name="reason" rows="2" required placeholder="e.g. duplicate, wrong design, test entry..." id="reason-2"></textarea>
                         </div>
                     </div>
-                    <div class="bt-form-row" style="grid-template-columns:1fr;">
+                    <div class="bt-form-row bt-form-row--single">
                         <div class="bt-form-field">
-                            <label style="font-weight:normal; display:flex; align-items:flex-start; gap:8px; cursor:pointer;">
-                                <input type="checkbox" name="confirm" required style="margin-top:3px;">
+                            <label class="bt-checkline">
+                                <input type="checkbox" name="confirm" required class="bt-checkline-input">
                                 <span>I understand this <strong>cannot be recovered</strong>.</span>
                             </label>
                         </div>
@@ -373,15 +374,15 @@
     </div>
 
     <!-- Rush Toggle Modal -->
-    <div id="td-rush-modal" class="bt-modal" style="display:none;">
-        <div class="bt-modal-content" style="max-width:500px;">
+    <div id="td-rush-modal" class="bt-modal" hidden>
+        <div class="bt-modal-content bt-modal-content--form">
             <div class="bt-modal-header">
                 <h3 id="td-rush-modal-title"><i class="fas fa-bolt" aria-hidden="true"></i> Mark as Rush</h3>
                 <button class="bt-modal-close" data-close="td-rush-modal">&times;</button>
             </div>
             <div class="bt-modal-body">
                 <form id="td-rush-form" class="bt-form">
-                    <div class="bt-form-row" style="grid-template-columns:1fr;" id="td-rush-reason-row">
+                    <div class="bt-form-row bt-form-row--single" id="td-rush-reason-row">
                         <div class="bt-form-field">
                             <label for="reason-3">Reason for rush *</label>
                             <textarea name="reason" rows="2" placeholder="Customer deadline, event date, etc." id="reason-3"></textarea>
@@ -397,7 +398,7 @@
     </div>
 
     <!-- Edit Specs Modal -->
-    <div id="td-specs-modal" class="bt-modal" style="display:none;">
+    <div id="td-specs-modal" class="bt-modal" hidden>
         <div class="bt-modal-content">
             <div class="bt-modal-header">
                 <h3><i class="fas fa-pen" aria-hidden="true"></i> Edit Order Specs</h3>
@@ -436,7 +437,7 @@
                         </div>
                     </div>
                     <!-- Print Specs (Supacolor-aligned structured fields) -->
-                    <div class="bt-form-row" style="grid-template-columns: 1fr 1fr 1fr;">
+                    <div class="bt-form-row bt-form-row--thirds">
                         <div class="bt-form-field">
                             <label for="transfer-type">Transfer Type</label>
                             <select name="Transfer_Type" id="transfer-type">
@@ -506,11 +507,11 @@
          so the session-gated forwarder authorises them. Must load first — the Send
          Mockup picker in transfer-actions-shared.js calls boxUrl() too. -->
     <script src="/shared_components/js/box-url.js?v=2026.08.05.23"></script>
-    <script src="/shared_components/js/transfer-actions-shared.js?v=2026.09.06.37"></script>
-    <script src="/shared_components/js/product-thumbnail-modal.js?v=2026.09.06.22"></script>
+    <script src="/shared_components/js/transfer-actions-shared.js?v=2026.09.08.4"></script>
+    <script src="/shared_components/js/product-thumbnail-modal.js?v=2026.09.08.4"></script>
     <script src="/shared_components/js/caspio-date-utils.js?v=2026.09.06.46"></script>
     <!-- SAML identity → legacy nwca_user_* keys (StaffAuthHelper.ready(), 2026-09-05) -->
     <script src="/shared_components/js/staff-auth-helper.js?v=2026.09.06.37"></script>
-    <script src="/pages/js/transfer-detail.js?v=2026.09.06.37"></script>
+    <script src="/pages/js/transfer-detail.js?v=2026.09.08.4"></script>
 </body>
 </html>

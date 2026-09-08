@@ -7,12 +7,13 @@
     <title>Bradley's Screen Print Queue</title>
     <link rel="icon" href="/favicon.png" type="image/png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&amp;display=swap">
     <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/shared_components/css/art-hub.css?v=2026.09.07.19">
-    <link rel="stylesheet" href="/dashboards/css/bradley-transfers.css?v=2026.09.07.19">
-    <link rel="stylesheet" href="/shared_components/css/transfer-actions.css?v=2026.09.07.19">
+    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.08.4">
+    <link rel="stylesheet" href="/dashboards/css/bradley-transfers.css?v=2026.09.08.4">
+    <link rel="stylesheet" href="/shared_components/css/transfer-workflow.css?v=2026.09.08.4">
 </head>
-<body>
+<body data-ui="unified" data-surface="staff" data-department="bradley" data-density="comfortable">
     <div class="minimal-header">
         <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
              alt="Northwest Custom Apparel" class="logo">
@@ -149,13 +150,14 @@
     <!-- EmailJS + TransferActions shared module — provide openSendModal() for
          the "+ Send Another" button injected by ?view=steve. EmailJS is
          needed so the submit notification email actually fires. -->
+    <script src="/shared_components/js/ui-dialog.js?v=2026.09.08.4"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <!-- Normalises stored absolute proxy Box urls onto this origin so the session-gated
          forwarder authorises them. Must precede both consumers below. -->
     <script src="/config/app.config.js"></script>
     <script src="/shared_components/js/box-url.js?v=2026.08.06.1"></script>
-    <script src="/shared_components/js/transfer-actions-shared.js?v=2026.09.06.37"></script>
+    <script src="/shared_components/js/transfer-actions-shared.js?v=2026.09.08.4"></script>
     <script src="/shared_components/js/caspio-date-utils.js?v=2026.09.06.46"></script>
-    <script src="/dashboards/js/bradley-screenprint.js?v=2026.09.06.37"></script>
+    <script src="/dashboards/js/bradley-screenprint.js?v=2026.09.08.4"></script>
 </body>
 </html>

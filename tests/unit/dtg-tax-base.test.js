@@ -227,3 +227,27 @@ describe('DTG saved-quote tax invariant (Phase 1 Chunk C lock)', () => {
     expect(notes.tax.isWholesale).toBe(false);
   });
 });
+
+
+describe('DTG save rejects unpriced line items before any write', () => {
+  test.each([0, -1, NaN, Infinity])('invalid line total %s cannot be saved', async (amount) => {
+    const quote = formQuote();
+    quote.lineItems[0].lineTotal = amount;
+    const result = await saveAndCapture(quote);
+    expect(result.session).toBeUndefined();
+    expect(result.item).toBeUndefined();
+  });
+  test('one priced row cannot hide a second unpriced row', async () => {
+    const quote = formQuote();
+    quote.lineItems.push({ ...quote.lineItems[0], style: 'PC61', finalUnitPrice: 0, lineTotal: 0 });
+    const result = await saveAndCapture(quote);
+    expect(result.session).toBeUndefined();
+    expect(result.item).toBeUndefined();
+  });
+  test.each(['totalQuantity', 'finalUnitPrice'])('invalid %s blocks a positive total', async (field) => {
+    const quote = formQuote();
+    quote.lineItems[0][field] = 0;
+    const result = await saveAndCapture(quote);
+    expect(result.session).toBeUndefined();
+  });
+});

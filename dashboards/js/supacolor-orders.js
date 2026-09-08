@@ -554,23 +554,18 @@
     }
 
     // ── Backfill modal ─────────────────────────────────────────────────
-    var backfillReturnFocus = null;
     function openBackfillModal() {
-        backfillReturnFocus = document.activeElement;
-        $('sc-backfill-modal').hidden = false;
         resetBackfillModal();
         // Focus the paste zone so Ctrl+V works immediately
-        setTimeout(function () { $('sc-paste-zone').focus(); }, 50);
+        window.UiDialog.open('sc-backfill-modal', { focus: '#sc-paste-zone', onDismiss: closeBackfillModal });
     }
 
     function closeBackfillModal() {
         var m = $('sc-backfill-modal');
         if (m.hidden) return;
-        m.hidden = true;
+        window.UiDialog.close(m);
         state.pendingBackfill = null;
         state.pendingSingleJob = null;
-        if (backfillReturnFocus && document.body.contains(backfillReturnFocus) && typeof backfillReturnFocus.focus === 'function') backfillReturnFocus.focus();
-        backfillReturnFocus = null;
     }
 
     function resetBackfillModal() {

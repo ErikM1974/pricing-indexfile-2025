@@ -1382,3 +1382,6 @@
     padding-bottom: 8px;
     border-bottom: 1px solid var(--gray-200);
 }
+
+/* Sender section spacing; shared with the migrated workflow entry point. */
+.tas-mockup-summary-head--specs { margin-top: 10px; }

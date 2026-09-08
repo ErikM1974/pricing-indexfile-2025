@@ -1421,7 +1421,7 @@ const AI_ENDPOINT = '/api/dtg-quote-ai/chat';
             // does NOT reflect manual row/qty/tax edits (it's set ONLY from the PRICE_QUOTE
             // block at :997). Prefer the live form quote so the saved record == the on-screen
             // total (Erik's #1 rule) and so tax/wholesale (recomputeTaxRate, the single
-            // authority) persist. Fall back to the AI quote when the form has no priced rows.
+            // authority) persist. Fall back to the AI quote only when the form has no entered rows.
             let priceQuote = aiState.currentPriceQuote;
             let customer = aiState.currentCustomerFinal || {};
             const draft = aiState.currentEmailDraft || {};
@@ -1434,6 +1434,12 @@ const AI_ENDPOINT = '/api/dtg-quote-ai/chat';
             }
             if (!priceQuote || !priceQuote.lineItems || !priceQuote.lineItems.length) {
                 throw new Error('No price quote to save');
+            }
+            if (priceQuote.lineItems.some(item =>
+                ['totalQuantity', 'finalUnitPrice', 'lineTotal'].some(field =>
+                    !Number.isFinite(Number(item[field])) || Number(item[field]) <= 0))) {
+                throw Object.assign(new Error('Pricing is incomplete. Wait for every product price before saving.'),
+                    { code: 'DTG_PRICING_NOT_READY' });
             }
             const quoteID = aiState.quoteID || await ensureQuoteID();
             if (!quoteID) throw new Error('Failed to get quote ID');
@@ -1672,7 +1678,7 @@ const AI_ENDPOINT = '/api/dtg-quote-ai/chat';
                 : `Saved ${effectiveQuoteID} — click again for share link`);
         } catch (err) {
             console.error('[dtg-ai] save failed:', err);
-            showToast('Save failed — check console');
+            showToast(err.code === 'DTG_PRICING_NOT_READY' ? err.message : 'Save failed — check console');
             const btn = document.getElementById('aiSaveQuoteBtn');
             if (btn) btn.disabled = false;
         } finally {

@@ -23,7 +23,7 @@ test('design queue — structure', () => {
     expect(html).toMatch(/<button type="button" class="dash-error-banner-close" aria-label="Dismiss">/);
     expect((html.match(/class="dash-stat-card[^"]*dq-stat-btn" data-filter="(draw|research|skip)" aria-pressed="false"/g) || []).length).toBe(3);
     expect(html).toMatch(/id="queue-root" class="dash-loading" role="status"/);
-    expect(css).toMatch(/\[hidden\] \{ display: none; \}/);
+    expect(css).toMatch(/\[hidden\]\s*\{\s*display: none;\s*\}/);
     expect(css).toMatch(/\.dash-stat-card\[aria-pressed="true"\]/);
 });
 

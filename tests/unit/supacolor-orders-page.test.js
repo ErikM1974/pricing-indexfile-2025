@@ -28,7 +28,8 @@ describe('supacolor orders — config + Rule 3', () => {
         expect(html).not.toMatch(/\son(click|error|change|submit)=/);
         expect(js).not.toMatch(/\.style\.display/);
         expect(js).not.toMatch(/style="/);
-        expect(css).toMatch(/^\[hidden\] \{ display: none !important; \}/m);
+        expect(html).toContain('/shared_components/css/components.css?v=');
+        expect(read('shared_components/css/components.css')).toMatch(/@layer utilities[\s\S]*?\[hidden\]\s*\{\s*display: none;/);
         expect(html).not.toMatch(/<i class="fa[^"]*"><\/i>/);
         expect(js).not.toMatch(/<i class="fa[^"]*"><\/i>/);
         expect(html).toMatch(/supacolor-orders\.js\?v=2026\.\d{2}\.\d{2}\.\d+/);
@@ -55,7 +56,10 @@ describe('supacolor orders — chips, states, modal', () => {
         expect(html).toMatch(/class="bt-modal-content" role="dialog" aria-modal="true" aria-labelledby="sc-backfill-title"/);
         expect(html).toMatch(/id="sc-backfill-modal-close" aria-label="Close"/);
         expect(html).toMatch(/id="sc-paste-zone" tabindex="0" role="button" aria-label="/);
-        expect(js).toMatch(/backfillReturnFocus = document\.activeElement;/);
+        expect(html.indexOf('/shared_components/js/ui-dialog.js')).toBeGreaterThan(0);
+        expect(html.indexOf('/shared_components/js/ui-dialog.js')).toBeLessThan(html.indexOf('/dashboards/js/'));
+        expect(js).toContain("window.UiDialog.open('sc-backfill-modal'");
+        expect(js).toContain('window.UiDialog.close('); // Focus/escape/scroll behavior is exercised in css-unification-bradley.spec.js.
         expect(js).toMatch(/if \(e\.key === 'Escape'\) closeBackfillModal\(\);/);
         expect(js).toMatch(/if \(backfillModal\.hidden\) return;/);
         expect(js).toMatch(/\$\('sc-paste-zone'\)\.addEventListener\('keydown'/);

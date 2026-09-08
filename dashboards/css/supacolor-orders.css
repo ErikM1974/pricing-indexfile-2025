@@ -1,583 +1,590 @@
-/* Supacolor Orders Dashboard
+/* Bradley workflow: scoped shared UI, department semantics and existing business hooks.
+ */
+@layer components.pages {
+    /* Supacolor Orders Dashboard
  * Companion to bradley-transfers.css — uses .bt-* classes for shared elements
  * (header, stats chips, filter bar, modal, toast). Adds Supacolor-specific
  * .sc-* classes for the table layout, view toggle, paste zone, and pagination.
  */
 
-/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue so the page
-   keeps its exact look. Map them to shared_components/css/tokens.css names when the page is redesigned;
-   every rule below uses var(). Raw hex is allowed ONLY in this block. */
-/* stylelint-disable color-no-hex */
-:root {
-    --supacolor-orders-gray: #adb5bd;
-    --supacolor-orders-red: #c0392b;
-    --supacolor-orders-green: #198754;
-    --supacolor-orders-blue-tint: #c7d2fe;
-    --supacolor-orders-blue-2: #3730a3;
-    --supacolor-orders-orange: #d68910;
-    --supacolor-orders-orange-2: #ffe0b2;
-    --supacolor-orders-cyan: #1971c2;
-    --supacolor-orders-teal-tint: #c3fae8;
-    --supacolor-orders-red-2: #e74c3c;
-}
-/* stylelint-enable color-no-hex */
+    /* ── Filter bar growth ─────────────────────────────────────────────── */
+    :where([data-ui="unified"]) .bt-filter-group--grow {
+        flex: 1;
+    }
 
-/* ── Filter bar growth ─────────────────────────────────────────────── */
-.bt-filter-group--grow { flex: 1; }
-.bt-filter-group--grow .bt-filter-input { width: 100%; }
+    :where([data-ui="unified"]) .bt-filter-group--grow .bt-filter-input {
+        width: 100%;
+    }
 
-/* ── Fallback screenshot group (backup if API fails) ───────────────── */
-.sc-fallback-group {
-    display: inline-flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 2px;
-    margin-left: 4px;
-}
+    /* ── Fallback screenshot group (backup if API fails) ───────────────── */
+    :where([data-ui="unified"]) .sc-fallback-group {
+        display: inline-flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 2px;
+        margin-left: 4px;
+    }
 
-.sc-fallback-btn {
-    background: transparent;
-    color: var(--gray-500);
-    border: 1px solid var(--gray-300);
-    font-size: 12px;
-    padding: 4px 10px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: 500;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    transition: background-color 0.15s, color 0.15s, border-color 0.15s;
-}
+    :where([data-ui="unified"]) .sc-fallback-btn {
+        background: transparent;
+        color: var(--ui-muted);
+        border: 1px solid var(--gray-300);
+        font-size: var(--font-size-sm);
+        padding: 4px 10px;
+        border-radius: var(--radius-sm);
+        cursor: pointer;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition:
+            background-color 0.15s,
+            color 0.15s,
+            border-color 0.15s;
+    }
 
-.sc-fallback-btn:hover {
-    background: var(--gray-100);
-    color: var(--gray-700);
-    border-color: var(--gray-400);
-}
+    :where([data-ui="unified"]) .sc-fallback-btn:hover {
+        background: var(--gray-100);
+        color: var(--gray-700);
+        border-color: var(--gray-400);
+    }
 
-.sc-fallback-btn i {
-    font-size: 11px;
-}
+    :where([data-ui="unified"]) .sc-fallback-btn i {
+        font-size: var(--font-size-sm);
+    }
 
-.sc-fallback-note {
-    font-size: 10px;
-    color: var(--gray-400);
-    font-style: italic;
-    letter-spacing: 0.02em;
-}
+    :where([data-ui="unified"]) .sc-fallback-note {
+        font-size: var(--font-size-sm);
+        color: var(--ui-muted);
+        font-style: italic;
+        letter-spacing: 0.02em;
+    }
 
-/* ── Auto-sync subnote (under the action row) ──────────────────────── */
-.bt-subnote {
-    grid-column: 1 / -1;
-    width: 100%;
-    font-size: 12px;
-    color: var(--slate-500);
-    margin-top: 6px;
-    text-align: right;
-    font-style: italic;
-}
+    /* ── Auto-sync subnote (under the action row) ──────────────────────── */
+    :where([data-ui="unified"]) .bt-subnote {
+        grid-column: 1 / -1;
+        width: 100%;
+        font-size: var(--font-size-sm);
+        color: var(--ui-muted);
+        margin-top: 6px;
+        text-align: right;
+        font-style: italic;
+    }
 
-/* ── Stat chip extras ──────────────────────────────────────────────── */
-.bt-stat-chip--cancelled { border-left: 4px solid var(--supacolor-orders-red); }
-.bt-stat-chip--cancelled .bt-stat-count { color: var(--supacolor-orders-red); }
-.bt-stat-chip--total { border-left: 4px solid var(--color-bradley); }
-.bt-stat-chip--total .bt-stat-count { color: var(--color-bradley); }
+    /* ── Stat chip extras ──────────────────────────────────────────────── */
+    :where([data-ui="unified"]) .bt-stat-chip--cancelled {
+        border-left: 4px solid var(--color-danger-ink);
+    }
 
-/* ── Clickable stat chips (= view filter) ──────────────────────────── */
-.bt-stat-chip--clickable {
-    cursor: pointer;
-    transition: background-color 0.15s ease, box-shadow 0.15s ease, transform 0.1s ease;
-    user-select: none;
-    outline: none;
-}
+    :where([data-ui="unified"]) .bt-stat-chip--cancelled .bt-stat-count {
+        color: var(--color-danger-ink);
+    }
 
-.bt-stat-chip--clickable:hover {
-    background: var(--gray-50);
-    box-shadow: 0 2px 6px rgb(0 0 0 / 8%);
-}
+    :where([data-ui="unified"]) .bt-stat-chip--total {
+        border-left: 4px solid var(--color-bradley);
+    }
 
-.bt-stat-chip--clickable:focus-visible {
-    box-shadow: 0 0 0 2px var(--color-bradley);
-}
+    :where([data-ui="unified"]) .bt-stat-chip--total .bt-stat-count {
+        color: var(--color-bradley);
+    }
 
-.bt-stat-chip--clickable.selected {
-    background: var(--slate-100);
-    box-shadow: 0 2px 10px rgb(74 111 165 / 18%);
-}
+    /* ── Clickable stat chips (= view filter) ──────────────────────────── */
+    :where([data-ui="unified"]) .bt-stat-chip--clickable {
+        cursor: pointer;
+        transition:
+            background-color 0.15s ease,
+            box-shadow 0.15s ease,
+            transform 0.1s ease;
+        user-select: none;
+        outline: none;
+    }
 
-.bt-stat-chip--clickable.selected .bt-stat-label {
-    color: var(--gray-700);
-    font-weight: 700;
-}
+    :where([data-ui="unified"]) .bt-stat-chip--clickable:hover {
+        background: var(--gray-50);
+        box-shadow: 0 2px 6px rgb(0 0 0 / 8%);
+    }
 
-/* ── Table layout (mimics Supacolor's clean row layout) ────────────── */
-.sc-table-wrap {
-    background: var(--color-surface);
-    border: 1px solid var(--gray-200);
-    border-radius: 8px;
-    overflow: hidden;
-    margin-top: 8px;
-}
+    :where([data-ui="unified"]) .bt-stat-chip--clickable:focus-visible {
+        box-shadow: 0 0 0 2px var(--color-bradley);
+    }
 
-.sc-table {
-    display: block;
-    width: 100%;
-}
+    :where([data-ui="unified"]) .bt-stat-chip--clickable.selected {
+        background: var(--slate-100);
+        box-shadow: 0 2px 10px rgb(74 111 165 / 18%);
+    }
 
-.sc-row {
-    display: grid;
-    grid-template-columns: 110px 110px 1fr 110px 110px 130px 24px;
-    gap: 16px;
-    align-items: center;
-    padding: 14px 20px;
-    border-bottom: 1px solid var(--gray-100);
-    text-decoration: none;
-    color: inherit;
-    transition: background-color 0.1s ease;
-}
-.sc-row:last-child { border-bottom: none; }
-.sc-row:hover:not(.sc-row--header) { background: var(--gray-50); }
+    :where([data-ui="unified"]) .bt-stat-chip--clickable.selected .bt-stat-label {
+        color: var(--gray-700);
+        font-weight: 700;
+    }
 
-.sc-row--header {
-    background: var(--gray-50);
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: var(--gray-500);
-    cursor: default;
-    pointer-events: none;
-}
+    /* ── Table layout (mimics Supacolor's clean row layout) ────────────── */
+    :where([data-ui="unified"]) .sc-table-wrap {
+        background: var(--color-surface);
+        border: 1px solid var(--gray-200);
+        border-radius: var(--radius-md);
+        overflow: hidden;
+        margin-top: 8px;
+    }
 
-.sc-cell { font-size: 14px; color: var(--gray-700); }
+    :where([data-ui="unified"]) .sc-table {
+        display: block;
+        width: 100%;
+    }
 
-.sc-cell--job {
-    font-weight: 600;
-    color: var(--color-bradley);
-    font-variant-numeric: tabular-nums;
-}
+    :where([data-ui="unified"]) .sc-row {
+        display: grid;
+        grid-template-columns: 110px 110px 1fr 110px 110px 130px 24px;
+        gap: 16px;
+        align-items: center;
+        padding: 14px 20px;
+        border-bottom: 1px solid var(--gray-100);
+        text-decoration: none;
+        color: inherit;
+        transition: background-color 0.1s ease;
+    }
 
-.sc-cell--po {
-    font-family: 'SF Mono', Monaco, Consolas, monospace;
-    font-size: 12px;
-    color: var(--gray-500);
-    background: var(--gray-50);
-    padding: 3px 8px;
-    border-radius: 4px;
-    display: inline-block;
-    width: fit-content;
-}
+    :where([data-ui="unified"]) .sc-row:last-child {
+        border-bottom: none;
+    }
 
-.sc-row--header .sc-cell--po {
-    background: transparent;
-    padding: 0;
-    font-family: inherit;
-    font-size: 11px;
-}
+    :where([data-ui="unified"]) .sc-row:hover:not(.sc-row--header) {
+        background: var(--gray-50);
+    }
 
-.sc-cell--desc {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 2px;
-    overflow: hidden;
-}
+    :where([data-ui="unified"]) .sc-row--header {
+        background: var(--gray-50);
+        font-size: var(--font-size-sm);
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--ui-muted);
+        cursor: default;
+        pointer-events: none;
+    }
 
-.sc-customer-line {
-    font-weight: 600;
-    color: var(--gray-700);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
+    :where([data-ui="unified"]) .sc-cell {
+        font-size: var(--font-size-md);
+        color: var(--gray-700);
+    }
 
-.sc-order-meta {
-    font-size: 11px;
-    color: var(--gray-500);
-    font-variant-numeric: tabular-nums;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
+    :where([data-ui="unified"]) .sc-cell--job {
+        font-weight: 600;
+        color: var(--color-bradley);
+        font-variant-numeric: tabular-nums;
+    }
 
-.sc-row--header .sc-cell--desc {
-    display: block;
-}
+    :where([data-ui="unified"]) .sc-cell--po {
+        font-family: var(--font-mono);
+        font-size: var(--font-size-sm);
+        color: var(--ui-muted);
+        background: var(--gray-50);
+        padding: 3px 8px;
+        border-radius: var(--radius-sm);
+        display: inline-block;
+        width: fit-content;
+    }
 
-.sc-due-risk {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    margin-top: 2px;
-    padding: 1px 6px;
-    border-radius: 4px;
-    font-size: 11px;
-    font-weight: 600;
-    width: fit-content;
-}
-.sc-due-risk i { font-size: 10px; }
-.sc-due-risk--overdue  { background: var(--red-100); color: var(--red-700); }
-.sc-due-risk--risk     { background: var(--red-100); color: var(--red-700); }
-.sc-due-risk--tight    { background: var(--red-100); color: var(--amber-700); }
-.sc-due-risk--invoiced { background: var(--store-green-100); color: var(--print-green); }
+    :where([data-ui="unified"]) .sc-row--header .sc-cell--po {
+        background: transparent;
+        padding: 0;
+        font-family: inherit;
+        font-size: var(--font-size-sm);
+    }
 
-.sc-subtitle-meta {
-    color: var(--gray-500);
-    font-weight: 500;
-}
+    :where([data-ui="unified"]) .sc-cell--desc {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 2px;
+        overflow: hidden;
+    }
 
-.sc-cell--received {
-    color: var(--supacolor-orders-green);
-    font-size: 13px;
-    font-variant-numeric: tabular-nums;
-    font-weight: 500;
-}
+    :where([data-ui="unified"]) .sc-customer-line {
+        font-weight: 600;
+        color: var(--gray-700);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
 
-.sc-received-check {
-    font-size: 11px;
-    margin-right: 2px;
-}
+    :where([data-ui="unified"]) .sc-order-meta {
+        font-size: var(--font-size-sm);
+        color: var(--ui-muted);
+        font-variant-numeric: tabular-nums;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
 
-.sc-row--header .sc-cell--received {
-    color: var(--gray-500);
-    font-weight: 700;
-}
+    :where([data-ui="unified"]) .sc-row--header .sc-cell--desc {
+        display: block;
+    }
 
-.sc-cell--shipped {
-    color: var(--gray-500);
-    font-size: 13px;
-    font-variant-numeric: tabular-nums;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    align-items: flex-start;
-    justify-content: center;
-}
+    :where([data-ui="unified"]) .sc-due-risk {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        margin-top: 2px;
+        padding: 1px 6px;
+        border-radius: var(--radius-sm);
+        font-size: var(--font-size-sm);
+        font-weight: 600;
+        width: fit-content;
+    }
 
-.sc-ship-date {
-    line-height: 1.2;
-}
+    :where([data-ui="unified"]) .sc-due-risk i {
+        font-size: var(--font-size-sm);
+    }
 
-.sc-ship-expected {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 2px 8px;
-    border-radius: 10px;
-    font-size: 11px;
-    font-weight: 500;
-    background: var(--amber-100);
-    color: var(--amber-800);
-    font-variant-numeric: tabular-nums;
-    width: fit-content;
-}
-.sc-ship-expected i { font-size: 10px; opacity: 0.8; }
+    :where([data-ui="unified"]) .sc-due-risk--overdue {
+        background: var(--red-100);
+        color: var(--red-700);
+    }
 
-/* "Arriving Today" stat chip — matches the amber Expected ETA pill so the
+    :where([data-ui="unified"]) .sc-due-risk--risk {
+        background: var(--red-100);
+        color: var(--red-700);
+    }
+
+    :where([data-ui="unified"]) .sc-due-risk--tight {
+        background: var(--red-100);
+        color: var(--amber-700);
+    }
+
+    :where([data-ui="unified"]) .sc-due-risk--invoiced {
+        background: var(--store-green-100);
+        color: var(--print-green);
+    }
+
+    :where([data-ui="unified"]) .sc-subtitle-meta {
+        color: var(--ui-muted);
+        font-weight: 500;
+    }
+
+    :where([data-ui="unified"]) .sc-cell--received {
+        color: var(--color-brand-deep);
+        font-size: var(--font-size-md);
+        font-variant-numeric: tabular-nums;
+        font-weight: 500;
+    }
+
+    :where([data-ui="unified"]) .sc-received-check {
+        font-size: var(--font-size-sm);
+        margin-right: 2px;
+    }
+
+    :where([data-ui="unified"]) .sc-row--header .sc-cell--received {
+        color: var(--ui-muted);
+        font-weight: 700;
+    }
+
+    :where([data-ui="unified"]) .sc-cell--shipped {
+        color: var(--ui-muted);
+        font-size: var(--font-size-md);
+        font-variant-numeric: tabular-nums;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        align-items: flex-start;
+        justify-content: center;
+    }
+
+    :where([data-ui="unified"]) .sc-ship-date {
+        line-height: 1.2;
+    }
+
+    :where([data-ui="unified"]) .sc-ship-expected {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 2px 8px;
+        border-radius: var(--radius-lg);
+        font-size: var(--font-size-sm);
+        font-weight: 500;
+        background: var(--amber-100);
+        color: var(--amber-800);
+        font-variant-numeric: tabular-nums;
+        width: fit-content;
+    }
+
+    :where([data-ui="unified"]) .sc-ship-expected i {
+        font-size: var(--font-size-sm);
+        opacity: 0.8;
+    }
+
+    /* "Arriving Today" stat chip — matches the amber Expected ETA pill so the
    visual link is obvious: "this card filters to those rows." */
-.bt-stat-chip--arriving { border-left-color: var(--amber-500); }
-.bt-stat-chip--arriving .bt-stat-count { color: var(--amber-700); }
+    :where([data-ui="unified"]) .bt-stat-chip--arriving {
+        border-left-color: var(--amber-500);
+    }
 
-/* Tracking pill under the shipped date. Clickable when carrier is known
+    :where([data-ui="unified"]) .bt-stat-chip--arriving .bt-stat-count {
+        color: var(--amber-700);
+    }
+
+    /* Tracking pill under the shipped date. Clickable when carrier is known
    (opens carrier tracking page in new tab); static text otherwise. */
-.sc-track-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 2px 8px;
-    border-radius: 10px;
-    font-size: 11px;
-    font-weight: 500;
-    background: var(--color-floor-tint);
-    color: var(--indigo-700);
-    font-variant-numeric: tabular-nums;
-    max-width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
+    :where([data-ui="unified"]) .sc-track-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 2px 8px;
+        border-radius: var(--radius-lg);
+        font-size: var(--font-size-sm);
+        font-weight: 500;
+        background: var(--color-floor-tint);
+        color: var(--indigo-700);
+        font-variant-numeric: tabular-nums;
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
 
-.sc-track-pill i {
-    font-size: 10px;
-    opacity: 0.8;
-}
+    :where([data-ui="unified"]) .sc-track-pill i {
+        font-size: var(--font-size-sm);
+        opacity: 0.8;
+    }
 
-.sc-track-pill--link {
-    cursor: pointer;
-    transition: background-color 0.15s ease, color 0.15s ease;
-}
+    :where([data-ui="unified"]) .sc-track-pill--link {
+        cursor: pointer;
+        transition:
+            background-color 0.15s ease,
+            color 0.15s ease;
+    }
 
-.sc-track-pill--link:hover {
-    background: var(--supacolor-orders-blue-tint);
-    color: var(--supacolor-orders-blue-2);
-}
+    :where([data-ui="unified"]) .sc-track-pill--link:hover {
+        background: var(--color-info-bg);
+        color: var(--color-info-ink);
+    }
 
-/* 2026-05-13 — Whole-cell click affordance for the Shipped column.
+    /* 2026-05-13 — Whole-cell click affordance for the Shipped column.
    When a tracking URL is available, clicking ANYWHERE in the cell (date,
    tracking pill, Expected … line) opens the carrier tracking page. The
    cursor and hover state hint at the larger hit zone so Mikalah doesn't
    have to aim for the pill specifically. JS handler (cell-level) prevents
    the row's <a href="…detail"> from firing for this cell only. */
-.sc-cell--shipped--track {
-    cursor: pointer;
-    border-radius: 6px;
-    margin: -4px -8px;
-    padding: 4px 8px;
-    transition: background-color 0.15s ease;
-}
+    :where([data-ui="unified"]) .sc-cell--shipped--track {
+        cursor: pointer;
+        border-radius: var(--radius-sm);
+        margin: -4px -8px;
+        padding: 4px 8px;
+        transition: background-color 0.15s ease;
+    }
 
-.sc-cell--shipped--track:hover {
-    background: var(--color-floor-tint);
-}
+    :where([data-ui="unified"]) .sc-cell--shipped--track:hover {
+        background: var(--color-floor-tint);
+    }
 
-.sc-cell--shipped--track:hover .sc-track-pill--link {
-    /* Pill already has its own hover — reset to base so the pill doesn't
+    :where([data-ui="unified"]) .sc-cell--shipped--track:hover .sc-track-pill--link {
+        /* Pill already has its own hover — reset to base so the pill doesn't
        look "double-hovered" when the parent cell is also highlighted. */
-    background: var(--color-floor-tint);
-    color: var(--indigo-700);
-}
-
-.sc-cell--shipped--track:hover .sc-ship-date {
-    color: var(--indigo-700);
-}
-
-.sc-cell--chevron {
-    color: var(--supacolor-orders-gray);
-    text-align: right;
-}
-
-/* Status badges */
-.sc-status-badge {
-    display: inline-block;
-    padding: 3px 10px;
-    border-radius: 12px;
-    font-size: 12px;
-    font-weight: 600;
-}
-
-.sc-status-badge--open {
-    background: var(--store-rush-soft);
-    color: var(--supacolor-orders-orange);
-    border: 1px solid var(--supacolor-orders-orange-2);
-}
-
-.sc-status-badge--closed {
-    background: var(--slate-100);
-    color: var(--gray-600);
-    border: 1px solid var(--slate-200);
-}
-
-.sc-status-badge--cancelled {
-    background: var(--red-50);
-    color: var(--supacolor-orders-red);
-    border: 1px solid var(--red-100);
-}
-
-/* ── Pagination ────────────────────────────────────────────────────── */
-.sc-pagination {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 12px;
-    padding: 16px 4px;
-    margin-top: 8px;
-}
-
-.sc-page-btn {
-    padding: 6px 14px;
-    border: 1px solid var(--gray-200);
-    background: var(--color-surface);
-    border-radius: 6px;
-    font-size: 13px;
-    color: var(--gray-600);
-    cursor: pointer;
-    transition: all 0.15s ease;
-}
-
-.sc-page-btn:hover:not(:disabled) {
-    background: var(--gray-50);
-    border-color: var(--supacolor-orders-gray);
-}
-
-.sc-page-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-.sc-page-info {
-    font-size: 13px;
-    color: var(--gray-500);
-    font-variant-numeric: tabular-nums;
-}
-
-/* ── Backfill modal: paste zone ────────────────────────────────────── */
-.sc-paste-zone {
-    border: 2px dashed var(--gray-300);
-    border-radius: 8px;
-    padding: 24px;
-    margin-top: 16px;
-    background: var(--gray-50);
-    min-height: 180px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.15s ease;
-    outline: none;
-}
-
-.sc-paste-zone:hover,
-.sc-paste-zone:focus,
-.sc-paste-zone--dragover {
-    border-color: var(--color-bradley);
-    background: var(--slate-100);
-}
-
-.sc-paste-empty {
-    text-align: center;
-    color: var(--gray-500);
-}
-
-.sc-paste-empty i {
-    font-size: 36px;
-    color: var(--supacolor-orders-gray);
-    margin-bottom: 12px;
-    display: block;
-}
-
-.sc-paste-empty p {
-    margin: 4px 0;
-    font-size: 14px;
-}
-
-.sc-paste-empty .sc-paste-hint {
-    font-size: 12px;
-    color: var(--supacolor-orders-gray);
-}
-
-.sc-paste-preview {
-    max-width: 100%;
-    max-height: 320px;
-    object-fit: contain;
-    border-radius: 4px;
-    box-shadow: 0 2px 8px rgb(0 0 0 / 10%);
-}
-
-/* Status banner inside modal */
-.sc-extract-status {
-    margin-top: 12px;
-    padding: 10px 14px;
-    border-radius: 6px;
-    font-size: 13px;
-}
-
-.sc-extract-status--info {
-    background: var(--sky-100);
-    color: var(--supacolor-orders-cyan);
-    border: 1px solid var(--sky-100);
-}
-
-.sc-extract-status--success {
-    background: var(--color-steve-tint);
-    color: var(--store-green-600);
-    border: 1px solid var(--supacolor-orders-teal-tint);
-}
-
-.sc-extract-status--error {
-    background: var(--red-50);
-    color: var(--red-700);
-    border: 1px solid var(--red-100);
-}
-.sc-extract-status i { margin-right: 6px; }
-
-/* Preview table inside modal */
-.sc-extract-results {
-    margin-top: 12px;
-    max-height: 280px;
-    overflow-y: auto;
-    border: 1px solid var(--gray-200);
-    border-radius: 6px;
-}
-.sc-preview-table { display: block; }
-
-.sc-preview-row {
-    display: grid;
-    grid-template-columns: 90px 110px 1fr 90px 110px;
-    gap: 12px;
-    padding: 8px 12px;
-    font-size: 13px;
-    border-bottom: 1px solid var(--gray-100);
-    color: var(--gray-600);
-}
-.sc-preview-row:last-child { border-bottom: none; }
-
-.sc-preview-row--header {
-    background: var(--gray-50);
-    font-weight: 700;
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: var(--gray-500);
-    position: sticky;
-    top: 0;
-}
-
-/* Empty state */
-.bt-empty {
-    text-align: center;
-    padding: 60px 24px;
-    color: var(--gray-500);
-}
-
-.bt-empty i {
-    font-size: 48px;
-    color: var(--supacolor-orders-gray);
-    margin-bottom: 16px;
-    display: block;
-}
-
-.bt-empty p {
-    margin: 0;
-    font-size: 15px;
-}
-.bt-empty--error i { color: var(--supacolor-orders-red-2); }
-
-/* ── Responsive ────────────────────────────────────────────────────── */
-@media (width <= 900px) {
-    .sc-row {
-        grid-template-columns: 90px 1fr 90px 24px;
-        gap: 10px;
-        padding: 12px 14px;
-    }
-    .sc-cell--po, .sc-cell--shipped, .sc-cell--received { display: none; }
-    .sc-cell--desc { font-size: 13px; }
-
-    .sc-preview-row {
-        grid-template-columns: 70px 1fr 80px;
+        background: var(--color-floor-tint);
+        color: var(--indigo-700);
     }
 
-    .sc-preview-row > div:nth-child(2),
-    .sc-preview-row > div:nth-child(5) { display: none; }
-}
+    :where([data-ui="unified"]) .sc-cell--shipped--track:hover .sc-ship-date {
+        color: var(--indigo-700);
+    }
 
-/* ── 2026-09-05 review ────────────────────────────────────────────────────── */
-/* stylelint-disable-next-line declaration-no-important -- the hidden attribute must beat any display rule */
-[hidden] { display: none !important; }
-.sc-title { margin-bottom: 4px; display: flex; align-items: center; gap: 12px; }
-.sc-title-mark { display: inline-flex; align-items: center; background: var(--gray-800); padding: 8px 14px; border-radius: 8px; }
-.sc-title-logo { height: 28px; width: auto; display: block; }
+    :where([data-ui="unified"]) .sc-cell--chevron {
+        color: var(--ui-line-strong);
+        text-align: right;
+    }
 
-/* View chips are real <button>s now (aria-pressed replaces the .selected class as the state). */
-.bt-stat-chip[aria-pressed="true"] { background: var(--slate-100); border-color: var(--color-bradley); box-shadow: 0 0 0 2px rgb(74 111 165 / 25%); }
-.sc-preview-note { margin-top: 12px; font-size: 13px; color: var(--slate-600); }
-.sc-error { text-align: center; padding: 40px 20px; color: var(--red-800); background: var(--red-100); border: 1px solid var(--red-200); border-radius: 8px; }
-.sc-error .bt-btn { margin-top: 12px; }
-.sc-page-btn:focus-visible, .sc-fallback-btn:focus-visible, .sc-paste-zone:focus-visible, .sc-row:focus-visible { outline: 2px solid var(--color-bradley); outline-offset: 2px; }
+    /* Status badges */
 
-@media (width <= 600px) {
-    .bt-stat-chip { min-width: 0; flex: 1 1 45%; }
-    .bt-filter-bar { flex-wrap: wrap; }
-    .bt-filter-group { flex: 1 1 100%; }
-    .sc-title { flex-wrap: wrap; }
+    /* ── Pagination ────────────────────────────────────────────────────── */
+    :where([data-ui="unified"]) .sc-pagination {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 12px;
+        padding: 16px 4px;
+        margin-top: 8px;
+    }
+
+    :where([data-ui="unified"]) .sc-page-btn {
+        padding: 6px 14px;
+        border: 1px solid var(--gray-200);
+        background: var(--color-surface);
+        border-radius: var(--radius-sm);
+        font-size: var(--font-size-md);
+        color: var(--gray-600);
+        cursor: pointer;
+        transition: all 0.15s ease;
+    }
+
+    :where([data-ui="unified"]) .sc-page-btn:hover:not(:disabled) {
+        background: var(--gray-50);
+        border-color: var(--ui-line-strong);
+    }
+
+    :where([data-ui="unified"]) .sc-page-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    :where([data-ui="unified"]) .sc-page-info {
+        font-size: var(--font-size-md);
+        color: var(--ui-muted);
+        font-variant-numeric: tabular-nums;
+    }
+
+    /* ── Backfill modal: paste zone ────────────────────────────────────── */
+
+    /* Status banner inside modal */
+
+    /* Preview table inside modal */
+    :where([data-ui="unified"]) .sc-preview-table {
+        display: block;
+        min-width: 640px;
+    }
+
+    :where([data-ui="unified"]) .sc-preview-row {
+        display: grid;
+        grid-template-columns: 90px 110px 1fr 90px 110px;
+        gap: 12px;
+        padding: 8px 12px;
+        font-size: var(--font-size-md);
+        border-bottom: 1px solid var(--gray-100);
+        color: var(--gray-600);
+    }
+
+    :where([data-ui="unified"]) .sc-preview-row:last-child {
+        border-bottom: none;
+    }
+
+    :where([data-ui="unified"]) .sc-preview-row--header {
+        background: var(--gray-50);
+        font-weight: 700;
+        font-size: var(--font-size-sm);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--ui-muted);
+        position: sticky;
+        top: 0;
+    }
+
+    /* Empty state */
+    :where([data-ui="unified"]) .bt-empty {
+        text-align: center;
+        padding: 60px 24px;
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"]) .bt-empty i {
+        font-size: 48px;
+        color: var(--ui-line-strong);
+        margin-bottom: 16px;
+        display: block;
+    }
+
+    :where([data-ui="unified"]) .bt-empty p {
+        margin: 0;
+        font-size: 15px;
+    }
+
+    :where([data-ui="unified"]) .bt-empty--error i {
+        color: var(--color-danger-ink);
+    }
+
+    /* ── Responsive ────────────────────────────────────────────────────── */
+    @media (width <= 900px) {
+        :where([data-ui="unified"]) .sc-row {
+            grid-template-columns: 90px 1fr 90px 24px;
+            gap: 10px;
+            padding: 12px 14px;
+        }
+
+        :where([data-ui="unified"]) .sc-cell--po,
+        :where([data-ui="unified"]) .sc-cell--shipped,
+        :where([data-ui="unified"]) .sc-cell--received {
+            display: none;
+        }
+
+        :where([data-ui="unified"]) .sc-cell--desc {
+            font-size: var(--font-size-md);
+        }
+    }
+
+    /* ── 2026-09-05 review ────────────────────────────────────────────────────── */
+    :where([data-ui="unified"]) .sc-title {
+        margin-bottom: 4px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    :where([data-ui="unified"]) .sc-title-mark {
+        display: inline-flex;
+        align-items: center;
+        background: var(--gray-800);
+        padding: 8px 14px;
+        border-radius: var(--radius-md);
+    }
+
+    :where([data-ui="unified"]) .sc-title-logo {
+        height: 28px;
+        width: auto;
+        display: block;
+    }
+
+    /* View chips are real <button>s now (aria-pressed replaces the .selected class as the state). */
+    :where([data-ui="unified"]) .bt-stat-chip[aria-pressed="true"] {
+        background: var(--slate-100);
+        border-color: var(--color-bradley);
+        box-shadow: 0 0 0 2px rgb(74 111 165 / 25%);
+    }
+
+    :where([data-ui="unified"]) .sc-preview-note {
+        margin-top: 12px;
+        font-size: var(--font-size-md);
+        color: var(--slate-600);
+    }
+
+    :where([data-ui="unified"]) .sc-error {
+        text-align: center;
+        padding: 40px 20px;
+        color: var(--red-800);
+        background: var(--red-100);
+        border: 1px solid var(--red-200);
+        border-radius: var(--radius-md);
+    }
+
+    :where([data-ui="unified"]) .sc-error .bt-btn {
+        margin-top: 12px;
+    }
+
+    :where([data-ui="unified"]) .sc-page-btn:focus-visible,
+    :where([data-ui="unified"]) .sc-fallback-btn:focus-visible,
+    :where([data-ui="unified"]) .sc-paste-zone:focus-visible,
+    :where([data-ui="unified"]) .sc-row:focus-visible {
+        outline: 2px solid var(--color-bradley);
+        outline-offset: 2px;
+    }
+
+    @media (width <= 600px) {
+        :where([data-ui="unified"]) .bt-stat-chip {
+            min-width: 0;
+            flex: 1 1 45%;
+        }
+
+        :where([data-ui="unified"]) .bt-filter-bar {
+            flex-wrap: wrap;
+        }
+
+        :where([data-ui="unified"]) .bt-filter-group {
+            flex: 1 1 100%;
+        }
+
+        :where([data-ui="unified"]) .sc-title {
+            flex-wrap: wrap;
+        }
+    }
+
+    :where([data-ui="unified"]) :is(.sc-fallback-btn, .sc-page-btn) {
+        min-height: var(--ui-control-height);
+    }
 }

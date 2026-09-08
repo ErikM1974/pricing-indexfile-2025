@@ -427,9 +427,15 @@ var bradscreLog = BRADSCRE_LOG_ON ? console.log.bind(console) : function () {}; 
 
     // ── Refresh ──────────────────────────────────────────────────────
     async function refresh() {
-        await fetchTransfers();
-        renderStats();
-        applyFilters();
+        try {
+            await fetchTransfers();
+            renderStats();
+            applyFilters();
+            return true;
+        } catch (_) {
+            // fetchTransfers has already rendered the failure; polling and retry callers stay settled.
+            return false;
+        }
     }
 
     // ── Toast ────────────────────────────────────────────────────────
@@ -448,24 +454,18 @@ var bradscreLog = BRADSCRE_LOG_ON ? console.log.bind(console) : function () {}; 
     // ── Delete modal ─────────────────────────────────────────────────
     var deleteTargetId = null;
 
-    var deleteReturnFocus = null;
     function openDeleteModal(idTransfer) {
         deleteTargetId = idTransfer;
-        deleteReturnFocus = document.activeElement;
         $('bt-delete-modal-target').textContent = idTransfer || 'This order';
         $('bt-delete-form').reset();
-        $('bt-delete-modal').hidden = false;
-        var reason = document.getElementById('bt-delete-reason');
-        if (reason) setTimeout(function () { reason.focus(); }, 30);
+        window.UiDialog.open('bt-delete-modal', { focus: '#bt-delete-reason', onDismiss: closeDeleteModal });
     }
 
     function closeDeleteModal() {
         var m = $('bt-delete-modal');
         if (m.hidden) return;
         deleteTargetId = null;
-        m.hidden = true;
-        if (deleteReturnFocus && document.body.contains(deleteReturnFocus) && typeof deleteReturnFocus.focus === 'function') deleteReturnFocus.focus();
-        deleteReturnFocus = null;
+        window.UiDialog.close(m);
     }
 
     async function handleDeleteSubmit(e) {
@@ -616,9 +616,8 @@ var bradscreLog = BRADSCRE_LOG_ON ? console.log.bind(console) : function () {}; 
             applyFilters();
         });
 
-        $('bt-refresh-btn').addEventListener('click', function () {
-            refresh();
-            showToast('Refreshed.', 'info');
+        $('bt-refresh-btn').addEventListener('click', async function () {
+            if (await refresh()) showToast('Refreshed.', 'info');
         });
 
         $('bt-delete-modal-close').addEventListener('click', closeDeleteModal);
