@@ -38,3 +38,5 @@ Source: Erik's Claude handover (2026-09-08). Work on develop; one server editor;
 
 - Rate-limit PR33: 8.7.0, all thirteen configurations use limit with existing budgets. Regression tests exercise production login and quote options against Express. Follow-up discovered: global apiLimiter skip checks req.path for /api after Express strips the mount prefix; assess intended general/staff quota before changing that existing behavior. Dedicated login/order/quote limiters remain separately applied.
 - Rate-limit verification: 191 unit suites / 4,698 passed, DOM88, accessibility4, fixture parity84, browser15 passed / 3 optional screenshot skips, all five surface parity specs, route456 unchanged, undefined names0 and boot200. A legacy image-quota spelling lock now evaluates limiter options instead.
+
+- Stripe pre-upgrade: verified installed SDK19.3 uses API2025-10-29.clover; pinned that contract in lib/stripe-client.js for all seven constructors. Five tests passed BEFORE upgrading: checkout header/encoding/retrieve/expire, tampered signature rejection, signed samples dispatch, lookup503 retry, deposit duplicate acknowledgment.
