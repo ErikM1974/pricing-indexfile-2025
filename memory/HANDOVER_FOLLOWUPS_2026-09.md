@@ -19,3 +19,5 @@ Other explicitly separate work:
 - Frontend development audit: two high findings remain in the presentation-tooling dependency chain; the production audit is zero and CI enforces it.
 - Backend dependency/runtime backlog observed during the caller-auth release: Node was unpinned and the production audit reported 15 findings (9 high, 6 moderate). This is separate from the frontend dependency upgrades and is not cleared by the caller-auth patch.
 - Memory cleanup: `memory/INDEX.md` did not label a currently indexed file as superseded. No documentation was deleted based on age alone. Its existing deliberate retention notes remain authoritative.
+
+- Transfer/Supacolor caller boundary discovered during CSS verification (2026-09-08): Supacolor Job Detail currently serves a public HTML shell; proxy transfer/supacolor mounts are direct and need a complete caller/auth audit before adding prefix gates. Browser direct calls and scheduled sync must migrate together. No anonymous business-data probes or writes were used; the CSS release does not claim these APIs are gated.
