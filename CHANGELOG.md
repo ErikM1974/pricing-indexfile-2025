@@ -1,3 +1,9 @@
+## v2026.09.07.27 (2026.09.07)
+
+- Memory: archive the money-path-alerts lesson (LESSONS_LEARNED back under the 300-line cap after the CI entry)
+- Upgrade runtime and CI to Node 22 and patch compatible dependencies
+- Pace live pricing parity checks within the proxy request limit
+
 ## v2026.09.07.26 (2026.09.08)
 
 - Deploy v2026.09.07.26: CI made meaningful again — the cross-repo purchasing-portal assertion skips when the sibling checkout is absent; the Playwright job runs the axe ratchet always and the live-engine specs only when CRM_API_SECRET is configured (CI had been red since 2026-09-07 15:54 for those two environmental reasons; no served code changes)
