@@ -3818,3 +3818,28 @@ config-standard rewrites are value-identical (hue `deg`, `rgb(… / 12%)`, `#fff
 line) but prove it with the pixel diff, not by eye. 🔑 Another session deployed `v2026.09.07.2` into
 this checkout between my first read and my first edit — `git log -1` + `git status` before the first
 commit is what caught that develop had moved (DURABLE_GOTCHAS § Repo/deploy, again).
+
+
+## Archived during dependency handover, 2026-09-07
+## 2026-09-07 — Forms family migration (`v2026.09.07.4`): the family list was wrong, and `--fix` is not cosmetic
+
+**Problem.** (a) "The 18 forms stylesheets" were migrated and pixel-verified — and the deploy's cache-bust
+then bumped two pages outside `pages/forms/` (`request-a-quote`, `webstore-inquiry`) that load the same
+shared sheet. Without the tokens link those pages would have rendered every `var(--print-*)` as nothing.
+(b) `stylelint --fix` rewrote `@media (max-width: 700px)` to range syntax, `page-break-inside` to
+`break-inside`, and dropped `-webkit-`/`-moz-appearance` (leaving a duplicated `appearance: textfield`).
+(c) A one-command migration chain broke at a Python error, but because `for …; done;` ends the `&&`
+chain, the second half (`--fix`) still ran and the output read as if everything had.
+**Root cause.** (a) A family was defined by directory; consumers are defined by `<link>`. (b) The
+standard config's fixers modernize syntax — byte changes, fine in 2026 browsers, but not "formatting".
+(c) `;` after a compound command terminates an `&&` chain.
+**Solution.** (a) `grep -rl 'pages/forms/.*\.css' --include=*.html .` BEFORE the family list is final; the
+two pages got the link and their own before/after through a HEAD worktree. (b) Read `git diff -U0` of
+every `--fix` run; dedupe by hand; the pixel diff (screen AND print) is the proof. (c) One step per Bash
+call, or `;`-separated steps each ending in a printed count.
+**Prevention.** 🔑 A family = every page that LINKS its stylesheets, not a directory listing. 🔑 Name the
+three diff classes before diffing — identical, threshold-neutral (≤16/channel), deliberate consolidation —
+so differing shots read as expected or as a bug, never as "close enough". 🔑 Printed sheets: verify with
+`SHOT_MEDIA=print` too. 🔑 A specificity fight is fixed with a more specific selector
+(`.form-table td .size-chip input`), never `!important`; the `!important`s that must stay (print beating
+JS-toggled state) carry a `stylelint-disable-next-line` reason.

@@ -24,4 +24,25 @@ function serverSource() {
     return raw.replace(CALL, (line, name) => inline(name));
 }
 
-module.exports = { serverSource, ROOT };
+const vm = require('vm');
+const espree = require('espree');
+
+// Evaluate only the production limiter options, never boot the application or its jobs.
+function rateLimitOptions(name) {
+    const source = serverSource();
+    const ast = espree.parse(source, { ecmaVersion: 'latest', range: true });
+    let initializer;
+    function visit(node) {
+        if (!node || typeof node !== 'object') return;
+        if (node.type === 'VariableDeclarator' && node.id.name === name) initializer = node.init;
+        for (const value of Object.values(node)) {
+            if (Array.isArray(value)) value.forEach(visit);
+            else if (value && typeof value === 'object') visit(value);
+        }
+    }
+    visit(ast);
+    if (!initializer || initializer.callee.name !== 'rateLimit') throw new Error(`Missing limiter ${name}`);
+    return vm.runInNewContext(source.slice(...initializer.range), { rateLimit: options => options });
+}
+
+module.exports = { serverSource, rateLimitOptions, ROOT };

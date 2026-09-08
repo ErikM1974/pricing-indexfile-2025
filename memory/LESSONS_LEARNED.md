@@ -41,28 +41,7 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 
 ### CSS standardization Step 1+3 (2026-09-07, archived): keep token loading and screenshot parity tied to the served page. Full entry in LESSONS_LEARNED_ARCHIVE.md.
 
-## 2026-09-07 — Forms family migration (`v2026.09.07.4`): the family list was wrong, and `--fix` is not cosmetic
-
-**Problem.** (a) "The 18 forms stylesheets" were migrated and pixel-verified — and the deploy's cache-bust
-then bumped two pages outside `pages/forms/` (`request-a-quote`, `webstore-inquiry`) that load the same
-shared sheet. Without the tokens link those pages would have rendered every `var(--print-*)` as nothing.
-(b) `stylelint --fix` rewrote `@media (max-width: 700px)` to range syntax, `page-break-inside` to
-`break-inside`, and dropped `-webkit-`/`-moz-appearance` (leaving a duplicated `appearance: textfield`).
-(c) A one-command migration chain broke at a Python error, but because `for …; done;` ends the `&&`
-chain, the second half (`--fix`) still ran and the output read as if everything had.
-**Root cause.** (a) A family was defined by directory; consumers are defined by `<link>`. (b) The
-standard config's fixers modernize syntax — byte changes, fine in 2026 browsers, but not "formatting".
-(c) `;` after a compound command terminates an `&&` chain.
-**Solution.** (a) `grep -rl 'pages/forms/.*\.css' --include=*.html .` BEFORE the family list is final; the
-two pages got the link and their own before/after through a HEAD worktree. (b) Read `git diff -U0` of
-every `--fix` run; dedupe by hand; the pixel diff (screen AND print) is the proof. (c) One step per Bash
-call, or `;`-separated steps each ending in a printed count.
-**Prevention.** 🔑 A family = every page that LINKS its stylesheets, not a directory listing. 🔑 Name the
-three diff classes before diffing — identical, threshold-neutral (≤16/channel), deliberate consolidation —
-so differing shots read as expected or as a bug, never as "close enough". 🔑 Printed sheets: verify with
-`SHOT_MEDIA=print` too. 🔑 A specificity fight is fixed with a more specific selector
-(`.form-table td .size-chip input`), never `!important`; the `!important`s that must stay (print beating
-JS-toggled state) carry a `stylelint-disable-next-line` reason.
+### Forms family migration (2026-09-07, archived): verify the served family inventory; formatter fixes can change appearance. Full entry in LESSONS_LEARNED_ARCHIVE.md.
 
 ## 2026-09-07 — Training family (`v2026.09.07.6`): an `!important` that source order cannot replace, and a family with no palette
 
@@ -275,3 +254,11 @@ and a qs 6.16 override (Express/body-parser pin an older minor). The repository 
 with Erik's explicit approval; verify the live-engine step actually runs on the next CI push.
 **Prevention.** Audit the resolved tree after updating: a green install is not a clean audit. Preserve CRLF in
 these two already-CRLF-tracked package files to avoid hiding the dependency diff. Major upgrades stay separate.
+
+## 2026-09-07 — Major SDK upgrades need contract checks
+
+**Problem:** Rate-limit option spelling broke a text lock; Stripe22 types rejected the intentionally retained API version.
+**Root cause:** The quota test matched source text, and Stripe generated types describe only its newest API contract.
+**Solution:** Evaluate limiter options semantically; preserve 2025-10-29.clover through one shared Stripe factory,
+with the documented narrow type exception. HTTP tests verify quotas, IPv6 grouping, API headers and signed webhook dispatch.
+**Prevention:** Run contract tests before and after each major upgrade; a dependency PR passing CI alone is insufficient.
