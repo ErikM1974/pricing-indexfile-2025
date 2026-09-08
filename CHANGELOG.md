@@ -1,3 +1,13 @@
+## v2026.09.07.28 (2026.09.07)
+
+- Bump csv-parse from 6.1.0 to 7.0.2
+- Bump express-rate-limit from 7.5.1 to 8.7.0
+- Bump stripe from 19.3.0 to 22.6.1
+- Merge CSV parser 7 update with compatibility verification
+- Merge rate-limit 8 with IPv6 and quota regression checks
+- Pin Stripe API contract and test signed webhook dispatch
+- Merge Stripe 22 while preserving payment API and webhook contracts
+
 ## v2026.09.07.27 (2026.09.07)
 
 - Memory: archive the money-path-alerts lesson (LESSONS_LEARNED back under the 300-line cap after the CI entry)
