@@ -43,27 +43,7 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 
 ### Forms family migration (2026-09-07, archived): verify the served family inventory; formatter fixes can change appearance. Full entry in LESSONS_LEARNED_ARCHIVE.md.
 
-## 2026-09-07 — Training family (`v2026.09.07.6`): an `!important` that source order cannot replace, and a family with no palette
-
-**Problem.** (a) Moving `nwca-language-reference.css`'s 117-flag print block to the END of the file and
-stripping `!important` looked right on screen and broke ONE card in print: its columns are laid out by
-inline `style=""` attributes in the HTML, and the print block overrides them with `[style*=…]` selectors.
-(b) A parser I wrote to find the losing rules choked on those very selectors (a `{`-free attribute value
-containing `)`) and "restored" three wrong declarations. (c) The training family has 190 distinct colours
-across 26 one-off pages — no palette to map to without repainting 26 pages.
-**Root cause.** (a) Inline styles beat every stylesheet rule except `!important`; source order is
-irrelevant. (b) Regex CSS parsing. (c) Pages built one at a time, each with its own theme.
-**Solution.** (a) Keep `!important` only on the print rules whose selector targets `[style` (a
-disable/enable pair with the reason); everything else in the block runs on source order — verified by the
-print pixel diff. (b) Read the card's markup and grep its classes instead. (c) Exact/near colours →
-tokens; every other colour → a `--page-<hue>` variable declared ONCE in the page's `:root` (auto-named by
-hue, stylelint-disable block), so consolidation later is one block per page, not a page-wide hunt.
-**Prevention.** 🔑 Before stripping `!important`, grep the page for `style="` — anything the sheet must
-beat inline needs the flag, full stop. 🔑 Print verification (`SHOT_MEDIA=print`) is what caught it; the
-screen shots were clean. 🔑 A byte-identical rule shared by N pages is a component; extract it to a
-family sheet linked before the page sheet, then re-theme it ONCE (ten maroon training headers → the
-Training Center's green in one rule). 🔑 Admin pages cannot be screenshotted by the e2e spec (its session
-is role `staff`) — verify them live.
+### Training family migration (2026-09-07, archived): retain flags that override inline styles; verify print and page-specific tokens. Full entry in LESSONS_LEARNED_ARCHIVE.md.
 
 ## 2026-09-07 — Webstore family (`v2026.09.07.8`): a push that "succeeded", and variables a sheet did not need
 
@@ -262,3 +242,12 @@ these two already-CRLF-tracked package files to avoid hiding the dependency diff
 **Solution:** Evaluate limiter options semantically; preserve 2025-10-29.clover through one shared Stripe factory,
 with the documented narrow type exception. HTTP tests verify quotas, IPv6 grouping, API headers and signed webhook dispatch.
 **Prevention:** Run contract tests before and after each major upgrade; a dependency PR passing CI alone is insufficient.
+
+## 2026-09-07 — Tooling upgrades and visual verification
+
+**Problem:** New major tooling exposed type inference gaps, redundant CSS and two existing dimmed DTG art-fee contrast findings.
+**Solution:** Jest30/TypeScript7/Stylelint17 pass with narrow type corrections and 24 redundant declarations removed.
+Keep ESLint9, jsdom26 and browser axe4.12.1 until their measured migration issues are addressed; do not raise ratchets.
+**Prevention:** Screenshots must build the changed assets and normalize focus/scroll before capture. A second after-shot
+proved the remaining 850-pixel screen-print difference was an async thumbnail; the second comparison was exactly zero.
+Native Node22.23 runs Puppeteer25; invoke its capture CLI outside Jest, and report unavailable baselines as actual skips.

@@ -28,8 +28,10 @@ jobs:
         run: npm run test:dom
       - name: A11y ratchet (roadmap 1.9 — axe violations only drop vs tests/a11y/baseline.json)
         run: npm run test:a11y
-      - name: npm audit (advisory — 15 pre-existing vulns as of 2026-07-07; tighten to a hard gate once cleared)
-        run: npm audit --audit-level=high || echo "::warning::npm audit found high+ vulnerabilities — see log"
+      - name: Production dependency audit (clean baseline)
+        run: npm audit --omit=dev
+      - name: Full dependency audit (presentation-tool findings remain in dev only)
+        run: npm audit --audit-level=high || echo "::warning::Development dependency audit findings — see log"
 
   e2e:
     name: Playwright E2E (money path + rendered axe ratchet)

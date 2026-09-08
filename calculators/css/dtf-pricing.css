@@ -637,8 +637,6 @@ body.show-internal .accordion-item.internal-only {
 body.dtf-pricing-page .dtf-toggle-item.active,
 .dtf-toggle-item.active {
     background: var(--brand-100) !important;  /* Light green background like DTG */
-    background-color: var(--brand-100) !important;
-    background-image: none !important;
     border: 3px solid var(--brand-500) !important;
     color: var(--brand-500) !important;
     box-shadow: 0 0 0 2px rgb(76 179 84 / 20%) !important;
@@ -655,10 +653,7 @@ body.dtf-pricing-page .dtf-toggle-item.active .dtf-toggle-label,
 body.dtf-pricing-page .dtf-tier-button.selected,
 .dtf-tier-button.selected {
     background: white !important;
-    background-color: white !important;
-    background-image: none !important;
     border: 3px solid var(--brand-500) !important;
-    border-width: 3px !important;
     color: var(--brand-500) !important;
     font-weight: 600 !important;
     box-shadow: 0 0 0 2px rgb(76 179 84 / 20%) !important;
@@ -670,7 +665,6 @@ body.dtf-pricing-page .dtf-tier-button.selected,
 .dtf-tier-button.selected::before,
 .dtf-tier-button.selected::after {
     background: none !important;
-    background-image: none !important;
 }
 
 /* Keep the toggle switch slider green when active */
@@ -685,13 +679,11 @@ body.dtf-pricing-page .dtf-tier-button.selected,
 /* Override hover states to maintain proper backgrounds */
 .dtf-toggle-item.active:hover {
     background: var(--brand-100) !important;  /* Keep light green on hover */
-    background-color: var(--brand-100) !important;
     border-color: var(--brand-500) !important;
 }
 
 .dtf-tier-button.selected:hover {
     background: white !important;  /* Keep tier buttons white as per DTG */
-    background-color: white !important;
     border-color: var(--brand-500) !important;
 }
 

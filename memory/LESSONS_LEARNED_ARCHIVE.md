@@ -3843,3 +3843,26 @@ so differing shots read as expected or as a bug, never as "close enough". 🔑 P
 `SHOT_MEDIA=print` too. 🔑 A specificity fight is fixed with a more specific selector
 (`.form-table td .size-chip input`), never `!important`; the `!important`s that must stay (print beating
 JS-toggled state) carry a `stylelint-disable-next-line` reason.
+
+
+## 2026-09-07 — Training family (`v2026.09.07.6`): an `!important` that source order cannot replace, and a family with no palette
+
+**Problem.** (a) Moving `nwca-language-reference.css`'s 117-flag print block to the END of the file and
+stripping `!important` looked right on screen and broke ONE card in print: its columns are laid out by
+inline `style=""` attributes in the HTML, and the print block overrides them with `[style*=…]` selectors.
+(b) A parser I wrote to find the losing rules choked on those very selectors (a `{`-free attribute value
+containing `)`) and "restored" three wrong declarations. (c) The training family has 190 distinct colours
+across 26 one-off pages — no palette to map to without repainting 26 pages.
+**Root cause.** (a) Inline styles beat every stylesheet rule except `!important`; source order is
+irrelevant. (b) Regex CSS parsing. (c) Pages built one at a time, each with its own theme.
+**Solution.** (a) Keep `!important` only on the print rules whose selector targets `[style` (a
+disable/enable pair with the reason); everything else in the block runs on source order — verified by the
+print pixel diff. (b) Read the card's markup and grep its classes instead. (c) Exact/near colours →
+tokens; every other colour → a `--page-<hue>` variable declared ONCE in the page's `:root` (auto-named by
+hue, stylelint-disable block), so consolidation later is one block per page, not a page-wide hunt.
+**Prevention.** 🔑 Before stripping `!important`, grep the page for `style="` — anything the sheet must
+beat inline needs the flag, full stop. 🔑 Print verification (`SHOT_MEDIA=print`) is what caught it; the
+screen shots were clean. 🔑 A byte-identical rule shared by N pages is a component; extract it to a
+family sheet linked before the page sheet, then re-theme it ONCE (ten maroon training headers → the
+Training Center's green in one rule). 🔑 Admin pages cannot be screenshotted by the e2e spec (its session
+is role `staff`) — verify them live.

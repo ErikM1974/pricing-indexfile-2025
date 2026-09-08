@@ -32,7 +32,7 @@ function seriousCounts(results) {
 }
 
 for (const file of BUILDERS) {
-    test(`${file}: no NEW serious/critical axe violations (rendered, contrast ON)`, async ({ page }) => {
+    test(`${file}: no NEW serious/critical axe violations (rendered, contrast ON)`, async ({ page }, testInfo) => {
         await page.goto(`/quote-builders/${file}`);
         await page.waitForLoadState('load');
         // Contrast needs the FINAL paint: webfonts swap in after first paint and
@@ -48,6 +48,10 @@ for (const file of BUILDERS) {
             .withTags(['wcag2a', 'wcag2aa', 'wcag21aa'])
             .analyze();
 
+        // Keep affected selectors and axe evidence when the ratchet fails.
+        await testInfo.attach('axe-violations', {
+            body: JSON.stringify(results.violations, null, 2), contentType: 'application/json',
+        });
         const counts = seriousCounts(results);
         const allowed = baseline[file] || {};
         const regressions = [];
@@ -56,6 +60,7 @@ for (const file of BUILDERS) {
                 regressions.push(`${rule}: ${count} nodes (baseline ${allowed[rule] || 0})`);
             }
         }
+        if (regressions.length) console.log(JSON.stringify(results.violations.filter(v => v.impact === 'serious' || v.impact === 'critical').map(v => ({ rule: v.id, nodes: v.nodes.map(n => ({ target: n.target, failure: n.failureSummary })) })), null, 2));
         expect(regressions, `NEW serious/critical a11y violations in ${file}:\n  ${regressions.join('\n  ')}`).toEqual([]);
     });
 }

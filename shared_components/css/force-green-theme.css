@@ -47,7 +47,6 @@ button[type="submit"],
 .add-location-btn,
 .calculate-btn {
     background: var(--pnw-forest, var(--brand-500)) !important;
-    background-color: var(--pnw-forest, var(--brand-500)) !important;
     border-color: var(--pnw-forest, var(--brand-500)) !important;
     color: white !important;
 }
@@ -61,7 +60,6 @@ button[type="submit"]:hover,
 .add-location-btn:hover,
 .calculate-btn:hover {
     background: var(--pnw-forest-deep, var(--brand-600)) !important;
-    background-color: var(--pnw-forest-deep, var(--brand-600)) !important;
     border-color: var(--pnw-forest-deep, var(--brand-600)) !important;
 }
 
