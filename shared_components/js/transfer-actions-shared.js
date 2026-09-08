@@ -620,6 +620,13 @@ var tranactisharLog = TRANACTISHAR_LOG_ON ? console.log.bind(console) : function
     // + (for mockups) Claude vision extraction + sales rep resolve.
     // Steve types nothing else beyond the optional Rush checkbox.
 
+    function unifiedUI() { return document.body.dataset.ui === 'unified'; }
+    function setDisplay(node, display) {
+        if (unifiedUI()) { node.hidden = display === 'none'; node.style.removeProperty('display'); }
+        else node.style.display = display;
+    }
+    function isHidden(node) { return unifiedUI() ? node.hidden : node.style.display === 'none'; }
+
     function injectModal() {
         if (modalState.injected) return;
         var html =
@@ -714,6 +721,11 @@ var tranactisharLog = TRANACTISHAR_LOG_ON ? console.log.bind(console) : function
         var wrapper = document.createElement('div');
         wrapper.innerHTML = html;
         document.body.appendChild(wrapper.firstElementChild);
+        if (unifiedUI()) {
+            document.querySelectorAll('#tas-modal [style], #tas-modal[style]').forEach(function (node) {
+                if (node.style.display === 'none') setDisplay(node, 'none');
+            });
+        }
         wireModalEvents();
         modalState.injected = true;
     }
@@ -749,7 +761,7 @@ var tranactisharLog = TRANACTISHAR_LOG_ON ? console.log.bind(console) : function
             var searchDebounce;
             searchInput.addEventListener('input', function () {
                 var q = searchInput.value.trim();
-                clearBtn.style.display = q ? '' : 'none';
+                setDisplay(clearBtn, q ? '' : 'none');
                 clearTimeout(searchDebounce);
                 if (q.length < 2) {
                     renderRecentFolders();
@@ -762,7 +774,7 @@ var tranactisharLog = TRANACTISHAR_LOG_ON ? console.log.bind(console) : function
         if (clearBtn) {
             clearBtn.addEventListener('click', function () {
                 searchInput.value = '';
-                clearBtn.style.display = 'none';
+                setDisplay(clearBtn, 'none');
                 $('#tas-picker-results').innerHTML = '';
                 renderRecentFolders();
                 searchInput.focus();
@@ -782,7 +794,7 @@ var tranactisharLog = TRANACTISHAR_LOG_ON ? console.log.bind(console) : function
 
         document.addEventListener('keydown', function (e) {
             var m = $('#tas-modal');
-            if (e.key === 'Escape' && m && m.style.display !== 'none') closeModal();
+            if (e.key === 'Escape' && m && !isHidden(m)) closeModal();
         });
     }
 
@@ -946,7 +958,7 @@ var tranactisharLog = TRANACTISHAR_LOG_ON ? console.log.bind(console) : function
                 : '<div class="tas-picker-file-grid">' +
                     sorted.map(function (f) {
                         var thumb = f.thumbnailUrl
-                            ? '<img src="' + escapeHtml(resolveBoxUrl(API_BASE + f.thumbnailUrl)) + '" alt="" class="tas-picker-file-thumb" onerror="this.style.display=\'none\'">'
+                            ? '<img src="' + escapeHtml(resolveBoxUrl(API_BASE + f.thumbnailUrl)) + '" alt="" class="tas-picker-file-thumb">'
                             : '<div class="tas-picker-file-thumb tas-picker-file-thumb--placeholder"><i class="fas fa-file" aria-hidden="true"></i></div>';
                         var ext = String(f.extension || '').toUpperCase();
                         var size = f.size ? formatBytes(f.size) : '';
@@ -963,6 +975,9 @@ var tranactisharLog = TRANACTISHAR_LOG_ON ? console.log.bind(console) : function
                 '</div>'
             );
 
+        results.querySelectorAll('img.tas-picker-file-thumb').forEach(function (image) {
+            image.addEventListener('error', function () { setDisplay(image, 'none'); });
+        });
         var backBtn = $('#tas-picker-back-btn');
         if (backBtn) {
             backBtn.addEventListener('click', function () {
@@ -990,11 +1005,12 @@ var tranactisharLog = TRANACTISHAR_LOG_ON ? console.log.bind(console) : function
      *  5. Open the <details> fallback so the user can see the analyzed card
      */
     async function selectFileFromPicker(fileId, fileName, btnEl) {
-        if (btnEl && btnEl.classList.contains('tas-picker-file--added')) return; // double-click guard
+        if (btnEl && (btnEl.disabled || btnEl.classList.contains('tas-picker-file--added'))) return; // double-click guard
         if (btnEl) {
-            btnEl.classList.add('tas-picker-file--added');
+            btnEl.disabled = true;
+            btnEl.setAttribute('aria-busy', 'true');
             var addIcon = btnEl.querySelector('.tas-picker-file-add');
-            if (addIcon) addIcon.className = 'fas fa-check-circle tas-picker-file-add tas-picker-file-add--done';
+            if (addIcon) addIcon.className = 'fas fa-spinner fa-spin tas-picker-file-add';
         }
 
         try {
@@ -1006,6 +1022,11 @@ var tranactisharLog = TRANACTISHAR_LOG_ON ? console.log.bind(console) : function
             var data = await resp.json();
             if (!resp.ok || !data.success || !data.sharedLink) {
                 throw new Error(data.error || 'shared-link generation failed');
+            }
+            if (btnEl) {
+                btnEl.classList.add('tas-picker-file--added');
+                var addedIcon = btnEl.querySelector('.tas-picker-file-add');
+                if (addedIcon) addedIcon.className = 'fas fa-check-circle tas-picker-file-add tas-picker-file-add--done';
             }
             // Open the paste-details panel so the analyzed result is visible
             var details = $('#tas-paste-details');
@@ -1020,7 +1041,16 @@ var tranactisharLog = TRANACTISHAR_LOG_ON ? console.log.bind(console) : function
         } catch (err) {
             console.warn('[tas picker] shared-link failed:', err);
             showToast('Failed to generate Box shared link: ' + err.message, 'error');
-            if (btnEl) btnEl.classList.remove('tas-picker-file--added');
+            if (btnEl) {
+                btnEl.classList.remove('tas-picker-file--added');
+                var icon = btnEl.querySelector('.tas-picker-file-add');
+                if (icon) icon.className = 'fas fa-plus-circle tas-picker-file-add';
+            }
+        } finally {
+            if (btnEl) {
+                btnEl.disabled = false;
+                btnEl.removeAttribute('aria-busy');
+            }
         }
     }
 
@@ -1090,7 +1120,7 @@ var tranactisharLog = TRANACTISHAR_LOG_ON ? console.log.bind(console) : function
 
         return '<div class="tas-link-row" data-row-id="' + escapeHtml(row.id) + '">' +
             '<div class="tas-link-row-input-line">' +
-                '<input type="url" class="tas-link-input" placeholder="https://\u2026box.com/s/\u2026 or /file/\u2026" value="' + escapeHtml(row.url) + '" data-row-id="' + escapeHtml(row.id) + '">' +
+                '<input type="url" class="tas-link-input" aria-label="Box file link" placeholder="https://\u2026box.com/s/\u2026 or /file/\u2026" value="' + escapeHtml(row.url) + '" data-row-id="' + escapeHtml(row.id) + '">' +
                 removeBtn +
             '</div>' +
             statusBlock +
@@ -1164,20 +1194,20 @@ var tranactisharLog = TRANACTISHAR_LOG_ON ? console.log.bind(console) : function
         var mockupAnalysis = mockupRow ? mockupRow.analysis : null;
 
         if (!mockupAnalysis) {
-            container.style.display = 'none';
+            setDisplay(container, 'none');
             container.innerHTML = '';
             return;
         }
 
         if (mockupAnalysis.mockupVisionError) {
-            container.style.display = '';
+            setDisplay(container, '');
             container.innerHTML = '<div class="tas-mockup-summary-head"><i class="fas fa-robot" aria-hidden="true"></i> Mockup scan</div>' +
                 '<div class="tas-row-warn">Couldn\'t auto-read this mockup. Bradley will still get the Box link but no pre-filled sales rep / garment info.</div>';
             return;
         }
 
         if (!mockupAnalysis.mockupVision) {
-            container.style.display = 'none';
+            setDisplay(container, 'none');
             return;
         }
 
@@ -1231,12 +1261,12 @@ var tranactisharLog = TRANACTISHAR_LOG_ON ? console.log.bind(console) : function
                 '</tr>';
             }).join('');
             spChartHtml = '<div class="tas-sp-chart">' +
-                '<div class="tas-mockup-summary-head" style="margin-top:10px;"><i class="fas fa-print" aria-hidden="true"></i> Print Specs</div>' +
+                '<div class="tas-mockup-summary-head tas-mockup-summary-head--specs"><i class="fas fa-print" aria-hidden="true"></i> Print Specs</div>' +
                 '<table class="tas-mockup-summary-table tas-sp-chart-table">' + locRows + '</table>' +
                 '</div>';
         }
 
-        container.style.display = '';
+        setDisplay(container, '');
         container.innerHTML = '<div class="tas-mockup-summary-head"><i class="fas fa-robot" aria-hidden="true"></i> Extracted from mockup</div>' +
             '<table class="tas-mockup-summary-table">' +
             rows.map(function (r) { return '<tr><td class="tas-label">' + r.label + '</td><td>' + r.value + '</td></tr>'; }).join('') +
@@ -1402,30 +1432,30 @@ var tranactisharLog = TRANACTISHAR_LOG_ON ? console.log.bind(console) : function
         var warn = $('#tas-mockup-warning');
         if (!warn) return;
         if (mockupCount > 1) {
-            warn.style.display = '';
+            setDisplay(warn, '');
             warn.innerHTML = '<i class="fas fa-exclamation-triangle" aria-hidden="true"></i>' +
                 '<span>Only <strong>one mockup</strong> is allowed per transfer. Toggle the extras to "Working" before sending.</span>';
             return;
         }
         if (workingCount > MAX_WORKING_FILES) {
-            warn.style.display = '';
+            setDisplay(warn, '');
             warn.innerHTML = '<i class="fas fa-exclamation-triangle" aria-hidden="true"></i>' +
                 '<span>Too many working files (' + workingCount + '). Max ' + MAX_WORKING_FILES + ' per transfer.</span>';
             return;
         }
         if (workingCount > SOFT_WARN_FILES) {
-            warn.style.display = '';
+            setDisplay(warn, '');
             warn.innerHTML = '<i class="fas fa-info-circle" aria-hidden="true"></i>' +
                 '<span>That’s a lot of working files (' + workingCount + '). Bradley will see them all on his queue card.</span>';
             return;
         }
         if (hasTransfer && !hasMockup) {
-            warn.style.display = '';
+            setDisplay(warn, '');
             warn.innerHTML = '<i class="fas fa-exclamation-triangle" aria-hidden="true"></i>' +
                 '<span>No mockup detected. Bradley will get the transfer file but <strong>won’t get auto-filled sales rep / customer / garment info</strong>. Add a mockup if you can.</span>';
             return;
         }
-        warn.style.display = 'none';
+        setDisplay(warn, 'none');
     }
 
     // Update the live checklist that shows whether Steve has both file types.
@@ -1479,7 +1509,7 @@ var tranactisharLog = TRANACTISHAR_LOG_ON ? console.log.bind(console) : function
         // Toggle SP notes section visibility + reset its value
         var spNotesRow = $('#tas-sp-notes-row');
         var spNotesEl = $('#tas-sp-notes');
-        if (spNotesRow) spNotesRow.style.display = modalState.method === 'Screen Print' ? '' : 'none';
+        if (spNotesRow) setDisplay(spNotesRow, modalState.method === 'Screen Print' ? '' : 'none');
         if (spNotesEl) spNotesEl.value = '';
 
         // Don't pre-populate a blank URL row — the picker is primary now.
@@ -1493,33 +1523,35 @@ var tranactisharLog = TRANACTISHAR_LOG_ON ? console.log.bind(console) : function
         var designSrc = $('#tas-design-source');
         if (designSrc) designSrc.textContent = '';
         var summary = $('#tas-mockup-summary');
-        if (summary) { summary.style.display = 'none'; summary.innerHTML = ''; }
+        if (summary) { setDisplay(summary, 'none'); summary.innerHTML = ''; }
         var pasteDetails = $('#tas-paste-details');
         if (pasteDetails) pasteDetails.open = false;
         var searchInput = $('#tas-picker-search-input');
         if (searchInput) {
             searchInput.value = '';
             var clearBtn = $('#tas-picker-clear');
-            if (clearBtn) clearBtn.style.display = 'none';
+            if (clearBtn) setDisplay(clearBtn, 'none');
         }
         var results = $('#tas-picker-results');
         if (results) results.innerHTML = '';
         // Show recent folders (if any) as pills below the search box
         renderRecentFolders();
         updateSubmitButton();
-        $('#tas-modal').style.display = 'flex';
-        document.body.style.overflow = 'hidden';
+        setDisplay($('#tas-modal'), 'flex');
+        if (unifiedUI()) window.UiDialog.open('tas-modal', { focus: '#tas-picker-search-input', onDismiss: closeModal });
+        else document.body.style.overflow = 'hidden';
         // Focus the search input for instant typing
         setTimeout(function () {
             var si = $('#tas-picker-search-input');
-            if (si) si.focus();
+            if (si && !isHidden($('#tas-modal'))) si.focus();
         }, 80);
     }
 
     function closeModal() {
         var modal = $('#tas-modal');
-        if (modal) modal.style.display = 'none';
-        document.body.style.overflow = '';
+        if (modal) setDisplay(modal, 'none');
+        if (unifiedUI()) window.UiDialog.close(modal);
+        else document.body.style.overflow = '';
     }
 
     // ── Submit ───────────────────────────────────────────────────────

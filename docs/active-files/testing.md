@@ -7,6 +7,8 @@
 
 | File | Purpose | Status |
 |------|---------|--------|
+| `/tests/unit/dtg-pricing-readiness.test.js` | Controlled pending, partial, stale response and immutable snapshot pricing regressions; no network (2026-09-08). | Active |
+| `/tests/e2e/css-unification-bradley.spec.js` | Mocked Bradley queues/details, keyboard dialogs, image previews and screenshot import at four widths (2026-09-08). | Active |
 | `/tests/e2e/css-unification-workspaces.spec.js` | Mocked Vault and Publisher states: windowed scrolling, overlays, saved drafts, failed uploads and publication gates (2026-09-08). | Active |
 | `/tests/unit/css-runtime-inventory.test.js` | Census guard for route aliases, dynamic CSS, generated documents, served archives and tracked HTML coverage (2026-09-08). | Active |
 | `/tests/unit/css-migration.test.js` | CSS ownership, byte budgets, token resolution and pre-migration billing content lock | Active |

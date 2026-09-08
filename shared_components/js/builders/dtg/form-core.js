@@ -11,7 +11,7 @@ import { applyContact, populateContactPicker, wireHistoryPillHandlers } from './
 import { artFeeTotals } from './fees.js';
 import { dtgEmailQuote, dtgPrintQuote, submitToShopWorks } from './output.js';
 import { fillFromQuote, getQuoteID, getState, loadSavedDtgQuoteForEdit, resetForm, restoreStateFromSession, scheduleStateSave, showResumeBanner } from './persistence.js';
-import { combinedQty, computePriceQuoteFromState, fetchBundle, findNextTier, renderSummary, schedulePriceUpdate } from './pricing.js';
+import { assertPricingReady, combinedQty, computePriceQuoteFromState, fetchBundle, findNextTier, getPricingReadiness, renderSummary, schedulePriceUpdate } from './pricing.js';
 import { BACK_LOCATIONS, FRONT_LOCATIONS, LOCATION_LABELS, SALES_REPS, SHIP_METHODS, STANDARD_SIZES, _designsCacheByCustomer, dtgIF, state } from './state.js';
 import { effectiveShipFee, recomputeTaxRate, syncPickupToggleFromShipMethod, syncShipFeeFromDom } from './tax-shipping.js';
 import { clearDirty, computeAutoDueDate, dueDateAutoLabel, escapeHtml, fmtMoney, isComboSupported, isPickupMethod, markDirty, parseBulkSizes, sanitizeLocationState, showToastSafe } from './utils.js';
@@ -956,14 +956,14 @@ export function updateSubmitEnabled() {
     const { items, blockers, warnings, ready } = computeReadiness();
     btn.disabled = state.submitting || !ready;
 
-    // [2026-06-08] Phase 1 Chunk C — enable Save once any row is fully priced
+    // Save requires every entered row to have current pricing
     // (looser than Submit, which also needs email/design). Lets a rep save a
     // draft quote + share link before the full push-readiness gate passes.
     const saveBtn = /** @type {HTMLInputElement|null} */ (document.getElementById('dtgSaveBtn'));
     if (saveBtn) {
-        const anyPriced = state.rows.some(r =>
-            r.style && r.color && Object.keys(r.sizes || {}).length > 0 && Number(r._lineTotal) > 0);
-        saveBtn.disabled = !anyPriced;
+        const pricing = getPricingReadiness();
+        saveBtn.disabled = !pricing.ready;
+        saveBtn.title = pricing.ready ? 'Save this quote and get a share link' : pricing.message;
     }
 
     if (panel) {
@@ -1805,6 +1805,7 @@ export function previewStyle({ style, desc, color, colorsAvailable, availableSiz
             if (sizes.length) {
                 row.availableSizes = sizes;
                 renderTable();
+                schedulePriceUpdate();
             }
         }).catch((err) => {
             console.warn('[dtg-inline-form] previewStyle: bundle hydration failed', err);
@@ -1939,8 +1940,9 @@ window.DTGInlineForm = {
     // this so the saved quote_session reflects the MANUAL form (the on-screen total), not
     // the AI chat's stale currentPriceQuote. Returns the tax-bearing, item-complete quote
     // plus the customer + shipping/tax blocks the save + edit-reload (Chunk E) need.
-    // null when the form has no priced rows (handleSaveQuote then falls back to the AI quote).
+    // Only an empty form returns null. Pending manual rows must never fall back to stale AI data.
     getSaveQuote: () => {
+        assertPricingReady();
         const pq = computePriceQuoteFromState();
         if (!pq || !pq.lineItems || !pq.lineItems.length) return null;
         pq.customer = {
@@ -1972,9 +1974,9 @@ window.DTGInlineForm = {
         };
         return pq;
     },
-    // True when at least one row is fully priced — gates the form's Save button.
-    hasCompleteRows: () => state.rows.some(r =>
-        r.style && r.color && Object.keys(r.sizes || {}).length > 0 && Number(r._lineTotal) > 0),
+    // Shared readiness for the form and chat Save controls.
+    hasCompleteRows: () => getPricingReadiness().ready,
+    getPricingReadiness,
     // C9 — chat controller calls this before fillFromQuote() to decide
     // whether to warn about overwriting user edits.
     isDirty: () => state.dirtyAfterChatFill,

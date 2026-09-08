@@ -232,6 +232,7 @@
 | `universal-cart-header.js` | Cart header component |
 | `cart-drawer.js` | Slide-out cart drawer |
 | `toast-notifications.js` | Toast notification system |
+| `ui-dialog.js` | Migrated custom-dialog focus trap, nested dismissal, background inert state and scroll/focus restoration. Load before page controllers; business cleanup stays in `onDismiss`. |
 | `dp5-helper.js` | DataPage 5 (Caspio) helper |
 | `box-label-template.js` | THE 8.5×11 box-label renderer (`window.BoxLabelTemplate`) + rush/follow-on wording — shared by the SanMar Inbound modal and the repack station (pages/box-labels.html) so labels can't drift. Pair with `../css/box-label-print.css`. NEW 2026-08-04 |
 

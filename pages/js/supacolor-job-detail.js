@@ -277,8 +277,8 @@ var supajobdetaLog = SUPAJOBDETA_LOG_ON ? console.log.bind(console) : function (
         $('sjd-backfill-source').textContent = footer.length ? footer.join(' · ') : '';
         $('sjd-last-updated').textContent = '';
 
-        $('sjd-loading').style.display = 'none';
-        $('sjd-content').style.display = '';
+        $('sjd-loading').hidden = true;
+        $('sjd-content').hidden = false;
     }
 
     function renderTimelineStep(stepId, dateId, isoDate) {
@@ -300,7 +300,7 @@ var supajobdetaLog = SUPAJOBDETA_LOG_ON ? console.log.bind(console) : function (
 
         if (lines.length === 0) {
             container.innerHTML = '<div class="sjd-empty-mini">No joblines captured yet. Paste a detail screenshot to fill them in.</div>';
-            $('sjd-totals').style.display = 'none';
+            $('sjd-totals').hidden = true;
             return;
         }
 
@@ -313,16 +313,15 @@ var supajobdetaLog = SUPAJOBDETA_LOG_ON ? console.log.bind(console) : function (
             // normalize to " · " for single-line display in the modal meta.
             var detailForMeta = (line.Detail_Line || '').replace(/\s*\n\s*/g, ' · ');
             var thumb = line.Thumbnail_URL
-                ? '<img class="sjd-line-thumb sjd-line-thumb--clickable"' +
-                  ' src="' + escapeHtml(boxUrl(line.Thumbnail_URL)) + '"' +
+                ? '<button type="button" class="sjd-line-thumb sjd-line-thumb--clickable"' +
                   ' data-thumb-url="' + escapeHtml(boxUrl(line.Thumbnail_URL)) + '"' +
                   ' data-item-code="' + escapeHtml(line.Item_Code || '') + '"' +
                   ' data-description="' + escapeHtml(line.Description || '') + '"' +
                   ' data-detail="' + escapeHtml(detailForMeta) + '"' +
                   ' data-color="' + escapeHtml(line.Color || '') + '"' +
                   ' data-quantity="' + escapeHtml(line.Quantity != null ? String(line.Quantity) : '') + '"' +
-                  ' alt="" title="Click to view larger"' +
-                  ' onerror="this.style.display=\'none\'">'
+                  ' aria-label="Preview ' + escapeHtml(line.Description || line.Item_Code || 'transfer artwork') + '">' +
+                  '<img src="' + escapeHtml(boxUrl(line.Thumbnail_URL)) + '" alt="" data-hide-on-error></button>'
                 : '<div class="sjd-line-thumb sjd-line-thumb--placeholder">' +
                     '<i class="fas fa-' + (line.Line_Type === 'SHIPPING' ? 'truck' : line.Line_Type === 'FEE' ? 'tag' : 'image') + '" aria-hidden="true"></i>' +
                   '</div>';
@@ -398,11 +397,11 @@ var supajobdetaLog = SUPAJOBDETA_LOG_ON ? console.log.bind(console) : function (
         // Totals
         var j = state.job;
         if (j.Subtotal != null || j.Total != null) {
-            $('sjd-totals').style.display = '';
+            $('sjd-totals').hidden = false;
             $('sjd-subtotal').textContent = formatMoney(j.Subtotal) || '—';
             $('sjd-total').textContent    = formatMoney(j.Total) || '—';
         } else {
-            $('sjd-totals').style.display = 'none';
+            $('sjd-totals').hidden = true;
         }
     }
 
@@ -430,7 +429,7 @@ var supajobdetaLog = SUPAJOBDETA_LOG_ON ? console.log.bind(console) : function (
         $('sjd-ship-email').textContent = j.Ship_To_Email || '—';
 
         if (j.Tracking_Number) {
-            $('sjd-tracking-section').style.display = '';
+            $('sjd-tracking-section').hidden = false;
             $('sjd-tracking-number').textContent = j.Tracking_Number;
             // Pass Shipping_Method so empty-Carrier stamps_com / etc. still
             // resolves to the right carrier link + label.
@@ -441,7 +440,7 @@ var supajobdetaLog = SUPAJOBDETA_LOG_ON ? console.log.bind(console) : function (
             }
             $('sjd-carrier-line').textContent = displayCarrierLabel(j.Carrier, j.Shipping_Method, j.Tracking_Number);
         } else {
-            $('sjd-tracking-section').style.display = 'none';
+            $('sjd-tracking-section').hidden = true;
         }
     }
 
@@ -451,10 +450,10 @@ var supajobdetaLog = SUPAJOBDETA_LOG_ON ? console.log.bind(console) : function (
         // A broken lookup must never look like "no linked transfers" — surface it
         // so the user knows the panel is unreliable rather than empty (Rule 4).
         if (state.linkedTransfersError) {
-            $('sjd-linked-card').style.display = '';
+            $('sjd-linked-card').hidden = false;
             $('sjd-linked-list').innerHTML =
                 '<div class="sjd-linked-item" role="alert">' +
-                    '<i class="fas fa-triangle-exclamation" style="color:#c0392b;" aria-hidden="true"></i>' +
+                    '<i class="fas fa-triangle-exclamation sjd-history-danger" aria-hidden="true"></i>' +
                     '<div class="sjd-linked-info">' +
                         '<div class="sjd-linked-design">Couldn’t load linked transfers</div>' +
                         '<div class="sjd-linked-company">' + escapeHtml(state.linkedTransfersError) +
@@ -465,10 +464,10 @@ var supajobdetaLog = SUPAJOBDETA_LOG_ON ? console.log.bind(console) : function (
         }
 
         if (transfers.length === 0) {
-            $('sjd-linked-card').style.display = 'none';
+            $('sjd-linked-card').hidden = true;
             return;
         }
-        $('sjd-linked-card').style.display = '';
+        $('sjd-linked-card').hidden = false;
         $('sjd-linked-list').innerHTML = transfers.map(function (t) {
             return '<a href="/pages/transfer-detail.html?id=' + encodeURIComponent(t.ID_Transfer) + '" class="sjd-linked-item">' +
                 '<div class="sjd-linked-id">' + escapeHtml(t.ID_Transfer) + '</div>' +
@@ -479,7 +478,7 @@ var supajobdetaLog = SUPAJOBDETA_LOG_ON ? console.log.bind(console) : function (
                 '<div class="sjd-linked-status">' +
                     '<span class="sc-status-badge">' + escapeHtml(t.Status || '') + '</span>' +
                 '</div>' +
-                '<i class="fas fa-chevron-right" style="color:#adb5bd;" aria-hidden="true"></i>' +
+                '<i class="fas fa-chevron-right sjd-history-muted" aria-hidden="true"></i>' +
             '</a>';
         }).join('');
     }
@@ -523,21 +522,21 @@ var supajobdetaLog = SUPAJOBDETA_LOG_ON ? console.log.bind(console) : function (
 
     // ── Paste / OCR ────────────────────────────────────────────────────
     function openPasteModal() {
-        $('sjd-paste-modal').style.display = 'flex';
+        window.UiDialog.open('sjd-paste-modal', { focus: '#sjd-paste-zone', onDismiss: closePasteModal });
         resetPasteModal();
-        setTimeout(function () { $('sjd-paste-zone').focus(); }, 50);
+        $('sjd-paste-zone').focus();
     }
     function closePasteModal() {
-        $('sjd-paste-modal').style.display = 'none';
+        window.UiDialog.close('sjd-paste-modal');
         state.pendingExtraction = null;
     }
     function resetPasteModal() {
-        $('sjd-paste-empty').style.display = '';
-        $('sjd-paste-preview').style.display = 'none';
+        $('sjd-paste-empty').hidden = false;
+        $('sjd-paste-preview').hidden = true;
         $('sjd-paste-preview').src = '';
-        $('sjd-extract-status').style.display = 'none';
+        $('sjd-extract-status').hidden = true;
         $('sjd-extract-status').innerHTML = '';
-        $('sjd-extract-summary').style.display = 'none';
+        $('sjd-extract-summary').hidden = true;
         $('sjd-extract-summary').innerHTML = '';
         $('sjd-paste-apply').disabled = true;
         $('sjd-overwrite').checked = false;
@@ -546,7 +545,7 @@ var supajobdetaLog = SUPAJOBDETA_LOG_ON ? console.log.bind(console) : function (
 
     function showExtractStatus(html, kind) {
         var el = $('sjd-extract-status');
-        el.style.display = '';
+        el.hidden = false;
         el.className = 'sc-extract-status sc-extract-status--' + (kind || 'info');
         el.innerHTML = html;
     }
@@ -564,9 +563,9 @@ var supajobdetaLog = SUPAJOBDETA_LOG_ON ? console.log.bind(console) : function (
             r.readAsDataURL(file);
         });
 
-        $('sjd-paste-empty').style.display = 'none';
+        $('sjd-paste-empty').hidden = true;
         $('sjd-paste-preview').src = dataUri;
-        $('sjd-paste-preview').style.display = '';
+        $('sjd-paste-preview').hidden = false;
         $('sjd-paste-apply').disabled = true;
 
         showExtractStatus('<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Reading screenshot with Claude Vision…', 'info');
@@ -615,7 +614,7 @@ var supajobdetaLog = SUPAJOBDETA_LOG_ON ? console.log.bind(console) : function (
 
             // Render summary preview
             var sumEl = $('sjd-extract-summary');
-            sumEl.style.display = '';
+            sumEl.hidden = false;
             sumEl.innerHTML = renderExtractionSummary(d);
 
             $('sjd-paste-apply').disabled = false;
@@ -821,10 +820,10 @@ var supajobdetaLog = SUPAJOBDETA_LOG_ON ? console.log.bind(console) : function (
         radios.forEach(function (r) { r.checked = (r.value === current); });
         updateStatusSaveBtn();
 
-        $('sjd-status-modal').style.display = 'flex';
+        window.UiDialog.open('sjd-status-modal', { onDismiss: closeStatusModal });
     }
     function closeStatusModal() {
-        $('sjd-status-modal').style.display = 'none';
+        window.UiDialog.close('sjd-status-modal');
     }
     function updateStatusSaveBtn() {
         var picked = document.querySelector('input[name="sjd-status-choice"]:checked');
@@ -872,19 +871,19 @@ var supajobdetaLog = SUPAJOBDETA_LOG_ON ? console.log.bind(console) : function (
         var openConfirm = $('sjd-delete-open-confirm');
         var deleteBtn = $('sjd-delete-confirm');
         if (j.Status === 'Open') {
-            openWarning.style.display = '';
+            openWarning.hidden = false;
             openConfirm.checked = false;
             deleteBtn.disabled = true;
             openConfirm.onchange = function () { deleteBtn.disabled = !openConfirm.checked; };
         } else {
-            openWarning.style.display = 'none';
+            openWarning.hidden = true;
             deleteBtn.disabled = false;
         }
 
-        $('sjd-delete-modal').style.display = 'flex';
+        window.UiDialog.open('sjd-delete-modal', { onDismiss: closeDeleteModal });
     }
     function closeDeleteModal() {
-        $('sjd-delete-modal').style.display = 'none';
+        window.UiDialog.close('sjd-delete-modal');
     }
 
     async function confirmDelete() {
@@ -909,6 +908,9 @@ var supajobdetaLog = SUPAJOBDETA_LOG_ON ? console.log.bind(console) : function (
 
     // ── Init ───────────────────────────────────────────────────────────
     async function init() {
+        document.addEventListener('error', function (event) {
+            if (event.target.matches && event.target.matches('img[data-hide-on-error]')) event.target.hidden = true;
+        }, true);
         var params = new URLSearchParams(window.location.search);
         state.idJob = params.get('id');
         if (!state.idJob) {
@@ -974,13 +976,16 @@ var supajobdetaLog = SUPAJOBDETA_LOG_ON ? console.log.bind(console) : function (
         });
 
         var pasteZone = $('sjd-paste-zone');
+        pasteZone.addEventListener('keydown', function (event) {
+            if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); $('sjd-paste-file').click(); }
+        });
         // Paste listener on document (not the zone) so it fires regardless of
         // where focus is when Ctrl+V hits — avoids the setTimeout-focus race
         // where the first Ctrl+V lands on the trigger button (outside the
         // modal) and silently no-ops.
         var pasteModal = $('sjd-paste-modal');
         document.addEventListener('paste', function (e) {
-            if (pasteModal.style.display === 'none') return;
+            if (pasteModal.hidden) return;
             var items = (e.clipboardData || window.clipboardData || {}).items;
             if (!items) return;
             for (var i = 0; i < items.length; i++) {

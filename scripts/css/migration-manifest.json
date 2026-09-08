@@ -31,13 +31,13 @@
         "disabled-example"
       ],
       "test": "tests/e2e/css-unification.spec.js",
-      "maxCssBytes": 44718,
+      "maxCssBytes": 64459,
       "baseline": {
         "commit": "2ca502a1",
         "rawCssBytes": 34377,
         "localCssRequests": 4
       },
-      "measuredRawCssBytes": 42670
+      "measuredRawCssBytes": 62363
     },
     {
       "source": "dashboards/design-queue.html",
@@ -61,13 +61,13 @@
         "metrics-unavailable"
       ],
       "test": "tests/e2e/css-unification.spec.js",
-      "maxCssBytes": 51705,
+      "maxCssBytes": 71446,
       "baseline": {
         "commit": "2ca502a1",
         "rawCssBytes": 173704,
         "localCssRequests": 4
       },
-      "measuredRawCssBytes": 49657
+      "measuredRawCssBytes": 69350
     },
     {
       "source": "pages/art-billing-reference.html",
@@ -87,13 +87,13 @@
         "unchanged-content"
       ],
       "test": "tests/e2e/css-unification.spec.js",
-      "maxCssBytes": 45317,
+      "maxCssBytes": 65058,
       "baseline": {
         "commit": "2ca502a1",
         "rawCssBytes": 149859,
         "localCssRequests": 3
       },
-      "measuredRawCssBytes": 43269
+      "measuredRawCssBytes": 62962
     },
     {
       "source": "pages/webstore-inquiry.html",
@@ -117,13 +117,13 @@
         "success"
       ],
       "test": "tests/e2e/css-unification.spec.js",
-      "maxCssBytes": 41128,
+      "maxCssBytes": 60869,
       "baseline": {
         "commit": "2ca502a1",
         "rawCssBytes": 33091,
         "localCssRequests": 3
       },
-      "measuredRawCssBytes": 39080
+      "measuredRawCssBytes": 58773
     },
     {
       "source": "dashboards/design-gallery.html",
@@ -149,8 +149,8 @@
         "mobile"
       ],
       "test": "tests/e2e/css-unification-workspaces.spec.js",
-      "maxCssBytes": 91794,
-      "measuredRawCssBytes": 89746,
+      "maxCssBytes": 113293,
+      "measuredRawCssBytes": 111197,
       "dynamicTokens": [
         "--w",
         "--h"
@@ -189,8 +189,8 @@
         "publication-receipt-reload"
       ],
       "test": "tests/e2e/css-unification-workspaces.spec.js",
-      "maxCssBytes": 46016,
-      "measuredRawCssBytes": 43968,
+      "maxCssBytes": 65949,
+      "measuredRawCssBytes": 63853,
       "dynamicTokens": [
         "--w"
       ],
@@ -199,6 +199,173 @@
         "rawCssBytes": 170944,
         "localCssRequests": 4
       }
+    },
+    {
+      "source": "dashboards/bradley-transfers.html",
+      "family": "bradley-workflow",
+      "status": "migrated",
+      "route": "/dashboards/bradley-transfers.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "dashboards/css/bradley-transfers.css",
+        "shared_components/css/transfer-workflow.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "populated",
+        "filtered",
+        "empty",
+        "load-error-retry",
+        "delete-cancel",
+        "keyboard-focus",
+        "sender-search-error",
+        "sender-populated",
+        "sender-link-failure-retry",
+        "sender-analysis",
+        "mobile"
+      ],
+      "test": "tests/e2e/css-unification-bradley.spec.js",
+      "dynamicTokens": [
+        "--badge-color",
+        "--badge-bg"
+      ],
+      "baseline": {
+        "commit": "02441a7da546b06cb7fc159087ce38681dc1c598",
+        "rawCssBytes": 216211,
+        "localCssRequests": 4
+      },
+      "measuredRawCssBytes": 118529,
+      "maxCssBytes": 120625
+    },
+    {
+      "source": "dashboards/bradley-screenprint.html",
+      "family": "bradley-workflow",
+      "status": "migrated",
+      "route": "/dashboards/bradley-screenprint.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "dashboards/css/bradley-transfers.css",
+        "shared_components/css/transfer-workflow.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "populated",
+        "filtered",
+        "empty",
+        "load-error-retry",
+        "delete-cancel",
+        "keyboard-focus",
+        "mobile"
+      ],
+      "test": "tests/e2e/css-unification-bradley.spec.js",
+      "dynamicTokens": [
+        "--badge-color",
+        "--badge-bg"
+      ],
+      "baseline": {
+        "commit": "02441a7da546b06cb7fc159087ce38681dc1c598",
+        "rawCssBytes": 216211,
+        "localCssRequests": 4
+      },
+      "measuredRawCssBytes": 118529,
+      "maxCssBytes": 120625
+    },
+    {
+      "source": "dashboards/supacolor-orders.html",
+      "family": "bradley-workflow",
+      "status": "migrated",
+      "route": "/dashboards/supacolor-orders.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "dashboards/css/bradley-transfers.css",
+        "dashboards/css/supacolor-orders.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "populated",
+        "views",
+        "search-empty",
+        "load-error-retry",
+        "screenshot-list-review",
+        "import-cancel",
+        "keyboard-focus",
+        "mobile"
+      ],
+      "test": "tests/e2e/css-unification-bradley.spec.js",
+      "baseline": {
+        "commit": "02441a7da546b06cb7fc159087ce38681dc1c598",
+        "rawCssBytes": 197054,
+        "localCssRequests": 4
+      },
+      "measuredRawCssBytes": 106154,
+      "maxCssBytes": 108250
+    },
+    {
+      "source": "pages/transfer-detail.html",
+      "family": "bradley-workflow",
+      "status": "migrated",
+      "route": "/pages/transfer-detail.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "dashboards/css/bradley-transfers.css",
+        "pages/css/transfer-detail.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "populated",
+        "po-entry",
+        "po-pending",
+        "po-linked",
+        "screenprint-ordered",
+        "empty-files",
+        "load-error",
+        "delete-cancel",
+        "keyboard-focus",
+        "mobile"
+      ],
+      "test": "tests/e2e/css-unification-bradley.spec.js",
+      "baseline": {
+        "commit": "02441a7da546b06cb7fc159087ce38681dc1c598",
+        "rawCssBytes": 216465,
+        "localCssRequests": 5
+      },
+      "measuredRawCssBytes": 133984,
+      "maxCssBytes": 136080
+    },
+    {
+      "source": "pages/supacolor-job-detail.html",
+      "family": "bradley-workflow",
+      "status": "migrated",
+      "route": "/pages/supacolor-job-detail.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "dashboards/css/bradley-transfers.css",
+        "pages/css/supacolor-job-detail.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "populated",
+        "image-preview",
+        "image-error-recovery",
+        "status-cancel",
+        "screenshot-extraction-review",
+        "closed-paste-guard",
+        "keyboard-focus",
+        "mobile"
+      ],
+      "test": "tests/e2e/css-unification-bradley.spec.js",
+      "baseline": {
+        "commit": "02441a7da546b06cb7fc159087ce38681dc1c598",
+        "rawCssBytes": 217378,
+        "localCssRequests": 6
+      },
+      "measuredRawCssBytes": 109145,
+      "maxCssBytes": 111241
     }
   ],
   "billingContentSha256": "d85f8530e03a1863d1b8bb2ebe97ba332d5c9e3411887d1eb2d02dcdb14c0863",
@@ -261,10 +428,11 @@
     {
       "kind": "external-embed",
       "owners": [
-        "dashboards/bradley-transfers.html",
-        "dashboards/supacolor-orders.html"
+        "dashboards/digitized-designs.html",
+        "dashboards/old-designs.html",
+        "admin/announcements-create.html"
       ],
-      "note": "App owns the surrounding page, Caspio owns embedded markup. Audit frame boundaries and loaded styles before changes."
+      "note": "These sources execute Caspio /emb scripts. Bradley and the current Steve/Ruth/AE workflow use app-rendered markup; historical DataPage comments, CDN images and date utilities are not embedded UI."
     }
   ]
 }

@@ -166,12 +166,70 @@ export function findNextTier(tiers, currentTier, _currentQty) {
     };
 }
 
+// A completed calculation belongs to one exact set of garment inputs. Invalidate
+// immediately, including the debounce window; late requests cannot certify edits.
+let priceGeneration = 0;
+let pricedInputs = null;
+
+function enteredRows() {
+    return state.rows.filter(row => row.style || row.color ||
+        Object.values(row.sizes || {}).some(qty => Number(qty) !== 0));
+}
+
+function pricingInputs() {
+    return JSON.stringify([effectiveLocationCode(), enteredRows().map(row => [
+        row.id, row.style, row.color, row.catalogColor, isRowColorInvalid(row),
+        Object.entries(row.sizes || {}), row.availableSizes,
+    ])]);
+}
+
+export function getPricingReadiness() {
+    const rows = enteredRows();
+    const hasRows = rows.length > 0;
+    const current = pricedInputs === pricingInputs();
+    const ready = hasRows && current && rows.every(row => {
+        if (!row.style || !row.color || isRowColorInvalid(row) || row._priceError) return false;
+        const sizes = Object.entries(row.sizes || {}).filter(([, qty]) => Number(qty) !== 0);
+        if (!sizes.length || !Number.isFinite(row._perPiece) || row._perPiece <= 0) return false;
+        let total = 0;
+        for (const [size, qty] of sizes) {
+            const count = Number(qty);
+            const price = Number((row._priceBySize || {})[size.toUpperCase()]);
+            if (!Number.isInteger(count) || count <= 0 || !Number.isFinite(price) || price <= 0) return false;
+            total += count * price;
+        }
+        return Number.isFinite(row._lineTotal) && row._lineTotal > 0 &&
+            Math.abs(Math.round(total * 100) / 100 - row._lineTotal) < 0.011;
+    });
+    return {
+        hasRows, ready,
+        message: !current
+            ? 'Pricing is still loading or has changed. Wait for all prices, then try again.'
+            : 'Complete every product, color and quantity, and wait for all size prices before saving.',
+    };
+}
+
+export function assertPricingReady() {
+    const status = getPricingReadiness();
+    if (status.hasRows && !status.ready) {
+        throw Object.assign(new Error(status.message), { code: 'DTG_PRICING_NOT_READY' });
+    }
+    return status;
+}
+
 export function schedulePriceUpdate() {
+    priceGeneration++;
+    pricedInputs = null;
+    updateSubmitEnabled();
     clearTimeout(dtgIF._priceTimer);
     dtgIF._priceTimer = setTimeout(() => updateLivePrices().catch((e) => console.error('[dtg-inline-form] price update failed:', e)), 200);
 }
 
 export async function updateLivePrices() {
+    const generation = ++priceGeneration;
+    const inputs = pricingInputs();
+    pricedInputs = null;
+    updateSubmitEnabled();
     const code = effectiveLocationCode();
     const cq = combinedQty();
     if (!code || cq === 0 || !window.DTGPricingService) {
@@ -202,6 +260,7 @@ export async function updateLivePrices() {
         if (isRowColorInvalid(row)) { row._perPiece = null; row._lineTotal = 0; continue; }
         try {
             const bundle = await fetchBundle(row.style);
+            if (generation !== priceGeneration || inputs !== pricingInputs()) return;
             if (bundle && bundle.__pricingError) {
                 // Pricing API failed for this style — surface it; do NOT let the row
                 // sit at $0 in the rep-facing total. (2026-06-01)
@@ -286,6 +345,8 @@ export async function updateLivePrices() {
             _anyPriceError = true; _erroredStyles.add(row.style);
         }
     }
+    if (generation !== priceGeneration || inputs !== pricingInputs()) return;
+    pricedInputs = inputs;
     // Surface any pricing failure so the rep never quotes an incomplete total
     // that silently dropped a $0 row. (2026-06-01)
     renderPriceErrorBanner(_anyPriceError ? Array.from(_erroredStyles) : null);
@@ -343,8 +404,8 @@ export function computePriceQuoteFromState() {
                 style: r.style,
                 color: r.color,
                 description: r.description || `${r.style} ${r.color}`,
-                sizes: r.sizes,
-                priceBySize: r._priceBySize || {},
+                sizes: { ...r.sizes },
+                priceBySize: { ...(r._priceBySize || {}) },
                 totalQuantity: totalQty,
                 baseUnitPrice: baseUnit,
                 ltmPerUnit: ltmPerUnit,

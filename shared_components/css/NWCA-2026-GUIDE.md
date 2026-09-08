@@ -248,3 +248,11 @@ Design Vault and Gear Publisher use components.css as their only common control/
 The toast service now supplies .nwca-toast-container as well as its existing ID. Migrated pages use the scoped toast pattern in components.css and omit toast-notifications.css; unmigrated consumers continue loading that sheet. No browser stylesheet injection is added.
 
 Drawers need a nonshrinking content flow inside an independently scrollable body. Nested overlays consume Escape once, trap focus at the active level and return focus to a visible connected trigger. Windowed galleries use viewport screenshots; a full-page capture cannot represent unmounted rows. Publisher review fixtures mock the complete service path, including XHR photo uploads, job polling and publish responses.
+
+## Transfer workflow owners (2026-09-08)
+
+The five Bradley pages use tokens.css → components.css → bradley-transfers.css, plus only their page layout and transfer-workflow.css when they expose the sender. Art Hub is no longer an owner for these pages. Status colors stay distinct from the department accent. Buttons, fields, navigation, toasts and image previews live in components.css; transfer/order layouts and screenshot patterns live in the Bradley family owner.
+
+Load ui-dialog.js before controllers for existing custom overlay markup. Call UiDialog.open(host, { focus, onDismiss }) and UiDialog.close(host); the helper owns focus trapping, Escape, background inert state and scroll/focus restoration. Keep business state cleanup in onDismiss. New dialogs may continue to use the native dialog API demonstrated in Brand Standards.
+
+The sender and thumbnail helpers opt in to hidden state only on migrated bodies. Legacy Steve/art-detail and three builder thumbnail callers retain their current display behavior until their family migrates. transfer-actions.css remains for those old consumers. Its two dynamic badge colors are documented manifest exceptions; all fixed styling lives in the owning sheet.

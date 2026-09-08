@@ -119,8 +119,7 @@ var trandetaLog = TRANDETA_LOG_ON ? console.log.bind(console) : function () {}; 
         toast.textContent = msg;
         container.appendChild(toast);
         setTimeout(function () {
-            toast.style.opacity = '0';
-            toast.style.transition = 'opacity .3s';
+            toast.classList.add('is-leaving');
             setTimeout(function () { toast.remove(); }, 300);
         }, 4000);
     }
@@ -209,7 +208,7 @@ var trandetaLog = TRANDETA_LOG_ON ? console.log.bind(console) : function () {}; 
         return new Promise(function (resolve) {
             var modal = $('td-user-modal');
             var form = $('td-user-form');
-            modal.style.display = 'flex';
+            window.UiDialog.open(modal, { dismissible: modal.id !== 'td-user-modal', onDismiss: function () { closeModal(modal.id); } });
             function onSubmit(e) {
                 e.preventDefault();
                 var formData = new FormData(form);
@@ -217,7 +216,7 @@ var trandetaLog = TRANDETA_LOG_ON ? console.log.bind(console) : function () {}; 
                 var email = formData.get('userEmail').trim();
                 if (!name || !email) return;
                 saveUser(name, email);
-                modal.style.display = 'none';
+                window.UiDialog.close(modal);
                 form.removeEventListener('submit', onSubmit);
                 resolve(state.user);
             }
@@ -233,12 +232,12 @@ var trandetaLog = TRANDETA_LOG_ON ? console.log.bind(console) : function () {}; 
             form.querySelector('[name="userName"]').value = state.user.name;
             form.querySelector('[name="userEmail"]').value = state.user.email;
         }
-        modal.style.display = 'flex';
+        window.UiDialog.open(modal, { dismissible: modal.id !== 'td-user-modal', onDismiss: function () { closeModal(modal.id); } });
         var onSubmit = function (e) {
             e.preventDefault();
             var fd = new FormData(form);
             saveUser(fd.get('userName').trim(), fd.get('userEmail').trim());
-            modal.style.display = 'none';
+            window.UiDialog.close(modal);
             form.removeEventListener('submit', onSubmit);
             showToast('Identity updated.', 'success');
         };
@@ -274,16 +273,16 @@ var trandetaLog = TRANDETA_LOG_ON ? console.log.bind(console) : function () {}; 
         $('td-subtitle').textContent = subtitleParts.join(' · ');
 
         // Header badges
-        var badgesHtml = '<span class="bt-badge ' + statusBadgeClass(r.Status) + '" style="font-size:13px; padding:5px 14px;">' +
+        var badgesHtml = '<span class="bt-badge ' + statusBadgeClass(r.Status) + ' td-button-label">' +
                          escapeHtml(statusLabel(r.Status)) + '</span>';
         if (isRush(r)) {
-            badgesHtml += '<span class="bt-badge bt-badge--rush" style="font-size:12px;"><i class="fas fa-bolt" aria-hidden="true"></i> RUSH</span>';
+            badgesHtml += '<span class="bt-badge bt-badge--rush td-small"><i class="fas fa-bolt" aria-hidden="true"></i> RUSH</span>';
         }
         if (r.Is_Reorder) {
-            badgesHtml += '<span class="tas-reorder-badge" style="font-size:12px;"><i class="fas fa-redo" aria-hidden="true"></i> REORDER</span>';
+            badgesHtml += '<span class="tas-reorder-badge td-small"><i class="fas fa-redo" aria-hidden="true"></i> REORDER</span>';
         }
         if (state.lines && state.lines.length > 1) {
-            badgesHtml += '<span class="tas-line-count-pill" style="font-size:12px;"><i class="fas fa-list-ol" aria-hidden="true"></i> ' + state.lines.length + ' lines</span>';
+            badgesHtml += '<span class="tas-line-count-pill td-small"><i class="fas fa-list-ol" aria-hidden="true"></i> ' + state.lines.length + ' lines</span>';
         }
         $('td-header-badges').innerHTML = badgesHtml;
 
@@ -325,7 +324,7 @@ var trandetaLog = TRANDETA_LOG_ON ? console.log.bind(console) : function () {}; 
         }
 
         // Show the card with SP-specific copy.
-        card.style.display = '';
+        card.hidden = false;
         var header = card.querySelector('.td-card-header h3');
         if (header) header.innerHTML = '<i class="fas fa-print" aria-hidden="true"></i> Screen Print Order';
         var headerHint = card.querySelector('.td-card-header-hint');
@@ -343,8 +342,8 @@ var trandetaLog = TRANDETA_LOG_ON ? console.log.bind(console) : function () {}; 
         rows.push('</dl>');
 
         if (r.SP_Notes) {
-            rows.push('<h4 class="td-artwork-section-heading" style="margin-top:14px;">Special Instructions for L&P</h4>' +
-                '<div style="white-space:pre-wrap;background:#f0f9ff;padding:10px 14px;border-left:3px solid #0ea5e9;border-radius:4px;font-size:13px;color:#0c4a6e;">' +
+            rows.push('<h4 class="td-artwork-section-heading td-block-separated">Special Instructions for L&P</h4>' +
+                '<div class="td-info-note">' +
                 escapeHtml(r.SP_Notes) + '</div>');
         }
 
@@ -389,7 +388,7 @@ var trandetaLog = TRANDETA_LOG_ON ? console.log.bind(console) : function () {}; 
     function renderSupacolorHeaderStrip(job) {
         // PO + Description + Created by + Location — compact strip below status row.
         var rows = [];
-        rows.push('<dl class="td-specs-grid" style="margin-top:10px;">');
+        rows.push('<dl class="td-specs-grid td-block-gap">');
         if (job.PO_Number) rows.push('<dt>PO</dt><dd><span class="td-po-badge">' + escapeHtml(job.PO_Number) + '</span></dd>');
         if (job.Description) rows.push('<dt>Description</dt><dd>' + escapeHtml(job.Description) + '</dd>');
         if (job.Created_By_Name) rows.push('<dt>Created by</dt><dd>' + escapeHtml(job.Created_By_Name) + '</dd>');
@@ -407,16 +406,15 @@ var trandetaLog = TRANDETA_LOG_ON ? console.log.bind(console) : function () {}; 
         joblines.forEach(function (line) {
             var detailForMeta = (line.Detail_Line || '').replace(/\s*\n\s*/g, ' · ');
             var thumb = line.Thumbnail_URL
-                ? '<img class="td-jobline-thumb td-jobline-thumb--clickable"' +
-                  ' src="' + escapeHtml(boxUrl(line.Thumbnail_URL)) + '"' +
+                ? '<button type="button" class="td-jobline-thumb td-jobline-thumb--clickable"' +
                   ' data-thumb-url="' + escapeHtml(boxUrl(line.Thumbnail_URL)) + '"' +
                   ' data-item-code="' + escapeHtml(line.Item_Code || '') + '"' +
                   ' data-description="' + escapeHtml(line.Description || '') + '"' +
                   ' data-detail="' + escapeHtml(detailForMeta) + '"' +
                   ' data-color="' + escapeHtml(line.Color || '') + '"' +
                   ' data-quantity="' + escapeHtml(line.Quantity != null ? String(line.Quantity) : '') + '"' +
-                  ' alt="" title="Click to view larger"' +
-                  ' onerror="this.style.display=\'none\'">'
+                  ' aria-label="Preview ' + escapeHtml(line.Description || line.Item_Code || 'transfer artwork') + '">' +
+                  '<img src="' + escapeHtml(boxUrl(line.Thumbnail_URL)) + '" alt="" data-hide-on-error></button>'
                 : '<div class="td-jobline-thumb td-jobline-thumb--placeholder">' +
                     '<i class="fas fa-' + (line.Line_Type === 'SHIPPING' ? 'truck' : line.Line_Type === 'FEE' ? 'tag' : 'image') + '" aria-hidden="true"></i>' +
                   '</div>';
@@ -574,19 +572,19 @@ var trandetaLog = TRANDETA_LOG_ON ? console.log.bind(console) : function () {}; 
         // Hide the card unless we have a linked Supacolor job#
         var num = r.Supacolor_Order_Number;
         if (!num) {
-            card.style.display = 'none';
+            card.hidden = true;
             panel.innerHTML = '';
             return;
         }
 
         // Render a loading stub immediately so the card appears
-        card.style.display = '';
-        panel.innerHTML = '<div class="td-empty-panel" style="padding:12px 0;"><i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Loading live status...</div>';
+        card.hidden = false;
+        panel.innerHTML = '<div class="td-empty-panel td-status-message"><i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Loading live status...</div>';
 
         try {
             var resp = await fetch(API_BASE + '/api/supacolor-jobs/by-number/' + encodeURIComponent(num));
             if (resp.status === 404) {
-                panel.innerHTML = '<div class="td-empty-panel" style="padding:12px 0; color:#92400e;">' +
+                panel.innerHTML = '<div class="td-empty-panel td-warning-message">' +
                     '<i class="fas fa-info-circle" aria-hidden="true"></i> Supacolor job <strong>#' + escapeHtml(num) + '</strong> not yet synced. ' +
                     'The 10-min API sync will catch it shortly, or click "Mark as Ordered" again to re-trigger.' +
                     '</div>';
@@ -609,14 +607,14 @@ var trandetaLog = TRANDETA_LOG_ON ? console.log.bind(console) : function () {}; 
                 '<span class="td-live-status-jobnum">Supacolor #' + escapeHtml(num) + '</span>' +
                 '</div>');
 
-            rows.push('<dl class="td-specs-grid" style="margin-top:10px;">');
+            rows.push('<dl class="td-specs-grid td-block-gap">');
             if (job.Date_Entered) rows.push('<dt>Entered</dt><dd>' + escapeHtml(formatDate(job.Date_Entered)) + '</dd>');
             if (job.Requested_Ship_Date) rows.push('<dt>Requested Ship</dt><dd>' + escapeHtml(formatDate(job.Requested_Ship_Date)) + '</dd>');
             if (job.Date_Shipped) rows.push('<dt>Shipped</dt><dd><strong>' + escapeHtml(formatDate(job.Date_Shipped)) + '</strong></dd>');
             if (carrier) rows.push('<dt>Carrier</dt><dd>' + escapeHtml(carrier) + (job.Shipping_Method ? ' &middot; ' + escapeHtml(job.Shipping_Method) : '') + '</dd>');
             if (tracking) {
                 var trackDisplay = trackUrl
-                    ? '<a href="' + escapeHtml(trackUrl) + '" target="_blank" rel="noopener">' + escapeHtml(tracking) + ' <i class="fas fa-external-link-alt" style="font-size:10px;" aria-hidden="true"></i></a>'
+                    ? '<a href="' + escapeHtml(trackUrl) + '" target="_blank" rel="noopener">' + escapeHtml(tracking) + ' <i class="fas fa-external-link-alt td-small" aria-hidden="true"></i></a>'
                     : escapeHtml(tracking);
                 rows.push('<dt>Tracking</dt><dd>' + trackDisplay + '</dd>');
             }
@@ -643,7 +641,7 @@ var trandetaLog = TRANDETA_LOG_ON ? console.log.bind(console) : function () {}; 
             if (caspioId) {
                 var slot = $('td-supacolor-detail-slot');
                 if (slot) {
-                    slot.innerHTML = '<div class="td-empty-panel" style="padding:8px 0; font-size:12px;"><i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Loading joblines & shipping...</div>';
+                    slot.innerHTML = '<div class="td-empty-panel td-status-caption"><i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Loading joblines & shipping...</div>';
                     fetch(API_BASE + '/api/supacolor-jobs/' + encodeURIComponent(caspioId))
                         .then(function (r2) {
                             if (!r2.ok) throw new Error('HTTP ' + r2.status);
@@ -661,7 +659,7 @@ var trandetaLog = TRANDETA_LOG_ON ? console.log.bind(console) : function () {}; 
                         })
                         .catch(function (err) {
                             console.error('[transfer-detail] full Supacolor fetch failed:', err);
-                            slot.innerHTML = '<div class="td-empty-panel" style="padding:8px 0; color:#991b1b; font-size:12px;">' +
+                            slot.innerHTML = '<div class="td-empty-panel td-error-caption">' +
                                 '<i class="fas fa-exclamation-triangle" aria-hidden="true"></i> Couldn\'t load joblines/shipping. ' +
                                 'Try the dedicated Supacolor dashboard.' +
                                 '</div>';
@@ -670,7 +668,7 @@ var trandetaLog = TRANDETA_LOG_ON ? console.log.bind(console) : function () {}; 
             }
         } catch (err) {
             console.error('[transfer-detail] Live Supacolor fetch failed:', err);
-            panel.innerHTML = '<div class="td-empty-panel" style="padding:12px 0; color:#991b1b;">' +
+            panel.innerHTML = '<div class="td-empty-panel td-error-message">' +
                 '<i class="fas fa-exclamation-triangle" aria-hidden="true"></i> Unable to load live Supacolor status. ' +
                 'Open the Supacolor Orders dashboard to view directly.' +
                 '</div>';
@@ -690,7 +688,7 @@ var trandetaLog = TRANDETA_LOG_ON ? console.log.bind(console) : function () {}; 
 
         if (allFiles.length === 0) {
             if (r.Is_Reorder) {
-                panel.innerHTML = '<div class="td-empty-panel" style="background:#f0fdf4;border-left:3px solid #16a34a;padding:10px 14px;color:#166534;"><i class="fas fa-info-circle" aria-hidden="true"></i> Reorder — artwork is already on file at Supacolor under order #' + escapeHtml(r.Supacolor_Order_Number || 'n/a') + '. No files attached here.</div>';
+                panel.innerHTML = '<div class="td-empty-panel td-success-note"><i class="fas fa-info-circle" aria-hidden="true"></i> Reorder — artwork is already on file at Supacolor under order #' + escapeHtml(r.Supacolor_Order_Number || 'n/a') + '. No files attached here.</div>';
             } else {
                 panel.innerHTML = '<div class="td-empty-panel">No working files attached. Only Steve can attach files via the "Send to Supacolor" button on the mockup or his dashboard.</div>';
             }
@@ -773,9 +771,9 @@ var trandetaLog = TRANDETA_LOG_ON ? console.log.bind(console) : function () {}; 
         // Reorder banner (top of specs panel) — makes it obvious artwork is on file at Supacolor.
         if (r.Is_Reorder) {
             var num = r.Supacolor_Order_Number ? escapeHtml(r.Supacolor_Order_Number) : '(not provided)';
-            parts.push('<div class="td-reorder-banner" style="background:#dcfce7;border-left:4px solid #16a34a;padding:12px 16px;border-radius:4px;margin-bottom:14px;">' +
-                '<strong style="color:#166534;font-size:14px;"><i class="fas fa-redo" aria-hidden="true"></i> REORDER — Supacolor #' + num + '</strong>' +
-                '<div style="color:#166534;font-size:12px;margin-top:3px;">Artwork already on file at Supacolor.</div>' +
+            parts.push('<div class="td-reorder-banner td-reorder-note">' +
+                '<strong class="td-success-title"><i class="fas fa-redo" aria-hidden="true"></i> REORDER — Supacolor #' + num + '</strong>' +
+                '<div class="td-success-caption">Artwork already on file at Supacolor.</div>' +
                 '</div>');
         }
 
@@ -785,32 +783,32 @@ var trandetaLog = TRANDETA_LOG_ON ? console.log.bind(console) : function () {}; 
                 var q = parseInt(l.Quantity, 10);
                 return s + (Number.isNaN(q) ? 0 : q);
             }, 0);
-            var header = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">' +
-                '<strong style="font-size:14px;">Transfer Lines</strong>' +
-                '<span style="font-size:12px;color:#6b7280;">' + lines.length + ' line' + (lines.length === 1 ? '' : 's') +
+            var header = '<div class="td-section-heading">' +
+                '<strong class="td-body-small">Transfer Lines</strong>' +
+                '<span class="td-muted">' + lines.length + ' line' + (lines.length === 1 ? '' : 's') +
                     ' · Total Qty: <strong>' + totalQty + '</strong></span>' +
                 '</div>';
             var rows = lines.map(function (l, i) {
                 var dim = (l.Transfer_Width_In || l.Transfer_Height_In)
-                    ? ' <span style="color:#6b7280;font-size:12px;">(' + escapeHtml((l.Transfer_Width_In || '?') + '" × ' + (l.Transfer_Height_In || '?') + '")') + '</span>'
+                    ? ' <span class="td-muted">(' + escapeHtml((l.Transfer_Width_In || '?') + '" × ' + (l.Transfer_Height_In || '?') + '")') + '</span>'
                     : '';
                 var notes = l.File_Notes
-                    ? '<div style="margin-top:4px;font-size:12px;color:#6b7280;white-space:pre-wrap;">' + escapeHtml(l.File_Notes) + '</div>'
+                    ? '<div class="td-file-note">' + escapeHtml(l.File_Notes) + '</div>'
                     : '';
                 return '<tr>' +
-                    '<td style="padding:8px 10px;border-bottom:1px solid #e5e7eb;color:#6b7280;font-weight:600;width:50px;">#' + (i + 1) + '</td>' +
-                    '<td style="padding:8px 10px;border-bottom:1px solid #e5e7eb;font-weight:700;">' + escapeHtml(l.Quantity || '?') + '</td>' +
-                    '<td style="padding:8px 10px;border-bottom:1px solid #e5e7eb;">' + escapeHtml(l.Transfer_Size || '—') + dim + '</td>' +
-                    '<td style="padding:8px 10px;border-bottom:1px solid #e5e7eb;">' + escapeHtml(l.Press_Count || '1') + notes + '</td>' +
+                    '<td class="td-line-number">#' + (i + 1) + '</td>' +
+                    '<td class="td-line-quantity">' + escapeHtml(l.Quantity || '?') + '</td>' +
+                    '<td class="td-line-cell">' + escapeHtml(l.Transfer_Size || '—') + dim + '</td>' +
+                    '<td class="td-line-cell">' + escapeHtml(l.Press_Count || '1') + notes + '</td>' +
                 '</tr>';
             }).join('');
             parts.push(header +
-                '<table style="width:100%;border-collapse:collapse;background:white;border:1px solid #e5e7eb;border-radius:6px;overflow:hidden;font-size:13px;margin-bottom:12px;">' +
-                    '<thead><tr style="background:#f9fafb;">' +
-                        '<th style="padding:8px 10px;text-align:left;color:#6b7280;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;">Line</th>' +
-                        '<th style="padding:8px 10px;text-align:left;color:#6b7280;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;">Qty</th>' +
-                        '<th style="padding:8px 10px;text-align:left;color:#6b7280;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;">Size (W × H)</th>' +
-                        '<th style="padding:8px 10px;text-align:left;color:#6b7280;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;">Press / Notes</th>' +
+                '<table class="td-lines-table">' +
+                    '<thead><tr class="td-lines-heading">' +
+                        '<th class="td-lines-column">Line</th>' +
+                        '<th class="td-lines-column">Qty</th>' +
+                        '<th class="td-lines-column">Size (W × H)</th>' +
+                        '<th class="td-lines-column">Press / Notes</th>' +
                     '</tr></thead>' +
                     '<tbody>' + rows + '</tbody>' +
                 '</table>');
@@ -825,11 +823,11 @@ var trandetaLog = TRANDETA_LOG_ON ? console.log.bind(console) : function () {}; 
         // Legacy Transfer_Type/Fabric_Target/Color_Count/Additional_Colors no longer
         // rendered (they're still in Caspio but unused in the UI going forward).
         if (r.Primary_Color) {
-            parts.push('<div class="td-specs-notes" style="background:#f0fdf4;border-left-color:#22c55e;"><strong style="color:#166534;">Primary Color / PMS</strong>' + escapeHtml(r.Primary_Color) + '</div>');
+            parts.push('<div class="td-specs-notes td-note-success"><strong class="td-text-success">Primary Color / PMS</strong>' + escapeHtml(r.Primary_Color) + '</div>');
         }
 
         if (r.Special_Instructions) {
-            parts.push('<div class="td-specs-notes" style="background:#eff6ff; border-left-color:#3b82f6;"><strong style="color:#1e40af;">Special Instructions</strong>' + escapeHtml(r.Special_Instructions) + '</div>');
+            parts.push('<div class="td-specs-notes td-note-info"><strong class="td-text-info">Special Instructions</strong>' + escapeHtml(r.Special_Instructions) + '</div>');
         }
         $('td-specs-panel').innerHTML = parts.join('');
     }
@@ -840,7 +838,7 @@ var trandetaLog = TRANDETA_LOG_ON ? console.log.bind(console) : function () {}; 
             var displayVal;
             if (value) {
                 displayVal = url
-                    ? '<a href="' + escapeHtml(url) + '" target="_blank" rel="noopener" class="td-tracking-value">' + escapeHtml(value) + ' <i class="fas fa-external-link-alt" style="font-size:10px;" aria-hidden="true"></i></a>'
+                    ? '<a href="' + escapeHtml(url) + '" target="_blank" rel="noopener" class="td-tracking-value">' + escapeHtml(value) + ' <i class="fas fa-external-link-alt td-small" aria-hidden="true"></i></a>'
                     : '<span class="td-tracking-value">' + escapeHtml(value) + '</span>';
             } else {
                 displayVal = '<span class="td-tracking-value td-tracking-value--empty">not set</span>';
@@ -867,22 +865,22 @@ var trandetaLog = TRANDETA_LOG_ON ? console.log.bind(console) : function () {}; 
 
         // Add timeline of who did what
         if (r.Sent_To_Supacolor_By) {
-            html += '<div class="td-tracking-row"><span class="td-tracking-label">Ordered By</span><span class="td-tracking-value" style="font-family:inherit;">' +
+            html += '<div class="td-tracking-row"><span class="td-tracking-label">Ordered By</span><span class="td-tracking-value td-font-body">' +
                 escapeHtml(r.Sent_To_Supacolor_By) + ' · ' + escapeHtml(formatDateTime(r.Sent_To_Supacolor_At)) + '</span></div>';
         }
         if (r.PO_Created_By) {
-            html += '<div class="td-tracking-row"><span class="td-tracking-label">PO Created By</span><span class="td-tracking-value" style="font-family:inherit;">' +
+            html += '<div class="td-tracking-row"><span class="td-tracking-label">PO Created By</span><span class="td-tracking-value td-font-body">' +
                 escapeHtml(r.PO_Created_By) + ' · ' + escapeHtml(formatDateTime(r.PO_Created_At)) + '</span></div>';
         }
         if (r.Received_By) {
-            html += '<div class="td-tracking-row"><span class="td-tracking-label">Received By</span><span class="td-tracking-value" style="font-family:inherit;">' +
+            html += '<div class="td-tracking-row"><span class="td-tracking-label">Received By</span><span class="td-tracking-value td-font-body">' +
                 escapeHtml(r.Received_By) + ' · ' + escapeHtml(formatDateTime(r.Received_At)) + '</span></div>';
         }
         if (r.Cancelled_By) {
-            html += '<div class="td-tracking-row"><span class="td-tracking-label">Cancelled By</span><span class="td-tracking-value" style="font-family:inherit;">' +
+            html += '<div class="td-tracking-row"><span class="td-tracking-label">Cancelled By</span><span class="td-tracking-value td-font-body">' +
                 escapeHtml(r.Cancelled_By) + ' · ' + escapeHtml(formatDateTime(r.Cancelled_At)) + '</span></div>';
             if (r.Cancel_Reason) {
-                html += '<div class="td-tracking-row"><span class="td-tracking-label">Reason</span><span class="td-tracking-value" style="font-family:inherit; white-space:pre-wrap;">' +
+                html += '<div class="td-tracking-row"><span class="td-tracking-label">Reason</span><span class="td-tracking-value td-text-pre">' +
                     escapeHtml(r.Cancel_Reason) + '</span></div>';
             }
         }
@@ -919,11 +917,11 @@ var trandetaLog = TRANDETA_LOG_ON ? console.log.bind(console) : function () {}; 
             hideCard = (status !== 'Requested' && status !== 'On_Hold');
         }
         if (hideCard) {
-            if (card) card.style.display = 'none';
+            if (card) card.hidden = true;
             panel.innerHTML = '';
             return;
         }
-        if (card) card.style.display = '';
+        if (card) card.hidden = false;
 
         var actions = [];
 
@@ -1035,7 +1033,7 @@ var trandetaLog = TRANDETA_LOG_ON ? console.log.bind(console) : function () {}; 
             return (parseCaspioDate(a.Created_At) || 0) - (parseCaspioDate(b.Created_At) || 0);
         });
         if (list.length === 0) {
-            $('td-timeline').innerHTML = '<div class="td-empty-panel" style="padding:12px 0;">No activity yet.</div>';
+            $('td-timeline').innerHTML = '<div class="td-empty-panel td-status-message">No activity yet.</div>';
             return;
         }
 
@@ -1067,19 +1065,19 @@ var trandetaLog = TRANDETA_LOG_ON ? console.log.bind(console) : function () {}; 
 
     // ── Modal helpers ────────────────────────────────────────────────
     function openModal(id) {
-        $(id).style.display = 'flex';
+        window.UiDialog.open(id, { onDismiss: function () { closeModal(id); } });
         // Focus the paste zone if this modal has one — enables Ctrl+V immediately
         var pasteZone = document.querySelector('#' + id + ' .td-paste-zone');
-        if (pasteZone) setTimeout(function () { pasteZone.focus(); }, 50);
+        if (pasteZone) pasteZone.focus();
     }
 
     function closeModal(id) {
-        $(id).style.display = 'none';
+        window.UiDialog.close(id);
         var form = document.querySelector('#' + id + ' form');
         if (form) form.reset();
         // Clear any lingering paste status message
         var status = document.querySelector('#' + id + ' .td-paste-status');
-        if (status) { status.style.display = 'none'; status.innerHTML = ''; }
+        if (status) { status.hidden = true; status.innerHTML = ''; }
         var zone = document.querySelector('#' + id + ' .td-paste-zone');
         if (zone) zone.classList.remove('td-paste-zone--active');
     }
@@ -1117,7 +1115,7 @@ var trandetaLog = TRANDETA_LOG_ON ? console.log.bind(console) : function () {}; 
         var thumb = thumbUri ? '<img src="' + thumbUri + '" class="td-paste-thumb" alt="">' : '';
         el.className = 'td-paste-status td-paste-status--' + state;
         el.innerHTML = icon + '<span>' + message + '</span>' + thumb;
-        el.style.display = '';
+        el.hidden = false;
     }
 
     /**
@@ -1135,7 +1133,7 @@ var trandetaLog = TRANDETA_LOG_ON ? console.log.bind(console) : function () {}; 
 
         modal.addEventListener('paste', async function (e) {
             // Only when modal is visible
-            if (modal.style.display === 'none') return;
+            if (modal.hidden) return;
             var items = (e.clipboardData || window.clipboardData || {}).items;
             if (!items) return;
             var imageItem = null;
@@ -1313,9 +1311,9 @@ var trandetaLog = TRANDETA_LOG_ON ? console.log.bind(console) : function () {}; 
             ? '<i class="fas fa-bolt" aria-hidden="true"></i> Mark as Rush'
             : '<i class="fas fa-bolt" aria-hidden="true"></i> Clear Rush Flag';
         $('td-rush-submit-btn').textContent = markingRush ? 'Mark Rush' : 'Clear Rush';
-        $('td-rush-reason-row').style.display = markingRush ? '' : 'none';
+        $('td-rush-reason-row').hidden = !(markingRush);
         modal.setAttribute('data-marking-rush', markingRush ? '1' : '0');
-        modal.style.display = 'flex';
+        window.UiDialog.open(modal, { dismissible: modal.id !== 'td-user-modal', onDismiss: function () { closeModal(modal.id); } });
     }
 
     // ── Status Transition Actions ────────────────────────────────────
@@ -1444,12 +1442,12 @@ var trandetaLog = TRANDETA_LOG_ON ? console.log.bind(console) : function () {}; 
             } else if (canEnter) {
                 renderScreenPrintPoBannerEmpty(banner);
             } else {
-                banner.style.display = 'none';
+                banner.hidden = true;
                 banner.className = 'td-po-banner';
                 banner.innerHTML = '';
                 return;
             }
-            banner.style.display = '';
+            banner.hidden = false;
             return;
         }
 
@@ -1461,12 +1459,12 @@ var trandetaLog = TRANDETA_LOG_ON ? console.log.bind(console) : function () {}; 
         } else if (canEnter) {
             renderPoBannerEmpty(banner);
         } else {
-            banner.style.display = 'none';
+            banner.hidden = true;
             banner.className = 'td-po-banner';
             banner.innerHTML = '';
             return;
         }
-        banner.style.display = '';
+        banner.hidden = false;
     }
 
     // ── Screen Print PO banner variants ──────────────────────────────
@@ -1600,7 +1598,7 @@ var trandetaLog = TRANDETA_LOG_ON ? console.log.bind(console) : function () {}; 
         // (which captures Supacolor # directly + skips the auto-link path).
         fallbackBtn.addEventListener('click', function () {
             var modal = document.getElementById('td-ordered-modal');
-            if (modal) modal.style.display = '';
+            if (modal) window.UiDialog.open(modal, { dismissible: modal.id !== 'td-user-modal', onDismiss: function () { closeModal(modal.id); } });
         });
 
         // Auto-focus if URL hash is #enter-po (queue card "Enter PO#" button sets this)
@@ -1861,15 +1859,15 @@ var trandetaLog = TRANDETA_LOG_ON ? console.log.bind(console) : function () {}; 
             state.notes = data.notes || [];
             state.lines = Array.isArray(data.lines) ? data.lines : [];
             state.files = Array.isArray(data.files) ? data.files : [];
-            $('td-loading').style.display = 'none';
-            $('td-error').style.display = 'none';
-            $('td-main').style.display = '';
+            $('td-loading').hidden = true;
+            $('td-error').hidden = true;
+            $('td-main').hidden = false;
             renderAll();
         } catch (err) {
             console.error('Load failed:', err);
-            $('td-loading').style.display = 'none';
-            $('td-main').style.display = 'none';
-            $('td-error').style.display = '';
+            $('td-loading').hidden = true;
+            $('td-main').hidden = true;
+            $('td-error').hidden = false;
             $('td-error-message').textContent = err.message === 'NOT_FOUND'
                 ? 'Transfer ID "' + state.transferId + '" does not exist.'
                 : ('Error: ' + err.message);
@@ -1878,10 +1876,13 @@ var trandetaLog = TRANDETA_LOG_ON ? console.log.bind(console) : function () {}; 
 
     // ── Init ─────────────────────────────────────────────────────────
     function init() {
+        document.addEventListener('error', function (event) {
+            if (event.target.matches && event.target.matches('img[data-hide-on-error]')) event.target.hidden = true;
+        }, true);
         state.transferId = qs('id');
         if (!state.transferId) {
-            $('td-loading').style.display = 'none';
-            $('td-error').style.display = '';
+            $('td-loading').hidden = true;
+            $('td-error').hidden = false;
             $('td-error-message').textContent = 'No transfer ID in the URL. Expected ?id=ST-YYMMDD-####';
             return;
         }
@@ -1905,7 +1906,7 @@ var trandetaLog = TRANDETA_LOG_ON ? console.log.bind(console) : function () {}; 
             modal.addEventListener('click', function (e) {
                 // Don't close the user modal by background click (must complete it)
                 if (modal.id === 'td-user-modal' && !state.user) return;
-                if (e.target === modal) modal.style.display = 'none';
+                if (e.target === modal) window.UiDialog.close(modal);
             });
         });
 

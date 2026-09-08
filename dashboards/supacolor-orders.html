@@ -7,12 +7,13 @@
     <title>Supacolor API Orders - Local Mirror</title>
     <link rel="icon" href="/favicon.png" type="image/png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&amp;display=swap">
     <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/shared_components/css/art-hub.css?v=2026.09.07.19">
-    <link rel="stylesheet" href="/dashboards/css/bradley-transfers.css?v=2026.09.07.19">
-    <link rel="stylesheet" href="/dashboards/css/supacolor-orders.css?v=2026.09.07.19">
+    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.08.5">
+    <link rel="stylesheet" href="/dashboards/css/bradley-transfers.css?v=2026.09.08.5">
+    <link rel="stylesheet" href="/dashboards/css/supacolor-orders.css?v=2026.09.08.5">
 </head>
-<body>
+<body data-ui="unified" data-surface="staff" data-department="bradley" data-density="comfortable">
     <div class="minimal-header">
         <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
              alt="Northwest Custom Apparel" class="logo">
@@ -156,7 +157,7 @@
 
                 <div id="sc-extract-status" class="sc-extract-status" role="status" hidden></div>
 
-                <div id="sc-extract-results" class="sc-extract-results" hidden></div>
+                <div id="sc-extract-results" class="sc-extract-results" tabindex="0" role="region" aria-label="Extracted order rows" hidden></div>
 
                 <div class="bt-form-actions">
                     <button type="button" class="bt-btn bt-btn--secondary" id="sc-backfill-cancel">Cancel</button>
@@ -171,7 +172,8 @@
     <!-- Toast container -->
     <div id="sc-toast-container" class="bt-toast-container" role="status" aria-live="polite"></div>
 
+    <script src="/shared_components/js/ui-dialog.js?v=2026.09.08.5"></script>
     <script src="/config/app.config.js"></script>
-    <script src="/dashboards/js/supacolor-orders.js?v=2026.09.06.31"></script>
+    <script src="/dashboards/js/supacolor-orders.js?v=2026.09.08.5"></script>
 </body>
 </html>

@@ -176,6 +176,36 @@ test.describe('SCP money path (Batch 2.1)', () => {
 });
 
 test.describe('DTG money path (Batch 2.1)', () => {
+    test('pending or failed pricing blocks every save write and shows the reason', async ({ page }) => {
+        const captured = await mockWrites(page, 'DTG');
+        let release;
+        const pricingGate = new Promise(resolve => { release = resolve; });
+        let requests = 0;
+        await page.route('**/api/dtg/product-bundle?**', async route => {
+            requests++;
+            await pricingGate;
+            await route.fulfill({ status: 503, json: { error: 'Fixture pricing unavailable' } });
+        });
+        await page.goto('/quote-builders/dtg-quote-builder.html');
+        await page.waitForFunction(() => window.DTGInlineForm?.previewStyle);
+        await page.evaluate(() => window.DTGInlineForm.previewStyle({ style: 'PC54', color: 'Athletic Heather' }));
+        const qty = page.locator('input[type="number"][data-row-id][data-size="M"]').first();
+        await qty.fill('24'); await qty.dispatchEvent('change');
+        await expect.poll(() => requests).toBeGreaterThan(0);
+        try {
+            await page.evaluate(() => window.dtgSaveQuote());
+            await expect(page.locator('#shareToastText')).toContainText(/pricing.*loading|pricing.*changed/i);
+            await expect(page.locator('#dtgSaveBtn')).toBeDisabled();
+            expect(captured.sessions).toEqual([]);
+            expect(captured.items).toEqual([]);
+        } finally { release(); }
+        await expect(page.locator('#dtg-price-error-banner')).toBeVisible({ timeout: 15000 });
+        await page.evaluate(() => window.dtgSaveQuote());
+        await expect(page.locator('#shareToastText')).toContainText(/every product|pricing.*loading/i);
+        expect(captured.sessions).toEqual([]);
+        expect(captured.items).toEqual([]);
+    });
+
     test('catalog previewStyle → size grid → live prices → save posts REAL money', async ({ page }) => {
         const captured = await mockWrites(page, 'DTG');
         await page.goto('/quote-builders/dtg-quote-builder.html');
@@ -186,12 +216,15 @@ test.describe('DTG money path (Batch 2.1)', () => {
             window.DTGInlineForm.previewStyle({ style: 'PC54', desc: 'Core Cotton Tee', color: 'Athletic Heather' });
         });
 
-        // Size grid renders once the live bundle lands; type a real quantity.
+        // The grid can appear before pricing finishes; type a real quantity.
         const qtyInput = page.locator('input[type="number"][data-row-id][data-size="M"]').first();
         await qtyInput.waitFor({ state: 'visible', timeout: 30000 });
         await qtyInput.fill('24');
         await qtyInput.dispatchEvent('change');
-        await page.waitForTimeout(6000); // live pricing (bundle + updateLivePrices)
+        await expect.poll(() => page.evaluate(() => window.DTGInlineForm.hasCompleteRows()), {
+            timeout: 60000, message: 'DTG live pricing did not become ready',
+        }).toBe(true);
+        await expect(page.locator('#dtgSaveBtn')).toBeEnabled();
 
         // Save straight off the form (the #dtgSaveBtn/aiSaveQuoteBtn path).
         await page.evaluate(() => window.dtgSaveQuote());
@@ -202,7 +235,11 @@ test.describe('DTG money path (Batch 2.1)', () => {
         const session = captured.sessions[0];
         expect(String(session.QuoteID)).toMatch(/^DTG/);
         expect(parseFloat(session.TotalAmount)).toBeGreaterThan(0); // DTG TotalAmount is PRE-tax by contract
-        expect(captured.items.length).toBeGreaterThan(0);
+        // Session and item routes are observed separately; assert the completed item write too.
+        await expect.poll(() => captured.items.length, { timeout: 30000, message: 'DTG quote_items POST never fired' }).toBeGreaterThan(0);
+        expect(captured.items[0].QuoteID).toBe(session.QuoteID);
+        expect(Number(captured.items[0].Quantity)).toBe(24);
+        expect(Number(captured.items[0].LineTotal)).toBeGreaterThan(0);
     });
 });
 

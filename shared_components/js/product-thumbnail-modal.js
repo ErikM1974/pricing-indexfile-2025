@@ -20,6 +20,23 @@ class ProductThumbnailModal {
         this.isOpen = false;
     }
 
+    _usesUnifiedUI() { return document.body.dataset.ui === 'unified' && Boolean(window.UiDialog); }
+
+    _setDisplay(node, display) {
+        if (this._usesUnifiedUI()) { node.hidden = display === 'none'; node.style.removeProperty('display'); }
+        else node.style.display = display;
+    }
+
+    _focusAndLock() {
+        if (this._usesUnifiedUI()) {
+            window.UiDialog.open(this.modalElement, { onDismiss: () => this.close() });
+        } else {
+            document.body.style.overflow = 'hidden';
+            const button = this.modalElement.querySelector('.product-image-modal-close');
+            if (button) setTimeout(() => { if (this.isOpen) button.focus(); }, 100);
+        }
+    }
+
     /**
      * Escape a string for safe HTML insertion.
      */
@@ -65,7 +82,8 @@ class ProductThumbnailModal {
                      class="product-image-modal-image"
                      src=""
                      alt="Product image"
-                     onerror="this.style.display='none'">
+                     >
+                <p class="product-image-unavailable" role="status" hidden>Image could not be loaded. Close the preview and try again.</p>
                 <div class="product-image-modal-details">
                     <h3 id="modal-product-title"></h3>
                     <div id="modal-product-legacy-details">
@@ -84,6 +102,15 @@ class ProductThumbnailModal {
         `;
         document.body.appendChild(modal);
         this.modalElement = modal;
+        if (this._usesUnifiedUI()) {
+            modal.querySelectorAll('[style]').forEach(node => {
+                if (node.style.display === 'none') this._setDisplay(node, 'none');
+            });
+        }
+        const preview = modal.querySelector('#modal-product-img');
+        const unavailable = modal.querySelector('.product-image-unavailable');
+        preview.addEventListener('error', () => { this._setDisplay(preview, 'none'); unavailable.hidden = false; });
+        preview.addEventListener('load', () => { this._setDisplay(preview, 'block'); unavailable.hidden = true; });
 
         // Delegated close handling (replaces old inline onclick="...")
         // — survives cases where window.productThumbnailModal was reassigned or renamed.
@@ -125,7 +152,8 @@ class ProductThumbnailModal {
         const actionsEl = document.getElementById('modal-product-actions');
 
         // Set image - show element and set src
-        imgEl.style.display = 'block';
+        this._setDisplay(imgEl, 'block');
+        this.modalElement.querySelector('.product-image-unavailable').hidden = true;
         imgEl.src = imageUrl || '';
         imgEl.alt = title || style || 'Product image';
 
@@ -135,22 +163,15 @@ class ProductThumbnailModal {
         colorEl.textContent = color || '-';
 
         // Show legacy layout, hide generic meta + actions
-        if (legacyEl) legacyEl.style.display = '';
-        if (metaEl) metaEl.style.display = 'none';
-        if (actionsEl) actionsEl.style.display = 'none';
+        if (legacyEl) this._setDisplay(legacyEl, '');
+        if (metaEl) this._setDisplay(metaEl, 'none');
+        if (actionsEl) this._setDisplay(actionsEl, 'none');
 
         // Show modal
         this.modalElement.classList.remove('hidden');
         this.isOpen = true;
 
-        // Prevent body scroll
-        document.body.style.overflow = 'hidden';
-
-        // Focus the close button for accessibility
-        const closeBtn = this.modalElement.querySelector('.product-image-modal-close');
-        if (closeBtn) {
-            setTimeout(() => closeBtn.focus(), 100);
-        }
+        this._focusAndLock();
     }
 
     /**
@@ -189,7 +210,8 @@ class ProductThumbnailModal {
         const dlEl = document.getElementById('modal-product-download');
 
         // Image
-        imgEl.style.display = 'block';
+        this._setDisplay(imgEl, 'block');
+        this.modalElement.querySelector('.product-image-unavailable').hidden = true;
         imgEl.src = opts.imageUrl || '';
         imgEl.alt = opts.title || 'Image';
 
@@ -197,9 +219,9 @@ class ProductThumbnailModal {
         titleEl.textContent = opts.title || '';
 
         // Meta lines (hide legacy Style/Color, show generic list)
-        if (legacyEl) legacyEl.style.display = 'none';
+        if (legacyEl) this._setDisplay(legacyEl, 'none');
         if (metaEl) {
-            metaEl.style.display = '';
+            this._setDisplay(metaEl, '');
             const metaLines = Array.isArray(opts.metaLines) ? opts.metaLines : [];
             metaEl.innerHTML = metaLines
                 .filter(m => m && m.value != null && m.value !== '')
@@ -211,20 +233,17 @@ class ProductThumbnailModal {
 
         // Download button (optional)
         if (opts.downloadUrl && actionsEl && dlEl) {
-            actionsEl.style.display = '';
+            this._setDisplay(actionsEl, '');
             dlEl.href = opts.downloadUrl; // fallback for browsers where the onclick fails
             dlEl.onclick = (e) => this.downloadImage(e, opts.downloadUrl, opts.downloadFilename);
         } else if (actionsEl) {
-            actionsEl.style.display = 'none';
+            this._setDisplay(actionsEl, 'none');
         }
 
         // Show modal
         this.modalElement.classList.remove('hidden');
         this.isOpen = true;
-        document.body.style.overflow = 'hidden';
-
-        const closeBtn = this.modalElement.querySelector('.product-image-modal-close');
-        if (closeBtn) setTimeout(() => closeBtn.focus(), 100);
+        this._focusAndLock();
     }
 
     /**
@@ -244,7 +263,7 @@ class ProductThumbnailModal {
             const a = document.createElement('a');
             a.href = objUrl;
             a.download = filename || 'image.jpg';
-            a.style.display = 'none';
+            a.hidden = true;
             document.body.appendChild(a);
             a.click();
             setTimeout(() => {
@@ -266,7 +285,8 @@ class ProductThumbnailModal {
             this.modalElement.classList.add('hidden');
         }
         this.isOpen = false;
-        document.body.style.overflow = '';
+        if (this._usesUnifiedUI()) window.UiDialog.close(this.modalElement);
+        else document.body.style.overflow = '';
     }
 }
 
