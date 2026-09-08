@@ -1,402 +1,158 @@
-/* shopworks-embroidery-order-type.css — page styles (extracted from inline \3c style>, 2026.09.05.11) */
+/* Embroidery order-type examples. Reading/navigation/print: training-guide.css. */
+@layer components.pages {
+    :where([data-ui="unified"].training-embroidery) .effective-date {
+        display: inline-block;
+        margin-block-start: var(--space-4);
+        color: var(--ui-muted);
+        font-size: var(--font-size-md);
+    }
 
-/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue so the page
-   keeps its exact look. Map them to shared_components/css/tokens.css names when the page is redesigned;
-   every rule below uses var(). Raw hex is allowed ONLY in this block. */
-/* stylelint-disable color-no-hex */
-:root {
-    --page-blue: #1e3c72;
-    --page-cyan: #2196f3;
-    --page-blue-2: #2a5298;
-    --page-blue-3: #667eea;
-    --page-indigo: #764ba2;
-    --page-gray-dark: #333;
-    --page-cyan-2: #1976d2;
-    --page-violet: #9c27b0;
-    --page-green-2: #2e7d32;
-    --page-yellow-3: #ffd700;
+    :where([data-ui="unified"].training-embroidery) .card-header {
+        display: flex;
+        align-items: baseline;
+        gap: var(--space-4);
+    }
+
+    :where([data-ui="unified"].training-embroidery) .card-number {
+        font-size: var(--font-size-2xl);
+        font-weight: var(--font-weight-semibold);
+        color: var(--ui-accent);
+    }
+
+    :where([data-ui="unified"].training-embroidery) .examples-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: var(--space-5);
+        margin-block: var(--space-5);
+    }
+
+    :where([data-ui="unified"].training-embroidery) .example-card {
+        padding: var(--space-4);
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-sm);
+    }
+
+    :where([data-ui="unified"].training-embroidery) .example-card h3 {
+        margin-block-start: 0;
+    }
+
+    :where([data-ui="unified"].training-embroidery) .order-items ul {
+        list-style: none;
+        padding: 0;
+    }
+
+    :where([data-ui="unified"].training-embroidery) .order-items li {
+        padding-block: var(--space-2);
+    }
+
+    :where([data-ui="unified"].training-embroidery) .pricing-method {
+        margin-block-start: var(--space-4);
+        padding: var(--space-4);
+        background: var(--emerald-100);
+        color: var(--emerald-800);
+        border-inline-start: 3px solid var(--emerald-800);
+    }
+
+    :where([data-ui="unified"].training-embroidery) .pricing-method.is-incorrect {
+        background: var(--red-50);
+        color: var(--red-800);
+        border-color: var(--red-800);
+    }
+
+    :where([data-ui="unified"].training-embroidery) .price-group {
+        display: flex;
+        align-items: baseline;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: var(--space-2);
+        margin-block-start: var(--space-3);
+        padding-block: var(--space-3);
+        border-block-start: 1px solid currentcolor;
+    }
+
+    :where([data-ui="unified"].training-embroidery) :is(.quantity, .price-break, .new-text, .yes) {
+        color: var(--emerald-800);
+        font-weight: var(--font-weight-semibold);
+    }
+
+    :where([data-ui="unified"].training-embroidery) :is(.removed-text, .no, .incorrect-text) {
+        color: var(--red-800);
+        font-weight: var(--font-weight-semibold);
+    }
+
+    :where([data-ui="unified"].training-embroidery) .removed-text {
+        text-decoration: line-through;
+    }
+
+    :where([data-ui="unified"].training-embroidery) .beanie-rule {
+        margin-block-start: var(--space-5);
+        padding: var(--space-5);
+        background: var(--ui-tint);
+        border-inline-start: 3px solid var(--ui-accent);
+    }
+
+    :where([data-ui="unified"].training-embroidery) .beanie-rule h3 {
+        margin-block-start: 0;
+    }
+
+    :where([data-ui="unified"].training-embroidery) .beanie-hint {
+        display: block;
+        margin-block-start: var(--space-4);
+        font-weight: var(--font-weight-medium);
+    }
+
+    :where([data-ui="unified"].training-embroidery) .scenario-example {
+        margin-block-start: var(--space-6);
+        padding: var(--space-5);
+        background: var(--gray-50);
+    }
+
+    :where([data-ui="unified"].training-embroidery) .scenario-example h3 {
+        margin-block-start: 0;
+    }
+
+    :where([data-ui="unified"].training-embroidery) .scenario-group {
+        display: block;
+        padding: var(--space-3);
+        margin-block: var(--space-3);
+        border-inline-start: 3px solid var(--ui-line-strong);
+        background: var(--ui-surface);
+    }
+
+    @media (width <= 768px) {
+        :where([data-ui="unified"].training-embroidery) .examples-grid {
+            grid-template-columns: minmax(0, 1fr);
+        }
+    }
+
+    @media print {
+        :where([data-ui="unified"].training-embroidery)
+            :is(.examples-grid, .beanie-rule, .scenario-example) {
+            break-inside: avoid;
+        }
+
+        :where([data-ui="unified"].training-embroidery)
+            :is(.example-card, .pricing-method, .beanie-rule, .scenario-example) {
+            padding: 8pt;
+            margin-block: 8pt;
+        }
+
+        :where([data-ui="unified"].training-embroidery) :is(.price-group, .scenario-group) {
+            padding-block: 5pt;
+            margin-block: 5pt;
+        }
+
+        :where([data-ui="unified"].training-embroidery) .examples-grid {
+            gap: 10pt;
+            margin-block: 10pt;
+        }
+
+        :where([data-ui="unified"].training-embroidery) .order-items li {
+            padding-block: 3pt;
+        }
+
+        :where([data-ui="unified"].training-embroidery) .beanie-hint {
+            margin-block-start: 8pt;
+        }
+    }
 }
-/* stylelint-enable color-no-hex */
-
-/* ── moved from inline \3c style> in training/shopworks-embroidery-order-type.html (Rule 3, 2026.09.05.11) ── */
-* {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: linear-gradient(135deg, var(--page-blue) 0%, var(--page-blue-2) 100%);
-            min-height: 100vh;
-            line-height: 1.6;
-        }
-
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        /* Header Section */
-        .header {
-            background: white;
-            border-radius: 20px;
-            padding: 40px;
-            margin-bottom: 30px;
-            box-shadow: 0 20px 40px rgb(0 0 0 / 10%);
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 5px;
-            background: linear-gradient(90deg, var(--brand-500), var(--page-cyan), var(--page-violet));
-        }
-
-        .header h1 {
-            color: var(--page-blue);
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            font-weight: 700;
-        }
-
-        .effective-date {
-            display: inline-block;
-            background: var(--brand-500);
-            color: white;
-            padding: 8px 20px;
-            border-radius: 25px;
-            font-weight: 600;
-            margin-top: 15px;
-            font-size: 1.1em;
-        }
-
-        /* Alert Box */
-        .alert-box {
-            background: var(--amber-100);
-            border: 2px solid var(--bs-warning);
-            border-radius: 15px;
-            padding: 25px;
-            margin-bottom: 30px;
-            position: relative;
-            box-shadow: 0 10px 30px rgb(255 193 7 / 20%);
-        }
-
-        .alert-box::before {
-            content: '⚠️';
-            position: absolute;
-            top: -15px;
-            left: 30px;
-            background: white;
-            padding: 0 10px;
-            font-size: 2em;
-        }
-
-        .alert-box h2 {
-            color: var(--bs-warning-ink);
-            margin-bottom: 15px;
-            font-size: 1.5em;
-        }
-
-        .removed-text {
-            color: var(--bs-danger);
-            font-weight: bold;
-            text-decoration: line-through;
-        }
-
-        .new-text {
-            color: var(--bs-success);
-            font-weight: bold;
-        }
-
-        /* Main Content Cards */
-        .card {
-            background: white;
-            border-radius: 15px;
-            padding: 30px;
-            margin-bottom: 25px;
-            box-shadow: 0 10px 30px rgb(0 0 0 / 10%);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 40px rgb(0 0 0 / 15%);
-        }
-
-        .card-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 3px solid var(--gray-100);
-        }
-
-        .card-number {
-            background: linear-gradient(135deg, var(--page-blue-3) 0%, var(--page-indigo) 100%);
-            color: white;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 1.3em;
-            margin-right: 15px;
-        }
-
-        .card-title {
-            flex: 1;
-        }
-
-        .card-title h2 {
-            color: var(--page-gray-dark);
-            font-size: 1.6em;
-            margin: 0;
-        }
-
-        .card-content {
-            color: var(--print-ink-soft);
-            font-size: 1.1em;
-        }
-
-        .highlight-box {
-            background: var(--gray-50);
-            border-left: 5px solid var(--page-cyan);
-            padding: 20px;
-            margin: 20px 0;
-            border-radius: 8px;
-        }
-
-        .highlight-box strong {
-            color: var(--page-cyan-2);
-        }
-
-        /* Examples Section */
-        .examples-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
-        }
-
-        .example-card {
-            background: linear-gradient(135deg, var(--color-bradley-tint) 0%, var(--gray-300) 100%);
-            padding: 20px;
-            border-radius: 12px;
-            border: 2px solid transparent;
-            transition: all 0.3s ease;
-        }
-
-        .example-card:hover {
-            border-color: var(--page-cyan);
-            transform: scale(1.02);
-        }
-
-        .example-card h3 {
-            color: var(--page-blue);
-            margin-bottom: 15px;
-            font-size: 1.2em;
-            display: flex;
-            align-items: center;
-        }
-
-        .example-card h3 .icon {
-            margin-right: 10px;
-            font-size: 1.5em;
-        }
-
-        .order-items {
-            background: white;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-        }
-
-        .order-items ul {
-            list-style: none;
-            padding: 0;
-        }
-
-        .order-items li {
-            padding: 8px 0;
-            border-bottom: 1px solid var(--brand-100);
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .order-items li:last-child {
-            border-bottom: none;
-        }
-
-        .pricing-method {
-            background: var(--brand-100);
-            padding: 15px;
-            border-radius: 8px;
-            border: 2px solid var(--brand-500);
-        }
-
-        .pricing-method h4 {
-            color: var(--page-green-2);
-            margin-bottom: 10px;
-        }
-
-        .price-group {
-            background: white;
-            padding: 10px;
-            margin: 8px 0;
-            border-radius: 5px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .price-group .quantity {
-            font-weight: bold;
-            color: var(--page-cyan-2);
-        }
-
-        .price-group .price-break {
-            color: var(--brand-500);
-            font-weight: 600;
-        }
-
-        /* Special Note */
-        .special-note {
-            background: linear-gradient(135deg, var(--page-blue-3) 0%, var(--page-indigo) 100%);
-            color: white;
-            padding: 30px;
-            border-radius: 15px;
-            margin-top: 30px;
-            text-align: center;
-            box-shadow: 0 10px 30px rgb(102 126 234 / 30%);
-        }
-
-        .special-note h2 {
-            margin-bottom: 20px;
-            font-size: 1.8em;
-        }
-
-        .special-note .beanie-rule {
-            background: rgb(255 255 255 / 20%);
-            padding: 20px;
-            border-radius: 10px;
-            margin-top: 20px;
-            backdrop-filter: blur(10px);
-        }
-
-        .special-note .beanie-rule h3 {
-            color: var(--page-yellow-3);
-            margin-bottom: 10px;
-            font-size: 1.4em;
-        }
-
-        /* Quick Reference Table */
-        .reference-table {
-            background: white;
-            border-radius: 15px;
-            padding: 30px;
-            margin-top: 30px;
-            box-shadow: 0 10px 30px rgb(0 0 0 / 10%);
-        }
-
-        .reference-table h2 {
-            color: var(--page-gray-dark);
-            margin-bottom: 20px;
-            text-align: center;
-            font-size: 1.8em;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-
-        th {
-            background: linear-gradient(135deg, var(--page-blue) 0%, var(--page-blue-2) 100%);
-            color: white;
-            padding: 15px;
-            text-align: left;
-            font-weight: 600;
-        }
-
-        td {
-            padding: 15px;
-            border-bottom: 1px solid var(--brand-100);
-        }
-
-        tr:hover {
-            background: var(--gray-50);
-        }
-
-        .yes {
-            color: var(--brand-500);
-            font-weight: bold;
-        }
-
-        .no {
-            color: var(--bs-danger);
-            font-weight: bold;
-        }
-
-        .note {
-            color: var(--bs-warning);
-            font-weight: bold;
-        }
-
-        /* Responsive Design */
-        @media (width <= 768px) {
-            .header h1 {
-                font-size: 1.8em;
-            }
-            
-            .card {
-                padding: 20px;
-            }
-            
-            .examples-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            table {
-                font-size: 0.9em;
-            }
-            
-            th, td {
-                padding: 10px;
-            }
-
-            .nav-container {
-                flex-wrap: wrap;
-                gap: 1rem;
-            }
-
-            .page-title {
-                font-size: 1.25rem;
-            }
-        }
-
-        /* Print Styles */
-        @media print {
-            body {
-                background: white;
-            }
-            
-            .nav-header {
-                display: none;
-            }
-            
-            .card, .alert-box, .reference-table {
-                box-shadow: none;
-                border: 1px solid var(--gray-300);
-            }
-        }

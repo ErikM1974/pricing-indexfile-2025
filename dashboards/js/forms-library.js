@@ -17,6 +17,7 @@
         'Customer Intake': 'fa-clipboard-user',
         'Payments': 'fa-credit-card',
         'Employee / HR': 'fa-id-badge',
+        'New Employee': 'fa-user-plus',
         'Supplies & Production': 'fa-boxes-stacked'
     };
     var DEFAULT_ICON = 'fa-file-lines';

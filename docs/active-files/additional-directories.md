@@ -93,3 +93,9 @@ These directories contain code but aren't enumerated at file level — list grow
 | `/vendor-portals/` | Vendor integrations | ✅ Active | External vendor access |
 
 [Back to the registry index](../../ACTIVE_FILES.md)
+
+### New employee PDF forms (2026-09-08)
+
+- `forms/direct-deposit-authorization.pdf`: blank one-page printable direct deposit form, added in fe794c6f.
+- `forms/new-hire-information-sheet.pdf`: blank one-page printable new hire information sheet, added in fe794c6f.
+- `dashboards/js/forms-library.js`: maps the New Employee library category to its staff icon.

@@ -84,7 +84,9 @@ jobs:
       - name: Rendered axe ratchet (no secret needed)
         run: npx playwright test --config tests/e2e/playwright.config.js a11y
       - name: Unified CSS and staff relay browser checks (mocked services)
-        run: npx playwright test --config tests/e2e/playwright.config.js css-unification transfer-auth
+        # These specs isolate service calls and writes per browser context; 74 cases passed
+        # locally with three workers in 156.8 seconds. Keep live pricing below serial.
+        run: npm run test:css
       - name: Money path + calculator parity (live engine — needs CRM_API_SECRET)
         if: ${{ env.CRM_API_SECRET != '' }}
         run: npx playwright test --config tests/e2e/playwright.config.js money-path calculator-parity
