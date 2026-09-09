@@ -439,3 +439,9 @@ Family CSS graphs: dashboards/caspio-api-reference.html: 173804 → 73142 bytes 
 ### API integration guard update
 
 The first full unit run found five legacy admin-reference assertions tied to per-page important visibility guards and the old ODBC Retry id. Updated that existing guard to require the loaded unified components visibility owner, no page important rules, and the native Retry listener. The 17 real-browser cases already cover layout, disclosure and retry. Full regression rerun follows; no production change yet.
+
+## API reference family ready for exact-source CI — 2026-09-08
+
+Full integrated release checks passed on ecd150e5: 209 unit suites / 5,079 tests (four existing skips), 88 DOM, four a11y unit, 84 quote parity, 230 mocked browser cases and 16 remaining browser cases (three optional screenshot skips), including all five live calculator comparisons and EMB/CAP additional-logo tiers. Build/lint/types, 295-file local CSS scope and actual HTTP boot pass; 485 routes / 24 modules unchanged. All 17 reference browser cases and final paper checks are included. .16 remains production until exact-source CI and actual release verification finish.
+
+Meanwhile the separate training-final-worktree now uses codex/policy-reference-family (base ecd150e5; plan commit 96b2364f). Its uncommitted task work is the next four pages: policy migration tracker, pricing-negotiation guide, Resources and Sale. Baseline and desktop/phone review saved; shared-layout rewrite applied, but controls/tests/complete review remain. Do not reset it or claim those pages are ready/live. Candidate after that next group: 68 / 157; this API group alone is 64 / 161. Policy CMS/editor/handbook are a later shared family.
