@@ -1,67 +1,69 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
+<!DOCTYPE html><html lang="en"><head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex, nofollow">
   <title>Access Admin — Northwest Custom Apparel</title>
   <link rel="icon" href="/favicon.png" type="image/png">
-  <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-  <link href="/dashboards/css/access-admin.css?v=2026.09.07.19" rel="stylesheet">
+
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&amp;display=swap"><link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.09.11">
+<link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.09.11">
+<link rel="stylesheet" href="/shared_components/css/staff-admin-tools.css?v=2026.09.09.11">
 </head>
-<body>
-  <main class="aa-wrap">
+<body data-ui="unified" data-staff-tools="access" data-department="neutral"><a class="skip-link" href="#staff-tool-main">Skip to Access Admin</a>
+  <main class="aa-wrap page-main" id="staff-tool-main" tabindex="-1" aria-labelledby="staff-tool-title">
     <header class="aa-header">
       <div>
-        <h1>Access Admin</h1>
+        <h1 id="staff-tool-title">Access Admin</h1>
         <p class="aa-sub">Manage staff roles and which pages they can see. Changes apply on the person's next page load — no deploy.</p>
       </div>
-      <a class="aa-back" href="/staff-dashboard.html">← Dashboard</a>
+      <a class="aa-back btn btn-secondary" href="/staff-dashboard.html">← Dashboard</a>
     </header>
 
     <div id="aa-status" class="aa-status" role="status" aria-live="polite"></div>
 
-    <nav class="aa-tabs">
-      <button class="aa-tab is-active" data-panel="roles" type="button">Staff Roles</button>
-      <button class="aa-tab" data-panel="pages" type="button">Page Access</button>
+    <nav class="aa-tabs" aria-label="Administrative views">
+      <button class="aa-tab is-active btn btn-secondary" data-panel="roles" type="button" aria-pressed="true">Staff Roles</button>
+      <button class="aa-tab btn btn-secondary" data-panel="pages" type="button" aria-pressed="false">Page Access</button>
     </nav>
 
     <!-- ROLES -->
-    <section id="panel-roles" class="aa-panel is-active">
+    <section id="panel-roles" class="aa-panel is-active card">
       <div class="aa-panel-head">
         <h2>Staff Roles</h2>
         <p>What each person can do across the app. <strong>admin</strong> = everything (incl. financials); <strong>accountant</strong> = finance; <strong>sales / art / shipping / production</strong> = their area; <strong>staff</strong> = basic.</p>
       </div>
-      <table class="aa-table">
-        <thead><tr><th>Email</th><th>Role</th><th class="aa-actions">Actions</th></tr></thead>
+      <div class="table-wrap" tabindex="0" role="region" aria-label="Staff Roles table"><table class="aa-table data-table">
+        <thead><tr><th scope="col">Email</th><th scope="col">Role</th><th class="aa-actions" scope="col">Actions</th></tr></thead>
         <tbody id="roles-body"><tr><td colspan="3" class="aa-loading">Loading…</td></tr></tbody>
-      </table>
+      </table></div>
       <div class="aa-add">
-        <input id="new-role-email" type="email" aria-label="New staff email" placeholder="new.person@nwcustomapparel.com" autocomplete="off">
-        <select id="new-role-role" aria-label="Role for the new staff member"></select>
-        <button id="add-role-btn" type="button" class="aa-btn">Add / Update</button>
+        <input id="new-role-email" type="email" aria-label="New staff email" placeholder="new.person@nwcustomapparel.com" autocomplete="off" class="field-input">
+        <select id="new-role-role" aria-label="Role for the new staff member" class="field-select"></select>
+        <button id="add-role-btn" type="button" class="aa-btn btn btn-primary">Add / Update</button>
       </div>
     </section>
 
     <!-- PAGES -->
-    <section id="panel-pages" class="aa-panel">
+    <section id="panel-pages" class="aa-panel card">
       <div class="aa-panel-head">
         <h2>Page Access</h2>
         <p>Only the pages listed here are restricted. <strong>Any page not listed is visible to all logged-in staff.</strong> A person gets in if their role is in <em>Allowed Roles</em> OR their email is in <em>Allowed Emails</em>. (Admins always have access.)</p>
       </div>
-      <table class="aa-table aa-table-pages">
-        <thead><tr><th>Page</th><th>Allowed Roles</th><th>Allowed Emails</th><th>Note</th><th class="aa-actions">Actions</th></tr></thead>
+      <div class="table-wrap" tabindex="0" role="region" aria-label="Page Access table"><table class="aa-table aa-table-pages data-table">
+        <thead><tr><th scope="col">Page</th><th scope="col">Allowed Roles</th><th scope="col">Allowed Emails</th><th scope="col">Note</th><th class="aa-actions" scope="col">Actions</th></tr></thead>
         <tbody id="pages-body"><tr><td colspan="5" class="aa-loading">Loading…</td></tr></tbody>
-      </table>
+      </table></div>
       <div class="aa-add aa-add-page">
-        <input id="new-page-name" aria-label="Page file name" type="text" placeholder="some-dashboard.html">
-        <input id="new-page-roles" aria-label="Allowed roles" type="text" placeholder="roles: admin,accountant">
-        <input id="new-page-emails" aria-label="Allowed emails" type="text" placeholder="emails: bradley@…,erik@…">
-        <input id="new-page-desc" aria-label="Description" type="text" placeholder="note (optional)">
-        <button id="add-page-btn" type="button" class="aa-btn">Add Rule</button>
+        <input id="new-page-name" aria-label="Page file name" type="text" placeholder="some-dashboard.html" class="field-input">
+        <input id="new-page-roles" aria-label="Allowed roles" type="text" placeholder="roles: admin,accountant" class="field-input">
+        <input id="new-page-emails" aria-label="Allowed emails" type="text" placeholder="emails: bradley@…,erik@…" class="field-input">
+        <input id="new-page-desc" aria-label="Description" type="text" placeholder="note (optional)" class="field-input">
+        <button id="add-page-btn" type="button" class="aa-btn btn btn-primary">Add Rule</button>
       </div>
     </section>
   </main>
-  <script src="/dashboards/js/access-admin.js?v=2026.09.05.72"></script>
-</body>
-</html>
+  <script src="/dashboards/js/access-admin.js?v=2026.09.09.11"></script>
+
+
+</body></html>

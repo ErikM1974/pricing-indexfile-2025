@@ -242,9 +242,9 @@
             var previewUrl = hasId ? ('/portal-admin/preview/' + c.customerId) : '';
             var totalItems = c.mockupCount + c.artCount;
 
-            html += '<div class="pd-card" data-company="' + escapeAttr(c.displayName.toLowerCase()) + '">'
+            html += '<div class="card pd-card" data-company="' + escapeAttr(c.displayName.toLowerCase()) + '">'
                 + '<div class="pd-card-header">'
-                + '<h3 class="pd-card-company">' + escapeHtml(c.displayName) + '</h3>'
+                + '<h2 class="pd-card-company">' + escapeHtml(c.displayName) + '</h2>'
                 + '<span class="pd-dot ' + dotClass + '" role="img" title="' + escapeAttr(dotTitle) + '" aria-label="Last activity ' + escapeAttr(dotTitle) + '"></span>'
                 + '</div>'
 
@@ -262,14 +262,14 @@
                 + '<div class="pd-card-actions">';
 
             if (hasId) {
-                html += '<button type="button" class="pd-btn-copy" data-call="_pdCopy" data-args="' + escapeAttr(JSON.stringify([c.customerId, '$this'])) + '" title="Copy the customer-facing portal link" aria-label="Copy portal link for ' + escapeAttr(c.displayName) + '">'
+                html += '<button type="button" class="btn btn-secondary pd-btn-copy" data-call="_pdCopy" data-args="' + escapeAttr(JSON.stringify([c.customerId, '$this'])) + '" title="Copy the customer-facing portal link" aria-label="Copy portal link for ' + escapeAttr(c.displayName) + '">'
                     + '<i class="fas fa-copy" aria-hidden="true"></i> Copy Link</button>'
-                    + '<a class="pd-btn-open" href="' + escapeAttr(previewUrl) + '" target="_blank" rel="noopener" title="Preview their portal (read-only staff view)" aria-label="Preview portal for ' + escapeAttr(c.displayName) + '">'
+                    + '<a class="btn btn-primary pd-btn-open" href="' + escapeAttr(previewUrl) + '" target="_blank" rel="noopener" title="Preview their portal (read-only staff view)" aria-label="Preview portal for ' + escapeAttr(c.displayName) + '">'
                     + '<i class="fas fa-eye" aria-hidden="true"></i> Preview</a>';
             } else {
-                html += '<button type="button" class="pd-btn-copy" disabled title="No customer ID on file">'
+                html += '<button type="button" class="btn btn-secondary pd-btn-copy" disabled title="No customer ID on file">'
                     + '<i class="fas fa-copy" aria-hidden="true"></i> No ID</button>'
-                    + '<span class="pd-btn-open is-disabled" aria-disabled="true">'
+                    + '<span class="btn btn-primary pd-btn-open is-disabled" aria-disabled="true">'
                     + '<i class="fas fa-eye" aria-hidden="true"></i> Preview</span>';
             }
 

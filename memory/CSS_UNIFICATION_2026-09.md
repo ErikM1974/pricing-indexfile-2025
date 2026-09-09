@@ -776,3 +776,30 @@ Tested source7b8f8f3bd0ca5256f3426cf9f94be51ee61ef8a9. Build/lint/types,485 rout
 ## Nine-page release record — v2026.09.09.10
 
 Exact-source CI 34379198691 passed all four jobs on8fffd4a65741675e823d0ba9eacaa9ab29deab70, including actual money/calculator comparisons and full mocked browser checks. Nine intake/hosted staff pages use canonical controls and shared arrangements; eight old sheets retired. Original nine controller sources and provider IDs retained. Public lookup and age-warning contrast corrected; browser fixture boundaries and clocks deterministic. Full suite5232 passed,456mocked browser,16remaining browser and all five calculator surfaces;485routes unchanged. Candidate126reviewed/99pending becomes live only after actual rollout verification. Unreleased .8/.9 plans consolidated here.
+
+## Staff access and portal tools plan — 2026-09-09
+
+Next isolated branch codex/staff-admin-tools based on7b8f8f3bd0ca5256f3426cf9f94be51ee61ef8a9: dashboards/access-admin.html, drive-access.html and portal-directory.html. Source/controller/route/content/field contracts captured before changes. Primary nine-page release .10 runs separately; this plan is not part of that release.
+
+Use Public Sans, canonical fields/buttons/cards and a shared scoped staff tools arrangement. Administrative access/drive pages use neutral ink; retain the portal directory's navy identity with existing tokens rather than AE maroon. White content surfaces, consistent left-aligned headings and clear table/card reading order. Keep drive rights visibly distinct with written Modify/Read only/Full control labels, retired-account warnings, and existing mapped-versus-permitted explanations. Customer portal counts and Preview/Copy Link destinations remain unchanged.
+
+- [ ] Capture synthetic original desktop/phone states; no actual roles, file permissions, customer data or clipboard writes.
+- [ ] Migrate page arrangements; preserve source contracts and only adjust UI class hooks/accessibility semantics as needed. Canonical primitives stay in components.css.
+- [ ] Test original admin role/page payloads with writes mocked, failure/draft retention and cancelled removal; data stays behind the existing server gates. Drive mapping remains read-only with per-person rights and both views preserved.
+- [ ] Verify portal grouping/counts/sort/search, missing IDs, failed feeds, clipboard failure fallback and staff-preview/customer-link distinction; retain date behavior.
+- [ ] Four widths/axe/keyboard and complete reference/data-fixture paper; register reviewed owners and retire obsolete CSS only after final consumers move.
+- [ ] Full local checks, exact-source CI and verified deployment after .10. No staff-tools pages count as reviewed yet.
+
+## Staff access/portal implementation in progress — 2026-09-09
+
+Staff access/portal migration in progress: shared_components/css/staff-admin-tools.css replaces dashboards/css/access-admin.css, drive-access.css and portal-directory.css after their final consumers move. Canonical buttons/fields/cards/tables, named keyboard table scrolling and skip links. Three controllers differ only through explicitly recorded presentation-class and heading/pressed-state replacements; permission payloads, drive rights and portal links unchanged. Full state/content/paper review pending; no added reviewed pages.
+
+### Staff tools review in progress — 2026-09-09
+
+Three layouts implemented in isolated codex/staff-admin-tools.15 focused browser cases passed after labeling the empty drive summary as a group. Permission writes/removal confirmations and drive rights/portal destinations mocked and retained. Paper review found clipped native table values/placeholder ambiguity and excessive drive whitespace; current-value print mirrors and scoped compact print arrangements under review. No new pages counted reviewed/live yet. Source hash guards reverse only explicit presentation changes.
+
+## Staff tools local review complete — 2026-09-09
+
+Staff access and portal tools: dashboards/access-admin.html, dashboards/drive-access.html and dashboards/portal-directory.html share canonical tokens/components and shared_components/css/staff-admin-tools.css. Their three obsolete local CSS owners are retired. Neutral admin/drive and CRM ink preserved.15 focused browser cases cover four widths/zero axe, keyboard views, mocked permissions/save failure/retry/removal confirmation, separate drive rights, denied/malformed data, portal counts/search/sort/clipboard fallback and distinct staff-preview/customer URLs. Three reference PDFs/four pages preserve65 checked text/value nodes, including long wrapping permissions; all visually reviewed. Current-value print mirrors are removed after printing and never change editable data. Original controller hashes restored by reversing only explicit presentation mappings.29 source/hygiene unit checks and290-file CSS lint pass. No actual permission or clipboard writes, business actions or messages. Shared raw CSS graph grows; no byte-reduction claim.
+
+129 pages reviewed locally/96 pending; production count remains tied to the actual verified release. Nine-page .10 release in primary is separate. This isolated candidate .11 still requires broader guards, full checks, exact-source CI and rollout.
