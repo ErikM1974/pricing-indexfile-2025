@@ -658,3 +658,7 @@ Next three shared-style consumers: Golf Tournament Apparel, its product detail, 
 - [ ] Rebuild shared campaign and product page arrangements, preserve content and financial behavior, register changed owners immediately.
 - [ ] Four widths/axe/keyboard/photo viewer/filter/gallery/form failure and success with all real business writes and email blocked; compare complete PDF content.
 - [ ] Full primary release checks, exact-source CI and verified deployment after catalog discovery. Candidate 2026.09.09.5; live count remains 110/115 until catalog verification, then112/113. Only verified three-page rollout would become115/110.
+
+## Campaign storefront implementation in progress — 2026-09-09
+
+Original screenshots captured for three golf/safety pages. Shared campaign-storefront.css replaces the oversized golf-tournament-showcase owner; product detail retains a scoped arrangement. Canonical controls and semantic colors applied; original page storytelling/photos/prose retained. New shared controller replaces the old custom photo overlay with a native dialog, fragment focus and reversible full-FAQ printing. Pricing/email/quote code is unchanged apart from class/style attributes; two underlying services byte-locked. Generated inline style declarations extracted into named page classes. Original-content fixture and financial/controller guards registered. Not reviewed/deployable: responsive/contrast/dialog/form/error/full-paper tests and complete primary release gates remain. Candidate .5, separate from catalog .4 release.
