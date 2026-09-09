@@ -719,3 +719,43 @@ Original four-page desktop/phone screenshots captured with hosted forms mocked. 
 Customer intake: public request-a-quote and three hosted staff forms use canonical tokens/components/Public Sans with one scoped customer-intake.css owner; public fields retain their own arrangement. Digitizing follows Ruth purple, monogram follows shop-floor blue, purchasing follows Bradley slate. Four old CSS owners retired after their final consumers migrated. Seven existing controller sources remain unchanged; complete original prose/fields/images/vendor URLs locked.14 focused browser cases,11 original-contract checks, four widths/zero axe, navigation, blocked embeds and keyboard fallback, public validation/prefill/calendar/lookup/upload/save failures and retained draft retry checked with all business writes and hosted content mocked. Four one-page reference PDFs retain74 checked text nodes; vendor form contents stay external and are not printed from the wrapper. Raw CSS graph grows with shared primitives/scoping; no network byte-reduction claim. Full release gates remain.
 
 Candidate2026.09.09.8. Isolated codex/customer-intake; instant2 .7 exact-source CI still running separately.121 total pages reviewed locally after this four-page batch; live115 remains until actual deployments are verified (.7 becomes117/108, intake .8 becomes121/104). Complete primary release gates/exact-source CI/actual slug and asset verification still required.
+
+## Vendor portal wrapper plan — 2026-09-09
+
+Next isolated batch: vendor-portals/sanmar-vendor-portal.html, sanmar-invoices.html and sanmar-credits.html. Branch codex/vendor-portals based on d7c91600f85993eb4d0d45471ff0c0fc4356b3b7. Two nearly identical WSU-themed sheets duplicate their navigation/heading/card arrangements. Original complete wrapper prose, links/images and Caspio DataPage embed URLs captured in vendor-portals-original-baseline.json. Use canonical chrome and Bradley purchasing color, preserve exact embedded invoice/credit apps and every financial behavior. Caspio-rendered form/table content remains external; test the boundary with synthetic login/table/empty/failed states and block all real vendor writes. No invoice or credit transactions during review.
+
+- [ ] Capture original desktop/phone and read-only hosted entry availability.
+- [ ] Consolidate wrapper CSS, accessible navigation/table scrolling and persistent hosted fallback; register lifecycle.
+- [ ] Four widths/axe, keyboard/empty/error boundaries, original embed contracts and complete reference/data-fixture print review.
+- [ ] Full primary gates/exact-source CI/actual deployment after intake4 .8. Vendor3 not reviewed or counted yet.
+
+## Vendor portal wrappers implementation in progress — 2026-09-09
+
+Three original desktop/phone views captured with synthetic Caspio reports; both hosted DataPage entry URLs respond200. Canonical navigation, Bradley accent and one scoped arrangement replace duplicated WSU styles. Exact invoice/credit embed URLs unchanged; persistent hosted fallback links, named keyboard-scroll regions and paper destinations added. Vendor-owned controls and data are not rewritten. Four-width/axe, external login/report/empty/error boundary and full synthetic paper review still required. Candidate .9, isolated from intake .8 running primary gates.
+
+## Vendor portal local review complete — 2026-09-09
+
+SanMar vendor portal wrappers: three pages use canonical navigation/typography/Bradley purchasing accents and one scoped sanmar-portal-shared.css owner; the duplicate sanmar-vendor-portal.css is retired. Original invoice/credit Caspio app URLs and wrapper content remain unchanged.12 focused browser cases cover four widths, zero wrapper axe, native focus/keyboard scrolling, mocked login/empty/failure states and complete synthetic report printing; three landscape PDFs retain216 checked nodes. All provider writes blocked. Provider-owned UI styling/data remains explicitly separate; the runtime census now recognizes Jotform alongside Caspio and the external-owner backlog names all six reviewed hosted wrappers. Full release gates remain; no raw-CSS byte reduction claim.
+
+Candidate2026.09.09.9; isolated codex/vendor-portals. Three source contracts passed; broader CSS/runtime guards next.124 total local reviewed pages, but live117/108 remains until intake .8 and then vendor .9 are separately verified. Vendor release would become124/101. Do not merge vendor work into intake .8.
+
+## Hosted staff tools grouped plan — 2026-09-09
+
+Group reviewed vendor3 with the two announcement wrappers on codex/hosted-staff-tools, based on9a3191a65a8f7975ea33a54caed24a95399b045e. Their external Caspio forms/reports share the same page boundary, so consolidate the vendor arrangement into shared_components/css/hosted-workspace.css and use it for all five. This replaces two duplicate announcement sheets and the vendor-local arrangement; canonical tokens/components remain the sole control/navigation owners. Preserve exact provider IDs, all original wrapper prose/links/images and both announcement controller sources. Business data and access rules stay unchanged; all actual hosted submissions blocked in review.
+
+Design: Public Sans, white surfaces on the existing neutral canvas (#ffffff/#f3f4f6), dark ink (#1f2937), strong dividing lines (#d1d5db), semantic Bradley slate on vendor pages and existing AE burgundy on announcements. Left-aligned page heading, clear Create/Manage navigation, one hosted content area with permanent fallback and optional instructions. No repeated decorative cards around instructions. Native skip links, loading text, bounded keyboard-scroll region, and paper destinations. Apply the established application direction rather than adding another palette or control system.
+
+- [ ] Capture original two-page desktop/phone state and exact hosted/controller contracts.
+- [ ] Consolidate the five hosted page arrangements; register additions/deletions immediately.
+- [ ] Four widths/axe/keyboard/loading/failed/login/form/report/empty states and complete reference paper with provider writes blocked.
+- [ ] Update coverage/counts only after review; full primary gates, exact-source CI and verified grouped release after intake .8.
+
+## Hosted workspace implementation in progress — 2026-09-09
+
+Hosted staff tools migration: shared_components/css/hosted-workspace.css now owns five Caspio wrappers (SanMar vendor/invoices/credits and announcement create/manage), using canonical tokens/components. Retired admin/css/announcements-create.css, admin/css/announcements-manage.css and vendor-portals/css/sanmar-portal-shared.css after their final consumers moved. Exact provider URLs and announcement controllers preserved; native skip links, loading labels and permanent hosted fallback added. Five-page review pending.
+
+## Hosted staff tools local browser review — 2026-09-09
+
+Hosted staff tools: five Caspio page wrappers (SanMar vendor/invoices/credits, announcement create/manage) share shared_components/css/hosted-workspace.css with canonical tokens/components. Vendor-local and two announcement sheets retired; the earlier duplicate sanmar-vendor-portal.css is also retired. Bradley/AE ownership colors preserved. Exact provider IDs and both announcement controller sources retained.20 focused browser cases cover four widths/zero wrapper axe, native skip/navigation/scrolling, loading/failure/fallback and synthetic login/form/report/empty boundaries; five landscape reference PDFs retain258 text nodes, every page visually reviewed. Provider-owned controls and data remain separate unfinished work. Seven original source contracts passed; broader inventory guards and full release gates remain. Raw CSS graph grows with scoped shared primitives; no network-byte reduction claim.
+
+This five-page group supersedes the vendor-only .9 plan.126 pages reviewed locally/99pending, but live remains117/108 until intake .8 rollout (121/104), then this verified group would126/99. Never count branch review as live. Candidate2026.09.09.9; full checks/exact-source CI/rollout required.

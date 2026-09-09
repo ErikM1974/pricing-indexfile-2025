@@ -165,7 +165,7 @@ const surfaces = files.filter(f => f.endsWith('.html')).map(file => {
     const directRoutes = routes.filter(r => r.targets.includes(file));
     const [kind, exception] = classification(file, directRoutes);
     const pilot = reviewed.get(file);
-    const embeds = [...document.querySelectorAll('iframe[src],script[src]')].map(el => el.getAttribute('src')).filter(url => /^https?:\/\//.test(url) && /caspio|youtube|vimeo|inksoft/.test(url));
+    const embeds = [...document.querySelectorAll('iframe[src],script[src]')].map(el => el.getAttribute('src')).filter(url => /^https?:\/\//.test(url) && /caspio|jotform\.com|youtube|vimeo|inksoft/.test(url));
     const record = {
         source: file, kind, family: pilot?.family || family(file, directStyles),
         status: pilot ? 'verified-migration' : kind === 'application' || kind === 'served-archive' ? 'pending' : 'exception',

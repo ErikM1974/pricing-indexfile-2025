@@ -1,0 +1,81 @@
+{
+  "base": "9a3191a65a8f7975ea33a54caed24a95399b045e",
+  "pages": [
+    {
+      "file": "admin/announcements-create.html",
+      "title": "Create Announcement - Northwest Custom Apparel",
+      "mainText": "Create Announcement Post a new announcement for the team New Announcement",
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "label": "Back to Dashboard"
+        },
+        {
+          "href": "/announcements-create.html",
+          "label": "Create"
+        },
+        {
+          "href": "/announcements-manage.html",
+          "label": "Manage"
+        }
+      ],
+      "images": [
+        {
+          "src": "https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1",
+          "alt": "Northwest Custom Apparel"
+        }
+      ],
+      "scripts": [
+        "https://c3eku948.caspio.com/dp/a0e150008551501faaf64d18aef3/emb",
+        "/admin/js/announcements-create-page.js?v=2026.09.06.30"
+      ],
+      "styles": [
+        "shared_components/css/tokens.css",
+        "admin/css/announcements-create.css"
+      ],
+      "cssBytes": 19898
+    },
+    {
+      "file": "admin/announcements-manage.html",
+      "title": "Manage Announcements - Northwest Custom Apparel",
+      "mainText": "Manage Announcements View, edit, and delete announcements All Announcements New Announcement Quick Tips • Click on any announcement to edit its details • Use the search box to find specific announcements • Sort by clicking column headers • Delete announcements using the action buttons",
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "label": "Back to Dashboard"
+        },
+        {
+          "href": "/announcements-create.html",
+          "label": "Create"
+        },
+        {
+          "href": "/announcements-manage.html",
+          "label": "Manage"
+        },
+        {
+          "href": "/announcements-create.html",
+          "label": "New Announcement"
+        }
+      ],
+      "images": [
+        {
+          "src": "https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1",
+          "alt": "Northwest Custom Apparel"
+        }
+      ],
+      "scripts": [
+        "https://c3eku948.caspio.com/dp/a0e1500007b4ed22d47344c4a974/emb",
+        "/admin/js/announcements-manage-page.js?v=2026.09.06.30"
+      ],
+      "styles": [
+        "shared_components/css/tokens.css",
+        "admin/css/announcements-manage.css"
+      ],
+      "cssBytes": 20934
+    }
+  ],
+  "controllers": {
+    "admin/js/announcements-create-page.js": "2da9c4c66a1500df39132a36e36cd02df59b08737099d0d1671e6abfdae0e390",
+    "admin/js/announcements-manage-page.js": "1a975864aad61d1e8fcf76f0995367105198037a8c209b04ad9e1eec4043b14c"
+  }
+}

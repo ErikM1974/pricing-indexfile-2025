@@ -118,14 +118,6 @@ with Erik's explicit approval; verify the live-engine step actually runs on the 
 **Prevention.** Audit the resolved tree after updating: a green install is not a clean audit. Preserve CRLF in
 these two already-CRLF-tracked package files to avoid hiding the dependency diff. Major upgrades stay separate.
 
-## 2026-09-07 — Major SDK upgrades need contract checks
-
-**Problem:** Rate-limit option spelling broke a text lock; Stripe22 types rejected the intentionally retained API version.
-**Root cause:** The quota test matched source text, and Stripe generated types describe only its newest API contract.
-**Solution:** Evaluate limiter options semantically; preserve 2025-10-29.clover through one shared Stripe factory,
-with the documented narrow type exception. HTTP tests verify quotas, IPv6 grouping, API headers and signed webhook dispatch.
-**Prevention:** Run contract tests before and after each major upgrade; a dependency PR passing CI alone is insufficient.
-
 ## Tooling upgrades and visual verification (2026-09-07, archived)
 
 Keep version choices tied to measured checks and compare screenshots only after readiness. Full entry in LESSONS_LEARNED_ARCHIVE.md.
@@ -254,3 +246,7 @@ Problem: consolidating repeated .stk-card selectors moved desktop grid placement
 ## Paper-like form layouts need a separate phone arrangement (2026-09-09)
 
 Problem: the quote request inherited line-oriented paper styling that pushed the project textarea beyond the phone viewport. Root cause: its legacy field row and width rules survived in an online customer form. Solution: canonical vertical fields and bounded grid columns; shared hosted-form wrappers, native keyboard upload and explicit page landmark names. Prevention: check actual control bounds at320/390/768/1440, source-lock serialization and lookup/upload helpers, exercise blocked embeds and retained draft retries, inspect every reference-PDF page. The lookup helper floats popups only on printable forms; anchor the public form menu absolutely to its input and assert its coordinates, not just visibility. Keep mock routes installed across fixture-state transitions: removing them between navigations can allow in-flight requests to reach a live API. Keep department colors tied to ownership: monogram is shop-floor blue, digitizing Ruth purple, purchasing Bradley slate.
+
+## A reviewed page wrapper is not a reviewed external app (2026-09-09)
+
+Problem: the CSS census omitted Jotform scripts and its external-owner backlog named only three Caspio pages. Root cause: provider recognition did not match the currently loaded embeds. Solution: recognize Jotform and explicitly retain vendor-owned UI as pending even after its surrounding page is reviewed. Prevention: lock live embed IDs/URLs, test wrapper boundaries with login/table/empty/failure fixtures and block all real provider writes; do not describe synthetic fixture coverage as validation of a vendor app.

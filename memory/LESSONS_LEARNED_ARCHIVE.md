@@ -4047,3 +4047,12 @@ Storefront and sample webhooks continued after a rejected Payment Confirmed writ
 - Solution: assign the message; no-unused-labels is now an error.
 - Prevention: test returned stock status and customer message together for available, low-stock and unavailable inventory.
 
+
+## 2026-09-07 — Major SDK upgrades need contract checks
+
+**Problem:** Rate-limit option spelling broke a text lock; Stripe22 types rejected the intentionally retained API version.
+**Root cause:** The quota test matched source text, and Stripe generated types describe only its newest API contract.
+**Solution:** Evaluate limiter options semantically; preserve 2025-10-29.clover through one shared Stripe factory,
+with the documented narrow type exception. HTTP tests verify quotas, IPv6 grouping, API headers and signed webhook dispatch.
+**Prevention:** Run contract tests before and after each major upgrade; a dependency PR passing CI alone is insufficient.
+
