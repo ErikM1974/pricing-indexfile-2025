@@ -22,10 +22,11 @@
     <link rel="icon" href="/favicon.ico" sizes="48x48">
     <link rel="icon" href="/favicon.png" type="image/png" sizes="48x48">
 
-    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/shared_components/css/nwca-2026-core.css?v=2026.09.07.8">
-    <link rel="stylesheet" href="/pages/css/custom-carhartt.css?v=2026.09.07.8">
+    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.09.1">
+    <link rel="stylesheet" href="/shared_components/css/storefront-shell.css?v=2026.09.09.1">
+    <link rel="stylesheet" href="/pages/css/brand-guide.css?v=2026.09.09.1">
 
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://www.teamnwca.com/"},{"@type":"ListItem","position":2,"name":"Custom Sport-Tek","item":"https://www.teamnwca.com/custom-sport-tek"}]}</script>
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"CollectionPage","name":"Custom Sport-Tek Apparel — Team & Performance Wear","url":"https://www.teamnwca.com/custom-sport-tek","description":"Sport-Tek moisture-wicking polos, Competitor tees, and Sport-Wick 1/4-zips decorated with your logo by Northwest Custom Apparel in Milton, WA.","mainEntity":{"@type":"ItemList","itemListElement":[
@@ -50,7 +51,7 @@
         {"@type":"Question","name":"Is there a minimum order?","acceptedAnswer":{"@type":"Answer","text":"Pricing is sharpest at two dozen and up, where most team and spirit-wear orders land. Smaller runs carry a small-batch fee that's quoted up front. Every quote shows the real number before anything goes to production."}}
     ]}</script>
 </head>
-<body>
+<body data-ui="unified" data-storefront="brand">
     <a class="skip-link" href="#main">Skip to content</a>
 
     <div class="util-strip">
@@ -92,7 +93,7 @@
         </div>
     </header>
 
-    <aside class="sidebar" id="sidebar" aria-label="Browse menu">
+    <dialog class="sidebar" id="sidebar" aria-label="Browse menu">
         <div class="drawer-head">
             <span class="drawer-head-title">Browse NWCA</span>
             <button class="drawer-close" id="drawerClose" type="button" aria-label="Close menu">
@@ -117,10 +118,9 @@
             <a href="tel:253-922-5793">253-922-5793</a>
             <a href="mailto:sales@nwcustomapparel.com">sales@nwcustomapparel.com</a>
         </div>
-    </aside>
-    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    </dialog>
 
-    <main id="main">
+    <main id="main" tabindex="-1">
         <!-- Hero -->
         <section class="cch-hero">
             <div class="wrap cch-hero-grid">
@@ -132,8 +132,8 @@
                     decorate it in-house in Milton, WA, and we've put logos on <strong>25,000+ Sport-Tek pieces across 3,000+
                     orders</strong> for Northwest schools, leagues, and crews.</p>
                     <div class="cch-hero-ctas">
-                        <a class="btn btn-cta" href="/pages/request-a-quote.html">Get a Sport-Tek quote</a>
-                        <a class="btn btn-ghost" href="/product.html?style=ST650">See the ST650 polo</a>
+                        <a class="btn btn-primary" href="/pages/request-a-quote.html">Get a Sport-Tek quote</a>
+                        <a class="btn btn-secondary" href="/product.html?style=ST650">See the ST650 polo</a>
                     </div>
                     <ul class="cch-ticks">
                         <li>✓ Embroidery, screen print &amp; DTF in-house</li>
@@ -343,8 +343,8 @@
                 <h2>Kit your team in custom Sport-Tek</h2>
                 <p>Send your logo and a roster count — we'll recommend embroidery, screen print, or DTF and price it today.</p>
                 <div class="cch-hero-ctas">
-                    <a class="btn btn-hero" href="/pages/request-a-quote.html">Get a Sport-Tek quote</a>
-                    <a class="btn btn-ghost cch-cta-ghost" href="tel:253-922-5793">Or call 253-922-5793</a>
+                    <a class="btn btn-primary" href="/pages/request-a-quote.html">Get a Sport-Tek quote</a>
+                    <a class="btn btn-secondary" href="tel:253-922-5793">Or call 253-922-5793</a>
                 </div>
             </div>
         </section>
@@ -392,6 +392,6 @@
         </div>
     </footer>
 
-    <script src="/pages/js/custom-carhartt.js?v=2026.08.26.5" defer></script>
+    <script src="/pages/js/brand-guide.js?v=2026.09.09.1" defer></script>
 </body>
 </html>
