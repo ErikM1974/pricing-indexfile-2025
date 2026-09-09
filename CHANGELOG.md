@@ -1,3 +1,11 @@
+## v2026.09.09.14 (2026.09.09)
+
+- Plan finished-photo and design-library family review
+- Record verified purchasing release and photo checkpoint
+- Unify photo capture and library controls with honest failure states
+- Integrate reviewed photo workspaces and failure states
+- Deploy v2026.09.09.14: unify photo capture and library workspaces
+
 ## v2026.09.09.13 (2026.09.09)
 
 - Plan purchasing and payables workspace review

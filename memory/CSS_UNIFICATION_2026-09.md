@@ -973,3 +973,7 @@ Preserved the .13 live checkpoint and all append-only photo evidence. The initia
 ## Photo release checks complete — v2026.09.09.14
 
 Tested source 694e88c7e04f18797427d8f4d81207ddf9c679e2: build/lint/types,485routes/24modules,226unit suites/5279passed/four existing skips,88DOM,four accessibility unit,84quote parity,551mocked browser,16remaining browser/three optional screenshot skips,all five calculators. 287CSS clean,boot200,production audit zero.22focused photo cases; two PDFs/three pages/28visible blocks. One shared owner and both controllers versioned2026.09.09.14 across capture/library/harness. Canonical native controls, preserved compression/payload helpers, unknown photo counts and visible publication errors; old requests cannot replace current customers/previews. Two old sheets retired. Live remains136/89 until verified138/87 after exact-source CI and rollout.
+
+## Photo release record — v2026.09.09.14
+
+Exact-source CI 34400870432 passed all four jobs on 30b900e8159597072738cf3fb2f373d30106b656, including actual money/calculator parity and551mocked browser checks. Photo capture/library share controls and dialogs with native camera/album inputs.22focused interaction cases and two PDFs/three pages/28visible blocks; exact image compression/upload metadata and malformed/failed/late photo states checked using synthetic data only.485routes unchanged. Count becomes138reviewed/87pending only after verified rollout.
