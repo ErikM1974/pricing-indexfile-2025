@@ -649,3 +649,7 @@ Brand directory and Fall catalog share canonical controls/cards and storefront n
 ## Catalog discovery integration — 2026-09-09
 
 Reviewed commit a29c40992536519b55ee313c307d29c263c33d5e integrated after verified entry/status release 2082. Only appended memory notes conflicted; both histories and latest live checkpoint retained. All application changes merged directly; prior commission serialization fix retained. Next full primary release checks. Live 110 reviewed/115 pending stays authoritative until verified catalog rollout.
+
+## Catalog discovery release checks complete — 2026-09-09
+
+Brand directory and Fall catalog tested at 03c7ec49ca597b40ce0346497ec812737954180e. Completed: 216 unit suites/5182 passed/four existing skips; 88 DOM, 4 accessibility unit, 84 quote parity; 389 mocked browser (887.5s), 16 remaining browser and3 optional skips; all5 live calculator surfaces. Build/lint/types/298 CSS/HTTP boot; 485 routes/24 modules unchanged. Shared navigation moved unchanged across17 consumers; all179 curated products,21 brands and10 categories retained. 48 focused browser cases,229 focused units,7 PDFs/292 checked blocks. Candidate v2026.09.09.4, 23 changed references versioned. Exact-source CI and actual deployment pending; live remains110 reviewed/115 pending. Next isolated codex/campaign-storefront contains three golf/safety pages in progress, not part of this release.
