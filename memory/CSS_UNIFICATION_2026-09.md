@@ -493,3 +493,12 @@ Paper review verifies every selected synthetic block (101 in total): hub/detail/
 Bug fixes: use resolved staff identity for comments before guarded legacy storage; fail closed on missing content sanitizer or editor; load parent options after policy mode resolves; preserve text after ordinary handbook dividers; synchronize chart search visibility and expanded state; show unknown question count instead of a false zero; escape AI error toast text.
 
 Measured raw local CSS graphs: pages/policies-hub.html 51709 → 99945 bytes; pages/policy-detail.html 138235 → 209120 bytes; pages/policy-questions.html 51709 → 99945 bytes; pages/handbook.html 65652 → 112698 bytes. These are source bytes, not network transfers; the shared component graph adds bytes to lighter pages and reduces repeated control ownership across the application. Full primary gates, exact-source CI and verified .19 release remain. Live remains .18 /68 reviewed /157 pending; candidate72 is not yet live.
+
+## Webstore public family plan — 2026-09-08
+
+Worktree codex/webstore-family starts from the reviewed CMS commit 32cd5e640c9a304f1cf4f1f1650efdb7d12553bb; CMS full release gates continue in primary. Live still .18 /68 reviewed until the actual .19 verification. Baseline metadata, policy/offer prose, headings, destinations, images, structured data and CSS graphs for all 12 public webstore marketing pages are saved in webstore-original-baseline.json. No business writes.
+
+- [x] Inventory the twelve consumers of company-webstores.css: company, college, construction, event, fundraising, government, industrial, property-management, restaurant, retail, school-spirit and team. All currently borrow golf-tournament-showcase.css.
+- [ ] Give the family its own shared scoped public layout in company-webstores.css, using app tokens/components/Public Sans; remove its borrowed golf stylesheet and duplicated control ownership. Preserve all copy, offer terms, imagery, SEO metadata/structured data and inquiry destinations.
+- [ ] Review desktop/tablet/phones, native navigation/FAQ/links, contrast and print; lock original content and register family ownership. These pages have no business-service controller.
+- [ ] Pass full release checks and exact-source CI, then verify actual deployment after CMS. Candidate would be 84 of225 reviewed /141 pending. Do not claim live from a local manifest.
