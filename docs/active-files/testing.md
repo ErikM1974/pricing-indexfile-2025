@@ -152,3 +152,5 @@ Staff admin source contracts: tests/fixtures/staff-admin-original-content.json a
 
 - tests/e2e/css-unification-staff-admin.spec.js — Synthetic staff roles, drive access and portal behavior, responsive/accessibility/print review; all writes mocked.
 - tests/fixtures/staff-admin-review-data.json — Synthetic staff admin browser fixtures; no real permission or account records.
+
+Staff monitoring review sources: tests/unit/staff-monitoring-content.test.js, tests/fixtures/staff-monitoring-original-content.json, tests/fixtures/staff-monitoring-review-data.json and tests/e2e/css-unification-staff-monitoring.spec.js. Synthetic API fixtures, preserved163-table snapshot/source hashes and explicit controller edits; all real business requests blocked.

@@ -23,8 +23,24 @@
 
     var LS_KEY = 'nwca_table_audit_review_v1';
     var review = {};
-    try { review = JSON.parse(localStorage.getItem(LS_KEY) || '{}') || {}; } catch (e) { review = {}; }
-    function saveReview() { try { localStorage.setItem(LS_KEY, JSON.stringify(review)); } catch (e) {} }
+    var reviewStorageFailed = false;
+    function reviewStorageError() {
+        reviewStorageFailed = true;
+        var banner = document.querySelector('.dash-error-banner');
+        var message = document.querySelector('.dash-error-banner-message');
+        if (message) message.textContent = 'Browser storage is unavailable. Your current edits stay on this page only; export your review before closing it.';
+        if (banner) banner.classList.add('show');
+    }
+    try {
+        review = JSON.parse(localStorage.getItem(LS_KEY) || '{}') || {};
+        if (typeof review !== 'object' || Array.isArray(review)) throw new Error('Invalid stored review');
+    } catch (e) { review = {}; reviewStorageError(); }
+    function saveReview() {
+        try {
+            localStorage.setItem(LS_KEY, JSON.stringify(review));
+            if (reviewStorageFailed) { reviewStorageFailed = false; DashPage.hideError(); }
+        } catch (e) { reviewStorageError(); }
+    }
     function rv(name) { return review[name] || {}; }
 
     // Live-refresh state. code/task are baked (repo-side, not browser-refreshable); a
@@ -33,6 +49,9 @@
     DATA.forEach(function (r) { r._code = r.u.indexOf('code') > -1; r._task = r.u.indexOf('task') > -1; });
 
     function applyLive(payload) {
+        if (!payload || payload.success !== true || !Array.isArray(payload.tables) || payload.count !== payload.tables.length || !Number.isFinite(Date.parse(payload.generatedAt)) || payload.tables.some(function (table) { return !table || typeof (table.n || table.name) !== 'string' || !(table.n || table.name).trim() || !Number.isInteger(table.fieldCount) || table.fieldCount < 0; })) throw new Error('Incomplete live schema');
+        var names = payload.tables.map(function (table) { return table.n || table.name; });
+        if (new Set(names).size !== names.length) throw new Error('Duplicate live tables');
         var info = {}, liveSet = {};
         (payload.tables || []).forEach(function (t) { info[t.n || t.name] = t; liveSet[t.n || t.name] = 1; });
         DATA.forEach(function (r) {
@@ -115,28 +134,28 @@
     function decideCell(r) {
         var cur = rv(r.n).dec || '';
         var opts = DECISIONS.map(function (d) { return '<option value="' + d + '"' + (d === cur ? ' selected' : '') + '>' + (d || '—') + '</option>'; }).join('');
-        return '<select aria-label="Decision" class="tua-decide d-' + esc(cur) + '" data-n="' + esc(r.n) + '">' + opts + '</select>';
+        return '<select aria-label="Decision" class="field-select tua-decide d-' + esc(cur) + '" data-n="' + esc(r.n) + '">' + opts + '</select>';
     }
 
     function render() {
         var rows = DATA.filter(matches).slice().sort(cmp);
         var head = '<thead><tr>' +
-            '<th class="no-sort" title="Mark reviewed">✓</th>' +
-            '<th data-sort="tier">Tier</th>' +
-            '<th data-sort="name">Table</th>' +
-            '<th data-sort="fields">#f</th>' +
-            '<th data-sort="created">Created</th>' +
-            '<th data-sort="code">code p/f/i</th>' +
-            '<th class="no-sort">used by</th>' +
-            '<th class="no-sort">flags</th>' +
-            '<th class="no-sort">decision</th>' +
-            '<th class="no-sort">notes</th>' +
-            (refreshed ? '<th class="no-sort">live</th>' : '') +
+            '<th scope="col" class="no-sort" title="Mark reviewed">✓</th>' +
+            '<th scope="col" data-sort="tier" aria-sort="' + (state.sort === 'tier' ? (state.dir === 1 ? 'ascending' : 'descending') : 'none') + '"><button type="button" class="btn btn-secondary table-sort">Tier</button></th>' +
+            '<th scope="col" data-sort="name" aria-sort="' + (state.sort === 'name' ? (state.dir === 1 ? 'ascending' : 'descending') : 'none') + '"><button type="button" class="btn btn-secondary table-sort">Table</button></th>' +
+            '<th scope="col" data-sort="fields" aria-sort="' + (state.sort === 'fields' ? (state.dir === 1 ? 'ascending' : 'descending') : 'none') + '"><button type="button" class="btn btn-secondary table-sort">#f</button></th>' +
+            '<th scope="col" data-sort="created" aria-sort="' + (state.sort === 'created' ? (state.dir === 1 ? 'ascending' : 'descending') : 'none') + '"><button type="button" class="btn btn-secondary table-sort">Created</button></th>' +
+            '<th scope="col" data-sort="code" aria-sort="' + (state.sort === 'code' ? (state.dir === 1 ? 'ascending' : 'descending') : 'none') + '"><button type="button" class="btn btn-secondary table-sort">code p/f/i</button></th>' +
+            '<th scope="col" class="no-sort">used by</th>' +
+            '<th scope="col" class="no-sort">flags</th>' +
+            '<th scope="col" class="no-sort">decision</th>' +
+            '<th scope="col" class="no-sort">notes</th>' +
+            (refreshed ? '<th scope="col" class="no-sort">live</th>' : '') +
             '</tr></thead>';
         var body = rows.map(function (r) {
             var st = rv(r.n);
             return '<tr class="' + (st.rev ? 'is-reviewed' : '') + '" data-n="' + esc(r.n) + '">' +
-                '<td><input type="checkbox" class="tua-rev" aria-label="Reviewed" data-n="' + esc(r.n) + '"' + (st.rev ? ' checked' : '') + '></td>' +
+                '<td><input type="checkbox" class="field-checkbox tua-rev" aria-label="Reviewed" data-n="' + esc(r.n) + '"' + (st.rev ? ' checked' : '') + '></td>' +
                 '<td>' + tierBadge(r) + '</td>' +
                 '<td class="tua-name">' + esc(r.n) + (r._new ? ' <span class="tua-flag flex">new</span>' : '') + '</td>' +
                 '<td>' + fieldCell(r) + '</td>' +
@@ -145,7 +164,7 @@
                 '<td>' + sigChips(r) + '</td>' +
                 '<td>' + flagChips(r) + '</td>' +
                 '<td>' + decideCell(r) + '</td>' +
-                '<td><input type="text" class="tua-note" aria-label="Note" data-n="' + esc(r.n) + '" value="' + esc(st.note || '') + '" placeholder="…"></td>' +
+                '<td><input type="text" class="field-input tua-note" aria-label="Note" data-n="' + esc(r.n) + '" value="' + esc(st.note || '') + '" placeholder="…"></td>' +
                 (refreshed ? '<td>' + liveCell(r) + '</td>' : '') +
                 '</tr>';
         }).join('');
@@ -167,7 +186,7 @@
         var n = e.target.getAttribute('data-n'); if (!n) return;
         var st = review[n] = review[n] || {};
         if (e.target.classList.contains('tua-rev')) { st.rev = e.target.checked; e.target.closest('tr').classList.toggle('is-reviewed', st.rev); refreshStats(); }
-        else if (e.target.classList.contains('tua-decide')) { st.dec = e.target.value; e.target.className = 'tua-decide d-' + st.dec; }
+        else if (e.target.classList.contains('tua-decide')) { st.dec = e.target.value; e.target.className = 'field-select tua-decide d-' + st.dec; }
         saveReview();
     });
     els.table.addEventListener('input', function (e) {
@@ -179,11 +198,13 @@
         var s = th.getAttribute('data-sort');
         if (state.sort === s) state.dir *= -1; else { state.sort = s; state.dir = 1; }
         render();
+        var activeSort = els.table.querySelector('th[data-sort="' + s + '"] button');
+        if (activeSort) activeSort.focus({ preventScroll: true });
     });
     els.filters.addEventListener('click', function (e) {
         var b = e.target.closest('.tua-chip'); if (!b) return;
         state.filter = b.getAttribute('data-filter');
-        Array.prototype.forEach.call(els.filters.children, function (c) { c.classList.toggle('is-active', c === b); });
+        Array.prototype.forEach.call(els.filters.children, function (c) { c.classList.toggle('is-active', c === b); c.setAttribute('aria-pressed', String(c === b)); });
         render();
     });
     els.search.addEventListener('input', function () { state.q = els.search.value.trim().toLowerCase(); render(); });
@@ -196,6 +217,7 @@
             .then(function (j) {
                 applyLive(j);
                 refreshStats(); render();
+                if (reviewStorageFailed) reviewStorageError(); else DashPage.hideError();
                 var gone = DATA.filter(function (r) { return r._exists === false; }).length;
                 var isnew = DATA.filter(function (r) { return r._new; }).length;
                 btn.disabled = false; btn.innerHTML = '<i class="fas fa-rotate" aria-hidden="true"></i> Refresh (live)';
@@ -209,6 +231,21 @@
                 btn.disabled = false; btn.innerHTML = '<i class="fas fa-rotate" aria-hidden="true"></i> Refresh (live)';
             });
     });
+
+    // Print editable values as text so long review notes are never clipped.
+    function clearPrintValues() {
+        document.querySelectorAll('.tua-print-value,.tua-print-reviewed').forEach(function (node) { node.remove(); });
+    }
+    window.addEventListener('beforeprint', function () {
+        clearPrintValues();
+        els.table.querySelectorAll('input,select').forEach(function (control) {
+            var text = document.createElement('span');
+            text.className = control.type === 'checkbox' ? 'tua-print-reviewed' : 'tua-print-value';
+            text.textContent = control.type === 'checkbox' ? (control.checked ? 'Reviewed' : 'Not reviewed') : (control.value || '—');
+            control.insertAdjacentElement('afterend', text);
+        });
+    });
+    window.addEventListener('afterprint', clearPrintValues);
 
     // ---- CSV export of the full audit + your review ----
     document.getElementById('tuaExport').addEventListener('click', function () {

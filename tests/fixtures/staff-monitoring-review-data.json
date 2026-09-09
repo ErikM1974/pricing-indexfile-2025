@@ -1,0 +1,64 @@
+{
+  "usage": {
+    "success": true,
+    "data": {
+      "mode": "rollup",
+      "projected": 420000,
+      "periodToDate": 160000,
+      "budgetPerDay": 16667,
+      "estimatedOverageUsd": 0,
+      "percentOfLimit": 84,
+      "alertAtPercent": 90,
+      "period": {
+        "startYmd": "2026-08-28",
+        "endYmd": "2026-09-27",
+        "daysElapsed": 13,
+        "daysInPeriod": 31
+      },
+      "rollupByDay": {
+        "2026-09-04": 21000,
+        "2026-09-05": 18000,
+        "2026-09-06": 13000,
+        "2026-09-07": 12000,
+        "2026-09-08": 14000
+      },
+      "trend": {
+        "trustedFrom": "2026-09-06"
+      }
+    }
+  },
+  "metrics": {
+    "success": true,
+    "data": {
+      "processUptimeHours": 3.5,
+      "callsByTable": [
+        {
+          "table": "Sample_Orders",
+          "count": 600
+        },
+        {
+          "table": "Sample_Catalog",
+          "count": 250
+        },
+        {
+          "table": "Sample_Inventory",
+          "count": 150
+        }
+      ],
+      "callsByEndpoint": [
+        {
+          "endpoint": "/tables/Sample_Orders/records",
+          "count": 600
+        },
+        {
+          "endpoint": "/tables/Sample_Catalog/records",
+          "count": 400
+        }
+      ],
+      "callsByMethod": {
+        "GET": 960,
+        "PUT": 40
+      }
+    }
+  }
+}

@@ -80,15 +80,9 @@ module", suspect the install, not the change — `npm ci` before debugging anyth
 
 Module moves change scope and relative paths; verify dependency bindings, route order and a real HTTP boot. Full resolved incident and prevention details are in LESSONS_LEARNED_ARCHIVE.md.
 
-## 2026-09-07 — Proxy review: contact and shipping authentication
-**Problem:** Customer-directory reads/updates and shipping reads were reachable without credentials.
-**Root cause:** Browser callers went directly to the proxy; shipping sync omitted the secret.
-**Solution:** Contact lookups now use staff-authenticated same-origin relays; server reads send
-withProxySecret(). Legacy cart CRUD is staff-only (the public cart was retired).
-**Prevention:** Test anonymous and authenticated calls at both layers. Deploy the app BEFORE
-proxy gates. Public forms retain manual entry; directory autocomplete requires staff login.
-Regression coverage: tests/unit/proxy-review-relays.test.js. The payroll relay also needs its 40 MB parser BEFORE the global 5 MB parser; moving it only before the forwarder does not work.
-Validation after v2026.09.07.24: full unit 4,695 passed / 4 skipped; fixture parity 84 passed; browser E2E 15 passed / 3 opt-in screenshot skips (includes all five calculator-parity checks). Route lock updated to 456 registrations. Commit tests/fixtures/server-route-table.json with the hardening and explicitly add tests/unit/proxy-review-relays.test.js.
+## Proxy review authentication (2026-09-07, archived)
+
+Keep caller migrations before proxy gates and authenticate before special parsers. Full resolved incident and regression details are in LESSONS_LEARNED_ARCHIVE.md.
 
 ## 2026-09-08 — CI was red for nine hours and nobody noticed, because every local gate was green
 
@@ -250,3 +244,7 @@ Problem: the quote request inherited line-oriented paper styling that pushed the
 ## A reviewed page wrapper is not a reviewed external app (2026-09-09)
 
 Problem: the CSS census omitted Jotform scripts and its external-owner backlog named only three Caspio pages. Root cause: provider recognition did not match the currently loaded embeds. Solution: recognize Jotform and explicitly retain vendor-owned UI as pending even after its surrounding page is reviewed. Prevention: lock live embed IDs/URLs, test wrapper boundaries with login/table/empty/failure fixtures and block all real provider writes; do not describe synthetic fixture coverage as validation of a vendor app. Check DESIGN_COLOUR_CODE before mapping an inherited palette: announcement admin tools are neutral; legacy maroon does not make them AE-owned.
+
+## Monitoring data needs complete responses and visible persistence failures (2026-09-09)
+
+Problem/root cause: malformed usage could appear as zero, partial schema could mark tables gone, and local review storage assumed every read/write succeeded. Solution: validate complete responses before rendering, preserve snapshot evidence and notes, distinguish unknown from zero, show export/retry paths and clear only recovered errors. Prevention: exercise malformed/partial/denied storage and successful recovery with synthetic records, preserve the original snapshot, and inspect current-value PDFs. Print long reports in block flow; inherited flex/min-height can create a blank trailing sheet even when PDF text is complete.
