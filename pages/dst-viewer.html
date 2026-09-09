@@ -1,17 +1,16 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
+<html lang="en"><head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex, nofollow">
 <title>DST Studio | NWCA</title>
 <link rel="icon" href="/favicon.png">
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&amp;family=Outfit:wght@300;400;500;600;700&amp;family=Public+Sans:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-<link rel="stylesheet" href="/pages/css/dst-viewer.css?v=2026.09.07.14">
+<link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.09.16"><link rel="stylesheet" href="/shared_components/css/embroidery-studio.css?v=2026.09.09.16">
 </head>
-<body>
+<body data-ui="unified" data-preview-tool="studio"><a href="#stageWrap" class="skip-link">Skip to stitch preview</a>
 
 <div class="studio-root">
 
@@ -20,42 +19,42 @@
       <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" alt="NWCA" class="brand-logo">
     </a>
     <div class="brand-title">
-      <span class="brand-name">DST Studio</span>
+      <h1 class="brand-name">DST Studio</h1>
       <span class="brand-sub">stitch viewer · true-scale mockups · production planner</span>
     </div>
 
     <button type="button" id="fileChip" class="file-chip" title="Click to replace the loaded file">
       <i class="fas fa-file-lines" aria-hidden="true"></i>
       <span class="file-chip-text">
-        <span id="fileChipName">No file loaded</span>
-        <span id="fileChipMeta">drop a .DST anywhere on this page</span>
+        <span id="fileChipName" class="dst-hook-filechipname">No file loaded</span>
+        <span id="fileChipMeta" class="dst-hook-filechipmeta">drop a .DST anywhere on this page</span>
       </span>
     </button>
 
     <div class="topbar-actions">
-      <button type="button" id="btnSample" class="tb-btn ghost needs-nofile"><i class="fas fa-wand-magic-sparkles" aria-hidden="true"></i> Sample</button>
-      <button type="button" id="btnCopySummary" class="tb-btn needs-file" title="Copy a production summary for ShopWorks or email"><i class="fas fa-copy" aria-hidden="true"></i> Summary</button>
-      <button type="button" id="btnExportDesign" class="tb-btn needs-file" title="Download the stitch render as a transparent PNG"><i class="fas fa-image" aria-hidden="true"></i> PNG</button>
-      <button type="button" id="btnPrintSheet" class="tb-btn accent needs-file"><i class="fas fa-file-signature" aria-hidden="true"></i> Approval Sheet</button>
-      <button type="button" id="btnNewFile" class="tb-btn ghost"><i class="fas fa-folder-open" aria-hidden="true"></i> Open</button>
+      <button type="button" id="btnSample" class="tb-btn ghost needs-nofile btn btn-secondary"><i class="fas fa-wand-magic-sparkles" aria-hidden="true"></i> Sample</button>
+      <button type="button" id="btnCopySummary" class="tb-btn needs-file btn btn-secondary" title="Copy a production summary for ShopWorks or email"><i class="fas fa-copy" aria-hidden="true"></i> Summary</button>
+      <button type="button" id="btnExportDesign" class="tb-btn needs-file btn btn-secondary" title="Download the stitch render as a transparent PNG"><i class="fas fa-image" aria-hidden="true"></i> PNG</button>
+      <button type="button" id="btnPrintSheet" class="tb-btn accent needs-file btn btn-primary"><i class="fas fa-file-signature" aria-hidden="true"></i> Approval Sheet</button>
+      <button type="button" id="btnNewFile" class="tb-btn ghost btn btn-secondary"><i class="fas fa-folder-open" aria-hidden="true"></i> Open</button>
       <!-- Mockup Generator link removed 2026-08-05 with that tool's retirement; the URL now 302s back here. -->
     </div>
-  </header>
+  <div class="dst-file-control"><label class="dst-file-label" for="fileInput">DST file</label><input type="file" id="fileInput" aria-label="DST file" accept=".dst" class="dst-native-file dst-hook-fileinput"></div></header>
 
   <div class="workbench">
 
     <nav class="toolrail" aria-label="View tools">
       <div class="rail-group">
         <span class="rail-label">View</span>
-        <button type="button" class="rail-btn active" data-mode="stitch" title="Realistic thread render (1)"><i class="fas fa-braille" aria-hidden="true"></i><span>Stitch</span></button>
-        <button type="button" class="rail-btn" data-mode="flat" title="Flat color lines (2)"><i class="fas fa-draw-polygon" aria-hidden="true"></i><span>Flat</span></button>
-        <button type="button" class="rail-btn" data-mode="wire" title="Structure + jumps (3)"><i class="fas fa-diagram-project" aria-hidden="true"></i><span>Wire</span></button>
-        <button type="button" class="rail-btn" data-mode="trace" title="Sew-order playback (4)"><i class="fas fa-circle-play" aria-hidden="true"></i><span>Trace</span></button>
+        <button type="button" class="rail-btn active" data-mode="stitch" title="Realistic thread render (1)" aria-pressed="true"><i class="fas fa-braille" aria-hidden="true"></i><span>Stitch</span></button>
+        <button type="button" class="rail-btn" data-mode="flat" title="Flat color lines (2)" aria-pressed="false"><i class="fas fa-draw-polygon" aria-hidden="true"></i><span>Flat</span></button>
+        <button type="button" class="rail-btn" data-mode="wire" title="Structure + jumps (3)" aria-pressed="false"><i class="fas fa-diagram-project" aria-hidden="true"></i><span>Wire</span></button>
+        <button type="button" class="rail-btn" data-mode="trace" title="Sew-order playback (4)" aria-pressed="false"><i class="fas fa-circle-play" aria-hidden="true"></i><span>Trace</span></button>
       </div>
       <div class="rail-group">
         <span class="rail-label">Overlay</span>
-        <button type="button" id="btnGrid" class="rail-btn active" title="mm grid (G)"><i class="fas fa-border-all" aria-hidden="true"></i><span>Grid</span></button>
-        <button type="button" id="btnDensity" class="rail-btn" title="Stitch density heatmap (D)"><i class="fas fa-fire" aria-hidden="true"></i><span>Density</span></button>
+        <button type="button" id="btnGrid" class="rail-btn active" title="mm grid (G)" aria-pressed="true"><i class="fas fa-border-all" aria-hidden="true"></i><span>Grid</span></button>
+        <button type="button" id="btnDensity" class="rail-btn" title="Stitch density heatmap (D)" aria-pressed="false"><i class="fas fa-fire" aria-hidden="true"></i><span>Density</span></button>
       </div>
       <div class="rail-group">
         <span class="rail-label">Zoom</span>
@@ -66,7 +65,7 @@
       </div>
       <div class="rail-group">
         <span class="rail-label">Mockup</span>
-        <button type="button" id="btnMockupMode" class="rail-btn tall" title="Place the design on a garment (M)"><i class="fas fa-shirt" aria-hidden="true"></i><span>On&nbsp;Garment</span></button>
+        <button type="button" id="btnMockupMode" class="rail-btn tall" title="Place the design on a garment (M)" aria-pressed="false"><i class="fas fa-shirt" aria-hidden="true"></i><span>On&nbsp;Garment</span></button>
       </div>
       <div class="rail-spacer"></div>
       <div class="rail-group rail-help" title="Shortcuts: 1-4 modes · G grid · D density · M garment · F fit · space play">
@@ -74,8 +73,8 @@
       </div>
     </nav>
 
-    <main class="stage-wrap" id="stageWrap">
-      <canvas id="stage"></canvas>
+    <main class="stage-wrap" id="stageWrap" tabindex="-1">
+      <canvas id="stage" role="img" aria-label="Embroidery stitch preview. Use the view and zoom controls to inspect the design." class="dst-hook-stage"></canvas>
 
       <div class="fabric-chip mockup-hide">
         <span class="fabric-label"><i class="fas fa-swatchbook" aria-hidden="true"></i> Fabric</span>
@@ -111,16 +110,16 @@
       <div id="dropzone" class="dropzone">
         <div class="drop-inner">
           <svg class="drop-hoop" viewBox="0 0 200 200" aria-hidden="true">
-            <circle cx="100" cy="100" r="86" fill="none" stroke="currentColor" stroke-width="7" opacity="0.9"/>
-            <circle cx="100" cy="100" r="72" fill="none" stroke="currentColor" stroke-width="3" opacity="0.5"/>
-            <rect x="86" y="4" width="28" height="18" rx="4" fill="none" stroke="currentColor" stroke-width="5" opacity="0.9"/>
-            <path d="M60,118 C74,86 96,84 100,102 C104,120 128,118 140,88" fill="none" stroke="currentColor" stroke-width="3" stroke-dasharray="1 6" stroke-linecap="round" opacity="0.9"/>
+            <circle cx="100" cy="100" r="86" fill="none" stroke="currentColor" stroke-width="7" opacity="0.9"></circle>
+            <circle cx="100" cy="100" r="72" fill="none" stroke="currentColor" stroke-width="3" opacity="0.5"></circle>
+            <rect x="86" y="4" width="28" height="18" rx="4" fill="none" stroke="currentColor" stroke-width="5" opacity="0.9"></rect>
+            <path d="M60,118 C74,86 96,84 100,102 C104,120 128,118 140,88" fill="none" stroke="currentColor" stroke-width="3" stroke-dasharray="1 6" stroke-linecap="round" opacity="0.9"></path>
           </svg>
           <h2>Drop a <span class="mono">.DST</span> file</h2>
           <p class="drop-sub">Tajima stitch file — straight from the digitizer or ShopWorks art folder</p>
           <div class="drop-actions">
-            <button type="button" id="btnBrowse" class="drop-btn"><i class="fas fa-folder-open" aria-hidden="true"></i> Browse files</button>
-            <button type="button" id="btnSample2" class="drop-btn ghost"><i class="fas fa-wand-magic-sparkles" aria-hidden="true"></i> Load sample badge</button>
+            <button type="button" id="btnBrowse" class="drop-btn btn btn-secondary"><i class="fas fa-folder-open" aria-hidden="true"></i> Browse files</button>
+            <button type="button" id="btnSample2" class="drop-btn ghost btn btn-secondary"><i class="fas fa-wand-magic-sparkles" aria-hidden="true"></i> Load sample badge</button>
           </div>
           <p class="drop-note"><i class="fas fa-lock" aria-hidden="true"></i> 100% local — files are parsed in your browser and never uploaded.</p>
           <div id="recentsWrap" class="recents-wrap">
@@ -133,13 +132,13 @@
 
     <aside class="sidebar">
       <div class="side-tabs">
-        <button type="button" class="side-tab active" data-panel="design"><i class="fas fa-circle-info" aria-hidden="true"></i> Design</button>
-        <button type="button" class="side-tab" data-panel="threads"><i class="fas fa-palette" aria-hidden="true"></i> Threads</button>
-        <button type="button" class="side-tab" data-panel="production"><i class="fas fa-industry" aria-hidden="true"></i> Production</button>
-        <button type="button" class="side-tab" data-panel="mockup"><i class="fas fa-shirt" aria-hidden="true"></i> Mockup</button>
+        <button type="button" class="side-tab active" data-panel="design" aria-pressed="true"><i class="fas fa-circle-info" aria-hidden="true"></i> Design</button>
+        <button type="button" class="side-tab" data-panel="threads" aria-pressed="false"><i class="fas fa-palette" aria-hidden="true"></i> Threads</button>
+        <button type="button" class="side-tab" data-panel="production" aria-pressed="false"><i class="fas fa-industry" aria-hidden="true"></i> Production</button>
+        <button type="button" class="side-tab" data-panel="mockup" aria-pressed="false"><i class="fas fa-shirt" aria-hidden="true"></i> Mockup</button>
       </div>
 
-      <div class="side-panel active" id="panelDesign">
+      <div class="side-panel active" id="panelDesign" tabindex="0" role="region" aria-label="Design details">
         <div class="side-empty">Load a design to see stats.</div>
         <div class="side-content">
           <div class="meta-rows">
@@ -166,19 +165,19 @@
         </div>
       </div>
 
-      <div class="side-panel" id="panelThreads">
+      <div class="side-panel" id="panelThreads" tabindex="0" role="region" aria-label="Threads details">
         <div class="side-empty">Load a design to assign threads.</div>
         <div class="side-content">
           <div class="threads-head">
             <span class="pill" id="threadCount">—</span>
-            <button type="button" id="btnResetColors" class="mini-btn"><i class="fas fa-rotate-left" aria-hidden="true"></i> Reset</button>
+            <button type="button" id="btnResetColors" class="mini-btn btn btn-secondary"><i class="fas fa-rotate-left" aria-hidden="true"></i> Reset</button>
           </div>
           <p class="side-note">Click a swatch to pick the real Robison-Anton thread. Choices are remembered per design on this computer and flow into the approval sheet.</p>
           <div class="thread-list" id="threadList"></div>
         </div>
       </div>
 
-      <div class="side-panel" id="panelProduction">
+      <div class="side-panel" id="panelProduction" tabindex="0" role="region" aria-label="Production details">
         <div class="side-empty">Load a design to plan the run.</div>
         <div class="side-content">
           <div class="side-section">
@@ -211,7 +210,7 @@
             <div class="side-section-head"><h3>Density check</h3><span class="pill" id="densityThreshold">—</span></div>
             <div class="calc-row"><span>Peak</span><b id="densityMax">—</b></div>
             <div class="hotspot-list" id="hotspotList"></div>
-            <button type="button" id="btnToggleDensity" class="mini-btn block"><i class="fas fa-fire" aria-hidden="true"></i> Toggle heatmap overlay</button>
+            <button type="button" id="btnToggleDensity" class="mini-btn block btn btn-secondary"><i class="fas fa-fire" aria-hidden="true"></i> Toggle heatmap overlay</button>
             <p class="side-note">Hotspots are cells with stacked needle penetrations — the usual cause of thread breaks, puckering and holes. Check them with the digitizer before a big run.</p>
           </div>
           <a class="quote-cta" href="/quote-builders/embroidery-quote-builder.html">
@@ -222,7 +221,7 @@
         </div>
       </div>
 
-      <div class="side-panel" id="panelMockup">
+      <div class="side-panel" id="panelMockup" tabindex="0" role="region" aria-label="Mockup details">
         <div class="side-empty">Load a design to build a mockup.</div>
         <div class="side-content">
           <div class="side-section">
@@ -230,7 +229,7 @@
             <div class="garment-tiles" id="garmentTiles"></div>
           </div>
           <div class="side-section">
-            <div class="side-section-head"><h3>Fabric color</h3><input type="color" id="mockupCustom" value="#1F2A44" title="Custom color"></div>
+            <div class="side-section-head"><h3>Fabric color</h3><input type="color" id="mockupCustom" value="#1F2A44" title="Custom color" class="dst-hook-mockupcustom"></div>
             <div class="fabric-grid" id="mockupSwatches"></div>
           </div>
           <div class="side-section">
@@ -246,12 +245,12 @@
               <div class="calc-row"><span>Position</span><b id="mockOffsetLabel">—</b></div>
             </div>
             <div class="mock-actions">
-              <button type="button" id="btnOffsetReset" class="mini-btn"><i class="fas fa-crosshairs" aria-hidden="true"></i> Re-center</button>
+              <button type="button" id="btnOffsetReset" class="mini-btn btn btn-secondary"><i class="fas fa-crosshairs" aria-hidden="true"></i> Re-center</button>
             </div>
             <div class="mockup-warning" id="mockupWarning"></div>
             <p class="side-note">Drag the design on the garment to fine-tune. Placement is true to physical scale — a 4" logo renders 4" wide on a 22" chest.</p>
           </div>
-          <button type="button" id="btnExportMockup" class="cta-btn"><i class="fas fa-download" aria-hidden="true"></i> Download mockup PNG</button>
+          <button type="button" id="btnExportMockup" class="cta-btn btn btn-primary"><i class="fas fa-download" aria-hidden="true"></i> Download mockup PNG</button>
         </div>
       </div>
     </aside>
@@ -259,22 +258,22 @@
   </div>
 </div>
 
-<input type="file" id="fileInput" aria-label="DST file" accept=".dst" class="visually-hidden">
 
-<div id="pickerOverlay" class="picker-overlay">
+
+<div id="pickerOverlay" class="picker-overlay" role="dialog" aria-modal="true" aria-labelledby="pickerTitle">
   <div class="picker-modal">
     <div class="picker-head">
-      <h3><i class="fas fa-palette" aria-hidden="true"></i> Robison-Anton 40wt</h3>
-      <button type="button" id="pickerClose" class="mini-btn" aria-label="Close design picker"><i class="fas fa-xmark" aria-hidden="true"></i></button>
+      <h3 id="pickerTitle"><i class="fas fa-palette" aria-hidden="true"></i> Robison-Anton 40wt</h3>
+      <button type="button" id="pickerClose" class="mini-btn btn btn-secondary" aria-label="Close thread color picker"><i class="fas fa-xmark" aria-hidden="true"></i></button>
     </div>
     <div class="picker-current" id="pickerCurrent"></div>
-    <input type="text" id="pickerSearch" aria-label="Search designs" class="picker-search" placeholder="Search name or catalog #…">
+    <input type="text" id="pickerSearch" aria-label="Search thread colors" class="picker-search" placeholder="Search name or catalog #…">
     <div class="chip-row picker-families" id="pickerFamilies"></div>
     <div class="picker-grid" id="pickerGrid"></div>
   </div>
 </div>
 
-<div id="toast" class="toast"></div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
 
 <section id="printSheet" class="print-sheet" aria-hidden="true">
   <header class="sheet-head">
@@ -317,6 +316,8 @@
 <script src="/pages/js/dst-parser.js?v=2026.08.05.4"></script>
 <script src="/pages/js/dst-palette.js?v=2026.08.05.4"></script>
 <script src="/pages/js/dst-garments.js?v=2026.08.05.4"></script>
-<script src="/pages/js/dst-viewer.js?v=2026.09.06.27"></script>
-</body>
-</html>
+<script src="/shared_components/js/ui-dialog.js?v=2026.09.09.16"></script><script src="/pages/js/dst-viewer.js?v=2026.09.09.16"></script>
+
+
+
+</body></html>

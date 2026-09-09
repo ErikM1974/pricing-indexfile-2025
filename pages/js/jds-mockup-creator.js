@@ -73,6 +73,7 @@
     var isDragging = false;
     var dragStart = null;
 
+    var imageRequest = 0;             // only the latest color request owns the preview
     var imageCache = {};               // sku → HTMLImageElement
     var engravedCache = {};            // engrave-hex → recolored logo canvas
     var compareSelection = [];         // SKUs chosen for the comparison sheet
@@ -102,10 +103,13 @@
 
     // ── Catalog fetch + swatch render ──────────────────────────────────
     function loadCatalog() {
+        var host = document.getElementById('jmc-swatch-grid');
+        if (host) { host.setAttribute('aria-busy', 'true'); host.innerHTML = '<div class="jmc-swatch-loading" role="status">Loading colors…</div>'; }
         fetch(API_BASE + '/api/jds-catalog?category=Drinkware')
             .then(function (r) { return r.ok ? r.json() : Promise.reject(r); })
             .then(function (data) {
-                var raw = (data && data.result) || [];
+                if (!data || !Array.isArray(data.result) || data.result.some(function (row) { return !row || typeof row.SKU !== 'string' || !row.SKU || typeof row.DisplayName !== 'string'; })) throw new Error('Incomplete catalog response');
+                var raw = data.result;
                 catalog = raw.filter(function (r) {
                     return MOCKUP_EXCLUDED_SKUS.indexOf(r.SKU) === -1;
                 });
@@ -115,8 +119,9 @@
                 console.error('[jds-mockup-creator] Catalog fetch failed:', err);
                 var grid = document.getElementById('jmc-swatch-grid');
                 if (grid) {
-                    grid.innerHTML = '<div class="jmc-swatch-loading" style="color:#b91c1c;">'
-                        + 'Failed to load catalog. Refresh the page to retry.</div>';
+                    grid.setAttribute('aria-busy', 'false');
+                    grid.innerHTML = '<div class="jmc-catalog-error" role="alert"><p>Unable to load tumbler colors. Please try again.</p><button type="button" class="btn btn-secondary">Try again</button></div>';
+                    grid.querySelector('button').addEventListener('click', loadCatalog);
                 }
             });
     }
@@ -132,7 +137,9 @@
     function renderSwatches() {
         var grid = document.getElementById('jmc-swatch-grid');
         if (!grid) return;
+        grid.setAttribute('aria-busy', 'false');
         grid.innerHTML = '';
+        if (!catalog.length) grid.innerHTML = '<div class="jmc-swatch-loading" role="status">No tumbler colors are available right now.</div>';
         catalog.forEach(function (row) {
             var colorName = colorNameFromRow(row);
             var btn = document.createElement('button');
@@ -141,6 +148,7 @@
             btn.dataset.sku = row.SKU;
             btn.title = colorName + ' (' + row.SKU + ')';
             btn.setAttribute('aria-label', colorName);
+            btn.setAttribute('aria-pressed', 'false');
             btn.innerHTML = '<span class="jmc-swatch-fill" style="background:' + swatchFillHex(row) + ';"></span>'
                 + '<span class="jmc-swatch-label">' + escapeHtml(colorName) + '</span>';
             btn.addEventListener('click', function () { selectSku(row.SKU); });
@@ -157,6 +165,7 @@
         var swatches = document.querySelectorAll('#jmc-swatch-grid .jmc-swatch');
         swatches.forEach(function (s) {
             s.classList.toggle('jmc-swatch--active', s.dataset.sku === sku);
+            s.setAttribute('aria-pressed', String(s.dataset.sku === sku));
         });
 
         var label = document.getElementById('jmc-selected-label');
@@ -196,19 +205,23 @@
 
     function loadTumblerImage() {
         if (!selectedSku) return;
+        var request = ++imageRequest;
+        tumblerImage = null;
+        render();
         showLoading(true);
         showError('');
         ensureImage(selectedSku)
             .then(function (img) {
+                if (request !== imageRequest) return;
                 tumblerImage = img;
                 showLoading(false);
                 render();
             })
             .catch(function (err) {
+                if (request !== imageRequest) return;
                 showLoading(false);
                 console.error('[jds-mockup-creator] Tumbler load failed:', err);
-                showError('Couldn\'t load the tumbler image. JDS\'s CDN may not allow cross-origin requests; '
-                    + 'try again or contact Erik to set up a proxy endpoint.');
+                showError('Unable to load this tumbler image. Try again or select another color.');
             });
     }
 
@@ -1097,12 +1110,20 @@
     function showLoading(on) {
         var el = document.getElementById('jmc-preview-loading');
         if (el) el.classList.toggle('jmc-hidden', !on);
+        document.querySelector('.jmc-preview').setAttribute('aria-busy', String(on));
+        ['jmc-download-btn', 'jmc-copy-btn'].forEach(function (id) { document.getElementById(id).disabled = on || !tumblerImage; });
     }
 
     function showError(msg) {
         var el = document.getElementById('jmc-preview-error');
         if (!el) return;
-        if (msg) { el.textContent = msg; el.classList.remove('jmc-hidden'); }
+        if (msg) {
+            el.textContent = msg;
+            var retry = document.createElement('button');
+            retry.type = 'button'; retry.className = 'btn btn-secondary'; retry.textContent = 'Try again';
+            retry.addEventListener('click', loadTumblerImage); el.appendChild(retry);
+            el.classList.remove('jmc-hidden');
+        }
         else { el.classList.add('jmc-hidden'); }
     }
 

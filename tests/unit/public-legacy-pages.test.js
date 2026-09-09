@@ -16,7 +16,7 @@ const PAGES = {
     'inventory-details': { css: 'pages/css/inventory-details.css', js: 'pages/js/inventory-details.js' },
     'dtg-compatible-products': { css: 'pages/css/dtg-compatible-products.css', js: 'pages/js/dtg-compatible-products.js' },
     'pricing-negotiation-policy': { css: 'pages/css/pricing-negotiation-policy.css', js: 'pages/js/pricing-negotiation-policy.js' },
-    'design-view': { css: 'pages/css/design-view.css', js: 'pages/js/design-view.js' },
+    'design-view': { css: 'shared_components/css/design-preview-tools.css', js: 'pages/js/design-view.js' },
 };
 
 describe('public legacy pages — Rule 3', () => {
@@ -70,7 +70,11 @@ describe('public legacy pages — specifics', () => {
     test('design-view: dialog lightbox with focus return, hidden attr, keyboard hero/grid', () => {
         const html = read('pages/design-view.html');
         const js = read('pages/js/design-view.js');
-        expect(html).toMatch(/id="dv-lightbox" role="dialog" aria-modal="true" aria-label="[^"]+" hidden>/);
+        const dialog = new (require('jsdom').JSDOM)(html).window.document.getElementById('dv-lightbox');
+        expect(dialog.getAttribute('role')).toBe('dialog');
+        expect(dialog.getAttribute('aria-modal')).toBe('true');
+        expect(dialog.getAttribute('aria-label')).toBeTruthy();
+        expect(dialog.hidden).toBe(true);
         expect(html).toMatch(/<button type="button" class="dv-hero-btn" id="dv-hero-btn"/);
         expect(html).not.toMatch(/style="/);
         expect(js).toMatch(/lightboxReturnFocus = document\.activeElement;/);
