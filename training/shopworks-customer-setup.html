@@ -1,67 +1,103 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shopworks Customer Setup Training</title>
-    <link rel="icon" href="/favicon.png" type="image/png">
-    <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/training/css/shopworks-customer-setup.css?v=2026.09.07.19">
-</head>
-<body>
-    <main class="game-container">
-        <div class="header">
-            <h1>
-                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" alt="NWCA Logo">
-                Shopworks Customer Setup Training
-            </h1>
-            <p>Master the art of customer setup in Shopworks CRM</p>
-        </div>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Shopworks Customer Setup Training</title>
+        <link rel="icon" href="/favicon.png" type="image/png" />
+        <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2" />
+        <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.08.15" />
+        <link rel="stylesheet" href="/shared_components/css/training-practice.css?v=2026.09.08.15" />
+        <link rel="stylesheet" href="/shared_components/css/training-simulator.css?v=2026.09.08.16" />
+        <link rel="stylesheet" href="/training/css/shopworks-customer-setup.css?v=2026.09.08.16" />
+        <link
+            rel="stylesheet"
+            href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&amp;display=swap"
+        />
+    </head>
+    <body data-ui="unified" data-training="practice" data-training-simulator="shopworks-customer-setup">
+        <main class="game-container training-workspace" id="training-main">
+            <div class="header training-page-header">
+                <nav aria-label="Training navigation">
+                    <img
+                        src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                        alt="NWCA Logo"
+                        class="training-brand"
+                    /><a href="/training/index.html">Training Center</a
+                    ><a href="/staff-dashboard.html">Staff Dashboard</a>
+                </nav>
+                <h1>Shopworks Customer Setup Training</h1>
+                <p>Master the art of customer setup in Shopworks CRM</p>
+                <p id="storage-status" class="simulator-storage" role="status" hidden=""></p>
+            </div>
 
-        <div class="score-bar">
-            <div class="score-item">
-                <div class="score-label">Current Score</div>
-                <div class="score-value" id="currentScore">0</div>
+            <div class="score-bar">
+                <div class="score-item">
+                    <div class="score-label">Current Score</div>
+                    <div class="score-value" id="currentScore">0</div>
+                </div>
+                <div class="score-item">
+                    <div class="score-label">Streak</div>
+                    <div class="score-value" id="streak">0</div>
+                </div>
+                <div class="score-item">
+                    <div class="score-label">Best Score</div>
+                    <div class="score-value" id="bestScore">0</div>
+                </div>
+                <div class="score-item">
+                    <div class="score-label">Level</div>
+                    <div class="score-value" id="level">1</div>
+                </div>
             </div>
-            <div class="score-item">
-                <div class="score-label">Streak</div>
-                <div class="score-value" id="streak">0</div>
-            </div>
-            <div class="score-item">
-                <div class="score-label">Best Score</div>
-                <div class="score-value" id="bestScore">0</div>
-            </div>
-            <div class="score-item">
-                <div class="score-label">Level</div>
-                <div class="score-value" id="level">1</div>
-            </div>
-        </div>
 
-        <div class="game-modes">
-            <div class="mode-card" data-call="startMode" data-args='["explorer"]'>
-                <h3>🔍 Field Explorer</h3>
-                <p>Learn about each field and its purpose in customer setup</p>
+            <div class="game-modes">
+                <button
+                    type="button"
+                    class="mode-card"
+                    aria-pressed="false"
+                    data-sim-call="startMode"
+                    data-sim-args='["explorer"]'
+                >
+                    <strong>🔍 Field Explorer</strong>
+                    <p>Learn about each field and its purpose in customer setup</p>
+                </button>
+                <button
+                    type="button"
+                    class="mode-card"
+                    aria-pressed="false"
+                    data-sim-call="startMode"
+                    data-sim-args='["simulator"]'
+                >
+                    <strong>💼 Setup Simulator</strong>
+                    <p>Practice setting up real customer scenarios</p>
+                </button>
+                <button
+                    type="button"
+                    class="mode-card"
+                    aria-pressed="false"
+                    data-sim-call="startMode"
+                    data-sim-args='["detective"]'
+                >
+                    <strong>🕵️ Field Detective</strong>
+                    <p>Identify and fix errors in customer records</p>
+                </button>
+                <button
+                    type="button"
+                    class="mode-card"
+                    aria-pressed="false"
+                    data-sim-call="startMode"
+                    data-sim-args='["speed"]'
+                >
+                    <strong>⚡ Speed Challenge</strong>
+                    <p>Test your knowledge against the clock</p>
+                </button>
             </div>
-            <div class="mode-card" data-call="startMode" data-args='["simulator"]'>
-                <h3>💼 Setup Simulator</h3>
-                <p>Practice setting up real customer scenarios</p>
-            </div>
-            <div class="mode-card" data-call="startMode" data-args='["detective"]'>
-                <h3>🕵️ Field Detective</h3>
-                <p>Identify and fix errors in customer records</p>
-            </div>
-            <div class="mode-card" data-call="startMode" data-args='["speed"]'>
-                <h3>⚡ Speed Challenge</h3>
-                <p>Test your knowledge against the clock</p>
-            </div>
-        </div>
 
-        <div class="game-area" id="gameArea">
-            <!-- Game content will be dynamically inserted here -->
-        </div>
-    </main>
+            <div class="game-area" id="gameArea">
+                <!-- Game content will be dynamically inserted here -->
+            </div>
+        </main>
 
-    <script src="/shared_components/js/data-call-delegator.js?v=2026.09.06.29"></script>
-    <script src="/training/js/shopworks-customer-setup.js?v=2026.09.05.12"></script>
-</body>
+        <script src="/training/js/shopworks-customer-setup.js?v=2026.09.08.16"></script>
+    </body>
 </html>

@@ -1,414 +1,596 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="/favicon.png" type="image/png">
-    <title>Shopworks Customer Setup Training - Enhanced</title>
-    <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/training/css/shopworks-customer-setup-enhanced.css?v=2026.09.07.19">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-</head>
-<body>
-    <h1 class="sr-only">ShopWorks Customer Setup Training</h1>
-    <!-- Shopworks Navigation Bar -->
-    <div class="shopworks-nav">
-        <div class="nav-modules">
-            <a class="nav-module">
-                <i class="fas fa-dollar-sign" aria-hidden="true"></i>
-                <span>sales</span>
-            </a>
-            <a class="nav-module">
-                <i class="fas fa-shopping-cart" aria-hidden="true"></i>
-                <span>purchasing</span>
-            </a>
-            <a class="nav-module">
-                <i class="fas fa-inbox" aria-hidden="true"></i>
-                <span>receiving</span>
-            </a>
-            <a class="nav-module">
-                <i class="fas fa-industry" aria-hidden="true"></i>
-                <span>production</span>
-            </a>
-            <a class="nav-module">
-                <i class="fas fa-truck" aria-hidden="true"></i>
-                <span>shipping</span>
-            </a>
-            <a class="nav-module">
-                <i class="fas fa-file-invoice" aria-hidden="true"></i>
-                <span>invoicing</span>
-            </a>
-            <a class="nav-module">
-                <i class="fas fa-calculator" aria-hidden="true"></i>
-                <span>accounting</span>
-            </a>
-            <a class="nav-module">
-                <i class="fas fa-boxes" aria-hidden="true"></i>
-                <span>inventory</span>
-            </a>
-            <a class="nav-module">
-                <i class="fas fa-chart-line" aria-hidden="true"></i>
-                <span>analysis</span>
-            </a>
-            <a class="nav-module">
-                <i class="fas fa-cog" aria-hidden="true"></i>
-                <span>utilities</span>
-            </a>
-            <a class="nav-module">
-                <i class="fas fa-bullhorn" aria-hidden="true"></i>
-                <span>marketing</span>
-            </a>
-            <a class="nav-module active">
-                <i class="fas fa-users" aria-hidden="true"></i>
-                <span>customers</span>
-            </a>
-            <a class="nav-module">
-                <i class="fas fa-box" aria-hidden="true"></i>
-                <span>products</span>
-            </a>
-            <a class="nav-module">
-                <i class="fas fa-palette" aria-hidden="true"></i>
-                <span>designs</span>
-            </a>
-            <a class="nav-module">
-                <i class="fas fa-building" aria-hidden="true"></i>
-                <span>vendors</span>
-            </a>
-        </div>
-    </div>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="icon" href="/favicon.png" type="image/png" />
+        <title>Shopworks Customer Setup Training - Enhanced</title>
+        <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2" />
+        <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.08.15" />
+        <link rel="stylesheet" href="/shared_components/css/training-practice.css?v=2026.09.08.15" />
+        <link rel="stylesheet" href="/shared_components/css/training-simulator.css?v=2026.09.08.16" />
+        <link rel="stylesheet" href="/training/css/shopworks-customer-setup-enhanced.css?v=2026.09.08.16" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+        <link
+            rel="stylesheet"
+            href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&amp;display=swap"
+        />
+    </head>
+    <body data-ui="unified" data-training="practice" data-training-simulator="shopworks-customer-setup-enhanced">
+        <header class="training-page-header">
+            <nav aria-label="Training navigation">
+                <img
+                    src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                    alt="Northwest Custom Apparel"
+                    class="training-brand"
+                /><a href="/training/index.html">Training Center</a><a href="/staff-dashboard.html">Staff Dashboard</a>
+            </nav>
+            <h1 class="">ShopWorks Customer Setup Training</h1>
+            <p>
+                Practice workspace. The controls below use sample customer records; the ShopWorks toolbar is shown for
+                reference.
+            </p>
+            <p id="storage-status" class="simulator-storage" role="status" hidden=""></p>
+        </header>
 
-    <!-- Main Container -->
-    <main class="main-container">
-        <!-- Customer Header -->
-        <div class="customer-header">
-            <label for="customerId">Company:</label>
-            <input type="text" class="customer-id" id="customerId" placeholder="ID">
-            <input type="text" class="company-name" id="companyName" placeholder="Company Name" aria-label="Company Name">
-            <label for="website">Website:</label>
-            <input type="text" class="website-field" id="website" placeholder="website.com">
-            <label for="mainEmail">Main Email:</label>
-            <input type="text" class="email-field" id="mainEmail" placeholder="email@domain.com">
-            <div class="action-buttons">
-                <button class="action-btn"><i class="fas fa-print" aria-hidden="true"></i> Print</button>
-                <button class="action-btn"><i class="fas fa-clone" aria-hidden="true"></i> Clone</button>
-                <button class="action-btn"><i class="fas fa-trash" aria-hidden="true"></i> Delete</button>
-                <button class="action-btn"><i class="fas fa-plus" aria-hidden="true"></i> Add</button>
-                <button class="action-btn primary"><i class="fas fa-check" aria-hidden="true"></i> Done</button>
+        <!-- Shopworks Navigation Bar -->
+
+        <!-- Main Container -->
+        <main class="main-container training-workspace" id="training-main">
+            <div class="training-overlay" id="trainingOverlay" aria-label="Training exercises">
+                <h3>Training Mode</h3>
+                <div class="mode-selector">
+                    <button class="mode-btn btn" type="button" data-sim-call="startFieldExplorer" aria-pressed="false">
+                        <i class="fas fa-search" aria-hidden="true"></i> Field Explorer
+                    </button>
+                    <button class="mode-btn btn" type="button" data-sim-call="startSetupSimulator" aria-pressed="false">
+                        <i class="fas fa-user-plus" aria-hidden="true"></i> Setup Simulator
+                    </button>
+                    <button class="mode-btn btn" type="button" data-sim-call="startFieldDetective" aria-pressed="false">
+                        <i class="fas fa-user-secret" aria-hidden="true"></i> Field Detective
+                    </button>
+                    <button class="mode-btn btn" type="button" data-sim-call="startSpeedChallenge" aria-pressed="false">
+                        <i class="fas fa-tachometer-alt" aria-hidden="true"></i> Speed Challenge
+                    </button>
+                </div>
+
+                <div id="modeContent">
+                    <!-- Mode-specific content will appear here -->
+                </div>
+                <p id="exercise-status" role="status"></p>
+
+                <div class="score-display" id="scoreDisplay" hidden="">
+                    <h4>Score</h4>
+                    <div class="score-value" id="scoreValue">0</div>
+                </div>
             </div>
-        </div>
+            <!-- Customer Header -->
 
-        <!-- Tab Navigation -->
-        <div class="tab-nav">
-            <div class="tab active">Profile</div>
-            <div class="tab">Accounting</div>
-            <div class="tab">Commissions</div>
-            <div class="tab">Receivables</div>
-            <div class="tab">Web & Email</div>
-            <div class="tab">Attachments</div>
-        </div>
+            <!-- Tab Navigation -->
 
-        <!-- Content Area -->
-        <div class="content-area">
-            <!-- Left Panel -->
-            <div class="left-panel">
-                <!-- Contacts Section -->
-                <div class="contacts-section">
-                    <div class="section-tabs">
-                        <div class="section-tab active">Contacts</div>
-                        <div class="section-tab">Notes</div>
-                        <div class="section-tab">Addresses</div>
+            <!-- Content Area -->
+
+            <section class="simulator-workspace" aria-label="Sample ShopWorks customer profile">
+                <div class="shopworks-nav">
+                    <div class="nav-modules">
+                        <span class="nav-module">
+                            <i class="fas fa-dollar-sign" aria-hidden="true"></i>
+                            <span>sales</span>
+                        </span>
+                        <span class="nav-module">
+                            <i class="fas fa-shopping-cart" aria-hidden="true"></i>
+                            <span>purchasing</span>
+                        </span>
+                        <span class="nav-module">
+                            <i class="fas fa-inbox" aria-hidden="true"></i>
+                            <span>receiving</span>
+                        </span>
+                        <span class="nav-module">
+                            <i class="fas fa-industry" aria-hidden="true"></i>
+                            <span>production</span>
+                        </span>
+                        <span class="nav-module">
+                            <i class="fas fa-truck" aria-hidden="true"></i>
+                            <span>shipping</span>
+                        </span>
+                        <span class="nav-module">
+                            <i class="fas fa-file-invoice" aria-hidden="true"></i>
+                            <span>invoicing</span>
+                        </span>
+                        <span class="nav-module">
+                            <i class="fas fa-calculator" aria-hidden="true"></i>
+                            <span>accounting</span>
+                        </span>
+                        <span class="nav-module">
+                            <i class="fas fa-boxes" aria-hidden="true"></i>
+                            <span>inventory</span>
+                        </span>
+                        <span class="nav-module">
+                            <i class="fas fa-chart-line" aria-hidden="true"></i>
+                            <span>analysis</span>
+                        </span>
+                        <span class="nav-module">
+                            <i class="fas fa-cog" aria-hidden="true"></i>
+                            <span>utilities</span>
+                        </span>
+                        <span class="nav-module">
+                            <i class="fas fa-bullhorn" aria-hidden="true"></i>
+                            <span>marketing</span>
+                        </span>
+                        <span class="nav-module active">
+                            <i class="fas fa-users" aria-hidden="true"></i>
+                            <span>customers</span>
+                        </span>
+                        <span class="nav-module">
+                            <i class="fas fa-box" aria-hidden="true"></i>
+                            <span>products</span>
+                        </span>
+                        <span class="nav-module">
+                            <i class="fas fa-palette" aria-hidden="true"></i>
+                            <span>designs</span>
+                        </span>
+                        <span class="nav-module">
+                            <i class="fas fa-building" aria-hidden="true"></i>
+                            <span>vendors</span>
+                        </span>
                     </div>
-                    <div style="padding: 10px;">
-                        <div style="margin-bottom: 5px;">
-                            <button class="action-btn" style="font-size: 11px;"><i class="fas fa-sort" aria-hidden="true"></i> Sort Tool</button>
-                            <button class="action-btn" style="font-size: 11px;"><i class="fas fa-plus" aria-hidden="true"></i> Add</button>
+                </div>
+                <div class="customer-header">
+                    <div class="field simulator-profile-field">
+                        <label for="customerId">Customer ID</label
+                        ><input
+                            type="text"
+                            class="customer-id field-input"
+                            id="customerId"
+                            placeholder="ID"
+                            aria-label="Customer ID"
+                        />
+                    </div>
+                    <div class="field simulator-profile-field">
+                        <label for="companyName">Company:</label
+                        ><input
+                            type="text"
+                            class="company-name field-input"
+                            id="companyName"
+                            placeholder="Company Name"
+                            aria-label="Company Name"
+                        />
+                    </div>
+                    <div class="field simulator-profile-field">
+                        <label for="website">Website:</label
+                        ><input type="text" class="website-field field-input" id="website" placeholder="website.com" />
+                    </div>
+                    <div class="field simulator-profile-field">
+                        <label for="mainEmail">Main Email:</label
+                        ><input
+                            type="text"
+                            class="email-field field-input"
+                            id="mainEmail"
+                            placeholder="email@domain.com"
+                        />
+                    </div>
+                    <div class="action-buttons">
+                        <button class="action-btn btn" disabled="" title="ShopWorks interface reference" type="button">
+                            <i class="fas fa-print" aria-hidden="true"></i> Print
+                        </button>
+                        <button class="action-btn btn" disabled="" title="ShopWorks interface reference" type="button">
+                            <i class="fas fa-clone" aria-hidden="true"></i> Clone
+                        </button>
+                        <button class="action-btn btn" disabled="" title="ShopWorks interface reference" type="button">
+                            <i class="fas fa-trash" aria-hidden="true"></i> Delete
+                        </button>
+                        <button class="action-btn btn" disabled="" title="ShopWorks interface reference" type="button">
+                            <i class="fas fa-plus" aria-hidden="true"></i> Add
+                        </button>
+                        <button
+                            class="action-btn primary btn btn-primary"
+                            disabled=""
+                            title="ShopWorks interface reference"
+                            type="button"
+                        >
+                            <i class="fas fa-check" aria-hidden="true"></i> Done
+                        </button>
+                    </div>
+                </div>
+                <div class="tab-nav">
+                    <div class="tab active">Profile</div>
+                    <div class="tab">Accounting</div>
+                    <div class="tab">Commissions</div>
+                    <div class="tab">Receivables</div>
+                    <div class="tab">Web &amp; Email</div>
+                    <div class="tab">Attachments</div>
+                </div>
+                <div class="content-area">
+                    <!-- Left Panel -->
+                    <div class="left-panel">
+                        <!-- Contacts Section -->
+                        <div class="contacts-section">
+                            <div class="section-tabs">
+                                <div class="section-tab active">Contacts</div>
+                                <div class="section-tab">Notes</div>
+                                <div class="section-tab">Addresses</div>
+                            </div>
+                            <div>
+                                <div>
+                                    <button
+                                        class="action-btn btn"
+                                        disabled=""
+                                        title="ShopWorks interface reference"
+                                        type="button"
+                                    >
+                                        <i class="fas fa-sort" aria-hidden="true"></i> Sort Tool
+                                    </button>
+                                    <button
+                                        class="action-btn btn"
+                                        disabled=""
+                                        title="ShopWorks interface reference"
+                                        type="button"
+                                    >
+                                        <i class="fas fa-plus" aria-hidden="true"></i> Add
+                                    </button>
+                                </div>
+                                <div
+                                    class="simulator-table-scroll"
+                                    tabindex="0"
+                                    role="region"
+                                    aria-label="Sample contacts, scroll horizontally"
+                                >
+                                    <table class="contacts-grid">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">
+                                                    <input type="checkbox" class="grid-checkbox" aria-label="Select" />
+                                                </th>
+                                                <th scope="col">First Name <span class="sort-arrow">▼</span></th>
+                                                <th scope="col">Last Name <span class="sort-arrow">▲</span></th>
+                                                <th scope="col">Title</th>
+                                                <th scope="col">Department</th>
+                                                <th scope="col">Primary Phone</th>
+                                                <th scope="col">Primary Fax</th>
+                                                <th scope="col">Primary Email Address</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="contactsTableBody">
+                                            <!-- Contacts will be populated here -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
-                        <table class="contacts-grid">
-                            <thead>
-                                <tr>
-                                    <th style="width: 30px;"><input type="checkbox" class="grid-checkbox" aria-label="Select"></th>
-                                    <th>First Name <span class="sort-arrow">▼</span></th>
-                                    <th>Last Name <span class="sort-arrow">▲</span></th>
-                                    <th>Title</th>
-                                    <th>Department</th>
-                                    <th>Primary Phone</th>
-                                    <th>Primary Fax</th>
-                                    <th>Primary Email Address</th>
-                                </tr>
-                            </thead>
-                            <tbody id="contactsTableBody">
-                                <!-- Contacts will be populated here -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
 
-                <!-- Activities Section -->
-                <div class="activities-section">
-                    <div class="section-tabs">
-                        <div class="section-tab active">Activities (0)</div>
-                        <div class="section-tab">Activities As Marketing</div>
-                        <div class="section-tab">Internal Messages</div>
-                    </div>
-                    <div class="activities-filters">
-                        <span>Filter By Source:</span>
-                        <label><input type="radio" name="filter" class="filter-radio"> Profile</label>
-                        <label><input type="radio" name="filter" class="filter-radio"> Receivables</label>
-                        <label><input type="radio" name="filter" class="filter-radio"> Quotes</label>
-                        <label><input type="radio" name="filter" class="filter-radio"> Order Entry</label>
-                        <label><input type="radio" name="filter" class="filter-radio" checked> All</label>
-                    </div>
-                </div>
+                        <!-- Activities Section -->
+                        <div class="activities-section">
+                            <div class="section-tabs">
+                                <div class="section-tab active">Activities (0)</div>
+                                <div class="section-tab">Activities As Marketing</div>
+                                <div class="section-tab">Internal Messages</div>
+                            </div>
+                            <div class="activities-filters">
+                                <span>Filter By Source:</span>
+                                <label><input type="radio" name="filter" class="filter-radio" /> Profile</label>
+                                <label><input type="radio" name="filter" class="filter-radio" /> Receivables</label>
+                                <label><input type="radio" name="filter" class="filter-radio" /> Quotes</label>
+                                <label><input type="radio" name="filter" class="filter-radio" /> Order Entry</label>
+                                <label><input type="radio" name="filter" class="filter-radio" checked="" /> All</label>
+                            </div>
+                        </div>
 
-                <!-- Bottom Panels -->
-                <div class="bottom-panels">
-                    <!-- Sales Tax Section -->
-                    <div class="sales-tax-section">
-                        <div class="sales-tax-title">Sales Tax</div>
-                        <div class="sales-tax-content">
-                            <div class="tax-grid">
-                                <div class="tax-header-row">
-                                    <div class="tax-header" style="width: 100px;"></div>
-                                    <div class="tax-header" style="width: 80px;"></div>
-                                    <div class="tax-header" style="width: 220px;"></div>
-                                    <div class="tax-header" style="width: 30px;"></div>
-                                    <div class="tax-header" style="width: 120px; text-align: center;">Pay Sales Tax?</div>
-                                    <div class="tax-header" style="width: 120px; text-align: center;">Shipping Taxable</div>
-                                </div>
-                                <div class="tax-row">
-                                    <div class="tax-cell"><label for="taxCode1">Account #1</label></div>
-                                    <div class="tax-cell">
-                                        <input type="text" class="tax-code" id="taxCode1" value="2200">
+                        <!-- Bottom Panels -->
+                        <div class="bottom-panels">
+                            <!-- Sales Tax Section -->
+                            <div class="sales-tax-section">
+                                <div class="sales-tax-title">Sales Tax</div>
+                                <div class="sales-tax-content">
+                                    <div class="tax-grid">
+                                        <div class="tax-header-row">
+                                            <div class="tax-header"></div>
+                                            <div class="tax-header"></div>
+                                            <div class="tax-header"></div>
+                                            <div class="tax-header"></div>
+                                            <div class="tax-header">Pay Sales Tax?</div>
+                                            <div class="tax-header">Shipping Taxable</div>
+                                        </div>
+                                        <div class="tax-row">
+                                            <div class="tax-cell"><label for="taxCode1">Account #1</label></div>
+                                            <div class="tax-cell">
+                                                <input
+                                                    type="text"
+                                                    class="tax-code field-input"
+                                                    id="taxCode1"
+                                                    value="2200"
+                                                />
+                                            </div>
+                                            <div class="tax-cell">
+                                                <input
+                                                    type="text"
+                                                    class="tax-desc field-input"
+                                                    id="taxDesc1"
+                                                    value="Washington State Sales Tax"
+                                                    readonly=""
+                                                    aria-label="Tax desc1"
+                                                />
+                                            </div>
+                                            <div class="tax-cell">
+                                                <button
+                                                    type="button"
+                                                    class="search-icon btn"
+                                                    aria-label="Choose tax code for account 1"
+                                                    data-sim-call="searchTaxCode"
+                                                    data-sim-args="[1]"
+                                                >
+                                                    Choose
+                                                </button>
+                                            </div>
+                                            <div class="tax-cell">
+                                                <span class="tax-indicator active" id="payTax1"></span>
+                                            </div>
+                                            <div class="tax-cell">
+                                                <span class="tax-indicator active" id="shipTax1"></span>
+                                            </div>
+                                        </div>
+                                        <div class="tax-row">
+                                            <div class="tax-cell"><label for="taxCode2">Account #2</label></div>
+                                            <div class="tax-cell">
+                                                <input type="text" class="tax-code field-input" id="taxCode2" />
+                                            </div>
+                                            <div class="tax-cell">
+                                                <input
+                                                    type="text"
+                                                    class="tax-desc field-input"
+                                                    id="taxDesc2"
+                                                    readonly=""
+                                                    aria-label="Tax desc2"
+                                                />
+                                            </div>
+                                            <div class="tax-cell">
+                                                <button
+                                                    type="button"
+                                                    class="search-icon btn"
+                                                    aria-label="Choose tax code for account 2"
+                                                    data-sim-call="searchTaxCode"
+                                                    data-sim-args="[2]"
+                                                >
+                                                    Choose
+                                                </button>
+                                            </div>
+                                            <div class="tax-cell">
+                                                <span class="tax-indicator inactive" id="payTax2"></span>
+                                            </div>
+                                            <div class="tax-cell">
+                                                <span class="tax-indicator inactive" id="shipTax2"></span>
+                                            </div>
+                                        </div>
+                                        <div class="tax-row">
+                                            <div class="tax-cell"><label for="taxCode3">Account #3</label></div>
+                                            <div class="tax-cell">
+                                                <input type="text" class="tax-code field-input" id="taxCode3" />
+                                            </div>
+                                            <div class="tax-cell">
+                                                <input
+                                                    type="text"
+                                                    class="tax-desc field-input"
+                                                    id="taxDesc3"
+                                                    readonly=""
+                                                    aria-label="Tax desc3"
+                                                />
+                                            </div>
+                                            <div class="tax-cell">
+                                                <button
+                                                    type="button"
+                                                    class="search-icon btn"
+                                                    aria-label="Choose tax code for account 3"
+                                                    data-sim-call="searchTaxCode"
+                                                    data-sim-args="[3]"
+                                                >
+                                                    Choose
+                                                </button>
+                                            </div>
+                                            <div class="tax-cell">
+                                                <span class="tax-indicator inactive" id="payTax3"></span>
+                                            </div>
+                                            <div class="tax-cell">
+                                                <span class="tax-indicator inactive" id="shipTax3"></span>
+                                            </div>
+                                        </div>
+                                        <div class="tax-row">
+                                            <div class="tax-cell"><label for="taxCode4">Account #4</label></div>
+                                            <div class="tax-cell">
+                                                <input type="text" class="tax-code field-input" id="taxCode4" />
+                                            </div>
+                                            <div class="tax-cell">
+                                                <input
+                                                    type="text"
+                                                    class="tax-desc field-input"
+                                                    id="taxDesc4"
+                                                    readonly=""
+                                                    aria-label="Tax desc4"
+                                                />
+                                            </div>
+                                            <div class="tax-cell">
+                                                <button
+                                                    type="button"
+                                                    class="search-icon btn"
+                                                    aria-label="Choose tax code for account 4"
+                                                    data-sim-call="searchTaxCode"
+                                                    data-sim-args="[4]"
+                                                >
+                                                    Choose
+                                                </button>
+                                            </div>
+                                            <div class="tax-cell">
+                                                <span class="tax-indicator inactive" id="payTax4"></span>
+                                            </div>
+                                            <div class="tax-cell">
+                                                <span class="tax-indicator inactive" id="shipTax4"></span>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="tax-cell">
-                                        <input type="text" class="tax-desc" id="taxDesc1" value="Washington State Sales Tax" readonly aria-label="Tax desc1">
-                                    </div>
-                                    <div class="tax-cell" style="text-align: center;">
-                                        <span class="search-icon" data-call="searchTaxCode" data-args='[1]'></span>
-                                    </div>
-                                    <div class="tax-cell" style="text-align: center;">
-                                        <span class="tax-indicator active" id="payTax1"></span>
-                                    </div>
-                                    <div class="tax-cell" style="text-align: center;">
-                                        <span class="tax-indicator active" id="shipTax1"></span>
-                                    </div>
-                                </div>
-                                <div class="tax-row">
-                                    <div class="tax-cell"><label for="taxCode2">Account #2</label></div>
-                                    <div class="tax-cell">
-                                        <input type="text" class="tax-code" id="taxCode2">
-                                    </div>
-                                    <div class="tax-cell">
-                                        <input type="text" class="tax-desc" id="taxDesc2" readonly aria-label="Tax desc2">
-                                    </div>
-                                    <div class="tax-cell" style="text-align: center;">
-                                        <span class="search-icon" data-call="searchTaxCode" data-args='[2]'></span>
-                                    </div>
-                                    <div class="tax-cell" style="text-align: center;">
-                                        <span class="tax-indicator inactive" id="payTax2"></span>
-                                    </div>
-                                    <div class="tax-cell" style="text-align: center;">
-                                        <span class="tax-indicator inactive" id="shipTax2"></span>
-                                    </div>
-                                </div>
-                                <div class="tax-row">
-                                    <div class="tax-cell"><label for="taxCode3">Account #3</label></div>
-                                    <div class="tax-cell">
-                                        <input type="text" class="tax-code" id="taxCode3">
-                                    </div>
-                                    <div class="tax-cell">
-                                        <input type="text" class="tax-desc" id="taxDesc3" readonly aria-label="Tax desc3">
-                                    </div>
-                                    <div class="tax-cell" style="text-align: center;">
-                                        <span class="search-icon" data-call="searchTaxCode" data-args='[3]'></span>
-                                    </div>
-                                    <div class="tax-cell" style="text-align: center;">
-                                        <span class="tax-indicator inactive" id="payTax3"></span>
-                                    </div>
-                                    <div class="tax-cell" style="text-align: center;">
-                                        <span class="tax-indicator inactive" id="shipTax3"></span>
-                                    </div>
-                                </div>
-                                <div class="tax-row">
-                                    <div class="tax-cell"><label for="taxCode4">Account #4</label></div>
-                                    <div class="tax-cell">
-                                        <input type="text" class="tax-code" id="taxCode4">
-                                    </div>
-                                    <div class="tax-cell">
-                                        <input type="text" class="tax-desc" id="taxDesc4" readonly aria-label="Tax desc4">
-                                    </div>
-                                    <div class="tax-cell" style="text-align: center;">
-                                        <span class="search-icon" data-call="searchTaxCode" data-args='[4]'></span>
-                                    </div>
-                                    <div class="tax-cell" style="text-align: center;">
-                                        <span class="tax-indicator inactive" id="payTax4"></span>
-                                    </div>
-                                    <div class="tax-cell" style="text-align: center;">
-                                        <span class="tax-indicator inactive" id="shipTax4"></span>
+                                    <div class="tax-exempt-section">
+                                        <button
+                                            type="button"
+                                            class="tax-exempt-toggle inactive btn"
+                                            id="taxExemptToggle"
+                                            aria-label="Tax exemption"
+                                            aria-pressed="false"
+                                            data-sim-call="toggleTaxExempt"
+                                        >
+                                            Tax exempt
+                                        </button>
+                                        <label for="taxExempt">Tax Exempt #</label>
+                                        <input
+                                            type="text"
+                                            class="tax-exempt-input field-input"
+                                            id="taxExempt"
+                                            placeholder=""
+                                            disabled=""
+                                        />
+                                        <label for="expirationDate">Expiration Date</label>
+                                        <input
+                                            type="text"
+                                            class="expiration-input field-input"
+                                            id="expirationDate"
+                                            placeholder=""
+                                            disabled=""
+                                        />
+                                        <span class="calendar-icon"></span>
                                     </div>
                                 </div>
                             </div>
-                            <div class="tax-exempt-section">
-                                <span class="tax-exempt-toggle inactive" id="taxExemptToggle" data-call="toggleTaxExempt"></span>
-                                <label for="taxExempt" style="font-size: 11px; margin-right: 10px;">Tax Exempt #</label>
-                                <input type="text" class="tax-exempt-input" id="taxExempt" placeholder="" disabled>
-                                <label for="expirationDate" style="font-size: 11px; margin: 0 10px;">Expiration Date</label>
-                                <input type="text" class="expiration-input" id="expirationDate" placeholder="" disabled>
-                                <span class="calendar-icon"></span>
+                        </div>
+                    </div>
+
+                    <!-- Right Panel - Profile -->
+                    <div class="right-panel">
+                        <div class="profile-header">
+                            Profile
+                            <span
+                                >Active?
+                                <span></span>
+                            </span>
+                        </div>
+
+                        <div class="profile-field">
+                            <label for="extCustId">Ext. Cust ID:</label>
+                            <input type="text" id="extCustId" value="big" class="field-input" />
+                        </div>
+
+                        <div class="profile-field">
+                            <label for="salesperson">Salesperson:</label>
+                            <select id="salesperson" class="field-select">
+                                <option value="">Select...</option>
+                                <option value="Nika Lao">Nika Lao</option>
+                                <option value="Adriyella Trujillo">Adriyella Trujillo</option>
+                                <option value="Taneisha Clark">Taneisha Clark</option>
+                                <option value="Ruthie Nhong">Ruthie Nhong</option>
+                                <option value="Erik Mickelson">Erik Mickelson</option>
+                                <option value="Jim Mickelson">Jim Mickelson</option>
+                                <option value="House">House</option>
+                            </select>
+                        </div>
+
+                        <div class="profile-field">
+                            <label for="salesGroup">Sales Group:</label>
+                            <input type="text" id="salesGroup" class="field-input" />
+                        </div>
+
+                        <div class="profile-field">
+                            <label for="customerType">Type:</label>
+                            <select id="customerType" class="field-select">
+                                <option value="">Select...</option>
+                                <option value="Corporate">Corporate</option>
+                                <option value="Individual">Individual</option>
+                                <option value="Government">Government</option>
+                                <option value="Non-Profit">Non-Profit</option>
+                                <option value="School">School</option>
+                                <option value="Church">Church</option>
+                                <option value="Fundraising">Fundraising</option>
+                                <option value="Medical">Medical</option>
+                                <option value="Military">Military</option>
+                                <option value="Events">Events</option>
+                                <option value="AMC">AMC</option>
+                            </select>
+                        </div>
+
+                        <div class="profile-field">
+                            <label for="source">Source:</label>
+                            <select id="source" class="field-select">
+                                <option value="">Select...</option>
+                                <option value="Google Search">Google Search</option>
+                                <option value="Drive By">Drive By</option>
+                                <option value="Referral">Referral</option>
+                                <option value="Cold Call">Cold Call</option>
+                                <option value="Trade Show">Trade Show</option>
+                                <option value="Web">Web</option>
+                                <option value="Facebook">Facebook</option>
+                                <option value="Instagram">Instagram</option>
+                            </select>
+                        </div>
+
+                        <div class="profile-field">
+                            <label for="reference">Reference:</label>
+                            <input type="text" id="reference" class="field-input" />
+                        </div>
+
+                        <div class="profile-field">
+                            <label for="sicCode">SIC Code:</label>
+                            <input type="text" id="sicCode" class="field-input" />
+                        </div>
+
+                        <div class="profile-field">
+                            <label for="sicDesc">SIC Desc.:</label>
+                            <input type="text" id="sicDesc" class="field-input" />
+                        </div>
+
+                        <div class="profile-field">
+                            <label for="numEmployees"># Of Emp.:</label>
+                            <input type="number" id="numEmployees" class="field-input" />
+                        </div>
+
+                        <div class="custom-fields">
+                            <h4>Custom Fields</h4>
+                            <div class="profile-field">
+                                <label for="accountTier">Account Tier:</label>
+                                <select id="accountTier" class="field-select">
+                                    <option value="">Select...</option>
+                                    <option value="Gold">Gold</option>
+                                    <option value="Silver">Silver</option>
+                                    <option value="Bronze">Bronze</option>
+                                </select>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
+                <p class="status-bar">User: <strong id="currentUser">Training Mode</strong> · New Messages: (0)</p>
+            </section>
+        </main>
 
-            <!-- Right Panel - Profile -->
-            <div class="right-panel">
-                <div class="profile-header">Profile
-                    <span style="float: right; font-size: 10px; color: #666;">Active? 
-                        <span style="display: inline-block; width: 16px; height: 16px; background: #40c040; border-radius: 50%; vertical-align: middle;"></span>
-                    </span>
-                </div>
-                
-                <div class="profile-field">
-                    <label for="extCustId">Ext. Cust ID:</label>
-                    <input type="text" id="extCustId" value="big" style="background: #ffe8e8; color: red;">
-                </div>
-                
-                <div class="profile-field">
-                    <label for="salesperson">Salesperson:</label>
-                    <select id="salesperson">
-                        <option value="">Select...</option>
-                        <option value="Nika Lao">Nika Lao</option>
-                        <option value="Adriyella Trujillo">Adriyella Trujillo</option>
-                        <option value="Taneisha Clark">Taneisha Clark</option>
-                        <option value="Ruthie Nhong">Ruthie Nhong</option>
-                        <option value="Erik Mickelson">Erik Mickelson</option>
-                        <option value="Jim Mickelson">Jim Mickelson</option>
-                        <option value="House">House</option>
-                    </select>
-                </div>
-                
-                <div class="profile-field">
-                    <label for="salesGroup">Sales Group:</label>
-                    <input type="text" id="salesGroup">
-                </div>
-                
-                <div class="profile-field">
-                    <label for="customerType">Type:</label>
-                    <select id="customerType">
-                        <option value="">Select...</option>
-                        <option value="Corporate">Corporate</option>
-                        <option value="Individual">Individual</option>
-                        <option value="Government">Government</option>
-                        <option value="Non-Profit">Non-Profit</option>
-                        <option value="School">School</option>
-                        <option value="Church">Church</option>
-                        <option value="Fundraising">Fundraising</option>
-                        <option value="Medical">Medical</option>
-                        <option value="Military">Military</option>
-                        <option value="Events">Events</option>
-                        <option value="AMC">AMC</option>
-                    </select>
-                </div>
-                
-                <div class="profile-field">
-                    <label for="source">Source:</label>
-                    <select id="source">
-                        <option value="">Select...</option>
-                        <option value="Google Search">Google Search</option>
-                        <option value="Drive By">Drive By</option>
-                        <option value="Referral">Referral</option>
-                        <option value="Cold Call">Cold Call</option>
-                        <option value="Trade Show">Trade Show</option>
-                        <option value="Web">Web</option>
-                        <option value="Facebook">Facebook</option>
-                        <option value="Instagram">Instagram</option>
-                    </select>
-                </div>
-                
-                <div class="profile-field">
-                    <label for="reference">Reference:</label>
-                    <input type="text" id="reference">
-                </div>
-                
-                <div class="profile-field">
-                    <label for="sicCode">SIC Code:</label>
-                    <input type="text" id="sicCode">
-                </div>
-                
-                <div class="profile-field">
-                    <label for="sicDesc">SIC Desc.:</label>
-                    <input type="text" id="sicDesc">
-                </div>
-                
-                <div class="profile-field">
-                    <label for="numEmployees"># Of Emp.:</label>
-                    <input type="number" id="numEmployees">
-                </div>
+        <!-- Status Bar -->
 
-                <div class="custom-fields">
-                    <h4>Custom Fields</h4>
-                    <div class="profile-field">
-                        <label for="accountTier">Account Tier:</label>
-                        <select id="accountTier">
-                            <option value="">Select...</option>
-                            <option value="Gold">Gold</option>
-                            <option value="Silver">Silver</option>
-                            <option value="Bronze">Bronze</option>
-                        </select>
-                    </div>
-                </div>
+        <!-- Training Overlay -->
+
+        <!-- Tooltip -->
+        <div class="tooltip" id="tooltip"></div>
+
+        <!-- Loading Screen -->
+        <div class="loading-screen" id="loadingScreen" hidden="">
+            <div class="loading-content">
+                <h2>Loading Shopworks Training...</h2>
+                <div class="spinner"></div>
+                <p>Preparing your training environment</p>
             </div>
         </div>
-    </main>
 
-    <!-- Status Bar -->
-    <div class="status-bar">
-        <span>User: <strong id="currentUser">Training Mode</strong></span>
-        <span>New Messages: (0)</span>
-    </div>
+        <script defer="" src="/training/js/shopworks-customer-setup-enhanced.js?v=2026.09.08.16"></script>
 
-    <!-- Training Overlay -->
-    <div class="training-overlay" id="trainingOverlay">
-        <h3>Training Mode</h3>
-        <div class="mode-selector">
-            <button class="mode-btn" data-call="startFieldExplorer">
-                <i class="fas fa-search" aria-hidden="true"></i> Field Explorer
-            </button>
-            <button class="mode-btn" data-call="startSetupSimulator">
-                <i class="fas fa-user-plus" aria-hidden="true"></i> Setup Simulator
-            </button>
-            <button class="mode-btn" data-call="startFieldDetective">
-                <i class="fas fa-user-secret" aria-hidden="true"></i> Field Detective
-            </button>
-            <button class="mode-btn" data-call="startSpeedChallenge">
-                <i class="fas fa-tachometer-alt" aria-hidden="true"></i> Speed Challenge
-            </button>
-        </div>
-        
-        <div id="modeContent" style="margin-top: 15px;">
-            <!-- Mode-specific content will appear here -->
-        </div>
-        
-        <div class="score-display" id="scoreDisplay" style="display: none;">
-            <h4>Score</h4>
-            <div class="score-value" id="scoreValue">0</div>
-        </div>
-    </div>
-
-    <!-- Tooltip -->
-    <div class="tooltip" id="tooltip"></div>
-
-    <!-- Loading Screen -->
-    <div class="loading-screen" id="loadingScreen" style="display: none;">
-        <div class="loading-content">
-            <h2>Loading Shopworks Training...</h2>
-            <div class="spinner"></div>
-            <p>Preparing your training environment</p>
-        </div>
-    </div>
-
-    <script src="/shared_components/js/data-call-delegator.js?v=2026.09.06.29"></script>
-    <script src="/training/js/shopworks-customer-setup-enhanced.js?v=2026.09.06.27"></script>
-</body>
+        <dialog id="tax-code-dialog" class="simulator-dialog" aria-labelledby="tax-dialog-title">
+            <h2 id="tax-dialog-title">Choose tax code</h2>
+            <div class="options-grid">
+                <button type="button" class="btn option-btn" data-tax-code="2200">
+                    2200 — Washington State Sales Tax</button
+                ><button type="button" class="btn option-btn" data-tax-code="2202">2202 — Out of State Sales</button
+                ><button type="button" class="btn option-btn" data-tax-code="2203">2203 — Wholesale Sales</button>
+            </div>
+            <button class="btn" id="tax-dialog-close" type="button">Cancel</button>
+        </dialog>
+    </body>
 </html>

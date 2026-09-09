@@ -87,3 +87,7 @@ Training references: cap/quick-tips/shipping/purchasing load tokens → componen
 
 
 Training manuals: tokens → components → training-guide → training-reference → training-manual → page arrangement. data-training-manual identifies this family; data-manual-mode=chapters hides other sections on screen. Mobile contents use native details, biography uses native buttons, and printing temporarily opens complete content then restores it. Keep generic card classes out of long document sections. Original prose, destinations, media, employee and exercise data have source guards.
+
+## Training simulators
+
+`training-simulator.css` extends the unified training practice family with responsive exercise options, scoreboards, progress and native dialogs. The four final training pages keep their page-specific arrangements in training CSS; controls and tokens remain shared.
