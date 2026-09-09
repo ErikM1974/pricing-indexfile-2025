@@ -290,7 +290,15 @@ var golftourshowLog = GOLFTOURSHOW_LOG_ON ? console.log.bind(console) : function
         const resp = await fetch(`${API_BASE}/api/garment-tracker/config`);
         if (!resp.ok) throw new Error(`Garment tracker config failed: ${resp.status}`);
         const json = await resp.json();
-        if (!json.success || !json.config) throw new Error('Invalid garment tracker config response');
+        const config = json?.config;
+        if (!json?.success || !config || !Array.isArray(config.itemGroups) || !config.itemGroups.length
+            || !config.premiumItems || typeof config.premiumItems !== 'object'
+            || !config.itemGroups.every(group => group && typeof group.name === 'string' && group.name.trim()
+                && Array.isArray(group.styles) && group.styles.length
+                && group.styles.every(style => typeof style === 'string' && style.trim()
+                    && typeof config.premiumItems[style]?.name === 'string' && config.premiumItems[style].name.trim()))) {
+            throw new Error('Invalid or empty garment tracker config response');
+        }
         return json.config;
     }
 
@@ -469,7 +477,7 @@ var golftourshowLog = GOLFTOURSHOW_LOG_ON ? console.log.bind(console) : function
         if (priceData.error || priceData[72] == null) {
             const msg = priceData.error || 'Quote on request';
             snapshot.innerHTML = `<span class="product-card__price-pending">${escapeHtml(msg)}</span>`;
-            table.innerHTML = `<p style="text-align:center;color:#6b7280;font-size:0.8125rem;padding:0.5rem;">Contact Taneisha for pricing on this style.</p>`;
+            table.innerHTML = `<p class="campaign-pricing-note">Contact Taneisha for pricing on this style.</p>`;
             return;
         }
 
@@ -496,7 +504,7 @@ var golftourshowLog = GOLFTOURSHOW_LOG_ON ? console.log.bind(console) : function
                 <thead><tr>${rows}</tr></thead>
                 <tbody><tr>${cells}</tr></tbody>
             </table>
-            <p style="font-size:0.6875rem;color:#6b7280;margin-top:0.5rem;text-align:center;">
+            <p class="campaign-small-note">
                 Per piece, embroidered. +$50 small-order fee under qty 24. Final pricing confirmed in your quote.
             </p>
         `;
@@ -603,9 +611,17 @@ var golftourshowLog = GOLFTOURSHOW_LOG_ON ? console.log.bind(console) : function
         const form = document.getElementById('golf-quote-form');
         const success = document.getElementById('form-success');
         if (!form || !success) return;
+        const status = document.getElementById('campaign-send-status');
+        const showError = message => {
+            status.textContent = message;
+            status.hidden = false;
+            status.focus();
+        };
 
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
+            status.hidden = true;
+            status.textContent = '';
 
             const submitBtn = document.getElementById('qf-submit');
             const originalBtn = submitBtn.innerHTML;
@@ -616,17 +632,19 @@ var golftourshowLog = GOLFTOURSHOW_LOG_ON ? console.log.bind(console) : function
                 const formData = collectFormData();
                 const validationError = validateFormData(formData);
                 if (validationError) {
-                    alert(validationError);
+                    showError(validationError);
                     submitBtn.disabled = false;
                     submitBtn.innerHTML = originalBtn;
                     return;
                 }
 
                 // Save to Caspio quote_sessions (prefix: GOLF). Returns a quote ID either way.
-                const saveResult = await saveLeadToCaspio(formData);
+                const saveResult = await saveLeadToCaspio(formData).catch(error => ({
+                    quoteID: generateFallbackQuoteId(), savedToCaspio: false, error: error.message
+                }));
                 const quoteId = saveResult.quoteID;
                 if (!saveResult.savedToCaspio) {
-                    console.warn('[golf-showcase] Caspio save failed — lead lives in EmailJS + console only:', saveResult.error);
+                    console.warn('[golf-showcase] Quote save failed; attempting sales notification:', saveResult.error);
                 }
 
                 const utm = getUtmParams();
@@ -674,26 +692,31 @@ var golftourshowLog = GOLFTOURSHOW_LOG_ON ? console.log.bind(console) : function
                     reply_to: formData.email
                 };
 
-                // Fire both emails. Lead alert is the one that MUST succeed —
-                // customer confirmation is nice-to-have. If lead alert fails, surface it.
-                const [customerResult, leadResult] = await Promise.allSettled([
-                    sendEmail(EMAILJS_CUSTOMER_TEMPLATE, customerParams),
-                    sendEmail(EMAILJS_LEAD_TEMPLATE, leadParams)
-                ]);
-
-                if (leadResult.status === 'rejected') {
-                    console.error('[golf-showcase] Lead alert failed:', leadResult.reason);
-                    // Still show success to user — we have their info in console; Erik can recover.
-                    // But surface a softer message so they know to expect a slight delay.
-                    showSuccess(quoteId, true);
-                } else {
-                    showSuccess(quoteId, false);
+                // A request is received only after storage or the sales notification succeeds.
+                let leadDelivered = false;
+                try {
+                    await sendEmail(EMAILJS_LEAD_TEMPLATE, leadParams);
+                    leadDelivered = true;
+                } catch (error) {
+                    console.warn('[golf-showcase] Sales notification failed:', error);
+                }
+                if (!saveResult.savedToCaspio && !leadDelivered) {
+                    throw new Error('Neither quote storage nor sales notification accepted the request.');
                 }
 
-                if (customerResult.status === 'rejected') {
-                    console.warn('[golf-showcase] Customer confirmation failed (non-blocking):', customerResult.reason);
+                // Never send a customer confirmation for an undelivered request.
+                let confirmationDelivered = true;
+                try {
+                    await sendEmail(EMAILJS_CUSTOMER_TEMPLATE, customerParams);
+                } catch (error) {
+                    confirmationDelivered = false;
+                    console.warn('[golf-showcase] Customer confirmation failed:', error);
                 }
-
+                showSuccess(quoteId, !leadDelivered);
+                if (!confirmationDelivered) {
+                    status.textContent = 'We received your request, but the confirmation email could not be sent. Our sales team will follow up.';
+                    status.hidden = false;
+                }
                 // Log lead to console for recovery if EmailJS misconfigured
                 golftourshowLog('[golf-showcase] LEAD CAPTURED:', {
                     quoteId,
@@ -705,7 +728,7 @@ var golftourshowLog = GOLFTOURSHOW_LOG_ON ? console.log.bind(console) : function
                 form.reset();
             } catch (err) {
                 console.error('[golf-showcase] Form submission error:', err);
-                alert('There was an error sending your request. Please call Taneisha directly at 253-922-5793 or email taneisha@nwcustomapparel.com.');
+                showError('We could not send your request. Your details are still here. Please try again, call 253-922-5793, or email sales@nwcustomapparel.com.');
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = originalBtn;
             }
@@ -828,11 +851,11 @@ var golftourshowLog = GOLFTOURSHOW_LOG_ON ? console.log.bind(console) : function
         if (form) form.hidden = true;
         if (success) {
             success.hidden = false;
-            success.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            success.tabIndex = -1;
+            success.focus();
         }
         if (withLeadWarning) {
-            // Quietly log — don't alarm the user.
-            console.warn('[golf-showcase] Lead notification email failed; lead is in console only.');
+            console.warn('[golf-showcase] Quote stored; sales notification email needs follow-up.');
         }
     }
 
@@ -846,6 +869,13 @@ var golftourshowLog = GOLFTOURSHOW_LOG_ON ? console.log.bind(console) : function
 
     async function init() {
         setFooterYear();
+        function showUnavailableExample() {
+            const example = document.getElementById('example-package-card');
+            if (example) {
+                example.textContent = 'Sample package pricing is unavailable. Please use the form below for a quote or reload the page to try again.';
+                example.setAttribute('role', 'status');
+            }
+        }
 
         // Initialize EmailJS
         if (typeof emailjs !== 'undefined') {
@@ -868,6 +898,7 @@ var golftourshowLog = GOLFTOURSHOW_LOG_ON ? console.log.bind(console) : function
         // Initialize embroidery pricing service (defined in embroidery-pricing-service.js)
         if (typeof EmbroideryPricingService === 'undefined') {
             console.error('[golf-showcase] EmbroideryPricingService not loaded — pricing will not display.');
+            showUnavailableExample();
             const container = document.getElementById('product-categories');
             if (container) {
                 container.innerHTML = `<div class="loading-state"><i class="fas fa-triangle-exclamation" aria-hidden="true"></i><span>Pricing service unavailable. Please reload the page or call ${COMPANY_PHONE}.</span></div>`;
@@ -884,6 +915,7 @@ var golftourshowLog = GOLFTOURSHOW_LOG_ON ? console.log.bind(console) : function
             state.config = await loadConfig();
         } catch (err) {
             console.error('[golf-showcase] Config load failed:', err);
+            showUnavailableExample();
             const container = document.getElementById('product-categories');
             if (container) {
                 container.innerHTML = `
@@ -904,112 +936,6 @@ var golftourshowLog = GOLFTOURSHOW_LOG_ON ? console.log.bind(console) : function
 
         // Background-load all pricing in parallel
         loadAllPricing();
-    }
-
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init);
-    } else {
-        init();
-    }
-})();
-
-// Sticky anchor nav — slides in once visitor scrolls past the hero
-(function stickyNav() {
-    function init() {
-        const nav = document.querySelector('[data-sticky-nav]');
-        const hero = document.querySelector('.hero');
-        if (!nav || !hero || !('IntersectionObserver' in window)) return;
-
-        const observer = new IntersectionObserver(([entry]) => {
-            nav.classList.toggle('is-visible', !entry.isIntersecting);
-        }, {
-            rootMargin: '-80px 0px 0px 0px',
-            threshold: 0
-        });
-
-        observer.observe(hero);
-    }
-
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init);
-    } else {
-        init();
-    }
-})();
-
-// Team-photo lightbox — click any team card image to open a full-screen viewer
-(function teamLightbox() {
-    function init() {
-        const lb = document.querySelector('[data-lightbox]');
-        const triggers = [...document.querySelectorAll('.team__card .team__card-image')];
-        if (!lb || !triggers.length) return;
-
-        const lbImg = lb.querySelector('.lightbox__image');
-        const lbCap = lb.querySelector('.lightbox__caption');
-        const closeBtn = lb.querySelector('.lightbox__close');
-        const prevBtn = lb.querySelector('.lightbox__prev');
-        const nextBtn = lb.querySelector('.lightbox__next');
-
-        let currentIndex = -1;
-        let lastFocused = null;
-
-        function open(index) {
-            if (index < 0 || index >= triggers.length) return;
-            currentIndex = index;
-            const trigger = triggers[index];
-            const sourceImg = trigger.querySelector('img');
-            const figcap = trigger.closest('.team__card').querySelector('figcaption');
-            if (!sourceImg) return;
-            lbImg.src = sourceImg.src;
-            lbImg.alt = sourceImg.alt || '';
-            lbCap.textContent = figcap ? figcap.textContent.trim() : '';
-            lb.classList.add('is-open');
-            lb.setAttribute('aria-hidden', 'false');
-            document.body.style.overflow = 'hidden';
-            lastFocused = document.activeElement;
-            closeBtn.focus();
-        }
-
-        function close() {
-            lb.classList.remove('is-open');
-            lb.setAttribute('aria-hidden', 'true');
-            document.body.style.overflow = '';
-            lbImg.src = '';
-            if (lastFocused && typeof lastFocused.focus === 'function') {
-                lastFocused.focus();
-            }
-        }
-
-        function navigate(delta) {
-            const next = (currentIndex + delta + triggers.length) % triggers.length;
-            open(next);
-        }
-
-        triggers.forEach((trigger, i) => {
-            trigger.setAttribute('role', 'button');
-            trigger.setAttribute('tabindex', '0');
-            trigger.setAttribute('aria-label', 'View larger photo');
-            trigger.addEventListener('click', () => open(i));
-            trigger.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    open(i);
-                }
-            });
-        });
-
-        closeBtn.addEventListener('click', close);
-        prevBtn.addEventListener('click', () => navigate(-1));
-        nextBtn.addEventListener('click', () => navigate(1));
-        lb.addEventListener('click', (e) => {
-            if (e.target === lb) close();
-        });
-        document.addEventListener('keydown', (e) => {
-            if (!lb.classList.contains('is-open')) return;
-            if (e.key === 'Escape') close();
-            else if (e.key === 'ArrowLeft') navigate(-1);
-            else if (e.key === 'ArrowRight') navigate(1);
-        });
     }
 
     if (document.readyState === 'loading') {

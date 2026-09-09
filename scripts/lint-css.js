@@ -32,7 +32,7 @@ const CSS_LINT_SCOPE = [
     // Webstore / SEO family (2026-09-07): the storefront system, the g-header template sheets, catalog + carts
     'shared_components/css/nwca-2026-core.css',
     'shared_components/css/nwca-2026.css',
-    'shared_components/css/golf-tournament-showcase.css',
+    'shared_components/css/campaign-storefront.css',
     'shared_components/css/golf-tournament-product.css',
     'shared_components/css/cart-drawer.css',
     'shared_components/css/safety-stripe-recs.css',

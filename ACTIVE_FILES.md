@@ -105,3 +105,10 @@ Historical counts are retained as audit notes and must not be presented as curre
 - `tests/fixtures/catalog-discovery-original-content.json` — original copy/links/fields/images and complete curated Fall brand/category/style arrays.
 
 - `tests/unit/catalog-discovery-content.test.js`, `tests/e2e/css-unification-catalog-discovery.spec.js`, `tests/fixtures/catalog-discovery-original-content.json` — original catalog copy/curation, named brand links, four widths/native menus, actual server label passthrough, failure/malformed/retry/filters/broken images and populated paper.
+
+- shared_components/css/campaign-storefront.css replaces golf-tournament-showcase.css for three golf/safety pages. golf-tournament-product.css remains its scoped detail arrangement. Shared controls and semantic tokens load first. Work in progress; visual review pending.
+- shared_components/js/campaign-storefront.js owns native photo dialog, fragment focus and complete paper disclosure restoration. Financial services and quote submission remain in their existing controllers.
+
+- tests/fixtures/campaign-storefront-original-content.json and tests/unit/campaign-storefront-content.test.js — original three-page prose/links/images/fields/SEO and normalized controller/service guards; only visual class/style attributes and replaced navigation adapters are excluded from controller comparison.
+
+- tests/e2e/css-unification-campaign-storefront.spec.js — four widths/contrast/native photo viewer/filter/gallery/print plus synthetic save/email outcome matrix; all real business writes and email blocked. Submission now retains inputs and sends no customer confirmation unless storage or sales notification accepted the request.

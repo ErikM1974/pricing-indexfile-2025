@@ -17,7 +17,7 @@
 | `/shared_components/css/embroidery-quote-builder-extracted.css` | Embroidery quote builder styles (2026-01-27 extraction) | Embroidery quote builder | ✅ Active |
 | `/shared_components/css/quote-builder-unified-step1.css` | ~~DELETED~~ — superseded by `quote-builder-common.css` (2026-01-27) | — | ❌ Deleted |
 | `/shared_components/css/dtg-quote-builder.css` | DTG specific | DTG quote builder | ❌ Removed 2026-09-07 — dead: no page, script, route or @import referenced it (verified by path, basename and stem search); deleted with the CSS standardization tail batch |
-| `/shared_components/css/golf-tournament-showcase.css` | **NEW** Golf tournament landing page styles (golf theme — fairway greens, sand accents, gold offer ribbon) | golf-tournaments-2026.html, golf-tournament-product.html | ✅ Active |
+| `/shared_components/css/campaign-storefront.css` | **NEW** Golf tournament landing page styles (golf theme — fairway greens, sand accents, gold offer ribbon) | golf-tournaments-2026.html, golf-tournament-product.html | ✅ Active |
 | `/shared_components/css/golf-tournament-product.css` | **NEW** Product detail page styles (gallery, color swatches, size pills, volume pricing table) — layered on top of showcase.css | golf-tournament-product.html | ✅ Active |
 | `/shared_components/css/dtg-quote-builder-extracted.css` | DTG quote builder extracted styles (2026-01-27) | DTG quote builder | ❌ Removed 2026-09-07 — dead: no page, script, route or @import referenced it (verified by path, basename and stem search); deleted with the CSS standardization tail batch |
 | `/shared_components/css/screenprint-quote-builder-extracted.css` | Screenprint quote builder extracted styles (2026-01-27) | Screenprint quote builder | ✅ Active |
@@ -195,7 +195,7 @@ The four policy pages load tokens, shared components, then pages/css/policy-work
 
 ## Public webstore family — 2026-09-08
 
-The twelve public webstore marketing pages share tokens/components/Public Sans and the rebuilt pages/css/company-webstores.css. They no longer borrow golf-tournament-showcase.css. The family owns a split photo/text hero, reachable public navigation, image/product/price grids, native FAQs and paper layout. Shared webstore-guide.js only focuses fragment destinations and restores FAQ state after printing. Preserve original terms, full main text, image destinations and SEO JSON-LD data; no business API calls.
+The twelve public webstore marketing pages share tokens/components/Public Sans and the rebuilt pages/css/company-webstores.css. They no longer borrow campaign-storefront.css. The family owns a split photo/text hero, reachable public navigation, image/product/price grids, native FAQs and paper layout. Shared webstore-guide.js only focuses fragment destinations and restores FAQ state after printing. Preserve original terms, full main text, image destinations and SEO JSON-LD data; no business API calls.
 
 Brand guides: fifteen custom-brand pages now use tokens/components + shared `storefront-shell.css` + `pages/css/brand-guide.css`. The shared shell owns public navigation/footer; family CSS owns original content layout. `shared_components/js/storefront-navigation.js` manages native mobile dialog and existing encoded catalogue search. Other storefront consumers retain nwca-2026-core.css.
 
