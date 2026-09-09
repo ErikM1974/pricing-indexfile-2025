@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
+<html lang="en"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DTG-Compatible Products | Northwest Custom Apparel</title>
@@ -10,21 +9,21 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <!-- Universal Components -->
-    <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/shared_components/css/universal-header.css?v=2026.09.07.12">
-    <link rel="stylesheet" href="/shared_components/css/universal-cart-header.css?v=2026.09.07.19">
-    <link rel="stylesheet" href="/shared_components/css/universal-calculator-theme.css?v=2026.09.07.19">
-    <script src="/shared_components/js/universal-cart-header.js?v=2026.09.06.5"></script>
-    <script src="/shared_components/js/sample-cart.js?v=2026.09.06.8"></script>
 
-    <link rel="stylesheet" href="/pages/css/dtg-compatible-products.css?v=2026.09.07.19">
-</head>
-<body>
+
+
+
+    <script src="/shared_components/js/universal-cart-header.js?v=2026.09.09.17"></script>
+
+
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap"><link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.09.17"><link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.09.17"><link rel="stylesheet" href="/shared_components/css/product-detail-tools.css?v=2026.09.09.17"><link rel="icon" href="/favicon.png"></head>
+<body data-ui="unified" data-product-detail="discovery" data-surface="storefront"><a class="skip-link" href="#product-detail-main">Skip to products</a>
     <!-- Universal Header Placeholder -->
     <div id="universal-header-placeholder"></div>
 
     <!-- Hero Section -->
-    <main>
+    <main id="product-detail-main" tabindex="-1">
     <section class="hero">
         <div class="hero-container">
             <h1>
@@ -39,7 +38,7 @@
             <div class="hero-features">
                 <div class="hero-feature">
                     <i class="fas fa-certificate" aria-hidden="true"></i>
-                    <h3>Tested & Verified</h3>
+                    <h3>Tested &amp; Verified</h3>
                     <p>Every product tested for DTG compatibility</p>
                 </div>
                 <div class="hero-feature">
@@ -80,15 +79,15 @@
     <section class="products-section">
         <div class="section-header">
             <h2>DTG-Compatible Products</h2>
-            <p id="productCount">Loading products...</p>
+            <p id="productCount" aria-live="polite">Loading products...</p>
         </div>
 
-        <div class="loading" id="loadingIndicator">
+        <div class="loading" id="loadingIndicator" role="status">
             <div class="spinner"></div>
             <p class="loading-text">Loading DTG-compatible products...</p>
         </div>
 
-        <div class="products-grid" id="productsGrid" hidden>
+        <div class="products-grid" id="productsGrid" hidden="">
             <!-- Products will be dynamically loaded here -->
         </div>
     </section>
@@ -97,12 +96,13 @@
     <!-- Footer -->
     <footer class="footer">
         <div class="footer-content">
-            <p>&copy; 2026 Northwest Custom Apparel. All rights reserved.</p>
+            <p>© 2026 Northwest Custom Apparel. All rights reserved.</p>
             <p>2025 Freeman Road East, Milton, WA 98354 | 253-922-5793</p>
         </div>
     </footer>
 
     <script src="/config/app.config.js"></script>
-    <script src="/pages/js/dtg-compatible-products.js?v=2026.09.06.31"></script>
-</body>
-</html>
+    <script src="/pages/js/dtg-compatible-products.js?v=2026.09.09.17"></script>
+
+
+</body></html>

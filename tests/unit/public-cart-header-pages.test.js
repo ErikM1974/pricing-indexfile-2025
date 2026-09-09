@@ -24,12 +24,14 @@ describe('universal cart header component', () => {
         expect(js).toMatch(/badge\.hidden = !\(this\.cartCount > 0\);/);
         expect(js).toMatch(/<a class="\$\{cartIndicatorClass\}" href=/);
         expect(js).not.toMatch(BARE);
-        expect(fs.existsSync(path.join(ROOT, 'shared_components/css/universal-cart-header.css'))).toBe(true);
-        expect(read('shared_components/css/universal-cart-header.css')).toMatch(/\[hidden\] \{ display: none !important; \}/);
+        expect(fs.existsSync(path.join(ROOT, 'shared_components/css/universal-cart-header.css'))).toBe(false);
+        expect(read('shared_components/css/components.css')).toMatch(/\[hidden\]\s*\{[^}]*display:\s*none;/);
+        expect(read('shared_components/css/product-detail-tools.css')).toContain('.universal-header');
     });
-    test('its one consumer links the stylesheet and versions every asset', () => {
+    test('its one consumer links shared style ownership and versions every asset', () => {
         const html = read('pages/dtg-compatible-products.html');
-        expect(html).toContain('/shared_components/css/universal-cart-header.css?v=');
+        expect(html).toContain('/shared_components/css/components.css?v=');
+        expect(html).toContain('/shared_components/css/product-detail-tools.css?v=');
         expect(html).not.toMatch(/(href|src)="\/(?!config\/app\.config\.js)[^"?]+\.(css|js)"/);
     });
 });

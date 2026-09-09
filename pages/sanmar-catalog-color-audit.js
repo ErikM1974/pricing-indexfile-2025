@@ -59,6 +59,15 @@
   }
 
   function render(result) {
+    var buckets = ['inSync', 'caspioMismatch', 'caspioOrphan', 'sanmarOnly', 'internalDrift'];
+    if (!result || typeof result !== 'object' || !result.style || !Number.isFinite(Date.parse(result.generatedAt)) ||
+        ['caspioRowsFetched', 'caspioColorsUnique', 'sanmarColors'].some(function (key) { return !Number.isInteger(result[key]) || result[key] < 0; }) ||
+        buckets.some(function (key) {
+          var bucket = result[key];
+          return !bucket || !Array.isArray(bucket.rows) || bucket.count !== bucket.rows.length || bucket.rows.some(function (row) {
+            return !row || typeof row !== 'object' || !row.colorName || (row.sizes != null && !Array.isArray(row.sizes));
+          });
+        })) throw new Error('Incomplete audit response. Run the audit again.');
     lastResult = result;
 
     document.getElementById('sum-sync').textContent       = result.inSync.count;
@@ -166,7 +175,14 @@
     );
     showBucket('bkt-sync', result.inSync.count);
 
-    setStatus('Loaded ' + result.caspioRowsFetched + ' Caspio rows + ' + result.sanmarColors + ' SanMar colors.', false);
+    if (result.sanmarApiError) {
+      ['sum-sync', 'sum-mismatch', 'sum-orphan', 'sum-sanmar-only'].forEach(function (id) { document.getElementById(id).textContent = 'Unknown'; });
+      ['bkt-sync', 'bkt-mismatch', 'bkt-orphan', 'bkt-sanmaronly'].forEach(function (id) { document.getElementById(id).hidden = true; });
+      document.getElementById('meta-sanmar-colors').textContent = 'Unavailable';
+      setStatus('SanMar is unavailable. Only internal Caspio drift can be reviewed. Run audit to retry.', true);
+    } else {
+      setStatus('Loaded ' + result.caspioRowsFetched + ' Caspio rows + ' + result.sanmarColors + ' SanMar colors.', false);
+    }
   }
 
   function tsv(headers, rows) {
@@ -180,7 +196,7 @@
   }
 
   function copyForBucket(target) {
-    if (!lastResult) return null;
+    if (!lastResult || (lastResult.sanmarApiError && target !== 'drift')) return null;
     if (target === 'mismatch') {
       return tsv(
         ['COLOR_NAME', 'Caspio_CATALOG_COLOR', 'Caspio_SANMAR_MAINFRAME_COLOR', 'SanMar_mainframeColor', 'SanMar_status', 'Sizes'],
@@ -222,7 +238,10 @@
     var target = btn.getAttribute('data-target');
     var text = copyForBucket(target);
     if (!text) return;
-    navigator.clipboard.writeText(text).then(function () {
+    Promise.resolve().then(function () {
+      if (!navigator.clipboard || typeof navigator.clipboard.writeText !== 'function') throw new Error('Clipboard unavailable');
+      return navigator.clipboard.writeText(text);
+    }).then(function () {
       var orig = btn.textContent;
       btn.classList.add('copied');
       btn.textContent = 'Copied!';
@@ -230,13 +249,16 @@
         btn.classList.remove('copied');
         btn.textContent = orig;
       }, 1400);
-    });
+    }).catch(function () { setStatus('Could not copy. Allow clipboard access and try Copy CSV again, or select the table text.', true); });
   });
 
   async function runAudit() {
+    if (runBtn.disabled) return;
     var style = (styleInput.value || '').trim().toUpperCase();
     if (!style) { setStatus('Enter a style first.', true); return; }
     runBtn.disabled = true;
+    lastResult = null; summaryEl.hidden = true; metaEl.hidden = true;
+    document.querySelectorAll('.bucket').forEach(function (bucket) { bucket.hidden = true; });
     setStatus('Fetching Caspio + SanMar live data…', false);
 
     try {

@@ -66,3 +66,5 @@
 
 
 2026-09-08: training/js/customer-service.js and training/js/get-to-know-erik.js retired after both callers moved to training-manual.js.
+
+Product detail ownership follow-up: the DTG list was the only consumer of shared_components/css/universal-cart-header.css. Its layout is now provided by product-detail-tools.css plus components.css, so the unused sheet is retired and removed from lint scope. UniversalCartHeader behavior remains unchanged; its obsolete stylesheet comment is updated and the consuming script cache version is2026.09.09.17. Historical tests/unit/public-cart-header-pages.test.js follows the current owner and still locks no style injection, badge visibility, asset versions and destinations. Seven original script hashes now reverse33mapped changes (the extra change is only that comment). This retires four sheets/5important declarations total; current local owner zero.

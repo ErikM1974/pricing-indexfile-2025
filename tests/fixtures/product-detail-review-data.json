@@ -1,0 +1,203 @@
+{
+  "fixed": "2026-09-09T20:00:00Z",
+  "products": [
+    {
+      "STYLE": "PC54",
+      "PRODUCT_TITLE": "Cotton Crew Tee. Example product details",
+      "PRODUCT_DESCRIPTION": "100% cotton. Sample review garment.",
+      "MILL": "Example Brand",
+      "BRAND_NAME": "Example Brand",
+      "COLOR_NAME": "Brilliant Orange",
+      "CATALOG_COLOR": "BrillOrng",
+      "COLOR_SQUARE_IMAGE": "http://localhost:3400/product-detail-review/color-0.svg",
+      "FRONT_MODEL": "http://localhost:3400/product-detail-review/tee-0.svg",
+      "FRONT_FLAT": "http://localhost:3400/product-detail-review/tee-0.svg",
+      "PRODUCT_IMAGE": "http://localhost:3400/product-detail-review/tee-0.svg",
+      "AVAILABLE_SIZES": "S, M, L, XL, 2XL, 3XL"
+    },
+    {
+      "STYLE": "PC54",
+      "PRODUCT_TITLE": "Cotton Crew Tee. Example product details",
+      "PRODUCT_DESCRIPTION": "100% cotton. Sample review garment.",
+      "MILL": "Example Brand",
+      "BRAND_NAME": "Example Brand",
+      "COLOR_NAME": "Deep Navy",
+      "CATALOG_COLOR": "Navy",
+      "COLOR_SQUARE_IMAGE": "http://localhost:3400/product-detail-review/color-1.svg",
+      "FRONT_MODEL": "http://localhost:3400/product-detail-review/tee-1.svg",
+      "FRONT_FLAT": "http://localhost:3400/product-detail-review/tee-1.svg",
+      "PRODUCT_IMAGE": "http://localhost:3400/product-detail-review/tee-1.svg",
+      "AVAILABLE_SIZES": "S, M, L, XL, 2XL, 3XL"
+    }
+  ],
+  "stock": {
+    "style": "PC54",
+    "color": "BrillOrng",
+    "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "2XL",
+      "3XL"
+    ],
+    "warehouses": [
+      {
+        "name": "Seattle",
+        "inventory": [
+          1,
+          23,
+          24,
+          100,
+          0,
+          6
+        ],
+        "total": 154
+      },
+      {
+        "name": "Reno",
+        "inventory": [
+          2,
+          0,
+          50,
+          200,
+          7,
+          0
+        ],
+        "total": 259
+      }
+    ],
+    "sizeTotals": [
+      3,
+      23,
+      74,
+      300,
+      7,
+      6
+    ],
+    "grandTotal": 413
+  },
+  "audit": {
+    "style": "112",
+    "caspioRowsFetched": 8,
+    "caspioColorsUnique": 3,
+    "sanmarColors": 3,
+    "generatedAt": "2026-09-09T20:00:00Z",
+    "sanmarApiError": null,
+    "inSync": {
+      "count": 1,
+      "rows": [
+        {
+          "colorName": "Deep Navy",
+          "caspioCatalogColor": "Navy",
+          "caspioMainframeColor": "Navy",
+          "sanmarMainframeColor": "Navy",
+          "sanmarProductStatus": "Active",
+          "productStatus": "Active",
+          "sizes": [
+            "S",
+            "M",
+            "L",
+            "XL",
+            "2XL",
+            "3XL"
+          ]
+        }
+      ]
+    },
+    "caspioMismatch": {
+      "count": 1,
+      "rows": [
+        {
+          "colorName": "Brilliant Orange",
+          "caspioCatalogColor": "Brilliant Orange",
+          "caspioMainframeColor": "BrillOrng",
+          "sanmarMainframeColor": "BrillOrng",
+          "sanmarProductStatus": "Active",
+          "productStatus": "Active",
+          "sizes": [
+            "S",
+            "M",
+            "L",
+            "XL",
+            "2XL",
+            "3XL"
+          ]
+        }
+      ]
+    },
+    "caspioOrphan": {
+      "count": 1,
+      "rows": [
+        {
+          "colorName": "Retired Color",
+          "caspioCatalogColor": "Retired",
+          "caspioMainframeColor": "Retired",
+          "sanmarMainframeColor": "BrillOrng",
+          "sanmarProductStatus": "Active",
+          "productStatus": "Discontinued",
+          "sizes": [
+            "S",
+            "M",
+            "L",
+            "XL",
+            "2XL",
+            "3XL"
+          ]
+        }
+      ]
+    },
+    "sanmarOnly": {
+      "count": 1,
+      "rows": [
+        {
+          "colorName": "New Green",
+          "caspioCatalogColor": "Brilliant Orange",
+          "caspioMainframeColor": "BrillOrng",
+          "sanmarMainframeColor": "NewGreen",
+          "sanmarProductStatus": "Active",
+          "productStatus": "Active",
+          "sizes": [
+            "S",
+            "M",
+            "L",
+            "XL",
+            "2XL",
+            "3XL"
+          ]
+        }
+      ]
+    },
+    "internalDrift": {
+      "count": 1,
+      "rows": [
+        {
+          "colorName": "Brilliant Orange",
+          "caspioCatalogColor": "Brilliant Orange",
+          "caspioMainframeColor": "BrillOrng",
+          "sanmarMainframeColor": "BrillOrng",
+          "sanmarProductStatus": "Active",
+          "productStatus": "Active",
+          "sizes": [
+            "S",
+            "M",
+            "L",
+            "XL",
+            "2XL",
+            "3XL"
+          ]
+        }
+      ]
+    }
+  },
+  "knownOriginalIssues": [
+    "DTG page references missing shared_components/js/sample-cart.js",
+    "Inventory page omits APP_CONFIG script while its imported API requires it"
+  ],
+  "originalCopies": [
+    "COLOR_NAME\tCaspio_CATALOG_COLOR\tCaspio_SANMAR_MAINFRAME_COLOR\tSanMar_mainframeColor\tSanMar_status\tSizes\nBrilliant Orange\tBrilliant Orange\tBrillOrng\tBrillOrng\tActive\tS, M, L, XL, 2XL, 3XL",
+    "COLOR_NAME\tCATALOG_COLOR\tSANMAR_MAINFRAME_COLOR\tPRODUCT_STATUS\tSizes\nBrilliant Orange\tBrilliant Orange\tBrillOrng\tActive\tS, M, L, XL, 2XL, 3XL",
+    "COLOR_NAME\tCATALOG_COLOR\tSANMAR_MAINFRAME_COLOR\tPRODUCT_STATUS\tSizes\nRetired Color\tRetired\tRetired\tDiscontinued\tS, M, L, XL, 2XL, 3XL",
+    "displayName\tmainframeColor\tproductStatus\tSizes\nNew Green\tNewGreen\tActive\tS, M, L, XL, 2XL, 3XL"
+  ]
+}
