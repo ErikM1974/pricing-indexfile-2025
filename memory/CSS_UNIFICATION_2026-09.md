@@ -572,3 +572,7 @@ Next two surfaces:brands.html andpages/fall-catalog-2026.html. Isolated codex/ca
 - [ ] Migrate shared navigation, both catalogue owners and necessary accessible/failure states.
 - [ ] Preserve curated taxonomy and original page content; four widths/keyboard/filter/failed-image/retry/price-label/print checks.
 - [ ] Full primary gates, exact-source CI and verified rollout after the pending entry/status release. Candidate2026.09.09.4; no live-count change yet.
+
+## Catalog discovery implementation in progress — 2026-09-09
+
+Two catalog layouts implemented in codex/catalog-discovery, not reviewed/deployable yet. Shared navigation moved byte-identically and all15 prior brand-guide script references updated. Brand tiles are named native links with visible labels when logos fail; retry retains search. Fall catalog retains all179 original curated styles,21 brand descriptions,10 categories and server-generated price labels; malformed batches visibly warn and retry preserves filters. Removed unused header dropdown placeholders/controllers; the existing native Products/Brands links preserve destinations. Source fixtures and tests registered. Next: four-width/keyboard/price/state/paper review, then primary full gates/CI after entry-status release. Live stillstaff.2/2081:104 reviewed/121 pending; candidate manifests are not a live count.
