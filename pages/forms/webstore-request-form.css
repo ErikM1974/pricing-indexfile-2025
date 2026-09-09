@@ -1,20 +1,22 @@
-/* webstore-request-form.css — Webstore / Company Store Request twin (portrait) */
+@layer components.pages {/* webstore-request-form.css — Webstore / Company Store Request twin (portrait) */
 
-.info-field--wide { grid-column: span 2; }
+:where([data-ui="unified"][data-form="printable"]) .info-field--wide { grid-column: span 2; }
 
-.assist-hint {
+:where([data-ui="unified"][data-form="printable"]) .assist-hint {
     font-size: 0.82rem;
     color: var(--print-ink-soft);
     margin: 6px 0 8px;
 }
-.assist-hint .fa-wand-magic-sparkles { color: var(--print-green); margin-right: 4px; }
+:where([data-ui="unified"][data-form="printable"]) .assist-hint .fa-wand-magic-sparkles { color: var(--print-green); margin-right: 4px; }
 
-.store-table .col-style { width: 14%; }
-.store-table .col-color { width: 18%; }
-.store-table .col-desc { width: 32%; }
-.store-table .col-deco { width: 16%; }
-.store-table .col-place { width: 20%; }
+:where([data-ui="unified"][data-form="printable"]) .store-table .col-style { width: 14%; }
+:where([data-ui="unified"][data-form="printable"]) .store-table .col-color { width: 18%; }
+:where([data-ui="unified"][data-form="printable"]) .store-table .col-desc { width: 32%; }
+:where([data-ui="unified"][data-form="printable"]) .store-table .col-deco { width: 16%; }
+:where([data-ui="unified"][data-form="printable"]) .store-table .col-place { width: 20%; }
 
 @media print {
-    .store-table td input { padding: 4px 3px; font-size: 0.76rem; }
+    :where([data-ui="unified"][data-form="printable"]) .store-table td input { padding: 4px 3px; font-size: 0.76rem; }
 }
+
+@media screen and (width <= 700px) { :where([data-ui="unified"][data-form="printable"]) .info-field--wide { grid-column: auto; } } }

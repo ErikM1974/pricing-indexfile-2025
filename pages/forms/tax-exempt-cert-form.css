@@ -1,22 +1,24 @@
-/* tax-exempt-cert-form.css — Tax-Exempt / Resale Certificate twin (portrait) */
+@layer components.pages {/* tax-exempt-cert-form.css — Tax-Exempt / Resale Certificate twin (portrait) */
 
-.info-field--wide { grid-column: span 2; }
+:where([data-ui="unified"][data-form="printable"]) .info-field--wide { grid-column: span 2; }
 
-.exp-hint {
+:where([data-ui="unified"][data-form="printable"]) .exp-hint {
     font-weight: 400;
     font-size: 0.72rem;
     color: var(--print-gold);
 }
 
-.assist-hint {
+:where([data-ui="unified"][data-form="printable"]) .assist-hint {
     font-size: 0.82rem;
     color: var(--print-ink-soft);
     margin: 6px 0 8px;
 }
 
-.assist-hint .fa-circle-info,
-.assist-hint .fa-list-check { color: var(--print-green); margin-right: 4px; }
+:where([data-ui="unified"][data-form="printable"]) .assist-hint .fa-circle-info,
+:where([data-ui="unified"][data-form="printable"]) .assist-hint .fa-list-check { color: var(--print-green); margin-right: 4px; }
 
 @media print {
-    .exp-hint { display: none; }
+    :where([data-ui="unified"][data-form="printable"]) .exp-hint { display: none; }
 }
+
+@media screen and (width <= 700px) { :where([data-ui="unified"][data-form="printable"]) .info-field--wide { grid-column: auto; } } }

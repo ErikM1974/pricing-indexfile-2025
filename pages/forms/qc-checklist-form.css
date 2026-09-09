@@ -1,4 +1,4 @@
-/* ==========================================================================
+@layer components.pages {/* ==========================================================================
    qc-checklist-form.css — pages/forms/qc-checklist-form.html
    Final QC checklist twin. Portrait print.
    ========================================================================== */
@@ -8,48 +8,51 @@
 }
 
 /* inspection checklist */
-.col-item { width: 70%; text-align: left; }
-.col-mark { width: 10%; }
+:where([data-ui="unified"][data-form="printable"]) .col-item { width: 70%; text-align: left; }
+:where([data-ui="unified"][data-form="printable"]) .col-mark { width: 10%; }
 
-.qc-table .cell-item {
+:where([data-ui="unified"][data-form="printable"]) .qc-table .cell-item {
     font-size: 0.85rem;
     padding: 6px 10px;
 }
 
-.qc-table .cell-mark { text-align: center; padding: 3px; }
+:where([data-ui="unified"][data-form="printable"]) .qc-table .cell-mark { text-align: center; padding: 3px; }
 
-.qc-table input[type="checkbox"] {
+:where([data-ui="unified"][data-form="printable"]) .qc-table input[type="checkbox"] {
     width: 17px;
     height: 17px;
     accent-color: var(--form-green);
 }
 
-.qc-table .cell-mark--fail input[type="checkbox"] { accent-color: var(--red-700); }
+:where([data-ui="unified"][data-form="printable"]) .qc-table .cell-mark--fail input[type="checkbox"] { accent-color: var(--red-700); }
 
 /* quantity verification */
-.col-style { width: 20%; }
-.col-color { width: 13%; }
-.col-num { width: 9%; }
-.col-notes { width: 31%; }
+:where([data-ui="unified"][data-form="printable"]) .col-style { width: 20%; }
+:where([data-ui="unified"][data-form="printable"]) .col-color { width: 13%; }
+:where([data-ui="unified"][data-form="printable"]) .col-num { width: 9%; }
+:where([data-ui="unified"][data-form="printable"]) .col-notes { width: 31%; }
 
-.qty-table td input { padding: 6px 4px; font-size: 0.82rem; }
+:where([data-ui="unified"][data-form="printable"]) .qty-table td input { padding: 6px 4px; font-size: 0.82rem; }
 
 /* disposition */
-.disposition-row {
+:where([data-ui="unified"][data-form="printable"]) .disposition-row {
     border: none;
     justify-content: center;
     gap: 18px;
     padding: 6px 0 2px;
 }
 
-.disposition-row .deco-check { font-weight: 800; }
+:where([data-ui="unified"][data-form="printable"]) .disposition-row .deco-check { font-weight: 800; }
 
-.signature-row--two { grid-template-columns: 2fr 1fr; margin-top: 14px; }
+:where([data-ui="unified"][data-form="printable"]) .signature-row--two { grid-template-columns: 2fr 1fr; margin-top: 14px; }
 
 @media print {
-    .form-logo { height: 44px; }
-    .form-title { font-size: 1.3rem; }
-    .form-section { margin-top: 9px; }
-    .qc-table .cell-item { padding: 4px 8px; font-size: 0.78rem; }
-    .notes-area { min-height: 0.5in; }
+    :where([data-ui="unified"][data-form="printable"]) .form-logo { height: 44px; }
+    :where([data-ui="unified"][data-form="printable"]) .form-title { font-size: 1.3rem; }
+    :where([data-ui="unified"][data-form="printable"]) .form-section { margin-top: 9px; }
+    :where([data-ui="unified"][data-form="printable"]) .qc-table .cell-item { padding: 4px 8px; font-size: 0.78rem; }
+    :where([data-ui="unified"][data-form="printable"]) .notes-area { min-height: 0.5in; }
+}
+
+@media screen and (width <= 700px) { :where([data-ui="unified"][data-form="printable"]) .signature-row--two { grid-template-columns: minmax(0, 1fr); } }
 }

@@ -6,13 +6,14 @@
     <meta name="robots" content="noindex, nofollow">
     <title>Webstore / Company Store Request - Northwest Custom Apparel</title>
     <link rel="icon" href="/favicon.png" type="image/png">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/pages/forms/nwca-form-shared.css?v=2026.09.07.4">
-    <link rel="stylesheet" href="/pages/forms/webstore-request-form.css?v=2026.09.07.4">
+    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.08.2">
+    <link rel="stylesheet" href="/shared_components/css/printable-forms.css?v=2026.09.08.12">
+    <link rel="stylesheet" href="/pages/forms/webstore-request-form.css?v=2026.09.08.12">
 </head>
-<body>
+<body data-ui="unified" data-form="printable">
     <div class="form-toolbar no-print">
         <a href="/dashboards/forms-library.html" class="toolbar-link">
             <i class="fas fa-arrow-left" aria-hidden="true"></i> Forms Library
@@ -118,7 +119,7 @@
             <div class="section-bar">4. Products Wanted</div>
             <p class="assist-hint no-print"><i class="fas fa-wand-magic-sparkles" aria-hidden="true"></i>
                 Style # lookup fills the description and turns Color into a swatch picker. Rough list is fine — we'll confirm final lineup with mockups.</p>
-            <table class="form-table store-table" id="storeTable">
+            <div class="form-table-scroll" tabindex="0" role="region" aria-label="4. Products Wanted table"><table class="form-table store-table" id="storeTable">
                 <thead>
                     <tr>
                         <th class="col-style">Style #</th>
@@ -131,7 +132,7 @@
                 <tbody id="storeRows">
                     <!-- rows injected by webstore-request-form.js -->
                 </tbody>
-            </table>
+            </table></div>
             <button type="button" id="addRowBtn" class="toolbar-btn toolbar-btn--ghost add-row-btn no-print">
                 <i class="fas fa-plus" aria-hidden="true"></i> Add Row
             </button>
@@ -158,10 +159,10 @@
     </main>
 
     <script src="/config/app.config.js"></script>
-    <script src="/pages/forms/nwca-form-shared.js?v=2026.09.06.34"></script>
+    <script src="/pages/forms/nwca-form-shared.js?v=2026.09.08.12"></script>
     <script src="/pages/forms/nwca-form-dates.js?v=2026.09.07.33"></script>
-    <script src="/pages/forms/nwca-form-contacts.js?v=2026.09.07.25"></script>
-    <script src="/pages/forms/nwca-form-styles.js?v=2026.09.06.32"></script>
+    <script src="/pages/forms/nwca-form-contacts.js?v=2026.09.08.12"></script>
+    <script src="/pages/forms/nwca-form-styles.js?v=2026.09.08.12"></script>
     <script src="/pages/forms/nwca-form-save.js?v=2026.09.07.33"></script>
     <script src="/pages/forms/webstore-request-form.js?v=2026.09.06.32"></script>
 </body>

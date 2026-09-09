@@ -173,3 +173,5 @@ cap-embroidery-fix.css
 - `shared_components/css/training-guide.css`: scoped navigation, reading, table, callout and print owner for reviewed training guides. Legacy training-shared.css remains for unmigrated consumers.
 
 - `shared_components/css/training-service.css`: shared service-guide disclosures, examples, images and print; replaces art-approval/google-review page CSS. Thank-you specimens and lead practice fields retain their two small page sheets.
+
+- `shared_components/css/printable-forms.css`: scoped shared printable-form layout, controls, lookup/swatch states, phone table regions and paper rules for 17 `/pages/forms/` consumers. Their page sheets retain unique layouts/orientation. Old `nwca-form-shared.css` remains for public `pages/request-a-quote.html`; it is not retired.

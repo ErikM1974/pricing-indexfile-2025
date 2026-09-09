@@ -1,6 +1,6 @@
 # Active Files Registry
 
-Last updated: 2026-09-08 — service training styles/controller, consolidated guide owners and browser coverage.
+Last updated: 2026-09-08 — printable form shared owner, 17 scoped consumers and browser/content checks.
 
 | Area | Registry |
 |---|---|

@@ -130,3 +130,19 @@ describe('service training guide preservation', () => {
         expect(document.querySelectorAll('[style], style, script:not([src]), [data-call]')).toHaveLength(0);
     });
 });
+
+describe('printable form content and field preservation', () => {
+    test.each(manifest.printableFormsContent)('$source retains its original text, IDs, destinations and default values', entry => {
+        const document = new JSDOM(read(entry.source)).window.document;
+        const main = document.querySelector('main');
+        const content = {
+            text: main.textContent.replace(/\s+/g, ' ').trim(),
+            ids: [...document.querySelectorAll('[id]')].map(el => el.id),
+            links: [...document.querySelectorAll('a')].map(el => [el.getAttribute('href'), el.textContent.replace(/\s+/g, ' ').trim()]),
+            fields: [...document.querySelectorAll('input,textarea,select')].map(el => ({ id: el.id, type: el.type, value: el.value })),
+        };
+        expect(crypto.createHash('sha256').update(JSON.stringify(content)).digest('hex')).toBe(entry.sha256);
+        expect(document.body.dataset.form).toBe('printable');
+        expect(document.querySelectorAll('style, script:not([src])')).toHaveLength(0);
+    });
+});

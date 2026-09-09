@@ -1,0 +1,908 @@
+/* Unified printable form foundation. Per-form sheets own paper orientation and unique layouts. */
+@layer components.patterns {
+@media print { @page { size: letter portrait; margin: 0.35in; } }
+
+:where([data-ui="unified"][data-form="printable"]), :where([data-ui="unified"][data-form="printable"]) * { box-sizing: border-box; }
+
+:where([data-ui="unified"][data-form="printable"]) {
+    --form-green: var(--ui-accent);
+    --form-green-dark: var(--ui-accent-hover);
+    --ink: var(--ui-ink);
+    --ink-soft: var(--ui-muted);
+    --line: var(--ui-line);
+    --paper: var(--ui-surface);
+
+    margin: 0;
+    font-family: var(--ui-font);
+    background: var(--ui-canvas);
+    color: var(--ink);
+}
+
+:where([data-ui="unified"][data-form="printable"]) .form-toolbar {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: var(--space-4) var(--space-6);
+    background: var(--ui-surface);
+    color: var(--ui-ink);
+    box-shadow: none;
+    border-block-start: 4px solid var(--ui-accent);
+    border-block-end: 1px solid var(--ui-line);
+    flex-wrap: wrap;
+}
+
+:where([data-ui="unified"][data-form="printable"]) .toolbar-link {
+    color: var(--ui-accent);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: var(--font-size-base);
+}
+
+:where([data-ui="unified"][data-form="printable"]) .toolbar-link:hover { text-decoration: underline; }
+
+:where([data-ui="unified"][data-form="printable"]) .toolbar-actions { display: flex; gap: var(--space-2); flex-wrap: wrap; }
+
+:where([data-ui="unified"][data-form="printable"]) .toolbar-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--ui-line-strong);
+    background: var(--ui-surface);
+    color: var(--ui-ink);
+    font: inherit;
+    font-size: 0.875rem;
+    font-weight: var(--font-weight-semibold);
+    cursor: pointer;
+    text-decoration: none;
+    min-height: var(--ui-control-height);
+}
+
+:where([data-ui="unified"][data-form="printable"]) .toolbar-btn--ghost:hover { background: var(--gray-100); }
+
+:where([data-ui="unified"][data-form="printable"]) .toolbar-btn--primary {
+    background: var(--ui-accent);
+    color: var(--color-on-brand);
+    border-color: var(--ui-accent);
+}
+
+:where([data-ui="unified"][data-form="printable"]) .toolbar-btn--primary:hover { background: var(--ui-accent-hover); }
+
+:where([data-ui="unified"][data-form="printable"]) .toolbar-btn--save {
+    background: var(--ui-tint);
+    border-color: var(--ui-line-strong);
+}
+
+:where([data-ui="unified"][data-form="printable"]) .toolbar-btn--save:hover { background: var(--brand-100); }
+
+:where([data-ui="unified"][data-form="printable"]) .toolbar-btn:disabled { opacity: 0.6; cursor: default; }
+
+:where([data-ui="unified"][data-form="printable"]) .form-save-banner {
+    max-width: 8.5in;
+    margin: 16px auto -8px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    border: 1.5px solid;
+}
+
+:where([data-ui="unified"][data-form="printable"]) .form-save-banner--wide { max-width: 11in; }
+
+:where([data-ui="unified"][data-form="printable"]) .form-save-banner--ok {
+    background: var(--brand-100);
+    border-color: var(--form-green);
+    color: var(--form-green-dark);
+}
+
+:where([data-ui="unified"][data-form="printable"]) .form-save-banner--error {
+    background: var(--red-50);
+    border-color: var(--red-700);
+    color: var(--print-red);
+}
+
+:where([data-ui="unified"][data-form="printable"]) .form-sheet {
+    max-width: 8.5in;
+    margin: var(--space-8) auto;
+    padding: var(--space-8);
+    background: var(--paper);
+    box-shadow: none;
+    width: calc(100% - var(--space-8));
+    border: 1px solid var(--ui-line);
+    border-radius: var(--radius-md);
+}
+:where([data-ui="unified"][data-form="printable"]) .form-sheet--landscape { max-width: 11in; }
+
+:where([data-ui="unified"][data-form="printable"]) .form-header { text-align: start; }
+
+:where([data-ui="unified"][data-form="printable"]) .form-logo { height: 54px; max-width: 100%; object-fit: contain; object-position: left; }
+
+:where([data-ui="unified"][data-form="printable"]) .form-title {
+    margin: var(--space-5) 0 var(--space-2);
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: normal;
+}
+
+:where([data-ui="unified"][data-form="printable"]) .form-subtitle {
+    margin: 0;
+    color: var(--ink-soft);
+    font-size: 0.95rem;
+}
+
+:where([data-ui="unified"][data-form="printable"]) .form-contact {
+    margin: 6px 0 0;
+    font-size: 0.85rem;
+    font-weight: var(--font-weight-regular);
+    color: var(--ink);
+    padding-bottom: var(--space-5);
+    border-bottom: 1px solid var(--ui-line);
+}
+
+:where([data-ui="unified"][data-form="printable"]) .form-section { margin-top: 16px; }
+
+:where([data-ui="unified"][data-form="printable"]) .section-bar {
+    display: block;
+    background: transparent;
+    color: var(--ui-ink);
+    font-weight: 700;
+    font-size: var(--font-size-lg);
+    letter-spacing: normal;
+    text-transform: none;
+    padding: var(--space-4) 0 var(--space-3);
+    clip-path: none;
+}
+
+:where([data-ui="unified"][data-form="printable"]) .form-section > .info-grid,
+:where([data-ui="unified"][data-form="printable"]) .form-section > .decoration-row {
+    border: 0;
+    border-radius: 0;
+    padding: 0;
+}
+
+:where([data-ui="unified"][data-form="printable"]) .info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-4) var(--space-6);
+}
+
+:where([data-ui="unified"][data-form="printable"]) .info-grid--cols4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+:where([data-ui="unified"][data-form="printable"]) .info-field {
+    display: block;
+    align-items: baseline;
+    gap: 8px;
+    min-width: 0;
+}
+
+:where([data-ui="unified"][data-form="printable"]) .info-field label {
+    flex: 0 0 auto;
+    min-width: 0;
+    font-weight: 600;
+    font-size: 0.875rem;
+    display: block;
+    margin-block-end: var(--space-2);
+}
+:where([data-ui="unified"][data-form="printable"]) .info-grid--cols4 .info-field label { min-width: 0; }
+
+:where([data-ui="unified"][data-form="printable"]) .info-field input:where(:not([type="checkbox"], [type="radio"], .date-pick-native)) {
+    flex: 1;
+    border: 1px solid var(--ui-line-strong);
+    border-bottom: 1px solid var(--ink);
+    font: inherit;
+    font-size: var(--font-size-base);
+    padding: var(--space-2) var(--space-3);
+    background: var(--ui-surface);
+    min-width: 0;
+    width: 100%;
+    border-radius: var(--radius-sm);
+    min-height: var(--ui-control-height);
+}
+
+:where([data-ui="unified"][data-form="printable"]) .info-field input:focus,
+:where([data-ui="unified"][data-form="printable"]) .deco-other-text:focus,
+:where([data-ui="unified"][data-form="printable"]) .form-table input:focus,
+:where([data-ui="unified"][data-form="printable"]) .notes-area:focus,
+:where([data-ui="unified"][data-form="printable"]) .signature-field input:focus {
+    outline: 2px solid var(--ui-accent);
+    background: var(--ui-surface);
+    outline-offset: 2px;
+}
+
+:where([data-ui="unified"][data-form="printable"]) .decoration-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 26px;
+    align-items: center;
+}
+
+:where([data-ui="unified"][data-form="printable"]) .deco-check {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    white-space: normal;
+    min-height: var(--ui-control-height);
+}
+
+:where([data-ui="unified"][data-form="printable"]) .deco-check input[type="checkbox"] {
+    width: 17px;
+    height: 17px;
+    accent-color: var(--form-green);
+}
+
+:where([data-ui="unified"][data-form="printable"]) .deco-check--other { flex: 1; min-width: 180px; }
+
+:where([data-ui="unified"][data-form="printable"]) .deco-other-text {
+    flex: 1;
+    border: none;
+    border-bottom: 1px solid var(--ink);
+    font: inherit;
+    font-size: 0.9rem;
+    padding: 2px 4px;
+    background: transparent;
+    min-width: 80px;
+}
+
+:where([data-ui="unified"][data-form="printable"]) .form-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+:where([data-ui="unified"][data-form="printable"]) .form-table th,
+:where([data-ui="unified"][data-form="printable"]) .form-table td {
+    border: 1px solid var(--ui-line-strong);
+    padding: 0;
+}
+
+:where([data-ui="unified"][data-form="printable"]) .form-table th {
+    background: var(--gray-100);
+    font-size: var(--font-size-md);
+    font-weight: 700;
+    padding: var(--space-3);
+    text-align: start;
+}
+
+:where([data-ui="unified"][data-form="printable"]) .form-table td input {
+    width: 100%;
+    border: none;
+    background: transparent;
+    font: inherit;
+    font-size: var(--font-size-base);
+    padding: var(--space-2);
+    text-align: center;
+    min-height: var(--ui-control-height);
+}
+
+:where([data-ui="unified"][data-form="printable"]) .form-table td.cell-text input { text-align: left; }
+
+:where([data-ui="unified"][data-form="printable"]) .form-table td.cell-num {
+    text-align: center;
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 7px 2px;
+    background: var(--gray-100);
+}
+
+:where([data-ui="unified"][data-form="printable"]) .form-table input[type="number"]::-webkit-outer-spin-button,
+:where([data-ui="unified"][data-form="printable"]) .form-table input[type="number"]::-webkit-inner-spin-button {
+    appearance: none;
+    margin: 0;
+}
+
+:where([data-ui="unified"][data-form="printable"]) .form-table input[type="number"] { appearance: textfield; }
+
+:where([data-ui="unified"][data-form="printable"]) .cell-total input { font-weight: 700; }
+
+:where([data-ui="unified"][data-form="printable"]) .add-row-btn {
+    margin-top: 8px;
+    border-color: var(--form-green);
+    color: var(--form-green);
+    background: transparent;
+}
+
+:where([data-ui="unified"][data-form="printable"]) .add-row-btn:hover { background: var(--brand-100); }
+
+:where([data-ui="unified"][data-form="printable"]) .notes-area {
+    width: 100%;
+    border: 1px solid var(--ui-line-strong);
+    border-radius: var(--radius-sm);
+    font: inherit;
+    font-size: var(--font-size-base);
+    padding: var(--space-3);
+    resize: vertical;
+    background: var(--ui-surface);
+}
+
+:where([data-ui="unified"][data-form="printable"]) .waiver-box {
+    margin-top: 18px;
+    border: 1px solid var(--ui-line-strong);
+    border-radius: var(--radius-sm);
+    padding: var(--space-5);
+}
+
+:where([data-ui="unified"][data-form="printable"]) .waiver-title {
+    margin: 0 0 6px;
+    text-align: start;
+    font-size: 1rem;
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: normal;
+    text-transform: none;
+}
+
+:where([data-ui="unified"][data-form="printable"]) .waiver-text {
+    margin: 0;
+    font-size: 0.85rem;
+    font-weight: 600;
+    line-height: 1.5;
+}
+
+:where([data-ui="unified"][data-form="printable"]) .signature-row {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--space-5);
+    margin-top: 26px;
+}
+
+:where([data-ui="unified"][data-form="printable"]) .signature-field { text-align: center; }
+
+:where([data-ui="unified"][data-form="printable"]) .signature-field input,
+:where([data-ui="unified"][data-form="printable"]) .signature-line {
+    width: 100%;
+    border: none;
+    border-bottom: 1.5px solid var(--form-green);
+    font: inherit;
+    font-size: 0.9rem;
+    padding: 2px 4px;
+    background: transparent;
+    height: 26px;
+    text-align: center;
+}
+
+:where([data-ui="unified"][data-form="printable"]) .signature-field label {
+    display: block;
+    margin-top: 4px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--ink);
+}
+
+:where([data-ui="unified"][data-form="printable"]) .date-anchor { position: relative; display: block; }
+
+:where([data-ui="unified"][data-form="printable"]) .date-pick-btn {
+    position: absolute;
+    right: 0;
+    bottom: 2px;
+    border: none;
+    background: transparent;
+    color: var(--form-green);
+    cursor: pointer;
+    font-size: 0.95rem;
+    padding: 2px 4px;
+}
+
+:where([data-ui="unified"][data-form="printable"]) .date-pick-btn:hover { color: var(--form-green-dark); }
+
+:where([data-ui="unified"][data-form="printable"]) .date-pick-native {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+}
+
+:where([data-ui="unified"][data-form="printable"]) .date-anchor input[type="text"] { padding-right: 26px; }
+
+:where([data-ui="unified"][data-form="printable"]) .draft-restore-btn, :where([data-ui="unified"][data-form="printable"]) .draft-discard-btn {
+    border: none;
+    background: none;
+    font: inherit;
+    font-weight: 700;
+    color: var(--form-green-dark);
+    text-decoration: underline;
+    cursor: pointer;
+    padding: 0;
+}
+
+:where([data-ui="unified"][data-form="printable"]) .customer-intel {
+    max-width: 8.5in;
+    margin: 12px auto -8px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+:where([data-ui="unified"][data-form="printable"]) .customer-intel--wide { max-width: 11in; }
+
+:where([data-ui="unified"][data-form="printable"]) .intel-banner {
+    padding: 9px 14px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    border: 1.5px solid;
+}
+
+:where([data-ui="unified"][data-form="printable"]) .intel-banner--warning { background: var(--amber-100); border-color: var(--amber-700); color: var(--amber-800); }
+:where([data-ui="unified"][data-form="printable"]) .intel-banner--info { background: var(--color-info-bg); border-color: var(--color-info-line); color: var(--color-info-ink); }
+
+:where([data-ui="unified"][data-form="printable"]) .contacts-anchor { position: relative; }
+
+:where([data-ui="unified"][data-form="printable"]) .contacts-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 20;
+    background: var(--color-surface);
+    border: 1.5px solid var(--form-green);
+    border-radius: 0 0 6px 6px;
+    box-shadow: 0 6px 18px rgb(0 0 0 / 18%);
+    max-height: 280px;
+    overflow-y: auto;
+}
+
+:where([data-ui="unified"][data-form="printable"]) .contacts-row {
+    padding: 8px 12px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    border-top: 1px solid var(--gray-100);
+}
+
+:where([data-ui="unified"][data-form="printable"]) .contacts-row--company { background: var(--gray-50); }
+
+:where([data-ui="unified"][data-form="printable"]) .contacts-row--contact { padding-left: 28px; }
+
+:where([data-ui="unified"][data-form="printable"]) .contacts-row.is-active,
+:where([data-ui="unified"][data-form="printable"]) .contacts-row:hover { background: var(--brand-100); }
+
+:where([data-ui="unified"][data-form="printable"]) .contacts-row--empty {
+    color: var(--ink-soft);
+    font-style: italic;
+    cursor: default;
+}
+
+:where([data-ui="unified"][data-form="printable"]) .contacts-muted { color: var(--ink-soft); font-weight: 400; font-size: 0.82em; }
+
+@media print {
+:where([data-ui="unified"][data-form="printable"]) {
+--form-green: var(--print-green);
+--form-green-dark: var(--print-green-dark);
+--ink: var(--print-ink);
+--ink-soft: var(--print-ink-soft);
+--line: var(--print-line);
+--paper: var(--color-surface);
+
+font-family: var(--ui-font);
+line-height: normal;
+background: var(--gray-100);
+}
+
+:where([data-ui="unified"][data-form="printable"]) .form-toolbar {
+background: var(--form-green);
+color: var(--color-on-brand);
+border-block-start: initial;
+border-block-end: initial;
+box-shadow: 0 2px 6px rgb(0 0 0 / 15%);
+padding: 10px 16px;
+flex-wrap: initial;
+}
+
+:where([data-ui="unified"][data-form="printable"]) .toolbar-link {
+color: var(--color-on-brand);
+font-size: 0.9rem;
+}
+
+:where([data-ui="unified"][data-form="printable"]) .toolbar-actions {
+gap: 8px;
+}
+
+:where([data-ui="unified"][data-form="printable"]) .toolbar-btn {
+min-height: initial;
+border: 1px solid rgb(255 255 255 / 70%);
+border-radius: 6px;
+color: var(--color-on-brand);
+background: transparent;
+padding: 8px 14px;
+font-weight: 600;
+}
+
+:where([data-ui="unified"][data-form="printable"]) .toolbar-btn--ghost:hover {
+background: rgb(255 255 255 / 12%);
+}
+
+:where([data-ui="unified"][data-form="printable"]) .toolbar-btn--primary {
+background: var(--color-surface);
+color: var(--form-green-dark);
+border-color: var(--color-on-brand);
+}
+
+:where([data-ui="unified"][data-form="printable"]) .toolbar-btn--primary:hover {
+background: var(--brand-100);
+}
+
+:where([data-ui="unified"][data-form="printable"]) .toolbar-btn--save {
+background: rgb(255 255 255 / 18%);
+border-color: var(--color-on-brand);
+}
+
+:where([data-ui="unified"][data-form="printable"]) .toolbar-btn--save:hover {
+background: rgb(255 255 255 / 30%);
+}
+
+:where([data-ui="unified"][data-form="printable"]) .form-sheet {
+width: initial;
+margin: 24px auto 48px;
+padding: 0.45in 0.5in;
+box-shadow: 0 4px 18px rgb(0 0 0 / 12%);
+border: initial;
+border-radius: initial;
+}
+
+:where([data-ui="unified"][data-form="printable"]) .form-header {
+text-align: center;
+}
+
+:where([data-ui="unified"][data-form="printable"]) .form-logo {
+max-width: initial;
+height: 62px;
+object-fit: initial;
+object-position: initial;
+}
+
+:where([data-ui="unified"][data-form="printable"]) .form-title {
+font-size: 1.7rem;
+font-weight: 800;
+letter-spacing: -0.02em;
+margin: 8px 0 2px;
+}
+
+:where([data-ui="unified"][data-form="printable"]) .form-contact {
+font-weight: 600;
+padding-bottom: 10px;
+border-bottom: 2px solid var(--form-green);
+}
+
+:where([data-ui="unified"][data-form="printable"]) .section-bar {
+display: inline-block;
+background: var(--form-green);
+color: var(--color-on-brand);
+font-size: 0.8rem;
+letter-spacing: 0.06em;
+text-transform: uppercase;
+padding: 4px 22px 4px 10px;
+clip-path: polygon(0 0, 100% 0, calc(100% - 12px) 100%, 0 100%);
+}
+
+:where([data-ui="unified"][data-form="printable"]) .form-section > .info-grid, :where([data-ui="unified"][data-form="printable"]) .form-section > .decoration-row {
+border: 1.5px solid var(--form-green);
+border-radius: 0 4px 4px;
+padding: 12px 14px;
+}
+
+:where([data-ui="unified"][data-form="printable"]) .info-grid {
+grid-template-columns: 1fr 1fr;
+gap: 10px 28px;
+}
+
+:where([data-ui="unified"][data-form="printable"]) .info-grid--cols4 {
+grid-template-columns: repeat(4, 1fr);
+}
+
+:where([data-ui="unified"][data-form="printable"]) .info-field {
+display: flex;
+min-width: initial;
+}
+
+:where([data-ui="unified"][data-form="printable"]) .info-field label {
+display: initial;
+min-width: 92px;
+margin-block-end: initial;
+}
+
+:where([data-ui="unified"][data-form="printable"]) .info-field input {
+width: initial;
+border: none;
+border-bottom: 1px solid var(--ink);
+border-radius: initial;
+min-height: initial;
+padding: 2px 4px;
+background: transparent;
+font-size: 0.9rem;
+}
+
+:where([data-ui="unified"][data-form="printable"]) .info-field input:focus, :where([data-ui="unified"][data-form="printable"]) .deco-other-text:focus, :where([data-ui="unified"][data-form="printable"]) .form-table input:focus, :where([data-ui="unified"][data-form="printable"]) .notes-area:focus, :where([data-ui="unified"][data-form="printable"]) .signature-field input:focus {
+outline: none;
+outline-offset: initial;
+background: var(--brand-50);
+}
+
+:where([data-ui="unified"][data-form="printable"]) .deco-check {
+white-space: nowrap;
+min-height: initial;
+}
+
+:where([data-ui="unified"][data-form="printable"]) .form-table th, :where([data-ui="unified"][data-form="printable"]) .form-table td {
+border: 1px solid var(--ink);
+}
+
+:where([data-ui="unified"][data-form="printable"]) .form-table th {
+background: var(--gray-200);
+text-align: center;
+padding: 6px 4px;
+font-size: 0.72rem;
+}
+
+:where([data-ui="unified"][data-form="printable"]) .form-table td input {
+min-height: initial;
+font-size: 0.85rem;
+padding: 7px 5px;
+}
+
+:where([data-ui="unified"][data-form="printable"]) .notes-area {
+border: 1.5px solid var(--form-green);
+border-radius: 0 4px 4px;
+font-size: 0.9rem;
+padding: 10px 12px;
+background: transparent;
+}
+
+:where([data-ui="unified"][data-form="printable"]) .waiver-box {
+border: 2px solid var(--ink);
+padding: 12px 16px;
+border-radius: 4px;
+}
+
+:where([data-ui="unified"][data-form="printable"]) .waiver-title {
+text-align: center;
+text-transform: uppercase;
+letter-spacing: 0.02em;
+font-weight: 800;
+}
+
+:where([data-ui="unified"][data-form="printable"]) .signature-row {
+grid-template-columns: repeat(4, 1fr);
+gap: 20px;
+}
+}
+
+@media print {
+    :where([data-ui="unified"][data-form="printable"]) .contacts-dropdown { display: none; }
+}
+
+:where([data-ui="unified"][data-form="printable"]) .swatch-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+    border: none;
+    background: transparent;
+    font: inherit;
+    font-size: 0.78rem;
+    padding: 5px 4px;
+    cursor: pointer;
+    text-align: left;
+}
+
+:where([data-ui="unified"][data-form="printable"]) .swatch-chip {
+    flex: 0 0 auto;
+    width: 16px;
+    height: 16px;
+    border-radius: 3px;
+    border: 1px solid var(--line);
+    background-color: var(--gray-100);
+    background-size: cover;
+    background-position: center;
+}
+
+:where([data-ui="unified"][data-form="printable"]) .swatch-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+:where([data-ui="unified"][data-form="printable"]) .swatch-grid {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 25;
+    min-width: 250px;
+    max-width: 330px;
+    max-height: 280px;
+    overflow-y: auto;
+    background: var(--color-surface);
+    border: 1.5px solid var(--form-green);
+    border-radius: 6px;
+    box-shadow: 0 6px 18px rgb(0 0 0 / 18%);
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    padding: 6px;
+}
+:where([data-ui="unified"][data-form="printable"]) .swatch-grid[hidden] { display: none; }
+
+:where([data-ui="unified"][data-form="printable"]) .swatch-cell {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    border: none;
+    background: transparent;
+    font: inherit;
+    font-size: 0.72rem;
+    padding: 5px 6px;
+    cursor: pointer;
+    border-radius: 4px;
+    text-align: left;
+}
+
+:where([data-ui="unified"][data-form="printable"]) .swatch-cell:hover { background: var(--brand-100); }
+
+:where([data-ui="unified"][data-form="printable"]) .swatch-cell .swatch-chip { width: 20px; height: 20px; }
+
+:where([data-ui="unified"][data-form="printable"]) .swatch-cell-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+:where([data-ui="unified"][data-form="printable"]) .swatch-cell--manual {
+    grid-column: 1 / -1;
+    justify-content: center;
+    color: var(--ink-soft);
+    border-top: 1px solid var(--gray-100);
+}
+
+@media print {
+    :where([data-ui="unified"][data-form="printable"]) .swatch-grid { display: none; }
+    :where([data-ui="unified"][data-form="printable"]) .swatch-btn { padding: 5px 2px; }
+    :where([data-ui="unified"][data-form="printable"]) .swatch-btn .swatch-chip { display: none; }
+}
+
+:where([data-ui="unified"][data-form="printable"]) .size-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3px 6px;
+    padding: 3px 4px;
+}
+
+:where([data-ui="unified"][data-form="printable"]) .size-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 0.72rem;
+    font-weight: 700;
+}
+
+:where([data-ui="unified"][data-form="printable"]) .size-chip input,
+:where([data-ui="unified"][data-form="printable"]) .form-table td .size-chip input {
+    width: 34px;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    text-align: center;
+    padding: 3px 2px;
+}
+
+:where([data-ui="unified"][data-form="printable"]) .size-chip--upcharge label { color: var(--amber-700); }
+
+:where([data-ui="unified"][data-form="printable"]) .form-footer {
+    margin-top: 20px;
+    text-align: center;
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+
+:where([data-ui="unified"][data-form="printable"]) .form-footer--fine {
+    font-weight: 600;
+    font-style: italic;
+    font-size: 0.8rem;
+}
+
+@media (width <= 700px) {
+    :where([data-ui="unified"][data-form="printable"]) .form-sheet { padding: 20px 14px; margin: 12px 8px 32px; }
+    :where([data-ui="unified"][data-form="printable"]) .info-grid, :where([data-ui="unified"][data-form="printable"]) .info-grid--cols4 { grid-template-columns: 1fr; }
+    :where([data-ui="unified"][data-form="printable"]) .signature-row { grid-template-columns: 1fr 1fr; }
+    :where([data-ui="unified"][data-form="printable"]) .form-table { font-size: 0.75rem; }
+}
+
+@media (width >= 701px) and (width <= 1000px) {
+    :where([data-ui="unified"][data-form="printable"]) .info-grid--cols4 { grid-template-columns: 1fr 1fr; }
+}
+
+@media print {
+    :where([data-ui="unified"][data-form="printable"]) { background: var(--color-surface); }
+    :where([data-ui="unified"][data-form="printable"]) .no-print { display: none; }
+
+    :where([data-ui="unified"][data-form="printable"]) .form-sheet,
+    :where([data-ui="unified"][data-form="printable"]) .form-sheet--landscape {
+        max-width: none;
+        margin: 0;
+        padding: 0;
+        box-shadow: none;
+    }
+
+    :where([data-ui="unified"][data-form="printable"]) .section-bar,
+    :where([data-ui="unified"][data-form="printable"]) .form-table th,
+    :where([data-ui="unified"][data-form="printable"]) .form-table td.cell-num {
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+    }
+
+    :where([data-ui="unified"][data-form="printable"]) .form-section { margin-top: 12px; }
+
+    :where([data-ui="unified"][data-form="printable"]) .form-logo { height: 52px; }
+    :where([data-ui="unified"][data-form="printable"]) .form-title { font-size: 1.45rem; }
+    :where([data-ui="unified"][data-form="printable"]) .waiver-box, :where([data-ui="unified"][data-form="printable"]) .signature-row, :where([data-ui="unified"][data-form="printable"]) .form-footer { break-inside: avoid; }
+
+    :where([data-ui="unified"][data-form="printable"]) .notes-area { min-height: 0.9in; resize: none; }
+
+    :where([data-ui="unified"][data-form="printable"]) input, :where([data-ui="unified"][data-form="printable"]) textarea { color: var(--ink); }
+}
+:where([data-ui="unified"][data-form="printable"]) .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+:where([data-ui="unified"][data-form="printable"]) .info-field > span { display: block; width: 100%; min-width: 0; }
+:where([data-ui="unified"][data-form="printable"]) .form-table-scroll { width: 100%; max-width: 100%; overflow-x: auto; margin-block: var(--space-3); }
+:where([data-ui="unified"][data-form="printable"]) .form-table-scroll:focus-visible { outline: 2px solid var(--ui-accent); outline-offset: 3px; }
+:where([data-ui="unified"][data-form="printable"]) .form-table-scroll .form-table { min-width: 680px; }
+:where([data-ui="unified"][data-form="printable"]) .form-save-banner, :where([data-ui="unified"][data-form="printable"]) .customer-intel, :where([data-ui="unified"][data-form="printable"]) .pan-block-banner { width: calc(100% - var(--space-8)); }
+
+@media screen and (width <= 700px) {
+ :where([data-ui="unified"][data-form="printable"]) .form-toolbar { padding: var(--space-3); gap: var(--space-3); }
+ :where([data-ui="unified"][data-form="printable"]) .toolbar-actions { width: 100%; }
+ :where([data-ui="unified"][data-form="printable"]) .toolbar-actions .toolbar-btn { flex: 1 1 auto; justify-content: center; }
+ :where([data-ui="unified"][data-form="printable"]) .form-sheet { width: calc(100% - var(--space-6)); margin: var(--space-4) auto; padding: var(--space-4); }
+ :where([data-ui="unified"][data-form="printable"]) .info-grid, :where([data-ui="unified"][data-form="printable"]) .info-grid--cols4 { grid-template-columns: minmax(0, 1fr); }
+ :where([data-ui="unified"][data-form="printable"]) .signature-row { grid-template-columns: minmax(0, 1fr); }
+ :where([data-ui="unified"][data-form="printable"]) .form-save-banner, :where([data-ui="unified"][data-form="printable"]) .customer-intel, :where([data-ui="unified"][data-form="printable"]) .pan-block-banner { width: calc(100% - var(--space-6)); margin-inline: auto; }
+ :where([data-ui="unified"][data-form="printable"]) .swatch-grid { min-width: 0; width: min(300px, 75vw); max-width: 100%; }
+}
+
+@media print {
+ :where([data-ui="unified"][data-form="printable"]) .form-sheet { width: 100%; border: 0; border-radius: 0; }
+ :where([data-ui="unified"][data-form="printable"]) .form-table-scroll { overflow: visible; margin: 0; }
+ :where([data-ui="unified"][data-form="printable"]) .form-table-scroll .form-table { min-width: 0; }
+ :where([data-ui="unified"][data-form="printable"]) .info-field > span { display: inline; width: auto; flex: 1; }
+}
+}
+
+@layer components.print {@media print {:where([data-ui="unified"][data-form="printable"]) .contacts-dropdown, :where([data-ui="unified"][data-form="printable"]) .swatch-grid, :where([data-ui="unified"][data-form="printable"]) .no-print {
+display: none;
+}
+}
+}
+
+@layer components.patterns {
+    :where([data-ui="unified"][data-form="printable"]) .form-print-value { display: none; }
+
+    @media screen {
+        :where([data-ui="unified"][data-form="printable"]) .form-picker-floating { position: fixed; min-width: 0; max-width: none; z-index: 40; }
+        :where([data-ui="unified"][data-form="printable"]) :is(.swatch-btn, .swatch-cell, .draft-restore-btn, .draft-discard-btn) { min-height: var(--ui-control-height); }
+        :where([data-ui="unified"][data-form="printable"]) .form-lookup-status { padding: var(--space-2); font-size: var(--font-size-sm); color: var(--ui-muted); }
+    }
+}
+
+@layer components.print {
+    @media print {
+        :where([data-ui="unified"][data-form="printable"]) .form-print-source { display: none; }
+        :where([data-ui="unified"][data-form="printable"]) .form-print-value { display: block; min-width: 0; max-width: 100%; flex: 1; white-space: pre-wrap; overflow-wrap: anywhere; font-size: inherit; padding: 2px 4px; }
+        :where([data-ui="unified"][data-form="printable"]) .form-print-textarea { width: 100%; border: 1px solid var(--line); }
+        :where([data-ui="unified"][data-form="printable"]) .form-table .form-print-value { font-size: 0.78rem; }
+        :where([data-ui="unified"][data-form="printable"]) .swatch-name { white-space: normal; overflow: visible; }
+    }
+}
+
+@layer components.print {
+    @media print {
+        :where([data-ui="unified"][data-form="printable"]) .waiver-box { break-after: avoid; }
+        :where([data-ui="unified"][data-form="printable"]) .form-footer { break-before: avoid; }
+        :where([data-ui="unified"][data-form="printable"]) .signature-field.date-anchor { display: block; }
+        :where([data-ui="unified"][data-form="printable"]) .date-anchor input[type="text"] { padding-right: 4px; }
+        :where([data-ui="unified"][data-form="printable"]) .info-field .form-print-value { border-bottom: 1px solid var(--ink); }
+    }
+}

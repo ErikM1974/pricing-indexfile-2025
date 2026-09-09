@@ -1,18 +1,20 @@
-/* customer-onboarding-form.css — New Customer Onboarding twin (portrait) */
+@layer components.pages {/* customer-onboarding-form.css — New Customer Onboarding twin (portrait) */
 
-.info-field--wide { grid-column: span 2; }
+:where([data-ui="unified"][data-form="printable"]) .info-field--wide { grid-column: span 2; }
 
-.assist-hint {
+:where([data-ui="unified"][data-form="printable"]) .assist-hint {
     font-size: 0.82rem;
     color: var(--print-ink-soft);
     margin: 6px 0 8px;
 }
 
-.assist-hint .fa-wand-magic-sparkles,
-.assist-hint .fa-circle-info,
-.assist-hint .fa-list-check { color: var(--print-green); margin-right: 4px; }
+:where([data-ui="unified"][data-form="printable"]) .assist-hint .fa-wand-magic-sparkles,
+:where([data-ui="unified"][data-form="printable"]) .assist-hint .fa-circle-info,
+:where([data-ui="unified"][data-form="printable"]) .assist-hint .fa-list-check { color: var(--print-green); margin-right: 4px; }
 
 @media print {
-    .form-section { margin-top: 10px; }
-    .assist-hint { font-size: 0.72rem; }
+    :where([data-ui="unified"][data-form="printable"]) .form-section { margin-top: 10px; }
+    :where([data-ui="unified"][data-form="printable"]) .assist-hint { font-size: 0.72rem; }
 }
+
+@media screen and (width <= 700px) { :where([data-ui="unified"][data-form="printable"]) .info-field--wide { grid-column: auto; } } }

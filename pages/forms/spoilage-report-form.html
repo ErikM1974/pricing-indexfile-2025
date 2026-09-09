@@ -6,13 +6,14 @@
     <meta name="robots" content="noindex, nofollow">
     <title>Spoilage, Damage & Reprint Report - Northwest Custom Apparel</title>
     <link rel="icon" href="/favicon.png" type="image/png">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/pages/forms/nwca-form-shared.css?v=2026.09.07.4">
-    <link rel="stylesheet" href="/pages/forms/spoilage-report-form.css?v=2026.09.07.4">
+    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.08.2">
+    <link rel="stylesheet" href="/shared_components/css/printable-forms.css?v=2026.09.08.12">
+    <link rel="stylesheet" href="/pages/forms/spoilage-report-form.css?v=2026.09.08.12">
 </head>
-<body>
+<body data-ui="unified" data-form="printable">
     <!-- Screen-only toolbar: never prints -->
     <div class="form-toolbar no-print">
         <a href="/dashboards/forms-library.html" class="toolbar-link">
@@ -107,7 +108,7 @@
             <div class="section-bar">4. Damaged / Spoiled Items</div>
             <p class="assist-hint no-print"><i class="fas fa-wand-magic-sparkles" aria-hidden="true"></i>
                 Style # lookup fills the description; Loss Total auto-computes Qty × (Garment + Decoration cost).</p>
-            <table class="form-table spoil-table" id="spoilTable">
+            <div class="form-table-scroll" tabindex="0" role="region" aria-label="4. Damaged / Spoiled Items table"><table class="form-table spoil-table" id="spoilTable">
                 <thead>
                     <tr>
                         <th class="col-style">Style</th>
@@ -124,7 +125,7 @@
                 <tbody id="spoilRows">
                     <!-- rows injected by spoilage-report-form.js -->
                 </tbody>
-            </table>
+            </table></div>
             <button type="button" id="addRowBtn" class="toolbar-btn toolbar-btn--ghost add-row-btn no-print">
                 <i class="fas fa-plus" aria-hidden="true"></i> Add Row
             </button>
@@ -168,10 +169,10 @@
     </main>
 
     <script src="/config/app.config.js"></script>
-    <script src="/pages/forms/nwca-form-shared.js?v=2026.09.06.34"></script>
+    <script src="/pages/forms/nwca-form-shared.js?v=2026.09.08.12"></script>
     <script src="/pages/forms/nwca-form-dates.js?v=2026.09.07.33"></script>
-    <script src="/pages/forms/nwca-form-contacts.js?v=2026.09.07.25"></script>
-    <script src="/pages/forms/nwca-form-styles.js?v=2026.09.06.32"></script>
+    <script src="/pages/forms/nwca-form-contacts.js?v=2026.09.08.12"></script>
+    <script src="/pages/forms/nwca-form-styles.js?v=2026.09.08.12"></script>
     <script src="/pages/forms/nwca-form-save.js?v=2026.09.07.33"></script>
     <script src="/pages/forms/spoilage-report-form.js?v=2026.09.06.32"></script>
 </body>

@@ -1,14 +1,14 @@
-/* injury-report-form.css — Employee Injury / Incident Report twin (portrait) */
+@layer components.pages {/* injury-report-form.css — Employee Injury / Incident Report twin (portrait) */
 
-.waiver-box--urgent {
+:where([data-ui="unified"][data-form="printable"]) .waiver-box--urgent {
     border-color: var(--red-700);
     background: var(--red-50);
     margin-bottom: 12px;
 }
-.waiver-box--urgent .waiver-text { color: var(--print-red); }
-.waiver-box--urgent .fa-truck-medical { margin-right: 5px; }
+:where([data-ui="unified"][data-form="printable"]) .waiver-box--urgent .waiver-text { color: var(--print-red); }
+:where([data-ui="unified"][data-form="printable"]) .waiver-box--urgent .fa-truck-medical { margin-right: 5px; }
 
-.equip-label {
+:where([data-ui="unified"][data-form="printable"]) .equip-label {
     font-size: 0.85rem;
     font-weight: 600;
     align-self: center;
@@ -16,6 +16,7 @@
 }
 
 @media print {
-    .form-section { margin-top: 10px; }
-    .waiver-box--urgent { margin-bottom: 8px; }
+    :where([data-ui="unified"][data-form="printable"]) .form-section { margin-top: 10px; }
+    :where([data-ui="unified"][data-form="printable"]) .waiver-box--urgent { margin-bottom: 8px; }
+}
 }

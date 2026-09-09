@@ -1,16 +1,34 @@
 # Handover follow-ups — 2026-09-07
 
-## Active CSS batch — four service training guides — 2026-09-08
+## Shutdown checkpoint — 2026-09-08
 
-Frontend v2026.09.08.10 / Heroku 2068 is verified live on d65ccce189c969b8b8baed56d755c7ee6e82b58f. Twenty reviewed pages use unified owners. Exact-source CI 34269638273 passed all four jobs; eight deployed runtime assets, four anonymous staff gates and five public shells passed. Local checks passed 4,972 unit tests and 98 browser tests. Main/develop release CI is tracked separately. The application-wide migration remains open; Erik authorizes continued edits/deployments without repeated permission questions.
+PAUSED at Erik's request so he can turn off the computer. Save this state; do not continue implementation or deploy until he resumes. His edit/deploy authorization continues after resuming. This section supersedes older active/pause paragraphs below.
 
-- [x] Capture the original art-approval, thank-you-card, lead-sheet and Google-review guides at desktop/phone widths; retain source content/field values for regression checks.
-- [ ] Reuse Public Sans, neutral white/gray surfaces, restrained NWCA green wayfinding and the shared training reading/table/print owner. Keep the thank-you examples handwritten. Consolidate four duplicate disclosure/navigation scripts into a shared controller; preserve all prose, examples, IDs, destinations and local exercise values. Make field help usable on phones and keyboards.
-- [ ] Verify all fourteen disclosures, four widths, keyboard navigation, image failure/retry, practice-field help and complete print output. Mock business writes and external services. Update source ownership and measured LF byte budgets.
-- [ ] Run all release gates, exact-source CI, cache invalidation, deploy and verify live files. Continue compatible training/reference families afterwards; remaining calculators/builders/documents require their own state coverage.
+### Current count
 
-The mocked CSS/browser checks now run with three workers (82 cases in 207.9 seconds locally); live pricing remains serial. The former CSS Factor task is archived and its worktree remains clean at c20d424b; no pending forms CSS implementation was found. Concurrent employee-form commit fe794c6f shipped with original attribution; both blank PDFs were visually reviewed and verified byte-for-byte live. This task made no Caspio writes or notifications.
+The fresh static runtime inventory contains 224 application/served-archive HTML pages (223 + 1): 24 reviewed pages live, 17 printable forms implemented and tested but not deployed, and 183 pages still pending CSS modernization. The 304 tracked HTML total also includes 80 excluded archive/email/template/retired sources. Generated document/style owners are tracked separately; this is the page count, not a claim that their cleanup is finished. Inventory: September 7 artifact directory/css-shutdown-inventory.json.
 
+### Live and saved state
+
+- Production frontend remains **v2026.09.08.11 / Heroku 2069**, full SHA **4087810dc7fadb68d2cf5a1d00aebad073faa8c7**. Last actual slug check succeeded at 2026-09-08T21:07:18Z. Source CI 34273774152 and main/develop CI 34274628083 / 34274861898 succeeded. No .12 release merge, tag, Heroku push or deployment was started.
+- Backend security remains **v2026.09.08.1 / Heroku 1130**, d06aee3e4d25c5e1410241ea8007cdc8339aa3fa. Backend dependency/runtime backlog and natural scheduler verification remain separate unfinished work; no backend edits this batch.
+- Frontend develop contains the 17-form migration (initial source **02c849b5ec8fe23c6083b5df603e9425150ca7a0**, intended **v2026.09.08.12**) plus the final public quote-request compatibility fix saved with this checkpoint. The authoritative final candidate SHA is in **printable-forms-source-record.json** and **printable-forms-shutdown-checkpoint.json** in the artifact directory. Do not deploy the initial source SHA: it predates the compatibility fix.
+- One scoped printable-forms.css owner, 17 page sheets/HTML graphs and three shared form helpers changed. Source prose/IDs/default values/destinations remain guarded. Public request-a-quote.html keeps its old CSS and anchored menu; floating menu coordinates apply only to opted-in printable forms. It was the eighteenth JS caller found by the cache-reference review. Eighteen HTML files received cache updates, 70 references checked. No real submissions, uploads or notifications were sent.
+
+### Verification completed
+
+- Full release pass: 207 unit suites / 5,014 tests, four existing skips; 88 DOM; four accessibility unit; 84 quote parity; 141 mocked browser + 16 remaining browser = 157 passed, three optional screenshot skips; all five live calculator surfaces agree with their engines. Build/lint/types/291 CSS files/boot pass. Routes remain 485 registrations / 24 modules.
+- After the last shared-helper compatibility correction: targeted lint and rebuild passed; **all 48 printable-form/public-caller browser cases passed**. The new public-menu case first reproduced a 681px placement error and then passed at 1440/390/320. Previous 157-test full run is a prior snapshot; exact final-source CI still must be checked on resume. The initial candidate CI must not be treated as final-source approval.
+- All 17 blank PDFs keep their original page counts. Actual filled output reviewed: card authorization 1 page, garment drop-off with 45 long notes 3, name personalization 2, roster 2. Every note line and the end marker survive extraction. Date labels/writing lines, margins, legal/signature/footer groups are intact. Native input values restore after print. Test services/writes are mocked.
+
+### Resume steps
+
+1. Read this section and printable-forms-shutdown-checkpoint.json. Check develop/main/origin freshness and ownership; verify the existing production slug. Do not touch another actor's work.
+2. Read CI for the final saved candidate SHA from printable-forms-source-record.json. Write the successful report to printable-forms-source-ci.json; all four jobs including the live money/calculator step must pass. If final CI fails, fix and rerun affected/full gates as appropriate, then update the source record to the actual candidate tip.
+3. Resume the authorized .12 release with the prepared helpers: prepare-printable-forms-release.cjs, corporate Git pushes of main/tag then Heroku main, actual slug verification, verify-printable-forms-live.cjs, develop fast-forward/push and fresh checkpoint. These helpers are PREPARED only; do not mint a new version just because the user paused. Confirm their ownership/freshness guards before running.
+4. Continue the remaining seven training pages: customer-categorization-training, lead-email-templates, lead-source-training, training-games-hub, shopworks-notes, shopworks-sales-tax-training, team-match-game. Baselines are complete in remaining-training-baseline.json and training-before-*.png; no training source edits have begun. Games need keyboard/touch workflows, template editing needs copy/error/modal checks. Then continue the rest of the 183-page queue by family.
+
+Artifact root: C:/Users/erik/.codex/visualizations/2026/09/07/01a07d90-9a4c-7e70-9e4e-c196377b7c6b. Node 22 is under TEMP/nwca-handover-node22/node_modules/node/bin. Frontend checkout is the sibling Pricing Index File 2025. Source/release/CI/live reports for this batch use printable-forms-*; .11 uses training-service-*. Do not rerun historical draft/install/append scripts against already edited files. No automation or goal was created. No local server or browser-test job is intended to remain running at shutdown.
 
 ## Coordinated transfer authentication LIVE — 2026-09-08
 
