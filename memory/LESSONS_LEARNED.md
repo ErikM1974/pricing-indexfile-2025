@@ -202,15 +202,7 @@ Native Node22.23 runs Puppeteer25; invoke its capture CLI outside Jest, and repo
 - Solution: pass the originating button explicitly, show local pending/error/retry feedback, use native disclosure buttons and owned document sections, and let print flow through readable columns.
 - Prevention: lock unchanged training text/examples/links, test keyboard and denied clipboard states, and inspect actual PDFs. A two-sheet language-handout guard catches blank-page regressions that a print-media screenshot misses.
 
-### Shared form styles and print pseudo-elements need rendered checks (2026-09-08)
-
-Problem: migrated training fields retained browser-default styling, and paper chevrons remained visible. Root cause: shared controls require their canonical field classes; pseudo-elements cannot be selected inside `:is()`. Solution: use `.field-input`/`.field-textarea` and a separate `::after` selector. Prevention: check rendered control size/font and print pseudo-element display, then inspect actual pages/PDFs; CSS lint and behavior checks alone do not catch these.
-
-## Printable forms need populated output and menu checks (2026-09-08)
-
-Problem: screen input specificity defeated compact paper rules, the shared date adapter squeezed signature labels, scroll tables clipped menus, and native fields truncated printed values. Use zero-specificity input exclusions, an explicit form date owner, viewport-positioned native keyboard menus, and temporary wrapping print text. Preserve original input values, full PDF text, legal/signature groups and the one-page card authorization. Browser tests cover blank/filled print, phone hit testing, saves, drafts and money provenance; byte/content checks alone cannot certify these states.
-
-Shared JS can outlive a CSS migration: the public quote-request page is also a style-helper caller. Limit floating coordinates to the matching opted-in CSS owner, and exercise every runtime caller found by the cache-reference review before release.
+### Shared form styles and print pseudo-elements (2026-09-08, archived): inspect actual filled paper and scoped pseudo-elements. Full entry in LESSONS_LEARNED_ARCHIVE.md.
 
 ### Training state must survive every input path (2026-09-08)
 
@@ -249,3 +241,7 @@ Problem: SAML staff lost comment controls, failed editor loads could save empty 
 Problem: borrowed campaign CSS hid navigation without its original controller, CSS byte audits missed a relative stylesheet link, and printed footers split onto a trailing page. Root cause: cross-page stylesheet dependencies and incomplete source/path/print accounting. Solution: one scoped family layout with native navigation and FAQs, resolve relative and root asset paths alike, preserve the entire original main text plus SEO/image/link data, and keep footer blocks together. Prevention: check every route alias, four widths and keyboard disclosures, then compare actual PDF offer/pricing/FAQ text and render paper samples.
 
 Webstore follow-up: full hygiene checks also require cache versions on every new local CSS/JS reference. Add the reserved candidate version before full gates, including unchanged shared components newly linked into a page.
+
+### Native storefront menus still need keyboard and layout ownership checks (2026-09-09)
+
+Problem: the inherited drawer had no focus boundary or return, and initial native-dialog review found reverse Tab leaving the menu. Root cause: hidden custom panels and relying on browser traversal alone. Solution: native modal with explicit first/last Tab wrap, Escape/backdrop/close-button dismissal, return focus, desktop-resize cleanup; scope every CSS rule to unified ownership and merge repeated selectors. Prevention: run all fifteen brand pages at four widths, test both search triggers and empty input, lock original brand/SEO/product text, and compare rendered PDF text allowing CSS text-transform case changes.
