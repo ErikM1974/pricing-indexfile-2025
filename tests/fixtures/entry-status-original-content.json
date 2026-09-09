@@ -1,0 +1,431 @@
+{
+  "base": "245d00e86e1c07099f5e4bbc4b1ea6999c327b62",
+  "pages": [
+    {
+      "file": "dashboards/staff-login.html",
+      "title": "Staff Portal Login - Northwest Custom Apparel",
+      "mainText": "Staff Portal Access internal tools and resources Secure Staff Login Click below to access the staff portal with your credentials. Sign In to Staff Portal You will be redirected to our secure authentication system. Back to main website Need assistance? Contact IT Support",
+      "blocks": [
+        "Staff Portal",
+        "Access internal tools and resources",
+        "Click below to access the staff portal with your credentials.",
+        "You will be redirected to our secure authentication system."
+      ],
+      "links": [
+        {
+          "href": "/auth/saml/login",
+          "label": "Sign In to Staff Portal"
+        },
+        {
+          "href": "/",
+          "label": "Back to main website"
+        },
+        {
+          "href": "mailto:support@nwcustomapparel.com",
+          "label": "IT Support"
+        }
+      ],
+      "images": [
+        {
+          "src": "https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png",
+          "alt": "Northwest Custom Apparel"
+        }
+      ],
+      "ids": [
+        "auth-check"
+      ],
+      "fields": [],
+      "styles": [
+        "shared_components/css/tokens.css",
+        "dashboards/css/staff-login.css"
+      ],
+      "cssBytes": 19483,
+      "scripts": [
+        {
+          "file": "dashboards/js/staff-login-page.js",
+          "hash": "6b3731b07f4bb42ea8563157eef265b00311f3c368aa60976446d9fee8c9f8c7"
+        }
+      ]
+    },
+    {
+      "file": "pages/customer-login.html",
+      "title": "Sign In — Northwest Custom Apparel",
+      "mainText": "Sign in to your portal Enter your email and we'll send you a secure one-click sign-in link. Email address Email me a sign-in link That link has expired or is no longer valid. Enter your email to get a new one. ✓ Check your email If your email is on file, a sign-in link is on its way. It expires in 15 minutes. Didn't get it? Check your spam folder, or try again. Need access? Contact your Northwest Custom Apparel rep.← Back to site",
+      "blocks": [
+        "Sign in to your portal",
+        "Enter your email and we'll send you a secure one-click sign-in link.",
+        "That link has expired or is no longer valid. Enter your email to get a new one.",
+        "Check your email",
+        "If your email is on file, a sign-in link is on its way. It expires in 15 minutes.",
+        "Didn't get it? Check your spam folder, or try again.",
+        "Need access? Contact your Northwest Custom Apparel rep.← Back to site"
+      ],
+      "links": [
+        {
+          "href": "/customer/login",
+          "label": "try again"
+        },
+        {
+          "href": "/",
+          "label": "← Back to site"
+        }
+      ],
+      "images": [
+        {
+          "src": "https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png",
+          "alt": "Northwest Custom Apparel"
+        }
+      ],
+      "ids": [
+        "cl-form-view",
+        "cl-form",
+        "cl-email",
+        "cl-submit",
+        "cl-error",
+        "cl-sent-view",
+        "cl-again"
+      ],
+      "fields": [
+        {
+          "tag": "INPUT",
+          "id": "cl-email",
+          "name": "email",
+          "type": "email",
+          "value": ""
+        }
+      ],
+      "styles": [
+        "shared_components/css/tokens.css",
+        "pages/css/customer-login.css"
+      ],
+      "cssBytes": 18515,
+      "scripts": [
+        {
+          "file": "pages/js/customer-login.js",
+          "hash": "9fa32983aa1d136d31146c6a08b7b8093484991ae5da2b5e5732826e1b60ff7b"
+        }
+      ]
+    },
+    {
+      "file": "pages/vendor-login.html",
+      "title": "Vendor Sign In — Northwest Custom Apparel",
+      "mainText": "Vendor portal sign in Enter your email and we'll send you a secure one-click sign-in link. Email address Email me a sign-in link That link has expired or is no longer valid. Enter your email to get a new one. ✓ Check your email If your email is on file, a sign-in link is on its way. It expires in 15 minutes. Didn't get it? Check your spam folder, or try again. Need access? Contact Northwest Custom Apparel · (253) 922-5793",
+      "blocks": [
+        "Vendor portal sign in",
+        "Enter your email and we'll send you a secure one-click sign-in link.",
+        "That link has expired or is no longer valid. Enter your email to get a new one.",
+        "Check your email",
+        "If your email is on file, a sign-in link is on its way. It expires in 15 minutes.",
+        "Didn't get it? Check your spam folder, or try again.",
+        "Need access? Contact Northwest Custom Apparel · (253) 922-5793"
+      ],
+      "links": [
+        {
+          "href": "/vendor/login",
+          "label": "try again"
+        }
+      ],
+      "images": [
+        {
+          "src": "https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png",
+          "alt": "Northwest Custom Apparel"
+        }
+      ],
+      "ids": [
+        "cl-form-view",
+        "cl-form",
+        "cl-email",
+        "cl-submit",
+        "cl-error",
+        "cl-sent-view",
+        "cl-again"
+      ],
+      "fields": [
+        {
+          "tag": "INPUT",
+          "id": "cl-email",
+          "name": "email",
+          "type": "email",
+          "value": ""
+        }
+      ],
+      "styles": [
+        "shared_components/css/tokens.css",
+        "pages/css/customer-login.css"
+      ],
+      "cssBytes": 18515,
+      "scripts": [
+        {
+          "file": "pages/js/vendor-login.js",
+          "hash": "c8d709a742738b1b8ecfe5350f2361cfd5fb22bfc33d777ceaa0b9db4af04e4c"
+        }
+      ]
+    },
+    {
+      "file": "pages/3-day-tees-success.html",
+      "title": "Order Confirmed — 3-Day Tees | Northwest Custom Apparel",
+      "mainText": "Finalizing your order… Payment received — we’re writing your order into our production system. This usually takes a few seconds. You’re on the press schedule. Order — A confirmation email with everything above is on its way. Start another order Payment received — order finishing up Your payment went through and your order is safe. Our team is completing the production setup by hand, and you’ll get your confirmation email shortly. Reference: — Questions? 253-922-5793 — mention the reference number above. We couldn’t look up that order If you just paid, don’t worry — your payment and order are recorded on our side. Call us and we’ll confirm everything on the spot. 253-922-5793",
+      "blocks": [
+        "Finalizing your order…",
+        "Payment received — we’re writing your order into our production system. This usually takes a few seconds.",
+        "You’re on the press schedule.",
+        "Order —",
+        "A confirmation email with everything above is on its way.",
+        "Payment received — order finishing up",
+        "Your payment went through and your order is safe. Our team is completing the production setup by hand, and you’ll get your confirmation email shortly.",
+        "Reference: —",
+        "Questions? 253-922-5793 — mention the reference number above.",
+        "We couldn’t look up that order",
+        "If you just paid, don’t worry — your payment and order are recorded on our side. Call us and we’ll confirm everything on the spot.",
+        "253-922-5793"
+      ],
+      "links": [
+        {
+          "href": "/",
+          "label": "Northwest Custom Apparel 3-Day Tees ⚡ fast turnaround"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "label": "253-922-5793"
+        },
+        {
+          "href": "/pages/3-day-tees.html",
+          "label": "Start another order"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "label": "253-922-5793"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "label": "253-922-5793"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "label": "253-922-5793"
+        }
+      ],
+      "images": [
+        {
+          "src": "https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1",
+          "alt": "Northwest Custom Apparel"
+        }
+      ],
+      "ids": [
+        "s-working",
+        "s-working-msg",
+        "s-done",
+        "s-order-num",
+        "s-ship-line",
+        "s-mockups",
+        "s-summary",
+        "s-timeline",
+        "s-email-note",
+        "s-delayed",
+        "s-delayed-num",
+        "s-error",
+        "s-error-msg"
+      ],
+      "fields": [],
+      "styles": [
+        "shared_components/css/tokens.css",
+        "pages/css/3-day-tees.css",
+        "pages/css/3-day-tees-success.css"
+      ],
+      "cssBytes": 52631,
+      "scripts": [
+        {
+          "file": "config/app.config.js",
+          "hash": "fe83e4329ce3eee97e48dd68dab81d9d5eb6ec94511d9650e2c9ebbb1528d6ea"
+        },
+        {
+          "file": "pages/js/3-day-tees-shipdate.js",
+          "hash": "dba483ec64460a431b9bedd79832017ffbf140753c78b0f2425488e730c83bd1"
+        },
+        {
+          "file": "pages/js/3-day-tees-success.js",
+          "hash": "485dcb7b1ebad0f2cf4d9678ee079bc4403ef02e56f6773ad234e7856de19551"
+        }
+      ]
+    },
+    {
+      "file": "pages/custom-tees-success.html",
+      "title": "Order Confirmed — Custom T-Shirts | Northwest Custom Apparel",
+      "mainText": "Finalizing your order… Payment received — we’re writing your order into our production system. This usually takes a few seconds. You’re on the press schedule. Order — A confirmation email with everything above is on its way. Start another order Payment received — order finishing up Your payment went through and your order is safe. Our team is completing the production setup by hand, and you’ll get your confirmation email shortly. Reference: — Questions? 253-922-5793 — mention the reference number above. We couldn’t look up that order If you just paid, your payment is safe with Stripe — call 253-922-5793 and we’ll find your order. 253-922-5793",
+      "blocks": [
+        "Finalizing your order…",
+        "Payment received — we’re writing your order into our production system. This usually takes a few seconds.",
+        "You’re on the press schedule.",
+        "Order —",
+        "A confirmation email with everything above is on its way.",
+        "Payment received — order finishing up",
+        "Your payment went through and your order is safe. Our team is completing the production setup by hand, and you’ll get your confirmation email shortly.",
+        "Reference: —",
+        "Questions? 253-922-5793 — mention the reference number above.",
+        "We couldn’t look up that order",
+        "If you just paid, your payment is safe with Stripe — call 253-922-5793 and we’ll find your order.",
+        "253-922-5793"
+      ],
+      "links": [
+        {
+          "href": "/",
+          "label": "Northwest Custom Apparel Custom T-Shirts · Full-Color DTG"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "label": "253-922-5793"
+        },
+        {
+          "href": "/custom-tees",
+          "label": "Start another order"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "label": "253-922-5793"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "label": "253-922-5793"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "label": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "label": "sales@nwcustomapparel.com"
+        }
+      ],
+      "images": [
+        {
+          "src": "https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1",
+          "alt": "Northwest Custom Apparel"
+        }
+      ],
+      "ids": [
+        "s-working",
+        "s-working-msg",
+        "s-done",
+        "s-order-num",
+        "s-ship-line",
+        "s-mockups",
+        "s-summary",
+        "s-timeline",
+        "s-email-note",
+        "s-questions",
+        "s-delayed",
+        "s-delayed-num",
+        "s-error",
+        "s-error-msg"
+      ],
+      "fields": [],
+      "styles": [
+        "shared_components/css/tokens.css",
+        "pages/css/custom-tees.css",
+        "pages/css/custom-tees-success.css"
+      ],
+      "cssBytes": 70616,
+      "scripts": [
+        {
+          "file": "config/app.config.js",
+          "hash": "fe83e4329ce3eee97e48dd68dab81d9d5eb6ec94511d9650e2c9ebbb1528d6ea"
+        },
+        {
+          "file": "pages/js/custom-tees-shipdate.js",
+          "hash": "b4f1b952e521b2df2bca1bd3f1bce7b855bb525878e1291b244d8625f36601a4"
+        },
+        {
+          "file": "pages/js/custom-tees-success.js",
+          "hash": "fe2db22305a441b8e674c765aec2cdef39eebd4240f228fbc78045e0de7d0d27"
+        }
+      ]
+    },
+    {
+      "file": "pages/custom-caps-success.html",
+      "title": "Order Confirmed — Custom Hats | Northwest Custom Apparel",
+      "mainText": "Finalizing your order… Payment received — we’re writing your order into our production system. This usually takes a few seconds. Your caps are in the queue. Order — A confirmation email with everything above is on its way. Start another order Payment received — order finishing up Your payment went through and your order is safe. Our team is completing the production setup by hand, and you’ll get your confirmation email shortly. Reference: — Questions? 253-922-5793 — mention the reference number above. We couldn’t look up that order If you just paid, your payment is safe with Stripe — call 253-922-5793 and we’ll find your order. 253-922-5793",
+      "blocks": [
+        "Finalizing your order…",
+        "Payment received — we’re writing your order into our production system. This usually takes a few seconds.",
+        "Your caps are in the queue.",
+        "Order —",
+        "A confirmation email with everything above is on its way.",
+        "Payment received — order finishing up",
+        "Your payment went through and your order is safe. Our team is completing the production setup by hand, and you’ll get your confirmation email shortly.",
+        "Reference: —",
+        "Questions? 253-922-5793 — mention the reference number above.",
+        "We couldn’t look up that order",
+        "If you just paid, your payment is safe with Stripe — call 253-922-5793 and we’ll find your order.",
+        "253-922-5793"
+      ],
+      "links": [
+        {
+          "href": "/",
+          "label": "Northwest Custom Apparel Custom Hats · Embroidered"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "label": "253-922-5793"
+        },
+        {
+          "href": "/custom-caps",
+          "label": "Start another order"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "label": "253-922-5793"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "label": "253-922-5793"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "label": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "label": "sales@nwcustomapparel.com"
+        }
+      ],
+      "images": [
+        {
+          "src": "https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1",
+          "alt": "Northwest Custom Apparel"
+        }
+      ],
+      "ids": [
+        "s-working",
+        "s-working-msg",
+        "s-done",
+        "s-order-num",
+        "s-ship-line",
+        "s-mockups",
+        "s-summary",
+        "s-timeline",
+        "s-email-note",
+        "s-questions",
+        "s-delayed",
+        "s-delayed-num",
+        "s-error",
+        "s-error-msg"
+      ],
+      "fields": [],
+      "styles": [
+        "shared_components/css/tokens.css",
+        "pages/css/custom-caps.css"
+      ],
+      "cssBytes": 58194,
+      "scripts": [
+        {
+          "file": "config/app.config.js",
+          "hash": "fe83e4329ce3eee97e48dd68dab81d9d5eb6ec94511d9650e2c9ebbb1528d6ea"
+        },
+        {
+          "file": "pages/js/custom-caps-success.js",
+          "hash": "f1422f19b37f0041616fe88257d83845c61180e3ab9aaad409b9d2424ef5857e"
+        }
+      ]
+    }
+  ]
+}

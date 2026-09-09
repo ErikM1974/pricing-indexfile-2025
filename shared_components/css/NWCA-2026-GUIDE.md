@@ -306,3 +306,5 @@ The twelve public webstore marketing pages share tokens/components/Public Sans a
 Brand guides: fifteen custom-brand pages now use tokens/components + shared `storefront-shell.css` + `pages/css/brand-guide.css`. The shared shell owns public navigation/footer; family CSS owns original content layout. `pages/js/brand-guide.js` manages native mobile dialog and existing encoded catalogue search. Other storefront consumers retain nwca-2026-core.css.
 
 Staff references load tokens -> components -> staff-reference.css -> scoped page arrangements. Headers, buttons, cards and table primitives use existing shared components; staff-reference owns paper and source-warning presentation.
+
+- Entry/status: `shared_components/css/access-shell.css` + the two scoped login page sheets; `pages/css/order-confirmation.css` owns3-Day Tees/custom-tees/custom-caps confirmation layout without loading builder styles. All use tokens/components and Public Sans.

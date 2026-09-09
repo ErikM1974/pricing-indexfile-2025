@@ -2878,6 +2878,177 @@
         "localCssRequests": 2
       },
       "measuredRawCssBytes": 70594
+    },
+    {
+      "source": "dashboards/staff-login.html",
+      "family": "entry-status",
+      "status": "pilot",
+      "route": "/dashboards/staff-login.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/access-shell.css",
+        "dashboards/css/staff-login.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "four-widths",
+        "keyboard",
+        "failure-retry",
+        "confirmation-states",
+        "print",
+        "original-content"
+      ],
+      "test": "tests/e2e/css-unification-entry-status.spec.js",
+      "maxCssBytes": 60713,
+      "baseline": {
+        "commit": "245d00e86e1c07099f5e4bbc4b1ea6999c327b62",
+        "rawCssBytes": 19483,
+        "localCssRequests": 2
+      },
+      "measuredRawCssBytes": 58713
+    },
+    {
+      "source": "pages/customer-login.html",
+      "family": "entry-status",
+      "status": "pilot",
+      "route": "/pages/customer-login.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/access-shell.css",
+        "pages/css/customer-login.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "four-widths",
+        "keyboard",
+        "failure-retry",
+        "confirmation-states",
+        "print",
+        "original-content"
+      ],
+      "test": "tests/e2e/css-unification-entry-status.spec.js",
+      "maxCssBytes": 61032,
+      "baseline": {
+        "commit": "245d00e86e1c07099f5e4bbc4b1ea6999c327b62",
+        "rawCssBytes": 18515,
+        "localCssRequests": 2
+      },
+      "measuredRawCssBytes": 59032
+    },
+    {
+      "source": "pages/vendor-login.html",
+      "family": "entry-status",
+      "status": "pilot",
+      "route": "/pages/vendor-login.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/access-shell.css",
+        "pages/css/customer-login.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "four-widths",
+        "keyboard",
+        "failure-retry",
+        "confirmation-states",
+        "print",
+        "original-content"
+      ],
+      "test": "tests/e2e/css-unification-entry-status.spec.js",
+      "maxCssBytes": 61032,
+      "baseline": {
+        "commit": "245d00e86e1c07099f5e4bbc4b1ea6999c327b62",
+        "rawCssBytes": 18515,
+        "localCssRequests": 2
+      },
+      "measuredRawCssBytes": 59032
+    },
+    {
+      "source": "pages/3-day-tees-success.html",
+      "family": "entry-status",
+      "status": "pilot",
+      "route": "/pages/3-day-tees-success.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "pages/css/order-confirmation.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "four-widths",
+        "keyboard",
+        "failure-retry",
+        "confirmation-states",
+        "print",
+        "original-content"
+      ],
+      "test": "tests/e2e/css-unification-entry-status.spec.js",
+      "maxCssBytes": 63749,
+      "baseline": {
+        "commit": "245d00e86e1c07099f5e4bbc4b1ea6999c327b62",
+        "rawCssBytes": 52631,
+        "localCssRequests": 3
+      },
+      "measuredRawCssBytes": 61749
+    },
+    {
+      "source": "pages/custom-tees-success.html",
+      "family": "entry-status",
+      "status": "pilot",
+      "route": "/pages/custom-tees-success.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "pages/css/order-confirmation.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "four-widths",
+        "keyboard",
+        "failure-retry",
+        "confirmation-states",
+        "print",
+        "original-content"
+      ],
+      "test": "tests/e2e/css-unification-entry-status.spec.js",
+      "maxCssBytes": 63749,
+      "baseline": {
+        "commit": "245d00e86e1c07099f5e4bbc4b1ea6999c327b62",
+        "rawCssBytes": 70616,
+        "localCssRequests": 3
+      },
+      "measuredRawCssBytes": 61749
+    },
+    {
+      "source": "pages/custom-caps-success.html",
+      "family": "entry-status",
+      "status": "pilot",
+      "route": "/pages/custom-caps-success.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "pages/css/order-confirmation.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "four-widths",
+        "keyboard",
+        "failure-retry",
+        "confirmation-states",
+        "print",
+        "original-content"
+      ],
+      "test": "tests/e2e/css-unification-entry-status.spec.js",
+      "maxCssBytes": 63749,
+      "baseline": {
+        "commit": "245d00e86e1c07099f5e4bbc4b1ea6999c327b62",
+        "rawCssBytes": 58194,
+        "localCssRequests": 2
+      },
+      "measuredRawCssBytes": 61749
     }
   ],
   "billingContentSha256": "d85f8530e03a1863d1b8bb2ebe97ba332d5c9e3411887d1eb2d02dcdb14c0863",
