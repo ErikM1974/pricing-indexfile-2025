@@ -6,7 +6,7 @@ Erik resumed explicitly; edit/deploy authorization continues. The 17 printable f
 
 ### Count and current work
 
-**41 reviewed application pages live; 183 still pending**, from 224 application/served-archive HTML sources. Another 80 tracked HTML files are excluded archives/email/templates/retired sources. Generated style/document owners remain separate work. Inventory: September 7 artifacts/css-shutdown-inventory.json.
+**41 reviewed application pages live; 184 still pending**, from 225 application/served-archive HTML sources (inventory corrected to include the browser template editor). Another 79 tracked HTML files are excluded archives/email/templates/retired sources. Generated style/document owners remain separate work. Inventory: September 7 artifacts/css-shutdown-inventory.json.
 
 Next batch: seven remaining training pages — customer-categorization-training, lead-email-templates, lead-source-training, training-games-hub, shopworks-notes, shopworks-sales-tax-training, team-match-game. Baselines already captured in remaining-training-baseline.json / training-before-*.png. Preserve original training prose, fixtures, destinations and rates. Share scoped navigation/control/layout styles, retain page-specific game arrangements, verify keyboard/touch games and template copy/edit/failure states. Implementation is local and under validation.
 
@@ -21,6 +21,14 @@ Backend remains v2026.09.08.1 / Heroku 1130 / d06aee3e4d25c5e1410241ea8007cdc833
 ### Training practice implementation — active local batch
 
 Seven pages now share training-guide/practice owners and component primitives. Twenty focused browser cases are implemented: the first eighteen passed; completion/timer refinements passed their two targeted cases afterward. Ninety ownership/content/fixture tests pass. Full release gates and PDF review remain required before source CI/deploy. Superseded training-shared.css is retired after a zero-HTML-caller check; original lesson text and seven JS exercise fixture objects are unchanged. Template storage/copy failures stay visible, saved templates render after reload, matching supports touch/keyboard/drag, quiz/tax scoring and mode timers are guarded. Forms .12 main CI 34297584052 is green.
+
+### Training practice ready for source CI — 2026-09-08
+
+Full local checks passed: 207 unit suites / 5,035 passed / four existing skips; 88 DOM, four a11y unit, 84 quote parity; 162 mocked browser cases in 273.6 seconds and 16 remaining cases, three optional screenshot skips. All five live calculator surfaces agree. Build/lint/types/291 CSS/boot pass; 485 registrations / 24 modules unchanged. Final print and inventory refinements then passed 91 ownership/census cases, all twenty family browser cases, one last email-print check and CSS lint. Real PDFs are reviewed: one-page hub, six-page notes with whole sections, twelve complete email templates verified against their full original text.
+
+The census correction includes the browser email-template editor as an APPLICATION, rather than an email-client document. Correct denominator: **225 application/served-archive pages** (224 + 1), plus 79 excluded HTML sources. **41 pages remain live on .12; seven ready for .13, bringing reviewed/live to 48 and pending to 177 after deployment.** Prior 224/183 totals excluded that editor. Fourteen training pages will be reviewed after this batch; thirteen other training HTML pages remain in the larger queue.
+
+Unique family-owned CSS: 87399 → 22402 bytes (74.4% less), excluding the existing cached foundations. This does not claim lower cold-page network transfer. Source/CI/release/live records use training-practice-* in September 7 artifacts. Source commit, exact CI, release and live verification are next; no .13 deployment yet.
 
 ## Resumed — 2026-09-08
 
