@@ -2733,6 +2733,151 @@
         "localCssRequests": 3
       },
       "measuredRawCssBytes": 72784
+    },
+    {
+      "source": "dashboards/commission-structure.html",
+      "family": "staff-reference",
+      "status": "pilot",
+      "route": "/dashboards/commission-structure.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/staff-reference.css",
+        "dashboards/css/commission-structure.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "four-widths",
+        "keyboard",
+        "source-warnings",
+        "failure-retry",
+        "complete-print",
+        "original-content"
+      ],
+      "test": "tests/e2e/css-unification-staff-reference.spec.js",
+      "maxCssBytes": 80609,
+      "baseline": {
+        "commit": "a6d59feca31b1a4419c1f963bb91c063e7d03539",
+        "rawCssBytes": 31965,
+        "localCssRequests": 2
+      },
+      "measuredRawCssBytes": 78609
+    },
+    {
+      "source": "dashboards/embroidery-bonus-plan.html",
+      "family": "staff-reference",
+      "status": "pilot",
+      "route": "/dashboards/embroidery-bonus-plan.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/staff-reference.css",
+        "dashboards/css/embroidery-bonus-plan.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "four-widths",
+        "keyboard",
+        "source-warnings",
+        "failure-retry",
+        "complete-print",
+        "original-content"
+      ],
+      "test": "tests/e2e/css-unification-staff-reference.spec.js",
+      "maxCssBytes": 67364,
+      "baseline": {
+        "commit": "a6d59feca31b1a4419c1f963bb91c063e7d03539",
+        "rawCssBytes": 157077,
+        "localCssRequests": 3
+      },
+      "measuredRawCssBytes": 65364
+    },
+    {
+      "source": "dashboards/seo-strategy.html",
+      "family": "staff-reference",
+      "status": "pilot",
+      "route": "/dashboards/seo-strategy.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/staff-reference.css",
+        "dashboards/css/seo-strategy.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "four-widths",
+        "keyboard",
+        "source-warnings",
+        "failure-retry",
+        "complete-print",
+        "original-content"
+      ],
+      "test": "tests/e2e/css-unification-staff-reference.spec.js",
+      "maxCssBytes": 69999,
+      "baseline": {
+        "commit": "a6d59feca31b1a4419c1f963bb91c063e7d03539",
+        "rawCssBytes": 166036,
+        "localCssRequests": 4
+      },
+      "measuredRawCssBytes": 67999
+    },
+    {
+      "source": "dashboards/forms-library.html",
+      "family": "staff-reference",
+      "status": "pilot",
+      "route": "/dashboards/forms-library.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/staff-reference.css",
+        "dashboards/css/forms-library.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "four-widths",
+        "keyboard",
+        "source-warnings",
+        "failure-retry",
+        "complete-print",
+        "original-content"
+      ],
+      "test": "tests/e2e/css-unification-staff-reference.spec.js",
+      "maxCssBytes": 61801,
+      "baseline": {
+        "commit": "a6d59feca31b1a4419c1f963bb91c063e7d03539",
+        "rawCssBytes": 159117,
+        "localCssRequests": 4
+      },
+      "measuredRawCssBytes": 59801
+    },
+    {
+      "source": "pages/data-entry-guide.html",
+      "family": "staff-reference",
+      "status": "pilot",
+      "route": "/pages/data-entry-guide.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/staff-reference.css",
+        "pages/data-entry-guide.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "four-widths",
+        "keyboard",
+        "source-warnings",
+        "failure-retry",
+        "complete-print",
+        "original-content"
+      ],
+      "test": "tests/e2e/css-unification-staff-reference.spec.js",
+      "maxCssBytes": 72594,
+      "baseline": {
+        "commit": "a6d59feca31b1a4419c1f963bb91c063e7d03539",
+        "rawCssBytes": 25662,
+        "localCssRequests": 2
+      },
+      "measuredRawCssBytes": 70594
     }
   ],
   "billingContentSha256": "d85f8530e03a1863d1b8bb2ebe97ba332d5c9e3411887d1eb2d02dcdb14c0863",

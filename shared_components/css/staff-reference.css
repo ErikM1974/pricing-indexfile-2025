@@ -1,0 +1,20 @@
+/* Shared staff reference reading and paper contract; controls/shell remain in components.css. */
+@layer components.pages {
+    :where([data-ui="unified"][data-staff-reference]) .table-wrap { max-width: 100%; }
+    :where([data-ui="unified"][data-staff-reference]) .reference-source-warning { margin-block: 12px; padding: 12px; color: var(--color-warning-ink); background: var(--color-warning-bg); border: 1px solid var(--color-warning); border-radius: var(--radius-sm); }
+    :where([data-ui="unified"][data-staff-reference]) .reference-source-warning .btn { margin-top: 8px; }
+
+    @media print {
+        :where([data-ui="unified"][data-staff-reference]) { background: var(--ui-surface); font-size: 11px; }
+        :where([data-ui="unified"][data-staff-reference]) .dash-header { display: block; padding: 0 0 12px; border: 0; background: var(--ui-surface); }
+        :where([data-ui="unified"][data-staff-reference]) .dash-header :is(h1, p, .header-subtitle) { color: var(--ui-ink); }
+        :where([data-ui="unified"][data-staff-reference]) :is(.dash-header-right, .dash-header > .btn, .dash-header-logo, .no-print, .seo-toc) { display: none; }
+        :where([data-ui="unified"][data-staff-reference]) .dash-content { max-width: none; padding: 0; }
+        :where([data-ui="unified"][data-staff-reference]) .table-wrap { overflow: visible; }
+        :where([data-ui="unified"][data-staff-reference]) table { width: 100%; min-width: 0; }
+        :where([data-ui="unified"][data-staff-reference]) :is(th, td) { overflow-wrap: anywhere; }
+        :where([data-ui="unified"][data-staff-reference]) h2 { break-after: avoid; }
+        :where([data-ui="unified"][data-staff-reference]) :is(.reference-source-warning, .dash-error-banner.show) { display: block; break-inside: avoid; }
+        :where([data-ui="unified"][data-staff-reference]) :is(.reference-source-warning, .dash-error-banner, .ebp-note[role="status"]) button { display: none; }
+    }
+}

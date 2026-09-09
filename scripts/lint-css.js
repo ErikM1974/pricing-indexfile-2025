@@ -40,6 +40,7 @@ const CSS_LINT_SCOPE = [
     'shared_components/css/embroidery-quote-pricing.css',
     'pages/css/brand-guide.css',
     'shared_components/css/storefront-shell.css',
+    'shared_components/css/staff-reference.css',
     'pages/css/company-webstores.css',
     'pages/css/webstore-inquiry.css',
     'pages/css/instant-quote.css',
