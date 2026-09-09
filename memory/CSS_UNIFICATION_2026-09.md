@@ -1002,3 +1002,14 @@ Reviewed design libraries: dashboards/digitized-designs.html and dashboards/old-
 Preserved the .14 live checkpoint and all append-only design evidence. The initial review commit helper stopped on whitespace-only HTML lines; finish-design-reviewed.cjs removed trailing whitespace and committed the owned source, preserving both indexed deletions. Do not rerun either review helper. Full integrated checks follow.
 
 Integrated design checks found two historical photo-source locks still expected the previously untouched design controllers. The photo guard now reverses the same31 explicitly documented design edits before checking its original hashes; no source lock was removed or rebased. All227suites rerun on the updated integrated source.
+
+## Design preview tools plan — 2026-09-09
+
+Next isolated candidate .16, base09faa19b656c10c7e8331aee477c3ebea080711f: pages/design-view.html, pages/dst-viewer.html and pages/jds-mockup-creator.html. Public design gallery, local DST studio and JDS tumbler mockup UI. Preserve all existing URLs, inputs, output pixels/measurements and pure DST/color/garment/template helpers; customer gallery must keep internal pricing/order notes absent. JDS uses documented drinkware oxblood identity; DST retains its dark instrument workspace, matched to its existing launcher. All use shared control/font/focus conventions with separate family layout owners.
+
+- [ ] Capture original desktop/mobile states with synthetic APIs/assets and local sample files.
+- [ ] Consolidate local style owners and canonical controls; review native file inputs, keyboard/dialog/canvas controls and complete visible failure states.
+- [ ] Compare image/PNG/download/approval outputs, DST counts/dimensions and public/private content boundaries.
+- [ ] Run browser/source/print review, integrate full gates and exact-source CI, deploy and verify actual slug.
+
+No app CSS changes or extra review credit yet. Verified live .14/2090/db9c6a64ea6f1dc98b32aecd9924f45fcc1ce473:138/225,87pending. Design-library .15 source09faa19b656c10c7e8331aee477c3ebea080711f has full gates running after historical source guards were extended through its documented edits. Original preview-tool evidence remains outside Git at C:/Users/erik/.codex/visualizations/2026/09/07/01a07d90-9a4c-7e70-9e4e-c196377b7c6b. No real uploads, writes, emails or notifications.
