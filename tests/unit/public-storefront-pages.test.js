@@ -35,7 +35,7 @@ describe('storefront HTML hygiene', () => {
     test('"(optional)" hint is a class on both instant-quote pages', () => {
         expect((read('pages/custom-stickers.html').match(/class="stk-optional"/g) || []).length).toBe(3);
         expect((read('pages/custom-banners.html').match(/class="stk-optional"/g) || []).length).toBe(3);
-        expect(read('pages/css/instant-quote.css')).toMatch(/\.stk-optional \{ font-weight: 400; \}/);
+        expect(read('pages/css/instant-quote.css').replace(/\s+/g, ' ')).toMatch(/\.stk-optional \{ font-weight: 400; \}/);
     });
 });
 
