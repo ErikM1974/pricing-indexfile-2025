@@ -1,3 +1,13 @@
+## v2026.09.09.4 (2026.09.09)
+
+- Plan shared catalog discovery and native brand navigation
+- Record catalog discovery implementation in progress
+- Record catalog discovery review and data failure lesson
+- Unify brand directory and Fall catalog with shared storefront navigation
+- Record verified entry status release and catalog review
+- Integrate reviewed brand directory and Fall catalog
+- Record completed catalog discovery release checks
+
 ## v2026.09.09.3 (2026.09.09)
 
 - Plan unified sign-in and order confirmation pages
