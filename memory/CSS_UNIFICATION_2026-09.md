@@ -815,3 +815,9 @@ Branch codex/staff-monitoring-tools starts at d4a0b187ade98f936df5e619b90d6d6767
 - [ ] Review four widths/axe/keyboard, denied/failed/malformed/retry/storage/export cases with all business traffic mocked; source/ownership/full release checks and actual live verification.
 
 Still126pages live/99pending after verified .10;129reviewed locally/96pending with .11. These three monitoring pages are only planned, not reviewed. Candidate .12. Keep source controllers exact except explicit presentation and demonstrated error-state fixes, which require their own tests.
+
+### Staff monitoring layout implementation started
+
+Staff monitoring migration in progress: new shared_components/css/staff-monitoring.css owns layouts for dashboards/api-usage.html,table-usage-audit.html,bandit-integration.html. Their three dashboards/css sheets retired. Shared tokens/components replace art-hub/dash-shell dependencies. Original data/controllers retained pending specific review refinements; no live completion claimed.
+
+Native table sorting, storage/failure states, print values and focused review remain.
