@@ -1,173 +1,276 @@
-/* ==========================================================================
-   policy-migration.css — page-specific styles for dashboards/policy-migration.html
+/* Migration snapshot arrangements; shared page chrome, fields, buttons and cards come from components. */
+@layer components.pages {
+    :where([data-ui="unified"][data-guidance="policy-migration"]) .dash-stat-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: var(--space-4);
+        margin-block-end: var(--space-5);
+    }
 
-   Shell classes (.dash-header, .dash-back-link, .dash-stat-card, etc.) come
-   from shared_components/css/dash-shell.css. Design tokens (--surface-*,
-   --gray-*, --shadow-*, --radius-*, --state-*) come from
-   shared_components/css/art-hub.css.
+    :where([data-ui="unified"][data-guidance="policy-migration"]) .dash-stat-card {
+        padding: var(--space-5);
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-md);
+        background: var(--ui-surface);
+    }
 
-   Only page-specific styles here. NEVER redefine tokens. NEVER hardcode
-   colors/shadows/radii — use var(--token-name).
-   ========================================================================== */
+    :where([data-ui="unified"][data-guidance="policy-migration"]) .dash-stat-value {
+        font-size: var(--font-size-display);
+        font-weight: 600;
+        color: var(--ui-ink);
+    }
 
-/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue so the page
-   keeps its exact look. Map them to shared_components/css/tokens.css names when the page is redesigned;
-   every rule below uses var(). Raw hex is allowed ONLY in this block. */
-/* stylelint-disable color-no-hex */
-:root {
-    --policy-migration-green-tint: #d1e7dd;
-    --policy-migration-yellow-dark: #664d03;
+    :where([data-ui="unified"][data-guidance="policy-migration"]) .dash-stat-label {
+        font-size: var(--font-size-md);
+        color: var(--ui-muted);
+        margin-block-start: var(--space-2);
+    }
+
+    :where([data-ui="unified"][data-guidance="policy-migration"]) .dash-card {
+        margin-block: var(--space-5);
+    }
+
+    :where([data-ui="unified"][data-guidance="policy-migration"]) .dash-card-title {
+        font-size: var(--font-size-xl);
+        margin: 0;
+    }
+
+    :where([data-ui="unified"][data-guidance="policy-migration"]) .dash-card-header {
+        gap: var(--space-4);
+        margin-block-end: var(--space-4);
+    }
+
+    :where([data-ui="unified"][data-guidance="policy-migration"]) .pm-controls {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: var(--space-3);
+        width: 100%;
+    }
+
+    :where([data-ui="unified"][data-guidance="policy-migration"]) .pm-controls input {
+        flex: 1 1 250px;
+        min-width: 0;
+        max-width: 520px;
+    }
+
+    :where([data-ui="unified"][data-guidance="policy-migration"]) .pm-search-label {
+        font-size: var(--font-size-md);
+        font-weight: 600;
+    }
+
+    :where([data-ui="unified"][data-guidance="policy-migration"]) .pm-chiprow {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-2);
+    }
+
+    :where([data-ui="unified"][data-guidance="policy-migration"]) .pm-chip[aria-pressed="true"] {
+        background: var(--ui-accent);
+        border-color: var(--ui-accent);
+        color: var(--color-on-brand);
+    }
+
+    :where([data-ui="unified"][data-guidance="policy-migration"]) .pm-count {
+        display: block;
+        color: var(--ui-muted);
+        font-size: var(--font-size-md);
+        margin-block: var(--space-3);
+    }
+
+    :where([data-ui="unified"][data-guidance="policy-migration"]) :is(.pm-questions-list, .pm-wave-log) {
+        padding-inline-start: var(--space-5);
+        line-height: 1.7;
+    }
+
+    :where([data-ui="unified"][data-guidance="policy-migration"]) :is(.pm-questions-list, .pm-wave-log) li {
+        margin-block: var(--space-3);
+        overflow-wrap: anywhere;
+    }
+
+    :where([data-ui="unified"][data-guidance="policy-migration"]) .pm-wave-log {
+        list-style: none;
+        padding: 0;
+    }
+
+    :where([data-ui="unified"][data-guidance="policy-migration"]) .pm-wave-log li {
+        display: grid;
+        grid-template-columns: 90px minmax(0, 1fr);
+        gap: var(--space-3);
+    }
+
+    :where([data-ui="unified"][data-guidance="policy-migration"]) .pm-wave-when {
+        color: var(--ui-muted);
+        font-size: var(--font-size-md);
+    }
+
+    :where([data-ui="unified"][data-guidance="policy-migration"]) :is(.pm-hint, .pm-footnote) {
+        font-size: var(--font-size-md);
+        color: var(--ui-muted);
+        line-height: 1.7;
+        overflow-wrap: anywhere;
+    }
+
+    :where([data-ui="unified"][data-guidance="policy-migration"]) .pm-table-wrap {
+        overflow: auto;
+        max-width: 100%;
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-sm);
+    }
+
+    :where([data-ui="unified"][data-guidance="policy-migration"]) .pm-table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 900px;
+        font-size: var(--font-size-md);
+    }
+
+    :where([data-ui="unified"][data-guidance="policy-migration"]) .pm-table :is(td, th) {
+        text-align: start;
+        vertical-align: top;
+        padding: var(--space-3);
+        border-block-end: 1px solid var(--ui-line);
+        line-height: 1.6;
+        overflow-wrap: anywhere;
+    }
+
+    :where([data-ui="unified"][data-guidance="policy-migration"]) .pm-table th {
+        font-size: var(--font-size-sm);
+        font-weight: 600;
+        background: var(--ui-canvas);
+    }
+
+    :where([data-ui="unified"][data-guidance="policy-migration"]) .pm-table td:nth-child(2) {
+        min-width: 200px;
+    }
+
+    :where([data-ui="unified"][data-guidance="policy-migration"]) .pm-table td:last-child {
+        width: 40%;
+    }
+
+    :where([data-ui="unified"][data-guidance="policy-migration"]) .pm-badge {
+        display: inline-block;
+        padding: var(--space-1) var(--space-2);
+        border-radius: var(--radius-sm);
+        color: var(--ui-muted);
+        background: var(--ui-canvas);
+        font-size: var(--font-size-sm);
+    }
+
+    :where([data-ui="unified"][data-guidance="policy-migration"]) .pm-badge--done {
+        color: var(--ui-accent);
+        background: var(--ui-tint);
+    }
+
+    :where([data-ui="unified"][data-guidance="policy-migration"]) .pm-badge--core {
+        background: var(--color-warning-bg);
+        color: var(--color-warning-ink);
+    }
+
+    :where([data-ui="unified"][data-guidance="policy-migration"]) .pm-badge--erik {
+        background: var(--color-info-bg);
+        color: var(--color-info-ink);
+    }
+
+    :where([data-ui="unified"][data-guidance="policy-migration"]) .pm-empty {
+        padding: var(--space-5);
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-guidance="policy-migration"]) .dash-loading {
+        padding: var(--space-5);
+        color: var(--ui-muted);
+    }
 }
-/* stylelint-enable color-no-hex */
 
-.pm-questions-list {
-    margin: 0;
-    padding: 0 0 0 1.2rem;
-    display: grid;
-    gap: 0.45rem;
+@media (width <= 600px) {
+    @layer components.pages {
+        :where([data-ui="unified"][data-guidance="policy-migration"]) .pm-wave-log li {
+            grid-template-columns: 1fr;
+        }
+
+        :where([data-ui="unified"][data-guidance="policy-migration"]) .dash-stat-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        :where([data-ui="unified"][data-guidance="policy-migration"]) .dash-stat-value {
+            font-size: var(--font-size-2xl);
+        }
+    }
 }
 
-.pm-questions-list li {
-    line-height: 1.45;
+@media print {
+    @layer components.print {
+        :where([data-ui="unified"][data-guidance="policy-migration"]) .pm-controls,
+        :where([data-ui="unified"][data-guidance="policy-migration"]) .dash-error-banner {
+            display: none;
+        }
+
+        :where([data-ui="unified"][data-guidance="policy-migration"]) .pm-table-wrap {
+            overflow: visible;
+            border: 0;
+        }
+
+        :where([data-ui="unified"][data-guidance="policy-migration"]) .pm-table {
+            min-width: 0;
+            table-layout: fixed;
+            font-size: 8pt;
+        }
+
+        :where([data-ui="unified"][data-guidance="policy-migration"]) .pm-table td:nth-child(2) {
+            min-width: 0;
+        }
+
+        :where([data-ui="unified"][data-guidance="policy-migration"]) .pm-table :is(td, th) {
+            padding: 4pt;
+        }
+
+        :where([data-ui="unified"][data-guidance="policy-migration"]) .pm-table tr {
+            break-inside: avoid;
+        }
+
+        :where([data-ui="unified"][data-guidance="policy-migration"]) .dash-stat-grid {
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+        }
+
+        :where([data-ui="unified"][data-guidance="policy-migration"]) .dash-stat-card {
+            padding: 6pt;
+        }
+
+        :where([data-ui="unified"][data-guidance="policy-migration"]) .dash-stat-value {
+            font-size: 16pt;
+        }
+
+        :where([data-ui="unified"][data-guidance="policy-migration"]) .dash-card {
+            padding: 0;
+            border: 0;
+        }
+
+        :where([data-ui="unified"][data-guidance="policy-migration"]) .dash-card-header {
+            break-after: avoid;
+        }
+    }
 }
 
-.pm-hint {
-    margin: 0.9rem 0 0;
-    color: var(--gray-500);
-    font-size: 0.85rem;
+@media print {
+    @layer components.print {
+        [data-ui="unified"][data-guidance] {
+            background: var(--ui-surface);
+            font-size: 10.5pt;
+        }
+    }
 }
 
-.pm-wave-log {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    display: grid;
-    gap: 0.55rem;
+@media print {
+    @layer components.print {
+        :where([data-ui="unified"][data-guidance="policy-migration"]) .dash-header {
+            display: flex;
+            padding: 0;
+            border: 0;
+        }
+
+        :where([data-ui="unified"][data-guidance="policy-migration"]) .dash-header-right {
+            display: none;
+        }
+    }
 }
-
-.pm-wave-log li {
-    display: flex;
-    gap: 0.6rem;
-    align-items: baseline;
-    line-height: 1.4;
-}
-
-.pm-wave-when {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.78rem;
-    color: var(--gray-500);
-    white-space: nowrap;
-}
-
-.pm-controls {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.6rem;
-    align-items: center;
-}
-
-.pm-controls input[type="search"] {
-    padding: 0.45rem 0.75rem;
-    border: 1px solid var(--gray-200);
-    border-radius: var(--radius-md);
-    font: inherit;
-    min-width: 220px;
-}
-
-.pm-chiprow {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.4rem;
-}
-
-.pm-chip {
-    border: 1px solid var(--gray-200);
-    background: var(--gray-50);
-    border-radius: 999px;
-    padding: 0.25rem 0.7rem;
-    font-size: 0.8rem;
-    cursor: pointer;
-    user-select: none;
-}
-
-.pm-chip.on {
-    background: var(--gray-800);
-    color: var(--gray-50);
-    border-color: var(--gray-800);
-}
-
-.pm-table-wrap {
-    overflow-x: auto;
-}
-
-.pm-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.86rem;
-}
-
-.pm-table th {
-    text-align: left;
-    padding: 0.5rem 0.6rem;
-    color: var(--gray-500);
-    font-size: 0.74rem;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    border-bottom: 1px solid var(--gray-200);
-    position: sticky;
-    top: 0;
-    background: var(--surface-card, var(--color-surface));
-}
-
-.pm-table td {
-    padding: 0.5rem 0.6rem;
-    border-bottom: 1px solid var(--gray-100);
-    vertical-align: top;
-}
-
-.pm-badge {
-    display: inline-block;
-    padding: 0.1rem 0.5rem;
-    border-radius: 999px;
-    font-size: 0.7rem;
-    font-weight: 700;
-    white-space: nowrap;
-    background: var(--gray-100);
-    color: var(--gray-700);
-}
-
-.pm-badge--done    { background: var(--state-success-bg, var(--policy-migration-green-tint)); color: var(--state-success-text, var(--brand-800)); }
-.pm-badge--core    { background: var(--state-warning-bg, var(--amber-100)); color: var(--state-warning-text, var(--policy-migration-yellow-dark)); }
-.pm-badge--erik    { background: var(--state-danger-bg, var(--red-100));  color: var(--state-danger-text, var(--color-ae-dark)); }
-.pm-badge--auto    { background: var(--gray-100); color: var(--gray-600); }
-
-.pm-note {
-    color: var(--gray-500);
-    font-size: 0.8rem;
-}
-
-.pm-footnote {
-    color: var(--gray-500);
-    font-size: 0.8rem;
-    margin: 1rem 0 0;
-}
-
-.pm-count {
-    color: var(--gray-500);
-    font-size: 0.8rem;
-    margin-left: auto;
-}
-
-/* Phone (≤640px) — 2026-09-05 staff-dashboard sweep: the page measured wider than the
-   viewport at 375px and panned sideways. */
-@media (width <= 640px) {
-    .pm-table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
-}
-
-@media (width <= 640px) {
-    .dash-card-header { flex-wrap: wrap; row-gap: 6px; }
-}
-
-/* 2026-09-05 review */
-/* stylelint-disable-next-line declaration-no-important -- the hidden attribute must beat any display rule */
-[hidden] { display: none !important; }

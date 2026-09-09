@@ -1,31 +1,42 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sale - Northwest Custom Apparel</title>
-    <link rel="icon" href="/favicon.png" type="image/png">
-    <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/pages/css/simple-notice-page.css?v=2026.09.07.14">
-</head>
-<body>
-    <header class="header">
-        <div class="header-content">
-            <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Logo%20White.png" alt="NWCA" class="logo">
-            <p class="header-title">Sale Items</p>
-            <a href="/" class="back-link">
-                ← Back to Sales Tool
-            </a>
-        </div>
-    </header>
-    
-    <main class="content">
-        <div class="coming-soon">
-            <div class="icon">🏷️</div>
-            <h1>Sale & Clearance</h1>
-            <p>Check back soon for special deals and clearance items! We'll be featuring discounted apparel, overstock items, and seasonal promotions to help you save on your custom apparel orders.</p>
-            <a href="/" class="btn-home">Return to Homepage</a>
-        </div>
-    </main>
-</body>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Sale - Northwest Custom Apparel</title>
+        <link rel="icon" href="/favicon.png" type="image/png" />
+        <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2" />
+        <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.08.16" />
+        <link rel="stylesheet" href="/pages/css/simple-notice-page.css?v=2026.09.07.14" />
+        <link
+            rel="stylesheet"
+            href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&amp;display=swap"
+        />
+    </head>
+    <body data-ui="unified" data-guidance="sale">
+        <a class="skip-link" href="#guide-main">Skip to content</a>
+        <header class="page-header">
+            <div class="page-header-inner">
+                <img
+                    src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                    alt="NWCA"
+                    class="page-header-logo"
+                />
+                <p class="page-title">Sale Items</p>
+                <a href="/" class="page-nav-link"> ← Back to Sales Tool </a>
+            </div>
+        </header>
+
+        <main class="page-main notice-main" id="guide-main" tabindex="-1">
+            <div class="notice-card">
+                <div class="icon" aria-hidden="true">🏷️</div>
+                <h1>Sale &amp; Clearance</h1>
+                <p>
+                    Check back soon for special deals and clearance items! We'll be featuring discounted apparel,
+                    overstock items, and seasonal promotions to help you save on your custom apparel orders.
+                </p>
+                <a href="/" class="btn btn-primary">Return to Homepage</a>
+            </div>
+        </main>
+    </body>
 </html>
