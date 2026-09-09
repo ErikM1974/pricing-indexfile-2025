@@ -481,3 +481,15 @@ Worktree codex/policy-cms-family is based on integrated policy-reference source 
 - [ ] Run full local gates, exact-source CI and verified deployment after the preceding .18 batch; update the canonical live checkpoint only after actual release verification.
 
 Candidate count after this family would be 72 reviewed /153 pending of 225, contingent on the previous four shipping first. Runtime generated documents remain separately tracked.
+
+## Policies CMS family reviewed locally — 2026-09-08
+
+All four pages now share tokens/components/Public Sans and policy-workspace.css. Original static prose/navigation/fields remain locked; the existing API client and authentication gate are unchanged. Published Caspio policy and organization records and the downloadable handbook PDF are untouched. Body content is exercised with synthetic fixtures only.
+
+Twenty-one focused browser cases pass at four widths with axe, keyboard navigation, visible storage/catalogue/search/inbox failures and retry, ordinary-staff/admin controls, native AI modal/focus recovery, actual TipTap editing and unchanged normalized content through failed saves, loaded parent choices, disabled saving when the editor cannot load, blocked-storage comment identity, failed-post draft preservation, native moderation confirmation, chart search revealing collapsed teams, and paper preserving collapsed-screen state. Eight controllers pass strict lint; 294 worktree CSS files pass. Four targeted unit suites pass 137 tests with one sibling-proxy check skipped only in this isolated worktree.
+
+Paper review verifies every selected synthetic block (101 in total): hub/detail/questions one page each, 23-page handbook with all 22 chapters and text following ordinary content dividers, and two-page chart with every tested team/name. Actual first/middle/last renders reviewed. Print hides editing controls, starts handbook chapters on new pages, restores disclosures/collapsed teams, and keeps chart coverage readable. Visual review also caught and removed the old mobile TOC height/row overrides from its actual handbook owner.
+
+Bug fixes: use resolved staff identity for comments before guarded legacy storage; fail closed on missing content sanitizer or editor; load parent options after policy mode resolves; preserve text after ordinary handbook dividers; synchronize chart search visibility and expanded state; show unknown question count instead of a false zero; escape AI error toast text.
+
+Measured raw local CSS graphs: pages/policies-hub.html 51709 → 99945 bytes; pages/policy-detail.html 138235 → 209120 bytes; pages/policy-questions.html 51709 → 99945 bytes; pages/handbook.html 65652 → 112698 bytes. These are source bytes, not network transfers; the shared component graph adds bytes to lighter pages and reduces repeated control ownership across the application. Full primary gates, exact-source CI and verified .19 release remain. Live remains .18 /68 reviewed /157 pending; candidate72 is not yet live.
