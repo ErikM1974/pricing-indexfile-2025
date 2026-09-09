@@ -696,3 +696,7 @@ Next isolated branch codex/customer-intake at C:\Users\erik\.codex\visualization
 - [ ] Replace three repeated embed-page styles with scoped shared arrangements; unify native quote-request fields using canonical tokens/components. Preserve original content, upload/submit helpers and hosted form destinations.
 - [ ] Four widths/axe, navigation, prefill/date/style lookup, failed/successful mocked uploads/submissions, vendor embed availability and complete paper content.
 - [ ] Register reviewed owners, full local gates/exact-source CI and verified release after instant2.
+
+## Customer intake implementation in progress — 2026-09-09
+
+Original four-page desktop/phone screenshots captured with hosted forms mocked. Public quote form now uses canonical full-width fields and choice controls, fixing its phone project-textarea overflow; three duplicate hosted-form wrappers share one scoped owner with Ruth/Bradley department colors. Existing prose, images, business helper sources and vendor embed destinations retained. Verified direct Jotform destinations respond200; persistent accessible fallback links and paper destinations added. Four old CSS owners retired after final consumers migrated; lifecycle docs updated. Candidate .8, isolated from instant .7. Four-width/state/keyboard/axe/paper verification and full gates remain; no additional pages counted reviewed.
