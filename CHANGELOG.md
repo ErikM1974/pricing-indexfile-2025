@@ -1,3 +1,10 @@
+## v2026.09.08.13 (2026.09.08)
+
+- Record live forms release and resume training migration
+- Record training migration progress and interaction lessons
+- Record reviewed training release gates and corrected page inventory
+- Unify training practice pages and repair accessible exercise workflows
+
 ## v2026.09.08.12 (2026.09.08)
 
 - Record live service guides and printable forms continuation
