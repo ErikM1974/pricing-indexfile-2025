@@ -1,5 +1,18 @@
 # CSS unification — design direction and implementation plan
 
+
+## Shutdown checkpoint — 2026-09-09
+
+PAUSED at Erik's request so he can turn off the computer. No further implementation or deployment until he resumes. Live frontend remains v2026.09.09.4 / Heroku2083,112 reviewed pages and113 pending. Campaign3 is integrated in primary develop at f5c12668f7bb7e0aa086912ae0ad65539a4f68df but still needs complete browser/live-parity/CI/release checks.
+
+This codex/instant-storefront branch saves thirteen owned WIP files for the banner/sticker family. It is NOT reviewed, NOT release ready, and must NOT be merged into the campaign release. New storefront-commerce.css and instant-storefront.js are explicitly included. node_modules is a junction; no .env copied. Preserve the junction and never recursively remove this worktree.
+
+First implementation fix on resume: pages/css/instant-quote.css has a known mobile regression. The one-shot merge-instant-arrangements.cjs moved base .stk-card grid-column:2/grid-row:1/span2 into a later rule after the width<=900px media query, overriding mobile grid-column:1/grid-row:auto. Fix cascade order and audit other merged selectors; do not hide overflow. Sticker phone screenshot shows two narrow columns. Desktop styles are preliminary; no content/financial fixture locks, state tests, four-width accessibility checks or print verification are complete for these two pages. Manifest not registered and these pages must not count as reviewed.
+
+Original baseline/controller hashes, read-only live pricing snapshots, before/after screenshots and helpers live in C:/Users/erik/.codex/visualizations/2026/09/07/01a07d90-9a4c-7e70-9e4e-c196377b7c6b. Start with instant-storefront-original-baseline.json, instant-storefront-pricing-capture.json and instant-crop-custom-stickers-phone.png. Do not rerun plan/install/merge one-shot helpers. Existing pricing/submission/artwork controllers remain unchanged; app-modern.js only bypasses the legacy menu setup for a native DIALOG. Three CSS files and two JS files passed focused lint; that is not visual approval.
+
+Resume from the primary repository memory/CSS_UNIFICATION_2026-09.md active checkpoint and pause-checkpoint-2026-09-09.json in the artifact directory. Campaign full mocked browser run was intentionally stopped at shutdown, not passed; 16 remaining browser/live checks and all5 calculator surfaces are still required before campaign release. No new release or background continuation started.
+
 ## Active checkpoint — 2026-09-09
 
 Standing edit/deploy authorization continues. **Frontend v2026.09.09.4 / Heroku 2083 is LIVE**, full SHA **08f8059f80560a70699a70b6502ed5924642a3d0**, actual slug verified 2026-09-09T12:25:13.1748627Z. Exact-source CI **34349270516** passed all four jobs, including actual money/calculator parity on **945362553cd95ba5ef781aa4318f4a61a85ff74b**. Six changed raw assets and four hashed build assets match approved bytes. Two new catalog pages, all fifteen prior brand navigation consumers, seven older public pages and five staff gates verified. No business writes or notifications during visual review.
