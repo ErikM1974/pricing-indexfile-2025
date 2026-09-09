@@ -1,8 +1,8 @@
 # Handover follow-ups — 2026-09-07
 
-## Shutdown checkpoint — 2026-09-08
+## Resumed forms release — 2026-09-08
 
-PAUSED at Erik's request so he can turn off the computer. Save this state; do not continue implementation or deploy until he resumes. His edit/deploy authorization continues after resuming. This section supersedes older active/pause paragraphs below.
+RESUMED at Erik's explicit request. Exact final-source CI 34280132378 passed on 70b32f5ae11672d21a77e67624d1f9aff31be684; preparing the authorized v2026.09.08.12 release. The saved checkpoint below describes the prior paused state. Actual production verification and the next active batch will be recorded after deployment.
 
 ### Current count
 

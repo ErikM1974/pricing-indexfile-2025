@@ -1,8 +1,8 @@
 # CSS unification — design direction and implementation plan
 
-## Shutdown checkpoint — 2026-09-08
+## Resumed forms release — 2026-09-08
 
-PAUSED at Erik's request so he can turn off the computer. Save this state; do not continue implementation or deploy until he resumes. His edit/deploy authorization continues after resuming. This section supersedes older active/pause paragraphs below.
+RESUMED at Erik's explicit request. Exact final-source CI 34280132378 passed on 70b32f5ae11672d21a77e67624d1f9aff31be684; preparing the authorized v2026.09.08.12 release. The saved checkpoint below describes the prior paused state. Actual production verification and the next active batch will be recorded after deployment.
 
 ### Current count
 
@@ -360,4 +360,12 @@ All gates passed on the final service-guide source: 207 suites / 4,980 unit test
 Exact-source CI 34273774152 passed on edd6cf1ca5b9371df2e71817f6ebcd3d925ba8b0, including all required jobs and live money/calculator parity. The full local application gate passed; exact counts and timing are recorded in the service-guide checkpoint and local-gates artifact. Routes remain 485 registrations / 24 modules. Business writes and notifications were mocked.
 
 Art approval, thank-you cards, lead sheets and Google reviews share one scoped service-guide owner and controller. Six duplicate assets are replaced; unique handwritten specimens and practice fields keep two small page sheets. Original prose, example values, IDs and destinations are preserved. Four-width/keyboard checks cover all fourteen disclosures, visible field help, image loading/failure/retry, no-controller reading and printing. Actual image-loaded PDFs were reviewed (2, 6, 3 and 3 pages). Twenty-four pages are ready for unified styling after this rollout. The application-wide migration remains open.
+
+
+## Printable forms release record — v2026.09.08.12
+
+Exact-source CI 34280132378 passed on 70b32f5ae11672d21a77e67624d1f9aff31be684, including all four required jobs and live money/calculator parity. Full local unit/DOM/a11y/browser/quote-parity/CSS/build/boot gates passed; counts are in the printable-forms local-gates record. Routes remain 485 registrations / 24 modules. Business writes and notifications were mocked.
+
+Seventeen printable forms now share a scoped owner and Public Sans screen layout. Page sheets retain unique fields and paper orientation; all original prose, IDs/default values and destinations are guarded. All seventeen blank PDFs retain their page counts. Focused browser coverage includes four widths, keyboard/focus, clear/cancel, saves, drafts, contacts/dates, QC, roster totals and AE money/provenance. Native swatch clicks support keyboard and pointer, menus escape table scroll containers, failed color lookups stay visible, and style changes clear stale color verification. Temporary print text preserves full values and restores editing afterward; reviewed output retains writing lines, compact card authorization, complete notes and legal/signature groups. Forty-one reviewed pages are ready after this rollout; the application-wide migration remains open.
+
 

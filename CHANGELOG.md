@@ -1,3 +1,12 @@
+## v2026.09.08.12 (2026.09.08)
+
+- Record live service guides and printable forms continuation
+- Record installed printable forms and remaining verification
+- Record reviewed printable forms and output safeguards
+- Record full printable forms release gates
+- Unify printable forms and preserve keyboard and paper workflows
+- Save CSS shutdown checkpoint and public lookup compatibility
+
 ## v2026.09.08.11 (2026.09.08)
 
 - Record verified training release and next shared guide batch
