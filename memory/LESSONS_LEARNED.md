@@ -5,7 +5,6 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 
 ---
 
-### First real custom-tees order: proforma hid data the session already had; ShopWorks dates were UTC days (2026-09-01, ARCHIVED 2026-09-05): a blank pre-import field is usually a READER gap (parse the session's JSON blob columns); every date written to ShopWorks/Caspio is the PACIFIC day (`nowPacificNaiveIso()`); a session stuck in `Payment Confirmed` NEVER self-links — manual `POST sync-from-shopworks` with the WO#. Full entry in archive.
 ### An audit reported a clean manifest as 26 missing POs (2026-08-26, ARCHIVED 2026-09-02): a check must distinguish "I looked and it isn't there" from "I never looked" and SAY WHICH — refresh the arrival span itself, compare mirror lastSync <= manifest date, and a failed fetch marks the run INCONCLUSIVE, never missing. Full entry in archive.
 ### curl from git-bash mangled em dashes into U+FFFD (2026-08-25, ARCHIVED 2026-09-01): non-ASCII Caspio writes go through Python `ensure_ascii=True`, never a git-bash curl body; verify stored text with `ascii()` on a re-read. Full entry in archive.
 ### A customer's real size request was shown to nobody (2026-08-19, ARCHIVED 2026-08-27): render every field you persist — a saved-but-unshown field is data loss with extra steps. Full entry in archive.
@@ -256,3 +255,8 @@ Problem/root cause: incomplete invoices looked empty, failed import logs were cl
 - Root cause: unchecked response defaults, filters rerendered cached rows, and unrelated controls shared a status host.
 - Solution: validate complete photo responses, clear counts to unknown until success, guard late reads and give manage actions a visible status. Confirm mutation success explicitly.
 - Prevention: synthetic browser cases cover failure/filter/retry, native file compression and request payloads; original upload and URL helpers remain source locked.
+
+### Caspio design reports need actual provider boundaries (2026-09-09)
+- Problem/root cause: simplistic fixtures missed nested source definitions and generated unlayered ID styles; the existing digitized mobile form hid its fields. Provider replacement also detached the archive sticky observer.
+- Solution: keep original field names and handlers, hide only the cloned source definitions, rebind replaced forms, and isolate77 exact provider exceptions from the zero-exception local owner (275flags retired). Failed/empty searches clear loading without conflating errors with no results.
+- Prevention: real read-only searches verify provider markup; synthetic tests reproduce nested records, all select options, mobile precedence, pricing tiers, clipboard denial and current-value paper output. Match print exceptions by selector/property AND media context. Preserve six original controller/helper hashes outside31 recorded UI edits.
