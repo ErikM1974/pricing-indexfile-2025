@@ -247,3 +247,7 @@ Still126pages live/99pending after verified .10;129reviewed locally/96pending wi
 Staff monitoring migration in progress: new shared_components/css/staff-monitoring.css owns layouts for dashboards/api-usage.html,table-usage-audit.html,bandit-integration.html. Their three dashboards/css sheets retired. Shared tokens/components replace art-hub/dash-shell dependencies. Original data/controllers retained pending specific review refinements; no live completion claimed.
 
 Native table sorting, storage/failure states, print values and focused review remain.
+
+### Staff monitoring validation and keyboard refinements
+
+Current isolated source keeps163 snapshot rows and original operations, adds native sorting/pressed-state/print hooks, rejects malformed usage and incomplete live-schema responses before altering evidence, and surfaces local review storage failures. Shared styles now retain labels/caveats at narrow widths. Browser and source review still pending; no new live count. Initial migration helper failed on one exact marker after an owned partial edit; restored only that owned controller from its captured baseline, made the helper transactional, then successfully applied all20 recorded changes.
