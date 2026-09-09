@@ -44,6 +44,23 @@ for (const file of BUILDERS) {
         await page.evaluate(() => document.fonts.ready);
         await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
 
+        if (file === 'dtg-quote-builder.html') {
+            // Exercise every real notification colour deterministically. A live
+            // service outage previously exposed white-on-amber contrast only by chance.
+            await page.evaluate(() => {
+                document.getElementById('toast-container').replaceChildren();
+                for (const type of ['success', 'warning', 'error', 'info']) {
+                    window.showToast('Example ' + type + ' notification', type, 60000);
+                    document.getElementById('toast-container').lastElementChild.dataset.a11ySample = 'true';
+                }
+            });
+            const samples = page.locator('#toast-container .toast.show[data-a11y-sample]');
+            await expect(samples).toHaveCount(4);
+            for (const sample of await samples.all()) {
+                await expect(sample).toHaveCSS('transform', 'matrix(1, 0, 0, 1, 0, 0)');
+            }
+        }
+
         const results = await new AxeBuilder({ page })
             .withTags(['wcag2a', 'wcag2aa', 'wcag21aa'])
             .analyze();

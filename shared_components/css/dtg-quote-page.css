@@ -1385,7 +1385,7 @@ body > .header::after,
 .toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 10000; pointer-events: none; }
 .toast { min-width: 250px; max-width: 350px; padding: 15px 20px; border-radius: 8px; color: var(--color-on-brand); font-weight: 500; box-shadow: 0 4px 12px rgb(0 0 0 / 15%); transform: translateX(400px); transition: transform .3s ease, opacity .3s ease; margin-top: 10px; display: flex; align-items: center; gap: 10px; pointer-events: all; background: var(--gray-800); }
 .toast.show { transform: translateX(0); }
-.toast-success { background: var(--green-600); } .toast-error { background: var(--red-600); } .toast-warning { background: var(--amber-600); } .toast-info { background: var(--blue-600); }
+.toast-success { background: var(--brand-800); } .toast-error { background: var(--red-600); } .toast-warning { background: var(--color-warning-ink); } .toast-info { background: var(--blue-600); }
 
 /* ============================================================
    PHONE LAYOUT (≤640px) — mirrors quote-builder-shell.css (Rule 8), 2026-09-05
