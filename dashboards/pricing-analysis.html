@@ -19,15 +19,15 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/shared_components/css/art-hub.css?v=2026.09.07.19">
-    <link rel="stylesheet" href="/shared_components/css/dash-shell.css?v=2026.09.07.10">
-    <link rel="stylesheet" href="/dashboards/css/pricing-analysis.css?v=2026.09.07.10">
+    <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.09.18">
+    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.09.18">
+    <link rel="stylesheet" href="/shared_components/css/pricing-reports.css?v=2026.09.09.18">
 </head>
-<body>
+<body data-ui="unified" data-pricing-report="analysis">
+    <a class="skip-link" href="#pricing-report-main">Skip to pricing report</a>
     <div class="dash-shell">
         <header class="dash-header">
             <div class="dash-header-left">
@@ -39,13 +39,13 @@
             </div>
             <div class="dash-header-right">
                 <span class="pa-lock" title="Admin only"><i class="fas fa-user-shield" aria-hidden="true"></i> Admin</span>
-                <a href="/staff-dashboard.html" class="dash-back-link"><i class="fas fa-arrow-left" aria-hidden="true"></i> Dashboard</a>
+                <a href="/staff-dashboard.html" class="dash-back-link btn btn-secondary"><i class="fas fa-arrow-left" aria-hidden="true"></i> Dashboard</a>
             </div>
         </header>
 
         <nav class="pa-nav" aria-label="Sections"><a href="#pa-tiers" class="pa-nav-link">Units by tier</a><a href="#pa-year" class="pa-nav-link">Year by year</a><a href="#pa-gap" class="pa-nav-link">The gap</a><a href="#pa-cost" class="pa-nav-link">Cost basis</a><a href="#pa-costing" class="pa-nav-link">Settled costing</a><a href="#pa-sales" class="pa-nav-link">Sales playbook</a><a href="#pa-customers" class="pa-nav-link">Customer behaviour</a><a href="#pa-pricing" class="pa-nav-link">Caspio today</a><a href="#pa-design" class="pa-nav-link">Tier design</a><a href="#pa-rules" class="pa-nav-link">Five rules</a><a href="#pa-limits" class="pa-nav-link">Limits</a></nav>
 
-        <main class="dash-content">
+        <main class="dash-content" id="pricing-report-main" tabindex="-1">
 
             <section class="dash-card pa-prov" id="pa-top">
                 <p class="pa-lead">Everything on this page is measured from <strong>ShopWorks order
@@ -106,14 +106,14 @@
                     volume. A change to the 72+ break moves the majority of everything.</p>
                 </div>
 
-                <div class="pa-scroll"><table class="pa-table">
+                <div class="pa-scroll table-scroll" tabindex="0" role="region" aria-label="Pricing analysis table"><table class="pa-table data-table">
 <thead><tr><th class="pa-l">tier</th><th class="pa-r">orders</th><th class="pa-r">share of orders</th><th class="pa-r">units</th><th class="pa-r">share of units</th><th class="pa-r">units/order</th><th class="pa-r">revenue</th><th class="pa-r">$/unit</th></tr></thead>
 <tbody>
-<tr><td class="pa-l"><b>1-7</b></td><td class="pa-r">4,865</td><td class="pa-r"><span class="pa-bar pa-bar--muted"><span class="pa-bar-fill" style="width:31.3%"></span></span> 31.3%</td><td class="pa-r"><b>16,971</b></td><td class="pa-r"><span class="pa-bar pa-bar--theme"><span class="pa-bar-fill" style="width:2.8%"></span></span> 2.8%</td><td class="pa-r">3.5</td><td class="pa-r">$803,353</td><td class="pa-r">$47.34</td></tr>
-<tr><td class="pa-l"><b>8-23</b></td><td class="pa-r">4,206</td><td class="pa-r"><span class="pa-bar pa-bar--muted"><span class="pa-bar-fill" style="width:27.0%"></span></span> 27.0%</td><td class="pa-r"><b>58,126</b></td><td class="pa-r"><span class="pa-bar pa-bar--theme"><span class="pa-bar-fill" style="width:9.6%"></span></span> 9.6%</td><td class="pa-r">13.8</td><td class="pa-r">$2,144,172</td><td class="pa-r">$36.89</td></tr>
-<tr><td class="pa-l"><b>24-47</b></td><td class="pa-r">2,955</td><td class="pa-r"><span class="pa-bar pa-bar--muted"><span class="pa-bar-fill" style="width:19.0%"></span></span> 19.0%</td><td class="pa-r"><b>91,674</b></td><td class="pa-r"><span class="pa-bar pa-bar--theme"><span class="pa-bar-fill" style="width:15.2%"></span></span> 15.2%</td><td class="pa-r">31.0</td><td class="pa-r">$2,580,248</td><td class="pa-r">$28.15</td></tr>
-<tr><td class="pa-l"><b>48-71</b></td><td class="pa-r">1,374</td><td class="pa-r"><span class="pa-bar pa-bar--muted"><span class="pa-bar-fill" style="width:8.8%"></span></span> 8.8%</td><td class="pa-r"><b>75,662</b></td><td class="pa-r"><span class="pa-bar pa-bar--theme"><span class="pa-bar-fill" style="width:12.5%"></span></span> 12.5%</td><td class="pa-r">55.1</td><td class="pa-r">$1,865,419</td><td class="pa-r">$24.65</td></tr>
-<tr><td class="pa-l"><b>72+</b></td><td class="pa-r">2,167</td><td class="pa-r"><span class="pa-bar pa-bar--muted"><span class="pa-bar-fill" style="width:13.9%"></span></span> 13.9%</td><td class="pa-r"><b>362,008</b></td><td class="pa-r"><span class="pa-bar pa-bar--theme"><span class="pa-bar-fill" style="width:59.9%"></span></span> 59.9%</td><td class="pa-r">167.1</td><td class="pa-r">$6,639,609</td><td class="pa-r">$18.34</td></tr>
+<tr><td class="pa-l"><b>1-7</b></td><td class="pa-r">4,865</td><td class="pa-r"><span class="pa-bar pa-bar--muted"><span class="pa-bar-fill" style="--report-share:31.3%"></span></span> 31.3%</td><td class="pa-r"><b>16,971</b></td><td class="pa-r"><span class="pa-bar pa-bar--theme"><span class="pa-bar-fill" style="--report-share:2.8%"></span></span> 2.8%</td><td class="pa-r">3.5</td><td class="pa-r">$803,353</td><td class="pa-r">$47.34</td></tr>
+<tr><td class="pa-l"><b>8-23</b></td><td class="pa-r">4,206</td><td class="pa-r"><span class="pa-bar pa-bar--muted"><span class="pa-bar-fill" style="--report-share:27.0%"></span></span> 27.0%</td><td class="pa-r"><b>58,126</b></td><td class="pa-r"><span class="pa-bar pa-bar--theme"><span class="pa-bar-fill" style="--report-share:9.6%"></span></span> 9.6%</td><td class="pa-r">13.8</td><td class="pa-r">$2,144,172</td><td class="pa-r">$36.89</td></tr>
+<tr><td class="pa-l"><b>24-47</b></td><td class="pa-r">2,955</td><td class="pa-r"><span class="pa-bar pa-bar--muted"><span class="pa-bar-fill" style="--report-share:19.0%"></span></span> 19.0%</td><td class="pa-r"><b>91,674</b></td><td class="pa-r"><span class="pa-bar pa-bar--theme"><span class="pa-bar-fill" style="--report-share:15.2%"></span></span> 15.2%</td><td class="pa-r">31.0</td><td class="pa-r">$2,580,248</td><td class="pa-r">$28.15</td></tr>
+<tr><td class="pa-l"><b>48-71</b></td><td class="pa-r">1,374</td><td class="pa-r"><span class="pa-bar pa-bar--muted"><span class="pa-bar-fill" style="--report-share:8.8%"></span></span> 8.8%</td><td class="pa-r"><b>75,662</b></td><td class="pa-r"><span class="pa-bar pa-bar--theme"><span class="pa-bar-fill" style="--report-share:12.5%"></span></span> 12.5%</td><td class="pa-r">55.1</td><td class="pa-r">$1,865,419</td><td class="pa-r">$24.65</td></tr>
+<tr><td class="pa-l"><b>72+</b></td><td class="pa-r">2,167</td><td class="pa-r"><span class="pa-bar pa-bar--muted"><span class="pa-bar-fill" style="--report-share:13.9%"></span></span> 13.9%</td><td class="pa-r"><b>362,008</b></td><td class="pa-r"><span class="pa-bar pa-bar--theme"><span class="pa-bar-fill" style="--report-share:59.9%"></span></span> 59.9%</td><td class="pa-r">167.1</td><td class="pa-r">$6,639,609</td><td class="pa-r">$18.34</td></tr>
 </tbody>
 <tfoot><tr><td class="pa-l">TOTAL</td><td class="pa-r">15,567</td><td class="pa-r"></td><td class="pa-r"><b>604,441</b></td><td class="pa-r"></td><td class="pa-r">38.8</td><td class="pa-r">$14,032,801</td><td class="pa-r">$23.22</td></tr></tfoot>
 </table></div>
@@ -124,7 +124,7 @@
                 the two for a tier discount. A mixed order therefore contributes one cap stream and
                 one garment stream, which is why the stream counts below add to more than the
                 15,567 orders in the table above.</p>
-                <div class="pa-scroll"><table class="pa-table">
+                <div class="pa-scroll table-scroll" tabindex="0" role="region" aria-label="Pricing analysis table"><table class="pa-table data-table">
 <thead><tr><th class="pa-l">tier</th><th class="pa-r">cap units</th><th class="pa-r">%</th><th class="pa-r">cap orders</th><th class="pa-r">cap $/unit</th><th class="pa-r">garment units</th><th class="pa-r">%</th><th class="pa-r">garment orders</th><th class="pa-r">garment $/unit</th><th class="pa-r">total units</th></tr></thead>
 <tbody>
 <tr><td class="pa-l"><b>1-7</b></td><td class="pa-r">2,527</td><td class="pa-r">0.9%</td><td class="pa-r">812</td><td class="pa-r">$31.84</td><td class="pa-r">16,781</td><td class="pa-r">5.3%</td><td class="pa-r">4,852</td><td class="pa-r">$47.67</td><td class="pa-r">19,307</td></tr>
@@ -146,7 +146,7 @@
                 <p class="pa-body">For comparison: tier assigned from the order's whole quantity,
                 then units split inside the tier. This is the more intuitive reading, but it is
                 <em>not</em> how the order was priced.</p>
-                <div class="pa-scroll"><table class="pa-table">
+                <div class="pa-scroll table-scroll" tabindex="0" role="region" aria-label="Pricing analysis table"><table class="pa-table data-table">
 <thead><tr><th class="pa-l">tier</th><th class="pa-r">orders</th><th class="pa-r">cap units</th><th class="pa-r">%</th><th class="pa-r">garment units</th><th class="pa-r">%</th><th class="pa-r">unclassified</th><th class="pa-r">total</th></tr></thead>
 <tbody>
 <tr><td class="pa-l"><b>1-7</b></td><td class="pa-r">4,865</td><td class="pa-r">1,191</td><td class="pa-r">7.1%</td><td class="pa-r">15,626</td><td class="pa-r">92.9%</td><td class="pa-r">154</td><td class="pa-r">16,971</td></tr>
@@ -173,7 +173,7 @@
                 <code>mesh back</code>, <code>knit cap</code>) &mdash; a definition that holds
                 regardless of how the order was coded. Validated against order type 1 in the years
                 where type 1 is still trustworthy:</p>
-                <div class="pa-scroll"><table class="pa-table">
+                <div class="pa-scroll table-scroll" tabindex="0" role="region" aria-label="Pricing analysis table"><table class="pa-table data-table">
 <thead><tr><th class="pa-l">year</th><th class="pa-r">type-1 orders</th><th class="pa-r">cap units recovered</th><th class="pa-r">type-21 orders</th><th class="pa-r">cap share of type-21 units</th></tr></thead>
 <tbody>
 <tr><td class="pa-l">2016</td><td class="pa-r">552</td><td class="pa-r">81.3%</td><td class="pa-r">1,863</td><td class="pa-r">8.0%</td></tr>
@@ -200,7 +200,7 @@
                 <h2 class="pa-h">Year by year <span class="pa-tag">2016 &ndash; 2026</span></h2>
                 <p class="pa-body">Units per tier by year, with the garment-classified cap split
                 beside it. 2026 is a partial year (through 2026-07-30).</p>
-                <div class="pa-scroll"><table class="pa-table">
+                <div class="pa-scroll table-scroll" tabindex="0" role="region" aria-label="Pricing analysis table"><table class="pa-table data-table">
 <thead><tr><th class="pa-l">year</th><th class="pa-r">orders</th><th class="pa-r">1-7</th><th class="pa-r">8-23</th><th class="pa-r">24-47</th><th class="pa-r">48-71</th><th class="pa-r">72+</th><th class="pa-r">units</th><th class="pa-r">cap units</th><th class="pa-r">garment units</th><th class="pa-r">cap %</th></tr></thead>
 <tbody>
 <tr><td class="pa-l">2016</td><td class="pa-r">2,435</td><td class="pa-r">2,635</td><td class="pa-r">9,569</td><td class="pa-r">14,202</td><td class="pa-r">10,027</td><td class="pa-r">65,587</td><td class="pa-r">102,020</td><td class="pa-r">40,342</td><td class="pa-r">61,264</td><td class="pa-r">39.7%</td></tr>
@@ -231,23 +231,23 @@
                     <strong>$221,000 a year</strong>. The gap is entirely revenue-side, so it holds
                     regardless of which cost model you accept.</p>
                 </div>
-                <div class="pa-scroll"><table class="pa-table">
+                <div class="pa-scroll table-scroll" tabindex="0" role="region" aria-label="Pricing analysis table"><table class="pa-table data-table">
 <thead><tr><th class="pa-l"></th><th class="pa-r">orders</th><th class="pa-r">pieces</th><th class="pa-r">invoiced</th><th class="pa-r">at Caspio list</th><th class="pa-r">gap</th><th class="pa-r">realization</th></tr></thead>
 <tbody>
-<tr><td class="pa-l">Caps</td><td class="pa-r">205</td><td class="pa-r">16,695</td><td class="pa-r">$264,213</td><td class="pa-r">$319,877</td><td class="pa-r pa-neg"><b>$55,664</b></td><td class="pa-r"><span class="pa-bar pa-bar--warn"><span class="pa-bar-fill" style="width:82.6%"></span></span> 82.6%</td></tr>
-<tr><td class="pa-l">Custom Embroidery</td><td class="pa-r">1,733</td><td class="pa-r">62,012</td><td class="pa-r">$2,297,697</td><td class="pa-r">$2,684,034</td><td class="pa-r pa-neg"><b>$386,337</b></td><td class="pa-r"><span class="pa-bar pa-bar--warn"><span class="pa-bar-fill" style="width:85.6%"></span></span> 85.6%</td></tr>
+<tr><td class="pa-l">Caps</td><td class="pa-r">205</td><td class="pa-r">16,695</td><td class="pa-r">$264,213</td><td class="pa-r">$319,877</td><td class="pa-r pa-neg"><b>$55,664</b></td><td class="pa-r"><span class="pa-bar pa-bar--warn"><span class="pa-bar-fill" style="--report-share:82.6%"></span></span> 82.6%</td></tr>
+<tr><td class="pa-l">Custom Embroidery</td><td class="pa-r">1,733</td><td class="pa-r">62,012</td><td class="pa-r">$2,297,697</td><td class="pa-r">$2,684,034</td><td class="pa-r pa-neg"><b>$386,337</b></td><td class="pa-r"><span class="pa-bar pa-bar--warn"><span class="pa-bar-fill" style="--report-share:85.6%"></span></span> 85.6%</td></tr>
 </tbody>
 <tfoot><tr><td class="pa-l">TOTAL</td><td class="pa-r">1,938</td><td class="pa-r">78,707</td><td class="pa-r">$2,561,910</td><td class="pa-r">$3,003,911</td><td class="pa-r"><b>$442,001</b></td><td class="pa-r">85.3%</td></tr></tfoot>
 </table></div>
                 <h3 class="pa-h3">By tier</h3>
-                <div class="pa-scroll"><table class="pa-table">
+                <div class="pa-scroll table-scroll" tabindex="0" role="region" aria-label="Pricing analysis table"><table class="pa-table data-table">
 <thead><tr><th class="pa-l">tier</th><th class="pa-r">orders</th><th class="pa-r">pieces</th><th class="pa-r">invoiced</th><th class="pa-r">at list</th><th class="pa-r">gap</th><th class="pa-r">realization</th></tr></thead>
 <tbody>
-<tr><td class="pa-l"><b>1-7</b></td><td class="pa-r">578</td><td class="pa-r">2,148</td><td class="pa-r">$139,641</td><td class="pa-r">$178,678</td><td class="pa-r">$39,038</td><td class="pa-r"><span class="pa-bar pa-bar--warn"><span class="pa-bar-fill" style="width:78.2%"></span></span> 78.2%</td></tr>
-<tr><td class="pa-l"><b>8-23</b></td><td class="pa-r">494</td><td class="pa-r">6,667</td><td class="pa-r">$345,528</td><td class="pa-r">$404,036</td><td class="pa-r">$58,507</td><td class="pa-r"><span class="pa-bar pa-bar--warn"><span class="pa-bar-fill" style="width:85.5%"></span></span> 85.5%</td></tr>
-<tr><td class="pa-l"><b>24-47</b></td><td class="pa-r">368</td><td class="pa-r">11,609</td><td class="pa-r">$470,240</td><td class="pa-r">$523,216</td><td class="pa-r">$52,976</td><td class="pa-r"><span class="pa-bar pa-bar--warn"><span class="pa-bar-fill" style="width:89.9%"></span></span> 89.9%</td></tr>
-<tr><td class="pa-l"><b>48-71</b></td><td class="pa-r">187</td><td class="pa-r">10,403</td><td class="pa-r">$332,318</td><td class="pa-r">$371,208</td><td class="pa-r">$38,889</td><td class="pa-r"><span class="pa-bar pa-bar--warn"><span class="pa-bar-fill" style="width:89.5%"></span></span> 89.5%</td></tr>
-<tr><td class="pa-l"><b>72+</b></td><td class="pa-r">311</td><td class="pa-r">47,880</td><td class="pa-r">$1,274,183</td><td class="pa-r">$1,526,774</td><td class="pa-r">$252,590</td><td class="pa-r"><span class="pa-bar pa-bar--warn"><span class="pa-bar-fill" style="width:83.5%"></span></span> 83.5%</td></tr>
+<tr><td class="pa-l"><b>1-7</b></td><td class="pa-r">578</td><td class="pa-r">2,148</td><td class="pa-r">$139,641</td><td class="pa-r">$178,678</td><td class="pa-r">$39,038</td><td class="pa-r"><span class="pa-bar pa-bar--warn"><span class="pa-bar-fill" style="--report-share:78.2%"></span></span> 78.2%</td></tr>
+<tr><td class="pa-l"><b>8-23</b></td><td class="pa-r">494</td><td class="pa-r">6,667</td><td class="pa-r">$345,528</td><td class="pa-r">$404,036</td><td class="pa-r">$58,507</td><td class="pa-r"><span class="pa-bar pa-bar--warn"><span class="pa-bar-fill" style="--report-share:85.5%"></span></span> 85.5%</td></tr>
+<tr><td class="pa-l"><b>24-47</b></td><td class="pa-r">368</td><td class="pa-r">11,609</td><td class="pa-r">$470,240</td><td class="pa-r">$523,216</td><td class="pa-r">$52,976</td><td class="pa-r"><span class="pa-bar pa-bar--warn"><span class="pa-bar-fill" style="--report-share:89.9%"></span></span> 89.9%</td></tr>
+<tr><td class="pa-l"><b>48-71</b></td><td class="pa-r">187</td><td class="pa-r">10,403</td><td class="pa-r">$332,318</td><td class="pa-r">$371,208</td><td class="pa-r">$38,889</td><td class="pa-r"><span class="pa-bar pa-bar--warn"><span class="pa-bar-fill" style="--report-share:89.5%"></span></span> 89.5%</td></tr>
+<tr><td class="pa-l"><b>72+</b></td><td class="pa-r">311</td><td class="pa-r">47,880</td><td class="pa-r">$1,274,183</td><td class="pa-r">$1,526,774</td><td class="pa-r">$252,590</td><td class="pa-r"><span class="pa-bar pa-bar--warn"><span class="pa-bar-fill" style="--report-share:83.5%"></span></span> 83.5%</td></tr>
 </tbody>
 </table></div>
                 <h3 class="pa-h3">By blank price &mdash; the variable that decides the outcome</h3>
@@ -255,14 +255,14 @@
                 had it been billed at the Caspio price, after the blank and the loaded production
                 hour. <strong>Only the two most expensive bands cover their hour</strong>, and the
                 cheapest blanks are both the least profitable and the most discounted.</p>
-                <div class="pa-scroll"><table class="pa-table">
+                <div class="pa-scroll table-scroll" tabindex="0" role="region" aria-label="Pricing analysis table"><table class="pa-table data-table">
 <thead><tr><th class="pa-l">blank price band</th><th class="pa-r">orders</th><th class="pa-r">pieces</th><th class="pa-r">invoiced</th><th class="pa-r">at list</th><th class="pa-r">gap</th><th class="pa-r">realization</th><th class="pa-r">profit at list</th></tr></thead>
 <tbody>
-<tr><td class="pa-l">under $4 &mdash; basic tees</td><td class="pa-r">237</td><td class="pa-r">19,893</td><td class="pa-r">$270,145</td><td class="pa-r">$340,825</td><td class="pa-r">$70,680</td><td class="pa-r"><span class="pa-bar pa-bar--warn"><span class="pa-bar-fill" style="width:79.3%"></span></span> 79.3%</td><td class="pa-r pa-neg">&minus;$126,049</td></tr>
-<tr><td class="pa-l">$4&ndash;8 &mdash; heavier tees, basic polos</td><td class="pa-r">364</td><td class="pa-r">19,341</td><td class="pa-r">$400,031</td><td class="pa-r">$455,522</td><td class="pa-r">$55,490</td><td class="pa-r"><span class="pa-bar pa-bar--warn"><span class="pa-bar-fill" style="width:87.8%"></span></span> 87.8%</td><td class="pa-r pa-neg">&minus;$118,620</td></tr>
-<tr><td class="pa-l">$8&ndash;15 &mdash; mid-priced</td><td class="pa-r">415</td><td class="pa-r">16,014</td><td class="pa-r">$497,905</td><td class="pa-r">$565,826</td><td class="pa-r">$67,921</td><td class="pa-r"><span class="pa-bar pa-bar--warn"><span class="pa-bar-fill" style="width:88.0%"></span></span> 88.0%</td><td class="pa-r pa-neg">&minus;$51,594</td></tr>
-<tr><td class="pa-l">$15&ndash;25 &mdash; better polos, light outerwear</td><td class="pa-r">392</td><td class="pa-r">13,078</td><td class="pa-r">$566,753</td><td class="pa-r">$659,007</td><td class="pa-r">$92,254</td><td class="pa-r"><span class="pa-bar pa-bar--warn"><span class="pa-bar-fill" style="width:86.0%"></span></span> 86.0%</td><td class="pa-r pa-pos">$36,891</td></tr>
-<tr><td class="pa-l">$25+ &mdash; Carhartt, hoodies, North Face</td><td class="pa-r">530</td><td class="pa-r">10,381</td><td class="pa-r">$827,076</td><td class="pa-r">$982,732</td><td class="pa-r">$155,656</td><td class="pa-r"><span class="pa-bar pa-bar--warn"><span class="pa-bar-fill" style="width:84.2%"></span></span> 84.2%</td><td class="pa-r pa-pos">$206,852</td></tr>
+<tr><td class="pa-l">under $4 &mdash; basic tees</td><td class="pa-r">237</td><td class="pa-r">19,893</td><td class="pa-r">$270,145</td><td class="pa-r">$340,825</td><td class="pa-r">$70,680</td><td class="pa-r"><span class="pa-bar pa-bar--warn"><span class="pa-bar-fill" style="--report-share:79.3%"></span></span> 79.3%</td><td class="pa-r pa-neg">&minus;$126,049</td></tr>
+<tr><td class="pa-l">$4&ndash;8 &mdash; heavier tees, basic polos</td><td class="pa-r">364</td><td class="pa-r">19,341</td><td class="pa-r">$400,031</td><td class="pa-r">$455,522</td><td class="pa-r">$55,490</td><td class="pa-r"><span class="pa-bar pa-bar--warn"><span class="pa-bar-fill" style="--report-share:87.8%"></span></span> 87.8%</td><td class="pa-r pa-neg">&minus;$118,620</td></tr>
+<tr><td class="pa-l">$8&ndash;15 &mdash; mid-priced</td><td class="pa-r">415</td><td class="pa-r">16,014</td><td class="pa-r">$497,905</td><td class="pa-r">$565,826</td><td class="pa-r">$67,921</td><td class="pa-r"><span class="pa-bar pa-bar--warn"><span class="pa-bar-fill" style="--report-share:88.0%"></span></span> 88.0%</td><td class="pa-r pa-neg">&minus;$51,594</td></tr>
+<tr><td class="pa-l">$15&ndash;25 &mdash; better polos, light outerwear</td><td class="pa-r">392</td><td class="pa-r">13,078</td><td class="pa-r">$566,753</td><td class="pa-r">$659,007</td><td class="pa-r">$92,254</td><td class="pa-r"><span class="pa-bar pa-bar--warn"><span class="pa-bar-fill" style="--report-share:86.0%"></span></span> 86.0%</td><td class="pa-r pa-pos">$36,891</td></tr>
+<tr><td class="pa-l">$25+ &mdash; Carhartt, hoodies, North Face</td><td class="pa-r">530</td><td class="pa-r">10,381</td><td class="pa-r">$827,076</td><td class="pa-r">$982,732</td><td class="pa-r">$155,656</td><td class="pa-r"><span class="pa-bar pa-bar--warn"><span class="pa-bar-fill" style="--report-share:84.2%"></span></span> 84.2%</td><td class="pa-r pa-pos">$206,852</td></tr>
 </tbody>
 </table></div>
                 <p class="pa-note">Excluded from the 24-month study: 521 no purchase order, 38 no quantity, 42 no revenue. Those orders lack the
@@ -290,7 +290,7 @@
                 estimated: <strong>caps 20.0 pcs/hr</strong> and <strong>flat embroidery
                 13.7 pcs/hr</strong> at 72+. &ldquo;Price covers&rdquo; is the garment margin plus the
                 decoration charge; &ldquo;gap/pc&rdquo; is that minus cost.</p>
-                <div class="pa-scroll"><table class="pa-table">
+                <div class="pa-scroll table-scroll" tabindex="0" role="region" aria-label="Pricing analysis table"><table class="pa-table data-table">
 <thead><tr><th class="pa-l">tier</th><th class="pa-r">pieces logged</th><th class="pa-r">hours logged</th><th class="pa-r">pcs/hr</th><th class="pa-r">cost/pc</th><th class="pa-r">avg blank</th><th class="pa-r">decoration charge</th><th class="pa-r">price covers</th><th class="pa-r">gap/pc</th></tr></thead>
 <tbody>
 <tr><td class="pa-l">Garments 1-7</td><td class="pa-r">1,591</td><td class="pa-r">416.6</td><td class="pa-r">3.82</td><td class="pa-r">$74.87</td><td class="pa-r">$27.85</td><td class="pa-r">$18.00</td><td class="pa-r">$42.70</td><td class="pa-r pa-neg">&minus;$32.17</td></tr>
@@ -351,7 +351,7 @@
                 in the production pool, which is why the hour is $30.09 and not lower.</p>
 
                 <h3 class="pa-h3">Four full years from the general ledger</h3>
-                <div class="pa-scroll"><table class="pa-table">
+                <div class="pa-scroll table-scroll" tabindex="0" role="region" aria-label="Pricing analysis table"><table class="pa-table data-table">
 <thead><tr><th class="pa-l">component</th><th class="pa-r">2022</th><th class="pa-r">2023</th><th class="pa-r">2024</th><th class="pa-r">2025</th></tr></thead>
 <tbody>
 <tr><td class="pa-l">material / blanks</td><td class="pa-r">$1,386,710</td><td class="pa-r">$1,248,802</td><td class="pa-r">$1,454,243</td><td class="pa-r">$1,296,431</td></tr>
@@ -394,7 +394,7 @@
                 </div>
 
                 <h3 class="pa-h3">Each cost on the base that actually drives it</h3>
-                <div class="pa-scroll"><table class="pa-table">
+                <div class="pa-scroll table-scroll" tabindex="0" role="region" aria-label="Pricing analysis table"><table class="pa-table data-table">
 <thead><tr><th class="pa-l">cost pool</th><th class="pa-r">spread over</th><th class="pa-r">per embroidery order</th></tr></thead>
 <tbody>
 <tr><td class="pa-l">Sales reps &mdash; Nika &amp; Taneisha</td><td class="pa-r">2,990 rep-touched orders</td><td class="pa-r">$69</td></tr>
@@ -411,7 +411,7 @@
                 promo carry office cost but <b>zero</b> production overhead.</p>
 
                 <h3 class="pa-h3">What each tier really earns, per order</h3>
-                <div class="pa-scroll"><table class="pa-table">
+                <div class="pa-scroll table-scroll" tabindex="0" role="region" aria-label="Pricing analysis table"><table class="pa-table data-table">
 <thead><tr><th class="pa-l">tier</th><th class="pa-r">mean qty</th><th class="pa-r">flats bill</th><th class="pa-r">flats cost</th><th class="pa-r">flats profit &mdash; $70 pool</th><th class="pa-r">flats profit &mdash; $100 pool</th><th class="pa-r">caps profit &mdash; $70 pool</th><th class="pa-r">caps profit &mdash; $100 pool</th></tr></thead>
 <tbody>
 <tr><td class="pa-l"><b>1-7</b></td><td class="pa-r">3.7</td><td class="pa-r">$236</td><td class="pa-r">$216</td><td class="pa-r pa-pos">$20</td><td class="pa-r pa-neg">&minus;$9</td><td class="pa-r pa-neg">&minus;$27</td><td class="pa-r pa-neg">&minus;$57</td></tr>
@@ -438,7 +438,7 @@
                     order</strong>, from a customer who spent <strong>$2,278</strong> in the prior
                     90 days. 32% come back inside 14 days.</p>
                 </div>
-                <div class="pa-scroll"><table class="pa-table">
+                <div class="pa-scroll table-scroll" tabindex="0" role="region" aria-label="Pricing analysis table"><table class="pa-table data-table">
 <thead><tr><th class="pa-l">era</th><th class="pa-r">orders/yr</th><th class="pa-r">1-7 orders/yr</th><th class="pa-r">after a 24+ order</th><th class="pa-r">1-7 share of all</th><th class="pa-r">reorder share of 1-7</th></tr></thead>
 <tbody>
 <tr><td class="pa-l">2006-2010</td><td class="pa-r">2,859</td><td class="pa-r">755</td><td class="pa-r">351</td><td class="pa-r">26%</td><td class="pa-r"><b>78%</b></td></tr>
@@ -449,7 +449,7 @@
 </table></div>
 
                 <h3 class="pa-h3">So the 1-7 tier is three different situations</h3>
-                <div class="pa-scroll"><table class="pa-table">
+                <div class="pa-scroll table-scroll" tabindex="0" role="region" aria-label="Pricing analysis table"><table class="pa-table data-table">
 <thead><tr><th class="pa-l">what it is</th><th class="pa-r">orders/yr</th><th class="pa-r">treatment</th></tr></thead>
 <tbody>
 <tr><td class="pa-l">reorder within 90 days of a <b>24+</b> order</td><td class="pa-r">126</td><td class="pa-r"><b>keep the $50 fee unchanged</b> &mdash; these orders already clear cost</td></tr>
@@ -509,7 +509,7 @@
                 <h3 class="pa-h3">1. The break-even table &mdash; the number to actually use</h3>
                 <p class="pa-body">An order clears cost when <code>qty &times; contribution</code>
                 beats <strong>$38 setup + $100 order handling + $1.99 per piece of machine time</strong>.</p>
-                <div class="pa-scroll"><table class="pa-table">
+                <div class="pa-scroll table-scroll" tabindex="0" role="region" aria-label="Pricing analysis table"><table class="pa-table data-table">
 <thead><tr><th class="pa-l">blank cost</th><th class="pa-r">lines</th><th class="pa-r">pieces</th><th class="pa-r">median blank</th><th class="pa-r">median charged</th><th class="pa-r">contribution/pc</th><th class="pa-r">BREAK-EVEN qty</th><th class="pa-r">what it means</th></tr></thead>
 <tbody>
 <tr><td class="pa-l"><b>under $5</b></td><td class="pa-r">641</td><td class="pa-r">11,079</td><td class="pa-r">$3.67</td><td class="pa-r">$19.35</td><td class="pa-r"><b>$15.60</b></td><td class="pa-r"><b>10.2 pcs</b></td><td class="pa-r"><b>bulk only</b></td></tr>
@@ -526,7 +526,7 @@
                 one premium piece is worth 2.8&times; cheap ones.</b></p>
 
                 <h3 class="pa-h3">2. Caps need more volume than garments</h3>
-                <div class="pa-scroll"><table class="pa-table">
+                <div class="pa-scroll table-scroll" tabindex="0" role="region" aria-label="Pricing analysis table"><table class="pa-table data-table">
 <thead><tr><th class="pa-l"></th><th class="pa-r">lines</th><th class="pa-r">pieces</th><th class="pa-r">median blank</th><th class="pa-r">median charged</th><th class="pa-r">contribution/pc</th><th class="pa-r">break-even</th></tr></thead>
 <tbody>
 <tr><td class="pa-l"><b>Caps</b></td><td class="pa-r">574</td><td class="pa-r">9,296</td><td class="pa-r">$6.75</td><td class="pa-r">$24.00</td><td class="pa-r">$17.25</td><td class="pa-r"><b>9.1 pcs</b></td></tr>
@@ -539,7 +539,7 @@
                 actual cap cost on the PO, not the standard table.</b></p>
 
                 <h3 class="pa-h3">3. Where the money actually came from</h3>
-                <div class="pa-scroll"><table class="pa-table">
+                <div class="pa-scroll table-scroll" tabindex="0" role="region" aria-label="Pricing analysis table"><table class="pa-table data-table">
 <thead><tr><th class="pa-l">style</th><th class="pa-r">description</th><th class="pa-r">pieces</th><th class="pa-r">total contribution</th><th class="pa-r">$/pc</th></tr></thead>
 <tbody>
 <tr><td class="pa-l"><b>PC54</b></td><td class="pa-r">Size 2XL - Port &amp; Co Core Cotton Tee</td><td class="pa-r">3,182</td><td class="pa-r">$45,184</td><td class="pa-r">$14.20</td></tr>
@@ -562,7 +562,7 @@
                 a thousand of the latter. Same rep hours, same order count, same machine setups.</p>
 
                 <h3 class="pa-h3">4. The best quantity is 24&ndash;47, not 72+</h3>
-                <div class="pa-scroll"><table class="pa-table">
+                <div class="pa-scroll table-scroll" tabindex="0" role="region" aria-label="Pricing analysis table"><table class="pa-table data-table">
 <thead><tr><th class="pa-l">tier</th><th class="pa-r">1-7</th><th class="pa-r">8-23</th><th class="pa-r">24-47</th><th class="pa-r">48-71</th><th class="pa-r">72+</th></tr></thead>
 <tbody>
 <tr><td class="pa-l"><b>profit per piece</b></td><td class="pa-r">$5.48</td><td class="pa-r">$18.94</td><td class="pa-r"><b>$20.98</b></td><td class="pa-r">$19.51</td><td class="pa-r">$16.24</td></tr>
@@ -633,7 +633,7 @@
                 <strong>13%</strong> of it. By the end of month twelve you have still seen just
                 <strong>35%</strong>. Judging a customer by what they walk in with is judging on an
                 eighth of the evidence.</p>
-                <div class="pa-scroll"><table class="pa-table">
+                <div class="pa-scroll table-scroll" tabindex="0" role="region" aria-label="Pricing analysis table"><table class="pa-table data-table">
 <thead><tr><th class="pa-l">their FIRST order</th><th class="pa-r">customers</th><th class="pa-r">median lifetime</th><th class="pa-r">mean lifetime</th><th class="pa-r">orders</th><th class="pa-r">ever reach 24+?</th></tr></thead>
 <tbody>
 <tr><td class="pa-l"><b>under 8 pcs</b></td><td class="pa-r">590</td><td class="pa-r">$373</td><td class="pa-r">$2,474</td><td class="pa-r">5.3</td><td class="pa-r">22%</td></tr>
@@ -648,13 +648,13 @@
                 strongest one available, and it is the one a rep cannot change.</p>
 
                 <h3 class="pa-h3">2. The second order tells you almost everything</h3>
-                <div class="pa-scroll"><table class="pa-table">
+                <div class="pa-scroll table-scroll" tabindex="0" role="region" aria-label="Pricing analysis table"><table class="pa-table data-table">
 <thead><tr><th class="pa-l">did they come back?</th><th class="pa-r">customers</th><th class="pa-r">median lifetime</th><th class="pa-r">mean lifetime</th><th class="pa-r">share of all revenue</th></tr></thead>
 <tbody>
-<tr><td class="pa-l">never ordered again</td><td class="pa-r">966</td><td class="pa-r">$350</td><td class="pa-r"><b>$576</b></td><td class="pa-r"><span class="pa-bar pa-bar--theme"><span class="pa-bar-fill" style="width:4.0%"></span></span> 4%</td></tr>
-<tr><td class="pa-l"><b>came back within 90 days</b></td><td class="pa-r">1,066</td><td class="pa-r">$2,461</td><td class="pa-r"><b>$8,382</b></td><td class="pa-r"><span class="pa-bar pa-bar--theme"><span class="pa-bar-fill" style="width:64.1%"></span></span> 64%</td></tr>
-<tr><td class="pa-l">came back in 91&ndash;365 days</td><td class="pa-r">444</td><td class="pa-r">$2,048</td><td class="pa-r"><b>$6,521</b></td><td class="pa-r"><span class="pa-bar pa-bar--theme"><span class="pa-bar-fill" style="width:20.8%"></span></span> 21%</td></tr>
-<tr><td class="pa-l">came back after a year</td><td class="pa-r">397</td><td class="pa-r">$1,601</td><td class="pa-r"><b>$3,926</b></td><td class="pa-r"><span class="pa-bar pa-bar--theme"><span class="pa-bar-fill" style="width:11.2%"></span></span> 11%</td></tr>
+<tr><td class="pa-l">never ordered again</td><td class="pa-r">966</td><td class="pa-r">$350</td><td class="pa-r"><b>$576</b></td><td class="pa-r"><span class="pa-bar pa-bar--theme"><span class="pa-bar-fill" style="--report-share:4.0%"></span></span> 4%</td></tr>
+<tr><td class="pa-l"><b>came back within 90 days</b></td><td class="pa-r">1,066</td><td class="pa-r">$2,461</td><td class="pa-r"><b>$8,382</b></td><td class="pa-r"><span class="pa-bar pa-bar--theme"><span class="pa-bar-fill" style="--report-share:64.1%"></span></span> 64%</td></tr>
+<tr><td class="pa-l">came back in 91&ndash;365 days</td><td class="pa-r">444</td><td class="pa-r">$2,048</td><td class="pa-r"><b>$6,521</b></td><td class="pa-r"><span class="pa-bar pa-bar--theme"><span class="pa-bar-fill" style="--report-share:20.8%"></span></span> 21%</td></tr>
+<tr><td class="pa-l">came back after a year</td><td class="pa-r">397</td><td class="pa-r">$1,601</td><td class="pa-r"><b>$3,926</b></td><td class="pa-r"><span class="pa-bar pa-bar--theme"><span class="pa-bar-fill" style="--report-share:11.2%"></span></span> 11%</td></tr>
 </tbody>
 </table></div>
                 <p class="pa-note"><b>Customers who reorder within 90 days generate 64% of all
@@ -670,7 +670,7 @@
                 </div>
 
                 <h3 class="pa-h3">3. Both signals together &mdash; the table to actually use</h3>
-                <div class="pa-scroll"><table class="pa-table">
+                <div class="pa-scroll table-scroll" tabindex="0" role="region" aria-label="Pricing analysis table"><table class="pa-table data-table">
 <thead><tr><th class="pa-l">their FIRST order</th><th class="pa-r">came back &le;90d</th><th class="pa-r">their lifetime</th><th class="pa-r">did not</th><th class="pa-r">their lifetime</th><th class="pa-r">difference</th></tr></thead>
 <tbody>
 <tr><td class="pa-l"><b>under 8 pcs</b></td><td class="pa-r">173</td><td class="pa-r pa-pos"><b>$5,479</b></td><td class="pa-r">417</td><td class="pa-r pa-neg">$1,227</td><td class="pa-r">4.5&times;</td></tr>
@@ -698,13 +698,13 @@
                 <p class="pa-body">Median gap between orders is <strong>40 days</strong>; median
                 first-to-second is <strong>63 days</strong>. So a customer silent for 90 days is
                 already past normal.</p>
-                <div class="pa-scroll"><table class="pa-table">
+                <div class="pa-scroll table-scroll" tabindex="0" role="region" aria-label="Pricing analysis table"><table class="pa-table data-table">
 <thead><tr><th class="pa-l">how long since their last order</th><th class="pa-r">still ever order again</th><th class="pa-r"></th></tr></thead>
 <tbody>
-<tr><td class="pa-l">quiet 40 days &mdash; <i>the median gap</i></td><td class="pa-r"><b>75%</b></td><td class="pa-r"><span class="pa-bar pa-bar--theme"><span class="pa-bar-fill" style="width:74.5%"></span></span></td></tr>
-<tr><td class="pa-l">quiet 90 days</td><td class="pa-r"><b>68%</b></td><td class="pa-r"><span class="pa-bar pa-bar--theme"><span class="pa-bar-fill" style="width:67.7%"></span></span></td></tr>
-<tr><td class="pa-l">quiet 161 days &mdash; <i>the 75th percentile</i></td><td class="pa-r"><b>60%</b></td><td class="pa-r"><span class="pa-bar pa-bar--theme"><span class="pa-bar-fill" style="width:60.1%"></span></span></td></tr>
-<tr><td class="pa-l">quiet 393 days &mdash; <i>the 90th</i></td><td class="pa-r"><b>38%</b></td><td class="pa-r"><span class="pa-bar pa-bar--muted"><span class="pa-bar-fill" style="width:38.5%"></span></span></td></tr>
+<tr><td class="pa-l">quiet 40 days &mdash; <i>the median gap</i></td><td class="pa-r"><b>75%</b></td><td class="pa-r"><span class="pa-bar pa-bar--theme"><span class="pa-bar-fill" style="--report-share:74.5%"></span></span></td></tr>
+<tr><td class="pa-l">quiet 90 days</td><td class="pa-r"><b>68%</b></td><td class="pa-r"><span class="pa-bar pa-bar--theme"><span class="pa-bar-fill" style="--report-share:67.7%"></span></span></td></tr>
+<tr><td class="pa-l">quiet 161 days &mdash; <i>the 75th percentile</i></td><td class="pa-r"><b>60%</b></td><td class="pa-r"><span class="pa-bar pa-bar--theme"><span class="pa-bar-fill" style="--report-share:60.1%"></span></span></td></tr>
+<tr><td class="pa-l">quiet 393 days &mdash; <i>the 90th</i></td><td class="pa-r"><b>38%</b></td><td class="pa-r"><span class="pa-bar pa-bar--muted"><span class="pa-bar-fill" style="--report-share:38.5%"></span></span></td></tr>
 </tbody>
 </table></div>
                 <p class="pa-note"><b>Speed of return barely matters &mdash; the fact of it is
@@ -728,7 +728,7 @@
                 portion</strong> &mdash; and because decoration is added <em>after</em> that
                 divisor, the tier break is a flat dollar amount no matter how expensive the
                 garment is.</p>
-                <div class="pa-scroll"><table class="pa-table">
+                <div class="pa-scroll table-scroll" tabindex="0" role="region" aria-label="Pricing analysis table"><table class="pa-table data-table">
 <thead><tr><th class="pa-l">tier</th><th class="pa-r">garment decoration</th><th class="pa-r">cap decoration</th><th class="pa-r">small-order fee</th></tr></thead>
 <tbody>
 <tr><td class="pa-l"><b>1-7</b></td><td class="pa-r">$18.00</td><td class="pa-r">$17.00</td><td class="pa-r">$50.00</td></tr>
@@ -757,7 +757,7 @@
                 <h3 class="pa-h3">The cost curve: hours(q) = S + v &times; q</h3>
                 <p class="pa-body">Fitted three independent ways. They agree on S, which is the
                 number every recommendation below depends on.</p>
-                <div class="pa-scroll"><table class="pa-table">
+                <div class="pa-scroll table-scroll" tabindex="0" role="region" aria-label="Pricing analysis table"><table class="pa-table data-table">
 <thead><tr><th class="pa-l">fit</th><th class="pa-r">fixed setup S</th><th class="pa-r">variable v</th><th class="pa-r">R&sup2;</th><th class="pa-r">n</th></tr></thead>
 <tbody>
 <tr><td class="pa-l">Flats &mdash; pooled tier points</td><td class="pa-r"><b>1.279 hr/order</b></td><td class="pa-r">0.06612 hr/pc</td><td class="pa-r">0.988</td><td class="pa-r">5</td></tr>
@@ -777,7 +777,7 @@
                 </div>
 
                 <h3 class="pa-h3">Which is why cost per piece collapses early, then flattens</h3>
-                <div class="pa-scroll"><table class="pa-table">
+                <div class="pa-scroll table-scroll" tabindex="0" role="region" aria-label="Pricing analysis table"><table class="pa-table data-table">
 <thead><tr><th class="pa-l">pieces</th><th class="pa-r">1</th><th class="pa-r">2</th><th class="pa-r">4</th><th class="pa-r">8</th><th class="pa-r">16</th><th class="pa-r">24</th><th class="pa-r">48</th><th class="pa-r">72</th><th class="pa-r">144</th><th class="pa-r">288</th></tr></thead>
 <tbody>
 <tr><td class="pa-l">hours per piece</td><td class="pa-r">1.345</td><td class="pa-r">0.705</td><td class="pa-r">0.386</td><td class="pa-r">0.226</td><td class="pa-r">0.146</td><td class="pa-r">0.119</td><td class="pa-r">0.093</td><td class="pa-r">0.084</td><td class="pa-r">0.075</td><td class="pa-r">0.071</td></tr>
@@ -799,7 +799,7 @@
                 error is the 1-D k-segmentation problem, which dynamic programming solves
                 <em>optimally</em> &mdash; there is no judgement call in it. Run against the real
                 order-size distribution, it lands in the same place at every cost target tested:</p>
-                <div class="pa-scroll"><table class="pa-table">
+                <div class="pa-scroll table-scroll" tabindex="0" role="region" aria-label="Pricing analysis table"><table class="pa-table data-table">
 <thead><tr><th class="pa-l">cost target used</th><th class="pa-r">breaks the solver chooses</th></tr></thead>
 <tbody>
 <tr><td class="pa-l">target $89/hr</td><td class="pa-r">2 / 4 / 8 / 18</td></tr>
@@ -814,14 +814,14 @@
                 <h3 class="pa-h3">What each tier earns per production hour</h3>
                 <p class="pa-body">The machine hour is the scarce resource, so contribution per hour
                 is what makes tiers comparable. Note the last column.</p>
-                <div class="pa-scroll"><table class="pa-table">
+                <div class="pa-scroll table-scroll" tabindex="0" role="region" aria-label="Pricing analysis table"><table class="pa-table data-table">
 <thead><tr><th class="pa-l">tier</th><th class="pa-r">flat orders</th><th class="pa-r">flats &mdash; $ per production hour</th><th class="pa-r">caps</th><th class="pa-r">gain over previous tier</th></tr></thead>
 <tbody>
-<tr><td class="pa-l"><b>1-7</b></td><td class="pa-r">3,345</td><td class="pa-r"><span class="pa-bar pa-bar--theme"><span class="pa-bar-fill" style="width:33.5%"></span></span> $134</td><td class="pa-r">$101</td><td class="pa-r">&mdash;</td></tr>
-<tr><td class="pa-l"><b>8-23</b></td><td class="pa-r">3,140</td><td class="pa-r"><span class="pa-bar pa-bar--theme"><span class="pa-bar-fill" style="width:56.2%"></span></span> $225</td><td class="pa-r">$174</td><td class="pa-r"><b>+$91</b></td></tr>
-<tr><td class="pa-l"><b>24-47</b></td><td class="pa-r">1,703</td><td class="pa-r"><span class="pa-bar pa-bar--theme"><span class="pa-bar-fill" style="width:69.0%"></span></span> $276</td><td class="pa-r">$200</td><td class="pa-r"><b>+$51</b></td></tr>
-<tr><td class="pa-l"><b>48-71</b></td><td class="pa-r">727</td><td class="pa-r"><span class="pa-bar pa-bar--theme"><span class="pa-bar-fill" style="width:77.9%"></span></span> $312</td><td class="pa-r">$222</td><td class="pa-r"><b>+$36</b></td></tr>
-<tr><td class="pa-l"><b>72+</b></td><td class="pa-r">1,112</td><td class="pa-r"><span class="pa-bar pa-bar--theme"><span class="pa-bar-fill" style="width:80.3%"></span></span> $321</td><td class="pa-r">$255</td><td class="pa-r"><b>+$10</b></td></tr>
+<tr><td class="pa-l"><b>1-7</b></td><td class="pa-r">3,345</td><td class="pa-r"><span class="pa-bar pa-bar--theme"><span class="pa-bar-fill" style="--report-share:33.5%"></span></span> $134</td><td class="pa-r">$101</td><td class="pa-r">&mdash;</td></tr>
+<tr><td class="pa-l"><b>8-23</b></td><td class="pa-r">3,140</td><td class="pa-r"><span class="pa-bar pa-bar--theme"><span class="pa-bar-fill" style="--report-share:56.2%"></span></span> $225</td><td class="pa-r">$174</td><td class="pa-r"><b>+$91</b></td></tr>
+<tr><td class="pa-l"><b>24-47</b></td><td class="pa-r">1,703</td><td class="pa-r"><span class="pa-bar pa-bar--theme"><span class="pa-bar-fill" style="--report-share:69.0%"></span></span> $276</td><td class="pa-r">$200</td><td class="pa-r"><b>+$51</b></td></tr>
+<tr><td class="pa-l"><b>48-71</b></td><td class="pa-r">727</td><td class="pa-r"><span class="pa-bar pa-bar--theme"><span class="pa-bar-fill" style="--report-share:77.9%"></span></span> $312</td><td class="pa-r">$222</td><td class="pa-r"><b>+$36</b></td></tr>
+<tr><td class="pa-l"><b>72+</b></td><td class="pa-r">1,112</td><td class="pa-r"><span class="pa-bar pa-bar--theme"><span class="pa-bar-fill" style="--report-share:80.3%"></span></span> $321</td><td class="pa-r">$255</td><td class="pa-r"><b>+$10</b></td></tr>
 </tbody>
 </table></div>
                 <div class="pa-finding pa-finding--alt">
@@ -846,7 +846,7 @@
                 cross, <strong>S/v = 19.3 pieces</strong> for flats (26.9 for caps): below that an order
                 is mostly setup. The nearest existing tier boundary is 23, so extending the fee
                 there needs no new break.</p>
-                <div class="pa-scroll"><table class="pa-table">
+                <div class="pa-scroll table-scroll" tabindex="0" role="region" aria-label="Pricing analysis table"><table class="pa-table data-table">
 <thead><tr><th class="pa-l">fee</th><th class="pa-r">fee revenue/yr</th><th class="pa-r">vs today</th><th class="pa-r">flats 1-7</th><th class="pa-r">flats 8-23</th><th class="pa-r">caps 1-7</th><th class="pa-r">caps 8-23</th></tr></thead>
 <tbody>
 <tr><td class="pa-l">today — $50 on 1-7</td><td class="pa-r">$16,425</td><td class="pa-r">&mdash;</td><td class="pa-r">$134</td><td class="pa-r">$225</td><td class="pa-r">$101</td><td class="pa-r">$174</td></tr>
@@ -863,7 +863,7 @@
                     the customer sees a $115 line on the job, which is unremarkable in this trade.</p>
                 </div>
                 <h4 class="pa-h3">What the customer actually sees</h4>
-                <div class="pa-scroll"><table class="pa-table">
+                <div class="pa-scroll table-scroll" tabindex="0" role="region" aria-label="Pricing analysis table"><table class="pa-table data-table">
 <thead><tr><th class="pa-l">pieces</th><th class="pa-r">price/pc</th><th class="pa-r">goods</th><th class="pa-r">fee today</th><th class="pa-r">fee at $115</th><th class="pa-r">order total today</th><th class="pa-r">order total at $115</th></tr></thead>
 <tbody>
 <tr><td class="pa-l">1</td><td class="pa-r">$67.00</td><td class="pa-r">$67</td><td class="pa-r">$50</td><td class="pa-r">$115</td><td class="pa-r">$117</td><td class="pa-r">$182 <small>($182.00/pc)</small></td></tr>
@@ -886,7 +886,7 @@
                     The residual below is a decide-whether-to-take-the-work number, not a pricing
                     problem.</p>
                 </div>
-                <div class="pa-scroll"><table class="pa-table">
+                <div class="pa-scroll table-scroll" tabindex="0" role="region" aria-label="Pricing analysis table"><table class="pa-table data-table">
 <thead><tr><th class="pa-l">tier</th><th class="pa-r">orders/yr</th><th class="pa-r">gap to $276/hr</th><th class="pa-r">per order</th></tr></thead>
 <tbody>
 <tr><td class="pa-l">FLAT 1-7</td><td class="pa-r">317</td><td class="pa-r">$84,537</td><td class="pa-r">$267</td></tr>
@@ -911,7 +911,7 @@
                 </div>
                 <p class="pa-body">The prize is <strong>consolidation, not earliness</strong>. Two
                 orders from one customer landing close together each pay a fresh 1.28-hour setup:</p>
-                <div class="pa-scroll"><table class="pa-table">
+                <div class="pa-scroll table-scroll" tabindex="0" role="region" aria-label="Pricing analysis table"><table class="pa-table data-table">
 <thead><tr><th class="pa-l">if two orders land within</th><th class="pa-r">pairs/yr</th><th class="pa-r">duplicated hours/yr</th><th class="pa-r">value/yr</th></tr></thead>
 <tbody>
 <tr><td class="pa-l">30 days</td><td class="pa-r">374</td><td class="pa-r">479</td><td class="pa-r"><b>$42,967</b></td></tr>
@@ -921,7 +921,7 @@
 </table></div>
                 <p class="pa-body">Volume also leaks downward on reorder. Of 13,339 consecutive order
                 pairs, <strong>4,303 (32.3%) dropped a tier</strong>, 4,979 (37.3%) stayed level and 4,057 (30.4%) moved up:</p>
-                <div class="pa-scroll"><table class="pa-table">
+                <div class="pa-scroll table-scroll" tabindex="0" role="region" aria-label="Pricing analysis table"><table class="pa-table data-table">
 <thead><tr><th class="pa-l">previous order was</th><th class="pa-r">&rarr; 1-7</th><th class="pa-r">&rarr; 8-23</th><th class="pa-r">&rarr; 24-47</th><th class="pa-r">&rarr; 48-71</th><th class="pa-r">&rarr; 72+</th><th class="pa-r">total</th><th class="pa-r">dropped a tier</th></tr></thead>
 <tbody>
 <tr><td class="pa-l"><b>1-7</b></td><td class="pa-r">2,074</td><td class="pa-r">1,015</td><td class="pa-r">490</td><td class="pa-r">222</td><td class="pa-r">386</td><td class="pa-r">4,187</td><td class="pa-r ">0%</td></tr>
@@ -993,7 +993,7 @@
                     <div class="pa-totals-sum"><span>Both together, over 24 months</span><b>$699,712</b></div>
                 </div>
                 <h3 class="pa-h3">Rule 5 in detail</h3>
-                <div class="pa-scroll"><table class="pa-table">
+                <div class="pa-scroll table-scroll" tabindex="0" role="region" aria-label="Pricing analysis table"><table class="pa-table data-table">
 <thead><tr><th class="pa-l">blank price band</th><th class="pa-r">surcharge/pc</th><th class="pa-r">value over 24 months</th></tr></thead>
 <tbody>
 <tr><td class="pa-l">under $4 &mdash; basic tees</td><td class="pa-r">$4.00</td><td class="pa-r">$79,284</td></tr>
@@ -1037,6 +1037,6 @@
             </section>
         </main>
     </div>
-    <script src="/dashboards/js/pricing-analysis.js?v=2026.09.05.74"></script>
+    <script src="/dashboards/js/pricing-analysis.js?v=2026.09.09.18"></script>
 </body>
 </html>
