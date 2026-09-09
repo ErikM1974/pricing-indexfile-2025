@@ -1,3 +1,10 @@
+## v2026.09.08.15 (2026.09.08)
+
+- Record live reference release and next manual family
+- Record manual-family implementation and verification checkpoint
+- Record complete manual family release checks
+- Unify training manuals with accessible navigation and complete printing
+
 ## v2026.09.08.14 (2026.09.08)
 
 - Record live training release and next reference family
