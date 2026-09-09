@@ -1,3 +1,13 @@
+## v2026.09.08.18 (2026.09.08)
+
+- Record policy guide and notice family baseline plan
+- Record live API reference release and policy family checkpoint
+- Record policy reference visual, content and print verification
+- Unify policy guide, migration tracker and notice pages
+- Integrate reviewed policy reference and notice family
+- Record full policy reference release checks and next CMS worktree
+- Version unified policy reference assets for verified rollout
+
 ## v2026.09.08.17 (2026.09.08)
 
 - Record API reference family baseline and migration plan
