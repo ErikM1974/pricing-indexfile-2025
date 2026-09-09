@@ -684,3 +684,7 @@ Banner and sticker public configurators are the next shared-style family. Isolat
 - [ ] Migrate shared and banner-specific arrangements, native menu behavior and canonical controls without price calculation changes. Register all changed owners.
 - [ ] Four widths/axe/keyboard/native dialogs, preset/custom/finishing/quantity price states, failed loads and submissions with draft retention; all actual uploads/writes/email blocked; compare complete paper.
 - [ ] Full primary gates/exact-source CI/actual deployment; verified live remains112/113 until campaign release, then115/110.
+
+## Instant storefront local review complete — 2026-09-09
+
+Candidate v2026.09.09.7.14 focused browser cases passed26.2s (last targeted all50-price/menu checks passed6s);11 original content/controller contracts passed. Four widths/axe, both menu modes, focus/search, all50 sticker prices and seven banner presets, server custom/quantity/finishing totals and recovery, failed/empty/degraded data, invalid form, artwork failure and retained draft retry verified with all writes mocked. Two PDFs retain419 text nodes, all9 paper pages visually reviewed. Three scoped CSS owners lint clean. The saved WIP is now finished and reviewed; full primary release gates, exact-source CI and rollout remain. Live115/110; only verified deployment changes this to117/108. Previous paused/WIP notes are historical.
