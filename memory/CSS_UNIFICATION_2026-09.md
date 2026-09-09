@@ -10,7 +10,7 @@ Erik resumed; standing edit/deploy authorization continues. **Frontend v2026.09.
 
 - [x] Deploy and verify four reference pages: caps, quick tips, shipping and purchasing (.14).
 - [x] Capture four-width baselines and map the remaining tracked training sources.
-- [ ] Unify customer-service, get-to-know-erik, sales-coordinator-manual and sales-coordinator-training-schedule with shared reading/navigation/print patterns. Draft shared layout/navigation files currently exist only in the artifact directory; no application edits for this next batch yet.
+- [ ] Unify customer-service, get-to-know-erik, sales-coordinator-manual and sales-coordinator-training-schedule with shared reading/navigation/print patterns. Local implementation is complete; validation and release are in progress. See the manual-family checkpoint below.
 - [ ] Preserve all original lessons, staff data, figures, field values and media destinations. Repair manual/day hash navigation and selected links, biography keyboard disclosure/print restoration, and missing-birthday/calendar handling in the manual roster. Give tables keyboard-accessible overflow and remove inline presentation styles.
 - [ ] Review four widths, keyboard/axe, all 44 manual chapters and 12 schedule sections, practice feedback, print content/state restoration, then full release gates and exact-source CI/deploy.
 - [ ] Then finish training/index, sales-tax-code-trainer, shopworks-customer-setup and shopworks-customer-setup-enhanced. Continue the other application families after training.
@@ -386,3 +386,12 @@ Next training work has eight tracked pages: manuals/schedule/Erik biography (4),
 ## Training reference release record — v2026.09.08.14
 
 Exact-source CI 34303626869 passed all four required jobs on eac07064ad2952da43563c0ad89482928b02dffe, including live money/calculator parity. Four pages share the existing component/training-guide foundations and scoped training-reference patterns. Original lessons, figures, media and shared tips data remain unchanged. Sixteen focused browser cases cover four widths, keyboard/touch checklists, persistence/read/write/reset failures, safe tip rendering and request retry. Reviewed PDFs: caps 3, tips 3 complete topics, shipping 10, purchasing 9; all 333 selected text blocks preserved. After verified rollout: 52 of 225 application/served-archive pages reviewed/live, 173 pending. Actual slug and live verification follow.
+
+
+## Manual-family implementation checkpoint — 2026-09-08
+
+Four next pages implemented locally: customer-service, get-to-know-erik, sales-coordinator-manual, sales-coordinator-training-schedule. Production remains .14 / Heroku 2073 / 7c65286d (52 live, 173 pending). This candidate would make 56 live / 169 pending, leaving four training pages. Shared training-manual.css/js own reading/contents/navigation/print. Old customer-service/bio page scripts are retired and explicitly staged as removals; all create/delete actions registered.
+
+Four-width browser review and 14 family browser cases passed before final paper refinements; all 44 manual chapters and all 12 schedule sections were exercised with axe. 109 ownership/content cases passed. Full local release suite and exact-source CI/deployment are still pending. Original body text/media/fields and employee/scenario data remain locked. PDF review now verifies 2,910 selected content blocks (navigation labels omitted intentionally from paper): customer-service 54 pages, biography 2, manual 64, schedule 33. Generic .card was removed from schedule to eliminate an unwanted blank opening page. Paper has no blank sheets. Latest shared summary page-break refinement and continuous-document scroll marker still need the final broad browser run.
+
+Artifact directory remains the same. manual-family-owned-files.json is the explicit ownership list; training-manual-baseline-record.json records pre-migration content on c9b0d054. manual-paper-review.json reports selected paper text; manual-after-*.pdf and manual-paper-*-*.png contain visual evidence. Do not rerun install-training-manual-family.cjs or register-training-manual-checks.cjs: they are one-shot mutation helpers. Next: finish paper overview, run training-manual-full-gates.ps1, then prepare a version from fresh tags/HTML, commit explicit files including the new browser test, wait exact-source CI and deploy.
