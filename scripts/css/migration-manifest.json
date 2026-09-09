@@ -3844,6 +3844,70 @@
         "rawCssBytes": 162764,
         "localCssRequests": 4
       }
+    },
+    {
+      "source": "dashboards/purchasing-portal.html",
+      "family": "purchasing-workspaces",
+      "status": "pilot",
+      "route": "/dashboards/purchasing-portal.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/purchasing-workspaces.css",
+        "shared_components/css/vendor-invoice.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "four-widths-zero-axe-and-readable-money",
+        "native-file-input-and-scroll-regions",
+        "request-filters-finished-work-refresh-and-retained-links",
+        "unknown-ledgers-and-import-log-disable-export",
+        "original-csv-values-and-mock-only-import-confirmation",
+        "marketing-totals-complete-print-and-failure-recovery",
+        "native-invoice-focus-return-and-stale-response-protection",
+        "legacy-ae-invoice-compatibility",
+        "complete-print-fields-lines-totals-and-failed-po-notes"
+      ],
+      "test": "tests/e2e/css-unification-purchasing.spec.js",
+      "maxCssBytes": 75229,
+      "measuredRawCssBytes": 73178,
+      "baseline": {
+        "commit": "d524d2e51de086c1af8461392bd0fae6a0fc91c7",
+        "rawCssBytes": 170371,
+        "localCssRequests": 5
+      }
+    },
+    {
+      "source": "dashboards/sanmar-payables.html",
+      "family": "purchasing-workspaces",
+      "status": "pilot",
+      "route": "/dashboards/sanmar-payables.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/purchasing-workspaces.css",
+        "shared_components/css/vendor-invoice.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "four-widths-zero-axe-and-readable-money",
+        "native-file-input-and-scroll-regions",
+        "request-filters-finished-work-refresh-and-retained-links",
+        "unknown-ledgers-and-import-log-disable-export",
+        "original-csv-values-and-mock-only-import-confirmation",
+        "marketing-totals-complete-print-and-failure-recovery",
+        "native-invoice-focus-return-and-stale-response-protection",
+        "legacy-ae-invoice-compatibility",
+        "complete-print-fields-lines-totals-and-failed-po-notes"
+      ],
+      "test": "tests/e2e/css-unification-purchasing.spec.js",
+      "maxCssBytes": 75229,
+      "measuredRawCssBytes": 73178,
+      "baseline": {
+        "commit": "d524d2e51de086c1af8461392bd0fae6a0fc91c7",
+        "rawCssBytes": 172534,
+        "localCssRequests": 5
+      }
     }
   ],
   "billingContentSha256": "d85f8530e03a1863d1b8bb2ebe97ba332d5c9e3411887d1eb2d02dcdb14c0863",

@@ -1,0 +1,101 @@
+/* Purchasing and payables arrangements; controls and tables use components.css. */
+@layer components.pages {
+    :where([data-ui="unified"][data-purchasing]) { --w: 0%; --ui-accent: var(--brand-800); --ui-accent-hover: var(--color-brand-deep); --ui-tint: var(--brand-50); }
+    :where([data-ui="unified"][data-purchasing="portal"]) { --ui-accent: var(--color-bradley-dark); --ui-accent-hover: var(--color-bradley-dark); --ui-tint: var(--color-bradley-tint); }
+    :where([data-ui="unified"][data-purchasing]) .dash-content { max-width: 1440px; margin-inline: auto; }
+    :where([data-ui="unified"][data-purchasing]) :is(.dash-header-right, .pp-toolbar, .smp-toolbar, .smp-filters, .pp-filters, .smp-swbar, .smp-mkt-controls, .smp-footer, .smp-progress-legend) { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); }
+    :where([data-ui="unified"][data-purchasing]) :is(.pp-filters, .smp-filters, .smp-swbar, .smp-mkt-controls) { margin-bottom: var(--space-4); }
+    :where([data-ui="unified"][data-purchasing]) :is(.smp-filters, .smp-mkt-controls) { align-items: flex-end; }
+    :where([data-ui="unified"][data-purchasing]) :is(.smp-field, .purchasing-field) { display: flex; flex: 1 1 155px; flex-direction: column; gap: var(--space-2); min-width: 0; }
+    :where([data-ui="unified"][data-purchasing]) :is(.smp-field-label, .purchasing-field-label) { color: var(--ui-muted); font-size: var(--font-size-sm); font-weight: 600; }
+    :where([data-ui="unified"][data-purchasing]) .pp-input[type="search"] { flex: 2 1 270px; }
+    :where([data-ui="unified"][data-purchasing]) :is(.pp-input, .smp-input) { width: auto; min-width: 0; max-width: 100%; }
+    :where([data-ui="unified"][data-purchasing]) :is(.smp-field, .purchasing-field) :is(input, select) { width: 100%; }
+    :where([data-ui="unified"][data-purchasing]) :is(.pp-toggle, .pp-actions) { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); }
+    :where([data-ui="unified"][data-purchasing]) :is(.pp-toggle input, .smp-row-check, .smp-check-all) { width: 20px; height: 20px; accent-color: var(--ui-accent); }
+    :where([data-ui="unified"][data-purchasing]) .pp-shown { margin-left: auto; }
+    :where([data-ui="unified"][data-purchasing]) :is(.pp-updated, .smp-updated, .pp-stat-sub, .pp-toggle-n, .pp-shown, .smp-note, .smp-paiddate, .smp-sw-status, .smp-mkt-projnote) { color: var(--ui-muted); font-size: var(--font-size-sm); overflow-wrap: anywhere; }
+    :where([data-ui="unified"][data-purchasing]) .pp-stat-sub { margin-top: var(--space-2); }
+    :where([data-ui="unified"][data-purchasing]) .pp-tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    :where([data-ui="unified"][data-purchasing]) :is(button.pp-tile, .smp-stat-btn) { font: inherit; text-align: left; color: var(--ui-ink); cursor: pointer; }
+    :where([data-ui="unified"][data-purchasing]) :is(button.pp-tile.is-active, .smp-stat-btn[aria-pressed="true"]) { border-color: var(--ui-accent); background: var(--ui-tint); box-shadow: inset 0 3px var(--ui-accent); }
+    :where([data-ui="unified"][data-purchasing]) :is(.pp-table, .smp-table) { min-width: 1000px; }
+    :where([data-ui="unified"][data-purchasing]) :is(.pp-wo, .smp-inv, .smp-po, .smp-monthval) { font-family: var(--font-mono); }
+    :where([data-ui="unified"][data-purchasing]) :is(.pp-wo, .smp-inv, .smp-po, .pp-company) { color: var(--ui-ink); }
+    :where([data-ui="unified"][data-purchasing]) :is(.pp-company, .pp-wo) { font-weight: 600; }
+    :where([data-ui="unified"][data-purchasing]) .data-table .smp-amt { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    :where([data-ui="unified"][data-purchasing]) :is(.smp-amt--credit, .smp-sw-status--warn) { color: var(--color-danger-ink); }
+    :where([data-ui="unified"][data-purchasing]) :is(.pp-empty, .smp-empty) { padding: var(--space-5); color: var(--ui-muted); }
+    :where([data-ui="unified"][data-purchasing]) :is(.pp-chip, .smp-badge) { display: inline-block; margin-block: var(--space-1); padding: var(--space-1) var(--space-2); border-radius: var(--radius-sm); font-size: var(--font-size-sm); font-weight: 600; color: var(--ui-muted); background: var(--gray-100); white-space: nowrap; }
+    :where([data-ui="unified"][data-purchasing]) :is(.pp-chip--ordered, .smp-badge--todo) { color: var(--color-info-ink); background: var(--color-info-bg); }
+    :where([data-ui="unified"][data-purchasing]) :is(.pp-chip--partial, .smp-badge--imported, .smp-badge--mkt) { color: var(--color-warning-ink); background: var(--color-warning-bg); }
+    :where([data-ui="unified"][data-purchasing]) :is(.pp-chip--received, .pp-chip--invoiced, .pp-chip--shipped, .smp-badge--paid) { color: var(--color-brand-deep); background: var(--color-success-bg); }
+    :where([data-ui="unified"][data-purchasing]) .smp-badge--credit { color: var(--color-danger-ink); background: var(--color-danger-bg); }
+    :where([data-ui="unified"][data-purchasing]) :is(.pp-trunc, .smp-older-hint) { padding: var(--space-3); margin-block: var(--space-3); color: var(--color-warning-ink); background: var(--color-warning-bg); border-radius: var(--radius-sm); }
+    :where([data-ui="unified"][data-purchasing]) .dash-error-banner { display: none; align-items: center; gap: var(--space-3); padding: var(--space-4); margin-bottom: var(--space-4); color: var(--color-danger-ink); background: var(--color-danger-bg); border-radius: var(--radius-card); }
+    :where([data-ui="unified"][data-purchasing]) .dash-error-banner.show { display: flex; }
+    :where([data-ui="unified"][data-purchasing]) .dash-error-banner-message { flex: 1; }
+    :where([data-ui="unified"][data-purchasing]) .smp-swbar { padding: var(--space-4); background: var(--ui-tint); border-radius: var(--radius-card); }
+    :where([data-ui="unified"][data-purchasing]) .purchasing-file { max-width: 100%; min-width: 0; font: inherit; }
+    :where([data-ui="unified"][data-purchasing]) .purchasing-file::file-selector-button { margin-right: var(--space-3); padding: var(--space-3); border: 0; border-radius: var(--radius-sm); color: var(--ui-surface); background: var(--ui-accent); font: inherit; cursor: pointer; }
+    :where([data-ui="unified"][data-purchasing]) .smp-tabs { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-bottom: var(--space-4); }
+    :where([data-ui="unified"][data-purchasing]) .smp-tab[aria-selected="true"] { border-color: var(--ui-accent); color: var(--ui-accent); background: var(--ui-tint); }
+    :where([data-ui="unified"][data-purchasing]) .smp-footer { justify-content: flex-end; margin-top: var(--space-4); padding-top: var(--space-4); border-top: 1px solid var(--ui-line); }
+    :where([data-ui="unified"][data-purchasing]) :is(.smp-note, .smp-mkt-projnote) { flex: 1 1 280px; margin: 0; line-height: 1.5; }
+    :where([data-ui="unified"][data-purchasing]) .smp-progress { height: 16px; overflow: hidden; border-radius: var(--radius-sm); background: var(--gray-100); }
+    :where([data-ui="unified"][data-purchasing]) .smp-progress-fill { height: 100%; width: var(--w, 0%); background: var(--ui-accent); }
+    :where([data-ui="unified"][data-purchasing]) .smp-progress-legend { margin-top: var(--space-2); color: var(--ui-muted); font-size: var(--font-size-sm); }
+    :where([data-ui="unified"][data-purchasing]) .smp-dot { display: inline-block; width: 10px; height: 10px; margin-right: var(--space-2); border-radius: var(--radius-sm); background: var(--gray-300); }
+    :where([data-ui="unified"][data-purchasing]) .smp-dot--spent { background: var(--ui-accent); }
+    :where([data-ui="unified"][data-purchasing]) .smp-mkt-cols { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: var(--space-5); margin-top: var(--space-5); }
+    :where([data-ui="unified"][data-purchasing]) .smp-subhead { font-size: var(--font-size-base); margin: 0 0 var(--space-3); }
+    :where([data-ui="unified"][data-purchasing]) .smp-monthrow { display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-3); font-size: var(--font-size-sm); }
+    :where([data-ui="unified"][data-purchasing]) .smp-monthlbl { flex: 0 0 34px; color: var(--ui-muted); }
+    :where([data-ui="unified"][data-purchasing]) .smp-monthbar-track { flex: 1; height: 10px; overflow: hidden; background: var(--gray-100); border-radius: var(--radius-sm); }
+    :where([data-ui="unified"][data-purchasing]) .smp-monthbar-fill { display: block; width: var(--w, 0%); height: 100%; background: var(--ui-accent); }
+    :where([data-ui="unified"][data-purchasing]) :is(.smp-progress-fill--over, .smp-monthbar-fill--credit) { background: var(--color-danger-ink); }
+    :where([data-ui="unified"][data-purchasing]) .smp-monthval { flex: 0 0 88px; text-align: right; }
+
+    @media screen and (width <= 1000px) {
+        :where([data-ui="unified"][data-purchasing="payables"]) .dash-stat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media screen and (width <= 800px) {
+        :where([data-ui="unified"][data-purchasing]) .pp-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        :where([data-ui="unified"][data-purchasing]) .smp-mkt-cols { grid-template-columns: minmax(0, 1fr); }
+        :where([data-ui="unified"][data-purchasing]) .pp-shown { margin-left: 0; }
+    }
+
+    @media screen and (width <= 640px) {
+        :where([data-ui="unified"][data-purchasing]) .pp-col-phone-hide { display: none; }
+    }
+
+    @media screen and (width <= 480px) {
+        :where([data-ui="unified"][data-purchasing="payables"]) .dash-stat-grid { grid-template-columns: minmax(0, 1fr); }
+        :where([data-ui="unified"][data-purchasing]) :is(.pp-input, .smp-field) { flex-basis: 100%; }
+    }
+
+    @media print {
+        @page purchasing-report { size: letter landscape; margin: 0.4in; }
+        :where([data-ui="unified"][data-purchasing]) { page: purchasing-report; font-size: 11px; background: var(--ui-surface); }
+        :where([data-ui="unified"][data-purchasing]) .dash-shell { display: block; min-height: 0; padding: 0; }
+        :where([data-ui="unified"][data-purchasing]) .dash-header { display: block; padding: 0 0 var(--space-3); margin-bottom: var(--space-3); }
+        :where([data-ui="unified"][data-purchasing]) :is(.dash-header-right, .dash-header-logo, .smp-swbar, .btn, .smp-check-cell) { display: none; }
+        :where([data-ui="unified"][data-purchasing]) .dash-card { padding: var(--space-3); box-shadow: none; }
+        :where([data-ui="unified"][data-purchasing]) :focus { outline: none; }
+        :where([data-ui="unified"][data-purchasing]) :is(.dash-stat-grid, .pp-tiles) { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: var(--space-2); }
+        :where([data-ui="unified"][data-purchasing]) .dash-stat-card { padding: var(--space-2); }
+        :where([data-ui="unified"][data-purchasing]) .dash-stat-value { font-size: 20px; }
+        :where([data-ui="unified"][data-purchasing]) :is(.field-input, .smp-input, .pp-input) { font-size: inherit; min-height: 24px; padding: var(--space-1); }
+        :where([data-ui="unified"][data-purchasing]) :is(.pp-updated, .smp-updated, .pp-stat-sub, .pp-shown, .smp-note, .smp-badge, .pp-chip, .dash-stat-label) { font-size: inherit; }
+        :where([data-ui="unified"][data-purchasing]) .table-wrap { overflow: visible; }
+        :where([data-ui="unified"][data-purchasing]) .data-table { min-width: 0; font-size: inherit; }
+        :where([data-ui="unified"][data-purchasing]) .data-table :is(th, td) { font-size: inherit; padding: var(--space-1); overflow-wrap: anywhere; }
+        :where([data-ui="unified"][data-purchasing]) .dash-content .data-table :is(th, td):last-child:not([colspan]) { display: none; }
+        :where([data-ui="unified"][data-purchasing="portal"]) .data-table :is(th, td):first-child { white-space: nowrap; }
+        :where([data-ui="unified"][data-purchasing]) .smp-mkt-cols { margin-top: var(--space-3); gap: var(--space-3); }
+        :where([data-ui="unified"][data-purchasing]) .smp-footer { margin-top: var(--space-3); padding-top: var(--space-2); }
+        :where([data-ui="unified"][data-purchasing]) tr { break-inside: avoid; }
+        :where([data-ui="unified"][data-purchasing]) :is(h2, h3) { break-after: avoid; }
+    }
+}

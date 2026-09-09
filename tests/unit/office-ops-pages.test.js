@@ -66,11 +66,12 @@ describe('box label template', () => {
 describe('purchasing portal hygiene', () => {
     const html = read('dashboards/purchasing-portal.html').replace(/<!--[\s\S]*?-->/g, '');
     test('banner typed; icons; viewer css version matches the js', () => {
-        expect(html).toMatch(/<button type="button" class="dash-error-banner-close" aria-label="Dismiss">/);
+        expect(html).toMatch(/<button type="button" class="dash-error-banner-close btn btn-secondary" aria-label="Dismiss">/);
         expect(html).not.toMatch(BARE);
-        expect(html).toMatch(/sanmar-invoice-viewer\.css\?v=2026\.09\./);
-        expect(html).toMatch(/sanmar-invoice-viewer\.js\?v=2026\.09\./);
-        expect(html).toMatch(/purchasing-portal\.js\?v=2026\.09\.05\.(7\d|[89]\d)/);
+        const version = /vendor-invoice\.css\?v=([0-9.]+)/.exec(html)[1];
+        expect(version).toMatch(/^\d{4}\.\d{2}\.\d{2}\.\d+$/);
+        expect(html).toContain('sanmar-invoice-viewer.js?v=' + version);
+        expect(html).toContain('purchasing-portal.js?v=' + version);
     });
 });
 

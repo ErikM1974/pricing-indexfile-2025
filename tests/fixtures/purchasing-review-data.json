@@ -1,0 +1,808 @@
+{
+  "portal": {
+    "rep": null,
+    "generatedAt": "2026-09-09T19:00:00.000Z",
+    "windowDays": 60,
+    "submissionCount": 5,
+    "truncated": 0,
+    "cacheHit": false,
+    "counts": {
+      "sent": 1,
+      "ordered": 1,
+      "partial": 1,
+      "received": 1,
+      "shipped": 1
+    },
+    "items": [
+      {
+        "submissionId": "1",
+        "submittedAt": "2026-09-09 09:12:00",
+        "orderType": "Regular Order",
+        "bradleyPo": "3702",
+        "requestedBy": "nika@nwcustomapparel.com",
+        "requestedByName": "Nika Lao",
+        "orders": [
+          {
+            "orderNumber": 142501,
+            "company": "Harbor Electric",
+            "status": "sent",
+            "poCount": 0,
+            "vendors": [],
+            "sanmarPos": [],
+            "orderedDate": "",
+            "receivedDate": ""
+          }
+        ]
+      },
+      {
+        "submissionId": "2",
+        "submittedAt": "2026-09-07 14:40:00",
+        "orderType": "Rush",
+        "bradleyPo": "3691",
+        "requestedBy": "taneisha@nwcustomapparel.com",
+        "requestedByName": "Taneisha Clark",
+        "orders": [
+          {
+            "orderNumber": 142449,
+            "company": "Korsmo Construction",
+            "status": "ordered",
+            "poCount": 1,
+            "vendors": [
+              "SanMar"
+            ],
+            "sanmarPos": [
+              882301
+            ],
+            "orderedDate": "2026-09-08",
+            "receivedDate": ""
+          }
+        ]
+      },
+      {
+        "submissionId": "3",
+        "submittedAt": "2026-09-04 10:05:00",
+        "orderType": "Regular Order",
+        "bradleyPo": "3668",
+        "requestedBy": "nika@nwcustomapparel.com",
+        "requestedByName": "Nika Lao",
+        "orders": [
+          {
+            "orderNumber": 142398,
+            "company": "Power Science Engineering <script>alert(1)</script>",
+            "status": "partial",
+            "poCount": 2,
+            "vendors": [
+              "SanMar",
+              "Supacolor"
+            ],
+            "sanmarPos": [
+              882290
+            ],
+            "orderedDate": "2026-09-05",
+            "receivedDate": "2026-09-08"
+          }
+        ]
+      },
+      {
+        "submissionId": "4",
+        "submittedAt": "2026-09-01 16:22:00",
+        "orderType": "Regular Order",
+        "bradleyPo": "",
+        "requestedBy": "taneisha@nwcustomapparel.com",
+        "requestedByName": "Taneisha Clark",
+        "orders": [
+          {
+            "orderNumber": 142312,
+            "company": "Temple Fitness",
+            "status": "received",
+            "poCount": 1,
+            "vendors": [
+              "SanMar"
+            ],
+            "sanmarPos": [
+              882270
+            ],
+            "orderedDate": "2026-09-02",
+            "receivedDate": "2026-09-06"
+          }
+        ]
+      },
+      {
+        "submissionId": "5",
+        "submittedAt": "2026-08-28 08:00:00",
+        "orderType": "Regular Order",
+        "bradleyPo": "3640",
+        "requestedBy": "nika@nwcustomapparel.com",
+        "requestedByName": "Nika Lao",
+        "orders": [
+          {
+            "orderNumber": 142290,
+            "company": "UnCruise Adventures",
+            "status": "shipped",
+            "poCount": 1,
+            "vendors": [
+              "SanMar"
+            ],
+            "sanmarPos": [
+              882240
+            ],
+            "orderedDate": "2026-08-29",
+            "receivedDate": "2026-09-02"
+          }
+        ]
+      }
+    ]
+  },
+  "unpaid": {
+    "invoices": [
+      {
+        "invoiceNumber": "162398367",
+        "invoiceDate": "2026-09-07",
+        "dueDate": "2026-10-07",
+        "purchaseOrderNo": "113686",
+        "orderDate": "2026-09-04",
+        "invoiceStatus": "Unpaid",
+        "terms": "Net30",
+        "subtotal": 122.05,
+        "salesTax": 0,
+        "shippingCharges": 0,
+        "freightSavings": 0,
+        "totalAmount": 122.05,
+        "shipTo": {
+          "name": "NORTHWEST EMBROIDERY INC",
+          "city": "Milton",
+          "state": "WA",
+          "zip": "98354"
+        },
+        "lineItems": [
+          {
+            "styleNo": "PC54",
+            "color": "Navy",
+            "description": "Core Cotton Tee",
+            "size": "L",
+            "quantity": 12,
+            "unitPrice": 10.170833333333333,
+            "lineTotal": 122.05
+          }
+        ]
+      },
+      {
+        "invoiceNumber": "162395846",
+        "invoiceDate": "2026-09-07",
+        "dueDate": "2026-10-07",
+        "purchaseOrderNo": "113693",
+        "orderDate": "2026-09-04",
+        "invoiceStatus": "Unpaid",
+        "terms": "Net30",
+        "subtotal": 170.4,
+        "salesTax": 0,
+        "shippingCharges": 0,
+        "freightSavings": 0,
+        "totalAmount": 170.4,
+        "shipTo": {
+          "name": "NORTHWEST EMBROIDERY INC",
+          "city": "Milton",
+          "state": "WA",
+          "zip": "98354"
+        },
+        "lineItems": [
+          {
+            "styleNo": "PC54",
+            "color": "Navy",
+            "description": "Core Cotton Tee",
+            "size": "L",
+            "quantity": 12,
+            "unitPrice": 14.200000000000001,
+            "lineTotal": 170.4
+          }
+        ]
+      },
+      {
+        "invoiceNumber": "162394919",
+        "invoiceDate": "2026-09-06",
+        "dueDate": "2026-10-06",
+        "purchaseOrderNo": "113683",
+        "orderDate": "2026-09-03",
+        "invoiceStatus": "Unpaid",
+        "terms": "Net30",
+        "subtotal": 40.96,
+        "salesTax": 0,
+        "shippingCharges": 0,
+        "freightSavings": 0,
+        "totalAmount": 40.96,
+        "shipTo": {
+          "name": "NORTHWEST EMBROIDERY INC",
+          "city": "Milton",
+          "state": "WA",
+          "zip": "98354"
+        },
+        "lineItems": [
+          {
+            "styleNo": "PC54",
+            "color": "Navy",
+            "description": "Core Cotton Tee",
+            "size": "L",
+            "quantity": 12,
+            "unitPrice": 3.4133333333333336,
+            "lineTotal": 40.96
+          }
+        ]
+      },
+      {
+        "invoiceNumber": "162391874",
+        "invoiceDate": "2026-09-06",
+        "dueDate": "2026-10-06",
+        "purchaseOrderNo": "113682",
+        "orderDate": "2026-09-03",
+        "invoiceStatus": "Unpaid",
+        "terms": "Net30",
+        "subtotal": 1991.77,
+        "salesTax": 0,
+        "shippingCharges": 0,
+        "freightSavings": 0,
+        "totalAmount": 1991.77,
+        "shipTo": {
+          "name": "Korsmo Construction <script>alert(1)</script>",
+          "city": "Milton",
+          "state": "WA",
+          "zip": "98354"
+        },
+        "lineItems": [
+          {
+            "styleNo": "PC54",
+            "color": "Navy",
+            "description": "Core Cotton Tee",
+            "size": "L",
+            "quantity": 12,
+            "unitPrice": 165.98083333333332,
+            "lineTotal": 1991.77
+          }
+        ]
+      },
+      {
+        "invoiceNumber": "5670868",
+        "invoiceDate": "2026-09-07",
+        "dueDate": "2026-10-07",
+        "purchaseOrderNo": "113612",
+        "orderDate": "2026-09-04",
+        "invoiceStatus": "Unpaid",
+        "terms": "Net30",
+        "subtotal": -81.51,
+        "salesTax": 0,
+        "shippingCharges": 0,
+        "freightSavings": 0,
+        "totalAmount": -81.51,
+        "shipTo": {
+          "name": "NORTHWEST EMBROIDERY INC",
+          "city": "Milton",
+          "state": "WA",
+          "zip": "98354"
+        },
+        "lineItems": [
+          {
+            "styleNo": "PC54",
+            "color": "Navy",
+            "description": "Core Cotton Tee",
+            "size": "L",
+            "quantity": 12,
+            "unitPrice": 6.7925,
+            "lineTotal": -81.51
+          }
+        ]
+      },
+      {
+        "invoiceNumber": "5615563",
+        "invoiceDate": "2026-09-03",
+        "dueDate": "2026-10-03",
+        "purchaseOrderNo": "113372",
+        "orderDate": "2026-08-31",
+        "invoiceStatus": "Unpaid",
+        "terms": "Net30",
+        "subtotal": -36.5,
+        "salesTax": 0,
+        "shippingCharges": 0,
+        "freightSavings": 0,
+        "totalAmount": -36.5,
+        "shipTo": {
+          "name": "NORTHWEST EMBROIDERY INC",
+          "city": "Milton",
+          "state": "WA",
+          "zip": "98354"
+        },
+        "lineItems": [
+          {
+            "styleNo": "PC54",
+            "color": "Navy",
+            "description": "Core Cotton Tee",
+            "size": "L",
+            "quantity": 12,
+            "unitPrice": 3.0416666666666665,
+            "lineTotal": -36.5
+          }
+        ]
+      },
+      {
+        "invoiceNumber": "162009107",
+        "invoiceDate": "2026-09-04",
+        "dueDate": "2026-10-04",
+        "purchaseOrderNo": "113552 BW",
+        "orderDate": "2026-09-01",
+        "invoiceStatus": "Unpaid",
+        "terms": "Net30",
+        "subtotal": 249.6,
+        "salesTax": 0,
+        "shippingCharges": 0,
+        "freightSavings": 0,
+        "totalAmount": 249.6,
+        "shipTo": {
+          "name": "NORTHWEST EMBROIDERY INC",
+          "city": "Milton",
+          "state": "WA",
+          "zip": "98354"
+        },
+        "lineItems": [
+          {
+            "styleNo": "PC54",
+            "color": "Navy",
+            "description": "Core Cotton Tee",
+            "size": "L",
+            "quantity": 12,
+            "unitPrice": 20.8,
+            "lineTotal": 249.6
+          }
+        ]
+      },
+      {
+        "invoiceNumber": "161990010",
+        "invoiceDate": "2026-09-05",
+        "dueDate": "2026-09-05",
+        "purchaseOrderNo": "113610",
+        "orderDate": "2026-09-02",
+        "invoiceStatus": "Unpaid",
+        "terms": "MRKFUND",
+        "subtotal": 164.87,
+        "salesTax": 0,
+        "shippingCharges": 0,
+        "freightSavings": 0,
+        "totalAmount": 164.87,
+        "shipTo": {
+          "name": "NORTHWEST EMBROIDERY INC",
+          "city": "Milton",
+          "state": "WA",
+          "zip": "98354"
+        },
+        "lineItems": [
+          {
+            "styleNo": "PC54",
+            "color": "Navy",
+            "description": "Core Cotton Tee",
+            "size": "L",
+            "quantity": 12,
+            "unitPrice": 13.739166666666668,
+            "lineTotal": 164.87
+          }
+        ]
+      },
+      {
+        "invoiceNumber": "157400001",
+        "invoiceDate": "2026-02-21",
+        "dueDate": "2026-03-23",
+        "purchaseOrderNo": "111853",
+        "orderDate": "2026-02-18",
+        "invoiceStatus": "Unpaid",
+        "terms": "Net30",
+        "subtotal": 875.07,
+        "salesTax": 0,
+        "shippingCharges": 0,
+        "freightSavings": 0,
+        "totalAmount": 875.07,
+        "shipTo": {
+          "name": "NORTHWEST EMBROIDERY INC",
+          "city": "Milton",
+          "state": "WA",
+          "zip": "98354"
+        },
+        "lineItems": [
+          {
+            "styleNo": "PC54",
+            "color": "Navy",
+            "description": "Core Cotton Tee",
+            "size": "L",
+            "quantity": 12,
+            "unitPrice": 72.9225,
+            "lineTotal": 875.07
+          }
+        ]
+      },
+      {
+        "invoiceNumber": "157400002",
+        "invoiceDate": "2026-02-11",
+        "dueDate": "2026-03-13",
+        "purchaseOrderNo": "111854",
+        "orderDate": "2026-02-08",
+        "invoiceStatus": "Unpaid",
+        "terms": "Net30",
+        "subtotal": 100,
+        "salesTax": 0,
+        "shippingCharges": 0,
+        "freightSavings": 0,
+        "totalAmount": 100,
+        "shipTo": {
+          "name": "NORTHWEST EMBROIDERY INC",
+          "city": "Milton",
+          "state": "WA",
+          "zip": "98354"
+        },
+        "lineItems": [
+          {
+            "styleNo": "PC54",
+            "color": "Navy",
+            "description": "Core Cotton Tee",
+            "size": "L",
+            "quantity": 12,
+            "unitPrice": 8.333333333333334,
+            "lineTotal": 100
+          }
+        ]
+      }
+    ]
+  },
+  "imports": {
+    "success": true,
+    "count": 1,
+    "imports": [
+      {
+        "InvoiceNumber": "INV-162009107",
+        "Date_Imported": "2026-07-19T00:00:00",
+        "Imported_By": "erik@nwcustomapparel.com",
+        "Vendor": "1002"
+      }
+    ]
+  },
+  "shopworks": {
+    "success": true,
+    "count": 0,
+    "rows": []
+  },
+  "marketing": {
+    "dateRange": {},
+    "invoices": [
+      {
+        "invoiceNumber": "157411096",
+        "invoiceDate": "2026-09-15",
+        "dueDate": "2026-09-15",
+        "purchaseOrderNo": "111808",
+        "orderDate": "2026-09-12",
+        "invoiceStatus": "Unpaid",
+        "terms": "MRKFUND",
+        "subtotal": 560,
+        "salesTax": 0,
+        "shippingCharges": 0,
+        "freightSavings": 0,
+        "totalAmount": 560,
+        "shipTo": {
+          "name": "NORTHWEST EMBROIDERY INC",
+          "city": "Milton",
+          "state": "WA",
+          "zip": "98354"
+        },
+        "lineItems": [
+          {
+            "styleNo": "PC54",
+            "color": "Navy",
+            "description": "Core Cotton Tee",
+            "size": "L",
+            "quantity": 12,
+            "unitPrice": 46.666666666666664,
+            "lineTotal": 560
+          }
+        ]
+      },
+      {
+        "invoiceNumber": "157410959",
+        "invoiceDate": "2026-08-15",
+        "dueDate": "2026-08-15",
+        "purchaseOrderNo": "111807",
+        "orderDate": "2026-08-12",
+        "invoiceStatus": "Unpaid",
+        "terms": "MRKFUND",
+        "subtotal": 1210,
+        "salesTax": 0,
+        "shippingCharges": 0,
+        "freightSavings": 0,
+        "totalAmount": 1210,
+        "shipTo": {
+          "name": "NORTHWEST EMBROIDERY INC",
+          "city": "Milton",
+          "state": "WA",
+          "zip": "98354"
+        },
+        "lineItems": [
+          {
+            "styleNo": "PC54",
+            "color": "Navy",
+            "description": "Core Cotton Tee",
+            "size": "L",
+            "quantity": 12,
+            "unitPrice": 100.83333333333333,
+            "lineTotal": 1210
+          }
+        ]
+      },
+      {
+        "invoiceNumber": "157410822",
+        "invoiceDate": "2026-07-15",
+        "dueDate": "2026-07-15",
+        "purchaseOrderNo": "111806",
+        "orderDate": "2026-07-12",
+        "invoiceStatus": "Unpaid",
+        "terms": "MRKFUND",
+        "subtotal": 730,
+        "salesTax": 0,
+        "shippingCharges": 0,
+        "freightSavings": 0,
+        "totalAmount": 730,
+        "shipTo": {
+          "name": "NORTHWEST EMBROIDERY INC",
+          "city": "Milton",
+          "state": "WA",
+          "zip": "98354"
+        },
+        "lineItems": [
+          {
+            "styleNo": "PC54",
+            "color": "Navy",
+            "description": "Core Cotton Tee",
+            "size": "L",
+            "quantity": 12,
+            "unitPrice": 60.833333333333336,
+            "lineTotal": 730
+          }
+        ]
+      },
+      {
+        "invoiceNumber": "157410685",
+        "invoiceDate": "2026-06-15",
+        "dueDate": "2026-06-15",
+        "purchaseOrderNo": "111805",
+        "orderDate": "2026-06-12",
+        "invoiceStatus": "Unpaid",
+        "terms": "MRKFUND",
+        "subtotal": 980,
+        "salesTax": 0,
+        "shippingCharges": 0,
+        "freightSavings": 0,
+        "totalAmount": 980,
+        "shipTo": {
+          "name": "NORTHWEST EMBROIDERY INC",
+          "city": "Milton",
+          "state": "WA",
+          "zip": "98354"
+        },
+        "lineItems": [
+          {
+            "styleNo": "PC54",
+            "color": "Navy",
+            "description": "Core Cotton Tee",
+            "size": "L",
+            "quantity": 12,
+            "unitPrice": 81.66666666666667,
+            "lineTotal": 980
+          }
+        ]
+      },
+      {
+        "invoiceNumber": "157410548",
+        "invoiceDate": "2026-05-15",
+        "dueDate": "2026-05-15",
+        "purchaseOrderNo": "111804",
+        "orderDate": "2026-05-12",
+        "invoiceStatus": "Unpaid",
+        "terms": "MRKFUND",
+        "subtotal": 1490,
+        "salesTax": 0,
+        "shippingCharges": 0,
+        "freightSavings": 0,
+        "totalAmount": 1490,
+        "shipTo": {
+          "name": "NORTHWEST EMBROIDERY INC",
+          "city": "Milton",
+          "state": "WA",
+          "zip": "98354"
+        },
+        "lineItems": [
+          {
+            "styleNo": "PC54",
+            "color": "Navy",
+            "description": "Core Cotton Tee",
+            "size": "L",
+            "quantity": 12,
+            "unitPrice": 124.16666666666667,
+            "lineTotal": 1490
+          }
+        ]
+      },
+      {
+        "invoiceNumber": "157410411",
+        "invoiceDate": "2026-04-15",
+        "dueDate": "2026-04-15",
+        "purchaseOrderNo": "111803",
+        "orderDate": "2026-04-12",
+        "invoiceStatus": "Unpaid",
+        "terms": "MRKFUND",
+        "subtotal": 640,
+        "salesTax": 0,
+        "shippingCharges": 0,
+        "freightSavings": 0,
+        "totalAmount": 640,
+        "shipTo": {
+          "name": "NORTHWEST EMBROIDERY INC",
+          "city": "Milton",
+          "state": "WA",
+          "zip": "98354"
+        },
+        "lineItems": [
+          {
+            "styleNo": "PC54",
+            "color": "Navy",
+            "description": "Core Cotton Tee",
+            "size": "L",
+            "quantity": 12,
+            "unitPrice": 53.333333333333336,
+            "lineTotal": 640
+          }
+        ]
+      },
+      {
+        "invoiceNumber": "157410274",
+        "invoiceDate": "2026-03-15",
+        "dueDate": "2026-03-15",
+        "purchaseOrderNo": "111802",
+        "orderDate": "2026-03-12",
+        "invoiceStatus": "Unpaid",
+        "terms": "MRKFUND",
+        "subtotal": 875,
+        "salesTax": 0,
+        "shippingCharges": 0,
+        "freightSavings": 0,
+        "totalAmount": 875,
+        "shipTo": {
+          "name": "NORTHWEST EMBROIDERY INC",
+          "city": "Milton",
+          "state": "WA",
+          "zip": "98354"
+        },
+        "lineItems": [
+          {
+            "styleNo": "PC54",
+            "color": "Navy",
+            "description": "Core Cotton Tee",
+            "size": "L",
+            "quantity": 12,
+            "unitPrice": 72.91666666666667,
+            "lineTotal": 875
+          }
+        ]
+      },
+      {
+        "invoiceNumber": "157410137",
+        "invoiceDate": "2026-02-15",
+        "dueDate": "2026-02-15",
+        "purchaseOrderNo": "111801",
+        "orderDate": "2026-02-12",
+        "invoiceStatus": "Unpaid",
+        "terms": "MRKFUND",
+        "subtotal": 1180,
+        "salesTax": 0,
+        "shippingCharges": 0,
+        "freightSavings": 0,
+        "totalAmount": 1180,
+        "shipTo": {
+          "name": "NORTHWEST EMBROIDERY INC",
+          "city": "Milton",
+          "state": "WA",
+          "zip": "98354"
+        },
+        "lineItems": [
+          {
+            "styleNo": "PC54",
+            "color": "Navy",
+            "description": "Core Cotton Tee",
+            "size": "L",
+            "quantity": 12,
+            "unitPrice": 98.33333333333333,
+            "lineTotal": 1180
+          }
+        ]
+      },
+      {
+        "invoiceNumber": "157410000",
+        "invoiceDate": "2026-01-15",
+        "dueDate": "2026-01-15",
+        "purchaseOrderNo": "111800",
+        "orderDate": "2026-01-12",
+        "invoiceStatus": "Unpaid",
+        "terms": "MRKFUND",
+        "subtotal": 520,
+        "salesTax": 0,
+        "shippingCharges": 0,
+        "freightSavings": 0,
+        "totalAmount": 520,
+        "shipTo": {
+          "name": "NORTHWEST EMBROIDERY INC",
+          "city": "Milton",
+          "state": "WA",
+          "zip": "98354"
+        },
+        "lineItems": [
+          {
+            "styleNo": "PC54",
+            "color": "Navy",
+            "description": "Core Cotton Tee",
+            "size": "L",
+            "quantity": 12,
+            "unitPrice": 43.333333333333336,
+            "lineTotal": 520
+          }
+        ]
+      }
+    ]
+  },
+  "invoice": {
+    "purchaseOrder": "882301",
+    "invoices": [
+      {
+        "invoiceNumber": "INV-77301",
+        "invoiceDate": "2026-09-07",
+        "dueDate": "2026-10-07",
+        "purchaseOrderNo": "882301",
+        "orderDate": "2026-09-05",
+        "invoiceStatus": "Open",
+        "shipVia": "UPS GROUND",
+        "terms": "NET 30",
+        "subtotal": 412.5,
+        "salesTax": 0,
+        "shippingCharges": 18.4,
+        "freightSavings": 6.2,
+        "totalAmount": 424.7,
+        "shipTo": {
+          "name": "Northwest Custom Apparel <script>alert(1)</script>",
+          "city": "Milton",
+          "state": "WA"
+        },
+        "lineItems": [
+          {
+            "styleNo": "PC54",
+            "color": "Navy",
+            "description": "Port & Company Core Cotton Tee",
+            "size": "L",
+            "quantity": 48,
+            "unitPrice": 3.42,
+            "lineTotal": 164.16
+          },
+          {
+            "styleNo": "PC54",
+            "color": "Navy",
+            "description": "Port & Company Core Cotton Tee",
+            "size": "XL",
+            "quantity": 36,
+            "unitPrice": 3.42,
+            "lineTotal": 123.12
+          },
+          {
+            "styleNo": "CT104670",
+            "color": "Black",
+            "description": "Carhartt Gilliam Jacket",
+            "size": "M",
+            "quantity": 5,
+            "unitPrice": 25.04,
+            "lineTotal": 125.22
+          }
+        ]
+      }
+    ],
+    "fetchedAt": "2026-09-09T19:00:00.000Z"
+  },
+  "shopworksCsv": "id_PO,VendorName,cur_Payable,date_Paid,ID_Payable,id_Vendor,InvoiceNumber,cnCur_PayableOutstanding\r\n113686,SANMAR,122.05 ,,148300,1002,INV-162398367,122.05\r\n113693,SANMAR,\"1,170.40 \",07/18/2026,148301,1002,INV-162395846,\r\n113372,SANMAR,-36.50 ,,148302,1002,CR-005615563,\r\n",
+  "fixed": 1788980400000
+}
