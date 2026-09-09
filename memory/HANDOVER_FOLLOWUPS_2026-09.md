@@ -383,3 +383,7 @@ Photo final checks:22mocked browser cases and478checks across eight source/CSS/c
 ## Photo integration — 2026-09-09
 
 Preserved the .13 live checkpoint and all append-only photo evidence. The initial review commit helper stopped while restaging two already-indexed deletions; finish-photo-reviewed.cjs staged only existing owned files and committed the saved source, preserving both indexed deletions. Do not rerun either review helper. Full integrated checks follow.
+
+## Design libraries plan — 2026-09-09
+
+Next isolated candidate .15: dashboards/digitized-designs.html and dashboards/old-designs.html, with their existing controllers and Caspio presentation adapters. Base 694e88c7e04f18797427d8f4d81207ddf9c679e2. Preserve every embed URL, field, additional-logo/full-back price computation, image action and keyboard control. Neutral reference ownership for digitized designs; amber archive ownership; Public Sans and existing canonical fields/buttons/dialogs. First read the actual provider rendering and inventory inline styles; then choose the smallest safe adapter, unify local shell/cards/dialogs, and review synthetic filters, load failure, images, price tables, copy failures, four widths and print. Provider internals must stay separately identified. Photo .14 full integrated gates are running on primary; live .13/2089 remains136reviewed/89pending. No new design review credit.
