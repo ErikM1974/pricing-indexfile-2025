@@ -283,3 +283,6 @@ Training practice pages opt in with data-training="practice". training-practice.
 
 
 Training reference pages opt in with data-training="reference". training-reference.css owns reference navigation, procedure/contacts/checklists and paper rhythm; components/training-guide remain the control/table/callout owners. Page CSS owns caps, tip articles and shipping/purchasing examples.
+
+
+Training manuals: tokens → components → training-guide → training-reference → training-manual → page arrangement. data-training-manual identifies this family; data-manual-mode=chapters hides other sections on screen. Mobile contents use native details, biography uses native buttons, and printing temporarily opens complete content then restores it. Keep generic card classes out of long document sections. Original prose, destinations, media, employee and exercise data have source guards.

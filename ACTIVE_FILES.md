@@ -1,6 +1,6 @@
 # Active Files Registry
 
-Last updated: 2026-09-08 — training reference shared owners, four consumers and browser/content/print checks.
+Last updated: 2026-09-08 — shared manual navigation/layout, four consumers, two retired scripts and full chapter/content/print checks.
 
 | Area | Registry |
 |---|---|
@@ -36,3 +36,10 @@ Historical counts are retained as audit notes and must not be presented as curre
 
 
 - `tests/e2e/css-unification-training-reference.spec.js` — responsive/axe, cap content, quick-tip search/errors/rich text, shared checklist storage/navigation and real PDF coverage.
+
+
+- `shared_components/css/training-manual.css` — shared manual contents, reading layout and print contract.
+- `shared_components/js/training-manual.js` — chapter/hash navigation, biography disclosure and print-state restoration.
+
+- Retired training/js/customer-service.js and training/js/get-to-know-erik.js; their pages now load training-manual.js.
+- `tests/e2e/css-unification-training-manual.spec.js` — responsive/axe, all manual/day sections, keyboard disclosures, practice/roster and complete PDF state restoration.

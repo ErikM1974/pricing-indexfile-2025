@@ -1,0 +1,374 @@
+/* Prefix every selector with the manual family scope when installing. */
+@layer components.patterns {
+    :where([data-ui="unified"][data-training-manual]) .manual-workspace {
+        width: min(1360px, calc(100% - var(--space-8)));
+        margin: var(--space-6) auto;
+        display: grid;
+        grid-template-columns: 270px minmax(0, 1fr);
+        gap: var(--space-6);
+        align-items: start;
+    }
+
+    :where([data-ui="unified"][data-training-manual]) .manual-content {
+        min-width: 0;
+        padding: clamp(1rem, 3vw, 2.5rem);
+        background: var(--ui-surface);
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-md);
+        overflow-wrap: anywhere;
+    }
+
+    :where([data-ui="unified"][data-training-manual]) .manual-content > h1,
+    :where([data-ui="unified"][data-training-manual])
+        .manual-content
+        .chapter
+        h1 {
+        font-size: clamp(1.6rem, 3vw, 2.25rem);
+        line-height: var(--line-height-tight);
+        margin-block-end: var(--space-5);
+    }
+
+    :where([data-ui="unified"][data-training-manual]) .manual-content h2 {
+        margin-block: var(--space-6) var(--space-4);
+    }
+
+    :where([data-ui="unified"][data-training-manual])
+        .manual-content
+        :is(section, .chapter) {
+        scroll-margin-block-start: var(--space-5);
+    }
+
+    :where([data-ui="unified"][data-training-manual])
+        .manual-content
+        :is(section, .chapter)
+        > :first-child {
+        margin-block-start: 0;
+    }
+
+    :where([data-ui="unified"][data-training-manual])
+        .manual-content
+        section
+        + section {
+        margin-block-start: var(--space-8);
+        padding-block-start: var(--space-6);
+        border-block-start: 1px solid var(--ui-line);
+    }
+
+    :where([data-ui="unified"][data-training-manual])
+        .manual-content
+        :is(p, li) {
+        max-width: 80ch;
+    }
+
+    :where([data-ui="unified"][data-training-manual])
+        .manual-content
+        :is(h4, h5) {
+        margin-block: var(--space-5) var(--space-3);
+        font-size: var(--font-size-base);
+    }
+
+    :where([data-ui="unified"][data-training-manual])
+        .manual-content
+        :is(img, iframe) {
+        max-width: 100%;
+    }
+
+    :where([data-ui="unified"][data-training-manual]) .manual-content iframe {
+        border: 0;
+    }
+
+    :where([data-ui="unified"][data-training-manual]) .manual-contents {
+        position: sticky;
+        top: var(--space-4);
+        max-height: calc(100vh - var(--space-8));
+        overflow-y: auto;
+        border: 1px solid var(--ui-line);
+        background: var(--ui-surface);
+        border-radius: var(--radius-md);
+    }
+
+    :where([data-ui="unified"][data-training-manual])
+        .manual-contents
+        > summary {
+        padding: var(--space-4);
+        min-height: 48px;
+        cursor: pointer;
+        color: var(--ui-ink);
+    }
+
+    :where([data-ui="unified"][data-training-manual])
+        .manual-contents
+        > summary
+        :is(h2, h3) {
+        display: inline;
+        font-size: var(--font-size-base);
+    }
+
+    :where([data-ui="unified"][data-training-manual]) .manual-contents nav {
+        padding: 0 var(--space-3) var(--space-4);
+    }
+
+    :where([data-ui="unified"][data-training-manual]) .manual-contents ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    :where([data-ui="unified"][data-training-manual]) .manual-contents li + li {
+        margin: 0;
+    }
+
+    :where([data-ui="unified"][data-training-manual]) .manual-contents a {
+        display: block;
+        padding: var(--space-3);
+        min-height: 44px;
+        font-size: var(--font-size-md);
+        line-height: var(--line-height-base);
+        color: var(--ui-muted);
+        text-decoration: none;
+        border-inline-start: 3px solid transparent;
+    }
+
+    :where([data-ui="unified"][data-training-manual]) .manual-contents a:hover {
+        background: var(--gray-50);
+        color: var(--ui-ink);
+    }
+
+    :where([data-ui="unified"][data-training-manual])
+        .manual-contents
+        a.is-active {
+        border-color: var(--ui-accent);
+        color: var(--ui-accent);
+        background: var(--ui-tint);
+        font-weight: var(--font-weight-semibold);
+    }
+
+    :where([data-ui="unified"][data-training-manual])
+        .manual-contents
+        .part-header {
+        margin-block-start: var(--space-4);
+        padding: var(--space-3);
+        color: var(--ui-ink);
+        font-weight: var(--font-weight-semibold);
+        font-size: var(--font-size-sm);
+    }
+
+    :where([data-ui="unified"][data-training-manual]) .manual-nav-footer {
+        padding: var(--space-4);
+        border-block-start: 1px solid var(--ui-line);
+        color: var(--ui-muted);
+        font-size: var(--font-size-sm);
+    }
+
+    :where([data-ui="unified"][data-training-manual]) .manual-actions {
+        display: flex;
+        gap: var(--space-3);
+        flex-wrap: wrap;
+        margin-block-end: var(--space-5);
+    }
+
+    :where([data-ui="unified"][data-training-manual]) .manual-actions .btn {
+        white-space: normal;
+    }
+
+    :where([data-ui="unified"][data-training-manual])
+        .manual-content
+        .training-callout
+        :is(a, h2, h3, h4) {
+        color: inherit;
+    }
+
+    :where([data-ui="unified"][data-training-manual])
+        .manual-content
+        .training-callout
+        > :first-child {
+        margin-block-start: 0;
+    }
+
+    :where([data-ui="unified"][data-training-manual])
+        .manual-content
+        .training-callout
+        > :last-child {
+        margin-block-end: 0;
+    }
+
+    :where([data-ui="unified"][data-training-manual]) .manual-content details {
+        margin-block: var(--space-4);
+        border-block-end: 1px solid var(--ui-line);
+    }
+
+    :where([data-ui="unified"][data-training-manual]) .manual-content summary {
+        padding-block: var(--space-4);
+        cursor: pointer;
+        min-height: 48px;
+        font-weight: var(--font-weight-semibold);
+    }
+
+    :where([data-ui="unified"][data-training-manual])
+        .manual-content
+        .details-content {
+        padding: 0 var(--space-4) var(--space-5);
+    }
+
+    :where([data-ui="unified"][data-training-manual])
+        .manual-content
+        .manual-section-card
+        + .manual-section-card {
+        margin-block-start: var(--space-8);
+        padding-block-start: var(--space-6);
+        border-block-start: 1px solid var(--ui-line);
+    }
+
+    :where([data-ui="unified"][data-training-manual]) .manual-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: var(--space-5);
+        margin-block: var(--space-5);
+    }
+
+    :where([data-ui="unified"][data-training-manual]) .manual-grid > * {
+        min-width: 0;
+    }
+
+    :where([data-ui="unified"][data-training-manual]) .manual-emphasis {
+        font-weight: var(--font-weight-semibold);
+    }
+
+    :where([data-ui="unified"][data-training-manual])
+        .manual-content
+        .training-table-scroll {
+        max-width: 100%;
+    }
+
+    :where([data-ui="unified"][data-training-manual]) .manual-top {
+        position: fixed;
+        right: var(--space-4);
+        bottom: var(--space-4);
+        z-index: 5;
+    }
+
+    @media (width < 900px) {
+        :where([data-ui="unified"][data-training-manual]) .manual-workspace {
+            grid-template-columns: minmax(0, 1fr);
+            width: calc(100% - var(--space-6));
+            gap: var(--space-4);
+            margin-block: var(--space-4);
+        }
+
+        :where([data-ui="unified"][data-training-manual]) .manual-contents {
+            position: static;
+            max-height: none;
+        }
+
+        :where([data-ui="unified"][data-training-manual])
+            .manual-contents[open]
+            nav {
+            max-height: 50vh;
+            overflow-y: auto;
+        }
+
+        :where([data-ui="unified"][data-training-manual]) .manual-grid {
+            grid-template-columns: minmax(0, 1fr);
+        }
+    }
+}
+
+@layer components.pages {
+    @media print {
+        :where([data-ui="unified"][data-training-manual]) .manual-workspace {
+            display: block;
+            width: 100%;
+            margin: 0;
+        }
+
+        :where([data-ui="unified"][data-training-manual]) .manual-content {
+            border: 0;
+            padding: 0;
+            width: 100%;
+        }
+
+        :where([data-ui="unified"][data-training-manual]) .manual-contents,
+        :where([data-ui="unified"][data-training-manual]) .manual-actions,
+        :where([data-ui="unified"][data-training-manual]) .manual-top {
+            display: none;
+        }
+
+        :where([data-ui="unified"][data-training-manual])
+            .manual-content
+            :is(section, .chapter) {
+            padding-block-start: 8pt;
+            margin-block-start: 10pt;
+        }
+
+        :where([data-ui="unified"][data-training-manual])
+            .manual-content
+            .chapter
+            + .chapter {
+            break-before: page;
+        }
+
+        :where([data-ui="unified"][data-training-manual])
+            .manual-content
+            :is(section, .chapter)
+            > :first-child {
+            margin-block-start: 0;
+        }
+
+        :where([data-ui="unified"][data-training-manual])
+            .manual-content
+            .training-callout {
+            break-inside: auto;
+        }
+
+        :where([data-ui="unified"][data-training-manual])
+            .manual-content
+            details {
+            border: 0;
+        }
+
+        :where([data-ui="unified"][data-training-manual])
+            .manual-content
+            summary {
+            padding-block: 4pt;
+            break-after: avoid;
+        }
+
+        :where([data-ui="unified"][data-training-manual])
+            .manual-content
+            .details-content {
+            padding: 0 0 6pt;
+        }
+
+        :where([data-ui="unified"][data-training-manual])
+            .manual-content
+            :is(p, li) {
+            max-width: none;
+        }
+
+        :where([data-ui="unified"][data-training-manual]) .manual-grid {
+            gap: 8pt;
+            margin-block: 8pt;
+        }
+
+        :where([data-ui="unified"][data-training-manual]) .manual-content h1 {
+            font-size: 19pt;
+        }
+
+        :where([data-ui="unified"][data-training-manual]) .manual-content h2 {
+            font-size: 14pt;
+            margin-block: 10pt 6pt;
+        }
+
+        :where([data-ui="unified"][data-training-manual]) .manual-content h3 {
+            font-size: 12pt;
+            margin-block: 8pt 5pt;
+        }
+
+        :where([data-ui="unified"][data-training-manual])
+            .manual-content
+            :is(h4, h5) {
+            margin-block: 8pt 4pt;
+            font-size: 10pt;
+        }
+    }
+}

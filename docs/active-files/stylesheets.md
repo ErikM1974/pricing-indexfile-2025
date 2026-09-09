@@ -179,3 +179,6 @@ cap-embroidery-fix.css
 - `shared_components/css/training-practice.css`: scoped practice layouts and feedback for seven games/reference pages; shared controls remain in components.css. Replaces the last training-shared.css consumers and their duplicated page controls.
 
 - `shared_components/css/training-reference.css` — reference reading/nav/steps/contact/checklist pattern; four explicitly opted-in training pages.
+
+
+- `shared_components/css/training-manual.css` — shared manual contents, reading layout and print contract.

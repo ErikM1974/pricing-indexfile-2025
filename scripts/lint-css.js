@@ -65,6 +65,7 @@ const CSS_LINT_SCOPE = [
     'shared_components/css/training-service.css',
     'shared_components/css/training-practice.css',
     'shared_components/css/training-reference.css',
+    'shared_components/css/training-manual.css',
     'shared_components/css/printable-forms.css',
     'shared_components/css/art-intake.css',
     'shared_components/css/sanmar-invoice-viewer.css',

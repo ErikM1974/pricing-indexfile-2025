@@ -1426,6 +1426,114 @@
       "test": "tests/e2e/css-unification-training-reference.spec.js",
       "maxCssBytes": 83009,
       "measuredRawCssBytes": 82497
+    },
+    {
+      "source": "training/customer-service.html",
+      "family": "training-manual",
+      "status": "pilot",
+      "route": "/training/customer-service.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/training-guide.css",
+        "shared_components/css/training-reference.css",
+        "shared_components/css/training-manual.css",
+        "training/css/customer-service.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "four-widths",
+        "keyboard",
+        "original-content-media",
+        "all-sections",
+        "hash-back-forward",
+        "real-pdf",
+        "print-state-restored"
+      ],
+      "test": "tests/e2e/css-unification-training-manual.spec.js",
+      "maxCssBytes": 96448,
+      "measuredRawCssBytes": 95248
+    },
+    {
+      "source": "training/get-to-know-erik.html",
+      "family": "training-manual",
+      "status": "pilot",
+      "route": "/training/get-to-know-erik.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/training-guide.css",
+        "shared_components/css/training-reference.css",
+        "shared_components/css/training-manual.css",
+        "training/css/get-to-know-erik.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "four-widths",
+        "keyboard",
+        "original-content-media",
+        "all-sections",
+        "hash-back-forward",
+        "real-pdf",
+        "print-state-restored"
+      ],
+      "test": "tests/e2e/css-unification-training-manual.spec.js",
+      "maxCssBytes": 95572,
+      "measuredRawCssBytes": 94372
+    },
+    {
+      "source": "training/sales-coordinator-manual.html",
+      "family": "training-manual",
+      "status": "pilot",
+      "route": "/training/sales-coordinator-manual.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/training-guide.css",
+        "shared_components/css/training-reference.css",
+        "shared_components/css/training-manual.css",
+        "training/css/sales-coordinator-manual.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "four-widths",
+        "keyboard",
+        "original-content-media",
+        "all-sections",
+        "hash-back-forward",
+        "real-pdf",
+        "print-state-restored"
+      ],
+      "test": "tests/e2e/css-unification-training-manual.spec.js",
+      "maxCssBytes": 93535,
+      "measuredRawCssBytes": 92335
+    },
+    {
+      "source": "training/sales-coordinator-training-schedule.html",
+      "family": "training-manual",
+      "status": "pilot",
+      "route": "/training/sales-coordinator-training-schedule.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/training-guide.css",
+        "shared_components/css/training-reference.css",
+        "shared_components/css/training-manual.css",
+        "training/css/sales-coordinator-training-schedule.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "four-widths",
+        "keyboard",
+        "original-content-media",
+        "all-sections",
+        "hash-back-forward",
+        "real-pdf",
+        "print-state-restored"
+      ],
+      "test": "tests/e2e/css-unification-training-manual.spec.js",
+      "maxCssBytes": 99568,
+      "measuredRawCssBytes": 98368
     }
   ],
   "billingContentSha256": "d85f8530e03a1863d1b8bb2ebe97ba332d5c9e3411887d1eb2d02dcdb14c0863",
@@ -1941,5 +2049,633 @@
   "trainingReferenceData": {
     "source": "training/quick-tips-data.json",
     "sha256": "11cb06c43900f6d085cecde06ce8dd033a7f2b152888dbdb66248fc92d17492e"
-  }
+  },
+  "trainingManualContent": [
+    {
+      "source": "training/customer-service.html",
+      "bodySha256": "bd75d8103d530f0d72ecd8b9b1ca9c4a4c3e5b5944c4a8e68014f855bd517013",
+      "links": [
+        [
+          "/staff-dashboard.html",
+          "Dashboard"
+        ],
+        [
+          "/staff-dashboard.html#training",
+          "Training"
+        ],
+        [
+          "#foreword",
+          "Foreword from Leadership"
+        ],
+        [
+          "#part1",
+          "Part I: Welcome & Industry Overview"
+        ],
+        [
+          "#chapter1",
+          "Chapter 1: Our Story, Mission & Values"
+        ],
+        [
+          "#chapter2",
+          "Chapter 2: Industry Overview"
+        ],
+        [
+          "#part2",
+          "Part II: Decoration Technologies"
+        ],
+        [
+          "#embroidery",
+          "Embroidery"
+        ],
+        [
+          "#dtg",
+          "DTG (Direct to Garment)"
+        ],
+        [
+          "#screen-printing",
+          "Screen Printing"
+        ],
+        [
+          "#dtf",
+          "DTF (Direct to Film)"
+        ],
+        [
+          "#laser",
+          "Laser Engraving"
+        ],
+        [
+          "#stickers",
+          "Stickers & Promotional Items"
+        ],
+        [
+          "#part3",
+          "Part III: Sales Process & Customer Service"
+        ],
+        [
+          "#chapter3",
+          "Chapter 3: Sales Journey"
+        ],
+        [
+          "#part4",
+          "Part IV: Operational Workflow"
+        ],
+        [
+          "#chapter4",
+          "Chapter 4: Standard Procedures"
+        ],
+        [
+          "#part5",
+          "Part V: Company Policies"
+        ],
+        [
+          "#chapter5",
+          "Chapter 5: HR & Company Policies"
+        ],
+        [
+          "#part6",
+          "Part VI: Resources & Reference"
+        ],
+        [
+          "#resources",
+          "Chapter 6: Resources"
+        ]
+      ],
+      "ids": [
+        "foreword",
+        "part1",
+        "chapter1",
+        "chapter2",
+        "part2",
+        "embroidery",
+        "dtg",
+        "screen-printing",
+        "dtf",
+        "laser",
+        "stickers",
+        "part3",
+        "chapter3",
+        "part4",
+        "chapter4",
+        "part5",
+        "chapter5",
+        "part6",
+        "resources",
+        "dtf-reference",
+        "laser-reference",
+        "stickers-reference",
+        "sales-process",
+        "pricing",
+        "customer-files",
+        "garment-info",
+        "production",
+        "ordering",
+        "shipping",
+        "qa",
+        "marketing",
+        "customer-comm",
+        "key-takeaways",
+        "conclusion"
+      ],
+      "media": [
+        [
+          "IMG",
+          "https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1",
+          "Northwest Custom Apparel",
+          null
+        ]
+      ],
+      "fields": []
+    },
+    {
+      "source": "training/get-to-know-erik.html",
+      "bodySha256": "5495d092111159e2cb0a4219ff0123a1e31040be039577e236b440388b97c5eb",
+      "links": [
+        [
+          "/staff-dashboard.html",
+          "Back to Dashboard"
+        ]
+      ],
+      "ids": [
+        "training-panel-bio-1",
+        "training-panel-bio-2",
+        "training-panel-bio-3",
+        "training-panel-bio-4",
+        "training-panel-bio-5",
+        "training-panel-bio-6",
+        "training-panel-bio-7",
+        "training-panel-bio-8",
+        "training-panel-bio-9"
+      ],
+      "media": [
+        [
+          "IMG",
+          "https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1",
+          "Northwest Custom Apparel",
+          null
+        ],
+        [
+          "IFRAME",
+          "https://www.youtube.com/embed/o2PC4CTSQko",
+          null,
+          "Getting to Know Erik Mickelson"
+        ],
+        [
+          "IMG",
+          "https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1",
+          "Northwest Custom Apparel",
+          null
+        ]
+      ],
+      "fields": []
+    },
+    {
+      "source": "training/sales-coordinator-manual.html",
+      "bodySha256": "63b1931f61e56626420f816c4ec37a42c07ce87af71bd461b6575958e20b6bed",
+      "links": [
+        [
+          "/staff-dashboard.html",
+          "Dashboard"
+        ],
+        [
+          "/staff-dashboard.html#training",
+          "Training"
+        ],
+        [
+          "#foreword",
+          "Foreword: Message from Leadership"
+        ],
+        [
+          "#chapter1",
+          "Chapter 1: Our Company & Your Role"
+        ],
+        [
+          "#chapter2",
+          "Chapter 2: The Decorated Apparel Industry"
+        ],
+        [
+          "#chapter3",
+          "Chapter 3: How We Work Together"
+        ],
+        [
+          "#chapter4",
+          "Chapter 4: From First Call to Final Invoice"
+        ],
+        [
+          "#chapter5",
+          "Chapter 5: The Art of the Work Order"
+        ],
+        [
+          "#chapter6",
+          "Chapter 6: A Look Inside the Factory"
+        ],
+        [
+          "#chapter7",
+          "Chapter 7: Shipping and Receiving"
+        ],
+        [
+          "#chapter8",
+          "Chapter 8: The Final Steps: Shipping and Receiving"
+        ],
+        [
+          "#chapter9",
+          "Chapter 9: Embroidery - The Gold Standard"
+        ],
+        [
+          "#chapter10",
+          "Chapter 10: DTG & DTF - Digital Powerhouses"
+        ],
+        [
+          "#chapter11",
+          "Chapter 11: Screen Printing - Volume Champion"
+        ],
+        [
+          "#chapter12",
+          "Chapter 12: Emblems & Patches"
+        ],
+        [
+          "#chapter13",
+          "Chapter 13: Our Core Products"
+        ],
+        [
+          "#chapter14",
+          "Chapter 14: Our Artwork Style"
+        ],
+        [
+          "#chapter15",
+          "Chapter 15: Artwork - The Foundation"
+        ],
+        [
+          "#chapter16",
+          "Chapter 16: The Art Form"
+        ],
+        [
+          "#chapter17",
+          "Chapter 17: The 3 Touch Print Play"
+        ],
+        [
+          "#chapter18",
+          "Chapter 18: Critical Sales & Service Policies"
+        ],
+        [
+          "#chapter19",
+          "Chapter 19: Conflict Resolution & De-escalation"
+        ],
+        [
+          "#chapter20",
+          "Chapter 20: Economics of Customer Loyalty"
+        ],
+        [
+          "#chapter21",
+          "Chapter 21: The Retention Playbook"
+        ],
+        [
+          "#chapter22",
+          "Chapter 22: Account Classification"
+        ],
+        [
+          "#chapter23",
+          "Chapter 23: Pack-and-Hold Program"
+        ],
+        [
+          "#chapter24",
+          "Chapter 24: Scripts for Success"
+        ],
+        [
+          "#chapter25",
+          "Chapter 25: The Appointment System"
+        ],
+        [
+          "#chapter26",
+          "Chapter 26: Mastering Your Tools"
+        ],
+        [
+          "#chapter27",
+          "Chapter 27: Google Review Program"
+        ],
+        [
+          "#chapter28",
+          "Chapter 28: Beyond the Quote"
+        ],
+        [
+          "#chapter29",
+          "Chapter 29: Your KPIs"
+        ],
+        [
+          "#chapter30",
+          "Chapter 30: Professional Standards"
+        ],
+        [
+          "#chapter31",
+          "Chapter 31: Flex Time Policy"
+        ],
+        [
+          "#chapter32",
+          "Chapter 32: Your Success & Our Success"
+        ],
+        [
+          "#chapter33",
+          "Chapter 33: Your First 90 Days"
+        ],
+        [
+          "#chapter34",
+          "Chapter 34: Story of the T-Shirt"
+        ],
+        [
+          "#chapter35",
+          "Chapter 35: Leapfrog Marketing"
+        ],
+        [
+          "#chapter36",
+          "Chapter 36: Getting Customers to Love You"
+        ],
+        [
+          "#chapter37",
+          "Chapter 37: Customer Service Salesperson"
+        ],
+        [
+          "#chapter38",
+          "Chapter 38: Art and Science of Pricing"
+        ],
+        [
+          "#chapter39",
+          "Chapter 39: Lead-Processing Model"
+        ],
+        [
+          "#chapter40",
+          "Chapter 40: Customer Evolution"
+        ],
+        [
+          "#chapter41",
+          "Chapter 41: Thinking Like an Owner"
+        ],
+        [
+          "#chapter42",
+          "Chapter 42: Welcome to the Family"
+        ],
+        [
+          "#chapter43",
+          "Chapter 43: Meet the Staff"
+        ]
+      ],
+      "ids": [
+        "foreword",
+        "chapter1",
+        "chapter2",
+        "chapter3",
+        "chapter4",
+        "chapter5",
+        "chapter6",
+        "chapter7",
+        "chapter8",
+        "chapter9",
+        "chapter10",
+        "chapter11",
+        "chapter12",
+        "chapter13",
+        "chapter14",
+        "chapter15",
+        "chapter16",
+        "chapter17",
+        "chapter18",
+        "chapter19",
+        "chapter20",
+        "chapter21",
+        "chapter22",
+        "chapter23",
+        "chapter24",
+        "chapter25",
+        "chapter26",
+        "chapter27",
+        "chapter28",
+        "chapter29",
+        "chapter30",
+        "chapter31",
+        "chapter32",
+        "chapter33",
+        "chapter34",
+        "chapter35",
+        "chapter36",
+        "chapter37",
+        "chapter38",
+        "chapter39",
+        "chapter40",
+        "chapter41",
+        "chapter42",
+        "chapter43",
+        "staffRosterTable",
+        "staffRosterBody",
+        "celebrationsWidget"
+      ],
+      "media": [
+        [
+          "IMG",
+          "https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1",
+          "Northwest Custom Apparel",
+          null
+        ]
+      ],
+      "fields": []
+    },
+    {
+      "source": "training/sales-coordinator-training-schedule.html",
+      "bodySha256": "94063df9587893a09364c0f2400939e9b78f4be7cd0c248ec5bba6d8c6215ccd",
+      "links": [
+        [
+          "/staff-dashboard.html",
+          "Dashboard"
+        ],
+        [
+          "/staff-dashboard.html#training",
+          "Training"
+        ],
+        [
+          "#day1",
+          "Day 1: Welcome, Orientation & Setup"
+        ],
+        [
+          "#day2",
+          "Day 2: Workstation Setup"
+        ],
+        [
+          "#day3",
+          "Day 3: Shopworks Fundamentals"
+        ],
+        [
+          "#day4",
+          "Day 4: Practical Shopworks"
+        ],
+        [
+          "#day5",
+          "Day 5: Advanced Shopworks"
+        ],
+        [
+          "#day6",
+          "Day 6: Order Entry Efficiency"
+        ],
+        [
+          "#day7",
+          "Day 7: Factory Training/Artwork"
+        ],
+        [
+          "#day8",
+          "Day 8: Job Shadow Nika Day 1"
+        ],
+        [
+          "#day9",
+          "Day 9: Job Shadow Nika Day 2"
+        ],
+        [
+          "#day10",
+          "Day 10: Full Work Day (8-25-25)"
+        ],
+        [
+          "#notes-game",
+          "Notes Training Game"
+        ],
+        [
+          "#log",
+          "Training Log & Action Items"
+        ],
+        [
+          "https://slack.com/downloads",
+          "slack.com/downloads"
+        ],
+        [
+          "https://www.grammarly.com/desktop",
+          "Grammarly for Windows"
+        ],
+        [
+          "https://www.youtube.com/watch?v=hnu_21V_H8s",
+          "YouTube: How to Use Grammarly in Microsoft Word"
+        ],
+        [
+          "https://www.youtube.com/watch?v=k-C5_iY6p-c",
+          "YouTube: Getting Started with GrammarlyGO"
+        ],
+        [
+          "https://www.canva.com/designschool/",
+          "Canva Design School"
+        ],
+        [
+          "https://www.goto.com/download",
+          "GoTo Download Center"
+        ],
+        [
+          "https://www.goto.com/connect",
+          "goto.com/connect"
+        ],
+        [
+          "https://support.goto.com/connect",
+          "Support & Training Center"
+        ],
+        [
+          "https://www.youtube.com/watch?v=A_s-14Ie2_s",
+          "Polycom IP 650 Video Tutorial"
+        ],
+        [
+          "https://support.polycom.com/content/dam/polycom-support/products/voice/soundpoint-ip/user-guides/en/soundpoint-ip-650-user-guide-sip-3-2.pdf",
+          "Official User Guide"
+        ],
+        [
+          "https://www.youtube.com/watch?v=s_4D2-d3-hA",
+          "Epson ET-2850 Video Guide"
+        ],
+        [
+          "https://epson.com/support/ecotank-et-2850",
+          "Official Epson ET-2850 Support & Manuals Page"
+        ],
+        [
+          "https://g.co/gemini/share/beb4aa8a998b",
+          "Barnaby's Big Stitch"
+        ]
+      ],
+      "ids": [
+        "day1",
+        "day2",
+        "day3",
+        "day4",
+        "day5",
+        "log",
+        "day6",
+        "day7",
+        "day8",
+        "day9",
+        "day10",
+        "notes-game",
+        "practice1",
+        "feedback1",
+        "practice2",
+        "feedback2",
+        "practice3",
+        "feedback3"
+      ],
+      "media": [
+        [
+          "IMG",
+          "https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1",
+          "Northwest Custom Apparel",
+          null
+        ],
+        [
+          "IMG",
+          "https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9092941",
+          "Shopworks Help Button Screenshot",
+          null
+        ],
+        [
+          "IMG",
+          "https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9092945",
+          "Shopworks Help Menu Screenshot",
+          null
+        ],
+        [
+          "IMG",
+          "https://cdn.caspio.com/A0E15000/Safety%20Stripes/Basics%20for%20Using%20Onsite.png?ver=1",
+          "Screenshot of the Shopworks video page for System Navigation and Basics",
+          null
+        ],
+        [
+          "IMG",
+          "https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9092997",
+          "Screenshot of the Shopworks video page for Order Entry Basics",
+          null
+        ],
+        [
+          "IMG",
+          "https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9093022",
+          "Screenshot of the Shopworks video page for Adding and Editing Customers",
+          null
+        ]
+      ],
+      "fields": [
+        {
+          "id": "practice1",
+          "type": "textarea",
+          "value": ""
+        },
+        {
+          "id": "practice2",
+          "type": "textarea",
+          "value": ""
+        },
+        {
+          "id": "practice3",
+          "type": "textarea",
+          "value": ""
+        }
+      ]
+    }
+  ],
+  "trainingManualData": [
+    {
+      "source": "training/js/sales-coordinator-manual.js",
+      "key": "employees",
+      "sha256": "35bba5e0c0d2844499c24ce828852726ee24b73f5e11a073ad237122d76224a4"
+    },
+    {
+      "source": "training/js/sales-coordinator-training-schedule.js",
+      "key": "scenarios",
+      "sha256": "858e905a4b09c348e68f326dcfa74d25403f458104a963d4dbb98d352471f1d7"
+    }
+  ]
 }

@@ -1,714 +1,155 @@
-/* customer-service.css — page styles (extracted from inline \3c style>, 2026.09.05.7) */
-
-/* ── moved from inline \3c style> in training/customer-service.html (Rule 3, 2026.09.05.7) ── */
-
-/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue, merged into its
-   existing :root. Map them to shared_components/css/tokens.css names when the page is redesigned;
-   raw hex is allowed ONLY in this block. */
-/* stylelint-disable color-no-hex */
-:root {
-    --page-green-2: #2e7d32;
-            --primary-color: var(--brand-500);
-            --primary-dark: var(--brand-600);
-            --primary-light: var(--brand-400);
-            --bg-color: var(--color-bradley-tint);
-            --card-bg: var(--color-surface);
-            --border-color: var(--gray-200);
-            --text-primary: var(--gray-800);
-            --text-secondary: var(--gray-500);
-            --hover-bg: var(--gray-100);
-            --success-bg: var(--emerald-100);
-            --success-text: var(--emerald-800);
-            --warning-bg: var(--amber-100);
-            --warning-text: var(--amber-800);
-        }
-/* stylelint-enable color-no-hex */
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: Inter, sans-serif;
-            background: var(--bg-color);
-            color: var(--text-primary);
-            line-height: 1.6;
-        }
-
-        /* Header */
-        .header {
-            background: var(--card-bg);
-            border-bottom: 1px solid var(--border-color);
-            padding: 1rem 0;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: 0 1px 3px rgb(0 0 0 / 5%);
-        }
-
-        .header-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo {
-            height: 40px;
-            width: auto;
-        }
-
-        .breadcrumb {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: var(--text-secondary);
-            font-size: 0.875rem;
-        }
-
-        .breadcrumb a {
-            color: var(--primary-color);
-            text-decoration: none;
-            font-weight: 500;
-        }
-
-        /* Main Container */
-        .container {
-            max-width: 1200px;
-            margin: 2rem auto;
-            padding: 0 2rem;
-            display: grid;
-            grid-template-columns: 300px 1fr;
-            gap: 2rem;
-        }
-
-        /* Table of Contents */
-        .toc {
-            background: var(--card-bg);
-            border-radius: 8px;
-            padding: 1.5rem;
-            box-shadow: 0 1px 3px rgb(0 0 0 / 10%);
-            position: sticky;
-            top: 100px;
-            height: fit-content;
-            max-height: calc(100vh - 120px);
-            overflow-y: auto;
-        }
-
-        .toc-title {
-            font-size: 1.125rem;
-            font-weight: 600;
-            margin-bottom: 1rem;
-            color: var(--text-primary);
-        }
-
-        .toc-list {
-            list-style: none;
-        }
-
-        .toc-item {
-            margin-bottom: 0.5rem;
-        }
-
-        .toc-link {
-            color: var(--text-secondary);
-            text-decoration: none;
-            font-size: 0.875rem;
-            display: block;
-            padding: 0.5rem;
-            border-radius: 4px;
-            transition: all 0.2s;
-        }
-
-        .toc-link:hover {
-            background: var(--hover-bg);
-            color: var(--primary-color);
-            padding-left: 1rem;
-        }
-
-        .toc-link.active {
-            background: var(--primary-light);
-            color: white;
-            font-weight: 500;
-        }
-
-        /* Content */
-        .content {
-            background: var(--card-bg);
-            border-radius: 8px;
-            padding: 2rem;
-            box-shadow: 0 1px 3px rgb(0 0 0 / 10%);
-        }
-
-        h1 {
-            font-size: 2.5rem;
-            color: var(--primary-color);
-            margin-bottom: 2rem;
-            font-weight: 700;
-        }
-
-        h2 {
-            font-size: 1.875rem;
-            color: var(--text-primary);
-            margin-top: 3rem;
-            margin-bottom: 1.5rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 2px solid var(--border-color);
-        }
-
-        h3 {
-            font-size: 1.5rem;
-            color: var(--text-primary);
-            margin-top: 2rem;
-            margin-bottom: 1rem;
-        }
-
-        h4 {
-            font-size: 1.25rem;
-            color: var(--text-primary);
-            margin-top: 1.5rem;
-            margin-bottom: 0.75rem;
-            font-weight: 600;
-        }
-
-        p {
-            margin-bottom: 1rem;
-            line-height: 1.7;
-        }
-
-        ul, ol {
-            margin-bottom: 1rem;
-            padding-left: 2rem;
-        }
-
-        li {
-            margin-bottom: 0.5rem;
-        }
-
-        strong {
-            color: var(--text-primary);
-            font-weight: 600;
-        }
-
-        .highlight-box {
-            background: var(--success-bg);
-            border-left: 4px solid var(--primary-color);
-            padding: 1rem;
-            margin: 1rem 0;
-            border-radius: 4px;
-        }
-
-        .warning-box {
-            background: var(--warning-bg);
-            border-left: 4px solid var(--amber-500);
-            padding: 1rem;
-            margin: 1rem 0;
-            border-radius: 4px;
-        }
-
-        .info-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 1rem 0;
-        }
-
-        .info-table th,
-        .info-table td {
-            padding: 0.75rem;
-            text-align: left;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .info-table th {
-            background: var(--hover-bg);
-            font-weight: 600;
-        }
-
-        .info-table tr:hover {
-            background: var(--hover-bg);
-        }
-
-        /* Responsive */
-        @media (width <= 768px) {
-            .container {
-                grid-template-columns: 1fr;
-            }
-
-            .toc {
-                position: static;
-                margin-bottom: 2rem;
-            }
-
-            .content {
-                padding: 1.5rem;
-            }
-        }
-
-        /* Industry Wisdom Callouts */
-        .industry-wisdom {
-            background: linear-gradient(135deg, var(--brand-100) 0%, var(--color-steve-tint) 100%);
-            border-left: 4px solid var(--brand-500);
-            padding: 1.5rem;
-            margin: 2rem 0;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgb(76 175 80 / 10%);
-        }
-
-        .industry-wisdom h4 {
-            color: var(--page-green-2);
-            margin-top: 0;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .industry-wisdom p {
-            font-style: italic;
-            color: var(--material-green-900);
-            margin: 0;
-            font-size: 1.1rem;
-        }
-
-        /* Comparison Table */
-        .comparison-table {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2rem;
-            margin: 2rem 0;
-        }
-
-        .comparison-column {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgb(0 0 0 / 10%);
-        }
-
-        .comparison-column h5 {
-            margin-top: 0;
-            font-size: 1.25rem;
-        }
-
-        .comparison-column ul {
-            list-style: none;
-            padding: 0;
-        }
-
-        .comparison-column li {
-            padding: 0.5rem 0;
-            border-bottom: 1px solid var(--brand-100);
-        }
-
-        .comparison-column li:last-child {
-            border-bottom: none;
-        }
-
-        /* Two Column List */
+@layer components.pages {
+    :where([data-ui="unified"][data-training-manual="customer-service"])
+        .values-container,
+    :where([data-ui="unified"][data-training-manual="customer-service"])
+        .vision-container,
+    :where([data-ui="unified"][data-training-manual="customer-service"])
+        .comparison-table,
+    :where([data-ui="unified"][data-training-manual="customer-service"])
         .two-column-list {
-            margin: 1rem 0;
-        }
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: var(--space-5);
+        margin-block: var(--space-6);
+    }
 
-        .two-column-list ol {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-            counter-reset: list-counter;
-            padding-left: 0;
-            list-style: none;
-        }
-
-        .two-column-list li {
-            counter-increment: list-counter;
-            display: flex;
-            align-items: baseline;
-        }
-
-        .two-column-list li::before {
-            content: counter(list-counter) ". ";
-            font-weight: bold;
-            margin-right: 0.5rem;
-            color: var(--primary-color);
-        }
-
-        /* Values Container */
-        .values-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
-            margin: 2rem 0;
-        }
-
-        .value-card {
-            background: white;
-            border-radius: 12px;
-            padding: 1.5rem;
-            box-shadow: 0 4px 12px rgb(0 0 0 / 8%);
-            border-top: 4px solid var(--primary-color);
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .value-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 20px rgb(0 0 0 / 12%);
-        }
-
-        .value-number {
-            background: var(--primary-color);
-            color: white;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 1.2rem;
-            margin-bottom: 1rem;
-        }
-
-        .value-card h5 {
-            color: var(--text-primary);
-            font-size: 1.5rem;
-            margin: 0.5rem 0;
-        }
-
-        .value-card > p {
-            color: var(--text-secondary);
-            margin: 1rem 0;
-            line-height: 1.6;
-        }
-
-        .value-examples {
-            margin-top: 1rem;
-            padding-top: 1rem;
-            border-top: 1px solid var(--border-color);
-        }
-
-        .value-examples strong {
-            color: var(--primary-color);
-            display: block;
-            margin-bottom: 0.5rem;
-        }
-
-        .value-examples ul {
-            list-style: none;
-            padding: 0;
-        }
-
-        .value-examples li {
-            padding: 0.25rem 0;
-            padding-left: 1.5rem;
-            position: relative;
-        }
-
-        .value-examples li::before {
-            content: "✓";
-            position: absolute;
-            left: 0;
-            color: var(--primary-color);
-            font-weight: bold;
-        }
-
-        /* Vision Container and Cards */
-        .vision-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            margin: 2rem 0;
-        }
-
-        .vision-card {
-            background: linear-gradient(135deg, var(--color-surface) 0%, var(--gray-50) 100%);
-            border-radius: 12px;
-            padding: 2rem;
-            box-shadow: 0 4px 12px rgb(0 0 0 / 8%);
-            transition: all 0.3s ease;
-            border: 1px solid var(--border-color);
-        }
-
-        .vision-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 24px rgb(0 0 0 / 12%);
-        }
-
-        .vision-icon {
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 1.5rem;
-        }
-
-        .vision-icon i {
-            font-size: 1.5rem;
-            color: white;
-        }
-
-        .vision-card h4 {
-            color: var(--text-primary);
-            margin-bottom: 1rem;
-            font-size: 1.25rem;
-            font-weight: 600;
-        }
-
-        .vision-card p {
-            color: var(--text-secondary);
-            margin-bottom: 1.5rem;
-            line-height: 1.6;
-        }
-
-        .vision-details {
-            margin-top: 1.5rem;
-            padding-top: 1.5rem;
-            border-top: 1px solid var(--border-color);
-        }
-
-        .vision-details h5 {
-            color: var(--text-primary);
-            margin-bottom: 1rem;
-            font-size: 1rem;
-            font-weight: 600;
-        }
-
-        .vision-details ul {
-            list-style: none;
-            padding: 0;
-            margin-bottom: 1rem;
-        }
-
-        .vision-details li {
-            padding: 0.5rem 0;
-            padding-left: 1.5rem;
-            position: relative;
-            color: var(--text-secondary);
-        }
-
-        .vision-details li::before {
-            content: "→";
-            position: absolute;
-            left: 0;
-            color: var(--primary-color);
-            font-weight: bold;
-        }
-
-        .vision-inspiration {
-            background: var(--bg-color);
-            padding: 1rem;
-            border-radius: 8px;
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-            margin-top: 1rem;
-        }
-
-        /* Office Team Styles */
+    :where([data-ui="unified"][data-training-manual="customer-service"])
+        .value-card,
+    :where([data-ui="unified"][data-training-manual="customer-service"])
+        .vision-card,
+    :where([data-ui="unified"][data-training-manual="customer-service"])
         .role-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 2rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 2px 8px rgb(0 0 0 / 5%);
-            transition: all 0.3s ease;
-        }
+        padding: var(--space-5);
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-sm);
+        min-width: 0;
+    }
 
-        .role-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 16px rgb(0 0 0 / 10%);
-        }
-
-        .role-header {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
+    :where([data-ui="unified"][data-training-manual="customer-service"])
+        .value-number,
+    :where([data-ui="unified"][data-training-manual="customer-service"])
+        .vision-icon,
+    :where([data-ui="unified"][data-training-manual="customer-service"])
         .role-icon {
-            width: 50px;
-            height: 50px;
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 1.25rem;
-        }
+        color: var(--ui-accent);
+        font-size: var(--font-size-2xl);
+        font-weight: var(--font-weight-semibold);
+    }
 
-        .role-title h4 {
-            margin: 0;
-            color: var(--text-primary);
-            font-size: 1.25rem;
-            font-weight: 600;
-        }
-
-        .role-subtitle {
-            color: var(--text-secondary);
-            font-size: 0.875rem;
-            margin-top: 0.25rem;
-        }
-
+    :where([data-ui="unified"][data-training-manual="customer-service"])
+        .value-examples,
+    :where([data-ui="unified"][data-training-manual="customer-service"])
+        .vision-details,
+    :where([data-ui="unified"][data-training-manual="customer-service"])
+        .vision-inspiration,
+    :where([data-ui="unified"][data-training-manual="customer-service"])
         .role-section {
-            margin-top: 1.5rem;
-        }
+        margin-block-start: var(--space-4);
+    }
 
-        .role-section h5 {
-            color: var(--text-primary);
-            margin-bottom: 0.75rem;
-            font-size: 1rem;
-            font-weight: 600;
-        }
+    :where([data-ui="unified"][data-training-manual="customer-service"])
+        .role-card {
+        margin-block: var(--space-5);
+    }
 
-        .workflow-diagram {
-            background: linear-gradient(135deg, var(--gray-50) 0%, var(--color-surface) 100%);
-            border-radius: 12px;
-            padding: 2rem;
-            margin: 2rem 0;
-            text-align: center;
-            border: 1px solid var(--border-color);
-        }
+    :where([data-ui="unified"][data-training-manual="customer-service"])
+        .role-header {
+        display: flex;
+        gap: var(--space-4);
+        align-items: baseline;
+    }
 
-        .workflow-step {
-            display: inline-block;
-            padding: 1rem 1.5rem;
-            background: var(--primary-color);
-            color: white;
-            border-radius: 8px;
-            margin: 0.5rem;
-            font-weight: 500;
-        }
-
-        .workflow-arrow {
-            display: inline-block;
-            margin: 0 1rem;
-            color: var(--primary-color);
-            font-size: 1.5rem;
-        }
-
-        .impact-metric {
-            background: linear-gradient(135deg, var(--success-bg) 0%, var(--color-surface) 100%);
-            border-left: 4px solid var(--primary-color);
-            padding: 1rem 1.5rem;
-            margin: 1rem 0;
-            border-radius: 0 8px 8px 0;
-        }
-
-        .impact-metric strong {
-            color: var(--primary-color);
-            font-size: 1.125rem;
-        }
-
-        .team-philosophy {
-            background: linear-gradient(135deg, var(--red-50) 0%, var(--gray-50) 100%);
-            border: 1px solid var(--amber-100);
-            border-radius: 12px;
-            padding: 2rem;
-            margin: 2rem 0;
-            text-align: center;
-        }
-
-        .team-philosophy h4 {
-            color: var(--text-primary);
-            margin-bottom: 1rem;
-        }
-
-        .team-philosophy .philosophy-quote {
-            font-size: 1.125rem;
-            font-style: italic;
-            color: var(--text-secondary);
-            margin: 1rem 0;
-        }
-
-        /* Timeline Styles */
-        .timeline {
-            position: relative;
-            padding-left: 2rem;
-            margin: 2rem 0;
-        }
-
-        .timeline::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 2px;
-            background: var(--primary-color);
-        }
-
-        .timeline-item {
-            position: relative;
-            padding-bottom: 2rem;
-        }
-
-        .timeline-item::before {
-            content: '';
-            position: absolute;
-            left: -2.5rem;
-            top: 0.5rem;
-            width: 12px;
-            height: 12px;
-            background: var(--primary-color);
-            border-radius: 50%;
-            border: 3px solid white;
-            box-shadow: 0 2px 4px rgb(0 0 0 / 20%);
-        }
-
+    :where([data-ui="unified"][data-training-manual="customer-service"])
+        .role-subtitle,
+    :where([data-ui="unified"][data-training-manual="customer-service"])
         .timeline-date {
-            display: inline-block;
-            background: var(--primary-color);
-            color: white;
-            padding: 0.25rem 0.75rem;
-            border-radius: 4px;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-training-manual="customer-service"])
+        .team-philosophy,
+    :where([data-ui="unified"][data-training-manual="customer-service"])
+        .industry-wisdom {
+        margin-block: var(--space-5);
+        padding-inline-start: var(--space-5);
+        border-inline-start: 3px solid var(--ui-accent);
+    }
+
+    :where([data-ui="unified"][data-training-manual="customer-service"])
+        .philosophy-quote {
+        font-size: var(--font-size-lg);
+    }
+
+    :where([data-ui="unified"][data-training-manual="customer-service"])
+        .workflow-diagram {
+        margin-block: var(--space-5);
+    }
+
+    :where([data-ui="unified"][data-training-manual="customer-service"])
+        .workflow-step {
+        padding: var(--space-4);
+        border-block-end: 1px solid var(--ui-line);
+    }
+
+    :where([data-ui="unified"][data-training-manual="customer-service"])
+        .workflow-arrow {
+        color: var(--ui-accent);
+        padding-inline: var(--space-4);
+    }
+
+    :where([data-ui="unified"][data-training-manual="customer-service"])
+        .impact-metric {
+        color: var(--ui-accent);
+        font-weight: var(--font-weight-semibold);
+    }
+
+    :where([data-ui="unified"][data-training-manual="customer-service"])
+        .timeline {
+        margin-block: var(--space-5);
+        padding-inline-start: var(--space-5);
+        border-inline-start: 2px solid var(--ui-line);
+    }
+
+    :where([data-ui="unified"][data-training-manual="customer-service"])
+        .timeline-item
+        + .timeline-item {
+        margin-block-start: var(--space-5);
+    }
+
+    @media (width < 900px) {
+        :where([data-ui="unified"][data-training-manual="customer-service"])
+            .values-container,
+        :where([data-ui="unified"][data-training-manual="customer-service"])
+            .vision-container,
+        :where([data-ui="unified"][data-training-manual="customer-service"])
+            .comparison-table,
+        :where([data-ui="unified"][data-training-manual="customer-service"])
+            .two-column-list {
+            grid-template-columns: minmax(0, 1fr);
+        }
+    }
+
+    @media print {
+        :where([data-ui="unified"][data-training-manual="customer-service"])
+            .value-card,
+        :where([data-ui="unified"][data-training-manual="customer-service"])
+            .vision-card,
+        :where([data-ui="unified"][data-training-manual="customer-service"])
+            .role-card {
+            padding: 8pt;
+            break-inside: avoid;
         }
 
-        .timeline-item h5 {
-            margin: 0.5rem 0;
-            color: var(--text-primary);
+        :where([data-ui="unified"][data-training-manual="customer-service"])
+            .values-container,
+        :where([data-ui="unified"][data-training-manual="customer-service"])
+            .vision-container,
+        :where([data-ui="unified"][data-training-manual="customer-service"])
+            .comparison-table,
+        :where([data-ui="unified"][data-training-manual="customer-service"])
+            .two-column-list {
+            gap: 8pt;
+            margin-block: 8pt;
         }
-
-        .timeline-item ul {
-            margin: 0.5rem 0;
-            padding-left: 1.5rem;
-        }
-
-        .timeline-item li {
-            margin: 0.25rem 0;
-            color: var(--text-secondary);
-        }
-
-        @media (width <= 768px) {
-            .comparison-table {
-                grid-template-columns: 1fr;
-            }
-            
-            .two-column-list ol {
-                grid-template-columns: 1fr;
-            }
-        }
-
-/* Phone (≤640px) — 2026-09-05 staff-dashboard sweep: the page measured wider than the
-   viewport at 375px and panned sideways. */
-@media (width <= 640px) {
-    .toc { position: static; width: auto; max-width: 100%; max-height: none; }
-}
-
-@media (width <= 768px) {
-    /* The page grid track was sized by the TOC's nowrap title (521px) and widened the phone viewport. */
-    .container { grid-template-columns: minmax(0, 1fr); }
-    .toc-title, .toc-link { white-space: normal; }
-}
-
-@media (width <= 768px) {
-    /* Reference tables inside the article scroll in place instead of widening the page. */
-    .content table { display: block; overflow-x: auto; max-width: 100%; -webkit-overflow-scrolling: touch; }
+    }
 }
