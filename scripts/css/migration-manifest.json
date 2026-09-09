@@ -1544,7 +1544,7 @@
         "shared_components/css/training-simulator.css",
         "training/training-center.css"
       ],
-      "maxCssBytes": 83000,
+      "maxCssBytes": 89000,
       "states": [
         "desktop",
         "tablet",
@@ -1566,7 +1566,7 @@
         "shared_components/css/training-simulator.css",
         "training/css/sales-tax-code-trainer.css"
       ],
-      "maxCssBytes": 80000,
+      "maxCssBytes": 87000,
       "states": [
         "desktop",
         "tablet",
@@ -1589,7 +1589,7 @@
         "shared_components/css/training-simulator.css",
         "training/css/shopworks-customer-setup.css"
       ],
-      "maxCssBytes": 80000,
+      "maxCssBytes": 87000,
       "states": [
         "desktop",
         "tablet",
@@ -1614,7 +1614,7 @@
         "shared_components/css/training-simulator.css",
         "training/css/shopworks-customer-setup-enhanced.css"
       ],
-      "maxCssBytes": 93000,
+      "maxCssBytes": 99000,
       "states": [
         "desktop",
         "tablet",

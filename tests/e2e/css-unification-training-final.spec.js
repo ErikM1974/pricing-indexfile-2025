@@ -35,6 +35,25 @@ const clean = (s) => {
     expect(s.errors).toEqual([]);
     expect(s.writes).toEqual([]);
 };
+
+for (const name of names) test('CSS final training: ' + name + ' prints a compact complete active view', async ({ page }) => {
+    await page.addInitScript(() => Math.random = () => 0);
+    const state = await open(page, name);
+    if (name === 'sales-tax-code-trainer') await page.getByRole('button', { name: 'Start Training', exact: true }).click();
+    if (name === 'shopworks-customer-setup') await page.getByRole('button', { name: /Field Explorer Learn/ }).click();
+    if (name.endsWith('enhanced')) await page.getByRole('button', { name: 'Setup Simulator', exact: true }).click();
+    const values = () => page.locator('input,select').evaluateAll(fields => fields.map(field => [field.id, field.value]));
+    const before = await values();
+    await page.emulateMedia({ media: 'print' });
+    await expect(page.locator('.training-page-header nav')).toBeHidden();
+    const pdf = await page.pdf({ path: path.join(output, 'training-final-' + name + '.pdf'), preferCSSPageSize: true, printBackground: true });
+    const count = (pdf.toString('latin1').match(/\/Type\s*\/Page(?=\s|\/|>)/g) || []).length;
+    const max = name === 'index' || name.endsWith('enhanced') ? 3 : 1;
+    expect(count).toBeGreaterThan(0); expect(count).toBeLessThanOrEqual(max);
+    await page.emulateMedia({ media: 'screen' });
+    expect(await values()).toEqual(before);
+    clean(state);
+});
 const axe = async (page) =>
     expect(
         (await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa']).analyze()).violations,

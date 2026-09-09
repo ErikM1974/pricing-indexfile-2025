@@ -111,5 +111,5 @@
 - `tests/e2e/css-unification-training-reference.spec.js` — responsive/axe, cap content, quick-tip search/errors/rich text, shared checklist storage/navigation and real PDF coverage.
 - `tests/e2e/css-unification-training-manual.spec.js` — responsive/axe, all manual/day sections, keyboard disclosures, practice/roster and complete PDF state restoration.
 
-- `tests/e2e/css-unification-training-final.spec.js` — 17 mocked checks: final four training pages, responsive/axe, every mode, native dialogs, complete/restarted rounds, live-list retry and storage/timer failures.
+- `tests/e2e/css-unification-training-final.spec.js` — 21 mocked checks: final four training pages, responsive/axe, every mode, native dialogs, complete/restarted rounds, live-list retry, storage/timer failures and compact real PDF output.
 - `tests/unit/training-final-content.test.js` + `tests/fixtures/training-final-original-content.json` — original course literals, prose, fields/options and navigation.
