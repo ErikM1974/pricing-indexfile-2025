@@ -768,3 +768,7 @@ Intake4 and hosted staff tools5 are reviewed and now integrated on primary devel
 ## Administrative ownership correction before release — 2026-09-09
 
 Final design-rule audit caught inherited announcement maroon. DESIGN_COLOUR_CODE reserves that accent for AE chrome; both administrative wrappers now use existing neutral ink tokens, while vendor wrappers retain Bradley slate. Controller/provider contracts remain unchanged. Combined full run was intentionally stopped after deterministic checks passed so the final source can be retested; no completed browser gate claimed.
+
+## Nine-page release checks complete — v2026.09.09.10
+
+Tested source7b8f8f3bd0ca5256f3426cf9f94be51ee61ef8a9. Build/lint/types,485 routes/24modules,221 unit suites/5232 passed/four existing skips,88DOM,4accessibility unit,84quote parity,456mocked browser and16remaining browser/three optional screenshot skips;all five calculator surfaces. 293 CSS lint clean,HTTP boot200,production audit zero. Intake14 and hosted20 focused browser cases;9 reference PDFs retain332checked nodes. Original nine intake/announcement controllers and provider IDs preserved; eight obsolete CSS owners retired. Public lookup anchored; queue age warning uses readable semantic ink; test mocks/date/poll clocks deterministic.24 repeated age/poll and9menu/warning cases passed. Candidatev2026.09.09.10 consolidates unreleased .8/.9. Exact-source CI and actual rollout remain; live117/108 until verified126/99.
