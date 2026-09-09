@@ -725,3 +725,14 @@ Three original desktop/phone views captured with synthetic Caspio reports; both 
 SanMar vendor portal wrappers: three pages use canonical navigation/typography/Bradley purchasing accents and one scoped sanmar-portal-shared.css owner; the duplicate sanmar-vendor-portal.css is retired. Original invoice/credit Caspio app URLs and wrapper content remain unchanged.12 focused browser cases cover four widths, zero wrapper axe, native focus/keyboard scrolling, mocked login/empty/failure states and complete synthetic report printing; three landscape PDFs retain216 checked nodes. All provider writes blocked. Provider-owned UI styling/data remains explicitly separate; the runtime census now recognizes Jotform alongside Caspio and the external-owner backlog names all six reviewed hosted wrappers. Full release gates remain; no raw-CSS byte reduction claim.
 
 Candidate2026.09.09.9; isolated codex/vendor-portals. Three source contracts passed; broader CSS/runtime guards next.124 total local reviewed pages, but live117/108 remains until intake .8 and then vendor .9 are separately verified. Vendor release would become124/101. Do not merge vendor work into intake .8.
+
+## Hosted staff tools grouped plan — 2026-09-09
+
+Group reviewed vendor3 with the two announcement wrappers on codex/hosted-staff-tools, based on9a3191a65a8f7975ea33a54caed24a95399b045e. Their external Caspio forms/reports share the same page boundary, so consolidate the vendor arrangement into shared_components/css/hosted-workspace.css and use it for all five. This replaces two duplicate announcement sheets and the vendor-local arrangement; canonical tokens/components remain the sole control/navigation owners. Preserve exact provider IDs, all original wrapper prose/links/images and both announcement controller sources. Business data and access rules stay unchanged; all actual hosted submissions blocked in review.
+
+Design: Public Sans, white surfaces on the existing neutral canvas (#ffffff/#f3f4f6), dark ink (#1f2937), strong dividing lines (#d1d5db), semantic Bradley slate on vendor pages and existing AE burgundy on announcements. Left-aligned page heading, clear Create/Manage navigation, one hosted content area with permanent fallback and optional instructions. No repeated decorative cards around instructions. Native skip links, loading text, bounded keyboard-scroll region, and paper destinations. Apply the established application direction rather than adding another palette or control system.
+
+- [ ] Capture original two-page desktop/phone state and exact hosted/controller contracts.
+- [ ] Consolidate the five hosted page arrangements; register additions/deletions immediately.
+- [ ] Four widths/axe/keyboard/loading/failed/login/form/report/empty states and complete reference paper with provider writes blocked.
+- [ ] Update coverage/counts only after review; full primary gates, exact-source CI and verified grouped release after intake .8.
