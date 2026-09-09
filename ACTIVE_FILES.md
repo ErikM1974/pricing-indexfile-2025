@@ -76,3 +76,11 @@ Historical counts are retained as audit notes and must not be presented as curre
 - `tests/fixtures/webstore-original-content.json` — public webstore content/SEO and responsive, native navigation, FAQ and paper verification.
 - `tests/unit/webstore-content.test.js` — public webstore content/SEO and responsive, native navigation, FAQ and paper verification.
 - `tests/e2e/css-unification-webstore.spec.js` — public webstore content/SEO and responsive, native navigation, FAQ and paper verification.
+
+- `shared_components/css/storefront-shell.css` — fifteen public brand guides; shared storefront shell, preserved source content, native menu/search and responsive/paper coverage.
+- `pages/css/brand-guide.css` — fifteen public brand guides; shared storefront shell, preserved source content, native menu/search and responsive/paper coverage.
+- `pages/js/brand-guide.js` — fifteen public brand guides; shared storefront shell, preserved source content, native menu/search and responsive/paper coverage.
+- `tests/fixtures/brand-guide-original-content.json` — fifteen public brand guides; shared storefront shell, preserved source content, native menu/search and responsive/paper coverage.
+- `tests/unit/brand-guide-content.test.js` — fifteen public brand guides; shared storefront shell, preserved source content, native menu/search and responsive/paper coverage.
+- `tests/e2e/css-unification-brand-guides.spec.js` — fifteen public brand guides; shared storefront shell, preserved source content, native menu/search and responsive/paper coverage.
+- Renamed `pages/css/custom-carhartt.css` and `pages/js/custom-carhartt.js` to the brand-guide owners above; all fifteen consumers updated.

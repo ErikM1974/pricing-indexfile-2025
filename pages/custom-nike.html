@@ -20,10 +20,11 @@
     <link rel="icon" href="/favicon.ico" sizes="48x48">
     <link rel="icon" href="/favicon.png" type="image/png" sizes="48x48">
 
-    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/shared_components/css/nwca-2026-core.css?v=2026.09.07.8">
-    <link rel="stylesheet" href="/pages/css/custom-carhartt.css?v=2026.09.07.8">
+    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.09.1">
+    <link rel="stylesheet" href="/shared_components/css/storefront-shell.css?v=2026.09.09.1">
+    <link rel="stylesheet" href="/pages/css/brand-guide.css?v=2026.09.09.1">
 
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://www.teamnwca.com/"},{"@type":"ListItem","position":2,"name":"Custom Nike","item":"https://www.teamnwca.com/custom-nike"}]}</script>
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"CollectionPage","name":"Custom Nike — Embroidered for Your Team & Clients","url":"https://www.teamnwca.com/custom-nike","description":"Nike Dri-FIT polos, Club Fleece, and caps embroidered with your company logo by Northwest Custom Apparel in Milton, WA.","mainEntity":{"@type":"ItemList","itemListElement":[
@@ -48,7 +49,7 @@
         {"@type":"Question","name":"How long does an order take?","acceptedAnswer":{"@type":"Answer","text":"Typically about two weeks from proof approval, with rush options available. You always approve a stitched proof first."}}
     ]}</script>
 </head>
-<body>
+<body data-ui="unified" data-storefront="brand">
     <a class="skip-link" href="#main">Skip to content</a>
 
     <div class="util-strip">
@@ -90,7 +91,7 @@
         </div>
     </header>
 
-    <aside class="sidebar" id="sidebar" aria-label="Browse menu">
+    <dialog class="sidebar" id="sidebar" aria-label="Browse menu">
         <div class="drawer-head">
             <span class="drawer-head-title">Browse NWCA</span>
             <button class="drawer-close" id="drawerClose" type="button" aria-label="Close menu">
@@ -114,10 +115,9 @@
             <a href="tel:253-922-5793">253-922-5793</a>
             <a href="mailto:sales@nwcustomapparel.com">sales@nwcustomapparel.com</a>
         </div>
-    </aside>
-    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    </dialog>
 
-    <main id="main">
+    <main id="main" tabindex="-1">
         <!-- Hero -->
         <section class="cch-hero">
             <div class="wrap cch-hero-grid">
@@ -129,8 +129,8 @@
                     WA — your logo on the chest, the swoosh doing the rest. Our most-embroidered Nike, the
                     <strong>Dri-FIT Micro Pique 2.0 polo, has run over 1,700 pieces across 300+ orders</strong>.</p>
                     <div class="cch-hero-ctas">
-                        <a class="btn btn-cta" href="/pages/request-a-quote.html">Get a Nike quote</a>
-                        <a class="btn btn-ghost" href="/product.html?style=NKDC1963">See the Micro Pique polo</a>
+                        <a class="btn btn-primary" href="/pages/request-a-quote.html">Get a Nike quote</a>
+                        <a class="btn btn-secondary" href="/product.html?style=NKDC1963">See the Micro Pique polo</a>
                     </div>
                     <ul class="cch-ticks">
                         <li>✓ In-house embroidery &amp; digitizing</li>
@@ -340,8 +340,8 @@
                 <h2>Put your logo next to the swoosh</h2>
                 <p>Send your logo and a count — we'll price your Nike program today.</p>
                 <div class="cch-hero-ctas">
-                    <a class="btn btn-hero" href="/pages/request-a-quote.html">Get a Nike quote</a>
-                    <a class="btn btn-ghost cch-cta-ghost" href="tel:253-922-5793">Or call 253-922-5793</a>
+                    <a class="btn btn-primary" href="/pages/request-a-quote.html">Get a Nike quote</a>
+                    <a class="btn btn-secondary" href="tel:253-922-5793">Or call 253-922-5793</a>
                 </div>
             </div>
         </section>
@@ -389,6 +389,6 @@
         </div>
     </footer>
 
-    <script src="/pages/js/custom-carhartt.js?v=2026.08.26.5" defer></script>
+    <script src="/pages/js/brand-guide.js?v=2026.09.09.1" defer></script>
 </body>
 </html>

@@ -18,6 +18,7 @@ const POLICY_UI_FILES = [
     'shared_components/js/policies/handbook-reader.js',
 ];
 const STRICT_FILES = [
+    'pages/js/brand-guide.js',
     'shared_components/js/webstore-guide.js',
     ...POLICY_UI_FILES,
     'dashboards/js/policy-migration.js',
@@ -165,7 +166,7 @@ export default [
         },
     },
     {
-        files: [...POLICY_UI_FILES, 'shared_components/js/webstore-guide.js'],
+        files: ['pages/js/brand-guide.js', ...POLICY_UI_FILES, 'shared_components/js/webstore-guide.js'],
         languageOptions: { sourceType: 'script', globals: { ...globals.browser } },
     },
     {

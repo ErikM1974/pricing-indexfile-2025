@@ -22,10 +22,11 @@
     <link rel="icon" href="/favicon.ico" sizes="48x48">
     <link rel="icon" href="/favicon.png" type="image/png" sizes="48x48">
 
-    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/shared_components/css/nwca-2026-core.css?v=2026.09.07.8">
-    <link rel="stylesheet" href="/pages/css/custom-carhartt.css?v=2026.09.07.8">
+    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.09.1">
+    <link rel="stylesheet" href="/shared_components/css/storefront-shell.css?v=2026.09.09.1">
+    <link rel="stylesheet" href="/pages/css/brand-guide.css?v=2026.09.09.1">
 
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://www.teamnwca.com/"},{"@type":"ListItem","position":2,"name":"Custom Gildan","item":"https://www.teamnwca.com/custom-gildan"}]}</script>
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"CollectionPage","name":"Custom Gildan — Value Tees & Hoodies","url":"https://www.teamnwca.com/custom-gildan","description":"Gildan Ultra Cotton and DryBlend tees and Heavy Blend hoodies decorated with your design by Northwest Custom Apparel in Milton, WA.","mainEntity":{"@type":"ItemList","itemListElement":[
@@ -50,7 +51,7 @@
         {"@type":"Question","name":"Is there a minimum order?","acceptedAnswer":{"@type":"Answer","text":"Pricing is sharpest at two dozen and up, which is where most big-order and event runs land. Smaller runs carry a small-batch fee that's quoted up front. Every quote shows the real number before anything goes to production."}}
     ]}</script>
 </head>
-<body>
+<body data-ui="unified" data-storefront="brand">
     <a class="skip-link" href="#main">Skip to content</a>
 
     <div class="util-strip">
@@ -92,7 +93,7 @@
         </div>
     </header>
 
-    <aside class="sidebar" id="sidebar" aria-label="Browse menu">
+    <dialog class="sidebar" id="sidebar" aria-label="Browse menu">
         <div class="drawer-head">
             <span class="drawer-head-title">Browse NWCA</span>
             <button class="drawer-close" id="drawerClose" type="button" aria-label="Close menu">
@@ -116,10 +117,9 @@
             <a href="tel:253-922-5793">253-922-5793</a>
             <a href="mailto:sales@nwcustomapparel.com">sales@nwcustomapparel.com</a>
         </div>
-    </aside>
-    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    </dialog>
 
-    <main id="main">
+    <main id="main" tabindex="-1">
         <!-- Hero -->
         <section class="cch-hero">
             <div class="wrap cch-hero-grid">
@@ -130,8 +130,8 @@
                     budget is the whole ballgame. Ultra Cotton, DryBlend, and Heavy Blend fleece, in every color you can think of. We print
                     it in-house in Milton, WA, and we've decorated <strong>8,000+ Gildan pieces across 330+ orders</strong>.</p>
                     <div class="cch-hero-ctas">
-                        <a class="btn btn-cta" href="/pages/request-a-quote.html">Get a Gildan quote</a>
-                        <a class="btn btn-ghost" href="/product.html?style=2000">See the 2000 tee</a>
+                        <a class="btn btn-primary" href="/pages/request-a-quote.html">Get a Gildan quote</a>
+                        <a class="btn btn-secondary" href="/product.html?style=2000">See the 2000 tee</a>
                     </div>
                     <ul class="cch-ticks">
                         <li>✓ Screen print &amp; DTF in-house</li>
@@ -339,8 +339,8 @@
                 <h2>Big run, tight budget? Gildan's your blank</h2>
                 <p>Send your design and a count — we'll recommend screen print or DTF and price it today.</p>
                 <div class="cch-hero-ctas">
-                    <a class="btn btn-hero" href="/pages/request-a-quote.html">Get a Gildan quote</a>
-                    <a class="btn btn-ghost cch-cta-ghost" href="tel:253-922-5793">Or call 253-922-5793</a>
+                    <a class="btn btn-primary" href="/pages/request-a-quote.html">Get a Gildan quote</a>
+                    <a class="btn btn-secondary" href="tel:253-922-5793">Or call 253-922-5793</a>
                 </div>
             </div>
         </section>
@@ -388,6 +388,6 @@
         </div>
     </footer>
 
-    <script src="/pages/js/custom-carhartt.js?v=2026.08.26.5" defer></script>
+    <script src="/pages/js/brand-guide.js?v=2026.09.09.1" defer></script>
 </body>
 </html>
