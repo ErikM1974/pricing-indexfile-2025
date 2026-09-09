@@ -313,3 +313,7 @@ Staff import final local guards:235passed across six source/inventory suites,287
 ## Staff operations integration — 2026-09-09
 
 Merged the two reviewed branches after verified .11 rollout (Heroku2087). Conflict resolution preserved the live checkpoint and both branches’ appended evidence/lessons. Archived the resolved junction-recovery narrative while retaining its active prevention rule. Five-page candidate .12 now enters full checks; .13 purchasing plan remains isolated.
+
+## Five staff operations pages ready for CI — v2026.09.09.12
+
+Tested source 82b954c487c7c1ea84454768cc85ea493102d295: build, lint, types, 485 routes/24 modules, 224 unit suites/5258 passed/four existing skips; 88 DOM, four accessibility unit, 84 quote parity, 505 mocked browser and 16 remaining browser/three optional screenshot skips. All five calculator surfaces passed. 288 CSS files clean, HTTP boot200 and production audit zero. The monitoring and import pages passed 34 focused browser cases and five print documents/11 pages/283 checked content blocks. Original static references, schema snapshot and monetary/SKU transforms are guarded; five obsolete CSS owners retired. Both shared owners and all changed controllers use 2026.09.09.12. Live remains129 reviewed/96pending until exact-source CI and actual rollout verify134/91. Purchasing work remains isolated and is not in this release.
