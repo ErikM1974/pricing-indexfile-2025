@@ -10,6 +10,7 @@
  */
 const fs = require('fs');
 const path = require('path');
+const { JSDOM } = require('jsdom');
 const ROOT = path.join(__dirname, '..', '..');
 const read = (rel) => fs.readFileSync(path.join(ROOT, rel), 'utf8');
 const noComments = (s) => s.replace(/\/\/[^\n]*/g, '');
@@ -17,13 +18,14 @@ const noComments = (s) => s.replace(/\/\/[^\n]*/g, '');
 describe('finished photos (capture)', () => {
     const html = read('dashboards/finished-photos.html').replace(/<!--[\s\S]*?-->/g, '');
     const js = read('dashboards/js/finished-photos.js');
+    const document = new JSDOM(html).window.document;
     test('Rule 3, zoom, icon dependency', () => {
         expect(noComments(js)).not.toMatch(/(?<!data-)onerror=/);
         expect(js).not.toMatch(/\.style\./);
         expect(js).toMatch(/data-onerror="blank"/);
         expect(html).not.toMatch(/maximum-scale/);
         expect(html).not.toMatch(/<i class="fa/); // the page never loads Font Awesome
-        expect(html).toMatch(/<span aria-hidden="true">&larr;<\/span> Dashboard/);
+        expect(document.querySelector('.fp-back [aria-hidden="true"]').textContent).toBe('←');
     });
     test('failures are honest and retryable', () => {
         expect(js).not.toMatch(/r\.ok \? r\.json\(\) : \{ contacts: \[\] \}/);
@@ -42,10 +44,13 @@ describe('finished photos (capture)', () => {
             expect(html).toMatch(new RegExp(`id="fp-pane-${m}" role="tabpanel" aria-labelledby="fp-mode-${m}"`));
         }
         expect(js).toMatch(/e\.key !== 'ArrowRight' && e\.key !== 'ArrowLeft'/);
-        expect(html).toMatch(/id="fp-camera-btn" role="button" tabindex="0"/);
-        expect(html).toMatch(/id="fp-album-btn" role="button" tabindex="0"/);
-        expect(js).toMatch(/\['fp-camera-btn', 'fp-album-btn'\]\.forEach/);
-        expect(html).toMatch(/class="fp-scan-sheet" role="dialog" aria-modal="true" aria-labelledby="fp-scan-title"/);
+        for (const id of ['fp-camera-btn', 'fp-album-btn']) {
+            const label = document.getElementById(id), input = document.getElementById(label.htmlFor);
+            expect(label.tagName).toBe('LABEL'); expect(input.type).toBe('file'); expect(input.hidden).toBe(false);
+        }
+        expect(js).toContain("window.UiDialog.open('fp-scan-modal'");
+        expect(document.querySelector('.fp-scan-sheet').getAttribute('role')).toBe('dialog');
+        expect(document.querySelector('.fp-scan-sheet').getAttribute('aria-labelledby')).toBe('fp-scan-title');
         expect(html).toMatch(/id="fp-lightbox" role="dialog" aria-modal="true" aria-label="Photo, full size" hidden/);
         expect(js).toMatch(/scanReturnFocus = document\.activeElement;/);
         expect(js).toMatch(/lightboxReturnFocus = t;/);

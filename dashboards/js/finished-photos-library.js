@@ -25,6 +25,8 @@
         search: '',
         visibility: 'all', // all | live | hidden
         truncated: 0,
+        ready: false,
+        loadSerial: 0,
     };
 
     function el(id) { return document.getElementById(id); }
@@ -98,6 +100,11 @@
     // ── data ──
     function load(refresh) {
         DashPage.hideError();
+        var serial = ++state.loadSerial;
+        state.ready = false; state.photos = []; state.reps = []; state.truncated = 0;
+        ['total', 'live', 'hidden', 'accounts'].forEach(function (key) { el('fpl-stat-' + key).textContent = '—'; });
+        el('fpl-sub').textContent = '(Loading…)';
+        el('fpl-rep-chips').innerHTML = '';
         el('fpl-body').innerHTML = '<div class="dash-loading">Loading the photo library…</div>';
         fetch('/api/staff/finished-photos/library?limit=1000' + (refresh ? '&refresh=1' : ''), { credentials: 'same-origin' })
             .then(function (r) {
@@ -107,14 +114,22 @@
                 });
             })
             .then(function (data) {
-                state.photos = data.photos || [];
-                state.reps = data.reps || [];
-                state.truncated = data.truncated || 0;
+                if (serial !== state.loadSerial) return;
+                if (!data || data.success !== true || !Array.isArray(data.photos) || !Array.isArray(data.reps) ||
+                    data.photos.some(function (p) { return !p || !p.pkId || typeof p.showToCustomer !== 'boolean' || typeof p.imageUrl !== 'string'; }) ||
+                    data.reps.some(function (r) { return !r || typeof r.name !== 'string' || !Number.isInteger(r.count) || r.count < 0; }) ||
+                    !Number.isInteger(data.truncated) || data.truncated < 0) throw new Error('Incomplete photo library response');
+                state.photos = data.photos;
+                state.reps = data.reps;
+                state.truncated = data.truncated;
+                state.ready = true;
                 render();
             })
             .catch(function (err) {
+                if (serial !== state.loadSerial) return;
+                el('fpl-sub').textContent = '(Unavailable)';
                 el('fpl-body').innerHTML = '<div class="fpl-empty">The library could not load (' + esc(err.message) + '). ' +
-                    '<button type="button" class="dash-btn" id="fpl-retry"><i class="fas fa-rotate" aria-hidden="true"></i> Retry</button></div>';
+                    '<button type="button" class="dash-btn btn btn-secondary" id="fpl-retry"><i class="fas fa-rotate" aria-hidden="true"></i> Retry</button></div>';
                 var rb = el('fpl-retry'); if (rb) rb.addEventListener('click', function () { load(true); });
                 DashPage.showError('Unable to load finished photos: ' + err.message);
             });
@@ -138,6 +153,7 @@
 
     // ── render ──
     function render() {
+        if (!state.ready) return;
         renderStats();
         renderChips();
         var rows = filtered();
@@ -197,8 +213,8 @@
             (p.caption ? '<div>' + esc(p.caption) + '</div>' : '') +
             '<div class="fpl-card-foot">' +
             (p.showToCustomer
-                ? '<span class="fpl-live"><i class="fas fa-circle" aria-hidden="true"></i> Live on portal</span><button type="button" class="fpl-pub-btn" data-act="pub" data-on="1" aria-label="Hide ' + esc(title) + ' from the portal">Hide</button>'
-                : '<span class="fpl-hidden-note">Hidden</span><button type="button" class="fpl-pub-btn" data-act="pub" data-on="0" aria-label="Publish ' + esc(title) + ' to the portal">Publish</button>') +
+                ? '<span class="fpl-live"><i class="fas fa-circle" aria-hidden="true"></i> Live on portal</span><button type="button" class="fpl-pub-btn btn btn-secondary" data-act="pub" data-on="1" aria-label="Hide ' + esc(title) + ' from the portal">Hide</button>'
+                : '<span class="fpl-hidden-note">Hidden</span><button type="button" class="fpl-pub-btn btn btn-secondary" data-act="pub" data-on="0" aria-label="Publish ' + esc(title) + ' to the portal">Publish</button>') +
             '</div></div></article>';
     }
 
@@ -222,7 +238,7 @@
         })
             .then(function (r) {
                 return r.json().catch(function () { return {}; }).then(function (j) {
-                    if (!r.ok || j.success === false) throw new Error(j.error || ('HTTP ' + r.status));
+                    if (!r.ok || !j || j.success !== true) throw new Error((j && j.error) || 'Publication status was not confirmed');
                 });
             })
             .then(function () {
@@ -257,7 +273,7 @@
         host.innerHTML = chips.map(function (c) {
             var active = (state.rep || '') === c.name ||
                 (c.name !== '' && state.rep.toLowerCase() === c.name.toLowerCase());
-            return '<button type="button" class="fpl-chip' + (active ? ' is-active' : '') + '" data-rep="' + esc(c.name) + '" aria-pressed="' + (active ? 'true' : 'false') + '">' +
+            return '<button type="button" class="fpl-chip btn btn-secondary' + (active ? ' is-active' : '') + '" data-rep="' + esc(c.name) + '" aria-pressed="' + (active ? 'true' : 'false') + '">' +
                 esc(c.label) + '<span class="fpl-chip-count">' + c.count + '</span></button>';
         }).join('');
         Array.prototype.forEach.call(host.querySelectorAll('.fpl-chip'), function (btn) {
@@ -282,14 +298,16 @@
     }
 
     var lightboxReturnFocus = null;
+    var lightboxSerial = 0;
     function openLightbox(thumbUrl, cap) {
+        var serial = ++lightboxSerial;
         lightboxReturnFocus = document.activeElement;
         var box = el('fpl-lightbox');
         setTimeout(function () { var c = el('fpl-lightbox-close'); if (c) c.focus(); }, 30);
         var img = el('fpl-lightbox-img');
         var status = el('fpl-lightbox-status');
         el('fpl-lightbox-cap').textContent = cap || '';
-        box.hidden = false;
+        window.UiDialog.open(box, { focus: '#fpl-lightbox-close', onDismiss: closeLightbox });
         status.hidden = true;
         status.textContent = '';
 
@@ -300,27 +318,30 @@
         // Instant preview from the (usually cached) grid thumbnail — but if that exact
         // thumbnail is a cold/broken one, drop to a Loading state, not a broken glyph.
         img.onload = function () { img.hidden = false; status.hidden = true; };
-        img.onerror = function () { showStatus('Loading…'); };
+        var highFailed = false;
+        img.onerror = function () { showStatus(highFailed ? 'This photo could not be loaded.' : 'Loading…'); };
         img.hidden = false;
         img.src = thumbUrl;
 
         // Upgrade to the full-size original in the background.
         var hi = new Image();
         hi.onload = function () {
-            if (box.hidden) return;                 // closed before it finished
+            if (box.hidden || serial !== lightboxSerial) return; // a newer preview owns this image
             img.onerror = function () { showStatus('This photo could not be loaded.'); };
             img.src = hi.src; img.hidden = false; status.hidden = true;
         };
         hi.onerror = function () {
-            if (box.hidden) return;
-            if (img.hidden) showStatus('This photo could not be loaded.'); // neither size loaded
+            if (box.hidden || serial !== lightboxSerial) return;
+            highFailed = true;
+            if (img.hidden || (img.complete && !img.naturalWidth)) showStatus('This photo could not be loaded.'); // neither size loaded
         };
         hi.src = largeUrl(thumbUrl);
     }
 
     function closeLightbox() {
+        lightboxSerial++;
         var wasOpen = !el('fpl-lightbox').hidden;
-        el('fpl-lightbox').hidden = true;
+        window.UiDialog.close('fpl-lightbox');
         if (wasOpen && lightboxReturnFocus && document.body.contains(lightboxReturnFocus)) { try { lightboxReturnFocus.focus(); } catch (e) { /* gone */ } }
         lightboxReturnFocus = null;
         var img = el('fpl-lightbox-img');

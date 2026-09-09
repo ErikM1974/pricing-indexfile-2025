@@ -1,6 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
+<!DOCTYPE html><html lang="en"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
@@ -9,47 +7,46 @@
 
     <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <!-- 2026 design tokens (must load before dash-shell.css) -->
-    <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/shared_components/css/art-hub.css">
-    <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
-    <link rel="stylesheet" href="/dashboards/css/finished-photos-library.css">
-</head>
-<body>
+
+
+
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap"><link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.09.14"><link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.09.14"><link rel="stylesheet" href="/shared_components/css/photo-workspaces.css?v=2026.09.09.14"></head>
+<body data-ui="unified" data-photo="library" data-department="photo"><a class="skip-link" href="#photo-main">Skip to photo library</a>
     <div class="dash-shell">
         <header class="dash-header">
             <div class="dash-header-left">
                 <a href="/staff-dashboard.html" title="Back to Staff Dashboard">
-                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
-                         alt="Northwest Custom Apparel" class="dash-header-logo">
+                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" alt="Northwest Custom Apparel" class="dash-header-logo">
                 </a>
-                <h1 class="dash-header-title">Finished Photos Library</h1>
+                <h1 class="dash-header-title" id="photo-title">Finished Photos Library</h1>
             </div>
             <div class="dash-header-right">
-                <a href="/dashboards/finished-photos.html" class="dash-btn" title="Snap a new finished-product photo">
+                <a href="/dashboards/finished-photos.html" class="dash-btn btn btn-secondary" title="Snap a new finished-product photo">
                     <i class="fas fa-camera"></i>
                     Add a photo
                 </a>
-                <button type="button" id="fpl-refresh" class="dash-btn" title="Refresh photos">
+                <button type="button" id="fpl-refresh" class="dash-btn btn btn-secondary" title="Refresh photos">
                     <i class="fas fa-rotate"></i>
                     Refresh
                 </button>
-                <a href="/staff-dashboard.html" class="dash-back-link">
+                <a href="/staff-dashboard.html" class="dash-back-link btn btn-secondary">
                     <i class="fas fa-arrow-left"></i>
                     Dashboard
                 </a>
             </div>
         </header>
 
-        <main class="dash-content">
+        <main class="dash-content" id="photo-main" tabindex="-1" aria-labelledby="photo-title">
             <div class="dash-error-banner" role="alert">
                 <i class="fas fa-exclamation-triangle"></i>
                 <span class="dash-error-banner-message"></span>
-                <button class="dash-error-banner-close" aria-label="Dismiss">
+                <button class="dash-error-banner-close btn btn-secondary" aria-label="Dismiss">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
@@ -80,8 +77,8 @@
                 <div class="fpl-toolbar">
                     <div class="fpl-chips" id="fpl-rep-chips" role="group" aria-label="Filter by sales rep"></div>
                     <div class="fpl-toolbar-right">
-                        <input type="search" id="fpl-search" class="fpl-search" placeholder="Search company or design…" autocomplete="off">
-                        <select id="fpl-visibility" class="fpl-select" aria-label="Filter by portal visibility">
+                        <input type="search" id="fpl-search" class="fpl-search field-input" placeholder="Search company or design…" autocomplete="off">
+                        <select id="fpl-visibility" class="fpl-select field-input" aria-label="Filter by portal visibility">
                             <option value="all">All photos</option>
                             <option value="live">Published only</option>
                             <option value="hidden">Hidden only</option>
@@ -94,13 +91,13 @@
     </div>
 
     <!-- Full-size viewer -->
-    <div class="fpl-lightbox" id="fpl-lightbox" hidden>
-        <button type="button" class="fpl-lightbox-close" id="fpl-lightbox-close" aria-label="Close">
+    <div class="fpl-lightbox" id="fpl-lightbox" hidden="">
+        <button type="button" class="fpl-lightbox-close btn btn-secondary" id="fpl-lightbox-close" aria-label="Close">
             <i class="fas fa-times"></i>
         </button>
         <figure class="fpl-lightbox-fig">
-            <img id="fpl-lightbox-img" alt="Finished product photo, full size" hidden>
-            <div class="fpl-lightbox-status" id="fpl-lightbox-status" hidden></div>
+            <img id="fpl-lightbox-img" alt="Finished product photo, full size" hidden="">
+            <div class="fpl-lightbox-status" id="fpl-lightbox-status" hidden=""></div>
             <figcaption id="fpl-lightbox-cap"></figcaption>
         </figure>
     </div>
@@ -110,6 +107,7 @@
     <script src="/shared_components/js/fetch-timeout.js"></script>
     <script src="/shared_components/js/dash-page-helpers.js"></script>
     <script src="/tests/ui/test-finished-photos-library-stub.js"></script>
-    <script src="/dashboards/js/finished-photos-library.js"></script>
-</body>
-</html>
+    <script src="/shared_components/js/ui-dialog.js?v=2026.09.09.14"></script><script src="/dashboards/js/finished-photos-library.js?v=2026.09.09.14"></script>
+
+
+</body></html>

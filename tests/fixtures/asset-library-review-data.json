@@ -1,0 +1,188 @@
+{
+  "fixed": 1788980400000,
+  "library": {
+    "success": true,
+    "generatedAt": "2026-09-09T19:00:00.000Z",
+    "cacheHit": false,
+    "totalCount": 5,
+    "count": 5,
+    "truncated": 0,
+    "reps": [
+      {
+        "name": "Taneisha Clark",
+        "count": 2
+      },
+      {
+        "name": "Nika Lao",
+        "count": 2
+      },
+      {
+        "name": "House / Unassigned",
+        "count": 1
+      }
+    ],
+    "photos": [
+      {
+        "pkId": 9,
+        "idCustomer": "4581",
+        "companyName": "Archterra Landscaping",
+        "designNumber": "40121",
+        "designName": "Archterra Crew Polo",
+        "idOrder": "142476",
+        "caption": "Front crest",
+        "imageUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22400%22%20height%3D%22300%22%3E%3Crect%20width%3D%22400%22%20height%3D%22300%22%20fill%3D%22%232f6f43%22%2F%3E%3Ctext%20x%3D%22200%22%20y%3D%22155%22%20font-family%3D%22sans-serif%22%20font-size%3D%2228%22%20fill%3D%22%23fff%22%20text-anchor%3D%22middle%22%3EArchterra%201%3C%2Ftext%3E%3C%2Fsvg%3E",
+        "uploadedBy": "",
+        "uploadedDate": "2026-09-09T19:00:00.000Z",
+        "showToCustomer": true,
+        "repName": "Taneisha Clark"
+      },
+      {
+        "pkId": 8,
+        "idCustomer": "4581",
+        "companyName": "Archterra Landscaping",
+        "designNumber": "40121",
+        "designName": "Archterra Crew Polo",
+        "idOrder": "142476",
+        "caption": "Back print",
+        "imageUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22400%22%20height%3D%22300%22%3E%3Crect%20width%3D%22400%22%20height%3D%22300%22%20fill%3D%22%23388450%22%2F%3E%3Ctext%20x%3D%22200%22%20y%3D%22155%22%20font-family%3D%22sans-serif%22%20font-size%3D%2228%22%20fill%3D%22%23fff%22%20text-anchor%3D%22middle%22%3EArchterra%202%3C%2Ftext%3E%3C%2Fsvg%3E",
+        "uploadedBy": "",
+        "uploadedDate": "2026-09-09T19:00:00.000Z",
+        "showToCustomer": false,
+        "repName": "Taneisha Clark"
+      },
+      {
+        "pkId": 7,
+        "idCustomer": "3120",
+        "companyName": "Harbor Electric",
+        "designNumber": "39984",
+        "designName": "Harbor Hi-Vis Tee",
+        "idOrder": "142449",
+        "caption": "",
+        "imageUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22400%22%20height%3D%22300%22%3E%3Crect%20width%3D%22400%22%20height%3D%22300%22%20fill%3D%22%23b58c1f%22%2F%3E%3Ctext%20x%3D%22200%22%20y%3D%22155%22%20font-family%3D%22sans-serif%22%20font-size%3D%2228%22%20fill%3D%22%23fff%22%20text-anchor%3D%22middle%22%3EHarbor%3C%2Ftext%3E%3C%2Fsvg%3E",
+        "uploadedBy": "",
+        "uploadedDate": "2026-09-08T19:00:00.000Z",
+        "showToCustomer": true,
+        "repName": "Nika Lao"
+      },
+      {
+        "pkId": 6,
+        "idCustomer": "2210",
+        "companyName": "Temple Fitness <script>alert(1)</script>",
+        "designNumber": "",
+        "designName": "",
+        "idOrder": "",
+        "caption": "XSS check — must render as text",
+        "imageUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22400%22%20height%3D%22300%22%3E%3Crect%20width%3D%22400%22%20height%3D%22300%22%20fill%3D%22%237a3b8f%22%2F%3E%3Ctext%20x%3D%22200%22%20y%3D%22155%22%20font-family%3D%22sans-serif%22%20font-size%3D%2228%22%20fill%3D%22%23fff%22%20text-anchor%3D%22middle%22%3ETemple%3C%2Ftext%3E%3C%2Fsvg%3E",
+        "uploadedBy": "",
+        "uploadedDate": "2026-09-06T19:00:00.000Z",
+        "showToCustomer": false,
+        "repName": ""
+      },
+      {
+        "pkId": 5,
+        "idCustomer": "3120",
+        "companyName": "Harbor Electric",
+        "designNumber": "39984",
+        "designName": "Harbor Hi-Vis Tee",
+        "idOrder": "",
+        "caption": "Sleeve logo",
+        "imageUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22400%22%20height%3D%22300%22%3E%3Crect%20width%3D%22400%22%20height%3D%22300%22%20fill%3D%22%23b5641f%22%2F%3E%3Ctext%20x%3D%22200%22%20y%3D%22155%22%20font-family%3D%22sans-serif%22%20font-size%3D%2228%22%20fill%3D%22%23fff%22%20text-anchor%3D%22middle%22%3EHarbor%202%3C%2Ftext%3E%3C%2Fsvg%3E",
+        "uploadedBy": "",
+        "uploadedDate": "2026-09-03T19:00:00.000Z",
+        "showToCustomer": false,
+        "repName": "Nika Lao"
+      }
+    ]
+  },
+  "lookup": {
+    "success": true,
+    "match": {
+      "type": "order",
+      "idCustomer": "4581",
+      "companyName": "Example Outfitters",
+      "orderNumber": "142476"
+    }
+  },
+  "contacts": {
+    "contacts": [
+      {
+        "id_Customer": "4581",
+        "CustomerCompanyName": "Example Outfitters"
+      }
+    ]
+  },
+  "designs": {
+    "designs": [
+      {
+        "idDesign": 40121,
+        "designName": "Crew polo",
+        "thumbnailUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22400%22%20height%3D%22300%22%3E%3Crect%20width%3D%22400%22%20height%3D%22300%22%20fill%3D%22%232f6f43%22%2F%3E%3Ctext%20x%3D%22200%22%20y%3D%22155%22%20font-family%3D%22sans-serif%22%20font-size%3D%2228%22%20fill%3D%22%23fff%22%20text-anchor%3D%22middle%22%3EArchterra%201%3C%2Ftext%3E%3C%2Fsvg%3E"
+      }
+    ]
+  },
+  "manage": {
+    "photos": [
+      {
+        "pkId": 9,
+        "idCustomer": "4581",
+        "companyName": "Archterra Landscaping",
+        "designNumber": "40121",
+        "designName": "Archterra Crew Polo",
+        "idOrder": "142476",
+        "caption": "Front crest",
+        "imageUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22400%22%20height%3D%22300%22%3E%3Crect%20width%3D%22400%22%20height%3D%22300%22%20fill%3D%22%232f6f43%22%2F%3E%3Ctext%20x%3D%22200%22%20y%3D%22155%22%20font-family%3D%22sans-serif%22%20font-size%3D%2228%22%20fill%3D%22%23fff%22%20text-anchor%3D%22middle%22%3EArchterra%201%3C%2Ftext%3E%3C%2Fsvg%3E",
+        "uploadedBy": "",
+        "uploadedDate": "2026-09-09T19:00:00.000Z",
+        "showToCustomer": true,
+        "repName": "Taneisha Clark"
+      },
+      {
+        "pkId": 8,
+        "idCustomer": "4581",
+        "companyName": "Archterra Landscaping",
+        "designNumber": "40121",
+        "designName": "Archterra Crew Polo",
+        "idOrder": "142476",
+        "caption": "Back print",
+        "imageUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22400%22%20height%3D%22300%22%3E%3Crect%20width%3D%22400%22%20height%3D%22300%22%20fill%3D%22%23388450%22%2F%3E%3Ctext%20x%3D%22200%22%20y%3D%22155%22%20font-family%3D%22sans-serif%22%20font-size%3D%2228%22%20fill%3D%22%23fff%22%20text-anchor%3D%22middle%22%3EArchterra%202%3C%2Ftext%3E%3C%2Fsvg%3E",
+        "uploadedBy": "",
+        "uploadedDate": "2026-09-09T19:00:00.000Z",
+        "showToCustomer": false,
+        "repName": "Taneisha Clark"
+      }
+    ]
+  },
+  "pricing": {
+    "garments": {
+      "basePrices": {
+        "1-7": 10,
+        "8-23": 9,
+        "24-47": 8,
+        "48-71": 7.5,
+        "72+": 7
+      },
+      "perThousandUpcharge": 1.25,
+      "baseStitches": 8000,
+      "ltmFee": 50,
+      "ltmThreshold": 7
+    },
+    "caps": {
+      "basePrices": {
+        "1-7": 6.5,
+        "8-23": 5.5,
+        "24-47": 4.75,
+        "48-71": 4.5,
+        "72+": 4.25
+      },
+      "perThousandUpcharge": 1,
+      "baseStitches": 5000,
+      "ltmFee": 50,
+      "ltmThreshold": 7
+    },
+    "fullBack": {
+      "ltmFee": 100
+    }
+  },
+  "designEmbed": "<form class=\"cbFormTable\" action=\"#\"><div class=\"cbFormLabelCell\"><label for=\"sample-search\">Company or design</label></div><div class=\"cbFormFieldCell\"><input class=\"cbFormTextField\" id=\"sample-search\" value=\"Example\"></div><div class=\"cbSearchButtonContainer\"><input type=\"submit\" class=\"cbSearchButton\" value=\"Search\"></div></form><div class=\"cbResultSetPanel\"><div data-cb-name=\"data-row\"><dl class=\"cbResultSetPanelDataContainer\"><dt class=\"cbResultSetLabel\">Company</dt><dd class=\"cbResultSetData\">Example Outfitters</dd><dt class=\"cbResultSetLabel\">Design Number</dt><dd class=\"cbResultSetData\">40121</dd><dt class=\"cbResultSetLabel\">Design Description</dt><dd class=\"cbResultSetData\">Crew polo</dd><dt class=\"cbResultSetLabel\">Stitch Tier</dt><dd class=\"cbResultSetData\">8K</dd><dt class=\"cbResultSetLabel\">Stitch Count</dt><dd class=\"cbResultSetData\">12500</dd><dt class=\"cbResultSetLabel\">DST Filename</dt><dd class=\"cbResultSetData\">40121.dst</dd><dt class=\"cbResultSetLabel\">AS-Garm &amp; AS-CAP</dt><dd class=\"cbResultSetData\">$6.00</dd><dt class=\"cbResultSetLabel\">Full Back 24-47</dt><dd class=\"cbResultSetData\">$14.25</dd><dt class=\"cbResultSetLabel\">Location</dt><dd class=\"cbResultSetData\">Left chest</dd><dt>Image</dt><dd><img src=\"data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22400%22%20height%3D%22300%22%3E%3Crect%20width%3D%22400%22%20height%3D%22300%22%20fill%3D%22%232f6f43%22%2F%3E%3Ctext%20x%3D%22200%22%20y%3D%22155%22%20font-family%3D%22sans-serif%22%20font-size%3D%2228%22%20fill%3D%22%23fff%22%20text-anchor%3D%22middle%22%3EArchterra%201%3C%2Ftext%3E%3C%2Fsvg%3E\" alt=\"Example stitched crest 1\"></dd></dl></div><div data-cb-name=\"data-row\"><dl class=\"cbResultSetPanelDataContainer\"><dt class=\"cbResultSetLabel\">Company</dt><dd class=\"cbResultSetData\">Example Outfitters</dd><dt class=\"cbResultSetLabel\">Design Number</dt><dd class=\"cbResultSetData\">40122</dd><dt class=\"cbResultSetLabel\">Design Description</dt><dd class=\"cbResultSetData\">Crew polo</dd><dt class=\"cbResultSetLabel\">Stitch Tier</dt><dd class=\"cbResultSetData\">8K</dd><dt class=\"cbResultSetLabel\">Stitch Count</dt><dd class=\"cbResultSetData\">12500</dd><dt class=\"cbResultSetLabel\">DST Filename</dt><dd class=\"cbResultSetData\">40121.dst</dd><dt class=\"cbResultSetLabel\">AS-Garm &amp; AS-CAP</dt><dd class=\"cbResultSetData\">$6.00</dd><dt class=\"cbResultSetLabel\">Full Back 24-47</dt><dd class=\"cbResultSetData\">$14.25</dd><dt class=\"cbResultSetLabel\">Location</dt><dd class=\"cbResultSetData\">Left chest</dd><dt>Image</dt><dd><img src=\"data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22400%22%20height%3D%22300%22%3E%3Crect%20width%3D%22400%22%20height%3D%22300%22%20fill%3D%22%232f6f43%22%2F%3E%3Ctext%20x%3D%22200%22%20y%3D%22155%22%20font-family%3D%22sans-serif%22%20font-size%3D%2228%22%20fill%3D%22%23fff%22%20text-anchor%3D%22middle%22%3EArchterra%201%3C%2Ftext%3E%3C%2Fsvg%3E\" alt=\"Example stitched crest 2\"></dd></dl></div></div>",
+  "archiveEmbed": "<form class=\"cbFormTable\" action=\"#\"><div class=\"cbFormLabelCell\"><label for=\"sample-search\">Company or design</label></div><div class=\"cbFormFieldCell\"><input class=\"cbFormTextField\" id=\"sample-search\" value=\"Example\"></div><div class=\"cbSearchButtonContainer\"><input type=\"submit\" class=\"cbSearchButton\" value=\"Search\"></div></form><div class=\"cbResultSetPanel\"><div data-cb-name=\"data-row\"><dl class=\"cbResultSetPanelDataContainer\"><dt class=\"cbResultSetLabel\">Company</dt><dd class=\"cbResultSetData\">Example Outfitters</dd><dt class=\"cbResultSetLabel\">Design Number</dt><dd class=\"cbResultSetData\">40121</dd><dt class=\"cbResultSetLabel\">Design Description</dt><dd class=\"cbResultSetData\">Crew polo</dd><dt class=\"cbResultSetLabel\">Stitch Tier</dt><dd class=\"cbResultSetData\">8K</dd><dt class=\"cbResultSetLabel\">Stitch Count</dt><dd class=\"cbResultSetData\">12500</dd><dt class=\"cbResultSetLabel\">DST Filename</dt><dd class=\"cbResultSetData\">40121.dst</dd><dt class=\"cbResultSetLabel\">AS-Garm &amp; AS-CAP</dt><dd class=\"cbResultSetData\">$6.00</dd><dt class=\"cbResultSetLabel\">Full Back 24-47</dt><dd class=\"cbResultSetData\">$14.25</dd><dt class=\"cbResultSetLabel\">Location</dt><dd class=\"cbResultSetData\">Left chest</dd><dt>Image</dt><dd><img src=\"data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22400%22%20height%3D%22300%22%3E%3Crect%20width%3D%22400%22%20height%3D%22300%22%20fill%3D%22%232f6f43%22%2F%3E%3Ctext%20x%3D%22200%22%20y%3D%22155%22%20font-family%3D%22sans-serif%22%20font-size%3D%2228%22%20fill%3D%22%23fff%22%20text-anchor%3D%22middle%22%3EArchterra%201%3C%2Ftext%3E%3C%2Fsvg%3E\" alt=\"Example stitched crest 1\"></dd><dt>DST File</dt><dd></dd></dl></div><div data-cb-name=\"data-row\"><dl class=\"cbResultSetPanelDataContainer\"><dt class=\"cbResultSetLabel\">Company</dt><dd class=\"cbResultSetData\">Example Outfitters</dd><dt class=\"cbResultSetLabel\">Design Number</dt><dd class=\"cbResultSetData\">40122</dd><dt class=\"cbResultSetLabel\">Design Description</dt><dd class=\"cbResultSetData\">Crew polo</dd><dt class=\"cbResultSetLabel\">Stitch Tier</dt><dd class=\"cbResultSetData\">8K</dd><dt class=\"cbResultSetLabel\">Stitch Count</dt><dd class=\"cbResultSetData\">12500</dd><dt class=\"cbResultSetLabel\">DST Filename</dt><dd class=\"cbResultSetData\">40121.dst</dd><dt class=\"cbResultSetLabel\">AS-Garm &amp; AS-CAP</dt><dd class=\"cbResultSetData\">$6.00</dd><dt class=\"cbResultSetLabel\">Full Back 24-47</dt><dd class=\"cbResultSetData\">$14.25</dd><dt class=\"cbResultSetLabel\">Location</dt><dd class=\"cbResultSetData\">Left chest</dd><dt>Image</dt><dd><img src=\"data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22400%22%20height%3D%22300%22%3E%3Crect%20width%3D%22400%22%20height%3D%22300%22%20fill%3D%22%232f6f43%22%2F%3E%3Ctext%20x%3D%22200%22%20y%3D%22155%22%20font-family%3D%22sans-serif%22%20font-size%3D%2228%22%20fill%3D%22%23fff%22%20text-anchor%3D%22middle%22%3EArchterra%201%3C%2Ftext%3E%3C%2Fsvg%3E\" alt=\"Example stitched crest 2\"></dd><dt>DST File</dt><dd></dd></dl></div></div>"
+}

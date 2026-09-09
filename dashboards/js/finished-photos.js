@@ -63,6 +63,7 @@
     }
 
     var state = { cust: null, order: null, design: null, designChosen: false, file: null };
+    var lookupSerial = 0, designSerial = 0, manageSerial = 0;
 
     // ── Find modes (segmented control; last-used mode remembered per device) ──
     var MODE_KEY = 'nwca-fp-find-mode';
@@ -72,7 +73,7 @@
         ['scan', 'order', 'search'].forEach(function (m) {
             var btn = el('fp-mode-' + m), pane = el('fp-pane-' + m);
             var on = m === mode;
-            if (btn) { btn.classList.toggle('is-active', on); btn.setAttribute('aria-selected', on ? 'true' : 'false'); }
+            if (btn) { btn.classList.toggle('is-active', on); btn.setAttribute('aria-selected', on ? 'true' : 'false'); btn.tabIndex = on ? 0 : -1; }
             if (pane) pane.hidden = !on;
         });
         try { localStorage.setItem(MODE_KEY, mode); } catch (e) { /* private browsing */ }
@@ -97,13 +98,7 @@
         var img = e.target;
         if (img && img.tagName === 'IMG' && img.dataset && img.dataset.onerror === 'blank') img.classList.add('is-broken');
     }, true);
-    // The file-input labels are the two big photo buttons — make them keyboard-operable.
-    ['fp-camera-btn', 'fp-album-btn'].forEach(function (id) {
-        var lab = el(id);
-        if (lab) lab.addEventListener('keydown', function (e) {
-            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); var inp = el(lab.getAttribute('for')); if (inp) inp.click(); }
-        });
-    });
+    // Visible native file inputs own photo/album keyboard selection.
     (function initMode() {
         var saved = null;
         try { saved = localStorage.getItem(MODE_KEY); } catch (e) { /* ignore */ }
@@ -120,11 +115,13 @@
     function lookupCode(raw) {
         var code = String(raw == null ? '' : raw).trim();
         if (!code) return;
+        var serial = ++lookupSerial;
         setFindStatus('busy', 'Looking up “' + code + '”…');
         fetch('/api/staff/finished-photos/lookup?code=' + encodeURIComponent(code), { credentials: 'same-origin' })
             .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
             .then(function (res) {
-                if (!res.ok || !res.j || res.j.success === false) {
+                if (serial !== lookupSerial) return;
+                if (!res.ok || !res.j || res.j.success !== true || !Object.prototype.hasOwnProperty.call(res.j, 'match')) {
                     throw new Error((res.j && res.j.error) || 'Lookup failed');
                 }
                 var m = res.j.match;
@@ -139,6 +136,7 @@
                 }
             })
             .catch(function (err) {
+                if (serial !== lookupSerial) return;
                 setFindStatus('err', '✗ ' + ((err && err.message) || 'Lookup failed — try the company search.'));
             });
     }
@@ -153,7 +151,7 @@
     var scanReturnFocus = null;
     function openScanner() {
         scanReturnFocus = document.activeElement;
-        el('fp-scan-modal').hidden = false;
+        window.UiDialog.open('fp-scan-modal', { focus: '#fp-scan-close', onDismiss: closeScanner });
         setTimeout(function () { var c = el('fp-scan-close'); if (c) c.focus(); }, 30);
         setScanStatus('Starting camera…');
         if (!window.Html5Qrcode) { setScanStatus('Scanner failed to load — type the order # instead.'); return; }
@@ -191,7 +189,7 @@
     }
     function closeScanner() {
         var wasOpen = !el('fp-scan-modal').hidden;
-        el('fp-scan-modal').hidden = true;
+        window.UiDialog.close('fp-scan-modal');
         if (wasOpen && scanReturnFocus && document.body.contains(scanReturnFocus)) { try { scanReturnFocus.focus(); } catch (e) { /* gone */ } }
         scanReturnFocus = null;
         var s = scanner; scanner = null;
@@ -216,6 +214,8 @@
         fetch('/api/company-contacts/search?q=' + encodeURIComponent(q) + '&limit=25')
             .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
             .then(function (d) {
+                if (q !== searchInput.value.trim() || state.cust) return;
+                if (!d || !Array.isArray(d.contacts) || d.contacts.some(function (c) { return !c || !c.id_Customer; })) throw new Error('Incomplete customer search response');
                 var seen = {}, rows = [];
                 ((d && d.contacts) || []).forEach(function (c) { var id = c.id_Customer; if (id && !seen[id]) { seen[id] = 1; rows.push(c); } });
                 // A staffer is picking a COMPANY, not a contact named "Adam" — float company-name
@@ -229,13 +229,14 @@
                 }).sort(function (a, b) { return b.s - a.s || a.i - b.i; }).map(function (x) { return x.c; });
                 if (!rows.length) { results.innerHTML = '<div class="fp-result fp-muted">No matches</div>'; results.hidden = false; return; }
                 results.innerHTML = rows.map(function (c) {
-                    return '<button type="button" class="fp-result" data-id="' + esc(c.id_Customer) + '" data-name="' + esc(c.CustomerCompanyName) + '">'
+                    return '<button type="button" class="fp-result btn btn-secondary" data-id="' + esc(c.id_Customer) + '" data-name="' + esc(c.CustomerCompanyName) + '">'
                         + esc(c.CustomerCompanyName || ('Customer ' + c.id_Customer))
                         + '<span class="fp-r-sub">#' + esc(c.id_Customer) + (c.ct_NameFull ? ' · ' + esc(c.ct_NameFull) : '') + '</span></button>';
                 }).join('');
                 results.hidden = false;
             })
             .catch(function (err) {
+                if (q !== searchInput.value.trim() || state.cust) return;
                 // A failed search is not "no matches" — say so (Erik's #1 rule).
                 results.innerHTML = '<div class="fp-result fp-muted">Search failed (' + esc(err.message) + ') — try again.</div>';
                 results.hidden = false;
@@ -247,6 +248,7 @@
     });
 
     function pickCustomer(id, name, meta) {
+        lookupSerial++;
         state.cust = { id: String(id), name: name || '' };
         state.order = (meta && meta.order) ? String(meta.order) : null;
         state.design = null; state.designChosen = false;
@@ -270,6 +272,7 @@
     el('fp-cust-change').addEventListener('click', function () {
         el('fp-find-picker').hidden = false; el('fp-cust-chosen').hidden = true;
         el('fp-step-design').hidden = true; el('fp-step-photo').hidden = true; el('fp-step-manage').hidden = true;
+        lookupSerial++; designSerial++; manageSerial++;
         state.cust = null; state.order = null;
         setMode(el('fp-mode-scan').classList.contains('is-active') ? 'scan'
             : el('fp-mode-order').classList.contains('is-active') ? 'order' : 'search', true);
@@ -277,12 +280,15 @@
 
     // ── Designs (open proxy GET; method=all, not date-gated) ──
     function loadDesigns(cid) {
+        var serial = ++designSerial;
         var grid = el('fp-design-grid');
         grid.innerHTML = '<div class="fp-muted">Loading designs…</div>';
         fetch(apiBase() + '/api/designs/by-customer/' + encodeURIComponent(cid) + '?method=all&limit=200')
             .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
             .then(function (d) {
-                var ds = (d && d.designs) || [];
+                if (serial !== designSerial || !state.cust || state.cust.id !== String(cid)) return;
+                if (!d || !Array.isArray(d.designs) || d.designs.some(function (x) { return !x || !x.idDesign; })) throw new Error('Incomplete designs response');
+                var ds = d.designs;
                 if (!ds.length) { grid.innerHTML = '<div class="fp-muted">No registered designs — use “No specific design” below.</div>'; return; }
                 grid.innerHTML = ds.map(function (x) {
                     // Design thumbnails come back as absolute proxy Box urls too
@@ -296,8 +302,9 @@
                 }).join('');
             })
             .catch(function (err) {
+                if (serial !== designSerial || !state.cust || state.cust.id !== String(cid)) return;
                 grid.innerHTML = '<div class="fp-muted">Couldn’t load designs (' + esc(err.message) + '). ' +
-                    '<button type="button" class="fp-link" id="fp-designs-retry">Retry</button> or use “No specific design” below.</div>';
+                    '<button type="button" class="fp-link btn btn-secondary" id="fp-designs-retry">Retry</button> or use “No specific design” below.</div>';
                 var rb = el('fp-designs-retry'); if (rb) rb.addEventListener('click', function () { loadDesigns(cid); });
             });
     }
@@ -428,12 +435,15 @@
 
     // ── Manage: list / publish / delete (same-origin, SAML-gated → proxy with secret) ──
     function loadManage(cid) {
+        var serial = ++manageSerial;
         var listEl = el('fp-manage-list'), emptyEl = el('fp-manage-empty');
         listEl.innerHTML = '<div class="fp-muted">Loading…</div>'; emptyEl.hidden = true;
         fetch('/api/staff/finished-photos?idCustomer=' + encodeURIComponent(cid), { credentials: 'same-origin' })
             .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
             .then(function (d) {
-                var ps = (d && d.photos) || [];
+                if (serial !== manageSerial || !state.cust || state.cust.id !== String(cid)) return;
+                if (!d || !Array.isArray(d.photos) || d.photos.some(function (p) { return !p || !p.pkId || typeof p.showToCustomer !== 'boolean'; })) throw new Error('Incomplete photo response');
+                var ps = d.photos;
                 if (!ps.length) { listEl.innerHTML = ''; emptyEl.hidden = false; return; }
                 listEl.innerHTML = ps.map(function (p) {
                     var title = p.designName || (p.designNumber ? 'Design #' + p.designNumber : 'Finished photo');
@@ -452,32 +462,33 @@
                         + '<div class="fp-mrow-body"><div class="fp-mrow-title">' + esc(title) + '</div>'
                         + '<div class="fp-mrow-sub">' + (on ? '<span class="fp-live-dot">Live on portal</span>' + (sub ? ' · ' : '') : '') + sub + '</div></div>'
                         + '<div class="fp-mrow-actions">'
-                        + '<button type="button" class="fp-toggle' + (on ? ' is-on' : '') + '" data-act="toggle" data-on="' + (on ? '1' : '0') + '" aria-pressed="' + (on ? 'true' : 'false') + '" aria-label="' + (on ? 'Published — tap to hide from the portal' : 'Publish to the portal') + '">' + (on ? '✓ Published' : 'Publish') + '</button>'
-                        + '<button type="button" class="fp-del" data-act="del" aria-label="Delete this photo">Delete</button>'
+                        + '<button type="button" class="fp-toggle btn btn-secondary' + (on ? ' is-on' : '') + '" data-act="toggle" data-on="' + (on ? '1' : '0') + '" aria-pressed="' + (on ? 'true' : 'false') + '" aria-label="' + (on ? 'Published — tap to hide from the portal' : 'Publish to the portal') + '">' + (on ? '✓ Published' : 'Publish') + '</button>'
+                        + '<button type="button" class="fp-del btn btn-secondary" data-act="del" aria-label="Delete this photo">Delete</button>'
                         + '</div></div>';
                 }).join('');
             })
             .catch(function (err) {
+                if (serial !== manageSerial || !state.cust || state.cust.id !== String(cid)) return;
                 listEl.innerHTML = '<div class="fp-muted">Couldn’t load this customer’s photos (' + esc(err.message) + '). ' +
-                    '<button type="button" class="fp-link" id="fp-manage-retry">Retry</button></div>';
+                    '<button type="button" class="fp-link btn btn-secondary" id="fp-manage-retry">Retry</button></div>';
                 var rb = el('fp-manage-retry'); if (rb) rb.addEventListener('click', function () { loadManage(cid); });
             });
     }
-    function setManageStatus(kind, msg) { setStatus(kind, msg); }
+    function setManageStatus(kind, msg) { var s = el('photo-manage-status'); s.className = 'fp-status' + (kind ? ' is-' + kind : ''); s.textContent = msg || ''; }
     el('fp-manage-list').addEventListener('click', function (e) {
         var row = e.target.closest('.fp-mrow[data-pk]'); if (!row) return;
         var t = e.target.closest('[data-act]'); if (!t) return;
         var pk = row.getAttribute('data-pk'), act = t.getAttribute('data-act');
         if (act === 'view') {
             var src = t.getAttribute('data-src');
-            if (src) { lightboxReturnFocus = t; el('fp-lightbox-img').src = src; el('fp-lightbox').hidden = false; setTimeout(function () { el('fp-lightbox-close').focus(); }, 30); }
+            if (src) { lightboxReturnFocus = t; el('fp-lightbox-img').src = src; window.UiDialog.open('fp-lightbox', { focus: '#fp-lightbox-close', onDismiss: closeLightbox }); setTimeout(function () { el('fp-lightbox-close').focus(); }, 30); }
         } else if (act === 'toggle') {
             var turnOn = t.getAttribute('data-on') !== '1';
             t.disabled = true;
             fetch('/api/staff/finished-photos/' + encodeURIComponent(pk), {
                 method: 'PATCH', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ show: turnOn })
-            }).then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { if (!r.ok || j.success === false) throw new Error(j.error || ('HTTP ' + r.status)); }); })
+            }).then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { if (!r.ok || !j || j.success !== true) throw new Error((j && j.error) || 'Publication status was not confirmed'); }); })
                 .then(function () { setManageStatus('ok', turnOn ? '✓ Published to the portal.' : 'Hidden from the portal.'); if (state.cust) loadManage(state.cust.id); })
                 .catch(function (err) { t.disabled = false; setManageStatus('err', '✗ Photo NOT ' + (turnOn ? 'published' : 'hidden') + ': ' + (err.message || 'request failed')); });
         } else if (act === 'del') {
@@ -490,7 +501,7 @@
     var lightboxReturnFocus = null;
     function closeLightbox() {
         var wasOpen = !el('fp-lightbox').hidden;
-        el('fp-lightbox').hidden = true; el('fp-lightbox-img').src = '';
+        window.UiDialog.close('fp-lightbox'); el('fp-lightbox-img').src = '';
         if (wasOpen && lightboxReturnFocus && document.body.contains(lightboxReturnFocus)) { try { lightboxReturnFocus.focus(); } catch (e) { /* gone */ } }
         lightboxReturnFocus = null;
     }

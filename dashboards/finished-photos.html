@@ -1,6 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
+<!DOCTYPE html><html lang="en"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="robots" content="noindex, nofollow">
@@ -16,147 +14,146 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Finished Photos">
-    <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/dashboards/css/finished-photos.css?v=2026.09.07.19">
-</head>
-<body>
-    <header class="fp-topbar">
-        <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
-             alt="Northwest Custom Apparel" class="fp-logo" id="fp-logo">
-        <div class="fp-topbar-text">
-            <h1>Finished Photos</h1>
-            <p>Snap the finished piece &rarr; publish it to the customer&rsquo;s portal</p>
-        </div>
-        <a class="fp-back" href="/staff-dashboard.html" title="Back to the staff dashboard"><span aria-hidden="true">&larr;</span> Dashboard</a>
-    </header>
 
-    <main class="fp-main">
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap"><link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.09.14"><link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.09.14"><link rel="stylesheet" href="/shared_components/css/photo-workspaces.css?v=2026.09.09.14"></head>
+<body data-ui="unified" data-photo="capture" data-department="photo"><a class="skip-link" href="#photo-main">Skip to photo capture</a>
+    <div class="dash-shell"><header class="fp-topbar dash-header">
+        <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" alt="Northwest Custom Apparel" class="fp-logo dash-header-logo" id="fp-logo">
+        <div class="fp-topbar-text">
+            <h1 id="photo-title" class="dash-header-title">Finished Photos</h1>
+            <p>Snap the finished piece → publish it to the customer’s portal</p>
+        </div>
+        <a class="fp-back btn btn-secondary" href="/staff-dashboard.html" title="Back to the staff dashboard"><span aria-hidden="true">←</span> Dashboard</a>
+    </header><main class="fp-main dash-content" id="photo-main" tabindex="-1" aria-labelledby="photo-title">
         <!-- STEP 1 — find the order / customer -->
-        <section class="fp-step" id="fp-step-find">
+        <section class="fp-step dash-card" id="fp-step-find">
             <div class="fp-step-head"><span class="fp-num">1</span><h2>Find the order</h2></div>
 
             <div id="fp-find-picker">
                 <div class="fp-modes" role="tablist" aria-label="How to find the order">
-                    <button type="button" class="fp-mode" id="fp-mode-scan" data-mode="scan" role="tab" aria-selected="false" aria-controls="fp-pane-scan">
-                        <span class="fp-mode-ico" aria-hidden="true">&#9635;</span>Scan
+                    <button type="button" class="fp-mode btn btn-secondary" id="fp-mode-scan" data-mode="scan" role="tab" aria-selected="false" aria-controls="fp-pane-scan">
+                        <span class="fp-mode-ico" aria-hidden="true">▣</span>Scan
                     </button>
-                    <button type="button" class="fp-mode" id="fp-mode-order" data-mode="order" role="tab" aria-selected="false" aria-controls="fp-pane-order">
+                    <button type="button" class="fp-mode btn btn-secondary" id="fp-mode-order" data-mode="order" role="tab" aria-selected="false" aria-controls="fp-pane-order">
                         <span class="fp-mode-ico" aria-hidden="true">#</span>Order&nbsp;#
                     </button>
-                    <button type="button" class="fp-mode" id="fp-mode-search" data-mode="search" role="tab" aria-selected="false" aria-controls="fp-pane-search">
-                        <span class="fp-mode-ico" aria-hidden="true">&#9906;</span>Search
+                    <button type="button" class="fp-mode btn btn-secondary" id="fp-mode-search" data-mode="search" role="tab" aria-selected="false" aria-controls="fp-pane-search">
+                        <span class="fp-mode-ico" aria-hidden="true">⚲</span>Search
                     </button>
                 </div>
 
                 <!-- Scan a work-order barcode -->
-                <div class="fp-pane" id="fp-pane-scan" role="tabpanel" aria-labelledby="fp-mode-scan" hidden>
-                    <button type="button" class="fp-scan-btn" id="fp-scan-open">
-                        <span class="fp-scan-btn-ico" aria-hidden="true">&#128247;</span>
+                <div class="fp-pane" id="fp-pane-scan" role="tabpanel" aria-labelledby="fp-mode-scan" hidden="">
+                    <button type="button" class="fp-scan-btn btn btn-secondary" id="fp-scan-open">
+                        <span class="fp-scan-btn-ico" aria-hidden="true">📷</span>
                         <span>Scan the work-order barcode</span>
-                        <span class="fp-scan-btn-sub">Bottom of the work order &middot; or the design-sheet barcode</span>
+                        <span class="fp-scan-btn-sub">Bottom of the work order · or the design-sheet barcode</span>
                     </button>
                 </div>
 
                 <!-- Type the order number -->
-                <div class="fp-pane" id="fp-pane-order" role="tabpanel" aria-labelledby="fp-mode-order" hidden>
+                <div class="fp-pane" id="fp-pane-order" role="tabpanel" aria-labelledby="fp-mode-order" hidden="">
                     <div class="fp-orderrow">
-                        <input type="text" id="fp-order-input" aria-label="Order number" class="fp-input" inputmode="numeric" autocomplete="off"
-                               enterkeyhint="search" placeholder="Order # — e.g. 142476">
-                        <button type="button" class="fp-btn fp-btn-primary fp-btn-inline" id="fp-order-find">Find</button>
+                        <input type="text" id="fp-order-input" aria-label="Order number" class="fp-input field-input" inputmode="numeric" autocomplete="off" enterkeyhint="search" placeholder="Order # — e.g. 142476">
+                        <button type="button" class="fp-btn fp-btn-primary fp-btn-inline btn btn-primary" id="fp-order-find">Find</button>
                     </div>
                     <p class="fp-hint">Top-right of the work order. Design #s from the design sheet work too. A handheld scanner can type straight into this box.</p>
                 </div>
 
                 <!-- Search company name -->
-                <div class="fp-pane" id="fp-pane-search" role="tabpanel" aria-labelledby="fp-mode-search" hidden>
-                    <input type="search" id="fp-cust-search" aria-label="Customer search" class="fp-input" placeholder="Search company name&hellip;" autocomplete="off" autocapitalize="none">
-                    <div class="fp-results" id="fp-cust-results" hidden></div>
+                <div class="fp-pane" id="fp-pane-search" role="tabpanel" aria-labelledby="fp-mode-search" hidden="">
+                    <input type="search" id="fp-cust-search" aria-label="Customer search" class="fp-input field-input" placeholder="Search company name…" autocomplete="off" autocapitalize="none">
+                    <div class="fp-results" id="fp-cust-results" hidden=""></div>
                 </div>
 
                 <div class="fp-status" id="fp-find-status" role="status" aria-live="polite"></div>
             </div>
 
-            <div class="fp-chosen" id="fp-cust-chosen" hidden>
+            <div class="fp-chosen" id="fp-cust-chosen" hidden="">
                 <div class="fp-chosen-body">
                     <strong id="fp-cust-name"></strong>
                     <div class="fp-chips">
                         <span class="fp-chip" id="fp-cust-id"></span>
-                        <span class="fp-chip fp-chip--order" id="fp-order-chip" hidden></span>
+                        <span class="fp-chip fp-chip--order" id="fp-order-chip" hidden=""></span>
                     </div>
                 </div>
-                <button type="button" class="fp-link" id="fp-cust-change">Change</button>
+                <button type="button" class="fp-link btn btn-secondary" id="fp-cust-change">Change</button>
             </div>
         </section>
 
         <!-- STEP 2 — design -->
-        <section class="fp-step" id="fp-step-design" hidden>
+        <section class="fp-step dash-card" id="fp-step-design" hidden="">
             <div class="fp-step-head"><span class="fp-num">2</span><h2>Design</h2></div>
-            <p class="fp-hint" id="fp-design-hint">Tap the design this photo is for &mdash; it files the photo next to that logo on the portal.</p>
+            <p class="fp-hint" id="fp-design-hint">Tap the design this photo is for — it files the photo next to that logo on the portal.</p>
             <div class="fp-design-grid" id="fp-design-grid"></div>
-            <button type="button" class="fp-link" id="fp-design-none">No specific design &mdash; general photo</button>
-            <div class="fp-chosen" id="fp-design-chosen" hidden>
+            <button type="button" class="fp-link btn btn-secondary" id="fp-design-none">No specific design — general photo</button>
+            <div class="fp-chosen" id="fp-design-chosen" hidden="">
                 <div class="fp-chosen-body">
                     <strong id="fp-design-name"></strong>
                     <div class="fp-chips"><span class="fp-chip" id="fp-design-num"></span></div>
                 </div>
-                <button type="button" class="fp-link" id="fp-design-change">Change</button>
+                <button type="button" class="fp-link btn btn-secondary" id="fp-design-change">Change</button>
             </div>
         </section>
 
         <!-- STEP 3 — photo -->
-        <section class="fp-step" id="fp-step-photo" hidden>
+        <section class="fp-step dash-card" id="fp-step-photo" hidden="">
             <div class="fp-step-head"><span class="fp-num">3</span><h2>Photo</h2></div>
             <p class="fp-hint">Clean shot = happy customer: plain background, garment flat or on a form, logo filling the frame.</p>
-            <input type="file" id="fp-file" accept="image/*" capture="environment" hidden>
-            <input type="file" id="fp-file-album" accept="image/*" hidden>
+
+
             <div class="fp-photo-btns" id="fp-photo-btns">
-                <label for="fp-file" class="fp-camera-btn" id="fp-camera-btn" role="button" tabindex="0">
-                    <span class="fp-camera-ico" aria-hidden="true">&#128247;</span>
+                <div class="photo-file-field"><label for="fp-file" class="fp-camera-btn" id="fp-camera-btn">
+                    <span class="fp-camera-ico" aria-hidden="true">📷</span>
                     <span>Take a photo</span>
-                </label>
-                <label for="fp-file-album" class="fp-album-btn" id="fp-album-btn" role="button" tabindex="0">&#128444;&#65039; Choose from album</label>
+                </label><input type="file" id="fp-file" accept="image/*" capture="environment" class="field-input"></div>
+                <div class="photo-file-field"><label for="fp-file-album" class="fp-album-btn" id="fp-album-btn">🖼️ Choose from album</label><input type="file" id="fp-file-album" accept="image/*" class="field-input"></div>
             </div>
-            <div class="fp-preview-wrap" id="fp-preview-wrap" hidden>
+            <div class="fp-preview-wrap" id="fp-preview-wrap" hidden="">
                 <img id="fp-preview" alt="Selected photo preview">
-                <button type="button" class="fp-retake" id="fp-retake">&#8634; Retake</button>
-                <span class="fp-size-note" id="fp-size-note" hidden></span>
+                <button type="button" class="fp-retake btn btn-secondary" id="fp-retake">↺ Retake</button>
+                <span class="fp-size-note" id="fp-size-note" hidden=""></span>
             </div>
             <div class="fp-caption-chips" id="fp-caption-chips" role="group" aria-label="Quick captions">
-                <button type="button" class="fp-cchip" data-cap="Front">Front</button>
-                <button type="button" class="fp-cchip" data-cap="Back">Back</button>
-                <button type="button" class="fp-cchip" data-cap="Left chest">Left chest</button>
-                <button type="button" class="fp-cchip" data-cap="Sleeve">Sleeve</button>
-                <button type="button" class="fp-cchip" data-cap="Cap">Cap</button>
+                <button type="button" class="fp-cchip btn btn-secondary" data-cap="Front">Front</button>
+                <button type="button" class="fp-cchip btn btn-secondary" data-cap="Back">Back</button>
+                <button type="button" class="fp-cchip btn btn-secondary" data-cap="Left chest">Left chest</button>
+                <button type="button" class="fp-cchip btn btn-secondary" data-cap="Sleeve">Sleeve</button>
+                <button type="button" class="fp-cchip btn btn-secondary" data-cap="Cap">Cap</button>
             </div>
-            <input type="text" id="fp-caption" aria-label="Photo caption" class="fp-input" placeholder="Optional caption (e.g. 'Left chest on navy polo')" maxlength="200">
-            <button type="button" class="fp-btn fp-btn-primary" id="fp-upload-btn" disabled>Upload photo</button>
+            <input type="text" id="fp-caption" aria-label="Photo caption" class="fp-input field-input" placeholder="Optional caption (e.g. 'Left chest on navy polo')" maxlength="200">
+            <button type="button" class="fp-btn fp-btn-primary btn btn-primary" id="fp-upload-btn" disabled="">Upload photo</button>
             <div class="fp-status" id="fp-status" role="status" aria-live="polite"></div>
         </section>
 
         <!-- Manage — this customer's photos -->
-        <section class="fp-step" id="fp-step-manage" hidden>
-            <div class="fp-step-head"><span class="fp-num">&#10003;</span><h2>On file for this customer</h2></div>
-            <p class="fp-hint">New photos stay <em>hidden</em> until you publish them. Only published photos appear on the customer&rsquo;s portal.</p>
+        <section class="fp-step dash-card" id="fp-step-manage" hidden="">
+            <div class="fp-step-head"><span class="fp-num">✓</span><h2>On file for this customer</h2></div>
+            <p class="fp-hint">New photos stay <em>hidden</em> until you publish them. Only published photos appear on the customer’s portal.</p>
             <div class="fp-manage-list" id="fp-manage-list"></div>
-            <div class="fp-empty" id="fp-manage-empty" hidden>No photos for this customer yet.</div>
+            <div class="fp-status" id="photo-manage-status" role="status" aria-live="polite"></div>
+            <div class="fp-empty" id="fp-manage-empty" hidden="">No photos for this customer yet.</div>
         </section>
-    </main>
+    </main></div>
+
+
 
     <!-- Barcode scanner modal -->
-    <div class="fp-scan-modal" id="fp-scan-modal" hidden>
-        <div class="fp-scan-sheet" role="dialog" aria-modal="true" aria-labelledby="fp-scan-title">
+    <div class="fp-scan-modal" id="fp-scan-modal" hidden="">
+        <div class="fp-scan-sheet ui-dialog" role="dialog" aria-modal="true" aria-labelledby="fp-scan-title">
             <div class="fp-scan-head">
                 <strong id="fp-scan-title">Scan the barcode</strong>
-                <button type="button" class="fp-scan-close" id="fp-scan-close" aria-label="Close scanner">&times;</button>
+                <button type="button" class="fp-scan-close btn btn-secondary" id="fp-scan-close" aria-label="Close scanner">×</button>
             </div>
             <div id="fp-scan-video"></div>
-            <div class="fp-scan-status" id="fp-scan-status" role="status" aria-live="polite">Starting camera&hellip;</div>
+            <div class="fp-scan-status" id="fp-scan-status" role="status" aria-live="polite">Starting camera…</div>
         </div>
     </div>
 
     <!-- Photo lightbox (manage list) -->
-    <div class="fp-lightbox" id="fp-lightbox" role="dialog" aria-modal="true" aria-label="Photo, full size" hidden>
-        <button type="button" class="fp-lightbox-close" id="fp-lightbox-close" aria-label="Close">&times;</button>
+    <div class="fp-lightbox" id="fp-lightbox" role="dialog" aria-modal="true" aria-label="Photo, full size" hidden="">
+        <button type="button" class="fp-lightbox-close btn btn-secondary" id="fp-lightbox-close" aria-label="Close">×</button>
         <img id="fp-lightbox-img" alt="Finished photo full size">
     </div>
 
@@ -164,7 +161,8 @@
     <!-- box-url.js before the controller: stored photo urls are absolute proxy urls
          that 401 cross-origin, and boxUrl() is what brings them back to this origin. -->
     <script src="/shared_components/js/box-url.js?v=2026.08.05.23"></script>
-    <script src="/dashboards/js/vendor/html5-qrcode.min.js?v=2026.07.17.11" defer></script>
-    <script src="/dashboards/js/finished-photos.js?v=2026.09.07.25" defer></script>
-</body>
-</html>
+    <script src="/dashboards/js/vendor/html5-qrcode.min.js?v=2026.07.17.11" defer=""></script>
+    <script src="/shared_components/js/ui-dialog.js?v=2026.09.09.14"></script><script src="/dashboards/js/finished-photos.js?v=2026.09.09.14" defer=""></script>
+
+
+</body></html>
