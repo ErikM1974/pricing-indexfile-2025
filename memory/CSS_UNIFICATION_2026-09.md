@@ -8,7 +8,7 @@ Erik resumed explicitly; edit/deploy authorization continues. The 17 printable f
 
 **41 reviewed application pages live; 183 still pending**, from 224 application/served-archive HTML sources. Another 80 tracked HTML files are excluded archives/email/templates/retired sources. Generated style/document owners remain separate work. Inventory: September 7 artifacts/css-shutdown-inventory.json.
 
-Next batch: seven remaining training pages — customer-categorization-training, lead-email-templates, lead-source-training, training-games-hub, shopworks-notes, shopworks-sales-tax-training, team-match-game. Baselines already captured in remaining-training-baseline.json / training-before-*.png. Preserve original training prose, fixtures, destinations and rates. Share scoped navigation/control/layout styles, retain page-specific game arrangements, verify keyboard/touch games and template copy/edit/failure states. No source edits to that batch yet.
+Next batch: seven remaining training pages — customer-categorization-training, lead-email-templates, lead-source-training, training-games-hub, shopworks-notes, shopworks-sales-tax-training, team-match-game. Baselines already captured in remaining-training-baseline.json / training-before-*.png. Preserve original training prose, fixtures, destinations and rates. Share scoped navigation/control/layout styles, retain page-specific game arrangements, verify keyboard/touch games and template copy/edit/failure states. Implementation is local and under validation.
 
 ### Verification and resuming safely
 
@@ -17,6 +17,10 @@ Forms local gates: 207 unit suites / 5,014 tests, 88 DOM, four a11y unit, 84 quo
 Artifacts: C:/Users/erik/.codex/visualizations/2026/09/07/01a07d90-9a4c-7e70-9e4e-c196377b7c6b. printable-forms-release-record.json, source-ci.json, heroku-verification.json and live-verification.json are authoritative. Do NOT rerun historical install/release helpers. Fresh-check branch, CI and ownership before the next release. Release main/develop CI is tracked separately after source CI.
 
 Backend remains v2026.09.08.1 / Heroku 1130 / d06aee3e4d25c5e1410241ea8007cdc8339aa3fa. Its dependency/runtime backlog and natural scheduler verification are unfinished separate work. Frontend production audit remains zero; Heroku build notes two dev dependency advisories and stack-22 deprecation, to assess separately without broadening this CSS release.
+
+### Training practice implementation — active local batch
+
+Seven pages now share training-guide/practice owners and component primitives. Twenty focused browser cases are implemented: the first eighteen passed; completion/timer refinements passed their two targeted cases afterward. Ninety ownership/content/fixture tests pass. Full release gates and PDF review remain required before source CI/deploy. Superseded training-shared.css is retired after a zero-HTML-caller check; original lesson text and seven JS exercise fixture objects are unchanged. Template storage/copy failures stay visible, saved templates render after reload, matching supports touch/keyboard/drag, quiz/tax scoring and mode timers are guarded. Forms .12 main CI 34297584052 is green.
 
 ## Resumed — 2026-09-08
 
