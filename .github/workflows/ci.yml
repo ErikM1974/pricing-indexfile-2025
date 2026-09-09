@@ -87,6 +87,17 @@ jobs:
         with:
           path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-playwright-${{ steps.pw.outputs.version }}
+      # The runner's Google Chrome repository is unrelated to Playwright's
+      # bundled Chromium. Its inconsistent index blocked apt before any tests
+      # on 2026-09-09. Disable only that vendor source on this temporary runner;
+      # Ubuntu system libraries and all package integrity checks stay enabled.
+      - name: Disable unrelated Google Chrome package source
+        run: |
+          for source in /etc/apt/sources.list.d/google-chrome.list /etc/apt/sources.list.d/google-chrome.sources; do
+            if [ -f "$source" ] && grep -Eq 'dl\.google\.com/linux/chrome(-stable)?/deb' "$source"; then
+              sudo mv -- "$source" "$source.disabled"
+            fi
+          done
       - name: Install Chromium + OS deps (cache miss)
         if: steps.pw-cache.outputs.cache-hit != 'true'
         run: npx playwright install --with-deps chromium

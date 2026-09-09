@@ -102,6 +102,8 @@ skip never means untested).
 it skipped. 🔑 `gh run list -L 5` belongs in the deploy pre-flight: local green is not CI green. 🔑 To switch the
 live-engine specs back on in CI, add `CRM_API_SECRET` under Settings → Secrets → Actions.
 
+CI setup follow-up (2026-09-09): a Google Chrome apt index checksum mismatch blocked Playwright before tests on two runners. CI uses bundled Chromium; disable only the unrelated Google Chrome source on the disposable runner and keep Ubuntu repositories/checksum verification intact. Require the actual browser steps to pass on the new exact commit.
+
 ## 2026-09-08 — Node runtime and dependency audit must match CI
 
 **Problem.** Production and CI selected Node 18 while local checks ran Node 22; 17 high audit findings remained.
