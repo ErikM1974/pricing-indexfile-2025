@@ -785,3 +785,7 @@ Use Public Sans, canonical fields/buttons/cards and a shared scoped staff tools 
 ## Staff access/portal implementation in progress — 2026-09-09
 
 Staff access/portal migration in progress: shared_components/css/staff-admin-tools.css replaces dashboards/css/access-admin.css, drive-access.css and portal-directory.css after their final consumers move. Canonical buttons/fields/cards/tables, named keyboard table scrolling and skip links. Three controllers differ only through explicitly recorded presentation-class and heading/pressed-state replacements; permission payloads, drive rights and portal links unchanged. Full state/content/paper review pending; no added reviewed pages.
+
+### Staff tools review in progress — 2026-09-09
+
+Three layouts implemented in isolated codex/staff-admin-tools.15 focused browser cases passed after labeling the empty drive summary as a group. Permission writes/removal confirmations and drive rights/portal destinations mocked and retained. Paper review found clipped native table values/placeholder ambiguity and excessive drive whitespace; current-value print mirrors and scoped compact print arrangements under review. No new pages counted reviewed/live yet. Source hash guards reverse only explicit presentation changes.

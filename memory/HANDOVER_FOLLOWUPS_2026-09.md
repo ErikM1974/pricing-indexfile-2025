@@ -215,3 +215,7 @@ Intake4 and hosted staff tools5 are reviewed and now integrated on primary devel
 ## Administrative ownership correction before release — 2026-09-09
 
 Final design-rule audit caught inherited announcement maroon. DESIGN_COLOUR_CODE reserves that accent for AE chrome; both administrative wrappers now use existing neutral ink tokens, while vendor wrappers retain Bradley slate. Controller/provider contracts remain unchanged. Combined full run was intentionally stopped after deterministic checks passed so the final source can be retested; no completed browser gate claimed.
+
+### Staff tools review in progress — 2026-09-09
+
+Three layouts implemented in isolated codex/staff-admin-tools.15 focused browser cases passed after labeling the empty drive summary as a group. Permission writes/removal confirmations and drive rights/portal destinations mocked and retained. Paper review found clipped native table values/placeholder ambiguity and excessive drive whitespace; current-value print mirrors and scoped compact print arrangements under review. No new pages counted reviewed/live yet. Source hash guards reverse only explicit presentation changes.
