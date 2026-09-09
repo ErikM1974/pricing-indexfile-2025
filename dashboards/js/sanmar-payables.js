@@ -31,7 +31,7 @@
     var state = {
         activeTab: 'invoices',
         unpaid: [], range: { start: '', end: '' },
-        loadError: '',
+        loadError: '', invoicesLoading: true, invoiceRequest: 0, marking: false,
         imports: null, importsLoaded: false, // Map(normInv → {date}) — self-managed "imported to ShopWorks" stamps (primary)
         sw: null,       // { map: Map(normInv → {datePaid, outstanding}) } — optional ShopWorks feed/upload (adds Paid)
         mkt: null
@@ -138,11 +138,7 @@
                 renderInvoiceTable();
             });
         });
-        // The upload control is a <label for=file> — make it keyboard-operable
-        var up = document.querySelector('.smp-upload-btn');
-        if (up) up.addEventListener('keydown', function (e) {
-            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); el('smp-sw-file').click(); }
-        });
+        // The visible native file input owns keyboard file selection.
         el('smp-start').value = isoDaysAgo(RECENT_DAYS);
         el('smp-end').value = todayIso();
         el('smp-refresh').addEventListener('click', function () {
@@ -195,12 +191,17 @@
         if (start > end) { DashPage.showError('Start date must be on or before the end date.'); return; }
         DashPage.hideError();
         state.range = { start: start, end: end };
+        var request = ++state.invoiceRequest;
+        state.invoicesLoading = true; state.loadError = ''; state.unpaid = []; state.olderCount = 0;
+        el('smp-updated').textContent = 'Loading open payables…';
+        renderInvoiceStats();
         el('smp-tbody').innerHTML = '<tr><td colspan="8" class="smp-empty dash-loading">Loading open SanMar payables…</td></tr>';
         el('smp-select-all').checked = false;
         // GetUnpaidInvoices returns the full open ledger; filter to vendor-1002 (non-MRKFUND) in the date window.
         fetchJson('/api/staff/sanmar-invoices/unpaid').then(function (data) {
-            state.loadError = '';
-            var all = (data.invoices || []).filter(function (i) { return !isMarketing(i); });
+            if (request !== state.invoiceRequest) return;
+            var all = invoiceRows(data).filter(function (i) { return !isMarketing(i); });
+            state.loadError = ''; state.invoicesLoading = false;
             state.olderCount = all.filter(function (i) { return String(i.invoiceDate) < start; }).length;
             state.unpaid = all.filter(function (i) {
                 var d = String(i.invoiceDate);
@@ -215,6 +216,9 @@
                 new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) +
                 ' · ' + toMDY(start) + ' – ' + toMDY(end);
         }).catch(function (err) {
+            if (request !== state.invoiceRequest) return;
+            state.invoicesLoading = false;
+            el('smp-updated').textContent = 'Not loaded — retry to update balances.';
             DashPage.showError('Could not load open payables: ' + err.message);
             // Remember the failure: renderInvoiceTable() is also called by the imports/ShopWorks feeds
             // when THEY land, and used to overwrite this row with "No open payables in this range".
@@ -266,6 +270,10 @@
     }
 
     function renderInvoiceStats() {
+        if (state.invoicesLoading || state.loadError) {
+            ['smp-stat-count', 'smp-stat-net', 'smp-stat-notimported'].forEach(function (id) { el(id).textContent = '—'; });
+            el('smp-older-hint').hidden = true; updateSelectionCount(); return;
+        }
         var owed = state.unpaid.reduce(function (s, i) { return s + (Number(i.totalAmount) || 0); }, 0);
         el('smp-stat-count').textContent = state.unpaid.length;
         el('smp-stat-net').textContent = money(owed);
@@ -290,9 +298,13 @@
     function renderInvoiceTable() {
         syncStatTiles();
         var rows = filteredInvoices();
+        if (state.invoicesLoading) {
+            el('smp-tbody').innerHTML = '<tr><td colspan="8" class="smp-empty dash-loading">Loading open SanMar payables…</td></tr>';
+            updateSelectionCount(); return;
+        }
         if (!rows.length && state.loadError) {
             el('smp-tbody').innerHTML = '<tr><td colspan="8" class="smp-empty" role="alert">Not loaded — ' + esc(state.loadError) + ' ' +
-                '<button type="button" class="dash-btn smp-retry" id="smp-inv-retry">Retry</button></td></tr>';
+                '<button type="button" class="dash-btn smp-retry btn btn-secondary" id="smp-inv-retry">Retry</button></td></tr>';
             var rb = el('smp-inv-retry'); if (rb) rb.addEventListener('click', loadInvoices);
             el('smp-select-all').checked = false; updateSelectionCount(); return;
         }
@@ -338,13 +350,15 @@
         var n = el('smp-tbody').querySelectorAll('.smp-row-check:checked').length;
         el('smp-stat-selected').textContent = n;
         var dl = el('smp-download');
-        dl.disabled = n === 0;
+        var unavailable = state.invoicesLoading || !!state.loadError || !(state.importsLoaded || state.sw);
+        dl.disabled = n === 0 || unavailable;
         dl.querySelector('.smp-download-count').textContent = n;
         var mk = el('smp-markimported');
-        if (mk) { mk.disabled = n === 0; var c = mk.querySelector('.smp-mark-count'); if (c) c.textContent = n; }
+        if (mk) { mk.disabled = n === 0 || unavailable || state.marking; var c = mk.querySelector('.smp-mark-count'); if (c) c.textContent = n; }
     }
 
     function downloadStandardCsv() {
+        if (el('smp-download').disabled) { DashPage.showError('Wait for invoice and imported-status data before exporting.'); return; }
         var picks = selectedInvoices();
         if (!picks.length) { DashPage.showError('Select at least one invoice to export.'); return; }
         DashPage.hideError();
@@ -374,25 +388,30 @@
 
     // Load the import-stamp log → the PRIMARY imported cross-reference (no ShopWorks needed).
     function loadImports() {
+        state.importsLoaded = false; state.imports = null;
+        if (!state.sw) { el('smp-status-filter').disabled = true; el('smp-status-filter').value = 'all'; }
+        updateSelectionCount();
         fetchJson('/api/staff/sanmar-invoices/imports').then(function (d) {
+            if (!d || !Array.isArray(d.imports) || d.imports.some(function (row) { return !row || !row.InvoiceNumber; })) throw new Error('Incomplete imported-status response');
             var map = new Map();
-            (d.imports || []).forEach(function (row) {
+            d.imports.forEach(function (row) {
                 var key = normInv(row.InvoiceNumber);
                 if (key && key !== '0') map.set(key, { date: fmtStamp(row.Date_Imported) });
             });
             state.imports = map; state.importsLoaded = true;
+            el('smp-sw-status').classList.remove('smp-sw-status--warn');
             enableStatusFilter();
             el('smp-sw-status').textContent = statusLine();
             renderInvoiceStats(); renderInvoiceTable();
         }).catch(function (err) {
             // Rule 4: the imported cross-reference failing must be SEEN — otherwise every row reads
             // "NOT IMPORTED" and looks like fresh work.
-            state.importsLoaded = true;
+            state.importsLoaded = false; state.imports = null;
             var st = el('smp-sw-status');
-            st.textContent = '\u26a0 Imported status unavailable (' + (err.message || 'request failed') + ') — every row shows as not imported. ';
+            st.textContent = '\u26a0 Import log unavailable (' + (err.message || 'request failed') + ') — retry or load a ShopWorks export to check imported status. ';
             st.classList.add('smp-sw-status--warn');
             var rb = document.createElement('button');
-            rb.type = 'button'; rb.className = 'smp-linkbtn'; rb.textContent = 'Retry';
+            rb.type = 'button'; rb.className = 'smp-linkbtn btn btn-secondary'; rb.textContent = 'Retry';
             rb.addEventListener('click', function () { st.classList.remove('smp-sw-status--warn'); st.textContent = 'Loading imported status…'; state.importsLoaded = false; loadImports(); });
             st.appendChild(rb);
             renderInvoiceStats(); renderInvoiceTable();
@@ -401,6 +420,7 @@
 
     // Stamp the selected (not-yet-imported) invoices → they drop off the worklist.
     function markSelectedImported() {
+        if (el('smp-markimported').disabled) return;
         var picks = selectedInvoices().filter(function (i) { return !swStatus(i).imported; });
         if (!picks.length) { DashPage.showError('Select invoices that are not already imported.'); return; }
         if (!window.confirm('Mark ' + picks.length + ' invoice' + (picks.length === 1 ? '' : 's') + ' as imported into ShopWorks? They will drop off the "not imported" list.')) return;
@@ -409,7 +429,7 @@
             var neg = (Number(i.totalAmount) || 0) < 0;
             return { invoiceNumber: (neg ? 'CR-' : 'INV-') + String(i.invoiceNumber), payableDate: toMDY(i.invoiceDate), amount: Number(i.totalAmount) || 0, poNumber: String(i.purchaseOrderNo || ''), vendor: '1002' };
         }) };
-        var btn = el('smp-markimported'); btn.disabled = true;
+        var btn = el('smp-markimported'); state.marking = true; btn.disabled = true;
         fetch('/api/staff/sanmar-invoices/mark-imported', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
             .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
             .then(function (res) {
@@ -421,7 +441,7 @@
                 el('smp-sw-status').textContent = '✓ Marked ' + (res.stamped != null ? res.stamped : picks.length) + ' imported · ' + statusLine();
             })
             .catch(function (err) { DashPage.showError('Could not mark imported: ' + err.message); })
-            .then(function () { btn.disabled = false; });
+            .then(function () { state.marking = false; updateSelectionCount(); });
     }
 
     // ---------- ShopWorks payables cross-reference (upload now; ODBC later) ----------
@@ -466,6 +486,8 @@
     // enables the status filter, defaults to the worklist, re-renders.
     function applySw(map, statusText, allowClear) {
         state.sw = { map: map, count: map.size, at: new Date() };
+        el('purchasing-feed-status').textContent = statusText;
+        el('purchasing-feed-status').classList.remove('smp-sw-status--warn');
         enableStatusFilter();
         el('smp-sw-status').textContent = statusLine();
         el('smp-sw-clear').hidden = !allowClear;
@@ -493,22 +515,28 @@
     }
 
     // Auto ODBC feed (bandit → Caspio ShopWorks_Payables). When it has rows, the page
-    // skips the manual upload; when it's empty (sync not live yet) it silently leaves
-    // the upload fallback in place. Optional — never surfaces an error banner.
+    // skips the manual upload. Empty or unavailable sync is explained beside the
+    // manual fallback so absence of paid-status data cannot look like a complete sync.
     function loadShopworksFeed() {
         fetchJson('/api/staff/shopworks-payables?sinceDays=365').then(function (d) {
-            if (!d || !d.count) return;              // sync not populated yet → keep upload fallback
+            if (!d || !Array.isArray(d.rows) || d.rows.some(function (row) { return !row || !row.InvoiceNumber; })) throw new Error('Incomplete ShopWorks response');
+            if (!d.rows.length) { el('purchasing-feed-status').textContent = 'ShopWorks paid-status sync has no data. Upload an export to check payments.'; return; }
             var map = new Map();
-            (d.rows || []).forEach(function (row) {
+            d.rows.forEach(function (row) {
                 var key = normInv(row.InvoiceNumber);
                 if (key && key !== '0') map.set(key, { datePaid: String(row.date_Paid || '').trim(), outstanding: row.cnCur_PayableOutstanding });
             });
             applySw(map, 'Auto-synced from ShopWorks · ' + map.size + ' payables (refreshes ~every 15 min).', false);
-        }).catch(function () { /* optional feed — keep the upload fallback */ });
+        }).catch(function (err) {
+            var status = el('purchasing-feed-status');
+            status.textContent = 'ShopWorks paid-status sync unavailable (' + (err.message || 'request failed') + '). Upload an export to check payments.';
+            status.classList.add('smp-sw-status--warn');
+        });
     }
 
     function clearShopworks() {
         state.sw = null;
+        el('purchasing-feed-status').textContent = 'ShopWorks paid status cleared. Upload an export to check payments.';
         if (!(state.importsLoaded && state.imports)) { el('smp-status-filter').disabled = true; el('smp-status-filter').value = 'all'; }
         el('smp-sw-clear').hidden = true;
         el('smp-sw-status').textContent = statusLine();
@@ -529,12 +557,28 @@
         });
         return out;
     }
+    // Reject missing or invalid ledger data before it can look like a zero balance.
+    function invoiceRows(data) {
+        if (!data || !Array.isArray(data.invoices) || data.invoices.some(function (i) {
+            return !i || !i.invoiceNumber || !/^\d{4}-\d{2}-\d{2}$/.test(String(i.invoiceDate)) ||
+                i.totalAmount == null || String(i.totalAmount).trim() === '' || !Number.isFinite(Number(i.totalAmount));
+        })) throw new Error('Incomplete invoice response');
+        return data.invoices;
+    }
+
     function fetchByDate(start, end) {
         return fetchJson('/api/staff/sanmar-invoices/by-date?start=' + encodeURIComponent(start) + '&end=' + encodeURIComponent(end))
-            .then(function (d) { return d.invoices || []; });
+            .then(invoiceRows);
     }
 
     function loadMarketing() {
+        state.mkt = null;
+        el('smp-mkt-download').disabled = true;
+        ['smp-mkt-spent', 'smp-mkt-remaining', 'smp-mkt-used-pct', 'smp-mkt-projected', 'smp-mkt-bar-spent', 'smp-mkt-bar-left', 'smp-mkt-item-count'].forEach(function (id) { el(id).textContent = '—'; });
+        el('smp-mkt-projnote').textContent = '';
+        el('smp-mkt-bar').style.setProperty('--w', '0%');
+        el('smp-mkt-progress').removeAttribute('aria-valuenow');
+        el('smp-mkt-updated').textContent = 'Loading marketing-fund activity…';
         DashPage.hideError();
         el('smp-mkt-tbody').innerHTML = '<tr><td colspan="5" class="smp-empty dash-loading">Loading marketing-fund activity…</td></tr>';
         el('smp-mkt-monthbars').innerHTML = '<div class="smp-empty dash-loading">Loading…</div>';
@@ -550,10 +594,12 @@
             state.mkt = { items: items, byMonth: byMonth, net: items.reduce(function (s, i) { return s + (Number(i.totalAmount) || 0); }, 0) };
             el('smp-mkt-updated').textContent = 'Pulled live from SanMar · ' + new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) + ' · Jan 1 – today';
             renderMarketingTable(); renderMarketingMonths(); renderMarketingSummary();
+            el('smp-mkt-download').disabled = !items.length;
         }).catch(function (err) {
+            el('smp-mkt-updated').textContent = 'Not loaded — retry to update the fund.';
             DashPage.showError('Could not load marketing-fund activity: ' + err.message);
             el('smp-mkt-tbody').innerHTML = '<tr><td colspan="5" class="smp-empty" role="alert">Not loaded — ' + esc(err.message) + ' ' +
-                '<button type="button" class="dash-btn smp-retry" id="smp-mkt-retry">Retry</button></td></tr>';
+                '<button type="button" class="dash-btn smp-retry btn btn-secondary" id="smp-mkt-retry">Retry</button></td></tr>';
             var rb = el('smp-mkt-retry'); if (rb) rb.addEventListener('click', loadMarketing);
             el('smp-mkt-monthbars').innerHTML = '';
         });
@@ -628,7 +674,7 @@
     // ==================== shared invoice viewer ====================
 
     function viewBtn(i, ship) {
-        return '<button type="button" class="smp-view-btn" data-po="' + esc(basePo(i.purchaseOrderNo)) +
+        return '<button type="button" class="smp-view-btn btn btn-secondary" data-po="' + esc(basePo(i.purchaseOrderNo)) +
             '" data-company="' + esc(ship || '') + '" data-ordered="' + esc(i.orderDate || '') +
             '" aria-label="View SanMar invoice ' + esc(i.invoiceNumber || '') + '"><i class="fas fa-file-invoice-dollar" aria-hidden="true"></i> View</button>';
     }

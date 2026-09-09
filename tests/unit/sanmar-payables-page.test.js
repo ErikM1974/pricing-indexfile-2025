@@ -15,7 +15,7 @@ const BARE = /<i class="(?:fa[sr]|fa-solid|fa-regular) [^"]*"><\/i>/;
 const html = read('dashboards/sanmar-payables.html').replace(/<!--[\s\S]*?-->/g, '');
 const js = read('dashboards/js/sanmar-payables.js');
 const viewer = read('shared_components/js/sanmar-invoice-viewer.js');
-const css = read('dashboards/css/sanmar-payables.css');
+const css = read('shared_components/css/purchasing-workspaces.css');
 
 describe('sanmar payables — structure', () => {
     test('tabs, panels, tiles, statuses, icons, versions', () => {
@@ -26,13 +26,16 @@ describe('sanmar payables — structure', () => {
         expect(html).toMatch(/id="smp-sw-status" role="status"/);
         expect(html).toMatch(/id="smp-older-hint" role="status" hidden/);
         expect(html).toMatch(/role="progressbar" aria-label="Marketing fund used"/);
-        expect(html).toMatch(/for="smp-sw-file" role="button" tabindex="0"/);
-        expect(html).toMatch(/<button type="button" class="dash-error-banner-close" aria-label="Dismiss">/);
+        expect(html).toMatch(/<label[^>]+for="smp-sw-file">/);
+        expect(html).toMatch(/<input type="file" id="smp-sw-file"[^>]+class="purchasing-file"/);
+        expect(html).not.toMatch(/for="smp-sw-file" role="button"/);
+        expect(html).toMatch(/<button type="button" class="dash-error-banner-close btn btn-secondary" aria-label="Dismiss">/);
         expect(html).not.toMatch(BARE);
         expect(html).not.toMatch(/style="/);
         expect(html).toMatch(/sanmar-payables\.js\?v=2026\.09\./);
-        expect(css).toMatch(/^\[hidden\] \{ display: none !important; \}/m);
-        expect(css).toMatch(/\.smp-progress-fill \{ width: var\(--w, 0%\); \}/);
+        expect(read('shared_components/css/components.css')).toMatch(/\[hidden\][^}]*display: none/);
+        expect(css).not.toContain('!important');
+        expect(css).toMatch(/\.smp-progress-fill \{[^}]*width: var\(--w, 0%\);/);
     });
     test('the shared viewer is loaded at ONE version by all three consumers', () => {
         const v = /sanmar-invoice-viewer\.js\?v=([0-9.]+)/.exec(html)[1];
@@ -52,7 +55,7 @@ describe('sanmar payables — behaviour', () => {
         expect(js).toMatch(/id="smp-inv-retry"/);
         expect(js).toMatch(/id="smp-mkt-retry"/);
         expect(js).not.toMatch(/refresh to retry/);
-        expect(js).toMatch(/Imported status unavailable \(/);
+        expect(js).toMatch(/Import log unavailable \(/);
         expect(js).not.toMatch(/\.catch\(function \(\) \{ state\.importsLoaded = true;/);
         expect(js).toMatch(/bar\.style\.setProperty\('--w'/);
         expect(js).not.toMatch(/style="width:/);

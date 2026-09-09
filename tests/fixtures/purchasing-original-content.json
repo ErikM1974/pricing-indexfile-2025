@@ -1,0 +1,457 @@
+{
+  "base": "d524d2e51de086c1af8461392bd0fae6a0fc91c7",
+  "pages": [
+    {
+      "file": "dashboards/purchasing-portal.html",
+      "title": "Purchasing Portal - Northwest Custom Apparel",
+      "mainText": "— Requests (60d) — Awaiting Purchase — Ordered — Received — Invoiced / Shipped — Request → PO, median Purchase Requests to Bradley All requesters All statuses Sent to Bradley Ordered Partially received Received Invoiced Shipped Show finished WO # Company Requested by Sent Type PO # Vendors Ordered Received Status Request · Invoice Loading purchase requests…",
+      "headerText": "Purchasing Portal Form inbox Refresh Dashboard",
+      "ids": [
+        "pp-refresh",
+        "pp-stat-total",
+        "pp-stat-total-sub",
+        "pp-stat-sent",
+        "pp-stat-sent-sub",
+        "pp-stat-ordered",
+        "pp-stat-ordered-sub",
+        "pp-stat-received",
+        "pp-stat-received-sub",
+        "pp-stat-done",
+        "pp-stat-done-sub",
+        "pp-stat-turnaround",
+        "pp-stat-turnaround-sub",
+        "pp-updated",
+        "pp-search",
+        "pp-filter-rep",
+        "pp-filter-status",
+        "pp-show-finished",
+        "pp-finished-n",
+        "pp-shown",
+        "pp-trunc",
+        "pp-tbody"
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "label": ""
+        },
+        {
+          "href": "https://www.jotform.com/inbox/241646601815152",
+          "label": "Form inbox"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "label": "Dashboard"
+        }
+      ],
+      "images": [
+        {
+          "src": "https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1",
+          "alt": "Northwest Custom Apparel"
+        }
+      ],
+      "scripts": [
+        "/config/app.config.js",
+        "/shared_components/js/fetch-timeout.js?v=2026.09.06.26",
+        "/shared_components/js/dash-page-helpers.js?v=2026.09.07.25",
+        "/shared_components/js/sanmar-invoice-viewer.js?v=2026.09.05.63",
+        "/dashboards/js/purchasing-portal.js?v=2026.09.05.70"
+      ],
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/art-hub.css",
+        "shared_components/css/dash-shell.css",
+        "shared_components/css/sanmar-invoice-viewer.css",
+        "dashboards/css/purchasing-portal.css"
+      ],
+      "cssBytes": 170371
+    },
+    {
+      "file": "dashboards/sanmar-payables.html",
+      "title": "SanMar Payables - Northwest Custom Apparel",
+      "mainText": "Invoices Marketing Fund — Open payables — Amount owed — Not imported yet — Selected for export Open SanMar Payables Upload ShopWorks payables clear Loading imported status… From date To date Show Not imported & unpaid Imported, awaiting payment All still owed Everything (incl. paid) PO # Invoice # Invoice Date Invoice # PO # Ship To Amount ShopWorks status Invoice Loading open SanMar payables… Workflow: select the not-imported rows → Download ShopWorks CSV → import into ShopWorks → Mark imported (stamps them so they drop off this list). Marketing-fund charges live on the Marketing Fund tab. Download ShopWorks CSV (0) Mark imported (0) — Remaining this year — Spent year-to-date — % of fund used — Projected unused (Dec 31) 2026 SanMar Marketing Fund Vendor 2425 Annual allotment ($) Spent — Remaining — Monthly spend Marketing charges (0) DateInvoice #PO #AmountInvoice Loading marketing-fund activity… Marketing-fund charges import to ShopWorks vendor 2425 — 6920-0001 Marketing (Sanmar), separate from standard payables. Download Marketing CSV (2425)",
+      "headerText": "SanMar Payables Refresh Dashboard",
+      "ids": [
+        "smp-refresh",
+        "smp-tab-invoices",
+        "smp-tab-marketing",
+        "smp-panel-invoices",
+        "smp-stat-count",
+        "smp-stat-net",
+        "smp-stat-notimported",
+        "smp-stat-selected",
+        "smp-updated",
+        "smp-sw-file",
+        "smp-sw-clear",
+        "smp-sw-status",
+        "smp-start",
+        "smp-end",
+        "smp-status-filter",
+        "smp-search-po",
+        "smp-search-inv",
+        "smp-older-hint",
+        "smp-select-all",
+        "smp-tbody",
+        "smp-download",
+        "smp-markimported",
+        "smp-panel-marketing",
+        "smp-mkt-remaining",
+        "smp-mkt-spent",
+        "smp-mkt-used-pct",
+        "smp-mkt-projected",
+        "smp-mkt-year",
+        "smp-mkt-updated",
+        "smp-mkt-allowance",
+        "smp-mkt-projnote",
+        "smp-mkt-progress",
+        "smp-mkt-bar",
+        "smp-mkt-bar-spent",
+        "smp-mkt-bar-left",
+        "smp-mkt-monthbars",
+        "smp-mkt-item-count",
+        "smp-mkt-tbody",
+        "smp-mkt-download"
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "label": ""
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "label": "Dashboard"
+        }
+      ],
+      "images": [
+        {
+          "src": "https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1",
+          "alt": "Northwest Custom Apparel"
+        }
+      ],
+      "scripts": [
+        "/config/app.config.js",
+        "/shared_components/js/fetch-timeout.js?v=2026.09.06.26",
+        "/shared_components/js/dash-page-helpers.js?v=2026.09.07.25",
+        "/shared_components/js/sanmar-invoice-viewer.js?v=2026.09.05.63",
+        "/dashboards/js/sanmar-payables.js?v=2026.09.07.33"
+      ],
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/art-hub.css",
+        "shared_components/css/dash-shell.css",
+        "shared_components/css/sanmar-invoice-viewer.css",
+        "dashboards/css/sanmar-payables.css"
+      ],
+      "cssBytes": 172534
+    }
+  ],
+  "hashes": {
+    "dashboards/js/purchasing-portal.js": "45af956fb27465e8478d7d14c2173be4894e472cda6dade95ee15b36108e7ede",
+    "dashboards/js/sanmar-payables.js": "b322dc3f9c77c474c1709a2bb206f362d1b1bf0acd6959ca1809cfa4d4b7b9c1",
+    "shared_components/js/sanmar-invoice-viewer.js": "17b43daa7c73ce26212f347f09579976a4be1f11babfeb4d47e287bb11a23fca",
+    "shared_components/js/dash-page-helpers.js": "4ce7902b8502978835949ecec36a95d27ebc2604f86ef1a9665353cd8c38ccbe",
+    "shared_components/js/fetch-timeout.js": "1d9852795f9af3b674a48ad5e719bc970cae867e36b1962f0c3f1a28dd830179"
+  },
+  "changes": [
+    {
+      "file": "dashboards/js/purchasing-portal.js",
+      "from": "class=\"pp-req-link\"",
+      "to": "class=\"pp-req-link btn btn-secondary\"",
+      "kind": "presentation"
+    },
+    {
+      "file": "dashboards/js/purchasing-portal.js",
+      "from": "class=\"pp-invoice-btn\"",
+      "to": "class=\"pp-invoice-btn btn btn-secondary\"",
+      "kind": "presentation"
+    },
+    {
+      "file": "dashboards/js/sanmar-payables.js",
+      "from": "class=\"smp-view-btn\"",
+      "to": "class=\"smp-view-btn btn btn-secondary\"",
+      "kind": "presentation"
+    },
+    {
+      "file": "dashboards/js/sanmar-payables.js",
+      "from": "class=\"dash-btn smp-retry\" id=\"smp-inv-retry\"",
+      "to": "class=\"dash-btn smp-retry btn btn-secondary\" id=\"smp-inv-retry\"",
+      "kind": "presentation"
+    },
+    {
+      "file": "dashboards/js/sanmar-payables.js",
+      "from": "class=\"dash-btn smp-retry\" id=\"smp-mkt-retry\"",
+      "to": "class=\"dash-btn smp-retry btn btn-secondary\" id=\"smp-mkt-retry\"",
+      "kind": "presentation"
+    },
+    {
+      "file": "dashboards/js/sanmar-payables.js",
+      "from": "        // The upload control is a <label for=file> — make it keyboard-operable\n        var up = document.querySelector('.smp-upload-btn');\n        if (up) up.addEventListener('keydown', function (e) {\n            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); el('smp-sw-file').click(); }\n        });",
+      "to": "        // The visible native file input owns keyboard file selection.",
+      "kind": "native-control"
+    },
+    {
+      "file": "shared_components/js/sanmar-invoice-viewer.js",
+      "from": "    'use strict';",
+      "to": "    'use strict';\n\n    function unified() { return document.body.dataset.invoiceViewer === 'unified'; }\n    function decorateInvoices(body) {\n        if (!unified()) return;\n        Array.prototype.forEach.call(body.querySelectorAll('.smiv-inv table'), function (table) {\n            table.classList.add('data-table');\n            var wrap = document.createElement('div'); wrap.className = 'table-wrap'; wrap.tabIndex = 0;\n            wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', 'SanMar invoice line items');\n            table.replaceWith(wrap); wrap.appendChild(table);\n        });\n    }",
+      "kind": "presentation"
+    },
+    {
+      "file": "shared_components/js/sanmar-invoice-viewer.js",
+      "from": "        var modal = document.createElement('div');\n        modal.className = 'smiv-modal';",
+      "to": "        var modal = document.createElement(unified() ? 'dialog' : 'div');\n        modal.className = 'smiv-modal' + (unified() ? ' ui-dialog' : '');",
+      "kind": "presentation"
+    },
+    {
+      "file": "shared_components/js/sanmar-invoice-viewer.js",
+      "from": "        document.body.appendChild(modal);",
+      "to": "        document.body.appendChild(modal);\n        if (unified()) {\n            document.getElementById('smiv-print').classList.add('btn', 'btn-primary');\n            document.getElementById('smiv-close').classList.add('btn', 'btn-secondary');\n            modal.addEventListener('cancel', function (event) { event.preventDefault(); close(); });\n        }",
+      "kind": "presentation"
+    },
+    {
+      "file": "shared_components/js/sanmar-invoice-viewer.js",
+      "from": "            if (e.key === 'Escape' && m && !m.hidden) close();",
+      "to": "            if (e.key === 'Escape' && m && !m.hidden) close();\n            if (e.key === 'Tab' && unified() && m && m.open) {\n                var items = Array.prototype.filter.call(m.querySelectorAll('a[href],button:not([disabled]),[tabindex=\"0\"]'), function (n) { return n.checkVisibility(); });\n                var first = items[0], last = items[items.length - 1];\n                if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }\n                else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }\n            }",
+      "kind": "keyboard-boundary"
+    },
+    {
+      "file": "shared_components/js/sanmar-invoice-viewer.js",
+      "from": "    var returnFocus = null;",
+      "to": "    var returnFocus = null;\n    var requestSerial = 0;",
+      "kind": "request-lifetime"
+    },
+    {
+      "file": "shared_components/js/sanmar-invoice-viewer.js",
+      "from": "        if (m) m.hidden = true;",
+      "to": "        if (wasOpen) requestSerial++;\n        if (m && typeof m.close === 'function' && m.open) m.close();\n        if (m) m.hidden = true;",
+      "kind": "request-lifetime"
+    },
+    {
+      "file": "shared_components/js/sanmar-invoice-viewer.js",
+      "from": "        ensureModal();\n        returnFocus",
+      "to": "        ensureModal();\n        var request = ++requestSerial;\n        returnFocus",
+      "kind": "request-lifetime"
+    },
+    {
+      "file": "shared_components/js/sanmar-invoice-viewer.js",
+      "from": "        document.getElementById('smiv-overlay').hidden = false;\n        document.getElementById('smiv-modal').hidden = false;",
+      "to": "        document.getElementById('smiv-overlay').hidden = unified();\n        var modal = document.getElementById('smiv-modal');\n        modal.hidden = false;\n        if (unified() && !modal.open) modal.showModal();",
+      "kind": "presentation"
+    },
+    {
+      "file": "shared_components/js/sanmar-invoice-viewer.js",
+      "from": "                .then(function (r) { return { po: po, invoices: r.invoices || [] }; })",
+      "to": "                .then(function (r) {\n                    if (!r || !Array.isArray(r.invoices)) throw new Error('Incomplete invoice response');\n                    return { po: po, invoices: r.invoices };\n                })",
+      "kind": "validated-response"
+    },
+    {
+      "file": "shared_components/js/sanmar-invoice-viewer.js",
+      "from": "        })).then(function (results) {\n            var html",
+      "to": "        })).then(function (results) {\n            if (request !== requestSerial) return;\n            var html",
+      "kind": "request-lifetime"
+    },
+    {
+      "file": "shared_components/js/sanmar-invoice-viewer.js",
+      "from": "html += '<div class=\"smiv-note\">PO ' + esc(r.po) + ': invoice lookup failed",
+      "to": "html += '<div class=\"smiv-note is-error\">PO ' + esc(r.po) + ': invoice lookup failed",
+      "kind": "visible-failure"
+    },
+    {
+      "file": "shared_components/js/sanmar-invoice-viewer.js",
+      "from": "            document.getElementById('smiv-print').disabled = !body.querySelector('.smiv-inv');",
+      "to": "            decorateInvoices(body);\n            document.getElementById('smiv-print').disabled = !body.querySelector('.smiv-inv');",
+      "kind": "presentation"
+    },
+    {
+      "file": "shared_components/js/sanmar-invoice-viewer.js",
+      "from": "        sheet.id = 'smiv-print-sheet';\n        Array.prototype.forEach.call(invoices, function (inv) { sheet.appendChild(inv.cloneNode(true)); });",
+      "to": "        sheet.id = 'smiv-print-sheet';\n        sheet.className = 'smiv-print-sheet';\n        var documents = document.getElementById('smiv-body').querySelectorAll('.smiv-inv,.smiv-note');\n        Array.prototype.forEach.call(documents, function (inv) { sheet.appendChild(inv.cloneNode(true)); });",
+      "kind": "complete-print-state"
+    },
+    {
+      "file": "dashboards/js/purchasing-portal.js",
+      "from": "        state.loading = true;\n        DashPage.hideError();",
+      "to": "        state.loading = true;\n        put('pp-updated', 'Refreshing purchase requests…');\n        el('pp-refresh').disabled = true;\n        DashPage.hideError();",
+      "kind": "visible-load-state"
+    },
+    {
+      "file": "dashboards/js/purchasing-portal.js",
+      "from": "            if (data && data.error) throw new Error(data.details || data.error);",
+      "to": "            if (data && data.error) throw new Error(data.details || data.error);\n            if (!data || !Array.isArray(data.items) || !data.counts ||\n                !Number.isInteger(data.submissionCount) || data.submissionCount < 0 ||\n                Object.keys(data.counts).some(function (key) { return !Number.isInteger(data.counts[key]) || data.counts[key] < 0; }) ||\n                data.items.some(function (item) { return !item || !Array.isArray(item.orders) || item.orders.some(function (order) { return !order || !order.orderNumber || !STATUS_LABEL[order.status]; }); })) {\n                throw new Error('Incomplete purchasing response');\n            }",
+      "kind": "validated-response"
+    },
+    {
+      "file": "dashboards/js/purchasing-portal.js",
+      "from": "            put('pp-shown', '');\n        }).then(function () { state.loading = false; });",
+      "to": "            put('pp-shown', '');\n            put('pp-updated', 'Not loaded — refresh to retry.');\n        }).then(function () { state.loading = false; el('pp-refresh').disabled = false; });",
+      "kind": "visible-load-state"
+    },
+    {
+      "file": "dashboards/js/sanmar-payables.js",
+      "from": "        loadError: '',",
+      "to": "        loadError: '', invoicesLoading: true, invoiceRequest: 0, marking: false,",
+      "kind": "visible-load-state"
+    },
+    {
+      "file": "dashboards/js/sanmar-payables.js",
+      "from": "        state.range = { start: start, end: end };",
+      "to": "        state.range = { start: start, end: end };\n        var request = ++state.invoiceRequest;\n        state.invoicesLoading = true; state.loadError = ''; state.unpaid = []; state.olderCount = 0;\n        el('smp-updated').textContent = 'Loading open payables…';\n        renderInvoiceStats();",
+      "kind": "request-lifetime"
+    },
+    {
+      "file": "dashboards/js/sanmar-payables.js",
+      "from": "            state.loadError = '';\n            var all = (data.invoices || []).filter(function (i) { return !isMarketing(i); });",
+      "to": "            if (request !== state.invoiceRequest) return;\n            var all = invoiceRows(data).filter(function (i) { return !isMarketing(i); });\n            state.loadError = ''; state.invoicesLoading = false;",
+      "kind": "validated-response"
+    },
+    {
+      "file": "dashboards/js/sanmar-payables.js",
+      "from": "            DashPage.showError('Could not load open payables: ' + err.message);",
+      "to": "            if (request !== state.invoiceRequest) return;\n            state.invoicesLoading = false;\n            el('smp-updated').textContent = 'Not loaded — retry to update balances.';\n            DashPage.showError('Could not load open payables: ' + err.message);",
+      "kind": "request-lifetime"
+    },
+    {
+      "file": "dashboards/js/sanmar-payables.js",
+      "from": "    function renderInvoiceStats() {\n        var owed",
+      "to": "    function renderInvoiceStats() {\n        if (state.invoicesLoading || state.loadError) {\n            ['smp-stat-count', 'smp-stat-net', 'smp-stat-notimported'].forEach(function (id) { el(id).textContent = '—'; });\n            el('smp-older-hint').hidden = true; updateSelectionCount(); return;\n        }\n        var owed",
+      "kind": "visible-load-state"
+    },
+    {
+      "file": "dashboards/js/sanmar-payables.js",
+      "from": "        var rows = filteredInvoices();\n        if (!rows.length && state.loadError)",
+      "to": "        var rows = filteredInvoices();\n        if (state.invoicesLoading) {\n            el('smp-tbody').innerHTML = '<tr><td colspan=\"8\" class=\"smp-empty dash-loading\">Loading open SanMar payables…</td></tr>';\n            updateSelectionCount(); return;\n        }\n        if (!rows.length && state.loadError)",
+      "kind": "visible-load-state"
+    },
+    {
+      "file": "dashboards/js/sanmar-payables.js",
+      "from": "        dl.disabled = n === 0;",
+      "to": "        var unavailable = state.invoicesLoading || !!state.loadError || !(state.importsLoaded || state.sw);\n        dl.disabled = n === 0 || unavailable;",
+      "kind": "visible-load-state"
+    },
+    {
+      "file": "dashboards/js/sanmar-payables.js",
+      "from": "mk.disabled = n === 0;",
+      "to": "mk.disabled = n === 0 || unavailable || state.marking;",
+      "kind": "visible-load-state"
+    },
+    {
+      "file": "dashboards/js/sanmar-payables.js",
+      "from": "    function downloadStandardCsv() {\n        var picks",
+      "to": "    function downloadStandardCsv() {\n        if (el('smp-download').disabled) { DashPage.showError('Wait for invoice and imported-status data before exporting.'); return; }\n        var picks",
+      "kind": "visible-load-state"
+    },
+    {
+      "file": "dashboards/js/sanmar-payables.js",
+      "from": "    function loadImports() {\n        fetchJson",
+      "to": "    function loadImports() {\n        state.importsLoaded = false; state.imports = null;\n        if (!state.sw) { el('smp-status-filter').disabled = true; el('smp-status-filter').value = 'all'; }\n        updateSelectionCount();\n        fetchJson",
+      "kind": "visible-load-state"
+    },
+    {
+      "file": "dashboards/js/sanmar-payables.js",
+      "from": "            var map = new Map();\n            (d.imports || []).forEach(function (row) {",
+      "to": "            if (!d || !Array.isArray(d.imports) || d.imports.some(function (row) { return !row || !row.InvoiceNumber; })) throw new Error('Incomplete imported-status response');\n            var map = new Map();\n            d.imports.forEach(function (row) {",
+      "kind": "validated-response"
+    },
+    {
+      "file": "dashboards/js/sanmar-payables.js",
+      "from": "            state.imports = map; state.importsLoaded = true;\n            enableStatusFilter();",
+      "to": "            state.imports = map; state.importsLoaded = true;\n            el('smp-sw-status').classList.remove('smp-sw-status--warn');\n            enableStatusFilter();",
+      "kind": "visible-load-state"
+    },
+    {
+      "file": "dashboards/js/sanmar-payables.js",
+      "from": "            state.importsLoaded = true;\n            var st = el('smp-sw-status');\n            st.textContent = '\\u26a0 Imported status unavailable (' + (err.message || 'request failed') + ') — every row shows as not imported. ';",
+      "to": "            state.importsLoaded = false; state.imports = null;\n            var st = el('smp-sw-status');\n            st.textContent = '\\u26a0 Import log unavailable (' + (err.message || 'request failed') + ') — retry or load a ShopWorks export to check imported status. ';",
+      "kind": "visible-load-state"
+    },
+    {
+      "file": "dashboards/js/sanmar-payables.js",
+      "from": "rb.className = 'smp-linkbtn';",
+      "to": "rb.className = 'smp-linkbtn btn btn-secondary';",
+      "kind": "presentation"
+    },
+    {
+      "file": "dashboards/js/sanmar-payables.js",
+      "from": "    function markSelectedImported() {\n        var picks",
+      "to": "    function markSelectedImported() {\n        if (el('smp-markimported').disabled) return;\n        var picks",
+      "kind": "visible-load-state"
+    },
+    {
+      "file": "dashboards/js/sanmar-payables.js",
+      "from": "        var btn = el('smp-markimported'); btn.disabled = true;",
+      "to": "        var btn = el('smp-markimported'); state.marking = true; btn.disabled = true;",
+      "kind": "visible-load-state"
+    },
+    {
+      "file": "dashboards/js/sanmar-payables.js",
+      "from": "            .then(function () { btn.disabled = false; });",
+      "to": "            .then(function () { state.marking = false; updateSelectionCount(); });",
+      "kind": "visible-load-state"
+    },
+    {
+      "file": "dashboards/js/sanmar-payables.js",
+      "from": "    function fetchByDate(start, end) {",
+      "to": "    // Reject missing or invalid ledger data before it can look like a zero balance.\n    function invoiceRows(data) {\n        if (!data || !Array.isArray(data.invoices) || data.invoices.some(function (i) {\n            return !i || !i.invoiceNumber || !/^\\d{4}-\\d{2}-\\d{2}$/.test(String(i.invoiceDate)) ||\n                i.totalAmount == null || String(i.totalAmount).trim() === '' || !Number.isFinite(Number(i.totalAmount));\n        })) throw new Error('Incomplete invoice response');\n        return data.invoices;\n    }\n\n    function fetchByDate(start, end) {",
+      "kind": "validated-response"
+    },
+    {
+      "file": "dashboards/js/sanmar-payables.js",
+      "from": "            .then(function (d) { return d.invoices || []; });",
+      "to": "            .then(invoiceRows);",
+      "kind": "validated-response"
+    },
+    {
+      "file": "dashboards/js/sanmar-payables.js",
+      "from": "    function loadMarketing() {\n        DashPage.hideError();",
+      "to": "    function loadMarketing() {\n        state.mkt = null;\n        el('smp-mkt-download').disabled = true;\n        ['smp-mkt-spent', 'smp-mkt-remaining', 'smp-mkt-used-pct', 'smp-mkt-projected', 'smp-mkt-bar-spent', 'smp-mkt-bar-left', 'smp-mkt-item-count'].forEach(function (id) { el(id).textContent = '—'; });\n        el('smp-mkt-projnote').textContent = '';\n        el('smp-mkt-bar').style.setProperty('--w', '0%');\n        el('smp-mkt-progress').removeAttribute('aria-valuenow');\n        el('smp-mkt-updated').textContent = 'Loading marketing-fund activity…';\n        DashPage.hideError();",
+      "kind": "visible-load-state"
+    },
+    {
+      "file": "dashboards/js/sanmar-payables.js",
+      "from": "            renderMarketingTable(); renderMarketingMonths(); renderMarketingSummary();",
+      "to": "            renderMarketingTable(); renderMarketingMonths(); renderMarketingSummary();\n            el('smp-mkt-download').disabled = !items.length;",
+      "kind": "visible-load-state"
+    },
+    {
+      "file": "dashboards/js/sanmar-payables.js",
+      "from": "            DashPage.showError('Could not load marketing-fund activity: ' + err.message);",
+      "to": "            el('smp-mkt-updated').textContent = 'Not loaded — retry to update the fund.';\n            DashPage.showError('Could not load marketing-fund activity: ' + err.message);",
+      "kind": "visible-load-state"
+    },
+    {
+      "file": "shared_components/js/sanmar-invoice-viewer.js",
+      "from": "                    if (!r || !Array.isArray(r.invoices)) throw new Error('Incomplete invoice response');",
+      "to": "                    if (!r || !Array.isArray(r.invoices) || r.invoices.some(function (inv) {\n                        return !inv || !inv.invoiceNumber || inv.totalAmount == null || String(inv.totalAmount).trim() === '' || !Number.isFinite(Number(inv.totalAmount));\n                    })) throw new Error('Incomplete invoice response');",
+      "kind": "validated-response"
+    },
+    {
+      "file": "dashboards/js/sanmar-payables.js",
+      "from": "        state.sw = { map: map, count: map.size, at: new Date() };",
+      "to": "        state.sw = { map: map, count: map.size, at: new Date() };\n        el('purchasing-feed-status').textContent = statusText;\n        el('purchasing-feed-status').classList.remove('smp-sw-status--warn');",
+      "kind": "visible-load-state"
+    },
+    {
+      "file": "dashboards/js/sanmar-payables.js",
+      "from": "    // skips the manual upload; when it's empty (sync not live yet) it silently leaves\n    // the upload fallback in place. Optional — never surfaces an error banner.",
+      "to": "    // skips the manual upload. Empty or unavailable sync is explained beside the\n    // manual fallback so absence of paid-status data cannot look like a complete sync.",
+      "kind": "visible-load-state"
+    },
+    {
+      "file": "dashboards/js/sanmar-payables.js",
+      "from": "            if (!d || !d.count) return;              // sync not populated yet → keep upload fallback\n            var map = new Map();\n            (d.rows || []).forEach(function (row) {",
+      "to": "            if (!d || !Array.isArray(d.rows) || d.rows.some(function (row) { return !row || !row.InvoiceNumber; })) throw new Error('Incomplete ShopWorks response');\n            if (!d.rows.length) { el('purchasing-feed-status').textContent = 'ShopWorks paid-status sync has no data. Upload an export to check payments.'; return; }\n            var map = new Map();\n            d.rows.forEach(function (row) {",
+      "kind": "validated-response"
+    },
+    {
+      "file": "dashboards/js/sanmar-payables.js",
+      "from": "        }).catch(function () { /* optional feed — keep the upload fallback */ });",
+      "to": "        }).catch(function (err) {\n            var status = el('purchasing-feed-status');\n            status.textContent = 'ShopWorks paid-status sync unavailable (' + (err.message || 'request failed') + '). Upload an export to check payments.';\n            status.classList.add('smp-sw-status--warn');\n        });",
+      "kind": "visible-load-state"
+    },
+    {
+      "file": "dashboards/js/sanmar-payables.js",
+      "from": "    function clearShopworks() {\n        state.sw = null;",
+      "to": "    function clearShopworks() {\n        state.sw = null;\n        el('purchasing-feed-status').textContent = 'ShopWorks paid status cleared. Upload an export to check payments.';",
+      "kind": "visible-load-state"
+    }
+  ]
+}

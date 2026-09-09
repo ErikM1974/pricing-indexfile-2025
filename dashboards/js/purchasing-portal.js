@@ -102,6 +102,8 @@
     function load(force) {
         if (state.loading) return;
         state.loading = true;
+        put('pp-updated', 'Refreshing purchase requests…');
+        el('pp-refresh').disabled = true;
         DashPage.hideError();
         var tbody = el('pp-tbody');
         if (!state.rows.length) {
@@ -113,6 +115,12 @@
             return resp.json();
         }).then(function (data) {
             if (data && data.error) throw new Error(data.details || data.error);
+            if (!data || !Array.isArray(data.items) || !data.counts ||
+                !Number.isInteger(data.submissionCount) || data.submissionCount < 0 ||
+                Object.keys(data.counts).some(function (key) { return !Number.isInteger(data.counts[key]) || data.counts[key] < 0; }) ||
+                data.items.some(function (item) { return !item || !Array.isArray(item.orders) || item.orders.some(function (order) { return !order || !order.orderNumber || !STATUS_LABEL[order.status]; }); })) {
+                throw new Error('Incomplete purchasing response');
+            }
             state.data = data;
             state.loadedAt = Date.now();
             // Flatten: one table row per work order on each request.
@@ -149,7 +157,8 @@
             tbody.innerHTML = '<tr><td colspan="11" class="pp-empty">Not loaded — ' + esc(err.message) + '</td></tr>';
             var tr = el('pp-trunc'); if (tr) tr.hidden = true;
             put('pp-shown', '');
-        }).then(function () { state.loading = false; });
+            put('pp-updated', 'Not loaded — refresh to retry.');
+        }).then(function () { state.loading = false; el('pp-refresh').disabled = false; });
     }
 
     function renderStats(data) {
@@ -266,12 +275,12 @@
         el('pp-tbody').innerHTML = rows.map(function (r) {
             var who = esc(r.company || 'this order');
             var reqLink = r.submissionId
-                ? '<a class="pp-req-link" href="' + JOTFORM_SUBMISSION + esc(r.submissionId) + '" target="_blank" rel="noopener"'
+                ? '<a class="pp-req-link btn btn-secondary" href="' + JOTFORM_SUBMISSION + esc(r.submissionId) + '" target="_blank" rel="noopener"'
                   + ' title="Open the original purchase request for WO ' + esc(r.wo) + ' (' + who + ') in JotForm"'
                   + ' aria-label="Open the purchase request for work order ' + esc(r.wo) + '"><i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i> Request</a>'
                 : '';
             var invBtn = (r.sanmarPos && r.sanmarPos.length)
-                ? '<button type="button" class="pp-invoice-btn" data-wo="' + esc(r.wo) + '" data-company="' + esc(r.company) + '"'
+                ? '<button type="button" class="pp-invoice-btn btn btn-secondary" data-wo="' + esc(r.wo) + '" data-company="' + esc(r.company) + '"'
                   + ' data-pos="' + esc(r.sanmarPos.join(',')) + '" data-ordered="' + esc(r.orderedDate || '') + '"'
                   + ' aria-label="View the SanMar invoice for work order ' + esc(r.wo) + ', ' + who + '"'
                   + ' title="SanMar invoice · PO ' + esc(r.sanmarPos.join(', ')) + '"><i class="fas fa-file-invoice-dollar" aria-hidden="true"></i> Invoice</button>'

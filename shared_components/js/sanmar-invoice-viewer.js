@@ -18,6 +18,17 @@
 (function () {
     'use strict';
 
+    function unified() { return document.body.dataset.invoiceViewer === 'unified'; }
+    function decorateInvoices(body) {
+        if (!unified()) return;
+        Array.prototype.forEach.call(body.querySelectorAll('.smiv-inv table'), function (table) {
+            table.classList.add('data-table');
+            var wrap = document.createElement('div'); wrap.className = 'table-wrap'; wrap.tabIndex = 0;
+            wrap.setAttribute('role', 'region'); wrap.setAttribute('aria-label', 'SanMar invoice line items');
+            table.replaceWith(wrap); wrap.appendChild(table);
+        });
+    }
+
     function esc(v) {
         return String(v == null ? '' : v)
             .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
@@ -36,8 +47,8 @@
         overlay.className = 'smiv-overlay';
         overlay.id = 'smiv-overlay';
         overlay.hidden = true;
-        var modal = document.createElement('div');
-        modal.className = 'smiv-modal';
+        var modal = document.createElement(unified() ? 'dialog' : 'div');
+        modal.className = 'smiv-modal' + (unified() ? ' ui-dialog' : '');
         modal.id = 'smiv-modal';
         modal.setAttribute('role', 'dialog');
         modal.setAttribute('aria-modal', 'true');
@@ -53,20 +64,34 @@
             '<div class="smiv-body" id="smiv-body" role="status" aria-live="polite"></div>';
         document.body.appendChild(overlay);
         document.body.appendChild(modal);
+        if (unified()) {
+            document.getElementById('smiv-print').classList.add('btn', 'btn-primary');
+            document.getElementById('smiv-close').classList.add('btn', 'btn-secondary');
+            modal.addEventListener('cancel', function (event) { event.preventDefault(); close(); });
+        }
         document.getElementById('smiv-close').addEventListener('click', close);
         overlay.addEventListener('click', close);
         document.getElementById('smiv-print').addEventListener('click', print);
         document.addEventListener('keydown', function (e) {
             var m = document.getElementById('smiv-modal');
             if (e.key === 'Escape' && m && !m.hidden) close();
+            if (e.key === 'Tab' && unified() && m && m.open) {
+                var items = Array.prototype.filter.call(m.querySelectorAll('a[href],button:not([disabled]),[tabindex="0"]'), function (n) { return n.checkVisibility(); });
+                var first = items[0], last = items[items.length - 1];
+                if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+                else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+            }
         });
     }
 
     var returnFocus = null;
+    var requestSerial = 0;
     function close() {
         var o = document.getElementById('smiv-overlay'), m = document.getElementById('smiv-modal');
         var wasOpen = !!(m && !m.hidden);
         if (o) o.hidden = true;
+        if (wasOpen) requestSerial++;
+        if (m && typeof m.close === 'function' && m.open) m.close();
         if (m) m.hidden = true;
         if (wasOpen && returnFocus && document.body.contains(returnFocus)) { try { returnFocus.focus(); } catch (e) { /* gone */ } }
         returnFocus = null;
@@ -115,9 +140,12 @@
         var wo = opts.wo, company = opts.company || '', pos = opts.pos || [], orderedDate = opts.orderedDate || '';
         if (!pos.length) return;
         ensureModal();
+        var request = ++requestSerial;
         returnFocus = opts.returnFocus || document.activeElement;
-        document.getElementById('smiv-overlay').hidden = false;
-        document.getElementById('smiv-modal').hidden = false;
+        document.getElementById('smiv-overlay').hidden = unified();
+        var modal = document.getElementById('smiv-modal');
+        modal.hidden = false;
+        if (unified() && !modal.open) modal.showModal();
         // Title names what was asked for: the WO when the caller has one, else the PO(s). (Was "WO #undefined"
         // whenever a page opened the viewer by PO only — SanMar Payables does.)
         var subject = wo ? 'WO #' + esc(wo) : 'PO ' + pos.map(esc).join(', ');
@@ -134,13 +162,19 @@
                     if (!resp.ok) throw new Error('HTTP ' + resp.status);
                     return resp.json();
                 })
-                .then(function (r) { return { po: po, invoices: r.invoices || [] }; })
+                .then(function (r) {
+                    if (!r || !Array.isArray(r.invoices) || r.invoices.some(function (inv) {
+                        return !inv || !inv.invoiceNumber || inv.totalAmount == null || String(inv.totalAmount).trim() === '' || !Number.isFinite(Number(inv.totalAmount));
+                    })) throw new Error('Incomplete invoice response');
+                    return { po: po, invoices: r.invoices };
+                })
                 .catch(function (err) { return { po: po, error: err.message }; });
         })).then(function (results) {
+            if (request !== requestSerial) return;
             var html = '';
             results.forEach(function (r) {
                 if (r.error) {
-                    html += '<div class="smiv-note">PO ' + esc(r.po) + ': invoice lookup failed (' + esc(r.error) + ').</div>';
+                    html += '<div class="smiv-note is-error">PO ' + esc(r.po) + ': invoice lookup failed (' + esc(r.error) + ').</div>';
                 } else if (!r.invoices.length) {
                     html += '<div class="smiv-note">PO ' + esc(r.po) + ': SanMar has not invoiced this PO yet — invoices cut after shipment.</div>';
                 } else {
@@ -148,6 +182,7 @@
                 }
             });
             body.innerHTML = html || '<div class="smiv-note">No invoices found.</div>';
+            decorateInvoices(body);
             document.getElementById('smiv-print').disabled = !body.querySelector('.smiv-inv');
         });
     }
@@ -159,7 +194,9 @@
         if (old) old.remove();
         var sheet = document.createElement('div');
         sheet.id = 'smiv-print-sheet';
-        Array.prototype.forEach.call(invoices, function (inv) { sheet.appendChild(inv.cloneNode(true)); });
+        sheet.className = 'smiv-print-sheet';
+        var documents = document.getElementById('smiv-body').querySelectorAll('.smiv-inv,.smiv-note');
+        Array.prototype.forEach.call(documents, function (inv) { sheet.appendChild(inv.cloneNode(true)); });
         document.body.appendChild(sheet);
         document.body.classList.add('smiv-printing');
         var cleanup = function () {

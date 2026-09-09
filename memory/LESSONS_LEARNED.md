@@ -59,22 +59,9 @@ Never rewrite a variable declaration into a self-reference; dry-run reruns and c
 
 Preserve generated override precedence and exact palette matches; full resolved migration and corporate TLS notes are in LESSONS_LEARNED_ARCHIVE.md.
 
-## 2026-09-07 — `git worktree remove --force` followed a node_modules junction and deleted the real packages
+## Worktree junction deletion incident (2026-09-07, archived)
 
-**Problem.** A HEAD worktree at `C:/tmp/pi-before` (for before-screenshots) had the main tree's `node_modules`
-JUNCTIONED in so `scripts/build.js` could find esbuild. `git worktree remove --force` deleted the worktree
-recursively, followed the junction into the real `node_modules`, removed packages alphabetically (`@asamuzakjp`,
-`@babel`, …) and stopped with "Invalid argument". Nothing said so; the next full gate run failed 184 of 188 unit
-suites with `Cannot find module '@babel/code-frame'` and e2e/parity could not start.
-**Root cause.** Windows junctions look like directories to recursive deletes (git's, and MSYS `rm -rf`);
-the link was inside the thing being deleted.
-**Solution.** `npm ci` (lockfile reinstall) restored everything in one pass; the gates were re-run green before
-the deploy. The junction is now removed FIRST with `cmd /c rmdir <junction>` (which removes only the link),
-verified gone, and only then is the directory deleted.
-**Prevention.** 🔑 Never delete a directory that contains a junction or symlink to something you keep — remove
-the link with `rmdir` (cmd) first and check it is gone. 🔑 Prefer `NODE_PATH=<repo>/node_modules` over a
-junction when a scratch tree needs the repo's packages. 🔑 When 184 suites fail at once with "Cannot find
-module", suspect the install, not the change — `npm ci` before debugging anything.
+Never recursively delete a tree containing a junction to shared packages. Inspect link targets, remove only the link through a safe native operation, then verify before deleting the tree. Prefer a module lookup path over a shared node_modules junction. A widespread missing-package failure after cleanup means restore the locked install before debugging code; full resolved incident is in LESSONS_LEARNED_ARCHIVE.md.
 
 ## Server split first-cut incident (2026-09-07, archived)
 
@@ -252,3 +239,7 @@ Problem/root cause: malformed usage could appear as zero, partial schema could m
 ## Local file tools need dependency errors and native download evidence (2026-09-09)
 
 Problem/root cause: missing transform/parser globals could leave conversion stuck, malformed FTP rows looked like valid files, and a download mock observed no request even when the browser saved the file. Solution: validate dependencies/listings, show visible errors with the file retained, and test browser-managed attachments using an isolated loopback CSV server. Prevention: compare actual download bytes/queries and converted SKU/prices for CSV/TSV/XLSX; preserve pure financial transforms. Use canonical data-table classes as well as scrolling wrappers; check current-value paper text and geometry, not text extraction alone.
+
+## Purchasing views must distinguish missing ledgers from zero balances (2026-09-09)
+
+Problem/root cause: incomplete invoices looked empty, failed import logs were classified as loaded, delayed requests could replace newer selections, and partial printouts dropped failed lookups. Solution: validate source shapes, keep unknown status and disable unsafe actions, invalidate old responses, and print failure notes with complete invoices. Prevention: test malformed/empty/failed/recovered feeds, mock confirmation and exact CSV bytes, preserve pure money/CSV helpers and AE compatibility. Declare CSS sublayers after primitives; check money widths at768 as well as phones, and inspect all printed line-item columns/current filter values. Optional paid-status sync needs its own visible fallback state.
