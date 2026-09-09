@@ -41,7 +41,11 @@
     btnConvert.disabled = true;
     var ext = (file.name.split('.').pop() || '').toLowerCase();
     try {
-      if (ext === 'xlsx' || ext === 'xls') convertExcel(file);
+      var isExcel = ext === 'xlsx' || ext === 'xls';
+      if (!SW || (isExcel ? !window.XLSX : !window.Papa)) {
+        throw new Error('Converter tools did not load. Refresh this page and choose the file again.');
+      }
+      if (isExcel) convertExcel(file);
       else convertCsv(file);
     } catch (e) { fail(e.message || String(e)); }
   });

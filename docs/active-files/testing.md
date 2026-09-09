@@ -1,5 +1,7 @@
 # 🧪 Automated Testing System
 
+Reviewed: tests/e2e/css-unification-staff-import.spec.js and tests/fixtures/staff-import-review-data.json cover shared SanMar file tools with synthetic files and mocked downloads.
+
 **Created:** 2025-10-03
 **Purpose:** Comprehensive automated testing for all screen print calculators
 
@@ -154,3 +156,7 @@ Staff admin source contracts: tests/fixtures/staff-admin-original-content.json a
 - tests/fixtures/staff-admin-review-data.json — Synthetic staff admin browser fixtures; no real permission or account records.
 
 Staff monitoring review sources: tests/unit/staff-monitoring-content.test.js, tests/fixtures/staff-monitoring-original-content.json, tests/fixtures/staff-monitoring-review-data.json and tests/e2e/css-unification-staff-monitoring.spec.js. Synthetic API fixtures, preserved163-table snapshot/source hashes and explicit controller edits; all real business requests blocked.
+
+Staff import source checks: tests/unit/staff-import-content.test.js and tests/fixtures/staff-import-original-content.json preserve original static content/dependencies plus four controller/transform sources, reversed through nine exact recorded edits. Existing sanmar-shopworks-parts.test.js retains the financial/SKU conversion locks.
+
+Staff file tools: SanMar Downloads and SanMar → ShopWorks Parts share tokens/components/Public Sans and shared_components/css/staff-import-tools.css; two local sheets retired. Canonical buttons/data tables, native named file input, skip links and focused scrolling regions retain all original prose/IDs/dependencies and source-locked financial/SKU transforms. Malformed FTP listings and missing converter libraries report visible failures with retry/file retention.17 mocked browser cases cover four widths/zero axe, exact synthetic FTP download query/bytes, CSV/TSV/XLSX conversion, errors and recovery. Two one-page portrait PDFs retain70 checked content/data blocks, visually reviewed; print hides only action controls and their empty download column. All real business writes/imports/uploads/emails blocked. A tiny temporary loopback server serves only synthetic CSV because browser-managed attachments bypass page routing; request assertions observe that server and compare actual downloaded bytes.

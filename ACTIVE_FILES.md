@@ -1,5 +1,9 @@
 # Active Files Registry
 
+In progress: tests/e2e/css-unification-staff-import.spec.js and tests/fixtures/staff-import-review-data.json — synthetic downloads and conversions, all business traffic blocked.
+
+In progress: shared_components/css/staff-import-tools.css — scoped SanMar download/conversion arrangements. Page migration and verification pending.
+
 Last updated: 2026-09-08 — shared manual navigation/layout, four consumers, two retired scripts and full chapter/content/print checks.
 
 | Area | Registry |
@@ -151,3 +155,9 @@ Staff monitoring migration in progress: new shared_components/css/staff-monitori
 Staff monitoring review sources: tests/unit/staff-monitoring-content.test.js, tests/fixtures/staff-monitoring-original-content.json, tests/fixtures/staff-monitoring-review-data.json and tests/e2e/css-unification-staff-monitoring.spec.js. Synthetic API fixtures, preserved163-table snapshot/source hashes and explicit controller edits; all real business requests blocked.
 
 Staff monitoring: API Usage,Table Usage Audit and Bandit Integration share tokens/components/Public Sans and shared_components/css/staff-monitoring.css. Their three local sheets are retired. Native keyboard sorting/filtering, named scrolling tables and current-value print mirrors preserve the original163-table evidence and full reference prose. Usage failures stay unknown; malformed/incomplete live schema cannot label tables gone. Local storage failures stay visible with export available, and successful recovery clears the related error.17 mocked browser cases cover all four widths/zero axe, numeric/source states, retry, saved notes and CSV export. Three reference PDFs/nine pages retain213 checked text/value nodes, all visually inspected. Print uses normal block flow so a flex fragment cannot produce a blank trailing sheet; focus outlines remain screen-only. All real business writes and notifications blocked. Measured LF raw CSS per page is70,169bytes, down from162,994–164,472bytes (about57%); these are source bytes, not compressed network transfer.
+
+Staff import tools in progress: dashboards/sanmar-ftp-integration.html and dashboards/sanmar-shopworks-converter.html use shared_components/css/staff-import-tools.css with tokens/components. Their two dashboards/css/*.css owners are retired after their final consumers moved. Pure conversion/SKU helpers and converter controller retained; FTP changes are explicitly recorded presentation/loading/response-validation hooks. Browser/source review pending; no new reviewed/live count.
+
+Staff import source checks: tests/unit/staff-import-content.test.js and tests/fixtures/staff-import-original-content.json preserve original static content/dependencies plus four controller/transform sources, reversed through nine exact recorded edits. Existing sanmar-shopworks-parts.test.js retains the financial/SKU conversion locks.
+
+Staff file tools: SanMar Downloads and SanMar → ShopWorks Parts share tokens/components/Public Sans and shared_components/css/staff-import-tools.css; two local sheets retired. Canonical buttons/data tables, native named file input, skip links and focused scrolling regions retain all original prose/IDs/dependencies and source-locked financial/SKU transforms. Malformed FTP listings and missing converter libraries report visible failures with retry/file retention.17 mocked browser cases cover four widths/zero axe, exact synthetic FTP download query/bytes, CSV/TSV/XLSX conversion, errors and recovery. Two one-page portrait PDFs retain70 checked content/data blocks, visually reviewed; print hides only action controls and their empty download column. All real business writes/imports/uploads/emails blocked. A tiny temporary loopback server serves only synthetic CSV because browser-managed attachments bypass page routing; request assertions observe that server and compare actual downloaded bytes.

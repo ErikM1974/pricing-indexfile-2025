@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
+<html lang="en"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
@@ -8,38 +7,33 @@
     <link rel="icon" href="/favicon.png" type="image/png">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/shared_components/css/art-hub.css?v=2026.09.07.19">
-    <link rel="stylesheet" href="/shared_components/css/dash-shell.css?v=2026.09.07.10">
-    <link rel="stylesheet" href="/dashboards/css/sanmar-ftp-integration.css?v=2026.09.07.10">
-</head>
-<body>
+<link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.09.12"><link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.09.12"><link rel="stylesheet" href="/shared_components/css/staff-import-tools.css?v=2026.09.09.12"></head>
+<body data-ui="unified" data-import-tool="sanmar-ftp-integration" data-department="neutral"><a class="skip-link" href="#import-main">Skip to SanMar Downloads</a>
     <div class="dash-shell">
         <header class="dash-header">
             <div class="dash-header-left">
                 <a href="/staff-dashboard.html" title="Back to Staff Dashboard">
-                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
-                         alt="Northwest Custom Apparel" class="dash-header-logo">
+                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" alt="Northwest Custom Apparel" class="dash-header-logo">
                 </a>
-                <h1 class="dash-header-title">SanMar Downloads <span class="sf-subhead">pull SanMar's pricing &amp; data files, then import into Caspio</span></h1>
+                <h1 class="dash-header-title" id="import-title">SanMar Downloads <span class="sf-subhead">pull SanMar's pricing &amp; data files, then import into Caspio</span></h1>
             </div>
             <div class="dash-header-right">
                 <span class="sf-lock" title="Admin only"><i class="fas fa-user-shield" aria-hidden="true"></i> Admin</span>
-                <a href="/staff-dashboard.html" class="dash-back-link"><i class="fas fa-arrow-left" aria-hidden="true"></i> Dashboard</a>
+                <a href="/staff-dashboard.html" class="dash-back-link btn btn-secondary"><i class="fas fa-arrow-left" aria-hidden="true"></i> Dashboard</a>
             </div>
         </header>
 
-        <main class="dash-content">
+        <main class="dash-content" id="import-main" tabindex="-1" aria-labelledby="import-title">
 
             <!-- ── Download the files ───────────────────────────────────── -->
             <section class="dash-card">
                 <div class="dash-card-header">
                     <h2 class="dash-card-title"><i class="fas fa-cloud-arrow-down" aria-hidden="true"></i> Download SanMar files</h2>
-                    <button type="button" id="sf-refresh" class="sf-btn sf-btn--ghost"><i class="fas fa-rotate" aria-hidden="true"></i> Refresh</button>
+                    <button type="button" id="sf-refresh" class="sf-btn sf-btn--ghost btn btn-secondary"><i class="fas fa-rotate" aria-hidden="true"></i> Refresh</button>
                 </div>
                 <p class="sf-lead">These are the data files SanMar publishes on their FTP server. Click <b>Download</b> to save one to your computer — no FileZilla needed — then import it into Caspio. The product &amp; pricing master is <code>SanMarPI-Bulk</code>; it feeds garment <b>CASE_PRICE</b> into every quote builder. SanMar pricing changes only every few months, so grab a fresh copy when it does.</p>
                 <div id="sf-status" class="sf-status" aria-live="polite"></div>
@@ -57,7 +51,7 @@
                     <li>Done — this one table feeds every quote builder, so all pricing surfaces refresh within ~15 min (Customer Catalog, Quick Quote, and the DTG/DTF/EMB/SCP builders).</li>
                 </ol>
                 <div class="sf-callout sf-callout--danger">
-                    <h4><i class="fas fa-triangle-exclamation" aria-hidden="true"></i> This is the table that runs pricing</h4>
+                    <h3><i class="fas fa-triangle-exclamation" aria-hidden="true"></i> This is the table that runs pricing</h3>
                     <p><code>Sanmar_Bulk_251816_Feb2024</code> is the single garment-cost source for all quote builders. After a big import, spot-check a couple of styles and confirm a changed price shows the same in the Catalog, Quick Quote, and a Quote Builder.</p>
                 </div>
             </section>
@@ -80,11 +74,11 @@
                     <span class="sf-chip">Downloads stream through the app — nothing stored on the server</span>
                 </div>
                 <div class="sf-callout sf-callout--info">
-                    <h4><i class="fas fa-laptop" aria-hidden="true"></i> Prefer a one-click desktop tool?</h4>
+                    <h3><i class="fas fa-laptop" aria-hidden="true"></i> Prefer a one-click desktop tool?</h3>
                     <p>There's also <code>Download-SanMar-Pricing.bat</code> in the <code>sanmar-ftp-box</code> folder — double-click it to pull the newest pricing file straight to your Downloads folder without opening this page. Same file, same next step (import into Caspio).</p>
                 </div>
-                <div class="sf-callout sf-callout--warn" id="sf-config-note" hidden>
-                    <h4><i class="fas fa-gear" aria-hidden="true"></i> One-time setup</h4>
+                <div class="sf-callout sf-callout--warn" id="sf-config-note" hidden="">
+                    <h3><i class="fas fa-gear" aria-hidden="true"></i> One-time setup</h3>
                     <p>The download buttons need the SanMar FTP password stored on the app as the config var <code>SANMAR_FTP_PASSWORD</code> (with optional <code>SANMAR_FTP_USER</code>, default <code>6920</code>). Once it's set, this page works for any admin — no local FileZilla or password prompts.</p>
                 </div>
             </section>
@@ -92,6 +86,7 @@
         </main>
     </div>
 
-    <script src="/dashboards/js/sanmar-ftp-integration.js?v=2026.09.05.73"></script>
-</body>
-</html>
+    <script src="/dashboards/js/sanmar-ftp-integration.js?v=2026.09.09.12"></script>
+
+
+</body></html>

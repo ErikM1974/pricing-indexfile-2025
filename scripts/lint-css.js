@@ -19,6 +19,7 @@ const CSS_LINT_SCOPE = [
     'shared_components/css/hosted-workspace.css',
     'shared_components/css/staff-admin-tools.css',
     'shared_components/css/staff-monitoring.css',
+    'shared_components/css/staff-import-tools.css',
     'shared_components/css/api-reference.css',
     // Step 1 (2026-09-07): the two token files
     'shared_components/css/tokens.css',

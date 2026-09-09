@@ -248,3 +248,7 @@ Problem: the CSS census omitted Jotform scripts and its external-owner backlog n
 ## Monitoring data needs complete responses and visible persistence failures (2026-09-09)
 
 Problem/root cause: malformed usage could appear as zero, partial schema could mark tables gone, and local review storage assumed every read/write succeeded. Solution: validate complete responses before rendering, preserve snapshot evidence and notes, distinguish unknown from zero, show export/retry paths and clear only recovered errors. Prevention: exercise malformed/partial/denied storage and successful recovery with synthetic records, preserve the original snapshot, and inspect current-value PDFs. Print long reports in block flow; inherited flex/min-height can create a blank trailing sheet even when PDF text is complete.
+
+## Local file tools need dependency errors and native download evidence (2026-09-09)
+
+Problem/root cause: missing transform/parser globals could leave conversion stuck, malformed FTP rows looked like valid files, and a download mock observed no request even when the browser saved the file. Solution: validate dependencies/listings, show visible errors with the file retained, and test browser-managed attachments using an isolated loopback CSV server. Prevention: compare actual download bytes/queries and converted SKU/prices for CSV/TSV/XLSX; preserve pure financial transforms. Use canonical data-table classes as well as scrolling wrappers; check current-value paper text and geometry, not text extraction alone.
