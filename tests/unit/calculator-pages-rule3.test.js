@@ -24,8 +24,15 @@ describe('calculator pages — Rule 3', () => {
         expect(html).not.toMatch(BARE);
         expect(html).not.toMatch(HOST);
         expect(html).not.toMatch(/(href|src)="\/(?!config\/app\.config\.js)[^"?]+\.(css|js)"/);
-        expect(html).toContain(`/calculators/css/${pg}.css?v=`);
-        expect(read(`calculators/css/${pg}.css`)).toMatch(/\[hidden\] \{ display: none !important; \}/);
+        if (['digitizingform', 'monogramform'].includes(pg)) {
+            expect(html).toContain('data-ui="unified"');
+            expect(html).toContain('/shared_components/css/components.css?v=');
+            expect(html).toContain('/shared_components/css/customer-intake.css?v=');
+            expect(read('shared_components/css/components.css')).toMatch(/\[hidden\]\s*\{\s*display: none;/);
+        } else {
+            expect(html).toContain(`/calculators/css/${pg}.css?v=`);
+            expect(read(`calculators/css/${pg}.css`)).toMatch(/\[hidden\] \{ display: none !important; \}/);
+        }
         if (exists(`calculators/js/${pg}-page.js`)) {
             expect(html).toContain(`/calculators/js/${pg}-page.js?v=`);
             const js = read(`calculators/js/${pg}-page.js`);
