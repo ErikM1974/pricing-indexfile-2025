@@ -266,3 +266,5 @@ Homepage "From the blog" section (index.html). Fetches the 3 newest Published po
 - `webstore-guide.js` — twelve public webstore marketing pages; focuses native section destinations and restores FAQ disclosures after printing. No business API calls.
 
 - `staff-reference.js`: five staff references; original button accordion opens fully for print, restores its prior state, and fragment navigation focuses the reading destination. No service calls.
+
+- `storefront-navigation.js` (moved from pages/js/brand-guide.js) owns native menu focus/wrap/return, Escape/backdrop/resize and encoded catalogue search for seventeen unified public pages.

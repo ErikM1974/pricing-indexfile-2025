@@ -628,3 +628,24 @@ Six sign-in/confirmation pages integrated and tested atf343ce6fa4d28e047bc78922c
 ## Entry/status release record — v2026.09.09.3
 
 Exact-source CI 34345813195 passed all four jobs onfba80b9d825a42f2e77cd0d757f9b88aca1396d3, including actual money/calculator parity. Six sign-in/confirmation pages share components and explicit page arrangements. Original content, input/deep-link contracts, fulfillment/email controller bytes, totals and server promises retained. Infrastructure errors display honestly with retry preserving email.30 focused browser cases,167 paper blocks;full checks5177 unit tests,372 mocked browser,16 remaining browser,all5 calculators;485 routes unchanged. One initial local live embroidery fetch failed visibly; unchanged full live-group rerun and CI passed. Candidate110 reviewed/115 pending becomes live only after actual rollout verification.
+
+## Catalog discovery plan — 2026-09-09
+
+Next two surfaces:brands.html andpages/fall-catalog-2026.html. Isolated codex/catalog-discovery based on1118d1d4642bf38db59948b3064362280f6df69a. Capture original content, route/link/field/image contracts and exact curated Fall BRANDS/CATS/ITEMS arrays before changes. Share existing storefront navigation by moving the byte-identical brand-guide controller toshared_components/js/storefront-navigation.js and updating all fifteen existing consumers; preserve their reviewed behavior and retest them. Replace legacy catalogue CSS with canonical controls, shared card layout and scoped responsive/print arrangements. Brand tiles become named native links so missing logos and keyboard input remain usable. Keep API priority ordering, product destinations and server price labels; validate malformed/failed loads with visible retry retaining filters. No pricing computation or business-service writes.
+
+- [ ] Original desktop/phone/API contract capture.
+- [ ] Migrate shared navigation, both catalogue owners and necessary accessible/failure states.
+- [ ] Preserve curated taxonomy and original page content; four widths/keyboard/filter/failed-image/retry/price-label/print checks.
+- [ ] Full primary gates, exact-source CI and verified rollout after the pending entry/status release. Candidate2026.09.09.4; no live-count change yet.
+
+## Catalog discovery implementation in progress — 2026-09-09
+
+Two catalog layouts implemented in codex/catalog-discovery, not reviewed/deployable yet. Shared navigation moved byte-identically and all15 prior brand-guide script references updated. Brand tiles are named native links with visible labels when logos fail; retry retains search. Fall catalog retains all179 original curated styles,21 brand descriptions,10 categories and server-generated price labels; malformed batches visibly warn and retry preserves filters. Removed unused header dropdown placeholders/controllers; the existing native Products/Brands links preserve destinations. Source fixtures and tests registered. Next: four-width/keyboard/price/state/paper review, then primary full gates/CI after entry-status release. Live stillstaff.2/2081:104 reviewed/121 pending; candidate manifests are not a live count.
+
+## Catalog discovery reviewed — 2026-09-09
+
+Brand directory and Fall catalog share canonical controls/cards and storefront navigation, with scoped responsive and paper arrangements. Shared controller moved unchanged; all fifteen existing brand consumers updated and retested. Original page content, product destinations and all 179 curated styles, 21 brand descriptions and 10 categories preserved. Server display-price labels remain authoritative. Named brand links survive missing logos; validated data distinguishes empty/failed/malformed/partial results and retry retains filters. 48 focused browser cases (17 catalog plus 31 prior brands) passed; all 17 catalog cases passed again after containing print images. Four widths, zero axe violations. 229 focused unit checks passed. Seven PDFs retain 292 checked blocks: complete Fall catalog 23 pages, brand views one page, filtered/failure Fall views two pages with contact footer intact. Screen and every paper page visually reviewed. No business writes. Candidate 2026.09.09.4 requires full primary gates, exact-source CI and actual rollout after entry/status release. Live count stays 104/121 until entry release verified; catalog would reach 112/113 after both rollouts.
+
+## Catalog discovery integration — 2026-09-09
+
+Reviewed commit a29c40992536519b55ee313c307d29c263c33d5e integrated after verified entry/status release 2082. Only appended memory notes conflicted; both histories and latest live checkpoint retained. All application changes merged directly; prior commission serialization fix retained. Next full primary release checks. Live 110 reviewed/115 pending stays authoritative until verified catalog rollout.

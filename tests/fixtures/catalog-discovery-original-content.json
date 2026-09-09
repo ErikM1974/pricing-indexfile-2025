@@ -1,0 +1,473 @@
+{
+  "base": "1118d1d4642bf38db59948b3064362280f6df69a",
+  "pages": [
+    {
+      "file": "brands.html",
+      "title": "Shop by Brand - Northwest Custom Apparel",
+      "mainText": "Shop by Brand Browse our complete collection of apparel brands. Click any brand to view all available products. Loading brands... Unable to load brands. Please try again later. Retry",
+      "links": [
+        {
+          "href": "#main",
+          "label": "Skip to content"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "label": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "label": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "label": "Staff"
+        },
+        {
+          "href": "/",
+          "label": ""
+        },
+        {
+          "href": "/catalog",
+          "label": "Products"
+        },
+        {
+          "href": "/brands.html",
+          "label": "Brands"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "label": "Top Sellers"
+        },
+        {
+          "href": "/pages/fall-catalog-2026.html",
+          "label": "Fall Catalog '26 New"
+        },
+        {
+          "href": "/custom-tees",
+          "label": "Custom Tees New"
+        },
+        {
+          "href": "/custom-caps",
+          "label": "Custom Hats New"
+        },
+        {
+          "href": "/company-webstores",
+          "label": "Webstores"
+        },
+        {
+          "href": "/blog",
+          "label": "Blog"
+        },
+        {
+          "href": "/custom-stickers",
+          "label": "Stickers"
+        },
+        {
+          "href": "/pages/request-a-quote.html",
+          "label": "Get a Quote"
+        },
+        {
+          "href": "/quote-cart",
+          "label": "Quote 0"
+        },
+        {
+          "href": "/",
+          "label": "Home"
+        },
+        {
+          "href": "/custom-tees",
+          "label": "Custom T-Shirts New"
+        },
+        {
+          "href": "/custom-caps",
+          "label": "Custom Hats New"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "label": "Top Sellers & Free Samples"
+        },
+        {
+          "href": "/brands.html",
+          "label": "Brands"
+        },
+        {
+          "href": "/company-webstores",
+          "label": "Custom Webstores"
+        },
+        {
+          "href": "/catalog",
+          "label": "Catalog"
+        },
+        {
+          "href": "/pages/fall-catalog-2026.html",
+          "label": "Fall Catalog '26"
+        },
+        {
+          "href": "/custom-stickers",
+          "label": "Custom Stickers"
+        },
+        {
+          "href": "/custom-banners",
+          "label": "Vinyl Banners"
+        },
+        {
+          "href": "/blog",
+          "label": "Blog"
+        },
+        {
+          "href": "/pages/request-a-quote.html",
+          "label": "Get a Quote"
+        },
+        {
+          "href": "/catalog?category=T-Shirts",
+          "label": "T-Shirts"
+        },
+        {
+          "href": "/catalog?category=Polos%2FKnits",
+          "label": "Polos & Knits"
+        },
+        {
+          "href": "/catalog?category=Sweatshirts%2FFleece",
+          "label": "Sweatshirts & Fleece"
+        },
+        {
+          "href": "/catalog?category=Caps",
+          "label": "Caps"
+        },
+        {
+          "href": "/catalog?category=Outerwear",
+          "label": "Outerwear"
+        },
+        {
+          "href": "/catalog?category=Workwear",
+          "label": "Workwear"
+        },
+        {
+          "href": "/catalog?category=Bags",
+          "label": "Bags"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "label": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "label": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "label": "Top Sellers"
+        },
+        {
+          "href": "/brands.html",
+          "label": "Brands"
+        },
+        {
+          "href": "/custom-tees",
+          "label": "Custom T-Shirts"
+        },
+        {
+          "href": "/custom-caps",
+          "label": "Custom Hats"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "label": "Free Sample Program"
+        },
+        {
+          "href": "/golf-tournament-apparel?utm_source=brands&utm_campaign=golf-2026-q2&utm_medium=footer",
+          "label": "Tournament Packages"
+        },
+        {
+          "href": "/company-webstores",
+          "label": "Custom Webstores"
+        },
+        {
+          "href": "/calculators/laser-tumbler-polarcamel.html",
+          "label": "Laser-Engraved Tumblers"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "label": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "label": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "label": "Staff Portal"
+        }
+      ],
+      "images": [
+        {
+          "src": "https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1",
+          "alt": "Northwest Custom Apparel"
+        },
+        {
+          "src": "https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20White%20Text.png?ver=1",
+          "alt": "Northwest Custom Apparel"
+        }
+      ],
+      "fields": [
+        {
+          "tag": "INPUT",
+          "id": "navSearchInput",
+          "name": "",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "tag": "INPUT",
+          "id": "brandSearchInput",
+          "name": "",
+          "type": "text",
+          "value": ""
+        }
+      ],
+      "ids": [
+        "mobileMenuBtn",
+        "navSearchInput",
+        "navSearchBtn",
+        "sidebar",
+        "drawerClose",
+        "sidebarOverlay",
+        "main",
+        "brandSearchInput",
+        "loadingState",
+        "errorState",
+        "brandsRetry",
+        "brandsContainer"
+      ],
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/nwca-2026-core.css",
+        "brands.css"
+      ],
+      "cssBytes": 64995
+    },
+    {
+      "file": "pages/fall-catalog-2026.html",
+      "title": "Fall Catalog '26 — New Arrivals | Northwest Custom Apparel",
+      "mainText": "Home/ Catalog/ Fall Catalog '26 New for Fall 2026 Fall Catalog '26 From our newest brand MiiR to favorites like Port Authority, The North Face, Carhartt and Nike — a fresh mix of on-trend apparel, bags and accessories. Every style below is brand-new this season and ready to decorate with your logo. 170+New styles 21Brands 4Decoration methods Browse the collection Request a quote Clear 170+ new styles Just landed. These are brand-new Fall 2026 arrivals — pick anything you like and we'll send decorated pricing for your quantity and logo. Prefer to talk it through? Call 253-922-5793. No matching styles Try a different category or search term. Clear filters See something you like? Tell us the style and your quantity — a real person replies within one business day. Request a quote Browse full catalog",
+      "links": [
+        {
+          "href": "#main",
+          "label": "Skip to content"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "label": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "label": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "label": "Staff"
+        },
+        {
+          "href": "/",
+          "label": ""
+        },
+        {
+          "href": "/catalog",
+          "label": "Products"
+        },
+        {
+          "href": "/brands.html",
+          "label": "Brands"
+        },
+        {
+          "href": "/brands.html",
+          "label": "View all brands →"
+        },
+        {
+          "href": "/pages/fall-catalog-2026.html",
+          "label": "Fall Catalog '26 New"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "label": "Top Sellers"
+        },
+        {
+          "href": "/company-webstores",
+          "label": "Webstores"
+        },
+        {
+          "href": "/pages/request-a-quote.html",
+          "label": "Get a Quote"
+        },
+        {
+          "href": "/quote-cart",
+          "label": "Quote 0"
+        },
+        {
+          "href": "/",
+          "label": "Home"
+        },
+        {
+          "href": "/catalog",
+          "label": "Catalog"
+        },
+        {
+          "href": "/pages/fall-catalog-2026.html",
+          "label": "Fall Catalog '26 New"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "label": "Top Sellers & Free Samples"
+        },
+        {
+          "href": "/brands.html",
+          "label": "Brands"
+        },
+        {
+          "href": "/company-webstores",
+          "label": "Custom Webstores"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "label": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "label": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/",
+          "label": "Home"
+        },
+        {
+          "href": "/catalog",
+          "label": "Catalog"
+        },
+        {
+          "href": "#fcSections",
+          "label": "Browse the collection"
+        },
+        {
+          "href": "/pages/request-a-quote.html?source=Fall%20Catalog%2026",
+          "label": "Request a quote"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "label": "253-922-5793"
+        },
+        {
+          "href": "/pages/request-a-quote.html?source=Fall%20Catalog%2026",
+          "label": "Request a quote"
+        },
+        {
+          "href": "/catalog",
+          "label": "Browse full catalog"
+        },
+        {
+          "href": "/catalog",
+          "label": "Product Catalog"
+        },
+        {
+          "href": "/pages/fall-catalog-2026.html",
+          "label": "Fall Catalog '26"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "label": "Top Sellers"
+        },
+        {
+          "href": "/brands.html",
+          "label": "Brands"
+        },
+        {
+          "href": "/catalog?topSellers=1",
+          "label": "Free Sample Program"
+        },
+        {
+          "href": "/golf-tournament-apparel?utm_source=catalog&utm_campaign=golf-2026-q2&utm_medium=footer",
+          "label": "Tournament Packages"
+        },
+        {
+          "href": "/company-webstores",
+          "label": "Custom Webstores"
+        },
+        {
+          "href": "/calculators/laser-tumbler-polarcamel.html",
+          "label": "Laser-Engraved Tumblers"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "label": "253-922-5793"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "label": "sales@nwcustomapparel.com"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "label": "Staff Portal"
+        }
+      ],
+      "images": [
+        {
+          "src": "https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1",
+          "alt": "Northwest Custom Apparel"
+        },
+        {
+          "src": "https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20White%20Text.png?ver=1",
+          "alt": "Northwest Custom Apparel"
+        }
+      ],
+      "fields": [
+        {
+          "tag": "INPUT",
+          "id": "navSearchInput",
+          "name": "",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "tag": "INPUT",
+          "id": "fcSearch",
+          "name": "",
+          "type": "text",
+          "value": ""
+        }
+      ],
+      "ids": [
+        "mobileMenuBtn",
+        "navDropdownSearch",
+        "navCategories",
+        "navBrandsGrid",
+        "navSearchInput",
+        "navAutocompleteList",
+        "navSearchBtn",
+        "sidebar",
+        "drawerClose",
+        "categoryList",
+        "sidebarOverlay",
+        "main",
+        "fcHeroCount",
+        "fcSearch",
+        "fcClear",
+        "fcCount",
+        "fcCatChips",
+        "fcBrandNav",
+        "fcAlert",
+        "fcSections",
+        "fcEmpty"
+      ],
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/nwca-2026-core.css",
+        "pages/css/fall-catalog-2026.css"
+      ],
+      "cssBytes": 72069
+    }
+  ],
+  "collections": {
+    "BRANDS": "[\n    { name: 'MiiR', tag: 'Our newest brand — Japanese-inspired outerwear, bags & drinkware built to last.', count: 31 },\n    { name: 'The North Face', tag: 'Iron Drift quilted layers and Textured Pine Grove fleece.', count: 8 },\n    { name: 'Carhartt', tag: 'Rugged Flex duck jackets, grid fleece and heavy-duty gear.', count: 10 },\n    { name: 'Nike', tag: 'Dri-FIT Primary and Stride performance layers.', count: 8 },\n    { name: 'Brooks Brothers', tag: 'Refined fleece jackets, vests and 1/4-snaps.', count: 4 },\n    { name: 'TravisMathew', tag: 'Momentum Shift, Coto and Waffle premium layers.', count: 5 },\n    { name: 'Tommy Bahama', tag: 'Coconut Bay half- and full-zips.', count: 3 },\n    { name: 'OGIO', tag: 'Driveline hybrid jacket and vest.', count: 3 },\n    { name: 'New Era', tag: 'Double Back hoodies and Heritage fleece.', count: 6 },\n    { name: 'Flexfit', tag: '110 snapbacks, Delta and classic fitted caps.', count: 8 },\n    { name: 'Mercer+Mettle', tag: 'Soft shell, Brookline quilted and buttery-soft tops.', count: 10 },\n    { name: 'Port Authority', tag: 'Therma-Tek fleece, Wearever polos, Dream Plush and bags.', count: 16 },\n    { name: 'Sport-Tek', tag: 'Repeat, Versa and Pro Perform performance layers & caps.', count: 19 },\n    { name: 'CornerStone', tag: 'Workwear Pro, ANSI hi-vis, tough fleece and utility packs.', count: 11 },\n    { name: 'District', tag: 'MelloFleece hoodies and flannel plaid pants.', count: 5 },\n    { name: 'Port & Company', tag: 'Foundation fleece, Fan Favorite tees and core cotton.', count: 6 },\n    { name: 'Stanley/Stella', tag: 'Sustainable Creator, Freestyler and Chaser styles.', count: 9 },\n    { name: 'Bella+Canvas', tag: '10-ounce heavyweight fleece and garment-dyed tee.', count: 3 },\n    { name: 'Gildan', tag: 'Heavy Blend joggers, sweatpants and 1/4-zip.', count: 3 },\n    { name: 'Jerzees', tag: 'Dri-Power sport shirts and NuBlend fleece.', count: 4 },\n    { name: 'Comfort Colors', tag: 'Sunwashed caps, totes and carry-all bags.', count: 7 },\n  ]",
+    "CATS": "['Jackets', 'Vests', 'Sweatshirts & Fleece', 'Polos', 'Tees', 'Tops', 'Pants', 'Caps', 'Bags & Gear', 'Loungewear']",
+    "ITEMS": "[\n    { s: 'MRA452', n: 'MiiR Pourigami M1 Shell', b: 'MiiR', c: 'Jackets', p: 7 },\n    { s: 'MRA440', n: 'MiiR Sashiko Full-Zip Stretch Puffy', b: 'MiiR', c: 'Sweatshirts & Fleece', p: 9 },\n    { s: 'MRAW440', n: 'MiiR Women\\'s Sashiko Full-Zip Stretch Puffy', b: 'MiiR', c: 'Sweatshirts & Fleece', p: 9 },\n    { s: 'MRA444', n: 'MiiR Sashiko Stretch Puffy Shacket', b: 'MiiR', c: 'Jackets', p: 11 },\n    { s: 'MRAW445', n: 'MiiR Women\\'s Sashiko Stretch Puffy Long Jacket', b: 'MiiR', c: 'Jackets', p: 11 },\n    { s: 'MRA442', n: 'MiiR Sashiko Stretch Puffy Vest', b: 'MiiR', c: 'Vests', p: 13 },\n    { s: 'MRAW442', n: 'MiiR Women\\'s Sashiko Stretch Puffy Vest', b: 'MiiR', c: 'Vests', p: 13 },\n    { s: 'MRA472', n: 'MiiR Nozawa Soft Shell Vest', b: 'MiiR', c: 'Vests', p: 15 },\n    { s: 'MRA474', n: 'MiiR Nozawa Full-Zip Soft Shell', b: 'MiiR', c: 'Jackets', p: 15 },\n    { s: 'MRAW473', n: 'MiiR Women\\'s Nozawa Soft Shell Vest', b: 'MiiR', c: 'Vests', p: 15 },\n    { s: 'MRAW474', n: 'MiiR Women\\'s Nozawa Full-Zip Soft Shell', b: 'MiiR', c: 'Jackets', p: 15 },\n    { s: 'MRA220', n: 'MiiR Kumo 1/4-Snap Pullover', b: 'MiiR', c: 'Sweatshirts & Fleece', p: 17 },\n    { s: 'MRAW221', n: 'MiiR Women\\'s Kumo 1/4-Zip Pullover', b: 'MiiR', c: 'Sweatshirts & Fleece', p: 17 },\n    { s: 'MRAW222', n: 'MiiR Women\\'s Kumo Full-Zip', b: 'MiiR', c: 'Sweatshirts & Fleece', p: 17 },\n    { s: 'MRA230', n: 'MiiR Kivu Hybrid Full-Zip Hooded Jacket', b: 'MiiR', c: 'Jackets', p: 18 },\n    { s: 'MRAW231', n: 'MiiR Women\\'s Kivu Hybrid Full-Zip Jacket', b: 'MiiR', c: 'Jackets', p: 18 },\n    { s: 'MRA235', n: 'MiiR Kivu 1/4-Zip', b: 'MiiR', c: 'Sweatshirts & Fleece', p: 19 },\n    { s: 'MRAW235', n: 'MiiR Women\\'s Kivu 1/4-Zip', b: 'MiiR', c: 'Sweatshirts & Fleece', p: 19 },\n    { s: 'MRA110', n: 'MiiR Alta Polo', b: 'MiiR', c: 'Polos', p: 20 },\n    { s: 'MRAW110', n: 'MiiR Women\\'s Alta Polo', b: 'MiiR', c: 'Polos', p: 20 },\n    { s: 'MRB1002', n: 'MiiR Kondoh Pack', b: 'MiiR', c: 'Bags & Gear', p: 22 },\n    { s: 'MRB1000', n: 'MiiR Kondoh Double-Handle Pack', b: 'MiiR', c: 'Bags & Gear', p: 23 },\n    { s: 'MRB1001', n: 'MiiR Kondoh Classic Pack', b: 'MiiR', c: 'Bags & Gear', p: 23 },\n    { s: 'MRB1060', n: 'MiiR Causeway Crossbody', b: 'MiiR', c: 'Bags & Gear', p: 24 },\n    { s: 'MRB1072', n: 'MiiR Vessel Crossbody', b: 'MiiR', c: 'Bags & Gear', p: 24 },\n    { s: 'MRB1070', n: 'MiiR Causeway Tech Organizer', b: 'MiiR', c: 'Bags & Gear', p: 25 },\n    { s: 'MRB1071', n: 'MiiR Causeway Travel Organizer', b: 'MiiR', c: 'Bags & Gear', p: 25 },\n    { s: 'MRB1080', n: 'MiiR Kondoh Weekend Duffel', b: 'MiiR', c: 'Bags & Gear', p: 26 },\n    { s: 'MRB1081', n: 'MiiR Kondoh Duffel', b: 'MiiR', c: 'Bags & Gear', p: 26 },\n    { s: 'MRB1101', n: 'MiiR Kori 24-Can Vertical Pack Cooler', b: 'MiiR', c: 'Bags & Gear', p: 27 },\n    { s: 'MRB1102', n: 'MiiR Kori 12-Can Vertical Cooler', b: 'MiiR', c: 'Bags & Gear', p: 27 },\n    { s: 'NF0A8JEV', n: 'The North Face Iron Drift Quilted Jacket', b: 'The North Face', c: 'Jackets', p: 29 },\n    { s: 'NF0A8JEZ', n: 'The North Face Women\\'s Iron Drift Quilted Jacket', b: 'The North Face', c: 'Jackets', p: 29 },\n    { s: 'NF0A8JEX', n: 'The North Face Iron Drift Quilted Shirt Jacket', b: 'The North Face', c: 'Jackets', p: 30 },\n    { s: 'NF0A8JEW', n: 'The North Face Iron Drift Quilted Vest', b: 'The North Face', c: 'Vests', p: 31 },\n    { s: 'NF0A8JEY', n: 'The North Face Women\\'s Iron Drift Quilted Hooded Parka', b: 'The North Face', c: 'Jackets', p: 31 },\n    { s: 'NF0A8JF0', n: 'The North Face Women\\'s Iron Drift Quilted Vest', b: 'The North Face', c: 'Vests', p: 31 },\n    { s: 'NF0A8JF6', n: 'The North Face Textured Pine Grove 1/2-Zip', b: 'The North Face', c: 'Sweatshirts & Fleece', p: 33 },\n    { s: 'NF0A8JF7', n: 'The North Face Women\\'s Textured Pine Grove 1/2-Zip', b: 'The North Face', c: 'Sweatshirts & Fleece', p: 33 },\n    { s: 'CT106432', n: 'Carhartt Montana Rugged Flex Duck Jacket', b: 'Carhartt', c: 'Jackets', p: 35 },\n    { s: 'CT106433', n: 'Carhartt Montana Rugged Flex Duck Vest', b: 'Carhartt', c: 'Vests', p: 35 },\n    { s: 'CT106980', n: 'Carhartt Full Swing Washed Duck Active Jac', b: 'Carhartt', c: 'Jackets', p: 36 },\n    { s: 'CT106378', n: 'Carhartt Midweight 1/4-Zip Sweater Fleece', b: 'Carhartt', c: 'Sweatshirts & Fleece', p: 37 },\n    { s: 'CT107814', n: 'Carhartt Force 1/2-Zip Grid Fleece', b: 'Carhartt', c: 'Sweatshirts & Fleece', p: 37 },\n    { s: 'CTT100617', n: 'Carhartt Tall Rain Defender Paxton Heavyweight Hooded Zip Mock Sweatshirt', b: 'Carhartt', c: 'Sweatshirts & Fleece', p: 37 },\n    { s: 'CTB0000687', n: 'Carhartt 16-Inch Molded Base Heavyweight Tool Bag', b: 'Carhartt', c: 'Bags & Gear', p: 38 },\n    { s: 'CTB0000688', n: 'Carhartt 10L Sling Bag', b: 'Carhartt', c: 'Bags & Gear', p: 38 },\n    { s: 'CTB0000608', n: 'Carhartt 3L Travel Kit', b: 'Carhartt', c: 'Bags & Gear', p: 39 },\n    { s: 'CTB0000609', n: 'Carhartt Insulated Lunch Cooler', b: 'Carhartt', c: 'Bags & Gear', p: 39 },\n    { s: 'NKIO8126', n: 'Nike Dri-FIT Primary Hoodie', b: 'Nike', c: 'Sweatshirts & Fleece', p: 41 },\n    { s: 'NKIO8127', n: 'Nike Dri-FIT Primary Crew', b: 'Nike', c: 'Sweatshirts & Fleece', p: 41 },\n    { s: 'NKIO8128', n: 'Nike Dri-FIT Primary 1/4-Zip', b: 'Nike', c: 'Sweatshirts & Fleece', p: 41 },\n    { s: 'NKIO8129', n: 'Nike Women\\'s Dri-FIT Primary 1/4-Zip', b: 'Nike', c: 'Sweatshirts & Fleece', p: 41 },\n    { s: 'NKIO8137', n: 'Nike Dri-FIT Stride 1/2-Zip', b: 'Nike', c: 'Sweatshirts & Fleece', p: 43 },\n    { s: 'NKIO8141', n: 'Nike Women\\'s Dri-FIT Stride 1/2-Zip', b: 'Nike', c: 'Sweatshirts & Fleece', p: 43 },\n    { s: 'NKIO8132', n: 'Nike Women\\'s Bomber Jacket', b: 'Nike', c: 'Jackets', p: 44 },\n    { s: 'NKIO8125', n: 'Nike Therma-FIT Pocket 1/4-Zip', b: 'Nike', c: 'Sweatshirts & Fleece', p: 45 },\n    { s: 'BB18611', n: 'Brooks Brothers Women\\'s Fleece Jacket', b: 'Brooks Brothers', c: 'Jackets', p: 46 },\n    { s: 'BB18612', n: 'Brooks Brothers Fleece 1/4-Snap Neck', b: 'Brooks Brothers', c: 'Sweatshirts & Fleece', p: 46 },\n    { s: 'BB18614', n: 'Brooks Brothers Fleece Vest', b: 'Brooks Brothers', c: 'Vests', p: 47 },\n    { s: 'BB18615', n: 'Brooks Brothers Women\\'s Fleece Vest', b: 'Brooks Brothers', c: 'Vests', p: 47 },\n    { s: 'TMA42219', n: 'TravisMathew Women\\'s Momentum Shift 1/2-Zip', b: 'TravisMathew', c: 'Sweatshirts & Fleece', p: 49 },\n    { s: 'TMA42408', n: 'TravisMathew Momentum Shift 1/4-Zip', b: 'TravisMathew', c: 'Sweatshirts & Fleece', p: 49 },\n    { s: 'TMA47413', n: 'TravisMathew Bomber Jacket', b: 'TravisMathew', c: 'Jackets', p: 50 },\n    { s: 'TMA42777', n: 'TravisMathew Women\\'s Coto 1/2-Zip', b: 'TravisMathew', c: 'Sweatshirts & Fleece', p: 51 },\n    { s: 'TMA46418', n: 'TravisMathew Waffle 1/4-Zip', b: 'TravisMathew', c: 'Sweatshirts & Fleece', p: 51 },\n    { s: 'SW222374TB', n: 'Tommy Bahama Women\\'s Coconut Bay Full-Zip', b: 'Tommy Bahama', c: 'Sweatshirts & Fleece', p: 52 },\n    { s: 'ST228073TB', n: 'Tommy Bahama Coconut Bay 1/2-Zip', b: 'Tommy Bahama', c: 'Sweatshirts & Fleece', p: 53 },\n    { s: 'SW222350TB', n: 'Tommy Bahama Women\\'s Coconut Bay 1/2-Zip', b: 'Tommy Bahama', c: 'Sweatshirts & Fleece', p: 53 },\n    { s: 'LOG761', n: 'OGIO Women\\'s Driveline Hybrid Vest', b: 'OGIO', c: 'Vests', p: 55 },\n    { s: 'OG760', n: 'OGIO Driveline Hybrid Jacket', b: 'OGIO', c: 'Jackets', p: 55 },\n    { s: 'OG761', n: 'OGIO Driveline Hybrid Vest', b: 'OGIO', c: 'Vests', p: 55 },\n    { s: 'LNEA566', n: 'New Era Women\\'s Double Back Full-Zip Hoodie', b: 'New Era', c: 'Sweatshirts & Fleece', p: 57 },\n    { s: 'NEA565', n: 'New Era Double Back Pullover Hoodie', b: 'New Era', c: 'Sweatshirts & Fleece', p: 57 },\n    { s: 'NEA566', n: 'New Era Double Back Full-Zip', b: 'New Era', c: 'Sweatshirts & Fleece', p: 57 },\n    { s: 'NEA567', n: 'New Era Double Back 1/4-Zip', b: 'New Era', c: 'Sweatshirts & Fleece', p: 57 },\n    { s: 'LNEA528', n: 'New Era Women\\'s Heritage Fleece 1/2-Zip', b: 'New Era', c: 'Sweatshirts & Fleece', p: 58 },\n    { s: 'NEA528', n: 'New Era Heritage Fleece 1/2-Zip', b: 'New Era', c: 'Sweatshirts & Fleece', p: 59 },\n    { s: 'FF5001', n: 'Flexfit V-Flexfit Cotton Twill Cap', b: 'Flexfit', c: 'Caps', p: 61 },\n    { s: 'FF6277', n: 'Flexfit Wooly Combed Cap', b: 'Flexfit', c: 'Caps', p: 61 },\n    { s: 'FF6533', n: 'Flexfit Ultrafiber Airmesh Cap', b: 'Flexfit', c: 'Caps', p: 61 },\n    { s: 'FF110F', n: 'Flexfit 110 Snapback Cap', b: 'Flexfit', c: 'Caps', p: 62 },\n    { s: 'FF6511', n: 'Flexfit Trucker Mesh Cap', b: 'Flexfit', c: 'Caps', p: 62 },\n    { s: 'FF110M', n: 'Flexfit 110 Mesh Cap', b: 'Flexfit', c: 'Caps', p: 63 },\n    { s: 'FF180', n: 'Flexfit Delta Cap', b: 'Flexfit', c: 'Caps', p: 63 },\n    { s: 'FF180AP', n: 'Flexfit Delta Perforated Cap', b: 'Flexfit', c: 'Caps', p: 63 },\n    { s: 'MM7104', n: 'Mercer+Mettle Comfort Soft Shell Jacket', b: 'Mercer+Mettle', c: 'Jackets', p: 64 },\n    { s: 'MM7105', n: 'Mercer+Mettle Women\\'s Comfort Soft Shell Jacket', b: 'Mercer+Mettle', c: 'Jackets', p: 64 },\n    { s: 'MM7220', n: 'Mercer+Mettle Brookline Quilted Jacket', b: 'Mercer+Mettle', c: 'Jackets', p: 67 },\n    { s: 'MM7221', n: 'Mercer+Mettle Women\\'s Brookline Quilted Jacket', b: 'Mercer+Mettle', c: 'Jackets', p: 67 },\n    { s: 'MM7222', n: 'Mercer+Mettle Brookline Quilted Vest', b: 'Mercer+Mettle', c: 'Vests', p: 67 },\n    { s: 'MM7223', n: 'Mercer+Mettle Women\\'s Brookline Quilted Vest', b: 'Mercer+Mettle', c: 'Vests', p: 67 },\n    { s: 'MM2017', n: 'Mercer+Mettle Women\\'s Long Sleeve Buttery Soft Blouse', b: 'Mercer+Mettle', c: 'Tops', p: 68 },\n    { s: 'MM2019', n: 'Mercer+Mettle Women\\'s Long Sleeve Buttery Soft Pullover Blouse', b: 'Mercer+Mettle', c: 'Tops', p: 68 },\n    { s: 'MM1040', n: 'Mercer+Mettle Lite Spacer Polo', b: 'Mercer+Mettle', c: 'Polos', p: 69 },\n    { s: 'MM1041', n: 'Mercer+Mettle Women\\'s Short Sleeve Lite Spacer Top', b: 'Mercer+Mettle', c: 'Tops', p: 69 },\n    { s: 'F180', n: 'Port Authority Therma-Tek Fleece Jacket', b: 'Port Authority', c: 'Jackets', p: 71 },\n    { s: 'F181', n: 'Port Authority Therma-Tek Fleece Vest', b: 'Port Authority', c: 'Vests', p: 71 },\n    { s: 'L180', n: 'Port Authority Women\\'s Therma-Tek Fleece Jacket', b: 'Port Authority', c: 'Jackets', p: 71 },\n    { s: 'LK821', n: 'Port Authority Women\\'s Breakwater 1/4-Zip', b: 'Port Authority', c: 'Sweatshirts & Fleece', p: 72 },\n    { s: 'J855', n: 'Port Authority Packable Puffy Anorak', b: 'Port Authority', c: 'Jackets', p: 73 },\n    { s: 'K240LS', n: 'Port Authority Wearever Performance Pique Long Sleeve Polo', b: 'Port Authority', c: 'Polos', p: 75 },\n    { s: 'K240P', n: 'Port Authority Wearever Performance Pique Pocket Polo', b: 'Port Authority', c: 'Polos', p: 75 },\n    { s: 'K241', n: 'Port Authority Wearever Performance Pique 1/4-Zip', b: 'Port Authority', c: 'Polos', p: 75 },\n    { s: 'LK241', n: 'Port Authority Women\\'s Wearever Performance Pique 1/4-Zip', b: 'Port Authority', c: 'Polos', p: 75 },\n    { s: 'Y240', n: 'Port Authority Youth Wearever Performance Pique Polo', b: 'Port Authority', c: 'Polos', p: 75 },\n    { s: 'BP44', n: 'Port Authority Dream Plush Open Hoodie', b: 'Port Authority', c: 'Loungewear', p: 76 },\n    { s: 'R104', n: 'Port Authority Dream Plush Robe', b: 'Port Authority', c: 'Loungewear', p: 76 },\n    { s: 'BG472', n: 'Port Authority Matte Oxford Tote', b: 'Port Authority', c: 'Bags & Gear', p: 77 },\n    { s: 'BG755', n: 'Port Authority Matte Oxford Hanging Travel Case', b: 'Port Authority', c: 'Bags & Gear', p: 77 },\n    { s: 'BP37', n: 'Port Authority Dream Plush Blanket', b: 'Port Authority', c: 'Bags & Gear', p: 77 },\n    { s: 'BP38', n: 'Port Authority Dream Plush Travel Blanket Kit', b: 'Port Authority', c: 'Bags & Gear', p: 77 },\n    { s: 'JST480', n: 'Sport-Tek Repeat Jacket', b: 'Sport-Tek', c: 'Jackets', p: 79 },\n    { s: 'JST481', n: 'Sport-Tek Repeat 1/2-Zip', b: 'Sport-Tek', c: 'Sweatshirts & Fleece', p: 79 },\n    { s: 'LST480', n: 'Sport-Tek Women\\'s Repeat Jacket', b: 'Sport-Tek', c: 'Jackets', p: 79 },\n    { s: 'LST481', n: 'Sport-Tek Women\\'s Repeat 1/2-Zip', b: 'Sport-Tek', c: 'Sweatshirts & Fleece', p: 79 },\n    { s: 'LST491', n: 'Sport-Tek Women\\'s Versa 1/4-Zip', b: 'Sport-Tek', c: 'Sweatshirts & Fleece', p: 80 },\n    { s: 'ST491', n: 'Sport-Tek Versa 1/4-Zip', b: 'Sport-Tek', c: 'Sweatshirts & Fleece', p: 80 },\n    { s: 'LST492', n: 'Sport-Tek Women\\'s Versa Long Sleeve Pullover Hoodie', b: 'Sport-Tek', c: 'Sweatshirts & Fleece', p: 81 },\n    { s: 'ST492', n: 'Sport-Tek Versa Long Sleeve Pullover Hoodie', b: 'Sport-Tek', c: 'Sweatshirts & Fleece', p: 81 },\n    { s: 'ST582', n: 'Sport-Tek Pro Perform Full-Zip', b: 'Sport-Tek', c: 'Sweatshirts & Fleece', p: 82 },\n    { s: 'LST581', n: 'Sport-Tek Women\\'s Pro Perform 1/4-Zip', b: 'Sport-Tek', c: 'Sweatshirts & Fleece', p: 83 },\n    { s: 'LST582', n: 'Sport-Tek Women\\'s Pro Perform Full-Zip', b: 'Sport-Tek', c: 'Sweatshirts & Fleece', p: 83 },\n    { s: 'ST580', n: 'Sport-Tek Pro Perform Pullover Hoodie', b: 'Sport-Tek', c: 'Sweatshirts & Fleece', p: 83 },\n    { s: 'ST581', n: 'Sport-Tek Pro Perform 1/4-Zip', b: 'Sport-Tek', c: 'Sweatshirts & Fleece', p: 83 },\n    { s: 'ST858', n: 'Sport-Tek Sport-Wick Stretch Sleeveless Hooded 1/4-Zip', b: 'Sport-Tek', c: 'Sweatshirts & Fleece', p: 84 },\n    { s: 'ST859', n: 'Sport-Tek Sport-Wick Stretch Pocketed Crewneck', b: 'Sport-Tek', c: 'Sweatshirts & Fleece', p: 84 },\n    { s: 'YST550', n: 'Sport-Tek Youth Competitor Polo', b: 'Sport-Tek', c: 'Polos', p: 85 },\n    { s: 'YST850', n: 'Sport-Tek Youth Sport-Wick Stretch 1/4-Zip Pullover', b: 'Sport-Tek', c: 'Sweatshirts & Fleece', p: 85 },\n    { s: 'STC74', n: 'Sport-Tek Stretch-Tek Snapback Trucker Cap', b: 'Sport-Tek', c: 'Caps', p: 87 },\n    { s: 'STC75', n: 'Sport-Tek Stretch-Tek 5-Panel Trucker Cap', b: 'Sport-Tek', c: 'Caps', p: 87 },\n    { s: 'CSF750', n: 'CornerStone Fleece Overlay Jacket', b: 'CornerStone', c: 'Jackets', p: 88 },\n    { s: 'CSF751', n: 'CornerStone Fleece Overlay Vest', b: 'CornerStone', c: 'Vests', p: 88 },\n    { s: 'CSF633', n: 'CornerStone Tough Fleece 1/4-Zip Hoodie', b: 'CornerStone', c: 'Sweatshirts & Fleece', p: 89 },\n    { s: 'CS452', n: 'CornerStone Workwear Pro Tactical Polo', b: 'CornerStone', c: 'Polos', p: 90 },\n    { s: 'CS452LS', n: 'CornerStone Workwear Pro Tactical Long Sleeve Polo', b: 'CornerStone', c: 'Polos', p: 90 },\n    { s: 'CS453', n: 'CornerStone Women\\'s Workwear Pro Tactical Polo', b: 'CornerStone', c: 'Polos', p: 90 },\n    { s: 'CS454', n: 'CornerStone Workwear Pro Gripper Polo', b: 'CornerStone', c: 'Polos', p: 91 },\n    { s: 'CS205', n: 'CornerStone ANSI 107 Class 2 Short Sleeve Mesh Blocked Tee', b: 'CornerStone', c: 'Tees', p: 92 },\n    { s: 'CS207', n: 'CornerStone ANSI 107 Class 2 Long Sleeve Mesh Blocked Tee', b: 'CornerStone', c: 'Tees', p: 92 },\n    { s: 'CSB215', n: 'CornerStone Utility Pro Molded Bottom Pack', b: 'CornerStone', c: 'Bags & Gear', p: 93 },\n    { s: 'CSB430', n: 'CornerStone Utility Pro Tool Tote', b: 'CornerStone', c: 'Bags & Gear', p: 93 },\n    { s: 'DT6700', n: 'District MelloFleece Hoodie', b: 'District', c: 'Sweatshirts & Fleece', p: 94 },\n    { s: 'DT6702', n: 'District MelloFleece Full-Zip Hoodie', b: 'District', c: 'Sweatshirts & Fleece', p: 94 },\n    { s: 'DT6704', n: 'District MelloFleece Crew', b: 'District', c: 'Sweatshirts & Fleece', p: 94 },\n    { s: 'DT1810', n: 'District Flannel Pocket Pant', b: 'District', c: 'Pants', p: 96 },\n    { s: 'DT1800', n: 'District Flannel Plaid Pant', b: 'District', c: 'Pants', p: 97 },\n    { s: 'PC460', n: 'Port & Co Fan Favorite Varsity Tee', b: 'Port & Company', c: 'Tees', p: 98 },\n    { s: 'PC54H', n: 'Port & Co Core Cotton Pullover Hooded Tee', b: 'Port & Company', c: 'Sweatshirts & Fleece', p: 99 },\n    { s: 'PC68H', n: 'Port & Co Easy Fleece Pullover Hooded Sweatshirt', b: 'Port & Company', c: 'Sweatshirts & Fleece', p: 100 },\n    { s: 'PC68YH', n: 'Port & Co Youth Easy Fleece Pullover Hooded Sweatshirt', b: 'Port & Company', c: 'Sweatshirts & Fleece', p: 100 },\n    { s: 'PC107', n: 'Port & Co Foundation Fleece Pullover Crewneck Sweatshirt', b: 'Port & Company', c: 'Sweatshirts & Fleece', p: 101 },\n    { s: 'PC107H', n: 'Port & Co Foundation Fleece Pullover Hooded Sweatshirt', b: 'Port & Company', c: 'Sweatshirts & Fleece', p: 101 },\n    { s: 'SXU019', n: 'Stanley/Stella Unisex Freestyler Vintage Heavyweight Tee', b: 'Stanley/Stella', c: 'Tees', p: 102 },\n    { s: 'SXU041', n: 'Stanley/Stella Unisex Creator 2.0 Vintage Tee', b: 'Stanley/Stella', c: 'Tees', p: 102 },\n    { s: 'SXU042', n: 'Stanley/Stella Unisex Chaser Vintage Hooded Sweatshirt', b: 'Stanley/Stella', c: 'Sweatshirts & Fleece', p: 103 },\n    { s: 'SXU043', n: 'Stanley/Stella Unisex Easer Vintage Crewneck Sweatshirt', b: 'Stanley/Stella', c: 'Sweatshirts & Fleece', p: 103 },\n    { s: 'SXU038', n: 'Stanley/Stella Unisex Chaser Hooded Sweatshirt', b: 'Stanley/Stella', c: 'Sweatshirts & Fleece', p: 104 },\n    { s: 'SXW036', n: 'Stanley/Stella Women\\'s Stella Alma Crewneck Sweatshirt', b: 'Stanley/Stella', c: 'Sweatshirts & Fleece', p: 104 },\n    { s: 'SXU017', n: 'Stanley/Stella Unisex Sparker 2.0 Tee', b: 'Stanley/Stella', c: 'Tees', p: 105 },\n    { s: 'SXU020', n: 'Stanley/Stella Unisex Blaster 2.0 Tee', b: 'Stanley/Stella', c: 'Tees', p: 105 },\n    { s: 'SXU039', n: 'Stanley/Stella Unisex Asher Tee', b: 'Stanley/Stella', c: 'Tees', p: 105 },\n    { s: 'BC6110GD', n: 'BELLA+CANVAS Women\\'s Heavyweight Garment-Dyed Tee', b: 'Bella+Canvas', c: 'Tees', p: 106 },\n    { s: 'BC4739', n: 'BELLA+CANVAS Unisex 10-Ounce Heavyweight Full-Zip Hooded Sweatshirt', b: 'Bella+Canvas', c: 'Sweatshirts & Fleece', p: 107 },\n    { s: 'BC4740', n: 'BELLA+CANVAS Unisex 10-Ounce Heavyweight 1/2-Zip Sweatshirt', b: 'Bella+Canvas', c: 'Sweatshirts & Fleece', p: 107 },\n    { s: '18810', n: 'Gildan Heavy Blend 1/4-Zip Sweatshirt', b: 'Gildan', c: 'Sweatshirts & Fleece', p: 108 },\n    { s: '18100', n: 'Gildan Heavy Blend Pocket Sweatpant', b: 'Gildan', c: 'Pants', p: 109 },\n    { s: '18250', n: 'Gildan Heavy Blend Jogger', b: 'Gildan', c: 'Pants', p: 109 },\n    { s: '437LS', n: 'Jerzees Dri-Power Sport Shirt', b: 'Jerzees', c: 'Tees', p: 110 },\n    { s: '437W', n: 'Jerzees Women\\'s Dri-Power Sport Shirt', b: 'Jerzees', c: 'Tees', p: 110 },\n    { s: '437B', n: 'Jerzees Youth Dri-Power Sport Shirt', b: 'Jerzees', c: 'Tees', p: 111 },\n    { s: '995Y', n: 'Jerzees Youth NuBlend 1/4-Zip Cadet Collar Sweatshirt', b: 'Jerzees', c: 'Sweatshirts & Fleece', p: 111 },\n    { s: 'CCET0', n: 'Comfort Colors Everyday Tote', b: 'Comfort Colors', c: 'Bags & Gear', p: 112 },\n    { s: 'CCNT0', n: 'Comfort Colors Nomad Carry-All Bag', b: 'Comfort Colors', c: 'Bags & Gear', p: 112 },\n    { s: 'CCSB0', n: 'Comfort Colors Explorer Sling Bag', b: 'Comfort Colors', c: 'Bags & Gear', p: 112 },\n    { s: 'CCRC0', n: 'Comfort Colors Rope Cap', b: 'Comfort Colors', c: 'Caps', p: 113 },\n    { s: 'CCSC0', n: 'Comfort Colors Sunwashed Cap', b: 'Comfort Colors', c: 'Caps', p: 113 },\n    { s: 'CCST0', n: 'Comfort Colors Sunwashed Trucker Cap', b: 'Comfort Colors', c: 'Caps', p: 113 },\n    { s: 'CCWC0', n: 'Comfort Colors Coastal Washed Cap', b: 'Comfort Colors', c: 'Caps', p: 113 },\n  ]"
+  }
+}

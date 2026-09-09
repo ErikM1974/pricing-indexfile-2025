@@ -79,7 +79,7 @@ Historical counts are retained as audit notes and must not be presented as curre
 
 - `shared_components/css/storefront-shell.css` — fifteen public brand guides; shared storefront shell, preserved source content, native menu/search and responsive/paper coverage.
 - `pages/css/brand-guide.css` — fifteen public brand guides; shared storefront shell, preserved source content, native menu/search and responsive/paper coverage.
-- `pages/js/brand-guide.js` — fifteen public brand guides; shared storefront shell, preserved source content, native menu/search and responsive/paper coverage.
+- `shared_components/js/storefront-navigation.js` — fifteen public brand guides; shared storefront shell, preserved source content, native menu/search and responsive/paper coverage.
 - `tests/fixtures/brand-guide-original-content.json` — fifteen public brand guides; shared storefront shell, preserved source content, native menu/search and responsive/paper coverage.
 - `tests/unit/brand-guide-content.test.js` — fifteen public brand guides; shared storefront shell, preserved source content, native menu/search and responsive/paper coverage.
 - `tests/e2e/css-unification-brand-guides.spec.js` — fifteen public brand guides; shared storefront shell, preserved source content, native menu/search and responsive/paper coverage.
@@ -99,3 +99,9 @@ Historical counts are retained as audit notes and must not be presented as curre
 
 - `tests/unit/entry-status-content.test.js` — six sign-in/confirmation sources preserve text, hooks and untouched fulfillment controllers.
 - `tests/e2e/css-unification-entry-status.spec.js` — four widths, keyboard/sign-in errors/retry, existing confirmation polling and populated paper; all business writes/email mocked or blocked.
+
+- `shared_components/css/catalog-discovery.css` — shared brand-directory and Fall catalog controls/cards; existing brands.css and fall-catalog-2026.css now own only page arrangements.
+- Moved `pages/js/brand-guide.js` to `shared_components/js/storefront-navigation.js`; byte-identical native navigation reused by fifteen brand guides and both catalog discovery pages.
+- `tests/fixtures/catalog-discovery-original-content.json` — original copy/links/fields/images and complete curated Fall brand/category/style arrays.
+
+- `tests/unit/catalog-discovery-content.test.js`, `tests/e2e/css-unification-catalog-discovery.spec.js`, `tests/fixtures/catalog-discovery-original-content.json` — original catalog copy/curation, named brand links, four widths/native menus, actual server label passthrough, failure/malformed/retry/filters/broken images and populated paper.
