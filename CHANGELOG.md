@@ -1,3 +1,14 @@
+## v2026.09.08.20 (2026.09.08)
+
+- Plan unified twelve-page public webstore family
+- Record twelve webstore pages and original-content verification
+- Unify twelve public webstore pages with one shared layout
+- Record live policy workspace and reviewed webstore checkpoint
+- Integrate reviewed twelve-page public webstore family
+- Record missing webstore cache references caught by full gates
+- Version new webstore stylesheet and navigation references
+- Record completed webstore release gates and brand continuation
+
 ## v2026.09.08.19 (2026.09.08)
 
 - Plan shared policies CMS and handbook design migration
