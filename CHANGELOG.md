@@ -1,3 +1,29 @@
+## v2026.09.09.10 (2026.09.09)
+
+- Plan shared customer and staff intake page cleanup
+- Record intake migration implementation and remaining review
+- Record reviewed intake layouts and phone form lesson
+- Unify public quote request and hosted staff intake layouts
+- Plan shared SanMar vendor portal wrappers
+- Record verified banner sticker release and reviewed intake batch
+- Integrate reviewed customer intake layouts
+- Keep extraction guards aligned with shared intake styles
+- Keep extraction guards aligned with shared intake styles
+- Record consolidated vendor wrapper implementation
+- Record reviewed vendor wrappers and external UI boundary
+- Unify SanMar vendor portal wrappers and track hosted UI
+- Anchor public form lookup and preserve browser mock boundaries
+- Anchor public form lookup and preserve browser mock boundaries
+- Group announcement and vendor wrappers under shared hosted layout
+- Record five shared hosted workspace layouts
+- Record five reviewed hosted staff tools and provider boundary
+- Unify five hosted staff tools under shared CSS
+- Keep queue age warnings readable and browser polling deterministic
+- Integrate reviewed hosted staff tools with intake release
+- Prepare nine reviewed form pages for one release
+- Apply neutral administrative ownership to announcements
+- Deploy v2026.09.09.10: unify nine intake and hosted staff pages
+
 ## v2026.09.09.7 (2026.09.09)
 
 - Plan banner and sticker configurator style unification
