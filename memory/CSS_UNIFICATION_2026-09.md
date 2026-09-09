@@ -619,3 +619,7 @@ Staff/customer/vendor sign-in and3-Day Tees/custom-tees/custom-caps confirmation
 ## Entry/status integration — 2026-09-09
 
 Reviewed entry/status commit 1118d1d4642bf38db59948b3064362280f6df69a integrated after verified staff release2081. Only appended memory notes conflicted; retained both histories and the latest live checkpoint. All app changes merged directly; original commission serialization from the staff full-suite fix is preserved. Full primary gates next. Live104 reviewed/121 pending remains authoritative until actual entry rollout.
+
+## Entry/status release checks complete — 2026-09-09
+
+Six sign-in/confirmation pages integrated and tested atf343ce6fa4d28e047bc78922c2009b3f3099727b. Completed:215 unit suites/5177 passed/four existing skips;88 DOM,4 accessibility unit,84 quote parity;372 mocked browser (491.99999999999994s),16 remaining browser and3 optional screenshot skips;all5 live calculator surfaces,build/lint/types/297 CSS/HTTP boot.485 routes/24 modules unchanged.30 focused family browser cases and167 checked content blocks in17 one-sheet PDFs retained. Candidatev2026.09.09.3,17 changed/shared references versioned. Exact-source CI and actual deployment pending. Live remains104/225,121 pending. Next isolated codex/catalog-discovery covers brand directory/fall catalog and shared navigation; not reviewed or part of this release.
