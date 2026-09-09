@@ -190,7 +190,9 @@ test.describe('DTG money path (Batch 2.1)', () => {
         await page.waitForFunction(() => window.DTGInlineForm?.previewStyle);
         await page.evaluate(() => window.DTGInlineForm.previewStyle({ style: 'PC54', color: 'Athletic Heather' }));
         const qty = page.locator('input[type="number"][data-row-id][data-size="M"]').first();
-        await qty.fill('24'); await qty.dispatchEvent('change');
+        await qty.waitFor({ state: 'visible', timeout: 30000 });
+        await setHiddenInput(page, 'input[type="number"][data-row-id][data-size="M"]', '24');
+        await expect(page.locator('.dtg-line-qty strong').first()).toHaveText('24');
         await expect.poll(() => requests).toBeGreaterThan(0);
         try {
             await page.evaluate(() => window.dtgSaveQuote());
@@ -219,8 +221,11 @@ test.describe('DTG money path (Batch 2.1)', () => {
         // The grid can appear before pricing finishes; type a real quantity.
         const qtyInput = page.locator('input[type="number"][data-row-id][data-size="M"]').first();
         await qtyInput.waitFor({ state: 'visible', timeout: 30000 });
-        await qtyInput.fill('24');
-        await qtyInput.dispatchEvent('change');
+        // Hydrating the real size bundle can replace this input between
+        // Playwright's focus and text insertion. Dispatch value + input together
+        // through the existing form helper, then require the real row state.
+        await setHiddenInput(page, 'input[type="number"][data-row-id][data-size="M"]', '24');
+        await expect(page.locator('.dtg-line-qty strong').first()).toHaveText('24');
         await expect.poll(() => page.evaluate(() => window.DTGInlineForm.hasCompleteRows()), {
             timeout: 60000, message: 'DTG live pricing did not become ready',
         }).toBe(true);
