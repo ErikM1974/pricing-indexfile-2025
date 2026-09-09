@@ -29,7 +29,7 @@ describe('content pages — shared hygiene', () => {
 
 describe('content pages — specifics', () => {
     test('fall catalog clear-filters forwards via data attribute', () => {
-        expect(read('pages/fall-catalog-2026.html')).toMatch(/<button class="btn btn-ghost" type="button" data-fc-clear>Clear filters<\/button>/);
+        expect(read('pages/fall-catalog-2026.html')).toMatch(/<button class="btn btn-secondary" type="button" data-fc-clear>Clear filters<\/button>/);
         expect(read('pages/js/fall-catalog-2026.js')).toMatch(/querySelectorAll\('\[data-fc-clear\]'\)/);
     });
     test('brands: APP_CONFIG host, hidden toggles, delegated image fallback, no console.log', () => {
@@ -38,13 +38,14 @@ describe('content pages — specifics', () => {
         expect(html).toMatch(/<script src="\/config\/app\.config\.js"><\/script>\s*<script src="\/shared_components\/js\/brands-registry\.js/);
         expect(html).toMatch(/id="errorState" class="error-state" role="alert" hidden>/);
         expect(html).toMatch(/id="brandsContainer" class="brands-container" hidden>/);
-        expect(html).toMatch(/<button type="button" id="brandsRetry" class="btn-retry">Retry<\/button>/);
+        expect(html).toMatch(/<button type="button" id="brandsRetry" class="btn-retry btn btn-secondary">Retry<\/button>/);
         expect(js).not.toMatch(/caspio-pricing-proxy-ab30/);
         expect(js).not.toMatch(/\.style\.display/);
         expect(js.replace(/data-onerror/g, '')).not.toMatch(/onerror=/);
-        expect(js).toMatch(/data-onerror="hide"/);
+        expect(js).toContain("img.dataset.onerror = 'hide'");
         expect(js).not.toMatch(/console\.log\(/);
-        expect(read('brands.css')).toMatch(/\[hidden\] \{ display: none !important; \}/);
+        expect(html).toContain('/shared_components/css/components.css?v=');
+        expect(read('shared_components/css/components.css')).toMatch(/\[hidden\]/);
     });
     test('embroidery contract pricing: print via listener, hidden content, css versioned', () => {
         const html = read('pages/embroidery-contract-pricing.html');

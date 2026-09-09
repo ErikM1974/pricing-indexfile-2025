@@ -3049,6 +3049,72 @@
         "localCssRequests": 2
       },
       "measuredRawCssBytes": 61749
+    },
+    {
+      "source": "brands.html",
+      "family": "catalog-discovery",
+      "status": "pilot",
+      "route": "/brands.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/storefront-shell.css",
+        "shared_components/css/catalog-discovery.css",
+        "brands.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "four-widths",
+        "named-keyboard-brand-links",
+        "native-menu",
+        "filter-and-clear",
+        "loading-empty-failed-malformed",
+        "retry-preserves-search",
+        "server-price-label",
+        "image-fallback",
+        "filtered-paper"
+      ],
+      "test": "tests/e2e/css-unification-catalog-discovery.spec.js",
+      "maxCssBytes": 72769,
+      "baseline": {
+        "commit": "1118d1d4642bf38db59948b3064362280f6df69a",
+        "rawCssBytes": 64995,
+        "localCssRequests": 3
+      },
+      "measuredRawCssBytes": 70269
+    },
+    {
+      "source": "pages/fall-catalog-2026.html",
+      "family": "catalog-discovery",
+      "status": "pilot",
+      "route": "/pages/fall-catalog-2026.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/storefront-shell.css",
+        "shared_components/css/catalog-discovery.css",
+        "pages/css/fall-catalog-2026.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "four-widths",
+        "named-keyboard-brand-links",
+        "native-menu",
+        "filter-and-clear",
+        "loading-empty-failed-malformed",
+        "retry-preserves-search",
+        "server-price-label",
+        "image-fallback",
+        "filtered-paper"
+      ],
+      "test": "tests/e2e/css-unification-catalog-discovery.spec.js",
+      "maxCssBytes": 80444,
+      "baseline": {
+        "commit": "1118d1d4642bf38db59948b3064362280f6df69a",
+        "rawCssBytes": 72069,
+        "localCssRequests": 3
+      },
+      "measuredRawCssBytes": 77944
     }
   ],
   "billingContentSha256": "d85f8530e03a1863d1b8bb2ebe97ba332d5c9e3411887d1eb2d02dcdb14c0863",

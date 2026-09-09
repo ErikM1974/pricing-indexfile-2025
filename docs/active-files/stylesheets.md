@@ -197,8 +197,10 @@ The four policy pages load tokens, shared components, then pages/css/policy-work
 
 The twelve public webstore marketing pages share tokens/components/Public Sans and the rebuilt pages/css/company-webstores.css. They no longer borrow golf-tournament-showcase.css. The family owns a split photo/text hero, reachable public navigation, image/product/price grids, native FAQs and paper layout. Shared webstore-guide.js only focuses fragment destinations and restores FAQ state after printing. Preserve original terms, full main text, image destinations and SEO JSON-LD data; no business API calls.
 
-Brand guides: fifteen custom-brand pages now use tokens/components + shared `storefront-shell.css` + `pages/css/brand-guide.css`. The shared shell owns public navigation/footer; family CSS owns original content layout. `pages/js/brand-guide.js` manages native mobile dialog and existing encoded catalogue search. Other storefront consumers retain nwca-2026-core.css.
+Brand guides: fifteen custom-brand pages now use tokens/components + shared `storefront-shell.css` + `pages/css/brand-guide.css`. The shared shell owns public navigation/footer; family CSS owns original content layout. `shared_components/js/storefront-navigation.js` manages native mobile dialog and existing encoded catalogue search. Other storefront consumers retain nwca-2026-core.css.
 
 - `shared_components/css/staff-reference.css` — five staff reference pages, complete printed titles/content and source warnings, with existing shared component headers/buttons/cards.
 
 - Entry/status: `shared_components/css/access-shell.css` + the two scoped login page sheets; `pages/css/order-confirmation.css` owns3-Day Tees/custom-tees/custom-caps confirmation layout without loading builder styles. All use tokens/components and Public Sans.
+
+Catalog discovery: shared `catalog-discovery.css` follows tokens/components/storefront-shell and owns brand/product cards and controls; existing brands.css and fall-catalog-2026.css contain scoped page arrangements. Header navigation controller is now shared_components/js/storefront-navigation.js; original fifteen brand-guide consumers updated without runtime changes.

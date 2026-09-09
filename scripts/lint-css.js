@@ -151,6 +151,7 @@ const CSS_LINT_SCOPE = [
     'pages/css/customer-invoice.css',
     'pages/css/customer-login.css',
     'shared_components/css/access-shell.css',
+    'shared_components/css/catalog-discovery.css',
     'pages/css/order-confirmation.css',
     'pages/css/customer-portal.css',
     'pages/css/customer-product.css',

@@ -15,12 +15,14 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
     <!-- Styles -->
-    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/shared_components/css/nwca-2026-core.css?v=2026.09.07.8">
-    <link rel="stylesheet" href="/brands.css?v=2026.09.07.8">
+    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.09.4">
+    <link rel="stylesheet" href="/shared_components/css/storefront-shell.css?v=2026.09.09.1">
+    <link rel="stylesheet" href="/shared_components/css/catalog-discovery.css?v=2026.09.09.4">
+    <link rel="stylesheet" href="/brands.css?v=2026.09.09.4">
 </head>
-<body>
+<body data-ui="unified" data-storefront="catalog" data-catalog-discovery="brands">
     <a class="skip-link" href="#main">Skip to content</a>
 
     <!-- Utility strip -->
@@ -39,8 +41,8 @@
     <!-- Masthead -->
     <header class="nav-bar">
         <div class="nav-bar-inner">
-            <button class="mobile-menu-btn" id="mobileMenuBtn" type="button" aria-label="Open menu" aria-controls="sidebar">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <button class="mobile-menu-btn" id="mobileMenuBtn" type="button" aria-label="Open menu" aria-controls="sidebar" aria-expanded="false">
+                <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <line x1="3" y1="6" x2="21" y2="6"></line>
                     <line x1="3" y1="12" x2="21" y2="12"></line>
                     <line x1="3" y1="18" x2="21" y2="18"></line>
@@ -93,7 +95,7 @@
                        autocomplete="off"
                        aria-label="Search products">
                 <button id="navSearchBtn" class="nav-search-btn" type="button" aria-label="Search">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="11" cy="11" r="8"></circle>
                         <path d="m21 21-4.35-4.35"></path>
                     </svg>
@@ -102,7 +104,7 @@
 
             <!-- Quote-cart badge (count wired by quote-cart-store.js; hidden at 0) -->
             <a class="quote-badge" href="/quote-cart" data-quote-badge hidden>
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"></path>
                     <rect x="9" y="3" width="6" height="4" rx="1"></rect>
                     <path d="M9 12h6"></path><path d="M9 16h6"></path>
@@ -114,11 +116,11 @@
     </header>
 
     <!-- Drawer (mobile menu + category browse) -->
-    <aside class="sidebar" id="sidebar" aria-label="Browse menu">
+    <dialog class="sidebar" id="sidebar" aria-label="Browse menu">
         <div class="drawer-head">
             <span class="drawer-head-title">Browse NWCA</span>
             <button class="drawer-close" id="drawerClose" type="button" aria-label="Close menu">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                     <line x1="18" y1="6" x2="6" y2="18"></line>
                     <line x1="6" y1="6" x2="18" y2="18"></line>
                 </svg>
@@ -154,10 +156,9 @@
             <a href="mailto:sales@nwcustomapparel.com">sales@nwcustomapparel.com</a><br>
             2025 Freeman Rd E, Milton, WA 98354
         </div>
-    </aside>
-    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    </dialog>
 
-    <main id="main">
+    <main id="main" tabindex="-1">
     <div class="brands-page-container">
         <div class="brands-content">
             <!-- Page Header -->
@@ -168,8 +169,8 @@
 
             <!-- Brand Search -->
             <div class="brand-search-container">
-                <input type="text" id="brandSearchInput" class="brand-search-input" placeholder="Search brands..." aria-label="Search brands">
-                <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <input type="text" id="brandSearchInput" class="brand-search-input field-input" placeholder="Search brands..." aria-label="Search brands">
+                <svg aria-hidden="true" class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="11" cy="11" r="8"></circle>
                     <path d="m21 21-4.35-4.35"></path>
                 </svg>
@@ -184,9 +185,10 @@
             <!-- Error State -->
             <div id="errorState" class="error-state" role="alert" hidden>
                 <p>Unable to load brands. Please try again later.</p>
-                <button type="button" id="brandsRetry" class="btn-retry">Retry</button>
+                <button type="button" id="brandsRetry" class="btn-retry btn btn-secondary">Retry</button>
             </div>
 
+            <p class="catalog-result-context" id="brandsResultContext" role="status"></p>
             <!-- Brands Grid -->
             <div id="brandsContainer" class="brands-container" hidden>
                 <!-- Brands will be dynamically inserted by brands.js -->
@@ -245,7 +247,8 @@
     <!-- Scripts -->
     <script src="/config/app.config.js"></script>
     <script src="/shared_components/js/brands-registry.js?v=2026.07.25.3"></script>
-    <script src="/brands.js?v=2026.09.06.3"></script>
+    <script src="/brands.js?v=2026.09.09.4"></script>
     <script src="/shared_components/js/quote-cart-store.js?v=2026.08.19.5" defer></script>
+    <script src="/shared_components/js/storefront-navigation.js?v=2026.09.09.4" defer></script>
 </body>
 </html>

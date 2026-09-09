@@ -282,50 +282,42 @@
     els.alert.hidden = false;
   }
 
+  var hydrating = false;
   function hydrate() {
-    var base = apiBase();
-    if (!base) {
-      showAlert('Live pricing is unavailable right now — open any product for current pricing.');
-      return;
-    }
-    var styles = ITEMS.map(function (i) { return i.s; });
-    var batches = [];
-    for (var i = 0; i < styles.length; i += HYDRATE_BATCH) {
-      batches.push(styles.slice(i, i + HYDRATE_BATCH));
-    }
-    var failures = 0;
-    Promise.all(batches.map(function (batch) {
-      var url = base + '/api/products/search?styleNumbers=' +
-                encodeURIComponent(batch.join(',')) + '&limit=' + batch.length;
-      return fetch(url)
-        .then(function (resp) {
-          if (!resp.ok) throw new Error('HTTP ' + resp.status);
-          return resp.json();
-        })
-        .then(function (body) {
-          var prods = (body && body.data && body.data.products) || [];
-          prods.forEach(function (p) {
-            if (p && p.styleNumber) hydrated[String(p.styleNumber).toUpperCase()] = p;
-          });
-        })
-        .catch(function (err) {
-          failures++;
-          console.error('[fall-catalog] hydration batch failed:', err);
-        });
+    if (hydrating) return;
+    var base = apiBase(), retry = byId('fcRetry');
+    if (!base) { showAlert('Live pricing is unavailable right now — open any product for current pricing.'); if (retry) retry.hidden = false; return; }
+    hydrating = true;
+    if (retry) { retry.disabled = true; retry.textContent = 'Loading live details…'; }
+    var styles = ITEMS.map(function (i) { return i.s; }), batches = [], failures = 0, nextProducts = {};
+    for (var i = 0; i < styles.length; i += HYDRATE_BATCH) batches.push(styles.slice(i, i + HYDRATE_BATCH));
+    return Promise.all(batches.map(function (batch) {
+      var url = base + '/api/products/search?styleNumbers=' + encodeURIComponent(batch.join(',')) + '&limit=' + batch.length;
+      return fetch(url, { signal: AbortSignal.timeout(20000) }).then(function (resp) {
+        if (!resp.ok) throw new Error('HTTP ' + resp.status);
+        return resp.json();
+      }).then(function (body) {
+        var prods = body && body.data && body.data.products;
+        if (!Array.isArray(prods) || prods.some(function (p) { return !p || typeof p.styleNumber !== 'string' || !p.styleNumber.trim(); })) throw new Error('Invalid product response');
+        prods.forEach(function (p) { nextProducts[p.styleNumber.toUpperCase()] = p; });
+      }).catch(function (err) { failures++; console.error('[fall-catalog] hydration batch failed:', err); });
     })).then(function () {
+      hydrated = nextProducts;
       hydrateComplete = failures === 0;
-      if (failures > 0) {
-        // Visible per Erik's #1 rule — never degrade silently.
-        showAlert('Live pricing and photos are partially unavailable right now — open any product for current pricing.');
-      }
+      if (failures) showAlert('Live pricing and photos are partially unavailable right now — open any product for current pricing.');
+      else els.alert.hidden = true;
+      var focusWasRetry = document.activeElement === retry;
+      if (retry) { retry.disabled = false; retry.hidden = !failures; retry.textContent = 'Retry live details'; }
+      hydrating = false;
       render();
+      if (!failures && focusWasRetry) els.search.focus();
     });
   }
 
   /* ── Card + section markup ─────────────────────────────────────── */
 
   // Broken-image ladder: hydrated model shot → CDN flat shot → labeled fallback.
-  window.__fcImgErr = function (img) {
+  function handleImageError(img) {
     var alt = img.getAttribute('data-alt-src');
     if (alt) {
       img.removeAttribute('data-alt-src');
@@ -362,7 +354,7 @@
       '<article class="fc-card" data-cat="' + esc(item.c) + '" data-style="' + esc(item.s) + '">' +
         '<a class="fc-card-media" href="' + esc(href) + '">' +
           '<img loading="lazy" src="' + esc(primary) + '"' + altAttr + ' alt="' + esc(title) + '" ' +
-               'onerror="window.__fcImgErr(this)">' +
+               'data-fc-image>' +
           '<span class="fc-card-fallback">' + esc(item.s) + '</span>' +
         '</a>' +
         '<div class="fc-card-body">' +
@@ -411,7 +403,7 @@
       for (var j = 0; j < brandItems.length; j++) cards += cardHtml(brandItems[j]);
 
       sectionsHtml += '' +
-        '<section class="fc-brand" id="' + id + '">' +
+        '<section class="fc-brand" tabindex="-1" id="' + id + '">' +
           '<div class="fc-brand-head">' +
             '<h2 class="fc-brand-name">' + esc(brand.name) + '</h2>' +
             '<p class="fc-brand-tag">' + esc(brand.tag) + '</p>' +
@@ -421,12 +413,15 @@
         '</section>';
     }
 
+    // Every brand/URL interpolation passes through esc(); counts are array lengths.
+    // eslint-disable-next-line no-unsanitized/property -- escaped brand links and numeric counts only
     els.brandNav.innerHTML = navHtml;
+    // eslint-disable-next-line no-unsanitized/property -- cardHtml/priceHtml escape every API label, URL and catalog string
     els.sections.innerHTML = sectionsHtml;
 
     var filtering = !!(state.cat || state.q);
     els.count.textContent = filtering
-      ? (shown + ' of ' + ITEMS.length + ' styles')
+      ? (shown + ' of ' + ITEMS.length + ' styles' + (state.cat ? ' · ' + state.cat : '') + (state.q ? ' · “' + state.q + '”' : ''))
       : (ITEMS.length + ' new styles');
     els.empty.hidden = shown > 0;
     els.sections.hidden = shown === 0;
@@ -435,15 +430,16 @@
 
   /* ── Category chips ────────────────────────────────────────────── */
   function buildChips() {
-    var html = '<button class="fc-chip is-active" type="button" data-cat="">All' +
+    var html = '<button class="fc-chip btn btn-primary is-active" type="button" aria-pressed="true" data-cat="">All' +
                '<span class="fc-chip-count">' + ITEMS.length + '</span></button>';
     for (var i = 0; i < CATS.length; i++) {
       var c = CATS[i];
       var n = 0;
       for (var k = 0; k < ITEMS.length; k++) if (ITEMS[k].c === c) n++;
-      html += '<button class="fc-chip" type="button" data-cat="' + esc(c) + '">' +
+      html += '<button class="fc-chip btn btn-secondary" type="button" aria-pressed="false" data-cat="' + esc(c) + '">' +
               esc(c) + '<span class="fc-chip-count">' + n + '</span></button>';
     }
+    // eslint-disable-next-line no-unsanitized/property -- esc() handles category labels/attributes; counts are numeric
     els.catChips.innerHTML = html;
   }
 
@@ -451,7 +447,11 @@
     state.cat = cat;
     var chips = els.catChips.querySelectorAll('.fc-chip');
     for (var i = 0; i < chips.length; i++) {
-      chips[i].classList.toggle('is-active', (chips[i].getAttribute('data-cat') || '') === cat);
+      var selected = (chips[i].getAttribute('data-cat') || '') === cat;
+      chips[i].classList.toggle('is-active', selected);
+      chips[i].classList.toggle('btn-primary', selected);
+      chips[i].classList.toggle('btn-secondary', !selected);
+      chips[i].setAttribute('aria-pressed', String(selected));
     }
     render();
   }
@@ -464,6 +464,11 @@
 
   function init() {
     if (!els.sections) return;
+    var retry = byId('fcRetry');
+    if (retry) retry.addEventListener('click', hydrate);
+    document.addEventListener('error', function (event) {
+      if (event.target.matches && event.target.matches('img[data-fc-image]')) handleImageError(event.target);
+    }, true);
     // "Clear filters" in the empty state forwards to the real control (was an inline handler)
     document.querySelectorAll('[data-fc-clear]').forEach(function (b) {
       b.addEventListener('click', function () { if (els.clear) els.clear.click(); });
@@ -490,15 +495,11 @@
       });
     }
 
-    // Smooth-scroll brand nav with sticky-offset correction
+    // Native fragments preserve links/history; focus follows the selected section.
     els.brandNav.addEventListener('click', function (e) {
       var a = e.target.closest('a[href^="#"]');
-      if (!a) return;
-      var target = document.getElementById(a.getAttribute('href').slice(1));
-      if (!target) return;
-      e.preventDefault();
-      var y = target.getBoundingClientRect().top + window.pageYOffset - 96;
-      window.scrollTo({ top: y, behavior: 'smooth' });
+      var target = a && document.getElementById(a.getAttribute('href').slice(1));
+      if (target) target.focus({ preventScroll: true });
     });
   }
 
