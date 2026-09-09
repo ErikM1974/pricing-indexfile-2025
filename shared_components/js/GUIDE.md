@@ -257,3 +257,6 @@ Homepage "From the blog" section (index.html). Fetches the 3 newest Published po
 - `training-practice.js` — NWTraining mode state, accessible card selection/status and safe data-call arguments; loaded before seven training practice controllers.
 
 - `training-reference.js`: opt-in reference guides. Uses body data-checklist-prefix, data-checklist, data-reset, data-action=print/top. Preserves browser storage keys, reports persistence failures and respects reduced motion. No business services.
+
+
+- `training-manual.js`: opt-in data-training-manual pages. Real hash links select data-manual-section panels, mobile contents collapse after selection, biography buttons expose state, and print temporarily opens all panels/details then restores them. No business services.

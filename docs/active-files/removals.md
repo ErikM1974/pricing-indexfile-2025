@@ -63,3 +63,6 @@
 
 
 2026-09-08: retired training/shipping-receiving-guide.js and training/sanmar-purchasing-guide.js after both HTML callers moved to shared_components/js/training-reference.js.
+
+
+2026-09-08: training/js/customer-service.js and training/js/get-to-know-erik.js retired after both callers moved to training-manual.js.

@@ -193,3 +193,25 @@ describe('training reference preservation', () => {
         expect(crypto.createHash('sha256').update(read(entry.source).replace(/\r\n/g, '\n')).digest('hex')).toBe(entry.sha256);
     });
 });
+
+
+describe('training manual content preservation', () => {
+    test.each(manifest.trainingManualContent)('$source keeps its complete original text, links, fields and media', entry => {
+        const document = new JSDOM(read(entry.source)).window.document;
+        const body = document.body.cloneNode(true);
+        body.querySelectorAll('[data-manual-actions],[data-manual-label]').forEach(el => el.remove());
+        expect(crypto.createHash('sha256').update(body.textContent.replace(/\s+/g, ' ').trim()).digest('hex')).toBe(entry.bodySha256);
+        expect([...document.querySelectorAll('a')].map(el => [el.getAttribute('href'),el.textContent.replace(/\s+/g,' ').trim()])).toEqual(entry.links);
+        expect([...document.querySelectorAll('[id]')].map(el => el.id)).toEqual(entry.ids);
+        expect([...document.querySelectorAll('img,iframe')].map(el => [el.tagName,el.getAttribute('src'),el.getAttribute('alt'),el.getAttribute('title')])).toEqual(entry.media);
+        expect([...document.querySelectorAll('input,textarea,select')].map(el => ({id:el.id,type:el.type,value:el.value}))).toEqual(entry.fields);
+        expect(document.querySelectorAll('[style],style,script:not([src])')).toHaveLength(0);
+    });
+    test.each(manifest.trainingManualData)('$key lesson data remains unchanged', entry => {
+        const patterns={employees:/const employees = (\[[\s\S]*?\n\s*\]);/,scenarios:/const scenarios = (\{[\s\S]*?\n\s*\});/};
+        const match=read(entry.source).match(patterns[entry.key]);
+        expect(match).not.toBeNull();
+        const value=require('node:vm').runInNewContext('('+match[1]+')');
+        expect(crypto.createHash('sha256').update(JSON.stringify(value)).digest('hex')).toBe(entry.sha256);
+    });
+});

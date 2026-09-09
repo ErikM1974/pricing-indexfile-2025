@@ -4,7 +4,7 @@
  *   1. No staff page carries an inline <style> block or an inline <script> body (JSON-LD is
  *      data and is allowed). The 15 pages that did were extracted in v2026.09.05.8.
  *   2. Font Awesome is ONE build (6.4.0) across the staff pages — four versions had drifted.
- *   3. The Sales Coordinator manual's 45 onclick= attributes became data-chapter / data-action.
+ *   3. The Sales Coordinator manual keeps 44 real chapter links and shared external navigation.
  *   4. Every staff page links the site favicon (no Caspio-CDN icon, none missing).
  */
 const fs = require('fs');
@@ -48,10 +48,16 @@ describe('Sales Coordinator manual', () => {
     test('chapter navigation is data-driven, not onclick=', () => {
         const html = read('training/sales-coordinator-manual.html').replace(/<!--[\s\S]*?-->/g, '');
         expect(html).not.toMatch(/\sonclick=/);
-        expect((html.match(/data-chapter="/g) || []).length).toBeGreaterThan(30);
-        const js = read('training/js/sales-coordinator-manual.js');
-        expect(js).toMatch(/closest\('\[data-chapter\]'\)/);
-        expect(js).toMatch(/data-action="scroll-top"/);
+        const document = new (require('jsdom').JSDOM)(html).window.document;
+        const links = [...document.querySelectorAll('.manual-contents [data-manual-link]')];
+        expect(links).toHaveLength(44);
+        for (const link of links) {
+            const target = document.querySelector(link.getAttribute('href'));
+            expect(target).not.toBeNull();
+            expect(target.hasAttribute('data-manual-section')).toBe(true);
+        }
+        expect(document.querySelector('button[data-manual-top]')).not.toBeNull();
+        expect(document.querySelector('script[src^="/shared_components/js/training-manual.js?"]')).not.toBeNull();
     });
 });
 

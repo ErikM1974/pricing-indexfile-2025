@@ -454,3 +454,6 @@
 - `shared_components/js/training-guide.js`: scoped keyboard disclosures, dashboard navigation and image loading/failure/retry for four service guides; replaces four identical training page scripts.
 
 - `shared_components/js/training-reference.js` — shared shipping/purchasing behavior; replaces their duplicate page scripts, retaining checklist keys.
+
+
+- `shared_components/js/training-manual.js` — chapter/hash navigation, biography disclosure and print-state restoration.

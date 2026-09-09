@@ -1,89 +1,5 @@
-/* sales-coordinator-manual.js — page script (extracted from inline <script>, 2026.09.05.7) */
-
-// ── moved from inline <script> in training/sales-coordinator-manual.html (Rule 3, 2026.09.05.7) ──
-// Show specific chapter
-var SALECOORMANU_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));
-var salecoormanuLog = SALECOORMANU_LOG_ON ? console.log.bind(console) : function () {}; // debug logging: localhost or ?debug=1 only (2026-09-06 console sweep)
-        function showChapter(chapterId) {
-            salecoormanuLog(`Navigating to chapter: ${chapterId}`);
-            
-            // Hide all chapters
-            document.querySelectorAll('.chapter').forEach(chapter => {
-                chapter.classList.remove('active');
-            });
-            
-            // Show selected chapter
-            const chapter = document.getElementById(chapterId);
-            if (chapter) {
-                chapter.classList.add('active');
-                salecoormanuLog(`Successfully activated chapter: ${chapterId}`);
-                
-                // If it's Chapter 43, populate the staff data
-                if (chapterId === 'chapter43') {
-                    populateStaffRoster();
-                    updateCelebrationsWidget();
-                }
-                
-                // Update sidebar navigation to show active chapter
-                updateSidebarActiveState(chapterId);
-                
-                // Scroll the content container to top to show the new chapter
-                const contentContainer = document.querySelector('.content');
-                if (contentContainer) {
-                    contentContainer.scrollTop = 0;
-                    salecoormanuLog(`Content container scrolled to top for chapter: ${chapterId}`);
-                }
-                
-                // Also scroll the window to top in case user scrolled down
-                window.scrollTo({
-                    top: 0,
-                    behavior: 'smooth'
-                });
-                
-                // Force the chapter into view with a small delay to ensure DOM updates
-                setTimeout(() => {
-                    chapter.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    salecoormanuLog(`Chapter ${chapterId} scrolled into view`);
-                }, 100);
-                
-            } else {
-                console.error(`Chapter not found: ${chapterId}`);
-                alert(`Chapter "${chapterId}" not found. Please check the navigation.`);
-            }
-        }
-        
-        // Update active state in sidebar navigation
-        function updateSidebarActiveState(chapterId) {
-            // Remove all active states
-            document.querySelectorAll('.sidebar a').forEach(link => {
-                link.classList.remove('active-chapter');
-            });
-            
-            // Find and highlight the active chapter link
-            const activeLink = document.querySelector(`.sidebar a[onclick*="'${chapterId}'"]`);
-            if (activeLink) {
-                activeLink.classList.add('active-chapter');
-                salecoormanuLog(`Highlighted sidebar link for: ${chapterId}`);
-            }
-        }
-
-        // Scroll to top functionality
-        window.addEventListener('scroll', function() {
-            const scrollButton = document.querySelector('.scroll-to-top');
-            if (window.pageYOffset > 300) {
-                scrollButton.classList.add('visible');
-            } else {
-                scrollButton.classList.remove('visible');
-            }
-        });
-
-        function scrollToTop() {
-            window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
-            });
-        }
-
+/* Original training roster data; local calendar dates avoid UTC day shifts. */
+function localCalendarDate(value) { const [year, month, day] = value.split('-').map(Number); return new Date(year, month - 1, day); }
         // Employee data for Chapter 43
         const employees = [
             {
@@ -224,7 +140,7 @@ var salecoormanuLog = SALECOORMANU_LOG_ON ? console.log.bind(console) : function
 
         // Calculate detailed tenure from start date (matching staff dashboard)
         function calculateDetailedTenure(startDate) {
-            const start = new Date(startDate);
+            const start = localCalendarDate(startDate);
             const now = new Date();
             
             // Check if future start date
@@ -265,25 +181,6 @@ var salecoormanuLog = SALECOORMANU_LOG_ON ? console.log.bind(console) : function
             };
         }
         
-        // Calculate simple tenure years for celebrations
-        function calculateTenure(startDate) {
-            const start = new Date(startDate);
-            const now = new Date();
-            
-            // If future date, return 0
-            if (start > now) return 0;
-            
-            let years = now.getFullYear() - start.getFullYear();
-            const monthDiff = now.getMonth() - start.getMonth();
-            
-            // Check if we haven't reached the anniversary date yet this year
-            if (monthDiff < 0 || (monthDiff === 0 && now.getDate() < start.getDate())) {
-                years--;
-            }
-            
-            return years;
-        }
-
         // Format tenure display
         function formatTenure(startDate) {
             const tenure = calculateDetailedTenure(startDate);
@@ -292,7 +189,7 @@ var salecoormanuLog = SALECOORMANU_LOG_ON ? console.log.bind(console) : function
 
         // Format date for display
         function formatDateDisplay(dateStr) {
-            const date = new Date(dateStr);
+            const date = localCalendarDate(dateStr);
             const options = { month: 'long', day: 'numeric', year: 'numeric' };
             return date.toLocaleDateString('en-US', options);
         }
@@ -312,7 +209,7 @@ var salecoormanuLog = SALECOORMANU_LOG_ON ? console.log.bind(console) : function
             
             let targetDate;
             if (isAnniversary) {
-                targetDate = new Date(dateString);
+                targetDate = localCalendarDate(dateString);
                 targetDate.setFullYear(today.getFullYear());
             } else {
                 const [month, day] = dateString.split('-');
@@ -324,7 +221,7 @@ var salecoormanuLog = SALECOORMANU_LOG_ON ? console.log.bind(console) : function
                 targetDate.setFullYear(today.getFullYear() + 1);
             }
             
-            const diffTime = targetDate - today;
+            const diffTime = Date.UTC(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate()) - Date.UTC(today.getFullYear(), today.getMonth(), today.getDate());
             const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
             
             return diffDays;
@@ -337,7 +234,7 @@ var salecoormanuLog = SALECOORMANU_LOG_ON ? console.log.bind(console) : function
             
             employees.forEach(emp => {
                 // Check birthdays
-                const daysUntilBirthday = calculateDaysUntil(emp.birthday);
+                const daysUntilBirthday = emp.birthday ? calculateDaysUntil(emp.birthday) : Infinity;
                 if (daysUntilBirthday <= daysAhead) {
                     celebrations.push({
                         name: emp.firstName + (emp.lastName ? ' ' + emp.lastName : ''),
@@ -351,7 +248,9 @@ var salecoormanuLog = SALECOORMANU_LOG_ON ? console.log.bind(console) : function
                 // Check work anniversaries
                 const daysUntilAnniversary = calculateDaysUntil(emp.startDate, true);
                 if (daysUntilAnniversary <= daysAhead) {
-                    const years = calculateTenure(emp.startDate);
+                    const upcoming = new Date(today.getFullYear(), localCalendarDate(emp.startDate).getMonth(), localCalendarDate(emp.startDate).getDate());
+                    if (calculateDaysUntil(emp.startDate, true) > 0 && upcoming < today) upcoming.setFullYear(upcoming.getFullYear() + 1);
+                    const years = upcoming.getFullYear() - localCalendarDate(emp.startDate).getFullYear();
                     celebrations.push({
                         name: emp.firstName + (emp.lastName ? ' ' + emp.lastName : ''),
                         type: 'anniversary',
@@ -378,7 +277,7 @@ var salecoormanuLog = SALECOORMANU_LOG_ON ? console.log.bind(console) : function
             
             // Sort employees by tenure (longest first)
             const sortedEmployees = [...employees].sort((a, b) => {
-                return new Date(a.startDate) - new Date(b.startDate);
+                return localCalendarDate(a.startDate) - localCalendarDate(b.startDate);
             });
             
             sortedEmployees.forEach(emp => {
@@ -388,13 +287,13 @@ var salecoormanuLog = SALECOORMANU_LOG_ON ? console.log.bind(console) : function
                 // Determine status
                 let status = 'Active';
                 const now = new Date();
-                const startDate = new Date(emp.startDate);
+                const startDate = localCalendarDate(emp.startDate);
                 
                 if (startDate > now) {
                     const daysUntil = Math.ceil((startDate - now) / (1000 * 60 * 60 * 24));
                     status = `Starting in ${daysUntil} day${daysUntil !== 1 ? 's' : ''}`;
                 } else if (emp.endDate) {
-                    const endDate = new Date(emp.endDate);
+                    const endDate = localCalendarDate(emp.endDate);
                     if (endDate > now) {
                         const daysUntil = Math.ceil((endDate - now) / (1000 * 60 * 60 * 24));
                         status = `Leaving in ${daysUntil} day${daysUntil !== 1 ? 's' : ''}`;
@@ -406,93 +305,38 @@ var salecoormanuLog = SALECOORMANU_LOG_ON ? console.log.bind(console) : function
                 // Format birthday - handle missing birthdays
                 const birthdayDisplay = emp.birthday ? formatBirthday(emp.birthday) : '-';
                 
-                row.innerHTML = `
-                    <td><strong>${fullName}</strong></td>
-                    <td>${emp.position}</td>
-                    <td>${formatDateDisplay(emp.startDate)}</td>
-                    <td>${formatTenure(emp.startDate)}</td>
-                    <td>${birthdayDisplay}</td>
-                    <td>${status}</td>
-                `;
-                
+                [fullName, emp.position, formatDateDisplay(emp.startDate), formatTenure(emp.startDate), birthdayDisplay, status].forEach(value => {
+                    const cell = document.createElement('td');
+                    cell.textContent = value;
+                    row.append(cell);
+                });
+
                 tbody.appendChild(row);
             });
         }
 
-        // Update celebrations widget
+        // Plain DOM rendering preserves names and avoids embedded presentation styles.
         function updateCelebrationsWidget() {
             const widget = document.getElementById('celebrationsWidget');
             if (!widget) return;
-            
             const celebrations = getUpcomingCelebrations(30);
-            
-            if (celebrations.length === 0) {
-                widget.innerHTML = '<p style="color: white;">No upcoming celebrations in the next 30 days.</p>';
+            widget.replaceChildren();
+            if (!celebrations.length) {
+                const empty = document.createElement('p');
+                empty.textContent = 'No upcoming celebrations in the next 30 days.';
+                widget.append(empty);
                 return;
             }
-            
-            let html = '<div style="color: white;">';
             celebrations.forEach(celebration => {
-                const icon = celebration.type === 'birthday' ? '🎂' : '🎉';
-                let dayText = '';
-                
-                if (celebration.daysUntil === 0) {
-                    dayText = '<strong>TODAY!</strong>';
-                } else if (celebration.daysUntil === 1) {
-                    dayText = 'Tomorrow';
-                } else {
-                    dayText = `In ${celebration.daysUntil} days`;
-                }
-                
-                if (celebration.type === 'birthday') {
-                    html += `
-                        <div style="margin: 0.75rem 0; padding: 0.75rem; background: rgba(255,255,255,0.1); border-radius: 8px;">
-                            ${icon} <strong>${celebration.name}'s Birthday</strong><br>
-                            ${celebration.displayDate} - ${dayText}
-                        </div>
-                    `;
-                } else {
-                    html += `
-                        <div style="margin: 0.75rem 0; padding: 0.75rem; background: rgba(255,255,255,0.1); border-radius: 8px;">
-                            ${icon} <strong>${celebration.name}'s ${celebration.years}-Year Anniversary</strong><br>
-                            ${dayText}
-                        </div>
-                    `;
-                }
+                const item = document.createElement('div');
+                item.className = 'celebration';
+                const title = document.createElement('strong');
+                const dayText = celebration.daysUntil === 0 ? 'TODAY!' : celebration.daysUntil === 1 ? 'Tomorrow' : 'In ' + celebration.daysUntil + ' days';
+                title.textContent = celebration.type === 'birthday' ? '🎂 ' + celebration.name + "'s Birthday" : '🎉 ' + celebration.name + "'s " + celebration.years + '-Year Anniversary';
+                const timing = document.createElement('p');
+                timing.textContent = celebration.type === 'birthday' ? celebration.displayDate + ' - ' + dayText : dayText;
+                item.append(title, timing);
+                widget.append(item);
             });
-            html += '</div>';
-            
-            widget.innerHTML = html;
         }
-
-        // Initialize with foreword
-        document.addEventListener('DOMContentLoaded', function() {
-            showChapter('foreword');
-            salecoormanuLog('Sales Coordinator Manual loaded. All 43 chapters ready for navigation.');
-            
-            // Add click tracking for debugging
-            document.querySelectorAll('.sidebar a[onclick*="showChapter"]').forEach(link => {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const chapterMatch = this.getAttribute('onclick').match(/'([^']+)'/);
-                    if (chapterMatch) {
-                        salecoormanuLog(`Sidebar click detected for: ${chapterMatch[1]}`);
-                    }
-                });
-            });
-        });
-
-// ── 2026-09-05: chapter navigation via data attributes (the 45 onclick= attributes are gone) ──
-document.addEventListener('click', function (e) {
-    var chapter = e.target.closest('[data-chapter]');
-    if (chapter) {
-        e.preventDefault();
-        if (typeof showChapter === 'function') showChapter(chapter.getAttribute('data-chapter'), e);
-        return;
-    }
-    var top = e.target.closest('[data-action="scroll-top"]');
-    if (top) {
-        e.preventDefault();
-        if (typeof scrollToTop === 'function') scrollToTop();
-    }
-});
+document.addEventListener('DOMContentLoaded', () => { populateStaffRoster(); updateCelebrationsWidget(); });
