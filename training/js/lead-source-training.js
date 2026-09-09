@@ -149,17 +149,21 @@ let totalAnswers = 0;
 let currentStreak = 0;
 let selectedSource = null;
 let speedTimer = null;
+let speedAdvance = null;
 let speedTimeLeft = 60;
 let speedScore = 0;
 let currentReferralIndex = 0;
 let currentReferralQuestion = 0;
+let referralAnswered = false;
 
 function setGameMode(mode) {
     currentMode = mode;
     
     // Update button states
-    document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
-    event.target.classList.add('active');
+    NWTraining.modes(mode);
+    clearInterval(speedTimer);
+    clearTimeout(speedAdvance);
+    speedTimeLeft = 0;
     
     // Hide all containers
     document.getElementById('learnMode').classList.remove('active');
@@ -236,7 +240,7 @@ function selectSource(source) {
     });
     
     // Show feedback
-    let feedbackHTML = `<div class="${isCorrect ? 'referral-action-box' : 'source-action'}" style="margin-top: 20px;">`;
+    let feedbackHTML = `<div class="${isCorrect ? 'referral-action-box' : 'source-action'}" >`;
     
     if (isCorrect) {
         feedbackHTML += `<h3>✅ Correct!</h3>`;
@@ -290,20 +294,21 @@ function loadReferralScenario() {
 }
 
 function showReferralQuestion() {
+    referralAnswered = false;
     const scenario = referralScenarios[currentReferralIndex];
     const question = scenario.questions[currentReferralQuestion];
     
     let html = `
-        <div style="background: white; padding: 20px; border-radius: 10px; margin-top: 20px;">
+        <div >
             <h3>${question.question}</h3>
-            <div class="source-options" style="margin-top: 15px;">
+            <div class="source-options" >
     `;
     
     question.options.forEach((option, index) => {
         html += `
-            <div class="source-option" onclick="selectReferralAnswer('${option}')" data-option="${option}">
+            <button type="button" class="source-option btn" data-call="selectReferralAnswer" data-args="${NWTraining.args([option])}" data-option="${option}">
                 ${option}
-            </div>
+            </button>
         `;
     });
     
@@ -316,6 +321,8 @@ function selectReferralAnswer(answer) {
     const scenario = referralScenarios[currentReferralIndex];
     const question = scenario.questions[currentReferralQuestion];
     const isCorrect = answer === question.answer;
+    referralAnswered = isCorrect;
+    NWTraining.announce(isCorrect ? 'Correct. Continue to the next question.' : 'Try again. The correct answer is ' + question.answer + '.');
     
     // Visual feedback
     document.querySelectorAll('.source-option').forEach(option => {
@@ -329,6 +336,10 @@ function selectReferralAnswer(answer) {
 }
 
 function checkReferralAnswer() {
+    if (!referralAnswered) {
+        NWTraining.announce('Select the correct answer before continuing.');
+        return;
+    }
     // Move to next question or scenario
     const scenario = referralScenarios[currentReferralIndex];
     
@@ -356,6 +367,10 @@ function nextReferralScenario() {
 function startSpeedChallenge() {
     speedScore = 0;
     speedTimeLeft = 60;
+    clearTimeout(speedAdvance);
+    document.getElementById('speedScore').textContent = '0';
+    document.getElementById('timeLeft').textContent = '60s';
+    document.getElementById('timerFill').style.width = '100%';
     loadSpeedScenario();
     
     // Start timer
@@ -380,9 +395,9 @@ function setupSpeedButtons() {
     
     sources.forEach(source => {
         html += `
-            <div class="source-option" onclick="speedSelect('${source}')" data-source="${source}">
+            <button type="button" class="source-option btn" data-call="speedSelect" data-args="${NWTraining.args([source])}" data-source="${source}">
                 ${source}
-            </div>
+            </button>
         `;
     });
     
@@ -390,92 +405,41 @@ function setupSpeedButtons() {
 }
 
 function loadSpeedScenario() {
-    // Reset all button colors
+    if (currentMode !== 'speed' || speedTimeLeft <= 0) return;
     document.querySelectorAll('#speedOptions .source-option').forEach(option => {
-        option.style.background = '';
         option.classList.remove('correct', 'incorrect');
+        option.disabled = false;
     });
-    
-    // Add fade animation for new question
-    const dialogueEl = document.getElementById('speedDialogue');
-    dialogueEl.style.opacity = '0';
-    
     const scenario = scenarios[Math.floor(Math.random() * scenarios.length)];
-    
-    setTimeout(() => {
-        dialogueEl.textContent = scenario.dialogue;
-        dialogueEl.dataset.correctSource = scenario.source;
-        dialogueEl.style.transition = 'opacity 0.3s';
-        dialogueEl.style.opacity = '1';
-    }, 100);
+    const dialogue = document.getElementById('speedDialogue');
+    dialogue.textContent = scenario.dialogue;
+    dialogue.dataset.correctSource = scenario.source;
 }
 
 function speedSelect(source) {
-    // Prevent multiple clicks
-    const allOptions = document.querySelectorAll('#speedOptions .source-option');
-    if (event.target.classList.contains('disabled')) return;
-    
-    // Disable all buttons temporarily
-    allOptions.forEach(opt => opt.classList.add('disabled'));
-    
-    const correctSource = document.getElementById('speedDialogue').dataset.correctSource;
-    const isCorrect = source === correctSource;
-    
-    if (isCorrect) {
-        speedScore += 10;
-        document.getElementById('speedScore').textContent = speedScore;
-        
-        // Show correct answer with animation
-        event.target.classList.add('correct');
-        event.target.style.background = '#4CAF50';
-        
-        // Add floating +10 animation
-        const floater = document.createElement('div');
-        floater.textContent = '+10';
-        floater.style.cssText = `
-            position: absolute;
-            color: #4CAF50;
-            font-weight: bold;
-            font-size: 1.5em;
-            animation: floatUp 1s ease-out;
-            pointer-events: none;
-            z-index: 1000;
-        `;
-        event.target.style.position = 'relative';
-        event.target.appendChild(floater);
-        
-        setTimeout(() => {
-            floater.remove();
-            allOptions.forEach(opt => opt.classList.remove('disabled'));
-            loadSpeedScenario();
-        }, 500);
-    } else {
-        // Show incorrect answer
-        event.target.classList.add('incorrect');
-        event.target.style.background = '#ff6b6b';
-        
-        // Also highlight the correct answer
-        allOptions.forEach(opt => {
-            if (opt.dataset.source === correctSource) {
-                opt.classList.add('correct');
-                opt.style.background = '#4CAF50';
-            }
-        });
-        
-        setTimeout(() => {
-            allOptions.forEach(opt => opt.classList.remove('disabled'));
-            loadSpeedScenario();
-        }, 800);
-    }
+    if (currentMode !== 'speed' || speedTimeLeft <= 0) return;
+    const options = [...document.querySelectorAll('#speedOptions .source-option')];
+    const selected = options.find(option => option.dataset.source === source);
+    if (!selected || selected.disabled) return;
+    options.forEach(option => { option.disabled = true; });
+    const correct = document.getElementById('speedDialogue').dataset.correctSource;
+    const isCorrect = source === correct;
+    if (isCorrect) { speedScore += 10; document.getElementById('speedScore').textContent = speedScore; }
+    selected.classList.add(isCorrect ? 'correct' : 'incorrect');
+    options.find(option => option.dataset.source === correct)?.classList.add('correct');
+    NWTraining.announce(isCorrect ? 'Correct! 10 points.' : 'Incorrect. The answer is ' + correct + '.');
+    speedAdvance = setTimeout(loadSpeedScenario, isCorrect ? 500 : 800);
 }
 
 function endSpeedChallenge() {
     clearInterval(speedTimer);
+    clearTimeout(speedAdvance);
+    speedTimeLeft = 0;
     
     document.getElementById('speedDialogue').innerHTML = `
         <h2>⏱️ Time's Up!</h2>
         <p>Final Score: ${speedScore} points</p>
-        <button class="nav-btn" onclick="startSpeedChallenge()">Try Again</button>
+        <button type="button" class="nav-btn btn" data-call="startSpeedChallenge" data-args="${NWTraining.args([])}">Try Again</button>
     `;
     
     document.getElementById('speedOptions').innerHTML = '';

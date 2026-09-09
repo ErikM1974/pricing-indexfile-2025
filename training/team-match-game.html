@@ -1,23 +1,23 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
+<!DOCTYPE html><html lang="en"><head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Team Match Game - Northwest Custom Apparel</title>
 <link rel="icon" href="/favicon.png" type="image/png">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-<link rel="stylesheet" href="/training/css/training-shared.css?v=2026.09.07.6">
-<link rel="stylesheet" href="/training/css/team-match-game.css?v=2026.09.07.19">
+<link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.08.13">
+<link rel="stylesheet" href="/shared_components/css/training-guide.css?v=2026.09.08.13">
+<link rel="stylesheet" href="/shared_components/css/training-practice.css?v=2026.09.08.13">
+<link rel="stylesheet" href="/training/css/team-match-game.css?v=2026.09.08.13">
 </head>
-<body>
+<body data-ui="unified" data-training="practice">
 
 <!-- Navigation Header -->
 <nav class="nav-header">
     <div class="nav-container">
         <div class="nav-left">
-            <a href="/staff-dashboard.html" class="back-btn">
+            <a href="/staff-dashboard.html" class="back-btn btn">
                 <i class="fas fa-arrow-left" aria-hidden="true"></i>
                 <span>Back to Dashboard</span>
             </a>
@@ -28,8 +28,7 @@
         </div>
         <div class="nav-right">
             <div class="logo-container">
-                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
-                     alt="Northwest Custom Apparel">
+                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" alt="Northwest Custom Apparel">
             </div>
         </div>
     </div>
@@ -47,7 +46,7 @@
 </div>
 
 <!-- Game Wrapper -->
-<main class="game-wrapper">
+<main class="game-wrapper training-workspace">
     <div class="container">
         <div class="game-header">
             <h1>🎯 NWCA Team Match Game</h1>
@@ -60,10 +59,10 @@
     </div>
 
     <div class="game-controls">
-        <button class="mode-btn active" data-call="setGameMode" data-args='["tenure"]'>Years of Service</button>
-        <button class="mode-btn" data-call="setGameMode" data-args='["position"]'>Job Positions</button>
-        <button class="mode-btn" data-call="setGameMode" data-args='["birthday"]'>Birthdays</button>
-        <button class="mode-btn" data-call="setGameMode" data-args='["mix"]'>Mix Challenge</button>
+        <button class="mode-btn active btn" data-call="setGameMode" data-args="[&quot;tenure&quot;]" type="button">Years of Service</button>
+        <button class="mode-btn btn" data-call="setGameMode" data-args="[&quot;position&quot;]" type="button">Job Positions</button>
+        <button class="mode-btn btn" data-call="setGameMode" data-args="[&quot;birthday&quot;]" type="button">Birthdays</button>
+        <button class="mode-btn btn" data-call="setGameMode" data-args="[&quot;mix&quot;]" type="button">Mix Challenge</button>
     </div>
 
     <div class="game-info">
@@ -86,7 +85,7 @@
     </div>
 </main>
 
-<div class="completion-overlay" id="completionOverlay">
+<dialog class="completion-overlay ui-dialog" id="completionOverlay" aria-label="Team match results">
     <div class="completion-message">
         <h2>🎉 Excellent Job!</h2>
         <div class="stats">
@@ -95,13 +94,14 @@
             <p>Attempts: <span id="finalAttempts"></span></p>
             <p>Accuracy: <span id="accuracy"></span>%</p>
         </div>
-        <button class="btn" data-call="playAgain">Play Again</button>
-        <button class="btn" data-call="nextMode">Next Challenge</button>
+        <button class="btn" data-call="playAgain" type="button">Play Again</button>
+        <button class="btn" data-call="nextMode" type="button">Next Challenge</button>
     </div>
-</div>
+</dialog>
 
     <script src="/shared_components/js/data-call-delegator.js?v=2026.09.06.29"></script>
-<script src="/training/js/team-match-game.js?v=2026.09.07.33"></script>
+<script src="/shared_components/js/training-practice.js?v=2026.09.08.13"></script>
+<script src="/training/js/team-match-game.js?v=2026.09.08.13"></script>
 
-</body>
-</html>
+
+</body></html>

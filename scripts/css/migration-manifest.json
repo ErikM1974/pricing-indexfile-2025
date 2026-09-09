@@ -1154,6 +1154,174 @@
         "lookup/save/draft states where present"
       ],
       "test": "tests/e2e/css-unification-printable-forms.spec.js"
+    },
+    {
+      "source": "training/customer-categorization-training.html",
+      "family": "training-practice",
+      "status": "reviewed",
+      "route": "/training/customer-categorization-training.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/training-guide.css",
+        "shared_components/css/training-practice.css",
+        "training/css/customer-categorization-training.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "desktop",
+        "tablet",
+        "mobile",
+        "keyboard",
+        "exercise-feedback",
+        "print"
+      ],
+      "maxCssBytes": 76667,
+      "test": "tests/e2e/css-unification-training-practice.spec.js"
+    },
+    {
+      "source": "training/lead-email-templates.html",
+      "family": "training-practice",
+      "status": "reviewed",
+      "route": "/training/lead-email-templates.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/training-guide.css",
+        "shared_components/css/training-practice.css",
+        "training/css/lead-email-templates.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "desktop",
+        "tablet",
+        "mobile",
+        "keyboard",
+        "exercise-feedback",
+        "print"
+      ],
+      "maxCssBytes": 77552,
+      "test": "tests/e2e/css-unification-training-practice.spec.js"
+    },
+    {
+      "source": "training/lead-source-training.html",
+      "family": "training-practice",
+      "status": "reviewed",
+      "route": "/training/lead-source-training.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/training-guide.css",
+        "shared_components/css/training-practice.css",
+        "training/css/lead-source-training.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "desktop",
+        "tablet",
+        "mobile",
+        "keyboard",
+        "exercise-feedback",
+        "print"
+      ],
+      "maxCssBytes": 76853,
+      "test": "tests/e2e/css-unification-training-practice.spec.js"
+    },
+    {
+      "source": "training/training-games-hub.html",
+      "family": "training-practice",
+      "status": "reviewed",
+      "route": "/training/training-games-hub.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/training-guide.css",
+        "shared_components/css/training-practice.css",
+        "training/css/training-games-hub.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "desktop",
+        "tablet",
+        "mobile",
+        "keyboard",
+        "exercise-feedback",
+        "print"
+      ],
+      "maxCssBytes": 78433,
+      "test": "tests/e2e/css-unification-training-practice.spec.js"
+    },
+    {
+      "source": "training/shopworks-notes.html",
+      "family": "training-practice",
+      "status": "reviewed",
+      "route": "/training/shopworks-notes.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/training-guide.css",
+        "shared_components/css/training-practice.css",
+        "training/css/shopworks-notes.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "desktop",
+        "tablet",
+        "mobile",
+        "keyboard",
+        "exercise-feedback",
+        "print"
+      ],
+      "maxCssBytes": 78192,
+      "test": "tests/e2e/css-unification-training-practice.spec.js"
+    },
+    {
+      "source": "training/shopworks-sales-tax-training.html",
+      "family": "training-practice",
+      "status": "reviewed",
+      "route": "/training/shopworks-sales-tax-training.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/training-guide.css",
+        "shared_components/css/training-practice.css",
+        "training/css/shopworks-sales-tax-training.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "desktop",
+        "tablet",
+        "mobile",
+        "keyboard",
+        "exercise-feedback",
+        "print"
+      ],
+      "maxCssBytes": 76627,
+      "test": "tests/e2e/css-unification-training-practice.spec.js"
+    },
+    {
+      "source": "training/team-match-game.html",
+      "family": "training-practice",
+      "status": "reviewed",
+      "route": "/training/team-match-game.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/training-guide.css",
+        "shared_components/css/training-practice.css",
+        "training/css/team-match-game.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "desktop",
+        "tablet",
+        "mobile",
+        "keyboard",
+        "exercise-feedback",
+        "print"
+      ],
+      "maxCssBytes": 76759,
+      "test": "tests/e2e/css-unification-training-practice.spec.js"
     }
   ],
   "billingContentSha256": "d85f8530e03a1863d1b8bb2ebe97ba332d5c9e3411887d1eb2d02dcdb14c0863",
@@ -1440,6 +1608,73 @@
       "source": "pages/forms/webstore-request-form.html",
       "sha256": "75dc14b98c9f5fd7cd1643fa16738a6d3a4d4cdd6227e782ab0365e71fc42ac5",
       "blankPrintPages": 2
+    }
+  ],
+  "trainingPracticeContent": [
+    {
+      "source": "training/customer-categorization-training.html",
+      "sha256": "06802c86012f76d562b386b8e4a70c27908d70db0967b004d3c3539ecee206cc"
+    },
+    {
+      "source": "training/lead-email-templates.html",
+      "sha256": "474a53f1a4f84f3c2f424efc0764f862ceec2867b2146f0d2434248aea39ee2c"
+    },
+    {
+      "source": "training/lead-source-training.html",
+      "sha256": "70483ffa1c97ce8916d158cb34f35d7bfb6c0a5664a4a11cf31c559de68c695b"
+    },
+    {
+      "source": "training/training-games-hub.html",
+      "sha256": "07fd011f1a9230580b4fc6a910514a3c23c6ff834d59e118df7400cc63b7b9e9"
+    },
+    {
+      "source": "training/shopworks-notes.html",
+      "sha256": "1e910c8c876083ab8994a92e156097f38b00cc07ba8ab3a2346b79e8cdcc9100"
+    },
+    {
+      "source": "training/shopworks-sales-tax-training.html",
+      "sha256": "c0b9a3023d1acb08237fcbf72614ca7371a7ac4eab0adbbb84fdf971e2a433cd"
+    },
+    {
+      "source": "training/team-match-game.html",
+      "sha256": "aef22fbd41b84aad266510d821797ae680066c88d5c01b573c508d9a200cad00"
+    }
+  ],
+  "trainingPracticeData": [
+    {
+      "source": "training/js/customer-categorization-training.js",
+      "variable": "categories",
+      "sha256": "238da617b4fb1d3ab5e93d7ac1356c213bf5e360a35c33adb4e4681e995e12e3"
+    },
+    {
+      "source": "training/js/customer-categorization-training.js",
+      "variable": "practiceCustomers",
+      "sha256": "74d81295322950e12609f00ea65ab3aac99414f6f9cdbd12fac8cb06bffe21ef"
+    },
+    {
+      "source": "training/js/team-match-game.js",
+      "variable": "employees",
+      "sha256": "1f56992cdeb083145c1f085e6574eb81eb8ae5890802ab25988111b44612982d"
+    },
+    {
+      "source": "training/js/lead-source-training.js",
+      "variable": "scenarios",
+      "sha256": "a133c6512c59210705dac196dba13e78184cd2d37e0352e798c53070b53fc187"
+    },
+    {
+      "source": "training/js/lead-source-training.js",
+      "variable": "referralScenarios",
+      "sha256": "635b840a40fb0f8d1a19f75e5468a392c1a0f7ea5f9c7551894519d37d21dfcb"
+    },
+    {
+      "source": "training/js/shopworks-sales-tax-training.js",
+      "variable": "taxScenarios",
+      "sha256": "54e8c8994fa85436f4c76b44f6a343266613864dd11858df3e127eb100e49f71"
+    },
+    {
+      "source": "training/js/shopworks-notes.js",
+      "variable": "scenarios",
+      "sha256": "97c7daf147bb344f61237f4c2d242afd4fb7bcc99ab19c78791dfdee514c2c83"
     }
   ]
 }

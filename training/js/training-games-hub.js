@@ -25,16 +25,7 @@ var traigamehubLog = TRAIGAMEHUB_LOG_ON ? console.log.bind(console) : function (
             });
         });
 
-        // Add hover effects to game cards
-        document.querySelectorAll('.game-card').forEach(card => {
-            card.addEventListener('mouseenter', function() {
-                this.style.transform = 'translateY(-5px) scale(1.02)';
-            });
-            
-            card.addEventListener('mouseleave', function() {
-                this.style.transform = 'translateY(0) scale(1)';
-            });
-        });
+        // Card appearance and reduced-motion behavior belong to CSS.
 
         // Track game clicks for analytics
         document.querySelectorAll('.play-btn').forEach(btn => {
@@ -48,6 +39,3 @@ var traigamehubLog = TRAIGAMEHUB_LOG_ON ? console.log.bind(console) : function (
                 }
             });
         });
-
-        // Add smooth scroll behavior
-        document.documentElement.style.scrollBehavior = 'smooth';

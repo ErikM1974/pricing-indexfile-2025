@@ -29,6 +29,7 @@ let gameData = {};
 let score = 0;
 let attempts = 0;
 let timer = null;
+let completionTimer = null;
 let timeElapsed = 0;
 let draggedElement = null;
 let draggedName = null;
@@ -99,17 +100,20 @@ function shuffle(array) {
 
 function setGameMode(mode) {
     currentMode = mode;
-    document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
-    event.target.classList.add('active');
+    NWTraining.modes(mode);
     initGame();
 }
 
 function initGame() {
     clearInterval(timer);
+    clearTimeout(completionTimer);
     timeElapsed = 0;
     score = 0;
     attempts = 0;
     gameData = {};
+    draggedElement = null;
+    draggedName = null;
+    NWTraining.modes(currentMode);
     
     document.getElementById('timer').textContent = '0';
     document.getElementById('score').textContent = '0';
@@ -184,8 +188,14 @@ function initGame() {
     
     // Create employee cards
     shuffle(Object.keys(gameData)).forEach(name => {
-        const card = document.createElement('div');
-        card.className = 'employee-card';
+        const card = document.createElement('button');
+        card.type = 'button';
+        card.className = 'employee-card btn';
+        card.setAttribute('aria-pressed', 'false');
+        card.addEventListener('click', () => {
+            draggedElement = card; draggedName = name;
+            NWTraining.selectCard(card, '.employee-card');
+        });
         card.textContent = name;
         card.draggable = true;
         card.dataset.name = name;
@@ -198,8 +208,10 @@ function initGame() {
     
     // Create drop zones
     shuffle(dropZoneData).forEach(item => {
-        const zone = document.createElement('div');
-        zone.className = 'drop-zone';
+        const zone = document.createElement('button');
+        zone.type = 'button';
+        zone.className = 'drop-zone btn';
+        zone.addEventListener('click', handleDrop);
         zone.dataset.value = item.value;
         zone.innerHTML = `<div class="drop-zone-label">${item.label}</div>`;
         
@@ -220,9 +232,11 @@ function initGame() {
 }
 
 function handleDragStart(e) {
-    draggedElement = e.target;
-    draggedName = e.target.dataset.name;
-    e.target.classList.add('dragging');
+    draggedElement = e.currentTarget;
+    draggedName = draggedElement.dataset.name;
+    e.dataTransfer.setData('text/plain', draggedName);
+    e.dataTransfer.effectAllowed = 'move';
+    draggedElement.classList.add('dragging');
 }
 
 function handleDragEnd(e) {
@@ -241,6 +255,10 @@ function handleDragLeave(e) {
 function handleDrop(e) {
     e.preventDefault();
     const dropZone = e.currentTarget;
+    if (!draggedElement || !draggedElement.isConnected || draggedElement.disabled) {
+        NWTraining.announce('Choose an employee name first.');
+        return;
+    }
     dropZone.classList.remove('drag-over');
     
     // Check if zone already has an employee
@@ -261,15 +279,21 @@ function handleDrop(e) {
         dropZone.innerHTML = `<div class="dropped-employee">${draggedName}</div>`;
         draggedElement.classList.add('matched');
         draggedElement.draggable = false;
+        draggedElement.disabled = true;
+        draggedElement.classList.remove('training-selected');
+        draggedElement.setAttribute('aria-pressed', 'false');
+        dropZone.disabled = true;
         
         score++;
         document.getElementById('score').textContent = score;
         
         showFeedback(true);
+        draggedElement = null; draggedName = null;
+        document.querySelector('.employee-card:not(:disabled)')?.focus();
         
         if (score === Object.keys(gameData).length) {
             clearInterval(timer);
-            setTimeout(showCompletion, 1000);
+            completionTimer = setTimeout(showCompletion, 1000);
         }
     } else {
         // Incorrect match
@@ -283,15 +307,7 @@ function handleDrop(e) {
 }
 
 function showFeedback(isCorrect) {
-    const existing = document.querySelector('.feedback');
-    if (existing) existing.remove();
-    
-    const feedback = document.createElement('div');
-    feedback.className = `feedback ${isCorrect ? 'correct' : 'incorrect'}`;
-    feedback.textContent = isCorrect ? '✓ Correct!' : '✗ Try Again';
-    document.body.appendChild(feedback);
-    
-    setTimeout(() => feedback.remove(), 600);
+    NWTraining.announce(isCorrect ? 'Correct match!' : 'Not a match. Try another destination.');
 }
 
 function showCompletion() {
@@ -307,11 +323,11 @@ function showCompletion() {
     document.getElementById('finalTime').textContent = timeElapsed;
     document.getElementById('finalAttempts').textContent = attempts;
     document.getElementById('accuracy').textContent = accuracy;
-    document.getElementById('completionOverlay').style.display = 'block';
+    document.getElementById('completionOverlay').showModal();
 }
 
 function playAgain() {
-    document.getElementById('completionOverlay').style.display = 'none';
+    document.getElementById('completionOverlay').close();
     initGame();
 }
 
@@ -325,7 +341,7 @@ function nextMode() {
         btn.classList.toggle('active', index === nextIndex);
     });
     
-    document.getElementById('completionOverlay').style.display = 'none';
+    document.getElementById('completionOverlay').close();
     initGame();
 }
 
@@ -333,4 +349,5 @@ function nextMode() {
 window.addEventListener('DOMContentLoaded', () => {
     updateDateNotice();
     initGame();
+    NWTraining.announce('Drag a name, or select a name and then its matching information.');
 });

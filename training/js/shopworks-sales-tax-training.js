@@ -118,13 +118,15 @@
         let currentScenarioIndex = 0;
         let score = 0;
         let selectedTaxCode = null;
+        let answerSubmitted = false;
 
         function displayScenario() {
+            answerSubmitted = false;
             const scenario = taxScenarios[currentScenarioIndex];
             const scenarioCard = document.getElementById('scenarioCard');
             
             scenarioCard.innerHTML = `
-                <h3 style="color: #2B5797; margin-bottom: 15px; text-align: center;">
+                <h3 >
                     Customer Setup Scenario
                 </h3>
                 
@@ -147,7 +149,7 @@
                     </div>
                     <div class="info-item">
                         <span class="info-label">Has Resale Cert:</span>
-                        <span class="info-value" style="color: ${scenario.hasResaleCert ? '#5cb85c' : '#d9534f'};">
+                        <span class="info-value" >
                             ${scenario.hasResaleCert ? '✅ YES' : '❌ NO'}
                         </span>
                     </div>
@@ -158,31 +160,28 @@
                 </div>
 
                 <div class="tax-selection">
-                    <h4 style="margin-bottom: 15px;">Which tax code should you use?</h4>
+                    <h4 >Which tax code should you use?</h4>
                     
                     <div class="tax-options">
-                        <div class="tax-option" onclick="selectTaxCode('2200')" data-code="2200">
+                        <button type="button" class="tax-option btn" aria-pressed="false" data-call="selectTaxCode" data-args="${NWTraining.args(['2200'])}" data-code="2200">
                             <div class="code-number">2200</div>
-                            <div class="code-name">Washington State<br>Sales Tax</div>
-                        </div>
-                        <div class="tax-option" onclick="selectTaxCode('2202')" data-code="2202">
+                            <div class="code-name">Washington State<br>Sales Tax</div></button>
+                        <button type="button" class="tax-option btn" aria-pressed="false" data-call="selectTaxCode" data-args="${NWTraining.args(['2202'])}" data-code="2202">
                             <div class="code-number">2202</div>
-                            <div class="code-name">Out of State<br>Sales</div>
-                        </div>
-                        <div class="tax-option" onclick="selectTaxCode('2203')" data-code="2203">
+                            <div class="code-name">Out of State<br>Sales</div></button>
+                        <button type="button" class="tax-option btn" aria-pressed="false" data-call="selectTaxCode" data-args="${NWTraining.args(['2203'])}" data-code="2203">
                             <div class="code-number">2203</div>
-                            <div class="code-name">Wholesale<br>Sales</div>
-                        </div>
+                            <div class="code-name">Wholesale<br>Sales</div></button>
                     </div>
                     
-                    <button class="submit-btn" onclick="submitAnswer()" disabled id="submitBtn">
+                    <button type="button" class="submit-btn btn" data-call="submitAnswer" data-args="${NWTraining.args([])}" disabled id="submitBtn">
                         <i class="fas fa-check" aria-hidden="true"></i> Submit Answer
                     </button>
                 </div>
 
-                <div class="feedback" id="feedback"></div>
+                <div class="feedback" id="feedback" role="status"></div>
 
-                <div class="hint-section" style="display: none;" id="hintSection">
+                <div class="hint-section" hidden id="hintSection">
                     <div class="hint-title">💡 Hint:</div>
                     <div id="hintText"></div>
                 </div>
@@ -193,11 +192,13 @@
         }
 
         function selectTaxCode(code) {
+            if (answerSubmitted) return;
             selectedTaxCode = code;
             
             // Clear previous selections
             document.querySelectorAll('.tax-option').forEach(option => {
                 option.classList.remove('selected');
+                option.setAttribute('aria-pressed', String(option.dataset.code === code));
             });
             
             // Highlight selected option
@@ -208,6 +209,8 @@
         }
 
         function submitAnswer() {
+            if (answerSubmitted || !selectedTaxCode) return;
+            answerSubmitted = true;
             const scenario = taxScenarios[currentScenarioIndex];
             const feedback = document.getElementById('feedback');
             const isCorrect = selectedTaxCode === scenario.expectedTaxCode;
@@ -216,6 +219,7 @@
             document.querySelectorAll('.tax-option').forEach(option => {
                 const optionCode = option.getAttribute('data-code');
                 option.classList.remove('selected');
+                option.disabled = true;
                 
                 if (optionCode === scenario.expectedTaxCode) {
                     option.classList.add('correct');
@@ -251,7 +255,7 @@
             setTimeout(() => {
                 if (currentScenarioIndex < taxScenarios.length - 1) {
                     feedback.innerHTML += `
-                        <button class="next-scenario-btn" onclick="nextScenario()">
+                        <button type="button" class="next-scenario-btn btn" data-call="nextScenario" data-args="${NWTraining.args([])}">
                             <i class="fas fa-arrow-right" aria-hidden="true"></i> Next Scenario
                         </button>
                     `;
@@ -280,7 +284,7 @@
             }
             
             hintText.textContent = hint;
-            hintSection.style.display = 'block';
+            hintSection.hidden = false;
         }
 
         function nextScenario() {
@@ -311,6 +315,7 @@
         function showCompletion() {
             document.getElementById('gameSection').style.display = 'none';
             document.getElementById('completionSection').style.display = 'block';
+            document.querySelector('.restart-btn').focus();
             document.getElementById('finalScore').textContent = score;
             document.getElementById('progressFill').style.width = '100%';
         }

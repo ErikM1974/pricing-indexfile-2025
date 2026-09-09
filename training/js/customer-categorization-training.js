@@ -319,14 +319,15 @@ let progress = 0;
 let quizQuestions = [];
 let currentQuizIndex = 0;
 let practiceRound = 0;
+let practiceTimer = null;
 
 function switchMode(mode) {
+    clearTimeout(practiceTimer);
     currentMode = mode;
     document.querySelectorAll('.training-mode').forEach(el => el.classList.remove('active'));
-    document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+    NWTraining.modes(mode);
     
     document.getElementById(`${mode}Mode`).classList.add('active');
-    event.target.classList.add('active');
     
     if (mode === 'learn') {
         initLearnMode();
@@ -342,8 +343,10 @@ function initLearnMode() {
     grid.innerHTML = '';
     
     Object.entries(categories).forEach(([key, category]) => {
-        const card = document.createElement('div');
+        const card = document.createElement('button');
+        card.type = 'button';
         card.className = 'category-card';
+        card.setAttribute('aria-pressed', 'false');
         card.innerHTML = `
             <div class="customer-count">${category.realCustomers.length}</div>
             <div class="category-icon">${category.icon}</div>
@@ -356,8 +359,9 @@ function initLearnMode() {
         `;
         
         card.onclick = () => {
-            document.querySelectorAll('.category-card').forEach(c => c.classList.remove('selected'));
+            document.querySelectorAll('.category-card').forEach(c => { c.classList.remove('selected'); c.setAttribute('aria-pressed', 'false'); });
             card.classList.add('selected');
+            card.setAttribute('aria-pressed', 'true');
             showCategoryDetails(category);
         };
         
@@ -366,11 +370,12 @@ function initLearnMode() {
 }
 
 function showCategoryDetails(category) {
-    // Could expand to show modal with full customer list
-    custcatetraiLog('Selected category:', category);
+    NWTraining.announce(category.name + ': ' + category.characteristics.join(', '));
 }
 
 function initPracticeMode() {
+    draggedElement = null;
+    NWTraining.announce('Drag a customer, or select a customer and then a category.');
     const stack = document.getElementById('customerStack');
     const dropZones = document.getElementById('dropZones');
     
@@ -381,8 +386,11 @@ function initPracticeMode() {
     const roundCustomers = shuffle(practiceCustomers).slice(0, 12);
     
     roundCustomers.forEach(customer => {
-        const card = document.createElement('div');
-        card.className = 'customer-card';
+        const card = document.createElement('button');
+        card.type = 'button';
+        card.className = 'customer-card btn';
+        card.setAttribute('aria-pressed', 'false');
+        card.addEventListener('click', () => { draggedElement = card; NWTraining.selectCard(card, '.customer-card'); });
         card.draggable = true;
         card.dataset.name = customer.name;
         card.dataset.category = customer.category;
@@ -400,8 +408,10 @@ function initPracticeMode() {
     // Create drop zones for ALL 12 categories
     Object.keys(categories).forEach(key => {
         const category = categories[key];
-        const zone = document.createElement('div');
-        zone.className = 'category-drop-zone';
+        const zone = document.createElement('button');
+        zone.type = 'button';
+        zone.className = 'category-drop-zone btn';
+        zone.addEventListener('click', handleDrop);
         zone.dataset.category = key;
         zone.innerHTML = `
             <div class="zone-icon">${category.icon}</div>
@@ -418,6 +428,9 @@ function initPracticeMode() {
 }
 
 function initQuizMode() {
+    score = 0;
+    document.getElementById('score').textContent = score;
+    updateProgress();
     quizQuestions = generateQuizQuestions();
     currentQuizIndex = 0;
     showQuizQuestion();
@@ -457,12 +470,12 @@ function showQuizQuestion() {
     container.innerHTML = `
         <div class="question">Question ${currentQuizIndex + 1} of ${quizQuestions.length}</div>
         <div class="quiz-customer">
-            <strong style="font-size: 1.2em;">${question.name}</strong><br>
+            <strong >${question.name}</strong><br>
             <small>Select the correct category for this customer</small>
         </div>
         <div class="options">
             ${options.map(opt => `
-                <button class="option-btn" onclick="checkAnswer('${opt.key}', '${question.category}')">
+                <button type="button" class="option-btn btn" data-call="checkAnswer" data-args="${NWTraining.args([opt.key, question.category])}">
                     ${opt.icon} ${opt.name}
                 </button>
             `).join('')}
@@ -520,7 +533,7 @@ function checkAnswer(selected, correct) {
     updateProgress();
     
     feedback.innerHTML += `
-        <button class="next-btn" onclick="nextQuestion()">Next Question →</button>
+        <button type="button" class="next-btn btn" data-call="nextQuestion" data-args="${NWTraining.args([])}">Next Question →</button>
     `;
 }
 
@@ -544,7 +557,7 @@ function showQuizResults() {
                 '<div class="achievement">⭐ Good Progress!</div>' :
                 '<div class="achievement">📚 Keep Practicing!</div>'
             }
-            <button class="next-btn" onclick="initQuizMode()">Try Again</button>
+            <button type="button" class="next-btn btn" data-call="initQuizMode" data-args="${NWTraining.args([])}">Try Again</button>
         </div>
     `;
 }
@@ -553,8 +566,10 @@ function showQuizResults() {
 let draggedElement = null;
 
 function handleDragStart(e) {
-    draggedElement = e.target;
-    e.target.classList.add('dragging');
+    draggedElement = e.currentTarget;
+    e.dataTransfer.setData('text/plain', draggedElement.dataset.name);
+    e.dataTransfer.effectAllowed = 'move';
+    draggedElement.classList.add('dragging');
 }
 
 function handleDragEnd(e) {
@@ -575,6 +590,7 @@ function handleDrop(e) {
     const zone = e.currentTarget;
     zone.classList.remove('drag-over');
     
+    if (!draggedElement || !draggedElement.isConnected) { NWTraining.announce('Choose a customer first.'); return; }
     const correctCategory = draggedElement.dataset.category;
     const dropCategory = zone.dataset.category;
     
@@ -587,6 +603,9 @@ function handleDrop(e) {
         droppedArea.appendChild(dropped);
         
         draggedElement.remove();
+        draggedElement = null;
+        NWTraining.announce('Correct category!');
+        document.querySelector('.customer-card')?.focus();
         score += 5;
         document.getElementById('score').textContent = score;
         updateProgress();
@@ -595,12 +614,13 @@ function handleDrop(e) {
         
         // Check if round complete
         if (document.getElementById('customerStack').children.length === 0) {
-            setTimeout(() => {
-                alert('Round complete! Great job! Starting next round...');
+            practiceTimer = setTimeout(() => {
+                NWTraining.announce('Round complete! Great job! Starting next round...');
                 initPracticeMode();
             }, 1000);
         }
     } else {
+        NWTraining.announce('Incorrect category. Choose another category.');
         zone.classList.add('incorrect');
         setTimeout(() => zone.classList.remove('incorrect'), 600);
     }
@@ -622,5 +642,6 @@ function shuffle(array) {
 
 // Initialize on load
 window.addEventListener('DOMContentLoaded', () => {
+    NWTraining.modes('learn');
     initLearnMode();
 });

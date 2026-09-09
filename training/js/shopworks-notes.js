@@ -103,15 +103,3 @@
             element.className = `feedback ${isSuccess ? 'success' : 'error'}`;
             element.style.display = 'block';
         }
-
-        // Add some interactivity to decision boxes
-        document.querySelectorAll('.decision-box').forEach(box => {
-            box.addEventListener('click', function() {
-                // Reset all boxes
-                document.querySelectorAll('.decision-box').forEach(b => {
-                    b.style.background = '#f8f9fa';
-                });
-                // Highlight clicked box
-                this.style.background = '#e8f5e9';
-            });
-        });

@@ -146,3 +146,30 @@ describe('printable form content and field preservation', () => {
         expect(document.querySelectorAll('style, script:not([src])')).toHaveLength(0);
     });
 });
+
+
+describe('training practice content preservation', () => {
+    test.each(manifest.trainingPracticeContent)('$source preserves the original lessons and exercise field defaults', entry => {
+        const document = new JSDOM(read(entry.source)).window.document;
+        const main = document.querySelector('main');
+        const content = {
+            text: main.textContent.replace(/\s+/g, ' ').trim(),
+            ids: [...document.querySelectorAll('[id]')].map(el => el.id),
+            links: [...document.querySelectorAll('a')].map(el => [el.getAttribute('href'), el.textContent.replace(/\s+/g, ' ').trim()]),
+            fields: [...document.querySelectorAll('input,textarea,select')].map(el => ({ id: el.id, type: el.type, value: el.value })),
+        };
+        expect(crypto.createHash('sha256').update(JSON.stringify(content)).digest('hex')).toBe(entry.sha256);
+        expect(document.querySelectorAll('[style], style, script:not([src])')).toHaveLength(0);
+    });
+});
+
+
+test.each(manifest.trainingPracticeData)('$source keeps the original $variable exercise data', entry => {
+    const source = read(entry.source);
+    const ast = require('acorn').parse(source, { ecmaVersion: 'latest' });
+    const declaration = ast.body.filter(node => node.type === 'VariableDeclaration')
+        .flatMap(node => node.declarations).find(node => node.id.name === entry.variable);
+    expect(declaration).toBeDefined();
+    const value = source.slice(declaration.init.start, declaration.init.end).replace(/\r\n/g, '\n');
+    expect(crypto.createHash('sha256').update(value).digest('hex')).toBe(entry.sha256);
+});
