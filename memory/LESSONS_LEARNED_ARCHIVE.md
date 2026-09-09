@@ -4018,3 +4018,7 @@ Problem: screen input specificity defeated compact paper rules, the shared date 
 
 Shared JS can outlive a CSS migration: the public quote-request page is also a style-helper caller. Limit floating coordinates to the matching opted-in CSS owner, and exercise every runtime caller found by the cache-reference review before release.
 
+
+### Training state must survive every input path (2026-09-08)
+
+Problem: drag-only exercise tiles excluded touch/keyboard, quiz points survived retries, tax choices could re-enable an already-scored answer, and template saves never rendered on reload. Root cause: visual-only click state and incomplete localStorage readers. Fix: native selectable buttons and one scoring guard, cancel outstanding round/timer callbacks, reset quiz scores, modal focus lifecycle and safe saved-template rendering with visible clipboard/storage failures. Prevention: exercise complete rounds/retries with keyboard, touch and drag; test failed/malformed storage without overwriting it; preserve training fixtures with source locks.

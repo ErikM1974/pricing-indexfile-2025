@@ -559,3 +559,7 @@ Six sources after staff references: staff/customer/vendor sign-in and3-Day Tees/
 - [ ] Register files/tests/owners, integrate only reviewed scope, full local checks/CI/actual release.
 
 Current live remains99/225,126 pending atv2026.09.09.1/2080. Five staff references are reviewed and full primary gates running. This next family is planned only.
+
+## Six entry/status pages reviewed — 2026-09-09
+
+Staff/customer/vendor sign-in and3-Day Tees/custom-tees/custom-caps confirmation pages now use shared access/confirmation layouts and scoped page arrangements. Original full main text, images, fields, links and IDs preserved. All three fulfillment/email controllers and helpers unchanged and hash-locked. Magic-link pages retain deep links and identical successful known/unknown-account messaging; server outages now display generic retryable errors preserving email.30 focused browser cases passed in34.3s at1440/768/390/320, zero axe violations;198 focused unit cases passed.17 populated/error/delayed/sent PDFs retain167 checked content blocks, each one sheet including mockup captions and contact/footer text. Candidate2026.09.09.3 pre-versioned; two obsolete success stylesheets retired, caps studio stylesheet remains until its own migration. Full primary gates/CI/deploy pending. Verified live staff releasev2026.09.09.2/2081 is104 reviewed/121 pending; only verified entry rollout becomes110/115.
