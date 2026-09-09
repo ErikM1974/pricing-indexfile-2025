@@ -862,3 +862,16 @@ Staff file tools: SanMar Downloads and SanMar → ShopWorks Parts share tokens/c
 134 of225 application pages reviewed locally/91pending, including staff admin3 and monitoring3; production still126/99 until .11 rollout. Source guard45passed; broader inventory/gates follow. The .12 candidate can combine monitoring3 and import2 after .11. Shared financial transform and SKU validation remain byte-locked; nine controller edit mappings are precise reversible presentation/loading/validation/error changes.
 
 Staff import final local guards:235passed across six source/inventory suites,287CSS files clean. Shared CSS graph64,626LF bytes per page versus163,985/162,764before (about60% smaller). Final print-only compacting retained all70 reading/data blocks on two complete one-page PDFs; keyboard/four-width/axe review reran after the print refinement. No financial transform change.
+
+## Next purchasing workspace review — 2026-09-09
+
+Branch codex/purchasing-workspaces starts atd524d2e51de086c1af8461392bd0fae6a0fc91c7. The saved codex/staff-import-tools branch is complete for candidate .12 (monitoring3 plus import2); do not include this new plan in .12. Primary .11 exact-source CI34388214812 runs on5215f8214f28c15805a552d12628ab09e51ce0cf. Production still.10/2086/126reviewed;134reviewed locally/91pending. Current plan adds no reviewed pages.
+
+- [ ] Preserve original purchasing feed counts/status/turnaround, filters, open-work default and exact Jotform destinations. Keep Bradley slate; payables retains its existing NW-green ownership rather than adopting an unapproved new department color.
+- [ ] Preserve payables/credits, local dates, imported/paid/unknown distinctions, vendor1002/2425 export data, marketing fund figures, and all existing financial parsing/matching helpers. No actual marking, upload, import or email.
+- [ ] Use canonical controls/tables and scoped purchasing arrangements, accessible native file input, keyboard tiles/tabs, visible failure/retry/partial-feed states and all four widths.
+- [ ] Review shared invoice viewer at screen and paper sizes, loading/empty/partial/error/retry, keyboard modal boundary and returned focus. Preserve all invoice rows/totals/server fields. The viewer also belongs to AE Mission Control plus three UI harnesses: its legacy CSS stays until those owners migrate; any shared controller edit must retain that behavior and one version across consumers.
+- [ ] Source-lock original prose/IDs/links/scripts and five controller/helper sources; record only explicit presentation/recovery edits. Existing purchasing/payables unit guards remain meaningful, updated only for real owner/native-control changes.
+- [ ] Complete mocked business-state/browser and PDF review before adding these two pages to the manifest. Then full integration gates/exact-source CI and rollout after .12.
+
+Only inspection and this plan have been completed. Saved originals: purchasing-original-baseline.json. Legacy fixture stubs were read for schemas; new browser checks must block every unmocked business request, including their realFetch fallback.
