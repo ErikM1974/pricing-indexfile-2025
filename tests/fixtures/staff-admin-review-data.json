@@ -1,0 +1,157 @@
+{
+  "roles": {
+    "rows": [
+      {
+        "Email": "operator@example.test",
+        "Role": "production"
+      },
+      {
+        "Email": "reviewer@example.test",
+        "Role": "art"
+      }
+    ]
+  },
+  "pages": {
+    "rows": [
+      {
+        "Page": "payroll.html",
+        "Allowed_Roles": "accountant",
+        "Allowed_Emails": "",
+        "Description": "Financial workspace"
+      },
+      {
+        "Page": "design-gallery.html",
+        "Allowed_Roles": "art,sales",
+        "Allowed_Emails": "reviewer@example.test",
+        "Description": "Artwork workspace"
+      }
+    ]
+  },
+  "drive": {
+    "server": "REVIEW-FS",
+    "policy": "Review drive maps",
+    "verifiedAt": "2026-09-09",
+    "defaultProductionLogin": "review-floor",
+    "profiles": [
+      {
+        "id": "production-art",
+        "names": [
+          "Sample Operator"
+        ],
+        "purpose": "Production tools",
+        "drives": [
+          "A"
+        ],
+        "modify": [
+          "A"
+        ],
+        "readOnly": [
+          "B"
+        ],
+        "notes": "Review data only."
+      },
+      {
+        "id": "design",
+        "names": [
+          "Sample Designer",
+          "Sample Reviewer"
+        ],
+        "purpose": "Different rights remain separate",
+        "drives": [
+          "B"
+        ],
+        "perPerson": {
+          "Sample Designer": {
+            "modify": [
+              "B"
+            ]
+          },
+          "Sample Reviewer": {
+            "readOnly": [
+              "B"
+            ]
+          }
+        }
+      },
+      {
+        "id": "retired",
+        "names": [
+          "Former Example"
+        ],
+        "purpose": "Former role",
+        "drives": [],
+        "retired": true,
+        "notes": "Review the retired login."
+      }
+    ],
+    "drives": [
+      {
+        "letter": "A",
+        "label": "Production",
+        "path": "review.invalid/production",
+        "mappedFor": [
+          "Sample Operator"
+        ],
+        "modify": [
+          "Sample Operator"
+        ],
+        "readOnly": [],
+        "fullControl": [
+          "Review Admin"
+        ]
+      },
+      {
+        "letter": "B",
+        "label": "Designs",
+        "path": "review.invalid/designs",
+        "mappedFor": [
+          "Sample Designer",
+          "Sample Reviewer"
+        ],
+        "modify": [
+          "Sample Designer"
+        ],
+        "readOnly": [
+          "Sample Reviewer"
+        ],
+        "fullControl": [
+          "Review Admin"
+        ]
+      }
+    ]
+  },
+  "mockups": {
+    "records": [
+      {
+        "Company_Name": "Alpha Company",
+        "Id_Customer": 101,
+        "Sales_Rep": "Sample Rep",
+        "Box_Mockup_1": "/favicon.png",
+        "Submitted_Date": "2026-09-08T09:00:00"
+      },
+      {
+        "Company_Name": "No ID Company",
+        "Box_Mockup_1": "/favicon.png",
+        "Submitted_Date": "2026-08-01T09:00:00"
+      }
+    ]
+  },
+  "art": {
+    "records": [
+      {
+        "CompanyName": "Alpha Company",
+        "Company_Name": "Alpha Company",
+        "Shopwork_customer_number": 101,
+        "MAIN_IMAGE_URL_1": "/favicon.png",
+        "Date_Created": "2026-09-09T09:00:00"
+      },
+      {
+        "CompanyName": "Beta Company",
+        "Company_Name": "Beta Company",
+        "Shopwork_customer_number": 202,
+        "MAIN_IMAGE_URL_1": "/favicon.png",
+        "Date_Created": "2026-08-20T09:00:00"
+      }
+    ]
+  }
+}

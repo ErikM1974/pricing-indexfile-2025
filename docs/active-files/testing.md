@@ -147,3 +147,8 @@ Customer intake: customer-intake-content.test.js and css-unification-customer-in
 Vendor portals: vendor-portals-content.test.js and css-unification-vendor-portals.spec.js preserve original wrapper/Caspio contracts and synthetic vendor states using vendor-portals-original-content.json.
 
 Hosted announcement verification: tests/fixtures/announcements-original-content.json preserves original wrapper content/provider IDs and both controller hashes; tests/unit/announcements-content.test.js checks those contracts. tests/e2e/css-unification-announcements.spec.js covers four widths/axe, native navigation/keyboard scrolling, loaded/unavailable/login/empty provider fixtures and complete synthetic reference printing. All real business writes blocked. Vendor browser/source checks now point at the shared hosted arrangement with their prior assertions retained.
+
+Staff admin source contracts: tests/fixtures/staff-admin-original-content.json and tests/unit/staff-admin-content.test.js preserve all original content/IDs/dependencies and reverse only explicit UI-class/heading/pressed-state edits before checking controller hashes. Existing admin/reference and portal-directory hygiene guards now read the shared CSS owner; API/feed/preview/copy/error guards remain.
+
+- tests/e2e/css-unification-staff-admin.spec.js — Synthetic staff roles, drive access and portal behavior, responsive/accessibility/print review; all writes mocked.
+- tests/fixtures/staff-admin-review-data.json — Synthetic staff admin browser fixtures; no real permission or account records.

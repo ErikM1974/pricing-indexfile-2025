@@ -1,0 +1,212 @@
+{
+  "base": "7b8f8f3bd0ca5256f3426cf9f94be51ee61ef8a9",
+  "pages": [
+    {
+      "file": "dashboards/access-admin.html",
+      "title": "Access Admin — Northwest Custom Apparel",
+      "mainText": "Access Admin Manage staff roles and which pages they can see. Changes apply on the person's next page load — no deploy. ← Dashboard Staff Roles Page Access Staff Roles What each person can do across the app. admin = everything (incl. financials); accountant = finance; sales / art / shipping / production = their area; staff = basic. EmailRoleActions Loading… Add / Update Page Access Only the pages listed here are restricted. Any page not listed is visible to all logged-in staff. A person gets in if their role is in Allowed Roles OR their email is in Allowed Emails. (Admins always have access.) PageAllowed RolesAllowed EmailsNoteActions Loading… Add Rule",
+      "ids": [
+        "aa-status",
+        "panel-roles",
+        "roles-body",
+        "new-role-email",
+        "new-role-role",
+        "add-role-btn",
+        "panel-pages",
+        "pages-body",
+        "new-page-name",
+        "new-page-roles",
+        "new-page-emails",
+        "new-page-desc",
+        "add-page-btn"
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "label": "← Dashboard"
+        }
+      ],
+      "images": [],
+      "scripts": [
+        "/dashboards/js/access-admin.js?v=2026.09.05.72"
+      ],
+      "styles": [
+        "shared_components/css/tokens.css",
+        "dashboards/css/access-admin.css"
+      ],
+      "cssBytes": 19817
+    },
+    {
+      "file": "dashboards/drive-access.html",
+      "title": "Drive Access Center — Northwest Custom Apparel",
+      "mainText": "Drive Access Center What appears in File Explorer for each person, versus what they can actually change or read. Read-only reference — nothing here edits the server. ← Dashboard Admin · File access NCA-FS01 drive map Mapped from the NCA Drive Maps group policy, Active Directory group membership and audited folder ACLs. Default production login — Search access By person By drive Print Server: — Policy: — Verified: — Loading the access snapshot… Mapped — the drive letter appears automatically. Modify — create, edit, move, delete. Read only — open and copy. Full control — file-administrator accounts. A person can have folder access without the drive letter being mapped — Erik reaches K, R and T through Y: or a UNC path even though they do not auto-map for him. To update this page, re-verify the GPO, recursive AD group membership and folder ACLs, then edit lib/drive-access-data.json (bump verifiedAt) and deploy.",
+      "ids": [
+        "da-default-login",
+        "da-status",
+        "da-alerts",
+        "da-stats",
+        "da-search",
+        "da-server",
+        "da-policy",
+        "da-verified",
+        "da-count",
+        "da-grid"
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "label": "← Dashboard"
+        }
+      ],
+      "images": [],
+      "scripts": [
+        "/dashboards/js/drive-access.js?v=2026.09.05.73"
+      ],
+      "styles": [
+        "shared_components/css/tokens.css",
+        "dashboards/css/drive-access.css"
+      ],
+      "cssBytes": 27103
+    },
+    {
+      "file": "dashboards/portal-directory.html",
+      "title": "Customer Portals - Northwest Custom Apparel",
+      "mainText": "Customer Portals Back to Dashboard Last Updated Company A-Z Most Items Loading customer portals... Unable to Load Please refresh the page or try again later. Retry No customer portals yet. Portals are created when mockups or art requests are submitted. Northwest Custom Apparel · (253) 922-5793",
+      "ids": [
+        "pd-toolbar",
+        "pd-search",
+        "pd-sort",
+        "pd-stats",
+        "pd-loading",
+        "pd-error",
+        "pd-error-title",
+        "pd-error-message",
+        "pd-retry",
+        "pd-grid",
+        "pd-empty",
+        "pd-toast"
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "label": "Back to Dashboard"
+        }
+      ],
+      "images": [
+        {
+          "src": "https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1",
+          "alt": "Northwest Custom Apparel"
+        }
+      ],
+      "scripts": [
+        "/config/app.config.js",
+        "/shared_components/js/app-config.js?v=2026.09.06.26",
+        "/shared_components/js/data-call-delegator.js?v=2026.09.06.27",
+        "/dashboards/js/portal-directory.js?v=2026.09.07.25"
+      ],
+      "styles": [
+        "shared_components/css/tokens.css",
+        "dashboards/css/portal-directory.css"
+      ],
+      "cssBytes": 24571
+    }
+  ],
+  "hashes": {
+    "dashboards/js/access-admin.js": "75267cc8389d40e59d98828dfff445d555aa3a3da7d19da9a28524a6b197ac9d",
+    "dashboards/js/drive-access.js": "bb3bf33e598a3213bcc38f821ef5c1907ed51306d979763b2fd8bce382af287e",
+    "dashboards/js/portal-directory.js": "d0841d497abfeb5ccc52b6d5712885af46a976eaed8dd6802c34cf851f0e5e6b"
+  },
+  "presentation": [
+    {
+      "file": "dashboards/js/access-admin.js",
+      "replacements": [
+        {
+          "from": "class=\"aa-btn aa-ghost",
+          "to": "class=\"btn btn-secondary aa-btn aa-ghost"
+        },
+        {
+          "from": "class=\"aa-btn aa-save",
+          "to": "class=\"btn btn-primary aa-btn aa-save"
+        },
+        {
+          "from": "class=\"aa-role-sel\"",
+          "to": "class=\"field-select aa-role-sel\""
+        },
+        {
+          "from": "class=\"aa-roles-in\"",
+          "to": "class=\"field-input aa-roles-in\""
+        },
+        {
+          "from": "class=\"aa-emails-in\"",
+          "to": "class=\"field-input aa-emails-in\""
+        },
+        {
+          "from": "class=\"aa-desc-in\"",
+          "to": "class=\"field-input aa-desc-in\""
+        },
+        {
+          "from": "document.querySelectorAll('.aa-tab').forEach(function (x) { x.classList.remove('is-active'); });",
+          "to": "document.querySelectorAll('.aa-tab').forEach(function (x) { x.classList.remove('is-active'); x.setAttribute('aria-pressed', 'false'); });"
+        },
+        {
+          "from": "t.classList.add('is-active');",
+          "to": "t.classList.add('is-active'); t.setAttribute('aria-pressed', 'true');"
+        },
+        {
+          "from": "  // ---------- Wire up ----------",
+          "to": "  // Print current table values as wrapping text, including unsaved edits.\n  // Native input controls clip long permissions and print misleading placeholders.\n  function clearPrintValues() {\n    document.querySelectorAll('.aa-print-value').forEach(function (node) { node.remove(); });\n  }\n  window.addEventListener('beforeprint', function () {\n    clearPrintValues();\n    document.querySelectorAll('.aa-table input, .aa-table select').forEach(function (control) {\n      var value = document.createElement('span');\n      value.className = 'aa-print-value';\n      value.textContent = control.value || '—';\n      control.insertAdjacentElement('afterend', value);\n    });\n  });\n  window.addEventListener('afterprint', clearPrintValues);\n\n  // ---------- Wire up ----------"
+        }
+      ]
+    },
+    {
+      "file": "dashboards/js/drive-access.js",
+      "replacements": [
+        {
+          "from": "retry.className = 'da-retry';",
+          "to": "retry.className = 'btn btn-secondary da-retry';"
+        },
+        {
+          "from": "<article class=\"da-card",
+          "to": "<article class=\"card da-card"
+        },
+        {
+          "from": "<h3>",
+          "to": "<h2>"
+        },
+        {
+          "from": "</h3>",
+          "to": "</h2>"
+        }
+      ]
+    },
+    {
+      "file": "dashboards/js/portal-directory.js",
+      "replacements": [
+        {
+          "from": "class=\"pd-card\"",
+          "to": "class=\"card pd-card\""
+        },
+        {
+          "from": "class=\"pd-btn-copy\"",
+          "to": "class=\"btn btn-secondary pd-btn-copy\""
+        },
+        {
+          "from": "class=\"pd-btn-open\"",
+          "to": "class=\"btn btn-primary pd-btn-open\""
+        },
+        {
+          "from": "class=\"pd-btn-open is-disabled\"",
+          "to": "class=\"btn btn-primary pd-btn-open is-disabled\""
+        },
+        {
+          "from": "<h3 class=\"pd-card-company\"",
+          "to": "<h2 class=\"pd-card-company\""
+        },
+        {
+          "from": "</h3>",
+          "to": "</h2>"
+        }
+      ]
+    }
+  ]
+}

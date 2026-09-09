@@ -34,7 +34,7 @@
     status.setAttribute('role', 'alert');
     status.textContent = message + ' ';
     const retry = document.createElement('button');
-    retry.type = 'button'; retry.className = 'da-retry'; retry.textContent = 'Try again';
+    retry.type = 'button'; retry.className = 'btn btn-secondary da-retry'; retry.textContent = 'Try again';
     retry.addEventListener('click', () => window.location.reload());
     status.appendChild(retry);
     grid.innerHTML = '<div class="da-empty">No access data loaded.</div>';
@@ -66,9 +66,9 @@
       }).join('')
       : '';
 
-    return `<article class="da-card${p.retired ? ' da-card--retired' : ''}">
+    return `<article class="card da-card${p.retired ? ' da-card--retired' : ''}">
       <div class="da-card-head"><div>
-        <h3>${esc(arr(p.names).join(', '))}${p.retired ? ' — RETIRED' : ''}</h3>
+        <h2>${esc(arr(p.names).join(', '))}${p.retired ? ' — RETIRED' : ''}</h2>
         <p class="da-purpose">${esc(p.purpose)}</p>
       </div></div>
       <div class="da-section"><p class="da-section-title">Mapped drives</p>${driveList(arr(p.drives))}</div>
@@ -79,9 +79,9 @@
 
   function driveCard(d) {
     const retired = arr(d.mappedFor).some((n) => isRetiredName(n));
-    return `<article class="da-card${retired ? ' da-card--retired' : ''}">
+    return `<article class="card da-card${retired ? ' da-card--retired' : ''}">
       <div class="da-card-head">
-        <div><h3>${esc(d.label)}</h3><p class="da-purpose">Network drive</p></div>
+        <div><h2>${esc(d.label)}</h2><p class="da-purpose">Network drive</p></div>
         <span class="da-drive da-drive--large">${esc(d.letter)}:</span>
       </div>
       <div class="da-section"><p class="da-section-title">Mapped automatically for</p>${chips(d.mappedFor, 'full')}</div>
