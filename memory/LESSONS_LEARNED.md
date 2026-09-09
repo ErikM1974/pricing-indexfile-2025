@@ -248,3 +248,7 @@ Problem: drag-only exercise tiles excluded touch/keyboard, quiz points survived 
 - Problem/root cause: removed inline handlers left stale selected-link code; duplicate initializers ignored deep links; missing birthdays and UTC date parsing broke roster display. Generic card print rules forced long schedule sections onto new sheets.
 - Solution: real section links, native disclosure buttons, one navigation/print-state owner, optional-birthday handling and local calendar dates; retire the legacy card class from documents.
 - Prevention: exercise every chapter/day and back/forward history, preserve original lesson data, check temporary print expansion restores screen state, and inspect actual PDFs for blank pages and complete text.
+
+### Training exercises: round lifecycle and saved progress (2026-09-08)
+
+Problem: restarting bound handlers again, speed rounds graded the first answer, and old timers changed a new mode; blocked/malformed localStorage prevented startup. Root cause: DOM/event lifetime and round lifetime were mixed, while persistence was assumed available. Solution: bind once, reset the same instance, grade the current question once, cancel interval/delayed work on mode changes, use a wall-clock deadline, and validate saved progress with visible read/write failures. Preserve unreadable storage rather than overwriting it. Prevention: complete/restart rounds, switch modes with work pending, and test denied/malformed/readable-but-unwritable storage in a real browser.
