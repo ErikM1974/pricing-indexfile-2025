@@ -1,0 +1,387 @@
+{
+  "base": "7d6cf7bc8124e7d3da8642093c3a9018b98e8897",
+  "pages": [
+    {
+      "file": "pages/request-a-quote.html",
+      "title": "Request a Quote - Northwest Custom Apparel",
+      "mainText": "Request a Quote Tell us what you're making — a real person replies within one business day (usually much faster) Family owned since 1977 • Milton, WA • 253-922-5793 • sales@nwcustomapparel.com Website 1. How do we reach you? Your name * Company / Team (if any) Email * Phone * Best way to reply: Email Call Text 2. What do you need? Tell us about the project * (what it's for, roughly what you have in mind) Decoration: Embroidery Screen Printing DTG Print DTF Transfers Laser Engraving Patches Not sure — help me choose About how many pieces? When do you need them? Style # (only if you know it) — start typing, we'll look it up Product 3. Your logo / artwork (optional) Attach a logo image PNG or JPG is perfect — even a photo or screenshot. We'll ask for production files later if we need them. Send my quote request We only use this to reply about your project — no mailing lists, no spam. Got it — thank you! Your request is in (reference ) and a real person will get back to you within one business day. Need us sooner? Call 253-922-5793. ← Back to nwcustomapparel.com",
+      "links": [
+        {
+          "href": "/",
+          "label": "nwcustomapparel.com"
+        },
+        {
+          "href": "tel:253-922-5793",
+          "label": "253-922-5793"
+        },
+        {
+          "href": "/",
+          "label": "← Back to nwcustomapparel.com"
+        }
+      ],
+      "images": [
+        {
+          "src": "https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1",
+          "alt": "Northwest Custom Apparel"
+        }
+      ],
+      "fields": [
+        {
+          "tag": "INPUT",
+          "id": "hpWebsite",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "required": false
+        },
+        {
+          "tag": "INPUT",
+          "id": "fldName",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "required": false
+        },
+        {
+          "tag": "INPUT",
+          "id": "fldCompany",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "required": false
+        },
+        {
+          "tag": "INPUT",
+          "id": "fldEmail",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "required": false
+        },
+        {
+          "tag": "INPUT",
+          "id": "fldPhone",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "required": false
+        },
+        {
+          "tag": "INPUT",
+          "id": "rpEmail",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "required": false
+        },
+        {
+          "tag": "INPUT",
+          "id": "rpCall",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "required": false
+        },
+        {
+          "tag": "INPUT",
+          "id": "rpText",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "required": false
+        },
+        {
+          "tag": "TEXTAREA",
+          "id": "fldWhat",
+          "name": "",
+          "type": "textarea",
+          "value": "",
+          "required": false
+        },
+        {
+          "tag": "INPUT",
+          "id": "mEmbroidery",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "required": false
+        },
+        {
+          "tag": "INPUT",
+          "id": "mScreen",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "required": false
+        },
+        {
+          "tag": "INPUT",
+          "id": "mDtg",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "required": false
+        },
+        {
+          "tag": "INPUT",
+          "id": "mDtf",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "required": false
+        },
+        {
+          "tag": "INPUT",
+          "id": "mLaser",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "required": false
+        },
+        {
+          "tag": "INPUT",
+          "id": "mPatches",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "required": false
+        },
+        {
+          "tag": "INPUT",
+          "id": "mNotSure",
+          "name": "",
+          "type": "checkbox",
+          "value": "on",
+          "required": false
+        },
+        {
+          "tag": "INPUT",
+          "id": "fldQty",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "required": false
+        },
+        {
+          "tag": "INPUT",
+          "id": "fldNeedBy",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "required": false
+        },
+        {
+          "tag": "INPUT",
+          "id": "fldStyle",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "required": false
+        },
+        {
+          "tag": "INPUT",
+          "id": "fldProduct",
+          "name": "",
+          "type": "text",
+          "value": "",
+          "required": false
+        },
+        {
+          "tag": "INPUT",
+          "id": "fldLogoFile",
+          "name": "",
+          "type": "file",
+          "value": "",
+          "required": false
+        }
+      ],
+      "ids": [
+        "hpWebsite",
+        "fldName",
+        "fldCompany",
+        "fldEmail",
+        "fldPhone",
+        "rpEmail",
+        "rpCall",
+        "rpText",
+        "fldWhat",
+        "mEmbroidery",
+        "mScreen",
+        "mDtg",
+        "mDtf",
+        "mLaser",
+        "mPatches",
+        "mNotSure",
+        "fldQty",
+        "fldNeedBy",
+        "fldStyle",
+        "fldProduct",
+        "fldLogoFile",
+        "uploadStatus",
+        "submitQuoteBtn"
+      ],
+      "jsonLd": [],
+      "embeds": [],
+      "styles": [
+        "shared_components/css/tokens.css",
+        "pages/forms/nwca-form-shared.css",
+        "pages/request-a-quote.css"
+      ],
+      "cssBytes": 33692
+    },
+    {
+      "file": "calculators/digitizingform.html",
+      "title": "Digitizing Order Form - Northwest Custom Apparel",
+      "mainText": "Embroidery Digitizing Order Form Submit digitizing requests to Ruthie for embroidery design conversion Meet Your Digitizer Ruth Nhong Production Manager & Expert Digitizer With years of experience in embroidery digitizing, Ruth personally handles all digitizing requests to ensure the highest quality results. She specializes in converting your artwork into beautiful embroidered designs that bring your vision to life. 24-48 hour turnaround Expert quality assurance Direct communication Processing Time Standard turnaround is 24-48 hours for most digitizing requests File Requirements Please provide high-resolution images (JPG, PNG, PDF) for best results Quality Guarantee We ensure all designs are optimized for clean, professional embroidery results Digitizing Request Form Complete the form below to submit your embroidery digitizing request. All fields marked with an asterisk (*) are required. Loading digitizing form...",
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "label": "Staff Dashboard"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "label": "Back to Dashboard"
+        }
+      ],
+      "images": [
+        {
+          "src": "https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1",
+          "alt": "Northwest Custom Apparel"
+        },
+        {
+          "src": "https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9094678",
+          "alt": "Ruth Nhong - Production Manager & Expert Digitizer"
+        }
+      ],
+      "fields": [],
+      "ids": [
+        "loadingOverlay",
+        "JotFormIFrame-241687786443168"
+      ],
+      "jsonLd": [],
+      "embeds": [
+        {
+          "tag": "IFRAME",
+          "src": "https://www.jotform.com/app/241687786443168?appEmbedded=1",
+          "title": "Ruthie Forms"
+        }
+      ],
+      "styles": [
+        "shared_components/css/tokens.css",
+        "calculators/css/digitizingform.css"
+      ],
+      "cssBytes": 23391
+    },
+    {
+      "file": "calculators/monogramform.html",
+      "title": "Monogram Embroidery Form - Northwest Custom Apparel",
+      "mainText": "Monogram Embroidery Form Submit individual name embroidery requests for custom garments Service Type Individual name embroidery for personalized garments - perfect for employee uniforms and gifts Common Use Names on jackets, uniforms, gifts, and corporate apparel - typically right chest placement Processing Quick turnaround for standard monogram requests - typically 24-48 hours Monogram Request Form Submit your monogram embroidery request below. Please include individual names and placement details.",
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "label": "Staff Dashboard"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "label": "Back to Dashboard"
+        }
+      ],
+      "images": [
+        {
+          "src": "https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1",
+          "alt": "Northwest Custom Apparel"
+        }
+      ],
+      "fields": [],
+      "ids": [
+        "jotformContainer"
+      ],
+      "jsonLd": [],
+      "embeds": [
+        {
+          "tag": "SCRIPT",
+          "src": "https://form.jotform.com/jsform/243095362828059",
+          "title": null
+        }
+      ],
+      "styles": [
+        "shared_components/css/tokens.css",
+        "calculators/css/monogramform.css"
+      ],
+      "cssBytes": 20716
+    },
+    {
+      "file": "calculators/purchasingform.html",
+      "title": "Purchasing Request Form - Northwest Custom Apparel",
+      "mainText": "Purchasing Request Form Submit purchase requests to Bradley for blank garments and supplies Purchasing Agent All requests are processed by Bradley Wright, our Accountant and Purchasing Specialist Required Information Please provide Customer Name and Work Order Number for all purchase requests Processing Workflow Form submission → Bradley processes → Purchases from supplier → Items ordered Purchase Request Form Complete the form below to submit your purchasing request. Please include Customer Name and Work Order Number.",
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "label": "Staff Dashboard"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "label": "Back to Dashboard"
+        }
+      ],
+      "images": [
+        {
+          "src": "https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1",
+          "alt": "Northwest Custom Apparel"
+        }
+      ],
+      "fields": [],
+      "ids": [
+        "jotformContainer"
+      ],
+      "jsonLd": [],
+      "embeds": [
+        {
+          "tag": "SCRIPT",
+          "src": "https://form.jotform.com/jsform/241646601815152",
+          "title": null
+        }
+      ],
+      "styles": [
+        "shared_components/css/tokens.css",
+        "calculators/css/purchasingform.css"
+      ],
+      "cssBytes": 22440
+    }
+  ],
+  "controllers": {
+    "pages/request-a-quote.js": {
+      "source": "/**\n * request-a-quote.js — pages/request-a-quote.html (PUBLIC customer lead form)\n *\n * The structured replacement for the mailto: link — every request arrives\n * with contact info, project description, method, qty, date, and (optionally)\n * a style # verified against SanMar and an uploaded logo image. Saves as\n * formId quote-request (QRQ) → Forms Inbox + Slack lead ping.\n * Logo upload uses the public /api/image-uploads (Caspio Files); an upload\n * failure NEVER blocks the request — the lead matters more than the file.\n */\n(function () {\n    'use strict';\n\n    var METHODS = [\n        ['mEmbroidery', 'Embroidery'], ['mScreen', 'Screen Printing'], ['mDtg', 'DTG Print'],\n        ['mDtf', 'DTF Transfers'], ['mLaser', 'Laser Engraving'], ['mPatches', 'Patches'],\n        ['mNotSure', 'Not sure — help me choose'],\n    ];\n    var REPLY = [['rpEmail', 'Email'], ['rpCall', 'Call'], ['rpText', 'Text']];\n\n    var logoUrl = '';\n    var logoName = '';\n\n    document.addEventListener('DOMContentLoaded', function () {\n        NWCAFormDates.attach('fldNeedBy');\n        NWCAFormStyles.attachRow({\n            styleInput: document.getElementById('fldStyle'),\n            descInput: document.getElementById('fldProduct'),\n        });\n        document.getElementById('fldLogoFile').addEventListener('change', uploadLogo);\n        prefillFromUrl();\n\n        NWCAPublicForm.init({\n            formId: 'quote-request',\n            submitId: 'submitQuoteBtn',\n            required: [\n                ['fldName', 'your name'],\n                ['fldEmail', 'a valid email'],\n                ['fldPhone', 'your phone number'],\n                ['fldWhat', 'a sentence about the project'],\n            ],\n            build: buildSubmission,\n        });\n    });\n\n    // Deep-link prefill: /request-a-quote.html?style=&product=&source= (used by\n    // the Fall Catalog '26 landing page cards). Purely additive — a visitor with\n    // no params sees the blank form exactly as before.\n    function prefillFromUrl() {\n        var p;\n        try { p = new URLSearchParams(window.location.search); } catch (e) { return; }\n        var style = (p.get('style') || '').trim();\n        var product = (p.get('product') || '').trim();\n        var source = (p.get('source') || '').trim();\n        var styleEl = document.getElementById('fldStyle');\n        var prodEl = document.getElementById('fldProduct');\n        var whatEl = document.getElementById('fldWhat');\n        if (style && styleEl && !styleEl.value) styleEl.value = style.toUpperCase();\n        if (product && prodEl && !prodEl.value) prodEl.value = product;\n        if (whatEl && !whatEl.value && (product || style)) {\n            whatEl.value = \"I'm interested in \" + (product || style) +\n                (style && product ? ' (' + style.toUpperCase() + ')' : '') +\n                (source ? ' — from ' + source : '') +\n                '. Please send decorated pricing.';\n        }\n    }\n\n    function uploadLogo() {\n        var input = document.getElementById('fldLogoFile');\n        var status = document.getElementById('uploadStatus');\n        var file = input.files && input.files[0];\n        if (!file) return;\n        if (file.size > 20 * 1024 * 1024) {\n            status.textContent = 'That file is over 20 MB — email it to sales@nwcustomapparel.com instead (your request still goes through).';\n            return;\n        }\n        var base = (window.APP_CONFIG && APP_CONFIG.API && APP_CONFIG.API.BASE_URL || '').replace(/\\/+$/, '');\n        if (!base) { status.textContent = 'Upload unavailable — email the logo instead; your request still goes through.'; return; }\n\n        status.innerHTML = '<i class=\"fas fa-spinner fa-spin\" aria-hidden=\"true\"></i> Uploading ' + escapeText(file.name) + '…';\n        var fd = new FormData();\n        fd.append('file', file);\n        fd.append('description', 'Quote request logo — ' + (NWCAPublicForm.val('fldCompany') || NWCAPublicForm.val('fldName') || 'web lead'));\n\n        fetch(base + '/api/image-uploads', { method: 'POST', body: fd })\n            .then(function (resp) { return resp.json().then(function (b) { if (!resp.ok) throw new Error(b.error || ('HTTP ' + resp.status)); return b; }); })\n            .then(function (body) {\n                logoUrl = (body.image && body.image.url) || '';\n                logoName = file.name;\n                status.innerHTML = '<i class=\"fas fa-circle-check ok\" aria-hidden=\"true\"></i> Attached: ' + escapeText(file.name);\n            })\n            .catch(function (err) {\n                console.error('[quote-request] upload failed:', err);\n                logoUrl = '';\n                logoName = '';\n                status.textContent = 'Upload didn\\'t work — no problem, email the logo to sales@nwcustomapparel.com. Your request still goes through.';\n            });\n    }\n\n    function buildSubmission() {\n        var V = NWCAPublicForm.val;\n        var checksList = [];\n        METHODS.concat(REPLY).forEach(function (p) {\n            if (NWCAPublicForm.checked(p[0])) checksList.push(p[0].indexOf('rp') === 0 ? 'Reply by: ' + p[1] : p[1]);\n        });\n        var methods = METHODS.filter(function (p) { return NWCAPublicForm.checked(p[0]); }).map(function (p) { return p[1]; });\n\n        return {\n            company: V('fldCompany') || V('fldName'), // Inbox \"Company\" column always says who\n            contactName: V('fldName'),\n            phone: V('fldPhone'),\n            email: V('fldEmail'),\n            dueDateText: V('fldNeedBy'),\n            summary: (V('fldQty') ? '~' + V('fldQty') + ' pcs · ' : '') + (methods[0] || 'method open') +\n                     (V('fldStyle') ? ' · ' + V('fldStyle').toUpperCase() : '') +\n                     (V('fldNeedBy') ? ' · needs ' + V('fldNeedBy') : '') +\n                     (logoUrl ? ' · logo attached' : ''),\n            payload: {\n                fields: [\n                    ['Name', V('fldName')], ['Company / Team', V('fldCompany')],\n                    ['Email', V('fldEmail')], ['Phone', V('fldPhone')],\n                    ['About how many pieces', V('fldQty')], ['Needed by', V('fldNeedBy')],\n                    ['Style #', V('fldStyle').toUpperCase()], ['Product', V('fldProduct')],\n                    ['Logo file', logoUrl ? logoName + ' — ' + logoUrl : ''],\n                    ['Submitted by', 'Customer (public quote form)'],\n                ],\n                checks: checksList,\n                tables: [],\n                notes: [['Project', V('fldWhat')]],\n            },\n        };\n    }\n\n    function escapeText(v) {\n        return String(v == null ? '' : v).replace(/[<>&\"']/g, '');\n    }\n})();\n",
+      "sha256": "3ac5ae9b1997e963a39f282273cdcf7b9e7bf2566a371a2b1e4478da45f159da"
+    },
+    "pages/forms/nwca-form-dates.js": {
+      "source": "/**\n * nwca-form-dates.js — hybrid date pickers for the fillable form twins.\n *\n * Date fields stay FREE TEXT (people write \"ASAP\" on these forms) but get a\n * 📅 button that opens the native date picker and writes M/D/YYYY into the\n * text field. Save-time ISO normalizing (nwca-form-save.js toIsoDay) is\n * unchanged — picked dates always normalize cleanly.\n *\n *   NWCAFormDates.attach('fldDateNeeded', 'fldDateIn', …)   // by id\n *   NWCAFormDates.attachEl(inputEl)                          // by element\n *   NWCAFormDates.today()                                    // \"7/11/2026\"\n *   NWCAFormDates.plusDays(base, 14)                         // date math\n */\n(function (global) {\n    'use strict';\n\n    function fmt(d) {\n        return (d.getMonth() + 1) + '/' + d.getDate() + '/' + d.getFullYear();\n    }\n\n    function today() { return fmt(new Date()); }\n\n    // base: Date | \"M/D/YYYY\" | \"YYYY-MM-DD\" | '' (today). Returns M/D/YYYY.\n    function plusDays(base, days) {\n        var d;\n        if (base instanceof Date) d = new Date(base);\n        else {\n            var s = String(base || '').trim();\n            var m = s.match(/^(\\d{1,2})[/-](\\d{1,2})[/-](\\d{2,4})$/);\n            var iso = s.match(/^(\\d{4})-(\\d{1,2})-(\\d{1,2})$/);\n            if (m) d = new Date(m[3].length === 2 ? 2000 + +m[3] : +m[3], +m[1] - 1, +m[2]);\n            else if (iso) d = new Date(+iso[1], +iso[2] - 1, +iso[3]);\n            else d = new Date();\n        }\n        d.setDate(d.getDate() + days);\n        return fmt(d);\n    }\n\n    function attachEl(input) {\n        if (!input || input.dataset.dateWired) return;\n        input.dataset.dateWired = '1';\n\n        var wrap = input.parentNode;\n        wrap.classList.add('date-anchor');\n\n        var btn = document.createElement('button');\n        btn.type = 'button';\n        btn.className = 'date-pick-btn no-print';\n        btn.setAttribute('aria-label', 'Pick a date');\n        btn.innerHTML = '<i class=\"far fa-calendar\" aria-hidden=\"true\"></i>';\n\n        var hidden = document.createElement('input');\n        hidden.type = 'date';\n        hidden.className = 'date-pick-native';\n        hidden.tabIndex = -1;\n        hidden.setAttribute('aria-hidden', 'true');\n\n        btn.addEventListener('click', function () {\n            if (typeof hidden.showPicker === 'function') {\n                try { hidden.showPicker(); return; } catch (_) { /* fall through */ }\n            }\n            hidden.click();\n        });\n        hidden.addEventListener('change', function () {\n            if (!hidden.value) return;\n            var parts = hidden.value.split('-'); // YYYY-MM-DD\n            input.value = (+parts[1]) + '/' + (+parts[2]) + '/' + parts[0];\n            input.dispatchEvent(new Event('input', { bubbles: true }));\n        });\n\n        wrap.appendChild(btn);\n        wrap.appendChild(hidden);\n    }\n\n    function attach() {\n        Array.prototype.forEach.call(arguments, function (id) {\n            attachEl(document.getElementById(id));\n        });\n    }\n\n    global.NWCAFormDates = { attach: attach, attachEl: attachEl, today: today, plusDays: plusDays };\n})(window);\n",
+      "sha256": "2b38a2c7648e29549ee2a3bc5846a81c3d7d23ef45c260e5a66c1064bf83872b"
+    },
+    "pages/forms/nwca-form-styles.js": {
+      "source": "/**\n * nwca-form-styles.js — SanMar style lookup for the fillable form twins.\n *\n * Per-row style assist using the SAME public proxy endpoints the quote\n * builders trust: GET /api/stylesearch?term= ([{value: STYLE, label: TITLE}])\n * and GET /api/product-colors?styleNumber= ({colors:[{COLOR_NAME,\n * CATALOG_COLOR,…}], CATEGORY_NAME}).\n *\n * NWCAFormStyles.attachRow({ styleInput, colorCell, descInput, onProduct })\n *   - type-ahead dropdown on the style input\n *   - picking a style fills the description with the product title and swaps\n *     the color cell's text input for a <select> of that style's REAL colors\n *     (display COLOR_NAME; the row remembers CATALOG_COLOR — needed if this\n *     submission is ever pushed to ShopWorks). \"— type color manually —\"\n *     restores the free-text input (catalog color cleared: unverified).\n *   - lookup failure never blocks: everything stays hand-typable.\n */\n(function (global) {\n    'use strict';\n\n    var DEBOUNCE_MS = 250;\n    var MIN_CHARS = 2;\n    var colorsCache = {};\n    var colorRequests = new WeakMap();\n    var pickerSequence = 0;\n    var floatingPickers = [];\n\n    // Table scrolling must not clip a menu in the final row. Fixed menus stay\n    // in the viewport; reposition on either page or table scroll.\n    function placePicker(box, anchor) {\n        // The public quote-request form still owns its legacy popup CSS.\n        if (box.hidden || !anchor.closest('[data-ui=\"unified\"][data-form=\"printable\"]')) return;\n        var rect = anchor.getBoundingClientRect();\n        var width = Math.min(330, window.innerWidth - 24);\n        var below = window.innerHeight - rect.bottom - 12;\n        var above = rect.top - 12;\n        var height = Math.max(44, Math.min(280, Math.max(below, above)));\n        box.classList.add('form-picker-floating');\n        box.style.width = width + 'px';\n        box.style.left = Math.max(12, Math.min(rect.left, window.innerWidth - width - 12)) + 'px';\n        box.style.maxHeight = height + 'px';\n        box.style.top = (below >= Math.min(280, box.scrollHeight) || below >= above\n            ? rect.bottom + 4 : Math.max(12, rect.top - Math.min(height, box.scrollHeight) - 4)) + 'px';\n    }\n\n    function trackPicker(box, anchor) { floatingPickers.push({ box: box, anchor: anchor }); }\n    function positionOpenPickers() {\n        floatingPickers = floatingPickers.filter(function (item) { return item.box.isConnected; });\n        floatingPickers.forEach(function (item) { placePicker(item.box, item.anchor); });\n    }\n    document.addEventListener('scroll', positionOpenPickers, true);\n    window.addEventListener('resize', positionOpenPickers);\n\n    function apiBase() {\n        if (global.APP_CONFIG && global.APP_CONFIG.API && global.APP_CONFIG.API.BASE_URL) {\n            return global.APP_CONFIG.API.BASE_URL.replace(/\\/+$/, '');\n        }\n        return null;\n    }\n\n    function attachRow(opts) {\n        var styleInput = opts.styleInput;\n        if (!styleInput) return;\n\n        var box = document.createElement('div');\n        box.className = 'contacts-dropdown styles-dropdown';\n        box.id = 'form-style-options-' + (++pickerSequence);\n        box.setAttribute('role', 'listbox');\n        box.setAttribute('aria-label', 'Matching garment styles');\n        trackPicker(box, styleInput);\n        box.hidden = true;\n        var parent = styleInput.parentNode;\n        parent.classList.add('contacts-anchor');\n        parent.appendChild(box);\n\n        var timer = null;\n        var lastQuery = '';\n        var items = [];\n        var active = -1;\n        var suppressNext = false;\n\n        styleInput.setAttribute('autocomplete', 'off');\n        styleInput.setAttribute('role', 'combobox');\n        styleInput.setAttribute('aria-autocomplete', 'list');\n        styleInput.setAttribute('aria-controls', box.id);\n        styleInput.setAttribute('aria-expanded', 'false');\n\n        styleInput.addEventListener('input', function () {\n            if (suppressNext) { suppressNext = false; return; }\n            // Hand-typed styles are allowed too. A previous product's catalog\n            // color is no longer verified as soon as its style is edited.\n            if (opts.colorCell) {\n                colorRequests.set(opts.colorCell, {});\n                opts.colorCell.querySelectorAll('.swatch-btn, .swatch-grid').forEach(function (el) { el.remove(); });\n                var colorInput = opts.colorCell.querySelector('input');\n                if (colorInput) { colorInput.hidden = false; delete colorInput.dataset.catalogColor; }\n                colorMessage(opts.colorCell, '');\n            }\n            var q = styleInput.value.trim();\n            if (timer) clearTimeout(timer);\n            if (q.length < MIN_CHARS) { hide(); return; }\n            timer = setTimeout(function () { search(q); }, DEBOUNCE_MS);\n        });\n\n        styleInput.addEventListener('keydown', function (e) {\n            if (box.hidden) return;\n            if (e.key === 'ArrowDown') { e.preventDefault(); move(1); }\n            else if (e.key === 'ArrowUp') { e.preventDefault(); move(-1); }\n            else if (e.key === 'Enter') { if (active >= 0) { e.preventDefault(); pick(items[active]); } }\n            else if (e.key === 'Escape') { hide(); }\n        });\n\n        document.addEventListener('click', function (e) {\n            if (e.target !== styleInput && !box.contains(e.target)) hide();\n        });\n\n        function search(q) {\n            var base = apiBase();\n            if (!base) { hide(); return; }\n            lastQuery = q;\n            fetch(base + '/api/stylesearch?term=' + encodeURIComponent(q))\n                .then(function (resp) {\n                    if (!resp.ok) throw new Error('HTTP ' + resp.status);\n                    return resp.json();\n                })\n                .then(function (data) {\n                    if (q !== lastQuery || document.activeElement !== styleInput) return;\n                    render(data || []);\n                })\n                .catch(function (err) {\n                    if (q !== lastQuery || document.activeElement !== styleInput) return;\n                    console.error('[form-styles] style search failed:', err);\n                    renderMessage('Style lookup unavailable — keep typing manually.');\n                });\n        }\n\n        function render(results) {\n            box.setAttribute('role', 'listbox');\n            box.innerHTML = '';\n            items = [];\n            active = -1;\n            if (!results.length) { renderMessage('No SanMar match — keep typing manually.'); return; }\n            results.slice(0, 10).forEach(function (r, i) {\n                var el = document.createElement('div');\n                el.className = 'contacts-row';\n                el.id = box.id + '-' + i;\n                el.setAttribute('role', 'option');\n                el.setAttribute('aria-selected', 'false');\n                el.innerHTML = '<strong>' + escapeHtml(r.value) + '</strong> <span class=\"contacts-muted\">' + escapeHtml(r.label || '') + '</span>';\n                el.addEventListener('mousedown', function (e) { e.preventDefault(); pick(items[i]); });\n                el.addEventListener('mousemove', function () { setActive(i); });\n                items.push({ el: el, style: r.value, title: r.label || '' });\n                box.appendChild(el);\n            });\n            box.hidden = false;\n            styleInput.setAttribute('aria-expanded', 'true');\n            placePicker(box, styleInput);\n        }\n\n        function renderMessage(text) {\n            box.setAttribute('role', 'status');\n            box.innerHTML = '';\n            items = [];\n            active = -1;\n            var el = document.createElement('div');\n            el.className = 'contacts-row contacts-row--empty';\n            el.textContent = text;\n            box.appendChild(el);\n            box.hidden = false;\n            styleInput.setAttribute('aria-expanded', 'true');\n            placePicker(box, styleInput);\n        }\n\n        function move(delta) {\n            if (!items.length) return;\n            setActive((active + delta + items.length) % items.length);\n        }\n\n        function setActive(i) {\n            if (active >= 0 && items[active]) items[active].el.classList.remove('is-active');\n            active = i;\n            if (items[active]) {\n                items.forEach(function (item, index) { item.el.setAttribute('aria-selected', String(index === active)); });\n                styleInput.setAttribute('aria-activedescendant', items[active].el.id);\n                items[active].el.classList.add('is-active');\n                items[active].el.scrollIntoView({ block: 'nearest' });\n            }\n        }\n\n        function pick(item) {\n            if (!item) return;\n            if (timer) clearTimeout(timer);\n            lastQuery = '';\n            suppressNext = true;\n            styleInput.value = item.style;\n            styleInput.dispatchEvent(new Event('input', { bubbles: true }));\n            hide();\n            if (opts.descInput && item.title && !opts.descInput.dataset.manual) {\n                opts.descInput.value = item.title;\n            }\n            loadColors(item.style, opts);\n            if (typeof opts.onProduct === 'function') opts.onProduct(item);\n        }\n\n        function hide() {\n            styleInput.setAttribute('aria-expanded', 'false');\n            styleInput.removeAttribute('aria-activedescendant');\n            box.hidden = true;\n            items = [];\n            active = -1;\n        }\n    }\n\n    function loadColors(styleNumber, opts) {\n        var base = apiBase();\n        var colorCell = opts.colorCell;\n        if (!base || !colorCell) return;\n        var request = {};\n        colorRequests.set(colorCell, request);\n        colorCell.querySelectorAll('.swatch-btn, .swatch-grid').forEach(function (el) { el.remove(); });\n        var colorInput = colorCell.querySelector('input');\n        if (colorInput) { colorInput.hidden = false; delete colorInput.dataset.catalogColor; }\n        colorMessage(colorCell, '');\n\n        var apply = function (data) {\n            if (colorRequests.get(colorCell) !== request) return;\n            var colors = (data && data.colors) || [];\n            if (!colors.length) { colorMessage(colorCell, 'No catalog colors — type color manually.'); return; }\n            colorMessage(colorCell, '');\n            buildColorSelect(colorCell, colors);\n        };\n\n        if (colorsCache[styleNumber]) { apply(colorsCache[styleNumber]); return; }\n        fetch(base + '/api/product-colors?styleNumber=' + encodeURIComponent(styleNumber))\n            .then(function (resp) {\n                if (!resp.ok) throw new Error('HTTP ' + resp.status);\n                return resp.json();\n            })\n            .then(function (data) {\n                if (data && data.colors && data.colors.length) colorsCache[styleNumber] = data;\n                apply(data);\n            })\n            .catch(function (err) {\n                if (colorRequests.get(colorCell) !== request) return;\n                console.error('[form-styles] colors failed:', err);\n                colorMessage(colorCell, 'Color lookup unavailable — type color manually or select the style to retry.');\n            });\n    }\n\n    // Swatch picker (Erik 2026-07-11: \"like the quote builder\"). A button shows\n    // the picked swatch+name; clicking opens a swatch grid. Built ONCE per\n    // colors load and toggled — never regenerated on hover (archived combobox\n    // lesson: regenerating DOM mid-hover eats the click).\n    function colorMessage(colorCell, text) {\n        var message = colorCell.querySelector('.form-lookup-status');\n        if (!text) { if (message) message.remove(); return; }\n        if (!message) {\n            message = document.createElement('div');\n            message.className = 'form-lookup-status no-print';\n            message.setAttribute('role', 'status');\n            colorCell.appendChild(message);\n        }\n        message.textContent = text;\n    }\n\n    function buildColorSelect(colorCell, colors) {\n        var textInput = colorCell.querySelector('input');\n        var oldBtn = colorCell.querySelector('.swatch-btn');\n        if (oldBtn) oldBtn.remove();\n        var oldGrid = colorCell.querySelector('.swatch-grid');\n        if (oldGrid) oldGrid.remove();\n\n        colorCell.classList.add('contacts-anchor');\n\n        var btn = document.createElement('button');\n        btn.type = 'button';\n        btn.className = 'swatch-btn';\n        btn.setAttribute('aria-label', 'Pick color');\n        btn.setAttribute('aria-expanded', 'false');\n        btn.innerHTML = '<span class=\"swatch-chip\"></span><span class=\"swatch-name\">— pick color —</span>';\n\n        var grid = document.createElement('div');\n        grid.className = 'swatch-grid';\n        grid.id = 'form-color-options-' + (++pickerSequence);\n        btn.setAttribute('aria-controls', grid.id);\n        trackPicker(grid, btn);\n        grid.hidden = true;\n\n        function choose(colorName, catalogColor, img) {\n            textInput.value = colorName;\n            textInput.dataset.catalogColor = catalogColor || '';\n            btn.querySelector('.swatch-name').textContent = colorName || '— pick color —';\n            var chip = btn.querySelector('.swatch-chip');\n            chip.style.backgroundImage = img ? 'url(\"' + img + '\")' : 'none';\n            grid.hidden = true;\n            btn.setAttribute('aria-expanded', 'false');\n            btn.setAttribute('aria-label', 'Change color: ' + colorName);\n            btn.focus();\n            textInput.dispatchEvent(new Event('input', { bubbles: true }));\n        }\n\n        // Native click handles pointer, Enter and Space once each.\n        colors.forEach(function (c) {\n            var cell = document.createElement('button');\n            cell.type = 'button';\n            cell.className = 'swatch-cell';\n            cell.title = c.COLOR_NAME || '';\n            var img = c.COLOR_SQUARE_IMAGE || '';\n            cell.innerHTML = '<span class=\"swatch-chip\"' + (img ? ' style=\"background-image:url(&quot;' + img + '&quot;)\"' : '') + '></span>' +\n                '<span class=\"swatch-cell-name\">' + escapeHtml(c.COLOR_NAME || '') + '</span>';\n            cell.addEventListener('click', function (e) {\n                e.preventDefault();\n                e.stopPropagation();\n                choose(c.COLOR_NAME || '', c.CATALOG_COLOR || '', img);\n            });\n            grid.appendChild(cell);\n        });\n\n        var manual = document.createElement('button');\n        manual.type = 'button';\n        manual.className = 'swatch-cell swatch-cell--manual';\n        manual.textContent = '⌨ type color manually';\n        manual.addEventListener('click', function (e) {\n            e.preventDefault();\n            e.stopPropagation();\n            btn.remove();\n            grid.remove();\n            textInput.hidden = false;\n            delete textInput.dataset.catalogColor; // manual = unverified\n            textInput.focus();\n        });\n        grid.appendChild(manual);\n\n        btn.addEventListener('click', function (e) {\n            e.preventDefault();\n            e.stopPropagation();\n            grid.hidden = !grid.hidden;\n            btn.setAttribute('aria-expanded', String(!grid.hidden));\n            placePicker(grid, btn);\n            if (!grid.hidden) grid.querySelector('button').focus();\n        });\n        document.addEventListener('mousedown', function (e) {\n            if (!colorCell.contains(e.target)) { grid.hidden = true; btn.setAttribute('aria-expanded', 'false'); }\n        });\n\n        grid.addEventListener('keydown', function (e) {\n            if (e.key === 'Escape') {\n                e.preventDefault(); grid.hidden = true; btn.setAttribute('aria-expanded', 'false'); btn.focus();\n            }\n        });\n\n        textInput.hidden = true;\n        colorCell.appendChild(btn);\n        colorCell.appendChild(grid);\n\n        // preselect if the text input already holds one of the colors\n        if (textInput.value) {\n            var match = colors.filter(function (c) { return (c.COLOR_NAME || '').toLowerCase() === textInput.value.toLowerCase(); })[0];\n            if (match) choose(match.COLOR_NAME, match.CATALOG_COLOR, match.COLOR_SQUARE_IMAGE || '');\n        }\n    }\n\n    function escapeHtml(value) {\n        return String(value == null ? '' : value)\n            .replace(/&/g, '&amp;')\n            .replace(/</g, '&lt;')\n            .replace(/>/g, '&gt;')\n            .replace(/\"/g, '&quot;')\n            .replace(/'/g, '&#39;');\n    }\n\n    // ── Size list + extended-size upcharges (for dynamic size cells) ───────\n    // sizes: /api/sizes-by-style-color (CATALOG color) → ordered real sizes.\n    // upcharges: /api/max-prices-by-style → sellingPriceDisplayAddOns map\n    // {SIZE: dollars} straight from Caspio Standard_Size_Upcharges (the same\n    // source the pricing engine reads — Rule 9: never hardcoded).\n    var sizesCache = {};\n    var upchargeCache = {};\n\n    function loadSizes(styleNumber, catalogColor) {\n        var base = apiBase();\n        var key = styleNumber + '|' + catalogColor;\n        if (sizesCache[key]) return Promise.resolve(sizesCache[key]);\n        if (!base) return Promise.reject(new Error('config missing'));\n        return fetch(base + '/api/sizes-by-style-color?styleNumber=' + encodeURIComponent(styleNumber) + '&color=' + encodeURIComponent(catalogColor))\n            .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })\n            .then(function (data) {\n                var sizes = (data && data.sizes) || [];\n                sizesCache[key] = sizes;\n                return sizes;\n            });\n    }\n\n    function loadUpcharges(styleNumber) {\n        var base = apiBase();\n        if (upchargeCache[styleNumber]) return Promise.resolve(upchargeCache[styleNumber]);\n        if (!base) return Promise.reject(new Error('config missing'));\n        return fetch(base + '/api/max-prices-by-style?styleNumber=' + encodeURIComponent(styleNumber))\n            .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })\n            .then(function (data) {\n                var map = (data && data.sellingPriceDisplayAddOns) || {};\n                upchargeCache[styleNumber] = map;\n                return map;\n            });\n    }\n\n    global.NWCAFormStyles = { attachRow: attachRow, loadSizes: loadSizes, loadUpcharges: loadUpcharges };\n})(window);\n",
+      "sha256": "2306c1a0e17451862255cd9b4912833d9af30eae87344bb80605785f0f8d2ce0"
+    },
+    "pages/forms/nwca-public-form.js": {
+      "source": "/**\n * nwca-public-form.js — submit helper for CUSTOMER-facing public forms\n * (request-a-quote, webstore-inquiry). Staff twins use nwca-form-save.js;\n * this is the customer flavor:\n *   - required-field validation (focus + inline banner; email format checked)\n *   - honeypot: hidden #hpWebsite rides as body.hp — the server fakes success\n *     for bots and stores nothing\n *   - success replaces the form with a thank-you panel + reference number\n *   - failure keeps everything typed and says exactly what to do (call us)\n *\n * NWCAPublicForm.init({ formId, submitId, required: [[id,label]…], build })\n * build() returns the same shape the twins produce (see nwca-form-save.js).\n */\n(function (global) {\n    'use strict';\n\n    function apiBase() {\n        if (global.APP_CONFIG && global.APP_CONFIG.API && global.APP_CONFIG.API.BASE_URL) {\n            return global.APP_CONFIG.API.BASE_URL.replace(/\\/+$/, '');\n        }\n        return null;\n    }\n\n    function val(id) {\n        var el = document.getElementById(id);\n        return el ? el.value.trim() : '';\n    }\n\n    function checked(id) {\n        var el = document.getElementById(id);\n        return !!(el && el.checked);\n    }\n\n    function banner(kind, html) {\n        var el = document.querySelector('.public-form-banner');\n        if (!el) {\n            el = document.createElement('div');\n            el.className = 'public-form-banner';\n            el.setAttribute('role', 'alert');\n            var sheet = document.querySelector('.form-sheet');\n            sheet.insertBefore(el, sheet.firstChild);\n        }\n        el.classList.remove('is-ok', 'is-error');\n        el.classList.add(kind === 'ok' ? 'is-ok' : 'is-error');\n        el.innerHTML = html;\n        el.scrollIntoView({ block: 'center', behavior: 'smooth' });\n    }\n\n    // \"7/25/2026\", \"2026-07-25\" → ISO day (same normalizer the twins use)\n    function toIsoDay(text) {\n        var s = String(text == null ? '' : text).trim();\n        if (!s) return '';\n        var m = s.match(/^(\\d{4})-(\\d{1,2})-(\\d{1,2})$/);\n        if (m) return m[1] + '-' + pad(m[2]) + '-' + pad(m[3]);\n        m = s.match(/^(\\d{1,2})[/-](\\d{1,2})[/-](\\d{2,4})$/);\n        if (m) {\n            var year = m[3].length === 2 ? '20' + m[3] : m[3];\n            var month = parseInt(m[1], 10), day = parseInt(m[2], 10);\n            if (month >= 1 && month <= 12 && day >= 1 && day <= 31) return year + '-' + pad(month) + '-' + pad(day);\n        }\n        return '';\n    }\n    function pad(n) { return String(n).padStart(2, '0'); }\n\n    function init(opts) {\n        var btn = document.getElementById(opts.submitId);\n        if (!btn || typeof opts.build !== 'function') return;\n\n        btn.addEventListener('click', function () {\n            // required fields — say which one, put the cursor there\n            for (var i = 0; i < (opts.required || []).length; i++) {\n                var id = opts.required[i][0], label = opts.required[i][1];\n                var el = document.getElementById(id);\n                var v = el ? el.value.trim() : '';\n                var bad = !v || (/email/i.test(id) && !/.+@.+\\..+/.test(v));\n                if (bad) {\n                    banner('error', '<i class=\"fas fa-circle-exclamation\" aria-hidden=\"true\"></i> Please enter ' + label + ' so we can get back to you.');\n                    if (el) el.focus();\n                    return;\n                }\n            }\n\n            var data;\n            try { data = opts.build(); }\n            catch (e) {\n                console.error('[public-form] build failed:', e);\n                banner('error', '<i class=\"fas fa-circle-exclamation\" aria-hidden=\"true\"></i> Something went wrong reading the form — call us at 253-922-5793 and we\\'ll take it by phone.');\n                return;\n            }\n\n            var base = apiBase();\n            if (!base) {\n                banner('error', '<i class=\"fas fa-circle-exclamation\" aria-hidden=\"true\"></i> We couldn\\'t load our connection — call 253-922-5793 or email sales@nwcustomapparel.com.');\n                return;\n            }\n\n            btn.disabled = true;\n            var oldLabel = btn.innerHTML;\n            btn.innerHTML = '<i class=\"fas fa-spinner fa-spin\" aria-hidden=\"true\"></i> Sending…';\n\n            fetch(base + '/api/form-submissions', {\n                method: 'POST',\n                headers: { 'Content-Type': 'application/json' },\n                body: JSON.stringify({\n                    formId: opts.formId,\n                    company: data.company,\n                    contactName: data.contactName || '',\n                    phone: data.phone || '',\n                    email: data.email || '',\n                    salesRep: '',\n                    dueDateIso: toIsoDay(data.dueDateText),\n                    summary: data.summary || '',\n                    payload: data.payload || {},\n                    hp: val('hpWebsite'), // honeypot — humans never see the field\n                }),\n            })\n                .then(function (resp) {\n                    return resp.json().catch(function () { return {}; }).then(function (body) {\n                        if (!resp.ok) throw new Error(body.error || ('HTTP ' + resp.status));\n                        return body;\n                    });\n                })\n                .then(function (body) {\n                    // swap the form for the thank-you panel\n                    document.querySelectorAll('.form-sheet .form-section, .form-sheet .public-submit-row').forEach(function (el) { el.hidden = true; });\n                    var ok = document.querySelector('.public-success');\n                    if (ok) {\n                        ok.hidden = false;\n                        ok.setAttribute('tabindex', '-1');\n                        ok.focus({ preventScroll: true });\n                        var ref = ok.querySelector('.public-success-ref');\n                        if (ref) ref.textContent = body.submissionId || '';\n                    }\n                    var b = document.querySelector('.public-form-banner');\n                    if (b) b.remove();\n                    window.scrollTo({ top: 0, behavior: 'smooth' });\n                })\n                .catch(function (err) {\n                    console.error('[public-form] submit failed:', err);\n                    banner('error', '<i class=\"fas fa-circle-exclamation\" aria-hidden=\"true\"></i> <strong>That didn\\'t go through.</strong> Nothing you typed was lost — try again in a minute, or call 253-922-5793 / email sales@nwcustomapparel.com.');\n                })\n                .finally(function () {\n                    btn.disabled = false;\n                    btn.innerHTML = oldLabel;\n                });\n        });\n    }\n\n    global.NWCAPublicForm = { init: init, val: val, checked: checked };\n})(window);\n",
+      "sha256": "ce3d711b2fa4d32e549060e7285e18f8db979e1666d6d528ead44dee2e7567da"
+    },
+    "calculators/js/digitizingform-page.js": {
+      "source": "/* digitizingform-page.js — the page script for /calculators/digitizingform.html, extracted 2026-09-06 from its inline <script>\n * (Rule 3). Kept at global scope on purpose: it was global before, and the shared calculator scripts call some\n * of these functions by name. Logging is gated (localhost or ?debug=1); console.error/warn stay live. */\nvar DIGI_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));\nvar digiLog = DIGI_LOG_ON ? console.log.bind(console) : function () {};\n\n// Hide loading overlay when iframe loads\nfunction hideLoading() {\n    const overlay = document.getElementById('loadingOverlay');\n    if (overlay) {\n        overlay.style.display = 'none';\n    }\n}\n\n// The embedded form used to carry onload=\"hideLoading()\" — a listener does the same job\nvar digiFrame = document.getElementById('JotFormIFrame-241687786443168');\nif (digiFrame) digiFrame.addEventListener('load', hideLoading);\n\n// Handle iframe loading timeout\nsetTimeout(() => {\n    hideLoading();\n}, 10000); // Hide loading after 10 seconds regardless\n\n// Add smooth scrolling for navigation links\ndocument.querySelectorAll('a[href^=\"#\"]').forEach(anchor => {\n    anchor.addEventListener('click', function (e) {\n        e.preventDefault();\n        const target = document.querySelector(this.getAttribute('href'));\n        if (target) {\n            target.scrollIntoView({\n                behavior: 'smooth',\n                block: 'start'\n            });\n        }\n    });\n});\n\n// Log page load for analytics\ndigiLog('Digitizing Order Form loaded successfully');\n",
+      "sha256": "f09c2346097b14e1c1c8be35796b3e09dd3efb91839b358effb55edd78317910"
+    },
+    "calculators/js/monogramform-page.js": {
+      "source": "/* monogramform-page.js — the page script for /calculators/monogramform.html, extracted 2026-09-06 from its inline <script>\n * (Rule 3). Kept at global scope on purpose: it was global before, and the shared calculator scripts call some\n * of these functions by name. Logging is gated (localhost or ?debug=1); console.error/warn stay live. */\nvar MONO_LOG_ON = (typeof window !== 'undefined' && !!window.location && (window.location.hostname === 'localhost' || new URLSearchParams(window.location.search).has('debug')));\nvar monoLog = MONO_LOG_ON ? console.log.bind(console) : function () {};\n\n// Wait for JotForm to fully load and apply styling\ndocument.addEventListener('DOMContentLoaded', function() {\n    // Monitor for JotForm iframe to ensure proper styling\n    const checkAndStyleForm = () => {\n        const jotformIframe = document.querySelector('#jotformContainer iframe');\n        if (jotformIframe) {\n            // Ensure iframe has proper responsive styling\n            jotformIframe.style.width = '100%';\n            jotformIframe.style.minHeight = '800px';\n            jotformIframe.style.border = 'none';\n            jotformIframe.style.borderRadius = '0.5rem';\n            return true;\n        }\n        return false;\n    };\n\n    // Try to style immediately\n    if (!checkAndStyleForm()) {\n        // If not loaded yet, check periodically\n        const styleInterval = setInterval(() => {\n            if (checkAndStyleForm()) {\n                clearInterval(styleInterval);\n            }\n        }, 500);\n\n        // Stop checking after 10 seconds\n        setTimeout(() => clearInterval(styleInterval), 10000);\n    }\n});\n\n// Add smooth scrolling for navigation links\ndocument.querySelectorAll('a[href^=\"#\"]').forEach(anchor => {\n    anchor.addEventListener('click', function (e) {\n        e.preventDefault();\n        const target = document.querySelector(this.getAttribute('href'));\n        if (target) {\n            target.scrollIntoView({\n                behavior: 'smooth',\n                block: 'start'\n            });\n        }\n    });\n});\n\n// Log page load for analytics\nmonoLog('Monogram Embroidery Form loaded successfully');\n",
+      "sha256": "304f191af31cdf6e869860d39308b47c8906969408fa78fd7cc7967cb1ee49e0"
+    },
+    "calculators/js/purchasingform.js": {
+      "source": "/* purchasingform.js — page script (extracted from inline <script>, 2026.09.05.7) */\n\n// ── moved from inline <script> in calculators/purchasingform.html (Rule 3, 2026.09.05.7) ──\n// Wait for JotForm to fully load and apply styling\n        document.addEventListener('DOMContentLoaded', function() {\n            // Monitor for JotForm iframe to ensure proper styling\n            const checkAndStyleForm = () => {\n                const jotformIframe = document.querySelector('#jotformContainer iframe');\n                if (jotformIframe) {\n                    // Ensure iframe has proper responsive styling\n                    jotformIframe.style.width = '100%';\n                    jotformIframe.style.minHeight = '800px';\n                    jotformIframe.style.border = 'none';\n                    jotformIframe.style.borderRadius = '0.5rem';\n                    return true;\n                }\n                return false;\n            };\n\n            // Try to style immediately\n            if (!checkAndStyleForm()) {\n                // If not loaded yet, check periodically\n                const styleInterval = setInterval(() => {\n                    if (checkAndStyleForm()) {\n                        clearInterval(styleInterval);\n                    }\n                }, 500);\n\n                // Stop checking after 10 seconds\n                setTimeout(() => clearInterval(styleInterval), 10000);\n            }\n        });\n\n        // Add smooth scrolling for navigation links\n        document.querySelectorAll('a[href^=\"#\"]').forEach(anchor => {\n            anchor.addEventListener('click', function (e) {\n                e.preventDefault();\n                const target = document.querySelector(this.getAttribute('href'));\n                if (target) {\n                    target.scrollIntoView({\n                        behavior: 'smooth',\n                        block: 'start'\n                    });\n                }\n            });\n        });\n\n        // Log page load for analytics\n",
+      "sha256": "322764752a62fa5c86eb13a818de9a0dca0f5ad1a15e591707e0abfffa9688cb"
+    }
+  },
+  "hostedLinks": {
+    "calculators/monogramform.html": "https://form.jotform.com/243095362828059",
+    "calculators/purchasingform.html": "https://form.jotform.com/241646601815152",
+    "calculators/digitizingform.html": "https://www.jotform.com/app/241687786443168?appEmbedded=1"
+  }
+}

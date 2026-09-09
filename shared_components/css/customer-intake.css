@@ -1,0 +1,61 @@
+/* Four intake entry pages. Canonical controls, typography and alerts live in components.css. */
+@layer components.pages {
+    :where([data-ui="unified"][data-intake]) :is(.main-container, .form-sheet) { max-width: 1120px; margin: 0 auto; padding: var(--space-7) var(--space-5); }
+    :where([data-ui="unified"][data-intake]) .intake-print-link { display: none; }
+    :where([data-ui="unified"][data-intake="embedded"]) .header { border-bottom: 1px solid var(--ui-line); background: var(--ui-surface); }
+    :where([data-ui="unified"][data-intake="embedded"]) .header-container { max-width: 1320px; margin: auto; padding: var(--space-4) var(--space-5); display: flex; align-items: center; justify-content: space-between; gap: var(--space-5); }
+    :where([data-ui="unified"][data-intake="embedded"]) .header-left { display: flex; align-items: center; gap: var(--space-5); min-width: 0; }
+    :where([data-ui="unified"][data-intake="embedded"]) .logo { width: 112px; height: 58px; object-fit: contain; }
+    :where([data-ui="unified"][data-intake="embedded"]) .breadcrumb { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); font-size: var(--font-size-sm); color: var(--ui-muted); }
+    :where([data-ui="unified"][data-intake="embedded"]) .help-btn { white-space: nowrap; }
+    :where([data-ui="unified"][data-intake="embedded"]) .intake-heading { padding: var(--space-3) 0 var(--space-6); border-bottom: 1px solid var(--ui-line); margin-bottom: var(--space-6); }
+    :where([data-ui="unified"][data-intake="embedded"]) .page-title { margin: 0; max-width: 850px; font-size: clamp(1.75rem, 4vw, 2.75rem); letter-spacing: -0.035em; }
+    :where([data-ui="unified"][data-intake="embedded"]) .page-title i { color: var(--ui-accent); font-size: 0.65em; vertical-align: 0.1em; margin-right: var(--space-2); }
+    :where([data-ui="unified"][data-intake="embedded"]) .page-subtitle { margin: var(--space-3) 0 0; color: var(--ui-muted); max-width: 70ch; }
+    :where([data-ui="unified"][data-intake="embedded"]) .info-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-5); margin-bottom: var(--space-6); }
+    :where([data-ui="unified"][data-intake="embedded"]) .info-card { border-left: 2px solid var(--ui-line-strong); padding: var(--space-2) var(--space-4); }
+    :where([data-ui="unified"][data-intake="embedded"]) .info-card-icon { color: var(--ui-accent); margin-bottom: var(--space-3); }
+    :where([data-ui="unified"][data-intake="embedded"]) .info-card-title { font-size: var(--font-size-base); margin: 0 0 var(--space-2); }
+    :where([data-ui="unified"][data-intake="embedded"]) .info-card-text { font-size: var(--font-size-md); color: var(--ui-muted); margin: 0; }
+    :where([data-ui="unified"][data-intake="embedded"]) .form-container { background: var(--ui-surface); border: 1px solid var(--ui-line); border-radius: var(--radius-card); }
+    :where([data-ui="unified"][data-intake="embedded"]) .form-intro { padding: var(--space-5); border-bottom: 1px solid var(--ui-line); }
+    :where([data-ui="unified"][data-intake="embedded"]) .form-intro h2 { font-size: var(--font-size-xl); margin: 0 0 var(--space-2); }
+    :where([data-ui="unified"][data-intake="embedded"]) .form-intro p { margin: var(--space-2) 0 0; color: var(--ui-muted); }
+    :where([data-ui="unified"][data-intake="embedded"]) .form-intro .intake-embed-help { font-size: var(--font-size-sm); margin-top: var(--space-4); }
+    :where([data-ui="unified"][data-intake="embedded"]) .jotform-container { position: relative; min-height: 180px; }
+    :where([data-ui="unified"][data-intake="embedded"]) .jotform-container iframe { display: block; width: 100%; min-height: 800px; border: 0; border-radius: var(--radius-card); }
+    :where([data-ui="unified"][data-intake="embedded"]) .loading-overlay { position: absolute; inset: 0; display: grid; place-content: center; background: var(--ui-surface); color: var(--ui-muted); border-radius: var(--radius-card); pointer-events: none; }
+    :where([data-ui="unified"][data-intake="embedded"]) .digitizer-spotlight { display: grid; grid-template-columns: 170px minmax(0, 1fr); gap: var(--space-5); padding: var(--space-5); margin-bottom: var(--space-6); background: var(--ui-tint); border-radius: var(--radius-card); }
+    :where([data-ui="unified"][data-intake="embedded"]) .digitizer-image img { width: 100%; height: 200px; object-fit: cover; border-radius: var(--radius-md); }
+    :where([data-ui="unified"][data-intake="embedded"]) .digitizer-content h2 { font-size: var(--font-size-sm); color: var(--ui-accent); margin: 0 0 var(--space-2); }
+    :where([data-ui="unified"][data-intake="embedded"]) .digitizer-content h3 { font-size: var(--font-size-xl); margin: 0; }
+    :where([data-ui="unified"][data-intake="embedded"]) .digitizer-content p { margin: var(--space-3) 0; }
+    :where([data-ui="unified"][data-intake="embedded"]) .digitizer-title { color: var(--ui-muted); font-size: var(--font-size-sm); }
+    :where([data-ui="unified"][data-intake="embedded"]) .digitizer-features { display: flex; flex-wrap: wrap; gap: var(--space-3) var(--space-5); font-size: var(--font-size-sm); }
+    :where([data-ui="unified"][data-intake="embedded"]) .digitizer-stat i { color: var(--ui-accent); margin-right: var(--space-1); }
+
+    @media (width <= 700px) {
+        :where([data-ui="unified"][data-intake]) :is(.main-container, .form-sheet) { padding: var(--space-5) var(--space-4); }
+        :where([data-ui="unified"][data-intake="embedded"]) .header-container { flex-wrap: wrap; padding: var(--space-4); gap: var(--space-3); }
+        :where([data-ui="unified"][data-intake="embedded"]) .header-left { align-items: flex-start; gap: var(--space-3); }
+        :where([data-ui="unified"][data-intake="embedded"]) .logo { width: 82px; height: 45px; flex-shrink: 0; }
+        :where([data-ui="unified"][data-intake="embedded"]) .breadcrumb { font-size: var(--font-size-xs); }
+        :where([data-ui="unified"][data-intake="embedded"]) .info-cards { grid-template-columns: 1fr; gap: var(--space-4); }
+        :where([data-ui="unified"][data-intake="embedded"]) .digitizer-spotlight { grid-template-columns: 1fr; padding: var(--space-4); }
+        :where([data-ui="unified"][data-intake="embedded"]) .digitizer-image img { width: 120px; height: 140px; }
+        :where([data-ui="unified"][data-intake="embedded"]) .form-intro { padding: var(--space-4); }
+    }
+
+    @media print {
+        :where([data-ui="unified"][data-intake]) { background: var(--ui-surface); font-size: 11px; }
+        :where([data-ui="unified"][data-intake]) :is(.main-container, .form-sheet) { padding: 0; max-width: none; }
+        :where([data-ui="unified"][data-intake="embedded"]) :is(.header, .jotform-container, .intake-embed-help) { display: none; }
+        :where([data-ui="unified"][data-intake="embedded"]) .intake-print-link { display: block; padding: var(--space-4); overflow-wrap: anywhere; }
+        :where([data-ui="unified"][data-intake="embedded"]) :is(.intake-heading, .info-cards, .digitizer-spotlight) { margin-bottom: var(--space-4); }
+        :where([data-ui="unified"][data-intake="embedded"]) .info-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-3); }
+        :where([data-ui="unified"][data-intake="embedded"]) .page-title { font-size: 24px; }
+        :where([data-ui="unified"][data-intake="embedded"]) :is(.form-container, .digitizer-spotlight, .info-card) { break-inside: avoid; }
+        :where([data-ui="unified"][data-intake="embedded"]) .digitizer-spotlight { grid-template-columns: 110px minmax(0, 1fr); }
+        :where([data-ui="unified"][data-intake="embedded"]) .digitizer-image img { height: 140px; }
+    }
+}

@@ -1,78 +1,64 @@
-/* request-a-quote.css — public customer lead form (shares nwca-form-shared.css) */
+/* Public quote-request arrangement; field, button, choice and feedback primitives are shared. */
+@layer components.pages {
+    :where([data-ui="unified"][data-intake="public"]) .public-topbar { display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--space-2); padding: var(--space-3) max(var(--space-4), calc((100vw - 1080px) / 2)); font-size: var(--font-size-sm); background: var(--ui-accent); color: var(--color-on-brand); }
+    :where([data-ui="unified"][data-intake="public"]) .public-topbar a { color: inherit; text-decoration: none; }
+    :where([data-ui="unified"][data-intake="public"]) .public-topbar a:hover { text-decoration: underline; }
+    :where([data-ui="unified"][data-intake="public"]) .public-topbar :focus-visible { outline-color: var(--color-on-brand); }
+    :where([data-ui="unified"][data-intake="public"]) .form-sheet { max-width: 920px; }
+    :where([data-ui="unified"][data-intake="public"]) .form-header { margin-bottom: var(--space-6); }
+    :where([data-ui="unified"][data-intake="public"]) .form-logo { width: 156px; height: 80px; object-fit: contain; object-position: left center; }
+    :where([data-ui="unified"][data-intake="public"]) .form-title { font-size: clamp(2.25rem, 6vw, 3.5rem); letter-spacing: -0.045em; margin: var(--space-4) 0 var(--space-3); }
+    :where([data-ui="unified"][data-intake="public"]) .form-subtitle { font-size: var(--font-size-lg); max-width: 60ch; margin: 0 0 var(--space-4); }
+    :where([data-ui="unified"][data-intake="public"]) .form-contact { font-size: var(--font-size-sm); color: var(--ui-muted); }
+    :where([data-ui="unified"][data-intake="public"]) .form-section { padding: var(--space-6); margin-bottom: var(--space-5); border: 1px solid var(--ui-line); background: var(--ui-surface); border-radius: var(--radius-card); }
+    :where([data-ui="unified"][data-intake="public"]) .section-bar { font-size: var(--font-size-xl); margin: 0 0 var(--space-5); }
+    :where([data-ui="unified"][data-intake="public"]) .info-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-5); }
+    :where([data-ui="unified"][data-intake="public"]) .hint { font-weight: 400; font-size: var(--font-size-sm); color: var(--ui-muted); }
+    :where([data-ui="unified"][data-intake="public"]) .decoration-row { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-5); }
+    :where([data-ui="unified"][data-intake="public"]) .decoration-row + .info-grid { margin-top: var(--space-5); }
+    :where([data-ui="unified"][data-intake="public"]) .type-label { flex-basis: 100%; font-size: var(--font-size-md); font-weight: 600; margin-bottom: var(--space-1); }
+    :where([data-ui="unified"][data-intake="public"]) .upload-row { display: flex; align-items: flex-start; flex-direction: column; gap: var(--space-3); }
+    :where([data-ui="unified"][data-intake="public"]) .upload-btn { position: relative; }
+    :where([data-ui="unified"][data-intake="public"]) .upload-btn:focus-within { outline: 2px solid var(--ui-accent); outline-offset: 3px; }
+    :where([data-ui="unified"][data-intake="public"]) .intake-file-input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+    :where([data-ui="unified"][data-intake="public"]) .upload-status { font-size: var(--font-size-sm); color: var(--ui-muted); }
+    :where([data-ui="unified"][data-intake="public"]) .upload-status .ok { color: var(--ui-accent); }
+    :where([data-ui="unified"][data-intake="public"]) .public-submit-row { margin: var(--space-6) 0; }
+    :where([data-ui="unified"][data-intake="public"]) .public-submit { padding-inline: var(--space-6); min-height: 52px; }
+    :where([data-ui="unified"][data-intake="public"]) .public-privacy { font-size: var(--font-size-sm); color: var(--ui-muted); }
+    :where([data-ui="unified"][data-intake="public"]) .public-success { padding: var(--space-6); background: var(--ui-surface); border: 1px solid var(--ui-line); border-radius: var(--radius-card); }
+    :where([data-ui="unified"][data-intake="public"]) .success-icon { color: var(--ui-accent); font-size: 2rem; }
+    :where([data-ui="unified"][data-intake="public"]) .contacts-anchor { position: relative; }
+    :where([data-ui="unified"][data-intake="public"]) .contacts-dropdown { position: fixed; z-index: var(--z-overlay); max-width: calc(100vw - 24px); max-height: 280px; overflow: auto; background: var(--ui-surface); border: 1px solid var(--ui-accent); border-radius: var(--radius-sm); box-shadow: var(--shadow-md); }
+    :where([data-ui="unified"][data-intake="public"]) .contacts-row { padding: var(--space-3); border-bottom: 1px solid var(--ui-line); font-size: var(--font-size-md); cursor: pointer; }
+    :where([data-ui="unified"][data-intake="public"]) .contacts-row:is(.is-active, :hover) { background: var(--ui-tint); }
+    :where([data-ui="unified"][data-intake="public"]) :is(.contacts-row--empty, .contacts-muted, .form-lookup-status) { color: var(--ui-muted); }
 
-.public-topbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: var(--print-green);
-    color: var(--color-on-brand);
-    padding: 10px 18px;
-    font-size: 0.9rem;
-    font-weight: 600;
-}
-.public-topbar a { color: var(--color-on-brand); text-decoration: none; }
-.public-topbar a:hover { text-decoration: underline; }
+    @media (width <= 700px) {
+        :where([data-ui="unified"][data-intake="public"]) .form-section { padding: var(--space-4); }
+        :where([data-ui="unified"][data-intake="public"]) .info-grid { grid-template-columns: 1fr; }
+        :where([data-ui="unified"][data-intake="public"]) .public-submit { width: 100%; }
+    }
 
-.req { color: var(--red-700); }
-.hint { font-weight: 400; font-size: 0.72rem; color: var(--gray-500); }
-.type-label { font-size: 0.85rem; font-weight: 600; align-self: center; margin-right: 4px; }
-.info-field--full { margin-top: 4px; }
+    @media print {
+        :where([data-ui="unified"][data-intake="public"]) :is(.public-topbar, .upload-btn, .public-submit-row, .contacts-dropdown) { display: none; }
+        :where([data-ui="unified"][data-intake="public"]) .form-header { margin-bottom: var(--space-3); }
+        :where([data-ui="unified"][data-intake="public"]) .form-logo { width: 110px; height: 52px; }
+        :where([data-ui="unified"][data-intake="public"]) .form-title { font-size: 26px; margin: var(--space-2) 0; }
+        :where([data-ui="unified"][data-intake="public"]) .form-subtitle { font-size: 12px; margin-bottom: var(--space-2); }
 
-/* honeypot — visually gone, still in the DOM for bots */
-.hp-wrap { position: absolute; left: -9999px; top: -9999px; height: 1px; overflow: hidden; }
+        :where([data-ui="unified"][data-intake="public"]) .form-contact { margin-block: var(--space-2); }
+        :where([data-ui="unified"][data-intake="public"]) .form-section { padding: var(--space-3); margin-bottom: var(--space-3); }
+        :where([data-ui="unified"][data-intake="public"]) .section-bar { font-size: 15px; margin-bottom: var(--space-3); break-after: avoid; }
+        :where([data-ui="unified"][data-intake="public"]) .info-grid { gap: var(--space-2); }
 
-.upload-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        :where([data-ui="unified"][data-intake="public"]) :is(.field-label, .type-label, .hint) { font-size: 11px; }
 
-.upload-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    background: var(--color-surface);
-    border: 1.5px solid var(--print-green);
-    color: var(--brand-800);
-    border-radius: 8px;
-    padding: 8px 14px;
-    font-weight: 600;
-    font-size: 0.9rem;
-    cursor: pointer;
-}
-.upload-btn:hover { background: var(--store-green-50); }
-.upload-status { font-size: 0.8rem; color: var(--print-ink-soft); flex: 1; min-width: 220px; }
-.upload-status .ok { color: var(--print-green); }
-
-.public-submit-row { text-align: center; margin-top: 22px; }
-
-.public-submit {
-    background: var(--print-green);
-    color: var(--color-on-brand);
-    border: none;
-    border-radius: 10px;
-    padding: 14px 34px;
-    font: inherit;
-    font-size: 1.05rem;
-    font-weight: 700;
-    cursor: pointer;
-}
-.public-submit:hover { background: var(--brand-800); }
-.public-submit:disabled { opacity: 0.6; cursor: default; }
-.public-privacy { font-size: 0.75rem; color: var(--gray-500); margin-top: 8px; }
-
-.public-form-banner {
-    border-radius: 8px;
-    padding: 10px 14px;
-    font-size: 0.92rem;
-    font-weight: 500;
-    margin-bottom: 14px;
-}
-.public-form-banner.is-error { border: 2px solid var(--red-700); background: var(--red-50); color: var(--print-red); }
-.public-form-banner.is-ok { border: 2px solid var(--print-green); background: var(--store-green-50); color: var(--brand-800); }
-
-.public-success { text-align: center; padding: 30px 10px 20px; }
-.public-success .success-icon { font-size: 3rem; color: var(--print-green); }
-.public-success h2 { margin: 12px 0 6px; }
-.public-success p { color: var(--gray-700); max-width: 520px; margin: 6px auto; }
-.public-success a { color: var(--brand-800); font-weight: 600; }
-
-@media (width <= 700px) {
-    .public-submit { width: 100%; }
+        :where([data-ui="unified"][data-intake="public"]) .decoration-row + .info-grid { margin-top: var(--space-3); }
+        :where([data-ui="unified"][data-intake="public"]) :is(.field-input, .field-textarea, .choice) { font-size: 11px; min-height: 28px; padding: 4px; }
+        :where([data-ui="unified"][data-intake="public"]) .field-textarea { min-height: 64px; }
+        :where([data-ui="unified"][data-intake="public"]) .decoration-row { margin-top: var(--space-3); }
+        :where([data-ui="unified"][data-intake="public"]) .choice { break-inside: avoid; }
+        :where([data-ui="unified"][data-intake="public"]) .date-anchor .field-input { padding-right: 4px; }
+    }
 }
