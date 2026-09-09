@@ -18,7 +18,7 @@ const NO_ICON = /<i class="fa[^"]*"><\/i>/;
 describe('portal directory', () => {
     const html = strip(read('dashboards/portal-directory.html'));
     const js = read('dashboards/js/portal-directory.js');
-    const css = read('dashboards/css/portal-directory.css');
+    const css = read('shared_components/css/components.css');
     test('Rule 3 + hidden', () => {
         expect(html).not.toMatch(/style="/);
         expect(html).not.toMatch(/\son(click|error|change)=/);
@@ -26,10 +26,10 @@ describe('portal directory', () => {
         expect(js).not.toMatch(/style="/);
         expect(html).toMatch(/class="pd-header-logo" data-onerror="hide"/);
         expect(js).toMatch(/document\.addEventListener\('error', function \(e\)[\s\S]*?\}, true\);/);
-        expect(css).toMatch(/^\[hidden\] \{ display: none !important; \}/m);
+        expect(css).toMatch(/\[hidden\]\s*\{\s*display:\s*none;/);
         expect(html).not.toMatch(NO_ICON);
         expect(js).not.toMatch(NO_ICON);
-        expect(html).toMatch(/portal-directory\.css\?v=2026\.\d{2}\.\d{2}\.\d+/);
+        expect(html).toMatch(/staff-admin-tools\.css\?v=2026\.\d{2}\.\d{2}\.\d+/);
     });
     test('feeds fail loudly and the error panel retries', () => {
         expect(js).not.toMatch(/console\.error\('Mockups fetch error:', err\);\s*return \[\];/);
@@ -43,7 +43,7 @@ describe('portal directory', () => {
         expect(js).toMatch(/href="' \+ escapeAttr\(previewUrl\) \+ '" target="_blank" rel="noopener" title="Preview their portal/);
         expect(js).toMatch(/var url = SITE_ORIGIN \+ '\/portal\/' \+ customerId;/);
         expect(js).not.toMatch(/\bprompt\(/);
-        expect(js).toMatch(/class="pd-btn-open is-disabled" aria-disabled="true"/);
+        expect(js).toMatch(/class="btn btn-primary pd-btn-open is-disabled" aria-disabled="true"/);
         expect(js).toMatch(/class="pd-dot ' \+ dotClass \+ '" role="img" title="[^"]*" aria-label="Last activity /);
     });
 });

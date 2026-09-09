@@ -39,9 +39,9 @@
         var email = esc(row.Email);
         return '<tr data-email="' + email + '">' +
           '<td>' + email + '</td>' +
-          '<td><select class="aa-role-sel" aria-label="Role">' + roleSelect((row.Role || '').toLowerCase()) + '</select></td>' +
-          '<td class="aa-actions"><button type="button" class="aa-btn aa-save-role">Save</button> ' +
-          '<button type="button" class="aa-btn aa-ghost aa-del-role">Remove</button></td></tr>';
+          '<td><select class="field-select aa-role-sel" aria-label="Role">' + roleSelect((row.Role || '').toLowerCase()) + '</select></td>' +
+          '<td class="aa-actions"><button type="button" class="btn btn-primary aa-btn aa-save-role">Save</button> ' +
+          '<button type="button" class="btn btn-secondary aa-btn aa-ghost aa-del-role">Remove</button></td></tr>';
       }).join('');
     } catch (e) { body.innerHTML = '<tr><td colspan="3" class="aa-err">Failed to load: ' + esc(e.message) + '</td></tr>'; }
   }
@@ -68,11 +68,11 @@
         var page = esc(row.Page);
         return '<tr data-page="' + page + '">' +
           '<td class="aa-page">' + page + '</td>' +
-          '<td><input class="aa-roles-in" type="text" aria-label="Allowed roles" value="' + esc(row.Allowed_Roles) + '" placeholder="admin,accountant"></td>' +
-          '<td><input class="aa-emails-in" type="text" aria-label="Allowed emails" value="' + esc(row.Allowed_Emails) + '" placeholder="bradley@…"></td>' +
-          '<td><input class="aa-desc-in" type="text" aria-label="Description" value="' + esc(row.Description) + '" placeholder="note"></td>' +
-          '<td class="aa-actions"><button type="button" class="aa-btn aa-save-page">Save</button> ' +
-          '<button type="button" class="aa-btn aa-ghost aa-del-page">Remove</button></td></tr>';
+          '<td><input class="field-input aa-roles-in" type="text" aria-label="Allowed roles" value="' + esc(row.Allowed_Roles) + '" placeholder="admin,accountant"></td>' +
+          '<td><input class="field-input aa-emails-in" type="text" aria-label="Allowed emails" value="' + esc(row.Allowed_Emails) + '" placeholder="bradley@…"></td>' +
+          '<td><input class="field-input aa-desc-in" type="text" aria-label="Description" value="' + esc(row.Description) + '" placeholder="note"></td>' +
+          '<td class="aa-actions"><button type="button" class="btn btn-primary aa-btn aa-save-page">Save</button> ' +
+          '<button type="button" class="btn btn-secondary aa-btn aa-ghost aa-del-page">Remove</button></td></tr>';
       }).join('');
     } catch (e) { body.innerHTML = '<tr><td colspan="5" class="aa-err">Failed to load: ' + esc(e.message) + '</td></tr>'; }
   }
@@ -88,6 +88,22 @@
     status('Removed restriction on ' + page, 'ok'); loadPages();
   }
 
+  // Print current table values as wrapping text, including unsaved edits.
+  // Native input controls clip long permissions and print misleading placeholders.
+  function clearPrintValues() {
+    document.querySelectorAll('.aa-print-value').forEach(function (node) { node.remove(); });
+  }
+  window.addEventListener('beforeprint', function () {
+    clearPrintValues();
+    document.querySelectorAll('.aa-table input, .aa-table select').forEach(function (control) {
+      var value = document.createElement('span');
+      value.className = 'aa-print-value';
+      value.textContent = control.value || '—';
+      control.insertAdjacentElement('afterend', value);
+    });
+  });
+  window.addEventListener('afterprint', clearPrintValues);
+
   // ---------- Wire up ----------
   function init() {
     // populate the add-role dropdown
@@ -96,9 +112,9 @@
     // tabs
     Array.prototype.forEach.call(document.querySelectorAll('.aa-tab'), function (t) {
       t.addEventListener('click', function () {
-        document.querySelectorAll('.aa-tab').forEach(function (x) { x.classList.remove('is-active'); });
+        document.querySelectorAll('.aa-tab').forEach(function (x) { x.classList.remove('is-active'); x.setAttribute('aria-pressed', 'false'); });
         document.querySelectorAll('.aa-panel').forEach(function (x) { x.classList.remove('is-active'); });
-        t.classList.add('is-active');
+        t.classList.add('is-active'); t.setAttribute('aria-pressed', 'true');
         el('panel-' + t.dataset.panel).classList.add('is-active');
       });
     });

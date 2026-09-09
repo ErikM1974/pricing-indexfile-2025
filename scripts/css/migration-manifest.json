@@ -3612,6 +3612,93 @@
         "rawCssBytes": 20934,
         "localCssRequests": 2
       }
+    },
+    {
+      "source": "dashboards/access-admin.html",
+      "family": "staff-admin-tools",
+      "status": "pilot",
+      "route": "/dashboards/access-admin.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/staff-admin-tools.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "four-widths",
+        "zero-axe-loaded-and-error",
+        "keyboard-skip-and-views",
+        "mocked-permission-save-error-retry-confirmation",
+        "read-only-drive-rights",
+        "portal-feed-error-retry-and-links",
+        "complete-print-values"
+      ],
+      "test": "tests/e2e/css-unification-staff-admin.spec.js",
+      "maxCssBytes": 74968,
+      "measuredRawCssBytes": 72920,
+      "baseline": {
+        "commit": "7b8f8f3bd0ca5256f3426cf9f94be51ee61ef8a9",
+        "rawCssBytes": 19817,
+        "localCssRequests": 2
+      }
+    },
+    {
+      "source": "dashboards/drive-access.html",
+      "family": "staff-admin-tools",
+      "status": "pilot",
+      "route": "/dashboards/drive-access.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/staff-admin-tools.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "four-widths",
+        "zero-axe-loaded-and-error",
+        "keyboard-skip-and-views",
+        "mocked-permission-save-error-retry-confirmation",
+        "read-only-drive-rights",
+        "portal-feed-error-retry-and-links",
+        "complete-print-values"
+      ],
+      "test": "tests/e2e/css-unification-staff-admin.spec.js",
+      "maxCssBytes": 74968,
+      "measuredRawCssBytes": 72920,
+      "baseline": {
+        "commit": "7b8f8f3bd0ca5256f3426cf9f94be51ee61ef8a9",
+        "rawCssBytes": 27103,
+        "localCssRequests": 2
+      }
+    },
+    {
+      "source": "dashboards/portal-directory.html",
+      "family": "staff-admin-tools",
+      "status": "pilot",
+      "route": "/dashboards/portal-directory.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/staff-admin-tools.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "four-widths",
+        "zero-axe-loaded-and-error",
+        "keyboard-skip-and-views",
+        "mocked-permission-save-error-retry-confirmation",
+        "read-only-drive-rights",
+        "portal-feed-error-retry-and-links",
+        "complete-print-values"
+      ],
+      "test": "tests/e2e/css-unification-staff-admin.spec.js",
+      "maxCssBytes": 74968,
+      "measuredRawCssBytes": 72920,
+      "baseline": {
+        "commit": "7b8f8f3bd0ca5256f3426cf9f94be51ee61ef8a9",
+        "rawCssBytes": 24571,
+        "localCssRequests": 2
+      }
     }
   ],
   "billingContentSha256": "d85f8530e03a1863d1b8bb2ebe97ba332d5c9e3411887d1eb2d02dcdb14c0863",

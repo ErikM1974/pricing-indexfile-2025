@@ -4056,3 +4056,14 @@ Storefront and sample webhooks continued after a rejected Payment Confirmed writ
 with the documented narrow type exception. HTTP tests verify quotas, IPv6 grouping, API headers and signed webhook dispatch.
 **Prevention:** Run contract tests before and after each major upgrade; a dependency PR passing CI alone is insufficient.
 
+
+## 2026-09-07 — Proxy review: contact and shipping authentication
+**Problem:** Customer-directory reads/updates and shipping reads were reachable without credentials.
+**Root cause:** Browser callers went directly to the proxy; shipping sync omitted the secret.
+**Solution:** Contact lookups now use staff-authenticated same-origin relays; server reads send
+withProxySecret(). Legacy cart CRUD is staff-only (the public cart was retired).
+**Prevention:** Test anonymous and authenticated calls at both layers. Deploy the app BEFORE
+proxy gates. Public forms retain manual entry; directory autocomplete requires staff login.
+Regression coverage: tests/unit/proxy-review-relays.test.js. The payroll relay also needs its 40 MB parser BEFORE the global 5 MB parser; moving it only before the forwarder does not work.
+Validation after v2026.09.07.24: full unit 4,695 passed / 4 skipped; fixture parity 84 passed; browser E2E 15 passed / 3 opt-in screenshot skips (includes all five calculator-parity checks). Route lock updated to 456 registrations. Commit tests/fixtures/server-route-table.json with the hardening and explicitly add tests/unit/proxy-review-relays.test.js.
+

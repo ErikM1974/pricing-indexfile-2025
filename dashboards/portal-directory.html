@@ -1,40 +1,39 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
+<!DOCTYPE html><html lang="en"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
     <title>Customer Portals - Northwest Custom Apparel</title>
     <link rel="icon" href="/favicon.png" type="image/png">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link href="/dashboards/css/portal-directory.css?v=2026.09.07.19" rel="stylesheet">
+
+
     <script src="/config/app.config.js"></script>
+<link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.09.11">
+<link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.09.11">
+<link rel="stylesheet" href="/shared_components/css/staff-admin-tools.css?v=2026.09.09.11">
 </head>
-<body>
-    <main class="pd-page">
+<body data-ui="unified" data-staff-tools="portals" data-department="crm"><a class="skip-link" href="#staff-tool-main">Skip to Customer Portals</a>
+    <main class="pd-page page-main" id="staff-tool-main" tabindex="-1" aria-labelledby="staff-tool-title">
         <!-- Header -->
         <header class="pd-header">
             <div class="pd-header-left">
-                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
-                     alt="Northwest Custom Apparel" class="pd-header-logo" data-onerror="hide">
-                <h1 class="pd-header-title">Customer Portals</h1>
+                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" alt="Northwest Custom Apparel" class="pd-header-logo" data-onerror="hide">
+                <h1 class="pd-header-title" id="staff-tool-title">Customer Portals</h1>
             </div>
-            <a href="/staff-dashboard.html" class="pd-back-btn">
+            <a href="/staff-dashboard.html" class="pd-back-btn btn btn-secondary">
                 <i class="fas fa-arrow-left" aria-hidden="true"></i> Back to Dashboard
             </a>
         </header>
 
         <div class="pd-content">
             <!-- Toolbar -->
-            <div class="pd-toolbar" id="pd-toolbar" hidden>
+            <div class="pd-toolbar" id="pd-toolbar" hidden="">
                 <div class="pd-search-wrap">
                     <i class="fas fa-search pd-search-icon" aria-hidden="true"></i>
-                    <input type="text" class="pd-search" id="pd-search" aria-label="Search portals"
-                           placeholder="Search companies...">
+                    <input type="text" class="pd-search field-input" id="pd-search" aria-label="Search portals" placeholder="Search companies...">
                 </div>
-                <select class="pd-sort" id="pd-sort" aria-label="Sort portals">
+                <select class="pd-sort field-select" id="pd-sort" aria-label="Sort portals">
                     <option value="lastUpdated">Last Updated</option>
                     <option value="nameAZ">Company A-Z</option>
                     <option value="mostItems">Most Items</option>
@@ -49,18 +48,18 @@
             </div>
 
             <!-- Error -->
-            <div class="pd-error" id="pd-error" role="alert" hidden>
+            <div class="pd-error" id="pd-error" role="alert" hidden="">
                 <div class="pd-error-icon"><i class="fas fa-exclamation-triangle" aria-hidden="true"></i></div>
                 <div class="pd-error-title" id="pd-error-title">Unable to Load</div>
                 <div class="pd-error-message" id="pd-error-message">Please refresh the page or try again later.</div>
-                <button type="button" class="pd-btn-open pd-btn-retry" id="pd-retry" data-call="_pdRetry"><i class="fas fa-rotate" aria-hidden="true"></i> Retry</button>
+                <button type="button" class="pd-btn-open pd-btn-retry btn btn-primary" id="pd-retry" data-call="_pdRetry"><i class="fas fa-rotate" aria-hidden="true"></i> Retry</button>
             </div>
 
             <!-- Card Grid -->
-            <div class="pd-grid" id="pd-grid" hidden></div>
+            <div class="pd-grid" id="pd-grid" hidden=""></div>
 
             <!-- Empty State -->
-            <div class="pd-empty" id="pd-empty" role="status" hidden>
+            <div class="pd-empty" id="pd-empty" role="status" hidden="">
                 <div class="pd-empty-icon"><i class="fas fa-globe" aria-hidden="true"></i></div>
                 <div class="pd-empty-text">No customer portals yet. Portals are created when mockups or art requests are submitted.</div>
             </div>
@@ -71,12 +70,13 @@
 
         <!-- Footer -->
         <div class="pd-footer">
-            Northwest Custom Apparel &middot; (253) 922-5793
+            Northwest Custom Apparel · (253) 922-5793
         </div>
     </main>
 
     <script src="/shared_components/js/app-config.js?v=2026.09.06.26"></script>
     <script src="/shared_components/js/data-call-delegator.js?v=2026.09.06.27"></script>
-    <script src="/dashboards/js/portal-directory.js?v=2026.09.07.25"></script>
-</body>
-</html>
+    <script src="/dashboards/js/portal-directory.js?v=2026.09.09.11"></script>
+
+
+</body></html>

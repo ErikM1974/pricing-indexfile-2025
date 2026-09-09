@@ -80,15 +80,9 @@ module", suspect the install, not the change — `npm ci` before debugging anyth
 
 Module moves change scope and relative paths; verify dependency bindings, route order and a real HTTP boot. Full resolved incident and prevention details are in LESSONS_LEARNED_ARCHIVE.md.
 
-## 2026-09-07 — Proxy review: contact and shipping authentication
-**Problem:** Customer-directory reads/updates and shipping reads were reachable without credentials.
-**Root cause:** Browser callers went directly to the proxy; shipping sync omitted the secret.
-**Solution:** Contact lookups now use staff-authenticated same-origin relays; server reads send
-withProxySecret(). Legacy cart CRUD is staff-only (the public cart was retired).
-**Prevention:** Test anonymous and authenticated calls at both layers. Deploy the app BEFORE
-proxy gates. Public forms retain manual entry; directory autocomplete requires staff login.
-Regression coverage: tests/unit/proxy-review-relays.test.js. The payroll relay also needs its 40 MB parser BEFORE the global 5 MB parser; moving it only before the forwarder does not work.
-Validation after v2026.09.07.24: full unit 4,695 passed / 4 skipped; fixture parity 84 passed; browser E2E 15 passed / 3 opt-in screenshot skips (includes all five calculator-parity checks). Route lock updated to 456 registrations. Commit tests/fixtures/server-route-table.json with the hardening and explicitly add tests/unit/proxy-review-relays.test.js.
+## Proxy review authentication (2026-09-07, archived)
+
+Keep caller migrations before proxy gates and authenticate before special parsers. Full resolved incident and regression details are in LESSONS_LEARNED_ARCHIVE.md.
 
 ## 2026-09-08 — CI was red for nine hours and nobody noticed, because every local gate was green
 
@@ -107,6 +101,8 @@ skip never means untested).
 **Prevention.** 🔑 A test that reads outside the repository or needs a secret must guard for its absence and SAY
 it skipped. 🔑 `gh run list -L 5` belongs in the deploy pre-flight: local green is not CI green. 🔑 To switch the
 live-engine specs back on in CI, add `CRM_API_SECRET` under Settings → Secrets → Actions.
+
+CI setup follow-up (2026-09-09): a Google Chrome apt index checksum mismatch blocked Playwright before tests on two runners. CI uses bundled Chromium; disable only the unrelated Google Chrome source on the disposable runner and keep Ubuntu repositories/checksum verification intact. Require the actual browser steps to pass on the new exact commit.
 
 ## 2026-09-08 — Node runtime and dependency audit must match CI
 
@@ -149,7 +145,7 @@ Keep version choices tied to measured checks and compare screenshots only after 
 ## Shared workflow state must match its visibility owner (2026-09-08)
 - Problem/root cause: migrating hidden state left paste guards on inline display; queues showed success before awaiting refresh, and failed file links left a success icon.
 - Solution: keep visibility checks aligned with the migrated owner, centralize custom-dialog focus/scroll state, preserve keyboard focus when filters or expansion buttons are replaced, and update success indicators only after the operation settles.
-- Prevention: exercise populated, failed, retry and cancelled states with mocked writes; check old consumers when a shared helper opts into new presentation. Queue-age labels need semantic warning ink: amber-600 on white failed contrast only when a fixture crossed24 hours. Fix the CSS and lock fresh/warning/critical ages under a fixed date, retaining axe checks. A browser clock must be explicitly paused for exact polling-count tests; installation alone lets startup/network latency advance timers.
+- Prevention: exercise populated, failed, retry and cancelled states with mocked writes; check old consumers when a shared helper opts into new presentation. Queue-age labels need semantic warning ink: amber-600 on white failed contrast only when a fixture crossed24 hours. Fix the CSS and lock fresh/warning/critical ages under a fixed date, retaining axe checks. A browser clock must be explicitly paused for exact polling-count tests; installation alone lets startup/network latency advance timers. Also wait for the application to register its next timer after an asynchronous response; an intercepted request count is not a timer-ready signal. Deliberately delayed fixtures and a no-more-polls assertion protect this boundary.
 
 ## A visible quantity grid does not prove pricing is ready (2026-09-08)
 - Problem/root cause: DTG rendered sizes before its bundle request completed; Save accepted zero/partial prices, and an older request could overwrite edits. A six-second browser delay hid the readiness gap.
@@ -250,3 +246,9 @@ Problem: the quote request inherited line-oriented paper styling that pushed the
 ## A reviewed page wrapper is not a reviewed external app (2026-09-09)
 
 Problem: the CSS census omitted Jotform scripts and its external-owner backlog named only three Caspio pages. Root cause: provider recognition did not match the currently loaded embeds. Solution: recognize Jotform and explicitly retain vendor-owned UI as pending even after its surrounding page is reviewed. Prevention: lock live embed IDs/URLs, test wrapper boundaries with login/table/empty/failure fixtures and block all real provider writes; do not describe synthetic fixture coverage as validation of a vendor app. Check DESIGN_COLOUR_CODE before mapping an inherited palette: announcement admin tools are neutral; legacy maroon does not make them AE-owned.
+
+## Transient notifications need deterministic contrast checks (2026-09-09)
+
+Problem/root cause: a DTG service outage exposed white text on an amber toast (3.18 contrast); the notification was absent on healthy runs. Solution: use existing dark warning/success tokens and render all four real toast types in the accessibility check. Prevention: wait for their final painted state, test transient failures deliberately, and inspect each builder’s actual style owner. The other three builders have a separate warning foreground; pricing and notification behavior remain unchanged.
+
+DTG test follow-up: initial product hydration can replace a number input between automated focus and text insertion. Set the value and dispatch its actual input event atomically using the shared test helper, then assert the row quantity before waiting for pricing. Keep real pricing reads and mocked writes; never relax the positive-money guard.
