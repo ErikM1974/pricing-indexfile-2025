@@ -595,6 +595,7 @@
     }
 
     function fitView() {
+        state.autoFit = true;
         var s = resizeStage();
         // A stage that measures 0 (page opened in a hidden/zero-size container)
         // would fit to the clamp minimum and never recover — the design reads as
@@ -1063,8 +1064,7 @@
     function copyTextFallback(text) {
         var ta = document.createElement('textarea');
         ta.value = text;
-        ta.style.position = 'fixed';
-        ta.style.opacity = '0';
+        ta.className = 'dst-clipboard-buffer';
         document.body.appendChild(ta);
         ta.select();
         var ok = false;
@@ -1357,10 +1357,15 @@
         renderPickerFamilies();
         renderPickerGrid();
         $('pickerOverlay').classList.add('visible');
-        setTimeout(function () { $('pickerSearch').focus(); }, 40);
+        window.UiDialog.open('pickerOverlay', { focus: '#pickerSearch', onDismiss: closePicker });
     }
 
-    function closePicker() { $('pickerOverlay').classList.remove('visible'); }
+    function closePicker() {
+        $('pickerOverlay').classList.remove('visible');
+        window.UiDialog.close('pickerOverlay');
+        var trigger = document.querySelectorAll('.thread-swatch')[pickerCtx.runIndex];
+        if (trigger) trigger.focus({ preventScroll: true });
+    }
 
     function renderPickerFamilies() {
         var bar = $('pickerFamilies');
@@ -1415,6 +1420,7 @@
         bitmap.dirty = bitmap.mode !== mode;
         document.querySelectorAll('.rail-btn[data-mode]').forEach(function (b) {
             b.classList.toggle('active', b.dataset.mode === mode);
+            b.setAttribute('aria-pressed', String(b.dataset.mode === mode));
         });
         var tc = $('traceControls');
         if (mode === 'trace') {
@@ -1438,6 +1444,7 @@
             setPanel('mockup');
         }
         $('btnMockupMode').classList.toggle('active', state.mockup);
+        $('btnMockupMode').setAttribute('aria-pressed', String(state.mockup));
         document.body.classList.toggle('mockup-on', state.mockup);
         draw();
     }
@@ -1445,6 +1452,7 @@
     function setPanel(name) {
         document.querySelectorAll('.side-tab').forEach(function (t) {
             t.classList.toggle('active', t.dataset.panel === name);
+            t.setAttribute('aria-pressed', String(t.dataset.panel === name));
         });
         document.querySelectorAll('.side-panel').forEach(function (p) {
             p.classList.toggle('active', p.id === 'panel' + name.charAt(0).toUpperCase() + name.slice(1));
@@ -1452,6 +1460,7 @@
     }
 
     function zoomAt(factor, cx, cy) {
+        state.autoFit = false;
         var before = screenToMM(cx, cy);
         state.view.scale = Math.max(0.25, Math.min(80, state.view.scale * factor));
         var after = mmToScreen(before.x, before.y);
@@ -1471,6 +1480,10 @@
     /* ─── event wiring ──────────────────────────────────────────────── */
 
     function wire() {
+        // Disabled export controls remain unavailable to keyboard users until a file is ready.
+        function syncFileControls() { document.querySelectorAll('.needs-file').forEach(function (button) { button.disabled = !state.data; }); }
+        new MutationObserver(syncFileControls).observe(document.body, { attributes: true, attributeFilter: ['class'] });
+        syncFileControls();
         // uploads
         $('btnBrowse').addEventListener('click', function () { fileInput.click(); });
         $('fileChip').addEventListener('click', function () { if (state.data) fileInput.click(); });
@@ -1502,6 +1515,7 @@
         $('btnGrid').addEventListener('click', function () {
             state.overlays.grid = !state.overlays.grid;
             $('btnGrid').classList.toggle('active', state.overlays.grid);
+            $('btnGrid').setAttribute('aria-pressed', String(state.overlays.grid));
             draw();
         });
         $('btnDensity').addEventListener('click', function () { toggleDensity(); });
@@ -1517,6 +1531,7 @@
             if (!state.data) return;
             var c = { x: stage.clientWidth / 2, y: stage.clientHeight / 2 };
             var mm = screenToMM(c.x, c.y);
+            state.autoFit = false;
             state.view.scale = CSS_PX_PER_MM;
             var after = mmToScreen(mm.x, mm.y);
             state.view.tx += c.x - after.x;
@@ -1562,6 +1577,7 @@
                 return;
             }
             if (drag) {
+                state.autoFit = false;
                 state.view.tx = drag.tx + (x - drag.x);
                 state.view.ty = drag.ty + (y - drag.y);
                 draw();
@@ -1706,11 +1722,13 @@
             }
         });
 
-        window.addEventListener('resize', function () {
-            if (!state.data) return;
-            if (state.fitDeferred) { fitView(); }
+        function refreshStageLayout() {
+            if (!state.data || stageWrap.clientWidth < 2 || stageWrap.clientHeight < 2) return;
+            if (state.fitDeferred || state.autoFit) fitView();
             draw();
-        });
+        }
+        window.addEventListener('resize', refreshStageLayout);
+        if (window.ResizeObserver) new ResizeObserver(refreshStageLayout).observe(stageWrap);
 
         // print: rebuild is done in printSheet(); ctrl+P works too if a design is loaded
         window.addEventListener('beforeprint', function () {
@@ -1722,6 +1740,7 @@
         if (!state.data) return;
         state.overlays.density = !state.overlays.density;
         $('btnDensity').classList.toggle('active', state.overlays.density);
+        $('btnDensity').setAttribute('aria-pressed', String(state.overlays.density));
         $('btnToggleDensity').classList.toggle('on', state.overlays.density);
         if (state.mockup) toggleMockup(false); else draw();
     }

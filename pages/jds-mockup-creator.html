@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
+<html lang="en"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="/favicon.png" type="image/png">
@@ -8,26 +7,26 @@
     <meta name="description" content="Create quick customer-approval laser-engrave mockups on JDS Polar Camel tumblers — pick a color, drop a logo, download a branded mockup.">
     <title>JDS Tumbler Mockup Creator | NWCA Internal</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Public+Sans:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap">
     <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/pages/css/jds-mockup-creator.css?v=2026.09.07.19">
+    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.09.16"><link rel="stylesheet" href="/shared_components/css/design-preview-tools.css?v=2026.09.09.16">
     <script src="/config/app.config.js"></script>
 </head>
-<body>
+<body data-ui="unified" data-preview-tool="tumbler" class="dash-shell"><a class="skip-link" href="#preview-main">Skip to mockup controls</a>
 
-<header class="jmc-header">
+<header class="jmc-header dash-header">
     <div class="jmc-header-inner">
-        <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" alt="Northwest Custom Apparel" class="jmc-logo">
+        <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" alt="Northwest Custom Apparel" class="jmc-logo dash-logo">
         <div class="jmc-header-text">
             <h1>JDS Tumbler Mockup Creator</h1>
             <p>Quick customer-approval mockups — pick a color, drop a logo, download.</p>
         </div>
-        <a href="/dashboards/ae-dashboard.html" class="jmc-back">← Back to AE Dashboard</a>
+        <a href="/dashboards/ae-dashboard.html" class="jmc-back btn btn-secondary">← Back to AE Dashboard</a>
     </div>
 </header>
 
-<main class="jmc-main">
+<main class="jmc-main" id="preview-main" tabindex="-1">
 
     <!-- LEFT COLUMN: Controls -->
     <aside class="jmc-controls">
@@ -54,8 +53,7 @@
                 <span class="jmc-step-num" id="jmc-step2-num">2</span>
                 <h2>Upload your logo</h2>
             </div>
-            <div class="jmc-drop-zone" id="jmc-drop-zone" role="button" tabindex="0"
-                 aria-label="Upload a logo: drop a file here or press Enter to browse">
+            <div class="jmc-drop-zone" id="jmc-drop-zone" role="button" tabindex="0" aria-label="Upload a logo: drop a file here or press Enter to browse">
                 <svg class="jmc-drop-icon" viewBox="0 0 36 32" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
                     <rect x="2" y="6" width="20" height="24" rx="2" fill="#e5e7eb"></rect>
                     <rect x="8" y="4" width="20" height="24" rx="2" fill="#f3f4f6"></rect>
@@ -64,11 +62,11 @@
                 <div class="jmc-drop-cta">Drop logo here</div>
                 <div class="jmc-drop-sub">or click to browse — PNG, JPG, SVG</div>
             </div>
-            <input type="file" id="jmc-file-input" aria-label="Artwork file" accept="image/png,image/jpeg,image/svg+xml,.svg" class="jmc-hidden">
+            <label for="jmc-file-input" class="jmc-file-label">Artwork file</label><input type="file" id="jmc-file-input" aria-label="Artwork file" accept="image/png,image/jpeg,image/svg+xml,.svg" class="jmc-native-file">
             <div class="jmc-logo-info jmc-hidden" id="jmc-logo-info">
                 <span class="jmc-logo-thumb" id="jmc-logo-thumb" aria-hidden="true"></span>
                 <span class="jmc-logo-name" id="jmc-logo-name"></span>
-                <button type="button" class="jmc-logo-remove" id="jmc-logo-remove" title="Remove logo" aria-label="Remove logo">×</button>
+                <button type="button" class="jmc-logo-remove btn btn-secondary" id="jmc-logo-remove" title="Remove logo" aria-label="Remove logo">×</button>
             </div>
             <div class="jmc-logo-tip jmc-hidden" id="jmc-logo-tip">
                 <strong>Best results:</strong> single-color <strong>black-on-white</strong> or <strong>black-on-transparent</strong> (SVG, PNG, JPG).<br>
@@ -79,12 +77,12 @@
         <!-- Complexity warning panel — shown when detectLogoIssues() finds the
              uploaded file is likely to render poorly (multi-color, white-on-
              white, or photo-like). Hidden by default; revealed by JS. -->
-        <section class="jmc-warning jmc-hidden" id="jmc-logo-warning">
+        <section class="jmc-warning jmc-hidden" id="jmc-logo-warning" role="alert">
             <div class="jmc-warning-title" id="jmc-logo-warning-title">⚠ Warning</div>
             <div class="jmc-warning-body" id="jmc-logo-warning-body"></div>
             <div class="jmc-warning-actions">
-                <button type="button" class="jmc-warning-btn jmc-warning-btn--secondary" id="jmc-logo-warning-reupload">Upload different logo</button>
-                <button type="button" class="jmc-warning-btn jmc-warning-btn--primary" id="jmc-logo-warning-continue">Continue anyway →</button>
+                <button type="button" class="jmc-warning-btn jmc-warning-btn--secondary btn btn-secondary" id="jmc-logo-warning-reupload">Upload different logo</button>
+                <button type="button" class="jmc-warning-btn jmc-warning-btn--primary btn btn-primary" id="jmc-logo-warning-continue">Continue anyway →</button>
             </div>
         </section>
 
@@ -98,11 +96,11 @@
                 <label class="jmc-size-label" for="jmc-size-slider">
                     Logo size: <span id="jmc-size-pct">70</span>%
                 </label>
-                <button type="button" class="jmc-mini-btn" id="jmc-fit-btn" title="Reset to a size that fits the imprint area">Auto-fit</button>
+                <button type="button" class="jmc-mini-btn btn btn-secondary" id="jmc-fit-btn" title="Reset to a size that fits the imprint area">Auto-fit</button>
             </div>
             <input type="range" id="jmc-size-slider" min="30" max="110" value="70" step="2" class="jmc-size-slider" aria-label="Logo size percent">
             <div class="jmc-position-row">
-                <button type="button" class="jmc-mini-btn" id="jmc-center-btn" title="Re-center the logo">⤢ Center logo</button>
+                <button type="button" class="jmc-mini-btn btn btn-secondary" id="jmc-center-btn" title="Re-center the logo">⤢ Center logo</button>
                 <label class="jmc-check">
                     <input type="checkbox" id="jmc-guide-toggle">
                     <span>Show imprint area</span>
@@ -118,15 +116,15 @@
                 <h2>Download &amp; share</h2>
             </div>
             <label class="jmc-check jmc-check--block">
-                <input type="checkbox" id="jmc-frame-toggle" checked>
+                <input type="checkbox" id="jmc-frame-toggle" checked="">
                 <span><strong>Add branded frame</strong> — NWCA logo, product name &amp; approval note</span>
             </label>
             <div class="jmc-action-row">
-                <button type="button" class="jmc-download-btn" id="jmc-download-btn">
+                <button type="button" class="jmc-download-btn btn btn-primary" id="jmc-download-btn">
                     <span class="jmc-btn-icon" aria-hidden="true">⬇</span>
                     <span>Download PNG</span>
                 </button>
-                <button type="button" class="jmc-copy-btn" id="jmc-copy-btn" title="Copy the mockup image to your clipboard">
+                <button type="button" class="jmc-copy-btn btn btn-secondary" id="jmc-copy-btn" title="Copy the mockup image to your clipboard">
                     <span class="jmc-btn-icon" aria-hidden="true">⧉</span>
                     <span>Copy</span>
                 </button>
@@ -142,7 +140,7 @@
             </div>
             <p class="jmc-compare-intro">Pick a few colors to show the customer your logo on each — downloads as one side-by-side sheet.</p>
             <div class="jmc-compare-grid" id="jmc-compare-grid"></div>
-            <button type="button" class="jmc-compare-btn" id="jmc-compare-btn" disabled>
+            <button type="button" class="jmc-compare-btn btn btn-primary" id="jmc-compare-btn" disabled="">
                 <span class="jmc-btn-icon" aria-hidden="true">▦</span>
                 <span id="jmc-compare-btn-label">Download comparison</span>
             </button>
@@ -154,25 +152,24 @@
     <section class="jmc-preview">
         <div class="jmc-preview-toolbar jmc-hidden" id="jmc-preview-toolbar">
             <div class="jmc-segmented" role="group" aria-label="Preview mode">
-                <button type="button" class="jmc-seg-btn jmc-seg-btn--active" id="jmc-mode-edit" aria-pressed="true">Edit</button>
-                <button type="button" class="jmc-seg-btn" id="jmc-mode-frame" aria-pressed="false">Preview frame</button>
+                <button type="button" class="jmc-seg-btn jmc-seg-btn--active btn btn-secondary" id="jmc-mode-edit" aria-pressed="true">Edit</button>
+                <button type="button" class="jmc-seg-btn btn btn-secondary" id="jmc-mode-frame" aria-pressed="false">Preview frame</button>
             </div>
         </div>
         <div class="jmc-preview-frame">
             <div class="jmc-preview-empty" id="jmc-preview-empty">
                 <svg class="jmc-empty-icon" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                    <rect x="18" y="8" width="28" height="48" rx="4"/>
-                    <rect x="18" y="14" width="28" height="36"/>
+                    <rect x="18" y="8" width="28" height="48" rx="4"></rect>
+                    <rect x="18" y="14" width="28" height="36"></rect>
                 </svg>
                 <div>Pick a tumbler color to start.</div>
             </div>
-            <canvas id="jmc-canvas" class="jmc-canvas jmc-hidden" tabindex="0" role="img"
-                    aria-label="Tumbler mockup preview. Drag or use arrow keys to position the logo."></canvas>
-            <div class="jmc-preview-loading jmc-hidden" id="jmc-preview-loading">
+            <canvas id="jmc-canvas" class="jmc-canvas jmc-hidden" tabindex="0" role="img" aria-label="Tumbler mockup preview. Drag or use arrow keys to position the logo."></canvas>
+            <div class="jmc-preview-loading jmc-hidden" id="jmc-preview-loading" role="status">
                 <div class="jmc-spinner"></div>
                 <div>Loading tumbler image…</div>
             </div>
-            <div class="jmc-preview-error jmc-hidden" id="jmc-preview-error"></div>
+            <div class="jmc-preview-error jmc-hidden" id="jmc-preview-error" role="alert"></div>
         </div>
         <div class="jmc-preview-caption jmc-hidden" id="jmc-preview-caption">
             Live preview. Drag the logo to reposition.
@@ -185,7 +182,8 @@
 <div class="jmc-toast" id="jmc-toast" role="status" aria-live="polite"></div>
 
 <script src="/shared_components/js/jds-tumbler-template.js?v=20260529a"></script>
-<script src="/pages/js/jds-mockup-creator.js?v=2026.09.06.31"></script>
+<script src="/pages/js/jds-mockup-creator.js?v=2026.09.09.16"></script>
 
-</body>
-</html>
+
+
+</body></html>

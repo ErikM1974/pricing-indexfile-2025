@@ -17,6 +17,15 @@
     document.addEventListener('DOMContentLoaded', init);
 
     function init() {
+        document.getElementById('dv-loading').hidden = false;
+        document.getElementById('dv-error').hidden = true;
+        document.getElementById('dv-content').hidden = true;
+        document.getElementById('dv-image-status').hidden = true;
+        document.getElementById('dv-no-images').hidden = true;
+        document.getElementById('dv-hero').hidden = false;
+        document.getElementById('dv-image-grid').hidden = false;
+        document.getElementById('dv-hero-img').hidden = false;
+        document.getElementById('dv-hero-btn').disabled = false;
         if (!API_BASE) {
             showError('Configuration failed to load', 'Please refresh the page. If this keeps happening, contact us.');
             return;
@@ -41,7 +50,8 @@
             if (!resp.ok) throw new Error('HTTP ' + resp.status);
             var data = await resp.json();
 
-            if (!data.success || !data.designs || !data.designs[designNumber]) {
+            if (!data || data.success !== true || !data.designs || typeof data.designs !== 'object' || Array.isArray(data.designs)) throw new Error('Incomplete design response');
+            if (!data.designs[designNumber]) {
                 showError('Design Not Found', 'Design #' + escapeHtml(designNumber) + ' was not found in our system.');
                 return;
             }
@@ -167,7 +177,12 @@
 
     window.setHero = function (url, thumbEl) {
         var heroImg = document.getElementById('dv-hero-img');
-        if (heroImg) heroImg.src = url;
+        if (heroImg) {
+            document.getElementById('dv-image-status').hidden = true;
+            heroImg.hidden = false;
+            document.getElementById('dv-hero-btn').disabled = false;
+            heroImg.src = url;
+        }
 
         // Update active state on grid items
         var grid = document.getElementById('dv-image-grid');
@@ -185,11 +200,13 @@
         var overlay = document.getElementById('dv-lightbox');
         var img = document.getElementById('dv-lightbox-img');
         lightboxReturnFocus = document.activeElement;
+        img.hidden = false;
+        document.getElementById('dv-lightbox-error').hidden = true;
         img.src = src;
-        overlay.hidden = false;
+        window.UiDialog.open(overlay, { focus: '#dv-lightbox-close', onDismiss: window.closeLightbox });
         void overlay.offsetWidth; // commit display before the opacity transition starts
         overlay.classList.add('active');
-        document.body.classList.add('dv-modal-open');
+        // UiDialog owns scroll lock and background inertness.
         setTimeout(function () { var c = document.getElementById('dv-lightbox-close'); if (c) c.focus(); }, 30);
     };
 
@@ -199,13 +216,13 @@
         var overlay = document.getElementById('dv-lightbox');
         if (!overlay || !overlay.classList.contains('active')) return;
         overlay.classList.remove('active');
-        setTimeout(function () { if (!overlay.classList.contains('active')) overlay.hidden = true; }, 260);
-        document.body.classList.remove('dv-modal-open');
+        window.UiDialog.close(overlay);
         if (lightboxReturnFocus && document.body.contains(lightboxReturnFocus)) { try { lightboxReturnFocus.focus(); } catch (err) { /* gone */ } }
         lightboxReturnFocus = null;
     };
 
     // Wiring that used to be inline handlers (Rule 3)
+    document.getElementById('dv-retry').addEventListener('click', init);
     var heroBtn = document.getElementById('dv-hero-btn');
     if (heroBtn) heroBtn.addEventListener('click', function () { window.openLightbox(document.getElementById('dv-hero-img').src); });
     var lb = document.getElementById('dv-lightbox');
@@ -220,6 +237,18 @@
     document.addEventListener('error', function (e) {
         var img = e.target;
         if (!img || img.tagName !== 'IMG' || !img.dataset) return;
+        if (img.id === 'dv-hero-img') {
+            img.hidden = true;
+            document.getElementById('dv-hero-btn').disabled = true;
+            var status = document.getElementById('dv-image-status');
+            status.textContent = 'This preview image could not load. Choose another image or contact us using the details below.';
+            status.hidden = false;
+        } else if (img.id === 'dv-lightbox-img' && !document.getElementById('dv-lightbox').hidden) {
+            img.hidden = true;
+            var failure = document.getElementById('dv-lightbox-error');
+            failure.textContent = 'This preview image could not load. Close the preview and try another image.';
+            failure.hidden = false;
+        }
         if (img.dataset.onerror === 'hide') img.hidden = true;
         else if (img.dataset.onerror === 'hide-parent' && img.parentElement) img.parentElement.hidden = true;
     }, true);

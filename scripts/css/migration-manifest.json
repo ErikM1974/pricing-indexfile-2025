@@ -4028,6 +4028,90 @@
         "rawCssBytes": 61697,
         "localCssRequests": 2
       }
+    },
+    {
+      "source": "pages/design-view.html",
+      "family": "preview-tools",
+      "status": "pilot",
+      "route": "/design/40121",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/design-preview-tools.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "four-widths-and-keyboard",
+        "native-file-input-and-visible-load-errors",
+        "public-design-private-field-boundary",
+        "latest-selected-tumbler-image-and-retry",
+        "thread-color-dialog-and-production-controls",
+        "original-png-export-bytes-and-complete-approval-text"
+      ],
+      "test": "tests/e2e/css-unification-preview-tools.spec.js",
+      "maxCssBytes": 73078,
+      "measuredRawCssBytes": 72054,
+      "baseline": {
+        "commit": "09faa19b656c10c7e8331aee477c3ebea080711f",
+        "rawCssBytes": 25016,
+        "localCssRequests": 2
+      }
+    },
+    {
+      "source": "pages/dst-viewer.html",
+      "family": "preview-tools",
+      "status": "pilot",
+      "route": "/pages/dst-viewer.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/embroidery-studio.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "four-widths-and-keyboard",
+        "native-file-input-and-visible-load-errors",
+        "public-design-private-field-boundary",
+        "latest-selected-tumbler-image-and-retry",
+        "thread-color-dialog-and-production-controls",
+        "original-png-export-bytes-and-complete-approval-text"
+      ],
+      "test": "tests/e2e/css-unification-preview-tools.spec.js",
+      "maxCssBytes": 103995,
+      "measuredRawCssBytes": 102971,
+      "baseline": {
+        "commit": "09faa19b656c10c7e8331aee477c3ebea080711f",
+        "rawCssBytes": 47479,
+        "localCssRequests": 2
+      }
+    },
+    {
+      "source": "pages/jds-mockup-creator.html",
+      "family": "preview-tools",
+      "status": "pilot",
+      "route": "/pages/jds-mockup-creator.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/design-preview-tools.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "four-widths-and-keyboard",
+        "native-file-input-and-visible-load-errors",
+        "public-design-private-field-boundary",
+        "latest-selected-tumbler-image-and-retry",
+        "thread-color-dialog-and-production-controls",
+        "original-png-export-bytes-and-complete-approval-text"
+      ],
+      "test": "tests/e2e/css-unification-preview-tools.spec.js",
+      "maxCssBytes": 73078,
+      "measuredRawCssBytes": 72054,
+      "baseline": {
+        "commit": "09faa19b656c10c7e8331aee477c3ebea080711f",
+        "rawCssBytes": 38748,
+        "localCssRequests": 2
+      }
     }
   ],
   "billingContentSha256": "d85f8530e03a1863d1b8bb2ebe97ba332d5c9e3411887d1eb2d02dcdb14c0863",

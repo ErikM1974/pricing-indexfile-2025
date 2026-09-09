@@ -1,43 +1,33 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
+<html lang="en"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
     <title>Design Preview - Northwest Custom Apparel</title>
     <link rel="icon" href="/favicon.png" type="image/png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/pages/css/design-view.css?v=2026.09.07.14">
-</head>
-<body>
+
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap"><link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.09.16"><link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.09.16"><link rel="stylesheet" href="/shared_components/css/design-preview-tools.css?v=2026.09.09.16"></head>
+<body data-ui="unified" data-preview-tool="gallery" data-surface="storefront"><a class="skip-link" href="#preview-main">Skip to design preview</a>
     <!-- Header -->
-    <header class="dv-header">
+    <div class="dash-shell"><header class="dv-header dash-header">
         <div class="dv-header-inner">
-            <img src="/images/nwca-logo.png" alt="Northwest Custom Apparel" class="dv-logo" data-onerror="hide">
+            <img src="/images/nwca-logo.png" alt="Northwest Custom Apparel" class="dv-logo dash-header-logo" data-onerror="hide">
             <div class="dv-header-text">
                 <h1>Northwest Custom Apparel</h1>
                 <span>Design Preview</span>
             </div>
         </div>
-    </header>
-
-    <!-- Loading State -->
-    <div class="dv-loading" id="dv-loading" role="status">
+    </header><main id="preview-main" tabindex="-1" class="dash-content"><div class="dv-loading" id="dv-loading" role="status">
         <div class="dv-spinner"></div>
         <p>Loading design...</p>
-    </div>
-
-    <!-- Error State -->
-    <div class="dv-error" id="dv-error" role="alert" hidden>
+    </div><div class="dv-error" id="dv-error" role="alert" hidden="">
         <i class="fas fa-exclamation-circle" aria-hidden="true"></i>
         <h2 id="dv-error-title">Design Not Found</h2>
         <p id="dv-error-msg">The design you're looking for doesn't exist or may have been removed.</p>
         <p class="dv-contact">Questions? Call us at <a href="tel:2539225793">253-922-5793</a></p>
-    </div>
-
-    <!-- Design Content -->
-    <main class="dv-content" id="dv-content" hidden>
+    <button id="dv-retry" type="button" class="btn btn-primary">Try again</button></div><section class="dv-content" id="dv-content" hidden="">
         <!-- Design Info -->
         <div class="dv-info">
             <h2 class="dv-design-number" id="dv-design-number"></h2>
@@ -48,34 +38,45 @@
         <!-- Hero Image -->
         <div class="dv-hero" id="dv-hero">
             <button type="button" class="dv-hero-btn" id="dv-hero-btn" aria-label="View the design full size"><img id="dv-hero-img" src="" alt="Design preview"></button>
-        </div>
+        </div><p id="dv-image-status" class="dv-image-status" role="alert" hidden=""></p>
 
         <!-- Image Grid -->
         <div class="dv-image-grid" id="dv-image-grid"></div>
 
         <!-- No Images Fallback -->
-        <div class="dv-no-images" id="dv-no-images" hidden>
+        <div class="dv-no-images" id="dv-no-images" hidden="">
             <i class="fas fa-image" aria-hidden="true"></i>
             <p>No preview images available for this design.</p>
             <p class="dv-contact">Contact us for more information: <a href="tel:2539225793">253-922-5793</a></p>
         </div>
-    </main>
-
-    <!-- Footer -->
-    <footer class="dv-footer">
+    </section></main><footer class="dv-footer">
         <div class="dv-footer-inner">
             <p><strong>Northwest Custom Apparel</strong></p>
-            <p>253-922-5793 &bull; <a href="https://www.nwcustomapparel.com">nwcustomapparel.com</a></p>
+            <p>253-922-5793 • <a href="https://www.nwcustomapparel.com">nwcustomapparel.com</a></p>
         </div>
-    </footer>
+    </footer></div>
+
+    <!-- Loading State -->
+
+
+    <!-- Error State -->
+
+
+    <!-- Design Content -->
+
+
+    <!-- Footer -->
+
 
     <!-- Lightbox Overlay -->
-    <div class="dv-lightbox" id="dv-lightbox" role="dialog" aria-modal="true" aria-label="Design preview, full size" hidden>
-        <button type="button" class="dv-lightbox-close" id="dv-lightbox-close" aria-label="Close"><i class="fas fa-times" aria-hidden="true"></i></button>
+    <div class="dv-lightbox" id="dv-lightbox" role="dialog" aria-modal="true" aria-label="Design preview, full size" hidden="">
+        <button type="button" class="dv-lightbox-close btn btn-secondary" id="dv-lightbox-close" aria-label="Close"><i class="fas fa-times" aria-hidden="true"></i></button>
         <img id="dv-lightbox-img" src="" alt="Full size preview">
-    </div>
+    <p id="dv-lightbox-error" class="dv-image-status" role="alert" hidden=""></p></div>
 
     <script src="/config/app.config.js"></script>
-    <script src="/pages/js/design-view.js?v=2026.09.05.77"></script>
-</body>
-</html>
+    <script src="/shared_components/js/ui-dialog.js?v=2026.09.09.16"></script><script src="/pages/js/design-view.js?v=2026.09.09.16"></script>
+
+
+
+</body></html>
