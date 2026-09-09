@@ -831,3 +831,15 @@ Current isolated source keeps163 snapshot rows and original operations, adds nat
 Staff monitoring: API Usage,Table Usage Audit and Bandit Integration share tokens/components/Public Sans and shared_components/css/staff-monitoring.css. Their three local sheets are retired. Native keyboard sorting/filtering, named scrolling tables and current-value print mirrors preserve the original163-table evidence and full reference prose. Usage failures stay unknown; malformed/incomplete live schema cannot label tables gone. Local storage failures stay visible with export available, and successful recovery clears the related error.17 mocked browser cases cover all four widths/zero axe, numeric/source states, retry, saved notes and CSV export. Three reference PDFs/nine pages retain213 checked text/value nodes, all visually inspected. Print uses normal block flow so a flex fragment cannot produce a blank trailing sheet; focus outlines remain screen-only. All real business writes and notifications blocked. Measured LF raw CSS per page is70,169bytes, down from162,994–164,472bytes (about57%); these are source bytes, not compressed network transfer.
 
 132 pages reviewed locally/93pending, including the separate staff-admin candidate. Production remains126/99 until verified releases. Candidate .12 requires broader guards, full integration checks, exact-source CI and rollout after .11. Original controllers reverse only the23 recorded presentation/validation/recovery edits; financial calculations and snapshot data retained.
+
+## Next paired staff import tools — 2026-09-09
+
+Branch codex/staff-import-tools starts at71f8d6c466cc523a798d33f5572ba3a61114a5dc (the reviewed monitoring batch). Scope: SanMar Downloads and the browser-only SanMar→ShopWorks converter. Purchasing Portal was inspected but is deferred to its purchasing/invoice-viewer family. Candidate .12 may combine these two tools with the three monitoring pages after review; no additional pages count yet. Primary .11 exact-source CI34385622118 is running on481232711e07332613f8a0fd7e5123096426878b.
+
+- [ ] Preserve all original prose/links/scripts and pure conversion/SKU sources, including prices, size flags and part-number rules.
+- [ ] Shared canonical neutral admin controls and scoped tool arrangements, phone layouts, skip/named keyboard table regions and native file input.
+- [ ] Download listing must distinguish unavailable/configuration/session/malformed/empty states; mock all requests and downloads, never import files into live systems.
+- [ ] Exercise synthetic CSV/TSV/Excel file selection, conversion/reset/download and unavailable dependencies; preserve source transform tests and compare output bytes.
+- [ ] Four widths/axe/keyboard and complete reference/preview paper. Register reviewed styles and retire only the two superseded owners, then integrate/full checks/CI/release.
+
+Monitoring is reviewed locally (132of225/93pending); current live count remains126/99 until .11 verification. Saved originals: staff-import-original-baseline.json.
