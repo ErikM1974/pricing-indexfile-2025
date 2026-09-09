@@ -1,34 +1,22 @@
 # CSS unification — design direction and implementation plan
 
-## Resumed forms release — 2026-09-08
+## Active checkpoint — 2026-09-08
 
-RESUMED at Erik's explicit request. Exact final-source CI 34280132378 passed on 70b32f5ae11672d21a77e67624d1f9aff31be684; preparing the authorized v2026.09.08.12 release. The saved checkpoint below describes the prior paused state. Actual production verification and the next active batch will be recorded after deployment.
+Erik resumed explicitly; edit/deploy authorization continues. The 17 printable forms are LIVE as **v2026.09.08.12 / Heroku 2070**, full SHA **cb2fe3da7191b4d5f8b1de60a73fed7e72c75cb4**. Actual successful slug verified 2026-09-09T01:04:44Z. Exact final-source CI **34280132378** passed all four jobs, including live money/calculator parity on **70b32f5ae11672d21a77e67624d1f9aff31be684**. Twenty-one deployed runtime assets match committed bytes; 20 unified public shells and the legacy quote request return 200; four staff shells remain protected. No business writes or notifications.
 
-### Current count
+### Count and current work
 
-The fresh static runtime inventory contains 224 application/served-archive HTML pages (223 + 1): 24 reviewed pages live, 17 printable forms implemented and tested but not deployed, and 183 pages still pending CSS modernization. The 304 tracked HTML total also includes 80 excluded archive/email/template/retired sources. Generated document/style owners are tracked separately; this is the page count, not a claim that their cleanup is finished. Inventory: September 7 artifact directory/css-shutdown-inventory.json.
+**41 reviewed application pages live; 183 still pending**, from 224 application/served-archive HTML sources. Another 80 tracked HTML files are excluded archives/email/templates/retired sources. Generated style/document owners remain separate work. Inventory: September 7 artifacts/css-shutdown-inventory.json.
 
-### Live and saved state
+Next batch: seven remaining training pages — customer-categorization-training, lead-email-templates, lead-source-training, training-games-hub, shopworks-notes, shopworks-sales-tax-training, team-match-game. Baselines already captured in remaining-training-baseline.json / training-before-*.png. Preserve original training prose, fixtures, destinations and rates. Share scoped navigation/control/layout styles, retain page-specific game arrangements, verify keyboard/touch games and template copy/edit/failure states. No source edits to that batch yet.
 
-- Production frontend remains **v2026.09.08.11 / Heroku 2069**, full SHA **4087810dc7fadb68d2cf5a1d00aebad073faa8c7**. Last actual slug check succeeded at 2026-09-08T21:07:18Z. Source CI 34273774152 and main/develop CI 34274628083 / 34274861898 succeeded. No .12 release merge, tag, Heroku push or deployment was started.
-- Backend security remains **v2026.09.08.1 / Heroku 1130**, d06aee3e4d25c5e1410241ea8007cdc8339aa3fa. Backend dependency/runtime backlog and natural scheduler verification remain separate unfinished work; no backend edits this batch.
-- Frontend develop contains the 17-form migration (initial source **02c849b5ec8fe23c6083b5df603e9425150ca7a0**, intended **v2026.09.08.12**) plus the final public quote-request compatibility fix saved with this checkpoint. The authoritative final candidate SHA is in **printable-forms-source-record.json** and **printable-forms-shutdown-checkpoint.json** in the artifact directory. Do not deploy the initial source SHA: it predates the compatibility fix.
-- One scoped printable-forms.css owner, 17 page sheets/HTML graphs and three shared form helpers changed. Source prose/IDs/default values/destinations remain guarded. Public request-a-quote.html keeps its old CSS and anchored menu; floating menu coordinates apply only to opted-in printable forms. It was the eighteenth JS caller found by the cache-reference review. Eighteen HTML files received cache updates, 70 references checked. No real submissions, uploads or notifications were sent.
+### Verification and resuming safely
 
-### Verification completed
+Forms local gates: 207 unit suites / 5,014 tests, 88 DOM, four a11y unit, 84 quote parity, 157 browser cases, five calculator surfaces; build/lint/types/291 CSS/boot pass; 485 route registrations / 24 modules. Final compatibility correction then passed all 48 focused browser cases and exact-source CI. All 17 blank PDFs preserve page counts; filled PDFs reviewed with full notes and legal/signature content intact.
 
-- Full release pass: 207 unit suites / 5,014 tests, four existing skips; 88 DOM; four accessibility unit; 84 quote parity; 141 mocked browser + 16 remaining browser = 157 passed, three optional screenshot skips; all five live calculator surfaces agree with their engines. Build/lint/types/291 CSS files/boot pass. Routes remain 485 registrations / 24 modules.
-- After the last shared-helper compatibility correction: targeted lint and rebuild passed; **all 48 printable-form/public-caller browser cases passed**. The new public-menu case first reproduced a 681px placement error and then passed at 1440/390/320. Previous 157-test full run is a prior snapshot; exact final-source CI still must be checked on resume. The initial candidate CI must not be treated as final-source approval.
-- All 17 blank PDFs keep their original page counts. Actual filled output reviewed: card authorization 1 page, garment drop-off with 45 long notes 3, name personalization 2, roster 2. Every note line and the end marker survive extraction. Date labels/writing lines, margins, legal/signature/footer groups are intact. Native input values restore after print. Test services/writes are mocked.
+Artifacts: C:/Users/erik/.codex/visualizations/2026/09/07/01a07d90-9a4c-7e70-9e4e-c196377b7c6b. printable-forms-release-record.json, source-ci.json, heroku-verification.json and live-verification.json are authoritative. Do NOT rerun historical install/release helpers. Fresh-check branch, CI and ownership before the next release. Release main/develop CI is tracked separately after source CI.
 
-### Resume steps
-
-1. Read this section and printable-forms-shutdown-checkpoint.json. Check develop/main/origin freshness and ownership; verify the existing production slug. Do not touch another actor's work.
-2. Read CI for the final saved candidate SHA from printable-forms-source-record.json. Write the successful report to printable-forms-source-ci.json; all four jobs including the live money/calculator step must pass. If final CI fails, fix and rerun affected/full gates as appropriate, then update the source record to the actual candidate tip.
-3. Resume the authorized .12 release with the prepared helpers: prepare-printable-forms-release.cjs, corporate Git pushes of main/tag then Heroku main, actual slug verification, verify-printable-forms-live.cjs, develop fast-forward/push and fresh checkpoint. These helpers are PREPARED only; do not mint a new version just because the user paused. Confirm their ownership/freshness guards before running.
-4. Continue the remaining seven training pages: customer-categorization-training, lead-email-templates, lead-source-training, training-games-hub, shopworks-notes, shopworks-sales-tax-training, team-match-game. Baselines are complete in remaining-training-baseline.json and training-before-*.png; no training source edits have begun. Games need keyboard/touch workflows, template editing needs copy/error/modal checks. Then continue the rest of the 183-page queue by family.
-
-Artifact root: C:/Users/erik/.codex/visualizations/2026/09/07/01a07d90-9a4c-7e70-9e4e-c196377b7c6b. Node 22 is under TEMP/nwca-handover-node22/node_modules/node/bin. Frontend checkout is the sibling Pricing Index File 2025. Source/release/CI/live reports for this batch use printable-forms-*; .11 uses training-service-*. Do not rerun historical draft/install/append scripts against already edited files. No automation or goal was created. No local server or browser-test job is intended to remain running at shutdown.
+Backend remains v2026.09.08.1 / Heroku 1130 / d06aee3e4d25c5e1410241ea8007cdc8339aa3fa. Its dependency/runtime backlog and natural scheduler verification are unfinished separate work. Frontend production audit remains zero; Heroku build notes two dev dependency advisories and stack-22 deprecation, to assess separately without broadening this CSS release.
 
 ## Resumed — 2026-09-08
 
