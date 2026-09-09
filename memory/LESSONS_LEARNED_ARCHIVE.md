@@ -4007,3 +4007,14 @@ not resolution. 🔑 Derive a cut's range from the section banner every time —
 and check the first line is the rule line, not a neighbour's call site. 🔑 Treat `__dirname` and `require('./…')` as
 part of a file's address, not its code. 🔑 One agent in `server.js` at a time; `git stash -u` is the tool when it is not.
 
+
+### Shared form styles and print pseudo-elements need rendered checks (2026-09-08)
+
+Problem: migrated training fields retained browser-default styling, and paper chevrons remained visible. Root cause: shared controls require their canonical field classes; pseudo-elements cannot be selected inside `:is()`. Solution: use `.field-input`/`.field-textarea` and a separate `::after` selector. Prevention: check rendered control size/font and print pseudo-element display, then inspect actual pages/PDFs; CSS lint and behavior checks alone do not catch these.
+
+## Printable forms need populated output and menu checks (2026-09-08)
+
+Problem: screen input specificity defeated compact paper rules, the shared date adapter squeezed signature labels, scroll tables clipped menus, and native fields truncated printed values. Use zero-specificity input exclusions, an explicit form date owner, viewport-positioned native keyboard menus, and temporary wrapping print text. Preserve original input values, full PDF text, legal/signature groups and the one-page card authorization. Browser tests cover blank/filled print, phone hit testing, saves, drafts and money provenance; byte/content checks alone cannot certify these states.
+
+Shared JS can outlive a CSS migration: the public quote-request page is also a style-helper caller. Limit floating coordinates to the matching opted-in CSS owner, and exercise every runtime caller found by the cache-reference review before release.
+

@@ -539,3 +539,22 @@ Twelve public webstore guides integrated. The interrupted browser run was resume
 ## Webstore release record — v2026.09.08.20
 
 Exact-source CI 34330122846 passed all four jobs on a71e4e24ee620f1c82347ad24d14728b6829d744, including actual money/calculator parity. Twelve public webstore guides now use shared tokens/components, consistent navigation, photo/text heroes, product/price grids and native FAQ printing. All original text, imagery, terms and SEO data preserved. Local checks:5,122 unit tests,290 mocked browser and16 remaining browser,all5 calculator surfaces;773 paper blocks retained.485 routes unchanged. Candidate84 reviewed/141 pending becomes live only after actual rollout verification.
+
+## Brand guides family plan — 2026-09-08
+
+The webstore family plus its cache correction is committed at b417e03de7f9db0aea8bd6f485b2c2c947bd207b; full checks run in primary. Live .19 has72 reviewed pages. New worktree branch codex/brand-guide-family isolates the next15 static brand pages using custom-carhartt.css/js. Original complete main text, metadata/structured data, every image/link/input and CSS graphs are saved in brand-guide-original-baseline.json. No application edits yet.
+
+- [x] Inventory all15 shared consumers: Bella+Canvas, Carhartt, CornerStone, District, Eddie Bauer, Gildan, New Era, Nike, The North Face, OGIO, Port & Company, Port Authority, Richardson, Sport-Tek and TravisMathew.
+- [ ] Move shared navigation/footer onto scoped storefront-shell.css plus app tokens/components/Public Sans; rename the old single-brand CSS/JS owners to brand-guide.css/js. Preserve individual brand/product content and static Richardson showcase tiles.
+- [ ] Replace custom mobile overlay behavior with a native dialog, focus/escape restoration and search preserving the existing /catalog query semantics. Keep every original menu destination and business term.
+- [ ] Lock content/SEO/image/field data, verify four widths/contrast, native dialog keyboard/focus, search and complete printed product/FAQ blocks; then full release checks, exact-source CI and verified deployment after webstores.
+
+If both pending families deploy successfully, this batch would reach99 of225 application pages reviewed,126 pending. Until actual release verification, candidate manifests do not change the live count. No business-service writes.
+
+## Brand guides reviewed locally — 2026-09-09
+
+Fifteen custom-brand pages share tokens/components + storefront-shell.css + renamed brand-guide.css/controller. Original full main text, all anchors/images/SEO JSON-LD and search fields remain exact. Native dialog supports focus wrap/return, Escape, backdrop and desktop resize; search still trims/encodes the catalogue query. Richardson showcase tiles stay static.31 focused browser cases pass at1440/768/390/320 with zero axe violations;168 source/ownership/runtime cases pass after correcting selector scope and rerunning an inventory timeout from competing browser load. Strict JS and focused CSS clean. Duplicate rules merged into owners. PDFs retain1261 checked text/product/FAQ blocks (Carhartt6 pages, others5); case-normalized comparison reflects the existing uppercase eyebrow. Desktop/phone and first/middle/last paper renders reviewed. Raw CSS graph65,000 ->72790 bytes: shared components add coverage; no byte-saving claim. Pending full primary release gates and deployment; not yet live. Candidate2026.09.09.1 references pre-versioned on all15 consumers.
+
+## Brand integration — 2026-09-09
+
+Reviewed brand commit a6d59feca31b1a4419c1f963bb91c063e7d03539 integrated after verified webstore release2079. Only the two append-only memory conflicts required a union; all reviewed app changes merged directly. Current live checkpoint84/141 retained. Full primary gates now run with candidate2026.09.09.1 references already present. Next five staff reference pages remain plan-only in their isolated branch.
