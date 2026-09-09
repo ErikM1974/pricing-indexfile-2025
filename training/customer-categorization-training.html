@@ -1,23 +1,23 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
+<!DOCTYPE html><html lang="en"><head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Customer Categorization Training - Northwest Custom Apparel</title>
 <link rel="icon" href="/favicon.png" type="image/png">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-<link rel="stylesheet" href="/training/css/training-shared.css?v=2026.09.07.6">
-<link rel="stylesheet" href="/training/css/customer-categorization-training.css?v=2026.09.07.19">
+<link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.08.13">
+<link rel="stylesheet" href="/shared_components/css/training-guide.css?v=2026.09.08.13">
+<link rel="stylesheet" href="/shared_components/css/training-practice.css?v=2026.09.08.13">
+<link rel="stylesheet" href="/training/css/customer-categorization-training.css?v=2026.09.08.13">
 </head>
-<body>
+<body data-ui="unified" data-training="practice">
 
 <!-- Navigation Header -->
 <nav class="nav-header">
     <div class="nav-container">
         <div class="nav-left">
-            <a href="/staff-dashboard.html" class="back-btn">
+            <a href="/staff-dashboard.html" class="back-btn btn">
                 <i class="fas fa-arrow-left" aria-hidden="true"></i>
                 <span>Back to Dashboard</span>
             </a>
@@ -28,8 +28,7 @@
         </div>
         <div class="nav-right">
             <div class="logo-container">
-                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
-                     alt="Northwest Custom Apparel">
+                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" alt="Northwest Custom Apparel">
             </div>
         </div>
     </div>
@@ -47,7 +46,7 @@
 </div>
 
 <!-- Game Wrapper -->
-<main class="game-wrapper">
+<main class="game-wrapper training-workspace">
     <div class="container">
         <div class="game-header">
             <h1>🎯 Customer Categorization Training</h1>
@@ -55,9 +54,9 @@
         </div>
 
         <div class="game-mode-selector">
-            <button class="mode-btn active" data-call="switchMode" data-args='["learn"]'>📚 Learn Categories</button>
-            <button class="mode-btn" data-call="switchMode" data-args='["practice"]'>🎮 Practice Mode</button>
-            <button class="mode-btn" data-call="switchMode" data-args='["quiz"]'>📝 Quiz Challenge</button>
+            <button class="mode-btn active btn" data-call="switchMode" data-args="[&quot;learn&quot;]" type="button">📚 Learn Categories</button>
+            <button class="mode-btn btn" data-call="switchMode" data-args="[&quot;practice&quot;]" type="button">🎮 Practice Mode</button>
+            <button class="mode-btn btn" data-call="switchMode" data-args="[&quot;quiz&quot;]" type="button">📝 Quiz Challenge</button>
         </div>
 
         <div class="info-bar">
@@ -68,7 +67,7 @@
 
         <!-- Learn Mode -->
         <div id="learnMode" class="training-mode active">
-            <h2 style="text-align: center; margin-bottom: 20px;">Customer Categories Overview</h2>
+            <h2 class="training-section-title">Customer Categories Overview</h2>
             <div class="categories-grid" id="categoriesGrid"></div>
             <div class="tips-section">
                 <h3>💡 Quick Recognition Tips:</h3>
@@ -89,10 +88,10 @@
 
         <!-- Practice Mode -->
         <div id="practiceMode" class="training-mode">
-            <h2 style="text-align: center; margin-bottom: 20px;">Drag Customers to Their Categories</h2>
+            <h2 class="training-section-title">Drag Customers to Their Categories</h2>
             <div class="practice-area">
                 <div class="customer-stack">
-                    <h3 style="color: #1e3c72; margin-bottom: 15px;">New Customers</h3>
+                    <h3 class="training-section-title">New Customers</h3>
                     <div id="customerStack"></div>
                 </div>
                 <div class="categories-drop-area" id="dropZones"></div>
@@ -107,7 +106,8 @@
 </main>
 
     <script src="/shared_components/js/data-call-delegator.js?v=2026.09.06.29"></script>
-<script src="/training/js/customer-categorization-training.js?v=2026.09.06.37"></script>
+<script src="/shared_components/js/training-practice.js?v=2026.09.08.13"></script>
+<script src="/training/js/customer-categorization-training.js?v=2026.09.08.13"></script>
 
-</body>
-</html>
+
+</body></html>

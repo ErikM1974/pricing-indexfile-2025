@@ -170,8 +170,10 @@ cap-embroidery-fix.css
 - `scripts/css/migration-manifest.json`: first four pilot style owners, state fixtures, source-byte budgets and pending generated/dynamic surfaces. Pending means not yet migrated or verified.
 - `pages/css/webstore-inquiry.css`: storefront inquiry arrangement; shared controls belong to `components.css`.
 
-- `shared_components/css/training-guide.css`: scoped navigation, reading, table, callout and print owner for reviewed training guides. Legacy training-shared.css remains for unmigrated consumers.
+- `shared_components/css/training-guide.css`: scoped navigation, reading, table, callout and print owner for reviewed training guides. The superseded training-shared.css was retired after its last consumers migrated.
 
 - `shared_components/css/training-service.css`: shared service-guide disclosures, examples, images and print; replaces art-approval/google-review page CSS. Thank-you specimens and lead practice fields retain their two small page sheets.
 
 - `shared_components/css/printable-forms.css`: scoped shared printable-form layout, controls, lookup/swatch states, phone table regions and paper rules for 17 `/pages/forms/` consumers. Their page sheets retain unique layouts/orientation. Old `nwca-form-shared.css` remains for public `pages/request-a-quote.html`; it is not retired.
+
+- `shared_components/css/training-practice.css`: scoped practice layouts and feedback for seven games/reference pages; shared controls remain in components.css. Replaces the last training-shared.css consumers and their duplicated page controls.

@@ -124,6 +124,8 @@ function jsClosure(initial) {
     initial.forEach(visit); return [...seen];
 }
 function classification(file, directRoutes) {
+    // This is the browser-based template editor, not an email-client document.
+    if (file === 'training/lead-email-templates.html') return ['application', null];
     if (/email.?template|emailjs.?template/i.test(file)) return ['email', 'Email clients require a separate maintained style contract.'];
     if (/^(?:tests?|reference|templates)\/|\/templates\//.test(file)) return ['fixture-or-template', 'Not a production page.'];
     if (/archive\//.test(file)) return directRoutes.length ? ['served-archive', 'Explicit server route still serves this archived source.'] : ['archive', 'Archived source; no literal file-serving route found.'];

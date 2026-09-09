@@ -1,133 +1,144 @@
-/* lead-email-templates.js — page script (extracted from inline <script>, 2026.09.05.11) */
+/* Local email-template editor. This page never sends email. */
+let activeTemplateCategory = 'all';
+let templateSearch = '';
+const templateStorageKey = 'nwca_email_templates';
+const templateModal = document.getElementById('templateModal');
+const templateForm = document.getElementById('templateForm');
+const templateError = document.createElement('p');
+templateError.className = 'training-status';
+templateError.setAttribute('role', 'status');
+templateForm.prepend(templateError);
 
-// ── moved from inline <script> in training/lead-email-templates.html (Rule 3, 2026.09.05.11) ──
-// Template Management
-        function copyTemplate(button) {
-            const card = button.closest('.template-card');
-            const content = card.querySelector('.template-content').textContent;
-            
-            navigator.clipboard.writeText(content).then(() => {
-                // Show success message
-                const successMsg = document.getElementById('successMessage');
-                successMsg.classList.add('active');
-                
-                // Update button temporarily
-                const originalHTML = button.innerHTML;
-                button.innerHTML = '<i class="fas fa-check" aria-hidden="true"></i> Copied!';
-                button.style.background = 'var(--success)';
-                
-                setTimeout(() => {
-                    button.innerHTML = originalHTML;
-                    button.style.background = '';
-                    successMsg.classList.remove('active');
-                }, 2000);
-            });
-        }
+function templateMessage(message, error = false) {
+    const banner = document.getElementById('successMessage');
+    banner.textContent = message;
+    banner.classList.add('active');
+    banner.classList.toggle('error', error);
+}
 
-        function editTemplate(button) {
-            const card = button.closest('.template-card');
-            const title = card.querySelector('.template-title').textContent;
-            const subject = card.querySelector('.template-subject').textContent.replace('Subject: ', '');
-            const content = card.querySelector('.template-content').textContent;
-            
-            // Populate modal
-            document.getElementById('templateName').value = title;
-            document.getElementById('templateSubject').value = subject;
-            document.getElementById('templateBody').value = content;
-            
-            // Open modal
-            document.getElementById('templateModal').classList.add('active');
-        }
+async function copyTemplate(button) {
+    const content = button.closest('.template-card').querySelector('.template-content').textContent;
+    try {
+        await navigator.clipboard.writeText(content);
+        templateMessage('Template copied to clipboard!');
+    } catch {
+        templateMessage('Could not copy. Select the template text and copy it manually, or try again.', true);
+    }
+}
 
-        function filterTemplates(category) {
-            // Update active button
-            document.querySelectorAll('.filter-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            event.target.classList.add('active');
-            
-            // Filter cards
-            const cards = document.querySelectorAll('.template-card');
-            cards.forEach(card => {
-                if (category === 'all' || card.dataset.category === category) {
-                    card.style.display = 'block';
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-        }
+function editTemplate(button) {
+    const card = button.closest('.template-card');
+    templateForm.reset();
+    document.getElementById('templateName').value = card.querySelector('.template-title').textContent;
+    document.getElementById('templateCategory').value = card.dataset.category;
+    document.getElementById('templateSubject').value = card.querySelector('.template-subject').textContent.replace(/^Subject:\s*/, '');
+    document.getElementById('templateBody').value = card.querySelector('.template-content').textContent;
+    templateError.textContent = '';
+    templateModal.showModal();
+    document.getElementById('templateName').focus();
+}
 
-        function searchTemplates(query) {
-            const cards = document.querySelectorAll('.template-card');
-            const searchTerm = query.toLowerCase();
-            
-            cards.forEach(card => {
-                const title = card.querySelector('.template-title').textContent.toLowerCase();
-                const desc = card.querySelector('.template-desc').textContent.toLowerCase();
-                const content = card.querySelector('.template-content').textContent.toLowerCase();
-                
-                if (title.includes(searchTerm) || desc.includes(searchTerm) || content.includes(searchTerm)) {
-                    card.style.display = 'block';
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-        }
+function applyTemplateFilters() {
+    let visible = 0;
+    document.querySelectorAll('.template-card').forEach(card => {
+        const match = (activeTemplateCategory === 'all' || card.dataset.category === activeTemplateCategory)
+            && card.textContent.toLowerCase().includes(templateSearch);
+        card.hidden = !match;
+        if (match) visible++;
+    });
+    document.getElementById('training-template-results').textContent = visible
+        ? visible + ' templates shown' : 'No matching templates. Change the category or search.';
+}
 
-        function openCreateModal() {
-            // Clear form
-            document.getElementById('templateForm').reset();
-            document.getElementById('templateModal').classList.add('active');
-        }
+function filterTemplates(category) {
+    activeTemplateCategory = category;
+    document.querySelectorAll('.filter-btn').forEach(button => {
+        const selected = JSON.parse(button.dataset.args || '[]')[0] === category;
+        button.classList.toggle('active', selected);
+        button.setAttribute('aria-pressed', String(selected));
+    });
+    applyTemplateFilters();
+}
 
-        function closeModal() {
-            document.getElementById('templateModal').classList.remove('active');
-        }
+function searchTemplates(query) {
+    templateSearch = query.toLowerCase().trim();
+    applyTemplateFilters();
+}
 
-        function insertVariable(variable) {
-            const textarea = document.getElementById('templateBody');
-            const start = textarea.selectionStart;
-            const end = textarea.selectionEnd;
-            const text = textarea.value;
-            
-            textarea.value = text.substring(0, start) + variable + text.substring(end);
-            textarea.focus();
-            textarea.setSelectionRange(start + variable.length, start + variable.length);
-        }
+function openCreateModal() {
+    templateForm.reset();
+    templateError.textContent = '';
+    templateModal.showModal();
+    document.getElementById('templateName').focus();
+}
 
-        // Form submission
-        document.getElementById('templateForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            
-            // Save template to localStorage
-            const template = {
-                name: document.getElementById('templateName').value,
-                category: document.getElementById('templateCategory').value,
-                subject: document.getElementById('templateSubject').value,
-                body: document.getElementById('templateBody').value,
-                created: new Date().toISOString()
-            };
-            
-            // Get existing templates
-            let templates = JSON.parse(localStorage.getItem('nwca_email_templates') || '[]');
-            templates.push(template);
-            localStorage.setItem('nwca_email_templates', JSON.stringify(templates));
-            
-            // Show success and close modal
-            alert('Template saved successfully!');
-            closeModal();
-            
-            // Optionally reload templates
-            location.reload();
-        });
+function closeModal() { templateModal.close(); }
 
-        // Load custom templates on page load
-        document.addEventListener('DOMContentLoaded', () => {
-            const customTemplates = JSON.parse(localStorage.getItem('nwca_email_templates') || '[]');
-            
-            // Add custom templates to the grid
-            customTemplates.forEach(template => {
-                // This would add the custom templates to the grid
-                // Implementation depends on your needs
-            });
-        });
+function insertVariable(variable) {
+    const textarea = document.getElementById('templateBody');
+    textarea.setRangeText(variable, textarea.selectionStart, textarea.selectionEnd, 'end');
+    textarea.focus();
+}
+
+function readCustomTemplates() {
+    const saved = JSON.parse(localStorage.getItem(templateStorageKey) || '[]');
+    if (!Array.isArray(saved) || saved.some(template => !template ||
+        ['name', 'category', 'subject', 'body'].some(key => typeof template[key] !== 'string'))) {
+        throw new Error('Saved template format is invalid');
+    }
+    return saved;
+}
+
+function renderCustomTemplate(template) {
+    const card = document.querySelector('.template-card').cloneNode(true);
+    card.hidden = false;
+    card.dataset.category = template.category;
+    card.querySelector('.template-title').textContent = template.name;
+    card.querySelector('.template-desc').textContent = 'Your custom template, saved in this browser.';
+    card.querySelector('.template-subject').textContent = 'Subject: ' + template.subject;
+    card.querySelector('.template-content').textContent = template.body;
+    const category = card.querySelector('.template-category');
+    category.className = 'template-category';
+    category.textContent = [...document.getElementById('templateCategory').options]
+        .find(option => option.value === template.category)?.textContent || template.category;
+    document.querySelector('.template-grid').append(card);
+}
+
+templateForm.addEventListener('submit', event => {
+    event.preventDefault();
+    const template = {
+        name: document.getElementById('templateName').value.trim(),
+        category: document.getElementById('templateCategory').value,
+        subject: document.getElementById('templateSubject').value.trim(),
+        body: document.getElementById('templateBody').value,
+        created: new Date().toISOString(),
+    };
+    if (!template.name || !template.subject || !template.body.trim()) {
+        templateError.textContent = 'Enter a template name, subject and email body before saving.';
+        return;
+    }
+    try {
+        const templates = readCustomTemplates();
+        templates.push(template);
+        localStorage.setItem(templateStorageKey, JSON.stringify(templates));
+    } catch {
+        templateError.textContent = 'Could not save in this browser. Your text is still here. Copy it before closing, or try Save again.';
+        return;
+    }
+    renderCustomTemplate(template);
+    applyTemplateFilters();
+    closeModal();
+    templateMessage('Template saved in this browser.');
+});
+
+const templateResults = document.createElement('p');
+templateResults.id = 'training-template-results';
+templateResults.className = 'training-status';
+templateResults.setAttribute('role', 'status');
+document.querySelector('.filter-bar').after(templateResults);
+try {
+    readCustomTemplates().forEach(renderCustomTemplate);
+} catch {
+    templateMessage('Could not load saved templates from this browser. Existing data has been kept; built-in templates remain available.', true);
+}
+filterTemplates('all');

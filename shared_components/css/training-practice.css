@@ -1,0 +1,60 @@
+/* Training practice family; shared primitives remain in components.css. */
+@layer components.patterns {
+:where([data-ui="unified"][data-training="practice"]) main.training-workspace { width: min(1200px, calc(100% - var(--space-6))); margin: var(--space-6) auto var(--space-9); padding: 0; border: 0; background: transparent; }
+:where([data-ui="unified"][data-training="practice"]) :is(.game-header, .header, .hero) { padding-block: var(--space-5) var(--space-6); border-block-end: 1px solid var(--ui-line); margin-block-end: var(--space-6); }
+:where([data-ui="unified"][data-training="practice"]) h1 { font-size: clamp(1.65rem, 3vw, 2.25rem); max-width: 30ch; margin: 0 0 var(--space-3); }
+:where([data-ui="unified"][data-training="practice"]) :is(.subtitle, .date-notice, .customer-details, .category-description, .template-desc, .code-name, .info-label) { color: var(--ui-muted); }
+:where([data-ui="unified"][data-training="practice"]) :is(.breadcrumb-container, .game-controls, .game-mode-selector, .info-bar, .game-info, .stats-bar, .score-section, .nav-buttons, .button-group, .template-actions, .filter-group, .variable-chips) { display: flex; align-items: center; gap: var(--space-3); flex-wrap: wrap; }
+:where([data-ui="unified"][data-training="practice"]) .breadcrumb-container { max-width: 1200px; margin: var(--space-4) auto; padding-inline: var(--space-3); font-size: var(--font-size-md); }
+:where([data-ui="unified"][data-training="practice"]) :is(.game-controls, .game-mode-selector, .info-bar, .game-info, .nav-buttons, .button-group) { margin-block: var(--space-5); }
+:where([data-ui="unified"][data-training="practice"]) :is(.info-bar, .game-info, .score-section) { padding: var(--space-4); background: var(--ui-surface); border: 1px solid var(--ui-line); border-radius: var(--radius-sm); font-variant-numeric: tabular-nums; }
+:where([data-ui="unified"][data-training="practice"]) :is(.mode-btn.active, .filter-btn.active, .source-option.selected, .tax-option.selected, .training-selected) { background: var(--ui-tint); border-color: var(--ui-accent); color: var(--ui-accent); box-shadow: inset 0 -3px var(--ui-accent); }
+:where([data-ui="unified"][data-training="practice"]) :is(.source-card, .category-card, .tax-code-card, .section-card, .scenario-card, .template-card, .game-card) { min-width: 0; padding: var(--space-5); background: var(--ui-surface); border: 1px solid var(--ui-line); border-radius: var(--radius-md); }
+:where([data-ui="unified"][data-training="practice"]) :is(.categories-grid, .tax-codes-reference, .games-grid, .template-grid, .tips-grid, .shame-grid) { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 290px), 1fr)); gap: var(--space-5); }
+:where([data-ui="unified"][data-training="practice"]) :is(.source-options, .tax-options, .options) { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr)); gap: var(--space-3); margin-block: var(--space-4); }
+:where([data-ui="unified"][data-training="practice"]) :is(.source-option, .tax-option, .option-btn) { justify-content: flex-start; text-align: start; white-space: normal; }
+:where([data-ui="unified"][data-training="practice"]) :is(.category-name, .source-title, .template-title, .game-title, .tree-title) { font-size: var(--font-size-lg); font-weight: var(--font-weight-semibold); margin-block-end: var(--space-3); }
+:where([data-ui="unified"][data-training="practice"]) :is(.category-icon, .game-icon, .zone-icon) { font-size: var(--font-size-2xl); color: var(--ui-accent); margin-block-end: var(--space-3); }
+:where([data-ui="unified"][data-training="practice"]) :is(.example-customers, .source-action, .use-when, .instructions, .tips-section, .important-notice, .decision-tree, .quick-tips, .referral-action-box, .variables-helper) { padding: var(--space-5); background: var(--ui-tint); border-inline-start: 3px solid var(--ui-accent); margin-block: var(--space-5); }
+:where([data-ui="unified"][data-training="practice"]) :is(.example-customers, .use-when) { padding: var(--space-3); margin-block: var(--space-3) 0; font-size: var(--font-size-md); }
+:where([data-ui="unified"][data-training="practice"]) :is(.category-badge, .status-badge, .template-category, .action-word) { display: inline-block; padding: var(--space-1) var(--space-3); border-radius: var(--radius-sm); background: var(--gray-100); color: var(--ui-muted); font-size: var(--font-size-md); font-weight: var(--font-weight-semibold); }
+:where([data-ui="unified"][data-training="practice"]) :is(.customer-dialogue, .quiz-customer) { font-size: var(--font-size-lg); padding: var(--space-6); border: 1px solid var(--ui-line); border-inline-start: 3px solid var(--ui-accent); background: var(--ui-surface); margin-block: var(--space-5); }
+:where([data-ui="unified"][data-training="practice"]) :is(.training-mode, .learn-container, .scenario-container, .speed-container) { display: none; }
+:where([data-ui="unified"][data-training="practice"]) :is(.training-mode, .learn-container, .scenario-container, .speed-container).active { display: block; }
+:where([data-ui="unified"][data-training="practice"]) :is(.feedback, .training-status):not(:empty) { padding: var(--space-4); border-radius: var(--radius-sm); margin-block: var(--space-4); background: var(--ui-tint); color: var(--ui-ink); }
+:where([data-ui="unified"][data-training="practice"]) :is(.correct, .success, .matched) { background: var(--emerald-100); color: var(--emerald-800); border-color: var(--emerald-800); }
+:where([data-ui="unified"][data-training="practice"]) :is(.incorrect, .error) { background: var(--red-100); color: var(--red-800); border-color: var(--red-800); }
+:where([data-ui="unified"][data-training="practice"]) :is(.drag-over, .training-selected) { outline: 2px solid var(--ui-accent); outline-offset: 2px; }
+:where([data-ui="unified"][data-training="practice"]) .dragging { opacity: 0.55; }
+:where([data-ui="unified"][data-training="practice"]) :is(.customer-card, .employee-card, .category-drop-zone, .drop-zone) { width: 100%; min-width: 0; justify-content: flex-start; text-align: start; margin-block-end: var(--space-3); }
+:where([data-ui="unified"][data-training="practice"]) :is(.customer-card, .category-drop-zone, .tax-option) { flex-direction: column; align-items: flex-start; }
+:where([data-ui="unified"][data-training="practice"]) :is(.dropped-customer, .dropped-employee) { padding: var(--space-2); border-radius: var(--radius-sm); background: var(--emerald-100); color: var(--emerald-800); font-size: var(--font-size-md); }
+:where([data-ui="unified"][data-training="practice"]) .dropped-customers { display: grid; gap: var(--space-2); margin-block-start: var(--space-3); }
+:where([data-ui="unified"][data-training="practice"]) :is(.timer-bar, .progress-bar) { height: 8px; overflow: hidden; background: var(--gray-200); border-radius: var(--radius-sm); margin-block: var(--space-5); }
+:where([data-ui="unified"][data-training="practice"]) :is(.timer-fill, .progress-fill) { height: 100%; background: var(--ui-accent); }
+:where([data-ui="unified"][data-training="practice"]) .progress-fill { width: 0; }
+:where([data-ui="unified"][data-training="practice"]) :is(.form-group, .scenario, .category-section, .practice-section, .hall-of-shame) { margin-block: var(--space-6); }
+:where([data-ui="unified"][data-training="practice"]) .form-label { display: block; margin-block-end: var(--space-2); font-weight: var(--font-weight-semibold); }
+:where([data-ui="unified"][data-training="practice"]) textarea { min-height: 140px; }
+:where([data-ui="unified"][data-training="practice"]) :is(.score-value, .stat-card .number, .code-number) { font-size: var(--font-size-2xl); font-weight: var(--font-weight-semibold); font-variant-numeric: tabular-nums; }
+:where([data-ui="unified"][data-training="practice"]) .training-final-score { font-size: var(--font-size-xl); margin-block: var(--space-5); }
+:where([data-ui="unified"][data-training="practice"]) .training-copyright { margin-block-start: var(--space-4); font-size: var(--font-size-md); }
+:where([data-ui="unified"][data-training="practice"]) .training-required { color: var(--red-800); font-weight: var(--font-weight-semibold); }
+:where([data-ui="unified"][data-training="practice"]) .training-emphasis { padding: var(--space-3); background: var(--amber-100); }
+:where([data-ui="unified"][data-training="practice"]) .training-section-title { margin-block-end: var(--space-5); }
+
+@media (width <= 600px) {
+:where([data-ui="unified"][data-training="practice"]) :is(.game-controls, .game-mode-selector) > button { flex: 1 1 130px; }
+:where([data-ui="unified"][data-training="practice"]) main.training-workspace { width: calc(100% - var(--space-5)); }
+:where([data-ui="unified"][data-training="practice"]) .customer-dialogue { padding: var(--space-4); }
+ }
+
+@media print {
+:where([data-ui="unified"][data-training="practice"]) :is(.breadcrumb, .game-controls, .game-mode-selector, .nav-buttons, .button-group, .template-actions, .filter-bar, .success-message) { display: none; }
+:where([data-ui="unified"][data-training="practice"]) main.training-workspace { width: 100%; margin: 0; }
+:where([data-ui="unified"][data-training="practice"]) :is(.section-card, .template-card, .game-card, .tax-code-card, .category-card) { break-inside: avoid; padding: 8pt; }
+:where([data-ui="unified"][data-training="practice"]) :is(.categories-grid, .tax-codes-reference, .games-grid, .template-grid, .tips-grid, .shame-grid) { display: block; }
+:where([data-ui="unified"][data-training="practice"]) :is(.section-card, .template-card, .game-card, .tax-code-card, .category-card) + * { margin-block-start: 8pt; }
+ }
+
+}

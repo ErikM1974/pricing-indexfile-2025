@@ -1,23 +1,23 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
+<!DOCTYPE html><html lang="en"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lead Source Training - Northwest Custom Apparel</title>
     <link rel="icon" href="/favicon.png" type="image/png">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/training/css/training-shared.css?v=2026.09.07.6">
-    <link rel="stylesheet" href="/training/css/lead-source-training.css?v=2026.09.07.6">
+    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.08.13">
+<link rel="stylesheet" href="/shared_components/css/training-guide.css?v=2026.09.08.13">
+<link rel="stylesheet" href="/shared_components/css/training-practice.css?v=2026.09.08.13">
+    <link rel="stylesheet" href="/training/css/lead-source-training.css?v=2026.09.08.13">
 </head>
-<body>
+<body data-ui="unified" data-training="practice">
 
 <!-- Navigation Header -->
 <nav class="nav-header">
     <div class="nav-container">
         <div class="nav-left">
-            <a href="/staff-dashboard.html" class="back-btn">
+            <a href="/staff-dashboard.html" class="back-btn btn">
                 <i class="fas fa-arrow-left" aria-hidden="true"></i>
                 <span>Back to Dashboard</span>
             </a>
@@ -28,8 +28,7 @@
         </div>
         <div class="nav-right">
             <div class="logo-container">
-                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
-                     alt="Northwest Custom Apparel">
+                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" alt="Northwest Custom Apparel">
             </div>
         </div>
     </div>
@@ -47,7 +46,7 @@
 </div>
 
 <!-- Game Content -->
-<main class="game-wrapper">
+<main class="game-wrapper training-workspace">
     <div class="container">
         <div class="game-header">
             <h1>🎯 Lead Source Training</h1>
@@ -58,23 +57,23 @@
         </div>
 
         <div class="game-controls">
-            <button class="mode-btn active" data-call="setGameMode" data-args='["learn"]'>
+            <button class="mode-btn active btn" data-call="setGameMode" data-args="[&quot;learn&quot;]" type="button">
                 <i class="fas fa-book" aria-hidden="true"></i> Learn Sources
             </button>
-            <button class="mode-btn" data-call="setGameMode" data-args='["scenario"]'>
+            <button class="mode-btn btn" data-call="setGameMode" data-args="[&quot;scenario&quot;]" type="button">
                 <i class="fas fa-comments" aria-hidden="true"></i> Practice Scenarios
             </button>
-            <button class="mode-btn" data-call="setGameMode" data-args='["referral"]'>
+            <button class="mode-btn btn" data-call="setGameMode" data-args="[&quot;referral&quot;]" type="button">
                 <i class="fas fa-gift" aria-hidden="true"></i> Referral Training
             </button>
-            <button class="mode-btn" data-call="setGameMode" data-args='["speed"]'>
+            <button class="mode-btn btn" data-call="setGameMode" data-args="[&quot;speed&quot;]" type="button">
                 <i class="fas fa-tachometer-alt" aria-hidden="true"></i> Speed Challenge
             </button>
         </div>
 
         <!-- Learn Mode -->
         <div class="learn-container active" id="learnMode">
-            <h2 style="margin-bottom: 20px; color: #2c3e50;">📚 Understanding Lead Sources</h2>
+            <h2 class="training-section-title">📚 Understanding Lead Sources</h2>
             
             <div class="source-card referral">
                 <div class="source-title">🎁 Referral</div>
@@ -146,20 +145,20 @@
                 <h3>📊 Shopworks Customer Setup</h3>
                 <div class="shopworks-field">
                     <span class="shopworks-label">Salesperson:</span>
-                    <select class="shopworks-dropdown" aria-label="Salesperson">
+                    <select class="shopworks-dropdown field-select" aria-label="Salesperson">
                         <option>Nika Lao</option>
                         <option>Taylar Hanson</option>
                     </select>
                 </div>
                 <div class="shopworks-field">
                     <span class="shopworks-label">Type:</span>
-                    <select class="shopworks-dropdown" aria-label="Type">
+                    <select class="shopworks-dropdown field-select" aria-label="Type">
                         <option>Corporate</option>
                     </select>
                 </div>
-                <div class="shopworks-field" style="background: yellow; padding: 5px;">
+                <div class="shopworks-field training-emphasis">
                     <span class="shopworks-label"><strong>Source:</strong></span>
-                    <select class="shopworks-dropdown" aria-label="Source">
+                    <select class="shopworks-dropdown field-select" aria-label="Source">
                         <option>-- SELECT SOURCE --</option>
                         <option>Google Search</option>
                         <option>Walk In</option>
@@ -168,7 +167,7 @@
                         <option>Other</option>
                         <option>Drive By</option>
                     </select>
-                    <span style="color: red; font-weight: bold;">← REQUIRED!</span>
+                    <span class="training-required">← REQUIRED!</span>
                 </div>
             </div>
         </div>
@@ -199,36 +198,36 @@
             </div>
 
             <div class="source-options" id="sourceOptions">
-                <div class="source-option" data-call="selectSource" data-args='["Google Search"]'>
+                <button class="source-option btn" data-call="selectSource" data-args="[&quot;Google Search&quot;]" type="button">
                     <i class="fas fa-search" aria-hidden="true"></i><br>Google Search
-                </div>
-                <div class="source-option" data-call="selectSource" data-args='["Walk In"]'>
+                </button>
+                <button class="source-option btn" data-call="selectSource" data-args="[&quot;Walk In&quot;]" type="button">
                     <i class="fas fa-walking" aria-hidden="true"></i><br>Walk In
-                </div>
-                <div class="source-option" data-call="selectSource" data-args='["Old Customer"]'>
+                </button>
+                <button class="source-option btn" data-call="selectSource" data-args="[&quot;Old Customer&quot;]" type="button">
                     <i class="fas fa-history" aria-hidden="true"></i><br>Old Customer
-                </div>
-                <div class="source-option" data-call="selectSource" data-args='["Referral"]'>
+                </button>
+                <button class="source-option btn" data-call="selectSource" data-args="[&quot;Referral&quot;]" type="button">
                     <i class="fas fa-user-friends" aria-hidden="true"></i><br>Referral
-                </div>
-                <div class="source-option" data-call="selectSource" data-args='["Other"]'>
+                </button>
+                <button class="source-option btn" data-call="selectSource" data-args="[&quot;Other&quot;]" type="button">
                     <i class="fas fa-ellipsis-h" aria-hidden="true"></i><br>Other
-                </div>
-                <div class="source-option" data-call="selectSource" data-args='["Drive By"]'>
+                </button>
+                <button class="source-option btn" data-call="selectSource" data-args="[&quot;Drive By&quot;]" type="button">
                     <i class="fas fa-car" aria-hidden="true"></i><br>Drive By
-                </div>
+                </button>
             </div>
 
-            <div id="feedbackArea"></div>
+            <div id="feedbackArea" role="status"></div>
 
             <div class="nav-buttons">
-                <button class="nav-btn" data-call="nextScenario">Next Scenario →</button>
+                <button class="nav-btn btn btn-primary" data-call="nextScenario" type="button">Next Scenario →</button>
             </div>
         </div>
 
         <!-- Referral Action Training -->
         <div class="scenario-container" id="referralMode">
-            <h2 style="margin-bottom: 20px;">🎁 Referral Action Training</h2>
+            <h2 class="training-section-title">🎁 Referral Action Training</h2>
             
             <div class="customer-dialogue" id="referralDialogue">
                 <!-- Dynamic referral scenarios -->
@@ -237,8 +236,8 @@
             <div id="referralQuestions"></div>
 
             <div class="nav-buttons">
-                <button class="nav-btn" data-call="checkReferralAnswer">Check Answer</button>
-                <button class="nav-btn" data-call="nextReferralScenario">Next Scenario →</button>
+                <button class="nav-btn btn btn-primary" data-call="checkReferralAnswer" type="button">Check Answer</button>
+                <button class="nav-btn btn btn-primary" data-call="nextReferralScenario" type="button">Next Scenario →</button>
             </div>
         </div>
 
@@ -271,7 +270,8 @@
 </main>
 
     <script src="/shared_components/js/data-call-delegator.js?v=2026.09.06.29"></script>
-<script src="/training/js/lead-source-training.js?v=2026.09.05.12"></script>
+<script src="/shared_components/js/training-practice.js?v=2026.09.08.13"></script>
+<script src="/training/js/lead-source-training.js?v=2026.09.08.13"></script>
 
-</body>
-</html>
+
+</body></html>

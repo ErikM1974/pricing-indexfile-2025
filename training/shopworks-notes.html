@@ -1,22 +1,22 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
+<!DOCTYPE html><html lang="en"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shopworks Notes Training - Northwest Custom Apparel</title>
     <link rel="icon" href="/favicon.png" type="image/png">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/training/css/training-shared.css?v=2026.09.07.6">
-    <link rel="stylesheet" href="/training/css/shopworks-notes.css?v=2026.09.07.19">
+    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.08.13">
+<link rel="stylesheet" href="/shared_components/css/training-guide.css?v=2026.09.08.13">
+<link rel="stylesheet" href="/shared_components/css/training-practice.css?v=2026.09.08.13">
+    <link rel="stylesheet" href="/training/css/shopworks-notes.css?v=2026.09.08.13">
 </head>
-<body>
+<body data-ui="unified" data-training="practice">
     <!-- Navigation Header -->
     <nav class="nav-header">
         <div class="nav-container">
             <div class="nav-left">
-                <a href="training-games-hub.html" class="back-btn">
+                <a href="training-games-hub.html" class="back-btn btn">
                     <i class="fas fa-arrow-left" aria-hidden="true"></i>
                     <span>Back to Training Hub</span>
                 </a>
@@ -27,14 +27,13 @@
             </div>
             <div class="nav-right">
                 <div class="logo-container">
-                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
-                         alt="Northwest Custom Apparel">
+                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" alt="Northwest Custom Apparel">
                 </div>
             </div>
         </div>
     </nav>
 
-    <main class="container">
+    <main class="container training-workspace">
         <!-- Header -->
         <div class="header">
             <h1>📝 Shopworks Notes Training</h1>
@@ -56,7 +55,7 @@
                 <div class="label">All other sections</div>
             </div>
             <div class="stat-card">
-                <div class="number">< 20</div>
+                <div class="number">&lt; 20</div>
                 <div class="label">Words per note</div>
             </div>
         </div>
@@ -179,7 +178,7 @@
                     <h3>✅ Good Examples from Your Team:</h3>
                     <div class="example-note">"White logo on black shirts, 3 inch, left chest"</div>
                     <div class="example-note">"Use tear away backing on all"</div>
-                    <div class="example-note">"Name & year 2024 on left chest"</div>
+                    <div class="example-note">"Name &amp; year 2024 on left chest"</div>
                     <div class="example-note">"Charcoal thread for embroidery"</div>
                     <div class="example-note">"2.5 inch logo centered on back"</div>
                 </div>
@@ -262,56 +261,56 @@
             <div class="scenario">
                 <h3>Scenario 1: Customer Communication</h3>
                 <p>A customer just called to check on their order status. You told them it will be ready Friday. Where do you put this note and what do you write?</p>
-                <textarea id="practice1" placeholder="Type your note here..." aria-label="Type your note here"></textarea>
+                <textarea id="practice1" placeholder="Type your note here..." aria-label="Type your note here" class="field-textarea"></textarea>
                 <div class="button-group">
-                    <button data-call="checkAnswer" data-args='[1]'>Check Answer</button>
-                    <button class="secondary" data-call="showExample" data-args='[1]'>Show Example</button>
+                    <button data-call="checkAnswer" data-args="[1]" class="btn" type="button">Check Answer</button>
+                    <button class="secondary btn" data-call="showExample" data-args="[1]" type="button">Show Example</button>
                 </div>
-                <div id="feedback1" class="feedback"></div>
+                <div id="feedback1" class="feedback" role="status"></div>
             </div>
 
             <div class="scenario">
                 <h3>Scenario 2: Production Specification</h3>
                 <p>Customer wants their company logo in white on navy blue shirts, 3 inches wide, centered on the left chest. Write the production note.</p>
-                <textarea id="practice2" placeholder="Type your note here..." aria-label="Type your note here"></textarea>
+                <textarea id="practice2" placeholder="Type your note here..." aria-label="Type your note here" class="field-textarea"></textarea>
                 <div class="button-group">
-                    <button data-call="checkAnswer" data-args='[2]'>Check Answer</button>
-                    <button class="secondary" data-call="showExample" data-args='[2]'>Show Example</button>
+                    <button data-call="checkAnswer" data-args="[2]" class="btn" type="button">Check Answer</button>
+                    <button class="secondary btn" data-call="showExample" data-args="[2]" type="button">Show Example</button>
                 </div>
-                <div id="feedback2" class="feedback"></div>
+                <div id="feedback2" class="feedback" role="status"></div>
             </div>
 
             <div class="scenario">
                 <h3>Scenario 3: Shipping Instructions</h3>
                 <p>Customer wants to use their own FedEx account #445566 for shipping. Write the appropriate note.</p>
-                <textarea id="practice3" placeholder="Type your note here..." aria-label="Type your note here"></textarea>
+                <textarea id="practice3" placeholder="Type your note here..." aria-label="Type your note here" class="field-textarea"></textarea>
                 <div class="button-group">
-                    <button data-call="checkAnswer" data-args='[3]'>Check Answer</button>
-                    <button class="secondary" data-call="showExample" data-args='[3]'>Show Example</button>
+                    <button data-call="checkAnswer" data-args="[3]" class="btn" type="button">Check Answer</button>
+                    <button class="secondary btn" data-call="showExample" data-args="[3]" type="button">Show Example</button>
                 </div>
-                <div id="feedback3" class="feedback"></div>
+                <div id="feedback3" class="feedback" role="status"></div>
             </div>
 
             <div class="scenario">
                 <h3>Scenario 4: The "PO Sent" Problem</h3>
                 <p>You just sent a purchase order to Sanmar for 50 navy blue t-shirts, PO #12345. How do you write this note? (This scenario addresses RL's most common vague note)</p>
-                <textarea id="practice4" placeholder="Type your note here..." aria-label="Type your note here"></textarea>
+                <textarea id="practice4" placeholder="Type your note here..." aria-label="Type your note here" class="field-textarea"></textarea>
                 <div class="button-group">
-                    <button data-call="checkAnswer" data-args='[4]'>Check Answer</button>
-                    <button class="secondary" data-call="showExample" data-args='[4]'>Show Example</button>
+                    <button data-call="checkAnswer" data-args="[4]" class="btn" type="button">Check Answer</button>
+                    <button class="secondary btn" data-call="showExample" data-args="[4]" type="button">Show Example</button>
                 </div>
-                <div id="feedback4" class="feedback"></div>
+                <div id="feedback4" class="feedback" role="status"></div>
             </div>
             
             <div class="scenario">
                 <h3>Scenario 5: The "See Attached" Problem</h3>
                 <p>Customer emailed their new logo file for embroidery approval. You attached it to the order. Write the note. (This addresses TH's most common issue)</p>
-                <textarea id="practice5" placeholder="Type your note here..." aria-label="Type your note here"></textarea>
+                <textarea id="practice5" placeholder="Type your note here..." aria-label="Type your note here" class="field-textarea"></textarea>
                 <div class="button-group">
-                    <button data-call="checkAnswer" data-args='[5]'>Check Answer</button>
-                    <button class="secondary" data-call="showExample" data-args='[5]'>Show Example</button>
+                    <button data-call="checkAnswer" data-args="[5]" class="btn" type="button">Check Answer</button>
+                    <button class="secondary btn" data-call="showExample" data-args="[5]" type="button">Show Example</button>
                 </div>
-                <div id="feedback5" class="feedback"></div>
+                <div id="feedback5" class="feedback" role="status"></div>
             </div>
         </div>
 
@@ -365,6 +364,7 @@
     </main>
 
     <script src="/shared_components/js/data-call-delegator.js?v=2026.09.06.29"></script>
-    <script src="/training/js/shopworks-notes.js?v=2026.09.05.12"></script>
-</body>
-</html>
+    <script src="/shared_components/js/training-practice.js?v=2026.09.08.13"></script>
+<script src="/training/js/shopworks-notes.js?v=2026.09.08.13"></script>
+
+</body></html>

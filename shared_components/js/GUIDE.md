@@ -254,3 +254,4 @@
 Homepage "From the blog" section (index.html). Fetches the 3 newest Published posts from the proxy's public `/api/blog-posts` and renders blog.css cards into `#blogTeaserGrid`; the `#blogTeaser` section stays `[hidden]` unless posts actually render (failed/empty fetch = untouched homepage). Needs `/config/app.config.js` loaded first. The SSR `/blog` pages carry the SEO — this is décor only.
 
 - `training-guide.js`: service-guide disclosures/navigation and visible image loading/failure/retry. Document-only; no business API or writes.
+- `training-practice.js` — NWTraining mode state, accessible card selection/status and safe data-call arguments; loaded before seven training practice controllers.

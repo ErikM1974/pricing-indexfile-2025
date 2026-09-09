@@ -1,23 +1,23 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
+<!DOCTYPE html><html lang="en"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
     <title>Lead Email Templates - Northwest Custom Apparel</title>
     <link rel="icon" href="/favicon.png" type="image/png">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/training/css/training-shared.css?v=2026.09.07.6">
-    <link rel="stylesheet" href="/training/css/lead-email-templates.css?v=2026.09.07.19">
+    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.08.13">
+<link rel="stylesheet" href="/shared_components/css/training-guide.css?v=2026.09.08.13">
+<link rel="stylesheet" href="/shared_components/css/training-practice.css?v=2026.09.08.13">
+    <link rel="stylesheet" href="/training/css/lead-email-templates.css?v=2026.09.08.13">
 </head>
-<body>
+<body data-ui="unified" data-training="practice">
     <!-- Navigation -->
     <nav class="nav-header">
         <div class="nav-container">
             <div class="nav-left">
-                <a href="/staff-dashboard.html" class="back-btn">
+                <a href="/staff-dashboard.html" class="back-btn btn">
                     <i class="fas fa-arrow-left" aria-hidden="true"></i>
                     <span>Dashboard</span>
                 </a>
@@ -27,11 +27,11 @@
                 </h1>
             </div>
             <div class="nav-right">
-                <a href="lead-follow-up-guide.html" class="nav-btn">
+                <a href="lead-follow-up-guide.html" class="nav-btn btn">
                     <i class="fas fa-book" aria-hidden="true"></i>
                     <span>Follow-Up Guide</span>
                 </a>
-                <button class="nav-btn" data-call="openCreateModal">
+                <button class="nav-btn btn btn-primary" data-call="openCreateModal" type="button">
                     <i class="fas fa-plus" aria-hidden="true"></i>
                     <span>Create Template</span>
                 </button>
@@ -40,20 +40,20 @@
     </nav>
 
     <!-- Main Container -->
-    <main class="container">
+    <main class="container training-workspace">
         <!-- Filter Bar -->
         <div class="filter-bar">
             <div class="filter-group">
-                <button class="filter-btn active" data-call="filterTemplates" data-args='["all"]'>All Templates</button>
-                <button class="filter-btn" data-call="filterTemplates" data-args='["initial"]'>Initial Contact</button>
-                <button class="filter-btn" data-call="filterTemplates" data-args='["followup"]'>Follow-Up</button>
-                <button class="filter-btn" data-call="filterTemplates" data-args='["nurture"]'>Nurturing</button>
-                <button class="filter-btn" data-call="filterTemplates" data-args='["closing"]'>Closing</button>
-                <button class="filter-btn" data-call="filterTemplates" data-args='["industry"]'>Industry-Specific</button>
+                <button class="filter-btn active btn" data-call="filterTemplates" data-args="[&quot;all&quot;]" type="button">All Templates</button>
+                <button class="filter-btn btn" data-call="filterTemplates" data-args="[&quot;initial&quot;]" type="button">Initial Contact</button>
+                <button class="filter-btn btn" data-call="filterTemplates" data-args="[&quot;followup&quot;]" type="button">Follow-Up</button>
+                <button class="filter-btn btn" data-call="filterTemplates" data-args="[&quot;nurture&quot;]" type="button">Nurturing</button>
+                <button class="filter-btn btn" data-call="filterTemplates" data-args="[&quot;closing&quot;]" type="button">Closing</button>
+                <button class="filter-btn btn" data-call="filterTemplates" data-args="[&quot;industry&quot;]" type="button">Industry-Specific</button>
             </div>
             <div class="search-bar">
                 <i class="fas fa-search" aria-hidden="true"></i>
-                <input type="text" placeholder="Search templates..." data-input="searchTemplates" data-input-args='["$this.value"]' aria-label="Search templates">
+                <input type="text" placeholder="Search templates..." data-input="searchTemplates" data-input-args="[&quot;$this.value&quot;]" aria-label="Search templates" class="field-input">
             </div>
         </div>
 
@@ -87,11 +87,11 @@ Northwest Custom Apparel
 253-922-5793</div>
                 </div>
                 <div class="template-actions">
-                    <button class="template-btn primary" data-call="copyTemplate" data-args='["$this"]'>
+                    <button class="template-btn primary btn btn-primary" data-call="copyTemplate" data-args="[&quot;$this&quot;]" type="button">
                         <i class="fas fa-copy" aria-hidden="true"></i>
                         Copy Template
                     </button>
-                    <button class="template-btn secondary" data-call="editTemplate" data-args='["$this"]'>
+                    <button class="template-btn secondary btn" data-call="editTemplate" data-args="[&quot;$this&quot;]" type="button">
                         <i class="fas fa-edit" aria-hidden="true"></i>
                         Customize
                     </button>
@@ -131,11 +131,11 @@ Would you prefer a quick call to review, or should I send additional options?
 P.S. Free shipping on orders over $500!</div>
                 </div>
                 <div class="template-actions">
-                    <button class="template-btn primary" data-call="copyTemplate" data-args='["$this"]'>
+                    <button class="template-btn primary btn btn-primary" data-call="copyTemplate" data-args="[&quot;$this&quot;]" type="button">
                         <i class="fas fa-copy" aria-hidden="true"></i>
                         Copy Template
                     </button>
-                    <button class="template-btn secondary" data-call="editTemplate" data-args='["$this"]'>
+                    <button class="template-btn secondary btn" data-call="editTemplate" data-args="[&quot;$this&quot;]" type="button">
                         <i class="fas fa-edit" aria-hidden="true"></i>
                         Customize
                     </button>
@@ -173,11 +173,11 @@ Feel free to call me directly at 253-922-5793 with any questions!
 [Your Name]</div>
                 </div>
                 <div class="template-actions">
-                    <button class="template-btn primary" data-call="copyTemplate" data-args='["$this"]'>
+                    <button class="template-btn primary btn btn-primary" data-call="copyTemplate" data-args="[&quot;$this&quot;]" type="button">
                         <i class="fas fa-copy" aria-hidden="true"></i>
                         Copy Template
                     </button>
-                    <button class="template-btn secondary" data-call="editTemplate" data-args='["$this"]'>
+                    <button class="template-btn secondary btn" data-call="editTemplate" data-args="[&quot;$this&quot;]" type="button">
                         <i class="fas fa-edit" aria-hidden="true"></i>
                         Customize
                     </button>
@@ -218,11 +218,11 @@ Still happy to discuss your [specific request] whenever you're ready!
 [Your Name]</div>
                 </div>
                 <div class="template-actions">
-                    <button class="template-btn primary" data-call="copyTemplate" data-args='["$this"]'>
+                    <button class="template-btn primary btn btn-primary" data-call="copyTemplate" data-args="[&quot;$this&quot;]" type="button">
                         <i class="fas fa-copy" aria-hidden="true"></i>
                         Copy Template
                     </button>
-                    <button class="template-btn secondary" data-call="editTemplate" data-args='["$this"]'>
+                    <button class="template-btn secondary btn" data-call="editTemplate" data-args="[&quot;$this&quot;]" type="button">
                         <i class="fas fa-edit" aria-hidden="true"></i>
                         Customize
                     </button>
@@ -260,11 +260,11 @@ Want to lock in these savings? Reply with "YES" and I'll send the official quote
 P.S. This offer expires Friday at 5 PM.</div>
                 </div>
                 <div class="template-actions">
-                    <button class="template-btn primary" data-call="copyTemplate" data-args='["$this"]'>
+                    <button class="template-btn primary btn btn-primary" data-call="copyTemplate" data-args="[&quot;$this&quot;]" type="button">
                         <i class="fas fa-copy" aria-hidden="true"></i>
                         Copy Template
                     </button>
-                    <button class="template-btn secondary" data-call="editTemplate" data-args='["$this"]'>
+                    <button class="template-btn secondary btn" data-call="editTemplate" data-args="[&quot;$this&quot;]" type="button">
                         <i class="fas fa-edit" aria-hidden="true"></i>
                         Customize
                     </button>
@@ -306,11 +306,11 @@ Thanks for considering Northwest Custom Apparel!
 P.S. Your quote remains valid for 30 days.</div>
                 </div>
                 <div class="template-actions">
-                    <button class="template-btn primary" data-call="copyTemplate" data-args='["$this"]'>
+                    <button class="template-btn primary btn btn-primary" data-call="copyTemplate" data-args="[&quot;$this&quot;]" type="button">
                         <i class="fas fa-copy" aria-hidden="true"></i>
                         Copy Template
                     </button>
-                    <button class="template-btn secondary" data-call="editTemplate" data-args='["$this"]'>
+                    <button class="template-btn secondary btn" data-call="editTemplate" data-args="[&quot;$this&quot;]" type="button">
                         <i class="fas fa-edit" aria-hidden="true"></i>
                         Customize
                     </button>
@@ -351,11 +351,11 @@ Can I show you some options for your crew?
 Safety-compliant decoration specialist</div>
                 </div>
                 <div class="template-actions">
-                    <button class="template-btn primary" data-call="copyTemplate" data-args='["$this"]'>
+                    <button class="template-btn primary btn btn-primary" data-call="copyTemplate" data-args="[&quot;$this&quot;]" type="button">
                         <i class="fas fa-copy" aria-hidden="true"></i>
                         Copy Template
                     </button>
-                    <button class="template-btn secondary" data-call="editTemplate" data-args='["$this"]'>
+                    <button class="template-btn secondary btn" data-call="editTemplate" data-args="[&quot;$this&quot;]" type="button">
                         <i class="fas fa-edit" aria-hidden="true"></i>
                         Customize
                     </button>
@@ -366,7 +366,7 @@ Safety-compliant decoration specialist</div>
             <div class="template-card" data-category="industry">
                 <div class="template-header">
                     <span class="template-category industry">Industry-Specific</span>
-                    <h3 class="template-title">Schools & Education</h3>
+                    <h3 class="template-title">Schools &amp; Education</h3>
                     <p class="template-desc">For school districts and educators</p>
                 </div>
                 <div class="template-body">
@@ -397,11 +397,11 @@ Would you like to see samples from other schools we've worked with?
 Education Partner Specialist</div>
                 </div>
                 <div class="template-actions">
-                    <button class="template-btn primary" data-call="copyTemplate" data-args='["$this"]'>
+                    <button class="template-btn primary btn btn-primary" data-call="copyTemplate" data-args="[&quot;$this&quot;]" type="button">
                         <i class="fas fa-copy" aria-hidden="true"></i>
                         Copy Template
                     </button>
-                    <button class="template-btn secondary" data-call="editTemplate" data-args='["$this"]'>
+                    <button class="template-btn secondary btn" data-call="editTemplate" data-args="[&quot;$this&quot;]" type="button">
                         <i class="fas fa-edit" aria-hidden="true"></i>
                         Customize
                     </button>
@@ -412,7 +412,7 @@ Education Partner Specialist</div>
             <div class="template-card" data-category="industry">
                 <div class="template-header">
                     <span class="template-category industry">Industry-Specific</span>
-                    <h3 class="template-title">Healthcare & Medical</h3>
+                    <h3 class="template-title">Healthcare &amp; Medical</h3>
                     <p class="template-desc">For medical facilities and practices</p>
                 </div>
                 <div class="template-body">
@@ -441,11 +441,11 @@ Can we discuss your facility's specific needs?
 Healthcare Apparel Specialist</div>
                 </div>
                 <div class="template-actions">
-                    <button class="template-btn primary" data-call="copyTemplate" data-args='["$this"]'>
+                    <button class="template-btn primary btn btn-primary" data-call="copyTemplate" data-args="[&quot;$this&quot;]" type="button">
                         <i class="fas fa-copy" aria-hidden="true"></i>
                         Copy Template
                     </button>
-                    <button class="template-btn secondary" data-call="editTemplate" data-args='["$this"]'>
+                    <button class="template-btn secondary btn" data-call="editTemplate" data-args="[&quot;$this&quot;]" type="button">
                         <i class="fas fa-edit" aria-hidden="true"></i>
                         Customize
                     </button>
@@ -456,7 +456,7 @@ Healthcare Apparel Specialist</div>
             <div class="template-card" data-category="industry">
                 <div class="template-header">
                     <span class="template-category industry">Industry-Specific</span>
-                    <h3 class="template-title">Events & Trade Shows</h3>
+                    <h3 class="template-title">Events &amp; Trade Shows</h3>
                     <p class="template-desc">For event organizers and exhibitors</p>
                 </div>
                 <div class="template-body">
@@ -488,11 +488,11 @@ Ready to make your booth memorable?
 Event Specialist</div>
                 </div>
                 <div class="template-actions">
-                    <button class="template-btn primary" data-call="copyTemplate" data-args='["$this"]'>
+                    <button class="template-btn primary btn btn-primary" data-call="copyTemplate" data-args="[&quot;$this&quot;]" type="button">
                         <i class="fas fa-copy" aria-hidden="true"></i>
                         Copy Template
                     </button>
-                    <button class="template-btn secondary" data-call="editTemplate" data-args='["$this"]'>
+                    <button class="template-btn secondary btn" data-call="editTemplate" data-args="[&quot;$this&quot;]" type="button">
                         <i class="fas fa-edit" aria-hidden="true"></i>
                         Customize
                     </button>
@@ -528,11 +528,11 @@ Thanks again for your business.
 P.S. Need more items? Your reorder has no setup fees!</div>
                 </div>
                 <div class="template-actions">
-                    <button class="template-btn primary" data-call="copyTemplate" data-args='["$this"]'>
+                    <button class="template-btn primary btn btn-primary" data-call="copyTemplate" data-args="[&quot;$this&quot;]" type="button">
                         <i class="fas fa-copy" aria-hidden="true"></i>
                         Copy Template
                     </button>
-                    <button class="template-btn secondary" data-call="editTemplate" data-args='["$this"]'>
+                    <button class="template-btn secondary btn" data-call="editTemplate" data-args="[&quot;$this&quot;]" type="button">
                         <i class="fas fa-edit" aria-hidden="true"></i>
                         Customize
                     </button>
@@ -577,11 +577,11 @@ Which option works best for you?
 [Your Name]</div>
                 </div>
                 <div class="template-actions">
-                    <button class="template-btn primary" data-call="copyTemplate" data-args='["$this"]'>
+                    <button class="template-btn primary btn btn-primary" data-call="copyTemplate" data-args="[&quot;$this&quot;]" type="button">
                         <i class="fas fa-copy" aria-hidden="true"></i>
                         Copy Template
                     </button>
-                    <button class="template-btn secondary" data-call="editTemplate" data-args='["$this"]'>
+                    <button class="template-btn secondary btn" data-call="editTemplate" data-args="[&quot;$this&quot;]" type="button">
                         <i class="fas fa-edit" aria-hidden="true"></i>
                         Customize
                     </button>
@@ -591,22 +591,22 @@ Which option works best for you?
     </main>
 
     <!-- Create/Edit Template Modal -->
-    <div id="templateModal" class="modal">
+    <dialog id="templateModal" class="modal ui-dialog" aria-label="Customize email template">
         <div class="modal-content">
             <div class="modal-header">
                 <h2 class="modal-title">Create Custom Template</h2>
-                <button class="modal-close" data-call="closeModal">&times;</button>
+                <button class="modal-close btn" data-call="closeModal" type="button" aria-label="Close template editor">×</button>
             </div>
             
             <form id="templateForm">
                 <div class="form-group">
                     <label for="templateName" class="form-label">Template Name</label>
-                    <input type="text" class="form-input" id="templateName" placeholder="e.g., Welcome Email for Construction Companies">
+                    <input type="text" class="form-input field-input" id="templateName" placeholder="e.g., Welcome Email for Construction Companies">
                 </div>
 
                 <div class="form-group">
                     <label for="templateCategory" class="form-label">Category</label>
-                    <select class="form-input" id="templateCategory">
+                    <select class="form-input field-select" id="templateCategory">
                         <option value="initial">Initial Contact</option>
                         <option value="followup">Follow-Up</option>
                         <option value="nurture">Nurturing</option>
@@ -617,46 +617,47 @@ Which option works best for you?
 
                 <div class="form-group">
                     <label for="templateSubject" class="form-label">Subject Line</label>
-                    <input type="text" class="form-input" id="templateSubject" placeholder="e.g., Re: Your Custom Apparel Request">
+                    <input type="text" class="form-input field-input" id="templateSubject" placeholder="e.g., Re: Your Custom Apparel Request">
                 </div>
 
                 <div class="variables-helper">
                     <div class="variables-title">Click to insert variables:</div>
                     <div class="variable-chips">
-                        <span class="variable-chip" data-call="insertVariable" data-args='["[Name]"]'>[Name]</span>
-                        <span class="variable-chip" data-call="insertVariable" data-args='["[Company Name]"]'>[Company Name]</span>
-                        <span class="variable-chip" data-call="insertVariable" data-args='["[Product]"]'>[Product]</span>
-                        <span class="variable-chip" data-call="insertVariable" data-args='["[Quantity]"]'>[Quantity]</span>
-                        <span class="variable-chip" data-call="insertVariable" data-args='["[Date]"]'>[Date]</span>
-                        <span class="variable-chip" data-call="insertVariable" data-args='["[Your Name]"]'>[Your Name]</span>
+                        <button class="variable-chip btn" data-call="insertVariable" data-args="[&quot;[Name]&quot;]" type="button">[Name]</button>
+                        <button class="variable-chip btn" data-call="insertVariable" data-args="[&quot;[Company Name]&quot;]" type="button">[Company Name]</button>
+                        <button class="variable-chip btn" data-call="insertVariable" data-args="[&quot;[Product]&quot;]" type="button">[Product]</button>
+                        <button class="variable-chip btn" data-call="insertVariable" data-args="[&quot;[Quantity]&quot;]" type="button">[Quantity]</button>
+                        <button class="variable-chip btn" data-call="insertVariable" data-args="[&quot;[Date]&quot;]" type="button">[Date]</button>
+                        <button class="variable-chip btn" data-call="insertVariable" data-args="[&quot;[Your Name]&quot;]" type="button">[Your Name]</button>
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label for="templateBody" class="form-label">Email Body</label>
-                    <textarea class="form-textarea" id="templateBody" placeholder="Type your email template here..."></textarea>
+                    <textarea class="form-textarea field-textarea" id="templateBody" placeholder="Type your email template here..."></textarea>
                 </div>
 
                 <div class="template-actions">
-                    <button type="submit" class="template-btn primary">
+                    <button type="submit" class="template-btn primary btn btn-primary">
                         <i class="fas fa-save" aria-hidden="true"></i>
                         Save Template
                     </button>
-                    <button type="button" class="template-btn secondary" data-call="closeModal">
+                    <button type="button" class="template-btn secondary btn" data-call="closeModal">
                         Cancel
                     </button>
                 </div>
             </form>
         </div>
-    </div>
+    </dialog>
 
     <!-- Success Message -->
-    <div id="successMessage" class="success-message">
+    <div id="successMessage" class="success-message" role="status">
         <i class="fas fa-check-circle" aria-hidden="true"></i>
         <span>Template copied to clipboard!</span>
     </div>
 
     <script src="/shared_components/js/data-call-delegator.js?v=2026.09.06.29"></script>
-    <script src="/training/js/lead-email-templates.js?v=2026.09.06.27"></script>
-</body>
-</html>
+    <script src="/shared_components/js/training-practice.js?v=2026.09.08.13"></script>
+<script src="/training/js/lead-email-templates.js?v=2026.09.08.13"></script>
+
+</body></html>
