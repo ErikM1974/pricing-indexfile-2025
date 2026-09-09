@@ -1,144 +1,118 @@
-/* company-webstores.css — scoped card grids for the Webstores SEO hub.
-   Shell/typography come from golf-tournament-showcase.css (same as the safety page);
-   this file only adds the icon-driven "types" + "benefits" card grids (no images). */
+/* Shared public webstore family. App components own controls; this owner arranges content. */
+@layer components.pages {
+    :where([data-ui="unified"][data-webstore]) { background: var(--ui-surface); color: var(--ui-ink); }
+    :where([data-ui="unified"][data-webstore]) :is(a,p,li) { overflow-wrap: anywhere; }
+    :where([data-ui="unified"][data-webstore]) a:not(.btn) { color: var(--ui-accent-hover); }
+    :where([data-ui="unified"][data-webstore]) :is(section,main)[id] { scroll-margin-block-start: var(--space-5); }
+    :where([data-ui="unified"][data-webstore]) :is(.g-header__inner,.sticky-nav__inner,.ws-breadcrumb__inner,.trust-band__inner,.ws-grid,.ws-steps,.showroom-cta__inner,.g-footer__inner) { max-width: 1200px; margin-inline: auto; padding-inline: var(--space-5); }
+    :where([data-ui="unified"][data-webstore]) .g-header { border-block-start: 3px solid var(--ui-accent); border-block-end: 1px solid var(--ui-line); background: var(--ui-surface); }
+    :where([data-ui="unified"][data-webstore]) .g-header__inner { display: flex; align-items: center; justify-content: space-between; gap: var(--space-5); padding-block: var(--space-4); flex-wrap: wrap; }
+    :where([data-ui="unified"][data-webstore]) .g-header__brand { display: flex; align-items: center; gap: var(--space-3); text-decoration: none; min-width: 0; }
+    :where([data-ui="unified"][data-webstore]) .g-header__logo { width: 88px; height: 54px; object-fit: contain; flex: none; }
+    :where([data-ui="unified"][data-webstore]) .g-header__name { display: block; font-size: var(--font-size-lg); font-weight: 700; color: var(--ui-ink); }
+    :where([data-ui="unified"][data-webstore]) .g-header__tag { display: block; color: var(--ui-muted); font-size: var(--font-size-sm); margin-top: var(--space-1); }
+    :where([data-ui="unified"][data-webstore]) .g-header__contact { display: flex; flex-wrap: wrap; gap: var(--space-4); font-size: var(--font-size-md); }
+    :where([data-ui="unified"][data-webstore]) .g-header__contact-item { display: inline-flex; gap: var(--space-2); align-items: center; }
+    :where([data-ui="unified"][data-webstore]) .sticky-nav { background: var(--ui-canvas); border-block-end: 1px solid var(--ui-line); }
+    :where([data-ui="unified"][data-webstore]) .sticky-nav__inner { display: flex; align-items: center; flex-wrap: wrap; gap: var(--space-2) var(--space-5); padding-block: var(--space-3); }
+    :where([data-ui="unified"][data-webstore]) .sticky-nav__inner > a:not(.btn) { display: inline-flex; align-items: center; min-height: 44px; font-size: var(--font-size-md); text-decoration: none; }
+    :where([data-ui="unified"][data-webstore]) .sticky-nav__cta { margin-inline-start: auto; }
+    :where([data-ui="unified"][data-webstore]) .ws-breadcrumb__inner { display: flex; flex-wrap: wrap; gap: var(--space-2); padding-block: var(--space-4); color: var(--ui-muted); font-size: var(--font-size-md); }
+    :where([data-ui="unified"][data-webstore]) .hero { display: grid; grid-template-columns: 1.1fr 1fr; grid-template-areas: "copy image"; gap: var(--space-6); align-items: center; max-width: 1200px; margin-inline: auto; padding: var(--space-6) var(--space-5); }
+    :where([data-ui="unified"][data-webstore]) .hero__image { grid-area: image; width: 100%; height: 100%; max-height: 580px; min-height: 420px; object-fit: cover; border-radius: var(--radius-lg); }
+    :where([data-ui="unified"][data-webstore]) .hero__inner { grid-area: copy; min-width: 0; }
+    :where([data-ui="unified"][data-webstore]) :is(.hero__eyebrow,.showroom-cta__eyebrow) { color: var(--ui-accent-hover); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; font-size: var(--font-size-sm); margin-bottom: var(--space-4); }
+    :where([data-ui="unified"][data-webstore]) .hero__headline { font-size: clamp(2.1rem, 4vw, 3.5rem); line-height: 1.08; letter-spacing: -0.035em; margin: 0 0 var(--space-4); text-wrap: balance; }
+    :where([data-ui="unified"][data-webstore]) .hero__sub { color: var(--ui-muted); font-size: var(--font-size-lg); line-height: 1.65; margin-bottom: var(--space-5); }
+    :where([data-ui="unified"][data-webstore]) :is(.hero__cta-row,.showroom-cta__buttons) { display: flex; flex-wrap: wrap; gap: var(--space-3); }
+    :where([data-ui="unified"][data-webstore]) .hero__trust { font-size: var(--font-size-md); color: var(--ui-muted); line-height: 1.6; margin-top: var(--space-5); }
+    :where([data-ui="unified"][data-webstore]) .trust-band { background: var(--ui-canvas); border-block: 1px solid var(--ui-line); }
+    :where([data-ui="unified"][data-webstore]) .trust-band__inner { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: var(--space-5); padding-block: var(--space-5); }
+    :where([data-ui="unified"][data-webstore]) .trust-band__item { display: flex; align-items: baseline; gap: var(--space-3); font-size: var(--font-size-md); }
+    :where([data-ui="unified"][data-webstore]) .trust-band__item i { color: var(--ui-accent-hover); }
+    :where([data-ui="unified"][data-webstore]) :is(.ws-section,.faq,.showroom-cta) { padding-block: var(--space-7); }
+    :where([data-ui="unified"][data-webstore]) :is(.section-title,.section-sub) { max-width: 840px; margin-inline: auto; padding-inline: var(--space-5); }
+    :where([data-ui="unified"][data-webstore]) .section-title { font-size: clamp(1.7rem, 3vw, 2.25rem); line-height: 1.2; letter-spacing: -0.025em; margin-block: 0 var(--space-3); text-align: center; }
+    :where([data-ui="unified"][data-webstore]) .section-sub { color: var(--ui-muted); line-height: 1.7; margin-bottom: var(--space-5); text-align: center; }
+    :where([data-ui="unified"][data-webstore]) :is(.ws-grid,.ws-steps) { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: var(--space-5); }
+    :where([data-ui="unified"][data-webstore]) .ws-card { border: 1px solid var(--ui-line); border-radius: var(--radius-md); padding: var(--space-5); background: var(--ui-surface); min-width: 0; }
+    :where([data-ui="unified"][data-webstore]) a.ws-card { display: flex; flex-direction: column; text-decoration: none; }
+    :where([data-ui="unified"][data-webstore]) a.ws-card:hover { border-color: var(--ui-accent); box-shadow: var(--shadow-sm); }
+    :where([data-ui="unified"][data-webstore]) .ws-card--photo { padding: 0; overflow: hidden; }
+    :where([data-ui="unified"][data-webstore]) .ws-card__photo { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; display: block; }
+    :where([data-ui="unified"][data-webstore]) .ws-card__photo--square { aspect-ratio: 1; }
+    :where([data-ui="unified"][data-webstore]) .ws-card__photo--top { object-position: center top; }
+    :where([data-ui="unified"][data-webstore]) .ws-card__body { padding: var(--space-5); display: flex; flex-direction: column; flex: 1; }
+    :where([data-ui="unified"][data-webstore]) .ws-card__icon { color: var(--ui-accent-hover); font-size: 1.5rem; margin-bottom: var(--space-3); }
+    :where([data-ui="unified"][data-webstore]) :is(.ws-card__title,.ws-step__title) { font-size: var(--font-size-lg); line-height: 1.4; color: var(--ui-ink); margin: 0 0 var(--space-2); }
+    :where([data-ui="unified"][data-webstore]) :is(.ws-card__desc,.ws-card__eg,.ws-step__desc) { color: var(--ui-muted); font-size: var(--font-size-md); line-height: 1.65; margin: 0 0 var(--space-3); }
+    :where([data-ui="unified"][data-webstore]) .ws-card__go { font-size: var(--font-size-md); font-weight: 700; margin-top: auto; padding-top: var(--space-3); }
+    :where([data-ui="unified"][data-webstore]) .ws-card__img { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: contain; background: var(--ui-canvas); border-radius: var(--radius-sm); margin-bottom: var(--space-4); }
+    :where([data-ui="unified"][data-webstore]) .ws-card__pricing { background: var(--ui-canvas); border-radius: var(--radius-sm); padding: var(--space-2) var(--space-3); }
+    :where([data-ui="unified"][data-webstore]) .ws-card__pricerow { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-3); padding-block: var(--space-2); font-size: var(--font-size-md); }
+    :where([data-ui="unified"][data-webstore]) .ws-card__pricerow + .ws-card__pricerow { border-top: 1px solid var(--ui-line); }
+    :where([data-ui="unified"][data-webstore]) .ws-card__amt { white-space: nowrap; color: var(--ui-accent-hover); font-weight: 700; }
+    :where([data-ui="unified"][data-webstore]) .ws-card__deco { color: var(--ui-muted); font-size: var(--font-size-sm); line-height: 1.6; margin-top: var(--space-2); }
+    :where([data-ui="unified"][data-webstore]) :is(.ws-pricenote,.tournament-proof__footer) { max-width: 1152px; margin: var(--space-5) auto 0; padding: var(--space-4) var(--space-5); color: var(--ui-muted); font-size: var(--font-size-md); line-height: 1.6; }
+    :where([data-ui="unified"][data-webstore]) .ws-pricenote { background: var(--ui-tint); border-radius: var(--radius-md); }
+    :where([data-ui="unified"][data-webstore]) .ws-step { border-top: 1px solid var(--ui-line); padding-top: var(--space-4); }
+    :where([data-ui="unified"][data-webstore]) .ws-step__num { color: var(--ui-accent-hover); font-size: 2rem; font-weight: 700; line-height: 1; margin-bottom: var(--space-4); }
+    :where([data-ui="unified"][data-webstore]) .faq { background: var(--ui-canvas); }
+    :where([data-ui="unified"][data-webstore]) .faq__inner { max-width: 840px; padding-inline: var(--space-5); margin-inline: auto; }
+    :where([data-ui="unified"][data-webstore]) .faq__item { border-bottom: 1px solid var(--ui-line); }
+    :where([data-ui="unified"][data-webstore]) .faq summary { padding-block: var(--space-4); cursor: pointer; font-weight: 600; }
+    :where([data-ui="unified"][data-webstore]) .faq details p { margin: 0 0 var(--space-4); line-height: 1.7; color: var(--ui-muted); }
+    :where([data-ui="unified"][data-webstore]) .showroom-cta__inner { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-6); align-items: center; }
+    :where([data-ui="unified"][data-webstore]) .showroom-cta__inner--center { display: block; max-width: 840px; }
+    :where([data-ui="unified"][data-webstore]) .showroom-cta__photo { min-width: 0; }
+    :where([data-ui="unified"][data-webstore]) .showroom-cta__photo img { display: block; width: 100%; border-radius: var(--radius-lg); }
+    :where([data-ui="unified"][data-webstore]) .showroom-cta__photo-tag { color: var(--ui-muted); margin-top: var(--space-2); font-size: var(--font-size-sm); }
+    :where([data-ui="unified"][data-webstore]) .showroom-cta__title { font-size: 2rem; line-height: 1.2; letter-spacing: -0.025em; margin: 0 0 var(--space-4); }
+    :where([data-ui="unified"][data-webstore]) .showroom-cta__lead { color: var(--ui-muted); line-height: 1.7; margin-bottom: var(--space-5); }
+    :where([data-ui="unified"][data-webstore]) .showroom-cta__lead--callout { padding: var(--space-4); background: var(--ui-tint); border-inline-start: 3px solid var(--ui-accent); }
+    :where([data-ui="unified"][data-webstore]) .g-footer { background: var(--ui-canvas); border-top: 1px solid var(--ui-line); padding-block: var(--space-6) var(--space-4); }
+    :where([data-ui="unified"][data-webstore]) .g-footer__inner { display: flex; justify-content: space-between; gap: var(--space-5); flex-wrap: wrap; }
+    :where([data-ui="unified"][data-webstore]) .g-footer__name { font-weight: 700; margin: 0 0 var(--space-2); }
+    :where([data-ui="unified"][data-webstore]) :is(.g-footer__since,.g-footer__addr,.g-footer__copyright) { font-size: var(--font-size-md); color: var(--ui-muted); }
+    :where([data-ui="unified"][data-webstore]) .g-footer__rep { display: flex; flex-direction: column; gap: var(--space-3); font-size: var(--font-size-md); }
+    :where([data-ui="unified"][data-webstore]) .g-footer__copyright { max-width: 1200px; margin: var(--space-5) auto 0; padding-inline: var(--space-5); border-top: 1px solid var(--ui-line); padding-top: var(--space-4); }
 
-/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue so the page
-   keeps its exact look. Map them to shared_components/css/tokens.css names when the page is redesigned;
-   every rule below uses var(). Raw hex is allowed ONLY in this block. */
-/* stylelint-disable color-no-hex */
-:root {
-    --cw-green-dark: #2f4a3c;
-    --cw-gray: #c3ccc7;
+    @media (width <= 900px) {
+        :where([data-ui="unified"][data-webstore]) .hero { grid-template-columns: 1fr; grid-template-areas: "copy" "image"; }
+        :where([data-ui="unified"][data-webstore]) .hero__image { height: 340px; min-height: 0; }
+        :where([data-ui="unified"][data-webstore]) :is(.ws-grid,.ws-steps) { grid-template-columns: repeat(2,minmax(0,1fr)); }
+        :where([data-ui="unified"][data-webstore]) .showroom-cta__inner { grid-template-columns: 1fr; }
+    }
+
+    @media (width <= 560px) {
+        :where([data-ui="unified"][data-webstore]) :is(.ws-grid,.ws-steps,.trust-band__inner) { grid-template-columns: 1fr; }
+        :where([data-ui="unified"][data-webstore]) .g-header__name { font-size: var(--font-size-base); }
+        :where([data-ui="unified"][data-webstore]) .g-header__logo { width: 68px; }
+        :where([data-ui="unified"][data-webstore]) .sticky-nav__cta { margin-inline-start: 0; }
+        :where([data-ui="unified"][data-webstore]) :is(.hero__cta-row,.showroom-cta__buttons) { align-items: stretch; flex-direction: column; }
+        :where([data-ui="unified"][data-webstore]) .hero__image { height: 260px; }
+    }
 }
-/* stylelint-enable color-no-hex */
 
-/* Hero scrim — the webstore heroes use a bare <img class="hero__image"> with no
-   .hero__overlay element, so add a dark gradient here (loads after golf CSS) so the
-   white headline stays readable over any image, including bright ones like the Carhartt
-   banner. Left-weighted: darkest where the centered text sits, lighter on the right. */
-.hero::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-  background: linear-gradient(90deg, rgb(8 18 12 / 86%) 0%, rgb(8 18 12 / 68%) 52%, rgb(8 18 12 / 42%) 100%);
+@layer components.print {
+    @media print {
+        :where([data-ui="unified"][data-webstore]) :is(.sticky-nav,.ws-breadcrumb,.hero__cta-row,.showroom-cta__buttons,.hero__image) { display: none; }
+        :where([data-ui="unified"][data-webstore]) .hero { display: block; padding-block: 1rem; }
+        :where([data-ui="unified"][data-webstore]) :is(.hero__headline,.section-title,.showroom-cta__title) { font-size: 20pt; break-after: avoid; }
+        :where([data-ui="unified"][data-webstore]) :is(.ws-section,.faq,.showroom-cta) { padding-block: 1rem; }
+        :where([data-ui="unified"][data-webstore]) :is(.ws-grid,.ws-steps) { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 1rem; }
+        :where([data-ui="unified"][data-webstore]) :is(.ws-card,.ws-step,.faq__item) { break-inside: avoid; box-shadow: none; }
+        :where([data-ui="unified"][data-webstore]) :is(.ws-card__photo,.ws-card__img) { max-height: 180px; }
+        :where([data-ui="unified"][data-webstore]) .showroom-cta__inner { display: block; }
+        :where([data-ui="unified"][data-webstore]) .showroom-cta__photo { max-width: 400px; }
+        :where([data-ui="unified"][data-webstore]) .hero__headline { letter-spacing: normal; }
+        :where([data-ui="unified"][data-webstore]) :is(p,li) { orphans: 3; widows: 3; }
+        :where([data-ui="unified"][data-webstore]) .g-footer { break-inside: avoid; padding-block: 1rem; }
+        :where([data-ui="unified"][data-webstore]) :is(.g-header__inner,.trust-band__inner) { padding-block: 0.75rem; }
+        :where([data-ui="unified"][data-webstore]) :is(.hero__sub,.hero__trust,.section-sub) { font-size: 11pt; line-height: 1.5; margin-block: 0.75rem; }
+        :where([data-ui="unified"][data-webstore]) :is(.ws-card,.ws-card__body) { padding: 0.75rem; }
+        :where([data-ui="unified"][data-webstore]) .ws-card--photo { padding: 0; }
+        :where([data-ui="unified"][data-webstore]) .ws-card__title { font-size: 12pt; }
+        :where([data-ui="unified"][data-webstore]) :is(.ws-card__desc,.ws-card__eg) { font-size: 10pt; line-height: 1.5; }
+    }
 }
-.hero__headline, .hero__sub { text-shadow: 0 2px 14px rgb(0 0 0 / 55%); }
-
-.ws-section { padding: 40px 0 8px; }
-
-.ws-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 18px;
-  max-width: 1120px;
-  margin: 22px auto 0;
-  padding: 0 1.5rem;
-}
-
-.ws-card {
-  background: var(--color-surface);
-  border: 1px solid var(--gray-200);
-  border-radius: 14px;
-  box-shadow: 0 1px 3px rgb(20 40 30 / 8%);
-  padding: 22px 22px 20px;
-  display: flex;
-  flex-direction: column;
-}
-
-.ws-card__icon {
-  width: 46px; height: 46px; border-radius: 12px;
-  display: inline-flex; align-items: center; justify-content: center;
-  font-size: 20px; background: var(--brand-100); color: var(--print-green);
-  margin-bottom: 12px;
-}
-.ws-card__title { font-size: 1.06rem; font-weight: 800; margin: 0 0 6px; color: var(--gray-800); }
-.ws-card__desc { font-size: 0.9rem; color: var(--gray-600); margin: 0 0 10px; line-height: 1.55; flex: 1 1 auto; }
-.ws-card__eg { font-size: 0.8rem; color: var(--gray-500); font-style: italic; margin: 0; }
-
-/* any anchor card (incl. spoke product cards) — no default underline/blue */
-a.ws-card { text-decoration: none; color: inherit; }
-a.ws-card:hover { border-color: var(--print-green); }
-
-/* linked niche cards (hub -> industry spoke pages) */
-a.ws-card--link { text-decoration: none; color: inherit; transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease; }
-a.ws-card--link:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgb(20 40 30 / 14%); border-color: var(--print-green); }
-.ws-card__go { margin-top: auto; padding-top: 4px; font-size: 0.85rem; font-weight: 800; color: var(--print-green); display: inline-flex; align-items: center; gap: 6px; }
-.ws-card__go i { transition: transform .15s ease; }
-a.ws-card--link:hover .ws-card__go i { transform: translateX(3px); }
-
-/* breadcrumb bar on the spoke pages — visible path back up to the hub (mirrors JSON-LD) */
-.ws-breadcrumb { background: var(--color-surface); border-bottom: 1px solid var(--brand-100); }
-
-.ws-breadcrumb__inner {
-  max-width: 1120px; margin: 0 auto; padding: 10px 1.5rem;
-  font-size: 0.85rem; color: var(--gray-500);
-  display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
-}
-.ws-breadcrumb__inner a { color: var(--print-green); text-decoration: none; font-weight: 600; }
-.ws-breadcrumb__inner a:hover { text-decoration: underline; }
-.ws-breadcrumb__sep { color: var(--cw-gray); }
-.ws-breadcrumb__current { color: var(--gray-500); }
-
-/* photo variant of the niche card — full-bleed image on top, text body below */
-.ws-card--photo { padding: 0; overflow: hidden; }
-.ws-card__photo { width: 100%; aspect-ratio: 3 / 2; object-fit: cover; display: block; background: var(--store-green-50); }
-.ws-card--photo .ws-card__body { padding: 18px 20px 20px; display: flex; flex-direction: column; flex: 1 1 auto; }
-
-/* highlighted callout paragraph inside a showroom-cta (e.g. the names-and-numbers AE-routing note) */
-.showroom-cta__lead--callout {
-  background: var(--store-green-50);
-  border: 1px solid var(--store-green-100);
-  border-left: 4px solid var(--print-green);
-  border-radius: 10px;
-  padding: 14px 18px;
-  color: var(--cw-green-dark);
-}
-.showroom-cta__lead--callout strong { color: var(--gray-800); }
-
-/* cause-gallery cards (real fundraisers we've printed) — square variant of the photo card */
-.ws-card__photo--square { aspect-ratio: 1 / 1; }
-.ws-card__photo--top { object-position: center top; }
-
-/* product cards with an image + suggested price (spoke pages) */
-.ws-card__img { width: 100%; aspect-ratio: 4 / 3; object-fit: contain; background: var(--gray-100); border-radius: 10px; margin-bottom: 12px; display: block; }
-.ws-card__price { font-size: 0.9rem; font-weight: 800; color: var(--print-green); margin: 2px 0 8px; }
-
-/* per-card decoration price list — one row per method (embroidered / DTG / DTF), menu-style */
-.ws-card__pricing { background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: 10px; padding: 4px 12px; margin: 2px 0 8px; }
-.ws-card__pricerow { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; padding: 6px 0; font-size: 0.85rem; }
-.ws-card__pricerow + .ws-card__pricerow { border-top: 1px solid var(--gray-200); }
-.ws-card__method { color: var(--gray-600); }
-.ws-card__amt { font-weight: 800; color: var(--print-green); white-space: nowrap; }
-
-/* decoration-method caption under the price list (poly fabric note, embroidery-only caps) */
-.ws-card__deco { font-size: 0.78rem; color: var(--gray-500); margin: -2px 0 8px; }
-.ws-card__price span { font-weight: 500; color: var(--gray-500); font-size: 0.8rem; }
-
-.ws-pricenote {
-  max-width: 1120px; margin: 20px auto 0; padding: 13px 20px;
-  background: var(--store-green-50); border: 1px solid var(--store-green-100); border-radius: 12px;
-  font-size: 0.9rem; color: var(--cw-green-dark); text-align: center; line-height: 1.5;
-}
-.ws-pricenote strong { color: var(--gray-800); }
-
-/* the "how it works" numbered steps as a clean row */
-.ws-steps {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 18px;
-  max-width: 1120px;
-  margin: 22px auto 0;
-  padding: 0 1.5rem;
-}
-.ws-step { text-align: left; }
-
-.ws-step__num {
-  width: 38px; height: 38px; border-radius: 50%;
-  display: inline-flex; align-items: center; justify-content: center;
-  font-weight: 800; font-size: 1.05rem; color: var(--color-on-brand); background: var(--print-green);
-  margin-bottom: 10px;
-}
-.ws-step__title { font-size: 1rem; font-weight: 800; margin: 0 0 4px; color: var(--gray-800); }
-.ws-step__desc { font-size: 0.9rem; color: var(--gray-600); margin: 0; line-height: 1.55; }

@@ -511,3 +511,20 @@ Next work is isolated in training-final-worktree, branch codex/webstore-family b
 ## Policy CMS release record — v2026.09.08.19
 
 Exact-source CI 34319634271 passed all four jobs on 1919b192842f41790e1cc12142c411bf07539465, including live money/calculator parity. Policies Hub, Policy Detail, Open Questions and Handbook share scoped styles and controls. Original policy text, API client and authentication remain unchanged. Twenty-one family browser cases cover four widths, native navigation/dialog/focus, failures and retry, actual editing/failed-save recovery, SAML comment identity, parent choices, moderation confirmation and complete paper. All 101 selected synthetic content blocks print. Full local checks: 5,098 unit tests, 265 mocked browser plus16 remaining browser, all five calculator surfaces; 485 routes unchanged. After actual verified rollout:72 reviewed /153 pending of225 application sources. Deployment and live verification follow.
+
+## Webstore public family plan — 2026-09-08
+
+Worktree codex/webstore-family starts from the reviewed CMS commit 32cd5e640c9a304f1cf4f1f1650efdb7d12553bb; CMS full release gates continue in primary. Live still .18 /68 reviewed until the actual .19 verification. Baseline metadata, policy/offer prose, headings, destinations, images, structured data and CSS graphs for all 12 public webstore marketing pages are saved in webstore-original-baseline.json. No business writes.
+
+- [x] Inventory the twelve consumers of company-webstores.css: company, college, construction, event, fundraising, government, industrial, property-management, restaurant, retail, school-spirit and team. All currently borrow golf-tournament-showcase.css.
+- [ ] Give the family its own shared scoped public layout in company-webstores.css, using app tokens/components/Public Sans; remove its borrowed golf stylesheet and duplicated control ownership. Preserve all copy, offer terms, imagery, SEO metadata/structured data and inquiry destinations.
+- [ ] Review desktop/tablet/phones, native navigation/FAQ/links, contrast and print; lock original content and register family ownership. These pages have no business-service controller.
+- [ ] Pass full release checks and exact-source CI, then verify actual deployment after CMS. Candidate would be 84 of225 reviewed /141 pending. Do not claim live from a local manifest.
+
+## Webstore family reviewed locally — 2026-09-08
+
+All twelve public webstore pages now use one scoped family owner, shared controls and Public Sans. The separate photo/text hero keeps the original shop/product photos visible; public navigation remains reachable on phones. No original wording, marketing price examples, offer terms, links, imagery or SEO metadata/JSON-LD changed; the complete original main text is equality-locked. No business writes or service calls.
+
+All 24 responsive/navigation/print browser cases pass, plus one case checking all twelve live-server route aliases (25 cases total). Four widths have no horizontal overflow or axe violations. Native FAQs work by keyboard, every anchor target receives focus, and printing opens all FAQ answers then restores prior disclosure state. Actual PDFs retain all 773 checked content/pricing/FAQ blocks across12 pages; first/middle/last samples reviewed. Print cards retain images, avoid clipping and keep footer contents together. Three content/ownership suites pass150 tests, with the final full-copy equality check separately passing all12 pages; CSS and controller lint pass.
+
+Raw CSS graph per page:81,097 → 70707 bytes (12.8% smaller), including shared tokens/components. Baseline captures relative CSS paths on the company hub as well as root paths on the spokes. Full primary gates, cache version, exact-source CI and actual deployment remain. Local manifest84 is a candidate count only; live remains68 until CMS(.19) verification, then72 until this family ships.

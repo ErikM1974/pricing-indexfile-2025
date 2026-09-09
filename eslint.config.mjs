@@ -18,6 +18,7 @@ const POLICY_UI_FILES = [
     'shared_components/js/policies/handbook-reader.js',
 ];
 const STRICT_FILES = [
+    'shared_components/js/webstore-guide.js',
     ...POLICY_UI_FILES,
     'dashboards/js/policy-migration.js',
     'pages/js/pricing-negotiation-policy.js',
@@ -164,7 +165,7 @@ export default [
         },
     },
     {
-        files: POLICY_UI_FILES,
+        files: [...POLICY_UI_FILES, 'shared_components/js/webstore-guide.js'],
         languageOptions: { sourceType: 'script', globals: { ...globals.browser } },
     },
     {

@@ -192,3 +192,7 @@ Policy guides/notices: shared components own page chrome, fields/buttons, cards 
 ## Unified policies workspace — 2026-09-08
 
 The four policy pages load tokens, shared components, then pages/css/policy-workspace.css. Policy Detail adds policy-detail.css and org-chart-2026.css; Handbook adds handbook.css. Each owns its responsive domain layout and one print layer. The prior policies-hub-v2.css path is retired. Shared policy-workspace.js owns contents disclosure, read-only table scrolling and control classes, excluding editor-owned DOM.
+
+## Public webstore family — 2026-09-08
+
+The twelve public webstore marketing pages share tokens/components/Public Sans and the rebuilt pages/css/company-webstores.css. They no longer borrow golf-tournament-showcase.css. The family owns a split photo/text hero, reachable public navigation, image/product/price grids, native FAQs and paper layout. Shared webstore-guide.js only focuses fragment destinations and restores FAQ state after printing. Preserve original terms, full main text, image destinations and SEO JSON-LD data; no business API calls.
