@@ -1,0 +1,439 @@
+{
+  "base": "98e17e0d5f999cb45df77f285cf0af16cdf69ebf",
+  "pages": [
+    {
+      "file": "dashboards/reports/price-audit-report.html",
+      "title": "Price Audit Report — NWCA 2026",
+      "bodyTextSha": "9f7576dc0abe2f3317a9042571fb46f9d0b355f5f9dfc15bc34dc623582bc3b0",
+      "ids": [
+        "discrepancy-table",
+        "order-table"
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "label": "Staff Dashboard"
+        }
+      ],
+      "fields": [],
+      "tableHashes": [
+        "75249f3af2af40c742c5a2be84e346ba1070f4cd2ab97911b8707ea5bf7218ea",
+        "f1b21d6296532be4f12b4b243c1b5dd4a5b6e8ff865fad154f87b26fe1248279",
+        "2e23285c856cb84cf198a3649678a9d76ac18857262cfc50e3ff7174d455bf5c",
+        "ec90194175ae6a38b98074a2c92c566d1064d03ac2d79fad81ece5ef995714c3",
+        "3bb81dff28f10edc593b88cf96fa1d41b5333bf00cd3c99539d215af09acb7de",
+        "3f7c5e85a3ec4833a21ed97962fa609b03e47daf3d679fb40fcc1daa7e8852ee",
+        "24663739b462e8b7bc830949ea7007accd861d098f525d89411466a8b1f23960",
+        "38e56294fa454a2a0d1c7b34c2d86a69b976bc2530914fbe207c72d6f4c539c7"
+      ],
+      "tableRows": [
+        5,
+        5,
+        5,
+        5,
+        9,
+        16,
+        56,
+        80
+      ]
+    },
+    {
+      "file": "pages/quote-audit.html",
+      "title": "Pricing Audit - Northwest Custom Apparel",
+      "bodyTextSha": "1bd33fbada717d9df02e72b6afecf136a00386c219df16808774f2c079c731e5",
+      "ids": [
+        "auth-gate",
+        "loading-state",
+        "error-state",
+        "error-title",
+        "error-message",
+        "audit-content",
+        "audit-quote-id",
+        "overall-flag-badge",
+        "ctx-customer",
+        "ctx-customer-value",
+        "ctx-company",
+        "ctx-company-value",
+        "ctx-sales-rep",
+        "ctx-sales-rep-value",
+        "ctx-order",
+        "ctx-order-value",
+        "ctx-created",
+        "ctx-created-value",
+        "ctx-paid",
+        "ctx-paid-value",
+        "ctx-balance",
+        "ctx-balance-value",
+        "ctx-digitizing",
+        "ctx-digitizing-value",
+        "ctx-tracking",
+        "ctx-tracking-value",
+        "summary-grid",
+        "audit-products-table",
+        "audit-products-tbody",
+        "audit-products-tfoot",
+        "import-notes-section",
+        "import-notes-list",
+        "view-customer-quote",
+        "qa-print-btn"
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "label": "Go to Staff Dashboard"
+        },
+        {
+          "href": "#",
+          "label": "View Customer Quote"
+        },
+        {
+          "href": "/dashboards/quote-management.html",
+          "label": "Back to Quotes"
+        }
+      ],
+      "fields": [],
+      "tableHashes": [
+        "d7ca2fcd5e0b3dc4416a5030bef3f36d3bdfde1b500f6683b05a18c9df57a309"
+      ],
+      "tableRows": [
+        3
+      ]
+    },
+    {
+      "file": "dashboards/pricing-analysis.html",
+      "title": "Pricing Analysis · Northwest Custom Apparel",
+      "bodyTextSha": "c6bbf28b605f308f7209073098f4ab5d42d3d6af4f545e382b11a92c33f46c54",
+      "ids": [
+        "pa-top",
+        "pa-tiers",
+        "pa-year",
+        "pa-gap",
+        "pa-cost",
+        "pa-costing",
+        "pa-reorders",
+        "pa-sales",
+        "pa-customers",
+        "pa-pricing",
+        "pa-design",
+        "pa-rules",
+        "pa-limits"
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "label": ""
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "label": "Dashboard"
+        },
+        {
+          "href": "#pa-tiers",
+          "label": "Units by tier"
+        },
+        {
+          "href": "#pa-year",
+          "label": "Year by year"
+        },
+        {
+          "href": "#pa-gap",
+          "label": "The gap"
+        },
+        {
+          "href": "#pa-cost",
+          "label": "Cost basis"
+        },
+        {
+          "href": "#pa-costing",
+          "label": "Settled costing"
+        },
+        {
+          "href": "#pa-sales",
+          "label": "Sales playbook"
+        },
+        {
+          "href": "#pa-customers",
+          "label": "Customer behaviour"
+        },
+        {
+          "href": "#pa-pricing",
+          "label": "Caspio today"
+        },
+        {
+          "href": "#pa-design",
+          "label": "Tier design"
+        },
+        {
+          "href": "#pa-rules",
+          "label": "Five rules"
+        },
+        {
+          "href": "#pa-limits",
+          "label": "Limits"
+        },
+        {
+          "href": "#pa-costing",
+          "label": "Settled costing"
+        },
+        {
+          "href": "#pa-costing",
+          "label": "Settled costing"
+        },
+        {
+          "href": "#pa-costing",
+          "label": "Settled costing"
+        },
+        {
+          "href": "#pa-costing",
+          "label": "Settled costing"
+        }
+      ],
+      "fields": [],
+      "tableHashes": [
+        "a078fcfacc0b0c6f843dd1420dab09ea80fc456d020c94f4fe4b93a424d3a7de",
+        "61c0a268923c5e4dbc9e0cb1c830d8f8a07c2054bfc57b4a181cc952f491e7f2",
+        "a2be52c099096ad97479d28724a68a9fd5fb9ac86d27014660f11be242aa431e",
+        "00914cd5c459749b7164492192aabc271b1078ed89efe4f9d7a9412c2471582f",
+        "631888fe2fde62b8a93cb7bdf6ca3bd05148400e1175d235d56cf6aa21f782ee",
+        "6154a0a8e004f24dad9e3c49162628dcf973e39ec84b41a4da8a5681132b66c7",
+        "964ee23fe9f6c8108d3be87fce584778daa52e136c273087033556aa4fc48b5b",
+        "488041a57fd206f41c3b4081ff9c7b75918da4947f98ee9ad0fd0de7af52830f",
+        "9916a85f010ab31820098584f31634841ad4faffc109ec2bd234696ce46ca8ae",
+        "029f518d3210665669f0020ae4b3ec4334c074cc6911e648d1318781fafcdd26",
+        "c7854a4718b2858671496ab72eedf6a894ea86210e4b0d863bca863f8b1b4376",
+        "301574118b217f11adcc1b5624a4b871bd0eb21fd0825374f33638280d4adfd3",
+        "3adee9c149a65d4532431700d0478ce5b4f52c70912f9b7e1e31399cd4d585dd",
+        "65df507c0886316439de2c669e70fa39270f7524538aea78463814b32e1a3eba",
+        "6ee0c10fec0e4b1079c9a44f7056032b0332382df927ba4f91542777817d24a9",
+        "23406d8b9486cdc93ae7d3f4aacd5a02d1f4b2ba193af3da8d45c76a35251177",
+        "98b479869d765929dfc634623c9aca7024607ef7aa7ed09c571b48e0808883bd",
+        "d23ddefacdcd3852fe116bb8ac69d8ff51839158a3ca4e8547cb459ce7fbf51a",
+        "b02ba58394e1cd08b152a09cabdbfdefb6a2ce9f54b2ebf2be7bc662f2df2e61",
+        "9e9f966f141d2e5507b054e4096a657610ff21096fe4caa404d40794157ba84b",
+        "ea86c39c18d9702fa4614f54d5e0655d73961e7027f61f0f479bb88d56edc155",
+        "41cd711e549c9d8e4b756c674910f031b3d3853560cd3456929c709b36185962",
+        "b29f368cb696e8d0659698a41d94eb664542f2b70700c1f2af5319e351023752",
+        "337c129da47df5a985ae414e365cd16d1bb3206b7da6794c3f099a43e06ab3f3",
+        "1f69c70888f17ced5bee1a046a3d2725d925475e4f345a9ad9e4dea578eee1fe",
+        "dce39019bf8dcf8dd2e2c5d890da83e34ca5412551c29d1ebdd516257a31e5a1",
+        "d2b30ad597aec64029666c02cbd040a4010eaf8105b2428cff5cc18cd2f4241a",
+        "0078d95f38b6a4297ec1e581a20bdcebd4722ac0f5ef471b4dde30769e10508d",
+        "e0ed34e486db976d38d531cc2ad40adff83b8d880a15f39d00751bd6ca2f2ac4",
+        "5e7f8648554f241141d36136d319e84f6b79e082d8ab803247a8e094bed36ba7",
+        "3fff645d6b52c931964ca9528b606723e4e1380a4d89567fe39f5f9f6835cb9e",
+        "67daee530b7afeb8e3eda44297af3c447385951b2324d207658cf3fca97c43c3",
+        "dc5578608e7e18c7814327cedc7b7b7218795067ca1bea64f9e6c3842ac2914f"
+      ],
+      "tableRows": [
+        5,
+        5,
+        5,
+        11,
+        11,
+        2,
+        5,
+        5,
+        10,
+        11,
+        3,
+        5,
+        4,
+        3,
+        6,
+        2,
+        12,
+        1,
+        5,
+        4,
+        5,
+        4,
+        5,
+        4,
+        2,
+        6,
+        5,
+        5,
+        11,
+        4,
+        3,
+        5,
+        5
+      ]
+    }
+  ],
+  "hashes": {
+    "dashboards/reports/price-audit-report.js": "1a8e4a68cf2dbb82afe7674d7992169f8d394a34d38cdb9db8be472ab423cd2e",
+    "shared_components/js/staff-auth-helper.js": "b858bb5e30a775c949aaab2e4f0bbb4796e06c02a76f3bb8d8a9c97985f5addd",
+    "pages/js/quote-audit.js": "172c511fd179cf593b9ae4792b14bec6a2630974039a8c5869b0480f69167521",
+    "dashboards/js/pricing-analysis.js": "2f5ce48b70f04ccec3cc6a6466977c9853ebd32c28ffa1b77724e117ea8d86dd",
+    "scripts/build-pricing-analysis.py": "80db76769a87624871ac1858cb8cca560a52f660bdfea7532832011e586faca2",
+    "memory/pricing-analysis-data.json": "f1267acd7621a6742da30b70a98269227aafcf8ba6cd2b45550286ee76c9aa93"
+  },
+  "changes": [
+    {
+      "file": "scripts/build-pricing-analysis.py",
+      "from": "Bump CSS_VER whenever pricing-analysis.css changes.",
+      "to": "Bump CSS_VER whenever shared pricing-reports.css changes."
+    },
+    {
+      "file": "scripts/build-pricing-analysis.py",
+      "from": "CSS_VER = '2026.09.07.10'",
+      "to": "CSS_VER = '2026.09.09.18'"
+    },
+    {
+      "file": "scripts/build-pricing-analysis.py",
+      "from": "JS_VER = '2026.09.05.74'",
+      "to": "JS_VER = '2026.09.09.18'"
+    },
+    {
+      "file": "scripts/build-pricing-analysis.py",
+      "from": "<div class=\"pa-scroll\"><table class=\"pa-table\">",
+      "to": "<div class=\"pa-scroll table-scroll\" tabindex=\"0\" role=\"region\" aria-label=\"Pricing analysis table\"><table class=\"pa-table data-table\">"
+    },
+    {
+      "file": "scripts/build-pricing-analysis.py",
+      "from": "style=\"width:%.1f%%\"",
+      "to": "style=\"--report-share:%.1f%%\""
+    },
+    {
+      "file": "scripts/build-pricing-analysis.py",
+      "from": "family=Inter:wght@400;500;600;700&family=JetBrains+Mono",
+      "to": "family=Public+Sans:wght@400;500;600;700&family=JetBrains+Mono"
+    },
+    {
+      "file": "scripts/build-pricing-analysis.py",
+      "from": "    <link rel=\"stylesheet\" href=\"/shared_components/css/art-hub.css\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/dash-shell.css\">\n    <link rel=\"stylesheet\" href=\"/dashboards/css/pricing-analysis.css?v=%s\">",
+      "to": "    <link rel=\"stylesheet\" href=\"/shared_components/css/tokens.css?v=2026.09.09.18\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/components.css?v=2026.09.09.18\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/pricing-reports.css?v=%s\">"
+    },
+    {
+      "file": "scripts/build-pricing-analysis.py",
+      "from": "<body>\n    <div class=\"dash-shell\">",
+      "to": "<body data-ui=\"unified\" data-pricing-report=\"analysis\">\n    <a class=\"skip-link\" href=\"#pricing-report-main\">Skip to pricing report</a>\n    <div class=\"dash-shell\">"
+    },
+    {
+      "file": "scripts/build-pricing-analysis.py",
+      "from": "class=\"dash-back-link\"",
+      "to": "class=\"dash-back-link btn btn-secondary\""
+    },
+    {
+      "file": "scripts/build-pricing-analysis.py",
+      "from": "<main class=\"dash-content\">",
+      "to": "<main class=\"dash-content\" id=\"pricing-report-main\" tabindex=\"-1\">"
+    },
+    {
+      "file": "pages/js/quote-audit.js",
+      "from": "document.getElementById('loading-state').style.display = 'none';",
+      "to": "document.getElementById('loading-state').hidden = true;"
+    },
+    {
+      "file": "pages/js/quote-audit.js",
+      "from": "document.getElementById('loading-state').style.display = 'none';",
+      "to": "document.getElementById('loading-state').hidden = true;"
+    },
+    {
+      "file": "pages/js/quote-audit.js",
+      "from": "document.getElementById('loading-state').style.display = 'none';",
+      "to": "document.getElementById('loading-state').hidden = true;"
+    },
+    {
+      "file": "pages/js/quote-audit.js",
+      "from": "document.getElementById('auth-gate').style.display = 'flex';",
+      "to": "document.getElementById('auth-gate').hidden = false;"
+    },
+    {
+      "file": "pages/js/quote-audit.js",
+      "from": "document.getElementById('audit-content').style.display = 'block';",
+      "to": "document.getElementById('audit-content').hidden = false;"
+    },
+    {
+      "file": "pages/js/quote-audit.js",
+      "from": "document.getElementById('import-notes-section').style.display = 'block';",
+      "to": "document.getElementById('import-notes-section').hidden = false;"
+    },
+    {
+      "file": "pages/js/quote-audit.js",
+      "from": "document.getElementById('import-notes-section').style.display = 'block';",
+      "to": "document.getElementById('import-notes-section').hidden = false;"
+    },
+    {
+      "file": "pages/js/quote-audit.js",
+      "from": "document.getElementById('error-state').style.display = 'flex';",
+      "to": "document.getElementById('error-state').hidden = false;"
+    },
+    {
+      "file": "pages/js/quote-audit.js",
+      "from": "        el.style.display = 'flex';",
+      "to": "        el.hidden = false;"
+    },
+    {
+      "file": "dashboards/reports/price-audit-report.js",
+      "from": "                th.style.cursor = 'pointer';\n                th.addEventListener('click', () => {",
+      "to": "                const button = document.createElement('button');\n                button.type = 'button';\n                button.className = 'report-sort';\n                button.setAttribute('aria-label', 'Sort by ' + th.textContent.trim());\n                while (th.firstChild) button.appendChild(th.firstChild);\n                th.appendChild(button);\n                button.addEventListener('click', () => {"
+    },
+    {
+      "file": "dashboards/reports/price-audit-report.js",
+      "from": "                    th.dataset.sortDir = dir;",
+      "to": "                    th.dataset.sortDir = dir;\n                    headers.forEach(header => header.removeAttribute('aria-sort'));\n                    th.setAttribute('aria-sort', dir === 'asc' ? 'ascending' : 'descending');"
+    },
+    {
+      "file": "dashboards/js/pricing-analysis.js",
+      "from": "        if (active) active.link.classList.remove('is-active');\n        current.link.classList.add('is-active');",
+      "to": "        if (active) {\n            active.link.classList.remove('is-active');\n            active.link.removeAttribute('aria-current');\n        }\n        current.link.classList.add('is-active');\n        current.link.setAttribute('aria-current', 'location');"
+    },
+    {
+      "file": "dashboards/js/pricing-analysis.js",
+      "from": "    var links = Array.prototype.slice.call(document.querySelectorAll('.pa-nav-link'));",
+      "to": "    document.querySelectorAll('.pa-scroll').forEach(function (region, index) {\n        var section = region.closest('section');\n        var heading = section && section.querySelector('h2,h3');\n        var caption = region.querySelector('caption');\n        region.setAttribute('aria-label', (caption || heading ? (caption || heading).textContent.trim() : 'Pricing analysis') + ' — table ' + (index + 1));\n    });\n\n    var links = Array.prototype.slice.call(document.querySelectorAll('.pa-nav-link'));"
+    },
+    {
+      "file": "pages/js/quote-audit.js",
+      "from": "        this.init();",
+      "to": "        document.getElementById('qa-retry-btn').addEventListener('click', () => this.loadQuote());\n        this.init();"
+    },
+    {
+      "file": "pages/js/quote-audit.js",
+      "from": "        document.title = `Pricing Audit — ${this.quoteId}`;\n\n        try {",
+      "to": "        document.title = `Pricing Audit — ${this.quoteId}`;\n        await this.loadQuote();\n    }\n\n    async loadQuote() {\n        if (this.loading) return;\n        this.loading = true;\n        document.getElementById('loading-state').hidden = false;\n        document.getElementById('error-state').hidden = true;\n        document.getElementById('audit-content').hidden = true;\n        document.querySelectorAll('.context-field').forEach(field => { field.hidden = true; });\n        document.getElementById('import-notes-section').hidden = true;\n        try {"
+    },
+    {
+      "file": "pages/js/quote-audit.js",
+      "from": "            const resp = await fetch(`/api/public/quote/${encodeURIComponent(this.quoteId)}`);",
+      "to": "            const resp = await fetch(`/api/public/quote/${encodeURIComponent(this.quoteId)}`, { signal: AbortSignal.timeout(20000) });"
+    },
+    {
+      "file": "pages/js/quote-audit.js",
+      "from": "            this.session = data.session || data;\n            this.items = data.items || [];",
+      "to": "            if (!data || typeof data !== 'object' || Array.isArray(data)) throw new Error('The quote response was incomplete.');\n            this.session = data.session || data;\n            if (!this.session || typeof this.session !== 'object' || Array.isArray(this.session)) throw new Error('The quote response was incomplete.');\n            this.items = data.items || [];"
+    },
+    {
+      "file": "pages/js/quote-audit.js",
+      "from": "            this.showError('Failed to Load Quote', `Could not load data for quote ${this.escapeHtml(this.quoteId)}. ${this.escapeHtml(err.message)}`);\n        }",
+      "to": "            this.showError('Failed to Load Quote', `Could not load data for quote ${this.quoteId}. ${err.message}`);\n        } finally {\n            this.loading = false;\n        }"
+    },
+    {
+      "file": "pages/js/quote-audit.js",
+      "from": "                `Quote ${this.escapeHtml(this.quoteId)} does not have pricing audit data. Audit data is generated when a ShopWorks order is imported and saved.`",
+      "to": "                `Quote ${this.quoteId} does not have pricing audit data. Audit data is generated when a ShopWorks order is imported and saved.`"
+    },
+    {
+      "file": "pages/js/quote-audit.js",
+      "from": "        // Hide loading, show content",
+      "to": "        // An incomplete audit must never look like a verified zero-price/OK result.\n        const numeric = value => (typeof value === 'number' || typeof value === 'string' && value.trim() !== '') && Number.isFinite(Number(value));\n        const validFlag = value => typeof value === 'string' && ['OK', 'REVIEW', 'MISMATCH'].includes(value.toUpperCase());\n        const totalPresent = (value, fallback) => numeric(value) || (value == null && numeric(fallback));\n        if (typeof audit !== 'object' || Array.isArray(audit) || !validFlag(audit.flag) ||\n            !totalPresent(audit.swSubtotal, this.session.SWSubtotal) || !totalPresent(audit.ourSubtotal, this.session.SubtotalAmount) ||\n            !Array.isArray(audit.products) || audit.products.some(p => !p || !validFlag(p.flag) ||\n                !numeric(p.qty) || !Number.isInteger(Number(p.qty)) || Number(p.qty) < 0 || !numeric(p.swUnit) || !numeric(p.ourUnit))) {\n            this.showError('Incomplete Audit Data', 'This audit is missing comparison values or flags. Retry the saved quote, or return to Quotes to review the import.');\n            return;\n        }\n\n        // Hide loading, show content"
+    },
+    {
+      "file": "pages/js/quote-audit.js",
+      "from": "        document.getElementById('error-message').innerHTML = message;\n        document.getElementById('error-state').hidden = false;",
+      "to": "        document.getElementById('audit-content').hidden = true;\n        document.getElementById('error-message').textContent = message;\n        document.getElementById('qa-retry-btn').hidden = !this.quoteId;\n        document.getElementById('error-state').hidden = false;"
+    },
+    {
+      "file": "pages/js/quote-audit.js",
+      "from": "audit.swSubtotal || this.session.SWSubtotal || 0",
+      "to": "audit.swSubtotal ?? this.session.SWSubtotal ?? 0"
+    },
+    {
+      "file": "pages/js/quote-audit.js",
+      "from": "audit.ourSubtotal || this.session.SubtotalAmount || 0",
+      "to": "audit.ourSubtotal ?? this.session.SubtotalAmount ?? 0"
+    }
+  ]
+}

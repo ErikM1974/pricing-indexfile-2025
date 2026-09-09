@@ -40,7 +40,7 @@ describe('pricing analysis (generated)', () => {
         expect(py).not.toMatch(BARE);
         expect(html).not.toMatch(BARE);
         const cssVer = /CSS_VER = '([0-9.]+)'/.exec(py)[1];
-        expect(html).toContain('pricing-analysis.css?v=' + cssVer);
+        expect(html).toContain('pricing-reports.css?v=' + cssVer);
     });
 });
 
@@ -48,6 +48,6 @@ describe('price audit report', () => {
     test('icons decorative; css versioned', () => {
         const html = read('dashboards/reports/price-audit-report.html');
         expect(html).not.toMatch(BARE);
-        expect(html).toMatch(/price-audit-report\.css\?v=\d{4}\.\d{2}\.\d{2}\.\d+/);
+        expect(html).toMatch(/pricing-reports\.css\?v=\d{4}\.\d{2}\.\d{2}\.\d+/);
     });
 });

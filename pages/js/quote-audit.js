@@ -7,6 +7,7 @@
 class QuoteAuditPage {
     constructor() {
         this.quoteId = new URLSearchParams(window.location.search).get('id');
+        document.getElementById('qa-retry-btn').addEventListener('click', () => this.loadQuote());
         this.init();
     }
 
@@ -15,8 +16,8 @@ class QuoteAuditPage {
         // sessionStorage, and the gate used to send signed-in staff to the login card).
         if (typeof StaffAuthHelper !== 'undefined' && StaffAuthHelper.ready) await StaffAuthHelper.ready();
         if (typeof StaffAuthHelper === 'undefined' || !StaffAuthHelper.isLoggedIn()) {
-            document.getElementById('loading-state').style.display = 'none';
-            document.getElementById('auth-gate').style.display = 'flex';
+            document.getElementById('loading-state').hidden = true;
+            document.getElementById('auth-gate').hidden = false;
             return;
         }
 
@@ -26,18 +27,32 @@ class QuoteAuditPage {
         }
 
         document.title = `Pricing Audit — ${this.quoteId}`;
+        await this.loadQuote();
+    }
 
+    async loadQuote() {
+        if (this.loading) return;
+        this.loading = true;
+        document.getElementById('loading-state').hidden = false;
+        document.getElementById('error-state').hidden = true;
+        document.getElementById('audit-content').hidden = true;
+        document.querySelectorAll('.context-field').forEach(field => { field.hidden = true; });
+        document.getElementById('import-notes-section').hidden = true;
         try {
-            const resp = await fetch(`/api/public/quote/${encodeURIComponent(this.quoteId)}`);
+            const resp = await fetch(`/api/public/quote/${encodeURIComponent(this.quoteId)}`, { signal: AbortSignal.timeout(20000) });
             if (!resp.ok) {
                 throw new Error(`API returned ${resp.status}`);
             }
             const data = await resp.json();
+            if (!data || typeof data !== 'object' || Array.isArray(data)) throw new Error('The quote response was incomplete.');
             this.session = data.session || data;
+            if (!this.session || typeof this.session !== 'object' || Array.isArray(this.session)) throw new Error('The quote response was incomplete.');
             this.items = data.items || [];
             this.render();
         } catch (err) {
-            this.showError('Failed to Load Quote', `Could not load data for quote ${this.escapeHtml(this.quoteId)}. ${this.escapeHtml(err.message)}`);
+            this.showError('Failed to Load Quote', `Could not load data for quote ${this.quoteId}. ${err.message}`);
+        } finally {
+            this.loading = false;
         }
     }
 
@@ -55,14 +70,26 @@ class QuoteAuditPage {
         if (!audit) {
             this.showError(
                 'No Audit Data',
-                `Quote ${this.escapeHtml(this.quoteId)} does not have pricing audit data. Audit data is generated when a ShopWorks order is imported and saved.`
+                `Quote ${this.quoteId} does not have pricing audit data. Audit data is generated when a ShopWorks order is imported and saved.`
             );
             return;
         }
 
+        // An incomplete audit must never look like a verified zero-price/OK result.
+        const numeric = value => (typeof value === 'number' || typeof value === 'string' && value.trim() !== '') && Number.isFinite(Number(value));
+        const validFlag = value => typeof value === 'string' && ['OK', 'REVIEW', 'MISMATCH'].includes(value.toUpperCase());
+        const totalPresent = (value, fallback) => numeric(value) || (value == null && numeric(fallback));
+        if (typeof audit !== 'object' || Array.isArray(audit) || !validFlag(audit.flag) ||
+            !totalPresent(audit.swSubtotal, this.session.SWSubtotal) || !totalPresent(audit.ourSubtotal, this.session.SubtotalAmount) ||
+            !Array.isArray(audit.products) || audit.products.some(p => !p || !validFlag(p.flag) ||
+                !numeric(p.qty) || !Number.isInteger(Number(p.qty)) || Number(p.qty) < 0 || !numeric(p.swUnit) || !numeric(p.ourUnit))) {
+            this.showError('Incomplete Audit Data', 'This audit is missing comparison values or flags. Retry the saved quote, or return to Quotes to review the import.');
+            return;
+        }
+
         // Hide loading, show content
-        document.getElementById('loading-state').style.display = 'none';
-        document.getElementById('audit-content').style.display = 'block';
+        document.getElementById('loading-state').hidden = true;
+        document.getElementById('audit-content').hidden = false;
 
         // Header
         document.getElementById('audit-quote-id').textContent = this.quoteId;
@@ -101,8 +128,8 @@ class QuoteAuditPage {
         }
 
         // Summary card
-        const swSub = parseFloat(audit.swSubtotal || this.session.SWSubtotal || 0);
-        const ourSub = parseFloat(audit.ourSubtotal || this.session.SubtotalAmount || 0);
+        const swSub = parseFloat(audit.swSubtotal ?? this.session.SWSubtotal ?? 0);
+        const ourSub = parseFloat(audit.ourSubtotal ?? this.session.SubtotalAmount ?? 0);
         const delta = ourSub - swSub;
         const deltaPct = swSub > 0 ? ((delta / swSub) * 100) : 0;
         const deltaSign = delta >= 0 ? '+' : '-';
@@ -199,13 +226,13 @@ class QuoteAuditPage {
                     listEl.innerHTML = importNotes.map(note =>
                         `<li>${this.escapeHtml(typeof note === 'string' ? note : JSON.stringify(note))}</li>`
                     ).join('');
-                    document.getElementById('import-notes-section').style.display = 'block';
+                    document.getElementById('import-notes-section').hidden = false;
                 }
             } catch (e) {
                 // Not valid JSON — show as single item
                 const listEl = document.getElementById('import-notes-list');
                 listEl.innerHTML = `<li>${this.escapeHtml(this.session.ImportNotes)}</li>`;
-                document.getElementById('import-notes-section').style.display = 'block';
+                document.getElementById('import-notes-section').hidden = false;
             }
         }
 
@@ -217,15 +244,17 @@ class QuoteAuditPage {
     setContextField(id, value) {
         if (!value) return;
         const el = document.getElementById(id);
-        el.style.display = 'flex';
+        el.hidden = false;
         document.getElementById(id + '-value').textContent = value;
     }
 
     showError(title, message) {
-        document.getElementById('loading-state').style.display = 'none';
+        document.getElementById('loading-state').hidden = true;
         document.getElementById('error-title').textContent = title;
-        document.getElementById('error-message').innerHTML = message;
-        document.getElementById('error-state').style.display = 'flex';
+        document.getElementById('audit-content').hidden = true;
+        document.getElementById('error-message').textContent = message;
+        document.getElementById('qa-retry-btn').hidden = !this.quoteId;
+        document.getElementById('error-state').hidden = false;
     }
 
     formatDate(dateStr) {
