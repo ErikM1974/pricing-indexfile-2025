@@ -24,8 +24,8 @@
 
     function buildModal() {
         return `
-            <div class="ai-modal-overlay" id="aiSearchOverlay">
-                <div class="ai-modal ai-search-modal" role="dialog" aria-labelledby="aiSearchTitle">
+            <dialog class="ai-modal-overlay" id="aiSearchOverlay" aria-labelledby="aiSearchTitle">
+                <div class="ai-modal ai-search-modal">
                     <div class="ai-modal-header">
                         <h2 id="aiSearchTitle">
                             <i class="fas fa-wand-magic-sparkles" aria-hidden="true"></i>
@@ -50,6 +50,7 @@
                             <input
                                 type="text"
                                 id="aiSearchInput"
+                                aria-label="Describe the policy you need"
                                 class="ai-search-input"
                                 placeholder="Ask anything about NWCA policies…"
                                 maxlength="300"
@@ -60,11 +61,11 @@
                             </button>
                         </form>
 
-                        <div class="ai-search-status" id="aiSearchStatus"></div>
+                        <div class="ai-search-status" id="aiSearchStatus" role="status"></div>
                         <div class="ai-search-results" id="aiSearchResults"></div>
                     </div>
                 </div>
-            </div>
+            </dialog>
         `;
     }
 
@@ -73,7 +74,10 @@
     }
 
     function open() {
+        if (document.getElementById('aiSearchOverlay')) return;
+        const trigger = document.activeElement;
         const host = document.createElement('div');
+        // eslint-disable-next-line no-unsanitized/property -- buildModal returns fixed application markup with no external interpolation.
         host.innerHTML = buildModal();
         document.body.appendChild(host);
 
@@ -93,9 +97,8 @@
             });
         });
 
-        function dismiss() { close(host); document.removeEventListener('keydown', escHandler); }
-        function escHandler(e) { if (e.key === 'Escape') dismiss(); }
-        document.addEventListener('keydown', escHandler);
+        function dismiss() { overlay.close(); close(host); if (trigger?.isConnected) trigger.focus(); }
+        overlay.addEventListener('cancel', e => { e.preventDefault(); dismiss(); });
         overlay.addEventListener('click', e => { if (e.target === overlay) dismiss(); });
         closeBtn.addEventListener('click', dismiss);
 
@@ -136,20 +139,23 @@
         });
 
         // Auto-focus the input
-        setTimeout(() => input.focus(), 50);
+        overlay.showModal();
+        input.focus();
     }
 
     function renderResults(resultsEl, statusEl, data) {
         const results = data.results || [];
-        const searched = data.policies_searched || 0;
+        const searched = Number.isSafeInteger(data.policies_searched) && data.policies_searched >= 0 ? data.policies_searched : 0;
 
         if (results.length === 0) {
             statusEl.innerHTML = `<i class="fas fa-circle-info" aria-hidden="true"></i> No relevant policies found. Try rephrasing, or ask Erik to write a policy on this topic.`;
             return;
         }
 
+        // eslint-disable-next-line no-unsanitized/property -- Composed UI markup: external labels are escaped or encoded; other values are fixed markup or numeric counts.
         statusEl.innerHTML = `<i class="fas fa-check-circle" aria-hidden="true"></i> Found ${results.length} relevant ${results.length === 1 ? 'policy' : 'policies'} (searched ${searched})`;
 
+        // eslint-disable-next-line no-unsanitized/property -- Composed UI markup: external labels are escaped or encoded; other values are fixed markup or numeric counts.
         resultsEl.innerHTML = results.map(r => {
             const conf = r.confidence || 'medium';
             const href = `/pages/policy-detail.html?id=${encodeURIComponent(r.policy_id)}`;
@@ -164,5 +170,6 @@
         }).join('');
     }
 
+    // eslint-disable-next-line no-restricted-syntax -- Existing classic-script export or metadata bridge; preserved for current policy callers.
     window.PolicyAISearch = { open };
 })();

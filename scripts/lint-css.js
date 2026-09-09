@@ -165,7 +165,7 @@ const CSS_LINT_SCOPE = [
     'pages/css/mockup-library.css',
     'pages/css/order-status.css',
     'pages/css/org-chart-2026.css',
-    'pages/css/policies-hub-v2.css',
+    'pages/css/policy-workspace.css',
     'pages/css/policy-detail.css',
     'pages/css/portal-reorder-list.css',
     'pages/css/pricing-negotiation-policy.css',

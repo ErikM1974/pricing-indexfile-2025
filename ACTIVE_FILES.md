@@ -60,3 +60,12 @@ Historical counts are retained as audit notes and must not be presented as curre
 - `tests/fixtures/policy-reference-original-content.json` — policy guide, migration tracker and two notices: preserved content/data plus responsive/filter/retry/navigation/print checks.
 - `tests/unit/policy-reference-content.test.js` — policy guide, migration tracker and two notices: preserved content/data plus responsive/filter/retry/navigation/print checks.
 - `tests/e2e/css-unification-policy-reference.spec.js` — policy guide, migration tracker and two notices: preserved content/data plus responsive/filter/retry/navigation/print checks.
+
+- `pages/css/policy-workspace.css` — renamed Policies Hub shared owner; all four CMS/handbook pages opt in to unified controls. Replaces `pages/css/policies-hub-v2.css`.
+
+- `shared_components/js/policies/policy-workspace.js` — native policy contents, read-only table scrolling and shared control classes; preserves editor-owned DOM.
+
+- `tests/fixtures/policy-cms-original-content.json` — policy CMS original-content/data and mocked responsive/state/print verification.
+- `tests/fixtures/policy-cms-data.json` — policy CMS original-content/data and mocked responsive/state/print verification.
+- `tests/unit/policy-cms-content.test.js` — policy CMS original-content/data and mocked responsive/state/print verification.
+- `tests/e2e/css-unification-policy-cms.spec.js` — policy CMS original-content/data and mocked responsive/state/print verification.

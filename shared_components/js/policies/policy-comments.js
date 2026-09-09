@@ -2,7 +2,7 @@
  * Threaded comments / questions per policy.
  *
  * Renders into a `#commentsSection` element on the policy detail page.
- * Anyone with sessionStorage auth can read + post; admin (policies-admin)
+ * Signed-in staff can read + post; admin (policies-admin)
  * can resolve, hide, and edit any comment.
  *
  * Endpoints:
@@ -43,14 +43,6 @@
         return String(name || '?').trim().split(/\s+/).map(p => p[0]).filter(Boolean).slice(0, 2).join('').toUpperCase() || '?';
     }
 
-    // Stable color per author for the avatar — hash-based
-    function authorColor(name) {
-        let h = 0;
-        for (const c of String(name || '')) h = (h * 31 + c.charCodeAt(0)) & 0xffffffff;
-        const palette = ['#16a34a', '#2563eb', '#9333ea', '#db2777', '#d97706', '#0891b2', '#dc2626', '#7c3aed'];
-        return palette[Math.abs(h) % palette.length];
-    }
-
     // ---------------------------------------------------------------------
     // mount(policyId): the only public entry point
     // ---------------------------------------------------------------------
@@ -58,12 +50,21 @@
         const host = document.getElementById('commentsSection');
         if (!host || !policyId) return;
 
-        // Get logged-in author info from sessionStorage (stamped by staff-dashboard.html on login)
-        const authorName = sessionStorage.getItem('nwca_user_name') || '';
-        const authorEmail = sessionStorage.getItem('nwca_user_email') || '';
+        // Prefer the resolved staff identity; legacy dashboard sessions may only
+        // have browser storage. Blocked storage must not prevent reading.
+        const user = window.POLICIES_USER;
+        let authorName = user ? [user.firstName, user.lastName].filter(Boolean).join(' ') : '';
+        let authorEmail = user?.email || '';
+        if (!user) {
+            try {
+                authorName = sessionStorage.getItem('nwca_user_name') || '';
+                authorEmail = sessionStorage.getItem('nwca_user_email') || '';
+            } catch (_error) { /* Reading remains available without a stored identity. */ }
+        }
         const isAdmin = !!window.IS_POLICIES_ADMIN;
 
-        host.style.display = '';
+        host.hidden = false;
+        // eslint-disable-next-line no-unsanitized/property -- Composed UI markup: external labels are escaped or encoded; other values are fixed markup or numeric counts.
         host.innerHTML = `
             <h2 class="comments-title">
                 <i class="fas fa-comments" aria-hidden="true"></i> Discussion
@@ -78,7 +79,7 @@
             ${authorName ? `
                 <form class="comments-post-form" id="commentsForm">
                     <div class="comments-post-header">
-                        <div class="comments-avatar" style="background:${authorColor(authorName)}">${escapeHtml(authorInitials(authorName))}</div>
+                        <div class="comments-avatar">${escapeHtml(authorInitials(authorName))}</div>
                         <div>
                             <div class="comments-post-as">Posting as <strong>${escapeHtml(authorName)}</strong></div>
                             <label class="comments-question-toggle">
@@ -186,6 +187,7 @@
             }
         }
 
+        // eslint-disable-next-line no-unsanitized/property -- Composed UI markup: external labels are escaped or encoded; other values are fixed markup or numeric counts.
         thread.innerHTML = topLevel.map(c => {
             const replies = byParent.get(c.Comment_ID) || [];
             return renderComment(c, state, false) +
@@ -216,7 +218,7 @@
 
         return `
             <div class="comment ${isReply ? 'comment-reply' : ''} ${isResolved ? 'comment-resolved' : ''}" id="comment-${escapeHtml(c.Comment_ID)}" data-comment-id="${escapeHtml(c.Comment_ID)}">
-                <div class="comment-avatar" style="background:${authorColor(c.Author_Name)}">${escapeHtml(authorInitials(c.Author_Name))}</div>
+                <div class="comment-avatar">${escapeHtml(authorInitials(c.Author_Name))}</div>
                 <div class="comment-body">
                     <div class="comment-meta">
                         <span class="comment-author">${escapeHtml(c.Author_Name || 'Anonymous')}</span>
@@ -345,6 +347,7 @@
                 statusEl.innerHTML = `<i class="fas fa-triangle-exclamation" aria-hidden="true"></i> ${escapeHtml(err.message)}`;
             } finally {
                 submitBtn.disabled = false;
+                // eslint-disable-next-line no-unsanitized/property -- Restores or copies this controller’s own already-escaped UI markup.
                 submitBtn.innerHTML = originalLabel;
             }
         });
@@ -352,7 +355,7 @@
         // AI polish button — admin only (uses /api/policies/ai-assist which is role-gated)
         if (polishBtn) {
             if (!state.isAdmin) {
-                polishBtn.style.display = 'none';
+                polishBtn.hidden = true;
             } else {
                 polishBtn.addEventListener('click', async () => {
                     const draft = (bodyInput.value || '').trim();
@@ -372,6 +375,7 @@
                         statusEl.innerHTML = `<i class="fas fa-triangle-exclamation" aria-hidden="true"></i> ${escapeHtml(e.message)}`;
                     } finally {
                         polishBtn.disabled = false;
+                        // eslint-disable-next-line no-unsanitized/property -- Restores or copies this controller’s own already-escaped UI markup.
                         polishBtn.innerHTML = orig;
                     }
                 });
@@ -429,5 +433,6 @@
         return output.replace(/<[^>]+>/g, '').trim();
     }
 
+    // eslint-disable-next-line no-restricted-syntax -- Existing classic-script export or metadata bridge; preserved for current policy callers.
     window.PolicyComments = { mount };
 })();
