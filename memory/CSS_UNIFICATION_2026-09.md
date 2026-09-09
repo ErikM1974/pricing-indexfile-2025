@@ -514,3 +514,14 @@ Raw CSS graph per page:81,097 → 70707 bytes (12.8% smaller), including shared 
 ## Webstore full-gate correction — 2026-09-08
 
 The first primary unit pass stopped on24 existing hygiene assertions across all12 pages: new shared components, family CSS and controller references lacked cache versions. Added explicit candidate .20 query versions. This is a reference-only correction; no policy/product copy or CSS/JS behavior changed. Re-run the full gates before source CI. The previously passed focused rendering and paper evidence still describes the same runtime bytes.
+
+## Brand guides family plan — 2026-09-08
+
+The webstore family plus its cache correction is committed at b417e03de7f9db0aea8bd6f485b2c2c947bd207b; full checks run in primary. Live .19 has72 reviewed pages. New worktree branch codex/brand-guide-family isolates the next15 static brand pages using custom-carhartt.css/js. Original complete main text, metadata/structured data, every image/link/input and CSS graphs are saved in brand-guide-original-baseline.json. No application edits yet.
+
+- [x] Inventory all15 shared consumers: Bella+Canvas, Carhartt, CornerStone, District, Eddie Bauer, Gildan, New Era, Nike, The North Face, OGIO, Port & Company, Port Authority, Richardson, Sport-Tek and TravisMathew.
+- [ ] Move shared navigation/footer onto scoped storefront-shell.css plus app tokens/components/Public Sans; rename the old single-brand CSS/JS owners to brand-guide.css/js. Preserve individual brand/product content and static Richardson showcase tiles.
+- [ ] Replace custom mobile overlay behavior with a native dialog, focus/escape restoration and search preserving the existing /catalog query semantics. Keep every original menu destination and business term.
+- [ ] Lock content/SEO/image/field data, verify four widths/contrast, native dialog keyboard/focus, search and complete printed product/FAQ blocks; then full release checks, exact-source CI and verified deployment after webstores.
+
+If both pending families deploy successfully, this batch would reach99 of225 application pages reviewed,126 pending. Until actual release verification, candidate manifests do not change the live count. No business-service writes.
