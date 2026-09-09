@@ -152,9 +152,15 @@ for (const family of families) {
     test(`${family.name}: failed and empty pricing disable ordering; backup prices carry a warning`, async ({
         page,
     }) => {
+        const state = { pricing: 'failed' };
+        await open(page, family, state);
         for (const pricing of ['failed', 'empty', 'degraded']) {
-            await page.unrouteAll({ behavior: 'wait' });
-            await open(page, family, { pricing });
+            // Keep the service boundary installed while changing fixture states.
+            // Removing routes between navigations can let an in-flight request reach the live API.
+            if (pricing !== state.pricing) {
+                state.pricing = pricing;
+                await page.reload();
+            }
             if (pricing === 'degraded') await expect(page.locator('#' + p + 'Warn')).toBeVisible();
             else {
                 await expect(page.locator('#' + p + 'Alert')).toBeVisible();
