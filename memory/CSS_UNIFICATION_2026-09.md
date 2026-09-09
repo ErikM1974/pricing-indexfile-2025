@@ -719,3 +719,9 @@ Next isolated batch: vendor-portals/sanmar-vendor-portal.html, sanmar-invoices.h
 ## Vendor portal wrappers implementation in progress — 2026-09-09
 
 Three original desktop/phone views captured with synthetic Caspio reports; both hosted DataPage entry URLs respond200. Canonical navigation, Bradley accent and one scoped arrangement replace duplicated WSU styles. Exact invoice/credit embed URLs unchanged; persistent hosted fallback links, named keyboard-scroll regions and paper destinations added. Vendor-owned controls and data are not rewritten. Four-width/axe, external login/report/empty/error boundary and full synthetic paper review still required. Candidate .9, isolated from intake .8 running primary gates.
+
+## Vendor portal local review complete — 2026-09-09
+
+SanMar vendor portal wrappers: three pages use canonical navigation/typography/Bradley purchasing accents and one scoped sanmar-portal-shared.css owner; the duplicate sanmar-vendor-portal.css is retired. Original invoice/credit Caspio app URLs and wrapper content remain unchanged.12 focused browser cases cover four widths, zero wrapper axe, native focus/keyboard scrolling, mocked login/empty/failure states and complete synthetic report printing; three landscape PDFs retain216 checked nodes. All provider writes blocked. Provider-owned UI styling/data remains explicitly separate; the runtime census now recognizes Jotform alongside Caspio and the external-owner backlog names all six reviewed hosted wrappers. Full release gates remain; no raw-CSS byte reduction claim.
+
+Candidate2026.09.09.9; isolated codex/vendor-portals. Three source contracts passed; broader CSS/runtime guards next.124 total local reviewed pages, but live117/108 remains until intake .8 and then vendor .9 are separately verified. Vendor release would become124/101. Do not merge vendor work into intake .8.
