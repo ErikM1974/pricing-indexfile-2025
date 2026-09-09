@@ -33,12 +33,16 @@
 
     async function load() {
         setLoading();
+        blankStats();
         try {
             // Pacing first — it also tells us which data source we're on, which
             // changes how much the rest of the page should be trusted.
             var pacing = await getJson('/api/crm-proxy/admin/usage');
             var metrics = await getJson('/api/crm-proxy/admin/metrics?full=1');
-            render(pacing.data || {}, (metrics.data) || {});
+            validateUsage(pacing.data, metrics.data);
+            render(pacing.data, metrics.data);
+            var banner = document.querySelector('.dash-error-banner');
+            if (banner) banner.classList.remove('show');
         } catch (err) {
             console.error('[api-usage] load failed:', err);
             showError(
@@ -85,6 +89,19 @@
             throw new Error(body.error || 'request failed');
         }
         return body;
+    }
+
+    function validateUsage(pacing, metrics) {
+        var object = function (value) { return value && typeof value === 'object' && !Array.isArray(value); };
+        var count = function (value) { return typeof value === 'number' && Number.isFinite(value) && value >= 0; };
+        if (!object(pacing) || !object(metrics) || ['rollup', 'dyno', 'insufficient'].indexOf(pacing.mode) < 0) throw new Error('unexpected usage response');
+        ['periodToDate', 'budgetPerDay', 'estimatedOverageUsd'].forEach(function (key) { if (!count(pacing[key])) throw new Error('invalid ' + key); });
+        ['projected', 'percentOfLimit'].forEach(function (key) { if (!(pacing.mode === 'insufficient' && pacing[key] === null) && !count(pacing[key])) throw new Error('invalid ' + key); });
+        ['callsByTable', 'callsByEndpoint'].forEach(function (key) {
+            if (!Array.isArray(metrics[key]) || metrics[key].some(function (row) { return !object(row) || !count(row.count) || typeof row[key === 'callsByTable' ? 'table' : 'endpoint'] !== 'string'; })) throw new Error('invalid ' + key);
+        });
+        if (!object(metrics.callsByMethod) || Object.values(metrics.callsByMethod).some(function (value) { return !count(value); })) throw new Error('invalid method counts');
+        if (pacing.rollupByDay != null && (!object(pacing.rollupByDay) || Object.values(pacing.rollupByDay).some(function (value) { return !count(value); }))) throw new Error('invalid daily history');
     }
 
     /* ---------------- render ---------------- */
@@ -254,7 +271,7 @@
                     (stale ? ' au-bar--untrusted' : '');
                 var tip = esc(d) + ': ' + num(v) + ' calls' +
                     (stale ? ' — pre-repair meter, not comparable with Caspio' : '');
-                return '<div class="' + cls + '" style="--h:' + h + '%" title="' + tip + '"></div>';
+                return '<div class="' + cls + '" style="--h:' + h + '%" role="img" aria-label="' + tip + '" title="' + tip + '"></div>';
             }).join('') + '</div>' +
             '<div class="au-trend-axis"><span>' + esc(days[0]) + '</span><span>' + esc(days[days.length - 1]) + '</span></div>';
     }
@@ -268,11 +285,19 @@
         });
     }
 
+    function blankStats() {
+        ['au-projected', 'au-period-to-date', 'au-budget', 'au-overage'].forEach(function (id) { text(id, '—'); });
+        text('au-mode', 'Checking data source…');
+        text('au-period-label', '');
+        text('au-meter-caption', 'Loading…');
+        var fill = document.getElementById('au-meter-fill');
+        if (fill) { fill.style.setProperty('--w', '0%'); fill.className = 'au-meter-fill'; }
+    }
+
     // On failure show em-dashes, never zeros — a zero reads as "no usage".
     function blankOut() {
-        ['au-projected', 'au-period-to-date', 'au-budget', 'au-overage'].forEach(function (id) {
-            text(id, '—');
-        });
+        blankStats();
+        text('au-mode', 'Data source unavailable.');
         ['au-tables', 'au-endpoints', 'au-methods', 'au-trend'].forEach(function (id) {
             var el = document.getElementById(id);
             if (el) { el.classList.remove('dash-loading'); el.innerHTML = '<p class="au-empty">Unavailable — see the error above.</p>'; }

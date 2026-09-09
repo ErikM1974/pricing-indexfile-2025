@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
+<html lang="en"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
@@ -8,32 +7,27 @@
     <link rel="icon" href="/favicon.png" type="image/png">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/shared_components/css/art-hub.css?v=2026.09.07.19">
-    <link rel="stylesheet" href="/shared_components/css/dash-shell.css?v=2026.09.07.10">
-    <link rel="stylesheet" href="/dashboards/css/bandit-integration.css?v=2026.09.07.10">
-</head>
-<body>
+<link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.09.12"><link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.09.12"><link rel="stylesheet" href="/shared_components/css/staff-monitoring.css?v=2026.09.09.12"></head>
+<body data-ui="unified" data-monitoring="bandit-integration" data-department="neutral"><a class="skip-link" href="#monitor-main">Skip to Bandit Integration</a>
     <div class="dash-shell">
         <header class="dash-header">
             <div class="dash-header-left">
                 <a href="/staff-dashboard.html" title="Back to Staff Dashboard">
-                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
-                         alt="Northwest Custom Apparel" class="dash-header-logo">
+                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" alt="Northwest Custom Apparel" class="dash-header-logo">
                 </a>
-                <h1 class="dash-header-title">Bandit Integration <span class="bi-subhead">how ShopWorks data &amp; thumbnails flow to Caspio &amp; Box</span></h1>
+                <h1 class="dash-header-title" id="monitor-title">Bandit Integration <span class="bi-subhead">how ShopWorks data &amp; thumbnails flow to Caspio &amp; Box</span></h1>
             </div>
             <div class="dash-header-right">
                 <span class="bi-lock" title="Admin only"><i class="fas fa-user-shield" aria-hidden="true"></i> Admin</span>
-                <a href="/staff-dashboard.html" class="dash-back-link"><i class="fas fa-arrow-left" aria-hidden="true"></i> Dashboard</a>
+                <a href="/staff-dashboard.html" class="dash-back-link btn btn-secondary"><i class="fas fa-arrow-left" aria-hidden="true"></i> Dashboard</a>
             </div>
         </header>
 
-        <main class="dash-content">
+        <main class="dash-content" id="monitor-main" tabindex="-1" aria-labelledby="monitor-title">
 
             <!-- ── Overview + the data flow ─────────────────────────────── -->
             <section class="dash-card">
@@ -54,7 +48,7 @@
                     <span class="bi-chip">Box uploads happen <b>on the proxy</b> (not bandit)</span>
                 </div>
                 <div class="bi-callout bi-callout--danger">
-                    <h4><i class="fas fa-triangle-exclamation" aria-hidden="true"></i> The one rule that bit us</h4>
+                    <h3><i class="fas fa-triangle-exclamation" aria-hidden="true"></i> The one rule that bit us</h3>
                     <p><b>Never run two write-heavy Caspio syncs at full speed at the same time.</b> On 2026-07-17 the thumbnail-metadata sync and image sync ran concurrently and tripped Caspio's <b>per-second</b> rate limit (<code>api-calls-rate</code>) — even though the <em>monthly</em> Integrations meter was only 496K/500K. The monthly cap is <b>soft</b> (billed overage), not a hard block; the per-second burst limit is the real ceiling. It looked like an outage but recovered the instant the concurrency stopped.</p>
                 </div>
             </section>
@@ -63,9 +57,9 @@
             <section class="dash-card">
                 <div class="dash-card-header"><h2 class="dash-card-title"><i class="fas fa-clock" aria-hidden="true"></i> Scheduled tasks on bandit</h2></div>
                 <p class="bi-note">Task Scheduler → the <code>\NWCA</code> folder (all 7 grouped there, away from the OneDrive/Adobe/OS tasks). Every task runs as <b>SYSTEM</b> — independent of who's logged into bandit. Master copies of every script live in the repo at <code>caspio-pricing-proxy/scripts/bandit-agent/</code> — <b>edit there, then re-copy to bandit</b>.</p>
-                <div class="bi-table-wrap">
-                <table class="bi-table">
-                    <thead><tr><th>Task</th><th>Reads</th><th>Proxy endpoint</th><th>Every</th><th>Runs as</th><th>Status</th></tr></thead>
+                <div class="bi-table-wrap table-wrap" tabindex="0" role="region" aria-label="Integration table 1">
+                <table class="bi-table data-table">
+                    <thead><tr><th scope="col">Task</th><th scope="col">Reads</th><th scope="col">Proxy endpoint</th><th scope="col">Every</th><th scope="col">Runs as</th><th scope="col">Status</th></tr></thead>
                     <tbody>
                         <tr><td>ShopWorks ODBC Order Sync</td><td>ODBC <code>Orders</code></td><td><code>/sync-orders</code></td><td>15 min</td><td>SYSTEM</td><td><span class="bi-ok">Live</span></td></tr>
                         <tr><td>ShopWorks ODBC PO Sync</td><td>ODBC <code>PO</code></td><td><code>/sync-purchase-orders</code></td><td>15 min</td><td>SYSTEM</td><td><span class="bi-ok">Live</span></td></tr>
@@ -79,11 +73,11 @@
                 </div>
                 <p class="bi-note">All 7 sit in the <code>\NWCA</code> Task Scheduler folder and run as SYSTEM. The metadata sync now reads the ODBC <code>Thumbnails</code> table directly (delta on <code>timestamp_Modification</code>) — the old manual "Thumbnails Report" xlsx export is <b>retired as of 2026-07-21</b>. SYSTEM reaches <code>\\NCA-FS01\Thumbnails</code> because the <b>BANDIT machine account has share read</b> — no interactive login needed.</p>
                 <div class="bi-callout bi-callout--info">
-                    <h4><i class="fas fa-triangle-exclamation" aria-hidden="true"></i> Steady-state, not backfill — keep them from bursting together</h4>
+                    <h3><i class="fas fa-triangle-exclamation" aria-hidden="true"></i> Steady-state, not backfill — keep them from bursting together</h3>
                     <p>These are gentle now (deltas of a few rows/images per run). The one guard: don't let the metadata + image syncs fire a <b>large</b> batch at the exact same second (that's the per-second-limit trap). Steady-state overlap is fine; a future bulk re-load should be staggered or done via CSV import.</p>
                 </div>
                 <div class="bi-callout bi-callout--info">
-                    <h4><i class="fas fa-gauge-high" aria-hidden="true"></i> Caspio quota: Box Sync now 4 h — APPLIED 2026-07-27</h4>
+                    <h3><i class="fas fa-gauge-high" aria-hidden="true"></i> Caspio quota: Box Sync now 4 h — APPLIED 2026-07-27</h3>
                     <p>A <b>$358 Caspio overage</b> (689.8K calls against a 500K/period cap). Measured live on 2026-07-26 with the repaired meter: <code>Shopworks_Thumbnail_Report</code> was <b>48% of ALL Caspio traffic</b> — 909 of 1,883 calls in a 4.3-hour window.</p>
                     <ol class="bi-list">
                         <li><b>✅ Thumbnail Box Sync 20 min → every 4 hours (applied 2026-07-27, verified).</b> Before it uploads anything, each run makes <b>two full scans</b> of the 27,613-row <code>Shopworks_Thumbnail_Report</code> (<code>/thumbnails/uploaded-ids</code> 27 pages + <code>/thumbnails/all-ids</code> 28 pages = <b>55 Caspio calls per run, fixed</b>). The backfill is complete and steady state is <b>~5 changed thumbnails/day</b>, so 72 runs/day was <b>3,960 calls/day — roughly 800 Caspio calls per image actually synced</b>. Now 6 runs = <b>330/day</b>, saving ~3,630/day (~$218/period).<br>
@@ -112,7 +106,7 @@
                 <p class="bi-note">On bandit: <b>Task Scheduler → Task Scheduler Library → NWCA</b>. Right-click any task for <b>Run · End · Enable/Disable · Properties · History</b>. All 7 run as SYSTEM, so nothing depends on who's logged in. Set up 2026-07-18.</p>
 
                 <h3 class="bi-h">Where everything lives on bandit</h3>
-                <div class="bi-code">C:\NWCA\
+                <div class="bi-code" tabindex="0" role="region" aria-label="Command reference 1">C:\NWCA\
   odbc-sync\                       # the 5 ODBC syncs + the SHARED config
     config.json                    # { ProxyBase, CrmApiSecret, Dsn=SWODBC,
                                    #   OverlapMinutes=30, OrdersOverlapMinutes=20, MaxRows=900 }
@@ -131,9 +125,9 @@
                 <p class="bi-note"><b>Master copies</b> of every <code>.ps1</code> live in the repo at <code>caspio-pricing-proxy/scripts/bandit-agent/</code>. Rule: <b>edit the repo copy, then re-copy it to the matching <code>C:\NWCA\…</code> path</b> — never hand-edit on bandit (it drifts and gets overwritten). Only <code>config.json</code> is bandit-only (it holds the secret). The <code>last-*.txt / *.json</code> files are each sync's delta bookmark — deleting one forces a full re-sync (don't, unless you mean to). <code>last-sent-orders.json</code> is the newest of these: deleting it makes Order Sync re-send one full overlap window once, then settle — the named escape hatch if you ever suspect Caspio and ShopWorks have drifted apart.</p>
 
                 <h3 class="bi-h">Task → script → schedule → log</h3>
-                <div class="bi-table-wrap">
-                <table class="bi-table">
-                    <thead><tr><th>Task (in \NWCA)</th><th>Script</th><th>Every</th><th>Log file</th><th>Caspio table</th></tr></thead>
+                <div class="bi-table-wrap table-wrap" tabindex="0" role="region" aria-label="Integration table 2">
+                <table class="bi-table data-table">
+                    <thead><tr><th scope="col">Task (in \NWCA)</th><th scope="col">Script</th><th scope="col">Every</th><th scope="col">Log file</th><th scope="col">Caspio table</th></tr></thead>
                     <tbody>
                         <tr><td>ShopWorks ODBC Order Sync</td><td><code>sync-orders.ps1</code></td><td>15 min</td><td><code>sync-orders.log</code></td><td>ORDER_ODBC</td></tr>
                         <tr><td>ShopWorks ODBC PO Sync</td><td><code>sync-purchase-orders.ps1</code></td><td>15 min</td><td><code>sync-purchase-orders.log</code></td><td>PurchaseOrders</td></tr>
@@ -157,7 +151,7 @@
                 </ul>
 
                 <div class="bi-callout bi-callout--danger">
-                    <h4><i class="fas fa-triangle-exclamation" aria-hidden="true"></i> Never-break rules for this folder</h4>
+                    <h3><i class="fas fa-triangle-exclamation" aria-hidden="true"></i> Never-break rules for this folder</h3>
                     <ul>
                         <li><b>Only touch tasks inside <code>\NWCA</code>.</b> Leave the OneDrive / Adobe / Edge / Norton / Windows tasks alone — they're app/OS-managed, get auto-recreated, and deleting them breaks sync/updates/antivirus.</li>
                         <li><b>New sync?</b> Create it <b>inside <code>\NWCA</code>, run as SYSTEM</b>, script in <code>C:\NWCA\…</code> with its master in the repo <code>bandit-agent/</code> folder.</li>
@@ -178,7 +172,7 @@
                 </ol>
                 <p class="bi-note">Each agent supports handy flags: <code>-DryRun</code> (validate + 0 writes), <code>-SeedSnapshot</code> (adopt current state as the delta baseline), <code>-CsvOut &lt;path&gt;</code> (emit a table-shaped CSV for a bulk Caspio import — the import quota, not the API budget).</p>
                 <div class="bi-callout bi-callout--info">
-                    <h4><i class="fas fa-lightbulb" aria-hidden="true"></i> Big backfills = CSV import, not the API</h4>
+                    <h3><i class="fas fa-lightbulb" aria-hidden="true"></i> Big backfills = CSV import, not the API</h3>
                     <p>A Caspio <b>CSV import</b> runs on the <em>Data import/export runs</em> quota (~90/1000), <b>not</b> the metered Integrations API calls (500K/mo). Every agent's <code>-CsvOut</code> mode emits a CSV so a 25k-row backfill costs <b>$0 in API</b>. That's how the full thumbnail backfill was done.</p>
                 </div>
             </section>
@@ -203,7 +197,7 @@
                     <li><b>Task inventory:</b> use <code>schtasks /query</code> — the <code>Get-ScheduledTask</code> cmdlet returns empty over PS-remoting on this box.</li>
                 </ul>
                 <div class="bi-callout bi-callout--danger">
-                    <h4><i class="fas fa-triangle-exclamation" aria-hidden="true"></i> Vendor rules — OnSite is LIVE production</h4>
+                    <h3><i class="fas fa-triangle-exclamation" aria-hidden="true"></i> Vendor rules — OnSite is LIVE production</h3>
                     <ul>
                         <li><b>Never blanket-query</b> the ODBC DSN — always <code>WHERE</code> + <code>FETCH FIRST n</code>; unbounded scans can crash OnSite for everyone. <b>No writes ever</b> (order creation stays on the ManageOrders push API).</li>
                         <li><b>Never poll tightly</b> — minutes apart, not seconds. And never two write-heavy Caspio syncs at once (see the rule at the top).</li>
@@ -219,5 +213,6 @@
 
         </main>
     </div>
-</body>
-</html>
+
+
+</body></html>

@@ -1,0 +1,161 @@
+{
+  "base": "71f8d6c466cc523a798d33f5572ba3a61114a5dc",
+  "pages": [
+    {
+      "file": "dashboards/sanmar-ftp-integration.html",
+      "title": "SanMar Downloads · Northwest Custom Apparel",
+      "mainText": "Download SanMar files Refresh These are the data files SanMar publishes on their FTP server. Click Download to save one to your computer — no FileZilla needed — then import it into Caspio. The product & pricing master is SanMarPI-Bulk; it feeds garment CASE_PRICE into every quote builder. SanMar pricing changes only every few months, so grab a fresh copy when it does. After you download — import into Caspio Caspio app Sanmar Pricing 2026 → table Sanmar_Bulk_251816_Feb2024 → Import the CSV you just downloaded. Import mode: Update & add records, match on UNIQUE_KEY. Leave unmapped so your own values are kept: IsTopSeller, IsNew, Display_Image_URL (formula). Done — this one table feeds every quote builder, so all pricing surfaces refresh within ~15 min (Customer Catalog, Quick Quote, and the DTG/DTF/EMB/SCP builders). This is the table that runs pricing Sanmar_Bulk_251816_Feb2024 is the single garment-cost source for all quote builders. After a big import, spot-check a couple of styles and confirm a changed price shows the same in the Catalog, Quick Quote, and a Quote Builder. How this works SanMar FTPftp.sanmar.com this page Downloadto your PC Caspio import Sanmar_Bulkproduct master CASE_PRICE All quote builders Host ftp.sanmar.com · user 6920 · plain FTP Pricing master in /SanMarPDD/SanMarPI/ (SanMarPI-Bulk-*.csv) Downloads stream through the app — nothing stored on the server Prefer a one-click desktop tool? There's also Download-SanMar-Pricing.bat in the sanmar-ftp-box folder — double-click it to pull the newest pricing file straight to your Downloads folder without opening this page. Same file, same next step (import into Caspio). One-time setup The download buttons need the SanMar FTP password stored on the app as the config var SANMAR_FTP_PASSWORD (with optional SANMAR_FTP_USER, default 6920). Once it's set, this page works for any admin — no local FileZilla or password prompts.",
+      "headerText": "SanMar Downloads pull SanMar's pricing & data files, then import into Caspio Admin Dashboard",
+      "ids": [
+        "sf-refresh",
+        "sf-status",
+        "sf-files",
+        "sf-checked",
+        "sf-config-note"
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "label": ""
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "label": "Dashboard"
+        }
+      ],
+      "images": [
+        {
+          "src": "https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1",
+          "alt": "Northwest Custom Apparel"
+        }
+      ],
+      "scripts": [
+        "/dashboards/js/sanmar-ftp-integration.js?v=2026.09.05.73"
+      ],
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/art-hub.css",
+        "shared_components/css/dash-shell.css",
+        "dashboards/css/sanmar-ftp-integration.css"
+      ],
+      "cssBytes": 163985
+    },
+    {
+      "file": "dashboards/sanmar-shopworks-converter.html",
+      "title": "SanMar → ShopWorks Parts · Northwest Custom Apparel",
+      "mainText": "Convert a price list Pick a SanMar price list and click Convert. It runs entirely in your browser (nothing is uploaded), then you download a CSV ready to import into ShopWorks → Parts. It auto-detects the file: a ShopWorks Integration Only Price List (already formatted) gets the sizes added to its descriptions and _2XL→_2X fixed; a raw SanMar feed is fully converted (colors collapsed, part numbers, prices, size flags, sizes in descriptions). Choose file No file selected Convert Reset 0 rows in 0 parts out Download CSV ID_ProductDescriptionPieceCaseSizes Preview shows the first 12 rows. The download contains all of them. What the converter does Descriptions get the size. Extended-size rows become Size 3XL - …, Size 2XL - …, Size OSFA - … — matching how your existing parts read. 2XL part numbers are fixed. _2XL → _2X so an import updates your existing parts instead of creating duplicates. Ladies _XXL parts are left alone. One part per style + size. On a raw feed, colors collapse to a single part (highest/standard piece price), with the ShopWorks size-limit flags set (Size01–04 base, Size05 for 2XL/XXL, Size06 for everything else). Prices & brand carried through. Piece / Dozen / Case pricing and brand come straight from the feed. Two ways to get a price list Use ShopWorks's monthly \"Sanmar Integration Only Price List\", or pull the raw SanMar feed yourself from the SanMar Downloads page / FileZilla. Either one works here. Then import into ShopWorks Download the CSV above. In ShopWorks (OnSite), import it into Parts — it matches on ID_Product, so existing parts update and new ones are added. Spot-check a couple of styles (e.g. 29M_2X reads Size 2XL - …).",
+      "headerText": "SanMar → ShopWorks Parts convert a SanMar price list into a ShopWorks parts import Admin Dashboard",
+      "ids": [
+        "sw-file",
+        "sw-file-name",
+        "sw-convert",
+        "sw-reset",
+        "sw-status",
+        "sw-error",
+        "sw-results",
+        "sw-stat-in",
+        "sw-stat-out",
+        "sw-stat-fmt",
+        "sw-download",
+        "sw-preview-body"
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "label": ""
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "label": "Dashboard"
+        },
+        {
+          "href": "/dashboards/sanmar-ftp-integration.html",
+          "label": "SanMar Downloads"
+        }
+      ],
+      "images": [
+        {
+          "src": "https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1",
+          "alt": "Northwest Custom Apparel"
+        }
+      ],
+      "scripts": [
+        "/config/app.config.js",
+        "/dashboards/js/vendor/papaparse.min.js?v=2026.09.05.72",
+        "/dashboards/js/vendor/xlsx.full.min.js?v=2026.09.05.72",
+        "/shared_components/js/sku-validation-service.js?v=2026.09.06.37",
+        "/dashboards/js/sanmar-shopworks-parts.js?v=2026.09.05.72",
+        "/dashboards/js/sanmar-shopworks-converter.js?v=2026.09.05.73"
+      ],
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/art-hub.css",
+        "shared_components/css/dash-shell.css",
+        "dashboards/css/sanmar-shopworks-converter.css"
+      ],
+      "cssBytes": 162764
+    }
+  ],
+  "hashes": {
+    "dashboards/js/sanmar-ftp-integration.js": "3588d4d4ef468c9f85f8ffe2b6b723aa4712f6c6baeda38263735b13921a21ee",
+    "dashboards/js/sanmar-shopworks-converter.js": "b80202dcabf15a56726fcbbdad9ccfeb1558d88cb126c2be5eb1f6db726b8b46",
+    "dashboards/js/sanmar-shopworks-parts.js": "e6e1d10d48994aabd88f575ece39507eeb4f861be4841b7153478c1f4e3f1459",
+    "shared_components/js/sku-validation-service.js": "601ebf4fb5ea81960fd70f1eb3c98011700178a4baf545429f83ad36ad569c5f"
+  },
+  "changes": [
+    {
+      "file": "dashboards/js/sanmar-ftp-integration.js",
+      "from": "class=\"sf-btn\" href=",
+      "to": "class=\"sf-btn btn btn-primary\" href=",
+      "kind": "presentation"
+    },
+    {
+      "file": "dashboards/js/sanmar-ftp-integration.js",
+      "from": "<div class=\"sf-table-wrap\"><table class=\"sf-table\">",
+      "to": "<div class=\"sf-table-wrap table-wrap\" tabindex=\"0\" role=\"region\" aria-label=\"Available SanMar files\"><table class=\"sf-table data-table\">",
+      "kind": "presentation"
+    },
+    {
+      "file": "dashboards/js/sanmar-ftp-integration.js",
+      "from": "<th>Updated</th><th></th>",
+      "to": "<th>Updated</th><th>Download</th>",
+      "kind": "presentation"
+    },
+    {
+      "file": "dashboards/js/sanmar-ftp-integration.js",
+      "from": "    filesEl.innerHTML = '';",
+      "to": "    filesEl.innerHTML = '';\n    if (checkedEl) checkedEl.textContent = '';",
+      "kind": "explicit-loading"
+    },
+    {
+      "file": "dashboards/js/sanmar-ftp-integration.js",
+      "from": "if (refreshBtn) refreshBtn.classList.add('is-busy');",
+      "to": "if (refreshBtn) { refreshBtn.classList.add('is-busy'); refreshBtn.disabled = true; }",
+      "kind": "native-state"
+    },
+    {
+      "file": "dashboards/js/sanmar-ftp-integration.js",
+      "from": "if (refreshBtn) refreshBtn.classList.remove('is-busy');",
+      "to": "if (refreshBtn) { refreshBtn.classList.remove('is-busy'); refreshBtn.disabled = false; }",
+      "kind": "native-state"
+    },
+    {
+      "file": "dashboards/js/sanmar-ftp-integration.js",
+      "from": "if (refreshBtn) refreshBtn.classList.remove('is-busy');",
+      "to": "if (refreshBtn) { refreshBtn.classList.remove('is-busy'); refreshBtn.disabled = false; }",
+      "kind": "native-state"
+    },
+    {
+      "file": "dashboards/js/sanmar-ftp-integration.js",
+      "from": "        setStatus('', false);\n        render(b);",
+      "to": "        if (!Array.isArray(b.files) || b.files.some(function (file) {\n          return !file || typeof file.name !== 'string' || !file.name || typeof file.dir !== 'string' || !file.dir || typeof file.size !== 'number' || !Number.isFinite(file.size) || file.size < 0;\n        })) throw new Error('SanMar returned an incomplete file listing. Please refresh.');\n        setStatus('', false);\n        render(b);",
+      "kind": "validated-response"
+    },
+    {
+      "file": "dashboards/js/sanmar-shopworks-converter.js",
+      "from": "    try {\n      if (ext === 'xlsx' || ext === 'xls') convertExcel(file);\n      else convertCsv(file);",
+      "to": "    try {\n      var isExcel = ext === 'xlsx' || ext === 'xls';\n      if (!SW || (isExcel ? !window.XLSX : !window.Papa)) {\n        throw new Error('Converter tools did not load. Refresh this page and choose the file again.');\n      }\n      if (isExcel) convertExcel(file);\n      else convertCsv(file);",
+      "kind": "visible-dependency-failure"
+    }
+  ]
+}

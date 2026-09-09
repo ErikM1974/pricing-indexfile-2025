@@ -8,12 +8,11 @@ Standing edit/deploy authorization continues. **Frontend v2026.09.09.11 / Heroku
 
 ### Current work
 
-- **Staff access/portal release complete:** Access Admin,Drive Access,Customer Portals use canonical styles and shared staff-admin-tools.css. Neutral administrative and CRM ownership retained. Permissions/confirmation, separate drive rights and original staff-preview/customer links remain. Three obsolete sheets retired;15 focused browser cases and three reference PDFs/four pages/65checked nodes reviewed, including long current input values.
-- DTG warning/success notifications now use readable existing tokens; all four actual toast states exercised. Three repeated contrast checks passed. A later money-path failure showed0pieces after automated fill raced size hydration; the test now assigns the value and dispatches its input event together, then asserts24pieces. Both money paths passed three repetitions. No production pricing/controller change. Initial failed runs are retained in artifacts; final remaining16 passed.
-- **Next reviewed batch: monitoring and file tools** on codex/staff-import-tools at C:\Users\erik\.codex\visualizations\2026\09\07\01a07d90-9a4c-7e70-9e4e-c196377b7c6b\training-final-worktree, reviewed sourced524d2e51de086c1af8461392bd0fae6a0fc91c7, including monitoring source71f8d6c466cc523a798d33f5572ba3a61114a5dc. API Usage,Table Usage Audit,Bandit Integration share staff-monitoring.css;17 focused browser cases,223 source/inventory checks,three PDFs/nine pages/213checked nodes. Unknown versus zero, complete schema, retained163-row snapshot/local notes/export and visible failures/recovery covered with mocked business requests. Their CSS graph is70,169LF bytes each versus162,994–164,472before. SanMar Downloads and the local ShopWorks converter share staff-import-tools.css;17 focused browser cases,235 source/inventory checks,287CSS files clean and two one-page PDFs/70checked nodes. Exact synthetic downloads and CSV/TSV/XLSX conversion retained; missing libraries now fail visibly. Their CSS graph is64,626LF bytes each versus163,985/162,764before. **134reviewed/91pending locally only**; full integration checks/exact-source CI/rollout remain for these five pages.
-- CI recovery: an unrelated Google Chrome apt index checksum mismatch blocked browser installation twice. Disable only that vendor source on the disposable CI runner, retaining bundled Chromium and package verification. A later full run passed470cases but exposed a paused-clock race in an existing payment-status test; it now waits for the actual poll timer registration, deliberately delays a synthetic response and verifies25polls stop.18 repeated local cases passed across all three confirmation pages. The final exact-source CI then passed all actual steps; the earlier skipped money checks were never counted as success.
-- Continue the remaining staff workspaces, storefront, calculators/builders and generated documents. Whole-application cleanup is not complete.
-- The isolated worktree has now advanced to **codex/purchasing-workspaces** for the next two-page Purchasing Portal/Payables plan only; saved codex/staff-import-tools still points atd524d2e51de086c1af8461392bd0fae6a0fc91c7 for .12 integration. No purchasing-page implementation or review credit yet. Its original five controller/helper sources and page contracts are captured in purchasing-original-baseline.json. The invoice viewer also has legacy AE consumers that need compatibility checks.
+**Candidate v2026.09.09.12:** five reviewed monitoring and file tools are integrated on primary develop: API Usage,Table Usage Audit,Bandit Integration,SanMar Downloads and SanMar→ShopWorks Parts. Two shared arrangement sheets replace five legacy sheets.134of225 reviewed locally/91pending; current production .11 has129reviewed/96pending. Full combined unit/DOM/a11y/parity/CSS/browser/boot/audit gates, exact-source CI and actual rollout are required before counting them live.
+
+Monitoring17focused browser/223source-inventory checks and three PDFs/nine pages/213nodes; import17focused browser/235source-inventory checks and two one-page PDFs/70nodes. Fixtures retain original content,163-table evidence, complete current notes and conversion prices/SKUs. Loading, malformed/partial/denied storage/dependency failures and successful recovery are covered without business writes, imports or emails. The old failed print/download harness attempts remain evidence; the reviewed final layouts and actual downloads passed.
+
+Isolated worktree atC:\Users\erik\.codex\visualizations\2026\09\07\01a07d90-9a4c-7e70-9e4e-c196377b7c6b\training-final-worktree is now codex/purchasing-workspaces, plan648939fb3ec586111c9467931b4818e510843a85. Only its originals and read-only fixture screenshots have been captured; it adds no review credit and is excluded from .12. Saved codex/staff-import-tools atd524d2e51de086c1af8461392bd0fae6a0fc91c7 and codex/staff-monitoring-tools at71f8d6c466cc523a798d33f5572ba3a61114a5dc are the reviewed integration sources. Backend unchanged. Whole-application CSS work remains unfinished.
 
 ### Verification and resume evidence
 
@@ -252,3 +251,65 @@ Exact-source run34385622118 on481232711e07332613f8a0fd7e5123096426878b passed th
 ### Payment-status test clock recovery before .11 — 2026-09-09
 
 Run34386325023 on0e7acabec720031597b669daff55b513f54ac77f passed all three deterministic jobs, browser installation and rendered axe;470 mocked cases passed, one existing custom-tees delayed-webhook case failed twice. Its test advanced a paused clock when a request arrived, before the asynchronous response registered the next timer. The test now observes the actual unchanged poll timer registration before advancing exactly3000ms, deliberately delays the11th synthetic response and verifies polling stops at25 reads. All three success pages and transient recovery passed18 repeated local cases. No fulfillment, payment, email or production controller changes. This test-only follow-up requires a new complete exact-source CI run; money/calculator steps on the failed prior run were skipped, not passed.
+
+## Next isolated batch — staff monitoring and audit tools, 2026-09-09
+
+Branch codex/staff-monitoring-tools starts at d4a0b187ade98f936df5e619b90d6d6767e7cbad. Primary .11 (staff access/drive/portal) full checks continue separately. Scope: dashboards/api-usage.html,table-usage-audit.html,bandit-integration.html. Original prose/IDs/links/media/style graphs/controllers captured in staff-monitoring-original-baseline.json.
+
+- [ ] Shared neutral staff shell and canonical controls/tables; preserve department ownership.
+- [ ] Retain API attribution versus billing caveats, exact counts/rates/source reliability and history warnings. No invented fresh data.
+- [ ] Preserve all163 original audit records, local decisions/notes/review storage, sort/filter/export and mocked live snapshot refresh; never archive or delete real tables.
+- [ ] Preserve all Bandit task/command/endpoint references; keyboard scrolling and complete print with long tables/code.
+- [ ] Review four widths/axe/keyboard, denied/failed/malformed/retry/storage/export cases with all business traffic mocked; source/ownership/full release checks and actual live verification.
+
+Still126pages live/99pending after verified .10;129reviewed locally/96pending with .11. These three monitoring pages are only planned, not reviewed. Candidate .12. Keep source controllers exact except explicit presentation and demonstrated error-state fixes, which require their own tests.
+
+### Staff monitoring layout implementation started
+
+Staff monitoring migration in progress: new shared_components/css/staff-monitoring.css owns layouts for dashboards/api-usage.html,table-usage-audit.html,bandit-integration.html. Their three dashboards/css sheets retired. Shared tokens/components replace art-hub/dash-shell dependencies. Original data/controllers retained pending specific review refinements; no live completion claimed.
+
+Native table sorting, storage/failure states, print values and focused review remain.
+
+### Staff monitoring validation and keyboard refinements
+
+Current isolated source keeps163 snapshot rows and original operations, adds native sorting/pressed-state/print hooks, rejects malformed usage and incomplete live-schema responses before altering evidence, and surfaces local review storage failures. Shared styles now retain labels/caveats at narrow widths. Browser and source review still pending; no new live count. Initial migration helper failed on one exact marker after an owned partial edit; restored only that owned controller from its captured baseline, made the helper transactional, then successfully applied all20 recorded changes.
+
+## Staff monitoring local review complete — 2026-09-09
+
+Staff monitoring: API Usage,Table Usage Audit and Bandit Integration share tokens/components/Public Sans and shared_components/css/staff-monitoring.css. Their three local sheets are retired. Native keyboard sorting/filtering, named scrolling tables and current-value print mirrors preserve the original163-table evidence and full reference prose. Usage failures stay unknown; malformed/incomplete live schema cannot label tables gone. Local storage failures stay visible with export available, and successful recovery clears the related error.17 mocked browser cases cover all four widths/zero axe, numeric/source states, retry, saved notes and CSV export. Three reference PDFs/nine pages retain213 checked text/value nodes, all visually inspected. Print uses normal block flow so a flex fragment cannot produce a blank trailing sheet; focus outlines remain screen-only. All real business writes and notifications blocked. Measured LF raw CSS per page is70,169bytes, down from162,994–164,472bytes (about57%); these are source bytes, not compressed network transfer.
+
+132 pages reviewed locally/93pending, including the separate staff-admin candidate. Production remains126/99 until verified releases. Candidate .12 requires broader guards, full integration checks, exact-source CI and rollout after .11. Original controllers reverse only the23 recorded presentation/validation/recovery edits; financial calculations and snapshot data retained.
+
+## Next paired staff import tools — 2026-09-09
+
+Branch codex/staff-import-tools starts at71f8d6c466cc523a798d33f5572ba3a61114a5dc (the reviewed monitoring batch). Scope: SanMar Downloads and the browser-only SanMar→ShopWorks converter. Purchasing Portal was inspected but is deferred to its purchasing/invoice-viewer family. Candidate .12 may combine these two tools with the three monitoring pages after review; no additional pages count yet. Primary .11 exact-source CI34385622118 is running on481232711e07332613f8a0fd7e5123096426878b.
+
+- [ ] Preserve all original prose/links/scripts and pure conversion/SKU sources, including prices, size flags and part-number rules.
+- [ ] Shared canonical neutral admin controls and scoped tool arrangements, phone layouts, skip/named keyboard table regions and native file input.
+- [ ] Download listing must distinguish unavailable/configuration/session/malformed/empty states; mock all requests and downloads, never import files into live systems.
+- [ ] Exercise synthetic CSV/TSV/Excel file selection, conversion/reset/download and unavailable dependencies; preserve source transform tests and compare output bytes.
+- [ ] Four widths/axe/keyboard and complete reference/preview paper. Register reviewed styles and retire only the two superseded owners, then integrate/full checks/CI/release.
+
+Monitoring is reviewed locally (132of225/93pending); current live count remains126/99 until .11 verification. Saved originals: staff-import-original-baseline.json.
+
+### Staff import arrangement implementation
+
+Staff import tools in progress: dashboards/sanmar-ftp-integration.html and dashboards/sanmar-shopworks-converter.html use shared_components/css/staff-import-tools.css with tokens/components. Their two dashboards/css/*.css owners are retired after their final consumers moved. Pure conversion/SKU helpers and converter controller retained; FTP changes are explicitly recorded presentation/loading/response-validation hooks. Browser/source review pending; no new reviewed/live count.
+
+Original synthetic desktop/phone screenshots captured before migration. The initial multi-file CSS patch rejected a mismatched documentation heading atomically; no partial file was created. Current shared stylesheet and page/controller migration still require verification. .11 revised-source CI34386325023 on0e7acabec720031597b669daff55b513f54ac77f has passed setup/axe and is running full mocked browser checks after the Google apt-index recovery.
+
+### Staff import review findings
+
+Initial browser review passed13 cases and found the missing transform library left conversion stuck; converter now checks required format dependencies and shows a visible error with the chosen file retained. Pure conversion/pricing rules unchanged. Native attachment tests now use a local HTTP server serving only synthetic CSV; intercepted browser download responses were canceled by Chrome. Two additional missing-parser cases added. Source/paper/full focused checks pending. A second combined patch rejected an unverified documentation heading atomically; corrected by reading the exact heading before editing. No partial test file existed.
+
+## Staff import local review complete — 2026-09-09
+
+Staff file tools: SanMar Downloads and SanMar → ShopWorks Parts share tokens/components/Public Sans and shared_components/css/staff-import-tools.css; two local sheets retired. Canonical buttons/data tables, native named file input, skip links and focused scrolling regions retain all original prose/IDs/dependencies and source-locked financial/SKU transforms. Malformed FTP listings and missing converter libraries report visible failures with retry/file retention.17 mocked browser cases cover four widths/zero axe, exact synthetic FTP download query/bytes, CSV/TSV/XLSX conversion, errors and recovery. Two one-page portrait PDFs retain70 checked content/data blocks, visually reviewed; print hides only action controls and their empty download column. All real business writes/imports/uploads/emails blocked. A tiny temporary loopback server serves only synthetic CSV because browser-managed attachments bypass page routing; request assertions observe that server and compare actual downloaded bytes.
+
+134 of225 application pages reviewed locally/91pending, including staff admin3 and monitoring3; production still126/99 until .11 rollout. Source guard45passed; broader inventory/gates follow. The .12 candidate can combine monitoring3 and import2 after .11. Shared financial transform and SKU validation remain byte-locked; nine controller edit mappings are precise reversible presentation/loading/validation/error changes.
+
+Staff import final local guards:235passed across six source/inventory suites,287CSS files clean. Shared CSS graph64,626LF bytes per page versus163,985/162,764before (about60% smaller). Final print-only compacting retained all70 reading/data blocks on two complete one-page PDFs; keyboard/four-width/axe review reran after the print refinement. No financial transform change.
+
+## Staff operations integration — 2026-09-09
+
+Merged the two reviewed branches after verified .11 rollout (Heroku2087). Conflict resolution preserved the live checkpoint and both branches’ appended evidence/lessons. Archived the resolved junction-recovery narrative while retaining its active prevention rule. Five-page candidate .12 now enters full checks; .13 purchasing plan remains isolated.

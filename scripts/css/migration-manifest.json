@@ -3699,6 +3699,151 @@
         "rawCssBytes": 24571,
         "localCssRequests": 2
       }
+    },
+    {
+      "source": "dashboards/api-usage.html",
+      "family": "staff-monitoring",
+      "status": "pilot",
+      "route": "/dashboards/api-usage.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/staff-monitoring.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "four-widths",
+        "zero-axe-loaded-error-and-degraded",
+        "keyboard-skip-sort-filter-scroll",
+        "usage-unknown-versus-zero-and-retry",
+        "complete-live-schema-and-preserved-snapshot",
+        "local-review-storage-failure-recovery-and-export",
+        "complete-paper-with-current-notes"
+      ],
+      "test": "tests/e2e/css-unification-staff-monitoring.spec.js",
+      "maxCssBytes": 72217,
+      "measuredRawCssBytes": 70169,
+      "baseline": {
+        "commit": "d4a0b187ade98f936df5e619b90d6d6767e7cbad",
+        "rawCssBytes": 163836,
+        "localCssRequests": 4
+      }
+    },
+    {
+      "source": "dashboards/table-usage-audit.html",
+      "family": "staff-monitoring",
+      "status": "pilot",
+      "route": "/dashboards/table-usage-audit.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/staff-monitoring.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "four-widths",
+        "zero-axe-loaded-error-and-degraded",
+        "keyboard-skip-sort-filter-scroll",
+        "usage-unknown-versus-zero-and-retry",
+        "complete-live-schema-and-preserved-snapshot",
+        "local-review-storage-failure-recovery-and-export",
+        "complete-paper-with-current-notes"
+      ],
+      "test": "tests/e2e/css-unification-staff-monitoring.spec.js",
+      "maxCssBytes": 72217,
+      "measuredRawCssBytes": 70169,
+      "baseline": {
+        "commit": "d4a0b187ade98f936df5e619b90d6d6767e7cbad",
+        "rawCssBytes": 164472,
+        "localCssRequests": 4
+      }
+    },
+    {
+      "source": "dashboards/bandit-integration.html",
+      "family": "staff-monitoring",
+      "status": "pilot",
+      "route": "/dashboards/bandit-integration.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/staff-monitoring.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "four-widths",
+        "zero-axe-loaded-error-and-degraded",
+        "keyboard-skip-sort-filter-scroll",
+        "usage-unknown-versus-zero-and-retry",
+        "complete-live-schema-and-preserved-snapshot",
+        "local-review-storage-failure-recovery-and-export",
+        "complete-paper-with-current-notes"
+      ],
+      "test": "tests/e2e/css-unification-staff-monitoring.spec.js",
+      "maxCssBytes": 72217,
+      "measuredRawCssBytes": 70169,
+      "baseline": {
+        "commit": "d4a0b187ade98f936df5e619b90d6d6767e7cbad",
+        "rawCssBytes": 162994,
+        "localCssRequests": 4
+      }
+    },
+    {
+      "source": "dashboards/sanmar-ftp-integration.html",
+      "family": "staff-import-tools",
+      "status": "pilot",
+      "route": "/dashboards/sanmar-ftp-integration.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/staff-import-tools.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "four-widths-zero-axe",
+        "native-file-keyboard-and-scrollable-tables",
+        "honest-loading-empty-invalid-and-retry",
+        "exact-synthetic-ftp-download-query-and-bytes",
+        "csv-tsv-xlsx-complete-local-conversion",
+        "missing-dependency-errors-preserve-file",
+        "complete-single-page-reference-print"
+      ],
+      "test": "tests/e2e/css-unification-staff-import.spec.js",
+      "maxCssBytes": 66674,
+      "measuredRawCssBytes": 64626,
+      "baseline": {
+        "commit": "71f8d6c466cc523a798d33f5572ba3a61114a5dc",
+        "rawCssBytes": 163985,
+        "localCssRequests": 4
+      }
+    },
+    {
+      "source": "dashboards/sanmar-shopworks-converter.html",
+      "family": "staff-import-tools",
+      "status": "pilot",
+      "route": "/dashboards/sanmar-shopworks-converter.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/staff-import-tools.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "four-widths-zero-axe",
+        "native-file-keyboard-and-scrollable-tables",
+        "honest-loading-empty-invalid-and-retry",
+        "exact-synthetic-ftp-download-query-and-bytes",
+        "csv-tsv-xlsx-complete-local-conversion",
+        "missing-dependency-errors-preserve-file",
+        "complete-single-page-reference-print"
+      ],
+      "test": "tests/e2e/css-unification-staff-import.spec.js",
+      "maxCssBytes": 66674,
+      "measuredRawCssBytes": 64626,
+      "baseline": {
+        "commit": "71f8d6c466cc523a798d33f5572ba3a61114a5dc",
+        "rawCssBytes": 162764,
+        "localCssRequests": 4
+      }
     }
   ],
   "billingContentSha256": "d85f8530e03a1863d1b8bb2ebe97ba332d5c9e3411887d1eb2d02dcdb14c0863",

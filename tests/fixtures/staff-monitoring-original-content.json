@@ -1,0 +1,282 @@
+{
+  "base": "d4a0b187ade98f936df5e619b90d6d6767e7cbad",
+  "pages": [
+    {
+      "file": "dashboards/api-usage.html",
+      "title": "API Usage - Northwest Custom Apparel",
+      "mainText": "This page attributes calls; it does not bill them. For the authoritative period total go to Caspio → Plan and billing → Usage. What you get here is the breakdown Caspio doesn't show: which tables and endpoints the calls came from. Checking data source… — Projected this period / 500,000 cap — Calls so far — Daily budget to stay under the cap — Projected overage at $0.002 / call Top tables The number Caspio can't give you Loading… Top endpoints Caspio resource paths Loading… Calls by method Distinguishes a read storm from a write storm Loading… Daily trend Loading…",
+      "headerText": "API Usage Refresh Dashboard",
+      "ids": [
+        "au-refresh",
+        "au-scope",
+        "au-mode",
+        "au-projected",
+        "au-period-to-date",
+        "au-period-label",
+        "au-budget",
+        "au-overage",
+        "au-meter-wrap",
+        "au-meter-fill",
+        "au-meter-caption",
+        "au-tables",
+        "au-endpoints",
+        "au-methods",
+        "au-trend-hint",
+        "au-trend"
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "label": ""
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "label": "Dashboard"
+        }
+      ],
+      "images": [
+        {
+          "src": "https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1",
+          "alt": "Northwest Custom Apparel"
+        }
+      ],
+      "scripts": [
+        "/config/app.config.js",
+        "/shared_components/js/fetch-timeout.js?v=2026.09.06.26",
+        "/shared_components/js/dash-page-helpers.js?v=2026.09.07.25",
+        "/dashboards/js/api-usage.js?v=2026.09.05.73"
+      ],
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/art-hub.css",
+        "shared_components/css/dash-shell.css",
+        "dashboards/css/api-usage.css"
+      ],
+      "cssBytes": 163836
+    },
+    {
+      "file": "dashboards/table-usage-audit.html",
+      "title": "Caspio Table Audit — Northwest Custom Apparel",
+      "mainText": "Read before you delete \"Not used\" here = no reference in code (proxy/frontend/inksoft) and no Caspio wiring (views, relationships, tasks, webhooks). It does NOT check DataPages or Flex apps — the Caspio API can't reveal a DataPage's source table. Verify each candidate against the Caspio DataPages list + the \"Christmas Bundles\" Flex app before archiving. Archive ≠ delete. Caspio blocks table DELETE via API by design. Safe path in the Caspio UI: export a CSV backup → rename to zz_ARCHIVE_<name> → wait a week → delete if nothing breaks. Start with the red \"dup/old\" tier. The signal bias is safe: exact-name matching can only over-count usage, so a truly-used table is never mislabeled unused. Snapshot: 2026-07-10. —Tables —In use —No detected use —You've reviewed All Candidates ⛔ Dup / old ⚠ Verify DataPages ✓ In use Refresh (live) Export my review usedBy: codeviewrelationshiptaskwebhook · code p/f/i = files in proxy / frontend / inksoft · set a decision + notes as you work (saved in this browser). · Refresh (live) re-pulls view/rel/webhook wiring + field counts + new / deleted tables from Caspio; the code signal stays as of the 2026-07-10 snapshot (needs a repo re-scan).",
+      "headerText": "Caspio Table Audit 163 tables · which are used? Admin Dashboard",
+      "ids": [
+        "stTotal",
+        "stUsed",
+        "stCand",
+        "stReviewed",
+        "tuaFilters",
+        "tuaSearch",
+        "tuaLive",
+        "tuaExport",
+        "tuaCount",
+        "tuaLiveInfo",
+        "tuaTable"
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "label": ""
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "label": "Dashboard"
+        }
+      ],
+      "images": [
+        {
+          "src": "https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1",
+          "alt": "Northwest Custom Apparel"
+        }
+      ],
+      "scripts": [
+        "/config/app.config.js",
+        "/shared_components/js/fetch-timeout.js?v=2026.09.06.26",
+        "/shared_components/js/dash-page-helpers.js?v=2026.09.07.25",
+        "/dashboards/js/table-usage-audit.js?v=2026.09.05.73"
+      ],
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/art-hub.css",
+        "shared_components/css/dash-shell.css",
+        "dashboards/css/table-usage-audit.css"
+      ],
+      "cssBytes": 164472
+    },
+    {
+      "file": "dashboards/bandit-integration.html",
+      "title": "Bandit Integration · Northwest Custom Apparel",
+      "mainText": "Bandit is the always-on Windows box on the shop LAN that carries ShopWorks data into Caspio. It is not a file-copy or a Box client — it runs small PowerShell agents on a schedule that read ShopWorks and POST to our proxy, which does every Caspio write and every Box upload. Living document — kept current whenever the bandit tasks or sync scripts change. Verified live 2026-07-21. ShopWorksFileMaker @192.168.10.6 ODBC read / file share Banditagents in C:\\NWCA HTTPS POST + secret caspio-pricing-proxyHeroku REST / Box API Caspio + Box Bandit bandit.NWEINC.local · 192.168.10.219 Tables via FileMaker ODBC (DSN SWODBC → Data_ODBCMapping @192.168.10.6) Thumbnail images from \\\\NCA-FS01\\Thumbnails Box uploads happen on the proxy (not bandit) The one rule that bit us Never run two write-heavy Caspio syncs at full speed at the same time. On 2026-07-17 the thumbnail-metadata sync and image sync ran concurrently and tripped Caspio's per-second rate limit (api-calls-rate) — even though the monthly Integrations meter was only 496K/500K. The monthly cap is soft (billed overage), not a hard block; the per-second burst limit is the real ceiling. It looked like an outage but recovered the instant the concurrency stopped. Scheduled tasks on bandit Task Scheduler → the \\NWCA folder (all 7 grouped there, away from the OneDrive/Adobe/OS tasks). Every task runs as SYSTEM — independent of who's logged into bandit. Master copies of every script live in the repo at caspio-pricing-proxy/scripts/bandit-agent/ — edit there, then re-copy to bandit. TaskReadsProxy endpointEveryRuns asStatus ShopWorks ODBC Order SyncODBC Orders/sync-orders15 minSYSTEMLive ShopWorks ODBC PO SyncODBC PO/sync-purchase-orders15 minSYSTEMLive ShopWorks ODBC Designs SyncODBC Des/sync-designs4 hSYSTEMLive ShopWorks ODBC SalesReps SyncODBC Cust/sync-sales-reps4 hSYSTEMLive ShopWorks ODBC Contacts SyncODBC (4 tables)/sync-contacts12 hSYSTEMLive Thumbnail Metadata SyncODBC Thumbnails (+ DesignLocations, Des)/thumbnails/metadata-sync30 minSYSTEMLive Thumbnail Box Sync\\\\NCA-FS01\\Thumbnails/thumbnails/upload-with-stub?target=box4 hSYSTEMLive All 7 sit in the \\NWCA Task Scheduler folder and run as SYSTEM. The metadata sync now reads the ODBC Thumbnails table directly (delta on timestamp_Modification) — the old manual \"Thumbnails Report\" xlsx export is retired as of 2026-07-21. SYSTEM reaches \\\\NCA-FS01\\Thumbnails because the BANDIT machine account has share read — no interactive login needed. Steady-state, not backfill — keep them from bursting together These are gentle now (deltas of a few rows/images per run). The one guard: don't let the metadata + image syncs fire a large batch at the exact same second (that's the per-second-limit trap). Steady-state overlap is fine; a future bulk re-load should be staggered or done via CSV import. Caspio quota: Box Sync now 4 h — APPLIED 2026-07-27 A $358 Caspio overage (689.8K calls against a 500K/period cap). Measured live on 2026-07-26 with the repaired meter: Shopworks_Thumbnail_Report was 48% of ALL Caspio traffic — 909 of 1,883 calls in a 4.3-hour window. ✅ Thumbnail Box Sync 20 min → every 4 hours (applied 2026-07-27, verified). Before it uploads anything, each run makes two full scans of the 27,613-row Shopworks_Thumbnail_Report (/thumbnails/uploaded-ids 27 pages + /thumbnails/all-ids 28 pages = 55 Caspio calls per run, fixed). The backfill is complete and steady state is ~5 changed thumbnails/day, so 72 runs/day was 3,960 calls/day — roughly 800 Caspio calls per image actually synced. Now 6 runs = 330/day, saving ~3,630/day (~$218/period). schtasks /Change /TN \"\\NWCA\\Thumbnail Box Sync\" /RI 240 Why 4 h and not daily: the cost is fixed per run, so 72→6 runs already captures 92% of the saving and going all the way to once-daily adds only ~$16/period more — not worth a 24-hour worst case. Trade-off as set: a brand-new thumbnail reaches Box/the portal in up to ~4.5 h (4 h for the image sync + up to 30 min for the metadata sync to create its row first) instead of ~20 min. 🔴 OPEN — 4 oversized thumbnails can never sync (found 2026-07-27). upload-with-stub caps uploads at 20 MB (multer limits.fileSize, src/routes/thumbnails.js:18). Four files on the share are 21–28 MB and fail every single run, and because multer's LIMIT_FILE_SIZE is not caught they surface as an opaque HTTP 500 (\"An unexpected error occurred\") rather than \"file too large\". Worse, the agent still logs 0 still pending, because its counter treats an errored file as processed — so the log reads clean while four images are permanently stuck. 106886_Copy of Warriors2.png · 100641_36971 ETC Tacoma (9 Year Sports Collage) (Final) A.png · 98671_35921Coob Scooter Adult FF FP copy.png · 78223_BE KIND (1).png The names (\"Copy of\", \"(Final) A\", \"copy\", \"(1)\") suggest full-resolution artwork accidentally saved into the thumbnails share rather than genuine thumbnails. Decide per-file: resize/remove them at source, or raise the cap — noting multer.memoryStorage() holds the whole file in dyno RAM, so a higher cap is a memory trade. Do NOT slow the Thumbnail Metadata Sync. Its delta read is an ODBC query against FileMaker — zero Caspio calls. In steady state the whole task costs ~48 calls/day, nearly all heartbeats on Sync_Heartbeats, with only ~6/day touching the thumbnail table. There is no money in it, and it is the record-creator the image sync depends on (upload-with-stub 404s RECORD_NOT_FOUND rather than creating a row, because Thumb_DesLocid_Design is UNIQUE NOT NULL). Slowing it would also break its overlap — see the trap below. Re-copy the three updated agent scripts from caspio-pricing-proxy/scripts/bandit-agent/ to C:\\NWCA\\odbc-sync\\: sync-orders.ps1, sync-purchase-orders.ps1, sync-thumbnail-metadata.ps1. ⚠️ The overlap trap — do NOT \"simplify\" this back. Order Sync and PO Sync run every 15 min but shared a 30-min OverlapMinutes, so every changed row landed in multiple consecutive runs and the proxy PUTs unconditionally — each change written to Caspio several times. They now read their own OrdersOverlapMinutes (default 20). The shared OverlapMinutes stays at 30 because Thumbnail Metadata Sync runs on a 30-minute cadence — lowering the shared key to 20 would open a 10-minute window in which modified rows are never seen again. Note if ($cfg.OrdersOverlapMinutes) is PowerShell-truthy, so a literal 0 in config.json silently means 20. ✅ Content dedupe (2026-07-29) — the overlap is now free, so stop trying to shorten it. ORDER_ODBC was measured at 55% of all Caspio calls on a fresh web dyno. sync-orders.ps1 now keeps a SHA-1 of exactly what it last sent per order in last-sent-orders.json and skips rows whose content is unchanged. Proven on bandit against live data: first run 2 to send, 0 unchanged → posted 2; immediately re-run inside the same overlap window, 0 to send, 2 unchanged → posted 0. The overlap was NOT reduced — it is the clock-skew and long-transaction safety net, and the dedupe delivers the same saving without spending it. Two guards that must survive any edit: a capped run bypasses the dedupe entirely (state is not advanced on a cap and FETCH FIRST has no ORDER BY, so deduping there would post rows:[] and stamp a green heartbeat over a stalled sync), and the state-advance test reads $capped, never the post-filter row count. Run with -DryRun to log every send/skip decision and post nothing. Monitoring note: lastRows: 0 on /api/shopworks-odbc/health is now the NORMAL steady state. Health is reason: fresh + ageMin, not row count. The per-run log line dedupe: N to send, M unchanged is where the real activity shows. PO Sync got the same treatment (state file last-sent-po.json, keyed ID_PO) once the legacy \"Purchase Orders Export\" CSV chain was confirmed retired on 2026-07-29 — the bandit export task was disabled 2026-07-17, no export task exists on the box today, and the Caspio-side import no longer runs. That check was the precondition: with a second writer still active, the agent would have been silently correcting the CSV's writes and dedupe would have stopped it. sync-purchase-orders.ps1 is now the only writer of PurchaseOrders. Proven the same way: 2 to send → posted 2, then 0 to send, 2 unchanged → posted 0. Managing the tasks — reference On bandit: Task Scheduler → Task Scheduler Library → NWCA. Right-click any task for Run · End · Enable/Disable · Properties · History. All 7 run as SYSTEM, so nothing depends on who's logged in. Set up 2026-07-18. Where everything lives on bandit C:\\NWCA\\ odbc-sync\\ # the 5 ODBC syncs + the SHARED config config.json # { ProxyBase, CrmApiSecret, Dsn=SWODBC, # OverlapMinutes=30, OrdersOverlapMinutes=20, MaxRows=900 } # SHARED by 7 scripts — one bad edit stops them all sync-orders.ps1 last-sync.txt sync-orders.log last-sent-orders.json # content hashes (dedupe) sync-purchase-orders.ps1 last-sync-po.txt sync-purchase-orders.log last-sent-po.json # content hashes (dedupe) sync-contacts.ps1 last-snapshot-contacts.json sync-contacts.log sync-designs.ps1 last-snapshot-designs.json sync-designs.log sync-sales-reps.ps1 last-snapshot-reps.json sync-sales-reps.log thumb-image-sync\\ sync-thumbnails-to-box.ps1 sync-thumbnails-to-box.log thumb-sync\\ sync-thumbnail-metadata.ps1 last-sync-thumb-meta.txt sync-thumbnail-metadata.log Master copies of every .ps1 live in the repo at caspio-pricing-proxy/scripts/bandit-agent/. Rule: edit the repo copy, then re-copy it to the matching C:\\NWCA\\… path — never hand-edit on bandit (it drifts and gets overwritten). Only config.json is bandit-only (it holds the secret). The last-*.txt / *.json files are each sync's delta bookmark — deleting one forces a full re-sync (don't, unless you mean to). last-sent-orders.json is the newest of these: deleting it makes Order Sync re-send one full overlap window once, then settle — the named escape hatch if you ever suspect Caspio and ShopWorks have drifted apart. Task → script → schedule → log Task (in \\NWCA)ScriptEveryLog fileCaspio table ShopWorks ODBC Order Syncsync-orders.ps115 minsync-orders.logORDER_ODBC ShopWorks ODBC PO Syncsync-purchase-orders.ps115 minsync-purchase-orders.logPurchaseOrders ShopWorks ODBC Contacts Syncsync-contacts.ps112 hsync-contacts.logCompanyContactsMerge2026 ShopWorks ODBC Designs Syncsync-designs.ps14 hsync-designs.logDesigns2026 ShopWorks ODBC SalesReps Syncsync-sales-reps.ps14 hsync-sales-reps.logSales_Reps_2026 Thumbnail Metadata Syncsync-thumbnail-metadata.ps130 minsync-thumbnail-metadata.logShopworks_Thumbnail_Report (rows) Thumbnail Box Syncsync-thumbnails-to-box.ps14 hsync-thumbnails-to-box.logShopworks_Thumbnail_Report (FileUrl) Common jobs Is a sync healthy? From any browser: …/api/shopworks-odbc/health (+ /po-health, /contacts-health, /designs-health, /reps-health) → returns ok, minutes since last success, and the last summary. Run one now: right-click → Run, or schtasks /Run /TN \"\\NWCA\\ShopWorks ODBC Order Sync\". Then read its .log. See what happened: the Last Run Result column, or the task's History tab, or the tail of its .log. Change a script's behavior: edit the repo master, copy to the matching C:\\NWCA\\… path — no task change needed. Thumbnail metadata is automatic: the metadata sync reads the ODBC Thumbnails table directly (joined to DesignLocations for the design id and Des for the design name) — no manual \"Thumbnails Report\" export needed (retired 2026-07-21). Handy script flags (run manually): -DryRun (validate, 0 writes), -SeedSnapshot (baseline after a bulk import), -CsvOut <path> (emit a CSV for a $0 bulk import). Never-break rules for this folder Only touch tasks inside \\NWCA. Leave the OneDrive / Adobe / Edge / Norton / Windows tasks alone — they're app/OS-managed, get auto-recreated, and deleting them breaks sync/updates/antivirus. New sync? Create it inside \\NWCA, run as SYSTEM, script in C:\\NWCA\\… with its master in the repo bandit-agent/ folder. Never run a large metadata + image batch at the same time (per-second Caspio limit). Bulk loads go through a CSV import, not the API. How each sync works Read — the agent opens the FileMaker ODBC DSN (SWODBC, login extro/extro, read-only) and pulls a bounded query (orders/PO/thumbnail-metadata = rows changed since last run; contacts/designs/reps = full scan). Only the thumbnail images come from the file share instead of ODBC. Join what isn't on the main table — the Order Sync runs a second bounded query for the ship method, which ShopWorks keeps on the address row (Addr.ShipMethod), not on Orders. It fetches the method for just the orders in the delta (chunked id_Order IN (…)) and attaches it as an extra ShipMethod column on ORDER_ODBC — which is what lets the AE data-quality radar flag \"a ship method was chosen but no ship-to address was entered\". The Thumbnail Metadata Sync works the same way: it resolves each thumbnail's design id and design name by joining Thumbnails → DesignLocations → Des in one bounded query (that design id is the link from a thumbnail to its customer for the portal logo library). Clean — the agent applies the same normalization the old OneDrive export used (rep names, address/city/state, tiers, flags). POST — cleaned rows go in chunks to the proxy endpoint above (header x-crm-api-secret). The proxy is the only thing that writes Caspio, upserting by key (ID_Order / ID_PO / ID_Contact / ID_Customer / ID_Design / ID_Serial). It also uploads images to Box. Heartbeat — every run stamps Sync_Heartbeats so the watchdog can tell \"alive but quiet\" from \"dead\". Each agent supports handy flags: -DryRun (validate + 0 writes), -SeedSnapshot (adopt current state as the delta baseline), -CsvOut <path> (emit a table-shaped CSV for a bulk Caspio import — the import quota, not the API budget). Big backfills = CSV import, not the API A Caspio CSV import runs on the Data import/export runs quota (~90/1000), not the metered Integrations API calls (500K/mo). Every agent's -CsvOut mode emits a CSV so a 25k-row backfill costs $0 in API. That's how the full thumbnail backfill was done. Thumbnails & Box Two parts. Metadata rows (design id, design name, part #, dims) come from a direct ODBC read of the ShopWorks Thumbnails table — scoped to rows that have an image file (FileName IS NOT NULL), joined to DesignLocations for the design id and Des for the design name (ShopWorks ticket 386060 exposed these tables 2026-07-21; the old manual Thumbnails Report*.xlsx export is retired). Images come from the FileMaker container store shared as \\\\NCA-FS01\\Thumbnails (read-only — never write it). All images live on Box (folder ShopWorks Thumbnails Archive, id 400901982283). As of 2026-07-18: 26,896 thumbnails serve from Box, 0 from Caspio. The upload happens on the proxy via uploadFileToBox() using Box creds in the Heroku env — there is no Box client or token on bandit. Transparent to the website. Every consumer resolves the URL as ExternalKey ? /api/files/{key} : FileUrl, so a row that points at Box just serves from Box — no app change needed. Connecting & troubleshooting Reach bandit from Erik's laptop over PowerShell Remoting: $cred = Import-Clixml \"$env:USERPROFILE\\bandit-cred.xml\"; Invoke-Command -ComputerName bandit -Credential $cred { … } (the credential is DPAPI-encrypted, laptop-bound — re-create it after any domain password change). Or plain RDP. Is a sync healthy? GET /api/shopworks-odbc/health (and /po-health, /contacts-health, /designs-health, /reps-health) return ok + minutes since last success. Logs live next to each script: C:\\NWCA\\odbc-sync\\*.log, C:\\NWCA\\thumb-image-sync\\*.log, C:\\NWCA\\thumb-sync\\*.log. Config for all: C:\\NWCA\\odbc-sync\\config.json (ProxyBase, CrmApiSecret, Dsn). Task inventory: use schtasks /query — the Get-ScheduledTask cmdlet returns empty over PS-remoting on this box. Vendor rules — OnSite is LIVE production Never blanket-query the ODBC DSN — always WHERE + FETCH FIRST n; unbounded scans can crash OnSite for everyone. No writes ever (order creation stays on the ManageOrders push API). Never poll tightly — minutes apart, not seconds. And never two write-heavy Caspio syncs at once (see the rule at the top). What this replaced The old path was bandit exports a CSV → OneDrive → a Caspio scheduled import (overnight). It's fully retired as of 2026-07-18: the direct ODBC syncs above write Caspio in ~15 min, and the 5 old … Export to OneDrive tasks + the Caspio import tasks have been deleted/disabled. The manual Thumbnails Report xlsx export — the last hand-step left in the whole pipeline — was replaced by a direct ODBC read of the Thumbnails table on 2026-07-21 (ShopWorks ticket 386060 exposed the Thumbnails + DesignLocations tables). (The many OneDrive Reporting/Startup, Adobe, Edge, Norton tasks in Task Scheduler are Windows/app-managed — not ours, left intact.) Full history & field-level detail: repo memory/SHOPWORKS_ODBC_INTEGRATION.md.",
+      "headerText": "Bandit Integration how ShopWorks data & thumbnails flow to Caspio & Box Admin Dashboard",
+      "ids": [],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "label": ""
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "label": "Dashboard"
+        }
+      ],
+      "images": [
+        {
+          "src": "https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1",
+          "alt": "Northwest Custom Apparel"
+        }
+      ],
+      "scripts": [],
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/art-hub.css",
+        "shared_components/css/dash-shell.css",
+        "dashboards/css/bandit-integration.css"
+      ],
+      "cssBytes": 162994
+    }
+  ],
+  "hashes": {
+    "dashboards/js/api-usage.js": "8d368c947a48b49497ab4df4d0efd6093e6e297959664953fe247c22b6f2032b",
+    "dashboards/js/table-usage-audit.js": "1810c35831e0f200c282a7b1a084b835c0f27a3a8955393060fa74bac5cfe392",
+    "shared_components/js/dash-page-helpers.js": "4ce7902b8502978835949ecec36a95d27ebc2604f86ef1a9665353cd8c38ccbe"
+  },
+  "changes": [
+    {
+      "file": "dashboards/js/api-usage.js",
+      "from": "            render(pacing.data || {}, (metrics.data) || {});",
+      "to": "            validateUsage(pacing.data, metrics.data);\n            render(pacing.data, metrics.data);\n            var banner = document.querySelector('.dash-error-banner');\n            if (banner) banner.classList.remove('show');",
+      "kind": "validated-response"
+    },
+    {
+      "file": "dashboards/js/api-usage.js",
+      "from": "    /* ---------------- render ---------------- */",
+      "to": "    function validateUsage(pacing, metrics) {\n        var object = function (value) { return value && typeof value === 'object' && !Array.isArray(value); };\n        var count = function (value) { return typeof value === 'number' && Number.isFinite(value) && value >= 0; };\n        if (!object(pacing) || !object(metrics) || ['rollup', 'dyno', 'insufficient'].indexOf(pacing.mode) < 0) throw new Error('unexpected usage response');\n        ['periodToDate', 'budgetPerDay', 'estimatedOverageUsd'].forEach(function (key) { if (!count(pacing[key])) throw new Error('invalid ' + key); });\n        ['projected', 'percentOfLimit'].forEach(function (key) { if (!(pacing.mode === 'insufficient' && pacing[key] === null) && !count(pacing[key])) throw new Error('invalid ' + key); });\n        ['callsByTable', 'callsByEndpoint'].forEach(function (key) {\n            if (!Array.isArray(metrics[key]) || metrics[key].some(function (row) { return !object(row) || !count(row.count) || typeof row[key === 'callsByTable' ? 'table' : 'endpoint'] !== 'string'; })) throw new Error('invalid ' + key);\n        });\n        if (!object(metrics.callsByMethod) || Object.values(metrics.callsByMethod).some(function (value) { return !count(value); })) throw new Error('invalid method counts');\n        if (pacing.rollupByDay != null && (!object(pacing.rollupByDay) || Object.values(pacing.rollupByDay).some(function (value) { return !count(value); }))) throw new Error('invalid daily history');\n    }\n\n    /* ---------------- render ---------------- */",
+      "kind": "validated-response"
+    },
+    {
+      "file": "dashboards/js/api-usage.js",
+      "from": "        setLoading();",
+      "to": "        setLoading();\n        blankStats();",
+      "kind": "explicit-loading"
+    },
+    {
+      "file": "dashboards/js/api-usage.js",
+      "from": "    // On failure show em-dashes, never zeros — a zero reads as \"no usage\".\n    function blankOut() {\n        ['au-projected', 'au-period-to-date', 'au-budget', 'au-overage'].forEach(function (id) {\n            text(id, '—');\n        });",
+      "to": "    function blankStats() {\n        ['au-projected', 'au-period-to-date', 'au-budget', 'au-overage'].forEach(function (id) { text(id, '—'); });\n        text('au-mode', 'Checking data source…');\n        text('au-period-label', '');\n        text('au-meter-caption', 'Loading…');\n        var fill = document.getElementById('au-meter-fill');\n        if (fill) { fill.style.setProperty('--w', '0%'); fill.className = 'au-meter-fill'; }\n    }\n\n    // On failure show em-dashes, never zeros — a zero reads as \"no usage\".\n    function blankOut() {\n        blankStats();\n        text('au-mode', 'Data source unavailable.');",
+      "kind": "explicit-loading"
+    },
+    {
+      "file": "dashboards/js/api-usage.js",
+      "from": "title=\"' + tip + '\"></div>';",
+      "to": "role=\"img\" aria-label=\"' + tip + '\" title=\"' + tip + '\"></div>';",
+      "kind": "presentation"
+    },
+    {
+      "file": "dashboards/js/table-usage-audit.js",
+      "from": "    try { review = JSON.parse(localStorage.getItem(LS_KEY) || '{}') || {}; } catch (e) { review = {}; }\n    function saveReview() { try { localStorage.setItem(LS_KEY, JSON.stringify(review)); } catch (e) {} }",
+      "to": "    function reviewStorageError() {\n        var banner = document.querySelector('.dash-error-banner');\n        var message = document.querySelector('.dash-error-banner-message');\n        if (message) message.textContent = 'Browser storage is unavailable. Your current edits stay on this page only; export your review before closing it.';\n        if (banner) banner.classList.add('show');\n    }\n    try {\n        review = JSON.parse(localStorage.getItem(LS_KEY) || '{}') || {};\n        if (typeof review !== 'object' || Array.isArray(review)) throw new Error('Invalid stored review');\n    } catch (e) { review = {}; reviewStorageError(); }\n    function saveReview() { try { localStorage.setItem(LS_KEY, JSON.stringify(review)); } catch (e) { reviewStorageError(); } }",
+      "kind": "visible-storage-failure"
+    },
+    {
+      "file": "dashboards/js/table-usage-audit.js",
+      "from": "    function applyLive(payload) {\n        var info = {}, liveSet = {};",
+      "to": "    function applyLive(payload) {\n        if (!payload || payload.success !== true || !Array.isArray(payload.tables) || payload.count !== payload.tables.length || !Number.isFinite(Date.parse(payload.generatedAt)) || payload.tables.some(function (table) { return !table || typeof (table.n || table.name) !== 'string' || !(table.n || table.name).trim() || !Number.isInteger(table.fieldCount) || table.fieldCount < 0; })) throw new Error('Incomplete live schema');\n        var names = payload.tables.map(function (table) { return table.n || table.name; });\n        if (new Set(names).size !== names.length) throw new Error('Duplicate live tables');\n        var info = {}, liveSet = {};",
+      "kind": "validated-response"
+    },
+    {
+      "file": "dashboards/js/table-usage-audit.js",
+      "from": "class=\"tua-decide d-",
+      "to": "class=\"field-select tua-decide d-",
+      "kind": "presentation"
+    },
+    {
+      "file": "dashboards/js/table-usage-audit.js",
+      "from": "e.target.className = 'tua-decide d-' + st.dec;",
+      "to": "e.target.className = 'field-select tua-decide d-' + st.dec;",
+      "kind": "presentation"
+    },
+    {
+      "file": "dashboards/js/table-usage-audit.js",
+      "from": "class=\"tua-note\"",
+      "to": "class=\"field-input tua-note\"",
+      "kind": "presentation"
+    },
+    {
+      "file": "dashboards/js/table-usage-audit.js",
+      "from": "class=\"tua-rev\"",
+      "to": "class=\"field-checkbox tua-rev\"",
+      "kind": "presentation"
+    },
+    {
+      "file": "dashboards/js/table-usage-audit.js",
+      "from": "<th class=\"no-sort\"",
+      "to": "<th scope=\"col\" class=\"no-sort\"",
+      "kind": "presentation"
+    },
+    {
+      "file": "dashboards/js/table-usage-audit.js",
+      "from": "<th data-sort=\"tier\">Tier</th>",
+      "to": "<th scope=\"col\" data-sort=\"tier\" aria-sort=\"' + (state.sort === 'tier' ? (state.dir === 1 ? 'ascending' : 'descending') : 'none') + '\"><button type=\"button\" class=\"btn btn-secondary table-sort\">Tier</button></th>",
+      "kind": "presentation"
+    },
+    {
+      "file": "dashboards/js/table-usage-audit.js",
+      "from": "<th data-sort=\"name\">Table</th>",
+      "to": "<th scope=\"col\" data-sort=\"name\" aria-sort=\"' + (state.sort === 'name' ? (state.dir === 1 ? 'ascending' : 'descending') : 'none') + '\"><button type=\"button\" class=\"btn btn-secondary table-sort\">Table</button></th>",
+      "kind": "presentation"
+    },
+    {
+      "file": "dashboards/js/table-usage-audit.js",
+      "from": "<th data-sort=\"fields\">#f</th>",
+      "to": "<th scope=\"col\" data-sort=\"fields\" aria-sort=\"' + (state.sort === 'fields' ? (state.dir === 1 ? 'ascending' : 'descending') : 'none') + '\"><button type=\"button\" class=\"btn btn-secondary table-sort\">#f</button></th>",
+      "kind": "presentation"
+    },
+    {
+      "file": "dashboards/js/table-usage-audit.js",
+      "from": "<th data-sort=\"created\">Created</th>",
+      "to": "<th scope=\"col\" data-sort=\"created\" aria-sort=\"' + (state.sort === 'created' ? (state.dir === 1 ? 'ascending' : 'descending') : 'none') + '\"><button type=\"button\" class=\"btn btn-secondary table-sort\">Created</button></th>",
+      "kind": "presentation"
+    },
+    {
+      "file": "dashboards/js/table-usage-audit.js",
+      "from": "<th data-sort=\"code\">code p/f/i</th>",
+      "to": "<th scope=\"col\" data-sort=\"code\" aria-sort=\"' + (state.sort === 'code' ? (state.dir === 1 ? 'ascending' : 'descending') : 'none') + '\"><button type=\"button\" class=\"btn btn-secondary table-sort\">code p/f/i</button></th>",
+      "kind": "presentation"
+    },
+    {
+      "file": "dashboards/js/table-usage-audit.js",
+      "from": "        render();\n    });\n    els.filters",
+      "to": "        render();\n        var activeSort = els.table.querySelector('th[data-sort=\"' + s + '\"] button');\n        if (activeSort) activeSort.focus({ preventScroll: true });\n    });\n    els.filters",
+      "kind": "presentation"
+    },
+    {
+      "file": "dashboards/js/table-usage-audit.js",
+      "from": "c.classList.toggle('is-active', c === b);",
+      "to": "c.classList.toggle('is-active', c === b); c.setAttribute('aria-pressed', String(c === b));",
+      "kind": "presentation"
+    },
+    {
+      "file": "dashboards/js/table-usage-audit.js",
+      "from": "    // ---- CSV export of the full audit + your review ----",
+      "to": "    // Print editable values as text so long review notes are never clipped.\n    function clearPrintValues() {\n        document.querySelectorAll('.tua-print-value,.tua-print-reviewed').forEach(function (node) { node.remove(); });\n    }\n    window.addEventListener('beforeprint', function () {\n        clearPrintValues();\n        els.table.querySelectorAll('input,select').forEach(function (control) {\n            var text = document.createElement('span');\n            text.className = control.type === 'checkbox' ? 'tua-print-reviewed' : 'tua-print-value';\n            text.textContent = control.type === 'checkbox' ? (control.checked ? 'Reviewed' : 'Not reviewed') : (control.value || '—');\n            control.insertAdjacentElement('afterend', text);\n        });\n    });\n    window.addEventListener('afterprint', clearPrintValues);\n\n    // ---- CSV export of the full audit + your review ----",
+      "kind": "presentation"
+    },
+    {
+      "file": "dashboards/js/table-usage-audit.js",
+      "from": "    function reviewStorageError() {",
+      "to": "    var reviewStorageFailed = false;\n    function reviewStorageError() {\n        reviewStorageFailed = true;",
+      "kind": "visible-recovery"
+    },
+    {
+      "file": "dashboards/js/table-usage-audit.js",
+      "from": "    function saveReview() { try { localStorage.setItem(LS_KEY, JSON.stringify(review)); } catch (e) { reviewStorageError(); } }",
+      "to": "    function saveReview() {\n        try {\n            localStorage.setItem(LS_KEY, JSON.stringify(review));\n            if (reviewStorageFailed) { reviewStorageFailed = false; DashPage.hideError(); }\n        } catch (e) { reviewStorageError(); }\n    }",
+      "kind": "visible-recovery"
+    },
+    {
+      "file": "dashboards/js/table-usage-audit.js",
+      "from": "                applyLive(j);\n                refreshStats(); render();",
+      "to": "                applyLive(j);\n                refreshStats(); render();\n                if (reviewStorageFailed) reviewStorageError(); else DashPage.hideError();",
+      "kind": "visible-recovery"
+    }
+  ]
+}

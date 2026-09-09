@@ -82,29 +82,30 @@
           '<td class="sf-file-kind">' + describe(f.name) + '</td>' +
           '<td class="sf-file-meta">' + humanSize(f.size) + '</td>' +
           '<td class="sf-file-meta">' + esc(fmtDate(f.modifiedAt)) + '</td>' +
-          '<td><a class="sf-btn" href="' + href + '" download="' + esc(f.name) + '">' +
+          '<td><a class="sf-btn btn btn-primary" href="' + href + '" download="' + esc(f.name) + '">' +
             '<i class="fas fa-download" aria-hidden="true"></i> Download</a></td>' +
         '</tr>';
     }).join('');
 
     filesEl.innerHTML =
-      '<div class="sf-table-wrap"><table class="sf-table">' +
-      '<thead><tr><th>File</th><th>What it is</th><th>Size</th><th>Updated</th><th></th></tr></thead>' +
+      '<div class="sf-table-wrap table-wrap" tabindex="0" role="region" aria-label="Available SanMar files"><table class="sf-table data-table">' +
+      '<thead><tr><th>File</th><th>What it is</th><th>Size</th><th>Updated</th><th>Download</th></tr></thead>' +
       '<tbody>' + rows + '</tbody></table></div>';
   }
 
   function load(fresh) {
     setStatus('<i class="fas fa-rotate sf-spin" aria-hidden="true"></i> Connecting to SanMar…', false);
     filesEl.innerHTML = '';
+    if (checkedEl) checkedEl.textContent = '';
     if (configNote) configNote.hidden = true;
-    if (refreshBtn) refreshBtn.classList.add('is-busy');
+    if (refreshBtn) { refreshBtn.classList.add('is-busy'); refreshBtn.disabled = true; }
 
     fetch(LIST_URL + (fresh ? '?fresh=1' : ''), { credentials: 'same-origin', headers: { Accept: 'application/json' } })
       .then(function (r) {
         return r.json().catch(function () { return {}; }).then(function (body) { return { status: r.status, body: body }; });
       })
       .then(function (res) {
-        if (refreshBtn) refreshBtn.classList.remove('is-busy');
+        if (refreshBtn) { refreshBtn.classList.remove('is-busy'); refreshBtn.disabled = false; }
         var b = res.body || {};
         if (res.status === 401) {
           setStatus('Your session expired. <a href="/auth/saml/login">Sign in again</a>.', true);
@@ -121,12 +122,15 @@
           filesEl.innerHTML = '<div class="sf-msg sf-msg--error"><b>Could not reach SanMar.</b> ' + esc(b.message || ('Error ' + res.status)) + ' — try Refresh in a minute.</div>';
           return;
         }
+        if (!Array.isArray(b.files) || b.files.some(function (file) {
+          return !file || typeof file.name !== 'string' || !file.name || typeof file.dir !== 'string' || !file.dir || typeof file.size !== 'number' || !Number.isFinite(file.size) || file.size < 0;
+        })) throw new Error('SanMar returned an incomplete file listing. Please refresh.');
         setStatus('', false);
         render(b);
         if (checkedEl) checkedEl.textContent = b.checkedAt ? ('Listing as of ' + fmtDate(b.checkedAt) + '. Large files (the pricing master is ~330 MB) can take a minute to download.') : '';
       })
       .catch(function (e) {
-        if (refreshBtn) refreshBtn.classList.remove('is-busy');
+        if (refreshBtn) { refreshBtn.classList.remove('is-busy'); refreshBtn.disabled = false; }
         setStatus('', false);
         filesEl.innerHTML = '<div class="sf-msg sf-msg--error"><b>Network error.</b> ' + esc(e.message || '') + '</div>';
       });
