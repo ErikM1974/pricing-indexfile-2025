@@ -932,3 +932,5 @@ Purchasing final local evidence:217passed across six content/controller/inventor
 ## Purchasing integration — 2026-09-09
 
 Merged reviewed source after verified .12 rollout. Conflict resolution preserved the live checkpoint, all append-only purchasing evidence, existing import ownership and new reviewed purchasing owners. The review commit helper stopped on an extra EOF blank line in its new source test; finalization removed only that blank line and completed source971f673521d606cf592dfca1a7d4df626a96a229. Do not rerun either commit helper. Full integrated verification follows.
+
+Full purchasing integration initially passed224unit suites and failed one older office-operations source guard that still required the deleted viewer stylesheet, bare button classes and a September5 cache version. Updated that existing guard to canonical controls and an actual shared CSS/viewer/page version match; all five office-operations checks passed. Full integrated gates restart on the resulting source; the initial failed unit log is retained.
