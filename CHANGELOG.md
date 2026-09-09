@@ -1,3 +1,12 @@
+## v2026.09.09.3 (2026.09.09)
+
+- Plan unified sign-in and order confirmation pages
+- Record verified staff reference release and entry status review
+- Record entry status review and sign in failure lesson
+- Unify sign in and order confirmation pages with honest retry states
+- Integrate reviewed sign in and order confirmation family
+- Record completed sign in and confirmation release checks
+
 ## v2026.09.09.2 (2026.09.09)
 
 - Plan shared staff references and forms directory
