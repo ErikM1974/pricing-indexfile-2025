@@ -61,10 +61,12 @@
       body: JSON.stringify(body)
     }).then(function (r) { return r.status; }, function () { return 0; }).then(function (status) {
       // The server answers 200 { ok:true } whether or not the email is on file, so the "check your
-      // email" state is the SAME for everyone (no account enumeration). Only two things are not
-      // that: the rate limiter (429) and no response at all (0) — both are told to the user.
+      // email" state is the SAME for everyone (no account enumeration). The following failures are not
+      // that: rate limits, network failures and server outages are shown without account details.
       if (status === 429) { resetButton(); showError('Too many sign-in requests. Please wait a few minutes and try again.'); return; }
       if (status === 0) { resetButton(); showError('We couldn’t reach the server. Check your connection and try again.'); return; }
+      // An infrastructure outage is independent of whether an account exists. Keep 200 identical for everyone.
+      if (status >= 500) { resetButton(); showError('Sign-in is temporarily unavailable. Please try again in a moment.'); return; }
       formView.hidden = true;
       sentView.hidden = false;
       var h = sentView.querySelector('h1');

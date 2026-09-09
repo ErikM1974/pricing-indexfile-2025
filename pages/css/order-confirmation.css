@@ -1,0 +1,74 @@
+/* data-order-confirmation — shared entry layout using app tokens and components. */
+@layer components.pages {
+
+:where([data-ui="unified"][data-order-confirmation]) { min-height: 100svh; display: flex; flex-direction: column; }
+:where([data-ui="unified"][data-order-confirmation]) .site-head { border-top: 3px solid var(--ui-accent); border-bottom: 1px solid var(--ui-line); background: var(--ui-surface); }
+:where([data-ui="unified"][data-order-confirmation]) .site-head-inner { max-width: 1200px; padding: 18px 24px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+:where([data-ui="unified"][data-order-confirmation]) .brand { display: flex; align-items: center; gap: 16px; text-decoration: none; color: var(--ui-ink); }
+:where([data-ui="unified"][data-order-confirmation]) .brand-logo { width: 100px; height: auto; }
+:where([data-ui="unified"][data-order-confirmation]) .brand-text { display: grid; gap: 4px; font-size: 14px; }
+:where([data-ui="unified"][data-order-confirmation]) .brand-text em { font-style: normal; color: var(--ui-muted); }
+:where([data-ui="unified"][data-order-confirmation]) .head-contact { font-size: 14px; }
+:where([data-ui="unified"][data-order-confirmation]) .success-main { width: 100%; max-width: 760px; margin: 0 auto; padding: 48px 24px; flex: 1; }
+:where([data-ui="unified"][data-order-confirmation]) .success-card { padding: clamp(24px, 5vw, 40px); background: var(--ui-surface); border: 1px solid var(--ui-line); border-radius: var(--radius-lg); text-align: center; }
+:where([data-ui="unified"][data-order-confirmation]) .success-card h1 { font-size: clamp(25px, 4vw, 34px); line-height: 1.2; letter-spacing: -0.025em; margin: 0 0 16px; }
+:where([data-ui="unified"][data-order-confirmation]) .success-card > p { color: var(--ui-muted); line-height: 1.65; }
+:where([data-ui="unified"][data-order-confirmation]) :is(.success-check, .success-spin) { color: var(--emerald-800); font-size: 42px; margin-bottom: 20px; }
+:where([data-ui="unified"][data-order-confirmation]) .success-check.is-amber { color: var(--color-warning-ink); }
+:where([data-ui="unified"][data-order-confirmation]) .success-order strong { color: var(--ui-ink); font-size: 19px; overflow-wrap: anywhere; }
+:where([data-ui="unified"][data-order-confirmation]) .success-ship { padding: 12px 16px; border-radius: var(--radius-sm); background: var(--color-info-bg); color: var(--color-info-ink); font-size: 14px; margin: 16px 0; }
+:where([data-ui="unified"][data-order-confirmation]) .success-mockups { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; margin: 24px 0; }
+:where([data-ui="unified"][data-order-confirmation]) .success-mockups:empty { display: none; }
+:where([data-ui="unified"][data-order-confirmation]) .success-mockups figure { margin: 0; width: 140px; }
+:where([data-ui="unified"][data-order-confirmation]) .success-mockups img { width: 100%; height: 140px; object-fit: contain; border: 1px solid var(--ui-line); border-radius: var(--radius-sm); }
+:where([data-ui="unified"][data-order-confirmation]) .success-mockups figcaption { font-size: 12px; color: var(--ui-muted); margin-top: 8px; }
+:where([data-ui="unified"][data-order-confirmation]) .success-summary { text-align: left; margin: 24px 0; }
+:where([data-ui="unified"][data-order-confirmation]) .tot-row { display: flex; justify-content: space-between; gap: 20px; padding: 8px 0; font-size: 14px; }
+:where([data-ui="unified"][data-order-confirmation]) .tot-row > :last-child { white-space: nowrap; font-variant-numeric: tabular-nums; }
+:where([data-ui="unified"][data-order-confirmation]) .tot-row.is-grand { border-top: 2px solid var(--ui-ink); margin-top: 8px; padding-top: 16px; font-weight: 700; font-size: 21px; }
+:where([data-ui="unified"][data-order-confirmation]) .success-timeline { text-align: left; border-top: 1px solid var(--ui-line); padding-top: 24px; display: grid; gap: 20px; }
+:where([data-ui="unified"][data-order-confirmation]) .success-step { display: flex; align-items: flex-start; gap: 12px; }
+:where([data-ui="unified"][data-order-confirmation]) .success-step i { width: 20px; color: var(--emerald-800); margin-top: 4px; }
+:where([data-ui="unified"][data-order-confirmation]) .success-step strong { display: block; font-size: 15px; line-height: 1.5; }
+:where([data-ui="unified"][data-order-confirmation]) .success-step small { display: block; font-size: 13px; line-height: 1.6; color: var(--ui-muted); }
+:where([data-ui="unified"][data-order-confirmation]) .success-email-note { font-size: 13px; margin: 24px 0 16px; }
+:where([data-ui="unified"][data-order-confirmation]) .success-questions { font-size: 13px; margin-top: 16px; }
+:where([data-ui="unified"][data-order-confirmation]) .success-actions .btn { max-width: 100%; white-space: normal; }
+:where([data-ui="unified"][data-order-confirmation]) .site-foot { padding: 20px 24px; border-top: 1px solid var(--ui-line); color: var(--ui-muted); font-size: 12px; text-align: center; line-height: 1.8; background: var(--ui-surface); }
+
+@media screen and (width <= 600px) {
+    :where([data-ui="unified"][data-order-confirmation]) .site-head-inner { padding: 16px; }
+    :where([data-ui="unified"][data-order-confirmation]) .brand { align-items: flex-start; gap: 12px; }
+    :where([data-ui="unified"][data-order-confirmation]) .brand-logo { width: 72px; }
+    :where([data-ui="unified"][data-order-confirmation]) .brand-text { max-width: 180px; }
+    :where([data-ui="unified"][data-order-confirmation]) .success-main { padding: 24px 16px; }
+}
+
+@media print {
+    :where([data-ui="unified"][data-order-confirmation]) { display: block; min-height: 0; background: var(--ui-surface); }
+    :where([data-ui="unified"][data-order-confirmation]) .success-main { max-width: none; padding: 12px 0; }
+    :where([data-ui="unified"][data-order-confirmation]) .success-card { border: 0; padding: 0; }
+    :where([data-ui="unified"][data-order-confirmation]) .success-card h1 { font-size: 24px; margin-bottom: 10px; }
+    :where([data-ui="unified"][data-order-confirmation]) .success-card > p { font-size: 12px; }
+    :where([data-ui="unified"][data-order-confirmation]) :is(.success-check, .success-spin) { font-size: 32px; margin-bottom: 12px; }
+    :where([data-ui="unified"][data-order-confirmation]) .success-summary { margin: 16px 0; }
+    :where([data-ui="unified"][data-order-confirmation]) .tot-row { font-size: 12px; padding: 5px 0; }
+    :where([data-ui="unified"][data-order-confirmation]) .tot-row.is-grand { font-size: 18px; margin-top: 4px; padding-top: 8px; }
+    :where([data-ui="unified"][data-order-confirmation]) .success-timeline { gap: 12px; padding-top: 16px; }
+    :where([data-ui="unified"][data-order-confirmation]) .success-step strong { font-size: 13px; }
+    :where([data-ui="unified"][data-order-confirmation]) .success-step small { font-size: 11px; }
+    :where([data-ui="unified"][data-order-confirmation]) .site-foot { padding: 8px; }
+    :where([data-ui="unified"][data-order-confirmation]) :is(.success-summary, .success-step, figure, .site-foot) { break-inside: avoid; }
+    :where([data-ui="unified"][data-order-confirmation]) .success-mockups img { height: 80px; }
+    :where([data-ui="unified"][data-order-confirmation]) .success-mockups { margin: 12px 0; }
+    :where([data-ui="unified"][data-order-confirmation]) .success-mockups figure { width: 100px; }
+    :where([data-ui="unified"][data-order-confirmation]) .success-mockups figcaption { margin-top: 4px; }
+    :where([data-ui="unified"][data-order-confirmation]) .success-ship { padding: 8px 12px; margin: 12px 0; }
+    :where([data-ui="unified"][data-order-confirmation]) .success-email-note { margin: 12px 0 8px; }
+    :where([data-ui="unified"][data-order-confirmation]) .success-questions { margin-top: 8px; }
+    :where([data-ui="unified"][data-order-confirmation]) .site-head-inner { padding: 12px; }
+    :where([data-ui="unified"][data-order-confirmation]) .brand-logo { width: 80px; }
+    :where([data-ui="unified"][data-order-confirmation]) .success-actions .btn { display: none; }
+}
+
+}

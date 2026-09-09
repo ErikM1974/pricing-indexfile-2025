@@ -600,3 +600,22 @@ Five staff references integrated and tested at3432538f676b06ce8cc8cd3c6cc10d15eb
 ## Staff reference release record — v2026.09.09.2
 
 Exact-source CI 34341414138 passed all four jobs on0203038d69fd8733d5fd6c5d404cd56f423d92b5, including actual money/calculator parity. Five staff references share components, scoped page arrangements and complete print behavior. Original content, examples and existing access boundaries retained. Service/bonus/form-directory failures are explicit with usable retry.21 focused browser cases,805 paper blocks; full checks5162 unit tests,342 mocked browser,16 remaining browser,all5 calculators;485 routes unchanged. Candidate104 reviewed/121 pending becomes live only after actual rollout verification.
+
+## Entry and order-confirmation family plan — 2026-09-09
+
+Six sources after staff references: staff/customer/vendor sign-in and3-Day Tees/custom-tees/custom-caps confirmation pages. Isolated codex/entry-status-family based on245d00e86e1c07099f5e4bbc4b1ea6999c327b62. Original full text, fields, images, routes, controller hashes and CSS graphs captured. Keep three auth flows and three channel-specific fulfillment/email controllers; replace borrowed storefront styles with a scoped confirmation owner and share sign-in shell/control styling. Preserve every payment-status state and server-stamped amounts/ship promises. Tests must block every actual business write, email and authentication request while exercising synthetic response states. Candidate2026.09.09.3 only after primary full gates, exact-source CI and verified deployment.
+
+- [ ] Capture original desktop/phone and current state contracts.
+- [ ] Build shared scoped sign-in and confirmation owners, retaining original prose and function hooks.
+- [ ] Verify four widths/axe, keyboard/email validation/rate limits/failure/sent/try-again, confirmation working/done/delayed/error and complete paper.
+- [ ] Register files/tests/owners, integrate only reviewed scope, full local checks/CI/actual release.
+
+Current live remains99/225,126 pending atv2026.09.09.1/2080. Five staff references are reviewed and full primary gates running. This next family is planned only.
+
+## Six entry/status pages reviewed — 2026-09-09
+
+Staff/customer/vendor sign-in and3-Day Tees/custom-tees/custom-caps confirmation pages now use shared access/confirmation layouts and scoped page arrangements. Original full main text, images, fields, links and IDs preserved. All three fulfillment/email controllers and helpers unchanged and hash-locked. Magic-link pages retain deep links and identical successful known/unknown-account messaging; server outages now display generic retryable errors preserving email.30 focused browser cases passed in34.3s at1440/768/390/320, zero axe violations;198 focused unit cases passed.17 populated/error/delayed/sent PDFs retain167 checked content blocks, each one sheet including mockup captions and contact/footer text. Candidate2026.09.09.3 pre-versioned; two obsolete success stylesheets retired, caps studio stylesheet remains until its own migration. Full primary gates/CI/deploy pending. Verified live staff releasev2026.09.09.2/2081 is104 reviewed/121 pending; only verified entry rollout becomes110/115.
+
+## Entry/status integration — 2026-09-09
+
+Reviewed entry/status commit 1118d1d4642bf38db59948b3064362280f6df69a integrated after verified staff release2081. Only appended memory notes conflicted; retained both histories and the latest live checkpoint. All app changes merged directly; original commission serialization from the staff full-suite fix is preserved. Full primary gates next. Live104 reviewed/121 pending remains authoritative until actual entry rollout.
