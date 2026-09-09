@@ -20,7 +20,7 @@ async function open(page,file,state={},query=''){
         if(!['GET','HEAD'].includes(req.method())){events.writes.push(u.pathname);return route.fulfill({status:503,body:'Business writes blocked'});}
         if(u.hostname.includes('caspio.com')&&u.pathname.endsWith('/emb'))return route.fulfill({contentType:'application/javascript',body:'/* Isolated auth provider */'});
         if(u.href.includes('@emailjs/'))return route.fulfill({contentType:'application/javascript',body:'window.emailjs={init(){},send(){throw new Error("Unexpected business email")}};'});
-        if(u.pathname==='/api/quote_sessions'){events.reads++;return route.fulfill(state.quote===503?{status:503,json:{error:'Offline fixture'}}:{json:state.quote||[row]});}
+        if(u.pathname==='/api/quote_sessions'){events.reads++;if(events.reads===state.delayRead)return new Promise(resolve=>setTimeout(()=>resolve(route.fulfill({json:state.quote})),150));return route.fulfill(state.quote===503?{status:503,json:{error:'Offline fixture'}}:{json:state.quote||[row]});}
         if(u.pathname.startsWith('/api/'))return route.fulfill({status:503,json:{error:'Unmocked service'}});
         return route.fallback();
     });
@@ -30,7 +30,18 @@ async function freezePollingClock(page){
     // Installing alone leaves timers ticking while fonts/network finish loading.
     await page.clock.install({time:new Date('2026-09-09T12:00:00Z')});
     await page.clock.pauseAt(new Date('2026-09-09T12:00:01Z'));
+    // A request arriving does not mean its async response has scheduled the next
+    // poll. Observe the real timer registration before advancing the paused clock.
+    await page.addInitScript(()=>{
+        const schedule=window.setTimeout.bind(window);window.__scheduledPolls=0;
+        window.setTimeout=(callback,delay,...args)=>{
+            const timer=schedule(callback,delay,...args);
+            if(typeof callback==='function'&&callback.name==='poll'&&delay===3000)window.__scheduledPolls++;
+            return timer;
+        };
+    });
 }
+async function advancePoll(page,scheduled){await expect.poll(()=>page.evaluate(()=>window.__scheduledPolls)).toBe(scheduled);await page.clock.runFor(3000);}
 const clean=events=>{expect(events.errors).toEqual([]);expect(events.writes).toEqual([]);};
 async function paper(page,name){
     const blocks=await page.locator('main h1,main p,main .tot-row,main .success-step,main figcaption,footer p').evaluateAll(nodes=>nodes.filter(n=>!n.closest('[hidden]')).map(n=>n.textContent.replace(/\s+/g,' ').trim()).filter(Boolean));
@@ -94,11 +105,12 @@ for(const entry of fixture.pages.filter(p=>p.file.includes('success'))){const na
     });
     test('CSS entry status: '+name+' transient lookup failure recovers through existing polling',async({page})=>{
         await freezePollingClock(page);const state={quote:503},events=await open(page,entry.file,state,'?quote_id=REVIEW-1042');await expect.poll(()=>events.reads).toBe(1);await expect(page.locator('#s-working')).toBeVisible();
-        state.quote=[{...row,Status:'Payment Confirmed - ShopWorks Failed'}];await page.clock.runFor(3100);await expect(page.locator('#s-done')).toBeVisible();await expect(page.locator('#s-email-note')).toContainText('by hand');await paper(page,name+'-manual');clean(events);
+        state.quote=[{...row,Status:'Payment Confirmed - ShopWorks Failed'}];await advancePoll(page,1);await expect(page.locator('#s-done')).toBeVisible();await expect(page.locator('#s-email-note')).toContainText('by hand');await paper(page,name+'-manual');clean(events);
     });
     test('CSS entry status: '+name+' pending webhook reaches the existing delayed state',async({page})=>{
-        await freezePollingClock(page);const state={quote:[{...row,Status:'Pending Payment'}]},events=await open(page,entry.file,state,'?quote_id=REVIEW-1042');await expect.poll(()=>events.reads).toBe(1);
-        for(let i=2;i<=25;i++){await page.clock.runFor(3100);await expect.poll(()=>events.reads).toBe(i);}
+        await freezePollingClock(page);const state={quote:[{...row,Status:'Pending Payment'}],delayRead:11},events=await open(page,entry.file,state,'?quote_id=REVIEW-1042');await expect.poll(()=>events.reads).toBe(1);
+        for(let i=2;i<=25;i++){await advancePoll(page,i-1);await expect.poll(()=>events.reads).toBe(i);}
         await expect(page.locator('#s-delayed')).toBeVisible();await expect(page.locator('#s-delayed-num')).toHaveText('REVIEW-1042');await expect(page.locator('#s-done')).toBeHidden();await paper(page,name+'-delayed');clean(events);
+        await page.clock.runFor(30000);expect(events.reads).toBe(25);
     });
 }
