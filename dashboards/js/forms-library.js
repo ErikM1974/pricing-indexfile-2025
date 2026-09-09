@@ -53,13 +53,14 @@
     function safeUrl(value) {
         var url = String(value == null ? '' : value).trim();
         if (!url) return '';
-        if (url.startsWith('/') || /^https?:\/\//i.test(url)) return url;
+        if (/^\/(?![/\\])/.test(url) || /^https?:\/\//i.test(url)) return url;
         return '';
     }
 
     async function loadForms() {
         var data = await DashPage.fetchJson('/api/forms-library');
-        var forms = (data && data.forms) || [];
+        if (!data || !Array.isArray(data.forms) || data.forms.some(function (form) { return !form || typeof form !== 'object' || typeof form.Form_Name !== 'string' || !form.Form_Name.trim(); })) throw new Error('The forms list returned an invalid response');
+        var forms = data.forms;
         render(forms);
     }
 
@@ -75,7 +76,7 @@
 
         // API returns rows already sorted Category → Sort_Order; group in order.
         var groups = [];
-        var byCategory = {};
+        var byCategory = Object.create(null);
         forms.forEach(function (form) {
             var cat = form.Category || 'General';
             if (!byCategory[cat]) {
@@ -98,6 +99,7 @@
             );
         }).join('');
 
+        // eslint-disable-next-line no-unsanitized/property -- category/name/description are escaped; renderForm validates and escapes every destination and label.
         root.innerHTML = html;
     }
 

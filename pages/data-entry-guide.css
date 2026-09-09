@@ -1,107 +1,32 @@
-/* Data Entry Guide — Styles */
-
-/* Follows service-price-cheat-sheet.css design system */
-
-/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue, merged into its
-   existing :root. Map them to shared_components/css/tokens.css names when the page is redesigned;
-   raw hex is allowed ONLY in this block. */
-/* stylelint-disable color-no-hex */
-:root {
-    --data-entry-guide-orange: #a16207;
-    --primary-green: var(--store-green-700);
-    --bg-light: var(--slate-50);
-    --text-primary: var(--gray-800);
-    --text-secondary: var(--slate-500);
-    --border-color: var(--slate-200);
-    --card-shadow: 0 1px 3px rgb(0 0 0 / 8%);
-    --stop-red: var(--red-600);
-    --stop-bg: var(--red-50);
-    --stop-border: var(--red-200);
-    --start-green: var(--green-600);
-    --start-bg: var(--brand-50);
-    --start-border: var(--green-200);
-}
-/* stylelint-enable color-no-hex */
-
-* { box-sizing: border-box; margin: 0; padding: 0; }
-
-body {
-    font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
-    background: var(--bg-light);
-    color: var(--text-primary);
-    line-height: 1.5;
-}
-
-.main-container {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 0 20px 40px;
-}
-
-/* Header */
-.header {
-    padding: 14px 0;
-    border-bottom: 1px solid var(--border-color);
-    margin-bottom: 20px;
-}
-
-.header-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-.header-left { flex: 1; }
-
-.header-right {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-}
-
-.breadcrumb {
+/* data-entry-guide arrangements; shared components own the shell and controls. */
+@layer components.pages {
+:where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .breadcrumb {
     font-size: 13px;
-    color: var(--text-secondary);
+    color: var(--ui-muted);
 }
 
-.breadcrumb a {
-    color: var(--primary-green);
-    text-decoration: none;
+:where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .breadcrumb a {
+    color: var(--ui-accent);
+    text-decoration: underline;
 }
-.breadcrumb a:hover { text-decoration: underline; }
-.breadcrumb span { margin: 0 4px; }
+:where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .breadcrumb a:hover { text-decoration: underline; }
+:where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .breadcrumb span { margin: 0 4px; }
 
-.btn-print, .btn-link {
-    padding: 6px 14px;
-    border: 1px solid var(--border-color);
-    border-radius: 6px;
-    background: white;
-    color: var(--text-primary);
-    font-size: 13px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    text-decoration: none;
-}
-.btn-print:hover, .btn-link:hover { background: var(--slate-100); }
-
-/* Page Title */
-.page-title {
+:where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .page-title {
     font-size: 22px;
     font-weight: 700;
-    color: var(--text-primary);
+    color: var(--ui-ink);
     margin-bottom: 4px;
 }
-.page-title i { color: var(--primary-green); margin-right: 8px; }
+:where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .page-title i { color: var(--ui-accent); margin-right: 8px; }
 
-.page-subtitle {
+:where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .page-subtitle {
     font-size: 14px;
-    color: var(--text-secondary);
+    color: var(--ui-muted);
     margin-bottom: 24px;
 }
 
-/* Section Dividers */
-.section-divider {
+:where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .section-divider {
     font-size: 16px;
     font-weight: 700;
     padding: 10px 16px;
@@ -111,71 +36,68 @@ body {
     align-items: center;
     gap: 10px;
 }
-.section-divider i { font-size: 18px; }
+:where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .section-divider i { font-size: 18px; }
 
-.stop-theme {
-    background: var(--stop-bg);
-    color: var(--stop-red);
-    border: 1px solid var(--stop-border);
+:where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .stop-theme {
+    background: var(--color-danger-bg);
+    color: var(--color-danger-ink);
+    border: 1px solid var(--red-200);
 }
 
-.start-theme {
-    background: var(--start-bg);
-    color: var(--start-green);
-    border: 1px solid var(--start-border);
+:where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .start-theme {
+    background: var(--ui-tint);
+    color: var(--ui-accent);
+    border: 1px solid var(--ui-line);
 }
 
-.ref-theme {
+:where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .ref-theme {
     background: var(--color-floor-tint);
     color: var(--color-floor-dark);
     border: 1px solid var(--blue-200);
 }
 
-.checklist-theme {
+:where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .checklist-theme {
     background: var(--red-50);
-    color: var(--data-entry-guide-orange);
+    color: var(--color-warning-ink);
     border: 1px solid var(--amber-200);
 }
 
-/* Cards */
-.ref-card {
+:where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .ref-card {
     background: white;
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--ui-line);
     border-radius: 10px;
-    box-shadow: var(--card-shadow);
     margin-bottom: 14px;
     overflow: hidden;
 }
 
-.ref-card-header {
+:where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .ref-card-header {
     padding: 12px 18px;
     background: var(--slate-50);
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--ui-line);
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
-.ref-card-header h2 {
+:where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .ref-card-header h2 {
     font-size: 14px;
     font-weight: 600;
-    color: var(--text-primary);
+    color: var(--ui-ink);
     display: flex;
     align-items: center;
     gap: 8px;
 }
 
-.ref-card-header h2 i {
-    color: var(--primary-green);
+:where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .ref-card-header h2 i {
+    color: var(--ui-accent);
     font-size: 14px;
 }
 
-.ref-card-body {
+:where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .ref-card-body {
     padding: 14px 18px;
 }
 
-/* Stop/Start number badges */
-.stop-number, .start-number {
+:where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .stop-number, :where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .start-number {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -187,20 +109,19 @@ body {
     flex-shrink: 0;
 }
 
-.stop-number {
-    background: var(--stop-red);
+:where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .stop-number {
+    background: var(--color-danger-ink);
     color: white;
 }
-.stop-header { border-left: 3px solid var(--stop-red); }
+:where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .stop-header { border-left: 3px solid var(--color-danger-ink); }
 
-.start-number {
-    background: var(--start-green);
+:where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .start-number {
+    background: var(--ui-accent);
     color: white;
 }
-.start-header { border-left: 3px solid var(--start-green); }
+:where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .start-header { border-left: 3px solid var(--ui-accent); }
 
-/* Content blocks */
-.bad-example {
+:where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .bad-example {
     background: var(--red-50);
     border: 1px solid var(--red-200);
     border-radius: 6px;
@@ -209,18 +130,18 @@ body {
     margin-bottom: 10px;
 }
 
-.real-examples {
+:where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .real-examples {
     font-size: 13px;
-    color: var(--text-secondary);
+    color: var(--ui-muted);
     margin-bottom: 10px;
 }
 
-.real-examples ul {
+:where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .real-examples ul {
     margin: 4px 0 0 18px;
     font-size: 12px;
 }
 
-.do-this {
+:where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .do-this {
     background: var(--brand-50);
     border: 1px solid var(--green-200);
     border-radius: 6px;
@@ -228,29 +149,28 @@ body {
     font-size: 13px;
     color: var(--print-green);
 }
-.do-this i { color: var(--green-600); margin-right: 4px; }
+:where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .do-this i { color: var(--green-600); margin-right: 4px; }
 
-.notes-list {
+:where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .notes-list {
     margin: 6px 0 6px 18px;
     font-size: 13px;
 }
-.notes-list li { margin-bottom: 3px; }
+:where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .notes-list li { margin-bottom: 3px; }
 
-.address-format {
+:where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .address-format {
     background: var(--slate-100);
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--ui-line);
     border-radius: 6px;
     padding: 10px 14px;
     margin-bottom: 10px;
 }
 
-.address-format code {
+:where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .address-format code {
     font-size: 13px;
     font-weight: 600;
 }
 
-/* Source badges */
-.source-badge {
+:where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .source-badge {
     font-size: 10px;
     font-weight: 600;
     padding: 2px 8px;
@@ -258,54 +178,52 @@ body {
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
-.source-api { background: var(--store-green-100); color: var(--print-green); }
-.source-fallback { background: var(--amber-100); color: var(--amber-800); }
+:where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .source-api { background: var(--store-green-100); color: var(--print-green); }
+:where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .source-fallback { background: var(--amber-100); color: var(--amber-800); }
 
-/* Tables */
-.ref-table {
+:where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .ref-table {
     width: 100%;
     border-collapse: collapse;
     font-size: 13px;
 }
 
-.ref-table th {
+:where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .ref-table th {
     text-align: left;
     padding: 8px 10px;
     font-size: 11px;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    color: var(--text-secondary);
-    border-bottom: 2px solid var(--border-color);
+    color: var(--ui-muted);
+    border-bottom: 2px solid var(--ui-line);
     background: var(--gray-50);
 }
 
-.ref-table td {
+:where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .ref-table td {
     padding: 9px 10px;
     border-bottom: 1px solid var(--slate-100);
     vertical-align: middle;
 }
-.ref-table tbody tr:last-child td { border-bottom: none; }
-.ref-table tbody tr:hover { background: var(--slate-50); }
+:where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .ref-table tbody tr:last-child td { border-bottom: none; }
+:where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .ref-table tbody tr:hover { background: var(--slate-50); }
 
-.price-col { text-align: right; font-weight: 600; color: var(--primary-green); }
-.service-name { font-weight: 500; }
+:where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .price-col { text-align: right; font-weight: 600; color: var(--ui-accent); }
+:where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .service-name { font-weight: 500; }
 
-.pn-cell code, .ref-table code {
+:where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .pn-cell code, :where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .ref-table code {
     font-size: 12px;
     background: var(--slate-100);
     padding: 2px 6px;
     border-radius: 3px;
     color: var(--slate-600);
 }
-.notes-cell { font-size: 12px; color: var(--text-secondary); }
+:where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .notes-cell { font-size: 12px; color: var(--ui-muted); }
 
-.compact-table { max-width: 500px; }
+:where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .compact-table { max-width: 500px; }
 
-.al-vs-fb-table { margin-top: 10px; }
+:where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .al-vs-fb-table { margin-top: 10px; }
 
-/* Tier note */
-.tier-note {
+:where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .tier-note {
     margin-top: 12px;
     padding: 8px 12px;
     background: var(--color-floor-tint);
@@ -314,143 +232,124 @@ body {
     font-size: 12px;
     color: var(--blue-800);
 }
-.tier-note i { margin-right: 6px; }
+:where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .tier-note i { margin-right: 6px; }
 
-.tier-note a {
+:where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .tier-note a {
     color: var(--color-floor-dark);
     font-weight: 600;
 }
 
-/* Loading & error states */
-.loading-cell, .error-cell {
+:where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .loading-cell, :where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .error-cell {
     text-align: center;
     padding: 20px;
-    color: var(--text-secondary);
+    color: var(--ui-muted);
     font-size: 13px;
 }
 
-.error-cell {
+:where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .error-cell {
     color: var(--red-800);
     background: var(--red-50);
 }
+:where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .checklist-card .ref-card-body { padding: 18px; }
 
-/* Checklist */
-.checklist-card .ref-card-body { padding: 18px; }
-
-.checklist-grid {
+:where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .checklist-grid {
     display: flex;
     flex-direction: column;
     gap: 8px;
 }
 
-.checklist-item {
+:where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .checklist-item {
     display: flex;
     align-items: flex-start;
     gap: 10px;
     padding: 8px 12px;
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--ui-line);
     border-radius: 6px;
     font-size: 13px;
     cursor: pointer;
     transition: background 0.15s;
 }
-.checklist-item:hover { background: var(--slate-50); }
+:where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .checklist-item:hover { background: var(--slate-50); }
 
-.checklist-item input[type="checkbox"] {
+:where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .checklist-item input[type="checkbox"] {
     margin-top: 2px;
-    accent-color: var(--primary-green);
+    accent-color: var(--ui-accent);
     flex-shrink: 0;
 }
 
-.checklist-item input:checked + span {
+:where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .checklist-item input:checked + span {
     text-decoration: line-through;
-    color: var(--text-secondary);
+    color: var(--ui-muted);
 }
 
-/* Alias intro */
-.alias-intro {
+:where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .alias-intro {
     font-size: 13px;
-    color: var(--text-secondary);
+    color: var(--ui-muted);
     margin-bottom: 12px;
 }
 
-/* Footer */
-.page-footer {
+:where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .page-footer {
     text-align: center;
     font-size: 12px;
-    color: var(--text-secondary);
+    color: var(--ui-muted);
     margin-top: 20px;
     padding-top: 16px;
-    border-top: 1px solid var(--border-color);
+    border-top: 1px solid var(--ui-line);
 }
 
-.page-footer a {
-    color: var(--primary-green);
+:where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .page-footer a {
+    color: var(--ui-accent);
     text-decoration: none;
     font-weight: 500;
 }
-.page-footer a:hover { text-decoration: underline; }
-.page-footer p + p { margin-top: 6px; }
+:where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .page-footer a:hover { text-decoration: underline; }
+:where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .page-footer p + p { margin-top: 6px; }
 
-/* ── Print styles ──────────────────────────────────────────────────── */
 @media print {
-    body { background: white; }
-    .header, .btn-print, .btn-link, .page-footer { display: none; }
-
-    .main-container {
-        max-width: 100%;
-        padding: 0;
-    }
-
-    .page-title {
+    :where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .page-title {
         font-size: 18px;
         margin-bottom: 2px;
     }
 
-    .page-subtitle {
+    :where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .page-subtitle {
         font-size: 11px;
         margin-bottom: 10px;
     }
 
-    .section-divider {
+    :where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .section-divider {
         margin: 16px 0 10px;
         padding: 6px 12px;
         font-size: 14px;
         break-after: avoid;
     }
 
-    .ref-card {
-        box-shadow: none;
+    :where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .ref-card {
         border: 1px solid var(--gray-300);
         margin-bottom: 10px;
         break-inside: avoid;
     }
-    .ref-card-header { background: var(--gray-100); padding: 8px 12px; }
-    .ref-card-body { padding: 8px 12px; }
+    :where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .ref-card-header { background: var(--gray-100); padding: 8px 12px; }
+    :where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .ref-card-body { padding: 8px 12px; }
 
-    .ref-table th, .ref-table td { padding: 4px 8px; font-size: 11px; }
-    .bad-example, .do-this, .real-examples { font-size: 11px; padding: 6px 10px; }
-    .tier-note { font-size: 10px; padding: 4px 8px; }
-    .source-badge { font-size: 9px; }
+    :where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .ref-table th, :where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .ref-table td { padding: 4px 8px; font-size: 11px; }
+    :where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .bad-example, :where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .do-this, :where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .real-examples { font-size: 11px; padding: 6px 10px; }
+    :where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .tier-note { font-size: 10px; padding: 4px 8px; }
+    :where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .source-badge { font-size: 9px; }
 
-    .checklist-item {
+    :where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .checklist-item {
         padding: 4px 8px;
         font-size: 11px;
         border: 1px solid var(--store-line);
     }
 
-    .checklist-item input[type="checkbox"] {
+    :where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .checklist-item input[type="checkbox"] {
         width: 14px;
         height: 14px;
     }
-
-    /* Ensure checklist prints on one page if possible */
-    .checklist-card { break-inside: avoid; }
+    :where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .checklist-card { break-inside: avoid; }
 }
 
-/* ── Responsive ────────────────────────────────────────────────────── */
-@media (width <= 600px) {
-    .header-container { flex-direction: column; gap: 8px; }
-    .header-right { width: 100%; justify-content: flex-end; }
-    .compact-table { max-width: 100%; }
+@media screen and (width <= 600px) {
+    :where([data-ui="unified"][data-staff-reference="data-entry-guide"]) .compact-table { max-width: 100%; }
+}
 }

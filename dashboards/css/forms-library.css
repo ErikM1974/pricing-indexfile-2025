@@ -1,33 +1,22 @@
-/* ==========================================================================
-   forms-library.css — page-specific styles for dashboards/forms-library.html
-
-   Shell classes (.dash-header, .dash-back-link, .dash-card, .dash-btn, etc.)
-   come from shared_components/css/dash-shell.css. Design tokens (--surface-*,
-   --gray-*, --shadow-*, --radius-*, --state-*) come from
-   shared_components/css/art-hub.css.
-
-   Only add page-specific styles here. NEVER redefine tokens. NEVER hardcode
-   colors/shadows/radii — use var(--token-name) so the page inherits the
-   2026 design system.
-   ========================================================================== */
-
-.forms-intro {
+/* forms-library arrangements; shared components own the shell and controls. */
+@layer components.pages {
+:where([data-ui="unified"][data-staff-reference="forms-library"]) .forms-intro {
     margin: 0 0 16px;
     color: var(--gray-600);
     font-size: 0.9375rem;
     max-width: 70ch;
 }
 
-.forms-category {
+:where([data-ui="unified"][data-staff-reference="forms-library"]) .forms-category {
     margin-bottom: 16px;
 }
 
-.forms-rows {
+:where([data-ui="unified"][data-staff-reference="forms-library"]) .forms-rows {
     display: flex;
     flex-direction: column;
 }
 
-.forms-row {
+:where([data-ui="unified"][data-staff-reference="forms-library"]) .forms-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -36,22 +25,22 @@
     border-top: 1px solid var(--gray-100);
 }
 
-.forms-row:first-child {
+:where([data-ui="unified"][data-staff-reference="forms-library"]) .forms-row:first-child {
     border-top: none;
 }
 
-.forms-row-name {
+:where([data-ui="unified"][data-staff-reference="forms-library"]) .forms-row-name {
     font-weight: 600;
     color: var(--gray-800);
 }
 
-.forms-row-desc {
+:where([data-ui="unified"][data-staff-reference="forms-library"]) .forms-row-desc {
     font-size: 0.85rem;
-    color: var(--gray-500);
+    color: var(--ui-muted);
     margin-top: 2px;
 }
 
-.forms-row-actions {
+:where([data-ui="unified"][data-staff-reference="forms-library"]) .forms-row-actions {
     display: flex;
     gap: 8px;
     flex-shrink: 0;
@@ -59,40 +48,36 @@
     justify-content: flex-end;
 }
 
-.forms-howto p {
+:where([data-ui="unified"][data-staff-reference="forms-library"]) .forms-howto p {
     margin: 0;
-    color: var(--gray-500);
+    color: var(--ui-muted);
     font-size: 0.85rem;
     max-width: 80ch;
 }
 
-.forms-howto code {
-    font-family: 'JetBrains Mono', monospace;
+:where([data-ui="unified"][data-staff-reference="forms-library"]) .forms-howto code {
+    font-family: var(--font-mono);
     font-size: 0.8em;
     background: var(--gray-100);
     padding: 1px 5px;
     border-radius: var(--radius-sm);
 }
 
-.forms-load-failed {
-    color: var(--gray-500);
+:where([data-ui="unified"][data-staff-reference="forms-library"]) .forms-load-failed {
+    color: var(--ui-muted);
     padding: 24px;
     text-align: center;
 }
 
-/* Stack rows on narrow screens so buttons don't crush the text */
 @media (width <= 640px) {
-    .forms-row {
+    :where([data-ui="unified"][data-staff-reference="forms-library"]) .forms-row {
         flex-direction: column;
         align-items: flex-start;
     }
 
-    .forms-row-actions {
+    :where([data-ui="unified"][data-staff-reference="forms-library"]) .forms-row-actions {
         justify-content: flex-start;
     }
 }
-
-/* 2026-09-05 review */
-/* stylelint-disable-next-line declaration-no-important -- the hidden attribute must beat any display rule */
-[hidden] { display: none !important; }
-.forms-load-failed .dash-btn { margin-left: 8px; }
+:where([data-ui="unified"][data-staff-reference="forms-library"]) .forms-load-failed .dash-btn { margin-left: 8px; }
+}

@@ -77,13 +77,15 @@
 
         var pcts = [startPct].concat(WAYPOINTS.filter(function (p) { return p > startPct; }));
 
+        // eslint-disable-next-line no-unsanitized/property -- rep names are escaped and baseline values pass numeric config validation before formatting.
         head.innerHTML = '<th>Where you finish</th><th class="ebp-r">Rate pays</th>' +
             reps.map(function (name) {
-                var first = name.split(' ')[0];
+                var first = escapeHtml(name.split(' ')[0]);
                 return '<th class="ebp-r">' + first +
                     '<br><span class="ebp-th-sub">goal ' + money0(cfg.reps[name].baselineRevenue) + '</span></th>';
             }).join('');
 
+        // eslint-disable-next-line no-unsanitized/property -- only validated numeric percentages/currency and fixed labels enter the rate table.
         body.innerHTML = pcts.map(function (pct, idx) {
             var label = pct + '%';
             if (pct === startPct) label += ' — earning starts';
@@ -107,8 +109,32 @@
         if (table) table.hidden = true;
     }
 
+    function escapeHtml(value) {
+        return String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+    function validNumber(value) { return value !== null && value !== undefined && String(value).trim() !== '' && Number.isFinite(Number(value)) && Number(value) >= 0; }
+    function validate(cfg) {
+        var fields = ['newAccountBounty','reactivatedBounty','dormancyMonths','minAccountRevenue','rateStartPct','ratePerPoint'];
+        if (fields.some(function (key) { return !validNumber(cfg[key]); })) throw new Error('Invalid bonus figures');
+        if (!cfg.reps || Array.isArray(cfg.reps) || typeof cfg.reps !== 'object' || !Object.keys(cfg.reps).length || Object.values(cfg.reps).some(function (rep) { return !rep || !validNumber(rep.baselineRevenue); })) throw new Error('Invalid bonus goals');
+        if (cfg.teamKickers && (!Array.isArray(cfg.teamKickers) || cfg.teamKickers.some(function (tier) { return !tier || !validNumber(tier.target) || !validNumber(tier.pay); }))) throw new Error('Invalid team bonus tiers');
+    }
+    var busy = false;
+    var retry;
     function load() {
-        fetch(ENDPOINT, { credentials: 'same-origin' })
+        if (busy) return;
+        busy = true;
+        if (!retry) {
+            retry = document.createElement('button');
+            retry.type = 'button'; retry.className = 'btn'; retry.id = 'ebp-retry'; retry.textContent = 'Retry current figures';
+            retry.addEventListener('click', load);
+            el('ebp-config-status').append(retry);
+            el('ebp-config-status').setAttribute('role', 'status');
+        }
+        retry.disabled = true;
+        document.querySelectorAll('[data-ebp]').forEach(function (slot) { slot.textContent = '—'; });
+        fail('Loading the current bonus figures…');
+        fetch(ENDPOINT, { credentials: 'same-origin', signal: AbortSignal.timeout(20000) })
             .then(function (resp) {
                 if (!resp.ok) throw new Error('HTTP ' + resp.status);
                 return resp.json();
@@ -116,6 +142,7 @@
             .then(function (data) {
                 var cfg = data && data.config;
                 if (!cfg || data.success === false) throw new Error(data && data.error || 'no config returned');
+                validate(cfg);
                 setSlots(cfg);
                 renderTable(cfg);
                 var banner = el('ebp-config-status');
@@ -134,9 +161,9 @@
             .catch(function (err) {
                 // Never leave a figure on screen that might be wrong — the slots stay as dashes.
                 fail('Could not load the current bonus figures. Nothing is shown rather than ' +
-                     'something out of date — reload the page, and tell Erik if it keeps happening.');
+                     'something out of date — retry, and tell Erik if it keeps happening.');
                 console.error('[bonus-plan] config load failed:', err);
-            });
+            }).finally(function () { busy = false; retry.disabled = false; });
     }
 
     if (document.readyState === 'loading') {

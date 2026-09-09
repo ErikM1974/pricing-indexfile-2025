@@ -264,3 +264,5 @@ Homepage "From the blog" section (index.html). Fetches the 3 newest Published po
 - `policies/policy-workspace.js` — loaded by the four unified policy pages. Owns native contents/print restoration and accessible shared control classes; never rewrites TipTap editor tables or policy data.
 
 - `webstore-guide.js` — twelve public webstore marketing pages; focuses native section destinations and restores FAQ disclosures after printing. No business API calls.
+
+- `staff-reference.js`: five staff references; original button accordion opens fully for print, restores its prior state, and fragment navigation focuses the reading destination. No service calls.

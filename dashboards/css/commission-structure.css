@@ -1,140 +1,56 @@
-/* =====================================================
-   COMMISSION STRUCTURE DASHBOARD STYLES
-   Matches NWCA Staff Dashboard Theme (WSU Crimson)
-   ===================================================== */
-
-/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue so the page
-   keeps its exact look. Map them to shared_components/css/tokens.css names when the page is redesigned;
-   every rule below uses var(). Raw hex is allowed ONLY in this block. */
-/* stylelint-disable color-no-hex */
-:root {
-    --commission-structure-blue: #1e4a8b;
-    --commission-structure-yellow-dark: #5c4503;
-}
-/* stylelint-enable color-no-hex */
-
-/* =====================================================
-   PAGE LAYOUT
-   ===================================================== */
-.commission-page {
-    min-height: 100vh;
-    background: var(--gray-50);
-}
-
-/* Header */
-.commission-header {
-    background: var(--color-ae);
-    padding: 1.5rem 2rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    box-shadow: 0 2px 8px rgb(0 0 0 / 15%);
-}
-
-.header-left {
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
-}
-
-.header-logo {
-    height: 50px;
-    width: auto;
-}
-
-.header-title {
-    color: white;
-    font-size: 1.5rem;
-    font-weight: 600;
-    margin: 0;
-}
-
-.header-subtitle {
-    color: rgb(255 255 255 / 75%);
+/* commission-structure arrangements; shared components own the shell and controls. */
+@layer components.pages {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .header-subtitle {
+    color: var(--ui-muted);
     font-size: 0.875rem;
     font-weight: 400;
     margin-left: 1rem;
 }
 
-.back-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.625rem 1.25rem;
-    background: rgb(255 255 255 / 10%);
-    color: white;
-    text-decoration: none;
-    border-radius: 6px;
-    font-weight: 500;
-    font-size: 0.875rem;
-    border: 1px solid rgb(255 255 255 / 20%);
-    transition: all 0.2s;
-}
-
-.back-btn:hover {
-    background: rgb(255 255 255 / 20%);
-    border-color: rgb(255 255 255 / 40%);
-}
-
-/* Main Content Container */
-.commission-content {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 2rem;
-}
-
-/* =====================================================
-   SECTION HEADERS
-   ===================================================== */
-.section-header {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .section-header {
     display: flex;
     align-items: center;
     gap: 0.75rem;
     margin-bottom: 1.5rem;
 }
 
-.section-header i {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .section-header i {
     color: var(--color-ae);
     font-size: 1.25rem;
 }
 
-.section-title {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .section-title {
     font-size: 1.25rem;
     font-weight: 600;
     color: var(--gray-800);
     margin: 0;
 }
 
-/* =====================================================
-   RATE CARDS - Commission Types
-   ===================================================== */
-.rate-cards-grid {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .rate-cards-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 1.5rem;
     margin-bottom: 3rem;
 }
 
-.rate-card {
-    background: linear-gradient(135deg, var(--color-surface) 0%, var(--gray-50) 100%);
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .rate-card {
+    background: var(--ui-surface);
     border-radius: 12px;
     padding: 2rem;
     text-align: center;
-    box-shadow: 0 2px 8px rgb(0 0 0 / 8%);
     border: 1px solid var(--gray-200);
     transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.rate-card:hover {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .rate-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 16px rgb(0 0 0 / 12%);
 }
 
-.rate-card-header {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .rate-card-header {
     margin-bottom: 1.5rem;
 }
 
-.rate-card-label {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .rate-card-label {
     font-size: 0.75rem;
     font-weight: 600;
     text-transform: uppercase;
@@ -143,27 +59,27 @@
     margin-bottom: 0.5rem;
 }
 
-.rate-card-type {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .rate-card-type {
     font-size: 1rem;
     font-weight: 500;
-    color: var(--print-line);
+    color: var(--ui-muted);
 }
 
-.rate-value {
-    font-size: 4rem;
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .rate-value {
+    font-size: clamp(1.75rem, 3.2vw, 2.5rem);
     font-weight: 700;
     color: var(--color-ae);
     line-height: 1;
     margin-bottom: 0.5rem;
 }
 
-.rate-period {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .rate-period {
     font-size: 0.875rem;
     color: var(--print-ink-soft);
     margin-bottom: 1.5rem;
 }
 
-.rate-bonus {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .rate-bonus {
     background: var(--amber-100);
     padding: 0.75rem 1rem;
     border-radius: 6px;
@@ -172,42 +88,38 @@
     margin-top: 1rem;
 }
 
-.rate-bonus i {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .rate-bonus i {
     margin-right: 0.5rem;
 }
 
-.rate-requirement {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .rate-requirement {
     background: var(--color-floor-tint);
     padding: 0.75rem 1rem;
     border-radius: 6px;
     font-size: 0.875rem;
-    color: var(--commission-structure-blue);
+    color: var(--color-info-ink);
     margin-top: 1rem;
 }
 
-.rate-requirement i {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .rate-requirement i {
     margin-right: 0.5rem;
 }
 
-/* =====================================================
-   REP ASSIGNMENT CARDS
-   ===================================================== */
-.rep-cards-grid {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .rep-cards-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 1.5rem;
     margin-bottom: 3rem;
 }
 
-.rep-card {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .rep-card {
     background: white;
     border-left: 4px solid var(--color-ae);
     border-radius: 8px;
     padding: 1.5rem;
-    box-shadow: 0 2px 8px rgb(0 0 0 / 8%);
 }
 
-.rep-header {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .rep-header {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
@@ -216,19 +128,19 @@
     border-bottom: 1px solid var(--gray-200);
 }
 
-.rep-name {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .rep-name {
     font-size: 1.5rem;
     font-weight: 700;
     color: var(--gray-800);
     margin: 0 0 0.25rem;
 }
 
-.rep-account-count {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .rep-account-count {
     font-size: 0.875rem;
     color: var(--print-ink-soft);
 }
 
-.rep-badge {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .rep-badge {
     background: var(--color-ae);
     color: white;
     padding: 0.25rem 0.75rem;
@@ -237,41 +149,41 @@
     font-weight: 600;
 }
 
-.rep-baseline {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .rep-baseline {
     background: var(--amber-100);
     padding: 1rem;
     border-radius: 8px;
     margin-bottom: 1.25rem;
 }
 
-.baseline-row {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .baseline-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 0.5rem;
 }
 
-.baseline-row:last-child {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .baseline-row:last-child {
     margin-bottom: 0;
 }
 
-.baseline-label {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .baseline-label {
     font-size: 0.875rem;
     color: var(--bs-warning-ink);
     font-weight: 500;
 }
 
-.baseline-value {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .baseline-value {
     font-size: 1.125rem;
     font-weight: 700;
-    color: var(--commission-structure-yellow-dark);
+    color: var(--color-warning-ink);
 }
 
-.rep-accounts-section {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .rep-accounts-section {
     margin-top: 1rem;
 }
 
-.accounts-header {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .accounts-header {
     font-size: 0.875rem;
     font-weight: 600;
     color: var(--print-ink-soft);
@@ -281,17 +193,17 @@
     gap: 0.5rem;
 }
 
-.accounts-header i {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .accounts-header i {
     color: var(--color-ae);
 }
 
-.account-list {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .account-list {
     list-style: none;
     padding: 0;
     margin: 0;
 }
 
-.account-item {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .account-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -300,37 +212,33 @@
     font-size: 0.875rem;
 }
 
-.account-item:last-child {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .account-item:last-child {
     border-bottom: none;
 }
 
-.account-name {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .account-name {
     color: var(--gray-800);
 }
 
-.account-revenue {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .account-revenue {
     font-weight: 600;
-    color: var(--emerald-500);
+    color: var(--emerald-800);
 }
 
-/* =====================================================
-   HOW IT WORKS SECTION
-   ===================================================== */
-.how-it-works {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .how-it-works {
     background: white;
     border-radius: 8px;
-    box-shadow: 0 2px 8px rgb(0 0 0 / 8%);
     margin-bottom: 3rem;
     overflow: hidden;
 }
 
-.how-it-works-header {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .how-it-works-header {
     background: var(--gray-50);
     padding: 1.25rem 1.5rem;
     border-bottom: 1px solid var(--gray-200);
 }
 
-.how-it-works-header h2 {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .how-it-works-header h2 {
     font-size: 1.125rem;
     font-weight: 600;
     color: var(--gray-800);
@@ -340,24 +248,24 @@
     gap: 0.75rem;
 }
 
-.how-it-works-header i {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .how-it-works-header i {
     color: var(--color-ae);
 }
 
-.accordion {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .accordion {
     border: none;
 }
 
-.accordion-item {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .accordion-item {
     border: none;
     border-bottom: 1px solid var(--gray-200);
 }
 
-.accordion-item:last-child {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .accordion-item:last-child {
     border-bottom: none;
 }
 
-.accordion-header {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .accordion-header {
     padding: 1.25rem 1.5rem;
     cursor: pointer;
     display: flex;
@@ -367,11 +275,11 @@
     transition: background 0.2s;
 }
 
-.accordion-header:hover {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .accordion-header:hover {
     background: var(--gray-50);
 }
 
-.accordion-title {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .accordion-title {
     font-size: 1rem;
     font-weight: 600;
     color: var(--gray-800);
@@ -381,7 +289,7 @@
     gap: 0.75rem;
 }
 
-.accordion-title .number {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .accordion-title .number {
     background: var(--color-ae);
     color: white;
     width: 24px;
@@ -394,42 +302,42 @@
     font-weight: 600;
 }
 
-.accordion-chevron {
-    color: var(--print-line);
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .accordion-chevron {
+    color: var(--ui-muted);
     transition: transform 0.2s;
 }
 
-.accordion-item.open .accordion-chevron {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .accordion-item.open .accordion-chevron {
     transform: rotate(180deg);
 }
 
-.accordion-content {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .accordion-content {
     display: none;
     padding: 0 1.5rem 1.5rem 4rem;
 }
 
-.accordion-item.open .accordion-content {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .accordion-item.open .accordion-content {
     display: block;
 }
 
-.accordion-content p {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .accordion-content p {
     color: var(--print-ink-soft);
     font-size: 0.9375rem;
     line-height: 1.7;
     margin-bottom: 0.75rem;
 }
 
-.accordion-content p:last-child {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .accordion-content p:last-child {
     margin-bottom: 0;
 }
 
-.accordion-content ul {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .accordion-content ul {
     list-style: none;
     padding: 0;
     margin: 0.75rem 0;
 }
 
-.accordion-content li {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .accordion-content li {
     padding: 0.5rem 0;
     padding-left: 1.5rem;
     position: relative;
@@ -437,7 +345,7 @@
     font-size: 0.9375rem;
 }
 
-.accordion-content li::before {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .accordion-content li::before {
     content: "";
     position: absolute;
     left: 0;
@@ -448,7 +356,7 @@
     border-radius: 50%;
 }
 
-.highlight-box {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .highlight-box {
     background: var(--color-floor-tint);
     padding: 1rem;
     border-radius: 6px;
@@ -456,23 +364,20 @@
     margin-top: 1rem;
 }
 
-.highlight-box p {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .highlight-box p {
     margin: 0;
-    color: var(--commission-structure-blue);
+    color: var(--color-info-ink);
     font-weight: 500;
 }
 
-/* =====================================================
-   INFO TABLES (Inside Accordions)
-   ===================================================== */
-.info-table {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .info-table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 0.5rem;
     font-size: 0.875rem;
 }
 
-.info-table th {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .info-table th {
     background: var(--gray-100);
     padding: 0.625rem 0.75rem;
     text-align: left;
@@ -481,69 +386,63 @@
     border-bottom: 2px solid var(--gray-200);
 }
 
-.info-table td {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .info-table td {
     padding: 0.625rem 0.75rem;
     border-bottom: 1px solid var(--gray-200);
     color: var(--gray-600);
 }
 
-.info-table tr:last-child td {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .info-table tr:last-child td {
     border-bottom: none;
 }
 
-.info-table tr:hover {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .info-table tr:hover {
     background: var(--gray-50);
 }
 
-/* =====================================================
-   TIMELINE BOX
-   ===================================================== */
-.timeline-box {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .timeline-box {
     background: var(--gray-50);
     border-radius: 8px;
     padding: 1rem;
     margin-top: 0.5rem;
 }
 
-.timeline-item {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .timeline-item {
     display: flex;
     gap: 1rem;
     padding: 0.75rem 0;
     border-bottom: 1px dashed var(--gray-300);
 }
 
-.timeline-item:last-child {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .timeline-item:last-child {
     border-bottom: none;
     padding-bottom: 0;
 }
 
-.timeline-item:first-child {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .timeline-item:first-child {
     padding-top: 0;
 }
 
-.timeline-label {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .timeline-label {
     font-weight: 600;
     color: var(--color-ae);
     min-width: 100px;
     flex-shrink: 0;
 }
 
-.timeline-text {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .timeline-text {
     color: var(--gray-600);
     line-height: 1.5;
 }
 
-/* =====================================================
-   EXAMPLE BOXES
-   ===================================================== */
-.example-box {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .example-box {
     background: var(--gray-50);
     border-radius: 8px;
     overflow: hidden;
     border: 1px solid var(--gray-200);
 }
 
-.example-header {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .example-header {
     background: var(--color-ae);
     color: white;
     padding: 0.625rem 1rem;
@@ -551,11 +450,11 @@
     font-size: 0.875rem;
 }
 
-.example-content {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .example-content {
     padding: 1rem;
 }
 
-.example-row {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .example-row {
     display: flex;
     justify-content: space-between;
     padding: 0.375rem 0;
@@ -563,64 +462,60 @@
     border-bottom: 1px solid var(--gray-200);
 }
 
-.example-row:last-of-type {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .example-row:last-of-type {
     border-bottom: none;
 }
 
-.example-row span:first-child {
-    color: var(--gray-500);
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .example-row span:first-child {
+    color: var(--ui-muted);
 }
 
-.example-row span:last-child {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .example-row span:last-child {
     color: var(--gray-800);
     font-weight: 500;
 }
 
-.example-row.total {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .example-row.total {
     margin-top: 0.5rem;
     padding-top: 0.75rem;
     border-top: 2px solid var(--gray-300);
     border-bottom: none;
 }
 
-.example-row.total span:first-child {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .example-row.total span:first-child {
     font-weight: 600;
     color: var(--gray-800);
 }
 
-.example-row.total span:last-child {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .example-row.total span:last-child {
     font-weight: 700;
-    color: var(--emerald-500);
+    color: var(--emerald-800);
     font-size: 1rem;
 }
 
-.example-note {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .example-note {
     margin-top: 0.75rem;
     padding-top: 0.75rem;
     border-top: 1px dashed var(--gray-300);
     font-size: 0.8125rem;
-    color: var(--gray-500);
+    color: var(--ui-muted);
     font-style: italic;
 }
 
-/* =====================================================
-   EXAMPLE SCENARIOS (Optional Enhancement)
-   ===================================================== */
-.scenarios-grid {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .scenarios-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 1.5rem;
     margin-bottom: 2rem;
 }
 
-.scenario-card {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .scenario-card {
     background: white;
     border-radius: 8px;
     padding: 1.5rem;
-    box-shadow: 0 2px 8px rgb(0 0 0 / 8%);
 }
 
-.scenario-header {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .scenario-header {
     display: flex;
     align-items: center;
     gap: 0.75rem;
@@ -629,7 +524,7 @@
     border-bottom: 1px solid var(--gray-200);
 }
 
-.scenario-icon {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .scenario-icon {
     width: 40px;
     height: 40px;
     background: var(--color-floor-tint);
@@ -640,20 +535,20 @@
     color: var(--color-floor-light);
 }
 
-.scenario-title {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .scenario-title {
     font-size: 1rem;
     font-weight: 600;
     color: var(--gray-800);
     margin: 0;
 }
 
-.scenario-content {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .scenario-content {
     color: var(--print-ink-soft);
     font-size: 0.875rem;
     line-height: 1.6;
 }
 
-.scenario-calculation {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .scenario-calculation {
     background: var(--gray-50);
     padding: 0.75rem 1rem;
     border-radius: 6px;
@@ -663,7 +558,7 @@
     color: var(--gray-800);
 }
 
-.scenario-result {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .scenario-result {
     margin-top: 1rem;
     padding: 0.75rem 1rem;
     background: var(--emerald-100);
@@ -672,136 +567,98 @@
     font-weight: 600;
 }
 
-.scenario-result.no-pay {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .scenario-result.no-pay {
     background: var(--red-100);
     color: var(--red-800);
 }
 
-/* =====================================================
-   FOOTER NOTE
-   ===================================================== */
-.footer-note {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .footer-note {
     text-align: center;
     padding: 2rem;
-    color: var(--print-line);
+    color: var(--ui-muted);
     font-size: 0.875rem;
 }
 
-.footer-note i {
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .footer-note i {
     margin-right: 0.5rem;
 }
 
-/* =====================================================
-   RESPONSIVE DESIGN
-   ===================================================== */
-@media (width <= 1024px) {
-    .rate-cards-grid {
+@media screen and (width <= 1024px) {
+    :where([data-ui="unified"][data-staff-reference="commission-structure"]) .rate-cards-grid {
         grid-template-columns: repeat(2, 1fr);
     }
 
-    .rep-cards-grid {
+    :where([data-ui="unified"][data-staff-reference="commission-structure"]) .rep-cards-grid {
         grid-template-columns: 1fr;
     }
 
-    .scenarios-grid {
+    :where([data-ui="unified"][data-staff-reference="commission-structure"]) .scenarios-grid {
         grid-template-columns: 1fr;
     }
 }
 
-@media (width <= 768px) {
-    .commission-header {
-        flex-direction: column;
-        gap: 1rem;
-        padding: 1rem;
-    }
-
-    .header-left {
-        flex-direction: column;
-        text-align: center;
-    }
-
-    .header-title {
-        font-size: 1.25rem;
-    }
-
-    .header-subtitle {
+@media screen and (width <= 768px) {
+    :where([data-ui="unified"][data-staff-reference="commission-structure"]) .header-subtitle {
         margin-left: 0;
         margin-top: 0.25rem;
         display: block;
     }
 
-    .commission-content {
-        padding: 1rem;
-    }
-
-    .rate-cards-grid {
+    :where([data-ui="unified"][data-staff-reference="commission-structure"]) .rate-cards-grid {
         grid-template-columns: 1fr;
     }
 
-    .rate-value {
-        font-size: 3rem;
+    :where([data-ui="unified"][data-staff-reference="commission-structure"]) .rate-value {
+        font-size: clamp(1.75rem, 3.2vw, 2.5rem);
     }
 
-    .rep-header {
+    :where([data-ui="unified"][data-staff-reference="commission-structure"]) .rep-header {
         flex-direction: column;
         gap: 0.75rem;
     }
 
-    .accordion-content {
+    :where([data-ui="unified"][data-staff-reference="commission-structure"]) .accordion-content {
         padding-left: 1.5rem;
     }
 }
 
-/* =====================================================
-   PRINT STYLES
-   ===================================================== */
 @media print {
-    .commission-header {
-        background: white;
-        color: var(--gray-800);
-        box-shadow: none;
-        border-bottom: 2px solid var(--color-ae);
-    }
+    :where([data-ui="unified"][data-staff-reference="commission-structure"]) :is(.rate-cards-grid, .rep-cards-grid, .scenarios-grid) { gap: 12px; margin-bottom: 20px; }
+    :where([data-ui="unified"][data-staff-reference="commission-structure"]) .rate-card { padding: 12px; }
+    :where([data-ui="unified"][data-staff-reference="commission-structure"]) :is(.rate-card-header, .rate-period, .section-header) { margin-bottom: 10px; }
+    :where([data-ui="unified"][data-staff-reference="commission-structure"]) :is(.rate-bonus, .rate-requirement) { padding: 8px; margin-top: 8px; }
+    :where([data-ui="unified"][data-staff-reference="commission-structure"]) .rate-value { font-size: 24px; }
+    :where([data-ui="unified"][data-staff-reference="commission-structure"]) .rate-card-type { font-size: 12px; }
+    :where([data-ui="unified"][data-staff-reference="commission-structure"]) .rep-card { padding: 14px; }
+    :where([data-ui="unified"][data-staff-reference="commission-structure"]) .how-it-works { break-inside: auto; }
+    :where([data-ui="unified"][data-staff-reference="commission-structure"]) .accordion-header { border: 0; background: var(--ui-canvas); }
 
-    .header-title {
-        color: var(--gray-800);
-    }
-
-    .back-btn {
-        display: none;
-    }
-
-    .rate-card,
-    .rep-card,
-    .how-it-works,
-    .scenario-card {
-        box-shadow: none;
+    :where([data-ui="unified"][data-staff-reference="commission-structure"]) .rate-card,
+    :where([data-ui="unified"][data-staff-reference="commission-structure"]) .rep-card,
+    :where([data-ui="unified"][data-staff-reference="commission-structure"]) .scenario-card {
         border: 1px solid var(--gray-200);
         break-inside: avoid;
     }
 
-    .accordion-item.open .accordion-content {
+    :where([data-ui="unified"][data-staff-reference="commission-structure"]) .accordion-item.open .accordion-content {
         display: block;
     }
 }
-
-/* 2026-09-05 review — inline style= moved here (Rule 3) */
-/* stylelint-disable-next-line declaration-no-important -- the hidden attribute must beat any display rule */
-[hidden] { display: none !important; }
-.cs-lead { margin: 0 0 18px; color: var(--text-muted, var(--slate-500)); line-height: 1.6; }
-.cs-lead--tight { margin-bottom: 14px; }
-.cs-h3 { margin: 26px 0 10px; font-size: 1.05rem; }
-.table-wrapper { overflow-x: auto; }
-.detail-table { width: 100%; border-collapse: collapse; }
-.detail-table th, .detail-table td { padding: 8px; text-align: left; }
-.detail-table .num { text-align: right; }
-.cs-mt-16 { margin-top: 16px; }
-.cs-mt { margin-top: 1.25rem; }
-.cs-mt-lg { margin-top: 1.5rem; }
-.cs-legacy { color: var(--color-ae); }
-.cs-new { color: var(--emerald-500); }
-.scenario-icon--danger { background: var(--red-100); color: var(--red-800); }
-.scenario-icon--ok { background: var(--emerald-100); color: var(--emerald-800); }
-.scenario-icon--warn { background: var(--amber-100); color: var(--amber-800); }
-button.accordion-header { width: 100%; font: inherit; color: inherit; text-align: left; }
-.accordion-header:focus-visible { outline: 2px solid var(--art-theme, var(--color-ae)); outline-offset: 2px; }
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .cs-lead { margin: 0 0 18px; color: var(--ui-muted); line-height: 1.6; }
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .cs-lead--tight { margin-bottom: 14px; }
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .cs-h3 { margin: 26px 0 10px; font-size: 1.05rem; }
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .table-wrapper { overflow-x: auto; }
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .detail-table { width: 100%; border-collapse: collapse; }
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .detail-table th, :where([data-ui="unified"][data-staff-reference="commission-structure"]) .detail-table td { padding: 8px; text-align: left; }
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .detail-table .num { text-align: right; }
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .cs-mt-16 { margin-top: 16px; }
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .cs-mt { margin-top: 1.25rem; }
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .cs-mt-lg { margin-top: 1.5rem; }
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .cs-legacy { color: var(--color-ae); }
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .cs-new { color: var(--emerald-800); }
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .scenario-icon--danger { background: var(--red-100); color: var(--red-800); }
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .scenario-icon--ok { background: var(--emerald-100); color: var(--emerald-800); }
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .scenario-icon--warn { background: var(--amber-100); color: var(--amber-800); }
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) button.accordion-header { width: 100%; font: inherit; color: inherit; text-align: left; }
+:where([data-ui="unified"][data-staff-reference="commission-structure"]) .accordion-header:focus-visible { outline: 2px solid var(--color-ae); outline-offset: 2px; }
+}

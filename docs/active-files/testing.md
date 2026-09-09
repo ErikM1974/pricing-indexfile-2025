@@ -125,3 +125,7 @@
 - `tests/e2e/css-unification-webstore.spec.js`, `tests/unit/webstore-content.test.js`, and `tests/fixtures/webstore-original-content.json` — twelve webstore marketing pages; original copy/SEO/images/destinations, native FAQs/navigation and responsive/print contracts.
 
 - `tests/e2e/css-unification-brand-guides.spec.js`, `tests/unit/brand-guide-content.test.js`, `tests/fixtures/brand-guide-original-content.json`: all fifteen brand guides; preserved copy/SEO/products/links/search fields, native mobile menu/focus, four widths/axe and complete paper.
+
+- `tests/fixtures/staff-reference-original-content.json` — preserved source baseline for five staff references.
+
+- Staff references: `tests/unit/staff-reference-content.test.js` and `tests/e2e/css-unification-staff-reference.spec.js` cover original source data, all five layouts and mocked service/print states; all business writes are blocked.
