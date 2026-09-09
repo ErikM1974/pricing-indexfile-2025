@@ -502,3 +502,11 @@ Worktree codex/webstore-family starts from the reviewed CMS commit 32cd5e640c9a3
 - [ ] Give the family its own shared scoped public layout in company-webstores.css, using app tokens/components/Public Sans; remove its borrowed golf stylesheet and duplicated control ownership. Preserve all copy, offer terms, imagery, SEO metadata/structured data and inquiry destinations.
 - [ ] Review desktop/tablet/phones, native navigation/FAQ/links, contrast and print; lock original content and register family ownership. These pages have no business-service controller.
 - [ ] Pass full release checks and exact-source CI, then verify actual deployment after CMS. Candidate would be 84 of225 reviewed /141 pending. Do not claim live from a local manifest.
+
+## Webstore family reviewed locally — 2026-09-08
+
+All twelve public webstore pages now use one scoped family owner, shared controls and Public Sans. The separate photo/text hero keeps the original shop/product photos visible; public navigation remains reachable on phones. No original wording, marketing price examples, offer terms, links, imagery or SEO metadata/JSON-LD changed; the complete original main text is equality-locked. No business writes or service calls.
+
+All 24 responsive/navigation/print browser cases pass, plus one case checking all twelve live-server route aliases (25 cases total). Four widths have no horizontal overflow or axe violations. Native FAQs work by keyboard, every anchor target receives focus, and printing opens all FAQ answers then restores prior disclosure state. Actual PDFs retain all 773 checked content/pricing/FAQ blocks across12 pages; first/middle/last samples reviewed. Print cards retain images, avoid clipping and keep footer contents together. Three content/ownership suites pass150 tests, with the final full-copy equality check separately passing all12 pages; CSS and controller lint pass.
+
+Raw CSS graph per page:81,097 → 70707 bytes (12.8% smaller), including shared tokens/components. Baseline captures relative CSS paths on the company hub as well as root paths on the spokes. Full primary gates, cache version, exact-source CI and actual deployment remain. Local manifest84 is a candidate count only; live remains68 until CMS(.19) verification, then72 until this family ships.
