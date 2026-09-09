@@ -69,3 +69,10 @@ Historical counts are retained as audit notes and must not be presented as curre
 - `tests/fixtures/policy-cms-data.json` — policy CMS original-content/data and mocked responsive/state/print verification.
 - `tests/unit/policy-cms-content.test.js` — policy CMS original-content/data and mocked responsive/state/print verification.
 - `tests/e2e/css-unification-policy-cms.spec.js` — policy CMS original-content/data and mocked responsive/state/print verification.
+
+- `shared_components/js/webstore-guide.js` — twelve public webstore guides: native fragment focus and FAQ print expansion/restoration; no business-service calls.
+- `pages/css/company-webstores.css` — rebuilt scoped public webstore family owner; replaces these pages’ borrowed golf layout.
+
+- `tests/fixtures/webstore-original-content.json` — public webstore content/SEO and responsive, native navigation, FAQ and paper verification.
+- `tests/unit/webstore-content.test.js` — public webstore content/SEO and responsive, native navigation, FAQ and paper verification.
+- `tests/e2e/css-unification-webstore.spec.js` — public webstore content/SEO and responsive, native navigation, FAQ and paper verification.

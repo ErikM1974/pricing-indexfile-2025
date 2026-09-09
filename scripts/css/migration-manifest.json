@@ -1989,6 +1989,330 @@
         "localCssRequests": 3
       },
       "measuredRawCssBytes": 112698
+    },
+    {
+      "source": "pages/college-webstores.html",
+      "family": "webstore-marketing",
+      "status": "pilot",
+      "route": "/pages/college-webstores.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "pages/css/company-webstores.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "four-widths",
+        "keyboard",
+        "original-content",
+        "native-faq",
+        "complete-print"
+      ],
+      "test": "tests/e2e/css-unification-webstore.spec.js",
+      "maxCssBytes": 72207,
+      "baseline": {
+        "commit": "32cd5e640c9a304f1cf4f1f1650efdb7d12553bb",
+        "rawCssBytes": 81097,
+        "localCssRequests": 3
+      },
+      "measuredRawCssBytes": 70707
+    },
+    {
+      "source": "pages/company-webstores.html",
+      "family": "webstore-marketing",
+      "status": "pilot",
+      "route": "/pages/company-webstores.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "pages/css/company-webstores.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "four-widths",
+        "keyboard",
+        "original-content",
+        "native-faq",
+        "complete-print"
+      ],
+      "test": "tests/e2e/css-unification-webstore.spec.js",
+      "maxCssBytes": 72207,
+      "baseline": {
+        "commit": "32cd5e640c9a304f1cf4f1f1650efdb7d12553bb",
+        "rawCssBytes": 81097,
+        "localCssRequests": 3
+      },
+      "measuredRawCssBytes": 70707
+    },
+    {
+      "source": "pages/construction-webstores.html",
+      "family": "webstore-marketing",
+      "status": "pilot",
+      "route": "/pages/construction-webstores.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "pages/css/company-webstores.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "four-widths",
+        "keyboard",
+        "original-content",
+        "native-faq",
+        "complete-print"
+      ],
+      "test": "tests/e2e/css-unification-webstore.spec.js",
+      "maxCssBytes": 72207,
+      "baseline": {
+        "commit": "32cd5e640c9a304f1cf4f1f1650efdb7d12553bb",
+        "rawCssBytes": 81097,
+        "localCssRequests": 3
+      },
+      "measuredRawCssBytes": 70707
+    },
+    {
+      "source": "pages/event-webstores.html",
+      "family": "webstore-marketing",
+      "status": "pilot",
+      "route": "/pages/event-webstores.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "pages/css/company-webstores.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "four-widths",
+        "keyboard",
+        "original-content",
+        "native-faq",
+        "complete-print"
+      ],
+      "test": "tests/e2e/css-unification-webstore.spec.js",
+      "maxCssBytes": 72207,
+      "baseline": {
+        "commit": "32cd5e640c9a304f1cf4f1f1650efdb7d12553bb",
+        "rawCssBytes": 81097,
+        "localCssRequests": 3
+      },
+      "measuredRawCssBytes": 70707
+    },
+    {
+      "source": "pages/fundraising-webstores.html",
+      "family": "webstore-marketing",
+      "status": "pilot",
+      "route": "/pages/fundraising-webstores.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "pages/css/company-webstores.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "four-widths",
+        "keyboard",
+        "original-content",
+        "native-faq",
+        "complete-print"
+      ],
+      "test": "tests/e2e/css-unification-webstore.spec.js",
+      "maxCssBytes": 72207,
+      "baseline": {
+        "commit": "32cd5e640c9a304f1cf4f1f1650efdb7d12553bb",
+        "rawCssBytes": 81097,
+        "localCssRequests": 3
+      },
+      "measuredRawCssBytes": 70707
+    },
+    {
+      "source": "pages/government-webstores.html",
+      "family": "webstore-marketing",
+      "status": "pilot",
+      "route": "/pages/government-webstores.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "pages/css/company-webstores.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "four-widths",
+        "keyboard",
+        "original-content",
+        "native-faq",
+        "complete-print"
+      ],
+      "test": "tests/e2e/css-unification-webstore.spec.js",
+      "maxCssBytes": 72207,
+      "baseline": {
+        "commit": "32cd5e640c9a304f1cf4f1f1650efdb7d12553bb",
+        "rawCssBytes": 81097,
+        "localCssRequests": 3
+      },
+      "measuredRawCssBytes": 70707
+    },
+    {
+      "source": "pages/industrial-webstores.html",
+      "family": "webstore-marketing",
+      "status": "pilot",
+      "route": "/pages/industrial-webstores.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "pages/css/company-webstores.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "four-widths",
+        "keyboard",
+        "original-content",
+        "native-faq",
+        "complete-print"
+      ],
+      "test": "tests/e2e/css-unification-webstore.spec.js",
+      "maxCssBytes": 72207,
+      "baseline": {
+        "commit": "32cd5e640c9a304f1cf4f1f1650efdb7d12553bb",
+        "rawCssBytes": 81097,
+        "localCssRequests": 3
+      },
+      "measuredRawCssBytes": 70707
+    },
+    {
+      "source": "pages/property-management-webstores.html",
+      "family": "webstore-marketing",
+      "status": "pilot",
+      "route": "/pages/property-management-webstores.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "pages/css/company-webstores.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "four-widths",
+        "keyboard",
+        "original-content",
+        "native-faq",
+        "complete-print"
+      ],
+      "test": "tests/e2e/css-unification-webstore.spec.js",
+      "maxCssBytes": 72207,
+      "baseline": {
+        "commit": "32cd5e640c9a304f1cf4f1f1650efdb7d12553bb",
+        "rawCssBytes": 81097,
+        "localCssRequests": 3
+      },
+      "measuredRawCssBytes": 70707
+    },
+    {
+      "source": "pages/restaurant-webstores.html",
+      "family": "webstore-marketing",
+      "status": "pilot",
+      "route": "/pages/restaurant-webstores.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "pages/css/company-webstores.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "four-widths",
+        "keyboard",
+        "original-content",
+        "native-faq",
+        "complete-print"
+      ],
+      "test": "tests/e2e/css-unification-webstore.spec.js",
+      "maxCssBytes": 72207,
+      "baseline": {
+        "commit": "32cd5e640c9a304f1cf4f1f1650efdb7d12553bb",
+        "rawCssBytes": 81097,
+        "localCssRequests": 3
+      },
+      "measuredRawCssBytes": 70707
+    },
+    {
+      "source": "pages/retail-webstores.html",
+      "family": "webstore-marketing",
+      "status": "pilot",
+      "route": "/pages/retail-webstores.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "pages/css/company-webstores.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "four-widths",
+        "keyboard",
+        "original-content",
+        "native-faq",
+        "complete-print"
+      ],
+      "test": "tests/e2e/css-unification-webstore.spec.js",
+      "maxCssBytes": 72207,
+      "baseline": {
+        "commit": "32cd5e640c9a304f1cf4f1f1650efdb7d12553bb",
+        "rawCssBytes": 81097,
+        "localCssRequests": 3
+      },
+      "measuredRawCssBytes": 70707
+    },
+    {
+      "source": "pages/school-spirit-webstores.html",
+      "family": "webstore-marketing",
+      "status": "pilot",
+      "route": "/pages/school-spirit-webstores.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "pages/css/company-webstores.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "four-widths",
+        "keyboard",
+        "original-content",
+        "native-faq",
+        "complete-print"
+      ],
+      "test": "tests/e2e/css-unification-webstore.spec.js",
+      "maxCssBytes": 72207,
+      "baseline": {
+        "commit": "32cd5e640c9a304f1cf4f1f1650efdb7d12553bb",
+        "rawCssBytes": 81097,
+        "localCssRequests": 3
+      },
+      "measuredRawCssBytes": 70707
+    },
+    {
+      "source": "pages/team-webstores.html",
+      "family": "webstore-marketing",
+      "status": "pilot",
+      "route": "/pages/team-webstores.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "pages/css/company-webstores.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "four-widths",
+        "keyboard",
+        "original-content",
+        "native-faq",
+        "complete-print"
+      ],
+      "test": "tests/e2e/css-unification-webstore.spec.js",
+      "maxCssBytes": 72207,
+      "baseline": {
+        "commit": "32cd5e640c9a304f1cf4f1f1650efdb7d12553bb",
+        "rawCssBytes": 81097,
+        "localCssRequests": 3
+      },
+      "measuredRawCssBytes": 70707
     }
   ],
   "billingContentSha256": "d85f8530e03a1863d1b8bb2ebe97ba332d5c9e3411887d1eb2d02dcdb14c0863",

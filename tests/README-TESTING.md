@@ -322,3 +322,5 @@ For questions or issues with the testing system:
 - `tests/unit/policy-reference-content.test.js` + `tests/fixtures/policy-reference-original-content.json` — original policy prose/figures, routes/IDs/fields and migration snapshot.
 
 - `tests/e2e/css-unification-policy-cms.spec.js` — unified policy CMS, mocked reads/writes, responsive controls, role and paper checks; original locks in `tests/unit/policy-cms-content.test.js`.
+
+- Public webstore family: `css-unification-webstore.spec.js` exercises every migrated marketing page at four widths and on paper, with business-service writes blocked; `webstore-content.test.js` preserves the original copy, SEO structured data and links.
