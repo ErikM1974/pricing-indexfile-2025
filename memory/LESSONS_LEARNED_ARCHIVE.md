@@ -4036,3 +4036,8 @@ Keep ESLint9, jsdom26 and browser axe4.12.1 until their measured migration issue
 **Prevention:** Screenshots must build the changed assets and normalize focus/scroll before capture. A second after-shot
 proved the remaining 850-pixel screen-print difference was an async thumbnail; the second comparison was exactly zero.
 Native Node22.23 runs Puppeteer25; invoke its capture CLI outside Jest, and report unavailable baselines as actual skips.
+
+### Paid-order status writes must succeed before fulfillment (2026-09-07)
+
+Storefront and sample webhooks continued after a rejected Payment Confirmed write; storefront final writes also omitted authentication. Require a successful authenticated marker before pushing. If fulfillment succeeds but the final Processed write fails, acknowledge and alert for bookkeeping without labeling the push failed or repeating it. Exercise HTTP/transport failures and redelivery with mocked APIs, plus signed HTTP dispatch; source-string checks alone missed variable-based URLs. Status markers are not an atomic cross-dyno lock.
+

@@ -270,3 +270,7 @@ Homepage "From the blog" section (index.html). Fetches the 3 newest Published po
 - `storefront-navigation.js` (moved from pages/js/brand-guide.js) owns native menu focus/wrap/return, Escape/backdrop/resize and encoded catalogue search for seventeen unified public pages.
 
 - campaign-storefront.js — native photo viewer, fragment focus and reversible print disclosure state for golf and safety storefront pages.
+
+- instant-storefront.js: banner/sticker navigation, native dialog keyboard and reversible paper helpers; business controllers retain their existing pricing/submission/artwork code.
+
+Instant storefront: banner/sticker configurators use scoped instant-quote/custom-banners plus storefront-commerce, existing tokens/components/storefront-shell and Public Sans. Native dialogs and one disclosure owner retain keyboard navigation. Pricing, quote submission and artwork controllers remain source locked; app-modern delegates only the new native menu/disclosure paths. Four widths, all50 sticker prices, seven banner presets, quantity/custom/finishing, visible failed/empty/degraded data, retained draft/artwork and retry, and419 PDF text nodes reviewed. Entire raw CSS graph grows with shared primitives and full paper support; measured budgets track that honestly.

@@ -21,19 +21,21 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="icon" href="/favicon.png" type="image/png">
 
-    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/shared_components/css/nwca-2026-core.css?v=2026.09.07.8">
-    <link rel="stylesheet" href="/pages/css/instant-quote.css?v=2026.09.07.19">
+    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.09.7">
+    <link rel="stylesheet" href="/shared_components/css/storefront-shell.css?v=2026.09.09.7">
+    <link rel="stylesheet" href="/shared_components/css/storefront-commerce.css?v=2026.09.09.7">
+    <link rel="stylesheet" href="/pages/css/instant-quote.css?v=2026.09.09.7">
     <!-- 🔴 Do NOT add sticker-pricing-page.css or nwca-form-shared.css here.
          Both declare :root tokens that collide with core and would repaint the
          masthead and footer. See the header note in instant-quote.css. -->
 </head>
-<body>
+<body data-ui="unified" data-storefront="instant" data-instant="stickers">
     <a class="skip-link" href="#configurator">Skip to pricing</a>
 
     <!-- Utility strip -->
-    <div class="util-strip">
+    <div class="util-strip" role="region" aria-label="Company information">
         <div class="util-inner">
             <p class="util-fam"><strong>Northwest Custom Apparel</strong> — family-owned in Milton, WA since 1977</p>
             <div class="util-contact">
@@ -111,9 +113,9 @@
             <div class="nav-search" role="search">
                 <input type="text" id="navSearchInput" class="nav-search-input"
                        placeholder="Search styles — PC61, hoodies, caps…" autocomplete="off"
-                       role="combobox" aria-expanded="false" aria-autocomplete="list"
-                       aria-controls="navAutocompleteList" aria-label="Search products">
-                <div id="navAutocompleteList" class="nav-autocomplete-list" role="listbox" aria-label="Product suggestions"></div>
+                      
+                       aria-label="Search products">
+                <div id="navAutocompleteList" class="nav-autocomplete-list" hidden role="listbox" aria-label="Product suggestions"></div>
                 <button id="navSearchBtn" class="nav-search-btn" type="button" aria-label="Search">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                         <circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path>
@@ -134,7 +136,7 @@
     </header>
 
     <!-- Drawer -->
-    <aside class="sidebar" id="sidebar" aria-label="Browse menu">
+    <dialog class="sidebar" id="sidebar" aria-label="Browse menu">
         <div class="drawer-head">
             <span class="drawer-head-title">Browse NWCA</span>
             <button class="drawer-close" id="drawerClose" type="button" aria-label="Close menu">
@@ -161,8 +163,8 @@
             <a href="mailto:sales@nwcustomapparel.com">sales@nwcustomapparel.com</a><br>
             2025 Freeman Rd E, Milton, WA 98354
         </div>
-    </aside>
-    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    </dialog>
+    <div class="sidebar-overlay" id="sidebarOverlay" hidden></div>
 
     <main id="main">
         <div class="wrap">
@@ -233,9 +235,9 @@
                         </div>
                         <ul class="stk-sizes" id="stkSizes"></ul>
                         <div class="stk-custom-dims" id="stkCustomDims">
-                            <input type="number" id="stkW" inputmode="decimal" step="0.25" min="0.75" placeholder="Width" aria-label="Width in inches">
+                            <input type="number" class="field__control" id="stkW" inputmode="decimal" step="0.25" min="0.75" placeholder="Width" aria-label="Width in inches">
                             <span aria-hidden="true">×</span>
-                            <input type="number" id="stkH" inputmode="decimal" step="0.25" min="0.75" placeholder="Height" aria-label="Height in inches">
+                            <input type="number" class="field__control" id="stkH" inputmode="decimal" step="0.25" min="0.75" placeholder="Height" aria-label="Height in inches">
                             <span>in</span>
                         </div>
                         <p class="stk-inline-note" id="stkSizeNote" hidden></p>
@@ -247,7 +249,7 @@
                     <div class="stk-oversize" id="stkOversize" hidden>
                         <h3>Larger than 6 inches — that's a large-format decal</h3>
                         <p>Priced by the square foot, any size up to 52 inches wide, with volume breaks. Same material, same printer.</p>
-                        <button type="button" class="stk-cta" id="stkOversizeCta">Get a large-format quote →</button>
+                        <button type="button" class="stk-cta btn btn--primary" id="stkOversizeCta">Get a large-format quote →</button>
                     </div>
 
                     <div id="stkQtyBlock">
@@ -263,7 +265,7 @@
                                     <tbody></tbody>
                                 </table>
                                 <div class="stk-custom-qty" id="stkCustomQtyWrap">
-                                    <input type="number" id="stkCustomQty" inputmode="numeric" min="1" placeholder="Quantity" aria-label="A different quantity">
+                                    <input type="number" class="field__control" id="stkCustomQty" inputmode="numeric" min="1" placeholder="Quantity" aria-label="A different quantity">
                                 </div>
                             </div>
 
@@ -284,7 +286,7 @@
                              below it: each was ~20px of distance between the
                              number and the thing you click, and that distance is
                              what decides whether the CTA clears the fold. -->
-                        <button type="button" class="stk-cta" id="stkCta">Get this in writing →</button>
+                        <button type="button" class="stk-cta btn btn--primary" id="stkCta">Get this in writing →</button>
                         <p class="stk-cta-sub">Next: send your artwork. A real person sends you a proof, and nothing prints until you approve it.</p>
 
                         <div class="stk-below">
@@ -340,15 +342,15 @@
                         </div>
 
                         <div class="stk-lead-grid">
-                            <div><label for="stkName">Your name</label><input type="text" id="stkName" autocomplete="name"></div>
-                            <div><label for="stkEmail">Email</label><input type="email" id="stkEmail" autocomplete="email"></div>
-                            <div><label for="stkPhone">Phone <span class="stk-optional">(optional)</span></label><input type="tel" id="stkPhone" autocomplete="tel"></div>
-                            <div><label for="stkCompany">Company <span class="stk-optional">(optional)</span></label><input type="text" id="stkCompany" autocomplete="organization"></div>
-                            <div><label for="stkMessage">Instructions for your proof <span class="stk-optional">(optional)</span></label><textarea id="stkMessage" rows="2" placeholder="Anything we should know before we prepare your proof — colours to match, how it will be used, a deadline."></textarea></div>
-                            <div class="stk-hp"><label for="hpWebsite">Website</label><input type="text" id="hpWebsite" tabindex="-1" autocomplete="off"></div>
+                            <div><label for="stkName">Your name</label><input type="text" class="field__control" id="stkName" autocomplete="name"></div>
+                            <div><label for="stkEmail">Email</label><input type="email" class="field__control" id="stkEmail" autocomplete="email"></div>
+                            <div><label for="stkPhone">Phone <span class="stk-optional">(optional)</span></label><input type="tel" class="field__control" id="stkPhone" autocomplete="tel"></div>
+                            <div><label for="stkCompany">Company <span class="stk-optional">(optional)</span></label><input type="text" class="field__control" id="stkCompany" autocomplete="organization"></div>
+                            <div><label for="stkMessage">Instructions for your proof <span class="stk-optional">(optional)</span></label><textarea class="field__control" id="stkMessage" rows="2" placeholder="Anything we should know before we prepare your proof — colours to match, how it will be used, a deadline."></textarea></div>
+                            <div class="stk-hp"><label for="hpWebsite">Website</label><input type="text" class="field__control" id="hpWebsite" tabindex="-1" autocomplete="off"></div>
                         </div>
                         <p class="stk-inline-note is-error" id="stkLeadError" hidden></p>
-                        <button type="button" class="stk-cta" id="stkLeadSubmit">Send my quote request</button>
+                        <button type="button" class="stk-cta btn btn--primary" id="stkLeadSubmit">Send my quote request</button>
                         <p class="stk-cta-sub">Artwork comes next — you can email it later if it's not handy.</p>
                     </div>
                 </div>
@@ -359,17 +361,17 @@
                 <div class="stk-trust-grid">
                     <div>
                         <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><path d="M14 2v6h6"></path><path d="m9 15 2 2 4-4"></path></svg>
-                        <h3>Approve a proof first</h3>
+                        <h2>Approve a proof first</h2>
                         <p>Nothing goes on the printer until you sign off on a digital proof. A real person sends it, and you can ask for changes.</p>
                     </div>
                     <div>
                         <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-                        <h3>Cut to your shape</h3>
+                        <h2>Cut to your shape</h2>
                         <p>Contour cut on the printer, so the sticker follows your artwork — not a square with your logo floating in the middle.</p>
                     </div>
                     <div>
                         <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 21h18"></path><path d="M5 21V7l7-4 7 4v14"></path><path d="M9 21v-6h6v6"></path></svg>
-                        <h3>Printed here, not brokered</h3>
+                        <h2>Printed here, not brokered</h2>
                         <p>Milton, Washington since 1977. Family-owned, one building. You can pick your order up.</p>
                     </div>
                 </div>
@@ -406,7 +408,7 @@
                         grommets included, no size limit — and <strong>large-format decals</strong> priced by the square foot,
                         up to 52 inches wide. And we decorate apparel, so it can all be one order and one invoice.
                     </p>
-                    <a class="btn btn-primary" href="/pages/request-a-quote.html?source=custom-stickers&amp;product=Banners%20%26%20large-format%20decals">Ask about banners &amp; decals →</a>
+                    <a class="btn btn--primary" href="/pages/request-a-quote.html?source=custom-stickers&amp;product=Banners%20%26%20large-format%20decals">Ask about banners &amp; decals →</a>
                 </div>
             </section>
 
@@ -467,12 +469,12 @@
 
     <!-- Always-on action bar. Not media-gated: a card taller than the viewport
          cannot rely on position:sticky to keep its CTA reachable. -->
-    <div class="stk-bar" id="stkBar" hidden>
+    <div class="stk-bar" id="stkBar" role="region" aria-label="Current quote" hidden>
         <div class="stk-bar-summary">
             <strong id="stkBarTotal">—</strong>
             <span id="stkBarDetail"></span>
         </div>
-        <button type="button" class="stk-bar-cta" id="stkBarCta">Get this in writing →</button>
+        <button type="button" class="stk-bar-cta btn" id="stkBarCta">Get this in writing →</button>
     </div>
 
     <div class="stk-toast" id="stkToast" role="status" aria-live="polite"></div>
@@ -569,7 +571,9 @@
     <script src="/shared_components/js/decoration-methods.js?v=2026.09.06.31"></script>
     <script src="/brands-flyout.js?v=2026.09.06.31"></script>
     <script src="/shared_components/js/nav-dropdown.js?v=2026.07.13.4" defer></script>
-    <script src="/app-modern.js?v=2026.09.06.41" defer></script>
+    <script src="/shared_components/js/storefront-navigation.js?v=2026.09.09.7" defer></script>
+    <script src="/shared_components/js/instant-storefront.js?v=2026.09.09.7" defer></script>
+    <script src="/app-modern.js?v=2026.09.09.7" defer></script>
     <script src="/shared_components/js/quote-cart-store.js?v=2026.08.19.5" defer></script>
     <script src="/pages/js/instant-quote-artwork.js?v=2026.07.25.1" defer></script>
     <script src="/pages/js/custom-stickers-ladder.js?v=2026.07.24.2" defer></script>

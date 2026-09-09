@@ -204,3 +204,7 @@ Brand guides: fifteen custom-brand pages now use tokens/components + shared `sto
 - Entry/status: `shared_components/css/access-shell.css` + the two scoped login page sheets; `pages/css/order-confirmation.css` owns3-Day Tees/custom-tees/custom-caps confirmation layout without loading builder styles. All use tokens/components and Public Sans.
 
 Catalog discovery: shared `catalog-discovery.css` follows tokens/components/storefront-shell and owns brand/product cards and controls; existing brands.css and fall-catalog-2026.css contain scoped page arrangements. Header navigation controller is now shared_components/js/storefront-navigation.js; original fifteen brand-guide consumers updated without runtime changes.
+
+- shared_components/css/storefront-commerce.css extends storefront-shell for live commerce dropdowns; instant-quote.css/custom-banners.css now scoped to data-instant.
+
+Instant storefront: banner/sticker configurators use scoped instant-quote/custom-banners plus storefront-commerce, existing tokens/components/storefront-shell and Public Sans. Native dialogs and one disclosure owner retain keyboard navigation. Pricing, quote submission and artwork controllers remain source locked; app-modern delegates only the new native menu/disclosure paths. Four widths, all50 sticker prices, seven banner presets, quantity/custom/finishing, visible failed/empty/degraded data, retained draft/artwork and retry, and419 PDF text nodes reviewed. Entire raw CSS graph grows with shared primitives and full paper support; measured budgets track that honestly.
