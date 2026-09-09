@@ -270,3 +270,5 @@ Homepage "From the blog" section (index.html). Fetches the 3 newest Published po
 - `storefront-navigation.js` (moved from pages/js/brand-guide.js) owns native menu focus/wrap/return, Escape/backdrop/resize and encoded catalogue search for seventeen unified public pages.
 
 - campaign-storefront.js — native photo viewer, fragment focus and reversible print disclosure state for golf and safety storefront pages.
+
+- instant-storefront.js: banner/sticker navigation, native dialog keyboard and reversible paper helpers; business controllers retain their existing pricing/submission/artwork code.

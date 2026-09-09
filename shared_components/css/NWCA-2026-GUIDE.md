@@ -310,3 +310,5 @@ Staff references load tokens -> components -> staff-reference.css -> scoped page
 - Entry/status: `shared_components/css/access-shell.css` + the two scoped login page sheets; `pages/css/order-confirmation.css` owns3-Day Tees/custom-tees/custom-caps confirmation layout without loading builder styles. All use tokens/components and Public Sans.
 
 Catalog discovery: shared `catalog-discovery.css` follows tokens/components/storefront-shell and owns brand/product cards and controls; existing brands.css and fall-catalog-2026.css contain scoped page arrangements. Header navigation controller is now shared_components/js/storefront-navigation.js; original fifteen brand-guide consumers updated without runtime changes.
+
+Instant configurators share storefront-shell/commerce navigation, canonical components and scoped instant-quote arrangements. Preserve server prices and full rate cards.

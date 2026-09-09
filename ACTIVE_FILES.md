@@ -112,3 +112,6 @@ Historical counts are retained as audit notes and must not be presented as curre
 - tests/fixtures/campaign-storefront-original-content.json and tests/unit/campaign-storefront-content.test.js — original three-page prose/links/images/fields/SEO and normalized controller/service guards; only visual class/style attributes and replaced navigation adapters are excluded from controller comparison.
 
 - tests/e2e/css-unification-campaign-storefront.spec.js — four widths/contrast/native photo viewer/filter/gallery/print plus synthetic save/email outcome matrix; all real business writes and email blocked. Submission now retains inputs and sends no customer confirmation unless storage or sales notification accepted the request.
+
+- shared_components/css/storefront-commerce.css — scoped commerce dropdowns, category links and quote badge shared by public instant configurators; base navigation/footer remain storefront-shell.css.
+- shared_components/js/instant-storefront.js — shared configurator fragment focus, native dialog keyboard boundary and reversible FAQ paper preparation; no financial requests. Banner/sticker pages opt into canonical tokens/components and retain original price/submit/artwork controllers. app-modern.js delegates DIALOG mobile menus to existing storefront-navigation.js.

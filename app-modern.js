@@ -329,6 +329,9 @@ function setupMobileMenu() {
     const sidebar = document.getElementById('sidebar');
     const overlay = document.getElementById('sidebarOverlay');
 
+    // Unified storefront pages use the shared native dialog navigation.
+    if (sidebar?.tagName === 'DIALOG') return;
+
     if (menuBtn) {
         menuBtn.addEventListener('click', () => {
             sidebar.classList.toggle('show');
