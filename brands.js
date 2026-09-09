@@ -1,398 +1,105 @@
-/**
- * Brands Browse Page
- * Displays all available brands with priority loading (Carhartt first)
- * @version 6.0.0
- *
- * Update 6.0.0: Priority brand loading - Carhartt and top brands appear first
- *   - Carhartt appears first (0.3s), top 10 brands visible in 0.6s
- *   - Removed alphabetical letter grouping for cleaner, priority-based display
- *   - Progressive image loading in 3 batches (0ms, 500ms, 1000ms)
- *   - Perceived load time: 0.6s (was 3s) - 5x faster user experience
- * Update 5.0.0: Performance optimization - removed product counts
- *   - Removed 39 API calls for product counts (8-second delay eliminated)
- *   - Removed gray placeholder container (cleaner look)
- *   - Increased logo size to 160px for maximum visibility
- *   - Load time reduced from 8s to ~500ms (94% faster!)
- * Update 4.0.0: Logo-first design with lazy loading for performance
- * Update 2.0.0: Added brand logo support from API, fixed property access for new API format
- */
-
+/* Brand directory: native named links, API priority order, and retry preserving search. */
 class BrandsPage {
     constructor() {
-        // Proxy host from /config/app.config.js (Rule 6) — a missing config fails visibly in loadBrands()
-        const base = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) || '';
+        const base = window.APP_CONFIG?.API?.BASE_URL || '';
         this.apiBase = base ? base + '/api' : '';
         this.allBrands = [];
-        this.filteredBrands = [];
-
-        // Priority order + landing pages come from the shared brands registry
-        // (shared_components/js/brands-registry.js), tagged before this file.
-        // This page used to keep its own PRIORITY_BRANDS copy AND had no landing
-        // -page map at all, so every tile — including the 15 brands with a
-        // /custom-<brand> page — dumped the customer on the generic catalog
-        // filter instead of the brand's own page (2026-07-25 drift fix).
-        this.PRIORITY_BRANDS = (window.NWCA_BRANDS && window.NWCA_BRANDS.PRIORITY_ORDER) || [];
-        if (!this.PRIORITY_BRANDS.length) {
-            console.error('[BrandsPage] brands-registry.js not loaded — using plain alphabetical order');
-        }
-
-        this.init();
-    }
-
-    async init() {
-        const retry = document.getElementById('brandsRetry');
-        if (retry) retry.addEventListener('click', () => window.location.reload());
-        // Logo images that fail hide themselves (was an inline handler on every card)
-        document.addEventListener('error', (e) => {
-            const img = e.target;
-            if (img && img.tagName === 'IMG' && img.dataset && img.dataset.onerror === 'hide') img.hidden = true;
+        this.PRIORITY_BRANDS = window.NWCA_BRANDS?.PRIORITY_ORDER || [];
+        this.search = document.getElementById('brandSearchInput');
+        this.container = document.getElementById('brandsContainer');
+        this.loading = document.getElementById('loadingState');
+        this.error = document.getElementById('errorState');
+        this.retry = document.getElementById('brandsRetry');
+        this.context = document.getElementById('brandsResultContext');
+        this.loading.setAttribute('role', 'status');
+        this.search.addEventListener('input', () => this.displayBrands());
+        this.retry.addEventListener('click', () => this.loadBrands(true));
+        document.addEventListener('error', event => {
+            const img = event.target;
+            if (img.tagName === 'IMG' && img.dataset.onerror === 'hide') img.hidden = true;
         }, true);
-
-        // Set up search input
-        this.setupSearch();
-
-        // Load brands
-        await this.loadBrands();
-
-        // Set up mobile menu if it exists
-        this.setupMobileMenu();
+        this.loadBrands();
     }
-
-    setupSearch() {
-        const searchInput = document.getElementById('brandSearchInput');
-        if (!searchInput) return;
-
-        let searchTimeout;
-        searchInput.addEventListener('input', (e) => {
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(() => {
-                this.filterBrands(e.target.value);
-            }, 300);
-        });
-    }
-
-    async loadBrands() {
-        const loadingState = document.getElementById('loadingState');
-        const errorState = document.getElementById('errorState');
-        const container = document.getElementById('brandsContainer');
-
+    async loadBrands(fromRetry = false) {
+        if (this.requesting) return;
+        this.requesting = true;
+        this.loading.hidden = false;
+        this.error.hidden = true;
+        this.container.hidden = true;
+        this.context.textContent = '';
+        this.retry.disabled = true;
         try {
-
-            const response = await fetch(`${this.apiBase}/all-brands`);
-
-            if (!response.ok) {
-                throw new Error(`API error: ${response.status}`);
-            }
-
+            if (!this.apiBase) throw new Error('The catalogue service is not configured.');
+            const response = await fetch(this.apiBase + '/all-brands', { signal: AbortSignal.timeout(20000) });
+            if (!response.ok) throw new Error('Brand service returned ' + response.status);
             const data = await response.json();
-
-            // Extract brands array from response
-            this.allBrands = data.brands || data.data?.brands || data;
-
-            // If brands is not an array, try to convert
-            if (!Array.isArray(this.allBrands)) {
-                console.error('[BrandsPage] Brands data is not an array:', this.allBrands);
-                throw new Error('Invalid brands data format');
-            }
-
-            // Product counts removed for faster loading
-            // await this.enrichBrandsWithCounts();
-
-            // Sort by priority (Carhartt first), then alphabetically
-            this.allBrands = this.sortBrandsByPriority(this.allBrands);
-
-
-            this.filteredBrands = [...this.allBrands];
+            const brands = data?.brands ?? data?.data?.brands ?? data;
+            if (!Array.isArray(brands) || brands.some(brand => !this.brandName(brand))) throw new Error('The brand service returned an invalid list.');
+            this.allBrands = this.sortBrandsByPriority(brands);
             this.displayBrands();
-
-            // Hide loading, show container
-            loadingState.hidden = true;
-            container.hidden = false;
-
+            this.container.hidden = false;
+            if (fromRetry) this.search.focus();
         } catch (error) {
-            console.error('[BrandsPage] Error loading brands:', error);
-            loadingState.hidden = true;
-            errorState.hidden = false;
+            console.error('[BrandsPage] Unable to load brands:', error);
+            this.error.hidden = false;
+        } finally {
+            this.loading.hidden = true;
+            this.retry.disabled = false;
+            this.requesting = false;
         }
     }
-
-    async enrichBrandsWithCounts() {
-        // For each brand, try to get product count from a quick search
-
-        const enrichPromises = this.allBrands.map(async (brand) => {
-            const brandName = brand.brand || brand.name || brand;
-
-            try {
-                // Quick search to get count
-                const response = await fetch(`${this.apiBase}/products/search?brand=${encodeURIComponent(brandName)}&limit=1&includeFacets=true`);
-                const data = await response.json();
-
-                if (data.success && data.data) {
-                    const count = data.data.pagination?.total || 0;
-
-                    // Update brand object
-                    if (typeof brand === 'string') {
-                        // Convert string to object
-                        return { name: brand, productCount: count };
-                    } else {
-                        brand.productCount = count;
-                        return brand;
-                    }
-                }
-            } catch (error) {
-                console.warn(`[BrandsPage] Could not get count for ${brandName}`);
-            }
-
-            // Return as-is if enrichment failed
-            return typeof brand === 'string' ? { name: brand, productCount: 0 } : brand;
-        });
-
-        this.allBrands = await Promise.all(enrichPromises);
+    brandName(brand) {
+        const name = typeof brand === 'string' ? brand : brand?.brand || brand?.name;
+        return typeof name === 'string' ? name.trim() : '';
     }
-
-    /**
-     * Sort brands by priority order, with Carhartt first
-     * Priority brands appear first in exact order, then remaining brands alphabetically
-     */
     sortBrandsByPriority(brands) {
-        return brands.sort((a, b) => {
-            // Extract brand names
-            const nameA = (a.brand || a.name || a).toString();
-            const nameB = (b.brand || b.name || b).toString();
-
-            // Find priority indexes
-            const indexA = this.PRIORITY_BRANDS.indexOf(nameA);
-            const indexB = this.PRIORITY_BRANDS.indexOf(nameB);
-
-            // Both are priority brands - maintain priority order
-            if (indexA !== -1 && indexB !== -1) {
-                return indexA - indexB;
-            }
-
-            // A is priority, B is not - A comes first
-            if (indexA !== -1) return -1;
-
-            // B is priority, A is not - B comes first
-            if (indexB !== -1) return 1;
-
-            // Neither is priority - sort alphabetically
-            return nameA.toUpperCase().localeCompare(nameB.toUpperCase());
+        return [...brands].sort((a, b) => {
+            const first = this.brandName(a), second = this.brandName(b);
+            const ia = this.PRIORITY_BRANDS.indexOf(first), ib = this.PRIORITY_BRANDS.indexOf(second);
+            if (ia !== -1 && ib !== -1) return ia - ib;
+            if (ia !== -1) return -1;
+            if (ib !== -1) return 1;
+            return first.toUpperCase().localeCompare(second.toUpperCase());
         });
     }
-
-    filterBrands(searchTerm) {
-        const term = searchTerm.toLowerCase().trim();
-
-        if (!term) {
-            this.filteredBrands = [...this.allBrands];
-        } else {
-            this.filteredBrands = this.allBrands.filter(brand => {
-                const name = (brand.brand || brand.name || brand).toString().toLowerCase();
-                return name.includes(term);
-            });
-        }
-
-        this.displayBrands();
-    }
-
     displayBrands() {
-        const container = document.getElementById('brandsContainer');
-        if (!container) return;
-
-        if (this.filteredBrands.length === 0) {
-            container.innerHTML = `
-                <div class="no-brands">
-                    <p>No brands found matching your search.</p>
-                </div>
-            `;
+        const term = this.search.value.trim().toLowerCase();
+        const brands = this.allBrands.filter(brand => this.brandName(brand).toLowerCase().includes(term));
+        this.filteredBrands = brands;
+        this.context.textContent = brands.length + ' of ' + this.allBrands.length + ' brands' + (term ? ' — matching “' + this.search.value.trim() + '”' : '');
+        this.container.replaceChildren();
+        if (!brands.length) {
+            const empty = document.createElement('p');
+            empty.className = 'no-brands';
+            empty.textContent = this.allBrands.length ? 'No brands found matching your search.' : 'No brands are available right now.';
+            this.container.append(empty);
             return;
         }
-
-        // Display brands in priority order (no alphabetical grouping)
-        // Carhartt appears first, followed by other priority brands, then alphabetical
-        const html = `
-            <div class="brand-grid">
-                ${this.filteredBrands.map(brand => this.createBrandCard(brand)).join('')}
-            </div>
-        `;
-
-        container.innerHTML = html;
-
-        // Add click handlers
-        this.attachClickHandlers();
-
-        // Initialize progressive image loading
-        this.initProgressiveLoading();
-    }
-
-    groupByLetter(brands) {
-        const grouped = {};
-
-        brands.forEach(brand => {
-            const name = (brand.brand || brand.name || brand).toString();
-            const firstLetter = name.charAt(0).toUpperCase();
-
-            if (!grouped[firstLetter]) {
-                grouped[firstLetter] = [];
+        const grid = document.createElement('div');
+        grid.className = 'brand-grid';
+        for (const brand of brands) {
+            const name = this.brandName(brand), card = document.createElement('a');
+            card.className = 'brand-card';
+            card.dataset.brand = encodeURIComponent(name);
+            card.href = window.NWCA_BRANDS?.landingPageFor(name) || '/catalog?brand=' + encodeURIComponent(name);
+            const logo = typeof brand === 'object' && typeof brand.logo === 'string' ? brand.logo : '';
+            if (/^https?:\/\//i.test(logo) || /^\/(?!\/)/.test(logo)) {
+                const img = document.createElement('img');
+                img.src = logo;
+                img.alt = '';
+                img.className = 'brand-card-logo';
+                img.loading = 'lazy';
+                img.decoding = 'async';
+                img.dataset.onerror = 'hide';
+                card.append(img);
             }
-
-            grouped[firstLetter].push(brand);
-        });
-
-        return grouped;
-    }
-
-    createBrandCard(brand) {
-        const name = brand.brand || brand.name || brand;
-        const logo = brand.logo || '';
-        const encodedName = encodeURIComponent(name);
-
-        // Create logo HTML with progressive loading (use data-src instead of src)
-        let logoHtml = '';
-        if (logo) {
-            logoHtml = `
-                <img data-src="${this.escapeHtml(logo)}"
-                     alt="${this.escapeHtml(name)}"
-                     class="brand-card-logo brand-logo-loading"
-                     decoding="async"
-                     data-onerror="hide">
-            `;
+            const label = document.createElement('span');
+            label.className = 'brand-name';
+            label.textContent = name;
+            card.append(label);
+            grid.append(card);
         }
-
-        return `
-            <div class="brand-card" data-brand="${encodedName}">
-                ${logoHtml}
-            </div>
-        `;
-    }
-
-    /**
-     * Initialize progressive image loading for priority brands first
-     */
-    initProgressiveLoading() {
-        const brandImages = document.querySelectorAll('.brand-card-logo[data-src]');
-
-        if (brandImages.length === 0) {
-            return;
-        }
-
-
-        // Load images in batches with priority
-        this.loadImagesBatched(brandImages);
-    }
-
-    /**
-     * Load images in priority batches
-     */
-    loadImagesBatched(images) {
-        const imageArray = Array.from(images);
-
-        // Batch 1: Priority brands (first 10) - load immediately
-        const priorityImages = imageArray.slice(0, 10);
-        const secondaryImages = imageArray.slice(10, 20);
-        const remainingImages = imageArray.slice(20);
-
-        priorityImages.forEach(img => this.loadImage(img));
-
-        // Batch 2: Next 10 brands - load after 500ms
-        setTimeout(() => {
-            secondaryImages.forEach(img => this.loadImage(img));
-        }, 500);
-
-        // Batch 3: Remaining brands - load after 1000ms
-        setTimeout(() => {
-            remainingImages.forEach(img => this.loadImage(img));
-        }, 1000);
-    }
-
-    /**
-     * Load a single image with fade-in effect
-     */
-    loadImage(img) {
-        const src = img.getAttribute('data-src');
-        if (!src) return;
-
-        // Create new image to preload
-        const loader = new Image();
-
-        loader.onload = () => {
-            // Image loaded successfully - swap and fade in
-            img.src = src;
-            img.removeAttribute('data-src');
-            img.classList.add('brand-logo-loaded');
-            img.classList.remove('brand-logo-loading');
-        };
-
-        loader.onerror = () => {
-            // Image failed to load - hide gracefully
-            console.warn(`[BrandsPage] Failed to load image: ${src}`);
-            img.hidden = true;
-            img.classList.remove('brand-logo-loading');
-        };
-
-        // Start loading
-        loader.src = src;
-    }
-
-    attachClickHandlers() {
-        document.querySelectorAll('.brand-card').forEach(card => {
-            card.addEventListener('click', () => {
-                const brandName = decodeURIComponent(card.dataset.brand);
-                this.navigateToBrand(brandName);
-            });
-        });
-    }
-
-    navigateToBrand(brandName) {
-        // Brands with a dedicated landing page go there — it's the page built to
-        // sell that brand. Everything else falls back to the catalog filter.
-        const landingPage = window.NWCA_BRANDS && window.NWCA_BRANDS.landingPageFor(brandName);
-        window.location.href = landingPage || `/catalog?brand=${encodeURIComponent(brandName)}`;
-    }
-
-    /**
-     * Escape HTML to prevent XSS
-     */
-    escapeHtml(text) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
-
-    // Standard 2026 chrome: drawer + masthead search (same pattern as product-2026.js)
-    setupMobileMenu() {
-        const sidebar = document.getElementById('sidebar');
-        const overlay = document.getElementById('sidebarOverlay');
-        const openBtn = document.getElementById('mobileMenuBtn');
-        const closeBtn = document.getElementById('drawerClose');
-
-        function setDrawer(open) {
-            if (!sidebar || !overlay) return;
-            sidebar.classList.toggle('show', open);
-            overlay.classList.toggle('show', open);
-            document.body.classList.toggle('drawer-open', open);
-        }
-        if (openBtn) openBtn.addEventListener('click', () => setDrawer(true));
-        if (closeBtn) closeBtn.addEventListener('click', () => setDrawer(false));
-        if (overlay) overlay.addEventListener('click', () => setDrawer(false));
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') setDrawer(false);
-        });
-
-        const input = document.getElementById('navSearchInput');
-        const btn = document.getElementById('navSearchBtn');
-        function goSearch() {
-            const term = (input && input.value || '').trim();
-            if (term) window.location.href = '/catalog?q=' + encodeURIComponent(term);
-        }
-        if (btn) btn.addEventListener('click', goSearch);
-        if (input) input.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') goSearch();
-        });
+        this.container.append(grid);
     }
 }
-
-// Initialize when DOM is ready
-document.addEventListener('DOMContentLoaded', () => {
-    window.brandsPage = new BrandsPage();
-});
+document.addEventListener('DOMContentLoaded', () => { new BrandsPage(); });

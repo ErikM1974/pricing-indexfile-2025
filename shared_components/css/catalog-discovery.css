@@ -1,0 +1,56 @@
+/* Shared tokens/components precede this explicitly scoped owner. */
+@layer components.pages {
+
+:where([data-ui="unified"][data-catalog-discovery]) .nav-bar-inner { flex-wrap: wrap; }
+:where([data-ui="unified"][data-catalog-discovery]) .nav-menu { flex: 1; flex-wrap: wrap; gap: 4px 16px; }
+:where([data-ui="unified"][data-catalog-discovery]) .nav-search { flex: 1 1 230px; }
+:where([data-ui="unified"][data-catalog-discovery]) .quote-badge { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; border: 1px solid var(--ui-line); border-radius: var(--radius-md); padding: 8px 12px; white-space: nowrap; text-decoration: none; color: var(--ui-accent); }
+:where([data-ui="unified"][data-catalog-discovery]) .quote-badge-count { background: var(--ui-tint); padding: 2px 7px; border-radius: var(--radius-pill); font-weight: 700; }
+:where([data-ui="unified"][data-catalog-discovery]) .category-list { list-style: none; margin: 0 0 20px; padding: 0; }
+:where([data-ui="unified"][data-catalog-discovery]) .category-link { display: block; padding: 10px 0; }
+:where([data-ui="unified"][data-catalog-discovery]) :is(.brands-content, .fc-hero-inner, .fc-tools-inner, .fc-body, .fc-nav, .fc-cta-inner) { width: min(1200px, calc(100% - 48px)); margin-inline: auto; }
+:where([data-ui="unified"][data-catalog-discovery]) :is(.brands-title, .fc-hero-title) { font-size: clamp(32px, 5vw, 56px); font-weight: 700; line-height: 1.12; letter-spacing: -0.035em; margin: 0 0 20px; }
+:where([data-ui="unified"][data-catalog-discovery]) :is(.brands-subtitle, .fc-hero-sub) { max-width: 720px; font-size: 18px; line-height: 1.7; color: var(--ui-muted); }
+:where([data-ui="unified"][data-catalog-discovery]) :is(.brand-search-container, .fc-search) { position: relative; }
+:where([data-ui="unified"][data-catalog-discovery]) :is(.brand-search-container, .fc-search) svg { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); pointer-events: none; color: var(--ui-muted); }
+:where([data-ui="unified"][data-catalog-discovery]) :is(.brand-search-container, .fc-search) input { padding-right: 42px; }
+:where([data-ui="unified"][data-catalog-discovery]) :is(.brand-grid, .fc-grid) { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px; }
+:where([data-ui="unified"][data-catalog-discovery]) :is(.brand-card, .fc-card) { min-width: 0; border: 1px solid var(--ui-line); border-radius: var(--radius-lg); background: var(--ui-surface); overflow: hidden; }
+:where([data-ui="unified"][data-catalog-discovery]) :is(.brand-card, .fc-card):hover { border-color: var(--ui-accent); }
+:where([data-ui="unified"][data-catalog-discovery]) :is(.loading-state, .error-state, .no-brands, .fc-empty) { padding: 40px 20px; text-align: center; border: 1px solid var(--ui-line); border-radius: var(--radius-lg); }
+:where([data-ui="unified"][data-catalog-discovery]) :is(.error-state, .fc-alert) { color: var(--color-danger-ink); background: var(--color-danger-bg); border-color: var(--color-danger); }
+:where([data-ui="unified"][data-catalog-discovery]) :is(.catalog-result-context, .fc-count) { color: var(--ui-muted); font-size: 14px; line-height: 1.6; }
+:where([data-ui="unified"][data-catalog-discovery]) :is(.brand-name, .fc-card-name) { overflow-wrap: anywhere; }
+:where([data-ui="unified"][data-catalog-discovery]) .catalog-retry { margin: 0 0 24px; }
+
+@media screen and (width >= 1051px) {
+ :where([data-ui="unified"][data-catalog-discovery]) .nav-bar-inner { display: grid; grid-template-columns: 120px minmax(0, 1fr) auto; gap: 8px 24px; }
+ :where([data-ui="unified"][data-catalog-discovery]) .brand { grid-column: 1; grid-row: 1; }
+ :where([data-ui="unified"][data-catalog-discovery]) .nav-search { grid-column: 2; grid-row: 1; margin-left: 0; }
+ :where([data-ui="unified"][data-catalog-discovery]) .quote-badge { grid-column: 3; grid-row: 1; }
+ :where([data-ui="unified"][data-catalog-discovery]) .nav-menu { grid-column: 1 / -1; grid-row: 2; }
+}
+
+@media screen and (width <= 900px) { :where([data-ui="unified"][data-catalog-discovery]) :is(.brand-grid, .fc-grid) { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+
+@media screen and (width <= 600px) {
+ :where([data-ui="unified"][data-catalog-discovery]) :is(.brands-content, .fc-hero-inner, .fc-tools-inner, .fc-body, .fc-nav, .fc-cta-inner) { width: calc(100% - 32px); }
+ :where([data-ui="unified"][data-catalog-discovery]) :is(.brand-grid, .fc-grid) { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+ :where([data-ui="unified"][data-catalog-discovery]) :is(.brands-subtitle, .fc-hero-sub) { font-size: 16px; }
+ :where([data-ui="unified"][data-catalog-discovery]) .quote-badge { margin-left: auto; }
+}
+
+@media print {
+ :where([data-ui="unified"][data-catalog-discovery]) :is(.brands-content, .fc-hero-inner, .fc-tools-inner, .fc-body, .fc-nav, .fc-cta-inner) { width: 100%; }
+ :where([data-ui="unified"][data-catalog-discovery]) :is(.brand-grid, .fc-grid) { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+ :where([data-ui="unified"][data-catalog-discovery]) :is(.brand-card, .fc-card) { break-inside: avoid; }
+ :where([data-ui="unified"][data-catalog-discovery]) :is(.brand-search-container, .catalog-retry, .btn-retry) { display: none; }
+ :where([data-ui="unified"][data-catalog-discovery]) :is(.brands-title, .fc-hero-title) { font-size: 28px; }
+ :where([data-ui="unified"][data-catalog-discovery]) :is(.brands-subtitle, .fc-hero-sub) { font-size: 13px; }
+ :where([data-ui="unified"][data-catalog-discovery]) .footer-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+ :where([data-ui="unified"][data-catalog-discovery]) .site-footer :is(p, address, li) { font-size: 11px; line-height: 1.5; }
+ :where([data-ui="unified"][data-catalog-discovery]) .footer-bottom { font-size: 10px; }
+ :where([data-ui="unified"][data-catalog-discovery]) :focus { outline: none; }
+}
+
+}

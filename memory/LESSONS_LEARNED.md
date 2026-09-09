@@ -197,10 +197,9 @@ Native Node22.23 runs Puppeteer25; invoke its capture CLI outside Jest, and repo
 - Solution: stable page scope, actual shared aliases, separate tablists, opaque text, native named keyboard controls and a visible close glyph. Load ui-dialog.js before transfer-actions-shared.js on every unified consumer; a dependency guard and both sender browser paths lock this. Customer rush indicators are read-only; print keeps its existing staff-only job sheet.
 - Prevention: resolve tokens per real style graph, inspect screenshots as well as axe, and exercise intake/error/dialog/print states at four widths with writes mocked. Keep exact visibility exceptions rather than deleting important flags by script.
 
-## Training controls and printed guides need state/output checks (2026-09-08)
-- Problem/root cause: clipboard feedback depended on the global event after an asynchronous operation, clickable divs excluded keyboard users, and fixed-height print rules could clip text. Generic card adapters also added unwanted document padding.
-- Solution: pass the originating button explicitly, show local pending/error/retry feedback, use native disclosure buttons and owned document sections, and let print flow through readable columns.
-- Prevention: lock unchanged training text/examples/links, test keyboard and denied clipboard states, and inspect actual PDFs. A two-sheet language-handout guard catches blank-page regressions that a print-media screenshot misses.
+## Training controls and printed guides need state/output checks (2026-09-08, archived)
+
+Exercise state transitions and verify complete printed content. Full entry in LESSONS_LEARNED_ARCHIVE.md.
 
 ### Shared form styles and print pseudo-elements (2026-09-08, archived): inspect actual filled paper and scoped pseudo-elements. Full entry in LESSONS_LEARNED_ARCHIVE.md.
 
@@ -251,3 +250,7 @@ Problem: partial service rows looked fully live, invalid bonus figures could ren
 ### Sign-in and confirmation owners need honest state and paper checks (2026-09-09)
 
 Problem: shared form arrangements initially omitted canonical field styles, infrastructure failures falsely displayed an email-sent state, and artwork pushed receipt contact details onto a trailing sheet. Root cause: class ownership, treating all HTTP responses as success, and screen spacing inherited by print. Solution: canonical fields/shared access shell, generic outage errors preserving the email for retry while keeping successful known/unknown accounts identical, and compact print spacing with empty artwork regions hidden. Fulfillment controllers, totals and server shipping promises remain unchanged and hash-locked. Prevention: exercise keyboard/invalid/pending/rate/network/outage/sent states with all writes and emails blocked, inspect paper with actual artwork fixtures and compare every content block. Preserve line endings in scripted registry edits so removing a line cannot merge an adjacent entry into a comment.
+
+### Catalog discovery must distinguish failed data from absent products (2026-09-09)
+
+Problem: missing logos left unnamed tiles, failed product batches could appear as verified absent products, and intrinsic grid images overlapped card labels on paper. Root cause: image-only interaction, unchecked response shape, and print grid intrinsic sizing. Solution: named native links, validated batches with explicit retry preserving filters, server price labels retained verbatim, and contained images with separate label flow. Move shared navigation without duplicating it; preserve every curated style/category/brand description. Prevention: test keyboard, malformed/partial/empty/retry states and escaped server labels; assert image-to-body print geometry and compare every PDF text block. Browser review blocks all business writes and emails.
