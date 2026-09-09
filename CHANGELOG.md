@@ -1,3 +1,13 @@
+## v2026.09.09.13 (2026.09.09)
+
+- Plan purchasing and payables workspace review
+- Record purchasing workspace layout implementation
+- Unify purchasing workspaces and preserve invoice load states
+- Record verified monitoring release and purchasing checkpoint
+- Integrate reviewed purchasing layouts and invoice states
+- Align purchasing office guard with shared invoice ownership
+- Deploy v2026.09.09.13: unify purchasing and invoice workspaces
+
 ## v2026.09.09.12 (2026.09.09)
 
 - Plan isolated staff monitoring and audit CSS review

@@ -938,3 +938,7 @@ Full purchasing integration initially passed224unit suites and failed one older 
 ## Purchasing release checks complete — v2026.09.09.13
 
 Tested source 5664f53f64a01cec66cb23c9390243e78b9dd018: build/lint/types,485routes/24modules,225unit suites/5267passed/four existing skips,88DOM,four accessibility unit,84quote parity,529mocked browser,16remaining browser/three optional screenshots skipped, all five calculators. 288CSS clean,boot200,production audit zero.24focused purchasing browser cases and four complete one-page PDFs/176checked blocks. Preserve exact money/CSV values and legacy AE viewer, native dialog/file controls, unknown balances and protected import/export state. Two old page sheets retired; both shared owners and all six viewer consumers use2026.09.09.13. Live remains134/91 until verified136/89 after exact-source CI and actual rollout.
+
+## Purchasing release record — v2026.09.09.13
+
+Exact-source CI 34396445336 passed all four jobs on 12b924f395e36f843a2c50667d06c181982fe5bc, including actual money/calculator parity and529mocked browser cases. Purchasing Portal and SanMar Payables share canonical controls/tables and a native opt-in invoice dialog. Complete source and visible failure states, exact CSV values and legacy AE compatibility verified. Four one-page PDFs/176checked blocks retain current fields, all invoice columns/totals and failed-lookup notices.485routes unchanged. Count becomes136reviewed/89pending only after actual rollout verification.
