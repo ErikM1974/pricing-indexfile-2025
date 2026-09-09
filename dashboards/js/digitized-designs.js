@@ -15,11 +15,13 @@
                 imageReturnFocus = document.activeElement;
                 modalImg.src = src;
                 modal.classList.add('active');
+                window.UiDialog.open(modal, { focus: '#image-modal-close', onDismiss: closeImageModal });
                 setTimeout(function () { var c = document.getElementById('image-modal-close'); if (c) c.focus(); }, 30);
             }
             function closeImageModal() {
                 if (!modal.classList.contains('active')) return;
                 modal.classList.remove('active');
+                window.UiDialog.close(modal);
                 modalImg.src = '';
                 if (imageReturnFocus && document.body.contains(imageReturnFocus)) { try { imageReturnFocus.focus(); } catch (e) { /* gone */ } }
                 imageReturnFocus = null;
@@ -71,7 +73,12 @@
                 return fetch(API_BASE + '/api/al-pricing')
                     .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
                     .then(function (d) {
-                        if (!d || !d.garments || !d.garments.basePrices || !d.caps || !d.caps.basePrices) throw new Error('unexpected shape');
+                        var amount = function (value) { return value !== null && value !== '' && Number.isFinite(Number(value)) && Number(value) >= 0; };
+                        if (!d || ['garments', 'caps'].some(function (cat) {
+                            var item = d[cat];
+                            return !item || !item.basePrices || AL_TIERS.some(function (tier) { return !amount(item.basePrices[tier]); }) ||
+                                !amount(item.baseStitches) || Number(item.baseStitches) <= 0 || !amount(item.perThousandUpcharge) || !amount(item.ltmFee);
+                        })) throw new Error('incomplete pricing response');
                         alPricing = d; alPricingError = '';
                     })
                     .catch(function (err) {
@@ -93,6 +100,7 @@
             function closeALModal() {
                 if (!alModal.classList.contains('active')) return;
                 alModal.classList.remove('active');
+                window.UiDialog.close(alModal);
                 if (alReturnFocus && document.body.contains(alReturnFocus)) { try { alReturnFocus.focus(); } catch (e) { /* gone */ } }
                 alReturnFocus = null;
             }
@@ -149,6 +157,7 @@
                 document.querySelectorAll('#al-cap-table .al-total-col').forEach(function(el) { el.hidden = !(capOverage > 0); });
 
                 alModal.classList.add('active');
+                window.UiDialog.open(alModal, { focus: '.al-modal-close', onDismiss: closeALModal });
                 setTimeout(function () { var c = alModal.querySelector('.al-modal-close'); if (c) c.focus(); }, 30);
             }
 
@@ -196,7 +205,7 @@
         note.textContent = 'The Caspio list did not load. Check your connection, then ';
         var retry = document.createElement('button');
         retry.type = 'button';
-        retry.className = 'caspio-fail-retry';
+        retry.className = 'caspio-fail-retry btn btn-secondary';
         retry.textContent = 'Reload the page';
         retry.addEventListener('click', function () { window.location.reload(); });
         note.appendChild(retry);
@@ -328,12 +337,12 @@
                     html += '</div>';
                     html += '<div class="card-image-item"><span class="image-label">Mockup</span>';
                     html += imgBtn(imgSrcs[1], 'Mockup ' + designNum);
-                    if (mockupHref) html += '<br><a href="' + escapeHtml(mockupHref) + '" target="_blank" rel="noopener" class="mockup-link">View Full</a>';
+                    if (mockupHref) html += '<br><a href="' + escapeHtml(mockupHref) + '" target="_blank" rel="noopener" class="mockup-link btn btn-secondary">View Full</a>';
                     html += '</div>';
                 } else if (imgSrcs.length === 1) {
                     html += '<div class="card-image-item">';
                     html += imgBtn(imgSrcs[0], 'Design ' + designNum);
-                    if (mockupHref) html += '<br><a href="' + escapeHtml(mockupHref) + '" target="_blank" rel="noopener" class="mockup-link">View Full Mockup</a>';
+                    if (mockupHref) html += '<br><a href="' + escapeHtml(mockupHref) + '" target="_blank" rel="noopener" class="mockup-link btn btn-secondary">View Full Mockup</a>';
                     html += '</div>';
                 } else {
                     html += '<span class="no-image">No preview available</span>';
@@ -373,7 +382,7 @@
                 var hasDetails = DETAIL_FIELDS.some(function(l) { return fields[l]; });
                 if (hasDetails) {
                     var detailsId = 'card-details-' + (designNum || Math.random().toString(36).slice(2, 8));
-                    html += '<button class="card-details-toggle" type="button" aria-expanded="false" aria-controls="' + detailsId + '">Details</button>';
+                    html += '<button class="card-details-toggle btn btn-secondary" type="button" aria-expanded="false" aria-controls="' + detailsId + '">Details</button>';
                     html += '<div class="card-details" id="' + detailsId + '">';
                     DETAIL_FIELDS.forEach(function(label) {
                         var f = fields[label];
@@ -396,7 +405,7 @@
                 if (stitchTier !== 'Full Back') {
                     var stitchRaw = fields['Stitch Count'] ? fields['Stitch Count'].text : '0';
                     var stitchNum = parseInt(stitchRaw.replace(/,/g, ''), 10) || 0;
-                    html += '<button class="al-pricing-btn" type="button" data-stitches="' + stitchNum + '" data-design="' + escapeHtml(designNum) + '" aria-label="Additional logo pricing for #' + escapeHtml(designNum || '?') + '">AL Pricing</button>';
+                    html += '<button class="al-pricing-btn btn btn-secondary" type="button" data-stitches="' + stitchNum + '" data-design="' + escapeHtml(designNum) + '" aria-label="Additional logo pricing for #' + escapeHtml(designNum || '?') + '">AL Pricing</button>';
                 }
 
                 return html;

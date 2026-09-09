@@ -1,0 +1,88 @@
+/* Local design-library presentation. Caspio supplies the search and record data. */
+@layer components.pages {
+    :where([data-ui="unified"][data-design-library]) { --design-record-font-size: var(--font-size-base); --design-preview-height: 180px; --design-heading-size: var(--font-size-lg); --ui-accent: var(--gray-700); --ui-accent-hover: var(--gray-900); --ui-tint: var(--gray-100); }
+    :where([data-ui="unified"][data-design-library="archive"]) { --ui-accent: var(--amber-800); --ui-accent-hover: var(--amber-900); --ui-tint: var(--amber-100); }
+    :where([data-ui="unified"][data-design-library]) .dash-content { width: 100%; max-width: 1440px; margin-inline: auto; }
+    :where([data-ui="unified"][data-design-library]) .page-title { margin: 0 0 var(--space-3); font-size: clamp(1.5rem, 3vw, 2rem); }
+    :where([data-ui="unified"][data-design-library]) .page-subtitle { display: block; margin-bottom: var(--space-5); color: var(--ui-muted); }
+    :where([data-ui="unified"][data-design-library]) .caspio-container { min-width: 0; }
+    :where([data-ui="unified"][data-design-library]) .design-search-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)); gap: var(--space-4); width: 100%; margin-block: var(--space-4); }
+    :where([data-ui="unified"][data-design-library]) .form-field-group { display: grid; gap: var(--space-2); min-width: 0; }
+    :where([data-ui="unified"][data-design-library]) :is(.cbFormLabelCell, .cbFormFieldCell) { min-width: 0; }
+    :where([data-ui="unified"][data-design-library]) .cbSearchButtonContainer { grid-column: 1 / -1; }
+    :where([data-ui="unified"][data-design-library]) .cbSearchButtonContainerM { display: none; }
+    :where([data-ui="unified"][data-design-library]) .design-result-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: var(--space-5); align-items: start; }
+    :where([data-ui="unified"][data-design-library]) [data-cb-name="data-row"] { min-width: 0; padding: var(--space-4); border: 1px solid var(--ui-line); border-top: 3px solid var(--ui-accent); border-radius: var(--radius-card); background: var(--ui-surface); overflow-wrap: anywhere; }
+    :where([data-ui="unified"][data-design-library]) .card-header h3 { margin: 0; font-size: var(--font-size-lg); }
+    :where([data-ui="unified"][data-design-library]) .card-header h3 span { display: block; margin-top: var(--space-2); font-size: var(--font-size-sm); color: var(--ui-muted); }
+    :where([data-ui="unified"][data-design-library]) .card-description { margin-block: var(--space-3); }
+    :where([data-ui="unified"][data-design-library]) :is(.as-surcharge-badge, .al-stitch-info, .fb-pricing) { margin-block: var(--space-3); padding: var(--space-3); border: 1px solid var(--ui-line); border-radius: var(--radius-sm); background: var(--ui-tint); font-size: var(--font-size-sm); }
+    :where([data-ui="unified"][data-design-library]) :is(.as-surcharge-badge.warn, .al-source-note--warn) { color: var(--color-warning-ink); background: var(--color-warning-bg); }
+    :where([data-ui="unified"][data-design-library]) .card-images { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-block: var(--space-4); }
+    :where([data-ui="unified"][data-design-library]) .card-image-item { flex: 1 1 120px; min-width: 0; text-align: center; }
+    :where([data-ui="unified"][data-design-library]) :is(.card-image-item img, [data-cb-name="data-row"] dd img) { display: block; width: 100%; max-width: 100%; height: 180px; object-fit: contain; }
+    :where([data-ui="unified"][data-design-library]) .img-btn { display: block; width: 100%; padding: 0; border: 1px solid var(--ui-line); border-radius: var(--radius-sm); background: var(--gray-50); cursor: zoom-in; }
+    :where([data-ui="unified"][data-design-library]) :is(.image-label, .design-from-file, .no-design-num, .no-image, .al-base, .al-footnote, .al-source-note, .keyboard-hint) { display: block; color: var(--ui-muted); font-size: var(--font-size-sm); line-height: 1.6; }
+    :where([data-ui="unified"][data-design-library]) :is(.card-meta, .card-details.open) { display: grid; grid-template-columns: minmax(90px, 0.8fr) minmax(0, 1.2fr); gap: var(--space-2) var(--space-3); margin-block: var(--space-4); font-size: var(--font-size-sm); }
+    :where([data-ui="unified"][data-design-library]) .meta-label { color: var(--ui-muted); }
+    :where([data-ui="unified"][data-design-library]) .meta-value { font-weight: 500; overflow-wrap: anywhere; }
+    :where([data-ui="unified"][data-design-library]) .card-details { display: none; }
+    :where([data-ui="unified"][data-design-library]) :is(.card-details-toggle, .al-pricing-btn, .mockup-link) { margin-block: var(--space-2); }
+    :where([data-ui="unified"][data-design-library]) .card-details-toggle { margin-right: var(--space-2); }
+    :where([data-ui="unified"][data-design-library]) .card-details-toggle::before { content: '\25B8'; }
+    :where([data-ui="unified"][data-design-library]) .card-details-toggle.open::before { content: '\25BE'; }
+    :where([data-ui="unified"][data-design-library]) .fb-pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: var(--space-2); }
+    :where([data-ui="unified"][data-design-library]) .fb-tier { display: grid; gap: var(--space-1); padding: var(--space-2); border: 1px solid var(--ui-line); border-radius: var(--radius-sm); background: var(--ui-surface); }
+    :where([data-ui="unified"][data-design-library]) :is(.fb-tier-price, .tier-price, .tier-total) { font-variant-numeric: tabular-nums; white-space: nowrap; }
+    :where([data-ui="unified"][data-design-library]) .fb-tier-price { font-weight: 700; }
+    :where([data-ui="unified"][data-design-library]) :is(.image-modal-overlay, .al-modal-overlay) { position: fixed; inset: 0; z-index: var(--z-modal); display: flex; align-items: center; justify-content: center; padding: var(--space-5); background: rgb(0 0 0 / 80%); }
+    :where([data-ui="unified"][data-design-library]) .image-modal-overlay img { max-width: calc(100% - 96px); max-height: 85dvh; object-fit: contain; }
+    :where([data-ui="unified"][data-design-library]) .image-modal-close { position: absolute; top: var(--space-4); right: var(--space-4); }
+    :where([data-ui="unified"][data-design-library]) .modal-nav { position: absolute; top: 50%; }
+    :where([data-ui="unified"][data-design-library]) .modal-prev { left: var(--space-3); }
+    :where([data-ui="unified"][data-design-library]) .modal-next { right: var(--space-3); }
+    :where([data-ui="unified"][data-design-library]) .modal-counter { position: absolute; bottom: var(--space-4); color: var(--color-on-brand); }
+    :where([data-ui="unified"][data-design-library]) .al-modal-content { position: relative; width: min(900px, 100%); max-height: calc(100dvh - 48px); padding: var(--space-5); overflow: auto; border-radius: var(--radius-lg); background: var(--ui-surface); }
+    :where([data-ui="unified"][data-design-library]) .al-modal-close { float: right; margin: 0 0 var(--space-3) var(--space-3); }
+    :where([data-ui="unified"][data-design-library]) .al-modal-title { margin: 0 0 var(--space-4); font-size: var(--font-size-xl); }
+    :where([data-ui="unified"][data-design-library]) .al-tables { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-5); }
+    :where([data-ui="unified"][data-design-library]) .al-table-section { min-width: 0; }
+    :where([data-ui="unified"][data-design-library]) .al-table-heading { font-size: var(--font-size-base); }
+    :where([data-ui="unified"][data-design-library]) .al-table { width: 100%; font-size: var(--font-size-sm); }
+    :where([data-ui="unified"][data-design-library]) .al-table :is(th, td) { padding: var(--space-3) var(--space-2); }
+    :where([data-ui="unified"][data-design-library]) :is(.al-badge, .ltm-tag) { display: inline-block; padding: var(--space-1); border-radius: var(--radius-sm); color: var(--ui-accent); background: var(--ui-tint); font-size: var(--font-size-sm); white-space: nowrap; }
+    :where([data-ui="unified"][data-design-library]) [data-cb-name="data-row"] dl { margin: 0; }
+    :where([data-ui="unified"][data-design-library]) [data-cb-name="data-row"] dt { margin-top: var(--space-3); color: var(--ui-muted); font-size: var(--font-size-sm); }
+    :where([data-ui="unified"][data-design-library]) [data-cb-name="data-row"] dd { margin: var(--space-1) 0; overflow-wrap: anywhere; }
+    :where([data-ui="unified"][data-design-library]) .card-actions { display: flex; gap: var(--space-3); margin-top: var(--space-4); }
+    :where([data-ui="unified"][data-design-library]) :is(.caspio-fail, .empty-state, .loading-spinner) { padding: var(--space-5); margin-block: var(--space-4); border: 1px solid var(--ui-line); border-radius: var(--radius-card); background: var(--ui-surface); }
+    :where([data-ui="unified"][data-design-library]) .caspio-fail { color: var(--color-danger-ink); background: var(--color-danger-bg); }
+    :where([data-ui="unified"][data-design-library]) :is(.result-count-badge, .keyboard-hint) { margin-block: var(--space-3); }
+    :where([data-ui="unified"][data-design-library]) .sticky-search-bar { display: none; position: fixed; top: 0; left: 0; right: 0; z-index: var(--z-sticky); background: var(--ui-surface); border-bottom: 2px solid var(--ui-accent); }
+    :where([data-ui="unified"][data-design-library]) .sticky-search-bar.visible { display: block; }
+    :where([data-ui="unified"][data-design-library]) .sticky-content { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); max-width: 1440px; margin: auto; padding: var(--space-3) var(--space-4); }
+    :where([data-ui="unified"][data-design-library]) .sticky-chip { padding: var(--space-1) var(--space-2); border: 1px solid var(--ui-line); border-radius: var(--radius-sm); font-size: var(--font-size-sm); }
+    :where([data-ui="unified"][data-design-library]) .sticky-edit-btn { margin-left: auto; }
+    :where([data-ui="unified"][data-design-library]) .toast { position: fixed; bottom: var(--space-5); right: var(--space-5); z-index: var(--z-modal); max-width: calc(100% - 48px); padding: var(--space-4); border: 1px solid var(--ui-line); border-radius: var(--radius-card); background: var(--ui-surface); color: var(--ui-ink); box-shadow: var(--shadow-sm); }
+    :where([data-ui="unified"][data-design-library]) .toast-error { background: var(--color-danger-bg); color: var(--color-danger-ink); }
+    :where([data-ui="unified"][data-design-library]) .sr-copy { position: fixed; opacity: 0; left: -9999px; }
+
+    @media screen and (width <= 700px) {
+        :where([data-ui="unified"][data-design-library]) .al-tables { grid-template-columns: minmax(0, 1fr); }
+        :where([data-ui="unified"][data-design-library]) :is(.al-modal-overlay, .al-modal-content) { padding: var(--space-3); }
+        :where([data-ui="unified"][data-design-library]) .al-modal-content { max-height: calc(100dvh - 24px); }
+    }
+
+    @media print {
+        @page design-library { size: letter portrait; margin: 0.4in; }
+        :where([data-ui="unified"][data-design-library]) { page: design-library; --design-record-font-size: 12px; --design-preview-height: 100px; --design-heading-size: var(--font-size-base); font-size: 11px; background: var(--ui-surface); }
+        :where([data-ui="unified"][data-design-library]) .dash-shell { display: block; background: var(--ui-surface); }
+        :where([data-ui="unified"][data-design-library]) .dash-content { padding: 0; }
+        :where([data-ui="unified"][data-design-library]) .caspio-container { padding: 0; border: 0; }
+        :where([data-ui="unified"][data-design-library]) :is(.sticky-search-bar, .card-actions, .card-details-toggle, .al-pricing-btn, .keyboard-hint, .toast) { display: none; }
+        :where([data-ui="unified"][data-design-library]) .design-result-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-3); }
+        :where([data-ui="unified"][data-design-library]) [data-cb-name="data-row"] { break-inside: avoid; padding: var(--space-3); }
+        :where([data-ui="unified"][data-design-library]) :is(.card-image-item img, [data-cb-name="data-row"] dd img) { height: 100px; }
+        :where([data-ui="unified"][data-design-library]) :is(.card-meta, .card-details, .card-header h3 span) { font-size: inherit; }
+    }
+}

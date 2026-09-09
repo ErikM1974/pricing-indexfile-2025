@@ -48,7 +48,7 @@
         }
     }
 
-    function fallbackCopy(text, designNum) {
+    function fallbackCopy(text, designNum, isNumber) {
         var ta = document.createElement('textarea');
         ta.value = text;
         ta.className = 'sr-copy';
@@ -56,10 +56,10 @@
         document.body.appendChild(ta);
         ta.select();
         try {
-            document.execCommand('copy');
-            showToast('Image link copied for ' + designNum + '!', 'success');
+            if (!document.execCommand('copy')) throw new Error('Clipboard unavailable');
+            showToast(isNumber ? 'Copied: ' + designNum : 'Image link copied for ' + designNum + '!', 'success');
         } catch (e) {
-            showToast('Could not copy link', 'error');
+            showToast(isNumber ? 'Could not copy design number' : 'Could not copy link', 'error');
         }
         document.body.removeChild(ta);
     }
@@ -74,9 +74,9 @@
         if (navigator.clipboard && navigator.clipboard.writeText) {
             navigator.clipboard.writeText(designNum).then(function() {
                 showToast('Copied: ' + designNum, 'success');
-            });
+            }).catch(function() { fallbackCopy(designNum, designNum, true); });
         } else {
-            fallbackCopy(designNum, designNum);
+            fallbackCopy(designNum, designNum, true);
         }
     }
 
@@ -108,6 +108,7 @@
         modalImg.src = src;
         updateModalCounter();
         modal.classList.add('active');
+        window.UiDialog.open(modal, { focus: '#image-modal-close', onDismiss: closeModal });
         setTimeout(function () { var c = document.getElementById('image-modal-close'); if (c) c.focus(); }, 30);
     }
 
@@ -129,6 +130,7 @@
     function closeModal() {
         if (!modal.classList.contains('active')) return;
         modal.classList.remove('active');
+        window.UiDialog.close(modal);
         modalImg.src = '';
         if (modalReturnFocus && document.body.contains(modalReturnFocus)) { try { modalReturnFocus.focus(); } catch (e) { /* gone */ } }
         modalReturnFocus = null;
@@ -179,7 +181,7 @@
         note.textContent = 'The Caspio list did not load. Check your connection, then ';
         var retry = document.createElement('button');
         retry.type = 'button';
-        retry.className = 'caspio-fail-retry';
+        retry.className = 'caspio-fail-retry btn btn-secondary';
         retry.textContent = 'Reload the page';
         retry.addEventListener('click', function () { window.location.reload(); });
         note.appendChild(retry);
@@ -221,6 +223,7 @@
 
         var labels = form.querySelectorAll('.cbFormLabelCell');
         labels.forEach(function(label) {
+            if (label.closest('.form-field-group')) return;
             var field = label.nextElementSibling;
             if (field && field.classList.contains('cbFormFieldCell')) {
                 var wrapper = document.createElement('div');
@@ -249,7 +252,12 @@
        =========================== */
     function cleanupResults() {
         var cards = container.querySelectorAll('[data-cb-name="data-row"]');
-        if (!cards.length) return;
+        if (!cards.length) {
+            updateResultCount();
+            if (container.querySelector('.cbResultSetError, .cbResultSetNavigationMessages, .cbResultSetNavigationTable')) hideLoading();
+            checkEmptyState();
+            return;
+        }
 
         cards.forEach(function(card) {
             if (card.dataset.cleaned) return;
@@ -285,8 +293,8 @@
                 var actions = document.createElement('div');
                 actions.className = 'card-actions';
                 actions.innerHTML =
-                    '<button type="button" class="card-action-btn card-copy-btn" title="Copy design number" aria-label="Copy design number"><i class="fa-regular fa-copy" aria-hidden="true"></i></button>' +
-                    '<button type="button" class="card-action-btn card-share-btn" title="Copy image link for customer" aria-label="Copy image link for customer"><i class="fa-solid fa-share-from-square" aria-hidden="true"></i></button>';
+                    '<button type="button" class="card-action-btn card-copy-btn btn btn-secondary" title="Copy design number" aria-label="Copy design number"><i class="fa-regular fa-copy" aria-hidden="true"></i></button>' +
+                    '<button type="button" class="card-action-btn card-share-btn btn btn-secondary" title="Copy image link for customer" aria-label="Copy image link for customer"><i class="fa-solid fa-share-from-square" aria-hidden="true"></i></button>';
                 card.appendChild(actions);
             }
 
@@ -341,7 +349,8 @@
         }
 
         existing.setAttribute('role', 'status');
-        existing.innerHTML = '<i class="fa-solid fa-layer-group" aria-hidden="true"></i> ' + totalText;
+        var markup = '<i class="fa-solid fa-layer-group" aria-hidden="true"></i> ' + totalText;
+        if (existing.innerHTML !== markup) existing.innerHTML = markup;
     }
 
     /* ===========================
@@ -391,7 +400,9 @@
         }
 
         /* Check if Caspio has finished loading (has navigation or error element) */
-        var hasNav = container.querySelector('.cbResultSetNavigationTable, .cbResultSetError');
+        var providerError = container.querySelector('.cbResultSetError');
+        if (providerError) { if (existing) existing.remove(); return; }
+        var hasNav = container.querySelector('.cbResultSetNavigationTable');
         var hasMessage = container.querySelector('.cbResultSetNavigationMessages');
         var messageText = hasMessage ? hasMessage.textContent : '';
         var hasZero = messageText.indexOf('0') > -1 || messageText.indexOf('No records') > -1;
@@ -416,15 +427,16 @@
     /* ===========================
        10. Sticky Search Summary Bar
        =========================== */
-    var searchFormObserved = false;
+    var searchFormObserved = null;
+    var stickyObserver = null;
 
     function setupStickyBar() {
-        if (searchFormObserved) return;
         var form = container.querySelector('form');
-        if (!form) return;
-        searchFormObserved = true;
+        if (!form || searchFormObserved === form) return;
+        if (stickyObserver) stickyObserver.disconnect();
+        searchFormObserved = form;
 
-        var io = new IntersectionObserver(function(entries) {
+        stickyObserver = new IntersectionObserver(function(entries) {
             entries.forEach(function(entry) {
                 if (!entry.isIntersecting) {
                     stickyBar.classList.add('visible');
@@ -434,7 +446,7 @@
             });
         }, { threshold: 0, rootMargin: '-80px 0px 0px 0px' });
 
-        io.observe(form);
+        stickyObserver.observe(form);
     }
 
     function buildStickyBar(form) {
@@ -468,9 +480,9 @@
         });
 
         if (chips.length === 0) {
-            stickyBar.innerHTML = '<div class="sticky-content"><span class="sticky-label">Showing all designs</span><button type="button" class="sticky-edit-btn" data-call="scrollToCaspioSearch">Edit Search</button></div>';
+            stickyBar.innerHTML = '<div class="sticky-content"><span class="sticky-label">Showing all designs</span><button type="button" class="sticky-edit-btn btn btn-secondary" data-call="scrollToCaspioSearch">Edit Search</button></div>';
         } else {
-            stickyBar.innerHTML = '<div class="sticky-content"><span class="sticky-label">Filtered by:</span>' + chips.join('') + '<button type="button" class="sticky-edit-btn" data-call="scrollToCaspioSearch">Edit Search</button></div>';
+            stickyBar.innerHTML = '<div class="sticky-content"><span class="sticky-label">Filtered by:</span>' + chips.join('') + '<button type="button" class="sticky-edit-btn btn btn-secondary" data-call="scrollToCaspioSearch">Edit Search</button></div>';
         }
     }
 

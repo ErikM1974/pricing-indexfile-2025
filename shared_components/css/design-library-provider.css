@@ -1,0 +1,149 @@
+/* Caspio boundary only: its generated unlayered ID selectors and responsive rules
+ * outrank app layers and hide nested search fields on phones. These declarations
+ * map those provider controls to shared tokens; local app UI needs no exceptions.
+ * Each important declaration is individually inventoried in the migration manifest.
+ */
+/* stylelint-disable declaration-no-important -- bounded Caspio generated-style adapter, verified against the actual provider form */
+@layer components.pages {
+    :where([data-ui="unified"][data-design-library]) .caspio-container form > div {
+        display: block !important;
+        width: 100% !important;
+    }
+
+    :where([data-ui="unified"][data-design-library]) .caspio-container .design-search-fields {
+        display: grid !important;
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)) !important;
+        gap: var(--space-4) !important;
+        width: 100% !important;
+    }
+
+    :where([data-ui="unified"][data-design-library]) .caspio-container :is(.form-field-group, .cbFormNestedTableContainer, .cbFormLabelCell, .cbFormFieldCell) {
+        display: block !important;
+        grid-area: auto !important;
+        min-width: 0 !important;
+        width: auto !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        font: inherit !important;
+        color: var(--ui-ink) !important;
+    }
+
+    :where([data-ui="unified"][data-design-library]) .caspio-container .cbFormLabelCell {
+        margin-bottom: var(--space-2) !important;
+    }
+
+    :where([data-ui="unified"][data-design-library]) .caspio-container .field-input {
+        width: 100% !important;
+        min-height: var(--ui-control-height) !important;
+        padding: var(--space-2) var(--space-3) !important;
+        font: inherit !important;
+        border: 1px solid var(--ui-line-strong) !important;
+        border-radius: var(--radius-sm) !important;
+        color: var(--ui-ink) !important;
+        background: var(--ui-surface) !important;
+    }
+
+    :where([data-ui="unified"][data-design-library]) .caspio-container .cbSearchButtonContainer {
+        display: block !important;
+        grid-column: 1 / -1 !important;
+        grid-row: auto !important;
+        margin: var(--space-3) 0 !important;
+        padding: 0 !important;
+        text-align: left !important;
+    }
+
+    :where([data-ui="unified"][data-design-library]) .caspio-container .cbSearchButtonContainerM {
+        display: none !important;
+    }
+
+    :where([data-ui="unified"][data-design-library]) .caspio-container .cbSearchButton {
+        width: auto !important;
+        min-height: var(--ui-control-height) !important;
+        padding: var(--space-2) var(--space-4) !important;
+        font: inherit !important;
+        color: var(--color-on-brand) !important;
+        background: var(--ui-accent) !important;
+        border: 1px solid var(--ui-accent) !important;
+        border-radius: var(--radius-sm) !important;
+    }
+
+    :where([data-ui="unified"][data-design-library]) .caspio-container .design-result-grid {
+        display: grid !important;
+        grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)) !important;
+        gap: var(--space-5) !important;
+        width: 100% !important;
+    }
+
+    :where([data-ui="unified"][data-design-library]) .caspio-container [data-cb-name="data-row"] {
+        display: block !important;
+        width: auto !important;
+        height: auto !important;
+        min-width: 0 !important;
+        font: var(--design-record-font-size)/var(--line-height-base) var(--ui-font) !important;
+        padding: var(--space-4) !important;
+        border: 1px solid var(--ui-line) !important;
+        border-top: 3px solid var(--ui-accent) !important;
+        border-radius: var(--radius-card) !important;
+        background: var(--ui-surface) !important;
+    }
+
+    :where([data-ui="unified"][data-design-library]) .caspio-container .cbResultSetPanelDataContainer {
+        margin: 0 !important;
+        font: inherit !important;
+    }
+
+    :where([data-ui="unified"][data-design-library]) .caspio-container .cbResultSetPanelDataContainer :is(dt, dd) {
+        display: block !important;
+        float: none !important;
+        width: auto !important;
+        font: inherit !important;
+        padding: 0 !important;
+        color: var(--ui-ink) !important;
+    }
+
+    :where([data-ui="unified"][data-design-library]) .caspio-container .cbResultSetPanelDataContainer dt {
+        margin: var(--space-3) 0 var(--space-1) !important;
+        color: var(--ui-muted) !important;
+        font-size: var(--font-size-sm) !important;
+    }
+
+    :where([data-ui="unified"][data-design-library]) .caspio-container .cbResultSetPanelDataContainer dd {
+        margin: 0 !important;
+    }
+
+    :where([data-ui="unified"][data-design-library]) .caspio-container .cbResultSetPanelDataContainer img {
+        width: 100% !important;
+        height: var(--design-preview-height) !important;
+        margin: var(--space-3) 0 !important;
+    }
+
+    :where([data-ui="unified"][data-design-library]) .caspio-container :is(input, select, textarea, img[role="button"]):focus-visible {
+        outline: 2px solid var(--ui-accent) !important;
+        outline-offset: 3px !important;
+    }
+
+    :where([data-ui="unified"][data-design-library]) .caspio-container [data-cb-name="data-row"] > div {
+        padding: 0 !important;
+        font: inherit !important;
+    }
+
+    :where([data-ui="unified"][data-design-library]) .caspio-container .card-content > div {
+        font: inherit !important;
+    }
+
+    :where([data-ui="unified"][data-design-library]) .caspio-container .card-header h3 {
+        font: 700 var(--design-heading-size)/var(--line-height-base) var(--ui-font) !important;
+        color: var(--ui-ink) !important;
+    }
+
+    :where([data-ui="unified"][data-design-library]) .caspio-container .card-header h3 span {
+        font: 400 var(--font-size-sm)/var(--line-height-base) var(--ui-font) !important;
+        color: var(--ui-muted) !important;
+    }
+
+    @media print {
+        :where([data-ui="unified"][data-design-library]) .caspio-container .design-result-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        }
+    }
+}

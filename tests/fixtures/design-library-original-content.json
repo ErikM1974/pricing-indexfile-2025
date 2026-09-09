@@ -1,0 +1,276 @@
+{
+  "base": "694e88c7e04f18797427d8f4d81207ddf9c679e2",
+  "pages": [
+    {
+      "file": "dashboards/digitized-designs.html",
+      "title": "Digitized Design Master List 2026 - Northwest Custom Apparel",
+      "mainText": "Digitized Design Master List 2026",
+      "headerText": null,
+      "ids": [
+        "image-modal",
+        "image-modal-close",
+        "al-modal",
+        "al-modal-title",
+        "al-design-label",
+        "al-source-note",
+        "al-stitch-info",
+        "al-garment-base",
+        "al-garment-table",
+        "al-garment-footnote",
+        "al-cap-base",
+        "al-cap-table",
+        "al-cap-footnote"
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "label": "Back to Dashboard"
+        }
+      ],
+      "images": [
+        {
+          "src": "https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1",
+          "alt": "Northwest Custom Apparel"
+        },
+        {
+          "src": null,
+          "alt": "Design preview"
+        }
+      ],
+      "scripts": [
+        "/config/app.config.js",
+        "https://c3eku948.caspio.com/dp/a0e1500091d2864405df4b1db655/emb",
+        "/dashboards/js/digitized-designs.js?v=2026.09.06.31"
+      ]
+    },
+    {
+      "file": "dashboards/old-designs.html",
+      "title": "Old Designs Archive - Northwest Custom Apparel",
+      "mainText": "Old Designs Archive Search archived designs from Megafile directories",
+      "headerText": null,
+      "ids": [
+        "image-modal",
+        "image-modal-close",
+        "sticky-search-bar",
+        "toast-container"
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "label": "Back to Dashboard"
+        }
+      ],
+      "images": [
+        {
+          "src": "https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1",
+          "alt": "Northwest Custom Apparel"
+        },
+        {
+          "src": null,
+          "alt": "Design preview"
+        }
+      ],
+      "scripts": [
+        "https://c3eku948.caspio.com/dp/a0e150006e417291bd264106a505/emb",
+        "/shared_components/js/data-call-delegator.js?v=2026.09.06.27",
+        "/shared_components/js/old-designs.js?v=2026.09.07.33"
+      ]
+    }
+  ],
+  "hashes": {
+    "dashboards/js/digitized-designs.js": "4b1579365ac8fe09cdb1cb5d4ebb4167f878a4823c8eec0ae6df8ec3f889ec8f",
+    "shared_components/js/old-designs.js": "ef12882c403c50b4e649fee25154276bd17563ec62686765bdc12df2695d7463",
+    "shared_components/js/box-url.js": "3daf0620159f6c8f4bf5929e90476030307aaf4ecbdcaa1a066d5c8a98e0935f",
+    "shared_components/js/data-call-delegator.js": "50e836385b6804b2b52fd8c549744277fe69ff701c232b7badf4fdcb09f343f6",
+    "shared_components/js/dash-page-helpers.js": "4ce7902b8502978835949ecec36a95d27ebc2604f86ef1a9665353cd8c38ccbe",
+    "shared_components/js/fetch-timeout.js": "1d9852795f9af3b674a48ad5e719bc970cae867e36b1962f0c3f1a28dd830179"
+  },
+  "changes": [
+    {
+      "file": "dashboards/js/digitized-designs.js",
+      "from": "class=\"card-details-toggle\"",
+      "to": "class=\"card-details-toggle btn btn-secondary\"",
+      "kind": "presentation"
+    },
+    {
+      "file": "dashboards/js/digitized-designs.js",
+      "from": "class=\"al-pricing-btn\"",
+      "to": "class=\"al-pricing-btn btn btn-secondary\"",
+      "kind": "presentation"
+    },
+    {
+      "file": "dashboards/js/digitized-designs.js",
+      "from": "class=\"mockup-link\"",
+      "to": "class=\"mockup-link btn btn-secondary\"",
+      "kind": "presentation"
+    },
+    {
+      "file": "dashboards/js/digitized-designs.js",
+      "from": "class=\"mockup-link\"",
+      "to": "class=\"mockup-link btn btn-secondary\"",
+      "kind": "presentation"
+    },
+    {
+      "file": "shared_components/js/old-designs.js",
+      "from": "class=\"card-action-btn card-copy-btn\"",
+      "to": "class=\"card-action-btn card-copy-btn btn btn-secondary\"",
+      "kind": "presentation"
+    },
+    {
+      "file": "shared_components/js/old-designs.js",
+      "from": "class=\"card-action-btn card-share-btn\"",
+      "to": "class=\"card-action-btn card-share-btn btn btn-secondary\"",
+      "kind": "presentation"
+    },
+    {
+      "file": "shared_components/js/old-designs.js",
+      "from": "class=\"sticky-edit-btn\"",
+      "to": "class=\"sticky-edit-btn btn btn-secondary\"",
+      "kind": "presentation"
+    },
+    {
+      "file": "shared_components/js/old-designs.js",
+      "from": "class=\"sticky-edit-btn\"",
+      "to": "class=\"sticky-edit-btn btn btn-secondary\"",
+      "kind": "presentation"
+    },
+    {
+      "file": "dashboards/js/digitized-designs.js",
+      "from": "retry.className = 'caspio-fail-retry';",
+      "to": "retry.className = 'caspio-fail-retry btn btn-secondary';",
+      "kind": "presentation"
+    },
+    {
+      "file": "shared_components/js/old-designs.js",
+      "from": "retry.className = 'caspio-fail-retry';",
+      "to": "retry.className = 'caspio-fail-retry btn btn-secondary';",
+      "kind": "presentation"
+    },
+    {
+      "file": "dashboards/js/digitized-designs.js",
+      "from": "                modal.classList.add('active');",
+      "to": "                modal.classList.add('active');\n                window.UiDialog.open(modal, { focus: '#image-modal-close', onDismiss: closeImageModal });",
+      "kind": "dialog"
+    },
+    {
+      "file": "dashboards/js/digitized-designs.js",
+      "from": "                modal.classList.remove('active');",
+      "to": "                modal.classList.remove('active');\n                window.UiDialog.close(modal);",
+      "kind": "dialog"
+    },
+    {
+      "file": "dashboards/js/digitized-designs.js",
+      "from": "                alModal.classList.add('active');",
+      "to": "                alModal.classList.add('active');\n                window.UiDialog.open(alModal, { focus: '.al-modal-close', onDismiss: closeALModal });",
+      "kind": "dialog"
+    },
+    {
+      "file": "dashboards/js/digitized-designs.js",
+      "from": "                alModal.classList.remove('active');",
+      "to": "                alModal.classList.remove('active');\n                window.UiDialog.close(alModal);",
+      "kind": "dialog"
+    },
+    {
+      "file": "shared_components/js/old-designs.js",
+      "from": "        modal.classList.add('active');",
+      "to": "        modal.classList.add('active');\n        window.UiDialog.open(modal, { focus: '#image-modal-close', onDismiss: closeModal });",
+      "kind": "dialog"
+    },
+    {
+      "file": "shared_components/js/old-designs.js",
+      "from": "        modal.classList.remove('active');",
+      "to": "        modal.classList.remove('active');\n        window.UiDialog.close(modal);",
+      "kind": "dialog"
+    },
+    {
+      "file": "shared_components/js/old-designs.js",
+      "from": "        labels.forEach(function(label) {",
+      "to": "        labels.forEach(function(label) {\n            if (label.closest('.form-field-group')) return;",
+      "kind": "provider-layout"
+    },
+    {
+      "file": "shared_components/js/old-designs.js",
+      "from": "            document.execCommand('copy');",
+      "to": "            if (!document.execCommand('copy')) throw new Error('Clipboard unavailable');",
+      "kind": "visible-copy-failure"
+    },
+    {
+      "file": "shared_components/js/old-designs.js",
+      "from": "                showToast('Copied: ' + designNum, 'success');\n            });",
+      "to": "                showToast('Copied: ' + designNum, 'success');\n            }).catch(function() { fallbackCopy(designNum, designNum); });",
+      "kind": "visible-copy-failure"
+    },
+    {
+      "file": "shared_components/js/old-designs.js",
+      "from": "        var hasNav = container.querySelector('.cbResultSetNavigationTable, .cbResultSetError');",
+      "to": "        var providerError = container.querySelector('.cbResultSetError');\n        if (providerError) { if (existing) existing.remove(); return; }\n        var hasNav = container.querySelector('.cbResultSetNavigationTable');",
+      "kind": "visible-provider-error"
+    },
+    {
+      "file": "dashboards/js/digitized-designs.js",
+      "from": "                        if (!d || !d.garments || !d.garments.basePrices || !d.caps || !d.caps.basePrices) throw new Error('unexpected shape');",
+      "to": "                        var amount = function (value) { return value !== null && value !== '' && Number.isFinite(Number(value)) && Number(value) >= 0; };\n                        if (!d || ['garments', 'caps'].some(function (cat) {\n                            var item = d[cat];\n                            return !item || !item.basePrices || AL_TIERS.some(function (tier) { return !amount(item.basePrices[tier]); }) ||\n                                !amount(item.baseStitches) || Number(item.baseStitches) <= 0 || !amount(item.perThousandUpcharge) || !amount(item.ltmFee);\n                        })) throw new Error('incomplete pricing response');",
+      "kind": "visible-incomplete-pricing"
+    },
+    {
+      "file": "shared_components/js/old-designs.js",
+      "from": "function fallbackCopy(text, designNum) {",
+      "to": "function fallbackCopy(text, designNum, isNumber) {",
+      "kind": "clipboard feedback"
+    },
+    {
+      "file": "shared_components/js/old-designs.js",
+      "from": "            showToast('Image link copied for ' + designNum + '!', 'success');\n        } catch (e)",
+      "to": "            showToast(isNumber ? 'Copied: ' + designNum : 'Image link copied for ' + designNum + '!', 'success');\n        } catch (e)",
+      "kind": "clipboard feedback"
+    },
+    {
+      "file": "shared_components/js/old-designs.js",
+      "from": "showToast('Could not copy link', 'error');",
+      "to": "showToast(isNumber ? 'Could not copy design number' : 'Could not copy link', 'error');",
+      "kind": "clipboard feedback"
+    },
+    {
+      "file": "shared_components/js/old-designs.js",
+      "from": "fallbackCopy(designNum, designNum);",
+      "to": "fallbackCopy(designNum, designNum, true);",
+      "kind": "clipboard feedback"
+    },
+    {
+      "file": "shared_components/js/old-designs.js",
+      "from": "fallbackCopy(designNum, designNum);",
+      "to": "fallbackCopy(designNum, designNum, true);",
+      "kind": "clipboard feedback"
+    },
+    {
+      "file": "shared_components/js/old-designs.js",
+      "from": "        if (!cards.length) return;\n\n        cards.forEach",
+      "to": "        if (!cards.length) {\n            updateResultCount();\n            if (container.querySelector('.cbResultSetError, .cbResultSetNavigationMessages, .cbResultSetNavigationTable')) hideLoading();\n            checkEmptyState();\n            return;\n        }\n\n        cards.forEach",
+      "kind": "UI state"
+    },
+    {
+      "file": "shared_components/js/old-designs.js",
+      "from": "        existing.innerHTML = '<i class=\"fa-solid fa-layer-group\" aria-hidden=\"true\"></i> ' + totalText;",
+      "to": "        var markup = '<i class=\"fa-solid fa-layer-group\" aria-hidden=\"true\"></i> ' + totalText;\n        if (existing.innerHTML !== markup) existing.innerHTML = markup;",
+      "kind": "avoid repeated DOM mutation"
+    },
+    {
+      "file": "shared_components/js/old-designs.js",
+      "from": "    var searchFormObserved = false;",
+      "to": "    var searchFormObserved = null;\n    var stickyObserver = null;",
+      "kind": "provider form replacement"
+    },
+    {
+      "file": "shared_components/js/old-designs.js",
+      "from": "        if (searchFormObserved) return;\n        var form = container.querySelector('form');\n        if (!form) return;\n        searchFormObserved = true;\n\n        var io = new IntersectionObserver",
+      "to": "        var form = container.querySelector('form');\n        if (!form || searchFormObserved === form) return;\n        if (stickyObserver) stickyObserver.disconnect();\n        searchFormObserved = form;\n\n        stickyObserver = new IntersectionObserver",
+      "kind": "provider form replacement"
+    },
+    {
+      "file": "shared_components/js/old-designs.js",
+      "from": "        io.observe(form);",
+      "to": "        stickyObserver.observe(form);",
+      "kind": "provider form replacement"
+    }
+  ]
+}

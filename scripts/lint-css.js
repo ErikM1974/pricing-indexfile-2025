@@ -22,6 +22,8 @@ const CSS_LINT_SCOPE = [
     'shared_components/css/staff-import-tools.css',
     'shared_components/css/purchasing-workspaces.css',
     'shared_components/css/photo-workspaces.css',
+    'shared_components/css/design-libraries.css',
+    'shared_components/css/design-library-provider.css',
     'shared_components/css/vendor-invoice.css',
     'shared_components/css/api-reference.css',
     // Step 1 (2026-09-07): the two token files
