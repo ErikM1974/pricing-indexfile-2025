@@ -413,3 +413,15 @@ Worktree codex/training-final-family (base 20d3e247) implements Training Center,
 ### Final training print follow-up
 
 Actual print review found the tax exercise forced onto a new page and repeated simulator controls consuming five pages. Scoped print rules now keep directory at two pages, tax challenge at one, basic setup at one and expanded simulator at two. Four real-PDF cases added; all 21 family browser cases passed, followed by four final print cases. Original fields/course material remain unchanged. Review port 3416 is isolated from the primary release suite on 3400. Source CSS now 21% smaller including the new print contract.
+
+## API reference family plan — 2026-09-08
+
+Work continues with standing edit/deploy authorization. Isolated worktree training-final-worktree now uses branch codex/api-reference-family, based on exact .16 source 76a52b66. Primary .16 deployment remains independent. No API reference changes are live yet.
+
+- [x] Save original static prose, links, fields and reference-data AST hashes for Caspio, ManageOrders, SanMar and ShopWorks ODBC; capture desktop/phone baselines. Artifact api-reference-original-baseline.json is based on 76a52b66.
+- [ ] Replace art-hub/dash-shell dependencies with shared scoped reference layout, tokens and controls; use Public Sans, restrained forest accents, readable endpoint/field tables and useful phone layouts.
+- [ ] Preserve technical content, service/schema paths, identifiers and access gates. Keep descriptions visible on phones; add keyboard table scrolling, labeled searches/status counts and native ODBC disclosure controls. Honor reduced motion and fragment navigation.
+- [ ] Verify failed/malformed/empty ODBC catalog and retry without losing the search. Preserve source catalog and never call business services in browser checks.
+- [ ] Lock original data/content; review four widths, search cases, keyboard, complete printing and access protections; run required full release gates and exact-source CI before release.
+
+Baseline each page loads 169,584–173,804 raw CSS bytes including shared dependencies. Four-page completion would bring the census to 64 reviewed / 161 pending of 225. This is a candidate outcome, not a live count. All original artifacts are in C:/Users/erik/.codex/visualizations/2026/09/07/01a07d90-9a4c-7e70-9e4e-c196377b7c6b. Do not rerun baseline capture or reset this worktree.
