@@ -1,0 +1,448 @@
+{
+  "base": "5664f53f64a01cec66cb23c9390243e78b9dd018",
+  "pages": [
+    {
+      "file": "dashboards/finished-photos.html",
+      "title": "Finished Photos — Capture | NWCA Staff",
+      "bodyText": "Finished Photos Snap the finished piece → publish it to the customer’s portal ← Dashboard 1Find the order ▣Scan #Order # ⚲Search 📷 Scan the work-order barcode Bottom of the work order · or the design-sheet barcode Find Top-right of the work order. Design #s from the design sheet work too. A handheld scanner can type straight into this box. Change 2Design Tap the design this photo is for — it files the photo next to that logo on the portal. No specific design — general photo Change 3Photo Clean shot = happy customer: plain background, garment flat or on a form, logo filling the frame. 📷 Take a photo 🖼️ Choose from album ↺ Retake Front Back Left chest Sleeve Cap Upload photo ✓On file for this customer New photos stay hidden until you publish them. Only published photos appear on the customer’s portal. No photos for this customer yet. Scan the barcode × Starting camera… ×",
+      "mainText": "1Find the order ▣Scan #Order # ⚲Search 📷 Scan the work-order barcode Bottom of the work order · or the design-sheet barcode Find Top-right of the work order. Design #s from the design sheet work too. A handheld scanner can type straight into this box. Change 2Design Tap the design this photo is for — it files the photo next to that logo on the portal. No specific design — general photo Change 3Photo Clean shot = happy customer: plain background, garment flat or on a form, logo filling the frame. 📷 Take a photo 🖼️ Choose from album ↺ Retake Front Back Left chest Sleeve Cap Upload photo ✓On file for this customer New photos stay hidden until you publish them. Only published photos appear on the customer’s portal. No photos for this customer yet.",
+      "headerText": "Finished Photos Snap the finished piece → publish it to the customer’s portal ← Dashboard",
+      "ids": [
+        "fp-logo",
+        "fp-step-find",
+        "fp-find-picker",
+        "fp-mode-scan",
+        "fp-mode-order",
+        "fp-mode-search",
+        "fp-pane-scan",
+        "fp-scan-open",
+        "fp-pane-order",
+        "fp-order-input",
+        "fp-order-find",
+        "fp-pane-search",
+        "fp-cust-search",
+        "fp-cust-results",
+        "fp-find-status",
+        "fp-cust-chosen",
+        "fp-cust-name",
+        "fp-cust-id",
+        "fp-order-chip",
+        "fp-cust-change",
+        "fp-step-design",
+        "fp-design-hint",
+        "fp-design-grid",
+        "fp-design-none",
+        "fp-design-chosen",
+        "fp-design-name",
+        "fp-design-num",
+        "fp-design-change",
+        "fp-step-photo",
+        "fp-file",
+        "fp-file-album",
+        "fp-photo-btns",
+        "fp-camera-btn",
+        "fp-album-btn",
+        "fp-preview-wrap",
+        "fp-preview",
+        "fp-retake",
+        "fp-size-note",
+        "fp-caption-chips",
+        "fp-caption",
+        "fp-upload-btn",
+        "fp-status",
+        "fp-step-manage",
+        "fp-manage-list",
+        "fp-manage-empty",
+        "fp-scan-modal",
+        "fp-scan-title",
+        "fp-scan-close",
+        "fp-scan-video",
+        "fp-scan-status",
+        "fp-lightbox",
+        "fp-lightbox-close",
+        "fp-lightbox-img"
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "label": "← Dashboard"
+        }
+      ],
+      "images": [
+        {
+          "src": "https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1",
+          "alt": "Northwest Custom Apparel"
+        },
+        {
+          "src": null,
+          "alt": "Selected photo preview"
+        },
+        {
+          "src": null,
+          "alt": "Finished photo full size"
+        }
+      ],
+      "scripts": [
+        "/config/app.config.js?v=2026.09.03.11",
+        "/shared_components/js/box-url.js?v=2026.08.05.23",
+        "/dashboards/js/vendor/html5-qrcode.min.js?v=2026.07.17.11",
+        "/dashboards/js/finished-photos.js?v=2026.09.07.25"
+      ],
+      "styles": [
+        "shared_components/css/tokens.css",
+        "dashboards/css/finished-photos.css"
+      ],
+      "cssBytes": 34293
+    },
+    {
+      "file": "dashboards/finished-photos-library.html",
+      "title": "Finished Photos Library - Northwest Custom Apparel",
+      "bodyText": "Finished Photos Library Add a photo Refresh Dashboard — Photos — Live on portals — Not published yet — Accounts with photos Browse All photos Published only Hidden only Loading the photo library…",
+      "mainText": "— Photos — Live on portals — Not published yet — Accounts with photos Browse All photos Published only Hidden only Loading the photo library…",
+      "headerText": "Finished Photos Library Add a photo Refresh Dashboard",
+      "ids": [
+        "fpl-refresh",
+        "fpl-stat-total",
+        "fpl-stat-live",
+        "fpl-stat-hidden",
+        "fpl-stat-accounts",
+        "fpl-sub",
+        "fpl-rep-chips",
+        "fpl-search",
+        "fpl-visibility",
+        "fpl-body",
+        "fpl-lightbox",
+        "fpl-lightbox-close",
+        "fpl-lightbox-img",
+        "fpl-lightbox-status",
+        "fpl-lightbox-cap"
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "label": ""
+        },
+        {
+          "href": "/dashboards/finished-photos.html",
+          "label": "Add a photo"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "label": "Dashboard"
+        }
+      ],
+      "images": [
+        {
+          "src": "https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1",
+          "alt": "Northwest Custom Apparel"
+        },
+        {
+          "src": null,
+          "alt": "Finished product photo, full size"
+        }
+      ],
+      "scripts": [
+        "/config/app.config.js",
+        "/shared_components/js/fetch-timeout.js?v=2026.09.06.26",
+        "/shared_components/js/dash-page-helpers.js?v=2026.09.07.25",
+        "/shared_components/js/box-url.js?v=2026.08.05.23",
+        "/dashboards/js/finished-photos-library.js?v=2026.09.05.49"
+      ],
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/art-hub.css",
+        "shared_components/css/dash-shell.css",
+        "dashboards/css/finished-photos-library.css"
+      ],
+      "cssBytes": 164116
+    }
+  ],
+  "hashes": {
+    "dashboards/js/finished-photos.js": "73da86c2b7fa1b4815eb570672a1c2b8aa74f8a8980aea51ebafc675d74de9ab",
+    "dashboards/js/finished-photos-library.js": "b01f6c40f257092ef3625651528c993acc56ba3cee0889596945a95d10b65baa",
+    "dashboards/js/digitized-designs.js": "4b1579365ac8fe09cdb1cb5d4ebb4167f878a4823c8eec0ae6df8ec3f889ec8f",
+    "shared_components/js/old-designs.js": "ef12882c403c50b4e649fee25154276bd17563ec62686765bdc12df2695d7463",
+    "shared_components/js/box-url.js": "3daf0620159f6c8f4bf5929e90476030307aaf4ecbdcaa1a066d5c8a98e0935f",
+    "shared_components/js/data-call-delegator.js": "50e836385b6804b2b52fd8c549744277fe69ff701c232b7badf4fdcb09f343f6",
+    "shared_components/js/dash-page-helpers.js": "4ce7902b8502978835949ecec36a95d27ebc2604f86ef1a9665353cd8c38ccbe",
+    "shared_components/js/fetch-timeout.js": "1d9852795f9af3b674a48ad5e719bc970cae867e36b1962f0c3f1a28dd830179"
+  },
+  "changes": [
+    {
+      "file": "dashboards/js/finished-photos.js",
+      "from": "class=\"fp-link\"",
+      "to": "class=\"fp-link btn btn-secondary\"",
+      "kind": "presentation"
+    },
+    {
+      "file": "dashboards/js/finished-photos.js",
+      "from": "class=\"fp-link\"",
+      "to": "class=\"fp-link btn btn-secondary\"",
+      "kind": "presentation"
+    },
+    {
+      "file": "dashboards/js/finished-photos.js",
+      "from": "class=\"fp-del\"",
+      "to": "class=\"fp-del btn btn-secondary\"",
+      "kind": "presentation"
+    },
+    {
+      "file": "dashboards/js/finished-photos.js",
+      "from": "class=\"fp-result\"",
+      "to": "class=\"fp-result btn btn-secondary\"",
+      "kind": "presentation"
+    },
+    {
+      "file": "dashboards/js/finished-photos-library.js",
+      "from": "class=\"dash-btn\"",
+      "to": "class=\"dash-btn btn btn-secondary\"",
+      "kind": "presentation"
+    },
+    {
+      "file": "dashboards/js/finished-photos-library.js",
+      "from": "class=\"fpl-pub-btn\"",
+      "to": "class=\"fpl-pub-btn btn btn-secondary\"",
+      "kind": "presentation"
+    },
+    {
+      "file": "dashboards/js/finished-photos-library.js",
+      "from": "class=\"fpl-pub-btn\"",
+      "to": "class=\"fpl-pub-btn btn btn-secondary\"",
+      "kind": "presentation"
+    },
+    {
+      "file": "dashboards/js/finished-photos-library.js",
+      "from": "class=\"fpl-chip'",
+      "to": "class=\"fpl-chip btn btn-secondary'",
+      "kind": "presentation"
+    },
+    {
+      "file": "dashboards/js/finished-photos.js",
+      "from": "    // The file-input labels are the two big photo buttons — make them keyboard-operable.\n    ['fp-camera-btn', 'fp-album-btn'].forEach(function (id) {\n        var lab = el(id);\n        if (lab) lab.addEventListener('keydown', function (e) {\n            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); var inp = el(lab.getAttribute('for')); if (inp) inp.click(); }\n        });\n    });",
+      "to": "    // Visible native file inputs own photo/album keyboard selection.",
+      "kind": "native-file"
+    },
+    {
+      "file": "dashboards/js/finished-photos.js",
+      "from": "        el('fp-scan-modal').hidden = false;",
+      "to": "        window.UiDialog.open('fp-scan-modal', { focus: '#fp-scan-close', onDismiss: closeScanner });",
+      "kind": "dialog"
+    },
+    {
+      "file": "dashboards/js/finished-photos.js",
+      "from": "        el('fp-scan-modal').hidden = true;",
+      "to": "        window.UiDialog.close('fp-scan-modal');",
+      "kind": "dialog"
+    },
+    {
+      "file": "dashboards/js/finished-photos.js",
+      "from": "el('fp-lightbox').hidden = false;",
+      "to": "window.UiDialog.open('fp-lightbox', { focus: '#fp-lightbox-close', onDismiss: closeLightbox });",
+      "kind": "dialog"
+    },
+    {
+      "file": "dashboards/js/finished-photos.js",
+      "from": "        el('fp-lightbox').hidden = true; el('fp-lightbox-img').src = '';",
+      "to": "        window.UiDialog.close('fp-lightbox'); el('fp-lightbox-img').src = '';",
+      "kind": "dialog"
+    },
+    {
+      "file": "dashboards/js/finished-photos-library.js",
+      "from": "        box.hidden = false;",
+      "to": "        window.UiDialog.open(box, { focus: '#fpl-lightbox-close', onDismiss: closeLightbox });",
+      "kind": "dialog"
+    },
+    {
+      "file": "dashboards/js/finished-photos-library.js",
+      "from": "        el('fpl-lightbox').hidden = true;",
+      "to": "        window.UiDialog.close('fpl-lightbox');",
+      "kind": "dialog"
+    },
+    {
+      "file": "dashboards/js/finished-photos-library.js",
+      "from": "        truncated: 0,",
+      "to": "        truncated: 0,\n        ready: false,\n        loadSerial: 0,",
+      "kind": "load-state"
+    },
+    {
+      "file": "dashboards/js/finished-photos-library.js",
+      "from": "        DashPage.hideError();\n        el('fpl-body').innerHTML",
+      "to": "        DashPage.hideError();\n        var serial = ++state.loadSerial;\n        state.ready = false; state.photos = []; state.reps = []; state.truncated = 0;\n        ['total', 'live', 'hidden', 'accounts'].forEach(function (key) { el('fpl-stat-' + key).textContent = '—'; });\n        el('fpl-sub').textContent = '(Loading…)';\n        el('fpl-rep-chips').innerHTML = '';\n        el('fpl-body').innerHTML",
+      "kind": "load-state"
+    },
+    {
+      "file": "dashboards/js/finished-photos-library.js",
+      "from": "                state.photos = data.photos || [];\n                state.reps = data.reps || [];\n                state.truncated = data.truncated || 0;",
+      "to": "                if (serial !== state.loadSerial) return;\n                if (!data || data.success !== true || !Array.isArray(data.photos) || !Array.isArray(data.reps) ||\n                    data.photos.some(function (p) { return !p || !p.pkId || typeof p.showToCustomer !== 'boolean' || typeof p.imageUrl !== 'string'; }) ||\n                    data.reps.some(function (r) { return !r || typeof r.name !== 'string' || !Number.isInteger(r.count) || r.count < 0; }) ||\n                    !Number.isInteger(data.truncated) || data.truncated < 0) throw new Error('Incomplete photo library response');\n                state.photos = data.photos;\n                state.reps = data.reps;\n                state.truncated = data.truncated;\n                state.ready = true;",
+      "kind": "load-state"
+    },
+    {
+      "file": "dashboards/js/finished-photos-library.js",
+      "from": "            .catch(function (err) {\n                el('fpl-body').innerHTML",
+      "to": "            .catch(function (err) {\n                if (serial !== state.loadSerial) return;\n                el('fpl-sub').textContent = '(Unavailable)';\n                el('fpl-body').innerHTML",
+      "kind": "load-state"
+    },
+    {
+      "file": "dashboards/js/finished-photos-library.js",
+      "from": "    function render() {\n        renderStats();",
+      "to": "    function render() {\n        if (!state.ready) return;\n        renderStats();",
+      "kind": "load-state"
+    },
+    {
+      "file": "dashboards/js/finished-photos-library.js",
+      "from": "                    if (!r.ok || j.success === false) throw new Error(j.error || ('HTTP ' + r.status));\n                });",
+      "to": "                    if (!r.ok || !j || j.success !== true) throw new Error((j && j.error) || 'Publication status was not confirmed');\n                });",
+      "kind": "load-state"
+    },
+    {
+      "file": "dashboards/js/finished-photos-library.js",
+      "from": "    var lightboxReturnFocus = null;",
+      "to": "    var lightboxReturnFocus = null;\n    var lightboxSerial = 0;",
+      "kind": "dialog"
+    },
+    {
+      "file": "dashboards/js/finished-photos-library.js",
+      "from": "    function openLightbox(thumbUrl, cap) {",
+      "to": "    function openLightbox(thumbUrl, cap) {\n        var serial = ++lightboxSerial;",
+      "kind": "dialog"
+    },
+    {
+      "file": "dashboards/js/finished-photos-library.js",
+      "from": "            if (box.hidden) return;                 // closed before it finished",
+      "to": "            if (box.hidden || serial !== lightboxSerial) return; // a newer preview owns this image",
+      "kind": "dialog"
+    },
+    {
+      "file": "dashboards/js/finished-photos-library.js",
+      "from": "            if (box.hidden) return;\n            if (img.hidden)",
+      "to": "            if (box.hidden || serial !== lightboxSerial) return;\n            if (img.hidden)",
+      "kind": "dialog"
+    },
+    {
+      "file": "dashboards/js/finished-photos-library.js",
+      "from": "    function closeLightbox() {",
+      "to": "    function closeLightbox() {\n        lightboxSerial++;",
+      "kind": "dialog"
+    },
+    {
+      "file": "dashboards/js/finished-photos.js",
+      "from": "class=\"fp-toggle'",
+      "to": "class=\"fp-toggle btn btn-secondary'",
+      "kind": "presentation"
+    },
+    {
+      "file": "dashboards/js/finished-photos.js",
+      "from": "btn.setAttribute('aria-selected', on ? 'true' : 'false');",
+      "to": "btn.setAttribute('aria-selected', on ? 'true' : 'false'); btn.tabIndex = on ? 0 : -1;",
+      "kind": "keyboard"
+    },
+    {
+      "file": "dashboards/js/finished-photos.js",
+      "from": "    var state = { cust: null, order: null, design: null, designChosen: false, file: null };",
+      "to": "    var state = { cust: null, order: null, design: null, designChosen: false, file: null };\n    var lookupSerial = 0, designSerial = 0, manageSerial = 0;",
+      "kind": "load-state"
+    },
+    {
+      "file": "dashboards/js/finished-photos.js",
+      "from": "        setFindStatus('busy', 'Looking up “' + code + '”…');",
+      "to": "        var serial = ++lookupSerial;\n        setFindStatus('busy', 'Looking up “' + code + '”…');",
+      "kind": "load-state"
+    },
+    {
+      "file": "dashboards/js/finished-photos.js",
+      "from": "                if (!res.ok || !res.j || res.j.success === false) {",
+      "to": "                if (serial !== lookupSerial) return;\n                if (!res.ok || !res.j || res.j.success !== true || !Object.prototype.hasOwnProperty.call(res.j, 'match')) {",
+      "kind": "load-state"
+    },
+    {
+      "file": "dashboards/js/finished-photos.js",
+      "from": "                setFindStatus('err', '✗ ' + ((err && err.message)",
+      "to": "                if (serial !== lookupSerial) return;\n                setFindStatus('err', '✗ ' + ((err && err.message)",
+      "kind": "load-state"
+    },
+    {
+      "file": "dashboards/js/finished-photos.js",
+      "from": "    function pickCustomer(id, name, meta) {",
+      "to": "    function pickCustomer(id, name, meta) {\n        lookupSerial++;",
+      "kind": "load-state"
+    },
+    {
+      "file": "dashboards/js/finished-photos.js",
+      "from": "        state.cust = null; state.order = null;",
+      "to": "        lookupSerial++; designSerial++; manageSerial++;\n        state.cust = null; state.order = null;",
+      "kind": "load-state"
+    },
+    {
+      "file": "dashboards/js/finished-photos.js",
+      "from": "                var seen = {}, rows = [];",
+      "to": "                if (q !== searchInput.value.trim() || state.cust) return;\n                if (!d || !Array.isArray(d.contacts) || d.contacts.some(function (c) { return !c || !c.id_Customer; })) throw new Error('Incomplete customer search response');\n                var seen = {}, rows = [];",
+      "kind": "load-state"
+    },
+    {
+      "file": "dashboards/js/finished-photos.js",
+      "from": "                // A failed search is not \"no matches\" — say so (Erik's #1 rule).",
+      "to": "                if (q !== searchInput.value.trim() || state.cust) return;\n                // A failed search is not \"no matches\" — say so (Erik's #1 rule).",
+      "kind": "load-state"
+    },
+    {
+      "file": "dashboards/js/finished-photos.js",
+      "from": "    function loadDesigns(cid) {",
+      "to": "    function loadDesigns(cid) {\n        var serial = ++designSerial;",
+      "kind": "load-state"
+    },
+    {
+      "file": "dashboards/js/finished-photos.js",
+      "from": "                var ds = (d && d.designs) || [];",
+      "to": "                if (serial !== designSerial || !state.cust || state.cust.id !== String(cid)) return;\n                if (!d || !Array.isArray(d.designs) || d.designs.some(function (x) { return !x || !x.idDesign; })) throw new Error('Incomplete designs response');\n                var ds = d.designs;",
+      "kind": "load-state"
+    },
+    {
+      "file": "dashboards/js/finished-photos.js",
+      "from": "            .catch(function (err) {\n                grid.innerHTML",
+      "to": "            .catch(function (err) {\n                if (serial !== designSerial || !state.cust || state.cust.id !== String(cid)) return;\n                grid.innerHTML",
+      "kind": "load-state"
+    },
+    {
+      "file": "dashboards/js/finished-photos.js",
+      "from": "    function loadManage(cid) {",
+      "to": "    function loadManage(cid) {\n        var serial = ++manageSerial;",
+      "kind": "load-state"
+    },
+    {
+      "file": "dashboards/js/finished-photos.js",
+      "from": "                var ps = (d && d.photos) || [];",
+      "to": "                if (serial !== manageSerial || !state.cust || state.cust.id !== String(cid)) return;\n                if (!d || !Array.isArray(d.photos) || d.photos.some(function (p) { return !p || !p.pkId || typeof p.showToCustomer !== 'boolean'; })) throw new Error('Incomplete photo response');\n                var ps = d.photos;",
+      "kind": "load-state"
+    },
+    {
+      "file": "dashboards/js/finished-photos.js",
+      "from": "            .catch(function (err) {\n                listEl.innerHTML",
+      "to": "            .catch(function (err) {\n                if (serial !== manageSerial || !state.cust || state.cust.id !== String(cid)) return;\n                listEl.innerHTML",
+      "kind": "load-state"
+    },
+    {
+      "file": "dashboards/js/finished-photos.js",
+      "from": "if (!r.ok || j.success === false) throw new Error(j.error || ('HTTP ' + r.status));",
+      "to": "if (!r.ok || !j || j.success !== true) throw new Error((j && j.error) || 'Publication status was not confirmed');",
+      "kind": "load-state"
+    },
+    {
+      "file": "dashboards/js/finished-photos.js",
+      "from": "    function setManageStatus(kind, msg) { setStatus(kind, msg); }",
+      "to": "    function setManageStatus(kind, msg) { var s = el('photo-manage-status'); s.className = 'fp-status' + (kind ? ' is-' + kind : ''); s.textContent = msg || ''; }",
+      "kind": "visible-mutation-status"
+    },
+    {
+      "file": "dashboards/js/finished-photos-library.js",
+      "from": "        img.onerror = function () { showStatus('Loading…'); };",
+      "to": "        var highFailed = false;\n        img.onerror = function () { showStatus(highFailed ? 'This photo could not be loaded.' : 'Loading…'); };",
+      "kind": "image-failure-state"
+    },
+    {
+      "file": "dashboards/js/finished-photos-library.js",
+      "from": "            if (img.hidden) showStatus('This photo could not be loaded.'); // neither size loaded",
+      "to": "            highFailed = true;\n            if (img.hidden || (img.complete && !img.naturalWidth)) showStatus('This photo could not be loaded.'); // neither size loaded",
+      "kind": "image-failure-state"
+    }
+  ]
+}
