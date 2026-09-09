@@ -1,3 +1,14 @@
+## v2026.09.09.1 (2026.09.09)
+
+- Record missing webstore cache references caught by full gates
+- Version new webstore stylesheet and navigation references
+- Plan unified fifteen-brand storefront guides
+- Record reviewed brand guides and native menu lesson
+- Unify fifteen brand guides with shared storefront navigation
+- Record live webstores and reviewed brand continuation
+- Integrate reviewed fifteen-brand storefront guides
+- Record completed brand guide release gates
+
 ## v2026.09.08.20 (2026.09.08)
 
 - Plan unified twelve-page public webstore family
