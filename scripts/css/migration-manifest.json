@@ -3968,6 +3968,66 @@
         "rawCssBytes": 164116,
         "localCssRequests": 4
       }
+    },
+    {
+      "source": "dashboards/digitized-designs.html",
+      "family": "design-libraries",
+      "status": "pilot",
+      "route": "/dashboards/digitized-designs.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/design-libraries.css",
+        "shared_components/css/design-library-provider.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "four-widths-real-provider-markup-and-keyboard",
+        "nested-generated-result-cards-and-source-visibility",
+        "additional-logo-five-tiers-and-full-back-prices",
+        "explicit-reference-pricing-on-incomplete-response",
+        "archive-copy-fallback-and-image-dialog-navigation",
+        "failed-empty-recovered-provider-search",
+        "complete-print-content"
+      ],
+      "test": "tests/e2e/css-unification-design-libraries.spec.js",
+      "maxCssBytes": 75147,
+      "measuredRawCssBytes": 74123,
+      "baseline": {
+        "commit": "694e88c7e04f18797427d8f4d81207ddf9c679e2",
+        "rawCssBytes": 34811,
+        "localCssRequests": 2
+      }
+    },
+    {
+      "source": "dashboards/old-designs.html",
+      "family": "design-libraries",
+      "status": "pilot",
+      "route": "/dashboards/old-designs.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/design-libraries.css",
+        "shared_components/css/design-library-provider.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "four-widths-real-provider-markup-and-keyboard",
+        "nested-generated-result-cards-and-source-visibility",
+        "additional-logo-five-tiers-and-full-back-prices",
+        "explicit-reference-pricing-on-incomplete-response",
+        "archive-copy-fallback-and-image-dialog-navigation",
+        "failed-empty-recovered-provider-search",
+        "complete-print-content"
+      ],
+      "test": "tests/e2e/css-unification-design-libraries.spec.js",
+      "maxCssBytes": 75147,
+      "measuredRawCssBytes": 74123,
+      "baseline": {
+        "commit": "694e88c7e04f18797427d8f4d81207ddf9c679e2",
+        "rawCssBytes": 61697,
+        "localCssRequests": 2
+      }
     }
   ],
   "billingContentSha256": "d85f8530e03a1863d1b8bb2ebe97ba332d5c9e3411887d1eb2d02dcdb14c0863",
@@ -4077,6 +4137,622 @@
       "value": "var(--color-surface)",
       "context": "print",
       "reason": "The staff-only print sheet must override runtime inline visibility and screen background styles."
+    },
+    {
+      "file": "shared_components/css/design-library-provider.css",
+      "selector": ":where([data-ui=\"unified\"][data-design-library]) .caspio-container form > div",
+      "property": "display",
+      "value": "block",
+      "context": "provider-boundary",
+      "reason": "Actual Caspio report reads verified generated unlayered ID/inline styles overriding app layers, including hidden mobile fields; scoped adapter preserves provider behavior with shared tokens."
+    },
+    {
+      "file": "shared_components/css/design-library-provider.css",
+      "selector": ":where([data-ui=\"unified\"][data-design-library]) .caspio-container form > div",
+      "property": "width",
+      "value": "100%",
+      "context": "provider-boundary",
+      "reason": "Actual Caspio report reads verified generated unlayered ID/inline styles overriding app layers, including hidden mobile fields; scoped adapter preserves provider behavior with shared tokens."
+    },
+    {
+      "file": "shared_components/css/design-library-provider.css",
+      "selector": ":where([data-ui=\"unified\"][data-design-library]) .caspio-container .design-search-fields",
+      "property": "display",
+      "value": "grid",
+      "context": "provider-boundary",
+      "reason": "Actual Caspio report reads verified generated unlayered ID/inline styles overriding app layers, including hidden mobile fields; scoped adapter preserves provider behavior with shared tokens."
+    },
+    {
+      "file": "shared_components/css/design-library-provider.css",
+      "selector": ":where([data-ui=\"unified\"][data-design-library]) .caspio-container .design-search-fields",
+      "property": "grid-template-columns",
+      "value": "repeat(auto-fit, minmax(min(100%, 250px), 1fr))",
+      "context": "provider-boundary",
+      "reason": "Actual Caspio report reads verified generated unlayered ID/inline styles overriding app layers, including hidden mobile fields; scoped adapter preserves provider behavior with shared tokens."
+    },
+    {
+      "file": "shared_components/css/design-library-provider.css",
+      "selector": ":where([data-ui=\"unified\"][data-design-library]) .caspio-container .design-search-fields",
+      "property": "gap",
+      "value": "var(--space-4)",
+      "context": "provider-boundary",
+      "reason": "Actual Caspio report reads verified generated unlayered ID/inline styles overriding app layers, including hidden mobile fields; scoped adapter preserves provider behavior with shared tokens."
+    },
+    {
+      "file": "shared_components/css/design-library-provider.css",
+      "selector": ":where([data-ui=\"unified\"][data-design-library]) .caspio-container .design-search-fields",
+      "property": "width",
+      "value": "100%",
+      "context": "provider-boundary",
+      "reason": "Actual Caspio report reads verified generated unlayered ID/inline styles overriding app layers, including hidden mobile fields; scoped adapter preserves provider behavior with shared tokens."
+    },
+    {
+      "file": "shared_components/css/design-library-provider.css",
+      "selector": ":where([data-ui=\"unified\"][data-design-library]) .caspio-container :is(.form-field-group, .cbFormNestedTableContainer, .cbFormLabelCell, .cbFormFieldCell)",
+      "property": "display",
+      "value": "block",
+      "context": "provider-boundary",
+      "reason": "Actual Caspio report reads verified generated unlayered ID/inline styles overriding app layers, including hidden mobile fields; scoped adapter preserves provider behavior with shared tokens."
+    },
+    {
+      "file": "shared_components/css/design-library-provider.css",
+      "selector": ":where([data-ui=\"unified\"][data-design-library]) .caspio-container :is(.form-field-group, .cbFormNestedTableContainer, .cbFormLabelCell, .cbFormFieldCell)",
+      "property": "grid-area",
+      "value": "auto",
+      "context": "provider-boundary",
+      "reason": "Actual Caspio report reads verified generated unlayered ID/inline styles overriding app layers, including hidden mobile fields; scoped adapter preserves provider behavior with shared tokens."
+    },
+    {
+      "file": "shared_components/css/design-library-provider.css",
+      "selector": ":where([data-ui=\"unified\"][data-design-library]) .caspio-container :is(.form-field-group, .cbFormNestedTableContainer, .cbFormLabelCell, .cbFormFieldCell)",
+      "property": "min-width",
+      "value": "0",
+      "context": "provider-boundary",
+      "reason": "Actual Caspio report reads verified generated unlayered ID/inline styles overriding app layers, including hidden mobile fields; scoped adapter preserves provider behavior with shared tokens."
+    },
+    {
+      "file": "shared_components/css/design-library-provider.css",
+      "selector": ":where([data-ui=\"unified\"][data-design-library]) .caspio-container :is(.form-field-group, .cbFormNestedTableContainer, .cbFormLabelCell, .cbFormFieldCell)",
+      "property": "width",
+      "value": "auto",
+      "context": "provider-boundary",
+      "reason": "Actual Caspio report reads verified generated unlayered ID/inline styles overriding app layers, including hidden mobile fields; scoped adapter preserves provider behavior with shared tokens."
+    },
+    {
+      "file": "shared_components/css/design-library-provider.css",
+      "selector": ":where([data-ui=\"unified\"][data-design-library]) .caspio-container :is(.form-field-group, .cbFormNestedTableContainer, .cbFormLabelCell, .cbFormFieldCell)",
+      "property": "margin",
+      "value": "0",
+      "context": "provider-boundary",
+      "reason": "Actual Caspio report reads verified generated unlayered ID/inline styles overriding app layers, including hidden mobile fields; scoped adapter preserves provider behavior with shared tokens."
+    },
+    {
+      "file": "shared_components/css/design-library-provider.css",
+      "selector": ":where([data-ui=\"unified\"][data-design-library]) .caspio-container :is(.form-field-group, .cbFormNestedTableContainer, .cbFormLabelCell, .cbFormFieldCell)",
+      "property": "padding",
+      "value": "0",
+      "context": "provider-boundary",
+      "reason": "Actual Caspio report reads verified generated unlayered ID/inline styles overriding app layers, including hidden mobile fields; scoped adapter preserves provider behavior with shared tokens."
+    },
+    {
+      "file": "shared_components/css/design-library-provider.css",
+      "selector": ":where([data-ui=\"unified\"][data-design-library]) .caspio-container :is(.form-field-group, .cbFormNestedTableContainer, .cbFormLabelCell, .cbFormFieldCell)",
+      "property": "font",
+      "value": "inherit",
+      "context": "provider-boundary",
+      "reason": "Actual Caspio report reads verified generated unlayered ID/inline styles overriding app layers, including hidden mobile fields; scoped adapter preserves provider behavior with shared tokens."
+    },
+    {
+      "file": "shared_components/css/design-library-provider.css",
+      "selector": ":where([data-ui=\"unified\"][data-design-library]) .caspio-container :is(.form-field-group, .cbFormNestedTableContainer, .cbFormLabelCell, .cbFormFieldCell)",
+      "property": "color",
+      "value": "var(--ui-ink)",
+      "context": "provider-boundary",
+      "reason": "Actual Caspio report reads verified generated unlayered ID/inline styles overriding app layers, including hidden mobile fields; scoped adapter preserves provider behavior with shared tokens."
+    },
+    {
+      "file": "shared_components/css/design-library-provider.css",
+      "selector": ":where([data-ui=\"unified\"][data-design-library]) .caspio-container .cbFormLabelCell",
+      "property": "margin-bottom",
+      "value": "var(--space-2)",
+      "context": "provider-boundary",
+      "reason": "Actual Caspio report reads verified generated unlayered ID/inline styles overriding app layers, including hidden mobile fields; scoped adapter preserves provider behavior with shared tokens."
+    },
+    {
+      "file": "shared_components/css/design-library-provider.css",
+      "selector": ":where([data-ui=\"unified\"][data-design-library]) .caspio-container .field-input",
+      "property": "width",
+      "value": "100%",
+      "context": "provider-boundary",
+      "reason": "Actual Caspio report reads verified generated unlayered ID/inline styles overriding app layers, including hidden mobile fields; scoped adapter preserves provider behavior with shared tokens."
+    },
+    {
+      "file": "shared_components/css/design-library-provider.css",
+      "selector": ":where([data-ui=\"unified\"][data-design-library]) .caspio-container .field-input",
+      "property": "min-height",
+      "value": "var(--ui-control-height)",
+      "context": "provider-boundary",
+      "reason": "Actual Caspio report reads verified generated unlayered ID/inline styles overriding app layers, including hidden mobile fields; scoped adapter preserves provider behavior with shared tokens."
+    },
+    {
+      "file": "shared_components/css/design-library-provider.css",
+      "selector": ":where([data-ui=\"unified\"][data-design-library]) .caspio-container .field-input",
+      "property": "padding",
+      "value": "var(--space-2) var(--space-3)",
+      "context": "provider-boundary",
+      "reason": "Actual Caspio report reads verified generated unlayered ID/inline styles overriding app layers, including hidden mobile fields; scoped adapter preserves provider behavior with shared tokens."
+    },
+    {
+      "file": "shared_components/css/design-library-provider.css",
+      "selector": ":where([data-ui=\"unified\"][data-design-library]) .caspio-container .field-input",
+      "property": "font",
+      "value": "inherit",
+      "context": "provider-boundary",
+      "reason": "Actual Caspio report reads verified generated unlayered ID/inline styles overriding app layers, including hidden mobile fields; scoped adapter preserves provider behavior with shared tokens."
+    },
+    {
+      "file": "shared_components/css/design-library-provider.css",
+      "selector": ":where([data-ui=\"unified\"][data-design-library]) .caspio-container .field-input",
+      "property": "border",
+      "value": "1px solid var(--ui-line-strong)",
+      "context": "provider-boundary",
+      "reason": "Actual Caspio report reads verified generated unlayered ID/inline styles overriding app layers, including hidden mobile fields; scoped adapter preserves provider behavior with shared tokens."
+    },
+    {
+      "file": "shared_components/css/design-library-provider.css",
+      "selector": ":where([data-ui=\"unified\"][data-design-library]) .caspio-container .field-input",
+      "property": "border-radius",
+      "value": "var(--radius-sm)",
+      "context": "provider-boundary",
+      "reason": "Actual Caspio report reads verified generated unlayered ID/inline styles overriding app layers, including hidden mobile fields; scoped adapter preserves provider behavior with shared tokens."
+    },
+    {
+      "file": "shared_components/css/design-library-provider.css",
+      "selector": ":where([data-ui=\"unified\"][data-design-library]) .caspio-container .field-input",
+      "property": "color",
+      "value": "var(--ui-ink)",
+      "context": "provider-boundary",
+      "reason": "Actual Caspio report reads verified generated unlayered ID/inline styles overriding app layers, including hidden mobile fields; scoped adapter preserves provider behavior with shared tokens."
+    },
+    {
+      "file": "shared_components/css/design-library-provider.css",
+      "selector": ":where([data-ui=\"unified\"][data-design-library]) .caspio-container .field-input",
+      "property": "background",
+      "value": "var(--ui-surface)",
+      "context": "provider-boundary",
+      "reason": "Actual Caspio report reads verified generated unlayered ID/inline styles overriding app layers, including hidden mobile fields; scoped adapter preserves provider behavior with shared tokens."
+    },
+    {
+      "file": "shared_components/css/design-library-provider.css",
+      "selector": ":where([data-ui=\"unified\"][data-design-library]) .caspio-container .cbSearchButtonContainer",
+      "property": "display",
+      "value": "block",
+      "context": "provider-boundary",
+      "reason": "Actual Caspio report reads verified generated unlayered ID/inline styles overriding app layers, including hidden mobile fields; scoped adapter preserves provider behavior with shared tokens."
+    },
+    {
+      "file": "shared_components/css/design-library-provider.css",
+      "selector": ":where([data-ui=\"unified\"][data-design-library]) .caspio-container .cbSearchButtonContainer",
+      "property": "grid-column",
+      "value": "1 / -1",
+      "context": "provider-boundary",
+      "reason": "Actual Caspio report reads verified generated unlayered ID/inline styles overriding app layers, including hidden mobile fields; scoped adapter preserves provider behavior with shared tokens."
+    },
+    {
+      "file": "shared_components/css/design-library-provider.css",
+      "selector": ":where([data-ui=\"unified\"][data-design-library]) .caspio-container .cbSearchButtonContainer",
+      "property": "grid-row",
+      "value": "auto",
+      "context": "provider-boundary",
+      "reason": "Actual Caspio report reads verified generated unlayered ID/inline styles overriding app layers, including hidden mobile fields; scoped adapter preserves provider behavior with shared tokens."
+    },
+    {
+      "file": "shared_components/css/design-library-provider.css",
+      "selector": ":where([data-ui=\"unified\"][data-design-library]) .caspio-container .cbSearchButtonContainer",
+      "property": "margin",
+      "value": "var(--space-3) 0",
+      "context": "provider-boundary",
+      "reason": "Actual Caspio report reads verified generated unlayered ID/inline styles overriding app layers, including hidden mobile fields; scoped adapter preserves provider behavior with shared tokens."
+    },
+    {
+      "file": "shared_components/css/design-library-provider.css",
+      "selector": ":where([data-ui=\"unified\"][data-design-library]) .caspio-container .cbSearchButtonContainer",
+      "property": "padding",
+      "value": "0",
+      "context": "provider-boundary",
+      "reason": "Actual Caspio report reads verified generated unlayered ID/inline styles overriding app layers, including hidden mobile fields; scoped adapter preserves provider behavior with shared tokens."
+    },
+    {
+      "file": "shared_components/css/design-library-provider.css",
+      "selector": ":where([data-ui=\"unified\"][data-design-library]) .caspio-container .cbSearchButtonContainer",
+      "property": "text-align",
+      "value": "left",
+      "context": "provider-boundary",
+      "reason": "Actual Caspio report reads verified generated unlayered ID/inline styles overriding app layers, including hidden mobile fields; scoped adapter preserves provider behavior with shared tokens."
+    },
+    {
+      "file": "shared_components/css/design-library-provider.css",
+      "selector": ":where([data-ui=\"unified\"][data-design-library]) .caspio-container .cbSearchButtonContainerM",
+      "property": "display",
+      "value": "none",
+      "context": "provider-boundary",
+      "reason": "Actual Caspio report reads verified generated unlayered ID/inline styles overriding app layers, including hidden mobile fields; scoped adapter preserves provider behavior with shared tokens."
+    },
+    {
+      "file": "shared_components/css/design-library-provider.css",
+      "selector": ":where([data-ui=\"unified\"][data-design-library]) .caspio-container .cbSearchButton",
+      "property": "width",
+      "value": "auto",
+      "context": "provider-boundary",
+      "reason": "Actual Caspio report reads verified generated unlayered ID/inline styles overriding app layers, including hidden mobile fields; scoped adapter preserves provider behavior with shared tokens."
+    },
+    {
+      "file": "shared_components/css/design-library-provider.css",
+      "selector": ":where([data-ui=\"unified\"][data-design-library]) .caspio-container .cbSearchButton",
+      "property": "min-height",
+      "value": "var(--ui-control-height)",
+      "context": "provider-boundary",
+      "reason": "Actual Caspio report reads verified generated unlayered ID/inline styles overriding app layers, including hidden mobile fields; scoped adapter preserves provider behavior with shared tokens."
+    },
+    {
+      "file": "shared_components/css/design-library-provider.css",
+      "selector": ":where([data-ui=\"unified\"][data-design-library]) .caspio-container .cbSearchButton",
+      "property": "padding",
+      "value": "var(--space-2) var(--space-4)",
+      "context": "provider-boundary",
+      "reason": "Actual Caspio report reads verified generated unlayered ID/inline styles overriding app layers, including hidden mobile fields; scoped adapter preserves provider behavior with shared tokens."
+    },
+    {
+      "file": "shared_components/css/design-library-provider.css",
+      "selector": ":where([data-ui=\"unified\"][data-design-library]) .caspio-container .cbSearchButton",
+      "property": "font",
+      "value": "inherit",
+      "context": "provider-boundary",
+      "reason": "Actual Caspio report reads verified generated unlayered ID/inline styles overriding app layers, including hidden mobile fields; scoped adapter preserves provider behavior with shared tokens."
+    },
+    {
+      "file": "shared_components/css/design-library-provider.css",
+      "selector": ":where([data-ui=\"unified\"][data-design-library]) .caspio-container .cbSearchButton",
+      "property": "color",
+      "value": "var(--color-on-brand)",
+      "context": "provider-boundary",
+      "reason": "Actual Caspio report reads verified generated unlayered ID/inline styles overriding app layers, including hidden mobile fields; scoped adapter preserves provider behavior with shared tokens."
+    },
+    {
+      "file": "shared_components/css/design-library-provider.css",
+      "selector": ":where([data-ui=\"unified\"][data-design-library]) .caspio-container .cbSearchButton",
+      "property": "background",
+      "value": "var(--ui-accent)",
+      "context": "provider-boundary",
+      "reason": "Actual Caspio report reads verified generated unlayered ID/inline styles overriding app layers, including hidden mobile fields; scoped adapter preserves provider behavior with shared tokens."
+    },
+    {
+      "file": "shared_components/css/design-library-provider.css",
+      "selector": ":where([data-ui=\"unified\"][data-design-library]) .caspio-container .cbSearchButton",
+      "property": "border",
+      "value": "1px solid var(--ui-accent)",
+      "context": "provider-boundary",
+      "reason": "Actual Caspio report reads verified generated unlayered ID/inline styles overriding app layers, including hidden mobile fields; scoped adapter preserves provider behavior with shared tokens."
+    },
+    {
+      "file": "shared_components/css/design-library-provider.css",
+      "selector": ":where([data-ui=\"unified\"][data-design-library]) .caspio-container .cbSearchButton",
+      "property": "border-radius",
+      "value": "var(--radius-sm)",
+      "context": "provider-boundary",
+      "reason": "Actual Caspio report reads verified generated unlayered ID/inline styles overriding app layers, including hidden mobile fields; scoped adapter preserves provider behavior with shared tokens."
+    },
+    {
+      "file": "shared_components/css/design-library-provider.css",
+      "selector": ":where([data-ui=\"unified\"][data-design-library]) .caspio-container .design-result-grid",
+      "property": "display",
+      "value": "grid",
+      "context": "provider-boundary",
+      "reason": "Actual Caspio report reads verified generated unlayered ID/inline styles overriding app layers, including hidden mobile fields; scoped adapter preserves provider behavior with shared tokens."
+    },
+    {
+      "file": "shared_components/css/design-library-provider.css",
+      "selector": ":where([data-ui=\"unified\"][data-design-library]) .caspio-container .design-result-grid",
+      "property": "grid-template-columns",
+      "value": "repeat(auto-fill, minmax(min(100%, 300px), 1fr))",
+      "context": "provider-boundary",
+      "reason": "Actual Caspio report reads verified generated unlayered ID/inline styles overriding app layers, including hidden mobile fields; scoped adapter preserves provider behavior with shared tokens."
+    },
+    {
+      "file": "shared_components/css/design-library-provider.css",
+      "selector": ":where([data-ui=\"unified\"][data-design-library]) .caspio-container .design-result-grid",
+      "property": "gap",
+      "value": "var(--space-5)",
+      "context": "provider-boundary",
+      "reason": "Actual Caspio report reads verified generated unlayered ID/inline styles overriding app layers, including hidden mobile fields; scoped adapter preserves provider behavior with shared tokens."
+    },
+    {
+      "file": "shared_components/css/design-library-provider.css",
+      "selector": ":where([data-ui=\"unified\"][data-design-library]) .caspio-container .design-result-grid",
+      "property": "width",
+      "value": "100%",
+      "context": "provider-boundary",
+      "reason": "Actual Caspio report reads verified generated unlayered ID/inline styles overriding app layers, including hidden mobile fields; scoped adapter preserves provider behavior with shared tokens."
+    },
+    {
+      "file": "shared_components/css/design-library-provider.css",
+      "selector": ":where([data-ui=\"unified\"][data-design-library]) .caspio-container [data-cb-name=\"data-row\"]",
+      "property": "display",
+      "value": "block",
+      "context": "provider-boundary",
+      "reason": "Actual Caspio report reads verified generated unlayered ID/inline styles overriding app layers, including hidden mobile fields; scoped adapter preserves provider behavior with shared tokens."
+    },
+    {
+      "file": "shared_components/css/design-library-provider.css",
+      "selector": ":where([data-ui=\"unified\"][data-design-library]) .caspio-container [data-cb-name=\"data-row\"]",
+      "property": "width",
+      "value": "auto",
+      "context": "provider-boundary",
+      "reason": "Actual Caspio report reads verified generated unlayered ID/inline styles overriding app layers, including hidden mobile fields; scoped adapter preserves provider behavior with shared tokens."
+    },
+    {
+      "file": "shared_components/css/design-library-provider.css",
+      "selector": ":where([data-ui=\"unified\"][data-design-library]) .caspio-container [data-cb-name=\"data-row\"]",
+      "property": "height",
+      "value": "auto",
+      "context": "provider-boundary",
+      "reason": "Actual Caspio report reads verified generated unlayered ID/inline styles overriding app layers, including hidden mobile fields; scoped adapter preserves provider behavior with shared tokens."
+    },
+    {
+      "file": "shared_components/css/design-library-provider.css",
+      "selector": ":where([data-ui=\"unified\"][data-design-library]) .caspio-container [data-cb-name=\"data-row\"]",
+      "property": "min-width",
+      "value": "0",
+      "context": "provider-boundary",
+      "reason": "Actual Caspio report reads verified generated unlayered ID/inline styles overriding app layers, including hidden mobile fields; scoped adapter preserves provider behavior with shared tokens."
+    },
+    {
+      "file": "shared_components/css/design-library-provider.css",
+      "selector": ":where([data-ui=\"unified\"][data-design-library]) .caspio-container [data-cb-name=\"data-row\"]",
+      "property": "font",
+      "value": "var(--design-record-font-size)/var(--line-height-base) var(--ui-font)",
+      "context": "provider-boundary",
+      "reason": "Actual Caspio report reads verified generated unlayered ID/inline styles overriding app layers, including hidden mobile fields; scoped adapter preserves provider behavior with shared tokens."
+    },
+    {
+      "file": "shared_components/css/design-library-provider.css",
+      "selector": ":where([data-ui=\"unified\"][data-design-library]) .caspio-container [data-cb-name=\"data-row\"]",
+      "property": "padding",
+      "value": "var(--space-4)",
+      "context": "provider-boundary",
+      "reason": "Actual Caspio report reads verified generated unlayered ID/inline styles overriding app layers, including hidden mobile fields; scoped adapter preserves provider behavior with shared tokens."
+    },
+    {
+      "file": "shared_components/css/design-library-provider.css",
+      "selector": ":where([data-ui=\"unified\"][data-design-library]) .caspio-container [data-cb-name=\"data-row\"]",
+      "property": "border",
+      "value": "1px solid var(--ui-line)",
+      "context": "provider-boundary",
+      "reason": "Actual Caspio report reads verified generated unlayered ID/inline styles overriding app layers, including hidden mobile fields; scoped adapter preserves provider behavior with shared tokens."
+    },
+    {
+      "file": "shared_components/css/design-library-provider.css",
+      "selector": ":where([data-ui=\"unified\"][data-design-library]) .caspio-container [data-cb-name=\"data-row\"]",
+      "property": "border-top",
+      "value": "3px solid var(--ui-accent)",
+      "context": "provider-boundary",
+      "reason": "Actual Caspio report reads verified generated unlayered ID/inline styles overriding app layers, including hidden mobile fields; scoped adapter preserves provider behavior with shared tokens."
+    },
+    {
+      "file": "shared_components/css/design-library-provider.css",
+      "selector": ":where([data-ui=\"unified\"][data-design-library]) .caspio-container [data-cb-name=\"data-row\"]",
+      "property": "border-radius",
+      "value": "var(--radius-card)",
+      "context": "provider-boundary",
+      "reason": "Actual Caspio report reads verified generated unlayered ID/inline styles overriding app layers, including hidden mobile fields; scoped adapter preserves provider behavior with shared tokens."
+    },
+    {
+      "file": "shared_components/css/design-library-provider.css",
+      "selector": ":where([data-ui=\"unified\"][data-design-library]) .caspio-container [data-cb-name=\"data-row\"]",
+      "property": "background",
+      "value": "var(--ui-surface)",
+      "context": "provider-boundary",
+      "reason": "Actual Caspio report reads verified generated unlayered ID/inline styles overriding app layers, including hidden mobile fields; scoped adapter preserves provider behavior with shared tokens."
+    },
+    {
+      "file": "shared_components/css/design-library-provider.css",
+      "selector": ":where([data-ui=\"unified\"][data-design-library]) .caspio-container .cbResultSetPanelDataContainer",
+      "property": "margin",
+      "value": "0",
+      "context": "provider-boundary",
+      "reason": "Actual Caspio report reads verified generated unlayered ID/inline styles overriding app layers, including hidden mobile fields; scoped adapter preserves provider behavior with shared tokens."
+    },
+    {
+      "file": "shared_components/css/design-library-provider.css",
+      "selector": ":where([data-ui=\"unified\"][data-design-library]) .caspio-container .cbResultSetPanelDataContainer",
+      "property": "font",
+      "value": "inherit",
+      "context": "provider-boundary",
+      "reason": "Actual Caspio report reads verified generated unlayered ID/inline styles overriding app layers, including hidden mobile fields; scoped adapter preserves provider behavior with shared tokens."
+    },
+    {
+      "file": "shared_components/css/design-library-provider.css",
+      "selector": ":where([data-ui=\"unified\"][data-design-library]) .caspio-container .cbResultSetPanelDataContainer :is(dt, dd)",
+      "property": "display",
+      "value": "block",
+      "context": "provider-boundary",
+      "reason": "Actual Caspio report reads verified generated unlayered ID/inline styles overriding app layers, including hidden mobile fields; scoped adapter preserves provider behavior with shared tokens."
+    },
+    {
+      "file": "shared_components/css/design-library-provider.css",
+      "selector": ":where([data-ui=\"unified\"][data-design-library]) .caspio-container .cbResultSetPanelDataContainer :is(dt, dd)",
+      "property": "float",
+      "value": "none",
+      "context": "provider-boundary",
+      "reason": "Actual Caspio report reads verified generated unlayered ID/inline styles overriding app layers, including hidden mobile fields; scoped adapter preserves provider behavior with shared tokens."
+    },
+    {
+      "file": "shared_components/css/design-library-provider.css",
+      "selector": ":where([data-ui=\"unified\"][data-design-library]) .caspio-container .cbResultSetPanelDataContainer :is(dt, dd)",
+      "property": "width",
+      "value": "auto",
+      "context": "provider-boundary",
+      "reason": "Actual Caspio report reads verified generated unlayered ID/inline styles overriding app layers, including hidden mobile fields; scoped adapter preserves provider behavior with shared tokens."
+    },
+    {
+      "file": "shared_components/css/design-library-provider.css",
+      "selector": ":where([data-ui=\"unified\"][data-design-library]) .caspio-container .cbResultSetPanelDataContainer :is(dt, dd)",
+      "property": "font",
+      "value": "inherit",
+      "context": "provider-boundary",
+      "reason": "Actual Caspio report reads verified generated unlayered ID/inline styles overriding app layers, including hidden mobile fields; scoped adapter preserves provider behavior with shared tokens."
+    },
+    {
+      "file": "shared_components/css/design-library-provider.css",
+      "selector": ":where([data-ui=\"unified\"][data-design-library]) .caspio-container .cbResultSetPanelDataContainer :is(dt, dd)",
+      "property": "padding",
+      "value": "0",
+      "context": "provider-boundary",
+      "reason": "Actual Caspio report reads verified generated unlayered ID/inline styles overriding app layers, including hidden mobile fields; scoped adapter preserves provider behavior with shared tokens."
+    },
+    {
+      "file": "shared_components/css/design-library-provider.css",
+      "selector": ":where([data-ui=\"unified\"][data-design-library]) .caspio-container .cbResultSetPanelDataContainer :is(dt, dd)",
+      "property": "color",
+      "value": "var(--ui-ink)",
+      "context": "provider-boundary",
+      "reason": "Actual Caspio report reads verified generated unlayered ID/inline styles overriding app layers, including hidden mobile fields; scoped adapter preserves provider behavior with shared tokens."
+    },
+    {
+      "file": "shared_components/css/design-library-provider.css",
+      "selector": ":where([data-ui=\"unified\"][data-design-library]) .caspio-container .cbResultSetPanelDataContainer dt",
+      "property": "margin",
+      "value": "var(--space-3) 0 var(--space-1)",
+      "context": "provider-boundary",
+      "reason": "Actual Caspio report reads verified generated unlayered ID/inline styles overriding app layers, including hidden mobile fields; scoped adapter preserves provider behavior with shared tokens."
+    },
+    {
+      "file": "shared_components/css/design-library-provider.css",
+      "selector": ":where([data-ui=\"unified\"][data-design-library]) .caspio-container .cbResultSetPanelDataContainer dt",
+      "property": "color",
+      "value": "var(--ui-muted)",
+      "context": "provider-boundary",
+      "reason": "Actual Caspio report reads verified generated unlayered ID/inline styles overriding app layers, including hidden mobile fields; scoped adapter preserves provider behavior with shared tokens."
+    },
+    {
+      "file": "shared_components/css/design-library-provider.css",
+      "selector": ":where([data-ui=\"unified\"][data-design-library]) .caspio-container .cbResultSetPanelDataContainer dt",
+      "property": "font-size",
+      "value": "var(--font-size-sm)",
+      "context": "provider-boundary",
+      "reason": "Actual Caspio report reads verified generated unlayered ID/inline styles overriding app layers, including hidden mobile fields; scoped adapter preserves provider behavior with shared tokens."
+    },
+    {
+      "file": "shared_components/css/design-library-provider.css",
+      "selector": ":where([data-ui=\"unified\"][data-design-library]) .caspio-container .cbResultSetPanelDataContainer dd",
+      "property": "margin",
+      "value": "0",
+      "context": "provider-boundary",
+      "reason": "Actual Caspio report reads verified generated unlayered ID/inline styles overriding app layers, including hidden mobile fields; scoped adapter preserves provider behavior with shared tokens."
+    },
+    {
+      "file": "shared_components/css/design-library-provider.css",
+      "selector": ":where([data-ui=\"unified\"][data-design-library]) .caspio-container .cbResultSetPanelDataContainer img",
+      "property": "width",
+      "value": "100%",
+      "context": "provider-boundary",
+      "reason": "Actual Caspio report reads verified generated unlayered ID/inline styles overriding app layers, including hidden mobile fields; scoped adapter preserves provider behavior with shared tokens."
+    },
+    {
+      "file": "shared_components/css/design-library-provider.css",
+      "selector": ":where([data-ui=\"unified\"][data-design-library]) .caspio-container .cbResultSetPanelDataContainer img",
+      "property": "height",
+      "value": "var(--design-preview-height)",
+      "context": "provider-boundary",
+      "reason": "Actual Caspio report reads verified generated unlayered ID/inline styles overriding app layers, including hidden mobile fields; scoped adapter preserves provider behavior with shared tokens."
+    },
+    {
+      "file": "shared_components/css/design-library-provider.css",
+      "selector": ":where([data-ui=\"unified\"][data-design-library]) .caspio-container .cbResultSetPanelDataContainer img",
+      "property": "margin",
+      "value": "var(--space-3) 0",
+      "context": "provider-boundary",
+      "reason": "Actual Caspio report reads verified generated unlayered ID/inline styles overriding app layers, including hidden mobile fields; scoped adapter preserves provider behavior with shared tokens."
+    },
+    {
+      "file": "shared_components/css/design-library-provider.css",
+      "selector": ":where([data-ui=\"unified\"][data-design-library]) .caspio-container :is(input, select, textarea, img[role=\"button\"]):focus-visible",
+      "property": "outline",
+      "value": "2px solid var(--ui-accent)",
+      "context": "provider-boundary",
+      "reason": "Actual Caspio report reads verified generated unlayered ID/inline styles overriding app layers, including hidden mobile fields; scoped adapter preserves provider behavior with shared tokens."
+    },
+    {
+      "file": "shared_components/css/design-library-provider.css",
+      "selector": ":where([data-ui=\"unified\"][data-design-library]) .caspio-container :is(input, select, textarea, img[role=\"button\"]):focus-visible",
+      "property": "outline-offset",
+      "value": "3px",
+      "context": "provider-boundary",
+      "reason": "Actual Caspio report reads verified generated unlayered ID/inline styles overriding app layers, including hidden mobile fields; scoped adapter preserves provider behavior with shared tokens."
+    },
+    {
+      "file": "shared_components/css/design-library-provider.css",
+      "selector": ":where([data-ui=\"unified\"][data-design-library]) .caspio-container [data-cb-name=\"data-row\"] > div",
+      "property": "padding",
+      "value": "0",
+      "context": "provider-boundary",
+      "reason": "Actual Caspio report reads verified generated unlayered ID/inline styles overriding app layers, including hidden mobile fields; scoped adapter preserves provider behavior with shared tokens."
+    },
+    {
+      "file": "shared_components/css/design-library-provider.css",
+      "selector": ":where([data-ui=\"unified\"][data-design-library]) .caspio-container [data-cb-name=\"data-row\"] > div",
+      "property": "font",
+      "value": "inherit",
+      "context": "provider-boundary",
+      "reason": "Actual Caspio report reads verified generated unlayered ID/inline styles overriding app layers, including hidden mobile fields; scoped adapter preserves provider behavior with shared tokens."
+    },
+    {
+      "file": "shared_components/css/design-library-provider.css",
+      "selector": ":where([data-ui=\"unified\"][data-design-library]) .caspio-container .card-content > div",
+      "property": "font",
+      "value": "inherit",
+      "context": "provider-boundary",
+      "reason": "Actual Caspio report reads verified generated unlayered ID/inline styles overriding app layers, including hidden mobile fields; scoped adapter preserves provider behavior with shared tokens."
+    },
+    {
+      "file": "shared_components/css/design-library-provider.css",
+      "selector": ":where([data-ui=\"unified\"][data-design-library]) .caspio-container .card-header h3",
+      "property": "font",
+      "value": "700 var(--design-heading-size)/var(--line-height-base) var(--ui-font)",
+      "context": "provider-boundary",
+      "reason": "Actual Caspio report reads verified generated unlayered ID/inline styles overriding app layers, including hidden mobile fields; scoped adapter preserves provider behavior with shared tokens."
+    },
+    {
+      "file": "shared_components/css/design-library-provider.css",
+      "selector": ":where([data-ui=\"unified\"][data-design-library]) .caspio-container .card-header h3",
+      "property": "color",
+      "value": "var(--ui-ink)",
+      "context": "provider-boundary",
+      "reason": "Actual Caspio report reads verified generated unlayered ID/inline styles overriding app layers, including hidden mobile fields; scoped adapter preserves provider behavior with shared tokens."
+    },
+    {
+      "file": "shared_components/css/design-library-provider.css",
+      "selector": ":where([data-ui=\"unified\"][data-design-library]) .caspio-container .card-header h3 span",
+      "property": "font",
+      "value": "400 var(--font-size-sm)/var(--line-height-base) var(--ui-font)",
+      "context": "provider-boundary",
+      "reason": "Actual Caspio report reads verified generated unlayered ID/inline styles overriding app layers, including hidden mobile fields; scoped adapter preserves provider behavior with shared tokens."
+    },
+    {
+      "file": "shared_components/css/design-library-provider.css",
+      "selector": ":where([data-ui=\"unified\"][data-design-library]) .caspio-container .card-header h3 span",
+      "property": "color",
+      "value": "var(--ui-muted)",
+      "context": "provider-boundary",
+      "reason": "Actual Caspio report reads verified generated unlayered ID/inline styles overriding app layers, including hidden mobile fields; scoped adapter preserves provider behavior with shared tokens."
+    },
+    {
+      "file": "shared_components/css/design-library-provider.css",
+      "selector": ":where([data-ui=\"unified\"][data-design-library]) .caspio-container .design-result-grid",
+      "property": "grid-template-columns",
+      "value": "repeat(2, minmax(0, 1fr))",
+      "context": "print",
+      "reason": "Actual Caspio report reads verified generated unlayered ID/inline styles overriding app layers, including hidden mobile fields; scoped adapter preserves provider behavior with shared tokens."
     }
   ],
   "trainingContent": [

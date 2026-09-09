@@ -1,6 +1,7 @@
 const fs = require('node:fs'), path = require('node:path'), crypto = require('node:crypto');
 const { JSDOM } = require('jsdom');
 const fixture = require('../fixtures/photo-original-content.json');
+const designFixture = require('../fixtures/design-library-original-content.json');
 const root = path.resolve(__dirname, '../..'), norm = text => text.replace(/\s+/g, ' ').trim();
 
 test.each(fixture.pages)('$file preserves photo instructions, inputs and destinations', original => {
@@ -24,7 +25,8 @@ test.each(fixture.pages)('$file preserves photo instructions, inputs and destina
 });
 test.each(Object.keys(fixture.hashes))('%s retains helpers outside recorded UI and failure-state edits', file => {
     let source = fs.readFileSync(path.join(root, file), 'utf8').replace(/\r\n/g, '\n');
-    for (const change of fixture.changes.filter(c => c.file === file).reverse()) {
+    // Later design-library edits are reversed before the original photo checkpoint.
+    for (const change of [...fixture.changes, ...designFixture.changes].filter(c => c.file === file).reverse()) {
         expect(source).toContain(change.to); source = source.replace(change.to, change.from);
     }
     expect(crypto.createHash('sha256').update(source).digest('hex')).toBe(fixture.hashes[file]);

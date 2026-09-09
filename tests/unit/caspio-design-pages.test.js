@@ -16,7 +16,7 @@ const noComments = (s) => s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*
 describe('digitized designs', () => {
     const html = read('dashboards/digitized-designs.html').replace(/<!--[\s\S]*?-->/g, '');
     const js = read('dashboards/js/digitized-designs.js');
-    const css = read('dashboards/css/digitized-designs.css');
+    const css = read('shared_components/css/components.css') + read('shared_components/css/design-libraries.css');
     test('AL pricing from the API with visible fallback; no hardcoded tables in the render path', () => {
         expect(js).toMatch(/fetch\(API_BASE \+ '\/api\/al-pricing'\)/);
         expect(js).toMatch(/function alData\(\) \{ return alPricing \|\| AL_FALLBACK; \}/);
@@ -31,30 +31,30 @@ describe('digitized designs', () => {
         expect(js).not.toMatch(/\.style\./);
         expect(js).toMatch(/data-onerror="hide"/);
         expect(js).toMatch(/<button type="button" class="img-btn" aria-label="Enlarge /);
-        expect(js).toMatch(/rel="noopener" class="mockup-link"/);
+        expect(js).toMatch(/rel="noopener" class="mockup-link btn btn-secondary"/);
         expect(html).toMatch(/id="image-modal" role="dialog" aria-modal="true" aria-label="Design preview, full size"/);
         expect(html).toMatch(/class="al-modal-content" role="dialog" aria-modal="true" aria-labelledby="al-modal-title"/);
-        expect(html).toMatch(/class="al-modal-close" type="button" aria-label="Close pricing"/);
+        expect(html).toMatch(/class="al-modal-close btn btn-secondary" type="button" aria-label="Close pricing"/);
         expect(js).toMatch(/alReturnFocus = document\.activeElement;/);
         expect(js).toMatch(/imageReturnFocus = document\.activeElement;/);
         expect(js).toMatch(/aria-expanded="false" aria-controls="' \+ detailsId/);
         expect(js).toMatch(/designFromFile = true;/);
         expect(js).toMatch(/\(from DST file\)/);
         expect(js).toMatch(/The Caspio list did not load/);
-        expect(css).toMatch(/^\[hidden\] \{ display: none !important; \}/m);
-        expect(html).toMatch(/digitized-designs\.css\?v=\d{4}\.\d{2}\.\d{2}\.\d+/);
+        expect(css).toMatch(/\[hidden\]\s*\{\s*display: none;/);
+        expect(html).toMatch(/design-libraries\.css\?v=\d{4}\.\d{2}\.\d{2}\.\d+/);
     });
 });
 
 describe('old designs', () => {
     const html = read('dashboards/old-designs.html').replace(/<!--[\s\S]*?-->/g, '');
     const js = read('shared_components/js/old-designs.js');
-    const css = read('shared_components/css/old-designs.css');
+    const css = read('shared_components/css/components.css') + read('shared_components/css/design-libraries.css');
     test('hidden attr instead of style toggles; typed + named controls; decorative icons', () => {
         expect(js).not.toMatch(/\.style\./);
         expect(js).toMatch(/modalCounter\.hidden = !many;/);
         expect(js).toMatch(/img\.hidden = true;/);
-        expect(js).toMatch(/<button type="button" class="card-action-btn card-copy-btn" title="Copy design number" aria-label="Copy design number">/);
+        expect(js).toMatch(/<button type="button" class="card-action-btn card-copy-btn btn btn-secondary" title="Copy design number" aria-label="Copy design number">/);
         expect(js).not.toMatch(/<i class="fa[^"]*"><\/i>/);
         expect(html).not.toMatch(/<i class="fa[^"]*"><\/i>/);
         expect(html).not.toMatch(/<button class=/);
@@ -67,8 +67,9 @@ describe('old designs', () => {
         expect(js).toMatch(/e\.target\.closest\('img\[role="button"\]'\)/);
         expect(js).toMatch(/The Caspio list did not load/);
         expect(js).toMatch(/toast\.setAttribute\('role', type === 'error' \? 'alert' : 'status'\);/);
-        expect(css).toMatch(/^\[hidden\] \{ display: none !important; \}/m);
-        expect(css).toMatch(/:focus-within \.card-actions \{ opacity: 1; \}/);
+        expect(css).toMatch(/\[hidden\]\s*\{\s*display: none;/);
+        expect(css).toMatch(/\.card-actions \{ display: flex;/);
+        expect(css).not.toMatch(/\.card-actions[^}]*opacity: 0/);
         expect(html).toMatch(/old-designs\.js\?v=\d{4}\.\d{2}\.\d{2}\.\d+/);
     });
 });

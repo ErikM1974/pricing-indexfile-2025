@@ -68,8 +68,11 @@ describe('unified CSS ownership and preserved content', () => {
             });
         }
         expect(usedExceptions).toHaveLength(exceptions.length);
-        expect(exceptions).toHaveLength(4);
-        expect(exceptions.every(item => item.file === 'pages/css/art-request-detail.css')).toBe(true);
+        expect(exceptions).toHaveLength(81);
+        expect(exceptions.filter(item => item.file === 'pages/css/art-request-detail.css')).toHaveLength(4);
+        const provider = exceptions.filter(item => item.file === 'shared_components/css/design-library-provider.css');
+        expect(provider).toHaveLength(77);
+        expect(provider.every(item => item.selector.includes('[data-design-library]') && item.selector.includes('.caspio-container'))).toBe(true);
     });
     test('unified transfer consumers load the dialog dependency before the sender', () => {
         for (const pilot of manifest.pilots) {
