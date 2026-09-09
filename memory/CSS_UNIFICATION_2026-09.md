@@ -679,3 +679,7 @@ Golf landing/product and custom safety apparel share canonical tokens/controls p
 ## Campaign storefront integration — 2026-09-09
 
 Reviewed commit 5a5b096c9c7075de930674010e26d8e39c8eee2b integrated after verified catalog release2083. Only appended memory notes conflicted; both histories and latest live checkpoint retained. All application changes merged directly. Full primary release checks next; current live112/113 until campaign rollout is verified.
+
+## Campaign full-suite inventory timeout resolved — 2026-09-09
+
+First full primary unit run passed216 suites/5191 tests with four skips, but the runtime inventory child process exceeded its unchanged30-second deadline under concurrent tests. Standalone original inventory took18.31s. Reusing one inert DOMParser instead of constructing304 full windows reduced it to13.51s; the entire531123-byte report is identical before/after. No timeout increase or skipped assertion. Existing inventory regression and full primary suite will run again on this source.

@@ -147,8 +147,12 @@ function family(file, sheets) {
 }
 const manifest = JSON.parse(read('scripts/css/migration-manifest.json'));
 const reviewed = new Map(manifest.pilots.map(p => [p.source, p]));
+// The census only reads attributes. Reuse one parser instead of creating a
+// complete browser window for every tracked document; scripts stay inert.
+const censusWindow = new JSDOM('', { virtualConsole: new VirtualConsole() }).window;
+const htmlParser = new censusWindow.DOMParser();
 const surfaces = files.filter(f => f.endsWith('.html')).map(file => {
-    const document = new JSDOM(read(file), { virtualConsole: new VirtualConsole() }).window.document;
+    const document = htmlParser.parseFromString(read(file), 'text/html');
     const styles = [...document.querySelectorAll('link[rel="stylesheet"]')].map(el => el.getAttribute('href'));
     const directStyles = styles.map(url => local(file, url)).filter(Boolean);
     const scripts = [...document.querySelectorAll('script[src]')].map(el => local(file, el.getAttribute('src'))).filter(Boolean);
@@ -176,9 +180,9 @@ const surfaces = files.filter(f => f.endsWith('.html')).map(file => {
         states: pilot?.states || [], tests: pilot ? [pilot.test] : [],
         stateCoverage: pilot ? 'Manifest states tested; other states remain subject to review.' : 'Pending family fixtures; source inspection is not browser coverage.',
     };
-    document.defaultView.close();
     return record;
 });
+censusWindow.close();
 const counts = key => Object.fromEntries(unique(surfaces.map(s => s[key])).map(value => [value, surfaces.filter(s => s[key] === value).length]));
 const report = {
     scope: 'Tracked HTML, literal GET/path.join routes, CSS imports, JS ESM dependency closure and known runtime owners. Static evidence; no routes or business services executed. Variable-built routes/styles still require family review.',

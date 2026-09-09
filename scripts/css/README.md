@@ -113,3 +113,5 @@ Entry/status family: access-shell.css provides shared sign-in arrangements and o
 Catalog discovery: shared `catalog-discovery.css` follows tokens/components/storefront-shell and owns brand/product cards and controls; existing brands.css and fall-catalog-2026.css contain scoped page arrangements. Header navigation controller is now shared_components/js/storefront-navigation.js; original fifteen brand-guide consumers updated without runtime changes.
 
 Campaign storefront: golf tournament landing/product and custom safety apparel share tokens/components and campaign-storefront.css, plus scoped golf product arrangements. New campaign-storefront.js owns native photo dialog, fragment focus and reversible FAQ printing. Old golf-tournament-showcase.css retired; retain original storytelling/photos, service prices and form fields. Delivery receipt requires accepted storage or sales notice; total failure keeps the request for retry.
+
+The runtime inventory reuses one inert DOMParser for tracked HTML attribute extraction; the complete report was compared byte-for-byte with the previous per-page-window census. No page scripts or business services execute.
