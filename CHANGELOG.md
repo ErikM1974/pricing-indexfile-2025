@@ -1,3 +1,10 @@
+## v2026.09.08.14 (2026.09.08)
+
+- Record live training release and next reference family
+- Record reference family validation and persistence lessons
+- Record complete reference release checks and next training coverage
+- Unify reference pages and preserve accessible checklist and search workflows
+
 ## v2026.09.08.13 (2026.09.08)
 
 - Record live forms release and resume training migration
