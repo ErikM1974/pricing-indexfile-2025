@@ -1,3 +1,12 @@
+## v2026.09.09.16 (2026.09.09)
+
+- Plan design preview tool CSS and output review
+- Record verified design-library release and preview-tool checkpoint
+- Unify design preview tools and preserve artwork exports
+- Integrate reviewed design preview tools and export guards
+- Deploy v2026.09.09.16: unify preview tools and preserve artwork exports
+- Deploy v2026.09.09.16: wait for filtered thread choices in browser check
+
 ## v2026.09.09.15 (2026.09.09)
 
 - Plan design-library provider boundaries and shared presentation
