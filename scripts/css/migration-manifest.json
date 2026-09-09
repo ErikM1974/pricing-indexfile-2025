@@ -1755,6 +1755,117 @@
         "localCssRequests": 4
       },
       "measuredRawCssBytes": 76198
+    },
+    {
+      "source": "dashboards/policy-migration.html",
+      "family": "policy-reference",
+      "status": "pilot",
+      "route": "/dashboards/policy-migration.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "dashboards/css/policy-migration.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "four-widths",
+        "keyboard",
+        "content-preserved",
+        "complete-print",
+        "filter",
+        "empty",
+        "malformed",
+        "retry"
+      ],
+      "test": "tests/e2e/css-unification-policy-reference.spec.js",
+      "maxCssBytes": 65721,
+      "baseline": {
+        "commit": "ecd150e5e376699c9fe16d1c65b5a3bd6cea65f5",
+        "rawCssBytes": 167206,
+        "localCssRequests": 4
+      },
+      "measuredRawCssBytes": 64221
+    },
+    {
+      "source": "pages/pricing-negotiation-policy.html",
+      "family": "policy-reference",
+      "status": "pilot",
+      "route": "/pages/pricing-negotiation-policy.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "pages/css/pricing-negotiation-policy.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "four-widths",
+        "keyboard",
+        "content-preserved",
+        "complete-print",
+        "mobile-contents",
+        "fragment-history",
+        "back-to-top"
+      ],
+      "test": "tests/e2e/css-unification-policy-reference.spec.js",
+      "maxCssBytes": 68726,
+      "baseline": {
+        "commit": "ecd150e5e376699c9fe16d1c65b5a3bd6cea65f5",
+        "rawCssBytes": 23460,
+        "localCssRequests": 2
+      },
+      "measuredRawCssBytes": 67226
+    },
+    {
+      "source": "pages/resources.html",
+      "family": "policy-reference",
+      "status": "pilot",
+      "route": "/pages/resources.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "pages/css/simple-notice-page.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "four-widths",
+        "keyboard",
+        "content-preserved",
+        "complete-print"
+      ],
+      "test": "tests/e2e/css-unification-policy-reference.spec.js",
+      "maxCssBytes": 58941,
+      "baseline": {
+        "commit": "ecd150e5e376699c9fe16d1c65b5a3bd6cea65f5",
+        "rawCssBytes": 18041,
+        "localCssRequests": 2
+      },
+      "measuredRawCssBytes": 57441
+    },
+    {
+      "source": "pages/sale.html",
+      "family": "policy-reference",
+      "status": "pilot",
+      "route": "/pages/sale.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "pages/css/simple-notice-page.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "four-widths",
+        "keyboard",
+        "content-preserved",
+        "complete-print"
+      ],
+      "test": "tests/e2e/css-unification-policy-reference.spec.js",
+      "maxCssBytes": 58941,
+      "baseline": {
+        "commit": "ecd150e5e376699c9fe16d1c65b5a3bd6cea65f5",
+        "rawCssBytes": 18041,
+        "localCssRequests": 2
+      },
+      "measuredRawCssBytes": 57441
     }
   ],
   "billingContentSha256": "d85f8530e03a1863d1b8bb2ebe97ba332d5c9e3411887d1eb2d02dcdb14c0863",

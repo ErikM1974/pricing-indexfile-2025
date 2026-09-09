@@ -29,7 +29,11 @@ describe('public legacy pages — Rule 3', () => {
         expect(html).toContain(css + '?v=');
         expect(html).toContain(js + '?v=');
         expect(html).not.toMatch(BARE);
-        expect(read(css)).toMatch(/\[hidden\] \{ display: none !important; \}/);
+        if (html.includes('data-ui="unified"')) {
+            expect(html).toContain('/shared_components/css/components.css?v=');
+            expect(read('shared_components/css/components.css')).toMatch(/\[hidden\]\s*\{[^}]*display:\s*none;/);
+            expect(read(css)).not.toMatch(/!important/);
+        } else expect(read(css)).toMatch(/\[hidden\] \{ display: none !important; \}/);
         const code = read(js);
         expect(code).not.toMatch(/onclick=/);
         expect(code.replace(/data-onerror/g, '')).not.toMatch(/onerror=/);
