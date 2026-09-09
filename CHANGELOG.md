@@ -1,3 +1,18 @@
+## v2026.09.09.7 (2026.09.09)
+
+- Plan banner and sticker configurator style unification
+- Record shutdown state and pending instant storefront review
+- WIP save banner and sticker styles; mobile review pending
+- Save isolated shutdown checkpoint without changing concurrent release
+- Bring verified campaign release into instant storefront work
+- Record verified campaign release and resumed instant storefront review
+- Record verified campaign release and resumed instant storefront review
+- Record completed instant storefront review and cascade ownership lesson
+- Unify banner and sticker configurators with shared accessible controls
+- Integrate reviewed banner and sticker storefronts
+- Keep optional-label style guard independent of whitespace
+- Deploy v2026.09.09.7: unify banner and sticker storefronts
+
 ## v2026.09.09.6 (2026.09.09)
 
 - Plan shared golf and safety campaign storefront cleanup

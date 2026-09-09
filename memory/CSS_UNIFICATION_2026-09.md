@@ -691,3 +691,7 @@ Candidate v2026.09.09.7.14 focused browser cases passed26.2s (last targeted all5
 ## Instant storefront release checks complete — v2026.09.09.7
 
 Tested source 7d6cf7bc8124e7d3da8642093c3a9018b98e8897. Build/lint/types,485 routes/24 modules, 218 unit suites/5205 passed/four existing skips,88 DOM,4 accessibility-unit,84 quote parity,422 mocked browser and16 remaining browser cases;3 optional screenshot skips;all5 actual calculator surfaces. 299 CSS lint clean,HTTP boot200,production audit zero.14 focused browser and209 focused unit checks;two PDFs/419 retained text nodes. Only instant branch work and its documented shared asset references ship; saved WIP is now fully reviewed. Candidate v2026.09.09.7; exact-source CI and actual rollout pending. Live115/110 until verification.
+
+## Instant storefront release record — v2026.09.09.7
+
+Exact-source CI 34370064451 passed all four jobs on3462512138c1dc3601d29e335c5ca2c7fa82e032, including actual money/calculator parity and full mocked CSS browser group. Banner/sticker pricing, quote and artwork implementations preserved; shared native menu/disclosure ownership, four widths,14 focused browser cases,all50 sticker prices,seven banner presets,209 focused unit cases and419 checked paper text nodes. Full checks 5205 unit tests,422 mocked browser,16 remaining browser;485 routes unchanged. Candidate117 reviewed/108 pending becomes live only after actual rollout verification.
