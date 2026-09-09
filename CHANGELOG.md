@@ -1,3 +1,15 @@
+## v2026.09.08.17 (2026.09.08)
+
+- Record API reference family baseline and migration plan
+- Record live final training release and API reference worktree checkpoint
+- Record API reference verification and print lessons
+- Unify API reference layouts and accessible catalogue controls
+- Integrate reviewed API reference family with live training release
+- Record reference integration guard adjustment
+- Track unified reference visibility and native retry in hygiene guard
+- Record complete API reference release gates and next worktree
+- Version unified API reference assets for verified rollout
+
 ## v2026.09.08.16 (2026.09.08)
 
 - Record live manual release and final training worktree checkpoint
