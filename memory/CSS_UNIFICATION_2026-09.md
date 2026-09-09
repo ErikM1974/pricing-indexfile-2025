@@ -529,3 +529,14 @@ If both pending families deploy successfully, this batch would reach99 of225 app
 ## Brand guides reviewed locally — 2026-09-09
 
 Fifteen custom-brand pages share tokens/components + storefront-shell.css + renamed brand-guide.css/controller. Original full main text, all anchors/images/SEO JSON-LD and search fields remain exact. Native dialog supports focus wrap/return, Escape, backdrop and desktop resize; search still trims/encodes the catalogue query. Richardson showcase tiles stay static.31 focused browser cases pass at1440/768/390/320 with zero axe violations;168 source/ownership/runtime cases pass after correcting selector scope and rerunning an inventory timeout from competing browser load. Strict JS and focused CSS clean. Duplicate rules merged into owners. PDFs retain1261 checked text/product/FAQ blocks (Carhartt6 pages, others5); case-normalized comparison reflects the existing uppercase eyebrow. Desktop/phone and first/middle/last paper renders reviewed. Raw CSS graph65,000 ->72790 bytes: shared components add coverage; no byte-saving claim. Pending full primary release gates and deployment; not yet live. Candidate2026.09.09.1 references pre-versioned on all15 consumers.
+
+## Staff references and forms directory plan — 2026-09-09
+
+Next bounded family after brand guides: commission-structure, embroidery-bonus-plan, seo-strategy, forms-library and data-entry-guide (five sources). Base a6d59feca31b1a4419c1f963bb91c063e7d03539; original text/links/images/IDs/fields and dependency graphs saved in staff-reference-original-baseline.json. Existing shared reading/navigation patterns will own headers, readable sections, tables, controls and print; only page-specific arrangements stay local. Preserve published plan/strategy prose and commission examples exactly. Bonus amounts remain API-driven; test actual config, denied/malformed/fallback responses and complete printed warnings. Data-entry service prices keep source warnings visible and get usable retry instead of an ambiguous fallback badge. Forms directory retains live entries and destinations with explicit loading, malformed, empty and failed/retry states. Keep staff gates and service endpoints unchanged.
+
+- [ ] Capture original desktop/phone screenshots with synthetic service responses.
+- [ ] Migrate five layouts and needed navigation/print/error controls, retiring borrowed shell dependencies.
+- [ ] Lock original prose, fields, API mappings and financial computation; test keyboard, four widths/axe, retry/empty/malformed, and actual PDF content.
+- [ ] Register every file immediately, document results, run full primary release gates and exact-source CI, then verify actual rollout.
+
+This is a plan only; no application files in this family changed yet. Brand guides remain reviewed in codex/brand-guide-family at a6d59feca31b1a4419c1f963bb91c063e7d03539; production checks for the prior webstore release are still running.
