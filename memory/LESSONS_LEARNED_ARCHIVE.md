@@ -4085,3 +4085,5 @@ the link with `rmdir` (cmd) first and check it is gone. 🔑 Prefer `NODE_PATH=<
 junction when a scratch tree needs the repo's packages. 🔑 When 184 suites fail at once with "Cannot find
 module", suspect the install, not the change — `npm ci` before debugging anything.
 
+
+### Bonus hero dial + CTA wrap-hole (2026-09-01, ARCHIVED 2026-09-03): variable-width money never lives inside a fixed ring (ring holds the %, dollars beside it); flex-wrap breaks lines on MAX-CONTENT width, not post-shrink width — give the sibling `flex:1 1 0`. Full entry in archive.
