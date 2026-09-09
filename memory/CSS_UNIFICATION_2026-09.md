@@ -649,3 +649,12 @@ Brand directory and Fall catalog share canonical controls/cards and storefront n
 ## Catalog discovery integration — 2026-09-09
 
 Reviewed commit a29c40992536519b55ee313c307d29c263c33d5e integrated after verified entry/status release 2082. Only appended memory notes conflicted; both histories and latest live checkpoint retained. All application changes merged directly; prior commission serialization fix retained. Next full primary release checks. Live 110 reviewed/115 pending stays authoritative until verified catalog rollout.
+
+## Campaign storefront plan — 2026-09-09
+
+Next three shared-style consumers: Golf Tournament Apparel, its product detail, and Custom Safety Stripe Apparel. Branch codex/campaign-storefront based on 03c7ec49ca597b40ce0346497ec812737954180e. Original prose, link/image/field/SEO contracts and all four controller/service sources recorded before edits. Consolidate the oversized showcase sheet into a scoped campaign owner built on canonical typography, controls, surfaces and semantic tokens. Keep original photos, page-specific storytelling, published terms, safety copy and quote/pricing/email behavior. Shared public fragment/print/photo-viewer behavior gets keyboard focus and complete paper checks; financial helpers and services remain source locked. Existing Summer 2026 offer deadline is historical business copy, not silently changed as part of CSS work.
+
+- [ ] Capture original desktop/phone and controlled product/pricing/form states.
+- [ ] Rebuild shared campaign and product page arrangements, preserve content and financial behavior, register changed owners immediately.
+- [ ] Four widths/axe/keyboard/photo viewer/filter/gallery/form failure and success with all real business writes and email blocked; compare complete PDF content.
+- [ ] Full primary release checks, exact-source CI and verified deployment after catalog discovery. Candidate 2026.09.09.5; live count remains 110/115 until catalog verification, then112/113. Only verified three-page rollout would become115/110.
