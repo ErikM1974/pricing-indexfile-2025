@@ -130,14 +130,9 @@ these two already-CRLF-tracked package files to avoid hiding the dependency diff
 with the documented narrow type exception. HTTP tests verify quotas, IPv6 grouping, API headers and signed webhook dispatch.
 **Prevention:** Run contract tests before and after each major upgrade; a dependency PR passing CI alone is insufficient.
 
-## 2026-09-07 — Tooling upgrades and visual verification
+## Tooling upgrades and visual verification (2026-09-07, archived)
 
-**Problem:** New major tooling exposed type inference gaps, redundant CSS and two existing dimmed DTG art-fee contrast findings.
-**Solution:** Jest30/TypeScript7/Stylelint17 pass with narrow type corrections and 24 redundant declarations removed.
-Keep ESLint9, jsdom26 and browser axe4.12.1 until their measured migration issues are addressed; do not raise ratchets.
-**Prevention:** Screenshots must build the changed assets and normalize focus/scroll before capture. A second after-shot
-proved the remaining 850-pixel screen-print difference was an async thumbnail; the second comparison was exactly zero.
-Native Node22.23 runs Puppeteer25; invoke its capture CLI outside Jest, and report unavailable baselines as actual skips.
+Keep version choices tied to measured checks and compare screenshots only after readiness. Full entry in LESSONS_LEARNED_ARCHIVE.md.
 
 ## 2026-09-07 — DTF browser checks must await initialization
 
@@ -254,3 +249,7 @@ Problem: shared form arrangements initially omitted canonical field styles, infr
 ### Catalog discovery must distinguish failed data from absent products (2026-09-09)
 
 Problem: missing logos left unnamed tiles, failed product batches could appear as verified absent products, and intrinsic grid images overlapped card labels on paper. Root cause: image-only interaction, unchecked response shape, and print grid intrinsic sizing. Solution: named native links, validated batches with explicit retry preserving filters, server price labels retained verbatim, and contained images with separate label flow. Move shared navigation without duplicating it; preserve every curated style/category/brand description. Prevention: test keyboard, malformed/partial/empty/retry states and escaped server labels; assert image-to-body print geometry and compare every PDF text block. Browser review blocks all business writes and emails.
+
+### Campaign inquiries must be received before confirming success (2026-09-09)
+
+Problem: the golf form cleared entered details and sent a customer confirmation even when saving and sales notification both failed; malformed catalog data could also leave sample pricing loading forever. Root cause: all-settled delivery results were logged but never gated the receipt, and initial response shape/loading regions were unchecked. Solution: show success only after storage or sales notification accepts the request, send customer confirmation afterward, preserve inputs on total failure, show confirmation-email failures separately, and stop both catalog/sample loaders on invalid data. Prevention: exercise storage/lead/customer failure combinations and retry with the same values; preserve financial helpers and underlying services. For CSS, validate every token against actual page owners and inspect rendered paper: white text can survive PDF extraction while being invisible, narrow grids can wrap money, and flex list text can split into unintended columns.
