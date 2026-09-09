@@ -875,3 +875,5 @@ Branch codex/purchasing-workspaces starts atd524d2e51de086c1af8461392bd0fae6a0fc
 - [ ] Complete mocked business-state/browser and PDF review before adding these two pages to the manifest. Then full integration gates/exact-source CI and rollout after .12.
 
 Only inspection and this plan have been completed. Saved originals: purchasing-original-baseline.json. Legacy fixture stubs were read for schemas; new browser checks must block every unmocked business request, including their realFetch fallback.
+
+Purchasing workspace implementation started: shared arrangement owner, canonical static controls/tables, native file input, named keyboard scroll regions and four migrated production/harness entry points. Two old page owners retired; shared invoice CSS/controller still legacy and pending. Current pages are intentionally unreviewed; no business controller changes yet. Primary .12 full gates run independently on82b954c487c7c1ea84454768cc85ea493102d295; .11 is verified live at84bd143a/Heroku2087 (129of225).
