@@ -1,91 +1,90 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="robots" content="noindex, nofollow">
-    <title>Policy Detail — Northwest Custom Apparel</title>
-    <link rel="icon" href="/favicon.png" type="image/png">
+<!DOCTYPE html><html lang="en"><head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="robots" content="noindex, nofollow">
+        <title>Policy Detail — Northwest Custom Apparel</title>
+        <link rel="icon" href="/favicon.png" type="image/png">
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/pages/css/policies-hub-v2.css?v=2026.09.07.19">
-    <link rel="stylesheet" href="/pages/css/policy-detail.css?v=2026.09.07.19">
-    <link rel="stylesheet" href="/pages/css/org-chart-2026.css?v=2026.09.07.14">
-    <script src="/config/app.config.js"></script>
-</head>
-<body class="policy-detail-body">
-
-    <!-- Hidden Caspio auth embed — used by policies-admin-gate.js to
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+        <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
+        <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.08.17">
+        <link rel="stylesheet" href="/pages/css/policy-workspace.css?v=2026.09.08.19">
+        <link rel="stylesheet" href="/pages/css/policy-detail.css?v=2026.09.07.19">
+        <link rel="stylesheet" href="/pages/css/org-chart-2026.css?v=2026.09.07.14">
+        <script src="/config/app.config.js"></script>
+    </head>
+    <body class="policy-detail-body" data-ui="unified" data-policy="policy-detail"><a href="#policy-main" class="skip-link">Skip to content</a>
+        <!-- Hidden Caspio auth embed — used by policies-admin-gate.js to
          auto-bootstrap the Express CRM session if the viewer is already
          signed in to Caspio. Without this, edit affordances stay hidden. -->
-    <div class="caspio-auth" hidden>
-        <div id="auth-firstname">[@authfield:First_Name]</div>
-        <div id="auth-lastname">[@authfield:Last_Name]</div>
-        <div id="auth-email">[@authfield:Email]</div>
-        <div id="auth-role">[@authfield:Role]</div>
-        <!-- Injected by policies-admin-gate.js ONLY when no SAML/session identity exists (2026-09-05):
+        <div class="caspio-auth" hidden="">
+            <div id="auth-firstname">[@authfield:First_Name]</div>
+            <div id="auth-lastname">[@authfield:Last_Name]</div>
+            <div id="auth-email">[@authfield:Email]</div>
+            <div id="auth-role">[@authfield:Role]</div>
+            <!-- Injected by policies-admin-gate.js ONLY when no SAML/session identity exists (2026-09-05):
              as a static script it redirected signed-in staff to the Caspio portal login. -->
-        <div id="caspio-auth-embed" data-src="https://c3eku948.caspio.com/dp/a0e15000a0bb470ed2be4ec5943e/emb"></div>
-    </div>
-
-    <header class="detail-topbar">
-        <a href="/pages/policies-hub.html" class="back-link">
-            <i class="fas fa-arrow-left" aria-hidden="true"></i> Back to Hub
-        </a>
-        <div class="detail-topbar-title">
-            <i class="fas fa-book-open" aria-hidden="true"></i>
-            Company Policies
+            <div id="caspio-auth-embed" data-src="https://c3eku948.caspio.com/dp/a0e15000a0bb470ed2be4ec5943e/emb"></div>
         </div>
-    </header>
 
-    <div id="detailRoot" class="detail-layout">
+        <header class="page-header">
+            <div class="page-header-inner policy-topbar">
+                <a href="/pages/policies-hub.html" class="back-link btn">
+                    <i class="fas fa-arrow-left" aria-hidden="true"></i> Back to Hub
+                </a>
+                <div class="detail-topbar-title">
+                    <i class="fas fa-book-open" aria-hidden="true"></i>
+                    Company Policies
+                </div>
+            </div>
+        </header>
 
-        <main class="detail-main">
+        <div id="detailRoot" class="detail-layout">
+            <main class="detail-main" id="policy-main" tabindex="-1">
+                <!-- Breadcrumb -->
+                <nav class="breadcrumb" id="breadcrumb" aria-label="Breadcrumb"></nav>
 
-            <!-- Breadcrumb -->
-            <nav class="breadcrumb" id="breadcrumb" aria-label="Breadcrumb"></nav>
+                <!-- Title -->
+                <h1 class="policy-title" id="policyTitle">Loading…</h1>
 
-            <!-- Title -->
-            <h1 class="policy-title" id="policyTitle">Loading…</h1>
+                <!-- Summary -->
+                <div class="policy-summary" id="policySummary"></div>
 
-            <!-- Summary -->
-            <div class="policy-summary" id="policySummary"></div>
+                <!-- Meta row (or edit form fields when editing) -->
+                <div class="policy-meta-row" id="policyMeta"></div>
 
-            <!-- Meta row (or edit form fields when editing) -->
-            <div class="policy-meta-row" id="policyMeta"></div>
+                <!-- Body (rendered HTML, or TipTap editor when editing) -->
+                <div class="policy-body" id="policyBody"></div>
 
-            <!-- Body (rendered HTML, or TipTap editor when editing) -->
-            <div class="policy-body" id="policyBody"></div>
+                <!-- Actions: Edit / Save / Cancel / Archive -->
+                <div class="policy-actions" id="policyActions"></div>
 
-            <!-- Actions: Edit / Save / Cancel / Archive -->
-            <div class="policy-actions" id="policyActions"></div>
+                <!-- Sub-procedures (children) -->
+                <section class="sub-procedures" id="subProcedures" hidden=""></section>
 
-            <!-- Sub-procedures (children) -->
-            <section class="sub-procedures" id="subProcedures" style="display:none"></section>
+                <!-- Discussion / comments -->
+                <section id="commentsSection" hidden=""></section>
+            </main>
 
-            <!-- Discussion / comments -->
-            <section id="commentsSection" style="display:none"></section>
+            <!-- Outline (auto-generated from headings) -->
+            <aside class="outline-sidebar" id="policyOutline" aria-label="Page outline" hidden=""></aside>
+        </div>
 
-        </main>
+        <!-- Scripts -->
+        <script src="/shared_components/js/policies/policy-workspace.js?v=2026.09.08.19"></script>
 
-        <!-- Outline (auto-generated from headings) -->
-        <aside class="outline-sidebar" id="policyOutline" style="display:none" aria-label="Page outline"></aside>
+        <script src="/shared_components/js/policies/policies-admin-gate.js?v=2026.09.06.37"></script>
+        <script src="/shared_components/js/policies/policies-api.js?v=2026.09.06.31"></script>
+        <script src="/shared_components/js/policies/policy-editor-tiptap.js?v=2026.09.06.31"></script>
+        <script src="/shared_components/js/policies/policy-ai-assist.js?v=2026.09.06.27"></script>
+        <script src="/shared_components/js/policies/policy-lightbox.js?v=2026.09.06.27"></script>
+        <script src="/shared_components/js/policies/policy-mermaid.js?v=2026.09.06.27"></script>
+        <script src="/shared_components/js/policies/policy-comments.js?v=2026.09.06.31"></script>
+        <script src="/shared_components/js/policies/org-chart-2026.js?v=2026.07.14.4"></script>
+        <script src="/shared_components/js/policies/policy-detail.js?v=2026.09.06.27"></script>
 
-    </div>
 
-    <!-- Scripts -->
-    <script src="/shared_components/js/policies/policies-admin-gate.js?v=2026.09.06.37"></script>
-    <script src="/shared_components/js/policies/policies-api.js?v=2026.09.06.31"></script>
-    <script src="/shared_components/js/policies/policy-editor-tiptap.js?v=2026.09.06.31"></script>
-    <script src="/shared_components/js/policies/policy-ai-assist.js?v=2026.09.06.27"></script>
-    <script src="/shared_components/js/policies/policy-lightbox.js?v=2026.09.06.27"></script>
-    <script src="/shared_components/js/policies/policy-mermaid.js?v=2026.09.06.27"></script>
-    <script src="/shared_components/js/policies/policy-comments.js?v=2026.09.06.31"></script>
-    <script src="/shared_components/js/policies/org-chart-2026.js?v=2026.07.14.4"></script>
-    <script src="/shared_components/js/policies/policy-detail.js?v=2026.09.06.27"></script>
-</body>
-</html>
+</body></html>

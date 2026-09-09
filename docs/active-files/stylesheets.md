@@ -188,3 +188,7 @@ cap-embroidery-fix.css
 API reference family: Caspio, ManageOrders, SanMar and ShopWorks ODBC load tokens → components → api-reference → page arrangements. Shared reference CSS owns page chrome, labeled search, count/status, endpoint/field tables, callouts, mobile wrapping and paper rhythm. Keep technical catalogs in page controllers/data; original-content and schema guards prevent accidental edits. Native ODBC details and failed/malformed catalogue retry remain page behavior.
 
 Policy guides/notices: shared components own page chrome, fields/buttons, cards and visibility. policy-migration.css and pricing-negotiation-policy.css own domain arrangements; simple-notice-page.css is shared by Resources/Sale. These four opt in with data-guidance. Preserve historical policy figures and the migration snapshot. Bootstrap and art-hub/dash-shell dependencies are removed from this family.
+
+## Unified policies workspace — 2026-09-08
+
+The four policy pages load tokens, shared components, then pages/css/policy-workspace.css. Policy Detail adds policy-detail.css and org-chart-2026.css; Handbook adds handbook.css. Each owns its responsive domain layout and one print layer. The prior policies-hub-v2.css path is retired. Shared policy-workspace.js owns contents disclosure, read-only table scrolling and control classes, excluding editor-owned DOM.

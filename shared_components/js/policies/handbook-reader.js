@@ -26,6 +26,8 @@
     const PARENT_ID = 'employee-handbook';
     const BATCH_SIZE = 4;            // Parallel fetches per batch
     const BATCH_DELAY_MS = 250;       // Gap between batches to avoid 429
+    let scrollObserver;
+    let printBound = false;
 
     const els = {
         content: document.getElementById('handbookContent'),
@@ -73,16 +75,26 @@
         }
     }
 
-    // Strip the web "Return to TOC" footer (everything after the last <hr>)
-    // that CHAPTER_FOOTER injects via the policy detail view. The handbook
-    // reader is the chapter list itself, so the footer is noise here.
+    // Remove only a trailing navigation footer; an ordinary final section after a rule is content.
     function stripChapterFooter(html) {
         if (!html) return '';
-        const parts = html.split(/<hr\s*\/?>(?:\s*)/i);
-        if (parts.length > 1) {
-            return parts.slice(0, -1).join('<hr>');
-        }
-        return html;
+        return html.replace(/<hr\s*\/?>(?:\s*)<p\b[^>]*>(?:(?!<\/p>)[\s\S])*?(?:Return to (?:TOC|Table of Contents)|Back to Table of Contents)(?:(?!<\/p>)[\s\S])*?<\/p>\s*$/i, '');
+    }
+
+    function sanitizeContent(html) {
+        if (!window.DOMPurify) throw new Error('Handbook content could not be prepared safely. Please reload.');
+        const clean = window.DOMPurify.sanitize(html, {
+            ADD_TAGS: ['iframe'],
+            ADD_ATTR: ['target', 'rel', 'allow', 'allowfullscreen', 'frameborder', 'loading', 'data-video-embed', 'data-src', 'data-kind'],
+            FORBID_TAGS: ['style', 'script'],
+        });
+        const wrapper = document.createElement('div');
+        // eslint-disable-next-line no-unsanitized/property -- DOMPurify sanitized this markup; trusted video URLs are checked next.
+        wrapper.innerHTML = clean;
+        wrapper.querySelectorAll('iframe').forEach(frame => {
+            if (!/^https:\/\/(?:www\.)?(youtube\.com|youtube-nocookie\.com|loom\.com|player\.vimeo\.com)\//.test(frame.getAttribute('src') || '')) frame.remove();
+        });
+        return wrapper.innerHTML;
     }
 
     // ===== Fetching =====
@@ -103,6 +115,7 @@
 
     async function fetchPolicy(policyId) {
         const data = await fetchJSON(`${PROXY}/api/policies-public/${encodeURIComponent(policyId)}`);
+        if (!data?.policy || typeof data.policy.Body_HTML !== 'string') throw new Error('Unexpected chapter response');
         return data.policy;
     }
 
@@ -201,6 +214,7 @@
     // ===== Scroll-spy: highlight TOC item for current section =====
 
     function setupScrollSpy() {
+        scrollObserver?.disconnect();
         const sections = Array.from(document.querySelectorAll('.handbook-chapter, .handbook-intro'));
         const tocLinks = Array.from(document.querySelectorAll('.handbook-toc-item'));
         if (sections.length === 0 || tocLinks.length === 0) return;
@@ -220,16 +234,20 @@
         });
 
         sections.forEach(s => observer.observe(s));
+        scrollObserver = observer;
     }
 
     function setupBackToTop() {
+        if (document.querySelector('.handbook-back-top')) return;
         const btn = document.createElement('button');
         btn.className = 'handbook-back-top';
         btn.innerHTML = '<i class="fas fa-arrow-up" aria-hidden="true"></i>';
         btn.title = 'Back to top';
         btn.setAttribute('aria-label', 'Back to top');
         btn.addEventListener('click', () => {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            const title = document.querySelector('.handbook-topbar-title');
+            title.tabIndex = -1; title.focus({ preventScroll: true });
+            window.scrollTo({ top: 0, behavior: 'auto' });
         });
         document.body.appendChild(btn);
 
@@ -239,42 +257,34 @@
     }
 
     function setupPrintButton() {
-        if (!els.printBtn) return;
+        if (!els.printBtn || printBound) return;
+        printBound = true;
         els.printBtn.addEventListener('click', () => {
             window.print();
         });
     }
 
     function setupSmoothScroll() {
-        // Override default anchor behavior so links scroll smoothly and the
-        // TOC active state has a moment to update.
+        // Native fragment navigation preserves keyboard focus and browser history.
         document.querySelectorAll('.handbook-toc-item').forEach(a => {
-            a.addEventListener('click', (e) => {
-                const targetId = a.dataset.target;
-                if (!targetId) return;
-                const target = document.getElementById(targetId);
-                if (!target) return;
-                e.preventDefault();
-                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                // Update URL without jumping
-                if (history.pushState) {
-                    history.pushState(null, '', `#${targetId}`);
-                }
-            });
+            const target = document.getElementById(a.dataset.target);
+            if (target) target.tabIndex = -1;
         });
     }
 
     // ===== Main =====
 
     function showError(msg) {
-        els.content.innerHTML = `<div class="handbook-error">
+        els.content.innerHTML = `<div class="handbook-error" role="alert">
             <strong>Could not load handbook.</strong> ${escapeHTML(msg)}
-            <br><br>Try refreshing the page. If the problem persists, the Policies API may be down — check
-            <a href="${PROXY}/api/policies-public/tree" target="_blank">the API directly</a>.
+            <p><button type="button" class="btn">Retry</button></p>
         </div>`;
+        els.content.querySelector('button').addEventListener('click', init);
     }
 
     async function init() {
+        els.printBtn.disabled = true;
+        els.content.setAttribute('aria-busy', 'true');
         try {
             const tree = await fetchTree();
             const parentStub = findParentInTree(tree);
@@ -310,8 +320,18 @@
                 ...chapters.map((ch, i) => renderChapter(ch, i)),
             ].join('\n');
 
-            els.content.innerHTML = html;
+            // eslint-disable-next-line no-unsanitized/property -- Policy markup has passed DOMPurify and the trusted-video allowlist; sanitizer failure stops rendering.
+            els.content.innerHTML = sanitizeContent(html);
+            // eslint-disable-next-line no-unsanitized/property -- Composed UI markup: external labels are escaped or encoded; other values are fixed markup or numeric counts.
             els.toc.innerHTML = renderTOC(chapters);
+            const missing = chapters.filter(ch => ch._error).length;
+            if (missing) {
+                const warning = document.createElement('div'); warning.className = 'handbook-error'; warning.setAttribute('role', 'alert');
+                const message = document.createElement('p'); message.textContent = missing + ' chapter(s) could not load. This handbook is incomplete.';
+                const retry = document.createElement('button'); retry.type = 'button'; retry.className = 'btn'; retry.textContent = 'Retry missing chapters'; retry.addEventListener('click', init);
+                warning.append(message, retry); els.content.prepend(warning);
+            }
+            els.printBtn.disabled = false;
 
             if (els.loadedAt) {
                 els.loadedAt.textContent = new Date().toLocaleString('en-US', {
@@ -330,12 +350,14 @@
                 const id = window.location.hash.slice(1);
                 const target = document.getElementById(id);
                 if (target) {
-                    setTimeout(() => target.scrollIntoView({ behavior: 'smooth' }), 100);
+                    target.focus({ preventScroll: true }); target.scrollIntoView({ behavior: 'auto' });
                 }
             }
         } catch (err) {
             console.error('Handbook reader init failed:', err);
             showError(err.message || 'Unknown error.');
+        } finally {
+            els.content.setAttribute('aria-busy', 'false');
         }
     }
 

@@ -1,0 +1,1501 @@
+/* Unified policy workspace. Shared components own controls; this file owns domain layouts. */
+@layer components.pages {
+    :where([data-ui="unified"][data-policy]) .hub-search-wrap {
+        position: relative;
+        flex: 0 1 360px;
+    }
+
+    :where([data-ui="unified"][data-policy]) .hub-search-wrap i {
+        position: absolute;
+        left: 0.85rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--ui-muted);
+        pointer-events: none;
+    }
+
+    :where([data-ui="unified"][data-policy]) .hub-search-wrap input {
+        width: 100%;
+        border: 1px solid var(--ui-line);
+        border-radius: 8px;
+        font-size: 0.92rem;
+        transition:
+            border 0.15s,
+            background 0.15s;
+        padding: var(--space-3) var(--space-3) var(--space-3) 2.5rem;
+        background: var(--ui-surface);
+    }
+
+    :where([data-ui="unified"][data-policy]) .hub-search-wrap input:focus {
+        border-color: var(--ui-accent);
+        background: var(--ui-surface);
+        box-shadow: 0 0 0 3px var(--ui-tint);
+    }
+
+    :where([data-ui="unified"][data-policy]) .hub-layout {
+        display: grid;
+        margin: 0 auto;
+        grid-template-columns: 250px minmax(0, 1fr);
+        max-width: 1280px;
+        gap: var(--space-5);
+        padding: var(--space-5);
+    }
+
+    @media (width <= 900px) {
+        :where([data-ui="unified"][data-policy]) .hub-layout {
+            grid-template-columns: 1fr;
+        }
+
+        :where([data-ui="unified"][data-policy]) .hub-sidebar {
+            order: 2;
+        }
+    }
+
+    :where([data-ui="unified"][data-policy]) .hub-sidebar {
+        top: 84px;
+        align-self: start;
+        background: var(--ui-surface);
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-md);
+        box-shadow: none;
+        position: static;
+        max-height: none;
+        overflow: visible;
+        padding: var(--space-4);
+    }
+
+    :where([data-ui="unified"][data-policy]) .tree-sidebar-title {
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--ui-muted);
+        margin: 0.25rem 0 0.5rem;
+        padding: 0 0.5rem;
+    }
+
+    :where([data-ui="unified"][data-policy]) .tree-cat {
+        margin-bottom: 0.25rem;
+    }
+
+    :where([data-ui="unified"][data-policy]) .tree-cat > summary {
+        list-style: none;
+        cursor: pointer;
+        padding: 0.4rem 0.5rem;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--ui-ink);
+        transition: background 0.1s;
+    }
+
+    :where([data-ui="unified"][data-policy]) .tree-cat > summary::-webkit-details-marker {
+        display: none;
+    }
+
+    :where([data-ui="unified"][data-policy]) .tree-cat > summary::before {
+        content: "▸";
+        color: var(--ui-muted);
+        font-size: 0.7rem;
+        transition: transform 0.15s;
+        display: inline-block;
+    }
+
+    :where([data-ui="unified"][data-policy]) .tree-cat[open] > summary::before {
+        transform: rotate(90deg);
+    }
+
+    :where([data-ui="unified"][data-policy]) .tree-cat > summary:hover {
+        background: var(--ui-canvas);
+    }
+
+    :where([data-ui="unified"][data-policy]) .tree-cat > summary i {
+        color: var(--ui-accent);
+        width: 1em;
+        text-align: center;
+    }
+
+    :where([data-ui="unified"][data-policy]) .tree-count {
+        margin-left: auto;
+        background: var(--ui-canvas);
+        color: var(--ui-muted);
+        padding: 0.1rem 0.45rem;
+        border-radius: 10px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    :where([data-ui="unified"][data-policy]) .tree-list {
+        list-style: none;
+        padding: 0;
+        margin: 0 0 0.25rem 0.5rem;
+        border-left: 1px solid var(--ui-line);
+    }
+
+    :where([data-ui="unified"][data-policy]) .tree-list-nested {
+        margin-left: 0.5rem;
+    }
+
+    :where([data-ui="unified"][data-policy]) .tree-item {
+        margin: 0;
+    }
+
+    :where([data-ui="unified"][data-policy]) .tree-link {
+        display: block;
+        padding: 0.35rem 0.55rem;
+        margin: 0.1rem 0;
+        color: var(--ui-muted);
+        text-decoration: none;
+        font-size: 0.84rem;
+        border-radius: 5px;
+        line-height: 1.3;
+        transition:
+            background 0.1s,
+            color 0.1s;
+        position: relative;
+    }
+
+    :where([data-ui="unified"][data-policy]) .tree-link:hover {
+        background: var(--ui-tint);
+        color: var(--ui-accent-hover);
+    }
+
+    :where([data-ui="unified"][data-policy]) .tree-link.is-draft {
+        font-style: italic;
+        opacity: 0.85;
+    }
+
+    :where([data-ui="unified"][data-policy]) .tree-link.is-external::after {
+        content: "";
+    }
+
+    :where([data-ui="unified"][data-policy]) .tree-external-icon {
+        font-size: var(--font-size-xs);
+        margin-left: 0.4rem;
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-policy]) .tree-badge {
+        margin-left: 0.4rem;
+        font-size: var(--font-size-xs);
+        font-weight: 700;
+        padding: 0.05rem 0.4rem;
+        border-radius: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    :where([data-ui="unified"][data-policy]) .tree-badge-draft {
+        background: var(--color-warning-bg);
+        color: var(--color-warning-ink);
+    }
+
+    :where([data-ui="unified"][data-policy]) .tree-item-parent > details > summary {
+        list-style: none;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+    }
+
+    :where([data-ui="unified"][data-policy]) .tree-item-parent > details > summary::-webkit-details-marker {
+        display: none;
+    }
+
+    :where([data-ui="unified"][data-policy]) .tree-item-parent > details > summary::before {
+        content: "▸";
+        color: var(--ui-muted);
+        font-size: var(--font-size-xs);
+        margin: 0 0.3rem 0 0.1rem;
+        transition: transform 0.15s;
+        display: inline-block;
+    }
+
+    :where([data-ui="unified"][data-policy]) .tree-item-parent > details[open] > summary::before {
+        transform: rotate(90deg);
+    }
+
+    :where([data-ui="unified"][data-policy]) .tree-empty {
+        padding: 1rem 0.5rem;
+        color: var(--ui-muted);
+        font-size: 0.85rem;
+        font-style: italic;
+    }
+
+    :where([data-ui="unified"][data-policy]) .hub-content {
+        min-width: 0;
+    }
+
+    :where([data-ui="unified"][data-policy]) .hub-page-header {
+        margin-bottom: 1.5rem;
+    }
+
+    :where([data-ui="unified"][data-policy]) .hub-page-header h1 {
+        font-weight: 700;
+        color: var(--ui-ink);
+        margin: 0 0 0.4rem;
+        font-size: 2rem;
+    }
+
+    :where([data-ui="unified"][data-policy]) .hub-page-header p {
+        color: var(--ui-muted);
+        margin: 0;
+        font-size: 0.95rem;
+    }
+
+    :where([data-ui="unified"][data-policy]) .handbook-hero-tile {
+        border-radius: var(--radius-md);
+        margin-bottom: 1.5rem;
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 1.25rem;
+        align-items: center;
+        background: var(--ui-surface);
+        color: var(--ui-ink);
+        border: 1px solid var(--ui-line);
+        border-inline-start: 4px solid var(--ui-accent);
+        box-shadow: none;
+        padding: var(--space-5);
+    }
+
+    :where([data-ui="unified"][data-policy]) .handbook-hero-tile-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: 12px;
+        background: rgb(255 255 255 / 15%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+        color: var(--ui-ink);
+        opacity: 1;
+    }
+
+    :where([data-ui="unified"][data-policy]) .handbook-hero-tile-body {
+        min-width: 0;
+    }
+
+    :where([data-ui="unified"][data-policy]) .handbook-hero-tile-label {
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-bottom: 0.2rem;
+        color: var(--ui-ink);
+        opacity: 1;
+    }
+
+    :where([data-ui="unified"][data-policy]) .handbook-hero-tile-title {
+        font-size: 1.4rem;
+        margin: 0 0 0.3rem;
+        font-weight: 700;
+        line-height: 1.2;
+        color: var(--ui-ink);
+        opacity: 1;
+    }
+
+    :where([data-ui="unified"][data-policy]) .handbook-hero-tile-desc {
+        margin: 0;
+        font-size: 0.88rem;
+        line-height: 1.45;
+        color: var(--ui-ink);
+        opacity: 1;
+    }
+
+    :where([data-ui="unified"][data-policy]) .handbook-hero-tile-actions {
+        display: flex;
+        gap: 0.5rem;
+        flex-shrink: 0;
+    }
+
+    @media (width <= 700px) {
+        :where([data-ui="unified"][data-policy]) .handbook-hero-tile {
+            grid-template-columns: 1fr;
+            text-align: left;
+            padding: 1.25rem;
+        }
+
+        :where([data-ui="unified"][data-policy]) .handbook-hero-tile-icon {
+            display: none;
+        }
+
+        :where([data-ui="unified"][data-policy]) .handbook-hero-tile-actions {
+            width: 100%;
+            flex-wrap: wrap;
+        }
+    }
+
+    :where([data-ui="unified"][data-policy]) .category-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    :where([data-ui="unified"][data-policy]) .category-chip {
+        background: var(--ui-surface);
+        border: 1px solid var(--ui-line);
+        padding: 0.45rem 0.85rem;
+        cursor: pointer;
+        font-weight: 500;
+        color: var(--ui-muted);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.15s;
+        font-family: var(--ui-font);
+        min-height: 44px;
+        border-radius: var(--radius-sm);
+        font-size: var(--font-size-sm);
+    }
+
+    :where([data-ui="unified"][data-policy]) .category-chip i {
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-policy]) .category-chip:hover {
+        border-color: var(--ui-accent);
+        color: var(--ui-ink);
+    }
+
+    :where([data-ui="unified"][data-policy]) .category-chip.active {
+        background: var(--ui-accent);
+        border-color: var(--ui-accent);
+        color: white;
+    }
+
+    :where([data-ui="unified"][data-policy]) .category-chip.active i,
+    :where([data-ui="unified"][data-policy]) .category-chip.active .count {
+        color: white;
+    }
+
+    :where([data-ui="unified"][data-policy]) .category-chip .count {
+        background: rgb(0 0 0 / 6%);
+        color: var(--ui-muted);
+        padding: 0.1rem 0.5rem;
+        border-radius: 999px;
+        font-size: var(--font-size-xs);
+        font-weight: 700;
+    }
+
+    :where([data-ui="unified"][data-policy]) .category-chip.active .count {
+        background: rgb(255 255 255 / 25%);
+    }
+
+    :where([data-ui="unified"][data-policy]) .hub-toolbar-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    :where([data-ui="unified"][data-policy]) .view-toggle {
+        display: inline-flex;
+        background: var(--ui-surface);
+        border: 1px solid var(--ui-line);
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    :where([data-ui="unified"][data-policy]) .view-toggle-btn {
+        background: transparent;
+        border: none;
+        padding: 0.5rem 0.75rem;
+        cursor: pointer;
+        color: var(--ui-muted);
+        transition:
+            background 0.15s,
+            color 0.15s;
+    }
+
+    :where([data-ui="unified"][data-policy]) .view-toggle-btn:hover {
+        background: var(--ui-canvas);
+    }
+
+    :where([data-ui="unified"][data-policy]) .view-toggle-btn.active {
+        background: var(--ui-tint);
+        color: var(--ui-accent-hover);
+    }
+
+    :where([data-ui="unified"][data-policy]) .recently-updated {
+        background: var(--ui-surface);
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-md);
+        padding: 1rem 1.25rem;
+        margin-bottom: 1.5rem;
+    }
+
+    :where([data-ui="unified"][data-policy]) .recently-updated-header {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--ui-muted);
+        margin-bottom: 0.75rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+    }
+
+    :where([data-ui="unified"][data-policy]) .recent-items {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 0.5rem;
+    }
+
+    :where([data-ui="unified"][data-policy]) .recent-item {
+        display: flex;
+        flex-direction: column;
+        gap: 0.15rem;
+        padding: 0.5rem 0.75rem;
+        border-radius: 6px;
+        text-decoration: none;
+        color: var(--ui-ink);
+        border: 1px solid transparent;
+        transition: all 0.15s;
+        position: relative;
+    }
+
+    :where([data-ui="unified"][data-policy]) .recent-item:hover {
+        background: var(--ui-canvas);
+        border-color: var(--ui-line);
+    }
+
+    :where([data-ui="unified"][data-policy]) .recent-item-title {
+        font-size: 0.88rem;
+        font-weight: 500;
+    }
+
+    :where([data-ui="unified"][data-policy]) .recent-item-date {
+        font-size: 0.75rem;
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-policy]) .new-badge {
+        position: absolute;
+        top: 0.3rem;
+        right: 0.5rem;
+        background: var(--ui-accent);
+        color: white;
+        font-size: var(--font-size-xs);
+        font-weight: 700;
+        padding: 0.1rem 0.4rem;
+        border-radius: 10px;
+        letter-spacing: 0.05em;
+    }
+
+    :where([data-ui="unified"][data-policy]) .recent-empty {
+        color: var(--ui-muted);
+        font-size: 0.85rem;
+        font-style: italic;
+        padding: 0.5rem;
+    }
+
+    :where([data-ui="unified"][data-policy]) .policies-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+        gap: 1rem;
+    }
+
+    :where([data-ui="unified"][data-policy]) .policies-grid.hidden {
+        display: none;
+    }
+
+    :where([data-ui="unified"][data-policy]) .policy-card {
+        background: var(--ui-surface);
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-md);
+        padding: 1.1rem 1.1rem 1rem;
+        text-decoration: none;
+        color: var(--ui-ink);
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        transition:
+            transform 0.12s,
+            box-shadow 0.12s,
+            border-color 0.12s;
+        position: relative;
+        overflow: hidden;
+    }
+
+    :where([data-ui="unified"][data-policy]) .policy-card:hover {
+        transform: translateY(-2px);
+        box-shadow: none;
+        border-color: var(--ui-accent);
+    }
+
+    :where([data-ui="unified"][data-policy]) .policy-card.is-draft {
+        background: linear-gradient(180deg, var(--color-warning-bg), white 20%);
+    }
+
+    :where([data-ui="unified"][data-policy]) .policy-flag {
+        position: absolute;
+        top: 0.7rem;
+        right: 0.7rem;
+        font-size: var(--font-size-xs);
+        font-weight: 700;
+        padding: 0.15rem 0.5rem;
+        border-radius: 999px;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+    }
+
+    :where([data-ui="unified"][data-policy]) .flag-new {
+        background: var(--ui-accent);
+        color: white;
+    }
+
+    :where([data-ui="unified"][data-policy]) .flag-draft {
+        background: var(--color-warning-ink);
+        color: white;
+    }
+
+    :where([data-ui="unified"][data-policy]) .flag-external {
+        background: var(--ui-muted);
+        color: white;
+    }
+
+    :where([data-ui="unified"][data-policy]) .flag-archived {
+        background: var(--ui-muted);
+        color: white;
+    }
+
+    :where([data-ui="unified"][data-policy]) .policy-card.is-archived,
+    :where([data-ui="unified"][data-policy]) .policy-list-item.is-archived {
+        opacity: 0.62;
+    }
+
+    :where([data-ui="unified"][data-policy]) .tree-link.is-archived {
+        opacity: 0.6;
+        text-decoration: line-through;
+    }
+
+    :where([data-ui="unified"][data-policy]) .tree-badge-archived {
+        background: var(--ui-muted);
+        color: var(--color-on-brand);
+        font-size: var(--font-size-xs);
+        font-weight: 700;
+        padding: 0.05rem 0.35rem;
+        border-radius: 999px;
+        margin-left: 0.35rem;
+        text-transform: uppercase;
+    }
+
+    :where([data-ui="unified"][data-policy]) .archived-toggle {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        font-size: 0.82rem;
+        color: var(--ui-muted);
+        cursor: pointer;
+        user-select: none;
+    }
+
+    :where([data-ui="unified"][data-policy]) .archived-toggle input {
+        cursor: pointer;
+        margin: 0;
+    }
+
+    :where([data-ui="unified"][data-policy]) .archived-toggle i {
+        opacity: 0.7;
+    }
+
+    :where([data-ui="unified"][data-policy]) .policy-category-tag {
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--ui-accent);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+    }
+
+    :where([data-ui="unified"][data-policy]) .policy-title {
+        font-size: 1.05rem;
+        font-weight: 600;
+        color: var(--ui-ink);
+        margin: 0;
+        line-height: 1.35;
+    }
+
+    :where([data-ui="unified"][data-policy]) .policy-description {
+        color: var(--ui-muted);
+        font-size: 0.85rem;
+        line-height: 1.5;
+        margin: 0;
+        flex: 1;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    :where([data-ui="unified"][data-policy]) .policy-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.75rem;
+        color: var(--ui-muted);
+        padding-top: 0.6rem;
+        border-top: 1px solid var(--ui-line);
+        margin-top: 0.3rem;
+    }
+
+    :where([data-ui="unified"][data-policy]) .policy-meta i {
+        margin-right: 0.25rem;
+    }
+
+    :where([data-ui="unified"][data-policy]) .policies-list {
+        background: var(--ui-surface);
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-md);
+        overflow: hidden;
+        display: none;
+    }
+
+    :where([data-ui="unified"][data-policy]) .policies-list.active {
+        display: block;
+    }
+
+    :where([data-ui="unified"][data-policy]) .policy-list-header {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr 1fr;
+        gap: 1rem;
+        padding: 0.85rem 1.1rem;
+        background: var(--ui-canvas);
+        font-size: var(--font-size-xs);
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--ui-muted);
+        border-bottom: 1px solid var(--ui-line);
+    }
+
+    :where([data-ui="unified"][data-policy]) .policy-list-item {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr 1fr;
+        gap: 1rem;
+        padding: 0.85rem 1.1rem;
+        border-bottom: 1px solid var(--ui-line);
+        color: var(--ui-ink);
+        text-decoration: none;
+        font-size: 0.88rem;
+        transition: background 0.1s;
+    }
+
+    :where([data-ui="unified"][data-policy]) .policy-list-item:hover {
+        background: var(--ui-canvas);
+    }
+
+    :where([data-ui="unified"][data-policy]) .policy-list-item:last-child {
+        border-bottom: none;
+    }
+
+    :where([data-ui="unified"][data-policy]) .policy-list-title {
+        font-weight: 500;
+    }
+
+    :where([data-ui="unified"][data-policy]) .policy-list-category,
+    :where([data-ui="unified"][data-policy]) .policy-list-date,
+    :where([data-ui="unified"][data-policy]) .policy-list-owner {
+        color: var(--ui-muted);
+        font-size: 0.84rem;
+    }
+
+    :where([data-ui="unified"][data-policy]) .hub-empty,
+    :where([data-ui="unified"][data-policy]) .hub-error {
+        background: var(--ui-surface);
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-md);
+        padding: 3rem 1.5rem;
+        text-align: center;
+        color: var(--ui-muted);
+        font-size: 0.95rem;
+    }
+
+    :where([data-ui="unified"][data-policy]) .hub-empty i,
+    :where([data-ui="unified"][data-policy]) .hub-error i {
+        font-size: 2rem;
+        display: block;
+        margin-bottom: 0.75rem;
+        color: var(--ui-line);
+    }
+
+    :where([data-ui="unified"][data-policy]) .hub-error i {
+        color: var(--color-danger);
+    }
+
+    :where([data-ui="unified"][data-policy]) .admin-only {
+        display: none;
+    }
+
+    html.is-policies-admin :where([data-ui="unified"][data-policy]) .admin-only {
+        display: inline-flex;
+    }
+
+    :where([data-ui="unified"][data-policy]) .questions-layout {
+        grid-template-columns: 1fr;
+    }
+
+    :where([data-ui="unified"][data-policy]) .question-count-chip {
+        background: var(--color-danger);
+        color: white;
+        font-size: 0.78rem;
+        font-weight: 700;
+        padding: 0.15rem 0.55rem;
+        border-radius: 999px;
+        min-width: 1.5rem;
+        text-align: center;
+        margin-left: 0.4rem;
+    }
+
+    :where([data-ui="unified"][data-policy]) .questions-toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        padding: 1rem 1.25rem;
+        background: var(--ui-surface);
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-md);
+        margin-bottom: 1.25rem;
+        box-shadow: none;
+    }
+
+    :where([data-ui="unified"][data-policy]) .questions-toolbar-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.3rem;
+    }
+
+    :where([data-ui="unified"][data-policy]) .questions-toolbar-label {
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-policy]) .questions-select {
+        padding: 0.45rem 0.65rem;
+        border: 1px solid var(--ui-line);
+        border-radius: 6px;
+        font-size: 0.88rem;
+        font-family: var(--ui-font);
+        color: var(--ui-ink);
+        background: white;
+        cursor: pointer;
+        min-width: 160px;
+        transition: border 0.15s;
+    }
+
+    :where([data-ui="unified"][data-policy]) .questions-select:focus {
+        border-color: var(--ui-accent);
+        box-shadow: 0 0 0 3px var(--ui-tint);
+    }
+
+    :where([data-ui="unified"][data-policy]) .questions-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    :where([data-ui="unified"][data-policy]) .questions-loading {
+        padding: 2rem;
+        text-align: center;
+        color: var(--ui-muted);
+        font-style: italic;
+        background: var(--ui-surface);
+        border-radius: var(--radius-md);
+        border: 1px solid var(--ui-line);
+    }
+
+    :where([data-ui="unified"][data-policy]) .questions-loading i {
+        margin-right: 0.4rem;
+    }
+
+    :where([data-ui="unified"][data-policy]) .inbox-zero {
+        padding: 3.5rem 1.5rem;
+        text-align: center;
+        background: linear-gradient(180deg, var(--brand-50) 0%, white 60%);
+        border: 1px solid var(--green-200);
+        border-radius: var(--radius-md);
+    }
+
+    :where([data-ui="unified"][data-policy]) .inbox-zero i {
+        font-size: 3rem;
+        color: var(--green-600);
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+
+    :where([data-ui="unified"][data-policy]) .inbox-zero h2 {
+        margin: 0.4rem 0 0.3rem;
+        color: var(--green-700);
+        font-size: 1.4rem;
+        font-weight: 700;
+    }
+
+    :where([data-ui="unified"][data-policy]) .inbox-zero p {
+        color: var(--ui-muted);
+        margin: 0;
+        font-size: 0.95rem;
+    }
+
+    :where([data-ui="unified"][data-policy]) .inbox-zero-filtered {
+        background: var(--ui-canvas);
+        border-color: var(--ui-line);
+    }
+
+    :where([data-ui="unified"][data-policy]) .inbox-zero-filtered i {
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-policy]) .inbox-zero-filtered h2 {
+        color: var(--ui-ink);
+    }
+
+    :where([data-ui="unified"][data-policy]) .inbox-zero-filtered a {
+        color: var(--ui-accent);
+        text-decoration: underline;
+    }
+
+    :where([data-ui="unified"][data-policy]) .question-card {
+        background: white;
+        border: 1px solid var(--ui-line);
+        border-left: 4px solid var(--ui-accent);
+        border-radius: var(--radius-md);
+        padding: 1.1rem 1.3rem;
+        box-shadow: none;
+        transition:
+            box-shadow 0.15s,
+            transform 0.05s;
+    }
+
+    :where([data-ui="unified"][data-policy]) .question-card:hover {
+        box-shadow: none;
+    }
+
+    :where([data-ui="unified"][data-policy]) .question-card.card-stale {
+        border-left-color: var(--amber-600);
+    }
+
+    :where([data-ui="unified"][data-policy]) .question-card.card-very-stale {
+        border-left-color: var(--red-600);
+        background: linear-gradient(90deg, var(--red-50) 0%, white 4%);
+    }
+
+    :where([data-ui="unified"][data-policy]) .question-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 1rem;
+        margin-bottom: 0.85rem;
+        flex-wrap: wrap;
+    }
+
+    :where([data-ui="unified"][data-policy]) .question-author {
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+    }
+
+    :where([data-ui="unified"][data-policy]) .question-avatar {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        color: white;
+        font-size: 0.82rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        letter-spacing: 0.03em;
+        background: var(--ui-accent-hover);
+    }
+
+    :where([data-ui="unified"][data-policy]) .question-author-name {
+        font-weight: 600;
+        color: var(--ui-ink);
+        font-size: 0.95rem;
+    }
+
+    :where([data-ui="unified"][data-policy]) .question-author-email {
+        font-size: 0.78rem;
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-policy]) .question-age {
+        font-size: 0.82rem;
+        color: var(--ui-muted);
+        background: var(--ui-canvas);
+        padding: 0.3rem 0.7rem;
+        border-radius: 999px;
+        white-space: nowrap;
+    }
+
+    :where([data-ui="unified"][data-policy]) .card-stale .question-age {
+        background: var(--store-paper);
+        color: var(--amber-700);
+    }
+
+    :where([data-ui="unified"][data-policy]) .card-stale .question-age i {
+        color: var(--amber-600);
+    }
+
+    :where([data-ui="unified"][data-policy]) .card-very-stale .question-age {
+        background: var(--red-50);
+        color: var(--red-700);
+        font-weight: 600;
+    }
+
+    :where([data-ui="unified"][data-policy]) .card-very-stale .question-age i {
+        color: var(--red-600);
+    }
+
+    :where([data-ui="unified"][data-policy]) .question-body {
+        font-size: 0.95rem;
+        line-height: 1.6;
+        color: var(--ui-ink);
+        margin: 0 0 1rem;
+        background: var(--ui-canvas);
+        padding: 0.85rem 1rem;
+        border-radius: 8px;
+        border-left: 2px solid var(--ui-line);
+    }
+
+    :where([data-ui="unified"][data-policy]) .question-body p {
+        margin: 0 0 0.5em;
+    }
+
+    :where([data-ui="unified"][data-policy]) .question-body p:last-child {
+        margin-bottom: 0;
+    }
+
+    :where([data-ui="unified"][data-policy]) .question-policy {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        font-size: 0.85rem;
+        color: var(--ui-muted);
+        margin-bottom: 0.9rem;
+    }
+
+    :where([data-ui="unified"][data-policy]) .question-policy-label {
+        color: var(--ui-muted);
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        font-weight: 600;
+    }
+
+    :where([data-ui="unified"][data-policy]) .question-policy-link {
+        color: var(--ui-accent);
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    :where([data-ui="unified"][data-policy]) .question-policy-link:hover {
+        text-decoration: underline;
+    }
+
+    :where([data-ui="unified"][data-policy]) .question-policy-category {
+        color: var(--ui-muted);
+        font-size: 0.78rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+    }
+
+    :where([data-ui="unified"][data-policy]) .question-actions {
+        display: flex;
+        gap: 0.55rem;
+        flex-wrap: wrap;
+        padding-top: 0.6rem;
+        border-top: 1px solid var(--ui-line);
+    }
+
+    :where([data-ui="unified"][data-policy]) .question-actions .btn {
+        font-size: 0.85rem;
+    }
+
+    :where([data-ui="unified"][data-policy]) .question-resolve-btn {
+        color: var(--green-700);
+    }
+
+    :where([data-ui="unified"][data-policy]) .question-resolve-btn:hover {
+        background: var(--store-green-100);
+        border-color: var(--green-300);
+    }
+
+    :where([data-ui="unified"][data-policy]) .question-hide-btn {
+        color: var(--red-700);
+    }
+
+    :where([data-ui="unified"][data-policy]) .question-hide-btn:hover {
+        background: var(--red-100);
+        border-color: var(--red-300);
+    }
+
+    @media (width <= 600px) {
+        :where([data-ui="unified"][data-policy]) .questions-toolbar {
+            flex-direction: column;
+            gap: 0.75rem;
+            padding: 0.85rem;
+        }
+
+        :where([data-ui="unified"][data-policy]) .questions-toolbar-group {
+            flex-direction: row;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        :where([data-ui="unified"][data-policy]) .questions-toolbar-label {
+            min-width: 50px;
+            margin: 0;
+            font-size: var(--font-size-xs);
+        }
+
+        :where([data-ui="unified"][data-policy]) .questions-select {
+            flex: 1;
+        }
+
+        :where([data-ui="unified"][data-policy]) .question-card {
+            padding: 0.95rem 1rem;
+        }
+
+        :where([data-ui="unified"][data-policy]) .question-card-header {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 0.55rem;
+        }
+
+        :where([data-ui="unified"][data-policy]) .question-age {
+            align-self: flex-start;
+        }
+
+        :where([data-ui="unified"][data-policy]) .question-actions .btn {
+            flex: 1;
+            justify-content: center;
+        }
+    }
+
+    :where([data-ui="unified"][data-policy]) .ai-modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgb(15 23 42 / 55%);
+        z-index: 1000;
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        padding: 4rem 1rem 2rem;
+        overflow-y: auto;
+        animation: ai-modal-fade 0.15s ease-out;
+        width: 100vw;
+        height: 100dvh;
+        max-width: none;
+        max-height: none;
+        margin: 0;
+        border: 0;
+    }
+
+    @keyframes ai-modal-fade {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+    }
+
+    :where([data-ui="unified"][data-policy]) .ai-modal {
+        background: var(--ui-surface);
+        border-radius: var(--radius-md);
+        box-shadow: 0 20px 50px rgb(0 0 0 / 25%);
+        width: 100%;
+        max-width: 560px;
+        max-height: calc(100vh - 6rem);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        animation: ai-modal-rise 0.18s ease-out;
+    }
+
+    @keyframes ai-modal-rise {
+        from {
+            transform: translateY(8px);
+            opacity: 0;
+        }
+
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    :where([data-ui="unified"][data-policy]) .ai-modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid var(--ui-line);
+    }
+
+    :where([data-ui="unified"][data-policy]) .ai-modal-header h2 {
+        margin: 0;
+        font-size: 1.05rem;
+        font-weight: 600;
+        color: var(--ui-ink);
+        display: flex;
+        align-items: center;
+        gap: 0.55rem;
+    }
+
+    :where([data-ui="unified"][data-policy]) .ai-modal-header h2 i {
+        color: var(--ui-accent-hover);
+    }
+
+    :where([data-ui="unified"][data-policy]) .ai-modal-close {
+        background: transparent;
+        border: none;
+        color: var(--ui-muted);
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 1rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition:
+            background 0.15s,
+            color 0.15s;
+    }
+
+    :where([data-ui="unified"][data-policy]) .ai-modal-close:hover {
+        background: var(--ui-canvas);
+        color: var(--ui-ink);
+    }
+
+    :where([data-ui="unified"][data-policy]) .ai-modal-body {
+        padding: 1.25rem;
+        overflow-y: auto;
+    }
+
+    :where([data-ui="unified"][data-policy]) .ai-search-modal {
+        max-width: 640px;
+    }
+
+    :where([data-ui="unified"][data-policy]) .ai-search-help {
+        font-size: 0.88rem;
+        color: var(--ui-muted);
+        margin-bottom: 0.6rem;
+    }
+
+    :where([data-ui="unified"][data-policy]) .ai-search-examples {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem;
+        margin-bottom: 1rem;
+    }
+
+    :where([data-ui="unified"][data-policy]) .ai-search-example {
+        background: var(--gray-50);
+        border: 1px solid var(--ui-tint);
+        border-radius: 999px;
+        padding: 0.4rem 0.85rem;
+        font-size: 0.82rem;
+        color: var(--ui-accent-hover);
+        cursor: pointer;
+        font-family: var(--ui-font);
+        transition: all 0.15s;
+    }
+
+    :where([data-ui="unified"][data-policy]) .ai-search-example:hover {
+        background: var(--ui-accent-hover);
+        color: white;
+        border-color: var(--ui-accent-hover);
+    }
+
+    :where([data-ui="unified"][data-policy]) .ai-search-form {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+
+    :where([data-ui="unified"][data-policy]) .ai-search-input {
+        flex: 1;
+        padding: 0.65rem 0.85rem;
+        border: 1.5px solid var(--ui-line);
+        border-radius: 8px;
+        font-size: 0.95rem;
+        font-family: var(--ui-font);
+        background: white;
+        transition:
+            border 0.15s,
+            box-shadow 0.15s;
+    }
+
+    :where([data-ui="unified"][data-policy]) .ai-search-input:focus {
+        border-color: var(--ui-accent-hover);
+        box-shadow: 0 0 0 3px rgb(155 62 219 / 12%);
+    }
+
+    :where([data-ui="unified"][data-policy]) .ai-search-status {
+        font-size: 0.85rem;
+        color: var(--ui-muted);
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+    }
+
+    :where([data-ui="unified"][data-policy]) .ai-search-status i {
+        color: var(--green-600);
+    }
+
+    :where([data-ui="unified"][data-policy]) .ai-search-status.error {
+        color: var(--color-danger);
+    }
+
+    :where([data-ui="unified"][data-policy]) .ai-search-status.error i {
+        color: var(--color-danger);
+    }
+
+    :where([data-ui="unified"][data-policy]) .ai-search-results {
+        display: flex;
+        flex-direction: column;
+        gap: 0.6rem;
+    }
+
+    :where([data-ui="unified"][data-policy]) .ai-search-result {
+        display: block;
+        padding: 0.85rem 1rem;
+        border: 1px solid var(--ui-line);
+        border-radius: 9px;
+        text-decoration: none;
+        color: var(--ui-ink);
+        background: white;
+        transition:
+            border 0.15s,
+            transform 0.05s,
+            box-shadow 0.15s;
+        position: relative;
+    }
+
+    :where([data-ui="unified"][data-policy]) .ai-search-result:hover {
+        border-color: var(--ui-accent-hover);
+        box-shadow: none;
+        transform: translateY(-1px);
+    }
+
+    :where([data-ui="unified"][data-policy]) .ai-search-result-conf {
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--ui-muted);
+        margin-bottom: 0.3rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+    }
+
+    :where([data-ui="unified"][data-policy]) .ai-search-conf-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--gray-400);
+        display: inline-block;
+    }
+
+    :where([data-ui="unified"][data-policy]) .ai-search-result-high .ai-search-conf-dot {
+        background: var(--green-600);
+    }
+
+    :where([data-ui="unified"][data-policy]) .ai-search-result-medium .ai-search-conf-dot {
+        background: var(--amber-600);
+    }
+
+    :where([data-ui="unified"][data-policy]) .ai-search-result-low .ai-search-conf-dot {
+        background: var(--gray-400);
+    }
+
+    :where([data-ui="unified"][data-policy]) .ai-search-result-high .ai-search-result-conf {
+        color: var(--ui-accent-hover);
+    }
+
+    :where([data-ui="unified"][data-policy]) .ai-search-result-medium .ai-search-result-conf {
+        color: var(--amber-600);
+    }
+
+    :where([data-ui="unified"][data-policy]) .ai-search-result-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--ui-ink);
+        margin-bottom: 0.2rem;
+    }
+
+    :where([data-ui="unified"][data-policy]) .ai-search-result-category {
+        font-size: 0.78rem;
+        color: var(--ui-muted);
+        margin-bottom: 0.4rem;
+    }
+
+    :where([data-ui="unified"][data-policy]) .ai-search-result-category i {
+        margin-right: 0.25rem;
+    }
+
+    :where([data-ui="unified"][data-policy]) .ai-search-result-why {
+        font-size: 0.85rem;
+        color: var(--ui-muted);
+        font-style: italic;
+        line-height: 1.4;
+    }
+
+    :where([data-ui="unified"][data-policy]) .ai-search-result-why i {
+        color: var(--ui-muted);
+        margin-right: 0.3rem;
+        font-size: 0.75rem;
+    }
+
+    @media (width <= 900px) {
+        :where([data-ui="unified"][data-policy]) .hub-search-wrap {
+            flex: 1 1 100%;
+            order: 3;
+        }
+
+        :where([data-ui="unified"][data-policy]) .hub-search-wrap input {
+            font-size: 16px;
+        }
+
+        :where([data-ui="unified"][data-policy]) .hub-layout {
+            gap: 1rem;
+            padding: 1rem;
+        }
+
+        :where([data-ui="unified"][data-policy]) .hub-sidebar {
+            position: static;
+            max-height: none;
+            padding: 0.5rem 0.75rem;
+        }
+
+        :where([data-ui="unified"][data-policy]) .tree-cat > summary {
+            padding: 0.55rem 0.5rem;
+        }
+
+        :where([data-ui="unified"][data-policy]) .tree-link {
+            padding: 0.55rem 0.6rem;
+            font-size: 0.92rem;
+        }
+    }
+
+    @media (width <= 600px) {
+        :where([data-ui="unified"][data-policy]) .hub-page-header h1 {
+            font-size: 1.35rem;
+        }
+
+        :where([data-ui="unified"][data-policy]) .hub-page-header p {
+            font-size: 0.88rem;
+        }
+
+        :where([data-ui="unified"][data-policy]) .category-chips {
+            gap: 0.4rem;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            padding-bottom: 4px;
+        }
+
+        :where([data-ui="unified"][data-policy]) .category-chips::-webkit-scrollbar {
+            display: none;
+        }
+
+        :where([data-ui="unified"][data-policy]) .category-chip {
+            padding: 0.55rem 0.85rem;
+            font-size: 0.88rem;
+            flex: 0 0 auto;
+        }
+
+        :where([data-ui="unified"][data-policy]) .category-chip .count {
+            font-size: 0.7rem;
+        }
+
+        :where([data-ui="unified"][data-policy]) .policies-grid {
+            grid-template-columns: 1fr;
+        }
+
+        :where([data-ui="unified"][data-policy]) .policy-card {
+            padding: 1rem 1rem 0.85rem;
+        }
+
+        :where([data-ui="unified"][data-policy]) .policy-title {
+            font-size: 1rem;
+        }
+
+        :where([data-ui="unified"][data-policy]) .policy-description {
+            font-size: 0.83rem;
+        }
+
+        :where([data-ui="unified"][data-policy]) .recent-items {
+            grid-template-columns: 1fr;
+        }
+
+        :where([data-ui="unified"][data-policy]) .policy-list-header,
+        :where([data-ui="unified"][data-policy]) .policy-list-item {
+            grid-template-columns: 2fr 1fr;
+        }
+
+        :where([data-ui="unified"][data-policy]) .policy-list-header > :nth-child(2),
+        :where([data-ui="unified"][data-policy]) .policy-list-header > :nth-child(4),
+        :where([data-ui="unified"][data-policy]) .policy-list-item > :nth-child(2),
+        :where([data-ui="unified"][data-policy]) .policy-list-item > :nth-child(4) {
+            display: none;
+        }
+
+        :where([data-ui="unified"][data-policy]) .view-toggle {
+            display: none;
+        }
+    }
+
+    :where([data-ui="unified"][data-policy]) .policy-card-title {
+        font-size: var(--font-size-lg);
+    }
+}
+
+@layer components.pages {
+    :where([data-ui="unified"][data-policy]) .policy-topbar { justify-content: flex-start; gap: var(--space-4); }
+    :where([data-ui="unified"][data-policy]) :is(.hub-topbar-title, .detail-topbar-title, .handbook-topbar-title) { display: flex; align-items: center; gap: var(--space-2); font-size: var(--font-size-xl); font-weight: 600; margin: 0; }
+    :where([data-ui="unified"][data-policy]) .policy-topbar-spacer { flex: 1; }
+    :where([data-ui="unified"][data-policy]) .handbook-topbar-actions { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-inline-start: auto; }
+    :where([data-ui="unified"][data-policy]) .policy-navigation > summary { cursor: pointer; font-weight: 600; padding-block: var(--space-2); }
+    :where([data-ui="unified"][data-policy]) .policy-table-scroll { overflow: auto; max-width: 100%; margin-block: var(--space-4); }
+    :where([data-ui="unified"][data-policy]) .policy-table-scroll table { width: 100%; min-width: 34rem; margin: 0; }
+    :where([data-ui="unified"][data-policy]) :is(.policy-body [id], .handbook-chapter, .handbook-intro) { scroll-margin-block-start: var(--space-5); }
+    :where([data-ui="unified"][data-policy]) .policy-storage-notice { margin: var(--space-4); padding: var(--space-3); color: var(--color-warning-ink); background: var(--color-warning-bg); }
+
+    @media (width <= 900px) {
+        :where([data-ui="unified"][data-policy]) .hub-sidebar { order: -1; }
+        :where([data-ui="unified"][data-policy]) .handbook-topbar-actions { margin-inline-start: 0; }
+    }
+}
+
+@layer components.print { @media print {
+    :where([data-ui="unified"][data-policy]) { background: white; color: var(--ui-ink); }
+    :where([data-ui="unified"][data-policy]) :is(.hub-sidebar,.category-chips,.hub-toolbar-row,.recently-updated,.handbook-hero-tile-actions,.questions-toolbar,.question-actions,.comments-post-form,.comments-intro,.comment-actions,.comments-reply-banner,.policy-storage-notice) { display: none; }
+    :where([data-ui="unified"][data-policy]) :is(.hub-layout,.hub-content) { display: block; max-width: none; margin: 0; padding: 0; }
+    :where([data-ui="unified"][data-policy]) :is(.policy-card,.question-card,.handbook-hero-tile) { break-inside: avoid; box-shadow: none; }
+    :where([data-ui="unified"][data-policy]) .policy-table-scroll { overflow: visible; }
+    :where([data-ui="unified"][data-policy]) .policy-table-scroll table { min-width: 0; table-layout: fixed; }
+    :where([data-ui="unified"][data-policy]) .policy-table-scroll :is(th,td) { overflow-wrap: anywhere; }
+} }

@@ -12,6 +12,8 @@
  */
 (function () {
     'use strict';
+    const PoliciesAPI = window.PoliciesAPI;
+    const PolicyEditor = window.PolicyEditor;
 
     const VALID_CATEGORIES = ['Financial', 'Operations', 'Customer Service', 'HR', 'Training'];
     const VALID_STATUSES = ['Draft', 'Published', 'Archived'];
@@ -71,7 +73,7 @@
     const SAFE_IFRAME_HOSTS = /^https:\/\/(?:www\.)?(youtube\.com|youtube-nocookie\.com|loom\.com|player\.vimeo\.com)\//;
 
     function sanitizeHtml(html) {
-        if (!window.DOMPurify) return html;
+        if (!window.DOMPurify) throw new Error('Policy content could not be prepared safely. Please reload.');
         const clean = window.DOMPurify.sanitize(html, {
             ADD_TAGS: ['iframe'],
             ADD_ATTR: ['target', 'rel', 'allow', 'allowfullscreen', 'frameborder', 'loading', 'data-video-embed', 'data-src', 'data-kind'],
@@ -82,6 +84,7 @@
         // Defense-in-depth in case a future TipTap upgrade adds new iframe sources.
         try {
             const wrapper = document.createElement('div');
+            // eslint-disable-next-line no-unsanitized/property -- Policy markup has passed DOMPurify and the trusted-video allowlist; sanitizer failure stops rendering.
             wrapper.innerHTML = clean;
             wrapper.querySelectorAll('iframe').forEach(f => {
                 const src = f.getAttribute('src') || '';
@@ -128,6 +131,7 @@
             state.policy = result.policy;
             state.originalUpdatedAt = state.policy.Updated_At || '';
             // Expose policy meta for AI Assist context (read by policy-ai-assist.js)
+            // eslint-disable-next-line no-restricted-syntax -- Existing classic-script export or metadata bridge; preserved for current policy callers.
             window.POLICIES_CURRENT = state.policy;
 
             // External stub → redirect
@@ -148,7 +152,7 @@
             state.parentOptions = (result.policies || [])
                 .filter(p => !state.policy || p.Policy_ID !== state.policy.Policy_ID); // can't parent self
         } catch (e) {
-            state.parentOptions = [];
+            throw new Error('Could not load parent policies. Reload before editing.');
         }
     }
 
@@ -178,6 +182,7 @@
             parts.push(`<a href="/pages/policies-hub.html?category=${encodeURIComponent(state.policy.Category)}">${escapeHtml(state.policy.Category)}</a>`);
         }
         parts.push(`<span class="crumb-current">${escapeHtml(state.policy.Title || 'New policy')}</span>`);
+        // eslint-disable-next-line no-unsanitized/property -- Composed UI markup: external labels are escaped or encoded; other values are fixed markup or numeric counts.
         el.innerHTML = parts.join('<i class="fas fa-chevron-right crumb-sep" aria-hidden="true"></i>');
     }
 
@@ -197,6 +202,7 @@
                     </button>
                 </div>
             `;
+            // eslint-disable-next-line no-unsanitized/property -- Composed UI markup: external labels are escaped or encoded; other values are fixed markup or numeric counts.
             metaEl.innerHTML = `
                 <div class="edit-meta-row">
                     <label>
@@ -236,7 +242,7 @@
             wireAISuggestButtons();
         } else {
             titleEl.innerHTML = escapeHtml(state.policy.Title);
-            summaryEl.innerHTML = state.policy.Summary ? escapeHtml(state.policy.Summary) : '';
+            summaryEl.textContent = state.policy.Summary || '';
 
             const tagsHtml = (state.policy.Tags || '')
                 .split(',').map(t => t.trim()).filter(Boolean)
@@ -244,6 +250,7 @@
 
             const readMinutes = estimateReadTime(state.policy.Body_HTML);
 
+            // eslint-disable-next-line no-unsanitized/property -- Composed UI markup: external labels are escaped or encoded; other values are fixed markup or numeric counts.
             metaEl.innerHTML = `
                 <span class="meta-pill meta-category">
                     <i class="fas ${categoryIcon(state.policy.Category)}" aria-hidden="true"></i> ${escapeHtml(state.policy.Category)}
@@ -284,6 +291,7 @@
             }
         } else {
             const html = sanitizeHtml(state.policy.Body_HTML || '');
+            // eslint-disable-next-line no-unsanitized/property -- Policy markup has passed DOMPurify and the trusted-video allowlist; sanitizer failure stops rendering.
             el.innerHTML = html || '<p class="empty-body">This policy has no content yet.</p>';
             renderOutline();
         }
@@ -296,17 +304,18 @@
         const headings = $('policyBody').querySelectorAll('h1, h2, h3');
         if (headings.length === 0) {
             outline.innerHTML = '';
-            outline.style.display = 'none';
+            outline.hidden = true;
             return;
         }
 
-        outline.style.display = '';
+        outline.hidden = false;
         const items = Array.from(headings).map((h, i) => {
             if (!h.id) h.id = `h-${i}-${(h.textContent || '').slice(0, 30).replace(/\s+/g, '-').toLowerCase()}`;
             const level = parseInt(h.tagName.substring(1), 10);
-            return `<a class="outline-link outline-h${level}" href="#${h.id}">${escapeHtml(h.textContent || '')}</a>`;
+            return `<a class="outline-link outline-h${level}" href="#${encodeURIComponent(h.id)}">${escapeHtml(h.textContent || '')}</a>`;
         }).join('');
 
+        // eslint-disable-next-line no-unsanitized/property -- Composed UI markup: external labels are escaped or encoded; other values are fixed markup or numeric counts.
         outline.innerHTML = `
             <div class="outline-title">On this page</div>
             ${items}
@@ -323,6 +332,7 @@
             : '';
 
         if (state.isEditing) {
+            // eslint-disable-next-line no-unsanitized/property -- Composed UI markup: external labels are escaped or encoded; other values are fixed markup or numeric counts.
             el.innerHTML = `
                 <button id="saveBtn" class="btn btn-primary"><i class="fas fa-save" aria-hidden="true"></i> Save</button>
                 <button id="cancelBtn" class="btn btn-secondary">Cancel</button>
@@ -333,10 +343,12 @@
                 <span id="saveStatus" class="save-status"></span>
             `;
             $('saveBtn').addEventListener('click', onSave);
+            $('saveBtn').disabled = !state.editor;
             $('cancelBtn').addEventListener('click', onCancel);
             const archive = $('archiveBtn');
             if (archive) archive.addEventListener('click', onArchive);
         } else if (window.IS_POLICIES_ADMIN && state.policy && !state.policy.External_URL) {
+            // eslint-disable-next-line no-unsanitized/property -- Composed UI markup: external labels are escaped or encoded; other values are fixed markup or numeric counts.
             el.innerHTML = `
                 <button id="editBtn" class="btn btn-primary"><i class="fas fa-edit" aria-hidden="true"></i> Edit</button>
                 ${shareBtn}
@@ -347,6 +359,7 @@
                 window.location.href = url.toString();
             });
         } else if (shareBtn) {
+            // eslint-disable-next-line no-unsanitized/property -- Composed UI markup: external labels are escaped or encoded; other values are fixed markup or numeric counts.
             el.innerHTML = shareBtn;
         } else {
             el.innerHTML = '';
@@ -462,9 +475,10 @@
             showToast('<i class="fas fa-check-circle" aria-hidden="true"></i> Filled — review and tweak before saving');
         } catch (e) {
             console.error('[ai-suggest] error:', e);
-            showToast(`<i class="fas fa-triangle-exclamation" aria-hidden="true"></i> ${e.message}`);
+            showToast(`<i class="fas fa-triangle-exclamation" aria-hidden="true"></i> ${escapeHtml(e.message)}`);
         } finally {
             btn.disabled = false;
+            // eslint-disable-next-line no-unsanitized/property -- Restores or copies this controller’s own already-escaped UI markup.
             btn.innerHTML = originalHtml;
         }
     }
@@ -492,6 +506,7 @@
         if (host) host.remove();
         host = document.createElement('div');
         host.className = 'pd-toast';
+        // eslint-disable-next-line no-unsanitized/property -- Private toast calls use fixed application messages or explicitly escaped error text.
         host.innerHTML = html;
         document.body.appendChild(host);
         requestAnimationFrame(() => host.classList.add('show'));
@@ -513,11 +528,12 @@
             const children = result.policies || [];
 
             if (children.length === 0) {
-                el.style.display = 'none';
+                el.hidden = true;
                 return;
             }
 
-            el.style.display = '';
+            el.hidden = false;
+            // eslint-disable-next-line no-unsanitized/property -- Composed UI markup: external labels are escaped or encoded; other values are fixed markup or numeric counts.
             el.innerHTML = `
                 <h2 class="sub-procedures-title">
                     <i class="fas fa-folder-tree" aria-hidden="true"></i> Sub-procedures
@@ -533,7 +549,7 @@
                 </div>
             `;
         } catch (e) {
-            el.style.display = 'none';
+            el.hidden = true;
         }
     }
 
@@ -564,6 +580,7 @@
     }
 
     async function onSave() {
+        if (!state.editor) { setSaveStatus('The editor is unavailable. Reload before saving.', 'error'); return; }
         const payload = collectEditPayload();
         if (!payload.Title) {
             setSaveStatus('Title is required', 'error');
@@ -692,7 +709,8 @@
 
     // -------------------- init --------------------
     async function init() {
-        await ensureDOMPurify().catch(e => console.warn('[policy-detail]', e.message));
+        try { await ensureDOMPurify(); }
+        catch (e) { renderError('Policy content could not be prepared safely. Please reload.'); return; }
 
         // Wait for admin gate to resolve so edit affordances render correctly on first paint.
         await new Promise(resolve => {
@@ -716,9 +734,11 @@
             return;
         }
 
-        if (state.isEditing) await loadParentOptions();
         await loadPolicy();
-        if (state.policy) render();
+        try {
+            if (state.isEditing) await loadParentOptions();
+            if (state.policy) await render();
+        } catch (e) { renderError(e.message || 'Could not display policy.'); return; }
         wireKeyboardShortcuts();
     }
 

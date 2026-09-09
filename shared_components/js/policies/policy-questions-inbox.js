@@ -50,12 +50,7 @@
     function authorInitials(name) {
         return String(name || '?').trim().split(/\s+/).map(p => p[0]).filter(Boolean).slice(0, 2).join('').toUpperCase() || '?';
     }
-    function authorColor(name) {
-        let h = 0;
-        for (const c of String(name || '')) h = (h * 31 + c.charCodeAt(0)) & 0xffffffff;
-        const palette = ['#16a34a', '#2563eb', '#9333ea', '#db2777', '#d97706', '#0891b2', '#dc2626', '#7c3aed'];
-        return palette[Math.abs(h) % palette.length];
-    }
+
 
     function categoryIcon(cat) {
         const map = {
@@ -80,9 +75,9 @@
                 return;
             }
             if (res.status === 403) {
-                document.getElementById('questionsLockedNote').style.display = '';
-                listEl.style.display = 'none';
-                document.getElementById('questionsToolbar').style.display = 'none';
+                document.getElementById('questionsLockedNote').hidden = false;
+                listEl.hidden = true;
+                document.getElementById('questionsToolbar').hidden = true;
                 return;
             }
             if (!res.ok) {
@@ -91,13 +86,15 @@
                 throw new Error(`${res.status}: ${detail}`);
             }
             const data = await res.json();
-            state.questions = data.questions || [];
+            if (!data || !Array.isArray(data.questions)) throw new Error('Unexpected inbox response');
+            state.questions = data.questions;
             renderCount(data.count || 0);
             renderToolbar();
             renderList();
         } catch (e) {
             console.error('[inbox] load error:', e);
-            listEl.innerHTML = `<div class="hub-error"><i class="fas fa-triangle-exclamation" aria-hidden="true"></i> Could not load inbox: ${escapeHtml(e.message)}</div>`;
+            listEl.innerHTML = `<div class="hub-error" role="alert"><p>Could not load inbox: ${escapeHtml(e.message)}</p><button class="btn" type="button">Retry</button></div>`;
+            listEl.querySelector('button').addEventListener('click', loadInbox);
         }
     }
 
@@ -105,7 +102,7 @@
         const el = document.getElementById('inboxCount');
         if (!el) return;
         el.textContent = n > 0 ? n : '';
-        el.style.display = n > 0 ? '' : 'none';
+        el.hidden = n <= 0;
     }
 
     // ------------------------------------------------------------ toolbar
@@ -118,30 +115,31 @@
 
         const authors = Array.from(new Set(state.questions.map(q => q.Author_Name))).filter(Boolean).sort();
 
+        // eslint-disable-next-line no-unsanitized/property -- Composed UI markup: external labels are escaped or encoded; other values are fixed markup or numeric counts.
         el.innerHTML = `
             <div class="questions-toolbar-group">
-                <label class="questions-toolbar-label">Sort</label>
+                <label class="questions-toolbar-label" for="sortSelect">Sort</label>
                 <select id="sortSelect" class="questions-select">
                     <option value="oldest" ${state.sort === 'oldest' ? 'selected' : ''}>Oldest waiting</option>
                     <option value="newest" ${state.sort === 'newest' ? 'selected' : ''}>Newest first</option>
                 </select>
             </div>
             <div class="questions-toolbar-group">
-                <label class="questions-toolbar-label">Policy</label>
+                <label class="questions-toolbar-label" for="policyFilter">Policy</label>
                 <select id="policyFilter" class="questions-select">
                     <option value="all">All policies</option>
                     ${policies.map(pid => `<option value="${escapeHtml(pid)}" ${state.filterPolicy === pid ? 'selected' : ''}>${escapeHtml(policyTitles.get(pid) || pid)}</option>`).join('')}
                 </select>
             </div>
             <div class="questions-toolbar-group">
-                <label class="questions-toolbar-label">Author</label>
+                <label class="questions-toolbar-label" for="authorFilter">Author</label>
                 <select id="authorFilter" class="questions-select">
                     <option value="all">Anyone</option>
                     ${authors.map(a => `<option value="${escapeHtml(a)}" ${state.filterAuthor === a ? 'selected' : ''}>${escapeHtml(a)}</option>`).join('')}
                 </select>
             </div>
             <div class="questions-toolbar-group">
-                <label class="questions-toolbar-label">Age</label>
+                <label class="questions-toolbar-label" for="ageFilter">Age</label>
                 <select id="ageFilter" class="questions-select">
                     <option value="all">Any age</option>
                     <option value="over-3-days" ${state.filterAge === 'over-3-days' ? 'selected' : ''}>Over 3 days</option>
@@ -209,6 +207,7 @@
             return;
         }
 
+        // eslint-disable-next-line no-unsanitized/property -- Composed UI markup: external labels are escaped or encoded; other values are fixed markup or numeric counts.
         el.innerHTML = filtered.map(renderCard).join('');
         wireCardActions();
     }
@@ -226,7 +225,7 @@
             <article class="question-card ${ageClass}" data-comment-id="${escapeHtml(q.Comment_ID)}">
                 <div class="question-card-header">
                     <div class="question-author">
-                        <div class="question-avatar" style="background:${authorColor(q.Author_Name)}">${escapeHtml(authorInitials(q.Author_Name))}</div>
+                        <div class="question-avatar">${escapeHtml(authorInitials(q.Author_Name))}</div>
                         <div>
                             <div class="question-author-name">${escapeHtml(q.Author_Name || 'Anonymous')}</div>
                             <div class="question-author-email">${escapeHtml(q.Author_Email || '')}</div>
@@ -264,7 +263,7 @@
 
     function wireCardActions() {
         document.querySelectorAll('[data-action]').forEach(btn => {
-            btn.addEventListener('click', async (e) => {
+            btn.addEventListener('click', async (_e) => {
                 const action = btn.dataset.action;
                 const id = btn.dataset.id;
                 if (action === 'resolve') {
@@ -316,9 +315,9 @@
             if (window.IS_POLICIES_ADMIN) {
                 loadInbox();
             } else {
-                document.getElementById('questionsLockedNote').style.display = '';
-                document.getElementById('questionsList').style.display = 'none';
-                document.getElementById('questionsToolbar').style.display = 'none';
+                document.getElementById('questionsLockedNote').hidden = false;
+                document.getElementById('questionsList').hidden = true;
+                document.getElementById('questionsToolbar').hidden = true;
             }
         }, { once: true });
 
@@ -338,5 +337,6 @@
         init();
     }
 
+    // eslint-disable-next-line no-restricted-syntax -- Existing classic-script export or metadata bridge; preserved for current policy callers.
     window.PolicyQuestionsInbox = { reload: loadInbox };
 })();
