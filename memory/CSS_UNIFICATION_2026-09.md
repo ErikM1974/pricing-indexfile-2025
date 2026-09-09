@@ -969,3 +969,7 @@ Photo final checks:22mocked browser cases and478checks across eight source/CSS/c
 ## Photo integration — 2026-09-09
 
 Preserved the .13 live checkpoint and all append-only photo evidence. The initial review commit helper stopped while restaging two already-indexed deletions; finish-photo-reviewed.cjs staged only existing owned files and committed the saved source, preserving both indexed deletions. Do not rerun either review helper. Full integrated checks follow.
+
+## Photo release checks complete — v2026.09.09.14
+
+Tested source 694e88c7e04f18797427d8f4d81207ddf9c679e2: build/lint/types,485routes/24modules,226unit suites/5279passed/four existing skips,88DOM,four accessibility unit,84quote parity,551mocked browser,16remaining browser/three optional screenshot skips,all five calculators. 287CSS clean,boot200,production audit zero.22focused photo cases; two PDFs/three pages/28visible blocks. One shared owner and both controllers versioned2026.09.09.14 across capture/library/harness. Canonical native controls, preserved compression/payload helpers, unknown photo counts and visible publication errors; old requests cannot replace current customers/previews. Two old sheets retired. Live remains136/89 until verified138/87 after exact-source CI and rollout.
