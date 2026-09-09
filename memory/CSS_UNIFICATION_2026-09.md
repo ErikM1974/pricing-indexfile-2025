@@ -540,3 +540,7 @@ Next bounded family after brand guides: commission-structure, embroidery-bonus-p
 - [ ] Register every file immediately, document results, run full primary release gates and exact-source CI, then verify actual rollout.
 
 This is a plan only; no application files in this family changed yet. Brand guides remain reviewed in codex/brand-guide-family at a6d59feca31b1a4419c1f963bb91c063e7d03539; production checks for the prior webstore release are still running.
+
+## Staff reference implementation started — 2026-09-09
+
+Original five-page screenshots captured with synthetic read-only service data. First layout pass now replaces borrowed art-hub/dash-shell CSS with existing shared components. Canonical buttons/headers/cards and scoped page owners use shared semantic tokens; original main text is unchanged. New staff-reference.js handles complete accordion printing/restoration and native fragment focus. Baseline fixture and file inventory registered. This batch is IN PROGRESS and has not passed review or been deployed. Next: fix responsive/print details, explicit service-source warnings and retry, validate config, then add focused content/browser guards.
