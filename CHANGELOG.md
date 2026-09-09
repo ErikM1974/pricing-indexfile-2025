@@ -1,3 +1,13 @@
+## v2026.09.08.19 (2026.09.08)
+
+- Plan shared policies CMS and handbook design migration
+- Record live policy reference release and CMS worktree checkpoint
+- Record policy workspace content, editor and paper verification
+- Unify policy workspace, handbook and questions with shared controls
+- Integrate reviewed unified policies workspace
+- Record full policy workspace release checks and next webstore worktree
+- Version unified policy workspace assets for verified rollout
+
 ## v2026.09.08.18 (2026.09.08)
 
 - Record policy guide and notice family baseline plan
