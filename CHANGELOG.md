@@ -1,3 +1,14 @@
+## v2026.09.09.6 (2026.09.09)
+
+- Plan shared golf and safety campaign storefront cleanup
+- Record campaign layout implementation checkpoint
+- Record verified catalog release and campaign review checkpoint
+- Record campaign review and inquiry delivery failure lesson
+- Unify golf and safety storefronts and retain failed inquiries
+- Integrate reviewed golf and safety storefronts
+- Reuse inert HTML parser for the CSS runtime census
+- Deploy v2026.09.09.6: CI runs Playwright only for the release-gate commit and pull requests, and cancels superseded runs
+
 ## v2026.09.09.4 (2026.09.09)
 
 - Plan shared catalog discovery and native brand navigation

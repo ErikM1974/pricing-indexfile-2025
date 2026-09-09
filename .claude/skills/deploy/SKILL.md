@@ -198,6 +198,14 @@ pushes it. Step 5.1 enforces that gate before any release merge or Heroku push.
 A missing, running, failed or inaccessible run is not a pass. Wait or resolve the
 failure; do not treat an earlier green branch run as evidence for new source.
 
+**Playwright runs only for this gate (2026-09-09).** The CI `e2e` job is conditioned on the
+pushed commit's subject starting with `Deploy v` (Step 4's message) or the event being a pull
+request — each run prices through the live proxy at ~75 Caspio calls, and 114 runs on
+2026-09-07 were about a third of that day's quota. Ordinary develop pushes and the main/develop
+runs after the release get the deterministic jobs only. Keep the `Deploy v` prefix in Step 4:
+it is what makes the Step 5.1 run include Playwright. A release-gate run also has its own
+concurrency group, so another session's develop push cannot cancel it mid-gate.
+
 ### Step 1 — Compute single deploy version
 
 ```bash
