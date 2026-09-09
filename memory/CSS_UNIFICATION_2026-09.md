@@ -687,3 +687,12 @@ Banner and sticker public configurators are the next shared-style family. Isolat
 ## Instant storefront local review complete — 2026-09-09
 
 Candidate v2026.09.09.7.14 focused browser cases passed26.2s (last targeted all50-price/menu checks passed6s);11 original content/controller contracts passed. Four widths/axe, both menu modes, focus/search, all50 sticker prices and seven banner presets, server custom/quantity/finishing totals and recovery, failed/empty/degraded data, invalid form, artwork failure and retained draft retry verified with all writes mocked. Two PDFs retain419 text nodes, all9 paper pages visually reviewed. Three scoped CSS owners lint clean. The saved WIP is now finished and reviewed; full primary release gates, exact-source CI and rollout remain. Live115/110; only verified deployment changes this to117/108. Previous paused/WIP notes are historical.
+
+## Customer and staff intake plan — 2026-09-09
+
+Next isolated branch codex/customer-intake at C:\Users\erik\.codex\visualizations\2026\09\07\01a07d90-9a4c-7e70-9e4e-c196377b7c6b\training-final-worktree, based on 7d6cf7bc8124e7d3da8642093c3a9018b98e8897. Four pages: request-a-quote plus digitizingform, monogramform and purchasingform. Original complete prose, destinations, images, fields, IDs, Jotform embed URLs and seven controller sources recorded in customer-intake-original-baseline.json. Keep customer vs staff navigation meaningful while sharing field/panel/typography owners. Preserve vendor form IDs and native request payload/validation/style lookup/upload/date/prefill behavior. External form contents remain vendor-owned; review loaded, unavailable and keyboard-accessible wrapper states without submitting real forms. No pages count reviewed yet. Instant2 candidate .7 runs full primary gates separately; no intake changes enter that release.
+
+- [ ] Capture original desktop/phone and controlled native-form/embedded states.
+- [ ] Replace three repeated embed-page styles with scoped shared arrangements; unify native quote-request fields using canonical tokens/components. Preserve original content, upload/submit helpers and hosted form destinations.
+- [ ] Four widths/axe, navigation, prefill/date/style lookup, failed/successful mocked uploads/submissions, vendor embed availability and complete paper content.
+- [ ] Register reviewed owners, full local gates/exact-source CI and verified release after instant2.
