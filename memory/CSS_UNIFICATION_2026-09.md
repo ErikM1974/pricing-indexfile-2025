@@ -367,3 +367,10 @@ Seventeen printable forms now share a scoped owner and Public Sans screen layout
 ## Training practice release record — v2026.09.08.13
 
 Exact-source CI 34300872261 passed on 0ca66081bdd5bee21197a76aa29259c25021f38c, all four jobs including live money/calculator parity. Seven pages use scoped training layouts and existing shared controls. Original lessons and seven exercise data objects are guarded. Matching works through keyboard, touch and drag; score retries, answered-state locks, timers and native completion dialogs are checked. Template copying and browser storage failures remain visible; saved content renders safely after reload. The superseded training-shared.css has no HTML callers and is retired. Reference PDFs reviewed: hub one page, notes six pages with complete sections, twelve complete email templates. The corrected inventory has 225 application/served-archive pages: 48 reviewed after rollout, 177 pending. Actual slug/live verification follows this release commit.
+
+
+### Reference family implemented — 2026-09-08
+
+Four local pages now use shared reference patterns and existing controls/tables. Sixteen focused browser cases pass at 1440/768/390/320: keyboard/touch checklists, original storage keys, save/reset/read failures, protected malformed progress, print/nav/reduced motion, quick-tip search/empty/load/retry and safe rich text. Original HTML prose/figures/fields/media and shared tips JSON are preserved (99 ownership/content cases passed before final formatting; rechecked by full gates next). Quick-tip calendar dates no longer shift backwards in Pacific time; seven-day badges exclude future dates.
+
+Real PDFs reviewed: caps 3 pages (was 7), tips 3 with one full topic per page, shipping 10 (was 11), purchasing 9 (was 10). All 333 selected content blocks occur in the PDFs; cap images, procedure screenshots, complete checklist sections and document hierarchy inspected. Full release gates/source CI/deploy remain pending. These four pages are not yet counted live: .13 remains 48 live / 177 pending. Source/PDF/test artifacts use reference-* in the existing artifact directory.
