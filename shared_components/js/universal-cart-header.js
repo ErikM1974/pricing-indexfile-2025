@@ -131,7 +131,7 @@ class UniversalCartHeader {
     }
 
     generateStyles() {
-        // Styles live in /shared_components/css/universal-cart-header.css (linked by the page) — nothing injected.
+        // Layout and shared controls come from the consuming page stylesheet — nothing injected.
         return '';
     }
 

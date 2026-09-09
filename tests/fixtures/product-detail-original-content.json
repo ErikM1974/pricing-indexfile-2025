@@ -1,0 +1,345 @@
+{
+  "base": "8c9db3cac7a3830f208ce89008346d08cb08ebde",
+  "pages": [
+    {
+      "file": "pages/dtg-compatible-products.html",
+      "title": "DTG-Compatible Products | Northwest Custom Apparel",
+      "bodyText": "DTG-Compatible Products High-quality garments perfect for Direct-to-Garment printing 100% cotton and high-cotton blends tested over 10+ years Tested & Verified Every product tested for DTG compatibility High Cotton Content 100% cotton or 50%+ cotton blends Vibrant Prints Perfect for full-color, detailed designs Why Fabric Content Matters for DTG Direct-to-Garment printing is a precise digital printing method that requires specific fabric types to achieve the best results. Unlike screen printing or embroidery, DTG ink bonds best with natural cotton fibers. Best Results: 100% cotton garments provide the most vibrant colors and longest-lasting prints Good Results: 50% or higher cotton blends work well for most designs Poor Results: Polyester, performance fabrics, and low-cotton blends don't accept DTG ink properly Pro Tip: All products on this page have been carefully selected and tested by our team to ensure excellent DTG printing results every time. DTG-Compatible Products Loading products... Loading DTG-compatible products... © 2026 Northwest Custom Apparel. All rights reserved. 2025 Freeman Road East, Milton, WA 98354 | 253-922-5793",
+      "ids": [
+        "universal-header-placeholder",
+        "productCount",
+        "loadingIndicator",
+        "productsGrid"
+      ],
+      "links": [],
+      "fields": [],
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/universal-header.css",
+        "shared_components/css/universal-cart-header.css",
+        "shared_components/css/universal-calculator-theme.css",
+        "pages/css/dtg-compatible-products.css"
+      ],
+      "scripts": [
+        "/shared_components/js/universal-cart-header.js?v=2026.09.06.5",
+        "/shared_components/js/sample-cart.js?v=2026.09.06.8",
+        "/config/app.config.js",
+        "/pages/js/dtg-compatible-products.js?v=2026.09.06.31"
+      ],
+      "cssBytes": 42911
+    },
+    {
+      "file": "pages/inventory-details.html",
+      "title": "Inventory Details - Northwest Custom Apparel",
+      "bodyText": "(253) 922-5793 sales@nwcustomapparel.com Monday - Friday: 8:30 AM - 5:00 PM PST Home Products Contact Back to Product View Pricing Embroidery Screen Print DTG DTF Cap Embroidery Inventory: Loading... Select Color: Print",
+      "ids": [
+        "back-to-product",
+        "pricing-dropdown-menu",
+        "header-product-name",
+        "header-style-search",
+        "header-search-results",
+        "sidebar-product-image",
+        "color-options",
+        "inventory-display",
+        "loading-overlay"
+      ],
+      "links": [
+        {
+          "href": "/",
+          "label": ""
+        },
+        {
+          "href": "/",
+          "label": "Home"
+        },
+        {
+          "href": "/product.html",
+          "label": "Products"
+        },
+        {
+          "href": "mailto:sales@nwcustomapparel.com",
+          "label": "Contact"
+        },
+        {
+          "href": "#",
+          "label": "Back to Product"
+        },
+        {
+          "href": "#",
+          "label": "Embroidery"
+        },
+        {
+          "href": "#",
+          "label": "Screen Print"
+        },
+        {
+          "href": "#",
+          "label": "DTG"
+        },
+        {
+          "href": "#",
+          "label": "DTF"
+        },
+        {
+          "href": "#",
+          "label": "Cap Embroidery"
+        }
+      ],
+      "fields": [
+        {
+          "id": "header-style-search",
+          "type": "text",
+          "value": ""
+        }
+      ],
+      "styles": [
+        "shared_components/css/tokens.css",
+        "product/styles/product.css",
+        "pages/css/inventory-details.css"
+      ],
+      "scripts": [
+        "/pages/js/inventory-details.js?v=2026.09.05.79"
+      ],
+      "cssBytes": 44431
+    },
+    {
+      "file": "pages/sanmar-catalog-color-audit.html",
+      "title": "SanMar Catalog Color Audit — NWCA",
+      "bodyText": "SanMar Catalog Color Audit Diff Caspio's Sanmar_Bulk_251816_Feb2024 against SanMar's live mainframeColor. Read-only. ← Staff Dashboard Style # Run audit 0 In sync 0 Caspio mismatch (rejection candidates) 0 Caspio orphan (SanMar dropped it) 0 SanMar only (new colors) 0 Internal drift (Caspio rows disagree with themselves) Style: — Caspio rows: — Caspio unique colors: — SanMar live colors: — Generated: — Caspio Mismatches 0 Copy CSV Caspio's CATALOG_COLOR (and SANMAR_MAINFRAME_COLOR) don't match SanMar's current mainframeColor. These are the values likely getting rejected by SanMar. Internal Drift 0 Copy CSV Within Caspio: CATALOG_COLOR ≠ SANMAR_MAINFRAME_COLOR on the same row. Pre-existing data inconsistency. Caspio Orphans 0 Copy CSV Color exists in Caspio but SanMar's API didn't return it for this style. Likely discontinued by SanMar. SanMar Only 0 Copy CSV SanMar lists these mainframe colors but Caspio has no row. New colors not yet imported. In Sync 0 Caspio matches SanMar. No action needed.",
+      "ids": [
+        "style-input",
+        "run-btn",
+        "run-status",
+        "summary",
+        "sum-sync",
+        "sum-mismatch",
+        "sum-orphan",
+        "sum-sanmar-only",
+        "sum-drift",
+        "meta",
+        "meta-style",
+        "meta-caspio-rows",
+        "meta-caspio-colors",
+        "meta-sanmar-colors",
+        "meta-generated",
+        "meta-api-error",
+        "bkt-mismatch",
+        "cnt-mismatch",
+        "tbl-mismatch",
+        "bkt-drift",
+        "cnt-drift",
+        "tbl-drift",
+        "bkt-orphan",
+        "cnt-orphan",
+        "tbl-orphan",
+        "bkt-sanmaronly",
+        "cnt-sanmaronly",
+        "tbl-sanmaronly",
+        "bkt-sync",
+        "cnt-sync",
+        "tbl-sync"
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "label": "← Staff Dashboard"
+        }
+      ],
+      "fields": [
+        {
+          "id": "style-input",
+          "type": "text",
+          "value": "112"
+        }
+      ],
+      "styles": [
+        "shared_components/css/tokens.css",
+        "pages/sanmar-catalog-color-audit.css"
+      ],
+      "scripts": [
+        "/config/app.config.js",
+        "/pages/sanmar-catalog-color-audit.js?v=2026.09.06.31"
+      ],
+      "cssBytes": 21628
+    }
+  ],
+  "hashes": {
+    "shared_components/js/universal-cart-header.js": "e63914e55ab0d0e9f91a351499558af23b0b8f4f0de59e6d925e033b68bb84d1",
+    "config/app.config.js": "fe83e4329ce3eee97e48dd68dab81d9d5eb6ec94511d9650e2c9ebbb1528d6ea",
+    "pages/js/dtg-compatible-products.js": "1a169b33edaf84ceb0a7f69b7e7246b72fd88ba983694f88a9549a367fcc01bd",
+    "pages/js/inventory-details.js": "1fcc2884780ba06d891288b57d1ebdab78de3f029805ae508f717b06be310562",
+    "product/services/api.js": "912a20a076ce09aaeb94fcc3a01f03184a7f29d520e604af479d8a5d9b6a5d6b",
+    "product/components/inventory.js": "fe85d0f98b4dfb5fd55dc197b8c224167c76c0681483345326626039d00afb67",
+    "pages/sanmar-catalog-color-audit.js": "a8c3ce26f8f5ea3d26d5ee9fcc4b1bf277267f77409a8c0c691f9b7655c2144d"
+  },
+  "missingScripts": [
+    "shared_components/js/sample-cart.js"
+  ],
+  "changes": [
+    {
+      "file": "pages/js/dtg-compatible-products.js",
+      "to": "    document.querySelector('.cart-indicator')?.classList.add('btn', 'btn-secondary');\n    loadDTGProducts();",
+      "from": "    loadDTGProducts();"
+    },
+    {
+      "file": "pages/js/dtg-compatible-products.js",
+      "to": "    const loadErrors = [];",
+      "from": "    let loadErrors = '';"
+    },
+    {
+      "file": "pages/js/dtg-compatible-products.js",
+      "to": "    productsGrid.hidden = true;\n    productCount.textContent = 'Loading compatible products…';",
+      "from": "    productsGrid.hidden = true;"
+    },
+    {
+      "file": "pages/js/dtg-compatible-products.js",
+      "to": "                if (!response.ok) throw new Error('Request failed (' + response.status + ')');\n                const details = await response.json();\n                if (!Array.isArray(details) || details.some(item => !item || typeof item !== 'object' || !item.COLOR_NAME)) throw new Error('Incomplete product response');\n                if (details.length > 0) productCache[styleNumber] = details;",
+      "from": "                if (response.ok) {\n                    const details = await response.json();\n                    if (details && details.length > 0) {\n                        productCache[styleNumber] = details;\n                    }\n                }"
+    },
+    {
+      "file": "pages/js/dtg-compatible-products.js",
+      "to": "            loadErrors.push(styleNumber);",
+      "from": "            loadErrors = error.message || 'request failed';"
+    },
+    {
+      "file": "pages/js/dtg-compatible-products.js",
+      "to": "    productCount.textContent = loadErrors.length ? `${products.length} products loaded; ${loadErrors.length} styles unavailable` : `${products.length} products perfect for DTG printing`;",
+      "from": "    productCount.textContent = `${products.length} products perfect for DTG printing`;"
+    },
+    {
+      "file": "pages/js/dtg-compatible-products.js",
+      "to": "    if (loadErrors.length) {\n        const notice = document.createElement('p');\n        notice.className = 'dtg-empty'; notice.setAttribute('role', 'alert');\n        notice.innerHTML = (products.length ? 'Some products could not be loaded' : 'Products could not be loaded') + ' (' + esc(loadErrors.join(', ')) + '). <button type=\"button\" class=\"btn btn-secondary dtg-retry\" id=\"dtg-retry\">Retry</button>';\n        productsGrid.prepend(notice);\n        notice.querySelector('button').addEventListener('click', loadDTGProducts);\n    } else if (!products.length) {\n        productsGrid.innerHTML = '<p class=\"product-empty\" role=\"status\">No DTG-compatible products are available right now.</p>';\n    }",
+      "from": "    if (!products.length) {\n        // Erik's #1 rule: a failed catalogue read must not look like an empty catalogue\n        productsGrid.innerHTML = '<p class=\"dtg-empty\" role=\"alert\">Products could not be loaded' + (loadErrors ? ' (' + esc(loadErrors) + ')' : '') + '. <button type=\"button\" class=\"btn-sample dtg-retry\" id=\"dtg-retry\">Retry</button></p>';\n        const rb = document.getElementById('dtg-retry'); if (rb) rb.addEventListener('click', loadDTGProducts);\n    }"
+    },
+    {
+      "file": "pages/js/dtg-compatible-products.js",
+      "to": "class=\"btn-sample btn btn-primary\" data-style=",
+      "from": "class=\"btn-sample\" data-style="
+    },
+    {
+      "file": "pages/js/dtg-compatible-products.js",
+      "to": "    card.addEventListener('click', (event) => { if (!event.target.closest('button')) navigateToProduct(product); });",
+      "from": "    card.addEventListener('click', () => navigateToProduct(product));"
+    },
+    {
+      "file": "pages/js/dtg-compatible-products.js",
+      "to": "if (e.target === card && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); navigateToProduct(product); }",
+      "from": "if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); navigateToProduct(product); }"
+    },
+    {
+      "file": "pages/js/dtg-compatible-products.js",
+      "to": "        if (img.dataset.fallback && img.src !== img.dataset.fallback && !img.dataset.fallbackTried) {\n            img.dataset.fallbackTried = 'true'; img.src = img.dataset.fallback;\n        } else {\n            img.removeAttribute('data-onerror'); img.hidden = true;\n            const note = document.createElement('p'); note.className = 'image-unavailable'; note.textContent = 'Product image unavailable';\n            img.after(note);\n        }",
+      "from": "        img.removeAttribute('data-onerror');\n        if (img.dataset.fallback) img.src = img.dataset.fallback; else img.hidden = true;"
+    },
+    {
+      "file": "pages/js/inventory-details.js",
+      "to": "let selectedColor = colorCode;\nlet inventoryRequest = 0;",
+      "from": "let selectedColor = colorCode;"
+    },
+    {
+      "file": "pages/js/inventory-details.js",
+      "to": "        if (!productData || !Array.isArray(productData.colors) || !productData.colors.length || productData.colors.some(color => !(color.catalogColor || color.CATALOG_COLOR) || !(color.colorName || color.COLOR_NAME))) {",
+      "from": "        if (!productData) {"
+    },
+    {
+      "file": "pages/js/inventory-details.js",
+      "to": "        document.getElementById('header-product-name').textContent = styleNumber;\n        showError('Failed to load product data', loadProduct);",
+      "from": "        showError('Failed to load product data');"
+    },
+    {
+      "file": "pages/js/inventory-details.js",
+      "to": "async function loadInventory(colorCode) {\n    const request = ++inventoryRequest;\n    const display = document.getElementById('inventory-display');\n    display.innerHTML = '<p role=\"status\">Loading inventory for ' + esc(colorCode) + '…</p>';\n    try {\n        const inventory = await api.getInventory(styleNumber, colorCode);\n        if (request !== inventoryRequest) return;\n        const numbers = values => Array.isArray(values) && values.every(value => typeof value === 'number' && Number.isFinite(value));\n        if (!inventory || !Array.isArray(inventory.sizes) || !Array.isArray(inventory.warehouses) ||\n            !numbers(inventory.sizeTotals) || inventory.sizeTotals.length !== inventory.sizes.length ||\n            typeof inventory.grandTotal !== 'number' || !Number.isFinite(inventory.grandTotal) ||\n            inventory.warehouses.some(warehouse => !warehouse || !warehouse.name || !numbers(warehouse.inventory) ||\n                warehouse.inventory.length !== inventory.sizes.length || typeof warehouse.total !== 'number' || !Number.isFinite(warehouse.total))) {\n            throw new Error('Incomplete inventory response');\n        }\n        // Catalog size responses carry placeholder zeros, not warehouse quantities.\n        if (inventory.source === 'sanmar-bulk' || !inventory.warehouses.length) {\n            display.innerHTML = '<div class=\"inventory-unavailable\" role=\"status\"><h2>Warehouse availability unavailable</h2><p>Stock quantities were not supplied for this color.</p><p>Catalog sizes: ' + esc(inventory.sizes.join(', ') || 'Not supplied') + '</p></div>';\n        } else {\n            inventoryDisplay.update(inventory);\n            display.querySelector('.inventory-table')?.classList.add('data-table');\n            display.querySelector('.print-inventory')?.classList.add('btn', 'btn-secondary');\n            const table = display.querySelector('.table-wrapper');\n            if (table) { table.classList.add('table-scroll'); table.tabIndex = 0; table.setAttribute('role', 'region'); table.setAttribute('aria-label', 'Warehouse inventory by size'); }\n        }\n    } catch (error) {\n        if (request !== inventoryRequest) return;\n        console.error('Failed to load inventory:', error);\n        showError('Failed to load inventory', () => loadInventory(selectedColor));\n    }\n}\n",
+      "from": "async function loadInventory(colorCode) {\n    try {\n        const inventory = await api.getInventory(styleNumber, colorCode);\n        inventoryDisplay.update(inventory);\n    } catch (error) {\n        console.error('Failed to load inventory:', error);\n        inventoryDisplay.showError('Failed to load inventory');\n    }\n}\n"
+    },
+    {
+      "file": "pages/js/inventory-details.js",
+      "to": "function showError(message, retry) {\n    const display = document.getElementById('inventory-display');\n    display.innerHTML = '<div class=\"inventory-error\" role=\"alert\"><p>' + esc(message) + '</p></div>';\n    if (retry) {\n        const button = document.createElement('button'); button.type = 'button'; button.className = 'btn btn-secondary'; button.textContent = 'Retry';\n        button.addEventListener('click', () => { api.clearCache(); retry(); });\n        display.firstElementChild.appendChild(button);\n    }\n}",
+      "from": "function showError(message) {\n    const display = document.getElementById('inventory-display');\n    display.innerHTML = `<div class=\"inventory-error\" role=\"alert\"><p>${esc(message)}</p></div>`;\n}"
+    },
+    {
+      "file": "pages/js/inventory-details.js",
+      "to": "    productImage.hidden = false;\n    document.querySelector('.image-unavailable')?.remove();\n    if (colorData && (colorData.MAIN_IMAGE_URL || colorData.mainImageUrl)) {",
+      "from": "    if (colorData && (colorData.MAIN_IMAGE_URL || colorData.mainImageUrl)) {"
+    },
+    {
+      "file": "pages/js/inventory-details.js",
+      "to": "document.getElementById('sidebar-product-image').addEventListener('error', event => {\n    const img = event.target; img.hidden = true;\n    if (!img.parentElement.querySelector('.image-unavailable')) {\n        const note = document.createElement('p'); note.className = 'image-unavailable'; note.textContent = 'Product image unavailable'; img.after(note);\n    }\n});\n\n// Initialize search",
+      "from": "// Initialize search"
+    },
+    {
+      "file": "pages/js/inventory-details.js",
+      "to": "    let searchTimeout = null;\n    let searchRequest = 0;",
+      "from": "    let searchTimeout = null;"
+    },
+    {
+      "file": "pages/js/inventory-details.js",
+      "to": "        const query = e.target.value.trim();\n        const request = ++searchRequest;",
+      "from": "        const query = e.target.value.trim();"
+    },
+    {
+      "file": "pages/js/inventory-details.js",
+      "to": "                if (request !== searchRequest) return;\n                if (!Array.isArray(results)) throw new Error('Incomplete search response');\n                displaySearchResults(results);",
+      "from": "                displaySearchResults(results);"
+    },
+    {
+      "file": "pages/js/inventory-details.js",
+      "to": "                if (request !== searchRequest) return;\n                console.error('[Inventory Search] Failed:', error);",
+      "from": "                console.error('[Inventory Search] Failed:', error);"
+    },
+    {
+      "file": "pages/js/inventory-details.js",
+      "to": "        clearTimeout(searchTimeout);\n        searchResults.classList.add('hidden');",
+      "from": "        clearTimeout(searchTimeout);"
+    },
+    {
+      "file": "pages/js/inventory-details.js",
+      "to": "    searchInput.addEventListener('keydown', event => { if (event.key === 'Escape') { searchRequest++; clearTimeout(searchTimeout); searchResults.classList.add('hidden'); } });\n\n    // Click outside to close",
+      "from": "    // Click outside to close"
+    },
+    {
+      "file": "pages/js/inventory-details.js",
+      "to": "        if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {\n            searchRequest++; clearTimeout(searchTimeout);\n            searchResults.classList.add('hidden');",
+      "from": "        if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {\n            searchResults.classList.add('hidden');"
+    },
+    {
+      "file": "pages/sanmar-catalog-color-audit.js",
+      "to": "  function render(result) {\n    var buckets = ['inSync', 'caspioMismatch', 'caspioOrphan', 'sanmarOnly', 'internalDrift'];\n    if (!result || typeof result !== 'object' || !result.style || !Number.isFinite(Date.parse(result.generatedAt)) ||\n        ['caspioRowsFetched', 'caspioColorsUnique', 'sanmarColors'].some(function (key) { return !Number.isInteger(result[key]) || result[key] < 0; }) ||\n        buckets.some(function (key) {\n          var bucket = result[key];\n          return !bucket || !Array.isArray(bucket.rows) || bucket.count !== bucket.rows.length || bucket.rows.some(function (row) {\n            return !row || typeof row !== 'object' || !row.colorName || (row.sizes != null && !Array.isArray(row.sizes));\n          });\n        })) throw new Error('Incomplete audit response. Run the audit again.');\n    lastResult = result;",
+      "from": "  function render(result) {\n    lastResult = result;"
+    },
+    {
+      "file": "pages/sanmar-catalog-color-audit.js",
+      "to": "    if (result.sanmarApiError) {\n      ['sum-sync', 'sum-mismatch', 'sum-orphan', 'sum-sanmar-only'].forEach(function (id) { document.getElementById(id).textContent = 'Unknown'; });\n      ['bkt-sync', 'bkt-mismatch', 'bkt-orphan', 'bkt-sanmaronly'].forEach(function (id) { document.getElementById(id).hidden = true; });\n      document.getElementById('meta-sanmar-colors').textContent = 'Unavailable';\n      setStatus('SanMar is unavailable. Only internal Caspio drift can be reviewed. Run audit to retry.', true);\n    } else {\n      setStatus('Loaded ' + result.caspioRowsFetched + ' Caspio rows + ' + result.sanmarColors + ' SanMar colors.', false);\n    }",
+      "from": "    setStatus('Loaded ' + result.caspioRowsFetched + ' Caspio rows + ' + result.sanmarColors + ' SanMar colors.', false);"
+    },
+    {
+      "file": "pages/sanmar-catalog-color-audit.js",
+      "to": "    if (!lastResult || (lastResult.sanmarApiError && target !== 'drift')) return null;",
+      "from": "    if (!lastResult) return null;"
+    },
+    {
+      "file": "pages/sanmar-catalog-color-audit.js",
+      "to": "    Promise.resolve().then(function () {\n      if (!navigator.clipboard || typeof navigator.clipboard.writeText !== 'function') throw new Error('Clipboard unavailable');\n      return navigator.clipboard.writeText(text);\n    }).then(function () {",
+      "from": "    navigator.clipboard.writeText(text).then(function () {"
+    },
+    {
+      "file": "pages/sanmar-catalog-color-audit.js",
+      "to": "      }, 1400);\n    }).catch(function () { setStatus('Could not copy. Allow clipboard access and try Copy CSV again, or select the table text.', true); });",
+      "from": "      }, 1400);\n    });"
+    },
+    {
+      "file": "pages/sanmar-catalog-color-audit.js",
+      "to": "  async function runAudit() {\n    if (runBtn.disabled) return;\n    var style",
+      "from": "  async function runAudit() {\n    var style"
+    },
+    {
+      "file": "pages/sanmar-catalog-color-audit.js",
+      "to": "    runBtn.disabled = true;\n    lastResult = null; summaryEl.hidden = true; metaEl.hidden = true;\n    document.querySelectorAll('.bucket').forEach(function (bucket) { bucket.hidden = true; });\n    setStatus(",
+      "from": "    runBtn.disabled = true;\n    setStatus("
+    },
+    {
+      "file": "shared_components/js/universal-cart-header.js",
+      "from": "// Styles live in /shared_components/css/universal-cart-header.css (linked by the page) — nothing injected.",
+      "to": "// Layout and shared controls come from the consuming page stylesheet — nothing injected."
+    }
+  ]
+}

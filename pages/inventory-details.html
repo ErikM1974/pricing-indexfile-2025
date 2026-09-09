@@ -1,16 +1,15 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
+<html lang="en"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inventory Details - Northwest Custom Apparel</title>
-    <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/product/styles/product.css?v=2026.09.07.19">
+
+
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="/pages/css/inventory-details.css?v=2026.09.07.19">
-</head>
-<body>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap"><link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.09.17"><link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.09.17"><link rel="stylesheet" href="/shared_components/css/product-detail-tools.css?v=2026.09.09.17"><link rel="icon" href="/favicon.png"><script src="/config/app.config.js"></script></head>
+<body data-ui="unified" data-product-detail="inventory" data-surface="storefront"><a class="skip-link" href="#product-detail-main">Skip to inventory</a>
     <!-- Enhanced Header -->
     <header class="enhanced-inventory-header">
         <!-- Contact Bar -->
@@ -32,39 +31,37 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- Main Navigation -->
         <div class="header-nav">
             <div class="nav-content">
                 <div class="logo-section">
                     <a href="/" class="logo-link">
-                        <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
-                             alt="Northwest Custom Apparel" 
-                             class="logo-image">
+                        <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" alt="Northwest Custom Apparel" class="logo-image">
                     </a>
                 </div>
-                
-                <nav class="main-nav-links">
+
+                <nav class="main-nav-links" aria-label="Main navigation">
                     <a href="/">Home</a>
                     <a href="/product.html">Products</a>
                     <a href="mailto:sales@nwcustomapparel.com">Contact</a>
                 </nav>
             </div>
         </div>
-        
+
         <!-- Context Bar -->
         <div class="inventory-context-bar">
             <div class="context-bar-content">
                 <div class="context-left">
                     <!-- Navigation Buttons -->
                     <div class="nav-buttons">
-                        <a href="#" id="back-to-product" class="btn-back">
+                        <a href="#" id="back-to-product" class="btn-back btn btn-secondary">
                             <i class="fas fa-arrow-left" aria-hidden="true"></i>
                             Back to Product
                         </a>
-                        
+
                         <div class="pricing-dropdown">
-                            <button type="button" class="btn-pricing" aria-haspopup="true" aria-expanded="false" aria-controls="pricing-dropdown-menu">
+                            <button type="button" class="btn-pricing btn btn-secondary" aria-haspopup="true" aria-expanded="false" aria-controls="pricing-dropdown-menu">
                                 <i class="fas fa-calculator" aria-hidden="true"></i>
                                 View Pricing
                                 <i class="fas fa-chevron-down" aria-hidden="true"></i>
@@ -88,7 +85,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <!-- Breadcrumb -->
                     <div class="breadcrumb">
                         <i class="fas fa-warehouse" aria-hidden="true"></i>
@@ -96,15 +93,11 @@
                         <h1 id="header-product-name" class="breadcrumb-title">Loading...</h1>
                     </div>
                 </div>
-                
+
                 <!-- Search Box -->
                 <div class="header-search">
                     <i class="fas fa-search header-search-icon" aria-hidden="true"></i>
-                    <input type="text" 
-                           id="header-style-search" 
-                           class="header-search-input" 
-                           placeholder="Search another style..."
-                           autocomplete="off" aria-label="Search another style">
+                    <input type="text" id="header-style-search" class="header-search-input field-input" placeholder="Search another style..." autocomplete="off" aria-label="Search another style">
                     <div id="header-search-results" class="header-search-results hidden"></div>
                 </div>
             </div>
@@ -120,7 +113,7 @@
                 <div class="product-image-container">
                     <img id="sidebar-product-image" src="" alt="Product" class="product-image">
                 </div>
-                
+
                 <h3>Select Color:</h3>
                 <div id="color-options">
                     <!-- Color options will be populated by JavaScript -->
@@ -129,9 +122,9 @@
         </aside>
 
         <!-- Inventory Display -->
-        <main class="inventory-main">
+        <main class="inventory-main" id="product-detail-main" tabindex="-1">
             <section class="inventory-section inventory-section--rel">
-                <button type="button" class="print-btn">
+                <button type="button" class="print-btn btn btn-secondary">
                     <i class="fas fa-print" aria-hidden="true"></i>
                     Print
                 </button>
@@ -143,10 +136,10 @@
     </div>
 
     <!-- Loading Overlay -->
-    <div id="loading-overlay" class="loading-overlay hidden">
+    <div id="loading-overlay" class="loading-overlay hidden" role="status" aria-label="Loading product and inventory">
         <div class="spinner"></div>
     </div>
 
-    <script type="module" src="/pages/js/inventory-details.js?v=2026.09.05.79"></script>
-</body>
-</html>
+    <script type="module" src="/pages/js/inventory-details.js?v=2026.09.09.17"></script>
+
+</body></html>

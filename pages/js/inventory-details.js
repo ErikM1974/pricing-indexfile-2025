@@ -14,6 +14,7 @@ const colorCode = urlParams.get('color');
 // State
 let productData = null;
 let selectedColor = colorCode;
+let inventoryRequest = 0;
 
 // Update back link
 function updateBackLink() {
@@ -29,7 +30,7 @@ async function loadProduct() {
         showLoading(true);
         productData = await api.getProduct(styleNumber);
 
-        if (!productData) {
+        if (!productData || !Array.isArray(productData.colors) || !productData.colors.length || productData.colors.some(color => !(color.catalogColor || color.CATALOG_COLOR) || !(color.colorName || color.COLOR_NAME))) {
             throw new Error('Product not found');
         }
 
@@ -64,7 +65,8 @@ async function loadProduct() {
 
     } catch (error) {
         console.error('Failed to load product:', error);
-        showError('Failed to load product data');
+        document.getElementById('header-product-name').textContent = styleNumber;
+        showError('Failed to load product data', loadProduct);
     } finally {
         showLoading(false);
     }
@@ -133,12 +135,34 @@ function populateColors(colors) {
 
 // Load inventory
 async function loadInventory(colorCode) {
+    const request = ++inventoryRequest;
+    const display = document.getElementById('inventory-display');
+    display.innerHTML = '<p role="status">Loading inventory for ' + esc(colorCode) + '…</p>';
     try {
         const inventory = await api.getInventory(styleNumber, colorCode);
-        inventoryDisplay.update(inventory);
+        if (request !== inventoryRequest) return;
+        const numbers = values => Array.isArray(values) && values.every(value => typeof value === 'number' && Number.isFinite(value));
+        if (!inventory || !Array.isArray(inventory.sizes) || !Array.isArray(inventory.warehouses) ||
+            !numbers(inventory.sizeTotals) || inventory.sizeTotals.length !== inventory.sizes.length ||
+            typeof inventory.grandTotal !== 'number' || !Number.isFinite(inventory.grandTotal) ||
+            inventory.warehouses.some(warehouse => !warehouse || !warehouse.name || !numbers(warehouse.inventory) ||
+                warehouse.inventory.length !== inventory.sizes.length || typeof warehouse.total !== 'number' || !Number.isFinite(warehouse.total))) {
+            throw new Error('Incomplete inventory response');
+        }
+        // Catalog size responses carry placeholder zeros, not warehouse quantities.
+        if (inventory.source === 'sanmar-bulk' || !inventory.warehouses.length) {
+            display.innerHTML = '<div class="inventory-unavailable" role="status"><h2>Warehouse availability unavailable</h2><p>Stock quantities were not supplied for this color.</p><p>Catalog sizes: ' + esc(inventory.sizes.join(', ') || 'Not supplied') + '</p></div>';
+        } else {
+            inventoryDisplay.update(inventory);
+            display.querySelector('.inventory-table')?.classList.add('data-table');
+            display.querySelector('.print-inventory')?.classList.add('btn', 'btn-secondary');
+            const table = display.querySelector('.table-wrapper');
+            if (table) { table.classList.add('table-scroll'); table.tabIndex = 0; table.setAttribute('role', 'region'); table.setAttribute('aria-label', 'Warehouse inventory by size'); }
+        }
     } catch (error) {
+        if (request !== inventoryRequest) return;
         console.error('Failed to load inventory:', error);
-        inventoryDisplay.showError('Failed to load inventory');
+        showError('Failed to load inventory', () => loadInventory(selectedColor));
     }
 }
 
@@ -148,30 +172,47 @@ function showLoading(show) {
 }
 
 // Show error
-function showError(message) {
+function showError(message, retry) {
     const display = document.getElementById('inventory-display');
-    display.innerHTML = `<div class="inventory-error" role="alert"><p>${esc(message)}</p></div>`;
+    display.innerHTML = '<div class="inventory-error" role="alert"><p>' + esc(message) + '</p></div>';
+    if (retry) {
+        const button = document.createElement('button'); button.type = 'button'; button.className = 'btn btn-secondary'; button.textContent = 'Retry';
+        button.addEventListener('click', () => { api.clearCache(); retry(); });
+        display.firstElementChild.appendChild(button);
+    }
 }
 
 // Update product image
 function updateProductImage(colorData) {
     const productImage = document.getElementById('sidebar-product-image');
+    productImage.hidden = false;
+    document.querySelector('.image-unavailable')?.remove();
     if (colorData && (colorData.MAIN_IMAGE_URL || colorData.mainImageUrl)) {
         productImage.src = colorData.MAIN_IMAGE_URL || colorData.mainImageUrl;
         productImage.alt = `${productData.title || productData.productTitle || 'Product'} - ${colorData.colorName || colorData.COLOR_NAME}`;
     }
 }
 
+document.getElementById('sidebar-product-image').addEventListener('error', event => {
+    const img = event.target; img.hidden = true;
+    if (!img.parentElement.querySelector('.image-unavailable')) {
+        const note = document.createElement('p'); note.className = 'image-unavailable'; note.textContent = 'Product image unavailable'; img.after(note);
+    }
+});
+
 // Initialize search
 function initializeSearch() {
     const searchInput = document.getElementById('header-style-search');
     const searchResults = document.getElementById('header-search-results');
     let searchTimeout = null;
+    let searchRequest = 0;
 
     searchInput.addEventListener('input', async (e) => {
         const query = e.target.value.trim();
+        const request = ++searchRequest;
 
         clearTimeout(searchTimeout);
+        searchResults.classList.add('hidden');
 
         if (query.length < 2) {
             searchResults.classList.add('hidden');
@@ -181,8 +222,11 @@ function initializeSearch() {
         searchTimeout = setTimeout(async () => {
             try {
                 const results = await api.searchProducts(query);
+                if (request !== searchRequest) return;
+                if (!Array.isArray(results)) throw new Error('Incomplete search response');
                 displaySearchResults(results);
             } catch (error) {
+                if (request !== searchRequest) return;
                 console.error('[Inventory Search] Failed:', error);
                 searchResults.innerHTML = '<div class="search-msg search-msg--error" role="alert">Search failed. Please try again.</div>';
                 searchResults.classList.remove('hidden');
@@ -190,9 +234,12 @@ function initializeSearch() {
         }, 300);
     });
 
+    searchInput.addEventListener('keydown', event => { if (event.key === 'Escape') { searchRequest++; clearTimeout(searchTimeout); searchResults.classList.add('hidden'); } });
+
     // Click outside to close
     document.addEventListener('click', (e) => {
         if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+            searchRequest++; clearTimeout(searchTimeout);
             searchResults.classList.add('hidden');
         }
     });
