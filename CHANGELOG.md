@@ -1,3 +1,14 @@
+## v2026.09.08.16 (2026.09.08)
+
+- Record live manual release and final training worktree checkpoint
+- Record final training family implementation and lifecycle safeguards
+- Unify final training pages and repair exercise lifecycle controls
+- Integrate final training family with verified manual release
+- Record compact training print verification
+- Keep training exercise printouts compact and preserve active fields
+- Integrate reviewed training print layouts
+- Version final training family assets for verified rollout
+
 ## v2026.09.08.15 (2026.09.08)
 
 - Record live reference release and next manual family

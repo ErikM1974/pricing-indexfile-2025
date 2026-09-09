@@ -413,3 +413,7 @@ Worktree codex/training-final-family (base 20d3e247) implements Training Center,
 ### Final training print follow-up
 
 Actual print review found the tax exercise forced onto a new page and repeated simulator controls consuming five pages. Scoped print rules now keep directory at two pages, tax challenge at one, basic setup at one and expanded simulator at two. Four real-PDF cases added; all 21 family browser cases passed, followed by four final print cases. Original fields/course material remain unchanged. Review port 3416 is isolated from the primary release suite on 3400. Source CSS now 21% smaller including the new print contract.
+
+## Final training release record — v2026.09.08.16
+
+Exact-source CI 34310205668 passed all four jobs on 76a52b66f0de2a049e639a6bc446cd7163e19275, including live money/calculator parity. The Training Center, tax trainer and both ShopWorks simulators now share responsive controls and clear round/progress state. Original course data, fields and options remain locked. Twenty-one focused browser cases cover four widths, keyboard/dialogs, full/restarted rounds, storage/timer failures and compact real PDFs. All 26 tracked training pages are covered. After verified rollout: 60 of 225 application/served-archive pages reviewed/live, 165 pending. Actual slug and live verification follow.
