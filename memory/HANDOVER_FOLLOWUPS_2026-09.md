@@ -410,3 +410,5 @@ Reviewed design libraries: dashboards/digitized-designs.html and dashboards/old-
 ## Design-library integration — 2026-09-09
 
 Preserved the .14 live checkpoint and all append-only design evidence. The initial review commit helper stopped on whitespace-only HTML lines; finish-design-reviewed.cjs removed trailing whitespace and committed the owned source, preserving both indexed deletions. Do not rerun either review helper. Full integrated checks follow.
+
+Integrated design checks found two historical photo-source locks still expected the previously untouched design controllers. The photo guard now reverses the same31 explicitly documented design edits before checking its original hashes; no source lock was removed or rebased. All227suites rerun on the updated integrated source.
