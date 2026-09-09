@@ -2,33 +2,27 @@
 
 ## Active checkpoint — 2026-09-08
 
-Erik resumed explicitly; edit/deploy authorization continues. The 17 printable forms are LIVE as **v2026.09.08.12 / Heroku 2070**, full SHA **cb2fe3da7191b4d5f8b1de60a73fed7e72c75cb4**. Actual successful slug verified 2026-09-09T01:04:44Z. Exact final-source CI **34280132378** passed all four jobs, including live money/calculator parity on **70b32f5ae11672d21a77e67624d1f9aff31be684**. Twenty-one deployed runtime assets match committed bytes; 20 unified public shells and the legacy quote request return 200; four staff shells remain protected. No business writes or notifications.
+Erik resumed; standing edit/deploy authorization continues. **Frontend v2026.09.08.13 / Heroku 2071 is LIVE**, full SHA **28747d3f824eef7eb5ed67990a80a984a9ed9914**, actual slug verified 2026-09-09T02:03:01.0561969Z. Exact-source CI **34300872261** passed all four jobs including live money/calculator parity on 0ca66081bdd5bee21197a76aa29259c25021f38c. Sixteen deployed runtime assets match committed bytes; seven training HTML shells and two public form regression shells return 200; four staff shells remain protected. No business writes or notifications.
 
-### Count and current work
+**48 reviewed application pages live; 177 pending**, from **225 application/served-archive HTML sources**. Another 79 tracked HTML sources are excluded. The browser email-template editor is included as an application; the previous 224 denominator omitted it. Generated document/style owners are separate unfinished work. Fourteen training pages are reviewed; thirteen other training pages remain.
 
-**41 reviewed application pages live; 184 still pending**, from 225 application/served-archive HTML sources (inventory corrected to include the browser template editor). Another 79 tracked HTML files are excluded archives/email/templates/retired sources. Generated style/document owners remain separate work. Inventory: September 7 artifacts/css-shutdown-inventory.json.
+### Next batch and plan
 
-Next batch: seven remaining training pages — customer-categorization-training, lead-email-templates, lead-source-training, training-games-hub, shopworks-notes, shopworks-sales-tax-training, team-match-game. Baselines already captured in remaining-training-baseline.json / training-before-*.png. Preserve original training prose, fixtures, destinations and rates. Share scoped navigation/control/layout styles, retain page-specific game arrangements, verify keyboard/touch games and template copy/edit/failure states. Implementation is local and under validation.
+- [x] Deploy and verify seven training practice/reference pages (.13).
+- [x] Capture four-width baselines for all thirteen remaining training pages (next-training-baseline.json).
+- [ ] Unify cap-training, quick-reference-tips, shipping-receiving-guide and sanmar-purchasing-guide using existing components/training-guide and a scoped reference layout owner.
+- [ ] Preserve all lesson text, business figures, links, screenshots, video destinations and checklist storage keys. Give checklists visible storage errors; test persistence/reset and reduced-motion navigation. Keep quick-tips-data.json unchanged for other consumers; remove its presentation styles only in the migrated renderer.
+- [ ] Review desktop/mobile, keyboard/axe, failed/empty/search/retry states, real PDFs and full release gates, then exact-source CI/deploy.
 
-### Verification and resuming safely
+Design: Public Sans, existing white/neutral/forest tokens, left-aligned reading hierarchy. Cap imagery remains prominent with restrained sales statistics; tips read as a searchable reference. Shipping/purchasing share navigation, numbered steps, callouts, contact/checklist layouts and paper rules. Replace duplicate CSS rather than append overrides. No new styling applied yet to these four pages at this checkpoint. Baseline PDFs: caps 7, tips 3, shipping 11, purchasing 10 pages.
 
-Forms local gates: 207 unit suites / 5,014 tests, 88 DOM, four a11y unit, 84 quote parity, 157 browser cases, five calculator surfaces; build/lint/types/291 CSS/boot pass; 485 route registrations / 24 modules. Final compatibility correction then passed all 48 focused browser cases and exact-source CI. All 17 blank PDFs preserve page counts; filled PDFs reviewed with full notes and legal/signature content intact.
+### Verification / resume evidence
 
-Artifacts: C:/Users/erik/.codex/visualizations/2026/09/07/01a07d90-9a4c-7e70-9e4e-c196377b7c6b. printable-forms-release-record.json, source-ci.json, heroku-verification.json and live-verification.json are authoritative. Do NOT rerun historical install/release helpers. Fresh-check branch, CI and ownership before the next release. Release main/develop CI is tracked separately after source CI.
+.13 local gates: 207 unit suites / 5,035 passed / four existing skips; 88 DOM, four a11y unit, 84 quote parity; 162 mocked browser cases plus 16 remaining cases (three optional screenshot skips), all five calculator surfaces. Build/lint/types/291 CSS/boot pass; 485 registrations / 24 modules unchanged. Final refinements passed 91 ownership/census cases, all 20 family browser cases and the final email-paper case. Reviewed PDFs: hub one page, notes six complete pages, twelve complete email templates. Unique family CSS source shrank 74.4%; cold-page transfer is a different measure.
 
-Backend remains v2026.09.08.1 / Heroku 1130 / d06aee3e4d25c5e1410241ea8007cdc8339aa3fa. Its dependency/runtime backlog and natural scheduler verification are unfinished separate work. Frontend production audit remains zero; Heroku build notes two dev dependency advisories and stack-22 deprecation, to assess separately without broadening this CSS release.
+Artifact directory: C:/Users/erik/.codex/visualizations/2026/09/07/01a07d90-9a4c-7e70-9e4e-c196377b7c6b. training-practice-release-record.json, source-ci.json, heroku-verification.json and live-verification.json are authoritative. .13 release main/develop CI is tracked separately after source CI. Do not rerun historical installers/release helpers. Fresh-check ownership and branches before each release.
 
-### Training practice implementation — active local batch
-
-Seven pages now share training-guide/practice owners and component primitives. Twenty focused browser cases are implemented: the first eighteen passed; completion/timer refinements passed their two targeted cases afterward. Ninety ownership/content/fixture tests pass. Full release gates and PDF review remain required before source CI/deploy. Superseded training-shared.css is retired after a zero-HTML-caller check; original lesson text and seven JS exercise fixture objects are unchanged. Template storage/copy failures stay visible, saved templates render after reload, matching supports touch/keyboard/drag, quiz/tax scoring and mode timers are guarded. Forms .12 main CI 34297584052 is green.
-
-### Training practice ready for source CI — 2026-09-08
-
-Full local checks passed: 207 unit suites / 5,035 passed / four existing skips; 88 DOM, four a11y unit, 84 quote parity; 162 mocked browser cases in 273.6 seconds and 16 remaining cases, three optional screenshot skips. All five live calculator surfaces agree. Build/lint/types/291 CSS/boot pass; 485 registrations / 24 modules unchanged. Final print and inventory refinements then passed 91 ownership/census cases, all twenty family browser cases, one last email-print check and CSS lint. Real PDFs are reviewed: one-page hub, six-page notes with whole sections, twelve complete email templates verified against their full original text.
-
-The census correction includes the browser email-template editor as an APPLICATION, rather than an email-client document. Correct denominator: **225 application/served-archive pages** (224 + 1), plus 79 excluded HTML sources. **41 pages remain live on .12; seven ready for .13, bringing reviewed/live to 48 and pending to 177 after deployment.** Prior 224/183 totals excluded that editor. Fourteen training pages will be reviewed after this batch; thirteen other training HTML pages remain in the larger queue.
-
-Unique family-owned CSS: 87399 → 22402 bytes (74.4% less), excluding the existing cached foundations. This does not claim lower cold-page network transfer. Source/CI/release/live records use training-practice-* in September 7 artifacts. Source commit, exact CI, release and live verification are next; no .13 deployment yet.
+Backend remains v2026.09.08.1 / Heroku 1130 / d06aee3e4d25c5e1410241ea8007cdc8339aa3fa; dependency/runtime backlog and natural scheduler verification remain separate work. Frontend production dependency audit is zero.
 
 ## Coordinated transfer authentication LIVE — 2026-09-08
 
