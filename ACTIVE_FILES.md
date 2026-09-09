@@ -1,6 +1,6 @@
 # Active Files Registry
 
-Last updated: 2026-09-08 — printable form shared owner, 17 scoped consumers and browser/content checks.
+Last updated: 2026-09-08 — training reference shared owners, four consumers and browser/content/print checks.
 
 | Area | Registry |
 |---|---|
@@ -29,3 +29,10 @@ Historical counts are retained as audit notes and must not be presented as curre
 - `tests/e2e/css-unification-training-practice.spec.js` — four-width layouts/accessibility, keyboard/touch exercises, template filtering/copy/local saves/errors and printed reference checks.
 
 - Retired `training/css/training-shared.css` after the last seven HTML consumers migrated; maintained owners are training-guide.css and training-practice.css.
+
+- `shared_components/css/training-reference.css` — scoped reference layouts for cap training, quick tips, shipping and purchasing; existing components/training-guide own controls and tables.
+- `shared_components/js/training-reference.js` — shared guide printing, accessible navigation and local checklist persistence/failure states.
+- Retired `training/shipping-receiving-guide.js` and `training/sanmar-purchasing-guide.js`; both consumers now use training-reference.js with their original storage prefixes.
+
+
+- `tests/e2e/css-unification-training-reference.spec.js` — responsive/axe, cap content, quick-tip search/errors/rich text, shared checklist storage/navigation and real PDF coverage.

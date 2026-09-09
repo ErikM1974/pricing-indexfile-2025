@@ -173,3 +173,23 @@ test.each(manifest.trainingPracticeData)('$source keeps the original $variable e
     const value = source.slice(declaration.init.start, declaration.init.end).replace(/\r\n/g, '\n');
     expect(crypto.createHash('sha256').update(value).digest('hex')).toBe(entry.sha256);
 });
+
+
+describe('training reference preservation', () => {
+    test.each(manifest.trainingReferenceContent)('$source preserves lessons, figures, fields and media', entry => {
+        const document = new JSDOM(read(entry.source)).window.document;
+        const content = {
+            text: document.querySelector('main').textContent.replace(/\s+/g, ' ').trim(),
+            ids: [...document.querySelectorAll('[id]')].map(el => el.id),
+            links: [...document.querySelectorAll('a')].map(el => [el.getAttribute('href'), el.textContent.replace(/\s+/g, ' ').trim()]),
+            fields: [...document.querySelectorAll('input,textarea,select')].map(el => ({ id: el.id, type: el.type, value: el.value })),
+        };
+        expect(crypto.createHash('sha256').update(JSON.stringify(content)).digest('hex')).toBe(entry.sha256);
+        expect([...document.querySelectorAll('img,iframe')].map(el => [el.tagName,el.getAttribute('src'),el.getAttribute('alt'),el.getAttribute('title')])).toEqual(entry.media);
+        expect(document.querySelectorAll('[style], style, script:not([src])')).toHaveLength(0);
+    });
+    test('shared quick-tip data remains unchanged for other consumers', () => {
+        const entry = manifest.trainingReferenceData;
+        expect(crypto.createHash('sha256').update(read(entry.source).replace(/\r\n/g, '\n')).digest('hex')).toBe(entry.sha256);
+    });
+});

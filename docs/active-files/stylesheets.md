@@ -177,3 +177,5 @@ cap-embroidery-fix.css
 - `shared_components/css/printable-forms.css`: scoped shared printable-form layout, controls, lookup/swatch states, phone table regions and paper rules for 17 `/pages/forms/` consumers. Their page sheets retain unique layouts/orientation. Old `nwca-form-shared.css` remains for public `pages/request-a-quote.html`; it is not retired.
 
 - `shared_components/css/training-practice.css`: scoped practice layouts and feedback for seven games/reference pages; shared controls remain in components.css. Replaces the last training-shared.css consumers and their duplicated page controls.
+
+- `shared_components/css/training-reference.css` — reference reading/nav/steps/contact/checklist pattern; four explicitly opted-in training pages.

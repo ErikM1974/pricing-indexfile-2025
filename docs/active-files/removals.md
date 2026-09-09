@@ -60,3 +60,6 @@
 - `training/js/thank-you-card-guide.js`: replaced by shared training-service.css / training-guide.js after checking all consumers.
 - `training/js/lead-sheet-guide.js`: replaced by shared training-service.css / training-guide.js after checking all consumers.
 - `training/js/google-review-guide.js`: replaced by shared training-service.css / training-guide.js after checking all consumers.
+
+
+2026-09-08: retired training/shipping-receiving-guide.js and training/sanmar-purchasing-guide.js after both HTML callers moved to shared_components/js/training-reference.js.

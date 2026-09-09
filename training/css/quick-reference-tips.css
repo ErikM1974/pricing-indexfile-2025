@@ -1,233 +1,133 @@
-/* quick-reference-tips.css — page styles (extracted from inline \3c style>, 2026.09.05.7) */
+/* Scoped reference family; shared primitives and training-guide load first. */
+@layer components.pages {
+    :where([data-ui="unified"][data-training="reference"]) .stats-bar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-6);
+        padding-block: var(--space-5);
+        border-block: 1px solid var(--ui-line);
+    }
 
-/* ── moved from inline \3c style> in training/quick-reference-tips.html (Rule 3, 2026.09.05.7) ── */
+    :where([data-ui="unified"][data-training="reference"]) .stat-number {
+        font-size: var(--font-size-2xl);
+        font-weight: var(--font-weight-semibold);
+        font-variant-numeric: tabular-nums;
+    }
 
-/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue, merged into its
-   existing :root. Map them to shared_components/css/tokens.css names when the page is redesigned;
-   raw hex is allowed ONLY in this block. */
-/* stylelint-disable color-no-hex */
-:root {
-    --page-red: #c4365f;
-            --wsu-crimson: var(--color-ae);
-            --wsu-grey: var(--gray-500);
-            --wsu-light-grey: var(--gray-100);
-            --text-primary: var(--gray-800);
-            --text-secondary: var(--gray-500);
-            --bg-primary: var(--color-surface);
-            --bg-secondary: var(--gray-50);
-            --border-color: var(--gray-200);
-        }
-/* stylelint-enable color-no-hex */
+    :where([data-ui="unified"][data-training="reference"]) .stat-label {
+        font-size: var(--font-size-md);
+        color: var(--ui-muted);
+    }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+    :where([data-ui="unified"][data-training="reference"]) .search-bar {
+        margin-block: var(--space-6) var(--space-3);
+    }
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: var(--bg-secondary);
-            color: var(--text-primary);
-            line-height: 1.6;
-        }
+    :where([data-ui="unified"][data-training="reference"]) .tip-card {
+        padding-block: var(--space-6);
+        border-block-start: 1px solid var(--ui-line);
+    }
 
-        .header {
-            background: var(--wsu-crimson);
-            color: white;
-            padding: 1.5rem 2rem;
-            box-shadow: 0 2px 4px rgb(0 0 0 / 10%);
-        }
+    :where([data-ui="unified"][data-training="reference"]) .tip-header {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: var(--space-4);
+        flex-wrap: wrap;
+        margin-block-end: var(--space-5);
+    }
 
-        .header-content {
-            max-width: 1400px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+    :where([data-ui="unified"][data-training="reference"]) .tip-title {
+        font-size: var(--font-size-xl);
+        font-weight: var(--font-weight-semibold);
+    }
 
-        .header h1 {
-            font-size: 1.75rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
+    :where([data-ui="unified"][data-training="reference"]) .tip-date {
+        color: var(--ui-muted);
+        font-size: var(--font-size-md);
+    }
 
-        .back-link {
-            color: white;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem 1rem;
-            background: rgb(255 255 255 / 10%);
-            border-radius: 4px;
-            transition: background 0.2s;
-        }
+    :where([data-ui="unified"][data-training="reference"]) .new-badge {
+        color: var(--emerald-800);
+        background: var(--emerald-100);
+        font-size: var(--font-size-md);
+        padding: var(--space-1) var(--space-2);
+        margin-inline-start: var(--space-3);
+    }
 
-        .back-link:hover {
-            background: rgb(255 255 255 / 20%);
-        }
+    :where([data-ui="unified"][data-training="reference"]) .tip-content > div {
+        margin-block: var(--space-5);
+        padding-inline-start: var(--space-5);
+        border-inline-start: 2px solid var(--ui-line);
+    }
 
-        .container {
-            max-width: 1400px;
-            margin: 2rem auto;
-            padding: 0 2rem;
-        }
+    :where([data-ui="unified"][data-training="reference"])
+        .tip-content
+        :is(h4, h5) {
+        font-size: var(--font-size-lg);
+        margin-block: var(--space-5) var(--space-3);
+    }
 
-        .intro-section {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgb(0 0 0 / 6%);
-            margin-bottom: 2rem;
-            border-left: 4px solid var(--wsu-crimson);
-        }
+    :where([data-ui="unified"][data-training="reference"])
+        .tip-content
+        h4:first-child {
+        margin-block-start: 0;
+    }
 
-        .intro-section h2 {
-            color: var(--wsu-crimson);
-            font-size: 1.25rem;
-            margin-bottom: 0.75rem;
-        }
+    :where([data-ui="unified"][data-training="reference"])
+        .tip-content
+        :is(p, ul, ol) {
+        max-width: 76ch;
+    }
 
-        .intro-section p {
-            color: var(--text-secondary);
-            line-height: 1.6;
+    :where([data-ui="unified"][data-training="reference"])
+        .setup-fees-table
+        :is(th, td):last-child {
+        text-align: end;
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+    }
+
+    @media print {
+        :where([data-ui="unified"][data-training="reference"])
+            :is(.stats-bar, .search-bar, .intro-section) {
+            display: none;
         }
 
-        .stats-bar {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-bottom: 2rem;
+        :where([data-ui="unified"][data-training="reference"]) .tip-card {
+            padding-block: 7pt;
+            break-before: page;
         }
 
-        .stat-card {
-            background: white;
-            padding: 1.25rem;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgb(0 0 0 / 6%);
-            text-align: center;
+        :where([data-ui="unified"][data-training="reference"])
+            .tip-card:first-child {
+            break-before: auto;
         }
 
-        .stat-number {
-            font-size: 2rem;
-            font-weight: bold;
-            color: var(--wsu-crimson);
+        :where([data-ui="unified"][data-training="reference"]) .tip-header {
+            margin-block-end: 7pt;
         }
 
-        .stat-label {
-            color: var(--text-secondary);
-            font-size: 0.875rem;
-            margin-top: 0.25rem;
+        :where([data-ui="unified"][data-training="reference"]) .tip-title {
+            font-size: 14pt;
         }
 
-        .tips-grid {
-            display: grid;
-            gap: 1.5rem;
+        :where([data-ui="unified"][data-training="reference"]) .tip-date {
+            font-size: 9pt;
         }
 
-        .tip-card {
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgb(0 0 0 / 6%);
-            overflow: hidden;
-            transition: transform 0.2s, box-shadow 0.2s;
+        :where([data-ui="unified"][data-training="reference"])
+            .tip-content
+            > div {
+            margin-block: 8pt;
+            padding-inline-start: 8pt;
         }
 
-        .tip-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgb(0 0 0 / 10%);
+        :where([data-ui="unified"][data-training="reference"])
+            .tip-content
+            :is(h4, h5) {
+            font-size: 11pt;
+            margin-block: 8pt 5pt;
         }
-
-        .tip-header {
-            background: linear-gradient(135deg, var(--wsu-crimson), var(--page-red));
-            color: white;
-            padding: 1rem 1.5rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .tip-title {
-            font-size: 1.125rem;
-            font-weight: 600;
-        }
-
-        .tip-date {
-            font-size: 0.875rem;
-            opacity: 0.9;
-        }
-
-        .tip-body {
-            padding: 1.5rem;
-        }
-
-        .tip-content table {
-            width: 100%;
-            margin-top: 1rem;
-        }
-
-        .new-badge {
-            background: var(--green-500);
-            color: white;
-            padding: 0.25rem 0.5rem;
-            border-radius: 12px;
-            font-size: 0.75rem;
-            font-weight: bold;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
-        }
-
-        .no-tips {
-            text-align: center;
-            padding: 4rem 2rem;
-            color: var(--text-secondary);
-        }
-
-        .no-tips i {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            opacity: 0.3;
-        }
-
-        .search-bar {
-            background: white;
-            padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 2px 4px rgb(0 0 0 / 6%);
-        }
-
-        .search-input {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            font-size: 1rem;
-        }
-
-        .search-input:focus {
-            outline: none;
-            border-color: var(--wsu-crimson);
-        }
-
-        @media (width <= 768px) {
-            .container {
-                padding: 0 1rem;
-            }
-            
-            .header h1 {
-                font-size: 1.5rem;
-            }
-            
-            .stats-bar {
-                grid-template-columns: 1fr;
-            }
-        }
+    }
+}

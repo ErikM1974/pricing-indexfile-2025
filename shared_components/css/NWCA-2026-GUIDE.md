@@ -280,3 +280,6 @@ Service training guides add `training-service.css` after `training-guide.css`. I
 Printable twins opt in with `data-form="printable"` and load components → printable-forms → their page sheet. Shared form selectors stay within that scope. Paper geometry has its own media rules; `components.print` owns only the three screen-control visibility rules, replacing important flags. Public request-a-quote remains on its legacy owner pending separate review.
 
 Training practice pages opt in with data-training="practice". training-practice.css owns exercise layouts and feedback, while small page sheets own matching columns, source scenarios, template previews and the training directory. Native buttons/fields reuse components.css; do not add game-specific control primitives. training-practice.js provides one scoped selection/status and delegated-argument interface. Content/fixture preservation and complete keyboard/touch/error/print workflows are release gates.
+
+
+Training reference pages opt in with data-training="reference". training-reference.css owns reference navigation, procedure/contacts/checklists and paper rhythm; components/training-guide remain the control/table/callout owners. Page CSS owns caps, tip articles and shipping/purchasing examples.

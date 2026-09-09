@@ -12,6 +12,8 @@ const STRICT_FILES = [
     'shared_components/js/ui-dialog.js',
     'shared_components/js/training-guide.js',
     'shared_components/js/training-practice.js',
+    'shared_components/js/training-reference.js',
+    'training/js/quick-reference-tips.js',
     'lib/**/*.js',
     'scripts/build.js',
     'scripts/lint-css.js',
