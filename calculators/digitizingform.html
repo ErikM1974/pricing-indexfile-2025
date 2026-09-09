@@ -1,25 +1,25 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
+<!DOCTYPE html><html lang="en"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
     <title>Digitizing Order Form - Northwest Custom Apparel</title>
     <link rel="icon" href="/favicon.png" type="image/png">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    
-    <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/calculators/css/digitizingform.css?v=2026.09.07.19">
+
+
+
+<link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.09.8">
+<link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.09.8">
+<link rel="stylesheet" href="/shared_components/css/customer-intake.css?v=2026.09.09.8">
 </head>
-<body>
+<body data-ui="unified" data-intake="embedded" data-surface="staff" data-department="ruth"><a class="skip-link" href="/calculators/digitizingform.html#intake-main">Skip to form</a>
     <!-- Header -->
     <header class="header">
         <div class="header-container">
             <div class="header-left">
-                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
-                     alt="Northwest Custom Apparel" class="logo">
-                <nav class="breadcrumb">
+                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" alt="Northwest Custom Apparel" class="logo">
+                <nav class="breadcrumb" aria-label="Breadcrumb">
                     <a href="/staff-dashboard.html">Staff Dashboard</a>
                     <span>/</span>
                     <span>Forms</span>
@@ -28,7 +28,7 @@
                 </nav>
             </div>
             <div class="header-right">
-                <a href="/staff-dashboard.html" class="help-btn">
+                <a href="/staff-dashboard.html" class="help-btn btn">
                     <i class="fas fa-arrow-left" aria-hidden="true"></i>
                     Back to Dashboard
                 </a>
@@ -37,10 +37,10 @@
     </header>
 
     <!-- Main Content -->
-    <main class="main-container">
+    <main class="main-container" id="intake-main" tabindex="-1" aria-labelledby="intake-title">
         <!-- Page Header -->
-        <div class="page-header">
-            <h1 class="page-title">
+        <div class="intake-heading">
+            <h1 id="intake-title" class="page-title">
                 <i class="fas fa-edit" aria-hidden="true"></i>
                 Embroidery Digitizing Order Form
             </h1>
@@ -50,14 +50,12 @@
         <!-- Meet Your Digitizer -->
         <div class="digitizer-spotlight">
             <div class="digitizer-image">
-                <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9094678" 
-                     alt="Ruth Nhong - Production Manager & Expert Digitizer" 
-                     title="Ruth Nhong">
+                <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9094678" alt="Ruth Nhong - Production Manager &amp; Expert Digitizer" title="Ruth Nhong">
             </div>
             <div class="digitizer-content">
-                <h3>Meet Your Digitizer</h3>
-                <h4>Ruth Nhong</h4>
-                <p class="digitizer-title">Production Manager & Expert Digitizer</p>
+                <h2>Meet Your Digitizer</h2>
+                <h3>Ruth Nhong</h3>
+                <p class="digitizer-title">Production Manager &amp; Expert Digitizer</p>
                 <p>With years of experience in embroidery digitizing, Ruth personally handles all digitizing requests to ensure the highest quality results. She specializes in converting your artwork into beautiful embroidered designs that bring your vision to life.</p>
                 <div class="digitizer-features">
                     <div class="digitizer-stat">
@@ -82,23 +80,23 @@
                 <div class="info-card-icon">
                     <i class="fas fa-clock" aria-hidden="true"></i>
                 </div>
-                <h3 class="info-card-title">Processing Time</h3>
+                <h2 class="info-card-title">Processing Time</h2>
                 <p class="info-card-text">Standard turnaround is 24-48 hours for most digitizing requests</p>
             </div>
-            
+
             <div class="info-card">
                 <div class="info-card-icon">
                     <i class="fas fa-file-image" aria-hidden="true"></i>
                 </div>
-                <h3 class="info-card-title">File Requirements</h3>
+                <h2 class="info-card-title">File Requirements</h2>
                 <p class="info-card-text">Please provide high-resolution images (JPG, PNG, PDF) for best results</p>
             </div>
-            
+
             <div class="info-card">
                 <div class="info-card-icon">
                     <i class="fas fa-check-circle" aria-hidden="true"></i>
                 </div>
-                <h3 class="info-card-title">Quality Guarantee</h3>
+                <h2 class="info-card-title">Quality Guarantee</h2>
                 <p class="info-card-text">We ensure all designs are optimized for clean, professional embroidery results</p>
             </div>
         </div>
@@ -109,26 +107,21 @@
             <div class="form-intro">
                 <h2>Digitizing Request Form</h2>
                 <p>Complete the form below to submit your embroidery digitizing request. All fields marked with an asterisk (*) are required.</p>
-            </div>
+            <p class="intake-embed-help" data-intake-addition="hosted-fallback">If the form does not appear, <a href="https://www.jotform.com/app/241687786443168?appEmbedded=1" target="_blank" rel="noopener">open the hosted form in a new tab</a>.</p></div>
 
             <!-- JotForm Embed -->
             <div class="jotform-container">
-                <div class="loading-overlay" id="loadingOverlay">
+                <div class="loading-overlay" id="loadingOverlay" role="status">
                     <div class="loading-spinner"></div>
                     <p>Loading digitizing form...</p>
                 </div>
-                <iframe 
-                    id="JotFormIFrame-241687786443168" 
-                    title="Ruthie Forms" 
-                    allow="geolocation; microphone; camera" 
-                    src="https://www.jotform.com/app/241687786443168?appEmbedded=1" 
-                    class="jotform-iframe">
+                <iframe id="JotFormIFrame-241687786443168" title="Ruthie Forms" allow="geolocation; microphone; camera" src="https://www.jotform.com/app/241687786443168?appEmbedded=1" class="jotform-iframe">
                 </iframe>
             </div>
-        </div>
+        <p class="intake-print-link" data-intake-addition="paper-destination">Complete the hosted form online: https://www.jotform.com/app/241687786443168?appEmbedded=1</p></div>
     </main>
 
     <script src="/config/app.config.js"></script>
     <script src="/calculators/js/digitizingform-page.js?v=2026.09.06.19"></script>
-</body>
-</html>
+
+</body></html>

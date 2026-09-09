@@ -4041,3 +4041,9 @@ Native Node22.23 runs Puppeteer25; invoke its capture CLI outside Jest, and repo
 
 Storefront and sample webhooks continued after a rejected Payment Confirmed write; storefront final writes also omitted authentication. Require a successful authenticated marker before pushing. If fulfillment succeeds but the final Processed write fails, acknowledge and alert for bookkeeping without labeling the push failed or repeating it. Exercise HTTP/transport failures and redelivery with mocked APIs, plus signed HTTP dispatch; source-string checks alone missed variable-based URLs. Status markers are not an atomic cross-dyno lock.
 
+
+## A JavaScript label silently dropped an inventory message (2026-09-07)
+- Problem/root cause: `message:` was a label, not assignment, so in-stock samples had no message.
+- Solution: assign the message; no-unused-labels is now an error.
+- Prevention: test returned stock status and customer message together for available, low-stock and unavailable inventory.
+

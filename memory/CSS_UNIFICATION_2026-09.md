@@ -700,3 +700,22 @@ Tested source 7d6cf7bc8124e7d3da8642093c3a9018b98e8897. Build/lint/types,485 rou
 ## Instant storefront release record — v2026.09.09.7
 
 Exact-source CI 34370064451 passed all four jobs on3462512138c1dc3601d29e335c5ca2c7fa82e032, including actual money/calculator parity and full mocked CSS browser group. Banner/sticker pricing, quote and artwork implementations preserved; shared native menu/disclosure ownership, four widths,14 focused browser cases,all50 sticker prices,seven banner presets,209 focused unit cases and419 checked paper text nodes. Full checks 5205 unit tests,422 mocked browser,16 remaining browser;485 routes unchanged. Candidate117 reviewed/108 pending becomes live only after actual rollout verification.
+
+## Customer and staff intake plan — 2026-09-09
+
+Next isolated branch codex/customer-intake at C:\Users\erik\.codex\visualizations\2026\09\07\01a07d90-9a4c-7e70-9e4e-c196377b7c6b\training-final-worktree, based on 7d6cf7bc8124e7d3da8642093c3a9018b98e8897. Four pages: request-a-quote plus digitizingform, monogramform and purchasingform. Original complete prose, destinations, images, fields, IDs, Jotform embed URLs and seven controller sources recorded in customer-intake-original-baseline.json. Keep customer vs staff navigation meaningful while sharing field/panel/typography owners. Preserve vendor form IDs and native request payload/validation/style lookup/upload/date/prefill behavior. External form contents remain vendor-owned; review loaded, unavailable and keyboard-accessible wrapper states without submitting real forms. No pages count reviewed yet. Instant2 candidate .7 runs full primary gates separately; no intake changes enter that release.
+
+- [ ] Capture original desktop/phone and controlled native-form/embedded states.
+- [ ] Replace three repeated embed-page styles with scoped shared arrangements; unify native quote-request fields using canonical tokens/components. Preserve original content, upload/submit helpers and hosted form destinations.
+- [ ] Four widths/axe, navigation, prefill/date/style lookup, failed/successful mocked uploads/submissions, vendor embed availability and complete paper content.
+- [ ] Register reviewed owners, full local gates/exact-source CI and verified release after instant2.
+
+## Customer intake implementation in progress — 2026-09-09
+
+Original four-page desktop/phone screenshots captured with hosted forms mocked. Public quote form now uses canonical full-width fields and choice controls, fixing its phone project-textarea overflow; three duplicate hosted-form wrappers share one scoped owner with Ruth/Bradley department colors. Existing prose, images, business helper sources and vendor embed destinations retained. Verified direct Jotform destinations respond200; persistent accessible fallback links and paper destinations added. Four old CSS owners retired after final consumers migrated; lifecycle docs updated. Candidate .8, isolated from instant .7. Four-width/state/keyboard/axe/paper verification and full gates remain; no additional pages counted reviewed.
+
+## Customer intake local review complete — 2026-09-09
+
+Customer intake: public request-a-quote and three hosted staff forms use canonical tokens/components/Public Sans with one scoped customer-intake.css owner; public fields retain their own arrangement. Digitizing follows Ruth purple, monogram follows shop-floor blue, purchasing follows Bradley slate. Four old CSS owners retired after their final consumers migrated. Seven existing controller sources remain unchanged; complete original prose/fields/images/vendor URLs locked.14 focused browser cases,11 original-contract checks, four widths/zero axe, navigation, blocked embeds and keyboard fallback, public validation/prefill/calendar/lookup/upload/save failures and retained draft retry checked with all business writes and hosted content mocked. Four one-page reference PDFs retain74 checked text nodes; vendor form contents stay external and are not printed from the wrapper. Raw CSS graph grows with shared primitives/scoping; no network byte-reduction claim. Full release gates remain.
+
+Candidate2026.09.09.8. Isolated codex/customer-intake; instant2 .7 exact-source CI still running separately.121 total pages reviewed locally after this four-page batch; live115 remains until actual deployments are verified (.7 becomes117/108, intake .8 becomes121/104). Complete primary release gates/exact-source CI/actual slug and asset verification still required.

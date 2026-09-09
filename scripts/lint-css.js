@@ -15,6 +15,7 @@ const ROOT = path.resolve(__dirname, '..');
 
 /** Repo-relative globs. Widen only — never remove a file to make the lint pass. */
 const CSS_LINT_SCOPE = [
+    'shared_components/css/customer-intake.css',
     'shared_components/css/api-reference.css',
     // Step 1 (2026-09-07): the two token files
     'shared_components/css/tokens.css',
@@ -132,14 +133,11 @@ const CSS_LINT_SCOPE = [
     'calculators/embroidery-contract/embroidery-contract.css',
     'calculators/dtg-contract/dtg-contract.css',
     'calculators/css/screen-print-pricing.css',
-    'calculators/css/purchasingform.css',
-    'calculators/css/monogramform.css',
     'calculators/css/laser-manual-pricing.css',
     'calculators/css/embroidery-pricing.css',
     'calculators/css/embroidery-pricing-overrides.css',
     'calculators/css/dtg-pricing.css',
     'calculators/css/dtf-pricing.css',
-    'calculators/css/digitizingform.css',
     'calculators/css/christmas-bundles.css',
     'calculators/css/cap-embroidery-pricing-integrated.css',
     // pages/css staff + customer-portal batch (2026-09-07): the remaining page sheets under pages/ and their widgets

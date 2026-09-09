@@ -141,3 +141,5 @@
 - tests/e2e/css-unification-campaign-storefront.spec.js: campaign layout and delivery outcome browser coverage with mocked business services.
 
 - Instant storefront: tests/unit/instant-storefront-content.test.js; tests/e2e/css-unification-instant-storefront.spec.js; original-content and pricing fixtures in tests/fixtures.
+
+Customer intake: customer-intake-content.test.js and css-unification-customer-intake.spec.js use the preserved customer-intake-original-content.json fixture. All vendor content and business writes mocked.

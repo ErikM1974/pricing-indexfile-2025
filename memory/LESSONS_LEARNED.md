@@ -143,11 +143,6 @@ Keep version choices tied to measured checks and compare screenshots only after 
 - Solution: propagate errors to the product loader's existing error UI; clear size data before requesting it.
 - Prevention: calculator-api-errors.test.js covers HTTP, transport, malformed/empty responses and successful API data.
 
-## A JavaScript label silently dropped an inventory message (2026-09-07)
-- Problem/root cause: `message:` was a label, not assignment, so in-stock samples had no message.
-- Solution: assign the message; no-unused-labels is now an error.
-- Prevention: test returned stock status and customer message together for available, low-stock and unavailable inventory.
-
 ## Quote operations need caller and quote scope checks (2026-09-07)
 - Problem/root cause: bulk sync, tracking writes and change-log operations trusted their expected caller without authenticating it.
 - Solution: deploy credentials in proxy jobs/callbacks first; gate app operations with staff/shared-secret checks and authenticate loopback writes.
@@ -255,3 +250,7 @@ Campaign verification follow-up: a runtime census timed out under the full suite
 ### Shared CSS migration must preserve responsive and interaction ownership (2026-09-09)
 
 Problem: consolidating repeated .stk-card selectors moved desktop grid placement after the mobile media query, making tiny phone columns; legacy and shared menu handlers also toggled the same disclosure twice. Root cause: deduplication ignored cascade order, and both controllers owned aria-expanded/visibility. Solution: base geometry precedes responsive rules; the instant pages bypass legacy disclosure/mobile adapters and use existing shared native owners. Financial/submission/artwork code remains source locked. Prevention: real four-width geometry/axe and open/close/resize keyboard checks, every published sticker row and banner preset, retained upload/draft retry, and full paper text plus visual inspection. A clipped screen-reader caption needs an explicit visible print arrangement; shrink optional paper chrome without dropping original content.
+
+## Paper-like form layouts need a separate phone arrangement (2026-09-09)
+
+Problem: the quote request inherited line-oriented paper styling that pushed the project textarea beyond the phone viewport. Root cause: its legacy field row and width rules survived in an online customer form. Solution: canonical vertical fields and bounded grid columns; shared hosted-form wrappers, native keyboard upload and explicit page landmark names. Prevention: check actual control bounds at320/390/768/1440, source-lock serialization and lookup/upload helpers, exercise blocked embeds and retained draft retries, inspect every reference-PDF page. Keep department colors tied to ownership: monogram is shop-floor blue, digitizing Ruth purple, purchasing Bradley slate.
