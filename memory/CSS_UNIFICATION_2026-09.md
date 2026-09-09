@@ -439,3 +439,14 @@ Family CSS graphs: dashboards/caspio-api-reference.html: 173804 → 73142 bytes 
 ### API integration guard update
 
 The first full unit run found five legacy admin-reference assertions tied to per-page important visibility guards and the old ODBC Retry id. Updated that existing guard to require the loaded unified components visibility owner, no page important rules, and the native Retry listener. The 17 real-browser cases already cover layout, disclosure and retry. Full regression rerun follows; no production change yet.
+
+## Policy guides and notices plan — 2026-09-08
+
+Standing edit/deploy authorization continues. Separate worktree training-final-worktree now uses codex/policy-reference-family, base ecd150e5, while the primary API reference family runs full release gates. API pages are not yet live. New scope: dashboards/policy-migration.html, pages/pricing-negotiation-policy.html, pages/resources.html and pages/sale.html. Policy editor/detail/hub/questions and the handbook share more controls and follow as a separate family.
+
+- [x] Save original prose, headings, links, fields/IDs, CSS dependencies and exact migration snapshot hash in policy-reference-original-baseline.json (artifact directory).
+- [ ] Review baseline desktop/phone, adopt shared typography/controls/reference patterns, replace Bootstrap/layout and dashboard-shell dependencies where used, and unify the two notice pages together.
+- [ ] Preserve policy wording/figures, published migration records and route protections; repair native fragment navigation, keyboard filters and visible retry without changing any policy data.
+- [ ] Review four widths, filtering, empty/error/retry, keyboard and complete paper content; add content/ownership locks, then full regression, exact-source CI and verified release.
+
+Candidate result after this four-page group would be 68 reviewed / 157 pending of 225, assuming the API batch first ships its 64 / 161. No new page is live from this worktree yet. No business writes or notifications. Artifact path: C:/Users/erik/.codex/visualizations/2026/09/07/01a07d90-9a4c-7e70-9e4e-c196377b7c6b.
