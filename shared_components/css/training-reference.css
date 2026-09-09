@@ -1,0 +1,453 @@
+/* Scoped reference family; shared primitives and training-guide load first. */
+@layer components.patterns {
+    :where([data-ui="unified"][data-training="reference"])
+        main.reference-workspace {
+        width: min(1120px, calc(100% - var(--space-8)));
+        margin: var(--space-6) auto;
+        padding: clamp(1rem, 3vw, 2.5rem);
+        background: var(--ui-surface);
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-md);
+    }
+
+    :where([data-ui="unified"][data-training="reference"])
+        :is(.header-container, .header-content, .header-left, .header-right) {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: var(--space-4);
+        min-width: 0;
+    }
+
+    :where([data-ui="unified"][data-training="reference"])
+        :is(.header-container, .header-content) {
+        justify-content: space-between;
+    }
+
+    :where([data-ui="unified"][data-training="reference"]) > .header {
+        background: var(--ui-surface);
+        border-block-start: 4px solid var(--ui-accent);
+        border-block-end: 1px solid var(--ui-line);
+        padding: var(--space-5) var(--space-6);
+    }
+
+    :where([data-ui="unified"][data-training="reference"]) > .header > div {
+        max-width: 1200px;
+        margin-inline: auto;
+    }
+
+    :where([data-ui="unified"][data-training="reference"]) main > .header {
+        border-block-end: 1px solid var(--ui-line);
+        padding-block-end: var(--space-5);
+        margin-block-end: var(--space-6);
+    }
+
+    :where([data-ui="unified"][data-training="reference"])
+        :is(.logo, .header-logo) {
+        width: 105px;
+        height: auto;
+    }
+
+    :where([data-ui="unified"][data-training="reference"]) .header h1 {
+        font-size: clamp(1.25rem, 2vw, 1.75rem);
+        text-align: start;
+    }
+
+    :where([data-ui="unified"][data-training="reference"]) .breadcrumb {
+        color: var(--ui-muted);
+        font-size: var(--font-size-md);
+        line-height: 2;
+    }
+
+    :where([data-ui="unified"][data-training="reference"]) .breadcrumb a {
+        display: inline-block;
+    }
+
+    :where([data-ui="unified"][data-training="reference"]) main > .page-title {
+        font-size: clamp(1.5rem, 3vw, 2rem);
+    }
+
+    :where([data-ui="unified"][data-training="reference"])
+        :is(.page-subtitle, .intro-section p) {
+        color: var(--ui-muted);
+        max-width: 76ch;
+        margin-block: var(--space-3) var(--space-6);
+    }
+
+    :where([data-ui="unified"][data-training="reference"])
+        :is(.quicknav, .pillars, .contacts, .cheat-tables) {
+        margin-block: var(--space-6);
+    }
+
+    :where([data-ui="unified"][data-training="reference"]) .quicknav {
+        border-block: 1px solid var(--ui-line);
+        padding-block: var(--space-5);
+    }
+
+    :where([data-ui="unified"][data-training="reference"]) .quicknav h2 {
+        font-size: var(--font-size-lg);
+    }
+
+    :where([data-ui="unified"][data-training="reference"]) .quicknav ul {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: var(--space-2) var(--space-6);
+        list-style: none;
+        padding: 0;
+    }
+
+    :where([data-ui="unified"][data-training="reference"]) .quicknav li + li {
+        margin: 0;
+    }
+
+    :where([data-ui="unified"][data-training="reference"]) .quicknav a {
+        display: flex;
+        gap: var(--space-3);
+        align-items: baseline;
+        padding-block: var(--space-2);
+    }
+
+    :where([data-ui="unified"][data-training="reference"]) .num {
+        color: var(--ui-muted);
+        min-width: 1.25em;
+        font-variant-numeric: tabular-nums;
+    }
+
+    :where([data-ui="unified"][data-training="reference"])
+        :is(.pillars, .contacts) {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: var(--space-5);
+    }
+
+    :where([data-ui="unified"][data-training="reference"]) .pillar {
+        padding-inline-end: var(--space-5);
+        border-inline-end: 1px solid var(--ui-line);
+    }
+
+    :where([data-ui="unified"][data-training="reference"]) .pillar:last-child {
+        border: 0;
+    }
+
+    :where([data-ui="unified"][data-training="reference"]) .pillar-step {
+        font-size: var(--font-size-2xl);
+        font-weight: var(--font-weight-semibold);
+        color: var(--ui-accent);
+    }
+
+    :where([data-ui="unified"][data-training="reference"]) .pillar h3 {
+        margin-block: var(--space-2) var(--space-3);
+    }
+
+    :where([data-ui="unified"][data-training="reference"])
+        :is(.pillar p, .contact-card .for) {
+        font-size: var(--font-size-md);
+    }
+
+    :where([data-ui="unified"][data-training="reference"]) .pillar-where {
+        color: var(--ui-accent);
+    }
+
+    :where([data-ui="unified"][data-training="reference"]) .section-divider {
+        border-block-start: 2px solid var(--ui-accent);
+        margin-block: var(--space-8) var(--space-5);
+        padding-block-start: var(--space-5);
+        scroll-margin-top: var(--space-4);
+    }
+
+    :where([data-ui="unified"][data-training="reference"]) .ref-card {
+        border-block-end: 1px solid var(--ui-line);
+        padding-block-end: var(--space-5);
+        margin-block: var(--space-5);
+        min-width: 0;
+    }
+
+    :where([data-ui="unified"][data-training="reference"]) .ref-card-header {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: var(--space-3);
+    }
+
+    :where([data-ui="unified"][data-training="reference"])
+        .ref-card-header
+        :is(h2, h3) {
+        margin-block: 0 var(--space-4);
+        font-size: var(--font-size-lg);
+    }
+
+    :where([data-ui="unified"][data-training="reference"]) .ref-card-header i {
+        color: var(--ui-accent);
+    }
+
+    :where([data-ui="unified"][data-training="reference"]) .ref-card-body > p {
+        max-width: 76ch;
+    }
+
+    :where([data-ui="unified"][data-training="reference"]) .steps {
+        padding-inline-start: var(--space-6);
+    }
+
+    :where([data-ui="unified"][data-training="reference"]) .steps > li {
+        padding-inline-start: var(--space-2);
+        margin-block: var(--space-4);
+    }
+
+    :where([data-ui="unified"][data-training="reference"]) .steps > li::marker {
+        font-weight: var(--font-weight-semibold);
+        color: var(--ui-accent);
+    }
+
+    :where([data-ui="unified"][data-training="reference"])
+        :is(code, .note-example) {
+        overflow-wrap: anywhere;
+    }
+
+    :where([data-ui="unified"][data-training="reference"]) code {
+        font-size: 0.9em;
+        background: var(--gray-100);
+        padding-inline: var(--space-1);
+        border-radius: var(--radius-sm);
+    }
+
+    :where([data-ui="unified"][data-training="reference"])
+        .callout
+        :is(strong, a) {
+        color: inherit;
+    }
+
+    :where([data-ui="unified"][data-training="reference"]) .contact-card {
+        background: var(--gray-50);
+        border: 1px solid var(--ui-line);
+        padding: var(--space-4);
+        border-radius: var(--radius-sm);
+    }
+
+    :where([data-ui="unified"][data-training="reference"]) .who {
+        font-weight: var(--font-weight-semibold);
+    }
+
+    :where([data-ui="unified"][data-training="reference"]) .role {
+        color: var(--ui-accent);
+        margin-block: var(--space-2);
+    }
+
+    :where([data-ui="unified"][data-training="reference"]) .checklist-grid {
+        display: grid;
+        gap: var(--space-2);
+    }
+
+    :where([data-ui="unified"][data-training="reference"]) .checklist-item {
+        display: flex;
+        align-items: flex-start;
+        gap: var(--space-3);
+        min-height: 44px;
+        padding: var(--space-3);
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-sm);
+        cursor: pointer;
+    }
+
+    :where([data-ui="unified"][data-training="reference"])
+        .checklist-item:has(:checked) {
+        background: var(--ui-tint);
+    }
+
+    :where([data-ui="unified"][data-training="reference"])
+        .checklist-item
+        input {
+        flex: 0 0 auto;
+        width: 20px;
+        height: 20px;
+        margin: var(--space-1) 0 0;
+        accent-color: var(--ui-accent);
+    }
+
+    :where([data-ui="unified"][data-training="reference"])
+        .checklist-item
+        input:checked
+        + span {
+        text-decoration: line-through;
+    }
+
+    :where([data-ui="unified"][data-training="reference"])
+        :is(.checklist-reset, .checklist-phase-label) {
+        margin-block: var(--space-4);
+    }
+
+    :where([data-ui="unified"][data-training="reference"]) .reference-status {
+        color: var(--ui-muted);
+        font-size: var(--font-size-md);
+        margin-block: var(--space-3);
+    }
+
+    :where([data-ui="unified"][data-training="reference"])
+        .reference-status.error {
+        color: var(--red-800);
+    }
+
+    :where([data-ui="unified"][data-training="reference"])
+        :is(.sources-note, .page-footer) {
+        font-size: var(--font-size-md);
+        color: var(--ui-muted);
+        padding-block-start: var(--space-5);
+        margin-block-start: var(--space-5);
+        border-block-start: 1px solid var(--ui-line);
+    }
+
+    :where([data-ui="unified"][data-training="reference"]) .back-to-top {
+        display: none;
+        position: fixed;
+        inset: auto var(--space-5) var(--space-5) auto;
+        background: var(--ui-surface);
+        z-index: var(--z-sticky);
+    }
+
+    :where([data-ui="unified"][data-training="reference"])
+        .back-to-top.visible {
+        display: inline-flex;
+    }
+
+    @media (width <= 700px) {
+        :where([data-ui="unified"][data-training="reference"])
+            main.reference-workspace {
+            width: calc(100% - var(--space-6));
+            margin-block: var(--space-4);
+        }
+
+        :where([data-ui="unified"][data-training="reference"])
+            :is(.pillars, .contacts, .quicknav ul) {
+            grid-template-columns: minmax(0, 1fr);
+        }
+
+        :where([data-ui="unified"][data-training="reference"]) .pillar {
+            border: 0;
+            padding-block-end: var(--space-4);
+            border-block-end: 1px solid var(--ui-line);
+        }
+
+        :where([data-ui="unified"][data-training="reference"]) > .header {
+            padding-inline: var(--space-4);
+        }
+    }
+
+    @media print {
+        :where([data-ui="unified"][data-training="reference"])
+            main.reference-workspace {
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            border: 0;
+        }
+
+        :where([data-ui="unified"][data-training="reference"])
+            :is(
+                .header,
+                .quicknav,
+                .back-to-top,
+                .btn,
+                .page-footer,
+                .reference-status
+            ) {
+            display: none;
+        }
+
+        :where([data-ui="unified"][data-training="reference"]) > .header {
+            display: block;
+            padding: 0 0 10pt;
+            border: 0;
+        }
+
+        :where([data-ui="unified"][data-training="reference"])
+            > .header
+            :is(.logo, .breadcrumb) {
+            display: none;
+        }
+
+        :where([data-ui="unified"][data-training="reference"]) > .header h1 {
+            font-size: 17pt;
+        }
+
+        :where([data-ui="unified"][data-training="reference"])
+            main
+            > .page-title {
+            font-size: 17pt;
+        }
+
+        :where([data-ui="unified"][data-training="reference"]) .page-subtitle {
+            margin-block: 5pt 8pt;
+        }
+
+        :where([data-ui="unified"][data-training="reference"])
+            .section-divider {
+            margin-block: 12pt 7pt;
+            padding-block-start: 8pt;
+        }
+
+        :where([data-ui="unified"][data-training="reference"])
+            :is(.pillars, .contacts) {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 10pt;
+            margin-block: 10pt;
+        }
+
+        :where([data-ui="unified"][data-training="reference"])
+            :is(.pillar p, .contact-card .for, .sources-note) {
+            font-size: 9pt;
+        }
+
+        :where([data-ui="unified"][data-training="reference"]) .pillar-step {
+            font-size: 13pt;
+        }
+
+        :where([data-ui="unified"][data-training="reference"]) .ref-card {
+            margin-block: 7pt;
+            padding-block-end: 7pt;
+        }
+
+        :where([data-ui="unified"][data-training="reference"])
+            .ref-card-header
+            :is(h2, h3) {
+            font-size: 11pt;
+            margin-block-end: 5pt;
+        }
+
+        :where([data-ui="unified"][data-training="reference"]) .steps > li {
+            margin-block: 5pt;
+        }
+
+        :where([data-ui="unified"][data-training="reference"])
+            :is(
+                .pillar,
+                .contact-card,
+                .checklist-item,
+                .training-callout,
+                .ref-card-header
+            ) {
+            break-inside: avoid;
+        }
+
+        :where([data-ui="unified"][data-training="reference"])
+            .ref-card-header {
+            break-after: avoid;
+        }
+
+        :where([data-ui="unified"][data-training="reference"]) .contact-card {
+            padding: 6pt;
+        }
+
+        :where([data-ui="unified"][data-training="reference"]) .checklist-item {
+            min-height: 0;
+            padding: 4pt;
+            gap: 6pt;
+        }
+
+        :where([data-ui="unified"][data-training="reference"])
+            .checklist-item
+            input {
+            width: 10pt;
+            height: 10pt;
+        }
+    }
+}

@@ -624,7 +624,7 @@
         "clipboard-retry"
       ],
       "test": "tests/e2e/css-unification-training.spec.js",
-      "maxCssBytes": 74545,
+      "maxCssBytes": 73009,
       "baseline": {
         "commit": "c5f25ded",
         "rawCssBytes": 30698,
@@ -652,7 +652,7 @@
         "keyboard-table-scroll"
       ],
       "test": "tests/e2e/css-unification-training.spec.js",
-      "maxCssBytes": 72419,
+      "maxCssBytes": 70883,
       "baseline": {
         "commit": "c5f25ded",
         "rawCssBytes": 27575,
@@ -679,7 +679,7 @@
         "unchanged-content"
       ],
       "test": "tests/e2e/css-unification-training.spec.js",
-      "maxCssBytes": 73684,
+      "maxCssBytes": 72148,
       "baseline": {
         "commit": "c5f25ded",
         "rawCssBytes": 31727,
@@ -1322,6 +1322,110 @@
       ],
       "maxCssBytes": 76759,
       "test": "tests/e2e/css-unification-training-practice.spec.js"
+    },
+    {
+      "source": "training/cap-training.html",
+      "family": "training-reference",
+      "status": "pilot",
+      "route": "/training/cap-training.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/training-guide.css",
+        "shared_components/css/training-reference.css",
+        "training/css/cap-training.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "four-widths",
+        "keyboard",
+        "original-prose-media",
+        "real-pdf",
+        "nine-cap-images",
+        "sales-figures"
+      ],
+      "test": "tests/e2e/css-unification-training-reference.spec.js",
+      "maxCssBytes": 86142,
+      "measuredRawCssBytes": 85630
+    },
+    {
+      "source": "training/quick-reference-tips.html",
+      "family": "training-reference",
+      "status": "pilot",
+      "route": "/training/quick-reference-tips.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/training-guide.css",
+        "shared_components/css/training-reference.css",
+        "training/css/quick-reference-tips.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "four-widths",
+        "keyboard",
+        "original-prose-media",
+        "real-pdf",
+        "search-empty",
+        "request-failure-retry",
+        "markup-sanitized",
+        "calendar-date"
+      ],
+      "test": "tests/e2e/css-unification-training-reference.spec.js",
+      "maxCssBytes": 83473,
+      "measuredRawCssBytes": 82961
+    },
+    {
+      "source": "training/shipping-receiving-guide.html",
+      "family": "training-reference",
+      "status": "pilot",
+      "route": "/training/shipping-receiving-guide.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/training-guide.css",
+        "shared_components/css/training-reference.css",
+        "training/shipping-receiving-guide.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "four-widths",
+        "keyboard",
+        "original-prose-media",
+        "real-pdf",
+        "checklist-restore-save-reset",
+        "storage-failure",
+        "reduced-motion-nav"
+      ],
+      "test": "tests/e2e/css-unification-training-reference.spec.js",
+      "maxCssBytes": 81066,
+      "measuredRawCssBytes": 80554
+    },
+    {
+      "source": "training/sanmar-purchasing-guide.html",
+      "family": "training-reference",
+      "status": "pilot",
+      "route": "/training/sanmar-purchasing-guide.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/training-guide.css",
+        "shared_components/css/training-reference.css",
+        "training/sanmar-purchasing-guide.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "four-widths",
+        "keyboard",
+        "original-prose-media",
+        "real-pdf",
+        "checklist-restore-save-reset",
+        "storage-failure",
+        "reduced-motion-nav"
+      ],
+      "test": "tests/e2e/css-unification-training-reference.spec.js",
+      "maxCssBytes": 83009,
+      "measuredRawCssBytes": 82497
     }
   ],
   "billingContentSha256": "d85f8530e03a1863d1b8bb2ebe97ba332d5c9e3411887d1eb2d02dcdb14c0863",
@@ -1676,5 +1780,166 @@
       "variable": "scenarios",
       "sha256": "97c7daf147bb344f61237f4c2d242afd4fb7bcc99ab19c78791dfdee514c2c83"
     }
-  ]
+  ],
+  "trainingReferenceContent": [
+    {
+      "source": "training/cap-training.html",
+      "sha256": "5c050d82761cd08322494b7f207dc16474b624af291c4271bc49a297f3038a2f",
+      "media": [
+        [
+          "IMG",
+          "https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1",
+          "Northwest Custom Apparel",
+          null
+        ],
+        [
+          "IMG",
+          "https://cdnm.sanmar.com/catalog/images/C112.jpg",
+          "C112 Port Authority Snapback Trucker Cap",
+          null
+        ],
+        [
+          "IMG",
+          "https://cdnm.sanmar.com/catalog/images/NE1000.jpg",
+          "NE1000 New Era Structured Stretch Cotton Cap",
+          null
+        ],
+        [
+          "IMG",
+          "https://cdnm.sanmar.com/catalog/images/CP90.jpg",
+          "CP90 Port Company Knit Cap",
+          null
+        ],
+        [
+          "IMG",
+          "https://cdnm.sanmar.com/catalog/images/C110.jpg",
+          "C110 Port Authority Flexfit 110 Mesh Cap",
+          null
+        ],
+        [
+          "IMG",
+          "https://cdnm.sanmar.com/catalog/images/C826.jpg",
+          "C826 Port Authority Pique Mesh Cap",
+          null
+        ],
+        [
+          "IMG",
+          "https://cdnm.sanmar.com/catalog/images/C912.jpg",
+          "C912 Port Authority Camouflage Cap",
+          null
+        ],
+        [
+          "IMG",
+          "https://cdnm.sanmar.com/catalog/images/C114.jpg",
+          "C114 Port Authority Digi Camo Snapback",
+          null
+        ],
+        [
+          "IMG",
+          "https://cdnm.sanmar.com/catalog/images/CP82b.jpg",
+          "CP82 Port Company Brushed Twill Cap",
+          null
+        ],
+        [
+          "IMG",
+          "https://cdnm.sanmar.com/catalog/images/C865.jpg",
+          "C865 Port Authority Flexfit Cap",
+          null
+        ]
+      ]
+    },
+    {
+      "source": "training/quick-reference-tips.html",
+      "sha256": "fbe1121de934845af880518e318f46ab68ca612b08e5acdbeb56ae971eaa626e",
+      "media": []
+    },
+    {
+      "source": "training/shipping-receiving-guide.html",
+      "sha256": "3331e2d6376d2d8e48cc08a0b956fc0921aba35779a6454cb322e72378875bb7",
+      "media": [
+        [
+          "IMG",
+          "https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1",
+          "Northwest Custom Apparel",
+          null
+        ]
+      ]
+    },
+    {
+      "source": "training/sanmar-purchasing-guide.html",
+      "sha256": "3666d92d19818c428d490ad7fa73495d55d704abc50636ef9f26c5c3e3eb0f05",
+      "media": [
+        [
+          "IMG",
+          "https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1",
+          "Northwest Custom Apparel",
+          null
+        ],
+        [
+          "IMG",
+          "/training/images/sanmar-purchasing/line-items-get-cost.png",
+          "ShopWorks Line Items window on the Behavior tab for a PC55 tee — Product Source shows vendor 1002 SANMAR with Allow purchase selected, and the blue Get Cost from Vendor button is circled in red",
+          null
+        ],
+        [
+          "IMG",
+          "/training/images/sanmar-purchasing/get-cost-window.png",
+          "Get Cost from SANMAR window with numbered steps — 1 select color from a dropdown showing Dark Hthr Grey, 2 select vendor 1002, 3 Get Cost button, 4 Apply Cost button",
+          null
+        ],
+        [
+          "IMG",
+          "/training/images/sanmar-purchasing/one-line-per-size.png",
+          "Order line items showing sizes split into separate lines — K540 for standard sizes plus K540_2X, TLK540_XLT and TLK540_2XLT lines in Black and Navy, with special-size quantities keyed in the XXL and XXXL columns",
+          null
+        ],
+        [
+          "IMG",
+          "/training/images/sanmar-purchasing/purchasing-tab-add.png",
+          "ShopWorks Purchasing tab — Products to Purchase lists PC55, PC55_2X and PC55_3X with unit cost and vendor 1002, and the Add button under Product POs for This Order is circled in red",
+          null
+        ],
+        [
+          "IMG",
+          "/training/images/sanmar-purchasing/po-row-open.png",
+          "New PO row for vendor 1002 SANMAR showing PO number 86738 and date issued, with the green checkmark button at the far right circled in red",
+          null
+        ],
+        [
+          "IMG",
+          "/training/images/sanmar-purchasing/po-fill-buttons.png",
+          "Purchase order details form with red circles marking the Pick button for Vendor Contact, the green fill button for Ship To, and the Ship Method dropdown — phone, fax and Net 30 terms are already filled in automatically",
+          null
+        ],
+        [
+          "IMG",
+          "/training/images/sanmar-purchasing/send-po.png",
+          "Completed purchase order for vendor 1002 SANMAR — contact Dave Brown, ship-to Northwest Embroidery Inc in Milton WA, ship method PSST, PO number 86738 — with the Send PO button on the right panel circled in red",
+          null
+        ],
+        [
+          "IMG",
+          "/training/images/sanmar-purchasing/notes-example.png",
+          "Notes On Order panel in ShopWorks showing the first line: BW 5/17/21 PO submitted, ST650 on BO with est. restock of next week",
+          null
+        ],
+        [
+          "IFRAME",
+          "https://fast.wistia.net/embed/iframe/53fo8q4vtm",
+          null,
+          "ShopWorks Core Training — Session 5: Purchasing and Inventory (OnSite Ver. 13)"
+        ],
+        [
+          "IFRAME",
+          "https://fast.wistia.net/embed/iframe/o2mkh2dpbx",
+          null,
+          "ShopWorks Core Training — Session 5: Purchasing and Inventory (OnSite Ver. 14)"
+        ]
+      ]
+    }
+  ],
+  "trainingReferenceData": {
+    "source": "training/quick-tips-data.json",
+    "sha256": "11cb06c43900f6d085cecde06ce8dd033a7f2b152888dbdb66248fc92d17492e"
+  }
 }

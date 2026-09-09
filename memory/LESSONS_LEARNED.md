@@ -236,3 +236,9 @@ Shared JS can outlive a CSS migration: the public quote-request page is also a s
 ### Training state must survive every input path (2026-09-08)
 
 Problem: drag-only exercise tiles excluded touch/keyboard, quiz points survived retries, tax choices could re-enable an already-scored answer, and template saves never rendered on reload. Root cause: visual-only click state and incomplete localStorage readers. Fix: native selectable buttons and one scoring guard, cancel outstanding round/timer callbacks, reset quiz scores, modal focus lifecycle and safe saved-template rendering with visible clipboard/storage failures. Prevention: exercise complete rounds/retries with keyboard, touch and drag; test failed/malformed storage without overwriting it; preserve training fixtures with source locks.
+
+
+## Reference content and browser persistence need their own checks (2026-09-08)
+- Problem/root cause: rich quick-tip data carried inline presentation rules into redesigned pages; local date-only strings displayed a day earlier in Pacific time. Guide checklist writes and resets could fail silently after a one-time storage probe.
+- Solution: preserve shared JSON for other consumers, sanitize only the new renderer, use calendar-date comparisons and visible request/retry states; guard each storage read/write/reset and preserve unreadable saved progress.
+- Prevention: lock original prose/media/data, test timezone boundaries and later storage failures, and review actual PDF text plus page images. A green stylesheet check alone cannot verify these behaviors.
