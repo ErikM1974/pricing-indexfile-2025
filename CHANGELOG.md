@@ -1,3 +1,18 @@
+## v2026.09.09.11 (2026.09.09)
+
+- Plan shared staff access and portal tools
+- Record shared staff access and portal arrangements
+- Record staff tools review and paper refinements in progress
+- Record reviewed staff tools and preserved permission boundaries
+- Unify staff access and portal tools with shared controls and readable print values
+- Record verified nine-page release and next staff tools checkpoint
+- Integrate reviewed staff access and portal tools
+- Make DTG notifications readable and verify every toast state
+- Synchronize DTG money-path quantity entry with row hydration
+- Deploy v2026.09.09.11: unify staff tools and readable DTG notices
+- Deploy v2026.09.09.11: isolate Chromium setup from unrelated Chrome updates
+- Deploy v2026.09.09.11: synchronize payment-status browser clock
+
 ## v2026.09.09.10 (2026.09.09)
 
 - Plan shared customer and staff intake page cleanup
