@@ -310,3 +310,7 @@ For questions or issues with the testing system:
 **Created:** 2025-10-03
 **Last Updated:** 2025-10-03
 **Version:** 1.0.0
+
+## Final training family
+
+`css-unification-training-final.spec.js` covers the Training Center, tax-code trainer and both customer-setup simulators at four widths, with keyboard/axe, live-list failures/retry, score/restart behavior, timers and unavailable/malformed saved progress. Every service/write is mocked. `training-final-content.test.js` keeps the original lesson literals, prose, fields/options and navigation, with the retired training-hub destination explicitly replaced by Training Center. Run with `npm run test:css`; the content lock is part of `npm run test:unit`.

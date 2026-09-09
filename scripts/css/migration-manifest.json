@@ -1534,6 +1534,101 @@
       "test": "tests/e2e/css-unification-training-manual.spec.js",
       "maxCssBytes": 99568,
       "measuredRawCssBytes": 98368
+    },
+    {
+      "source": "training/index.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/training-practice.css",
+        "shared_components/css/training-simulator.css",
+        "training/training-center.css"
+      ],
+      "maxCssBytes": 83000,
+      "states": [
+        "desktop",
+        "tablet",
+        "phone",
+        "keyboard",
+        "axe",
+        "live list",
+        "empty",
+        "error",
+        "retry"
+      ]
+    },
+    {
+      "source": "training/sales-tax-code-trainer.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/training-practice.css",
+        "shared_components/css/training-simulator.css",
+        "training/css/sales-tax-code-trainer.css"
+      ],
+      "maxCssBytes": 80000,
+      "states": [
+        "desktop",
+        "tablet",
+        "phone",
+        "keyboard",
+        "axe",
+        "every exercise mode",
+        "score feedback",
+        "restart",
+        "complete round",
+        "native results dialog"
+      ]
+    },
+    {
+      "source": "training/shopworks-customer-setup.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/training-practice.css",
+        "shared_components/css/training-simulator.css",
+        "training/css/shopworks-customer-setup.css"
+      ],
+      "maxCssBytes": 80000,
+      "states": [
+        "desktop",
+        "tablet",
+        "phone",
+        "keyboard",
+        "axe",
+        "every exercise mode",
+        "score feedback",
+        "restart",
+        "complete round",
+        "storage denied",
+        "malformed progress",
+        "timer cancellation"
+      ]
+    },
+    {
+      "source": "training/shopworks-customer-setup-enhanced.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/training-practice.css",
+        "shared_components/css/training-simulator.css",
+        "training/css/shopworks-customer-setup-enhanced.css"
+      ],
+      "maxCssBytes": 93000,
+      "states": [
+        "desktop",
+        "tablet",
+        "phone",
+        "keyboard",
+        "axe",
+        "every exercise mode",
+        "score feedback",
+        "restart",
+        "complete round",
+        "storage denied",
+        "malformed progress",
+        "timer cancellation"
+      ]
     }
   ],
   "billingContentSha256": "d85f8530e03a1863d1b8bb2ebe97ba332d5c9e3411887d1eb2d02dcdb14c0863",

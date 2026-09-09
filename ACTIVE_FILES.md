@@ -43,3 +43,10 @@ Historical counts are retained as audit notes and must not be presented as curre
 
 - Retired training/js/customer-service.js and training/js/get-to-know-erik.js; their pages now load training-manual.js.
 - `tests/e2e/css-unification-training-manual.spec.js` — responsive/axe, all manual/day sections, keyboard disclosures, practice/roster and complete PDF state restoration.
+
+- `shared_components/css/training-simulator.css` — shared exercise controls, scoreboards, questions and native results dialog for the last training family.
+
+- `tests/e2e/css-unification-training-final.spec.js` — final training family: four widths, keyboard/axe, hub failure/retry, exercise grading/restart and storage/timer state.
+
+- `tests/fixtures/training-final-original-content.json` — pre-migration lesson literal hashes, prose, fields and navigation from 20d3e247.
+- `tests/unit/training-final-content.test.js` — original training material and field/options preservation.
