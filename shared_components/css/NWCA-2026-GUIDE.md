@@ -286,3 +286,7 @@ Training reference pages opt in with data-training="reference". training-referen
 
 
 Training manuals: tokens → components → training-guide → training-reference → training-manual → page arrangement. data-training-manual identifies this family; data-manual-mode=chapters hides other sections on screen. Mobile contents use native details, biography uses native buttons, and printing temporarily opens complete content then restores it. Keep generic card classes out of long document sections. Original prose, destinations, media, employee and exercise data have source guards.
+
+### Training Center and simulators
+
+The final four training pages share tokens, components, training-practice and training-simulator. Page owners contain layout only; native buttons/dialogs, named fields, current-round scoring, timer cancellation and visible progress failures stay in the page controllers. Static course data remains unchanged and locked. CSS uses no ID selectors or new important exceptions.

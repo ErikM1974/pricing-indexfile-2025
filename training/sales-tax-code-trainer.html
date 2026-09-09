@@ -1,167 +1,167 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="robots" content="noindex, nofollow">
-    <title>Sales Tax Code Training - Northwest Custom Apparel</title>
-    <link rel="icon" href="/favicon.png" type="image/png">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    
-    <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/training/css/sales-tax-code-trainer.css?v=2026.09.07.19">
-</head>
-<body>
-    <!-- Header -->
-    <header class="header">
-        <div class="header-container">
-            <div class="header-left">
-                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
-                     alt="Northwest Custom Apparel" class="logo">
-                <nav class="breadcrumb">
-                    <a href="/training/training-hub.html">Training Hub</a>
-                    <span>/</span>
-                    <span>Sales Tax Codes</span>
-                </nav>
-            </div>
-        </div>
-    </header>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="robots" content="noindex, nofollow" />
+        <title>Sales Tax Code Training - Northwest Custom Apparel</title>
+        <link rel="icon" href="/favicon.png" type="image/png" />
 
-    <!-- Main Content -->
-    <main class="container">
-        <!-- Title Section -->
-        <div class="title-section">
-            <h1 class="title">
-                <i class="fas fa-receipt" aria-hidden="true"></i>
-                Sales Tax Code Training
-            </h1>
-            <p class="subtitle">Master Washington State tax codes for accurate order processing</p>
-        </div>
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
 
-        <!-- Stats Bar -->
-        <div class="stats-bar">
-            <div class="stat-item">
-                <div class="stat-value" id="scoreDisplay">0</div>
-                <div class="stat-label">Score</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-value" id="streakDisplay">0</div>
-                <div class="stat-label">Streak</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-value" id="accuracyDisplay">0%</div>
-                <div class="stat-label">Accuracy</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-value" id="progressDisplay">0/10</div>
-                <div class="stat-label">Progress</div>
-            </div>
-        </div>
+        <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2" />
+        <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.08.15" />
+        <link rel="stylesheet" href="/shared_components/css/training-practice.css?v=2026.09.08.15" />
+        <link rel="stylesheet" href="/shared_components/css/training-simulator.css?v=2026.09.08.15" />
+        <link rel="stylesheet" href="/training/css/sales-tax-code-trainer.css?v=2026.09.07.19" />
+        <link
+            rel="stylesheet"
+            href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&amp;display=swap"
+        />
+    </head>
+    <body data-ui="unified" data-training="practice" data-training-simulator="sales-tax-code-trainer">
+        <!-- Header -->
+        <header class="header training-page-header">
+            <nav aria-label="Training navigation">
+                <img
+                    src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                    alt="Northwest Custom Apparel"
+                    class="training-brand"
+                /><a href="/training/index.html">Training Center</a><a href="/staff-dashboard.html">Staff Dashboard</a>
+            </nav>
+        </header>
 
-        <!-- Game Card -->
-        <div class="game-card">
-            <div class="game-header">
-                <h2 class="game-title">Tax Code Challenge</h2>
-                <p class="game-description">Select the correct tax code for each customer scenario</p>
+        <!-- Main Content -->
+        <main class="container training-workspace" id="training-main">
+            <!-- Title Section -->
+            <div class="title-section">
+                <h1 class="title">
+                    <i class="fas fa-receipt" aria-hidden="true"></i>
+                    Sales Tax Code Training
+                </h1>
+                <p class="subtitle">Master Washington State tax codes for accurate order processing</p>
             </div>
 
-            <!-- Progress Bar -->
-            <div class="progress-bar">
-                <div class="progress-fill" id="progressBar" style="width: 0%"></div>
-            </div>
-
-            <!-- Question Section -->
-            <div class="question-section">
-                <div class="question-number" id="questionNumber">Question 1 of 10</div>
-                <h3 class="question-text" id="questionText">Loading question...</h3>
-                
-                <div class="scenario-box" id="scenarioBox">
-                    <div class="scenario-title">Scenario:</div>
-                    <div class="scenario-text" id="scenarioText">Loading scenario...</div>
+            <!-- Stats Bar -->
+            <div class="stats-bar">
+                <div class="stat-item">
+                    <div class="stat-value" id="scoreDisplay">0</div>
+                    <div class="stat-label">Score</div>
                 </div>
-
-                <!-- Options Grid -->
-                <div class="options-grid" id="optionsGrid">
-                    <!-- Options will be dynamically inserted here -->
+                <div class="stat-item">
+                    <div class="stat-value" id="streakDisplay">0</div>
+                    <div class="stat-label">Streak</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="accuracyDisplay">0%</div>
+                    <div class="stat-label">Accuracy</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="progressDisplay">0/10</div>
+                    <div class="stat-label">Progress</div>
                 </div>
             </div>
 
-            <!-- Feedback Section -->
-            <div class="feedback-section" id="feedbackSection">
-                <div class="feedback-message" id="feedbackMessage">
-                    <div class="feedback-icon" id="feedbackIcon"></div>
-                    <div class="feedback-content">
-                        <div class="feedback-title" id="feedbackTitle"></div>
-                        <div class="feedback-text" id="feedbackText"></div>
+            <!-- Game Card -->
+            <div class="game-card">
+                <div class="game-header">
+                    <h2 class="game-title">Tax Code Challenge</h2>
+                    <p class="game-description">Select the correct tax code for each customer scenario</p>
+                </div>
+
+                <!-- Progress Bar -->
+                <progress id="progressBar" max="100" value="0" aria-label="Training progress"></progress>
+
+                <!-- Question Section -->
+                <div class="question-section">
+                    <div class="question-number" id="questionNumber">Question 1 of 10</div>
+                    <h3 class="question-text" id="questionText" tabindex="-1">Ready to practice?</h3>
+
+                    <div class="scenario-box" id="scenarioBox">
+                        <div class="scenario-title">Scenario:</div>
+                        <div class="scenario-text" id="scenarioText">Choose Start Training to begin.</div>
+                    </div>
+
+                    <!-- Options Grid -->
+                    <div class="options-grid" id="optionsGrid">
+                        <!-- Options will be dynamically inserted here -->
                     </div>
                 </div>
-            </div>
 
-            <!-- Control Buttons -->
-            <div class="control-buttons">
-                <button class="btn btn-secondary" id="skipBtn" style="display: none;">
-                    <i class="fas fa-forward" aria-hidden="true"></i>
-                    Skip Question
-                </button>
-                <button class="btn btn-primary" id="nextBtn" style="display: none;">
-                    <i class="fas fa-arrow-right" aria-hidden="true"></i>
-                    Next Question
-                </button>
-                <button class="btn btn-primary" id="submitBtn" style="display: none;">
-                    <i class="fas fa-check" aria-hidden="true"></i>
-                    Submit Answer
-                </button>
-                <button class="btn btn-primary" id="startBtn">
-                    <i class="fas fa-play" aria-hidden="true"></i>
-                    Start Training
-                </button>
-            </div>
-        </div>
-    </main>
-
-    <!-- Results Modal -->
-    <div class="modal-overlay" id="resultsModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <i class="fas fa-trophy" style="font-size: 3rem; margin-bottom: 1rem;" aria-hidden="true"></i>
-                <h2 style="margin: 0;">Training Complete!</h2>
-            </div>
-            <div class="modal-body">
-                <div style="text-align: center; margin-bottom: 2rem;">
-                    <div style="font-size: 3rem; font-weight: bold; color: var(--primary-color);" id="finalScore">0%</div>
-                    <div style="color: var(--text-secondary);">Final Score</div>
-                </div>
-                
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 2rem;">
-                    <div style="background: var(--bg-color); padding: 1rem; border-radius: 8px; text-align: center;">
-                        <div style="font-size: 1.5rem; font-weight: bold; color: var(--success-text);" id="correctCount">0</div>
-                        <div style="color: var(--text-secondary); font-size: 0.875rem;">Correct</div>
-                    </div>
-                    <div style="background: var(--bg-color); padding: 1rem; border-radius: 8px; text-align: center;">
-                        <div style="font-size: 1.5rem; font-weight: bold; color: var(--error-text);" id="incorrectCount">0</div>
-                        <div style="color: var(--text-secondary); font-size: 0.875rem;">Incorrect</div>
+                <!-- Feedback Section -->
+                <div class="feedback-section" id="feedbackSection" role="status">
+                    <div class="feedback-message" id="feedbackMessage">
+                        <div class="feedback-icon" id="feedbackIcon"></div>
+                        <div class="feedback-content">
+                            <div class="feedback-title" id="feedbackTitle"></div>
+                            <div class="feedback-text" id="feedbackText"></div>
+                        </div>
                     </div>
                 </div>
-                
-                <div id="performanceMessage" style="text-align: center; padding: 1rem; background: var(--bg-color); border-radius: 8px;">
-                    <!-- Performance message will be inserted here -->
+
+                <!-- Control Buttons -->
+                <div class="control-buttons">
+                    <button class="btn btn-secondary" id="skipBtn" hidden="" type="button">
+                        <i class="fas fa-forward" aria-hidden="true"></i>
+                        Skip Question
+                    </button>
+                    <button class="btn btn-primary" id="nextBtn" hidden="" type="button">
+                        <i class="fas fa-arrow-right" aria-hidden="true"></i>
+                        Next Question
+                    </button>
+                    <button class="btn btn-primary" id="submitBtn" hidden="" type="button">
+                        <i class="fas fa-check" aria-hidden="true"></i>
+                        Submit Answer
+                    </button>
+                    <button class="btn btn-primary" id="startBtn" type="button">
+                        <i class="fas fa-play" aria-hidden="true"></i>
+                        Start Training
+                    </button>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" data-call="closeResults">
-                    <i class="fas fa-times" aria-hidden="true"></i>
-                    Close
-                </button>
-                <button class="btn btn-primary" data-call="restartGame">
-                    <i class="fas fa-redo" aria-hidden="true"></i>
-                    Try Again
-                </button>
-            </div>
-        </div>
-    </div>
+        </main>
 
-    <script src="/shared_components/js/data-call-delegator.js?v=2026.09.06.29"></script>
-    <script src="/training/js/sales-tax-code-trainer.js?v=2026.09.06.27"></script>
-</body>
+        <!-- Results Modal -->
+        <dialog id="resultsModal" class="simulator-dialog" aria-labelledby="results-title">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <i class="fas fa-trophy" aria-hidden="true"></i>
+                    <h2 id="results-title">Training Complete!</h2>
+                </div>
+                <div class="modal-body">
+                    <div>
+                        <div id="finalScore">0%</div>
+                        <div>Final Score</div>
+                    </div>
+
+                    <div class="results-counts">
+                        <div>
+                            <div id="correctCount">0</div>
+                            <div>Correct</div>
+                        </div>
+                        <div>
+                            <div id="incorrectCount">0</div>
+                            <div>Incorrect</div>
+                        </div>
+                    </div>
+
+                    <div id="performanceMessage">
+                        <!-- Performance message will be inserted here -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-sim-call="closeResults">
+                        <i class="fas fa-times" aria-hidden="true"></i>
+                        Close
+                    </button>
+                    <button class="btn btn-primary" type="button" data-sim-call="restartGame">
+                        <i class="fas fa-redo" aria-hidden="true"></i>
+                        Try Again
+                    </button>
+                </div>
+            </div>
+        </dialog>
+
+        <script src="/training/js/sales-tax-code-trainer.js?v=2026.09.06.27"></script>
+    </body>
 </html>

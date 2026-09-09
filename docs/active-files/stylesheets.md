@@ -182,3 +182,5 @@ cap-embroidery-fix.css
 
 
 - `shared_components/css/training-manual.css` — shared manual contents, reading layout and print contract.
+
+- `/shared_components/css/training-simulator.css` — shared scoreboards, exercise options, feedback and native dialogs; Training Center and both ShopWorks simulations keep their arrangements in their scoped training sheets.

@@ -1,0 +1,423 @@
+{
+  "base": "20d3e247ee8519e99cb51084d9099467cf78588e",
+  "lessons": [
+    {
+      "file": "training/training-center.js",
+      "variables": [
+        "TRACKS"
+      ],
+      "hashes": {
+        "TRACKS": "5c114f0d88b77dc6928f0ccc1c963da779c9ef1ee45f394d9cc52ba7c871c6b7"
+      }
+    },
+    {
+      "file": "training/js/sales-tax-code-trainer.js",
+      "variables": [
+        "taxCodes",
+        "scenarios",
+        "taxOptions"
+      ],
+      "hashes": {
+        "taxCodes": "6847f41590a0e6df3f8ef8e793344418484d69d6c517b53d7fffc76a14b4d50f",
+        "scenarios": "c7b3456cb3b067a2001f39ba757d612f208e11980154d1a94cd7748af6bac957",
+        "taxOptions": "0b925f6f105d4f11bde9c5366f233b68560ff29a92a3cf24082cf5d2e93cb086"
+      }
+    },
+    {
+      "file": "training/js/shopworks-customer-setup.js",
+      "variables": [
+        "explorerQuestions",
+        "fieldDefinitions",
+        "scenarios",
+        "questions"
+      ],
+      "hashes": {
+        "explorerQuestions": "ed365bc9f85497d920e5ebeafa45b8452817edacbc8ddb39ff3d889cbc48e5f6",
+        "fieldDefinitions": "faf0863602de81ce4c25b6b53ff0b33c57832f069e0bf75fbb1af09ab3264a1d",
+        "scenarios": "e395a741bf6f7aef1b4970bdb365b220b1d6ca3d6ef2dfcbb4535c83460d5573",
+        "questions": "978dd7ce3376a47fad46db52468e14a92a660b50323b2b198d913692f6efbaba"
+      }
+    },
+    {
+      "file": "training/js/shopworks-customer-setup-enhanced.js",
+      "variables": [
+        "fieldInfo",
+        "setupScenarios",
+        "detectiveScenarios",
+        "taxCodes",
+        "contacts"
+      ],
+      "hashes": {
+        "fieldInfo": "629d13211a972694b3dad6ac21fcbd63328ce3543ca14fa0befdb6d2e9a1b6f5",
+        "setupScenarios": "d0c9fec37df09b7e6504736dbc4c7d8802f8bae9f1fdec84c411a7d29ff475d9",
+        "detectiveScenarios": "57c231847a5a31f335ad24f915e1df0d3765bc3163668f28f8ab8f58beffe9ce",
+        "taxCodes": "05f5ea7e94cf97ddd72d51dccf5d076086704219a2002ac94e257da26de09b6d",
+        "contacts": "c8c748caf282e715a231d3da0d805f21dd2d1b7ec029baa9d4870c00a745449a"
+      }
+    }
+  ],
+  "pages": [
+    {
+      "file": "training/index.html",
+      "paragraphs": [
+        "Everything you need to learn your job at NWCA, organized by role. Items marked HUB open in the Policies Hub; the rest are interactive guides. Rules and SOPs live in the Policies Hub — this page is for learning.",
+        "Live list — anything published to the Hub's Training category appears here automatically."
+      ],
+      "fields": [],
+      "links": [
+        "/staff-dashboard.html",
+        "/pages/policies-hub.html",
+        "/staff-dashboard.html",
+        "/pages/policies-hub.html"
+      ]
+    },
+    {
+      "file": "training/sales-tax-code-trainer.html",
+      "paragraphs": [
+        "Master Washington State tax codes for accurate order processing",
+        "Select the correct tax code for each customer scenario"
+      ],
+      "fields": [],
+      "links": [
+        "/training/training-hub.html"
+      ]
+    },
+    {
+      "file": "training/shopworks-customer-setup.html",
+      "paragraphs": [
+        "Master the art of customer setup in Shopworks CRM",
+        "Learn about each field and its purpose in customer setup",
+        "Practice setting up real customer scenarios",
+        "Identify and fix errors in customer records",
+        "Test your knowledge against the clock"
+      ],
+      "fields": [],
+      "links": []
+    },
+    {
+      "file": "training/shopworks-customer-setup-enhanced.html",
+      "paragraphs": [
+        "Preparing your training environment"
+      ],
+      "fields": [
+        {
+          "id": "customerId",
+          "type": "text",
+          "name": "",
+          "options": null
+        },
+        {
+          "id": "companyName",
+          "type": "text",
+          "name": "",
+          "options": null
+        },
+        {
+          "id": "website",
+          "type": "text",
+          "name": "",
+          "options": null
+        },
+        {
+          "id": "mainEmail",
+          "type": "text",
+          "name": "",
+          "options": null
+        },
+        {
+          "id": "",
+          "type": "checkbox",
+          "name": "",
+          "options": null
+        },
+        {
+          "id": "",
+          "type": "radio",
+          "name": "filter",
+          "options": null
+        },
+        {
+          "id": "",
+          "type": "radio",
+          "name": "filter",
+          "options": null
+        },
+        {
+          "id": "",
+          "type": "radio",
+          "name": "filter",
+          "options": null
+        },
+        {
+          "id": "",
+          "type": "radio",
+          "name": "filter",
+          "options": null
+        },
+        {
+          "id": "",
+          "type": "radio",
+          "name": "filter",
+          "options": null
+        },
+        {
+          "id": "taxCode1",
+          "type": "text",
+          "name": "",
+          "options": null
+        },
+        {
+          "id": "taxDesc1",
+          "type": "text",
+          "name": "",
+          "options": null
+        },
+        {
+          "id": "taxCode2",
+          "type": "text",
+          "name": "",
+          "options": null
+        },
+        {
+          "id": "taxDesc2",
+          "type": "text",
+          "name": "",
+          "options": null
+        },
+        {
+          "id": "taxCode3",
+          "type": "text",
+          "name": "",
+          "options": null
+        },
+        {
+          "id": "taxDesc3",
+          "type": "text",
+          "name": "",
+          "options": null
+        },
+        {
+          "id": "taxCode4",
+          "type": "text",
+          "name": "",
+          "options": null
+        },
+        {
+          "id": "taxDesc4",
+          "type": "text",
+          "name": "",
+          "options": null
+        },
+        {
+          "id": "taxExempt",
+          "type": "text",
+          "name": "",
+          "options": null
+        },
+        {
+          "id": "expirationDate",
+          "type": "text",
+          "name": "",
+          "options": null
+        },
+        {
+          "id": "extCustId",
+          "type": "text",
+          "name": "",
+          "options": null
+        },
+        {
+          "id": "salesperson",
+          "type": "select-one",
+          "name": "",
+          "options": [
+            [
+              "",
+              "Select..."
+            ],
+            [
+              "Nika Lao",
+              "Nika Lao"
+            ],
+            [
+              "Adriyella Trujillo",
+              "Adriyella Trujillo"
+            ],
+            [
+              "Taneisha Clark",
+              "Taneisha Clark"
+            ],
+            [
+              "Ruthie Nhong",
+              "Ruthie Nhong"
+            ],
+            [
+              "Erik Mickelson",
+              "Erik Mickelson"
+            ],
+            [
+              "Jim Mickelson",
+              "Jim Mickelson"
+            ],
+            [
+              "House",
+              "House"
+            ]
+          ]
+        },
+        {
+          "id": "salesGroup",
+          "type": "text",
+          "name": "",
+          "options": null
+        },
+        {
+          "id": "customerType",
+          "type": "select-one",
+          "name": "",
+          "options": [
+            [
+              "",
+              "Select..."
+            ],
+            [
+              "Corporate",
+              "Corporate"
+            ],
+            [
+              "Individual",
+              "Individual"
+            ],
+            [
+              "Government",
+              "Government"
+            ],
+            [
+              "Non-Profit",
+              "Non-Profit"
+            ],
+            [
+              "School",
+              "School"
+            ],
+            [
+              "Church",
+              "Church"
+            ],
+            [
+              "Fundraising",
+              "Fundraising"
+            ],
+            [
+              "Medical",
+              "Medical"
+            ],
+            [
+              "Military",
+              "Military"
+            ],
+            [
+              "Events",
+              "Events"
+            ],
+            [
+              "AMC",
+              "AMC"
+            ]
+          ]
+        },
+        {
+          "id": "source",
+          "type": "select-one",
+          "name": "",
+          "options": [
+            [
+              "",
+              "Select..."
+            ],
+            [
+              "Google Search",
+              "Google Search"
+            ],
+            [
+              "Drive By",
+              "Drive By"
+            ],
+            [
+              "Referral",
+              "Referral"
+            ],
+            [
+              "Cold Call",
+              "Cold Call"
+            ],
+            [
+              "Trade Show",
+              "Trade Show"
+            ],
+            [
+              "Web",
+              "Web"
+            ],
+            [
+              "Facebook",
+              "Facebook"
+            ],
+            [
+              "Instagram",
+              "Instagram"
+            ]
+          ]
+        },
+        {
+          "id": "reference",
+          "type": "text",
+          "name": "",
+          "options": null
+        },
+        {
+          "id": "sicCode",
+          "type": "text",
+          "name": "",
+          "options": null
+        },
+        {
+          "id": "sicDesc",
+          "type": "text",
+          "name": "",
+          "options": null
+        },
+        {
+          "id": "numEmployees",
+          "type": "number",
+          "name": "",
+          "options": null
+        },
+        {
+          "id": "accountTier",
+          "type": "select-one",
+          "name": "",
+          "options": [
+            [
+              "",
+              "Select..."
+            ],
+            [
+              "Gold",
+              "Gold"
+            ],
+            [
+              "Silver",
+              "Silver"
+            ],
+            [
+              "Bronze",
+              "Bronze"
+            ]
+          ]
+        }
+      ],
+      "links": []
+    }
+  ]
+}
