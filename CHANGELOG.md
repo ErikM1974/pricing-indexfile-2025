@@ -1,3 +1,14 @@
+## v2026.09.09.2 (2026.09.09)
+
+- Plan shared staff references and forms directory
+- Record staff reference layout work in progress
+- Record verified brand release and five staff references in review
+- Record staff reference review and visible data failure lesson
+- Unify five staff reference pages and preserve reliable data states
+- Integrate reviewed staff reference family
+- Preserve original commission accordion data-call serialization
+- Record completed staff reference release checks
+
 ## v2026.09.09.1 (2026.09.09)
 
 - Record missing webstore cache references caught by full gates

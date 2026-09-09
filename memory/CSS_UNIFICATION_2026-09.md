@@ -598,3 +598,7 @@ The complete unit suite caught a source serialization lock: HTML serialization c
 ## Staff reference release checks complete — 2026-09-09
 
 Five staff references integrated and tested at3432538f676b06ce8cc8cd3c6cc10d15eb6ae8f1. Completed:214 unit suites/5162 passed/four existing skips;88 DOM,4 accessibility unit,84 quote parity;342 mocked browser (464.9s),16 remaining browser and3 optional screenshot skips;all5 live calculator surfaces,build/lint/types/297 CSS/HTTP boot.485 routes/24 modules unchanged.21 focused family browser cases and805 checked paper blocks retained. Candidatev2026.09.09.2,24 changed/shared references versioned. Exact-source CI and actual deployment pending. Live remains99/225,126 pending. Next isolated codex/entry-status-family has first-pass six sign-in/confirmation layouts; not reviewed or part of this release.
+
+## Staff reference release record — v2026.09.09.2
+
+Exact-source CI 34341414138 passed all four jobs on0203038d69fd8733d5fd6c5d404cd56f423d92b5, including actual money/calculator parity. Five staff references share components, scoped page arrangements and complete print behavior. Original content, examples and existing access boundaries retained. Service/bonus/form-directory failures are explicit with usable retry.21 focused browser cases,805 paper blocks; full checks5162 unit tests,342 mocked browser,16 remaining browser,all5 calculators;485 routes unchanged. Candidate104 reviewed/121 pending becomes live only after actual rollout verification.
