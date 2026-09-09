@@ -1006,3 +1006,7 @@ Integrated design checks found two historical photo-source locks still expected 
 ## Design-library release checks complete — v2026.09.09.15
 
 Tested source 09faa19b656c10c7e8331aee477c3ebea080711f: build/lint/types,485routes/24modules,227unit suites/5289passed/four existing skips,88DOM,four accessibility unit,84quote parity,566mocked browser,16remaining browser/three optional screenshot skips,all five calculators. 287CSS clean,boot200,production audit zero.15focused cases; two PDFs/three pages/39visible text/current-filter blocks. Two CSS owners and three controllers/helpers versioned2026.09.09.15; exact Caspio embed URLs and pricing helpers preserved.77scoped provider exceptions replace275old flags; local app owner zero. Actual provider search reads checked24records per page; synthetic tests cover pricing/dialog/search/failure states. Live remains138/87 until verified140/85 after exact-source CI and rollout.
+
+## Design-library release record — v2026.09.09.15
+
+Exact-source CI 34405981395 passed all four jobs on d74325695312458086835c71010f223d4f0f8ba4, including actual money/calculator parity and566mocked browser checks. Design libraries share controls and dialogs with a scoped Caspio adapter.15focused interaction cases and two PDFs/three pages/39visible blocks; exact pricing, clipboard and provider form replacement states checked using synthetic data.485routes unchanged. Count becomes140reviewed/85pending only after verified rollout.
