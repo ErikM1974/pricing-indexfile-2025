@@ -563,3 +563,12 @@ Current live remains99/225,126 pending atv2026.09.09.1/2080. Five staff referenc
 ## Six entry/status pages reviewed — 2026-09-09
 
 Staff/customer/vendor sign-in and3-Day Tees/custom-tees/custom-caps confirmation pages now use shared access/confirmation layouts and scoped page arrangements. Original full main text, images, fields, links and IDs preserved. All three fulfillment/email controllers and helpers unchanged and hash-locked. Magic-link pages retain deep links and identical successful known/unknown-account messaging; server outages now display generic retryable errors preserving email.30 focused browser cases passed in34.3s at1440/768/390/320, zero axe violations;198 focused unit cases passed.17 populated/error/delayed/sent PDFs retain167 checked content blocks, each one sheet including mockup captions and contact/footer text. Candidate2026.09.09.3 pre-versioned; two obsolete success stylesheets retired, caps studio stylesheet remains until its own migration. Full primary gates/CI/deploy pending. Verified live staff releasev2026.09.09.2/2081 is104 reviewed/121 pending; only verified entry rollout becomes110/115.
+
+## Catalog discovery plan — 2026-09-09
+
+Next two surfaces:brands.html andpages/fall-catalog-2026.html. Isolated codex/catalog-discovery based on1118d1d4642bf38db59948b3064362280f6df69a. Capture original content, route/link/field/image contracts and exact curated Fall BRANDS/CATS/ITEMS arrays before changes. Share existing storefront navigation by moving the byte-identical brand-guide controller toshared_components/js/storefront-navigation.js and updating all fifteen existing consumers; preserve their reviewed behavior and retest them. Replace legacy catalogue CSS with canonical controls, shared card layout and scoped responsive/print arrangements. Brand tiles become named native links so missing logos and keyboard input remain usable. Keep API priority ordering, product destinations and server price labels; validate malformed/failed loads with visible retry retaining filters. No pricing computation or business-service writes.
+
+- [ ] Original desktop/phone/API contract capture.
+- [ ] Migrate shared navigation, both catalogue owners and necessary accessible/failure states.
+- [ ] Preserve curated taxonomy and original page content; four widths/keyboard/filter/failed-image/retry/price-label/print checks.
+- [ ] Full primary gates, exact-source CI and verified rollout after the pending entry/status release. Candidate2026.09.09.4; no live-count change yet.
