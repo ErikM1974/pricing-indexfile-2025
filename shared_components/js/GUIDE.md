@@ -262,3 +262,5 @@ Homepage "From the blog" section (index.html). Fetches the 3 newest Published po
 - `training-manual.js`: opt-in data-training-manual pages. Real hash links select data-manual-section panels, mobile contents collapse after selection, biography buttons expose state, and print temporarily opens all panels/details then restores them. No business services.
 
 - `policies/policy-workspace.js` — loaded by the four unified policy pages. Owns native contents/print restoration and accessible shared control classes; never rewrites TipTap editor tables or policy data.
+
+- `webstore-guide.js` — twelve public webstore marketing pages; focuses native section destinations and restores FAQ disclosures after printing. No business API calls.
