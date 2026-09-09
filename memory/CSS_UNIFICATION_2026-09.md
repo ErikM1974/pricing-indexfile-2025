@@ -1,59 +1,19 @@
 # CSS unification — design direction and implementation plan
 
 
-## Shutdown checkpoint — 2026-09-09
+## Active checkpoint — RESUMED 2026-09-09
 
-PAUSED at Erik's request so he can turn off the computer. No further implementation or deployment until he resumes. Live frontend remains v2026.09.09.4 / Heroku2083,112 reviewed pages and113 pending. Campaign3 is integrated in primary develop at f5c12668f7bb7e0aa086912ae0ad65539a4f68df but still needs complete browser/live-parity/CI/release checks.
+Erik resumed after shutdown; standing edit/deploy authorization continues. Frontend **v2026.09.09.6 / Heroku2084 / dce016510f29c7a655b4bb75628aea72b3b745a6** is live. Actual Heroku slug/status and live version verified; source CI34356406944 on98b82fc917c97e753a115efd5e37cbf0873c4960 passed all four jobs, including full mocked CSS browser tests and actual money/calculator parity. This release includes the three reviewed campaign golf/safety pages. **115 of225 pages live;110 pending.** All26 training complete; generated documents/style owners remain separate unfinished work. Backend unchanged.
 
-This codex/instant-storefront branch saves thirteen owned WIP files for the banner/sticker family. It is NOT reviewed, NOT release ready, and must NOT be merged into the campaign release. New storefront-commerce.css and instant-storefront.js are explicitly included. node_modules is a junction; no .env copied. Preserve the junction and never recursively remove this worktree.
+Work continues in codex/instant-storefront at C:\Users\erik\.codex\visualizations\2026\09\07\01a07d90-9a4c-7e70-9e4e-c196377b7c6b\training-final-worktree. WIP cc4d254c and checkpoint1a0844a5 are saved; verified campaign release merged without conflicts. Native banner/sticker layouts are being reviewed. The phone .stk-card cascade regression is fixed locally; four-width/state/print validation and complete release gates remain. No instant pages count as reviewed yet. Their preliminary .6 cache references must use the next unused version before release. No price computation changed.
 
-First implementation fix on resume: pages/css/instant-quote.css has a known mobile regression. The one-shot merge-instant-arrangements.cjs moved base .stk-card grid-column:2/grid-row:1/span2 into a later rule after the width<=900px media query, overriding mobile grid-column:1/grid-row:auto. Fix cascade order and audit other merged selectors; do not hide overflow. Sticker phone screenshot shows two narrow columns. Desktop styles are preliminary; no content/financial fixture locks, state tests, four-width accessibility checks or print verification are complete for these two pages. Manifest not registered and these pages must not count as reviewed.
+- [x] Verify Claude's completed release and exact-source CI; no redundant campaign deployment.
+- [x] Resume saved banner/sticker WIP and repair late desktop placement overriding mobile layout.
+- [ ] Review original content/financial locks, four widths, pricing/quantity/finishing, navigation/dialogs, form failures/retries and artwork with all actual writes mocked, complete print content.
+- [ ] Register reviewed owners; full required local gates and exact-source CI, then verified release.
+- [ ] Continue remaining storefront/staff/calculator/builder/document families.
 
-Original baseline/controller hashes, read-only live pricing snapshots, before/after screenshots and helpers live in C:/Users/erik/.codex/visualizations/2026/09/07/01a07d90-9a4c-7e70-9e4e-c196377b7c6b. Start with instant-storefront-original-baseline.json, instant-storefront-pricing-capture.json and instant-crop-custom-stickers-phone.png. Do not rerun plan/install/merge one-shot helpers. Existing pricing/submission/artwork controllers remain unchanged; app-modern.js only bypasses the legacy menu setup for a native DIALOG. Three CSS files and two JS files passed focused lint; that is not visual approval.
-
-Resume from the primary repository memory/CSS_UNIFICATION_2026-09.md active checkpoint and pause-checkpoint-2026-09-09.json in the artifact directory. Campaign full mocked browser run was intentionally stopped at shutdown, not passed; 16 remaining browser/live checks and all5 calculator surfaces are still required before campaign release. No new release or background continuation started.
-
-## Active checkpoint — PAUSED for shutdown, 2026-09-09
-
-Erik requested a stopping point so he can turn off his computer. All work is paused until he returns. The owned test runner and31 verified child processes were stopped; no deployment or automatic continuation was started. Standing edit/deploy authorization remains for resumption. This section supersedes older progress paragraphs below.
-
-**Concurrent release work observed at shutdown:** Another assistant advanced primary develop to98b82fc917c97e753a115efd5e37cbf0873c4960 (Deploy v2026.09.09.6), committing its CI/deploy-skill changes and campaign cache references. This checkpoint does not alter primary develop or that release. A read-only live /api/version probe still returned08f8059f /2083 at checkpoint preparation. Recheck source/CI/actual live slug on resume; do not assume .5 is next unused or redeploy a completed release. The campaign checks below apply to application source f5c12668, not automatically to the other assistant's newer commit. Instant references .6 now collide with the other release candidate and must receive the next unused version before eventual release. The root's two previously uncommitted files have now been committed by their owner. Our runner is stopped; the other assistant's release progress is outside this checkpoint.
-
-### What is live
-
-Frontend **v2026.09.09.4 / Heroku2083 /08f8059f80560a70699a70b6502ed5924642a3d0**, actual slug last verified2026-09-09T12:25:13.1748627Z. Exact-source CI34349270516 passed all four jobs, including actual money/calculator parity on945362553cd95ba5ef781aa4318f4a61a85ff74b. **112 of225 application pages are reviewed and live;113 pending.** All26 training pages complete. Another79 tracked sources excluded (12 archive,14 email,50 fixture/template,3 retired). Generated document/style owners remain separate unfinished work. Neither campaign3 nor instant2 is deployed.
-
-Backend unchanged: v2026.09.08.1 /Heroku1130 /d06aee3e4d25c5e1410241ea8007cdc8339aa3fa. Separate dependency/runtime and scheduler verification backlog remains.
-
-### Saved campaign batch — integrated, unreleased
-
-Three pages: golf-tournaments-2026.html, golf-tournament-product.html and custom-safety-apparel.html. Reviewed commit5a5b096c9c7075de930674010e26d8e39c8eee2b integrated at1473de57a9834918588261a65fb86299bf66addb; primary develop application HEAD **f5c12668f7bb7e0aa086912ae0ad65539a4f68df** includes the inventory parser optimization. Candidate2026.09.09.5; check next unused version before release.
-
-Shared scoped styles, canonical controls, native photo dialog, keyboard/focus handling and reversible full-FAQ printing are reviewed. Complete original prose/images/SEO/fields retained, including the historical Summer2026 deadline; underlying pricing/save services byte-locked. Golf inquiry now needs accepted storage OR delivered sales notice before sending a customer confirmation; total failure retains the form and shows a retryable error. Invalid/empty config shows an error and stops catalog/sample loading. All business writes and email were mocked. Owner/manifest/content/financial fixtures and lesson are registered.
-
-Completed on this application source: build, zero-warning JS lint, types,485 unchanged routes/24 modules/zero undefined names; **217 unit suites/5192 passed/4 existing skipped**, using two workers;88 DOM,4 accessibility-unit,84 quote-parity cases; HTTP boot200;298 CSS files lint clean. Campaign focused19 browser cases passed, final5 screen/failure/print cases passed again,203 focused unit checks passed. Five PDFs retain636 checked text nodes and all pages were visually reviewed; four viewport widths passed with zero axe violations. Live read-only config returned200 with six validated groups. Raw CSS bytes grew with scoping/print support; no size-reduction claim.
-
-**Full mocked browser group is INCOMPLETE: user-requested shutdown interrupted it around292 of408 cases. It did not finish and must not be reported passed.** Log saved as campaign-browser-paused-for-shutdown.log. The remaining16 browser/live money checks and all5 calculator surfaces have NOT run on this campaign source. Exact-source CI, release preparation and rollout are also pending. No final campaign-storefront-local-gates.json success was produced.
-
-Inventory detail: one inert shared DOMParser replaced304 JSDOM windows; standalone18.31s to13.51s and the whole531123-byte inventory was byte-identical. The full unit suite still timed out under19 workers but passed under2. Deadline remains30s; no skipped assertion. Use2 local unit workers and preserve complete coverage.
-
-### Saved instant configurator WIP — keep isolated
-
-Branch **codex/instant-storefront**, worktree **C:\Users\erik\.codex\visualizations\2026\09\07\01a07d90-9a4c-7e70-9e4e-c196377b7c6b\training-final-worktree**, based onf5c12668. Saved WIP commit **cc4d254cd1d215409cc2132b2574f28f2ae64db8**, preceded by checkpoint **1900c0af2db0d6f1eba54b270955fe172586fa61**. Thirteen owned files explicitly committed, including new storefront-commerce.css and instant-storefront.js. This branch is clean. It is NOT reviewed or deployable and must not enter the campaign release. Candidate2026.09.09.6 only after campaign.
-
-First fix on resuming this batch: late base .stk-card grid placement in pages/css/instant-quote.css overrides the width<=900px rule, making two tiny columns on the sticker phone view. Move base placement before media/keep later rule appearance-only and audit other merged selectors. Do not mask overflow. merge-instant-arrangements.cjs caused this during duplicate consolidation; do not rerun it. Original financial/controllers and pricing snapshots saved; no price arithmetic changed. Native menu bypass in app-modern.js is the only shared legacy behavior change. Three CSS/two JS lint checks passed, but content locks, navigation/price/error state tests, four widths/axe and all paper checks are still pending. These2 pages are NOT registered as reviewed. node_modules is a junction, no .env; never recursively delete the worktree/junction.
-
-### Resume in this order
-
-1. Inspect both branches and current working trees, remote freshness and this checkpoint. Primary repository has concurrent release preparation by another assistant, as noted above. Inspect its current state and preserve its changes. No other agent's work was committed by this checkpoint.
-2. Finish campaign full mocked browser group, then remaining16 browser/live money/calculator checks. Use saved runner configuration and all real business writes mocked. Preserve completed checks unless source changes or an unresolved concern requires rerunning. resume-campaign-storefront-gates.ps1 is already assembled; do not append its tail again. Its whole run repeats earlier checks; a carefully extracted remaining browser section can avoid redundant checks.
-3. Prepare exact-source CI and proper release per deployment skill; require all jobs and actual money/calculator steps. Verify Heroku release status, actual slug/full SHA, raw/hashed approved bytes and live states. Only then change live count to115/110. If unrelated working files remain, use a clean isolated release worktree; do not commit them.
-4. Return to isolated instant WIP, fix the mobile cascade, add original-content and unchanged-financial guards, review four widths, navigation/dialog/search, all price/failure/retry/submission/artwork/cart states with mocked writes and complete print content. Integrate only after review and full required checks.
-5. Continue remaining storefront/staff/calculator/builder families and generated document owners. Whole-app CSS work remains unfinished.
-
-### Durable artifacts
-
-Directory: **C:/Users/erik/.codex/visualizations/2026/09/07/01a07d90-9a4c-7e70-9e4e-c196377b7c6b**. Start with **pause-checkpoint-2026-09-09.json**. Campaign records: campaign-storefront-{worktree-record,integration-record,paper-review,live-config-check,css-measurement}.json; owned-files list, original baseline, fixtures, screenshots/PDFs and copied pricing-campaign-storefront-*.log. Prior live records remain catalog-discovery-{release-record,source-ci,heroku-verification,live-verification,local-gates}.json. Instant evidence: instant-storefront-{original-baseline,pricing-capture}.json and instant-crop-custom-stickers-phone.png. One-shot install/register/fix/integrate/checkpoint helpers must not be rerun. Node22 and corporate certificate may need restoring from TEMP after reboot; do not disable TLS. No background work will continue while the computer is off.
+Evidence: C:\Users\erik\.codex\visualizations\2026\09\07\01a07d90-9a4c-7e70-9e4e-c196377b7c6b; campaign-storefront-resumed-{ci,heroku}.json. The earlier campaign local browser run was intentionally interrupted at shutdown, but the subsequent release-source CI ran and passed that entire group. Use the saved fixtures/screenshots and current source; do not rerun one-shot installers or the merge helper that caused the mobile regression.
 
 ## Resumed — 2026-09-08
 
