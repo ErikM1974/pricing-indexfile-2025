@@ -1,0 +1,47 @@
+/* Opt-in SanMar invoice presentation; the legacy AE consumer keeps its own owner. */
+@layer components.pages {
+    :where([data-ui="unified"][data-invoice-viewer]) .smiv-overlay { display: none; }
+    :where([data-ui="unified"][data-invoice-viewer]) .smiv-modal { width: min(1080px, calc(100vw - 32px)); max-height: calc(100dvh - 32px); padding: 0; overflow: auto; }
+    :where([data-ui="unified"][data-invoice-viewer]) .smiv-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-3); padding: var(--space-4); border-bottom: 1px solid var(--ui-line); }
+    :where([data-ui="unified"][data-invoice-viewer]) .smiv-title { margin: 0; font-size: var(--font-size-lg); }
+    :where([data-ui="unified"][data-invoice-viewer]) .smiv-head-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); }
+    :where([data-ui="unified"][data-invoice-viewer]) .smiv-body { padding: var(--space-4); }
+    :where([data-ui="unified"][data-invoice-viewer]) :is(.smiv-loading, .smiv-note) { padding: var(--space-4); color: var(--ui-muted); overflow-wrap: anywhere; }
+    :where([data-ui="unified"][data-invoice-viewer]) .smiv-note.is-error { color: var(--color-danger-ink); background: var(--color-danger-bg); }
+    :where([data-ui="unified"][data-invoice-viewer]) .smiv-inv { padding: var(--space-4); margin-bottom: var(--space-4); border: 1px solid var(--ui-line); border-radius: var(--radius-card); color: var(--ui-ink); background: var(--ui-surface); }
+    :where([data-ui="unified"][data-invoice-viewer]) .smiv-inv-top { display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--space-3); padding-bottom: var(--space-4); margin-bottom: var(--space-4); border-bottom: 2px solid var(--ui-line); }
+    :where([data-ui="unified"][data-invoice-viewer]) .smiv-inv-brand { font-size: var(--font-size-lg); font-weight: 600; }
+    :where([data-ui="unified"][data-invoice-viewer]) .smiv-inv-brand small { display: block; margin-top: var(--space-2); font-size: var(--font-size-sm); font-weight: 400; color: var(--ui-muted); }
+    :where([data-ui="unified"][data-invoice-viewer]) .smiv-inv-no { font-family: var(--font-mono); font-size: var(--font-size-sm); }
+    :where([data-ui="unified"][data-invoice-viewer]) .smiv-meta { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-3); margin-block: 0 var(--space-4); }
+    :where([data-ui="unified"][data-invoice-viewer]) .smiv-meta dt { font-size: var(--font-size-sm); color: var(--ui-muted); }
+    :where([data-ui="unified"][data-invoice-viewer]) .smiv-meta dd { margin: var(--space-1) 0 0; overflow-wrap: anywhere; }
+    :where([data-ui="unified"][data-invoice-viewer]) .smiv-inv .data-table { min-width: 730px; }
+    :where([data-ui="unified"][data-invoice-viewer]) .data-table .smiv-num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    :where([data-ui="unified"][data-invoice-viewer]) .smiv-totals { width: min(360px, 100%); margin: var(--space-4) 0 0 auto; }
+    :where([data-ui="unified"][data-invoice-viewer]) .smiv-totals > div { display: flex; justify-content: space-between; gap: var(--space-3); padding-block: var(--space-2); }
+    :where([data-ui="unified"][data-invoice-viewer]) .smiv-totals .smiv-num { white-space: nowrap; font-variant-numeric: tabular-nums; }
+    :where([data-ui="unified"][data-invoice-viewer]) .smiv-grand { border-top: 2px solid var(--ui-line); font-weight: 700; }
+    :where([data-ui="unified"][data-invoice-viewer]) .smiv-badge { display: inline-block; margin-top: var(--space-2); padding: var(--space-1) var(--space-2); border-radius: var(--radius-sm); font-size: var(--font-size-sm); color: var(--ui-muted); background: var(--gray-100); }
+    :where([data-ui="unified"][data-invoice-viewer]) .smiv-print-sheet { display: none; }
+
+    @media screen and (width <= 600px) {
+        :where([data-ui="unified"][data-invoice-viewer]) .smiv-meta { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        :where([data-ui="unified"][data-invoice-viewer]) :is(.smiv-body, .smiv-inv) { padding: var(--space-3); }
+    }
+
+    @media print {
+        @page vendor-invoice { size: letter portrait; margin: 0.4in; }
+        :where([data-ui="unified"][data-invoice-viewer]).smiv-printing { page: vendor-invoice; }
+        :where([data-ui="unified"][data-invoice-viewer]).smiv-printing > :not(.smiv-print-sheet) { display: none; }
+        :where([data-ui="unified"][data-invoice-viewer]).smiv-printing > .smiv-print-sheet { display: block; }
+        :where([data-ui="unified"][data-invoice-viewer]) .smiv-print-sheet .smiv-inv { padding: 0; border: 0; margin: 0; font-size: 12px; }
+        :where([data-ui="unified"][data-invoice-viewer]) .smiv-print-sheet .smiv-inv ~ .smiv-inv { break-before: page; }
+        :where([data-ui="unified"][data-invoice-viewer]) .table-wrap { overflow: visible; }
+        :where([data-ui="unified"][data-invoice-viewer]) .smiv-inv .data-table { min-width: 0; font-size: inherit; }
+        :where([data-ui="unified"][data-invoice-viewer]) .smiv-inv .data-table :is(th, td) { padding: var(--space-2); font-size: inherit; }
+        :where([data-ui="unified"][data-invoice-viewer]) .smiv-inv tr { break-inside: avoid; }
+        :where([data-ui="unified"][data-invoice-viewer]) .smiv-totals { break-inside: avoid; }
+        :where([data-ui="unified"][data-invoice-viewer]) :focus { outline: none; }
+    }
+}

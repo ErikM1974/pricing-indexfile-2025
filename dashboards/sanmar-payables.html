@@ -1,6 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
+<!DOCTYPE html><html lang="en"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
@@ -9,51 +7,52 @@
 
     <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <!-- 2026 design tokens (must load before dash-shell.css) -->
-    <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/shared_components/css/art-hub.css?v=2026.09.07.19">
-    <link rel="stylesheet" href="/shared_components/css/dash-shell.css?v=2026.09.07.10">
-    <link rel="stylesheet" href="/shared_components/css/sanmar-invoice-viewer.css?v=2026.09.07.10">
-    <link rel="stylesheet" href="/dashboards/css/sanmar-payables.css?v=2026.09.07.10">
+    <!-- Layer order: tokens, primitives, page arrangements, invoice document. -->
+    <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.09.13">
+
+
+
+
+<link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.09.13"><link rel="stylesheet" href="/shared_components/css/purchasing-workspaces.css?v=2026.09.09.13">
+<link rel="stylesheet" href="/shared_components/css/vendor-invoice.css?v=2026.09.09.13">
 </head>
-<body>
+<body data-ui="unified" data-invoice-viewer="unified" data-purchasing="payables" data-department="money"><a class="skip-link" href="#purchasing-main">Skip to SanMar Payables</a>
     <div class="dash-shell">
         <header class="dash-header">
             <div class="dash-header-left">
                 <a href="/staff-dashboard.html" title="Back to Staff Dashboard">
-                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
-                         alt="Northwest Custom Apparel" class="dash-header-logo">
+                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" alt="Northwest Custom Apparel" class="dash-header-logo">
                 </a>
-                <h1 class="dash-header-title">SanMar Payables</h1>
+                <h1 class="dash-header-title" id="purchasing-title">SanMar Payables</h1>
             </div>
             <div class="dash-header-right">
-                <button type="button" id="smp-refresh" class="dash-btn" title="Reload the active tab">
+                <button type="button" id="smp-refresh" class="dash-btn btn btn-secondary" title="Reload the active tab">
                     <i class="fas fa-rotate" aria-hidden="true"></i>
                     Refresh
                 </button>
-                <a href="/staff-dashboard.html" class="dash-back-link">
+                <a href="/staff-dashboard.html" class="dash-back-link btn btn-secondary">
                     <i class="fas fa-arrow-left" aria-hidden="true"></i>
                     Dashboard
                 </a>
             </div>
         </header>
 
-        <main class="dash-content">
+        <main class="dash-content" id="purchasing-main" tabindex="-1" aria-labelledby="purchasing-title">
             <div class="dash-error-banner" role="alert">
                 <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
                 <span class="dash-error-banner-message"></span>
-                <button type="button" class="dash-error-banner-close" aria-label="Dismiss">
+                <button type="button" class="dash-error-banner-close btn btn-secondary" aria-label="Dismiss">
                     <i class="fas fa-times" aria-hidden="true"></i>
                 </button>
             </div>
 
             <div class="smp-tabs" role="tablist" aria-label="Payables views">
-                <button type="button" class="smp-tab is-active" id="smp-tab-invoices" data-tab="invoices" role="tab" aria-selected="true" aria-controls="smp-panel-invoices"><i class="fas fa-file-invoice-dollar" aria-hidden="true"></i> Invoices</button>
-                <button type="button" class="smp-tab" id="smp-tab-marketing" data-tab="marketing" role="tab" aria-selected="false" tabindex="-1" aria-controls="smp-panel-marketing"><i class="fas fa-bullhorn" aria-hidden="true"></i> Marketing Fund</button>
+                <button type="button" class="smp-tab is-active btn btn-secondary" id="smp-tab-invoices" data-tab="invoices" role="tab" aria-selected="true" aria-controls="smp-panel-invoices"><i class="fas fa-file-invoice-dollar" aria-hidden="true"></i> Invoices</button>
+                <button type="button" class="smp-tab btn btn-secondary" id="smp-tab-marketing" data-tab="marketing" role="tab" aria-selected="false" tabindex="-1" aria-controls="smp-panel-marketing"><i class="fas fa-bullhorn" aria-hidden="true"></i> Marketing Fund</button>
             </div>
 
             <!-- ============ INVOICES TAB ============ -->
@@ -85,24 +84,25 @@
                     </div>
 
                     <div class="smp-swbar">
-                        <label class="dash-btn smp-upload-btn" for="smp-sw-file" role="button" tabindex="0"><i class="fas fa-upload" aria-hidden="true"></i> Upload ShopWorks payables</label>
-                        <input type="file" id="smp-sw-file" accept=".csv,text/csv" hidden>
-                        <button type="button" id="smp-sw-clear" class="smp-linkbtn" hidden>clear</button>
+                        <label class="smp-upload-btn" for="smp-sw-file"><i class="fas fa-upload" aria-hidden="true"></i> Upload ShopWorks payables</label>
+                        <input type="file" id="smp-sw-file" accept=".csv,text/csv" class="purchasing-file" aria-describedby="smp-sw-status">
+                        <button type="button" id="smp-sw-clear" class="smp-linkbtn btn btn-secondary" hidden="">clear</button>
                         <span class="smp-sw-status" id="smp-sw-status" role="status">Loading imported status…</span>
+                        <span class="smp-sw-status" id="purchasing-feed-status" role="status"></span>
                     </div>
 
                     <div class="smp-filters">
                         <div class="smp-field">
                             <label class="smp-field-label" for="smp-start">From date</label>
-                            <input type="date" id="smp-start" class="smp-input">
+                            <input type="date" id="smp-start" class="smp-input field-input">
                         </div>
                         <div class="smp-field">
                             <label class="smp-field-label" for="smp-end">To date</label>
-                            <input type="date" id="smp-end" class="smp-input">
+                            <input type="date" id="smp-end" class="smp-input field-input">
                         </div>
                         <div class="smp-field">
                             <label class="smp-field-label" for="smp-status-filter">Show</label>
-                            <select id="smp-status-filter" class="smp-input" disabled>
+                            <select id="smp-status-filter" class="smp-input field-select" disabled="">
                                 <option value="needimport">Not imported &amp; unpaid</option>
                                 <option value="topay">Imported, awaiting payment</option>
                                 <option value="open">All still owed</option>
@@ -111,21 +111,21 @@
                         </div>
                         <div class="smp-field">
                             <label class="smp-field-label" for="smp-search-po">PO #</label>
-                            <input type="search" id="smp-search-po" class="smp-input" placeholder="Filter by PO…" aria-label="Filter by PO number">
+                            <input type="search" id="smp-search-po" class="smp-input field-input" placeholder="Filter by PO…" aria-label="Filter by PO number">
                         </div>
                         <div class="smp-field">
                             <label class="smp-field-label" for="smp-search-inv">Invoice #</label>
-                            <input type="search" id="smp-search-inv" class="smp-input" placeholder="Filter by invoice…" aria-label="Filter by invoice number">
+                            <input type="search" id="smp-search-inv" class="smp-input field-input" placeholder="Filter by invoice…" aria-label="Filter by invoice number">
                         </div>
                     </div>
 
-                    <p class="smp-older-hint" id="smp-older-hint" role="status" hidden></p>
+                    <p class="smp-older-hint" id="smp-older-hint" role="status" hidden=""></p>
 
-                    <div class="smp-table-scroll">
-                        <table class="smp-table">
+                    <div class="smp-table-scroll table-wrap" tabindex="0" role="region" aria-label="SanMar payables">
+                        <table class="smp-table data-table">
                             <thead>
                                 <tr>
-                                    <th class="smp-check-cell"><input type="checkbox" id="smp-select-all" aria-label="Select all"></th>
+                                    <th class="smp-check-cell"><input type="checkbox" id="smp-select-all" aria-label="Select all" class="smp-check-all"></th>
                                     <th>Invoice Date</th>
                                     <th>Invoice #</th>
                                     <th>PO #</th>
@@ -146,11 +146,11 @@
                             <i class="fas fa-circle-info" aria-hidden="true"></i>
                             Workflow: select the not-imported rows → <strong>Download ShopWorks CSV</strong> → import into ShopWorks → <strong>Mark imported</strong> (stamps them so they drop off this list). Marketing-fund charges live on the <strong>Marketing Fund</strong> tab.
                         </p>
-                        <button type="button" id="smp-download" class="dash-btn dash-btn--primary smp-download">
+                        <button type="button" id="smp-download" class="dash-btn dash-btn--primary smp-download btn btn-primary">
                             <i class="fas fa-file-csv" aria-hidden="true"></i>
                             Download ShopWorks CSV (<span class="smp-download-count">0</span>)
                         </button>
-                        <button type="button" id="smp-markimported" class="dash-btn smp-markbtn">
+                        <button type="button" id="smp-markimported" class="dash-btn smp-markbtn btn btn-secondary">
                             <i class="fas fa-check" aria-hidden="true"></i>
                             Mark imported (<span class="smp-mark-count">0</span>)
                         </button>
@@ -159,7 +159,7 @@
             </section>
 
             <!-- ============ MARKETING FUND TAB ============ -->
-            <section id="smp-panel-marketing" class="smp-panel" role="tabpanel" aria-labelledby="smp-tab-marketing" hidden>
+            <section id="smp-panel-marketing" class="smp-panel" role="tabpanel" aria-labelledby="smp-tab-marketing" hidden="">
                 <div class="dash-stat-grid">
                     <div class="dash-stat-card dash-stat-card--accent">
                         <div class="dash-stat-value" id="smp-mkt-remaining">—</div>
@@ -188,7 +188,7 @@
                     <div class="smp-mkt-controls">
                         <div class="smp-field">
                             <label class="smp-field-label" for="smp-mkt-allowance">Annual allotment ($)</label>
-                            <input type="number" id="smp-mkt-allowance" class="smp-input" step="0.01" value="35110.95">
+                            <input type="number" id="smp-mkt-allowance" class="smp-input field-input" step="0.01" value="35110.95">
                         </div>
                         <p class="smp-note smp-mkt-projnote" id="smp-mkt-projnote" role="status"></p>
                     </div>
@@ -208,8 +208,8 @@
                         </div>
                         <div class="smp-mkt-list">
                             <h3 class="smp-subhead">Marketing charges (<span id="smp-mkt-item-count">0</span>)</h3>
-                            <div class="smp-table-scroll">
-                                <table class="smp-table">
+                            <div class="smp-table-scroll table-wrap" tabindex="0" role="region" aria-label="Marketing fund activity">
+                                <table class="smp-table data-table">
                                     <thead>
                                         <tr><th>Date</th><th>Invoice #</th><th>PO #</th><th>Amount</th><th>Invoice</th></tr>
                                     </thead>
@@ -226,7 +226,7 @@
                             <i class="fas fa-circle-info" aria-hidden="true"></i>
                             Marketing-fund charges import to ShopWorks vendor <strong>2425 — 6920-0001 Marketing (Sanmar)</strong>, separate from standard payables.
                         </p>
-                        <button type="button" id="smp-mkt-download" class="dash-btn dash-btn--primary">
+                        <button type="button" id="smp-mkt-download" class="dash-btn dash-btn--primary btn btn-primary">
                             <i class="fas fa-file-csv" aria-hidden="true"></i>
                             Download Marketing CSV (2425)
                         </button>
@@ -240,7 +240,8 @@
     <script src="/config/app.config.js"></script>
     <script src="/shared_components/js/fetch-timeout.js?v=2026.09.06.26"></script>
     <script src="/shared_components/js/dash-page-helpers.js?v=2026.09.07.25"></script>
-    <script src="/shared_components/js/sanmar-invoice-viewer.js?v=2026.09.05.63"></script>
-    <script src="/dashboards/js/sanmar-payables.js?v=2026.09.07.33"></script>
-</body>
-</html>
+    <script src="/shared_components/js/sanmar-invoice-viewer.js?v=2026.09.09.13"></script>
+    <script src="/dashboards/js/sanmar-payables.js?v=2026.09.09.13"></script>
+
+
+</body></html>
