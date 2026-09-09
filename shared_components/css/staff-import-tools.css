@@ -1,0 +1,77 @@
+/* Staff file-tool arrangements; shared controls and tables belong to components.css. */
+@layer components.pages {
+    :where([data-ui="unified"][data-import-tool]) { --ui-accent: var(--gray-700); --ui-accent-hover: var(--gray-800); --ui-tint: var(--gray-100); }
+    :where([data-ui="unified"][data-import-tool]) :is(.sf-subhead, .sw-subhead) { display: block; margin-top: var(--space-2); color: var(--ui-muted); font-size: var(--font-size-base); font-weight: 400; }
+    :where([data-ui="unified"][data-import-tool]) :is(.sf-lock, .sw-lock, .sf-chip, .sf-tag, .sw-stat--mode) { display: inline-block; padding: var(--space-2) var(--space-3); background: var(--ui-tint); color: var(--ui-muted); border-radius: var(--radius-sm); font-size: var(--font-size-sm); overflow-wrap: anywhere; }
+    :where([data-ui="unified"][data-import-tool]) .dash-card { margin-bottom: var(--space-5); }
+    :where([data-ui="unified"][data-import-tool]) .dash-card-header { flex-wrap: wrap; gap: var(--space-3); }
+    :where([data-ui="unified"][data-import-tool]) :is(p, li) { line-height: 1.6; }
+    :where([data-ui="unified"][data-import-tool]) li { margin-block: var(--space-3); }
+    :where([data-ui="unified"][data-import-tool]) :is(.sf-note, .sw-note, .sf-file-kind, .sf-file-meta, .sw-file-name, .sw-dim) { color: var(--ui-muted); font-size: var(--font-size-sm); }
+    :where([data-ui="unified"][data-import-tool]) :is(code, .sf-file-name, .sw-mono, .sf-chip b) { font-family: var(--font-mono); overflow-wrap: anywhere; }
+    :where([data-ui="unified"][data-import-tool]) :is(.sf-status, .sw-status) { margin-block: var(--space-3); color: var(--ui-muted); }
+    :where([data-ui="unified"][data-import-tool]) .sf-status:empty { display: none; }
+    :where([data-ui="unified"][data-import-tool]) .sf-status.is-error { color: var(--color-danger-ink); }
+    :where([data-ui="unified"][data-import-tool]) :is(.sf-msg, .sw-msg, .sf-callout, .sw-callout) { margin-block: var(--space-4); padding: var(--space-4); border-left: 3px solid var(--color-info-ink); border-radius: var(--radius-sm); background: var(--color-info-bg); color: var(--ui-ink); }
+    :where([data-ui="unified"][data-import-tool]) :is(.sf-msg--error, .sw-msg--error, .sf-callout--danger) { border-color: var(--color-danger-ink); background: var(--color-danger-bg); }
+    :where([data-ui="unified"][data-import-tool]) :is(.sf-msg--error, .sw-msg--error, .sf-callout--danger h3) { color: var(--color-danger-ink); }
+    :where([data-ui="unified"][data-import-tool]) .sf-callout--warn { border-color: var(--color-warning-ink); background: var(--color-warning-bg); }
+    :where([data-ui="unified"][data-import-tool]) .sf-callout--warn h3 { color: var(--color-warning-ink); }
+    :where([data-ui="unified"][data-import-tool]) :is(.sf-callout h3, .sw-callout h3) { margin: 0 0 var(--space-2); font-size: var(--font-size-lg); }
+    :where([data-ui="unified"][data-import-tool]) :is(.sf-callout p, .sw-callout p) { margin-bottom: 0; }
+    :where([data-ui="unified"][data-import-tool]) :is(.sf-table, .sw-table) { min-width: 720px; }
+    :where([data-ui="unified"][data-import-tool]) :is(.sf-file-meta, .sw-num, .sw-stat b) { font-variant-numeric: tabular-nums; }
+    :where([data-ui="unified"][data-import-tool]) .data-table .sw-num { text-align: right; white-space: nowrap; }
+    :where([data-ui="unified"][data-import-tool]) .sf-row--master { background: var(--ui-tint); }
+    :where([data-ui="unified"][data-import-tool]) .sf-tag { margin-left: var(--space-2); }
+    :where([data-ui="unified"][data-import-tool]) :is(.sf-flow, .sf-chips, .sw-drop, .sw-stats) { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); margin-block: var(--space-4); }
+    :where([data-ui="unified"][data-import-tool]) .sf-flow { align-items: stretch; }
+    :where([data-ui="unified"][data-import-tool]) .sf-node { display: flex; flex: 1 1 145px; flex-direction: column; justify-content: center; align-items: center; gap: var(--space-2); padding: var(--space-4); border: 1px solid var(--ui-line); border-radius: var(--radius-sm); background: var(--ui-tint); text-align: center; }
+    :where([data-ui="unified"][data-import-tool]) .sf-node--accent { border-color: var(--ui-accent); }
+    :where([data-ui="unified"][data-import-tool]) .sf-node br { display: none; }
+    :where([data-ui="unified"][data-import-tool]) .sf-arrow { display: flex; flex: 0 1 90px; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-2); text-align: center; }
+    :where([data-ui="unified"][data-import-tool]) :is(.sf-node small, .sf-arrow small) { color: var(--ui-muted); overflow-wrap: anywhere; font-size: var(--font-size-sm); }
+    :where([data-ui="unified"][data-import-tool]) .sw-drop { padding: var(--space-4); background: var(--ui-tint); border: 1px dashed var(--ui-line); border-radius: var(--radius-card); }
+    :where([data-ui="unified"][data-import-tool]) .sw-file-input { flex: 1 1 300px; max-width: 100%; min-width: 0; }
+    :where([data-ui="unified"][data-import-tool]) .sw-file-input::file-selector-button { margin-right: var(--space-3); padding: var(--space-3); color: var(--ui-surface); background: var(--ui-accent); border: 0; border-radius: var(--radius-sm); font: inherit; cursor: pointer; }
+    :where([data-ui="unified"][data-import-tool]) .sw-file-name { flex: 1 1 220px; min-width: 0; overflow-wrap: anywhere; }
+    :where([data-ui="unified"][data-import-tool]) .sw-stat b { font-size: var(--font-size-lg); }
+    :where([data-ui="unified"][data-import-tool]) .import-file-label { flex-basis: 100%; font-weight: 600; }
+
+    @media screen and (width <= 700px) {
+        :where([data-ui="unified"][data-import-tool]) .sf-flow { flex-direction: column; }
+        :where([data-ui="unified"][data-import-tool]) :is(.sf-node, .sf-arrow) { flex-basis: auto; }
+        :where([data-ui="unified"][data-import-tool]) .sf-arrow i { transform: rotate(90deg); }
+        :where([data-ui="unified"][data-import-tool]) .sw-drop { padding: var(--space-3); }
+    }
+
+    @media print {
+        @page { size: letter portrait; margin: 0.4in; }
+        :where([data-ui="unified"][data-import-tool]) { font-size: 12px; background: var(--ui-surface); }
+        :where([data-ui="unified"][data-import-tool]) :focus { outline: none; }
+        :where([data-ui="unified"][data-import-tool]) .dash-shell { display: block; min-height: 0; padding: 0; }
+        :where([data-ui="unified"][data-import-tool]) .dash-header { display: block; margin-bottom: var(--space-3); padding: 0 0 var(--space-3); }
+        :where([data-ui="unified"][data-import-tool]) :is(.dash-header-right, .dash-header-logo, .sf-btn, .sw-btn, .sw-file-input) { display: none; }
+        :where([data-ui="unified"][data-import-tool]) .dash-card { padding: var(--space-2); margin-bottom: var(--space-2); box-shadow: none; break-inside: auto; }
+        :where([data-ui="unified"][data-import-tool]) .dash-card-header { margin-bottom: var(--space-1); }
+        :where([data-ui="unified"][data-import-tool]) .dash-header-title { font-size: 20px; }
+        :where([data-ui="unified"][data-import-tool]) :is(h2, h3) { font-size: 14px; }
+        :where([data-ui="unified"][data-import-tool]) :is(.sf-subhead, .sw-subhead) { font-size: inherit; }
+        :where([data-ui="unified"][data-import-tool]) :is(p, li) { line-height: 1.4; }
+        :where([data-ui="unified"][data-import-tool]) :is(p, ol, ul) { margin-block: var(--space-1); }
+        :where([data-ui="unified"][data-import-tool]) :is(.sf-note, .sw-note, .sf-file-kind, .sf-file-meta, .sw-file-name, .sw-dim, .sf-node small, .sf-arrow small, .sf-chip, .sf-tag, .sw-stat--mode) { font-size: inherit; }
+        :where([data-ui="unified"][data-import-tool]) :is(.sf-msg, .sw-msg, .sf-callout, .sw-callout) { padding: var(--space-3); margin-block: var(--space-3); }
+        :where([data-ui="unified"][data-import-tool]) :is(h2, h3, .dash-card-header) { break-after: avoid; }
+        :where([data-ui="unified"][data-import-tool]) :is(tr, .sf-node) { break-inside: avoid; }
+        :where([data-ui="unified"][data-import-tool]) li { margin-block: var(--space-1); }
+        :where([data-ui="unified"][data-import-tool]) .table-wrap { overflow: visible; }
+        :where([data-ui="unified"][data-import-tool]) :is(.sf-table, .sw-table) { min-width: 0; font-size: inherit; }
+        :where([data-ui="unified"][data-import-tool]) .data-table :is(th, td) { padding: var(--space-2); overflow-wrap: anywhere; font-size: inherit; }
+        :where([data-ui="unified"][data-import-tool]) .sf-table :is(th, td):last-child { display: none; }
+        :where([data-ui="unified"][data-import-tool]) .sf-file-meta { white-space: nowrap; }
+        :where([data-ui="unified"][data-import-tool]) :is(.sf-flow, .sf-chips, .sw-drop, .sw-stats) { gap: var(--space-2); margin-block: var(--space-3); }
+        :where([data-ui="unified"][data-import-tool]) .sf-node { flex-basis: 100px; padding: var(--space-2); }
+        :where([data-ui="unified"][data-import-tool]) .sf-arrow { flex-basis: 70px; }
+        :where([data-ui="unified"][data-import-tool]) .sf-arrow small { overflow-wrap: normal; }
+    }
+}

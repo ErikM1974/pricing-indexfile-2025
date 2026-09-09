@@ -1,0 +1,18 @@
+{
+  "files": [
+    {
+      "dir": "/SanMarPDD/SanMarPI/",
+      "name": "SanMarPI-Bulk-example.csv",
+      "size": 346030080,
+      "modifiedAt": "2026-09-09T15:00:00Z"
+    },
+    {
+      "dir": "/SanMarPDD/",
+      "name": "Category_Example.txt",
+      "size": 2048,
+      "modifiedAt": "2026-09-08T15:00:00Z"
+    }
+  ],
+  "masterKey": "/SanMarPDD/SanMarPI/SanMarPI-Bulk-example.csv",
+  "checkedAt": "2026-09-09T17:00:00Z"
+}

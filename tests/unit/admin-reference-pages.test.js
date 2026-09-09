@@ -26,7 +26,7 @@ describe('admin + reference pages — shared hygiene', () => {
         if (html.includes('data-ui="unified"')) {
             expect(html).toMatch(/href="\/shared_components\/css\/components\.css\?v=/);
             expect(read('shared_components/css/components.css')).toMatch(/\[hidden\]\s*\{[^}]*display:\s*none;/);
-            const owner = ['access-admin', 'drive-access'].includes(name) ? 'shared_components/css/staff-admin-tools.css' : `dashboards/css/${name}.css`;
+            const owner = ['access-admin', 'drive-access'].includes(name) ? 'shared_components/css/staff-admin-tools.css' : ['api-usage', 'table-usage-audit', 'bandit-integration'].includes(name) ? 'shared_components/css/staff-monitoring.css' : ['sanmar-ftp-integration', 'sanmar-shopworks-converter'].includes(name) ? 'shared_components/css/staff-import-tools.css' : `dashboards/css/${name}.css`;
             expect(read(owner)).not.toMatch(/!important/);
         } else if (exists(`dashboards/css/${name}.css`)) {
             expect(read(`dashboards/css/${name}.css`)).toMatch(/^\[hidden\] \{ display: none !important; \}/m);
@@ -40,16 +40,16 @@ describe('admin + reference pages — shared hygiene', () => {
 describe('admin + reference pages — specifics', () => {
     test('api-usage meters and bars via custom properties', () => {
         const js = read('dashboards/js/api-usage.js');
-        const css = read('dashboards/css/api-usage.css');
+        const css = read('shared_components/css/staff-monitoring.css');
         expect(js).not.toMatch(/\.style\.width/);
         expect(js).not.toMatch(/style="(?!--)/);
         expect(js).toMatch(/fill\.style\.setProperty\('--w'/);
-        expect(css).toMatch(/\.au-meter-fill \{ width: var\(--w, 0%\); \}/);
-        expect(css).toMatch(/\.au-bar \{ height: var\(--h, 2%\); \}/);
+        expect(css).toMatch(/\.au-meter-fill \{[^}]*width: var\(--w, 0%\);/);
+        expect(css).toMatch(/\.au-bar \{[^}]*height: var\(--h, 2%\);/);
     });
     test('table-usage-audit placeholder class', () => {
         expect(read('dashboards/js/table-usage-audit.js')).not.toMatch(/style="/);
-        expect(read('dashboards/css/table-usage-audit.css')).toMatch(/\.tua-none \{ color: var\(--gray-400\); \}/);
+        expect(read('shared_components/css/staff-monitoring.css')).toMatch(/\.tua-none\) \{ color: var\(--ui-muted\); \}/);
     });
     test('converter uses hidden, not display toggles', () => {
         const html = read('dashboards/sanmar-shopworks-converter.html').replace(/<!--[\s\S]*?-->/g, '');

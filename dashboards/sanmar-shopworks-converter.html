@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
+<html lang="en"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
@@ -8,33 +7,28 @@
     <link rel="icon" href="/favicon.png" type="image/png">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/shared_components/css/art-hub.css?v=2026.09.07.19">
-    <link rel="stylesheet" href="/shared_components/css/dash-shell.css?v=2026.09.07.10">
-    <link rel="stylesheet" href="/dashboards/css/sanmar-shopworks-converter.css?v=2026.09.07.19">
     <script src="/config/app.config.js"></script>
-</head>
-<body>
+<link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.09.12"><link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.09.12"><link rel="stylesheet" href="/shared_components/css/staff-import-tools.css?v=2026.09.09.12"></head>
+<body data-ui="unified" data-import-tool="sanmar-shopworks-converter" data-department="neutral"><a class="skip-link" href="#import-main">Skip to SanMar → ShopWorks Parts</a>
     <div class="dash-shell">
         <header class="dash-header">
             <div class="dash-header-left">
                 <a href="/staff-dashboard.html" title="Back to Staff Dashboard">
-                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
-                         alt="Northwest Custom Apparel" class="dash-header-logo">
+                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" alt="Northwest Custom Apparel" class="dash-header-logo">
                 </a>
-                <h1 class="dash-header-title">SanMar → ShopWorks Parts <span class="sw-subhead">convert a SanMar price list into a ShopWorks parts import</span></h1>
+                <h1 class="dash-header-title" id="import-title">SanMar → ShopWorks Parts <span class="sw-subhead">convert a SanMar price list into a ShopWorks parts import</span></h1>
             </div>
             <div class="dash-header-right">
                 <span class="sw-lock" title="Admin only"><i class="fas fa-user-shield" aria-hidden="true"></i> Admin</span>
-                <a href="/staff-dashboard.html" class="dash-back-link"><i class="fas fa-arrow-left" aria-hidden="true"></i> Dashboard</a>
+                <a href="/staff-dashboard.html" class="dash-back-link btn btn-secondary"><i class="fas fa-arrow-left" aria-hidden="true"></i> Dashboard</a>
             </div>
         </header>
 
-        <main class="dash-content">
+        <main class="dash-content" id="import-main" tabindex="-1" aria-labelledby="import-title">
 
             <!-- ── Convert ──────────────────────────────────────────────── -->
             <section class="dash-card">
@@ -42,25 +36,25 @@
                 <p class="sw-lead">Pick a SanMar price list and click <b>Convert</b>. It runs entirely in your browser (nothing is uploaded), then you download a CSV ready to import into <b>ShopWorks → Parts</b>. It auto-detects the file: a ShopWorks <b>Integration Only Price List</b> (already formatted) gets the sizes added to its descriptions and <code>_2XL</code>→<code>_2X</code> fixed; a <b>raw SanMar feed</b> is fully converted (colors collapsed, part numbers, prices, size flags, sizes in descriptions).</p>
 
                 <div class="sw-drop">
-                    <input type="file" id="sw-file" class="sw-file-input" accept=".csv,.tsv,.txt,.xlsx,.xls">
-                    <label for="sw-file" class="sw-btn sw-btn--ghost"><i class="fas fa-folder-open" aria-hidden="true"></i> Choose file</label>
+                    <label for="sw-file" class="import-file-label"><i class="fas fa-folder-open" aria-hidden="true"></i> Choose file</label><input type="file" id="sw-file" class="sw-file-input" accept=".csv,.tsv,.txt,.xlsx,.xls" aria-describedby="sw-file-name">
+
                     <span id="sw-file-name" class="sw-file-name">No file selected</span>
-                    <button type="button" id="sw-convert" class="sw-btn" disabled><i class="fas fa-wand-magic-sparkles" aria-hidden="true"></i> Convert</button>
-                    <button type="button" id="sw-reset" class="sw-btn sw-btn--ghost"><i class="fas fa-rotate-left" aria-hidden="true"></i> Reset</button>
+                    <button type="button" id="sw-convert" class="sw-btn btn btn-primary" disabled=""><i class="fas fa-wand-magic-sparkles" aria-hidden="true"></i> Convert</button>
+                    <button type="button" id="sw-reset" class="sw-btn sw-btn--ghost btn btn-secondary"><i class="fas fa-rotate-left" aria-hidden="true"></i> Reset</button>
                 </div>
 
-                <div id="sw-status" class="sw-status" role="status" aria-live="polite" hidden></div>
-                <div id="sw-error" class="sw-msg sw-msg--error" role="alert" hidden></div>
+                <div id="sw-status" class="sw-status" role="status" aria-live="polite" hidden=""></div>
+                <div id="sw-error" class="sw-msg sw-msg--error" role="alert" hidden=""></div>
 
-                <div id="sw-results" hidden>
+                <div id="sw-results" hidden="">
                     <div class="sw-stats">
                         <span class="sw-stat"><b id="sw-stat-in">0</b> rows in</span>
                         <span class="sw-stat"><b id="sw-stat-out">0</b> parts out</span>
                         <span class="sw-stat sw-stat--mode" id="sw-stat-fmt"></span>
-                        <button type="button" id="sw-download" class="sw-btn sw-btn--go"><i class="fas fa-download" aria-hidden="true"></i> Download CSV</button>
+                        <button type="button" id="sw-download" class="sw-btn sw-btn--go btn btn-primary"><i class="fas fa-download" aria-hidden="true"></i> Download CSV</button>
                     </div>
-                    <div class="sw-table-wrap">
-                        <table class="sw-table">
+                    <div class="sw-table-wrap table-wrap" tabindex="0" role="region" aria-label="Converted ShopWorks parts preview">
+                        <table class="sw-table data-table">
                             <thead><tr><th>ID_Product</th><th>Description</th><th>Piece</th><th>Case</th><th title="sts_LimitSize01–06 (1 = blocked)">Sizes</th></tr></thead>
                             <tbody id="sw-preview-body"></tbody>
                         </table>
@@ -79,7 +73,7 @@
                     <li><b>Prices &amp; brand carried through.</b> Piece / Dozen / Case pricing and brand come straight from the feed.</li>
                 </ul>
                 <div class="sw-callout sw-callout--info">
-                    <h4><i class="fas fa-circle-info" aria-hidden="true"></i> Two ways to get a price list</h4>
+                    <h3><i class="fas fa-circle-info" aria-hidden="true"></i> Two ways to get a price list</h3>
                     <p>Use ShopWorks's monthly <b>"Sanmar Integration Only Price List"</b>, or pull the raw SanMar feed yourself from the <a href="/dashboards/sanmar-ftp-integration.html">SanMar Downloads</a> page / FileZilla. Either one works here.</p>
                 </div>
             </section>
@@ -101,6 +95,7 @@
     <script src="/dashboards/js/vendor/xlsx.full.min.js?v=2026.09.05.72"></script>
     <script src="/shared_components/js/sku-validation-service.js?v=2026.09.06.37"></script>
     <script src="/dashboards/js/sanmar-shopworks-parts.js?v=2026.09.05.72"></script>
-    <script src="/dashboards/js/sanmar-shopworks-converter.js?v=2026.09.05.73"></script>
-</body>
-</html>
+    <script src="/dashboards/js/sanmar-shopworks-converter.js?v=2026.09.09.12"></script>
+
+
+</body></html>

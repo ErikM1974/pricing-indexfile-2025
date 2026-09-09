@@ -2,23 +2,23 @@
 
 ## Active checkpoint — 2026-09-09
 
-Standing edit/deploy authorization continues. **Frontend v2026.09.09.10 / Heroku2086 / b5561cdb3b0200fe54eae4b0a29a35b701197470 is LIVE.** Actual successful release and running slug verified 2026-09-09T17:04:59.7112482Z. Four raw CSS assets and two applicable built assets match approved bytes; nine original controller sources, eight retired CSS404s, nine changed page-access boundaries and public/staff regressions checked. The build hashes only the pages listed in lib/hashed-pages.js; request-a-quote and hosted-workspace CSS intentionally remain raw, versioned paths. Exact-source CI **34379198691** passed all four jobs on **8fffd4a65741675e823d0ba9eacaa9ab29deab70**, including actual money/calculator parity and full mocked CSS browser checks. No real business writes or notifications.
+Standing edit/deploy authorization continues. **Frontend v2026.09.09.11 / Heroku2087 / 84bd143a3e662879c9ad0e85ca3fe2be65843310 is LIVE.** Actual successful release and running slug verified 2026-09-09T18:34:59.6952163Z. Two raw CSS assets, three changed presentation controllers and their applicable built assets match approved bytes; three retired sheets404, four changed page-access boundaries and three staff API denials preserved, plus public regressions. Exact-source CI **34388214812** passed all four jobs on **5215f8214f28c15805a552d12628ab09e51ce0cf**, including actual money/calculator and all471mocked browser checks. No real business writes or notifications.
 
-**126 of225 application pages reviewed and live;99pending.** Another79 tracked HTML sources excluded (12archive,14email,50fixtures/templates,3retired). All26training pages complete. Generated documents and external provider UI are separate unfinished tracks. A reviewed wrapper does not certify its hosted app. Backend unchanged: v2026.09.08.1 / Heroku1130 / d06aee3e4d25c5e1410241ea8007cdc8339aa3fa.
+**129 of225 application pages reviewed and live;96pending.** Another79 tracked HTML sources excluded (12archive,14email,50fixtures/templates,3retired). All26training pages complete. Generated documents and external provider UI remain separate unfinished tracks. A reviewed wrapper does not certify its hosted app. Backend unchanged: v2026.09.08.1 / Heroku1130 / d06aee3e4d25c5e1410241ea8007cdc8339aa3fa.
 
 ### Current work
 
-- **Nine-page release complete:** public request-a-quote; digitizing/monogram/purchasing forms; SanMar vendor/invoices/credits; announcement create/manage. They share canonical tokens/components and intake/hosted arrangements; eight obsolete sheets retired. Ruth purple, floor blue, Bradley slate and neutral administrative ownership follow DESIGN_COLOUR_CODE. Original request/upload/lookups and hosted app IDs/controllers retained.
-- Four widths/zero axe, keyboard/skip/scroll, unavailable provider fallback, native validation and retained upload/save retry reviewed. Nine reference PDFs retain332 text nodes. Vendor fixtures are synthetic; hosted interiors remain external.
-- Full-suite findings resolved: absolute anchoring for the public style menu; persistent banner mocks; readable age warning ink with fixed fresh/warning/critical ages; explicitly paused polling clocks.24 repeated age/poll and9menu/warning cases passed. Earlier .8/.9 plans consolidated into this release.
-- **Next isolated batch: staff access and portal tools** on codex/staff-admin-tools at C:\Users\erik\.codex\visualizations\2026\09\07\01a07d90-9a4c-7e70-9e4e-c196377b7c6b\training-final-worktree, reviewed source9c3dc496736fbe145ab7d9809b5853b9d492f69c. Access-admin,drive-access and portal-directory now have shared layouts:15 focused browser cases,226 source/inventory unit checks,290 CSS files clean and three reference PDFs/four pages/65 checked nodes. Permission requests/confirmation, drive rights and staff-preview/customer-link destinations retained with all writes mocked. Print mirrors preserve long current values without changing inputs. These three pages are reviewed locally only (129reviewed/96pending locally); full integration checks/exact-source CI/rollout remain. See staff-admin-reviewed-source.json and owned-files.json; plan7175561894632ee46e0ff0e97f3d76620ffe8e88 captured originals.
-- Continue remaining admin/staff workspaces, storefront, calculators, builders and generated documents. Whole-application cleanup is not complete.
+**Candidate v2026.09.09.12:** five reviewed monitoring and file tools are integrated on primary develop: API Usage,Table Usage Audit,Bandit Integration,SanMar Downloads and SanMar→ShopWorks Parts. Two shared arrangement sheets replace five legacy sheets.134of225 reviewed locally/91pending; current production .11 has129reviewed/96pending. Full combined unit/DOM/a11y/parity/CSS/browser/boot/audit gates, exact-source CI and actual rollout are required before counting them live.
+
+Monitoring17focused browser/223source-inventory checks and three PDFs/nine pages/213nodes; import17focused browser/235source-inventory checks and two one-page PDFs/70nodes. Fixtures retain original content,163-table evidence, complete current notes and conversion prices/SKUs. Loading, malformed/partial/denied storage/dependency failures and successful recovery are covered without business writes, imports or emails. The old failed print/download harness attempts remain evidence; the reviewed final layouts and actual downloads passed.
+
+Isolated worktree atC:\Users\erik\.codex\visualizations\2026\09\07\01a07d90-9a4c-7e70-9e4e-c196377b7c6b\training-final-worktree is now codex/purchasing-workspaces, plan648939fb3ec586111c9467931b4818e510843a85. Only its originals and read-only fixture screenshots have been captured; it adds no review credit and is excluded from .12. Saved codex/staff-import-tools atd524d2e51de086c1af8461392bd0fae6a0fc91c7 and codex/staff-monitoring-tools at71f8d6c466cc523a798d33f5572ba3a61114a5dc are the reviewed integration sources. Backend unchanged. Whole-application CSS work remains unfinished.
 
 ### Verification and resume evidence
 
-This release: 221 unit suites/5232passed/four existing skips;88DOM,4accessibility unit,84quote parity;456mocked browser and16remaining browser/three optional screenshot skips, all five live calculator surfaces. Build/lint/types,293CSS lint clean,boot200,production audit zero.485route registrations/24modules unchanged.
+Final deterministic source0b9d08a23687f70c2445dc77fdde71e4185fc8aa: 222unit suites/5241passed/four existing skips;88DOM,4accessibility unit,84quote parity,16remaining browser/three optional screenshot skips and all five calculators. Local471mocked browser passed ond4a0b187ade98f936df5e619b90d6d6767e7cbad; isolated DTG CSS/test refinements did not affect their loaded pages/assets. Exact-source CI repeated all471 successfully. Build/lint/types,291CSS files clean,boot200,production audit zero;485routes/24modules unchanged.
 
-Artifacts: C:\Users\erik\.codex\visualizations\2026\09\07\01a07d90-9a4c-7e70-9e4e-c196377b7c6b. Authoritative forms-workspaces-{integration-record,source-record,source-ci,release-record,local-gates,heroku-verification,live-verification}.json plus pricing-forms-workspaces logs. Final hosted-focused/paper evidence and intake source/paper records. Earlier customer-intake/vendor-only release helpers are superseded and must not run. The next worktree node_modules is a junction to primary; never recursively delete through it. No .env copied. Do not rerun one-shot installers/register/commit/release helpers. After uncertain Heroku transport inspect the actual running slug before any retry.
+Artifacts: C:\Users\erik\.codex\visualizations\2026\09\07\01a07d90-9a4c-7e70-9e4e-c196377b7c6b. Authoritative staff-admin-{integration-record,source-record,source-ci,release-record,local-gates,heroku-verification,live-verification}.json plus pricing-staff-admin logs. Monitoring reviewed-source/owned-files/baseline/controller changes/focused/paper records. Monitoring commit helper stopped on trailing HTML whitespace after writing notes; finalization fixed only whitespace and completed the commit. Do not rerun either helper. The next worktree node_modules is a junction to primary: never recursively delete through it. No.env copied. After uncertain Heroku transport inspect the actual running slug before any retry.
 
 ## Coordinated transfer authentication LIVE — 2026-09-08
 
@@ -251,3 +251,69 @@ Exact-source run34385622118 on481232711e07332613f8a0fd7e5123096426878b passed th
 ### Payment-status test clock recovery before .11 — 2026-09-09
 
 Run34386325023 on0e7acabec720031597b669daff55b513f54ac77f passed all three deterministic jobs, browser installation and rendered axe;470 mocked cases passed, one existing custom-tees delayed-webhook case failed twice. Its test advanced a paused clock when a request arrived, before the asynchronous response registered the next timer. The test now observes the actual unchanged poll timer registration before advancing exactly3000ms, deliberately delays the11th synthetic response and verifies polling stops at25 reads. All three success pages and transient recovery passed18 repeated local cases. No fulfillment, payment, email or production controller changes. This test-only follow-up requires a new complete exact-source CI run; money/calculator steps on the failed prior run were skipped, not passed.
+
+## Next isolated batch — staff monitoring and audit tools, 2026-09-09
+
+Branch codex/staff-monitoring-tools starts at d4a0b187ade98f936df5e619b90d6d6767e7cbad. Primary .11 (staff access/drive/portal) full checks continue separately. Scope: dashboards/api-usage.html,table-usage-audit.html,bandit-integration.html. Original prose/IDs/links/media/style graphs/controllers captured in staff-monitoring-original-baseline.json.
+
+- [ ] Shared neutral staff shell and canonical controls/tables; preserve department ownership.
+- [ ] Retain API attribution versus billing caveats, exact counts/rates/source reliability and history warnings. No invented fresh data.
+- [ ] Preserve all163 original audit records, local decisions/notes/review storage, sort/filter/export and mocked live snapshot refresh; never archive or delete real tables.
+- [ ] Preserve all Bandit task/command/endpoint references; keyboard scrolling and complete print with long tables/code.
+- [ ] Review four widths/axe/keyboard, denied/failed/malformed/retry/storage/export cases with all business traffic mocked; source/ownership/full release checks and actual live verification.
+
+Still126pages live/99pending after verified .10;129reviewed locally/96pending with .11. These three monitoring pages are only planned, not reviewed. Candidate .12. Keep source controllers exact except explicit presentation and demonstrated error-state fixes, which require their own tests.
+
+### Staff monitoring layout implementation started
+
+Staff monitoring migration in progress: new shared_components/css/staff-monitoring.css owns layouts for dashboards/api-usage.html,table-usage-audit.html,bandit-integration.html. Their three dashboards/css sheets retired. Shared tokens/components replace art-hub/dash-shell dependencies. Original data/controllers retained pending specific review refinements; no live completion claimed.
+
+Native table sorting, storage/failure states, print values and focused review remain.
+
+### Staff monitoring validation and keyboard refinements
+
+Current isolated source keeps163 snapshot rows and original operations, adds native sorting/pressed-state/print hooks, rejects malformed usage and incomplete live-schema responses before altering evidence, and surfaces local review storage failures. Shared styles now retain labels/caveats at narrow widths. Browser and source review still pending; no new live count. Initial migration helper failed on one exact marker after an owned partial edit; restored only that owned controller from its captured baseline, made the helper transactional, then successfully applied all20 recorded changes.
+
+## Staff monitoring local review complete — 2026-09-09
+
+Staff monitoring: API Usage,Table Usage Audit and Bandit Integration share tokens/components/Public Sans and shared_components/css/staff-monitoring.css. Their three local sheets are retired. Native keyboard sorting/filtering, named scrolling tables and current-value print mirrors preserve the original163-table evidence and full reference prose. Usage failures stay unknown; malformed/incomplete live schema cannot label tables gone. Local storage failures stay visible with export available, and successful recovery clears the related error.17 mocked browser cases cover all four widths/zero axe, numeric/source states, retry, saved notes and CSV export. Three reference PDFs/nine pages retain213 checked text/value nodes, all visually inspected. Print uses normal block flow so a flex fragment cannot produce a blank trailing sheet; focus outlines remain screen-only. All real business writes and notifications blocked. Measured LF raw CSS per page is70,169bytes, down from162,994–164,472bytes (about57%); these are source bytes, not compressed network transfer.
+
+132 pages reviewed locally/93pending, including the separate staff-admin candidate. Production remains126/99 until verified releases. Candidate .12 requires broader guards, full integration checks, exact-source CI and rollout after .11. Original controllers reverse only the23 recorded presentation/validation/recovery edits; financial calculations and snapshot data retained.
+
+## Next paired staff import tools — 2026-09-09
+
+Branch codex/staff-import-tools starts at71f8d6c466cc523a798d33f5572ba3a61114a5dc (the reviewed monitoring batch). Scope: SanMar Downloads and the browser-only SanMar→ShopWorks converter. Purchasing Portal was inspected but is deferred to its purchasing/invoice-viewer family. Candidate .12 may combine these two tools with the three monitoring pages after review; no additional pages count yet. Primary .11 exact-source CI34385622118 is running on481232711e07332613f8a0fd7e5123096426878b.
+
+- [ ] Preserve all original prose/links/scripts and pure conversion/SKU sources, including prices, size flags and part-number rules.
+- [ ] Shared canonical neutral admin controls and scoped tool arrangements, phone layouts, skip/named keyboard table regions and native file input.
+- [ ] Download listing must distinguish unavailable/configuration/session/malformed/empty states; mock all requests and downloads, never import files into live systems.
+- [ ] Exercise synthetic CSV/TSV/Excel file selection, conversion/reset/download and unavailable dependencies; preserve source transform tests and compare output bytes.
+- [ ] Four widths/axe/keyboard and complete reference/preview paper. Register reviewed styles and retire only the two superseded owners, then integrate/full checks/CI/release.
+
+Monitoring is reviewed locally (132of225/93pending); current live count remains126/99 until .11 verification. Saved originals: staff-import-original-baseline.json.
+
+### Staff import arrangement implementation
+
+Staff import tools in progress: dashboards/sanmar-ftp-integration.html and dashboards/sanmar-shopworks-converter.html use shared_components/css/staff-import-tools.css with tokens/components. Their two dashboards/css/*.css owners are retired after their final consumers moved. Pure conversion/SKU helpers and converter controller retained; FTP changes are explicitly recorded presentation/loading/response-validation hooks. Browser/source review pending; no new reviewed/live count.
+
+Original synthetic desktop/phone screenshots captured before migration. The initial multi-file CSS patch rejected a mismatched documentation heading atomically; no partial file was created. Current shared stylesheet and page/controller migration still require verification. .11 revised-source CI34386325023 on0e7acabec720031597b669daff55b513f54ac77f has passed setup/axe and is running full mocked browser checks after the Google apt-index recovery.
+
+### Staff import review findings
+
+Initial browser review passed13 cases and found the missing transform library left conversion stuck; converter now checks required format dependencies and shows a visible error with the chosen file retained. Pure conversion/pricing rules unchanged. Native attachment tests now use a local HTTP server serving only synthetic CSV; intercepted browser download responses were canceled by Chrome. Two additional missing-parser cases added. Source/paper/full focused checks pending. A second combined patch rejected an unverified documentation heading atomically; corrected by reading the exact heading before editing. No partial test file existed.
+
+## Staff import local review complete — 2026-09-09
+
+Staff file tools: SanMar Downloads and SanMar → ShopWorks Parts share tokens/components/Public Sans and shared_components/css/staff-import-tools.css; two local sheets retired. Canonical buttons/data tables, native named file input, skip links and focused scrolling regions retain all original prose/IDs/dependencies and source-locked financial/SKU transforms. Malformed FTP listings and missing converter libraries report visible failures with retry/file retention.17 mocked browser cases cover four widths/zero axe, exact synthetic FTP download query/bytes, CSV/TSV/XLSX conversion, errors and recovery. Two one-page portrait PDFs retain70 checked content/data blocks, visually reviewed; print hides only action controls and their empty download column. All real business writes/imports/uploads/emails blocked. A tiny temporary loopback server serves only synthetic CSV because browser-managed attachments bypass page routing; request assertions observe that server and compare actual downloaded bytes.
+
+134 of225 application pages reviewed locally/91pending, including staff admin3 and monitoring3; production still126/99 until .11 rollout. Source guard45passed; broader inventory/gates follow. The .12 candidate can combine monitoring3 and import2 after .11. Shared financial transform and SKU validation remain byte-locked; nine controller edit mappings are precise reversible presentation/loading/validation/error changes.
+
+Staff import final local guards:235passed across six source/inventory suites,287CSS files clean. Shared CSS graph64,626LF bytes per page versus163,985/162,764before (about60% smaller). Final print-only compacting retained all70 reading/data blocks on two complete one-page PDFs; keyboard/four-width/axe review reran after the print refinement. No financial transform change.
+
+## Staff operations integration — 2026-09-09
+
+Merged the two reviewed branches after verified .11 rollout (Heroku2087). Conflict resolution preserved the live checkpoint and both branches’ appended evidence/lessons. Archived the resolved junction-recovery narrative while retaining its active prevention rule. Five-page candidate .12 now enters full checks; .13 purchasing plan remains isolated.
+
+## Five staff operations pages ready for CI — v2026.09.09.12
+
+Tested source 82b954c487c7c1ea84454768cc85ea493102d295: build, lint, types, 485 routes/24 modules, 224 unit suites/5258 passed/four existing skips; 88 DOM, four accessibility unit, 84 quote parity, 505 mocked browser and 16 remaining browser/three optional screenshot skips. All five calculator surfaces passed. 288 CSS files clean, HTTP boot200 and production audit zero. The monitoring and import pages passed 34 focused browser cases and five print documents/11 pages/283 checked content blocks. Original static references, schema snapshot and monetary/SKU transforms are guarded; five obsolete CSS owners retired. Both shared owners and all changed controllers use 2026.09.09.12. Live remains129 reviewed/96pending until exact-source CI and actual rollout verify134/91. Purchasing work remains isolated and is not in this release.

@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
+<html lang="en"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
@@ -8,32 +7,27 @@
     <link rel="icon" href="/favicon.png" type="image/png">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/shared_components/css/art-hub.css?v=2026.09.07.19">
-    <link rel="stylesheet" href="/shared_components/css/dash-shell.css?v=2026.09.07.10">
-    <link rel="stylesheet" href="/dashboards/css/table-usage-audit.css?v=2026.09.07.10">
-</head>
-<body>
+<link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.09.12"><link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.09.12"><link rel="stylesheet" href="/shared_components/css/staff-monitoring.css?v=2026.09.09.12"></head>
+<body data-ui="unified" data-monitoring="table-usage-audit" data-department="neutral"><a class="skip-link" href="#monitor-main">Skip to Caspio Table Audit</a>
     <div class="dash-shell">
         <header class="dash-header">
             <div class="dash-header-left">
                 <a href="/staff-dashboard.html" title="Back to Staff Dashboard">
-                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
-                         alt="Northwest Custom Apparel" class="dash-header-logo">
+                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" alt="Northwest Custom Apparel" class="dash-header-logo">
                 </a>
-                <h1 class="dash-header-title">Caspio Table Audit <span class="tua-sub">163 tables · which are used?</span></h1>
+                <h1 class="dash-header-title" id="monitor-title">Caspio Table Audit <span class="tua-sub">163 tables · which are used?</span></h1>
             </div>
             <div class="dash-header-right">
                 <span class="tua-lock" title="Admin only"><i class="fas fa-user-shield" aria-hidden="true"></i> Admin</span>
-                <a href="/staff-dashboard.html" class="dash-back-link"><i class="fas fa-arrow-left" aria-hidden="true"></i> Dashboard</a>
+                <a href="/staff-dashboard.html" class="dash-back-link btn btn-secondary"><i class="fas fa-arrow-left" aria-hidden="true"></i> Dashboard</a>
             </div>
         </header>
 
-        <main class="dash-content">
+        <main class="dash-content" id="monitor-main" tabindex="-1" aria-labelledby="monitor-title">
             <div class="dash-error-banner" role="alert">
                 <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
                 <span class="dash-error-banner-message"></span>
@@ -42,7 +36,7 @@
 
             <!-- Caveat -->
             <div class="tua-callout tua-callout--warn">
-                <h4><i class="fas fa-triangle-exclamation" aria-hidden="true"></i> Read before you delete</h4>
+                <h2><i class="fas fa-triangle-exclamation" aria-hidden="true"></i> Read before you delete</h2>
                 <ul>
                     <li><b>"Not used" here = no reference in code (proxy/frontend/inksoft) and no Caspio wiring (views, relationships, tasks, webhooks).</b> It does <b>NOT</b> check DataPages or Flex apps — the Caspio API can't reveal a DataPage's source table. <b>Verify each candidate against the Caspio DataPages list + the "Christmas Bundles" Flex app before archiving.</b></li>
                     <li><b>Archive ≠ delete.</b> Caspio blocks table DELETE via API by design. Safe path in the Caspio UI: <b>export a CSV backup → rename to <code>zz_ARCHIVE_&lt;name&gt;</code> → wait a week → delete if nothing breaks.</b> Start with the red "dup/old" tier.</li>
@@ -62,16 +56,16 @@
             <div class="dash-card">
                 <div class="tua-toolbar">
                     <div class="tua-filters" id="tuaFilters">
-                        <button class="tua-chip is-active" data-filter="all">All</button>
-                        <button class="tua-chip" data-filter="cand">Candidates</button>
-                        <button class="tua-chip tua-chip--a" data-filter="tierA">⛔ Dup / old</button>
-                        <button class="tua-chip tua-chip--b" data-filter="tierB">⚠ Verify DataPages</button>
-                        <button class="tua-chip tua-chip--used" data-filter="used">✓ In use</button>
+                        <button class="tua-chip is-active btn btn-secondary" data-filter="all" type="button" aria-pressed="true">All</button>
+                        <button class="tua-chip btn btn-secondary" data-filter="cand" type="button" aria-pressed="false">Candidates</button>
+                        <button class="tua-chip tua-chip--a btn btn-secondary" data-filter="tierA" type="button" aria-pressed="false">⛔ Dup / old</button>
+                        <button class="tua-chip tua-chip--b btn btn-secondary" data-filter="tierB" type="button" aria-pressed="false">⚠ Verify DataPages</button>
+                        <button class="tua-chip tua-chip--used btn btn-secondary" data-filter="used" type="button" aria-pressed="false">✓ In use</button>
                     </div>
-                    <input type="search" id="tuaSearch" class="tua-search" placeholder="Search table name…" aria-label="Search">
+                    <input type="search" id="tuaSearch" class="tua-search field-input" placeholder="Search table name…" aria-label="Search">
                     <div class="tua-actions">
-                        <button class="tua-btn" id="tuaLive"><i class="fas fa-rotate" aria-hidden="true"></i> Refresh (live)</button>
-                        <button class="tua-btn" id="tuaExport"><i class="fas fa-file-csv" aria-hidden="true"></i> Export my review</button>
+                        <button class="tua-btn btn btn-secondary" id="tuaLive" type="button"><i class="fas fa-rotate" aria-hidden="true"></i> Refresh (live)</button>
+                        <button class="tua-btn btn btn-secondary" id="tuaExport" type="button"><i class="fas fa-file-csv" aria-hidden="true"></i> Export my review</button>
                     </div>
                 </div>
                 <p class="tua-legend">
@@ -81,7 +75,7 @@
                     &nbsp;·&nbsp; <b>Refresh (live)</b> re-pulls view/rel/webhook wiring + field counts + <b>new / deleted</b> tables from Caspio; the <b>code</b> signal stays as of the 2026-07-10 snapshot (needs a repo re-scan).
                 </p>
                 <p class="tua-count"><span id="tuaCount"></span> &nbsp; <span class="tua-liveinfo" id="tuaLiveInfo"></span></p>
-                <div class="tua-scroll"><table class="tua-table" id="tuaTable"></table></div>
+                <div class="tua-scroll table-wrap" tabindex="0" role="region" aria-label="Caspio audit tables"><table class="tua-table data-table" id="tuaTable"></table></div>
             </div>
         </main>
     </div>
@@ -89,6 +83,7 @@
     <script src="/config/app.config.js"></script>
     <script src="/shared_components/js/fetch-timeout.js?v=2026.09.06.26"></script>
     <script src="/shared_components/js/dash-page-helpers.js?v=2026.09.07.25"></script>
-    <script src="/dashboards/js/table-usage-audit.js?v=2026.09.05.73"></script>
-</body>
-</html>
+    <script src="/dashboards/js/table-usage-audit.js?v=2026.09.09.12"></script>
+
+
+</body></html>

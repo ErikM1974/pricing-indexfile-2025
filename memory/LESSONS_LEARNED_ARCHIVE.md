@@ -4067,3 +4067,21 @@ proxy gates. Public forms retain manual entry; directory autocomplete requires s
 Regression coverage: tests/unit/proxy-review-relays.test.js. The payroll relay also needs its 40 MB parser BEFORE the global 5 MB parser; moving it only before the forwarder does not work.
 Validation after v2026.09.07.24: full unit 4,695 passed / 4 skipped; fixture parity 84 passed; browser E2E 15 passed / 3 opt-in screenshot skips (includes all five calculator-parity checks). Route lock updated to 456 registrations. Commit tests/fixtures/server-route-table.json with the hardening and explicitly add tests/unit/proxy-review-relays.test.js.
 
+
+## 2026-09-07 — `git worktree remove --force` followed a node_modules junction and deleted the real packages
+
+**Problem.** A HEAD worktree at `C:/tmp/pi-before` (for before-screenshots) had the main tree's `node_modules`
+JUNCTIONED in so `scripts/build.js` could find esbuild. `git worktree remove --force` deleted the worktree
+recursively, followed the junction into the real `node_modules`, removed packages alphabetically (`@asamuzakjp`,
+`@babel`, …) and stopped with "Invalid argument". Nothing said so; the next full gate run failed 184 of 188 unit
+suites with `Cannot find module '@babel/code-frame'` and e2e/parity could not start.
+**Root cause.** Windows junctions look like directories to recursive deletes (git's, and MSYS `rm -rf`);
+the link was inside the thing being deleted.
+**Solution.** `npm ci` (lockfile reinstall) restored everything in one pass; the gates were re-run green before
+the deploy. The junction is now removed FIRST with `cmd /c rmdir <junction>` (which removes only the link),
+verified gone, and only then is the directory deleted.
+**Prevention.** 🔑 Never delete a directory that contains a junction or symlink to something you keep — remove
+the link with `rmdir` (cmd) first and check it is gone. 🔑 Prefer `NODE_PATH=<repo>/node_modules` over a
+junction when a scratch tree needs the repo's packages. 🔑 When 184 suites fail at once with "Cannot find
+module", suspect the install, not the change — `npm ci` before debugging anything.
+

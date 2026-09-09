@@ -59,22 +59,9 @@ Never rewrite a variable declaration into a self-reference; dry-run reruns and c
 
 Preserve generated override precedence and exact palette matches; full resolved migration and corporate TLS notes are in LESSONS_LEARNED_ARCHIVE.md.
 
-## 2026-09-07 — `git worktree remove --force` followed a node_modules junction and deleted the real packages
+## Worktree junction deletion incident (2026-09-07, archived)
 
-**Problem.** A HEAD worktree at `C:/tmp/pi-before` (for before-screenshots) had the main tree's `node_modules`
-JUNCTIONED in so `scripts/build.js` could find esbuild. `git worktree remove --force` deleted the worktree
-recursively, followed the junction into the real `node_modules`, removed packages alphabetically (`@asamuzakjp`,
-`@babel`, …) and stopped with "Invalid argument". Nothing said so; the next full gate run failed 184 of 188 unit
-suites with `Cannot find module '@babel/code-frame'` and e2e/parity could not start.
-**Root cause.** Windows junctions look like directories to recursive deletes (git's, and MSYS `rm -rf`);
-the link was inside the thing being deleted.
-**Solution.** `npm ci` (lockfile reinstall) restored everything in one pass; the gates were re-run green before
-the deploy. The junction is now removed FIRST with `cmd /c rmdir <junction>` (which removes only the link),
-verified gone, and only then is the directory deleted.
-**Prevention.** 🔑 Never delete a directory that contains a junction or symlink to something you keep — remove
-the link with `rmdir` (cmd) first and check it is gone. 🔑 Prefer `NODE_PATH=<repo>/node_modules` over a
-junction when a scratch tree needs the repo's packages. 🔑 When 184 suites fail at once with "Cannot find
-module", suspect the install, not the change — `npm ci` before debugging anything.
+Never recursively delete a tree containing a junction to shared packages. Inspect link targets, remove only the link through a safe native operation, then verify before deleting the tree. Prefer a module lookup path over a shared node_modules junction. A widespread missing-package failure after cleanup means restore the locked install before debugging code; full resolved incident is in LESSONS_LEARNED_ARCHIVE.md.
 
 ## Server split first-cut incident (2026-09-07, archived)
 
@@ -252,3 +239,11 @@ Problem: the CSS census omitted Jotform scripts and its external-owner backlog n
 Problem/root cause: a DTG service outage exposed white text on an amber toast (3.18 contrast); the notification was absent on healthy runs. Solution: use existing dark warning/success tokens and render all four real toast types in the accessibility check. Prevention: wait for their final painted state, test transient failures deliberately, and inspect each builder’s actual style owner. The other three builders have a separate warning foreground; pricing and notification behavior remain unchanged.
 
 DTG test follow-up: initial product hydration can replace a number input between automated focus and text insertion. Set the value and dispatch its actual input event atomically using the shared test helper, then assert the row quantity before waiting for pricing. Keep real pricing reads and mocked writes; never relax the positive-money guard.
+
+## Monitoring data needs complete responses and visible persistence failures (2026-09-09)
+
+Problem/root cause: malformed usage could appear as zero, partial schema could mark tables gone, and local review storage assumed every read/write succeeded. Solution: validate complete responses before rendering, preserve snapshot evidence and notes, distinguish unknown from zero, show export/retry paths and clear only recovered errors. Prevention: exercise malformed/partial/denied storage and successful recovery with synthetic records, preserve the original snapshot, and inspect current-value PDFs. Print long reports in block flow; inherited flex/min-height can create a blank trailing sheet even when PDF text is complete.
+
+## Local file tools need dependency errors and native download evidence (2026-09-09)
+
+Problem/root cause: missing transform/parser globals could leave conversion stuck, malformed FTP rows looked like valid files, and a download mock observed no request even when the browser saved the file. Solution: validate dependencies/listings, show visible errors with the file retained, and test browser-managed attachments using an isolated loopback CSV server. Prevention: compare actual download bytes/queries and converted SKU/prices for CSV/TSV/XLSX; preserve pure financial transforms. Use canonical data-table classes as well as scrolling wrappers; check current-value paper text and geometry, not text extraction alone.
