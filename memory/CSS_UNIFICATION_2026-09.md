@@ -590,3 +590,7 @@ Commission structure, embroidery bonus plan, SEO strategy, forms library and dat
 ## Staff reference integration — 2026-09-09
 
 Reviewed staff reference commit 245d00e86e1c07099f5e4bbc4b1ea6999c327b62 integrated after live brand release2080. Only appended memory notes conflicted; retained both release and review records. All application changes merged directly. Full primary gates run next. Live99/126 remains authoritative until actual staff rollout.
+
+## Staff reference full-gate correction — 2026-09-09
+
+The complete unit suite caught a source serialization lock: HTML serialization changed three commission data-args attributes from single-quoted JSON to equivalent HTML entities. Restored the original attribute spelling without changing actions or weakening the guard. Full gates resume from this corrected commit; focused behavior/content still describes identical DOM/runtime semantics.
