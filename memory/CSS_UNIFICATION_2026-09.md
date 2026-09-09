@@ -594,3 +594,7 @@ Reviewed staff reference commit 245d00e86e1c07099f5e4bbc4b1ea6999c327b62 integra
 ## Staff reference full-gate correction — 2026-09-09
 
 The complete unit suite caught a source serialization lock: HTML serialization changed three commission data-args attributes from single-quoted JSON to equivalent HTML entities. Restored the original attribute spelling without changing actions or weakening the guard. Full gates resume from this corrected commit; focused behavior/content still describes identical DOM/runtime semantics.
+
+## Staff reference release checks complete — 2026-09-09
+
+Five staff references integrated and tested at3432538f676b06ce8cc8cd3c6cc10d15eb6ae8f1. Completed:214 unit suites/5162 passed/four existing skips;88 DOM,4 accessibility unit,84 quote parity;342 mocked browser (464.9s),16 remaining browser and3 optional screenshot skips;all5 live calculator surfaces,build/lint/types/297 CSS/HTTP boot.485 routes/24 modules unchanged.21 focused family browser cases and805 checked paper blocks retained. Candidatev2026.09.09.2,24 changed/shared references versioned. Exact-source CI and actual deployment pending. Live remains99/225,126 pending. Next isolated codex/entry-status-family has first-pass six sign-in/confirmation layouts; not reviewed or part of this release.
