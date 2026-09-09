@@ -133,9 +133,16 @@
     ];
 
     function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+    // Highlight raw text segments, then escape each segment before adding fixed mark tags.
     function hl(text, q) {
-        var s = esc(text); if (!q) return s;
-        try { return s.replace(new RegExp('(' + esc(q).replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'ig'), '<mark class="sm-hit">$1</mark>'); } catch (e) { return s; }
+        var value = String(text), needle = String(q || '').toLowerCase();
+        if (!needle) return esc(value);
+        var lower = value.toLowerCase(), at = 0, hit, output = '';
+        while ((hit = lower.indexOf(needle, at)) !== -1) {
+            output += esc(value.slice(at, hit)) + '<mark class="ref-hit">' + esc(value.slice(hit, hit + needle.length)) + '</mark>';
+            at = hit + needle.length;
+        }
+        return output + esc(value.slice(at));
     }
 
     var epHost = document.getElementById('smEndpoints');
@@ -145,9 +152,10 @@
     var TOTAL = MODELS.reduce(function (n, m) { return n + m.fields.length; }, 0);
 
     function renderEndpoints() {
+        // eslint-disable-next-line no-unsanitized/property -- Reference strings are escaped and highlights use fixed markup.
         epHost.innerHTML = ENDPOINTS.map(function (e) {
-            return '<div class="sm-ep"><span class="sm-grp ' + (e[0] === 'PromoStd' ? 'ps' : 'std') + '">' + esc(e[0]) + '</span>' +
-                '<span class="sm-path">' + esc(e[1]) + '</span><span class="sm-desc">' + esc(e[2]) + '</span></div>';
+            return '<div class="ref-ep"><span class="ref-group ' + (e[0] === 'PromoStd' ? 'ps' : 'std') + '">' + esc(e[0]) + '</span>' +
+                '<span class="ref-path">' + esc(e[1]) + '</span><span class="ref-desc">' + esc(e[2]) + '</span></div>';
         }).join('');
     }
 
@@ -161,21 +169,24 @@
             if (!rows.length) return '';
             shown += rows.length;
             var body = rows.map(function (f) {
-                return '<tr><td class="sm-fname">' + hl(f[0], q) + '</td>' +
-                    '<td class="sm-ftype">' + esc(f[1]) + '</td>' +
-                    '<td class="sm-fnote">' + hl(f[2], q) + '</td></tr>';
+                return '<tr><td class="ref-fname">' + hl(f[0], q) + '</td>' +
+                    '<td class="ref-ftype">' + esc(f[1]) + '</td>' +
+                    '<td class="ref-fnote">' + hl(f[2], q) + '</td></tr>';
             }).join('');
-            return '<div class="sm-model"><div class="sm-model-head"><h3>' + esc(m.name) + '</h3>' +
-                '<span class="sm-model-count">' + rows.length + '</span></div>' +
-                '<p class="sm-model-desc">' + esc(m.desc) + '</p>' +
-                '<div class="sm-scroll"><table class="sm-table"><thead><tr><th>method / field</th><th>kind</th><th>notes / gotchas</th></tr></thead><tbody>' +
+            return '<div class="ref-model"><div class="ref-model-head"><h3>' + esc(m.name) + '</h3>' +
+                '<span class="ref-model-count">' + rows.length + '</span></div>' +
+                '<p class="ref-model-desc">' + esc(m.desc) + '</p>' +
+                '<div class="ref-scroll" tabindex="0" role="region" aria-label="Reference fields; scroll horizontally"><table class="ref-table"><thead><tr><th scope="col">method / field</th><th scope="col">kind</th><th scope="col">notes / gotchas</th></tr></thead><tbody>' +
                 body + '</tbody></table></div></div>';
         }).join('');
-        host.innerHTML = shown ? out : '<div class="sm-empty">No entries match &ldquo;' + esc(q) + '&rdquo;.</div>';
+        // eslint-disable-next-line no-unsanitized/property -- Reference strings are escaped and highlights use fixed markup.
+        host.innerHTML = shown ? out : '<div class="ref-empty">No entries match &ldquo;' + esc(q) + '&rdquo;.</div>';
         countEl.textContent = q ? (shown + ' of ' + TOTAL + ' entries match') : (TOTAL + ' entries across ' + MODELS.length + ' sections');
     }
 
     renderEndpoints();
     renderModels('');
     if (filter) filter.addEventListener('input', function () { renderModels(filter.value.trim().toLowerCase()); });
+    window.addEventListener('beforeprint', function () { renderModels(''); });
+    window.addEventListener('afterprint', function () { renderModels(filter.value.trim().toLowerCase()); });
 })();

@@ -91,3 +91,5 @@ Training manuals: tokens → components → training-guide → training-referenc
 ## Training simulators
 
 `training-simulator.css` extends the unified training practice family with responsive exercise options, scoreboards, progress and native dialogs. The four final training pages keep their page-specific arrangements in training CSS; controls and tokens remain shared.
+
+API reference family: Caspio, ManageOrders, SanMar and ShopWorks ODBC load tokens → components → api-reference → page arrangements. Shared reference CSS owns page chrome, labeled search, count/status, endpoint/field tables, callouts, mobile wrapping and paper rhythm. Keep technical catalogs in page controllers/data; original-content and schema guards prevent accidental edits. Native ODBC details and failed/malformed catalogue retry remain page behavior.

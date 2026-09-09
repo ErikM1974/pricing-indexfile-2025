@@ -153,20 +153,16 @@
             .replace(/'/g, '&#39;');
     }
 
-    function escapeRegExp(s) {
-        return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    }
-
-    // Escape first, then wrap query hits in <mark> (query is escaped for both HTML + regex).
+    // Highlight raw text segments, then escape each segment before adding fixed mark tags.
     function highlight(text, q) {
-        var safe = escapeHtml(text);
-        if (!q) return safe;
-        try {
-            var re = new RegExp('(' + escapeRegExp(escapeHtml(q)) + ')', 'ig');
-            return safe.replace(re, '<mark class="capi-hit">$1</mark>');
-        } catch (e) {
-            return safe;
+        var value = String(text), needle = String(q || '').toLowerCase();
+        if (!needle) return escapeHtml(value);
+        var lower = value.toLowerCase(), at = 0, hit, output = '';
+        while ((hit = lower.indexOf(needle, at)) !== -1) {
+            output += escapeHtml(value.slice(at, hit)) + '<mark class="ref-hit">' + escapeHtml(value.slice(hit, hit + needle.length)) + '</mark>';
+            at = hit + needle.length;
         }
+        return output + escapeHtml(value.slice(at));
     }
 
     var catalogEl = document.getElementById('capiCatalog');
@@ -188,22 +184,23 @@
             if (!rows.length) return;
             shown += rows.length;
 
-            html += '<div class="capi-grpbar"><h3>' + escapeHtml(group) +
-                '</h3><span class="capi-count">' + rows.length + '</span></div>';
-            html += '<div class="capi-eplist">';
+            html += '<div class="ref-model-head"><h3>' + escapeHtml(group) +
+                '</h3><span class="ref-model-count">' + rows.length + '</span></div>';
+            html += '<div class="ref-eplist">';
             rows.forEach(function (r) {
-                html += '<div class="capi-ep">' +
-                    '<span class="capi-m ' + escapeHtml(r[0]) + '">' + escapeHtml(r[0]) + '</span>' +
-                    '<span class="capi-path">' + highlight(r[1], q) + '</span>' +
-                    '<span class="capi-desc">' + highlight(r[2], q) + '</span>' +
+                html += '<div class="ref-ep">' +
+                    '<span class="ref-method ' + escapeHtml(r[0]) + '">' + escapeHtml(r[0]) + '</span>' +
+                    '<span class="ref-path">' + highlight(r[1], q) + '</span>' +
+                    '<span class="ref-desc">' + highlight(r[2], q) + '</span>' +
                     '</div>';
             });
             html += '</div>';
         });
 
         if (!shown) {
-            html = '<div class="capi-empty">No endpoints match &ldquo;' + escapeHtml(query) + '&rdquo;.</div>';
+            html = '<div class="ref-empty">No endpoints match &ldquo;' + escapeHtml(query) + '&rdquo;.</div>';
         }
+        // eslint-disable-next-line no-unsanitized/property -- Reference strings are escaped and highlights use fixed markup.
         catalogEl.innerHTML = html;
 
         if (countEl) {
@@ -221,13 +218,7 @@
     }
 
     // Smooth-scroll the jump nav (respects reduced-motion via CSS scroll-behavior).
-    document.querySelectorAll('.capi-toc a[href^="#"]').forEach(function (a) {
-        a.addEventListener('click', function (e) {
-            var target = document.getElementById(this.getAttribute('href').slice(1));
-            if (target) {
-                e.preventDefault();
-                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-        });
-    });
+    // Native fragment links preserve history, focus and the user's motion preference.
+    window.addEventListener('beforeprint', function () { render(''); });
+    window.addEventListener('afterprint', function () { render(filterEl.value.trim().toLowerCase()); });
 })();

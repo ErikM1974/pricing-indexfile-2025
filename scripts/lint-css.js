@@ -15,6 +15,7 @@ const ROOT = path.resolve(__dirname, '..');
 
 /** Repo-relative globs. Widen only — never remove a file to make the lint pass. */
 const CSS_LINT_SCOPE = [
+    'shared_components/css/api-reference.css',
     // Step 1 (2026-09-07): the two token files
     'shared_components/css/tokens.css',
     'shared_components/css/staff-dashboard/tokens.css',

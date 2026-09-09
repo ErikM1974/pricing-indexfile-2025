@@ -113,3 +113,6 @@
 
 - `tests/e2e/css-unification-training-final.spec.js` — 21 mocked checks: final four training pages, responsive/axe, every mode, native dialogs, complete/restarted rounds, live-list retry, storage/timer failures and compact real PDF output.
 - `tests/unit/training-final-content.test.js` + `tests/fixtures/training-final-original-content.json` — original course literals, prose, fields/options and navigation.
+
+- `tests/e2e/css-unification-api-reference.spec.js` — four reference pages at four widths, search/empty/escaping, ODBC disclosure/stored-only/load retry, paper content/state and unchanged real authentication gates; business calls mocked.
+- `tests/unit/api-reference-content.test.js` + `tests/fixtures/api-reference-original-content.json` — original technical prose, fields/options, links, reference literals and ODBC schema bytes.
