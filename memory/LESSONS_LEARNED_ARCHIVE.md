@@ -4027,3 +4027,12 @@ Problem: drag-only exercise tiles excluded touch/keyboard, quiz points survived 
 - Problem/root cause: clipboard feedback depended on the global event after an asynchronous operation, clickable divs excluded keyboard users, and fixed-height print rules could clip text. Generic card adapters also added unwanted document padding.
 - Solution: pass the originating button explicitly, show local pending/error/retry feedback, use native disclosure buttons and owned document sections, and let print flow through readable columns.
 - Prevention: lock unchanged training text/examples/links, test keyboard and denied clipboard states, and inspect actual PDFs. A two-sheet language-handout guard catches blank-page regressions that a print-media screenshot misses.
+
+## 2026-09-07 — Tooling upgrades and visual verification
+
+**Problem:** New major tooling exposed type inference gaps, redundant CSS and two existing dimmed DTG art-fee contrast findings.
+**Solution:** Jest30/TypeScript7/Stylelint17 pass with narrow type corrections and 24 redundant declarations removed.
+Keep ESLint9, jsdom26 and browser axe4.12.1 until their measured migration issues are addressed; do not raise ratchets.
+**Prevention:** Screenshots must build the changed assets and normalize focus/scroll before capture. A second after-shot
+proved the remaining 850-pixel screen-print difference was an async thumbnail; the second comparison was exactly zero.
+Native Node22.23 runs Puppeteer25; invoke its capture CLI outside Jest, and report unavailable baselines as actual skips.
