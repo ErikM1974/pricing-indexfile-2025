@@ -558,3 +558,7 @@ Fifteen custom-brand pages share tokens/components + storefront-shell.css + rena
 ## Brand integration — 2026-09-09
 
 Reviewed brand commit a6d59feca31b1a4419c1f963bb91c063e7d03539 integrated after verified webstore release2079. Only the two append-only memory conflicts required a union; all reviewed app changes merged directly. Current live checkpoint84/141 retained. Full primary gates now run with candidate2026.09.09.1 references already present. Next five staff reference pages remain plan-only in their isolated branch.
+
+## Brand guide release checks complete — 2026-09-09
+
+Fifteen brand guides integrated and tested at2ac3c56bf26bd50fecf4fd28043267b4c0939fb3. Completed release checks:213 unit suites/5152 passed/four existing skips;88 DOM,4 accessibility unit,84 quote parity;321 mocked browser (444.6s),16 remaining browser and three optional screenshot skips;all five calculator surfaces,build/lint/types/296 CSS/HTTP boot.485 routes/24 modules unchanged.31 focused brand browser cases and1261 paper blocks retained. Candidatev2026.09.09.1; all60 new stylesheet/controller references already versioned. Exact-source CI and actual deployment pending. Live84/225;141 pending until verified rollout. Next five staff references are IN PROGRESS in the isolated worktree: first layout, shared print contract and service warning/retry changes implemented; focused content/browser review remains. They are not part of this release.
