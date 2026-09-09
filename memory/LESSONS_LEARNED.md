@@ -80,30 +80,9 @@ the link with `rmdir` (cmd) first and check it is gone. 🔑 Prefer `NODE_PATH=<
 junction when a scratch tree needs the repo's packages. 🔑 When 184 suites fail at once with "Cannot find
 module", suspect the install, not the change — `npm ci` before debugging anything.
 
-## 2026-09-07 — Server split, first cut: three ways "moved verbatim" was not the same server
+## Server split first-cut incident (2026-09-07, archived)
 
-**Problem.** Six sections of the 15,947-line `server.js` moved byte for byte into `routes/*.js`, the registration-order
-lock passed, and the server did not boot — then, once it booted, it would have served the static mounts from the
-wrong folder. (a) `requireStaff` was missing from the module's ctx: eslint-scope leaves references to top-level
-`function`/`var` declarations unresolved in a classic script (they are global-object properties), so the dependency
-analysis, built on `variable.references`, saw only the `const` bindings. (b) A later cut's line range began on the
-previous cut's call-site line, so `require('./routes/ai-chat')(app, ctx)` moved INTO `routes/gear-publisher.js`, where
-it resolves relative to `routes/`. The order lock still passed because the walker followed the include wherever it sat.
-(c) `require('./lib/blog')` and `path.join(__dirname, 'staff-dashboard-v3')` inside moved code now named `routes/…`:
-the first threw at boot, the second would have 404'd every static mount without any test noticing. Separately, the
-first attempt collided with another assistant's uncommitted change in the same tree.
-**Root cause.** Textual moves preserve bytes, not meaning: scope resolution, module-relative paths and the cut's
-own artefacts all changed meaning silently.
-**Solution.** References matched by name against module-scope declarations (ignoring references resolved to inner
-bindings); `check-undef.js` (ESLint no-undef with Node globals over `routes/`) after every cut; the walker errors on a
-call site inside a module; the extractor rewrites `require('./…')` → `require('../…')` and `__dirname`/`__filename` →
-`SERVER_DIR`/`SERVER_FILE` passed through ctx, and the lock forbids the raw forms; a boot smoke (`PORT=3999 timeout 15
-node server.js`) plus real requests to moved routes before any gate. The other agent's change went into a git stash
-for the duration and came back after the deploy.
-**Prevention.** 🔑 After any code move, boot the server and hit one moved route: a passing order lock proves order,
-not resolution. 🔑 Derive a cut's range from the section banner every time — never from arithmetic on stale numbers —
-and check the first line is the rule line, not a neighbour's call site. 🔑 Treat `__dirname` and `require('./…')` as
-part of a file's address, not its code. 🔑 One agent in `server.js` at a time; `git stash -u` is the tool when it is not.
+Module moves change scope and relative paths; verify dependency bindings, route order and a real HTTP boot. Full resolved incident and prevention details are in LESSONS_LEARNED_ARCHIVE.md.
 
 ## 2026-09-07 — Proxy review: contact and shipping authentication
 **Problem:** Customer-directory reads/updates and shipping reads were reachable without credentials.
@@ -252,3 +231,7 @@ Problem: drag-only exercise tiles excluded touch/keyboard, quiz points survived 
 ### Training exercises: round lifecycle and saved progress (2026-09-08)
 
 Problem: restarting bound handlers again, speed rounds graded the first answer, and old timers changed a new mode; blocked/malformed localStorage prevented startup. Root cause: DOM/event lifetime and round lifetime were mixed, while persistence was assumed available. Solution: bind once, reset the same instance, grade the current question once, cancel interval/delayed work on mode changes, use a wall-clock deadline, and validate saved progress with visible read/write failures. Preserve unreadable storage rather than overwriting it. Prevention: complete/restart rounds, switch modes with work pending, and test denied/malformed/readable-but-unwritable storage in a real browser.
+
+### Reference search, disclosure and paper code need explicit contracts (2026-09-08)
+
+Problem: reference descriptions disappeared on phones, ODBC tables were click-only and retry reloaded the page; font ligatures changed copied SQL operators in PDFs. Root cause: legacy shell rules, non-native disclosure, assumed-valid schema and programming-font contextual glyph substitution. Solution: shared scoped reference layout with native details, escaped raw-text highlighting, schema validation and retry preserving search; print the complete catalogue and restore filters, and disable ligatures/contextual alternates for code. Prevention: lock original catalog literals/schema/prose, test roles and keyboard/filter/failure states, compare every PDF field name and technical paragraph, and inspect actual paper operators.
