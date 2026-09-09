@@ -3475,8 +3475,8 @@
         "complete-landscape-report-print"
       ],
       "test": "tests/e2e/css-unification-vendor-portals.spec.js",
-      "maxCssBytes": 61887,
-      "measuredRawCssBytes": 59839,
+      "maxCssBytes": 62056,
+      "measuredRawCssBytes": 60008,
       "baseline": {
         "commit": "d7c91600f85993eb4d0d45471ff0c0fc4356b3b7",
         "rawCssBytes": 18121,
@@ -3508,8 +3508,8 @@
         "complete-landscape-report-print"
       ],
       "test": "tests/e2e/css-unification-vendor-portals.spec.js",
-      "maxCssBytes": 61887,
-      "measuredRawCssBytes": 59839,
+      "maxCssBytes": 62056,
+      "measuredRawCssBytes": 60008,
       "baseline": {
         "commit": "d7c91600f85993eb4d0d45471ff0c0fc4356b3b7",
         "rawCssBytes": 18392,
@@ -3541,8 +3541,8 @@
         "complete-landscape-report-print"
       ],
       "test": "tests/e2e/css-unification-vendor-portals.spec.js",
-      "maxCssBytes": 61887,
-      "measuredRawCssBytes": 59839,
+      "maxCssBytes": 62056,
+      "measuredRawCssBytes": 60008,
       "baseline": {
         "commit": "d7c91600f85993eb4d0d45471ff0c0fc4356b3b7",
         "rawCssBytes": 18392,
@@ -3573,8 +3573,8 @@
         "complete-reference-print"
       ],
       "test": "tests/e2e/css-unification-announcements.spec.js",
-      "maxCssBytes": 61887,
-      "measuredRawCssBytes": 59839,
+      "maxCssBytes": 62056,
+      "measuredRawCssBytes": 60008,
       "baseline": {
         "commit": "9a3191a65a8f7975ea33a54caed24a95399b045e",
         "rawCssBytes": 19898,
@@ -3605,8 +3605,8 @@
         "complete-reference-print"
       ],
       "test": "tests/e2e/css-unification-announcements.spec.js",
-      "maxCssBytes": 61887,
-      "measuredRawCssBytes": 59839,
+      "maxCssBytes": 62056,
+      "measuredRawCssBytes": 60008,
       "baseline": {
         "commit": "9a3191a65a8f7975ea33a54caed24a95399b045e",
         "rawCssBytes": 20934,

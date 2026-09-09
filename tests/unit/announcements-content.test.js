@@ -8,6 +8,7 @@ const fixture = require('../fixtures/announcements-original-content.json'),
 test.each(fixture.pages)('$file preserves original hosted app and navigation', (p) => {
     const d = new JSDOM(fs.readFileSync(path.join(root, p.file), 'utf8')).window.document;
     expect(d.title).toBe(p.title);
+    expect(d.body.dataset.department).toBe('neutral');
     expect([...d.querySelectorAll('script[src]')].map((n) => n.getAttribute('src'))).toEqual(
         p.scripts,
     );

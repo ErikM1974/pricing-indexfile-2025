@@ -1,5 +1,6 @@
 /* Shared boundaries for hosted staff forms/reports. Provider data and controls remain external. */
 @layer components.pages {
+    :where([data-ui="unified"][data-hosted-workspace="announcements"]) { --ui-accent: var(--gray-700); --ui-accent-hover: var(--gray-800); --ui-tint: var(--gray-100); }
     :where([data-ui="unified"][data-hosted-workspace]) .breadcrumb { display: flex; align-items: center; flex-wrap: wrap; gap: var(--space-2); color: var(--ui-muted); font-size: var(--font-size-sm); }
     :where([data-ui="unified"][data-hosted-workspace]) .hosted-heading { margin: var(--space-3) 0 var(--space-6); }
     :where([data-ui="unified"][data-hosted-workspace]) .page-title { font-size: clamp(1.75rem, 4vw, 2.75rem); letter-spacing: -0.035em; }

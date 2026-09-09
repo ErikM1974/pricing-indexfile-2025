@@ -75,6 +75,7 @@ for (const p of fixture.pages) {
         async ({ page }) => {
             const events = await open(page, p.file);
             await expect(page.locator('#loadingOverlay')).toBeHidden();
+        await expect(page.locator('[aria-current="page"]')).toHaveCSS('background-color', 'rgb(55, 65, 81)');
             for (const width of [1440, 768, 390, 320]) {
                 await page.setViewportSize({ width, height: 950 });
                 expect(
