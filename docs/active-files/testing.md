@@ -139,3 +139,5 @@
 - tests/unit/campaign-storefront-content.test.js + tests/fixtures/campaign-storefront-original-content.json: complete original content and financial/controller preservation for three golf/safety pages.
 
 - tests/e2e/css-unification-campaign-storefront.spec.js: campaign layout and delivery outcome browser coverage with mocked business services.
+
+- Instant storefront: tests/unit/instant-storefront-content.test.js; tests/e2e/css-unification-instant-storefront.spec.js; original-content and pricing fixtures in tests/fixtures.

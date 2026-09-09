@@ -334,3 +334,5 @@ For questions or issues with the testing system:
 - `tests/unit/catalog-discovery-content.test.js`, `tests/e2e/css-unification-catalog-discovery.spec.js`, `tests/fixtures/catalog-discovery-original-content.json` — original catalog copy/curation, named brand links, four widths/native menus, actual server label passthrough, failure/malformed/retry/filters/broken images and populated paper.
 
 - Campaign storefront: css-unification-campaign-storefront.spec.js covers three pages at four widths, contrast, photo/gallery/filters, complete paper and synthetic delivery/config failure states; all actual writes/email blocked. campaign-storefront-content.test.js and the original-content fixture preserve full prose, fields, links, structured data and financial helpers/services. Only explicitly reviewed init/config/delivery functions differ.
+
+- Instant storefront browser review uses captured server prices and mocks every quote/artwork write. Original content/controller contracts remain locked by instant-storefront-content.test.js.

@@ -1,27 +1,18 @@
 # Handover follow-ups — 2026-09-07
 
-## Active checkpoint — 2026-09-09
+## Active checkpoint — RESUMED 2026-09-09
 
-Standing edit/deploy authorization continues. **Frontend v2026.09.09.4 / Heroku 2083 is LIVE**, full SHA **08f8059f80560a70699a70b6502ed5924642a3d0**, actual slug verified 2026-09-09T12:25:13.1748627Z. Exact-source CI **34349270516** passed all four jobs, including actual money/calculator parity on **945362553cd95ba5ef781aa4318f4a61a85ff74b**. Six changed raw assets and four hashed build assets match approved bytes. Two new catalog pages, all fifteen prior brand navigation consumers, seven older public pages and five staff gates verified. No business writes or notifications during visual review.
+Erik resumed after shutdown; standing edit/deploy authorization continues. Frontend **v2026.09.09.6 / Heroku2084 / dce016510f29c7a655b4bb75628aea72b3b745a6** is live. Actual Heroku slug/status and live version verified; source CI34356406944 on98b82fc917c97e753a115efd5e37cbf0873c4960 passed all four jobs, including full mocked CSS browser tests and actual money/calculator parity. This release includes the three reviewed campaign golf/safety pages. **115 of225 pages live;110 pending.** All26 training complete; generated documents/style owners remain separate unfinished work. Backend unchanged.
 
-**112 reviewed application pages live; 113 pending**, from225 application/served-archive HTML sources. Another79 tracked sources excluded (12 archive,14 email,50 fixtures/templates,3 retired). All26 training pages reviewed/live. Generated document/style owners remain separate unfinished work. Ignored training/api-test-runner.html is not tracked/deployed; leave it alone.
+Work continues in codex/instant-storefront at C:\Users\erik\.codex\visualizations\2026\09\07\01a07d90-9a4c-7e70-9e4e-c196377b7c6b\training-final-worktree. WIP cc4d254c and checkpoint1a0844a5 are saved; verified campaign release merged without conflicts. Native banner/sticker layouts are being reviewed. The phone .stk-card cascade regression is fixed locally; four-width/state/print validation and complete release gates remain. No instant pages count as reviewed yet. Their preliminary .6 cache references must use the next unused version before release. No price computation changed.
 
-### Current batch and next steps
+- [x] Verify Claude's completed release and exact-source CI; no redundant campaign deployment.
+- [x] Resume saved banner/sticker WIP and repair late desktop placement overriding mobile layout.
+- [ ] Review original content/financial locks, four widths, pricing/quantity/finishing, navigation/dialogs, form failures/retries and artwork with all actual writes mocked, complete print content.
+- [ ] Register reviewed owners; full required local gates and exact-source CI, then verified release.
+- [ ] Continue remaining storefront/staff/calculator/builder/document families.
 
-- [x] Staff reference5 live in.2/2081; sign-in/confirmation6 live in.3/2082; original prose, fulfillment controllers and financial examples retained.
-- [x] Brand directory and Fall catalog2 live in.4/2083. Shared navigation moved unchanged across17 consumers; all179 curated styles,21 brand descriptions and10 categories preserved. Server price labels authoritative, named brand tiles survive failed logos; validated empty/failed/malformed/partial/retry states retain filters.48 focused browser cases,229 focused units;7 PDFs retain292 checked blocks.
-- [ ] Three golf/safety campaign pages in **codex/campaign-storefront**, based on **03c7ec49ca597b40ce0346497ec812737954180e**. Workdir **C:/Users/erik/.codex/visualizations/2026/09/07/01a07d90-9a4c-7e70-9e4e-c196377b7c6b/training-final-worktree**. App work UNCOMMITTED and owned by this session; node_modules junction, no .env copied. New shared campaign-storefront CSS/controller, scoped golf detail, canonical controls, native photo dialog and reversible FAQ printing. Old showcase CSS retired. Candidate2026.09.09.5.
-- [ ] Finish campaign paper review, owner/manifest documentation and content/state checks, then commit explicit owned files, integrate, full local gates/exact-source CI/actual rollout.15 focused browser cases passed44.4s after narrow footer/card and contrast fixes;35 focused units passed. Paper refinement currently running; initial PDFs preserved visible content but grouped extraction interleaved table/column text, and oversized proof images need print containment. New text-node checks include all captions and form labels. Do not count these3 live yet.
-- [ ] Existing golf form bug fixed locally: prior code could clear the form and show success when saving AND sales notification failed. Confirmation now waits for storage or delivered sales notice; total failure preserves input, displays retryable error and sends no customer confirmation. Seven form browser cases passed with all actual business writes/email blocked. Other quote/pricing code retained; normalized source guards exclude only bindForm/showSuccess for the reviewed delivery change, and both underlying services are byte-locked. Required lesson entry/final documentation still pending.
-- [ ] Continue remaining storefront/staff/calculator/builder families and generated document owners. Whole-app cleanup is not complete.
-
-### Verification / resume evidence
-
-Catalog release:216 unit suites/5,182 passed/four existing skips;88 DOM,4 accessibility unit,84 quote parity;389 mocked browser cases in887.5s;16 remaining browser in4.3min,3 optional screenshot skips;all5 live calculator surfaces including EMB/CAP additional-logo tiers. Build/lint/types/298 CSS/HTTP boot;485 routes/24 modules unchanged. Source approval excludes isolated campaign work.
-
-Artifacts: **C:/Users/erik/.codex/visualizations/2026/09/07/01a07d90-9a4c-7e70-9e4e-c196377b7c6b**. catalog-discovery-{release-record,source-ci,heroku-verification,live-verification,local-gates}.json authoritative. Campaign original baseline, focused port3425 config, content/financial fixtures and before/after screenshots saved. Temporary logs campaign-storefront-*.log. Do not rerun one-shot installers/registration/fix/release helpers. Campaign CSS AST refinement cloned moved nodes after the initial patch skipped siblings; all planned arrangements restored and stylelint fixed. Raw assets compare approved Git bytes; hashed assets compare passed local dist bytes. Inspect actual SHA after uncertain Heroku pushes before retrying.
-
-Backend unchanged:v2026.09.08.1 /Heroku1130 /d06aee3e4d25c5e1410241ea8007cdc8339aa3fa. Separate dependency/runtime and scheduler verification backlog remains. Frontend production audit zero. Heroku build reports two dev-only audit findings before pruning, zero after production prune; do not mix those figures.
+Evidence: C:\Users\erik\.codex\visualizations\2026\09\07\01a07d90-9a4c-7e70-9e4e-c196377b7c6b; campaign-storefront-resumed-{ci,heroku}.json. The earlier campaign local browser run was intentionally interrupted at shutdown, but the subsequent release-source CI ran and passed that entire group. Use the saved fixtures/screenshots and current source; do not rerun one-shot installers or the merge helper that caused the mobile regression.
 
 ## Coordinated transfer authentication LIVE — 2026-09-08
 
@@ -184,3 +175,11 @@ Six sign-in/confirmation pages integrated and tested atf343ce6fa4d28e047bc78922c
 ## Catalog discovery release checks complete — 2026-09-09
 
 Brand directory and Fall catalog tested at 03c7ec49ca597b40ce0346497ec812737954180e. Completed: 216 unit suites/5182 passed/four existing skips; 88 DOM, 4 accessibility unit, 84 quote parity; 389 mocked browser (887.5s), 16 remaining browser and3 optional skips; all5 live calculator surfaces. Build/lint/types/298 CSS/HTTP boot; 485 routes/24 modules unchanged. Shared navigation moved unchanged across17 consumers; all179 curated products,21 brands and10 categories retained. 48 focused browser cases,229 focused units,7 PDFs/292 checked blocks. Candidate v2026.09.09.4, 23 changed references versioned. Exact-source CI and actual deployment pending; live remains110 reviewed/115 pending. Next isolated codex/campaign-storefront contains three golf/safety pages in progress, not part of this release.
+
+## Instant storefront local review complete — 2026-09-09
+
+Candidate v2026.09.09.7.14 focused browser cases passed26.2s (last targeted all50-price/menu checks passed6s);11 original content/controller contracts passed. Four widths/axe, both menu modes, focus/search, all50 sticker prices and seven banner presets, server custom/quantity/finishing totals and recovery, failed/empty/degraded data, invalid form, artwork failure and retained draft retry verified with all writes mocked. Two PDFs retain419 text nodes, all9 paper pages visually reviewed. Three scoped CSS owners lint clean. The saved WIP is now finished and reviewed; full primary release gates, exact-source CI and rollout remain. Live115/110; only verified deployment changes this to117/108. Previous paused/WIP notes are historical.
+
+## Instant storefront release checks complete — v2026.09.09.7
+
+Tested source 7d6cf7bc8124e7d3da8642093c3a9018b98e8897. Build/lint/types,485 routes/24 modules, 218 unit suites/5205 passed/four existing skips,88 DOM,4 accessibility-unit,84 quote parity,422 mocked browser and16 remaining browser cases;3 optional screenshot skips;all5 actual calculator surfaces. 299 CSS lint clean,HTTP boot200,production audit zero.14 focused browser and209 focused unit checks;two PDFs/419 retained text nodes. Only instant branch work and its documented shared asset references ship; saved WIP is now fully reviewed. Candidate v2026.09.09.7; exact-source CI and actual rollout pending. Live115/110 until verification.

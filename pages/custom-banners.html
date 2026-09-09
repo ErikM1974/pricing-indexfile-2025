@@ -21,19 +21,21 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="icon" href="/favicon.png" type="image/png">
 
-    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/shared_components/css/nwca-2026-core.css?v=2026.09.07.8">
-    <link rel="stylesheet" href="/pages/css/instant-quote.css?v=2026.09.07.19">
-    <link rel="stylesheet" href="/pages/css/custom-banners.css?v=2026.09.07.8">
+    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.09.7">
+    <link rel="stylesheet" href="/shared_components/css/storefront-shell.css?v=2026.09.09.7">
+    <link rel="stylesheet" href="/shared_components/css/storefront-commerce.css?v=2026.09.09.7">
+    <link rel="stylesheet" href="/pages/css/instant-quote.css?v=2026.09.09.7">
+    <link rel="stylesheet" href="/pages/css/custom-banners.css?v=2026.09.09.7">
     <!-- Do NOT add sticker-pricing-page.css or nwca-form-shared.css - both
          declare :root tokens that collide with core. See instant-quote.css. -->
 </head>
-<body>
+<body data-ui="unified" data-storefront="instant" data-instant="banners">
     <a class="skip-link" href="#configurator">Skip to pricing</a>
 
     <!-- Utility strip -->
-    <div class="util-strip">
+    <div class="util-strip" role="region" aria-label="Company information">
         <div class="util-inner">
             <p class="util-fam"><strong>Northwest Custom Apparel</strong> — family-owned in Milton, WA since 1977</p>
             <div class="util-contact">
@@ -111,9 +113,9 @@
             <div class="nav-search" role="search">
                 <input type="text" id="navSearchInput" class="nav-search-input"
                        placeholder="Search styles — PC61, hoodies, caps…" autocomplete="off"
-                       role="combobox" aria-expanded="false" aria-autocomplete="list"
-                       aria-controls="navAutocompleteList" aria-label="Search products">
-                <div id="navAutocompleteList" class="nav-autocomplete-list" role="listbox" aria-label="Product suggestions"></div>
+                      
+                       aria-label="Search products">
+                <div id="navAutocompleteList" class="nav-autocomplete-list" hidden role="listbox" aria-label="Product suggestions"></div>
                 <button id="navSearchBtn" class="nav-search-btn" type="button" aria-label="Search">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                         <circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path>
@@ -134,7 +136,7 @@
     </header>
 
     <!-- Drawer -->
-    <aside class="sidebar" id="sidebar" aria-label="Browse menu">
+    <dialog class="sidebar" id="sidebar" aria-label="Browse menu">
         <div class="drawer-head">
             <span class="drawer-head-title">Browse NWCA</span>
             <button class="drawer-close" id="drawerClose" type="button" aria-label="Close menu">
@@ -161,8 +163,8 @@
             <a href="mailto:sales@nwcustomapparel.com">sales@nwcustomapparel.com</a><br>
             2025 Freeman Rd E, Milton, WA 98354
         </div>
-    </aside>
-    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    </dialog>
+    <div class="sidebar-overlay" id="sidebarOverlay" hidden></div>
 
         <main id="main">
         <div class="wrap">
@@ -226,9 +228,9 @@
                             <tbody></tbody>
                         </table>
                         <div class="bn-custom" id="bnCustomWrap">
-                            <input type="number" id="bnW" inputmode="decimal" step="0.5" min="0.5" placeholder="Width" aria-label="Width in feet">
+                            <input type="number" class="field__control" id="bnW" inputmode="decimal" step="0.5" min="0.5" placeholder="Width" aria-label="Width in feet">
                             <span aria-hidden="true">&times;</span>
-                            <input type="number" id="bnH" inputmode="decimal" step="0.5" min="0.5" placeholder="Height" aria-label="Height in feet">
+                            <input type="number" class="field__control" id="bnH" inputmode="decimal" step="0.5" min="0.5" placeholder="Height" aria-label="Height in feet">
                             <span>ft</span>
                             <button type="button" class="stk-textbtn" id="bnCustomGo">Price it</button>
                         </div>
@@ -239,7 +241,7 @@
                         <div class="stk-legend-row"><legend>How many?</legend></div>
                         <div class="bn-qty-row">
                             <button type="button" class="bn-step" id="bnMinus" aria-label="One fewer">&minus;</button>
-                            <input type="number" id="bnQty" value="1" min="1" step="1" inputmode="numeric" aria-label="Quantity">
+                            <input type="number" class="field__control" id="bnQty" value="1" min="1" step="1" inputmode="numeric" aria-label="Quantity">
                             <button type="button" class="bn-step" id="bnPlus" aria-label="One more">+</button>
                             <span class="bn-qty-note">Same price each &mdash; banners have no volume break.</span>
                         </div>
@@ -250,7 +252,7 @@
                         <span class="stk-price-unit" id="bnUnit"></span>
                     </div>
 
-                    <button type="button" class="stk-cta" id="bnCta">Get this in writing &rarr;</button>
+                    <button type="button" class="stk-cta btn btn--primary" id="bnCta">Get this in writing &rarr;</button>
                     <p class="stk-cta-sub">Next: send your artwork. A real person sends you a proof, and nothing prints until you approve it.</p>
 
                     <div class="stk-below">
@@ -297,15 +299,15 @@
                         </div>
 
                         <div class="stk-lead-grid">
-                            <div><label for="bnName">Your name</label><input type="text" id="bnName" autocomplete="name"></div>
-                            <div><label for="bnEmail">Email</label><input type="email" id="bnEmail" autocomplete="email"></div>
-                            <div><label for="bnPhone">Phone <span class="stk-optional">(optional)</span></label><input type="tel" id="bnPhone" autocomplete="tel"></div>
-                            <div><label for="bnCompany">Company <span class="stk-optional">(optional)</span></label><input type="text" id="bnCompany" autocomplete="organization"></div>
-                            <div><label for="bnMessage">Instructions for your proof <span class="stk-optional">(optional)</span></label><textarea id="bnMessage" rows="2" placeholder="Anything we should know before we prepare your proof — where it's hanging, colours to match, a deadline."></textarea></div>
-                            <div class="stk-hp"><label for="bnHp">Website</label><input type="text" id="bnHp" tabindex="-1" autocomplete="off"></div>
+                            <div><label for="bnName">Your name</label><input type="text" class="field__control" id="bnName" autocomplete="name"></div>
+                            <div><label for="bnEmail">Email</label><input type="email" class="field__control" id="bnEmail" autocomplete="email"></div>
+                            <div><label for="bnPhone">Phone <span class="stk-optional">(optional)</span></label><input type="tel" class="field__control" id="bnPhone" autocomplete="tel"></div>
+                            <div><label for="bnCompany">Company <span class="stk-optional">(optional)</span></label><input type="text" class="field__control" id="bnCompany" autocomplete="organization"></div>
+                            <div><label for="bnMessage">Instructions for your proof <span class="stk-optional">(optional)</span></label><textarea class="field__control" id="bnMessage" rows="2" placeholder="Anything we should know before we prepare your proof — where it's hanging, colours to match, a deadline."></textarea></div>
+                            <div class="stk-hp"><label for="bnHp">Website</label><input type="text" class="field__control" id="bnHp" tabindex="-1" autocomplete="off"></div>
                         </div>
                         <p class="stk-inline-note is-error" id="bnLeadError" hidden></p>
-                        <button type="button" class="stk-cta" id="bnLeadSubmit">Send my quote request</button>
+                        <button type="button" class="stk-cta btn btn--primary" id="bnLeadSubmit">Send my quote request</button>
                     </div>
                 </div>
             </section>
@@ -314,12 +316,12 @@
                 <div class="stk-trust-grid">
                     <div>
                         <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><path d="M14 2v6h6"></path><path d="m9 15 2 2 4-4"></path></svg>
-                        <h3>Approve a proof first</h3>
+                        <h2>Approve a proof first</h2>
                         <p>Nothing goes on the printer until you sign off on a digital proof. A real person sends it, and you can ask for changes.</p>
                     </div>
                     <div>
                         <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-                        <h3>Finished, not just printed</h3>
+                        <h2>Finished, not just printed</h2>
                         <p>Sewn hems and #2 brass grommets every 24 inches are included in the price &mdash; not an upsell.</p>
                     </div>
                     <div>
@@ -330,7 +332,7 @@
                              src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/Banner%201000%20x%201000%20erik%20and%20don%20o%27neill.jpg?ver=1"
                              alt="Two Northwest Custom Apparel staff holding a finished Lincoln Lynx Football banner in the Milton, Washington shop, brass grommets visible along both edges"
                              width="1000" height="1000" loading="lazy" decoding="async">
-                        <h3>Printed here, not brokered</h3>
+                        <h2>Printed here, not brokered</h2>
                         <p>Milton, Washington since 1977. Family-owned, one building. That's one of ours, fresh off the printer — you can pick yours up the same way.</p>
                     </div>
                 </div>
@@ -354,7 +356,7 @@
                         and <strong>large-format decals</strong> by the square foot. And we decorate apparel &mdash; so it can
                         all be one order and one invoice.
                     </p>
-                    <a class="btn btn-primary" href="/custom-stickers">See sticker pricing &rarr;</a>
+                    <a class="btn btn--primary" href="/custom-stickers">See sticker pricing &rarr;</a>
                 </div>
             </section>
 
@@ -404,12 +406,12 @@
         </div>
     </dialog>
 
-    <div class="stk-bar" id="bnBar" hidden>
+    <div class="stk-bar" id="bnBar" role="region" aria-label="Current quote" hidden>
         <div class="stk-bar-summary">
             <strong id="bnBarTotal">&mdash;</strong>
             <span id="bnBarDetail"></span>
         </div>
-        <button type="button" class="stk-bar-cta" id="bnBarCta">Get this in writing &rarr;</button>
+        <button type="button" class="stk-bar-cta btn" id="bnBarCta">Get this in writing &rarr;</button>
     </div>
 
     <div class="stk-toast" id="bnToast" role="status" aria-live="polite"></div>
@@ -500,7 +502,9 @@
     <script src="/shared_components/js/decoration-methods.js?v=2026.09.06.31"></script>
     <script src="/brands-flyout.js?v=2026.09.06.31"></script>
     <script src="/shared_components/js/nav-dropdown.js?v=2026.07.13.4" defer></script>
-    <script src="/app-modern.js?v=2026.09.06.41" defer></script>
+    <script src="/shared_components/js/storefront-navigation.js?v=2026.09.09.7" defer></script>
+    <script src="/shared_components/js/instant-storefront.js?v=2026.09.09.7" defer></script>
+    <script src="/app-modern.js?v=2026.09.09.7" defer></script>
     <script src="/shared_components/js/quote-cart-store.js?v=2026.08.19.5" defer></script>
     <script src="/pages/js/instant-quote-artwork.js?v=2026.07.25.1" defer></script>
     <script src="/pages/js/custom-banners-ladder.js?v=2026.07.24.5" defer></script>

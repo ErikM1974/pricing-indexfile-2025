@@ -3211,6 +3211,91 @@
         "rawCssBytes": 74171,
         "localCssRequests": 2
       }
+    },
+    {
+      "source": "pages/custom-banners.html",
+      "family": "instant-storefront",
+      "status": "pilot",
+      "route": "/pages/custom-banners.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/storefront-shell.css",
+        "shared_components/css/storefront-commerce.css",
+        "pages/css/instant-quote.css",
+        "pages/css/custom-banners.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "four-widths",
+        "contrast",
+        "native-menu",
+        "desktop-disclosure",
+        "encoded-search",
+        "size-help-focus",
+        "server-prices",
+        "quantity",
+        "custom-size",
+        "finishing",
+        "failed-pricing",
+        "empty-pricing",
+        "degraded-warning",
+        "invalid-inquiry",
+        "upload-failure",
+        "draft-retention",
+        "retry-success",
+        "complete-print"
+      ],
+      "test": "tests/e2e/css-unification-instant-storefront.spec.js",
+      "maxCssBytes": 121464,
+      "measuredRawCssBytes": 119416,
+      "baseline": {
+        "commit": "f5c12668f7bb7e0aa086912ae0ad65539a4f68df",
+        "rawCssBytes": 89926,
+        "localCssRequests": 4
+      }
+    },
+    {
+      "source": "pages/custom-stickers.html",
+      "family": "instant-storefront",
+      "status": "pilot",
+      "route": "/pages/custom-stickers.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/storefront-shell.css",
+        "shared_components/css/storefront-commerce.css",
+        "pages/css/instant-quote.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "four-widths",
+        "contrast",
+        "native-menu",
+        "desktop-disclosure",
+        "encoded-search",
+        "size-help-focus",
+        "server-prices",
+        "quantity",
+        "custom-size",
+        "finishing",
+        "failed-pricing",
+        "empty-pricing",
+        "degraded-warning",
+        "invalid-inquiry",
+        "upload-failure",
+        "draft-retention",
+        "retry-success",
+        "complete-print"
+      ],
+      "test": "tests/e2e/css-unification-instant-storefront.spec.js",
+      "maxCssBytes": 115430,
+      "measuredRawCssBytes": 113382,
+      "baseline": {
+        "commit": "f5c12668f7bb7e0aa086912ae0ad65539a4f68df",
+        "rawCssBytes": 85180,
+        "localCssRequests": 3
+      }
     }
   ],
   "billingContentSha256": "d85f8530e03a1863d1b8bb2ebe97ba332d5c9e3411887d1eb2d02dcdb14c0863",

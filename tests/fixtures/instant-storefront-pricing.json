@@ -1,0 +1,635 @@
+{
+  "capturedAt": "2026-09-09T13:03:07.426Z",
+  "banners": {
+    "presets": [
+      {
+        "key": "2x4",
+        "label": "2 × 4 ft",
+        "note": "Table banner",
+        "widthFt": 2,
+        "heightFt": 4,
+        "widthIn": 24,
+        "heightIn": 48,
+        "sqft": 8,
+        "price": 80,
+        "atMinimum": false
+      },
+      {
+        "key": "2x6",
+        "label": "2 × 6 ft",
+        "note": "Table / rail",
+        "widthFt": 2,
+        "heightFt": 6,
+        "widthIn": 24,
+        "heightIn": 72,
+        "sqft": 12,
+        "price": 120,
+        "atMinimum": false
+      },
+      {
+        "key": "3x5",
+        "label": "3 × 5 ft",
+        "note": "Fence banner",
+        "widthFt": 3,
+        "heightFt": 5,
+        "widthIn": 36,
+        "heightIn": 60,
+        "sqft": 15,
+        "price": 150,
+        "atMinimum": false
+      },
+      {
+        "key": "3x6",
+        "label": "3 × 6 ft",
+        "note": "Most popular",
+        "widthFt": 3,
+        "heightFt": 6,
+        "widthIn": 36,
+        "heightIn": 72,
+        "sqft": 18,
+        "price": 180,
+        "atMinimum": false
+      },
+      {
+        "key": "3x8",
+        "label": "3 × 8 ft",
+        "note": "Wide fence",
+        "widthFt": 3,
+        "heightFt": 8,
+        "widthIn": 36,
+        "heightIn": 96,
+        "sqft": 24,
+        "price": 240,
+        "atMinimum": false
+      },
+      {
+        "key": "4x8",
+        "label": "4 × 8 ft",
+        "note": "Field / building",
+        "widthFt": 4,
+        "heightFt": 8,
+        "widthIn": 48,
+        "heightIn": 96,
+        "sqft": 32,
+        "price": 320,
+        "atMinimum": false
+      },
+      {
+        "key": "4x10",
+        "label": "4 × 10 ft",
+        "note": "Large format",
+        "widthFt": 4,
+        "heightFt": 10,
+        "widthIn": 48,
+        "heightIn": 120,
+        "sqft": 40,
+        "price": 400,
+        "atMinimum": false
+      }
+    ],
+    "rateCard": {
+      "perSqft": 10,
+      "minimum": 40,
+      "grommet": 0.5,
+      "polePocketPerFt": 2.5,
+      "doubleSidedMultiplier": 1.8
+    },
+    "setupFee": {
+      "partNumber": "GRT-50",
+      "amount": 50,
+      "description": "Art Setup Fee — one-time charge for new artwork"
+    },
+    "source": "caspio",
+    "safeRollWidthIn": 52
+  },
+  "stickers": {
+    "grid": [
+      {
+        "PartNumber": "STK-2X2-50",
+        "Size": "2x2",
+        "Quantity": 50,
+        "TotalPrice": 87,
+        "PricePerSticker": 1.74,
+        "IsBestValue": false,
+        "unitPrice": 1.74,
+        "savingsPct": null
+      },
+      {
+        "PartNumber": "STK-2X2-100",
+        "Size": "2x2",
+        "Quantity": 100,
+        "TotalPrice": 104,
+        "PricePerSticker": 1.04,
+        "IsBestValue": false,
+        "unitPrice": 1.04,
+        "savingsPct": 40
+      },
+      {
+        "PartNumber": "STK-2X2-200",
+        "Size": "2x2",
+        "Quantity": 200,
+        "TotalPrice": 140,
+        "PricePerSticker": 0.7,
+        "IsBestValue": true,
+        "unitPrice": 0.7,
+        "savingsPct": 60
+      },
+      {
+        "PartNumber": "STK-2X2-300",
+        "Size": "2x2",
+        "Quantity": 300,
+        "TotalPrice": 186,
+        "PricePerSticker": 0.62,
+        "IsBestValue": false,
+        "unitPrice": 0.62,
+        "savingsPct": 64
+      },
+      {
+        "PartNumber": "STK-2X2-500",
+        "Size": "2x2",
+        "Quantity": 500,
+        "TotalPrice": 234,
+        "PricePerSticker": 0.47,
+        "IsBestValue": false,
+        "unitPrice": 0.468,
+        "savingsPct": 73
+      },
+      {
+        "PartNumber": "STK-2X2-1000",
+        "Size": "2x2",
+        "Quantity": 1000,
+        "TotalPrice": 408,
+        "PricePerSticker": 0.41,
+        "IsBestValue": false,
+        "unitPrice": 0.408,
+        "savingsPct": 77
+      },
+      {
+        "PartNumber": "STK-2X2-2000",
+        "Size": "2x2",
+        "Quantity": 2000,
+        "TotalPrice": 654,
+        "PricePerSticker": 0.33,
+        "IsBestValue": false,
+        "unitPrice": 0.327,
+        "savingsPct": 81
+      },
+      {
+        "PartNumber": "STK-2X2-3000",
+        "Size": "2x2",
+        "Quantity": 3000,
+        "TotalPrice": 874,
+        "PricePerSticker": 0.29,
+        "IsBestValue": false,
+        "unitPrice": 0.29133333333333333,
+        "savingsPct": 83
+      },
+      {
+        "PartNumber": "STK-2X2-5000",
+        "Size": "2x2",
+        "Quantity": 5000,
+        "TotalPrice": 1275,
+        "PricePerSticker": 0.26,
+        "IsBestValue": false,
+        "unitPrice": 0.255,
+        "savingsPct": 85
+      },
+      {
+        "PartNumber": "STK-2X2-10000",
+        "Size": "2x2",
+        "Quantity": 10000,
+        "TotalPrice": 2158,
+        "PricePerSticker": 0.22,
+        "IsBestValue": false,
+        "unitPrice": 0.2158,
+        "savingsPct": 88
+      },
+      {
+        "PartNumber": "STK-3X3-50",
+        "Size": "3x3",
+        "Quantity": 50,
+        "TotalPrice": 98,
+        "PricePerSticker": 1.96,
+        "IsBestValue": false,
+        "unitPrice": 1.96,
+        "savingsPct": null
+      },
+      {
+        "PartNumber": "STK-3X3-100",
+        "Size": "3x3",
+        "Quantity": 100,
+        "TotalPrice": 124,
+        "PricePerSticker": 1.24,
+        "IsBestValue": true,
+        "unitPrice": 1.24,
+        "savingsPct": 37
+      },
+      {
+        "PartNumber": "STK-3X3-200",
+        "Size": "3x3",
+        "Quantity": 200,
+        "TotalPrice": 234,
+        "PricePerSticker": 1.17,
+        "IsBestValue": false,
+        "unitPrice": 1.17,
+        "savingsPct": 40
+      },
+      {
+        "PartNumber": "STK-3X3-300",
+        "Size": "3x3",
+        "Quantity": 300,
+        "TotalPrice": 296,
+        "PricePerSticker": 0.99,
+        "IsBestValue": false,
+        "unitPrice": 0.9866666666666667,
+        "savingsPct": 50
+      },
+      {
+        "PartNumber": "STK-3X3-500",
+        "Size": "3x3",
+        "Quantity": 500,
+        "TotalPrice": 406,
+        "PricePerSticker": 0.81,
+        "IsBestValue": false,
+        "unitPrice": 0.812,
+        "savingsPct": 59
+      },
+      {
+        "PartNumber": "STK-3X3-1000",
+        "Size": "3x3",
+        "Quantity": 1000,
+        "TotalPrice": 656,
+        "PricePerSticker": 0.66,
+        "IsBestValue": false,
+        "unitPrice": 0.656,
+        "savingsPct": 67
+      },
+      {
+        "PartNumber": "STK-3X3-2000",
+        "Size": "3x3",
+        "Quantity": 2000,
+        "TotalPrice": 1089,
+        "PricePerSticker": 0.54,
+        "IsBestValue": false,
+        "unitPrice": 0.5445,
+        "savingsPct": 72
+      },
+      {
+        "PartNumber": "STK-3X3-3000",
+        "Size": "3x3",
+        "Quantity": 3000,
+        "TotalPrice": 1482,
+        "PricePerSticker": 0.49,
+        "IsBestValue": false,
+        "unitPrice": 0.494,
+        "savingsPct": 75
+      },
+      {
+        "PartNumber": "STK-3X3-5000",
+        "Size": "3x3",
+        "Quantity": 5000,
+        "TotalPrice": 2199,
+        "PricePerSticker": 0.44,
+        "IsBestValue": false,
+        "unitPrice": 0.4398,
+        "savingsPct": 78
+      },
+      {
+        "PartNumber": "STK-3X3-10000",
+        "Size": "3x3",
+        "Quantity": 10000,
+        "TotalPrice": 3790,
+        "PricePerSticker": 0.38,
+        "IsBestValue": false,
+        "unitPrice": 0.379,
+        "savingsPct": 81
+      },
+      {
+        "PartNumber": "STK-4X4-50",
+        "Size": "4x4",
+        "Quantity": 50,
+        "TotalPrice": 153,
+        "PricePerSticker": 3.06,
+        "IsBestValue": false,
+        "unitPrice": 3.06,
+        "savingsPct": null
+      },
+      {
+        "PartNumber": "STK-4X4-100",
+        "Size": "4x4",
+        "Quantity": 100,
+        "TotalPrice": 212,
+        "PricePerSticker": 2.12,
+        "IsBestValue": false,
+        "unitPrice": 2.12,
+        "savingsPct": 31
+      },
+      {
+        "PartNumber": "STK-4X4-200",
+        "Size": "4x4",
+        "Quantity": 200,
+        "TotalPrice": 294,
+        "PricePerSticker": 1.47,
+        "IsBestValue": true,
+        "unitPrice": 1.47,
+        "savingsPct": 52
+      },
+      {
+        "PartNumber": "STK-4X4-300",
+        "Size": "4x4",
+        "Quantity": 300,
+        "TotalPrice": 378,
+        "PricePerSticker": 1.26,
+        "IsBestValue": false,
+        "unitPrice": 1.26,
+        "savingsPct": 59
+      },
+      {
+        "PartNumber": "STK-4X4-500",
+        "Size": "4x4",
+        "Quantity": 500,
+        "TotalPrice": 544,
+        "PricePerSticker": 1.09,
+        "IsBestValue": false,
+        "unitPrice": 1.088,
+        "savingsPct": 64
+      },
+      {
+        "PartNumber": "STK-4X4-1000",
+        "Size": "4x4",
+        "Quantity": 1000,
+        "TotalPrice": 962,
+        "PricePerSticker": 0.96,
+        "IsBestValue": false,
+        "unitPrice": 0.962,
+        "savingsPct": 69
+      },
+      {
+        "PartNumber": "STK-4X4-2000",
+        "Size": "4x4",
+        "Quantity": 2000,
+        "TotalPrice": 1630,
+        "PricePerSticker": 0.82,
+        "IsBestValue": false,
+        "unitPrice": 0.815,
+        "savingsPct": 73
+      },
+      {
+        "PartNumber": "STK-4X4-3000",
+        "Size": "4x4",
+        "Quantity": 3000,
+        "TotalPrice": 2236,
+        "PricePerSticker": 0.75,
+        "IsBestValue": false,
+        "unitPrice": 0.7453333333333333,
+        "savingsPct": 76
+      },
+      {
+        "PartNumber": "STK-4X4-5000",
+        "Size": "4x4",
+        "Quantity": 5000,
+        "TotalPrice": 3346,
+        "PricePerSticker": 0.67,
+        "IsBestValue": false,
+        "unitPrice": 0.6692,
+        "savingsPct": 78
+      },
+      {
+        "PartNumber": "STK-4X4-10000",
+        "Size": "4x4",
+        "Quantity": 10000,
+        "TotalPrice": 5846,
+        "PricePerSticker": 0.58,
+        "IsBestValue": false,
+        "unitPrice": 0.5846,
+        "savingsPct": 81
+      },
+      {
+        "PartNumber": "STK-5X5-50",
+        "Size": "5x5",
+        "Quantity": 50,
+        "TotalPrice": 183,
+        "PricePerSticker": 3.66,
+        "IsBestValue": false,
+        "unitPrice": 3.66,
+        "savingsPct": null
+      },
+      {
+        "PartNumber": "STK-5X5-100",
+        "Size": "5x5",
+        "Quantity": 100,
+        "TotalPrice": 266,
+        "PricePerSticker": 2.66,
+        "IsBestValue": false,
+        "unitPrice": 2.66,
+        "savingsPct": 27
+      },
+      {
+        "PartNumber": "STK-5X5-200",
+        "Size": "5x5",
+        "Quantity": 200,
+        "TotalPrice": 412,
+        "PricePerSticker": 2.06,
+        "IsBestValue": true,
+        "unitPrice": 2.06,
+        "savingsPct": 44
+      },
+      {
+        "PartNumber": "STK-5X5-300",
+        "Size": "5x5",
+        "Quantity": 300,
+        "TotalPrice": 536,
+        "PricePerSticker": 1.79,
+        "IsBestValue": false,
+        "unitPrice": 1.7866666666666666,
+        "savingsPct": 51
+      },
+      {
+        "PartNumber": "STK-5X5-500",
+        "Size": "5x5",
+        "Quantity": 500,
+        "TotalPrice": 784,
+        "PricePerSticker": 1.57,
+        "IsBestValue": false,
+        "unitPrice": 1.568,
+        "savingsPct": 57
+      },
+      {
+        "PartNumber": "STK-5X5-1000",
+        "Size": "5x5",
+        "Quantity": 1000,
+        "TotalPrice": 1322,
+        "PricePerSticker": 1.32,
+        "IsBestValue": false,
+        "unitPrice": 1.322,
+        "savingsPct": 64
+      },
+      {
+        "PartNumber": "STK-5X5-2000",
+        "Size": "5x5",
+        "Quantity": 2000,
+        "TotalPrice": 2266,
+        "PricePerSticker": 1.13,
+        "IsBestValue": false,
+        "unitPrice": 1.133,
+        "savingsPct": 69
+      },
+      {
+        "PartNumber": "STK-5X5-3000",
+        "Size": "5x5",
+        "Quantity": 3000,
+        "TotalPrice": 3123,
+        "PricePerSticker": 1.04,
+        "IsBestValue": false,
+        "unitPrice": 1.041,
+        "savingsPct": 72
+      },
+      {
+        "PartNumber": "STK-5X5-5000",
+        "Size": "5x5",
+        "Quantity": 5000,
+        "TotalPrice": 4694,
+        "PricePerSticker": 0.94,
+        "IsBestValue": false,
+        "unitPrice": 0.9388,
+        "savingsPct": 74
+      },
+      {
+        "PartNumber": "STK-5X5-10000",
+        "Size": "5x5",
+        "Quantity": 10000,
+        "TotalPrice": 8892,
+        "PricePerSticker": 0.89,
+        "IsBestValue": false,
+        "unitPrice": 0.8892,
+        "savingsPct": 76
+      },
+      {
+        "PartNumber": "STK-6X6-50",
+        "Size": "6x6",
+        "Quantity": 50,
+        "TotalPrice": 218,
+        "PricePerSticker": 4.36,
+        "IsBestValue": false,
+        "unitPrice": 4.36,
+        "savingsPct": null
+      },
+      {
+        "PartNumber": "STK-6X6-100",
+        "Size": "6x6",
+        "Quantity": 100,
+        "TotalPrice": 383,
+        "PricePerSticker": 3.83,
+        "IsBestValue": false,
+        "unitPrice": 3.83,
+        "savingsPct": 12
+      },
+      {
+        "PartNumber": "STK-6X6-200",
+        "Size": "6x6",
+        "Quantity": 200,
+        "TotalPrice": 588,
+        "PricePerSticker": 2.94,
+        "IsBestValue": true,
+        "unitPrice": 2.94,
+        "savingsPct": 33
+      },
+      {
+        "PartNumber": "STK-6X6-300",
+        "Size": "6x6",
+        "Quantity": 300,
+        "TotalPrice": 774,
+        "PricePerSticker": 2.58,
+        "IsBestValue": false,
+        "unitPrice": 2.58,
+        "savingsPct": 41
+      },
+      {
+        "PartNumber": "STK-6X6-500",
+        "Size": "6x6",
+        "Quantity": 500,
+        "TotalPrice": 1125,
+        "PricePerSticker": 2.25,
+        "IsBestValue": false,
+        "unitPrice": 2.25,
+        "savingsPct": 48
+      },
+      {
+        "PartNumber": "STK-6X6-1000",
+        "Size": "6x6",
+        "Quantity": 1000,
+        "TotalPrice": 1740,
+        "PricePerSticker": 1.74,
+        "IsBestValue": false,
+        "unitPrice": 1.74,
+        "savingsPct": 60
+      },
+      {
+        "PartNumber": "STK-6X6-2000",
+        "Size": "6x6",
+        "Quantity": 2000,
+        "TotalPrice": 2940,
+        "PricePerSticker": 1.47,
+        "IsBestValue": false,
+        "unitPrice": 1.47,
+        "savingsPct": 66
+      },
+      {
+        "PartNumber": "STK-6X6-3000",
+        "Size": "6x6",
+        "Quantity": 3000,
+        "TotalPrice": 4080,
+        "PricePerSticker": 1.36,
+        "IsBestValue": false,
+        "unitPrice": 1.36,
+        "savingsPct": 69
+      },
+      {
+        "PartNumber": "STK-6X6-5000",
+        "Size": "6x6",
+        "Quantity": 5000,
+        "TotalPrice": 6250,
+        "PricePerSticker": 1.25,
+        "IsBestValue": false,
+        "unitPrice": 1.25,
+        "savingsPct": 71
+      },
+      {
+        "PartNumber": "STK-6X6-10000",
+        "Size": "6x6",
+        "Quantity": 10000,
+        "TotalPrice": 12000,
+        "PricePerSticker": 1.2,
+        "IsBestValue": false,
+        "unitPrice": 1.2,
+        "savingsPct": 72
+      }
+    ],
+    "setupFee": {
+      "partNumber": "GRT-50",
+      "amount": 50,
+      "description": "Art Setup Fee — one-time charge for new artwork"
+    },
+    "standardSizes": [
+      "2x2",
+      "3x3",
+      "4x4",
+      "5x5",
+      "6x6"
+    ],
+    "standardQtys": [
+      50,
+      100,
+      200,
+      300,
+      500,
+      1000,
+      2000,
+      3000,
+      5000,
+      10000
+    ],
+    "source": "caspio",
+    "degraded": false
+  }
+}

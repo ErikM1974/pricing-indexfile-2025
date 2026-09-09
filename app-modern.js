@@ -232,6 +232,9 @@ function setupDropdownSearch() {
 }
 
 function enhanceDropdownInteraction() {
+    // Unified instant pages delegate disclosure state to nav-dropdown.js.
+    if (document.querySelector('[data-ui="unified"][data-instant]')) return;
+
     const productsNavItem = document.querySelector('.nav-products').parentElement;
     const dropdown = productsNavItem.querySelector('.nav-dropdown');
     let closeTimeout;
@@ -328,6 +331,9 @@ function setupMobileMenu() {
     const menuBtn = document.getElementById('mobileMenuBtn');
     const sidebar = document.getElementById('sidebar');
     const overlay = document.getElementById('sidebarOverlay');
+
+    // Unified storefront pages use the shared native dialog navigation.
+    if (sidebar?.tagName === 'DIALOG') return;
 
     if (menuBtn) {
         menuBtn.addEventListener('click', () => {
