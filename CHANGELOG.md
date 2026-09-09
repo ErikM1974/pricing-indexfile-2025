@@ -1,3 +1,11 @@
+## v2026.09.09.17 (2026.09.09)
+
+- Plan product detail and catalog color CSS review
+- Unify product detail tools and preserve stock and audit outputs
+- Record verified preview release and product-detail checkpoint
+- Integrate reviewed product detail layouts and data-state guards
+- Deploy v2026.09.09.17: unify product detail tools and preserve stock and audit outputs
+
 ## v2026.09.09.16 (2026.09.09)
 
 - Plan design preview tool CSS and output review

@@ -1071,3 +1071,7 @@ Reviewed product detail tools: DTG-compatible products, inventory details and Sa
 ## Product detail release checks complete — v2026.09.09.17
 
 Full integrated source passed build/lint/types,485routes/24modules,229unit suites/5316tests/four existing skips,88DOM,four accessibility unit,84quote parity,604mocked browser,16remaining browser/three optional screenshot skips,all five calculators,283CSS clean,boot200 and production audit zero.22focused cases; three PDFs/six pages/610extracted words retain original business text with all11product images. Seven original script hashes preserved outside33mapped changes; four exact clipboard outputs and warehouse values retained. Four old sheets/five flags retired, new owner zero. Catalog size placeholders are labelled unavailable stock; no new stock source is invented. Versioned source assets follow existing page serving policy. Live remains143/82 until verified146/79 after exact-source CI and rollout.
+
+## Product detail release record — v2026.09.09.17
+
+Exact-source CI 34415212298 passed all four jobs on d9695d9ff41b3423b2c5be4b21bb349928cf105b, including actual money/calculator parity and604mocked browser checks. Three product detail tools share controls, table layouts and honest unknown/error states.22focused cases, exact warehouse and four clipboard outputs, three PDFs/six pages. Seven source hashes preserved outside33mapped changes. Four old sheets/five flags retired.485routes unchanged. Count becomes146reviewed/79pending only after verified rollout.
