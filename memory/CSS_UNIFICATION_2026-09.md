@@ -532,3 +532,7 @@ Raw CSS graph per page:81,097 → 70707 bytes (12.8% smaller), including shared 
 ## Webstore full-gate correction — 2026-09-08
 
 The first primary unit pass stopped on24 existing hygiene assertions across all12 pages: new shared components, family CSS and controller references lacked cache versions. Added explicit candidate .20 query versions. This is a reference-only correction; no policy/product copy or CSS/JS behavior changed. Re-run the full gates before source CI. The previously passed focused rendering and paper evidence still describes the same runtime bytes.
+
+## Webstore release checks complete — 2026-09-09
+
+Twelve public webstore guides integrated. The interrupted browser run was resumed from unchanged f916e43c118906bcf7c66faf899f74a2bea95871; it is not counted as a pass. Completed release checks:212 unit suites/5,122 passed/four existing skips;88 DOM,4 accessibility unit,84 quote parity;290 mocked browser (486.5s),16 remaining browser and three optional screenshot skips;all five live calculator surfaces,build/lint/types/295 CSS/HTTP boot.485 routes/24 modules unchanged. Twenty-five webstore browser cases and773 paper content blocks retained. Candidate v2026.09.08.20 was reserved before midnight; all36 new stylesheet/controller references already carry that version. Exact-source CI and actual deployment still pending. Live count remains72/225,153 pending until verified rollout. Next15 brand guides are under review in the isolated codex/brand-guide-family worktree.
