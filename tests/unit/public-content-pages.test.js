@@ -60,9 +60,12 @@ describe('content pages — specifics', () => {
             const html = read(p);
             expect(html).toContain('/pages/css/simple-notice-page.css?v=');
             expect((html.match(/<h1\b/g) || []).length).toBe(1);
-            expect(html).toMatch(/<p class="header-title">/);
+            expect(html).toMatch(/<p class="page-title">/);
+            expect(html).toContain('data-ui="unified"');
+            expect(html).toContain('/shared_components/css/components.css?v=');
         }
-        expect(read('pages/css/simple-notice-page.css')).toMatch(/\[hidden\] \{ display: none !important; \}/);
+        expect(read('shared_components/css/components.css')).toMatch(/\[hidden\]\s*\{[^}]*display:\s*none;/);
+        expect(read('pages/css/simple-notice-page.css')).not.toMatch(/!important/);
     });
     test('laser tumbler: spinner/error via hidden attribute', () => {
         const html = read('calculators/laser-tumbler-polarcamel.html');

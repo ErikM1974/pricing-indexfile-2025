@@ -317,3 +317,6 @@ For questions or issues with the testing system:
 
 - `tests/e2e/css-unification-api-reference.spec.js` — four reference pages at four widths, search/empty/escaping, ODBC disclosure/stored-only/load retry, paper content/state and unchanged real authentication gates; business calls mocked.
 - `tests/unit/api-reference-content.test.js` + `tests/fixtures/api-reference-original-content.json` — original technical prose, fields/options, links, reference literals and ODBC schema bytes.
+
+- `tests/e2e/css-unification-policy-reference.spec.js` — policy migration filters/retry/empty, guide contents/history/top, notices and all four paper layouts; calls are mocked.
+- `tests/unit/policy-reference-content.test.js` + `tests/fixtures/policy-reference-original-content.json` — original policy prose/figures, routes/IDs/fields and migration snapshot.

@@ -10,9 +10,11 @@
  */
 (function () {
     'use strict';
+    const DashPage = window.DashPage;
 
     var DATA = null;
     var state = { q: '', tiers: {} };
+    var printing = false;
 
     var TIER_LABEL = {
         CORE: '⭐ CORE — Claude updates & publishes',
@@ -24,17 +26,21 @@
 
     function boot() {
         var root = document.getElementById('content-root');
+        DATA = null;
+        DashPage.hideError();
+        root.setAttribute('aria-busy', 'true');
         if (root) { root.classList.add('dash-loading'); root.textContent = 'Loading…'; }
         loadData().then(function () { DashPage.hideError(); }).catch(function (err) {
             console.error('[policy-migration] load failed:', err);
             DashPage.showError('Unable to load migration data (' + (err.message || 'request failed') + ').');
             if (root) {
                 root.classList.remove('dash-loading');
+                // eslint-disable-next-line no-unsanitized/property -- Snapshot strings are escaped and links use encoded identifiers.
                 root.innerHTML = '<p class="pm-empty" role="alert">Migration data unavailable (' + esc(err.message || 'request failed') + '). ' +
                     '<button type="button" class="dash-btn dash-btn--sm" id="pmig-retry">Retry</button></p>';
                 var rb = document.getElementById('pmig-retry'); if (rb) rb.addEventListener('click', boot);
             }
-        });
+        }).finally(function () { root.setAttribute('aria-busy', 'false'); });
     }
 
     function esc(s) {
@@ -49,7 +55,15 @@
         // BASE_URL, which is wrong for this local file.
         var resp = await fetch('/dashboards/policy-migration-data.json', { cache: 'no-store' });
         if (!resp.ok) throw new Error('data fetch HTTP ' + resp.status);
-        DATA = await resp.json();
+        var data = await resp.json();
+        if (!data || !Array.isArray(data.rows) || !data.rows.every(function (row) {
+            return row && ['t','d','n','v','tier'].every(function (key) { return typeof row[key] === 'string'; });
+        }) || !data.stats || !Number.isFinite(data.stats.hub_live) || !Number.isInteger(data.confidential_count) || data.confidential_count < 0 ||
+            !Array.isArray(data.erik_questions) || !data.erik_questions.every(function (q) { return typeof q === 'string'; }) ||
+            !Array.isArray(data.wave_log) || !data.wave_log.every(function (w) { return w && typeof w.when === 'string' && typeof w.what === 'string' && (w.pid == null || typeof w.pid === 'string'); })) {
+            throw new Error('The migration snapshot has an unexpected format');
+        }
+        DATA = data;
         renderStats();
         renderQuestions();
         renderWaveLog();
@@ -75,11 +89,13 @@
     }
 
     function renderQuestions() {
+        // eslint-disable-next-line no-unsanitized/property -- Snapshot strings are escaped and links use encoded identifiers.
         document.getElementById('questions-list').innerHTML = DATA.erik_questions
             .map(function (q) { return '<li>' + esc(q) + '</li>'; }).join('');
     }
 
     function renderWaveLog() {
+        // eslint-disable-next-line no-unsanitized/property -- Snapshot strings are escaped and links use encoded identifiers.
         document.getElementById('wave-log').innerHTML = DATA.wave_log.map(function (w) {
             var link = w.pid
                 ? ' <a href="/pages/policy-detail.html?id=' + encodeURIComponent(w.pid) + '">open →</a>'
@@ -90,24 +106,24 @@
 
     function renderChips() {
         var host = document.getElementById('tier-chips');
-        host.innerHTML = '';
+        host.replaceChildren();
         ['CORE', 'ERIK', 'AUTO'].forEach(function (t) {
             var n = DATA.rows.filter(function (r) { return r.tier === t; }).length;
-            var el = document.createElement('span');
-            el.className = 'pm-chip';
+            var el = document.createElement('button');
+            el.type = 'button';
+            el.className = 'pm-chip btn';
+            el.dataset.tier = t;
+            el.setAttribute('aria-pressed', String(Boolean(state.tiers[t])));
             el.textContent = TIER_LABEL[t].split(' — ')[0] + ' (' + n + ')';
             el.title = TIER_LABEL[t];
             el.addEventListener('click', function () {
                 state.tiers[t] = !state.tiers[t];
-                el.classList.toggle('on');
+                el.setAttribute('aria-pressed', String(Boolean(state.tiers[t])));
                 renderTable();
             });
             host.appendChild(el);
         });
-        document.getElementById('pm-search').addEventListener('input', function (e) {
-            state.q = e.target.value.toLowerCase();
-            renderTable();
-        });
+
     }
 
     function badge(r) {
@@ -118,10 +134,11 @@
     }
 
     function renderTable() {
+        if (!DATA) return;
         var anyTier = Object.keys(state.tiers).some(function (k) { return state.tiers[k]; });
         var rows = DATA.rows.filter(function (r) {
-            if (anyTier && !state.tiers[r.tier]) return false;
-            if (state.q && (r.t + ' ' + r.d + ' ' + r.n).toLowerCase().indexOf(state.q) === -1) return false;
+            if (!printing && anyTier && !state.tiers[r.tier]) return false;
+            if (!printing && state.q && (r.t + ' ' + r.d + ' ' + r.n).toLowerCase().indexOf(state.q) === -1) return false;
             return true;
         });
         // CORE first, then ERIK, then the rest; done items sink within their group
@@ -134,8 +151,8 @@
             return a.t.localeCompare(b.t);
         });
 
-        var html = '<div class="pm-table-wrap"><table class="pm-table"><thead><tr>' +
-            '<th>Status</th><th>Document</th><th>Dept</th><th>Hub policy</th><th>Note</th>' +
+        var html = '<div class="pm-table-wrap" tabindex="0" role="region" aria-label="Document tracker; scroll horizontally"><table class="pm-table"><thead><tr>' +
+            '<th scope="col">Status</th><th scope="col">Document</th><th scope="col">Dept</th><th scope="col">Hub policy</th><th scope="col">Note</th>' +
             '</tr></thead><tbody>';
         html += rows.map(function (r) {
             var hub = r.pid
@@ -148,14 +165,22 @@
 
         var root = document.getElementById('content-root');
         root.classList.remove('dash-loading');
-        root.innerHTML = html;
+        // eslint-disable-next-line no-unsanitized/property -- Snapshot strings are escaped and links use encoded identifiers.
+        root.innerHTML = rows.length ? html : '<p class="pm-empty" role="status">' + (DATA.rows.length ? 'No documents match these filters.' : 'No documents are available in this snapshot.') + '</p>';
 
         var header = document.querySelector('.dash-card-header .pm-count');
         if (!header) {
             header = document.createElement('span');
             header.className = 'pm-count';
+            header.setAttribute('role', 'status');
             document.querySelectorAll('.dash-card-header')[2].appendChild(header);
         }
         header.textContent = rows.length + ' / ' + DATA.rows.length + ' documents';
     }
+    document.getElementById('pm-search').addEventListener('input', function (e) {
+        state.q = e.target.value.toLowerCase();
+        renderTable();
+    });
+    window.addEventListener('beforeprint', function () { printing = true; renderTable(); });
+    window.addEventListener('afterprint', function () { printing = false; renderTable(); });
 })();

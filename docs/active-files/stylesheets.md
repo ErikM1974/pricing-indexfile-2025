@@ -186,3 +186,5 @@ cap-embroidery-fix.css
 - `/shared_components/css/training-simulator.css` — shared scoreboards, exercise options, feedback and native dialogs; Training Center and both ShopWorks simulations keep their arrangements in their scoped training sheets.
 
 API reference family: Caspio, ManageOrders, SanMar and ShopWorks ODBC load tokens → components → api-reference → page arrangements. Shared reference CSS owns page chrome, labeled search, count/status, endpoint/field tables, callouts, mobile wrapping and paper rhythm. Keep technical catalogs in page controllers/data; original-content and schema guards prevent accidental edits. Native ODBC details and failed/malformed catalogue retry remain page behavior.
+
+Policy guides/notices: shared components own page chrome, fields/buttons, cards and visibility. policy-migration.css and pricing-negotiation-policy.css own domain arrangements; simple-notice-page.css is shared by Resources/Sale. These four opt in with data-guidance. Preserve historical policy figures and the migration snapshot. Bootstrap and art-hub/dash-shell dependencies are removed from this family.
