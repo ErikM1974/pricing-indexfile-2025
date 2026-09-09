@@ -61,7 +61,7 @@
         background: var(--ui-surface);
         border: 1px solid var(--ui-line);
         border-radius: 0 0 var(--radius-lg) var(--radius-lg);
-        box-shadow: var(--shadow-lg);
+        box-shadow: var(--shadow-md);
         opacity: 0;
         visibility: hidden;
         transform: translateY(-10px);
@@ -320,7 +320,7 @@
     }
 
     :where([data-ui="unified"][data-instant]) .category-link::after {
-        content: "›";
+        content: '›';
         color: var(--ui-line-strong);
         font-size: 18px;
         font-weight: 700;
@@ -363,7 +363,7 @@
         background: var(--ui-surface);
         border: 1px solid var(--ui-line);
         border-radius: var(--radius-lg);
-        box-shadow: var(--shadow-lg);
+        box-shadow: var(--shadow-md);
         opacity: 0;
         visibility: hidden;
         transform: translateX(-6px);

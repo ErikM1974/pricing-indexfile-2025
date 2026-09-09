@@ -23,11 +23,11 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.09.6">
-    <link rel="stylesheet" href="/shared_components/css/storefront-shell.css?v=2026.09.09.6">
-    <link rel="stylesheet" href="/shared_components/css/storefront-commerce.css?v=2026.09.09.6">
-    <link rel="stylesheet" href="/pages/css/instant-quote.css?v=2026.09.09.6">
-    <link rel="stylesheet" href="/pages/css/custom-banners.css?v=2026.09.09.6">
+    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.09.7">
+    <link rel="stylesheet" href="/shared_components/css/storefront-shell.css?v=2026.09.09.7">
+    <link rel="stylesheet" href="/shared_components/css/storefront-commerce.css?v=2026.09.09.7">
+    <link rel="stylesheet" href="/pages/css/instant-quote.css?v=2026.09.09.7">
+    <link rel="stylesheet" href="/pages/css/custom-banners.css?v=2026.09.09.7">
     <!-- Do NOT add sticker-pricing-page.css or nwca-form-shared.css - both
          declare :root tokens that collide with core. See instant-quote.css. -->
 </head>
@@ -35,7 +35,7 @@
     <a class="skip-link" href="#configurator">Skip to pricing</a>
 
     <!-- Utility strip -->
-    <div class="util-strip">
+    <div class="util-strip" role="region" aria-label="Company information">
         <div class="util-inner">
             <p class="util-fam"><strong>Northwest Custom Apparel</strong> — family-owned in Milton, WA since 1977</p>
             <div class="util-contact">
@@ -316,12 +316,12 @@
                 <div class="stk-trust-grid">
                     <div>
                         <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><path d="M14 2v6h6"></path><path d="m9 15 2 2 4-4"></path></svg>
-                        <h3>Approve a proof first</h3>
+                        <h2>Approve a proof first</h2>
                         <p>Nothing goes on the printer until you sign off on a digital proof. A real person sends it, and you can ask for changes.</p>
                     </div>
                     <div>
                         <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-                        <h3>Finished, not just printed</h3>
+                        <h2>Finished, not just printed</h2>
                         <p>Sewn hems and #2 brass grommets every 24 inches are included in the price &mdash; not an upsell.</p>
                     </div>
                     <div>
@@ -332,7 +332,7 @@
                              src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/Banner%201000%20x%201000%20erik%20and%20don%20o%27neill.jpg?ver=1"
                              alt="Two Northwest Custom Apparel staff holding a finished Lincoln Lynx Football banner in the Milton, Washington shop, brass grommets visible along both edges"
                              width="1000" height="1000" loading="lazy" decoding="async">
-                        <h3>Printed here, not brokered</h3>
+                        <h2>Printed here, not brokered</h2>
                         <p>Milton, Washington since 1977. Family-owned, one building. That's one of ours, fresh off the printer — you can pick yours up the same way.</p>
                     </div>
                 </div>
@@ -406,7 +406,7 @@
         </div>
     </dialog>
 
-    <div class="stk-bar" id="bnBar" hidden>
+    <div class="stk-bar" id="bnBar" role="region" aria-label="Current quote" hidden>
         <div class="stk-bar-summary">
             <strong id="bnBarTotal">&mdash;</strong>
             <span id="bnBarDetail"></span>
@@ -502,9 +502,9 @@
     <script src="/shared_components/js/decoration-methods.js?v=2026.09.06.31"></script>
     <script src="/brands-flyout.js?v=2026.09.06.31"></script>
     <script src="/shared_components/js/nav-dropdown.js?v=2026.07.13.4" defer></script>
-    <script src="/shared_components/js/storefront-navigation.js?v=2026.09.09.6" defer></script>
-    <script src="/shared_components/js/instant-storefront.js?v=2026.09.09.6" defer></script>
-    <script src="/app-modern.js?v=2026.09.09.6" defer></script>
+    <script src="/shared_components/js/storefront-navigation.js?v=2026.09.09.7" defer></script>
+    <script src="/shared_components/js/instant-storefront.js?v=2026.09.09.7" defer></script>
+    <script src="/app-modern.js?v=2026.09.09.7" defer></script>
     <script src="/shared_components/js/quote-cart-store.js?v=2026.08.19.5" defer></script>
     <script src="/pages/js/instant-quote-artwork.js?v=2026.07.25.1" defer></script>
     <script src="/pages/js/custom-banners-ladder.js?v=2026.07.24.5" defer></script>

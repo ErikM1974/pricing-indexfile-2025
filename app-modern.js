@@ -232,6 +232,9 @@ function setupDropdownSearch() {
 }
 
 function enhanceDropdownInteraction() {
+    // Unified instant pages delegate disclosure state to nav-dropdown.js.
+    if (document.querySelector('[data-ui="unified"][data-instant]')) return;
+
     const productsNavItem = document.querySelector('.nav-products').parentElement;
     const dropdown = productsNavItem.querySelector('.nav-dropdown');
     let closeTimeout;
