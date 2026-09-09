@@ -736,3 +736,7 @@ Design: Public Sans, white surfaces on the existing neutral canvas (#ffffff/#f3f
 - [ ] Consolidate the five hosted page arrangements; register additions/deletions immediately.
 - [ ] Four widths/axe/keyboard/loading/failed/login/form/report/empty states and complete reference paper with provider writes blocked.
 - [ ] Update coverage/counts only after review; full primary gates, exact-source CI and verified grouped release after intake .8.
+
+## Hosted workspace implementation in progress — 2026-09-09
+
+Hosted staff tools migration: shared_components/css/hosted-workspace.css now owns five Caspio wrappers (SanMar vendor/invoices/credits and announcement create/manage), using canonical tokens/components. Retired admin/css/announcements-create.css, admin/css/announcements-manage.css and vendor-portals/css/sanmar-portal-shared.css after their final consumers moved. Exact provider URLs and announcement controllers preserved; native skip links, loading labels and permanent hosted fallback added. Five-page review pending.
