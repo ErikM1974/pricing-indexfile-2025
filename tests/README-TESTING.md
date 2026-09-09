@@ -314,3 +314,6 @@ For questions or issues with the testing system:
 ## Final training family
 
 `css-unification-training-final.spec.js` covers the Training Center, tax-code trainer and both customer-setup simulators at four widths, with keyboard/axe, live-list failures/retry, score/restart behavior, timers and unavailable/malformed saved progress. Every service/write is mocked. `training-final-content.test.js` keeps the original lesson literals, prose, fields/options and navigation, with the retired training-hub destination explicitly replaced by Training Center. Run with `npm run test:css`; the content lock is part of `npm run test:unit`.
+
+- `tests/e2e/css-unification-api-reference.spec.js` — four reference pages at four widths, search/empty/escaping, ODBC disclosure/stored-only/load retry, paper content/state and unchanged real authentication gates; business calls mocked.
+- `tests/unit/api-reference-content.test.js` + `tests/fixtures/api-reference-original-content.json` — original technical prose, fields/options, links, reference literals and ODBC schema bytes.

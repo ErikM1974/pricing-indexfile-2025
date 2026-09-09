@@ -1,6 +1,6 @@
 /**
  * The 13 admin + reference dashboard pages — 2026-09-05 hygiene locks.
- *   Every page: decorative icons aria-hidden, banner close typed, page CSS carries the [hidden] guard,
+ *   Every page: decorative icons aria-hidden, banner close typed, active CSS owner carries the [hidden] guard,
  *   page assets versioned. Plus: api-usage meters/bars via custom properties (no .style.width / inline
  *   width/height), table-usage-audit placeholder via a class, SanMar→ShopWorks converter uses the hidden
  *   attribute (no display toggles), drive-access / policy-migration / ODBC reference offer Retry instead
@@ -23,7 +23,11 @@ describe('admin + reference pages — shared hygiene', () => {
         expect(html).not.toMatch(/<button class="dash-error-banner-close"/);
         expect(html).not.toMatch(/(href|src)="\/dashboards\/(css|js)\/[^"?]+\.(css|js)"/); // every page asset versioned
         expect((html.match(/<h1\b/g) || []).length).toBe(1);
-        if (exists(`dashboards/css/${name}.css`)) {
+        if (html.includes('data-ui="unified"')) {
+            expect(html).toMatch(/href="\/shared_components\/css\/components\.css\?v=/);
+            expect(read('shared_components/css/components.css')).toMatch(/\[hidden\]\s*\{[^}]*display:\s*none;/);
+            expect(read(`dashboards/css/${name}.css`)).not.toMatch(/!important/);
+        } else if (exists(`dashboards/css/${name}.css`)) {
             expect(read(`dashboards/css/${name}.css`)).toMatch(/^\[hidden\] \{ display: none !important; \}/m);
         }
         if (exists(`dashboards/js/${name}.js`)) {
@@ -60,7 +64,8 @@ describe('admin + reference pages — specifics', () => {
         expect(pm).toMatch(/id="pmig-retry"/);
         expect(pm).not.toMatch(/Please refresh/);
         const odbc = read('dashboards/js/shopworks-odbc-reference.js');
-        expect(odbc).toMatch(/id="swo-retry"/);
+        expect(odbc).toMatch(/retry\.textContent = 'Retry';/);
+        expect(odbc).toMatch(/retry\.addEventListener\('click', loadCatalog\)/);
         expect(odbc).not.toMatch(/Refresh to retry|Please refresh/);
     });
 });

@@ -8,6 +8,10 @@ import noUnsanitized from 'eslint-plugin-no-unsanitized';
 
 // The strict-scope files; the legacy block ignores exactly these so the two never merge.
 const STRICT_FILES = [
+    'dashboards/js/caspio-api-reference.js',
+    'dashboards/js/manageorders-api-reference.js',
+    'dashboards/js/sanmar-api-reference.js',
+    'dashboards/js/shopworks-odbc-reference.js',
     'shared_components/js/builders/**/*.js',
     'shared_components/js/ui-dialog.js',
     'shared_components/js/training-guide.js',
