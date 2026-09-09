@@ -26,6 +26,11 @@ async function open(page,file,state={},query=''){
     });
     await page.goto('/'+file+query);await page.evaluate(()=>document.fonts.ready);return events;
 }
+async function freezePollingClock(page){
+    // Installing alone leaves timers ticking while fonts/network finish loading.
+    await page.clock.install({time:new Date('2026-09-09T12:00:00Z')});
+    await page.clock.pauseAt(new Date('2026-09-09T12:00:01Z'));
+}
 const clean=events=>{expect(events.errors).toEqual([]);expect(events.writes).toEqual([]);};
 async function paper(page,name){
     const blocks=await page.locator('main h1,main p,main .tot-row,main .success-step,main figcaption,footer p').evaluateAll(nodes=>nodes.filter(n=>!n.closest('[hidden]')).map(n=>n.textContent.replace(/\s+/g,' ').trim()).filter(Boolean));
@@ -88,11 +93,11 @@ for(const entry of fixture.pages.filter(p=>p.file.includes('success'))){const na
         expect((await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze()).violations).toEqual([]);await paper(page,name+'-error');clean(events);
     });
     test('CSS entry status: '+name+' transient lookup failure recovers through existing polling',async({page})=>{
-        await page.clock.install();const state={quote:503},events=await open(page,entry.file,state,'?quote_id=REVIEW-1042');await expect.poll(()=>events.reads).toBe(1);await expect(page.locator('#s-working')).toBeVisible();
+        await freezePollingClock(page);const state={quote:503},events=await open(page,entry.file,state,'?quote_id=REVIEW-1042');await expect.poll(()=>events.reads).toBe(1);await expect(page.locator('#s-working')).toBeVisible();
         state.quote=[{...row,Status:'Payment Confirmed - ShopWorks Failed'}];await page.clock.runFor(3100);await expect(page.locator('#s-done')).toBeVisible();await expect(page.locator('#s-email-note')).toContainText('by hand');await paper(page,name+'-manual');clean(events);
     });
     test('CSS entry status: '+name+' pending webhook reaches the existing delayed state',async({page})=>{
-        await page.clock.install();const state={quote:[{...row,Status:'Pending Payment'}]},events=await open(page,entry.file,state,'?quote_id=REVIEW-1042');await expect.poll(()=>events.reads).toBe(1);
+        await freezePollingClock(page);const state={quote:[{...row,Status:'Pending Payment'}]},events=await open(page,entry.file,state,'?quote_id=REVIEW-1042');await expect.poll(()=>events.reads).toBe(1);
         for(let i=2;i<=25;i++){await page.clock.runFor(3100);await expect.poll(()=>events.reads).toBe(i);}
         await expect(page.locator('#s-delayed')).toBeVisible();await expect(page.locator('#s-delayed-num')).toHaveText('REVIEW-1042');await expect(page.locator('#s-done')).toBeHidden();await paper(page,name+'-delayed');clean(events);
     });

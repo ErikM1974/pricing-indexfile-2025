@@ -235,7 +235,7 @@
     }
 
     :where([data-ui="unified"]) .bt-card-age--warn {
-        color: var(--amber-600);
+        color: var(--color-warning-ink);
         font-weight: 500;
     }
 
