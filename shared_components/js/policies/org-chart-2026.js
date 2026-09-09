@@ -75,7 +75,17 @@
             person.classList.toggle('org-search-dim', Boolean(query) && !hit);
             person.classList.toggle('org-search-hit', Boolean(query) && hit);
         });
-        if (query) chart.classList.remove('is-production-collapsed');
+        if (query) {
+            chart.classList.remove('is-production-collapsed');
+            const toggle = chart.querySelector('.org-chart-toggle');
+            toggle.setAttribute('aria-expanded', 'true');
+            toggle.textContent = 'Collapse production';
+            chart.querySelectorAll('.org-department').forEach(department => {
+                if (!department.querySelector('.org-search-hit')) return;
+                department.classList.remove('is-collapsed');
+                department.querySelector('.org-card--department').setAttribute('aria-expanded', 'true');
+            });
+        }
     }
 
     function enhance() {

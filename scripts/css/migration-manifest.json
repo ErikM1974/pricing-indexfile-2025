@@ -1866,6 +1866,129 @@
         "localCssRequests": 2
       },
       "measuredRawCssBytes": 57441
+    },
+    {
+      "source": "pages/policies-hub.html",
+      "family": "policy-cms",
+      "status": "pilot",
+      "route": "/pages/policies-hub.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "pages/css/policy-workspace.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "four-widths",
+        "keyboard",
+        "loading",
+        "empty",
+        "error",
+        "retry",
+        "roles",
+        "complete-print"
+      ],
+      "test": "tests/e2e/css-unification-policy-cms.spec.js",
+      "maxCssBytes": 101445,
+      "baseline": {
+        "commit": "10a439b32c7e0b80ba500153284795f894c2dac5",
+        "rawCssBytes": 51709,
+        "localCssRequests": 2
+      },
+      "measuredRawCssBytes": 99945
+    },
+    {
+      "source": "pages/policy-detail.html",
+      "family": "policy-cms",
+      "status": "pilot",
+      "route": "/pages/policy-detail.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "pages/css/policy-workspace.css",
+        "pages/css/policy-detail.css",
+        "pages/css/org-chart-2026.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "four-widths",
+        "keyboard",
+        "loading",
+        "empty",
+        "error",
+        "retry",
+        "roles",
+        "complete-print"
+      ],
+      "test": "tests/e2e/css-unification-policy-cms.spec.js",
+      "maxCssBytes": 210620,
+      "baseline": {
+        "commit": "10a439b32c7e0b80ba500153284795f894c2dac5",
+        "rawCssBytes": 138235,
+        "localCssRequests": 4
+      },
+      "measuredRawCssBytes": 209120
+    },
+    {
+      "source": "pages/policy-questions.html",
+      "family": "policy-cms",
+      "status": "pilot",
+      "route": "/pages/policy-questions.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "pages/css/policy-workspace.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "four-widths",
+        "keyboard",
+        "loading",
+        "empty",
+        "error",
+        "retry",
+        "roles",
+        "complete-print"
+      ],
+      "test": "tests/e2e/css-unification-policy-cms.spec.js",
+      "maxCssBytes": 101445,
+      "baseline": {
+        "commit": "10a439b32c7e0b80ba500153284795f894c2dac5",
+        "rawCssBytes": 51709,
+        "localCssRequests": 2
+      },
+      "measuredRawCssBytes": 99945
+    },
+    {
+      "source": "pages/handbook.html",
+      "family": "policy-cms",
+      "status": "pilot",
+      "route": "/pages/handbook.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "pages/css/policy-workspace.css",
+        "pages/css/handbook.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "four-widths",
+        "keyboard",
+        "loading",
+        "empty",
+        "error",
+        "retry",
+        "roles",
+        "complete-print"
+      ],
+      "test": "tests/e2e/css-unification-policy-cms.spec.js",
+      "maxCssBytes": 114198,
+      "baseline": {
+        "commit": "10a439b32c7e0b80ba500153284795f894c2dac5",
+        "rawCssBytes": 65652,
+        "localCssRequests": 3
+      },
+      "measuredRawCssBytes": 112698
     }
   ],
   "billingContentSha256": "d85f8530e03a1863d1b8bb2ebe97ba332d5c9e3411887d1eb2d02dcdb14c0863",

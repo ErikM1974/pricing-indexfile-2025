@@ -1,137 +1,147 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="robots" content="noindex, nofollow">
-    <title>Company Policies Hub — Northwest Custom Apparel</title>
-    <link rel="icon" href="/favicon.png" type="image/png">
+<!DOCTYPE html><html lang="en"><head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="robots" content="noindex, nofollow">
+        <title>Company Policies Hub — Northwest Custom Apparel</title>
+        <link rel="icon" href="/favicon.png" type="image/png">
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/pages/css/policies-hub-v2.css?v=2026.09.07.19">
-    <script src="/config/app.config.js"></script>
-</head>
-<body class="policies-hub-body">
-
-    <!-- Hidden Caspio auth embed — provides First_Name/Last_Name/Email/Role
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+        <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
+        <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.08.17">
+        <link rel="stylesheet" href="/pages/css/policy-workspace.css?v=2026.09.08.19">
+        <script src="/config/app.config.js"></script>
+    </head>
+    <body class="policies-hub-body" data-ui="unified" data-policy="policies-hub"><a href="#policy-main" class="skip-link">Skip to content</a>
+        <!-- Hidden Caspio auth embed — provides First_Name/Last_Name/Email/Role
          that policies-admin-gate.js uses to auto-bootstrap the Express CRM
          session for admins on this page. -->
-    <div class="caspio-auth" hidden>
-        <div id="auth-firstname">[@authfield:First_Name]</div>
-        <div id="auth-lastname">[@authfield:Last_Name]</div>
-        <div id="auth-email">[@authfield:Email]</div>
-        <div id="auth-role">[@authfield:Role]</div>
-        <!-- Injected by policies-admin-gate.js ONLY when no SAML/session identity exists (2026-09-05):
+        <div class="caspio-auth" hidden="">
+            <div id="auth-firstname">[@authfield:First_Name]</div>
+            <div id="auth-lastname">[@authfield:Last_Name]</div>
+            <div id="auth-email">[@authfield:Email]</div>
+            <div id="auth-role">[@authfield:Role]</div>
+            <!-- Injected by policies-admin-gate.js ONLY when no SAML/session identity exists (2026-09-05):
              as a static script it redirected signed-in staff to the Caspio portal login. -->
-        <div id="caspio-auth-embed" data-src="https://c3eku948.caspio.com/dp/a0e15000a0bb470ed2be4ec5943e/emb"></div>
-    </div>
-
-    <!-- Top bar -->
-    <header class="hub-topbar">
-        <a href="/staff-dashboard.html" class="hub-topbar-back" aria-label="Back to staff dashboard">
-            <i class="fas fa-arrow-left" aria-hidden="true"></i> Dashboard
-        </a>
-        <div class="hub-topbar-title">
-            <i class="fas fa-book-open" aria-hidden="true"></i>
-            Company Policies Hub
+            <div id="caspio-auth-embed" data-src="https://c3eku948.caspio.com/dp/a0e15000a0bb470ed2be4ec5943e/emb"></div>
         </div>
-        <div class="hub-search-wrap">
-            <i class="fas fa-search" aria-hidden="true"></i>
-            <input type="text" id="hubSearch" aria-label="Search policies" placeholder="Search policies — title, summary, body…">
-        </div>
-        <button id="aiSearchBtn" class="btn btn-ai" title="Ask Claude to find a policy in plain English">
-            <i class="fas fa-sparkles" aria-hidden="true"></i> <span class="ai-search-btn-label">Ask Claude</span>
-        </button>
-        <a id="questionsBadge" href="/pages/policy-questions.html" class="btn-questions-badge" style="display:none" title="View open questions across all policies">
-            <i class="fas fa-comments-question" aria-hidden="true"></i>
-            <span class="badge-label">Questions</span>
-            <span class="badge-count" id="questionsBadgeCount">0</span>
-        </a>
-        <button id="newPolicyBtn" class="btn btn-primary" style="display:none">
-            <i class="fas fa-plus" aria-hidden="true"></i> New Policy
-        </button>
-    </header>
 
-    <div class="hub-layout">
-
-        <!-- Tree sidebar -->
-        <aside class="hub-sidebar" aria-label="Policy navigation">
-            <div class="tree-sidebar-title">Browse</div>
-            <div id="treeSidebar">
-                <div class="tree-empty">Loading…</div>
-            </div>
-        </aside>
-
-        <!-- Main -->
-        <main class="hub-content">
-
-            <div class="hub-page-header">
-                <h1>Policies &amp; Procedures</h1>
-                <p>The single source of truth for how we run Northwest Custom Apparel. Tap a card to read; rich-text edits sync live for the admin.</p>
-            </div>
-
-            <!-- Employee Handbook hero tile -->
-            <section class="handbook-hero-tile" aria-label="Employee Handbook">
-                <div class="handbook-hero-tile-icon">
+        <!-- Top bar -->
+        <header class="page-header">
+            <div class="page-header-inner policy-topbar">
+                <a href="/staff-dashboard.html" class="hub-topbar-back btn" aria-label="Back to staff dashboard">
+                    <i class="fas fa-arrow-left" aria-hidden="true"></i> Dashboard
+                </a>
+                <div class="hub-topbar-title">
                     <i class="fas fa-book-open" aria-hidden="true"></i>
+                    Company Policies Hub
                 </div>
-                <div class="handbook-hero-tile-body">
-                    <div class="handbook-hero-tile-label">Living Document &middot; 2026 Edition</div>
-                    <h2 class="handbook-hero-tile-title">Employee Handbook</h2>
-                    <p class="handbook-hero-tile-desc">All 22 chapters — Welcome, Core Values, Operating Principles, Vision, policies, safety, payroll, benefits. Auto-syncs with the chapter policies below.</p>
+                <div class="hub-search-wrap">
+                    <i class="fas fa-search" aria-hidden="true"></i>
+                    <input type="text" id="hubSearch" aria-label="Search policies" placeholder="Search policies — title, summary, body…" class="field-input">
                 </div>
-                <div class="handbook-hero-tile-actions">
-                    <a href="/pages/handbook.html" class="btn btn-handbook-primary">
-                        <i class="fas fa-book-reader" aria-hidden="true"></i> Read Online
-                    </a>
-                    <a href="/forms/Employee-Handbook-Latest.pdf" target="_blank" rel="noopener" class="btn btn-handbook-secondary">
-                        <i class="fas fa-file-pdf" aria-hidden="true"></i> Download PDF
-                    </a>
-                </div>
-            </section>
-
-            <!-- Category filter chips -->
-            <div class="category-chips" id="categoryChips"></div>
-
-            <!-- View toggle / status filter row -->
-            <div class="hub-toolbar-row">
-                <label class="archived-toggle" id="archivedToggleWrap" title="Show archived policies (admin only)">
-                    <input type="checkbox" id="archivedToggle">
-                    <i class="fas fa-box-archive" aria-hidden="true"></i> Show archived
-                </label>
-                <div class="view-toggle" role="tablist" aria-label="View mode">
-                    <button class="view-toggle-btn active" data-view="grid" title="Grid view" aria-label="Grid view">
-                        <i class="fas fa-th-large" aria-hidden="true"></i>
-                    </button>
-                    <button class="view-toggle-btn" data-view="list" title="List view" aria-label="List view">
-                        <i class="fas fa-list" aria-hidden="true"></i>
-                    </button>
-                </div>
+                <button id="aiSearchBtn" class="btn btn-ai" title="Ask Claude to find a policy in plain English" type="button">
+                    <i class="fas fa-sparkles" aria-hidden="true"></i>
+                    <span class="ai-search-btn-label">Ask Claude</span>
+                </button>
+                <a id="questionsBadge" href="/pages/policy-questions.html" class="btn-questions-badge btn" title="View open questions across all policies" hidden="">
+                    <i class="fas fa-comments-question" aria-hidden="true"></i>
+                    <span class="badge-label">Questions</span>
+                    <span class="badge-count" id="questionsBadgeCount">0</span>
+                </a>
+                <button id="newPolicyBtn" class="btn btn-primary" hidden="" type="button">
+                    <i class="fas fa-plus" aria-hidden="true"></i> New Policy
+                </button>
             </div>
+        </header>
 
-            <!-- Recently updated -->
-            <section class="recently-updated">
-                <div class="recently-updated-header">
-                    <i class="far fa-clock" aria-hidden="true"></i> Recently Updated
+        <div class="hub-layout">
+            <!-- Tree sidebar -->
+            <aside class="hub-sidebar" aria-label="Policy navigation">
+                <details class="policy-navigation" open="">
+                    <summary>Browse</summary>
+
+                    <div id="treeSidebar">
+                        <div class="tree-empty">Loading…</div>
+                    </div>
+                </details>
+            </aside>
+
+            <!-- Main -->
+            <main class="hub-content" id="policy-main" tabindex="-1">
+                <div class="hub-page-header">
+                    <h1>Policies &amp; Procedures</h1>
+                    <p>
+                        The single source of truth for how we run Northwest Custom Apparel. Tap a card to read;
+                        rich-text edits sync live for the admin.
+                    </p>
                 </div>
-                <div id="recentItems" class="recent-items"></div>
-            </section>
 
-            <!-- Grid / List -->
-            <section class="policies-grid" id="policiesGrid"></section>
-            <section class="policies-list" id="policiesList"></section>
+                <!-- Employee Handbook hero tile -->
+                <section class="handbook-hero-tile" aria-label="Employee Handbook">
+                    <div class="handbook-hero-tile-icon">
+                        <i class="fas fa-book-open" aria-hidden="true"></i>
+                    </div>
+                    <div class="handbook-hero-tile-body">
+                        <div class="handbook-hero-tile-label">Living Document · 2026 Edition</div>
+                        <h2 class="handbook-hero-tile-title">Employee Handbook</h2>
+                        <p class="handbook-hero-tile-desc">
+                            All 22 chapters — Welcome, Core Values, Operating Principles, Vision, policies, safety,
+                            payroll, benefits. Auto-syncs with the chapter policies below.
+                        </p>
+                    </div>
+                    <div class="handbook-hero-tile-actions">
+                        <a href="/pages/handbook.html" class="btn btn-handbook-primary">
+                            <i class="fas fa-book-reader" aria-hidden="true"></i> Read Online
+                        </a>
+                        <a href="/forms/Employee-Handbook-Latest.pdf" target="_blank" rel="noopener" class="btn btn-handbook-secondary">
+                            <i class="fas fa-file-pdf" aria-hidden="true"></i> Download PDF
+                        </a>
+                    </div>
+                </section>
 
-        </main>
-    </div>
+                <!-- Category filter chips -->
+                <div class="category-chips" id="categoryChips"></div>
 
-    <!-- Scripts: admin gate first (sets window.IS_POLICIES_ADMIN), then API, then page controller -->
-    <script src="/shared_components/js/policies/policies-admin-gate.js?v=2026.09.06.37"></script>
-    <script src="/shared_components/js/policies/policies-api.js?v=2026.09.06.31"></script>
-    <script src="/shared_components/js/policies/policy-ai-search.js?v=2026.09.06.31"></script>
-    <script src="/shared_components/js/policies/policies-hub.js?v=2026.09.06.27"></script>
-</body>
-</html>
+                <!-- View toggle / status filter row -->
+                <div class="hub-toolbar-row">
+                    <label class="archived-toggle" id="archivedToggleWrap" title="Show archived policies (admin only)">
+                        <input type="checkbox" id="archivedToggle">
+                        <i class="fas fa-box-archive" aria-hidden="true"></i> Show archived
+                    </label>
+                    <div class="view-toggle" role="group" aria-label="View mode">
+                        <button class="view-toggle-btn active btn" data-view="grid" title="Grid view" aria-label="Grid view" type="button" aria-pressed="true">
+                            <i class="fas fa-th-large" aria-hidden="true"></i>
+                        </button>
+                        <button class="view-toggle-btn btn" data-view="list" title="List view" aria-label="List view" type="button" aria-pressed="false">
+                            <i class="fas fa-list" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Recently updated -->
+                <section class="recently-updated">
+                    <div class="recently-updated-header">
+                        <i class="far fa-clock" aria-hidden="true"></i> Recently Updated
+                    </div>
+                    <div id="recentItems" class="recent-items"></div>
+                </section>
+
+                <!-- Grid / List -->
+                <section class="policies-grid" id="policiesGrid"></section>
+                <section class="policies-list" id="policiesList"></section>
+            </main>
+        </div>
+
+        <!-- Scripts: admin gate first (sets window.IS_POLICIES_ADMIN), then API, then page controller -->
+        <script src="/shared_components/js/policies/policy-workspace.js?v=2026.09.08.19"></script>
+
+        <script src="/shared_components/js/policies/policies-admin-gate.js?v=2026.09.06.37"></script>
+        <script src="/shared_components/js/policies/policies-api.js?v=2026.09.06.31"></script>
+        <script src="/shared_components/js/policies/policy-ai-search.js?v=2026.09.08.19"></script>
+        <script src="/shared_components/js/policies/policies-hub.js?v=2026.09.08.19"></script>
+
+
+</body></html>

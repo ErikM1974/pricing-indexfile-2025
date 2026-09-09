@@ -7,7 +7,18 @@ import globals from 'globals';
 import noUnsanitized from 'eslint-plugin-no-unsanitized';
 
 // The strict-scope files; the legacy block ignores exactly these so the two never merge.
+const POLICY_UI_FILES = [
+    'shared_components/js/policies/org-chart-2026.js',
+    'shared_components/js/policies/policy-workspace.js',
+    'shared_components/js/policies/policies-hub.js',
+    'shared_components/js/policies/policy-detail.js',
+    'shared_components/js/policies/policy-comments.js',
+    'shared_components/js/policies/policy-questions-inbox.js',
+    'shared_components/js/policies/policy-ai-search.js',
+    'shared_components/js/policies/handbook-reader.js',
+];
 const STRICT_FILES = [
+    ...POLICY_UI_FILES,
     'dashboards/js/policy-migration.js',
     'pages/js/pricing-negotiation-policy.js',
     'dashboards/js/caspio-api-reference.js',
@@ -151,6 +162,10 @@ export default [
             'no-unsanitized/method': ['error', { escape: { methods: ['escapeHtml', 'escapeHTML', '_dtfEsc', '_scpEsc'], taggedTemplates: [] } }],
             'no-unsanitized/property': ['error', { escape: { methods: ['escapeHtml', 'escapeHTML', '_dtfEsc', '_scpEsc'], taggedTemplates: [] } }],
         },
+    },
+    {
+        files: POLICY_UI_FILES,
+        languageOptions: { sourceType: 'script', globals: { ...globals.browser } },
     },
     {
         // The designated window re-export surface + the config seed file.

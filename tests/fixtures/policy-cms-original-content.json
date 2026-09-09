@@ -1,0 +1,234 @@
+{
+  "commit": "10a439b32c7e0b80ba500153284795f894c2dac5",
+  "pages": [
+    {
+      "file": "pages/policies-hub.html",
+      "paragraphs": [
+        "The single source of truth for how we run Northwest Custom Apparel. Tap a card to read; rich-text edits sync live for the admin.",
+        "All 22 chapters — Welcome, Core Values, Operating Principles, Vision, policies, safety, payroll, benefits. Auto-syncs with the chapter policies below."
+      ],
+      "headings": [
+        "Policies & Procedures",
+        "Employee Handbook"
+      ],
+      "links": [
+        "/staff-dashboard.html",
+        "/pages/policy-questions.html",
+        "/pages/handbook.html",
+        "/forms/Employee-Handbook-Latest.pdf"
+      ],
+      "fields": [
+        {
+          "id": "hubSearch",
+          "type": "text",
+          "name": "",
+          "options": null
+        },
+        {
+          "id": "archivedToggle",
+          "type": "checkbox",
+          "name": "",
+          "options": null
+        }
+      ],
+      "ids": [
+        "auth-firstname",
+        "auth-lastname",
+        "auth-email",
+        "auth-role",
+        "caspio-auth-embed",
+        "hubSearch",
+        "aiSearchBtn",
+        "questionsBadge",
+        "questionsBadgeCount",
+        "newPolicyBtn",
+        "treeSidebar",
+        "categoryChips",
+        "archivedToggleWrap",
+        "archivedToggle",
+        "recentItems",
+        "policiesGrid",
+        "policiesList"
+      ],
+      "styles": [
+        "shared_components/css/tokens.css",
+        "pages/css/policies-hub-v2.css"
+      ],
+      "cssBytes": 51709,
+      "scripts": [
+        "/config/app.config.js",
+        "/shared_components/js/policies/policies-admin-gate.js",
+        "/shared_components/js/policies/policies-api.js",
+        "/shared_components/js/policies/policy-ai-search.js",
+        "/shared_components/js/policies/policies-hub.js"
+      ],
+      "inlineStyles": [
+        {
+          "tag": "A",
+          "id": "questionsBadge",
+          "classes": "btn-questions-badge",
+          "style": "display:none"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "newPolicyBtn",
+          "classes": "btn btn-primary",
+          "style": "display:none"
+        }
+      ]
+    },
+    {
+      "file": "pages/policy-detail.html",
+      "paragraphs": [],
+      "headings": [
+        "Loading…"
+      ],
+      "links": [
+        "/pages/policies-hub.html"
+      ],
+      "fields": [],
+      "ids": [
+        "auth-firstname",
+        "auth-lastname",
+        "auth-email",
+        "auth-role",
+        "caspio-auth-embed",
+        "detailRoot",
+        "breadcrumb",
+        "policyTitle",
+        "policySummary",
+        "policyMeta",
+        "policyBody",
+        "policyActions",
+        "subProcedures",
+        "commentsSection",
+        "policyOutline"
+      ],
+      "styles": [
+        "shared_components/css/tokens.css",
+        "pages/css/policies-hub-v2.css",
+        "pages/css/policy-detail.css",
+        "pages/css/org-chart-2026.css"
+      ],
+      "cssBytes": 138235,
+      "scripts": [
+        "/config/app.config.js",
+        "/shared_components/js/policies/policies-admin-gate.js",
+        "/shared_components/js/policies/policies-api.js",
+        "/shared_components/js/policies/policy-editor-tiptap.js",
+        "/shared_components/js/policies/policy-ai-assist.js",
+        "/shared_components/js/policies/policy-lightbox.js",
+        "/shared_components/js/policies/policy-mermaid.js",
+        "/shared_components/js/policies/policy-comments.js",
+        "/shared_components/js/policies/org-chart-2026.js",
+        "/shared_components/js/policies/policy-detail.js"
+      ],
+      "inlineStyles": [
+        {
+          "tag": "SECTION",
+          "id": "subProcedures",
+          "classes": "sub-procedures",
+          "style": "display:none"
+        },
+        {
+          "tag": "SECTION",
+          "id": "commentsSection",
+          "classes": "",
+          "style": "display:none"
+        },
+        {
+          "tag": "ASIDE",
+          "id": "policyOutline",
+          "classes": "outline-sidebar",
+          "style": "display:none"
+        }
+      ]
+    },
+    {
+      "file": "pages/policy-questions.html",
+      "paragraphs": [
+        "Every question staff have asked that's still waiting on an answer. Oldest first."
+      ],
+      "headings": [
+        "Open questions across all policies"
+      ],
+      "links": [
+        "/pages/policies-hub.html"
+      ],
+      "fields": [],
+      "ids": [
+        "auth-firstname",
+        "auth-lastname",
+        "auth-email",
+        "auth-role",
+        "caspio-auth-embed",
+        "inboxCount",
+        "questionsToolbar",
+        "questionsList",
+        "questionsLockedNote"
+      ],
+      "styles": [
+        "shared_components/css/tokens.css",
+        "pages/css/policies-hub-v2.css"
+      ],
+      "cssBytes": 51709,
+      "scripts": [
+        "/shared_components/js/policies/policies-admin-gate.js",
+        "/shared_components/js/policies/policy-questions-inbox.js"
+      ],
+      "inlineStyles": [
+        {
+          "tag": "DIV",
+          "id": "",
+          "classes": "",
+          "style": "flex:1"
+        },
+        {
+          "tag": "DIV",
+          "id": "questionsLockedNote",
+          "classes": "hub-empty",
+          "style": "display:none"
+        }
+      ]
+    },
+    {
+      "file": "pages/handbook.html",
+      "paragraphs": [],
+      "headings": [
+        "Employee Handbook"
+      ],
+      "links": [
+        "/pages/policies-hub.html",
+        "/forms/Employee-Handbook-Latest.pdf"
+      ],
+      "fields": [],
+      "ids": [
+        "handbookPrintBtn",
+        "handbookToc",
+        "handbookLoadedAt",
+        "handbookContent"
+      ],
+      "styles": [
+        "shared_components/css/tokens.css",
+        "pages/css/policies-hub-v2.css",
+        "pages/css/handbook.css"
+      ],
+      "cssBytes": 65652,
+      "scripts": [
+        "/config/app.config.js",
+        "/shared_components/js/policies/handbook-reader.js"
+      ],
+      "inlineStyles": []
+    }
+  ],
+  "dataFiles": [
+    {
+      "file": "shared_components/js/policies/policies-api.js",
+      "sha256": "b8e8a94b953309b76d3a5a70477a5f6e7492e26d3dcf91444c3c336d34480936"
+    },
+    {
+      "file": "shared_components/js/policies/policies-admin-gate.js",
+      "sha256": "33e570a07955b1807c4bb48a281430082b608dd7705cd24ec5ad72cafd35d57c"
+    }
+  ]
+}

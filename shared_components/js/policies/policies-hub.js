@@ -13,11 +13,18 @@
  */
 (function () {
     'use strict';
+    const PoliciesAPI = window.PoliciesAPI;
 
+    let storageUnavailable = false;
+    let savedView = 'grid';
+    try { savedView = localStorage.getItem('policies_view') === 'list' ? 'list' : 'grid'; }
+    catch (error) { storageUnavailable = true; }
+    let treeGeneration = 0;
+    let searchGeneration = 0;
     const state = {
         tree: [],              // [{category, policies: [{..., children: [...]}]}]
         flatById: new Map(),   // policy_id -> record
-        viewMode: localStorage.getItem('policies_view') || 'grid',
+        viewMode: savedView,
         categoryFilter: 'all',
         searchQuery: '',
         searchResults: null,   // null = not searching; array = active search
@@ -68,13 +75,16 @@
 
     // ----------------------------- data load -----------------------------
     async function loadTree() {
+        const generation = ++treeGeneration;
         try {
             const useAdmin = window.IS_POLICIES_ADMIN;
             const result = useAdmin
                 ? await PoliciesAPI.adminGetTree()
                 : await PoliciesAPI.getTree();
 
-            state.tree = (result && result.tree) || [];
+            if (generation !== treeGeneration) return;
+            if (!result || !Array.isArray(result.tree)) throw new Error('Unexpected policy catalogue format');
+            state.tree = result.tree;
 
             // Build flat index for quick lookup
             state.flatById.clear();
@@ -86,6 +96,7 @@
 
             render();
         } catch (e) {
+            if (generation !== treeGeneration) return;
             console.error('[policies-hub] loadTree error:', e);
             renderError('Could not load policies. Please refresh.');
         }
@@ -100,11 +111,22 @@
         renderAdminAffordances();
     }
 
-    function renderError(msg) {
-        const grid = document.getElementById('policiesGrid');
-        if (grid) {
-            grid.innerHTML = `<div class="hub-error"><i class="fas fa-exclamation-triangle" aria-hidden="true"></i> ${escapeHtml(msg)}</div>`;
+    function renderError(msg, retry = loadTree) {
+        for (const id of ['policiesGrid', 'policiesList']) {
+            const panel = document.getElementById(id);
+            if (!panel) continue;
+            panel.innerHTML = `<div class="hub-error" role="alert"><p>${escapeHtml(msg)}</p><button class="btn" type="button">Retry</button></div>`;
+            panel.querySelector('button').addEventListener('click', retry);
         }
+        applyViewMode();
+    }
+
+    function showStorageNotice() {
+        if (document.querySelector('.policy-storage-notice')) return;
+        const note = document.createElement('p');
+        note.className = 'policy-storage-notice'; note.setAttribute('role', 'status');
+        note.textContent = 'Your view preference could not be saved. You can still browse policies and switch views.';
+        document.querySelector('.hub-page-header').append(note);
     }
 
     function renderTreeSidebar() {
@@ -132,6 +154,7 @@
             `;
         }).join('');
 
+        // eslint-disable-next-line no-unsanitized/property -- Composed UI markup: external labels are escaped or encoded; other values are fixed markup or numeric counts.
         el.innerHTML = rowsHtml;
     }
 
@@ -156,9 +179,10 @@
             const childrenHtml = visChildren.map(c => renderTreeNode(c, depth + 1)).join('');
             return `
                 <li class="tree-item tree-item-parent">
+                    <a class="${linkClass.join(' ')}" href="${href}">${escapeHtml(node.Title)}${externalBadge}${draftBadge}${archivedBadge}</a>
                     <details>
-                        <summary>
-                            <a class="${linkClass.join(' ')}" href="${href}">${escapeHtml(node.Title)}${externalBadge}${draftBadge}${archivedBadge}</a>
+                        <summary aria-label="Sub-procedures for ${escapeHtml(node.Title)}">
+                            Sub-procedures (${visChildren.length})
                         </summary>
                         <ul class="tree-list tree-list-nested">${childrenHtml}</ul>
                     </details>
@@ -190,8 +214,9 @@
             ...allCats.map(c => ({ key: c, label: c, icon: categoryIcon(c) }))
         ];
 
+        // eslint-disable-next-line no-unsanitized/property -- Composed UI markup: external labels are escaped or encoded; other values are fixed markup or numeric counts.
         el.innerHTML = chips.map(c => `
-            <button class="category-chip ${state.categoryFilter === c.key ? 'active' : ''}" data-category="${escapeHtml(c.key)}">
+            <button type="button" aria-pressed="${state.categoryFilter === c.key}" class="category-chip ${state.categoryFilter === c.key ? 'active' : ''}" data-category="${escapeHtml(c.key)}">
                 <i class="fas ${c.icon}" aria-hidden="true"></i>
                 ${escapeHtml(c.label)}
                 <span class="count">${counts[c.key] || 0}</span>
@@ -200,12 +225,14 @@
 
         el.querySelectorAll('.category-chip').forEach(chip => {
             chip.addEventListener('click', () => {
+                searchGeneration++;
                 state.categoryFilter = chip.dataset.category;
                 state.searchResults = null;
                 const searchInput = document.getElementById('hubSearch');
                 if (searchInput) searchInput.value = '';
                 state.searchQuery = '';
                 render();
+                Array.from(document.querySelectorAll('.category-chip')).find(button => button.dataset.category === state.categoryFilter)?.focus();
             });
         });
     }
@@ -233,15 +260,20 @@
             const msg = state.searchResults !== null
                 ? `No policies match "${escapeHtml(state.searchQuery)}".`
                 : 'No policies in this category yet.';
+            // eslint-disable-next-line no-unsanitized/property -- Composed UI markup: external labels are escaped or encoded; other values are fixed markup or numeric counts.
             grid.innerHTML = `<div class="hub-empty"><i class="far fa-folder-open" aria-hidden="true"></i> ${msg}</div>`;
-            list.innerHTML = '';
+            // eslint-disable-next-line no-unsanitized/property -- Restores or copies this controller’s own already-escaped UI markup.
+            list.innerHTML = grid.innerHTML;
+            applyViewMode();
             return;
         }
 
         // Grid view
+        // eslint-disable-next-line no-unsanitized/property -- Composed UI markup: external labels are escaped or encoded; other values are fixed markup or numeric counts.
         grid.innerHTML = policies.map(renderCard).join('');
 
         // List view
+        // eslint-disable-next-line no-unsanitized/property -- Composed UI markup: external labels are escaped or encoded; other values are fixed markup or numeric counts.
         list.innerHTML = `
             <div class="policy-list-header">
                 <span>Policy</span>
@@ -318,6 +350,7 @@
             return;
         }
 
+        // eslint-disable-next-line no-unsanitized/property -- Composed UI markup: external labels are escaped or encoded; other values are fixed markup or numeric counts.
         el.innerHTML = sorted.map(p => {
             const href = `/pages/policy-detail.html?id=${encodeURIComponent(p.Policy_ID)}`;
             return `
@@ -334,30 +367,36 @@
         const draftToggle = document.getElementById('draftToggle');
         const archivedToggleWrap = document.getElementById('archivedToggleWrap');
         const badge = document.getElementById('questionsBadge');
-        if (btn) btn.style.display = window.IS_POLICIES_ADMIN ? '' : 'none';
-        if (draftToggle) draftToggle.style.display = window.IS_POLICIES_ADMIN ? '' : 'none';
-        if (archivedToggleWrap) archivedToggleWrap.style.display = window.IS_POLICIES_ADMIN ? 'inline-flex' : 'none';
-        if (badge) badge.style.display = window.IS_POLICIES_ADMIN ? 'inline-flex' : 'none';
+        if (btn) btn.hidden = !window.IS_POLICIES_ADMIN;
+        if (draftToggle) draftToggle.hidden = !window.IS_POLICIES_ADMIN;
+        if (archivedToggleWrap) archivedToggleWrap.hidden = !window.IS_POLICIES_ADMIN;
+        if (badge) badge.hidden = !window.IS_POLICIES_ADMIN;
         if (window.IS_POLICIES_ADMIN) loadQuestionsBadge();
     }
 
     // Fetch the open-questions count from the admin inbox endpoint and
-    // update the topbar badge. Silent on failure — the badge stays hidden.
+    // update the topbar badge. An unavailable count must not look like zero.
     async function loadQuestionsBadge() {
         const badge = document.getElementById('questionsBadge');
         const countEl = document.getElementById('questionsBadgeCount');
         if (!badge || !countEl) return;
         try {
             const res = await fetch('/api/crm-proxy/policy-comments/inbox/count', { credentials: 'same-origin' });
-            if (!res.ok) return;
+            if (!res.ok) throw new Error('Question count unavailable');
             const data = await res.json();
-            const n = data.count || 0;
+            const n = data.count;
+            if (!Number.isInteger(n) || n < 0) throw new Error('Invalid question count');
             countEl.textContent = n;
             badge.classList.toggle('has-questions', n > 0);
             badge.title = n === 0
                 ? 'No open questions — inbox zero'
                 : `${n} open question${n === 1 ? '' : 's'} waiting`;
-        } catch (e) { /* silent — badge stays hidden */ }
+        } catch (e) {
+            countEl.textContent = '?';
+            badge.classList.remove('has-questions');
+            badge.title = 'Question count unavailable. Open the inbox to retry.';
+            badge.setAttribute('aria-label', badge.title);
+        }
     }
 
     // ----------------------------- view modes -----------------------------
@@ -374,7 +413,10 @@
             grid.classList.remove('hidden');
             list.classList.remove('active');
         }
-        buttons.forEach(b => b.classList.toggle('active', b.dataset.view === state.viewMode));
+        buttons.forEach(b => {
+            b.classList.toggle('active', b.dataset.view === state.viewMode);
+            b.setAttribute('aria-pressed', String(b.dataset.view === state.viewMode));
+        });
     }
 
     // ----------------------------- events -----------------------------
@@ -383,6 +425,7 @@
         const searchInput = document.getElementById('hubSearch');
         if (searchInput) {
             const onSearch = debounce(async () => {
+                const generation = ++searchGeneration;
                 const q = searchInput.value.trim();
                 state.searchQuery = q;
                 if (!q) {
@@ -392,10 +435,14 @@
                 }
                 try {
                     const result = await PoliciesAPI.searchPolicies(q);
-                    state.searchResults = result.policies || [];
+                    if (generation !== searchGeneration) return;
+                    if (!result || !Array.isArray(result.policies)) throw new Error('Unexpected search response');
+                    state.searchResults = result.policies;
                     render();
                 } catch (e) {
+                    if (generation !== searchGeneration) return;
                     console.error('[policies-hub] search error:', e);
+                    renderError('Could not search policies. Your search has been kept.', () => searchInput.dispatchEvent(new Event('input')));
                 }
             }, 300);
             searchInput.addEventListener('input', onSearch);
@@ -405,7 +452,8 @@
         document.querySelectorAll('.view-toggle-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 state.viewMode = btn.dataset.view;
-                localStorage.setItem('policies_view', state.viewMode);
+                try { localStorage.setItem('policies_view', state.viewMode); }
+                catch (error) { showStorageNotice(); }
                 applyViewMode();
             });
         });
@@ -482,6 +530,7 @@
 
     // ----------------------------- init -----------------------------
     function init() {
+        if (storageUnavailable) showStorageNotice();
         wireEvents();
         loadTree();
     }
