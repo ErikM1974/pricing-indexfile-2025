@@ -84,3 +84,11 @@ Historical counts are retained as audit notes and must not be presented as curre
 - `tests/unit/brand-guide-content.test.js` — fifteen public brand guides; shared storefront shell, preserved source content, native menu/search and responsive/paper coverage.
 - `tests/e2e/css-unification-brand-guides.spec.js` — fifteen public brand guides; shared storefront shell, preserved source content, native menu/search and responsive/paper coverage.
 - Renamed `pages/css/custom-carhartt.css` and `pages/js/custom-carhartt.js` to the brand-guide owners above; all fifteen consumers updated.
+
+- `shared_components/js/staff-reference.js` — five staff reference pages: preserve accordion state across complete printing; native fragment focus.
+- `tests/fixtures/staff-reference-original-content.json` — original five-page prose, links, images, field/ID inventory and style graphs.
+
+- `shared_components/css/staff-reference.css` — shared reading/print and visible source warning contract for five staff reference pages; standard shell/controls stay in components.css.
+
+- `tests/unit/staff-reference-content.test.js` — five staff guides preserve original full reference text, fields, links and imagery.
+- `tests/e2e/css-unification-staff-reference.spec.js` — staff references at four widths, real access gates, mocked valid/malformed/failed data, source warnings, retry, navigation and paper.

@@ -457,3 +457,5 @@
 
 
 - `shared_components/js/training-manual.js` — chapter/hash navigation, biography disclosure and print-state restoration.
+
+- `shared_components/js/staff-reference.js` — staff reference print and fragment focus, shared by commission/bonus/SEO/forms/data-entry guides.

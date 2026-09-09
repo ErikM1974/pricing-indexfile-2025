@@ -567,3 +567,26 @@ Fifteen brand guides integrated and tested at2ac3c56bf26bd50fecf4fd28043267b4c09
 ## Brand guide release record — v2026.09.09.1
 
 Exact-source CI 34332748897 passed all four jobs on 6b197548bbb43ca9ab5a602a7059edb2c260fe98, including actual money/calculator parity. Fifteen brand guides now share storefront navigation, typography, controls and page owners. All original copy, products, images, links and SEO preserved. Native menu supports focus wrap/return, Escape/backdrop/close and resize; original catalogue search retained.31 family browser cases,1261 paper blocks verified. Full local checks:5152 unit tests,321 mocked browser and16 remaining browser,all5 calculators;485 routes unchanged. Candidate99 reviewed/126 pending becomes live only after actual rollout verification.
+
+## Staff references and forms directory plan — 2026-09-09
+
+Next bounded family after brand guides: commission-structure, embroidery-bonus-plan, seo-strategy, forms-library and data-entry-guide (five sources). Base a6d59feca31b1a4419c1f963bb91c063e7d03539; original text/links/images/IDs/fields and dependency graphs saved in staff-reference-original-baseline.json. Existing shared reading/navigation patterns will own headers, readable sections, tables, controls and print; only page-specific arrangements stay local. Preserve published plan/strategy prose and commission examples exactly. Bonus amounts remain API-driven; test actual config, denied/malformed/fallback responses and complete printed warnings. Data-entry service prices keep source warnings visible and get usable retry instead of an ambiguous fallback badge. Forms directory retains live entries and destinations with explicit loading, malformed, empty and failed/retry states. Keep staff gates and service endpoints unchanged.
+
+- [ ] Capture original desktop/phone screenshots with synthetic service responses.
+- [ ] Migrate five layouts and needed navigation/print/error controls, retiring borrowed shell dependencies.
+- [ ] Lock original prose, fields, API mappings and financial computation; test keyboard, four widths/axe, retry/empty/malformed, and actual PDF content.
+- [ ] Register every file immediately, document results, run full primary release gates and exact-source CI, then verify actual rollout.
+
+This is a plan only; no application files in this family changed yet. Brand guides remain reviewed in codex/brand-guide-family at a6d59feca31b1a4419c1f963bb91c063e7d03539; production checks for the prior webstore release are still running.
+
+## Staff reference implementation started — 2026-09-09
+
+Original five-page screenshots captured with synthetic read-only service data. First layout pass now replaces borrowed art-hub/dash-shell CSS with existing shared components. Canonical buttons/headers/cards and scoped page owners use shared semantic tokens; original main text is unchanged. New staff-reference.js handles complete accordion printing/restoration and native fragment focus. Baseline fixture and file inventory registered. This batch is IN PROGRESS and has not passed review or been deployed. Next: fix responsive/print details, explicit service-source warnings and retry, validate config, then add focused content/browser guards.
+
+## Five staff references reviewed — 2026-09-09
+
+Commission structure, embroidery bonus plan, SEO strategy, forms library and data-entry guide now use shared tokens/components plus staff-reference CSS/print controller and scoped page arrangements. Original full main text/links/media/fields/IDs retained. Existing financial prose/examples unchanged; service/bonus figures remain API-driven. Incomplete data is visibly API+fallback; failed/malformed data warns and retries without clearing checklists. Bonus rep labels escaped; form directory handles malformed/empty data, hostile text/category keys and unsafe URLs. Four dashboards retain anonymous302; data-entry guide remains public200, with ordinary-staff admin restrictions intact.21 focused browser cases at four widths with zero axe violations;403 focused source/ownership cases; strict JS/CSS pass. Eight populated/failure PDFs preserve805 checked content/warning blocks, no retry controls on paper. Commission print9 ->5 pages, SEO15 ->11; screen-only breakpoints prevent mobile rules affecting paper. Candidate2026.09.09.2 pre-versioned. Reviewed branch must still integrate and pass full primary gates/exact-source CI/actual rollout. Live is brand release2026.09.09.1/2080:99 reviewed/126 pending. Only a verified staff rollout changes that to104/121.
+
+## Staff reference integration — 2026-09-09
+
+Reviewed staff reference commit 245d00e86e1c07099f5e4bbc4b1ea6999c327b62 integrated after live brand release2080. Only appended memory notes conflicted; retained both release and review records. All application changes merged directly. Full primary gates run next. Live99/126 remains authoritative until actual staff rollout.

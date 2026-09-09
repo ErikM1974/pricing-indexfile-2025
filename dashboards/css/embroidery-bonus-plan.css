@@ -1,52 +1,8 @@
-/* embroidery-bonus-plan.css — the rep-facing Q3 2026 bonus explainer.
- * Standalone page: readable on a phone, and prints cleanly to a PDF handout for a 1:1.
- * A live page rather than a static PDF on purpose — the two 2026_Bonus_Cheat_Sheet_*.pdf
- * files this replaces drifted out of sync with the code within months. */
+/* embroidery-bonus-plan arrangements; shared components own the shell and controls. */
+@layer components.pages {
+:where([data-ui="unified"][data-staff-reference="embroidery-bonus-plan"]) .ebp-hero-inner { max-width: 1200px; margin: 0 auto; width: 100%; }
 
-/* Figures load from the config API, so the page toggles the table and the error banner with
- * [hidden]. .ebp-note is display:flex and .ebp-table is display:table — both beat the bare
- * attribute, which would leave an "unavailable" banner permanently on screen. */
-/* stylelint-disable-next-line declaration-no-important -- the hidden attribute must beat any display rule */
-[hidden] { display: none !important; }
-
-/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue, merged into its
-   existing :root. Map them to shared_components/css/tokens.css names when the page is redesigned;
-   raw hex is allowed ONLY in this block. */
-/* stylelint-disable color-no-hex */
-:root {
-    --embroidery-bonus-plan-orange: #e0a33a;
-    --embroidery-bonus-plan-orange-2: #c9821c;
-    --ebp-green: var(--store-green-700);
-    --ebp-green-light: var(--brand-500);
-    --ebp-ink: var(--store-ink);
-    --ebp-body: var(--store-ink-soft);
-    --ebp-muted: var(--store-ink-faint);
-    --ebp-line: var(--gray-200);
-    --ebp-bg: var(--gray-50);
-}
-/* stylelint-enable color-no-hex */
-
-* { box-sizing: border-box; }
-
-body {
-    margin: 0;
-    background: var(--ebp-bg);
-    color: var(--ebp-body);
-    font-family: Inter, system-ui, -apple-system, sans-serif;
-    font-size: 16px;
-    line-height: 1.6;
-}
-
-/* ---------- hero ---------- */
-.ebp-hero {
-    background: linear-gradient(135deg, var(--brand-700) 0%, var(--ebp-green) 50%, var(--ebp-green-light) 100%);
-    color: var(--color-on-brand);
-    padding: 44px 24px 52px;
-}
-.ebp-hero-inner { max-width: 860px; margin: 0 auto; }
-.ebp-logo { height: 40px; margin-bottom: 22px; }
-
-.ebp-eyebrow {
+:where([data-ui="unified"][data-staff-reference="embroidery-bonus-plan"]) .ebp-eyebrow {
     margin: 0 0 4px;
     font-size: 0.78rem;
     font-weight: 700;
@@ -54,178 +10,128 @@ body {
     text-transform: uppercase;
     opacity: 0.85;
 }
+:where([data-ui="unified"][data-staff-reference="embroidery-bonus-plan"]) .ebp-lede { margin: 0 0 14px; font-size: 1.05rem; max-width: 62ch; opacity: 0.96; }
+:where([data-ui="unified"][data-staff-reference="embroidery-bonus-plan"]) .ebp-dates { margin: 0; font-size: 0.88rem; opacity: 0.85; font-weight: 600; }
+:where([data-ui="unified"][data-staff-reference="embroidery-bonus-plan"]) .ebp-hero-actions { margin-top: 24px; display: flex; flex-wrap: wrap; gap: 10px; }
 
-.ebp-hero h1 {
-    margin: 0 0 14px;
-    font-size: clamp(1.9rem, 5vw, 2.7rem);
-    font-weight: 800;
-    line-height: 1.15;
-}
-.ebp-lede { margin: 0 0 14px; font-size: 1.05rem; max-width: 62ch; opacity: 0.96; }
-.ebp-dates { margin: 0; font-size: 0.88rem; opacity: 0.85; font-weight: 600; }
-.ebp-hero-actions { margin-top: 24px; display: flex; flex-wrap: wrap; gap: 10px; }
-
-.ebp-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 18px;
-    border-radius: 999px;
+:where([data-ui="unified"][data-staff-reference="embroidery-bonus-plan"]) .ebp-section {
     background: var(--color-surface);
-    color: var(--ebp-green);
-    font-weight: 700;
-    font-size: 0.9rem;
-    text-decoration: none;
-    border: none;
-    cursor: pointer;
-    font-family: inherit;
-}
-.ebp-btn:hover { filter: brightness(0.96); }
-.ebp-btn--ghost { background: transparent; color: var(--color-on-brand); border: 1.5px solid rgb(255 255 255 / 60%); }
-.ebp-btn--ghost:hover { background: rgb(255 255 255 / 14%); }
-
-/* ---------- sections ---------- */
-.ebp-main { max-width: 860px; margin: -28px auto 0; padding: 0 24px 60px; }
-
-.ebp-section {
-    background: var(--color-surface);
-    border: 1px solid var(--ebp-line);
+    border: 1px solid var(--ui-line);
     border-radius: 14px;
     padding: 30px 28px;
     margin-bottom: 20px;
-    box-shadow: 0 2px 10px rgb(20 35 26 / 5%);
 }
-.ebp-section--flat { box-shadow: none; }
 
-.ebp-section h2 {
+:where([data-ui="unified"][data-staff-reference="embroidery-bonus-plan"]) .ebp-section h2 {
     display: flex;
     align-items: center;
     gap: 12px;
     margin: 0 0 6px;
     font-size: 1.35rem;
     font-weight: 800;
-    color: var(--ebp-ink);
+    color: var(--ui-ink);
 }
 
-.ebp-num {
+:where([data-ui="unified"][data-staff-reference="embroidery-bonus-plan"]) .ebp-num {
     flex: 0 0 auto;
     width: 30px; height: 30px;
     border-radius: 50%;
-    background: var(--ebp-green);
+    background: var(--ui-accent);
     color: var(--color-on-brand);
     display: grid; place-items: center;
     font-size: 0.9rem; font-weight: 800;
 }
-.ebp-h3 { margin: 28px 0 6px; font-size: 1.02rem; font-weight: 700; color: var(--ebp-ink); }
-.ebp-sub { margin: 0 0 20px; color: var(--ebp-muted); font-size: 0.93rem; }
-.ebp-sub--tight { margin: 12px 0 0; font-size: 0.86rem; }
-.ebp-section p { margin: 0 0 12px; }
+:where([data-ui="unified"][data-staff-reference="embroidery-bonus-plan"]) .ebp-h3 { margin: 28px 0 6px; font-size: 1.02rem; font-weight: 700; color: var(--ui-ink); }
+:where([data-ui="unified"][data-staff-reference="embroidery-bonus-plan"]) .ebp-sub { margin: 0 0 20px; color: var(--ui-muted); font-size: 0.93rem; }
+:where([data-ui="unified"][data-staff-reference="embroidery-bonus-plan"]) .ebp-sub--tight { margin: 12px 0 0; font-size: 0.86rem; }
+:where([data-ui="unified"][data-staff-reference="embroidery-bonus-plan"]) .ebp-section p { margin: 0 0 12px; }
+:where([data-ui="unified"][data-staff-reference="embroidery-bonus-plan"]) .ebp-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px; }
 
-/* ---------- amount cards ---------- */
-.ebp-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px; }
-
-.ebp-card {
-    border: 1px solid var(--ebp-line);
+:where([data-ui="unified"][data-staff-reference="embroidery-bonus-plan"]) .ebp-card {
+    border: 1px solid var(--ui-line);
     border-radius: 12px;
     padding: 20px;
-    background: var(--ebp-bg);
+    background: var(--ui-canvas);
 }
-.ebp-card--accent { border-color: var(--ebp-green-light); background: var(--color-dash-theme-bg); }
+:where([data-ui="unified"][data-staff-reference="embroidery-bonus-plan"]) .ebp-card--accent { border-color: var(--ui-accent); background: var(--color-dash-theme-bg); }
 
-.ebp-amount {
-    font-family: 'JetBrains Mono', monospace;
+:where([data-ui="unified"][data-staff-reference="embroidery-bonus-plan"]) .ebp-amount {
+    font-family: var(--font-mono);
     font-size: 2.1rem;
     font-weight: 600;
-    color: var(--ebp-green);
+    color: var(--ui-accent);
     line-height: 1;
 }
-.ebp-each { font-size: 0.8rem; font-family: Inter, sans-serif; color: var(--ebp-muted); margin-left: 6px; font-weight: 600; }
-.ebp-card h3 { margin: 8px 0 6px; font-size: 0.98rem; font-weight: 700; color: var(--ebp-ink); }
-.ebp-card p { margin: 0; font-size: 0.88rem; }
+:where([data-ui="unified"][data-staff-reference="embroidery-bonus-plan"]) .ebp-each { font-size: 0.8rem; font-family: var(--ui-font); color: var(--ui-muted); margin-left: 6px; font-weight: 600; }
+:where([data-ui="unified"][data-staff-reference="embroidery-bonus-plan"]) .ebp-card h3 { margin: 8px 0 6px; font-size: 0.98rem; font-weight: 700; color: var(--ui-ink); }
+:where([data-ui="unified"][data-staff-reference="embroidery-bonus-plan"]) .ebp-card p { margin: 0; font-size: 0.88rem; }
 
-/* ---------- notes ---------- */
-.ebp-note {
+:where([data-ui="unified"][data-staff-reference="embroidery-bonus-plan"]) .ebp-note:not([hidden]) {
     display: flex; gap: 12px;
     margin-top: 18px; padding: 14px 16px;
     background: var(--color-dash-theme-bg);
-    border-left: 4px solid var(--ebp-green-light);
+    border-left: 4px solid var(--ui-accent);
     border-radius: 6px;
     font-size: 0.9rem;
 }
-.ebp-note i { color: var(--ebp-green); margin-top: 3px; }
-.ebp-note--warn { background: var(--red-50); border-left-color: var(--embroidery-bonus-plan-orange); }
-.ebp-note--warn i { color: var(--embroidery-bonus-plan-orange-2); }
+:where([data-ui="unified"][data-staff-reference="embroidery-bonus-plan"]) .ebp-note:not([hidden]) i { color: var(--ui-accent); margin-top: 3px; }
+:where([data-ui="unified"][data-staff-reference="embroidery-bonus-plan"]) .ebp-note--warn:not([hidden]) { background: var(--color-warning-bg); border-left-color: var(--color-warning-ink); }
+:where([data-ui="unified"][data-staff-reference="embroidery-bonus-plan"]) .ebp-note--warn i { color: var(--color-warning-ink); }
 
-.ebp-callout {
+:where([data-ui="unified"][data-staff-reference="embroidery-bonus-plan"]) .ebp-callout {
     margin-top: 14px; padding: 14px 16px;
     background: var(--color-dash-theme-bg); border-radius: 8px;
     font-size: 0.92rem;
 }
 
-.ebp-math {
-    font-family: 'JetBrains Mono', monospace;
+:where([data-ui="unified"][data-staff-reference="embroidery-bonus-plan"]) .ebp-math {
+    font-family: var(--font-mono);
     font-size: 1rem;
-    background: var(--ebp-bg);
-    border: 1px solid var(--ebp-line);
+    background: var(--ui-canvas);
+    border: 1px solid var(--ui-line);
     border-radius: 8px;
     padding: 14px 16px;
     text-align: center;
 }
+:where([data-ui="unified"][data-staff-reference="embroidery-bonus-plan"]) .ebp-table-wrap { overflow-x: auto; }
+:where([data-ui="unified"][data-staff-reference="embroidery-bonus-plan"]) .ebp-table:not([hidden]) { width: 100%; border-collapse: collapse; font-size: 0.93rem; }
+:where([data-ui="unified"][data-staff-reference="embroidery-bonus-plan"]) .ebp-table:not([hidden]) th, :where([data-ui="unified"][data-staff-reference="embroidery-bonus-plan"]) .ebp-table:not([hidden]) td { padding: 11px 12px; border-bottom: 1px solid var(--ui-line); text-align: left; }
+:where([data-ui="unified"][data-staff-reference="embroidery-bonus-plan"]) .ebp-table:not([hidden]) thead th { background: var(--ui-canvas); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ui-muted); }
+:where([data-ui="unified"][data-staff-reference="embroidery-bonus-plan"]) .ebp-th-sub { font-weight: 500; text-transform: none; letter-spacing: 0; color: var(--ui-accent); }
+:where([data-ui="unified"][data-staff-reference="embroidery-bonus-plan"]) .ebp-r { text-align: right; font-variant-numeric: tabular-nums; }
+:where([data-ui="unified"][data-staff-reference="embroidery-bonus-plan"]) .ebp-pay { font-weight: 700; color: var(--ui-accent); font-family: var(--font-mono); }
+:where([data-ui="unified"][data-staff-reference="embroidery-bonus-plan"]) .ebp-table:not([hidden]) tbody tr:last-child td { border-bottom: none; }
+:where([data-ui="unified"][data-staff-reference="embroidery-bonus-plan"]) .ebp-top td { background: var(--color-dash-theme-bg); font-weight: 600; }
 
-/* ---------- ladder table ---------- */
-.ebp-table-wrap { overflow-x: auto; }
-.ebp-table { width: 100%; border-collapse: collapse; font-size: 0.93rem; }
-.ebp-table th, .ebp-table td { padding: 11px 12px; border-bottom: 1px solid var(--ebp-line); text-align: left; }
-.ebp-table thead th { background: var(--ebp-bg); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ebp-muted); }
-.ebp-th-sub { font-weight: 500; text-transform: none; letter-spacing: 0; color: var(--ebp-green); }
-.ebp-r { text-align: right; font-variant-numeric: tabular-nums; }
-.ebp-pay { font-weight: 700; color: var(--ebp-green); font-family: 'JetBrains Mono', monospace; }
-.ebp-table tbody tr:last-child td { border-bottom: none; }
-.ebp-top td { background: var(--color-dash-theme-bg); font-weight: 600; }
+:where([data-ui="unified"][data-staff-reference="embroidery-bonus-plan"]) .ebp-list { margin: 0; padding-left: 20px; }
+:where([data-ui="unified"][data-staff-reference="embroidery-bonus-plan"]) .ebp-list li { margin-bottom: 8px; }
 
-.ebp-list { margin: 0; padding-left: 20px; }
-.ebp-list li { margin-bottom: 8px; }
-
-.ebp-foot {
+:where([data-ui="unified"][data-staff-reference="embroidery-bonus-plan"]) .ebp-foot {
     text-align: center;
-    color: var(--ebp-muted);
+    color: var(--ui-muted);
     font-size: 0.85rem;
     padding: 8px 0 0;
 }
 
-/* ---------- print: a clean one-pager for a 1:1 ---------- */
 @media print {
     @page { margin: 12mm; }
-    body { background: var(--color-surface); font-size: 11pt; }
-    /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
-    .no-print { display: none !important; }
+    :where([data-ui="unified"][data-staff-reference="embroidery-bonus-plan"]) .ebp-eyebrow, :where([data-ui="unified"][data-staff-reference="embroidery-bonus-plan"]) .ebp-dates { color: var(--ui-accent); opacity: 1; }
+    :where([data-ui="unified"][data-staff-reference="embroidery-bonus-plan"]) .ebp-lede { opacity: 1; }
 
-    .ebp-hero {
-        background: var(--color-surface);
-        color: var(--ebp-ink);
-        padding: 0 0 12px;
-        border-bottom: 3px solid var(--ebp-green);
-    }
-    .ebp-eyebrow, .ebp-dates { color: var(--ebp-green); opacity: 1; }
-    .ebp-lede { opacity: 1; }
-    .ebp-main { margin: 16px 0 0; padding: 0; max-width: none; }
-
-    .ebp-section {
-        box-shadow: none;
+    :where([data-ui="unified"][data-staff-reference="embroidery-bonus-plan"]) .ebp-section {
         border: none;
-        border-top: 1px solid var(--ebp-line);
+        border-top: 1px solid var(--ui-line);
         border-radius: 0;
         padding: 14px 0;
         margin: 0;
         break-inside: avoid;
     }
-    .ebp-cards { gap: 10px; }
-    .ebp-card { break-inside: avoid; }
-    .ebp-num { border: 1px solid var(--ebp-green); }
+    :where([data-ui="unified"][data-staff-reference="embroidery-bonus-plan"]) .ebp-cards { gap: 10px; }
+    :where([data-ui="unified"][data-staff-reference="embroidery-bonus-plan"]) .ebp-card { break-inside: avoid; }
+    :where([data-ui="unified"][data-staff-reference="embroidery-bonus-plan"]) .ebp-num { border: 1px solid var(--ui-accent); }
 }
 
-@media (width <= 600px) {
-    .ebp-hero { padding: 32px 18px 44px; }
-    .ebp-main { padding: 0 14px 40px; }
-    .ebp-section { padding: 22px 18px; }
+@media screen and (width <= 600px) {
+    :where([data-ui="unified"][data-staff-reference="embroidery-bonus-plan"]) .ebp-section { padding: 22px 18px; }
+}
 }

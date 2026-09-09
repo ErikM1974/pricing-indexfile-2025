@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
+<html lang="en"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
@@ -10,18 +9,18 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
 
     <!-- Page styles -->
-    <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/pages/data-entry-guide.css?v=2026.09.07.19">
+    <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2"><link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.09.2"><link rel="stylesheet" href="/shared_components/css/staff-reference.css?v=2026.09.09.2">
+    <link rel="stylesheet" href="/pages/data-entry-guide.css?v=2026.09.09.2">
     <script src="/config/app.config.js"></script>
 </head>
-<body>
-    <main class="main-container">
+<body data-ui="unified" data-staff-reference="data-entry-guide" data-department="ae"><a href="#main" class="skip-link">Skip to content</a>
+    <main class="main-container dash-content" id="main" tabindex="-1">
         <!-- Header -->
         <header class="header">
-            <div class="header-container">
+            <div class="header-container dash-header-left">
                 <div class="header-left">
                     <div class="breadcrumb">
                         <a href="/staff-dashboard.html">Staff Dashboard</a>
@@ -29,11 +28,11 @@
                         <span>Data Entry Guide</span>
                     </div>
                 </div>
-                <div class="header-right">
-                    <a href="/calculators/service-price-cheat-sheet.html" class="btn-link">
+                <div class="header-right dash-header-right">
+                    <a href="/calculators/service-price-cheat-sheet.html" class="btn-link btn">
                         <i class="fas fa-tags" aria-hidden="true"></i> Service Prices
                     </a>
-                    <button class="btn-print" data-call="window.print">
+                    <button class="btn-print btn" data-call="window.print">
                         <i class="fas fa-print" aria-hidden="true"></i> Print
                     </button>
                 </div>
@@ -60,7 +59,7 @@
             </div>
             <div class="ref-card-body">
                 <div class="bad-example">
-                    <strong>What's wrong:</strong> Entering "Transfer", "EMB", "Embroidery", or "DTF" as line items with a blank part number. These aren't services &mdash; they're labels that confuse the system.
+                    <strong>What's wrong:</strong> Entering "Transfer", "EMB", "Embroidery", or "DTF" as line items with a blank part number. These aren't services — they're labels that confuse the system.
                 </div>
                 <div class="real-examples">
                     <strong>Real examples:</strong>
@@ -109,7 +108,7 @@
                 <div class="real-examples">
                     <strong>Real examples:</strong>
                     <ul>
-                        <li>Order #136562 (Fire Buffs): "Sew-on" at $12.50 with empty PN &mdash; should be <code>SEG</code></li>
+                        <li>Order #136562 (Fire Buffs): "Sew-on" at $12.50 with empty PN — should be <code>SEG</code></li>
                         <li>Order #136271: "Laser - Customer's Supplies" at $12.50 with empty PN</li>
                     </ul>
                 </div>
@@ -147,7 +146,7 @@
                     <strong>What's wrong:</strong> Same ShopWorks order has both "Transfer" items and "Embroidery" items. The quote builder can only generate one type of quote per order.
                 </div>
                 <div class="do-this">
-                    <i class="fas fa-check-circle" aria-hidden="true"></i> <strong>Do this instead:</strong> Create separate ShopWorks orders &mdash; one per decoration method. If a customer needs embroidery AND transfers, that's two orders.
+                    <i class="fas fa-check-circle" aria-hidden="true"></i> <strong>Do this instead:</strong> Create separate ShopWorks orders — one per decoration method. If a customer needs embroidery AND transfers, that's two orders.
                 </div>
             </div>
         </div>
@@ -164,8 +163,8 @@
                 <div class="real-examples">
                     <strong>Real examples:</strong>
                     <ul>
-                        <li>Order #136257 (Little Wheels QMA): AL at <strong>$120/pc</strong> &mdash; this is not an Additional Logo</li>
-                        <li>Order #136429 (CCNW Commercial): AL at $12.50 &mdash; likely a Full Back job</li>
+                        <li>Order #136257 (Little Wheels QMA): AL at <strong>$120/pc</strong> — this is not an Additional Logo</li>
+                        <li>Order #136429 (CCNW Commercial): AL at $12.50 — likely a Full Back job</li>
                     </ul>
                 </div>
                 <div class="al-vs-fb-table">
@@ -223,7 +222,7 @@
                     <li>Placement instructions ("Left Chest", "Back Logo")</li>
                     <li>Person name groupings ("Michael: items 1-3")</li>
                     <li>Method labels ("This section is Transfer")</li>
-                    <li>Special instructions ("Rush &mdash; need by Friday")</li>
+                    <li>Special instructions ("Rush — need by Friday")</li>
                 </ul>
                 <p><strong>None of these should be line items.</strong></p>
             </div>
@@ -238,7 +237,7 @@
                     <code>Company Name, Street Address, City, ST ZIP</code>
                 </div>
                 <ul class="notes-list">
-                    <li><strong>State:</strong> Always 2-letter uppercase (WA, OR, CA, AK &mdash; not "Wa")</li>
+                    <li><strong>State:</strong> Always 2-letter uppercase (WA, OR, CA, AK — not "Wa")</li>
                     <li><strong>ZIP:</strong> Always 5-digit (or 5+4 with dash: 98402-1234)</li>
                     <li><strong>Attn:</strong> Spell it correctly if needed ("Attn: John Smith")</li>
                 </ul>
@@ -251,10 +250,10 @@
             </div>
             <div class="ref-card-body">
                 <ul class="notes-list">
-                    <li>Embroidery order &rarr; only embroidery items</li>
-                    <li>Transfer order &rarr; only transfer items</li>
-                    <li>DTG order &rarr; only DTG items</li>
-                    <li>If customer needs both &rarr; create two separate orders</li>
+                    <li>Embroidery order → only embroidery items</li>
+                    <li>Transfer order → only transfer items</li>
+                    <li>DTG order → only DTG items</li>
+                    <li>If customer needs both → create two separate orders</li>
                 </ul>
             </div>
         </div>
@@ -288,8 +287,8 @@
                         <tr><td>2XL</td><td><code>_2X</code></td><td>PC54_2X</td></tr>
                         <tr><td>3XL</td><td><code>_3X</code></td><td>PC54_3X</td></tr>
                         <tr><td>4XL</td><td><code>_4X</code></td><td>PC54_4X</td></tr>
-                        <tr><td>5XL</td><td><code>_5X</code></td><td>&mdash;</td></tr>
-                        <tr><td>6XL</td><td><code>_6X</code></td><td>&mdash;</td></tr>
+                        <tr><td>5XL</td><td><code>_5X</code></td><td>—</td></tr>
+                        <tr><td>6XL</td><td><code>_6X</code></td><td>—</td></tr>
                         <tr><td>One size</td><td><code>_OSFA</code></td><td>CP90_OSFA</td></tr>
                     </tbody>
                 </table>
@@ -353,7 +352,7 @@
                     </label>
                     <label class="checklist-item">
                         <input type="checkbox">
-                        <span>No separator/label rows (Transfer, EMB, person names &rarr; moved to Notes)</span>
+                        <span>No separator/label rows (Transfer, EMB, person names → moved to Notes)</span>
                     </label>
                     <label class="checklist-item">
                         <input type="checkbox">
@@ -373,7 +372,7 @@
                     </label>
                     <label class="checklist-item">
                         <input type="checkbox">
-                        <span>AL pricing is $7-10/pc range (if higher &rarr; probably Full Back, use DECG-FB)</span>
+                        <span>AL pricing is $7-10/pc range (if higher → probably Full Back, use DECG-FB)</span>
                     </label>
                     <label class="checklist-item">
                         <input type="checkbox">
@@ -419,7 +418,7 @@
                         <tr><td>DESIGN PREP</td><td>GRT-75</td><td><code>GRT-75</code></td></tr>
                         <tr><td>EXCESS STITCH</td><td>AS-GARM</td><td><code>AS-Garm</code></td></tr>
                         <tr><td>SEW / SEW-ON</td><td>SEG</td><td><code>SEG</code></td></tr>
-                        <tr><td>COLOR CHANGE</td><td>Color Chg</td><td><code>Color Chg</code> &mdash; $15 screen-print fee</td></tr>
+                        <tr><td>COLOR CHANGE</td><td>Color Chg</td><td><code>Color Chg</code> — $15 screen-print fee</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -428,11 +427,11 @@
         <!-- Footer -->
         <div class="page-footer">
             <p>
-                Service prices loaded from API on page load. Last loaded: <span id="load-timestamp">&mdash;</span>
+                Service prices loaded from API on page load. Last loaded: <span id="load-timestamp">—</span>
             </p>
             <p>
                 <a href="/calculators/service-price-cheat-sheet.html"><i class="fas fa-tags" aria-hidden="true"></i> Full Service Price Cheat Sheet</a>
-                &nbsp;&middot;&nbsp;
+                &nbsp;·&nbsp;
                 <a href="/staff-dashboard.html"><i class="fas fa-arrow-left" aria-hidden="true"></i> Back to Dashboard</a>
             </p>
         </div>
@@ -441,6 +440,9 @@
     <!-- Scripts -->
     <script src="/shared_components/js/app-config.js?v=2026.09.06.26"></script>
     <script src="/shared_components/js/data-call-delegator.js?v=2026.09.06.27"></script>
-    <script src="/pages/data-entry-guide.js?v=2026.09.06.31"></script>
-</body>
-</html>
+    <script src="/pages/data-entry-guide.js?v=2026.09.09.2"></script>
+
+
+<script src="/shared_components/js/staff-reference.js?v=2026.09.09.2" defer=""></script>
+
+</body></html>

@@ -17,7 +17,15 @@ const POLICY_UI_FILES = [
     'shared_components/js/policies/policy-ai-search.js',
     'shared_components/js/policies/handbook-reader.js',
 ];
+const STAFF_REFERENCE_FILES = [
+    "shared_components/js/staff-reference.js",
+    "pages/data-entry-guide.js",
+    "dashboards/js/forms-library.js",
+    "dashboards/js/seo-strategy.js",
+    "dashboards/js/embroidery-bonus-plan.js"
+];
 const STRICT_FILES = [
+    ...STAFF_REFERENCE_FILES,
     'pages/js/brand-guide.js',
     'shared_components/js/webstore-guide.js',
     ...POLICY_UI_FILES,
@@ -166,8 +174,12 @@ export default [
         },
     },
     {
-        files: ['pages/js/brand-guide.js', ...POLICY_UI_FILES, 'shared_components/js/webstore-guide.js'],
+        files: [...STAFF_REFERENCE_FILES, 'pages/js/brand-guide.js', ...POLICY_UI_FILES, 'shared_components/js/webstore-guide.js'],
         languageOptions: { sourceType: 'script', globals: { ...globals.browser } },
+    },
+    {
+        files: STAFF_REFERENCE_FILES,
+        languageOptions: { globals: { APP_CONFIG: 'readonly', DashPage: 'readonly' } },
     },
     {
         // The designated window re-export surface + the config seed file.
