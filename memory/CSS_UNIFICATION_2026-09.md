@@ -768,3 +768,16 @@ Intake4 and hosted staff tools5 are reviewed and now integrated on primary devel
 ## Administrative ownership correction before release — 2026-09-09
 
 Final design-rule audit caught inherited announcement maroon. DESIGN_COLOUR_CODE reserves that accent for AE chrome; both administrative wrappers now use existing neutral ink tokens, while vendor wrappers retain Bradley slate. Controller/provider contracts remain unchanged. Combined full run was intentionally stopped after deterministic checks passed so the final source can be retested; no completed browser gate claimed.
+
+## Staff access and portal tools plan — 2026-09-09
+
+Next isolated branch codex/staff-admin-tools based on7b8f8f3bd0ca5256f3426cf9f94be51ee61ef8a9: dashboards/access-admin.html, drive-access.html and portal-directory.html. Source/controller/route/content/field contracts captured before changes. Primary nine-page release .10 runs separately; this plan is not part of that release.
+
+Use Public Sans, canonical fields/buttons/cards and a shared scoped staff tools arrangement. Administrative access/drive pages use neutral ink; retain the portal directory's navy identity with existing tokens rather than AE maroon. White content surfaces, consistent left-aligned headings and clear table/card reading order. Keep drive rights visibly distinct with written Modify/Read only/Full control labels, retired-account warnings, and existing mapped-versus-permitted explanations. Customer portal counts and Preview/Copy Link destinations remain unchanged.
+
+- [ ] Capture synthetic original desktop/phone states; no actual roles, file permissions, customer data or clipboard writes.
+- [ ] Migrate page arrangements; preserve source contracts and only adjust UI class hooks/accessibility semantics as needed. Canonical primitives stay in components.css.
+- [ ] Test original admin role/page payloads with writes mocked, failure/draft retention and cancelled removal; data stays behind the existing server gates. Drive mapping remains read-only with per-person rights and both views preserved.
+- [ ] Verify portal grouping/counts/sort/search, missing IDs, failed feeds, clipboard failure fallback and staff-preview/customer-link distinction; retain date behavior.
+- [ ] Four widths/axe/keyboard and complete reference/data-fixture paper; register reviewed owners and retire obsolete CSS only after final consumers move.
+- [ ] Full local checks, exact-source CI and verified deployment after .10. No staff-tools pages count as reviewed yet.
