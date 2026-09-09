@@ -129,3 +129,7 @@
 - `tests/fixtures/staff-reference-original-content.json` — preserved source baseline for five staff references.
 
 - Staff references: `tests/unit/staff-reference-content.test.js` and `tests/e2e/css-unification-staff-reference.spec.js` cover original source data, all five layouts and mocked service/print states; all business writes are blocked.
+
+- `tests/fixtures/entry-status-original-content.json` — complete original copy, fields, images, links and controller hashes for three sign-in and three confirmation pages.
+
+- Entry/status: `tests/unit/entry-status-content.test.js` and `tests/e2e/css-unification-entry-status.spec.js` preserve original content, all three fulfillment controller hashes, sign-in validation/privacy/error/retry and confirmation status/paper. Shared field styling replaces legacy CSS selector locks in customer-login-page.test.js; real browser assertions cover focus/invalid styling.

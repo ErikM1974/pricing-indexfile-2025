@@ -1,56 +1,54 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
+<html lang="en"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
     <title>Staff Portal Login - Northwest Custom Apparel</title>
-    
+
     <link rel="icon" href="/favicon.png" type="image/png">
-    
-    <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/dashboards/css/staff-login.css?v=2026.09.07.19">
-</head>
-<body>
-    <main class="login-container">
+
+
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&amp;display=swap"><link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2"><link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.09.3"><link rel="stylesheet" href="/shared_components/css/access-shell.css?v=2026.09.09.3"><link rel="stylesheet" href="/dashboards/css/staff-login.css?v=2026.09.09.3"></head>
+<body data-ui="unified" data-access="staff-login">
+    <main class="login-container" id="main" tabindex="-1">
         <div class="login-logo">
-            <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png"
-                 alt="Northwest Custom Apparel">
+            <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png" alt="Northwest Custom Apparel">
         </div>
-        
+
         <div class="login-header">
             <h1>Staff Portal</h1>
             <p>Access internal tools and resources</p>
         </div>
 
         <div class="security-badge">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                 <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
             </svg>
             Secure Staff Login
         </div>
-        
+
         <!-- Login Options -->
         <div class="login-options">
             <p class="login-message">Click below to access the staff portal with your credentials.</p>
-            
-            <a href="/auth/saml/login" class="login-button">
+
+            <a href="/auth/saml/login" class="login-button btn btn-primary">
                 Sign In to Staff Portal
             </a>
-            
+
             <div class="login-info">
                 <p>You will be redirected to our secure authentication system.</p>
             </div>
         </div>
-        
+
         <div class="login-footer">
             <a href="/" class="back-link">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M19 12H5M12 19l-7-7 7-7"/>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <path d="M19 12H5M12 19l-7-7 7-7"></path>
                 </svg>
                 Back to main website
             </a>
-            
+
             <div class="help-text">
                 Need assistance? Contact <a href="mailto:support@nwcustomapparel.com">IT Support</a>
             </div>
@@ -58,11 +56,11 @@
     </main>
 
     <!-- Hidden Caspio Auth Check -->
-    <div style="display: none;">
+    <div hidden="">
         <div id="auth-check">[@authfield:First_Name]</div>
         <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e15000a0bb470ed2be4ec5943e/emb"></script>
     </div>
 
     <script src="/dashboards/js/staff-login-page.js?v=2026.09.06.30"></script>
-</body>
-</html>
+
+</body></html>

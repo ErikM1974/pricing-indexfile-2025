@@ -328,3 +328,5 @@ For questions or issues with the testing system:
 - `tests/e2e/css-unification-brand-guides.spec.js`, `tests/unit/brand-guide-content.test.js`, `tests/fixtures/brand-guide-original-content.json`: all fifteen brand guides; preserved copy/SEO/products/links/search fields, native mobile menu/focus, four widths/axe and complete paper.
 
 - Staff references: `tests/unit/staff-reference-content.test.js` and `tests/e2e/css-unification-staff-reference.spec.js` cover original source data, all five layouts and mocked service/print states; all business writes are blocked.
+
+- Entry/status: `tests/unit/entry-status-content.test.js` and `tests/e2e/css-unification-entry-status.spec.js` preserve original content, all three fulfillment controller hashes, sign-in validation/privacy/error/retry and confirmation status/paper. Shared field styling replaces legacy CSS selector locks in customer-login-page.test.js; real browser assertions cover focus/invalid styling.

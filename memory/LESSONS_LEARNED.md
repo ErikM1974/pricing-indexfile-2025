@@ -204,10 +204,7 @@ Native Node22.23 runs Puppeteer25; invoke its capture CLI outside Jest, and repo
 
 ### Shared form styles and print pseudo-elements (2026-09-08, archived): inspect actual filled paper and scoped pseudo-elements. Full entry in LESSONS_LEARNED_ARCHIVE.md.
 
-### Training state must survive every input path (2026-09-08)
-
-Problem: drag-only exercise tiles excluded touch/keyboard, quiz points survived retries, tax choices could re-enable an already-scored answer, and template saves never rendered on reload. Root cause: visual-only click state and incomplete localStorage readers. Fix: native selectable buttons and one scoring guard, cancel outstanding round/timer callbacks, reset quiz scores, modal focus lifecycle and safe saved-template rendering with visible clipboard/storage failures. Prevention: exercise complete rounds/retries with keyboard, touch and drag; test failed/malformed storage without overwriting it; preserve training fixtures with source locks.
-
+### Training state must survive every input path (2026-09-08, archived): preserve input/retry/storage behavior. Full entry in LESSONS_LEARNED_ARCHIVE.md.
 
 ## Reference content and browser persistence need their own checks (2026-09-08)
 - Problem/root cause: rich quick-tip data carried inline presentation rules into redesigned pages; local date-only strings displayed a day earlier in Pacific time. Guide checklist writes and resets could fail silently after a one-time storage probe.
@@ -250,3 +247,7 @@ Problem: the inherited drawer had no focus boundary or return, and initial nativ
 ### Staff reference data and paper need explicit failure states (2026-09-09)
 
 Problem: partial service rows looked fully live, invalid bonus figures could render, malformed form lists looked empty, and screen breakpoints/large unbreakable cards wasted paper. Root cause: optimistic response shapes, fallback labels at response rather than row level, borrowed page CSS and screen rules applied to print. Solution: validate data, visibly distinguish API/mixed/fallback states, retry only dependent content, retain checklists, escape external labels/destinations, use focusable scrolling tables and screen-only breakpoints with compact print layouts. Prevention: preserve original prose/actions, test real existing page access, four widths/axe and failed/malformed/retry states, compare actual paper text including warnings, and keep retry controls off paper. Multiline tooling edits must normalize CRLF or assert replacements; check the resulting code.
+
+### Sign-in and confirmation owners need honest state and paper checks (2026-09-09)
+
+Problem: shared form arrangements initially omitted canonical field styles, infrastructure failures falsely displayed an email-sent state, and artwork pushed receipt contact details onto a trailing sheet. Root cause: class ownership, treating all HTTP responses as success, and screen spacing inherited by print. Solution: canonical fields/shared access shell, generic outage errors preserving the email for retry while keeping successful known/unknown accounts identical, and compact print spacing with empty artwork regions hidden. Fulfillment controllers, totals and server shipping promises remain unchanged and hash-locked. Prevention: exercise keyboard/invalid/pending/rate/network/outage/sent states with all writes and emails blocked, inspect paper with actual artwork fixtures and compare every content block. Preserve line endings in scripted registry edits so removing a line cannot merge an adjacent entry into a comment.

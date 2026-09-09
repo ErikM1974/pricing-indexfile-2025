@@ -3,7 +3,7 @@
  *   1. Deep links survive sign-in: the gate's ?next= is forwarded with the request-link POST, the
  *      emailed link carries it, and both /verify routes re-validate it with safeLoginNext().
  *   2. Rule 3 + a11y: real label, role=alert notice, visible focus, autofocus, invalid-email outline.
- *   3. The rate limiter (429) and a dead network (0) are told to the user; every other response is
+ *   3. The rate limiter (429), server outage (503) and dead network (0) are shown; successful responses are
  *      the SAME "check your email" state (no account enumeration).
  *   4. "try again" returns to the form in place (keeps ?next=); the sent heading takes focus.
  *   5. The two pages share markup + CSS — what one has, the other has.
@@ -48,23 +48,25 @@ describe.each(pages)('%s login page', (_name, html, js, prefix, loginPath) => {
         expect(re.test(prefix + 'x/evil')).toBe(false);
         expect(re.test('https://evil.example/')).toBe(false);
     });
-    test('429 and network failure are surfaced; everything else is the same sent state', () => {
+    test('rate, network and server failures are surfaced; successful requests use the same sent state', () => {
         expect(js).toMatch(/if \(status === 429\) \{ resetButton\(\); showError\('Too many sign-in requests/);
         expect(js).toMatch(/if \(status === 0\) \{ resetButton\(\); showError\('We couldn’t reach the server/);
         expect(js).toMatch(/formView\.hidden = true;\s*sentView\.hidden = false;\s*var h = sentView\.querySelector\('h1'\);\s*if \(h\) h\.focus\(\);/);
+        expect(js).toContain("if (status >= 500) { resetButton(); showError('Sign-in is temporarily unavailable.");
         expect(js).toMatch(/emailEl\.setAttribute\('aria-invalid', 'true'\)/);
         expect(js).toMatch(/again\.addEventListener\('click'/);
     });
 });
 
 describe('shared login CSS', () => {
-    test('visible focus, invalid outline, readable footer, phone padding', () => {
-        expect(css).toMatch(/#cl-submit:focus-visible, \.cl-card a:focus-visible \{ outline: 3px solid/);
-        // the invalid outline is the page's red (a raw hex before 2026-09-07, a page-scoped variable since)
-        expect(css).toMatch(/#cl-email\[aria-invalid="true"\] \{ border-color: (?:#a32d2d|var\(--[a-z0-9-]+\)); \}/);
-        expect(css).not.toMatch(/\.cl-foot \{ color:#bbb;/);
-        expect(css).not.toMatch(/\.cl-hint \{ color:#999;/);
-        expect(css).toMatch(/@media \((?:max-width: 420px|width <= 420px)\) \{[\s\S]*\.cl-card \{ padding: 2rem 1\.25rem 1\.5rem;/);
+    test('both forms use shared focusable fields and retain the invalid outline', () => {
+        for (const [_name, html] of pages) {
+            expect(html).toContain('class="cl-email field-input"');
+            expect(html).toContain('/shared_components/css/components.css?v=');
+            expect(html).toContain('/shared_components/css/access-shell.css?v=');
+        }
+        expect(css).toContain('.cl-email[aria-invalid="true"] { border-color: var(--color-danger-ink); }');
+        // Four-width, keyboard focus, contrast, error and sent-state layout are exercised by css-unification-entry-status.spec.js.
     });
 });
 

@@ -60,9 +60,11 @@
       body: JSON.stringify(body)
     }).then(function (r) { return r.status; }, function () { return 0; }).then(function (status) {
       // Same "check your email" state whether or not the email is on file (no enumeration);
-      // only the rate limiter (429) and no response at all (0) are surfaced.
+      // rate limits, network failures and server outages are surfaced without account details.
       if (status === 429) { resetButton(); showError('Too many sign-in requests. Please wait a few minutes and try again.'); return; }
       if (status === 0) { resetButton(); showError('We couldn’t reach the server. Check your connection and try again.'); return; }
+      // An infrastructure outage is independent of whether an account exists. Keep 200 identical for everyone.
+      if (status >= 500) { resetButton(); showError('Sign-in is temporarily unavailable. Please try again in a moment.'); return; }
       formView.hidden = true;
       sentView.hidden = false;
       var h = sentView.querySelector('h1');

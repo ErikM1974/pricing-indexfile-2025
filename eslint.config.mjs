@@ -24,7 +24,9 @@ const STAFF_REFERENCE_FILES = [
     "dashboards/js/seo-strategy.js",
     "dashboards/js/embroidery-bonus-plan.js"
 ];
+const MAGIC_LINK_FILES = ['pages/js/customer-login.js', 'pages/js/vendor-login.js'];
 const STRICT_FILES = [
+    ...MAGIC_LINK_FILES,
     ...STAFF_REFERENCE_FILES,
     'pages/js/brand-guide.js',
     'shared_components/js/webstore-guide.js',
@@ -174,7 +176,7 @@ export default [
         },
     },
     {
-        files: [...STAFF_REFERENCE_FILES, 'pages/js/brand-guide.js', ...POLICY_UI_FILES, 'shared_components/js/webstore-guide.js'],
+        files: [...MAGIC_LINK_FILES, ...STAFF_REFERENCE_FILES, 'pages/js/brand-guide.js', ...POLICY_UI_FILES, 'shared_components/js/webstore-guide.js'],
         languageOptions: { sourceType: 'script', globals: { ...globals.browser } },
     },
     {

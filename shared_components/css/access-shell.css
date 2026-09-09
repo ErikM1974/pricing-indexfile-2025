@@ -1,0 +1,28 @@
+/* data-access — shared entry layout using app tokens and components. */
+@layer components.pages {
+
+:where([data-ui="unified"][data-access]) { min-height: 100svh; display: grid; place-items: center; padding: clamp(16px, 4vw, 48px); }
+:where([data-ui="unified"][data-access]) :is(.cl-wrap, .login-container) { width: 100%; max-width: 460px; }
+:where([data-ui="unified"][data-access]) :is(.cl-card, .login-container) { padding: clamp(24px, 4vw, 40px); background: var(--ui-surface); border: 1px solid var(--ui-line); border-top: 4px solid var(--ui-accent); border-radius: var(--radius-lg); text-align: left; }
+:where([data-ui="unified"][data-access]) :is(.cl-logo, .login-logo img) { display: block; width: 152px; height: auto; margin: 0 0 28px; }
+:where([data-ui="unified"][data-access]) h1 { margin: 0 0 12px; font-size: clamp(24px, 4vw, 30px); line-height: 1.2; letter-spacing: -0.025em; }
+:where([data-ui="unified"][data-access]) p { line-height: 1.65; }
+:where([data-ui="unified"][data-access]) :is(.cl-sub, .login-header p, .login-message) { margin: 0 0 24px; color: var(--ui-muted); }
+:where([data-ui="unified"][data-access]) :is(.cl-foot, .login-footer) { margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--ui-line); font-size: 13px; color: var(--ui-muted); }
+:where([data-ui="unified"][data-access]) :is(.cl-hint, .login-info, .help-text) { color: var(--ui-muted); font-size: 13px; }
+:where([data-ui="unified"][data-access]) a:not(.btn) { text-decoration: underline; text-underline-offset: 3px; }
+:where([data-ui="unified"][data-access]) .btn { width: 100%; min-height: 48px; white-space: normal; }
+:where([data-ui="unified"][data-access]) .cl-check { width: 52px; height: 52px; display: grid; place-items: center; background: var(--color-success-bg); color: var(--emerald-800); border-radius: var(--radius-pill); font-size: 28px; margin-bottom: 20px; }
+:where([data-ui="unified"][data-access]) .cl-error { padding: 12px; margin: 16px 0 0; border: 1px solid var(--color-danger); border-radius: var(--radius-sm); color: var(--color-danger-ink); background: var(--color-danger-bg); font-size: 14px; }
+:where([data-ui="unified"][data-access]) :is(.security-badge, .back-link) { display: inline-flex; align-items: center; gap: 8px; }
+:where([data-ui="unified"][data-access]) .security-badge { padding: 8px 12px; background: var(--color-success-bg); color: var(--emerald-800); border-radius: var(--radius-sm); font-size: 13px; margin-bottom: 24px; }
+:where([data-ui="unified"][data-access]) svg { flex-shrink: 0; width: 18px; height: 18px; }
+
+@media print {
+    :where([data-ui="unified"][data-access]) { display: block; padding: 0; min-height: 0; background: var(--ui-surface); }
+    :where([data-ui="unified"][data-access]) :is(.cl-wrap, .login-container) { max-width: 100%; }
+    :where([data-ui="unified"][data-access]) :is(.cl-card, .login-container) { padding: 16px; }
+    :where([data-ui="unified"][data-access]) h1:focus { outline: none; }
+}
+
+}

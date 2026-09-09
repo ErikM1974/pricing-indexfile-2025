@@ -92,3 +92,10 @@ Historical counts are retained as audit notes and must not be presented as curre
 
 - `tests/unit/staff-reference-content.test.js` — five staff guides preserve original full reference text, fields, links and imagery.
 - `tests/e2e/css-unification-staff-reference.spec.js` — staff references at four widths, real access gates, mocked valid/malformed/failed data, source warnings, retry, navigation and paper.
+
+- `shared_components/css/access-shell.css` — shared staff/customer/vendor sign-in shell; existing login sheets keep only page arrangements.
+- `pages/css/order-confirmation.css` — all three storefront confirmation pages; replaces and retires `pages/css/3-day-tees-success.css` and `pages/css/custom-tees-success.css`.
+- `tests/fixtures/entry-status-original-content.json` — original six-page source/controller/CSS inventory.
+
+- `tests/unit/entry-status-content.test.js` — six sign-in/confirmation sources preserve text, hooks and untouched fulfillment controllers.
+- `tests/e2e/css-unification-entry-status.spec.js` — four widths, keyboard/sign-in errors/retry, existing confirmation polling and populated paper; all business writes/email mocked or blocked.
