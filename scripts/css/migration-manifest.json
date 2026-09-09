@@ -4112,6 +4112,101 @@
         "rawCssBytes": 38748,
         "localCssRequests": 2
       }
+    },
+    {
+      "source": "pages/dtg-compatible-products.html",
+      "family": "product-detail-tools",
+      "status": "pilot",
+      "route": "/pages/dtg-compatible-products.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/product-detail-tools.css"
+      ],
+      "dynamicStyles": [],
+      "dynamicTokens": [],
+      "states": [
+        "four-widths-keyboard-and-accessibility",
+        "preserved-product-links-and-stock-values",
+        "failed-partial-empty-and-retry",
+        "catalog-sizes-not-stock-quantities",
+        "late-selected-color-and-search",
+        "identical-audit-clipboard-output-and-visible-clipboard-error",
+        "partial-provider-audit-stays-unknown",
+        "print-complete-warehouse-tables"
+      ],
+      "test": "tests/e2e/css-unification-product-detail-tools.spec.js",
+      "maxCssBytes": 76960,
+      "measuredRawCssBytes": 75936,
+      "baseline": {
+        "commit": "8c9db3cac7a3830f208ce89008346d08cb08ebde",
+        "rawCssBytes": 42911,
+        "localCssRequests": 5
+      }
+    },
+    {
+      "source": "pages/inventory-details.html",
+      "family": "product-detail-tools",
+      "status": "pilot",
+      "route": "/pages/inventory-details.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/product-detail-tools.css"
+      ],
+      "dynamicStyles": [],
+      "dynamicTokens": [
+        "--swatch"
+      ],
+      "states": [
+        "four-widths-keyboard-and-accessibility",
+        "preserved-product-links-and-stock-values",
+        "failed-partial-empty-and-retry",
+        "catalog-sizes-not-stock-quantities",
+        "late-selected-color-and-search",
+        "identical-audit-clipboard-output-and-visible-clipboard-error",
+        "partial-provider-audit-stays-unknown",
+        "print-complete-warehouse-tables"
+      ],
+      "test": "tests/e2e/css-unification-product-detail-tools.spec.js",
+      "maxCssBytes": 76960,
+      "measuredRawCssBytes": 75936,
+      "baseline": {
+        "commit": "8c9db3cac7a3830f208ce89008346d08cb08ebde",
+        "rawCssBytes": 44431,
+        "localCssRequests": 3
+      }
+    },
+    {
+      "source": "pages/sanmar-catalog-color-audit.html",
+      "family": "product-detail-tools",
+      "status": "pilot",
+      "route": "/pages/sanmar-catalog-color-audit.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/product-detail-tools.css"
+      ],
+      "dynamicStyles": [],
+      "dynamicTokens": [],
+      "states": [
+        "four-widths-keyboard-and-accessibility",
+        "preserved-product-links-and-stock-values",
+        "failed-partial-empty-and-retry",
+        "catalog-sizes-not-stock-quantities",
+        "late-selected-color-and-search",
+        "identical-audit-clipboard-output-and-visible-clipboard-error",
+        "partial-provider-audit-stays-unknown",
+        "print-complete-warehouse-tables"
+      ],
+      "test": "tests/e2e/css-unification-product-detail-tools.spec.js",
+      "maxCssBytes": 76960,
+      "measuredRawCssBytes": 75936,
+      "baseline": {
+        "commit": "8c9db3cac7a3830f208ce89008346d08cb08ebde",
+        "rawCssBytes": 21628,
+        "localCssRequests": 2
+      }
     }
   ],
   "billingContentSha256": "d85f8530e03a1863d1b8bb2ebe97ba332d5c9e3411887d1eb2d02dcdb14c0863",

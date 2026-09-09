@@ -20,6 +20,7 @@ document.addEventListener('DOMContentLoaded', function() {
         showContactInfo: true
     });
 
+    document.querySelector('.cart-indicator')?.classList.add('btn', 'btn-secondary');
     loadDTGProducts();
 });
 
@@ -31,21 +32,20 @@ async function loadDTGProducts() {
 
     loadingIndicator.hidden = false;
     productsGrid.hidden = true;
+    productCount.textContent = 'Loading compatible products…';
 
     const products = [];
-    let loadErrors = '';
+    const loadErrors = [];
 
     // Fetch product details for each DTG-compatible style
     for (const styleNumber of dtgCompatibleStyles) {
         try {
             if (!productCache[styleNumber]) {
                 const response = await fetch(`${API_BASE}/api/product-details?styleNumber=${encodeURIComponent(styleNumber)}`);
-                if (response.ok) {
-                    const details = await response.json();
-                    if (details && details.length > 0) {
-                        productCache[styleNumber] = details;
-                    }
-                }
+                if (!response.ok) throw new Error('Request failed (' + response.status + ')');
+                const details = await response.json();
+                if (!Array.isArray(details) || details.some(item => !item || typeof item !== 'object' || !item.COLOR_NAME)) throw new Error('Incomplete product response');
+                if (details.length > 0) productCache[styleNumber] = details;
             }
 
             if (productCache[styleNumber]) {
@@ -59,22 +59,26 @@ async function loadDTGProducts() {
             }
         } catch (error) {
             console.error(`Error fetching ${styleNumber}:`, error);
-            loadErrors = error.message || 'request failed';
+            loadErrors.push(styleNumber);
         }
     }
 
     // Update product count
-    productCount.textContent = `${products.length} products perfect for DTG printing`;
+    productCount.textContent = loadErrors.length ? `${products.length} products loaded; ${loadErrors.length} styles unavailable` : `${products.length} products perfect for DTG printing`;
 
     // Display products
     displayProducts(products);
 
     loadingIndicator.hidden = true;
     productsGrid.hidden = false;
-    if (!products.length) {
-        // Erik's #1 rule: a failed catalogue read must not look like an empty catalogue
-        productsGrid.innerHTML = '<p class="dtg-empty" role="alert">Products could not be loaded' + (loadErrors ? ' (' + esc(loadErrors) + ')' : '') + '. <button type="button" class="btn-sample dtg-retry" id="dtg-retry">Retry</button></p>';
-        const rb = document.getElementById('dtg-retry'); if (rb) rb.addEventListener('click', loadDTGProducts);
+    if (loadErrors.length) {
+        const notice = document.createElement('p');
+        notice.className = 'dtg-empty'; notice.setAttribute('role', 'alert');
+        notice.innerHTML = (products.length ? 'Some products could not be loaded' : 'Products could not be loaded') + ' (' + esc(loadErrors.join(', ')) + '). <button type="button" class="btn btn-secondary dtg-retry" id="dtg-retry">Retry</button>';
+        productsGrid.prepend(notice);
+        notice.querySelector('button').addEventListener('click', loadDTGProducts);
+    } else if (!products.length) {
+        productsGrid.innerHTML = '<p class="product-empty" role="status">No DTG-compatible products are available right now.</p>';
     }
 
     // Check sample eligibility after products load
@@ -125,8 +129,8 @@ function createProductCard(product) {
     card.setAttribute('role', 'link');
     card.tabIndex = 0;
     card.setAttribute('aria-label', `${product.description} — style ${product.style}`);
-    card.addEventListener('click', () => navigateToProduct(product));
-    card.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); navigateToProduct(product); } });
+    card.addEventListener('click', (event) => { if (!event.target.closest('button')) navigateToProduct(product); });
+    card.addEventListener('keydown', (e) => { if (e.target === card && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); navigateToProduct(product); } });
 
     const imageUrl = firstProduct.FRONT_MODEL ||
                     firstProduct.FRONT_FLAT ||
@@ -155,7 +159,7 @@ function createProductCard(product) {
                     <div class="more-colors">+${uniqueColors.length - 5}</div>
                 ` : ''}
             </div>
-            <button type="button" class="btn-sample" data-style="${esc(product.style)}" data-eligible="pending" data-desc="${esc(product.description)}" aria-label="Request a sample of ${esc(product.description)}">
+            <button type="button" class="btn-sample btn btn-primary" data-style="${esc(product.style)}" data-eligible="pending" data-desc="${esc(product.description)}" aria-label="Request a sample of ${esc(product.description)}">
                 <i class="fas fa-box-open" aria-hidden="true"></i> Request Sample
             </button>
         </div>
@@ -174,8 +178,13 @@ document.addEventListener('click', (e) => {
 document.addEventListener('error', (e) => {
     const img = e.target;
     if (img && img.tagName === 'IMG' && img.dataset && img.dataset.onerror === 'fallback') {
-        img.removeAttribute('data-onerror');
-        if (img.dataset.fallback) img.src = img.dataset.fallback; else img.hidden = true;
+        if (img.dataset.fallback && img.src !== img.dataset.fallback && !img.dataset.fallbackTried) {
+            img.dataset.fallbackTried = 'true'; img.src = img.dataset.fallback;
+        } else {
+            img.removeAttribute('data-onerror'); img.hidden = true;
+            const note = document.createElement('p'); note.className = 'image-unavailable'; note.textContent = 'Product image unavailable';
+            img.after(note);
+        }
     }
 }, true);
 

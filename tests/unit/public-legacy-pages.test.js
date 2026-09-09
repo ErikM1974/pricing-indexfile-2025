@@ -13,8 +13,8 @@ const BARE = /<i class="(?:fa[sr]|fab|fa-solid|fa-regular) [^"]*"><\/i>/;
 const strip = (h) => h.replace(/<!--[\s\S]*?-->/g, '').replace(/<script type="application\/ld\+json">[\s\S]*?<\/script>/g, '');
 
 const PAGES = {
-    'inventory-details': { css: 'pages/css/inventory-details.css', js: 'pages/js/inventory-details.js' },
-    'dtg-compatible-products': { css: 'pages/css/dtg-compatible-products.css', js: 'pages/js/dtg-compatible-products.js' },
+    'inventory-details': { css: 'shared_components/css/product-detail-tools.css', js: 'pages/js/inventory-details.js' },
+    'dtg-compatible-products': { css: 'shared_components/css/product-detail-tools.css', js: 'pages/js/dtg-compatible-products.js' },
     'pricing-negotiation-policy': { css: 'pages/css/pricing-negotiation-policy.css', js: 'pages/js/pricing-negotiation-policy.js' },
     'design-view': { css: 'shared_components/css/design-preview-tools.css', js: 'pages/js/design-view.js' },
 };
@@ -51,14 +51,17 @@ describe('public legacy pages — specifics', () => {
         expect(js).toMatch(/Products could not be loaded/);
         expect(js).toMatch(/card\.setAttribute\('role', 'link'\);/);
         expect(js).toMatch(/data-onerror="fallback"/);
-        expect(html).toMatch(/id="productsGrid" hidden>/);
+        expect(new (require('jsdom').JSDOM)(html).window.document.getElementById('productsGrid').hidden).toBe(true);
         expect(html).not.toMatch(/style="/);
         expect(js).not.toMatch(/\.style\.display/);
     });
     test('inventory-details: disclosure pricing menu, keyboard colours, escaped search results', () => {
         const html = read('pages/inventory-details.html');
         const js = read('pages/js/inventory-details.js');
-        expect(html).toMatch(/class="btn-pricing" aria-haspopup="true" aria-expanded="false" aria-controls="pricing-dropdown-menu"/);
+        const pricing = new (require('jsdom').JSDOM)(html).window.document.querySelector('.btn-pricing');
+        expect(pricing.getAttribute('aria-haspopup')).toBe('true');
+        expect(pricing.getAttribute('aria-expanded')).toBe('false');
+        expect(pricing.getAttribute('aria-controls')).toBe('pricing-dropdown-menu');
         expect((html.match(/data-pricing="/g) || []).length).toBe(5);
         expect(html).toMatch(/<script type="module" src="\/pages\/js\/inventory-details\.js\?v=/);
         expect(js).toMatch(/option\.setAttribute\('aria-pressed'/);
