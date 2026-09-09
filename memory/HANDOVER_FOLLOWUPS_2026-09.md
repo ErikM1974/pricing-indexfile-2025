@@ -269,3 +269,9 @@ Branch codex/staff-import-tools starts at71f8d6c466cc523a798d33f5572ba3a61114a5d
 - [ ] Four widths/axe/keyboard and complete reference/preview paper. Register reviewed styles and retire only the two superseded owners, then integrate/full checks/CI/release.
 
 Monitoring is reviewed locally (132of225/93pending); current live count remains126/99 until .11 verification. Saved originals: staff-import-original-baseline.json.
+
+### Staff import arrangement implementation
+
+Staff import tools in progress: dashboards/sanmar-ftp-integration.html and dashboards/sanmar-shopworks-converter.html use shared_components/css/staff-import-tools.css with tokens/components. Their two dashboards/css/*.css owners are retired after their final consumers moved. Pure conversion/SKU helpers and converter controller retained; FTP changes are explicitly recorded presentation/loading/response-validation hooks. Browser/source review pending; no new reviewed/live count.
+
+Original synthetic desktop/phone screenshots captured before migration. The initial multi-file CSS patch rejected a mismatched documentation heading atomically; no partial file was created. Current shared stylesheet and page/controller migration still require verification. .11 revised-source CI34386325023 on0e7acabec720031597b669daff55b513f54ac77f has passed setup/axe and is running full mocked browser checks after the Google apt-index recovery.
