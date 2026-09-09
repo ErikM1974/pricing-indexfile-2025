@@ -1,0 +1,575 @@
+{
+  "base": "09faa19b656c10c7e8331aee477c3ebea080711f",
+  "pages": [
+    {
+      "file": "pages/design-view.html",
+      "title": "Design Preview - Northwest Custom Apparel",
+      "bodyText": "Northwest Custom Apparel Design Preview Loading design... Design Not Found The design you're looking for doesn't exist or may have been removed. Questions? Call us at 253-922-5793 No preview images available for this design. Contact us for more information: 253-922-5793 Northwest Custom Apparel 253-922-5793 • nwcustomapparel.com",
+      "mainText": "No preview images available for this design. Contact us for more information: 253-922-5793",
+      "ids": [
+        "dv-loading",
+        "dv-error",
+        "dv-error-title",
+        "dv-error-msg",
+        "dv-content",
+        "dv-design-number",
+        "dv-company",
+        "dv-name",
+        "dv-hero",
+        "dv-hero-btn",
+        "dv-hero-img",
+        "dv-image-grid",
+        "dv-no-images",
+        "dv-lightbox",
+        "dv-lightbox-close",
+        "dv-lightbox-img"
+      ],
+      "links": [
+        {
+          "href": "tel:2539225793",
+          "label": "253-922-5793"
+        },
+        {
+          "href": "tel:2539225793",
+          "label": "253-922-5793"
+        },
+        {
+          "href": "https://www.nwcustomapparel.com",
+          "label": "nwcustomapparel.com"
+        }
+      ],
+      "images": [
+        {
+          "src": "/images/nwca-logo.png",
+          "alt": "Northwest Custom Apparel"
+        },
+        {
+          "src": "",
+          "alt": "Design preview"
+        },
+        {
+          "src": "",
+          "alt": "Full size preview"
+        }
+      ],
+      "fields": [],
+      "scripts": [
+        "/config/app.config.js",
+        "/pages/js/design-view.js?v=2026.09.05.77"
+      ]
+    },
+    {
+      "file": "pages/dst-viewer.html",
+      "title": "DST Studio | NWCA",
+      "bodyText": "DST Studio stitch viewer · true-scale mockups · production planner No file loaded drop a .DST anywhere on this page Sample Summary PNG Approval Sheet Open View Stitch Flat Wire Trace Overlay Grid Density Zoom Fit 1:1 Mockup On Garment Fabric Back to stitch view All —— 5x — — — scroll = zoom · drag = pan · double-click = fit — Drop a .DST file Tajima stitch file — straight from the digitizer or ShopWorks art folder Browse files Load sample badge 100% local — files are parsed in your browser and never uploaded. Recent designs Design Threads Production Mockup Load a design to see stats. Label— Stitch length— Stitches— Colors— Size— Est. run time— Trims— Jumps— Top thread— Peak density— Thread breaks & events — Load a design to assign threads. — Reset Click a swatch to pick the real Robison-Anton thread. Choices are remembered per design on this computer and flow into the approval sheet. Load a design to plan the run. Sew timeestimate Machine speed 750 spm Sewing— Color changes— Trims— Start / finish— Per piece— Thread usage±15% ThreadStitchesTop Total top— Bobbin— Density check— Peak— Toggle heatmap overlay Hotspots are cells with stacked needle penetrations — the usual cause of thread breaks, puckering and holes. Check them with the digitizer before a big run. Price this designopen the Embroidery Quote Builder Load a design to build a mockup. Garment Fabric color Placement Scale 100% · true size Sewn size— Position— Re-center Drag the design on the garment to fine-tune. Placement is true to physical scale — a 4\" logo renders 4\" wide on a 22\" chest. Download mockup PNG Robison-Anton 40wt Embroidery Design Approval File Design label Finished size Stitch count Thread colors Run time Digital stitch-out preview RunCatalogThreadStitches Thread colors shown are digital approximations of Robison-Anton 40wt polyester. Actual sewn colors may vary slightly by fabric and dye lot. Sew-time figures are production estimates, not billing. Customer approval Date Northwest Custom Apparel · nwcustomapparel.com · 253-922-5793",
+      "mainText": "Fabric Back to stitch view All —— 5x — — — scroll = zoom · drag = pan · double-click = fit — Drop a .DST file Tajima stitch file — straight from the digitizer or ShopWorks art folder Browse files Load sample badge 100% local — files are parsed in your browser and never uploaded. Recent designs",
+      "ids": [
+        "fileChip",
+        "fileChipName",
+        "fileChipMeta",
+        "btnSample",
+        "btnCopySummary",
+        "btnExportDesign",
+        "btnPrintSheet",
+        "btnNewFile",
+        "btnGrid",
+        "btnDensity",
+        "btnZoomIn",
+        "btnZoomOut",
+        "btnZoomFit",
+        "btnZoom11",
+        "btnMockupMode",
+        "stageWrap",
+        "stage",
+        "fabricSwatches",
+        "btnExitMockup",
+        "traceControls",
+        "btnTracePrev",
+        "btnTracePlay",
+        "btnTraceNext",
+        "btnTraceAll",
+        "traceProgressWrap",
+        "traceProgressBar",
+        "traceRunLabel",
+        "traceStitchLabel",
+        "traceSpeed",
+        "traceSpeedLabel",
+        "statPos",
+        "statSizeRO",
+        "statStitchRO",
+        "statZoom",
+        "dropzone",
+        "btnBrowse",
+        "btnSample2",
+        "recentsWrap",
+        "recentsGrid",
+        "panelDesign",
+        "designLabelMeta",
+        "avgStitchMeta",
+        "tileStitches",
+        "tileColors",
+        "tileSize",
+        "tileSizeSub",
+        "tileTime",
+        "tileTimeSub",
+        "tileTrims",
+        "tileJumps",
+        "tileThread",
+        "tileDensityCard",
+        "tileDensity",
+        "tileDensitySub",
+        "breaksCount",
+        "breaksList",
+        "panelThreads",
+        "threadCount",
+        "btnResetColors",
+        "threadList",
+        "panelProduction",
+        "spmRange",
+        "spmLabel",
+        "tbSew",
+        "tbChanges",
+        "tbTrims",
+        "tbOverhead",
+        "tbTotal",
+        "usageBody",
+        "usageTop",
+        "usageBobbin",
+        "densityThreshold",
+        "densityMax",
+        "hotspotList",
+        "btnToggleDensity",
+        "panelMockup",
+        "garmentTiles",
+        "mockupCustom",
+        "mockupSwatches",
+        "placementChips",
+        "scaleRange",
+        "scaleLabel",
+        "mockSizeLabel",
+        "mockOffsetLabel",
+        "btnOffsetReset",
+        "mockupWarning",
+        "btnExportMockup",
+        "fileInput",
+        "pickerOverlay",
+        "pickerClose",
+        "pickerCurrent",
+        "pickerSearch",
+        "pickerFamilies",
+        "pickerGrid",
+        "toast",
+        "printSheet",
+        "sheetDate",
+        "sheetFile",
+        "sheetLabel",
+        "sheetSize",
+        "sheetStitches",
+        "sheetColors",
+        "sheetTime",
+        "sheetDesignImg",
+        "sheetMockupWrap",
+        "sheetMockupImg",
+        "sheetMockupCaption",
+        "sheetThreadRows"
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "label": ""
+        },
+        {
+          "href": "/quote-builders/embroidery-quote-builder.html",
+          "label": "Price this designopen the Embroidery Quote Builder"
+        }
+      ],
+      "images": [
+        {
+          "src": "https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1",
+          "alt": "NWCA"
+        },
+        {
+          "src": "https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1",
+          "alt": "Northwest Custom Apparel"
+        },
+        {
+          "src": null,
+          "alt": "Stitch render"
+        },
+        {
+          "src": null,
+          "alt": "Garment mockup"
+        }
+      ],
+      "fields": [
+        {
+          "id": "traceSpeed",
+          "type": "range",
+          "value": "5"
+        },
+        {
+          "id": "spmRange",
+          "type": "range",
+          "value": "750"
+        },
+        {
+          "id": "mockupCustom",
+          "type": "color",
+          "value": "#1f2a44"
+        },
+        {
+          "id": "scaleRange",
+          "type": "range",
+          "value": "100"
+        },
+        {
+          "id": "fileInput",
+          "type": "file",
+          "value": ""
+        },
+        {
+          "id": "pickerSearch",
+          "type": "text",
+          "value": ""
+        }
+      ],
+      "scripts": [
+        "/pages/js/dst-parser.js?v=2026.08.05.4",
+        "/pages/js/dst-palette.js?v=2026.08.05.4",
+        "/pages/js/dst-garments.js?v=2026.08.05.4",
+        "/pages/js/dst-viewer.js?v=2026.09.06.27"
+      ]
+    },
+    {
+      "file": "pages/jds-mockup-creator.html",
+      "title": "JDS Tumbler Mockup Creator | NWCA Internal",
+      "bodyText": "JDS Tumbler Mockup Creator Quick customer-approval mockups — pick a color, drop a logo, download. ← Back to AE Dashboard 1 Pick a tumbler color Loading colors… 2 Upload your logo Drop logo here or click to browse — PNG, JPG, SVG × Best results: single-color black-on-white or black-on-transparent (SVG, PNG, JPG). Multi-color logos with shadows, white-on-dark logos, and photos may not engrave cleanly. ⚠ Warning Upload different logo Continue anyway → 3 Size & position Logo size: 70% Auto-fit ⤢ Center logo Show imprint area Drag the logo on the preview to reposition, or click it and nudge with the arrow keys. 4 Download & share Add branded frame — NWCA logo, product name & approval note ⬇ Download PNG ⧉ Copy Saves at full 1800 px resolution. Paste a copy straight into an email or Slack. + Compare colors optional Pick a few colors to show the customer your logo on each — downloads as one side-by-side sheet. ▦ Download comparison Edit Preview frame Pick a tumbler color to start. Loading tumbler image… Live preview. Drag the logo to reposition.",
+      "mainText": "1 Pick a tumbler color Loading colors… 2 Upload your logo Drop logo here or click to browse — PNG, JPG, SVG × Best results: single-color black-on-white or black-on-transparent (SVG, PNG, JPG). Multi-color logos with shadows, white-on-dark logos, and photos may not engrave cleanly. ⚠ Warning Upload different logo Continue anyway → 3 Size & position Logo size: 70% Auto-fit ⤢ Center logo Show imprint area Drag the logo on the preview to reposition, or click it and nudge with the arrow keys. 4 Download & share Add branded frame — NWCA logo, product name & approval note ⬇ Download PNG ⧉ Copy Saves at full 1800 px resolution. Paste a copy straight into an email or Slack. + Compare colors optional Pick a few colors to show the customer your logo on each — downloads as one side-by-side sheet. ▦ Download comparison Edit Preview frame Pick a tumbler color to start. Loading tumbler image… Live preview. Drag the logo to reposition.",
+      "ids": [
+        "jmc-step1-num",
+        "jmc-swatch-grid",
+        "jmc-selected-label",
+        "jmc-selected-sku",
+        "jmc-selected-name",
+        "jmc-step2-num",
+        "jmc-drop-zone",
+        "jmc-file-input",
+        "jmc-logo-info",
+        "jmc-logo-thumb",
+        "jmc-logo-name",
+        "jmc-logo-remove",
+        "jmc-logo-tip",
+        "jmc-logo-warning",
+        "jmc-logo-warning-title",
+        "jmc-logo-warning-body",
+        "jmc-logo-warning-reupload",
+        "jmc-logo-warning-continue",
+        "jmc-size-step",
+        "jmc-step3-num",
+        "jmc-size-pct",
+        "jmc-fit-btn",
+        "jmc-size-slider",
+        "jmc-center-btn",
+        "jmc-guide-toggle",
+        "jmc-download-step",
+        "jmc-step4-num",
+        "jmc-frame-toggle",
+        "jmc-download-btn",
+        "jmc-copy-btn",
+        "jmc-compare-step",
+        "jmc-step5-num",
+        "jmc-compare-grid",
+        "jmc-compare-btn",
+        "jmc-compare-btn-label",
+        "jmc-preview-toolbar",
+        "jmc-mode-edit",
+        "jmc-mode-frame",
+        "jmc-preview-empty",
+        "jmc-canvas",
+        "jmc-preview-loading",
+        "jmc-preview-error",
+        "jmc-preview-caption",
+        "jmc-toast"
+      ],
+      "links": [
+        {
+          "href": "/dashboards/ae-dashboard.html",
+          "label": "← Back to AE Dashboard"
+        }
+      ],
+      "images": [
+        {
+          "src": "https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1",
+          "alt": "Northwest Custom Apparel"
+        }
+      ],
+      "fields": [
+        {
+          "id": "jmc-file-input",
+          "type": "file",
+          "value": ""
+        },
+        {
+          "id": "jmc-size-slider",
+          "type": "range",
+          "value": "70"
+        },
+        {
+          "id": "jmc-guide-toggle",
+          "type": "checkbox",
+          "value": "on"
+        },
+        {
+          "id": "jmc-frame-toggle",
+          "type": "checkbox",
+          "value": "on"
+        }
+      ],
+      "scripts": [
+        "/config/app.config.js",
+        "/shared_components/js/jds-tumbler-template.js?v=20260529a",
+        "/pages/js/jds-mockup-creator.js?v=2026.09.06.31"
+      ]
+    }
+  ],
+  "hashes": {
+    "config/app.config.js": "fe83e4329ce3eee97e48dd68dab81d9d5eb6ec94511d9650e2c9ebbb1528d6ea",
+    "pages/js/design-view.js": "c12a03a077b920336271b3ab4534df68a0496d464dc3c026a716b37de17773a2",
+    "pages/js/dst-parser.js": "fe7eb75dd7d3b4d6296445c3ffa1ab0e5f9dcde4d0aafb610308c3847b27120d",
+    "pages/js/dst-palette.js": "0c68b0375c00e7a1f25524e7281520afd3adf08377ea460d5f86ebc3490b4006",
+    "pages/js/dst-garments.js": "75e0d2543333e3c37ea596be09f0f418cd5de2bddbcf62e8128ddc76a6c271f2",
+    "pages/js/dst-viewer.js": "83bb9e5d6cd7281d42ed1c8f527934ce7bad05ced9191a4d1ddc33942fbb8c99",
+    "shared_components/js/jds-tumbler-template.js": "670aa7015f5263bc5eb49bf7b795f9a1f7ef8263e5e8e15fbd55c8cba821cad4",
+    "pages/js/jds-mockup-creator.js": "e80c1c554176f33b1caf58790e7888d442279b53e1464506ad9185863a290bc0"
+  },
+  "changes": [
+    {
+      "file": "pages/js/design-view.js",
+      "from": "    function init() {",
+      "to": "    function init() {\n        document.getElementById('dv-loading').hidden = false;\n        document.getElementById('dv-error').hidden = true;\n        document.getElementById('dv-content').hidden = true;\n        document.getElementById('dv-image-status').hidden = true;",
+      "kind": "UI state"
+    },
+    {
+      "file": "pages/js/design-view.js",
+      "from": "            if (!data.success || !data.designs || !data.designs[designNumber]) {",
+      "to": "            if (!data || data.success !== true || !data.designs || typeof data.designs !== 'object' || Array.isArray(data.designs)) throw new Error('Incomplete design response');\n            if (!data.designs[designNumber]) {",
+      "kind": "UI state"
+    },
+    {
+      "file": "pages/js/design-view.js",
+      "from": "        if (heroImg) heroImg.src = url;",
+      "to": "        if (heroImg) {\n            document.getElementById('dv-image-status').hidden = true;\n            heroImg.hidden = false;\n            document.getElementById('dv-hero-btn').disabled = false;\n            heroImg.src = url;\n        }",
+      "kind": "UI state"
+    },
+    {
+      "file": "pages/js/design-view.js",
+      "from": "        img.src = src;\n        overlay.hidden = false;",
+      "to": "        img.hidden = false;\n        document.getElementById('dv-lightbox-error').hidden = true;\n        img.src = src;\n        window.UiDialog.open(overlay, { focus: '#dv-lightbox-close', onDismiss: window.closeLightbox });",
+      "kind": "dialog"
+    },
+    {
+      "file": "pages/js/design-view.js",
+      "from": "        document.body.classList.add('dv-modal-open');",
+      "to": "        // UiDialog owns scroll lock and background inertness.",
+      "kind": "dialog"
+    },
+    {
+      "file": "pages/js/design-view.js",
+      "from": "        setTimeout(function () { if (!overlay.classList.contains('active')) overlay.hidden = true; }, 260);\n        document.body.classList.remove('dv-modal-open');",
+      "to": "        window.UiDialog.close(overlay);",
+      "kind": "dialog"
+    },
+    {
+      "file": "pages/js/design-view.js",
+      "from": "    var heroBtn = document.getElementById('dv-hero-btn');",
+      "to": "    document.getElementById('dv-retry').addEventListener('click', init);\n    var heroBtn = document.getElementById('dv-hero-btn');",
+      "kind": "retry"
+    },
+    {
+      "file": "pages/js/design-view.js",
+      "from": "        if (!img || img.tagName !== 'IMG' || !img.dataset) return;",
+      "to": "        if (!img || img.tagName !== 'IMG' || !img.dataset) return;\n        if (img.id === 'dv-hero-img') {\n            img.hidden = true;\n            document.getElementById('dv-hero-btn').disabled = true;\n            var status = document.getElementById('dv-image-status');\n            status.textContent = 'This preview image could not load. Choose another image or try again.';\n            status.hidden = false;\n        } else if (img.id === 'dv-lightbox-img' && !document.getElementById('dv-lightbox').hidden) {\n            img.hidden = true;\n            var failure = document.getElementById('dv-lightbox-error');\n            failure.textContent = 'This preview image could not load. Close the preview and try another image.';\n            failure.hidden = false;\n        }",
+      "kind": "image failure"
+    },
+    {
+      "file": "pages/js/design-view.js",
+      "from": "        document.getElementById('dv-image-status').hidden = true;",
+      "to": "        document.getElementById('dv-image-status').hidden = true;\n        document.getElementById('dv-no-images').hidden = true;\n        document.getElementById('dv-hero').hidden = false;\n        document.getElementById('dv-image-grid').hidden = false;\n        document.getElementById('dv-hero-img').hidden = false;\n        document.getElementById('dv-hero-btn').disabled = false;",
+      "kind": "retry state"
+    },
+    {
+      "file": "pages/js/design-view.js",
+      "from": "This preview image could not load. Choose another image or try again.",
+      "to": "This preview image could not load. Choose another image or contact us using the details below.",
+      "kind": "visible image failure"
+    },
+    {
+      "file": "pages/js/jds-mockup-creator.js",
+      "from": "    var imageCache = {};",
+      "to": "    var imageRequest = 0;             // only the latest color request owns the preview\n    var imageCache = {};",
+      "kind": "UI state"
+    },
+    {
+      "file": "pages/js/jds-mockup-creator.js",
+      "from": "    function loadCatalog() {\n        fetch(",
+      "to": "    function loadCatalog() {\n        var host = document.getElementById('jmc-swatch-grid');\n        if (host) { host.setAttribute('aria-busy', 'true'); host.innerHTML = '<div class=\"jmc-swatch-loading\" role=\"status\">Loading colors…</div>'; }\n        fetch(",
+      "kind": "UI state"
+    },
+    {
+      "file": "pages/js/jds-mockup-creator.js",
+      "from": "                var raw = (data && data.result) || [];",
+      "to": "                if (!data || !Array.isArray(data.result) || data.result.some(function (row) { return !row || typeof row.SKU !== 'string' || !row.SKU || typeof row.DisplayName !== 'string'; })) throw new Error('Incomplete catalog response');\n                var raw = data.result;",
+      "kind": "UI state"
+    },
+    {
+      "file": "pages/js/jds-mockup-creator.js",
+      "from": "                if (grid) {\n                    grid.innerHTML = '<div class=\"jmc-swatch-loading\" style=\"color:#b91c1c;\">'\n                        + 'Failed to load catalog. Refresh the page to retry.</div>';\n                }",
+      "to": "                if (grid) {\n                    grid.setAttribute('aria-busy', 'false');\n                    grid.innerHTML = '<div class=\"jmc-catalog-error\" role=\"alert\"><p>Unable to load tumbler colors. Please try again.</p><button type=\"button\" class=\"btn btn-secondary\">Try again</button></div>';\n                    grid.querySelector('button').addEventListener('click', loadCatalog);\n                }",
+      "kind": "UI state"
+    },
+    {
+      "file": "pages/js/jds-mockup-creator.js",
+      "from": "    function renderSwatches() {\n        var grid = document.getElementById('jmc-swatch-grid');\n        if (!grid) return;\n        grid.innerHTML = '';\n        catalog.forEach(function (row) {",
+      "to": "    function renderSwatches() {\n        var grid = document.getElementById('jmc-swatch-grid');\n        if (!grid) return;\n        grid.setAttribute('aria-busy', 'false');\n        grid.innerHTML = '';\n        if (!catalog.length) grid.innerHTML = '<div class=\"jmc-swatch-loading\" role=\"status\">No tumbler colors are available right now.</div>';\n        catalog.forEach(function (row) {",
+      "kind": "UI state"
+    },
+    {
+      "file": "pages/js/jds-mockup-creator.js",
+      "from": "            btn.setAttribute('aria-label', colorName);\n            btn.innerHTML",
+      "to": "            btn.setAttribute('aria-label', colorName);\n            btn.setAttribute('aria-pressed', 'false');\n            btn.innerHTML",
+      "kind": "UI state"
+    },
+    {
+      "file": "pages/js/jds-mockup-creator.js",
+      "from": "            s.classList.toggle('jmc-swatch--active', s.dataset.sku === sku);",
+      "to": "            s.classList.toggle('jmc-swatch--active', s.dataset.sku === sku);\n            s.setAttribute('aria-pressed', String(s.dataset.sku === sku));",
+      "kind": "UI state"
+    },
+    {
+      "file": "pages/js/jds-mockup-creator.js",
+      "from": "        showLoading(true);\n        showError('');\n        ensureImage(selectedSku)",
+      "to": "        var request = ++imageRequest;\n        tumblerImage = null;\n        render();\n        showLoading(true);\n        showError('');\n        ensureImage(selectedSku)",
+      "kind": "UI state"
+    },
+    {
+      "file": "pages/js/jds-mockup-creator.js",
+      "from": "            .then(function (img) {\n                tumblerImage = img;",
+      "to": "            .then(function (img) {\n                if (request !== imageRequest) return;\n                tumblerImage = img;",
+      "kind": "UI state"
+    },
+    {
+      "file": "pages/js/jds-mockup-creator.js",
+      "from": "            .catch(function (err) {\n                showLoading(false);\n                console.error('[jds-mockup-creator] Tumbler load failed:', err);",
+      "to": "            .catch(function (err) {\n                if (request !== imageRequest) return;\n                showLoading(false);\n                console.error('[jds-mockup-creator] Tumbler load failed:', err);",
+      "kind": "UI state"
+    },
+    {
+      "file": "pages/js/jds-mockup-creator.js",
+      "from": "                showError('Couldn\\'t load the tumbler image. JDS\\'s CDN may not allow cross-origin requests; '\n                    + 'try again or contact Erik to set up a proxy endpoint.');",
+      "to": "                showError('Unable to load this tumbler image. Try again or select another color.');",
+      "kind": "UI state"
+    },
+    {
+      "file": "pages/js/jds-mockup-creator.js",
+      "from": "        if (el) el.classList.toggle('jmc-hidden', !on);\n    }",
+      "to": "        if (el) el.classList.toggle('jmc-hidden', !on);\n        document.querySelector('.jmc-preview').setAttribute('aria-busy', String(on));\n        ['jmc-download-btn', 'jmc-copy-btn'].forEach(function (id) { document.getElementById(id).disabled = on || !tumblerImage; });\n    }",
+      "kind": "UI state"
+    },
+    {
+      "file": "pages/js/jds-mockup-creator.js",
+      "from": "        if (msg) { el.textContent = msg; el.classList.remove('jmc-hidden'); }",
+      "to": "        if (msg) {\n            el.textContent = msg;\n            var retry = document.createElement('button');\n            retry.type = 'button'; retry.className = 'btn btn-secondary'; retry.textContent = 'Try again';\n            retry.addEventListener('click', loadTumblerImage); el.appendChild(retry);\n            el.classList.remove('jmc-hidden');\n        }",
+      "kind": "UI state"
+    },
+    {
+      "file": "pages/js/dst-viewer.js",
+      "from": "        $('pickerOverlay').classList.add('visible');\n        setTimeout(function () { $('pickerSearch').focus(); }, 40);",
+      "to": "        $('pickerOverlay').classList.add('visible');\n        window.UiDialog.open('pickerOverlay', { focus: '#pickerSearch', onDismiss: closePicker });",
+      "kind": "UI state"
+    },
+    {
+      "file": "pages/js/dst-viewer.js",
+      "from": "    function closePicker() { $('pickerOverlay').classList.remove('visible'); }",
+      "to": "    function closePicker() {\n        $('pickerOverlay').classList.remove('visible');\n        window.UiDialog.close('pickerOverlay');\n        var trigger = document.querySelectorAll('.thread-swatch')[pickerCtx.runIndex];\n        if (trigger) trigger.focus({ preventScroll: true });\n    }",
+      "kind": "UI state"
+    },
+    {
+      "file": "pages/js/dst-viewer.js",
+      "from": "            b.classList.toggle('active', b.dataset.mode === mode);",
+      "to": "            b.classList.toggle('active', b.dataset.mode === mode);\n            b.setAttribute('aria-pressed', String(b.dataset.mode === mode));",
+      "kind": "UI state"
+    },
+    {
+      "file": "pages/js/dst-viewer.js",
+      "from": "            t.classList.toggle('active', t.dataset.panel === name);",
+      "to": "            t.classList.toggle('active', t.dataset.panel === name);\n            t.setAttribute('aria-pressed', String(t.dataset.panel === name));",
+      "kind": "UI state"
+    },
+    {
+      "file": "pages/js/dst-viewer.js",
+      "from": "            $('btnGrid').classList.toggle('active', state.overlays.grid);",
+      "to": "            $('btnGrid').classList.toggle('active', state.overlays.grid);\n            $('btnGrid').setAttribute('aria-pressed', String(state.overlays.grid));",
+      "kind": "UI state"
+    },
+    {
+      "file": "pages/js/dst-viewer.js",
+      "from": "        $('btnDensity').classList.toggle('active', state.overlays.density);",
+      "to": "        $('btnDensity').classList.toggle('active', state.overlays.density);\n        $('btnDensity').setAttribute('aria-pressed', String(state.overlays.density));",
+      "kind": "UI state"
+    },
+    {
+      "file": "pages/js/dst-viewer.js",
+      "from": "        $('btnMockupMode').classList.toggle('active', state.mockup);",
+      "to": "        $('btnMockupMode').classList.toggle('active', state.mockup);\n        $('btnMockupMode').setAttribute('aria-pressed', String(state.mockup));",
+      "kind": "UI state"
+    },
+    {
+      "file": "pages/js/dst-viewer.js",
+      "from": "    function fitView() {\n        var s = resizeStage();",
+      "to": "    function fitView() {\n        state.autoFit = true;\n        var s = resizeStage();",
+      "kind": "UI state"
+    },
+    {
+      "file": "pages/js/dst-viewer.js",
+      "from": "    function zoomAt(factor, cx, cy) {\n        var before",
+      "to": "    function zoomAt(factor, cx, cy) {\n        state.autoFit = false;\n        var before",
+      "kind": "UI state"
+    },
+    {
+      "file": "pages/js/dst-viewer.js",
+      "from": "            state.view.scale = CSS_PX_PER_MM;",
+      "to": "            state.autoFit = false;\n            state.view.scale = CSS_PX_PER_MM;",
+      "kind": "UI state"
+    },
+    {
+      "file": "pages/js/dst-viewer.js",
+      "from": "            if (drag) {\n                state.view.tx",
+      "to": "            if (drag) {\n                state.autoFit = false;\n                state.view.tx",
+      "kind": "UI state"
+    },
+    {
+      "file": "pages/js/dst-viewer.js",
+      "from": "        window.addEventListener('resize', function () {\n            if (!state.data) return;\n            if (state.fitDeferred) { fitView(); }\n            draw();\n        });",
+      "to": "        function refreshStageLayout() {\n            if (!state.data) return;\n            if (state.fitDeferred || state.autoFit) fitView();\n            draw();\n        }\n        window.addEventListener('resize', refreshStageLayout);\n        if (window.ResizeObserver) new ResizeObserver(refreshStageLayout).observe(stageWrap);",
+      "kind": "UI state"
+    },
+    {
+      "file": "pages/js/dst-viewer.js",
+      "from": "        ta.style.position = 'fixed';\n        ta.style.opacity = '0';",
+      "to": "        ta.className = 'dst-clipboard-buffer';",
+      "kind": "UI state"
+    },
+    {
+      "file": "pages/js/dst-viewer.js",
+      "from": "        // uploads\n        $('btnBrowse')",
+      "to": "        // Disabled export controls remain unavailable to keyboard users until a file is ready.\n        function syncFileControls() { document.querySelectorAll('.needs-file').forEach(function (button) { button.disabled = !state.data; }); }\n        new MutationObserver(syncFileControls).observe(document.body, { attributes: true, attributeFilter: ['class'] });\n        syncFileControls();\n        // uploads\n        $('btnBrowse')",
+      "kind": "UI state"
+    },
+    {
+      "file": "pages/js/dst-viewer.js",
+      "from": "        function refreshStageLayout() {\n            if (!state.data) return;",
+      "to": "        function refreshStageLayout() {\n            if (!state.data || stageWrap.clientWidth < 2 || stageWrap.clientHeight < 2) return;",
+      "kind": "UI state"
+    }
+  ]
+}

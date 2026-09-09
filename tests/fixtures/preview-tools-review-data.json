@@ -1,0 +1,45 @@
+{
+  "fixed": "2026-09-09T20:00:00Z",
+  "design": {
+    "success": true,
+    "designs": {
+      "40121": {
+        "company": "Example Outfitters",
+        "designName": "Crew polo crest",
+        "mockupUrl": "http://localhost:3400/preview-review/design.svg",
+        "dstPreviewUrl": "http://localhost:3400/preview-review/stitched.svg",
+        "thumbnailUrl": "http://localhost:3400/preview-review/design.svg",
+        "stitchCount": 12500,
+        "price": 99,
+        "notes": "STAFF ONLY REVIEW MARKER",
+        "variants": [
+          {
+            "dstFilename": "40121.dst",
+            "dstPreviewUrl": "http://localhost:3400/preview-review/stitched.svg"
+          }
+        ]
+      }
+    }
+  },
+  "catalog": {
+    "result": [
+      {
+        "SKU": "LTM752",
+        "DisplayName": "20 oz Polar Camel - Black",
+        "EngraveColor": "#c0c0c0",
+        "ThumbnailURL": "http://localhost:3400/preview-review/tumbler-black.svg"
+      },
+      {
+        "SKU": "LTM753",
+        "DisplayName": "20 oz Polar Camel - Red",
+        "EngraveColor": "#c0c0c0",
+        "ThumbnailURL": "http://localhost:3400/preview-review/tumbler-red.svg"
+      },
+      {
+        "SKU": "LTM751",
+        "DisplayName": "20 oz Polar Camel - Stainless Steel",
+        "EngraveColor": "#c0c0c0"
+      }
+    ]
+  }
+}
