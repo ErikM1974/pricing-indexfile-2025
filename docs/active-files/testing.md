@@ -143,3 +143,5 @@
 - Instant storefront: tests/unit/instant-storefront-content.test.js; tests/e2e/css-unification-instant-storefront.spec.js; original-content and pricing fixtures in tests/fixtures.
 
 Customer intake: customer-intake-content.test.js and css-unification-customer-intake.spec.js use the preserved customer-intake-original-content.json fixture. All vendor content and business writes mocked.
+
+Vendor portals: vendor-portals-content.test.js and css-unification-vendor-portals.spec.js preserve original wrapper/Caspio contracts and synthetic vendor states using vendor-portals-original-content.json.

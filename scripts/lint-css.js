@@ -223,7 +223,6 @@ const CSS_LINT_SCOPE = [
     'employee-bundles/css/wcttr-bundle.css',
     'tools/custom-tees-calibrate.css',
     'vendor-portals/css/sanmar-portal-shared.css',
-    'vendor-portals/css/sanmar-vendor-portal.css',
 ];
 
 async function run() {

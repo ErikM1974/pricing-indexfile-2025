@@ -3449,6 +3449,105 @@
         "rawCssBytes": 22440,
         "localCssRequests": 2
       }
+    },
+    {
+      "source": "vendor-portals/sanmar-vendor-portal.html",
+      "family": "vendor-portals",
+      "status": "pilot",
+      "route": "/vendor-portals/sanmar-vendor-portal.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "vendor-portals/css/sanmar-portal-shared.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "four-widths",
+        "zero-axe-wrapper",
+        "native-skip-focus",
+        "keyboard-report-scroll",
+        "preserved-external-embed",
+        "hosted-fallback",
+        "external-sign-in-fixture",
+        "empty-report-fixture",
+        "failed-embed",
+        "synthetic-values-preserved",
+        "complete-landscape-report-print"
+      ],
+      "test": "tests/e2e/css-unification-vendor-portals.spec.js",
+      "maxCssBytes": 60076,
+      "measuredRawCssBytes": 58028,
+      "baseline": {
+        "commit": "d7c91600f85993eb4d0d45471ff0c0fc4356b3b7",
+        "rawCssBytes": 18121,
+        "localCssRequests": 2
+      }
+    },
+    {
+      "source": "vendor-portals/sanmar-invoices.html",
+      "family": "vendor-portals",
+      "status": "pilot",
+      "route": "/vendor-portals/sanmar-invoices.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "vendor-portals/css/sanmar-portal-shared.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "four-widths",
+        "zero-axe-wrapper",
+        "native-skip-focus",
+        "keyboard-report-scroll",
+        "preserved-external-embed",
+        "hosted-fallback",
+        "external-sign-in-fixture",
+        "empty-report-fixture",
+        "failed-embed",
+        "synthetic-values-preserved",
+        "complete-landscape-report-print"
+      ],
+      "test": "tests/e2e/css-unification-vendor-portals.spec.js",
+      "maxCssBytes": 60076,
+      "measuredRawCssBytes": 58028,
+      "baseline": {
+        "commit": "d7c91600f85993eb4d0d45471ff0c0fc4356b3b7",
+        "rawCssBytes": 18392,
+        "localCssRequests": 2
+      }
+    },
+    {
+      "source": "vendor-portals/sanmar-credits.html",
+      "family": "vendor-portals",
+      "status": "pilot",
+      "route": "/vendor-portals/sanmar-credits.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "vendor-portals/css/sanmar-portal-shared.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "four-widths",
+        "zero-axe-wrapper",
+        "native-skip-focus",
+        "keyboard-report-scroll",
+        "preserved-external-embed",
+        "hosted-fallback",
+        "external-sign-in-fixture",
+        "empty-report-fixture",
+        "failed-embed",
+        "synthetic-values-preserved",
+        "complete-landscape-report-print"
+      ],
+      "test": "tests/e2e/css-unification-vendor-portals.spec.js",
+      "maxCssBytes": 60076,
+      "measuredRawCssBytes": 58028,
+      "baseline": {
+        "commit": "d7c91600f85993eb4d0d45471ff0c0fc4356b3b7",
+        "rawCssBytes": 18392,
+        "localCssRequests": 2
+      }
     }
   ],
   "billingContentSha256": "d85f8530e03a1863d1b8bb2ebe97ba332d5c9e3411887d1eb2d02dcdb14c0863",
@@ -3513,9 +3612,15 @@
       "owners": [
         "dashboards/digitized-designs.html",
         "dashboards/old-designs.html",
-        "admin/announcements-create.html"
+        "admin/announcements-create.html",
+        "vendor-portals/sanmar-vendor-portal.html",
+        "vendor-portals/sanmar-invoices.html",
+        "vendor-portals/sanmar-credits.html",
+        "calculators/digitizingform.html",
+        "calculators/monogramform.html",
+        "calculators/purchasingform.html"
       ],
-      "note": "These sources execute Caspio /emb scripts. Bradley and the current Steve/Ruth/AE workflow use app-rendered markup; historical DataPage comments, CDN images and date utilities are not embedded UI."
+      "note": "These sources execute Caspio DataPages or embed hosted Jotform apps. Reviewed local wrappers do not certify provider-owned styles, controls or runtime data. Keep provider work in the separate external-UI backlog. Current app-rendered Bradley/Steve/Ruth/AE workflows, historical DataPage comments, CDN images and date utilities are not embedded UI."
     }
   ],
   "ruthBillingContentSha256": "153e67f628dc0f0d45cededc8b1eb4923d90363f4a056b5ad01b14d7ae46ca68",

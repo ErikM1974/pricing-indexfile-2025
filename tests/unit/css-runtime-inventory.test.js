@@ -19,4 +19,6 @@ test('runtime CSS census includes aliases, dynamic styles and explicitly served 
     expect(invoice.generatedStyles).toBe(true);
     expect(sources.get('dashboards/design-gallery.html')).toMatchObject({ missingStyles: [], cssParseErrors: [] });
     expect(report.serverGeneratedOwners.flatMap(group => group.owners)).toContain('lib/blog-templates.js');
+    expect(sources.get('calculators/monogramform.html').externalEmbeds).toContain('https://form.jotform.com/jsform/243095362828059');
+    expect(sources.get('vendor-portals/sanmar-invoices.html').externalEmbeds).toContain('https://c3eku948.caspio.com/dp/a0e15000094c1ad41f84402184a5/emb');
 }, 40000);

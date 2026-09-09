@@ -1,170 +1,28 @@
-/* sanmar-portal-shared.css — extracted 2026-09-06 from the inline \3c style> block in vendor-portals/sanmar-credits.html (Rule 3). */
-:root {
-    /* WSU Cougar Colors */
-    --wsu-crimson: var(--color-ae);
-    --wsu-dark-crimson: var(--color-ae-dark);
-    --wsu-gray: var(--print-ink-soft);
-    --wsu-light-gray: var(--gray-200);
+/* SanMar portal boundaries. Caspio retains invoice/credit data and form behavior. */
+@layer components.pages {
+    :where([data-ui="unified"][data-vendor="sanmar"]) .breadcrumb { display: flex; align-items: center; flex-wrap: wrap; gap: var(--space-2); color: var(--ui-muted); font-size: var(--font-size-sm); }
+    :where([data-ui="unified"][data-vendor="sanmar"]) .vendor-heading { margin: var(--space-3) 0 var(--space-6); }
+    :where([data-ui="unified"][data-vendor="sanmar"]) .page-title { font-size: clamp(1.75rem, 4vw, 2.75rem); letter-spacing: -0.035em; }
+    :where([data-ui="unified"][data-vendor="sanmar"]) .page-title i { color: var(--ui-accent); font-size: 0.7em; margin-right: var(--space-2); }
+    :where([data-ui="unified"][data-vendor="sanmar"]) .page-subtitle { color: var(--ui-muted); margin: var(--space-3) 0 0; }
+    :where([data-ui="unified"][data-vendor="sanmar"]) .vendor-card { padding: 0; }
+    :where([data-ui="unified"][data-vendor="sanmar"]) .vendor-help { padding: var(--space-4) var(--space-5); margin: 0; border-bottom: 1px solid var(--ui-line); font-size: var(--font-size-sm); color: var(--ui-muted); }
+    :where([data-ui="unified"][data-vendor="sanmar"]) .vendor-embed { max-width: 100%; min-height: 200px; overflow: auto; padding: var(--space-5); overscroll-behavior-x: contain; }
+    :where([data-ui="unified"][data-vendor="sanmar"]) .vendor-print-link { display: none; }
 
-    /* Neutrals */
-
-    /* Shadows */
-    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 5%);
-    --shadow: 0 1px 3px 0 rgb(0 0 0 / 10%), 0 1px 2px 0 rgb(0 0 0 / 6%);
-    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 10%), 0 2px 4px -1px rgb(0 0 0 / 6%);
-    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 10%), 0 4px 6px -2px rgb(0 0 0 / 5%);
-}
-
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
-    background: var(--gray-50);
-    color: var(--gray-900);
-    line-height: 1.6;
-}
-
-/* Header */
-.header {
-    background: white;
-    border-bottom: 1px solid var(--gray-200);
-    padding: 1rem 0;
-    box-shadow: var(--shadow-sm);
-}
-
-.header-container {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 0 2rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.header-left {
-    display: flex;
-    align-items: center;
-    gap: 2rem;
-}
-
-.logo {
-    height: 40px;
-    width: auto;
-}
-
-.breadcrumb {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: var(--gray-500);
-    font-size: 0.875rem;
-}
-
-.breadcrumb a {
-    color: var(--wsu-crimson);
-    text-decoration: none;
-    font-weight: 500;
-}
-
-.breadcrumb a:hover {
-    text-decoration: underline;
-}
-
-/* Main Content */
-.main-container {
-    max-width: 1400px;
-    margin: 2rem auto;
-    padding: 0 2rem;
-}
-
-.page-header {
-    margin-bottom: 2rem;
-}
-
-.page-title {
-    font-size: 2rem;
-    font-weight: 700;
-    color: var(--gray-900);
-    margin-bottom: 0.5rem;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
-
-.page-title i {
-    color: var(--wsu-crimson);
-}
-
-.page-subtitle {
-    color: var(--gray-600);
-    font-size: 1rem;
-}
-
-/* Content Card */
-.content-card {
-    background: white;
-    border-radius: 0.5rem;
-    box-shadow: var(--shadow);
-    padding: 2rem;
-    min-height: 600px;
-}
-
-/* Caspio Overrides */
-.cbFormTable {
-    /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */
-    width: 100% !important;
-}
-
-/* Loading State */
-.loading {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 400px;
-    color: var(--gray-500);
-}
-
-.loading i {
-    font-size: 3rem;
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
-
-/* Print Styles */
-@media print {
-    .header {
-        display: none;
+    @media (width <= 700px) {
+        :where([data-ui="unified"][data-vendor="sanmar"]) :is(.vendor-help, .vendor-embed) { padding: var(--space-4); }
     }
 
-    .page-header {
-        margin-bottom: 1rem;
-    }
-
-    .content-card {
-        box-shadow: none;
-        border: 1px solid var(--gray-300);
-    }
-}
-
-/* Responsive */
-@media (width <= 768px) {
-    .header-container,
-    .main-container {
-        padding: 0 1rem;
-    }
-
-    .page-title {
-        font-size: 1.5rem;
-    }
-
-    .content-card {
-        padding: 1rem;
+    @media print {
+        @page { size: letter landscape; margin: 0.4in; }
+        :where([data-ui="unified"][data-vendor="sanmar"]) { background: var(--ui-surface); font-size: 11px; }
+        :where([data-ui="unified"][data-vendor="sanmar"]) .page-main { max-width: none; padding: 0; }
+        :where([data-ui="unified"][data-vendor="sanmar"]) .vendor-heading { margin: 0 0 var(--space-4); }
+        :where([data-ui="unified"][data-vendor="sanmar"]) .page-title { font-size: 24px; }
+        :where([data-ui="unified"][data-vendor="sanmar"]) .vendor-help { display: none; }
+        :where([data-ui="unified"][data-vendor="sanmar"]) .vendor-card { break-inside: auto; }
+        :where([data-ui="unified"][data-vendor="sanmar"]) .vendor-embed { padding: var(--space-3); overflow: visible; min-height: 0; }
+        :where([data-ui="unified"][data-vendor="sanmar"]) .vendor-print-link { display: block; padding: var(--space-3); margin: 0; overflow-wrap: anywhere; }
     }
 }
