@@ -4022,3 +4022,8 @@ Shared JS can outlive a CSS migration: the public quote-request page is also a s
 ### Training state must survive every input path (2026-09-08)
 
 Problem: drag-only exercise tiles excluded touch/keyboard, quiz points survived retries, tax choices could re-enable an already-scored answer, and template saves never rendered on reload. Root cause: visual-only click state and incomplete localStorage readers. Fix: native selectable buttons and one scoring guard, cancel outstanding round/timer callbacks, reset quiz scores, modal focus lifecycle and safe saved-template rendering with visible clipboard/storage failures. Prevention: exercise complete rounds/retries with keyboard, touch and drag; test failed/malformed storage without overwriting it; preserve training fixtures with source locks.
+
+## Training controls and printed guides need state/output checks (2026-09-08)
+- Problem/root cause: clipboard feedback depended on the global event after an asynchronous operation, clickable divs excluded keyboard users, and fixed-height print rules could clip text. Generic card adapters also added unwanted document padding.
+- Solution: pass the originating button explicitly, show local pending/error/retry feedback, use native disclosure buttons and owned document sections, and let print flow through readable columns.
+- Prevention: lock unchanged training text/examples/links, test keyboard and denied clipboard states, and inspect actual PDFs. A two-sheet language-handout guard catches blank-page regressions that a print-media screenshot misses.
