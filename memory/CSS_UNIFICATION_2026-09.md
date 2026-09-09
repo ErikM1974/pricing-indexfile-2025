@@ -548,3 +548,14 @@ Original five-page screenshots captured with synthetic read-only service data. F
 ## Five staff references reviewed — 2026-09-09
 
 Commission structure, embroidery bonus plan, SEO strategy, forms library and data-entry guide now use shared tokens/components plus staff-reference CSS/print controller and scoped page arrangements. Original full main text/links/media/fields/IDs retained. Existing financial prose/examples unchanged; service/bonus figures remain API-driven. Incomplete data is visibly API+fallback; failed/malformed data warns and retries without clearing checklists. Bonus rep labels escaped; form directory handles malformed/empty data, hostile text/category keys and unsafe URLs. Four dashboards retain anonymous302; data-entry guide remains public200, with ordinary-staff admin restrictions intact.21 focused browser cases at four widths with zero axe violations;403 focused source/ownership cases; strict JS/CSS pass. Eight populated/failure PDFs preserve805 checked content/warning blocks, no retry controls on paper. Commission print9 ->5 pages, SEO15 ->11; screen-only breakpoints prevent mobile rules affecting paper. Candidate2026.09.09.2 pre-versioned. Reviewed branch must still integrate and pass full primary gates/exact-source CI/actual rollout. Live is brand release2026.09.09.1/2080:99 reviewed/126 pending. Only a verified staff rollout changes that to104/121.
+
+## Entry and order-confirmation family plan — 2026-09-09
+
+Six sources after staff references: staff/customer/vendor sign-in and3-Day Tees/custom-tees/custom-caps confirmation pages. Isolated codex/entry-status-family based on245d00e86e1c07099f5e4bbc4b1ea6999c327b62. Original full text, fields, images, routes, controller hashes and CSS graphs captured. Keep three auth flows and three channel-specific fulfillment/email controllers; replace borrowed storefront styles with a scoped confirmation owner and share sign-in shell/control styling. Preserve every payment-status state and server-stamped amounts/ship promises. Tests must block every actual business write, email and authentication request while exercising synthetic response states. Candidate2026.09.09.3 only after primary full gates, exact-source CI and verified deployment.
+
+- [ ] Capture original desktop/phone and current state contracts.
+- [ ] Build shared scoped sign-in and confirmation owners, retaining original prose and function hooks.
+- [ ] Verify four widths/axe, keyboard/email validation/rate limits/failure/sent/try-again, confirmation working/done/delayed/error and complete paper.
+- [ ] Register files/tests/owners, integrate only reviewed scope, full local checks/CI/actual release.
+
+Current live remains99/225,126 pending atv2026.09.09.1/2080. Five staff references are reviewed and full primary gates running. This next family is planned only.
