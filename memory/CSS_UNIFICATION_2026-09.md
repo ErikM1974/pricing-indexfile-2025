@@ -803,3 +803,15 @@ Three layouts implemented in isolated codex/staff-admin-tools.15 focused browser
 Staff access and portal tools: dashboards/access-admin.html, dashboards/drive-access.html and dashboards/portal-directory.html share canonical tokens/components and shared_components/css/staff-admin-tools.css. Their three obsolete local CSS owners are retired. Neutral admin/drive and CRM ink preserved.15 focused browser cases cover four widths/zero axe, keyboard views, mocked permissions/save failure/retry/removal confirmation, separate drive rights, denied/malformed data, portal counts/search/sort/clipboard fallback and distinct staff-preview/customer URLs. Three reference PDFs/four pages preserve65 checked text/value nodes, including long wrapping permissions; all visually reviewed. Current-value print mirrors are removed after printing and never change editable data. Original controller hashes restored by reversing only explicit presentation mappings.29 source/hygiene unit checks and290-file CSS lint pass. No actual permission or clipboard writes, business actions or messages. Shared raw CSS graph grows; no byte-reduction claim.
 
 129 pages reviewed locally/96 pending; production count remains tied to the actual verified release. Nine-page .10 release in primary is separate. This isolated candidate .11 still requires broader guards, full checks, exact-source CI and rollout.
+
+## Next isolated batch — staff monitoring and audit tools, 2026-09-09
+
+Branch codex/staff-monitoring-tools starts at d4a0b187ade98f936df5e619b90d6d6767e7cbad. Primary .11 (staff access/drive/portal) full checks continue separately. Scope: dashboards/api-usage.html,table-usage-audit.html,bandit-integration.html. Original prose/IDs/links/media/style graphs/controllers captured in staff-monitoring-original-baseline.json.
+
+- [ ] Shared neutral staff shell and canonical controls/tables; preserve department ownership.
+- [ ] Retain API attribution versus billing caveats, exact counts/rates/source reliability and history warnings. No invented fresh data.
+- [ ] Preserve all163 original audit records, local decisions/notes/review storage, sort/filter/export and mocked live snapshot refresh; never archive or delete real tables.
+- [ ] Preserve all Bandit task/command/endpoint references; keyboard scrolling and complete print with long tables/code.
+- [ ] Review four widths/axe/keyboard, denied/failed/malformed/retry/storage/export cases with all business traffic mocked; source/ownership/full release checks and actual live verification.
+
+Still126pages live/99pending after verified .10;129reviewed locally/96pending with .11. These three monitoring pages are only planned, not reviewed. Candidate .12. Keep source controllers exact except explicit presentation and demonstrated error-state fixes, which require their own tests.
