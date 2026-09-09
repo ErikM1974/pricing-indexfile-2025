@@ -1,18 +1,23 @@
 # CSS unification — design direction and implementation plan
 
-## Active checkpoint — RESUMED 2026-09-09
+## Active checkpoint — 2026-09-09
 
-Erik resumed after shutdown; standing edit/deploy authorization continues. Frontend **v2026.09.09.6 / Heroku2084 / dce016510f29c7a655b4bb75628aea72b3b745a6** is live. Actual Heroku slug/status and live version verified; source CI34356406944 on98b82fc917c97e753a115efd5e37cbf0873c4960 passed all four jobs, including full mocked CSS browser tests and actual money/calculator parity. This release includes the three reviewed campaign golf/safety pages. **115 of225 pages live;110 pending.** All26 training complete; generated documents/style owners remain separate unfinished work. Backend unchanged.
+Standing edit/deploy authorization continues. **Frontend v2026.09.09.7 / Heroku 2085 / 7de7708587984d234b2d13c865b326b787b705ae is LIVE.** Actual successful release and running slug verified 2026-09-09T15:41:56.7768281Z; five changed raw assets and their built assets match approved bytes. Banner/sticker pages and shared home/catalog references verified, plus five public regression pages and five staff gates. Exact-source CI **34370064451** passed all four jobs on **3462512138c1dc3601d29e335c5ca2c7fa82e032**, including the actual money/calculator and full mocked CSS browser steps. No real business writes or notifications during review.
 
-Work continues in codex/instant-storefront at C:\Users\erik\.codex\visualizations\2026\09\07\01a07d90-9a4c-7e70-9e4e-c196377b7c6b\training-final-worktree. WIP cc4d254c and checkpoint1a0844a5 are saved; verified campaign release merged without conflicts. Native banner/sticker layouts are being reviewed. The phone .stk-card cascade regression is fixed locally; four-width/state/print validation and complete release gates remain. No instant pages count as reviewed yet. Their preliminary .6 cache references must use the next unused version before release. No price computation changed.
+**117 of 225 application pages reviewed and live; 108 pending.** Another 79 tracked HTML sources are excluded (12 archive, 14 email, 50 fixtures/templates, 3 retired). All 26 training pages are complete. Generated document and external content owners remain a separate unfinished track. Whole-app cleanup is not complete. Backend unchanged: v2026.09.08.1 / Heroku1130 / d06aee3e4d25c5e1410241ea8007cdc8339aa3fa.
 
-- [x] Verify Claude's completed release and exact-source CI; no redundant campaign deployment.
-- [x] Resume saved banner/sticker WIP and repair late desktop placement overriding mobile layout.
-- [ ] Review original content/financial locks, four widths, pricing/quantity/finishing, navigation/dialogs, form failures/retries and artwork with all actual writes mocked, complete print content.
-- [ ] Register reviewed owners; full required local gates and exact-source CI, then verified release.
-- [ ] Continue remaining storefront/staff/calculator/builder/document families.
+### Current work
 
-Evidence: C:\Users\erik\.codex\visualizations\2026\09\07\01a07d90-9a4c-7e70-9e4e-c196377b7c6b; campaign-storefront-resumed-{ci,heroku}.json. The earlier campaign local browser run was intentionally interrupted at shutdown, but the subsequent release-source CI ran and passed that entire group. Use the saved fixtures/screenshots and current source; do not rerun one-shot installers or the merge helper that caused the mobile regression.
+- Banner and sticker storefronts finished: canonical controls, native menus, single dropdown owner, working phone configuration; seven banner presets and all 50 sticker prices verified, original pricing/upload/quote controllers retained. Four widths, keyboard and zero axe; failed/empty/degraded pricing, retained upload/draft and retry; two PDFs retain 419 checked text nodes.
+- **Next reviewed batch: four customer/staff intake pages**, saved on codex/customer-intake at d7c91600f85993eb4d0d45471ff0c0fc4356b3b7. Public request-a-quote plus digitizingform, monogramform and purchasingform share one scoped owner; four old CSS sheets retired. Phone textarea overflow fixed; seven original controllers unchanged; vendor URLs preserved, explicit hosted fallback links.14 focused browser and199 focused unit checks passed, four one-page reference PDFs/74 nodes. Full primary gates, exact-source CI and actual release remain. Candidate .8 would become121 live/104 pending only after verification. These hosted intake wrappers already return anonymous200 on production; no page-access changes.
+- **Next isolated plan: three SanMar vendor portal wrappers** on codex/vendor-portals, based on the reviewed intake commit. Workdir: C:\Users\erik\.codex\visualizations\2026\09\07\01a07d90-9a4c-7e70-9e4e-c196377b7c6b\training-final-worktree. Plan commit ec96a4001ad118c40cbb6f67c94769c1d88ab92b; no vendor application changes yet. Original Caspio invoice/credit embed URLs and wrapper content captured. Preserve financial behavior and test external boundaries with all real vendor writes blocked.
+- Continue remaining storefront, staff tools, calculators, quote builders and generated document owners after these batches. Group compatible pages and use focused mocked checks during editing; full checks at release boundaries.
+
+### Verification and resume evidence
+
+Instant release: 218 unit suites / 5,205 passed / four existing skips; 88 DOM, 4 accessibility unit, 84 quote parity; 422 mocked browser cases (10.4 minutes), 16 remaining browser (4.3 minutes), three optional screenshot skips, all five live calculator surfaces. Build, lint, types, 299 CSS files, boot200 and production audit zero. Route lock remains485 registrations in24 modules.
+
+Artifacts: C:\Users\erik\.codex\visualizations\2026\09\07\01a07d90-9a4c-7e70-9e4e-c196377b7c6b. Authoritative instant-storefront-{source-record,source-ci,release-record,local-gates,heroku-verification,live-verification}.json; intake-reviewed-source/owned-files/css-measurement/runtime-inventory and intake-focused/unit-focused/paper-review evidence. Isolated node_modules is a junction to primary; never recursively delete through it. No .env copied. Do not rerun one-shot installers/register/commit/release helpers. After an uncertain Heroku push, inspect the actual running slug before retrying.
 
 ## Resumed — 2026-09-08
 
