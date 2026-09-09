@@ -428,3 +428,5 @@
 | `/pages/embroidery-contract-pricing.css` | Contract embroidery pricing page styles | — | ✅ Active |
 
 [Back to the registry index](../../ACTIVE_FILES.md)
+
+Campaign storefront: golf tournament landing/product and custom safety apparel share tokens/components and campaign-storefront.css, plus scoped golf product arrangements. New campaign-storefront.js owns native photo dialog, fragment focus and reversible FAQ printing. Old golf-tournament-showcase.css retired; retain original storytelling/photos, service prices and form fields. Delivery receipt requires accepted storage or sales notice; total failure keeps the request for retry.

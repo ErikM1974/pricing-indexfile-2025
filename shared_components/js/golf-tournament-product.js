@@ -114,7 +114,7 @@
                         Per piece, with 8,000-stitch logo embroidery in 1 location. Price shown for size S — sizes 2XL+ have small upcharges.
                     </p>
                     <div class="volume-pricing__table-wrap">
-                        <div class="loading-state" style="padding:2rem;">
+                        <div class="loading-state campaign-loading">
                             <i class="fas fa-spinner fa-spin" aria-hidden="true"></i>
                             <span>Loading volume pricing&hellip;</span>
                         </div>
@@ -208,7 +208,7 @@
                 <div>
                     <div class="product-info__price-label">Embroidered, qty 72+</div>
                     <div class="product-info__price-value" id="info-price-value">
-                        <i class="fas fa-spinner fa-spin" style="font-size:1.25rem;" aria-hidden="true"></i>
+                        <i class="fas fa-spinner fa-spin campaign-spinner" aria-hidden="true"></i>
                     </div>
                     <div class="product-info__price-suffix">per piece</div>
                 </div>
@@ -227,7 +227,7 @@
                         <i class="fas fa-circle-info" aria-hidden="true"></i>
                         Product Details
                     </div>
-                    <ul style="margin:0; padding-left: 1.25rem; color: var(--gray-700); font-size: 0.875rem; line-height: 1.7;">
+                    <ul class="campaign-spec-list">
                         ${descBullets.slice(0, 8).map(b => `<li>${escapeHtml(b)}</li>`).join('')}
                     </ul>
                 </div>
@@ -263,11 +263,11 @@
             ` : ''}
 
             <div class="product-info__ctas">
-                <a href="golf-tournaments-2026.html?prefill=${encodeURIComponent(p.styleNumber)}#quote-form" class="btn-primary">
+                <a href="golf-tournaments-2026.html?prefill=${encodeURIComponent(p.styleNumber)}#quote-form" class="btn btn-primary">
                     <i class="fas fa-paper-plane" aria-hidden="true"></i>
                     Request Quote for This Style
                 </a>
-                <a href="golf-tournaments-2026.html#showcase" class="btn-secondary">
+                <a href="golf-tournaments-2026.html#showcase" class="btn btn-secondary">
                     <i class="fas fa-grip" aria-hidden="true"></i>
                     See All Tournament Styles
                 </a>
@@ -414,7 +414,7 @@
         if (priceVal && price72 != null) {
             priceVal.innerHTML = formatPrice(price72);
         } else if (priceVal) {
-            priceVal.innerHTML = '<span style="font-size:0.875rem;color:#6b7280;">Quote on request</span>';
+            priceVal.innerHTML = '<span class="campaign-quote-on-request">Quote on request</span>';
         }
 
         // Render full tier table
@@ -440,7 +440,7 @@
             <table class="volume-pricing__table">
                 <thead>
                     <tr>
-                        <th style="text-align:left; padding-left: 1.5rem;">Quantity</th>
+                        <th class="campaign-first-column">Quantity</th>
                         <th>Per piece (size S)</th>
                         <th>Notes</th>
                     </tr>
@@ -457,15 +457,15 @@
         const tableWrap = document.querySelector('#volume-pricing-section .volume-pricing__table-wrap');
         if (tableWrap) {
             tableWrap.innerHTML = `
-                <div style="padding: 2rem; text-align: center; color: #6b7280;">
-                    <i class="fas fa-info-circle" style="font-size: 1.5rem; color: var(--primary); margin-bottom: 0.5rem;" aria-hidden="true"></i>
-                    <p>Volume pricing for this style is available on request. <a href="golf-tournaments-2026.html?prefill=${encodeURIComponent(state.styleNumber)}#quote-form" style="color: var(--primary-dark); font-weight: 700;">Request a quote</a> or call ${COMPANY_PHONE}.</p>
+                <div class="campaign-price-error">
+                    <i class="fas fa-info-circle campaign-price-error-icon" aria-hidden="true"></i>
+                    <p>Volume pricing for this style is available on request. <a class="campaign-quote-link" href="golf-tournaments-2026.html?prefill=${encodeURIComponent(state.styleNumber)}#quote-form">Request a quote</a> or call ${COMPANY_PHONE}.</p>
                 </div>
             `;
         }
         const priceVal = document.getElementById('info-price-value');
         if (priceVal) {
-            priceVal.innerHTML = '<span style="font-size:0.875rem;color:#6b7280;">Quote on request</span>';
+            priceVal.innerHTML = '<span class="campaign-quote-on-request">Quote on request</span>';
         }
     }
 
@@ -480,7 +480,7 @@
                 <div class="product-error__icon"><i class="fas fa-triangle-exclamation" aria-hidden="true"></i></div>
                 <h2 class="product-error__title">We couldn't load this product</h2>
                 <p class="product-error__lead">${escapeHtml(message || 'Something went wrong fetching product data.')}</p>
-                <a href="golf-tournaments-2026.html" class="btn-primary" style="display:inline-flex;">
+                <a href="golf-tournaments-2026.html" class="btn btn-primary">
                     <i class="fas fa-arrow-left" aria-hidden="true"></i>
                     Back to Tournament Apparel
                 </a>
