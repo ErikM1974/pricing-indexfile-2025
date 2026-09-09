@@ -1,18 +1,24 @@
 # CSS unification — design direction and implementation plan
 
-## Active checkpoint — RESUMED 2026-09-09
+## Active checkpoint — 2026-09-09
 
-Erik resumed after shutdown; standing edit/deploy authorization continues. Frontend **v2026.09.09.6 / Heroku2084 / dce016510f29c7a655b4bb75628aea72b3b745a6** is live. Actual Heroku slug/status and live version verified; source CI34356406944 on98b82fc917c97e753a115efd5e37cbf0873c4960 passed all four jobs, including full mocked CSS browser tests and actual money/calculator parity. This release includes the three reviewed campaign golf/safety pages. **115 of225 pages live;110 pending.** All26 training complete; generated documents/style owners remain separate unfinished work. Backend unchanged.
+Standing edit/deploy authorization continues. **Frontend v2026.09.09.7 / Heroku 2085 / 7de7708587984d234b2d13c865b326b787b705ae is LIVE.** Actual successful release and running slug verified 2026-09-09T15:41:56.7768281Z; five changed raw assets and their built assets match approved bytes. Banner/sticker pages and shared home/catalog references verified, plus five public regression pages and five staff gates. Exact-source CI **34370064451** passed all four jobs on **3462512138c1dc3601d29e335c5ca2c7fa82e032**, including the actual money/calculator and full mocked CSS browser steps. No real business writes or notifications during review.
 
-Work continues in codex/instant-storefront at C:\Users\erik\.codex\visualizations\2026\09\07\01a07d90-9a4c-7e70-9e4e-c196377b7c6b\training-final-worktree. WIP cc4d254c and checkpoint1a0844a5 are saved; verified campaign release merged without conflicts. Native banner/sticker layouts are being reviewed. The phone .stk-card cascade regression is fixed locally; four-width/state/print validation and complete release gates remain. No instant pages count as reviewed yet. Their preliminary .6 cache references must use the next unused version before release. No price computation changed.
+**117 of 225 application pages reviewed and live; 108 pending.** Another 79 tracked HTML sources are excluded (12 archive, 14 email, 50 fixtures/templates, 3 retired). All 26 training pages are complete. Generated document and external content owners remain a separate unfinished track. Whole-app cleanup is not complete. Backend unchanged: v2026.09.08.1 / Heroku1130 / d06aee3e4d25c5e1410241ea8007cdc8339aa3fa.
 
-- [x] Verify Claude's completed release and exact-source CI; no redundant campaign deployment.
-- [x] Resume saved banner/sticker WIP and repair late desktop placement overriding mobile layout.
-- [ ] Review original content/financial locks, four widths, pricing/quantity/finishing, navigation/dialogs, form failures/retries and artwork with all actual writes mocked, complete print content.
-- [ ] Register reviewed owners; full required local gates and exact-source CI, then verified release.
-- [ ] Continue remaining storefront/staff/calculator/builder/document families.
+### Current work
 
-Evidence: C:\Users\erik\.codex\visualizations\2026\09\07\01a07d90-9a4c-7e70-9e4e-c196377b7c6b; campaign-storefront-resumed-{ci,heroku}.json. The earlier campaign local browser run was intentionally interrupted at shutdown, but the subsequent release-source CI ran and passed that entire group. Use the saved fixtures/screenshots and current source; do not rerun one-shot installers or the merge helper that caused the mobile regression.
+**Nine reviewed pages are integrated on primary develop for candidate v2026.09.09.10:** request-a-quote; digitizing, monogram and purchasing; SanMar vendor/invoices/credits; announcement create/manage. Eight old stylesheet owners retired.126 reviewed locally/99pending; live remains117/108 until rollout. Full combined gates, exact-source CI and verified deployment remain. Earlier .8/.9 plans are superseded.
+
+Full-suite follow-ups: public suggestion positioning, persistent banner mock boundaries, readable age-warning color and explicit fixed/paused test clocks.24 repeated age/poll cases and nine menu/warning cases passed. Hosted pages passed20 focused browser/187 units with five complete reference PDFs258nodes; intake14 focused browser/199units and four reference PDFs74nodes. Original business controllers and provider IDs preserved. External app interiors remain separate unfinished work.
+
+Isolated worktree on codex/hosted-staff-tools is saved at56265125dd0fcb3c430ed3ee3a63621f2e3f5f64; its reviewed work is integrated. Continue next compatible staff-tool family while release gates run, using a new isolated branch. No real business writes or notifications.
+
+### Verification and resume evidence
+
+Instant release: 218 unit suites / 5,205 passed / four existing skips; 88 DOM, 4 accessibility unit, 84 quote parity; 422 mocked browser cases (10.4 minutes), 16 remaining browser (4.3 minutes), three optional screenshot skips, all five live calculator surfaces. Build, lint, types, 299 CSS files, boot200 and production audit zero. Route lock remains485 registrations in24 modules.
+
+Artifacts: C:\Users\erik\.codex\visualizations\2026\09\07\01a07d90-9a4c-7e70-9e4e-c196377b7c6b. Authoritative instant-storefront-{source-record,source-ci,release-record,local-gates,heroku-verification,live-verification}.json; intake-reviewed-source/owned-files/css-measurement/runtime-inventory and intake-focused/unit-focused/paper-review evidence. Isolated node_modules is a junction to primary; never recursively delete through it. No .env copied. Do not rerun one-shot installers/register/commit/release helpers. After an uncertain Heroku push, inspect the actual running slug before retrying.
 
 ## Resumed — 2026-09-08
 
@@ -695,3 +701,74 @@ Tested source 7d6cf7bc8124e7d3da8642093c3a9018b98e8897. Build/lint/types,485 rou
 ## Instant storefront release record — v2026.09.09.7
 
 Exact-source CI 34370064451 passed all four jobs on3462512138c1dc3601d29e335c5ca2c7fa82e032, including actual money/calculator parity and full mocked CSS browser group. Banner/sticker pricing, quote and artwork implementations preserved; shared native menu/disclosure ownership, four widths,14 focused browser cases,all50 sticker prices,seven banner presets,209 focused unit cases and419 checked paper text nodes. Full checks 5205 unit tests,422 mocked browser,16 remaining browser;485 routes unchanged. Candidate117 reviewed/108 pending becomes live only after actual rollout verification.
+
+## Customer and staff intake plan — 2026-09-09
+
+Next isolated branch codex/customer-intake at C:\Users\erik\.codex\visualizations\2026\09\07\01a07d90-9a4c-7e70-9e4e-c196377b7c6b\training-final-worktree, based on 7d6cf7bc8124e7d3da8642093c3a9018b98e8897. Four pages: request-a-quote plus digitizingform, monogramform and purchasingform. Original complete prose, destinations, images, fields, IDs, Jotform embed URLs and seven controller sources recorded in customer-intake-original-baseline.json. Keep customer vs staff navigation meaningful while sharing field/panel/typography owners. Preserve vendor form IDs and native request payload/validation/style lookup/upload/date/prefill behavior. External form contents remain vendor-owned; review loaded, unavailable and keyboard-accessible wrapper states without submitting real forms. No pages count reviewed yet. Instant2 candidate .7 runs full primary gates separately; no intake changes enter that release.
+
+- [ ] Capture original desktop/phone and controlled native-form/embedded states.
+- [ ] Replace three repeated embed-page styles with scoped shared arrangements; unify native quote-request fields using canonical tokens/components. Preserve original content, upload/submit helpers and hosted form destinations.
+- [ ] Four widths/axe, navigation, prefill/date/style lookup, failed/successful mocked uploads/submissions, vendor embed availability and complete paper content.
+- [ ] Register reviewed owners, full local gates/exact-source CI and verified release after instant2.
+
+## Customer intake implementation in progress — 2026-09-09
+
+Original four-page desktop/phone screenshots captured with hosted forms mocked. Public quote form now uses canonical full-width fields and choice controls, fixing its phone project-textarea overflow; three duplicate hosted-form wrappers share one scoped owner with Ruth/Bradley department colors. Existing prose, images, business helper sources and vendor embed destinations retained. Verified direct Jotform destinations respond200; persistent accessible fallback links and paper destinations added. Four old CSS owners retired after final consumers migrated; lifecycle docs updated. Candidate .8, isolated from instant .7. Four-width/state/keyboard/axe/paper verification and full gates remain; no additional pages counted reviewed.
+
+## Customer intake local review complete — 2026-09-09
+
+Customer intake: public request-a-quote and three hosted staff forms use canonical tokens/components/Public Sans with one scoped customer-intake.css owner; public fields retain their own arrangement. Digitizing follows Ruth purple, monogram follows shop-floor blue, purchasing follows Bradley slate. Four old CSS owners retired after their final consumers migrated. Seven existing controller sources remain unchanged; complete original prose/fields/images/vendor URLs locked.14 focused browser cases,11 original-contract checks, four widths/zero axe, navigation, blocked embeds and keyboard fallback, public validation/prefill/calendar/lookup/upload/save failures and retained draft retry checked with all business writes and hosted content mocked. Four one-page reference PDFs retain74 checked text nodes; vendor form contents stay external and are not printed from the wrapper. Raw CSS graph grows with shared primitives/scoping; no network byte-reduction claim. Full release gates remain.
+
+Candidate2026.09.09.8. Isolated codex/customer-intake; instant2 .7 exact-source CI still running separately.121 total pages reviewed locally after this four-page batch; live115 remains until actual deployments are verified (.7 becomes117/108, intake .8 becomes121/104). Complete primary release gates/exact-source CI/actual slug and asset verification still required.
+
+## Vendor portal wrapper plan — 2026-09-09
+
+Next isolated batch: vendor-portals/sanmar-vendor-portal.html, sanmar-invoices.html and sanmar-credits.html. Branch codex/vendor-portals based on d7c91600f85993eb4d0d45471ff0c0fc4356b3b7. Two nearly identical WSU-themed sheets duplicate their navigation/heading/card arrangements. Original complete wrapper prose, links/images and Caspio DataPage embed URLs captured in vendor-portals-original-baseline.json. Use canonical chrome and Bradley purchasing color, preserve exact embedded invoice/credit apps and every financial behavior. Caspio-rendered form/table content remains external; test the boundary with synthetic login/table/empty/failed states and block all real vendor writes. No invoice or credit transactions during review.
+
+- [ ] Capture original desktop/phone and read-only hosted entry availability.
+- [ ] Consolidate wrapper CSS, accessible navigation/table scrolling and persistent hosted fallback; register lifecycle.
+- [ ] Four widths/axe, keyboard/empty/error boundaries, original embed contracts and complete reference/data-fixture print review.
+- [ ] Full primary gates/exact-source CI/actual deployment after intake4 .8. Vendor3 not reviewed or counted yet.
+
+## Vendor portal wrappers implementation in progress — 2026-09-09
+
+Three original desktop/phone views captured with synthetic Caspio reports; both hosted DataPage entry URLs respond200. Canonical navigation, Bradley accent and one scoped arrangement replace duplicated WSU styles. Exact invoice/credit embed URLs unchanged; persistent hosted fallback links, named keyboard-scroll regions and paper destinations added. Vendor-owned controls and data are not rewritten. Four-width/axe, external login/report/empty/error boundary and full synthetic paper review still required. Candidate .9, isolated from intake .8 running primary gates.
+
+## Vendor portal local review complete — 2026-09-09
+
+SanMar vendor portal wrappers: three pages use canonical navigation/typography/Bradley purchasing accents and one scoped sanmar-portal-shared.css owner; the duplicate sanmar-vendor-portal.css is retired. Original invoice/credit Caspio app URLs and wrapper content remain unchanged.12 focused browser cases cover four widths, zero wrapper axe, native focus/keyboard scrolling, mocked login/empty/failure states and complete synthetic report printing; three landscape PDFs retain216 checked nodes. All provider writes blocked. Provider-owned UI styling/data remains explicitly separate; the runtime census now recognizes Jotform alongside Caspio and the external-owner backlog names all six reviewed hosted wrappers. Full release gates remain; no raw-CSS byte reduction claim.
+
+Candidate2026.09.09.9; isolated codex/vendor-portals. Three source contracts passed; broader CSS/runtime guards next.124 total local reviewed pages, but live117/108 remains until intake .8 and then vendor .9 are separately verified. Vendor release would become124/101. Do not merge vendor work into intake .8.
+
+## Hosted staff tools grouped plan — 2026-09-09
+
+Group reviewed vendor3 with the two announcement wrappers on codex/hosted-staff-tools, based on9a3191a65a8f7975ea33a54caed24a95399b045e. Their external Caspio forms/reports share the same page boundary, so consolidate the vendor arrangement into shared_components/css/hosted-workspace.css and use it for all five. This replaces two duplicate announcement sheets and the vendor-local arrangement; canonical tokens/components remain the sole control/navigation owners. Preserve exact provider IDs, all original wrapper prose/links/images and both announcement controller sources. Business data and access rules stay unchanged; all actual hosted submissions blocked in review.
+
+Design: Public Sans, white surfaces on the existing neutral canvas (#ffffff/#f3f4f6), dark ink (#1f2937), strong dividing lines (#d1d5db), semantic Bradley slate on vendor pages and neutral administrative ink on announcements. Left-aligned page heading, clear Create/Manage navigation, one hosted content area with permanent fallback and optional instructions. No repeated decorative cards around instructions. Native skip links, loading text, bounded keyboard-scroll region, and paper destinations. Apply the established application direction rather than adding another palette or control system.
+
+- [ ] Capture original two-page desktop/phone state and exact hosted/controller contracts.
+- [ ] Consolidate the five hosted page arrangements; register additions/deletions immediately.
+- [ ] Four widths/axe/keyboard/loading/failed/login/form/report/empty states and complete reference paper with provider writes blocked.
+- [ ] Update coverage/counts only after review; full primary gates, exact-source CI and verified grouped release after intake .8.
+
+## Hosted workspace implementation in progress — 2026-09-09
+
+Hosted staff tools migration: shared_components/css/hosted-workspace.css now owns five Caspio wrappers (SanMar vendor/invoices/credits and announcement create/manage), using canonical tokens/components. Retired admin/css/announcements-create.css, admin/css/announcements-manage.css and vendor-portals/css/sanmar-portal-shared.css after their final consumers moved. Exact provider URLs and announcement controllers preserved; native skip links, loading labels and permanent hosted fallback added. Five-page review pending.
+
+## Hosted staff tools local browser review — 2026-09-09
+
+Hosted staff tools: five Caspio page wrappers (SanMar vendor/invoices/credits, announcement create/manage) share shared_components/css/hosted-workspace.css with canonical tokens/components. Vendor-local and two announcement sheets retired; the earlier duplicate sanmar-vendor-portal.css is also retired. Bradley purchasing and neutral administrative colors follow the ownership rules. Exact provider IDs and both announcement controller sources retained.20 focused browser cases cover four widths/zero wrapper axe, native skip/navigation/scrolling, loading/failure/fallback and synthetic login/form/report/empty boundaries; five landscape reference PDFs retain258 text nodes, every page visually reviewed. Provider-owned controls and data remain separate unfinished work. Seven original source contracts passed; broader inventory guards and full release gates remain. Raw CSS graph grows with scoped shared primitives; no network-byte reduction claim.
+
+This five-page group supersedes the vendor-only .9 plan.126 pages reviewed locally/99pending, but live remains117/108 until intake .8 rollout (121/104), then this verified group would126/99. Never count branch review as live. Candidate2026.09.09.9; full checks/exact-source CI/rollout required.
+
+## Nine-page release consolidation — 2026-09-09
+
+Intake4 and hosted staff tools5 are reviewed and now integrated on primary develop. Candidate v2026.09.09.10 supersedes unreleased .8/.9 references; no empty intermediate release or live-count change. Shared intake/hosted arrangements retire eight CSS files across nine pages; original nine intake/announcement controllers and all provider IDs remain unchanged. Existing Bradley warning text uses semantic readable ink; fixed browser dates cover fresh/warning/critical queue ages. Public lookup anchoring, persistent banner mocks and explicitly paused confirmation polling fix full-suite findings without changing order handling.24 repeated age/poll cases passed; nine repeated menu/warning cases passed; hosted20 browser/187 unit/five PDFs258nodes, intake14 browser/199unit/four reference PDFs74nodes. Full primary combined gates, exact-source CI and actual rollout now required. Expected456 mocked browser plus16 remaining browser/all5 calculator surfaces. Live still.7/2085,117 reviewed/108pending. Only verified nine-page rollout becomes126/99.
+
+## Administrative ownership correction before release — 2026-09-09
+
+Final design-rule audit caught inherited announcement maroon. DESIGN_COLOUR_CODE reserves that accent for AE chrome; both administrative wrappers now use existing neutral ink tokens, while vendor wrappers retain Bradley slate. Controller/provider contracts remain unchanged. Combined full run was intentionally stopped after deterministic checks passed so the final source can be retested; no completed browser gate claimed.
+
+## Nine-page release checks complete — v2026.09.09.10
+
+Tested source7b8f8f3bd0ca5256f3426cf9f94be51ee61ef8a9. Build/lint/types,485 routes/24modules,221 unit suites/5232 passed/four existing skips,88DOM,4accessibility unit,84quote parity,456mocked browser and16remaining browser/three optional screenshot skips;all five calculator surfaces. 293 CSS lint clean,HTTP boot200,production audit zero. Intake14 and hosted20 focused browser cases;9 reference PDFs retain332checked nodes. Original nine intake/announcement controllers and provider IDs preserved; eight obsolete CSS owners retired. Public lookup anchored; queue age warning uses readable semantic ink; test mocks/date/poll clocks deterministic.24 repeated age/poll and9menu/warning cases passed. Candidatev2026.09.09.10 consolidates unreleased .8/.9. Exact-source CI and actual rollout remain; live117/108 until verified126/99.

@@ -1,25 +1,25 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
+<!DOCTYPE html><html lang="en"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
     <title>Purchasing Request Form - Northwest Custom Apparel</title>
     <link rel="icon" href="/favicon.png" type="image/png">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    
-    <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/calculators/css/purchasingform.css?v=2026.09.07.19">
+
+
+
+<link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.09.8">
+<link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.09.8">
+<link rel="stylesheet" href="/shared_components/css/customer-intake.css?v=2026.09.09.10">
 </head>
-<body>
+<body data-ui="unified" data-intake="embedded" data-surface="staff" data-department="bradley"><a class="skip-link" href="/calculators/purchasingform.html#intake-main">Skip to form</a>
     <!-- Header -->
     <header class="header">
         <div class="header-container">
             <div class="header-left">
-                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
-                     alt="Northwest Custom Apparel" class="logo">
-                <nav class="breadcrumb">
+                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" alt="Northwest Custom Apparel" class="logo">
+                <nav class="breadcrumb" aria-label="Breadcrumb">
                     <a href="/staff-dashboard.html">Staff Dashboard</a>
                     <span>/</span>
                     <span>Forms</span>
@@ -28,7 +28,7 @@
                 </nav>
             </div>
             <div class="header-right">
-                <a href="/staff-dashboard.html" class="help-btn">
+                <a href="/staff-dashboard.html" class="help-btn btn">
                     <i class="fas fa-arrow-left" aria-hidden="true"></i>
                     Back to Dashboard
                 </a>
@@ -37,10 +37,10 @@
     </header>
 
     <!-- Main Content -->
-    <main class="main-container">
+    <main class="main-container" id="intake-main" tabindex="-1" aria-labelledby="intake-title">
         <!-- Page Header -->
-        <div class="page-header">
-            <h1 class="page-title">
+        <div class="intake-heading">
+            <h1 id="intake-title" class="page-title">
                 <i class="fas fa-shopping-cart" aria-hidden="true"></i>
                 Purchasing Request Form
             </h1>
@@ -53,23 +53,23 @@
                 <div class="info-card-icon">
                     <i class="fas fa-user" aria-hidden="true"></i>
                 </div>
-                <h3 class="info-card-title">Purchasing Agent</h3>
+                <h2 class="info-card-title">Purchasing Agent</h2>
                 <p class="info-card-text">All requests are processed by Bradley Wright, our Accountant and Purchasing Specialist</p>
             </div>
-            
+
             <div class="info-card">
                 <div class="info-card-icon">
                     <i class="fas fa-clipboard-list" aria-hidden="true"></i>
                 </div>
-                <h3 class="info-card-title">Required Information</h3>
+                <h2 class="info-card-title">Required Information</h2>
                 <p class="info-card-text">Please provide Customer Name and Work Order Number for all purchase requests</p>
             </div>
-            
+
             <div class="info-card">
                 <div class="info-card-icon">
                     <i class="fas fa-truck" aria-hidden="true"></i>
                 </div>
-                <h3 class="info-card-title">Processing Workflow</h3>
+                <h2 class="info-card-title">Processing Workflow</h2>
                 <p class="info-card-text">Form submission → Bradley processes → Purchases from supplier → Items ordered</p>
             </div>
         </div>
@@ -79,16 +79,16 @@
             <div class="form-intro">
                 <h2>Purchase Request Form</h2>
                 <p>Complete the form below to submit your purchasing request. Please include Customer Name and Work Order Number.</p>
-            </div>
+            <p class="intake-embed-help" data-intake-addition="hosted-fallback">If the form does not appear, <a href="https://form.jotform.com/241646601815152" target="_blank" rel="noopener">open the hosted form in a new tab</a>.</p></div>
 
             <!-- JotForm JavaScript Embed Container -->
             <div class="jotform-container" id="jotformContainer">
                 <!-- JotForm JavaScript Embed - Renders Here -->
                 <script type="text/javascript" src="https://form.jotform.com/jsform/241646601815152"></script>
             </div>
-        </div>
+        <p class="intake-print-link" data-intake-addition="paper-destination">Complete the hosted form online: https://form.jotform.com/241646601815152</p></div>
     </main>
-    
+
     <script src="/calculators/js/purchasingform.js?v=2026.09.06.16"></script>
-</body>
-</html>
+
+</body></html>

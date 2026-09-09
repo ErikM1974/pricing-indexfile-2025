@@ -141,3 +141,9 @@
 - tests/e2e/css-unification-campaign-storefront.spec.js: campaign layout and delivery outcome browser coverage with mocked business services.
 
 - Instant storefront: tests/unit/instant-storefront-content.test.js; tests/e2e/css-unification-instant-storefront.spec.js; original-content and pricing fixtures in tests/fixtures.
+
+Customer intake: customer-intake-content.test.js and css-unification-customer-intake.spec.js use the preserved customer-intake-original-content.json fixture. All vendor content and business writes mocked.
+
+Vendor portals: vendor-portals-content.test.js and css-unification-vendor-portals.spec.js preserve original wrapper/Caspio contracts and synthetic vendor states using vendor-portals-original-content.json.
+
+Hosted announcement verification: tests/fixtures/announcements-original-content.json preserves original wrapper content/provider IDs and both controller hashes; tests/unit/announcements-content.test.js checks those contracts. tests/e2e/css-unification-announcements.spec.js covers four widths/axe, native navigation/keyboard scrolling, loaded/unavailable/login/empty provider fixtures and complete synthetic reference printing. All real business writes blocked. Vendor browser/source checks now point at the shared hosted arrangement with their prior assertions retained.

@@ -118,14 +118,6 @@ with Erik's explicit approval; verify the live-engine step actually runs on the 
 **Prevention.** Audit the resolved tree after updating: a green install is not a clean audit. Preserve CRLF in
 these two already-CRLF-tracked package files to avoid hiding the dependency diff. Major upgrades stay separate.
 
-## 2026-09-07 — Major SDK upgrades need contract checks
-
-**Problem:** Rate-limit option spelling broke a text lock; Stripe22 types rejected the intentionally retained API version.
-**Root cause:** The quota test matched source text, and Stripe generated types describe only its newest API contract.
-**Solution:** Evaluate limiter options semantically; preserve 2025-10-29.clover through one shared Stripe factory,
-with the documented narrow type exception. HTTP tests verify quotas, IPv6 grouping, API headers and signed webhook dispatch.
-**Prevention:** Run contract tests before and after each major upgrade; a dependency PR passing CI alone is insufficient.
-
 ## Tooling upgrades and visual verification (2026-09-07, archived)
 
 Keep version choices tied to measured checks and compare screenshots only after readiness. Full entry in LESSONS_LEARNED_ARCHIVE.md.
@@ -143,11 +135,6 @@ Keep version choices tied to measured checks and compare screenshots only after 
 - Solution: propagate errors to the product loader's existing error UI; clear size data before requesting it.
 - Prevention: calculator-api-errors.test.js covers HTTP, transport, malformed/empty responses and successful API data.
 
-## A JavaScript label silently dropped an inventory message (2026-09-07)
-- Problem/root cause: `message:` was a label, not assignment, so in-stock samples had no message.
-- Solution: assign the message; no-unused-labels is now an error.
-- Prevention: test returned stock status and customer message together for available, low-stock and unavailable inventory.
-
 ## Quote operations need caller and quote scope checks (2026-09-07)
 - Problem/root cause: bulk sync, tracking writes and change-log operations trusted their expected caller without authenticating it.
 - Solution: deploy credentials in proxy jobs/callbacks first; gate app operations with staff/shared-secret checks and authenticate loopback writes.
@@ -162,7 +149,7 @@ Keep version choices tied to measured checks and compare screenshots only after 
 ## Shared workflow state must match its visibility owner (2026-09-08)
 - Problem/root cause: migrating hidden state left paste guards on inline display; queues showed success before awaiting refresh, and failed file links left a success icon.
 - Solution: keep visibility checks aligned with the migrated owner, centralize custom-dialog focus/scroll state, preserve keyboard focus when filters or expansion buttons are replaced, and update success indicators only after the operation settles.
-- Prevention: exercise populated, failed, retry and cancelled states with mocked writes; check old consumers when a shared helper opts into new presentation.
+- Prevention: exercise populated, failed, retry and cancelled states with mocked writes; check old consumers when a shared helper opts into new presentation. Queue-age labels need semantic warning ink: amber-600 on white failed contrast only when a fixture crossed24 hours. Fix the CSS and lock fresh/warning/critical ages under a fixed date, retaining axe checks. A browser clock must be explicitly paused for exact polling-count tests; installation alone lets startup/network latency advance timers.
 
 ## A visible quantity grid does not prove pricing is ready (2026-09-08)
 - Problem/root cause: DTG rendered sizes before its bundle request completed; Save accepted zero/partial prices, and an older request could overwrite edits. A six-second browser delay hid the readiness gap.
@@ -255,3 +242,11 @@ Campaign verification follow-up: a runtime census timed out under the full suite
 ### Shared CSS migration must preserve responsive and interaction ownership (2026-09-09)
 
 Problem: consolidating repeated .stk-card selectors moved desktop grid placement after the mobile media query, making tiny phone columns; legacy and shared menu handlers also toggled the same disclosure twice. Root cause: deduplication ignored cascade order, and both controllers owned aria-expanded/visibility. Solution: base geometry precedes responsive rules; the instant pages bypass legacy disclosure/mobile adapters and use existing shared native owners. Financial/submission/artwork code remains source locked. Prevention: real four-width geometry/axe and open/close/resize keyboard checks, every published sticker row and banner preset, retained upload/draft retry, and full paper text plus visual inspection. A clipped screen-reader caption needs an explicit visible print arrangement; shrink optional paper chrome without dropping original content.
+
+## Paper-like form layouts need a separate phone arrangement (2026-09-09)
+
+Problem: the quote request inherited line-oriented paper styling that pushed the project textarea beyond the phone viewport. Root cause: its legacy field row and width rules survived in an online customer form. Solution: canonical vertical fields and bounded grid columns; shared hosted-form wrappers, native keyboard upload and explicit page landmark names. Prevention: check actual control bounds at320/390/768/1440, source-lock serialization and lookup/upload helpers, exercise blocked embeds and retained draft retries, inspect every reference-PDF page. The lookup helper floats popups only on printable forms; anchor the public form menu absolutely to its input and assert its coordinates, not just visibility. Keep mock routes installed across fixture-state transitions: removing them between navigations can allow in-flight requests to reach a live API. Keep department colors tied to ownership: monogram is shop-floor blue, digitizing Ruth purple, purchasing Bradley slate.
+
+## A reviewed page wrapper is not a reviewed external app (2026-09-09)
+
+Problem: the CSS census omitted Jotform scripts and its external-owner backlog named only three Caspio pages. Root cause: provider recognition did not match the currently loaded embeds. Solution: recognize Jotform and explicitly retain vendor-owned UI as pending even after its surrounding page is reviewed. Prevention: lock live embed IDs/URLs, test wrapper boundaries with login/table/empty/failure fixtures and block all real provider writes; do not describe synthetic fixture coverage as validation of a vendor app. Check DESIGN_COLOUR_CODE before mapping an inherited palette: announcement admin tools are neutral; legacy maroon does not make them AE-owned.

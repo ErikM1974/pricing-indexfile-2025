@@ -1,0 +1,92 @@
+{
+  "base": "d7c91600f85993eb4d0d45471ff0c0fc4356b3b7",
+  "pages": [
+    {
+      "file": "vendor-portals/sanmar-vendor-portal.html",
+      "title": "Sanmar Vendor Portal - Northwest Custom Apparel",
+      "mainText": "Sanmar Vendor Portal Manage invoices for Sanmar vendor transactions",
+      "links": [
+        {
+          "href": "/",
+          "label": ""
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "label": "Dashboard"
+        }
+      ],
+      "images": [
+        {
+          "src": "https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1",
+          "alt": "Northwest Custom Apparel"
+        }
+      ],
+      "embeds": [
+        "https://c3eku948.caspio.com/dp/a0e15000094c1ad41f84402184a5/emb"
+      ],
+      "styles": [
+        "shared_components/css/tokens.css",
+        "vendor-portals/css/sanmar-vendor-portal.css"
+      ],
+      "cssBytes": 18121
+    },
+    {
+      "file": "vendor-portals/sanmar-invoices.html",
+      "title": "Sanmar Invoices - Northwest Custom Apparel",
+      "mainText": "Sanmar Invoices View and manage invoices from Sanmar",
+      "links": [
+        {
+          "href": "/",
+          "label": ""
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "label": "Dashboard"
+        }
+      ],
+      "images": [
+        {
+          "src": "https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1",
+          "alt": "Northwest Custom Apparel"
+        }
+      ],
+      "embeds": [
+        "https://c3eku948.caspio.com/dp/a0e15000094c1ad41f84402184a5/emb"
+      ],
+      "styles": [
+        "shared_components/css/tokens.css",
+        "vendor-portals/css/sanmar-portal-shared.css"
+      ],
+      "cssBytes": 18392
+    },
+    {
+      "file": "vendor-portals/sanmar-credits.html",
+      "title": "Sanmar Credits - Northwest Custom Apparel",
+      "mainText": "Sanmar Credits View and manage credits from Sanmar",
+      "links": [
+        {
+          "href": "/",
+          "label": ""
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "label": "Dashboard"
+        }
+      ],
+      "images": [
+        {
+          "src": "https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1",
+          "alt": "Northwest Custom Apparel"
+        }
+      ],
+      "embeds": [
+        "https://c3eku948.caspio.com/dp/a0e150009d05828dd0ed40e188fa/emb"
+      ],
+      "styles": [
+        "shared_components/css/tokens.css",
+        "vendor-portals/css/sanmar-portal-shared.css"
+      ],
+      "cssBytes": 18392
+    }
+  ]
+}

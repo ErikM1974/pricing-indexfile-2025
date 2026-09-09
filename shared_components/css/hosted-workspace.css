@@ -1,0 +1,42 @@
+/* Shared boundaries for hosted staff forms/reports. Provider data and controls remain external. */
+@layer components.pages {
+    :where([data-ui="unified"][data-hosted-workspace="announcements"]) { --ui-accent: var(--gray-700); --ui-accent-hover: var(--gray-800); --ui-tint: var(--gray-100); }
+    :where([data-ui="unified"][data-hosted-workspace]) .breadcrumb { display: flex; align-items: center; flex-wrap: wrap; gap: var(--space-2); color: var(--ui-muted); font-size: var(--font-size-sm); }
+    :where([data-ui="unified"][data-hosted-workspace]) .hosted-heading { margin: var(--space-3) 0 var(--space-6); }
+    :where([data-ui="unified"][data-hosted-workspace]) .page-title { font-size: clamp(1.75rem, 4vw, 2.75rem); letter-spacing: -0.035em; }
+    :where([data-ui="unified"][data-hosted-workspace]) .page-title i { color: var(--ui-accent); font-size: 0.7em; margin-right: var(--space-2); }
+    :where([data-ui="unified"][data-hosted-workspace]) .page-subtitle { color: var(--ui-muted); margin: var(--space-3) 0 0; }
+    :where([data-ui="unified"][data-hosted-workspace]) .hosted-card { padding: 0; }
+    :where([data-ui="unified"][data-hosted-workspace]) .hosted-help { padding: var(--space-4) var(--space-5); margin: 0; border-bottom: 1px solid var(--ui-line); font-size: var(--font-size-sm); color: var(--ui-muted); }
+    :where([data-ui="unified"][data-hosted-workspace]) .hosted-embed { max-width: 100%; min-height: 200px; overflow: auto; padding: var(--space-5); overscroll-behavior-x: contain; }
+    :where([data-ui="unified"][data-hosted-workspace]) .hosted-print-link { display: none; }
+
+
+    :where([data-ui="unified"][data-hosted-workspace]) .hosted-brand-title { font-weight: 600; }
+    :where([data-ui="unified"][data-hosted-workspace]) .page-nav-link[aria-current="page"] { color: var(--ui-surface); background: var(--ui-accent); border-color: var(--ui-accent); }
+    :where([data-ui="unified"][data-hosted-workspace]) .hosted-card-header { display: flex; align-items: center; flex-wrap: wrap; justify-content: space-between; gap: var(--space-4); padding: var(--space-5); border-bottom: 1px solid var(--ui-line); }
+    :where([data-ui="unified"][data-hosted-workspace]) .hosted-card-header .card-title { margin: 0; }
+    :where([data-ui="unified"][data-hosted-workspace]) .hosted-instructions { padding: var(--space-4) var(--space-5); border-bottom: 1px solid var(--ui-line); color: var(--ui-muted); font-size: var(--font-size-sm); }
+    :where([data-ui="unified"][data-hosted-workspace]) .hosted-instructions h3 { margin: 0 0 var(--space-3); color: var(--ui-ink); font-size: var(--font-size-base); }
+    :where([data-ui="unified"][data-hosted-workspace]) .hosted-instructions p { margin: var(--space-2) 0; }
+    :where([data-ui="unified"][data-hosted-workspace]) .hosted-body { position: relative; min-width: 0; }
+    :where([data-ui="unified"][data-hosted-workspace]) .hosted-loading { position: absolute; inset: 0; display: grid; place-items: center; padding: var(--space-5); background: var(--ui-surface); color: var(--ui-muted); pointer-events: none; }
+
+    @media (width <= 700px) {
+        :where([data-ui="unified"][data-hosted-workspace]) :is(.hosted-help, .hosted-embed, .hosted-card-header, .hosted-instructions) { padding: var(--space-4); }
+    }
+
+    @media print {
+        @page { size: letter landscape; margin: 0.4in; }
+        :where([data-ui="unified"][data-hosted-workspace]) :is(.hosted-loading, .hosted-card-header .btn) { display: none; }
+        :where([data-ui="unified"][data-hosted-workspace]) :is(.hosted-card-header, .hosted-instructions) { padding: var(--space-3); }
+        :where([data-ui="unified"][data-hosted-workspace]) { background: var(--ui-surface); font-size: 11px; }
+        :where([data-ui="unified"][data-hosted-workspace]) .page-main { max-width: none; padding: 0; }
+        :where([data-ui="unified"][data-hosted-workspace]) .hosted-heading { margin: 0 0 var(--space-4); }
+        :where([data-ui="unified"][data-hosted-workspace]) .page-title { font-size: 24px; }
+        :where([data-ui="unified"][data-hosted-workspace]) .hosted-help { display: none; }
+        :where([data-ui="unified"][data-hosted-workspace]) .hosted-card { break-inside: auto; }
+        :where([data-ui="unified"][data-hosted-workspace]) .hosted-embed { padding: var(--space-3); overflow: visible; min-height: 0; }
+        :where([data-ui="unified"][data-hosted-workspace]) .hosted-print-link { display: block; padding: var(--space-3); margin: 0; overflow-wrap: anywhere; }
+    }
+}

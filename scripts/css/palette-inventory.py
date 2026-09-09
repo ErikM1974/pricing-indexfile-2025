@@ -8,10 +8,10 @@ SHEETS = [
     'shared_components/css/blog.css', 'product/css/product-2026.css', 'pages/css/catalog-2026.css',
     'shared_components/css/cart-drawer.css', 'brands.css', 'pages/css/fall-catalog-2026.css', 'pages/css/quote-cart.css',
     'pages/css/sample-cart.css', 'pages/css/instant-quote.css', 'pages/css/custom-banners.css',
-    'pages/forms/nwca-form-shared.css', 'pages/request-a-quote.css', 'pages/forms/sample-checkout-form.css',
+    'shared_components/css/customer-intake.css', 'pages/request-a-quote.css', 'pages/forms/sample-checkout-form.css',
     'pages/css/custom-tees.css', 'pages/css/custom-caps.css', 'pages/css/3-day-tees.css', 'pages/css/customer-login.css',
     'pages/css/customer-portal.css', 'pages/css/customer-product.css', 'pages/css/portal-reorder-list.css',
-    'shared_components/css/golf-tournament-showcase.css', 'shared_components/css/golf-tournament-product.css',
+    'shared_components/css/campaign-storefront.css', 'shared_components/css/golf-tournament-product.css',
     'shared_components/css/safety-stripe-recs.css', 'shared_components/css/embroidery-quote-pricing.css',
 ]
 

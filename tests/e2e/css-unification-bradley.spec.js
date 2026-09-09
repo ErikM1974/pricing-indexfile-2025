@@ -50,8 +50,8 @@ async function fixture(page, file, options = {}) {
         else if (url.pathname === '/api/transfer-orders') {
             data = { success: true, records: [
                 state.record,
-                { ...state.record, ID_Transfer: 'ST-260908-0002', Company_Name: 'Cascade Field Services', Status: 'Ordered', Is_Rush: false, ShopWorks_PO_Number: '112898' },
-                { ...state.record, ID_Transfer: 'ST-260908-0003', Company_Name: 'Cedar Works', Status: 'Shipped', Is_Rush: false, Supacolor_Order_Number: '900001', ShopWorks_PO_Number: '112899' },
+                { ...state.record, ID_Transfer: 'ST-260908-0002', Requested_At: '2026-09-09T11:00:00', Company_Name: 'Cascade Field Services', Status: 'Ordered', Is_Rush: false, ShopWorks_PO_Number: '112898' },
+                { ...state.record, ID_Transfer: 'ST-260908-0003', Requested_At: '2026-09-06T09:00:00', Company_Name: 'Cedar Works', Status: 'Shipped', Is_Rush: false, Supacolor_Order_Number: '900001', ShopWorks_PO_Number: '112899' },
             ] }; status = state.failure ? 503 : 200;
         } else if (url.pathname.startsWith('/api/transfer-orders/ST-')) {
             data = { success: true, record: state.record,
@@ -112,10 +112,15 @@ async function dismiss(page, host, trigger) {
 
 for (const [file, method] of [['bradley-transfers.html', 'Supacolor'], ['bradley-screenprint.html', 'Screen Print']]) {
     test(`CSS Bradley: ${method} queue filters, touch controls and delete cancellation`, async ({ page }) => {
+        // Exercise fresh, warning and critical ages regardless of the wall-clock date.
+        await page.clock.setFixedTime(new Date('2026-09-09T19:00:00Z'));
         const state = await fixture(page, 'dashboards/' + file, { record: { ...transfer, Method: method } });
         await page.goto('/dashboards/' + file);
         await expect(page.locator('.bt-card')).toHaveCount(3);
         await expect(page.locator('#bt-filter-search')).toHaveCSS('font-size', '16px');
+        await expect(page.locator('.bt-card-age--warn')).toHaveCount(1);
+        await expect(page.locator('.bt-card-age--critical')).toHaveCount(1);
+        await expect(page.locator('.bt-card-age:not(.bt-card-age--warn):not(.bt-card-age--critical)')).toHaveCount(1);
         await layouts(page, method === 'Supacolor' ? 'transfer-queue' : 'screenprint-queue');
         await page.locator('#bt-filter-status').selectOption('Ordered');
         await expect(page.locator('.bt-card')).toHaveCount(1);
