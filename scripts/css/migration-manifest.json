@@ -3452,13 +3452,13 @@
     },
     {
       "source": "vendor-portals/sanmar-vendor-portal.html",
-      "family": "vendor-portals",
+      "family": "hosted-workspace",
       "status": "pilot",
       "route": "/vendor-portals/sanmar-vendor-portal.html",
       "styles": [
         "shared_components/css/tokens.css",
         "shared_components/css/components.css",
-        "vendor-portals/css/sanmar-portal-shared.css"
+        "shared_components/css/hosted-workspace.css"
       ],
       "dynamicStyles": [],
       "states": [
@@ -3475,8 +3475,8 @@
         "complete-landscape-report-print"
       ],
       "test": "tests/e2e/css-unification-vendor-portals.spec.js",
-      "maxCssBytes": 60076,
-      "measuredRawCssBytes": 58028,
+      "maxCssBytes": 61887,
+      "measuredRawCssBytes": 59839,
       "baseline": {
         "commit": "d7c91600f85993eb4d0d45471ff0c0fc4356b3b7",
         "rawCssBytes": 18121,
@@ -3485,13 +3485,13 @@
     },
     {
       "source": "vendor-portals/sanmar-invoices.html",
-      "family": "vendor-portals",
+      "family": "hosted-workspace",
       "status": "pilot",
       "route": "/vendor-portals/sanmar-invoices.html",
       "styles": [
         "shared_components/css/tokens.css",
         "shared_components/css/components.css",
-        "vendor-portals/css/sanmar-portal-shared.css"
+        "shared_components/css/hosted-workspace.css"
       ],
       "dynamicStyles": [],
       "states": [
@@ -3508,8 +3508,8 @@
         "complete-landscape-report-print"
       ],
       "test": "tests/e2e/css-unification-vendor-portals.spec.js",
-      "maxCssBytes": 60076,
-      "measuredRawCssBytes": 58028,
+      "maxCssBytes": 61887,
+      "measuredRawCssBytes": 59839,
       "baseline": {
         "commit": "d7c91600f85993eb4d0d45471ff0c0fc4356b3b7",
         "rawCssBytes": 18392,
@@ -3518,13 +3518,13 @@
     },
     {
       "source": "vendor-portals/sanmar-credits.html",
-      "family": "vendor-portals",
+      "family": "hosted-workspace",
       "status": "pilot",
       "route": "/vendor-portals/sanmar-credits.html",
       "styles": [
         "shared_components/css/tokens.css",
         "shared_components/css/components.css",
-        "vendor-portals/css/sanmar-portal-shared.css"
+        "shared_components/css/hosted-workspace.css"
       ],
       "dynamicStyles": [],
       "states": [
@@ -3541,11 +3541,75 @@
         "complete-landscape-report-print"
       ],
       "test": "tests/e2e/css-unification-vendor-portals.spec.js",
-      "maxCssBytes": 60076,
-      "measuredRawCssBytes": 58028,
+      "maxCssBytes": 61887,
+      "measuredRawCssBytes": 59839,
       "baseline": {
         "commit": "d7c91600f85993eb4d0d45471ff0c0fc4356b3b7",
         "rawCssBytes": 18392,
+        "localCssRequests": 2
+      }
+    },
+    {
+      "source": "admin/announcements-create.html",
+      "family": "hosted-workspace",
+      "status": "pilot",
+      "route": "/admin/announcements-create.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/hosted-workspace.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "four-widths",
+        "zero-axe-wrapper",
+        "native-skip-focus",
+        "keyboard-hosted-scroll",
+        "preserved-provider-and-controller",
+        "loading-label",
+        "failed-provider-fallback",
+        "hosted-login-fixture",
+        "empty-announcements-fixture",
+        "complete-reference-print"
+      ],
+      "test": "tests/e2e/css-unification-announcements.spec.js",
+      "maxCssBytes": 61887,
+      "measuredRawCssBytes": 59839,
+      "baseline": {
+        "commit": "9a3191a65a8f7975ea33a54caed24a95399b045e",
+        "rawCssBytes": 19898,
+        "localCssRequests": 2
+      }
+    },
+    {
+      "source": "admin/announcements-manage.html",
+      "family": "hosted-workspace",
+      "status": "pilot",
+      "route": "/admin/announcements-manage.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/hosted-workspace.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "four-widths",
+        "zero-axe-wrapper",
+        "native-skip-focus",
+        "keyboard-hosted-scroll",
+        "preserved-provider-and-controller",
+        "loading-label",
+        "failed-provider-fallback",
+        "hosted-login-fixture",
+        "empty-announcements-fixture",
+        "complete-reference-print"
+      ],
+      "test": "tests/e2e/css-unification-announcements.spec.js",
+      "maxCssBytes": 61887,
+      "measuredRawCssBytes": 59839,
+      "baseline": {
+        "commit": "9a3191a65a8f7975ea33a54caed24a95399b045e",
+        "rawCssBytes": 20934,
         "localCssRequests": 2
       }
     }
@@ -3618,7 +3682,8 @@
         "vendor-portals/sanmar-credits.html",
         "calculators/digitizingform.html",
         "calculators/monogramform.html",
-        "calculators/purchasingform.html"
+        "calculators/purchasingform.html",
+        "admin/announcements-manage.html"
       ],
       "note": "These sources execute Caspio DataPages or embed hosted Jotform apps. Reviewed local wrappers do not certify provider-owned styles, controls or runtime data. Keep provider work in the separate external-UI backlog. Current app-rendered Bradley/Steve/Ruth/AE workflows, historical DataPage comments, CDN images and date utilities are not embedded UI."
     }

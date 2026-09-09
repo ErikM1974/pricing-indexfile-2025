@@ -15,7 +15,7 @@ test.each(fixture.pages)(
         expect([...d.images].map((n) => ({ src: n.getAttribute('src'), alt: n.alt }))).toEqual(
             p.images,
         );
-        const help = d.querySelector('.vendor-help a');
+        const help = d.querySelector('.hosted-help a');
         expect(help.href).toBe(p.embeds[0].replace(/\/emb$/, ''));
         expect(help.rel).toBe('noopener');
         expect(help.target).toBe('_blank');

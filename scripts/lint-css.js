@@ -16,6 +16,7 @@ const ROOT = path.resolve(__dirname, '..');
 /** Repo-relative globs. Widen only — never remove a file to make the lint pass. */
 const CSS_LINT_SCOPE = [
     'shared_components/css/customer-intake.css',
+    'shared_components/css/hosted-workspace.css',
     'shared_components/css/api-reference.css',
     // Step 1 (2026-09-07): the two token files
     'shared_components/css/tokens.css',
@@ -212,8 +213,6 @@ const CSS_LINT_SCOPE = [
     'shared_components/css/jds-submit-form.css',
     'shared_components/css/mockup-submit-form.css',
     // tail batch (2026-09-07): admin, production-shifts, price-audit-report, employee bundles, tools, vendor-portal css, dtf prototype css
-    'admin/css/announcements-create.css',
-    'admin/css/announcements-manage.css',
     'admin/css/universal-records-admin-injected.css',
     'admin/css/universal-records-admin.css',
     'calculators/quick-quote/dtf-prints-prototype.css',
@@ -222,7 +221,6 @@ const CSS_LINT_SCOPE = [
     'employee-bundles/css/streich-bros-bundle.css',
     'employee-bundles/css/wcttr-bundle.css',
     'tools/custom-tees-calibrate.css',
-    'vendor-portals/css/sanmar-portal-shared.css',
 ];
 
 async function run() {

@@ -93,7 +93,7 @@ for (const p of fixture.pages) {
         await page.locator('.skip-link').focus();
         await page.keyboard.press('Enter');
         await expect(page.locator('main')).toBeFocused();
-        const region = page.locator('.vendor-embed');
+        const region = page.locator('.hosted-embed');
         await region.focus();
         await page.keyboard.press('ArrowRight');
         await expect.poll(() => region.evaluate((n) => n.scrollLeft)).toBeGreaterThan(0);
@@ -109,7 +109,7 @@ for (const p of fixture.pages) {
         page,
     }) => {
         const events = await open(page, p.file, 'failed'),
-            link = page.locator('.vendor-help a');
+            link = page.locator('.hosted-help a');
         await expect(link).toHaveAttribute('href', p.embeds[0].replace(/\/emb$/, ''));
         await expect(link).toBeVisible();
         await link.focus();
@@ -144,7 +144,7 @@ for (const p of fixture.pages) {
     }) => {
         await open(page, p.file);
         await page.emulateMedia({ media: 'print' });
-        await expect(page.locator('.vendor-print-link')).toBeVisible();
+        await expect(page.locator('.hosted-print-link')).toBeVisible();
         const nodes = await page.locator('main').evaluate((main) => {
             const values = [],
                 w = document.createTreeWalker(main, NodeFilter.SHOW_TEXT);
@@ -171,7 +171,7 @@ for (const p of fixture.pages) {
             JSON.stringify(nodes),
         );
         await page.emulateMedia({ media: 'screen' });
-        await expect(page.locator('.vendor-print-link')).toBeHidden();
+        await expect(page.locator('.hosted-print-link')).toBeHidden();
         await expect(page.locator('tbody tr')).toHaveCount(rows.length);
     });
 }
