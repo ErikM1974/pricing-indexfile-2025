@@ -503,3 +503,9 @@ Paper review verifies every selected synthetic block (101 in total): hub/detail/
 Bug fixes: use resolved staff identity for comments before guarded legacy storage; fail closed on missing content sanitizer or editor; load parent options after policy mode resolves; preserve text after ordinary handbook dividers; synchronize chart search visibility and expanded state; show unknown question count instead of a false zero; escape AI error toast text.
 
 Measured raw local CSS graphs: pages/policies-hub.html 51709 → 99945 bytes; pages/policy-detail.html 138235 → 209120 bytes; pages/policy-questions.html 51709 → 99945 bytes; pages/handbook.html 65652 → 112698 bytes. These are source bytes, not network transfers; the shared component graph adds bytes to lighter pages and reduces repeated control ownership across the application. Full primary gates, exact-source CI and verified .19 release remain. Live remains .18 /68 reviewed /157 pending; candidate72 is not yet live.
+
+## Policy CMS full gates — 2026-09-08
+
+Integrated source 4dbca64461a7ee16c21cafd53443d1ba6d10db92 passed 211 unit suites /5,098 tests (four existing skips), 88 DOM, four accessibility unit, 84 quote parity, 265 mocked CSS/auth browser cases (385.4 seconds), 16 remaining browser cases (three optional screenshot skips), and all five live calculator surfaces including EMB/CAP additional-logo tiers. Build/lint/types/295 CSS/HTTP boot pass;485 registrations in24 modules unchanged. Ready for .19 cache version and exact-source CI, not deployed yet.
+
+Next work is isolated in training-final-worktree, branch codex/webstore-family based on reviewed CMS commit32cd5e64. Twelve public webstore pages share a new family layout and native guide controller; baseline, plan and original metadata are saved, initial desktop/mobile render review is complete. Work is uncommitted and NOT ready/live. No business writes. Preserve this worktree and node_modules junction.
