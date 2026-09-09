@@ -169,9 +169,16 @@
     };
 
     function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;'); }
+    // Highlight raw text segments, then escape each segment before adding fixed mark tags.
     function hl(text, q) {
-        var s = esc(text); if (!q) return s;
-        try { return s.replace(new RegExp('(' + q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'ig'), '<mark class="swo-hit">$1</mark>'); } catch (e) { return s; }
+        var value = String(text), needle = String(q || '').toLowerCase();
+        if (!needle) return esc(value);
+        var lower = value.toLowerCase(), at = 0, hit, output = '';
+        while ((hit = lower.indexOf(needle, at)) !== -1) {
+            output += esc(value.slice(at, hit)) + '<mark class="ref-hit">' + esc(value.slice(hit, hit + needle.length)) + '</mark>';
+            at = hit + needle.length;
+        }
+        return output + esc(value.slice(at));
     }
 
     var host = document.getElementById('swoTables');
@@ -180,78 +187,97 @@
     var countEl = document.getElementById('swoCount');
     var SCHEMA = null;
     var TOTAL = 0;
-    var collapsed = {};   // tableName -> bool (default: collapsed when not filtering)
+    var collapsed = Object.create(null);
+    var printing = false;   // tableName -> bool (default: collapsed when not filtering)
 
     function render() {
         if (!SCHEMA) return;
-        var q = (filterEl.value || '').trim().toLowerCase();
-        var storedOnly = storedOnlyEl.checked;
+        var q = printing ? '' : (filterEl.value || '').trim().toLowerCase();
+        var storedOnly = !printing && storedOnlyEl.checked;
         var shown = 0;
         var names = Object.keys(SCHEMA.tables);
         var htmlOut = names.map(function (t) {
-            var notes = NOTES[t] || {};
+            var notes = Object.hasOwn(NOTES, t) ? NOTES[t] : {};
             var rows = SCHEMA.tables[t].filter(function (f) {
                 var kind = kindOf(f[0]);
                 if (storedOnly && kind !== 'stored') return false;
                 if (!q) return true;
-                var note = notes[f[0]] || '';
+                var note = Object.hasOwn(notes, f[0]) ? notes[f[0]] : '';
                 return (t + ' ' + f[0] + ' ' + f[1] + ' ' + note).toLowerCase().indexOf(q) !== -1;
             });
             if (!rows.length) return '';
             shown += rows.length;
-            var isCollapsed = q ? false : (collapsed[t] !== undefined ? collapsed[t] : true);
+            var isCollapsed = printing || q ? false : (collapsed[t] !== undefined ? collapsed[t] : true);
             var body = rows.map(function (f) {
                 var kind = kindOf(f[0]);
-                var note = notes[f[0]] || '';
+                var note = Object.hasOwn(notes, f[0]) ? notes[f[0]] : '';
                 var star = note.indexOf('★') === 0;
                 return '<tr' + (star ? ' class="swo-row--star"' : '') + '>' +
-                    '<td class="swo-fname">' + (star ? '<i class="fas fa-star swo-star" aria-hidden="true"></i>' : '') + hl(f[0], q) + KIND_BADGE[kind] + '</td>' +
-                    '<td class="swo-ftype">' + esc(f[1]) + '</td>' +
-                    '<td class="swo-fnote">' + (note ? hl(note.replace(/^★\s*/, ''), q) : '') + '</td></tr>';
+                    '<td class="ref-fname">' + (star ? '<i class="fas fa-star swo-star" aria-hidden="true"></i>' : '') + hl(f[0], q) + KIND_BADGE[kind] + '</td>' +
+                    '<td class="ref-ftype">' + esc(f[1]) + '</td>' +
+                    '<td class="ref-fnote">' + (note ? hl(note.replace(/^★\s*/, ''), q) : '') + '</td></tr>';
             }).join('');
-            return '<div class="swo-tbl' + (isCollapsed ? ' collapsed' : '') + '" data-table="' + esc(t) + '">' +
-                '<div class="swo-tbl-head" data-action="toggle"><h3>' + hl(t, q) + '</h3>' +
+            return '<details class="swo-tbl" data-table="' + esc(t) + '"' + (isCollapsed ? '' : ' open') + '>' +
+                '<summary class="swo-tbl-head"><h3>' + hl(t, q) + '</h3>' +
                 '<span class="swo-tbl-count">' + rows.length + ' fields</span>' +
-                '<i class="fas fa-chevron-down swo-tbl-chevron" aria-hidden="true"></i></div>' +
-                '<p class="swo-tbl-desc">' + esc(TABLE_DESC[t] || '') + '</p>' +
-                '<div class="swo-scroll"><table class="swo-table"><thead><tr><th>field</th><th>type</th><th>notes / gotchas</th></tr></thead><tbody>' +
-                body + '</tbody></table></div></div>';
+                '<i class="fas fa-chevron-down swo-tbl-chevron" aria-hidden="true"></i></summary>' +
+                '<p class="swo-tbl-desc">' + esc(Object.hasOwn(TABLE_DESC, t) ? TABLE_DESC[t] : '') + '</p>' +
+                '<div class="ref-scroll" tabindex="0" role="region" aria-label="' + esc(t) + ' fields; scroll horizontally"><table class="ref-table"><thead><tr><th scope="col">field</th><th scope="col">type</th><th scope="col">notes / gotchas</th></tr></thead><tbody>' +
+                body + '</tbody></table></div></details>';
         }).join('');
-        host.innerHTML = shown ? htmlOut : '<div class="swo-empty">No fields match &ldquo;' + esc(q) + '&rdquo;' + (storedOnly ? ' (stored-only is ON)' : '') + '.</div>';
+        // eslint-disable-next-line no-unsanitized/property -- Reference strings are escaped and highlights use fixed markup.
+        host.innerHTML = !names.length ? '<div class="ref-empty" role="status">No tables are available in this catalog.</div>' : shown ? htmlOut : '<div class="ref-empty">No fields match &ldquo;' + esc(q) + '&rdquo;' + (storedOnly ? ' (stored-only is ON)' : '') + '.</div>';
         countEl.textContent = (q || storedOnly)
             ? (shown + ' of ' + TOTAL + ' fields shown' + (storedOnly ? ' · stored only' : '') + (q ? ' · filter: "' + q + '"' : ''))
             : (TOTAL + ' fields across ' + names.length + ' tables — click a table name to expand');
     }
 
-    host.addEventListener('click', function (ev) {
-        var head = ev.target.closest('.swo-tbl-head');
-        if (!head) return;
-        var box = head.closest('.swo-tbl');
-        var t = box.getAttribute('data-table');
-        collapsed[t] = !box.classList.contains('collapsed');
-        box.classList.toggle('collapsed');
-    });
+    // Native details owns keyboard/assistive-technology disclosure behavior.
+    host.addEventListener('toggle', function (event) {
+        if (!printing && !filterEl.value.trim() && event.target.matches('details[data-table]')) {
+            collapsed[event.target.dataset.table] = !event.target.open;
+        }
+    }, true);
 
-    document.addEventListener('DOMContentLoaded', function () {
-        fetch(SCHEMA_URL)
-            .then(function (resp) {
-                if (!resp.ok) throw new Error('HTTP ' + resp.status + ' loading schema JSON');
-                return resp.json();
-            })
-            .then(function (data) {
-                SCHEMA = data;
-                TOTAL = Object.keys(data.tables).reduce(function (n, t) { return n + data.tables[t].length; }, 0);
-                render();
-            })
-            .catch(function (err) {
-                console.error('[shopworks-odbc-reference] schema load failed:', err);
-                countEl.textContent = 'Failed to load field catalog.';
-                host.innerHTML = '<div class="swo-empty" role="alert"><i class="fas fa-triangle-exclamation" aria-hidden="true"></i> Unable to load the field catalog (' + esc(err.message) + '). ' +
-                    '<button type="button" class="dash-btn dash-btn--sm" id="swo-retry">Retry</button></div>';
-                var rb = document.getElementById('swo-retry'); if (rb) rb.addEventListener('click', function () { window.location.reload(); });
-                if (window.DashPage && DashPage.showError) DashPage.showError('Unable to load the ODBC field catalog (' + err.message + ').');
+    function validSchema(data) {
+        return data && typeof data === 'object' && data.tables && typeof data.tables === 'object' && !Array.isArray(data.tables) &&
+            Object.values(data.tables).every(function (fields) {
+                return Array.isArray(fields) && fields.every(function (field) {
+                    return Array.isArray(field) && field.length >= 2 && typeof field[0] === 'string' && typeof field[1] === 'string';
+                });
             });
-        filterEl.addEventListener('input', render);
-        storedOnlyEl.addEventListener('change', render);
-    });
+    }
+
+    async function loadCatalog() {
+        SCHEMA = null;
+        host.setAttribute('aria-busy', 'true');
+        host.textContent = 'Loading field catalog…';
+        countEl.textContent = 'Loading schema…';
+        try {
+            const response = await fetch(SCHEMA_URL);
+            if (!response.ok) throw new Error('The field catalog is unavailable.');
+            const data = await response.json();
+            if (!validSchema(data)) throw new Error('The field catalog has an unexpected format.');
+            SCHEMA = data;
+            TOTAL = Object.values(data.tables).reduce(function (count, fields) { return count + fields.length; }, 0);
+            render();
+        } catch (error) {
+            countEl.textContent = 'Unable to load the field catalog.';
+            host.replaceChildren();
+            const box = document.createElement('div'), message = document.createElement('p'), retry = document.createElement('button');
+            box.className = 'ref-empty'; box.setAttribute('role', 'alert');
+            message.textContent = error.name === 'AbortError' ? 'The field catalog took too long to load. Try again.' : 'Unable to load the field catalog. Check your connection and try again.';
+            retry.type = 'button'; retry.className = 'btn'; retry.textContent = 'Retry';
+            retry.addEventListener('click', loadCatalog);
+            box.append(message, retry); host.append(box);
+        } finally {
+            host.setAttribute('aria-busy', 'false');
+        }
+    }
+
+    filterEl.addEventListener('input', render);
+    storedOnlyEl.addEventListener('change', render);
+    window.addEventListener('beforeprint', function () { printing = true; render(); });
+    window.addEventListener('afterprint', function () { printing = false; render(); });
+    loadCatalog();
 })();

@@ -290,3 +290,5 @@ Training manuals: tokens → components → training-guide → training-referenc
 ### Training Center and simulators
 
 The final four training pages share tokens, components, training-practice and training-simulator. Page owners contain layout only; native buttons/dialogs, named fields, current-round scoring, timer cancellation and visible progress failures stay in the page controllers. Static course data remains unchanged and locked. CSS uses no ID selectors or new important exceptions.
+
+API reference family: Caspio, ManageOrders, SanMar and ShopWorks ODBC load tokens → components → api-reference → page arrangements. Shared reference CSS owns page chrome, labeled search, count/status, endpoint/field tables, callouts, mobile wrapping and paper rhythm. Keep technical catalogs in page controllers/data; original-content and schema guards prevent accidental edits. Native ODBC details and failed/malformed catalogue retry remain page behavior.

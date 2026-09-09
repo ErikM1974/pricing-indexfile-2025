@@ -417,3 +417,21 @@ Actual print review found the tax exercise forced onto a new page and repeated s
 ## Final training release record — v2026.09.08.16
 
 Exact-source CI 34310205668 passed all four jobs on 76a52b66f0de2a049e639a6bc446cd7163e19275, including live money/calculator parity. The Training Center, tax trainer and both ShopWorks simulators now share responsive controls and clear round/progress state. Original course data, fields and options remain locked. Twenty-one focused browser cases cover four widths, keyboard/dialogs, full/restarted rounds, storage/timer failures and compact real PDFs. All 26 tracked training pages are covered. After verified rollout: 60 of 225 application/served-archive pages reviewed/live, 165 pending. Actual slug and live verification follow.
+
+## API reference family plan — 2026-09-08
+
+Work continues with standing edit/deploy authorization. Isolated worktree training-final-worktree now uses branch codex/api-reference-family, based on exact .16 source 76a52b66. Primary .16 deployment remains independent. No API reference changes are live yet.
+
+- [x] Save original static prose, links, fields and reference-data AST hashes for Caspio, ManageOrders, SanMar and ShopWorks ODBC; capture desktop/phone baselines. Artifact api-reference-original-baseline.json is based on 76a52b66.
+- [ ] Replace art-hub/dash-shell dependencies with shared scoped reference layout, tokens and controls; use Public Sans, restrained forest accents, readable endpoint/field tables and useful phone layouts.
+- [ ] Preserve technical content, service/schema paths, identifiers and access gates. Keep descriptions visible on phones; add keyboard table scrolling, labeled searches/status counts and native ODBC disclosure controls. Honor reduced motion and fragment navigation.
+- [ ] Verify failed/malformed/empty ODBC catalog and retry without losing the search. Preserve source catalog and never call business services in browser checks.
+- [ ] Lock original data/content; review four widths, search cases, keyboard, complete printing and access protections; run required full release gates and exact-source CI before release.
+
+Baseline each page loads 169,584–173,804 raw CSS bytes including shared dependencies. Four-page completion would bring the census to 64 reviewed / 161 pending of 225. This is a candidate outcome, not a live count. All original artifacts are in C:/Users/erik/.codex/visualizations/2026/09/07/01a07d90-9a4c-7e70-9e4e-c196377b7c6b. Do not rerun baseline capture or reset this worktree.
+
+## API reference family local review — 2026-09-08
+
+All four API reference pages use tokens/components/api-reference and their page-specific arrangements. Original reference-data AST hashes, prose/links/fields and the ODBC schema are preserved. Strict lint now covers all four controllers. Seventeen focused browser cases passed at 1440/768/390/320 with axe, native disclosure, escaped search, failed/malformed/empty schema and retry, real role/email gates, and print-state restoration. Four final PDF checks then passed after paper refinement; all 2,630 ODBC rows print even from a filtered screen. PDFs: Caspio 16 pages, ManageOrders 14, SanMar 11, ODBC 105. All 114 selected original prose blocks and 2,342 unique catalogue names appear in extracted PDF text; the dynamic Loading placeholder is excluded. Code ligatures are disabled so comparison operators copy exactly. Final rendered review and full integration gates remain before release.
+
+Family CSS graphs: dashboards/caspio-api-reference.html: 173804 → 73142 bytes (58% less); dashboards/manageorders-api-reference.html: 169916 → 72834 bytes (57% less); dashboards/sanmar-api-reference.html: 169584 → 72821 bytes (57% less); dashboards/shopworks-odbc-reference.html: 171448 → 76198 bytes (56% less). These are source bytes, not network payloads. Current production remains .16 / Heroku 2075 / 520acd1d, 60 reviewed and 165 pending. Its follow-up main CI 34311104854 and develop CI 34311287933 passed. API candidate outcome is 64 reviewed / 161 pending, not yet live.

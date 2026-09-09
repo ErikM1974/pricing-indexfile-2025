@@ -3980,3 +3980,30 @@ that need it. 🔑 A "near" colour rule must exempt the page's ink (`--text`, `-
 shade on the body text is a look change even when no pixel crosses the threshold. 🔑 curl exit 35 from the
 office to teamnwca.com is the FortiGate, not the site — check `openssl s_client -connect … | grep issuer`.
 
+
+
+## 2026-09-07 — Server split, first cut: three ways "moved verbatim" was not the same server
+
+**Problem.** Six sections of the 15,947-line `server.js` moved byte for byte into `routes/*.js`, the registration-order
+lock passed, and the server did not boot — then, once it booted, it would have served the static mounts from the
+wrong folder. (a) `requireStaff` was missing from the module's ctx: eslint-scope leaves references to top-level
+`function`/`var` declarations unresolved in a classic script (they are global-object properties), so the dependency
+analysis, built on `variable.references`, saw only the `const` bindings. (b) A later cut's line range began on the
+previous cut's call-site line, so `require('./routes/ai-chat')(app, ctx)` moved INTO `routes/gear-publisher.js`, where
+it resolves relative to `routes/`. The order lock still passed because the walker followed the include wherever it sat.
+(c) `require('./lib/blog')` and `path.join(__dirname, 'staff-dashboard-v3')` inside moved code now named `routes/…`:
+the first threw at boot, the second would have 404'd every static mount without any test noticing. Separately, the
+first attempt collided with another assistant's uncommitted change in the same tree.
+**Root cause.** Textual moves preserve bytes, not meaning: scope resolution, module-relative paths and the cut's
+own artefacts all changed meaning silently.
+**Solution.** References matched by name against module-scope declarations (ignoring references resolved to inner
+bindings); `check-undef.js` (ESLint no-undef with Node globals over `routes/`) after every cut; the walker errors on a
+call site inside a module; the extractor rewrites `require('./…')` → `require('../…')` and `__dirname`/`__filename` →
+`SERVER_DIR`/`SERVER_FILE` passed through ctx, and the lock forbids the raw forms; a boot smoke (`PORT=3999 timeout 15
+node server.js`) plus real requests to moved routes before any gate. The other agent's change went into a git stash
+for the duration and came back after the deploy.
+**Prevention.** 🔑 After any code move, boot the server and hit one moved route: a passing order lock proves order,
+not resolution. 🔑 Derive a cut's range from the section banner every time — never from arithmetic on stale numbers —
+and check the first line is the rule line, not a neighbour's call site. 🔑 Treat `__dirname` and `require('./…')` as
+part of a file's address, not its code. 🔑 One agent in `server.js` at a time; `git stash -u` is the tool when it is not.
+

@@ -1629,6 +1629,132 @@
         "malformed progress",
         "timer cancellation"
       ]
+    },
+    {
+      "source": "dashboards/caspio-api-reference.html",
+      "family": "api-reference",
+      "status": "pilot",
+      "route": "/dashboards/caspio-api-reference.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/api-reference.css",
+        "dashboards/css/caspio-api-reference.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "four-widths",
+        "keyboard",
+        "search",
+        "empty-search",
+        "escaped-query",
+        "complete-print",
+        "protected-route"
+      ],
+      "test": "tests/e2e/css-unification-api-reference.spec.js",
+      "maxCssBytes": 73642,
+      "baseline": {
+        "commit": "76a52b66f0de2a049e639a6bc446cd7163e19275",
+        "rawCssBytes": 173804,
+        "localCssRequests": 4
+      },
+      "measuredRawCssBytes": 73142
+    },
+    {
+      "source": "dashboards/manageorders-api-reference.html",
+      "family": "api-reference",
+      "status": "pilot",
+      "route": "/dashboards/manageorders-api-reference.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/api-reference.css",
+        "dashboards/css/manageorders-api-reference.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "four-widths",
+        "keyboard",
+        "search",
+        "empty-search",
+        "escaped-query",
+        "complete-print",
+        "protected-route"
+      ],
+      "test": "tests/e2e/css-unification-api-reference.spec.js",
+      "maxCssBytes": 73334,
+      "baseline": {
+        "commit": "76a52b66f0de2a049e639a6bc446cd7163e19275",
+        "rawCssBytes": 169916,
+        "localCssRequests": 4
+      },
+      "measuredRawCssBytes": 72834
+    },
+    {
+      "source": "dashboards/sanmar-api-reference.html",
+      "family": "api-reference",
+      "status": "pilot",
+      "route": "/dashboards/sanmar-api-reference.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/api-reference.css",
+        "dashboards/css/sanmar-api-reference.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "four-widths",
+        "keyboard",
+        "search",
+        "empty-search",
+        "escaped-query",
+        "complete-print",
+        "protected-route"
+      ],
+      "test": "tests/e2e/css-unification-api-reference.spec.js",
+      "maxCssBytes": 73321,
+      "baseline": {
+        "commit": "76a52b66f0de2a049e639a6bc446cd7163e19275",
+        "rawCssBytes": 169584,
+        "localCssRequests": 4
+      },
+      "measuredRawCssBytes": 72821
+    },
+    {
+      "source": "dashboards/shopworks-odbc-reference.html",
+      "family": "api-reference",
+      "status": "pilot",
+      "route": "/dashboards/shopworks-odbc-reference.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/api-reference.css",
+        "dashboards/css/shopworks-odbc-reference.css"
+      ],
+      "dynamicStyles": [],
+      "states": [
+        "four-widths",
+        "keyboard",
+        "search",
+        "empty-search",
+        "escaped-query",
+        "complete-print",
+        "protected-route",
+        "native-disclosure",
+        "stored-only",
+        "load-error",
+        "malformed",
+        "retry",
+        "empty-schema"
+      ],
+      "test": "tests/e2e/css-unification-api-reference.spec.js",
+      "maxCssBytes": 76698,
+      "baseline": {
+        "commit": "76a52b66f0de2a049e639a6bc446cd7163e19275",
+        "rawCssBytes": 171448,
+        "localCssRequests": 4
+      },
+      "measuredRawCssBytes": 76198
     }
   ],
   "billingContentSha256": "d85f8530e03a1863d1b8bb2ebe97ba332d5c9e3411887d1eb2d02dcdb14c0863",

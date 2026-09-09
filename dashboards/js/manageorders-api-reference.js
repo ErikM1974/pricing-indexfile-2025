@@ -223,9 +223,16 @@
     ];
 
     function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+    // Highlight raw text segments, then escape each segment before adding fixed mark tags.
     function hl(text, q) {
-        var s = esc(text); if (!q) return s;
-        try { return s.replace(new RegExp('(' + esc(q).replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'ig'), '<mark class="mo-hit">$1</mark>'); } catch (e) { return s; }
+        var value = String(text), needle = String(q || '').toLowerCase();
+        if (!needle) return esc(value);
+        var lower = value.toLowerCase(), at = 0, hit, output = '';
+        while ((hit = lower.indexOf(needle, at)) !== -1) {
+            output += esc(value.slice(at, hit)) + '<mark class="ref-hit">' + esc(value.slice(hit, hit + needle.length)) + '</mark>';
+            at = hit + needle.length;
+        }
+        return output + esc(value.slice(at));
     }
 
     var epHost = document.getElementById('moEndpoints');
@@ -235,10 +242,11 @@
     var TOTAL_FIELDS = MODELS.reduce(function (n, m) { return n + m.fields.length; }, 0);
 
     function renderEndpoints() {
+        // eslint-disable-next-line no-unsanitized/property -- Reference strings are escaped and highlights use fixed markup.
         epHost.innerHTML = ENDPOINTS.map(function (e) {
-            return '<div class="mo-ep"><span class="mo-m ' + esc(e[0]) + '">' + esc(e[0]) + '</span>' +
-                '<span class="mo-path">' + esc(e[1]) + '</span><span class="mo-grp">' + esc(e[2]) + '</span>' +
-                '<span class="mo-desc">' + esc(e[3]) + '</span></div>';
+            return '<div class="ref-ep"><span class="ref-method ' + esc(e[0]) + '">' + esc(e[0]) + '</span>' +
+                '<span class="ref-path">' + esc(e[1]) + '</span><span class="ref-group">' + esc(e[2]) + '</span>' +
+                '<span class="ref-desc">' + esc(e[3]) + '</span></div>';
         }).join('');
     }
 
@@ -247,27 +255,30 @@
         var htmlOut = MODELS.map(function (m) {
             var rows = m.fields.filter(function (f) {
                 if (!q) return true;
-                return (f[0] + ' ' + f[1] + ' ' + f[3]).toLowerCase().indexOf(q) !== -1;
+                return (m.name + ' ' + f[0] + ' ' + f[1] + ' ' + f[3]).toLowerCase().indexOf(q) !== -1;
             });
             if (!rows.length) return '';
             shown += rows.length;
             var body = rows.map(function (f) {
                 return '<tr' + (f[2] ? ' class="mo-req-row"' : '') + '>' +
-                    '<td class="mo-fname">' + hl(f[0], q) + (f[2] ? ' <span class="mo-req">*</span>' : '') + '</td>' +
-                    '<td class="mo-ftype">' + esc(f[1]) + '</td>' +
-                    '<td class="mo-fnote">' + (f[3] ? hl(f[3], q) : '') + '</td></tr>';
+                    '<td class="ref-fname">' + hl(f[0], q) + (f[2] ? ' <span class="ref-req">*</span>' : '') + '</td>' +
+                    '<td class="ref-ftype">' + esc(f[1]) + '</td>' +
+                    '<td class="ref-fnote">' + (f[3] ? hl(f[3], q) : '') + '</td></tr>';
             }).join('');
-            return '<div class="mo-model"><div class="mo-model-head"><h3>' + esc(m.name) + '</h3>' +
-                '<span class="mo-model-count">' + rows.length + ' fields</span></div>' +
-                '<p class="mo-model-desc">' + esc(m.desc) + '</p>' +
-                '<div class="mo-scroll"><table class="mo-table"><thead><tr><th>field</th><th>type</th><th>notes / gotchas</th></tr></thead><tbody>' +
+            return '<div class="ref-model"><div class="ref-model-head"><h3>' + esc(m.name) + '</h3>' +
+                '<span class="ref-model-count">' + rows.length + ' fields</span></div>' +
+                '<p class="ref-model-desc">' + esc(m.desc) + '</p>' +
+                '<div class="ref-scroll" tabindex="0" role="region" aria-label="Reference fields; scroll horizontally"><table class="ref-table"><thead><tr><th scope="col">field</th><th scope="col">type</th><th scope="col">notes / gotchas</th></tr></thead><tbody>' +
                 body + '</tbody></table></div></div>';
         }).join('');
-        host.innerHTML = shown ? htmlOut : '<div class="mo-empty">No fields match &ldquo;' + esc(q) + '&rdquo;.</div>';
+        // eslint-disable-next-line no-unsanitized/property -- Reference strings are escaped and highlights use fixed markup.
+        host.innerHTML = shown ? htmlOut : '<div class="ref-empty">No fields match &ldquo;' + esc(q) + '&rdquo;.</div>';
         countEl.textContent = q ? (shown + ' of ' + TOTAL_FIELDS + ' fields match') : (TOTAL_FIELDS + ' fields across ' + MODELS.length + ' models');
     }
 
     renderEndpoints();
     renderModels('');
     if (filter) filter.addEventListener('input', function () { renderModels(filter.value.trim().toLowerCase()); });
+    window.addEventListener('beforeprint', function () { renderModels(''); });
+    window.addEventListener('afterprint', function () { renderModels(filter.value.trim().toLowerCase()); });
 })();

@@ -1,0 +1,572 @@
+/* Shared API references. Tokens/components first; page-specific data and arrangements stay in their owners. */
+@layer components.patterns {
+    :where([data-ui="unified"][data-reference]) .ref-shell {
+        min-height: 100vh;
+    }
+
+    :where([data-ui="unified"][data-reference]) .ref-header {
+        padding: var(--space-6) max(var(--space-4), calc((100vw - 1200px) / 2));
+        background: var(--ui-surface);
+        border-block-start: 4px solid var(--ui-accent);
+        border-block-end: 1px solid var(--ui-line);
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-5);
+    }
+
+    :where([data-ui="unified"][data-reference]) .ref-heading-group {
+        display: flex;
+        align-items: center;
+        gap: var(--space-5);
+        min-width: 0;
+        flex: 1 1 620px;
+    }
+
+    :where([data-ui="unified"][data-reference]) .ref-logo {
+        width: 86px;
+        padding: var(--space-2);
+        background: var(--ui-surface);
+        border-radius: var(--radius-sm);
+        display: block;
+    }
+
+    :where([data-ui="unified"][data-reference]) .ref-title {
+        font-size: clamp(1.6rem, 2.8vw, 2.25rem);
+        letter-spacing: -0.03em;
+        margin: 0;
+        font-weight: 700;
+    }
+
+    :where([data-ui="unified"][data-reference]) .ref-subtitle {
+        display: block;
+        color: var(--ui-muted);
+        font-size: var(--font-size-md);
+        font-weight: 400;
+        letter-spacing: normal;
+        margin-block-start: var(--space-2);
+    }
+
+    :where([data-ui="unified"][data-reference]) .ref-header-actions {
+        display: flex;
+        align-items: center;
+        gap: var(--space-4);
+        flex-wrap: wrap;
+    }
+
+    :where([data-ui="unified"][data-reference]) .ref-lock {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-2);
+        color: var(--ui-muted);
+        font-size: var(--font-size-md);
+    }
+
+    :where([data-ui="unified"][data-reference]) .ref-workspace {
+        width: min(1200px, calc(100% - var(--space-8)));
+        margin: var(--space-7) auto;
+    }
+
+    :where([data-ui="unified"][data-reference]) .ref-section {
+        padding: clamp(1rem, 3vw, 2rem);
+        background: var(--ui-surface);
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-md);
+        margin-block: var(--space-6);
+        min-width: 0;
+        scroll-margin-block: var(--space-5);
+    }
+
+    :where([data-ui="unified"][data-reference]) .ref-section p {
+        line-height: 1.65;
+    }
+
+    :where([data-ui="unified"][data-reference]) .ref-section :is(p, li, td, th) {
+        overflow-wrap: anywhere;
+    }
+
+    :where([data-ui="unified"][data-reference]) .ref-section :is(ul, ol) {
+        padding-inline-start: var(--space-5);
+    }
+
+    :where([data-ui="unified"][data-reference]) .ref-section li {
+        margin-block: var(--space-2);
+    }
+
+    :where([data-ui="unified"][data-reference]) .ref-lead {
+        font-size: var(--font-size-lg);
+        line-height: 1.65;
+        margin-block: 0 var(--space-5);
+        max-width: 95ch;
+    }
+
+    :where([data-ui="unified"][data-reference]) .ref-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-2);
+        margin-block: var(--space-5);
+    }
+
+    :where([data-ui="unified"][data-reference]) .ref-chip {
+        padding: var(--space-2) var(--space-3);
+        font-size: var(--font-size-md);
+        color: var(--ui-muted);
+        background: var(--ui-canvas);
+        border-radius: var(--radius-sm);
+        overflow-wrap: anywhere;
+    }
+
+    :where([data-ui="unified"][data-reference]) .ref-chip b {
+        color: var(--ui-ink);
+    }
+
+    :where([data-ui="unified"][data-reference]) .ref-heading {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        gap: var(--space-3);
+        font-size: var(--font-size-2xl);
+        margin: 0 0 var(--space-5);
+        padding-block-end: var(--space-4);
+        border-block-end: 1px solid var(--ui-line);
+    }
+
+    :where([data-ui="unified"][data-reference]) .ref-heading--flush {
+        margin: 0;
+        padding: 0;
+        border: 0;
+    }
+
+    :where([data-ui="unified"][data-reference]) .ref-tag {
+        color: var(--ui-muted);
+        font-size: var(--font-size-sm);
+        font-weight: 500;
+        letter-spacing: 0.03em;
+    }
+
+    :where([data-ui="unified"][data-reference]) .ref-callout {
+        border-inline-start: 3px solid var(--ui-line-strong);
+        padding: var(--space-4) var(--space-5);
+        background: var(--ui-canvas);
+        margin-block: var(--space-5);
+        border-radius: var(--radius-sm);
+    }
+
+    :where([data-ui="unified"][data-reference]) .ref-callout h4 {
+        margin: 0 0 var(--space-2);
+        font-size: var(--font-size-base);
+    }
+
+    :where([data-ui="unified"][data-reference]) .ref-callout :is(p, li) {
+        font-size: var(--font-size-md);
+    }
+
+    :where([data-ui="unified"][data-reference]) .ref-callout > :last-child {
+        margin-block-end: 0;
+    }
+
+    :where([data-ui="unified"][data-reference]) .ref-callout--danger {
+        border-color: var(--color-danger-ink);
+        background: var(--color-danger-bg);
+    }
+
+    :where([data-ui="unified"][data-reference]) .ref-callout--warn {
+        border-color: var(--color-warning);
+        background: var(--color-warning-bg);
+    }
+
+    :where([data-ui="unified"][data-reference]) .ref-callout--tip {
+        border-color: var(--color-info);
+        background: var(--color-info-bg);
+    }
+
+    :where([data-ui="unified"][data-reference]) .ref-callout--good {
+        border-color: var(--color-success);
+        background: var(--color-success-bg);
+    }
+
+    :where([data-ui="unified"][data-reference]) :is(.ref-note, .ref-foot, .ref-model-desc) {
+        font-size: var(--font-size-md);
+        color: var(--ui-muted);
+        line-height: 1.65;
+    }
+
+    :where([data-ui="unified"][data-reference]) .ref-foot {
+        margin-block: var(--space-8);
+        padding-block-start: var(--space-5);
+        border-block-start: 1px solid var(--ui-line);
+        overflow-wrap: anywhere;
+    }
+
+    :where([data-ui="unified"][data-reference]) :is(code, pre, .ref-path, .ref-fname, .ref-ftype) {
+        font-family: 'JetBrains Mono', ui-monospace, monospace;
+        font-variant-ligatures: none;
+        font-feature-settings: 'calt' 0;
+    }
+
+    :where([data-ui="unified"][data-reference]) code {
+        font-size: 0.86em;
+        overflow-wrap: anywhere;
+    }
+
+    :where([data-ui="unified"][data-reference]) pre {
+        font-size: var(--font-size-md);
+        line-height: 1.6;
+        max-width: 100%;
+        overflow: auto;
+        background: var(--ui-canvas);
+        padding: var(--space-4);
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-sm);
+        tab-size: 2;
+    }
+
+    :where([data-ui="unified"][data-reference]) pre code {
+        font-size: inherit;
+    }
+
+    :where([data-ui="unified"][data-reference]) .ref-search-head {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-3);
+        align-items: center;
+        border-block-end: 1px solid var(--ui-line);
+        padding-block-end: var(--space-4);
+        margin-block-end: var(--space-3);
+    }
+
+    :where([data-ui="unified"][data-reference]) .ref-search-head .ref-heading {
+        flex: 1 1 100%;
+    }
+
+    :where([data-ui="unified"][data-reference]) .ref-search-label {
+        font-size: var(--font-size-md);
+        font-weight: 600;
+    }
+
+    :where([data-ui="unified"][data-reference]) .ref-filter {
+        flex: 1 1 280px;
+        max-width: 600px;
+        min-width: 0;
+    }
+
+    :where([data-ui="unified"][data-reference]) .ref-status {
+        font-size: var(--font-size-md);
+        color: var(--ui-muted);
+        margin-block: var(--space-3) var(--space-6);
+    }
+
+    :where([data-ui="unified"][data-reference]) .ref-model {
+        margin-block: var(--space-6);
+    }
+
+    :where([data-ui="unified"][data-reference]) .ref-model-head {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        gap: var(--space-3);
+        margin-block: var(--space-6) var(--space-2);
+    }
+
+    :where([data-ui="unified"][data-reference]) .ref-model-head h3 {
+        font-size: var(--font-size-lg);
+        margin: 0;
+        color: var(--ui-accent);
+        overflow-wrap: anywhere;
+    }
+
+    :where([data-ui="unified"][data-reference]) .ref-model-count {
+        font-size: var(--font-size-sm);
+        color: var(--ui-muted);
+        font-weight: 500;
+    }
+
+    :where([data-ui="unified"][data-reference]) .ref-model-desc {
+        margin-block: var(--space-2) var(--space-4);
+    }
+
+    :where([data-ui="unified"][data-reference]) .ref-scroll {
+        max-width: 100%;
+        overflow: auto;
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-sm);
+    }
+
+    :where([data-ui="unified"][data-reference]) .ref-table {
+        width: 100%;
+        min-width: 660px;
+        border-collapse: collapse;
+        font-size: var(--font-size-md);
+    }
+
+    :where([data-ui="unified"][data-reference]) .ref-table :is(th, td) {
+        text-align: start;
+        padding: var(--space-3);
+        vertical-align: top;
+        border-block-end: 1px solid var(--ui-line);
+        line-height: 1.6;
+    }
+
+    :where([data-ui="unified"][data-reference]) .ref-table th {
+        background: var(--ui-canvas);
+        font-size: var(--font-size-sm);
+        font-weight: 600;
+        letter-spacing: 0.03em;
+    }
+
+    :where([data-ui="unified"][data-reference]) .ref-table tr:last-child td {
+        border-block-end: 0;
+    }
+
+    :where([data-ui="unified"][data-reference]) .ref-fname {
+        color: var(--ui-ink);
+        font-weight: 600;
+        width: 31%;
+        overflow-wrap: anywhere;
+    }
+
+    :where([data-ui="unified"][data-reference]) .ref-ftype {
+        color: var(--ui-muted);
+        width: 15%;
+    }
+
+    :where([data-ui="unified"][data-reference]) .ref-fnote {
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-reference]) .ref-eplist {
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-sm);
+        overflow: hidden;
+    }
+
+    :where([data-ui="unified"][data-reference]) .ref-ep {
+        display: flex;
+        align-items: baseline;
+        flex-wrap: wrap;
+        gap: var(--space-2) var(--space-3);
+        padding: var(--space-4);
+        border-block-end: 1px solid var(--ui-line);
+    }
+
+    :where([data-ui="unified"][data-reference]) .ref-ep:last-child {
+        border-block-end: 0;
+    }
+
+    :where([data-ui="unified"][data-reference]) .ref-ep:hover {
+        background: var(--ui-tint);
+    }
+
+    :where([data-ui="unified"][data-reference]) .ref-path {
+        font-size: var(--font-size-md);
+        font-weight: 600;
+        overflow-wrap: anywhere;
+        min-width: 0;
+    }
+
+    :where([data-ui="unified"][data-reference]) .ref-desc {
+        font-size: var(--font-size-md);
+        color: var(--ui-muted);
+        flex: 1 1 360px;
+        line-height: 1.6;
+        overflow-wrap: anywhere;
+    }
+
+    :where([data-ui="unified"][data-reference]) :is(.ref-method, .ref-group) {
+        font-size: var(--font-size-sm);
+        font-weight: 600;
+        background: var(--ui-canvas);
+        color: var(--ui-accent);
+        padding: var(--space-1) var(--space-2);
+        border-radius: var(--radius-sm);
+    }
+
+    :where([data-ui="unified"][data-reference]) .ref-method.DELETE {
+        color: var(--color-danger-ink);
+        background: var(--color-danger-bg);
+    }
+
+    :where([data-ui="unified"][data-reference]) .ref-method:is(.POST, .PUT, .PATCH) {
+        background: var(--ui-tint);
+    }
+
+    :where([data-ui="unified"][data-reference]) .ref-empty {
+        padding: var(--space-6);
+        color: var(--ui-muted);
+        background: var(--ui-canvas);
+        border-radius: var(--radius-sm);
+    }
+
+    :where([data-ui="unified"][data-reference]) mark.ref-hit {
+        background: var(--color-warning-bg);
+        color: var(--ui-ink);
+        border-radius: var(--radius-sm);
+    }
+
+    :where([data-ui="unified"][data-reference]) .ref-req {
+        color: var(--color-danger-ink);
+        font-weight: 700;
+    }
+
+    :where([data-ui="unified"][data-reference]) .ref-toc {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-2) var(--space-4);
+        padding: var(--space-4) 0;
+        border-block: 1px solid var(--ui-line);
+    }
+
+    :where([data-ui="unified"][data-reference]) .ref-toc a {
+        display: inline-flex;
+        align-items: center;
+        min-height: 44px;
+        font-size: var(--font-size-md);
+    }
+
+    :where([data-ui="unified"][data-reference]) .ref-skip {
+        position: absolute;
+        inset-block-start: 0;
+        inset-inline-start: var(--space-4);
+        transform: translateY(-120%);
+        padding: var(--space-3);
+        background: var(--ui-surface);
+        z-index: 20;
+    }
+
+    :where([data-ui="unified"][data-reference]) .ref-skip:focus {
+        transform: translateY(0);
+    }
+}
+
+@media (width <= 700px) {
+    @layer components.patterns {
+        :where([data-ui="unified"][data-reference]) .ref-workspace {
+            width: calc(100% - var(--space-6));
+            margin-block: var(--space-4);
+        }
+
+        :where([data-ui="unified"][data-reference]) .ref-header {
+            padding: var(--space-4);
+        }
+
+        :where([data-ui="unified"][data-reference]) .ref-heading-group {
+            align-items: flex-start;
+            gap: var(--space-3);
+        }
+
+        :where([data-ui="unified"][data-reference]) .ref-logo {
+            width: 64px;
+        }
+
+        :where([data-ui="unified"][data-reference]) .ref-title {
+            font-size: var(--font-size-2xl);
+        }
+
+        :where([data-ui="unified"][data-reference]) .ref-subtitle {
+            font-size: var(--font-size-md);
+        }
+
+        :where([data-ui="unified"][data-reference]) .ref-section {
+            margin-block: var(--space-4);
+        }
+
+        :where([data-ui="unified"][data-reference]) .ref-desc {
+            flex-basis: 100%;
+        }
+
+        :where([data-ui="unified"][data-reference]) .ref-lead {
+            font-size: var(--font-size-base);
+        }
+
+        :where([data-ui="unified"][data-reference]) .ref-filter {
+            flex-basis: 100%;
+        }
+    }
+}
+
+@media print {
+    @layer components.print {
+        [data-ui="unified"][data-reference] { background: var(--ui-surface); font-size: 10.5pt; }
+
+        :where([data-ui="unified"][data-reference]) .ref-header-actions,
+        :where([data-ui="unified"][data-reference]) .ref-toc,
+        :where([data-ui="unified"][data-reference]) .ref-skip,
+        :where([data-ui="unified"][data-reference]) .ref-search-label,
+        :where([data-ui="unified"][data-reference]) .ref-filter,
+        :where([data-ui="unified"][data-reference]) .swo-toggle {
+            display: none;
+        }
+
+        :where([data-ui="unified"][data-reference]) .ref-header {
+            padding: 0 0 12pt;
+            border-block-start: 0;
+            background: white;
+        }
+
+        :where([data-ui="unified"][data-reference]) .ref-logo {
+            width: 50pt;
+        }
+
+        :where([data-ui="unified"][data-reference]) .ref-title {
+            font-size: 20pt;
+        }
+
+        :where([data-ui="unified"][data-reference]) .ref-workspace {
+            width: 100%;
+            margin: 0;
+        }
+
+        :where([data-ui="unified"][data-reference]) .ref-section {
+            padding: 0;
+            border: 0;
+            margin: 16pt 0;
+            background: white;
+        }
+
+        :where([data-ui="unified"][data-reference]) .ref-scroll {
+            overflow: visible;
+            border: 0;
+        }
+
+        :where([data-ui="unified"][data-reference]) .ref-table {
+            min-width: 0;
+            table-layout: fixed;
+            font-size: 8pt;
+        }
+
+        :where([data-ui="unified"][data-reference]) .ref-table :is(td, th) {
+            padding: 5pt;
+            overflow-wrap: anywhere;
+        }
+
+        :where([data-ui="unified"][data-reference]) .ref-table tr {
+            break-inside: avoid;
+        }
+
+        :where([data-ui="unified"][data-reference]) :is(h2, h3, h4, .ref-model-head) {
+            break-after: avoid;
+        }
+
+        :where([data-ui="unified"][data-reference]) pre {
+            white-space: pre-wrap;
+            overflow: visible;
+            font-size: 8pt;
+        }
+
+        :where([data-ui="unified"][data-reference]) .ref-model-head {
+            margin-block: 12pt 4pt;
+        }
+
+        :where([data-ui="unified"][data-reference]) .ref-ep {
+            break-inside: avoid;
+            padding: 6pt;
+        }
+
+        :where([data-ui="unified"][data-reference]) .ref-callout {
+            break-inside: auto;
+        }
+
+        :where([data-ui="unified"][data-reference]) .ref-foot { margin-block: 6pt; padding-block-start: 6pt; font-size: 8pt; break-inside: avoid; }
+    }
+}
