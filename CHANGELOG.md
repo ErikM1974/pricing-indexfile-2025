@@ -1,3 +1,18 @@
+## v2026.09.09.12 (2026.09.09)
+
+- Plan isolated staff monitoring and audit CSS review
+- Record isolated staff monitoring layout implementation
+- Record monitoring response validation and source test plan
+- Record reviewed monitoring layouts and complete audit paper
+- Unify staff monitoring pages with reliable status, audit controls and complete print
+- Plan paired staff download and local conversion tools
+- Record shared staff import layout and pending review
+- Record staff import dependency errors and source checks
+- Unify SanMar downloads and local parts conversion layouts
+- Record verified staff tools release and reviewed monitoring checkpoint
+- Integrate reviewed staff monitoring and file tools
+- Deploy v2026.09.09.12: unify five monitoring and import pages
+
 ## v2026.09.09.11 (2026.09.09)
 
 - Plan shared staff access and portal tools
