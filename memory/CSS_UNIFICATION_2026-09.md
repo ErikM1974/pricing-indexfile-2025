@@ -715,3 +715,7 @@ Next isolated batch: vendor-portals/sanmar-vendor-portal.html, sanmar-invoices.h
 - [ ] Consolidate wrapper CSS, accessible navigation/table scrolling and persistent hosted fallback; register lifecycle.
 - [ ] Four widths/axe, keyboard/empty/error boundaries, original embed contracts and complete reference/data-fixture print review.
 - [ ] Full primary gates/exact-source CI/actual deployment after intake4 .8. Vendor3 not reviewed or counted yet.
+
+## Vendor portal wrappers implementation in progress — 2026-09-09
+
+Three original desktop/phone views captured with synthetic Caspio reports; both hosted DataPage entry URLs respond200. Canonical navigation, Bradley accent and one scoped arrangement replace duplicated WSU styles. Exact invoice/credit embed URLs unchanged; persistent hosted fallback links, named keyboard-scroll regions and paper destinations added. Vendor-owned controls and data are not rewritten. Four-width/axe, external login/report/empty/error boundary and full synthetic paper review still required. Candidate .9, isolated from intake .8 running primary gates.
