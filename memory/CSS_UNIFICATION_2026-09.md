@@ -1143,3 +1143,7 @@ Full integrated source passed build/lint/types,485routes/24modules,232unit suite
 ## Lead records CI portability repair
 
 Exact-source CI34439501966 on637361ee failed three of679mocked browser comparisons because the original captures use Pacific timestamps and Linux defaults to UTC (11:00a versus6:00p).676browser cases passed; unit/lint/types passed; live parity was not run after the browser failure. Application implementation is unchanged. The lead-record spec now explicitly sets America/Los_Angeles; all25focused cases pass with process TZ=UTC. Prior full local checks remain applicable to unchanged application bytes, and the new exact-source CI must run all679browser cases and actual live money/calculator parity before release.
+
+## CRM release record — v2026.09.09.20
+
+Exact-source CI 34440499535 passed all four jobs on c8523b2655fd1dadb2bdcf678309dc882850ba1e, including actual live money/calculator parity and679mocked browser checks. Three record workspaces share canonical CRM controls and layouts.25 focused scenarios,275 source/CSS/historical checks,17 original source hashes/93 mapped edits and explicit retirement provenance, five PDF outputs/seven pages. Four old sheets/four flags retired;485 routes unchanged. Shared art-module styling remains pending. Count becomes158 reviewed/67 pending only after verified rollout.

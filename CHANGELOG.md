@@ -1,3 +1,14 @@
+## v2026.09.09.20 (2026.09.09)
+
+- Plan lead detail and Forms Inbox CSS consolidation with original source locks
+- Include marketing shipments in lead records CSS plan and preserve originals
+- Record verified CRM release and three-page lead records continuation
+- Checkpoint lead records CSS draft with original contracts and focused browser checks
+- Unify lead records, preserve data and guard stale asynchronous updates
+- Integrate reviewed lead records and preserve the verified CRM release
+- Deploy v2026.09.09.20: unify lead records, form submissions and marketing shipments
+- Deploy v2026.09.09.20: pin CRM snapshot timezone across test runners
+
 ## v2026.09.09.19 (2026.09.09)
 
 - Plan shared CRM account and lead pipeline layouts
