@@ -58,26 +58,17 @@ live-engine specs back on in CI, add `CRM_API_SECRET` under Settings → Secrets
 
 CI setup follow-up (2026-09-09): a Google Chrome apt index checksum mismatch blocked Playwright before tests on two runners. CI uses bundled Chromium; disable only the unrelated Google Chrome source on the disposable runner and keep Ubuntu repositories/checksum verification intact. Require the actual browser steps to pass on the new exact commit.
 
-## 2026-09-08 — Node runtime and dependency audit must match CI
+## Runtime and dependency audit (2026-09-08, archived)
 
-**Problem.** Production and CI selected Node 18 while local checks ran Node 22; 17 high audit findings remained.
-**Root cause.** Old lockfile resolutions and exact transitive pins kept vulnerable packages installed.
-**Solution.** Select Node 22 in engines and all CI jobs; Express 4.22.2, Axios 1.20.0, compatible audit fixes,
-and a qs 6.16 override (Express/body-parser pin an older minor). The repository Actions secret is now configured
-with Erik's explicit approval; verify the live-engine step actually runs on the next CI push.
-**Prevention.** Audit the resolved tree after updating: a green install is not a clean audit. Preserve CRLF in
-these two already-CRLF-tracked package files to avoid hiding the dependency diff. Major upgrades stay separate.
+Match production/CI runtimes, audit the resolved tree and verify actual live-pricing CI steps. Full incident in LESSONS_LEARNED_ARCHIVE.md.
 
 ## Tooling upgrades and visual verification (2026-09-07, archived)
 
 Keep version choices tied to measured checks and compare screenshots only after readiness. Full entry in LESSONS_LEARNED_ARCHIVE.md.
 
-## 2026-09-07 — DTF browser checks must await initialization
+## DTF browser readiness (2026-09-07, archived)
 
-**Problem:** The money-path test typed before the search listener existed; its trace contained no product lookup.
-**Root cause:** The search box is visible before async pricing initialization binds listeners.
-**Solution:** In the browser test, await the existing end-of-init inline overlay state before typing. Production code and money assertions are unchanged.
-**Prevention:** Wait for functional readiness, not merely static HTML visibility; retain both blocked-save and successful-save coverage.
+Wait for functional initialization before typing; retain failed and successful save coverage. Full entry in LESSONS_LEARNED_ARCHIVE.md.
 
 ## Calculator prerequisite failures must stop pricing (2026-09-07)
 - Problem: color/size failures were swallowed; the next pricing stage could hide the error or reuse another style's size data.
@@ -253,3 +244,18 @@ Problem/root cause: incomplete invoices looked empty, failed import logs were cl
 - Problem/root cause: A stale linked quote can update the current lead after refresh; removed kit/art hosts can still receive asynchronous callbacks. Native dialog conversion and fixed banners can also lose focus or cover recovery controls.
 - Solution: bind quote rendering and existing value sync to the current view sequence, lead object, quote ID and connected target. Reject malformed replies, ignore superseded loads, preserve uncertain outreach warnings beside the action, contain modal focus, and block all unknown API traffic in previews.
 - Prevention: mock delayed responses and every write, verify unchanged valid quote sync and original payloads, reverse recorded controller changes into original source hashes, and retain explicit shared-module ownership. Inspect populated PDFs: narrow grids can split money; give the order table full width and verify every row and rendered page. Precompute file updates before writing so a missing preview anchor cannot leave a partial batch. Timestamp-based browser snapshots must set the baseline time zone explicitly; fixed Date.now alone does not standardize local date formatting on Windows and Linux.
+
+## Personalization lists must retain failed-load state (2026-09-09)
+
+- Problem/root cause: after a failed refresh, search/status changes rendered old monogram or roster data and removed Retry; missing roster arrays looked like zero records.
+- Solution: clear prior records/counts when loading, validate list arrays, preserve the error while filtering, and accept only the latest request before rendering. Current filters apply after a successful retry.
+- Prevention: synthetic failure/filter/retry, missing-list and out-of-order success cases must exercise the actual controls; wait for debounced handlers before judging output. Keep original rows, field values and controller/service source hashes outside mapped UI/recovery edits.
+
+## Personalization forms must preserve saved details and complete paper output (2026-09-09)
+
+**Problem:** Saved catalog styles reopened blank; custom styles interrupted loading, and editing manual styles threw. Wide roster printouts clipped garment/custom columns.
+**Root cause:** The loader populated only the custom dropdown path although saved forms create manual inputs; subsequent handlers assumed every style control was a select. The editable roster table was wider than the printed page.
+**Solution:** Restore saved styles and custom flags in manual rows, clear prior lookup constraints, guard dropdown-only handlers and retain flags through row rebuilds. Render the active roster group on paper in bounded column sections with repeated identities/headings, using existing descriptors and unchanged size-breakdown output.
+**Prevention:** Test catalog/custom round trips, row rebuilding, editing and loading after another order. Check narrow layouts, complete PDF values and multi-page headings; use the shared dialog lifecycle with native dialogs for keyboard focus and scroll restoration.
+
+**Personalization recovery follow-up:** Validate roster arrays before replacing current data; obsolete load/search/OCR/save responses must not change a newer view. Keep failed loads inert with visible retry, clear canceled OCR UI and preserve keyboard file access. Save success must match the API envelope; lock duplicate submissions and scope acknowledgments/navigation to the originating roster. Original native CSV and payload comparisons plus rejection/race tests prevent silent drift. Validate Excel groups/rows before replacing data; ignore obsolete files/views and imports preceding a save. Collect unsaved cells before adding a group; keep required-input errors inside native dialogs. Monogram ItemsJSON and save IDs/HTTP status must be validated before replacing names or clearing dirty state. Picker label clicks already dispatch native checkbox clicks; never toggle both. Return focus after Done/Escape, keep retry errors in place and preserve original proof fonts/colors when removing global print overrides.

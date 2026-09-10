@@ -15,7 +15,7 @@ const read = (rel) => fs.readFileSync(path.join(ROOT, rel), 'utf8');
 describe('monogram dashboard', () => {
     const html = read('dashboards/monogram-dashboard.html').replace(/<!--[\s\S]*?-->/g, '');
     const js = read('shared_components/js/monogram-dashboard.js');
-    const css = read('dashboards/css/monogram-dashboard.css');
+    const css = read('shared_components/css/personalization-workspaces.css') + read('shared_components/css/components.css');
     test('Rule 3 + labels + names', () => {
         expect(html).not.toMatch(/\son(click|change|keyup|input)=/);
         expect(html).not.toMatch(/style="/);
@@ -31,7 +31,7 @@ describe('monogram dashboard', () => {
         expect(js).not.toMatch(/<i class="fa[^"]*"><\/i>/);
         expect(js).toMatch(/aria-label="Delete order \$\{orderNum\}"/);
         expect(js).toMatch(/aria-label="Mark order \$\{orderNum\} as printed"/);
-        expect(css).toMatch(/^\[hidden\] \{ display: none !important; \}/m);
+        expect(css).toMatch(/:where\(\[data-ui="unified"\]\) \[hidden\]\s*\{\s*display: none;/);
     });
     test('listeners, local-day date filter, honest failures', () => {
         expect(js).toMatch(/search\.addEventListener\('input'/);
@@ -49,7 +49,7 @@ describe('monogram dashboard', () => {
 describe('names & numbers dashboard', () => {
     const html = read('dashboards/names-numbers-dashboard.html').replace(/<!--[\s\S]*?-->/g, '');
     const js = read('shared_components/js/names-numbers-dashboard.js');
-    const css = read('dashboards/css/names-numbers-dashboard.css');
+    const css = read('shared_components/css/personalization-workspaces.css') + read('shared_components/css/components.css');
     test('KPI tiles filter; labels; no inline style; icons decorative', () => {
         expect((html.match(/class="kpi-card kpi-btn" data-status="[^"]*" aria-pressed="(true|false)"/g) || []).length).toBe(5);
         expect(html).toMatch(/data-status="" aria-pressed="true"/);
@@ -58,8 +58,8 @@ describe('names & numbers dashboard', () => {
         for (const id of ['filterSearch', 'filterStatus', 'filterRep']) expect(html).toMatch(new RegExp(`<label for="${id}">`));
         expect(html).toMatch(/id="toast" role="status" aria-live="polite"/);
         expect(html).toMatch(/id="nnResultCount" role="status"/);
-        expect(css).toMatch(/^\[hidden\] \{ display: none !important; \}/m);
-        expect(css).toMatch(/\.kpi-btn\[aria-pressed="true"\]/);
+        expect(css).toMatch(/:where\(\[data-ui="unified"\]\) \[hidden\]\s*\{\s*display: none;/);
+        expect(css).toMatch(/\.kpi-card\[aria-pressed="true"\]/);
     });
     test('behaviour: live filters, KPI sync, keyboard rows, Retry, names', () => {
         expect(js).toMatch(/syncKpis\(\) \{/);

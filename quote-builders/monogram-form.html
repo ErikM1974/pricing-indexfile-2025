@@ -6,13 +6,14 @@
     <meta name="robots" content="noindex, nofollow">
     <title>Monogram Form - Northwest Custom Apparel</title>
     <link rel="icon" href="/favicon.png" type="image/png">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Dancing+Script:wght@600;700&family=Archivo+Black&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=Dancing+Script:wght@600;700&family=Archivo+Black&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link href="/shared_components/css/quote-builder-common.css?v=2026.09.07.19" rel="stylesheet">
-    <link href="/shared_components/css/monogram-form.css?v=2026.09.07.19" rel="stylesheet">
+    <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.10.1">
+    <link href="/shared_components/css/components.css?v=2026.09.10.1" rel="stylesheet">
+    <link href="/shared_components/css/personalization-workspaces.css?v=2026.09.10.1" rel="stylesheet">
 </head>
-<body>
+<body data-ui="unified" data-personalization="monogram-form">
+    <a class="skip-link" href="#personalization-main">Skip to monogram form</a>
     <!-- Header -->
     <header class="header">
         <div class="header-container">
@@ -27,7 +28,7 @@
             </div>
             <div class="header-right">
                 <span class="current-date" id="currentDate"></span>
-                <a href="/staff-dashboard.html" class="btn-secondary">
+                <a href="/staff-dashboard.html" class="btn btn-secondary">
                     <i class="fas fa-arrow-left" aria-hidden="true"></i>
                     Back to Dashboard
                 </a>
@@ -36,7 +37,7 @@
     </header>
 
     <!-- Main Content -->
-    <main class="main-container">
+    <main class="main-container" id="personalization-main" tabindex="-1">
         <!-- Page Header -->
         <div class="page-header">
             <div class="page-header-content">
@@ -47,32 +48,34 @@
                 <p class="page-subtitle">Embroidery personalization tracking for production</p>
             </div>
             <div class="page-header-actions">
-                <button type="button" class="btn-icon" id="searchBtn" title="Search existing forms">
+                <button type="button" class="btn btn-secondary btn-icon" id="searchBtn" title="Search existing forms">
                     <i class="fas fa-search" aria-hidden="true"></i>
                 </button>
-                <button type="button" class="btn-icon" id="newFormBtn" title="Start new form">
+                <button type="button" class="btn btn-secondary btn-icon" id="newFormBtn" title="Start new form">
                     <i class="fas fa-plus" aria-hidden="true"></i>
                 </button>
             </div>
         </div>
 
+    <div class="toast-container" id="toastContainer" role="status" aria-live="polite"></div>
+
         <!-- Search Panel (Hidden by default) -->
-        <div class="search-panel" id="searchPanel" style="display: none;">
+        <div class="search-panel" id="searchPanel" hidden>
             <div class="search-panel-header">
                 <h3><i class="fas fa-search" aria-hidden="true"></i> Search Existing Forms</h3>
-                <button type="button" class="btn-close" id="closeSearchBtn">&times;</button>
+                <button type="button" class="btn btn-secondary btn-close" id="closeSearchBtn" aria-label="Close search">&times;</button>
             </div>
             <div class="search-panel-body">
                 <div class="search-inputs">
                     <div class="search-field">
                         <label for="searchOrderNumber">Order Number</label>
-                        <input type="text" id="searchOrderNumber" placeholder="e.g., 139465">
+                        <input class="field-input" type="text" id="searchOrderNumber" placeholder="e.g., 139465">
                     </div>
                     <div class="search-field">
                         <label for="searchCompanyName">Company Name</label>
-                        <input type="text" id="searchCompanyName" placeholder="e.g., Puyallup">
+                        <input class="field-input" type="text" id="searchCompanyName" placeholder="e.g., Puyallup">
                     </div>
-                    <button type="button" class="btn-primary" id="doSearchBtn">
+                    <button type="button" class="btn btn-primary" id="doSearchBtn">
                         <i class="fas fa-search" aria-hidden="true"></i> Search
                     </button>
                 </div>
@@ -94,9 +97,9 @@
                     <div class="form-group order-lookup-group">
                         <label for="orderNumber">Order Number <span class="required">*</span></label>
                         <div class="input-with-button">
-                            <input type="text" id="orderNumber" name="orderNumber"
+                            <input class="field-input" type="text" id="orderNumber" name="orderNumber"
                                    placeholder="Enter ShopWorks order number" required>
-                            <button type="button" id="lookupOrderBtn" class="btn-lookup">
+                            <button type="button" id="lookupOrderBtn" class="btn btn-primary btn-lookup">
                                 <i class="fas fa-search" aria-hidden="true"></i> Lookup
                             </button>
                         </div>
@@ -104,18 +107,18 @@
                     </div>
                     <div class="form-group">
                         <label for="companyName">Company <span class="required">*</span></label>
-                        <input type="text" id="companyName" name="companyName"
+                        <input class="field-input" type="text" id="companyName" name="companyName"
                                placeholder="Auto-filled from order" required>
                     </div>
                     <div class="form-group">
                         <label for="salesRepEmail">Sales Rep Email</label>
-                        <input type="email" id="salesRepEmail" name="salesRepEmail"
+                        <input class="field-input" type="email" id="salesRepEmail" name="salesRepEmail"
                                placeholder="e.g., sales@nwcustomapparel.com">
                     </div>
                 </div>
 
                 <!-- Order Status Indicator -->
-                <div class="order-status" id="orderStatus" style="display: none;">
+                <div class="order-status" id="orderStatus" hidden>
                     <div class="status-badge status-loading" id="orderStatusBadge">
                         <i class="fas fa-spinner fa-spin" aria-hidden="true"></i>
                         <span id="orderStatusText">Looking up order...</span>
@@ -132,25 +135,25 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label for="fontStyle">Font Style</label>
-                        <input type="text" id="fontStyle" name="fontStyle"
+                        <input class="field-input" type="text" id="fontStyle" name="fontStyle"
                                placeholder="e.g., Sansita, Script, Block">
                     </div>
                     <div class="form-group thread-color-group">
-                        <label>Thread Color(s)</label>
+                        <label for="threadColorBtn">Thread Color(s)</label>
                         <div class="thread-color-selector">
-                            <button type="button" id="threadColorBtn" class="thread-color-toggle">
+                            <button type="button" id="threadColorBtn" aria-expanded="false" aria-controls="threadColorDropdown" class="btn btn-secondary thread-color-toggle">
                                 <span id="threadColorBtnText">Select Thread Colors...</span>
                                 <i class="fas fa-chevron-down" aria-hidden="true"></i>
                             </button>
                             <div id="threadColorDropdown" class="thread-color-dropdown" hidden>
                                 <div class="thread-color-search">
-                                    <input type="text" id="threadColorSearch" placeholder="Search colors..." aria-label="Search colors">
+                                    <input class="field-input" type="text" id="threadColorSearch" placeholder="Search colors..." aria-label="Search colors">
                                 </div>
                                 <div class="thread-color-list" id="threadColorList">
                                     <!-- Populated dynamically -->
                                 </div>
                                 <div class="thread-color-actions">
-                                    <button type="button" id="threadColorDoneBtn" class="btn-primary btn-sm">Done</button>
+                                    <button type="button" id="threadColorDoneBtn" class="btn btn-primary btn-sm">Done</button>
                                 </div>
                             </div>
                         </div>
@@ -159,9 +162,9 @@
                         </div>
                     </div>
                     <div class="form-group location-group">
-                        <label>Monogram Location(s)</label>
+                        <label for="locationBtn">Monogram Location(s)</label>
                         <div class="location-selector">
-                            <button type="button" id="locationBtn" class="location-toggle">
+                            <button type="button" id="locationBtn" aria-expanded="false" aria-controls="locationDropdown" class="btn btn-secondary location-toggle">
                                 <span id="locationBtnText">Select Locations...</span>
                                 <i class="fas fa-chevron-down" aria-hidden="true"></i>
                             </button>
@@ -169,11 +172,11 @@
                                 <div class="location-list" id="locationList">
                                     <!-- Populated with checkboxes -->
                                 </div>
-                                <div class="location-other-input" id="locationOtherInput" style="display: none;">
-                                    <input type="text" id="locationOtherText" placeholder="Specify custom location..." aria-label="Specify custom location">
+                                <div class="location-other-input" id="locationOtherInput" hidden>
+                                    <input class="field-input" type="text" id="locationOtherText" placeholder="Specify custom location..." aria-label="Specify custom location">
                                 </div>
                                 <div class="location-actions">
-                                    <button type="button" id="locationDoneBtn" class="btn-primary btn-sm">Done</button>
+                                    <button type="button" id="locationDoneBtn" class="btn btn-primary btn-sm">Done</button>
                                 </div>
                             </div>
                         </div>
@@ -185,20 +188,20 @@
                 <div class="form-group paste-names-group full-width">
                     <label for="pasteNamesInput">Bulk Name Import</label>
                     <div class="paste-names-container">
-                        <textarea id="pasteNamesInput" class="paste-names-textarea"
+                        <textarea id="pasteNamesInput" class="field-textarea paste-names-textarea"
                                   placeholder="Paste names here (one per line)...&#10;Example:&#10;Jim Mickelson&#10;Erik Mickelson&#10;Ruthie Nhoung"
                                   rows="4"></textarea>
                         <div class="paste-names-actions">
-                            <button type="button" id="importNamesBtn" class="btn-secondary btn-sm">
+                            <button type="button" id="importNamesBtn" class="btn btn-secondary btn-sm">
                                 <i class="fas fa-upload" aria-hidden="true"></i> Import Names
                             </button>
-                            <button type="button" id="clearNamesBtn" class="btn-secondary btn-sm">
+                            <button type="button" id="clearNamesBtn" class="btn btn-secondary btn-sm">
                                 <i class="fas fa-times" aria-hidden="true"></i> Clear
                             </button>
                             <span class="imported-count" id="importedCount"></span>
                         </div>
                     </div>
-                    <div class="unassigned-names-panel" id="unassignedNamesPanel" style="display: none;">
+                    <div class="unassigned-names-panel" id="unassignedNamesPanel" hidden>
                         <div class="unassigned-header">
                             <strong><i class="fas fa-user-clock" aria-hidden="true"></i> Unassigned Names</strong>
                             <span class="unassigned-count" id="unassignedCount">(0)</span>
@@ -210,7 +213,7 @@
                 </div>
                 <div class="form-group full-width">
                     <label for="notesToProduction">Notes to Production</label>
-                    <textarea id="notesToProduction" name="notesToProduction" rows="3"
+                    <textarea class="field-textarea" id="notesToProduction" name="notesToProduction" rows="3"
                               placeholder="Special instructions for the production team..."></textarea>
                 </div>
             </section>
@@ -224,16 +227,16 @@
                         <span class="name-count" id="nameCount">(0 entries)</span>
                     </h2>
                     <div class="section-actions">
-                        <button type="button" class="btn-secondary btn-sm" id="addRowBtn">
+                        <button type="button" class="btn btn-secondary btn-sm" id="addRowBtn">
                             <i class="fas fa-plus" aria-hidden="true"></i> Add Row
                         </button>
-                        <button type="button" class="btn-secondary btn-sm" id="add5RowsBtn">
+                        <button type="button" class="btn btn-secondary btn-sm" id="add5RowsBtn">
                             <i class="fas fa-plus" aria-hidden="true"></i> Add 5 Rows
                         </button>
                     </div>
                 </div>
 
-                <div class="table-container">
+                <div class="table-container" role="region" aria-label="Monogram names table" tabindex="0">
                     <table class="names-table" id="namesTable">
                         <thead>
                             <tr>
@@ -254,13 +257,13 @@
                 </div>
 
                 <div class="table-footer">
-                    <button type="button" class="btn-secondary" id="addRowBtnBottom">
+                    <button type="button" class="btn btn-secondary" id="addRowBtnBottom">
                         <i class="fas fa-plus" aria-hidden="true"></i> Add Row
                     </button>
                 </div>
 
                 <!-- Stitch Check: live QA on the name list (monogram-name-qa.js) -->
-                <div class="stitch-check-panel" id="stitchCheckPanel" style="display: none;">
+                <div class="stitch-check-panel" id="stitchCheckPanel" hidden>
                     <div class="stitch-check-header">
                         <strong><i class="fas fa-spell-check" aria-hidden="true"></i> Stitch Check</strong>
                         <span class="stitch-check-summary" id="stitchCheckSummary"></span>
@@ -272,18 +275,18 @@
             <!-- Action Buttons -->
             <section class="form-actions">
                 <div class="actions-left">
-                    <button type="button" class="btn-secondary" id="clearFormBtn">
+                    <button type="button" class="btn btn-secondary" id="clearFormBtn">
                         <i class="fas fa-eraser" aria-hidden="true"></i> Clear Form
                     </button>
                 </div>
                 <div class="actions-right">
-                    <button type="button" class="btn-secondary" id="saveDraftBtn">
+                    <button type="button" class="btn btn-secondary" id="saveDraftBtn">
                         <i class="fas fa-save" aria-hidden="true"></i> Save Draft
                     </button>
-                    <button type="button" class="btn-secondary" id="printProofBtn">
+                    <button type="button" class="btn btn-secondary" id="printProofBtn">
                         <i class="fas fa-file-signature" aria-hidden="true"></i> Print Customer Proof
                     </button>
-                    <button type="button" class="btn-primary" id="printPdfBtn">
+                    <button type="button" class="btn btn-primary" id="printPdfBtn">
                         <i class="fas fa-print" aria-hidden="true"></i> Print PDF
                     </button>
                 </div>
@@ -337,7 +340,7 @@
                 <strong>Notes to Production</strong>
                 <p id="printNotes"></p>
             </div>
-            <div class="print-run-plan" id="printRunPlan" style="display: none;"></div>
+            <div class="print-run-plan" id="printRunPlan" hidden></div>
         </div>
 
         <div class="print-names-section">
@@ -391,12 +394,12 @@
         </div>
 
         <p class="proof-instructions">
-            Please review each name below. Names are embroidered <strong>exactly as shown</strong> â€”
+            Please review each name below. Names are embroidered <strong>exactly as shown</strong> —
             including capitalization, spacing, and punctuation. Check the box beside each name to
             approve it, then sign at the bottom. On-screen fonts and thread colors are close
             approximations of the actual embroidery.
         </p>
-        <p class="proof-color-notice" id="proofColorNotice" style="display: none;"></p>
+        <p class="proof-color-notice" id="proofColorNotice" hidden></p>
 
         <div class="proof-list" id="proofList"></div>
 
@@ -414,21 +417,19 @@
     </div>
 
     <!-- Loading Overlay -->
-    <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-overlay" id="loadingOverlay" role="status" hidden>
         <div class="loading-content">
             <div class="loading-spinner"></div>
             <div class="loading-text" id="loadingText">Loading...</div>
         </div>
     </div>
 
-    <!-- Toast Container -->
-    <div class="toast-container" id="toastContainer"></div>
 
     <!-- Scripts -->
     <script src="/config/app.config.js"></script>
     <script src="/pages/js/dst-palette.js?v=2026.08.05.4"></script>
     <script src="/shared_components/js/monogram-name-qa.js?v=2026.09.07.33"></script>
-    <script src="/shared_components/js/monogram-form-service.js?v=2026.09.06.31"></script>
-    <script src="/shared_components/js/monogram-form-controller.js?v=2026.09.06.22"></script>
+    <script src="/shared_components/js/monogram-form-service.js?v=2026.09.10.1"></script>
+    <script src="/shared_components/js/monogram-form-controller.js?v=2026.09.10.1"></script>
 </body>
 </html>

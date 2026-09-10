@@ -4612,6 +4612,142 @@
         "rawCssBytes": 177211,
         "localCssRequests": 5
       }
+    },
+    {
+      "source": "dashboards/monogram-dashboard.html",
+      "family": "personalization",
+      "status": "pilot",
+      "route": "/dashboards/monogram-dashboard.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/personalization-workspaces.css"
+      ],
+      "dynamicStyles": [],
+      "dynamicTokens": [
+        "--column-min",
+        "--proof-thread"
+      ],
+      "states": [
+        "four-width-original-data-and-accessibility",
+        "keyboard-tables-and-native-dialogs",
+        "loading-malformed-failure-retry",
+        "obsolete-response-and-duplicate-save-protection",
+        "original-native-export-and-save-payload-comparison",
+        "mocked-import-search-and-order-lookup",
+        "thread-location-and-production-name-qa",
+        "normal-and-long-production-and-customer-paper"
+      ],
+      "test": "tests/e2e/css-unification-personalization.spec.js",
+      "maxCssBytes": 107684,
+      "measuredRawCssBytes": 106660,
+      "baseline": {
+        "commit": "02af336bb51431d33152d6a2ff9712557f5481a0",
+        "rawCssBytes": 26917,
+        "localCssRequests": 2
+      }
+    },
+    {
+      "source": "dashboards/names-numbers-dashboard.html",
+      "family": "personalization",
+      "status": "pilot",
+      "route": "/dashboards/names-numbers-dashboard.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/personalization-workspaces.css"
+      ],
+      "dynamicStyles": [],
+      "dynamicTokens": [
+        "--column-min",
+        "--proof-thread"
+      ],
+      "states": [
+        "four-width-original-data-and-accessibility",
+        "keyboard-tables-and-native-dialogs",
+        "loading-malformed-failure-retry",
+        "obsolete-response-and-duplicate-save-protection",
+        "original-native-export-and-save-payload-comparison",
+        "mocked-import-search-and-order-lookup",
+        "thread-location-and-production-name-qa",
+        "normal-and-long-production-and-customer-paper"
+      ],
+      "test": "tests/e2e/css-unification-personalization.spec.js",
+      "maxCssBytes": 107684,
+      "measuredRawCssBytes": 106660,
+      "baseline": {
+        "commit": "02af336bb51431d33152d6a2ff9712557f5481a0",
+        "rawCssBytes": 47131,
+        "localCssRequests": 3
+      }
+    },
+    {
+      "source": "pages/names-numbers.html",
+      "family": "personalization",
+      "status": "pilot",
+      "route": "/pages/names-numbers.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/personalization-workspaces.css"
+      ],
+      "dynamicStyles": [],
+      "dynamicTokens": [
+        "--column-min",
+        "--proof-thread"
+      ],
+      "states": [
+        "four-width-original-data-and-accessibility",
+        "keyboard-tables-and-native-dialogs",
+        "loading-malformed-failure-retry",
+        "obsolete-response-and-duplicate-save-protection",
+        "original-native-export-and-save-payload-comparison",
+        "mocked-import-search-and-order-lookup",
+        "thread-location-and-production-name-qa",
+        "normal-and-long-production-and-customer-paper"
+      ],
+      "test": "tests/e2e/css-unification-personalization.spec.js",
+      "maxCssBytes": 107684,
+      "measuredRawCssBytes": 106660,
+      "baseline": {
+        "commit": "02af336bb51431d33152d6a2ff9712557f5481a0",
+        "rawCssBytes": 44494,
+        "localCssRequests": 2
+      }
+    },
+    {
+      "source": "quote-builders/monogram-form.html",
+      "family": "personalization",
+      "status": "pilot",
+      "route": "/quote-builders/monogram-form.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/personalization-workspaces.css"
+      ],
+      "dynamicStyles": [],
+      "dynamicTokens": [
+        "--column-min",
+        "--proof-thread"
+      ],
+      "states": [
+        "four-width-original-data-and-accessibility",
+        "keyboard-tables-and-native-dialogs",
+        "loading-malformed-failure-retry",
+        "obsolete-response-and-duplicate-save-protection",
+        "original-native-export-and-save-payload-comparison",
+        "mocked-import-search-and-order-lookup",
+        "thread-location-and-production-name-qa",
+        "normal-and-long-production-and-customer-paper"
+      ],
+      "test": "tests/e2e/css-unification-personalization.spec.js",
+      "maxCssBytes": 107684,
+      "measuredRawCssBytes": 106660,
+      "baseline": {
+        "commit": "02af336bb51431d33152d6a2ff9712557f5481a0",
+        "rawCssBytes": 167534,
+        "localCssRequests": 3
+      }
     }
   ],
   "billingContentSha256": "d85f8530e03a1863d1b8bb2ebe97ba332d5c9e3411887d1eb2d02dcdb14c0863",
