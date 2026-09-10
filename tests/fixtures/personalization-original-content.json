@@ -508,7 +508,8 @@
     "pages/js/dst-palette.js": "0c68b0375c00e7a1f25524e7281520afd3adf08377ea460d5f86ebc3490b4006",
     "shared_components/js/monogram-name-qa.js": "38024411fa03f208c56009cb0359d566920477dab728d057926490b0d42947a1",
     "shared_components/js/monogram-form-service.js": "4672e9a22f9c8dcbc54f439b44729e4d7a970c8da0f95b8849ab79722c711d7e",
-    "shared_components/js/monogram-form-controller.js": "bec8975c190f7dd908965c95bf015d5354f3f15ab67d5e98302542b9db269a22"
+    "shared_components/js/monogram-form-controller.js": "bec8975c190f7dd908965c95bf015d5354f3f15ab67d5e98302542b9db269a22",
+    "shared_components/js/ui-dialog.js": "817866367556691f76e6c914a7f63086c19eeef8728c6884c2c2a0b6e0534c9c"
   },
   "changes": [
     {
@@ -623,6 +624,360 @@
       "file": "shared_components/js/names-numbers-dashboard.js",
       "before": "    applyFilters() {\n        const search",
       "after": "    applyFilters() {\n        if (this.loadState !== 'ready') { this.syncKpis(); return; }\n        const search",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/monogram-form-controller.js",
+      "before": "                isCustomStyle: styleSelect.value === '__custom__'",
+      "after": "                isCustomStyle: styleSelect.value === '__custom__' || styleSelect.dataset.customStyle === 'true'",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/monogram-form-controller.js",
+      "before": "                    : styleInput?.value || '',\n                description:",
+      "after": "                    : styleInput?.value || '',\n                isCustomStyle: styleInput?.value === '__custom__' || styleInput?.dataset.customStyle === 'true',\n                description:",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/monogram-form-controller.js",
+      "before": "                styleInput.value = data.style || '';\n",
+      "after": "                styleInput.value = data.style || '';\n                styleInput.dataset.customStyle = String(Boolean(data.isCustomStyle));\n",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/monogram-form-controller.js",
+      "before": "    populateForm(session, items) {\n",
+      "after": "    populateForm(session, items) {\n        // A saved session owns its garment data; a previous lookup must not constrain it.\n        this.orderLoaded = false;\n        this.products = [];\n        this.hideOrderStatus();\n",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/monogram-form-controller.js",
+      "before": "                const customStyle = row.querySelector('.style-custom');\n                const descInput",
+      "after": "                const styleInput = row.querySelector('.style-input');\n                const descInput",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/monogram-form-controller.js",
+      "before": "                if (item.isCustomStyle) {\n                    row.querySelector('.style-input').value = '__custom__';\n                    customStyle.style.display = 'block';\n                    customStyle.value = item.styleNumber || '';\n                    descInput.readOnly = false;\n                    descInput.classList.remove('input-readonly');\n                }",
+      "after": "                // Saved rows reopen in manual mode, including custom garments.\n                styleInput.value = item.styleNumber || '';\n                styleInput.dataset.customStyle = String(Boolean(item.isCustomStyle));",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/monogram-form-controller.js",
+      "before": "        if (!styleSelect || !sizeSelect) return;",
+      "after": "        if (!styleSelect || !sizeSelect || styleSelect.tagName !== 'SELECT') return;",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/monogram-form-controller.js",
+      "before": "    handleStyleChange(row, selectEl) {\n",
+      "after": "    handleStyleChange(row, selectEl) {\n        if (selectEl.tagName !== 'SELECT') {\n            this.isDirty = true;\n            return;\n        }\n",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "panel.style.display = 'none';",
+      "after": "panel.hidden = true;",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "panel.style.display = '';",
+      "after": "panel.hidden = false;",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "body.style.display = '';",
+      "after": "body.hidden = false;",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "body.style.display = 'none';",
+      "after": "body.hidden = true;",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "document.getElementById('tableCard').style.display = 'none';",
+      "after": "document.getElementById('tableCard').hidden = true;",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "breakdown.style.display = 'none';",
+      "after": "breakdown.hidden = true;",
+      "count": 2
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "document.getElementById('tableCard').style.display = '';",
+      "after": "document.getElementById('tableCard').hidden = false;",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "card.style.display = 'none';",
+      "after": "card.hidden = true;",
+      "count": 3
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "card.style.display = '';",
+      "after": "card.hidden = false;",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "preview.style.display = '';",
+      "after": "preview.hidden = false;",
+      "count": 2
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "processing.style.display = '';",
+      "after": "processing.hidden = false;",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "results.style.display = 'none';",
+      "after": "results.hidden = true;",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "importBtn.style.display = 'none';",
+      "after": "importBtn.hidden = true;",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "processing.style.display = 'none';",
+      "after": "processing.hidden = true;",
+      "count": 2
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "results.style.display = '';",
+      "after": "results.hidden = false;",
+      "count": 4
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "importBtn.style.display = '';",
+      "after": "importBtn.hidden = false;",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "if (body.style.display === 'none')",
+      "after": "if (body.hidden)",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "panel.style.display = panel.style.display === 'none' ? '' : 'none';",
+      "after": "panel.hidden = !panel.hidden;",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "if (panel.style.display !== 'none')",
+      "after": "if (!panel.hidden)",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "document.getElementById('emptyState').style.display = hasGroups ? 'none' : '';",
+      "after": "document.getElementById('emptyState').hidden = hasGroups;",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "document.getElementById('tableCard').style.display = hasGroups ? '' : 'none';",
+      "after": "document.getElementById('tableCard').hidden = !hasGroups;",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "document.getElementById('groupConfig').style.display = hasGroups ? '' : 'none';",
+      "after": "document.getElementById('groupConfig').hidden = !hasGroups;",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "style=\"min-width:${def.width}\"",
+      "after": "style=\"--column-min:${def.width}\"",
+      "count": 2
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "style=\"min-width:${d.width}\"",
+      "after": "style=\"--column-min:${d.width}\"",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "class=\"col-custom\" rowspan=\"2\" style=\"min-width:160px\"",
+      "after": "class=\"col-custom\" rowspan=\"2\"",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "style=\"color: var(--nn-error-text);\"",
+      "after": "class=\"roster-error\"",
+      "count": 3
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "style=\"font-size:0.8rem; background:#f5f5f5; padding:0.5rem; border-radius:0.25rem; white-space:pre-wrap;\"",
+      "after": "class=\"roster-raw-text\"",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "style=\"margin-bottom:0.5rem;\"",
+      "after": "class=\"roster-space-bottom\"",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "class=\"roster-table\" style=\"font-size:0.8rem;\"",
+      "after": "class=\"roster-table roster-preview-table\"",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "style=\"color: var(--nn-text-secondary); padding: 0.5rem 0;\"",
+      "after": "class=\"roster-hint\"",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "style=\"max-height: 300px; overflow-y: auto;\"",
+      "after": "class=\"roster-search-list\"",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "style=\"color: var(--nn-text-secondary); margin-left: 0.5rem;\"",
+      "after": "class=\"roster-search-company\"",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "style=\"display: flex; align-items: center; gap: 0.5rem;\"",
+      "after": "class=\"roster-actions\"",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "<span style=\"font-size: 0.8rem; color: var(--nn-text-secondary);\">",
+      "after": "<span class=\"roster-hint\">",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "document.getElementById(id).classList.add('active');",
+      "after": "const dialog = document.getElementById(id);\n        if (!dialog.open) dialog.showModal();",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "document.getElementById(id).classList.remove('active');",
+      "after": "document.getElementById(id).close();",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "class=\"btn-sm btn-danger",
+      "after": "class=\"btn btn-sm btn-danger",
+      "count": 2
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "class=\"row-delete-btn\"",
+      "after": "class=\"row-delete-btn btn btn-danger\"",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "class=\"gf-label\"",
+      "after": "class=\"gf-label field-input\" aria-label=\"Garment label\"",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "class=\"gf-style\"",
+      "after": "class=\"gf-style field-input\" aria-label=\"Garment style\"",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "class=\"gf-color\"",
+      "after": "class=\"gf-color field-input\" aria-label=\"Garment color\"",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "class=\"cc-label\"",
+      "after": "class=\"cc-label field-input\" aria-label=\"Custom column label\"",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "<input type=\"text\" ${dataAttrs} value=",
+      "after": "<input type=\"text\" class=\"field-input\" aria-label=\"Row ${idx + 1}, ${this.escapeAttr(d.kind === 'garment' ? d.garmentLabel + ': ' + d.label : d.label)}\" ${dataAttrs} value=",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "            unique.forEach(r => {\n                const statusClass = (r.Status || 'draft').toLowerCase().replace(/\\s+/g, '-');\n                html += `<div style=\"display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid var(--nn-border); cursor: pointer;\"\n                    onclick=\"controller.loadRoster(${r.ID_Roster}); controller.toggleSearch();\">\n                    <div>\n                        <strong>${this.escapeHtml(r.RosterName || 'Untitled')}</strong>\n                        <span class=\"roster-search-company\">${this.escapeHtml(r.CompanyName || '')}</span>\n                    </div>\n                    <div class=\"roster-actions\">\n                        <span class=\"status-badge status-${statusClass}\">${this.escapeHtml(r.Status || 'Draft')}</span>\n                        <span class=\"roster-hint\">${r.TotalPersons || 0} people</span>\n                    </div>\n                </div>`;\n            });\n",
+      "after": "            unique.forEach(r => {\n                const statusClass = (r.Status || 'draft').toLowerCase().replace(/\\s+/g, '-');\n                html += `<button type=\"button\" class=\"roster-search-result\" data-roster-id=\"${this.escapeAttr(String(r.ID_Roster))}\">\n                    <span>\n                        <strong>${this.escapeHtml(r.RosterName || 'Untitled')}</strong>\n                        <span class=\"roster-search-company\">${this.escapeHtml(r.CompanyName || '')}</span>\n                    </span>\n                    <span class=\"roster-actions\">\n                        <span class=\"status-badge status-${statusClass}\">${this.escapeHtml(r.Status || 'Draft')}</span>\n                        <span class=\"roster-hint\">${r.TotalPersons || 0} people</span>\n                    </span>\n                </button>`;\n            });\n",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "            html += '</div>';\n            results.innerHTML = html;",
+      "after": "            html += '</div>';\n            results.innerHTML = html;\n            results.querySelectorAll('[data-roster-id]').forEach(button => button.addEventListener('click', () => {\n                this.loadRoster(Number(button.dataset.rosterId));\n                this.toggleSearch();\n            }));",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "        if (!dialog.open) dialog.showModal();",
+      "after": "        if (dialog.open) return;\n        // Shared focus/scroll lifecycle wraps the browser's modal top layer.\n        window.UiDialog.open(dialog, { onDismiss: () => this.closeModal(id) });\n        dialog.showModal();",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "        document.getElementById(id).close();",
+      "after": "        const dialog = document.getElementById(id);\n        dialog.close();\n        window.UiDialog.close(dialog);",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "        if (body.hidden) {",
+      "after": "        document.getElementById('toggleConfigBtn').setAttribute('aria-expanded', String(body.hidden));\n        if (body.hidden) {",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "document.getElementById('printBtn').addEventListener('click', () => window.print());",
+      "after": "document.getElementById('printBtn').addEventListener('click', () => { this.renderPaper(); window.print(); });\n        window.addEventListener('beforeprint', () => this.renderPaper());",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "    exportExcel() {\n",
+      "after": "    renderPaper() {\n        this.collectTableData();\n        const make = (tag, text, className) => {\n            const element = document.createElement(tag);\n            if (text != null) element.textContent = String(text);\n            if (className) element.className = className;\n            return element;\n        };\n        const paper = make('section', null, 'roster-paper');\n        paper.append(make('h1', document.getElementById('rosterName').value || 'Names & Numbers'));\n        const details = make('dl', null, 'roster-paper-details');\n        for (const [id, label] of [\n            ['companyName', 'Company / Customer'], ['orderNumber', 'Order #'],\n            ['contactName', 'Contact Name'], ['contactEmail', 'Contact Email'],\n            ['salesRep', 'Sales Rep'], ['rosterNotes', 'Notes']\n        ]) {\n            const value = document.getElementById(id).value;\n            if (value) { details.append(make('dt', label), make('dd', value)); }\n        }\n        details.append(make('dt', 'Status'), make('dd', document.getElementById('statusBadge').textContent));\n        paper.append(details);\n        const group = this.getActiveGroup();\n        if (group) {\n            const descriptors = this.buildColumnDescriptors(group);\n            const identity = descriptors.filter(d => d.kind === 'person' && ['name', 'firstName', 'number', 'fullName'].includes(d.key)).slice(0, 3);\n            const remaining = descriptors.filter(d => !identity.includes(d));\n            const rows = this.getActiveRows();\n            paper.append(make('h2', group.name));\n            paper.append(make('p', group.garments.map(g => [g.label, g.style, g.color].filter(Boolean).join(' / ')).join(' · ')));\n            const sections = Math.max(1, Math.ceil(remaining.length / 5));\n            for (let section = 0; section < sections; section++) {\n                const columns = identity.concat(remaining.slice(section * 5, (section + 1) * 5));\n                const table = make('table');\n                if (sections > 1) table.append(make('caption', 'Columns ' + (section + 1) + ' of ' + sections + ' — row numbers and names match across tables'));\n                const head = make('thead'), headings = make('tr');\n                headings.append(make('th', '#'));\n                for (const d of columns) headings.append(make('th', d.kind === 'garment' ? d.garmentLabel + ': ' + d.label : d.label));\n                head.append(headings); table.append(head);\n                const body = make('tbody');\n                rows.forEach((row, index) => {\n                    const line = make('tr'); line.append(make('th', index + 1));\n                    for (const d of columns) {\n                        const value = d.kind === 'person' ? row[d.key]\n                            : d.kind === 'garment' ? row.garmentData?.[d.garmentId]?.[d.field]\n                                : row.custom?.[d.key];\n                        line.append(make('td', value == null ? '' : value));\n                    }\n                    body.append(line);\n                });\n                table.append(body); paper.append(table);\n            }\n            paper.append(make('p', 'Total: ' + rows.length + (rows.length === 1 ? ' person' : ' people')));\n            const breakdown = document.getElementById('sizeBreakdownCard');\n            if (!breakdown.hidden) {\n                const copy = breakdown.cloneNode(true);\n                copy.removeAttribute('id');\n                copy.querySelectorAll('[id]').forEach(n => n.removeAttribute('id'));\n                paper.append(copy);\n            }\n        } else {\n            paper.append(make('p', 'No Roster Data Yet'));\n        }\n        document.querySelector('.roster-paper')?.remove();\n        document.body.append(paper);\n    }\n\n    exportExcel() {\n",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/names-numbers-controller.js",
+      "before": "                if (sections > 1) table.append(make('caption', 'Columns ' + (section + 1) + ' of ' + sections + ' — row numbers and names match across tables'));\n                const head = make('thead'), headings = make('tr');",
+      "after": "                const head = make('thead'), headings = make('tr');\n                if (sections > 1) {\n                    const sectionRow = make('tr');\n                    const sectionTitle = make('th', 'Columns ' + (section + 1) + ' of ' + sections + ' — row numbers and names match across tables');\n                    sectionTitle.colSpan = columns.length + 1;\n                    sectionRow.append(sectionTitle); head.append(sectionRow);\n                }",
       "count": 1
     }
   ]

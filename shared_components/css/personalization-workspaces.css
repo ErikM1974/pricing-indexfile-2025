@@ -408,4 +408,540 @@
             grid-template-columns: repeat(5, minmax(0, 1fr));
         }
     }
+
+    :where([data-ui="unified"][data-personalization="roster-form"])
+        :is(.form-row, .garment-row-fields, .size-breakdown-body) {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+        gap: var(--space-4);
+        margin-bottom: var(--space-4);
+    }
+
+    :where([data-ui="unified"][data-personalization="roster-form"])
+        :is(
+            .page-header,
+            .page-header-actions,
+            .import-toolbar,
+            .action-bar,
+            .action-bar-group,
+            .roster-actions,
+            .group-config-header,
+            .config-section-header,
+            .garment-row-header,
+            .garment-row-toggles,
+            .custom-col-row,
+            .modal-header,
+            .modal-footer,
+            .search-row,
+            .tab-bar
+        ) {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: var(--space-3);
+        min-width: 0;
+    }
+
+    :where([data-ui="unified"][data-personalization="roster-form"])
+        :is(
+            .page-header,
+            .action-bar,
+            .group-config-header,
+            .config-section-header,
+            .garment-row-header,
+            .modal-header
+        ) {
+        justify-content: space-between;
+    }
+
+    :where([data-ui="unified"][data-personalization="roster-form"])
+        :is(.group-config, .search-panel) {
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-md);
+        padding: var(--space-5);
+        background: var(--ui-surface);
+        min-width: 0;
+    }
+
+    :where([data-ui="unified"][data-personalization="roster-form"])
+        :is(.card-title, .group-config-title, .modal-title) {
+        font-size: var(--font-size-lg);
+        font-weight: 700;
+        margin: 0;
+    }
+
+    :where([data-ui="unified"][data-personalization="roster-form"])
+        :is(.config-section, .modal-body) {
+        margin-block: var(--space-5);
+    }
+
+    :where([data-ui="unified"][data-personalization="roster-form"])
+        :is(.garments-editor, .custom-columns-editor) {
+        display: grid;
+        gap: var(--space-3);
+        margin-top: var(--space-3);
+    }
+
+    :where([data-ui="unified"][data-personalization="roster-form"])
+        .garment-row {
+        border: 1px solid var(--ui-line);
+        border-left: 3px solid var(--amber-400);
+        border-radius: var(--radius-sm);
+        padding: var(--space-4);
+        background: var(--ui-tint);
+        min-width: 0;
+    }
+
+    :where([data-ui="unified"][data-personalization="roster-form"])
+        .garment-row-header {
+        margin-bottom: var(--space-3);
+        font-weight: 700;
+    }
+
+    :where([data-ui="unified"][data-personalization="roster-form"])
+        :is(
+            .roster-hint,
+            .config-section-hint,
+            .custom-cols-empty,
+            .garment-band-style,
+            .breakdown-garment-meta,
+            .roster-search-company
+        ) {
+        color: var(--ui-muted);
+        font-size: var(--font-size-sm);
+        line-height: var(--line-height-base);
+    }
+
+    :where([data-ui="unified"][data-personalization="roster-form"])
+        .config-section-hint {
+        margin-top: var(--space-2);
+    }
+
+    :where([data-ui="unified"][data-personalization="roster-form"])
+        .column-picker {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-3);
+        margin-top: var(--space-3);
+    }
+
+    :where([data-ui="unified"][data-personalization="roster-form"])
+        :is(.column-picker label, .garment-row-toggles label) {
+        display: inline-flex;
+        gap: var(--space-2);
+        align-items: center;
+        min-height: var(--ui-control-height);
+        font-size: var(--font-size-sm);
+    }
+
+    :where([data-ui="unified"][data-personalization="roster-form"])
+        input[type="checkbox"] {
+        accent-color: var(--ui-accent);
+        width: 18px;
+        height: 18px;
+    }
+
+    :where([data-ui="unified"][data-personalization="roster-form"])
+        :is(.custom-col-row, .search-row)
+        .field-input {
+        flex: 1 1 180px;
+        min-width: 0;
+    }
+
+    :where([data-ui="unified"][data-personalization="roster-form"])
+        :is(.tab-btn, .tab-add-btn) {
+        font: inherit;
+        font-weight: 600;
+        min-height: var(--ui-control-height);
+        padding: var(--space-3) var(--space-4);
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-sm);
+        color: var(--ui-ink);
+        background: var(--ui-surface);
+        cursor: pointer;
+    }
+
+    :where([data-ui="unified"][data-personalization="roster-form"])
+        .tab-btn.active {
+        border-color: var(--ui-accent);
+        box-shadow: inset 0 -3px var(--amber-400);
+    }
+
+    :where([data-ui="unified"][data-personalization="roster-form"]) .tab-badge {
+        margin-left: var(--space-2);
+        font-size: var(--font-size-sm);
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-personalization="roster-form"])
+        .roster-table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    :where([data-ui="unified"][data-personalization="roster-form"])
+        .roster-table
+        :is(th, td) {
+        padding: var(--space-2);
+        text-align: left;
+        border-bottom: 1px solid var(--ui-line);
+        vertical-align: middle;
+    }
+
+    :where([data-ui="unified"][data-personalization="roster-form"])
+        .roster-table
+        th {
+        min-width: var(--column-min, 160px);
+        font-size: var(--font-size-sm);
+    }
+
+    :where([data-ui="unified"][data-personalization="roster-form"])
+        .roster-table
+        :is(.row-number, .row-actions) {
+        min-width: 44px;
+        width: 44px;
+    }
+
+    :where([data-ui="unified"][data-personalization="roster-form"])
+        .roster-table
+        :is(.garment-band-0, .garment-band-2) {
+        background: var(--gray-50);
+        border-left: 1px solid var(--ui-line);
+    }
+
+    :where([data-ui="unified"][data-personalization="roster-form"])
+        .roster-table
+        :is(.garment-band-1, .garment-band-3) {
+        background: color-mix(
+            in srgb,
+            var(--amber-100) 45%,
+            var(--color-surface)
+        );
+        border-left: 1px solid var(--ui-line);
+    }
+
+    :where([data-ui="unified"][data-personalization="roster-form"])
+        .garment-band-style {
+        display: block;
+        font-weight: 400;
+    }
+
+    :where([data-ui="unified"][data-personalization="roster-form"])
+        .roster-table
+        .field-input {
+        padding-inline: var(--space-2);
+    }
+
+    :where([data-ui="unified"][data-personalization="roster-form"])
+        .roster-table
+        tfoot
+        td {
+        padding-block: var(--space-4);
+        font-weight: 600;
+    }
+
+    :where([data-ui="unified"][data-personalization="roster-form"])
+        .roster-space-top {
+        margin-top: var(--space-4);
+    }
+
+    :where([data-ui="unified"][data-personalization="roster-form"])
+        .roster-space-bottom {
+        margin-bottom: var(--space-4);
+    }
+
+    :where([data-ui="unified"][data-personalization="roster-form"])
+        .roster-error {
+        color: var(--color-danger-ink);
+    }
+
+    :where([data-ui="unified"][data-personalization="roster-form"])
+        .roster-raw-text {
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+        padding: var(--space-3);
+        background: var(--ui-tint);
+        border-radius: var(--radius-sm);
+    }
+
+    :where([data-ui="unified"][data-personalization="roster-form"])
+        .roster-search-list {
+        max-height: 360px;
+        overflow: auto;
+    }
+
+    :where([data-ui="unified"][data-personalization="roster-form"])
+        .roster-search-result {
+        display: flex;
+        justify-content: space-between;
+        gap: var(--space-3);
+        flex-wrap: wrap;
+        width: 100%;
+        padding: var(--space-4);
+        border: 0;
+        border-bottom: 1px solid var(--ui-line);
+        text-align: left;
+        background: var(--ui-surface);
+        color: var(--ui-ink);
+        font: inherit;
+        cursor: pointer;
+    }
+
+    :where([data-ui="unified"][data-personalization="roster-form"])
+        .roster-search-result:hover {
+        background: var(--ui-tint);
+    }
+
+    :where([data-ui="unified"][data-personalization="roster-form"])
+        .roster-search-company {
+        display: block;
+        margin-top: var(--space-1);
+    }
+
+    :where([data-ui="unified"][data-personalization="roster-form"])
+        .breakdown-garment {
+        padding: var(--space-4);
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-sm);
+        background: var(--ui-tint);
+    }
+
+    :where([data-ui="unified"][data-personalization="roster-form"])
+        .breakdown-garment-header {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        gap: var(--space-2);
+    }
+
+    :where([data-ui="unified"][data-personalization="roster-form"])
+        .breakdown-garment-total {
+        margin-left: auto;
+        font-weight: 600;
+    }
+
+    :where([data-ui="unified"][data-personalization="roster-form"])
+        .breakdown-size-list {
+        list-style: none;
+        padding: 0;
+        display: grid;
+        gap: var(--space-2);
+    }
+
+    :where([data-ui="unified"][data-personalization="roster-form"])
+        .breakdown-size-list
+        li {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    :where([data-ui="unified"][data-personalization="roster-form"])
+        .breakdown-empty {
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-personalization="roster-form"])
+        .modal-footer {
+        justify-content: flex-end;
+        padding-top: var(--space-3);
+        border-top: 1px solid var(--ui-line);
+    }
+
+    :where([data-ui="unified"][data-personalization="roster-form"])
+        #pasteTextarea {
+        min-height: 220px;
+    }
+
+    :where([data-ui="unified"][data-personalization="roster-form"])
+        .ocr-drop-zone {
+        border: 2px dashed var(--ui-line);
+        border-radius: var(--radius-md);
+        padding: var(--space-6);
+        text-align: center;
+        cursor: pointer;
+    }
+
+    :where([data-ui="unified"][data-personalization="roster-form"])
+        .ocr-drop-zone.dragover {
+        border-color: var(--ui-accent);
+        background: var(--ui-tint);
+    }
+
+    :where([data-ui="unified"][data-personalization="roster-form"])
+        .ocr-preview
+        img {
+        max-width: 100%;
+        max-height: 260px;
+        object-fit: contain;
+    }
+
+    :where([data-ui="unified"][data-personalization="roster-form"])
+        .ocr-processing {
+        padding: var(--space-4);
+        text-align: center;
+    }
+
+    :where([data-ui="unified"][data-personalization="roster-form"])
+        #ocrResults {
+        overflow: auto;
+    }
+
+    :where([data-ui="unified"][data-personalization="roster-form"])
+        .roster-paper {
+        display: none;
+    }
+
+    [data-ui="unified"][data-personalization] [hidden] {
+        display: none;
+    }
+
+    @media (width <= 600px) {
+        :where([data-ui="unified"][data-personalization="roster-form"])
+            :is(.action-bar-group, .import-toolbar, .page-header-actions) {
+            width: 100%;
+        }
+
+        :where([data-ui="unified"][data-personalization="roster-form"])
+            .action-bar-group
+            .btn {
+            flex: 1 1 180px;
+        }
+
+        :where([data-ui="unified"][data-personalization="roster-form"])
+            :is(.card, .group-config, .search-panel) {
+            padding: var(--space-4);
+        }
+    }
+
+    :where([data-ui="unified"][data-personalization="roster-form"]) {
+        --column-min: 160px;
+    }
+
+    @media print {
+        [data-ui="unified"][data-personalization="roster-form"]
+            > :not(.roster-paper) {
+            display: none;
+        }
+
+        :where([data-ui="unified"][data-personalization="roster-form"])
+            .roster-paper {
+            display: block;
+            font-size: 9pt;
+            line-height: 1.35;
+            color: var(--ui-ink);
+        }
+
+        :where([data-ui="unified"][data-personalization="roster-form"])
+            .roster-paper
+            h1 {
+            margin: 0 0 12px;
+            font-size: 18pt;
+        }
+
+        :where([data-ui="unified"][data-personalization="roster-form"])
+            .roster-paper
+            h2 {
+            margin: 16px 0 8px;
+            font-size: 13pt;
+            break-after: avoid;
+        }
+
+        :where([data-ui="unified"][data-personalization="roster-form"])
+            .roster-paper-details {
+            display: grid;
+            grid-template-columns: 120px 1fr;
+            gap: 3px 12px;
+        }
+
+        :where([data-ui="unified"][data-personalization="roster-form"])
+            .roster-paper-details
+            dt {
+            font-weight: 600;
+        }
+
+        :where([data-ui="unified"][data-personalization="roster-form"])
+            .roster-paper-details
+            dd {
+            margin: 0;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+        }
+
+        :where([data-ui="unified"][data-personalization="roster-form"])
+            .roster-paper
+            table {
+            width: 100%;
+            table-layout: fixed;
+            border-collapse: collapse;
+            margin-block: 12px;
+            font-size: 9pt;
+        }
+
+        :where([data-ui="unified"][data-personalization="roster-form"])
+            .roster-paper
+            caption {
+            text-align: left;
+            padding-bottom: 6px;
+            font-weight: 600;
+        }
+
+        :where([data-ui="unified"][data-personalization="roster-form"])
+            .roster-paper
+            table
+            :is(th, td) {
+            padding: 6px;
+            border: 1px solid var(--ui-line);
+            text-align: left;
+            vertical-align: top;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+        }
+
+        :where([data-ui="unified"][data-personalization="roster-form"])
+            .roster-paper
+            table
+            :is(th, td):first-child {
+            width: 4%;
+        }
+
+        :where([data-ui="unified"][data-personalization="roster-form"])
+            .roster-paper
+            thead {
+            display: table-header-group;
+        }
+
+        :where([data-ui="unified"][data-personalization="roster-form"])
+            .roster-paper
+            tr {
+            break-inside: avoid;
+        }
+
+        :where([data-ui="unified"][data-personalization="roster-form"])
+            .roster-paper
+            :is(.card, .breakdown-garment) {
+            padding: 8px;
+            margin: 0;
+            box-shadow: none;
+            background: transparent;
+        }
+
+        :where([data-ui="unified"][data-personalization="roster-form"])
+            .roster-paper
+            .size-breakdown-body {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    @media print {
+        :where([data-ui="unified"][data-personalization="roster-form"])
+            .roster-paper
+            table
+            th[colspan] {
+            width: auto;
+            border: 0;
+            padding: 8px 0;
+        }
+    }
 }
+
+/* Roster entry uses the same workspace controls and spacing as its dashboard. */

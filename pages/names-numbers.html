@@ -1,35 +1,32 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
+<!DOCTYPE html><html lang="en"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
-    <title>Names & Numbers - Northwest Custom Apparel</title>
+    <title>Names &amp; Numbers - Northwest Custom Apparel</title>
     <link rel="icon" href="/favicon.png" type="image/png">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link href="/shared_components/css/names-numbers.css?v=2026.09.07.19" rel="stylesheet">
+
+
     <script src="/config/app.config.js"></script>
-</head>
-<body>
+<link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.09.21"><link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.09.21"><link rel="stylesheet" href="/shared_components/css/personalization-workspaces.css?v=2026.09.09.21"></head>
+<body data-ui="unified" data-personalization="roster-form"><a class="skip-link" href="#personalization-main">Skip to content</a>
     <!-- Header -->
     <header class="header">
         <div class="header-container">
             <div class="header-left">
-                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
-                     alt="Northwest Custom Apparel" class="logo">
-                <nav class="breadcrumb">
+                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" alt="Northwest Custom Apparel" class="logo">
+                <nav class="breadcrumb" aria-label="Breadcrumb">
                     <a href="/staff-dashboard.html">Staff Dashboard</a>
                     <span>/</span>
-                    <a href="/dashboards/names-numbers-dashboard.html">Names & Numbers</a>
+                    <a href="/dashboards/names-numbers-dashboard.html">Names &amp; Numbers</a>
                     <span>/</span>
                     <span id="breadcrumbCurrent">New Roster</span>
                 </nav>
             </div>
             <div class="header-right">
                 <span class="current-date" id="currentDate"></span>
-                <a href="/dashboards/names-numbers-dashboard.html" class="btn-secondary" title="Back to all rosters">
+                <a href="/dashboards/names-numbers-dashboard.html" class="btn-secondary btn btn-outline" title="Back to all rosters">
                     <i class="fas fa-arrow-left" aria-hidden="true"></i> All Rosters
                 </a>
             </div>
@@ -37,34 +34,34 @@
     </header>
 
     <!-- Main Content -->
-    <main class="main-container">
+    <main class="main-container" id="personalization-main" tabindex="-1">
         <!-- Page Header -->
         <div class="page-header">
             <div class="page-header-content">
                 <h1 class="page-title">
                     <i class="fas fa-users" aria-hidden="true"></i>
-                    Names & Numbers
+                    Names &amp; Numbers
                 </h1>
                 <p class="page-subtitle">Team roster management for personalized orders</p>
             </div>
             <div class="page-header-actions">
-                <button type="button" class="btn-icon" id="searchBtn" title="Search existing rosters">
+                <button type="button" class="btn-icon btn btn-outline" id="searchBtn" title="Search existing rosters">
                     <i class="fas fa-search" aria-hidden="true"></i>
                 </button>
-                <button type="button" class="btn-icon" id="newRosterBtn" title="Start new roster">
+                <button type="button" class="btn-icon btn btn-outline" id="newRosterBtn" title="Start new roster">
                     <i class="fas fa-plus" aria-hidden="true"></i>
                 </button>
             </div>
         </div>
 
         <!-- Search Panel (hidden by default) -->
-        <div class="search-panel" id="searchPanel" style="display: none;">
+        <div class="search-panel" id="searchPanel" hidden="">
             <div class="search-row">
-                <input type="text" id="searchInput" placeholder="Search by roster name, company, or order #..." aria-label="Search by roster name, company, or order #">
-                <button type="button" class="btn-primary" id="searchGoBtn"><i class="fas fa-search" aria-hidden="true"></i> Search</button>
-                <button type="button" class="btn-secondary" id="searchCloseBtn" aria-label="Close search"><i class="fas fa-times" aria-hidden="true"></i></button>
+                <input type="text" id="searchInput" placeholder="Search by roster name, company, or order #..." aria-label="Search by roster name, company, or order #" class="field-input">
+                <button type="button" class="btn-primary btn" id="searchGoBtn"><i class="fas fa-search" aria-hidden="true"></i> Search</button>
+                <button type="button" class="btn-secondary btn btn-outline" id="searchCloseBtn" aria-label="Close search"><i class="fas fa-times" aria-hidden="true"></i></button>
             </div>
-            <div id="searchResults" style="margin-top: 1rem;"></div>
+            <div id="searchResults" class="roster-space-top"></div>
         </div>
 
         <!-- Roster Info Card -->
@@ -76,85 +73,85 @@
             <div class="form-row">
                 <div class="form-group">
                     <label for="rosterName">Roster Name *</label>
-                    <input type="text" id="rosterName" placeholder="e.g. Lincoln Lynx Football 2026">
+                    <input type="text" id="rosterName" placeholder="e.g. Lincoln Lynx Football 2026" class="field-input">
                 </div>
                 <div class="form-group">
                     <label for="companyName">Company / Customer</label>
-                    <input type="text" id="companyName" placeholder="Company name">
+                    <input type="text" id="companyName" placeholder="Company name" class="field-input">
                 </div>
                 <div class="form-group">
                     <label for="orderNumber">Order # (Optional)</label>
-                    <input type="number" id="orderNumber" placeholder="ShopWorks order #">
+                    <input type="number" id="orderNumber" placeholder="ShopWorks order #" class="field-input">
                 </div>
             </div>
             <div class="form-row">
                 <div class="form-group">
                     <label for="contactName">Contact Name</label>
-                    <input type="text" id="contactName" placeholder="Customer contact">
+                    <input type="text" id="contactName" placeholder="Customer contact" class="field-input">
                 </div>
                 <div class="form-group">
                     <label for="contactEmail">Contact Email</label>
-                    <input type="email" id="contactEmail" placeholder="email@example.com">
+                    <input type="email" id="contactEmail" placeholder="email@example.com" class="field-input">
                 </div>
                 <div class="form-group">
                     <label for="salesRep">Sales Rep</label>
-                    <input type="text" id="salesRep" placeholder="Sales rep name">
+                    <input type="text" id="salesRep" placeholder="Sales rep name" class="field-input">
                 </div>
             </div>
             <div class="form-group">
                 <label for="rosterNotes">Notes</label>
-                <textarea id="rosterNotes" rows="2" placeholder="General notes about this roster..."></textarea>
+                <textarea id="rosterNotes" rows="2" placeholder="General notes about this roster..." class="field-input"></textarea>
             </div>
         </div>
 
         <!-- Import Toolbar -->
         <div class="import-toolbar">
-            <button type="button" class="btn-secondary" id="uploadExcelBtn">
+            <button type="button" class="btn-secondary btn btn-outline" id="uploadExcelBtn">
                 <i class="fas fa-file-excel" aria-hidden="true"></i> Upload Excel
             </button>
-            <button type="button" class="btn-secondary" id="ocrBtn">
+            <button type="button" class="btn-secondary btn btn-outline" id="ocrBtn">
                 <i class="fas fa-camera" aria-hidden="true"></i> Upload Image / PDF (OCR)
             </button>
-            <button type="button" class="btn-secondary" id="pasteNamesBtn">
+            <button type="button" class="btn-secondary btn btn-outline" id="pasteNamesBtn">
                 <i class="fas fa-paste" aria-hidden="true"></i> Paste Names
             </button>
-            <input type="file" id="excelFileInput" accept=".xlsx,.xls" style="display:none;" aria-label="Choose a file">
-            <input type="file" id="ocrFileInput" accept="image/jpeg,image/png,image/gif,image/webp,application/pdf" style="display:none;" aria-label="Choose a file">
+            <input type="file" id="excelFileInput" accept=".xlsx,.xls" aria-label="Choose a file" hidden="">
+            <input type="file" id="ocrFileInput" accept="image/jpeg,image/png,image/gif,image/webp,application/pdf" aria-label="Choose a file" hidden="">
         </div>
 
         <!-- Tab Bar -->
         <div class="tab-bar" id="tabBar">
             <!-- Tabs injected dynamically -->
-            <button type="button" class="tab-add-btn" id="addGroupBtn">
+            <button type="button" class="tab-add-btn btn" id="addGroupBtn">
                 <i class="fas fa-plus" aria-hidden="true"></i> Add Group
             </button>
         </div>
 
         <!-- Group Config Panel -->
-        <div class="group-config" id="groupConfig" style="display: none;">
+        <div class="group-config" id="groupConfig" hidden="">
             <div class="group-config-header">
                 <span class="group-config-title" id="groupConfigTitle">Group Settings</span>
-                <div style="display: flex; gap: 0.5rem;">
-                    <button type="button" class="btn-sm btn-secondary" id="toggleConfigBtn" aria-label="Show or hide configuration">
-                        <i class="fas fa-chevron-up" aria-hidden="true"></i>
+                <div class="roster-actions">
+                    <button type="button" class="btn-sm btn-secondary btn btn-outline" id="toggleConfigBtn" aria-label="Show or hide configuration" aria-expanded="false">
+                        <i class="fas fa-chevron-down" aria-hidden="true"></i>
                     </button>
-                    <button type="button" class="btn-sm btn-danger" id="deleteGroupBtn" title="Delete this group">
+                    <button type="button" class="btn-sm btn-danger btn" id="deleteGroupBtn" title="Delete this group">
                         <i class="fas fa-trash" aria-hidden="true"></i>
                     </button>
                 </div>
             </div>
-            <div id="groupConfigBody">
+            <div id="groupConfigBody" hidden="">
                 <div class="form-row">
                     <div class="form-group">
                         <label for="groupName">Group Name</label>
-                        <input type="text" id="groupName" placeholder="e.g. Player Hoodies">
+                        <input type="text" id="groupName" placeholder="e.g. Player Hoodies" class="field-input">
                     </div>
                 </div>
 
                 <div class="config-section">
                     <div class="config-section-header">
                         <label>Garments in this order</label>
-                        <button type="button" class="btn-sm btn-secondary" id="addGarmentBtn">
+                        <button type="button" class="btn-sm btn-secondary btn btn-outline" id="addGarmentBtn">
                             <i class="fas fa-plus" aria-hidden="true"></i> Add Garment
                         </button>
                     </div>
@@ -173,7 +170,7 @@
                 <div class="config-section">
                     <div class="config-section-header">
                         <label>Custom columns</label>
-                        <button type="button" class="btn-sm btn-secondary" id="addCustomColumnBtn">
+                        <button type="button" class="btn-sm btn-secondary btn btn-outline" id="addCustomColumnBtn">
                             <i class="fas fa-plus" aria-hidden="true"></i> Add Custom Column
                         </button>
                     </div>
@@ -184,25 +181,25 @@
 
         <!-- Data Table -->
         <div class="card" id="tableCard">
-            <div class="roster-table-wrapper">
-                <table class="roster-table" id="rosterTable">
+            <div class="roster-table-wrapper table-wrap" tabindex="0" role="region" aria-label="Roster table">
+                <table class="roster-table data-table" id="rosterTable">
                     <thead id="rosterTableHead"><tr></tr></thead>
                     <tbody id="rosterTableBody"></tbody>
                     <tfoot id="rosterTableFoot"><tr></tr></tfoot>
                 </table>
             </div>
-            <div style="margin-top: 0.75rem; display: flex; gap: 0.5rem;">
-                <button type="button" class="btn-secondary btn-sm" id="addRowBtn">
+            <div class="roster-actions roster-space-top">
+                <button type="button" class="btn-secondary btn-sm btn btn-outline" id="addRowBtn">
                     <i class="fas fa-plus" aria-hidden="true"></i> Add Row
                 </button>
-                <button type="button" class="btn-secondary btn-sm" id="addFiveRowsBtn">
+                <button type="button" class="btn-secondary btn-sm btn btn-outline" id="addFiveRowsBtn">
                     <i class="fas fa-plus" aria-hidden="true"></i> Add 5 Rows
                 </button>
             </div>
         </div>
 
         <!-- Size Breakdown (auto-generated from entered sizes) -->
-        <div class="card size-breakdown-card" id="sizeBreakdownCard" style="display: none;">
+        <div class="card size-breakdown-card" id="sizeBreakdownCard" hidden="">
             <div class="card-header">
                 <span class="card-title"><i class="fas fa-chart-bar" aria-hidden="true"></i> Size Breakdown</span>
             </div>
@@ -210,7 +207,7 @@
         </div>
 
         <!-- Empty State (shown when no groups) -->
-        <div class="empty-state" id="emptyState" style="display: none;">
+        <div class="empty-state" id="emptyState" hidden="">
             <i class="fas fa-clipboard-list" aria-hidden="true"></i>
             <h3>No Roster Data Yet</h3>
             <p>Upload an Excel file, take a photo with OCR, paste names, or add a group manually to get started.</p>
@@ -219,21 +216,21 @@
         <!-- Action Bar -->
         <div class="action-bar">
             <div class="action-bar-group">
-                <button type="button" class="btn-primary" id="saveDraftBtn">
+                <button type="button" class="btn-primary btn" id="saveDraftBtn">
                     <i class="fas fa-save" aria-hidden="true"></i> Save Draft
                 </button>
-                <button type="button" class="btn-success" id="saveSubmitBtn">
-                    <i class="fas fa-check" aria-hidden="true"></i> Save & Submit
+                <button type="button" class="btn-success btn" id="saveSubmitBtn">
+                    <i class="fas fa-check" aria-hidden="true"></i> Save &amp; Submit
                 </button>
-                <button type="button" class="btn-secondary" id="saveAndReturnBtn" title="Save and go back to the rosters list">
-                    <i class="fas fa-check-double" aria-hidden="true"></i> Save & Back to Dashboard
+                <button type="button" class="btn-secondary btn btn-outline" id="saveAndReturnBtn" title="Save and go back to the rosters list">
+                    <i class="fas fa-check-double" aria-hidden="true"></i> Save &amp; Back to Dashboard
                 </button>
             </div>
             <div class="action-bar-group">
-                <button type="button" class="btn-secondary" id="printBtn">
+                <button type="button" class="btn-secondary btn btn-outline" id="printBtn">
                     <i class="fas fa-print" aria-hidden="true"></i> Print
                 </button>
-                <button type="button" class="btn-secondary" id="exportExcelBtn">
+                <button type="button" class="btn-secondary btn btn-outline" id="exportExcelBtn">
                     <i class="fas fa-file-excel" aria-hidden="true"></i> Export Excel
                 </button>
             </div>
@@ -241,93 +238,97 @@
     </main>
 
     <!-- Paste Names Modal -->
-    <div class="modal-overlay" id="pasteModal">
+    <dialog class="modal-overlay ui-dialog" id="pasteModal" aria-label="Paste Names">
         <div class="modal">
             <div class="modal-header">
                 <span class="modal-title"><i class="fas fa-paste" aria-hidden="true"></i> Paste Names</span>
-                <button type="button" class="modal-close" id="pasteModalClose">&times;</button>
+                <button type="button" class="modal-close btn btn-outline" id="pasteModalClose" aria-label="Close Paste Names">×</button>
             </div>
             <div class="modal-body">
-                <p style="margin-bottom: 0.75rem; font-size: 0.875rem; color: var(--nn-text-secondary);">
+                <p class="roster-hint">
                     Paste one name per line. Optionally include number and size separated by commas or tabs.<br>
                     <strong>Examples:</strong> <code>Smith, 6, L</code> or <code>Smith&lt;tab&gt;6&lt;tab&gt;L</code>
                 </p>
-                <textarea id="pasteTextarea" placeholder="Smith, 6, L&#10;Johnson, 12, XL&#10;Williams, 3, M" aria-label="Paste names, quantities and sizes, one per line"></textarea>
+                <textarea id="pasteTextarea" placeholder="Smith, 6, L
+Johnson, 12, XL
+Williams, 3, M" aria-label="Paste names, quantities and sizes, one per line" class="field-input" autofocus=""></textarea>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn-secondary" id="pasteCancelBtn">Cancel</button>
-                <button type="button" class="btn-primary" id="pasteImportBtn"><i class="fas fa-download" aria-hidden="true"></i> Import</button>
+                <button type="button" class="btn-secondary btn btn-outline" id="pasteCancelBtn">Cancel</button>
+                <button type="button" class="btn-primary btn" id="pasteImportBtn"><i class="fas fa-download" aria-hidden="true"></i> Import</button>
             </div>
         </div>
-    </div>
+    </dialog>
 
     <!-- OCR Modal -->
-    <div class="modal-overlay" id="ocrModal">
+    <dialog class="modal-overlay ui-dialog" id="ocrModal" aria-label="Upload Image or PDF for OCR">
         <div class="modal">
             <div class="modal-header">
                 <span class="modal-title"><i class="fas fa-camera" aria-hidden="true"></i> Upload Image or PDF for OCR</span>
-                <button type="button" class="modal-close" id="ocrModalClose">&times;</button>
+                <button type="button" class="modal-close btn btn-outline" id="ocrModalClose" aria-label="Close Upload Image or PDF for OCR">×</button>
             </div>
             <div class="modal-body">
                 <div class="ocr-drop-zone" id="ocrDropZone">
                     <i class="fas fa-cloud-upload-alt" aria-hidden="true"></i>
-                    <p><strong>Drag & drop an image or PDF here</strong></p>
+                    <p><strong>Drag &amp; drop an image or PDF here</strong></p>
                     <p>or click to browse (JPEG, PNG, GIF, WebP, or PDF)</p>
                 </div>
-                <div class="ocr-preview" id="ocrPreview" style="display: none;"></div>
-                <div class="ocr-processing" id="ocrProcessing" style="display: none;">
+                <div class="ocr-preview" id="ocrPreview" hidden=""></div>
+                <div class="ocr-processing" id="ocrProcessing" hidden="">
                     <div class="spinner"></div>
                     <span>AI is reading the roster... this may take a few seconds</span>
                 </div>
-                <div id="ocrResults" style="display: none; margin-top: 1rem;"></div>
+                <div id="ocrResults" hidden="" class="roster-space-top"></div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn-secondary" id="ocrCancelBtn">Cancel</button>
-                <button type="button" class="btn-primary" id="ocrImportBtn" style="display: none;">
+                <button type="button" class="btn-secondary btn btn-outline" id="ocrCancelBtn">Cancel</button>
+                <button type="button" class="btn-primary btn" id="ocrImportBtn" hidden="">
                     <i class="fas fa-download" aria-hidden="true"></i> Import Extracted Names
                 </button>
             </div>
         </div>
-    </div>
+    </dialog>
 
     <!-- Add Group Modal -->
-    <div class="modal-overlay" id="addGroupModal">
+    <dialog class="modal-overlay ui-dialog" id="addGroupModal" aria-label="Add New Group">
         <div class="modal">
             <div class="modal-header">
                 <span class="modal-title"><i class="fas fa-layer-group" aria-hidden="true"></i> Add New Group</span>
-                <button type="button" class="modal-close" id="addGroupModalClose">&times;</button>
+                <button type="button" class="modal-close btn btn-outline" id="addGroupModalClose" aria-label="Close Add New Group">×</button>
             </div>
             <div class="modal-body">
-                <div class="form-group" style="margin-bottom: 1rem;">
+                <div class="form-group roster-space-bottom">
                     <label for="newGroupName">Group Name</label>
-                    <input type="text" id="newGroupName" placeholder="e.g. Player Hoodies, Coach Jackets">
+                    <input type="text" id="newGroupName" placeholder="e.g. Player Hoodies, Coach Jackets" class="field-input" autofocus="">
                 </div>
                 <div class="form-row">
                     <div class="form-group">
                         <label for="newGroupStyle">First Garment — Style (optional)</label>
-                        <input type="text" id="newGroupStyle" placeholder="e.g. PC54, ST254">
+                        <input type="text" id="newGroupStyle" placeholder="e.g. PC54, ST254" class="field-input">
                     </div>
                     <div class="form-group">
                         <label for="newGroupColor">First Garment — Color (optional)</label>
-                        <input type="text" id="newGroupColor" placeholder="e.g. Navy, Black">
+                        <input type="text" id="newGroupColor" placeholder="e.g. Navy, Black" class="field-input">
                     </div>
                 </div>
-                <p style="margin-top: 0.75rem; font-size: 0.8rem; color: var(--nn-text-secondary);">
+                <p class="roster-hint roster-space-top">
                     <i class="fas fa-info-circle" aria-hidden="true"></i> You can add more garments (e.g. T-shirt + Hoodie) after the group is created.
                 </p>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn-secondary" id="addGroupCancelBtn">Cancel</button>
-                <button type="button" class="btn-primary" id="addGroupConfirmBtn"><i class="fas fa-plus" aria-hidden="true"></i> Add Group</button>
+                <button type="button" class="btn-secondary btn btn-outline" id="addGroupCancelBtn">Cancel</button>
+                <button type="button" class="btn-primary btn" id="addGroupConfirmBtn"><i class="fas fa-plus" aria-hidden="true"></i> Add Group</button>
             </div>
         </div>
-    </div>
+    </dialog>
 
     <!-- Toast container -->
-    <div class="toast" id="toast"></div>
+    <div class="toast" id="toast" role="status"></div>
 
     <!-- Scripts -->
     <script src="/shared_components/js/names-numbers-service.js?v=2026.09.06.31"></script>
-    <script src="/shared_components/js/names-numbers-controller.js?v=2026.09.06.25"></script>
-</body>
-</html>
+    <script src="/shared_components/js/ui-dialog.js?v=2026.09.09.21"></script><script src="/shared_components/js/names-numbers-controller.js?v=2026.09.09.21"></script>
+
+
+
+</body></html>

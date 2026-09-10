@@ -1296,6 +1296,10 @@ class MonogramFormController {
     }
 
     handleStyleChange(row, selectEl) {
+        if (selectEl.tagName !== 'SELECT') {
+            this.isDirty = true;
+            return;
+        }
         const value = selectEl.value;
         const descInput = row.querySelector('.description-input');
         const colorSelect = row.querySelector('.color-input');
@@ -1466,7 +1470,7 @@ class MonogramFormController {
     updateSizeDropdownCounts(row) {
         const styleSelect = row.querySelector('.style-input');
         const sizeSelect = row.querySelector('.size-input');
-        if (!styleSelect || !sizeSelect) return;
+        if (!styleSelect || !sizeSelect || styleSelect.tagName !== 'SELECT') return;
 
         const styleValue = styleSelect.value;
         if (!styleValue) return;  // No style selected yet
@@ -1568,6 +1572,7 @@ class MonogramFormController {
                 style: styleInput?.tagName === 'SELECT'
                     ? (styleInput.value === '__custom__' ? styleCustom?.value : styleInput.value)
                     : styleInput?.value || '',
+                isCustomStyle: styleInput?.value === '__custom__' || styleInput?.dataset.customStyle === 'true',
                 description: descInput?.value || '',
                 color: colorInput?.value || '',
                 size: sizeInput?.value || '',
@@ -1601,6 +1606,7 @@ class MonogramFormController {
             // In manual mode, style is a text input
             if (styleInput.tagName === 'INPUT') {
                 styleInput.value = data.style || '';
+                styleInput.dataset.customStyle = String(Boolean(data.isCustomStyle));
             } else {
                 // In order mode, try to find matching option
                 const matchingOption = Array.from(styleInput.options).find(
@@ -1696,7 +1702,7 @@ class MonogramFormController {
                 rowThreadColor: rowThreadColorSelect?.value?.trim() || '',
                 rowLocation: rowLocationSelect?.value?.trim() || '',
                 monogramName: nameInput.value.trim(),
-                isCustomStyle: styleSelect.value === '__custom__'
+                isCustomStyle: styleSelect.value === '__custom__' || styleSelect.dataset.customStyle === 'true'
             };
 
             items.push(item);
@@ -1824,6 +1830,10 @@ class MonogramFormController {
     }
 
     populateForm(session, items) {
+        // A saved session owns its garment data; a previous lookup must not constrain it.
+        this.orderLoaded = false;
+        this.products = [];
+        this.hideOrderStatus();
         // Populate header fields (using camelCase from service)
         document.getElementById('orderNumber').value = session.orderNumber || '';
         document.getElementById('companyName').value = session.companyName || '';
@@ -1850,7 +1860,7 @@ class MonogramFormController {
                 const row = tbody.lastElementChild;
 
                 // Populate row fields
-                const customStyle = row.querySelector('.style-custom');
+                const styleInput = row.querySelector('.style-input');
                 const descInput = row.querySelector('.description-input');
                 const colorSelect = row.querySelector('.color-input');
                 const sizeSelect = row.querySelector('.size-input');
@@ -1858,13 +1868,9 @@ class MonogramFormController {
                 const rowLocationSelect = row.querySelector('.row-location');
                 const nameInput = row.querySelector('.name-input');
 
-                if (item.isCustomStyle) {
-                    row.querySelector('.style-input').value = '__custom__';
-                    customStyle.style.display = 'block';
-                    customStyle.value = item.styleNumber || '';
-                    descInput.readOnly = false;
-                    descInput.classList.remove('input-readonly');
-                }
+                // Saved rows reopen in manual mode, including custom garments.
+                styleInput.value = item.styleNumber || '';
+                styleInput.dataset.customStyle = String(Boolean(item.isCustomStyle));
 
                 descInput.value = item.description || '';
                 colorSelect.value = item.shirtColor || '';

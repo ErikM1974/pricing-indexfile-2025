@@ -66,12 +66,9 @@ Match production/CI runtimes, audit the resolved tree and verify actual live-pri
 
 Keep version choices tied to measured checks and compare screenshots only after readiness. Full entry in LESSONS_LEARNED_ARCHIVE.md.
 
-## 2026-09-07 — DTF browser checks must await initialization
+## DTF browser readiness (2026-09-07, archived)
 
-**Problem:** The money-path test typed before the search listener existed; its trace contained no product lookup.
-**Root cause:** The search box is visible before async pricing initialization binds listeners.
-**Solution:** In the browser test, await the existing end-of-init inline overlay state before typing. Production code and money assertions are unchanged.
-**Prevention:** Wait for functional readiness, not merely static HTML visibility; retain both blocked-save and successful-save coverage.
+Wait for functional initialization before typing; retain failed and successful save coverage. Full entry in LESSONS_LEARNED_ARCHIVE.md.
 
 ## Calculator prerequisite failures must stop pricing (2026-09-07)
 - Problem: color/size failures were swallowed; the next pricing stage could hide the error or reuse another style's size data.
@@ -253,3 +250,10 @@ Problem/root cause: incomplete invoices looked empty, failed import logs were cl
 - Problem/root cause: after a failed refresh, search/status changes rendered old monogram or roster data and removed Retry; missing roster arrays looked like zero records.
 - Solution: clear prior records/counts when loading, validate list arrays, preserve the error while filtering, and accept only the latest request before rendering. Current filters apply after a successful retry.
 - Prevention: synthetic failure/filter/retry, missing-list and out-of-order success cases must exercise the actual controls; wait for debounced handlers before judging output. Keep original rows, field values and controller/service source hashes outside mapped UI/recovery edits.
+
+## Personalization forms must preserve saved details and complete paper output (2026-09-09)
+
+**Problem:** Saved catalog styles reopened blank; custom styles interrupted loading, and editing manual styles threw. Wide roster printouts clipped garment/custom columns.
+**Root cause:** The loader populated only the custom dropdown path although saved forms create manual inputs; subsequent handlers assumed every style control was a select. The editable roster table was wider than the printed page.
+**Solution:** Restore saved styles and custom flags in manual rows, clear prior lookup constraints, guard dropdown-only handlers and retain flags through row rebuilds. Render the active roster group on paper in bounded column sections with repeated identities/headings, using existing descriptors and unchanged size-breakdown output.
+**Prevention:** Test catalog/custom round trips, row rebuilding, editing and loading after another order. Check narrow layouts, complete PDF values and multi-page headings; use the shared dialog lifecycle with native dialogs for keyboard focus and scroll restoration.

@@ -187,7 +187,8 @@ class NamesNumbersController {
             const currentStatus = document.getElementById('statusBadge').textContent.trim();
             this.save(currentStatus === 'Submitted' ? 'Submitted' : 'Draft');
         });
-        document.getElementById('printBtn').addEventListener('click', () => window.print());
+        document.getElementById('printBtn').addEventListener('click', () => { this.renderPaper(); window.print(); });
+        window.addEventListener('beforeprint', () => this.renderPaper());
         document.getElementById('exportExcelBtn').addEventListener('click', () => this.exportExcel());
 
         // Paste modal
@@ -329,11 +330,11 @@ class NamesNumbersController {
         const panel = document.getElementById('groupConfig');
 
         if (!group) {
-            panel.style.display = 'none';
+            panel.hidden = true;
             return;
         }
 
-        panel.style.display = '';
+        panel.hidden = false;
         document.getElementById('groupConfigTitle').textContent = `${group.name} — Settings`;
         document.getElementById('groupName').value = group.name || '';
 
@@ -370,14 +371,14 @@ class NamesNumbersController {
             <div class="garment-row" data-garment-id="${g.id}">
                 <div class="garment-row-header">
                     <span class="garment-row-idx">Garment ${idx + 1}</span>
-                    <button type="button" class="btn-sm btn-danger garment-delete-btn" title="Remove garment" ${group.garments.length === 1 ? 'disabled' : ''}>
+                    <button type="button" class="btn btn-sm btn-danger garment-delete-btn" title="Remove garment" ${group.garments.length === 1 ? 'disabled' : ''}>
                         <i class="fas fa-times" aria-hidden="true"></i>
                     </button>
                 </div>
                 <div class="garment-row-fields">
-                    <input type="text" class="gf-label" placeholder="Label (e.g. T-Shirt)" value="${this.escapeAttr(g.label || '')}">
-                    <input type="text" class="gf-style" placeholder="Style (e.g. PC54)" value="${this.escapeAttr(g.style || '')}">
-                    <input type="text" class="gf-color" placeholder="Color (e.g. Navy)" value="${this.escapeAttr(g.color || '')}">
+                    <input type="text" class="gf-label field-input" aria-label="Garment label" placeholder="Label (e.g. T-Shirt)" value="${this.escapeAttr(g.label || '')}">
+                    <input type="text" class="gf-style field-input" aria-label="Garment style" placeholder="Style (e.g. PC54)" value="${this.escapeAttr(g.style || '')}">
+                    <input type="text" class="gf-color field-input" aria-label="Garment color" placeholder="Color (e.g. Navy)" value="${this.escapeAttr(g.color || '')}">
                 </div>
                 <div class="garment-row-toggles">
                     <label><input type="checkbox" class="gf-backPrint"  ${g.hasBackPrint  ? 'checked' : ''}> Back Print</label>
@@ -457,8 +458,8 @@ class NamesNumbersController {
         } else {
             host.innerHTML = group.customColumns.map(cc => `
                 <div class="custom-col-row" data-col-id="${cc.id}">
-                    <input type="text" class="cc-label" placeholder="Column label" value="${this.escapeAttr(cc.label || '')}">
-                    <button type="button" class="btn-sm btn-danger cc-delete-btn" title="Remove column">
+                    <input type="text" class="cc-label field-input" aria-label="Custom column label" placeholder="Column label" value="${this.escapeAttr(cc.label || '')}">
+                    <button type="button" class="btn btn-sm btn-danger cc-delete-btn" title="Remove column">
                         <i class="fas fa-times" aria-hidden="true"></i>
                     </button>
                 </div>
@@ -516,11 +517,12 @@ class NamesNumbersController {
     toggleGroupConfig() {
         const body = document.getElementById('groupConfigBody');
         const icon = document.querySelector('#toggleConfigBtn i');
-        if (body.style.display === 'none') {
-            body.style.display = '';
+        document.getElementById('toggleConfigBtn').setAttribute('aria-expanded', String(body.hidden));
+        if (body.hidden) {
+            body.hidden = false;
             icon.className = 'fas fa-chevron-up';
         } else {
-            body.style.display = 'none';
+            body.hidden = true;
             icon.className = 'fas fa-chevron-down';
         }
     }
@@ -561,12 +563,12 @@ class NamesNumbersController {
     renderTable() {
         const group = this.getActiveGroup();
         if (!group) {
-            document.getElementById('tableCard').style.display = 'none';
+            document.getElementById('tableCard').hidden = true;
             const breakdown = document.getElementById('sizeBreakdownCard');
-            if (breakdown) breakdown.style.display = 'none';
+            if (breakdown) breakdown.hidden = true;
             return;
         }
-        document.getElementById('tableCard').style.display = '';
+        document.getElementById('tableCard').hidden = false;
 
         const descriptors = this.buildColumnDescriptors(group);
         const multiGarment = group.garments.length > 1;
@@ -583,7 +585,7 @@ class NamesNumbersController {
             // Person columns span rows
             group.personColumns.forEach(key => {
                 const def = PERSON_COLUMN_DEFS[key];
-                topRow.innerHTML += `<th class="col-person" rowspan="2" style="min-width:${def.width}">${this.escapeHtml(def.label)}</th>`;
+                topRow.innerHTML += `<th class="col-person" rowspan="2" style="--column-min:${def.width}">${this.escapeHtml(def.label)}</th>`;
             });
             // Garment bands
             group.garments.forEach((g, gi) => {
@@ -592,12 +594,12 @@ class NamesNumbersController {
                 topRow.innerHTML += `<th class="col-garment-band garment-band-${gi % 4}" colspan="${fieldCount}">${this.escapeHtml(g.label || 'Garment')}${g.style ? ` <span class="garment-band-style">${this.escapeHtml(g.style)}${g.color ? ' / ' + this.escapeHtml(g.color) : ''}</span>` : ''}</th>`;
                 Object.entries(GARMENT_FIELD_DEFS).forEach(([field, def]) => {
                     if (def.toggle && !g[def.toggle]) return;
-                    bottomRow.innerHTML += `<th class="col-garment garment-band-${gi % 4}" style="min-width:${def.width}">${this.escapeHtml(def.label)}</th>`;
+                    bottomRow.innerHTML += `<th class="col-garment garment-band-${gi % 4}" style="--column-min:${def.width}">${this.escapeHtml(def.label)}</th>`;
                 });
             });
             // Custom columns span rows
             group.customColumns.forEach(cc => {
-                topRow.innerHTML += `<th class="col-custom" rowspan="2" style="min-width:160px">${this.escapeHtml(cc.label || 'Custom')}</th>`;
+                topRow.innerHTML += `<th class="col-custom" rowspan="2">${this.escapeHtml(cc.label || 'Custom')}</th>`;
             });
             topRow.innerHTML += '<th class="row-actions" rowspan="2"></th>';
 
@@ -606,7 +608,7 @@ class NamesNumbersController {
         } else {
             const tr = document.createElement('tr');
             tr.innerHTML = '<th class="row-number">#</th>' +
-                descriptors.map(d => `<th class="col-${d.kind}" style="min-width:${d.width}">${this.escapeHtml(d.label)}</th>`).join('') +
+                descriptors.map(d => `<th class="col-${d.kind}" style="--column-min:${d.width}">${this.escapeHtml(d.label)}</th>`).join('') +
                 '<th class="row-actions"></th>';
             thead.appendChild(tr);
         }
@@ -639,9 +641,9 @@ class NamesNumbersController {
                 }
                 const placeholder = (d.kind === 'person' && group.defaults[d.key] && !val)
                     ? `placeholder="${this.escapeAttr(group.defaults[d.key])}"` : '';
-                html += `<td class="col-${d.kind}${d.kind === 'garment' ? ' garment-band-' + (group.garments.findIndex(g => g.id === d.garmentId) % 4) : ''}"><input type="text" ${dataAttrs} value="${this.escapeAttr(val)}" ${placeholder}></td>`;
+                html += `<td class="col-${d.kind}${d.kind === 'garment' ? ' garment-band-' + (group.garments.findIndex(g => g.id === d.garmentId) % 4) : ''}"><input type="text" class="field-input" aria-label="Row ${idx + 1}, ${this.escapeAttr(d.kind === 'garment' ? d.garmentLabel + ': ' + d.label : d.label)}" ${dataAttrs} value="${this.escapeAttr(val)}" ${placeholder}></td>`;
             });
-            html += `<td class="row-actions"><button type="button" class="row-delete-btn" data-idx="${idx}" title="Remove row"><i class="fas fa-times" aria-hidden="true"></i></button></td>`;
+            html += `<td class="row-actions"><button type="button" class="row-delete-btn btn btn-danger" data-idx="${idx}" title="Remove row"><i class="fas fa-times" aria-hidden="true"></i></button></td>`;
 
             tr.innerHTML = html;
             tbody.appendChild(tr);
@@ -730,10 +732,10 @@ class NamesNumbersController {
         if (!card || !body) return;
 
         const group = this.getActiveGroup();
-        if (!group) { card.style.display = 'none'; return; }
+        if (!group) { card.hidden = true; return; }
 
         const rows = this.getActiveRows();
-        if (rows.length === 0) { card.style.display = 'none'; return; }
+        if (rows.length === 0) { card.hidden = true; return; }
 
         // Per-garment size counts from live DOM (so breakdown tracks unsaved edits)
         const tbody = document.getElementById('rosterTableBody');
@@ -751,9 +753,9 @@ class NamesNumbersController {
         });
 
         const hasAny = Object.values(totals).some(n => n > 0);
-        if (!hasAny) { card.style.display = 'none'; return; }
+        if (!hasAny) { card.hidden = true; return; }
 
-        card.style.display = '';
+        card.hidden = false;
         body.innerHTML = group.garments.map((g, gi) => {
             if (totals[g.id] === 0) return '';
             const sorted = Object.entries(counts[g.id]).sort((a, b) => this.sizeRank(a[0]) - this.sizeRank(b[0]));
@@ -958,35 +960,35 @@ class NamesNumbersController {
         if (isPdf) {
             const sizeKb = Math.round(file.size / 1024);
             preview.innerHTML = `<div class="ocr-pdf-chip"><i class="fas fa-file-pdf" aria-hidden="true"></i><div><strong>${this.escapeHtml(file.name)}</strong><div class="ocr-pdf-meta">PDF · ${sizeKb} KB</div></div></div>`;
-            preview.style.display = '';
+            preview.hidden = false;
         } else {
             const reader = new FileReader();
             reader.onload = e => {
                 preview.innerHTML = `<img src="${e.target.result}" alt="Uploaded roster">`;
-                preview.style.display = '';
+                preview.hidden = false;
             };
             reader.readAsDataURL(file);
         }
 
         // Show processing
-        processing.style.display = '';
-        results.style.display = 'none';
-        importBtn.style.display = 'none';
+        processing.hidden = false;
+        results.hidden = true;
+        importBtn.hidden = true;
 
         try {
             const result = await this.service.ocrImage(file);
 
-            processing.style.display = 'none';
+            processing.hidden = true;
 
             if (!result.success) {
-                results.innerHTML = `<p style="color: var(--nn-error-text);">OCR failed: ${this.escapeHtml(result.error || 'Unknown error')}</p>`;
-                results.style.display = '';
+                results.innerHTML = `<p class="roster-error">OCR failed: ${this.escapeHtml(result.error || 'Unknown error')}</p>`;
+                results.hidden = false;
                 return;
             }
 
             if (!result.parsed || !result.entries || result.entries.length === 0) {
-                results.innerHTML = `<p>No structured data extracted. Raw text:</p><pre style="font-size:0.8rem; background:#f5f5f5; padding:0.5rem; border-radius:0.25rem; white-space:pre-wrap;">${this.escapeHtml(result.rawText || 'No text found')}</pre>`;
-                results.style.display = '';
+                results.innerHTML = `<p>No structured data extracted. Raw text:</p><pre class="roster-raw-text">${this.escapeHtml(result.rawText || 'No text found')}</pre>`;
+                results.hidden = false;
                 return;
             }
 
@@ -1006,7 +1008,7 @@ class NamesNumbersController {
             this._ocrGroupName = result.groupName;
 
             // Build preview HTML: editable garment labels + entries table
-            let html = `<p style="margin-bottom:0.5rem;"><strong>${result.entries.length} ${result.entries.length === 1 ? 'entry' : 'entries'} extracted</strong>`;
+            let html = `<p class="roster-space-bottom"><strong>${result.entries.length} ${result.entries.length === 1 ? 'entry' : 'entries'} extracted</strong>`;
             if (result.teamName) html += ` — ${this.escapeHtml(result.teamName)}`;
             html += `</p>`;
 
@@ -1025,7 +1027,7 @@ class NamesNumbersController {
             const sampleCount = Math.min(result.entries.length, 10);
             html += `<div class="ocr-entries-preview">
                 <div class="ocr-entries-label">Entries preview (first ${sampleCount} of ${result.entries.length}):</div>
-                <table class="roster-table" style="font-size:0.8rem;"><thead><tr>
+                <table class="roster-table roster-preview-table"><thead><tr>
                     <th>#</th><th>Name</th>
                     ${detectedGarments.map(g => `<th>${this.escapeHtml(g.label)}</th>`).join('')}
                     ${detectedGarments.some(g => g.hasBackPrint) ? '<th>Back Print</th>' : ''}
@@ -1046,8 +1048,8 @@ class NamesNumbersController {
             html += '</tbody></table></div>';
 
             results.innerHTML = html;
-            results.style.display = '';
-            importBtn.style.display = '';
+            results.hidden = false;
+            importBtn.hidden = false;
 
             // Wire garment preview editing
             results.querySelectorAll('.ocr-garment-label').forEach(input => {
@@ -1072,9 +1074,9 @@ class NamesNumbersController {
                 });
             });
         } catch (err) {
-            processing.style.display = 'none';
-            results.innerHTML = `<p style="color: var(--nn-error-text);">Error: ${this.escapeHtml(err.message)}</p>`;
-            results.style.display = '';
+            processing.hidden = true;
+            results.innerHTML = `<p class="roster-error">Error: ${this.escapeHtml(err.message)}</p>`;
+            results.hidden = false;
         }
     }
 
@@ -1344,8 +1346,8 @@ class NamesNumbersController {
 
     toggleSearch() {
         const panel = document.getElementById('searchPanel');
-        panel.style.display = panel.style.display === 'none' ? '' : 'none';
-        if (panel.style.display !== 'none') {
+        panel.hidden = !panel.hidden;
+        if (!panel.hidden) {
             document.getElementById('searchInput').focus();
         }
     }
@@ -1374,35 +1376,109 @@ class NamesNumbersController {
             });
 
             if (unique.length === 0) {
-                results.innerHTML = '<p style="color: var(--nn-text-secondary); padding: 0.5rem 0;">No rosters found.</p>';
+                results.innerHTML = '<p class="roster-hint">No rosters found.</p>';
                 return;
             }
 
-            let html = '<div style="max-height: 300px; overflow-y: auto;">';
+            let html = '<div class="roster-search-list">';
             unique.forEach(r => {
                 const statusClass = (r.Status || 'draft').toLowerCase().replace(/\s+/g, '-');
-                html += `<div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid var(--nn-border); cursor: pointer;"
-                    onclick="controller.loadRoster(${r.ID_Roster}); controller.toggleSearch();">
-                    <div>
+                html += `<button type="button" class="roster-search-result" data-roster-id="${this.escapeAttr(String(r.ID_Roster))}">
+                    <span>
                         <strong>${this.escapeHtml(r.RosterName || 'Untitled')}</strong>
-                        <span style="color: var(--nn-text-secondary); margin-left: 0.5rem;">${this.escapeHtml(r.CompanyName || '')}</span>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <span class="roster-search-company">${this.escapeHtml(r.CompanyName || '')}</span>
+                    </span>
+                    <span class="roster-actions">
                         <span class="status-badge status-${statusClass}">${this.escapeHtml(r.Status || 'Draft')}</span>
-                        <span style="font-size: 0.8rem; color: var(--nn-text-secondary);">${r.TotalPersons || 0} people</span>
-                    </div>
-                </div>`;
+                        <span class="roster-hint">${r.TotalPersons || 0} people</span>
+                    </span>
+                </button>`;
             });
             html += '</div>';
             results.innerHTML = html;
+            results.querySelectorAll('[data-roster-id]').forEach(button => button.addEventListener('click', () => {
+                this.loadRoster(Number(button.dataset.rosterId));
+                this.toggleSearch();
+            }));
         } catch (err) {
-            results.innerHTML = `<p style="color: var(--nn-error-text);">Search failed: ${this.escapeHtml(err.message)}</p>`;
+            results.innerHTML = `<p class="roster-error">Search failed: ${this.escapeHtml(err.message)}</p>`;
         }
     }
 
     // ============================================
     // Export Excel
     // ============================================
+
+    renderPaper() {
+        this.collectTableData();
+        const make = (tag, text, className) => {
+            const element = document.createElement(tag);
+            if (text != null) element.textContent = String(text);
+            if (className) element.className = className;
+            return element;
+        };
+        const paper = make('section', null, 'roster-paper');
+        paper.append(make('h1', document.getElementById('rosterName').value || 'Names & Numbers'));
+        const details = make('dl', null, 'roster-paper-details');
+        for (const [id, label] of [
+            ['companyName', 'Company / Customer'], ['orderNumber', 'Order #'],
+            ['contactName', 'Contact Name'], ['contactEmail', 'Contact Email'],
+            ['salesRep', 'Sales Rep'], ['rosterNotes', 'Notes']
+        ]) {
+            const value = document.getElementById(id).value;
+            if (value) { details.append(make('dt', label), make('dd', value)); }
+        }
+        details.append(make('dt', 'Status'), make('dd', document.getElementById('statusBadge').textContent));
+        paper.append(details);
+        const group = this.getActiveGroup();
+        if (group) {
+            const descriptors = this.buildColumnDescriptors(group);
+            const identity = descriptors.filter(d => d.kind === 'person' && ['name', 'firstName', 'number', 'fullName'].includes(d.key)).slice(0, 3);
+            const remaining = descriptors.filter(d => !identity.includes(d));
+            const rows = this.getActiveRows();
+            paper.append(make('h2', group.name));
+            paper.append(make('p', group.garments.map(g => [g.label, g.style, g.color].filter(Boolean).join(' / ')).join(' · ')));
+            const sections = Math.max(1, Math.ceil(remaining.length / 5));
+            for (let section = 0; section < sections; section++) {
+                const columns = identity.concat(remaining.slice(section * 5, (section + 1) * 5));
+                const table = make('table');
+                const head = make('thead'), headings = make('tr');
+                if (sections > 1) {
+                    const sectionRow = make('tr');
+                    const sectionTitle = make('th', 'Columns ' + (section + 1) + ' of ' + sections + ' — row numbers and names match across tables');
+                    sectionTitle.colSpan = columns.length + 1;
+                    sectionRow.append(sectionTitle); head.append(sectionRow);
+                }
+                headings.append(make('th', '#'));
+                for (const d of columns) headings.append(make('th', d.kind === 'garment' ? d.garmentLabel + ': ' + d.label : d.label));
+                head.append(headings); table.append(head);
+                const body = make('tbody');
+                rows.forEach((row, index) => {
+                    const line = make('tr'); line.append(make('th', index + 1));
+                    for (const d of columns) {
+                        const value = d.kind === 'person' ? row[d.key]
+                            : d.kind === 'garment' ? row.garmentData?.[d.garmentId]?.[d.field]
+                                : row.custom?.[d.key];
+                        line.append(make('td', value == null ? '' : value));
+                    }
+                    body.append(line);
+                });
+                table.append(body); paper.append(table);
+            }
+            paper.append(make('p', 'Total: ' + rows.length + (rows.length === 1 ? ' person' : ' people')));
+            const breakdown = document.getElementById('sizeBreakdownCard');
+            if (!breakdown.hidden) {
+                const copy = breakdown.cloneNode(true);
+                copy.removeAttribute('id');
+                copy.querySelectorAll('[id]').forEach(n => n.removeAttribute('id'));
+                paper.append(copy);
+            }
+        } else {
+            paper.append(make('p', 'No Roster Data Yet'));
+        }
+        document.querySelector('.roster-paper')?.remove();
+        document.body.append(paper);
+    }
 
     exportExcel() {
         this.collectTableData();
@@ -1466,11 +1542,11 @@ class NamesNumbersController {
 
     updateUI() {
         const hasGroups = this.groups.length > 0;
-        document.getElementById('emptyState').style.display = hasGroups ? 'none' : '';
-        document.getElementById('tableCard').style.display = hasGroups ? '' : 'none';
-        document.getElementById('groupConfig').style.display = hasGroups ? '' : 'none';
+        document.getElementById('emptyState').hidden = hasGroups;
+        document.getElementById('tableCard').hidden = !hasGroups;
+        document.getElementById('groupConfig').hidden = !hasGroups;
         const breakdown = document.getElementById('sizeBreakdownCard');
-        if (breakdown && !hasGroups) breakdown.style.display = 'none';
+        if (breakdown && !hasGroups) breakdown.hidden = true;
     }
 
     updateStatusBadge(status) {
@@ -1504,11 +1580,17 @@ class NamesNumbersController {
     }
 
     openModal(id) {
-        document.getElementById(id).classList.add('active');
+        const dialog = document.getElementById(id);
+        if (dialog.open) return;
+        // Shared focus/scroll lifecycle wraps the browser's modal top layer.
+        window.UiDialog.open(dialog, { onDismiss: () => this.closeModal(id) });
+        dialog.showModal();
     }
 
     closeModal(id) {
-        document.getElementById(id).classList.remove('active');
+        const dialog = document.getElementById(id);
+        dialog.close();
+        window.UiDialog.close(dialog);
     }
 
     showToast(message, type) {
