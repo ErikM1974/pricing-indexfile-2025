@@ -286,7 +286,9 @@
 
         // Load the Erik-editable kit catalog → checkbox + qty per item.
         kitFetch('/items').then(function (body) {
-            var items = body.items || [];
+            if (!overlay.isConnected) return;
+            if (!body || !Array.isArray(body.items)) throw new Error('Incomplete kit catalog');
+            var items = body.items;
             var box = document.getElementById('lw-kit-items');
             if (!items.length) { box.innerHTML = '<span class="ld-muted">No kit items configured. Add rows to Marketing_Kit_Items in Caspio.</span>'; return; }
             box.innerHTML = items.map(function (it) {
@@ -297,6 +299,7 @@
                     '</label>';
             }).join('');
         }).catch(function (err) {
+            if (!overlay.isConnected) return;
             document.getElementById('lw-kit-items').innerHTML = '<span class="ld-muted">Could not load kit items (' + esc(err.message) + ').</span>';
         });
 
@@ -665,11 +668,11 @@
                     // A 15s client timeout does NOT cancel the server's send — the
                     // email may have gone out. Saying "NOT sent" invites a duplicate.
                     var timedOut = err.name === 'AbortError' || /abort|timed?\s*out|timeout/i.test(err.message || '');
-                    if (timedOut) {
-                        DashPage.showError('The send timed out before the server confirmed — the email MAY have gone out. Reload the page to check the timeline before resending, so ' + lead.Email + ' isn\'t emailed twice.');
-                    } else {
-                        DashPage.showError('Email NOT sent: ' + err.message);
-                    }
+                    var message = timedOut
+                        ? 'The send timed out before the server confirmed — the email MAY have gone out. Reload the page to check the timeline before resending, so ' + lead.Email + ' isn\'t emailed twice.'
+                        : 'Email NOT sent: ' + err.message;
+                    if (note) { note.textContent = message; note.setAttribute('role', 'alert'); }
+                    DashPage.showError(message);
                 });
             });
         }).catch(function (err) {
@@ -950,6 +953,7 @@
 
     // Linked quote panel — live status/$ + start-a-quote handoff + suggestions.
     function renderQuotePanel(lead) {
+        var viewSeq = state.loadSeq;
         var root = document.getElementById('lw-panel-quote');
 
         function manualLinkHtml() {
@@ -968,11 +972,15 @@
                 '</span></div>' +
                 '<div id="lw-quote-live" class="ld-muted">Loading quote…</div></div>';
             document.getElementById('lw-quote-unlink').addEventListener('click', function () { unlinkQuote(lead); });
-            sameOriginJson('/api/quote_sessions?quoteID=' + encodeURIComponent(lead.Linked_Quote_ID))
+            var quoteId = lead.Linked_Quote_ID, quoteEl = document.getElementById('lw-quote-live');
+            var currentQuote = function () { return viewSeq === state.loadSeq && state.lead === lead && lead.Linked_Quote_ID === quoteId && quoteEl.isConnected; };
+            sameOriginJson('/api/quote_sessions?quoteID=' + encodeURIComponent(quoteId))
                 .then(function (body) {
-                    var rows = Array.isArray(body) ? body : (body.sessions || body.result || []);
+                    if (!currentQuote()) return;
+                    var rows = Array.isArray(body) ? body : (body && (body.sessions || body.result));
+                    if (!Array.isArray(rows)) throw new Error('Incomplete quote response');
                     var q = rows[0];
-                    var el = document.getElementById('lw-quote-live');
+                    var el = quoteEl;
                     if (!el) return;
                     if (!q) {
                         // Linked to an ID that doesn't exist (e.g. a typo to a valid-
@@ -990,7 +998,8 @@
                     }
                 })
                 .catch(function () {
-                    var el = document.getElementById('lw-quote-live');
+                    if (!currentQuote()) return;
+                    var el = quoteEl;
                     if (el) el.textContent = 'Quote lookup unavailable.';
                 });
             return;
@@ -1223,10 +1232,12 @@
     }
 
     function openArtModal(lead) {
+        var leadSeq = state.loadSeq;
         var btn = document.getElementById('lw-art-send') || document.getElementById('lw-art-again');
         var orig = btn ? btn.innerHTML : '';
         if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Loading…'; }
         ensureArtFormLoaded().then(function () {
+            if (leadSeq !== state.loadSeq || state.lead !== lead) return;
             if (typeof GarmentSubmitForm === 'undefined') throw new Error('art form bundle failed to load');
             var modal = document.getElementById('lw-art-modal');
             GarmentSubmitForm.init('lw-art-form-mount', {
@@ -1246,6 +1257,8 @@
             if (modal) {
                 artReturnFocus = btn;
                 modal.hidden = false;
+            document.querySelector('.dash-shell').inert = true;
+            document.body.classList.add('lead-art-open');
                 var c = document.getElementById('lw-art-modal-close');
                 if (c) c.focus();
             }
@@ -1263,6 +1276,8 @@
         var m = document.getElementById('lw-art-modal');
         if (!m || m.hidden) return;
         m.hidden = true;
+        document.querySelector('.dash-shell').inert = false;
+        document.body.classList.remove('lead-art-open');
         if (artReturnFocus && document.body.contains(artReturnFocus)) { try { artReturnFocus.focus(); } catch (e) { /* gone */ } }
         artReturnFocus = null;
     }
@@ -1274,7 +1289,14 @@
             if (b) b.addEventListener('click', closeArtModal);
             document.addEventListener('keydown', function (e) {
                 var m = document.getElementById('lw-art-modal');
-                if (e.key === 'Escape' && m && !m.hidden) closeArtModal();
+                if (!m || m.hidden) return;
+                if (e.key === 'Escape') closeArtModal();
+                if (e.key === 'Tab') {
+                    var controls = Array.from(m.querySelectorAll('a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])')).filter(function (el) { return el.getClientRects().length > 0; });
+                    var first = controls[0], last = controls[controls.length - 1];
+                    if (first && e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+                    else if (last && !e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+                }
             });
         });
     })();

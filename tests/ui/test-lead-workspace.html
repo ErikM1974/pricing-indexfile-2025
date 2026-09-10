@@ -5,22 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
     <title>TEST — Lead workspace harness</title>
+    <link rel="icon" href="/favicon.png" type="image/png">
 
+    <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+    <!-- Shared CRM primitives and scoped record layouts. -->
     <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/shared_components/css/art-hub.css">
-    <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
-    <link rel="stylesheet" href="/dashboards/css/leads.css?v=2026.09.07.10">
-    <link rel="stylesheet" href="/dashboards/css/lead-workspace.css?v=2026.09.07.10">
-    <link rel="stylesheet" href="/tests/ui/test-harness-ribbon.css">
+    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.09.20">
+    <link rel="stylesheet" href="/shared_components/css/crm-pipeline.css?v=2026.09.09.20">
+    <link rel="stylesheet" href="/shared_components/css/crm-records.css?v=2026.09.09.20">
+                <link rel="stylesheet" href="/tests/ui/test-harness-ribbon.css">
 </head>
-<body>
+<body data-ui="unified" data-crm-workspace="records" data-crm-record="lead">
     <div class="test-harness-ribbon" role="note">HARNESS — stubbed fixture data, no SAML, no Caspio, XHR uploads faked. Real controller (dashboards/js/lead-workspace.js) + real CSS. Open with #JFL0716-1234.</div>
-
+    <a class="skip-link" href="#main-content">Skip to main content</a>
     <div class="dash-shell">
         <header class="dash-header">
             <div class="dash-header-left">
@@ -31,59 +33,66 @@
                 <h1 class="dash-header-title" id="lw-page-title">Lead</h1>
             </div>
             <div class="dash-header-right">
-                <a href="/tests/ui/test-leads.html" class="dash-back-link">
-                    <i class="fas fa-arrow-left"></i>
+                <button type="button" id="lw-refresh" class="ld-refresh-btn btn" title="Reload this lead and its activity" aria-label="Reload this lead">
+                    <i class="fas fa-rotate" aria-hidden="true"></i>
+                    <span class="ld-btn-txt">Refresh</span>
+                </button>
+                <a href="/dashboards/leads.html" class="dash-back-link">
+                    <i class="fas fa-arrow-left" aria-hidden="true"></i>
                     Leads board
                 </a>
             </div>
         </header>
 
-        <main class="dash-content">
+        <main class="dash-content" id="main-content" tabindex="-1">
             <div class="dash-error-banner" role="alert">
-                <i class="fas fa-exclamation-triangle"></i>
+                <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
                 <span class="dash-error-banner-message"></span>
-                <button class="dash-error-banner-close" aria-label="Dismiss">
-                    <i class="fas fa-times"></i>
+                <button type="button" class="dash-error-banner-close btn" aria-label="Dismiss">
+                    <i class="fas fa-times" aria-hidden="true"></i>
                 </button>
             </div>
 
+            <!-- Lead header strip: who + source + pipeline controls -->
             <div class="dash-card lw-head" id="lw-head">
                 <div class="lw-head-main">
-                    <div class="lw-title" id="lw-title">Loading lead…</div>
+                    <div class="lw-title" id="lw-title" role="status">Loading lead…</div>
                     <div class="lw-sub" id="lw-sub"></div>
                     <div class="lw-head-chips" id="lw-head-chips" hidden></div>
+                    <div class="lw-head-actions" id="lw-head-actions" hidden></div>
                 </div>
                 <div class="lw-head-controls" id="lw-head-controls" hidden>
                     <div class="ld-control">
                         <label class="ld-control-label" for="lw-status">Status</label>
-                        <select id="lw-status" class="ld-select"></select>
+                        <select id="lw-status" class="ld-select field-select"></select>
                     </div>
                     <div class="ld-control">
                         <label class="ld-control-label" for="lw-rep">Assigned rep</label>
-                        <select id="lw-rep" class="ld-select"></select>
+                        <select id="lw-rep" class="ld-select field-select"></select>
                     </div>
                 </div>
             </div>
 
             <div class="lw-grid">
+                <!-- Center: composer + activity timeline -->
                 <section class="lw-main">
                     <div class="dash-card lw-composer-card">
                         <label class="ld-section-title" for="lw-note-input">Add a note</label>
-                        <textarea id="lw-note-input" class="lw-note-input" rows="3"
+                        <textarea id="lw-note-input" class="lw-note-input field-textarea" rows="3"
                             placeholder="Call notes, next steps, what the customer said… (Ctrl+Enter to save)"></textarea>
                         <div class="lw-composer-actions">
-                            <button type="button" id="lw-note-save" class="ld-btn ld-btn--primary">
-                                <i class="fas fa-plus"></i> Add note
+                            <button type="button" id="lw-note-save" class="ld-btn ld-btn--primary btn">
+                                <i class="fas fa-plus" aria-hidden="true"></i> Add note
                             </button>
                             <div class="lw-dropzone" id="lw-dropzone" role="button" tabindex="0"
                                  aria-label="Attach a file — drag and drop, paste, or click to browse">
-                                <i class="fas fa-paperclip"></i>
+                                <i class="fas fa-paperclip" aria-hidden="true"></i>
                                 <span>Drop, paste, or click to attach a file</span>
                             </div>
-                            <input type="file" id="lw-file-input" class="lw-file-input" multiple
+                            <input type="file" id="lw-file-input" class="lw-file-input" aria-label="Attach files to this lead" multiple
                                    accept=".ai,.eps,.pdf,.png,.jpg,.jpeg,.tiff,.tif,.psd,.svg,.webp" hidden>
                         </div>
-                        <div class="lw-upload-status ld-muted" id="lw-upload-status" hidden></div>
+                        <div class="lw-upload-status ld-muted" id="lw-upload-status" role="status" hidden></div>
                     </div>
 
                     <div class="dash-card">
@@ -94,6 +103,7 @@
                     </div>
                 </section>
 
+                <!-- Right rail: panels -->
                 <aside class="lw-rail">
                     <div class="dash-card lw-panel">
                         <div class="ld-section-title">Contact</div>
@@ -132,18 +142,33 @@
                         <div class="ld-section-title">Original artwork</div>
                         <div id="lw-panel-artwork" class="ld-muted">None attached.</div>
                     </div>
+                    <div class="dash-card lw-panel">
+                        <div class="ld-section-title">Send to the art team</div>
+                        <div id="lw-panel-art" class="lw-panel-art"></div>
+                    </div>
                 </aside>
             </div>
         </main>
     </div>
 
-    <!-- Same load order as lead.html, with the fetch/XHR stub injected before the controller -->
+    <!-- Send to the art team modal — mounts the shared garment art form
+         (GarmentSubmitForm) prefilled from this lead. Deps lazy-load on first open.
+         Cloned from quote-view's Send-to-Steve modal. -->
+    <div id="lw-art-modal" class="lw-art-modal" hidden>
+        <div class="lw-art-modal-backdrop" id="lw-art-modal-backdrop"></div>
+        <div class="lw-art-modal-dialog" role="dialog" aria-modal="true" aria-label="Send artwork to the art team">
+            <button type="button" class="lw-art-modal-close btn" id="lw-art-modal-close" title="Close" aria-label="Close">&times;</button>
+            <div id="lw-art-form-mount"></div>
+        </div>
+    </div>
+
+    <!-- Load order matters: APP_CONFIG → fetch-timeout → DashPage → shared upload → LeadsCommon → controller -->
     <script src="/config/app.config.js"></script>
-    <script src="/shared_components/js/fetch-timeout.js"></script>
-    <script src="/shared_components/js/dash-page-helpers.js"></script>
-    <script src="/shared_components/js/artwork-upload.js"></script>
+    <script src="/shared_components/js/fetch-timeout.js?v=2026.09.06.26"></script>
+    <script src="/shared_components/js/dash-page-helpers.js?v=2026.09.07.25"></script>
+    <script src="/shared_components/js/artwork-upload.js?v=2026.09.06.37"></script>
     <script src="/dashboards/js/leads-common.js?v=2026.09.05.33"></script>
     <script src="/tests/ui/test-leads-stub.js"></script>
-    <script src="/dashboards/js/lead-workspace.js?v=2026.09.07.33"></script>
+    <script src="/dashboards/js/lead-workspace.js?v=2026.09.09.20"></script>
 </body>
 </html>

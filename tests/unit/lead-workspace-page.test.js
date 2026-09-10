@@ -1,7 +1,7 @@
 /**
  * Lead workspace (dashboards/lead.html) — structural locks from the 2026-09-05 review.
  *   1. Rule 3: no inline style= in the page or templates, no .style.* toggles; the art modal uses
- *      `hidden` (leads.css already declares the [hidden] rule this page inherits).
+ *      `hidden` (canonical components declare the [hidden] rule this page inherits).
  *   2. Failed loads offer Retry (the lead itself and the activity timeline) and a header Refresh
  *      reloads the record — the page had no refresh path at all.
  *   3. The page h1 names the lead; document.title on the not-found path too.
@@ -16,7 +16,7 @@ const read = (rel) => fs.readFileSync(path.join(ROOT, rel), 'utf8');
 
 const html = read('dashboards/lead.html').replace(/<!--[\s\S]*?-->/g, '');
 const js = read('dashboards/js/lead-workspace.js');
-const css = read('dashboards/css/lead-workspace.css');
+const css = read('shared_components/css/crm-records.css');
 
 describe('lead workspace — Rule 3', () => {
     test('no inline style / handlers; art modal toggles with hidden', () => {
@@ -27,8 +27,9 @@ describe('lead workspace — Rule 3', () => {
         expect(html).toMatch(/id="lw-art-modal" class="lw-art-modal" hidden/);
         expect(js).toMatch(/function closeArtModal\(\)[\s\S]*?m\.hidden = true;/);
         expect(js).toMatch(/modal\.hidden = false;/);
-        expect(html).toMatch(/\/dashboards\/css\/leads\.css\?v=/); // supplies [hidden] { display:none !important }
-        expect(css).toMatch(/\.lw-mt-8 \{ margin-top: 8px; \}/);
+        expect(html).toMatch(/\/shared_components\/css\/components\.css\?v=/);
+        expect(read('shared_components/css/components.css')).toMatch(/\[hidden\]\s*\{\s*display: none;/);
+        expect(css).toMatch(/\.lw-mt-8\s*\{\s*margin-top: var\(--space-2\);/);
     });
     test('every icon is decorative', () => {
         expect(html).not.toMatch(/<i class="fa[^"]*"><\/i>/);
@@ -39,7 +40,7 @@ describe('lead workspace — Rule 3', () => {
 
 describe('lead workspace — recovery paths', () => {
     test('header Refresh reloads the lead; hidden when there is no id', () => {
-        expect(html).toMatch(/id="lw-refresh" class="ld-refresh-btn"[^>]*aria-label="Reload this lead"/);
+        expect(html).toMatch(/id="lw-refresh" class="ld-refresh-btn btn"[^>]*aria-label="Reload this lead"/);
         expect(js).toMatch(/refreshBtn\.addEventListener\('click', function \(\) \{ loadLead\(state\.id\); \}\)/);
         expect(js).toMatch(/if \(refreshBtn\) refreshBtn\.hidden = true;/);
     });
@@ -61,13 +62,13 @@ describe('lead workspace — names and focus', () => {
         expect(js).toMatch(/titleEl\.removeAttribute\('role'\);/);
     });
     test('icon-only controls and placeholder-only inputs are labelled', () => {
-        expect(js).toMatch(/id="lw-match-btn" class="ld-btn" aria-label="Search ShopWorks"/);
-        expect(js).toMatch(/id="lw-match-input" class="ld-search" placeholder="[^"]*" aria-label="Search ShopWorks customers"/);
-        expect(js).toMatch(/id="lw-quote-id" class="lw-quote-input" placeholder="[^"]*" aria-label="Quote ID to link"/);
-        expect(js).toMatch(/id="lw-value" class="lw-value-input" min="0" step="50" placeholder="Estimated \$" aria-label="Estimated value in dollars"/);
-        expect(js).toMatch(/id="lw-due" class="lw-value-input" aria-label="Follow-up date"/);
+        expect(js).toMatch(/id="lw-match-btn" class="ld-btn btn" aria-label="Search ShopWorks"/);
+        expect(js).toMatch(/id="lw-match-input" class="ld-search field-input" placeholder="[^"]*" aria-label="Search ShopWorks customers"/);
+        expect(js).toMatch(/id="lw-quote-id" class="lw-quote-input field-input" placeholder="[^"]*" aria-label="Quote ID to link"/);
+        expect(js).toMatch(/id="lw-value" class="lw-value-input field-input" min="0" step="50" placeholder="Estimated \$" aria-label="Estimated value in dollars"/);
+        expect(js).toMatch(/id="lw-due" class="lw-value-input field-input" aria-label="Follow-up date"/);
         expect(js).toMatch(/aria-label="Follow up in ' \+ c\[1\] \+ ' day'/);
-        expect(js).toMatch(/class="lw-kit-qty" min="1" value="1" aria-label="Quantity of ' \+ esc\(it\.Label\) \+ '"/);
+        expect(js).toMatch(/class="lw-kit-qty field-input" min="1" value="1" aria-label="Quantity of ' \+ esc\(it\.Label\) \+ '"/);
         expect(js).toMatch(/class="lw-item-icon" role="img" aria-label="' \+ esc\(type\) \+ '"/);
         expect(html).toMatch(/id="lw-art-modal-close" title="Close" aria-label="Close"/);
     });

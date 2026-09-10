@@ -1,5 +1,9 @@
 /* CRM records: lead activity and contact panels, inbox records and shipment queue. Canonical controls and lead atoms are shared. */
 @layer components.pages {
+    :where([data-ui="unified"][data-crm-record]).lead-art-open {
+        overflow: hidden;
+    }
+
     :where([data-ui="unified"][data-crm-record]) .lw-head {
         display: flex;
         justify-content: space-between;
@@ -802,16 +806,16 @@
         }
 
         :where([data-ui="unified"][data-crm-record]) .no-print,
-:where([data-ui="unified"][data-crm-record]) .inbox-tabs,
-:where([data-ui="unified"][data-crm-record]) .inbox-filterbar,
-:where([data-ui="unified"][data-crm-record]) .dash-error-banner,
-:where([data-ui="unified"][data-crm-record]) .lw-composer-card,
-:where([data-ui="unified"][data-crm-record]) .lw-head-actions,
-:where([data-ui="unified"][data-crm-record]) .lw-outreach-btns,
-:where([data-ui="unified"][data-crm-record]) .lw-outreach-actions,
-:where([data-ui="unified"][data-crm-record]) .lw-dropzone,
-:where([data-ui="unified"][data-crm-record]) .inbox-modal-actions,
-:where([data-ui="unified"][data-crm-record]) .ms-actions {
+        :where([data-ui="unified"][data-crm-record]) .inbox-tabs,
+        :where([data-ui="unified"][data-crm-record]) .inbox-filterbar,
+        :where([data-ui="unified"][data-crm-record]) .dash-error-banner,
+        :where([data-ui="unified"][data-crm-record]) .lw-composer-card,
+        :where([data-ui="unified"][data-crm-record]) .lw-head-actions,
+        :where([data-ui="unified"][data-crm-record]) .lw-outreach-btns,
+        :where([data-ui="unified"][data-crm-record]) .lw-outreach-actions,
+        :where([data-ui="unified"][data-crm-record]) .lw-dropzone,
+        :where([data-ui="unified"][data-crm-record]) .inbox-modal-actions,
+        :where([data-ui="unified"][data-crm-record]) .ms-actions {
             display: none;
         }
 
@@ -824,7 +828,7 @@
         }
 
         :where([data-ui="unified"][data-crm-record]) .dash-header-logo,
-:where([data-ui="unified"][data-crm-record]) .dash-header-right {
+        :where([data-ui="unified"][data-crm-record]) .dash-header-right {
             display: none;
         }
 
@@ -838,16 +842,17 @@
         }
 
         :where([data-ui="unified"][data-crm-record]) .lw-rail {
-            grid-template-columns: repeat(3,minmax(0,1fr));
-            gap: var(--space-3);
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: var(--space-2);
         }
 
         :where([data-ui="unified"][data-crm-record]) .lw-grid .dash-card {
             box-shadow: none;
             break-inside: avoid;
             padding: var(--space-3);
-            font-size: 10pt;
-            margin-bottom: var(--space-3);
+            font-size: 9pt;
+            line-height: 1.35;
+            margin-bottom: 0;
         }
 
         :where([data-ui="unified"][data-crm-record]) .lw-outreach-body {
@@ -946,7 +951,9 @@
             display: flex;
         }
 
-        :where([data-ui="unified"][data-crm-record]) .lw-head-controls .field-select {
+        :where([data-ui="unified"][data-crm-record])
+            .lw-head-controls
+            .field-select {
             border: 0;
             padding: 0;
             min-height: 0;
@@ -961,19 +968,38 @@
             display: none;
         }
 
-        :where([data-ui="unified"][data-crm-record]) :is(.lw-method-grid,.ld-match-search,.lw-quote-row) {
+        :where([data-ui="unified"][data-crm-record])
+            .lw-panel:has(.data-table) {
+            grid-column: 1 / -1;
+        }
+
+        :where([data-ui="unified"][data-crm-record])
+            .lw-panel
+            .data-table
+            :is(th, td) {
+            overflow-wrap: normal;
+        }
+
+        :where([data-ui="unified"][data-crm-record])
+            :is(.lw-method-grid, .ld-match-search, .lw-quote-row) {
             display: none;
         }
 
-        :where([data-ui="unified"][data-crm-record]) .lw-value-big + .lw-value-input {
+        :where([data-ui="unified"][data-crm-record])
+            .lw-value-big
+            + .lw-value-input {
             display: none;
         }
 
-        :where([data-ui="unified"][data-crm-record]) .lw-panel:has(.lw-outreach-btns):not(:has(.lw-outreach-card,.lw-outreach-sent)) {
+        :where([data-ui="unified"][data-crm-record])
+            .lw-panel:has(.lw-outreach-btns):not(
+                :has(.lw-outreach-card, .lw-outreach-sent)
+            ) {
             display: none;
         }
 
-        :where([data-ui="unified"][data-crm-record]) .detail-actionbar.no-print {
+        :where([data-ui="unified"][data-crm-record])
+            .detail-actionbar.no-print {
             display: flex;
             background: transparent;
             border: 0;
@@ -989,7 +1015,8 @@
             border-radius: 0;
         }
 
-        :where([data-ui="unified"][data-crm-record]) .inbox-modal-overlay::backdrop {
+        :where([data-ui="unified"][data-crm-record])
+            .inbox-modal-overlay::backdrop {
             display: none;
             background: transparent;
         }

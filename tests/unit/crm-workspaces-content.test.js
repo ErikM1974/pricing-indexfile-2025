@@ -1,6 +1,7 @@
 const fs = require('node:fs'), path = require('node:path'), crypto = require('node:crypto');
 const { JSDOM } = require('jsdom');
 const fixture = require('../fixtures/crm-workspaces-original-content.json');
+const records = require('../fixtures/lead-records-original-content.json');
 const root = path.resolve(__dirname, '../..'), norm = s => s.replace(/\s+/g, ' ').trim();
 const hash = s => crypto.createHash('sha256').update(s).digest('hex');
 test.each(fixture.pages)('$file preserves page content, destinations, identifiers and form values', original => {
@@ -11,8 +12,16 @@ test.each(fixture.pages)('$file preserves page content, destinations, identifier
     expect([...d.querySelectorAll('a[href]')].map(n => ({ href: n.getAttribute('href'), label: norm(n.textContent) }))).toEqual(original.links);
     expect([...d.querySelectorAll('input,select,textarea')].map(n => ({ id: n.id, type: n.type, value: n.value }))).toEqual(original.fields);
 });
-test.each(Object.keys(fixture.hashes))('%s preserves calculations, data contracts and excluded lead detail outside mapped edits', file => {
-    let s = fs.readFileSync(path.join(root, file), 'utf8').replace(/\r\n/g, '\n');
+test.each(Object.keys(fixture.hashes))('%s preserves calculations and data contracts through the CRM and lead-record migrations', file => {
+    const retired = records.retiredStyles.find(r => r.file === file);
+    if (retired) { expect(retired.sha256).toBe(fixture.hashes[file]); expect(fs.existsSync(path.join(root, file))).toBe(false); return; }
+    // The records suite separately checks current HTML semantics against this original source.
+    const page = records.pages.find(p => p.file === file);
+    let s = (page ? page.html : fs.readFileSync(path.join(root, file), 'utf8')).replace(/\r\n/g, '\n');
+    if (!page) for (const change of records.changes.filter(c => c.file === file).reverse()) {
+        expect(s.split(change.after).length - 1).toBe(change.count);
+        s = s.split(change.after).join(change.before);
+    }
     for (const change of fixture.changes.filter(c => c.file === file).reverse()) {
         expect(change.after).not.toBe(''); expect(s.split(change.after).length - 1).toBe(change.count);
         s = s.split(change.after).join(change.before);

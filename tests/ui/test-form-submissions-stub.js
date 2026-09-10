@@ -157,6 +157,7 @@
             return json({ success: true, PK_ID: 90210 }, 201);
         }
 
+        if (u.indexOf('/api/') !== -1 || (method !== 'GET' && method !== 'HEAD')) return json({ error: 'Unmapped preview endpoint; no real business request was made' }, 503);
         return realFetch(url, options);
     };
 })();

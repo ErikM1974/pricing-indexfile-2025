@@ -813,6 +813,95 @@
       "after": "        document.getElementById('detailOverlay').addEventListener('cancel', function (e) { e.preventDefault(); closeDetail(); });\n        document.getElementById('detailOverlay').addEventListener('keydown', function (e) {\n            if (e.key !== 'Tab') return;\n            var controls = Array.from(e.currentTarget.querySelectorAll('a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex=\"-1\"])')).filter(function (el) { return el.getClientRects().length > 0; });\n            var first = controls[0], last = controls[controls.length - 1];\n            if (first && e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }\n            else if (last && !e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }\n        });",
       "count": 1,
       "why": "Cycle native dialog Tab and Shift+Tab through visible controls"
+    },
+    {
+      "file": "dashboards/js/lead-workspace.js",
+      "before": "        kitFetch('/items').then(function (body) {\n            var items = body.items || [];",
+      "after": "        kitFetch('/items').then(function (body) {\n            if (!overlay.isConnected) return;\n            if (!body || !Array.isArray(body.items)) throw new Error('Incomplete kit catalog');\n            var items = body.items;",
+      "count": 1,
+      "why": "Ignore closed kit catalog and reject malformed data"
+    },
+    {
+      "file": "dashboards/js/lead-workspace.js",
+      "before": "        }).catch(function (err) {\n            document.getElementById('lw-kit-items').innerHTML",
+      "after": "        }).catch(function (err) {\n            if (!overlay.isConnected) return;\n            document.getElementById('lw-kit-items').innerHTML",
+      "count": 1,
+      "why": "Closed kit failure cannot touch a new modal"
+    },
+    {
+      "file": "dashboards/js/lead-workspace.js",
+      "before": "    function openArtModal(lead) {",
+      "after": "    function openArtModal(lead) {\n        var leadSeq = state.loadSeq;",
+      "count": 1,
+      "why": "Bind art prefill to the selected lead"
+    },
+    {
+      "file": "dashboards/js/lead-workspace.js",
+      "before": "        ensureArtFormLoaded().then(function () {",
+      "after": "        ensureArtFormLoaded().then(function () {\n            if (leadSeq !== state.loadSeq || state.lead !== lead) return;",
+      "count": 1,
+      "why": "Ignore outdated art form loading"
+    },
+    {
+      "file": "dashboards/js/lead-workspace.js",
+      "before": "            modal.hidden = false;",
+      "after": "            modal.hidden = false;\n            document.querySelector('.dash-shell').inert = true;\n            document.body.classList.add('lead-art-open');",
+      "count": 1,
+      "why": "Keep background controls inert while shared art form is open"
+    },
+    {
+      "file": "dashboards/js/lead-workspace.js",
+      "before": "        m.hidden = true;\n        if (artReturnFocus",
+      "after": "        m.hidden = true;\n        document.querySelector('.dash-shell').inert = false;\n        document.body.classList.remove('lead-art-open');\n        if (artReturnFocus",
+      "count": 1,
+      "why": "Restore host interaction before returning art focus"
+    },
+    {
+      "file": "dashboards/js/lead-workspace.js",
+      "before": "                if (e.key === 'Escape' && m && !m.hidden) closeArtModal();",
+      "after": "                if (!m || m.hidden) return;\n                if (e.key === 'Escape') closeArtModal();\n                if (e.key === 'Tab') {\n                    var controls = Array.from(m.querySelectorAll('a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex=\"-1\"])')).filter(function (el) { return el.getClientRects().length > 0; });\n                    var first = controls[0], last = controls[controls.length - 1];\n                    if (first && e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }\n                    else if (last && !e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }\n                }",
+      "count": 1,
+      "why": "Cycle shared art host focus without changing the form or its toast portal"
+    },
+    {
+      "file": "dashboards/js/lead-workspace.js",
+      "before": "                    if (timedOut) {\n                        DashPage.showError('The send timed out before the server confirmed — the email MAY have gone out. Reload the page to check the timeline before resending, so ' + lead.Email + ' isn\\'t emailed twice.');\n                    } else {\n                        DashPage.showError('Email NOT sent: ' + err.message);\n                    }",
+      "after": "                    var message = timedOut\n                        ? 'The send timed out before the server confirmed — the email MAY have gone out. Reload the page to check the timeline before resending, so ' + lead.Email + ' isn\\'t emailed twice.'\n                        : 'Email NOT sent: ' + err.message;\n                    if (note) { note.textContent = message; note.setAttribute('role', 'alert'); }\n                    DashPage.showError(message);",
+      "count": 1,
+      "why": "Keep existing timeout safety wording visible beside the send action"
+    },
+    {
+      "file": "dashboards/js/lead-workspace.js",
+      "before": "    function renderQuotePanel(lead) {\n        var root = document.getElementById('lw-panel-quote');\n\n        function manualLinkHtml() {\n            return '<div class=\"lw-quote-row\">' +\n                '<input type=\"text\" id=\"lw-quote-id\" class=\"lw-quote-input field-input\" placeholder=\"Quote ID (e.g. EMB0718-1)\" aria-label=\"Quote ID to link\">' +\n                '<button type=\"button\" id=\"lw-quote-link\" class=\"ld-btn btn\" aria-label=\"Link quote\"><i class=\"fas fa-link\" aria-hidden=\"true\"></i></button>' +\n                '</div>';\n        }\n\n        if (lead.Linked_Quote_ID) {\n            root.innerHTML = '<div class=\"lw-quote-linked\">' +\n                '<div class=\"ld-match-head\"><span class=\"ld-id\">' + esc(lead.Linked_Quote_ID) + '</span>' +\n                '<span class=\"lw-quote-linked-actions\">' +\n                '<a class=\"ld-btn\" href=\"/quote/' + encodeURIComponent(lead.Linked_Quote_ID) + '\" target=\"_blank\" rel=\"noopener\">Open</a>' +\n                '<button type=\"button\" id=\"lw-quote-unlink\" class=\"lw-chip btn\" title=\"Unlink this quote from the lead\">Unlink</button>' +\n                '</span></div>' +\n                '<div id=\"lw-quote-live\" class=\"ld-muted\">Loading quote…</div></div>';\n            document.getElementById('lw-quote-unlink').addEventListener('click', function () { unlinkQuote(lead); });\n            sameOriginJson('/api/quote_sessions?quoteID=' + encodeURIComponent(lead.Linked_Quote_ID))\n                .then(function (body) {\n                    var rows = Array.isArray(body) ? body : (body.sessions || body.result || []);\n                    var q = rows[0];\n                    var el = document.getElementById('lw-quote-live');\n                    if (!el) return;\n                    if (!q) {\n                        // Linked to an ID that doesn't exist (e.g. a typo to a valid-\n                        // format but missing quote). Say so AND keep the Unlink button\n                        // visible above so it's recoverable — never re-sync $ from it.\n                        el.innerHTML = '<span class=\"lw-quote-missing\">Quote ' + esc(lead.Linked_Quote_ID) + ' not found — use Unlink to correct it.</span>';\n                        return;\n                    }\n                    el.outerHTML = '<div class=\"lw-quote-amount\">' + (fmtMoney(q.TotalAmount) || '—') + '</div>' +\n                        '<div class=\"ld-muted\">' + esc(q.Status || '') + (q.CustomerName ? ' · ' + esc(q.CustomerName) : '') + '</div>';\n                    // Snapshot re-sync: the quote's real total drives pipeline $.\n                    var total = q.TotalAmount != null ? String(q.TotalAmount) : '';\n                    if (total && String(lead.Lead_Value || '') !== total) {\n                        saveLeadField('Lead_Value', total, null).then(function (ok) { if (ok) renderValuePanel(lead); });\n                    }\n                })\n                .catch(function () {\n                    var el = document.getElementById('lw-quote-live');\n                    if (el) el.textContent = 'Quote lookup unavailable.';\n                });\n            return;\n        }\n\n        root.innerHTML =\n            '<div class=\"lw-intel-title\">Start a quote — prefilled with this lead</div>' +\n            '<div class=\"lw-method-grid\">' + QUOTE_BUILDERS.map(function (b, i) {\n                return '<button type=\"button\" class=\"ld-btn lw-method-btn btn\" data-builder=\"' + i + '\">' +\n                    '<i class=\"fas ' + b.icon + '\" aria-hidden=\"true\"></i> ' + b.label + '</button>';\n            }).join('') + '</div>' +\n            '<div class=\"lw-intel-title\">Recent quotes for this email</div>' +\n            '<div id=\"lw-quote-suggest\"></div>' +\n            manualLinkHtml();\n\n        Array.prototype.forEach.call(root.querySelectorAll('[data-builder]'), function (b) {\n            b.addEventListener('click', function () { startQuote(QUOTE_BUILDERS[parseInt(b.getAttribute('data-builder'), 10)].url); });\n        });\n        loadQuoteSuggestions(lead);\n        document.getElementById('lw-quote-link').addEventListener('click', function () {\n            var id = document.getElementById('lw-quote-id').value.trim();\n            if (!/^[A-Za-z0-9-]{3,40}$/.test(id)) { DashPage.showError('That does not look like a Quote ID.'); return; }\n            // Verify the quote EXISTS before linking — a typo to a valid-format ID\n            // used to save silently and lock the panel to \"Quote not found\" with no\n            // way out (and could clobber Lead_Value from the wrong quote).\n            var linkBtn = document.getElementById('lw-quote-link');\n            linkBtn.disabled = true;\n            sameOriginJson('/api/quote_sessions?quoteID=' + encodeURIComponent(id))\n                .then(function (body) {\n                    var rows = Array.isArray(body) ? body : (body.sessions || body.result || []);\n                    var q = rows[0];\n                    if (!q) { DashPage.showError('Quote ' + id + ' was not found — check the ID and try again.'); linkBtn.disabled = false; return; }\n                    linkQuote(lead, { QuoteID: q.QuoteID || id, TotalAmount: q.TotalAmount != null ? q.TotalAmount : null });\n                })\n                .catch(function (err) {\n                    DashPage.showError('Could not verify quote ' + id + ' (' + err.message + ').');\n                    linkBtn.disabled = false;\n                });\n        });\n    }\n\n",
+      "after": "    function renderQuotePanel(lead) {\n        var viewSeq = state.loadSeq;\n        var root = document.getElementById('lw-panel-quote');\n\n        function manualLinkHtml() {\n            return '<div class=\"lw-quote-row\">' +\n                '<input type=\"text\" id=\"lw-quote-id\" class=\"lw-quote-input field-input\" placeholder=\"Quote ID (e.g. EMB0718-1)\" aria-label=\"Quote ID to link\">' +\n                '<button type=\"button\" id=\"lw-quote-link\" class=\"ld-btn btn\" aria-label=\"Link quote\"><i class=\"fas fa-link\" aria-hidden=\"true\"></i></button>' +\n                '</div>';\n        }\n\n        if (lead.Linked_Quote_ID) {\n            root.innerHTML = '<div class=\"lw-quote-linked\">' +\n                '<div class=\"ld-match-head\"><span class=\"ld-id\">' + esc(lead.Linked_Quote_ID) + '</span>' +\n                '<span class=\"lw-quote-linked-actions\">' +\n                '<a class=\"ld-btn\" href=\"/quote/' + encodeURIComponent(lead.Linked_Quote_ID) + '\" target=\"_blank\" rel=\"noopener\">Open</a>' +\n                '<button type=\"button\" id=\"lw-quote-unlink\" class=\"lw-chip btn\" title=\"Unlink this quote from the lead\">Unlink</button>' +\n                '</span></div>' +\n                '<div id=\"lw-quote-live\" class=\"ld-muted\">Loading quote…</div></div>';\n            document.getElementById('lw-quote-unlink').addEventListener('click', function () { unlinkQuote(lead); });\n            var quoteId = lead.Linked_Quote_ID, quoteEl = document.getElementById('lw-quote-live');\n            var currentQuote = function () { return viewSeq === state.loadSeq && state.lead === lead && lead.Linked_Quote_ID === quoteId && quoteEl.isConnected; };\n            sameOriginJson('/api/quote_sessions?quoteID=' + encodeURIComponent(quoteId))\n                .then(function (body) {\n                    if (!currentQuote()) return;\n                    var rows = Array.isArray(body) ? body : (body && (body.sessions || body.result));\n                    if (!Array.isArray(rows)) throw new Error('Incomplete quote response');\n                    var q = rows[0];\n                    var el = quoteEl;\n                    if (!el) return;\n                    if (!q) {\n                        // Linked to an ID that doesn't exist (e.g. a typo to a valid-\n                        // format but missing quote). Say so AND keep the Unlink button\n                        // visible above so it's recoverable — never re-sync $ from it.\n                        el.innerHTML = '<span class=\"lw-quote-missing\">Quote ' + esc(lead.Linked_Quote_ID) + ' not found — use Unlink to correct it.</span>';\n                        return;\n                    }\n                    el.outerHTML = '<div class=\"lw-quote-amount\">' + (fmtMoney(q.TotalAmount) || '—') + '</div>' +\n                        '<div class=\"ld-muted\">' + esc(q.Status || '') + (q.CustomerName ? ' · ' + esc(q.CustomerName) : '') + '</div>';\n                    // Snapshot re-sync: the quote's real total drives pipeline $.\n                    var total = q.TotalAmount != null ? String(q.TotalAmount) : '';\n                    if (total && String(lead.Lead_Value || '') !== total) {\n                        saveLeadField('Lead_Value', total, null).then(function (ok) { if (ok) renderValuePanel(lead); });\n                    }\n                })\n                .catch(function () {\n                    if (!currentQuote()) return;\n                    var el = quoteEl;\n                    if (el) el.textContent = 'Quote lookup unavailable.';\n                });\n            return;\n        }\n\n        root.innerHTML =\n            '<div class=\"lw-intel-title\">Start a quote — prefilled with this lead</div>' +\n            '<div class=\"lw-method-grid\">' + QUOTE_BUILDERS.map(function (b, i) {\n                return '<button type=\"button\" class=\"ld-btn lw-method-btn btn\" data-builder=\"' + i + '\">' +\n                    '<i class=\"fas ' + b.icon + '\" aria-hidden=\"true\"></i> ' + b.label + '</button>';\n            }).join('') + '</div>' +\n            '<div class=\"lw-intel-title\">Recent quotes for this email</div>' +\n            '<div id=\"lw-quote-suggest\"></div>' +\n            manualLinkHtml();\n\n        Array.prototype.forEach.call(root.querySelectorAll('[data-builder]'), function (b) {\n            b.addEventListener('click', function () { startQuote(QUOTE_BUILDERS[parseInt(b.getAttribute('data-builder'), 10)].url); });\n        });\n        loadQuoteSuggestions(lead);\n        document.getElementById('lw-quote-link').addEventListener('click', function () {\n            var id = document.getElementById('lw-quote-id').value.trim();\n            if (!/^[A-Za-z0-9-]{3,40}$/.test(id)) { DashPage.showError('That does not look like a Quote ID.'); return; }\n            // Verify the quote EXISTS before linking — a typo to a valid-format ID\n            // used to save silently and lock the panel to \"Quote not found\" with no\n            // way out (and could clobber Lead_Value from the wrong quote).\n            var linkBtn = document.getElementById('lw-quote-link');\n            linkBtn.disabled = true;\n            sameOriginJson('/api/quote_sessions?quoteID=' + encodeURIComponent(id))\n                .then(function (body) {\n                    var rows = Array.isArray(body) ? body : (body.sessions || body.result || []);\n                    var q = rows[0];\n                    if (!q) { DashPage.showError('Quote ' + id + ' was not found — check the ID and try again.'); linkBtn.disabled = false; return; }\n                    linkQuote(lead, { QuoteID: q.QuoteID || id, TotalAmount: q.TotalAmount != null ? q.TotalAmount : null });\n                })\n                .catch(function (err) {\n                    DashPage.showError('Could not verify quote ' + id + ' (' + err.message + ').');\n                    linkBtn.disabled = false;\n                });\n        });\n    }\n\n",
+      "count": 1,
+      "why": "Only the current linked quote may render or trigger the existing value resync; malformed lookup remains unavailable"
+    }
+  ],
+  "retiredStyles": [
+    {
+      "file": "dashboards/css/leads.css",
+      "sha256": "4aa7a447cd299aabd6bdca16a97c0d735bfddce915356676124d2a4e85509983",
+      "bytes": 19261,
+      "important": 1
+    },
+    {
+      "file": "dashboards/css/lead-workspace.css",
+      "sha256": "53e61c59b2c315f3728f90717fd85bde44b641a02ba332274ecb96979f03e90f",
+      "bytes": 10662,
+      "important": 0
+    },
+    {
+      "file": "dashboards/css/form-submissions.css",
+      "sha256": "e2757ea03401104259d3f98388220994af361de61de64b3d2199ce38d45c6e94",
+      "bytes": 10970,
+      "important": 2
+    },
+    {
+      "file": "dashboards/css/marketing-shipments.css",
+      "sha256": "cea2a04e4756dcffce3b5b5dc4dcdc1f933696d4b463ec7280eb8c193c7a8358",
+      "bytes": 1110,
+      "important": 1
     }
   ]
 }
