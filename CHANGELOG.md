@@ -1,3 +1,22 @@
+## v2026.09.10.4 (2026.09.10)
+
+- Preserve six remaining staff-workspace sources before CSS review
+- Unify Drain-Pro workspace tabs, mobile layout and complete paper output
+- Record verified staff toolkit release and remaining workspace continuation
+- Capture original production schedules, departments and employee details
+- Unify production schedules and preserve department paper and keyboard workflows
+- test(css): capture synthetic payroll workflow before redesign
+- style(css): unify payroll and preserve cancellation and paper workflows
+- test(css): preserve Mission Control tabs and mocked form actions
+- chore: checkpoint CSS work for laptop shutdown
+- Unify Mission Control and shared vendor document presentation
+- Unify Company Numbers reports and make refresh status accurate
+- Unify Quote Management and preserve current data and pending actions
+- Integrate six reviewed staff workspaces and shared vendor reports
+- Prepare staff workspace asset versions for full release checks
+- Keep purchasing viewer and controller cache versions synchronized
+- Deploy v2026.09.10.4: unify six staff workspaces and verify browser contracts
+
 ## v2026.09.10.2 (2026.09.10)
 
 - Capture original staff toolkit sources and preservation contracts
