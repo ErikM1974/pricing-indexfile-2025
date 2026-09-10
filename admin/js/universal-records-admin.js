@@ -41,6 +41,10 @@
                 this.totalRecords = 0;
                 this.allRecords = [];
                 this.filteredRecords = [];
+                this.dataState = "loading";
+                this.loadGeneration = 0;
+                this.actionPending = false;
+                this.heldControls = new Map();
                 
                 this.initializeEventListeners();
                 this.loadInitialData();
@@ -57,13 +61,13 @@
                 // the admin's find-any-record view, and a date window would hide
                 // older records from it. (2026-07-26 Caspio quota reduction)
                 setInterval(() => {
-                    if (document.hidden) return;
+                    if (document.hidden || document.querySelector('dialog[open]')) return;
                     this.loadInitialData();
                 }, 5 * 60 * 1000);
 
                 // Refresh on return so a backgrounded tab isn't showing stale rows.
                 document.addEventListener('visibilitychange', () => {
-                    if (!document.hidden) this.loadInitialData();
+                    if (!document.hidden && !document.querySelector('dialog[open]')) this.loadInitialData();
                 });
                 
                 // Filter change listeners
@@ -121,24 +125,57 @@
                 };
             }
 
-            async loadInitialData() {
+            async loadInitialData(force = false) {
+                if (this.actionPending && !force) return;
+                const generation = ++this.loadGeneration;
+                this.dataState = "loading";
+                this.allRecords = [];
+                this.filteredRecords = [];
+                this.renderTable();
+                this.updatePagination();
                 try {
-                    
-                    // Load all quote sessions
                     const response = await fetch(`${this.baseURL}/api/quote_sessions`);
+                    if (!response.ok) throw new Error("Quote service returned " + response.status);
                     const quotes = await response.json();
-                    
-                    // Filter out ADR quotes (Adriyella has a separate management system)
+                    if (!Array.isArray(quotes)) throw new Error("Quote response is not a list");
+                    if (generation !== this.loadGeneration) return;
                     this.allRecords = quotes.filter(quote => !quote.QuoteID.startsWith('ADR'));
-                    
-                    // Stats calculation removed - no longer displaying stats section
-                    // this.calculateStats();
+                    this.dataState = "ready";
                     this.applyFilters();
-                    
+                    if (document.getElementById("recordsFeedback").dataset.type === "load-error") showToast("");
                 } catch (error) {
+                    if (generation !== this.loadGeneration) return;
+                    this.dataState = "error";
+                    this.renderTable();
+                    this.updatePagination();
+                    showToast("Failed to load quote data. Use Refresh to try again.", "load-error");
                     console.error('[UniversalRecordsAdmin] Error loading data:', error);
-                    this.showError('Failed to load quote data');
                 }
+            }
+
+            beginAction() {
+                if (this.actionPending || this.dataState !== "ready") return false;
+                this.actionPending = true;
+                ++this.loadGeneration;
+                this.holdNewControls();
+                document.getElementById("recordsMain").setAttribute("aria-busy", "true");
+                return true;
+            }
+
+            holdNewControls() {
+                if (!this.actionPending) return;
+                document.querySelectorAll("main button, main input, main select, dialog button, dialog input, dialog select, dialog textarea").forEach(control => {
+                    if (!this.heldControls.has(control)) this.heldControls.set(control, control.disabled);
+                    control.disabled = true;
+                });
+            }
+
+            endAction() {
+                this.actionPending = false;
+                this.heldControls.forEach((disabled, control) => { if (control.isConnected) control.disabled = disabled; });
+                this.heldControls.clear();
+                document.getElementById("recordsMain").removeAttribute("aria-busy");
+                this.updatePagination();
             }
 
             // Stats calculation method - commented out since stats section was removed
@@ -194,6 +231,7 @@
             */
 
             applyFilters() {
+                if (this.dataState !== "ready") { this.renderTable(); this.updatePagination(); return; }
                 const typeFilter = document.getElementById('quoteTypeFilter').value;
                 const statusFilter = document.getElementById('statusFilter').value;
                 const dateFromFilter = document.getElementById('dateFromFilter').value;
@@ -253,6 +291,12 @@
             }
 
             renderTable() {
+                if (this.dataState !== "ready") {
+                    document.getElementById("recordsTableBody").innerHTML = '<tr><td colspan="8" class="records-empty">' + (this.dataState === "error" ? 'Failed to load quote data. Use Refresh to try again.' : 'Loading records...') + '</td></tr>';
+                    document.getElementById("recordsCount").textContent = this.dataState === "error" ? "Records unavailable" : "Loading records...";
+                    return;
+                }
+                const focus = recordFocusKey(document.activeElement);
                 const startIndex = (this.currentPage - 1) * this.recordsPerPage;
                 const endIndex = startIndex + this.recordsPerPage;
                 const pageRecords = this.filteredRecords.slice(startIndex, endIndex);
@@ -262,38 +306,39 @@
                 if (pageRecords.length === 0) {
                     tbody.innerHTML = `
                         <tr>
-                            <td colspan="8" style="text-align: center; padding: 2rem; color: var(--text-secondary);">
-                                <i class="fas fa-search" style="font-size: 2rem; margin-bottom: 1rem; display: block;" aria-hidden="true"></i>
+                            <td colspan="8" class="records-empty">
+                                <i class="fas fa-search" aria-hidden="true"></i>
                                 No records found matching your criteria
                             </td>
                         </tr>
                     `;
+                    document.getElementById("recordsCount").textContent = "Showing 0 of 0 records";
                     return;
                 }
                 
                 tbody.innerHTML = pageRecords.map(quote => `
                     <tr>
-                        <td>
+                        <td data-label="Quote ID">
                             <strong>${escapeHtml(quote.QuoteID)}</strong>
                         </td>
-                        <td>
+                        <td data-label="Type">
                             <span class="quote-type ${escapeHtml(this.getQuoteTypeClass(quote.QuoteID))}">
                                 ${escapeHtml(this.getQuoteTypeName(quote.QuoteID))}
                             </span>
                         </td>
-                        <td>
+                        <td data-label="Customer">
                             <div>
                                 <strong>${escapeHtml(quote.CustomerName || 'Unknown')}</strong>
                                 <br>
-                                <small style="color: var(--text-secondary);">${escapeHtml(quote.CustomerEmail || '')}</small>
+                                <small class="records-muted">${escapeHtml(quote.CustomerEmail || '')}</small>
                             </div>
                         </td>
-                        <td>${escapeHtml(quote.CompanyName || 'N/A')}</td>
-                        <td>
+                        <td data-label="Company">${escapeHtml(quote.CompanyName || 'N/A')}</td>
+                        <td data-label="Total">
                             <strong>$${(quote.TotalAmount || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}</strong>
                         </td>
-                        <td>
-                            <select class="status-select ${escapeHtml(String(quote.Status || '').toLowerCase())}" aria-label="Quote status"
+                        <td data-label="Status">
+                            <select class="field-input status-select ${escapeHtml(String(quote.Status || '').toLowerCase())}" aria-label="Status for ${escapeHtml(quote.QuoteID)}"
                                     data-quote-id="${escapeHtml(quote.QuoteID)}"
                                     data-pk-id="${escapeHtml(quote.PK_ID)}"
                                     data-action="status">
@@ -304,30 +349,30 @@
                                 <option value="Cancelled" ${quote.Status === 'Cancelled' ? 'selected' : ''}>Cancelled</option>
                             </select>
                         </td>
-                        <td>
+                        <td data-label="Created">
                             <div>
                                 ${new Date(quote.CreatedAt).toLocaleDateString()}
                                 <br>
-                                <small style="color: var(--text-secondary);">
+                                <small class="records-muted">
                                     ${new Date(quote.CreatedAt).toLocaleTimeString()}
                                 </small>
                             </div>
                         </td>
-                        <td>
-                            <div style="display: flex; gap: 0.25rem;">
-                                <button class="btn btn-sm btn-secondary" data-action="view" data-quote-id="${escapeHtml(quote.QuoteID)}" title="View Details">
+                        <td data-label="Actions">
+                            <div class="records-actions">
+                                <button class="btn btn-sm btn-secondary" data-action="view" data-quote-id="${escapeHtml(quote.QuoteID)}" title="View Details" aria-label="View Details ${escapeHtml(quote.QuoteID)}">
                                     <i class="fas fa-eye" aria-hidden="true"></i>
                                 </button>
-                                <button class="btn btn-sm btn-primary" data-action="edit" data-quote-id="${escapeHtml(quote.QuoteID)}" data-pk-id="${escapeHtml(quote.PK_ID)}" title="Edit">
+                                <button class="btn btn-sm btn-primary" data-action="edit" data-quote-id="${escapeHtml(quote.QuoteID)}" data-pk-id="${escapeHtml(quote.PK_ID)}" title="Edit" aria-label="Edit ${escapeHtml(quote.QuoteID)}">
                                     <i class="fas fa-edit" aria-hidden="true"></i>
                                 </button>
-                                <button class="btn btn-sm btn-secondary" data-action="duplicate" data-quote-id="${escapeHtml(quote.QuoteID)}" title="Duplicate">
+                                <button class="btn btn-sm btn-secondary" data-action="duplicate" data-quote-id="${escapeHtml(quote.QuoteID)}" title="Duplicate" aria-label="Duplicate ${escapeHtml(quote.QuoteID)}">
                                     <i class="fas fa-copy" aria-hidden="true"></i>
                                 </button>
-                                <button class="btn btn-sm btn-secondary" data-action="export" data-quote-id="${escapeHtml(quote.QuoteID)}" title="Export">
+                                <button class="btn btn-sm btn-secondary" data-action="export" data-quote-id="${escapeHtml(quote.QuoteID)}" title="Export" aria-label="Export ${escapeHtml(quote.QuoteID)}">
                                     <i class="fas fa-download" aria-hidden="true"></i>
                                 </button>
-                                <button class="btn btn-sm btn-secondary" style="background: #fee2e2; color: #991b1b; border-color: #fecaca;" data-action="delete" data-quote-id="${escapeHtml(quote.QuoteID)}" data-pk-id="${escapeHtml(quote.PK_ID)}" title="Delete">
+                                <button class="btn btn-sm btn-secondary" data-tone="danger" data-action="delete" data-quote-id="${escapeHtml(quote.QuoteID)}" data-pk-id="${escapeHtml(quote.PK_ID)}" title="Delete" aria-label="Delete ${escapeHtml(quote.QuoteID)}">
                                     <i class="fas fa-trash" aria-hidden="true"></i>
                                 </button>
                             </div>
@@ -335,6 +380,8 @@
                     </tr>
                 `).join('');
                 
+                this.holdNewControls();
+                restoreRecordFocus(focus);
                 // Update record count
                 document.getElementById('recordsCount').textContent = 
                     `Showing ${startIndex + 1}-${Math.min(endIndex, this.filteredRecords.length)} of ${this.filteredRecords.length} records`;
@@ -375,7 +422,7 @@
             }
 
             updatePagination() {
-                const totalPages = Math.ceil(this.filteredRecords.length / this.recordsPerPage);
+                const totalPages = Math.max(1, Math.ceil(this.filteredRecords.length / this.recordsPerPage));
                 
                 document.getElementById('paginationInfo').textContent = 
                     `Page ${this.currentPage} of ${totalPages}`;
@@ -392,18 +439,22 @@
                 
                 for (let i = startPage; i <= endPage; i++) {
                     const pageBtn = document.createElement('button');
-                    pageBtn.className = `pagination-btn ${i === this.currentPage ? 'active' : ''}`;
+                    pageBtn.className = `btn btn-secondary pagination-btn ${i === this.currentPage ? 'active' : ''}`;
+                    pageBtn.setAttribute("aria-label", `Page ${i}`);
+                    if (i === this.currentPage) pageBtn.setAttribute("aria-current", "page");
                     pageBtn.textContent = i;
                     pageBtn.onclick = () => this.changePage(i);
                     pageNumbers.appendChild(pageBtn);
                 }
+                document.querySelector('[data-call="exportData"]').disabled = this.dataState !== "ready";
+                this.holdNewControls();
             }
 
             changePage(direction) {
                 if (direction === 'prev' && this.currentPage > 1) {
                     this.currentPage--;
                 } else if (direction === 'next') {
-                    const totalPages = Math.ceil(this.filteredRecords.length / this.recordsPerPage);
+                    const totalPages = Math.max(1, Math.ceil(this.filteredRecords.length / this.recordsPerPage));
                     if (this.currentPage < totalPages) {
                         this.currentPage++;
                     }
@@ -427,6 +478,7 @@
             }
 
             exportData() {
+                if (this.dataState !== "ready" || this.actionPending) return;
                 const csvContent = this.generateCSV(this.filteredRecords);
                 const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
                 const link = document.createElement('a');
@@ -437,6 +489,7 @@
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
+                URL.revokeObjectURL(url);
             }
 
             generateCSV(records) {
@@ -466,10 +519,7 @@
                 this.loadInitialData();
             }
 
-            showError(message) {
-                // Could implement a toast notification here
-                console.error('[UniversalRecordsAdmin] Error:', message);
-            }
+            showError(message) { showToast(message, "error"); }
         }
 
         // Initialize the admin panel
@@ -500,90 +550,91 @@
         }
 
         async function updateQuoteStatus(quoteID, pkID, newStatus) {
+            const quote = adminPanel.allRecords.find(q => q.QuoteID === quoteID);
+            const dropdown = document.querySelector(`select[data-quote-id="${CSS.escape(quoteID)}"]`);
+            if (!quote || !dropdown) return;
+            const originalStatus = quote.Status;
+            if (!adminPanel.beginAction()) { dropdown.value = originalStatus; return; }
             try {
-                // Update the dropdown immediately for responsive UI
-                // CSS.escape: QuoteID is an anonymously-writable column, so a value
-                // containing a quote or bracket would otherwise throw here.
-                const dropdown = document.querySelector(`select[data-quote-id="${CSS.escape(quoteID)}"]`);
-                const originalStatus = dropdown.getAttribute('data-original-status') || dropdown.value;
-                
-                // Store original status for rollback if needed
-                dropdown.setAttribute('data-original-status', originalStatus);
-                
-                // Update UI optimistically
-                dropdown.className = `status-select ${newStatus.toLowerCase()}`;
-                dropdown.disabled = true;
-                
-                // Make API call using PK_ID
                 const response = await fetch(`${adminPanel.baseURL}/api/quote_sessions/${pkID}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        Status: newStatus
-                    })
+                    method: 'PUT', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ Status: newStatus })
                 });
-                
-                if (!response.ok) {
-                    throw new Error(`Failed to update status: ${response.status}`);
-                }
-                
-                // Update local data
-                const quote = adminPanel.allRecords.find(q => q.QuoteID === quoteID);
-                if (quote) {
-                    quote.Status = newStatus;
-                }
-                
-                // Show success message
+                if (!response.ok) throw new Error(`Failed to update status: ${response.status}`);
+                quote.Status = newStatus;
+                dropdown.className = `field-input status-select ${newStatus.toLowerCase()}`;
                 showToast('Status updated successfully', 'success');
-                
-                dropdown.disabled = false;
-                dropdown.removeAttribute('data-original-status');
-                
             } catch (error) {
+                dropdown.value = originalStatus;
+                dropdown.className = `field-input status-select ${String(originalStatus).toLowerCase()}`;
                 console.error('[UniversalRecordsAdmin] Error updating status:', error);
-                
-                // Rollback on error
-                // CSS.escape: QuoteID is an anonymously-writable column, so a value
-                // containing a quote or bracket would otherwise throw here.
-                const dropdown = document.querySelector(`select[data-quote-id="${CSS.escape(quoteID)}"]`);
-                const originalStatus = dropdown.getAttribute('data-original-status');
-                if (originalStatus) {
-                    dropdown.value = originalStatus;
-                    dropdown.className = `status-select ${originalStatus.toLowerCase()}`;
-                }
-                dropdown.disabled = false;
-                
                 showToast('Failed to update status. Please try again.', 'error');
-            }
+            } finally { adminPanel.endAction(); }
         }
 
         function showToast(message, type = 'info') {
-            // Create toast element
-            const toast = document.createElement('div');
-            toast.className = `toast toast-${type}`;
-            toast.innerHTML = `
-                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}" aria-hidden="true"></i>
-                <span>${escapeHtml(message)}</span>
-            `;
-            
-            // Add to body
-            document.body.appendChild(toast);
-            
-            // Add styles if not already present
-            if (!document.getElementById('toast-styles')) {
-                // (2026-09-06) styles live in /admin/css/universal-records-admin-injected.css — linked by every consumer page, nothing injected.
+            const modal = document.querySelector("dialog[open]");
+            let target = modal ? modal.querySelector(".records-dialog-feedback") : document.getElementById("recordsFeedback");
+            if (!target && modal) {
+                target = document.createElement("p");
+                target.className = "records-dialog-feedback";
+                target.setAttribute("role", "status");
+                modal.querySelector(".modal-body").prepend(target);
             }
-            
-            // Remove after 3 seconds
-            setTimeout(() => {
-                toast.style.animation = 'slideOut 0.3s ease-in forwards';
-                setTimeout(() => toast.remove(), 300);
-            }, 3000);
+            target.dataset.type = type;
+            target.textContent = message;
+            target.hidden = !message;
+        }
+
+        function recordFocusKey(node) {
+            if (!node) return null;
+            return node.dataset.quoteId && node.dataset.action ? { quoteId: node.dataset.quoteId, action: node.dataset.action } : null;
+        }
+
+        function restoreRecordFocus(key) {
+            if (!key) return;
+            const target = document.querySelector(`[data-action="${CSS.escape(key.action)}"][data-quote-id="${CSS.escape(key.quoteId)}"]`);
+            if (target && !target.disabled) target.focus({ preventScroll: true });
+        }
+
+        function openRecordsDialog(modal, focus) {
+            modal.setAttribute("aria-modal", "true");
+            modal.setAttribute("aria-label", modal.classList.contains("quote-edit-modal") ? "Edit quote" : "Quote details");
+            modal.returnFocus = document.activeElement;
+            modal.returnKey = recordFocusKey(document.activeElement);
+            modal.addEventListener("keydown", event => {
+                if (event.key !== "Tab") return;
+                const controls = [...modal.querySelectorAll("a[href],button,input,select,textarea,[tabindex]")].filter(node => !node.disabled && node.tabIndex >= 0 && node.getClientRects().length);
+                const first = controls[0] || modal, last = controls.at(-1) || modal;
+                if (!controls.length || (event.shiftKey && document.activeElement === first) || (!event.shiftKey && document.activeElement === last)) {
+                    event.preventDefault();
+                    (event.shiftKey ? last : first).focus();
+                }
+            });
+            modal.addEventListener("cancel", event => { event.preventDefault(); closeRecordsDialog(modal); });
+            modal.addEventListener("close", () => {
+                modal.remove();
+                if (modal.returnFocus?.isConnected) modal.returnFocus.focus({ preventScroll: true });
+                else restoreRecordFocus(modal.returnKey);
+            });
+            document.body.appendChild(modal);
+            modal.showModal();
+            (modal.querySelector(focus || ".close-btn") || modal).focus({ preventScroll: true });
+        }
+
+        function closeRecordsDialog(modal, force = false) {
+            if (!modal || (adminPanel.actionPending && !force)) return;
+            modal.close();
+            modal.remove();
         }
 
         async function viewQuote(quoteID) {
+            if (adminPanel.actionPending || adminPanel.dataState !== "ready") return;
+            document.querySelectorAll("dialog[open]").forEach(modal => closeRecordsDialog(modal));
+            const modal = document.createElement("dialog");
+            modal.className = "quote-view-modal";
+            modal.innerHTML = '<div class="modal-content"><div class="modal-header"><h2>Quote details</h2><button class="btn btn-secondary close-btn" aria-label="Close quote details" data-call="uraCloseModal" data-args=\'[".quote-view-modal"]\'>×</button></div><div class="modal-body"><p role="status">Loading quote details...</p></div></div>';
+            openRecordsDialog(modal);
             try {
                 // Find the quote in our data
                 const quote = adminPanel.allRecords.find(q => q.QuoteID === quoteID);
@@ -594,17 +645,18 @@
 
                 // Get quote items
                 const itemsResponse = await fetch(`${adminPanel.baseURL}/api/quote_items?quoteID=${quoteID}`);
+                if (!itemsResponse.ok) throw new Error("Quote items returned " + itemsResponse.status);
                 const items = await itemsResponse.json();
+                if (!Array.isArray(items)) throw new Error("Quote items are not a list");
 
                 // Create modal to display quote details
-                const modal = document.createElement('div');
-                modal.className = 'quote-view-modal';
+                if (!modal.isConnected || !modal.open) return;
                 modal.innerHTML = `
-                    <div class="modal-overlay" data-call="uraCloseModal" data-args='[".quote-view-modal"]'>
+                    <div class="modal-overlay">
                         <div class="modal-content" data-stop="1">
                             <div class="modal-header">
-                                <h2>Quote Details - ${quoteID}</h2>
-                                <button class="close-btn" data-call="uraCloseModal" data-args='[".quote-view-modal"]'>×</button>
+                                <h2>Quote Details - ${escapeHtml(quoteID)}</h2>
+                                <button class="btn btn-secondary close-btn" aria-label="Close quote details" data-call="uraCloseModal" data-args='[".quote-view-modal"]'>×</button>
                             </div>
                             <div class="modal-body">
                                 <div class="quote-info-grid">
@@ -647,11 +699,11 @@
                                             <tbody>
                                                 ${items.map(item => `
                                                     <tr>
-                                                        <td>${escapeHtml(item.LineNumber)}</td>
-                                                        <td>${escapeHtml(item.ProductName)}<br><small>${escapeHtml(item.StyleNumber)}</small></td>
-                                                        <td>${escapeHtml(item.Quantity)}</td>
-                                                        <td>$${item.FinalUnitPrice.toFixed(2)}</td>
-                                                        <td>$${item.LineTotal.toFixed(2)}</td>
+                                                        <td data-label="Item">${escapeHtml(item.LineNumber)}</td>
+                                                        <td data-label="Product">${escapeHtml(item.ProductName)}<br><small>${escapeHtml(item.StyleNumber)}</small></td>
+                                                        <td data-label="Quantity">${escapeHtml(item.Quantity)}</td>
+                                                        <td data-label="Unit Price">$${item.FinalUnitPrice.toFixed(2)}</td>
+                                                        <td data-label="Total">$${item.LineTotal.toFixed(2)}</td>
                                                     </tr>
                                                 `).join('')}
                                             </tbody>
@@ -674,7 +726,7 @@
 
                 // Add styles
                 if (!document.querySelector('#quote-modal-styles')) {
-                    // (2026-09-06) styles live in /admin/css/universal-records-admin-injected.css — linked by every consumer page, nothing injected.
+                    // Dialog styles are owned by the linked staff-records.css; nothing is injected.
                 }
                 
                 // Footer actions are bound here rather than as inline onclick:
@@ -688,19 +740,22 @@
                     if (btn.dataset.action === 'duplicate') duplicateQuote(id);
                 });
 
-                document.body.appendChild(modal);
+                modal.querySelector(".close-btn").focus({ preventScroll: true });
 
             } catch (error) {
                 console.error('Error viewing quote:', error);
-                alert('Error loading quote details');
+                if (modal.isConnected) { modal.querySelector(".modal-body").innerHTML = '<p>Could not load quote details. Close this window and try again.</p>'; showToast("Error loading quote details", "error"); }
             }
         }
 
         async function duplicateQuote(quoteID) {
+            if (adminPanel.actionPending || adminPanel.dataState !== "ready") return;
             if (!confirm(`Are you sure you want to duplicate quote ${quoteID}?`)) {
                 return;
             }
             
+            if (!adminPanel.beginAction()) return;
+            let createdQuoteId = null;
             try {
                 // Get the original quote
                 const quote = adminPanel.allRecords.find(q => q.QuoteID === quoteID);
@@ -711,7 +766,9 @@
                 
                 // Get quote items
                 const itemsResponse = await fetch(`${adminPanel.baseURL}/api/quote_items?quoteID=${quoteID}`);
+                if (!itemsResponse.ok) throw new Error("Quote items returned " + itemsResponse.status);
                 const items = await itemsResponse.json();
+                if (!Array.isArray(items)) throw new Error("Quote items are not a list");
                 
                 // Generate new quote ID
                 const prefix = quoteID.split(/\d/)[0]; // Extract prefix
@@ -755,6 +812,7 @@
                     throw new Error('Failed to create new quote');
                 }
                 
+                createdQuoteId = newQuoteId;
                 // Duplicate items
                 for (const item of items) {
                     const newItemData = {
@@ -779,22 +837,25 @@
                         AddedAt: new Date().toISOString().replace(/\.\d{3}Z$/, '')
                     };
                     
-                    await fetch(`${adminPanel.baseURL}/api/quote_items`, {
+                    const itemResponse = await fetch(`${adminPanel.baseURL}/api/quote_items`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(newItemData)
                     });
+                    if (!itemResponse.ok) throw new Error("Failed to copy a quote item");
                 }
                 
                 alert(`Quote duplicated successfully!\nNew Quote ID: ${newQuoteId}`);
                 
-                // Refresh the data
-                adminPanel.loadInitialData();
+                // Refresh the data without losing ownership of the pending write.
+                document.querySelectorAll('dialog[open]').forEach(modal => closeRecordsDialog(modal, true));
+                await adminPanel.loadInitialData(true);
                 
             } catch (error) {
                 console.error('Error duplicating quote:', error);
-                alert('Error duplicating quote');
-            }
+                if (createdQuoteId) showToast(`Quote ${createdQuoteId} was created, but some items could not be copied. Review that quote before trying again.`, 'error');
+                else showToast('Duplication could not be confirmed. Refresh and check the quote list before trying again.', 'error');
+            } finally { adminPanel.endAction(); }
         }
 
         function exportQuote(quoteID) {
@@ -837,6 +898,8 @@
         }
 
         async function editQuote(quoteID, pkID) {
+            if (adminPanel.actionPending || adminPanel.dataState !== "ready") return;
+            document.querySelectorAll("dialog[open]").forEach(modal => closeRecordsDialog(modal));
             try {
                 // Find the quote in our data
                 const quote = adminPanel.allRecords.find(q => q.QuoteID === quoteID);
@@ -846,53 +909,53 @@
                 }
 
                 // Create edit modal
-                const modal = document.createElement('div');
+                const modal = document.createElement('dialog');
                 modal.className = 'quote-edit-modal';
                 modal.innerHTML = `
-                    <div class="modal-overlay" data-call="uraCloseModal" data-args='[".quote-edit-modal"]'>
+                    <div class="modal-overlay">
                         <div class="modal-content" data-stop="1">
                             <div class="modal-header">
                                 <h2>Edit Quote - ${escapeHtml(quoteID)}</h2>
-                                <button class="close-btn" data-call="uraCloseModal" data-args='[".quote-edit-modal"]'>×</button>
+                                <button class="btn btn-secondary close-btn" aria-label="Close edit form" data-call="uraCloseModal" data-args='[".quote-edit-modal"]'>×</button>
                             </div>
                             <form id="editQuoteForm" data-quote-id="${escapeHtml(quoteID)}" data-pk-id="${escapeHtml(pkID)}">
                                 <div class="modal-body">
                                     <div class="form-grid">
                                         <div class="form-group">
                                             <label for="editCustomerName">Customer Name</label>
-                                            <input type="text" id="editCustomerName" class="form-control" value="${escapeHtml(quote.CustomerName || '')}" required>
+                                            <input type="text" id="editCustomerName" class="field-input form-control" value="${escapeHtml(quote.CustomerName || '')}" required>
                                         </div>
                                         <div class="form-group">
                                             <label for="editCustomerEmail">Customer Email</label>
-                                            <input type="email" id="editCustomerEmail" class="form-control" value="${escapeHtml(quote.CustomerEmail || '')}" required>
+                                            <input type="email" id="editCustomerEmail" class="field-input form-control" value="${escapeHtml(quote.CustomerEmail || '')}" required>
                                         </div>
                                         <div class="form-group">
                                             <label for="editCompanyName">Company Name</label>
-                                            <input type="text" id="editCompanyName" class="form-control" value="${escapeHtml(quote.CompanyName || '')}">
+                                            <input type="text" id="editCompanyName" class="field-input form-control" value="${escapeHtml(quote.CompanyName || '')}">
                                         </div>
                                         <div class="form-group">
                                             <label for="editPhone">Phone</label>
-                                            <input type="tel" id="editPhone" class="form-control" value="${escapeHtml(quote.Phone || '')}">
+                                            <input type="tel" id="editPhone" class="field-input form-control" value="${escapeHtml(quote.Phone || '')}">
                                         </div>
                                         <div class="form-group">
                                             <label for="editTotalQuantity">Total Quantity</label>
-                                            <input type="number" id="editTotalQuantity" class="form-control" value="${escapeHtml(quote.TotalQuantity || 0)}" min="0">
+                                            <input type="number" id="editTotalQuantity" class="field-input form-control" value="${escapeHtml(quote.TotalQuantity || 0)}" min="0">
                                         </div>
                                         <div class="form-group">
                                             <label for="editSubtotalAmount">Subtotal Amount</label>
-                                            <input type="number" id="editSubtotalAmount" class="form-control" value="${escapeHtml(quote.SubtotalAmount || 0)}" step="0.01" min="0">
+                                            <input type="number" id="editSubtotalAmount" class="field-input form-control" value="${escapeHtml(quote.SubtotalAmount || 0)}" step="0.01" min="0">
                                         </div>
                                         <div class="form-group">
                                             <label for="editLTMFeeTotal">LTM Fee Total</label>
-                                            <input type="number" id="editLTMFeeTotal" class="form-control" value="${escapeHtml(quote.LTMFeeTotal || 0)}" step="0.01" min="0">
+                                            <input type="number" id="editLTMFeeTotal" class="field-input form-control" value="${escapeHtml(quote.LTMFeeTotal || 0)}" step="0.01" min="0">
                                         </div>
                                         <div class="form-group">
                                             <label for="editTotalAmount">Total Amount</label>
-                                            <input type="number" id="editTotalAmount" class="form-control" value="${escapeHtml(quote.TotalAmount || 0)}" step="0.01" min="0">
+                                            <input type="number" id="editTotalAmount" class="field-input form-control" value="${escapeHtml(quote.TotalAmount || 0)}" step="0.01" min="0">
                                         </div>
                                         <div class="form-group">
                                             <label for="editStatus">Status</label>
-                                            <select id="editStatus" class="form-control">
+                                            <select id="editStatus" class="field-input form-control">
                                                 <option value="Open" ${quote.Status === 'Open' ? 'selected' : ''}>Open</option>
                                                 <option value="Sent" ${quote.Status === 'Sent' ? 'selected' : ''}>Sent</option>
                                                 <option value="Converted" ${quote.Status === 'Converted' ? 'selected' : ''}>Converted</option>
@@ -902,7 +965,7 @@
                                         </div>
                                         <div class="form-group full-width">
                                             <label for="editNotes">Notes</label>
-                                            <textarea id="editNotes" class="form-control" rows="3">${escapeHtml(quote.Notes || '')}</textarea>
+                                            <textarea id="editNotes" class="field-input form-control" rows="3">${escapeHtml(quote.Notes || '')}</textarea>
                                         </div>
                                     </div>
                                 </div>
@@ -919,7 +982,7 @@
 
                 // Add styles if not already present
                 if (!document.querySelector('#edit-modal-styles')) {
-                    // (2026-09-06) styles live in /admin/css/universal-records-admin-injected.css — linked by every consumer page, nothing injected.
+                    // Dialog styles are owned by the linked staff-records.css; nothing is injected.
                 }
                 
                 // Bound here rather than as an inline onsubmit: quoteID/pkID are
@@ -931,7 +994,7 @@
                     saveQuoteChanges(e, editForm.dataset.quoteId, editForm.dataset.pkId);
                 });
 
-                document.body.appendChild(modal);
+                openRecordsDialog(modal, "#editCustomerName");
 
             } catch (error) {
                 console.error('Error opening edit modal:', error);
@@ -941,7 +1004,9 @@
 
         async function saveQuoteChanges(event, quoteID, pkID) {
             event.preventDefault();
-            
+            if (!adminPanel.beginAction()) return;
+            const modal = document.querySelector(".quote-edit-modal");
+            const returnKey = modal?.returnKey;
             try {
                 // Gather form data
                 const updatedData = {
@@ -977,7 +1042,7 @@
                 }
 
                 // Close modal
-                document.querySelector('.quote-edit-modal').remove();
+                closeRecordsDialog(modal, true);
 
                 // Show success message
                 showToast('Quote updated successfully', 'success');
@@ -988,24 +1053,34 @@
             } catch (error) {
                 console.error('Error updating quote:', error);
                 showToast('Failed to update quote. Please try again.', 'error');
+            } finally {
+                adminPanel.endAction();
+                if (!modal?.isConnected) restoreRecordFocus(returnKey);
             }
         }
 
         async function deleteQuote(quoteID, pkID) {
+            if (adminPanel.actionPending || adminPanel.dataState !== "ready") return;
             if (!confirm(`Are you sure you want to delete quote ${quoteID}?\n\nThis action cannot be undone.`)) {
                 return;
             }
 
+            if (!adminPanel.beginAction()) return;
+            let removedItems = 0;
             try {
                 // First, delete all quote items
                 const itemsResponse = await fetch(`${adminPanel.baseURL}/api/quote_items?quoteID=${quoteID}`);
+                if (!itemsResponse.ok) throw new Error("Quote items returned " + itemsResponse.status);
                 const items = await itemsResponse.json();
+                if (!Array.isArray(items)) throw new Error("Quote items are not a list");
 
                 // Delete each item
                 for (const item of items) {
-                    await fetch(`${adminPanel.baseURL}/api/quote_items/${item.PK_ID}`, {
+                    const itemResponse = await fetch(`${adminPanel.baseURL}/api/quote_items/${item.PK_ID}`, {
                         method: 'DELETE'
                     });
+                    if (!itemResponse.ok) throw new Error('Quote item deletion was not confirmed');
+                    removedItems++;
                 }
 
                 // Then delete the quote session
@@ -1031,10 +1106,10 @@
 
             } catch (error) {
                 console.error('Error deleting quote:', error);
-                showToast('Failed to delete quote. Please try again.', 'error');
-            }
+                showToast(removedItems ? 'Some items were deleted, but the quote could not be fully removed. Refresh and review it before trying again.' : 'Deletion could not be confirmed. Refresh and review the quote before trying again.', 'error');
+            } finally { adminPanel.endAction(); }
         }
 
         // Console debug helpers
 // data-call target for the modal close controls (was inline onclick — Rule 3).
-window.uraCloseModal = function (selector) { const el = document.querySelector(selector); if (el) el.remove(); };
+window.uraCloseModal = function (selector) { closeRecordsDialog(document.querySelector(selector)); };

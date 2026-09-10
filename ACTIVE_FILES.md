@@ -1,5 +1,7 @@
 # Active Files Registry
 
+- Added shared_components/css/staff-records.css: unified Records Admin layout and dialogs. Retired admin/css/universal-records-admin.css and admin/css/universal-records-admin-injected.css; originals retained in the final-tools source fixture.
+
 - `tests/fixtures/staff-final-tools-records-original-mutations.json` — Original synthetic status, edit, duplicate, delete and single CSV contracts, captured before Records Admin changes.
 
 - Added shared_components/css/staff-calibration.css: scoped calibration layout using shared controls. Retired tools/custom-tees-calibrate.css; original preserved in the final-tools source fixture.

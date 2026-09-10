@@ -1,5 +1,15 @@
 # Handover follow-ups — 2026-09-07
 
+## NEXT batch — Calibration and Records Admin reviewed; two staff tools remain
+
+Live stays v2026.09.10.4 / Heroku2099 /031e03aa8ec68ac0951fe95a47871637c0c8e25a:176/225 reviewed pages,49pending. Calibration and Records Admin are reviewed drafts in codex/staff-final-tools, not deployed; candidate178/225,47pending. Staff Dashboard and Box Labels remain before integration/full release checks.
+
+- Records Admin: Public Sans, shared controls, full-width phone date fields, labelled quote/item rows and native dialogs with keyboard containment. Original filters, six successful mocked write payloads, complete/single CSV and money values match. Nineteen browser scenarios pass, four focused suites/517checks, controller ESLint/no-undef and owner Stylelint clean. Failure survives filtering, late reads cannot restore obsolete data, pending writes hold controls, and partial copy/delete failures are explicit. Original identifier policy and calculations unchanged.
+- Records paper is one landscape Letter sheet versus two, all six synthetic laser quote IDs/customer names/totals preserved. Final paper hash b5fad0f32029 visually reviewed; desktop/phone/dialog screenshots checked. Two old owners retired:19,792LFbytes/zero flags. Shared graph77,368LFbytes/three sheets versus34,994original; shared maintainability increases local source bytes.
+- Final-tools fixture now49 original hashes/148 reversible mappings/three retired stylesheet originals. Original Records mutation contract committed889ca8b8 before UI edits. Calibration remains reviewed1fba722c with22browser cases and one aligned garment paper page. Records artifacts:staff-final-tools-records-{final-browser.log,complete-guards.log,paper-review.json,reviewed-checkpoint.json}.
+- Box Labels original paper reviewed:8pages,hashf60718a6e3a9,all eight box labels visible; retain exact packing quantities, draft allocations, identifiers and print content. Next migrate its station to shared controls/vendor paper owner, add keyboard movement, and guard lookup/print/draft ownership. Then Staff Dashboard: preserve fixed dark/green branding, role defaults and all destinations.
+- This branch still predates primary06b3b5cd harness/CI timing fixes. Integrate only exact reviewed SHA, retain those primary fixes and perform all local and exact-source CI/release gates once the batch is complete. All writes/allocating GETs mocked. Never rerun completed one-shot helpers or recursively delete node_modules junction.
+
 ## NEXT batch — Calibration reviewed, three staff tools remain
 
 Calibration is the first reviewed draft on codex/staff-final-tools. Source contracts: 49 original hashes, 49 reversible changes. Twenty-two browser scenarios passed, including exact original coordinates/save/delete payloads, keyboard movement/resizing, four-width accessibility, late lookup/photo rejection, held edits during writes, failed refreshes and truthful clipboard feedback. Latest source/CSS owner guards: two suites / 279 checks; earlier four-suite baseline282; controller ESLint with no-undef and Stylelint clean.

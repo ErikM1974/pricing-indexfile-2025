@@ -228,12 +228,11 @@ const CSS_LINT_SCOPE = [
     'shared_components/css/jds-submit-form.css',
     'shared_components/css/mockup-submit-form.css',
     // tail batch (2026-09-07): admin, production-shifts, price-audit-report, employee bundles, tools, vendor-portal css, dtf prototype css
-    'admin/css/universal-records-admin-injected.css',
-    'admin/css/universal-records-admin.css',
     'calculators/quick-quote/dtf-prints-prototype.css',
     'employee-bundles/css/streich-bros-bundle.css',
     'employee-bundles/css/wcttr-bundle.css',
     'shared_components/css/staff-calibration.css',
+    'shared_components/css/staff-records.css',
 ];
 
 async function run() {

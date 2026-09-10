@@ -1314,12 +1314,614 @@
       "before": "        const r = imgRectOnScreen();\n        const wrap = $('cal-canvas-wrap').getBoundingClientRect();\n        const hf = hFracFor(S.box.wFrac);\n        box.style.left = (r.left - wrap.left + S.box.xFrac * r.width) + 'px';\n        box.style.top = (r.top - wrap.top + S.box.yFrac * r.height) + 'px';\n        box.style.width = (S.box.wFrac * r.width) + 'px';\n        box.style.height = (hf * r.height) + 'px';",
       "after": "        const hf = hFracFor(S.box.wFrac);\n        // Relative to the photo frame: screen and print share the same geometry.\n        box.style.left = (S.box.xFrac * 100) + '%';\n        box.style.top = (S.box.yFrac * 100) + '%';\n        box.style.width = (S.box.wFrac * 100) + '%';\n        box.style.height = (hf * 100) + '%';",
       "count": 1
+    },
+    {
+      "file": "admin/js/universal-records-admin.js",
+      "before": "            async loadInitialData() {\n                try {\n                    \n                    // Load all quote sessions\n                    const response = await fetch(`${this.baseURL}/api/quote_sessions`);\n                    const quotes = await response.json();\n                    \n                    // Filter out ADR quotes (Adriyella has a separate management system)\n                    this.allRecords = quotes.filter(quote => !quote.QuoteID.startsWith('ADR'));\n                    \n                    // Stats calculation removed - no longer displaying stats section\n                    // this.calculateStats();\n                    this.applyFilters();\n                    \n                } catch (error) {\n                    console.error('[UniversalRecordsAdmin] Error loading data:', error);\n                    this.showError('Failed to load quote data');\n                }\n            }\n\n",
+      "after": "            async loadInitialData(force = false) {\n                if (this.actionPending && !force) return;\n                const generation = ++this.loadGeneration;\n                this.dataState = \"loading\";\n                this.allRecords = [];\n                this.filteredRecords = [];\n                this.renderTable();\n                this.updatePagination();\n                try {\n                    const response = await fetch(`${this.baseURL}/api/quote_sessions`);\n                    if (!response.ok) throw new Error(\"Quote service returned \" + response.status);\n                    const quotes = await response.json();\n                    if (!Array.isArray(quotes)) throw new Error(\"Quote response is not a list\");\n                    if (generation !== this.loadGeneration) return;\n                    this.allRecords = quotes.filter(quote => !quote.QuoteID.startsWith('ADR'));\n                    this.dataState = \"ready\";\n                    this.applyFilters();\n                    if (document.getElementById(\"recordsFeedback\").dataset.type === \"load-error\") showToast(\"\");\n                } catch (error) {\n                    if (generation !== this.loadGeneration) return;\n                    this.dataState = \"error\";\n                    this.renderTable();\n                    this.updatePagination();\n                    showToast(\"Failed to load quote data. Use Refresh to try again.\", \"load-error\");\n                    console.error('[UniversalRecordsAdmin] Error loading data:', error);\n                }\n            }\n\n            beginAction() {\n                if (this.actionPending || this.dataState !== \"ready\") return false;\n                this.actionPending = true;\n                ++this.loadGeneration;\n                this.holdNewControls();\n                document.getElementById(\"recordsMain\").setAttribute(\"aria-busy\", \"true\");\n                return true;\n            }\n\n            holdNewControls() {\n                if (!this.actionPending) return;\n                document.querySelectorAll(\"main button, main input, main select, dialog button, dialog input, dialog select, dialog textarea\").forEach(control => {\n                    if (!this.heldControls.has(control)) this.heldControls.set(control, control.disabled);\n                    control.disabled = true;\n                });\n            }\n\n            endAction() {\n                this.actionPending = false;\n                this.heldControls.forEach((disabled, control) => { if (control.isConnected) control.disabled = disabled; });\n                this.heldControls.clear();\n                document.getElementById(\"recordsMain\").removeAttribute(\"aria-busy\");\n                this.updatePagination();\n            }\n\n",
+      "count": 1
+    },
+    {
+      "file": "admin/js/universal-records-admin.js",
+      "before": "        async function updateQuoteStatus(quoteID, pkID, newStatus) {\n            try {\n                // Update the dropdown immediately for responsive UI\n                // CSS.escape: QuoteID is an anonymously-writable column, so a value\n                // containing a quote or bracket would otherwise throw here.\n                const dropdown = document.querySelector(`select[data-quote-id=\"${CSS.escape(quoteID)}\"]`);\n                const originalStatus = dropdown.getAttribute('data-original-status') || dropdown.value;\n                \n                // Store original status for rollback if needed\n                dropdown.setAttribute('data-original-status', originalStatus);\n                \n                // Update UI optimistically\n                dropdown.className = `status-select ${newStatus.toLowerCase()}`;\n                dropdown.disabled = true;\n                \n                // Make API call using PK_ID\n                const response = await fetch(`${adminPanel.baseURL}/api/quote_sessions/${pkID}`, {\n                    method: 'PUT',\n                    headers: {\n                        'Content-Type': 'application/json'\n                    },\n                    body: JSON.stringify({\n                        Status: newStatus\n                    })\n                });\n                \n                if (!response.ok) {\n                    throw new Error(`Failed to update status: ${response.status}`);\n                }\n                \n                // Update local data\n                const quote = adminPanel.allRecords.find(q => q.QuoteID === quoteID);\n                if (quote) {\n                    quote.Status = newStatus;\n                }\n                \n                // Show success message\n                showToast('Status updated successfully', 'success');\n                \n                dropdown.disabled = false;\n                dropdown.removeAttribute('data-original-status');\n                \n            } catch (error) {\n                console.error('[UniversalRecordsAdmin] Error updating status:', error);\n                \n                // Rollback on error\n                // CSS.escape: QuoteID is an anonymously-writable column, so a value\n                // containing a quote or bracket would otherwise throw here.\n                const dropdown = document.querySelector(`select[data-quote-id=\"${CSS.escape(quoteID)}\"]`);\n                const originalStatus = dropdown.getAttribute('data-original-status');\n                if (originalStatus) {\n                    dropdown.value = originalStatus;\n                    dropdown.className = `status-select ${originalStatus.toLowerCase()}`;\n                }\n                dropdown.disabled = false;\n                \n                showToast('Failed to update status. Please try again.', 'error');\n            }\n        }\n\n",
+      "after": "        async function updateQuoteStatus(quoteID, pkID, newStatus) {\n            const quote = adminPanel.allRecords.find(q => q.QuoteID === quoteID);\n            const dropdown = document.querySelector(`select[data-quote-id=\"${CSS.escape(quoteID)}\"]`);\n            if (!quote || !dropdown) return;\n            const originalStatus = quote.Status;\n            if (!adminPanel.beginAction()) { dropdown.value = originalStatus; return; }\n            try {\n                const response = await fetch(`${adminPanel.baseURL}/api/quote_sessions/${pkID}`, {\n                    method: 'PUT', headers: { 'Content-Type': 'application/json' },\n                    body: JSON.stringify({ Status: newStatus })\n                });\n                if (!response.ok) throw new Error(`Failed to update status: ${response.status}`);\n                quote.Status = newStatus;\n                dropdown.className = `field-input status-select ${newStatus.toLowerCase()}`;\n                showToast('Status updated successfully', 'success');\n            } catch (error) {\n                dropdown.value = originalStatus;\n                dropdown.className = `field-input status-select ${String(originalStatus).toLowerCase()}`;\n                console.error('[UniversalRecordsAdmin] Error updating status:', error);\n                showToast('Failed to update status. Please try again.', 'error');\n            } finally { adminPanel.endAction(); }\n        }\n\n",
+      "count": 1
+    },
+    {
+      "file": "admin/js/universal-records-admin.js",
+      "before": "        function showToast(message, type = 'info') {\n            // Create toast element\n            const toast = document.createElement('div');\n            toast.className = `toast toast-${type}`;\n            toast.innerHTML = `\n                <i class=\"fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}\" aria-hidden=\"true\"></i>\n                <span>${escapeHtml(message)}</span>\n            `;\n            \n            // Add to body\n            document.body.appendChild(toast);\n            \n            // Add styles if not already present\n            if (!document.getElementById('toast-styles')) {\n                // (2026-09-06) styles live in /admin/css/universal-records-admin-injected.css — linked by every consumer page, nothing injected.\n            }\n            \n            // Remove after 3 seconds\n            setTimeout(() => {\n                toast.style.animation = 'slideOut 0.3s ease-in forwards';\n                setTimeout(() => toast.remove(), 300);\n            }, 3000);\n        }\n\n",
+      "after": "        function showToast(message, type = 'info') {\n            const modal = document.querySelector(\"dialog[open]\");\n            let target = modal ? modal.querySelector(\".records-dialog-feedback\") : document.getElementById(\"recordsFeedback\");\n            if (!target && modal) {\n                target = document.createElement(\"p\");\n                target.className = \"records-dialog-feedback\";\n                target.setAttribute(\"role\", \"status\");\n                modal.querySelector(\".modal-body\").prepend(target);\n            }\n            target.dataset.type = type;\n            target.textContent = message;\n            target.hidden = !message;\n        }\n\n        function recordFocusKey(node) {\n            if (!node) return null;\n            return node.dataset.quoteId && node.dataset.action ? { quoteId: node.dataset.quoteId, action: node.dataset.action } : null;\n        }\n\n        function restoreRecordFocus(key) {\n            if (!key) return;\n            const target = document.querySelector(`[data-action=\"${CSS.escape(key.action)}\"][data-quote-id=\"${CSS.escape(key.quoteId)}\"]`);\n            if (target && !target.disabled) target.focus({ preventScroll: true });\n        }\n\n        function openRecordsDialog(modal, focus) {\n            modal.setAttribute(\"aria-modal\", \"true\");\n            modal.setAttribute(\"aria-label\", modal.classList.contains(\"quote-edit-modal\") ? \"Edit quote\" : \"Quote details\");\n            modal.returnFocus = document.activeElement;\n            modal.returnKey = recordFocusKey(document.activeElement);\n            modal.addEventListener(\"cancel\", event => { event.preventDefault(); closeRecordsDialog(modal); });\n            modal.addEventListener(\"close\", () => {\n                modal.remove();\n                if (modal.returnFocus?.isConnected) modal.returnFocus.focus({ preventScroll: true });\n                else restoreRecordFocus(modal.returnKey);\n            });\n            document.body.appendChild(modal);\n            modal.showModal();\n            (modal.querySelector(focus || \".close-btn\") || modal).focus({ preventScroll: true });\n        }\n\n        function closeRecordsDialog(modal, force = false) {\n            if (!modal || (adminPanel.actionPending && !force)) return;\n            modal.close();\n            modal.remove();\n        }\n\n",
+      "count": 1
+    },
+    {
+      "file": "admin/universal-records-admin.html",
+      "before": "family=Inter:wght@400;500;600;700",
+      "after": "family=Public+Sans:wght@400;500;600;700;800",
+      "count": 1
+    },
+    {
+      "file": "admin/universal-records-admin.html",
+      "before": "    <link rel=\"stylesheet\" href=\"/admin/css/universal-records-admin.css?v=2026.09.07.19\">\n    <link rel=\"stylesheet\" href=\"/admin/css/universal-records-admin-injected.css?v=2026.09.07.18\">",
+      "after": "    <link rel=\"stylesheet\" href=\"/shared_components/css/components.css?v=2026.09.10.5\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/staff-records.css?v=2026.09.10.5\">",
+      "count": 1
+    },
+    {
+      "file": "admin/universal-records-admin.html",
+      "before": "<body>",
+      "after": "<body data-ui=\"unified\" data-staff-tool=\"records\" data-surface=\"staff\">\n    <a class=\"records-skip\" href=\"#recordsMain\">Skip to quote records</a>",
+      "count": 1
+    },
+    {
+      "file": "admin/universal-records-admin.html",
+      "before": "<nav class=\"breadcrumb\">",
+      "after": "<nav class=\"breadcrumb\" aria-label=\"Breadcrumb\">",
+      "count": 1
+    },
+    {
+      "file": "admin/universal-records-admin.html",
+      "before": "<main class=\"container\">",
+      "after": "<main class=\"container\" id=\"recordsMain\" tabindex=\"-1\">",
+      "count": 1
+    },
+    {
+      "file": "admin/universal-records-admin.html",
+      "before": "Comprehensive view of all quotes, bonuses, and analytics across all calculator types",
+      "after": "Find, review and maintain quotes across all calculator types.",
+      "count": 1
+    },
+    {
+      "file": "admin/universal-records-admin.html",
+      "before": "class=\"filter-control\"",
+      "after": "class=\"filter-control field-input\"",
+      "count": 6
+    },
+    {
+      "file": "admin/universal-records-admin.html",
+      "before": "<label class=\"filter-label\">Quote Type</label>",
+      "after": "<label class=\"filter-label\" for=\"quoteTypeFilter\">Quote Type</label>",
+      "count": 1
+    },
+    {
+      "file": "admin/universal-records-admin.html",
+      "before": "<label class=\"filter-label\">Status</label>",
+      "after": "<label class=\"filter-label\" for=\"statusFilter\">Status</label>",
+      "count": 1
+    },
+    {
+      "file": "admin/universal-records-admin.html",
+      "before": "<label class=\"filter-label\">Date From</label>",
+      "after": "<label class=\"filter-label\" for=\"dateFromFilter\">Date From</label>",
+      "count": 1
+    },
+    {
+      "file": "admin/universal-records-admin.html",
+      "before": "<label class=\"filter-label\">Date To</label>",
+      "after": "<label class=\"filter-label\" for=\"dateToFilter\">Date To</label>",
+      "count": 1
+    },
+    {
+      "file": "admin/universal-records-admin.html",
+      "before": "<label class=\"filter-label\">Customer</label>",
+      "after": "<label class=\"filter-label\" for=\"customerFilter\">Customer</label>",
+      "count": 1
+    },
+    {
+      "file": "admin/universal-records-admin.html",
+      "before": "<label class=\"filter-label\">Min Amount</label>",
+      "after": "<label class=\"filter-label\" for=\"minAmountFilter\">Min Amount</label>",
+      "count": 1
+    },
+    {
+      "file": "admin/universal-records-admin.html",
+      "before": "        <!-- Records Table -->",
+      "after": "        <div id=\"recordsFeedback\" class=\"records-feedback\" role=\"status\" aria-live=\"polite\" hidden></div>\n\n        <!-- Records Table -->",
+      "count": 1
+    },
+    {
+      "file": "admin/universal-records-admin.html",
+      "before": "<div class=\"pagination-info\" id=\"recordsCount\">",
+      "after": "<div class=\"pagination-info\" id=\"recordsCount\" aria-live=\"polite\">",
+      "count": 1
+    },
+    {
+      "file": "admin/universal-records-admin.html",
+      "before": "<table class=\"records-table\">",
+      "after": "<table class=\"records-table\" aria-label=\"Quote records\">",
+      "count": 1
+    },
+    {
+      "file": "admin/universal-records-admin.html",
+      "before": "<th>Quote ID</th>",
+      "after": "<th scope=\"col\">Quote ID</th>",
+      "count": 1
+    },
+    {
+      "file": "admin/universal-records-admin.html",
+      "before": "<th>Type</th>",
+      "after": "<th scope=\"col\">Type</th>",
+      "count": 1
+    },
+    {
+      "file": "admin/universal-records-admin.html",
+      "before": "<th>Customer</th>",
+      "after": "<th scope=\"col\">Customer</th>",
+      "count": 1
+    },
+    {
+      "file": "admin/universal-records-admin.html",
+      "before": "<th>Company</th>",
+      "after": "<th scope=\"col\">Company</th>",
+      "count": 1
+    },
+    {
+      "file": "admin/universal-records-admin.html",
+      "before": "<th>Total</th>",
+      "after": "<th scope=\"col\">Total</th>",
+      "count": 1
+    },
+    {
+      "file": "admin/universal-records-admin.html",
+      "before": "<th>Status</th>",
+      "after": "<th scope=\"col\">Status</th>",
+      "count": 1
+    },
+    {
+      "file": "admin/universal-records-admin.html",
+      "before": "<th>Created</th>",
+      "after": "<th scope=\"col\">Created</th>",
+      "count": 1
+    },
+    {
+      "file": "admin/universal-records-admin.html",
+      "before": "<th>Actions</th>",
+      "after": "<th scope=\"col\">Actions</th>",
+      "count": 1
+    },
+    {
+      "file": "admin/universal-records-admin.html",
+      "before": "class=\"pagination-btn\"",
+      "after": "class=\"btn btn-secondary pagination-btn\"",
+      "count": 2
+    },
+    {
+      "file": "admin/universal-records-admin.html",
+      "before": "/admin/js/universal-records-admin.js?v=2026.09.06.27",
+      "after": "/admin/js/universal-records-admin.js?v=2026.09.10.5",
+      "count": 1
+    },
+    {
+      "file": "admin/js/universal-records-admin.js",
+      "before": "                this.allRecords = [];\n                this.filteredRecords = [];\n                \n                this.initializeEventListeners();",
+      "after": "                this.allRecords = [];\n                this.filteredRecords = [];\n                this.dataState = \"loading\";\n                this.loadGeneration = 0;\n                this.actionPending = false;\n                this.heldControls = new Map();\n                \n                this.initializeEventListeners();",
+      "count": 1
+    },
+    {
+      "file": "admin/js/universal-records-admin.js",
+      "before": "if (document.hidden) return;",
+      "after": "if (document.hidden || document.querySelector('dialog[open]')) return;",
+      "count": 1
+    },
+    {
+      "file": "admin/js/universal-records-admin.js",
+      "before": "if (!document.hidden) this.loadInitialData();",
+      "after": "if (!document.hidden && !document.querySelector('dialog[open]')) this.loadInitialData();",
+      "count": 1
+    },
+    {
+      "file": "admin/js/universal-records-admin.js",
+      "before": "            applyFilters() {\n",
+      "after": "            applyFilters() {\n                if (this.dataState !== \"ready\") { this.renderTable(); this.updatePagination(); return; }\n",
+      "count": 1
+    },
+    {
+      "file": "admin/js/universal-records-admin.js",
+      "before": "            renderTable() {\n",
+      "after": "            renderTable() {\n                if (this.dataState !== \"ready\") {\n                    document.getElementById(\"recordsTableBody\").innerHTML = '<tr><td colspan=\"8\" class=\"records-empty\">' + (this.dataState === \"error\" ? 'Failed to load quote data. Use Refresh to try again.' : 'Loading records...') + '</td></tr>';\n                    document.getElementById(\"recordsCount\").textContent = this.dataState === \"error\" ? \"Records unavailable\" : \"Loading records...\";\n                    return;\n                }\n                const focus = recordFocusKey(document.activeElement);\n",
+      "count": 1
+    },
+    {
+      "file": "admin/js/universal-records-admin.js",
+      "before": "                    <td colspan=\"8\" style=\"text-align: center; padding: 2rem; color: var(--text-secondary);\">\n                   ",
+      "after": "                    <td colspan=\"8\" class=\"records-empty\">\n                   ",
+      "count": 1
+    },
+    {
+      "file": "admin/js/universal-records-admin.js",
+      "before": "<i class=\"fas fa-search\" style=\"font-size: 2rem; margin-bottom: 1rem; display: block;\" aria-hidden=\"true\"></i>",
+      "after": "<i class=\"fas fa-search\" aria-hidden=\"true\"></i>",
+      "count": 1
+    },
+    {
+      "file": "admin/js/universal-records-admin.js",
+      "before": "                    `;\n                    return;\n                }\n                \n                tbody.innerHTML",
+      "after": "                    `;\n                    document.getElementById(\"recordsCount\").textContent = \"Showing 0 of 0 records\";\n                    return;\n                }\n                \n                tbody.innerHTML",
+      "count": 1
+    },
+    {
+      "file": "admin/js/universal-records-admin.js",
+      "before": "<td>\n                            <strong>${escapeHtml(quote.QuoteID)}</strong>",
+      "after": "<td data-label=\"Quote ID\">\n                            <strong>${escapeHtml(quote.QuoteID)}</strong>",
+      "count": 1
+    },
+    {
+      "file": "admin/js/universal-records-admin.js",
+      "before": "<td>\n                            <span class=\"quote-type",
+      "after": "<td data-label=\"Type\">\n                            <span class=\"quote-type",
+      "count": 1
+    },
+    {
+      "file": "admin/js/universal-records-admin.js",
+      "before": "<td>\n                            <div>\n                                <strong>${escapeHtml(quote.CustomerName",
+      "after": "<td data-label=\"Customer\">\n                            <div>\n                                <strong>${escapeHtml(quote.CustomerName",
+      "count": 1
+    },
+    {
+      "file": "admin/js/universal-records-admin.js",
+      "before": "<td>${escapeHtml(quote.CompanyName || 'N/A')}</td>",
+      "after": "<td data-label=\"Company\">${escapeHtml(quote.CompanyName || 'N/A')}</td>",
+      "count": 1
+    },
+    {
+      "file": "admin/js/universal-records-admin.js",
+      "before": "<td>\n                            <strong>$",
+      "after": "<td data-label=\"Total\">\n                            <strong>$",
+      "count": 1
+    },
+    {
+      "file": "admin/js/universal-records-admin.js",
+      "before": "<td>\n                            <select class=\"status-select",
+      "after": "<td data-label=\"Status\">\n                            <select class=\"field-input status-select",
+      "count": 1
+    },
+    {
+      "file": "admin/js/universal-records-admin.js",
+      "before": "aria-label=\"Quote status\"",
+      "after": "aria-label=\"Status for ${escapeHtml(quote.QuoteID)}\"",
+      "count": 1
+    },
+    {
+      "file": "admin/js/universal-records-admin.js",
+      "before": "<td>\n                            <div>\n                                ${new Date(quote.CreatedAt)",
+      "after": "<td data-label=\"Created\">\n                            <div>\n                                ${new Date(quote.CreatedAt)",
+      "count": 1
+    },
+    {
+      "file": "admin/js/universal-records-admin.js",
+      "before": "<td>\n                            <div style=\"display: flex; gap: 0.25rem;\">",
+      "after": "<td data-label=\"Actions\">\n                            <div class=\"records-actions\">",
+      "count": 1
+    },
+    {
+      "file": "admin/js/universal-records-admin.js",
+      "before": "style=\"color: var(--text-secondary);\"",
+      "after": "class=\"records-muted\"",
+      "count": 2
+    },
+    {
+      "file": "admin/js/universal-records-admin.js",
+      "before": "style=\"background: #fee2e2; color: #991b1b; border-color: #fecaca;\"",
+      "after": "data-tone=\"danger\"",
+      "count": 1
+    },
+    {
+      "file": "admin/js/universal-records-admin.js",
+      "before": "title=\"View Details\"",
+      "after": "title=\"View Details\" aria-label=\"View Details ${escapeHtml(quote.QuoteID)}\"",
+      "count": 1
+    },
+    {
+      "file": "admin/js/universal-records-admin.js",
+      "before": "title=\"Edit\"",
+      "after": "title=\"Edit\" aria-label=\"Edit ${escapeHtml(quote.QuoteID)}\"",
+      "count": 1
+    },
+    {
+      "file": "admin/js/universal-records-admin.js",
+      "before": "title=\"Duplicate\"",
+      "after": "title=\"Duplicate\" aria-label=\"Duplicate ${escapeHtml(quote.QuoteID)}\"",
+      "count": 1
+    },
+    {
+      "file": "admin/js/universal-records-admin.js",
+      "before": "title=\"Export\"",
+      "after": "title=\"Export\" aria-label=\"Export ${escapeHtml(quote.QuoteID)}\"",
+      "count": 1
+    },
+    {
+      "file": "admin/js/universal-records-admin.js",
+      "before": "title=\"Delete\"",
+      "after": "title=\"Delete\" aria-label=\"Delete ${escapeHtml(quote.QuoteID)}\"",
+      "count": 1
+    },
+    {
+      "file": "admin/js/universal-records-admin.js",
+      "before": "                // Update record count\n",
+      "after": "                this.holdNewControls();\n                restoreRecordFocus(focus);\n                // Update record count\n",
+      "count": 1
+    },
+    {
+      "file": "admin/js/universal-records-admin.js",
+      "before": "const totalPages = Math.ceil(this.filteredRecords.length / this.recordsPerPage);",
+      "after": "const totalPages = Math.max(1, Math.ceil(this.filteredRecords.length / this.recordsPerPage));",
+      "count": 2
+    },
+    {
+      "file": "admin/js/universal-records-admin.js",
+      "before": "pageBtn.className = `pagination-btn ${i === this.currentPage ? 'active' : ''}`;",
+      "after": "pageBtn.className = `btn btn-secondary pagination-btn ${i === this.currentPage ? 'active' : ''}`;\n                    pageBtn.setAttribute(\"aria-label\", `Page ${i}`);\n                    if (i === this.currentPage) pageBtn.setAttribute(\"aria-current\", \"page\");",
+      "count": 1
+    },
+    {
+      "file": "admin/js/universal-records-admin.js",
+      "before": "                    pageNumbers.appendChild(pageBtn);\n                }\n",
+      "after": "                    pageNumbers.appendChild(pageBtn);\n                }\n                this.holdNewControls();\n",
+      "count": 1
+    },
+    {
+      "file": "admin/js/universal-records-admin.js",
+      "before": "            exportData() {\n",
+      "after": "            exportData() {\n                if (this.dataState !== \"ready\" || this.actionPending) return;\n",
+      "count": 1
+    },
+    {
+      "file": "admin/js/universal-records-admin.js",
+      "before": "                document.body.removeChild(link);\n",
+      "after": "                document.body.removeChild(link);\n                URL.revokeObjectURL(url);\n",
+      "count": 1
+    },
+    {
+      "file": "admin/js/universal-records-admin.js",
+      "before": "            showError(message) {\n                // Could implement a toast notification here\n                console.error('[UniversalRecordsAdmin] Error:', message);\n            }",
+      "after": "            showError(message) { showToast(message, \"error\"); }",
+      "count": 1
+    },
+    {
+      "file": "admin/js/universal-records-admin.js",
+      "before": "        async function viewQuote(quoteID) {\n            try {",
+      "after": "        async function viewQuote(quoteID) {\n            if (adminPanel.actionPending || adminPanel.dataState !== \"ready\") return;\n            document.querySelectorAll(\"dialog[open]\").forEach(modal => closeRecordsDialog(modal));\n            const modal = document.createElement(\"dialog\");\n            modal.className = \"quote-view-modal\";\n            modal.innerHTML = '<div class=\"modal-content\"><div class=\"modal-header\"><h2>Quote details</h2><button class=\"btn btn-secondary close-btn\" aria-label=\"Close quote details\" data-call=\"uraCloseModal\" data-args=\\'[\".quote-view-modal\"]\\'>×</button></div><div class=\"modal-body\"><p role=\"status\">Loading quote details...</p></div></div>';\n            openRecordsDialog(modal);\n            try {",
+      "count": 1
+    },
+    {
+      "file": "admin/js/universal-records-admin.js",
+      "before": "                const modal = document.createElement('div');\n                modal.className = 'quote-view-modal';\n",
+      "after": "                if (!modal.isConnected || !modal.open) return;\n",
+      "count": 1
+    },
+    {
+      "file": "admin/js/universal-records-admin.js",
+      "before": "<div class=\"modal-overlay\" data-call=\"uraCloseModal\" data-args='[\".quote-view-modal\"]'>",
+      "after": "<div class=\"modal-overlay\">",
+      "count": 1
+    },
+    {
+      "file": "admin/js/universal-records-admin.js",
+      "before": "<h2>Quote Details - ${quoteID}</h2>",
+      "after": "<h2>Quote Details - ${escapeHtml(quoteID)}</h2>",
+      "count": 1
+    },
+    {
+      "file": "admin/js/universal-records-admin.js",
+      "before": "<button class=\"close-btn\" data-call=\"uraCloseModal\" data-args='[\".quote-view-modal\"]'>",
+      "after": "<button class=\"btn btn-secondary close-btn\" aria-label=\"Close quote details\" data-call=\"uraCloseModal\" data-args='[\".quote-view-modal\"]'>",
+      "count": 1
+    },
+    {
+      "file": "admin/js/universal-records-admin.js",
+      "before": "                alert('Error loading quote details');",
+      "after": "                if (modal.isConnected) { modal.querySelector(\".modal-body\").innerHTML = '<p>Could not load quote details. Close this window and try again.</p>'; showToast(\"Error loading quote details\", \"error\"); }",
+      "count": 1
+    },
+    {
+      "file": "admin/js/universal-records-admin.js",
+      "before": "        async function editQuote(quoteID, pkID) {\n            try {",
+      "after": "        async function editQuote(quoteID, pkID) {\n            if (adminPanel.actionPending || adminPanel.dataState !== \"ready\") return;\n            document.querySelectorAll(\"dialog[open]\").forEach(modal => closeRecordsDialog(modal));\n            try {",
+      "count": 1
+    },
+    {
+      "file": "admin/js/universal-records-admin.js",
+      "before": "const modal = document.createElement('div');\n                modal.className = 'quote-edit-modal';",
+      "after": "const modal = document.createElement('dialog');\n                modal.className = 'quote-edit-modal';",
+      "count": 1
+    },
+    {
+      "file": "admin/js/universal-records-admin.js",
+      "before": "e = 'quote-edit-modal';\n                modal.innerHTML = `\n                    <div class=\"modal-overlay\" data-call=\"uraCloseModal\" data-args='[\".quote-edit-modal\"]'>\n                        <div class=\"modal-content\" data-stop=\"1\">\n             ",
+      "after": "e = 'quote-edit-modal';\n                modal.innerHTML = `\n                    <div class=\"modal-overlay\">\n                        <div class=\"modal-content\" data-stop=\"1\">\n             ",
+      "count": 1
+    },
+    {
+      "file": "admin/js/universal-records-admin.js",
+      "before": "<button class=\"close-btn\" data-call=\"uraCloseModal\" data-args='[\".quote-edit-modal\"]'>",
+      "after": "<button class=\"btn btn-secondary close-btn\" aria-label=\"Close edit form\" data-call=\"uraCloseModal\" data-args='[\".quote-edit-modal\"]'>",
+      "count": 1
+    },
+    {
+      "file": "admin/js/universal-records-admin.js",
+      "before": "class=\"form-control\"",
+      "after": "class=\"field-input form-control\"",
+      "count": 10
+    },
+    {
+      "file": "admin/js/universal-records-admin.js",
+      "before": "                document.body.appendChild(modal);\n\n            } catch (error) {\n                console.error('Error viewing quote:', error);",
+      "after": "                modal.querySelector(\".close-btn\").focus({ preventScroll: true });\n\n            } catch (error) {\n                console.error('Error viewing quote:', error);",
+      "count": 1
+    },
+    {
+      "file": "admin/js/universal-records-admin.js",
+      "before": "                document.body.appendChild(modal);\n\n            } catch (error) {\n                console.error('Error opening edit modal:', error);",
+      "after": "                openRecordsDialog(modal, \"#editCustomerName\");\n\n            } catch (error) {\n                console.error('Error opening edit modal:', error);",
+      "count": 1
+    },
+    {
+      "file": "admin/js/universal-records-admin.js",
+      "before": "            event.preventDefault();\n            \n            try {",
+      "after": "            event.preventDefault();\n            if (!adminPanel.beginAction()) return;\n            const modal = document.querySelector(\".quote-edit-modal\");\n            const returnKey = modal?.returnKey;\n            try {",
+      "count": 1
+    },
+    {
+      "file": "admin/js/universal-records-admin.js",
+      "before": "                document.querySelector('.quote-edit-modal').remove();",
+      "after": "                closeRecordsDialog(modal, true);",
+      "count": 1
+    },
+    {
+      "file": "admin/js/universal-records-admin.js",
+      "before": "                showToast('Failed to update quote. Please try again.', 'error');\n            }\n",
+      "after": "                showToast('Failed to update quote. Please try again.', 'error');\n            } finally {\n                adminPanel.endAction();\n                if (!modal?.isConnected) restoreRecordFocus(returnKey);\n            }\n",
+      "count": 1
+    },
+    {
+      "file": "admin/js/universal-records-admin.js",
+      "before": "        async function duplicateQuote(quoteID) {\n",
+      "after": "        async function duplicateQuote(quoteID) {\n            if (adminPanel.actionPending || adminPanel.dataState !== \"ready\") return;\n",
+      "count": 1
+    },
+    {
+      "file": "admin/js/universal-records-admin.js",
+      "before": "        async function deleteQuote(quoteID, pkID) {\n",
+      "after": "        async function deleteQuote(quoteID, pkID) {\n            if (adminPanel.actionPending || adminPanel.dataState !== \"ready\") return;\n",
+      "count": 1
+    },
+    {
+      "file": "admin/js/universal-records-admin.js",
+      "before": "            try {\n                // Get the original quote",
+      "after": "            if (!adminPanel.beginAction()) return;\n            let createdQuoteId = null;\n            try {\n                // Get the original quote",
+      "count": 1
+    },
+    {
+      "file": "admin/js/universal-records-admin.js",
+      "before": "                // Duplicate items\n",
+      "after": "                createdQuoteId = newQuoteId;\n                // Duplicate items\n",
+      "count": 1
+    },
+    {
+      "file": "admin/js/universal-records-admin.js",
+      "before": "                    await fetch(`${adminPanel.baseURL}/api/quote_items`, {",
+      "after": "                    const itemResponse = await fetch(`${adminPanel.baseURL}/api/quote_items`, {",
+      "count": 1
+    },
+    {
+      "file": "admin/js/universal-records-admin.js",
+      "before": "                        body: JSON.stringify(newItemData)\n                    });",
+      "after": "                        body: JSON.stringify(newItemData)\n                    });\n                    if (!itemResponse.ok) throw new Error(\"Failed to copy a quote item\");",
+      "count": 1
+    },
+    {
+      "file": "admin/js/universal-records-admin.js",
+      "before": "                // Refresh the data\n                adminPanel.loadInitialData();",
+      "after": "                // Refresh the data without losing ownership of the pending write.\n                document.querySelectorAll('dialog[open]').forEach(modal => closeRecordsDialog(modal, true));\n                await adminPanel.loadInitialData(true);",
+      "count": 1
+    },
+    {
+      "file": "admin/js/universal-records-admin.js",
+      "before": "                alert('Error duplicating quote');\n            }",
+      "after": "                if (createdQuoteId) showToast(`Quote ${createdQuoteId} was created, but some items could not be copied. Review that quote before trying again.`, 'error');\n                else showToast('Duplication could not be confirmed. Refresh and check the quote list before trying again.', 'error');\n            } finally { adminPanel.endAction(); }",
+      "count": 1
+    },
+    {
+      "file": "admin/js/universal-records-admin.js",
+      "before": "            try {\n                // First, delete all quote items",
+      "after": "            if (!adminPanel.beginAction()) return;\n            let removedItems = 0;\n            try {\n                // First, delete all quote items",
+      "count": 1
+    },
+    {
+      "file": "admin/js/universal-records-admin.js",
+      "before": "                    await fetch(`${adminPanel.baseURL}/api/quote_items/${item.PK_ID}`, {",
+      "after": "                    const itemResponse = await fetch(`${adminPanel.baseURL}/api/quote_items/${item.PK_ID}`, {",
+      "count": 1
+    },
+    {
+      "file": "admin/js/universal-records-admin.js",
+      "before": "                        method: 'DELETE'\n                    });",
+      "after": "                        method: 'DELETE'\n                    });\n                    if (!itemResponse.ok) throw new Error('Quote item deletion was not confirmed');\n                    removedItems++;",
+      "count": 1
+    },
+    {
+      "file": "admin/js/universal-records-admin.js",
+      "before": "                showToast('Failed to delete quote. Please try again.', 'error');\n            }",
+      "after": "                showToast(removedItems ? 'Some items were deleted, but the quote could not be fully removed. Refresh and review it before trying again.' : 'Deletion could not be confirmed. Refresh and review the quote before trying again.', 'error');\n            } finally { adminPanel.endAction(); }",
+      "count": 1
+    },
+    {
+      "file": "admin/js/universal-records-admin.js",
+      "before": "                const items = await itemsResponse.json();",
+      "after": "                if (!itemsResponse.ok) throw new Error(\"Quote items returned \" + itemsResponse.status);\n                const items = await itemsResponse.json();\n                if (!Array.isArray(items)) throw new Error(\"Quote items are not a list\");",
+      "count": 3
+    },
+    {
+      "file": "admin/js/universal-records-admin.js",
+      "before": "window.uraCloseModal = function (selector) { const el = document.querySelector(selector); if (el) el.remove(); };",
+      "after": "window.uraCloseModal = function (selector) { closeRecordsDialog(document.querySelector(selector)); };",
+      "count": 1
+    },
+    {
+      "file": "admin/js/universal-records-admin.js",
+      "before": "                this.holdNewControls();\n            }\n\n            changePage(direction)",
+      "after": "                document.querySelector('[data-call=\"exportData\"]').disabled = this.dataState !== \"ready\";\n                this.holdNewControls();\n            }\n\n            changePage(direction)",
+      "count": 1
+    },
+    {
+      "file": "admin/js/universal-records-admin.js",
+      "before": "// (2026-09-06) styles live in /admin/css/universal-records-admin-injected.css — linked by every consumer page, nothing injected.",
+      "after": "// Dialog styles are owned by the linked staff-records.css; nothing is injected.",
+      "count": 2
+    },
+    {
+      "file": "admin/js/universal-records-admin.js",
+      "before": "            modal.returnKey = recordFocusKey(document.activeElement);\n            modal.addEventListener(\"cancel\"",
+      "after": "            modal.returnKey = recordFocusKey(document.activeElement);\n            modal.addEventListener(\"keydown\", event => {\n                if (event.key !== \"Tab\") return;\n                const controls = [...modal.querySelectorAll(\"a[href],button,input,select,textarea,[tabindex]\")].filter(node => !node.disabled && node.tabIndex >= 0 && node.getClientRects().length);\n                const first = controls[0] || modal, last = controls.at(-1) || modal;\n                if (!controls.length || (event.shiftKey && document.activeElement === first) || (!event.shiftKey && document.activeElement === last)) {\n                    event.preventDefault();\n                    (event.shiftKey ? last : first).focus();\n                }\n            });\n            modal.addEventListener(\"cancel\"",
+      "count": 1
+    },
+    {
+      "file": "admin/universal-records-admin.html",
+      "before": "<div class=\"page-header\">",
+      "after": "<div class=\"records-heading\">",
+      "count": 1
+    },
+    {
+      "file": "admin/js/universal-records-admin.js",
+      "before": "<td>${escapeHtml(item.LineNumber)}</td>",
+      "after": "<td data-label=\"Item\">${escapeHtml(item.LineNumber)}</td>",
+      "count": 1
+    },
+    {
+      "file": "admin/js/universal-records-admin.js",
+      "before": "<td>${escapeHtml(item.ProductName)}",
+      "after": "<td data-label=\"Product\">${escapeHtml(item.ProductName)}",
+      "count": 1
+    },
+    {
+      "file": "admin/js/universal-records-admin.js",
+      "before": "<td>${escapeHtml(item.Quantity)}</td>",
+      "after": "<td data-label=\"Quantity\">${escapeHtml(item.Quantity)}</td>",
+      "count": 1
+    },
+    {
+      "file": "admin/js/universal-records-admin.js",
+      "before": "<td>$${item.FinalUnitPrice.toFixed(2)}</td>",
+      "after": "<td data-label=\"Unit Price\">$${item.FinalUnitPrice.toFixed(2)}</td>",
+      "count": 1
+    },
+    {
+      "file": "admin/js/universal-records-admin.js",
+      "before": "<td>$${item.LineTotal.toFixed(2)}</td>",
+      "after": "<td data-label=\"Total\">$${item.LineTotal.toFixed(2)}</td>",
+      "count": 1
     }
   ],
   "retiredStyles": [
     {
       "file": "tools/custom-tees-calibrate.css",
       "css": "/* custom-tees-calibrate.css — staff print-box calibration tool (2026-06-10) */\n\n/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue so the page\n   keeps its exact look. Map them to shared_components/css/tokens.css names when the page is redesigned;\n   every rule below uses var(). Raw hex is allowed ONLY in this block. */\n/* stylelint-disable color-no-hex */\n:root {\n    --custom-tees-calibrate-gray: #66735f;\n    --custom-tees-calibrate-gray-2: #8a8f7f;\n    --custom-tees-calibrate-green-tint: #c9ebd4;\n    --custom-tees-calibrate-green-dark: #136c34;\n}\n/* stylelint-enable color-no-hex */\n\n* { box-sizing: border-box; }\n\nbody {\n    margin: 0; font-family: 'Public Sans', Inter, Arial, sans-serif;\n    background: var(--store-paper); color: var(--store-ink);\n}\n\n.cal-head {\n    display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;\n    padding: 18px 22px; background: var(--store-green-950); color: var(--color-on-brand);\n}\n.cal-head h1 { margin: 0 0 6px; font-size: 19px; }\n.cal-head p { margin: 0; font-size: 13px; opacity: 0.85; max-width: 760px; }\n.cal-link { color: var(--custom-tees-calibrate-green-tint); font-size: 13px; white-space: nowrap; }\n\n.cal-main {\n    display: grid; grid-template-columns: 320px 1fr; gap: 18px;\n    padding: 18px 22px; align-items: start;\n}\n\n/* Style list */\n.cal-styles h2 { margin: 0 0 10px; font-size: 14px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--print-ink-soft); }\n.style-list { display: grid; gap: 6px; max-height: calc(100vh - 160px); overflow: auto; padding-right: 4px; }\n\n.style-item {\n    display: flex; align-items: center; gap: 10px; width: 100%;\n    padding: 8px; border: 1px solid var(--store-line); border-radius: 10px;\n    background: var(--color-surface); cursor: pointer; text-align: left; font: inherit;\n}\n.style-item img { width: 44px; height: 44px; object-fit: contain; background: var(--store-green-50); border-radius: 6px; }\n.style-item-name { flex: 1; font-weight: 700; font-size: 13px; }\n.style-item-name small { display: block; font-weight: 400; color: var(--custom-tees-calibrate-gray); font-size: 11.5px; }\n.style-item-state { font-size: 11px; color: var(--custom-tees-calibrate-gray-2); white-space: nowrap; }\n.style-item-state.is-saved { color: var(--green-700); font-weight: 700; }\n.style-item.is-active { border-color: var(--store-green-700); box-shadow: 0 0 0 2px rgb(47 125 59 / 18%); }\n.cal-loading { padding: 14px; color: var(--custom-tees-calibrate-gray); font-size: 13px; }\n\n/* Stage */\n.cal-stage { background: var(--color-surface); border: 1px solid var(--store-line); border-radius: 14px; padding: 14px; }\n.cal-toolbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }\n.cal-tabs { display: flex; border: 1px solid var(--store-line); border-radius: 999px; overflow: hidden; }\n.cal-tab { padding: 7px 18px; border: none; background: var(--color-surface); font: inherit; font-weight: 700; cursor: pointer; }\n.cal-tab.is-active { background: var(--store-green-950); color: var(--color-on-brand); }\n.cal-color { padding: 7px 10px; border: 1px solid var(--store-line); border-radius: 8px; font: inherit; }\n.cal-coloronly { font-size: 12.5px; color: var(--print-ink-soft); display: inline-flex; align-items: center; gap: 6px; }\n\n.cal-canvas-wrap {\n    position: relative; display: grid; place-items: center;\n    background: var(--store-green-50); border-radius: 10px; min-height: 420px; overflow: hidden;\n    touch-action: none;\n}\n#cal-photo { max-width: 100%; max-height: 72vh; display: block; user-select: none; }\n\n/* hidden attr must WIN over the display rule (author display beats the UA\n   hidden style otherwise) — and the overlay is informational, never a hit\n   target: without these two lines it invisibly swallowed every drag on the\n   calibration box. (Erik bug report 2026-06-10) */\n.cal-empty { position: absolute; inset: 0; display: grid; place-items: center; color: var(--custom-tees-calibrate-gray-2); font-size: 14px; pointer-events: none; }\n.cal-empty[hidden] { display: none; }\n\n.cal-box {\n    position: absolute; border: 2px dashed var(--green-600); border-radius: 4px;\n    background: rgb(22 163 74 / 8%); cursor: move;\n}\n\n.cal-box-label {\n    position: absolute; top: -22px; left: 0; font-size: 11px; font-weight: 700;\n    color: var(--green-700); white-space: nowrap;\n}\n\n.cal-box-handle {\n    position: absolute; right: -13px; bottom: -13px; width: 26px; height: 26px;\n    display: grid; place-items: center; background: var(--color-surface); color: var(--green-700);\n    border: 2px solid var(--green-600); border-radius: 50%; cursor: nwse-resize; font-size: 11px;\n    box-shadow: 0 2px 6px rgb(0 0 0 / 18%);\n}\n\n.cal-readout { margin: 10px 2px 0; font-size: 12px; color: var(--print-ink-soft); font-family: ui-monospace, Consolas, monospace; min-height: 16px; }\n\n.cal-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }\n\n.cal-btn {\n    display: inline-flex; align-items: center; gap: 7px;\n    padding: 9px 14px; border: 1px solid var(--store-line); border-radius: 9px;\n    background: var(--color-surface); font: inherit; font-weight: 600; cursor: pointer;\n}\n.cal-btn:hover { border-color: var(--store-green-700); }\n.cal-btn-primary { background: var(--green-700); border-color: var(--green-700); color: var(--color-on-brand); }\n.cal-btn-primary:hover { background: var(--custom-tees-calibrate-green-dark); }\n.cal-btn-primary:disabled { opacity: 0.6; cursor: wait; }\n.cal-btn-danger { color: var(--red-700); }\n.cal-btn-danger:hover { border-color: var(--red-700); }\n.cal-note { margin: 10px 2px 0; font-size: 12.5px; color: var(--custom-tees-calibrate-gray); }\n\n.cal-toasts { position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); display: grid; gap: 8px; z-index: 50; }\n\n.cal-toast {\n    background: var(--store-green-950); color: var(--color-on-brand); padding: 10px 16px; border-radius: 10px;\n    font-size: 13px; box-shadow: 0 6px 18px rgb(0 0 0 / 25%);\n}\n.cal-toast.is-error { background: var(--print-red); }\n.cal-toast.is-ok { background: var(--green-700); }\n\n@media (width <= 900px) {\n    .cal-main { grid-template-columns: 1fr; }\n    .style-list { max-height: 300px; }\n}\n"
+    },
+    {
+      "file": "admin/css/universal-records-admin.css",
+      "css": "/* universal-records-admin.css — page styles (extracted from inline \\3c style>, 2026.09.05.11) */\n\n/* ── moved from inline \\3c style> in admin/universal-records-admin.html (Rule 3, 2026.09.05.11) ── */\n\n/* Root Variables */\n\n/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue, merged into its\n   existing :root. Map them to shared_components/css/tokens.css names when the page is redesigned;\n   raw hex is allowed ONLY in this block. */\n/* stylelint-disable color-no-hex */\n        :root {\n    --universal-records-admin-orange: #f57c00;\n    --universal-records-admin-cyan: #1976d2;\n    --universal-records-admin-red: #c2185b;\n    --universal-records-admin-violet: #7b1fa2;\n    --universal-records-admin-orange-2: #f9a825;\n    --universal-records-admin-cyan-2: #0288d1;\n    --universal-records-admin-indigo: #6a0dad;\n            --primary-color: var(--brand-500);\n            --primary-dark: var(--brand-600);\n            --primary-light: var(--brand-400);\n            --bg-color: var(--color-bradley-tint);\n            --card-bg: var(--color-surface);\n            --border-color: var(--gray-200);\n            --text-primary: var(--gray-800);\n            --text-secondary: var(--gray-500);\n            --hover-bg: var(--gray-100);\n            --success-bg: var(--emerald-100);\n            --success-text: var(--emerald-800);\n            --warning-bg: var(--amber-100);\n            --warning-text: var(--amber-800);\n            --error-bg: var(--red-100);\n            --error-text: var(--red-800);\n            --info-bg: var(--sky-100);\n            --info-text: var(--blue-800);\n            --success-color: var(--emerald-800);\n            --error-color: var(--red-800);\n            --info-color: var(--blue-800);\n        }\n/* stylelint-enable color-no-hex */\n\n        /* Base Styles */\n        * {\n            margin: 0;\n            padding: 0;\n            box-sizing: border-box;\n        }\n\n        body {\n            font-family: Inter, sans-serif;\n            background: var(--bg-color);\n            color: var(--text-primary);\n            line-height: 1.6;\n        }\n\n        /* Header */\n        .header {\n            background: var(--card-bg);\n            border-bottom: 1px solid var(--border-color);\n            padding: 1rem 0;\n            position: sticky;\n            top: 0;\n            z-index: 100;\n            box-shadow: 0 1px 3px rgb(0 0 0 / 10%);\n        }\n\n        .header-container {\n            max-width: 1400px;\n            margin: 0 auto;\n            padding: 0 2rem;\n            display: flex;\n            justify-content: space-between;\n            align-items: center;\n        }\n\n        .logo {\n            height: 40px;\n            width: auto;\n        }\n\n        .breadcrumb {\n            display: flex;\n            align-items: center;\n            gap: 0.5rem;\n            color: var(--text-secondary);\n            font-size: 0.875rem;\n        }\n\n        .breadcrumb a {\n            color: var(--primary-color);\n            text-decoration: none;\n            font-weight: 500;\n        }\n\n        /* Main Container */\n        .container {\n            max-width: 1400px;\n            margin: 2rem auto;\n            padding: 0 2rem;\n        }\n\n        /* Page Header */\n        .page-header {\n            margin-bottom: 2rem;\n        }\n\n        .page-title {\n            font-size: 2rem;\n            font-weight: 700;\n            color: var(--text-primary);\n            margin-bottom: 0.5rem;\n        }\n\n        .page-description {\n            color: var(--text-secondary);\n            font-size: 1.125rem;\n        }\n\n        /* Stats Cards */\n        .stats-grid {\n            display: grid;\n            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));\n            gap: 1.5rem;\n            margin-bottom: 2rem;\n        }\n\n        .stat-card {\n            background: var(--card-bg);\n            padding: 1.5rem;\n            border-radius: 8px;\n            box-shadow: 0 1px 3px rgb(0 0 0 / 10%);\n            border: 1px solid var(--border-color);\n        }\n\n        .stat-header {\n            display: flex;\n            justify-content: space-between;\n            align-items: center;\n            margin-bottom: 1rem;\n        }\n\n        .stat-title {\n            font-size: 0.875rem;\n            font-weight: 500;\n            color: var(--text-secondary);\n            text-transform: uppercase;\n            letter-spacing: 0.05em;\n        }\n\n        .stat-icon {\n            width: 2rem;\n            height: 2rem;\n            border-radius: 50%;\n            display: flex;\n            align-items: center;\n            justify-content: center;\n            color: white;\n        }\n\n        .stat-value {\n            font-size: 2rem;\n            font-weight: 700;\n            color: var(--text-primary);\n        }\n\n        .stat-change {\n            font-size: 0.875rem;\n            margin-top: 0.25rem;\n        }\n\n        .stat-change.positive {\n            color: var(--success-text);\n        }\n\n        .stat-change.negative {\n            color: var(--error-text);\n        }\n\n        /* Filters */\n        .filters {\n            background: var(--card-bg);\n            padding: 1.5rem;\n            border-radius: 8px;\n            margin-bottom: 2rem;\n            border: 1px solid var(--border-color);\n        }\n\n        .filters-grid {\n            display: grid;\n            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));\n            gap: 1rem;\n            margin-bottom: 1rem;\n        }\n\n        .filter-group {\n            display: flex;\n            flex-direction: column;\n            gap: 0.5rem;\n        }\n\n        .filter-label {\n            font-size: 0.875rem;\n            font-weight: 500;\n            color: var(--text-primary);\n        }\n\n        .filter-control {\n            padding: 0.5rem 0.75rem;\n            border: 1px solid var(--border-color);\n            border-radius: 6px;\n            font-size: 0.875rem;\n            background: white;\n        }\n\n        .filter-control:focus {\n            outline: none;\n            border-color: var(--primary-color);\n            box-shadow: 0 0 0 0.25rem rgb(76 179 84 / 25%);\n        }\n\n        .filter-actions {\n            display: flex;\n            gap: 1rem;\n            align-items: center;\n        }\n\n        /* Buttons */\n        .btn {\n            padding: 0.5rem 1rem;\n            border: none;\n            border-radius: 6px;\n            font-weight: 500;\n            font-size: 0.875rem;\n            cursor: pointer;\n            transition: all 0.2s;\n            display: inline-flex;\n            align-items: center;\n            gap: 0.5rem;\n            text-decoration: none;\n        }\n\n        .btn-primary {\n            background: var(--primary-color);\n            color: white;\n        }\n\n        .btn-primary:hover {\n            background: var(--primary-dark);\n        }\n\n        .btn-secondary {\n            background: var(--hover-bg);\n            color: var(--text-primary);\n            border: 1px solid var(--border-color);\n        }\n\n        .btn-secondary:hover {\n            background: var(--border-color);\n        }\n\n        .btn-sm {\n            padding: 0.25rem 0.5rem;\n            font-size: 0.75rem;\n        }\n\n        /* Table */\n        .table-container {\n            background: var(--card-bg);\n            border-radius: 8px;\n            overflow: hidden;\n            box-shadow: 0 1px 3px rgb(0 0 0 / 10%);\n            border: 1px solid var(--border-color);\n        }\n\n        .table-header {\n            padding: 1rem 1.5rem;\n            border-bottom: 1px solid var(--border-color);\n            display: flex;\n            justify-content: space-between;\n            align-items: center;\n        }\n\n        .table-title {\n            font-size: 1.125rem;\n            font-weight: 600;\n            color: var(--text-primary);\n        }\n\n        .table-wrapper {\n            overflow-x: auto;\n        }\n\n        .records-table {\n            width: 100%;\n            border-collapse: collapse;\n        }\n\n        .records-table th,\n        .records-table td {\n            padding: 0.75rem 1rem;\n            text-align: left;\n            border-bottom: 1px solid var(--border-color);\n        }\n\n        .records-table th {\n            background: var(--bg-color);\n            font-weight: 600;\n            color: var(--text-primary);\n            font-size: 0.875rem;\n            text-transform: uppercase;\n            letter-spacing: 0.05em;\n        }\n\n        .records-table td {\n            font-size: 0.875rem;\n            color: var(--text-secondary);\n        }\n\n        .records-table tr:hover {\n            background: var(--hover-bg);\n        }\n\n        /* Quote Type Badges */\n        .quote-type {\n            display: inline-flex;\n            align-items: center;\n            gap: 0.25rem;\n            padding: 0.25rem 0.5rem;\n            border-radius: 4px;\n            font-size: 0.75rem;\n            font-weight: 500;\n            text-transform: uppercase;\n            letter-spacing: 0.05em;\n        }\n\n        .quote-type.dtg {\n            background: var(--brand-100);\n            color: var(--store-green-700);\n        }\n\n        .quote-type.rich {\n            background: var(--store-rush-soft);\n            color: var(--universal-records-admin-orange);\n        }\n\n        .quote-type.emb {\n            background: var(--sky-100);\n            color: var(--universal-records-admin-cyan);\n        }\n\n        .quote-type.embc {\n            background: var(--red-100);\n            color: var(--universal-records-admin-red);\n        }\n\n        .quote-type.lt {\n            background: var(--red-50);\n            color: var(--universal-records-admin-violet);\n        }\n\n        .quote-type.patch {\n            background: var(--brand-100);\n            color: var(--brand-600);\n        }\n\n        .quote-type.spc {\n            background: var(--store-rush-soft);\n            color: var(--universal-records-admin-orange-2);\n        }\n\n        .quote-type.ssc {\n            background: var(--red-50);\n            color: var(--red-600);\n        }\n\n        .quote-type.web {\n            background: var(--sky-100);\n            color: var(--universal-records-admin-cyan-2);\n        }\n        \n        .quote-type.adr {\n            background: var(--red-50);\n            color: var(--universal-records-admin-indigo);\n        }\n\n        /* Status Badges */\n        .status {\n            padding: 0.25rem 0.5rem;\n            border-radius: 4px;\n            font-size: 0.75rem;\n            font-weight: 500;\n            text-transform: uppercase;\n        }\n\n        .status.open {\n            background: var(--info-bg);\n            color: var(--info-text);\n        }\n\n        .status.sent {\n            background: var(--warning-bg);\n            color: var(--warning-text);\n        }\n\n        .status.converted {\n            background: var(--success-bg);\n            color: var(--success-text);\n        }\n\n        .status.expired {\n            background: var(--error-bg);\n            color: var(--error-text);\n        }\n        \n        .status.cancelled {\n            background: var(--red-50);\n            color: var(--red-600);\n        }\n        \n        /* Status dropdown styling */\n        .status-select {\n            padding: 0.375rem 0.75rem;\n            border-radius: 4px;\n            font-size: 0.75rem;\n            font-weight: 500;\n            text-transform: uppercase;\n            border: 1px solid transparent;\n            cursor: pointer;\n            transition: all 0.2s;\n            background-color: transparent;\n            appearance: none;\n            background-image: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' viewBox='0 0 12 12'%3E%3Cpath fill='%23374151' d='M6 7.5L2.25 3.75h7.5L6 7.5z'/%3E%3C/svg%3E\");\n            background-repeat: no-repeat;\n            background-position: right 0.5rem center;\n            padding-right: 2rem;\n            width: 120px;\n        }\n        \n        .status-select.open {\n            background-color: var(--info-bg);\n            color: var(--info-text);\n        }\n        \n        .status-select.sent {\n            background-color: var(--warning-bg);\n            color: var(--warning-text);\n        }\n        \n        .status-select.converted {\n            background-color: var(--success-bg);\n            color: var(--success-text);\n        }\n        \n        .status-select.expired {\n            background-color: var(--error-bg);\n            color: var(--error-text);\n        }\n        \n        .status-select.cancelled {\n            background-color: var(--red-50);\n            color: var(--red-600);\n        }\n        \n        .status-select:hover {\n            opacity: 0.85;\n        }\n        \n        .status-select:focus {\n            outline: none;\n            box-shadow: 0 0 0 2px var(--primary-light);\n        }\n\n        /* Loading State */\n        .loading {\n            display: flex;\n            justify-content: center;\n            align-items: center;\n            padding: 2rem;\n            color: var(--text-secondary);\n        }\n\n        .spinner {\n            width: 20px;\n            height: 20px;\n            border: 2px solid var(--border-color);\n            border-top: 2px solid var(--primary-color);\n            border-radius: 50%;\n            animation: spin 1s linear infinite;\n            margin-right: 0.5rem;\n        }\n\n        @keyframes spin {\n            0% { transform: rotate(0deg); }\n            100% { transform: rotate(360deg); }\n        }\n\n        /* Pagination */\n        .pagination {\n            display: flex;\n            justify-content: center;\n            align-items: center;\n            gap: 0.5rem;\n            padding: 1rem;\n            border-top: 1px solid var(--border-color);\n        }\n\n        .pagination-info {\n            font-size: 0.875rem;\n            color: var(--text-secondary);\n            margin-right: 1rem;\n        }\n\n        .pagination-btn {\n            padding: 0.5rem 0.75rem;\n            border: 1px solid var(--border-color);\n            background: white;\n            color: var(--text-primary);\n            border-radius: 4px;\n            cursor: pointer;\n            font-size: 0.875rem;\n            transition: all 0.2s;\n        }\n\n        .pagination-btn:hover:not(:disabled) {\n            background: var(--hover-bg);\n        }\n\n        .pagination-btn:disabled {\n            opacity: 0.5;\n            cursor: not-allowed;\n        }\n\n        .pagination-btn.active {\n            background: var(--primary-color);\n            color: white;\n            border-color: var(--primary-color);\n        }\n\n        /* Responsive */\n        @media (width <= 768px) {\n            .container {\n                padding: 0 1rem;\n            }\n            \n            .header-container {\n                padding: 0 1rem;\n            }\n            \n            .stats-grid {\n                grid-template-columns: 1fr;\n            }\n            \n            .filters-grid {\n                grid-template-columns: 1fr;\n            }\n            \n            .filter-actions {\n                flex-direction: column;\n                align-items: stretch;\n            }\n        }\n"
+    },
+    {
+      "file": "admin/css/universal-records-admin-injected.css",
+      "css": "/* universal-records-admin-injected.css — extracted 2026-09-06 from the \\3c style> block(s) universal-records-admin.js used to inject (Rule 3). */\n.toast {\n    position: fixed;\n    bottom: 2rem;\n    right: 2rem;\n    background: var(--card-bg);\n    padding: 1rem 1.5rem;\n    border-radius: 8px;\n    box-shadow: 0 4px 6px rgb(0 0 0 / 10%);\n    display: flex;\n    align-items: center;\n    gap: 0.75rem;\n    font-size: 0.875rem;\n    z-index: 1000;\n    animation: slideIn 0.3s ease-out;\n}\n\n.toast-success {\n    border-left: 4px solid var(--success-color);\n    color: var(--success-text);\n}\n\n.toast-error {\n    border-left: 4px solid var(--error-color);\n    color: var(--error-text);\n}\n\n.toast-info {\n    border-left: 4px solid var(--info-color);\n    color: var(--info-text);\n}\n\n@keyframes slideIn {\n    from {\n        transform: translateX(100%);\n        opacity: 0;\n    }\n\n    to {\n        transform: translateX(0);\n        opacity: 1;\n    }\n}\n\n.quote-view-modal {\n    position: fixed;\n    inset: 0;\n    z-index: 1000;\n}\n\n.modal-overlay {\n    width: 100%;\n    height: 100%;\n    background: rgb(0 0 0 / 50%);\n    display: flex;\n    align-items: center;\n    justify-content: center;\n}\n\n.modal-content {\n    background: white;\n    border-radius: 8px;\n    width: 90%;\n    max-width: 800px;\n    max-height: 90vh;\n    overflow: hidden;\n    display: flex;\n    flex-direction: column;\n}\n\n.modal-header {\n    padding: 1.5rem;\n    border-bottom: 1px solid var(--gray-200);\n    display: flex;\n    justify-content: space-between;\n    align-items: center;\n}\n\n.modal-header h2 {\n    margin: 0;\n    color: var(--gray-800);\n}\n\n.close-btn {\n    background: none;\n    border: none;\n    font-size: 1.5rem;\n    cursor: pointer;\n    color: var(--gray-500);\n}\n\n.modal-body {\n    padding: 1.5rem;\n    overflow-y: auto;\n    flex: 1;\n}\n\n.quote-info-grid {\n    display: grid;\n    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));\n    gap: 2rem;\n    margin-bottom: 2rem;\n}\n\n.info-section h3 {\n    margin: 0 0 1rem;\n    color: var(--gray-700);\n    font-size: 1.125rem;\n}\n\n.info-section p {\n    margin: 0.5rem 0;\n}\n\n.notes-section {\n    background: var(--gray-50);\n    padding: 1rem;\n    border-radius: 6px;\n    margin-bottom: 2rem;\n}\n\n.items-table {\n    width: 100%;\n    border-collapse: collapse;\n}\n\n.items-table th,\n.items-table td {\n    padding: 0.75rem;\n    text-align: left;\n    border-bottom: 1px solid var(--gray-200);\n}\n\n.items-table th {\n    background: var(--gray-50);\n    font-weight: 600;\n    color: var(--gray-700);\n}\n\n.modal-footer {\n    padding: 1.5rem;\n    border-top: 1px solid var(--gray-200);\n    display: flex;\n    gap: 1rem;\n    justify-content: flex-end;\n}\n\n.quote-edit-modal {\n    position: fixed;\n    inset: 0;\n    z-index: 1000;\n}\n\n.quote-edit-modal .modal-overlay {\n    width: 100%;\n    height: 100%;\n    background: rgb(0 0 0 / 50%);\n    display: flex;\n    align-items: center;\n    justify-content: center;\n}\n\n.quote-edit-modal .modal-content {\n    background: white;\n    border-radius: 8px;\n    width: 90%;\n    max-width: 800px;\n    max-height: 90vh;\n    overflow: hidden;\n    display: flex;\n    flex-direction: column;\n}\n\n.quote-edit-modal .modal-header {\n    padding: 1.5rem;\n    border-bottom: 1px solid var(--gray-200);\n    display: flex;\n    justify-content: space-between;\n    align-items: center;\n}\n\n.quote-edit-modal .modal-header h2 {\n    margin: 0;\n    color: var(--gray-800);\n}\n\n.quote-edit-modal .close-btn {\n    background: none;\n    border: none;\n    font-size: 1.5rem;\n    cursor: pointer;\n    color: var(--gray-500);\n}\n\n.quote-edit-modal .modal-body {\n    padding: 1.5rem;\n    overflow-y: auto;\n    flex: 1;\n}\n\n.quote-edit-modal .form-grid {\n    display: grid;\n    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));\n    gap: 1rem;\n}\n\n.quote-edit-modal .form-group {\n    margin-bottom: 1rem;\n}\n\n.quote-edit-modal .form-group.full-width {\n    grid-column: 1 / -1;\n}\n\n.quote-edit-modal .form-group label {\n    display: block;\n    margin-bottom: 0.5rem;\n    font-weight: 500;\n    color: var(--gray-700);\n}\n\n.quote-edit-modal .form-control {\n    width: 100%;\n    padding: 0.5rem 0.75rem;\n    border: 1px solid var(--gray-200);\n    border-radius: 6px;\n    font-size: 0.875rem;\n    background: white;\n}\n\n.quote-edit-modal .form-control:focus {\n    outline: none;\n    border-color: var(--brand-500);\n    box-shadow: 0 0 0 0.25rem rgb(76 179 84 / 25%);\n}\n\n.quote-edit-modal textarea.form-control {\n    resize: vertical;\n}\n\n.quote-edit-modal .modal-footer {\n    padding: 1.5rem;\n    border-top: 1px solid var(--gray-200);\n    display: flex;\n    gap: 1rem;\n    justify-content: flex-end;\n}\n"
     }
   ]
 }
