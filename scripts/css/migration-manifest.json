@@ -4980,6 +4980,200 @@
         "rawCssBytes": 173304,
         "localCssRequests": 0
       }
+    },
+    {
+      "source": "dashboards/DrainPro-Bundle.html",
+      "family": "staff-workspace",
+      "status": "pilot",
+      "route": "/dashboards/DrainPro-Bundle.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/staff-workspaces.css"
+      ],
+      "dynamicStyles": [],
+      "dynamicTokens": [],
+      "states": [
+        "four-width-original-content-and-links",
+        "two-exact-mocked-provider-boundaries",
+        "keyboard-tabs-direct-and-invalid-calls",
+        "phone-provider-containment",
+        "both-panel-paper-and-screen-restoration"
+      ],
+      "test": "tests/e2e/css-unification-staff-workspaces.spec.js",
+      "maxCssBytes": 64859,
+      "measuredRawCssBytes": 63835,
+      "baseline": {
+        "commit": "0f151e3899b8517092b1864babd8ea7f579fc95b",
+        "rawCssBytes": 27702,
+        "localCssRequests": 2
+      }
+    },
+    {
+      "source": "dashboards/production-shifts.html",
+      "family": "staff-workspace",
+      "status": "pilot",
+      "route": "/dashboards/production-shifts.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/staff-schedules.css"
+      ],
+      "dynamicStyles": [],
+      "dynamicTokens": [
+        "--ps-avatar-size",
+        "--ps-avatar-hue",
+        "--ps-left",
+        "--ps-width"
+      ],
+      "states": [
+        "four-original-department-and-ten-employee-contracts",
+        "original-segment-math-and-policy-content",
+        "four-width-accessibility-and-keyboard-scroll",
+        "detail-focus-containment-escape-and-return",
+        "missing-runtime-recovery",
+        "one-page-original-and-current-department-schedules"
+      ],
+      "test": "tests/e2e/css-unification-staff-workspaces.spec.js",
+      "maxCssBytes": 132320,
+      "measuredRawCssBytes": 131296,
+      "baseline": {
+        "commit": "0f151e3899b8517092b1864babd8ea7f579fc95b",
+        "rawCssBytes": 62983,
+        "localCssRequests": 2
+      }
+    },
+    {
+      "source": "dashboards/payroll.html",
+      "family": "staff-workspace",
+      "status": "pilot",
+      "route": "/dashboards/payroll.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/staff-payroll.css"
+      ],
+      "dynamicStyles": [],
+      "dynamicTokens": [],
+      "states": [
+        "synthetic-original-balances-carryover-and-register",
+        "four-width-tabs-keyboard-tables-and-accessibility",
+        "unchanged-audit-csv-and-six-slip-one-page-print",
+        "mocked-verified-packet-and-leave-imports",
+        "empty-failure-retry-and-reconciliation-gating",
+        "cancelled-upload-and-poll-response-ownership"
+      ],
+      "test": "tests/e2e/css-unification-staff-workspaces.spec.js",
+      "maxCssBytes": 79606,
+      "measuredRawCssBytes": 78582,
+      "baseline": {
+        "commit": "0f151e3899b8517092b1864babd8ea7f579fc95b",
+        "rawCssBytes": 29573,
+        "localCssRequests": 2
+      }
+    },
+    {
+      "source": "dashboards/ae-mission-control.html",
+      "family": "staff-workspace",
+      "status": "pilot",
+      "route": "/dashboards/ae-mission-control.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/vendor-invoice.css",
+        "shared_components/css/staff-mission-control.css",
+        "shared_components/css/vendor-inbound.css",
+        "shared_components/css/vendor-box-labels.css"
+      ],
+      "dynamicStyles": [],
+      "dynamicTokens": [
+        "--w",
+        "--x",
+        "--c",
+        "--bg",
+        "--m"
+      ],
+      "states": [
+        "six-tabs-four-widths-preserved-figures-and-accessibility",
+        "rep-admin-readonly-degraded-and-cancelled-tab-loads",
+        "native-kit-outreach-full-lists-focus-and-error-feedback",
+        "unchanged-mocked-request-bodies-and-late-preview-ownership",
+        "invoice-seven-inbound-profiles-eight-separate-box-labels",
+        "26-row-call-sheet-preserved-across-three-pages"
+      ],
+      "test": "tests/e2e/css-unification-ae-workspace.spec.js",
+      "maxCssBytes": 217270,
+      "measuredRawCssBytes": 216246,
+      "baseline": {
+        "commit": "0f151e3899b8517092b1864babd8ea7f579fc95b",
+        "rawCssBytes": 263878,
+        "localCssRequests": 7
+      }
+    },
+    {
+      "source": "dashboards/company-numbers.html",
+      "family": "staff-workspace",
+      "status": "pilot",
+      "route": "/dashboards/company-numbers.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/staff-company-numbers.css"
+      ],
+      "dynamicStyles": [],
+      "dynamicTokens": [],
+      "states": [
+        "eight-live-widgets-five-widths-original-money-and-date-ranges",
+        "empty-and-failed-load-recovery",
+        "failed-refresh-clears-old-figures-and-per-card-retry-updates-freshness",
+        "obsolete-revenue-response-cannot-change-current-range",
+        "missing-comparison-and-fallback-goals-are-clearly-labelled",
+        "complete-readable-company-report-on-letter-paper"
+      ],
+      "test": "tests/e2e/css-unification-company-numbers.spec.js",
+      "maxCssBytes": 96417,
+      "measuredRawCssBytes": 95393,
+      "baseline": {
+        "commit": "0f151e3899b8517092b1864babd8ea7f579fc95b",
+        "rawCssBytes": 215633,
+        "localCssRequests": 8
+      }
+    },
+    {
+      "source": "dashboards/quote-management.html",
+      "family": "staff-workspace",
+      "status": "pilot",
+      "route": "/dashboards/quote-management.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/staff-quote-management.css",
+        "shared_components/css/vendor-inbound.css",
+        "shared_components/css/vendor-box-labels.css"
+      ],
+      "dynamicStyles": [],
+      "dynamicTokens": [
+        "--c",
+        "--bg",
+        "--m"
+      ],
+      "states": [
+        "four-width-table-and-labelled-phone-cards-preserve-every-original-value",
+        "original-status-filters-tabs-search-pagination-and-owner-permissions",
+        "native-dialog-keyboard-focus-and-cancellation",
+        "pending-delete-email-and-shipstation-actions-preserve-one-request",
+        "failed-and-malformed-refresh-clears-old-data-and-remains-visible-until-retry",
+        "obsolete-date-window-and-inbound-responses-cannot-revive-old-data",
+        "landscape-quote-report-and-shared-inbound-report-with-one-label-per-sheet"
+      ],
+      "test": "tests/e2e/css-unification-quote-management.spec.js",
+      "maxCssBytes": 149999,
+      "measuredRawCssBytes": 148975,
+      "baseline": {
+        "commit": "0f151e3899b8517092b1864babd8ea7f579fc95b",
+        "rawCssBytes": 113392,
+        "localCssRequests": 5
+      }
     }
   ],
   "billingContentSha256": "d85f8530e03a1863d1b8bb2ebe97ba332d5c9e3411887d1eb2d02dcdb14c0863",

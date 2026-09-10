@@ -9,7 +9,7 @@
    ===================================================== */
 
 import { register } from '../core/dashboard-events.js';
-import { showApiError, clearApiError } from '../core/dashboard-errors.js';
+import { showApiError, clearApiError, reportWidgetResult } from '../core/dashboard-errors.js';
 import { store } from '../core/dashboard-store.js';
 import {
     formatMoney, formatMoneyCents, formatPercent,
@@ -33,6 +33,7 @@ const els = {
 };
 
 let currentDays = 7;
+let revenueRequest = 0;
 
 function setActiveRangeButton(days) {
     els.rangeButtons().forEach((btn) => {
@@ -104,21 +105,32 @@ function renderRevenue(payload, yoy) {
 }
 
 async function loadRevenue(refresh = false) {
+    const request = ++revenueRequest;
+    const days = currentDays;
     clearApiError('revenue');
     const valueEl = els.revenueValue();
     if (valueEl && !refresh) {
         valueEl.innerHTML = '<span class="skeleton skeleton-value"></span>';
     }
     try {
-        const yoy = await shopworksService.loadYearOverYear(currentDays, { refresh });
+        const yoy = await shopworksService.loadYearOverYear(days, { refresh });
+        if (request !== revenueRequest) return;
         renderRevenue(yoy.current, yoy);
         // Sales-goal YTD push deferred — see import note above. Banner stays at "—"
         // for current/pace/projection until the full hybrid YTD service ports in.
+        return reportWidgetResult('revenue', !yoy.lastYearError);
     } catch (err) {
+        if (request !== revenueRequest) return;
+        for (const getter of ['dateRange', 'growthBadge', 'comparison', 'sparkline', 'statRow']) {
+            els[getter]()?.replaceChildren();
+        }
+        els.growthBadge()?.removeAttribute('title');
+        els.sparkline()?.removeAttribute('title');
         showApiError('revenue', err, {
             onRetry: () => loadRevenue(true),
             detail: 'ShopWorks revenue is unavailable. The proxy may be slow or down.',
         });
+        return reportWidgetResult('revenue', false);
     }
 }
 
@@ -141,7 +153,7 @@ export async function initMetrics() {
     setActiveRangeButton(currentDays);
     // Note: #salesTeamList is owned by team-performance-controller.
     // It renders its own "Loading team performance…" spinner before the rep cards land.
-    await loadRevenue(false);
+    return loadRevenue(false);
 }
 
 /** Periodic re-read (Company Numbers 5-minute tick) — honours the 4-min client cache; force = header Refresh. */

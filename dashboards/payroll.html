@@ -7,16 +7,21 @@
   <title>Payroll — Northwest Custom Apparel</title>
   <link rel="icon" href="/favicon.png" type="image/png">
   <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-  <link href="/dashboards/css/payroll.css?v=2026.09.07.19" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.10.3">
+  <link rel="stylesheet" href="/shared_components/css/staff-payroll.css?v=2026.09.10.4">
 </head>
-<body>
-  <main class="pr-wrap">
+<body data-ui="unified" data-staff-schedule="payroll">
+  <a class="skip-link" href="#payroll-main">Skip to payroll</a>
+  <main class="pr-wrap" id="payroll-main" tabindex="-1">
     <header class="pr-header">
       <div>
         <h1>Payroll</h1>
         <p class="pr-sub">Vacation and sick balances, hours by pay period, and packet upload. Admin only — pay rates are never shown here.</p>
       </div>
-      <a class="pr-back" href="/staff-dashboard.html">← Dashboard</a>
+      <a class="btn pr-back" href="/staff-dashboard.html">← Dashboard</a>
     </header>
 
     <div id="pr-status" class="pr-status" role="status" aria-live="polite"></div>
@@ -43,11 +48,11 @@
       </div>
       <div class="pr-toolbar">
         <input id="leave-search" aria-label="Search employees" class="pr-search" type="search" placeholder="Filter by name or department…" autocomplete="off">
-        <button id="print-slips" class="pr-btn" type="button">🖨️ Print slips to hand out</button>
+        <button id="print-slips" class="btn pr-btn" type="button">🖨️ Print slips to hand out</button>
         <span id="leave-asof" class="pr-asof" role="status"></span>
       </div>
       <div id="leave-flags" class="pr-flags" hidden></div>
-      <div class="pr-tablewrap">
+      <div class="pr-tablewrap" role="region" aria-label="Payroll records; scroll to see all columns" tabindex="0">
         <table class="pr-table">
           <!-- Grouped header: ten columns only fit the page width once "Vac"/"Sick" is
                said once per group instead of on every column. -->
@@ -78,7 +83,7 @@
         <label class="pr-label" for="period-select">Pay date</label>
         <select id="period-select" class="pr-select"></select>
       </div>
-      <div class="pr-tablewrap">
+      <div class="pr-tablewrap" role="region" aria-label="Payroll records; scroll to see all columns" tabindex="0">
         <table class="pr-table">
           <thead>
             <tr>
@@ -107,7 +112,7 @@
           <option value="leave">Vacation &amp; sick page only</option>
         </select>
         <input id="packet-file" aria-label="Payroll packet PDF" class="pr-file" type="file" accept="application/pdf">
-        <button id="packet-parse" class="pr-btn" type="button" disabled>Read packet</button>
+        <button id="packet-parse" class="btn pr-btn" type="button" disabled>Read packet</button>
         <span id="packet-note" class="pr-note" role="status"></span>
         <!-- Busy indicator lives NEXT TO THE BUTTON, where the eye already is after a click.
              aria-hidden because #pr-status is a polite live region and a per-second counter
@@ -120,13 +125,15 @@
         <div id="review-verdict" class="pr-verdict"></div>
         <div id="review-notes" class="pr-verdict is-warn" hidden></div>
 
+        <div class="pr-tablewrap" role="region" aria-label="Reconciliation checks; scroll to see all columns" tabindex="0">
         <table class="pr-table pr-check-table">
           <thead><tr><th>Check</th><th class="pr-num">Printed on the document</th><th class="pr-num">From this read</th><th>Result</th></tr></thead>
           <tbody id="review-checks"></tbody>
         </table>
+        </div>
 
         <h3 id="review-rows-title" class="pr-h3">Hours and leave to be saved</h3>
-        <div class="pr-tablewrap">
+        <div class="pr-tablewrap" role="region" aria-label="Payroll review records; scroll to see all columns" tabindex="0">
           <table class="pr-table">
             <thead id="review-head"></thead>
             <tbody id="review-rows"></tbody>
@@ -134,8 +141,8 @@
         </div>
 
         <div class="pr-commit">
-          <button id="packet-commit" class="pr-btn pr-btn-primary" type="button" disabled>Save to payroll records</button>
-          <button id="packet-discard" class="pr-btn pr-btn-ghost" type="button">Discard</button>
+          <button id="packet-commit" class="btn btn-primary pr-btn pr-btn-primary" type="button" disabled>Save to payroll records</button>
+          <button id="packet-discard" class="btn pr-btn pr-btn-ghost" type="button">Discard</button>
         </div>
       </div>
     </section>
@@ -144,13 +151,13 @@
   <!-- Cut-apart slips, one per employee. Hidden on screen; replaces the whole page when
        the Print-slips button runs (body.print-slips + @media print). Built from whatever
        the Leave Balances tab is currently showing, so a filter narrows the printout too. -->
-  <div id="print-sheet" aria-hidden="true">
-    <div id="print-slips-grid"></div>
+  <div id="print-sheet" class="pr-print-sheet" aria-hidden="true">
+    <div id="print-slips-grid" class="pr-print-grid"></div>
   </div>
 
   <!-- The carryover transform is a separate file so it can be unit-tested in Node
        (tests/unit/vacation-carryover.test.js). It must load before payroll.js. -->
   <script src="/dashboards/js/vacation-carryover.js?v=2026.08.10.7"></script>
-  <script src="/dashboards/js/payroll.js?v=2026.09.05.65"></script>
+  <script src="/dashboards/js/payroll.js?v=2026.09.10.4"></script>
 </body>
 </html>

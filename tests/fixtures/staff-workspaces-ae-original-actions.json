@@ -1,0 +1,438 @@
+{
+  "dialogs": [
+    {
+      "name": "kit",
+      "width": 1440,
+      "text": " Request a sample / marketing kit\n\nGoes straight to Mikalah's shipping queue. Pick the contents, tell us where it goes.\n\nWhat to send\nSanMar Catalog 2026\nNWCA Sticker Pack\nSample Tee (printed)\nRecipient\nCompany\nStreet address *\nSuite / unit\nCity *\nState *\nZIP *\nPhone\nEmail\nNotes for shipping\nSend to shipping\nStreet, city, state, and ZIP are required.",
+      "fields": [
+        {
+          "id": "",
+          "value": "on",
+          "checked": true
+        },
+        {
+          "id": "",
+          "value": "2",
+          "checked": false
+        },
+        {
+          "id": "",
+          "value": "on",
+          "checked": false
+        },
+        {
+          "id": "",
+          "value": "1",
+          "checked": false
+        },
+        {
+          "id": "",
+          "value": "on",
+          "checked": false
+        },
+        {
+          "id": "",
+          "value": "1",
+          "checked": false
+        },
+        {
+          "id": "aemc-kit-recipient",
+          "value": "Cedar Example",
+          "checked": false
+        },
+        {
+          "id": "aemc-kit-company",
+          "value": "Synthetic Workshop",
+          "checked": false
+        },
+        {
+          "id": "aemc-kit-addr1",
+          "value": "123 Example Way",
+          "checked": false
+        },
+        {
+          "id": "aemc-kit-addr2",
+          "value": "Suite 2",
+          "checked": false
+        },
+        {
+          "id": "aemc-kit-city",
+          "value": "Sample City",
+          "checked": false
+        },
+        {
+          "id": "aemc-kit-state",
+          "value": "WA",
+          "checked": false
+        },
+        {
+          "id": "aemc-kit-zip",
+          "value": "00000",
+          "checked": false
+        },
+        {
+          "id": "aemc-kit-phone",
+          "value": "2535550100",
+          "checked": false
+        },
+        {
+          "id": "aemc-kit-email",
+          "value": "cedar@example.test",
+          "checked": false
+        },
+        {
+          "id": "aemc-kit-notes",
+          "value": "Local browser fixture only."
+        }
+      ]
+    },
+    {
+      "name": "kit",
+      "width": 768,
+      "text": " Request a sample / marketing kit\n\nGoes straight to Mikalah's shipping queue. Pick the contents, tell us where it goes.\n\nWhat to send\nSanMar Catalog 2026\nNWCA Sticker Pack\nSample Tee (printed)\nRecipient\nCompany\nStreet address *\nSuite / unit\nCity *\nState *\nZIP *\nPhone\nEmail\nNotes for shipping\nSend to shipping\nStreet, city, state, and ZIP are required.",
+      "fields": [
+        {
+          "id": "",
+          "value": "on",
+          "checked": true
+        },
+        {
+          "id": "",
+          "value": "2",
+          "checked": false
+        },
+        {
+          "id": "",
+          "value": "on",
+          "checked": false
+        },
+        {
+          "id": "",
+          "value": "1",
+          "checked": false
+        },
+        {
+          "id": "",
+          "value": "on",
+          "checked": false
+        },
+        {
+          "id": "",
+          "value": "1",
+          "checked": false
+        },
+        {
+          "id": "aemc-kit-recipient",
+          "value": "Cedar Example",
+          "checked": false
+        },
+        {
+          "id": "aemc-kit-company",
+          "value": "Synthetic Workshop",
+          "checked": false
+        },
+        {
+          "id": "aemc-kit-addr1",
+          "value": "123 Example Way",
+          "checked": false
+        },
+        {
+          "id": "aemc-kit-addr2",
+          "value": "Suite 2",
+          "checked": false
+        },
+        {
+          "id": "aemc-kit-city",
+          "value": "Sample City",
+          "checked": false
+        },
+        {
+          "id": "aemc-kit-state",
+          "value": "WA",
+          "checked": false
+        },
+        {
+          "id": "aemc-kit-zip",
+          "value": "00000",
+          "checked": false
+        },
+        {
+          "id": "aemc-kit-phone",
+          "value": "2535550100",
+          "checked": false
+        },
+        {
+          "id": "aemc-kit-email",
+          "value": "cedar@example.test",
+          "checked": false
+        },
+        {
+          "id": "aemc-kit-notes",
+          "value": "Local browser fixture only."
+        }
+      ]
+    },
+    {
+      "name": "kit",
+      "width": 390,
+      "text": " Request a sample / marketing kit\n\nGoes straight to Mikalah's shipping queue. Pick the contents, tell us where it goes.\n\nWhat to send\nSanMar Catalog 2026\nNWCA Sticker Pack\nSample Tee (printed)\nRecipient\nCompany\nStreet address *\nSuite / unit\nCity *\nState *\nZIP *\nPhone\nEmail\nNotes for shipping\nSend to shipping\nStreet, city, state, and ZIP are required.",
+      "fields": [
+        {
+          "id": "",
+          "value": "on",
+          "checked": true
+        },
+        {
+          "id": "",
+          "value": "2",
+          "checked": false
+        },
+        {
+          "id": "",
+          "value": "on",
+          "checked": false
+        },
+        {
+          "id": "",
+          "value": "1",
+          "checked": false
+        },
+        {
+          "id": "",
+          "value": "on",
+          "checked": false
+        },
+        {
+          "id": "",
+          "value": "1",
+          "checked": false
+        },
+        {
+          "id": "aemc-kit-recipient",
+          "value": "Cedar Example",
+          "checked": false
+        },
+        {
+          "id": "aemc-kit-company",
+          "value": "Synthetic Workshop",
+          "checked": false
+        },
+        {
+          "id": "aemc-kit-addr1",
+          "value": "123 Example Way",
+          "checked": false
+        },
+        {
+          "id": "aemc-kit-addr2",
+          "value": "Suite 2",
+          "checked": false
+        },
+        {
+          "id": "aemc-kit-city",
+          "value": "Sample City",
+          "checked": false
+        },
+        {
+          "id": "aemc-kit-state",
+          "value": "WA",
+          "checked": false
+        },
+        {
+          "id": "aemc-kit-zip",
+          "value": "00000",
+          "checked": false
+        },
+        {
+          "id": "aemc-kit-phone",
+          "value": "2535550100",
+          "checked": false
+        },
+        {
+          "id": "aemc-kit-email",
+          "value": "cedar@example.test",
+          "checked": false
+        },
+        {
+          "id": "aemc-kit-notes",
+          "value": "Local browser fixture only."
+        }
+      ]
+    },
+    {
+      "name": "kit",
+      "width": 320,
+      "text": " Request a sample / marketing kit\n\nGoes straight to Mikalah's shipping queue. Pick the contents, tell us where it goes.\n\nWhat to send\nSanMar Catalog 2026\nNWCA Sticker Pack\nSample Tee (printed)\nRecipient\nCompany\nStreet address *\nSuite / unit\nCity *\nState *\nZIP *\nPhone\nEmail\nNotes for shipping\nSend to shipping\nStreet, city, state, and ZIP are required.",
+      "fields": [
+        {
+          "id": "",
+          "value": "on",
+          "checked": true
+        },
+        {
+          "id": "",
+          "value": "2",
+          "checked": false
+        },
+        {
+          "id": "",
+          "value": "on",
+          "checked": false
+        },
+        {
+          "id": "",
+          "value": "1",
+          "checked": false
+        },
+        {
+          "id": "",
+          "value": "on",
+          "checked": false
+        },
+        {
+          "id": "",
+          "value": "1",
+          "checked": false
+        },
+        {
+          "id": "aemc-kit-recipient",
+          "value": "Cedar Example",
+          "checked": false
+        },
+        {
+          "id": "aemc-kit-company",
+          "value": "Synthetic Workshop",
+          "checked": false
+        },
+        {
+          "id": "aemc-kit-addr1",
+          "value": "123 Example Way",
+          "checked": false
+        },
+        {
+          "id": "aemc-kit-addr2",
+          "value": "Suite 2",
+          "checked": false
+        },
+        {
+          "id": "aemc-kit-city",
+          "value": "Sample City",
+          "checked": false
+        },
+        {
+          "id": "aemc-kit-state",
+          "value": "WA",
+          "checked": false
+        },
+        {
+          "id": "aemc-kit-zip",
+          "value": "00000",
+          "checked": false
+        },
+        {
+          "id": "aemc-kit-phone",
+          "value": "2535550100",
+          "checked": false
+        },
+        {
+          "id": "aemc-kit-email",
+          "value": "cedar@example.test",
+          "checked": false
+        },
+        {
+          "id": "aemc-kit-notes",
+          "value": "Local browser fixture only."
+        }
+      ]
+    },
+    {
+      "name": "outreach-preview",
+      "template": 0,
+      "text": " Email this lead\nSample Workshop 1 <b>escaping probe</b> — Sample Contact 1 <contact1@example.test>\nIntroduction\nQuote follow-up\nChecking in\nThanks — welcome aboard\nSynthetic intro preview\n\nSample message for a browser fixture. No email is sent.\n\nSend to contact1@example.test"
+    },
+    {
+      "name": "outreach-preview",
+      "template": 1,
+      "text": " Email this lead\nSample Workshop 1 <b>escaping probe</b> — Sample Contact 1 <contact1@example.test>\nIntroduction\nQuote follow-up\nChecking in\nThanks — welcome aboard\nSynthetic quote-followup preview\n\nSample message for a browser fixture. No email is sent.\n\nSend to contact1@example.test"
+    },
+    {
+      "name": "outreach-preview",
+      "template": 2,
+      "text": " Email this lead\nSample Workshop 1 <b>escaping probe</b> — Sample Contact 1 <contact1@example.test>\nIntroduction\nQuote follow-up\nChecking in\nThanks — welcome aboard\nSynthetic checking-in preview\n\nSample message for a browser fixture. No email is sent.\n\nSend to contact1@example.test"
+    },
+    {
+      "name": "outreach-preview",
+      "template": 3,
+      "text": " Email this lead\nSample Workshop 1 <b>escaping probe</b> — Sample Contact 1 <contact1@example.test>\nIntroduction\nQuote follow-up\nChecking in\nThanks — welcome aboard\nSynthetic won-thanks preview\n\nSample message for a browser fixture. No email is sent.\n\nSend to contact1@example.test"
+    }
+  ],
+  "writes": [
+    {
+      "path": "/api/crm-proxy/marketing-shipments",
+      "method": "POST",
+      "body": "{\"submissionId\":\"\",\"salesRep\":\"Aster Sample\",\"recipientName\":\"Cedar Example\",\"company\":\"Synthetic Workshop\",\"address1\":\"123 Example Way\",\"address2\":\"Suite 2\",\"city\":\"Sample City\",\"state\":\"WA\",\"zip\":\"00000\",\"phone\":\"2535550100\",\"email\":\"cedar@example.test\",\"notes\":\"Local browser fixture only.\",\"items\":[{\"code\":\"CATALOG\",\"label\":\"SanMar Catalog 2026\",\"qty\":2}]}"
+    },
+    {
+      "path": "/api/crm-proxy/lead-outreach",
+      "method": "POST",
+      "body": "{\"submissionId\":\"JFL0714-1001\",\"template\":\"intro\",\"preview\":true,\"lead\":{\"contactName\":\"Sample Contact 1\",\"email\":\"contact1@example.test\",\"company\":\"Sample Workshop 1 <b>escaping probe</b>\"},\"aeName\":\"Aster Sample\",\"aeEmail\":\"taneisha@nwcustomapparel.com\"}"
+    },
+    {
+      "path": "/api/crm-proxy/lead-outreach",
+      "method": "POST",
+      "body": "{\"submissionId\":\"JFL0714-1001\",\"template\":\"quote-followup\",\"preview\":true,\"lead\":{\"contactName\":\"Sample Contact 1\",\"email\":\"contact1@example.test\",\"company\":\"Sample Workshop 1 <b>escaping probe</b>\"},\"aeName\":\"Aster Sample\",\"aeEmail\":\"taneisha@nwcustomapparel.com\"}"
+    },
+    {
+      "path": "/api/crm-proxy/lead-outreach",
+      "method": "POST",
+      "body": "{\"submissionId\":\"JFL0714-1001\",\"template\":\"checking-in\",\"preview\":true,\"lead\":{\"contactName\":\"Sample Contact 1\",\"email\":\"contact1@example.test\",\"company\":\"Sample Workshop 1 <b>escaping probe</b>\"},\"aeName\":\"Aster Sample\",\"aeEmail\":\"taneisha@nwcustomapparel.com\"}"
+    },
+    {
+      "path": "/api/crm-proxy/lead-outreach",
+      "method": "POST",
+      "body": "{\"submissionId\":\"JFL0714-1001\",\"template\":\"won-thanks\",\"preview\":true,\"lead\":{\"contactName\":\"Sample Contact 1\",\"email\":\"contact1@example.test\",\"company\":\"Sample Workshop 1 <b>escaping probe</b>\"},\"aeName\":\"Aster Sample\",\"aeEmail\":\"taneisha@nwcustomapparel.com\"}"
+    },
+    {
+      "path": "/api/crm-proxy/lead-outreach",
+      "method": "POST",
+      "body": "{\"submissionId\":\"JFL0714-1001\",\"template\":\"won-thanks\",\"preview\":false,\"lead\":{\"contactName\":\"Sample Contact 1\",\"email\":\"contact1@example.test\",\"company\":\"Sample Workshop 1 <b>escaping probe</b>\"},\"aeName\":\"Aster Sample\",\"aeEmail\":\"taneisha@nwcustomapparel.com\"}"
+    }
+  ],
+  "events": {
+    "errors": [],
+    "writes": [
+      {
+        "path": "/api/crm-proxy/marketing-shipments",
+        "method": "POST",
+        "body": "{\"submissionId\":\"\",\"salesRep\":\"Aster Sample\",\"recipientName\":\"Cedar Example\",\"company\":\"Synthetic Workshop\",\"address1\":\"123 Example Way\",\"address2\":\"Suite 2\",\"city\":\"Sample City\",\"state\":\"WA\",\"zip\":\"00000\",\"phone\":\"2535550100\",\"email\":\"cedar@example.test\",\"notes\":\"Local browser fixture only.\",\"items\":[{\"code\":\"CATALOG\",\"label\":\"SanMar Catalog 2026\",\"qty\":2}]}"
+      },
+      {
+        "path": "/api/crm-proxy/lead-outreach",
+        "method": "POST",
+        "body": "{\"submissionId\":\"JFL0714-1001\",\"template\":\"intro\",\"preview\":true,\"lead\":{\"contactName\":\"Sample Contact 1\",\"email\":\"contact1@example.test\",\"company\":\"Sample Workshop 1 <b>escaping probe</b>\"},\"aeName\":\"Aster Sample\",\"aeEmail\":\"taneisha@nwcustomapparel.com\"}"
+      },
+      {
+        "path": "/api/crm-proxy/lead-outreach",
+        "method": "POST",
+        "body": "{\"submissionId\":\"JFL0714-1001\",\"template\":\"quote-followup\",\"preview\":true,\"lead\":{\"contactName\":\"Sample Contact 1\",\"email\":\"contact1@example.test\",\"company\":\"Sample Workshop 1 <b>escaping probe</b>\"},\"aeName\":\"Aster Sample\",\"aeEmail\":\"taneisha@nwcustomapparel.com\"}"
+      },
+      {
+        "path": "/api/crm-proxy/lead-outreach",
+        "method": "POST",
+        "body": "{\"submissionId\":\"JFL0714-1001\",\"template\":\"checking-in\",\"preview\":true,\"lead\":{\"contactName\":\"Sample Contact 1\",\"email\":\"contact1@example.test\",\"company\":\"Sample Workshop 1 <b>escaping probe</b>\"},\"aeName\":\"Aster Sample\",\"aeEmail\":\"taneisha@nwcustomapparel.com\"}"
+      },
+      {
+        "path": "/api/crm-proxy/lead-outreach",
+        "method": "POST",
+        "body": "{\"submissionId\":\"JFL0714-1001\",\"template\":\"won-thanks\",\"preview\":true,\"lead\":{\"contactName\":\"Sample Contact 1\",\"email\":\"contact1@example.test\",\"company\":\"Sample Workshop 1 <b>escaping probe</b>\"},\"aeName\":\"Aster Sample\",\"aeEmail\":\"taneisha@nwcustomapparel.com\"}"
+      },
+      {
+        "path": "/api/crm-proxy/lead-outreach",
+        "method": "POST",
+        "body": "{\"submissionId\":\"JFL0714-1001\",\"template\":\"won-thanks\",\"preview\":false,\"lead\":{\"contactName\":\"Sample Contact 1\",\"email\":\"contact1@example.test\",\"company\":\"Sample Workshop 1 <b>escaping probe</b>\"},\"aeName\":\"Aster Sample\",\"aeEmail\":\"taneisha@nwcustomapparel.com\"}"
+      }
+    ],
+    "unknown": [],
+    "missing": [],
+    "providers": []
+  }
+}

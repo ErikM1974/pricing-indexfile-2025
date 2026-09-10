@@ -58,7 +58,9 @@ jobs:
     # burned a runner and blocked a PR on a check that had not run a single test.
     # This bounds it: a hung setup now fails in minutes and is obviously a re-run,
     # not a mystery. The job itself takes ~2.5 min warm.
-    timeout-minutes: 20
+    # The 813-case release took 19m53s end to end. With 883 mocked cases,
+    # allow 30 minutes for the full gate; bound browser setup separately below.
+    timeout-minutes: 30
     # 2026-09-08: the money-path and calculator-parity specs price through the LIVE proxy, whose reads have
     # required the proxy secret since the quote-plane lockdown — without it every run failed with "engine
     # error" (red from 2026-09-07 15:54). The rendered axe ratchet needs no secret and always runs; the two
@@ -99,6 +101,7 @@ jobs:
             fi
           done
       - name: Install Chromium + OS deps (cache miss)
+        timeout-minutes: 5
         if: steps.pw-cache.outputs.cache-hit != 'true'
         run: npx playwright install --with-deps chromium
       # Cache hit still needs the apt step: only ~/.cache/ms-playwright is cached,
@@ -106,6 +109,7 @@ jobs:
       # ~170MB browser download, NOT the apt round trip — `timeout-minutes` above
       # is what actually bounds an apt stall.
       - name: Install OS deps only (cache hit)
+        timeout-minutes: 5
         if: steps.pw-cache.outputs.cache-hit == 'true'
         run: npx playwright install-deps chromium
       # Boots server.js on :3400 (stripe/emailjs init lazily); all WRITES are route-mocked in the specs.

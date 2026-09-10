@@ -8,40 +8,47 @@
     <!-- NWCA Favicon -->
     <link rel="icon" type="image/png" href="/favicon.png">
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/dashboards/css/DrainPro-Bundle.css?v=2026.09.07.19">
+    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.10.3">
+    <link rel="stylesheet" href="/shared_components/css/staff-workspaces.css?v=2026.09.10.4">
 </head>
-<body>
-    <!-- Fire Engine Red Header -->
-    <div class="drain-pro-header">
+<body data-ui="unified" data-staff-workspace="drainpro">
+    <a class="skip-link" href="#staff-workspace-main">Skip to content</a>
+    <!-- Drain-Pro identity in the shared staff workspace layout. -->
+    <header class="drain-pro-header">
         <div class="logo-container">
             <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/Drain%20Pro.png?ver=1"
                  alt="Drain-Pro Inc. Logo">
         </div>
+        <div class="dp-heading">
         <h1 class="header-title">Employee Bundle Program</h1>
         <p class="header-subtitle">Manage team apparel sizes and orders</p>
-    </div>
+        </div>
+    </header>
 
     <!-- Main Content -->
-    <main class="container">
+    <main class="container" id="staff-workspace-main">
         <div class="content-card">
             <!-- Tab Navigation -->
-            <div class="tab-navigation">
-                <button class="tab-button active" data-call="switchTab" data-args='["labels"]'>
+            <div class="tab-navigation tab-buttons" role="tablist" aria-label="Employee bundle views">
+                <button class="tab-button active" id="labels-tab-button" type="button" role="tab" aria-selected="true" aria-controls="labels-tab" tabindex="0" data-call="switchTab" data-args='["labels"]'>
                     <i class="fas fa-tags" aria-hidden="true"></i>
                     <span>Avery 5960 (2.5" x 1") Box Labels</span>
                 </button>
-                <button class="tab-button" data-call="switchTab" data-args='["employees"]'>
+                <button class="tab-button" id="employees-tab-button" type="button" role="tab" aria-selected="false" aria-controls="employees-tab" tabindex="-1" data-call="switchTab" data-args='["employees"]'>
                     <i class="fas fa-users" aria-hidden="true"></i>
                     <span>Bundle Details</span>
                 </button>
             </div>
 
             <!-- Tab Content: Box Labels -->
-            <div id="labels-tab" class="tab-content active">
+            <div id="labels-tab" class="tab-content active" role="tabpanel" aria-labelledby="labels-tab-button">
                 <h2 class="section-header">
                     <i class="fas fa-tags" aria-hidden="true"></i>
                     <span>Drain-Pro Box Labels</span>
@@ -77,19 +84,19 @@
                     </ol>
                 </div>
 
-                <div class="table-container">
+                <div class="table-container" role="region" aria-label="Drain-Pro box labels" tabindex="0">
                     <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e15000da6b6fa1d16145b4ab86/emb"></script>
                 </div>
             </div>
 
             <!-- Tab Content: Bundle Details -->
-            <div id="employees-tab" class="tab-content">
+            <div id="employees-tab" class="tab-content" role="tabpanel" aria-labelledby="employees-tab-button" hidden>
                 <h2 class="section-header">
                     <i class="fas fa-users" aria-hidden="true"></i>
                     <span>Bundle Details</span>
                 </h2>
 
-                <div class="table-container">
+                <div class="table-container" role="region" aria-label="Drain-Pro bundle details" tabindex="0">
                     <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e15000848e0baf43604a908d78/emb"></script>
                 </div>
             </div>
@@ -105,13 +112,13 @@
     </main>
 
     <!-- Footer -->
-    <div class="dp-footnote">
+    <footer class="dp-footnote">
         <p>Northwest Custom Apparel &bull; (253) 922-5793 &bull; sales@nwcustomapparel.com</p>
         <p class="dp-footnote-sub">Serving the Pacific Northwest since 1977</p>
-    </div>
+    </footer>
 
     <!-- Tab Switching JavaScript -->
     <script src="/shared_components/js/data-call-delegator.js?v=2026.09.06.27"></script>
-    <script src="/dashboards/js/DrainPro-Bundle.js?v=2026.09.05.12"></script>
+    <script src="/dashboards/js/DrainPro-Bundle.js?v=2026.09.10.4"></script>
 </body>
 </html>

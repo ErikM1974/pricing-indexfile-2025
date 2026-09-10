@@ -1,5 +1,29 @@
 # Active Files Registry
 
+- `tests/fixtures/staff-workspaces-quotes-original-documents.json` — Original Quote Management inbound calendar/report/box-label output with synthetic costs and per-box details.
+
+- `shared_components/css/staff-quote-management.css` — Scoped Quote Management table/cards and native local dialogs; retires `dashboards/css/quote-management.css`, reuses vendor-inbound/vendor-box-labels.
+- `tests/fixtures/staff-workspaces-quotes-original-{browser,actions,empty,failure,rep}.json` — Reviewed original table, totals, permissions, actions and synthetic request baselines.
+
+- `tests/fixtures/staff-workspaces-quotes-synthetic.json` — Synthetic quote/status/owner/deposit/shipment and pagination records for Quote Management review.
+- `tests/e2e/css-unification-quote-management.spec.js` — Fail-closed original/current table, filters, dialogs, actions, roles and inbound review.
+
+- `tests/fixtures/staff-workspaces-company-original-{browser,empty,failure}.json` — Verified original Company Numbers values, ranges, empty/error and recovery baselines.
+
+- `shared_components/css/staff-company-numbers.css` — Scoped Company Numbers owner; replaces `dashboards/css/company-numbers.css`. Shared staff-dashboard sheets remain for their other consumers.
+
+- `tests/fixtures/staff-workspaces-company-synthetic.json` — Explicitly synthetic eight-widget Company Numbers records, costs and date-window baselines.
+- `tests/e2e/css-unification-company-numbers.spec.js` — Fail-closed original/current Company Numbers browser, range, refresh, error and paper review.
+
+- `tests/fixtures/staff-workspaces-ae-original-{expanded,rep,secondRep,degraded,documents}.json` — Verified original Mission Control drawer, identity and synthetic paper baselines; existing browser/actions fixtures refreshed from the completed original checks.
+
+- Retired `dashboards/css/ae-mission-control.css`; its two HTML consumers use `shared_components/css/staff-mission-control.css`. Original stylesheet retained in the source-preservation fixture.
+
+- `shared_components/css/vendor-inbound.css` — Scoped opt-in inbound dialog and role-specific paper reports; first consumer Mission Control.
+- `shared_components/css/vendor-box-labels.css` — Scoped opt-in one-box-per-page labels; legacy box-label owner remains for unmigrated consumers.
+
+Added tests/unit/staff-workspace-runtime-lifetimes.test.js: rapid tab navigation and independent print cleanup regressions.
+
 Reviewed: shared_components/css/purchasing-workspaces.css — canonical Purchasing Portal and Payables arrangements; two legacy page owners retired.
 
 Reviewed: shared_components/css/vendor-invoice.css — native opt-in purchasing invoice dialog and complete printed documents; legacy AE CSS retained with compatibility coverage.
@@ -281,3 +305,35 @@ Staff toolkit preservation: tests/unit/staff-toolkit-content.test.js locks the e
 - tests/fixtures/staff-toolkit-pastdue-original-workflow.json — immutable synthetic 30/60/90-day board and per-rep print contract for staff toolkit review.
 
 - Staff toolkit family: retired dashboards/css/{blog-editor,contract-break-even,customer-portal-admin,jim-mailing-list,past-due-orders,product-manager,roland-printer-supplies,volume-quote}.css after auditing all HTML/JS consumers (including the Jim preview). Shared owner shared_components/css/staff-toolkit.css is registered and linted; original CSS retained only inside the immutable test fixture. art-hub.css, dash-shell.css and blog.css retain other consumers.
+
+- tests/fixtures/staff-workspaces-original-content.json — six remaining staff-workspace HTML contracts and transitive local JS/CSS hashes, verified against live v2026.09.10.1. tests/unit/staff-workspaces-content.test.js preserves original content outside explicit future UI mappings. Planning/baseline only; no migration credit.
+
+### Staff workspaces browser baseline — 2026-09-10
+- Added tests/e2e/css-unification-staff-workspaces.spec.js: synthetic provider boundaries and original four-width/tab/paper capture; remaining workspace fixtures to follow. No application review credit yet.
+
+
+- Added shared_components/css/staff-workspaces.css: scoped staff layout; first Drain-Pro consumer, canonical controls and contained provider regions. Legacy DrainPro-Bundle.css is retained until browser/paper review and consumer audit pass.
+- Added tests/fixtures/staff-workspaces-drainpro-original-browser.json: original tab text, links, two provider URLs and four-width overflow measurements.
+
+- Retired dashboards/css/DrainPro-Bundle.css after consumer audit and six browser checks. Original 11787 LF bytes / 7 flags preserved in staff-workspaces-original-content.json; staff-workspaces.css owns the current layout.
+- Added tests/fixtures/staff-workspaces-shifts-original-browser.json: original department tables, timeline text, every employee detail, segment math, four widths and four printed schedule captures.
+
+- Added shared_components/css/staff-schedules.css: scoped production schedule draft with canonical tokens/controls and preserved timeline/print geometry. Old production-shifts/styles.css retained until complete browser/paper/consumer review.
+
+- Retired dashboards/production-shifts/styles.css after original/current data, six browser scenarios and four one-page current paper reviews. Replaced its explicit lint entry with staff-schedules.css; updated the production page guard and active-owner documentation. Original 45452 LF bytes / 71 flags preserved in the source fixture.
+
+### Payroll original browser baseline — 2026-09-10
+- Added tests/fixtures/staff-workspaces-payroll-synthetic.json: seven entirely synthetic employees covering carryover, negative and pending eligibility, missing entitlement, stale dates and inconsistent balances; synthetic registers and reviews. No real records or rates.
+- Added tests/fixtures/staff-workspaces-payroll-original-browser.json: original tables, flags, filters, audit CSV, six slip slots, packet/leave review content and four intercepted parse/import requests. One complete browser workflow passed; every write was fulfilled locally.
+
+- Payroll drafts against shared_components/css/staff-schedules.css alongside production shifts; original payroll.css remains until screen/paper/consumer review. The unchanged vacation-carryover module owns every balance calculation.
+
+- Retired dashboards/css/payroll.css (13839 LF bytes / 3 flags) after nine mocked browser cases, exact CSV/slip values and one-page paper review. Shared staff-schedules.css owns payroll; its manual QA harness and unit guard now load the same owner. Refined production schedule phone reference spacing after visual review.
+
+- Added shared_components/css/staff-payroll.css as payroll’s scoped page/print owner, extracted byte-for-byte from the payroll portion of staff-schedules.css. Both pages share tokens.css and components.css; their own layout rules load independently. Updated the application, manual QA harness, lint scope, content mapping, owner guard and CSS budgets together.
+
+- Added tests/e2e/helpers/staff-workspaces-browser.js: extracted original-source loader and fail-closed API boundary, now covering the whole browser context including popups. Added tests/fixtures/staff-workspaces-ae-synthetic.json and tests/e2e/css-unification-ae-workspace.spec.js for Mission Control original UI capture; representative local harness payloads have customer/contact labels and contact details replaced. Preparation only, no page review credit.
+
+- Added tests/fixtures/staff-workspaces-ae-original-browser.json and staff-workspaces-ae-original-actions.json: settled original six-tab/four-width text and links, kit validation/fields, four outreach previews and six locally intercepted actions. Invoice/inbound/box labels, expanded lists/drawers and rep/error states remain to capture. No Mission Control CSS has changed.
+
+- Added shared_components/css/staff-mission-control.css for the Mission Control draft: canonical staff typography/controls and a scoped layout, native kit/outreach/drawer dialogs, existing vendor-invoice.css reuse. Legacy AE stylesheet retained until consumer and screen/paper review. No release credit yet.

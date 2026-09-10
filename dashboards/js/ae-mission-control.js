@@ -283,8 +283,9 @@
         el('mc-drawer-foot').innerHTML = cfg.foot || '';
         drawerState.open = kind;
         drawerState.opener = opener || null;
-        scrim.hidden = false;
+        scrim.hidden = true;
         d.hidden = false;
+        d.showModal();
         document.body.classList.add('is-modal-open');
         var first = d.querySelector('.mc-drawer-close');
         if (first) first.focus();
@@ -293,6 +294,7 @@
     function closeDrawer() {
         var d = el('mc-drawer'), scrim = el('mc-drawer-scrim');
         if (!d || d.hidden) return;
+        d.close();
         d.hidden = true;
         scrim.hidden = true;
         document.body.classList.remove('is-modal-open');
@@ -566,8 +568,7 @@
             wireBonusExplainer();
             wireCondensedSpine();
             initTabs();             // reads #tab=, switches visually, mounts nothing yet
-            loadSummary(false);
-            loadInbound();
+            loadSummary(false).then(loadInbound);
             pollArtNotifications();
             setInterval(pollArtNotifications, POLL_INTERVAL_MS);
             // A cockpit stays open all day. Re-read the summary + inbound every 5 minutes
@@ -718,8 +719,7 @@
         if (!email || email === state.viewAs) return;
         state.viewAs = email;
         resetData();
-        loadSummary(false);
-        loadInbound();
+        loadSummary(false).then(loadInbound);
     }
 
     // Refresh has to mean refresh. It used to send ?refresh=1 to the summary only, so the
@@ -2578,11 +2578,21 @@
     }
 
     // ---------- sample-kit modal ----------
+    var kitLoadGeneration = 0, kitSending = false;
+    var outreachGeneration = 0, outreachSending = false;
     function kitFetch(path, options) {
         return sameOriginJson('/api/crm-proxy/marketing-shipments' + (path || ''), options);
     }
 
     function wireKitModal() {
+        [['aemc-kit-modal', closeKitModal], ['aemc-outreach-modal', closeOutreachModal], ['mc-drawer', closeDrawer]].forEach(function (entry) {
+            var dialog = el(entry[0]);
+            dialog.addEventListener('cancel', function (event) { event.preventDefault(); entry[1](); });
+            dialog.addEventListener('click', function (event) {
+                var rect = dialog.getBoundingClientRect();
+                if (event.target === dialog && (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom)) entry[1]();
+            });
+        });
         el('aemc-kit-btn').addEventListener('click', openKitModal);
         el('aemc-kit-close').addEventListener('click', closeKitModal);
         el('aemc-kit-overlay').addEventListener('click', closeKitModal);
@@ -2592,12 +2602,17 @@
         });
     }
     function openKitModal() {
-        el('aemc-kit-overlay').hidden = false;
+        if (kitSending) return;
+        var generation = ++kitLoadGeneration;
+        el('aemc-kit-send').disabled = false;
         el('aemc-kit-modal').hidden = false;
+        el('aemc-kit-modal').showModal();
+        document.body.classList.add('is-modal-open');
         el('aemc-kit-status').textContent = '';
         var box = el('aemc-kit-items');
         box.innerHTML = '<span class="aemc-muted">Loading kit items…</span>';
         kitFetch('/items').then(function (body) {
+            if (generation !== kitLoadGeneration) return;
             var items = body.items || [];
             if (!items.length) { box.innerHTML = '<span class="aemc-muted">No kit items configured. Add rows to Marketing_Kit_Items in Caspio.</span>'; return; }
             box.innerHTML = items.map(function (it) {
@@ -2608,14 +2623,19 @@
                     '</label>';
             }).join('');
         }).catch(function (err) {
+            if (generation !== kitLoadGeneration) return;
             box.innerHTML = '<span class="aemc-muted">Could not load kit items (' + esc(err.message) + ').</span>';
         });
     }
     function closeKitModal() {
-        el('aemc-kit-overlay').hidden = true;
+        if (kitSending) return;
+        kitLoadGeneration += 1;
+        el('aemc-kit-modal').close();
         el('aemc-kit-modal').hidden = true;
+        if (!document.querySelector('dialog[open]')) document.body.classList.remove('is-modal-open');
     }
     function sendKit() {
+        if (kitSending || el('aemc-kit-send').disabled) return;
         var statusEl = el('aemc-kit-status');
         var picked = Array.prototype.slice.call(document.querySelectorAll('.aemc-kit-cb:checked')).map(function (cb) {
             var row = cb.closest('.aemc-kit-item');
@@ -2633,6 +2653,9 @@
             return;
         }
         var sendBtn = el('aemc-kit-send');
+        kitSending = true;
+        el('aemc-kit-close').disabled = true;
+        el('aemc-kit-modal').setAttribute('aria-busy', 'true');
         sendBtn.disabled = true;
         statusEl.textContent = 'Sending…';
         kitFetch('', {
@@ -2655,13 +2678,17 @@
             }),
         }).then(function (r) {
             statusEl.textContent = 'Sent to shipping — ' + (r.shipmentId || 'queued') + '. Mikalah has it.';
-            sendBtn.disabled = false;
-            setTimeout(closeKitModal, 2200);
+            kitSending = false;
+            el('aemc-kit-close').disabled = false;
+            el('aemc-kit-modal').removeAttribute('aria-busy');
+            // Keep the confirmed result and block a duplicate request until the dialog is reopened.
             loadSummary(false); // pick up the new kit row in the queue section
         }).catch(function (err) {
+            kitSending = false;
+            el('aemc-kit-close').disabled = false;
+            el('aemc-kit-modal').removeAttribute('aria-busy');
             sendBtn.disabled = false;
-            statusEl.textContent = '';
-            DashPage.showError('Kit request NOT saved: ' + err.message);
+            statusEl.textContent = 'Could not confirm the kit request: ' + err.message + '. Check the shipping queue before trying again.';
         });
     }
 
@@ -2684,8 +2711,11 @@
         };
     }
     function openOutreachModal(lead) {
-        el('aemc-outreach-overlay').hidden = false;
+        if (outreachSending) return;
+        outreachGeneration += 1;
         el('aemc-outreach-modal').hidden = false;
+        el('aemc-outreach-modal').showModal();
+        document.body.classList.add('is-modal-open');
         el('aemc-outreach-lead').textContent = (lead.company || '') + ' — ' + (lead.contactName || '') + ' <' + lead.email + '>';
         el('aemc-outreach-preview').innerHTML = '';
         el('aemc-outreach-btns').innerHTML = OUTREACH_TEMPLATES.map(function (t, i) {
@@ -2700,13 +2730,19 @@
         el('aemc-outreach-overlay').onclick = closeOutreachModal;
     }
     function closeOutreachModal() {
-        el('aemc-outreach-overlay').hidden = true;
+        if (outreachSending) return;
+        outreachGeneration += 1;
+        el('aemc-outreach-modal').close();
         el('aemc-outreach-modal').hidden = true;
+        if (!document.querySelector('dialog[open]')) document.body.classList.remove('is-modal-open');
     }
     function previewOutreach(lead, tpl) {
+        if (outreachSending) return;
+        var generation = ++outreachGeneration;
         var box = el('aemc-outreach-preview');
         box.innerHTML = '<span class="aemc-muted">Building preview…</span>';
         outreachFetch(outreachBody(lead, tpl, true)).then(function (p) {
+            if (generation !== outreachGeneration) return;
             box.innerHTML =
                 '<div class="aemc-outreach-subject">' + esc(p.subject || '') + '</div>' +
                 // bodyHtml is our server-side template output — lead values are
@@ -2714,29 +2750,45 @@
                 '<div class="aemc-outreach-body">' + (p.bodyHtml || '') + '</div>' +
                 '<div class="aemc-modal-actions">' +
                 '<button type="button" id="aemc-outreach-send" class="dash-btn dash-btn--primary"><i class="fas fa-paper-plane" aria-hidden="true"></i> Send to ' + esc(lead.email) + '</button>' +
-                '<span id="aemc-outreach-note" class="aemc-muted"></span>' +
+                '<span id="aemc-outreach-note" class="aemc-muted" role="status" aria-live="polite"></span>' +
                 '</div>';
             el('aemc-outreach-send').addEventListener('click', function () {
+                if (outreachSending || this.disabled || generation !== outreachGeneration) return;
                 var btn = this;
+                outreachSending = true;
+                setOutreachPending(true);
                 btn.disabled = true;
                 el('aemc-outreach-note').textContent = 'Sending…';
                 outreachFetch(outreachBody(lead, tpl, false)).then(function (r) {
+                    outreachSending = false;
+                    setOutreachPending(false);
+                    if (generation !== outreachGeneration) return;
                     box.innerHTML = '<div class="aemc-outreach-sent"><i class="fas fa-circle-check" aria-hidden="true"></i> Sent “' +
                         esc(r.label || tpl.label) + '” to ' + esc(r.to || lead.email) + '</div>';
                 }).catch(function (err) {
+                    outreachSending = false;
+                    setOutreachPending(false);
+                    if (generation !== outreachGeneration) return;
                     btn.disabled = false;
                     el('aemc-outreach-note').textContent = '';
                     var timedOut = err.name === 'AbortError' || /abort|timed?\s*out|timeout/i.test(err.message || '');
                     if (timedOut) {
-                        DashPage.showError('The send timed out before the server confirmed — the email MAY have gone out. Check the lead’s timeline before resending so ' + lead.email + ' isn’t emailed twice.');
+                        el('aemc-outreach-note').textContent = 'The send timed out before the server confirmed — the email MAY have gone out. Check the lead’s timeline before resending so ' + lead.email + ' isn’t emailed twice.';
                     } else {
-                        DashPage.showError('Email NOT sent: ' + err.message);
+                        el('aemc-outreach-note').textContent = 'Could not confirm the email: ' + err.message + '. Check the lead’s timeline before trying again.';
                     }
                 });
             });
         }).catch(function (err) {
+            if (generation !== outreachGeneration) return;
             box.innerHTML = '<span class="aemc-muted">Preview failed (' + esc(err.message) + ').</span>';
         });
+    }
+
+    function setOutreachPending(pending) {
+        el('aemc-outreach-close').disabled = pending;
+        el('aemc-outreach-modal').setAttribute('aria-busy', String(pending));
+        Array.prototype.forEach.call(el('aemc-outreach-btns').querySelectorAll('[data-tpl]'), function (button) { button.disabled = pending; });
     }
 
     // ---------- art notification toasts ----------

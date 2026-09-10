@@ -46,7 +46,9 @@ const SHARED_REGIONS = [
     { tag: 'section', id: 'mc-panel-pipeline' },
     { tag: 'section', id: 'mc-panel-wins' },
     { tag: 'div', id: 'mc-drawer-scrim' },
-    { tag: 'aside', id: 'mc-drawer' },
+    { tag: 'dialog', id: 'mc-drawer' },
+    { tag: 'dialog', id: 'aemc-kit-modal' },
+    { tag: 'dialog', id: 'aemc-outreach-modal' },
 ];
 
 /**

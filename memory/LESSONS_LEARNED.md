@@ -5,6 +5,22 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 
 ---
 
+## Quote lists must retain failure and action ownership (2026-09-10)
+
+- Problem/root cause: local filtering replaced failed-load feedback with an empty list; delayed inbound/date-window responses could restore obsolete rows. Native-dialog cancellation could not return focus to a trigger disabled before confirmation. Delete authentication recovery called a removed helper.
+- Solution: retain load failure until a successful retry, clear dependent data and guard render generations. Claim action ownership before confirmation but disable the trigger only after acceptance; contain focus and preserve cancellation. Reject repeated pending sends/deletes and show expired-session feedback without retrying a write.
+- Prevention: synthetic success→failure→filter→retry and reordered reads; keyboard/focus tests at four widths; blocked/expired/pending write tests and exact original payload comparisons. Verify one box label per page, quantities and IDs as well as total PDF text.
+
+## Reporting freshness must describe the rendered result (2026-09-10)
+
+- Problem/root cause: controllers caught API failures but resolved without a failure value, so Company Numbers labelled failed reads Updated and retained old totals, dates and charts. A recovered sample list kept its old error, and late revenue windows could overwrite a newer selection.
+- Solution: shared controllers announce actual results (including direct Retry and fallback goals), clear dependent stale displays on failure, remove recovered errors, and render only the latest revenue request. The header distinguishes incomplete reads.
+- Prevention: test initial failure and failure after success, recovery, partial comparison/fallback goals and delayed success/error with synthetic records. Preserve exact money/date-window results. Runtime SVG variables need a scoped alias when replacing the legacy theme; print checks must retain production amounts and blanks status that the old mobile cascade hid.
+
+## Shared staff dialogs and print jobs (2026-09-10)
+
+An afterprint handler must clear its fallback timer and remove only its own captured sheet; otherwise an old timer can delete the next document. Use page (not always) for modern break-before/after so box labels and rep reports actually separate in Chromium. Native dialog errors belong inside the dialog; guard obsolete previews and keep pending sends from closing or accepting duplicate actions. Mark lazy tabs mounted only when their delayed loader actually runs. Render PDFs with nonzero synthetic costs and multi-box data, check per-page identifiers and totals, and inspect white paper backgrounds.
+
 ## CRM UI recovery and print (2026-09-09)
 
 Use native disclosure buttons inside table cells; aria-expanded on ordinary table rows is invalid. Native dialogs must show operational errors inside their top layer and retain a usable retry. Guard delayed account/archive/quarter and category responses so a failed or newer view cannot regain stale figures. Search/view changes must preserve loading/error states. Test original card/table/detail/CSV hashes using exact page basenames (leads.html is also a suffix of unqualified-leads.html). Print must explicitly restore headings and summary counts hidden by generic shell rules.
@@ -14,37 +30,7 @@ Use native disclosure buttons inside table cells; aria-expanded on ordinary tabl
 
 Historical deployment, token, builder, junction, server split and proxy-auth migration notes are in LESSONS_LEARNED_ARCHIVE.md. Never recursively delete a worktree dependency junction.
 
-## 2026-09-08 — CI was red for nine hours and nobody noticed, because every local gate was green
-
-**Problem.** Every GitHub CI run from 2026-09-07 15:54 through the twenty-two releases that followed failed, on
-two assistants' commits alike. Nobody looked, because the deploy loop runs the same suites locally and those were
-green every time. Two causes, both environmental: a unit test read a file from the SIBLING repository
-(`../caspio-pricing-proxy/src/routes/ae-dashboard.js`), which the runner never checks out; and the Playwright
-money-path and calculator-parity specs price through the LIVE proxy, whose reads have required `CRM_API_SECRET`
-since the quote-plane lockdown — the repository has no Actions secrets, so every run ended in "engine error".
-**Root cause.** Tests that assume the developer machine (a sibling checkout, a secret in the environment) with no
-guard, and a CI whose red state had no reader.
-**Solution.** The cross-repo assertion skips with a warning when the sibling is absent. The e2e job is split: the
-rendered axe ratchet always runs; the live-engine specs run only when `CRM_API_SECRET` is configured as an Actions
-secret and are reported as skipped otherwise (the /deploy pre-flight runs them locally with the real secret, so a
-skip never means untested).
-**Prevention.** 🔑 A test that reads outside the repository or needs a secret must guard for its absence and SAY
-it skipped. 🔑 `gh run list -L 5` belongs in the deploy pre-flight: local green is not CI green. 🔑 To switch the
-live-engine specs back on in CI, add `CRM_API_SECRET` under Settings → Secrets → Actions.
-
-CI setup follow-up (2026-09-09): a Google Chrome apt index checksum mismatch blocked Playwright before tests on two runners. CI uses bundled Chromium; disable only the unrelated Google Chrome source on the disposable runner and keep Ubuntu repositories/checksum verification intact. Require the actual browser steps to pass on the new exact commit.
-
-## Runtime and dependency audit (2026-09-08, archived)
-
-Match production/CI runtimes, audit the resolved tree and verify actual live-pricing CI steps. Full incident in LESSONS_LEARNED_ARCHIVE.md.
-
-## Tooling upgrades and visual verification (2026-09-07, archived)
-
-Keep version choices tied to measured checks and compare screenshots only after readiness. Full entry in LESSONS_LEARNED_ARCHIVE.md.
-
-## DTF browser readiness (2026-09-07, archived)
-
-Wait for functional initialization before typing; retain failed and successful save coverage. Full entry in LESSONS_LEARNED_ARCHIVE.md.
+Exact-source CI must pass its actual browser/parity jobs, including credentials when required; local green is not CI green. Resolved runner/secret incidents are in LESSONS_LEARNED_ARCHIVE.md.
 
 ## Calculator prerequisite failures must stop pricing (2026-09-07)
 - Problem: color/size failures were swallowed; the next pricing stage could hide the error or reuse another style's size data.
@@ -247,3 +233,15 @@ Staff-tool follow-up: distinguish successful blog writes from failed canonical r
 Portal follow-up: scope delayed ledgers/calculations to their customer and invalidate each loop after a view change. Hold pending financial actions and display feedback inside the active dialog. Printing closed details can omit lines; render a plain paper copy, preserve screen disclosure state and keep modal print flow block-based. Repeated monetary values can conceal missing columns in whole-document text checks: verify amounts per page and inspect freshly named PNGs tied to the PDF hash. Read UTF-8 fixtures explicitly in Windows Python.
 
 Mailing/Past Due follow-up: failed or incomplete lists must remain unknown through filtering; missing rep groups cannot imply all clear. Hold form and outreach controls during pending requests, keep uncertain-write wording honest, and fail closed in preview stubs. Compare native CSV/label markup and per-page money; carry omission warnings from the board into repeated printed headings. Canonical visibility comes from components.css, and native file buttons/shared UiDialog replace legacy label/overlay mechanics: update structural guards while retaining browser behavior checks.
+
+### Drain-Pro tab ownership (2026-09-10)
+- Problem/root cause: switchTab relied on the browser global event, so a direct call could fail or clear both panels. Solution: resolve the target by tab ID before changing state; explicit selected/hidden semantics and arrow/Home/End navigation. Prevention: synthetic click, keyboard, direct-call and invalid-target browser checks; provider URLs stay unchanged.
+
+### Production schedule controls and paper (2026-09-10)
+- Problem/root cause: mobile rule cards kept a 240px minimum, header ghost links lost contrast on navy, detail dialogs did not contain focus, and 44px screen buttons expanded paper rows. Solution: bounded responsive grids, shared solid controls, inert/focus/scroll restoration and separate print row heights. Prevention: original/current ten-employee and four-department comparisons, four-width axe/scroll checks, modal keyboard tests and one-page PDF locks. Preserve data.js and policy prose; CSS case changes are presentation only.
+
+### Payroll upload ownership and cut-apart slips (2026-09-10)
+- Problem/root cause: changing the document while its upload/poll was in flight allowed a late response to restart the abandoned read. Solution: a generation and job check at every async boundary, with busy state beginning before file reading. Prevention: delayed synthetic upload/poll cancellation tests and unchanged import payload locks.
+- Shared screen line-height overflowed slip footnotes, while legacy 3.333in rows plus a border pushed six slots onto two pages. Keep paper line-height explicit and rows at 3.32in; verify all values, flags and footnotes plus six slots on one Letter sheet.
+
+Release-check follow-up (2026-09-10): update legacy integration expectations when a shared consumer adopts native dialogs, export/import failure-fixture constants explicitly, and give each local browser run exclusive ownership of its server. A reused server dies when its owning suite exits. Size CI from measured end-to-end duration while retaining short setup timeouts.

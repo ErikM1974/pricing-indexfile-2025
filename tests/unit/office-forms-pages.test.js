@@ -18,7 +18,7 @@ const noComments = (s) => s.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*
 describe('payroll', () => {
     const html = read('dashboards/payroll.html').replace(/<!--[\s\S]*?-->/g, '');
     const js = read('dashboards/js/payroll.js');
-    const css = read('dashboards/css/payroll.css');
+    const css = read('shared_components/css/staff-payroll.css');
     test('tablist, local dates, retries', () => {
         expect(html).toMatch(/<div class="pr-tabs" role="tablist" aria-label="Payroll views">/);
         for (const t of ['leave', 'periods', 'upload']) {
@@ -30,7 +30,9 @@ describe('payroll', () => {
         expect(js).toMatch(/today: todayLocal\(\)/);
         expect(js).toMatch(/t\.setAttribute\('aria-selected', on \? 'true' : 'false'\);/);
         for (const id of ['leave-retry', 'periods-retry', 'register-retry']) expect(js).toMatch(new RegExp(`id="${id}"`));
-        expect(css).toMatch(/^\[hidden\] \{ display: none !important; \}/m);
+        expect(html).toContain('/shared_components/css/components.css?v=');
+        expect(css).toContain('[data-staff-schedule="payroll"]');
+        expect(read('shared_components/css/components.css')).toMatch(/:where\(\[data-ui="unified"\]\) \[hidden\] \{\s+display: none;/);
         expect(html).toMatch(/payroll\.js\?v=2026\.09\./);
     });
 });

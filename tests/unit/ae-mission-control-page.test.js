@@ -22,7 +22,7 @@ const read = (rel) => fs.readFileSync(path.join(ROOT, rel), 'utf8');
 
 const html = read('dashboards/ae-mission-control.html');
 const js = read('dashboards/js/ae-mission-control.js');
-const css = read('dashboards/css/ae-mission-control.css');
+const css = read('shared_components/css/staff-mission-control.css');
 const vq = read('dashboards/js/volume-quote.js');
 const vqHtml = read('dashboards/volume-quote.html');
 const code = js.replace(/\/\/[^\n]*/g, '');
@@ -40,7 +40,7 @@ describe('Rule 3', () => {
         const styles = [...code.matchAll(/style="([^"]*)/g)].map((m) => m[1]);
         for (const s of styles) expect(s).toMatch(/^(width|left|--w|--x):' \+ /); // --w/--x = custom properties (2026-09-05)
         expect(css).toContain('.mc-sw--late');
-        expect(css).toContain('.mc-chip.is-fire .mc-chip-dot');
+        expect(css.replace(/\s+/g, ' ')).toContain('.mc-chip.is-fire .mc-chip-dot');
     });
     test('no browser dialogs', () => {
         expect(code).not.toMatch(/\balert\(/);

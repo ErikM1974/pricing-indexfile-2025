@@ -20,7 +20,7 @@ const read = (rel) => fs.readFileSync(path.join(ROOT, rel), 'utf8');
 const html = read('dashboards/quote-management.html');
 const doc = new DOMParser().parseFromString(html, 'text/html');
 const js = read('dashboards/js/quote-management.js');
-const css = read('dashboards/css/quote-management.css');
+const css = read('shared_components/css/staff-quote-management.css');
 const code = js.replace(/\/\/[^\n]*/g, ''); // strip line comments (they may NAME the old patterns)
 
 describe('identity', () => {
@@ -98,10 +98,13 @@ describe('tiles, pipeline, tabs, freshness, phone', () => {
         expect(js).toMatch(/document\.visibilityState === 'visible'/);
         expect(js).toMatch(/function stampLoaded/);
     });
-    test('phone: header wraps, low-value columns hide, actions stay on one line', () => {
-        expect(css).toMatch(/\.qm-col-phone-hide \{ display: none; \}/);
-        expect(css).toMatch(/td.actions-cell { white-space: normal; min-width: 150px/);
-        expect(doc.querySelectorAll('th.qm-col-phone-hide').length).toBe(5); // salesperson, items, progress, inbound, created
+    test('phone: labelled quote cards retain all columns and touch controls', () => {
+        const hidden = [];
+        require('postcss').parse(css).walkDecls('display', d => { if (d.value === 'none' && d.parent.selector?.includes('.qm-col-phone-hide')) hidden.push(d.parent.selector); });
+        expect(hidden).toEqual([]);
+        expect(css).toContain('content: attr(data-label)');
+        expect(css).toContain('min-width: 44px');
+        expect(doc.querySelectorAll('th.qm-col-phone-hide').length).toBe(5);
         expect(doc.querySelector('.quotes-table-scroll')).not.toBeNull();
     });
     test('housekeeping: shared Font Awesome build, site favicon', () => {

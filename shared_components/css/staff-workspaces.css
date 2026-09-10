@@ -1,0 +1,258 @@
+/* Staff workspaces: scoped layouts; shared controls remain in components.css. */
+@page staff-workspace-drainpro {
+    size: letter;
+    margin: 12mm;
+}
+
+@layer components.pages {
+    :where([data-ui="unified"][data-staff-workspace="drainpro"]) {
+        --ui-accent: var(--red-700);
+        --ui-accent-hover: var(--red-800);
+        --ui-tint: var(--red-50);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="drainpro"]) .drain-pro-header {
+        display: flex;
+        align-items: center;
+        gap: var(--space-7);
+        padding: var(--space-7) max(var(--space-5), calc((100% - 1280px) / 2));
+        border-top: 5px solid var(--red-600);
+        background: var(--gray-900);
+        color: var(--color-on-brand);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="drainpro"]) .logo-container {
+        flex: 0 1 300px;
+        min-width: 0;
+        padding: var(--space-4);
+        background: var(--ui-surface);
+        border-radius: var(--radius-sm);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="drainpro"]) .logo-container img {
+        display: block;
+        width: 100%;
+        height: auto;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="drainpro"]) .dp-heading {
+        min-width: 0;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="drainpro"]) .header-title {
+        margin: 0;
+        font-size: clamp(1.5rem, 3vw, 2.25rem);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="drainpro"]) .header-subtitle {
+        margin: var(--space-2) 0 0;
+        color: var(--gray-200);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="drainpro"]) .container {
+        max-width: 1320px;
+        margin: 0 auto;
+        padding: var(--space-6) var(--space-5);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="drainpro"]) .content-card {
+        min-width: 0;
+        padding: var(--ui-panel-space);
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-lg);
+        background: var(--ui-surface);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="drainpro"]) .tab-navigation {
+        margin-bottom: var(--space-5);
+        border-bottom: 1px solid var(--ui-line);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="drainpro"]) .tab-button {
+        gap: var(--space-2);
+        min-width: 0;
+        text-align: left;
+        white-space: normal;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="drainpro"]) .tab-content[hidden] {
+        display: none;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="drainpro"]) .section-header {
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+        margin: 0 0 var(--space-5);
+        font-size: var(--font-size-2xl);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="drainpro"]) :is(.section-header, .instructions-title) > i {
+        color: var(--ui-accent);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="drainpro"]) .info-banner {
+        display: flex;
+        align-items: flex-start;
+        gap: var(--space-3);
+        padding: var(--space-4);
+        border: 1px solid var(--amber-300);
+        border-radius: var(--radius-sm);
+        background: var(--amber-100);
+        color: var(--amber-900);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="drainpro"]) .info-banner > i {
+        margin-top: var(--space-1);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="drainpro"]) .instructions-box {
+        margin-block: var(--space-5);
+        padding: var(--space-5);
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-sm);
+        background: var(--gray-50);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="drainpro"]) .instructions-title {
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
+        font-weight: var(--font-weight-semibold);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="drainpro"]) .instructions-list {
+        display: grid;
+        gap: var(--space-3);
+        margin: var(--space-4) 0 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="drainpro"]) .instructions-list li {
+        display: flex;
+        align-items: flex-start;
+        gap: var(--space-3);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="drainpro"]) .instruction-number {
+        display: grid;
+        flex: 0 0 28px;
+        place-items: center;
+        min-height: 28px;
+        border-radius: var(--radius-pill);
+        background: var(--ui-accent);
+        color: var(--color-on-brand);
+        font-size: var(--font-size-md);
+        font-weight: var(--font-weight-semibold);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="drainpro"]) .table-container {
+        min-width: 0;
+        max-width: 100%;
+        overflow: auto;
+        padding: var(--space-4);
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-sm);
+        overscroll-behavior-inline: contain;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="drainpro"]) .table-container iframe {
+        display: block;
+        width: 100%;
+        border: 0;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="drainpro"]) .nav-buttons {
+        margin-top: var(--space-6);
+        padding-top: var(--space-5);
+        border-top: 1px solid var(--ui-line);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="drainpro"]) .dp-footnote {
+        padding: 0 var(--space-5) var(--space-6);
+        text-align: center;
+        color: var(--ui-muted);
+        font-size: var(--font-size-md);
+    }
+
+    @media (width <= 640px) {
+        :where([data-ui="unified"][data-staff-workspace="drainpro"]) .drain-pro-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: var(--space-5);
+            padding: var(--space-6) var(--space-4);
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="drainpro"]) .logo-container {
+            flex: auto;
+            width: min(100%, 280px);
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="drainpro"]) .container {
+            padding: var(--space-4) var(--space-3);
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="drainpro"]) .content-card {
+            padding: var(--space-4);
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="drainpro"]) .tab-button {
+            flex: 1 1 100%;
+            width: 100%;
+            justify-content: flex-start;
+        }
+    }
+
+    @media print {
+        :where([data-ui="unified"][data-staff-workspace="drainpro"]) {
+            page: staff-workspace-drainpro;
+            background: var(--color-surface);
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="drainpro"]) .drain-pro-header {
+            padding: 0 0 var(--space-4);
+            border-top: 0;
+            border-bottom: 1px solid var(--ui-line-strong);
+            color: var(--ui-ink);
+            background: var(--color-surface);
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="drainpro"]) .logo-container {
+            flex-basis: 220px;
+            padding: 0;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="drainpro"]) .header-subtitle {
+            color: var(--ui-muted);
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="drainpro"]) :is(.container, .content-card, .table-container) {
+            max-width: none;
+            padding: 0;
+            border: 0;
+            overflow: visible;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="drainpro"]) :is(.tab-navigation, .nav-buttons) {
+            display: none;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="drainpro"]) .tab-content[hidden] {
+            display: block;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="drainpro"]) .tab-content {
+            margin-top: var(--space-5);
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="drainpro"]) :is(.instructions-box, .info-banner) {
+            background: var(--color-surface);
+            break-inside: avoid;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="drainpro"]) .section-header {
+            break-after: avoid;
+        }
+    }
+}
