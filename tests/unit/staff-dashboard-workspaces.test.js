@@ -293,17 +293,13 @@ describe('2026-09-04 review — the things that must not regress', () => {
         for (const el of withKw) expect(el.classList.contains('ws-link')).toBe(true);
     });
 
-    test('stylesheets load in cascade order: tokens first, the unlayered overrides after the layered files, workspaces last', () => {
-        const hrefs = [...dash.querySelectorAll('link[rel="stylesheet"][href^="/shared_components/css/staff-dashboard/"]')]
-            .map((l) => l.getAttribute('href').split('/').pop().split('?')[0]);
-        expect(hrefs[0]).toBe('tokens.css');
-        expect(hrefs[hrefs.length - 1]).toBe('workspaces.css');
-        const idx = (n) => hrefs.indexOf(n);
-        for (const layered of ['tokens.css', 'base.css', 'components.css', 'utilities.css']) {
-            expect(idx(layered)).toBeGreaterThan(-1);
-            expect(idx(layered)).toBeLessThan(idx('dashboard-v3-theme.css'));
-        }
-        expect(idx('dashboard-v3-theme.css')).toBeLessThan(idx('dashboard-v3-patch-2.css'));
+    test('shared primitives precede the single scoped Staff Dashboard layout', () => {
+        const hrefs = [...dash.querySelectorAll('link[rel="stylesheet"][href^="/shared_components/css/"]')]
+            .map(l => l.getAttribute('href').split('?')[0]);
+        expect(hrefs).toEqual(['/shared_components/css/tokens.css','/shared_components/css/components.css','/shared_components/css/staff-home.css']);
+        expect(dash.body.dataset.ui).toBe('unified');
+        expect(dash.documentElement.dataset.theme).toBe('dark');
+        expect(dash.documentElement.dataset.accent).toBe('green');
     });
 
     test('the Tweaks FAB and the sidebar controller are gone', () => {

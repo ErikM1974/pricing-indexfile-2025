@@ -32,12 +32,6 @@ Historical deployment, token, builder, junction, server split and proxy-auth mig
 
 Exact-source CI must pass its actual browser/parity jobs, including credentials when required; local green is not CI green. Resolved runner/secret incidents are in LESSONS_LEARNED_ARCHIVE.md.
 
-## Calculator prerequisite failures must stop pricing (2026-09-07)
-- Problem: color/size failures were swallowed; the next pricing stage could hide the error or reuse another style's size data.
-- Root cause: empty error branches and catch blocks inside prerequisite loaders.
-- Solution: propagate errors to the product loader's existing error UI; clear size data before requesting it.
-- Prevention: calculator-api-errors.test.js covers HTTP, transport, malformed/empty responses and successful API data.
-
 ## Quote operations need caller and quote scope checks (2026-09-07)
 - Problem/root cause: bulk sync, tracking writes and change-log operations trusted their expected caller without authenticating it.
 - Solution: deploy credentials in proxy jobs/callbacks first; gate app operations with staff/shared-secret checks and authenticate loopback writes.
@@ -249,3 +243,8 @@ Calibration follow-up (2026-09-10): keep saved-layout failures visible while all
 Records Admin follow-up (2026-09-10): record original successful writes/CSV before changing controls; a saved session plus a failed item write is partial success, never complete. Retain load failure through filtering, hold pending actions and use saved data for status rollback. Native dialogs need explicit Tab containment. Give phone dates enough width and avoid shared heading aliases that hide print titles. Use split/join or a replacement callback for literal source rewrites: String.replace replacement strings interpret double dollar signs and can remove visible currency from template literals; original content locks catch this.
 
 Box-label follow-up (2026-09-10): a failed/new lookup must clear old printable data. Capture a draft key and serialized payload before a lookup changes state, flush it on pagehide, and warn if local storage fails. Hold the arrangement while refreshing/printing, scope Print anyway to its lookup, and reject incomplete refreshes. Repacking invalidates affected verification marks; provide a keyboard move for one-piece lines as well as multi-piece splits. Compare every paper page and original allocation, not only aggregate totals.
+
+### Staff home visibility and keyboard ownership (2026-09-10)
+- Problem/root cause: a display rule defeated Everything's hidden rows; welcome cleared inline display but retained hidden; Directory rendered an old search before clearing it, and a pending roster looked empty.
+- Solution: one scoped layout plus canonical hidden state, explicit welcome visibility, clear-before-filter ordering, and render open roster views when the read settles. Keep a separate library link outside summary, focusable directory scrolling and a real active descendant for palette selection.
+- Prevention: preserve original roles/links/values, distinguish loading/empty/failure, exercise reload/pins/disclosures and keyboard search at four widths. Historical UI fixtures still consume the legacy dashboard sheets; remove production links without breaking those fixtures.

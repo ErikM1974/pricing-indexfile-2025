@@ -5264,6 +5264,36 @@
         "rawCssBytes": 43789,
         "localCssRequests": 3
       }
+    },
+    {
+      "source": "staff-dashboard-v3/index.html",
+      "family": "staff-home",
+      "status": "pilot",
+      "route": "/staff-dashboard-v3/index.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/staff-home.css"
+      ],
+      "dynamicStyles": [],
+      "dynamicTokens": [
+        "--ws-sticky-top"
+      ],
+      "states": [
+        "seven-workspaces-four-widths",
+        "original-role-links-goal-and-staff-data",
+        "search-pins-and-quote-launcher",
+        "directory-filter-focus-and-reopen",
+        "visible-empty-and-failed-reads"
+      ],
+      "test": "tests/e2e/css-unification-staff-home.spec.js",
+      "maxCssBytes": 106024,
+      "measuredRawCssBytes": 105000,
+      "baseline": {
+        "commit": "9b6d76d6d77161818e73bd7caab56b0b02c342c9",
+        "rawCssBytes": 246827,
+        "localCssRequests": 10
+      }
     }
   ],
   "billingContentSha256": "d85f8530e03a1863d1b8bb2ebe97ba332d5c9e3411887d1eb2d02dcdb14c0863",

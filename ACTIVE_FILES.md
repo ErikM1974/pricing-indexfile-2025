@@ -1,5 +1,7 @@
 # Active Files Registry
 
+- `shared_components/css/staff-home.css` — Scoped dark/green Staff Dashboard owner over shared controls; nine legacy staff-dashboard sheets remain only for historical UI harnesses.
+
 - Added shared_components/css/staff-box-labels.css: repack-station layout and keyboard controls; shared vendor-box-labels.css owns paper. Retired pages/css/box-labels.css; original preserved in the final-tools fixture.
 
 - Added shared_components/css/staff-records.css: unified Records Admin layout and dialogs. Retired admin/css/universal-records-admin.css and admin/css/universal-records-admin-injected.css; originals retained in the final-tools source fixture.

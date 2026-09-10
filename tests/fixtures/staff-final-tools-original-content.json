@@ -2340,6 +2340,258 @@
       "before": "const qr = qrcode(0, 'M');",
       "after": "const qr = window.qrcode(0, 'M');",
       "count": 1
+    },
+    {
+      "file": "staff-dashboard-v3/index.html",
+      "before": "    <link rel=\"stylesheet\" href=\"/shared_components/css/staff-dashboard/tokens.css?v=2026.09.07.3\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/staff-dashboard/base.css?v=2026.09.07.10\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/staff-dashboard/components.css?v=2026.09.07.19\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/staff-dashboard/utilities.css?v=2026.09.07.10\">\n    <!-- Claude Design handoff theme (2026-05-13) — unlayered variant, wins all cascade fights. -->\n    <link rel=\"stylesheet\" href=\"/shared_components/css/staff-dashboard/dashboard-v3-theme.css?v=2026.09.07.19\">\n    <!-- Claude Design PATCH 2 (spacing) — pinned row, header chips, zone tightening.\n         Its §7 tool-grid block was removed 2026-09-03 with the grid it styled. -->\n    <link rel=\"stylesheet\" href=\"/shared_components/css/staff-dashboard/dashboard-v3-patch-2.css?v=2026.09.07.19\">\n    <!-- Phase 1 \"alive + personal\" widgets (2026-07-20): Pride Wall photo\n         strip, My Stuff pinned/recent tools row. (Win Bell removed 2026-07-23.) -->\n    <link rel=\"stylesheet\" href=\"/shared_components/css/staff-dashboard/phase1-widgets.css?v=2026.09.07.10\">\n    <!-- Phase 2 (2026-07-20): Ctrl+K command palette — the Everything Bar. -->\n    <link rel=\"stylesheet\" href=\"/shared_components/css/staff-dashboard/command-palette.css?v=2026.09.07.10\">\n    <!-- Workspaces (2026-09-03): the role-based tabs, tool rows, tiles and the\n         job-family colors. Unlayered and LAST on purpose — the only position\n         that beats the two unlayered files above. -->\n    <link rel=\"stylesheet\" href=\"/shared_components/css/staff-dashboard/workspaces.css?v=2026.09.07.19\">",
+      "after": "    <link rel=\"stylesheet\" href=\"/shared_components/css/components.css?v=2026.09.10.6\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/staff-home.css?v=2026.09.10.6\">",
+      "count": 1
+    },
+    {
+      "file": "staff-dashboard-v3/index.html",
+      "before": "<body>",
+      "after": "<body data-ui=\"unified\" data-surface=\"staff-home\">",
+      "count": 1
+    },
+    {
+      "file": "staff-dashboard-v3/index.html",
+      "before": "family=Inter:wght@400;500;600;700",
+      "after": "family=Public+Sans:wght@400;500;600;700",
+      "count": 1
+    },
+    {
+      "file": "staff-dashboard-v3/index.html",
+      "before": "class=\"ws-pd\"",
+      "after": "class=\"ws-pd btn\"",
+      "count": 1
+    },
+    {
+      "file": "staff-dashboard-v3/index.html",
+      "before": "class=\"goal-chip sales-goal-banner is-loading\"",
+      "after": "class=\"goal-chip sales-goal-banner is-loading btn\"",
+      "count": 1
+    },
+    {
+      "file": "staff-dashboard-v3/index.html",
+      "before": "class=\"team-btn\"",
+      "after": "class=\"team-btn btn\"",
+      "count": 1
+    },
+    {
+      "file": "staff-dashboard-v3/index.html",
+      "before": "class=\"sign-out-link\"",
+      "after": "class=\"sign-out-link btn\"",
+      "count": 1
+    },
+    {
+      "file": "staff-dashboard-v3/index.html",
+      "before": "class=\"team-dropdown__view-all\"",
+      "after": "class=\"team-dropdown__view-all btn\"",
+      "count": 3
+    },
+    {
+      "file": "staff-dashboard-v3/index.html",
+      "before": "class=\"hero-search__clear\"",
+      "after": "class=\"hero-search__clear btn\"",
+      "count": 1
+    },
+    {
+      "file": "staff-dashboard-v3/index.html",
+      "before": "class=\"staff-modal-close\"",
+      "after": "class=\"staff-modal-close btn\"",
+      "count": 1
+    },
+    {
+      "file": "staff-dashboard-v3/index.html",
+      "before": "class=\"staff-filter-btn active\"",
+      "after": "class=\"staff-filter-btn active btn\"",
+      "count": 1
+    },
+    {
+      "file": "staff-dashboard-v3/index.html",
+      "before": "class=\"staff-filter-btn\"",
+      "after": "class=\"staff-filter-btn btn\"",
+      "count": 3
+    },
+    {
+      "file": "staff-dashboard-v3/index.html",
+      "before": "class=\"ql-close\"",
+      "after": "class=\"ql-close btn\"",
+      "count": 1
+    },
+    {
+      "file": "staff-dashboard-v3/index.html",
+      "before": "<button type=\"button\" class=\"ws-tab",
+      "after": "<button type=\"button\" class=\"btn ws-tab",
+      "count": 7
+    },
+    {
+      "file": "staff-dashboard-v3/index.html",
+      "before": "class=\"quote-start-btn\"",
+      "after": "class=\"quote-start-btn btn\"",
+      "count": 1
+    },
+    {
+      "file": "staff-dashboard-v3/index.html",
+      "before": "class=\"hero-search__input\"",
+      "after": "class=\"hero-search__input field-input\"",
+      "count": 1
+    },
+    {
+      "file": "staff-dashboard-v3/index.html",
+      "before": "id=\"wsEveryFilter\"",
+      "after": "id=\"wsEveryFilter\" class=\"field-input\"",
+      "count": 1
+    },
+    {
+      "file": "staff-dashboard-v3/index.html",
+      "before": "id=\"staffDirectorySearch\"",
+      "after": "id=\"staffDirectorySearch\" class=\"field-input\"",
+      "count": 1
+    },
+    {
+      "file": "staff-dashboard-v3/index.html",
+      "before": "class=\"staff-filter-btn active btn\"",
+      "after": "class=\"staff-filter-btn active btn\" aria-pressed=\"true\"",
+      "count": 1
+    },
+    {
+      "file": "staff-dashboard-v3/index.html",
+      "before": "class=\"staff-filter-btn btn\"",
+      "after": "class=\"staff-filter-btn btn\" aria-pressed=\"false\"",
+      "count": 3
+    },
+    {
+      "file": "shared_components/js/staff-dashboard/controllers/my-stuff-controller.js",
+      "before": "class=\"tool-btn ms-chip-link\"",
+      "after": "class=\"tool-btn ms-chip-link btn\"",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/staff-dashboard/controllers/my-stuff-controller.js",
+      "before": "class=\"ms-star\"",
+      "after": "class=\"ms-star btn\"",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/staff-dashboard/controllers/celebrations-controller.js",
+      "before": "<td>${escapeHtml(e.fullName)}</td>",
+      "after": "<td data-label=\"Name\">${escapeHtml(e.fullName)}</td>",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/staff-dashboard/controllers/celebrations-controller.js",
+      "before": "<td>${escapeHtml(e.position)}</td>",
+      "after": "<td data-label=\"Position\">${escapeHtml(e.position)}</td>",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/staff-dashboard/controllers/celebrations-controller.js",
+      "before": "<td>${escapeHtml(e.formattedStartDate)}</td>",
+      "after": "<td data-label=\"Start Date\">${escapeHtml(e.formattedStartDate)}</td>",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/staff-dashboard/controllers/celebrations-controller.js",
+      "before": "<td class=\"num\">${e.yearsOfService}</td>",
+      "after": "<td class=\"num\" data-label=\"Years\">${e.yearsOfService}</td>",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/staff-dashboard/controllers/celebrations-controller.js",
+      "before": "<td>${escapeHtml(e.formattedBirthday)}</td>",
+      "after": "<td data-label=\"Birthday\">${escapeHtml(e.formattedBirthday)}</td>",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/staff-dashboard/controllers/celebrations-controller.js",
+      "before": "<td>${statusBadge}</td>",
+      "after": "<td data-label=\"Status\">${statusBadge}</td>",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/staff-dashboard/controllers/celebrations-controller.js",
+      "before": "btn.classList.toggle('active', btn.dataset.filter === name);",
+      "after": "btn.classList.toggle('active', btn.dataset.filter === name);\n        btn.setAttribute('aria-pressed', String(btn.dataset.filter === name));",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/staff-dashboard/controllers/celebrations-controller.js",
+      "before": "    setFilter(filter);\n    const search = els.modalSearch();\n    if (search) search.value = '';",
+      "after": "    const search = els.modalSearch();\n    if (search) search.value = '';\n    setFilter(filter);",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/staff-dashboard/controllers/celebrations-controller.js",
+      "before": "    // Outside-click closes the dropdown",
+      "after": "    // Escape dismisses celebrations without interfering with the open directory.\n    document.addEventListener('keydown', (e) => {\n        if (e.key === 'Escape' && els.teamDropdown()?.classList.contains('is-open') && !els.modal()?.hasAttribute('open')) {\n            closeDropdown();\n            els.teamBtn()?.focus();\n        }\n    });\n\n    // Outside-click closes the dropdown",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/staff-dashboard/controllers/auth-controller.js",
+      "before": "        welcome.style.display = '';",
+      "after": "        welcome.hidden = false;",
+      "count": 1
+    },
+    {
+      "file": "staff-dashboard-v3/index.html",
+      "before": "            <details class=\"pw-strip\" id=\"prideWall\" data-collapse-key=\"prideWall\" aria-label=\"Pride Wall — recent finished work\" open hidden>\n                <summary class=\"pw-head\">\n                    <span class=\"pw-title\">🖼️ Pride Wall — made by us, lately</span>\n                    <a class=\"pw-link\" href=\"/dashboards/finished-photos-library.html\">Open the Photo Library →</a>\n                </summary>\n                <div class=\"pw-track\" id=\"pwTrack\"></div>\n            </details>",
+      "after": "            <section class=\"pw-strip\" id=\"prideWall\" aria-label=\"Pride Wall — recent finished work\" hidden>\n                <details class=\"pw-fold\" data-collapse-key=\"prideWall\" open>\n                    <summary class=\"pw-head\">\n                        <span class=\"pw-title\">🖼️ Pride Wall — made by us, lately</span>\n                    </summary>\n                    <div class=\"pw-track\" id=\"pwTrack\"></div>\n                </details>\n                <a class=\"pw-link\" href=\"/dashboards/finished-photos-library.html\">Open the Photo Library →</a>\n            </section>",
+      "count": 1
+    },
+    {
+      "file": "staff-dashboard-v3/index.html",
+      "before": "<div class=\"staff-modal-content\">",
+      "after": "<div class=\"staff-modal-content\" tabindex=\"0\" role=\"region\" aria-label=\"Staff directory records\">",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/staff-dashboard/controllers/celebrations-controller.js",
+      "before": "let rosterError = null;",
+      "after": "let rosterError = null;\nlet rosterLoaded = false;",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/staff-dashboard/controllers/celebrations-controller.js",
+      "before": "    if (rosterError) {\n        const failRow",
+      "after": "    if (!rosterLoaded) {\n        const loadingRow = '<li class=\"celebration-empty\">Loading staff roster…</li>';\n        if (bdayTarget) bdayTarget.innerHTML = loadingRow;\n        if (annivTarget) annivTarget.innerHTML = loadingRow;\n        return;\n    }\n    if (rosterError) {\n        const failRow",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/staff-dashboard/controllers/celebrations-controller.js",
+      "before": "    if (!tbody) return;\n    if (rosterError)",
+      "after": "    if (!tbody) return;\n    if (!rosterLoaded) {\n        tbody.innerHTML = '<tr><td colspan=\"6\" class=\"staff-table__empty\">Loading staff roster…</td></tr>';\n        return;\n    }\n    if (rosterError)",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/staff-dashboard/controllers/celebrations-controller.js",
+      "before": "    renderHeaderCounts();\n}",
+      "after": "    rosterLoaded = true;\n    renderHeaderCounts();\n    if (els.teamDropdown()?.classList.contains('is-open')) renderDropdown();\n    if (els.modal()?.hasAttribute('open')) renderDirectoryTable();\n}",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/staff-dashboard/controllers/command-palette-controller.js",
+      "before": "        list.innerHTML = '';",
+      "after": "        list.innerHTML = '';\n        document.getElementById('cpInput')?.removeAttribute('aria-activedescendant');",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/staff-dashboard/controllers/command-palette-controller.js",
+      "before": "role=\"option\" aria-selected=\"${i === state.sel}\"",
+      "after": "id=\"cp-item-${i}\" role=\"option\" aria-selected=\"${i === state.sel}\"",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/staff-dashboard/controllers/command-palette-controller.js",
+      "before": "    list.innerHTML = html;\n    status.textContent",
+      "after": "    list.innerHTML = html;\n    const selected = list.querySelector('[aria-selected=\"true\"]');\n    const input = document.getElementById('cpInput');\n    if (selected) {\n        input?.setAttribute('aria-activedescendant', selected.id);\n        selected.scrollIntoView({ block: 'nearest' });\n    } else input?.removeAttribute('aria-activedescendant');\n    status.textContent",
+      "count": 1
+    },
+    {
+      "file": "shared_components/js/staff-dashboard/controllers/command-palette-controller.js",
+      "before": "    input.setAttribute('aria-expanded', 'false');",
+      "after": "    input.setAttribute('aria-expanded', 'false');\n    input.removeAttribute('aria-activedescendant');",
+      "count": 1
     }
   ],
   "retiredStyles": [
