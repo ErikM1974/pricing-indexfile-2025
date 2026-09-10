@@ -1,5 +1,7 @@
 # Active Files Registry
 
+- `tests/fixtures/staff-final-tools-records-original-mutations.json` — Original synthetic status, edit, duplicate, delete and single CSV contracts, captured before Records Admin changes.
+
 - Added shared_components/css/staff-calibration.css: scoped calibration layout using shared controls. Retired tools/custom-tees-calibrate.css; original preserved in the final-tools source fixture.
 
 - `tests/fixtures/staff-final-tools-box-labels-original-browser.json` — Original synthetic staff-tool browser contract; retained before visual changes.
