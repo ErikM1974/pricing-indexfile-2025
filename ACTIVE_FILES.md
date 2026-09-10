@@ -386,3 +386,7 @@ Staff toolkit preservation: tests/unit/staff-toolkit-content.test.js locks the e
 - tests/e2e/css-unification-records-admin.spec.js and tests/fixtures/staff-final-tools-records-synthetic.json — synthetic administrator records table, filters, pagination, detail, CSV and failure baselines. No real quote writes.
 
 - `tests/fixtures/customer-documents-original-content.json` and `tests/unit/customer-documents-content.test.js` — frozen three-page customer invoice/quote content and transitive local source contracts before visual changes. Shared runtime dependencies are captured; no migration credit yet.
+
+- tests/e2e/helpers/customer-invoice-browser.js — fail-closed synthetic invoice data, original-source restoration and PDF isolation.
+- tests/e2e/css-unification-customer-invoice.spec.js — original/current invoice contracts, four-width accessibility, auth/error and complete PDF checks.
+- tests/fixtures/customer-invoice-{normal,paid,empty,long,escaped,preview}-original-browser.json — immutable original customer invoice values and paper contracts.
