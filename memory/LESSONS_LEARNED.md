@@ -241,3 +241,7 @@ Mailing/Past Due follow-up: failed or incomplete lists must remain unknown throu
 
 ### Production schedule controls and paper (2026-09-10)
 - Problem/root cause: mobile rule cards kept a 240px minimum, header ghost links lost contrast on navy, detail dialogs did not contain focus, and 44px screen buttons expanded paper rows. Solution: bounded responsive grids, shared solid controls, inert/focus/scroll restoration and separate print row heights. Prevention: original/current ten-employee and four-department comparisons, four-width axe/scroll checks, modal keyboard tests and one-page PDF locks. Preserve data.js and policy prose; CSS case changes are presentation only.
+
+### Payroll upload ownership and cut-apart slips (2026-09-10)
+- Problem/root cause: changing the document while its upload/poll was in flight allowed a late response to restart the abandoned read. Solution: a generation and job check at every async boundary, with busy state beginning before file reading. Prevention: delayed synthetic upload/poll cancellation tests and unchanged import payload locks.
+- Shared screen line-height overflowed slip footnotes, while legacy 3.333in rows plus a border pushed six slots onto two pages. Keep paper line-height explicit and rows at 3.32in; verify all values, flags and footnotes plus six slots on one Letter sheet.

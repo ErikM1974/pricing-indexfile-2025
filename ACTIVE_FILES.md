@@ -301,3 +301,9 @@ Staff toolkit preservation: tests/unit/staff-toolkit-content.test.js locks the e
 ### Payroll original browser baseline — 2026-09-10
 - Added tests/fixtures/staff-workspaces-payroll-synthetic.json: seven entirely synthetic employees covering carryover, negative and pending eligibility, missing entitlement, stale dates and inconsistent balances; synthetic registers and reviews. No real records or rates.
 - Added tests/fixtures/staff-workspaces-payroll-original-browser.json: original tables, flags, filters, audit CSV, six slip slots, packet/leave review content and four intercepted parse/import requests. One complete browser workflow passed; every write was fulfilled locally.
+
+- Payroll drafts against shared_components/css/staff-schedules.css alongside production shifts; original payroll.css remains until screen/paper/consumer review. The unchanged vacation-carryover module owns every balance calculation.
+
+- Retired dashboards/css/payroll.css (13839 LF bytes / 3 flags) after nine mocked browser cases, exact CSV/slip values and one-page paper review. Shared staff-schedules.css owns payroll; its manual QA harness and unit guard now load the same owner. Refined production schedule phone reference spacing after visual review.
+
+- Added shared_components/css/staff-payroll.css as payroll’s scoped page/print owner, extracted byte-for-byte from the payroll portion of staff-schedules.css. Both pages share tokens.css and components.css; their own layout rules load independently. Updated the application, manual QA harness, lint scope, content mapping, owner guard and CSS budgets together.

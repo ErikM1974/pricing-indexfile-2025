@@ -17,7 +17,11 @@
 
         --production-shifts-gray-dark: var(--gray-800);
         --production-shifts-yellow-dark: var(--amber-900);
-        --production-shifts-indigo-dark: color-mix(in srgb, var(--violet-600) 60%, var(--gray-900));
+        --production-shifts-indigo-dark: color-mix(
+            in srgb,
+            var(--violet-600) 60%,
+            var(--gray-900)
+        );
         --c-bg: var(--ui-canvas);
         --c-surface: var(--ui-surface);
         --c-surface-2: var(--gray-50);
@@ -34,7 +38,11 @@
         --c-break: var(--amber-700);
         --c-break-bg: var(--amber-100);
         --c-lunch: var(--violet-600);
-        --c-lunch-bg: color-mix(in srgb, var(--violet-600) 10%, var(--color-surface));
+        --c-lunch-bg: color-mix(
+            in srgb,
+            var(--violet-600) 10%,
+            var(--color-surface)
+        );
         --c-off: var(--gray-500);
         --c-off-bg: var(--gray-100);
         --c-pre: var(--gray-500);
@@ -156,17 +164,21 @@
             color 0.15s;
     }
 
-    :where([data-ui="unified"][data-staff-schedule="shifts"]) .ps-breadcrumb a:hover {
+    :where([data-ui="unified"][data-staff-schedule="shifts"])
+        .ps-breadcrumb
+        a:hover {
         background: var(--c-surface);
         color: var(--c-accent);
     }
 
-    :where([data-ui="unified"][data-staff-schedule="shifts"]) .ps-breadcrumb-sep {
+    :where([data-ui="unified"][data-staff-schedule="shifts"])
+        .ps-breadcrumb-sep {
         color: var(--c-fg-soft);
         font-size: var(--font-size-base);
     }
 
-    :where([data-ui="unified"][data-staff-schedule="shifts"]) .ps-breadcrumb-current {
+    :where([data-ui="unified"][data-staff-schedule="shifts"])
+        .ps-breadcrumb-current {
         color: var(--c-fg);
         font-weight: 600;
         padding: 4px 8px;
@@ -261,7 +273,8 @@
         transition: background 0.15s;
     }
 
-    :where([data-ui="unified"][data-staff-schedule="shifts"]) .notice-link:hover {
+    :where([data-ui="unified"][data-staff-schedule="shifts"])
+        .notice-link:hover {
         background: var(--amber-100);
     }
 
@@ -271,12 +284,16 @@
         color: var(--red-800);
     }
 
-    :where([data-ui="unified"][data-staff-schedule="shifts"]) .notice-policy .notice-icon {
+    :where([data-ui="unified"][data-staff-schedule="shifts"])
+        .notice-policy
+        .notice-icon {
         background: var(--red-100);
         color: var(--red-800);
     }
 
-    :where([data-ui="unified"][data-staff-schedule="shifts"]) .notice-policy .notice-label {
+    :where([data-ui="unified"][data-staff-schedule="shifts"])
+        .notice-policy
+        .notice-label {
         color: var(--red-800);
     }
 
@@ -286,12 +303,16 @@
         color: var(--sky-900);
     }
 
-    :where([data-ui="unified"][data-staff-schedule="shifts"]) .notice-schedule .notice-icon {
+    :where([data-ui="unified"][data-staff-schedule="shifts"])
+        .notice-schedule
+        .notice-icon {
         background: var(--sky-100);
         color: var(--sky-700);
     }
 
-    :where([data-ui="unified"][data-staff-schedule="shifts"]) .notice-schedule .notice-label {
+    :where([data-ui="unified"][data-staff-schedule="shifts"])
+        .notice-schedule
+        .notice-label {
         color: var(--sky-700);
     }
 
@@ -302,7 +323,8 @@
         padding: 16px 20px;
         border-radius: var(--radius);
         background: var(--color-info-bg);
-        border: 1px solid color-mix(in srgb, var(--violet-600) 40%, var(--color-surface));
+        border: 1px solid
+            color-mix(in srgb, var(--violet-600) 40%, var(--color-surface));
         color: color-mix(in srgb, var(--violet-600) 60%, var(--gray-900));
         text-decoration: none;
         transition:
@@ -311,7 +333,8 @@
             border-color 0.15s;
     }
 
-    :where([data-ui="unified"][data-staff-schedule="shifts"]) .waiver-card:hover {
+    :where([data-ui="unified"][data-staff-schedule="shifts"])
+        .waiver-card:hover {
         transform: translateY(-1px);
         box-shadow: 0 4px 12px
             color-mix(
@@ -328,7 +351,11 @@
         width: 44px;
         height: 44px;
         border-radius: 10px;
-        background: color-mix(in srgb, var(--violet-600) 10%, var(--color-surface));
+        background: color-mix(
+            in srgb,
+            var(--violet-600) 10%,
+            var(--color-surface)
+        );
         color: var(--violet-600);
         flex-shrink: 0;
     }
@@ -370,13 +397,20 @@
         color: color-mix(in srgb, var(--violet-600) 60%, var(--gray-900));
         padding: 8px 14px;
         border-radius: 8px;
-        border: 1px solid color-mix(in srgb, var(--violet-600) 40%, var(--color-surface));
+        border: 1px solid
+            color-mix(in srgb, var(--violet-600) 40%, var(--color-surface));
         background: var(--c-surface);
         flex-shrink: 0;
     }
 
-    :where([data-ui="unified"][data-staff-schedule="shifts"]) .waiver-card:hover .waiver-cta {
-        background: color-mix(in srgb, var(--violet-600) 10%, var(--color-surface));
+    :where([data-ui="unified"][data-staff-schedule="shifts"])
+        .waiver-card:hover
+        .waiver-cta {
+        background: color-mix(
+            in srgb,
+            var(--violet-600) 10%,
+            var(--color-surface)
+        );
     }
 
     :where([data-ui="unified"][data-staff-schedule="shifts"]) .waiver-note {
@@ -394,7 +428,8 @@
         line-height: 1.45;
     }
 
-    :where([data-ui="unified"][data-staff-schedule="shifts"]) .waiver-note-icon {
+    :where([data-ui="unified"][data-staff-schedule="shifts"])
+        .waiver-note-icon {
         display: grid;
         place-items: center;
         flex-shrink: 0;
@@ -402,7 +437,9 @@
         margin-top: 1px;
     }
 
-    :where([data-ui="unified"][data-staff-schedule="shifts"]) .waiver-note strong {
+    :where([data-ui="unified"][data-staff-schedule="shifts"])
+        .waiver-note
+        strong {
         font-weight: 600;
     }
 
@@ -563,7 +600,9 @@
         font-weight: 500;
     }
 
-    :where([data-ui="unified"][data-staff-schedule="shifts"]) .chip-active .chip-count {
+    :where([data-ui="unified"][data-staff-schedule="shifts"])
+        .chip-active
+        .chip-count {
         background: color-mix(in srgb, var(--color-surface) 18%, transparent);
         color: var(--c-bg);
     }
@@ -599,7 +638,9 @@
         border-bottom: 1px solid var(--c-border);
     }
 
-    :where([data-ui="unified"][data-staff-schedule="shifts"]) .timeline-head h2 {
+    :where([data-ui="unified"][data-staff-schedule="shifts"])
+        .timeline-head
+        h2 {
         margin: 0 0 4px;
         font-size: var(--font-size-base);
         font-weight: 600;
@@ -612,7 +653,8 @@
         color: var(--c-fg-muted);
     }
 
-    :where([data-ui="unified"][data-staff-schedule="shifts"]) .timeline-head-right {
+    :where([data-ui="unified"][data-staff-schedule="shifts"])
+        .timeline-head-right {
         display: flex;
         align-items: center;
         gap: 10px;
@@ -668,10 +710,12 @@
         height: 8px;
         border-radius: 50%;
         background: var(--c-accent);
-        box-shadow: 0 0 0 0 color-mix(in oklab, var(--c-accent) 40%, transparent);
+        box-shadow: 0 0 0 0
+            color-mix(in oklab, var(--c-accent) 40%, transparent);
     }
 
-    :where([data-ui="unified"][data-staff-schedule="shifts"]) .now-dot.scrubbing {
+    :where([data-ui="unified"][data-staff-schedule="shifts"])
+        .now-dot.scrubbing {
         background: var(--c-fg-muted);
     }
 
@@ -744,11 +788,13 @@
         transition: background 0.12s;
     }
 
-    :where([data-ui="unified"][data-staff-schedule="shifts"]) .tl-row-label:hover {
+    :where([data-ui="unified"][data-staff-schedule="shifts"])
+        .tl-row-label:hover {
         background: var(--c-surface-2);
     }
 
-    :where([data-ui="unified"][data-staff-schedule="shifts"]) .tl-row-label.selected {
+    :where([data-ui="unified"][data-staff-schedule="shifts"])
+        .tl-row-label.selected {
         background: var(--c-accent-soft);
     }
 
@@ -798,7 +844,8 @@
         bottom: 12px;
         background: var(--c-surface-2);
         border-radius: 999px;
-        border: 1px dashed color-mix(in oklab, var(--c-border-strong) 60%, transparent);
+        border: 1px dashed
+            color-mix(in oklab, var(--c-border-strong) 60%, transparent);
     }
 
     :where([data-ui="unified"][data-staff-schedule="shifts"]) .tl-seg {
@@ -849,7 +896,9 @@
         pointer-events: none;
     }
 
-    :where([data-ui="unified"][data-staff-schedule="shifts"]) .tl-cap .cap-time {
+    :where([data-ui="unified"][data-staff-schedule="shifts"])
+        .tl-cap
+        .cap-time {
         position: absolute;
         top: -20px;
         left: 50%;
@@ -862,8 +911,14 @@
         transition: opacity 0.15s;
     }
 
-    :where([data-ui="unified"][data-staff-schedule="shifts"]) .tl-row:hover .tl-cap .cap-time,
-    :where([data-ui="unified"][data-staff-schedule="shifts"]) .tl-row.selected .tl-cap .cap-time {
+    :where([data-ui="unified"][data-staff-schedule="shifts"])
+        .tl-row:hover
+        .tl-cap
+        .cap-time,
+    :where([data-ui="unified"][data-staff-schedule="shifts"])
+        .tl-row.selected
+        .tl-cap
+        .cap-time {
         opacity: 1;
     }
 
@@ -882,11 +937,13 @@
         background: var(--c-accent);
     }
 
-    :where([data-ui="unified"][data-staff-schedule="shifts"]) .tl-playhead.scrubbing {
+    :where([data-ui="unified"][data-staff-schedule="shifts"])
+        .tl-playhead.scrubbing {
         background: var(--c-fg);
     }
 
-    :where([data-ui="unified"][data-staff-schedule="shifts"]) .tl-playhead::before {
+    :where([data-ui="unified"][data-staff-schedule="shifts"])
+        .tl-playhead::before {
         content: "";
         position: absolute;
         top: 38px;
@@ -900,11 +957,13 @@
         box-shadow: 0 0 0 1px var(--c-accent);
     }
 
-    :where([data-ui="unified"][data-staff-schedule="shifts"]) .tl-playhead.scrubbing::before {
+    :where([data-ui="unified"][data-staff-schedule="shifts"])
+        .tl-playhead.scrubbing::before {
         box-shadow: 0 0 0 1px var(--c-fg);
     }
 
-    :where([data-ui="unified"][data-staff-schedule="shifts"]) .tl-playhead-flag {
+    :where([data-ui="unified"][data-staff-schedule="shifts"])
+        .tl-playhead-flag {
         position: absolute;
         top: 4px;
         left: 50%;
@@ -942,18 +1001,21 @@
         outline: none;
     }
 
-    :where([data-ui="unified"][data-staff-schedule="shifts"]) .tl-scrubber::-webkit-slider-thumb {
+    :where([data-ui="unified"][data-staff-schedule="shifts"])
+        .tl-scrubber::-webkit-slider-thumb {
         appearance: none;
         width: 18px;
         height: 18px;
         background: var(--c-fg);
         border: 3px solid var(--c-surface);
         border-radius: 50%;
-        box-shadow: 0 1px 4px color-mix(in srgb, var(--gray-900) 15%, transparent);
+        box-shadow: 0 1px 4px
+            color-mix(in srgb, var(--gray-900) 15%, transparent);
         cursor: grab;
     }
 
-    :where([data-ui="unified"][data-staff-schedule="shifts"]) .tl-scrubber::-moz-range-thumb {
+    :where([data-ui="unified"][data-staff-schedule="shifts"])
+        .tl-scrubber::-moz-range-thumb {
         width: 18px;
         height: 18px;
         background: var(--c-fg);
@@ -968,7 +1030,8 @@
         margin-top: 6px;
     }
 
-    :where([data-ui="unified"][data-staff-schedule="shifts"]) .scrubber-tick-label {
+    :where([data-ui="unified"][data-staff-schedule="shifts"])
+        .scrubber-tick-label {
         position: absolute;
         transform: translateX(-50%);
         font-size: var(--font-size-sm);
@@ -1021,13 +1084,15 @@
         font-family: var(--ui-font);
     }
 
-    :where([data-ui="unified"][data-staff-schedule="shifts"]) .roster-card:hover {
+    :where([data-ui="unified"][data-staff-schedule="shifts"])
+        .roster-card:hover {
         border-color: var(--c-border-strong);
         transform: translateY(-1px);
         box-shadow: var(--shadow-md);
     }
 
-    :where([data-ui="unified"][data-staff-schedule="shifts"]) .roster-card.selected {
+    :where([data-ui="unified"][data-staff-schedule="shifts"])
+        .roster-card.selected {
         border-color: var(--c-accent);
         box-shadow: 0 0 0 3px var(--c-accent-soft);
     }
@@ -1038,7 +1103,8 @@
         gap: 12px;
     }
 
-    :where([data-ui="unified"][data-staff-schedule="shifts"]) .roster-card-meta {
+    :where([data-ui="unified"][data-staff-schedule="shifts"])
+        .roster-card-meta {
         flex: 1;
         min-width: 0;
     }
@@ -1076,7 +1142,8 @@
         font-weight: 500;
     }
 
-    :where([data-ui="unified"][data-staff-schedule="shifts"]) .roster-card-bottom {
+    :where([data-ui="unified"][data-staff-schedule="shifts"])
+        .roster-card-bottom {
         display: grid;
         grid-template-columns: 1.6fr 1.3fr 1fr;
         gap: 12px;
@@ -1084,7 +1151,8 @@
         border-top: 1px solid var(--c-border);
     }
 
-    :where([data-ui="unified"][data-staff-schedule="shifts"]) .roster-cell-label {
+    :where([data-ui="unified"][data-staff-schedule="shifts"])
+        .roster-cell-label {
         font-size: var(--font-size-sm);
         letter-spacing: 0.06em;
         text-transform: none;
@@ -1139,7 +1207,8 @@
         height: var(--ui-control-height);
     }
 
-    :where([data-ui="unified"][data-staff-schedule="shifts"]) .detail-close:hover {
+    :where([data-ui="unified"][data-staff-schedule="shifts"])
+        .detail-close:hover {
         background: var(--c-surface-2);
         color: var(--c-fg);
     }
@@ -1208,7 +1277,9 @@
         position: relative;
     }
 
-    :where([data-ui="unified"][data-staff-schedule="shifts"]) .evt + .evt::before {
+    :where([data-ui="unified"][data-staff-schedule="shifts"])
+        .evt
+        + .evt::before {
         content: "";
         position: absolute;
         left: 117px;
@@ -1228,7 +1299,8 @@
         background: var(--c-border);
     }
 
-    :where([data-ui="unified"][data-staff-schedule="shifts"]) .evt:last-child::after {
+    :where([data-ui="unified"][data-staff-schedule="shifts"])
+        .evt:last-child::after {
         display: none;
     }
 
@@ -1252,18 +1324,26 @@
         z-index: 2;
     }
 
-    :where([data-ui="unified"][data-staff-schedule="shifts"]) .evt-start .evt-dot,
-    :where([data-ui="unified"][data-staff-schedule="shifts"]) .evt-end .evt-dot {
+    :where([data-ui="unified"][data-staff-schedule="shifts"])
+        .evt-start
+        .evt-dot,
+    :where([data-ui="unified"][data-staff-schedule="shifts"])
+        .evt-end
+        .evt-dot {
         background: var(--c-fg);
         outline-color: var(--c-fg);
     }
 
-    :where([data-ui="unified"][data-staff-schedule="shifts"]) .evt-break .evt-dot {
+    :where([data-ui="unified"][data-staff-schedule="shifts"])
+        .evt-break
+        .evt-dot {
         background: var(--c-break);
         outline-color: var(--c-break);
     }
 
-    :where([data-ui="unified"][data-staff-schedule="shifts"]) .evt-lunch .evt-dot {
+    :where([data-ui="unified"][data-staff-schedule="shifts"])
+        .evt-lunch
+        .evt-dot {
         background: var(--c-lunch);
         outline-color: var(--c-lunch);
     }
@@ -1314,7 +1394,8 @@
         color: var(--c-fg-muted);
     }
 
-    :where([data-ui="unified"][data-staff-schedule="shifts"]) .master-head-right {
+    :where([data-ui="unified"][data-staff-schedule="shifts"])
+        .master-head-right {
         display: flex;
         align-items: center;
         gap: 16px;
@@ -1337,7 +1418,10 @@
         min-width: 880px;
     }
 
-    :where([data-ui="unified"][data-staff-schedule="shifts"]) .master-table thead th {
+    :where([data-ui="unified"][data-staff-schedule="shifts"])
+        .master-table
+        thead
+        th {
         text-align: left;
         padding: 12px 14px;
         background: var(--c-surface-2);
@@ -1357,26 +1441,42 @@
         text-align: center;
     }
 
-    :where([data-ui="unified"][data-staff-schedule="shifts"]) .master-table tbody tr {
+    :where([data-ui="unified"][data-staff-schedule="shifts"])
+        .master-table
+        tbody
+        tr {
         cursor: pointer;
         transition: background 0.1s;
     }
 
-    :where([data-ui="unified"][data-staff-schedule="shifts"]) .master-table tbody tr:hover {
+    :where([data-ui="unified"][data-staff-schedule="shifts"])
+        .master-table
+        tbody
+        tr:hover {
         background: var(--c-surface-2);
     }
 
-    :where([data-ui="unified"][data-staff-schedule="shifts"]) .master-table tbody tr.selected {
+    :where([data-ui="unified"][data-staff-schedule="shifts"])
+        .master-table
+        tbody
+        tr.selected {
         background: var(--c-accent-soft);
     }
 
-    :where([data-ui="unified"][data-staff-schedule="shifts"]) .master-table tbody td {
+    :where([data-ui="unified"][data-staff-schedule="shifts"])
+        .master-table
+        tbody
+        td {
         padding: 12px 14px;
         border-bottom: 1px solid var(--c-border);
         vertical-align: middle;
     }
 
-    :where([data-ui="unified"][data-staff-schedule="shifts"]) .master-table tbody tr:last-child td {
+    :where([data-ui="unified"][data-staff-schedule="shifts"])
+        .master-table
+        tbody
+        tr:last-child
+        td {
         border-bottom: none;
     }
 
@@ -1463,7 +1563,11 @@
     }
 
     :where([data-ui="unified"][data-staff-schedule="shifts"]) .legend-clock {
-        background: color-mix(in oklab, var(--c-accent) 60%, var(--color-surface));
+        background: color-mix(
+            in oklab,
+            var(--c-accent) 60%,
+            var(--color-surface)
+        );
     }
 
     :where([data-ui="unified"][data-staff-schedule="shifts"]) .workrules {
@@ -1492,7 +1596,8 @@
         gap: 12px;
     }
 
-    :where([data-ui="unified"][data-staff-schedule="shifts"]) .wr-card-featured {
+    :where([data-ui="unified"][data-staff-schedule="shifts"])
+        .wr-card-featured {
         background: var(--amber-100);
         border-color: var(--amber-300);
         grid-column: span 2;
@@ -1539,7 +1644,9 @@
         padding-left: 16px;
     }
 
-    :where([data-ui="unified"][data-staff-schedule="shifts"]) .wr-card li::before {
+    :where([data-ui="unified"][data-staff-schedule="shifts"])
+        .wr-card
+        li::before {
         content: "";
         position: absolute;
         left: 0;
@@ -1550,7 +1657,9 @@
         background: var(--c-fg-muted);
     }
 
-    :where([data-ui="unified"][data-staff-schedule="shifts"]) .wr-card-featured li::before {
+    :where([data-ui="unified"][data-staff-schedule="shifts"])
+        .wr-card-featured
+        li::before {
         background: var(--amber-700);
     }
 
@@ -1579,7 +1688,8 @@
         flex-shrink: 0;
     }
 
-    :where([data-ui="unified"][data-staff-schedule="shifts"]) .loopholes-eyebrow {
+    :where([data-ui="unified"][data-staff-schedule="shifts"])
+        .loopholes-eyebrow {
         font-size: var(--font-size-sm);
         letter-spacing: 0.1em;
         text-transform: none;
@@ -1588,7 +1698,9 @@
         margin-bottom: 4px;
     }
 
-    :where([data-ui="unified"][data-staff-schedule="shifts"]) .loopholes-head h3 {
+    :where([data-ui="unified"][data-staff-schedule="shifts"])
+        .loopholes-head
+        h3 {
         margin: 0;
         font-size: var(--font-size-base);
         font-weight: 600;
@@ -1596,7 +1708,9 @@
         color: var(--c-fg);
     }
 
-    :where([data-ui="unified"][data-staff-schedule="shifts"]) .loopholes-head p {
+    :where([data-ui="unified"][data-staff-schedule="shifts"])
+        .loopholes-head
+        p {
         margin: 4px 0 0;
         font-size: var(--font-size-md);
         color: var(--c-fg-muted);
@@ -1613,7 +1727,9 @@
         gap: 12px;
     }
 
-    :where([data-ui="unified"][data-staff-schedule="shifts"]) .loopholes-list li {
+    :where([data-ui="unified"][data-staff-schedule="shifts"])
+        .loopholes-list
+        li {
         background: var(--c-surface);
         border: 1px solid var(--red-300);
         border-radius: 8px;
@@ -1649,7 +1765,8 @@
         font-style: italic;
     }
 
-    :where([data-ui="unified"][data-staff-schedule="shifts"]) .loophole-reality {
+    :where([data-ui="unified"][data-staff-schedule="shifts"])
+        .loophole-reality {
         font-size: var(--font-size-md);
         line-height: 1.55;
         color: var(--c-fg);
@@ -1717,7 +1834,9 @@
         gap: 10px;
     }
 
-    :where([data-ui="unified"][data-staff-schedule="shifts"]) .rule-card-head h3 {
+    :where([data-ui="unified"][data-staff-schedule="shifts"])
+        .rule-card-head
+        h3 {
         margin: 0;
         font-size: var(--font-size-base);
         font-weight: 600;
@@ -1753,7 +1872,9 @@
         padding-left: 16px;
     }
 
-    :where([data-ui="unified"][data-staff-schedule="shifts"]) .rule-card li::before {
+    :where([data-ui="unified"][data-staff-schedule="shifts"])
+        .rule-card
+        li::before {
         content: "";
         position: absolute;
         left: 0;
@@ -1772,7 +1893,9 @@
         overflow: hidden;
     }
 
-    :where([data-ui="unified"][data-staff-schedule="shifts"]) .rules-source summary {
+    :where([data-ui="unified"][data-staff-schedule="shifts"])
+        .rules-source
+        summary {
         list-style: none;
         cursor: pointer;
         padding: 14px 18px;
@@ -1791,7 +1914,9 @@
         display: none;
     }
 
-    :where([data-ui="unified"][data-staff-schedule="shifts"]) .rules-source summary:hover {
+    :where([data-ui="unified"][data-staff-schedule="shifts"])
+        .rules-source
+        summary:hover {
         background: var(--c-surface-2);
     }
 
@@ -1807,7 +1932,9 @@
         border: 1px solid var(--c-border);
     }
 
-    :where([data-ui="unified"][data-staff-schedule="shifts"]) .rules-source[open] summary {
+    :where([data-ui="unified"][data-staff-schedule="shifts"])
+        .rules-source[open]
+        summary {
         border-bottom: 1px solid var(--c-border);
     }
 
@@ -1817,7 +1944,9 @@
         transition: transform 0.2s;
     }
 
-    :where([data-ui="unified"][data-staff-schedule="shifts"]) .rules-source[open] .chev {
+    :where([data-ui="unified"][data-staff-schedule="shifts"])
+        .rules-source[open]
+        .chev {
         transform: rotate(180deg);
     }
 
@@ -1853,7 +1982,8 @@
         color: var(--c-fg);
     }
 
-    :where([data-ui="unified"][data-staff-schedule="shifts"]) .rules-disclaimer {
+    :where([data-ui="unified"][data-staff-schedule="shifts"])
+        .rules-disclaimer {
         font-size: var(--font-size-md);
         color: var(--c-fg-muted);
         font-style: italic;
@@ -1876,14 +2006,22 @@
         min-height: var(--ui-control-height);
     }
 
-    :where([data-ui="unified"][data-staff-schedule="shifts"]) .row-btn:focus-visible,
-    :where([data-ui="unified"][data-staff-schedule="shifts"]) .chip:focus-visible,
-    :where([data-ui="unified"][data-staff-schedule="shifts"]) .roster-card:focus-visible,
-    :where([data-ui="unified"][data-staff-schedule="shifts"]) .tl-row-label:focus-visible,
-    :where([data-ui="unified"][data-staff-schedule="shifts"]) .detail-close:focus-visible,
-    :where([data-ui="unified"][data-staff-schedule="shifts"]) .master-print:focus-visible,
-    :where([data-ui="unified"][data-staff-schedule="shifts"]) .schedule-rule-link:focus-visible,
-    :where([data-ui="unified"][data-staff-schedule="shifts"]) .waiver-card:focus-visible {
+    :where([data-ui="unified"][data-staff-schedule="shifts"])
+        .row-btn:focus-visible,
+    :where([data-ui="unified"][data-staff-schedule="shifts"])
+        .chip:focus-visible,
+    :where([data-ui="unified"][data-staff-schedule="shifts"])
+        .roster-card:focus-visible,
+    :where([data-ui="unified"][data-staff-schedule="shifts"])
+        .tl-row-label:focus-visible,
+    :where([data-ui="unified"][data-staff-schedule="shifts"])
+        .detail-close:focus-visible,
+    :where([data-ui="unified"][data-staff-schedule="shifts"])
+        .master-print:focus-visible,
+    :where([data-ui="unified"][data-staff-schedule="shifts"])
+        .schedule-rule-link:focus-visible,
+    :where([data-ui="unified"][data-staff-schedule="shifts"])
+        .waiver-card:focus-visible {
         outline: 2px solid currentcolor;
         outline-offset: 2px;
     }
@@ -1940,7 +2078,8 @@
             flex-direction: column;
         }
 
-        :where([data-ui="unified"][data-staff-schedule="shifts"]) .wr-card-featured {
+        :where([data-ui="unified"][data-staff-schedule="shifts"])
+            .wr-card-featured {
             grid-column: auto;
         }
 
@@ -1973,7 +2112,8 @@
             justify-self: start;
         }
 
-        :where([data-ui="unified"][data-staff-schedule="shifts"]) .ps-breadcrumb {
+        :where([data-ui="unified"][data-staff-schedule="shifts"])
+            .ps-breadcrumb {
             padding: 8px 16px;
             font-size: var(--font-size-md);
         }
@@ -1993,7 +2133,8 @@
             padding: var(--space-5) var(--space-4);
         }
 
-        :where([data-ui="unified"][data-staff-schedule="shifts"]) .topbar-right {
+        :where([data-ui="unified"][data-staff-schedule="shifts"])
+            .topbar-right {
             width: 100%;
         }
 
@@ -2011,7 +2152,8 @@
             padding: 18px 16px;
         }
 
-        :where([data-ui="unified"][data-staff-schedule="shifts"]) .loophole-reality {
+        :where([data-ui="unified"][data-staff-schedule="shifts"])
+            .loophole-reality {
             padding-left: 0;
             margin-top: 8px;
         }
@@ -2046,7 +2188,8 @@
         :where([data-ui="unified"][data-staff-schedule="shifts"]) .topbar,
         :where([data-ui="unified"][data-staff-schedule="shifts"]) .stat-row,
         :where([data-ui="unified"][data-staff-schedule="shifts"]) .chip-row,
-        :where([data-ui="unified"][data-staff-schedule="shifts"]) .timeline-card,
+        :where([data-ui="unified"][data-staff-schedule="shifts"])
+            .timeline-card,
         :where([data-ui="unified"][data-staff-schedule="shifts"]) .roster,
         :where([data-ui="unified"][data-staff-schedule="shifts"]) .workrules,
         :where([data-ui="unified"][data-staff-schedule="shifts"]) .rules,
@@ -2055,8 +2198,10 @@
         :where([data-ui="unified"][data-staff-schedule="shifts"]) .waiver-card,
         :where([data-ui="unified"][data-staff-schedule="shifts"]) .waiver-note,
         :where([data-ui="unified"][data-staff-schedule="shifts"]) .master-print,
-        :where([data-ui="unified"][data-staff-schedule="shifts"]) .ps-breadcrumb,
-        :where([data-ui="unified"][data-staff-schedule="shifts"]) .detail-panel {
+        :where([data-ui="unified"][data-staff-schedule="shifts"])
+            .ps-breadcrumb,
+        :where([data-ui="unified"][data-staff-schedule="shifts"])
+            .detail-panel {
             display: none;
         }
 
@@ -2075,12 +2220,15 @@
             border-radius: 4px;
         }
 
-        :where([data-ui="unified"][data-staff-schedule="shifts"]) .notice-icon svg {
+        :where([data-ui="unified"][data-staff-schedule="shifts"])
+            .notice-icon
+            svg {
             width: 12px;
             height: 12px;
         }
 
-        :where([data-ui="unified"][data-staff-schedule="shifts"]) .notice-label {
+        :where([data-ui="unified"][data-staff-schedule="shifts"])
+            .notice-label {
             font-size: 7pt;
             margin-bottom: 0;
         }
@@ -2104,7 +2252,8 @@
             max-width: none;
         }
 
-        :where([data-ui="unified"][data-staff-schedule="shifts"]) .print-header {
+        :where([data-ui="unified"][data-staff-schedule="shifts"])
+            .print-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -2121,7 +2270,8 @@
             gap: 10px;
         }
 
-        :where([data-ui="unified"][data-staff-schedule="shifts"]) .print-brand-mark {
+        :where([data-ui="unified"][data-staff-schedule="shifts"])
+            .print-brand-mark {
             width: 28px;
             height: 28px;
             border-radius: 6px;
@@ -2131,12 +2281,15 @@
             place-items: center;
         }
 
-        :where([data-ui="unified"][data-staff-schedule="shifts"]) .print-brand-mark svg {
+        :where([data-ui="unified"][data-staff-schedule="shifts"])
+            .print-brand-mark
+            svg {
             width: 16px;
             height: 16px;
         }
 
-        :where([data-ui="unified"][data-staff-schedule="shifts"]) .print-eyebrow {
+        :where([data-ui="unified"][data-staff-schedule="shifts"])
+            .print-eyebrow {
             font-size: 7.5pt;
             letter-spacing: 0.08em;
             text-transform: none;
@@ -2164,17 +2317,22 @@
             gap: 1px;
         }
 
-        :where([data-ui="unified"][data-staff-schedule="shifts"]) .print-meta-row {
+        :where([data-ui="unified"][data-staff-schedule="shifts"])
+            .print-meta-row {
             display: flex;
             justify-content: flex-end;
             gap: 8px;
         }
 
-        :where([data-ui="unified"][data-staff-schedule="shifts"]) .print-meta-row span {
+        :where([data-ui="unified"][data-staff-schedule="shifts"])
+            .print-meta-row
+            span {
             color: var(--gray-500);
         }
 
-        :where([data-ui="unified"][data-staff-schedule="shifts"]) .print-meta-row strong {
+        :where([data-ui="unified"][data-staff-schedule="shifts"])
+            .print-meta-row
+            strong {
             color: var(--print-ink);
             font-weight: 600;
             min-width: 90px;
@@ -2199,13 +2357,17 @@
             gap: 12px;
         }
 
-        :where([data-ui="unified"][data-staff-schedule="shifts"]) .master-head h2 {
+        :where([data-ui="unified"][data-staff-schedule="shifts"])
+            .master-head
+            h2 {
             font-size: 11pt;
             color: var(--print-ink);
             margin-bottom: 0;
         }
 
-        :where([data-ui="unified"][data-staff-schedule="shifts"]) .master-head p {
+        :where([data-ui="unified"][data-staff-schedule="shifts"])
+            .master-head
+            p {
             display: none;
         }
 
@@ -2223,14 +2385,17 @@
         :where([data-ui="unified"][data-staff-schedule="shifts"]) .legend-sw {
             width: 11px;
             height: 8px;
-            border: 1px solid color-mix(in srgb, var(--gray-900) 8%, transparent);
+            border: 1px solid
+                color-mix(in srgb, var(--gray-900) 8%, transparent);
         }
 
-        :where([data-ui="unified"][data-staff-schedule="shifts"]) .master-scroll {
+        :where([data-ui="unified"][data-staff-schedule="shifts"])
+            .master-scroll {
             overflow: visible;
         }
 
-        :where([data-ui="unified"][data-staff-schedule="shifts"]) .master-table {
+        :where([data-ui="unified"][data-staff-schedule="shifts"])
+            .master-table {
             width: 100%;
             min-width: 0;
             font-size: 9pt;
@@ -2239,11 +2404,16 @@
             border-collapse: collapse;
         }
 
-        :where([data-ui="unified"][data-staff-schedule="shifts"]) .master-table thead {
+        :where([data-ui="unified"][data-staff-schedule="shifts"])
+            .master-table
+            thead {
             display: table-header-group;
         }
 
-        :where([data-ui="unified"][data-staff-schedule="shifts"]) .master-table thead th {
+        :where([data-ui="unified"][data-staff-schedule="shifts"])
+            .master-table
+            thead
+            th {
             background: var(--gray-100);
             color: var(--print-ink);
             font-size: 7pt;
@@ -2252,12 +2422,21 @@
             letter-spacing: 0.05em;
         }
 
-        :where([data-ui="unified"][data-staff-schedule="shifts"]) .master-table tbody tr:hover,
-        :where([data-ui="unified"][data-staff-schedule="shifts"]) .master-table tbody tr.selected {
+        :where([data-ui="unified"][data-staff-schedule="shifts"])
+            .master-table
+            tbody
+            tr:hover,
+        :where([data-ui="unified"][data-staff-schedule="shifts"])
+            .master-table
+            tbody
+            tr.selected {
             background: transparent;
         }
 
-        :where([data-ui="unified"][data-staff-schedule="shifts"]) .master-table tbody td {
+        :where([data-ui="unified"][data-staff-schedule="shifts"])
+            .master-table
+            tbody
+            td {
             padding: 4px 7px;
             border-bottom: 1px solid var(--gray-200);
             font-size: 9pt;
@@ -2277,7 +2456,8 @@
             font-size: 9pt;
         }
 
-        :where([data-ui="unified"][data-staff-schedule="shifts"]) .td-name-wrap {
+        :where([data-ui="unified"][data-staff-schedule="shifts"])
+            .td-name-wrap {
             gap: 7px;
         }
 
@@ -2291,7 +2471,9 @@
             font-size: 10pt;
         }
 
-        :where([data-ui="unified"][data-staff-schedule="shifts"]) .td-paid span {
+        :where([data-ui="unified"][data-staff-schedule="shifts"])
+            .td-paid
+            span {
             color: var(--print-ink-soft);
             font-size: 7.5pt;
         }
@@ -2307,7 +2489,11 @@
         }
 
         :where([data-ui="unified"][data-staff-schedule="shifts"]) .cell-lunch {
-            background: color-mix(in srgb, var(--violet-600) 10%, var(--color-surface));
+            background: color-mix(
+                in srgb,
+                var(--violet-600) 10%,
+                var(--color-surface)
+            );
             color: var(--production-shifts-indigo-dark);
             font-weight: 600;
         }
@@ -2318,7 +2504,9 @@
             margin-top: 1px;
         }
 
-        :where([data-ui="unified"][data-staff-schedule="shifts"]) .td-name-wrap .avatar {
+        :where([data-ui="unified"][data-staff-schedule="shifts"])
+            .td-name-wrap
+            .avatar {
             width: 20px;
             height: 20px;
             font-size: var(--font-size-sm);
@@ -2326,9 +2514,47 @@
             color: var(--production-shifts-gray-dark);
         }
 
-        :where([data-ui="unified"][data-staff-schedule="shifts"]) .master-table tbody tr {
+        :where([data-ui="unified"][data-staff-schedule="shifts"])
+            .master-table
+            tbody
+            tr {
             break-inside: avoid;
             cursor: default;
+        }
+    }
+
+    @media (width <= 640px) {
+        :where([data-ui="unified"][data-staff-schedule="shifts"]) .rules {
+            padding: 16px;
+        }
+
+        :where([data-ui="unified"][data-staff-schedule="shifts"])
+            .rules-source
+            summary {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            padding: 12px;
+            gap: 8px;
+        }
+
+        :where([data-ui="unified"][data-staff-schedule="shifts"]) .src-eyebrow {
+            grid-column: 1 / -1;
+            justify-self: start;
+            letter-spacing: normal;
+        }
+
+        :where([data-ui="unified"][data-staff-schedule="shifts"]) .wac-list {
+            padding: 12px;
+        }
+
+        :where([data-ui="unified"][data-staff-schedule="shifts"]) .wac-list li {
+            gap: 8px;
+        }
+
+        :where([data-ui="unified"][data-staff-schedule="shifts"]) .wac-num {
+            flex-shrink: 0;
+            min-width: 3ch;
+            white-space: nowrap;
         }
     }
 }

@@ -21,7 +21,9 @@
   var statusEl = document.getElementById('pr-status');
   var jobId = null;
   var pollTimer = null;
-  // True only between "the upload was accepted" and "the poll came back done/error". Lets
+  // Invalidates late file reads, uploads and polls when the operator changes the document.
+  var readGeneration = 0;
+  // True from the initial file read until the poll comes back done/error. Lets
   // resetReview() tell an ABANDONED read apart from a finished one, so cancelling says so
   // while a successful save keeps its own message.
   var parsing = false;
@@ -105,8 +107,14 @@
     tab.addEventListener('click', function () { showTab(tab); });
     // WAI-ARIA tabs: arrow keys move between the three panels
     tab.addEventListener('keydown', function (e) {
-      if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
-      var n = tabButtons[(i + (e.key === 'ArrowRight' ? 1 : tabButtons.length - 1)) % tabButtons.length];
+      var next;
+      if (e.key === 'Home') next = 0;
+      else if (e.key === 'End') next = tabButtons.length - 1;
+      else if (e.key === 'ArrowRight') next = (i + 1) % tabButtons.length;
+      else if (e.key === 'ArrowLeft') next = (i + tabButtons.length - 1) % tabButtons.length;
+      else return;
+      e.preventDefault();
+      var n = tabButtons[next];
       n.focus(); showTab(n);
     });
   });
@@ -223,7 +231,7 @@
     } catch (e) {
       document.getElementById('leave-body').innerHTML =
         '<tr><td colspan="10" class="pr-loading" role="alert">Could not load balances (' + esc(e.message) + '). '
-        + '<button type="button" class="pr-btn pr-retry" id="leave-retry">Retry</button></td></tr>';
+        + '<button type="button" class="btn pr-btn pr-retry" id="leave-retry">Retry</button></td></tr>';
       var rb = document.getElementById('leave-retry'); if (rb) rb.addEventListener('click', loadLeave);
       setStatus('Unable to load leave balances: ' + e.message, 'error');
     }
@@ -251,7 +259,7 @@
       sel2.innerHTML = '<option value="">Pay periods did not load</option>';
       document.getElementById('period-body').innerHTML =
         '<tr><td colspan="8" class="pr-loading" role="alert">Could not load pay periods (' + esc(e.message) + '). '
-        + '<button type="button" class="pr-btn pr-retry" id="periods-retry">Retry</button></td></tr>';
+        + '<button type="button" class="btn pr-btn pr-retry" id="periods-retry">Retry</button></td></tr>';
       var rb2 = document.getElementById('periods-retry'); if (rb2) rb2.addEventListener('click', loadPeriods);
       setStatus('Unable to load pay periods: ' + e.message, 'error');
     }
@@ -282,7 +290,7 @@
       }).join('');
     } catch (e) {
       body.innerHTML = '<tr><td colspan="8" class="pr-loading" role="alert">Could not load this period (' + esc(e.message) + '). '
-        + '<button type="button" class="pr-btn pr-retry" id="register-retry">Retry</button></td></tr>';
+        + '<button type="button" class="btn pr-btn pr-retry" id="register-retry">Retry</button></td></tr>';
       var rb3 = document.getElementById('register-retry'); if (rb3) rb3.addEventListener('click', function () { loadRegister(checkDate); });
       setStatus('Unable to load period: ' + e.message, 'error');
     }
@@ -366,6 +374,7 @@
     // server had the answer the whole time. A cancelled read must say so and hand the button
     // back, or the page is simply stuck with no way out but a reload.
     var wasParsing = parsing;
+    readGeneration++;
     var hadReview = !reviewEl.hidden;
     parsing = false;
     jobId = null;
@@ -404,6 +413,8 @@
     var f = fileInput.files && fileInput.files[0];
     if (!f) return;
     resetReview();
+    var generation = readGeneration;
+    parsing = true;
     parseBtn.disabled = true;
     setStatus('Uploading and reading the ' + (modeEl.value === 'leave' ? 'page' : 'packet')
       + ' — this usually takes under a minute…', 'info');
@@ -412,14 +423,16 @@
     startBusy();
     try {
       var b64 = await readAsBase64(f);
+      if (generation !== readGeneration) return;
       var started = await api('/parse', {
         method: 'POST',
         body: JSON.stringify({ filename: f.name, dataBase64: b64, mode: modeEl.value }),
       });
+      if (generation !== readGeneration) return;
       jobId = started.jobId;
-      parsing = true;
-      pollParse();
+      pollParse(generation, jobId);
     } catch (e) {
+      if (generation !== readGeneration) return;
       parsing = false;
       stopBusy();
       parseBtn.disabled = false;
@@ -427,18 +440,21 @@
     }
   });
 
-  function pollParse() {
-    if (!jobId) return;
+  function pollParse(generation, readJobId) {
+    if (!readJobId || generation !== readGeneration || readJobId !== jobId) return;
     pollTimer = setTimeout(async function () {
       try {
-        var res = await api('/parse/' + encodeURIComponent(jobId));
-        if (res.status === 'running') return pollParse();
+        if (generation !== readGeneration || readJobId !== jobId) return;
+        var res = await api('/parse/' + encodeURIComponent(readJobId));
+        if (generation !== readGeneration || readJobId !== jobId) return;
+        if (res.status === 'running') return pollParse(generation, readJobId);
         parsing = false;
         stopBusy();
         parseBtn.disabled = false;
         if (res.status === 'error') return setStatus('Could not read the packet: ' + res.error, 'error');
         renderReview(res.review);
       } catch (e) {
+        if (generation !== readGeneration || readJobId !== jobId) return;
         parsing = false;
         stopBusy();
         parseBtn.disabled = false;

@@ -5035,11 +5035,40 @@
         "one-page-original-and-current-department-schedules"
       ],
       "test": "tests/e2e/css-unification-staff-workspaces.spec.js",
-      "maxCssBytes": 129465,
-      "measuredRawCssBytes": 128441,
+      "maxCssBytes": 132320,
+      "measuredRawCssBytes": 131296,
       "baseline": {
         "commit": "0f151e3899b8517092b1864babd8ea7f579fc95b",
         "rawCssBytes": 62983,
+        "localCssRequests": 2
+      }
+    },
+    {
+      "source": "dashboards/payroll.html",
+      "family": "staff-workspace",
+      "status": "pilot",
+      "route": "/dashboards/payroll.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/staff-payroll.css"
+      ],
+      "dynamicStyles": [],
+      "dynamicTokens": [],
+      "states": [
+        "synthetic-original-balances-carryover-and-register",
+        "four-width-tabs-keyboard-tables-and-accessibility",
+        "unchanged-audit-csv-and-six-slip-one-page-print",
+        "mocked-verified-packet-and-leave-imports",
+        "empty-failure-retry-and-reconciliation-gating",
+        "cancelled-upload-and-poll-response-ownership"
+      ],
+      "test": "tests/e2e/css-unification-staff-workspaces.spec.js",
+      "maxCssBytes": 79606,
+      "measuredRawCssBytes": 78582,
+      "baseline": {
+        "commit": "0f151e3899b8517092b1864babd8ea7f579fc95b",
+        "rawCssBytes": 29573,
         "localCssRequests": 2
       }
     }

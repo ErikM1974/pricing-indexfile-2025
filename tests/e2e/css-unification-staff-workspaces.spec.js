@@ -9,6 +9,151 @@ fs.mkdirSync(output, { recursive: true });
 test.use({ reducedMotion: 'reduce', timezoneId: 'America/Los_Angeles' });
 const providerPaths = ['/dp/a0e15000da6b6fa1d16145b4ab86/emb', '/dp/a0e15000848e0baf43604a908d78/emb'];
 const payrollData = require('../fixtures/staff-workspaces-payroll-synthetic.json');
+test('CSS staff workspaces: payroll empty roster and periods show explicit guidance', async ({ page }) => {
+    const events = await open(page, 'payroll', payrollState({ empty: true }));
+    await expect(page.locator('#leave-body')).toContainText('No active employees found');
+    await expect(page.locator('#leave-asof')).toHaveText('No packet imported yet');
+    await page.locator('#print-slips').click();
+    await expect(page.locator('#pr-status')).toContainText('Nothing to print');
+    await page.getByRole('tab', { name: 'Pay Periods', exact: true }).click();
+    await expect(page.locator('#period-select')).toContainText('No pay periods imported yet');
+    for (const kind of ['errors', 'unknown', 'missing', 'writes']) expect(events[kind]).toEqual([]);
+});
+test('CSS staff workspaces: payroll cancelled poll cannot replace a newer document review', async ({ page }) => {
+    let release, started;
+    const arrived = new Promise(resolve => { started = resolve; });
+    const state = payrollState({ respond: async (_req, u) => {
+        if (u.pathname === payrollPrefix + '/parse/synthetic-1' && !release) {
+            started(); return new Promise(resolve => { release = () => resolve({ json: { status: 'error', error: 'Abandoned synthetic poll' } }); });
+        }
+        return null;
+    } }), events = await open(page, 'payroll', state);
+    await page.getByRole('tab', { name: 'Upload Packet' }).click();
+    await page.locator('#packet-file').setInputFiles({ name: 'synthetic-poll.pdf', mimeType: 'application/pdf', buffer: Buffer.from('%PDF-1.4\nSynthetic only.\n%%EOF') });
+    await page.locator('#packet-parse').click(); await arrived;
+    await payrollRead(page, 'leave');
+    release();
+    await expect(page.locator('#pr-status')).toHaveText('Page read and verified. Review below, then save.');
+    await expect(page.locator('#packet-commit')).toHaveText('Save leave balances');
+    await expect(page.locator('#packet-commit')).toBeEnabled();
+    await expect(page.locator('#review-verdict')).toContainText('no pay period is created');
+    for (const kind of ['errors', 'unknown', 'missing']) expect(events[kind]).toEqual([]);
+    expect(events.writes.map(w => w.path)).toEqual([payrollPrefix + '/parse', payrollPrefix + '/parse']);
+});
+test('CSS staff workspaces: payroll load failures retry and empty data remain explicit', async ({ page }) => {
+    const failures = new Set(['employees', 'periods', 'register']);
+    const state = payrollState({ respond: async (_req, u) => {
+        const endpoint = u.pathname.slice(payrollPrefix.length + 1);
+        if (u.pathname.startsWith(payrollPrefix + '/') && failures.has(endpoint)) {
+            failures.delete(endpoint); return { status: 503, json: { error: 'Synthetic ' + endpoint + ' unavailable' } };
+        }
+        return null;
+    } });
+    const events = await open(page, 'payroll', state);
+    await expect(page.locator('#leave-retry')).toBeVisible();
+    await page.locator('#leave-retry').click();
+    await expect(page.locator('#leave-body tr')).toHaveCount(7);
+    await page.getByRole('tab', { name: 'Pay Periods', exact: true }).click();
+    await page.locator('#periods-retry').click();
+    await expect(page.locator('#register-retry')).toBeVisible();
+    await page.locator('#register-retry').click();
+    await expect(page.locator('#period-body tr')).toHaveCount(3);
+    await page.getByRole('tab', { name: 'Leave Balances', exact: true }).click();
+    await page.locator('#leave-search').fill('no synthetic match');
+    await page.locator('#print-slips').click();
+    await expect(page.locator('#pr-status')).toContainText('Nothing to print');
+    expect(await page.evaluate(() => window.__printCalls || 0)).toBe(0);
+    for (const kind of ['errors', 'unknown', 'missing', 'writes']) expect(events[kind]).toEqual([]);
+});
+test('CSS staff workspaces: payroll reconciliation blocks saving and save failures keep the review available', async ({ page }) => {
+    const state = payrollState({ passed: false }), events = await open(page, 'payroll', state);
+    await payrollRead(page, 'leave');
+    await expect(page.locator('#packet-commit')).toBeDisabled();
+    await expect(page.locator('#review-verdict')).toContainText('Nothing can be saved');
+    await page.locator('#packet-discard').click();
+    await expect(page.locator('#review')).toBeHidden();
+    expect(events.writes.map(w => w.path)).toEqual([payrollPrefix + '/parse']);
+    for (const kind of ['errors', 'unknown', 'missing']) expect(events[kind]).toEqual([]);
+});
+test('CSS staff workspaces: payroll save errors can retry the same verified job without another read', async ({ page }) => {
+    let fail = true;
+    const state = payrollState({ respondWrite: async (_req, u) => {
+        if (u.pathname === payrollPrefix + '/import' && fail) { fail = false; return { status: 503, json: { error: 'Synthetic save unavailable', detail: ['Synthetic retry detail'] } }; }
+        return null;
+    } }), events = await open(page, 'payroll', state);
+    await payrollRead(page, 'packet');
+    await page.locator('#packet-commit').click();
+    await expect(page.locator('#pr-status')).toContainText('Synthetic retry detail');
+    await expect(page.locator('#packet-commit')).toBeEnabled();
+    await expect(page.locator('#review')).toBeVisible();
+    await page.locator('#packet-commit').click();
+    await expect(page.locator('#pr-status')).toContainText('Saved 2 of 2');
+    expect(events.writes.filter(w => w.path.endsWith('/import')).map(w => JSON.parse(w.body))).toEqual([{ jobId: 'synthetic-1' }, { jobId: 'synthetic-1' }]);
+    for (const kind of ['errors', 'unknown', 'missing']) expect(events[kind]).toEqual([]);
+});
+test('CSS staff workspaces: changing payroll document while upload is pending discards the late response', async ({ page }) => {
+    let release, started;
+    const arrived = new Promise(resolve => { started = resolve; });
+    const state = payrollState({ respondWrite: async (_req, u) => {
+        if (u.pathname === payrollPrefix + '/parse' && !release) {
+            started(); return new Promise(resolve => { release = () => resolve({ json: { jobId: 'synthetic-abandoned' } }); });
+        }
+        return null;
+    } }), events = await open(page, 'payroll', state);
+    await page.getByRole('tab', { name: 'Upload Packet' }).click();
+    await page.locator('#packet-file').setInputFiles({ name: 'synthetic-delayed.pdf', mimeType: 'application/pdf', buffer: Buffer.from('%PDF-1.4\nSynthetic only.\n%%EOF') });
+    await page.locator('#packet-parse').click(); await arrived;
+    await page.locator('#packet-mode').selectOption('leave');
+    release();
+    await expect(page.locator('#pr-status')).toContainText('cancelled');
+    await expect(page.locator('#packet-parse')).toBeEnabled();
+    await expect(page.locator('#packet-progress')).toBeHidden();
+    await page.waitForTimeout(3300);
+    await expect(page.locator('#review')).toBeHidden();
+    expect(state.polls).toBe(0);
+    for (const kind of ['errors', 'unknown', 'missing']) expect(events[kind]).toEqual([]);
+});
+test('CSS staff workspaces: payroll redesign preserves every synthetic calculation, paper value and import payload', async ({ page }) => {
+    const current = await payrollWorkflow(page, false), original = require('../fixtures/staff-workspaces-payroll-original-browser.json');
+    for (const key of ['leave', 'flags', 'periods', 'filtered', 'csv', 'slips', 'printStatus', 'reviews', 'writes']) expect(current[key], key).toEqual(original[key]);
+    for (const view of current.views) {
+        const before = original.views.find(v => v.width === view.width && v.tab === view.tab);
+        expect(view.text.toLowerCase()).toBe(before.text.toLowerCase());
+        expect(view.scrollWidth, view.tab + ' at ' + view.width).toBeLessThanOrEqual(view.width);
+    }
+});
+test('CSS staff workspaces: payroll keyboard, responsive tables and accessibility across all views', async ({ page }) => {
+    const events = await open(page, 'payroll', payrollState()), reports = [];
+    await expect(page.locator('#leave-body tr')).toHaveCount(7);
+    await page.locator('#tab-leave').focus();
+    for (const [key, id] of [['ArrowRight', 'tab-periods'], ['End', 'tab-upload'], ['ArrowRight', 'tab-leave'], ['ArrowLeft', 'tab-upload'], ['Home', 'tab-leave']]) {
+        await page.keyboard.press(key); await expect(page.locator('#' + id)).toBeFocused(); await expect(page.locator('#' + id)).toHaveAttribute('aria-selected', 'true');
+    }
+    for (const width of [1440, 768, 390, 320]) {
+        await page.setViewportSize({ width, height: 1000 });
+        for (const tab of ['Leave Balances', 'Pay Periods', 'Upload Packet']) {
+            await page.getByRole('tab', { name: tab, exact: true }).click();
+            const audit = await new AxeBuilder({ page }).analyze();
+            expect(audit.violations, tab + ' ' + width + ': ' + JSON.stringify(audit.violations.map(v => ({ id: v.id, nodes: v.nodes.map(n => n.target) })))).toEqual([]);
+            expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
+            reports.push({ width, tab, violations: audit.violations.length });
+        }
+    }
+    await page.getByRole('tab', { name: 'Leave Balances', exact: true }).click();
+    const region = page.locator('#panel-leave .pr-tablewrap');
+    await region.focus(); await page.keyboard.press('ArrowRight');
+    await expect.poll(() => region.evaluate(n => n.scrollLeft)).toBeGreaterThan(0);
+    for (const mode of ['packet', 'leave']) {
+        await payrollRead(page, mode);
+        expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+        expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(320);
+        await page.locator('#packet-discard').click();
+        await expect(page.locator('#review')).toBeHidden();
+    }
+    for (const kind of ['errors', 'unknown', 'missing']) expect(events[kind]).toEqual([]);
+    expect(events.writes.map(w => w.path)).toEqual([payrollPrefix + '/parse', payrollPrefix + '/parse']);
+    fs.writeFileSync(path.join(output, 'staff-workspaces-payroll-accessibility.json'), JSON.stringify(reports, null, 2) + '\n');
+});
 const payrollPrefix = '/api/crm-proxy/payroll';
 function payrollState(options = {}) {
     const state = { ...options, mode: 'packet', job: 0, polls: 0 };
