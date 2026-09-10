@@ -1150,3 +1150,7 @@ Exact-source CI 34440499535 passed all four jobs on c8523b2655fd1dadb2bdcf678309
 ## Personalization review record
 
 Reviewed source 315cc03bea6e9e235a5ea46e48113d0a40144ce5;57 focused browser/288 preservation-CSS-QA checks;167 source mappings;8PDFs/18pages;4retired owners/78408bytes/9flags. Full integration and release checks follow.
+
+## Personalization release checks complete — v2026.09.10.1
+
+Full integrated source passed build/lint/types,485routes/24modules,233unit suites/5409tests/four existing skips,88DOM,four accessibility unit,84quote parity,736mocked browser,16remaining browser/three optional screenshot skips,all five calculators,273CSS clean,boot200 and production audit zero.57 focused personalization scenarios;288 preservation/CSS/name-QA/historical checks;8PDF outputs/18reviewed pages.22 original hashes/167 reversible mappings;4retired owners/78408bytes/9flags. Live remains158/67 until exact-source CI and verified release raises it to162/63.
