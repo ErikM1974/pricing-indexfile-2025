@@ -5109,6 +5109,35 @@
         "rawCssBytes": 263878,
         "localCssRequests": 7
       }
+    },
+    {
+      "source": "dashboards/company-numbers.html",
+      "family": "staff-workspace",
+      "status": "pilot",
+      "route": "/dashboards/company-numbers.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/staff-company-numbers.css"
+      ],
+      "dynamicStyles": [],
+      "dynamicTokens": [],
+      "states": [
+        "eight-live-widgets-five-widths-original-money-and-date-ranges",
+        "empty-and-failed-load-recovery",
+        "failed-refresh-clears-old-figures-and-per-card-retry-updates-freshness",
+        "obsolete-revenue-response-cannot-change-current-range",
+        "missing-comparison-and-fallback-goals-are-clearly-labelled",
+        "complete-readable-company-report-on-letter-paper"
+      ],
+      "test": "tests/e2e/css-unification-company-numbers.spec.js",
+      "maxCssBytes": 96417,
+      "measuredRawCssBytes": 95393,
+      "baseline": {
+        "commit": "0f151e3899b8517092b1864babd8ea7f579fc95b",
+        "rawCssBytes": 215633,
+        "localCssRequests": 8
+      }
     }
   ],
   "billingContentSha256": "d85f8530e03a1863d1b8bb2ebe97ba332d5c9e3411887d1eb2d02dcdb14c0863",

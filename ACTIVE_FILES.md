@@ -1,5 +1,12 @@
 # Active Files Registry
 
+- `tests/fixtures/staff-workspaces-company-original-{browser,empty,failure}.json` — Verified original Company Numbers values, ranges, empty/error and recovery baselines.
+
+- `shared_components/css/staff-company-numbers.css` — Scoped Company Numbers owner; replaces `dashboards/css/company-numbers.css`. Shared staff-dashboard sheets remain for their other consumers.
+
+- `tests/fixtures/staff-workspaces-company-synthetic.json` — Explicitly synthetic eight-widget Company Numbers records, costs and date-window baselines.
+- `tests/e2e/css-unification-company-numbers.spec.js` — Fail-closed original/current Company Numbers browser, range, refresh, error and paper review.
+
 - `tests/fixtures/staff-workspaces-ae-original-{expanded,rep,secondRep,degraded,documents}.json` — Verified original Mission Control drawer, identity and synthetic paper baselines; existing browser/actions fixtures refreshed from the completed original checks.
 
 - Retired `dashboards/css/ae-mission-control.css`; its two HTML consumers use `shared_components/css/staff-mission-control.css`. Original stylesheet retained in the source-preservation fixture.

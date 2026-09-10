@@ -22,7 +22,7 @@ const read = (rel) => fs.readFileSync(path.join(ROOT, rel), 'utf8');
 const html = read('dashboards/company-numbers.html');
 const doc = new DOMParser().parseFromString(html, 'text/html');
 const entry = read('dashboards/js/company-numbers.js');
-const css = read('dashboards/css/company-numbers.css');
+const css = read('shared_components/css/staff-company-numbers.css');
 const artWidget = read('staff-dashboard-v3/art-aging-widget.js');
 const uiUtils = read('shared_components/js/staff-dashboard/core/dashboard-ui-utils.js');
 const shopworks = read('shared_components/js/staff-dashboard/services/shopworks-service.js');

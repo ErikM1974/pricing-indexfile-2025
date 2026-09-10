@@ -23,7 +23,7 @@
    ===================================================== */
 
 import { dashboardFetchJson } from '../core/dashboard-fetch.js';
-import { showApiError, clearApiError } from '../core/dashboard-errors.js';
+import { showApiError, clearApiError, reportWidgetResult } from '../core/dashboard-errors.js';
 import { escapeHtml, formatMoney } from '../core/dashboard-ui-utils.js';
 
 const ENDPOINT = '/api/crm-proxy/ae-dashboard/due-dates-all?days=30';
@@ -96,13 +96,15 @@ async function loadProduction(refresh = false) {
         const d = await dashboardFetchJson(ENDPOINT + (refresh ? '&refresh=1' : ''));
         if (d?.error) throw new Error(d.details || d.error);
         renderProduction(d);
-        return d;
+        return reportWidgetResult('production', d);
     } catch (err) {
+        for (const id of ['production-late', 'production-risk', 'production-nopo', 'production-ontrack']) put(id, null);
+        el('production-asof')?.replaceChildren();
         showApiError('production', err, {
             onRetry: () => loadProduction(true),
             detail: 'ShopWorks due dates are unavailable (ORDER_ODBC mirror). Nothing is shown rather than a stale list — a blank board would read as "nothing is late".',
         });
-        return null;
+        return reportWidgetResult('production', null);
     }
 }
 

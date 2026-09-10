@@ -18,7 +18,7 @@
 
 import { register } from '../core/dashboard-events.js';
 import { dashboardFetchJson } from '../core/dashboard-fetch.js';
-import { showApiError, clearApiError } from '../core/dashboard-errors.js';
+import { showApiError, clearApiError, reportWidgetResult } from '../core/dashboard-errors.js';
 import { escapeHtml, formatMoney as money } from '../core/dashboard-ui-utils.js';
 import { endpoints } from '../core/dashboard-endpoints.js';
 
@@ -129,12 +129,15 @@ export async function loadEmbroideryBonus(refresh = false) {
         const data = await dashboardFetchJson(endpoints.embroideryBonusTeam());
         if (data.success === false) throw new Error(data.error || 'Q3 team goal unavailable');
         renderStrip(data);
+        return reportWidgetResult('bonus', true, data.configSource !== 'fallback');
     } catch (err) {
+        document.getElementById(DATE_RANGE_ID)?.replaceChildren();
         // Never fall back to a stale number — a wrong goal is worse than an error.
         showApiError('embroidery-bonus', err, {
             onRetry: () => loadEmbroideryBonus(true),
             detail: 'Q3 team goal unavailable. Not shown rather than shown stale.',
         });
+        return reportWidgetResult('bonus', false);
     }
 }
 

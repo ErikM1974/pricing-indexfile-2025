@@ -4197,3 +4197,24 @@ Keep version choices tied to measured checks and compare screenshots only after 
 ## DTF browser readiness (2026-09-07, archived)
 
 Wait for functional initialization before typing; retain failed and successful save coverage. Full entry in LESSONS_LEARNED_ARCHIVE.md.
+
+
+## 2026-09-08 — CI was red for nine hours and nobody noticed, because every local gate was green
+
+**Problem.** Every GitHub CI run from 2026-09-07 15:54 through the twenty-two releases that followed failed, on
+two assistants' commits alike. Nobody looked, because the deploy loop runs the same suites locally and those were
+green every time. Two causes, both environmental: a unit test read a file from the SIBLING repository
+(`../caspio-pricing-proxy/src/routes/ae-dashboard.js`), which the runner never checks out; and the Playwright
+money-path and calculator-parity specs price through the LIVE proxy, whose reads have required `CRM_API_SECRET`
+since the quote-plane lockdown — the repository has no Actions secrets, so every run ended in "engine error".
+**Root cause.** Tests that assume the developer machine (a sibling checkout, a secret in the environment) with no
+guard, and a CI whose red state had no reader.
+**Solution.** The cross-repo assertion skips with a warning when the sibling is absent. The e2e job is split: the
+rendered axe ratchet always runs; the live-engine specs run only when `CRM_API_SECRET` is configured as an Actions
+secret and are reported as skipped otherwise (the /deploy pre-flight runs them locally with the real secret, so a
+skip never means untested).
+**Prevention.** 🔑 A test that reads outside the repository or needs a secret must guard for its absence and SAY
+it skipped. 🔑 `gh run list -L 5` belongs in the deploy pre-flight: local green is not CI green. 🔑 To switch the
+live-engine specs back on in CI, add `CRM_API_SECRET` under Settings → Secrets → Actions.
+
+CI setup follow-up (2026-09-09): a Google Chrome apt index checksum mismatch blocked Playwright before tests on two runners. CI uses bundled Chromium; disable only the unrelated Google Chrome source on the disposable runner and keep Ubuntu repositories/checksum verification intact. Require the actual browser steps to pass on the new exact commit.

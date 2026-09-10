@@ -1,0 +1,406 @@
+{
+  "description": "Entirely synthetic Company Numbers records and monetary values for local browser checks. Real configured rep names identify the existing routing branches; no production records or requests.",
+  "orders": [
+    {
+      "id_Order": 810001,
+      "date_Invoiced": "2026-09-10",
+      "cur_SubTotal": 1250,
+      "CustomerName": "Sample Workshop A",
+      "CustomerPurchaseOrder": "STANDARD-1",
+      "ContactFirstName": "Cedar",
+      "ContactLastName": "Example",
+      "ContactPhone": "2535550100",
+      "ContactEmail": "cedar@example.test"
+    },
+    {
+      "id_Order": 810002,
+      "date_Invoiced": "2026-09-08",
+      "cur_SubTotal": 720,
+      "CustomerName": "Sample Workshop B",
+      "CustomerPurchaseOrder": "STANDARD-2",
+      "ContactFirstName": "Cedar",
+      "ContactLastName": "Example",
+      "ContactPhone": "2535550100",
+      "ContactEmail": "cedar@example.test"
+    },
+    {
+      "id_Order": 810003,
+      "date_Invoiced": "2026-09-05",
+      "cur_SubTotal": 120,
+      "CustomerName": "Sample Workshop C",
+      "CustomerPurchaseOrder": "SAMPLE-3",
+      "ContactFirstName": "Cedar",
+      "ContactLastName": "Example",
+      "ContactPhone": "2535550100",
+      "ContactEmail": "cedar@example.test"
+    },
+    {
+      "id_Order": 810004,
+      "date_Invoiced": "2026-09-02",
+      "cur_SubTotal": 180,
+      "CustomerName": "Sample Workshop D",
+      "CustomerPurchaseOrder": "SAM0902-4004",
+      "ContactFirstName": "Cedar",
+      "ContactLastName": "Example",
+      "ContactPhone": "2535550100",
+      "ContactEmail": "cedar@example.test"
+    },
+    {
+      "id_Order": 810005,
+      "date_Invoiced": "2026-08-28",
+      "cur_SubTotal": 2400,
+      "CustomerName": "Sample Workshop E",
+      "CustomerPurchaseOrder": "STANDARD-5",
+      "ContactFirstName": "Cedar",
+      "ContactLastName": "Example",
+      "ContactPhone": "2535550100",
+      "ContactEmail": "cedar@example.test"
+    },
+    {
+      "id_Order": 810006,
+      "date_Invoiced": "2026-08-15",
+      "cur_SubTotal": 350,
+      "CustomerName": "Sample Workshop F",
+      "CustomerPurchaseOrder": "STANDARD-6",
+      "ContactFirstName": "Cedar",
+      "ContactLastName": "Example",
+      "ContactPhone": "2535550100",
+      "ContactEmail": "cedar@example.test"
+    },
+    {
+      "id_Order": 810007,
+      "date_Invoiced": "2026-07-25",
+      "cur_SubTotal": 975,
+      "CustomerName": "Sample Workshop G",
+      "CustomerPurchaseOrder": "STANDARD-7",
+      "ContactFirstName": "Cedar",
+      "ContactLastName": "Example",
+      "ContactPhone": "2535550100",
+      "ContactEmail": "cedar@example.test"
+    },
+    {
+      "id_Order": 810008,
+      "date_Invoiced": "2026-06-30",
+      "cur_SubTotal": 600,
+      "CustomerName": "Sample Workshop H",
+      "CustomerPurchaseOrder": "STANDARD-8",
+      "ContactFirstName": "Cedar",
+      "ContactLastName": "Example",
+      "ContactPhone": "2535550100",
+      "ContactEmail": "cedar@example.test"
+    },
+    {
+      "id_Order": 810009,
+      "date_Invoiced": "2026-08-20",
+      "cur_SubTotal": 80,
+      "CustomerName": "Sample Workshop A",
+      "CustomerPurchaseOrder": "SAMPLE-9",
+      "ContactFirstName": "Cedar",
+      "ContactLastName": "Example",
+      "ContactPhone": "2535550100",
+      "ContactEmail": "cedar@example.test"
+    },
+    {
+      "id_Order": 810010,
+      "date_Invoiced": "2026-08-26",
+      "cur_SubTotal": 90,
+      "CustomerName": "Sample Workshop I",
+      "CustomerPurchaseOrder": "SAMMAMISH HS 4471",
+      "ContactFirstName": "Cedar",
+      "ContactLastName": "Example",
+      "ContactPhone": "2535550100",
+      "ContactEmail": "cedar@example.test"
+    }
+  ],
+  "quotes": [
+    {
+      "QuoteID": "3DT0910-1001",
+      "Status": "Processed",
+      "TotalAmount": 1200,
+      "TaxAmount": 120,
+      "CreatedAt": "2026-09-10T09:00:00",
+      "CompanyName": "Synthetic screenprint workshop"
+    },
+    {
+      "QuoteID": "SAM0908-1002",
+      "Status": "Payment Confirmed",
+      "TotalAmount": 200,
+      "TaxAmount": 20,
+      "CreatedAt": "2026-09-08T09:00:00",
+      "CompanyName": "Synthetic sample workshop"
+    },
+    {
+      "QuoteID": "EMB0901-1003",
+      "Status": "Accepted",
+      "TotalAmount": 640,
+      "TaxAmount": 64,
+      "CreatedAt": "2026-09-01T09:00:00",
+      "CompanyName": "Synthetic embroidery workshop"
+    },
+    {
+      "QuoteID": "DTF0827-1004",
+      "Status": "Accepted",
+      "TotalAmount": 920,
+      "TaxAmount": 92,
+      "CreatedAt": "2026-08-27T09:00:00",
+      "CompanyName": "Synthetic transfer workshop with a deliberately long company name"
+    },
+    {
+      "QuoteID": "CAP0910-1005",
+      "Status": "ShopWorks Failed",
+      "TotalAmount": 450,
+      "TaxAmount": 45,
+      "CreatedAt": "2026-09-10T09:00:00",
+      "CompanyName": "Synthetic exception workshop"
+    }
+  ],
+  "payments": [
+    {
+      "quoteID": "3DT0910-1001",
+      "type": "order",
+      "amount": 1320,
+      "created": "2026-09-10T09:00:00",
+      "companyName": "Synthetic screenprint workshop",
+      "payerEmail": "cedar@example.test"
+    },
+    {
+      "quoteID": "SAM0908-1002",
+      "type": "samples-order",
+      "amount": 220,
+      "created": "2026-09-08T09:00:00",
+      "companyName": "Synthetic sample workshop",
+      "payerEmail": "aster@example.test"
+    },
+    {
+      "quoteID": "EMB0901-1003",
+      "type": "deposit",
+      "amount": 352,
+      "created": "2026-09-01T09:00:00",
+      "companyName": "Synthetic embroidery workshop",
+      "payerEmail": "cedar@example.test"
+    },
+    {
+      "quoteID": "CAP0828-1006",
+      "type": "refund",
+      "amount": -50,
+      "created": "2026-08-28T09:00:00",
+      "companyName": "Synthetic cap workshop",
+      "payerEmail": "aster@example.test"
+    }
+  ],
+  "archive": {
+    "success": true,
+    "year": 2026,
+    "reps": [
+      {
+        "name": "Taneisha Clark",
+        "totalRevenue": 500000,
+        "totalOrders": 500
+      },
+      {
+        "name": "Nika Lao",
+        "totalRevenue": 400000,
+        "totalOrders": 400
+      },
+      {
+        "name": "House",
+        "totalRevenue": 250000,
+        "totalOrders": 250
+      },
+      {
+        "name": "DEAD",
+        "totalRevenue": 50000,
+        "totalOrders": 50
+      },
+      {
+        "name": "Ruthie",
+        "totalRevenue": 100000,
+        "totalOrders": 100
+      }
+    ],
+    "lastArchivedDate": "2026-09-08",
+    "totalRevenue": 1300000,
+    "totalOrders": 1300
+  },
+  "team": {
+    "success": true,
+    "quarter": "Q3",
+    "year": 2026,
+    "scope": "team",
+    "reps": {},
+    "configSource": "caspio",
+    "dateRange": {
+      "start": "2026-07-01",
+      "end": "2026-09-30"
+    },
+    "teamKicker": {
+      "companyRevenue": 220000,
+      "tiers": [
+        {
+          "target": 200000
+        },
+        {
+          "target": 240000
+        },
+        {
+          "target": 280000
+        }
+      ],
+      "next": {
+        "target": 240000
+      },
+      "amountToNext": 20000
+    }
+  },
+  "due": {
+    "today": "2026-09-10",
+    "lookbackDays": 30,
+    "ordersScanned": 160,
+    "counts": {
+      "late": 4,
+      "atRisk": 3,
+      "dueSoonOnTrack": 5
+    },
+    "late": [
+      {
+        "idOrder": 820001,
+        "company": "Synthetic due-date workshop 1",
+        "rep": "Taneisha Clark",
+        "dueDate": "2026-09-06",
+        "daysUntilDue": -4,
+        "blanks": "none",
+        "subtotal": 300,
+        "orderType": "Embroidery"
+      },
+      {
+        "idOrder": 820002,
+        "company": "Synthetic due-date workshop 2",
+        "rep": "Nika Lao",
+        "dueDate": "2026-09-07",
+        "daysUntilDue": -3,
+        "blanks": "ordered",
+        "subtotal": 600,
+        "orderType": "Embroidery"
+      },
+      {
+        "idOrder": 820003,
+        "company": "Synthetic due-date workshop 3",
+        "rep": "Taneisha Clark",
+        "dueDate": "2026-09-08",
+        "daysUntilDue": -2,
+        "blanks": "partial",
+        "subtotal": 900,
+        "orderType": "Embroidery"
+      },
+      {
+        "idOrder": 820004,
+        "company": "Synthetic due-date workshop 4",
+        "rep": "Nika Lao",
+        "dueDate": "2026-09-09",
+        "daysUntilDue": -1,
+        "blanks": "received",
+        "subtotal": 1200,
+        "orderType": "Embroidery"
+      }
+    ],
+    "atRisk": [
+      {
+        "idOrder": 820011,
+        "company": "Synthetic risk workshop 1",
+        "rep": "House",
+        "dueDate": "2026-09-11",
+        "daysUntilDue": 1,
+        "blanks": "ordered",
+        "subtotal": 250,
+        "orderType": "DTG"
+      },
+      {
+        "idOrder": 820012,
+        "company": "Synthetic risk workshop 2",
+        "rep": "House",
+        "dueDate": "2026-09-12",
+        "daysUntilDue": 2,
+        "blanks": "ordered",
+        "subtotal": 500,
+        "orderType": "DTG"
+      },
+      {
+        "idOrder": 820013,
+        "company": "Synthetic risk workshop 3",
+        "rep": "House",
+        "dueDate": "2026-09-13",
+        "daysUntilDue": 3,
+        "blanks": "ordered",
+        "subtotal": 750,
+        "orderType": "DTG"
+      }
+    ]
+  },
+  "art": [
+    {
+      "ID_Design": 830001,
+      "CompanyName": "Synthetic artwork workshop 1",
+      "Status": "Submitted",
+      "Date_Created": "2026-07-30T09:00:00",
+      "Date_Updated": "2026-07-30T09:00:00",
+      "Is_On_Hold": false
+    },
+    {
+      "ID_Design": 830002,
+      "CompanyName": "Synthetic artwork workshop 2",
+      "Status": "In Progress",
+      "Date_Created": "2026-08-15T09:00:00",
+      "Date_Updated": "2026-08-15T09:00:00",
+      "Is_On_Hold": false
+    },
+    {
+      "ID_Design": 830003,
+      "CompanyName": "Synthetic artwork workshop 3",
+      "Status": "Awaiting Approval",
+      "Date_Created": "2026-08-30T09:00:00",
+      "Date_Updated": "2026-08-30T09:00:00",
+      "Is_On_Hold": false
+    },
+    {
+      "ID_Design": 830004,
+      "CompanyName": "Synthetic artwork workshop 4",
+      "Status": "Submitted",
+      "Date_Created": "2026-09-01T09:00:00",
+      "Date_Updated": "2026-09-01T09:00:00",
+      "Is_On_Hold": false
+    },
+    {
+      "ID_Design": 830005,
+      "CompanyName": "Synthetic artwork workshop 5",
+      "Status": "In Progress",
+      "Date_Created": "2026-09-04T09:00:00",
+      "Date_Updated": "2026-09-04T09:00:00",
+      "Is_On_Hold": false
+    },
+    {
+      "ID_Design": 830006,
+      "CompanyName": "Synthetic artwork workshop 6",
+      "Status": "Awaiting Approval",
+      "Date_Created": "2026-09-06T09:00:00",
+      "Date_Updated": "2026-09-06T09:00:00",
+      "Is_On_Hold": false
+    },
+    {
+      "ID_Design": 830007,
+      "CompanyName": "Synthetic artwork workshop 7",
+      "Status": "Submitted",
+      "Date_Created": "2026-09-09T09:00:00",
+      "Date_Updated": "2026-09-09T09:00:00",
+      "Is_On_Hold": false
+    }
+  ],
+  "goal": {
+    "data": [
+      {
+        "ServiceCode": "CO-ANNUAL-GOAL",
+        "SellPrice": 4000000,
+        "IsActive": true
+      }
+    ]
+  }
+}

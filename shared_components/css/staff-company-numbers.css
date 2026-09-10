@@ -1,0 +1,1316 @@
+/* Company Numbers: shared typography and controls, scoped live reporting layouts. */
+@layer components.pages {
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"]) {
+        --accent: var(--ui-accent);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .cn-shell {
+        width: 100%;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .main-content {
+        max-width: 1600px;
+        margin: 0 auto;
+        padding: var(--space-5);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .top-header {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-4);
+        margin: calc(-1 * var(--space-5)) calc(-1 * var(--space-5))
+            var(--space-6);
+        padding: var(--space-4) var(--space-5);
+        background: var(--gray-900);
+        color: var(--color-on-brand);
+        border-top: 3px solid var(--amber-400);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .header-left,
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .header-right {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: var(--space-3);
+        min-width: 0;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .header-right {
+        justify-content: flex-end;
+        flex: 1 1 26rem;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .page-title {
+        font-size: var(--font-size-xl);
+        margin: 0;
+        color: inherit;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .cn-back {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-2);
+        min-height: 44px;
+        padding: var(--space-2) var(--space-3);
+        border: 1px solid var(--gray-500);
+        border-radius: var(--radius-sm);
+        color: var(--color-on-brand);
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .cn-meta {
+        max-width: 50rem;
+        font-size: var(--font-size-md);
+        color: var(--gray-200);
+        line-height: 1.5;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .cn-refresh,
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .date-range-btn,
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .dashboard-error__retry,
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .aa-retry {
+        min-height: 44px;
+        padding: var(--space-2) var(--space-3);
+        border: 1px solid var(--ui-line-strong);
+        border-radius: var(--radius-sm);
+        font: inherit;
+        background: var(--ui-surface);
+        color: var(--ui-ink);
+        cursor: pointer;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .cn-refresh {
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        :is(button, a):focus-visible {
+        outline: 3px solid var(--ui-accent);
+        outline-offset: 3px;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .top-header
+        :is(button, a):focus-visible {
+        outline-color: var(--amber-400);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        button:disabled {
+        opacity: 0.65;
+        cursor: wait;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .dashboard-zones {
+        display: grid;
+        gap: var(--space-5);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        :is(
+            .zone-orders-inbox,
+            .zone-payments,
+            .zone-sample-pipeline,
+            .metrics-card,
+            .production-widget-card,
+            .embroidery-bonus-card
+        ) {
+        min-width: 0;
+        background: var(--ui-surface);
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-md);
+        padding: var(--space-5);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        :is(
+            .zone-header,
+            .metrics-revenue-header,
+            .metrics-team-header,
+            .production-header
+        ) {
+        display: flex;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: var(--space-2) var(--space-3);
+        margin-bottom: var(--space-4);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        :is(
+            .zone-title,
+            .metrics-revenue-title,
+            .metrics-team-title,
+            .production-title
+        ) {
+        margin: 0;
+        font-size: var(--font-size-lg);
+        font-weight: 650;
+        line-height: 1.35;
+        color: var(--ui-ink);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        :is(
+            .zone-title,
+            .metrics-revenue-title,
+            .metrics-team-title,
+            .production-title
+        )
+        i {
+        color: var(--ui-accent);
+        margin-right: var(--space-1);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        :is(
+            .zone-subtitle,
+            .metrics-date-range,
+            .cn-sub,
+            .cn-stamp,
+            .cn-win,
+            .metrics-ytd-label,
+            .metrics-ytd-note,
+            .metrics-comparison-label,
+            .inbox-row-sub,
+            .rep-orders,
+            .rep-subtitle,
+            .pipeline-sub,
+            .aa-status,
+            .cn-due-sub,
+            .cn-due-label,
+            .cn-due-blanks,
+            .cn-due-wo,
+            .cn-due-more,
+            .production-footer,
+            .aa-more,
+            .eb-team-label,
+            .eb-team-note,
+            .embroidery-bonus-loading,
+            .inbox-empty,
+            .rep-empty,
+            .rep-loading,
+            .production-empty,
+            .aa-clear,
+            .dashboard-error__detail,
+            .dashboard-error__cause
+        ) {
+        font-size: var(--font-size-md);
+        line-height: 1.5;
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .zone-subtitle {
+        flex: 1 1 15rem;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .cn-stamp {
+        margin-left: auto;
+        font-variant-numeric: tabular-nums;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .cn-stamp:empty {
+        display: none;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .cn-stamp.is-failed {
+        color: var(--red-700);
+        font-weight: 600;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        :is(.zone-money-row, .zone-metrics, .inbox-columns) {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: var(--space-5);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .col-span-full {
+        grid-column: 1 / -1;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .inbox-col {
+        min-width: 0;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .inbox-col-title {
+        display: flex;
+        align-items: baseline;
+        flex-wrap: wrap;
+        gap: var(--space-2);
+        font-size: var(--font-size-md);
+        margin: 0 0 var(--space-3);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        :is(.inbox-list, .pay-list, .pipeline-list) {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: grid;
+        gap: var(--space-2);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        :is(.inbox-row, .pipeline-row) {
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr) auto;
+        align-items: center;
+        gap: var(--space-3);
+        padding: var(--space-3);
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-sm);
+        color: var(--ui-ink);
+        text-decoration: none;
+        min-height: 56px;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        a.inbox-row:hover {
+        background: var(--gray-50);
+        border-color: var(--ui-line-strong);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .inbox-row-main,
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .pipeline-main {
+        min-width: 0;
+        display: grid;
+        gap: var(--space-1);
+        overflow-wrap: anywhere;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .inbox-row-title,
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .pipeline-company {
+        font-weight: 600;
+        line-height: 1.4;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .inbox-row-amount {
+        font-family: var(--font-mono);
+        font-weight: 600;
+        white-space: nowrap;
+        font-size: var(--font-size-md);
+        color: var(--ui-ink);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .inbox-chip {
+        padding: var(--space-1) var(--space-2);
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-sm);
+        background: var(--gray-50);
+        font-size: var(--font-size-md);
+        font-weight: 600;
+        color: var(--gray-700);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        :is(.inbox-chip--pay, .inbox-chip--sam, .inbox-chip--3dt) {
+        background: var(--brand-100);
+        color: var(--brand-800);
+        border-color: var(--brand-100);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .inbox-chip--emb {
+        background: var(--amber-100);
+        color: var(--amber-800);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .pipeline-row {
+        grid-template-columns: auto minmax(0, 1fr) auto auto;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .pipeline-actions {
+        display: flex;
+        gap: var(--space-2);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .pipeline-act {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 44px;
+        height: 44px;
+        border: 1px solid var(--ui-line-strong);
+        border-radius: var(--radius-sm);
+        text-decoration: none;
+        color: var(--ui-accent);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .pay-totals {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: var(--space-3);
+        margin-bottom: var(--space-4);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .pay-total {
+        padding: var(--space-3);
+        background: var(--gray-50);
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-sm);
+        min-width: 0;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .pay-total-label {
+        font-size: var(--font-size-md);
+        color: var(--ui-muted);
+        margin-bottom: var(--space-2);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .pay-total-value {
+        font-family: var(--font-mono);
+        font-size: clamp(1rem, 1.4vw, 1.5rem);
+        font-weight: 650;
+        overflow-wrap: anywhere;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .date-range-toggle {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-1);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .date-range-btn[aria-pressed="true"] {
+        background: var(--ui-accent);
+        border-color: var(--ui-accent);
+        color: var(--color-on-brand);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .metrics-revenue-value {
+        font-family: var(--font-mono);
+        font-size: clamp(1.5rem, 3vw, 2.5rem);
+        font-weight: 650;
+        letter-spacing: -0.025em;
+        overflow-wrap: anywhere;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .metrics-revenue-sparkline {
+        height: 84px;
+        margin: var(--space-4) 0;
+        overflow: hidden;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .metrics-revenue-sparkline
+        svg {
+        width: 100%;
+        height: 100%;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .metrics-revenue-comparison {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: var(--space-2);
+        margin-top: var(--space-3);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .metrics-comparison-badge {
+        padding: var(--space-1) var(--space-2);
+        border-radius: var(--radius-sm);
+        font-size: var(--font-size-md);
+        background: var(--gray-100);
+        color: var(--ui-ink);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .metrics-comparison-badge.positive {
+        background: var(--brand-100);
+        color: var(--brand-800);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        :is(
+            .metrics-comparison-badge.negative,
+            .metrics-comparison-badge.warning
+        ) {
+        background: var(--amber-100);
+        color: var(--amber-800);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .metrics-ytd {
+        display: flex;
+        align-items: baseline;
+        flex-wrap: wrap;
+        gap: var(--space-2);
+        padding-top: var(--space-4);
+        margin-top: var(--space-4);
+        border-top: 1px solid var(--ui-line);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .metrics-ytd-value {
+        font-family: var(--font-mono);
+        font-weight: 600;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .metrics-revenue-stats {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-3);
+        padding-top: var(--space-3);
+        font-size: var(--font-size-md);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"]) .num {
+        font-family: var(--font-mono);
+        font-variant-numeric: tabular-nums;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .rep-list {
+        display: grid;
+        gap: var(--space-3);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .rep-card {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: var(--space-2) var(--space-4);
+        padding: var(--space-3);
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-sm);
+        text-decoration: none;
+        color: var(--ui-ink);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .rep-card--link:hover {
+        border-color: var(--ui-accent);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .rep-info {
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
+        min-width: 0;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .rep-avatar {
+        display: grid;
+        place-items: center;
+        width: 36px;
+        height: 36px;
+        flex: none;
+        border-radius: 50%;
+        background: var(--brand-100);
+        color: var(--brand-800);
+        font-size: var(--font-size-md);
+        font-weight: 600;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .rep-name-group {
+        min-width: 0;
+        overflow-wrap: anywhere;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .rep-name {
+        font-weight: 600;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .rep-stats {
+        grid-column: 2;
+        grid-row: 1;
+        text-align: right;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .rep-revenue {
+        font-family: var(--font-mono);
+        font-weight: 600;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .rep-progress {
+        grid-column: 1/-1;
+        height: 5px;
+        border-radius: var(--radius-sm);
+        background: var(--gray-100);
+        overflow: hidden;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .rep-progress-bar {
+        height: 100%;
+        background: var(--brand-700);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .aa-chips,
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .cn-due-tiles {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: var(--space-3);
+        margin-bottom: var(--space-4);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .aa-chip,
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .cn-due-tile {
+        min-width: 0;
+        padding: var(--space-3);
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-sm);
+        background: var(--gray-50);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .aa-chip-num,
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .cn-due-num {
+        font-size: var(--font-size-2xl);
+        font-weight: 650;
+        margin-bottom: var(--space-1);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .aa-chip-label {
+        font-size: var(--font-size-md);
+        line-height: 1.5;
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        :is(
+            .aa-chip--stale,
+            .aa-chip--red,
+            .cn-due-tile--late,
+            .cn-due-tile--nopo
+        ) {
+        background: var(--red-50);
+        border-color: var(--red-300);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        :is(
+            .aa-chip--stale,
+            .aa-chip--red,
+            .cn-due-tile--late,
+            .cn-due-tile--nopo
+        )
+        :is(.aa-chip-num, .cn-due-num) {
+        color: var(--red-700);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .aa-chip--amber,
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .cn-due-tile--risk {
+        background: var(--amber-100);
+        border-color: var(--amber-300);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .aa-chip--amber
+        .aa-chip-num,
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .cn-due-tile--risk
+        .cn-due-num {
+        color: var(--amber-800);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .aa-chip--green,
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .cn-due-tile--ok {
+        background: var(--brand-100);
+        border-color: var(--brand-400);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .aa-chip--green
+        .aa-chip-num,
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .cn-due-tile--ok
+        .cn-due-num {
+        color: var(--brand-800);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .aa-list,
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .cn-due-list {
+        display: grid;
+        gap: var(--space-2);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .aa-row {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto 3rem;
+        align-items: center;
+        gap: var(--space-3);
+        min-height: 48px;
+        padding: var(--space-2) var(--space-3);
+        border: 1px solid var(--ui-line);
+        border-left: 3px solid var(--amber-600);
+        border-radius: var(--radius-sm);
+        text-decoration: none;
+        color: var(--ui-ink);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .aa-company {
+        font-weight: 600;
+        overflow-wrap: anywhere;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        :is(.aa-row--stale, .aa-row--red) {
+        border-left-color: var(--red-700);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .aa-row--amber {
+        border-left-color: var(--amber-600);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .aa-days {
+        font-size: var(--font-size-md);
+        font-weight: 600;
+        text-align: right;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .cn-due-row {
+        display: grid;
+        grid-template-columns: 7rem minmax(0, 1fr) minmax(8rem, auto) auto 6rem;
+        align-items: center;
+        gap: var(--space-3);
+        padding: var(--space-3);
+        border: 1px solid var(--ui-line);
+        border-left: 3px solid var(--amber-600);
+        border-radius: var(--radius-sm);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .cn-due-main {
+        display: grid;
+        min-width: 0;
+        overflow-wrap: anywhere;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .cn-due-company {
+        font-weight: 600;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .cn-due-row--late {
+        border-left-color: var(--red-700);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .cn-due-row--late
+        .cn-due-when,
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .cn-due-blanks--nopo {
+        color: var(--red-700);
+        font-weight: 600;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .cn-due-row--risk
+        .cn-due-when {
+        color: var(--amber-800);
+        font-weight: 600;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .cn-due-value {
+        text-align: right;
+        white-space: nowrap;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        :is(.production-footer, .cn-due-more, .aa-more) {
+        margin-top: var(--space-3);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .eb-team-head {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: var(--space-4);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .eb-team-value {
+        font-size: clamp(1.5rem, 3vw, 2.5rem);
+        font-weight: 650;
+        color: var(--brand-800);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .eb-team-goal-value {
+        font-size: var(--font-size-xl);
+        font-weight: 600;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .eb-ladder-track {
+        height: 9px;
+        background: var(--gray-200);
+        position: relative;
+        margin: var(--space-4) 0 var(--space-3);
+        border-radius: var(--radius-sm);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .eb-ladder-fill {
+        height: 100%;
+        background: var(--brand-700);
+        border-radius: inherit;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .eb-ladder-mark {
+        position: absolute;
+        top: -3px;
+        bottom: -3px;
+        width: 2px;
+        background: var(--gray-500);
+        transform: translateX(-100%);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .eb-team-scale {
+        display: flex;
+        justify-content: space-between;
+        gap: var(--space-2);
+        font-size: var(--font-size-md);
+        font-family: var(--font-mono);
+        flex-wrap: wrap;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .eb-team-tier.is-hit {
+        color: var(--brand-800);
+        font-weight: 600;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .eb-team-note {
+        margin: var(--space-4) 0 0;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        :is(
+            .inbox-failure,
+            .inbox-error,
+            .dashboard-error,
+            .aa-error,
+            .eb-warning,
+            .rep-goal-note
+        ) {
+        display: flex;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: var(--space-3);
+        padding: var(--space-4);
+        margin-bottom: var(--space-4);
+        background: var(--red-50);
+        border: 1px solid var(--red-300);
+        border-left: 4px solid var(--red-700);
+        border-radius: var(--radius-sm);
+        color: var(--red-800);
+        overflow-wrap: anywhere;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        :is(.inbox-failure, .inbox-error, .dashboard-error, .aa-error)
+        a {
+        color: inherit;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .dashboard-error__title {
+        font-weight: 600;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .dashboard-error__body {
+        flex: 1 1 15rem;
+        min-width: 0;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .inbox-failure
+        ul {
+        padding-left: var(--space-4);
+        margin: var(--space-2) 0 0;
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        :is(.rep-goal-note, .eb-warning, .dashboard-error--partial) {
+        background: var(--amber-100);
+        border-color: var(--amber-300);
+        color: var(--amber-800);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .skeleton {
+        display: block;
+        min-height: 2.5rem;
+        background: var(--gray-100);
+        border-radius: var(--radius-sm);
+    }
+
+    :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+        .visually-hidden {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        margin: -1px;
+        padding: 0;
+        border: 0;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+    }
+
+    @media (width >= 1500px) {
+        :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+            .zone-metrics {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+            [id="artAgingCard"] {
+            grid-column: auto;
+        }
+    }
+
+    @media (width <= 1050px) {
+        :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+            .zone-money-row,
+        :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+            .zone-metrics {
+            grid-template-columns: 1fr;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+            .cn-due-row {
+            grid-template-columns: 6rem minmax(0, 1fr) auto;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+            .cn-due-blanks {
+            grid-column: 2;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+            .cn-due-value {
+            grid-column: 3;
+            grid-row: 1;
+        }
+    }
+
+    @media (width <= 650px) {
+        :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+            .main-content {
+            padding: var(--space-3);
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+            .top-header {
+            margin: calc(-1 * var(--space-3)) calc(-1 * var(--space-3))
+                var(--space-4);
+            padding: var(--space-3);
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+            .header-right {
+            justify-content: flex-start;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+            .header-left {
+            width: 100%;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+            .inbox-columns {
+            grid-template-columns: 1fr;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+            :is(
+                .zone-orders-inbox,
+                .zone-payments,
+                .zone-sample-pipeline,
+                .metrics-card,
+                .production-widget-card,
+                .embroidery-bonus-card
+            ) {
+            padding: var(--space-3);
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+            .inbox-row {
+            grid-template-columns: auto minmax(0, 1fr);
+            gap: var(--space-2);
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+            .inbox-row-amount {
+            grid-column: 2;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+            .pipeline-row {
+            grid-template-columns: auto minmax(0, 1fr);
+            gap: var(--space-2);
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+            .pipeline-actions {
+            grid-column: 2;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+            .rep-card {
+            grid-template-columns: 1fr;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+            .rep-stats {
+            grid-column: 1;
+            grid-row: auto;
+            text-align: left;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+            .rep-progress {
+            grid-row: 3;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+            .pay-totals,
+        :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+            .aa-chips,
+        :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+            .cn-due-tiles {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: var(--space-2);
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+            .pay-total:last-child {
+            grid-column: 1/-1;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+            .aa-row {
+            grid-template-columns: minmax(0, 1fr) 3rem;
+            gap: var(--space-1) var(--space-2);
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+            .aa-status {
+            grid-column: 1;
+            grid-row: 2;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+            .aa-days {
+            grid-column: 2;
+            grid-row: 1;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+            .cn-due-row {
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: var(--space-2);
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+            .cn-due-main {
+            grid-column: 1/-1;
+            grid-row: 2;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+            .cn-due-value {
+            grid-column: 2;
+            grid-row: 1;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+            .cn-due-blanks {
+            grid-column: 1;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+            .cn-due-when {
+            grid-column: 2;
+        }
+    }
+
+    @media print {
+        @page company-numbers {
+            size: letter portrait;
+            margin: 0.45in;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="company-numbers"]) {
+            page: company-numbers;
+            background: var(--color-surface);
+            color: var(--print-ink);
+            font-size: 10pt;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+            .main-content {
+            max-width: none;
+            padding: 0;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+            .top-header {
+            background: var(--color-surface);
+            color: var(--print-ink);
+            border: 0;
+            border-bottom: 2px solid var(--gray-800);
+            margin: 0 0 var(--space-4);
+            padding: 0 0 var(--space-3);
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+            .cn-meta {
+            color: var(--gray-700);
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+            :is(
+                .skip-link,
+                .cn-back,
+                .cn-refresh,
+                .date-range-toggle,
+                .zone-refresh,
+                .refresh-btn,
+                .pipeline-actions,
+                .cn-due-more,
+                .aa-more,
+                .production-footer a
+            ) {
+            display: none;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+            :is(.zone-money-row, .zone-metrics, .inbox-columns) {
+            display: block;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+            :is(
+                .zone-payments,
+                .zone-sample-pipeline,
+                .metrics-card,
+                .production-widget-card,
+                .embroidery-bonus-card,
+                .inbox-col
+            ) {
+            margin-bottom: var(--space-3);
+            break-inside: avoid;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+            :is(
+                .zone-orders-inbox,
+                .zone-payments,
+                .zone-sample-pipeline,
+                .metrics-card,
+                .production-widget-card,
+                .embroidery-bonus-card
+            ) {
+            padding: var(--space-3);
+            box-shadow: none;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+            .dashboard-zones {
+            display: block;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+            .zone-orders-inbox {
+            margin-bottom: var(--space-3);
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+            .cn-due-row {
+            grid-template-columns: 5rem minmax(0, 1fr) auto auto 5rem;
+            gap: var(--space-2);
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+            .cn-due-main,
+        :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+            .cn-due-blanks,
+        :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+            .cn-due-value,
+        :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+            .cn-due-when {
+            grid-column: auto;
+            grid-row: auto;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+            .pay-totals {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+            .pay-total:last-child {
+            grid-column: auto;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+            .rep-card {
+            grid-template-columns: minmax(0, 1fr) auto;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+            .rep-stats {
+            grid-column: 2;
+            grid-row: 1;
+            text-align: right;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+            .inbox-row {
+            grid-template-columns: auto minmax(0, 1fr) auto;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+            .inbox-row-amount {
+            grid-column: auto;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+            .aa-chips,
+        :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+            .cn-due-tiles {
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+            .metrics-revenue-sparkline {
+            height: 32px;
+            margin: var(--space-2) 0;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="company-numbers"]) a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+            .aa-row,
+        :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+            .cn-due-row,
+        :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+            .inbox-row,
+        :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+            .pipeline-row {
+            break-inside: avoid;
+            min-height: 0;
+            padding: var(--space-2);
+            gap: var(--space-2);
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+            :is(
+                .zone-header,
+                .metrics-revenue-header,
+                .metrics-team-header,
+                .production-header,
+                .pay-totals,
+                .aa-chips,
+                .cn-due-tiles
+            ) {
+            margin-bottom: var(--space-2);
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+            :is(.rep-card, .pay-total, .aa-chip, .cn-due-tile) {
+            padding: var(--space-2);
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+            :is(
+                .rep-list,
+                .inbox-list,
+                .pay-list,
+                .pipeline-list,
+                .cn-due-list
+            ) {
+            gap: var(--space-1);
+        }
+
+        :where([data-ui="unified"][data-staff-workspace="company-numbers"])
+            :focus {
+            outline: none;
+        }
+    }
+}
