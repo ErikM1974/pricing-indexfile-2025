@@ -5232,6 +5232,38 @@
         "rawCssBytes": 34994,
         "localCssRequests": 3
       }
+    },
+    {
+      "source": "pages/box-labels.html",
+      "family": "staff-box-labels",
+      "status": "pilot",
+      "route": "/pages/box-labels.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/staff-box-labels.css",
+        "shared_components/css/vendor-box-labels.css"
+      ],
+      "dynamicStyles": [],
+      "dynamicTokens": [
+        "--m"
+      ],
+      "states": [
+        "four-width-accessible-station",
+        "original-packing-and-paper-contracts",
+        "native-split-dialog-and-keyboard-single-piece-move",
+        "lookup-print-draft-ownership",
+        "partial-refresh-explicit-print-choice",
+        "verification-clears-after-repacking"
+      ],
+      "test": "tests/e2e/css-unification-box-labels.spec.js",
+      "maxCssBytes": 89645,
+      "measuredRawCssBytes": 88621,
+      "baseline": {
+        "commit": "9b6d76d6d77161818e73bd7caab56b0b02c342c9",
+        "rawCssBytes": 43789,
+        "localCssRequests": 3
+      }
     }
   ],
   "billingContentSha256": "d85f8530e03a1863d1b8bb2ebe97ba332d5c9e3411887d1eb2d02dcdb14c0863",

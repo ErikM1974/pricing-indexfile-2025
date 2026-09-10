@@ -1,5 +1,15 @@
 # CSS unification — design direction and implementation plan
 
+## NEXT batch — three staff tools reviewed; Staff Dashboard remains
+
+Live remains v2026.09.10.4 / Heroku2099 /031e03aa8ec68ac0951fe95a47871637c0c8e25a:176/225reviewed pages,49pending. Calibration, Records Admin and Box Labels are reviewed drafts on codex/staff-final-tools, not deployed; candidate179/225,46pending. Finish Staff Dashboard, integrate the exact reviewed batch SHA, then run all full local and exact-source CI/release gates.
+
+- Box Labels: shared Public Sans controls, responsive repack station and vendor-box-labels.css paper owner. Nineteen browser cases and three focused suites/490checks pass; controller ESLint/no-undef and owner Stylelint clean. Original packing totals276/276/288, exact arrangements, local-draft restoration and all label text preserved. Deliberate correction: moving items clears the affected boxes verified marks. Single-piece moves work from the keyboard even if the drag library fails.
+- Latest lookup owns state; a failed second lookup clears old printable boxes. Pending printing holds controls/dragging and rejects duplicate clicks, restores its icon afterward, and cannot apply an old Print anyway choice to a new lookup. An incomplete refresh requires the explicit stale-print choice. Draft keys/payloads are captured before changing lookup; pagehide flushes; local-storage failure warns visibly. No real business writes or printing-to-device.
+- Paper:8current pages plus1selected-box page visually reviewed. All per-page original tokens/identifiers/quantities preserved; current3353961f7d56,singleef651e818858. Screen1440/320 and native phone dialog reviewed; axe/overflow passes at1440/768/390/320. Old page owner retired:19,394LFbytes/fiveflags. Direct shared graph88,621LFbytes/four sheets versus43,789/three original. Shared renderer and legacy paper owner for other consumers remain unchanged.
+- Cumulative final-tools ledger49original hashes/220reversible mappings/four retired stylesheet originals. Reviewed Calibration1fba722c (22browser/onepaper) and Records Admin8a42bc92 (19browser/517guards/onepaper) remain intact. Box evidence uses staff-final-tools-box-labels-* under the private artifact directory.
+- Next: Staff Dashboard retains the earlier fixed dark/green decision, seven workspaces, role defaults, pins/search/destinations and all live widget values. Its original8browser cases and30transitive JS snapshots are already committed; audit consumers before retiring any of its10CSSowners. The branch still predates primary06b3b5cd harness imports/native-dialog assertion/CI timing fixes: preserve those on integration. Never rerun completed mutation helpers or recursively delete node_modules junction.
+
 ## NEXT batch — Calibration and Records Admin reviewed; two staff tools remain
 
 Live stays v2026.09.10.4 / Heroku2099 /031e03aa8ec68ac0951fe95a47871637c0c8e25a:176/225 reviewed pages,49pending. Calibration and Records Admin are reviewed drafts in codex/staff-final-tools, not deployed; candidate178/225,47pending. Staff Dashboard and Box Labels remain before integration/full release checks.

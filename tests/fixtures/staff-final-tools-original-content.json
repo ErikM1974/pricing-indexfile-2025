@@ -1908,6 +1908,438 @@
       "before": "<td>$${item.LineTotal.toFixed(2)}</td>",
       "after": "<td data-label=\"Total\">$${item.LineTotal.toFixed(2)}</td>",
       "count": 1
+    },
+    {
+      "file": "pages/js/box-labels.js",
+      "before": "  async function handleLookup() {\n    const identifier = els.searchInput.value.trim();\n    if (!identifier) { els.searchInput.focus(); return; }\n    const type = document.querySelector('input[name=\"searchType\"]:checked').value;\n\n    showLoading(true); hideError(); hideDraftNote();\n    try {\n      const data = await fetchLabelData(identifier, type, false);\n      state.identifier = identifier;\n      state.type = type;\n      state.orders = data.orders || [];\n      state.loadedAt = Date.now();\n      state.boxes = buildBoxesFromOrders(state.orders);\n      if (!state.orders.length) {\n        showError(data.note || `Nothing found for ${identifier}.`);\n      } else {\n        maybeRestoreDraft();\n        fetchThumbnails(state.orders); // best-effort artwork for the labels\n      }\n      renderAll();\n    } catch (err) {\n      showError(`Lookup failed: ${err.message}`);\n    } finally {\n      showLoading(false);\n    }\n  }\n\n",
+      "after": "  async function handleLookup() {\n    if (printBusy) return;\n    const identifier = els.searchInput.value.trim();\n    if (!identifier) { els.searchInput.focus(); return; }\n    const type = document.querySelector('input[name=\"searchType\"]:checked').value;\n    flushDraft();\n    closeSplitModal();\n    const generation = ++lookupGeneration;\n    lookupPending = true;\n    state.orders = []; state.boxes = []; state.identifier = ''; state.loadedAt = 0;\n    sortables.forEach(s => s.destroy()); sortables = [];\n    els.ordersContainer.replaceChildren(); els.orderReference.replaceChildren();\n    els.printAllBtn.disabled = true;\n    els.lookupHint.hidden = true;\n    showLoading(true); hideError(); hideDraftNote();\n    try {\n      const data = await fetchLabelData(identifier, type, false);\n      if (generation !== lookupGeneration) return;\n      if (!Array.isArray(data.orders)) throw new Error('Shipment response is not a list');\n      state.identifier = identifier;\n      state.type = type;\n      state.orders = data.orders;\n      state.loadedAt = Date.now();\n      state.boxes = buildBoxesFromOrders(state.orders);\n      if (!state.orders.length) {\n        showError(data.note || `Nothing found for ${identifier}.`);\n      } else {\n        maybeRestoreDraft();\n        fetchThumbnails(state.orders);\n      }\n      lookupPending = false;\n      renderAll();\n    } catch (err) {\n      if (generation !== lookupGeneration) return;\n      showError(`Lookup failed: ${err.message}`);\n    } finally {\n      if (generation === lookupGeneration) { lookupPending = false; showLoading(false); }\n    }\n  }\n\n",
+      "count": 1
+    },
+    {
+      "file": "pages/js/box-labels.js",
+      "before": "  function saveDraft() {\n    clearTimeout(draftTimer);\n    draftTimer = setTimeout(() => {\n      try {\n        localStorage.setItem(draftKey(), JSON.stringify({ savedAt: Date.now(), boxes: state.boxes }));\n      } catch (e) { /* storage full — the arrangement still lives on screen */ }\n    }, 300);\n  }\n",
+      "after": "  function storageUnavailable() {\n    els.storageNotice.textContent = 'Local saving is unavailable. Keep this page open until you finish; your box arrangement may not be available after closing it.';\n    els.storageNotice.hidden = false;\n  }\n  function readLocal(key) {\n    try { return localStorage.getItem(key); } catch (error) { storageUnavailable(); return null; }\n  }\n  function writeLocal(key, value) {\n    try { localStorage.setItem(key, value); } catch (error) { storageUnavailable(); }\n  }\n  function flushDraft() {\n    clearTimeout(draftTimer);\n    if (!pendingDraft) return;\n    const draft = pendingDraft; pendingDraft = null;\n    writeLocal(draft.key, draft.value);\n  }\n  function saveDraft() {\n    clearTimeout(draftTimer);\n    if (!state.identifier) return;\n    pendingDraft = { key: draftKey(), value: JSON.stringify({ savedAt: Date.now(), boxes: state.boxes }) };\n    draftTimer = setTimeout(flushDraft, 300);\n  }\n",
+      "count": 1
+    },
+    {
+      "file": "pages/js/box-labels.js",
+      "before": "  async function freshenOrders() {\n    const data = await fetchLabelData(state.identifier, state.type, true);\n    const byPo = new Map((data.orders || []).map(o => [o.sanmarPO, o]));\n    state.orders = state.orders.map(o => {\n      const fresh = byPo.get(o.sanmarPO);\n      return fresh ? Object.assign({}, fresh, { logoUrl: o.logoUrl || fresh.logoUrl }) : o;\n    });\n    state.loadedAt = Date.now();\n  }\n\n  async function printLabels(onlyKey) {\n    const T = window.BoxLabelTemplate;\n    hideError();\n    const btn = els.printAllBtn;\n    const restore = btn.textContent;\n    btn.disabled = true; btn.textContent = 'Re-checking order…';\n    try {\n      await freshenOrders();\n      renderAll(); // fresh rush/due chips on screen too\n    } catch (err) {\n      // Loud, with an explicit escape hatch — never a silent stale label (Rule #4).\n      btn.disabled = false; btn.textContent = restore;\n      showError(`Couldn't re-check the order before printing (${err.message}). The rush/due info on the label may be out of date.`,\n        [{ label: 'Print anyway', onClick: () => { hideError(); doPrint(onlyKey); } }]);\n      return;\n    }\n    btn.disabled = false; btn.textContent = restore;\n    doPrint(onlyKey);\n  }\n\n",
+      "after": "  function setPrintBusy(busy) {\n    if (busy && !printBusy) printButtonContent = els.printAllBtn.innerHTML;\n    printBusy = busy;\n    els.lookupBtn.disabled = busy;\n    els.searchInput.disabled = busy;\n    els.repackerName.disabled = busy;\n    document.querySelectorAll('input[name=\"searchType\"]').forEach(n => { n.disabled = busy; });\n    els.draftResetBtn.disabled = busy;\n    els.expandAllBtn.disabled = busy;\n    els.printAllBtn.disabled = busy || lookupPending || !state.boxes.some(b => b.items.length);\n    els.ordersContainer.querySelectorAll('button').forEach(button => {\n      const box = boxByKey(button.closest('.bl-box-card')?.dataset.key);\n      button.disabled = busy || (button.dataset.act === 'delete-box' && Boolean(box?.items.length));\n    });\n    sortables.forEach(sortable => sortable.option('disabled', busy));\n  }\n\n  function finishPrinting() {\n    clearTimeout(printTimer);\n    if (printButtonContent !== null) { els.printAllBtn.innerHTML = printButtonContent; printButtonContent = null; }\n    setPrintBusy(false);\n  }\n\n  async function freshenOrders(generation) {\n    const orders = state.orders;\n    const data = await fetchLabelData(state.identifier, state.type, true);\n    if (generation !== lookupGeneration) return false;\n    if (!Array.isArray(data.orders)) throw new Error('Shipment response is not a list');\n    const byPo = new Map(data.orders.map(o => [o.sanmarPO, o]));\n    if (orders.some(o => !byPo.has(o.sanmarPO))) throw new Error('The refreshed response did not include every order');\n    state.orders = orders.map(o => Object.assign({}, byPo.get(o.sanmarPO), { logoUrl: o.logoUrl || byPo.get(o.sanmarPO).logoUrl }));\n    state.loadedAt = Date.now();\n    return true;\n  }\n\n  async function printLabels(onlyKey) {\n    if (lookupPending || printBusy || !state.identifier) return;\n    const generation = lookupGeneration;\n    hideError();\n    setPrintBusy(true);\n    els.printAllBtn.textContent = 'Re-checking order…';\n    try {\n      if (!await freshenOrders(generation)) { finishPrinting(); return; }\n      renderAll();\n    } catch (err) {\n      finishPrinting();\n      if (generation !== lookupGeneration) return;\n      showError(`Couldn't re-check the order before printing (${err.message}). The rush/due info on the label may be out of date.`,\n        [{ label: 'Print anyway', onClick: () => {\n          if (generation !== lookupGeneration || lookupPending || printBusy) return;\n          hideError(); setPrintBusy(true); doPrint(onlyKey);\n        } }]);\n      return;\n    }\n    doPrint(onlyKey);\n  }\n\n",
+      "count": 1
+    },
+    {
+      "file": "pages/box-labels.html",
+      "before": "  <link rel=\"stylesheet\" href=\"/pages/css/box-labels.css?v=2026.09.07.19\">",
+      "after": "  <link href=\"https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap\" rel=\"stylesheet\">\n  <link rel=\"stylesheet\" href=\"/shared_components/css/components.css?v=2026.09.10.5\">\n  <link rel=\"stylesheet\" href=\"/shared_components/css/staff-box-labels.css?v=2026.09.10.5\">",
+      "count": 1
+    },
+    {
+      "file": "pages/box-labels.html",
+      "before": "/shared_components/css/box-label-print.css?v=2026.09.10.4",
+      "after": "/shared_components/css/vendor-box-labels.css?v=2026.09.10.5",
+      "count": 1
+    },
+    {
+      "file": "pages/box-labels.html",
+      "before": "<body>",
+      "after": "<body data-ui=\"unified\" data-staff-tool=\"box-labels\" data-surface=\"staff\" data-box-label-viewer=\"unified\">",
+      "count": 1
+    },
+    {
+      "file": "pages/box-labels.html",
+      "before": "  <main>",
+      "after": "  <main class=\"bl-workspace\">\n  <p id=\"storageNotice\" class=\"bl-storage-notice\" role=\"status\" hidden></p>\n  <p id=\"lookupHint\" class=\"bl-lookup-hint\">Enter a SanMar PO or work order number to arrange boxes and print their labels.</p>",
+      "count": 1
+    },
+    {
+      "file": "pages/box-labels.html",
+      "before": "class=\"bl-loading\" style=\"display:none;\"",
+      "after": "class=\"bl-loading\" role=\"status\" hidden",
+      "count": 1
+    },
+    {
+      "file": "pages/box-labels.html",
+      "before": "class=\"bl-error\" style=\"display:none;\"",
+      "after": "class=\"bl-error\" role=\"alert\" hidden",
+      "count": 1
+    },
+    {
+      "file": "pages/box-labels.html",
+      "before": "class=\"bl-draft-note\" style=\"display:none;\"",
+      "after": "class=\"bl-draft-note\" hidden",
+      "count": 1
+    },
+    {
+      "file": "pages/box-labels.html",
+      "before": "class=\"bl-totals\" style=\"display:none;\"",
+      "after": "class=\"bl-totals\" aria-live=\"polite\" hidden",
+      "count": 1
+    },
+    {
+      "file": "pages/box-labels.html",
+      "before": "class=\"bl-totals__warning\" style=\"display:none;\"",
+      "after": "class=\"bl-totals__warning\" hidden",
+      "count": 1
+    },
+    {
+      "file": "pages/box-labels.html",
+      "before": "class=\"bl-main\" style=\"display:none;\"",
+      "after": "class=\"bl-main\" hidden",
+      "count": 1
+    },
+    {
+      "file": "pages/box-labels.html",
+      "before": "  <div id=\"splitModal\" class=\"bl-modal\" style=\"display:none;\">",
+      "after": "  <dialog id=\"splitModal\" class=\"bl-modal\" aria-labelledby=\"splitModalTitle\">",
+      "count": 1
+    },
+    {
+      "file": "pages/box-labels.html",
+      "before": "<h3 id=\"splitModalTitle\">Split to another box</h3>",
+      "after": "<h2 id=\"splitModalTitle\">Split to another box</h2>",
+      "count": 1
+    },
+    {
+      "file": "pages/box-labels.html",
+      "before": "  </div>\n\n  <!-- Libraries:",
+      "after": "  </dialog>\n\n  <!-- Libraries:",
+      "count": 1
+    },
+    {
+      "file": "pages/box-labels.html",
+      "before": "class=\"bl-input",
+      "after": "class=\"field-input bl-input",
+      "count": 2
+    },
+    {
+      "file": "pages/box-labels.html",
+      "before": "class=\"bl-btn",
+      "after": "class=\"btn btn-secondary bl-btn",
+      "count": 7
+    },
+    {
+      "file": "pages/box-labels.html",
+      "before": "<svg width=\"24\"",
+      "after": "<svg aria-hidden=\"true\" width=\"24\"",
+      "count": 1
+    },
+    {
+      "file": "pages/box-labels.html",
+      "before": "        PRINT ALL LABELS",
+      "after": "        Print all labels",
+      "count": 1
+    },
+    {
+      "file": "pages/box-labels.html",
+      "before": "/pages/js/box-labels.js?v=2026.09.06.31",
+      "after": "/pages/js/box-labels.js?v=2026.09.10.5",
+      "count": 1
+    },
+    {
+      "file": "pages/js/box-labels.js",
+      "before": "  let draftTimer = null;",
+      "after": "  let draftTimer = null;\n  let pendingDraft = null;\n  let lookupGeneration = 0;\n  let lookupPending = false;\n  let printBusy = false;\n  let printTimer = null;\n  let printButtonContent = null;\n  let splitReturn = null;",
+      "count": 1
+    },
+    {
+      "file": "pages/js/box-labels.js",
+      "before": "      'mainContent', 'ordersContainer', 'orderReference', 'expandAllBtn',",
+      "after": "      'mainContent', 'ordersContainer', 'orderReference', 'expandAllBtn', 'storageNotice', 'lookupHint',",
+      "count": 1
+    },
+    {
+      "file": "pages/js/box-labels.js",
+      "before": "els.repackerName.value = localStorage.getItem('bl_repacker_name') || '';",
+      "after": "els.repackerName.value = readLocal('bl_repacker_name') || '';",
+      "count": 1
+    },
+    {
+      "file": "pages/js/box-labels.js",
+      "before": "els.repackerName.addEventListener('change', () => localStorage.setItem('bl_repacker_name', els.repackerName.value.trim()));",
+      "after": "els.repackerName.addEventListener('change', () => writeLocal('bl_repacker_name', els.repackerName.value.trim()));\n    window.addEventListener('pagehide', flushDraft);\n    els.splitModal.addEventListener('cancel', e => { e.preventDefault(); closeSplitModal(); });\n    els.splitModal.addEventListener('keydown', trapSplitFocus);",
+      "count": 1
+    },
+    {
+      "file": "pages/js/box-labels.js",
+      "before": "try { draft = JSON.parse(localStorage.getItem(draftKey()) || 'null'); }",
+      "after": "try { draft = JSON.parse(readLocal(draftKey()) || 'null'); }",
+      "count": 1
+    },
+    {
+      "file": "pages/js/box-labels.js",
+      "before": "    els.draftNote.style.display = 'flex';",
+      "after": "    els.draftNote.hidden = false;",
+      "count": 1
+    },
+    {
+      "file": "pages/js/box-labels.js",
+      "before": "  function resetDraft() {\n",
+      "after": "  function resetDraft() {\n    if (printBusy || lookupPending) return;\n    clearTimeout(draftTimer); pendingDraft = null;\n",
+      "count": 1
+    },
+    {
+      "file": "pages/js/box-labels.js",
+      "before": "catch (e) { /* nothing to lose */ }",
+      "after": "catch (e) { storageUnavailable(); }",
+      "count": 1
+    },
+    {
+      "file": "pages/js/box-labels.js",
+      "before": "function hideDraftNote() { els.draftNote.style.display = 'none'; }",
+      "after": "function hideDraftNote() { els.draftNote.hidden = true; }",
+      "count": 1
+    },
+    {
+      "file": "pages/js/box-labels.js",
+      "before": "  function renderAll() {\n",
+      "after": "  function renderAll() {\n    const focus = captureBoxFocus();\n",
+      "count": 1
+    },
+    {
+      "file": "pages/js/box-labels.js",
+      "before": "      els.mainContent.style.display = 'none';\n      els.totalsBar.style.display = 'none';",
+      "after": "      els.mainContent.hidden = true;\n      els.totalsBar.hidden = true;",
+      "count": 1
+    },
+    {
+      "file": "pages/js/box-labels.js",
+      "before": "    els.mainContent.style.display = 'flex';",
+      "after": "    els.mainContent.hidden = false;",
+      "count": 1
+    },
+    {
+      "file": "pages/js/box-labels.js",
+      "before": "    els.printAllBtn.disabled = !state.boxes.some(b => b.items.length);",
+      "after": "    els.printAllBtn.disabled = printBusy || !state.boxes.some(b => b.items.length);\n    els.expandAllBtn.textContent = \"Collapse All\";\n    setPrintBusy(printBusy);\n    restoreBoxFocus(focus);",
+      "count": 1
+    },
+    {
+      "file": "pages/js/box-labels.js",
+      "before": "<div class=\"bl-box-card__header\" data-act=\"toggle-box\">",
+      "after": "<div class=\"bl-box-card__header\">",
+      "count": 1
+    },
+    {
+      "file": "pages/js/box-labels.js",
+      "before": "<div class=\"bl-box-card__title\">",
+      "after": "<button class=\"bl-box-card__title\" data-act=\"toggle-box\" aria-expanded=\"true\" aria-controls=\"box-body-${esc(b.key)}\">",
+      "count": 1
+    },
+    {
+      "file": "pages/js/box-labels.js",
+      "before": "          </div>\n          <div class=\"bl-box-card__right\">",
+      "after": "          </button>\n          <div class=\"bl-box-card__right\">",
+      "count": 1
+    },
+    {
+      "file": "pages/js/box-labels.js",
+      "before": "class=\"bl-box-card__verify ${b.verified",
+      "after": "class=\"btn btn-secondary bl-box-card__verify ${b.verified",
+      "count": 1
+    },
+    {
+      "file": "pages/js/box-labels.js",
+      "before": "data-act=\"verify\" title=\"Mark contents checked\"",
+      "after": "data-act=\"verify\" title=\"Mark contents checked\" aria-pressed=\"${b.verified ? 'true' : 'false'}\"",
+      "count": 1
+    },
+    {
+      "file": "pages/js/box-labels.js",
+      "before": "<div class=\"bl-box-card__body\">",
+      "after": "<div class=\"bl-box-card__body\" id=\"box-body-${esc(b.key)}\">",
+      "count": 1
+    },
+    {
+      "file": "pages/js/box-labels.js",
+      "before": "class=\"bl-btn",
+      "after": "class=\"btn btn-secondary bl-btn",
+      "count": 4
+    },
+    {
+      "file": "pages/js/box-labels.js",
+      "before": "${it.qty > 1 ? `<button",
+      "after": "${it.qty > 0 ? `<button",
+      "count": 1
+    },
+    {
+      "file": "pages/js/box-labels.js",
+      "before": "data-act=\"split\">Split to another box</button>",
+      "after": "data-act=\"split\">${it.qty > 1 ? 'Split to another box' : 'Move to another box'}</button>",
+      "count": 1
+    },
+    {
+      "file": "pages/js/box-labels.js",
+      "before": "    els.shortShipWarning.style.display = (ordered > 0 && shipped < ordered) ? 'inline-block' : 'none';\n    els.totalsBar.style.display = 'flex';",
+      "after": "    els.shortShipWarning.hidden = !(ordered > 0 && shipped < ordered);\n    els.totalsBar.hidden = false;",
+      "count": 1
+    },
+    {
+      "file": "pages/js/box-labels.js",
+      "before": "  function onOrdersClick(e) {\n",
+      "after": "  function onOrdersClick(e) {\n    if (printBusy || lookupPending) return;\n",
+      "count": 1
+    },
+    {
+      "file": "pages/js/box-labels.js",
+      "before": "    if (act === 'toggle-box' && !e.target.closest('button')) { card.classList.toggle('bl-box-card--expanded'); return; }",
+      "after": "    if (act === 'toggle-box') { setExpanded(card, !card.classList.contains('bl-box-card--expanded')); return; }",
+      "count": 1
+    },
+    {
+      "file": "pages/js/box-labels.js",
+      "before": "    cards.forEach(c => c.classList.toggle('bl-box-card--expanded', expand));",
+      "after": "    cards.forEach(c => setExpanded(c, expand));",
+      "count": 1
+    },
+    {
+      "file": "pages/js/box-labels.js",
+      "before": "    const cards = [...document.querySelectorAll('.bl-box-card')];",
+      "after": "    if (printBusy || lookupPending) return;\n    const cards = [...document.querySelectorAll('.bl-box-card')];",
+      "count": 1
+    },
+    {
+      "file": "pages/js/box-labels.js",
+      "before": "    sortables = [];\n    document.querySelectorAll",
+      "after": "    sortables = [];\n    if (typeof Sortable !== \"function\") return;\n    document.querySelectorAll",
+      "count": 1
+    },
+    {
+      "file": "pages/js/box-labels.js",
+      "before": "        group: 'bl-items', animation: 150, handle: '.bl-item-card',",
+      "after": "        group: 'bl-items', animation: 150, handle: '.bl-item-card', disabled: printBusy,\n        filter: 'button', preventOnFilter: false,",
+      "count": 1
+    },
+    {
+      "file": "pages/js/box-labels.js",
+      "before": "          const fromKey = evt.from.getAttribute('data-key');",
+      "after": "          if (printBusy || lookupPending) { renderAll(); return; }\n          const fromKey = evt.from.getAttribute('data-key');",
+      "count": 1
+    },
+    {
+      "file": "pages/js/box-labels.js",
+      "before": "          if (moved) to.items.splice(Math.min(evt.newIndex, to.items.length), 0, moved);",
+      "after": "          if (moved) { to.items.splice(Math.min(evt.newIndex, to.items.length), 0, moved); clearVerification(from, to); }",
+      "count": 1
+    },
+    {
+      "file": "pages/js/box-labels.js",
+      "before": "    splitCtx = { fromKey, itemIdx };",
+      "after": "    splitCtx = { fromKey, itemIdx };\n    splitReturn = captureBoxFocus();",
+      "count": 1
+    },
+    {
+      "file": "pages/js/box-labels.js",
+      "before": "        <label>Move</label>",
+      "after": "        <label for=\"splitQty\">Move</label>",
+      "count": 1
+    },
+    {
+      "file": "pages/js/box-labels.js",
+      "before": "<input type=\"number\" id=\"splitQty\"",
+      "after": "<input class=\"field-input\" type=\"number\" id=\"splitQty\"",
+      "count": 1
+    },
+    {
+      "file": "pages/js/box-labels.js",
+      "before": "        <label>To</label>",
+      "after": "        <label for=\"splitTarget\">To</label>",
+      "count": 1
+    },
+    {
+      "file": "pages/js/box-labels.js",
+      "before": "<select id=\"splitTarget\">",
+      "after": "<select id=\"splitTarget\" class=\"field-input\">",
+      "count": 1
+    },
+    {
+      "file": "pages/js/box-labels.js",
+      "before": "    els.splitModal.style.display = 'flex';",
+      "after": "    els.splitModal.showModal();",
+      "count": 1
+    },
+    {
+      "file": "pages/js/box-labels.js",
+      "before": "  function closeSplitModal() { els.splitModal.style.display = 'none'; splitCtx = null; }",
+      "after": "  function closeSplitModal() {\n    if (els.splitModal.open) els.splitModal.close();\n    splitCtx = null;\n    restoreBoxFocus(splitReturn); splitReturn = null;\n  }",
+      "count": 1
+    },
+    {
+      "file": "pages/js/box-labels.js",
+      "before": "    if (!splitCtx) return closeSplitModal();",
+      "after": "    if (printBusy || lookupPending) return;\n    if (!splitCtx) return closeSplitModal();\n    if (!grab(\"splitQty\").reportValidity()) return;",
+      "count": 1
+    },
+    {
+      "file": "pages/js/box-labels.js",
+      "before": "    closeSplitModal();\n    renderAll();",
+      "after": "    clearVerification(from, to);\n    closeSplitModal();\n    renderAll();",
+      "count": 1
+    },
+    {
+      "file": "pages/js/box-labels.js",
+      "before": "    els.loadingState.style.display = on ? 'block' : 'none';\n    if (on) { els.mainContent.style.display = 'none'; els.totalsBar.style.display = 'none'; }",
+      "after": "    els.loadingState.hidden = !on;\n    if (on) { els.mainContent.hidden = true; els.totalsBar.hidden = true; }",
+      "count": 1
+    },
+    {
+      "file": "pages/js/box-labels.js",
+      "before": "b.className = 'bl-btn bl-btn--danger';",
+      "after": "b.className = 'btn btn-secondary bl-btn bl-btn--danger';",
+      "count": 1
+    },
+    {
+      "file": "pages/js/box-labels.js",
+      "before": "    els.errorState.style.display = 'flex';",
+      "after": "    els.errorState.hidden = false;",
+      "count": 1
+    },
+    {
+      "file": "pages/js/box-labels.js",
+      "before": "function hideError() { els.errorState.style.display = 'none'; els.errorActions.innerHTML = ''; }",
+      "after": "function hideError() { els.errorState.hidden = true; els.errorActions.innerHTML = ''; }",
+      "count": 1
+    },
+    {
+      "file": "pages/js/box-labels.js",
+      "before": "    T.printSheet(pieces.join(''));",
+      "after": "    clearTimeout(printTimer);\n    printTimer = setTimeout(finishPrinting, 1600);\n    T.printSheet(pieces.join(''));",
+      "count": 1
+    },
+    {
+      "file": "pages/js/box-labels.js",
+      "before": "if (!pieces.length) { showError('Nothing to print — every box is empty.'); return; }",
+      "after": "if (!pieces.length) { finishPrinting(); showError('Nothing to print — every box is empty.'); return; }",
+      "count": 1
+    },
+    {
+      "file": "pages/js/box-labels.js",
+      "before": "    window.addEventListener('pagehide', flushDraft);",
+      "after": "    window.addEventListener('pagehide', flushDraft);\n    window.addEventListener('afterprint', finishPrinting);",
+      "count": 1
+    },
+    {
+      "file": "pages/js/box-labels.js",
+      "before": "  // ── Interactions (delegated) ──",
+      "after": "  function captureBoxFocus() {\n    const control = document.activeElement?.closest('[data-act]');\n    if (!control) return null;\n    return { act: control.dataset.act, key: control.closest('.bl-box-card')?.dataset.key, index: control.closest('.bl-item-card')?.dataset.idx, po: control.dataset.po };\n  }\n  function restoreBoxFocus(focus) {\n    if (!focus) return;\n    let container = focus.key ? document.querySelector(`.bl-box-card[data-key=\"${CSS.escape(focus.key)}\"]`) : els.ordersContainer;\n    if (focus.index !== undefined) container = container?.querySelector(`.bl-item-card[data-idx=\"${CSS.escape(focus.index)}\"]`);\n    const control = container?.querySelector(`[data-act=\"${CSS.escape(focus.act)}\"]${focus.po ? '[data-po=\"' + CSS.escape(focus.po) + '\"]' : ''}`);\n    if (control && !control.disabled) control.focus({ preventScroll: true });\n  }\n  function setExpanded(card, expanded) {\n    card.classList.toggle('bl-box-card--expanded', expanded);\n    card.querySelector('[data-act=\"toggle-box\"]').setAttribute('aria-expanded', String(expanded));\n    card.querySelector('.bl-box-card__body').hidden = !expanded;\n  }\n  function clearVerification(...boxes) {\n    boxes.forEach(box => { box.verified = false; box.verifiedBy = ''; });\n  }\n  function trapSplitFocus(event) {\n    if (event.key !== 'Tab') return;\n    const controls = [...els.splitModal.querySelectorAll('button,input,select')].filter(n => !n.disabled && n.getClientRects().length);\n    if ((event.shiftKey && document.activeElement === controls[0]) || (!event.shiftKey && document.activeElement === controls.at(-1))) {\n      event.preventDefault(); (event.shiftKey ? controls.at(-1) : controls[0]).focus();\n    }\n  }\n\n  // ── Interactions (delegated) ──",
+      "count": 1
+    },
+    {
+      "file": "pages/js/box-labels.js",
+      "before": "typeof Sortable !== \"function\"",
+      "after": "typeof window.Sortable !== \"function\"",
+      "count": 1
+    },
+    {
+      "file": "pages/js/box-labels.js",
+      "before": "new Sortable(list, {",
+      "after": "new window.Sortable(list, {",
+      "count": 1
+    },
+    {
+      "file": "pages/js/box-labels.js",
+      "before": "const qr = qrcode(0, 'M');",
+      "after": "const qr = window.qrcode(0, 'M');",
+      "count": 1
     }
   ],
   "retiredStyles": [
@@ -1922,6 +2354,10 @@
     {
       "file": "admin/css/universal-records-admin-injected.css",
       "css": "/* universal-records-admin-injected.css — extracted 2026-09-06 from the \\3c style> block(s) universal-records-admin.js used to inject (Rule 3). */\n.toast {\n    position: fixed;\n    bottom: 2rem;\n    right: 2rem;\n    background: var(--card-bg);\n    padding: 1rem 1.5rem;\n    border-radius: 8px;\n    box-shadow: 0 4px 6px rgb(0 0 0 / 10%);\n    display: flex;\n    align-items: center;\n    gap: 0.75rem;\n    font-size: 0.875rem;\n    z-index: 1000;\n    animation: slideIn 0.3s ease-out;\n}\n\n.toast-success {\n    border-left: 4px solid var(--success-color);\n    color: var(--success-text);\n}\n\n.toast-error {\n    border-left: 4px solid var(--error-color);\n    color: var(--error-text);\n}\n\n.toast-info {\n    border-left: 4px solid var(--info-color);\n    color: var(--info-text);\n}\n\n@keyframes slideIn {\n    from {\n        transform: translateX(100%);\n        opacity: 0;\n    }\n\n    to {\n        transform: translateX(0);\n        opacity: 1;\n    }\n}\n\n.quote-view-modal {\n    position: fixed;\n    inset: 0;\n    z-index: 1000;\n}\n\n.modal-overlay {\n    width: 100%;\n    height: 100%;\n    background: rgb(0 0 0 / 50%);\n    display: flex;\n    align-items: center;\n    justify-content: center;\n}\n\n.modal-content {\n    background: white;\n    border-radius: 8px;\n    width: 90%;\n    max-width: 800px;\n    max-height: 90vh;\n    overflow: hidden;\n    display: flex;\n    flex-direction: column;\n}\n\n.modal-header {\n    padding: 1.5rem;\n    border-bottom: 1px solid var(--gray-200);\n    display: flex;\n    justify-content: space-between;\n    align-items: center;\n}\n\n.modal-header h2 {\n    margin: 0;\n    color: var(--gray-800);\n}\n\n.close-btn {\n    background: none;\n    border: none;\n    font-size: 1.5rem;\n    cursor: pointer;\n    color: var(--gray-500);\n}\n\n.modal-body {\n    padding: 1.5rem;\n    overflow-y: auto;\n    flex: 1;\n}\n\n.quote-info-grid {\n    display: grid;\n    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));\n    gap: 2rem;\n    margin-bottom: 2rem;\n}\n\n.info-section h3 {\n    margin: 0 0 1rem;\n    color: var(--gray-700);\n    font-size: 1.125rem;\n}\n\n.info-section p {\n    margin: 0.5rem 0;\n}\n\n.notes-section {\n    background: var(--gray-50);\n    padding: 1rem;\n    border-radius: 6px;\n    margin-bottom: 2rem;\n}\n\n.items-table {\n    width: 100%;\n    border-collapse: collapse;\n}\n\n.items-table th,\n.items-table td {\n    padding: 0.75rem;\n    text-align: left;\n    border-bottom: 1px solid var(--gray-200);\n}\n\n.items-table th {\n    background: var(--gray-50);\n    font-weight: 600;\n    color: var(--gray-700);\n}\n\n.modal-footer {\n    padding: 1.5rem;\n    border-top: 1px solid var(--gray-200);\n    display: flex;\n    gap: 1rem;\n    justify-content: flex-end;\n}\n\n.quote-edit-modal {\n    position: fixed;\n    inset: 0;\n    z-index: 1000;\n}\n\n.quote-edit-modal .modal-overlay {\n    width: 100%;\n    height: 100%;\n    background: rgb(0 0 0 / 50%);\n    display: flex;\n    align-items: center;\n    justify-content: center;\n}\n\n.quote-edit-modal .modal-content {\n    background: white;\n    border-radius: 8px;\n    width: 90%;\n    max-width: 800px;\n    max-height: 90vh;\n    overflow: hidden;\n    display: flex;\n    flex-direction: column;\n}\n\n.quote-edit-modal .modal-header {\n    padding: 1.5rem;\n    border-bottom: 1px solid var(--gray-200);\n    display: flex;\n    justify-content: space-between;\n    align-items: center;\n}\n\n.quote-edit-modal .modal-header h2 {\n    margin: 0;\n    color: var(--gray-800);\n}\n\n.quote-edit-modal .close-btn {\n    background: none;\n    border: none;\n    font-size: 1.5rem;\n    cursor: pointer;\n    color: var(--gray-500);\n}\n\n.quote-edit-modal .modal-body {\n    padding: 1.5rem;\n    overflow-y: auto;\n    flex: 1;\n}\n\n.quote-edit-modal .form-grid {\n    display: grid;\n    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));\n    gap: 1rem;\n}\n\n.quote-edit-modal .form-group {\n    margin-bottom: 1rem;\n}\n\n.quote-edit-modal .form-group.full-width {\n    grid-column: 1 / -1;\n}\n\n.quote-edit-modal .form-group label {\n    display: block;\n    margin-bottom: 0.5rem;\n    font-weight: 500;\n    color: var(--gray-700);\n}\n\n.quote-edit-modal .form-control {\n    width: 100%;\n    padding: 0.5rem 0.75rem;\n    border: 1px solid var(--gray-200);\n    border-radius: 6px;\n    font-size: 0.875rem;\n    background: white;\n}\n\n.quote-edit-modal .form-control:focus {\n    outline: none;\n    border-color: var(--brand-500);\n    box-shadow: 0 0 0 0.25rem rgb(76 179 84 / 25%);\n}\n\n.quote-edit-modal textarea.form-control {\n    resize: vertical;\n}\n\n.quote-edit-modal .modal-footer {\n    padding: 1.5rem;\n    border-top: 1px solid var(--gray-200);\n    display: flex;\n    gap: 1rem;\n    justify-content: flex-end;\n}\n"
+    },
+    {
+      "file": "pages/css/box-labels.css",
+      "css": "/* Box Labels - Production Floor UI */\n\n/* Designed for warehouse use: big text, big buttons, easy drag/drop */\n\n/* Page theme (CSS standardization, 2026-09-07): this page's own colours, auto-named by hue, merged into its\n   existing :root. Map them to shared_components/css/tokens.css names when the page is redesigned;\n   raw hex is allowed ONLY in this block. */\n/* stylelint-disable color-no-hex */\n:root {\n    --box-labels-blue: #1e3a8a;\n    --box-labels-magenta: #ec4899;\n    --box-labels-teal-2: #14b8a6;\n    --box-labels-orange: #f97316;\n    --box-labels-yellow: #d9a406;\n    --box-labels-orange-2: #7c2d12;\n    --box-labels-gray-dark: #333;\n    --box-labels-gray: #666;\n    --box-labels-cyan: #93c5fd;\n  --bl-primary: var(--blue-600);\n  --bl-primary-dark: var(--color-floor-dark);\n  --bl-success: var(--green-600);\n  --bl-success-dark: var(--green-700);\n  --bl-warning: var(--amber-500);\n  --bl-danger: var(--red-600);\n  --bl-gray-50: var(--gray-50);\n  --bl-gray-100: var(--gray-100);\n  --bl-gray-200: var(--gray-200);\n  --bl-gray-300: var(--gray-300);\n  --bl-gray-400: var(--gray-400);\n  --bl-gray-500: var(--gray-500);\n  --bl-gray-600: var(--gray-600);\n  --bl-gray-700: var(--gray-700);\n  --bl-gray-800: var(--gray-800);\n  --bl-gray-900: var(--gray-900);\n  --bl-radius: 8px;\n  --bl-shadow: 0 1px 3px rgb(0 0 0 / 12%), 0 1px 2px rgb(0 0 0 / 8%);\n  --bl-shadow-lg: 0 4px 12px rgb(0 0 0 / 15%);\n  --bl-box-colors: var(--color-floor-light), var(--emerald-500), var(--amber-500), var(--red-500), var(--color-ruth-light), var(--box-labels-magenta), var(--box-labels-teal-2), var(--box-labels-orange);\n}\n/* stylelint-enable color-no-hex */\n\n* { box-sizing: border-box; margin: 0; padding: 0; }\n\nbody {\n  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;\n  background: var(--bl-gray-100);\n  color: var(--bl-gray-900);\n  min-height: 100vh;\n}\n\n/* === HEADER === */\n.bl-header {\n  position: sticky;\n  top: 0;\n  z-index: 100;\n  background: white;\n  border-bottom: 2px solid var(--bl-gray-200);\n  padding: 12px 20px;\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  gap: 16px;\n  box-shadow: var(--bl-shadow);\n}\n\n.bl-header__left {\n  display: flex;\n  align-items: center;\n  gap: 20px;\n  flex: 1;\n}\n\n.bl-header__title {\n  font-size: 22px;\n  font-weight: 700;\n  white-space: nowrap;\n  color: var(--bl-gray-800);\n}\n\n.bl-header__search {\n  display: flex;\n  align-items: center;\n  gap: 12px;\n  flex: 1;\n  max-width: 700px;\n}\n\n.bl-header__right {\n  display: flex;\n  align-items: center;\n  gap: 16px;\n}\n\n.bl-header__repacker {\n  display: flex;\n  align-items: center;\n  gap: 8px;\n  font-size: 14px;\n  color: var(--bl-gray-600);\n}\n\n.bl-header__repacker input {\n  width: 130px;\n}\n\n/* === INPUTS & BUTTONS === */\n.bl-input {\n  padding: 10px 14px;\n  border: 2px solid var(--bl-gray-300);\n  border-radius: var(--bl-radius);\n  font-size: 16px;\n  outline: none;\n  transition: border-color 0.15s;\n}\n\n.bl-input:focus {\n  border-color: var(--bl-primary);\n}\n\n.bl-input--large {\n  padding: 12px 16px;\n  font-size: 18px;\n  flex: 1;\n  min-width: 200px;\n}\n\n.bl-radio-group {\n  display: flex;\n  gap: 12px;\n  white-space: nowrap;\n}\n\n.bl-radio {\n  font-size: 14px;\n  display: flex;\n  align-items: center;\n  gap: 4px;\n  cursor: pointer;\n}\n\n.bl-radio input { cursor: pointer; }\n\n.bl-btn {\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n  gap: 8px;\n  padding: 10px 20px;\n  border: none;\n  border-radius: var(--bl-radius);\n  font-size: 15px;\n  font-weight: 600;\n  cursor: pointer;\n  transition: all 0.15s;\n  white-space: nowrap;\n}\n\n.bl-btn:disabled {\n  opacity: 0.5;\n  cursor: not-allowed;\n}\n\n.bl-btn--primary {\n  background: var(--bl-primary);\n  color: white;\n}\n\n.bl-btn--primary:hover:not(:disabled) { background: var(--bl-primary-dark); }\n\n.bl-btn--success {\n  background: var(--bl-success);\n  color: white;\n}\n\n.bl-btn--success:hover:not(:disabled) { background: var(--bl-success-dark); }\n\n.bl-btn--danger {\n  background: var(--bl-danger);\n  color: white;\n}\n\n.bl-btn--small {\n  padding: 6px 14px;\n  font-size: 13px;\n}\n\n.bl-btn--large {\n  padding: 12px 24px;\n  font-size: 16px;\n  min-height: 48px;\n}\n\n.bl-btn--xl {\n  padding: 14px 28px;\n  font-size: 18px;\n  font-weight: 700;\n  min-height: 56px;\n  border-radius: 10px;\n  box-shadow: var(--bl-shadow);\n}\n\n.bl-btn--outline {\n  background: white;\n  border: 2px solid var(--bl-gray-300);\n  color: var(--bl-gray-700);\n}\n\n.bl-btn--outline:hover { border-color: var(--bl-primary); }\n\n/* === ORDER BANNER === */\n.bl-banner {\n  background: white;\n  border-bottom: 1px solid var(--bl-gray-200);\n  padding: 10px 20px;\n}\n\n.bl-banner__row {\n  display: flex;\n  flex-wrap: wrap;\n  gap: 8px 24px;\n  padding: 2px 0;\n}\n\n.bl-banner__item {\n  font-size: 15px;\n  color: var(--bl-gray-700);\n}\n\n.bl-banner__item strong {\n  color: var(--bl-gray-900);\n}\n\n/* Link Work Order bar */\n.bl-banner__link-wo {\n  display: flex;\n  align-items: center;\n  gap: 10px;\n  padding: 6px 0 2px;\n  border-top: 1px dashed var(--bl-warning);\n  margin-top: 6px;\n}\n\n.bl-banner__link-wo-label {\n  font-size: 13px;\n  font-weight: 600;\n  color: var(--bl-warning);\n}\n\n/* === TOTALS BAR === */\n.bl-totals {\n  background: var(--bl-gray-800);\n  color: white;\n  padding: 10px 20px;\n  display: flex;\n  align-items: center;\n  gap: 32px;\n  font-size: 16px;\n}\n\n.bl-totals__item strong {\n  font-size: 20px;\n  margin: 0 2px;\n}\n\n.bl-totals__warning {\n  background: var(--bl-warning);\n  color: var(--bl-gray-900);\n  padding: 4px 16px;\n  border-radius: 20px;\n  font-weight: 700;\n  font-size: 14px;\n  animation: pulse 2s infinite;\n}\n\n@keyframes pulse {\n  0%, 100% { opacity: 1; }\n  50% { opacity: 0.7; }\n}\n\n/* === LOADING & ERROR === */\n.bl-loading {\n  text-align: center;\n  padding: 80px 20px;\n}\n\n.bl-spinner {\n  width: 48px;\n  height: 48px;\n  border: 4px solid var(--bl-gray-200);\n  border-top-color: var(--bl-primary);\n  border-radius: 50%;\n  margin: 0 auto 16px;\n  animation: spin 0.8s linear infinite;\n}\n\n@keyframes spin { to { transform: rotate(360deg); } }\n\n.bl-loading p { font-size: 18px; color: var(--bl-gray-500); }\n\n.bl-error {\n  background: var(--red-50);\n  border: 2px solid var(--red-200);\n  border-radius: var(--bl-radius);\n  padding: 20px 24px;\n  margin: 20px;\n  display: flex;\n  align-items: center;\n  gap: 16px;\n}\n\n.bl-error p {\n  font-size: 16px;\n  color: var(--bl-danger);\n  flex: 1;\n}\n\n/* === MAIN LAYOUT === */\n.bl-main {\n  display: flex;\n  gap: 16px;\n  padding: 16px 20px;\n  min-height: calc(100vh - 200px);\n}\n\n.bl-column {\n  display: flex;\n  flex-direction: column;\n  gap: 12px;\n}\n\n.bl-column--boxes {\n  flex: 7;\n  min-width: 0;\n}\n\n.bl-column--unboxed {\n  flex: 3;\n  min-width: 280px;\n  max-width: 400px;\n}\n\n.bl-column__header {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  padding: 0 4px;\n}\n\n.bl-column__header h2 {\n  font-size: 18px;\n  font-weight: 700;\n  color: var(--bl-gray-800);\n}\n\n.bl-column__actions {\n  display: flex;\n  gap: 8px;\n}\n\n/* === BOX CARDS === */\n.bl-box-container {\n  display: flex;\n  flex-direction: column;\n  gap: 12px;\n}\n\n.bl-box-card {\n  background: white;\n  border: 2px solid var(--bl-gray-200);\n  border-radius: 10px;\n  overflow: hidden;\n  box-shadow: var(--bl-shadow);\n  transition: border-color 0.15s;\n}\n\n.bl-box-card--verified {\n  border-color: var(--bl-success);\n}\n\n.bl-box-card__header {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  padding: 14px 18px;\n  cursor: pointer;\n  user-select: none;\n  transition: background 0.1s;\n  min-height: 64px;\n}\n\n.bl-box-card__header:hover {\n  background: var(--bl-gray-50);\n}\n\n.bl-box-card__title {\n  display: flex;\n  align-items: center;\n  gap: 12px;\n}\n\n.bl-box-card__number {\n  font-size: 22px;\n  font-weight: 800;\n  width: 44px;\n  height: 44px;\n  border-radius: 10px;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  color: white;\n}\n\n.bl-box-card__info {\n  display: flex;\n  flex-direction: column;\n  gap: 2px;\n}\n\n.bl-box-card__label {\n  font-size: 16px;\n  font-weight: 700;\n}\n\n.bl-box-card__meta {\n  font-size: 13px;\n  color: var(--bl-gray-500);\n  display: flex;\n  gap: 12px;\n}\n\n.bl-box-card__tag {\n  font-size: 11px;\n  font-weight: 600;\n  padding: 2px 8px;\n  border-radius: 10px;\n  text-transform: uppercase;\n}\n\n.bl-box-card__tag--sanmar { background: var(--sky-100); color: var(--color-floor-dark); }\n.bl-box-card__tag--custom { background: var(--amber-100); color: var(--amber-800); }\n\n.bl-box-card__right {\n  display: flex;\n  align-items: center;\n  gap: 12px;\n}\n\n.bl-box-card__chevron {\n  font-size: 20px;\n  color: var(--bl-gray-400);\n  transition: transform 0.2s;\n}\n\n.bl-box-card--expanded .bl-box-card__chevron {\n  transform: rotate(180deg);\n}\n\n.bl-box-card__verify {\n  display: flex;\n  align-items: center;\n  gap: 6px;\n  padding: 6px 14px;\n  border-radius: 20px;\n  font-size: 14px;\n  font-weight: 600;\n  cursor: pointer;\n  border: 2px solid var(--bl-gray-300);\n  background: white;\n  color: var(--bl-gray-600);\n  transition: all 0.15s;\n}\n\n.bl-box-card__verify:hover {\n  border-color: var(--bl-success);\n}\n\n.bl-box-card__verify--checked {\n  background: var(--store-green-100);\n  border-color: var(--bl-success);\n  color: var(--bl-success-dark);\n}\n\n.bl-box-card__body {\n  display: none;\n  border-top: 1px solid var(--bl-gray-200);\n  padding: 16px 18px;\n}\n\n.bl-box-card--expanded .bl-box-card__body {\n  display: block;\n}\n\n/* Item cards inside boxes (draggable) */\n.bl-item-card {\n  background: var(--bl-gray-50);\n  border: 2px solid var(--bl-gray-200);\n  border-radius: 8px;\n  padding: 12px 14px;\n  margin-bottom: 10px;\n  cursor: grab;\n  transition: all 0.15s;\n  min-height: 80px;\n}\n\n.bl-item-card:active { cursor: grabbing; }\n\n.bl-item-card:hover {\n  border-color: var(--bl-primary);\n  box-shadow: var(--bl-shadow);\n}\n\n.bl-item-card__header {\n  display: flex;\n  justify-content: space-between;\n  align-items: flex-start;\n  margin-bottom: 8px;\n}\n\n.bl-item-card__style {\n  font-size: 16px;\n  font-weight: 700;\n  color: var(--bl-gray-900);\n}\n\n.bl-item-card__color {\n  font-size: 14px;\n  color: var(--bl-gray-600);\n}\n\n.bl-item-card__qty {\n  font-size: 18px;\n  font-weight: 800;\n  color: var(--bl-primary);\n  white-space: nowrap;\n}\n\n.bl-item-card__desc {\n  font-size: 13px;\n  color: var(--bl-gray-500);\n  margin-bottom: 8px;\n}\n\n/* Size grid inside item cards */\n.bl-size-grid {\n  display: flex;\n  gap: 2px;\n  flex-wrap: wrap;\n}\n\n.bl-size-cell {\n  text-align: center;\n  min-width: 48px;\n  padding: 4px 6px;\n  background: white;\n  border: 1px solid var(--bl-gray-200);\n  border-radius: 4px;\n}\n\n.bl-size-cell__label {\n  font-size: 11px;\n  color: var(--bl-gray-400);\n  text-transform: uppercase;\n  font-weight: 600;\n}\n\n.bl-size-cell__value {\n  font-size: 18px;\n  font-weight: 800;\n  color: var(--bl-gray-900);\n  cursor: pointer;\n}\n\n.bl-size-cell:hover {\n  outline: 2px solid var(--bl-primary);\n  outline-offset: -1px;\n  border-radius: 4px;\n}\n\n/* Split button on item cards */\n.bl-item-card__split {\n  margin-top: 6px;\n  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */\n  font-size: 12px !important;\n  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */\n  padding: 4px 10px !important;\n  opacity: 0.7;\n}\n\n.bl-item-card:hover .bl-item-card__split {\n  opacity: 1;\n}\n\n.bl-size-cell--empty .bl-size-cell__value {\n  color: var(--bl-gray-200);\n}\n\n.bl-size-cell--has-value {\n  background: var(--color-floor-tint);\n  border-color: var(--blue-200);\n}\n\n/* Box actions row */\n.bl-box-card__actions {\n  display: flex;\n  gap: 8px;\n  margin-top: 12px;\n  padding-top: 12px;\n  border-top: 1px solid var(--bl-gray-100);\n}\n\n/* Item list (droppable zone) */\n.bl-item-list {\n  min-height: 60px;\n  padding: 4px;\n  border-radius: 8px;\n  transition: background 0.15s;\n}\n\n.bl-item-list--drag-over {\n  background: var(--sky-100);\n  border: 2px dashed var(--bl-primary);\n}\n\n/* === RIGHT COLUMN: UNBOXED === */\n.bl-unboxed-container {\n  flex: 1;\n  overflow-y: auto;\n}\n\n.bl-section-label {\n  font-size: 13px;\n  font-weight: 700;\n  text-transform: uppercase;\n  color: var(--bl-gray-500);\n  letter-spacing: 0.5px;\n  padding: 8px 4px 6px;\n}\n\n.bl-excluded-list {\n  padding: 4px;\n}\n\n.bl-excluded-item {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  padding: 8px 12px;\n  background: var(--bl-gray-50);\n  border: 1px solid var(--bl-gray-200);\n  border-radius: 6px;\n  margin-bottom: 6px;\n  font-size: 14px;\n  color: var(--bl-gray-500);\n}\n\n.bl-excluded-item__name {\n  text-decoration: line-through;\n}\n\n/* Drop zone at bottom of right column */\n.bl-drop-zone {\n  border: 3px dashed var(--bl-gray-300);\n  border-radius: 10px;\n  padding: 24px;\n  text-align: center;\n  color: var(--bl-gray-400);\n  font-size: 15px;\n  font-weight: 600;\n  margin-top: 12px;\n  transition: all 0.15s;\n}\n\n.bl-drop-zone--active {\n  border-color: var(--bl-danger);\n  background: var(--red-50);\n  color: var(--bl-danger);\n}\n\n/* Empty box placeholder */\n.bl-box-empty {\n  text-align: center;\n  padding: 30px 20px;\n  color: var(--bl-gray-400);\n  font-size: 16px;\n  border: 3px dashed var(--bl-gray-200);\n  border-radius: 8px;\n}\n\n.bl-box-empty--drag-over {\n  border-color: var(--bl-primary);\n  background: var(--color-floor-tint);\n  color: var(--bl-primary);\n}\n\n/* SortableJS ghost/drag styles */\n.sortable-ghost {\n  opacity: 0.4;\n  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */\n  background: var(--sky-100) !important;\n  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */\n  border-color: var(--bl-primary) !important;\n}\n\n.sortable-drag {\n  /* stylelint-disable-next-line declaration-no-important -- legacy: outranks a higher-specificity rule — re-examine when this page is redesigned */\n  box-shadow: var(--bl-shadow-lg) !important;\n  transform: rotate(2deg);\n}\n\n.sortable-chosen {\n  box-shadow: var(--bl-shadow-lg);\n}\n\n/* === MODAL === */\n.bl-modal {\n  position: fixed;\n  inset: 0;\n  background: rgb(0 0 0 / 50%);\n  z-index: 200;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n}\n\n.bl-modal__content {\n  background: white;\n  border-radius: 12px;\n  padding: 28px;\n  max-width: 500px;\n  width: 90%;\n  box-shadow: 0 20px 40px rgb(0 0 0 / 20%);\n}\n\n.bl-modal__content h3 {\n  font-size: 20px;\n  margin-bottom: 4px;\n}\n\n.bl-modal__content p {\n  color: var(--bl-gray-500);\n  margin-bottom: 20px;\n}\n\n.bl-split-grid {\n  display: grid;\n  grid-template-columns: 1fr 1fr 1fr;\n  gap: 8px;\n  margin-bottom: 24px;\n}\n\n.bl-split-cell {\n  text-align: center;\n  padding: 8px;\n  border: 1px solid var(--bl-gray-200);\n  border-radius: 6px;\n}\n\n.bl-split-cell label {\n  display: block;\n  font-size: 12px;\n  font-weight: 600;\n  color: var(--bl-gray-500);\n  margin-bottom: 4px;\n}\n\n.bl-split-cell__avail {\n  font-size: 13px;\n  color: var(--bl-gray-400);\n  margin-bottom: 4px;\n}\n\n.bl-split-cell input {\n  width: 60px;\n  padding: 8px;\n  text-align: center;\n  font-size: 18px;\n  font-weight: 700;\n  border: 2px solid var(--bl-gray-300);\n  border-radius: 6px;\n}\n\n.bl-split-cell input:focus {\n  border-color: var(--bl-primary);\n  outline: none;\n}\n\n.bl-modal__actions {\n  display: flex;\n  gap: 12px;\n  justify-content: flex-end;\n}\n\n/* === UTILITIES === */\n.bl-text-center { text-align: center; }\n.bl-mt-2 { margin-top: 8px; }\n.bl-mt-4 { margin-top: 16px; }\n\n/* === RESPONSIVE === */\n@media (width <= 1024px) {\n  .bl-main {\n    flex-direction: column;\n  }\n\n  .bl-column--unboxed {\n    max-width: none;\n  }\n\n  .bl-header {\n    flex-wrap: wrap;\n  }\n\n  .bl-header__search {\n    flex-wrap: wrap;\n  }\n}\n\n/* === ORDER GROUPS + REFERENCE (2026-08-04 rewrite: proxy label-data + shared template) === */\n.bl-order { margin-bottom: 28px; }\n\n.bl-order__head {\n  display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;\n  border-left: 8px solid var(--gray-700); background: var(--color-surface); border-radius: 6px;\n  padding: 10px 14px; margin-bottom: 10px; box-shadow: 0 1px 3px rgb(0 0 0 / 8%);\n}\n.bl-order__company { display: block; font-size: 18px; font-weight: 800; color: var(--print-ink); }\n.bl-order__meta { display: block; font-size: 12.5px; color: var(--print-ink-soft); margin-top: 2px; }\n.bl-order__flags { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }\n\n.bl-rush-chip {\n  display: inline-block; padding: 3px 8px; border-radius: 4px;\n  font-size: 12.5px; font-weight: 800; letter-spacing: 0.02em;\n  color: var(--color-on-brand); background: var(--red-700); border: 1px solid var(--print-red);\n}\n.bl-rush-chip--past { background: var(--print-red); }\n\n.bl-follow-chip {\n  display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: 700;\n  color: var(--amber-800); background: var(--amber-100); border: 1px solid var(--box-labels-yellow);\n}\n.bl-received-chip { font-size: 12px; font-weight: 700; color: var(--green-600); }\n\n.bl-nowo-chip {\n  display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 700;\n  color: var(--box-labels-orange-2); background: var(--red-100); border: 1px dashed var(--store-rush-deep); cursor: help;\n}\n\n.bl-size-chip {\n  display: inline-block; padding: 0 6px; margin-left: 4px; border-radius: 3px;\n  font-size: 12px; font-weight: 800; color: var(--box-labels-blue); background: var(--sky-100);\n}\n.bl-ref { background: var(--color-surface); border: 1px solid var(--gray-200); border-radius: 6px; padding: 10px 12px; margin-bottom: 14px; }\n.bl-ref__head { font-size: 13px; font-weight: 700; color: var(--box-labels-gray-dark); margin-bottom: 6px; }\n.bl-ref__table { width: 100%; border-collapse: collapse; font-size: 12.5px; }\n.bl-ref__table th, .bl-ref__table td { border-bottom: 1px solid var(--brand-100); padding: 4px 6px; text-align: left; }\n.bl-ref__table th { color: var(--box-labels-gray); font-weight: 700; }\n.bl-num { text-align: right; }\n\n.bl-draft-note {\n  display: flex; align-items: center; justify-content: space-between; gap: 12px;\n  margin: 12px 20px 0; padding: 10px 14px; border-radius: 6px;\n  background: var(--color-floor-tint); border: 1px solid var(--box-labels-cyan); color: var(--box-labels-blue); font-size: 13.5px;\n}\n.bl-split-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; font-size: 15px; }\n.bl-split-row label { font-weight: 700; min-width: 48px; }\n.bl-split-row input[type=\"number\"] { width: 80px; padding: 6px 8px; font-size: 16px; border: 2px solid var(--gray-300); border-radius: 6px; }\n.bl-split-row select { padding: 6px 8px; font-size: 15px; border: 2px solid var(--gray-300); border-radius: 6px; }\n\n/* Phone (≤640px) — 2026-09-05 staff-dashboard sweep: the page measured wider than the\n   viewport at 375px and panned sideways. */\n@media (width <= 640px) {\n    .bl-header, .bl-header__right { flex-wrap: wrap; row-gap: 8px; }\n    .bl-header__search { width: 100%; }\n    #searchInput { min-width: 0; width: 100%; }\n    #printAllBtn { white-space: normal; }\n    .bl-back { color: inherit; text-decoration: none; font-weight: 600; font-size: 13px; }\n}\n\n.bl-back { color: inherit; text-decoration: none; font-weight: 600; font-size: 13px; opacity: .85; margin-right: 8px; }\n.bl-back:hover { opacity: 1; text-decoration: underline; }\n"
     }
   ]
 }
