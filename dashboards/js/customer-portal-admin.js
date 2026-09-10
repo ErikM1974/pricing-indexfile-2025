@@ -20,15 +20,20 @@
   function balanceOf(id) { var b = balances[String(id)]; return typeof b === 'number' ? b : 0; }
   function fmtMoney(n) { return '$' + (Math.round(n * 100) / 100).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
   async function loadRewardBalances() {
+    var requestId = ++balanceRead, inviteId = inviteLoad;
+    balancesLoaded = false; balanceError = '';
+    renderStats(); renderTable();
     try {
       var data = await api(BALANCES_API);
-      balances = (data && data.balances) || {};
+      if (requestId !== balanceRead || inviteId !== inviteLoad) return;
+      if (!data || !data.balances || Array.isArray(data.balances) || typeof data.balances !== 'object' || !Object.values(data.balances).every(function (value) { return typeof value === 'number' && Number.isFinite(value); })) throw new Error('Reward balance response incomplete');
+      balances = data.balances;
       balancesLoaded = true;
     } catch (err) {
-      if (err.message === 'auth') return;
+      if (requestId !== balanceRead || inviteId !== inviteLoad || err.message === 'auth') return;
       balances = {}; balancesLoaded = false;
       console.error('[portal-admin] reward balances failed:', err);
-      toast('Reward balances unavailable: ' + err.message, true);   // never a silent $0 (Erik #1 rule)
+      balanceError = 'Reward balances unavailable: ' + err.message;
     }
     renderStats();
     renderTable();
@@ -38,6 +43,29 @@
 
   var invites = [];          // last-loaded rows
   var filterTerm = '';
+  var invitesReady = false, inviteLoad = 0, balanceRead = 0, balanceError = '';
+  var requestsReady = false, requestLoad = 0;
+  var lookupRead = 0, inviteBusy = false, rewardBusy = false;
+  function holdControls(id) {
+    var controls = [...document.getElementById(id).querySelectorAll('input, select, button')];
+    var disabled = controls.map(function (control) { return control.disabled; });
+    controls.forEach(function (control) { control.disabled = true; });
+    return function () { controls.forEach(function (control, index) { control.disabled = disabled[index]; }); };
+  }
+  async function runInviteSave() {
+    if (inviteBusy) return;
+    inviteBusy = true; var release = holdControls('cpa-modal');
+    try { await saveInvite(); } finally { inviteBusy = false; release(); }
+  }
+  async function runRewardOperation(task) {
+    if (rewardBusy) return;
+    rewardBusy = true; var release = holdControls('cpa-rewards-modal');
+    document.getElementById('cpa-rw-status').textContent = '';
+    try { await task(); } finally { rewardBusy = false; release(); }
+  }
+  function rewardWriteError(error) {
+    toast('Could not confirm the reward change (' + error.message + '). Check recent activity and recalculate before retrying.', true);
+  }
   var searchTimer = null;
   var me = null;             // logged-in staff identity (for the "My customers" filter)
   var myOnly = false;        // when true, show only the logged-in rep's accounts
@@ -82,6 +110,11 @@
     var t = document.getElementById('cpa-toast');
     t.textContent = msg;
     t.className = 'cpa-toast show' + (isError ? ' cpa-toast-error' : '');
+    if (!document.getElementById('cpa-rewards-modal').hidden) {
+      var status = document.getElementById('cpa-rw-status'); status.textContent = msg;
+      status.className = 'cpa-dialog-status' + (isError ? ' cpa-dialog-error' : '');
+      t.classList.remove('show');
+    }
     setTimeout(function () { t.className = 'cpa-toast' + (isError ? ' cpa-toast-error' : ''); }, 3200);
   }
 
@@ -98,26 +131,33 @@
 
   // ---- load + render ----
   async function loadInvites() {
+    var requestId = ++inviteLoad;
+    ++balanceRead; invitesReady = false; invites = []; balancesLoaded = false; balanceError = '';
+    ['stat-total','stat-enabled','stat-disabled','stat-loggedin','stat-rewards','cpa-rowcount'].forEach(function (id) { document.getElementById(id).textContent = '—'; });
     var root = document.getElementById('content-root');
     root.className = 'dash-loading';
     root.textContent = 'Loading…';
     try {
       var data = await api(ACCESS_API);
-      invites = (data && data.rows) || [];
+      if (requestId !== inviteLoad) return;
+      if (!data || !Array.isArray(data.rows)) throw new Error('Portal list response incomplete');
+      invites = data.rows; invitesReady = true;
+      clearLoadError('Unable to load customer portals:');
       invites.sort(function (a, b) { return String(a.company_name || '').localeCompare(String(b.company_name || '')); });
       renderStats();
       renderTable();
       loadRewardBalances();
     } catch (err) {
-      if (err.message === 'auth') return;
+      if (requestId !== inviteLoad || err.message === 'auth') return;
       console.error('[portal-admin] load failed:', err);
       DashPage.showError('Unable to load customer portals: ' + err.message);
       root.className = '';
-      root.innerHTML = '<div class="cpa-empty"><i class="fas fa-triangle-exclamation" aria-hidden="true"></i>Could not load the list.<br><button type="button" class="cpa-btn cpa-btn-ghost cpa-btn-sm" id="cpa-retry-invites"><i class="fas fa-rotate-right" aria-hidden="true"></i> Retry</button></div>';
+      root.innerHTML = '<div class="cpa-empty"><i class="fas fa-triangle-exclamation" aria-hidden="true"></i>Could not load the list.<br><button type="button" class="btn cpa-btn cpa-btn-ghost cpa-btn-sm btn-ghost" id="cpa-retry-invites"><i class="fas fa-rotate-right" aria-hidden="true"></i> Retry</button></div>';
     }
   }
 
   function renderStats() {
+    if (!invitesReady) return;
     var enabled = invites.filter(function (r) { return r.enabled; }).length;
     var loggedin = invites.filter(function (r) { return r.last_login; }).length;
     document.getElementById('stat-total').textContent = invites.length;
@@ -155,6 +195,7 @@
   }
 
   function renderTable() {
+    if (!invitesReady) return;
     var root = document.getElementById('content-root');
     root.className = '';
     var rows = filtered();
@@ -185,23 +226,24 @@
           if (!balancesLoaded) return '<span class="cpa-rep-none">…</span>';
           var b = balanceOf(r.id_Customer);
           return b > 0.005
-            ? '<button class="cpa-rw-chip" data-action="rewards" data-id="' + esc(r.id_Customer) + '" data-company="' + esc(r.company_name) + '" title="Open reward dollars" aria-label="Reward dollars for ' + esc(r.company_name) + ': ' + fmtMoney(b) + '">' + fmtMoney(b) + '</button>'
+            ? '<button class="btn cpa-rw-chip" data-action="rewards" data-id="' + esc(r.id_Customer) + '" data-company="' + esc(r.company_name) + '" title="Open reward dollars" aria-label="Reward dollars for ' + esc(r.company_name) + ': ' + fmtMoney(b) + '">' + fmtMoney(b) + '</button>'
             : '<span class="cpa-rep-none">—</span>';
         })() + '</td>' +
         '<td>' + badge + '</td>' +
         '<td class="cpa-hide-sm">' + fmtLastLogin(r.last_login) + '</td>' +
         '<td><div class="cpa-actions">' +
-          '<button class="cpa-btn-icon" data-action="preview" data-id="' + esc(r.id_Customer) + '" title="Preview their portal" aria-label="Preview portal for ' + esc(r.company_name) + '"><i class="fas fa-eye" aria-hidden="true"></i></button>' +
-          '<button class="cpa-btn-icon" data-action="rewards" data-id="' + esc(r.id_Customer) + '" data-company="' + esc(r.company_name) + '" title="Reward dollars" aria-label="Reward dollars for ' + esc(r.company_name) + '"><i class="fas fa-coins" aria-hidden="true"></i></button>' +
-          '<button class="cpa-btn-icon" data-action="sendlink" data-email="' + esc(r.email) + '" title="Email a login link" aria-label="Email a login link to ' + esc(r.email) + '"><i class="fas fa-paper-plane" aria-hidden="true"></i></button>' +
-          '<button class="cpa-btn-icon" data-action="toggle" data-pk="' + esc(r.PK_ID) + '" data-enabled="' + (r.enabled ? '1' : '0') + '" data-email="' + esc(r.email) + '" title="' + toggleLabel + ' access" aria-label="' + toggleLabel + ' access for ' + esc(r.email) + '"><i class="fas ' + toggleIcon + '" aria-hidden="true"></i></button>' +
-          '<button class="cpa-btn-icon cpa-danger" data-action="delete" data-pk="' + esc(r.PK_ID) + '" data-email="' + esc(r.email) + '" title="Remove access" aria-label="Remove access for ' + esc(r.email) + '"><i class="fas fa-trash" aria-hidden="true"></i></button>' +
+          '<button class="btn cpa-btn-icon btn-ghost" data-action="preview" data-id="' + esc(r.id_Customer) + '" title="Preview their portal" aria-label="Preview portal for ' + esc(r.company_name) + '"><i class="fas fa-eye" aria-hidden="true"></i></button>' +
+          '<button class="btn cpa-btn-icon btn-ghost" data-action="rewards" data-id="' + esc(r.id_Customer) + '" data-company="' + esc(r.company_name) + '" title="Reward dollars" aria-label="Reward dollars for ' + esc(r.company_name) + '"><i class="fas fa-coins" aria-hidden="true"></i></button>' +
+          '<button class="btn cpa-btn-icon btn-ghost" data-action="sendlink" data-email="' + esc(r.email) + '" title="Email a login link" aria-label="Email a login link to ' + esc(r.email) + '"><i class="fas fa-paper-plane" aria-hidden="true"></i></button>' +
+          '<button class="btn cpa-btn-icon btn-ghost" data-action="toggle" data-pk="' + esc(r.PK_ID) + '" data-enabled="' + (r.enabled ? '1' : '0') + '" data-email="' + esc(r.email) + '" title="' + toggleLabel + ' access" aria-label="' + toggleLabel + ' access for ' + esc(r.email) + '"><i class="fas ' + toggleIcon + '" aria-hidden="true"></i></button>' +
+          '<button class="btn cpa-btn-icon cpa-danger btn-ghost btn-danger" data-action="delete" data-pk="' + esc(r.PK_ID) + '" data-email="' + esc(r.email) + '" title="Remove access" aria-label="Remove access for ' + esc(r.email) + '"><i class="fas fa-trash" aria-hidden="true"></i></button>' +
         '</div></td>' +
       '</tr>';
     }).join('');
 
     root.innerHTML =
-      '<div class="cpa-table-scroll"><table class="cpa-table"><thead><tr>' +
+      (balanceError ? '<p class="cpa-data-error" role="alert">' + esc(balanceError) + ' <button type="button" class="btn btn-ghost" id="cpa-retry-balances">Retry rewards</button></p>' : '') +
+      '<div class="cpa-table-scroll" role="region" aria-label="Portal records" tabindex="0"><table class="cpa-table"><thead><tr>' +
       '<th>Company</th><th class="cpa-hide-sm">Account Rep</th><th>Email</th><th class="cpa-hide-sm">Customer #</th>' +
       '<th><button type="button" class="cpa-th-sort' + (sortByRewards ? ' cpa-th-sort--on' : '') + '" id="cpa-sort-rewards" title="Sort by reward balance" aria-pressed="' + (sortByRewards ? 'true' : 'false') + '">Rewards <i class="fas ' + (sortByRewards ? 'fa-arrow-down-wide-short' : 'fa-sort') + '" aria-hidden="true"></i></button></th><th>Status</th>' +
       '<th class="cpa-hide-sm">Last Sign-In</th><th class="cpa-th-right">Actions</th>' +
@@ -211,7 +253,8 @@
   // ---- row actions (event delegation) ----
   async function onTableClick(e) {
     if (e.target.closest('#cpa-retry-invites')) { loadInvites(); return; }
-    if (e.target.closest('#cpa-sort-rewards')) { sortByRewards = !sortByRewards; renderTable(); return; }
+    if (e.target.closest('#cpa-retry-balances')) { loadRewardBalances(); return; }
+    if (e.target.closest('#cpa-sort-rewards')) { sortByRewards = !sortByRewards; renderTable(); document.getElementById('cpa-sort-rewards').focus(); return; }
     var btn = e.target.closest('button[data-action]');
     if (!btn) return;
     var action = btn.getAttribute('data-action');
@@ -270,9 +313,23 @@
   }
 
   // ---- Add Customer modal ----
+  function clearLoadError(prefix) {
+    var message = document.querySelector('.dash-error-banner-message');
+    if (message && message.textContent.startsWith(prefix)) DashPage.hideError();
+  }
+
+  function lookupMessage(message) {
+    var box = document.getElementById('cpa-lookup-results'), input = document.getElementById('cpa-lookup');
+    box.innerHTML = ''; box.hidden = true; lookupActive = -1;
+    input.setAttribute('aria-expanded', 'false'); input.removeAttribute('aria-activedescendant');
+    document.getElementById('cpa-lookup-status').textContent = message;
+  }
+
   function openModal() {
+    if (inviteBusy) return;
+    ++lookupRead; clearTimeout(searchTimer);
     document.getElementById('cpa-lookup').value = '';
-    document.getElementById('cpa-lookup-results').innerHTML = '<div class="cpa-lookup-hint">Start typing to search your customers…</div>';
+    lookupMessage('Start typing to search your customers…');
     document.getElementById('cpa-email').value = '';
     document.getElementById('cpa-idcustomer').value = '';
     document.getElementById('cpa-company').value = '';
@@ -280,13 +337,14 @@
     document.getElementById('cpa-modal-error').textContent = '';
     lookupActive = -1;
     lastFocus = document.activeElement;
-    document.getElementById('cpa-modal').hidden = false;
-    setTimeout(function () { document.getElementById('cpa-lookup').focus(); }, 50);
+    UiDialog.open('cpa-modal', { focus: '#cpa-lookup', onDismiss: closeModal });
   }
-  function closeModal() {
+  function closeModal(force) {
+    if (inviteBusy && force !== true) return;
     var m = document.getElementById('cpa-modal');
     if (m.hidden) return;
-    m.hidden = true;
+    ++lookupRead; clearTimeout(searchTimer);
+    UiDialog.close(m);
     if (lastFocus && lastFocus.focus) lastFocus.focus();
   }
   var lastFocus = null;
@@ -313,16 +371,21 @@
   }
 
   function onLookupInput() {
+    var requestId = ++lookupRead;
     var q = document.getElementById('cpa-lookup').value.trim();
+    function current() { return requestId === lookupRead && !document.getElementById('cpa-modal').hidden && q === document.getElementById('cpa-lookup').value.trim(); }
     clearTimeout(searchTimer);
     var box = document.getElementById('cpa-lookup-results');
-    if (q.length < 2) { box.innerHTML = '<div class="cpa-lookup-hint">Type at least 2 characters…</div>'; return; }
-    box.innerHTML = '<div class="cpa-lookup-hint">Searching…</div>';
+    if (q.length < 2) { lookupMessage('Type at least 2 characters…'); return; }
+    lookupMessage('Searching…');
     searchTimer = setTimeout(async function () {
       try {
         var data = await api(SEARCH_API + '?q=' + encodeURIComponent(q) + '&limit=8');
-        var contacts = (data && data.contacts) || [];
-        if (!contacts.length) { document.getElementById('cpa-lookup').setAttribute('aria-expanded', 'false'); box.innerHTML = '<div class="cpa-lookup-hint">No matches — you can still type the details below manually.</div>'; return; }
+        if (!current()) return;
+        if (!data || !Array.isArray(data.contacts)) throw new Error('Customer search response incomplete');
+        var contacts = data.contacts;
+        if (!contacts.length) { lookupMessage('No matches — you can still type the details below manually.'); return; }
+        document.getElementById('cpa-lookup-status').textContent = ''; box.hidden = false;
         document.getElementById('cpa-lookup').setAttribute('aria-expanded', 'true');
         lookupActive = -1;
         box.innerHTML = contacts.map(function (c, i) {
@@ -339,7 +402,7 @@
           '</div>';
         }).join('');
       } catch (err) {
-        if (err.message !== 'auth') box.innerHTML = '<div class="cpa-lookup-hint">Search failed: ' + esc(err.message) + '</div>';
+        if (current() && err.message !== 'auth') lookupMessage('Search failed: ' + err.message);
       }
     }, 280);
   }
@@ -376,7 +439,7 @@
       } else {
         toast('Invited ' + email);
       }
-      closeModal();
+      closeModal(true);
       await loadInvites();
     } catch (err) {
       if (err.message === 'auth') return;
@@ -406,18 +469,25 @@
   }
 
   async function loadRequests() {
+    var requestId = ++requestLoad; requestsReady = false; requests = [];
+    document.getElementById('cpa-req-rowcount').textContent = '—';
+    var badge = document.getElementById('cpa-req-badge'); badge.hidden = false; badge.textContent = '…'; badge.setAttribute('aria-label', 'Request count unavailable while loading');
     var root = document.getElementById('requests-root');
     root.className = 'dash-loading'; root.textContent = 'Loading…';
     try {
       var data = await api(REQ_API);
-      requests = (data && data.rows) || [];
+      if (requestId !== requestLoad) return;
+      if (!data || !Array.isArray(data.rows)) throw new Error('Request list response incomplete');
+      requests = data.rows; requestsReady = true;
+      clearLoadError('Unable to load requests:');
       requests.sort(function (a, b) { return String(b.Created || '').localeCompare(String(a.Created || '')); });
       updateReqBadge();
       renderRequests();
     } catch (err) {
-      if (err.message === 'auth') return;
+      if (requestId !== requestLoad || err.message === 'auth') return;
+      badge.setAttribute('aria-label', 'Request count unavailable');
       DashPage.showError('Unable to load requests: ' + err.message);
-      root.className = ''; root.innerHTML = '<div class="cpa-empty"><i class="fas fa-triangle-exclamation" aria-hidden="true"></i>Could not load requests.<br><button type="button" class="cpa-btn cpa-btn-ghost cpa-btn-sm" id="cpa-retry-requests"><i class="fas fa-rotate-right" aria-hidden="true"></i> Retry</button></div>';
+      root.className = ''; root.innerHTML = '<div class="cpa-empty"><i class="fas fa-triangle-exclamation" aria-hidden="true"></i>Could not load requests.<br><button type="button" class="btn cpa-btn cpa-btn-ghost cpa-btn-sm btn-ghost" id="cpa-retry-requests"><i class="fas fa-rotate-right" aria-hidden="true"></i> Retry</button></div>';
     }
   }
 
@@ -438,6 +508,7 @@
   }
 
   function renderRequests() {
+    if (!requestsReady) return;
     var root = document.getElementById('requests-root'); root.className = '';
     var rows = reqFiltered();
     document.getElementById('cpa-req-rowcount').textContent = rows.length + (rows.length === 1 ? ' request' : ' requests');
@@ -453,12 +524,12 @@
         '<td><div class="cpa-req-prod">' + esc(prod) + '</div><div class="cpa-req-sub">' + esc(sub) + '</div>' + (r.Note ? '<div class="cpa-req-note">&ldquo;' + esc(r.Note) + '&rdquo;</div>' : '') + '</td>' +
         '<td class="cpa-hide-sm">' + (r.Design_Number ? '#' + esc(r.Design_Number) : '—') + '</td>' +
         '<td class="cpa-hide-sm cpa-rep">' + (esc(r.Rep) || '—') + '</td>' +
-        '<td><select class="cpa-status-select cpa-status-' + slug + '" data-pk="' + esc(r.PK_ID) + '" aria-label="Status for ' + esc(r.Company_Name || r.Email) + '">' + opts + '</select></td>' +
+        '<td><select class="field-select cpa-status-select cpa-status-' + slug + '" data-pk="' + esc(r.PK_ID) + '" aria-label="Status for ' + esc(r.Company_Name || r.Email) + '">' + opts + '</select></td>' +
         '<td class="cpa-hide-sm">' + fmtLastLogin(r.Created) + '</td>' +
-        '<td><div class="cpa-actions"><button type="button" class="cpa-btn-icon cpa-danger" data-req-action="delete" data-pk="' + esc(r.PK_ID) + '" title="Delete request" aria-label="Delete request from ' + esc(r.Company_Name || r.Email) + '"><i class="fas fa-trash" aria-hidden="true"></i></button></div></td>' +
+        '<td><div class="cpa-actions"><button type="button" class="btn cpa-btn-icon cpa-danger btn-ghost btn-danger" data-req-action="delete" data-pk="' + esc(r.PK_ID) + '" title="Delete request" aria-label="Delete request from ' + esc(r.Company_Name || r.Email) + '"><i class="fas fa-trash" aria-hidden="true"></i></button></div></td>' +
       '</tr>';
     }).join('');
-    root.innerHTML = '<div class="cpa-table-scroll"><table class="cpa-table"><thead><tr><th>Customer</th><th>Product</th><th class="cpa-hide-sm">Design</th><th class="cpa-hide-sm">Rep</th><th>Status</th><th class="cpa-hide-sm">Requested</th><th class="cpa-th-right">Actions</th></tr></thead><tbody>' + body + '</tbody></table></div>';
+    root.innerHTML = '<div class="cpa-table-scroll" role="region" aria-label="Portal records" tabindex="0"><table class="cpa-table"><thead><tr><th>Customer</th><th>Product</th><th class="cpa-hide-sm">Design</th><th class="cpa-hide-sm">Rep</th><th>Status</th><th class="cpa-hide-sm">Requested</th><th class="cpa-th-right">Actions</th></tr></thead><tbody>' + body + '</tbody></table></div>';
   }
 
   async function onRequestsClick(e) {
@@ -474,24 +545,32 @@
     var sel = e.target.closest('select.cpa-status-select');
     if (!sel) return;
     var pk = sel.getAttribute('data-pk'), status = sel.value;
+    var requestId = requestLoad, row = requests.find(function (item) { return String(item.PK_ID) === String(pk); });
+    var previous = row && row.Status;
     sel.disabled = true;
     try {
       await api(REQ_API + '/' + encodeURIComponent(pk), { method: 'PUT', body: JSON.stringify({ status: status }) });
       toast('Status → ' + status);
+      if (requestId !== requestLoad || !requestsReady) return;
       var r = requests.find(function (x) { return String(x.PK_ID) === String(pk); });
       if (r) r.Status = status;
       updateReqBadge(); renderRequests();
-    } catch (err) { if (err.message !== 'auth') toast(err.message, true); sel.disabled = false; }
+    } catch (err) { if (err.message !== 'auth') toast(err.message, true); sel.disabled = false; if (previous && sel.isConnected) sel.value = previous; }
   }
 
   // ═══ Reward dollars (Phase 5) ═══
   var REWARDS_LEDGER_API = '/api/crm-proxy/customer-rewards/ledger';
   var REWARDS_ENTRY_API = '/api/portal-admin/rewards/entry';
   var rwCustomer = null;
+  var ledgerRead = 0, accrualRead = 0;
+  function finiteMoney(value) { return typeof value === 'number' && Number.isFinite(value); }
+  function rewardViewCurrent(customer) { return customer === rwCustomer && !document.getElementById('cpa-rewards-modal').hidden; }
 
   function money2(n) { return '$' + (Number(n) || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
 
   function openRewardsModal(id, company) {
+    if (rewardBusy) return;
+    document.getElementById('cpa-rw-status').textContent = '';
     rwCustomer = { id: id, company: company || '' };
     document.getElementById('cpa-rw-title').textContent = 'Reward Dollars — ' + (company || ('#' + id));
     document.getElementById('cpa-rw-balance').textContent = '…';
@@ -503,15 +582,16 @@
     document.getElementById('cpa-rw-ledger').innerHTML = 'Loading…';
     resetAccrualBox();
     rwLastFocus = document.activeElement;
-    document.getElementById('cpa-rewards-modal').hidden = false;
-    setTimeout(function () { document.getElementById('cpa-rw-amount').focus(); }, 50);
+    UiDialog.open('cpa-rewards-modal', { focus: '#cpa-rw-amount', onDismiss: closeRewardsModal });
     loadRewardLedger();
   }
   var rwLastFocus = null;
   function closeRewardsModal() {
+    if (rewardBusy) return;
     var m = document.getElementById('cpa-rewards-modal');
     if (m.hidden) return;
-    m.hidden = true;
+    ++ledgerRead; ++accrualRead;
+    UiDialog.close(m);
     // The table re-renders while the modal is open (balances refresh), so the opener element is
     // usually detached by now — fall back to the same customer's chip/coins button in the new table.
     if (rwLastFocus && !document.contains(rwLastFocus) && rwCustomer) {
@@ -519,15 +599,21 @@
         document.querySelector('button[data-action="rewards"][data-id="' + rwCustomer.id + '"]');
     }
     if (rwLastFocus && rwLastFocus.focus) rwLastFocus.focus();
+    rwCustomer = null;
   }
 
   async function loadRewardLedger() {
     loadRewardBalances();
     if (!rwCustomer) return;
+    var customer = rwCustomer, requestId = ++ledgerRead;
+    document.getElementById('cpa-rw-balance').textContent = '…';
+    document.getElementById('cpa-rw-ledger').textContent = 'Loading…';
     try {
-      var data = await api(REWARDS_LEDGER_API + '/' + encodeURIComponent(rwCustomer.id));
+      var data = await api(REWARDS_LEDGER_API + '/' + encodeURIComponent(customer.id));
+      if (!rewardViewCurrent(customer) || requestId !== ledgerRead) return;
+      if (!data || !finiteMoney(data.balance) || !Array.isArray(data.entries) || !data.entries.every(function (entry) { return entry && finiteMoney(entry.amount); })) throw new Error('Reward ledger response incomplete');
       document.getElementById('cpa-rw-balance').textContent = money2(data.balance);
-      var entries = (data && data.entries) || [];
+      var entries = data.entries;
       var el = document.getElementById('cpa-rw-ledger');
       if (!entries.length) { el.innerHTML = '<div class="cpa-rw-empty">No activity yet.</div>'; return; }
       el.innerHTML = entries.map(function (e) {
@@ -539,7 +625,9 @@
         '</div>';
       }).join('');
     } catch (err) {
-      if (err.message !== 'auth') document.getElementById('cpa-rw-ledger').innerHTML = '<div class="cpa-rw-empty">Could not load: ' + esc(err.message) + '</div>';
+      if (!rewardViewCurrent(customer) || requestId !== ledgerRead || err.message === 'auth') return;
+      document.getElementById('cpa-rw-balance').textContent = '—';
+      document.getElementById('cpa-rw-ledger').innerHTML = '<div class="cpa-rw-empty" role="alert">Could not load: ' + esc(err.message) + ' <button type="button" class="btn btn-ghost" id="cpa-rw-retry">Retry ledger</button></div>';
     }
   }
 
@@ -558,13 +646,14 @@
     saveBtn.disabled = true;
     try {
       var res = await api(REWARDS_ENTRY_API, { method: 'POST', body: JSON.stringify({ id_Customer: rwCustomer.id, company_name: rwCustomer.company, amount: amount, type: type, reason: reason, order_ref: orderRef }) });
+      if (!res || !finiteMoney(res.balance)) throw new Error('Reward change response incomplete');
       toast('Balance now ' + money2(res.balance));
       document.getElementById('cpa-rw-amount').value = '';
       document.getElementById('cpa-rw-reason').value = '';
       document.getElementById('cpa-rw-order').value = '';
       await loadRewardLedger();
     } catch (e2) {
-      if (e2.message !== 'auth') err.textContent = e2.message;
+      if (e2.message !== 'auth') { err.textContent = 'Could not confirm the reward change. Check recent activity before retrying.'; rewardWriteError(e2); }
     } finally { saveBtn.disabled = false; }
   }
 
@@ -574,7 +663,7 @@
   // and asks the server to post the pending grants (one ledger entry per order, Order_Ref = #).
   var REWARDS_ACCRUAL_API = '/api/portal-admin/rewards/accrual';
   var rwAccrual = null;
-  var ACCRUAL_IDLE_HTML = '<button class="cpa-btn cpa-btn-ghost cpa-btn-sm" id="cpa-rw-calc" type="button"><i class="fas fa-calculator" aria-hidden="true"></i> Calculate earned rewards</button>' +
+  var ACCRUAL_IDLE_HTML = '<button class="btn cpa-btn cpa-btn-ghost cpa-btn-sm btn-ghost" id="cpa-rw-calc" type="button"><i class="fas fa-calculator" aria-hidden="true"></i> Calculate earned rewards</button>' +
     '<div class="cpa-rw-meta cpa-rw-acc-hint">Garment lines on invoiced <em>and</em> paid orders in the program window, rated by SanMar piece-cost band. Rates live in Caspio &rarr; Service_Codes (ServiceType <code>REWARD</code>, code <code>RWD-EARN</code>).</div>';
   function resetAccrualBox() {
     rwAccrual = null;
@@ -583,6 +672,9 @@
   }
   async function calcAccrual() {
     if (!rwCustomer) return;
+    var customer = rwCustomer, requestId = ++accrualRead;
+    rwAccrual = null;
+    document.getElementById('cpa-rw-acc-window').textContent = '';
     var box = document.getElementById('cpa-rw-accrual');
     box.innerHTML = '<div class="cpa-rw-empty"><i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Calculating from ManageOrders + catalog costs…</div>';
     try {
@@ -590,12 +682,23 @@
       // loop until complete, showing progress. The server caches what it fetched.
       var rounds = 0;
       do {
-        rwAccrual = await api(REWARDS_ACCRUAL_API + '/' + encodeURIComponent(rwCustomer.id));
+        var result = await api(REWARDS_ACCRUAL_API + '/' + encodeURIComponent(customer.id));
+        if (!rewardViewCurrent(customer) || requestId !== accrualRead) return;
+        if (!result || !result.program || typeof result.program.configured !== 'boolean') throw new Error('Reward program response incomplete');
+        if (result.partial && (!result.progress || !finiteMoney(result.progress.fetched) || !finiteMoney(result.progress.total))) throw new Error('Calculation progress incomplete');
+        rwAccrual = result;
         if (rwAccrual.partial) box.innerHTML = '<div class="cpa-rw-empty"><i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Fetching order details… ' + esc(String(rwAccrual.progress.fetched)) + ' of ' + esc(String(rwAccrual.progress.total)) + ' orders</div>';
       } while (rwAccrual.partial && ++rounds < 40);
+      if (rwAccrual.program.configured) {
+        var totals = rwAccrual.totals;
+        if (!totals || !['earned','eligibleRevenue','granted','pending','ledgerBalance','overGranted','redeemedOnOrders','redeemPending'].every(function (key) { return finiteMoney(totals[key]); }) ||
+            !Array.isArray(rwAccrual.orders) || !Array.isArray(rwAccrual.program.tiers) || !rwAccrual.orders.every(function (order) { return order && ['eligibleRevenue','reward','granted','pending'].every(function (key) { return finiteMoney(order[key]); }) && Array.isArray(order.lines); })) throw new Error('Reward calculation response incomplete');
+      }
       renderAccrual();
     } catch (err) {
-      if (err.message !== 'auth') box.innerHTML = '<div class="cpa-rw-empty">Could not calculate: ' + esc(err.message) + '</div><button class="cpa-btn cpa-btn-ghost cpa-btn-sm" id="cpa-rw-calc" type="button">Try again</button>';
+      if (!rewardViewCurrent(customer) || requestId !== accrualRead) return;
+      rwAccrual = null;
+      if (err.message !== 'auth') box.innerHTML = '<div class="cpa-rw-empty">Could not calculate: ' + esc(err.message) + '</div><button class="btn cpa-btn cpa-btn-ghost cpa-btn-sm btn-ghost" id="cpa-rw-calc" type="button">Try again</button>';
     }
   }
   function renderAccrual() {
@@ -603,7 +706,7 @@
     document.getElementById('cpa-rw-acc-window').textContent = a.window ? ((a.program && a.program.name ? a.program.name + ' · ' : '') + a.window.from + ' → ' + a.window.to + (a.program && a.program.spend ? ' · spend ' + a.program.spend.from + ' → ' + a.program.spend.to : '')) : '';
     if (!a.program || !a.program.configured) {
       box.innerHTML = '<div class="cpa-rw-notconf"><strong>Reward program not configured.</strong> Add rows to Caspio &rarr; <code>Service_Codes</code>: ServiceType <code>REWARD</code>, ServiceCode <code>RWD-EARN</code>, PricingMethod <code>TIERED</code>, IsActive Yes, Visible No — one row per SanMar piece-cost band with TierLabel like <code>0-39.99</code> and <code>40+</code> and SellPrice = the % back. Optional <code>RWD-WINDOW</code> row with UnitCost = months (default 12). Nothing is granted until this exists.</div>' +
-        '<div class="cpa-rw-acc-actions"><button class="cpa-btn cpa-btn-ghost cpa-btn-sm" id="cpa-rw-calc" type="button">Recalculate</button></div>';
+        '<div class="cpa-rw-acc-actions"><button class="btn cpa-btn cpa-btn-ghost cpa-btn-sm btn-ghost" id="cpa-rw-calc" type="button">Recalculate</button></div>';
       return;
     }
     var t = a.totals;
@@ -623,16 +726,16 @@
         (o.redemption ? ' <span class="cpa-rw-meta neg">redeemed ' + money2(o.redemption.onOrder) + (o.redemption.pending ? ' (unposted)' : '') + '</span>' : '');
       return '<tr><td><details><summary>#' + esc(o.orderNumber) + (o.designName ? ' <span class="cpa-rw-meta">' + esc(o.designName) + '</span>' : '') + extra + '</summary><div class="cpa-rw-acc-lines">' + (o.linesUnavailable ? 'Line items unavailable — recalculate.' : (lines || 'No garment lines (decoration / fees only).')) + '</div></details></td>' +
         '<td>' + esc(String(o.invoiceDate || '').slice(0, 10)) + '</td><td class="num">' + money2(o.eligibleRevenue) + '</td><td class="num">' + money2(o.reward) + '</td><td class="num">' + money2(o.granted) + '</td><td class="num' + (o.pending > 0 ? ' pos' : '') + '">' + money2(o.pending) +
-        (o.overGranted > 0.005 ? '<div class="cpa-rw-meta neg">over by ' + money2(o.overGranted) + '</div><button class="cpa-btn cpa-btn-ghost cpa-btn-sm cpa-rw-reverse" type="button" data-order="' + esc(String(o.orderNumber)) + '" data-amount="' + esc(String(o.overGranted)) + '" title="Post an adjustment of up to −' + money2(o.overGranted) + ' (never below the unspent balance)"><i class="fas fa-undo" aria-hidden="true"></i> Reverse</button>' : '') +
+        (o.overGranted > 0.005 ? '<div class="cpa-rw-meta neg">over by ' + money2(o.overGranted) + '</div><button class="btn cpa-btn cpa-btn-ghost cpa-btn-sm cpa-rw-reverse btn-ghost" type="button" data-order="' + esc(String(o.orderNumber)) + '" data-amount="' + esc(String(o.overGranted)) + '" title="Post an adjustment of up to −' + money2(o.overGranted) + ' (never below the unspent balance)"><i class="fas fa-undo" aria-hidden="true"></i> Reverse</button>' : '') +
         '</td></tr>';
     }).join('') + '</tbody></table>';
     var n = a.orders.filter(function (o) { return o.pending > 0 && !o.linesUnavailable; }).length;
     var nr = a.orders.filter(function (o) { return o.redemption && o.redemption.pending > 0 && !o.linesUnavailable; }).length;
     html += '<div class="cpa-rw-acc-actions">' +
-      ((n || nr) ? '<button class="cpa-btn cpa-btn-primary cpa-btn-sm" id="cpa-rw-post" type="button"><i class="fas fa-coins" aria-hidden="true"></i> Post ' + (n ? money2(t.pending) + ' as ' + n + ' grant' + (n === 1 ? '' : 's') : '') + (n && nr ? ' + ' : '') + (nr ? nr + ' redemption' + (nr === 1 ? '' : 's') + ' (' + money2(t.redeemPending) + ')' : '') + '</button>' : '<span class="cpa-rw-meta">Nothing pending — grants and redemptions are all in the ledger.</span>') +
-      ' <button class="cpa-btn cpa-btn-ghost cpa-btn-sm" id="cpa-rw-calc" type="button">Recalculate</button>' +
+      ((n || nr) ? '<button class="btn cpa-btn cpa-btn-primary cpa-btn-sm btn-primary" id="cpa-rw-post" type="button"><i class="fas fa-coins" aria-hidden="true"></i> Post ' + (n ? money2(t.pending) + ' as ' + n + ' grant' + (n === 1 ? '' : 's') : '') + (n && nr ? ' + ' : '') + (nr ? nr + ' redemption' + (nr === 1 ? '' : 's') + ' (' + money2(t.redeemPending) + ')' : '') + '</button>' : '<span class="cpa-rw-meta">Nothing pending — grants and redemptions are all in the ledger.</span>') +
+      ' <button class="btn cpa-btn cpa-btn-ghost cpa-btn-sm btn-ghost" id="cpa-rw-calc" type="button">Recalculate</button>' +
       (a.program && a.program.spend && new Date().toISOString().slice(0, 10) > a.program.spend.to && t.ledgerBalance > 0.005
-        ? ' <button class="cpa-btn cpa-btn-ghost cpa-btn-sm" id="cpa-rw-expire" type="button" title="Spend window closed ' + esc(a.program.spend.to) + '"><i class="fas fa-hourglass-end" aria-hidden="true"></i> Expire unused ' + money2(t.ledgerBalance) + '</button>'
+        ? ' <button class="btn cpa-btn cpa-btn-ghost cpa-btn-sm btn-ghost" id="cpa-rw-expire" type="button" title="Spend window closed ' + esc(a.program.spend.to) + '"><i class="fas fa-hourglass-end" aria-hidden="true"></i> Expire unused ' + money2(t.ledgerBalance) + '</button>'
         : '') + '</div>';
     box.innerHTML = html;
   }
@@ -641,28 +744,31 @@
     if (!window.confirm('Remove the unused ' + money2(rwAccrual.totals.ledgerBalance) + ' balance for ' + (rwCustomer.company || '#' + rwCustomer.id) + '? (' + rwAccrual.program.name + ' expired ' + rwAccrual.program.spend.to + ')')) return;
     try {
       var res = await api(REWARDS_ACCRUAL_API.replace('/accrual', '/expire') + '/' + encodeURIComponent(rwCustomer.id), { method: 'POST', body: JSON.stringify({ company_name: rwCustomer.company }) });
+      if (!res || !finiteMoney(res.expired) || !finiteMoney(res.balance)) throw new Error('Expiry response incomplete');
       toast('Expired ' + money2(res.expired) + ' — balance now ' + money2(res.balance));
       await loadRewardLedger(); await calcAccrual();
-    } catch (e) { if (e.message !== 'auth') toast(e.message, true); }
+    } catch (e) { if (e.message !== 'auth') rewardWriteError(e); }
   }
   async function reverseAccrual(orderNo, over) {
     if (!rwCustomer || !rwAccrual) return;
     if (!window.confirm('Reverse up to ' + money2(over) + ' granted on order #' + orderNo + ' for ' + (rwCustomer.company || '#' + rwCustomer.id) + '?\n\nThe order now earns less than it was granted (re-invoiced lower). Only the unspent balance can be taken back; dollars already redeemed stay redeemed.')) return;
     try {
       var res = await api(REWARDS_ACCRUAL_API + '/' + encodeURIComponent(rwCustomer.id) + '/reverse', { method: 'POST', body: JSON.stringify({ orderNumber: orderNo, company_name: rwCustomer.company }) });
+      if (!res || !finiteMoney(res.reversed) || !finiteMoney(res.overGranted) || !finiteMoney(res.balance)) throw new Error('Reversal response incomplete');
       toast('Reversed ' + money2(res.reversed) + ' on #' + orderNo + (res.reversed + 0.005 < res.overGranted ? ' (' + money2(res.overGranted - res.reversed) + ' was already redeemed)' : '') + ' — balance now ' + money2(res.balance));
       await loadRewardLedger(); await calcAccrual();
-    } catch (e) { if (e.message !== 'auth') toast(e.message, true); }
+    } catch (e) { if (e.message !== 'auth') rewardWriteError(e); }
   }
   async function postAccrual() {
     if (!rwCustomer || !rwAccrual) return;
     var btn = document.getElementById('cpa-rw-post'); if (btn) { btn.disabled = true; btn.textContent = 'Posting…'; }
     try {
       var res = await api(REWARDS_ACCRUAL_API + '/' + encodeURIComponent(rwCustomer.id) + '/post', { method: 'POST', body: JSON.stringify({ company_name: rwCustomer.company }) });
+      if (!res || !Array.isArray(res.posted) || !finiteMoney(res.total)) throw new Error('Posting response incomplete');
       toast('Posted ' + res.posted.length + ' grant' + (res.posted.length === 1 ? '' : 's') + ' (' + money2(res.total) + ')' + (res.redeemed && res.redeemed.length ? ' + ' + res.redeemed.length + ' redemption' + (res.redeemed.length === 1 ? '' : 's') + ' (' + money2(res.redeemTotal) + ')' : '') + (res.failed && res.failed.length ? ' — ' + res.failed.length + ' failed: ' + esc(res.failed.map(function (f) { return '#' + f.orderNumber + ' ' + f.error; }).join('; ')) : ''), !!(res.failed && res.failed.length));
       await loadRewardLedger();
       await calcAccrual();
-    } catch (e) { if (e.message !== 'auth') toast(e.message, true); if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-coins" aria-hidden="true"></i> Post pending grants'; } }
+    } catch (e) { if (e.message !== 'auth') rewardWriteError(e); if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-coins" aria-hidden="true"></i> Post pending grants'; } }
   }
 
   // ---- wire up ----
@@ -682,7 +788,7 @@
     document.getElementById('cpa-lookup').addEventListener('input', onLookupInput);
     document.getElementById('cpa-lookup').addEventListener('keydown', onLookupKeydown);
     document.getElementById('cpa-lookup-results').addEventListener('click', onLookupPick);
-    document.getElementById('cpa-save').addEventListener('click', saveInvite);
+    document.getElementById('cpa-save').addEventListener('click', runInviteSave);
     // Tabs + Re-order Requests view
     var tabs = Array.prototype.slice.call(document.querySelectorAll('.cpa-tab'));
     tabs.forEach(function (b, i) {
@@ -701,18 +807,39 @@
     // Reward dollars modal
     document.getElementById('cpa-rw-close').addEventListener('click', closeRewardsModal);
     document.getElementById('cpa-rewards-modal').addEventListener('click', function (e) { if (e.target === this) closeRewardsModal(); });
-    document.getElementById('cpa-rw-save').addEventListener('click', submitRewardEntry);
+    document.getElementById('cpa-rw-save').addEventListener('click', function () { runRewardOperation(submitRewardEntry); });
+    document.getElementById('cpa-rw-ledger').addEventListener('click', function (e) { if (!rewardBusy && e.target.closest('#cpa-rw-retry')) loadRewardLedger(); });
     document.getElementById('cpa-rw-accrual').addEventListener('click', function (e) {
+      if (rewardBusy) return;
       if (e.target.closest('#cpa-rw-calc')) calcAccrual();
-      else if (e.target.closest('#cpa-rw-post')) postAccrual();
-      else if (e.target.closest('#cpa-rw-expire')) expireAccrual();
-      else if (e.target.closest('.cpa-rw-reverse')) { var rb = e.target.closest('.cpa-rw-reverse'); reverseAccrual(rb.getAttribute('data-order'), Number(rb.getAttribute('data-amount')) || 0); }
+      else if (e.target.closest('#cpa-rw-post')) runRewardOperation(postAccrual);
+      else if (e.target.closest('#cpa-rw-expire')) runRewardOperation(expireAccrual);
+      else if (e.target.closest('.cpa-rw-reverse')) { var rb = e.target.closest('.cpa-rw-reverse'); runRewardOperation(function () { return reverseAccrual(rb.getAttribute('data-order'), Number(rb.getAttribute('data-amount')) || 0); }); }
     });
     document.addEventListener('keydown', function (e) {
       if (e.key !== 'Escape') return;
       if (!document.getElementById('cpa-rewards-modal').hidden) closeRewardsModal();
       else closeModal();
     });
+    // Plain paper rows avoid native details fragmenting money into another page.
+    window.addEventListener('beforeprint', function () {
+      var paper = document.getElementById('cpa-rw-accrual-print');
+      paper.innerHTML = document.getElementById('cpa-rw-accrual').innerHTML;
+      paper.querySelectorAll('button').forEach(function (button) { button.remove(); });
+      paper.querySelectorAll('[id]').forEach(function (node) { node.removeAttribute('id'); });
+      paper.querySelectorAll('details').forEach(function (details) {
+        var row = document.createElement('div'); row.className = 'cpa-print-order';
+        row.innerHTML = details.innerHTML;
+        row.querySelectorAll('summary').forEach(function (summary) { var label = document.createElement('div'); label.className = 'cpa-print-order-title'; label.innerHTML = summary.innerHTML; summary.replaceWith(label); });
+        details.replaceWith(row);
+      });
+      var amount = document.getElementById('cpa-rw-amount').value.trim(), reason = document.getElementById('cpa-rw-reason').value.trim(), order = document.getElementById('cpa-rw-order').value.trim();
+      var type = document.getElementById('cpa-rw-type').selectedOptions[0].textContent;
+      var draft = document.getElementById('cpa-rw-draft-print'); draft.innerHTML = '';
+      if (amount || reason || order) draft.innerHTML = '<h4>Unposted ledger entry — not saved</h4><p>' +
+        [['Amount', amount], ['Type', type], ['Reason', reason], ['ShopWorks order #', order]].filter(function (field) { return field[1]; }).map(function (field) { return '<strong>' + esc(field[0]) + ':</strong> ' + esc(field[1]); }).join('<br>') + '</p>';
+    });
+    window.addEventListener('afterprint', function () { document.getElementById('cpa-rw-accrual-print').innerHTML = ''; });
     loadMe();
     loadInvites();
     loadRequests(); // populate the "New" badge on the Requests tab

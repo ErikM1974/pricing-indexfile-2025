@@ -1753,6 +1753,504 @@
       "before": "        window.addEventListener('beforeunload', function (e) {",
       "after": "        window.addEventListener('beforeprint', function () {\n            var post = collect();\n            var fields = [['URL slug', post.slug], ['Category', post.category], ['Author', post.author], ['Meta description', post.metaDescription], ['Hero image URL', post.heroImageUrl]];\n            document.getElementById('blogPrintMetadata').innerHTML = '<h1>' + esc(post.title || 'Untitled post') + '</h1>' +\n                '<p>' + esc(document.getElementById('saveState').textContent) + '</p><dl>' +\n                fields.filter(function (field) { return field[1]; }).map(function (field) {\n                    return '<dt>' + esc(field[0]) + '</dt><dd>' + esc(field[1]) + '</dd>';\n                }).join('') + '</dl>';\n        });\n\n        window.addEventListener('beforeunload', function (e) {",
       "count": 1
+    },
+    {
+      "file": "dashboards/customer-portal-admin.html",
+      "before": "family=Inter:wght@400;500;600;700",
+      "after": "family=Public+Sans:wght@400;500;600;700",
+      "count": 1
+    },
+    {
+      "file": "dashboards/customer-portal-admin.html",
+      "before": "    <link rel=\"stylesheet\" href=\"/shared_components/css/art-hub.css?v=2026.09.07.19\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/dash-shell.css?v=2026.09.07.10\">\n    <link rel=\"stylesheet\" href=\"/dashboards/css/customer-portal-admin.css?v=2026.09.07.19\">",
+      "after": "    <link rel=\"stylesheet\" href=\"/shared_components/css/components.css?v=2026.09.10.2\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/staff-toolkit.css?v=2026.09.10.2\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/customer-portal-admin.html",
+      "before": "<body>",
+      "after": "<body data-ui=\"unified\" data-staff-tool=\"customer-portal-admin\">\n    <a class=\"skip-link\" href=\"#staff-tool-main\">Skip to content</a>",
+      "count": 1
+    },
+    {
+      "file": "dashboards/customer-portal-admin.html",
+      "before": "<main class=\"dash-content\">",
+      "after": "<main class=\"dash-content\" id=\"staff-tool-main\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/customer-portal-admin.html",
+      "before": "<script src=\"/dashboards/js/customer-portal-admin.js?v=2026.09.05.31\"></script>",
+      "after": "<script src=\"/shared_components/js/ui-dialog.js?v=2026.09.10.2\"></script>\n    <script src=\"/dashboards/js/customer-portal-admin.js?v=2026.09.10.2\"></script>",
+      "count": 1
+    },
+    {
+      "file": "dashboards/customer-portal-admin.html",
+      "before": "<input type=\"text\" id=\"cpa-filter\" aria-label=\"Search portal users\" placeholder=\"Filter by company, email, rep or customer #…\" autocomplete=\"off\">",
+      "after": "<input class=\"field-input\" type=\"text\" id=\"cpa-filter\" aria-label=\"Search portal users\" placeholder=\"Filter by company, email, rep or customer #…\" autocomplete=\"off\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/customer-portal-admin.html",
+      "before": "<input type=\"text\" id=\"cpa-req-filter\" aria-label=\"Search access requests\" placeholder=\"Filter by company, product, design or rep…\" autocomplete=\"off\">",
+      "after": "<input class=\"field-input\" type=\"text\" id=\"cpa-req-filter\" aria-label=\"Search access requests\" placeholder=\"Filter by company, product, design or rep…\" autocomplete=\"off\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/customer-portal-admin.html",
+      "before": "<select id=\"cpa-req-status\" aria-label=\"Request status\" class=\"cpa-select\">",
+      "after": "<select id=\"cpa-req-status\" aria-label=\"Request status\" class=\"field-select cpa-select\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/customer-portal-admin.html",
+      "before": "<input type=\"text\" id=\"cpa-lookup\" placeholder=\"e.g. Lincoln High School\" autocomplete=\"off\" role=\"combobox\" aria-autocomplete=\"list\" aria-expanded=\"false\" aria-controls=\"cpa-lookup-results\">",
+      "after": "<input class=\"field-input\" type=\"text\" id=\"cpa-lookup\" placeholder=\"e.g. Lincoln High School\" autocomplete=\"off\" role=\"combobox\" aria-autocomplete=\"list\" aria-expanded=\"false\" aria-controls=\"cpa-lookup-results\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/customer-portal-admin.html",
+      "before": "<input type=\"email\" id=\"cpa-email\" placeholder=\"buyer@company.com\" autocomplete=\"off\">",
+      "after": "<input class=\"field-input\" type=\"email\" id=\"cpa-email\" placeholder=\"buyer@company.com\" autocomplete=\"off\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/customer-portal-admin.html",
+      "before": "<input type=\"text\" id=\"cpa-idcustomer\" placeholder=\"13616\" inputmode=\"numeric\" autocomplete=\"off\">",
+      "after": "<input class=\"field-input\" type=\"text\" id=\"cpa-idcustomer\" placeholder=\"13616\" inputmode=\"numeric\" autocomplete=\"off\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/customer-portal-admin.html",
+      "before": "<input type=\"text\" id=\"cpa-company\" placeholder=\"Company, Inc.\" autocomplete=\"off\">",
+      "after": "<input class=\"field-input\" type=\"text\" id=\"cpa-company\" placeholder=\"Company, Inc.\" autocomplete=\"off\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/customer-portal-admin.html",
+      "before": "<input type=\"text\" id=\"cpa-rw-amount\" inputmode=\"decimal\" placeholder=\"25\" autocomplete=\"off\">",
+      "after": "<input class=\"field-input\" type=\"text\" id=\"cpa-rw-amount\" inputmode=\"decimal\" placeholder=\"25\" autocomplete=\"off\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/customer-portal-admin.html",
+      "before": "<select id=\"cpa-rw-type\" class=\"cpa-select cpa-rw-select\">",
+      "after": "<select id=\"cpa-rw-type\" class=\"field-select cpa-select cpa-rw-select\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/customer-portal-admin.html",
+      "before": "<input type=\"text\" id=\"cpa-rw-reason\" placeholder=\"e.g. Loyalty bonus, applied to order #…\" autocomplete=\"off\">",
+      "after": "<input class=\"field-input\" type=\"text\" id=\"cpa-rw-reason\" placeholder=\"e.g. Loyalty bonus, applied to order #…\" autocomplete=\"off\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/customer-portal-admin.html",
+      "before": "<input type=\"text\" id=\"cpa-rw-order\" inputmode=\"numeric\" placeholder=\"e.g. 141467\" autocomplete=\"off\">",
+      "after": "<input class=\"field-input\" type=\"text\" id=\"cpa-rw-order\" inputmode=\"numeric\" placeholder=\"e.g. 141467\" autocomplete=\"off\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/customer-portal-admin.html",
+      "before": "class=\"cpa-field\"",
+      "after": "class=\"field cpa-field\"",
+      "count": 8
+    },
+    {
+      "file": "dashboards/customer-portal-admin.html",
+      "before": "class=\"cpa-field-label\"",
+      "after": "class=\"field-label cpa-field-label\"",
+      "count": 8
+    },
+    {
+      "file": "dashboards/customer-portal-admin.html",
+      "before": "class=\"cpa-tab cpa-tab-active\"",
+      "after": "class=\"btn cpa-tab cpa-tab-active btn-ghost\"",
+      "count": 1
+    },
+    {
+      "file": "dashboards/customer-portal-admin.html",
+      "before": "class=\"cpa-tab\"",
+      "after": "class=\"btn cpa-tab btn-ghost\"",
+      "count": 1
+    },
+    {
+      "file": "dashboards/customer-portal-admin.html",
+      "before": "class=\"cpa-btn cpa-btn-ghost\"",
+      "after": "class=\"btn cpa-btn cpa-btn-ghost btn-ghost\"",
+      "count": 3
+    },
+    {
+      "file": "dashboards/customer-portal-admin.html",
+      "before": "class=\"cpa-btn cpa-btn-primary\"",
+      "after": "class=\"btn cpa-btn cpa-btn-primary btn-primary\"",
+      "count": 2
+    },
+    {
+      "file": "dashboards/customer-portal-admin.html",
+      "before": "class=\"cpa-modal-close\"",
+      "after": "class=\"btn cpa-modal-close btn-ghost\"",
+      "count": 2
+    },
+    {
+      "file": "dashboards/customer-portal-admin.html",
+      "before": "class=\"cpa-btn cpa-btn-primary cpa-rw-save-btn\"",
+      "after": "class=\"btn cpa-btn cpa-btn-primary cpa-rw-save-btn btn-primary\"",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/customer-portal-admin.js",
+      "before": "class=\"cpa-btn cpa-btn-ghost cpa-btn-sm\"",
+      "after": "class=\"btn cpa-btn cpa-btn-ghost cpa-btn-sm btn-ghost\"",
+      "count": 7
+    },
+    {
+      "file": "dashboards/js/customer-portal-admin.js",
+      "before": "class=\"cpa-rw-chip\"",
+      "after": "class=\"btn cpa-rw-chip\"",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/customer-portal-admin.js",
+      "before": "class=\"cpa-btn-icon\"",
+      "after": "class=\"btn cpa-btn-icon btn-ghost\"",
+      "count": 4
+    },
+    {
+      "file": "dashboards/js/customer-portal-admin.js",
+      "before": "class=\"cpa-btn-icon cpa-danger\"",
+      "after": "class=\"btn cpa-btn-icon cpa-danger btn-ghost btn-danger\"",
+      "count": 2
+    },
+    {
+      "file": "dashboards/js/customer-portal-admin.js",
+      "before": "class=\"cpa-btn cpa-btn-ghost cpa-btn-sm cpa-rw-reverse\"",
+      "after": "class=\"btn cpa-btn cpa-btn-ghost cpa-btn-sm cpa-rw-reverse btn-ghost\"",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/customer-portal-admin.js",
+      "before": "class=\"cpa-btn cpa-btn-primary cpa-btn-sm\"",
+      "after": "class=\"btn cpa-btn cpa-btn-primary cpa-btn-sm btn-primary\"",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/customer-portal-admin.js",
+      "before": "class=\"cpa-status-select cpa-status-",
+      "after": "class=\"field-select cpa-status-select cpa-status-",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/customer-portal-admin.js",
+      "before": "<div class=\"cpa-table-scroll\"><table class=\"cpa-table\">",
+      "after": "<div class=\"cpa-table-scroll\" role=\"region\" aria-label=\"Portal records\" tabindex=\"0\"><table class=\"cpa-table\">",
+      "count": 2
+    },
+    {
+      "file": "dashboards/js/customer-portal-admin.js",
+      "before": "    document.getElementById('cpa-modal').hidden = false;\n    setTimeout(function () { document.getElementById('cpa-lookup').focus(); }, 50);",
+      "after": "    UiDialog.open('cpa-modal', { focus: '#cpa-lookup', onDismiss: closeModal });",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/customer-portal-admin.js",
+      "before": "    document.getElementById('cpa-rewards-modal').hidden = false;\n    setTimeout(function () { document.getElementById('cpa-rw-amount').focus(); }, 50);",
+      "after": "    UiDialog.open('cpa-rewards-modal', { focus: '#cpa-rw-amount', onDismiss: closeRewardsModal });",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/customer-portal-admin.js",
+      "before": "    m.hidden = true;",
+      "after": "    UiDialog.close(m);",
+      "count": 2
+    },
+    {
+      "file": "dashboards/js/customer-portal-admin.js",
+      "before": "  var filterTerm = '';",
+      "after": "  var filterTerm = '';\n  var invitesReady = false, inviteLoad = 0, balanceRead = 0, balanceError = '';\n  var requestsReady = false, requestLoad = 0;\n  var lookupRead = 0;",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/customer-portal-admin.js",
+      "before": "  async function loadRewardBalances() {\n    try {\n      var data = await api(BALANCES_API);\n      balances = (data && data.balances) || {};\n      balancesLoaded = true;\n    } catch (err) {\n      if (err.message === 'auth') return;\n      balances = {}; balancesLoaded = false;\n      console.error('[portal-admin] reward balances failed:', err);\n      toast('Reward balances unavailable: ' + err.message, true);   // never a silent $0 (Erik #1 rule)\n    }\n    renderStats();\n    renderTable();\n  }\n",
+      "after": "  async function loadRewardBalances() {\n    var requestId = ++balanceRead, inviteId = inviteLoad;\n    balancesLoaded = false; balanceError = '';\n    renderStats(); renderTable();\n    try {\n      var data = await api(BALANCES_API);\n      if (requestId !== balanceRead || inviteId !== inviteLoad) return;\n      if (!data || !data.balances || Array.isArray(data.balances) || typeof data.balances !== 'object' || !Object.values(data.balances).every(function (value) { return typeof value === 'number' && Number.isFinite(value); })) throw new Error('Reward balance response incomplete');\n      balances = data.balances;\n      balancesLoaded = true;\n    } catch (err) {\n      if (requestId !== balanceRead || inviteId !== inviteLoad || err.message === 'auth') return;\n      balances = {}; balancesLoaded = false;\n      console.error('[portal-admin] reward balances failed:', err);\n      balanceError = 'Reward balances unavailable: ' + err.message;\n    }\n    renderStats();\n    renderTable();\n  }\n",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/customer-portal-admin.js",
+      "before": "  async function loadInvites() {\n    var root = document.getElementById('content-root');\n    root.className = 'dash-loading';\n    root.textContent = 'Loading…';\n    try {\n      var data = await api(ACCESS_API);\n      invites = (data && data.rows) || [];\n      invites.sort(function (a, b) { return String(a.company_name || '').localeCompare(String(b.company_name || '')); });\n      renderStats();\n      renderTable();\n      loadRewardBalances();\n    } catch (err) {\n      if (err.message === 'auth') return;\n      console.error('[portal-admin] load failed:', err);\n      DashPage.showError('Unable to load customer portals: ' + err.message);\n      root.className = '';\n      root.innerHTML = '<div class=\"cpa-empty\"><i class=\"fas fa-triangle-exclamation\" aria-hidden=\"true\"></i>Could not load the list.<br><button type=\"button\" class=\"btn cpa-btn cpa-btn-ghost cpa-btn-sm btn-ghost\" id=\"cpa-retry-invites\"><i class=\"fas fa-rotate-right\" aria-hidden=\"true\"></i> Retry</button></div>';\n    }\n  }\n\n",
+      "after": "  async function loadInvites() {\n    var requestId = ++inviteLoad;\n    ++balanceRead; invitesReady = false; invites = []; balancesLoaded = false; balanceError = '';\n    ['stat-total','stat-enabled','stat-disabled','stat-loggedin','stat-rewards','cpa-rowcount'].forEach(function (id) { document.getElementById(id).textContent = '—'; });\n    var root = document.getElementById('content-root');\n    root.className = 'dash-loading';\n    root.textContent = 'Loading…';\n    try {\n      var data = await api(ACCESS_API);\n      if (requestId !== inviteLoad) return;\n      if (!data || !Array.isArray(data.rows)) throw new Error('Portal list response incomplete');\n      invites = data.rows; invitesReady = true;\n      clearLoadError('Unable to load customer portals:');\n      invites.sort(function (a, b) { return String(a.company_name || '').localeCompare(String(b.company_name || '')); });\n      renderStats();\n      renderTable();\n      loadRewardBalances();\n    } catch (err) {\n      if (requestId !== inviteLoad || err.message === 'auth') return;\n      console.error('[portal-admin] load failed:', err);\n      DashPage.showError('Unable to load customer portals: ' + err.message);\n      root.className = '';\n      root.innerHTML = '<div class=\"cpa-empty\"><i class=\"fas fa-triangle-exclamation\" aria-hidden=\"true\"></i>Could not load the list.<br><button type=\"button\" class=\"btn cpa-btn cpa-btn-ghost cpa-btn-sm btn-ghost\" id=\"cpa-retry-invites\"><i class=\"fas fa-rotate-right\" aria-hidden=\"true\"></i> Retry</button></div>';\n    }\n  }\n\n",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/customer-portal-admin.js",
+      "before": "  function renderStats() {",
+      "after": "  function renderStats() {\n    if (!invitesReady) return;",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/customer-portal-admin.js",
+      "before": "  function renderTable() {",
+      "after": "  function renderTable() {\n    if (!invitesReady) return;",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/customer-portal-admin.js",
+      "before": "    root.innerHTML =\n      '<div class=\"cpa-table-scroll\"",
+      "after": "    root.innerHTML =\n      (balanceError ? '<p class=\"cpa-data-error\" role=\"alert\">' + esc(balanceError) + ' <button type=\"button\" class=\"btn btn-ghost\" id=\"cpa-retry-balances\">Retry rewards</button></p>' : '') +\n      '<div class=\"cpa-table-scroll\"",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/customer-portal-admin.js",
+      "before": "    if (e.target.closest('#cpa-retry-invites')) { loadInvites(); return; }",
+      "after": "    if (e.target.closest('#cpa-retry-invites')) { loadInvites(); return; }\n    if (e.target.closest('#cpa-retry-balances')) { loadRewardBalances(); return; }",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/customer-portal-admin.js",
+      "before": "    if (e.target.closest('#cpa-sort-rewards')) { sortByRewards = !sortByRewards; renderTable(); return; }",
+      "after": "    if (e.target.closest('#cpa-sort-rewards')) { sortByRewards = !sortByRewards; renderTable(); document.getElementById('cpa-sort-rewards').focus(); return; }",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/customer-portal-admin.js",
+      "before": "  function openModal() {",
+      "after": "  function clearLoadError(prefix) {\n    var message = document.querySelector('.dash-error-banner-message');\n    if (message && message.textContent.startsWith(prefix)) DashPage.hideError();\n  }\n\n  function lookupMessage(message) {\n    var box = document.getElementById('cpa-lookup-results'), input = document.getElementById('cpa-lookup');\n    box.innerHTML = ''; box.hidden = true; lookupActive = -1;\n    input.setAttribute('aria-expanded', 'false'); input.removeAttribute('aria-activedescendant');\n    document.getElementById('cpa-lookup-status').textContent = message;\n  }\n\n  function openModal() {\n    ++lookupRead; clearTimeout(searchTimer);",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/customer-portal-admin.js",
+      "before": "    document.getElementById('cpa-lookup-results').innerHTML = '<div class=\"cpa-lookup-hint\">Start typing to search your customers…</div>';",
+      "after": "    lookupMessage('Start typing to search your customers…');",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/customer-portal-admin.js",
+      "before": "    var m = document.getElementById('cpa-modal');\n    if (m.hidden) return;",
+      "after": "    var m = document.getElementById('cpa-modal');\n    if (m.hidden) return;\n    ++lookupRead; clearTimeout(searchTimer);",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/customer-portal-admin.js",
+      "before": "  function onLookupInput() {\n    var q = document.getElementById('cpa-lookup').value.trim();\n    clearTimeout(searchTimer);\n    var box = document.getElementById('cpa-lookup-results');\n    if (q.length < 2) { box.innerHTML = '<div class=\"cpa-lookup-hint\">Type at least 2 characters…</div>'; return; }\n    box.innerHTML = '<div class=\"cpa-lookup-hint\">Searching…</div>';\n    searchTimer = setTimeout(async function () {\n      try {\n        var data = await api(SEARCH_API + '?q=' + encodeURIComponent(q) + '&limit=8');\n        var contacts = (data && data.contacts) || [];\n        if (!contacts.length) { document.getElementById('cpa-lookup').setAttribute('aria-expanded', 'false'); box.innerHTML = '<div class=\"cpa-lookup-hint\">No matches — you can still type the details below manually.</div>'; return; }\n        document.getElementById('cpa-lookup').setAttribute('aria-expanded', 'true');\n        lookupActive = -1;\n        box.innerHTML = contacts.map(function (c, i) {\n          var name = c.ct_NameFull || [c.NameFirst, c.NameLast].filter(Boolean).join(' ');\n          var email = c.ContactNumbersEmail || '';\n          // Surface the account owner/rep so a rep recognises their OWN live account\n          // (the table is full of DEAD/House rows). 'DEAD' shown as a plain \"inactive\" flag.\n          var owner = c.Account_Owner || c.CustomerCustomerServiceRep || '';\n          var ownerTxt = owner ? (/^dead$/i.test(owner.trim()) ? 'inactive account' : owner) : '';\n          return '<div class=\"cpa-lookup-item\" role=\"option\" aria-selected=\"false\" id=\"cpa-lookup-opt-' + i + '\" tabindex=\"-1\" data-id=\"' + esc(c.id_Customer) + '\" data-company=\"' + esc(c.CustomerCompanyName) + '\" data-email=\"' + esc(email) + '\">' +\n            '<div class=\"li-co\">' + esc(c.CustomerCompanyName || '(no company name)') + '</div>' +\n            '<div class=\"li-meta\">' + (name ? esc(name) + ' &middot; ' : '') + (email ? esc(email) : '<em>no email on file</em>') + ' &middot; #' + esc(c.id_Customer) +\n              (ownerTxt ? ' &middot; ' + esc(ownerTxt) : '') + '</div>' +\n          '</div>';\n        }).join('');\n      } catch (err) {\n        if (err.message !== 'auth') box.innerHTML = '<div class=\"cpa-lookup-hint\">Search failed: ' + esc(err.message) + '</div>';\n      }\n    }, 280);\n  }\n\n",
+      "after": "  function onLookupInput() {\n    var requestId = ++lookupRead;\n    var q = document.getElementById('cpa-lookup').value.trim();\n    function current() { return requestId === lookupRead && !document.getElementById('cpa-modal').hidden && q === document.getElementById('cpa-lookup').value.trim(); }\n    clearTimeout(searchTimer);\n    var box = document.getElementById('cpa-lookup-results');\n    if (q.length < 2) { lookupMessage('Type at least 2 characters…'); return; }\n    lookupMessage('Searching…');\n    searchTimer = setTimeout(async function () {\n      try {\n        var data = await api(SEARCH_API + '?q=' + encodeURIComponent(q) + '&limit=8');\n        if (!current()) return;\n        if (!data || !Array.isArray(data.contacts)) throw new Error('Customer search response incomplete');\n        var contacts = data.contacts;\n        if (!contacts.length) { lookupMessage('No matches — you can still type the details below manually.'); return; }\n        document.getElementById('cpa-lookup-status').textContent = ''; box.hidden = false;\n        document.getElementById('cpa-lookup').setAttribute('aria-expanded', 'true');\n        lookupActive = -1;\n        box.innerHTML = contacts.map(function (c, i) {\n          var name = c.ct_NameFull || [c.NameFirst, c.NameLast].filter(Boolean).join(' ');\n          var email = c.ContactNumbersEmail || '';\n          // Surface the account owner/rep so a rep recognises their OWN live account\n          // (the table is full of DEAD/House rows). 'DEAD' shown as a plain \"inactive\" flag.\n          var owner = c.Account_Owner || c.CustomerCustomerServiceRep || '';\n          var ownerTxt = owner ? (/^dead$/i.test(owner.trim()) ? 'inactive account' : owner) : '';\n          return '<div class=\"cpa-lookup-item\" role=\"option\" aria-selected=\"false\" id=\"cpa-lookup-opt-' + i + '\" tabindex=\"-1\" data-id=\"' + esc(c.id_Customer) + '\" data-company=\"' + esc(c.CustomerCompanyName) + '\" data-email=\"' + esc(email) + '\">' +\n            '<div class=\"li-co\">' + esc(c.CustomerCompanyName || '(no company name)') + '</div>' +\n            '<div class=\"li-meta\">' + (name ? esc(name) + ' &middot; ' : '') + (email ? esc(email) : '<em>no email on file</em>') + ' &middot; #' + esc(c.id_Customer) +\n              (ownerTxt ? ' &middot; ' + esc(ownerTxt) : '') + '</div>' +\n          '</div>';\n        }).join('');\n      } catch (err) {\n        if (current() && err.message !== 'auth') lookupMessage('Search failed: ' + err.message);\n      }\n    }, 280);\n  }\n\n",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/customer-portal-admin.js",
+      "before": "  async function loadRequests() {\n    var root = document.getElementById('requests-root');\n    root.className = 'dash-loading'; root.textContent = 'Loading…';\n    try {\n      var data = await api(REQ_API);\n      requests = (data && data.rows) || [];\n      requests.sort(function (a, b) { return String(b.Created || '').localeCompare(String(a.Created || '')); });\n      updateReqBadge();\n      renderRequests();\n    } catch (err) {\n      if (err.message === 'auth') return;\n      DashPage.showError('Unable to load requests: ' + err.message);\n      root.className = ''; root.innerHTML = '<div class=\"cpa-empty\"><i class=\"fas fa-triangle-exclamation\" aria-hidden=\"true\"></i>Could not load requests.<br><button type=\"button\" class=\"btn cpa-btn cpa-btn-ghost cpa-btn-sm btn-ghost\" id=\"cpa-retry-requests\"><i class=\"fas fa-rotate-right\" aria-hidden=\"true\"></i> Retry</button></div>';\n    }\n  }\n\n",
+      "after": "  async function loadRequests() {\n    var requestId = ++requestLoad; requestsReady = false; requests = [];\n    document.getElementById('cpa-req-rowcount').textContent = '—';\n    var badge = document.getElementById('cpa-req-badge'); badge.hidden = false; badge.textContent = '…'; badge.setAttribute('aria-label', 'Request count unavailable while loading');\n    var root = document.getElementById('requests-root');\n    root.className = 'dash-loading'; root.textContent = 'Loading…';\n    try {\n      var data = await api(REQ_API);\n      if (requestId !== requestLoad) return;\n      if (!data || !Array.isArray(data.rows)) throw new Error('Request list response incomplete');\n      requests = data.rows; requestsReady = true;\n      clearLoadError('Unable to load requests:');\n      requests.sort(function (a, b) { return String(b.Created || '').localeCompare(String(a.Created || '')); });\n      updateReqBadge();\n      renderRequests();\n    } catch (err) {\n      if (requestId !== requestLoad || err.message === 'auth') return;\n      badge.setAttribute('aria-label', 'Request count unavailable');\n      DashPage.showError('Unable to load requests: ' + err.message);\n      root.className = ''; root.innerHTML = '<div class=\"cpa-empty\"><i class=\"fas fa-triangle-exclamation\" aria-hidden=\"true\"></i>Could not load requests.<br><button type=\"button\" class=\"btn cpa-btn cpa-btn-ghost cpa-btn-sm btn-ghost\" id=\"cpa-retry-requests\"><i class=\"fas fa-rotate-right\" aria-hidden=\"true\"></i> Retry</button></div>';\n    }\n  }\n\n",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/customer-portal-admin.js",
+      "before": "  function renderRequests() {",
+      "after": "  function renderRequests() {\n    if (!requestsReady) return;",
+      "count": 1
+    },
+    {
+      "file": "dashboards/customer-portal-admin.html",
+      "before": "                    <div class=\"cpa-lookup-results\" id=\"cpa-lookup-results\" role=\"listbox\" aria-label=\"Matching customers\"></div>",
+      "after": "                    <div id=\"cpa-lookup-status\" class=\"cpa-lookup-hint\" role=\"status\"></div>\n                    <div class=\"cpa-lookup-results\" id=\"cpa-lookup-results\" role=\"listbox\" aria-label=\"Matching customers\" hidden></div>",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/customer-portal-admin.js",
+      "before": "  var rwCustomer = null;",
+      "after": "  var rwCustomer = null;\n  var ledgerRead = 0, accrualRead = 0;\n  function finiteMoney(value) { return typeof value === 'number' && Number.isFinite(value); }\n  function rewardViewCurrent(customer) { return customer === rwCustomer && !document.getElementById('cpa-rewards-modal').hidden; }",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/customer-portal-admin.js",
+      "before": "  function closeRewardsModal() {\n    var m = document.getElementById('cpa-rewards-modal');\n    if (m.hidden) return;\n    UiDialog.close(m);\n    // The table re-renders while the modal is open (balances refresh), so the opener element is\n    // usually detached by now — fall back to the same customer's chip/coins button in the new table.\n    if (rwLastFocus && !document.contains(rwLastFocus) && rwCustomer) {\n      rwLastFocus = document.querySelector('.cpa-rw-chip[data-id=\"' + rwCustomer.id + '\"]') ||\n        document.querySelector('button[data-action=\"rewards\"][data-id=\"' + rwCustomer.id + '\"]');\n    }\n    if (rwLastFocus && rwLastFocus.focus) rwLastFocus.focus();\n  }\n\n",
+      "after": "  function closeRewardsModal() {\n    var m = document.getElementById('cpa-rewards-modal');\n    if (m.hidden) return;\n    ++ledgerRead; ++accrualRead;\n    UiDialog.close(m);\n    // The table re-renders while the modal is open (balances refresh), so the opener element is\n    // usually detached by now — fall back to the same customer's chip/coins button in the new table.\n    if (rwLastFocus && !document.contains(rwLastFocus) && rwCustomer) {\n      rwLastFocus = document.querySelector('.cpa-rw-chip[data-id=\"' + rwCustomer.id + '\"]') ||\n        document.querySelector('button[data-action=\"rewards\"][data-id=\"' + rwCustomer.id + '\"]');\n    }\n    if (rwLastFocus && rwLastFocus.focus) rwLastFocus.focus();\n    rwCustomer = null;\n  }\n\n",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/customer-portal-admin.js",
+      "before": "  async function loadRewardLedger() {\n    loadRewardBalances();\n    if (!rwCustomer) return;\n    try {\n      var data = await api(REWARDS_LEDGER_API + '/' + encodeURIComponent(rwCustomer.id));\n      document.getElementById('cpa-rw-balance').textContent = money2(data.balance);\n      var entries = (data && data.entries) || [];\n      var el = document.getElementById('cpa-rw-ledger');\n      if (!entries.length) { el.innerHTML = '<div class=\"cpa-rw-empty\">No activity yet.</div>'; return; }\n      el.innerHTML = entries.map(function (e) {\n        var pos = Number(e.amount) >= 0;\n        return '<div class=\"cpa-rw-entry\">' +\n          '<div class=\"cpa-rw-amt ' + (pos ? 'pos' : 'neg') + '\">' + (pos ? '+' : '−') + money2(Math.abs(e.amount)) + '</div>' +\n          '<div class=\"cpa-rw-mid\"><div>' + (esc(e.reason) || esc(e.type)) + '</div><div class=\"cpa-rw-meta\">' + esc(e.type) + (e.orderRef ? ' · order #' + esc(e.orderRef) : '') + (e.by ? ' · ' + esc(e.by) : '') + '</div></div>' +\n          '<div class=\"cpa-rw-when\">' + fmtLastLogin(e.created) + '</div>' +\n        '</div>';\n      }).join('');\n    } catch (err) {\n      if (err.message !== 'auth') document.getElementById('cpa-rw-ledger').innerHTML = '<div class=\"cpa-rw-empty\">Could not load: ' + esc(err.message) + '</div>';\n    }\n  }\n\n",
+      "after": "  async function loadRewardLedger() {\n    loadRewardBalances();\n    if (!rwCustomer) return;\n    var customer = rwCustomer, requestId = ++ledgerRead;\n    document.getElementById('cpa-rw-balance').textContent = '…';\n    document.getElementById('cpa-rw-ledger').textContent = 'Loading…';\n    try {\n      var data = await api(REWARDS_LEDGER_API + '/' + encodeURIComponent(customer.id));\n      if (!rewardViewCurrent(customer) || requestId !== ledgerRead) return;\n      if (!data || !finiteMoney(data.balance) || !Array.isArray(data.entries) || !data.entries.every(function (entry) { return entry && finiteMoney(entry.amount); })) throw new Error('Reward ledger response incomplete');\n      document.getElementById('cpa-rw-balance').textContent = money2(data.balance);\n      var entries = data.entries;\n      var el = document.getElementById('cpa-rw-ledger');\n      if (!entries.length) { el.innerHTML = '<div class=\"cpa-rw-empty\">No activity yet.</div>'; return; }\n      el.innerHTML = entries.map(function (e) {\n        var pos = Number(e.amount) >= 0;\n        return '<div class=\"cpa-rw-entry\">' +\n          '<div class=\"cpa-rw-amt ' + (pos ? 'pos' : 'neg') + '\">' + (pos ? '+' : '−') + money2(Math.abs(e.amount)) + '</div>' +\n          '<div class=\"cpa-rw-mid\"><div>' + (esc(e.reason) || esc(e.type)) + '</div><div class=\"cpa-rw-meta\">' + esc(e.type) + (e.orderRef ? ' · order #' + esc(e.orderRef) : '') + (e.by ? ' · ' + esc(e.by) : '') + '</div></div>' +\n          '<div class=\"cpa-rw-when\">' + fmtLastLogin(e.created) + '</div>' +\n        '</div>';\n      }).join('');\n    } catch (err) {\n      if (!rewardViewCurrent(customer) || requestId !== ledgerRead || err.message === 'auth') return;\n      document.getElementById('cpa-rw-balance').textContent = '—';\n      document.getElementById('cpa-rw-ledger').innerHTML = '<div class=\"cpa-rw-empty\" role=\"alert\">Could not load: ' + esc(err.message) + ' <button type=\"button\" class=\"btn btn-ghost\" id=\"cpa-rw-retry\">Retry ledger</button></div>';\n    }\n  }\n\n",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/customer-portal-admin.js",
+      "before": "  async function calcAccrual() {\n    if (!rwCustomer) return;\n    var box = document.getElementById('cpa-rw-accrual');\n    box.innerHTML = '<div class=\"cpa-rw-empty\"><i class=\"fas fa-spinner fa-spin\" aria-hidden=\"true\"></i> Calculating from ManageOrders + catalog costs…</div>';\n    try {\n      // Each call fetches at most ~9 uncached orders (Heroku's 30 s limit) and says partial:true;\n      // loop until complete, showing progress. The server caches what it fetched.\n      var rounds = 0;\n      do {\n        rwAccrual = await api(REWARDS_ACCRUAL_API + '/' + encodeURIComponent(rwCustomer.id));\n        if (rwAccrual.partial) box.innerHTML = '<div class=\"cpa-rw-empty\"><i class=\"fas fa-spinner fa-spin\" aria-hidden=\"true\"></i> Fetching order details… ' + esc(String(rwAccrual.progress.fetched)) + ' of ' + esc(String(rwAccrual.progress.total)) + ' orders</div>';\n      } while (rwAccrual.partial && ++rounds < 40);\n      renderAccrual();\n    } catch (err) {\n      if (err.message !== 'auth') box.innerHTML = '<div class=\"cpa-rw-empty\">Could not calculate: ' + esc(err.message) + '</div><button class=\"btn cpa-btn cpa-btn-ghost cpa-btn-sm btn-ghost\" id=\"cpa-rw-calc\" type=\"button\">Try again</button>';\n    }\n  }\n",
+      "after": "  async function calcAccrual() {\n    if (!rwCustomer) return;\n    var customer = rwCustomer, requestId = ++accrualRead;\n    rwAccrual = null;\n    document.getElementById('cpa-rw-acc-window').textContent = '';\n    var box = document.getElementById('cpa-rw-accrual');\n    box.innerHTML = '<div class=\"cpa-rw-empty\"><i class=\"fas fa-spinner fa-spin\" aria-hidden=\"true\"></i> Calculating from ManageOrders + catalog costs…</div>';\n    try {\n      // Each call fetches at most ~9 uncached orders (Heroku's 30 s limit) and says partial:true;\n      // loop until complete, showing progress. The server caches what it fetched.\n      var rounds = 0;\n      do {\n        var result = await api(REWARDS_ACCRUAL_API + '/' + encodeURIComponent(customer.id));\n        if (!rewardViewCurrent(customer) || requestId !== accrualRead) return;\n        if (!result || !result.program || typeof result.program.configured !== 'boolean') throw new Error('Reward program response incomplete');\n        if (result.partial && (!result.progress || !finiteMoney(result.progress.fetched) || !finiteMoney(result.progress.total))) throw new Error('Calculation progress incomplete');\n        rwAccrual = result;\n        if (rwAccrual.partial) box.innerHTML = '<div class=\"cpa-rw-empty\"><i class=\"fas fa-spinner fa-spin\" aria-hidden=\"true\"></i> Fetching order details… ' + esc(String(rwAccrual.progress.fetched)) + ' of ' + esc(String(rwAccrual.progress.total)) + ' orders</div>';\n      } while (rwAccrual.partial && ++rounds < 40);\n      if (rwAccrual.program.configured) {\n        var totals = rwAccrual.totals;\n        if (!totals || !['earned','eligibleRevenue','granted','pending','ledgerBalance','overGranted','redeemedOnOrders','redeemPending'].every(function (key) { return finiteMoney(totals[key]); }) ||\n            !Array.isArray(rwAccrual.orders) || !Array.isArray(rwAccrual.program.tiers) || !rwAccrual.orders.every(function (order) { return order && ['eligibleRevenue','reward','granted','pending'].every(function (key) { return finiteMoney(order[key]); }) && Array.isArray(order.lines); })) throw new Error('Reward calculation response incomplete');\n      }\n      renderAccrual();\n    } catch (err) {\n      if (!rewardViewCurrent(customer) || requestId !== accrualRead) return;\n      rwAccrual = null;\n      if (err.message !== 'auth') box.innerHTML = '<div class=\"cpa-rw-empty\">Could not calculate: ' + esc(err.message) + '</div><button class=\"btn cpa-btn cpa-btn-ghost cpa-btn-sm btn-ghost\" id=\"cpa-rw-calc\" type=\"button\">Try again</button>';\n    }\n  }\n",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/customer-portal-admin.js",
+      "before": "    document.getElementById('cpa-rw-save').addEventListener('click', submitRewardEntry);",
+      "after": "    document.getElementById('cpa-rw-save').addEventListener('click', submitRewardEntry);\n    document.getElementById('cpa-rw-ledger').addEventListener('click', function (e) { if (e.target.closest('#cpa-rw-retry')) loadRewardLedger(); });",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/customer-portal-admin.js",
+      "before": "  var lookupRead = 0;",
+      "after": "  var lookupRead = 0, inviteBusy = false, rewardBusy = false;\n  function holdControls(id) {\n    var controls = [...document.getElementById(id).querySelectorAll('input, select, button')];\n    var disabled = controls.map(function (control) { return control.disabled; });\n    controls.forEach(function (control) { control.disabled = true; });\n    return function () { controls.forEach(function (control, index) { control.disabled = disabled[index]; }); };\n  }\n  async function runInviteSave() {\n    if (inviteBusy) return;\n    inviteBusy = true; var release = holdControls('cpa-modal');\n    try { await saveInvite(); } finally { inviteBusy = false; release(); }\n  }\n  async function runRewardOperation(task) {\n    if (rewardBusy) return;\n    rewardBusy = true; var release = holdControls('cpa-rewards-modal');\n    document.getElementById('cpa-rw-status').textContent = '';\n    try { await task(); } finally { rewardBusy = false; release(); }\n  }\n  function rewardWriteError(error) {\n    toast('Could not confirm the reward change (' + error.message + '). Check recent activity and recalculate before retrying.', true);\n  }",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/customer-portal-admin.js",
+      "before": "    t.className = 'cpa-toast show' + (isError ? ' cpa-toast-error' : '');",
+      "after": "    t.className = 'cpa-toast show' + (isError ? ' cpa-toast-error' : '');\n    if (!document.getElementById('cpa-rewards-modal').hidden) {\n      var status = document.getElementById('cpa-rw-status'); status.textContent = msg;\n      status.className = 'cpa-dialog-status' + (isError ? ' cpa-dialog-error' : '');\n      t.classList.remove('show');\n    }",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/customer-portal-admin.js",
+      "before": "  function openModal() {",
+      "after": "  function openModal() {\n    if (inviteBusy) return;",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/customer-portal-admin.js",
+      "before": "  function closeModal() {",
+      "after": "  function closeModal(force) {\n    if (inviteBusy && force !== true) return;",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/customer-portal-admin.js",
+      "before": "  async function saveInvite() {\n    var email = document.getElementById('cpa-email').value.trim().toLowerCase();\n    var idCustomer = document.getElementById('cpa-idcustomer').value.trim();\n    var company = document.getElementById('cpa-company').value.trim();\n    var sendLink = document.getElementById('cpa-sendlink').checked;\n    var errEl = document.getElementById('cpa-modal-error');\n    errEl.textContent = '';\n\n    if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) { errEl.textContent = 'Please enter a valid email.'; return; }\n    if (!/^\\d+$/.test(idCustomer)) { errEl.textContent = 'Customer # must be the numeric ShopWorks id (use the search above to fill it in).'; return; }\n\n    var saveBtn = document.getElementById('cpa-save');\n    saveBtn.disabled = true;\n    try {\n      await api(ACCESS_API, { method: 'POST', body: JSON.stringify({ email: email, id_Customer: idCustomer, company_name: company, enabled: 'Yes' }) });\n      if (sendLink) {\n        try { await api(SENDLINK_API, { method: 'POST', body: JSON.stringify({ email: email }) }); toast('Invited ' + email + ' — login link sent'); }\n        catch (e2) { toast('Invited ' + email + ' (link not sent: ' + e2.message + ')', true); }\n      } else {\n        toast('Invited ' + email);\n      }\n      closeModal();\n      await loadInvites();\n    } catch (err) {\n      if (err.message === 'auth') return;\n      errEl.textContent = err.message;\n    } finally {\n      saveBtn.disabled = false;\n    }\n  }\n\n",
+      "after": "  async function saveInvite() {\n    var email = document.getElementById('cpa-email').value.trim().toLowerCase();\n    var idCustomer = document.getElementById('cpa-idcustomer').value.trim();\n    var company = document.getElementById('cpa-company').value.trim();\n    var sendLink = document.getElementById('cpa-sendlink').checked;\n    var errEl = document.getElementById('cpa-modal-error');\n    errEl.textContent = '';\n\n    if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) { errEl.textContent = 'Please enter a valid email.'; return; }\n    if (!/^\\d+$/.test(idCustomer)) { errEl.textContent = 'Customer # must be the numeric ShopWorks id (use the search above to fill it in).'; return; }\n\n    var saveBtn = document.getElementById('cpa-save');\n    saveBtn.disabled = true;\n    try {\n      await api(ACCESS_API, { method: 'POST', body: JSON.stringify({ email: email, id_Customer: idCustomer, company_name: company, enabled: 'Yes' }) });\n      if (sendLink) {\n        try { await api(SENDLINK_API, { method: 'POST', body: JSON.stringify({ email: email }) }); toast('Invited ' + email + ' — login link sent'); }\n        catch (e2) { toast('Invited ' + email + ' (link not sent: ' + e2.message + ')', true); }\n      } else {\n        toast('Invited ' + email);\n      }\n      closeModal(true);\n      await loadInvites();\n    } catch (err) {\n      if (err.message === 'auth') return;\n      errEl.textContent = err.message;\n    } finally {\n      saveBtn.disabled = false;\n    }\n  }\n\n",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/customer-portal-admin.js",
+      "before": "  function openRewardsModal(id, company) {",
+      "after": "  function openRewardsModal(id, company) {\n    if (rewardBusy) return;\n    document.getElementById('cpa-rw-status').textContent = '';",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/customer-portal-admin.js",
+      "before": "  function closeRewardsModal() {",
+      "after": "  function closeRewardsModal() {\n    if (rewardBusy) return;",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/customer-portal-admin.js",
+      "before": "  async function submitRewardEntry() {\n    if (!rwCustomer) return;\n    var amount = parseFloat(document.getElementById('cpa-rw-amount').value);\n    var type = document.getElementById('cpa-rw-type').value;\n    var reason = document.getElementById('cpa-rw-reason').value.trim();\n    var orderRef = document.getElementById('cpa-rw-order').value.trim();\n    var err = document.getElementById('cpa-rw-error');\n    err.textContent = '';\n    if (!isFinite(amount) || amount === 0) { err.textContent = 'Enter a non-zero amount.'; return; }\n    if (orderRef && !/^\\d{3,10}$/.test(orderRef)) { err.textContent = 'Order # must be the numeric ShopWorks order number.'; return; }\n    if (type === 'redeem' && !orderRef) { err.textContent = 'A redemption needs the ShopWorks order # it was applied to.'; return; }\n    var saveBtn = document.getElementById('cpa-rw-save');\n    saveBtn.disabled = true;\n    try {\n      var res = await api(REWARDS_ENTRY_API, { method: 'POST', body: JSON.stringify({ id_Customer: rwCustomer.id, company_name: rwCustomer.company, amount: amount, type: type, reason: reason, order_ref: orderRef }) });\n      toast('Balance now ' + money2(res.balance));\n      document.getElementById('cpa-rw-amount').value = '';\n      document.getElementById('cpa-rw-reason').value = '';\n      document.getElementById('cpa-rw-order').value = '';\n      await loadRewardLedger();\n    } catch (e2) {\n      if (e2.message !== 'auth') err.textContent = e2.message;\n    } finally { saveBtn.disabled = false; }\n  }\n\n",
+      "after": "  async function submitRewardEntry() {\n    if (!rwCustomer) return;\n    var amount = parseFloat(document.getElementById('cpa-rw-amount').value);\n    var type = document.getElementById('cpa-rw-type').value;\n    var reason = document.getElementById('cpa-rw-reason').value.trim();\n    var orderRef = document.getElementById('cpa-rw-order').value.trim();\n    var err = document.getElementById('cpa-rw-error');\n    err.textContent = '';\n    if (!isFinite(amount) || amount === 0) { err.textContent = 'Enter a non-zero amount.'; return; }\n    if (orderRef && !/^\\d{3,10}$/.test(orderRef)) { err.textContent = 'Order # must be the numeric ShopWorks order number.'; return; }\n    if (type === 'redeem' && !orderRef) { err.textContent = 'A redemption needs the ShopWorks order # it was applied to.'; return; }\n    var saveBtn = document.getElementById('cpa-rw-save');\n    saveBtn.disabled = true;\n    try {\n      var res = await api(REWARDS_ENTRY_API, { method: 'POST', body: JSON.stringify({ id_Customer: rwCustomer.id, company_name: rwCustomer.company, amount: amount, type: type, reason: reason, order_ref: orderRef }) });\n      if (!res || !finiteMoney(res.balance)) throw new Error('Reward change response incomplete');\n      toast('Balance now ' + money2(res.balance));\n      document.getElementById('cpa-rw-amount').value = '';\n      document.getElementById('cpa-rw-reason').value = '';\n      document.getElementById('cpa-rw-order').value = '';\n      await loadRewardLedger();\n    } catch (e2) {\n      if (e2.message !== 'auth') { err.textContent = 'Could not confirm the reward change. Check recent activity before retrying.'; rewardWriteError(e2); }\n    } finally { saveBtn.disabled = false; }\n  }\n\n",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/customer-portal-admin.js",
+      "before": "  async function expireAccrual() {\n    if (!rwCustomer || !rwAccrual || !rwAccrual.program) return;\n    if (!window.confirm('Remove the unused ' + money2(rwAccrual.totals.ledgerBalance) + ' balance for ' + (rwCustomer.company || '#' + rwCustomer.id) + '? (' + rwAccrual.program.name + ' expired ' + rwAccrual.program.spend.to + ')')) return;\n    try {\n      var res = await api(REWARDS_ACCRUAL_API.replace('/accrual', '/expire') + '/' + encodeURIComponent(rwCustomer.id), { method: 'POST', body: JSON.stringify({ company_name: rwCustomer.company }) });\n      toast('Expired ' + money2(res.expired) + ' — balance now ' + money2(res.balance));\n      await loadRewardLedger(); await calcAccrual();\n    } catch (e) { if (e.message !== 'auth') toast(e.message, true); }\n  }\n",
+      "after": "  async function expireAccrual() {\n    if (!rwCustomer || !rwAccrual || !rwAccrual.program) return;\n    if (!window.confirm('Remove the unused ' + money2(rwAccrual.totals.ledgerBalance) + ' balance for ' + (rwCustomer.company || '#' + rwCustomer.id) + '? (' + rwAccrual.program.name + ' expired ' + rwAccrual.program.spend.to + ')')) return;\n    try {\n      var res = await api(REWARDS_ACCRUAL_API.replace('/accrual', '/expire') + '/' + encodeURIComponent(rwCustomer.id), { method: 'POST', body: JSON.stringify({ company_name: rwCustomer.company }) });\n      if (!res || !finiteMoney(res.expired) || !finiteMoney(res.balance)) throw new Error('Expiry response incomplete');\n      toast('Expired ' + money2(res.expired) + ' — balance now ' + money2(res.balance));\n      await loadRewardLedger(); await calcAccrual();\n    } catch (e) { if (e.message !== 'auth') rewardWriteError(e); }\n  }\n",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/customer-portal-admin.js",
+      "before": "  async function reverseAccrual(orderNo, over) {\n    if (!rwCustomer || !rwAccrual) return;\n    if (!window.confirm('Reverse up to ' + money2(over) + ' granted on order #' + orderNo + ' for ' + (rwCustomer.company || '#' + rwCustomer.id) + '?\\n\\nThe order now earns less than it was granted (re-invoiced lower). Only the unspent balance can be taken back; dollars already redeemed stay redeemed.')) return;\n    try {\n      var res = await api(REWARDS_ACCRUAL_API + '/' + encodeURIComponent(rwCustomer.id) + '/reverse', { method: 'POST', body: JSON.stringify({ orderNumber: orderNo, company_name: rwCustomer.company }) });\n      toast('Reversed ' + money2(res.reversed) + ' on #' + orderNo + (res.reversed + 0.005 < res.overGranted ? ' (' + money2(res.overGranted - res.reversed) + ' was already redeemed)' : '') + ' — balance now ' + money2(res.balance));\n      await loadRewardLedger(); await calcAccrual();\n    } catch (e) { if (e.message !== 'auth') toast(e.message, true); }\n  }\n",
+      "after": "  async function reverseAccrual(orderNo, over) {\n    if (!rwCustomer || !rwAccrual) return;\n    if (!window.confirm('Reverse up to ' + money2(over) + ' granted on order #' + orderNo + ' for ' + (rwCustomer.company || '#' + rwCustomer.id) + '?\\n\\nThe order now earns less than it was granted (re-invoiced lower). Only the unspent balance can be taken back; dollars already redeemed stay redeemed.')) return;\n    try {\n      var res = await api(REWARDS_ACCRUAL_API + '/' + encodeURIComponent(rwCustomer.id) + '/reverse', { method: 'POST', body: JSON.stringify({ orderNumber: orderNo, company_name: rwCustomer.company }) });\n      if (!res || !finiteMoney(res.reversed) || !finiteMoney(res.overGranted) || !finiteMoney(res.balance)) throw new Error('Reversal response incomplete');\n      toast('Reversed ' + money2(res.reversed) + ' on #' + orderNo + (res.reversed + 0.005 < res.overGranted ? ' (' + money2(res.overGranted - res.reversed) + ' was already redeemed)' : '') + ' — balance now ' + money2(res.balance));\n      await loadRewardLedger(); await calcAccrual();\n    } catch (e) { if (e.message !== 'auth') rewardWriteError(e); }\n  }\n",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/customer-portal-admin.js",
+      "before": "  async function postAccrual() {\n    if (!rwCustomer || !rwAccrual) return;\n    var btn = document.getElementById('cpa-rw-post'); if (btn) { btn.disabled = true; btn.textContent = 'Posting…'; }\n    try {\n      var res = await api(REWARDS_ACCRUAL_API + '/' + encodeURIComponent(rwCustomer.id) + '/post', { method: 'POST', body: JSON.stringify({ company_name: rwCustomer.company }) });\n      toast('Posted ' + res.posted.length + ' grant' + (res.posted.length === 1 ? '' : 's') + ' (' + money2(res.total) + ')' + (res.redeemed && res.redeemed.length ? ' + ' + res.redeemed.length + ' redemption' + (res.redeemed.length === 1 ? '' : 's') + ' (' + money2(res.redeemTotal) + ')' : '') + (res.failed && res.failed.length ? ' — ' + res.failed.length + ' failed: ' + esc(res.failed.map(function (f) { return '#' + f.orderNumber + ' ' + f.error; }).join('; ')) : ''), !!(res.failed && res.failed.length));\n      await loadRewardLedger();\n      await calcAccrual();\n    } catch (e) { if (e.message !== 'auth') toast(e.message, true); if (btn) { btn.disabled = false; btn.innerHTML = '<i class=\"fas fa-coins\" aria-hidden=\"true\"></i> Post pending grants'; } }\n  }\n\n",
+      "after": "  async function postAccrual() {\n    if (!rwCustomer || !rwAccrual) return;\n    var btn = document.getElementById('cpa-rw-post'); if (btn) { btn.disabled = true; btn.textContent = 'Posting…'; }\n    try {\n      var res = await api(REWARDS_ACCRUAL_API + '/' + encodeURIComponent(rwCustomer.id) + '/post', { method: 'POST', body: JSON.stringify({ company_name: rwCustomer.company }) });\n      if (!res || !Array.isArray(res.posted) || !finiteMoney(res.total)) throw new Error('Posting response incomplete');\n      toast('Posted ' + res.posted.length + ' grant' + (res.posted.length === 1 ? '' : 's') + ' (' + money2(res.total) + ')' + (res.redeemed && res.redeemed.length ? ' + ' + res.redeemed.length + ' redemption' + (res.redeemed.length === 1 ? '' : 's') + ' (' + money2(res.redeemTotal) + ')' : '') + (res.failed && res.failed.length ? ' — ' + res.failed.length + ' failed: ' + esc(res.failed.map(function (f) { return '#' + f.orderNumber + ' ' + f.error; }).join('; ')) : ''), !!(res.failed && res.failed.length));\n      await loadRewardLedger();\n      await calcAccrual();\n    } catch (e) { if (e.message !== 'auth') rewardWriteError(e); if (btn) { btn.disabled = false; btn.innerHTML = '<i class=\"fas fa-coins\" aria-hidden=\"true\"></i> Post pending grants'; } }\n  }\n\n",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/customer-portal-admin.js",
+      "before": "    document.getElementById('cpa-save').addEventListener('click', saveInvite);",
+      "after": "    document.getElementById('cpa-save').addEventListener('click', runInviteSave);",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/customer-portal-admin.js",
+      "before": "    document.getElementById('cpa-rw-save').addEventListener('click', submitRewardEntry);",
+      "after": "    document.getElementById('cpa-rw-save').addEventListener('click', function () { runRewardOperation(submitRewardEntry); });",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/customer-portal-admin.js",
+      "before": "if (e.target.closest('#cpa-rw-retry')) loadRewardLedger();",
+      "after": "if (!rewardBusy && e.target.closest('#cpa-rw-retry')) loadRewardLedger();",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/customer-portal-admin.js",
+      "before": "    document.getElementById('cpa-rw-accrual').addEventListener('click', function (e) {",
+      "after": "    document.getElementById('cpa-rw-accrual').addEventListener('click', function (e) {\n      if (rewardBusy) return;",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/customer-portal-admin.js",
+      "before": "else if (e.target.closest('#cpa-rw-post')) postAccrual();",
+      "after": "else if (e.target.closest('#cpa-rw-post')) runRewardOperation(postAccrual);",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/customer-portal-admin.js",
+      "before": "else if (e.target.closest('#cpa-rw-expire')) expireAccrual();",
+      "after": "else if (e.target.closest('#cpa-rw-expire')) runRewardOperation(expireAccrual);",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/customer-portal-admin.js",
+      "before": "reverseAccrual(rb.getAttribute('data-order'), Number(rb.getAttribute('data-amount')) || 0);",
+      "after": "runRewardOperation(function () { return reverseAccrual(rb.getAttribute('data-order'), Number(rb.getAttribute('data-amount')) || 0); });",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/customer-portal-admin.js",
+      "before": "  async function onRequestsChange(e) {\n    var sel = e.target.closest('select.cpa-status-select');\n    if (!sel) return;\n    var pk = sel.getAttribute('data-pk'), status = sel.value;\n    sel.disabled = true;\n    try {\n      await api(REQ_API + '/' + encodeURIComponent(pk), { method: 'PUT', body: JSON.stringify({ status: status }) });\n      toast('Status → ' + status);\n      var r = requests.find(function (x) { return String(x.PK_ID) === String(pk); });\n      if (r) r.Status = status;\n      updateReqBadge(); renderRequests();\n    } catch (err) { if (err.message !== 'auth') toast(err.message, true); sel.disabled = false; }\n  }\n\n",
+      "after": "  async function onRequestsChange(e) {\n    var sel = e.target.closest('select.cpa-status-select');\n    if (!sel) return;\n    var pk = sel.getAttribute('data-pk'), status = sel.value;\n    var requestId = requestLoad, row = requests.find(function (item) { return String(item.PK_ID) === String(pk); });\n    var previous = row && row.Status;\n    sel.disabled = true;\n    try {\n      await api(REQ_API + '/' + encodeURIComponent(pk), { method: 'PUT', body: JSON.stringify({ status: status }) });\n      toast('Status → ' + status);\n      if (requestId !== requestLoad || !requestsReady) return;\n      var r = requests.find(function (x) { return String(x.PK_ID) === String(pk); });\n      if (r) r.Status = status;\n      updateReqBadge(); renderRequests();\n    } catch (err) { if (err.message !== 'auth') toast(err.message, true); sel.disabled = false; if (previous && sel.isConnected) sel.value = previous; }\n  }\n\n",
+      "count": 1
+    },
+    {
+      "file": "dashboards/customer-portal-admin.html",
+      "before": "                <div class=\"cpa-rw-balance\">",
+      "after": "                <div id=\"cpa-rw-status\" class=\"cpa-dialog-status\" role=\"status\" aria-live=\"polite\"></div>\n                <div class=\"cpa-rw-balance\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/customer-portal-admin.html",
+      "before": "                <div class=\"cpa-rw-balance\">",
+      "after": "                <div id=\"cpa-rw-draft-print\" class=\"cpa-print-draft\"></div>\n                <div class=\"cpa-rw-balance\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/customer-portal-admin.js",
+      "before": "    loadMe();\n    loadInvites();",
+      "after": "    var printDetails = [];\n    window.addEventListener('beforeprint', function () {\n      printDetails = [...document.querySelectorAll('.cpa-rw-acc-table details')].map(function (node) { return { node: node, open: node.open }; });\n      printDetails.forEach(function (entry) { entry.node.open = true; });\n      var amount = document.getElementById('cpa-rw-amount').value.trim(), reason = document.getElementById('cpa-rw-reason').value.trim(), order = document.getElementById('cpa-rw-order').value.trim();\n      var type = document.getElementById('cpa-rw-type').selectedOptions[0].textContent;\n      var draft = document.getElementById('cpa-rw-draft-print'); draft.innerHTML = '';\n      if (amount || reason || order) draft.innerHTML = '<h4>Unposted ledger entry — not saved</h4><p>' +\n        [['Amount', amount], ['Type', type], ['Reason', reason], ['ShopWorks order #', order]].filter(function (field) { return field[1]; }).map(function (field) { return '<strong>' + esc(field[0]) + ':</strong> ' + esc(field[1]); }).join('<br>') + '</p>';\n    });\n    window.addEventListener('afterprint', function () { printDetails.forEach(function (entry) { entry.node.open = entry.open; }); printDetails = []; });\n    loadMe();\n    loadInvites();",
+      "count": 1
+    },
+    {
+      "file": "dashboards/customer-portal-admin.html",
+      "before": "<div class=\"cpa-rw-ledger\" id=\"cpa-rw-ledger\">",
+      "after": "<div class=\"cpa-rw-ledger\" id=\"cpa-rw-ledger\" role=\"region\" aria-label=\"Rewards activity\" tabindex=\"0\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/customer-portal-admin.html",
+      "before": "<div class=\"cpa-rw-accrual\" id=\"cpa-rw-accrual\">",
+      "after": "<div class=\"cpa-rw-accrual\" id=\"cpa-rw-accrual\" role=\"region\" aria-label=\"Earned rewards details\" tabindex=\"0\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/customer-portal-admin.html",
+      "before": "                <div class=\"cpa-rw-accrual\" id=\"cpa-rw-accrual\"",
+      "after": "                <div id=\"cpa-rw-accrual-print\" class=\"cpa-accrual-print\"></div>\n                <div class=\"cpa-rw-accrual\" id=\"cpa-rw-accrual\"",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/customer-portal-admin.js",
+      "before": "    var printDetails = [];",
+      "after": "    // Plain paper rows avoid native details fragmenting money into another page.",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/customer-portal-admin.js",
+      "before": "      printDetails = [...document.querySelectorAll('.cpa-rw-acc-table details')].map(function (node) { return { node: node, open: node.open }; });\n      printDetails.forEach(function (entry) { entry.node.open = true; });",
+      "after": "      var paper = document.getElementById('cpa-rw-accrual-print');\n      paper.innerHTML = document.getElementById('cpa-rw-accrual').innerHTML;\n      paper.querySelectorAll('button').forEach(function (button) { button.remove(); });\n      paper.querySelectorAll('[id]').forEach(function (node) { node.removeAttribute('id'); });\n      paper.querySelectorAll('details').forEach(function (details) {\n        var row = document.createElement('div'); row.className = 'cpa-print-order';\n        row.innerHTML = details.innerHTML;\n        row.querySelectorAll('summary').forEach(function (summary) { var label = document.createElement('div'); label.className = 'cpa-print-order-title'; label.innerHTML = summary.innerHTML; summary.replaceWith(label); });\n        details.replaceWith(row);\n      });",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/customer-portal-admin.js",
+      "before": "    window.addEventListener('afterprint', function () { printDetails.forEach(function (entry) { entry.node.open = entry.open; }); printDetails = []; });",
+      "after": "    window.addEventListener('afterprint', function () { document.getElementById('cpa-rw-accrual-print').innerHTML = ''; });",
+      "count": 1
     }
   ]
 }

@@ -1763,3 +1763,1161 @@
         }
     }
 }
+
+@page staff-toolkit-portal {
+    size: letter landscape;
+    margin: 12mm;
+}
+
+@layer components.pages {
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-intro {
+        color: var(--ui-muted);
+        font-size: 0.95rem;
+        line-height: 1.5;
+        margin: 0 0 1.25rem;
+        max-width: 760px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-controls {
+        display: flex;
+        gap: var(--space-3);
+        align-items: center;
+        margin: 0 0 1rem;
+        flex-wrap: wrap;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-search-wrap {
+        position: relative;
+        flex: 1 1 260px;
+        min-width: 0;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-search-wrap
+        > i {
+        position: absolute;
+        left: 13px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--gray-500);
+        font-size: 0.85rem;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-btn-ghost.cpa-btn-active {
+        background: var(--ui-tint);
+        color: var(--ui-accent-hover);
+        border-color: var(--ui-accent);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-count {
+        color: var(--ui-muted);
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: var(--font-size-md);
+        min-width: 1040px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-table
+        th {
+        text-align: left;
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: var(--ui-muted);
+        font-weight: 600;
+        padding: 8px 12px;
+        border-bottom: 2px solid var(--gray-200);
+        white-space: nowrap;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-table
+        td {
+        padding: 11px 12px;
+        border-bottom: 1px solid var(--gray-100);
+        vertical-align: middle;
+        color: var(--gray-800);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-table
+        tr:hover
+        td {
+        background: var(--gray-50);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-company {
+        font-weight: 600;
+        color: var(--gray-900);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-email {
+        color: var(--ui-muted);
+        font-size: 0.85rem;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-cid {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.82rem;
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-rep {
+        color: var(--gray-700);
+        font-size: 0.85rem;
+        white-space: nowrap;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-rep-none {
+        color: var(--gray-300);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-lastlogin {
+        font-size: 0.83rem;
+        color: var(--ui-muted);
+        white-space: nowrap;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-lastlogin.cpa-never {
+        color: var(--gray-500);
+        font-style: italic;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 0.76rem;
+        font-weight: 600;
+        padding: 3px 10px;
+        border-radius: 999px;
+        white-space: nowrap;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-badge::before {
+        content: "";
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: currentcolor;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-badge--enabled {
+        background: var(--ui-tint);
+        color: var(--ui-accent-hover);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-badge--disabled {
+        background: var(--gray-100);
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-actions {
+        display: flex;
+        gap: 6px;
+        justify-content: flex-end;
+        flex-wrap: nowrap;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-empty {
+        text-align: center;
+        color: var(--ui-muted);
+        padding: 2.5rem 1rem;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-empty
+        i {
+        font-size: 2rem;
+        color: var(--gray-300);
+        display: block;
+        margin-bottom: 0.6rem;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgb(17 24 39 / 50%);
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        padding: 5vh 16px;
+        z-index: 1000;
+        overflow-y: auto;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-modal {
+        background: var(--color-surface);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-md);
+        width: 100%;
+        max-width: 900px;
+        min-width: 0;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-modal-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 18px 22px;
+        border-bottom: 1px solid var(--gray-200);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-modal-head
+        h3 {
+        margin: 0;
+        font-size: 1.15rem;
+        color: var(--ui-accent-hover);
+        overflow-wrap: anywhere;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-modal-body {
+        padding: 20px 22px;
+        min-width: 0;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-modal-foot {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        padding: 16px 22px;
+        border-top: 1px solid var(--gray-200);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-field {
+        display: block;
+        margin-bottom: 14px;
+        min-width: 0;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-field-label
+        small {
+        font-weight: 400;
+        color: var(--gray-500);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-field-row {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-search-inline {
+        min-width: 0;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-search-inline
+        input {
+        padding-left: 36px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-lookup-results {
+        margin-top: 8px;
+        max-height: 230px;
+        overflow-y: auto;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-lookup-item {
+        padding: 9px 12px;
+        border: 1px solid var(--gray-200);
+        border-radius: var(--radius-md);
+        margin-bottom: 6px;
+        cursor: pointer;
+        transition:
+            border-color 0.12s,
+            background 0.12s;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-lookup-item:hover {
+        border-color: var(--ui-accent);
+        background: var(--ui-tint);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-lookup-item
+        .li-co {
+        font-weight: 600;
+        color: var(--gray-900);
+        font-size: 0.9rem;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-lookup-item
+        .li-meta {
+        font-size: 0.8rem;
+        color: var(--ui-muted);
+        margin-top: 2px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-lookup-hint {
+        font-size: 0.82rem;
+        color: var(--gray-500);
+        padding: 6px 2px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-divider {
+        text-align: center;
+        margin: 16px 0;
+        position: relative;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-divider::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: var(--gray-200);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-divider
+        span {
+        position: relative;
+        background: var(--color-surface);
+        padding: 0 12px;
+        font-size: 0.78rem;
+        color: var(--gray-500);
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-checkline {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.88rem;
+        color: var(--gray-700);
+        cursor: pointer;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-checkline
+        input {
+        width: 16px;
+        height: 16px;
+        accent-color: var(--ui-accent);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-modal-error {
+        color: var(--color-danger-ink);
+        font-size: 0.85rem;
+        margin-top: 10px;
+        min-height: 1em;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-toast {
+        position: fixed;
+        bottom: 24px;
+        left: 50%;
+        transform: translateX(-50%) translateY(20px);
+        background: var(--ui-accent-hover);
+        color: var(--color-on-brand);
+        padding: 12px 20px;
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-md);
+        font-size: 0.9rem;
+        font-weight: 500;
+        opacity: 0;
+        pointer-events: none;
+        transition:
+            opacity 0.25s,
+            transform 0.25s;
+        z-index: 1100;
+        max-width: 90vw;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-toast.show {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-toast.cpa-toast-error {
+        background: var(--color-danger-ink);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-tabs {
+        display: flex;
+        gap: 4px;
+        border-bottom: 1px solid var(--gray-200);
+        margin: 0 0 1.25rem;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-tab {
+        background: none;
+        border: none;
+        border-bottom: 2px solid transparent;
+        margin-bottom: -1px;
+        padding: 10px 16px;
+        font-size: 0.92rem;
+        font-weight: 600;
+        color: var(--ui-muted);
+        cursor: pointer;
+        font-family: inherit;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        transition:
+            color 0.15s,
+            border-color 0.15s;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-tab:hover {
+        color: var(--ui-accent-hover);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-tab-active {
+        color: var(--color-on-brand);
+        background: var(--ui-accent);
+        border-color: var(--ui-accent);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-tab-badge {
+        background: var(--color-danger-ink);
+        color: var(--color-on-brand);
+        font-size: 0.68rem;
+        font-weight: 700;
+        min-width: 17px;
+        height: 17px;
+        padding: 0 5px;
+        border-radius: 999px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-req-prod {
+        font-weight: 600;
+        color: var(--gray-900);
+        font-size: 0.9rem;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-req-sub {
+        font-size: 0.82rem;
+        color: var(--ui-muted);
+        margin-top: 1px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-req-note {
+        font-size: 0.82rem;
+        color: var(--ui-muted);
+        font-style: italic;
+        margin-top: 3px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-status-new {
+        background: var(--red-50);
+        color: var(--color-ae);
+        border-color: var(--red-200);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-status-in-progress {
+        background: var(--store-rush-soft);
+        color: var(--color-warning-ink);
+        border-color: var(--amber-200);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-status-quoted {
+        background: var(--color-floor-tint);
+        color: var(--color-info-ink);
+        border-color: var(--blue-200);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-status-closed {
+        background: var(--gray-100);
+        color: var(--ui-muted);
+        border-color: var(--gray-200);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-rw-balance {
+        font-size: 0.95rem;
+        color: var(--gray-700);
+        margin-bottom: 16px;
+        padding: 10px 14px;
+        background: var(--ui-tint);
+        border-radius: var(--radius-md);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-rw-balance
+        strong {
+        color: var(--ui-accent-hover);
+        font-size: 1.15rem;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-rw-select {
+        width: 100%;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-rw-save-btn {
+        width: 100%;
+        justify-content: center;
+        margin-top: 2px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-rw-ledger-head {
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: var(--ui-muted);
+        font-weight: 600;
+        margin: 20px 0 8px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-rw-ledger {
+        max-height: 240px;
+        overflow-y: auto;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-rw-entry {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 8px 2px;
+        border-bottom: 1px solid var(--gray-100);
+        grid-template-columns: 100px minmax(0, 1fr) 120px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-rw-amt {
+        font-weight: 700;
+        font-size: 0.9rem;
+        min-width: 74px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-rw-amt.pos {
+        color: var(--ui-accent-hover);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-rw-amt.neg {
+        color: var(--color-danger-ink);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-rw-mid {
+        flex: 1;
+        font-size: 0.88rem;
+        color: var(--gray-800);
+        min-width: 0;
+        overflow-wrap: anywhere;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-rw-meta {
+        font-size: 0.76rem;
+        color: var(--gray-500);
+        margin-top: 1px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-rw-when {
+        font-size: 0.78rem;
+        color: var(--gray-500);
+        white-space: nowrap;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-rw-empty {
+        color: var(--gray-500);
+        font-size: 0.85rem;
+        padding: 12px 2px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-rw-accrual {
+        font-size: 0.86rem;
+        overflow-x: auto;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-rw-acc-hint {
+        margin-top: 8px;
+        line-height: 1.5;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-rw-acc-hint
+        code,
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-rw-notconf
+        code {
+        background: rgb(0 0 0 / 6%);
+        padding: 0 4px;
+        border-radius: 3px;
+        font-size: 0.95em;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-rw-acc-window {
+        font-weight: 400;
+        text-transform: none;
+        letter-spacing: 0;
+        color: var(--gray-500);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-rw-acc-sum {
+        padding: 10px 12px;
+        background: var(--ui-tint);
+        border-radius: var(--radius-md);
+        margin-bottom: 10px;
+        color: var(--gray-700);
+        line-height: 1.5;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-rw-acc-sum
+        .pos {
+        color: var(--ui-accent-hover);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-rw-acc-sum
+        .neg {
+        color: var(--color-danger-ink);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-rw-acc-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.82rem;
+        min-width: 650px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-rw-acc-table
+        th {
+        text-align: left;
+        font-weight: 600;
+        color: var(--ui-muted);
+        padding: 6px;
+        border-bottom: 1px solid var(--gray-200);
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-rw-acc-table
+        td {
+        padding: 6px;
+        border-bottom: 1px solid var(--gray-100);
+        vertical-align: top;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-rw-acc-table
+        .num {
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-rw-acc-table
+        td.pos {
+        color: var(--ui-accent-hover);
+        font-weight: 700;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-rw-acc-table
+        summary {
+        cursor: pointer;
+        list-style: none;
+        font-weight: 600;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-rw-acc-table
+        summary::-webkit-details-marker {
+        display: none;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-rw-acc-lines {
+        margin-top: 4px;
+        font-size: 0.76rem;
+        color: var(--ui-muted);
+        line-height: 1.5;
+        font-weight: 400;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-rw-acc-actions {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        flex-wrap: wrap;
+        margin-top: 10px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-rw-notconf {
+        padding: 10px 12px;
+        background: var(--store-rush-soft);
+        border: 1px solid var(--amber-200);
+        border-radius: var(--radius-md);
+        color: var(--color-warning-ink);
+        line-height: 1.55;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-rw-cell {
+        white-space: nowrap;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-rw-chip {
+        font: inherit;
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+        color: var(--ui-accent-hover);
+        background: var(--ui-tint);
+        border: 1px solid var(--green-200);
+        border-radius: 999px;
+        padding: 3px 10px;
+        cursor: pointer;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-rw-chip:hover {
+        background: var(--store-green-100);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-th-sort {
+        font: inherit;
+        font-weight: inherit;
+        text-transform: inherit;
+        letter-spacing: inherit;
+        color: inherit;
+        background: none;
+        border: 0;
+        padding: 0;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-th-sort
+        i {
+        opacity: 0.45;
+        font-size: 0.85em;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-th-sort--on,
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-th-sort--on
+        i {
+        color: var(--ui-accent-hover);
+        opacity: 1;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-table-scroll {
+        overflow-x: auto;
+        max-width: 100%;
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-sm);
+        background: var(--color-surface);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-th-right {
+        text-align: right;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-btn:focus-visible,
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-btn-icon:focus-visible,
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-tab:focus-visible,
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-rw-chip:focus-visible,
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-th-sort:focus-visible,
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-modal-close:focus-visible,
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-lookup-item:focus-visible,
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .dash-error-banner-close:focus-visible {
+        outline: 3px solid var(--ui-accent);
+        outline-offset: 2px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-lookup-item.is-active {
+        border-color: var(--ui-accent);
+        background: var(--ui-tint);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-btn-ghost[aria-pressed="true"] {
+        background: var(--ui-tint);
+        color: var(--ui-accent-hover);
+        border-color: var(--ui-accent);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-empty
+        .cpa-btn {
+        margin-top: 12px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-lastlogin.cpa-today {
+        color: var(--ui-accent-hover);
+        font-weight: 600;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-search-wrap
+        input {
+        padding-inline-start: 36px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-status-select {
+        min-width: 140px;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-modal-close {
+        flex-shrink: 0;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-field-label {
+        display: block;
+        margin-bottom: var(--space-1);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-dialog-status:not(:empty),
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-data-error {
+        padding: var(--space-3) var(--space-4);
+        background: var(--ui-tint);
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-sm);
+        margin-bottom: var(--space-4);
+        overflow-wrap: anywhere;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-dialog-error:not(:empty) {
+        color: var(--color-danger-ink);
+        background: var(--color-danger-bg);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-print-draft {
+        display: none;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+        .cpa-accrual-print {
+        display: none;
+    }
+
+    @media (width <= 640px) {
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+            .cpa-field-row {
+            grid-template-columns: 1fr;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+            .cpa-actions {
+            justify-content: flex-start;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+            #cpa-filter,
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+            .cpa-search-wrap
+            input {
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+            .cpa-tabs {
+            flex-wrap: wrap;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+            .cpa-tab {
+            padding: 8px 10px;
+            font-size: 0.86rem;
+            flex: 1 1 180px;
+            min-height: 44px;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+            .dash-stat-grid {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+            .dash-stat-card--accent {
+            grid-column: auto;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+            .cpa-controls
+            .cpa-btn {
+            flex: 1 1 auto;
+            justify-content: center;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+            .cpa-modal-overlay {
+            padding: 2vh 8px;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+            .cpa-modal-body,
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+            .cpa-modal-head,
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+            .cpa-modal-foot {
+            padding-left: 14px;
+            padding-right: 14px;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+            .cpa-rw-entry {
+            grid-template-columns: 90px minmax(0, 1fr);
+        }
+
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+            .cpa-rw-when {
+            grid-column: 2;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+            .cpa-modal-foot {
+            flex-wrap: wrap;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+            .dash-stat-card:last-child {
+            grid-column: 1 / -1;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+            .cpa-search-wrap {
+            flex-basis: 100%;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+            .dash-stat-value {
+            font-size: 1.75rem;
+        }
+    }
+
+    @media print {
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"]) {
+            --ui-canvas: var(--color-surface);
+
+            page: staff-toolkit-portal;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+            :is(
+                .cpa-tabs,
+                .cpa-controls,
+                .cpa-actions,
+                .cpa-toast,
+                .cpa-modal-foot,
+                .cpa-modal-close,
+                .cpa-rw-save-btn,
+                .cpa-rw-acc-actions,
+                .cpa-rw-reverse
+            ) {
+            display: none;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+            .cpa-table-scroll,
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+            .cpa-rw-accrual,
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+            .cpa-rw-ledger {
+            overflow: visible;
+            max-height: none;
+            outline: none;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+            .cpa-table,
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+            .cpa-rw-acc-table {
+            min-width: 0;
+            font-size: 9pt;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+            tr {
+            break-inside: avoid;
+        }
+
+        :where(
+                [data-ui="unified"][data-staff-tool="customer-portal-admin"]
+            ):has(.cpa-modal-overlay:not([hidden]))
+            .dash-shell {
+            display: none;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+            .cpa-modal-overlay {
+            position: static;
+            padding: 0;
+            background: var(--color-surface);
+            overflow: visible;
+            display: block;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+            .cpa-modal {
+            max-width: none;
+            box-shadow: none;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+            .cpa-rw-acc-lines {
+            display: block;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+            #cpa-rewards-modal
+            .cpa-field-row {
+            display: none;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+            .cpa-table
+            th:last-child,
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+            .cpa-table
+            td:last-child {
+            display: none;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+            .cpa-print-draft:not(:empty) {
+            display: block;
+            border: 1px solid var(--ui-line);
+            padding: 10pt;
+            margin-bottom: 12pt;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+            .cpa-rw-entry {
+            break-inside: avoid;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+            .cpa-rw-acc-table
+            summary {
+            font-weight: 600;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+            .cpa-rw-acc-table
+            :is(summary, a, button):focus-visible {
+            outline: none;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+            .cpa-rw-accrual {
+            display: none;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+            .cpa-accrual-print {
+            display: block;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="customer-portal-admin"])
+            .cpa-print-order-title {
+            font-weight: 600;
+        }
+    }
+}

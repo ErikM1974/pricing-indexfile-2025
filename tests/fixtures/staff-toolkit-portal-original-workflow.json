@@ -1,0 +1,237 @@
+{
+  "catalog": [
+    {
+      "id": "",
+      "rows": [
+        [
+          "Company",
+          "Account Rep",
+          "Email",
+          "Customer #",
+          "Rewards",
+          "Status",
+          "Last Sign-In",
+          "Actions"
+        ],
+        [
+          "Synthetic Cedar Outfitters",
+          "Review Staff",
+          "review0@example.test",
+          "98101",
+          "$125.50",
+          "Active",
+          "Today 11:00 AM",
+          ""
+        ],
+        [
+          "Synthetic Harbor Club",
+          "Sample Staff",
+          "review1@example.test",
+          "98102",
+          "—",
+          "Active",
+          "Never",
+          ""
+        ],
+        [
+          "Synthetic Pine Team",
+          "Review Staff",
+          "review2@example.test",
+          "98103",
+          "$25.00",
+          "Disabled",
+          "Never",
+          ""
+        ]
+      ]
+    },
+    {
+      "id": "",
+      "rows": [
+        [
+          "Customer",
+          "Product",
+          "Design",
+          "Rep",
+          "Status",
+          "Requested",
+          "Actions"
+        ],
+        [
+          "Synthetic Cedar Outfittersreview0@example.test",
+          "Synthetic Cotton TeePC54 · Navy · qty 48“Synthetic request; do not send.”",
+          "#88001",
+          "Review Staff",
+          "NewIn ProgressQuotedClosed",
+          "Today 9:00 AM",
+          ""
+        ]
+      ]
+    }
+  ],
+  "invite": [
+    {
+      "id": "cpa-lookup",
+      "value": "Maple",
+      "checked": false
+    },
+    {
+      "id": "cpa-email",
+      "value": "maple@example.test",
+      "checked": false
+    },
+    {
+      "id": "cpa-idcustomer",
+      "value": "98104",
+      "checked": false
+    },
+    {
+      "id": "cpa-company",
+      "value": "Synthetic Maple Team",
+      "checked": false
+    },
+    {
+      "id": "cpa-sendlink",
+      "value": "on",
+      "checked": true
+    }
+  ],
+  "ledger": "+$150.00\nSynthetic earned rewards\ngrant · order #99901 · Review Staff\nSep 8, 2026\n−$24.50\nSynthetic redemption\nredeem · order #99902 · Review Staff\nToday 11:00 AM",
+  "rewardTables": [
+    {
+      "id": "",
+      "rows": [
+        [
+          "Company",
+          "Account Rep",
+          "Email",
+          "Customer #",
+          "Rewards",
+          "Status",
+          "Last Sign-In",
+          "Actions"
+        ],
+        [
+          "Synthetic Cedar Outfitters",
+          "Review Staff",
+          "review0@example.test",
+          "98101",
+          "$125.50",
+          "Active",
+          "Today 11:00 AM",
+          ""
+        ],
+        [
+          "Synthetic Harbor Club",
+          "Sample Staff",
+          "review1@example.test",
+          "98102",
+          "—",
+          "Active",
+          "Never",
+          ""
+        ],
+        [
+          "Synthetic Pine Team",
+          "Review Staff",
+          "review2@example.test",
+          "98103",
+          "$25.00",
+          "Disabled",
+          "Never",
+          ""
+        ]
+      ]
+    },
+    {
+      "id": "",
+      "rows": [
+        [
+          "Customer",
+          "Product",
+          "Design",
+          "Rep",
+          "Status",
+          "Requested",
+          "Actions"
+        ],
+        [
+          "Synthetic Cedar Outfittersreview0@example.test",
+          "Synthetic Cotton TeePC54 · Navy · qty 48“Synthetic request; do not send.”",
+          "#88001",
+          "Review Staff",
+          "NewIn ProgressQuotedClosed",
+          "Today 9:00 AM",
+          ""
+        ]
+      ]
+    },
+    {
+      "id": "",
+      "rows": [
+        [
+          "Order",
+          "Invoiced",
+          "Eligible",
+          "Reward",
+          "Granted",
+          "Pending"
+        ],
+        [
+          "#99901 Synthetic Cedar artworkREVIEW-TEE Navy ×50 @ $30.00 · cost $5.25 · Review band 3% = $50.00",
+          "2026-08-14",
+          "$1,500.00",
+          "$50.00",
+          "$25.00",
+          "$25.00"
+        ],
+        [
+          "#99902 Synthetic Harbor artwork redeemed $10.00 (unposted)REVIEW-CAP Black ×50 @ $20.00 · cost $6.25 · Review band 3% = $25.00",
+          "2026-08-21",
+          "$1,000.00",
+          "$25.00",
+          "$30.00",
+          "$0.00over by $5.00 Reverse"
+        ]
+      ]
+    }
+  ],
+  "summary": "Earned $75.00 on $2,500.00 of eligible garments · granted $55.00 · pending $25.00 · redeemed on orders $10.00 ($10.00 not in ledger yet) · granted $5.00 more than now earned (re-invoiced lower — reverse per order below, or leave it)\nBands: Review band → 3% · 1-month window · 1 web-store order(s) ($400.00) excluded · lines from Caspio mirror 2, ManageOrders 0",
+  "writes": [
+    {
+      "path": "/api/crm-proxy/customer-portal-access",
+      "method": "POST",
+      "body": "{\"email\":\"maple@example.test\",\"id_Customer\":\"98104\",\"company_name\":\"Synthetic Maple Team\",\"enabled\":\"Yes\"}"
+    },
+    {
+      "path": "/api/portal-admin/send-link",
+      "method": "POST",
+      "body": "{\"email\":\"maple@example.test\"}"
+    },
+    {
+      "path": "/api/crm-proxy/portal-reorder/requests/99301",
+      "method": "PUT",
+      "body": "{\"status\":\"Quoted\"}"
+    },
+    {
+      "path": "/api/portal-admin/rewards/entry",
+      "method": "POST",
+      "body": "{\"id_Customer\":\"98101\",\"company_name\":\"Synthetic Cedar Outfitters\",\"amount\":25,\"type\":\"grant\",\"reason\":\"Synthetic review only\",\"order_ref\":\"99901\"}"
+    },
+    {
+      "path": "/api/portal-admin/rewards/accrual/98101/post",
+      "method": "POST",
+      "body": "{\"company_name\":\"Synthetic Cedar Outfitters\"}"
+    },
+    {
+      "path": "/api/portal-admin/rewards/accrual/98101/reverse",
+      "method": "POST",
+      "body": "{\"orderNumber\":\"99902\",\"company_name\":\"Synthetic Cedar Outfitters\"}"
+    },
+    {
+      "path": "/api/portal-admin/rewards/expire/98101",
+      "method": "POST",
+      "body": "{\"company_name\":\"Synthetic Cedar Outfitters\"}"
+    }
+  ]
+}

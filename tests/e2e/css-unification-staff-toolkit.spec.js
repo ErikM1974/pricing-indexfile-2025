@@ -611,3 +611,229 @@ test('CSS staff toolkit: long blog preview stays scrollable and prints every sec
     fs.writeFileSync(path.join(output, 'staff-toolkit-blog-long-expected.json'), JSON.stringify({ post: posts[0], renderedText: await pane.innerText() }, null, 2) + '\n');
     await expect(page.locator('#fldBody')).toHaveValue(posts[0].bodyMarkdown); expect(blogWrites(events)).toEqual([]); expect(events.errors).toEqual([]); expect(events.unknown).toEqual([]);
 });
+
+const portalData = require('./fixtures/staff-toolkit-portal-data');
+async function portalWorkflow(page, events, originalView = false) {
+    await expect(page.locator('#stat-rewards')).toHaveText('$150.50');
+    await expect(page.locator('#requests-root .cpa-table')).toHaveCount(1);
+    const catalog = await tables(page);
+    await page.locator('#cpa-add-btn').click(); await page.locator('#cpa-lookup').fill('Maple');
+    await expect(page.locator('.cpa-lookup-item')).toHaveCount(1); await page.locator('#cpa-lookup').press('ArrowDown'); await page.locator('#cpa-lookup').press('Enter');
+    const invite = await page.locator('#cpa-modal input').evaluateAll(ns => ns.map(n => ({ id: n.id, value: n.value, checked: n.checked })));
+    await page.locator('#cpa-save').click(); await expect(page.locator('#cpa-modal')).toBeHidden();
+    await expect(page.locator('#stat-rewards')).toHaveText('$150.50');
+    await page.locator('#cpa-tab-requests').click(); await page.locator('.cpa-status-select').selectOption('Quoted');
+    await expect(page.locator('#cpa-toast')).toContainText('Status → Quoted');
+    await page.locator('#cpa-tab-access').click();
+    await page.locator('button[data-action="rewards"][data-id="98101"]').last().click(); await expect(page.locator('#cpa-rw-balance')).toHaveText('$125.50');
+    const ledger = await page.locator('#cpa-rw-ledger').innerText();
+    await page.locator('#cpa-rw-calc').click(); await expect(page.locator('.cpa-rw-acc-table')).toBeVisible();
+    const rewardTables = await tables(page), summary = await page.locator('.cpa-rw-acc-sum').innerText();
+    for (const s of await page.locator('.cpa-rw-acc-table summary').all()) await s.click();
+    for (const width of [1440, 768, 390, 320]) {
+        await page.setViewportSize({ width, height: 1000 });
+        await page.screenshot({ path: path.join(output, 'staff-toolkit-portal-workflow-' + (originalView ? 'original' : 'current') + '-' + width + '.png'), fullPage: true });
+    }
+    await page.locator('#cpa-rw-amount').fill('25'); await page.locator('#cpa-rw-reason').fill('Synthetic review only'); await page.locator('#cpa-rw-order').fill('99901');
+    await page.locator('#cpa-rw-save').click(); await expect(page.locator('#cpa-rw-amount')).toHaveValue('');
+    await page.locator('#cpa-rw-post').click(); await expect(page.locator('#cpa-toast')).toContainText('Posted 1 grant'); await expect(page.locator('#cpa-rw-post')).toBeEnabled();
+    page.on('dialog', dialog => dialog.accept());
+    await page.locator('.cpa-rw-reverse').click(); await expect(page.locator('#cpa-toast')).toContainText('Reversed $5.00');
+    await page.locator('#cpa-rw-expire').click(); await expect(page.locator('#cpa-toast')).toContainText('Expired $125.50');
+    return { catalog, invite, ledger, rewardTables, summary, writes: events.writes };
+}
+test('CSS staff toolkit: original portal workflow preserves access, status and every reward operation', async ({ page }) => {
+    const events = await open(page, 'customer-portal-admin', { ...portalData.state(), original: true });
+    const result = await portalWorkflow(page, events, true); fs.writeFileSync(path.join(output, 'staff-toolkit-portal-original-workflow.json'), JSON.stringify(result, null, 2) + '\n');
+    expect(events.errors).toEqual([]); expect(events.unknown).toEqual([]); expect(events.missing).toEqual([]);
+    expect(events.writes.map(w => [w.method, w.path])).toEqual([
+        ['POST', '/api/crm-proxy/customer-portal-access'], ['POST', '/api/portal-admin/send-link'],
+        ['PUT', '/api/crm-proxy/portal-reorder/requests/99301'], ['POST', '/api/portal-admin/rewards/entry'],
+        ['POST', '/api/portal-admin/rewards/accrual/98101/post'], ['POST', '/api/portal-admin/rewards/accrual/98101/reverse'],
+        ['POST', '/api/portal-admin/rewards/expire/98101']
+    ]);
+});
+
+test('CSS staff toolkit: portal access, requests and dialogs remain readable and keyboard usable at four widths', async ({ page }) => {
+    const events = await open(page, 'customer-portal-admin', portalData.state());
+    await expect(page.locator('#stat-rewards')).toHaveText('$150.50');
+    const original = require('../fixtures/staff-toolkit-portal-original-workflow.json');
+    await expect(page.locator('#requests-root .cpa-table')).toHaveCount(1); expect(await tables(page)).toEqual(original.catalog);
+    for (const view of ['access', 'requests', 'invite', 'rewards']) {
+        if (view === 'requests') { await page.locator('#cpa-tab-access').focus(); await page.keyboard.press('ArrowRight'); await expect(page.locator('#cpa-view-requests')).toBeVisible(); }
+        if (view === 'invite') { await page.locator('#cpa-tab-access').click(); await page.locator('#cpa-add-btn').click(); await expect(page.locator('#cpa-lookup')).toBeFocused(); }
+        if (view === 'rewards') { await page.keyboard.press('Escape'); await expect(page.locator('#cpa-add-btn')).toBeFocused(); await page.locator('button[data-action="rewards"][data-id="98101"]').last().click(); await expect(page.locator('#cpa-rw-balance')).toHaveText('$125.50'); await page.locator('#cpa-rw-calc').click(); await expect(page.locator('.cpa-rw-acc-table')).toBeVisible(); }
+        for (const width of [1440, 768, 390, 320]) {
+            await page.setViewportSize({ width, height: 1000 }); expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width); await axe(page);
+            await page.screenshot({ path: path.join(output, 'staff-toolkit-portal-' + view + '-' + width + '.png'), fullPage: true });
+        }
+        if (view === 'invite') { await page.locator('#cpa-save').focus(); await page.keyboard.press('Tab'); await expect(page.locator('#cpa-modal-close')).toBeFocused(); }
+        await page.setViewportSize({ width: 1440, height: 1000 });
+        if (view !== 'invite') await page.pdf({ path: path.join(output, 'staff-toolkit-portal-' + view + '.pdf'), printBackground: true, preferCSSPageSize: true });
+    }
+    clean(events);
+});
+
+test('CSS staff toolkit: unified portal preserves original access, status and reward request bodies', async ({ page }) => {
+    const events = await open(page, 'customer-portal-admin', portalData.state());
+    const result = await portalWorkflow(page, events), original = require('../fixtures/staff-toolkit-portal-original-workflow.json');
+    expect(result).toEqual(original); expect(events.errors).toEqual([]); expect(events.unknown).toEqual([]); expect(events.missing).toEqual([]);
+});
+
+test('CSS staff toolkit: portal list failures survive filtering and retry without stale totals', async ({ page }) => {
+    let failed = true; const state = portalData.state(), normal = state.respond;
+    state.respond = async u => u.pathname === '/api/crm-proxy/customer-portal-access' && failed ? { json: {} } : normal(u);
+    const events = await open(page, 'customer-portal-admin', state); await expect(page.locator('#cpa-retry-invites')).toBeVisible();
+    await page.locator('#cpa-filter').fill('Cedar'); await expect(page.locator('#cpa-retry-invites')).toBeVisible(); await expect(page.locator('#stat-total')).toHaveText('—');
+    failed = false; await page.locator('#cpa-retry-invites').click(); await expect(page.locator('#content-root tbody tr')).toHaveCount(1);
+    await expect(page.locator('#stat-total')).toHaveText('3'); await expect(page.locator('#stat-rewards')).toHaveText('$150.50'); await expect(page.locator('.dash-error-banner')).toBeHidden(); clean(events);
+});
+
+test('CSS staff toolkit: missing portal reward balances remain unknown and retry independently', async ({ page }) => {
+    let failed = true; const state = portalData.state(), normal = state.respond;
+    state.respond = async u => u.pathname === '/api/crm-proxy/customer-rewards/balances' && failed ? { json: { balances: { 98101: null } } } : normal(u);
+    const events = await open(page, 'customer-portal-admin', state); await expect(page.locator('#cpa-retry-balances')).toBeVisible();
+    await expect(page.locator('#stat-rewards')).toHaveText('—'); await expect(page.locator('#stat-total')).toHaveText('3');
+    await page.locator('#cpa-filter').fill('Cedar'); await expect(page.locator('#cpa-retry-balances')).toBeVisible();
+    failed = false; await page.locator('#cpa-retry-balances').click(); await expect(page.locator('#stat-rewards')).toHaveText('$150.50'); await expect(page.locator('#cpa-retry-balances')).toHaveCount(0); clean(events);
+});
+
+test('CSS staff toolkit: portal request errors survive status filters and keep counts unknown', async ({ page }) => {
+    let failed = true; const state = portalData.state(), normal = state.respond;
+    state.respond = async u => u.pathname === '/api/crm-proxy/portal-reorder/requests' && failed ? { status: 503, json: { error: 'Synthetic requests unavailable' } } : normal(u);
+    const events = await open(page, 'customer-portal-admin', state); await page.locator('#cpa-tab-requests').click(); await expect(page.locator('#cpa-retry-requests')).toBeVisible();
+    await page.locator('#cpa-req-filter').fill('Cedar'); await page.locator('#cpa-req-status').selectOption('New'); await expect(page.locator('#cpa-retry-requests')).toBeVisible();
+    await expect(page.locator('#cpa-req-rowcount')).toHaveText('—'); await expect(page.locator('#cpa-req-badge')).toHaveText('…');
+    failed = false; await page.locator('#cpa-retry-requests').click(); await expect(page.locator('#requests-root tbody tr')).toHaveCount(1);
+    await expect(page.locator('#cpa-req-badge')).toHaveText('1'); await expect(page.locator('.dash-error-banner')).toBeHidden(); clean(events);
+});
+
+test('CSS staff toolkit: portal lookup ignores superseded search results and keeps combobox semantics', async ({ page }) => {
+    let release, started; const gate = new Promise(r => { release = r; }), requested = new Promise(r => { started = r; });
+    const state = portalData.state(), normal = state.respond;
+    state.respond = async u => {
+        if (u.pathname === '/api/crm-proxy/company-contacts/search' && u.searchParams.get('q') === 'Older') { started(); await gate; return { json: { contacts: [{ id_Customer: 98777, CustomerCompanyName: 'Obsolete company', ContactNumbersEmail: 'old@example.test' }] } }; }
+        return normal(u);
+    };
+    const events = await open(page, 'customer-portal-admin', state); await page.locator('#cpa-add-btn').click(); await page.locator('#cpa-lookup').fill('Older'); await requested;
+    try { await page.locator('#cpa-lookup').fill('Maple'); await expect(page.locator('.cpa-lookup-item')).toContainText('Synthetic Maple Team'); } finally { release(); }
+    await page.waitForTimeout(100); await expect(page.locator('.cpa-lookup-item')).not.toContainText('Obsolete company'); await axe(page);
+    await page.locator('#cpa-lookup').fill('M'); await expect(page.locator('#cpa-lookup-results')).toBeHidden(); await expect(page.locator('#cpa-lookup')).toHaveAttribute('aria-expanded', 'false'); await axe(page);
+    await page.keyboard.press('Escape'); await expect(page.locator('#cpa-add-btn')).toBeFocused(); clean(events);
+});
+
+test('CSS staff toolkit: late reward ledgers cannot replace the newly opened customer', async ({ page }) => {
+    let release, started; const gate = new Promise(r => { release = r; }), requested = new Promise(r => { started = r; });
+    const state = portalData.state(), normal = state.respond;
+    state.respond = async u => {
+        if (u.pathname === '/api/crm-proxy/customer-rewards/ledger/98101') { started(); await gate; }
+        if (u.pathname === '/api/crm-proxy/customer-rewards/ledger/98103') return { json: { balance: 25, entries: [] } };
+        return normal(u);
+    };
+    const events = await open(page, 'customer-portal-admin', state); await expect(page.locator('#stat-rewards')).toHaveText('$150.50');
+    await page.locator('button[data-action="rewards"][data-id="98101"]').last().click(); await requested;
+    try {
+        await page.keyboard.press('Escape'); await page.locator('button[data-action="rewards"][data-id="98103"]').last().click();
+        await expect(page.locator('#cpa-rw-balance')).toHaveText('$25.00');
+    } finally { release(); }
+    await page.waitForTimeout(100); await expect(page.locator('#cpa-rw-title')).toContainText('Synthetic Pine Team'); await expect(page.locator('#cpa-rw-balance')).toHaveText('$25.00'); clean(events);
+});
+
+test('CSS staff toolkit: obsolete partial reward calculations stop before fetching another customer', async ({ page }) => {
+    let release, started, oldCalls = 0; const gate = new Promise(r => { release = r; }), requested = new Promise(r => { started = r; });
+    const state = portalData.state(), normal = state.respond;
+    state.respond = async u => {
+        if (u.pathname === '/api/portal-admin/rewards/accrual/98101') { oldCalls++; started(); await gate; return { json: { ...structuredClone(portalData.accrual), partial: true, progress: { fetched: 1, total: 2 } } }; }
+        if (u.pathname === '/api/portal-admin/rewards/accrual/98103') return { json: { program: { configured: false } } };
+        return normal(u);
+    };
+    const events = await open(page, 'customer-portal-admin', state); await expect(page.locator('#stat-rewards')).toHaveText('$150.50');
+    await page.locator('button[data-action="rewards"][data-id="98101"]').last().click(); await page.locator('#cpa-rw-calc').click(); await requested;
+    try {
+        await page.keyboard.press('Escape'); await page.locator('button[data-action="rewards"][data-id="98103"]').last().click(); await page.locator('#cpa-rw-calc').click();
+        await expect(page.locator('#cpa-rw-accrual')).toContainText('Reward program not configured');
+    } finally { release(); }
+    await page.waitForTimeout(100); expect(oldCalls).toBe(1); await expect(page.locator('#cpa-rw-accrual')).toContainText('Reward program not configured'); await expect(page.locator('#cpa-rw-post')).toHaveCount(0); clean(events);
+});
+
+test('CSS staff toolkit: incomplete reward replies stay unknown until a valid retry', async ({ page }) => {
+    let ledgerFails = true, calcFails = true; const state = portalData.state(), normal = state.respond;
+    state.respond = async u => {
+        if (u.pathname.startsWith('/api/crm-proxy/customer-rewards/ledger/') && ledgerFails) return { json: { entries: [] } };
+        if (u.pathname.startsWith('/api/portal-admin/rewards/accrual/') && calcFails) return { json: { program: { configured: true }, totals: {}, orders: [] } };
+        return normal(u);
+    };
+    const events = await open(page, 'customer-portal-admin', state); await expect(page.locator('#stat-rewards')).toHaveText('$150.50');
+    await page.locator('button[data-action="rewards"][data-id="98101"]').last().click();
+    await expect(page.locator('#cpa-rw-balance')).toHaveText('—'); await expect(page.locator('#cpa-rw-retry')).toBeVisible();
+    ledgerFails = false; await page.locator('#cpa-rw-retry').click(); await expect(page.locator('#cpa-rw-balance')).toHaveText('$125.50');
+    await page.locator('#cpa-rw-calc').click(); await expect(page.locator('#cpa-rw-accrual')).toContainText('Could not calculate'); await expect(page.locator('#cpa-rw-post')).toHaveCount(0);
+    calcFails = false; await page.locator('#cpa-rw-calc').click(); await expect(page.locator('#cpa-rw-post')).toBeVisible(); await axe(page); clean(events);
+});
+
+for (const action of ['post', 'reverse', 'expire']) test('CSS staff toolkit: pending reward ' + action + ' holds its customer and prevents duplicate writes', async ({ page }) => {
+    let release, started; const gate = new Promise(r => { release = r; }), requested = new Promise(r => { started = r; });
+    const state = portalData.state(), normal = state.respondWrite;
+    state.respondWrite = async req => { started(); await gate; return normal(req); };
+    const events = await open(page, 'customer-portal-admin', state); await expect(page.locator('#stat-rewards')).toHaveText('$150.50');
+    await page.locator('button[data-action="rewards"][data-id="98101"]').last().click(); await page.locator('#cpa-rw-calc').click(); await expect(page.locator('#cpa-rw-post')).toBeVisible();
+    page.on('dialog', dialog => dialog.accept()); const button = page.locator(action === 'reverse' ? '.cpa-rw-reverse' : '#cpa-rw-' + action);
+    await button.click(); await requested;
+    try {
+        await expect(page.locator('#cpa-rw-close')).toBeDisabled(); await expect(page.locator('#cpa-rw-amount')).toBeDisabled(); await page.keyboard.press('Escape'); await expect(page.locator('#cpa-rewards-modal')).toBeVisible();
+        await button.evaluate(b => b.dispatchEvent(new MouseEvent('click', { bubbles: true }))); expect(events.writes).toHaveLength(1);
+    } finally { release(); }
+    await expect(page.locator('#cpa-rw-close')).toBeEnabled(); await expect(page.locator('#cpa-rw-status')).not.toHaveText('');
+    await expect(page.locator('#cpa-rw-status')).toBeVisible(); expect(events.writes).toHaveLength(1); expect(events.errors).toEqual([]); expect(events.unknown).toEqual([]);
+});
+
+test('CSS staff toolkit: failed reward entry retains its values and reports uncertainty inside the dialog', async ({ page }) => {
+    const state = portalData.state(); state.respondWrite = async () => ({ status: 503, json: { error: 'Synthetic reward service unavailable' } });
+    const events = await open(page, 'customer-portal-admin', state); await expect(page.locator('#stat-rewards')).toHaveText('$150.50');
+    await page.locator('button[data-action="rewards"][data-id="98101"]').last().click(); await page.locator('#cpa-rw-amount').fill('25'); await page.locator('#cpa-rw-reason').fill('Synthetic retained note');
+    await page.locator('#cpa-rw-save').click(); await expect(page.locator('#cpa-rw-status')).toContainText('Could not confirm the reward change');
+    await expect(page.locator('#cpa-rw-amount')).toHaveValue('25'); await expect(page.locator('#cpa-rw-reason')).toHaveValue('Synthetic retained note');
+    await expect(page.locator('#cpa-rw-save')).toBeEnabled(); await expect(page.locator('#cpa-rw-status')).toBeVisible(); await axe(page);
+    expect(events.writes).toHaveLength(1); expect(events.errors).toEqual([]); expect(events.unknown).toEqual([]);
+});
+
+test('CSS staff toolkit: pending invite holds its details and sends one invitation and one selected login link', async ({ page }) => {
+    let release, started; const gate = new Promise(r => { release = r; }), requested = new Promise(r => { started = r; });
+    const state = portalData.state(), normal = state.respondWrite;
+    state.respondWrite = async req => { if (new URL(req.url()).pathname === '/api/crm-proxy/customer-portal-access') { started(); await gate; } return normal(req); };
+    const events = await open(page, 'customer-portal-admin', state); await page.locator('#cpa-add-btn').click();
+    await page.locator('#cpa-email').fill('review@example.test'); await page.locator('#cpa-idcustomer').fill('98104'); await page.locator('#cpa-company').fill('Synthetic invitation');
+    await page.locator('#cpa-save').click(); await requested;
+    try {
+        await expect(page.locator('#cpa-email')).toBeDisabled(); await expect(page.locator('#cpa-modal-close')).toBeDisabled(); await page.keyboard.press('Escape'); await expect(page.locator('#cpa-modal')).toBeVisible();
+        await page.locator('#cpa-save').evaluate(b => b.dispatchEvent(new MouseEvent('click', { bubbles: true }))); expect(events.writes).toHaveLength(1);
+    } finally { release(); }
+    await expect(page.locator('#cpa-modal')).toBeHidden(); expect(events.writes.map(w => w.path)).toEqual(['/api/crm-proxy/customer-portal-access','/api/portal-admin/send-link']);
+    expect(events.errors).toEqual([]); expect(events.unknown).toEqual([]);
+});
+
+test('CSS staff toolkit: rejected request status restores the saved value', async ({ page }) => {
+    const state = portalData.state(); state.respondWrite = async () => ({ status: 503, json: { error: 'Synthetic status service unavailable' } });
+    const events = await open(page, 'customer-portal-admin', state); await page.locator('#cpa-tab-requests').click(); await page.locator('.cpa-status-select').selectOption('Quoted');
+    await expect(page.locator('#cpa-toast')).toContainText('Synthetic status service unavailable'); await expect(page.locator('.cpa-status-select')).toHaveValue('New');
+    await expect(page.locator('.cpa-status-select')).toBeEnabled(); expect(events.writes).toHaveLength(1); expect(events.errors).toEqual([]); expect(events.unknown).toEqual([]);
+});
+
+test('CSS staff toolkit: long reward histories and collapsed order lines print completely with drafts labeled', async ({ page }) => {
+    const ledger = { balance: 120, entries: Array.from({ length: 24 }, (_, i) => ({ amount: 5, type: 'grant', reason: 'Synthetic ledger marker ' + (i + 1), orderRef: String(99800 + i), by: 'Review Staff', created: '2026-09-08T18:00:00Z' })) };
+    const accrual = structuredClone(portalData.accrual);
+    accrual.orders = Array.from({ length: 18 }, (_, i) => ({ orderNumber: String(100000 + i), designName: 'Synthetic order marker ' + (i + 1), invoiceDate: '2026-08-14', eligibleRevenue: 1000, reward: 30, granted: 10, pending: 20, overGranted: 0, lines: [{ style: 'REVIEW-LONG-' + String(i + 1).padStart(2, '0'), color: 'Navy', qty: 50, unitPrice: 20, cost: 6.25, tier: 'Review band', ratePct: 3, reward: 30 }] }));
+    accrual.totals = { earned: 540, eligibleRevenue: 18000, granted: 180, pending: 360, redeemedOnOrders: 0, redeemPending: 0, overGranted: 0, ledgerBalance: 120 };
+    const state = portalData.state(), normal = state.respond;
+    state.respond = async u => u.pathname.startsWith('/api/crm-proxy/customer-rewards/ledger/') ? { json: ledger } : u.pathname.startsWith('/api/portal-admin/rewards/accrual/') ? { json: accrual } : normal(u);
+    const events = await open(page, 'customer-portal-admin', state); await expect(page.locator('#stat-rewards')).toHaveText('$150.50');
+    await page.locator('button[data-action="rewards"][data-id="98101"]').last().click(); await expect(page.locator('.cpa-rw-entry')).toHaveCount(24);
+    await page.locator('#cpa-rw-calc').click(); await expect(page.locator('.cpa-rw-acc-table tbody tr')).toHaveCount(18);
+    await page.setViewportSize({ width: 320, height: 800 }); const region = page.getByRole('region', { name: 'Earned rewards details' });
+    await region.focus(); await page.keyboard.press('ArrowRight'); await expect.poll(() => region.evaluate(n => n.scrollLeft)).toBeGreaterThan(0); await axe(page);
+    await page.locator('#cpa-rw-amount').fill('25'); await page.locator('#cpa-rw-reason').fill('Synthetic unsaved draft marker'); await page.locator('#cpa-rw-order').fill('199999');
+    const expected = { ledgerText: await page.locator('#cpa-rw-ledger').innerText(), cells: await page.locator('.cpa-rw-acc-table tbody td').evaluateAll(nodes => nodes.map(n => n.textContent.replace(/\s+/g, ' ').trim())), orders: accrual.orders.length, entries: ledger.entries.length };
+    await page.setViewportSize({ width: 1440, height: 1000 }); await page.pdf({ path: path.join(output, 'staff-toolkit-portal-rewards-long.pdf'), printBackground: true, preferCSSPageSize: true });
+    fs.writeFileSync(path.join(output, 'staff-toolkit-portal-rewards-long-expected.json'), JSON.stringify(expected, null, 2) + '\n');
+    await expect(page.locator('.cpa-rw-acc-table details[open]')).toHaveCount(0); await expect(page.locator('#cpa-rw-amount')).toHaveValue('25'); await expect(page.locator('#cpa-rw-draft-print')).toBeHidden(); clean(events);
+});
