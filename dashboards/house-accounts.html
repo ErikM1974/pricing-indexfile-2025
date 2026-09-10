@@ -8,42 +8,44 @@
     <link rel="icon" href="/favicon.png" type="image/png">
 
     <!-- Fonts & Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
     <!-- Dashboard Styles -->
     <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link href="/dashboards/css/house-accounts.css?v=2026.09.07.19" rel="stylesheet">
+    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.09.19">
+    <link rel="stylesheet" href="/shared_components/css/crm-accounts.css?v=2026.09.09.19">
 </head>
-<body>
+<body data-ui="unified" data-crm-workspace="house-accounts" data-density="compact">
+    <a class="skip-link" href="#crm-main">Skip to main content</a>
     <div class="house-page">
         <!-- Header -->
-        <header class="house-header">
-            <div class="header-left">
+        <header class="house-header dash-header">
+            <div class="header-left dash-header-left">
                 <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
-                     alt="Northwest Custom Apparel" class="header-logo">
-                <h1 class="header-title">House Accounts</h1>
+                     alt="Northwest Custom Apparel" class="header-logo dash-header-logo">
+                <h1 class="header-title dash-header-title">House Accounts</h1>
             </div>
-            <div class="header-right">
-                <a href="/crm-logout" class="back-btn" title="Logout">
+            <div class="header-right dash-header-right">
+                <a href="/crm-logout" class="back-btn btn" title="Logout">
                     <i class="fas fa-sign-out-alt" aria-hidden="true"></i> Logout
                 </a>
-                <a href="/staff-dashboard.html" class="back-btn">
+                <a href="/staff-dashboard.html" class="back-btn btn">
                     <i class="fas fa-arrow-left" aria-hidden="true"></i> Dashboard
                 </a>
             </div>
         </header>
 
         <!-- Main Content -->
-        <main class="house-content">
+        <main class="house-content dash-content" id="crm-main" tabindex="-1">
             <!-- Error Banner -->
             <div class="error-banner" id="error-banner">
                 <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
                 <span class="error-banner-message" id="error-message"></span>
-                <button type="button" class="error-banner-retry" id="error-retry" data-call="houseController.retryLoad" hidden>
+                <button type="button" class="error-banner-retry btn" id="error-retry" data-call="houseController.retryLoad" hidden>
                     <i class="fas fa-rotate" aria-hidden="true"></i> Retry
                 </button>
-                <button type="button" class="error-banner-close" aria-label="Dismiss error" data-call="dismissErrorBanner">
+                <button type="button" class="error-banner-close btn" aria-label="Dismiss error" data-call="dismissErrorBanner">
                     <i class="fas fa-times" aria-hidden="true"></i>
                 </button>
             </div>
@@ -84,11 +86,11 @@
             <div class="filters-section">
                 <div class="filter-group search-group">
                     <label for="filter-search">Search</label>
-                    <input type="text" id="filter-search" placeholder="Search company name...">
+                    <input type="text" id="filter-search" placeholder="Search company name..." class="field-input">
                 </div>
                 <div class="filter-group">
                     <label for="filter-assignee">Assignee</label>
-                    <select id="filter-assignee">
+                    <select id="filter-assignee" class="field-select">
                         <option value="">All Assignees</option>
                         <option value="Ruthie">Ruthie</option>
                         <option value="Erik">Erik</option>
@@ -98,7 +100,7 @@
                         <option value="Other">Other</option>
                     </select>
                 </div>
-                <button type="button" class="clear-filters-btn" id="clear-filters-btn">
+                <button type="button" class="clear-filters-btn btn" id="clear-filters-btn">
                     <i class="fas fa-times" aria-hidden="true"></i> Clear
                 </button>
             </div>
@@ -109,20 +111,20 @@
                     <h2><i class="fas fa-home" aria-hidden="true"></i> Accounts</h2>
                     <div class="accounts-meta">
                         <span class="accounts-count" id="accounts-count">0 accounts</span>
-                        <button type="button" class="gap-report-btn" id="gap-report-btn" title="View all authority conflicts - orders written by wrong rep">
+                        <button type="button" class="gap-report-btn btn" id="gap-report-btn" title="View all authority conflicts - orders written by wrong rep">
                             <i class="fas fa-exchange-alt" aria-hidden="true"></i> Gap Report
                         </button>
-                        <button type="button" class="reconcile-btn" id="reconcile-btn" title="Find customers with orders not in any account list">
+                        <button type="button" class="reconcile-btn btn" id="reconcile-btn" title="Find customers with orders not in any account list">
                             <i class="fas fa-user-plus" aria-hidden="true"></i> Find Unassigned
                         </button>
-                        <button type="button" class="gap-report-btn" id="sw-todo-btn" title="Dashboard rep assignments you still need to key into ShopWorks by hand (ShopWorks has no write-back — the ODBC mirror auto-confirms once you do)">
+                        <button type="button" class="gap-report-btn btn" id="sw-todo-btn" title="Dashboard rep assignments you still need to key into ShopWorks by hand (ShopWorks has no write-back — the ODBC mirror auto-confirms once you do)">
                             <i class="fas fa-clipboard-check" aria-hidden="true"></i> ShopWorks To-Do <span class="sw-todo-count" id="sw-todo-count" hidden></span>
                         </button>
                         <div class="sync-controls">
-                            <button type="button" class="sync-btn primary" id="sync-all-btn" title="Sync ownership and sales for all CRM dashboards (Nika, Taneisha, House)">
+                            <button type="button" class="sync-btn primary btn" id="sync-all-btn" title="Sync ownership and sales for all CRM dashboards (Nika, Taneisha, House)">
                                 <i class="fas fa-sync" aria-hidden="true"></i> Sync All CRM
                             </button>
-                            <button type="button" class="sync-btn" id="sync-house-btn" title="Quick sync House accounts sales only">
+                            <button type="button" class="sync-btn btn" id="sync-house-btn" title="Quick sync House accounts sales only">
                                 <i class="fas fa-home" aria-hidden="true"></i> Sync House Only
                             </button>
                         </div>
@@ -153,18 +155,18 @@
     </div>
 
     <!-- ShopWorks To-Do Modal -->
-    <div class="modal-overlay" id="sw-todo-modal-overlay">
-        <div class="gap-report-modal" role="dialog" aria-modal="true" aria-labelledby="sw-todo-title">
+    <dialog class="modal-overlay" id="sw-todo-modal-overlay" aria-labelledby="sw-todo-title">
+        <div class="gap-report-modal">
             <div class="modal-header">
                 <div class="modal-title">
                     <h2 id="sw-todo-title"><i class="fas fa-clipboard-check" aria-hidden="true"></i> ShopWorks To-Do</h2>
                     <p class="modal-subtitle">Assignments made in the dashboards that you still need to key into ShopWorks (Cust → Customer Service Rep). The 15-min ODBC mirror auto-clears each row once ShopWorks matches.</p>
                 </div>
                 <div class="modal-header-actions">
-                    <button type="button" class="sync-btn" id="sw-todo-copy" title="Copy the list to paste into notes / print for ShopWorks entry">
+                    <button type="button" class="sync-btn btn" id="sw-todo-copy" title="Copy the list to paste into notes / print for ShopWorks entry">
                         <i class="fas fa-copy" aria-hidden="true"></i> Copy list
                     </button>
-                    <button type="button" class="modal-close" aria-label="Close" id="sw-todo-close">
+                    <button type="button" class="modal-close btn" aria-label="Close" id="sw-todo-close">
                         <i class="fas fa-times" aria-hidden="true"></i>
                     </button>
                 </div>
@@ -173,21 +175,21 @@
                 <div class="loading-spinner"></div>
             </div>
         </div>
-    </div>
+    </dialog>
 
     <!-- Reconcile Modal -->
-    <div class="modal-overlay" id="reconcile-modal-overlay">
-        <div class="reconcile-modal" role="dialog" aria-modal="true" aria-labelledby="reconcile-title">
+    <dialog class="modal-overlay" id="reconcile-modal-overlay" aria-labelledby="reconcile-title">
+        <div class="reconcile-modal">
             <div class="modal-header">
                 <div class="modal-title">
                     <h2 id="reconcile-title"><i class="fas fa-user-plus" aria-hidden="true"></i> Find Unassigned Customers</h2>
                     <p class="modal-subtitle">Customers with orders not in any rep's account list</p>
                 </div>
                 <div class="modal-header-actions">
-                    <button type="button" class="refresh-btn" id="reconcile-refresh-btn" title="Refresh data from Caspio" aria-label="Refresh unassigned customers">
+                    <button type="button" class="refresh-btn btn" id="reconcile-refresh-btn" title="Refresh data from Caspio" aria-label="Refresh unassigned customers">
                         <i class="fas fa-sync-alt" aria-hidden="true"></i>
                     </button>
-                    <button type="button" class="modal-close" aria-label="Close" id="reconcile-modal-close">
+                    <button type="button" class="modal-close btn" aria-label="Close" id="reconcile-modal-close">
                         <i class="fas fa-times" aria-hidden="true"></i>
                     </button>
                 </div>
@@ -199,8 +201,8 @@
                 </div>
                 <div class="reconcile-results" id="reconcile-results" hidden>
                     <div class="reconcile-summary" id="reconcile-summary"></div>
-                    <div class="reconcile-table-wrapper">
-                        <table class="reconcile-table" id="reconcile-table">
+                    <div class="reconcile-table-wrapper table-wrap" role="region" aria-label="house accounts table 1" tabindex="0">
+                        <table class="reconcile-table data-table" id="reconcile-table">
                             <thead>
                                 <tr>
                                     <th class="expand-col"><span class="sr-only">Expand</span></th>
@@ -226,20 +228,20 @@
                 </div>
             </div>
             <div class="modal-footer" id="reconcile-footer" hidden>
-                <button type="button" class="btn-cancel" id="reconcile-cancel">Close</button>
-                <button type="button" class="btn-save" id="reconcile-add-all">
+                <button type="button" class="btn-cancel btn" id="reconcile-cancel">Close</button>
+                <button type="button" class="btn-save btn" id="reconcile-add-all">
                     <i class="fas fa-plus" aria-hidden="true"></i> Add All to House
                 </button>
             </div>
         </div>
-    </div>
+    </dialog>
 
     <!-- Confirmation Modal -->
-    <div class="modal-overlay" id="confirm-modal">
-        <div class="confirm-modal" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
+    <dialog class="modal-overlay" id="confirm-modal" aria-labelledby="confirm-title">
+        <div class="confirm-modal">
             <div class="modal-header">
                 <h2 id="confirm-title">Assign Account</h2>
-                <button type="button" class="modal-close" aria-label="Close" id="confirm-close">
+                <button type="button" class="modal-close btn" aria-label="Close" id="confirm-close">
                     <i class="fas fa-times" aria-hidden="true"></i>
                 </button>
             </div>
@@ -248,30 +250,30 @@
                 <div class="account-preview" id="confirm-account-preview"></div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn-cancel" id="confirm-cancel">Cancel</button>
-                <button type="button" class="btn-save" id="confirm-submit">
+                <button type="button" class="btn-cancel btn" id="confirm-cancel">Cancel</button>
+                <button type="button" class="btn-save btn" id="confirm-submit">
                     <i class="fas fa-check" aria-hidden="true"></i> Confirm
                 </button>
             </div>
         </div>
-    </div>
+    </dialog>
 
     <!-- Celebration Toast (for success messages) -->
     <div class="celebration-toast" id="celebration-toast" role="status" aria-live="polite"></div>
 
     <!-- Gap Report Modal -->
-    <div class="modal-overlay" id="gap-report-modal-overlay">
-        <div class="gap-report-modal" role="dialog" aria-modal="true" aria-labelledby="gap-report-title">
+    <dialog class="modal-overlay" id="gap-report-modal-overlay" aria-labelledby="gap-report-title">
+        <div class="gap-report-modal">
             <div class="modal-header">
                 <div class="modal-title">
                     <h2 id="gap-report-title"><i class="fas fa-exchange-alt" aria-hidden="true"></i> Full Reconciliation Report</h2>
                     <p class="modal-subtitle">Orders where rep doesn't match customer's CRM owner</p>
                 </div>
                 <div class="modal-header-actions">
-                    <button type="button" class="refresh-btn" id="gap-report-refresh-btn" title="Refresh report" aria-label="Refresh gap report">
+                    <button type="button" class="refresh-btn btn" id="gap-report-refresh-btn" title="Refresh report" aria-label="Refresh gap report">
                         <i class="fas fa-sync-alt" aria-hidden="true"></i>
                     </button>
-                    <button type="button" class="modal-close" aria-label="Close" id="gap-report-modal-close">
+                    <button type="button" class="modal-close btn" aria-label="Close" id="gap-report-modal-close">
                         <i class="fas fa-times" aria-hidden="true"></i>
                     </button>
                 </div>
@@ -286,10 +288,10 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn-cancel" id="gap-report-close">Close</button>
+                <button type="button" class="btn-cancel btn" id="gap-report-close">Close</button>
             </div>
         </div>
-    </div>
+    </dialog>
 
     <!-- Configuration -->
     <script src="/config/app.config.js"></script>
@@ -297,6 +299,6 @@
     <!-- Dashboard JavaScript -->
     <script src="/shared_components/js/caspio-date-utils.js?v=2026.09.06.46"></script>
     <script src="/shared_components/js/data-call-delegator.js?v=2026.09.06.27"></script>
-    <script src="/dashboards/js/house-accounts.js?v=2026.09.06.37"></script>
+    <script src="/dashboards/js/house-accounts.js?v=2026.09.09.19"></script>
 </body>
 </html>

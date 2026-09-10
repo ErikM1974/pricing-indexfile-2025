@@ -10,16 +10,16 @@
     <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <!-- 2026 design tokens (must load before dash-shell.css) -->
     <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/shared_components/css/art-hub.css?v=2026.09.07.19">
-    <link rel="stylesheet" href="/shared_components/css/dash-shell.css?v=2026.09.07.10">
-    <link rel="stylesheet" href="/dashboards/css/leads.css?v=2026.09.07.10">
+    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.09.19">
+    <link rel="stylesheet" href="/shared_components/css/crm-pipeline.css?v=2026.09.09.19">
 </head>
-<body>
+<body data-ui="unified" data-crm-workspace="leads" data-density="compact">
+    <a class="skip-link" href="#crm-main">Skip to main content</a>
     <div class="dash-shell">
         <header class="dash-header">
             <div class="dash-header-left">
@@ -30,23 +30,23 @@
                 <h1 class="dash-header-title">Leads</h1>
             </div>
             <div class="dash-header-right">
-                <button type="button" id="btn-new-lead" class="ld-refresh-btn ld-newlead-btn" title="Log a phone or walk-in lead" aria-label="New lead">
+                <button type="button" id="btn-new-lead" class="ld-refresh-btn ld-newlead-btn btn" title="Log a phone or walk-in lead" aria-label="New lead">
                     <i class="fas fa-plus" aria-hidden="true"></i>
                     <span class="ld-btn-txt">New lead</span>
                 </button>
-                <button type="button" id="btn-export" class="ld-refresh-btn" title="Download the current view as a CSV (opens in Excel)" aria-label="Export CSV">
+                <button type="button" id="btn-export" class="ld-refresh-btn btn" title="Download the current view as a CSV (opens in Excel)" aria-label="Export CSV">
                     <i class="fas fa-file-arrow-down" aria-hidden="true"></i>
                     <span class="ld-btn-txt">Export</span>
                 </button>
-                <button type="button" id="btn-refresh" class="ld-refresh-btn" title="Reload leads" aria-label="Refresh leads">
+                <button type="button" id="btn-refresh" class="ld-refresh-btn btn" title="Reload leads" aria-label="Refresh leads">
                     <i class="fas fa-rotate" aria-hidden="true"></i>
                     <span class="ld-btn-txt">Refresh</span>
                 </button>
-                <a href="/dashboards/lead-scorecard.html" class="ld-refresh-btn" title="Rep close rates + order value" aria-label="Rep scorecard">
+                <a href="/dashboards/lead-scorecard.html" class="ld-refresh-btn btn" title="Rep close rates + order value" aria-label="Rep scorecard">
                     <i class="fas fa-trophy" aria-hidden="true"></i>
                     <span class="ld-btn-txt">Scorecard</span>
                 </a>
-                <a href="/dashboards/unqualified-leads.html" class="ld-refresh-btn" title="Spam + unqualified leads (kept off this board)" aria-label="Spam and unqualified leads">
+                <a href="/dashboards/unqualified-leads.html" class="ld-refresh-btn btn" title="Spam + unqualified leads (kept off this board)" aria-label="Spam and unqualified leads">
                     <i class="fas fa-filter-circle-xmark" aria-hidden="true"></i>
                     <span class="ld-btn-txt">Spam / Unqualified</span>
                 </a>
@@ -57,11 +57,11 @@
             </div>
         </header>
 
-        <main class="dash-content">
+        <main class="dash-content" id="crm-main" tabindex="-1">
             <div class="dash-error-banner" role="alert">
                 <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
                 <span class="dash-error-banner-message"></span>
-                <button type="button" class="dash-error-banner-close" aria-label="Dismiss">
+                <button type="button" class="dash-error-banner-close btn" aria-label="Dismiss">
                     <i class="fas fa-times" aria-hidden="true"></i>
                 </button>
             </div>
@@ -90,23 +90,23 @@
                     <h2 class="dash-card-title">All Leads</h2>
                     <span class="ld-count" id="leads-count"></span>
                     <div class="ld-view-toggle" role="group" aria-label="View">
-                        <button type="button" id="view-board" class="ld-toggle-btn" aria-pressed="false"><i class="fas fa-table-columns" aria-hidden="true"></i> Board</button>
-                        <button type="button" id="view-list" class="ld-toggle-btn" aria-pressed="false"><i class="fas fa-list" aria-hidden="true"></i> List</button>
+                        <button type="button" id="view-board" class="ld-toggle-btn btn" aria-pressed="false"><i class="fas fa-table-columns" aria-hidden="true"></i> Board</button>
+                        <button type="button" id="view-list" class="ld-toggle-btn btn" aria-pressed="false"><i class="fas fa-list" aria-hidden="true"></i> List</button>
                     </div>
                 </div>
 
                 <div class="ld-toolbar">
-                    <select id="filter-source" class="ld-select" aria-label="Filter by source">
+                    <select id="filter-source" class="ld-select field-select" aria-label="Filter by source">
                         <option value="">All sources</option>
                     </select>
-                    <select id="filter-status" class="ld-select" aria-label="Filter by status">
+                    <select id="filter-status" class="ld-select field-select" aria-label="Filter by status">
                         <option value="">All statuses</option>
                     </select>
-                    <select id="filter-rep" class="ld-select" aria-label="Filter by rep">
+                    <select id="filter-rep" class="ld-select field-select" aria-label="Filter by rep">
                         <option value="">All reps</option>
                     </select>
-                    <input type="search" id="filter-search" class="ld-search" placeholder="Search name, company, email…" aria-label="Search leads">
-                    <button type="button" id="filter-mine" class="ld-chip-btn" aria-pressed="false" hidden>
+                    <input type="search" id="filter-search" class="ld-search field-input" placeholder="Search name, company, email…" aria-label="Search leads">
+                    <button type="button" id="filter-mine" class="ld-chip-btn btn" aria-pressed="false" hidden>
                         <i class="fas fa-user" aria-hidden="true"></i> Mine
                     </button>
                     <label class="ld-archived-toggle">
@@ -115,11 +115,11 @@
                     </label>
                 </div>
 
-                <div class="ld-board" id="leads-board" hidden></div>
+                <div class="ld-board" id="leads-board" tabindex="0" aria-label="Lead pipeline board" hidden></div>
                 <div class="ld-board-msg" id="leads-board-msg" role="status" hidden></div>
 
-                <div class="ld-table-scroll" id="leads-list-wrap">
-                    <table class="ld-table" id="leads-table">
+                <div class="ld-table-scroll table-wrap" id="leads-list-wrap" role="region" aria-label="leads table 1" tabindex="0">
+                    <table class="ld-table data-table" id="leads-table">
                         <thead>
                             <tr>
                                 <th>Received</th>
@@ -152,7 +152,7 @@
                 <a id="drawer-open-full" class="ld-btn" href="/dashboards/lead.html" title="Open the full lead workspace">
                     <i class="fas fa-up-right-from-square" aria-hidden="true"></i> Full lead
                 </a>
-                <button type="button" class="ld-drawer-close" id="drawer-close" aria-label="Close">
+                <button type="button" class="ld-drawer-close btn" id="drawer-close" aria-label="Close">
                     <i class="fas fa-times" aria-hidden="true"></i>
                 </button>
             </div>
@@ -165,39 +165,39 @@
     <div class="ld-modal" id="newlead-modal" role="dialog" aria-modal="true" aria-labelledby="newlead-title" hidden>
         <div class="ld-modal-head">
             <h2 class="ld-modal-title" id="newlead-title"><i class="fas fa-phone" aria-hidden="true"></i> New lead — phone / walk-in</h2>
-            <button type="button" class="ld-drawer-close" id="newlead-close" aria-label="Close">
+            <button type="button" class="ld-drawer-close btn" id="newlead-close" aria-label="Close">
                 <i class="fas fa-times" aria-hidden="true"></i>
             </button>
         </div>
         <div class="ld-modal-body">
             <div class="ld-control"><label class="ld-control-label" for="nl-name">Contact name *</label>
-                <input id="nl-name" class="ld-select" type="text" autocomplete="off"></div>
+                <input id="nl-name" class="ld-select field-input" type="text" autocomplete="off"></div>
             <div class="ld-control"><label class="ld-control-label" for="nl-company">Company</label>
-                <input id="nl-company" class="ld-select" type="text" autocomplete="off"></div>
+                <input id="nl-company" class="ld-select field-input" type="text" autocomplete="off"></div>
             <div class="ld-controls">
                 <div class="ld-control"><label class="ld-control-label" for="nl-email">Email</label>
-                    <input id="nl-email" class="ld-select" type="email" autocomplete="off"></div>
+                    <input id="nl-email" class="ld-select field-input" type="email" autocomplete="off"></div>
                 <div class="ld-control"><label class="ld-control-label" for="nl-phone">Phone</label>
-                    <input id="nl-phone" class="ld-select" type="tel" autocomplete="off"></div>
+                    <input id="nl-phone" class="ld-select field-input" type="tel" autocomplete="off"></div>
             </div>
             <div class="ld-control"><label class="ld-control-label" for="nl-summary">What they want *</label>
-                <textarea id="nl-summary" class="ld-select" rows="3" placeholder="e.g. 60 hoodies for a crew, needs them by Aug 15"></textarea></div>
+                <textarea id="nl-summary" class="ld-select field-textarea" rows="3" placeholder="e.g. 60 hoodies for a crew, needs them by Aug 15"></textarea></div>
             <div class="ld-controls">
                 <div class="ld-control"><label class="ld-control-label" for="nl-source">How they reached us</label>
-                    <select id="nl-source" class="ld-select">
+                    <select id="nl-source" class="ld-select field-select">
                         <option>Phone call</option><option>Walk-in</option><option>Referral</option><option>Email</option><option>Other</option>
                     </select></div>
                 <div class="ld-control"><label class="ld-control-label" for="nl-rep">Assigned rep</label>
-                    <select id="nl-rep" class="ld-select"></select></div>
+                    <select id="nl-rep" class="ld-select field-select"></select></div>
             </div>
             <div class="ld-controls">
                 <div class="ld-control"><label class="ld-control-label" for="nl-value">Est. value $</label>
-                    <input id="nl-value" class="ld-select" type="number" min="0" step="50" placeholder="0"></div>
+                    <input id="nl-value" class="ld-select field-input" type="number" min="0" step="50" placeholder="0"></div>
                 <div class="ld-control"><label class="ld-control-label" for="nl-due">Follow-up date</label>
-                    <input id="nl-due" class="ld-select" type="date"></div>
+                    <input id="nl-due" class="ld-select field-input" type="date"></div>
             </div>
             <div class="ld-modal-actions">
-                <button type="button" id="newlead-save" class="ld-btn ld-btn--primary"><i class="fas fa-plus" aria-hidden="true"></i> Create lead</button>
+                <button type="button" id="newlead-save" class="ld-btn ld-btn--primary btn"><i class="fas fa-plus" aria-hidden="true"></i> Create lead</button>
                 <span id="newlead-status" class="ld-muted" role="status"></span>
             </div>
         </div>
@@ -208,6 +208,6 @@
     <script src="/shared_components/js/fetch-timeout.js?v=2026.09.06.26"></script>
     <script src="/shared_components/js/dash-page-helpers.js?v=2026.09.07.25"></script>
     <script src="/dashboards/js/leads-common.js?v=2026.09.05.33"></script>
-    <script src="/dashboards/js/leads.js?v=2026.09.05.33"></script>
+    <script src="/dashboards/js/leads.js?v=2026.09.09.19"></script>
 </body>
 </html>

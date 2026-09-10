@@ -10,7 +10,7 @@
 (function () {
     'use strict';
 
-    var state = { cat: 'spam', search: '', cache: {} };
+    var state = { cat: 'spam', search: '', cache: {}, sequence: {} };
 
     function esc(v) {
         return String(v == null ? '' : v)
@@ -64,7 +64,11 @@
 
     function prefetchCount(cat) {
         if (state.cache[cat]) return;
-        fetchCat(cat).then(function (rows) { state.cache[cat] = rows; setBadge(cat, rows.length); }).catch(function () {});
+        var seq = state.sequence[cat] = (state.sequence[cat] || 0) + 1;
+        fetchCat(cat).then(function (rows) {
+            if (seq !== state.sequence[cat]) return;
+            state.cache[cat] = rows; setBadge(cat, rows.length);
+        }).catch(function () { if (seq === state.sequence[cat]) setBadge(cat, '?'); });
     }
 
     function setBadge(cat, n) { document.getElementById('badge-' + cat).textContent = n; }
@@ -87,7 +91,7 @@
             })
             .then(function (r) {
                 state.cache = {};
-                load('spam'); prefetchCount('unqualified');
+                load(state.cat); prefetchCount(state.cat === 'spam' ? 'unqualified' : 'spam');
                 var added = (r.spam || 0) + (r.unqualified || 0);
                 // A successful rescan is news, not an error — it used to be shown in the red error banner.
                 var st = document.getElementById('uq-status');
@@ -110,7 +114,10 @@
             .then(function (resp) {
                 return resp.json().catch(function () { return {}; }).then(function (b) {
                     if (!resp.ok) throw new Error((b && b.error) || ('HTTP ' + resp.status));
-                    return (b.submissions || []).sort(function (a, c) {
+                    if (!Array.isArray(b.submissions) || b.submissions.some(function (row) { return !row || typeof row !== 'object' || !row.Submission_ID; })) {
+                        throw new Error('The lead list is incomplete. Please retry.');
+                    }
+                    return b.submissions.sort(function (a, c) {
                         return String(c.Submitted_At || '').localeCompare(String(a.Submitted_At || ''));
                     });
                 });
@@ -118,23 +125,31 @@
     }
 
     function load(cat) {
+        var seq = state.sequence[cat] = (state.sequence[cat] || 0) + 1;
+        document.getElementById('list-count').textContent = 'Loading…';
         DashPage.hideError();
         var st = document.getElementById('uq-status'); if (st && cat !== state.cat) st.hidden = true;
         document.getElementById('uq-tbody').innerHTML = '<tr><td colspan="5" class="uq-empty dash-loading">Loading…</td></tr>';
         if (state.cache[cat]) { setBadge(cat, state.cache[cat].length); render(); return; }
         fetchCat(cat).then(function (rows) {
+            if (cat !== state.cat || seq !== state.sequence[cat]) return;
             state.cache[cat] = rows;
             setBadge(cat, rows.length);
             render();
         }).catch(function (err) {
+            if (cat !== state.cat || seq !== state.sequence[cat]) return;
+            delete state.cache[cat];
+            setBadge(cat, '?');
+            document.getElementById('list-count').textContent = 'Unavailable';
             console.error('[unqualified] load failed:', err);
             DashPage.showError('Unable to load ' + cat + ' leads (' + err.message + ').');
-            document.getElementById('uq-tbody').innerHTML = '<tr><td colspan="5" class="uq-empty"><i class="fas fa-triangle-exclamation" aria-hidden="true"></i> Unavailable. <button type="button" id="uq-retry" class="uq-btn uq-retry"><i class="fas fa-rotate" aria-hidden="true"></i> Retry</button></td></tr>';
+            document.getElementById('uq-tbody').innerHTML = '<tr><td colspan="5" class="uq-empty"><i class="fas fa-triangle-exclamation" aria-hidden="true"></i> Unavailable. <button type="button" id="uq-retry" class="uq-btn uq-retry btn"><i class="fas fa-rotate" aria-hidden="true"></i> Retry</button></td></tr>';
         });
     }
 
     function render() {
-        var rows = state.cache[state.cat] || [];
+        if (!state.cache[state.cat]) return;
+        var rows = state.cache[state.cat];
         if (state.search) {
             rows = rows.filter(function (l) {
                 return [l.Company, l.Contact_Name, l.Email, l.Summary].join(' ').toLowerCase().indexOf(state.search) !== -1;
