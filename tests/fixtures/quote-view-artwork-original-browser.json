@@ -1,0 +1,744 @@
+{
+  "before": {
+    "title": "Quote EMB0910-7401 - NWCA",
+    "fields": [
+      {
+        "id": "quote-id-header",
+        "text": "Quote #EMB0910-7401 · WO #740123",
+        "visible": true,
+        "disabled": false
+      },
+      {
+        "id": "quote-status",
+        "text": "Open",
+        "visible": true,
+        "disabled": false
+      },
+      {
+        "id": "sw-cancelled-detail",
+        "text": "",
+        "visible": false,
+        "disabled": false
+      },
+      {
+        "id": "sw-sync-pill-icon",
+        "text": "✓",
+        "visible": true,
+        "disabled": false
+      },
+      {
+        "id": "sw-sync-pill-text",
+        "text": "ShopWorks #740123",
+        "visible": true,
+        "disabled": false
+      },
+      {
+        "id": "sw-sync-extorder",
+        "text": "Ref: NWCA-EMB0910-7401",
+        "visible": true,
+        "disabled": false
+      },
+      {
+        "id": "sw-sync-timestamp",
+        "text": "Last synced just now",
+        "visible": true,
+        "disabled": false
+      },
+      {
+        "id": "sw-sync-refresh-btn",
+        "text": "🔄 Refresh",
+        "visible": true,
+        "disabled": false
+      },
+      {
+        "id": "sw-manual-wo-input",
+        "text": "",
+        "visible": false,
+        "disabled": false
+      },
+      {
+        "id": "sw-manual-wo-btn",
+        "text": "Set & Sync",
+        "visible": false,
+        "disabled": false
+      },
+      {
+        "id": "qv-deposit-state",
+        "text": "Waiting for customer acceptance",
+        "visible": true,
+        "disabled": false
+      },
+      {
+        "id": "qv-deposit-shipping",
+        "text": "",
+        "visible": false,
+        "disabled": false
+      },
+      {
+        "id": "qv-deposit-taxrate",
+        "text": "",
+        "visible": false,
+        "disabled": false
+      },
+      {
+        "id": "qv-deposit-preview",
+        "text": "",
+        "visible": false,
+        "disabled": false
+      },
+      {
+        "id": "qv-deposit-enable-btn",
+        "text": "Enable payment link",
+        "visible": false,
+        "disabled": false
+      },
+      {
+        "id": "sw-action-print",
+        "text": "🖨 Print / PDF",
+        "visible": true,
+        "disabled": false
+      },
+      {
+        "id": "sw-action-copy-link",
+        "text": "📋 Copy link",
+        "visible": true,
+        "disabled": false
+      },
+      {
+        "id": "sw-action-email",
+        "text": "📧 Email customer",
+        "visible": true,
+        "disabled": false
+      },
+      {
+        "id": "sw-action-shipstation",
+        "text": "🚢 Send to ShipStation",
+        "visible": true,
+        "disabled": false
+      },
+      {
+        "id": "sw-action-send-steve",
+        "text": "🎨 Send to Steve",
+        "visible": true,
+        "disabled": false
+      },
+      {
+        "id": "po-number-display",
+        "text": "PO-SYNTHETIC",
+        "visible": true,
+        "disabled": false
+      },
+      {
+        "id": "customer-name",
+        "text": "Cedar Example Construction",
+        "visible": true,
+        "disabled": false
+      },
+      {
+        "id": "company-name",
+        "text": "Cedar Example Construction",
+        "visible": true,
+        "disabled": false
+      },
+      {
+        "id": "customer-email",
+        "text": "review@example.test",
+        "visible": true,
+        "disabled": false
+      },
+      {
+        "id": "customer-phone",
+        "text": "(253) 555-0142",
+        "visible": true,
+        "disabled": false
+      },
+      {
+        "id": "customer-billing-address",
+        "text": "123 Example Street",
+        "visible": true,
+        "disabled": false
+      },
+      {
+        "id": "customer-billing-city-state",
+        "text": "Milton, WA 98354",
+        "visible": true,
+        "disabled": false
+      },
+      {
+        "id": "ship-to-address",
+        "text": "123 Example Street",
+        "visible": true,
+        "disabled": false
+      },
+      {
+        "id": "ship-to-city-state",
+        "text": "Milton, WA 98354",
+        "visible": true,
+        "disabled": false
+      },
+      {
+        "id": "ship-to-method",
+        "text": "Via: USPS Priority Mail",
+        "visible": true,
+        "disabled": false
+      },
+      {
+        "id": "ship-to-tracking",
+        "text": "",
+        "visible": false,
+        "disabled": false
+      },
+      {
+        "id": "quote-type",
+        "text": "Embroidery",
+        "visible": true,
+        "disabled": false
+      },
+      {
+        "id": "created-date",
+        "text": "September 8, 2026",
+        "visible": true,
+        "disabled": false
+      },
+      {
+        "id": "expires-date",
+        "text": "October 8, 2026",
+        "visible": true,
+        "disabled": false
+      },
+      {
+        "id": "sales-rep",
+        "text": "Example Rep",
+        "visible": true,
+        "disabled": false
+      },
+      {
+        "id": "order-number",
+        "text": "740123",
+        "visible": true,
+        "disabled": false
+      },
+      {
+        "id": "req-ship-date",
+        "text": "September 21, 2026",
+        "visible": true,
+        "disabled": false
+      },
+      {
+        "id": "drop-dead-date",
+        "text": "---",
+        "visible": false,
+        "disabled": false
+      },
+      {
+        "id": "customer-number-display",
+        "text": "90210",
+        "visible": true,
+        "disabled": false
+      },
+      {
+        "id": "payment-terms",
+        "text": "Net 30",
+        "visible": true,
+        "disabled": false
+      },
+      {
+        "id": "revised-date",
+        "text": "---",
+        "visible": false,
+        "disabled": false
+      },
+      {
+        "id": "expired-banner",
+        "text": "⚠ This quote has expired Prices change over time — request an updated quote and we'll refresh it for you. Request updated pricing Call (253) 922-5793",
+        "visible": false,
+        "disabled": false
+      },
+      {
+        "id": "accepted-info",
+        "text": "Accepted on ---",
+        "visible": false,
+        "disabled": false
+      },
+      {
+        "id": "deposit-panel",
+        "text": "",
+        "visible": false,
+        "disabled": false
+      },
+      {
+        "id": "qv-timeline-summary-meta",
+        "text": "1 event",
+        "visible": true,
+        "disabled": false
+      },
+      {
+        "id": "qv-timeline-list",
+        "text": "Quote created September 8, 2026",
+        "visible": true,
+        "disabled": false
+      },
+      {
+        "id": "dtf-specs-container",
+        "text": "",
+        "visible": false,
+        "disabled": false
+      },
+      {
+        "id": "sw-designs-product-qty",
+        "text": "14",
+        "visible": true,
+        "disabled": false
+      },
+      {
+        "id": "sw-designs-imprints",
+        "text": "14",
+        "visible": true,
+        "disabled": false
+      },
+      {
+        "id": "sw-designs-tbody",
+        "text": "44012 (no name) Unknown 1 ((unspecified)) 14",
+        "visible": true,
+        "disabled": false
+      },
+      {
+        "id": "sw-status-grid",
+        "text": "Purchase Received — Produced Yes Shipped — Invoiced — Paid —",
+        "visible": true,
+        "disabled": false
+      },
+      {
+        "id": "sw-vendor-body",
+        "text": "No SanMar PO linked to this order yet.",
+        "visible": true,
+        "disabled": false
+      },
+      {
+        "id": "product-image-0",
+        "text": "",
+        "visible": true,
+        "disabled": false
+      },
+      {
+        "id": "product-image-1",
+        "text": "",
+        "visible": true,
+        "disabled": false
+      },
+      {
+        "id": "modal-product-image",
+        "text": "",
+        "visible": false,
+        "disabled": false
+      },
+      {
+        "id": "modal-product-name",
+        "text": "",
+        "visible": false,
+        "disabled": false
+      },
+      {
+        "id": "modal-style-number",
+        "text": "",
+        "visible": false,
+        "disabled": false
+      },
+      {
+        "id": "modal-color-name",
+        "text": "",
+        "visible": false,
+        "disabled": false
+      },
+      {
+        "id": "customer-artwork-section",
+        "text": "Customer Artwork & Mockups Customer Artwork (original files) Front artwork front.png Download Back artwork back.pdf Download Approved Mockups Front — Navy Download",
+        "visible": true,
+        "disabled": false
+      },
+      {
+        "id": "special-notes-content",
+        "text": "Please use the approved design.",
+        "visible": true,
+        "disabled": false
+      },
+      {
+        "id": "sw-notes-list",
+        "text": "emb3 linesShip: USPS Priority MailPC90H Navy: S×2, M×3, L×3, XL×2 (10 pcs)PC90H_2X Navy: 2XL×2 (2 pcs)PC90H_3XL Navy: 3XL×1 (1 pcs)",
+        "visible": true,
+        "disabled": false
+      },
+      {
+        "id": "sw-notes-footer",
+        "text": "Notes as submitted. ShopWorks operators may have added more notes — open the order in ShopWorks to see the current full list.",
+        "visible": true,
+        "disabled": false
+      },
+      {
+        "id": "sw-fin-subtotal",
+        "text": "$653.00",
+        "visible": true,
+        "disabled": false
+      },
+      {
+        "id": "sw-fin-tax-rate",
+        "text": "10.00%",
+        "visible": true,
+        "disabled": false
+      },
+      {
+        "id": "sw-fin-tax",
+        "text": "$66.30",
+        "visible": true,
+        "disabled": false
+      },
+      {
+        "id": "sw-fin-shipping",
+        "text": "$10.00",
+        "visible": true,
+        "disabled": false
+      },
+      {
+        "id": "sw-fin-total",
+        "text": "$729.30",
+        "visible": true,
+        "disabled": false
+      },
+      {
+        "id": "sw-fin-payments",
+        "text": "$200.00",
+        "visible": true,
+        "disabled": false
+      },
+      {
+        "id": "sw-fin-balance",
+        "text": "$529.30",
+        "visible": true,
+        "disabled": false
+      },
+      {
+        "id": "sw-fin-terms",
+        "text": "Net 30",
+        "visible": true,
+        "disabled": false
+      },
+      {
+        "id": "sw-original-summary-meta",
+        "text": "No changes detected since submit",
+        "visible": true,
+        "disabled": false
+      },
+      {
+        "id": "sw-original-body",
+        "text": "What we pushed to ManageOrders on submit, vs. what ShopWorks currently has. Differences are highlighted. Field Original submission Current ShopWorks Customer email review@example.test review@example.test Customer phone 2535550142 2535550142 PO Number PO-SYNTHETIC PO-SYNTHETIC Sales rep Example Rep Example Rep Terms Net 30 Net 30 Subtotal — $653.00 Tax — $66.30 Ship method USPS Priority Mail USPS Priority Mail Original art: No design info captured Original line items (4) PC90H — S×2, M×3, L×3, XL×2 (10 pcs)PC90H_2X — 2XL×2 (2 pcs)PC90H_3XL — 3XL×1 (1 pcs)SETUP — 0 pcs (0 pcs)",
+        "visible": true,
+        "disabled": false
+      },
+      {
+        "id": "sw-shipping-date",
+        "text": "—",
+        "visible": true,
+        "disabled": false
+      },
+      {
+        "id": "sw-shipping-by",
+        "text": "—",
+        "visible": true,
+        "disabled": false
+      },
+      {
+        "id": "sw-shipping-boxes",
+        "text": "—",
+        "visible": true,
+        "disabled": false
+      },
+      {
+        "id": "sw-shipping-recipient",
+        "text": "Cedar Example Construction",
+        "visible": true,
+        "disabled": false
+      },
+      {
+        "id": "sw-shipping-line1",
+        "text": "456 Sample Ave",
+        "visible": true,
+        "disabled": false
+      },
+      {
+        "id": "sw-shipping-line2",
+        "text": "Dock 2",
+        "visible": true,
+        "disabled": false
+      },
+      {
+        "id": "sw-shipping-citystate",
+        "text": "Milton, WA 98354",
+        "visible": true,
+        "disabled": false
+      },
+      {
+        "id": "sw-shipping-country",
+        "text": "USA",
+        "visible": true,
+        "disabled": false
+      },
+      {
+        "id": "sw-shipping-method",
+        "text": "USPS Priority Mail",
+        "visible": true,
+        "disabled": false
+      },
+      {
+        "id": "sw-shipping-mode",
+        "text": "Single Address Multiple Addresses No Shipping",
+        "visible": true,
+        "disabled": false
+      },
+      {
+        "id": "download-pdf-btn",
+        "text": "Download PDF",
+        "visible": true,
+        "disabled": false
+      },
+      {
+        "id": "open-invoice-link",
+        "text": "Open as Invoice",
+        "visible": true,
+        "disabled": false
+      },
+      {
+        "id": "accept-quote-btn",
+        "text": "Accept Quote",
+        "visible": true,
+        "disabled": false
+      },
+      {
+        "id": "push-shopworks-label",
+        "text": "Push to ShopWorks",
+        "visible": true,
+        "disabled": false
+      },
+      {
+        "id": "current-year",
+        "text": "2026",
+        "visible": true,
+        "disabled": false
+      }
+    ],
+    "rows": [
+      [
+        "Item / Description",
+        "Color",
+        "S",
+        "M",
+        "L",
+        "XL",
+        "2XL",
+        "3XL",
+        "Qty",
+        "Unit $",
+        "Total"
+      ],
+      [
+        "PC90H - Core fleece hoodie",
+        "Navy",
+        "5",
+        "3",
+        "3",
+        "2",
+        "",
+        "",
+        "13",
+        "$41.38",
+        "$538.00"
+      ],
+      [
+        "PC90H_2X_2X - Core fleece hoodie - 2XL",
+        "Navy",
+        "",
+        "",
+        "",
+        "",
+        "2",
+        "",
+        "2",
+        "$30.00",
+        "$60.00"
+      ],
+      [
+        "SETUP",
+        "SETUP",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "1",
+        "$25.00",
+        "$25.00"
+      ],
+      [
+        "DISCOUNT",
+        "DISCOUNT",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "1",
+        "$0.00",
+        "$-5.00"
+      ]
+    ],
+    "links": [
+      {
+        "href": "tel:2539225793",
+        "text": "(253) 922-5793"
+      },
+      {
+        "href": "mailto:sales@nwcustomapparel.com",
+        "text": "sales@nwcustomapparel.com"
+      },
+      {
+        "href": "/",
+        "text": "Browse the catalog"
+      },
+      {
+        "href": "mailto:sales@nwcustomapparel.com?subject=Updated%20pricing%20request",
+        "text": "Request updated pricing"
+      },
+      {
+        "href": "tel:2539225793",
+        "text": "Call (253) 922-5793"
+      },
+      {
+        "href": "/__invoice-fixture/front.png",
+        "text": ""
+      },
+      {
+        "href": "/__invoice-fixture/front.png",
+        "text": "Download"
+      },
+      {
+        "href": "/__invoice-fixture/back.pdf",
+        "text": ""
+      },
+      {
+        "href": "/__invoice-fixture/back.pdf",
+        "text": "Download"
+      },
+      {
+        "href": "/__invoice-fixture/mockup.png",
+        "text": ""
+      },
+      {
+        "href": "/__invoice-fixture/mockup.png",
+        "text": "Download"
+      },
+      {
+        "href": "/invoice/EMB0910-7401",
+        "text": "Open as Invoice"
+      },
+      {
+        "href": "tel:2539225793",
+        "text": "(253) 922-5793"
+      },
+      {
+        "href": "tel:2539225793",
+        "text": "(253) 922-5793"
+      }
+    ],
+    "forms": [
+      {
+        "id": "sw-manual-wo-input",
+        "name": "",
+        "type": "text",
+        "value": "",
+        "checked": false
+      },
+      {
+        "id": "qv-deposit-shipping",
+        "name": "",
+        "type": "number",
+        "value": "0",
+        "checked": false
+      },
+      {
+        "id": "qv-deposit-taxrate",
+        "name": "",
+        "type": "number",
+        "value": "",
+        "checked": false
+      },
+      {
+        "id": "accept-name",
+        "name": "name",
+        "type": "text",
+        "value": "",
+        "checked": false
+      },
+      {
+        "id": "accept-email",
+        "name": "email",
+        "type": "email",
+        "value": "",
+        "checked": false
+      },
+      {
+        "id": "accept-pickup",
+        "name": "deliveryMethod",
+        "type": "radio",
+        "value": "pickup",
+        "checked": false
+      },
+      {
+        "id": "accept-ship",
+        "name": "deliveryMethod",
+        "type": "radio",
+        "value": "ship",
+        "checked": false
+      }
+    ],
+    "paper": "Quote #EMB0910-7401 · WO #740123\nOPEN\n✓\nShopWorks #740123\nRef: NWCA-EMB0910-7401\nLast synced just now\n🔄\nRefresh\n💰\nOnline payment\nWaiting for customer acceptance\nConfirms tax + shipping and turns on the customer's Pay button on this page (amount = Service_Codes DEPOSIT-PCT: 100 = pay in full, lower = deposit). Tax applies to subtotal + shipping (WA destination rate; enter 0 for out-of-state).\n🖨\nPrint / PDF\n📋\nCopy link\n📧\nEmail customer\n🚢\nSend to ShipStation\n🎨\nSend to Steve\nPO# PO-SYNTHETIC\nPREPARED FOR\n\nCedar Example Construction\n\nCedar Example Construction\n\nreview@example.test\n\n(253) 555-0142\n\nBILLING ADDRESS\n\n123 Example Street\n\nMilton, WA 98354\n\nSHIP TO\n\n123 Example Street\n\nMilton, WA 98354\n\nVia: USPS Priority Mail\n\nQUOTE DETAILS\nType:\nEmbroidery\nCreated:\nSeptember 8, 2026\nValid Until:\nOctober 8, 2026\nSales Rep:\nExample Rep\nOrder #:\n740123\nReq Ship Date:\nSeptember 21, 2026\nCustomer #:\n90210\nTerms:\nNet 30\n▸\nTimeline\n1 event\nDesigns\nPRODUCT QTY\n14\nTOTAL IMPRINTS\n14\n\tID\tNAME\tTYPE\tLOCATIONS\tIMPRINTS\n\t44012\t(no name)\tUnknown\t1 ((unspecified))\t14\nOrder Status\nPURCHASE RECEIVED\n—\nPRODUCED\nYes\nSHIPPED\n—\nINVOICED\n—\nPAID\n—\nBlank Goods — from SanMar\nNo SanMar PO linked to this order yet.\nQuote Details\nLocation: Left Chest\nStitches: 8000\nITEM / DESCRIPTION\tCOLOR\tS\tM\tL\tXL\t2XL\t3XL\tQTY\tUNIT $\tTOTAL\n\nPC90H - Core fleece hoodie\n\tNavy\t5\t3\t3\t2\t\t\t13\t$41.38\t$538.00\n\nPC90H_2X_2X - Core fleece hoodie - 2XL\n\tNavy\t\t\t\t\t2\t\t2\t$30.00\t$60.00\nSETUP\tSETUP\t\t\t\t\t\t\t1\t$25.00\t$25.00\nDISCOUNT\tDISCOUNT\t\t\t\t\t\t\t1\t$0.00\t$-5.00\nCustomer Artwork & Mockups\nCUSTOMER ARTWORK (ORIGINAL FILES)\nFront artwork\nfront.png\nDownload\nBack artwork\nback.pdf\nDownload\nAPPROVED MOCKUPS\nFront — Navy\nDownload\nSpecial Notes\nPlease use the approved design.\nNotes To Production\nemb\n3 lines\nShip: USPS Priority Mail\nPC90H Navy: S×2, M×3, L×3, XL×2 (10 pcs)\nPC90H_2X Navy: 2XL×2 (2 pcs)\nPC90H_3XL Navy: 3XL×1 (1 pcs)\nNotes as submitted. ShopWorks operators may have added more notes — open the order in ShopWorks to see the current full list.\nFinancial Summary\nSubtotal\n$653.00\nSales Tax 10.00%\n$66.30\nShipping\n$10.00\nTotal Invoice\n$729.30\nPayments Received\n$200.00\nBalance Due\n$529.30\nTerms\nNet 30\n▸\nView original submission\nNo changes detected since submit\nShipping\nDATE SHIPPED\n—\nSHIPPED BY\n—\n# OF BOXES\n—\nCedar Example Construction\n456 Sample Ave\nDock 2\nMilton, WA 98354\nUSA\nUSPS Priority Mail\nSingle Address\nMultiple Addresses\nNo Shipping\nSubtotal:\n$653.00\nShipping:\n$10.00\nWA Sales Tax (10.0%):\n$66.30\nTOTAL:\n$729.30\n\nTotal items: 26\n\nPricing is based on customer-supplied blanks. This quote is valid for 30 days. Reply to confirm or send a PO when you're ready.\n\nDownload PDF\nOpen as Invoice\nAccept Quote\nPush to ShopWorks\nQUESTIONS?\n\nContact your sales representative or call us at\n\n(253) 922-5793\nTERMS\nQuote valid for 30 days\nPayment due before production begins\nProduction time begins after art approval\n\n© 2026 Northwest Custom Apparel - Serving the Pacific Northwest Since 1977"
+  },
+  "views": [
+    {
+      "width": 1440,
+      "scrollWidth": 1440
+    },
+    {
+      "width": 768,
+      "scrollWidth": 768
+    },
+    {
+      "width": 390,
+      "scrollWidth": 390
+    },
+    {
+      "width": 320,
+      "scrollWidth": 320
+    }
+  ],
+  "paper": "",
+  "events": {
+    "errors": [],
+    "writes": [],
+    "unknown": [],
+    "missing": [],
+    "reads": [
+      {
+        "path": "/api/public/quote/EMB0910-7401",
+        "query": ""
+      },
+      {
+        "path": "/api/quote-sessions/EMB0910-7401/full",
+        "query": ""
+      }
+    ],
+    "actions": [],
+    "beacons": [],
+    "lazy": []
+  }
+}

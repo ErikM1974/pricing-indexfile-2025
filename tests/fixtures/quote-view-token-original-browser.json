@@ -1,0 +1,28 @@
+{
+  "href": "/invoice/EMB0910-7401",
+  "events": {
+    "errors": [],
+    "writes": [],
+    "unknown": [],
+    "missing": [],
+    "reads": [
+      {
+        "path": "/api/public/quote/EMB0910-7401",
+        "query": "?k=review%20token%20%2F%20only"
+      },
+      {
+        "path": "/api/quote-sessions/EMB0910-7401/full",
+        "query": "?k=review%20token%20%2F%20only"
+      }
+    ],
+    "actions": [],
+    "beacons": [
+      {
+        "SessionID": "qv_mz5gk44lk",
+        "EventType": "customer_view",
+        "QuoteID": "EMB0910-7401"
+      }
+    ],
+    "lazy": []
+  }
+}
