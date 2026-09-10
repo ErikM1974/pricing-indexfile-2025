@@ -33,3 +33,13 @@ test.each(Object.keys(original.hashes).filter(f => !f.endsWith('.html')))('%s re
     }
     expect(hash(s)).toBe(original.hashes[file]);
 });
+
+test('product editor and quote builders keep the same curated vendor codes', () => {
+    const vendorList = file => {
+        const code = fs.readFileSync(path.join(root, file), 'utf8');
+        const literal = code.match(/const NON_SANMAR_VENDORS = (\[[\s\S]*?\n\s*\]);/);
+        expect(literal).not.toBeNull();
+        return JSON.parse(JSON.stringify(require('node:vm').runInNewContext(literal[1])));
+    };
+    expect(vendorList('dashboards/js/product-manager.js')).toEqual(vendorList('shared_components/js/quote-builder-utils.js'));
+});

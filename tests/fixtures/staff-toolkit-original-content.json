@@ -1171,6 +1171,324 @@
       "before": "        const btn = $('vq-save');\n        const status = $('vq-save-status');",
       "after": "        const status = $('vq-save-status');",
       "count": 1
+    },
+    {
+      "file": "dashboards/product-manager.html",
+      "before": "family=Inter:wght@400;500;600;700",
+      "after": "family=Public+Sans:wght@400;500;600;700",
+      "count": 1
+    },
+    {
+      "file": "dashboards/product-manager.html",
+      "before": "    <link rel=\"stylesheet\" href=\"/shared_components/css/art-hub.css?v=2026.09.07.19\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/dash-shell.css?v=2026.09.07.10\">\n    <link rel=\"stylesheet\" href=\"/dashboards/css/product-manager.css?v=2026.09.07.10\">",
+      "after": "    <link rel=\"stylesheet\" href=\"/shared_components/css/components.css?v=2026.09.10.2\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/staff-toolkit.css?v=2026.09.10.2\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/product-manager.html",
+      "before": "<body>",
+      "after": "<body data-ui=\"unified\" data-staff-tool=\"product-manager\">\n    <a class=\"skip-link\" href=\"#staff-tool-main\">Skip to content</a>",
+      "count": 1
+    },
+    {
+      "file": "dashboards/product-manager.html",
+      "before": "<main class=\"dash-content\">",
+      "after": "<main class=\"dash-content\" id=\"staff-tool-main\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/product-manager.html",
+      "before": "<script src=\"/dashboards/js/product-manager.js?v=2026.09.05.71\"></script>",
+      "after": "<script src=\"/dashboards/js/product-manager.js?v=2026.09.10.2\"></script>",
+      "count": 1
+    },
+    {
+      "file": "dashboards/product-manager.html",
+      "before": "<input type=\"search\" id=\"pmFilter\" class=\"pm-filter\" placeholder=\"Filter by style, name, brand…\" aria-label=\"Filter products\">",
+      "after": "<input type=\"search\" id=\"pmFilter\" class=\"field-input pm-filter\" placeholder=\"Filter by style, name, brand…\" aria-label=\"Filter products\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/product-manager.html",
+      "before": "<input type=\"text\" id=\"fStyle\" required maxlength=\"40\" placeholder=\"e.g. PC-TUMBLER-30\">",
+      "after": "<input class=\"field-input\" type=\"text\" id=\"fStyle\" required maxlength=\"40\" placeholder=\"e.g. PC-TUMBLER-30\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/product-manager.html",
+      "before": "<input type=\"text\" id=\"fName\" required maxlength=\"120\" placeholder=\"e.g. Polar Camel 30oz Tumbler\">",
+      "after": "<input class=\"field-input\" type=\"text\" id=\"fName\" required maxlength=\"120\" placeholder=\"e.g. Polar Camel 30oz Tumbler\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/product-manager.html",
+      "before": "<input type=\"text\" id=\"fBrand\" required maxlength=\"60\" placeholder=\"e.g. Polar Camel\">",
+      "after": "<input class=\"field-input\" type=\"text\" id=\"fBrand\" required maxlength=\"60\" placeholder=\"e.g. Polar Camel\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/product-manager.html",
+      "before": "<select id=\"fCategory\">",
+      "after": "<select class=\"field-select\" id=\"fCategory\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/product-manager.html",
+      "before": "<input type=\"number\" id=\"fCost\" min=\"0\" step=\"0.01\" inputmode=\"decimal\" placeholder=\"12.40\">",
+      "after": "<input class=\"field-input\" type=\"number\" id=\"fCost\" min=\"0\" step=\"0.01\" inputmode=\"decimal\" placeholder=\"12.40\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/product-manager.html",
+      "before": "<select id=\"fPricingMethod\">",
+      "after": "<select class=\"field-select\" id=\"fPricingMethod\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/product-manager.html",
+      "before": "<input type=\"number\" id=\"fSell\" min=\"0\" step=\"0.01\" inputmode=\"decimal\" placeholder=\"49.00\">",
+      "after": "<input class=\"field-input\" type=\"number\" id=\"fSell\" min=\"0\" step=\"0.01\" inputmode=\"decimal\" placeholder=\"49.00\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/product-manager.html",
+      "before": "<input type=\"text\" id=\"fSizes\" placeholder=\"S, M, L, XL, 2XL\" maxlength=\"120\">",
+      "after": "<input class=\"field-input\" type=\"text\" id=\"fSizes\" placeholder=\"S, M, L, XL, 2XL\" maxlength=\"120\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/product-manager.html",
+      "before": "<input type=\"text\" id=\"fColors\" placeholder=\"Black, Navy, White\" maxlength=\"240\">",
+      "after": "<input class=\"field-input\" type=\"text\" id=\"fColors\" placeholder=\"Black, Navy, White\" maxlength=\"240\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/product-manager.html",
+      "before": "<select id=\"fVendorSelect\">",
+      "after": "<select class=\"field-select\" id=\"fVendorSelect\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/product-manager.html",
+      "before": "<input type=\"text\" id=\"fVendor\" aria-label=\"Vendor\" maxlength=\"40\" placeholder=\"Vendor code, e.g. JDS\" hidden>",
+      "after": "<input class=\"field-input\" type=\"text\" id=\"fVendor\" aria-label=\"Vendor\" maxlength=\"40\" placeholder=\"Vendor code, e.g. JDS\" hidden>",
+      "count": 1
+    },
+    {
+      "file": "dashboards/product-manager.html",
+      "before": "<input type=\"url\" id=\"fVendorUrl\" maxlength=\"240\" placeholder=\"https://…\">",
+      "after": "<input class=\"field-input\" type=\"url\" id=\"fVendorUrl\" maxlength=\"240\" placeholder=\"https://…\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/product-manager.html",
+      "before": "<input type=\"file\" id=\"fImageFile\" accept=\".png,.jpg,.jpeg,.webp,.gif\">",
+      "after": "<input class=\"field-input\" type=\"file\" id=\"fImageFile\" accept=\".png,.jpg,.jpeg,.webp,.gif\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/product-manager.html",
+      "before": "<input type=\"url\" id=\"fImageUrl\" aria-label=\"Image URL\" placeholder=\"…or paste an image URL\" maxlength=\"400\">",
+      "after": "<input class=\"field-input\" type=\"url\" id=\"fImageUrl\" aria-label=\"Image URL\" placeholder=\"…or paste an image URL\" maxlength=\"400\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/product-manager.html",
+      "before": "<textarea id=\"fNotes\" rows=\"3\" maxlength=\"1000\">",
+      "after": "<textarea class=\"field-textarea\" id=\"fNotes\" rows=\"3\" maxlength=\"1000\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/product-manager.html",
+      "before": "<label for=\"fStyle\">",
+      "after": "<label class=\"field-label\" for=\"fStyle\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/product-manager.html",
+      "before": "<label for=\"fName\">",
+      "after": "<label class=\"field-label\" for=\"fName\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/product-manager.html",
+      "before": "<label for=\"fBrand\">",
+      "after": "<label class=\"field-label\" for=\"fBrand\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/product-manager.html",
+      "before": "<label for=\"fCategory\">",
+      "after": "<label class=\"field-label\" for=\"fCategory\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/product-manager.html",
+      "before": "<label for=\"fCost\">",
+      "after": "<label class=\"field-label\" for=\"fCost\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/product-manager.html",
+      "before": "<label for=\"fPricingMethod\">",
+      "after": "<label class=\"field-label\" for=\"fPricingMethod\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/product-manager.html",
+      "before": "<label for=\"fSell\">",
+      "after": "<label class=\"field-label\" for=\"fSell\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/product-manager.html",
+      "before": "<label for=\"fSizes\">",
+      "after": "<label class=\"field-label\" for=\"fSizes\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/product-manager.html",
+      "before": "<label for=\"fColors\">",
+      "after": "<label class=\"field-label\" for=\"fColors\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/product-manager.html",
+      "before": "<label for=\"fVendorSelect\">",
+      "after": "<label class=\"field-label\" for=\"fVendorSelect\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/product-manager.html",
+      "before": "<label for=\"fVendorUrl\">",
+      "after": "<label class=\"field-label\" for=\"fVendorUrl\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/product-manager.html",
+      "before": "<label for=\"fImageFile\">",
+      "after": "<label class=\"field-label\" for=\"fImageFile\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/product-manager.html",
+      "before": "<label for=\"fNotes\">",
+      "after": "<label class=\"field-label\" for=\"fNotes\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/product-manager.html",
+      "before": "class=\"pm-field\"",
+      "after": "class=\"field pm-field\"",
+      "count": 11
+    },
+    {
+      "file": "dashboards/product-manager.html",
+      "before": "class=\"pm-btn pm-btn-primary\"",
+      "after": "class=\"btn pm-btn pm-btn-primary btn-primary\"",
+      "count": 2
+    },
+    {
+      "file": "dashboards/product-manager.html",
+      "before": "class=\"pm-btn pm-btn-ghost\"",
+      "after": "class=\"btn pm-btn pm-btn-ghost btn-ghost\"",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/product-manager.js",
+      "before": "class=\"pm-btn pm-btn-ghost\"",
+      "after": "class=\"btn pm-btn pm-btn-ghost btn-ghost\"",
+      "count": 2
+    },
+    {
+      "file": "dashboards/js/product-manager.js",
+      "before": "class=\"pm-btn pm-btn-ghost pm-edit\"",
+      "after": "class=\"btn pm-btn pm-btn-ghost pm-edit btn-ghost\"",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/product-manager.js",
+      "before": "<div class=\"pm-table-wrap\">",
+      "after": "<div class=\"pm-table-wrap\" role=\"region\" aria-label=\"Product catalog\" tabindex=\"0\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/product-manager.html",
+      "before": "class=\"pm-field pm-span-2\"",
+      "after": "class=\"field pm-field pm-span-2\"",
+      "count": 2
+    },
+    {
+      "file": "dashboards/js/product-manager.js",
+      "before": "<span class=\"pm-thumb pm-thumb-empty\" title=\"No image\" aria-label=\"No image\">",
+      "after": "<span class=\"pm-thumb pm-thumb-empty\" role=\"img\" title=\"No image\" aria-label=\"No image\">",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/product-manager.js",
+      "before": "    let filterText = '';",
+      "after": "    let filterText = '';\n    let listReady = false;\n    let listRequestId = 0;",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/product-manager.js",
+      "before": "    function boot() {\n        const root = $('content-root');",
+      "after": "    function boot() {\n        const requestId = ++listRequestId;\n        listReady = false; products = [];\n        ['stat-total', 'stat-active', 'stat-incomplete'].forEach(id => { $(id).textContent = '—'; });\n        const root = $('content-root');",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/product-manager.js",
+      "before": "        loadProducts().then(function () { DashPage.hideError(); }).catch(function (err) {",
+      "after": "        return loadProducts(requestId).then(function (current) { if (current) DashPage.hideError(); }).catch(function (err) {\n            if (requestId !== listRequestId) return;",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/product-manager.js",
+      "before": "    async function loadProducts() {\n        const data = await DashPage.fetchJson('/api/non-sanmar-products?active=all&refresh=true');\n        products = (data && data.data) || [];\n        renderStats();\n        renderTable();\n    }",
+      "after": "    async function loadProducts(requestId) {\n        const data = await DashPage.fetchJson('/api/non-sanmar-products?active=all&refresh=true');\n        if (requestId !== listRequestId) return false;\n        if (!data || !Array.isArray(data.data)) throw new Error('Product list response incomplete');\n        products = data.data; listReady = true;\n        renderStats(); renderTable(); return true;\n    }",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/product-manager.js",
+      "before": "    function renderTable() {\n        const root = $('content-root');",
+      "after": "    function renderTable() {\n        if (!listReady) return;\n        const root = $('content-root');",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/product-manager.js",
+      "before": "        $('fCategory').value = product && product.Category ? product.Category : 'Other';",
+      "after": "        const category = $('fCategory');\n        category.querySelectorAll('[data-stored-category]').forEach(option => option.remove());\n        const storedCategory = product && product.Category ? String(product.Category) : 'Other';\n        if (![...category.options].some(option => option.value === storedCategory)) {\n            const option = document.createElement('option');\n            option.value = storedCategory; option.textContent = storedCategory; option.dataset.storedCategory = 'true';\n            category.appendChild(option);\n        }\n        category.value = storedCategory;",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/product-manager.js",
+      "before": "            await loadProducts();",
+      "after": "            // A failed refresh does not mean the completed product save failed.\n            await boot();",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/product-manager.js",
+      "before": "    let listRequestId = 0;",
+      "after": "    let listRequestId = 0;\n    let saving = false;",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/product-manager.js",
+      "before": "    function openForm(product) {",
+      "after": "    function openForm(product) {\n        if (saving) return;",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/product-manager.js",
+      "before": "    async function saveProduct(e) {\n        e.preventDefault();\n        DashPage.hideError();\n        const saveBtn = $('pmSaveBtn');\n        const original = saveBtn.innerHTML;\n        saveBtn.disabled = true;\n        saveBtn.innerHTML = '<i class=\"fas fa-spinner fa-spin\" aria-hidden=\"true\"></i> Saving…';\n        try {\n            const pricingMethod = $('fPricingMethod').value;\n            const cost = parseFloat($('fCost').value) || 0;\n            const sell = parseFloat($('fSell').value) || 0;\n            if (pricingMethod === 'Margin' && cost <= 0) {\n                throw new Error('Enter your cost — the catalog prices from it (or switch to Fixed sell price).');\n            }\n            if (pricingMethod === 'FixedPrice' && sell <= 0) {\n                throw new Error('Fixed pricing needs a sell price.');\n            }\n\n            // Image: uploaded file wins over pasted URL\n            let imageUrl = $('fImageUrl').value.trim();\n            const file = $('fImageFile').files && $('fImageFile').files[0];\n            if (file) {\n                saveBtn.innerHTML = '<i class=\"fas fa-spinner fa-spin\" aria-hidden=\"true\"></i> Uploading image…';\n                imageUrl = await uploadImage(file);\n                saveBtn.innerHTML = '<i class=\"fas fa-spinner fa-spin\" aria-hidden=\"true\"></i> Saving…';\n            }\n\n            const payload = {\n                StyleNumber: $('fStyle').value.trim().toUpperCase(),\n                ProductName: $('fName').value.trim(),\n                Brand: $('fBrand').value.trim(),\n                Category: $('fCategory').value,\n                DefaultCost: cost,\n                DefaultSellPrice: pricingMethod === 'FixedPrice' ? sell : 0,\n                PricingMethod: pricingMethod,\n                AvailableSizes: $('fSizes').value.trim(),\n                DefaultColors: $('fColors').value.trim(),\n                VendorCode: readVendorCode(),\n                VendorURL: $('fVendorUrl').value.trim(),\n                ImageURL: imageUrl,\n                Notes: $('fNotes').value.trim(),\n                IsActive: $('fActive').checked\n            };\n\n            const id = $('fId').value;\n            if (id) {\n                await DashPage.fetchJson(`/api/non-sanmar-products/${encodeURIComponent(id)}`, {\n                    method: 'PUT',\n                    headers: { 'Content-Type': 'application/json' },\n                    body: JSON.stringify(payload)\n                });\n            } else {\n                await DashPage.fetchJson('/api/non-sanmar-products', {\n                    method: 'POST',\n                    headers: { 'Content-Type': 'application/json' },\n                    body: JSON.stringify(payload)\n                });\n            }\n\n            closeForm();\n            // A failed refresh does not mean the completed product save failed.\n            await boot();\n        } catch (err) {\n            console.error('[product-manager] save failed:', err);\n            DashPage.showError(err.message || 'Save failed — nothing was changed. Try again or check the console.');\n        } finally {\n            saveBtn.disabled = false;\n            saveBtn.innerHTML = original;\n        }\n    }\n\n",
+      "after": "    async function saveProduct(e) {\n        e.preventDefault();\n        if (saving) return;\n        saving = true;\n        DashPage.hideError();\n        const saveBtn = $('pmSaveBtn');\n        const original = saveBtn.innerHTML;\n        const controls = [...document.querySelectorAll('#pmForm input, #pmForm select, #pmForm textarea, #pmForm button, #pmFormClose, #pmAddBtn, .pm-edit')];\n        const disabled = controls.map(control => control.disabled);\n        controls.forEach(control => { control.disabled = true; });\n        let saveAttempted = false;\n        saveBtn.innerHTML = '<i class=\"fas fa-spinner fa-spin\" aria-hidden=\"true\"></i> Saving…';\n        try {\n            const pricingMethod = $('fPricingMethod').value;\n            const cost = parseFloat($('fCost').value) || 0;\n            const sell = parseFloat($('fSell').value) || 0;\n            if (pricingMethod === 'Margin' && cost <= 0) {\n                throw new Error('Enter your cost — the catalog prices from it (or switch to Fixed sell price).');\n            }\n            if (pricingMethod === 'FixedPrice' && sell <= 0) {\n                throw new Error('Fixed pricing needs a sell price.');\n            }\n\n            // Capture the editor before the image upload can yield to another event.\n            const id = $('fId').value;\n            const file = $('fImageFile').files && $('fImageFile').files[0];\n\n            const payload = {\n                StyleNumber: $('fStyle').value.trim().toUpperCase(),\n                ProductName: $('fName').value.trim(),\n                Brand: $('fBrand').value.trim(),\n                Category: $('fCategory').value,\n                DefaultCost: cost,\n                DefaultSellPrice: pricingMethod === 'FixedPrice' ? sell : 0,\n                PricingMethod: pricingMethod,\n                AvailableSizes: $('fSizes').value.trim(),\n                DefaultColors: $('fColors').value.trim(),\n                VendorCode: readVendorCode(),\n                VendorURL: $('fVendorUrl').value.trim(),\n                ImageURL: $('fImageUrl').value.trim(),\n                Notes: $('fNotes').value.trim(),\n                IsActive: $('fActive').checked\n            };\n\n            // An uploaded file still takes precedence over the captured URL.\n            if (file) {\n                saveBtn.innerHTML = '<i class=\"fas fa-spinner fa-spin\" aria-hidden=\"true\"></i> Uploading image…';\n                payload.ImageURL = await uploadImage(file);\n                saveBtn.innerHTML = '<i class=\"fas fa-spinner fa-spin\" aria-hidden=\"true\"></i> Saving…';\n            }\n            saveAttempted = true;\n            if (id) {\n                await DashPage.fetchJson(`/api/non-sanmar-products/${encodeURIComponent(id)}`, {\n                    method: 'PUT',\n                    headers: { 'Content-Type': 'application/json' },\n                    body: JSON.stringify(payload)\n                });\n            } else {\n                await DashPage.fetchJson('/api/non-sanmar-products', {\n                    method: 'POST',\n                    headers: { 'Content-Type': 'application/json' },\n                    body: JSON.stringify(payload)\n                });\n            }\n\n            closeForm();\n            // A failed refresh does not mean the completed product save failed.\n            await boot();\n        } catch (err) {\n            console.error('[product-manager] save failed:', err);\n            DashPage.showError(saveAttempted\n                ? 'Could not confirm the product save (' + (err.message || 'request failed') + '). Check the catalog before retrying.'\n                : (err.message || 'Unable to save this product. Check the fields and try again.'));\n        } finally {\n            saving = false;\n            controls.forEach((control, index) => { control.disabled = disabled[index]; });\n            if ($('pmFormCard').hidden) $('pmAddBtn').focus();\n            saveBtn.innerHTML = original;\n        }\n    }\n\n",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/product-manager.js",
+      "before": "tests/unit/non-sanmar-vendor-drift.test.js",
+      "after": "tests/unit/staff-toolkit-content.test.js",
+      "count": 1
     }
   ]
 }

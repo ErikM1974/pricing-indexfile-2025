@@ -305,3 +305,128 @@ for (const failure of ['sequence', 'session', 'item']) test('CSS staff toolkit: 
     await page.setViewportSize({ width: 320, height: 1000 }); await axe(page);
     expect(events.errors).toEqual([]); expect(events.unknown).toEqual([]); expect(events.missing).toEqual([]);
 });
+
+test('CSS staff toolkit: original product editor preserves fixed pricing and legacy vendor payloads', async ({ page }) => {
+    const products = data.products.map(p => ({ ...p })); products[1].VendorCode = 'LEGACY-SUPPLIER';
+    const events = await open(page, 'product-manager', { original: true, respond: async u => u.pathname === '/api/non-sanmar-products' ? { json: { data: products } } : undefined, respondWrite: async () => ({ json: { success: true } }) });
+    await expect(page.locator('.pm-table tbody tr')).toHaveCount(3);
+    await page.getByRole('button', { name: 'Edit REVIEW-CAP', exact: true }).click();
+    await expect(page.locator('#fName')).toBeFocused(); await expect(page.locator('#fStyle')).toBeDisabled();
+    await expect(page.locator('#fPricingMethod')).toHaveValue('FixedPrice'); await expect(page.locator('#fSell')).toHaveValue('14');
+    await expect(page.locator('#fVendorSelect')).toHaveValue('__other'); await expect(page.locator('#fVendor')).toHaveValue('LEGACY-SUPPLIER');
+    const fields = await page.locator('#pmForm input,#pmForm select,#pmForm textarea').evaluateAll(ns => ns.map(n => ({ id: n.id, value: n.value, checked: n.checked, disabled: n.disabled })));
+    for (const width of [1440, 768, 390, 320]) { await page.setViewportSize({ width, height: 1000 }); await page.locator('#pmFormCard').screenshot({ path: path.join(output, 'staff-toolkit-product-original-edit-' + width + '.png') }); }
+    await page.locator('#pmSaveBtn').click(); await expect(page.locator('#pmFormCard')).toBeHidden();
+    expect(events.writes.map(w => [w.method, w.path])).toEqual([['PUT', '/api/non-sanmar-products/99602']]);
+    fs.writeFileSync(path.join(output, 'staff-toolkit-product-original-workflow.json'), JSON.stringify({ fields, writes: events.writes }, null, 2) + '\n');
+    expect(events.errors).toEqual([]); expect(events.unknown).toEqual([]); expect(events.missing).toEqual([]);
+});
+
+test('CSS staff toolkit: product catalog keeps every original row and readable status at four widths', async ({ page }) => {
+    const events = await open(page, 'product-manager'); await expect(page.locator('.pm-table tbody tr')).toHaveCount(3);
+    const original = baseline.find(r => r.tool === 'product-manager').states[0].tables;
+    for (const width of [1440, 768, 390, 320]) {
+        await page.setViewportSize({ width, height: 1000 }); expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
+        expect(await tables(page)).toEqual(original); await axe(page);
+        await page.screenshot({ path: path.join(output, 'staff-toolkit-product-manager-' + width + '.png'), fullPage: true });
+    }
+    const region = page.getByRole('region', { name: 'Product catalog' }); await region.focus(); await page.keyboard.press('ArrowRight'); await expect.poll(() => region.evaluate(n => n.scrollLeft)).toBeGreaterThan(0);
+    await page.setViewportSize({ width: 1440, height: 1000 }); await page.pdf({ path: path.join(output, 'staff-toolkit-product-catalog.pdf'), printBackground: true, preferCSSPageSize: true });
+    clean(events);
+});
+
+test('CSS staff toolkit: product editor preserves original fixed pricing, vendor fields and save payload', async ({ page }) => {
+    const products = data.products.map(p => ({ ...p })); products[1].VendorCode = 'LEGACY-SUPPLIER';
+    const events = await open(page, 'product-manager', { respond: async u => u.pathname === '/api/non-sanmar-products' ? { json: { data: products } } : undefined, respondWrite: async () => ({ json: { success: true } }) });
+    await page.getByRole('button', { name: 'Edit REVIEW-CAP', exact: true }).click(); await expect(page.locator('#fName')).toBeFocused();
+    const original = require('../fixtures/staff-toolkit-product-original-workflow.json');
+    expect(await page.locator('#pmForm input,#pmForm select,#pmForm textarea').evaluateAll(ns => ns.map(n => ({ id: n.id, value: n.value, checked: n.checked, disabled: n.disabled })))).toEqual(original.fields);
+    for (const width of [1440, 768, 390, 320]) {
+        await page.setViewportSize({ width, height: 1000 }); expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width); await axe(page);
+        await page.locator('#pmFormCard').screenshot({ path: path.join(output, 'staff-toolkit-product-edit-' + width + '.png') });
+    }
+    await page.locator('#pmSaveBtn').click(); await expect(page.locator('#pmFormCard')).toBeHidden(); expect(events.writes).toEqual(original.writes);
+    expect(events.errors).toEqual([]); expect(events.unknown).toEqual([]); expect(events.missing).toEqual([]);
+});
+
+test('CSS staff toolkit: product list distinguishes pending, malformed, empty and filtered recovery states', async ({ page }) => {
+    let release; const gate = new Promise(r => { release = r; }); let mode = 'pending';
+    const events = await open(page, 'product-manager', { respond: async u => {
+        if (u.pathname !== '/api/non-sanmar-products') return;
+        if (mode === 'pending') { await gate; return { json: {} }; }
+        return mode === 'empty' ? { json: { data: [] } } : { json: { data: data.products } };
+    } });
+    try {
+        await expect(page.locator('#content-root')).toContainText('Loading products'); await expect(page.locator('#stat-total')).toHaveText('—');
+        await page.locator('#pmFilter').fill('CAP'); await expect(page.locator('#content-root')).toContainText('Loading products');
+    } finally { release(); }
+    await expect(page.locator('#pmRetry')).toBeVisible(); await expect(page.locator('#content-root')).toContainText('response incomplete');
+    await page.locator('#pmFilter').fill('TEE'); await expect(page.locator('#pmRetry')).toBeVisible(); await axe(page);
+    mode = 'ready'; await page.locator('#pmRetry').click(); await expect(page.locator('.pm-table tbody tr')).toHaveCount(1);
+    await expect(page.locator('.pm-table')).toContainText('REVIEW-TEE'); await expect(page.locator('#stat-total')).toHaveText('3');
+    await expect(page.locator('.dash-error-banner')).toBeHidden();
+    mode = 'empty'; await page.reload(); await expect(page.locator('#content-root')).toContainText('No non-SanMar products yet');
+    await expect(page.locator('#stat-total')).toHaveText('0'); clean(events);
+});
+
+test('CSS staff toolkit: product edit preserves a stored category outside the curated options', async ({ page }) => {
+    const products = data.products.map(p => ({ ...p })); products[0].Category = 'Jackets';
+    const events = await open(page, 'product-manager', { respond: async u => u.pathname === '/api/non-sanmar-products' ? { json: { data: products } } : undefined, respondWrite: async () => ({ json: { success: true } }) });
+    await page.getByRole('button', { name: 'Edit REVIEW-TEE', exact: true }).click();
+    await expect(page.locator('#fCategory')).toHaveValue('Jackets'); await page.locator('#pmSaveBtn').click();
+    await expect(page.locator('#pmFormCard')).toBeHidden(); expect(JSON.parse(events.writes[0].body).Category).toBe('Jackets');
+    await page.getByRole('button', { name: 'Edit REVIEW-CAP', exact: true }).click();
+    await expect(page.locator('#fCategory')).toHaveValue('Caps'); await expect(page.locator('#fCategory [data-stored-category]')).toHaveCount(0);
+    expect(events.errors).toEqual([]); expect(events.unknown).toEqual([]); expect(events.missing).toEqual([]);
+});
+
+test('CSS staff toolkit: a saved product with a failed list refresh reports catalog recovery without another save', async ({ page }) => {
+    let saved = false;
+    const events = await open(page, 'product-manager', {
+        respond: async u => u.pathname === '/api/non-sanmar-products' && saved ? { status: 503, json: { error: 'Synthetic catalog offline' } } : undefined,
+        respondWrite: async () => { saved = true; return { json: { success: true } }; }
+    });
+    await page.getByRole('button', { name: 'Edit REVIEW-CAP', exact: true }).click(); await page.locator('#pmSaveBtn').click();
+    await expect(page.locator('#pmFormCard')).toBeHidden(); await expect(page.locator('#pmRetry')).toBeVisible();
+    await expect(page.locator('.dash-error-banner')).toContainText('Unable to load products'); await expect(page.locator('#stat-total')).toHaveText('—');
+    await page.locator('#pmFilter').fill('CAP'); await expect(page.locator('#pmRetry')).toBeVisible();
+    saved = false; await page.locator('#pmRetry').click(); await expect(page.locator('.pm-table tbody tr')).toHaveCount(1);
+    expect(events.writes).toHaveLength(1); expect(events.errors).toEqual([]); expect(events.unknown).toEqual([]);
+});
+
+test('CSS staff toolkit: product upload holds its original editor and submits one captured product', async ({ page }) => {
+    let release, started; const gate = new Promise(r => { release = r; }), requested = new Promise(r => { started = r; });
+    const events = await open(page, 'product-manager', { respondWrite: async req => {
+        if (new URL(req.url()).pathname === '/api/files/upload') { started(); await gate; return { json: { externalKey: 'synthetic-review-image.png' } }; }
+        return { json: { success: true } };
+    } });
+    await page.getByRole('button', { name: 'Edit REVIEW-CAP', exact: true }).click();
+    await page.locator('#fImageFile').setInputFiles({ name: 'synthetic-review-image.png', mimeType: 'image/png', buffer: Buffer.from('synthetic upload bytes') });
+    await page.locator('#pmSaveBtn').click(); await requested;
+    try {
+        await expect(page.locator('#fName')).toBeDisabled(); await expect(page.locator('#pmFormClose')).toBeDisabled(); await expect(page.locator('#pmAddBtn')).toBeDisabled();
+        await expect(page.getByRole('button', { name: 'Edit REVIEW-TEE', exact: true })).toBeDisabled();
+        await page.locator('#pmForm').evaluate(form => { document.getElementById('fName').value = 'Late script change'; document.getElementById('fId').value = '99999'; form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true })); });
+        expect(events.writes).toHaveLength(1);
+    } finally { release(); }
+    await expect(page.locator('#pmFormCard')).toBeHidden(); await expect(page.locator('#pmAddBtn')).toBeEnabled();
+    expect(events.writes.map(w => [w.method, w.path])).toEqual([['POST', '/api/files/upload'], ['PUT', '/api/non-sanmar-products/99602']]);
+    const payload = JSON.parse(events.writes[1].body); expect(payload.ProductName).toBe(data.products[1].ProductName); expect(payload.ImageURL).toMatch(/\/api\/files\/synthetic-review-image\.png$/);
+    expect(events.errors).toEqual([]); expect(events.unknown).toEqual([]); expect(events.missing).toEqual([]);
+});
+
+test('CSS staff toolkit: product upload and save failures retain editable values without a false success', async ({ page }) => {
+    let uploadFails = true;
+    const events = await open(page, 'product-manager', { respondWrite: async req => {
+        if (new URL(req.url()).pathname === '/api/files/upload') return uploadFails ? { status: 503, json: { error: 'Synthetic image upload unavailable' } } : { json: { externalKey: 'synthetic-review-image.png' } };
+        return { status: 503, json: { error: 'Synthetic product service unavailable' } };
+    } });
+    await page.getByRole('button', { name: 'Edit REVIEW-CAP', exact: true }).click();
+    await page.locator('#fImageFile').setInputFiles({ name: 'synthetic-review-image.png', mimeType: 'image/png', buffer: Buffer.from('synthetic upload bytes') });
+    await page.locator('#pmSaveBtn').click(); await expect(page.locator('.dash-error-banner')).toContainText('Synthetic image upload unavailable');
+    await expect(page.locator('#pmFormCard')).toBeVisible(); await expect(page.locator('#fName')).toBeEnabled(); await expect(page.locator('#fStyle')).toBeDisabled();
+    expect(events.writes).toHaveLength(1); uploadFails = false; await page.locator('#pmSaveBtn').click();
+    await expect(page.locator('.dash-error-banner')).toContainText('Check the catalog before retrying'); await expect(page.locator('#fName')).toHaveValue(data.products[1].ProductName);
+    await expect(page.locator('#pmSaveBtn')).toBeEnabled(); await expect(page.locator('#fStyle')).toBeDisabled(); expect(events.writes).toHaveLength(3);
+    await axe(page); expect(events.errors).toEqual([]); expect(events.unknown).toEqual([]);
+});
