@@ -1,0 +1,458 @@
+/* Calibration workspace. Shared controls own sizing, focus and hidden state. */
+@page staff-calibration {
+    size: letter;
+    margin: 0.4in;
+}
+
+@layer components.pages {
+    :where([data-ui="unified"][data-staff-tool="calibration"]) .cal-head {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto auto;
+        align-items: center;
+        gap: var(--space-5);
+        padding: var(--space-6) max(var(--space-5), calc((100% - 1520px) / 2));
+        background: var(--gray-900);
+        color: var(--color-on-brand);
+        border-top: 4px solid var(--amber-400);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="calibration"]) .cal-head h1 {
+        margin: 0 0 var(--space-3);
+        color: inherit;
+        font-size: clamp(1.35rem, 2.6vw, 1.9rem);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="calibration"]) .cal-head p {
+        margin: 0;
+        max-width: 76ch;
+        font-size: var(--font-size-md);
+        color: var(--gray-200);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="calibration"])
+        .cal-head
+        .cal-link {
+        color: var(--color-on-brand);
+        background: var(--gray-800);
+        border-color: var(--gray-500);
+        text-decoration: none;
+        white-space: nowrap;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="calibration"])
+        .cal-head
+        .cal-link:hover {
+        background: var(--gray-700);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="calibration"]) .cal-main {
+        display: grid;
+        grid-template-columns: 280px minmax(0, 1fr);
+        gap: var(--space-6);
+        max-width: 1560px;
+        margin: 0 auto;
+        padding: var(--space-6) var(--space-5) var(--space-8);
+        align-items: start;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="calibration"])
+        :is(.cal-styles, .cal-stage) {
+        min-width: 0;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="calibration"]) .cal-styles h2 {
+        margin: 0 0 var(--space-3);
+        font-size: var(--font-size-lg);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="calibration"]) .style-list {
+        display: grid;
+        gap: var(--space-3);
+        max-height: 75vh;
+        overflow: auto;
+        padding: var(--space-1);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="calibration"]) .style-item {
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+        width: 100%;
+        min-height: var(--ui-control-height);
+        padding: var(--space-3);
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-md);
+        background: var(--ui-surface);
+        color: var(--ui-ink);
+        cursor: pointer;
+        text-align: left;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="calibration"]) .style-item img {
+        width: 48px;
+        height: 60px;
+        object-fit: contain;
+        background: var(--ui-canvas);
+        border-radius: var(--radius-sm);
+        flex-shrink: 0;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="calibration"])
+        .style-item-name {
+        flex: 1;
+        min-width: 0;
+        font-size: var(--font-size-base);
+        font-weight: 700;
+        overflow-wrap: anywhere;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="calibration"])
+        .style-item-name
+        small {
+        display: block;
+        margin-top: var(--space-1);
+        color: var(--ui-muted);
+        font-size: var(--font-size-md);
+        font-weight: 400;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="calibration"])
+        .style-item-state {
+        font-size: var(--font-size-sm);
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="calibration"])
+        .style-item-state.is-saved {
+        color: var(--green-700);
+        font-weight: 700;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="calibration"])
+        .style-item.is-active {
+        border-color: var(--ui-accent);
+        background: var(--ui-tint);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="calibration"])
+        .style-item:disabled {
+        cursor: wait;
+        opacity: 0.65;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="calibration"]) .cal-stage {
+        padding: var(--space-5);
+        border: 1px solid var(--ui-line);
+        border-radius: var(--radius-lg);
+        background: var(--ui-surface);
+        box-shadow: var(--shadow-sm);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="calibration"]) .cal-toolbar {
+        display: flex;
+        gap: var(--space-4);
+        align-items: center;
+        flex-wrap: wrap;
+        margin-bottom: var(--space-4);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="calibration"]) .cal-tabs {
+        display: inline-flex;
+        flex-wrap: wrap;
+        gap: var(--space-2);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="calibration"])
+        .cal-tab.is-active {
+        background: var(--ui-accent);
+        color: var(--color-on-brand);
+        border-color: var(--ui-accent);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="calibration"]) .cal-color {
+        width: auto;
+        min-width: 130px;
+        max-width: 100%;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="calibration"]) .cal-coloronly {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-2);
+        min-height: var(--ui-control-height);
+        font-size: var(--font-size-md);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="calibration"])
+        .cal-coloronly
+        input {
+        width: 20px;
+        height: 20px;
+        accent-color: var(--ui-accent);
+        flex-shrink: 0;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="calibration"])
+        .cal-canvas-wrap {
+        position: relative;
+        display: grid;
+        place-items: center;
+        min-height: 400px;
+        background: var(--gray-50);
+        outline: 1px solid var(--ui-line);
+        border-radius: var(--radius-md);
+        overflow: hidden;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="calibration"]) .cal-photo-frame {
+        --cal-image-ratio: 0.8;
+
+        position: relative;
+        width: min(100%, calc(62vh * var(--cal-image-ratio)));
+        max-width: calc(720px * var(--cal-image-ratio));
+    }
+
+    :where([data-ui="unified"][data-staff-tool="calibration"]) .cal-photo {
+        display: block;
+        width: 100%;
+        max-width: 100%;
+        object-fit: contain;
+        user-select: none;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="calibration"]) .cal-empty {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        padding: var(--space-6);
+        color: var(--ui-muted);
+        text-align: center;
+        pointer-events: none;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="calibration"]) .cal-box {
+        position: absolute;
+        border: 2px dashed var(--green-700);
+        border-radius: var(--radius-sm);
+        background: color-mix(in srgb, var(--green-600) 8%, transparent);
+        cursor: move;
+        touch-action: none;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="calibration"]) .cal-box-label {
+        position: absolute;
+        left: 0;
+        bottom: calc(100% + 4px);
+        max-width: 100%;
+        padding: var(--space-1) var(--space-2);
+        border-radius: var(--radius-sm);
+        background: var(--green-700);
+        color: var(--color-on-brand);
+        font-size: var(--font-size-sm);
+        font-weight: 700;
+        line-height: 1.3;
+        overflow-wrap: anywhere;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="calibration"]) .cal-box-handle {
+        position: absolute;
+        right: -22px;
+        bottom: -22px;
+        display: grid;
+        place-items: center;
+        width: var(--ui-control-height);
+        height: var(--ui-control-height);
+        padding: 0;
+        border: 2px solid var(--green-700);
+        border-radius: var(--radius-pill);
+        background: var(--ui-surface);
+        color: var(--green-700);
+        box-shadow: var(--shadow-sm);
+        cursor: nwse-resize;
+        touch-action: none;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="calibration"]) .cal-adjust {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-2);
+        border: 0;
+        margin: var(--space-4) 0;
+        padding: 0;
+        min-width: 0;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="calibration"])
+        .cal-adjust
+        legend {
+        margin-bottom: var(--space-2);
+        padding: 0;
+        font-size: var(--font-size-md);
+        font-weight: 600;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="calibration"])
+        .cal-adjust
+        .btn {
+        flex: 1 1 auto;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="calibration"]) .cal-readout {
+        min-height: 1.5em;
+        font-size: var(--font-size-sm);
+        color: var(--ui-muted);
+        font-family: var(--font-mono);
+        overflow-wrap: anywhere;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="calibration"]) .cal-actions {
+        display: flex;
+        gap: var(--space-3);
+        flex-wrap: wrap;
+        margin-top: var(--space-4);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="calibration"]) .cal-note {
+        margin: var(--space-3) 0 0;
+        font-size: var(--font-size-md);
+        color: var(--ui-muted);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="calibration"]) .cal-warning {
+        margin: 0 0 var(--space-3);
+        padding: var(--space-4);
+        background: var(--amber-100);
+        color: var(--amber-900);
+        border: 1px solid var(--amber-400);
+        border-radius: var(--radius-sm);
+        font-size: var(--font-size-md);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="calibration"])
+        .cal-warning
+        + .btn {
+        margin-bottom: var(--space-4);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="calibration"]) .cal-toasts {
+        position: fixed;
+        bottom: var(--space-5);
+        left: 50%;
+        transform: translateX(-50%);
+        display: grid;
+        gap: var(--space-2);
+        width: max-content;
+        max-width: calc(100vw - 32px);
+        z-index: 50;
+        pointer-events: none;
+    }
+
+    :where([data-ui="unified"][data-staff-tool="calibration"]) .cal-toast {
+        padding: var(--space-3) var(--space-4);
+        border-radius: var(--radius-md);
+        background: var(--gray-900);
+        color: var(--color-on-brand);
+        font-size: var(--font-size-md);
+        box-shadow: var(--shadow-md);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="calibration"])
+        .cal-toast.is-error {
+        background: var(--red-800);
+    }
+
+    :where([data-ui="unified"][data-staff-tool="calibration"])
+        .cal-toast.is-ok {
+        background: var(--green-700);
+    }
+
+    @media (width <= 1050px) {
+        :where([data-ui="unified"][data-staff-tool="calibration"]) .cal-head {
+            grid-template-columns: 1fr auto;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="calibration"])
+            .cal-head
+            > div {
+            grid-column: 1 / -1;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="calibration"]) .cal-main {
+            grid-template-columns: 230px minmax(0, 1fr);
+            gap: var(--space-4);
+        }
+    }
+
+    @media (width <= 760px) {
+        :where([data-ui="unified"][data-staff-tool="calibration"]) .cal-head {
+            grid-template-columns: 1fr;
+            padding: var(--space-5);
+            gap: var(--space-3);
+        }
+
+        :where([data-ui="unified"][data-staff-tool="calibration"]) .cal-main {
+            grid-template-columns: minmax(0, 1fr);
+            padding: var(--space-4);
+        }
+
+        :where([data-ui="unified"][data-staff-tool="calibration"]) .style-list {
+            max-height: 260px;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="calibration"]) .cal-stage {
+            padding: var(--space-3);
+        }
+
+        :where([data-ui="unified"][data-staff-tool="calibration"])
+            .cal-canvas-wrap {
+            min-height: 320px;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="calibration"])
+            .cal-actions
+            .btn {
+            flex: 1 1 100%;
+        }
+    }
+
+    @media print {
+        :where([data-ui="unified"][data-staff-tool="calibration"]) {
+            page: staff-calibration;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="calibration"]) .cal-photo-frame {
+            width: min(100%, calc(5in * var(--cal-image-ratio)));
+        }
+
+        :where([data-ui="unified"][data-staff-tool="calibration"]) .cal-head {
+            background: var(--color-surface);
+            color: var(--print-ink);
+            padding: var(--space-3);
+        }
+
+        :where([data-ui="unified"][data-staff-tool="calibration"]) .cal-head p {
+            color: var(--print-ink-soft);
+        }
+
+        :where([data-ui="unified"][data-staff-tool="calibration"]) .cal-main {
+            display: block;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="calibration"])
+            :is(
+                .cal-styles,
+                .cal-link,
+                .cal-actions,
+                .cal-adjust,
+                .cal-toasts
+            ) {
+            display: none;
+        }
+
+        :where([data-ui="unified"][data-staff-tool="calibration"]) .cal-stage {
+            box-shadow: none;
+            break-inside: avoid;
+        }
+    }
+}

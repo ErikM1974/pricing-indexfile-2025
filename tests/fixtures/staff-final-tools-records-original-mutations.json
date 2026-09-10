@@ -1,0 +1,92 @@
+{
+  "writes": [
+    {
+      "path": "/api/quote_sessions/880001",
+      "method": "PUT",
+      "body": {
+        "Status": "Sent"
+      }
+    },
+    {
+      "path": "/api/quote_sessions/880001",
+      "method": "PUT",
+      "body": {
+        "CustomerName": "Cedar Updated",
+        "CustomerEmail": "updated@example.test",
+        "CompanyName": "Synthetic Updated Workshop",
+        "Phone": "555-0100",
+        "TotalQuantity": 24,
+        "SubtotalAmount": 225.5,
+        "LTMFeeTotal": 30,
+        "TotalAmount": 255.5,
+        "Status": "Converted",
+        "Notes": "Synthetic revised note\nSecond line"
+      }
+    },
+    {
+      "path": "/api/quote_sessions",
+      "method": "POST",
+      "body": {
+        "QuoteID": "DTG0910-1",
+        "SessionID": "dtg_sess_1789063200000_di",
+        "CustomerEmail": "updated@example.test",
+        "CustomerName": "Cedar Updated",
+        "CompanyName": "Synthetic Updated Workshop",
+        "Phone": "555-0100",
+        "TotalQuantity": 24,
+        "SubtotalAmount": 225.5,
+        "LTMFeeTotal": 30,
+        "TotalAmount": 255.5,
+        "Status": "Open",
+        "ExpiresAt": "2026-10-10T18:00:00",
+        "Notes": "Duplicated from DTG0910-8001\n\nSynthetic revised note\nSecond line"
+      }
+    },
+    {
+      "path": "/api/quote_items",
+      "method": "POST",
+      "body": {
+        "QuoteID": "DTG0910-1",
+        "LineNumber": 1,
+        "StyleNumber": "PC54",
+        "ProductName": "Synthetic cotton tee",
+        "Quantity": 12,
+        "FinalUnitPrice": 10,
+        "LineTotal": 120,
+        "AddedAt": "2026-09-10T18:00:00"
+      }
+    },
+    {
+      "path": "/api/quote_items/980001",
+      "method": "DELETE",
+      "body": null
+    },
+    {
+      "path": "/api/quote_sessions/880001",
+      "method": "DELETE",
+      "body": null
+    }
+  ],
+  "csv": "PK_ID,QuoteID,CustomerName,CustomerEmail,CompanyName,Phone,TotalAmount,Status,CreatedAt,ExpiresAt,Notes,TotalQuantity,SubtotalAmount,LTMFeeTotal\n880001,DTG0910-8001,Cedar Updated,updated@example.test,Synthetic Updated Workshop,555-0100,255.5,Converted,2026-09-09T18:00:00Z,2026-10-01T18:00:00Z,\"Synthetic revised note\nSecond line\",24,225.5,30",
+  "csvName": "quote_DTG0910-8001.csv",
+  "dialogs": [
+    {
+      "type": "confirm",
+      "message": "Are you sure you want to duplicate quote DTG0910-8001?"
+    },
+    {
+      "type": "alert",
+      "message": "Quote duplicated successfully!\nNew Quote ID: DTG0910-1"
+    },
+    {
+      "type": "confirm",
+      "message": "Are you sure you want to delete quote DTG0910-8001?\n\nThis action cannot be undone."
+    }
+  ],
+  "reads": [
+    "/api/quote_sessions",
+    "/api/quote_items?quoteID=DTG0910-8001",
+    "/api/quote_sessions",
+    "/api/quote_items?quoteID=DTG0910-8001"
+  ]
+}

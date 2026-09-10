@@ -1,0 +1,981 @@
+{
+  "data": {
+    "active": "sales",
+    "tabs": [
+      {
+        "id": "sales",
+        "text": "Sales",
+        "selected": "true"
+      },
+      {
+        "id": "production",
+        "text": "Production",
+        "selected": "false"
+      },
+      {
+        "id": "art",
+        "text": "Art",
+        "selected": "false"
+      },
+      {
+        "id": "office",
+        "text": "Office",
+        "selected": "false"
+      },
+      {
+        "id": "company",
+        "text": "Company",
+        "selected": "false"
+      },
+      {
+        "id": "everything",
+        "text": "Everything can't find it? it's here",
+        "selected": "false"
+      },
+      {
+        "id": "admin",
+        "text": "Admin",
+        "selected": "false"
+      }
+    ],
+    "goal": [
+      {
+        "id": "goalCurrent",
+        "text": "YTD unavailable"
+      },
+      {
+        "id": "goalPercent",
+        "text": "0"
+      },
+      {
+        "id": "goalOf",
+        "text": "$3M ⚠"
+      }
+    ],
+    "counts": [
+      {
+        "id": "teamActiveCount",
+        "text": "!"
+      },
+      {
+        "id": "teamBdayCount",
+        "text": "–"
+      },
+      {
+        "id": "teamAnnivCount",
+        "text": "–"
+      }
+    ],
+    "links": [
+      {
+        "href": "/ae-dashboard.html",
+        "text": "AE Art Requestsend art to Steve, approve the proofs that come back"
+      },
+      {
+        "href": "/calculators/purchasingform.html",
+        "text": "Purchase Request · Bradleyask Bradley to buy blanks or supplies for a work order"
+      },
+      {
+        "href": "#",
+        "text": "Continue"
+      },
+      {
+        "href": "/calculators/quick-quote/",
+        "text": "Quick Quoteany style fast, or a multi-style price sheet"
+      },
+      {
+        "href": "/dashboards/quote-management.html",
+        "text": "Saved Quotesfind, track and sync every saved quote"
+      },
+      {
+        "href": "/quote-builders/embroidery-quote-builder.html",
+        "text": "Embroidery Quotegarments, caps, 3D puff, patches"
+      },
+      {
+        "href": "/quote-builders/dtg-quote-builder.html",
+        "text": "DTG Quotefull-color prints on garments"
+      },
+      {
+        "href": "/quote-builders/screenprint-quote-builder.html",
+        "text": "Screen Print Quotescreens, colors, safety stripes"
+      },
+      {
+        "href": "/quote-builders/dtf-quote-builder.html",
+        "text": "DTF Quoteheat-applied transfers"
+      },
+      {
+        "href": "/calculators/manual-pricing.html",
+        "text": "$Price From Costtype any blank's cost, get our price for all five methods"
+      },
+      {
+        "href": "/calculators/service-price-cheat-sheet.html",
+        "text": "Shop MenuEst. 1977 · every service price"
+      },
+      {
+        "href": "/calculators/embroidery-pricing-all/?tab=al-retail",
+        "text": "Extra Logo2nd or 3rd logo on a garment we supply"
+      },
+      {
+        "href": "/calculators/embroidery-pricing-all/?tab=stitch-charges",
+        "text": "Big Stitch Countsadd-on over 10,000 stitches"
+      },
+      {
+        "href": "/calculators/embroidery-pricing-all/?tab=fullback",
+        "text": "Full-Back Embroideryjacket backs, 25K+ designs"
+      },
+      {
+        "href": "/calculators/embroidery-pricing-all/?tab=decg-retail",
+        "text": "Customer's Garmentembroidery labor on blanks they bring"
+      },
+      {
+        "href": "/calculators/screenprint-customer/",
+        "text": "Print on Their Shirtsscreen-print labor on blanks they bring"
+      },
+      {
+        "href": "/calculators/embroidery-contract/",
+        "text": "CContract Embroidery 2026.wholesale rates for decorators who bring blanks"
+      },
+      {
+        "href": "/calculators/dtg-contract/",
+        "text": "CContract DTG 2026.wholesale DTG on partners' own blanks"
+      },
+      {
+        "href": "/calculators/embroidered-emblem/",
+        "text": "Patch Quote (AI)sew-on patches, 25-pc min, 4–6 wks"
+      },
+      {
+        "href": "/calculators/laser-tumbler-polarcamel.html",
+        "text": "Engraved DrinkwarePolar Camel tumblers: color, stock, price"
+      },
+      {
+        "href": "/calculators/custom-decal-pricing.html",
+        "text": "Odd-Size Decalsover 6×6, odd shapes, under 50 pcsstaff"
+      },
+      {
+        "href": "/calculators/webstores.html",
+        "text": "Company Webstoresquote a branded store or fundraiser"
+      },
+      {
+        "href": "/calculators/richardson-2025.html",
+        "text": "Richardson Directfactory-direct caps, and the 23 to buy via SanMar"
+      },
+      {
+        "href": "/custom-tees",
+        "text": "Tees Storefrontthe public tee shop — 20 styles, checkout"
+      },
+      {
+        "href": "/custom-stickers",
+        "text": "Sticker Pricesevery 2×2–6×6 price, 50+ pieces"
+      },
+      {
+        "href": "/custom-banners",
+        "text": "Banner Pricesany size, priced by the square foot"
+      },
+      {
+        "href": "/dashboards/ae-mission-control.html",
+        "text": "Mission Controlyour bonus, your goals, and everything waiting on you today"
+      },
+      {
+        "href": "/dashboards/leads.html",
+        "text": "Leadsevery website, phone and walk-in enquiry, with who owns it"
+      },
+      {
+        "href": "/dashboards/portal-directory.html",
+        "text": "Customer Portalsbrowse every customer's portal page"
+      },
+      {
+        "href": "/dashboards/customer-portal-admin.html",
+        "text": "Portal Accessinvite customers; work re-order requests"
+      },
+      {
+        "href": "/dashboards/lead-scorecard.html",
+        "text": "Lead Scorecardhow leads convert, by rep and source"
+      },
+      {
+        "href": "/dashboards/unqualified-leads.html",
+        "text": "Unqualified Leadsspam and no-fit enquiries"
+      },
+      {
+        "href": "/dashboards/design-gallery.html",
+        "text": "Design Vaultevery design we've ever made — search by name, number or customer"
+      },
+      {
+        "href": "/pages/garment-designer.html",
+        "text": "Shirt Designerput a logo on a shirt, send for approval"
+      },
+      {
+        "href": "/dashboards/finished-photos-library.html",
+        "text": "Photo Libraryevery finished-job photo; choose what customers see"
+      },
+      {
+        "href": "/pages/jds-mockup-creator.html",
+        "text": "Tumbler Mockuplogo on a Polar Camel, download approval"
+      },
+      {
+        "href": "/pages/mockup-library.html",
+        "text": "Saved Mockupsmockups you've built and sent"
+      },
+      {
+        "href": "/catalog?topSellers=1",
+        "text": "Top Sellersbest-selling styles, most with a free sample"
+      },
+      {
+        "href": "/pages/policy-detail.html?id=sales-office-procedures",
+        "text": "Sales & Office Procedures"
+      },
+      {
+        "href": "/pages/policy-detail.html?id=customer-notification-sop",
+        "text": "Customer Notification SOP"
+      },
+      {
+        "href": "/pages/policy-detail.html?id=ltm-order-decision-algorithm",
+        "text": "LTM Order Decision"
+      },
+      {
+        "href": "/pages/data-entry-guide.html",
+        "text": "Data Entry RulesShopWorks entry, live service codes"
+      },
+      {
+        "href": "/dashboards/reports/price-audit-report.html",
+        "text": "Price Audit (Feb 2026)frozen study, 80 orders"
+      },
+      {
+        "href": "/dashboards/art-hub-ruth.html",
+        "text": "Mockup Queue · Ruthiemockup requests in progress, completed, and on hold"
+      },
+      {
+        "href": "/dashboards/monogram-dashboard.html",
+        "text": "Monogram Ordersevery order and its names, printable proof"
+      },
+      {
+        "href": "/dashboards/names-numbers-dashboard.html",
+        "text": "Names & Numbersteam rosters: name, number, size"
+      },
+      {
+        "href": "/dashboards/past-due-orders.html",
+        "text": "Past Due Orderswhat each late order is waiting on"
+      },
+      {
+        "href": "/dashboards/production-shifts.html",
+        "text": "Shift Schedulewho works when; break and lunch rules"
+      },
+      {
+        "href": "/dashboards/quote-management.html?open=inbound-today",
+        "text": "SanMar Inbound Calendartoday's SanMar boxes, line by line, with labels to print"
+      },
+      {
+        "href": "/pages/box-labels.html",
+        "text": "Box Labelslook up a PO, sort into boxes, print"
+      },
+      {
+        "href": "/dashboards/purchasing-portal.html",
+        "text": "Purchase Trackingwhere every blanks request stands"
+      },
+      {
+        "href": "/calculators/purchasingform.html",
+        "text": "Purchase Request· Bradleythe form that asks Bradley to buy blanks or supplies for a WO"
+      },
+      {
+        "href": "/dashboards/roland-printer-supplies.html",
+        "text": "Roland Suppliesink and parts for the Roland — goes to Erik"
+      },
+      {
+        "href": "/dashboards/bradley-transfers.html",
+        "text": "Transfer Queue · Bradleyheat transfers waiting to be ordered, rush flagged"
+      },
+      {
+        "href": "/dashboards/supacolor-orders.html",
+        "text": "Supacolor Jobslive status at Supacolor, updated every 10 minutes"
+      },
+      {
+        "href": "/training/shipping-receiving-guide.html",
+        "text": "Dock Guidereceiving, shipping, pickups, close-day"
+      },
+      {
+        "href": "/training/sanmar-purchasing-guide.html",
+        "text": "SanMar Purchasingorder blanks through ShopWorks"
+      },
+      {
+        "href": "/pages/data-entry-guide.html",
+        "text": "Data Entry Rules"
+      },
+      {
+        "href": "/dashboards/finished-photos.html",
+        "text": "Photo Capturescan the work order, shoot the piece, publish — works on your phone"
+      },
+      {
+        "href": "/pages/dst-viewer.html",
+        "text": "DST Studiostitch viewer · true-scale mockup · approval sheet"
+      },
+      {
+        "href": "/dashboards/design-gallery.html",
+        "text": "Design Vaultsearch every design, any source"
+      },
+      {
+        "href": "/dashboards/digitized-designs.html",
+        "text": "Digitized Designsmaster list, with extra-logo prices"
+      },
+      {
+        "href": "/dashboards/finished-photos-library.html",
+        "text": "Photo Librarybrowse and publish finished photos"
+      },
+      {
+        "href": "/dashboards/old-designs.html",
+        "text": "Old Designsthe legacy Megafile archive"
+      },
+      {
+        "href": "/dashboards/art-hub-steve.html",
+        "text": "Art Queue · Steveincoming art requests, and sending finished art to Bradley"
+      },
+      {
+        "href": "/dashboards/art-hub-ruth.html",
+        "text": "Mockup Queue · Ruthiemockup requests in progress, completed, and on hold"
+      },
+      {
+        "href": "/ae-dashboard.html",
+        "text": "AE Art Requestwhat the reps submit and approve"
+      },
+      {
+        "href": "/dashboards/design-queue.html",
+        "text": "Design Queuedesigns waiting on a decision"
+      },
+      {
+        "href": "/dashboards/gear-publisher.html",
+        "text": "253gear Publisherpush a design to the 253gear store"
+      },
+      {
+        "href": "/pages/dst-viewer.html",
+        "text": "DST Studiostitch viewer · true-scale mockup · approval sheet"
+      },
+      {
+        "href": "/dashboards/design-gallery.html",
+        "text": "Design Vaultevery design we've ever made, one search"
+      },
+      {
+        "href": "/pages/garment-designer.html",
+        "text": "Shirt Designerlogo on a shirt, front/back, spin, proof"
+      },
+      {
+        "href": "/pages/jds-mockup-creator.html",
+        "text": "Tumbler MockupPolar Camel color + logo, approval image"
+      },
+      {
+        "href": "/pages/mockup-library.html",
+        "text": "Saved Mockups"
+      },
+      {
+        "href": "/dashboards/digitized-designs.html",
+        "text": "Digitized Designsmaster list, with extra-logo prices"
+      },
+      {
+        "href": "/dashboards/old-designs.html",
+        "text": "Old Designsthe legacy Megafile archive"
+      },
+      {
+        "href": "/dashboards/finished-photos.html",
+        "text": "Photo Captureshoot the finished piece, publish it"
+      },
+      {
+        "href": "/dashboards/finished-photos-library.html",
+        "text": "Photo Librarybrowse and publish finished photos"
+      },
+      {
+        "href": "/dashboards/monogram-dashboard.html",
+        "text": "Monogram Orders"
+      },
+      {
+        "href": "/dashboards/names-numbers-dashboard.html",
+        "text": "Names & Numbers"
+      },
+      {
+        "href": "/dashboards/bradley-transfers.html",
+        "text": "Transfer Queue· Bradleysend files for Supacolor"
+      },
+      {
+        "href": "/dashboards/bradley-transfers.html",
+        "text": "Transfer Queuestep 1 · what to order"
+      },
+      {
+        "href": "/dashboards/supacolor-orders.html",
+        "text": "Supacolor Jobsstep 2 · where it is"
+      },
+      {
+        "href": "/dashboards/purchasing-portal.html",
+        "text": "Purchase Trackingevery blanks request: sent → ordered → received → shipped"
+      },
+      {
+        "href": "/dashboards/quote-management.html?open=inbound-today",
+        "text": "SanMar Inbound Calendarincoming boxes by day, box labels, PDF"
+      },
+      {
+        "href": "/calculators/purchasingform.html",
+        "text": "Purchase Request· Bradleythe form reps fill in to ask Bradley for blanks"
+      },
+      {
+        "href": "/dashboards/roland-printer-supplies.html",
+        "text": "Roland Supplies"
+      },
+      {
+        "href": "/pages/box-labels.html",
+        "text": "Box Labels"
+      },
+      {
+        "href": "/dashboards/product-manager.html",
+        "text": "Non-SanMar Itemscatalog products we don't buy from SanMar"
+      },
+      {
+        "href": "/calculators/richardson-2025.html",
+        "text": "Richardson Directand the 23 styles to buy via SanMar"
+      },
+      {
+        "href": "/dashboards/quote-management.html",
+        "text": "Saved Quotesfind, track and sync every saved quote"
+      },
+      {
+        "href": "/dashboards/leads.html",
+        "text": "Leadsevery enquiry, with who owns it"
+      },
+      {
+        "href": "/dashboards/portal-directory.html",
+        "text": "Customer Portalsbrowse every customer's portal page"
+      },
+      {
+        "href": "/dashboards/customer-portal-admin.html",
+        "text": "Portal Accessinvites, rewards, re-order requests"
+      },
+      {
+        "href": "/dashboards/jim-mailing-list.html",
+        "text": "Prospect Mailing List· Jimbig-type add, edit, search"
+      },
+      {
+        "href": "/dashboards/form-submissions.html",
+        "text": "Forms Inboxsubmitted forms, samples-out tracker"
+      },
+      {
+        "href": "/custom-tees",
+        "text": "Tees Storefrontthe public tee shop customers buy from"
+      },
+      {
+        "href": "/custom-stickers",
+        "text": "Sticker Pricesevery 2×2–6×6 price"
+      },
+      {
+        "href": "/custom-banners",
+        "text": "Banner Pricesany size, by the square foot"
+      },
+      {
+        "href": "/calculators/webstores.html",
+        "text": "Company Webstoresquote a store or fundraiser"
+      },
+      {
+        "href": "/catalog?topSellers=1",
+        "text": "Top Sellers"
+      },
+      {
+        "href": "/pages/policies-hub.html",
+        "text": "Policies Hubevery company policy and SOP, searchable, always current"
+      },
+      {
+        "href": "/pages/policy-detail.html?id=sales-office-procedures",
+        "text": "Sales & Office Procedures"
+      },
+      {
+        "href": "/pages/policy-detail.html?id=customer-notification-sop",
+        "text": "Customer Notification SOP"
+      },
+      {
+        "href": "/pages/policy-detail.html?id=ltm-order-decision-algorithm",
+        "text": "LTM Order Decision"
+      },
+      {
+        "href": "/pages/policy-detail.html?id=org-chart-2026",
+        "text": "Org Chart 2026interactive, with member search"
+      },
+      {
+        "href": "/training/index.html",
+        "text": "Training Centerevery guide by role"
+      },
+      {
+        "href": "/pages/data-entry-guide.html",
+        "text": "Data Entry RulesShopWorks entry, live codes"
+      },
+      {
+        "href": "/training/customer-service.html",
+        "text": "Customer Service Manual"
+      },
+      {
+        "href": "/training/sales-coordinator-manual.html",
+        "text": "Sales Coordinator Bookchapter by chapter"
+      },
+      {
+        "href": "/training/shipping-receiving-guide.html",
+        "text": "Dock Guiderun the dock, with checklists"
+      },
+      {
+        "href": "/training/sanmar-purchasing-guide.html",
+        "text": "SanMar Purchasingthree phases, with videos"
+      },
+      {
+        "href": "/training/quick-reference-tips.html",
+        "text": "Tips Archiveevery quick-hitter tip"
+      },
+      {
+        "href": "/training/training-games-hub.html",
+        "text": "Training Games"
+      },
+      {
+        "href": "/dashboards/forms-library.html",
+        "text": "Forms Libraryprintable and fillable, by category"
+      },
+      {
+        "href": "/dashboards/form-submissions.html",
+        "text": "Forms Inboxsubmissions, samples-out tracker"
+      },
+      {
+        "href": "/DrainPro-Bundle.html",
+        "text": "Drain-Pro Bundletheir staff pick sizes here"
+      },
+      {
+        "href": "/streich-bros-bundle.html",
+        "text": "Streich Bros Bundle"
+      },
+      {
+        "href": "/wcttr-bundle.html",
+        "text": "WCTTR Bundle"
+      },
+      {
+        "href": "/christmas-bundles.html",
+        "text": "Christmas Gift Boxesseasonal Carhartt gift-box builder"
+      },
+      {
+        "href": "/dashboards/production-shifts.html",
+        "text": "Shift Schedulewho works when, break rules"
+      },
+      {
+        "href": "https://inksoft-transform-8a3dc4e38097.herokuapp.com/",
+        "text": "InkSoft Transform↗InkSoft → ShopWorks; full bonus dashboard"
+      },
+      {
+        "href": "/dashboards/gear-publisher.html",
+        "text": "253gear Publisherpush a design to the 253gear store"
+      },
+      {
+        "href": "/ae-dashboard.html",
+        "text": "AE Art Requestsend art to Steve, approve the proofs that come back"
+      },
+      {
+        "href": "/dashboards/art-hub-steve.html",
+        "text": "Art Queueincoming art requests, and sending finished art to Bradley"
+      },
+      {
+        "href": "/dashboards/design-queue.html",
+        "text": "Design Queuedesigns waiting on a decision"
+      },
+      {
+        "href": "/dashboards/design-gallery.html",
+        "text": "Design Vaultevery design we've ever made — search by name, number or customer"
+      },
+      {
+        "href": "/dashboards/digitized-designs.html",
+        "text": "Digitized Designsmaster list, with extra-logo prices"
+      },
+      {
+        "href": "/pages/dst-viewer.html",
+        "text": "DST Studiostitch viewer · true-scale mockup · approval sheet"
+      },
+      {
+        "href": "/dashboards/old-designs.html",
+        "text": "Old Designsthe legacy Megafile archive"
+      },
+      {
+        "href": "/dashboards/finished-photos.html",
+        "text": "Photo Capturescan the work order, shoot the piece, publish — works on your phone"
+      },
+      {
+        "href": "/dashboards/finished-photos-library.html",
+        "text": "Photo Libraryevery finished-job photo; choose what customers see"
+      },
+      {
+        "href": "/pages/mockup-library.html",
+        "text": "Saved Mockupsmockups you've built and sent"
+      },
+      {
+        "href": "/pages/garment-designer.html",
+        "text": "Shirt Designerput a logo on a shirt, send for approval"
+      },
+      {
+        "href": "/catalog?topSellers=1",
+        "text": "Top Sellersbest-selling styles, most with a free sample"
+      },
+      {
+        "href": "/pages/jds-mockup-creator.html",
+        "text": "Tumbler Mockuplogo on a Polar Camel, download approval"
+      },
+      {
+        "href": "/calculators/purchasingform.html",
+        "text": "Purchase Requestask Bradley to buy blanks or supplies for a work order"
+      },
+      {
+        "href": "/quote-builders/dtf-quote-builder.html",
+        "text": "DTF Quoteheat-applied transfers"
+      },
+      {
+        "href": "/quote-builders/dtg-quote-builder.html",
+        "text": "DTG Quotefull-color prints on garments"
+      },
+      {
+        "href": "/quote-builders/embroidery-quote-builder.html",
+        "text": "Embroidery Quotegarments, caps, 3D puff, patches"
+      },
+      {
+        "href": "/calculators/quick-quote/",
+        "text": "Quick Quoteany style fast, or a multi-style price sheet"
+      },
+      {
+        "href": "/dashboards/quote-management.html",
+        "text": "Saved Quotesfind, track and sync every saved quote"
+      },
+      {
+        "href": "/quote-builders/screenprint-quote-builder.html",
+        "text": "Screen Print Quotescreens, colors, safety stripes"
+      },
+      {
+        "href": "/custom-banners",
+        "text": "Banner Pricesany size, priced by the square foot"
+      },
+      {
+        "href": "/calculators/embroidery-pricing-all/?tab=stitch-charges",
+        "text": "Big Stitch Countsadd-on over 10,000 stitches"
+      },
+      {
+        "href": "/calculators/webstores.html",
+        "text": "Company Webstoresquote a branded store or fundraiser"
+      },
+      {
+        "href": "/calculators/dtg-contract/",
+        "text": "Contract DTGwholesale DTG on partners' own blanks"
+      },
+      {
+        "href": "/calculators/embroidery-contract/",
+        "text": "Contract Embroiderywholesale rates for decorators who bring blanks"
+      },
+      {
+        "href": "/calculators/embroidery-pricing-all/?tab=decg-retail",
+        "text": "Customer's Garmentembroidery labor on blanks they bring"
+      },
+      {
+        "href": "/calculators/laser-tumbler-polarcamel.html",
+        "text": "Engraved DrinkwarePolar Camel tumblers: color, stock, price"
+      },
+      {
+        "href": "/calculators/embroidery-pricing-all/?tab=al-retail",
+        "text": "Extra Logo2nd or 3rd logo on a garment we supply"
+      },
+      {
+        "href": "/calculators/embroidery-pricing-all/?tab=fullback",
+        "text": "Full-Back Embroideryjacket backs, 25K+ designs"
+      },
+      {
+        "href": "/calculators/custom-decal-pricing.html",
+        "text": "Odd-Size Decalsover 6×6, odd shapes, under 50 pcs"
+      },
+      {
+        "href": "/calculators/embroidered-emblem/",
+        "text": "Patch Quote (AI)sew-on patches, 25-pc min, 4–6 wks"
+      },
+      {
+        "href": "/calculators/manual-pricing.html",
+        "text": "Price From Costtype any blank's cost, get our price for all five methods"
+      },
+      {
+        "href": "/calculators/screenprint-customer/",
+        "text": "Print on Their Shirtsscreen-print labor on blanks they bring"
+      },
+      {
+        "href": "/calculators/richardson-2025.html",
+        "text": "Richardson Directfactory-direct caps, and the 23 to buy via SanMar"
+      },
+      {
+        "href": "/calculators/service-price-cheat-sheet.html",
+        "text": "Shop MenuEst. 1977 · every service price"
+      },
+      {
+        "href": "/custom-stickers",
+        "text": "Sticker Pricesevery 2×2–6×6 price, 50+ pieces"
+      },
+      {
+        "href": "/custom-tees",
+        "text": "Tees Storefrontthe public tee shop — 20 styles, checkout"
+      },
+      {
+        "href": "/dashboards/portal-directory.html",
+        "text": "Customer Portalsbrowse every customer's portal page"
+      },
+      {
+        "href": "/dashboards/form-submissions.html",
+        "text": "Forms Inboxsubmitted forms, samples-out tracker"
+      },
+      {
+        "href": "/dashboards/lead-scorecard.html",
+        "text": "Lead Scorecardhow leads convert, by rep and source"
+      },
+      {
+        "href": "/dashboards/leads.html",
+        "text": "Leadsevery website, phone and walk-in enquiry, with who owns it"
+      },
+      {
+        "href": "/dashboards/ae-mission-control.html",
+        "text": "Mission Controlyour bonus, your goals, and everything waiting on you today"
+      },
+      {
+        "href": "/dashboards/customer-portal-admin.html",
+        "text": "Portal Accessinvite customers; work re-order requests"
+      },
+      {
+        "href": "/dashboards/jim-mailing-list.html",
+        "text": "Prospect Mailing Listbig-type add, edit, search"
+      },
+      {
+        "href": "/dashboards/unqualified-leads.html",
+        "text": "Unqualified Leadsspam and no-fit enquiries"
+      },
+      {
+        "href": "/pages/policy-detail.html?id=customer-notification-sop",
+        "text": "Customer Notification SOP"
+      },
+      {
+        "href": "/pages/data-entry-guide.html",
+        "text": "Data Entry RulesShopWorks entry, live service codes"
+      },
+      {
+        "href": "/pages/policy-detail.html?id=ltm-order-decision-algorithm",
+        "text": "LTM Order Decision"
+      },
+      {
+        "href": "/pages/policy-detail.html?id=org-chart-2026",
+        "text": "Org Chart 2026interactive, with member search"
+      },
+      {
+        "href": "/pages/policies-hub.html",
+        "text": "Policies Hubevery company policy and SOP, searchable, always current"
+      },
+      {
+        "href": "/dashboards/reports/price-audit-report.html",
+        "text": "Price Audit (Feb 2026)frozen study, 80 orders"
+      },
+      {
+        "href": "/pages/policy-detail.html?id=sales-office-procedures",
+        "text": "Sales & Office Procedures"
+      },
+      {
+        "href": "/pages/box-labels.html",
+        "text": "Box Labelslook up a PO, sort into boxes, print"
+      },
+      {
+        "href": "/training/shipping-receiving-guide.html",
+        "text": "Dock Guidereceiving, shipping, pickups, close-day"
+      },
+      {
+        "href": "/dashboards/art-hub-ruth.html",
+        "text": "Mockup Queuemockup requests in progress, completed, and on hold"
+      },
+      {
+        "href": "/dashboards/monogram-dashboard.html",
+        "text": "Monogram Ordersevery order and its names, printable proof"
+      },
+      {
+        "href": "/dashboards/names-numbers-dashboard.html",
+        "text": "Names & Numbersteam rosters: name, number, size"
+      },
+      {
+        "href": "/dashboards/product-manager.html",
+        "text": "Non-SanMar Itemscatalog products we don't buy from SanMar"
+      },
+      {
+        "href": "/dashboards/past-due-orders.html",
+        "text": "Past Due Orderswhat each late order is waiting on"
+      },
+      {
+        "href": "/dashboards/purchasing-portal.html",
+        "text": "Purchase Trackingwhere every blanks request stands"
+      },
+      {
+        "href": "/dashboards/roland-printer-supplies.html",
+        "text": "Roland Suppliesink and parts for the Roland — goes to Erik"
+      },
+      {
+        "href": "/dashboards/quote-management.html?open=inbound-today",
+        "text": "SanMar Inbound Calendartoday's SanMar boxes, line by line, with labels to print"
+      },
+      {
+        "href": "/training/sanmar-purchasing-guide.html",
+        "text": "SanMar Purchasingorder blanks through ShopWorks"
+      },
+      {
+        "href": "/dashboards/production-shifts.html",
+        "text": "Shift Schedulewho works when; break and lunch rules"
+      },
+      {
+        "href": "/dashboards/supacolor-orders.html",
+        "text": "Supacolor Jobslive status at Supacolor, updated every 10 minutes"
+      },
+      {
+        "href": "/dashboards/bradley-transfers.html",
+        "text": "Transfer Queueheat transfers waiting to be ordered, rush flagged"
+      },
+      {
+        "href": "/training/customer-service.html",
+        "text": "Customer Service Manual"
+      },
+      {
+        "href": "/training/sales-coordinator-manual.html",
+        "text": "Sales Coordinator Bookchapter by chapter"
+      },
+      {
+        "href": "/training/quick-reference-tips.html",
+        "text": "Tips Archiveevery quick-hitter tip"
+      },
+      {
+        "href": "/training/index.html",
+        "text": "Training Centerevery guide by role"
+      },
+      {
+        "href": "/training/training-games-hub.html",
+        "text": "Training Games"
+      },
+      {
+        "href": "/dashboards/forms-library.html",
+        "text": "Forms Libraryprintable and fillable, by category"
+      },
+      {
+        "href": "/christmas-bundles.html",
+        "text": "Christmas Gift Boxesseasonal Carhartt gift-box builder"
+      },
+      {
+        "href": "/DrainPro-Bundle.html",
+        "text": "Drain-Pro Bundletheir staff pick sizes here"
+      },
+      {
+        "href": "/streich-bros-bundle.html",
+        "text": "Streich Bros Bundle"
+      },
+      {
+        "href": "/wcttr-bundle.html",
+        "text": "WCTTR Bundle"
+      },
+      {
+        "href": "https://inksoft-transform-8a3dc4e38097.herokuapp.com/",
+        "text": "InkSoft TransformInkSoft → ShopWorks; full bonus dashboard"
+      },
+      {
+        "href": "/dashboards/sanmar-payables.html",
+        "text": "SanMar Payablesopen invoices, CSV, marketing fund"
+      },
+      {
+        "href": "/dashboards/payroll.html",
+        "text": "Payrollvacation hours, packet upload"
+      },
+      {
+        "href": "/dashboards/commission-structure.html",
+        "text": "Store Commissions"
+      },
+      {
+        "href": "/dashboards/volume-quote.html",
+        "text": "Volume Quoteone-time price for 72+ orders"
+      },
+      {
+        "href": "/dashboards/blog-editor.html",
+        "text": "Blog Editorwrite and publish posts"
+      },
+      {
+        "href": "/dashboards/seo-strategy.html",
+        "text": "SEO Strategy"
+      },
+      {
+        "href": "/dashboards/brand-standards.html",
+        "text": "Brand Standardscolours, type and spacing every page follows, read live from the token file"
+      },
+      {
+        "href": "/dashboards/access-admin.html",
+        "text": "Access Adminroles and page access"
+      },
+      {
+        "href": "/dashboards/policy-migration.html",
+        "text": "Policy Migration"
+      },
+      {
+        "href": "/dashboards/drive-access.html",
+        "text": "Drive Accesswho sees which network drive"
+      },
+      {
+        "href": "/dashboards/bandit-integration.html",
+        "text": "Bandit Integrationsync tasks and agents"
+      },
+      {
+        "href": "/dashboards/sanmar-ftp-integration.html",
+        "text": "SanMar Downloads"
+      },
+      {
+        "href": "/dashboards/sanmar-shopworks-converter.html",
+        "text": "Parts ConverterSanMar list → ShopWorks parts"
+      },
+      {
+        "href": "/sanmar-vendor-portal.html",
+        "text": "Vendor Invoiceslegacy Caspio portal"
+      },
+      {
+        "href": "/universal-records-admin.html",
+        "text": "Records Admin"
+      },
+      {
+        "href": "/tools/custom-tees-calibrate.html",
+        "text": "Print-Box Calibrationwhere art prints on each tee"
+      },
+      {
+        "href": "/dashboards/company-numbers.html",
+        "text": "Company Numbersrevenue, team YTD, Q3 push, payments, turnaround estimates"
+      },
+      {
+        "href": "/dashboards/pricing-analysis.html",
+        "text": "Pricing Analysiscost, margin, realization"
+      },
+      {
+        "href": "/dashboards/contract-break-even.html",
+        "text": "Contract Break-Even"
+      },
+      {
+        "href": "/dashboards/api-usage.html",
+        "text": "API UsageCaspio call attribution"
+      },
+      {
+        "href": "/dashboards/caspio-api-reference.html",
+        "text": "Caspio API Docs"
+      },
+      {
+        "href": "/dashboards/table-usage-audit.html",
+        "text": "Table Audit"
+      },
+      {
+        "href": "/dashboards/manageorders-api-reference.html",
+        "text": "ManageOrders Docs"
+      },
+      {
+        "href": "/dashboards/sanmar-api-reference.html",
+        "text": "SanMar API Docs"
+      },
+      {
+        "href": "/dashboards/shopworks-odbc-reference.html",
+        "text": "ShopWorks ODBC"
+      }
+    ]
+  },
+  "team": "UPCOMING BIRTHDAYS\nStaff roster unavailable right now — reload to retry.\nUPCOMING ANNIVERSARIES\nStaff roster unavailable right now — reload to retry.\n Shift Schedule\n Open Staff Directory\n View Org Chart (2026)",
+  "text": "Staff Dashboard\nWELCOME,\nCedar\nPast due\n0%\nYTD unavailable / $3M ⚠\nTeam\n!\n🎂\n–\n🏆\n–\nUPCOMING BIRTHDAYS\nStaff roster unavailable right now — reload to retry.\nUPCOMING ANNIVERSARIES\nStaff roster unavailable right now — reload to retry.\n Shift Schedule\n Open Staff Directory\n View Org Chart (2026)\nSign Out\nCtrl K\n🖼️ Pride Wall — made by us, lately\nOpen the Photo Library →\nPride Wall photos unavailable right now — they'll be back on the next refresh.\nSales\nProduction\nArt\nOffice\nCompany\nEverything\ncan't find it? it's here\nAdmin\nCtrl K finds any tool from any tab · green dot = your tab\n📌 MY STUFF\nUse any tool below and it shows up here — hit its ☆ to pin it for good.\nSales\n\nQuote it, price it, follow up. What Nika and Taneisha open all day.\n\nMost used\nthe two pages the reps open every day\nAE Art Request\nsend art to Steve, approve the proofs that come back\nPurchase Request · Bradley\nask Bradley to buy blanks or supplies for a work order\nQuote\nNew Quote\npick the decoration, price it, send it\nContinue\nQuick Quote\nany style fast, or a multi-style price sheet\nSaved Quotes\nfind, track and sync every saved quote\nGo straight to a builder\n4\nPrice it\n2 up front · 16 more\n$\nPrice From Cost\ntype any blank's cost, get our price for all five methods\nShop Menu\nEST. 1977 · EVERY SERVICE PRICE\nMore pricing — add-ons, customer supplied, contract, specialty, customer pages\n16\nCustomers\nMission Control\nyour bonus, your goals, and everything waiting on you today\nLeads\nevery website, phone and walk-in enquiry, with who owns it\nALSO HERE\nCustomer Portals\nbrowse every customer's portal page\nPortal Access\ninvite customers; work re-order requests\nLead Scorecard\nhow leads convert, by rep and source\nUnqualified Leads\nspam and no-fit enquiries\nShow the customer\nDesign Vault\nevery design we've ever made — search by name, number or customer\nShirt Designer\nput a logo on a shirt, send for approval\nPhoto Library\nevery finished-job photo; choose what customers see\nTumbler Mockup\nlogo on a Polar Camel, download approval\nSaved Mockups\nmockups you've built and sent\nTop Sellers\nbest-selling styles, most with a free sample\nReference\nSales & Office Procedures\nCustomer Notification SOP\nLTM Order Decision\nData Entry Rules\nShopWorks entry, live service codes\nPrice Audit (Feb 2026)\nfrozen study, 80 orders",
+  "events": {
+    "errors": [],
+    "writes": [],
+    "unknown": [],
+    "missing": [],
+    "providers": []
+  }
+}

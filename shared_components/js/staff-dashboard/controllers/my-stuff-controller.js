@@ -70,10 +70,10 @@ function toolFromLink(a) {
 function chipHtml(tool, pinned) {
     return `
         <span class="ms-chip${pinned ? ' ms-chip--pinned' : ''}">
-            <a href="${escapeHtml(tool.href)}" class="tool-btn ms-chip-link">
+            <a href="${escapeHtml(tool.href)}" class="tool-btn ms-chip-link btn">
                 <i class="${escapeHtml(safeIcon(tool.icon))}" aria-hidden="true"></i> ${escapeHtml(tool.label)}
             </a>
-            <button type="button" class="ms-star" data-action="mystuff:toggle-pin"
+            <button type="button" class="ms-star btn" data-action="mystuff:toggle-pin"
                     data-href="${escapeHtml(tool.href)}"
                     aria-label="${pinned ? `Unpin ${escapeHtml(tool.label)}` : `Pin ${escapeHtml(tool.label)}`}"
                     title="${pinned ? 'Unpin' : 'Pin — keeps it here forever'}">${pinned ? '★' : '☆'}</button>

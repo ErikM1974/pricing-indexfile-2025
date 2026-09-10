@@ -32,12 +32,6 @@ Historical deployment, token, builder, junction, server split and proxy-auth mig
 
 Exact-source CI must pass its actual browser/parity jobs, including credentials when required; local green is not CI green. Resolved runner/secret incidents are in LESSONS_LEARNED_ARCHIVE.md.
 
-## Calculator prerequisite failures must stop pricing (2026-09-07)
-- Problem: color/size failures were swallowed; the next pricing stage could hide the error or reuse another style's size data.
-- Root cause: empty error branches and catch blocks inside prerequisite loaders.
-- Solution: propagate errors to the product loader's existing error UI; clear size data before requesting it.
-- Prevention: calculator-api-errors.test.js covers HTTP, transport, malformed/empty responses and successful API data.
-
 ## Quote operations need caller and quote scope checks (2026-09-07)
 - Problem/root cause: bulk sync, tracking writes and change-log operations trusted their expected caller without authenticating it.
 - Solution: deploy credentials in proxy jobs/callbacks first; gate app operations with staff/shared-secret checks and authenticate loopback writes.
@@ -247,3 +241,14 @@ Mailing/Past Due follow-up: failed or incomplete lists must remain unknown throu
 Release-check follow-up (2026-09-10): update legacy integration expectations when a shared consumer adopts native dialogs, export/import failure-fixture constants explicitly, and give each local browser run exclusive ownership of its server. A reused server dies when its owning suite exits. Size CI from measured end-to-end duration while retaining short setup timeouts.
 
 Build-verification follow-up (2026-09-10): ESM bundle hashes can differ across Windows and Linux even when compiled code matches, because their linked source maps differ. Read the deployed asset manifest; verify compiled bodies after only source-map-reference/line-ending normalization, and validate every mapped source against the exact release commit. Do not treat a guessed local bundle filename404 as a broken live page.
+
+Calibration follow-up (2026-09-10): keep saved-layout failures visible while allowing copy-only review, bind late photos to the selected view, and hold editing during writes. Size the overlay as fractions of a shared photo frame: pixel offsets from screen layout drift when paper resizes the image. Check actual paper alignment as well as saved-coordinate equality; only use declared palette tokens and canonical field classes.
+
+Records Admin follow-up (2026-09-10): record original successful writes/CSV before changing controls; a saved session plus a failed item write is partial success, never complete. Retain load failure through filtering, hold pending actions and use saved data for status rollback. Native dialogs need explicit Tab containment. Give phone dates enough width and avoid shared heading aliases that hide print titles. Use split/join or a replacement callback for literal source rewrites: String.replace replacement strings interpret double dollar signs and can remove visible currency from template literals; original content locks catch this.
+
+Box-label follow-up (2026-09-10): a failed/new lookup must clear old printable data. Capture a draft key and serialized payload before a lookup changes state, flush it on pagehide, and warn if local storage fails. Hold the arrangement while refreshing/printing, scope Print anyway to its lookup, and reject incomplete refreshes. Repacking invalidates affected verification marks; provide a keyboard move for one-piece lines as well as multi-piece splits. Compare every paper page and original allocation, not only aggregate totals.
+
+### Staff home visibility and keyboard ownership (2026-09-10)
+- Problem/root cause: a display rule defeated Everything's hidden rows; welcome cleared inline display but retained hidden; Directory rendered an old search before clearing it, and a pending roster looked empty.
+- Solution: one scoped layout plus canonical hidden state, explicit welcome visibility, clear-before-filter ordering, and render open roster views when the read settles. Keep a separate library link outside summary, focusable directory scrolling and a real active descendant for palette selection.
+- Prevention: preserve original roles/links/values, distinguish loading/empty/failure, exercise reload/pins/disclosures and keyboard search at four widths. Historical UI fixtures still consume the legacy dashboard sheets; remove production links without breaking those fixtures.

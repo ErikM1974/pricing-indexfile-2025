@@ -1,0 +1,99 @@
+{
+  "states": [
+    {
+      "name": "saved-front",
+      "record": {
+        "StyleNumber": "PC54",
+        "ViewName": "flatFront",
+        "CatalogColor": "",
+        "XFrac": 0.28,
+        "YFrac": 0.22,
+        "WFrac": 0.38,
+        "HFrac": 0.38,
+        "ImageURL": "https://example.test/PC54-Black-front.svg",
+        "UpdatedBy": "calibration-tool"
+      }
+    },
+    {
+      "name": "auto-back",
+      "record": {
+        "StyleNumber": "PC54",
+        "ViewName": "flatBack",
+        "CatalogColor": "",
+        "XFrac": 0.22727,
+        "YFrac": 0.16955,
+        "WFrac": 0.54545,
+        "HFrac": 0.54545,
+        "ImageURL": "https://example.test/PC54-Black-back.svg",
+        "UpdatedBy": "calibration-tool"
+      }
+    },
+    {
+      "name": "navy-back",
+      "record": {
+        "StyleNumber": "PC54",
+        "ViewName": "flatBack",
+        "CatalogColor": "",
+        "XFrac": 0.22727,
+        "YFrac": 0.16955,
+        "WFrac": 0.54545,
+        "HFrac": 0.54545,
+        "ImageURL": "https://example.test/PC54-Navy-back.svg",
+        "UpdatedBy": "calibration-tool"
+      }
+    },
+    {
+      "name": "moved-color-only",
+      "record": {
+        "StyleNumber": "PC54",
+        "ViewName": "flatBack",
+        "CatalogColor": "Navy",
+        "XFrac": 0.27727,
+        "YFrac": 0.20955,
+        "WFrac": 0.54545,
+        "HFrac": 0.54545,
+        "ImageURL": "https://example.test/PC54-Navy-back.svg",
+        "UpdatedBy": "calibration-tool"
+      }
+    },
+    {
+      "name": "after-delete",
+      "record": {
+        "StyleNumber": "PC54",
+        "ViewName": "flatBack",
+        "CatalogColor": "Navy",
+        "XFrac": 0.22727,
+        "YFrac": 0.16955,
+        "WFrac": 0.54545,
+        "HFrac": 0.54545,
+        "ImageURL": "https://example.test/PC54-Navy-back.svg",
+        "UpdatedBy": "calibration-tool"
+      }
+    }
+  ],
+  "reads": [
+    "/api/dtg/top-sellers/styles",
+    "/api/dtg-calibration?refresh=1",
+    "/api/product-details?styleNumber=PC54",
+    "/api/dtg-calibration?refresh=1",
+    "/api/dtg-calibration?refresh=1"
+  ],
+  "events": {
+    "errors": [],
+    "writes": [
+      {
+        "path": "/api/dtg-calibration",
+        "method": "POST",
+        "body": "{\"StyleNumber\":\"PC54\",\"ViewName\":\"flatBack\",\"CatalogColor\":\"Navy\",\"XFrac\":0.27727,\"YFrac\":0.20955,\"WFrac\":0.54545,\"HFrac\":0.54545,\"ImageURL\":\"https://example.test/PC54-Navy-back.svg\",\"UpdatedBy\":\"calibration-tool\"}"
+      },
+      {
+        "path": "/api/dtg-calibration/4502",
+        "method": "DELETE",
+        "body": null
+      }
+    ],
+    "unknown": [],
+    "missing": [],
+    "providers": []
+  }
+}

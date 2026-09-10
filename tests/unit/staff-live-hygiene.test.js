@@ -39,7 +39,7 @@ const MOVED_STYLES = {
     'shared_components/js/elapsed-time-utils.js': 'shared_components/css/elapsed-time-utils.css',
     'shared_components/js/company-contact-picker.js': 'shared_components/css/company-contact-picker.css',
     'shared_components/js/toast-notifications.js': 'shared_components/css/toast-notifications.css',
-    'admin/js/universal-records-admin.js': 'admin/css/universal-records-admin-injected.css',
+    'admin/js/universal-records-admin.js': 'shared_components/css/staff-records.css',
     'shared_components/js/embroidery-quote-pricing.js': 'shared_components/css/embroidery-quote-pricing.css',
     'shared_components/js/quote-session.js': 'shared_components/css/quote-session.css',
     'shared_components/js/universal-pricing-grid.js': 'shared_components/css/universal-pricing-grid.css',

@@ -6,14 +6,15 @@
     <meta name="robots" content="noindex, nofollow">
     <title>Universal Records Admin Panel - Northwest Custom Apparel</title>
     <link rel="icon" href="/favicon.png" type="image/png">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     
     <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/admin/css/universal-records-admin.css?v=2026.09.07.19">
-    <link rel="stylesheet" href="/admin/css/universal-records-admin-injected.css?v=2026.09.07.18">
+    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.10.5">
+    <link rel="stylesheet" href="/shared_components/css/staff-records.css?v=2026.09.10.5">
 </head>
-<body>
+<body data-ui="unified" data-staff-tool="records" data-surface="staff">
+    <a class="records-skip" href="#recordsMain">Skip to quote records</a>
     <!-- Header -->
     <header class="header">
         <div class="header-container">
@@ -21,7 +22,7 @@
                 <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" 
                      alt="Northwest Custom Apparel" class="logo">
             </div>
-            <nav class="breadcrumb">
+            <nav class="breadcrumb" aria-label="Breadcrumb">
                 <a href="/staff-dashboard.html">Staff Dashboard</a>
                 <span>/</span>
                 <span>Universal Records Admin</span>
@@ -30,19 +31,19 @@
     </header>
 
     <!-- Main Content -->
-    <main class="container">
+    <main class="container" id="recordsMain" tabindex="-1">
         <!-- Page Header -->
-        <div class="page-header">
+        <div class="records-heading">
             <h1 class="page-title">Universal Records Admin Panel</h1>
-            <p class="page-description">Comprehensive view of all quotes, bonuses, and analytics across all calculator types</p>
+            <p class="page-description">Find, review and maintain quotes across all calculator types.</p>
         </div>
 
         <!-- Filters -->
         <div class="filters">
             <div class="filters-grid">
                 <div class="filter-group">
-                    <label class="filter-label">Quote Type</label>
-                    <select class="filter-control" id="quoteTypeFilter" aria-label="Quote type">
+                    <label class="filter-label" for="quoteTypeFilter">Quote Type</label>
+                    <select class="filter-control field-input" id="quoteTypeFilter" aria-label="Quote type">
                         <option value="">All Types</option>
                         <option value="DTG">DTG Contract</option>
                         <option value="RICH">Richardson Caps</option>
@@ -57,8 +58,8 @@
                 </div>
 
                 <div class="filter-group">
-                    <label class="filter-label">Status</label>
-                    <select class="filter-control" id="statusFilter" aria-label="Status">
+                    <label class="filter-label" for="statusFilter">Status</label>
+                    <select class="filter-control field-input" id="statusFilter" aria-label="Status">
                         <option value="">All Statuses</option>
                         <option value="Open">Open</option>
                         <option value="Sent">Sent</option>
@@ -68,23 +69,23 @@
                 </div>
 
                 <div class="filter-group">
-                    <label class="filter-label">Date From</label>
-                    <input type="date" class="filter-control" id="dateFromFilter" aria-label="From date">
+                    <label class="filter-label" for="dateFromFilter">Date From</label>
+                    <input type="date" class="filter-control field-input" id="dateFromFilter" aria-label="From date">
                 </div>
 
                 <div class="filter-group">
-                    <label class="filter-label">Date To</label>
-                    <input type="date" class="filter-control" id="dateToFilter" aria-label="To date">
+                    <label class="filter-label" for="dateToFilter">Date To</label>
+                    <input type="date" class="filter-control field-input" id="dateToFilter" aria-label="To date">
                 </div>
 
                 <div class="filter-group">
-                    <label class="filter-label">Customer</label>
-                    <input type="text" class="filter-control" id="customerFilter" aria-label="Customer" placeholder="Search by name or email">
+                    <label class="filter-label" for="customerFilter">Customer</label>
+                    <input type="text" class="filter-control field-input" id="customerFilter" aria-label="Customer" placeholder="Search by name or email">
                 </div>
 
                 <div class="filter-group">
-                    <label class="filter-label">Min Amount</label>
-                    <input type="number" class="filter-control" id="minAmountFilter" aria-label="Minimum amount" placeholder="$0.00">
+                    <label class="filter-label" for="minAmountFilter">Min Amount</label>
+                    <input type="number" class="filter-control field-input" id="minAmountFilter" aria-label="Minimum amount" placeholder="$0.00">
                 </div>
             </div>
 
@@ -108,25 +109,27 @@
             </div>
         </div>
 
+        <div id="recordsFeedback" class="records-feedback" role="status" aria-live="polite" hidden></div>
+
         <!-- Records Table -->
         <div class="table-container">
             <div class="table-header">
                 <h2 class="table-title">All Quote Records</h2>
-                <div class="pagination-info" id="recordsCount">Loading...</div>
+                <div class="pagination-info" id="recordsCount" aria-live="polite">Loading...</div>
             </div>
             
             <div class="table-wrapper">
-                <table class="records-table">
+                <table class="records-table" aria-label="Quote records">
                     <thead>
                         <tr>
-                            <th>Quote ID</th>
-                            <th>Type</th>
-                            <th>Customer</th>
-                            <th>Company</th>
-                            <th>Total</th>
-                            <th>Status</th>
-                            <th>Created</th>
-                            <th>Actions</th>
+                            <th scope="col">Quote ID</th>
+                            <th scope="col">Type</th>
+                            <th scope="col">Customer</th>
+                            <th scope="col">Company</th>
+                            <th scope="col">Total</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Created</th>
+                            <th scope="col">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="recordsTableBody">
@@ -142,12 +145,12 @@
 
             <div class="pagination" id="pagination">
                 <div class="pagination-info" id="paginationInfo">Loading...</div>
-                <button class="pagination-btn" id="prevBtn" data-call="changePage" data-args='["prev"]' disabled>
+                <button class="btn btn-secondary pagination-btn" id="prevBtn" data-call="changePage" data-args='["prev"]' disabled>
                     <i class="fas fa-chevron-left" aria-hidden="true"></i>
                     Previous
                 </button>
                 <div id="pageNumbers"></div>
-                <button class="pagination-btn" id="nextBtn" data-call="changePage" data-args='["next"]' disabled>
+                <button class="btn btn-secondary pagination-btn" id="nextBtn" data-call="changePage" data-args='["next"]' disabled>
                     Next
                     <i class="fas fa-chevron-right" aria-hidden="true"></i>
                 </button>
@@ -156,6 +159,6 @@
     </main>
 
     <script src="/shared_components/js/data-call-delegator.js?v=2026.09.06.27"></script>
-    <script src="/admin/js/universal-records-admin.js?v=2026.09.06.27"></script>
+    <script src="/admin/js/universal-records-admin.js?v=2026.09.10.5"></script>
 </body>
 </html>

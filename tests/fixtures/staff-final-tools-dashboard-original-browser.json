@@ -1,0 +1,1199 @@
+{
+  "initial": {
+    "active": "sales",
+    "tabs": [
+      {
+        "id": "sales",
+        "text": "Sales",
+        "selected": "true"
+      },
+      {
+        "id": "production",
+        "text": "Production",
+        "selected": "false"
+      },
+      {
+        "id": "art",
+        "text": "Art",
+        "selected": "false"
+      },
+      {
+        "id": "office",
+        "text": "Office",
+        "selected": "false"
+      },
+      {
+        "id": "company",
+        "text": "Company",
+        "selected": "false"
+      },
+      {
+        "id": "everything",
+        "text": "Everything can't find it? it's here",
+        "selected": "false"
+      },
+      {
+        "id": "admin",
+        "text": "Admin",
+        "selected": "false"
+      }
+    ],
+    "goal": [
+      {
+        "id": "goalCurrent",
+        "text": "$1,300,000"
+      },
+      {
+        "id": "goalPercent",
+        "text": "33"
+      },
+      {
+        "id": "goalOf",
+        "text": "$4M"
+      }
+    ],
+    "counts": [
+      {
+        "id": "teamActiveCount",
+        "text": "3"
+      },
+      {
+        "id": "teamBdayCount",
+        "text": "2"
+      },
+      {
+        "id": "teamAnnivCount",
+        "text": "2"
+      }
+    ],
+    "links": [
+      {
+        "href": "/ae-dashboard.html",
+        "text": "AE Art Requestsend art to Steve, approve the proofs that come back"
+      },
+      {
+        "href": "/calculators/purchasingform.html",
+        "text": "Purchase Request · Bradleyask Bradley to buy blanks or supplies for a work order"
+      },
+      {
+        "href": "#",
+        "text": "Continue"
+      },
+      {
+        "href": "/calculators/quick-quote/",
+        "text": "Quick Quoteany style fast, or a multi-style price sheet"
+      },
+      {
+        "href": "/dashboards/quote-management.html",
+        "text": "Saved Quotesfind, track and sync every saved quote"
+      },
+      {
+        "href": "/quote-builders/embroidery-quote-builder.html",
+        "text": "Embroidery Quotegarments, caps, 3D puff, patches"
+      },
+      {
+        "href": "/quote-builders/dtg-quote-builder.html",
+        "text": "DTG Quotefull-color prints on garments"
+      },
+      {
+        "href": "/quote-builders/screenprint-quote-builder.html",
+        "text": "Screen Print Quotescreens, colors, safety stripes"
+      },
+      {
+        "href": "/quote-builders/dtf-quote-builder.html",
+        "text": "DTF Quoteheat-applied transfers"
+      },
+      {
+        "href": "/calculators/manual-pricing.html",
+        "text": "$Price From Costtype any blank's cost, get our price for all five methods"
+      },
+      {
+        "href": "/calculators/service-price-cheat-sheet.html",
+        "text": "Shop MenuEst. 1977 · every service price"
+      },
+      {
+        "href": "/calculators/embroidery-pricing-all/?tab=al-retail",
+        "text": "Extra Logo2nd or 3rd logo on a garment we supply"
+      },
+      {
+        "href": "/calculators/embroidery-pricing-all/?tab=stitch-charges",
+        "text": "Big Stitch Countsadd-on over 10,000 stitches"
+      },
+      {
+        "href": "/calculators/embroidery-pricing-all/?tab=fullback",
+        "text": "Full-Back Embroideryjacket backs, 25K+ designs"
+      },
+      {
+        "href": "/calculators/embroidery-pricing-all/?tab=decg-retail",
+        "text": "Customer's Garmentembroidery labor on blanks they bring"
+      },
+      {
+        "href": "/calculators/screenprint-customer/",
+        "text": "Print on Their Shirtsscreen-print labor on blanks they bring"
+      },
+      {
+        "href": "/calculators/embroidery-contract/",
+        "text": "CContract Embroidery 2026.wholesale rates for decorators who bring blanks"
+      },
+      {
+        "href": "/calculators/dtg-contract/",
+        "text": "CContract DTG 2026.wholesale DTG on partners' own blanks"
+      },
+      {
+        "href": "/calculators/embroidered-emblem/",
+        "text": "Patch Quote (AI)sew-on patches, 25-pc min, 4–6 wks"
+      },
+      {
+        "href": "/calculators/laser-tumbler-polarcamel.html",
+        "text": "Engraved DrinkwarePolar Camel tumblers: color, stock, price"
+      },
+      {
+        "href": "/calculators/custom-decal-pricing.html",
+        "text": "Odd-Size Decalsover 6×6, odd shapes, under 50 pcsstaff"
+      },
+      {
+        "href": "/calculators/webstores.html",
+        "text": "Company Webstoresquote a branded store or fundraiser"
+      },
+      {
+        "href": "/calculators/richardson-2025.html",
+        "text": "Richardson Directfactory-direct caps, and the 23 to buy via SanMar"
+      },
+      {
+        "href": "/custom-tees",
+        "text": "Tees Storefrontthe public tee shop — 20 styles, checkout"
+      },
+      {
+        "href": "/custom-stickers",
+        "text": "Sticker Pricesevery 2×2–6×6 price, 50+ pieces"
+      },
+      {
+        "href": "/custom-banners",
+        "text": "Banner Pricesany size, priced by the square foot"
+      },
+      {
+        "href": "/dashboards/ae-mission-control.html",
+        "text": "Mission Controlyour bonus, your goals, and everything waiting on you today"
+      },
+      {
+        "href": "/dashboards/leads.html",
+        "text": "Leadsevery website, phone and walk-in enquiry, with who owns it"
+      },
+      {
+        "href": "/dashboards/portal-directory.html",
+        "text": "Customer Portalsbrowse every customer's portal page"
+      },
+      {
+        "href": "/dashboards/customer-portal-admin.html",
+        "text": "Portal Accessinvite customers; work re-order requests"
+      },
+      {
+        "href": "/dashboards/lead-scorecard.html",
+        "text": "Lead Scorecardhow leads convert, by rep and source"
+      },
+      {
+        "href": "/dashboards/unqualified-leads.html",
+        "text": "Unqualified Leadsspam and no-fit enquiries"
+      },
+      {
+        "href": "/dashboards/design-gallery.html",
+        "text": "Design Vaultevery design we've ever made — search by name, number or customer"
+      },
+      {
+        "href": "/pages/garment-designer.html",
+        "text": "Shirt Designerput a logo on a shirt, send for approval"
+      },
+      {
+        "href": "/dashboards/finished-photos-library.html",
+        "text": "Photo Libraryevery finished-job photo; choose what customers see"
+      },
+      {
+        "href": "/pages/jds-mockup-creator.html",
+        "text": "Tumbler Mockuplogo on a Polar Camel, download approval"
+      },
+      {
+        "href": "/pages/mockup-library.html",
+        "text": "Saved Mockupsmockups you've built and sent"
+      },
+      {
+        "href": "/catalog?topSellers=1",
+        "text": "Top Sellersbest-selling styles, most with a free sample"
+      },
+      {
+        "href": "/pages/policy-detail.html?id=sales-office-procedures",
+        "text": "Sales & Office Procedures"
+      },
+      {
+        "href": "/pages/policy-detail.html?id=customer-notification-sop",
+        "text": "Customer Notification SOP"
+      },
+      {
+        "href": "/pages/policy-detail.html?id=ltm-order-decision-algorithm",
+        "text": "LTM Order Decision"
+      },
+      {
+        "href": "/pages/data-entry-guide.html",
+        "text": "Data Entry RulesShopWorks entry, live service codes"
+      },
+      {
+        "href": "/dashboards/reports/price-audit-report.html",
+        "text": "Price Audit (Feb 2026)frozen study, 80 orders"
+      },
+      {
+        "href": "/dashboards/art-hub-ruth.html",
+        "text": "Mockup Queue · Ruthiemockup requests in progress, completed, and on hold"
+      },
+      {
+        "href": "/dashboards/monogram-dashboard.html",
+        "text": "Monogram Ordersevery order and its names, printable proof"
+      },
+      {
+        "href": "/dashboards/names-numbers-dashboard.html",
+        "text": "Names & Numbersteam rosters: name, number, size"
+      },
+      {
+        "href": "/dashboards/past-due-orders.html",
+        "text": "Past Due Orderswhat each late order is waiting on"
+      },
+      {
+        "href": "/dashboards/production-shifts.html",
+        "text": "Shift Schedulewho works when; break and lunch rules"
+      },
+      {
+        "href": "/dashboards/quote-management.html?open=inbound-today",
+        "text": "SanMar Inbound Calendartoday's SanMar boxes, line by line, with labels to print"
+      },
+      {
+        "href": "/pages/box-labels.html",
+        "text": "Box Labelslook up a PO, sort into boxes, print"
+      },
+      {
+        "href": "/dashboards/purchasing-portal.html",
+        "text": "Purchase Trackingwhere every blanks request stands"
+      },
+      {
+        "href": "/calculators/purchasingform.html",
+        "text": "Purchase Request· Bradleythe form that asks Bradley to buy blanks or supplies for a WO"
+      },
+      {
+        "href": "/dashboards/roland-printer-supplies.html",
+        "text": "Roland Suppliesink and parts for the Roland — goes to Erik"
+      },
+      {
+        "href": "/dashboards/bradley-transfers.html",
+        "text": "Transfer Queue · Bradleyheat transfers waiting to be ordered, rush flagged"
+      },
+      {
+        "href": "/dashboards/supacolor-orders.html",
+        "text": "Supacolor Jobslive status at Supacolor, updated every 10 minutes"
+      },
+      {
+        "href": "/training/shipping-receiving-guide.html",
+        "text": "Dock Guidereceiving, shipping, pickups, close-day"
+      },
+      {
+        "href": "/training/sanmar-purchasing-guide.html",
+        "text": "SanMar Purchasingorder blanks through ShopWorks"
+      },
+      {
+        "href": "/pages/data-entry-guide.html",
+        "text": "Data Entry Rules"
+      },
+      {
+        "href": "/dashboards/finished-photos.html",
+        "text": "Photo Capturescan the work order, shoot the piece, publish — works on your phone"
+      },
+      {
+        "href": "/pages/dst-viewer.html",
+        "text": "DST Studiostitch viewer · true-scale mockup · approval sheet"
+      },
+      {
+        "href": "/dashboards/design-gallery.html",
+        "text": "Design Vaultsearch every design, any source"
+      },
+      {
+        "href": "/dashboards/digitized-designs.html",
+        "text": "Digitized Designsmaster list, with extra-logo prices"
+      },
+      {
+        "href": "/dashboards/finished-photos-library.html",
+        "text": "Photo Librarybrowse and publish finished photos"
+      },
+      {
+        "href": "/dashboards/old-designs.html",
+        "text": "Old Designsthe legacy Megafile archive"
+      },
+      {
+        "href": "/dashboards/art-hub-steve.html",
+        "text": "Art Queue · Steveincoming art requests, and sending finished art to Bradley"
+      },
+      {
+        "href": "/dashboards/art-hub-ruth.html",
+        "text": "Mockup Queue · Ruthiemockup requests in progress, completed, and on hold"
+      },
+      {
+        "href": "/ae-dashboard.html",
+        "text": "AE Art Requestwhat the reps submit and approve"
+      },
+      {
+        "href": "/dashboards/design-queue.html",
+        "text": "Design Queuedesigns waiting on a decision"
+      },
+      {
+        "href": "/dashboards/gear-publisher.html",
+        "text": "253gear Publisherpush a design to the 253gear store"
+      },
+      {
+        "href": "/pages/dst-viewer.html",
+        "text": "DST Studiostitch viewer · true-scale mockup · approval sheet"
+      },
+      {
+        "href": "/dashboards/design-gallery.html",
+        "text": "Design Vaultevery design we've ever made, one search"
+      },
+      {
+        "href": "/pages/garment-designer.html",
+        "text": "Shirt Designerlogo on a shirt, front/back, spin, proof"
+      },
+      {
+        "href": "/pages/jds-mockup-creator.html",
+        "text": "Tumbler MockupPolar Camel color + logo, approval image"
+      },
+      {
+        "href": "/pages/mockup-library.html",
+        "text": "Saved Mockups"
+      },
+      {
+        "href": "/dashboards/digitized-designs.html",
+        "text": "Digitized Designsmaster list, with extra-logo prices"
+      },
+      {
+        "href": "/dashboards/old-designs.html",
+        "text": "Old Designsthe legacy Megafile archive"
+      },
+      {
+        "href": "/dashboards/finished-photos.html",
+        "text": "Photo Captureshoot the finished piece, publish it"
+      },
+      {
+        "href": "/dashboards/finished-photos-library.html",
+        "text": "Photo Librarybrowse and publish finished photos"
+      },
+      {
+        "href": "/dashboards/monogram-dashboard.html",
+        "text": "Monogram Orders"
+      },
+      {
+        "href": "/dashboards/names-numbers-dashboard.html",
+        "text": "Names & Numbers"
+      },
+      {
+        "href": "/dashboards/bradley-transfers.html",
+        "text": "Transfer Queue· Bradleysend files for Supacolor"
+      },
+      {
+        "href": "/dashboards/bradley-transfers.html",
+        "text": "Transfer Queuestep 1 · what to order"
+      },
+      {
+        "href": "/dashboards/supacolor-orders.html",
+        "text": "Supacolor Jobsstep 2 · where it is"
+      },
+      {
+        "href": "/dashboards/purchasing-portal.html",
+        "text": "Purchase Trackingevery blanks request: sent → ordered → received → shipped"
+      },
+      {
+        "href": "/dashboards/quote-management.html?open=inbound-today",
+        "text": "SanMar Inbound Calendarincoming boxes by day, box labels, PDF"
+      },
+      {
+        "href": "/calculators/purchasingform.html",
+        "text": "Purchase Request· Bradleythe form reps fill in to ask Bradley for blanks"
+      },
+      {
+        "href": "/dashboards/roland-printer-supplies.html",
+        "text": "Roland Supplies"
+      },
+      {
+        "href": "/pages/box-labels.html",
+        "text": "Box Labels"
+      },
+      {
+        "href": "/dashboards/product-manager.html",
+        "text": "Non-SanMar Itemscatalog products we don't buy from SanMar"
+      },
+      {
+        "href": "/calculators/richardson-2025.html",
+        "text": "Richardson Directand the 23 styles to buy via SanMar"
+      },
+      {
+        "href": "/dashboards/quote-management.html",
+        "text": "Saved Quotesfind, track and sync every saved quote"
+      },
+      {
+        "href": "/dashboards/leads.html",
+        "text": "Leadsevery enquiry, with who owns it"
+      },
+      {
+        "href": "/dashboards/portal-directory.html",
+        "text": "Customer Portalsbrowse every customer's portal page"
+      },
+      {
+        "href": "/dashboards/customer-portal-admin.html",
+        "text": "Portal Accessinvites, rewards, re-order requests"
+      },
+      {
+        "href": "/dashboards/jim-mailing-list.html",
+        "text": "Prospect Mailing List· Jimbig-type add, edit, search"
+      },
+      {
+        "href": "/dashboards/form-submissions.html",
+        "text": "Forms Inboxsubmitted forms, samples-out tracker"
+      },
+      {
+        "href": "/custom-tees",
+        "text": "Tees Storefrontthe public tee shop customers buy from"
+      },
+      {
+        "href": "/custom-stickers",
+        "text": "Sticker Pricesevery 2×2–6×6 price"
+      },
+      {
+        "href": "/custom-banners",
+        "text": "Banner Pricesany size, by the square foot"
+      },
+      {
+        "href": "/calculators/webstores.html",
+        "text": "Company Webstoresquote a store or fundraiser"
+      },
+      {
+        "href": "/catalog?topSellers=1",
+        "text": "Top Sellers"
+      },
+      {
+        "href": "/pages/policies-hub.html",
+        "text": "Policies Hubevery company policy and SOP, searchable, always current"
+      },
+      {
+        "href": "/pages/policy-detail.html?id=sales-office-procedures",
+        "text": "Sales & Office Procedures"
+      },
+      {
+        "href": "/pages/policy-detail.html?id=customer-notification-sop",
+        "text": "Customer Notification SOP"
+      },
+      {
+        "href": "/pages/policy-detail.html?id=ltm-order-decision-algorithm",
+        "text": "LTM Order Decision"
+      },
+      {
+        "href": "/pages/policy-detail.html?id=org-chart-2026",
+        "text": "Org Chart 2026interactive, with member search"
+      },
+      {
+        "href": "/training/index.html",
+        "text": "Training Centerevery guide by role"
+      },
+      {
+        "href": "/pages/data-entry-guide.html",
+        "text": "Data Entry RulesShopWorks entry, live codes"
+      },
+      {
+        "href": "/training/customer-service.html",
+        "text": "Customer Service Manual"
+      },
+      {
+        "href": "/training/sales-coordinator-manual.html",
+        "text": "Sales Coordinator Bookchapter by chapter"
+      },
+      {
+        "href": "/training/shipping-receiving-guide.html",
+        "text": "Dock Guiderun the dock, with checklists"
+      },
+      {
+        "href": "/training/sanmar-purchasing-guide.html",
+        "text": "SanMar Purchasingthree phases, with videos"
+      },
+      {
+        "href": "/training/quick-reference-tips.html",
+        "text": "Tips Archiveevery quick-hitter tip"
+      },
+      {
+        "href": "/training/training-games-hub.html",
+        "text": "Training Games"
+      },
+      {
+        "href": "/dashboards/forms-library.html",
+        "text": "Forms Libraryprintable and fillable, by category"
+      },
+      {
+        "href": "/dashboards/form-submissions.html",
+        "text": "Forms Inboxsubmissions, samples-out tracker"
+      },
+      {
+        "href": "/DrainPro-Bundle.html",
+        "text": "Drain-Pro Bundletheir staff pick sizes here"
+      },
+      {
+        "href": "/streich-bros-bundle.html",
+        "text": "Streich Bros Bundle"
+      },
+      {
+        "href": "/wcttr-bundle.html",
+        "text": "WCTTR Bundle"
+      },
+      {
+        "href": "/christmas-bundles.html",
+        "text": "Christmas Gift Boxesseasonal Carhartt gift-box builder"
+      },
+      {
+        "href": "/dashboards/production-shifts.html",
+        "text": "Shift Schedulewho works when, break rules"
+      },
+      {
+        "href": "https://inksoft-transform-8a3dc4e38097.herokuapp.com/",
+        "text": "InkSoft Transform↗InkSoft → ShopWorks; full bonus dashboard"
+      },
+      {
+        "href": "/dashboards/gear-publisher.html",
+        "text": "253gear Publisherpush a design to the 253gear store"
+      },
+      {
+        "href": "/ae-dashboard.html",
+        "text": "AE Art Requestsend art to Steve, approve the proofs that come back"
+      },
+      {
+        "href": "/dashboards/art-hub-steve.html",
+        "text": "Art Queueincoming art requests, and sending finished art to Bradley"
+      },
+      {
+        "href": "/dashboards/design-queue.html",
+        "text": "Design Queuedesigns waiting on a decision"
+      },
+      {
+        "href": "/dashboards/design-gallery.html",
+        "text": "Design Vaultevery design we've ever made — search by name, number or customer"
+      },
+      {
+        "href": "/dashboards/digitized-designs.html",
+        "text": "Digitized Designsmaster list, with extra-logo prices"
+      },
+      {
+        "href": "/pages/dst-viewer.html",
+        "text": "DST Studiostitch viewer · true-scale mockup · approval sheet"
+      },
+      {
+        "href": "/dashboards/old-designs.html",
+        "text": "Old Designsthe legacy Megafile archive"
+      },
+      {
+        "href": "/dashboards/finished-photos.html",
+        "text": "Photo Capturescan the work order, shoot the piece, publish — works on your phone"
+      },
+      {
+        "href": "/dashboards/finished-photos-library.html",
+        "text": "Photo Libraryevery finished-job photo; choose what customers see"
+      },
+      {
+        "href": "/pages/mockup-library.html",
+        "text": "Saved Mockupsmockups you've built and sent"
+      },
+      {
+        "href": "/pages/garment-designer.html",
+        "text": "Shirt Designerput a logo on a shirt, send for approval"
+      },
+      {
+        "href": "/catalog?topSellers=1",
+        "text": "Top Sellersbest-selling styles, most with a free sample"
+      },
+      {
+        "href": "/pages/jds-mockup-creator.html",
+        "text": "Tumbler Mockuplogo on a Polar Camel, download approval"
+      },
+      {
+        "href": "/calculators/purchasingform.html",
+        "text": "Purchase Requestask Bradley to buy blanks or supplies for a work order"
+      },
+      {
+        "href": "/quote-builders/dtf-quote-builder.html",
+        "text": "DTF Quoteheat-applied transfers"
+      },
+      {
+        "href": "/quote-builders/dtg-quote-builder.html",
+        "text": "DTG Quotefull-color prints on garments"
+      },
+      {
+        "href": "/quote-builders/embroidery-quote-builder.html",
+        "text": "Embroidery Quotegarments, caps, 3D puff, patches"
+      },
+      {
+        "href": "/calculators/quick-quote/",
+        "text": "Quick Quoteany style fast, or a multi-style price sheet"
+      },
+      {
+        "href": "/dashboards/quote-management.html",
+        "text": "Saved Quotesfind, track and sync every saved quote"
+      },
+      {
+        "href": "/quote-builders/screenprint-quote-builder.html",
+        "text": "Screen Print Quotescreens, colors, safety stripes"
+      },
+      {
+        "href": "/custom-banners",
+        "text": "Banner Pricesany size, priced by the square foot"
+      },
+      {
+        "href": "/calculators/embroidery-pricing-all/?tab=stitch-charges",
+        "text": "Big Stitch Countsadd-on over 10,000 stitches"
+      },
+      {
+        "href": "/calculators/webstores.html",
+        "text": "Company Webstoresquote a branded store or fundraiser"
+      },
+      {
+        "href": "/calculators/dtg-contract/",
+        "text": "Contract DTGwholesale DTG on partners' own blanks"
+      },
+      {
+        "href": "/calculators/embroidery-contract/",
+        "text": "Contract Embroiderywholesale rates for decorators who bring blanks"
+      },
+      {
+        "href": "/calculators/embroidery-pricing-all/?tab=decg-retail",
+        "text": "Customer's Garmentembroidery labor on blanks they bring"
+      },
+      {
+        "href": "/calculators/laser-tumbler-polarcamel.html",
+        "text": "Engraved DrinkwarePolar Camel tumblers: color, stock, price"
+      },
+      {
+        "href": "/calculators/embroidery-pricing-all/?tab=al-retail",
+        "text": "Extra Logo2nd or 3rd logo on a garment we supply"
+      },
+      {
+        "href": "/calculators/embroidery-pricing-all/?tab=fullback",
+        "text": "Full-Back Embroideryjacket backs, 25K+ designs"
+      },
+      {
+        "href": "/calculators/custom-decal-pricing.html",
+        "text": "Odd-Size Decalsover 6×6, odd shapes, under 50 pcs"
+      },
+      {
+        "href": "/calculators/embroidered-emblem/",
+        "text": "Patch Quote (AI)sew-on patches, 25-pc min, 4–6 wks"
+      },
+      {
+        "href": "/calculators/manual-pricing.html",
+        "text": "Price From Costtype any blank's cost, get our price for all five methods"
+      },
+      {
+        "href": "/calculators/screenprint-customer/",
+        "text": "Print on Their Shirtsscreen-print labor on blanks they bring"
+      },
+      {
+        "href": "/calculators/richardson-2025.html",
+        "text": "Richardson Directfactory-direct caps, and the 23 to buy via SanMar"
+      },
+      {
+        "href": "/calculators/service-price-cheat-sheet.html",
+        "text": "Shop MenuEst. 1977 · every service price"
+      },
+      {
+        "href": "/custom-stickers",
+        "text": "Sticker Pricesevery 2×2–6×6 price, 50+ pieces"
+      },
+      {
+        "href": "/custom-tees",
+        "text": "Tees Storefrontthe public tee shop — 20 styles, checkout"
+      },
+      {
+        "href": "/dashboards/portal-directory.html",
+        "text": "Customer Portalsbrowse every customer's portal page"
+      },
+      {
+        "href": "/dashboards/form-submissions.html",
+        "text": "Forms Inboxsubmitted forms, samples-out tracker"
+      },
+      {
+        "href": "/dashboards/lead-scorecard.html",
+        "text": "Lead Scorecardhow leads convert, by rep and source"
+      },
+      {
+        "href": "/dashboards/leads.html",
+        "text": "Leadsevery website, phone and walk-in enquiry, with who owns it"
+      },
+      {
+        "href": "/dashboards/ae-mission-control.html",
+        "text": "Mission Controlyour bonus, your goals, and everything waiting on you today"
+      },
+      {
+        "href": "/dashboards/customer-portal-admin.html",
+        "text": "Portal Accessinvite customers; work re-order requests"
+      },
+      {
+        "href": "/dashboards/jim-mailing-list.html",
+        "text": "Prospect Mailing Listbig-type add, edit, search"
+      },
+      {
+        "href": "/dashboards/unqualified-leads.html",
+        "text": "Unqualified Leadsspam and no-fit enquiries"
+      },
+      {
+        "href": "/pages/policy-detail.html?id=customer-notification-sop",
+        "text": "Customer Notification SOP"
+      },
+      {
+        "href": "/pages/data-entry-guide.html",
+        "text": "Data Entry RulesShopWorks entry, live service codes"
+      },
+      {
+        "href": "/pages/policy-detail.html?id=ltm-order-decision-algorithm",
+        "text": "LTM Order Decision"
+      },
+      {
+        "href": "/pages/policy-detail.html?id=org-chart-2026",
+        "text": "Org Chart 2026interactive, with member search"
+      },
+      {
+        "href": "/pages/policies-hub.html",
+        "text": "Policies Hubevery company policy and SOP, searchable, always current"
+      },
+      {
+        "href": "/dashboards/reports/price-audit-report.html",
+        "text": "Price Audit (Feb 2026)frozen study, 80 orders"
+      },
+      {
+        "href": "/pages/policy-detail.html?id=sales-office-procedures",
+        "text": "Sales & Office Procedures"
+      },
+      {
+        "href": "/pages/box-labels.html",
+        "text": "Box Labelslook up a PO, sort into boxes, print"
+      },
+      {
+        "href": "/training/shipping-receiving-guide.html",
+        "text": "Dock Guidereceiving, shipping, pickups, close-day"
+      },
+      {
+        "href": "/dashboards/art-hub-ruth.html",
+        "text": "Mockup Queuemockup requests in progress, completed, and on hold"
+      },
+      {
+        "href": "/dashboards/monogram-dashboard.html",
+        "text": "Monogram Ordersevery order and its names, printable proof"
+      },
+      {
+        "href": "/dashboards/names-numbers-dashboard.html",
+        "text": "Names & Numbersteam rosters: name, number, size"
+      },
+      {
+        "href": "/dashboards/product-manager.html",
+        "text": "Non-SanMar Itemscatalog products we don't buy from SanMar"
+      },
+      {
+        "href": "/dashboards/past-due-orders.html",
+        "text": "Past Due Orderswhat each late order is waiting on"
+      },
+      {
+        "href": "/dashboards/purchasing-portal.html",
+        "text": "Purchase Trackingwhere every blanks request stands"
+      },
+      {
+        "href": "/dashboards/roland-printer-supplies.html",
+        "text": "Roland Suppliesink and parts for the Roland — goes to Erik"
+      },
+      {
+        "href": "/dashboards/quote-management.html?open=inbound-today",
+        "text": "SanMar Inbound Calendartoday's SanMar boxes, line by line, with labels to print"
+      },
+      {
+        "href": "/training/sanmar-purchasing-guide.html",
+        "text": "SanMar Purchasingorder blanks through ShopWorks"
+      },
+      {
+        "href": "/dashboards/production-shifts.html",
+        "text": "Shift Schedulewho works when; break and lunch rules"
+      },
+      {
+        "href": "/dashboards/supacolor-orders.html",
+        "text": "Supacolor Jobslive status at Supacolor, updated every 10 minutes"
+      },
+      {
+        "href": "/dashboards/bradley-transfers.html",
+        "text": "Transfer Queueheat transfers waiting to be ordered, rush flagged"
+      },
+      {
+        "href": "/training/customer-service.html",
+        "text": "Customer Service Manual"
+      },
+      {
+        "href": "/training/sales-coordinator-manual.html",
+        "text": "Sales Coordinator Bookchapter by chapter"
+      },
+      {
+        "href": "/training/quick-reference-tips.html",
+        "text": "Tips Archiveevery quick-hitter tip"
+      },
+      {
+        "href": "/training/index.html",
+        "text": "Training Centerevery guide by role"
+      },
+      {
+        "href": "/training/training-games-hub.html",
+        "text": "Training Games"
+      },
+      {
+        "href": "/dashboards/forms-library.html",
+        "text": "Forms Libraryprintable and fillable, by category"
+      },
+      {
+        "href": "/christmas-bundles.html",
+        "text": "Christmas Gift Boxesseasonal Carhartt gift-box builder"
+      },
+      {
+        "href": "/DrainPro-Bundle.html",
+        "text": "Drain-Pro Bundletheir staff pick sizes here"
+      },
+      {
+        "href": "/streich-bros-bundle.html",
+        "text": "Streich Bros Bundle"
+      },
+      {
+        "href": "/wcttr-bundle.html",
+        "text": "WCTTR Bundle"
+      },
+      {
+        "href": "https://inksoft-transform-8a3dc4e38097.herokuapp.com/",
+        "text": "InkSoft TransformInkSoft → ShopWorks; full bonus dashboard"
+      },
+      {
+        "href": "/dashboards/sanmar-payables.html",
+        "text": "SanMar Payablesopen invoices, CSV, marketing fund"
+      },
+      {
+        "href": "/dashboards/payroll.html",
+        "text": "Payrollvacation hours, packet upload"
+      },
+      {
+        "href": "/dashboards/commission-structure.html",
+        "text": "Store Commissions"
+      },
+      {
+        "href": "/dashboards/volume-quote.html",
+        "text": "Volume Quoteone-time price for 72+ orders"
+      },
+      {
+        "href": "/dashboards/blog-editor.html",
+        "text": "Blog Editorwrite and publish posts"
+      },
+      {
+        "href": "/dashboards/seo-strategy.html",
+        "text": "SEO Strategy"
+      },
+      {
+        "href": "/dashboards/brand-standards.html",
+        "text": "Brand Standardscolours, type and spacing every page follows, read live from the token file"
+      },
+      {
+        "href": "/dashboards/access-admin.html",
+        "text": "Access Adminroles and page access"
+      },
+      {
+        "href": "/dashboards/policy-migration.html",
+        "text": "Policy Migration"
+      },
+      {
+        "href": "/dashboards/drive-access.html",
+        "text": "Drive Accesswho sees which network drive"
+      },
+      {
+        "href": "/dashboards/bandit-integration.html",
+        "text": "Bandit Integrationsync tasks and agents"
+      },
+      {
+        "href": "/dashboards/sanmar-ftp-integration.html",
+        "text": "SanMar Downloads"
+      },
+      {
+        "href": "/dashboards/sanmar-shopworks-converter.html",
+        "text": "Parts ConverterSanMar list → ShopWorks parts"
+      },
+      {
+        "href": "/sanmar-vendor-portal.html",
+        "text": "Vendor Invoiceslegacy Caspio portal"
+      },
+      {
+        "href": "/universal-records-admin.html",
+        "text": "Records Admin"
+      },
+      {
+        "href": "/tools/custom-tees-calibrate.html",
+        "text": "Print-Box Calibrationwhere art prints on each tee"
+      },
+      {
+        "href": "/dashboards/company-numbers.html",
+        "text": "Company Numbersrevenue, team YTD, Q3 push, payments, turnaround estimates"
+      },
+      {
+        "href": "/dashboards/pricing-analysis.html",
+        "text": "Pricing Analysiscost, margin, realization"
+      },
+      {
+        "href": "/dashboards/contract-break-even.html",
+        "text": "Contract Break-Even"
+      },
+      {
+        "href": "/dashboards/api-usage.html",
+        "text": "API UsageCaspio call attribution"
+      },
+      {
+        "href": "/dashboards/caspio-api-reference.html",
+        "text": "Caspio API Docs"
+      },
+      {
+        "href": "/dashboards/table-usage-audit.html",
+        "text": "Table Audit"
+      },
+      {
+        "href": "/dashboards/manageorders-api-reference.html",
+        "text": "ManageOrders Docs"
+      },
+      {
+        "href": "/dashboards/sanmar-api-reference.html",
+        "text": "SanMar API Docs"
+      },
+      {
+        "href": "/dashboards/shopworks-odbc-reference.html",
+        "text": "ShopWorks ODBC"
+      }
+    ]
+  },
+  "views": [
+    {
+      "ws": "sales",
+      "width": 1440,
+      "text": "Sales\n\nQuote it, price it, follow up. What Nika and Taneisha open all day.\n\nMost used\nthe two pages the reps open every day\nAE Art Request\nsend art to Steve, approve the proofs that come back\nPurchase Request · Bradley\nask Bradley to buy blanks or supplies for a work order\nQuote\nNew Quote\npick the decoration, price it, send it\nContinue\nQuick Quote\nany style fast, or a multi-style price sheet\nSaved Quotes\nfind, track and sync every saved quote\nGo straight to a builder\n4\nPrice it\n2 up front · 16 more\n$\nPrice From Cost\ntype any blank's cost, get our price for all five methods\nShop Menu\nEST. 1977 · EVERY SERVICE PRICE\nMore pricing — add-ons, customer supplied, contract, specialty, customer pages\n16\nCustomers\nMission Control\nyour bonus, your goals, and everything waiting on you today\nLeads\nevery website, phone and walk-in enquiry, with who owns it\nALSO HERE\nCustomer Portals\nbrowse every customer's portal page\nPortal Access\ninvite customers; work re-order requests\nLead Scorecard\nhow leads convert, by rep and source\nUnqualified Leads\nspam and no-fit enquiries\nShow the customer\nDesign Vault\nevery design we've ever made — search by name, number or customer\nShirt Designer\nput a logo on a shirt, send for approval\nPhoto Library\nevery finished-job photo; choose what customers see\nTumbler Mockup\nlogo on a Polar Camel, download approval\nSaved Mockups\nmockups you've built and sent\nTop Sellers\nbest-selling styles, most with a free sample\nReference\nSales & Office Procedures\nCustomer Notification SOP\nLTM Order Decision\nData Entry Rules\nShopWorks entry, live service codes\nPrice Audit (Feb 2026)\nfrozen study, 80 orders",
+      "scrollWidth": 1440
+    },
+    {
+      "ws": "sales",
+      "width": 768,
+      "text": "Sales\nMost used\nthe two pages the reps open every day\nAE Art Request\nsend art to Steve, approve the proofs that come back\nPurchase Request · Bradley\nask Bradley to buy blanks or supplies for a work order\nQuote\nNew Quote\npick the decoration, price it, send it\nContinue\nQuick Quote\nany style fast, or a multi-style price sheet\nSaved Quotes\nfind, track and sync every saved quote\nGo straight to a builder\n4\nPrice it\n2 up front · 16 more\n$\nPrice From Cost\ntype any blank's cost, get our price for all five methods\nShop Menu\nEST. 1977 · EVERY SERVICE PRICE\nMore pricing — add-ons, customer supplied, contract, specialty, customer pages\n16\nCustomers\nMission Control\nyour bonus, your goals, and everything waiting on you today\nLeads\nevery website, phone and walk-in enquiry, with who owns it\nALSO HERE\nCustomer Portals\nbrowse every customer's portal page\nPortal Access\ninvite customers; work re-order requests\nLead Scorecard\nhow leads convert, by rep and source\nUnqualified Leads\nspam and no-fit enquiries\nShow the customer\nDesign Vault\nevery design we've ever made — search by name, number or customer\nShirt Designer\nput a logo on a shirt, send for approval\nPhoto Library\nevery finished-job photo; choose what customers see\nTumbler Mockup\nlogo on a Polar Camel, download approval\nSaved Mockups\nmockups you've built and sent\nTop Sellers\nbest-selling styles, most with a free sample\nReference\nSales & Office Procedures\nCustomer Notification SOP\nLTM Order Decision\nData Entry Rules\nShopWorks entry, live service codes\nPrice Audit (Feb 2026)\nfrozen study, 80 orders",
+      "scrollWidth": 768
+    },
+    {
+      "ws": "sales",
+      "width": 390,
+      "text": "Sales\nMost used\nthe two pages the reps open every day\nAE Art Request\nsend art to Steve, approve the proofs that come back\nPurchase Request · Bradley\nask Bradley to buy blanks or supplies for a work order\nQuote\nNew Quote\npick the decoration, price it, send it\nContinue\nQuick Quote\nany style fast, or a multi-style price sheet\nSaved Quotes\nfind, track and sync every saved quote\nGo straight to a builder\n4\nPrice it\n2 up front · 16 more\n$\nPrice From Cost\ntype any blank's cost, get our price for all five methods\nShop Menu\nEST. 1977 · EVERY SERVICE PRICE\nMore pricing — add-ons, customer supplied, contract, specialty, customer pages\n16\nCustomers\nMission Control\nyour bonus, your goals, and everything waiting on you today\nLeads\nevery website, phone and walk-in enquiry, with who owns it\nALSO HERE\nCustomer Portals\nbrowse every customer's portal page\nPortal Access\ninvite customers; work re-order requests\nLead Scorecard\nhow leads convert, by rep and source\nUnqualified Leads\nspam and no-fit enquiries\nShow the customer\nDesign Vault\nevery design we've ever made — search by name, number or customer\nShirt Designer\nput a logo on a shirt, send for approval\nPhoto Library\nevery finished-job photo; choose what customers see\nTumbler Mockup\nlogo on a Polar Camel, download approval\nSaved Mockups\nmockups you've built and sent\nTop Sellers\nbest-selling styles, most with a free sample\nReference\nSales & Office Procedures\nCustomer Notification SOP\nLTM Order Decision\nData Entry Rules\nShopWorks entry, live service codes\nPrice Audit (Feb 2026)\nfrozen study, 80 orders",
+      "scrollWidth": 390
+    },
+    {
+      "ws": "sales",
+      "width": 320,
+      "text": "Sales\nMost used\nthe two pages the reps open every day\nAE Art Request\nsend art to Steve, approve the proofs that come back\nPurchase Request · Bradley\nask Bradley to buy blanks or supplies for a work order\nQuote\nNew Quote\npick the decoration, price it, send it\nContinue\nQuick Quote\nany style fast, or a multi-style price sheet\nSaved Quotes\nfind, track and sync every saved quote\nGo straight to a builder\n4\nPrice it\n2 up front · 16 more\n$\nPrice From Cost\ntype any blank's cost, get our price for all five methods\nShop Menu\nEST. 1977 · EVERY SERVICE PRICE\nMore pricing — add-ons, customer supplied, contract, specialty, customer pages\n16\nCustomers\nMission Control\nyour bonus, your goals, and everything waiting on you today\nLeads\nevery website, phone and walk-in enquiry, with who owns it\nALSO HERE\nCustomer Portals\nbrowse every customer's portal page\nPortal Access\ninvite customers; work re-order requests\nLead Scorecard\nhow leads convert, by rep and source\nUnqualified Leads\nspam and no-fit enquiries\nShow the customer\nDesign Vault\nevery design we've ever made — search by name, number or customer\nShirt Designer\nput a logo on a shirt, send for approval\nPhoto Library\nevery finished-job photo; choose what customers see\nTumbler Mockup\nlogo on a Polar Camel, download approval\nSaved Mockups\nmockups you've built and sent\nTop Sellers\nbest-selling styles, most with a free sample\nReference\nSales & Office Procedures\nCustomer Notification SOP\nLTM Order Decision\nData Entry Rules\nShopWorks entry, live service codes\nPrice Audit (Feb 2026)\nfrozen study, 80 orders",
+      "scrollWidth": 320
+    },
+    {
+      "ws": "production",
+      "width": 1440,
+      "text": "Production\n\nQueues, receiving, transfers. Brian's and Mikalah's tab; Ruthie's queue leads it.\n\nQueues\nMockup Queue · Ruthie\nmockup requests in progress, completed, and on hold\nALSO HERE\nMonogram Orders\nevery order and its names, printable proof\nNames & Numbers\nteam rosters: name, number, size\nPast Due Orders\nwhat each late order is waiting on\nShift Schedule\nwho works when; break and lunch rules\nReceiving & purchasing\nSanMar Inbound Calendar\ntoday's SanMar boxes, line by line, with labels to print\nALSO HERE\nBox Labels\nlook up a PO, sort into boxes, print\nPurchase Tracking\nwhere every blanks request stands\nPurchase Request\n· Bradley\nthe form that asks Bradley to buy blanks or supplies for a WO\nRoland Supplies\nink and parts for the Roland — goes to Erik\nTransfers\nTransfer Queue · Bradley\nheat transfers waiting to be ordered, rush flagged\nSupacolor Jobs\nlive status at Supacolor, updated every 10 minutes\nGUIDES\nDock Guide\nreceiving, shipping, pickups, close-day\nSanMar Purchasing\norder blanks through ShopWorks\nData Entry Rules\nArt files & photos\nPhoto Capture\nscan the work order, shoot the piece, publish — works on your phone\nDST Studio\nstitch viewer · true-scale mockup · approval sheet\nDesign Vault\nsearch every design, any source\nDigitized Designs\nmaster list, with extra-logo prices\nPhoto Library\nbrowse and publish finished photos\nOld Designs\nthe legacy Megafile archive",
+      "scrollWidth": 1440
+    },
+    {
+      "ws": "production",
+      "width": 768,
+      "text": "Production\nQueues\nMockup Queue · Ruthie\nmockup requests in progress, completed, and on hold\nALSO HERE\nMonogram Orders\nevery order and its names, printable proof\nNames & Numbers\nteam rosters: name, number, size\nPast Due Orders\nwhat each late order is waiting on\nShift Schedule\nwho works when; break and lunch rules\nReceiving & purchasing\nSanMar Inbound Calendar\ntoday's SanMar boxes, line by line, with labels to print\nALSO HERE\nBox Labels\nlook up a PO, sort into boxes, print\nPurchase Tracking\nwhere every blanks request stands\nPurchase Request\n· Bradley\nthe form that asks Bradley to buy blanks or supplies for a WO\nRoland Supplies\nink and parts for the Roland — goes to Erik\nTransfers\nTransfer Queue · Bradley\nheat transfers waiting to be ordered, rush flagged\nSupacolor Jobs\nlive status at Supacolor, updated every 10 minutes\nGUIDES\nDock Guide\nreceiving, shipping, pickups, close-day\nSanMar Purchasing\norder blanks through ShopWorks\nData Entry Rules\nArt files & photos\nPhoto Capture\nscan the work order, shoot the piece, publish — works on your phone\nDST Studio\nstitch viewer · true-scale mockup · approval sheet\nDesign Vault\nsearch every design, any source\nDigitized Designs\nmaster list, with extra-logo prices\nPhoto Library\nbrowse and publish finished photos\nOld Designs\nthe legacy Megafile archive",
+      "scrollWidth": 768
+    },
+    {
+      "ws": "production",
+      "width": 390,
+      "text": "Production\nQueues\nMockup Queue · Ruthie\nmockup requests in progress, completed, and on hold\nALSO HERE\nMonogram Orders\nevery order and its names, printable proof\nNames & Numbers\nteam rosters: name, number, size\nPast Due Orders\nwhat each late order is waiting on\nShift Schedule\nwho works when; break and lunch rules\nReceiving & purchasing\nSanMar Inbound Calendar\ntoday's SanMar boxes, line by line, with labels to print\nALSO HERE\nBox Labels\nlook up a PO, sort into boxes, print\nPurchase Tracking\nwhere every blanks request stands\nPurchase Request\n· Bradley\nthe form that asks Bradley to buy blanks or supplies for a WO\nRoland Supplies\nink and parts for the Roland — goes to Erik\nTransfers\nTransfer Queue · Bradley\nheat transfers waiting to be ordered, rush flagged\nSupacolor Jobs\nlive status at Supacolor, updated every 10 minutes\nGUIDES\nDock Guide\nreceiving, shipping, pickups, close-day\nSanMar Purchasing\norder blanks through ShopWorks\nData Entry Rules\nArt files & photos\nPhoto Capture\nscan the work order, shoot the piece, publish — works on your phone\nDST Studio\nstitch viewer · true-scale mockup · approval sheet\nDesign Vault\nsearch every design, any source\nDigitized Designs\nmaster list, with extra-logo prices\nPhoto Library\nbrowse and publish finished photos\nOld Designs\nthe legacy Megafile archive",
+      "scrollWidth": 390
+    },
+    {
+      "ws": "production",
+      "width": 320,
+      "text": "Production\nQueues\nMockup Queue · Ruthie\nmockup requests in progress, completed, and on hold\nALSO HERE\nMonogram Orders\nevery order and its names, printable proof\nNames & Numbers\nteam rosters: name, number, size\nPast Due Orders\nwhat each late order is waiting on\nShift Schedule\nwho works when; break and lunch rules\nReceiving & purchasing\nSanMar Inbound Calendar\ntoday's SanMar boxes, line by line, with labels to print\nALSO HERE\nBox Labels\nlook up a PO, sort into boxes, print\nPurchase Tracking\nwhere every blanks request stands\nPurchase Request\n· Bradley\nthe form that asks Bradley to buy blanks or supplies for a WO\nRoland Supplies\nink and parts for the Roland — goes to Erik\nTransfers\nTransfer Queue · Bradley\nheat transfers waiting to be ordered, rush flagged\nSupacolor Jobs\nlive status at Supacolor, updated every 10 minutes\nGUIDES\nDock Guide\nreceiving, shipping, pickups, close-day\nSanMar Purchasing\norder blanks through ShopWorks\nData Entry Rules\nArt files & photos\nPhoto Capture\nscan the work order, shoot the piece, publish — works on your phone\nDST Studio\nstitch viewer · true-scale mockup · approval sheet\nDesign Vault\nsearch every design, any source\nDigitized Designs\nmaster list, with extra-logo prices\nPhoto Library\nbrowse and publish finished photos\nOld Designs\nthe legacy Megafile archive",
+      "scrollWidth": 320
+    },
+    {
+      "ws": "art",
+      "width": 1440,
+      "text": "Art\n\nSteve's and Ruthie's queues first, then the design tools.\n\nQueues\nArt Queue · Steve\nincoming art requests, and sending finished art to Bradley\nMockup Queue · Ruthie\nmockup requests in progress, completed, and on hold\nALSO HERE\nAE Art Request\nwhat the reps submit and approve\nDesign Queue\ndesigns waiting on a decision\n253gear Publisher\npush a design to the 253gear store\nDesign tools\nDST Studio\nstitch viewer · true-scale mockup · approval sheet\nDesign Vault\nevery design we've ever made, one search\nALSO HERE\nShirt Designer\nlogo on a shirt, front/back, spin, proof\nTumbler Mockup\nPolar Camel color + logo, approval image\nSaved Mockups\nDigitized Designs\nmaster list, with extra-logo prices\nOld Designs\nthe legacy Megafile archive\nPhotos & hand-off\nPhoto Capture\nshoot the finished piece, publish it\nPhoto Library\nbrowse and publish finished photos\nTO PRODUCTION\nMonogram Orders\nNames & Numbers\nTransfer Queue\n· Bradley\nsend files for Supacolor",
+      "scrollWidth": 1440
+    },
+    {
+      "ws": "art",
+      "width": 768,
+      "text": "Art\nQueues\nArt Queue · Steve\nincoming art requests, and sending finished art to Bradley\nMockup Queue · Ruthie\nmockup requests in progress, completed, and on hold\nALSO HERE\nAE Art Request\nwhat the reps submit and approve\nDesign Queue\ndesigns waiting on a decision\n253gear Publisher\npush a design to the 253gear store\nDesign tools\nDST Studio\nstitch viewer · true-scale mockup · approval sheet\nDesign Vault\nevery design we've ever made, one search\nALSO HERE\nShirt Designer\nlogo on a shirt, front/back, spin, proof\nTumbler Mockup\nPolar Camel color + logo, approval image\nSaved Mockups\nDigitized Designs\nmaster list, with extra-logo prices\nOld Designs\nthe legacy Megafile archive\nPhotos & hand-off\nPhoto Capture\nshoot the finished piece, publish it\nPhoto Library\nbrowse and publish finished photos\nTO PRODUCTION\nMonogram Orders\nNames & Numbers\nTransfer Queue\n· Bradley\nsend files for Supacolor",
+      "scrollWidth": 768
+    },
+    {
+      "ws": "art",
+      "width": 390,
+      "text": "Art\nQueues\nArt Queue · Steve\nincoming art requests, and sending finished art to Bradley\nMockup Queue · Ruthie\nmockup requests in progress, completed, and on hold\nALSO HERE\nAE Art Request\nwhat the reps submit and approve\nDesign Queue\ndesigns waiting on a decision\n253gear Publisher\npush a design to the 253gear store\nDesign tools\nDST Studio\nstitch viewer · true-scale mockup · approval sheet\nDesign Vault\nevery design we've ever made, one search\nALSO HERE\nShirt Designer\nlogo on a shirt, front/back, spin, proof\nTumbler Mockup\nPolar Camel color + logo, approval image\nSaved Mockups\nDigitized Designs\nmaster list, with extra-logo prices\nOld Designs\nthe legacy Megafile archive\nPhotos & hand-off\nPhoto Capture\nshoot the finished piece, publish it\nPhoto Library\nbrowse and publish finished photos\nTO PRODUCTION\nMonogram Orders\nNames & Numbers\nTransfer Queue\n· Bradley\nsend files for Supacolor",
+      "scrollWidth": 390
+    },
+    {
+      "ws": "art",
+      "width": 320,
+      "text": "Art\nQueues\nArt Queue · Steve\nincoming art requests, and sending finished art to Bradley\nMockup Queue · Ruthie\nmockup requests in progress, completed, and on hold\nALSO HERE\nAE Art Request\nwhat the reps submit and approve\nDesign Queue\ndesigns waiting on a decision\n253gear Publisher\npush a design to the 253gear store\nDesign tools\nDST Studio\nstitch viewer · true-scale mockup · approval sheet\nDesign Vault\nevery design we've ever made, one search\nALSO HERE\nShirt Designer\nlogo on a shirt, front/back, spin, proof\nTumbler Mockup\nPolar Camel color + logo, approval image\nSaved Mockups\nDigitized Designs\nmaster list, with extra-logo prices\nOld Designs\nthe legacy Megafile archive\nPhotos & hand-off\nPhoto Capture\nshoot the finished piece, publish it\nPhoto Library\nbrowse and publish finished photos\nTO PRODUCTION\nMonogram Orders\nNames & Numbers\nTransfer Queue\n· Bradley\nsend files for Supacolor",
+      "scrollWidth": 320
+    },
+    {
+      "ws": "office",
+      "width": 1440,
+      "text": "Office\n\nPurchasing, transfers, money and portals. Bradley's and Jim's tab.\n\nTransfers & purchasing\nTransfer Queue\nstep 1 · what to order\nSupacolor Jobs\nstep 2 · where it is\nPurchase Tracking\nevery blanks request: sent → ordered → received → shipped\nSanMar Inbound Calendar\nincoming boxes by day, box labels, PDF\nALSO HERE\nPurchase Request\n· Bradley\nthe form reps fill in to ask Bradley for blanks\nRoland Supplies\nBox Labels\nNon-SanMar Items\ncatalog products we don't buy from SanMar\nRichardson Direct\nand the 23 styles to buy via SanMar\nMoney & customers\nSaved Quotes\nfind, track and sync every saved quote\nLeads\nevery enquiry, with who owns it\nCustomer Portals\nbrowse every customer's portal page\nPortal Access\ninvites, rewards, re-order requests\nProspect Mailing List\n· Jim\nbig-type add, edit, search\nForms Inbox\nsubmitted forms, samples-out tracker\nCustomer price pages\nTees Storefront\nthe public tee shop customers buy from\nSticker Prices\nevery 2×2–6×6 price\nBanner Prices\nany size, by the square foot\nCompany Webstores\nquote a store or fundraiser\nTop Sellers",
+      "scrollWidth": 1440
+    },
+    {
+      "ws": "office",
+      "width": 768,
+      "text": "Office\nTransfers & purchasing\nTransfer Queue\nstep 1 · what to order\nSupacolor Jobs\nstep 2 · where it is\nPurchase Tracking\nevery blanks request: sent → ordered → received → shipped\nSanMar Inbound Calendar\nincoming boxes by day, box labels, PDF\nALSO HERE\nPurchase Request\n· Bradley\nthe form reps fill in to ask Bradley for blanks\nRoland Supplies\nBox Labels\nNon-SanMar Items\ncatalog products we don't buy from SanMar\nRichardson Direct\nand the 23 styles to buy via SanMar\nMoney & customers\nSaved Quotes\nfind, track and sync every saved quote\nLeads\nevery enquiry, with who owns it\nCustomer Portals\nbrowse every customer's portal page\nPortal Access\ninvites, rewards, re-order requests\nProspect Mailing List\n· Jim\nbig-type add, edit, search\nForms Inbox\nsubmitted forms, samples-out tracker\nCustomer price pages\nTees Storefront\nthe public tee shop customers buy from\nSticker Prices\nevery 2×2–6×6 price\nBanner Prices\nany size, by the square foot\nCompany Webstores\nquote a store or fundraiser\nTop Sellers",
+      "scrollWidth": 768
+    },
+    {
+      "ws": "office",
+      "width": 390,
+      "text": "Office\nTransfers & purchasing\nTransfer Queue\nstep 1 · what to order\nSupacolor Jobs\nstep 2 · where it is\nPurchase Tracking\nevery blanks request: sent → ordered → received → shipped\nSanMar Inbound Calendar\nincoming boxes by day, box labels, PDF\nALSO HERE\nPurchase Request\n· Bradley\nthe form reps fill in to ask Bradley for blanks\nRoland Supplies\nBox Labels\nNon-SanMar Items\ncatalog products we don't buy from SanMar\nRichardson Direct\nand the 23 styles to buy via SanMar\nMoney & customers\nSaved Quotes\nfind, track and sync every saved quote\nLeads\nevery enquiry, with who owns it\nCustomer Portals\nbrowse every customer's portal page\nPortal Access\ninvites, rewards, re-order requests\nProspect Mailing List\n· Jim\nbig-type add, edit, search\nForms Inbox\nsubmitted forms, samples-out tracker\nCustomer price pages\nTees Storefront\nthe public tee shop customers buy from\nSticker Prices\nevery 2×2–6×6 price\nBanner Prices\nany size, by the square foot\nCompany Webstores\nquote a store or fundraiser\nTop Sellers",
+      "scrollWidth": 390
+    },
+    {
+      "ws": "office",
+      "width": 320,
+      "text": "Office\nTransfers & purchasing\nTransfer Queue\nstep 1 · what to order\nSupacolor Jobs\nstep 2 · where it is\nPurchase Tracking\nevery blanks request: sent → ordered → received → shipped\nSanMar Inbound Calendar\nincoming boxes by day, box labels, PDF\nALSO HERE\nPurchase Request\n· Bradley\nthe form reps fill in to ask Bradley for blanks\nRoland Supplies\nBox Labels\nNon-SanMar Items\ncatalog products we don't buy from SanMar\nRichardson Direct\nand the 23 styles to buy via SanMar\nMoney & customers\nSaved Quotes\nfind, track and sync every saved quote\nLeads\nevery enquiry, with who owns it\nCustomer Portals\nbrowse every customer's portal page\nPortal Access\ninvites, rewards, re-order requests\nProspect Mailing List\n· Jim\nbig-type add, edit, search\nForms Inbox\nsubmitted forms, samples-out tracker\nCustomer price pages\nTees Storefront\nthe public tee shop customers buy from\nSticker Prices\nevery 2×2–6×6 price\nBanner Prices\nany size, by the square foot\nCompany Webstores\nquote a store or fundraiser\nTop Sellers",
+      "scrollWidth": 320
+    },
+    {
+      "ws": "company",
+      "width": 1440,
+      "text": "Company\n\nPolicies, forms, training, bundles and people.\n\nPolicies & procedures\nPolicies Hub\nevery company policy and SOP, searchable, always current\nSales & Office Procedures\nCustomer Notification SOP\nLTM Order Decision\nOrg Chart 2026\ninteractive, with member search\nTraining\nTraining Center\nevery guide by role\nData Entry Rules\nShopWorks entry, live codes\nCustomer Service Manual\nSales Coordinator Book\nchapter by chapter\nDock Guide\nrun the dock, with checklists\nSanMar Purchasing\nthree phases, with videos\nTips Archive\nevery quick-hitter tip\nTraining Games\nForms\nForms Library\nprintable and fillable, by category\nForms Inbox\nsubmissions, samples-out tracker\nEmployee bundles\ncustomer-facing order pages\nDrain-Pro Bundle\ntheir staff pick sizes here\nStreich Bros Bundle\nWCTTR Bundle\nChristmas Gift Boxes\nseasonal Carhartt gift-box builder\nPeople & tools\nShift Schedule\nwho works when, break rules\nStaff Directory\nbirthdays, anniversaries\nInkSoft Transform\n↗\nInkSoft → ShopWorks; full bonus dashboard",
+      "scrollWidth": 1440
+    },
+    {
+      "ws": "company",
+      "width": 768,
+      "text": "Company\nPolicies & procedures\nPolicies Hub\nevery company policy and SOP, searchable, always current\nSales & Office Procedures\nCustomer Notification SOP\nLTM Order Decision\nOrg Chart 2026\ninteractive, with member search\nTraining\nTraining Center\nevery guide by role\nData Entry Rules\nShopWorks entry, live codes\nCustomer Service Manual\nSales Coordinator Book\nchapter by chapter\nDock Guide\nrun the dock, with checklists\nSanMar Purchasing\nthree phases, with videos\nTips Archive\nevery quick-hitter tip\nTraining Games\nForms\nForms Library\nprintable and fillable, by category\nForms Inbox\nsubmissions, samples-out tracker\nEmployee bundles\ncustomer-facing order pages\nDrain-Pro Bundle\ntheir staff pick sizes here\nStreich Bros Bundle\nWCTTR Bundle\nChristmas Gift Boxes\nseasonal Carhartt gift-box builder\nPeople & tools\nShift Schedule\nwho works when, break rules\nStaff Directory\nbirthdays, anniversaries\nInkSoft Transform\n↗\nInkSoft → ShopWorks; full bonus dashboard",
+      "scrollWidth": 768
+    },
+    {
+      "ws": "company",
+      "width": 390,
+      "text": "Company\nPolicies & procedures\nPolicies Hub\nevery company policy and SOP, searchable, always current\nSales & Office Procedures\nCustomer Notification SOP\nLTM Order Decision\nOrg Chart 2026\ninteractive, with member search\nTraining\nTraining Center\nevery guide by role\nData Entry Rules\nShopWorks entry, live codes\nCustomer Service Manual\nSales Coordinator Book\nchapter by chapter\nDock Guide\nrun the dock, with checklists\nSanMar Purchasing\nthree phases, with videos\nTips Archive\nevery quick-hitter tip\nTraining Games\nForms\nForms Library\nprintable and fillable, by category\nForms Inbox\nsubmissions, samples-out tracker\nEmployee bundles\ncustomer-facing order pages\nDrain-Pro Bundle\ntheir staff pick sizes here\nStreich Bros Bundle\nWCTTR Bundle\nChristmas Gift Boxes\nseasonal Carhartt gift-box builder\nPeople & tools\nShift Schedule\nwho works when, break rules\nStaff Directory\nbirthdays, anniversaries\nInkSoft Transform\n↗\nInkSoft → ShopWorks; full bonus dashboard",
+      "scrollWidth": 390
+    },
+    {
+      "ws": "company",
+      "width": 320,
+      "text": "Company\nPolicies & procedures\nPolicies Hub\nevery company policy and SOP, searchable, always current\nSales & Office Procedures\nCustomer Notification SOP\nLTM Order Decision\nOrg Chart 2026\ninteractive, with member search\nTraining\nTraining Center\nevery guide by role\nData Entry Rules\nShopWorks entry, live codes\nCustomer Service Manual\nSales Coordinator Book\nchapter by chapter\nDock Guide\nrun the dock, with checklists\nSanMar Purchasing\nthree phases, with videos\nTips Archive\nevery quick-hitter tip\nTraining Games\nForms\nForms Library\nprintable and fillable, by category\nForms Inbox\nsubmissions, samples-out tracker\nEmployee bundles\ncustomer-facing order pages\nDrain-Pro Bundle\ntheir staff pick sizes here\nStreich Bros Bundle\nWCTTR Bundle\nChristmas Gift Boxes\nseasonal Carhartt gift-box builder\nPeople & tools\nShift Schedule\nwho works when, break rules\nStaff Directory\nbirthdays, anniversaries\nInkSoft Transform\n↗\nInkSoft → ShopWorks; full bonus dashboard",
+      "scrollWidth": 320
+    },
+    {
+      "ws": "everything",
+      "width": 1440,
+      "text": "Everything\n\nEvery tool on the page, grouped the old way. Built from the other tabs, so it can never miss one.\n\n103 tools\nART & DESIGN · 14\n253gear Publisher\npush a design to the 253gear store\nAE Art Request\nsend art to Steve, approve the proofs that come back\nArt Queue\nincoming art requests, and sending finished art to Bradley\nDesign Queue\ndesigns waiting on a decision\nDesign Vault\nevery design we've ever made — search by name, number or customer\nDigitized Designs\nmaster list, with extra-logo prices\nDST Studio\nstitch viewer · true-scale mockup · approval sheet\nOld Designs\nthe legacy Megafile archive\nPhoto Capture\nscan the work order, shoot the piece, publish — works on your phone\nPhoto Library\nevery finished-job photo; choose what customers see\nSaved Mockups\nmockups you've built and sent\nShirt Designer\nput a logo on a shirt, send for approval\nTop Sellers\nbest-selling styles, most with a free sample\nTumbler Mockup\nlogo on a Polar Camel, download approval\nPURCHASING · 1\nPurchase Request\nask Bradley to buy blanks or supplies for a work order\nQUOTING · 6\nDTF Quote\nheat-applied transfers\nDTG Quote\nfull-color prints on garments\nEmbroidery Quote\ngarments, caps, 3D puff, patches\nQuick Quote\nany style fast, or a multi-style price sheet\nSaved Quotes\nfind, track and sync every saved quote\nScreen Print Quote\nscreens, colors, safety stripes\nPRICING · 17\nBanner Prices\nany size, priced by the square foot\nBig Stitch Counts\nadd-on over 10,000 stitches\nCompany Webstores\nquote a branded store or fundraiser\nContract DTG\nwholesale DTG on partners' own blanks\nContract Embroidery\nwholesale rates for decorators who bring blanks\nCustomer's Garment\nembroidery labor on blanks they bring\nEngraved Drinkware\nPolar Camel tumblers: color, stock, price\nExtra Logo\n2nd or 3rd logo on a garment we supply\nFull-Back Embroidery\njacket backs, 25K+ designs\nOdd-Size Decals\nover 6×6, odd shapes, under 50 pcs\nPatch Quote (AI)\nsew-on patches, 25-pc min, 4–6 wks\nPrice From Cost\ntype any blank's cost, get our price for all five methods\nPrint on Their Shirts\nscreen-print labor on blanks they bring\nRichardson Direct\nfactory-direct caps, and the 23 to buy via SanMar\nShop Menu\nEst. 1977 · every service price\nSticker Prices\nevery 2×2–6×6 price, 50+ pieces\nTees Storefront\nthe public tee shop — 20 styles, checkout\nCUSTOMERS · 8\nCustomer Portals\nbrowse every customer's portal page\nForms Inbox\nsubmitted forms, samples-out tracker\nLead Scorecard\nhow leads convert, by rep and source\nLeads\nevery website, phone and walk-in enquiry, with who owns it\nMission Control\nyour bonus, your goals, and everything waiting on you today\nPortal Access\ninvite customers; work re-order requests\nProspect Mailing List\nbig-type add, edit, search\nUnqualified Leads\nspam and no-fit enquiries\nREFERENCE · 7\nCustomer Notification SOP\nData Entry Rules\nShopWorks entry, live service codes\nLTM Order Decision\nOrg Chart 2026\ninteractive, with member search\nPolicies Hub\nevery company policy and SOP, searchable, always current\nPrice Audit (Feb 2026)\nfrozen study, 80 orders\nSales & Office Procedures\nPRODUCTION · 14\nBox Labels\nlook up a PO, sort into boxes, print\nDock Guide\nreceiving, shipping, pickups, close-day\nMockup Queue\nmockup requests in progress, completed, and on hold\nMonogram Orders\nevery order and its names, printable proof\nNames & Numbers\nteam rosters: name, number, size\nNon-SanMar Items\ncatalog products we don't buy from SanMar\nPast Due Orders\nwhat each late order is waiting on\nPurchase Tracking\nwhere every blanks request stands\nRoland Supplies\nink and parts for the Roland — goes to Erik\nSanMar Inbound Calendar\ntoday's SanMar boxes, line by line, with labels to print\nSanMar Purchasing\norder blanks through ShopWorks\nShift Schedule\nwho works when; break and lunch rules\nSupacolor Jobs\nlive status at Supacolor, updated every 10 minutes\nTransfer Queue\nheat transfers waiting to be ordered, rush flagged\nTRAINING · 5\nCustomer Service Manual\nSales Coordinator Book\nchapter by chapter\nTips Archive\nevery quick-hitter tip\nTraining Center\nevery guide by role\nTraining Games\nFORMS · 1\nForms Library\nprintable and fillable, by category\nEMPLOYEE BUNDLES · 4\nChristmas Gift Boxes\nseasonal Carhartt gift-box builder\nDrain-Pro Bundle\ntheir staff pick sizes here\nStreich Bros Bundle\nWCTTR Bundle\nPEOPLE & TOOLS · 1\nInkSoft Transform\nInkSoft → ShopWorks; full bonus dashboard\nADMINISTRATION · 25\nAccess Admin\nroles and page access\nAPI Usage\nCaspio call attribution\nBandit Integration\nsync tasks and agents\nBlog Editor\nwrite and publish posts\nBrand Standards\ncolours, type and spacing every page follows, read live from the token file\nCaspio API Docs\nCompany Numbers\nrevenue, team YTD, Q3 push, payments, turnaround estimates\nContract Break-Even\nDrive Access\nwho sees which network drive\nManageOrders Docs\nParts Converter\nSanMar list → ShopWorks parts\nPayroll\nvacation hours, packet upload\nPolicy Migration\nPricing Analysis\ncost, margin, realization\nPrint-Box Calibration\nwhere art prints on each tee\nRecords Admin\nSanMar API Docs\nSanMar Downloads\nSanMar Payables\nopen invoices, CSV, marketing fund\nSEO Strategy\nShopWorks ODBC\nStore Commissions\nTable Audit\nVendor Invoices\nlegacy Caspio portal\nVolume Quote\none-time price for 72+ orders",
+      "scrollWidth": 1440
+    },
+    {
+      "ws": "everything",
+      "width": 768,
+      "text": "Everything\n103 tools\nART & DESIGN · 14\n253gear Publisher\npush a design to the 253gear store\nAE Art Request\nsend art to Steve, approve the proofs that come back\nArt Queue\nincoming art requests, and sending finished art to Bradley\nDesign Queue\ndesigns waiting on a decision\nDesign Vault\nevery design we've ever made — search by name, number or customer\nDigitized Designs\nmaster list, with extra-logo prices\nDST Studio\nstitch viewer · true-scale mockup · approval sheet\nOld Designs\nthe legacy Megafile archive\nPhoto Capture\nscan the work order, shoot the piece, publish — works on your phone\nPhoto Library\nevery finished-job photo; choose what customers see\nSaved Mockups\nmockups you've built and sent\nShirt Designer\nput a logo on a shirt, send for approval\nTop Sellers\nbest-selling styles, most with a free sample\nTumbler Mockup\nlogo on a Polar Camel, download approval\nPURCHASING · 1\nPurchase Request\nask Bradley to buy blanks or supplies for a work order\nQUOTING · 6\nDTF Quote\nheat-applied transfers\nDTG Quote\nfull-color prints on garments\nEmbroidery Quote\ngarments, caps, 3D puff, patches\nQuick Quote\nany style fast, or a multi-style price sheet\nSaved Quotes\nfind, track and sync every saved quote\nScreen Print Quote\nscreens, colors, safety stripes\nPRICING · 17\nBanner Prices\nany size, priced by the square foot\nBig Stitch Counts\nadd-on over 10,000 stitches\nCompany Webstores\nquote a branded store or fundraiser\nContract DTG\nwholesale DTG on partners' own blanks\nContract Embroidery\nwholesale rates for decorators who bring blanks\nCustomer's Garment\nembroidery labor on blanks they bring\nEngraved Drinkware\nPolar Camel tumblers: color, stock, price\nExtra Logo\n2nd or 3rd logo on a garment we supply\nFull-Back Embroidery\njacket backs, 25K+ designs\nOdd-Size Decals\nover 6×6, odd shapes, under 50 pcs\nPatch Quote (AI)\nsew-on patches, 25-pc min, 4–6 wks\nPrice From Cost\ntype any blank's cost, get our price for all five methods\nPrint on Their Shirts\nscreen-print labor on blanks they bring\nRichardson Direct\nfactory-direct caps, and the 23 to buy via SanMar\nShop Menu\nEst. 1977 · every service price\nSticker Prices\nevery 2×2–6×6 price, 50+ pieces\nTees Storefront\nthe public tee shop — 20 styles, checkout\nCUSTOMERS · 8\nCustomer Portals\nbrowse every customer's portal page\nForms Inbox\nsubmitted forms, samples-out tracker\nLead Scorecard\nhow leads convert, by rep and source\nLeads\nevery website, phone and walk-in enquiry, with who owns it\nMission Control\nyour bonus, your goals, and everything waiting on you today\nPortal Access\ninvite customers; work re-order requests\nProspect Mailing List\nbig-type add, edit, search\nUnqualified Leads\nspam and no-fit enquiries\nREFERENCE · 7\nCustomer Notification SOP\nData Entry Rules\nShopWorks entry, live service codes\nLTM Order Decision\nOrg Chart 2026\ninteractive, with member search\nPolicies Hub\nevery company policy and SOP, searchable, always current\nPrice Audit (Feb 2026)\nfrozen study, 80 orders\nSales & Office Procedures\nPRODUCTION · 14\nBox Labels\nlook up a PO, sort into boxes, print\nDock Guide\nreceiving, shipping, pickups, close-day\nMockup Queue\nmockup requests in progress, completed, and on hold\nMonogram Orders\nevery order and its names, printable proof\nNames & Numbers\nteam rosters: name, number, size\nNon-SanMar Items\ncatalog products we don't buy from SanMar\nPast Due Orders\nwhat each late order is waiting on\nPurchase Tracking\nwhere every blanks request stands\nRoland Supplies\nink and parts for the Roland — goes to Erik\nSanMar Inbound Calendar\ntoday's SanMar boxes, line by line, with labels to print\nSanMar Purchasing\norder blanks through ShopWorks\nShift Schedule\nwho works when; break and lunch rules\nSupacolor Jobs\nlive status at Supacolor, updated every 10 minutes\nTransfer Queue\nheat transfers waiting to be ordered, rush flagged\nTRAINING · 5\nCustomer Service Manual\nSales Coordinator Book\nchapter by chapter\nTips Archive\nevery quick-hitter tip\nTraining Center\nevery guide by role\nTraining Games\nFORMS · 1\nForms Library\nprintable and fillable, by category\nEMPLOYEE BUNDLES · 4\nChristmas Gift Boxes\nseasonal Carhartt gift-box builder\nDrain-Pro Bundle\ntheir staff pick sizes here\nStreich Bros Bundle\nWCTTR Bundle\nPEOPLE & TOOLS · 1\nInkSoft Transform\nInkSoft → ShopWorks; full bonus dashboard\nADMINISTRATION · 25\nAccess Admin\nroles and page access\nAPI Usage\nCaspio call attribution\nBandit Integration\nsync tasks and agents\nBlog Editor\nwrite and publish posts\nBrand Standards\ncolours, type and spacing every page follows, read live from the token file\nCaspio API Docs\nCompany Numbers\nrevenue, team YTD, Q3 push, payments, turnaround estimates\nContract Break-Even\nDrive Access\nwho sees which network drive\nManageOrders Docs\nParts Converter\nSanMar list → ShopWorks parts\nPayroll\nvacation hours, packet upload\nPolicy Migration\nPricing Analysis\ncost, margin, realization\nPrint-Box Calibration\nwhere art prints on each tee\nRecords Admin\nSanMar API Docs\nSanMar Downloads\nSanMar Payables\nopen invoices, CSV, marketing fund\nSEO Strategy\nShopWorks ODBC\nStore Commissions\nTable Audit\nVendor Invoices\nlegacy Caspio portal\nVolume Quote\none-time price for 72+ orders",
+      "scrollWidth": 768
+    },
+    {
+      "ws": "everything",
+      "width": 390,
+      "text": "Everything\n103 tools\nART & DESIGN · 14\n253gear Publisher\npush a design to the 253gear store\nAE Art Request\nsend art to Steve, approve the proofs that come back\nArt Queue\nincoming art requests, and sending finished art to Bradley\nDesign Queue\ndesigns waiting on a decision\nDesign Vault\nevery design we've ever made — search by name, number or customer\nDigitized Designs\nmaster list, with extra-logo prices\nDST Studio\nstitch viewer · true-scale mockup · approval sheet\nOld Designs\nthe legacy Megafile archive\nPhoto Capture\nscan the work order, shoot the piece, publish — works on your phone\nPhoto Library\nevery finished-job photo; choose what customers see\nSaved Mockups\nmockups you've built and sent\nShirt Designer\nput a logo on a shirt, send for approval\nTop Sellers\nbest-selling styles, most with a free sample\nTumbler Mockup\nlogo on a Polar Camel, download approval\nPURCHASING · 1\nPurchase Request\nask Bradley to buy blanks or supplies for a work order\nQUOTING · 6\nDTF Quote\nheat-applied transfers\nDTG Quote\nfull-color prints on garments\nEmbroidery Quote\ngarments, caps, 3D puff, patches\nQuick Quote\nany style fast, or a multi-style price sheet\nSaved Quotes\nfind, track and sync every saved quote\nScreen Print Quote\nscreens, colors, safety stripes\nPRICING · 17\nBanner Prices\nany size, priced by the square foot\nBig Stitch Counts\nadd-on over 10,000 stitches\nCompany Webstores\nquote a branded store or fundraiser\nContract DTG\nwholesale DTG on partners' own blanks\nContract Embroidery\nwholesale rates for decorators who bring blanks\nCustomer's Garment\nembroidery labor on blanks they bring\nEngraved Drinkware\nPolar Camel tumblers: color, stock, price\nExtra Logo\n2nd or 3rd logo on a garment we supply\nFull-Back Embroidery\njacket backs, 25K+ designs\nOdd-Size Decals\nover 6×6, odd shapes, under 50 pcs\nPatch Quote (AI)\nsew-on patches, 25-pc min, 4–6 wks\nPrice From Cost\ntype any blank's cost, get our price for all five methods\nPrint on Their Shirts\nscreen-print labor on blanks they bring\nRichardson Direct\nfactory-direct caps, and the 23 to buy via SanMar\nShop Menu\nEst. 1977 · every service price\nSticker Prices\nevery 2×2–6×6 price, 50+ pieces\nTees Storefront\nthe public tee shop — 20 styles, checkout\nCUSTOMERS · 8\nCustomer Portals\nbrowse every customer's portal page\nForms Inbox\nsubmitted forms, samples-out tracker\nLead Scorecard\nhow leads convert, by rep and source\nLeads\nevery website, phone and walk-in enquiry, with who owns it\nMission Control\nyour bonus, your goals, and everything waiting on you today\nPortal Access\ninvite customers; work re-order requests\nProspect Mailing List\nbig-type add, edit, search\nUnqualified Leads\nspam and no-fit enquiries\nREFERENCE · 7\nCustomer Notification SOP\nData Entry Rules\nShopWorks entry, live service codes\nLTM Order Decision\nOrg Chart 2026\ninteractive, with member search\nPolicies Hub\nevery company policy and SOP, searchable, always current\nPrice Audit (Feb 2026)\nfrozen study, 80 orders\nSales & Office Procedures\nPRODUCTION · 14\nBox Labels\nlook up a PO, sort into boxes, print\nDock Guide\nreceiving, shipping, pickups, close-day\nMockup Queue\nmockup requests in progress, completed, and on hold\nMonogram Orders\nevery order and its names, printable proof\nNames & Numbers\nteam rosters: name, number, size\nNon-SanMar Items\ncatalog products we don't buy from SanMar\nPast Due Orders\nwhat each late order is waiting on\nPurchase Tracking\nwhere every blanks request stands\nRoland Supplies\nink and parts for the Roland — goes to Erik\nSanMar Inbound Calendar\ntoday's SanMar boxes, line by line, with labels to print\nSanMar Purchasing\norder blanks through ShopWorks\nShift Schedule\nwho works when; break and lunch rules\nSupacolor Jobs\nlive status at Supacolor, updated every 10 minutes\nTransfer Queue\nheat transfers waiting to be ordered, rush flagged\nTRAINING · 5\nCustomer Service Manual\nSales Coordinator Book\nchapter by chapter\nTips Archive\nevery quick-hitter tip\nTraining Center\nevery guide by role\nTraining Games\nFORMS · 1\nForms Library\nprintable and fillable, by category\nEMPLOYEE BUNDLES · 4\nChristmas Gift Boxes\nseasonal Carhartt gift-box builder\nDrain-Pro Bundle\ntheir staff pick sizes here\nStreich Bros Bundle\nWCTTR Bundle\nPEOPLE & TOOLS · 1\nInkSoft Transform\nInkSoft → ShopWorks; full bonus dashboard\nADMINISTRATION · 25\nAccess Admin\nroles and page access\nAPI Usage\nCaspio call attribution\nBandit Integration\nsync tasks and agents\nBlog Editor\nwrite and publish posts\nBrand Standards\ncolours, type and spacing every page follows, read live from the token file\nCaspio API Docs\nCompany Numbers\nrevenue, team YTD, Q3 push, payments, turnaround estimates\nContract Break-Even\nDrive Access\nwho sees which network drive\nManageOrders Docs\nParts Converter\nSanMar list → ShopWorks parts\nPayroll\nvacation hours, packet upload\nPolicy Migration\nPricing Analysis\ncost, margin, realization\nPrint-Box Calibration\nwhere art prints on each tee\nRecords Admin\nSanMar API Docs\nSanMar Downloads\nSanMar Payables\nopen invoices, CSV, marketing fund\nSEO Strategy\nShopWorks ODBC\nStore Commissions\nTable Audit\nVendor Invoices\nlegacy Caspio portal\nVolume Quote\none-time price for 72+ orders",
+      "scrollWidth": 390
+    },
+    {
+      "ws": "everything",
+      "width": 320,
+      "text": "Everything\n103 tools\nART & DESIGN · 14\n253gear Publisher\npush a design to the 253gear store\nAE Art Request\nsend art to Steve, approve the proofs that come back\nArt Queue\nincoming art requests, and sending finished art to Bradley\nDesign Queue\ndesigns waiting on a decision\nDesign Vault\nevery design we've ever made — search by name, number or customer\nDigitized Designs\nmaster list, with extra-logo prices\nDST Studio\nstitch viewer · true-scale mockup · approval sheet\nOld Designs\nthe legacy Megafile archive\nPhoto Capture\nscan the work order, shoot the piece, publish — works on your phone\nPhoto Library\nevery finished-job photo; choose what customers see\nSaved Mockups\nmockups you've built and sent\nShirt Designer\nput a logo on a shirt, send for approval\nTop Sellers\nbest-selling styles, most with a free sample\nTumbler Mockup\nlogo on a Polar Camel, download approval\nPURCHASING · 1\nPurchase Request\nask Bradley to buy blanks or supplies for a work order\nQUOTING · 6\nDTF Quote\nheat-applied transfers\nDTG Quote\nfull-color prints on garments\nEmbroidery Quote\ngarments, caps, 3D puff, patches\nQuick Quote\nany style fast, or a multi-style price sheet\nSaved Quotes\nfind, track and sync every saved quote\nScreen Print Quote\nscreens, colors, safety stripes\nPRICING · 17\nBanner Prices\nany size, priced by the square foot\nBig Stitch Counts\nadd-on over 10,000 stitches\nCompany Webstores\nquote a branded store or fundraiser\nContract DTG\nwholesale DTG on partners' own blanks\nContract Embroidery\nwholesale rates for decorators who bring blanks\nCustomer's Garment\nembroidery labor on blanks they bring\nEngraved Drinkware\nPolar Camel tumblers: color, stock, price\nExtra Logo\n2nd or 3rd logo on a garment we supply\nFull-Back Embroidery\njacket backs, 25K+ designs\nOdd-Size Decals\nover 6×6, odd shapes, under 50 pcs\nPatch Quote (AI)\nsew-on patches, 25-pc min, 4–6 wks\nPrice From Cost\ntype any blank's cost, get our price for all five methods\nPrint on Their Shirts\nscreen-print labor on blanks they bring\nRichardson Direct\nfactory-direct caps, and the 23 to buy via SanMar\nShop Menu\nEst. 1977 · every service price\nSticker Prices\nevery 2×2–6×6 price, 50+ pieces\nTees Storefront\nthe public tee shop — 20 styles, checkout\nCUSTOMERS · 8\nCustomer Portals\nbrowse every customer's portal page\nForms Inbox\nsubmitted forms, samples-out tracker\nLead Scorecard\nhow leads convert, by rep and source\nLeads\nevery website, phone and walk-in enquiry, with who owns it\nMission Control\nyour bonus, your goals, and everything waiting on you today\nPortal Access\ninvite customers; work re-order requests\nProspect Mailing List\nbig-type add, edit, search\nUnqualified Leads\nspam and no-fit enquiries\nREFERENCE · 7\nCustomer Notification SOP\nData Entry Rules\nShopWorks entry, live service codes\nLTM Order Decision\nOrg Chart 2026\ninteractive, with member search\nPolicies Hub\nevery company policy and SOP, searchable, always current\nPrice Audit (Feb 2026)\nfrozen study, 80 orders\nSales & Office Procedures\nPRODUCTION · 14\nBox Labels\nlook up a PO, sort into boxes, print\nDock Guide\nreceiving, shipping, pickups, close-day\nMockup Queue\nmockup requests in progress, completed, and on hold\nMonogram Orders\nevery order and its names, printable proof\nNames & Numbers\nteam rosters: name, number, size\nNon-SanMar Items\ncatalog products we don't buy from SanMar\nPast Due Orders\nwhat each late order is waiting on\nPurchase Tracking\nwhere every blanks request stands\nRoland Supplies\nink and parts for the Roland — goes to Erik\nSanMar Inbound Calendar\ntoday's SanMar boxes, line by line, with labels to print\nSanMar Purchasing\norder blanks through ShopWorks\nShift Schedule\nwho works when; break and lunch rules\nSupacolor Jobs\nlive status at Supacolor, updated every 10 minutes\nTransfer Queue\nheat transfers waiting to be ordered, rush flagged\nTRAINING · 5\nCustomer Service Manual\nSales Coordinator Book\nchapter by chapter\nTips Archive\nevery quick-hitter tip\nTraining Center\nevery guide by role\nTraining Games\nFORMS · 1\nForms Library\nprintable and fillable, by category\nEMPLOYEE BUNDLES · 4\nChristmas Gift Boxes\nseasonal Carhartt gift-box builder\nDrain-Pro Bundle\ntheir staff pick sizes here\nStreich Bros Bundle\nWCTTR Bundle\nPEOPLE & TOOLS · 1\nInkSoft Transform\nInkSoft → ShopWorks; full bonus dashboard\nADMINISTRATION · 25\nAccess Admin\nroles and page access\nAPI Usage\nCaspio call attribution\nBandit Integration\nsync tasks and agents\nBlog Editor\nwrite and publish posts\nBrand Standards\ncolours, type and spacing every page follows, read live from the token file\nCaspio API Docs\nCompany Numbers\nrevenue, team YTD, Q3 push, payments, turnaround estimates\nContract Break-Even\nDrive Access\nwho sees which network drive\nManageOrders Docs\nParts Converter\nSanMar list → ShopWorks parts\nPayroll\nvacation hours, packet upload\nPolicy Migration\nPricing Analysis\ncost, margin, realization\nPrint-Box Calibration\nwhere art prints on each tee\nRecords Admin\nSanMar API Docs\nSanMar Downloads\nSanMar Payables\nopen invoices, CSV, marketing fund\nSEO Strategy\nShopWorks ODBC\nStore Commissions\nTable Audit\nVendor Invoices\nlegacy Caspio portal\nVolume Quote\none-time price for 72+ orders",
+      "scrollWidth": 320
+    },
+    {
+      "ws": "admin",
+      "width": 1440,
+      "text": "Admin\n\nThe Administration links, same six groups. A lock means Erik-only.\n\nMoney & Payroll\nSanMar Payables\nopen invoices, CSV, marketing fund\nPayroll\nvacation hours, packet upload\nStore Commissions\nVolume Quote\none-time price for 72+ orders\nMarketing\nBlog Editor\nwrite and publish posts\nSEO Strategy\nBrand Standards\ncolours, type and spacing every page follows, read live from the token file\nAccess & Policy\nAccess Admin\nroles and page access\nPolicy Migration\nDrive Access\nwho sees which network drive\nIntegrations\nBandit Integration\nsync tasks and agents\nSanMar Downloads\nParts Converter\nSanMar list → ShopWorks parts\nVendor Invoices\nlegacy Caspio portal\nRecords Admin\nPrint-Box Calibration\nwhere art prints on each tee\nAnalysis\nCompany Numbers\nrevenue, team YTD, Q3 push, payments, turnaround estimates\nPricing Analysis\ncost, margin, realization\nContract Break-Even\nAPI Reference\nAPI Usage\nCaspio call attribution\nCaspio API Docs\nTable Audit\nManageOrders Docs\nSanMar API Docs\nShopWorks ODBC",
+      "scrollWidth": 1440
+    },
+    {
+      "ws": "admin",
+      "width": 768,
+      "text": "Admin\nMoney & Payroll\nSanMar Payables\nopen invoices, CSV, marketing fund\nPayroll\nvacation hours, packet upload\nStore Commissions\nVolume Quote\none-time price for 72+ orders\nMarketing\nBlog Editor\nwrite and publish posts\nSEO Strategy\nBrand Standards\ncolours, type and spacing every page follows, read live from the token file\nAccess & Policy\nAccess Admin\nroles and page access\nPolicy Migration\nDrive Access\nwho sees which network drive\nIntegrations\nBandit Integration\nsync tasks and agents\nSanMar Downloads\nParts Converter\nSanMar list → ShopWorks parts\nVendor Invoices\nlegacy Caspio portal\nRecords Admin\nPrint-Box Calibration\nwhere art prints on each tee\nAnalysis\nCompany Numbers\nrevenue, team YTD, Q3 push, payments, turnaround estimates\nPricing Analysis\ncost, margin, realization\nContract Break-Even\nAPI Reference\nAPI Usage\nCaspio call attribution\nCaspio API Docs\nTable Audit\nManageOrders Docs\nSanMar API Docs\nShopWorks ODBC",
+      "scrollWidth": 768
+    },
+    {
+      "ws": "admin",
+      "width": 390,
+      "text": "Admin\nMoney & Payroll\nSanMar Payables\nopen invoices, CSV, marketing fund\nPayroll\nvacation hours, packet upload\nStore Commissions\nVolume Quote\none-time price for 72+ orders\nMarketing\nBlog Editor\nwrite and publish posts\nSEO Strategy\nBrand Standards\ncolours, type and spacing every page follows, read live from the token file\nAccess & Policy\nAccess Admin\nroles and page access\nPolicy Migration\nDrive Access\nwho sees which network drive\nIntegrations\nBandit Integration\nsync tasks and agents\nSanMar Downloads\nParts Converter\nSanMar list → ShopWorks parts\nVendor Invoices\nlegacy Caspio portal\nRecords Admin\nPrint-Box Calibration\nwhere art prints on each tee\nAnalysis\nCompany Numbers\nrevenue, team YTD, Q3 push, payments, turnaround estimates\nPricing Analysis\ncost, margin, realization\nContract Break-Even\nAPI Reference\nAPI Usage\nCaspio call attribution\nCaspio API Docs\nTable Audit\nManageOrders Docs\nSanMar API Docs\nShopWorks ODBC",
+      "scrollWidth": 390
+    },
+    {
+      "ws": "admin",
+      "width": 320,
+      "text": "Admin\nMoney & Payroll\nSanMar Payables\nopen invoices, CSV, marketing fund\nPayroll\nvacation hours, packet upload\nStore Commissions\nVolume Quote\none-time price for 72+ orders\nMarketing\nBlog Editor\nwrite and publish posts\nSEO Strategy\nBrand Standards\ncolours, type and spacing every page follows, read live from the token file\nAccess & Policy\nAccess Admin\nroles and page access\nPolicy Migration\nDrive Access\nwho sees which network drive\nIntegrations\nBandit Integration\nsync tasks and agents\nSanMar Downloads\nParts Converter\nSanMar list → ShopWorks parts\nVendor Invoices\nlegacy Caspio portal\nRecords Admin\nPrint-Box Calibration\nwhere art prints on each tee\nAnalysis\nCompany Numbers\nrevenue, team YTD, Q3 push, payments, turnaround estimates\nPricing Analysis\ncost, margin, realization\nContract Break-Even\nAPI Reference\nAPI Usage\nCaspio call attribution\nCaspio API Docs\nTable Audit\nManageOrders Docs\nSanMar API Docs\nShopWorks ODBC",
+      "scrollWidth": 320
+    }
+  ],
+  "everything": "Everything\n\nEvery tool on the page, grouped the old way. Built from the other tabs, so it can never miss one.\n\n1 match\nPRODUCTION · 14\nBox Labels\nlook up a PO, sort into boxes, print\nDock Guide\nreceiving, shipping, pickups, close-day\nMockup Queue\nmockup requests in progress, completed, and on hold\nMonogram Orders\nevery order and its names, printable proof\nNames & Numbers\nteam rosters: name, number, size\nNon-SanMar Items\ncatalog products we don't buy from SanMar\nPast Due Orders\nwhat each late order is waiting on\nPurchase Tracking\nwhere every blanks request stands\nRoland Supplies\nink and parts for the Roland — goes to Erik\nSanMar Inbound Calendar\ntoday's SanMar boxes, line by line, with labels to print\nSanMar Purchasing\norder blanks through ShopWorks\nShift Schedule\nwho works when; break and lunch rules\nSupacolor Jobs\nlive status at Supacolor, updated every 10 minutes\nTransfer Queue\nheat transfers waiting to be ordered, rush flagged",
+  "search": "TOOLS & PAGES\nBox Labels\nMy Stuff\nMy Stuff ↵\nSanMar Inbound Calendar\ntoday's SanMar boxes, line by line, with labels to print\nProduction ↵",
+  "pins": {
+    "pins": [
+      {
+        "href": "/pages/box-labels.html",
+        "label": "Box Labels",
+        "icon": "fas fa-toolbox"
+      }
+    ],
+    "recents": [
+      {
+        "href": "/pages/box-labels.html",
+        "label": "Box Labels",
+        "icon": "fas fa-toolbox"
+      }
+    ]
+  },
+  "launcher": "×\nWhat are we decorating?\n\nOne question — the builder walks you through the rest. Need just a number? Stop after the first step.\n\nEmbroidery\npolos · jackets · caps · patches\nScreen Print\n24+ pieces · spot-color art\nDTG\nfull-color art · small runs\nDTF Transfers\nmixed garments · poly-friendly\nQuick Quote\n — not sure? compare every method's price for one style\nQuick Quote line sheet\n — several styles, price sheet to email",
+  "directories": [
+    {
+      "filter": "all",
+      "text": "Cedar Example\tSales\tSeptember 20, 2020\t5\tSeptember 12\tActive\nAster Example\tProduction\tFebruary 2, 2021\t5\tJanuary 3\tActive\nBirch Example\tArt\tSeptember 10, 2019\t7\tSeptember 10\tActive\nElm Example\tOffice\tMarch 1, 2018\t8\tSeptember 15\tFormer"
+    },
+    {
+      "filter": "active",
+      "text": "Cedar Example\tSales\tSeptember 20, 2020\t5\tSeptember 12\tActive\nAster Example\tProduction\tFebruary 2, 2021\t5\tJanuary 3\tActive\nBirch Example\tArt\tSeptember 10, 2019\t7\tSeptember 10\tActive"
+    },
+    {
+      "filter": "birthdays",
+      "text": "Birch Example\tArt\tSeptember 10, 2019\t7\tSeptember 10\tActive\nCedar Example\tSales\tSeptember 20, 2020\t5\tSeptember 12\tActive"
+    },
+    {
+      "filter": "anniversaries",
+      "text": "Birch Example\tArt\tSeptember 10, 2019\t7\tSeptember 10\tActive\nCedar Example\tSales\tSeptember 20, 2020\t5\tSeptember 12\tActive"
+    },
+    {
+      "filter": "search",
+      "text": "Cedar Example\tSales\tSeptember 20, 2020\t5\tSeptember 12\tActive"
+    }
+  ],
+  "reads": [
+    "/api/crm-session/me",
+    "/api/crm-session/me",
+    "/api/staff/service-codes?code=CO-ANNUAL-GOAL",
+    "/api/staff/employees",
+    "/api/staff/daily-sales-by-rep-ytd?year=2026",
+    "/api/staff/finished-photos/library?limit=200",
+    "/api/crm-proxy/ae-dashboard/due-dates-all?days=30"
+  ],
+  "events": {
+    "errors": [],
+    "writes": [],
+    "unknown": [],
+    "missing": [],
+    "providers": []
+  }
+}

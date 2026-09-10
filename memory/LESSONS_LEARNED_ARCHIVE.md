@@ -4218,3 +4218,9 @@ it skipped. 🔑 `gh run list -L 5` belongs in the deploy pre-flight: local gree
 live-engine specs back on in CI, add `CRM_API_SECRET` under Settings → Secrets → Actions.
 
 CI setup follow-up (2026-09-09): a Google Chrome apt index checksum mismatch blocked Playwright before tests on two runners. CI uses bundled Chromium; disable only the unrelated Google Chrome source on the disposable runner and keep Ubuntu repositories/checksum verification intact. Require the actual browser steps to pass on the new exact commit.
+
+## Calculator prerequisite failures must stop pricing (2026-09-07)
+- Problem: color/size failures were swallowed; the next pricing stage could hide the error or reuse another style's size data.
+- Root cause: empty error branches and catch blocks inside prerequisite loaders.
+- Solution: propagate errors to the product loader's existing error UI; clear size data before requesting it.
+- Prevention: calculator-api-errors.test.js covers HTTP, transport, malformed/empty responses and successful API data.

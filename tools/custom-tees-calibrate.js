@@ -32,13 +32,19 @@
         img: null,             // loaded HTMLImageElement (natural dims)
         box: null,             // { xFrac, yFrac, wFrac } (hFrac derived from aspect + image dims)
         drag: null,
+        styleRequest: 0,
+        photoRequest: 0,
+        bootRequest: 0,
+        busy: false,
+        copyBusy: false,
+        warning: '',
     };
 
     function toast(msg, type) {
         const el = document.createElement('div');
         el.className = 'cal-toast' + (type ? ' is-' + type : '');
         el.textContent = msg;
-        $('cal-toasts').appendChild(el);
+        $('cal-toasts').replaceChildren(el);
         setTimeout(() => el.remove(), 4500);
     }
 
@@ -54,26 +60,72 @@
         return r.json();
     }
 
-    // ── Boot: catalog + saved overrides ────────────────────────────────
+    function syncControls() {
+        const ready = !!(S.style && S.img && S.box);
+        $('cal-save').disabled = S.busy || !ready || !!S.warning;
+        $('cal-delete').disabled = S.busy || !ready || !!S.warning;
+        $('cal-auto').disabled = S.busy || !ready;
+        $('cal-copy').disabled = S.busy || S.copyBusy || !ready;
+        $('cal-adjust').disabled = S.busy || !ready;
+        $('cal-color').disabled = S.busy || !S.details.length;
+        $('cal-color-only').disabled = S.busy || !ready;
+        for (const b of document.querySelectorAll('.style-item')) b.disabled = S.busy;
+        for (const id of ['cal-tab-front', 'cal-tab-back']) $(id).disabled = S.busy || !S.details.length;
+        $('cal-box-handle').disabled = S.busy || !ready;
+        document.querySelector('.cal-stage').setAttribute('aria-busy', String(S.busy));
+    }
+
+    function warning(message) {
+        S.warning = message;
+        $('cal-warning').textContent = message;
+        $('cal-warning').hidden = !message;
+        $('cal-retry').hidden = !message;
+        syncControls();
+    }
+
+    function clearPhoto(message) {
+        S.img = null; S.box = null; S.drag = null;
+        $('cal-photo').hidden = true;
+        $('cal-photo').removeAttribute('src');
+        $('cal-box').hidden = true;
+        $('cal-delete').hidden = true;
+        $('cal-readout').textContent = '';
+        $('cal-empty').hidden = false;
+        $('cal-empty').textContent = message;
+        syncControls();
+    }
+
     async function boot() {
+        if (S.busy) return;
+        const request = ++S.bootRequest;
+        ++S.styleRequest; ++S.photoRequest;
+        S.style = null; S.details = []; S.color = null;
+        $('cal-color').replaceChildren();
+        clearPhoto('Pick a style to start');
+        $('cal-retry').disabled = true;
+        $('style-list').textContent = 'Loading catalog…';
         try {
             const [styles, cal] = await Promise.all([
                 grab(`${API_BASE}/api/dtg/top-sellers/styles`),
-                // Best-effort: a 404 (route not deployed) or table-missing must
-                // not block the catalog — the tool still works in layout+copy mode.
-                grab(`${API_BASE}/api/dtg-calibration?refresh=1`).catch(() => ({ data: [], routeMissing: true })),
+                grab(`${API_BASE}/api/dtg-calibration?refresh=1`).catch(() => null),
             ]);
-            S.styles = (styles.records || styles.data || []);
-            S.overrides = (cal.data || []);
-            if (cal.routeMissing) {
-                $('cal-status').textContent = '⚠️ Calibration API not deployed on the proxy yet — layouts can\'t save (use Copy JSON meanwhile).';
-            }
-            if (cal.tableMissing) {
-                $('cal-status').innerHTML = '⚠️ The Caspio table <strong>DTG_Calibration</strong> doesn\'t exist yet — layouts can\'t save until it\'s created (use Copy JSON meanwhile). Column spec is in the proxy route file.';
-            }
+            if (request !== S.bootRequest) return;
+            const rows = styles.records || styles.data;
+            if (!Array.isArray(rows)) throw new Error('Unexpected catalog response');
+            S.styles = rows;
+            S.overrides = Array.isArray(cal?.data) ? cal.data : [];
+            warning(!cal || !Array.isArray(cal.data)
+                ? 'Saved layouts could not be loaded. Reload to retry; you can still adjust a layout and copy its JSON.'
+                : cal.tableMissing ? 'Saved layouts are unavailable. You can adjust a layout and copy its JSON until saving is available.' : '');
             renderStyleList();
+            $('cal-status').textContent = '';
         } catch (e) {
-            $('style-list').innerHTML = `<div class="cal-loading">Failed to load catalog: ${esc(e.message)} — refresh to retry.</div>`;
+            if (request !== S.bootRequest) return;
+            S.styles = []; S.overrides = [];
+            $('style-list').textContent = 'Failed to load catalog: ' + e.message;
+            warning('The garment catalog is unavailable. Reload to retry.');
+        } finally {
+            if (request === S.bootRequest) $('cal-retry').disabled = false;
         }
     }
 
@@ -82,9 +134,11 @@
     }
 
     function renderStyleList() {
+        const focusedStyle = document.activeElement?.matches('.style-item') ? document.activeElement.dataset.style : null;
+        if (!S.styles.length) { $('style-list').textContent = 'No styles are available for calibration.'; return; }
         $('style-list').innerHTML = S.styles.map((st) => {
             const n = savedRowsFor(st.style).length;
-            return `<button type="button" class="style-item${S.style && S.style.style === st.style ? ' is-active' : ''}" data-style="${esc(st.style)}">
+            return `<button type="button" class="style-item${S.style && S.style.style === st.style ? ' is-active' : ''}" data-style="${esc(st.style)}" aria-pressed="${!!(S.style && S.style.style === st.style)}">
                 <img src="/api/image-proxy?url=${encodeURIComponent(st.main_image_url || '')}" alt="" loading="lazy">
                 <span class="style-item-name">${esc(st.style)}<small>${esc((st.product_title || '').replace(/\.\s*\w+$/, ''))}</small></span>
                 <span class="style-item-state ${n ? 'is-saved' : ''}">${n ? `✓ ${n} saved` : 'auto'}</span>
@@ -93,31 +147,39 @@
         [...document.querySelectorAll('.style-item')].forEach((b) => {
             b.addEventListener('click', () => selectStyle(b.dataset.style));
         });
+        syncControls();
+        if (focusedStyle) [...document.querySelectorAll('.style-item')].find(b => b.dataset.style === focusedStyle)?.focus();
     }
 
     // ── Style / view / color selection ─────────────────────────────────
     async function selectStyle(styleNumber) {
-        const st = S.styles.find((s) => s.style === styleNumber);
+        if (S.busy) return;
+        const st = S.styles.find(s => s.style === styleNumber);
         if (!st) return;
-        S.style = st;
-        S.view = 'front';
+        const request = ++S.styleRequest;
+        ++S.photoRequest;
+        S.style = st; S.view = 'front'; S.details = []; S.color = null;
+        $('cal-color').replaceChildren();
+        clearPhoto('Loading garment photos…');
         renderStyleList();
         $('cal-status').textContent = 'Loading photos…';
         try {
             const det = await grab(`${API_BASE}/api/product-details?styleNumber=${encodeURIComponent(styleNumber)}`);
-            S.details = Array.isArray(det) ? det : (det.data || det.records || []);
+            if (request !== S.styleRequest) return;
+            const rows = Array.isArray(det) ? det : (det.data || det.records);
+            if (!Array.isArray(rows)) throw new Error('Unexpected product response');
+            S.details = rows;
         } catch (e) {
-            toast('Couldn\'t load product photos: ' + e.message, 'error');
+            if (request !== S.styleRequest) return;
+            clearPhoto('Product photos could not be loaded. Select the style again to retry.');
+            $('cal-status').textContent = 'Could not load product photos: ' + e.message;
             return;
         }
-        // Color list: unique CATALOG_COLORs that have any front or back image
         const seen = new Map();
-        S.details.forEach((r) => {
-            if (!seen.has(r.CATALOG_COLOR) && (r.FRONT_FLAT || r.FRONT_MODEL || r.PRODUCT_IMAGE || r.BACK_FLAT || r.BACK_MODEL)) {
-                seen.set(r.CATALOG_COLOR, r);
-            }
+        S.details.forEach(r => {
+            if (!seen.has(r.CATALOG_COLOR) && (r.FRONT_FLAT || r.FRONT_MODEL || r.PRODUCT_IMAGE || r.BACK_FLAT || r.BACK_MODEL)) seen.set(r.CATALOG_COLOR, r);
         });
-        $('cal-color').innerHTML = [...seen.values()].map((r) =>
+        $('cal-color').innerHTML = [...seen.values()].map(r =>
             `<option value="${esc(r.CATALOG_COLOR)}">${esc(r.COLOR_NAME || r.CATALOG_COLOR)}</option>`).join('');
         S.color = $('cal-color').value || null;
         setView('front');
@@ -136,9 +198,15 @@
     }
 
     function setView(v) {
+        if (S.busy || !S.style) return;
         S.view = v;
-        $('cal-tab-front').classList.toggle('is-active', v === 'front');
-        $('cal-tab-back').classList.toggle('is-active', v === 'back');
+        for (const name of ['front', 'back']) {
+            const tab = $('cal-tab-' + name), active = v === name;
+            tab.classList.toggle('is-active', active);
+            tab.setAttribute('aria-selected', String(active));
+            tab.tabIndex = active ? 0 : -1;
+        }
+        $('cal-canvas-wrap').setAttribute('aria-labelledby', 'cal-tab-' + v);
         loadPhoto();
     }
 
@@ -151,27 +219,32 @@
     }
 
     async function loadPhoto() {
-        const url = photoUrl();
-        const img = $('cal-photo');
-        $('cal-box').hidden = true;
-        if (!url) {
-            img.removeAttribute('src');
-            $('cal-empty').hidden = false;
-            $('cal-empty').textContent = 'No photo for this view/color in SanMar\'s library.';
-            return;
-        }
-        $('cal-empty').hidden = true;
-        await new Promise((resolve) => {
-            img.onload = resolve;
-            img.onerror = resolve;
-            img.src = '/api/image-proxy?url=' + encodeURIComponent(url);
+        if (S.busy) return;
+        const request = ++S.photoRequest, url = photoUrl();
+        clearPhoto(url ? 'Loading garment photo…' : 'No photo for this view/color in SanMar\'s library.');
+        if (!url) { $('cal-status').textContent = 'Choose another view or color.'; return; }
+        const candidate = new Image();
+        const loaded = await new Promise(resolve => {
+            candidate.onload = () => resolve(true);
+            candidate.onerror = () => resolve(false);
+            candidate.src = '/api/image-proxy?url=' + encodeURIComponent(url);
         });
-        if (!img.naturalWidth) {
-            $('cal-empty').hidden = false;
-            $('cal-empty').textContent = 'Photo failed to load.';
+        if (request !== S.photoRequest) return;
+        if (!loaded || !candidate.naturalWidth) {
+            clearPhoto('Photo failed to load. Select the view or color again to retry.');
+            $('cal-status').textContent = 'Photo unavailable; no layout can be saved for this view.';
             return;
         }
+        const img = $('cal-photo');
+        img.src = candidate.src;
+        try { await img.decode(); } catch (_) { /* dimensions checked below */ }
+        if (request !== S.photoRequest) return;
+        if (!img.naturalWidth) { clearPhoto('Photo failed to load. Select the view again to retry.'); return; }
+        img.hidden = false;
+        img.alt = S.style.style + ' ' + S.color + ' ' + S.view + ' garment photo';
+        $('cal-empty').hidden = true;
         S.img = img;
+        $('cal-photo-frame').style.setProperty('--cal-image-ratio', String(img.naturalWidth / img.naturalHeight));
         initBox();
     }
 
@@ -209,6 +282,7 @@
         renderBox();
         const src = saved ? (saved.CatalogColor ? `saved (this color)` : 'saved (all colors)') : 'auto-detect — adjust + save';
         $('cal-status').textContent = `${S.style.style} · ${S.view} · ${S.color} — starting from ${src}.`;
+        syncControls();
     }
 
     // Same detector the storefront uses (96px white-bg bbox scan)
@@ -256,13 +330,12 @@
 
     function renderBox() {
         const box = $('cal-box');
-        const r = imgRectOnScreen();
-        const wrap = $('cal-canvas-wrap').getBoundingClientRect();
         const hf = hFracFor(S.box.wFrac);
-        box.style.left = (r.left - wrap.left + S.box.xFrac * r.width) + 'px';
-        box.style.top = (r.top - wrap.top + S.box.yFrac * r.height) + 'px';
-        box.style.width = (S.box.wFrac * r.width) + 'px';
-        box.style.height = (hf * r.height) + 'px';
+        // Relative to the photo frame: screen and print share the same geometry.
+        box.style.left = (S.box.xFrac * 100) + '%';
+        box.style.top = (S.box.yFrac * 100) + '%';
+        box.style.width = (S.box.wFrac * 100) + '%';
+        box.style.height = (hf * 100) + '%';
         box.hidden = false;
         const ppi = (S.box.wFrac * S.img.naturalWidth) / 16;
         $('cal-readout').textContent =
@@ -272,7 +345,7 @@
     const boxEl = () => $('cal-box');
 
     function startDrag(e, mode) {
-        if (!S.img || !S.box) return;
+        if (S.busy || !S.img || !S.box) return;
         e.preventDefault();
         const r = imgRectOnScreen();
         S.drag = {
@@ -285,7 +358,7 @@
     }
 
     function onDragMove(e) {
-        if (!S.drag) return;
+        if (S.busy || !S.drag) return;
         const dx = (e.clientX - S.drag.startX) / S.drag.imgW;
         const dy = (e.clientY - S.drag.startY) / S.drag.imgH;
         if (S.drag.mode === 'move') {
@@ -294,12 +367,16 @@
         } else {
             S.box.wFrac = Math.max(0.08, S.drag.start.wFrac + dx);
         }
+        clampBox();
+        renderBox();
+    }
+
+    function clampBox() {
         // soft clamp inside the image
         const hf = hFracFor(S.box.wFrac);
         S.box.wFrac = Math.min(S.box.wFrac, 1);
         S.box.xFrac = Math.min(Math.max(S.box.xFrac, -0.1), 1.1 - S.box.wFrac);
         S.box.yFrac = Math.min(Math.max(S.box.yFrac, -0.1), 1.1 - hf);
-        renderBox();
     }
 
     function endDrag() { S.drag = null; }
@@ -319,78 +396,118 @@
         };
     }
 
+    async function refreshSavedLayouts() {
+        const cal = await grab(`${API_BASE}/api/dtg-calibration?refresh=1`);
+        if (cal.tableMissing || !Array.isArray(cal.data)) throw new Error('Saved layouts are unavailable');
+        S.overrides = cal.data;
+        warning('');
+        renderStyleList();
+    }
+
     async function save() {
-        if (!S.style || !S.box) return;
+        if (S.busy || S.warning || !S.style || !S.img || !S.box) return;
         const rec = currentRecord();
-        $('cal-save').disabled = true;
+        S.busy = true; S.drag = null; syncControls();
+        let saved = false;
         try {
-            // SAME-ORIGIN on purpose (no API_BASE): the write goes to this app's
-            // session-gated forwarder so the SAML cookie rides along. Going
-            // straight to the proxy was unauthenticated — anyone could move the
-            // print box for every style. Reads stay on the proxy; the PUBLIC
-            // /custom-tees designer needs that GET.
+            // Same-origin staff forwarder; payload geometry remains unchanged.
             const r = await fetch('/api/dtg-calibration', {
-                method: 'POST',
-                credentials: 'same-origin',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(rec),
+                method:'POST', credentials:'same-origin',
+                headers:{'Content-Type':'application/json'}, body:JSON.stringify(rec),
             });
             const j = await r.json();
-            if (!r.ok || !j.success) {
-                if (j.tableMissing) {
-                    await navigator.clipboard.writeText(JSON.stringify(rec, null, 2)).catch(() => {});
-                    toast('Caspio table DTG_Calibration doesn\'t exist yet — JSON copied to clipboard instead.', 'error');
-                } else {
-                    toast('Save failed: ' + (j.error || r.status), 'error');
-                }
-                return;
-            }
-            toast(`Saved ${rec.StyleNumber} ${S.view}${rec.CatalogColor ? ' (' + rec.CatalogColor + ' only)' : ' (all colors)'} ✓`, 'ok');
-            const cal = await grab(`${API_BASE}/api/dtg-calibration?refresh=1`);
-            S.overrides = cal.data || [];
-            renderStyleList();
-            $('cal-delete').hidden = false;
+            if (!r.ok || !j.success) throw new Error(j.error || 'HTTP ' + r.status);
+            saved = true;
+            toast(`Saved ${rec.StyleNumber} ${rec.ViewName === 'flatBack' ? 'back' : 'front'}${rec.CatalogColor ? ' (' + rec.CatalogColor + ' only)' : ' (all colors)'} ✓`, 'ok');
+            await refreshSavedLayouts();
+            $('cal-delete').hidden = !savedRowForCurrent();
         } catch (e) {
-            toast('Save failed: ' + e.message, 'error');
-        } finally {
-            $('cal-save').disabled = false;
-        }
+            if (saved) {
+                S.overrides = []; renderStyleList(); $('cal-delete').hidden = true;
+                warning('Layout saved, but saved layouts could not be refreshed. Reload before saving again.');
+            } else {
+                $('cal-status').textContent = 'Save could not be confirmed: ' + e.message + '. Your adjustment is still here.';
+                toast('Save could not be confirmed. Your adjustment is still here.', 'error');
+            }
+        } finally { S.busy = false; syncControls(); }
     }
 
     async function removeSaved() {
+        if (S.busy || S.warning || !S.style || !S.img || !S.box) return;
         const row = savedRowForCurrent();
         if (!row || !row.PK_ID) return;
+        S.busy = true; S.drag = null; syncControls();
+        let removed = false;
         try {
-            // SAME-ORIGIN — see the note on save(); this is the session-gated forwarder.
-            const r = await fetch(`/api/dtg-calibration/${row.PK_ID}`, { method: 'DELETE', credentials: 'same-origin' });
+            const r = await fetch('/api/dtg-calibration/' + encodeURIComponent(row.PK_ID), {method:'DELETE',credentials:'same-origin'});
             const j = await r.json();
-            if (!j.success) { toast('Delete failed', 'error'); return; }
+            if (!r.ok || !j.success) throw new Error(j.error || 'HTTP ' + r.status);
+            removed = true;
             toast('Saved layout removed — back to auto-detect.', 'ok');
-            const cal = await grab(`${API_BASE}/api/dtg-calibration?refresh=1`);
-            S.overrides = cal.data || [];
-            renderStyleList();
+            await refreshSavedLayouts();
             initBox();
         } catch (e) {
-            toast('Delete failed: ' + e.message, 'error');
-        }
+            if (removed) {
+                S.overrides = []; renderStyleList(); $('cal-delete').hidden = true;
+                warning('Saved layout removed, but layouts could not be refreshed. Reload to continue.');
+            } else {
+                $('cal-status').textContent = 'Removal could not be confirmed: ' + e.message;
+                toast('Removal could not be confirmed. Reload before trying again.', 'error');
+            }
+        } finally { S.busy = false; syncControls(); }
+    }
+
+    async function copyRecord() {
+        if (S.busy || S.copyBusy || !S.img || !S.box) return;
+        const record = currentRecord();
+        S.copyBusy = true; syncControls();
+        try {
+            await navigator.clipboard.writeText(JSON.stringify(record, null, 2));
+            toast('JSON copied.', 'ok');
+        } catch (_) {
+            toast('Could not copy JSON. Allow clipboard access and try again.', 'error');
+        } finally { S.copyBusy = false; syncControls(); }
+    }
+
+    function adjustBox(direction, amount = 0.01) {
+        if (S.busy || !S.img || !S.box) return;
+        if (direction === 'left') S.box.xFrac -= amount;
+        if (direction === 'right') S.box.xFrac += amount;
+        if (direction === 'up') S.box.yFrac -= amount;
+        if (direction === 'down') S.box.yFrac += amount;
+        if (direction === 'smaller') S.box.wFrac = Math.max(0.08, S.box.wFrac - amount);
+        if (direction === 'larger') S.box.wFrac += amount;
+        clampBox(); renderBox();
     }
 
     // ── Wire up ─────────────────────────────────────────────────────────
     $('cal-tab-front').addEventListener('click', () => setView('front'));
     $('cal-tab-back').addEventListener('click', () => setView('back'));
-    $('cal-color').addEventListener('change', () => { S.color = $('cal-color').value; loadPhoto(); });
+    $('cal-color').addEventListener('change', () => { if (S.busy) return; S.color = $('cal-color').value; loadPhoto(); });
+    $('cal-retry').addEventListener('click', boot);
     $('cal-save').addEventListener('click', save);
     $('cal-delete').addEventListener('click', removeSaved);
     $('cal-auto').addEventListener('click', () => {
+        if (S.busy || !S.img || !S.box) return;
         const saved = savedRowForCurrent();
         if (saved) { S.overrides = S.overrides.filter((r) => r !== saved); }   // ignore saved for re-init only
         initBox();
         if (saved) S.overrides.push(saved);
     });
-    $('cal-copy').addEventListener('click', async () => {
-        if (!S.box) return;
-        await navigator.clipboard.writeText(JSON.stringify(currentRecord(), null, 2)).catch(() => {});
-        toast('JSON copied.', 'ok');
+    $('cal-copy').addEventListener('click', copyRecord);
+    for (const button of document.querySelectorAll('[data-adjust]')) button.addEventListener('click', () => adjustBox(button.dataset.adjust));
+    for (const tab of document.querySelectorAll('.cal-tab')) tab.addEventListener('keydown', e => {
+        if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(e.key) || S.busy) return;
+        e.preventDefault();
+        const view = e.key === 'Home' ? 'front' : e.key === 'End' ? 'back' : S.view === 'front' ? 'back' : 'front';
+        setView(view); $('cal-tab-' + view).focus();
+    });
+    boxEl().addEventListener('keydown', e => {
+        const directions = {ArrowLeft:'left',ArrowRight:'right',ArrowUp:'up',ArrowDown:'down'};
+        if (!directions[e.key]) return;
+        e.preventDefault();
+        const scale = e.target === $('cal-box-handle');
+        adjustBox(scale ? (['ArrowLeft','ArrowUp'].includes(e.key) ? 'smaller' : 'larger') : directions[e.key], e.shiftKey ? 0.05 : 0.01);
     });
 
     boxEl().addEventListener('pointerdown', (e) => {
@@ -399,6 +516,7 @@
     });
     document.addEventListener('pointermove', onDragMove);
     document.addEventListener('pointerup', endDrag);
+    document.addEventListener('pointercancel', endDrag);
     window.addEventListener('resize', () => { if (S.box && S.img) renderBox(); });
 
     boot();

@@ -1,0 +1,12 @@
+{
+  "description": "Synthetic staff dashboard identities, roster and portfolio only; no production records or writes.",
+  "employees": [
+    {"firstName":"Cedar","lastName":"Example","position":"Sales","startDate":"2020-09-20","birthday":"09-12"},
+    {"firstName":"Aster","lastName":"Example","position":"Production","startDate":"2021-02-02","birthday":"01-03"},
+    {"firstName":"Birch","lastName":"Example","position":"Art","startDate":"2019-09-10","birthday":"09-10"},
+    {"firstName":"Elm","lastName":"Example","position":"Office","startDate":"2018-03-01","birthday":"09-15","endDate":"2025-12-31"}
+  ],
+  "photos": [
+    {"imageUrl":"https://example.test/staff-sample.svg","companyName":"Sample Workshop","designNumber":"SYN-101","repName":"Cedar Example","uploadedDate":"2026-09-10T09:00:00","showToCustomer":true}
+  ]
+}

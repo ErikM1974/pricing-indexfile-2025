@@ -1,0 +1,46 @@
+{
+  "data": {
+    "count": "Loading...",
+    "pagination": "Page 1 of 0",
+    "rows": [
+      [
+        "No records found matching your criteria"
+      ]
+    ],
+    "statuses": [],
+    "filters": [
+      {
+        "id": "quoteTypeFilter",
+        "value": ""
+      },
+      {
+        "id": "statusFilter",
+        "value": ""
+      },
+      {
+        "id": "dateFromFilter",
+        "value": "2026-08-11"
+      },
+      {
+        "id": "dateToFilter",
+        "value": "2026-09-10"
+      },
+      {
+        "id": "customerFilter",
+        "value": ""
+      },
+      {
+        "id": "minAmountFilter",
+        "value": ""
+      }
+    ]
+  },
+  "text": "Universal Records Admin Panel\n\nComprehensive view of all quotes, bonuses, and analytics across all calculator types\n\nQuote Type\nAll Types\nDTG Contract\nRichardson Caps\nEmbroidery Contract\nCustomer Embroidery\nLaser Tumblers\nEmbroidered Emblems\nCustomer Screen Print\nSafety Stripe Creator\nWebstore Setup\nStatus\nAll Statuses\nOpen\nSent\nConverted\nExpired\nDate From\nDate To\nCustomer\nMin Amount\nApply Filters\nClear All\nExport CSV\nRefresh\nAll Quote Records\nLoading...\nQUOTE ID\tTYPE\tCUSTOMER\tCOMPANY\tTOTAL\tSTATUS\tCREATED\tACTIONS\n\nNo records found matching your criteria\nPage 1 of 0\n Previous\nNext ",
+  "events": {
+    "errors": [],
+    "writes": [],
+    "unknown": [],
+    "missing": [],
+    "providers": []
+  }
+}

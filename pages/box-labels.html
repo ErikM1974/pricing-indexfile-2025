@@ -6,74 +6,78 @@
     <link rel="icon" href="/favicon.png" type="image/png">
   <title>Box Labels - NWCA Shipping &amp; Receiving</title>
   <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-  <link rel="stylesheet" href="/pages/css/box-labels.css?v=2026.09.07.19">
+  <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.10.5">
+  <link rel="stylesheet" href="/shared_components/css/staff-box-labels.css?v=2026.09.10.5">
   <!-- Shared 8.5x11 label styles — the SAME label receiving prints (box-label-template.js) -->
-  <link rel="stylesheet" href="/shared_components/css/box-label-print.css?v=2026.09.10.4">
+  <link rel="stylesheet" href="/shared_components/css/vendor-box-labels.css?v=2026.09.10.5">
 </head>
-<body>
+<body data-ui="unified" data-staff-tool="box-labels" data-surface="staff" data-box-label-viewer="unified">
   <!-- Sticky Header -->
   <header class="bl-header">
     <div class="bl-header__left">
       <h1 class="bl-header__title">Box Labels</h1>
       <div class="bl-header__search">
-        <input type="text" id="searchInput" aria-label="Search orders" class="bl-input bl-input--large" placeholder="Enter PO# or Work Order#" autocomplete="off">
+        <input type="text" id="searchInput" aria-label="Search orders" class="field-input bl-input bl-input--large" placeholder="Enter PO# or Work Order#" autocomplete="off">
         <div class="bl-radio-group">
           <label class="bl-radio"><input type="radio" name="searchType" value="po" checked> SanMar PO#</label>
           <label class="bl-radio"><input type="radio" name="searchType" value="wo"> Work Order#</label>
         </div>
-        <button id="lookupBtn" class="bl-btn bl-btn--primary bl-btn--large">Look Up</button>
+        <button id="lookupBtn" class="btn btn-secondary bl-btn bl-btn--primary bl-btn--large">Look Up</button>
       </div>
     </div>
     <div class="bl-header__right">
       <a class="bl-back" href="/staff-dashboard.html" title="Back to the staff dashboard">&larr; Dashboard</a>
       <div class="bl-header__repacker">
         <label for="repackerName">Repacker:</label>
-        <input type="text" id="repackerName" class="bl-input" placeholder="Your name" autocomplete="off">
+        <input type="text" id="repackerName" class="field-input bl-input" placeholder="Your name" autocomplete="off">
       </div>
-      <button id="printAllBtn" class="bl-btn bl-btn--success bl-btn--xl" disabled>
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-        PRINT ALL LABELS
+      <button id="printAllBtn" class="btn btn-secondary bl-btn bl-btn--success bl-btn--xl" disabled>
+        <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        Print all labels
       </button>
     </div>
   </header>
 
   <!-- Loading State -->
-  <main>
-  <div id="loadingState" class="bl-loading" style="display:none;">
+  <main class="bl-workspace">
+  <p id="storageNotice" class="bl-storage-notice" role="status" hidden></p>
+  <p id="lookupHint" class="bl-lookup-hint">Enter a SanMar PO or work order number to arrange boxes and print their labels.</p>
+  <div id="loadingState" class="bl-loading" role="status" hidden>
     <div class="bl-spinner"></div>
     <p>Looking up shipment data...</p>
   </div>
 
   <!-- Error State (Rule #4: failures are always visible, never silent) -->
-  <div id="errorState" class="bl-error" style="display:none;">
+  <div id="errorState" class="bl-error" role="alert" hidden>
     <p id="errorMessage"></p>
     <span id="errorActions"></span>
-    <button class="bl-btn bl-btn--primary" id="errorDismissBtn">Dismiss</button>
+    <button class="btn btn-secondary bl-btn bl-btn--primary" id="errorDismissBtn">Dismiss</button>
   </div>
 
   <!-- Restored-draft note -->
-  <div id="draftNote" class="bl-draft-note" style="display:none;">
+  <div id="draftNote" class="bl-draft-note" hidden>
     <span id="draftNoteText"></span>
-    <button id="draftResetBtn" class="bl-btn bl-btn--small bl-btn--outline">Reset to SanMar boxes</button>
+    <button id="draftResetBtn" class="btn btn-secondary bl-btn bl-btn--small bl-btn--outline">Reset to SanMar boxes</button>
   </div>
 
   <!-- Totals Summary Bar -->
-  <div id="totalsBar" class="bl-totals" style="display:none;">
+  <div id="totalsBar" class="bl-totals" aria-live="polite" hidden>
     <span class="bl-totals__item">In boxes: <strong id="totalBoxed">0</strong> pcs</span>
     <span class="bl-totals__item">SanMar shipped: <strong id="totalShipped">0</strong> pcs</span>
     <span class="bl-totals__item">Ordered: <strong id="totalOrdered">0</strong> pcs</span>
-    <span id="shortShipWarning" class="bl-totals__warning" style="display:none;">
+    <span id="shortShipWarning" class="bl-totals__warning" hidden>
       ⚠ SanMar shipped fewer pieces than ordered — check for a short shipment
     </span>
   </div>
 
   <!-- Main Content: order groups render here -->
-  <div id="mainContent" class="bl-main" style="display:none;">
+  <div id="mainContent" class="bl-main" hidden>
     <div class="bl-column bl-column--boxes">
       <div class="bl-column__header">
         <h2>Boxes</h2>
         <div class="bl-column__actions">
-          <button id="expandAllBtn" class="bl-btn bl-btn--small">Expand All</button>
+          <button id="expandAllBtn" class="btn btn-secondary bl-btn bl-btn--small">Expand All</button>
         </div>
       </div>
       <div id="ordersContainer"></div>
@@ -89,17 +93,17 @@
   </main>
 
   <!-- Split Modal: move N pieces of one line to another box -->
-  <div id="splitModal" class="bl-modal" style="display:none;">
+  <dialog id="splitModal" class="bl-modal" aria-labelledby="splitModalTitle">
     <div class="bl-modal__content">
-      <h3 id="splitModalTitle">Split to another box</h3>
+      <h2 id="splitModalTitle">Split to another box</h2>
       <p id="splitModalSubtitle"></p>
       <div id="splitModalBody" class="bl-split-grid"></div>
       <div class="bl-modal__actions">
-        <button id="splitCancelBtn" class="bl-btn bl-btn--large">Cancel</button>
-        <button id="splitConfirmBtn" class="bl-btn bl-btn--primary bl-btn--large">Move</button>
+        <button id="splitCancelBtn" class="btn btn-secondary bl-btn bl-btn--large">Cancel</button>
+        <button id="splitConfirmBtn" class="btn btn-secondary bl-btn bl-btn--primary bl-btn--large">Move</button>
       </div>
     </div>
-  </div>
+  </dialog>
 
   <!-- Libraries: drag/drop + QR only. jsPDF/autotable/JsBarcode removed 2026-08-04 —
        printing goes through window.print() via the shared BoxLabelTemplate. -->
@@ -107,6 +111,6 @@
   <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
   <script src="/config/app.config.js?v=2026.09.03.11"></script>
   <script src="/shared_components/js/box-label-template.js?v=2026.09.10.4"></script>
-  <script src="/pages/js/box-labels.js?v=2026.09.06.31"></script>
+  <script src="/pages/js/box-labels.js?v=2026.09.10.5"></script>
 </body>
 </html>

@@ -159,6 +159,7 @@ function render() {
     if (state.q.trim().length < MIN_CHARS) {
         state.flat = [];
         list.innerHTML = '';
+        document.getElementById('cpInput')?.removeAttribute('aria-activedescendant');
         status.textContent = `Type ${MIN_CHARS}+ letters — a tool's name or what it does ("blanks", "roster", "heat") — every tab is searched, Enter opens the top match. Can't find it? The Everything tab lists every tool.`;
         return;
     }
@@ -174,7 +175,7 @@ function render() {
             lastGroup = it.group;
         }
         html += `
-            <div class="cp-item${i === state.sel ? ' cp-item--sel' : ''}" role="option" aria-selected="${i === state.sel}" data-action="palette:pick" data-idx="${i}">
+            <div class="cp-item${i === state.sel ? ' cp-item--sel' : ''}" id="cp-item-${i}" role="option" aria-selected="${i === state.sel}" data-action="palette:pick" data-idx="${i}">
                 <span class="cp-icon">${it.icon}</span>
                 <span class="cp-main">
                     <span class="cp-title">${escapeHtml(it.title)}</span>
@@ -184,6 +185,12 @@ function render() {
             </div>`;
     });
     list.innerHTML = html;
+    const selected = list.querySelector('[aria-selected="true"]');
+    const input = document.getElementById('cpInput');
+    if (selected) {
+        input?.setAttribute('aria-activedescendant', selected.id);
+        selected.scrollIntoView({ block: 'nearest' });
+    } else input?.removeAttribute('aria-activedescendant');
     status.textContent = state.flat[0]?.everything
         ? 'Customers, quotes, orders and designs each have their own search: Leads, Saved Quotes, Design Vault.'
         : '↑ ↓ to move · Enter to open · Esc to close';
@@ -217,6 +224,7 @@ function closePalette() {
     document.getElementById('cpPanel').hidden = true;
     const input = document.getElementById('cpInput');
     input.setAttribute('aria-expanded', 'false');
+    input.removeAttribute('aria-activedescendant');
     input.value = '';
     state.q = ''; state.sel = 0;
     syncClear();
