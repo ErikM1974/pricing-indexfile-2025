@@ -1,0 +1,869 @@
+{
+  "base": "ddfc539528ccafd5c6adf12f94513a9a4bcbde0b",
+  "pages": [
+    {
+      "file": "dashboards/blog-editor.html",
+      "html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <meta name=\"robots\" content=\"noindex, nofollow\">\n    <title>Blog Editor - Northwest Custom Apparel</title>\n    <link rel=\"icon\" href=\"/favicon.png\" type=\"image/png\">\n\n    <!-- Fonts & Icons -->\n    <link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n    <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n    <link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap\" rel=\"stylesheet\">\n    <link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css\">\n\n    <!-- 2026 design tokens (must load before dash-shell.css) -->\n    <link rel=\"stylesheet\" href=\"/shared_components/css/tokens.css?v=2026.09.08.2\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/art-hub.css?v=2026.09.07.19\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/dash-shell.css?v=2026.09.07.10\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/blog.css?v=2026.09.07.8\">\n    <link rel=\"stylesheet\" href=\"/dashboards/css/blog-editor.css?v=2026.09.07.10\">\n</head>\n<body>\n    <div class=\"dash-shell\">\n        <header class=\"dash-header\">\n            <div class=\"dash-header-left\">\n                <a href=\"/staff-dashboard.html\" title=\"Back to Staff Dashboard\">\n                    <img src=\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1\"\n                         alt=\"Northwest Custom Apparel\" class=\"dash-header-logo\">\n                </a>\n                <h1 class=\"dash-header-title\">Blog Editor</h1>\n            </div>\n            <div class=\"dash-header-right\">\n                <a href=\"/blog\" target=\"_blank\" rel=\"noopener\" class=\"dash-back-link\">\n                    <i class=\"fas fa-up-right-from-square\" aria-hidden=\"true\"></i>\n                    View live blog\n                </a>\n                <a href=\"/staff-dashboard.html\" class=\"dash-back-link\">\n                    <i class=\"fas fa-arrow-left\" aria-hidden=\"true\"></i>\n                    Dashboard\n                </a>\n            </div>\n        </header>\n\n        <main class=\"dash-content\">\n            <div class=\"dash-error-banner\" role=\"alert\">\n                <i class=\"fas fa-exclamation-triangle\" aria-hidden=\"true\"></i>\n                <span class=\"dash-error-banner-message\"></span>\n                <button type=\"button\" class=\"dash-error-banner-close\" aria-label=\"Dismiss\"><i class=\"fas fa-times\" aria-hidden=\"true\"></i></button>\n            </div>\n\n            <!-- ===== Post list ===== -->\n            <section id=\"listView\">\n                <div class=\"be-list-head\">\n                    <h2>Posts</h2>\n                    <button type=\"button\" id=\"newPostBtn\" class=\"be-btn be-btn--primary\">\n                        <i class=\"fas fa-plus\" aria-hidden=\"true\"></i> New post\n                    </button>\n                </div>\n                <div id=\"postList\" class=\"be-list dash-loading\" role=\"status\">Loading posts…</div>\n            </section>\n\n            <!-- ===== Editor ===== -->\n            <section id=\"editorView\" hidden>\n                <div class=\"be-editor-head\">\n                    <button type=\"button\" id=\"backToListBtn\" class=\"be-btn be-btn--ghost\">\n                        <i class=\"fas fa-arrow-left\" aria-hidden=\"true\"></i> All posts\n                    </button>\n                    <div class=\"be-editor-actions\">\n                        <span id=\"saveState\" class=\"be-save-state\" role=\"status\"></span>\n                        <button type=\"button\" id=\"saveDraftBtn\" class=\"be-btn\">Save draft</button>\n                        <button type=\"button\" id=\"publishBtn\" class=\"be-btn be-btn--primary\">\n                            <i class=\"fas fa-bullhorn\" aria-hidden=\"true\"></i> Publish\n                        </button>\n                        <button type=\"button\" id=\"unpublishBtn\" class=\"be-btn be-btn--warn\" hidden>Unpublish</button>\n                        <a id=\"viewLiveLink\" class=\"be-btn be-btn--ghost\" target=\"_blank\" rel=\"noopener\" hidden>\n                            <i class=\"fas fa-up-right-from-square\" aria-hidden=\"true\"></i> View live\n                        </a>\n                    </div>\n                </div>\n\n                <div class=\"be-grid\">\n                    <div class=\"be-fields\">\n                        <label class=\"be-label\" for=\"fldTitle\">Title</label>\n                        <input type=\"text\" id=\"fldTitle\" class=\"be-input\" placeholder=\"e.g. Embroidery vs. Screen Printing: Which Is Right for Your Team?\">\n\n                        <label class=\"be-label\" for=\"fldSlug\">URL slug <span class=\"be-hint\" id=\"slugHint\">/blog/…</span></label>\n                        <input type=\"text\" id=\"fldSlug\" class=\"be-input be-input--mono\" placeholder=\"auto-generates from the title\">\n                        <p class=\"be-note\" id=\"slugLockNote\" hidden><i class=\"fas fa-lock\" aria-hidden=\"true\"></i> Slug is permanent once published (search engines index the URL).</p>\n\n                        <label class=\"be-label\" for=\"fldMeta\">Meta description <span class=\"be-hint\"><span id=\"metaCount\">0</span>/155 — this is the Google snippet</span></label>\n                        <textarea id=\"fldMeta\" class=\"be-input\" rows=\"2\" maxlength=\"255\" placeholder=\"One or two sentences that make someone click.\"></textarea>\n\n                        <div class=\"be-row\">\n                            <div>\n                                <label class=\"be-label\" for=\"fldCategory\">Category</label>\n                                <input type=\"text\" id=\"fldCategory\" class=\"be-input\" list=\"beCategories\" placeholder=\"Guides / News / Behind the Scenes\">\n                                <datalist id=\"beCategories\"></datalist>\n                            </div>\n                            <div>\n                                <label class=\"be-label\" for=\"fldAuthor\">Author</label>\n                                <input type=\"text\" id=\"fldAuthor\" class=\"be-input\" placeholder=\"Northwest Custom Apparel\">\n                            </div>\n                        </div>\n\n                        <span class=\"be-label\" id=\"heroLabel\">Hero image</span>\n                        <div class=\"be-hero-row\" role=\"group\" aria-labelledby=\"heroLabel\">\n                            <img id=\"heroPreview\" class=\"be-hero-preview\" alt=\"Hero image preview\" hidden>\n                            <div class=\"be-hero-controls\">\n                                <label class=\"be-btn be-file-btn\" for=\"fldHeroFile\" role=\"button\" tabindex=\"0\"><i class=\"fas fa-image\" aria-hidden=\"true\"></i> Upload image</label>\n                                <input type=\"file\" id=\"fldHeroFile\" accept=\"image/*\" class=\"be-visually-hidden\" aria-label=\"Upload hero image\">\n                                <input type=\"text\" id=\"fldHeroUrl\" aria-label=\"Hero image URL\" class=\"be-input be-input--mono\" placeholder=\"…or paste an image URL\">\n                            </div>\n                        </div>\n\n                        <label class=\"be-label\" for=\"fldBody\">Post body <span class=\"be-hint\">Markdown — use the toolbar; paste a YouTube/Vimeo link on its own line to embed it</span></label>\n                        <div class=\"be-toolbar\" role=\"toolbar\" aria-label=\"Formatting\">\n                            <button type=\"button\" data-md=\"bold\" title=\"Bold\" aria-label=\"Bold\"><i class=\"fas fa-bold\" aria-hidden=\"true\"></i></button>\n                            <button type=\"button\" data-md=\"italic\" title=\"Italic\" aria-label=\"Italic\"><i class=\"fas fa-italic\" aria-hidden=\"true\"></i></button>\n                            <button type=\"button\" data-md=\"h2\" title=\"Section heading\" aria-label=\"Section heading\">H2</button>\n                            <button type=\"button\" data-md=\"h3\" title=\"Sub-heading\" aria-label=\"Sub-heading\">H3</button>\n                            <button type=\"button\" data-md=\"ul\" title=\"Bullet list\" aria-label=\"Bullet list\"><i class=\"fas fa-list-ul\" aria-hidden=\"true\"></i></button>\n                            <button type=\"button\" data-md=\"link\" title=\"Link\" aria-label=\"Insert link\"><i class=\"fas fa-link\" aria-hidden=\"true\"></i></button>\n                            <button type=\"button\" data-md=\"quote\" title=\"Quote\" aria-label=\"Quote\"><i class=\"fas fa-quote-left\" aria-hidden=\"true\"></i></button>\n                            <label class=\"be-toolbar-upload be-file-btn\" for=\"fldBodyImage\" title=\"Insert image\" role=\"button\" tabindex=\"0\" aria-label=\"Insert image\"><i class=\"fas fa-image\" aria-hidden=\"true\"></i></label>\n                            <input type=\"file\" id=\"fldBodyImage\" accept=\"image/*\" class=\"be-visually-hidden\" aria-label=\"Insert image into the post body\">\n                        </div>\n                        <textarea id=\"fldBody\" class=\"be-input be-body\" rows=\"18\" placeholder=\"Write like you're explaining it to a customer at the counter…\"></textarea>\n                    </div>\n\n                    <div class=\"be-preview-col\">\n                        <div class=\"be-preview-head\">Live preview <span class=\"be-hint\">(exactly what the published page renders)</span></div>\n                        <div class=\"be-google\">\n                            <div class=\"be-google-title\" id=\"gTitle\">Post title | Northwest Custom Apparel</div>\n                            <div class=\"be-google-url\" id=\"gUrl\">www.teamnwca.com/blog/…</div>\n                            <div class=\"be-google-desc\" id=\"gDesc\">Meta description preview…</div>\n                        </div>\n                        <div id=\"previewPane\" class=\"blog-prose be-preview\" aria-live=\"polite\"></div>\n                    </div>\n                </div>\n            </section>\n        </main>\n    </div>\n\n    <script src=\"/config/app.config.js\"></script>\n    <script src=\"/shared_components/js/fetch-timeout.js?v=2026.09.06.26\"></script>\n    <script src=\"/shared_components/js/dash-page-helpers.js?v=2026.09.07.25\"></script>\n    <script src=\"/dashboards/js/blog-editor.js?v=2026.09.05.69\"></script>\n</body>\n</html>\n",
+      "title": "Blog Editor - Northwest Custom Apparel",
+      "bodyText": "Blog Editor View live blog Dashboard Posts New post Loading posts… All posts Save draft Publish Unpublish View live Title URL slug /blog/… Slug is permanent once published (search engines index the URL). Meta description 0/155 — this is the Google snippet Category Author Hero image Upload image Post body Markdown — use the toolbar; paste a YouTube/Vimeo link on its own line to embed it H2 H3 Live preview (exactly what the published page renders) Post title | Northwest Custom Apparel www.teamnwca.com/blog/… Meta description preview…",
+      "bodyTextSha": "4a7242667c86ffca4f215991c6136e3f9b70ac4f9472ff6da54395294cec723f",
+      "ids": [
+        "listView",
+        "newPostBtn",
+        "postList",
+        "editorView",
+        "backToListBtn",
+        "saveState",
+        "saveDraftBtn",
+        "publishBtn",
+        "unpublishBtn",
+        "viewLiveLink",
+        "fldTitle",
+        "slugHint",
+        "fldSlug",
+        "slugLockNote",
+        "metaCount",
+        "fldMeta",
+        "fldCategory",
+        "beCategories",
+        "fldAuthor",
+        "heroLabel",
+        "heroPreview",
+        "fldHeroFile",
+        "fldHeroUrl",
+        "fldBodyImage",
+        "fldBody",
+        "gTitle",
+        "gUrl",
+        "gDesc",
+        "previewPane"
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "label": ""
+        },
+        {
+          "href": "/blog",
+          "label": "View live blog"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "label": "Dashboard"
+        }
+      ],
+      "fields": [
+        {
+          "id": "fldTitle",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "fldSlug",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "fldMeta",
+          "type": "textarea",
+          "value": ""
+        },
+        {
+          "id": "fldCategory",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "fldAuthor",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "fldHeroFile",
+          "type": "file",
+          "value": ""
+        },
+        {
+          "id": "fldHeroUrl",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "fldBodyImage",
+          "type": "file",
+          "value": ""
+        },
+        {
+          "id": "fldBody",
+          "type": "textarea",
+          "value": ""
+        }
+      ],
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/art-hub.css",
+        "shared_components/css/dash-shell.css",
+        "shared_components/css/blog.css",
+        "dashboards/css/blog-editor.css"
+      ],
+      "scripts": [
+        "config/app.config.js",
+        "shared_components/js/fetch-timeout.js",
+        "shared_components/js/dash-page-helpers.js",
+        "dashboards/js/blog-editor.js"
+      ],
+      "cssBytes": 177552
+    },
+    {
+      "file": "dashboards/contract-break-even.html",
+      "html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <meta name=\"robots\" content=\"noindex, nofollow\">\n    <title>Contract Break-Even - Northwest Custom Apparel</title>\n    <link rel=\"icon\" href=\"/favicon.png\" type=\"image/png\">\n\n    <!-- Fonts & Icons -->\n    <link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n    <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n    <link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap\" rel=\"stylesheet\">\n    <link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css\">\n\n    <!-- 2026 design tokens (must load before dash-shell.css) -->\n    <link rel=\"stylesheet\" href=\"/shared_components/css/tokens.css?v=2026.09.08.2\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/art-hub.css?v=2026.09.07.19\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/dash-shell.css?v=2026.09.07.10\">\n    <link rel=\"stylesheet\" href=\"/dashboards/css/contract-break-even.css?v=2026.09.07.10\">\n</head>\n<body>\n    <div class=\"dash-shell\">\n        <header class=\"dash-header\">\n            <div class=\"dash-header-left\">\n                <a href=\"/staff-dashboard.html\" title=\"Back to Staff Dashboard\">\n                    <img src=\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1\"\n                         alt=\"Northwest Custom Apparel\" class=\"dash-header-logo\">\n                </a>\n                <h1 class=\"dash-header-title\">Contract Break-Even</h1>\n            </div>\n            <div class=\"dash-header-right\">\n                <a href=\"/staff-dashboard.html\" class=\"dash-back-link\">\n                    <i class=\"fas fa-arrow-left\" aria-hidden=\"true\"></i>\n                    Dashboard\n                </a>\n            </div>\n        </header>\n\n        <main class=\"dash-content\">\n            <div class=\"dash-error-banner\" role=\"alert\">\n                <i class=\"fas fa-exclamation-triangle\" aria-hidden=\"true\"></i>\n                <span class=\"dash-error-banner-message\"></span>\n                <button type=\"button\" class=\"dash-error-banner-close\" aria-label=\"Dismiss\">\n                    <i class=\"fas fa-times\" aria-hidden=\"true\"></i>\n                </button>\n            </div>\n\n            <p class=\"cbe-intro\">\n                The contract price list, but every cell is what the job <strong>costs</strong> us: machine setup,\n                hooping and handling, sewing at the shop's stitch speed, thread, and the order-level admin cost,\n                divided by the pieces in the order. A price at or above the cell breaks even. Internal only:\n                nothing on this page goes to a customer.\n            </p>\n\n            <section class=\"dash-card cbe-controls\">\n                <div class=\"cbe-toggle\" role=\"group\" aria-label=\"Production case\">\n                    <button type=\"button\" class=\"dash-btn dash-btn--primary\" data-case=\"typical\" aria-pressed=\"true\">Typical run</button>\n                    <button type=\"button\" class=\"dash-btn\" data-case=\"worst\" aria-pressed=\"false\">Worst case</button>\n                </div>\n                <div class=\"cbe-toggle\" role=\"group\" aria-label=\"What the cells show\">\n                    <button type=\"button\" class=\"dash-btn dash-btn--primary\" data-view=\"cost\" aria-pressed=\"true\">Break-even cost / pc</button>\n                    <button type=\"button\" class=\"dash-btn\" data-view=\"profit\" aria-pressed=\"false\">Profit / pc at the card</button>\n                </div>\n                <div class=\"cbe-actions\">\n                    <button type=\"button\" class=\"dash-btn\" id=\"cbe-print\"><i class=\"fas fa-print\" aria-hidden=\"true\"></i> Print</button>\n                </div>\n            </section>\n\n            <section class=\"dash-card\">\n                <div class=\"dash-card-header\">\n                    <h2 class=\"dash-card-title\">Assumptions (live from Caspio)</h2>\n                </div>\n                <div class=\"cbe-assumptions\" id=\"cbe-assumptions\">Loading…</div>\n                <p class=\"cbe-note\" id=\"cbe-case-note\"></p>\n            </section>\n\n            <div id=\"cbe-tables\"></div>\n\n            <section class=\"dash-card\">\n                <div class=\"dash-card-header\">\n                    <h2 class=\"dash-card-title\">How to read it</h2>\n                </div>\n                <ul class=\"cbe-howto\">\n                    <li><strong>Break-even cost / pc</strong> = (setup + handling × qty + sewing × qty) × hour rate + thread + order cost, all divided by qty. Tier quantities used: 4, 12, 36, 60, 144. A small order carries the setup and order cost on few pieces, which is why the left columns are high.</li>\n                    <li><strong>Typical</strong> sews on the 8-head machines with no slack. <strong>Worst case</strong> sews on the smallest machine with the slack percentage on everything, the same model the Volume Quote page uses.</li>\n                    <li><strong>Profit / pc at the card</strong> = what the customer pays per piece (the card rate × stitches, or the order minimum ÷ qty when the minimum is higher) minus the break-even cost. Red cells lose money.</li>\n                    <li>Overhead beyond the order cost (executive, occupancy, card fees) is deliberately <strong>not</strong> in these cells, matching the July cost model. Change any assumption in Caspio <code>Service_Codes</code> (VOL-* rows) and this page follows on the next load.</li>\n                </ul>\n            </section>\n        </main>\n    </div>\n\n    <!-- Load order matters: APP_CONFIG -> fetch-timeout -> DashPage -> page controller -->\n    <script src=\"/config/app.config.js\"></script>\n    <script src=\"/shared_components/js/fetch-timeout.js?v=2026.09.06.26\"></script>\n    <script src=\"/shared_components/js/dash-page-helpers.js?v=2026.09.07.25\"></script>\n    <script src=\"/dashboards/js/contract-break-even.js?v=2026.09.05.72\"></script>\n</body>\n</html>\n",
+      "title": "Contract Break-Even - Northwest Custom Apparel",
+      "bodyText": "Contract Break-Even Dashboard The contract price list, but every cell is what the job costs us: machine setup, hooping and handling, sewing at the shop's stitch speed, thread, and the order-level admin cost, divided by the pieces in the order. A price at or above the cell breaks even. Internal only: nothing on this page goes to a customer. Typical run Worst case Break-even cost / pc Profit / pc at the card Print Assumptions (live from Caspio) Loading… How to read it Break-even cost / pc = (setup + handling × qty + sewing × qty) × hour rate + thread + order cost, all divided by qty. Tier quantities used: 4, 12, 36, 60, 144. A small order carries the setup and order cost on few pieces, which is why the left columns are high. Typical sews on the 8-head machines with no slack. Worst case sews on the smallest machine with the slack percentage on everything, the same model the Volume Quote page uses. Profit / pc at the card = what the customer pays per piece (the card rate × stitches, or the order minimum ÷ qty when the minimum is higher) minus the break-even cost. Red cells lose money. Overhead beyond the order cost (executive, occupancy, card fees) is deliberately not in these cells, matching the July cost model. Change any assumption in Caspio Service_Codes (VOL-* rows) and this page follows on the next load.",
+      "bodyTextSha": "feee8df6e1e82d7c5ebb8fc4393bb89d5e404c8b098df355517b7bd6650a41e8",
+      "ids": [
+        "cbe-print",
+        "cbe-assumptions",
+        "cbe-case-note",
+        "cbe-tables"
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "label": ""
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "label": "Dashboard"
+        }
+      ],
+      "fields": [],
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/art-hub.css",
+        "shared_components/css/dash-shell.css",
+        "dashboards/css/contract-break-even.css"
+      ],
+      "scripts": [
+        "config/app.config.js",
+        "shared_components/js/fetch-timeout.js",
+        "shared_components/js/dash-page-helpers.js",
+        "dashboards/js/contract-break-even.js"
+      ],
+      "cssBytes": 166499
+    },
+    {
+      "file": "dashboards/customer-portal-admin.html",
+      "html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <meta name=\"robots\" content=\"noindex, nofollow\">\n    <title>Portal Access - Northwest Custom Apparel</title>\n    <link rel=\"icon\" href=\"/favicon.png\" type=\"image/png\">\n\n    <!-- Fonts & Icons -->\n    <link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n    <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n    <link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap\" rel=\"stylesheet\">\n    <link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css\">\n\n    <!-- 2026 design tokens (must load before dash-shell.css) -->\n    <link rel=\"stylesheet\" href=\"/shared_components/css/tokens.css?v=2026.09.08.2\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/art-hub.css?v=2026.09.07.19\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/dash-shell.css?v=2026.09.07.10\">\n    <link rel=\"stylesheet\" href=\"/dashboards/css/customer-portal-admin.css?v=2026.09.07.19\">\n</head>\n<body>\n    <div class=\"dash-shell\">\n        <header class=\"dash-header\">\n            <div class=\"dash-header-left\">\n                <a href=\"/staff-dashboard.html\" title=\"Back to Staff Dashboard\">\n                    <img src=\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1\"\n                         alt=\"Northwest Custom Apparel\" class=\"dash-header-logo\">\n                </a>\n                <h1 class=\"dash-header-title\">Portal Access</h1>\n            </div>\n            <div class=\"dash-header-right\">\n                <a href=\"/staff-dashboard.html\" class=\"dash-back-link\">\n                    <i class=\"fas fa-arrow-left\" aria-hidden=\"true\"></i>\n                    Dashboard\n                </a>\n            </div>\n        </header>\n\n        <main class=\"dash-content\">\n            <div class=\"dash-error-banner\" role=\"alert\">\n                <i class=\"fas fa-exclamation-triangle\" aria-hidden=\"true\"></i>\n                <span class=\"dash-error-banner-message\"></span>\n                <button type=\"button\" class=\"dash-error-banner-close\" aria-label=\"Dismiss\">\n                    <i class=\"fas fa-times\" aria-hidden=\"true\"></i>\n                </button>\n            </div>\n\n            <p class=\"cpa-intro\">\n                Manage who can log into the customer portal. Customers sign in with a one-click\n                email link (no password) and see only their own company's mockups, art, orders and invoices.\n            </p>\n\n            <!-- Tabs -->\n            <div class=\"cpa-tabs\" role=\"tablist\" aria-label=\"Portal console sections\">\n                <button type=\"button\" class=\"cpa-tab cpa-tab-active\" role=\"tab\" id=\"cpa-tab-access\" aria-selected=\"true\" aria-controls=\"cpa-view-access\" data-tab=\"access\"><i class=\"fas fa-id-card-clip\" aria-hidden=\"true\"></i> Portal Access</button>\n                <button type=\"button\" class=\"cpa-tab\" role=\"tab\" id=\"cpa-tab-requests\" aria-selected=\"false\" aria-controls=\"cpa-view-requests\" data-tab=\"requests\"><i class=\"fas fa-cart-shopping\" aria-hidden=\"true\"></i> Re-order Requests <span class=\"cpa-tab-badge\" id=\"cpa-req-badge\" hidden>0</span></button>\n            </div>\n\n            <div id=\"cpa-view-access\" role=\"tabpanel\" aria-labelledby=\"cpa-tab-access\">\n            <!-- Stats -->\n            <div class=\"dash-stat-grid\">\n                <div class=\"dash-stat-card dash-stat-card--accent\">\n                    <div class=\"dash-stat-value\" id=\"stat-total\">—</div>\n                    <div class=\"dash-stat-label\">Invited Customers</div>\n                </div>\n                <div class=\"dash-stat-card\">\n                    <div class=\"dash-stat-value\" id=\"stat-enabled\">—</div>\n                    <div class=\"dash-stat-label\">Active</div>\n                </div>\n                <div class=\"dash-stat-card\">\n                    <div class=\"dash-stat-value\" id=\"stat-disabled\">—</div>\n                    <div class=\"dash-stat-label\">Disabled</div>\n                </div>\n                <div class=\"dash-stat-card\">\n                    <div class=\"dash-stat-value\" id=\"stat-loggedin\">—</div>\n                    <div class=\"dash-stat-label\">Have Signed In</div>\n                </div>\n                <div class=\"dash-stat-card\">\n                    <div class=\"dash-stat-value\" id=\"stat-rewards\">—</div>\n                    <div class=\"dash-stat-label\">Reward $ Outstanding</div>\n                </div>\n            </div>\n\n            <!-- Controls -->\n            <div class=\"cpa-controls\">\n                <div class=\"cpa-search-wrap\">\n                    <i class=\"fas fa-search\" aria-hidden=\"true\"></i>\n                    <input type=\"text\" id=\"cpa-filter\" aria-label=\"Search portal users\" placeholder=\"Filter by company, email, rep or customer #…\" autocomplete=\"off\">\n                </div>\n                <button type=\"button\" class=\"cpa-btn cpa-btn-ghost\" id=\"cpa-mine-btn\" hidden aria-pressed=\"false\" title=\"Show only accounts you own\">\n                    <i class=\"fas fa-user-check\" aria-hidden=\"true\"></i> My customers\n                </button>\n                <button type=\"button\" class=\"cpa-btn cpa-btn-primary\" id=\"cpa-add-btn\">\n                    <i class=\"fas fa-user-plus\" aria-hidden=\"true\"></i> Add Customer\n                </button>\n            </div>\n\n            <!-- Table -->\n            <div class=\"dash-card\">\n                <div class=\"dash-card-header\">\n                    <h2 class=\"dash-card-title\">Portal Access</h2>\n                    <span class=\"cpa-count\" id=\"cpa-rowcount\"></span>\n                </div>\n                <div id=\"content-root\" class=\"dash-loading\">Loading…</div>\n            </div>\n            </div><!-- /cpa-view-access -->\n\n            <!-- Re-order Requests view -->\n            <div id=\"cpa-view-requests\" role=\"tabpanel\" aria-labelledby=\"cpa-tab-requests\" hidden>\n                <div class=\"cpa-controls\">\n                    <div class=\"cpa-search-wrap\">\n                        <i class=\"fas fa-search\" aria-hidden=\"true\"></i>\n                        <input type=\"text\" id=\"cpa-req-filter\" aria-label=\"Search access requests\" placeholder=\"Filter by company, product, design or rep…\" autocomplete=\"off\">\n                    </div>\n                    <select id=\"cpa-req-status\" aria-label=\"Request status\" class=\"cpa-select\">\n                        <option value=\"\">All statuses</option>\n                        <option value=\"New\">New</option>\n                        <option value=\"In Progress\">In Progress</option>\n                        <option value=\"Quoted\">Quoted</option>\n                        <option value=\"Closed\">Closed</option>\n                    </select>\n                    <button type=\"button\" class=\"cpa-btn cpa-btn-ghost\" id=\"cpa-req-mine-btn\" hidden aria-pressed=\"false\" title=\"Show only your customers' requests\">\n                        <i class=\"fas fa-user-check\" aria-hidden=\"true\"></i> My requests\n                    </button>\n                </div>\n                <div class=\"dash-card\">\n                    <div class=\"dash-card-header\">\n                        <h2 class=\"dash-card-title\">Re-order Requests</h2>\n                        <span class=\"cpa-count\" id=\"cpa-req-rowcount\"></span>\n                    </div>\n                    <div id=\"requests-root\" class=\"dash-loading\">Loading…</div>\n                </div>\n            </div>\n        </main>\n    </div>\n\n    <!-- Add / Edit Customer modal -->\n    <div class=\"cpa-modal-overlay\" id=\"cpa-modal\" hidden>\n        <div class=\"cpa-modal\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"cpa-modal-title\">\n            <div class=\"cpa-modal-head\">\n                <h3 id=\"cpa-modal-title\">Add Customer</h3>\n                <button type=\"button\" class=\"cpa-modal-close\" id=\"cpa-modal-close\" aria-label=\"Close\"><i class=\"fas fa-times\" aria-hidden=\"true\"></i></button>\n            </div>\n            <div class=\"cpa-modal-body\">\n                <!-- Step 1: find the customer in the CRM -->\n                <div class=\"cpa-field\" id=\"cpa-lookup-field\">\n                    <label class=\"cpa-field-label\" for=\"cpa-lookup\">Find customer <small>(search company name or email)</small></label>\n                    <div class=\"cpa-search-wrap cpa-search-inline\">\n                        <i class=\"fas fa-search\" aria-hidden=\"true\"></i>\n                        <input type=\"text\" id=\"cpa-lookup\" placeholder=\"e.g. Lincoln High School\" autocomplete=\"off\" role=\"combobox\" aria-autocomplete=\"list\" aria-expanded=\"false\" aria-controls=\"cpa-lookup-results\">\n                    </div>\n                    <div class=\"cpa-lookup-results\" id=\"cpa-lookup-results\" role=\"listbox\" aria-label=\"Matching customers\"></div>\n                </div>\n\n                <div class=\"cpa-divider\"><span>then confirm the details</span></div>\n\n                <!-- Step 2: confirm / edit the invite fields -->\n                <label class=\"cpa-field\">\n                    <span class=\"cpa-field-label\">Email <small>(the login identity)</small></span>\n                    <input type=\"email\" id=\"cpa-email\" placeholder=\"buyer@company.com\" autocomplete=\"off\">\n                </label>\n                <div class=\"cpa-field-row\">\n                    <label class=\"cpa-field\">\n                        <span class=\"cpa-field-label\">Customer # <small>(ShopWorks id)</small></span>\n                        <input type=\"text\" id=\"cpa-idcustomer\" placeholder=\"13616\" inputmode=\"numeric\" autocomplete=\"off\">\n                    </label>\n                    <label class=\"cpa-field\">\n                        <span class=\"cpa-field-label\">Company name</span>\n                        <input type=\"text\" id=\"cpa-company\" placeholder=\"Company, Inc.\" autocomplete=\"off\">\n                    </label>\n                </div>\n                <label class=\"cpa-checkline\">\n                    <input type=\"checkbox\" id=\"cpa-sendlink\" checked>\n                    <span>Email them a login link right away</span>\n                </label>\n                <div class=\"cpa-modal-error\" id=\"cpa-modal-error\" role=\"alert\"></div>\n            </div>\n            <div class=\"cpa-modal-foot\">\n                <button type=\"button\" class=\"cpa-btn cpa-btn-ghost\" id=\"cpa-cancel\">Cancel</button>\n                <button type=\"button\" class=\"cpa-btn cpa-btn-primary\" id=\"cpa-save\"><i class=\"fas fa-check\" aria-hidden=\"true\"></i> Save & Invite</button>\n            </div>\n        </div>\n    </div>\n\n    <!-- Reward dollars modal -->\n    <div class=\"cpa-modal-overlay\" id=\"cpa-rewards-modal\" hidden>\n        <div class=\"cpa-modal\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"cpa-rw-title\">\n            <div class=\"cpa-modal-head\">\n                <h3 id=\"cpa-rw-title\">Reward Dollars</h3>\n                <button type=\"button\" class=\"cpa-modal-close\" id=\"cpa-rw-close\" aria-label=\"Close\"><i class=\"fas fa-times\" aria-hidden=\"true\"></i></button>\n            </div>\n            <div class=\"cpa-modal-body\">\n                <div class=\"cpa-rw-balance\">Current balance: <strong id=\"cpa-rw-balance\">—</strong></div>\n                <div class=\"cpa-field-row\">\n                    <label class=\"cpa-field\">\n                        <span class=\"cpa-field-label\">Amount ($)</span>\n                        <input type=\"text\" id=\"cpa-rw-amount\" inputmode=\"decimal\" placeholder=\"25\" autocomplete=\"off\">\n                    </label>\n                    <label class=\"cpa-field\">\n                        <span class=\"cpa-field-label\">Type</span>\n                        <select id=\"cpa-rw-type\" class=\"cpa-select cpa-rw-select\">\n                            <option value=\"grant\">Grant (add)</option>\n                            <option value=\"redeem\">Redeem (subtract)</option>\n                            <option value=\"adjust\">Adjust (+/−)</option>\n                        </select>\n                    </label>\n                </div>\n                <div class=\"cpa-field-row\">\n                    <label class=\"cpa-field\">\n                        <span class=\"cpa-field-label\">Reason <small>(shows in the audit trail)</small></span>\n                        <input type=\"text\" id=\"cpa-rw-reason\" placeholder=\"e.g. Loyalty bonus, applied to order #…\" autocomplete=\"off\">\n                    </label>\n                    <label class=\"cpa-field\">\n                        <span class=\"cpa-field-label\">ShopWorks order # <small>(ties a redemption to its order)</small></span>\n                        <input type=\"text\" id=\"cpa-rw-order\" inputmode=\"numeric\" placeholder=\"e.g. 141467\" autocomplete=\"off\">\n                    </label>\n                </div>\n                <div class=\"cpa-modal-error\" id=\"cpa-rw-error\" role=\"alert\"></div>\n                <button type=\"button\" class=\"cpa-btn cpa-btn-primary cpa-rw-save-btn\" id=\"cpa-rw-save\"><i class=\"fas fa-plus\" aria-hidden=\"true\"></i> Add ledger entry</button>\n                <div class=\"cpa-rw-ledger-head\">Recent activity</div>\n                <div class=\"cpa-rw-ledger\" id=\"cpa-rw-ledger\">—</div>\n                <div class=\"cpa-rw-ledger-head\">Earned on paid orders <span class=\"cpa-rw-acc-window\" id=\"cpa-rw-acc-window\"></span></div>\n                <div class=\"cpa-rw-accrual\" id=\"cpa-rw-accrual\"></div>\n            </div>\n        </div>\n    </div>\n\n    <!-- Toast -->\n    <div class=\"cpa-toast\" id=\"cpa-toast\" role=\"status\" aria-live=\"polite\"></div>\n\n    <!-- Load order matters: APP_CONFIG → fetch-timeout → DashPage → page controller -->\n    <script src=\"/config/app.config.js\"></script>\n    <script src=\"/shared_components/js/fetch-timeout.js?v=2026.09.06.26\"></script>\n    <script src=\"/shared_components/js/dash-page-helpers.js?v=2026.09.07.25\"></script>\n    <script src=\"/dashboards/js/customer-portal-admin.js?v=2026.09.05.31\"></script>\n</body>\n</html>\n",
+      "title": "Portal Access - Northwest Custom Apparel",
+      "bodyText": "Portal Access Dashboard Manage who can log into the customer portal. Customers sign in with a one-click email link (no password) and see only their own company's mockups, art, orders and invoices. Portal Access Re-order Requests 0 — Invited Customers — Active — Disabled — Have Signed In — Reward $ Outstanding My customers Add Customer Portal Access Loading… All statuses New In Progress Quoted Closed My requests Re-order Requests Loading… Add Customer Find customer (search company name or email) then confirm the details Email (the login identity) Customer # (ShopWorks id) Company name Email them a login link right away Cancel Save & Invite Reward Dollars Current balance: — Amount ($) Type Grant (add) Redeem (subtract) Adjust (+/−) Reason (shows in the audit trail) ShopWorks order # (ties a redemption to its order) Add ledger entry Recent activity — Earned on paid orders",
+      "bodyTextSha": "cc6d4fe99ba0b6762bbd0f4daa736b5a9c6aa03d45f314175b7dcb403d1fd390",
+      "ids": [
+        "cpa-tab-access",
+        "cpa-tab-requests",
+        "cpa-req-badge",
+        "cpa-view-access",
+        "stat-total",
+        "stat-enabled",
+        "stat-disabled",
+        "stat-loggedin",
+        "stat-rewards",
+        "cpa-filter",
+        "cpa-mine-btn",
+        "cpa-add-btn",
+        "cpa-rowcount",
+        "content-root",
+        "cpa-view-requests",
+        "cpa-req-filter",
+        "cpa-req-status",
+        "cpa-req-mine-btn",
+        "cpa-req-rowcount",
+        "requests-root",
+        "cpa-modal",
+        "cpa-modal-title",
+        "cpa-modal-close",
+        "cpa-lookup-field",
+        "cpa-lookup",
+        "cpa-lookup-results",
+        "cpa-email",
+        "cpa-idcustomer",
+        "cpa-company",
+        "cpa-sendlink",
+        "cpa-modal-error",
+        "cpa-cancel",
+        "cpa-save",
+        "cpa-rewards-modal",
+        "cpa-rw-title",
+        "cpa-rw-close",
+        "cpa-rw-balance",
+        "cpa-rw-amount",
+        "cpa-rw-type",
+        "cpa-rw-reason",
+        "cpa-rw-order",
+        "cpa-rw-error",
+        "cpa-rw-save",
+        "cpa-rw-ledger",
+        "cpa-rw-acc-window",
+        "cpa-rw-accrual",
+        "cpa-toast"
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "label": ""
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "label": "Dashboard"
+        }
+      ],
+      "fields": [
+        {
+          "id": "cpa-filter",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "cpa-req-filter",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "cpa-req-status",
+          "type": "select-one",
+          "value": ""
+        },
+        {
+          "id": "cpa-lookup",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "cpa-email",
+          "type": "email",
+          "value": ""
+        },
+        {
+          "id": "cpa-idcustomer",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "cpa-company",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "cpa-sendlink",
+          "type": "checkbox",
+          "value": "on"
+        },
+        {
+          "id": "cpa-rw-amount",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "cpa-rw-type",
+          "type": "select-one",
+          "value": "grant"
+        },
+        {
+          "id": "cpa-rw-reason",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "cpa-rw-order",
+          "type": "text",
+          "value": ""
+        }
+      ],
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/art-hub.css",
+        "shared_components/css/dash-shell.css",
+        "dashboards/css/customer-portal-admin.css"
+      ],
+      "scripts": [
+        "config/app.config.js",
+        "shared_components/js/fetch-timeout.js",
+        "shared_components/js/dash-page-helpers.js",
+        "dashboards/js/customer-portal-admin.js"
+      ],
+      "cssBytes": 180975
+    },
+    {
+      "file": "dashboards/jim-mailing-list.html",
+      "html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <meta name=\"robots\" content=\"noindex, nofollow\">\n    <title>Jim's Mailing List - Northwest Custom Apparel</title>\n    <link rel=\"icon\" href=\"/favicon.png\" type=\"image/png\">\n\n    <link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n    <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n    <link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap\" rel=\"stylesheet\">\n    <link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css\">\n\n    <!-- 2026 design tokens (must load before dash-shell.css) -->\n    <link rel=\"stylesheet\" href=\"/shared_components/css/tokens.css?v=2026.09.08.2\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/art-hub.css?v=2026.09.07.19\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/dash-shell.css?v=2026.09.07.10\">\n    <link rel=\"stylesheet\" href=\"/dashboards/css/jim-mailing-list.css?v=2026.09.07.10\">\n</head>\n<body>\n    <div class=\"dash-shell\">\n        <header class=\"dash-header\">\n            <div class=\"dash-header-left\">\n                <a href=\"/staff-dashboard.html\" title=\"Back to Staff Dashboard\">\n                    <img src=\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1\"\n                         alt=\"Northwest Custom Apparel\" class=\"dash-header-logo\">\n                </a>\n                <h1 class=\"dash-header-title\">Jim's Mailing List</h1>\n            </div>\n            <div class=\"dash-header-right\">\n                <a href=\"/staff-dashboard.html\" class=\"dash-back-link\">\n                    <i class=\"fas fa-arrow-left\" aria-hidden=\"true\"></i> Back to Dashboard\n                </a>\n            </div>\n        </header>\n\n        <main class=\"dash-content\">\n            <!-- Visible error (Erik's #1 rule — never a silent failure) -->\n            <div class=\"dash-error-banner\" role=\"alert\">\n                <i class=\"fas fa-exclamation-triangle\" aria-hidden=\"true\"></i>\n                <span class=\"dash-error-banner-message\"></span>\n                <button type=\"button\" class=\"dash-error-banner-close\" aria-label=\"Dismiss\"><i class=\"fas fa-times\" aria-hidden=\"true\"></i></button>\n            </div>\n\n            <!-- Green \"saved!\" confirmation -->\n            <div class=\"jml-ok\" id=\"jml-ok\" role=\"status\" aria-live=\"polite\" hidden>\n                <i class=\"fas fa-check-circle\" aria-hidden=\"true\"></i> <span id=\"jml-ok-text\">Saved!</span>\n            </div>\n\n            <div class=\"jml-welcome\" id=\"jml-welcome\" hidden>\n                <img class=\"jml-portrait\" id=\"jml-portrait\" src=\"https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9463872\" alt=\"Jim\">\n                <span class=\"jml-greeting\" id=\"jml-greeting\"></span>\n            </div>\n            <p class=\"jml-intro\">\n                Type in a company below and press <strong>Save</strong>. It gets added to your list.\n                You can change or remove any company anytime.\n            </p>\n\n            <!-- AI CAPTURE -->\n            <section class=\"jml-card jml-ai-card\">\n                <h2 class=\"jml-ai-title\">\n                    <i class=\"fas fa-wand-magic-sparkles\" aria-hidden=\"true\"></i> Let Claude fill it in for you\n                </h2>\n                <p class=\"jml-ai-help\">\n                    Found a company online? <strong>Copy the text</strong> from the web page and paste it in the box below —\n                    or <strong>paste a screenshot</strong> of it. Claude reads it and fills in the form for you.\n                    Then you just check it and press <strong>Save</strong>.\n                </p>\n\n                <label for=\"jml-ai-text\" class=\"jml-ai-label\">Paste what you copied here</label>\n                <textarea id=\"jml-ai-text\" rows=\"4\" placeholder=\"Paste the company name, address, phone, email…\"></textarea>\n\n                <div class=\"jml-ai-image-row\">\n                    <label class=\"jml-ai-imgbtn\" for=\"jml-ai-file\" role=\"button\" tabindex=\"0\">\n                        <i class=\"fas fa-image\" aria-hidden=\"true\"></i> Choose a screenshot\n                    </label>\n                    <input type=\"file\" id=\"jml-ai-file\" accept=\"image/*\" class=\"jml-visually-hidden\" aria-label=\"Choose a screenshot\">\n                    <span class=\"jml-ai-orpaste\">…or press <kbd>Ctrl</kbd> + <kbd>V</kbd> to paste a screenshot</span>\n                </div>\n                <div id=\"jml-ai-thumb-wrap\" class=\"jml-ai-thumb-wrap\" hidden>\n                    <img id=\"jml-ai-thumb\" alt=\"Your screenshot\" class=\"jml-ai-thumb\">\n                    <button type=\"button\" id=\"jml-ai-thumb-clear\" class=\"jml-ai-thumb-clear\" aria-label=\"Remove screenshot\">\n                        <i class=\"fas fa-times\" aria-hidden=\"true\"></i> Remove\n                    </button>\n                </div>\n\n                <button type=\"button\" class=\"jml-btn jml-btn-ai\" id=\"jml-ai-go\">\n                    <i class=\"fas fa-wand-magic-sparkles\" aria-hidden=\"true\"></i>\n                    <span id=\"jml-ai-go-text\">Read it &amp; fill in the form</span>\n                </button>\n                <p class=\"jml-ai-status\" id=\"jml-ai-status\" role=\"status\" aria-live=\"polite\" hidden></p>\n            </section>\n\n            <!-- ADD / EDIT FORM -->\n            <section class=\"jml-card jml-form-card\">\n                <h2 class=\"jml-form-title\" id=\"jml-form-title\">\n                    <i class=\"fas fa-plus-circle\" aria-hidden=\"true\"></i> Add a company\n                </h2>\n\n                <form id=\"jml-form\" novalidate>\n                    <div class=\"jml-field\">\n                        <label for=\"jml-company\">Company name</label>\n                        <input type=\"text\" id=\"jml-company\" autocomplete=\"off\" required>\n                        <span class=\"jml-hint\">This is the only box you have to fill in.</span>\n                    </div>\n\n                    <div class=\"jml-row\">\n                        <div class=\"jml-field jml-grow\">\n                            <label for=\"jml-first\">First name <span class=\"jml-opt\">(optional)</span></label>\n                            <input type=\"text\" id=\"jml-first\" autocomplete=\"off\">\n                        </div>\n                        <div class=\"jml-field jml-grow\">\n                            <label for=\"jml-last\">Last name <span class=\"jml-opt\">(optional)</span></label>\n                            <input type=\"text\" id=\"jml-last\" autocomplete=\"off\">\n                        </div>\n                    </div>\n\n                    <div class=\"jml-field\">\n                        <label for=\"jml-address\">Street address <span class=\"jml-opt\">(optional)</span></label>\n                        <input type=\"text\" id=\"jml-address\" autocomplete=\"off\">\n                    </div>\n\n                    <div class=\"jml-row\">\n                        <div class=\"jml-field jml-grow\">\n                            <label for=\"jml-city\">City <span class=\"jml-opt\">(optional)</span></label>\n                            <input type=\"text\" id=\"jml-city\" autocomplete=\"off\">\n                        </div>\n                        <div class=\"jml-field jml-state\">\n                            <label for=\"jml-state\">State</label>\n                            <input type=\"text\" id=\"jml-state\" autocomplete=\"off\">\n                        </div>\n                        <div class=\"jml-field jml-zip\">\n                            <label for=\"jml-zip\">ZIP</label>\n                            <input type=\"text\" id=\"jml-zip\" autocomplete=\"off\" inputmode=\"numeric\">\n                        </div>\n                    </div>\n\n                    <div class=\"jml-row\">\n                        <div class=\"jml-field jml-grow\">\n                            <label for=\"jml-phone\">Phone <span class=\"jml-opt\">(optional)</span></label>\n                            <input type=\"tel\" id=\"jml-phone\" autocomplete=\"off\">\n                        </div>\n                        <div class=\"jml-field jml-grow\">\n                            <label for=\"jml-email\">Email <span class=\"jml-opt\">(optional)</span></label>\n                            <input type=\"email\" id=\"jml-email\" autocomplete=\"off\">\n                        </div>\n                    </div>\n\n                    <div class=\"jml-field\">\n                        <label for=\"jml-website\">Website <span class=\"jml-opt\">(optional)</span></label>\n                        <input type=\"text\" id=\"jml-website\" autocomplete=\"off\" inputmode=\"url\">\n                    </div>\n\n                    <div class=\"jml-row\">\n                        <div class=\"jml-field jml-grow\">\n                            <label for=\"jml-source\">Where did you find them? <span class=\"jml-opt\">(optional)</span></label>\n                            <input type=\"text\" id=\"jml-source\" autocomplete=\"off\" placeholder=\"e.g. Milton Times magazine\">\n                        </div>\n                        <div class=\"jml-field jml-grow\">\n                            <label for=\"jml-category\">List / group <span class=\"jml-opt\">(optional)</span></label>\n                            <input type=\"text\" id=\"jml-category\" autocomplete=\"off\" placeholder=\"e.g. Fire Dept Prospect\">\n                        </div>\n                    </div>\n\n                    <div class=\"jml-field\">\n                        <label for=\"jml-notes\">Notes <span class=\"jml-opt\">(optional)</span></label>\n                        <textarea id=\"jml-notes\" rows=\"3\"></textarea>\n                    </div>\n\n                    <div class=\"jml-form-actions\">\n                        <button type=\"submit\" class=\"jml-btn jml-btn-save\" id=\"jml-save\">\n                            <i class=\"fas fa-check\" aria-hidden=\"true\"></i> <span id=\"jml-save-text\">Save company</span>\n                        </button>\n                        <button type=\"button\" class=\"jml-btn jml-btn-cancel\" id=\"jml-cancel\" hidden>\n                            Cancel\n                        </button>\n                    </div>\n                </form>\n            </section>\n\n            <!-- THE LIST -->\n            <section class=\"jml-list-section\">\n                <div class=\"jml-viewtoggle\" role=\"group\" aria-label=\"Which companies to show\">\n                    <button type=\"button\" class=\"jml-viewbtn\" id=\"jml-view-mine\" data-view=\"mine\" aria-pressed=\"false\">Your companies <span class=\"jml-view-n\" id=\"jml-mine-count\"></span></button>\n                    <button type=\"button\" class=\"jml-viewbtn\" id=\"jml-view-all\" data-view=\"all\" aria-pressed=\"false\">All companies <span class=\"jml-view-n\" id=\"jml-all-count\"></span></button>\n                </div>\n                <div class=\"jml-list-head\">\n                    <h2 class=\"jml-list-title\"><span id=\"jml-list-title-text\">Your companies</span> <span class=\"jml-count\" id=\"jml-count\" role=\"status\"></span></h2>\n                    <div class=\"jml-search-wrap\">\n                        <i class=\"fas fa-search\" aria-hidden=\"true\"></i>\n                        <input type=\"search\" id=\"jml-search\" placeholder=\"Search\" aria-label=\"Search the list\">\n                    </div>\n                </div>\n                <div class=\"jml-list-actions\" id=\"jml-list-actions\" hidden>\n                    <button type=\"button\" class=\"jml-tool-btn\" id=\"jml-export\"><i class=\"fas fa-file-csv\" aria-hidden=\"true\"></i> Download for Mailchimp</button>\n                    <button type=\"button\" class=\"jml-tool-btn\" id=\"jml-labels\"><i class=\"fas fa-print\" aria-hidden=\"true\"></i> Print mailing labels</button>\n                    <span class=\"jml-tool-hint\">exports whatever you're filtered to</span>\n                </div>\n                <div class=\"jml-filterbar\" id=\"jml-filterbar\" hidden>\n                    <div id=\"jml-chips\" class=\"jml-chips\" role=\"group\" aria-label=\"Filter by group\"></div>\n                    <label class=\"jml-sort\">Sort:\n                        <select id=\"jml-sort\">\n                            <option value=\"company\">Company A–Z</option>\n                            <option value=\"city\">City</option>\n                            <option value=\"last\">Last name</option>\n                            <option value=\"recent\">Recently added</option>\n                        </select>\n                    </label>\n                </div>\n                <div id=\"jml-list\" class=\"jml-list\"></div>\n            </section>\n\n            <!-- MAILCHIMP (staff — Erik). Collapsed by default so Jim never sees it. -->\n            <details class=\"jml-mc-details\">\n                <summary class=\"jml-mc-summary\"><i class=\"fas fa-paper-plane\" aria-hidden=\"true\"></i> Mailchimp — staff only (sync &amp; email tracking)</summary>\n                <div class=\"jml-mc-body\">\n                    <p class=\"jml-mc-help\">\n                        Adds <strong>only the group you're filtered to</strong> in “All companies” (and only ones with an email) —\n                        so you control how many contacts you use up in Mailchimp. They sync in <strong>non-subscribed</strong>, tagged by segment.\n                    </p>\n                    <p class=\"jml-mc-scope\" id=\"jml-mc-scope\"></p>\n                    <div class=\"jml-mc-actions\">\n                        <button type=\"button\" class=\"jml-tool-btn\" id=\"jml-mc-test\"><i class=\"fas fa-plug\" aria-hidden=\"true\"></i> Test connection</button>\n                        <button type=\"button\" class=\"jml-tool-btn\" id=\"jml-mc-check\"><i class=\"fas fa-chart-line\" aria-hidden=\"true\"></i> Check engagement</button>\n                        <button type=\"button\" class=\"jml-tool-btn\" id=\"jml-mc-sync\"><i class=\"fas fa-cloud-arrow-up\" aria-hidden=\"true\"></i> Sync this group</button>\n                        <button type=\"button\" class=\"jml-tool-btn jml-mc-engaged-btn\" id=\"jml-mc-sync-engaged\" hidden><i class=\"fas fa-star\" aria-hidden=\"true\"></i> Sync engaged only</button>\n                        <button type=\"button\" class=\"jml-tool-btn\" id=\"jml-mc-refresh\"><i class=\"fas fa-rotate\" aria-hidden=\"true\"></i> Refresh email activity</button>\n                    </div>\n                    <p class=\"jml-mc-status\" id=\"jml-mc-status\" role=\"status\" aria-live=\"polite\" hidden></p>\n                </div>\n            </details>\n        </main>\n    </div>\n\n    <script src=\"/config/app.config.js\"></script>\n    <script src=\"/shared_components/js/fetch-timeout.js?v=2026.09.06.26\"></script>\n    <script src=\"/shared_components/js/dash-page-helpers.js?v=2026.09.07.25\"></script>\n    <script src=\"/dashboards/js/jim-mailing-list.js?v=2026.09.05.67\"></script>\n</body>\n</html>\n",
+      "title": "Jim's Mailing List - Northwest Custom Apparel",
+      "bodyText": "Jim's Mailing List Back to Dashboard Saved! Type in a company below and press Save. It gets added to your list. You can change or remove any company anytime. Let Claude fill it in for you Found a company online? Copy the text from the web page and paste it in the box below — or paste a screenshot of it. Claude reads it and fills in the form for you. Then you just check it and press Save. Paste what you copied here Choose a screenshot …or press Ctrl + V to paste a screenshot Remove Read it & fill in the form Add a company Company name This is the only box you have to fill in. First name (optional) Last name (optional) Street address (optional) City (optional) State ZIP Phone (optional) Email (optional) Website (optional) Where did you find them? (optional) List / group (optional) Notes (optional) Save company Cancel Your companies All companies Your companies Download for Mailchimp Print mailing labels exports whatever you're filtered to Sort: Company A–Z City Last name Recently added Mailchimp — staff only (sync & email tracking) Adds only the group you're filtered to in “All companies” (and only ones with an email) — so you control how many contacts you use up in Mailchimp. They sync in non-subscribed, tagged by segment. Test connection Check engagement Sync this group Sync engaged only Refresh email activity",
+      "bodyTextSha": "8a8a10488c93414e044f3e7ba9a4369be5cde090f9251f56f3320937a041a04e",
+      "ids": [
+        "jml-ok",
+        "jml-ok-text",
+        "jml-welcome",
+        "jml-portrait",
+        "jml-greeting",
+        "jml-ai-text",
+        "jml-ai-file",
+        "jml-ai-thumb-wrap",
+        "jml-ai-thumb",
+        "jml-ai-thumb-clear",
+        "jml-ai-go",
+        "jml-ai-go-text",
+        "jml-ai-status",
+        "jml-form-title",
+        "jml-form",
+        "jml-company",
+        "jml-first",
+        "jml-last",
+        "jml-address",
+        "jml-city",
+        "jml-state",
+        "jml-zip",
+        "jml-phone",
+        "jml-email",
+        "jml-website",
+        "jml-source",
+        "jml-category",
+        "jml-notes",
+        "jml-save",
+        "jml-save-text",
+        "jml-cancel",
+        "jml-view-mine",
+        "jml-mine-count",
+        "jml-view-all",
+        "jml-all-count",
+        "jml-list-title-text",
+        "jml-count",
+        "jml-search",
+        "jml-list-actions",
+        "jml-export",
+        "jml-labels",
+        "jml-filterbar",
+        "jml-chips",
+        "jml-sort",
+        "jml-list",
+        "jml-mc-scope",
+        "jml-mc-test",
+        "jml-mc-check",
+        "jml-mc-sync",
+        "jml-mc-sync-engaged",
+        "jml-mc-refresh",
+        "jml-mc-status"
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "label": ""
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "label": "Back to Dashboard"
+        }
+      ],
+      "fields": [
+        {
+          "id": "jml-ai-text",
+          "type": "textarea",
+          "value": ""
+        },
+        {
+          "id": "jml-ai-file",
+          "type": "file",
+          "value": ""
+        },
+        {
+          "id": "jml-company",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "jml-first",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "jml-last",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "jml-address",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "jml-city",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "jml-state",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "jml-zip",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "jml-phone",
+          "type": "tel",
+          "value": ""
+        },
+        {
+          "id": "jml-email",
+          "type": "email",
+          "value": ""
+        },
+        {
+          "id": "jml-website",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "jml-source",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "jml-category",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "jml-notes",
+          "type": "textarea",
+          "value": ""
+        },
+        {
+          "id": "jml-search",
+          "type": "search",
+          "value": ""
+        },
+        {
+          "id": "jml-sort",
+          "type": "select-one",
+          "value": "company"
+        }
+      ],
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/art-hub.css",
+        "shared_components/css/dash-shell.css",
+        "dashboards/css/jim-mailing-list.css"
+      ],
+      "scripts": [
+        "config/app.config.js",
+        "shared_components/js/fetch-timeout.js",
+        "shared_components/js/dash-page-helpers.js",
+        "dashboards/js/jim-mailing-list.js"
+      ],
+      "cssBytes": 183334
+    },
+    {
+      "file": "dashboards/past-due-orders.html",
+      "html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <meta name=\"robots\" content=\"noindex, nofollow\">\n    <title>Past Due Orders - Northwest Custom Apparel</title>\n    <link rel=\"icon\" href=\"/favicon.png\" type=\"image/png\">\n\n    <!-- Fonts & Icons -->\n    <link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n    <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n    <link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap\" rel=\"stylesheet\">\n    <link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css\">\n\n    <!-- 2026 design tokens (must load before dash-shell.css) -->\n    <link rel=\"stylesheet\" href=\"/shared_components/css/tokens.css?v=2026.09.08.2\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/art-hub.css?v=2026.09.07.19\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/dash-shell.css?v=2026.09.07.10\">\n    <link rel=\"stylesheet\" href=\"/dashboards/css/past-due-orders.css?v=2026.09.07.19\">\n</head>\n<body>\n    <div class=\"dash-shell\">\n        <header class=\"dash-header\">\n            <div class=\"dash-header-left\">\n                <a href=\"/staff-dashboard.html\" title=\"Back to Staff Dashboard\">\n                    <img src=\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1\"\n                         alt=\"Northwest Custom Apparel\" class=\"dash-header-logo\">\n                </a>\n                <h1 class=\"dash-header-title\">Past Due Orders</h1>\n            </div>\n            <div class=\"dash-header-right\">\n                <label class=\"pdo-window\">\n                    <span>Window</span>\n                    <select id=\"pdo-days\">\n                        <option value=\"30\" selected>30 days</option>\n                        <option value=\"60\">60 days</option>\n                        <option value=\"90\">90 days</option>\n                    </select>\n                </label>\n                <button id=\"pdo-refresh\" class=\"dash-back-link\" type=\"button\">\n                    <i class=\"fas fa-rotate\" aria-hidden=\"true\"></i> Refresh\n                </button>\n                <label class=\"pdo-window pdo-printfor\">\n                    <span>Print for</span>\n                    <select id=\"pdo-print-who\" disabled>\n                        <option value=\"\">All rep sheets &mdash; one per page</option>\n                    </select>\n                </label>\n                <button id=\"pdo-print\" class=\"dash-back-link\" type=\"button\" disabled>\n                    <i class=\"fas fa-print\" aria-hidden=\"true\"></i> Print\n                </button>\n                <a href=\"/staff-dashboard.html\" class=\"dash-back-link\">\n                    <i class=\"fas fa-arrow-left\" aria-hidden=\"true\"></i>\n                    Dashboard\n                </a>\n            </div>\n        </header>\n\n        <main class=\"dash-content\">\n            <div class=\"dash-error-banner\" role=\"alert\">\n                <i class=\"fas fa-exclamation-triangle\" aria-hidden=\"true\"></i>\n                <span class=\"dash-error-banner-message\"></span>\n                <button class=\"dash-error-banner-close\" aria-label=\"Dismiss\">\n                    <i class=\"fas fa-times\" aria-hidden=\"true\"></i>\n                </button>\n            </div>\n\n            <!-- Each tile carries the dollar value under the count (2026-09-04) — a $63\n                 employee order and a $5,000 customer order used to look the same. The\n                 on-track tile has no value line: upstream sends only its count. -->\n            <div class=\"dash-stat-grid\">\n                <div class=\"dash-stat-card dash-stat-card--accent\">\n                    <div class=\"dash-stat-value\" id=\"stat-late\">—</div>\n                    <div class=\"dash-stat-label\">Past due</div>\n                    <div class=\"pdo-stat-sub\" id=\"stat-late-val\"></div>\n                </div>\n                <div class=\"dash-stat-card\">\n                    <div class=\"dash-stat-value\" id=\"stat-risk\">—</div>\n                    <div class=\"dash-stat-label\">At risk &middot; due within 7 days, blanks not in house</div>\n                    <div class=\"pdo-stat-sub\" id=\"stat-risk-val\"></div>\n                </div>\n                <div class=\"dash-stat-card\">\n                    <div class=\"dash-stat-value\" id=\"stat-nopo\">—</div>\n                    <div class=\"dash-stat-label\">Past due, no PO raised</div>\n                    <div class=\"pdo-stat-sub\" id=\"stat-nopo-val\"></div>\n                </div>\n                <div class=\"dash-stat-card\">\n                    <div class=\"dash-stat-value\" id=\"stat-ontrack\">—</div>\n                    <div class=\"dash-stat-label\">Due within 7 days, on track</div>\n                    <div class=\"pdo-stat-sub\" id=\"stat-ontrack-val\"></div>\n                </div>\n            </div>\n\n            <div class=\"dash-card\">\n                <div class=\"dash-card-header\">\n                    <h2 class=\"dash-card-title\">Past due &mdash; every rep, every vendor</h2>\n                    <span class=\"pdo-asof\"><span id=\"pdo-summary\"></span><span id=\"pdo-asof\"></span></span>\n                </div>\n                <div id=\"content-root\" class=\"dash-loading\">Loading…</div>\n            </div>\n        </main>\n    </div>\n\n    <!-- Load order matters: APP_CONFIG → fetch-timeout → DashPage → page controller -->\n    <script src=\"/config/app.config.js\"></script>\n    <script src=\"/shared_components/js/fetch-timeout.js?v=2026.09.06.26\"></script>\n    <script src=\"/shared_components/js/dash-page-helpers.js?v=2026.09.07.25\"></script>\n    <script src=\"/dashboards/js/past-due-orders.js?v=2026.09.06.27\"></script>\n</body>\n</html>\n",
+      "title": "Past Due Orders - Northwest Custom Apparel",
+      "bodyText": "Past Due Orders Window 30 days 60 days 90 days Refresh Print for All rep sheets — one per page Print Dashboard — Past due — At risk · due within 7 days, blanks not in house — Past due, no PO raised — Due within 7 days, on track Past due — every rep, every vendor Loading…",
+      "bodyTextSha": "52543162dbd0e5167f919cb65682c0e88e87e504b06bb8742eb1ae5b50ff63c8",
+      "ids": [
+        "pdo-days",
+        "pdo-refresh",
+        "pdo-print-who",
+        "pdo-print",
+        "stat-late",
+        "stat-late-val",
+        "stat-risk",
+        "stat-risk-val",
+        "stat-nopo",
+        "stat-nopo-val",
+        "stat-ontrack",
+        "stat-ontrack-val",
+        "pdo-summary",
+        "pdo-asof",
+        "content-root"
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "label": ""
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "label": "Dashboard"
+        }
+      ],
+      "fields": [
+        {
+          "id": "pdo-days",
+          "type": "select-one",
+          "value": "30"
+        },
+        {
+          "id": "pdo-print-who",
+          "type": "select-one",
+          "value": ""
+        }
+      ],
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/art-hub.css",
+        "shared_components/css/dash-shell.css",
+        "dashboards/css/past-due-orders.css"
+      ],
+      "scripts": [
+        "config/app.config.js",
+        "shared_components/js/fetch-timeout.js",
+        "shared_components/js/dash-page-helpers.js",
+        "dashboards/js/past-due-orders.js"
+      ],
+      "cssBytes": 179048
+    },
+    {
+      "file": "dashboards/product-manager.html",
+      "html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <meta name=\"robots\" content=\"noindex, nofollow\">\n    <title>Product Manager - Northwest Custom Apparel</title>\n    <link rel=\"icon\" href=\"/favicon.png\" type=\"image/png\">\n\n    <!-- Fonts & Icons -->\n    <link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n    <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n    <link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap\" rel=\"stylesheet\">\n    <link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css\">\n\n    <!-- 2026 design tokens (must load before dash-shell.css) -->\n    <link rel=\"stylesheet\" href=\"/shared_components/css/tokens.css?v=2026.09.08.2\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/art-hub.css?v=2026.09.07.19\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/dash-shell.css?v=2026.09.07.10\">\n    <link rel=\"stylesheet\" href=\"/dashboards/css/product-manager.css?v=2026.09.07.10\">\n</head>\n<body>\n    <div class=\"dash-shell\">\n        <header class=\"dash-header\">\n            <div class=\"dash-header-left\">\n                <a href=\"/staff-dashboard.html\" title=\"Back to Staff Dashboard\">\n                    <img src=\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1\"\n                         alt=\"Northwest Custom Apparel\" class=\"dash-header-logo\">\n                </a>\n                <h1 class=\"dash-header-title\">Product Manager <span class=\"pm-subtitle\">non-SanMar catalog items</span></h1>\n            </div>\n            <div class=\"dash-header-right\">\n                <a href=\"/staff-dashboard.html\" class=\"dash-back-link\">\n                    <i class=\"fas fa-arrow-left\" aria-hidden=\"true\"></i>\n                    Dashboard\n                </a>\n            </div>\n        </header>\n\n        <main class=\"dash-content\">\n            <div class=\"dash-error-banner\" role=\"alert\">\n                <i class=\"fas fa-exclamation-triangle\" aria-hidden=\"true\"></i>\n                <span class=\"dash-error-banner-message\"></span>\n                <button type=\"button\" class=\"dash-error-banner-close\" aria-label=\"Dismiss\">\n                    <i class=\"fas fa-times\" aria-hidden=\"true\"></i>\n                </button>\n            </div>\n\n            <div class=\"dash-stat-grid\">\n                <div class=\"dash-stat-card dash-stat-card--accent\">\n                    <div class=\"dash-stat-value\" id=\"stat-total\">—</div>\n                    <div class=\"dash-stat-label\">Products</div>\n                </div>\n                <div class=\"dash-stat-card\">\n                    <div class=\"dash-stat-value\" id=\"stat-active\">—</div>\n                    <div class=\"dash-stat-label\">Live in catalog</div>\n                </div>\n                <div class=\"dash-stat-card\">\n                    <div class=\"dash-stat-value\" id=\"stat-incomplete\">—</div>\n                    <div class=\"dash-stat-label\">Missing image or cost</div>\n                </div>\n            </div>\n\n            <div class=\"dash-card\">\n                <div class=\"dash-card-header\">\n                    <h2 class=\"dash-card-title\">Non-SanMar products</h2>\n                    <div class=\"pm-header-actions\">\n                        <input type=\"search\" id=\"pmFilter\" class=\"pm-filter\" placeholder=\"Filter by style, name, brand…\" aria-label=\"Filter products\">\n                        <button type=\"button\" class=\"pm-btn pm-btn-primary\" id=\"pmAddBtn\">\n                            <i class=\"fas fa-plus\" aria-hidden=\"true\"></i> Add product\n                        </button>\n                    </div>\n                </div>\n                <p class=\"pm-help\">\n                    Products added here appear in the customer catalog next to SanMar goods.\n                    <strong>Enter your cost, never a sell price</strong> — the catalog computes the\n                    decorated \"from $X with logo\" price with the same margin machinery as SanMar items\n                    (fixed-price mode is for special cases only). Changes go live within 5 minutes, no deploy.\n                </p>\n                <div id=\"content-root\" class=\"dash-loading\" role=\"status\">Loading products…</div>\n            </div>\n\n            <!-- Add / Edit form -->\n            <div class=\"dash-card pm-form-card\" id=\"pmFormCard\" hidden>\n                <div class=\"dash-card-header\">\n                    <h2 class=\"dash-card-title\" id=\"pmFormTitle\">Add product</h2>\n                    <button type=\"button\" class=\"pm-btn pm-btn-ghost\" id=\"pmFormClose\"><i class=\"fas fa-times\" aria-hidden=\"true\"></i> Close</button>\n                </div>\n                <form id=\"pmForm\">\n                    <input type=\"hidden\" id=\"fId\">\n                    <div class=\"pm-grid\">\n                        <div class=\"pm-field\">\n                            <label for=\"fStyle\">Style number <span class=\"pm-req\">*</span></label>\n                            <input type=\"text\" id=\"fStyle\" required maxlength=\"40\" placeholder=\"e.g. PC-TUMBLER-30\">\n                            <small>Must be unique — this is the catalog + ShopWorks key.</small>\n                        </div>\n                        <div class=\"pm-field\">\n                            <label for=\"fName\">Product name <span class=\"pm-req\">*</span></label>\n                            <input type=\"text\" id=\"fName\" required maxlength=\"120\" placeholder=\"e.g. Polar Camel 30oz Tumbler\">\n                        </div>\n                        <div class=\"pm-field\">\n                            <label for=\"fBrand\">Brand <span class=\"pm-req\">*</span></label>\n                            <input type=\"text\" id=\"fBrand\" required maxlength=\"60\" placeholder=\"e.g. Polar Camel\">\n                        </div>\n                        <div class=\"pm-field\">\n                            <label for=\"fCategory\">Category</label>\n                            <select id=\"fCategory\">\n                                <option value=\"T-Shirts\">T-Shirts</option>\n                                <option value=\"Polos/Knits\">Polos/Knits</option>\n                                <option value=\"Sweatshirts/Fleece\">Sweatshirts/Fleece</option>\n                                <option value=\"Caps\">Caps</option>\n                                <option value=\"Outerwear\">Outerwear</option>\n                                <option value=\"Workwear\">Workwear</option>\n                                <option value=\"Bags\">Bags</option>\n                                <option value=\"Accessories\">Accessories</option>\n                                <option value=\"Drinkware\">Drinkware</option>\n                                <option value=\"Other\">Other</option>\n                            </select>\n                        </div>\n                        <div class=\"pm-field\">\n                            <label for=\"fCost\">Your cost (per piece) <span class=\"pm-req\">*</span></label>\n                            <input type=\"number\" id=\"fCost\" min=\"0\" step=\"0.01\" inputmode=\"decimal\" placeholder=\"12.40\">\n                            <small>The catalog margins this automatically — customers never see it.</small>\n                        </div>\n                        <div class=\"pm-field\">\n                            <label for=\"fPricingMethod\">Pricing</label>\n                            <select id=\"fPricingMethod\">\n                                <option value=\"Margin\">Automatic (cost ÷ margin + logo — same as SanMar)</option>\n                                <option value=\"FixedPrice\">Fixed sell price (special cases)</option>\n                            </select>\n                        </div>\n                        <div class=\"pm-field\" id=\"fSellWrap\" hidden>\n                            <label for=\"fSell\">Fixed sell price</label>\n                            <input type=\"number\" id=\"fSell\" min=\"0\" step=\"0.01\" inputmode=\"decimal\" placeholder=\"49.00\">\n                        </div>\n                        <div class=\"pm-field\">\n                            <label for=\"fSizes\">Sizes (comma-separated)</label>\n                            <input type=\"text\" id=\"fSizes\" placeholder=\"S, M, L, XL, 2XL\" maxlength=\"120\">\n                        </div>\n                        <div class=\"pm-field\">\n                            <label for=\"fColors\">Colors (comma-separated)</label>\n                            <input type=\"text\" id=\"fColors\" placeholder=\"Black, Navy, White\" maxlength=\"240\">\n                        </div>\n                        <div class=\"pm-field\">\n                            <label for=\"fVendorSelect\">Vendor</label>\n                            <select id=\"fVendorSelect\"></select>\n                            <input type=\"text\" id=\"fVendor\" aria-label=\"Vendor\" maxlength=\"40\" placeholder=\"Vendor code, e.g. JDS\" hidden>\n                            <small>Who we buy the blank from. Pick from the list so vendor reports stay accurate.</small>\n                        </div>\n                        <div class=\"pm-field\">\n                            <label for=\"fVendorUrl\">Vendor URL</label>\n                            <input type=\"url\" id=\"fVendorUrl\" maxlength=\"240\" placeholder=\"https://…\">\n                        </div>\n                        <div class=\"pm-field pm-span-2\">\n                            <label for=\"fImageFile\">Product image</label>\n                            <div class=\"pm-image-row\">\n                                <img id=\"fImagePreview\" class=\"pm-image-preview\" alt=\"\" hidden>\n                                <div class=\"pm-image-controls\">\n                                    <input type=\"file\" id=\"fImageFile\" accept=\".png,.jpg,.jpeg,.webp,.gif\">\n                                    <small>PNG/JPG up to 20&nbsp;MB — uploads to our CDN and fills the URL below.</small>\n                                    <input type=\"url\" id=\"fImageUrl\" aria-label=\"Image URL\" placeholder=\"…or paste an image URL\" maxlength=\"400\">\n                                </div>\n                            </div>\n                        </div>\n                        <div class=\"pm-field pm-span-2\">\n                            <label for=\"fNotes\">Notes / description (shows on the product page)</label>\n                            <textarea id=\"fNotes\" rows=\"3\" maxlength=\"1000\"></textarea>\n                        </div>\n                    </div>\n                    <div class=\"pm-form-actions\">\n                        <button type=\"submit\" class=\"pm-btn pm-btn-primary\" id=\"pmSaveBtn\">\n                            <i class=\"fas fa-floppy-disk\" aria-hidden=\"true\"></i> Save product\n                        </button>\n                        <label class=\"pm-active-toggle\">\n                            <input type=\"checkbox\" id=\"fActive\" checked>\n                            <span>Live in catalog</span>\n                        </label>\n                    </div>\n                </form>\n            </div>\n        </main>\n    </div>\n\n    <!-- Load order matters: APP_CONFIG → fetch-timeout → DashPage → page controller -->\n    <script src=\"/config/app.config.js\"></script>\n    <script src=\"/shared_components/js/fetch-timeout.js?v=2026.09.06.26\"></script>\n    <script src=\"/shared_components/js/dash-page-helpers.js?v=2026.09.07.25\"></script>\n    <script src=\"/dashboards/js/product-manager.js?v=2026.09.05.71\"></script>\n</body>\n</html>\n",
+      "title": "Product Manager - Northwest Custom Apparel",
+      "bodyText": "Product Manager non-SanMar catalog items Dashboard — Products — Live in catalog — Missing image or cost Non-SanMar products Add product Products added here appear in the customer catalog next to SanMar goods. Enter your cost, never a sell price — the catalog computes the decorated \"from $X with logo\" price with the same margin machinery as SanMar items (fixed-price mode is for special cases only). Changes go live within 5 minutes, no deploy. Loading products… Add product Close Style number * Must be unique — this is the catalog + ShopWorks key. Product name * Brand * Category T-Shirts Polos/Knits Sweatshirts/Fleece Caps Outerwear Workwear Bags Accessories Drinkware Other Your cost (per piece) * The catalog margins this automatically — customers never see it. Pricing Automatic (cost ÷ margin + logo — same as SanMar) Fixed sell price (special cases) Fixed sell price Sizes (comma-separated) Colors (comma-separated) Vendor Who we buy the blank from. Pick from the list so vendor reports stay accurate. Vendor URL Product image PNG/JPG up to 20 MB — uploads to our CDN and fills the URL below. Notes / description (shows on the product page) Save product Live in catalog",
+      "bodyTextSha": "ea7156433ee811921c573e0fdbf0d39fd23164df86660842898b897dff2cce0a",
+      "ids": [
+        "stat-total",
+        "stat-active",
+        "stat-incomplete",
+        "pmFilter",
+        "pmAddBtn",
+        "content-root",
+        "pmFormCard",
+        "pmFormTitle",
+        "pmFormClose",
+        "pmForm",
+        "fId",
+        "fStyle",
+        "fName",
+        "fBrand",
+        "fCategory",
+        "fCost",
+        "fPricingMethod",
+        "fSellWrap",
+        "fSell",
+        "fSizes",
+        "fColors",
+        "fVendorSelect",
+        "fVendor",
+        "fVendorUrl",
+        "fImagePreview",
+        "fImageFile",
+        "fImageUrl",
+        "fNotes",
+        "pmSaveBtn",
+        "fActive"
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "label": ""
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "label": "Dashboard"
+        }
+      ],
+      "fields": [
+        {
+          "id": "pmFilter",
+          "type": "search",
+          "value": ""
+        },
+        {
+          "id": "fId",
+          "type": "hidden",
+          "value": ""
+        },
+        {
+          "id": "fStyle",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "fName",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "fBrand",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "fCategory",
+          "type": "select-one",
+          "value": "T-Shirts"
+        },
+        {
+          "id": "fCost",
+          "type": "number",
+          "value": ""
+        },
+        {
+          "id": "fPricingMethod",
+          "type": "select-one",
+          "value": "Margin"
+        },
+        {
+          "id": "fSell",
+          "type": "number",
+          "value": ""
+        },
+        {
+          "id": "fSizes",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "fColors",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "fVendorSelect",
+          "type": "select-one",
+          "value": ""
+        },
+        {
+          "id": "fVendor",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "fVendorUrl",
+          "type": "url",
+          "value": ""
+        },
+        {
+          "id": "fImageFile",
+          "type": "file",
+          "value": ""
+        },
+        {
+          "id": "fImageUrl",
+          "type": "url",
+          "value": ""
+        },
+        {
+          "id": "fNotes",
+          "type": "textarea",
+          "value": ""
+        },
+        {
+          "id": "fActive",
+          "type": "checkbox",
+          "value": "on"
+        }
+      ],
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/art-hub.css",
+        "shared_components/css/dash-shell.css",
+        "dashboards/css/product-manager.css"
+      ],
+      "scripts": [
+        "config/app.config.js",
+        "shared_components/js/fetch-timeout.js",
+        "shared_components/js/dash-page-helpers.js",
+        "dashboards/js/product-manager.js"
+      ],
+      "cssBytes": 168137
+    },
+    {
+      "file": "dashboards/roland-printer-supplies.html",
+      "html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <meta name=\"robots\" content=\"noindex, nofollow\">\n    <title>Order Roland Supplies - Northwest Custom Apparel</title>\n    <link rel=\"icon\" href=\"/favicon.png\" type=\"image/png\">\n\n    <!-- Fonts & Icons -->\n    <link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n    <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n    <link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap\" rel=\"stylesheet\">\n    <link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css\">\n\n    <!-- 2026 design tokens (must load before dash-shell.css) -->\n    <link rel=\"stylesheet\" href=\"/shared_components/css/tokens.css?v=2026.09.08.2\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/art-hub.css?v=2026.09.07.19\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/dash-shell.css?v=2026.09.07.10\">\n    <link rel=\"stylesheet\" href=\"/dashboards/css/roland-printer-supplies.css?v=2026.09.07.10\">\n</head>\n<body>\n    <div class=\"dash-shell\">\n        <header class=\"dash-header\">\n            <div class=\"dash-header-left\">\n                <a href=\"/staff-dashboard.html\" title=\"Back to Staff Dashboard\">\n                    <img src=\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1\"\n                         alt=\"Northwest Custom Apparel\" class=\"dash-header-logo\">\n                </a>\n                <h1 class=\"dash-header-title\">Order Roland Supplies</h1>\n            </div>\n            <div class=\"dash-header-right\">\n                <a href=\"/staff-dashboard.html\" class=\"dash-back-link\">\n                    <i class=\"fas fa-arrow-left\" aria-hidden=\"true\"></i>\n                    Dashboard\n                </a>\n            </div>\n        </header>\n\n        <main class=\"dash-content\">\n            <!-- Intro + printable PDF order form -->\n            <div class=\"dash-card\">\n                <div class=\"dash-card-header\">\n                    <h2 class=\"dash-card-title\">\n                        <i class=\"fas fa-print rps-title-icon\" aria-hidden=\"true\"></i>\n                        Order Supplies for the Roland Printer\n                    </h2>\n                </div>\n                <p class=\"rps-intro\">\n                    Use the form below to order <strong>ink, parts, and consumables</strong> for the Roland\n                    printer. Submit it online and the request goes straight to Erik for ordering.\n                </p>\n                <div class=\"rps-pdf-callout\">\n                    <div class=\"rps-pdf-callout-text\">\n                        <i class=\"fas fa-file-pdf rps-pdf-icon\" aria-hidden=\"true\"></i>\n                        <div>\n                            <div class=\"rps-pdf-title\">Prefer paper?</div>\n                            <div class=\"rps-pdf-sub\">Download the printable order form, fill it out by hand, and bring it to Erik.</div>\n                        </div>\n                    </div>\n                    <a class=\"dash-btn dash-btn--primary rps-pdf-btn\"\n                       href=\"/forms/NWCA_LG540_Order_Form_1page.pdf\"\n                       download=\"Roland-Printer-Supplies-Order-Form.pdf\"\n                       target=\"_blank\" rel=\"noopener\">\n                        <i class=\"fas fa-download\" aria-hidden=\"true\"></i>\n                        Download Printable Form (PDF)\n                    </a>\n                </div>\n            </div>\n\n            <!-- Online supply order form (JotForm embed) -->\n            <div class=\"dash-card\">\n                <div class=\"dash-card-header\">\n                    <h2 class=\"dash-card-title\">\n                        <i class=\"fas fa-clipboard-list rps-title-icon\" aria-hidden=\"true\"></i>\n                        Online Supply Order Form\n                    </h2>\n                </div>\n                <div class=\"rps-form-wrap\">\n                    <script type=\"text/javascript\" src=\"https://form.jotform.com/jsform/261515595979071\"></script>\n                </div>\n            </div>\n        </main>\n    </div>\n</body>\n</html>\n",
+      "title": "Order Roland Supplies - Northwest Custom Apparel",
+      "bodyText": "Order Roland Supplies Dashboard Order Supplies for the Roland Printer Use the form below to order ink, parts, and consumables for the Roland printer. Submit it online and the request goes straight to Erik for ordering. Prefer paper? Download the printable order form, fill it out by hand, and bring it to Erik. Download Printable Form (PDF) Online Supply Order Form",
+      "bodyTextSha": "2eb5fe31aba580a171f65a4228261c381a182d1a006ac03efbb3bb8f91f162c3",
+      "ids": [],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "label": ""
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "label": "Dashboard"
+        },
+        {
+          "href": "/forms/NWCA_LG540_Order_Form_1page.pdf",
+          "label": "Download Printable Form (PDF)"
+        }
+      ],
+      "fields": [],
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/art-hub.css",
+        "shared_components/css/dash-shell.css",
+        "dashboards/css/roland-printer-supplies.css"
+      ],
+      "scripts": [],
+      "cssBytes": 164993
+    },
+    {
+      "file": "dashboards/volume-quote.html",
+      "html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <meta name=\"robots\" content=\"noindex, nofollow\">\n    <title>Volume Quote - Northwest Custom Apparel</title>\n    <link rel=\"icon\" href=\"/favicon.png\" type=\"image/png\">\n\n    <!-- Fonts & Icons -->\n    <link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n    <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n    <link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap\" rel=\"stylesheet\">\n    <link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css\">\n\n    <!-- 2026 design tokens (must load before dash-shell.css) -->\n    <link rel=\"stylesheet\" href=\"/shared_components/css/tokens.css?v=2026.09.08.2\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/art-hub.css?v=2026.09.07.19\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/dash-shell.css?v=2026.09.07.10\">\n    <link rel=\"stylesheet\" href=\"/dashboards/css/volume-quote.css?v=2026.09.07.10\">\n</head>\n<body>\n    <div class=\"dash-shell\">\n        <header class=\"dash-header\">\n            <div class=\"dash-header-left\">\n                <a href=\"/staff-dashboard.html\" title=\"Back to Staff Dashboard\">\n                    <img src=\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1\"\n                         alt=\"Northwest Custom Apparel\" class=\"dash-header-logo\">\n                </a>\n                <h1 class=\"dash-header-title\">Volume Quote</h1>\n            </div>\n            <div class=\"dash-header-right\">\n                <a href=\"/staff-dashboard.html\" class=\"dash-back-link\">\n                    <i class=\"fas fa-arrow-left\" aria-hidden=\"true\"></i>\n                    Dashboard\n                </a>\n            </div>\n        </header>\n\n        <main class=\"dash-content\">\n            <div class=\"dash-error-banner\" role=\"alert\">\n                <i class=\"fas fa-exclamation-triangle\" aria-hidden=\"true\"></i>\n                <span class=\"dash-error-banner-message\"></span>\n                <button type=\"button\" class=\"dash-error-banner-close\" aria-label=\"Dismiss\">\n                    <i class=\"fas fa-times\" aria-hidden=\"true\"></i>\n                </button>\n            </div>\n\n            <p class=\"vq-intro\">\n                One-time price for a large embroidery order. Standard prices, garment case cost and the\n                cost-model assumptions all load live from Caspio. Nothing here changes a price list:\n                the output is an approval memo the rep attaches to the quote.\n            </p>\n\n            <!-- 1. Order -->\n            <section class=\"dash-card\">\n                <div class=\"dash-card-header\">\n                    <h2 class=\"dash-card-title\"><span class=\"vq-step\">1</span> Order</h2>\n                </div>\n                <div class=\"vq-form-grid\">\n                    <label class=\"vq-field\">\n                        <span>Customer</span>\n                        <input type=\"text\" id=\"vq-customer\" placeholder=\"Braun Northwest Inc.\" autocomplete=\"off\">\n                    </label>\n                    <label class=\"vq-field\">\n                        <span>Sales rep</span>\n                        <input type=\"text\" id=\"vq-rep\" list=\"vq-rep-list\" placeholder=\"Taneisha Clark\" autocomplete=\"off\">\n                        <datalist id=\"vq-rep-list\"></datalist>\n                    </label>\n                    <label class=\"vq-field\">\n                        <span>Location</span>\n                        <select id=\"vq-location\"></select>\n                    </label>\n                    <label class=\"vq-field\">\n                        <span>Stitch count</span>\n                        <input type=\"number\" id=\"vq-stitches\" min=\"100\" step=\"1\" value=\"8000\">\n                    </label>\n                    <label class=\"vq-field\">\n                        <span>Design # (optional)</span>\n                        <input type=\"text\" id=\"vq-design\" placeholder=\"40514\" autocomplete=\"off\">\n                    </label>\n                    <label class=\"vq-field vq-field--check\">\n                        <input type=\"checkbox\" id=\"vq-digitized\" checked>\n                        <span>Logo already digitized (no setup fee)</span>\n                    </label>\n                    <label class=\"vq-field\">\n                        <span>Price valid until</span>\n                        <input type=\"date\" id=\"vq-valid-until\">\n                    </label>\n                    <label class=\"vq-field\">\n                        <span>Price holds at or above (pcs, one PO)</span>\n                        <input type=\"number\" id=\"vq-hold-qty\" min=\"1\" step=\"1\" placeholder=\"defaults to the order quantity\">\n                    </label>\n                </div>\n            </section>\n\n            <!-- 2. Garments -->\n            <section class=\"dash-card\">\n                <div class=\"dash-card-header\">\n                    <h2 class=\"dash-card-title\"><span class=\"vq-step\">2</span> Garments</h2>\n                    <button type=\"button\" class=\"dash-btn\" id=\"vq-add-line\"><i class=\"fas fa-plus\" aria-hidden=\"true\"></i> Add style</button>\n                </div>\n                <div class=\"vq-lines-head\">\n                    <span>Style #</span><span>Qty</span><span>Garment</span><span>SanMar cost (case / piece)</span><span>Stock (all DCs)</span><span></span>\n                </div>\n                <div id=\"vq-lines\" class=\"vq-lines\"></div>\n                <p class=\"vq-hint\">\n                    Garment cost is the SanMar <strong>case price</strong> for the base size, the same figure the\n                    quote builders mark up. Piece price is shown beside it so nobody anchors on a sample invoice.\n                    Quantities are totals; 2XL and 3XL carry the standard upcharges shown in the result table.\n                </p>\n            </section>\n\n            <!-- 3. Levers -->\n            <section class=\"dash-card\">\n                <div class=\"dash-card-header\">\n                    <h2 class=\"dash-card-title\"><span class=\"vq-step\">3</span> Levers</h2>\n                </div>\n                <div class=\"vq-levers\">\n                    <div class=\"vq-lever\">\n                        <label for=\"vq-emb-price\">Embroidery charge per piece</label>\n                        <div class=\"vq-lever-row\">\n                            <input type=\"number\" id=\"vq-emb-price\" min=\"0\" step=\"0.25\">\n                            <span class=\"vq-lever-note\" id=\"vq-emb-note\">Standard 72+: loading</span>\n                        </div>\n                    </div>\n                    <div class=\"vq-lever\">\n                        <label for=\"vq-denom\">Garment margin denominator</label>\n                        <div class=\"vq-lever-row\">\n                            <input type=\"range\" id=\"vq-denom\" min=\"0.50\" max=\"0.65\" step=\"0.01\">\n                            <output id=\"vq-denom-out\">0.53</output>\n                            <span class=\"vq-lever-note\" id=\"vq-denom-note\">Standard: loading</span>\n                        </div>\n                    </div>\n                </div>\n            </section>\n\n            <!-- 4. Result -->\n            <section class=\"dash-card\">\n                <div class=\"dash-card-header\">\n                    <h2 class=\"dash-card-title\"><span class=\"vq-step\">4</span> Standard vs one-time price</h2>\n                </div>\n                <div class=\"dash-stat-grid vq-stats\">\n                    <div class=\"dash-stat-card\"><div class=\"dash-stat-value\" id=\"st-qty\">0</div><div class=\"dash-stat-label\">Pieces</div></div>\n                    <div class=\"dash-stat-card\"><div class=\"dash-stat-value\" id=\"st-hours\">0</div><div class=\"dash-stat-label\">Machine hours (worst case)</div></div>\n                    <div class=\"dash-stat-card\"><div class=\"dash-stat-value\" id=\"st-deco-cost\">$0</div><div class=\"dash-stat-label\">Decoration cost / pc (worst case)</div></div>\n                    <div class=\"dash-stat-card\"><div class=\"dash-stat-value\" id=\"st-order-list\">$0</div><div class=\"dash-stat-label\">Order at standard</div></div>\n                    <div class=\"dash-stat-card dash-stat-card--accent\"><div class=\"dash-stat-value\" id=\"st-order-vol\">$0</div><div class=\"dash-stat-label\">Order at one-time price</div></div>\n                    <div class=\"dash-stat-card\"><div class=\"dash-stat-value\" id=\"st-given\">$0</div><div class=\"dash-stat-label\">Given up vs standard</div></div>\n                    <div class=\"dash-stat-card\"><div class=\"dash-stat-value\" id=\"st-gm\">0%</div><div class=\"dash-stat-label\">Gross margin at one-time price</div></div>\n                </div>\n                <div id=\"vq-warnings\" class=\"vq-warnings\"></div>\n                <div class=\"vq-table-wrap\">\n                    <table class=\"vq-table\" id=\"vq-result\">\n                        <thead>\n                            <tr>\n                                <th>Style</th><th>Qty</th><th>Case cost</th>\n                                <th>Standard 72+<br><small>S-XL / 2XL / 3XL</small></th>\n                                <th>One-time<br><small>S-XL / 2XL / 3XL</small></th>\n                                <th>Garment $ margin / pc</th><th>GM %</th><th>Order $ standard / one-time</th>\n                            </tr>\n                        </thead>\n                        <tbody></tbody>\n                        <tfoot></tfoot>\n                    </table>\n                </div>\n                <p class=\"vq-hint\" id=\"vq-model-note\"></p>\n            </section>\n\n            <!-- 5. Memo -->\n            <section class=\"dash-card vq-print-keep\">\n                <div class=\"dash-card-header\">\n                    <h2 class=\"dash-card-title\"><span class=\"vq-step\">5</span> Approval memo</h2>\n                    <div class=\"vq-memo-actions\">\n                        <button type=\"button\" class=\"dash-btn\" id=\"vq-copy\"><i class=\"fas fa-copy\" aria-hidden=\"true\"></i> Copy</button>\n                        <button type=\"button\" class=\"dash-btn\" id=\"vq-print\"><i class=\"fas fa-print\" aria-hidden=\"true\"></i> Print memo (internal)</button>\n                    </div>\n                </div>\n                <pre id=\"vq-memo\" class=\"vq-memo\">Add a style and a quantity to build the memo.</pre>\n            </section>\n\n            <!-- 6. Customer quote — the only thing that leaves the building. No cost, no margin, no levers. -->\n            <section class=\"dash-card vq-print-customer-keep\">\n                <div class=\"dash-card-header\">\n                    <h2 class=\"dash-card-title\"><span class=\"vq-step\">6</span> Customer quote</h2>\n                    <div class=\"vq-memo-actions\">\n                        <span class=\"vq-save-status\" id=\"vq-save-status\" role=\"status\"></span>\n                        <button type=\"button\" class=\"dash-btn\" id=\"vq-save\"><i class=\"fas fa-save\" aria-hidden=\"true\"></i> Save quote</button>\n                        <button type=\"button\" class=\"dash-btn dash-btn--primary\" id=\"vq-print-customer\"><i class=\"fas fa-file-pdf\" aria-hidden=\"true\"></i> Print / save as PDF</button>\n                    </div>\n                </div>\n                <p class=\"vq-hint vq-cq-hint\">\n                    Prints only the sheet below. In the print dialog choose \"Save as PDF\" and forward it to the rep;\n                    they send it to the customer. Internal figures never appear here.\n                </p>\n                <div id=\"vq-cq\" class=\"vq-cq\">\n                    <header class=\"vq-cq-head\">\n                        <img src=\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1\" alt=\"Northwest Custom Apparel\" class=\"vq-cq-logo\">\n                        <div class=\"vq-cq-title\">\n                            <h3>Volume Pricing Quote</h3>\n                            <div class=\"vq-cq-meta\" id=\"vq-cq-meta\"></div>\n                        </div>\n                    </header>\n                    <div class=\"vq-cq-parties\" id=\"vq-cq-parties\"></div>\n                    <table class=\"vq-cq-table\">\n                        <thead>\n                            <tr><th>Style</th><th>Description</th><th>Qty</th><th>S–XL</th><th>2XL</th><th>3XL</th><th>Est. total</th></tr>\n                        </thead>\n                        <tbody id=\"vq-cq-rows\"></tbody>\n                        <tfoot id=\"vq-cq-foot\"></tfoot>\n                    </table>\n                    <div class=\"vq-cq-block\" id=\"vq-cq-decoration\"></div>\n                    <div class=\"vq-cq-block\">\n                        <h4>Terms</h4>\n                        <ul id=\"vq-cq-terms\"></ul>\n                    </div>\n                    <footer class=\"vq-cq-foot\">\n                        Northwest Custom Apparel · 2025 Freeman Road East, Milton, WA 98354 · 253-922-5793 · nwcustomapparel.com\n                    </footer>\n                </div>\n            </section>\n        </main>\n    </div>\n\n    <!-- Load order matters: APP_CONFIG -> fetch-timeout -> DashPage -> page controller -->\n    <script src=\"/config/app.config.js\"></script>\n    <script src=\"/shared_components/js/fetch-timeout.js?v=2026.09.06.26\"></script>\n    <script src=\"/shared_components/js/dash-page-helpers.js?v=2026.09.07.25\"></script>\n    <!-- STAFF_EMAIL_MAP: the saved quote's SalesRepEmail is the rep's real address (2026-09-05) -->\n    <script src=\"/shared_components/js/staff-auth-helper.js?v=2026.09.06.37\"></script>\n    <script src=\"/dashboards/js/volume-quote.js?v=2026.09.05.69\"></script>\n</body>\n</html>\n",
+      "title": "Volume Quote - Northwest Custom Apparel",
+      "bodyText": "Volume Quote Dashboard One-time price for a large embroidery order. Standard prices, garment case cost and the cost-model assumptions all load live from Caspio. Nothing here changes a price list: the output is an approval memo the rep attaches to the quote. 1 Order Customer Sales rep Location Stitch count Design # (optional) Logo already digitized (no setup fee) Price valid until Price holds at or above (pcs, one PO) 2 Garments Add style Style #QtyGarmentSanMar cost (case / piece)Stock (all DCs) Garment cost is the SanMar case price for the base size, the same figure the quote builders mark up. Piece price is shown beside it so nobody anchors on a sample invoice. Quantities are totals; 2XL and 3XL carry the standard upcharges shown in the result table. 3 Levers Embroidery charge per piece Standard 72+: loading Garment margin denominator 0.53 Standard: loading 4 Standard vs one-time price 0Pieces 0Machine hours (worst case) $0Decoration cost / pc (worst case) $0Order at standard $0Order at one-time price $0Given up vs standard 0%Gross margin at one-time price StyleQtyCase cost Standard 72+S-XL / 2XL / 3XL One-timeS-XL / 2XL / 3XL Garment $ margin / pcGM %Order $ standard / one-time 5 Approval memo Copy Print memo (internal) Add a style and a quantity to build the memo. 6 Customer quote Save quote Print / save as PDF Prints only the sheet below. In the print dialog choose \"Save as PDF\" and forward it to the rep; they send it to the customer. Internal figures never appear here. Volume Pricing Quote StyleDescriptionQtyS–XL2XL3XLEst. total Terms Northwest Custom Apparel · 2025 Freeman Road East, Milton, WA 98354 · 253-922-5793 · nwcustomapparel.com",
+      "bodyTextSha": "34a8deb5a5afa7edd1922b4d22a5032fbcbf727a238759dce055fe0aa21a7b05",
+      "ids": [
+        "vq-customer",
+        "vq-rep",
+        "vq-rep-list",
+        "vq-location",
+        "vq-stitches",
+        "vq-design",
+        "vq-digitized",
+        "vq-valid-until",
+        "vq-hold-qty",
+        "vq-add-line",
+        "vq-lines",
+        "vq-emb-price",
+        "vq-emb-note",
+        "vq-denom",
+        "vq-denom-out",
+        "vq-denom-note",
+        "st-qty",
+        "st-hours",
+        "st-deco-cost",
+        "st-order-list",
+        "st-order-vol",
+        "st-given",
+        "st-gm",
+        "vq-warnings",
+        "vq-result",
+        "vq-model-note",
+        "vq-copy",
+        "vq-print",
+        "vq-memo",
+        "vq-save-status",
+        "vq-save",
+        "vq-print-customer",
+        "vq-cq",
+        "vq-cq-meta",
+        "vq-cq-parties",
+        "vq-cq-rows",
+        "vq-cq-foot",
+        "vq-cq-decoration",
+        "vq-cq-terms"
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "label": ""
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "label": "Dashboard"
+        }
+      ],
+      "fields": [
+        {
+          "id": "vq-customer",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "vq-rep",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "vq-location",
+          "type": "select-one",
+          "value": ""
+        },
+        {
+          "id": "vq-stitches",
+          "type": "number",
+          "value": "8000"
+        },
+        {
+          "id": "vq-design",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "vq-digitized",
+          "type": "checkbox",
+          "value": "on"
+        },
+        {
+          "id": "vq-valid-until",
+          "type": "date",
+          "value": ""
+        },
+        {
+          "id": "vq-hold-qty",
+          "type": "number",
+          "value": ""
+        },
+        {
+          "id": "vq-emb-price",
+          "type": "number",
+          "value": ""
+        },
+        {
+          "id": "vq-denom",
+          "type": "range",
+          "value": "50"
+        }
+      ],
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/art-hub.css",
+        "shared_components/css/dash-shell.css",
+        "dashboards/css/volume-quote.css"
+      ],
+      "scripts": [
+        "config/app.config.js",
+        "shared_components/js/fetch-timeout.js",
+        "shared_components/js/dash-page-helpers.js",
+        "shared_components/js/staff-auth-helper.js",
+        "dashboards/js/volume-quote.js"
+      ],
+      "cssBytes": 173304
+    }
+  ],
+  "hashes": {
+    "dashboards/blog-editor.html": "6ed070da257e95929d1cbca2e9c7fb67dc91dc0dc1324b08c1695d452fa0d798",
+    "shared_components/css/tokens.css": "2b3ab556bb9eaf40765a5c84683777cb64d50a6c42d1b4e82bc6beff33a127b6",
+    "shared_components/css/art-hub.css": "34d32d4b3bfd1c46635cec73795e7986f974f3abcbb3984681cc9dd804b27ee7",
+    "shared_components/css/dash-shell.css": "6e4d20eead7dc51abd47826f3acbbb62b2c2b9aae5de4d2d69be764ec20bfca7",
+    "shared_components/css/blog.css": "08753efb1a7b3e37c00d985be5383ef8098eb72a80a6f1a0f2226af2fd336e8f",
+    "dashboards/css/blog-editor.css": "f1fc1333f5ac9e713544f10b8a7ec91e56d5b373dbc20551c55c2fcfc3ac8a14",
+    "config/app.config.js": "fe83e4329ce3eee97e48dd68dab81d9d5eb6ec94511d9650e2c9ebbb1528d6ea",
+    "shared_components/js/fetch-timeout.js": "1d9852795f9af3b674a48ad5e719bc970cae867e36b1962f0c3f1a28dd830179",
+    "shared_components/js/dash-page-helpers.js": "4ce7902b8502978835949ecec36a95d27ebc2604f86ef1a9665353cd8c38ccbe",
+    "dashboards/js/blog-editor.js": "f61115526d1c40156740ccd69042e04eef639efec8ac08dd0f5796a4d6814ebd",
+    "dashboards/contract-break-even.html": "84619847f42042a2433aa233ffc76d2725bf02c6d0c25fb8776b066402feff84",
+    "dashboards/css/contract-break-even.css": "2da74c70379fc5ef135643cba8c724bcd03f1dfeca1d76f02aef35e4b3a9f34d",
+    "dashboards/js/contract-break-even.js": "3bcd42f56364134902d1178b54a8a8a0a15a62e5889a9e8e08c76db7ac27e7a8",
+    "dashboards/customer-portal-admin.html": "c6434c4e644b511f4f29684e891125224371639c40b2dd006602c716a564e98d",
+    "dashboards/css/customer-portal-admin.css": "af06d5b16760fa9662fa2dde2e224969bdfc6224c4baf336c2649d33dddd7cfe",
+    "dashboards/js/customer-portal-admin.js": "98577c94f6ed3892c2a657f6d12b2f1c9676f5d31b490e521056f6f19d446ea8",
+    "dashboards/jim-mailing-list.html": "915fbea819edcefe3c7131e66bca962991e35f10733c07f5a5dae7ce8b12cbde",
+    "dashboards/css/jim-mailing-list.css": "3226102e204fcbb646e253f40942ebd80aa9a7e056f7102da436569275f01edf",
+    "dashboards/js/jim-mailing-list.js": "95b5217e728e723d3f30810c49ad25d950b42247c08de4c388368013fcb66d77",
+    "dashboards/past-due-orders.html": "7327b1b9f5c4aa1c1e6f95aa0b4c4c6ce6c1d45ad4c4b2527bfba6c89d367300",
+    "dashboards/css/past-due-orders.css": "318429bfadba6dbb2e9ab57a93fa657eefac03b2892d3ee2342950ff2742be1a",
+    "dashboards/js/past-due-orders.js": "747f39561dad5c19215168b9ac20d9c90bbcf0366ed7091c6fd5b39e6073abe0",
+    "dashboards/product-manager.html": "817190d7c046655f1a348527458f9c95aa7d2fc41e6cbe16e76123497a2ed411",
+    "dashboards/css/product-manager.css": "5860680b6f1625af4d827475a569bd42fe69aeed8ac7582e24f2e57d7234d965",
+    "dashboards/js/product-manager.js": "0786f5427b8acc708909b0dadaa10b353017e9254e692fd60fb23d77cfce9dd7",
+    "dashboards/roland-printer-supplies.html": "376b4558335c2cadcff03c99f7f99e6c05c58ca4131ac81308e39ea06b038a0d",
+    "dashboards/css/roland-printer-supplies.css": "705b39c55359fdc61700a3e05f5e2bf35e362f22c1e45f1deb458bb060aba794",
+    "dashboards/volume-quote.html": "4ad271e25c1233336acf986d67a4da9d06ff30cc969279700d2bd41bdf800cad",
+    "dashboards/css/volume-quote.css": "7a18308086e58cf9f44c8e8b8740568cdf22fd65cf3f0c1c834d1f8912c42e65",
+    "shared_components/js/staff-auth-helper.js": "b858bb5e30a775c949aaab2e4f0bbb4796e06c02a76f3bb8d8a9c97985f5addd",
+    "dashboards/js/volume-quote.js": "d6d3d994543cd7eb34229532f6b9b8189ac11f36345d171b54edc5dbd0b76c2b"
+  },
+  "changes": []
+}
