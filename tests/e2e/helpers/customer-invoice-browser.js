@@ -59,4 +59,4 @@ async function open(page,state={}){
  await page.goto(url);if(state.status===401)await page.waitForURL(new RegExp(state.preview?'/auth/saml/login$':'/customer/login$'));await page.evaluate(()=>document.fonts.ready);return events;
 }
 function check(expect,events){for(const k of ['errors','writes','unknown','missing'])expect(events[k],k).toEqual([]);}
-module.exports={open,data,check};
+module.exports={open,data,check,originalFile};

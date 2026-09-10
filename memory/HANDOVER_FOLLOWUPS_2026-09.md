@@ -1,5 +1,13 @@
 # Handover follow-ups — 2026-09-07
 
+## ACTIVE — compact Invoice original browser contracts captured
+
+Thirty original synthetic cases are captured before compact Invoice edits: ShopWorks/submission/child-row/storefront data, extended-size grouping, discount/shipping/tax/exempt/wholesale/payment totals, empty/long/rush/cancelled/pickup/production/shipping states, share links, session failures, sync and four exact ShipStation payloads. Six original PDFs/eight pages visually inspected; all data and payment instructions preserved. Initial23cases passed; five harness selectors corrected to actual nwca-toast, thosefive and two additional refresh cases passed. No application edits to compact Invoice or Quote View yet.
+
+Demonstrated fixes to include with presentation: preserve k share token on invoice full/sync/back links (Quote View’s invoice link also drops it; fix that only after its baseline); determine staff controls from current server identity, not a URL flag; refresh must restore newly present addresses/shipping and invalidate old storefront identity/artwork; terminal ShipStation state must precede UPS override; sync failures need visible feedback. Original print CSS forces the RUSH banner onto every invoice, including non-rush and empty ones: respect hidden state on paper. Keep saved monetary transforms, group-size logic, payment wording and successful mutation bodies unchanged. All test mutations intercepted; never exercise these writes live.
+
+Design: shared customer document header/type/buttons with compact white paper, labeled mobile item rows, scoped invoice owner replacing145 important overrides, native named confirmation/service dialogs with shared focus lifecycle. Preserve all original source via the existing24-hash ledger and reversible mappings. Capture expanded pending/delayed/failure/keyboard/paper states while reviewing. Candidate stays183/225,42pending until this page passes; live.7 stays180/225,45pending. Portal invoice4ad65b0f backed up; employee paire a622bf4 remains included in this isolated next batch.
+
 ## NEXT — Customer Portal Invoice reviewed; compact Invoice follows
 
 Customer Portal Invoice joins the two reviewed employee bundle pages in the next undeployed batch: **candidate183/225,42pending; live remains180/225,45pending on .7/Heroku2100/1143ffde.** Shared Public Sans controls and customer-documents.css now own the invoice shell, phone item labels and paper. Exact customer/staff preview routes, all original amounts, zero-price blank cells, dates, contact/design/size values and login destinations preserved. Empty invoices explicitly say there are no line items.

@@ -392,3 +392,8 @@ Staff toolkit preservation: tests/unit/staff-toolkit-content.test.js locks the e
 - tests/fixtures/customer-invoice-{normal,paid,empty,long,escaped,preview}-original-browser.json — immutable original customer invoice values and paper contracts.
 
 - shared_components/css/customer-documents.css — shared customer document shell and responsive/print portal invoice; replaces retired pages/css/customer-invoice.css.
+
+- tests/e2e/helpers/compact-invoice-browser.js — fail-closed synthetic original/current invoice data, staff/share-token and sync/ShipStation capture. No live business requests.
+
+- tests/e2e/css-unification-compact-invoice.spec.js — synthetic invoice source/financial/status/access and print contracts, exact sync/ShipStation payloads.
+- tests/fixtures/compact-invoice-*-original-browser.json — original invoice data, toolbar, share-link and workflow evidence (generated only in baseline mode).
