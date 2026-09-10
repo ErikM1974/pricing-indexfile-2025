@@ -98,7 +98,11 @@ class RepCRMService {
         }
 
         const data = await response.json();
-        this.accounts = data.Result || data.accounts || data || [];
+        const rows = data && (data.Result || data.accounts || data);
+        if (!Array.isArray(rows) || rows.some(row => !row || typeof row !== 'object' || Array.isArray(row))) {
+            throw new Error('The account response is incomplete. Please retry.');
+        }
+        this.accounts = rows;
 
         return this.accounts;
     }
@@ -537,17 +541,27 @@ class RepCRMController {
      * (Re)load everything — first boot and the error banner's Retry button.
      */
     async retryLoad() {
+        const seq = this.loadSeq = (this.loadSeq || 0) + 1;
+        this.archiveYTD = null;
         this.hideError();
         try {
             await this.loadAccounts();
+            if (seq !== this.loadSeq) return;
             this.updateStats();
             this.renderAccounts();
             this.updateAccountsCount();   // was skipped on boot → header said "0 accounts" beside 474 cards
 
             // Fire per-rep archive fetch in the background — re-render stats when it lands.
             // Non-blocking so the accounts list doesn't wait on a second API round-trip.
-            this.loadArchiveYTD().then(() => this.updateStats());
+            this.loadArchiveYTD(seq).then(() => { if (seq === this.loadSeq) this.updateStats(); });
         } catch (error) {
+            if (seq !== this.loadSeq) return;
+            this.service.accounts = [];
+            this.filteredAccounts = [];
+            this.elements.accountsGrid.innerHTML = '';
+            this.updateAccountsCount();
+            document.querySelectorAll('.tier-revenue, .tier-count, .total-value, .header-stat-value, .bonus-value').forEach(node => { node.textContent = '—'; });
+            document.querySelectorAll('.crm-archive-hint, .crm-recon-line').forEach(node => node.remove());
             console.error('[RepCRM] load failed:', error);
             this.showError('Unable to load accounts (' + (error && error.message ? error.message : 'unknown error') + ').', true);
         }
@@ -558,11 +572,14 @@ class RepCRMController {
      * On failure the headline falls back to the per-account sum AND SAYS SO (the hint line) —
      * never a silent fallback (Erik's #1 rule).
      */
-    async loadArchiveYTD() {
+    async loadArchiveYTD(seq) {
         try {
-            this.archiveYTD = await this.service.fetchYTDPerRepFromArchive();
+            const archive = await this.service.fetchYTDPerRepFromArchive();
+            if (seq !== this.loadSeq) return;
+            this.archiveYTD = archive;
             this.archiveFailed = false;
         } catch (error) {
+            if (seq !== this.loadSeq) return;
             console.warn('[RepCRM] Per-rep archive fetch failed; falling back to per-account total:', error.message);
             this.archiveYTD = null;
             this.archiveFailed = true;
@@ -730,6 +747,15 @@ class RepCRMController {
 
         // Keyboard shortcuts
         document.addEventListener('keydown', (e) => {
+            if (e.key === 'Tab') {
+                const dialog = Array.from(document.querySelectorAll('dialog[open]')).pop();
+                const controls = dialog && Array.from(dialog.querySelectorAll('a[href], button, input, select, textarea, [tabindex]')).filter(node => !node.disabled && node.tabIndex >= 0 && node.getClientRects().length);
+                if (controls && controls.length) {
+                    const first = controls[0], last = controls[controls.length - 1];
+                    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+                    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+                }
+            }
             if (e.key === 'Escape') {
                 this.closeAccountDetailModal();
             }
@@ -965,6 +991,7 @@ class RepCRMController {
      * dollar figure (Erik's #1 rule).
      */
     async _renderQuarterWinBack() {
+        const seq = this.loadSeq;
         const tile = this.elements.winbackBonus;
         if (!tile) return;
         try {
@@ -972,6 +999,7 @@ class RepCRMController {
             const resp = await fetch(`${apiBase}/api/commissions/quarterly-report`);
             if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
             const report = await resp.json();
+            if (seq !== this.loadSeq) return;
             // REP_CONFIG.repName is the FIRST name ("Taneisha"); the report keys
             // by FULL name ("Taneisha Clark") — match by prefix.
             const repFirst = (window.REP_CONFIG && window.REP_CONFIG.repName) || '';
@@ -983,6 +1011,7 @@ class RepCRMController {
             tile.title = `${report.quarter} ${report.year}: 5% of ${this.formatCurrency(wb.totalRevenue || 0)} win-back revenue this quarter`
                 + (wb.cumulativeRevenue ? ` (YTD across win-back accounts: ${this.formatCurrency(wb.cumulativeRevenue)})` : '');
         } catch (err) {
+            if (seq !== this.loadSeq) return;
             console.error('[RepCRM] quarter win-back fetch failed:', err.message);
             tile.textContent = '—';
             tile.title = 'Could not load the quarterly win-back number — refresh to retry.';
@@ -1092,12 +1121,12 @@ class RepCRMController {
             const priority = (account.Priority_Tier || 'D').toLowerCase();
 
             return `
-                <div class="account-card" data-id="${account.PK_ID}" role="button" tabindex="0" aria-label="Open ${this.escapeHtml(account.CompanyName || 'account')}">
+                <div class="account-card" data-id="${account.PK_ID}">
                     <div class="priority-bar priority-${priority}"></div>
                     <div class="account-card-content">
                         <div class="card-header">
                             <div>
-                                <h3 class="company-name">${this.escapeHtml(account.CompanyName)}</h3>
+                                <h3 class="company-name"><button type="button" class="account-open" aria-label="Open ${this.escapeHtml(account.CompanyName || 'account')}">${this.escapeHtml(account.CompanyName)}</button></h3>
                                 <div class="card-badges">
                                     ${tierInfo.label ? `<span class="tier-badge ${tierInfo.class}">${tierInfo.label}</span>` : ''}
                                     ${isAtRisk ? '<span class="status-badge at-risk"><i class="fas fa-exclamation-triangle" aria-hidden="true"></i> At Risk</span>' : ''}
@@ -1181,17 +1210,17 @@ class RepCRMController {
             const open = () => {
                 const accountId = card.dataset.id;
                 const account = this.filteredAccounts.find(a => String(a.PK_ID) === String(accountId));
-                if (account) this.openAccountDetailModal(account);
+                if (account) {
+                    card.querySelector('.account-open').focus();
+                    this.openAccountDetailModal(account);
+                }
             };
             card.addEventListener('click', (e) => {
                 // Don't open modal if clicking on email/phone links
                 if (e.target.closest('a')) return;
                 open();
             });
-            card.addEventListener('keydown', (e) => {
-                if (e.target !== card) return;
-                if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); }
-            });
+
         });
     }
 
@@ -1355,6 +1384,17 @@ class RepCRMController {
      * Show error banner
      */
     showError(message, retryable) {
+        const dialog = Array.from(document.querySelectorAll('dialog[open]')).pop();
+        if (dialog) {
+            let notice = dialog.querySelector('.crm-modal-error');
+            if (!notice) {
+                notice = document.createElement('p');
+                notice.className = 'crm-modal-error';
+                notice.setAttribute('role', 'alert');
+                (dialog.querySelector('.modal-body, .reconcile-modal-body, .gap-report-modal-body, .account-detail-modal-body') || dialog).prepend(notice);
+            }
+            notice.textContent = message;
+        }
         if (this.elements.errorBanner && this.elements.errorMessage) {
             this.elements.errorMessage.textContent = message;
             if (this.elements.errorRetry) this.elements.errorRetry.hidden = !retryable;
@@ -1455,6 +1495,7 @@ class RepCRMController {
         // Show modal — remember the opener so focus can return on close.
         this._modalReturnFocus = document.activeElement;
         this.elements.accountDetailModalOverlay.classList.add('active');
+        if (!this.elements.accountDetailModalOverlay.open) this.elements.accountDetailModalOverlay.showModal();
         if (this.elements.accountDetailModalClose) this.elements.accountDetailModalClose.focus();
     }
 
@@ -1465,6 +1506,7 @@ class RepCRMController {
         const overlay = this.elements.accountDetailModalOverlay;
         if (!overlay || !overlay.classList.contains('active')) return;
         overlay.classList.remove('active');
+        if (overlay.open) overlay.close();
         const back = this._modalReturnFocus;
         this._modalReturnFocus = null;
         if (back && document.body.contains(back) && typeof back.focus === 'function') back.focus();

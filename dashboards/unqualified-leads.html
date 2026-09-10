@@ -10,16 +10,16 @@
     <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <!-- 2026 design tokens (must load before dash-shell.css) -->
     <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/shared_components/css/art-hub.css?v=2026.09.07.19">
-    <link rel="stylesheet" href="/shared_components/css/dash-shell.css?v=2026.09.07.10">
-    <link rel="stylesheet" href="/dashboards/css/unqualified-leads.css?v=2026.09.07.10">
+    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.09.19">
+    <link rel="stylesheet" href="/shared_components/css/crm-pipeline.css?v=2026.09.09.19">
 </head>
-<body>
+<body data-ui="unified" data-crm-workspace="unqualified-leads" data-density="compact">
+    <a class="skip-link" href="#crm-main">Skip to main content</a>
     <div class="dash-shell">
         <header class="dash-header">
             <div class="dash-header-left">
@@ -30,19 +30,19 @@
                 <h1 class="dash-header-title">Unqualified &amp; Spam Leads</h1>
             </div>
             <div class="dash-header-right">
-                <button type="button" id="btn-rescan" class="uq-btn uq-btn--primary" title="Have Claude categorize any new, uncategorized leads">
+                <button type="button" id="btn-rescan" class="uq-btn uq-btn--primary btn" title="Have Claude categorize any new, uncategorized leads">
                     <i class="fas fa-wand-magic-sparkles" aria-hidden="true"></i> Rescan with Claude
                 </button>
-                <button type="button" id="btn-refresh" class="uq-btn" title="Reload"><i class="fas fa-rotate" aria-hidden="true"></i> Refresh</button>
+                <button type="button" id="btn-refresh" class="uq-btn btn" title="Reload"><i class="fas fa-rotate" aria-hidden="true"></i> Refresh</button>
                 <a href="/dashboards/leads.html" class="dash-back-link"><i class="fas fa-arrow-left" aria-hidden="true"></i> Leads board</a>
             </div>
         </header>
 
-        <main class="dash-content">
+        <main class="dash-content" id="crm-main" tabindex="-1">
             <div class="dash-error-banner" role="alert">
                 <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
                 <span class="dash-error-banner-message"></span>
-                <button type="button" class="dash-error-banner-close" aria-label="Dismiss"><i class="fas fa-times" aria-hidden="true"></i></button>
+                <button type="button" class="dash-error-banner-close btn" aria-label="Dismiss"><i class="fas fa-times" aria-hidden="true"></i></button>
             </div>
 
             <p class="uq-intro">
@@ -52,10 +52,10 @@
             </p>
 
             <div class="uq-tabs" role="tablist" aria-label="Lead category">
-                <button type="button" class="uq-tab is-active" data-cat="spam" role="tab" id="uq-tab-spam" aria-selected="true" aria-controls="uq-panel">
+                <button type="button" class="uq-tab is-active btn" data-cat="spam" role="tab" id="uq-tab-spam" aria-selected="true" aria-controls="uq-panel">
                     <i class="fas fa-ban" aria-hidden="true"></i> Spam <span class="uq-badge" id="badge-spam">—</span>
                 </button>
-                <button type="button" class="uq-tab" data-cat="unqualified" role="tab" id="uq-tab-unqualified" aria-selected="false" aria-controls="uq-panel" tabindex="-1">
+                <button type="button" class="uq-tab btn" data-cat="unqualified" role="tab" id="uq-tab-unqualified" aria-selected="false" aria-controls="uq-panel" tabindex="-1">
                     <i class="fas fa-user-slash" aria-hidden="true"></i> Unqualified <span class="uq-badge" id="badge-unqualified">—</span>
                 </button>
             </div>
@@ -66,15 +66,15 @@
                 <div class="dash-card-header">
                     <h2 class="dash-card-title" id="section-title">Spam</h2>
                     <span class="uq-count" id="list-count" role="status"></span>
-                    <input type="search" id="uq-search" class="uq-input" placeholder="Search company, contact, email…" aria-label="Search">
+                    <input type="search" id="uq-search" class="uq-input field-input" placeholder="Search company, contact, email…" aria-label="Search">
                 </div>
                 <div class="uq-note" id="spam-note" role="note">
                     <i class="fas fa-circle-info" aria-hidden="true"></i>
                     To permanently delete these, open <code>Downloads/leads-SPAM-to-delete.csv</code> (has Claude's reason per row),
                     then bulk-delete the matching rows in the Caspio <em>Form_Submissions</em> datasheet. They stay hidden here until you do.
                 </div>
-                <div class="uq-table-scroll">
-                    <table class="uq-table" id="uq-table">
+                <div class="uq-table-scroll table-wrap" role="region" aria-label="unqualified leads table 1" tabindex="0">
+                    <table class="uq-table data-table" id="uq-table">
                         <thead>
                             <tr><th>Received</th><th>Company</th><th>Contact</th><th>Email</th><th>What they said</th></tr>
                         </thead>
@@ -91,6 +91,6 @@
     <script src="/config/app.config.js"></script>
     <script src="/shared_components/js/fetch-timeout.js?v=2026.09.06.26"></script>
     <script src="/shared_components/js/dash-page-helpers.js?v=2026.09.07.25"></script>
-    <script src="/dashboards/js/unqualified-leads.js?v=2026.09.05.41"></script>
+    <script src="/dashboards/js/unqualified-leads.js?v=2026.09.09.19"></script>
 </body>
 </html>

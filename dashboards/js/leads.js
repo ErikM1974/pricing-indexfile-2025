@@ -33,6 +33,8 @@
         current: null,          // lead open in the drawer
         matchCache: {},         // email → contact | null (per page-load)
         hashOpened: false,      // #Submission_ID deep link handled once per load
+        loadState: 'loading',
+        loadError: '',
         loadSeq: 0,             // in-flight guard: only the newest loadLeads wins
         drawerReturnFocus: null,// element to restore focus to when the drawer closes
         perms: [],              // staff permissions (from /api/crm-session/me) — gates Delete
@@ -90,6 +92,15 @@
         syncViewToggle();
         var board = document.getElementById('leads-board');
         var listWrap = document.getElementById('leads-list-wrap');
+        if (state.loadState !== 'ready') {
+            var message = state.loadState === 'error' ? state.loadError : '<span class="dash-loading">Loading leads…</span>';
+            board.hidden = state.view !== 'board';
+            listWrap.hidden = state.view !== 'list';
+            board.innerHTML = '';
+            document.getElementById('leads-tbody').innerHTML = state.view === 'list' ? '<tr><td colspan="7" class="ld-empty">' + message + '</td></tr>' : '';
+            setBoardMessage(state.view === 'board' ? message : '');
+            return;
+        }
         if (state.view === 'board') { board.hidden = false; listWrap.hidden = true; renderBoard(); }
         else { board.hidden = true; listWrap.hidden = false; setBoardMessage(''); renderTable(); }
         var name = state.current ? (state.current.Contact_Name || state.current.Company || state.current.Submission_ID) + ' · ' : '';
@@ -285,6 +296,8 @@
     // ---------- data ----------
 
     function loadLeads() {
+        state.loadState = 'loading';
+        state.loadError = '';
         DashPage.hideError();
         // Reloading replaces every lead object, so a drawer left open would hold a
         // stale, orphaned row (saves would render pre-edit values). Close it first.
@@ -310,7 +323,11 @@
         var seq = ++state.loadSeq;
         L.crmFetch('?' + params.toString()).then(function (body) {
             if (seq !== state.loadSeq) return; // superseded by a newer load
-            state.leads = body.submissions || [];
+            if (!body || !Array.isArray(body.submissions) || body.submissions.some(row => !row || typeof row !== 'object' || !row.Submission_ID)) {
+                throw new Error('The lead list is incomplete. Please retry.');
+            }
+            state.loadState = 'ready';
+            state.leads = body.submissions;
             renderFilters();
             renderStats();
             renderView();
@@ -335,11 +352,15 @@
             }
         }).catch(function (err) {
             if (seq !== state.loadSeq) return;
+            state.leads = [];
+            ['stat-total', 'stat-new', 'stat-pipeline', 'stat-won'].forEach(function (id) { document.getElementById(id).textContent = '—'; });
+            document.getElementById('leads-count').textContent = 'Unavailable';
             console.error('[leads] load failed:', err);
             DashPage.showError('Unable to load leads (' + err.message + ').');
-            var failHtml = '<i class="fas fa-triangle-exclamation" aria-hidden="true"></i> Leads unavailable. <button type="button" id="btn-board-retry" class="ld-btn"><i class="fas fa-rotate" aria-hidden="true"></i> Retry</button>';
-            tbody.innerHTML = '<tr><td colspan="7" class="ld-empty">' + failHtml + '</td></tr>';
-            if (state.view === 'board') { document.getElementById('leads-board').innerHTML = ''; setBoardMessage(failHtml); }
+            var failHtml = '<i class="fas fa-triangle-exclamation" aria-hidden="true"></i> Leads unavailable. <button type="button" id="btn-board-retry" class="ld-btn btn"><i class="fas fa-rotate" aria-hidden="true"></i> Retry</button>';
+            state.loadState = 'error';
+            state.loadError = failHtml;
+            renderView();
         });
     }
 
@@ -598,7 +619,7 @@
             var hiddenN = items.length - shown.length;
             var moreBtn = '';
             if (items.length > COL_CAP) {
-                moreBtn = '<button type="button" class="ld-col-more" data-col="' + esc(c.key) + '" aria-expanded="' + (expanded ? 'true' : 'false') + '">' +
+                moreBtn = '<button type="button" class="ld-col-more btn" data-col="' + esc(c.key) + '" aria-expanded="' + (expanded ? 'true' : 'false') + '">' +
                     (expanded ? '<i class="fas fa-chevron-up" aria-hidden="true"></i> Show fewer'
                               : '<i class="fas fa-chevron-down" aria-hidden="true"></i> Show ' + hiddenN + ' more') + '</button>';
             }
@@ -747,25 +768,25 @@
 
         document.getElementById('drawer-body').innerHTML =
             '<div class="ld-section ld-drawer-actions">' +
-                '<button type="button" id="drawer-edit" class="ld-btn"><i class="fas fa-pen" aria-hidden="true"></i> Edit info</button>' +
-                (isAdmin() ? '<button type="button" id="drawer-delete" class="ld-btn ld-btn--danger"><i class="fas fa-trash" aria-hidden="true"></i> Delete</button>' : '') +
+                '<button type="button" id="drawer-edit" class="ld-btn btn"><i class="fas fa-pen" aria-hidden="true"></i> Edit info</button>' +
+                (isAdmin() ? '<button type="button" id="drawer-delete" class="ld-btn ld-btn--danger btn"><i class="fas fa-trash" aria-hidden="true"></i> Delete</button>' : '') +
             '</div>' +
             '<div class="ld-section"><div class="ld-controls">' +
                 '<div class="ld-control"><label class="ld-control-label" for="drawer-status">Status</label>' +
-                '<select id="drawer-status" class="ld-select">' +
+                '<select id="drawer-status" class="ld-select field-select">' +
                     choices.map(function (s) {
                         return '<option value="' + esc(s) + '"' + (s === lead.Status ? ' selected' : '') + '>' + esc(s) + '</option>';
                     }).join('') + '</select></div>' +
                 '<div class="ld-control"><label class="ld-control-label" for="drawer-rep">Assigned rep</label>' +
-                '<select id="drawer-rep" class="ld-select">' +
+                '<select id="drawer-rep" class="ld-select field-select">' +
                     '<option value="">(unassigned)</option>' +
                     reps.map(function (r) {
                         return '<option value="' + esc(r) + '"' + (r === lead.Sales_Rep ? ' selected' : '') + '>' + esc(r) + '</option>';
                     }).join('') + '</select></div>' +
                 '<div class="ld-control"><label class="ld-control-label" for="drawer-due">Follow-up date</label>' +
-                '<input type="date" id="drawer-due" class="ld-select" value="' + esc(lead.Due_Date || '') + '"></div>' +
+                '<input type="date" id="drawer-due" class="ld-select field-input" value="' + esc(lead.Due_Date || '') + '"></div>' +
                 '<div class="ld-control"><label class="ld-control-label" for="drawer-value">Est. value $</label>' +
-                '<input type="number" id="drawer-value" class="ld-select" min="0" step="50" placeholder="0" value="' + esc(lead.Lead_Value || '') + '"></div>' +
+                '<input type="number" id="drawer-value" class="ld-select field-input" min="0" step="50" placeholder="0" value="' + esc(lead.Lead_Value || '') + '"></div>' +
             '</div></div>' +
             (lead.Summary ? '<div class="ld-section"><div class="ld-section-title">Project</div>' +
                 '<div class="ld-summary">' + esc(lead.Summary) + '</div></div>' : '') +
@@ -877,7 +898,7 @@
             '<div class="ld-match-head"><span class="ld-pill ld-pill--customer"><i class="fas fa-circle-check" aria-hidden="true"></i> Existing customer</span>' +
             (alreadyLinked
                 ? '<span class="ld-muted">Linked</span>'
-                : '<button type="button" class="ld-btn" data-link-customer="' + esc(contact.id_Customer) + '">' +
+                : '<button type="button" class="ld-btn btn" data-link-customer="' + esc(contact.id_Customer) + '">' +
                     '<i class="fas fa-link" aria-hidden="true"></i> Link customer</button>') +
             '</div><dl class="ld-kv">' +
             rows.map(function (p) { return '<dt>' + esc(p[0]) + '</dt><dd>' + esc(p[1]) + '</dd>'; }).join('') +
@@ -910,8 +931,8 @@
 
     function searchBlockHtml(placeholder) {
         return '<div class="ld-match-search">' +
-            '<input type="search" id="match-search-input" class="ld-search" placeholder="' + esc(placeholder) + '">' +
-            '<button type="button" id="match-search-btn" class="ld-btn"><i class="fas fa-magnifying-glass" aria-hidden="true"></i> Search</button>' +
+            '<input type="search" id="match-search-input" class="ld-search field-input" placeholder="' + esc(placeholder) + '">' +
+            '<button type="button" id="match-search-btn" class="ld-btn btn"><i class="fas fa-magnifying-glass" aria-hidden="true"></i> Search</button>' +
             '</div><div class="ld-match-results" id="match-search-results"></div>';
     }
 
@@ -936,7 +957,7 @@
                             '<strong>' + esc(c.CustomerCompanyName || c.Company_Name || '—') + '</strong> ' +
                             '<span class="ld-muted">#' + esc(c.id_Customer) +
                             (c.CustomerCustomerServiceRep ? ' · ' + esc(c.CustomerCustomerServiceRep) : '') + '</span></span>' +
-                            '<button type="button" class="ld-btn" data-link-customer="' + esc(c.id_Customer) + '">Link</button></div>';
+                            '<button type="button" class="ld-btn btn" data-link-customer="' + esc(c.id_Customer) + '">Link</button></div>';
                     }).join('');
                     wireLinkButtons(lead);
                 })
@@ -1023,7 +1044,7 @@
             root.innerHTML = '<span class="ld-muted">Link a ShopWorks customer to see their orders.</span>';
             return;
         }
-        root.innerHTML = '<button type="button" id="btn-load-orders" class="ld-btn">' +
+        root.innerHTML = '<button type="button" id="btn-load-orders" class="ld-btn btn">' +
             '<i class="fas fa-clock-rotate-left" aria-hidden="true"></i> Load recent orders</button>';
         var btn = document.getElementById('btn-load-orders');
         var load = function () {
@@ -1043,7 +1064,7 @@
                     root.innerHTML = '<span class="ld-muted">No orders on file for customer #' + esc(custId) + '.</span>';
                     return;
                 }
-                root.innerHTML = '<div class="ld-table-scroll"><table class="ld-orders-table"><thead><tr>' +
+                root.innerHTML = '<div class="ld-table-scroll"><table class="ld-orders-table data-table"><thead><tr>' +
                     '<th>Placed</th><th>Order #</th><th>Total</th><th>Status</th></tr></thead><tbody>' +
                     orders.map(function (o) {
                         var st = String(o.sts_Invoiced) === '1' ? 'Invoiced'
@@ -1056,7 +1077,7 @@
             }).catch(function (err) {
                 console.error('[leads] order history failed:', err);
                 root.innerHTML = '<span class="ld-muted">Order history unavailable (' + esc(err.message) + '). </span>' +
-                    '<button type="button" id="btn-orders-retry" class="ld-btn">Retry</button>';
+                    '<button type="button" id="btn-orders-retry" class="ld-btn btn">Retry</button>';
                 var retry = document.getElementById('btn-orders-retry');
                 if (retry) retry.addEventListener('click', function () { renderOrdersSection(lead, true); });
             });

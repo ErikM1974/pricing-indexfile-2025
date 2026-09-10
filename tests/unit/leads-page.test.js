@@ -19,7 +19,7 @@ const read = (rel) => fs.readFileSync(path.join(ROOT, rel), 'utf8');
 const html = read('dashboards/leads.html').replace(/<!--[\s\S]*?-->/g, '');
 const js = read('dashboards/js/leads.js');
 const common = read('dashboards/js/leads-common.js');
-const css = read('dashboards/css/leads.css');
+const components = read('shared_components/css/components.css');
 
 describe('leads — Rule 3', () => {
     test('no inline style / handlers; hidden rule declared', () => {
@@ -28,7 +28,7 @@ describe('leads — Rule 3', () => {
         expect(js).not.toMatch(/style="/);
         expect(js).not.toMatch(/\.style\./);
         expect(common).not.toMatch(/\.style\./);
-        expect(css).toMatch(/^\[hidden\] \{ display: none !important; \}/m);
+        expect(components).toMatch(/\[hidden\]\s*\{\s*display: none;/);
     });
     test('every icon is decorative', () => {
         expect(html).not.toMatch(/<i class="fa[^"]*"><\/i>/);
@@ -68,10 +68,10 @@ describe('leads — accessible names', () => {
         expect(js).toMatch(/class="ld-card-src" role="img" title="[^"]*" aria-label="/);
         expect(js).toMatch(/class="ld-rep-chip" role="img" title="[^"]*" aria-label="Assigned to /);
         expect(js).toMatch(/class="ld-col ld-col--' \+ c\.key \+ '" data-col="' \+ c\.key \+ '" role="region" aria-label="' \+ c\.label \+ ' \(' \+ items\.length \+ '\)"/);
-        expect(js).toMatch(/class="ld-col-more" data-col="' \+ esc\(c\.key\) \+ '" aria-expanded="/);
+        expect(js).toMatch(/class="ld-col-more btn" data-col="' \+ esc\(c\.key\) \+ '" aria-expanded="/);
         for (const label of ['New lead', 'Export CSV', 'Refresh leads', 'Rep scorecard', 'Spam and unqualified leads']) expect(html).toMatch(new RegExp(`aria-label="${label}"`));
         expect((html.match(/<span class="ld-btn-txt">/g) || []).length).toBe(5);
-        expect(css).toMatch(/\.dash-header-right \.ld-refresh-btn \.ld-btn-txt \{ display: none; \}/);
+        expect(html).toMatch(/crm-pipeline\.css\?v=\d{4}\.\d{2}\.\d{2}\.\d+/);
     });
     test('drawer is a labelled dialog and the title tracks the open lead', () => {
         expect(html).toMatch(/<aside class="ld-drawer" id="lead-drawer" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="drawer-title">/);

@@ -71,7 +71,11 @@ class HouseAccountsService {
         }
 
         const data = await response.json();
-        this.accounts = data.Result || data.accounts || data || [];
+        const rows = data && (data.Result || data.accounts || data);
+        if (!Array.isArray(rows) || rows.some(row => !row || typeof row !== 'object' || Array.isArray(row))) {
+            throw new Error('The account response is incomplete. Please retry.');
+        }
+        this.accounts = rows;
 
         return this.accounts;
     }
@@ -97,7 +101,11 @@ class HouseAccountsService {
             throw new Error(`API returned ${response.status}: ${response.statusText}`);
         }
 
-        this.stats = await response.json();
+        const stats = await response.json();
+        if (!stats || typeof stats.total !== 'number' || !Number.isFinite(stats.total) || !stats.byAssignee || typeof stats.byAssignee !== 'object' || Array.isArray(stats.byAssignee)) {
+            throw new Error('The account counts are incomplete. Please retry.');
+        }
+        this.stats = stats;
         return this.stats;
     }
 
@@ -123,7 +131,11 @@ class HouseAccountsService {
             throw new Error(`API returned ${response.status}: ${response.statusText}`);
         }
 
-        this.sales = await response.json();
+        const sales = await response.json();
+        if (!sales || ['totalRevenue', 'totalOrders', 'accountsTracked'].some(key => typeof sales[key] !== 'number' || !Number.isFinite(sales[key])) || !sales.byAssignee || typeof sales.byAssignee !== 'object' || Array.isArray(sales.byAssignee) || Object.values(sales.byAssignee).some(row => !row || typeof row.revenue !== 'number' || !Number.isFinite(row.revenue))) {
+            throw new Error('The sales response is incomplete. Please retry.');
+        }
+        this.sales = sales;
         return this.sales;
     }
 
@@ -466,6 +478,12 @@ class HouseAccountsController {
             await this.loadSyncStatus();
         } catch (error) {
             console.error('[HouseAccounts] load failed:', error);
+            this.service.accounts = [];
+            this.filteredAccounts = [];
+            this.elements.accountsGrid.innerHTML = '';
+            this.updateAccountsCount();
+            document.querySelectorAll('.stat-value').forEach(node => { node.textContent = '—'; });
+            document.getElementById('houseDataSubline')?.remove();
             this.showError('Unable to load House accounts (' + (error && error.message ? error.message : 'unknown error') + ').', true);
         }
     }
@@ -648,6 +666,15 @@ class HouseAccountsController {
 
         // Keyboard shortcuts — Esc closes whichever modal is open (incl. the to-do + assign modals).
         document.addEventListener('keydown', (e) => {
+            if (e.key === 'Tab') {
+                const dialog = Array.from(document.querySelectorAll('dialog[open]')).pop();
+                const controls = dialog && Array.from(dialog.querySelectorAll('a[href], button, input, select, textarea, [tabindex]')).filter(node => !node.disabled && node.tabIndex >= 0 && node.getClientRects().length);
+                if (controls && controls.length) {
+                    const first = controls[0], last = controls[controls.length - 1];
+                    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+                    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+                }
+            }
             if (e.key === 'Escape') {
                 this.closeReconcileModal();
                 this.closeConfirmModal();
@@ -657,7 +684,7 @@ class HouseAccountsController {
                 return;
             }
             // Expandable rows/headers are data-call click targets; give them a keyboard path.
-            if ((e.key === 'Enter' || e.key === ' ') && e.target && e.target.matches && e.target.matches('tr[data-call], .gap-rep-header[data-call]')) {
+            if ((e.key === 'Enter' || e.key === ' ') && e.target && e.target.matches && e.target.matches('.gap-rep-header[data-call]')) {
                 e.preventDefault();
                 e.target.click();
             }
@@ -980,7 +1007,9 @@ class HouseAccountsController {
     _openOverlay(overlay, focusEl) {
         if (!overlay) return;
         if (!overlay.classList.contains('active')) overlay._returnFocus = document.activeElement;
+        overlay.querySelector('.crm-modal-error')?.remove();
         overlay.classList.add('active');
+        if (!overlay.open) overlay.showModal();
         const target = focusEl || overlay.querySelector('.modal-close, button, [tabindex]');
         if (target && typeof target.focus === 'function') setTimeout(() => target.focus(), 30);
     }
@@ -989,6 +1018,7 @@ class HouseAccountsController {
     _closeOverlay(overlay) {
         if (!overlay || !overlay.classList.contains('active')) return;
         overlay.classList.remove('active');
+        if (overlay.open) overlay.close();
         const back = overlay._returnFocus;
         overlay._returnFocus = null;
         if (back && document.body.contains(back) && typeof back.focus === 'function') back.focus();
@@ -1055,6 +1085,17 @@ class HouseAccountsController {
      * Show error banner
      */
     showError(message, retryable) {
+        const dialog = Array.from(document.querySelectorAll('dialog[open]')).pop();
+        if (dialog) {
+            let notice = dialog.querySelector('.crm-modal-error');
+            if (!notice) {
+                notice = document.createElement('p');
+                notice.className = 'crm-modal-error';
+                notice.setAttribute('role', 'alert');
+                (dialog.querySelector('.modal-body, .reconcile-modal-body, .gap-report-modal-body, .account-detail-modal-body') || dialog).prepend(notice);
+            }
+            notice.textContent = message;
+        }
         if (this.elements.errorBanner && this.elements.errorMessage) {
             this.elements.errorMessage.textContent = message;
             if (this.elements.errorRetry) this.elements.errorRetry.hidden = !retryable;
@@ -1504,8 +1545,8 @@ class HouseAccountsController {
                     : '<div class="order-item">No order details available</div>';
 
                 return `
-                <tr class="customer-row" data-customer-id="${customer.ID_Customer}" data-company-name="${this.escapeHtml(customer.companyName || '')}" data-call="houseController.toggleOrderDetails" data-args='["$this", "$event"]' tabindex="0" aria-expanded="false" aria-label="Show orders for ${this.escapeHtml(customer.companyName || ('ID ' + customer.ID_Customer))}">
-                    <td class="expand-toggle"><i class="fas fa-chevron-right" aria-hidden="true"></i></td>
+                <tr class="customer-row" data-customer-id="${customer.ID_Customer}" data-company-name="${this.escapeHtml(customer.companyName || '')}" data-call="houseController.toggleOrderDetails" data-args='["$this", "$event"]'>
+                    <td class="expand-toggle"><button type="button" class="btn order-disclosure" aria-expanded="false" aria-label="Show orders for ${this.escapeHtml(customer.companyName || ('ID ' + customer.ID_Customer))}"><i class="fas fa-chevron-right" aria-hidden="true"></i></button></td>
                     <td class="company-name ${!customer.companyName || customer.companyName.startsWith('ID:') ? 'unknown-company' : ''}">
                         ${this.escapeHtml(customer.companyName || `ID: ${customer.ID_Customer}`)}
                         <div class="customer-id">(ID: ${customer.ID_Customer})</div>
@@ -1517,7 +1558,7 @@ class HouseAccountsController {
                     <td class="sales-amount">${this.formatCurrency(customer.totalSales || 0)}</td>
                     <td class="last-order">${this.formatDate(customer.lastOrderDate)}</td>
                     <td class="actions">
-                        <select class="assign-dropdown" aria-label="Assign ${this.escapeHtml(customer.companyName || ('ID ' + customer.ID_Customer))} to" data-change="houseController.quickAssignFromSelect" data-change-args='["$this"]' data-stop="1">
+                        <select class="assign-dropdown field-select" aria-label="Assign ${this.escapeHtml(customer.companyName || ('ID ' + customer.ID_Customer))} to" data-change="houseController.quickAssignFromSelect" data-change-args='["$this"]' data-stop="1">
                             <option value="">Assign to...</option>
                             <option value="Taneisha Clark">Taneisha Clark</option>
                             <option value="Nika Lao">Nika Lao</option>
@@ -1640,16 +1681,16 @@ class HouseAccountsController {
         let html = '';
         if (reverted.length) {
             html += '<h3 class="sw-todo-section sw-todo-section--warn"><i class="fas fa-triangle-exclamation" aria-hidden="true"></i> ShopWorks disagreed — re-key or accept</h3>' +
-                '<table class="sw-todo-table"><thead><tr><th>Cust #</th><th>Company</th><th>What happened</th><th></th></tr></thead><tbody>' +
+                '<table class="sw-todo-table data-table"><thead><tr><th>Cust #</th><th>Company</th><th>What happened</th><th></th></tr></thead><tbody>' +
                 reverted.map((r) => `<tr><td>${esc(r.customerId)}</td><td>${esc(r.customerName)}</td><td>${esc(r.notes)}</td>` +
-                    `<td><button class="sync-btn sw-todo-dismiss" data-cid="${esc(r.customerId)}" data-cname="${esc(r.customerName)}" data-rep="${esc(r.newRep)}">Accept</button></td></tr>`).join('') +
+                    `<td><button class="sync-btn sw-todo-dismiss btn" data-cid="${esc(r.customerId)}" data-cname="${esc(r.customerName)}" data-rep="${esc(r.newRep)}">Accept</button></td></tr>`).join('') +
                 '</tbody></table>';
         }
         if (pending.length) {
             html += '<h3 class="sw-todo-section"><i class="fas fa-keyboard" aria-hidden="true"></i> Key these into ShopWorks (Cust → Customer Service Rep)</h3>' +
-                '<table class="sw-todo-table"><thead><tr><th>Cust #</th><th>Company</th><th>Set rep to</th><th>Assigned</th><th></th></tr></thead><tbody>' +
+                '<table class="sw-todo-table data-table"><thead><tr><th>Cust #</th><th>Company</th><th>Set rep to</th><th>Assigned</th><th></th></tr></thead><tbody>' +
                 pending.map((p) => `<tr><td>${esc(p.customerId)}</td><td>${esc(p.customerName)}</td><td><strong>${esc(p.newRep)}</strong></td><td>${fmtDay(p.actionDate)}</td>` +
-                    `<td><button class="sync-btn sw-todo-dismiss" data-cid="${esc(p.customerId)}" data-cname="${esc(p.customerName)}" data-rep="${esc(p.newRep)}">Mark done</button></td></tr>`).join('') +
+                    `<td><button class="sync-btn sw-todo-dismiss btn" data-cid="${esc(p.customerId)}" data-cname="${esc(p.customerName)}" data-rep="${esc(p.newRep)}">Mark done</button></td></tr>`).join('') +
                 '</tbody></table>' +
                 '<p class="modal-subtitle">Rows also clear automatically ~15 min after you key them in (the ODBC mirror confirms the match).</p>';
         }
@@ -1717,8 +1758,8 @@ class HouseAccountsController {
             this.displayGapReport(result);
         } catch (error) {
             console.error('Gap report error:', error);
-            this.showError('Failed to load gap report. Please try again.');
-            this.closeGapReportModal();
+            if (this.elements.gapReportLoading) this.elements.gapReportLoading.hidden = true;
+            this.showError('Failed to load gap report. Use Refresh to try again.');
         }
     }
 
@@ -1856,7 +1897,7 @@ class HouseAccountsController {
         if (!conflicts || conflicts.length === 0) return '';
 
         return `
-            <table class="gap-conflicts-table">
+            <table class="gap-conflicts-table data-table">
                 <thead>
                     <tr>
                         <th class="expand-col"></th>
@@ -1905,8 +1946,8 @@ class HouseAccountsController {
         `).join('');
 
         return `
-            <tr class="gap-conflict-row" data-call="houseController.toggleGapOrderDetails" data-args='["$this"]' tabindex="0" aria-expanded="false" aria-label="Show orders for ${this.escapeHtml(conflict.companyName || ('ID ' + conflict.ID_Customer))}">
-                <td class="expand-toggle"><i class="fas fa-chevron-right" aria-hidden="true"></i></td>
+            <tr class="gap-conflict-row" data-call="houseController.toggleGapOrderDetails" data-args='["$this"]'>
+                <td class="expand-toggle"><button type="button" class="btn order-disclosure" aria-expanded="false" aria-label="Show orders for ${this.escapeHtml(conflict.companyName || ('ID ' + conflict.ID_Customer))}"><i class="fas fa-chevron-right" aria-hidden="true"></i></button></td>
                 <td class="gap-company">
                     ${this.escapeHtml(conflict.companyName || `ID: ${conflict.ID_Customer}`)}
                     <div class="gap-customer-id">ID: ${conflict.ID_Customer}</div>
@@ -1957,7 +1998,7 @@ class HouseAccountsController {
         if (detailsRow && detailsRow.classList.contains('gap-orders-row')) {
             const isHidden = detailsRow.hidden;
             detailsRow.hidden = !isHidden;
-            row.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
+            row.querySelector('.order-disclosure').setAttribute('aria-expanded', isHidden ? 'true' : 'false');
 
             if (icon) {
                 icon.classList.toggle('fa-chevron-right', !isHidden);
@@ -1990,11 +2031,11 @@ class HouseAccountsController {
 
         // Create and show modal
         const modalHtml = `
-            <div class="modal-overlay active" id="assign-modal-overlay">
-                <div class="modal-content modal-content--narrow" role="dialog" aria-modal="true" aria-labelledby="assign-modal-title">
+            <dialog class="modal-overlay active" id="assign-modal-overlay" aria-labelledby="assign-modal-title">
+                <div class="modal-content modal-content--narrow">
                     <div class="modal-header">
                         <h2 id="assign-modal-title">Assign Customer</h2>
-                        <button type="button" class="close-btn" aria-label="Close" data-call="houseController.closeAssignModal">
+                        <button type="button" class="close-btn btn" aria-label="Close" data-call="houseController.closeAssignModal">
                             <i class="fas fa-times" aria-hidden="true"></i>
                         </button>
                     </div>
@@ -2022,20 +2063,20 @@ class HouseAccountsController {
                             </div>
 
                             <div class="assign-rep-buttons">
-                                <button type="button" class="btn-assign-rep taneisha" data-rep="Taneisha" aria-pressed="false" data-call="houseController.selectAssignRep" data-args='["Taneisha"]'>
+                                <button type="button" class="btn-assign-rep taneisha btn" data-rep="Taneisha" aria-pressed="false" data-call="houseController.selectAssignRep" data-args='["Taneisha"]'>
                                     <i class="fas fa-user" aria-hidden="true"></i> Taneisha
                                 </button>
-                                <button type="button" class="btn-assign-rep nika" data-rep="Nika" aria-pressed="false" data-call="houseController.selectAssignRep" data-args='["Nika"]'>
+                                <button type="button" class="btn-assign-rep nika btn" data-rep="Nika" aria-pressed="false" data-call="houseController.selectAssignRep" data-args='["Nika"]'>
                                     <i class="fas fa-user" aria-hidden="true"></i> Nika
                                 </button>
-                                <button type="button" class="btn-assign-rep house" data-rep="House" aria-pressed="false" data-call="houseController.selectAssignRep" data-args='["House"]'>
+                                <button type="button" class="btn-assign-rep house btn" data-rep="House" aria-pressed="false" data-call="houseController.selectAssignRep" data-args='["House"]'>
                                     <i class="fas fa-building" aria-hidden="true"></i> House
                                 </button>
                             </div>
 
                             <div class="tier-select-group">
                                 <label for="tier-select">Account Tier</label>
-                                <select id="tier-select" class="tier-select">
+                                <select id="tier-select" class="tier-select field-select">
                                     ${tierOptions}
                                 </select>
                             </div>
@@ -2047,13 +2088,13 @@ class HouseAccountsController {
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn-cancel" data-call="houseController.closeAssignModal">Cancel</button>
-                        <button type="button" class="btn-save" id="confirm-assign-btn" data-call="houseController.confirmAssignFromReconcile">
+                        <button type="button" class="btn-cancel btn" data-call="houseController.closeAssignModal">Cancel</button>
+                        <button type="button" class="btn-save btn" id="confirm-assign-btn" data-call="houseController.confirmAssignFromReconcile">
                             <i class="fas fa-check" aria-hidden="true"></i> Assign
                         </button>
                     </div>
                 </div>
-            </div>
+            </dialog>
         `;
 
         // Add modal to page (remember the opener so Close returns focus)
@@ -2062,6 +2103,7 @@ class HouseAccountsController {
         container.id = 'assign-modal-container';
         container.innerHTML = modalHtml;
         document.body.appendChild(container);
+        container.querySelector('dialog').showModal();
         const firstRep = container.querySelector('.btn-assign-rep');
         if (firstRep) setTimeout(() => firstRep.focus(), 30);
 
@@ -2089,7 +2131,7 @@ class HouseAccountsController {
         if (detailsRow && detailsRow.classList.contains('order-details-row')) {
             const isHidden = detailsRow.hidden;
             detailsRow.hidden = !isHidden;
-            row.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
+            row.querySelector('.order-disclosure').setAttribute('aria-expanded', isHidden ? 'true' : 'false');
 
             if (icon) {
                 icon.classList.toggle('fa-chevron-right', !isHidden);

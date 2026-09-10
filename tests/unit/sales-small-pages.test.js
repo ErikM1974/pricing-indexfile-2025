@@ -51,9 +51,9 @@ describe('portal directory', () => {
 describe('lead scorecard', () => {
     const html = strip(read('dashboards/lead-scorecard.html'));
     const js = read('dashboards/js/lead-scorecard.js');
-    const css = read('dashboards/css/lead-scorecard.css');
+    const css = read('shared_components/css/crm-pipeline.css');
     test('presets are pressed-state; Apply clears them; bar uses --w; Retry on failure', () => {
-        expect((html.match(/class="sc-preset" data-preset="[a-z0-9-]+" aria-pressed="false"/g) || []).length).toBe(4);
+        expect((html.match(/class="sc-preset btn" data-preset="[a-z0-9-]+" aria-pressed="false"/g) || []).length).toBe(4);
         expect(js).toMatch(/b\.setAttribute\('aria-pressed', on \? 'true' : 'false'\)/);
         expect(js).toMatch(/A custom range is none of the presets/);
         expect(js).toMatch(/style="--w:' \+ pct \+ '%" aria-hidden="true"/);
@@ -63,14 +63,14 @@ describe('lead scorecard', () => {
         expect(js).toMatch(/if \(e\.target\.closest\('#sc-retry'\)\) load\(\);/);
         expect(html).not.toMatch(NO_ICON);
         expect(js).not.toMatch(NO_ICON);
-        expect(html).toMatch(/<button type="button" class="dash-error-banner-close"/);
+        expect(html).toMatch(/<button type="button" class="dash-error-banner-close btn"/);
     });
 });
 
 describe('unqualified & spam leads', () => {
     const html = strip(read('dashboards/unqualified-leads.html'));
     const js = read('dashboards/js/unqualified-leads.js');
-    const css = read('dashboards/css/unqualified-leads.css');
+    const css = read('shared_components/css/components.css');
     test('real tablist with arrow keys; panel labelled by the active tab', () => {
         expect(html).toMatch(/<div class="uq-tabs" role="tablist" aria-label="Lead category">/);
         expect(html).toMatch(/id="uq-tab-spam" aria-selected="true" aria-controls="uq-panel"/);
@@ -80,7 +80,7 @@ describe('unqualified & spam leads', () => {
         expect(js).toMatch(/e\.key !== 'ArrowRight' && e\.key !== 'ArrowLeft'/);
         expect(js).toMatch(/document\.getElementById\('spam-note'\)\.hidden = state\.cat !== 'spam';/);
         expect(js).not.toMatch(/\.style\.display/);
-        expect(css).toMatch(/^\[hidden\] \{ display: none !important; \}/m);
+        expect(css).toMatch(/\[hidden\]\s*\{\s*display: none;/);
     });
     test('rescan result is a status line, not the error banner; failure offers Retry', () => {
         expect(html).toMatch(/<div class="uq-status" id="uq-status" role="status" hidden><\/div>/);

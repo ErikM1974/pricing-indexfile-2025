@@ -16,7 +16,8 @@ const read = (rel) => fs.readFileSync(path.join(ROOT, rel), 'utf8');
 
 const html = read('dashboards/house-accounts.html').replace(/<!--[\s\S]*?-->/g, '');
 const js = read('dashboards/js/house-accounts.js');
-const css = read('dashboards/css/house-accounts.css');
+const css = read('shared_components/css/crm-accounts.css');
+const components = read('shared_components/css/components.css');
 
 describe('house accounts — Rule 3', () => {
     test('no inline style / handlers in the page or templates', () => {
@@ -25,12 +26,12 @@ describe('house accounts — Rule 3', () => {
         expect(js).not.toMatch(/style="/);
         expect(js).not.toMatch(/onchange=/);
         expect(js).not.toMatch(/\.style\.(display|cssText)/);
-        expect(css).toMatch(/^\[hidden\] \{ display: none !important; \}/m);
+        expect(components).toMatch(/\[hidden\]\s*\{\s*display: none;/);
     });
     test('every icon is decorative; asset versions bumped', () => {
         expect(html).not.toMatch(/<i class="fa[^"]*"><\/i>/);
         expect(js).not.toMatch(/<i class="fa[^"]*"><\/i>/);
-        expect(html).toMatch(/house-accounts\.css\?v=\d{4}\.\d{2}\.\d{2}\.\d+/);
+        expect(html).toMatch(/crm-accounts\.css\?v=\d{4}\.\d{2}\.\d{2}\.\d+/);
         expect(html).toMatch(/house-accounts\.js\?v=\d{4}\.\d{2}\.\d{2}\.\d+/);
     });
 });
@@ -44,16 +45,16 @@ describe('house accounts — stat tiles filter correctly', () => {
         expect(js).not.toMatch(/label === 'Total'/);
         expect(js).toMatch(/function|_syncStatTiles\(assignee\) \{/);
         expect(js).toMatch(/c\.setAttribute\('aria-pressed', on \? 'true' : 'false'\)/);
-        expect(css).toMatch(/\.stat-card \{ font: inherit; color: inherit; width: 100%; display: block; text-align: center; \}/);
+        expect(css).toMatch(/\.stat-card,[^}]*\{[^}]*font:\s*inherit;[^}]*text-align:\s*left;/);
     });
 });
 
 describe('house accounts — modals and expanders', () => {
     test('static modals are labelled dialogs; open/close go through the focus helpers', () => {
-        expect(html).toMatch(/class="gap-report-modal" role="dialog" aria-modal="true" aria-labelledby="sw-todo-title"/);
-        expect(html).toMatch(/class="reconcile-modal" role="dialog" aria-modal="true" aria-labelledby="reconcile-title"/);
-        expect(html).toMatch(/class="confirm-modal" role="dialog" aria-modal="true" aria-labelledby="confirm-title"/);
-        expect(html).toMatch(/class="gap-report-modal" role="dialog" aria-modal="true" aria-labelledby="gap-report-title"/);
+        expect(html).toMatch(/<dialog class="modal-overlay" id="sw-todo-modal-overlay" aria-labelledby="sw-todo-title"/);
+        expect(html).toMatch(/<dialog class="modal-overlay" id="reconcile-modal-overlay" aria-labelledby="reconcile-title"/);
+        expect(html).toMatch(/<dialog class="modal-overlay" id="confirm-modal" aria-labelledby="confirm-title"/);
+        expect(html).toMatch(/<dialog class="modal-overlay" id="gap-report-modal-overlay" aria-labelledby="gap-report-title"/);
         expect(js).toMatch(/_openOverlay\(overlay, focusEl\) \{/);
         expect(js).toMatch(/_closeOverlay\(overlay\) \{/);
         for (const open of ['this.elements.confirmModal, this.elements.confirmSubmit', 'this.elements.reconcileModalOverlay, this.elements.reconcileModalClose', 'this.elements.swTodoOverlay, this.elements.swTodoClose', 'this.elements.gapReportModalOverlay, this.elements.gapReportModalClose']) {
@@ -63,24 +64,24 @@ describe('house accounts — modals and expanders', () => {
         expect(js).toMatch(/if \(e\.key === 'Escape'\) \{[\s\S]*?this\.closeShopWorksTodoModal\(\);\s*this\.closeAssignModal\(\);/);
     });
     test('dynamic assign modal is a labelled dialog with focus in/out and pressed rep buttons', () => {
-        expect(js).toMatch(/class="modal-content modal-content--narrow" role="dialog" aria-modal="true" aria-labelledby="assign-modal-title"/);
-        expect(js).toMatch(/class="close-btn" aria-label="Close" data-call="houseController\.closeAssignModal"/);
+        expect(js).toMatch(/<dialog class="modal-overlay active" id="assign-modal-overlay" aria-labelledby="assign-modal-title"/);
+        expect(js).toMatch(/class="close-btn btn" aria-label="Close" data-call="houseController\.closeAssignModal"/);
         expect(js).toMatch(/this\._assignReturnFocus = document\.activeElement;/);
         expect(js).toMatch(/btn\.setAttribute\('aria-pressed', on \? 'true' : 'false'\)/);
-        expect(css).toMatch(/\.modal-content--narrow \{ max-width: 480px; \}/);
+        expect(css).toMatch(/\.modal-content--narrow[^}]*max-width:\s*520px;/);
     });
     test('expandable rows and headers are keyboard-operable with aria-expanded', () => {
-        expect(js).toMatch(/class="customer-row"[^>]*tabindex="0" aria-expanded="false" aria-label="Show orders for /);
-        expect(js).toMatch(/class="gap-conflict-row"[^>]*tabindex="0" aria-expanded="false"/);
+        expect((js.match(/<button type="button" class="btn order-disclosure" aria-expanded="false" aria-label="Show orders for /g) || []).length).toBe(2);
+        expect(js).not.toMatch(/<tr[^>]*aria-expanded/);
         expect(js).toMatch(/class="gap-rep-header"[^>]*role="button" tabindex="0" aria-expanded="true"/);
-        expect(js).toMatch(/e\.target\.matches\('tr\[data-call\], \.gap-rep-header\[data-call\]'\)/);
+        expect(js).toMatch(/e\.target\.matches\('\.gap-rep-header\[data-call\]'\)/);
         expect((js.match(/setAttribute\('aria-expanded', isHidden \? 'true' : 'false'\)/g) || []).length).toBe(3);
         expect(js).toMatch(/<tr class="order-details-row" hidden>/);
         expect(js).toMatch(/<tr class="gap-orders-row" hidden>/);
         expect(html).toMatch(/<th class="expand-col"><span class="sr-only">Expand<\/span><\/th>/);
     });
     test('the reconcile Assign dropdown is a data-change target', () => {
-        expect(js).toMatch(/class="assign-dropdown" aria-label="Assign [^"]*" data-change="houseController\.quickAssignFromSelect" data-change-args='\["\$this"\]' data-stop="1"/);
+        expect(js).toMatch(/class="assign-dropdown field-select" aria-label="Assign [^"]*" data-change="houseController\.quickAssignFromSelect" data-change-args='\["\$this"\]' data-stop="1"/);
         expect(js).toMatch(/quickAssignFromSelect\(select\) \{[\s\S]*?this\.quickAssign\(id, select\.value\);/);
     });
 });

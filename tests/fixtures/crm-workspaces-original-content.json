@@ -1,0 +1,1258 @@
+{
+  "base": "75835086c06c3d4a0ac41876ab021c6ad050f85d",
+  "pages": [
+    {
+      "file": "dashboards/house-accounts.html",
+      "title": "House Accounts - Northwest Custom Apparel",
+      "ids": [
+        "error-banner",
+        "error-message",
+        "error-retry",
+        "stats-grid",
+        "stat-total",
+        "stat-ruthie",
+        "stat-erik",
+        "stat-web",
+        "stat-jim",
+        "stat-house",
+        "stat-other",
+        "filter-search",
+        "filter-assignee",
+        "clear-filters-btn",
+        "accounts-count",
+        "gap-report-btn",
+        "reconcile-btn",
+        "sw-todo-btn",
+        "sw-todo-count",
+        "sync-all-btn",
+        "sync-house-btn",
+        "sync-status",
+        "loading-overlay",
+        "accounts-grid",
+        "empty-state",
+        "sw-todo-modal-overlay",
+        "sw-todo-title",
+        "sw-todo-copy",
+        "sw-todo-close",
+        "sw-todo-body",
+        "reconcile-modal-overlay",
+        "reconcile-title",
+        "reconcile-refresh-btn",
+        "reconcile-modal-close",
+        "reconcile-loading",
+        "reconcile-results",
+        "reconcile-summary",
+        "reconcile-table",
+        "reconcile-table-body",
+        "reconcile-empty",
+        "reconcile-footer",
+        "reconcile-cancel",
+        "reconcile-add-all",
+        "confirm-modal",
+        "confirm-title",
+        "confirm-close",
+        "confirm-message",
+        "confirm-account-preview",
+        "confirm-cancel",
+        "confirm-submit",
+        "celebration-toast",
+        "gap-report-modal-overlay",
+        "gap-report-title",
+        "gap-report-refresh-btn",
+        "gap-report-modal-close",
+        "gap-report-loading",
+        "gap-report-content",
+        "gap-report-close"
+      ],
+      "links": [
+        {
+          "href": "/crm-logout",
+          "label": "Logout"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "label": "Dashboard"
+        }
+      ],
+      "fields": [
+        {
+          "id": "filter-search",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "filter-assignee",
+          "type": "select-one",
+          "value": ""
+        }
+      ],
+      "styles": [
+        "shared_components/css/tokens.css",
+        "dashboards/css/house-accounts.css"
+      ],
+      "scripts": [
+        "config/app.config.js",
+        "shared_components/js/caspio-date-utils.js",
+        "shared_components/js/data-call-delegator.js",
+        "dashboards/js/house-accounts.js"
+      ],
+      "cssBytes": 54563,
+      "bodyTextSha": "299969cc4a49251fbf937345a764b9554d3f21b4db4fe6bf5b69cd996652d675",
+      "tableHashes": [
+        "e26d4ba1043533bf9c80b1864f857349fdfb0e397e0ec6f193dc44ff68a2b032"
+      ],
+      "cardHashes": [
+        "dfaf97af907dbeeb29bec3512ff39cc38d946e36dbbf591e8f1836987bae79d4",
+        "f903e3328e00d36a543fd7d04bbc416112e34a8a1d425bad59c45ffdb37d285b",
+        "3400235018e47b4d8d0430cd0de5f8c16887712cd0dcefdb02b5e2e43e01e2af",
+        "a1a75fe5f618a1d7dd7d3c5a0806e8968d828254ad7443a50670484eda307d4f",
+        "4dfce0e5a9b8acca4b024b302f903079909b4ee26d54af50eaeb855fe05039aa",
+        "450a96aa0339896a42edec5d0ebace90b0510e15646354a72005d5d9d9368c6b"
+      ]
+    },
+    {
+      "file": "dashboards/nika-crm.html",
+      "title": "Nika's Account CRM - Northwest Custom Apparel",
+      "ids": [
+        "userWelcome",
+        "userName",
+        "header-total",
+        "header-at-risk",
+        "error-banner",
+        "error-message",
+        "error-retry",
+        "ytd-total",
+        "gold-revenue",
+        "gold-count",
+        "silver-revenue",
+        "silver-count",
+        "bronze-revenue",
+        "bronze-count",
+        "winback-revenue",
+        "winback-count",
+        "winback-bonus",
+        "quarter-label",
+        "quarter-payout-date",
+        "unclassified-revenue",
+        "unclassified-count",
+        "filter-search",
+        "filter-tier",
+        "filter-priority",
+        "filter-month",
+        "filter-trend",
+        "products-label",
+        "clear-filters-btn",
+        "accounts-count",
+        "loading-overlay",
+        "empty-state",
+        "accounts-grid",
+        "sync-status",
+        "last-synced",
+        "account-detail-modal-overlay",
+        "account-detail-company",
+        "account-detail-badges",
+        "account-detail-modal-close",
+        "account-detail-body",
+        "account-detail-close"
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "label": ""
+        },
+        {
+          "href": "/crm-logout",
+          "label": "Logout"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "label": "Dashboard"
+        }
+      ],
+      "fields": [
+        {
+          "id": "filter-search",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "filter-tier",
+          "type": "select-one",
+          "value": ""
+        },
+        {
+          "id": "filter-priority",
+          "type": "select-one",
+          "value": ""
+        },
+        {
+          "id": "filter-month",
+          "type": "select-one",
+          "value": ""
+        },
+        {
+          "id": "filter-trend",
+          "type": "select-one",
+          "value": ""
+        }
+      ],
+      "styles": [
+        "shared_components/css/tokens.css",
+        "dashboards/css/rep-crm.css"
+      ],
+      "scripts": [
+        "config/app.config.js",
+        "dashboards/js/nika-crm.js",
+        "shared_components/js/staff-auth-helper.js",
+        "shared_components/js/data-call-delegator.js",
+        "dashboards/js/rep-crm.js"
+      ],
+      "cssBytes": 59002,
+      "bodyTextSha": "d16cb9b97aabf8486b38d7a4dfd44cab6c1c9bf89eeef6d61eda2355e3ac5d75",
+      "tableHashes": [],
+      "cardHashes": [
+        "86e582488ed50ab33922e6eca1146d355020c54fd2f605ab6ec4a38c0e3d26df",
+        "7dbbe10a215762c82696a980c218e06e84081e5628af4820d4ed81e72134fa4a",
+        "56ff8cafd201fc47d1a2a5c0a038c3e0746d63dc90afea9d8fe93ae158e6ae2d",
+        "1d71942f3948ee28fa7d4f626634f269bd258424826f7707de8d66ff1d6475fa",
+        "e6b18d9b8ee0e6adee065f23437b902a42c4145d9fa2581d0d00b4f38283fddc",
+        "592a426d0571f2d8c616b8f35cf022b35978625a170a9d44a9ea9dd664f4bda4"
+      ],
+      "detailHash": "8aa49271227f2fb2ddcfede43b6eaff2a0dacf484278870449c5d40415628537"
+    },
+    {
+      "file": "dashboards/taneisha-crm.html",
+      "title": "Taneisha's Account CRM - Northwest Custom Apparel",
+      "ids": [
+        "userWelcome",
+        "userName",
+        "header-total",
+        "header-at-risk",
+        "error-banner",
+        "error-message",
+        "error-retry",
+        "ytd-total",
+        "gold-revenue",
+        "gold-count",
+        "silver-revenue",
+        "silver-count",
+        "bronze-revenue",
+        "bronze-count",
+        "winback-revenue",
+        "winback-count",
+        "winback-bonus",
+        "quarter-label",
+        "quarter-payout-date",
+        "unclassified-revenue",
+        "unclassified-count",
+        "filter-search",
+        "filter-tier",
+        "filter-priority",
+        "filter-month",
+        "filter-trend",
+        "products-label",
+        "clear-filters-btn",
+        "accounts-count",
+        "loading-overlay",
+        "empty-state",
+        "accounts-grid",
+        "sync-status",
+        "last-synced",
+        "account-detail-modal-overlay",
+        "account-detail-company",
+        "account-detail-badges",
+        "account-detail-modal-close",
+        "account-detail-body",
+        "account-detail-close"
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "label": ""
+        },
+        {
+          "href": "/crm-logout",
+          "label": "Logout"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "label": "Dashboard"
+        }
+      ],
+      "fields": [
+        {
+          "id": "filter-search",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "filter-tier",
+          "type": "select-one",
+          "value": ""
+        },
+        {
+          "id": "filter-priority",
+          "type": "select-one",
+          "value": ""
+        },
+        {
+          "id": "filter-month",
+          "type": "select-one",
+          "value": ""
+        },
+        {
+          "id": "filter-trend",
+          "type": "select-one",
+          "value": ""
+        }
+      ],
+      "styles": [
+        "shared_components/css/tokens.css",
+        "dashboards/css/rep-crm.css"
+      ],
+      "scripts": [
+        "config/app.config.js",
+        "dashboards/js/taneisha-crm.js",
+        "shared_components/js/staff-auth-helper.js",
+        "shared_components/js/data-call-delegator.js",
+        "dashboards/js/rep-crm.js"
+      ],
+      "cssBytes": 59002,
+      "bodyTextSha": "4fe96da632ceee0d11c00bcdbb217ca44bcb4e84e82a4aaa38fa9599d46fdeed",
+      "tableHashes": [],
+      "cardHashes": [
+        "86e582488ed50ab33922e6eca1146d355020c54fd2f605ab6ec4a38c0e3d26df",
+        "7dbbe10a215762c82696a980c218e06e84081e5628af4820d4ed81e72134fa4a",
+        "56ff8cafd201fc47d1a2a5c0a038c3e0746d63dc90afea9d8fe93ae158e6ae2d",
+        "1d71942f3948ee28fa7d4f626634f269bd258424826f7707de8d66ff1d6475fa",
+        "e6b18d9b8ee0e6adee065f23437b902a42c4145d9fa2581d0d00b4f38283fddc",
+        "592a426d0571f2d8c616b8f35cf022b35978625a170a9d44a9ea9dd664f4bda4"
+      ],
+      "detailHash": "8aa49271227f2fb2ddcfede43b6eaff2a0dacf484278870449c5d40415628537"
+    },
+    {
+      "file": "dashboards/leads.html",
+      "title": "Leads - Northwest Custom Apparel",
+      "ids": [
+        "btn-new-lead",
+        "btn-export",
+        "btn-refresh",
+        "stat-total",
+        "stat-new",
+        "stat-pipeline",
+        "stat-won",
+        "leads-count",
+        "view-board",
+        "view-list",
+        "filter-source",
+        "filter-status",
+        "filter-rep",
+        "filter-search",
+        "filter-mine",
+        "filter-archived",
+        "leads-board",
+        "leads-board-msg",
+        "leads-list-wrap",
+        "leads-table",
+        "leads-tbody",
+        "drawer-overlay",
+        "lead-drawer",
+        "drawer-title",
+        "drawer-sub",
+        "drawer-open-full",
+        "drawer-close",
+        "drawer-body",
+        "newlead-overlay",
+        "newlead-modal",
+        "newlead-title",
+        "newlead-close",
+        "nl-name",
+        "nl-company",
+        "nl-email",
+        "nl-phone",
+        "nl-summary",
+        "nl-source",
+        "nl-rep",
+        "nl-value",
+        "nl-due",
+        "newlead-save",
+        "newlead-status"
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "label": ""
+        },
+        {
+          "href": "/dashboards/lead-scorecard.html",
+          "label": "Scorecard"
+        },
+        {
+          "href": "/dashboards/unqualified-leads.html",
+          "label": "Spam / Unqualified"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "label": "Dashboard"
+        },
+        {
+          "href": "/dashboards/lead.html",
+          "label": "Full lead"
+        }
+      ],
+      "fields": [
+        {
+          "id": "filter-source",
+          "type": "select-one",
+          "value": ""
+        },
+        {
+          "id": "filter-status",
+          "type": "select-one",
+          "value": ""
+        },
+        {
+          "id": "filter-rep",
+          "type": "select-one",
+          "value": ""
+        },
+        {
+          "id": "filter-search",
+          "type": "search",
+          "value": ""
+        },
+        {
+          "id": "filter-archived",
+          "type": "checkbox",
+          "value": "on"
+        },
+        {
+          "id": "nl-name",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "nl-company",
+          "type": "text",
+          "value": ""
+        },
+        {
+          "id": "nl-email",
+          "type": "email",
+          "value": ""
+        },
+        {
+          "id": "nl-phone",
+          "type": "tel",
+          "value": ""
+        },
+        {
+          "id": "nl-summary",
+          "type": "textarea",
+          "value": ""
+        },
+        {
+          "id": "nl-source",
+          "type": "select-one",
+          "value": "Phone call"
+        },
+        {
+          "id": "nl-rep",
+          "type": "select-one",
+          "value": ""
+        },
+        {
+          "id": "nl-value",
+          "type": "number",
+          "value": ""
+        },
+        {
+          "id": "nl-due",
+          "type": "date",
+          "value": ""
+        }
+      ],
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/art-hub.css",
+        "shared_components/css/dash-shell.css",
+        "dashboards/css/leads.css"
+      ],
+      "scripts": [
+        "config/app.config.js",
+        "shared_components/js/fetch-timeout.js",
+        "shared_components/js/dash-page-helpers.js",
+        "dashboards/js/leads-common.js",
+        "dashboards/js/leads.js"
+      ],
+      "cssBytes": 176101,
+      "bodyTextSha": "ce31b16139530be0eabbe283c143613d526595860b4757513060c43d92349eba",
+      "tableHashes": [
+        "1816d57307600dea93ac64ed372a02ec845e60d92019236435de87200b14a779"
+      ],
+      "cardHashes": [],
+      "csvHash": "dea42445da879c25af95270c9c2414f1435fba17b14958bf5b4da39f4ec9dabb",
+      "csvFilename": "leads-active-2026-09-09.csv"
+    },
+    {
+      "file": "dashboards/lead-scorecard.html",
+      "title": "Lead Scorecard - Northwest Custom Apparel",
+      "ids": [
+        "sc-refresh",
+        "sc-since",
+        "sc-until",
+        "sc-apply",
+        "stat-closed",
+        "stat-sales",
+        "stat-reps",
+        "stat-range",
+        "rep-table",
+        "rep-tbody",
+        "leads-count",
+        "sc-rep-filter",
+        "leads-table",
+        "leads-tbody"
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "label": ""
+        },
+        {
+          "href": "/dashboards/leads.html",
+          "label": "Leads board"
+        }
+      ],
+      "fields": [
+        {
+          "id": "sc-since",
+          "type": "date",
+          "value": ""
+        },
+        {
+          "id": "sc-until",
+          "type": "date",
+          "value": ""
+        },
+        {
+          "id": "sc-rep-filter",
+          "type": "select-one",
+          "value": ""
+        }
+      ],
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/art-hub.css",
+        "shared_components/css/dash-shell.css",
+        "dashboards/css/lead-scorecard.css"
+      ],
+      "scripts": [
+        "config/app.config.js",
+        "shared_components/js/fetch-timeout.js",
+        "shared_components/js/dash-page-helpers.js",
+        "dashboards/js/lead-scorecard.js"
+      ],
+      "cssBytes": 161043,
+      "bodyTextSha": "915c559f0addb84cee88924b32edc1dfa0a5193219bd929c87a323a08ce8083a",
+      "tableHashes": [
+        "8dc09679da9ee18e1b5a1d69c5a011b403be71127739a5d791f4ac5f09ec28fb",
+        "e7893c790a188efe4886fbe2d19e2ca7550c2905d8d45af11205437120edd14d"
+      ],
+      "cardHashes": []
+    },
+    {
+      "file": "dashboards/unqualified-leads.html",
+      "title": "Unqualified & Spam Leads - Northwest Custom Apparel",
+      "ids": [
+        "btn-rescan",
+        "btn-refresh",
+        "uq-tab-spam",
+        "badge-spam",
+        "uq-tab-unqualified",
+        "badge-unqualified",
+        "uq-status",
+        "uq-panel",
+        "section-title",
+        "list-count",
+        "uq-search",
+        "spam-note",
+        "uq-table",
+        "uq-tbody"
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "label": ""
+        },
+        {
+          "href": "/dashboards/leads.html",
+          "label": "Leads board"
+        }
+      ],
+      "fields": [
+        {
+          "id": "uq-search",
+          "type": "search",
+          "value": ""
+        }
+      ],
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/art-hub.css",
+        "shared_components/css/dash-shell.css",
+        "dashboards/css/unqualified-leads.css"
+      ],
+      "scripts": [
+        "config/app.config.js",
+        "shared_components/js/fetch-timeout.js",
+        "shared_components/js/dash-page-helpers.js",
+        "dashboards/js/unqualified-leads.js"
+      ],
+      "cssBytes": 161142,
+      "bodyTextSha": "22ab0df84e3c25e1d799ee94598210a5be9b7a1da93a88efbe7f1defa157152b",
+      "tableHashes": [
+        "016b4adfb3b831a27063a41e16446233ad2dd2c051dd35151b18580a4d8df446"
+      ],
+      "cardHashes": [],
+      "csvHash": "dea42445da879c25af95270c9c2414f1435fba17b14958bf5b4da39f4ec9dabb",
+      "csvFilename": "leads-active-2026-09-09.csv"
+    }
+  ],
+  "hashes": {
+    "config/app.config.js": "fe83e4329ce3eee97e48dd68dab81d9d5eb6ec94511d9650e2c9ebbb1528d6ea",
+    "shared_components/js/caspio-date-utils.js": "631fad8e38f78d2f7a6d1f424b145ccc3f4bf0f0bf58e61d89e3a1851605474e",
+    "shared_components/js/data-call-delegator.js": "50e836385b6804b2b52fd8c549744277fe69ff701c232b7badf4fdcb09f343f6",
+    "dashboards/js/house-accounts.js": "12d6bf0e7949b5e3a0c27d14d377ba7d6a5b55fc79c819aaf149d0c01fb68071",
+    "dashboards/js/nika-crm.js": "cee0095f78950841206219a3d2377cfa0dfd664f6a01d3debf9bdb126f2ae494",
+    "shared_components/js/staff-auth-helper.js": "b858bb5e30a775c949aaab2e4f0bbb4796e06c02a76f3bb8d8a9c97985f5addd",
+    "dashboards/js/rep-crm.js": "2e749267b8c84a3564e88a9874e8a406f0026b30e4efafe98681fbc6a6615ead",
+    "dashboards/js/taneisha-crm.js": "efe15e5200888b97ea440576be8cf6335bd9310fc502621d55d38a62372ef5d1",
+    "shared_components/js/fetch-timeout.js": "1d9852795f9af3b674a48ad5e719bc970cae867e36b1962f0c3f1a28dd830179",
+    "shared_components/js/dash-page-helpers.js": "4ce7902b8502978835949ecec36a95d27ebc2604f86ef1a9665353cd8c38ccbe",
+    "dashboards/js/leads-common.js": "b5d262b7c82b6544cab07f90e38bcbf3096292965b5780df97d13f40a29d83d6",
+    "dashboards/js/leads.js": "1c292e640d49baa4daa08f15091747864c4496fbd6f5a1f167b9dc0685261ece",
+    "dashboards/js/lead-scorecard.js": "2d2e24b9bfe90e05124ced073aff70c9d17792774b810a0bd3a0579ad7a9e2c2",
+    "dashboards/js/unqualified-leads.js": "a48f008a9053078ea6bb51a94ac009eeb3494d1825dcf4cf7df702894b08d487",
+    "dashboards/lead.html": "4f21717c469ceafaf8af25f7f1d2b7845ed5ef92f3dab716ecdd988c8816fd7b",
+    "dashboards/js/lead-workspace.js": "1183552c68bc31a4ed1595d6cccb0473399c5a0118eb0204b8facace7479dda5",
+    "dashboards/css/leads.css": "4aa7a447cd299aabd6bdca16a97c0d735bfddce915356676124d2a4e85509983"
+  },
+  "changes": [
+    {
+      "file": "dashboards/js/rep-crm.js",
+      "before": "<div class=\"account-card\" data-id=\"${account.PK_ID}\" role=\"button\" tabindex=\"0\" aria-label=\"Open ${this.escapeHtml(account.CompanyName || 'account')}\">",
+      "after": "<div class=\"account-card\" data-id=\"${account.PK_ID}\">",
+      "label": "Remove nested interactive card role",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/rep-crm.js",
+      "before": "<h3 class=\"company-name\">${this.escapeHtml(account.CompanyName)}</h3>",
+      "after": "<h3 class=\"company-name\"><button type=\"button\" class=\"account-open\" aria-label=\"Open ${this.escapeHtml(account.CompanyName || 'account')}\">${this.escapeHtml(account.CompanyName)}</button></h3>",
+      "label": "Native account opener",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/rep-crm.js",
+      "before": "if (account) this.openAccountDetailModal(account);",
+      "after": "if (account) {\n                    card.querySelector('.account-open').focus();\n                    this.openAccountDetailModal(account);\n                }",
+      "label": "Return focus to the named opener",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/rep-crm.js",
+      "before": "            card.addEventListener('keydown', (e) => {\n                if (e.target !== card) return;\n                if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); }\n            });\n        });\n    }\n\n    /**\n     * Check if account is overdue",
+      "after": "\n        });\n    }\n\n    /**\n     * Check if account is overdue",
+      "label": "Native button supplies Enter and Space",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/rep-crm.js",
+      "before": "        this.elements.accountDetailModalOverlay.classList.add('active');",
+      "after": "        this.elements.accountDetailModalOverlay.classList.add('active');\n        if (!this.elements.accountDetailModalOverlay.open) this.elements.accountDetailModalOverlay.showModal();",
+      "label": "Native account modal contains focus",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/rep-crm.js",
+      "before": "        overlay.classList.remove('active');",
+      "after": "        overlay.classList.remove('active');\n        if (overlay.open) overlay.close();",
+      "label": "Close native account modal",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/house-accounts.js",
+      "before": "        overlay.classList.add('active');",
+      "after": "        overlay.classList.add('active');\n        if (!overlay.open) overlay.showModal();",
+      "label": "Native house dialogs contain focus",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/house-accounts.js",
+      "before": "        overlay.classList.remove('active');",
+      "after": "        overlay.classList.remove('active');\n        if (overlay.open) overlay.close();",
+      "label": "Close native house dialogs",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/house-accounts.js",
+      "before": "<div class=\"modal-overlay active\" id=\"assign-modal-overlay\">",
+      "after": "<dialog class=\"modal-overlay active\" id=\"assign-modal-overlay\" aria-labelledby=\"assign-modal-title\">",
+      "label": "Native dynamic assignment overlay",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/house-accounts.js",
+      "before": "<dialog class=\"modal-overlay active\" id=\"assign-modal-overlay\" aria-labelledby=\"assign-modal-title\">\n                <div class=\"modal-content modal-content--narrow\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"assign-modal-title\">\n                    <div class=\"modal-header\">\n                        <h2 id=\"assign-modal-title\">Assign Customer</h2>\n                        <button type=\"button\" class=\"close-btn\" aria-label=\"Close\" data-call=\"houseController.closeAssignModal\">\n                            <i class=\"fas fa-times\" aria-hidden=\"true\"></i>\n                        </button>\n                    </div>\n                    <div class=\"modal-body\">\n                        <div class=\"assign-modal-content\">\n                            <div class=\"assign-customer-info\">\n                                <div class=\"info-row\">\n                                    <span class=\"info-label\">Company</span>\n                                    <span class=\"info-value\">${this.escapeHtml(customer.companyName || `ID: ${customer.ID_Customer}`)}</span>\n                                </div>\n                                <div class=\"info-row\">\n                                    <span class=\"info-label\">Order Rep</span>\n                                    <span class=\"info-value\">${this.escapeHtml(customer.rep || '-')}</span>\n                                </div>\n                                <div class=\"info-row\">\n                                    <span class=\"info-label\">ShopWorks Rep</span>\n                                    <span class=\"info-value ${customer.inShopWorks ? '' : 'sw-not-found'}\">${customer.inShopWorks ? this.escapeHtml(customer.shopWorksRep || 'House') : 'Not in ShopWorks'}</span>\n                                </div>\n                                ${customer.shopWorksTier ? `\n                                <div class=\"info-row\">\n                                    <span class=\"info-label\">Current Tier</span>\n                                    <span class=\"info-value\">${this.escapeHtml(customer.shopWorksTier)}</span>\n                                </div>\n                                ` : ''}\n                            </div>\n\n                            <div class=\"assign-rep-buttons\">\n                                <button type=\"button\" class=\"btn-assign-rep taneisha\" data-rep=\"Taneisha\" aria-pressed=\"false\" data-call=\"houseController.selectAssignRep\" data-args='[\"Taneisha\"]'>\n                                    <i class=\"fas fa-user\" aria-hidden=\"true\"></i> Taneisha\n                                </button>\n                                <button type=\"button\" class=\"btn-assign-rep nika\" data-rep=\"Nika\" aria-pressed=\"false\" data-call=\"houseController.selectAssignRep\" data-args='[\"Nika\"]'>\n                                    <i class=\"fas fa-user\" aria-hidden=\"true\"></i> Nika\n                                </button>\n                                <button type=\"button\" class=\"btn-assign-rep house\" data-rep=\"House\" aria-pressed=\"false\" data-call=\"houseController.selectAssignRep\" data-args='[\"House\"]'>\n                                    <i class=\"fas fa-building\" aria-hidden=\"true\"></i> House\n                                </button>\n                            </div>\n\n                            <div class=\"tier-select-group\">\n                                <label for=\"tier-select\">Account Tier</label>\n                                <select id=\"tier-select\" class=\"tier-select\">\n                                    ${tierOptions}\n                                </select>\n                            </div>\n\n                            <div class=\"sync-checkbox-group\">\n                                <input type=\"checkbox\" id=\"sync-shopworks\" checked>\n                                <label for=\"sync-shopworks\">Also update ShopWorks (Sales_Reps_2026)</label>\n                            </div>\n                        </div>\n                    </div>\n                    <div class=\"modal-footer\">\n                        <button type=\"button\" class=\"btn-cancel\" data-call=\"houseController.closeAssignModal\">Cancel</button>\n                        <button type=\"button\" class=\"btn-save\" id=\"confirm-assign-btn\" data-call=\"houseController.confirmAssignFromReconcile\">\n                            <i class=\"fas fa-check\" aria-hidden=\"true\"></i> Assign\n                        </button>\n                    </div>\n                </div>\n            </div>\n",
+      "after": "<dialog class=\"modal-overlay active\" id=\"assign-modal-overlay\" aria-labelledby=\"assign-modal-title\">\n                <div class=\"modal-content modal-content--narrow\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"assign-modal-title\">\n                    <div class=\"modal-header\">\n                        <h2 id=\"assign-modal-title\">Assign Customer</h2>\n                        <button type=\"button\" class=\"close-btn\" aria-label=\"Close\" data-call=\"houseController.closeAssignModal\">\n                            <i class=\"fas fa-times\" aria-hidden=\"true\"></i>\n                        </button>\n                    </div>\n                    <div class=\"modal-body\">\n                        <div class=\"assign-modal-content\">\n                            <div class=\"assign-customer-info\">\n                                <div class=\"info-row\">\n                                    <span class=\"info-label\">Company</span>\n                                    <span class=\"info-value\">${this.escapeHtml(customer.companyName || `ID: ${customer.ID_Customer}`)}</span>\n                                </div>\n                                <div class=\"info-row\">\n                                    <span class=\"info-label\">Order Rep</span>\n                                    <span class=\"info-value\">${this.escapeHtml(customer.rep || '-')}</span>\n                                </div>\n                                <div class=\"info-row\">\n                                    <span class=\"info-label\">ShopWorks Rep</span>\n                                    <span class=\"info-value ${customer.inShopWorks ? '' : 'sw-not-found'}\">${customer.inShopWorks ? this.escapeHtml(customer.shopWorksRep || 'House') : 'Not in ShopWorks'}</span>\n                                </div>\n                                ${customer.shopWorksTier ? `\n                                <div class=\"info-row\">\n                                    <span class=\"info-label\">Current Tier</span>\n                                    <span class=\"info-value\">${this.escapeHtml(customer.shopWorksTier)}</span>\n                                </div>\n                                ` : ''}\n                            </div>\n\n                            <div class=\"assign-rep-buttons\">\n                                <button type=\"button\" class=\"btn-assign-rep taneisha\" data-rep=\"Taneisha\" aria-pressed=\"false\" data-call=\"houseController.selectAssignRep\" data-args='[\"Taneisha\"]'>\n                                    <i class=\"fas fa-user\" aria-hidden=\"true\"></i> Taneisha\n                                </button>\n                                <button type=\"button\" class=\"btn-assign-rep nika\" data-rep=\"Nika\" aria-pressed=\"false\" data-call=\"houseController.selectAssignRep\" data-args='[\"Nika\"]'>\n                                    <i class=\"fas fa-user\" aria-hidden=\"true\"></i> Nika\n                                </button>\n                                <button type=\"button\" class=\"btn-assign-rep house\" data-rep=\"House\" aria-pressed=\"false\" data-call=\"houseController.selectAssignRep\" data-args='[\"House\"]'>\n                                    <i class=\"fas fa-building\" aria-hidden=\"true\"></i> House\n                                </button>\n                            </div>\n\n                            <div class=\"tier-select-group\">\n                                <label for=\"tier-select\">Account Tier</label>\n                                <select id=\"tier-select\" class=\"tier-select\">\n                                    ${tierOptions}\n                                </select>\n                            </div>\n\n                            <div class=\"sync-checkbox-group\">\n                                <input type=\"checkbox\" id=\"sync-shopworks\" checked>\n                                <label for=\"sync-shopworks\">Also update ShopWorks (Sales_Reps_2026)</label>\n                            </div>\n                        </div>\n                    </div>\n                    <div class=\"modal-footer\">\n                        <button type=\"button\" class=\"btn-cancel\" data-call=\"houseController.closeAssignModal\">Cancel</button>\n                        <button type=\"button\" class=\"btn-save\" id=\"confirm-assign-btn\" data-call=\"houseController.confirmAssignFromReconcile\">\n                            <i class=\"fas fa-check\" aria-hidden=\"true\"></i> Assign\n                        </button>\n                    </div>\n                </div>\n            </dialog>\n",
+      "label": "Close dynamic dialog markup",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/house-accounts.js",
+      "before": "        document.body.appendChild(container);\n        const firstRep",
+      "after": "        document.body.appendChild(container);\n        container.querySelector('dialog').showModal();\n        const firstRep",
+      "label": "Open dynamic assignment in top layer",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/house-accounts.js",
+      "before": "<select class=\"assign-dropdown\" aria-label=\"Assign ${this.escapeHtml(customer.companyName || ('ID ' + customer.ID_Customer))} to\" data-change=\"houseController.quickAssignFromSelect\" data-change-args='[\"$this\"]' data-stop=\"1\">",
+      "after": "<select class=\"assign-dropdown field-select\" aria-label=\"Assign ${this.escapeHtml(customer.companyName || ('ID ' + customer.ID_Customer))} to\" data-change=\"houseController.quickAssignFromSelect\" data-change-args='[\"$this\"]' data-stop=\"1\">",
+      "label": "Canonical generated select",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/house-accounts.js",
+      "before": "<table class=\"sw-todo-table\">",
+      "after": "<table class=\"sw-todo-table data-table\">",
+      "label": "Canonical generated table",
+      "count": 2
+    },
+    {
+      "file": "dashboards/js/house-accounts.js",
+      "before": "<table class=\"gap-conflicts-table\">",
+      "after": "<table class=\"gap-conflicts-table data-table\">",
+      "label": "Canonical generated table",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/house-accounts.js",
+      "before": "<button type=\"button\" class=\"btn-assign-rep taneisha\" data-rep=\"Taneisha\" aria-pressed=\"false\" data-call=\"houseController.selectAssignRep\" data-args='[\"Taneisha\"]'>",
+      "after": "<button type=\"button\" class=\"btn-assign-rep taneisha btn\" data-rep=\"Taneisha\" aria-pressed=\"false\" data-call=\"houseController.selectAssignRep\" data-args='[\"Taneisha\"]'>",
+      "label": "Canonical generated button",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/house-accounts.js",
+      "before": "<button type=\"button\" class=\"btn-assign-rep nika\" data-rep=\"Nika\" aria-pressed=\"false\" data-call=\"houseController.selectAssignRep\" data-args='[\"Nika\"]'>",
+      "after": "<button type=\"button\" class=\"btn-assign-rep nika btn\" data-rep=\"Nika\" aria-pressed=\"false\" data-call=\"houseController.selectAssignRep\" data-args='[\"Nika\"]'>",
+      "label": "Canonical generated button",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/house-accounts.js",
+      "before": "<button type=\"button\" class=\"btn-assign-rep house\" data-rep=\"House\" aria-pressed=\"false\" data-call=\"houseController.selectAssignRep\" data-args='[\"House\"]'>",
+      "after": "<button type=\"button\" class=\"btn-assign-rep house btn\" data-rep=\"House\" aria-pressed=\"false\" data-call=\"houseController.selectAssignRep\" data-args='[\"House\"]'>",
+      "label": "Canonical generated button",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/house-accounts.js",
+      "before": "<select id=\"tier-select\" class=\"tier-select\">",
+      "after": "<select id=\"tier-select\" class=\"tier-select field-select\">",
+      "label": "Canonical generated select",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/house-accounts.js",
+      "before": "<button type=\"button\" class=\"btn-cancel\" data-call=\"houseController.closeAssignModal\">",
+      "after": "<button type=\"button\" class=\"btn-cancel btn\" data-call=\"houseController.closeAssignModal\">",
+      "label": "Canonical generated button",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/house-accounts.js",
+      "before": "<button type=\"button\" class=\"btn-save\" id=\"confirm-assign-btn\" data-call=\"houseController.confirmAssignFromReconcile\">",
+      "after": "<button type=\"button\" class=\"btn-save btn\" id=\"confirm-assign-btn\" data-call=\"houseController.confirmAssignFromReconcile\">",
+      "label": "Canonical generated button",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/leads.js",
+      "before": "<button type=\"button\" class=\"ld-col-more\" data-col=\"' + esc(c.key) + '\" aria-expanded=\"' + (expanded ? 'true' : 'false') + '\">",
+      "after": "<button type=\"button\" class=\"ld-col-more btn\" data-col=\"' + esc(c.key) + '\" aria-expanded=\"' + (expanded ? 'true' : 'false') + '\">",
+      "label": "Canonical generated button",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/leads.js",
+      "before": "<select id=\"drawer-status\" class=\"ld-select\">",
+      "after": "<select id=\"drawer-status\" class=\"ld-select field-select\">",
+      "label": "Canonical generated select",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/leads.js",
+      "before": "<select id=\"drawer-rep\" class=\"ld-select\">",
+      "after": "<select id=\"drawer-rep\" class=\"ld-select field-select\">",
+      "label": "Canonical generated select",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/leads.js",
+      "before": "<input type=\"date\" id=\"drawer-due\" class=\"ld-select\" value=\"' + esc(lead.Due_Date || '') + '\">",
+      "after": "<input type=\"date\" id=\"drawer-due\" class=\"ld-select field-input\" value=\"' + esc(lead.Due_Date || '') + '\">",
+      "label": "Canonical generated input",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/leads.js",
+      "before": "<input type=\"number\" id=\"drawer-value\" class=\"ld-select\" min=\"0\" step=\"50\" placeholder=\"0\" value=\"' + esc(lead.Lead_Value || '') + '\">",
+      "after": "<input type=\"number\" id=\"drawer-value\" class=\"ld-select field-input\" min=\"0\" step=\"50\" placeholder=\"0\" value=\"' + esc(lead.Lead_Value || '') + '\">",
+      "label": "Canonical generated input",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/leads.js",
+      "before": "<input type=\"search\" id=\"match-search-input\" class=\"ld-search\" placeholder=\"' + esc(placeholder) + '\">",
+      "after": "<input type=\"search\" id=\"match-search-input\" class=\"ld-search field-input\" placeholder=\"' + esc(placeholder) + '\">",
+      "label": "Canonical generated input",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/leads.js",
+      "before": "<table class=\"ld-orders-table\">",
+      "after": "<table class=\"ld-orders-table data-table\">",
+      "label": "Canonical generated table",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/house-accounts.js",
+      "before": "<div class=\"modal-content modal-content--narrow\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"assign-modal-title\">",
+      "after": "<div class=\"modal-content modal-content--narrow\">",
+      "label": "Remove duplicate assignment dialog role",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/house-accounts.js",
+      "before": "<button class=\"sync-btn sw-todo-dismiss\" data-cid=\"${esc(r.customerId)}\" data-cname=\"${esc(r.customerName)}\" data-rep=\"${esc(r.newRep)}\">",
+      "after": "<button class=\"sync-btn sw-todo-dismiss btn\" data-cid=\"${esc(r.customerId)}\" data-cname=\"${esc(r.customerName)}\" data-rep=\"${esc(r.newRep)}\">",
+      "label": "Canonical button token",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/house-accounts.js",
+      "before": "<button class=\"sync-btn sw-todo-dismiss\" data-cid=\"${esc(p.customerId)}\" data-cname=\"${esc(p.customerName)}\" data-rep=\"${esc(p.newRep)}\">",
+      "after": "<button class=\"sync-btn sw-todo-dismiss btn\" data-cid=\"${esc(p.customerId)}\" data-cname=\"${esc(p.customerName)}\" data-rep=\"${esc(p.newRep)}\">",
+      "label": "Canonical button token",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/house-accounts.js",
+      "before": "<button type=\"button\" class=\"close-btn\" aria-label=\"Close\" data-call=\"houseController.closeAssignModal\">",
+      "after": "<button type=\"button\" class=\"close-btn btn\" aria-label=\"Close\" data-call=\"houseController.closeAssignModal\">",
+      "label": "Canonical button token",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/leads.js",
+      "before": "<button type=\"button\" id=\"btn-board-retry\" class=\"ld-btn\">",
+      "after": "<button type=\"button\" id=\"btn-board-retry\" class=\"ld-btn btn\">",
+      "label": "Canonical button token",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/leads.js",
+      "before": "<button type=\"button\" id=\"drawer-edit\" class=\"ld-btn\">",
+      "after": "<button type=\"button\" id=\"drawer-edit\" class=\"ld-btn btn\">",
+      "label": "Canonical button token",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/leads.js",
+      "before": "<button type=\"button\" id=\"drawer-delete\" class=\"ld-btn ld-btn--danger\">",
+      "after": "<button type=\"button\" id=\"drawer-delete\" class=\"ld-btn ld-btn--danger btn\">",
+      "label": "Canonical button token",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/leads.js",
+      "before": "<button type=\"button\" class=\"ld-btn\" data-link-customer=\"' + esc(contact.id_Customer) + '\">",
+      "after": "<button type=\"button\" class=\"ld-btn btn\" data-link-customer=\"' + esc(contact.id_Customer) + '\">",
+      "label": "Canonical button token",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/leads.js",
+      "before": "<button type=\"button\" id=\"match-search-btn\" class=\"ld-btn\">",
+      "after": "<button type=\"button\" id=\"match-search-btn\" class=\"ld-btn btn\">",
+      "label": "Canonical button token",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/leads.js",
+      "before": "<button type=\"button\" class=\"ld-btn\" data-link-customer=\"' + esc(c.id_Customer) + '\">",
+      "after": "<button type=\"button\" class=\"ld-btn btn\" data-link-customer=\"' + esc(c.id_Customer) + '\">",
+      "label": "Canonical button token",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/leads.js",
+      "before": "<button type=\"button\" id=\"btn-load-orders\" class=\"ld-btn\">",
+      "after": "<button type=\"button\" id=\"btn-load-orders\" class=\"ld-btn btn\">",
+      "label": "Canonical button token",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/leads.js",
+      "before": "<button type=\"button\" id=\"btn-orders-retry\" class=\"ld-btn\">",
+      "after": "<button type=\"button\" id=\"btn-orders-retry\" class=\"ld-btn btn\">",
+      "label": "Canonical button token",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/lead-scorecard.js",
+      "before": "<button type=\"button\" id=\"sc-retry\" class=\"sc-btn sc-retry\">",
+      "after": "<button type=\"button\" id=\"sc-retry\" class=\"sc-btn sc-retry btn\">",
+      "label": "Canonical button token",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/unqualified-leads.js",
+      "before": "<button type=\"button\" id=\"uq-retry\" class=\"uq-btn uq-retry\">",
+      "after": "<button type=\"button\" id=\"uq-retry\" class=\"uq-btn uq-retry btn\">",
+      "label": "Canonical button token",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/rep-crm.js",
+      "before": "        this.accounts = data.Result || data.accounts || data || [];",
+      "after": "        const rows = data && (data.Result || data.accounts || data);\n        if (!Array.isArray(rows) || rows.some(row => !row || typeof row !== 'object' || Array.isArray(row))) {\n            throw new Error('The account response is incomplete. Please retry.');\n        }\n        this.accounts = rows;",
+      "label": "Validate account list",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/house-accounts.js",
+      "before": "        this.accounts = data.Result || data.accounts || data || [];",
+      "after": "        const rows = data && (data.Result || data.accounts || data);\n        if (!Array.isArray(rows) || rows.some(row => !row || typeof row !== 'object' || Array.isArray(row))) {\n            throw new Error('The account response is incomplete. Please retry.');\n        }\n        this.accounts = rows;",
+      "label": "Validate account list",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/house-accounts.js",
+      "before": "        this.stats = await response.json();",
+      "after": "        const stats = await response.json();\n        if (!stats || typeof stats.total !== 'number' || !Number.isFinite(stats.total) || !stats.byAssignee || typeof stats.byAssignee !== 'object' || Array.isArray(stats.byAssignee)) {\n            throw new Error('The account counts are incomplete. Please retry.');\n        }\n        this.stats = stats;",
+      "label": "Validate house counts",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/house-accounts.js",
+      "before": "        this.sales = await response.json();",
+      "after": "        const sales = await response.json();\n        if (!sales || ['totalRevenue', 'totalOrders', 'accountsTracked'].some(key => typeof sales[key] !== 'number' || !Number.isFinite(sales[key])) || !sales.byAssignee || typeof sales.byAssignee !== 'object' || Array.isArray(sales.byAssignee) || Object.values(sales.byAssignee).some(row => !row || typeof row.revenue !== 'number' || !Number.isFinite(row.revenue))) {\n            throw new Error('The sales response is incomplete. Please retry.');\n        }\n        this.sales = sales;",
+      "label": "Validate house sales",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/rep-crm.js",
+      "before": "    showError(message, retryable) {",
+      "after": "    showError(message, retryable) {\n        const dialog = Array.from(document.querySelectorAll('dialog[open]')).pop();\n        if (dialog) {\n            let notice = dialog.querySelector('.crm-modal-error');\n            if (!notice) {\n                notice = document.createElement('p');\n                notice.className = 'crm-modal-error';\n                notice.setAttribute('role', 'alert');\n                (dialog.querySelector('.modal-body, .reconcile-modal-body, .gap-report-modal-body, .account-detail-modal-body') || dialog).prepend(notice);\n            }\n            notice.textContent = message;\n        }",
+      "label": "Show operation error within dialog",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/house-accounts.js",
+      "before": "    showError(message, retryable) {",
+      "after": "    showError(message, retryable) {\n        const dialog = Array.from(document.querySelectorAll('dialog[open]')).pop();\n        if (dialog) {\n            let notice = dialog.querySelector('.crm-modal-error');\n            if (!notice) {\n                notice = document.createElement('p');\n                notice.className = 'crm-modal-error';\n                notice.setAttribute('role', 'alert');\n                (dialog.querySelector('.modal-body, .reconcile-modal-body, .gap-report-modal-body, .account-detail-modal-body') || dialog).prepend(notice);\n            }\n            notice.textContent = message;\n        }",
+      "label": "Show operation error within dialog",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/house-accounts.js",
+      "before": "        overlay.classList.add('active');",
+      "after": "        overlay.querySelector('.crm-modal-error')?.remove();\n        overlay.classList.add('active');",
+      "label": "Clear prior dialog error on opening",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/rep-crm.js",
+      "before": "            console.error('[RepCRM] load failed:', error);",
+      "after": "            this.service.accounts = [];\n            this.filteredAccounts = [];\n            this.elements.accountsGrid.innerHTML = '';\n            this.updateAccountsCount();\n            document.querySelectorAll('.tier-revenue, .tier-count, .total-value, .header-stat-value, .bonus-value').forEach(node => { node.textContent = '—'; });\n            document.querySelectorAll('.crm-archive-hint, .crm-recon-line').forEach(node => node.remove());\n            console.error('[RepCRM] load failed:', error);",
+      "label": "Clear unavailable rep account figures",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/house-accounts.js",
+      "before": "this.showError('Unable to load House accounts (' + (error && error.message ? error.message : 'unknown error') + ').', true);\n",
+      "after": "this.service.accounts = [];\n            this.filteredAccounts = [];\n            this.elements.accountsGrid.innerHTML = '';\n            this.updateAccountsCount();\n            document.querySelectorAll('.stat-value').forEach(node => { node.textContent = '—'; });\n            document.getElementById('houseDataSubline')?.remove();\n            this.showError('Unable to load House accounts (' + (error && error.message ? error.message : 'unknown error') + ').', true);\n",
+      "label": "Clear unavailable house figures",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/leads.js",
+      "before": "            state.leads = body.submissions || [];",
+      "after": "            if (!body || !Array.isArray(body.submissions) || body.submissions.some(row => !row || typeof row !== 'object' || !row.Submission_ID)) {\n                throw new Error('The lead list is incomplete. Please retry.');\n            }\n            state.leads = body.submissions;",
+      "label": "Validate lead list",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/leads.js",
+      "before": "            console.error('[leads] load failed:', err);",
+      "after": "            state.leads = [];\n            ['stat-total', 'stat-new', 'stat-pipeline', 'stat-won'].forEach(function (id) { document.getElementById(id).textContent = '—'; });\n            document.getElementById('leads-count').textContent = 'Unavailable';\n            console.error('[leads] load failed:', err);",
+      "label": "Clear stale lead counts",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/lead-scorecard.js",
+      "before": "    var state = { since: '', until: '', repFilter: '', data: null };",
+      "after": "    var state = { since: '', until: '', repFilter: '', data: null, loadSeq: 0 };",
+      "label": "Guard late scorecard requests",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/lead-scorecard.js",
+      "before": "    function load() {",
+      "after": "    function completeScorecard(body) {\n        function finite(value) { return typeof value === 'number' && Number.isFinite(value); }\n        function count(value) { return finite(value) && Number.isInteger(value) && value >= 0; }\n        var t = body && body.totals;\n        return !!(body && body.success === true && t && count(t.leadsClosed) && count(t.repsWithCloses) && finite(t.attributedSales) &&\n            Array.isArray(body.reps) && body.reps.every(function (r) { return r && typeof r.rep === 'string' && count(r.leadsClosed) && finite(r.attributedSales) && finite(r.lifetimeSales); }) &&\n            Array.isArray(body.leads) && body.leads.every(function (l) { return l && typeof l.rep === 'string' && finite(l.attributed) && finite(l.lifetime); }));\n    }\n\n    function clearScorecard() {\n        state.data = null;\n        ['stat-closed', 'stat-sales', 'stat-reps', 'stat-range'].forEach(function (id) { document.getElementById(id).textContent = '—'; });\n        document.getElementById('leads-count').textContent = '';\n        document.getElementById('leads-tbody').innerHTML = '<tr><td colspan=\"6\" class=\"sc-empty\">—</td></tr>';\n    }\n\n    function load() {\n        var seq = ++state.loadSeq;\n        clearScorecard();",
+      "label": "Validate scorecard shape",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/lead-scorecard.js",
+      "before": "        fetch('/api/crm-proxy/lead-scorecard?' + params.toString())",
+      "after": "        fetch('/api/crm-proxy/lead-scorecard?' + params.toString(), { signal: AbortSignal.timeout(20000) })",
+      "label": "Bound scorecard wait",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/lead-scorecard.js",
+      "before": "            state.data = body;",
+      "after": "            if (seq !== state.loadSeq) return;\n            if (!completeScorecard(body)) throw new Error('The scorecard response is incomplete. Please retry.');\n            state.data = body;",
+      "label": "Reject incomplete scorecard",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/lead-scorecard.js",
+      "before": "            console.error('[scorecard] load failed:', err);",
+      "after": "            if (seq !== state.loadSeq) return;\n            clearScorecard();\n            console.error('[scorecard] load failed:', err);",
+      "label": "Ignore late failed scorecard",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/lead-scorecard.js",
+      "before": "        sel.value = cur; if (sel.value !== cur) sel.value = '';",
+      "after": "        sel.value = cur; if (sel.value !== cur) sel.value = '';\n        state.repFilter = sel.value;",
+      "label": "Keep visible rep filter authoritative",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/unqualified-leads.js",
+      "before": "                    return (b.submissions || []).sort(function (a, c) {",
+      "after": "                    if (!Array.isArray(b.submissions) || b.submissions.some(function (row) { return !row || typeof row !== 'object' || !row.Submission_ID; })) {\n                        throw new Error('The lead list is incomplete. Please retry.');\n                    }\n                    return b.submissions.sort(function (a, c) {",
+      "label": "Validate categorized leads",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/unqualified-leads.js",
+      "before": "        fetchCat(cat).then(function (rows) { state.cache[cat] = rows; setBadge(cat, rows.length); }).catch(function () {});",
+      "after": "        fetchCat(cat).then(function (rows) { state.cache[cat] = rows; setBadge(cat, rows.length); }).catch(function () { setBadge(cat, '?'); });",
+      "label": "Show unavailable category count",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/unqualified-leads.js",
+      "before": "        fetchCat(cat).then(function (rows) {\n            state.cache[cat] = rows;",
+      "after": "        fetchCat(cat).then(function (rows) {\n            if (cat !== state.cat) return;\n            state.cache[cat] = rows;",
+      "label": "Ignore late category read",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/unqualified-leads.js",
+      "before": "            console.error('[unqualified] load failed:', err);",
+      "after": "            if (cat !== state.cat) return;\n            delete state.cache[cat];\n            setBadge(cat, '?');\n            document.getElementById('list-count').textContent = 'Unavailable';\n            console.error('[unqualified] load failed:', err);",
+      "label": "Ignore late category error and clear count",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/unqualified-leads.js",
+      "before": "                load('spam'); prefetchCount('unqualified');",
+      "after": "                load(state.cat); prefetchCount(state.cat === 'spam' ? 'unqualified' : 'spam');",
+      "label": "Keep selected category after rescan",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/leads.js",
+      "before": "        loadSeq: 0,",
+      "after": "        loadState: 'loading',\n        loadError: '',\n        loadSeq: 0,",
+      "label": "Track lead availability across views",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/leads.js",
+      "before": "        var listWrap = document.getElementById('leads-list-wrap');",
+      "after": "        var listWrap = document.getElementById('leads-list-wrap');\n        if (state.loadState !== 'ready') {\n            var message = state.loadState === 'error' ? state.loadError : '<span class=\"dash-loading\">Loading leads…</span>';\n            board.hidden = state.view !== 'board';\n            listWrap.hidden = state.view !== 'list';\n            board.innerHTML = '';\n            document.getElementById('leads-tbody').innerHTML = state.view === 'list' ? '<tr><td colspan=\"7\" class=\"ld-empty\">' + message + '</td></tr>' : '';\n            setBoardMessage(state.view === 'board' ? message : '');\n            return;\n        }",
+      "label": "Keep lead failure when switching views",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/leads.js",
+      "before": "    function loadLeads() {",
+      "after": "    function loadLeads() {\n        state.loadState = 'loading';\n        state.loadError = '';",
+      "label": "Reset view availability on retry",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/leads.js",
+      "before": "            state.leads = body.submissions;",
+      "after": "            state.loadState = 'ready';\n            state.leads = body.submissions;",
+      "label": "Mark complete lead response ready",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/leads.js",
+      "before": "            tbody.innerHTML = '<tr><td colspan=\"7\" class=\"ld-empty\">' + failHtml + '</td></tr>';\n            if (state.view === 'board') { document.getElementById('leads-board').innerHTML = ''; setBoardMessage(failHtml); }",
+      "after": "            state.loadState = 'error';\n            state.loadError = failHtml;\n            renderView();",
+      "label": "Only the active lead view owns Retry",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/house-accounts.js",
+      "before": "            this.showError('Failed to load gap report. Please try again.');\n            this.closeGapReportModal();",
+      "after": "            if (this.elements.gapReportLoading) this.elements.gapReportLoading.hidden = true;\n            this.showError('Failed to load gap report. Use Refresh to try again.');",
+      "label": "Keep failed gap report open for retry",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/house-accounts.js",
+      "before": "        document.addEventListener('keydown', (e) => {\n            if (e.key === 'Escape') {",
+      "after": "        document.addEventListener('keydown', (e) => {\n            if (e.key === 'Tab') {\n                const dialog = Array.from(document.querySelectorAll('dialog[open]')).pop();\n                const controls = dialog && Array.from(dialog.querySelectorAll('a[href], button, input, select, textarea, [tabindex]')).filter(node => !node.disabled && node.tabIndex >= 0 && node.getClientRects().length);\n                if (controls && controls.length) {\n                    const first = controls[0], last = controls[controls.length - 1];\n                    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }\n                    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }\n                }\n            }\n            if (e.key === 'Escape') {",
+      "label": "Cycle native dialog keyboard controls",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/rep-crm.js",
+      "before": "        document.addEventListener('keydown', (e) => {\n            if (e.key === 'Escape') {",
+      "after": "        document.addEventListener('keydown', (e) => {\n            if (e.key === 'Tab') {\n                const dialog = Array.from(document.querySelectorAll('dialog[open]')).pop();\n                const controls = dialog && Array.from(dialog.querySelectorAll('a[href], button, input, select, textarea, [tabindex]')).filter(node => !node.disabled && node.tabIndex >= 0 && node.getClientRects().length);\n                if (controls && controls.length) {\n                    const first = controls[0], last = controls[controls.length - 1];\n                    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }\n                    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }\n                }\n            }\n            if (e.key === 'Escape') {",
+      "label": "Cycle native dialog keyboard controls",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/house-accounts.js",
+      "before": " tabindex=\"0\" aria-expanded=\"false\" aria-label=\"Show orders for ${this.escapeHtml(customer.companyName || ('ID ' + customer.ID_Customer))}\">\n                    <td class=\"expand-toggle\"><i class=\"fas fa-chevron-right\" aria-hidden=\"true\"></i></td>",
+      "after": ">\n                    <td class=\"expand-toggle\"><button type=\"button\" class=\"btn order-disclosure\" aria-expanded=\"false\" aria-label=\"Show orders for ${this.escapeHtml(customer.companyName || ('ID ' + customer.ID_Customer))}\"><i class=\"fas fa-chevron-right\" aria-hidden=\"true\"></i></button></td>",
+      "label": "Native order disclosure buttons",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/house-accounts.js",
+      "before": " tabindex=\"0\" aria-expanded=\"false\" aria-label=\"Show orders for ${this.escapeHtml(conflict.companyName || ('ID ' + conflict.ID_Customer))}\">\n                <td class=\"expand-toggle\"><i class=\"fas fa-chevron-right\" aria-hidden=\"true\"></i></td>",
+      "after": ">\n                <td class=\"expand-toggle\"><button type=\"button\" class=\"btn order-disclosure\" aria-expanded=\"false\" aria-label=\"Show orders for ${this.escapeHtml(conflict.companyName || ('ID ' + conflict.ID_Customer))}\"><i class=\"fas fa-chevron-right\" aria-hidden=\"true\"></i></button></td>",
+      "label": "Native order disclosure buttons",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/house-accounts.js",
+      "before": "            row.setAttribute('aria-expanded', isHidden ? 'true' : 'false');",
+      "after": "            row.querySelector('.order-disclosure').setAttribute('aria-expanded', isHidden ? 'true' : 'false');",
+      "label": "Order disclosure announces expansion",
+      "count": 2
+    },
+    {
+      "file": "dashboards/js/house-accounts.js",
+      "before": "e.target.matches('tr[data-call], .gap-rep-header[data-call]')",
+      "after": "e.target.matches('.gap-rep-header[data-call]')",
+      "label": "Native buttons own order keyboard activation",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/unqualified-leads.js",
+      "before": "var state = { cat: 'spam', search: '', cache: {} };",
+      "after": "var state = { cat: 'spam', search: '', cache: {}, sequence: {} };",
+      "label": "Track categorized lead request freshness",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/unqualified-leads.js",
+      "before": "        fetchCat(cat).then(function (rows) { state.cache[cat] = rows; setBadge(cat, rows.length); }).catch(function () { setBadge(cat, '?'); });",
+      "after": "        var seq = state.sequence[cat] = (state.sequence[cat] || 0) + 1;\n        fetchCat(cat).then(function (rows) {\n            if (seq !== state.sequence[cat]) return;\n            state.cache[cat] = rows; setBadge(cat, rows.length);\n        }).catch(function () { if (seq === state.sequence[cat]) setBadge(cat, '?'); });",
+      "label": "Ignore superseded badge prefetch",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/unqualified-leads.js",
+      "before": "    function load(cat) {\n        DashPage.hideError();",
+      "after": "    function load(cat) {\n        var seq = state.sequence[cat] = (state.sequence[cat] || 0) + 1;\n        document.getElementById('list-count').textContent = 'Loading…';\n        DashPage.hideError();",
+      "label": "Loading has an honest count",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/unqualified-leads.js",
+      "before": "            if (cat !== state.cat) return;",
+      "after": "            if (cat !== state.cat || seq !== state.sequence[cat]) return;",
+      "label": "Only latest category response changes the view",
+      "count": 2
+    },
+    {
+      "file": "dashboards/js/unqualified-leads.js",
+      "before": "    function render() {\n        var rows = state.cache[state.cat] || [];",
+      "after": "    function render() {\n        if (!state.cache[state.cat]) return;\n        var rows = state.cache[state.cat];",
+      "label": "Search preserves unavailable and loading states",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/rep-crm.js",
+      "before": "    async retryLoad() {\n        this.hideError();",
+      "after": "    async retryLoad() {\n        const seq = this.loadSeq = (this.loadSeq || 0) + 1;\n        this.archiveYTD = null;\n        this.hideError();",
+      "label": "Invalidate background totals when retry starts",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/rep-crm.js",
+      "before": "            await this.loadAccounts();\n            this.updateStats();\n            this.renderAccounts();",
+      "after": "            await this.loadAccounts();\n            if (seq !== this.loadSeq) return;\n            this.updateStats();\n            this.renderAccounts();",
+      "label": "Only current account retry renders totals",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/rep-crm.js",
+      "before": "            this.loadArchiveYTD().then(() => this.updateStats());\n        } catch (error) {\n            this.service.accounts = [];",
+      "after": "            this.loadArchiveYTD(seq).then(() => { if (seq === this.loadSeq) this.updateStats(); });\n        } catch (error) {\n            if (seq !== this.loadSeq) return;\n            this.service.accounts = [];",
+      "label": "Late archive completion cannot restore unavailable totals",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/rep-crm.js",
+      "before": "    async loadArchiveYTD() {\n        try {\n            this.archiveYTD = await this.service.fetchYTDPerRepFromArchive();",
+      "after": "    async loadArchiveYTD(seq) {\n        try {\n            const archive = await this.service.fetchYTDPerRepFromArchive();\n            if (seq !== this.loadSeq) return;\n            this.archiveYTD = archive;",
+      "label": "Ignore late archive payload",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/rep-crm.js",
+      "before": "        } catch (error) {\n            console.warn('[RepCRM] Per-rep archive",
+      "after": "        } catch (error) {\n            if (seq !== this.loadSeq) return;\n            console.warn('[RepCRM] Per-rep archive",
+      "label": "Ignore late archive failure",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/rep-crm.js",
+      "before": "    async _renderQuarterWinBack() {\n        const tile",
+      "after": "    async _renderQuarterWinBack() {\n        const seq = this.loadSeq;\n        const tile",
+      "label": "Track quarterly tile request freshness",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/rep-crm.js",
+      "before": "            const report = await resp.json();\n            // REP_CONFIG",
+      "after": "            const report = await resp.json();\n            if (seq !== this.loadSeq) return;\n            // REP_CONFIG",
+      "label": "Late quarter response cannot restore unavailable bonus",
+      "count": 1
+    },
+    {
+      "file": "dashboards/js/rep-crm.js",
+      "before": "        } catch (err) {\n            console.error('[RepCRM] quarter win-back",
+      "after": "        } catch (err) {\n            if (seq !== this.loadSeq) return;\n            console.error('[RepCRM] quarter win-back",
+      "label": "Ignore late quarterly tile error",
+      "count": 1
+    }
+  ]
+}

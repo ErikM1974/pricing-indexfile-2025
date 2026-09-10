@@ -15,6 +15,8 @@ const ROOT = path.resolve(__dirname, '..');
 
 /** Repo-relative globs. Widen only — never remove a file to make the lint pass. */
 const CSS_LINT_SCOPE = [
+    'shared_components/css/crm-accounts.css',
+    'shared_components/css/crm-pipeline.css',
     'shared_components/css/customer-intake.css',
     'shared_components/css/hosted-workspace.css',
     'shared_components/css/staff-admin-tools.css',

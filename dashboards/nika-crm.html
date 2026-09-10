@@ -8,25 +8,27 @@
     <link rel="icon" href="/favicon.png" type="image/png">
 
     <!-- Fonts & Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
     <!-- Page Styles -->
     <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link href="/dashboards/css/rep-crm.css?v=2026.09.07.19" rel="stylesheet">
+    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.09.19">
+    <link rel="stylesheet" href="/shared_components/css/crm-accounts.css?v=2026.09.09.19">
 </head>
-<body>
+<body data-ui="unified" data-crm-workspace="nika-crm" data-density="compact">
+    <a class="skip-link" href="#crm-main">Skip to main content</a>
     <div class="crm-page">
         <!-- Header -->
-        <header class="crm-header">
-            <div class="header-left">
+        <header class="crm-header dash-header">
+            <div class="header-left dash-header-left">
                 <a href="/staff-dashboard.html" title="Back to Staff Dashboard">
                     <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
-                         alt="Northwest Custom Apparel" class="header-logo">
+                         alt="Northwest Custom Apparel" class="header-logo dash-header-logo">
                 </a>
-                <h1 class="header-title">Nika's Account CRM</h1>
+                <h1 class="header-title dash-header-title">Nika's Account CRM</h1>
             </div>
-            <div class="header-right">
+            <div class="header-right dash-header-right">
                 <div class="user-welcome" id="userWelcome" hidden>
                     <span class="welcome-text">Welcome,</span>
                     <span class="user-name" id="userName"></span>
@@ -41,10 +43,10 @@
                         <span class="header-stat-label">At Risk</span>
                     </button>
                 </div>
-                <a href="/crm-logout" class="back-btn" title="Logout">
+                <a href="/crm-logout" class="back-btn btn" title="Logout">
                     <i class="fas fa-sign-out-alt" aria-hidden="true"></i> Logout
                 </a>
-                <a href="/staff-dashboard.html" class="back-btn">
+                <a href="/staff-dashboard.html" class="back-btn btn">
                     <i class="fas fa-arrow-left" aria-hidden="true"></i>
                     Dashboard
                 </a>
@@ -52,15 +54,15 @@
         </header>
 
         <!-- Main Content -->
-        <main class="crm-content">
+        <main class="crm-content dash-content" id="crm-main" tabindex="-1">
             <!-- Error Banner -->
             <div class="error-banner" id="error-banner">
                 <i class="fas fa-exclamation-circle" aria-hidden="true"></i>
                 <span class="error-banner-message" id="error-message"></span>
-                <button type="button" class="error-banner-retry" id="error-retry" data-call="crmController.retryLoad" hidden>
+                <button type="button" class="error-banner-retry btn" id="error-retry" data-call="crmController.retryLoad" hidden>
                     <i class="fas fa-rotate" aria-hidden="true"></i> Retry
                 </button>
-                <button type="button" class="error-banner-close" aria-label="Dismiss error" data-call="crmController.hideError">
+                <button type="button" class="error-banner-close btn" aria-label="Dismiss error" data-call="crmController.hideError">
                     <i class="fas fa-times" aria-hidden="true"></i>
                 </button>
             </div>
@@ -117,11 +119,11 @@
                     <div class="filters-section">
                         <div class="filter-group search-group">
                             <label for="filter-search">Search</label>
-                            <input type="text" id="filter-search" aria-label="Search accounts" placeholder="Search company name...">
+                            <input type="text" id="filter-search" aria-label="Search accounts" placeholder="Search company name..." class="field-input">
                         </div>
                         <div class="filter-group">
                             <label for="filter-tier">Account Tier</label>
-                            <select id="filter-tier" aria-label="Tier">
+                            <select id="filter-tier" aria-label="Tier" class="field-select">
                                 <option value="">All Tiers</option>
                                 <option value="GOLD '26-NIKA">Gold</option>
                                 <option value="SILVER '26-NIKA">Silver</option>
@@ -131,7 +133,7 @@
                         </div>
                         <div class="filter-group">
                             <label for="filter-priority">Priority</label>
-                            <select id="filter-priority" aria-label="Priority">
+                            <select id="filter-priority" aria-label="Priority" class="field-select">
                                 <option value="">All Priorities</option>
                                 <option value="A">A - Highest</option>
                                 <option value="B">B - High</option>
@@ -142,7 +144,7 @@
                         </div>
                         <div class="filter-group">
                             <label for="filter-month">Best Month</label>
-                            <select id="filter-month" aria-label="Month">
+                            <select id="filter-month" aria-label="Month" class="field-select">
                                 <option value="">All Months</option>
                                 <option value="jan">January</option>
                                 <option value="feb">February</option>
@@ -160,7 +162,7 @@
                         </div>
                         <div class="filter-group">
                             <label for="filter-trend">Trend</label>
-                            <select id="filter-trend" aria-label="Trend">
+                            <select id="filter-trend" aria-label="Trend" class="field-select">
                                 <option value="">All Trends</option>
                                 <option value="Active 2025">Active 2025</option>
                                 <option value="Growing">Growing</option>
@@ -177,7 +179,7 @@
                                 <button type="button" class="product-toggle" data-product="Caps" aria-pressed="false">Caps</button>
                             </div>
                         </div>
-                        <button type="button" class="clear-filters-btn" id="clear-filters-btn">
+                        <button type="button" class="clear-filters-btn btn" id="clear-filters-btn">
                             <i class="fas fa-times" aria-hidden="true"></i> Clear
                         </button>
                     </div>
@@ -214,14 +216,14 @@
         </main>
 
         <!-- Account Detail Modal -->
-        <div class="modal-overlay" id="account-detail-modal-overlay">
-            <div class="account-detail-modal" role="dialog" aria-modal="true" aria-labelledby="account-detail-company">
+        <dialog class="modal-overlay" id="account-detail-modal-overlay" aria-labelledby="account-detail-company">
+            <div class="account-detail-modal">
                 <div class="modal-header">
                     <div class="modal-title">
                         <h2 id="account-detail-company"></h2>
                         <div class="account-detail-badges" id="account-detail-badges"></div>
                     </div>
-                    <button type="button" class="modal-close" aria-label="Close" id="account-detail-modal-close">
+                    <button type="button" class="modal-close btn" aria-label="Close" id="account-detail-modal-close">
                         <i class="fas fa-times" aria-hidden="true"></i>
                     </button>
                 </div>
@@ -229,10 +231,10 @@
                     <!-- Content populated by JavaScript -->
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn-cancel" id="account-detail-close">Close</button>
+                    <button type="button" class="btn-cancel btn" id="account-detail-close">Close</button>
                 </div>
             </div>
-        </div>
+        </dialog>
     </div>
 
     <!-- Config & Scripts -->
@@ -241,6 +243,6 @@
     <!-- SAML identity → legacy nwca_user_* keys (StaffAuthHelper.ready(), 2026-09-05) -->
     <script src="/shared_components/js/staff-auth-helper.js?v=2026.09.06.37"></script>
     <script src="/shared_components/js/data-call-delegator.js?v=2026.09.06.27"></script>
-    <script src="/dashboards/js/rep-crm.js?v=2026.09.05.37"></script>
+    <script src="/dashboards/js/rep-crm.js?v=2026.09.09.19"></script>
 </body>
 </html>

@@ -10,16 +10,16 @@
     <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <!-- 2026 design tokens (must load before dash-shell.css) -->
     <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/shared_components/css/art-hub.css?v=2026.09.07.19">
-    <link rel="stylesheet" href="/shared_components/css/dash-shell.css?v=2026.09.07.10">
-    <link rel="stylesheet" href="/dashboards/css/lead-scorecard.css?v=2026.09.07.10">
+    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.09.19">
+    <link rel="stylesheet" href="/shared_components/css/crm-pipeline.css?v=2026.09.09.19">
 </head>
-<body>
+<body data-ui="unified" data-crm-workspace="lead-scorecard" data-density="compact">
+    <a class="skip-link" href="#crm-main">Skip to main content</a>
     <div class="dash-shell">
         <header class="dash-header">
             <div class="dash-header-left">
@@ -30,7 +30,7 @@
                 <h1 class="dash-header-title">Lead Scorecard</h1>
             </div>
             <div class="dash-header-right">
-                <button type="button" id="sc-refresh" class="sc-btn" title="Reload the scorecard"><i class="fas fa-rotate" aria-hidden="true"></i> Refresh</button>
+                <button type="button" id="sc-refresh" class="sc-btn btn" title="Reload the scorecard"><i class="fas fa-rotate" aria-hidden="true"></i> Refresh</button>
                 <a href="/dashboards/leads.html" class="dash-back-link">
                     <i class="fas fa-table-columns" aria-hidden="true"></i>
                     Leads board
@@ -38,28 +38,28 @@
             </div>
         </header>
 
-        <main class="dash-content">
+        <main class="dash-content" id="crm-main" tabindex="-1">
             <div class="dash-error-banner" role="alert">
                 <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
                 <span class="dash-error-banner-message"></span>
-                <button type="button" class="dash-error-banner-close" aria-label="Dismiss">
+                <button type="button" class="dash-error-banner-close btn" aria-label="Dismiss">
                     <i class="fas fa-times" aria-hidden="true"></i>
                 </button>
             </div>
 
             <div class="dash-card sc-controls-card">
                 <div class="sc-presets" role="group" aria-label="Date range presets">
-                    <button type="button" class="sc-preset" data-preset="taneisha-oct" aria-pressed="false">Since Oct 2025</button>
-                    <button type="button" class="sc-preset" data-preset="ytd" aria-pressed="false">This year</button>
-                    <button type="button" class="sc-preset" data-preset="90d" aria-pressed="false">Last 90 days</button>
-                    <button type="button" class="sc-preset" data-preset="all" aria-pressed="false">All time</button>
+                    <button type="button" class="sc-preset btn" data-preset="taneisha-oct" aria-pressed="false">Since Oct 2025</button>
+                    <button type="button" class="sc-preset btn" data-preset="ytd" aria-pressed="false">This year</button>
+                    <button type="button" class="sc-preset btn" data-preset="90d" aria-pressed="false">Last 90 days</button>
+                    <button type="button" class="sc-preset btn" data-preset="all" aria-pressed="false">All time</button>
                 </div>
                 <div class="sc-range">
                     <label class="sc-field"><span>From</span>
-                        <input type="date" id="sc-since" class="sc-input"></label>
+                        <input type="date" id="sc-since" class="sc-input field-input"></label>
                     <label class="sc-field"><span>To</span>
-                        <input type="date" id="sc-until" class="sc-input"></label>
-                    <button type="button" id="sc-apply" class="sc-btn sc-btn--primary"><i class="fas fa-magnifying-glass" aria-hidden="true"></i> Apply</button>
+                        <input type="date" id="sc-until" class="sc-input field-input"></label>
+                    <button type="button" id="sc-apply" class="sc-btn sc-btn--primary btn"><i class="fas fa-magnifying-glass" aria-hidden="true"></i> Apply</button>
                 </div>
             </div>
 
@@ -87,8 +87,8 @@
                     <h2 class="dash-card-title">By rep</h2>
                     <span class="sc-hint">“Order value” = orders placed <em>after</em> the inquiry (what the lead drove). Lifetime = customer's total with us.</span>
                 </div>
-                <div class="sc-table-scroll">
-                    <table class="sc-table" id="rep-table">
+                <div class="sc-table-scroll table-wrap" role="region" aria-label="lead scorecard table 1" tabindex="0">
+                    <table class="sc-table data-table" id="rep-table">
                         <thead>
                             <tr>
                                 <th>Rep</th>
@@ -108,12 +108,12 @@
                 <div class="dash-card-header">
                     <h2 class="dash-card-title">Closed leads</h2>
                     <span class="sc-count" id="leads-count" role="status"></span>
-                    <select id="sc-rep-filter" class="sc-input sc-rep-filter" aria-label="Filter by rep">
+                    <select id="sc-rep-filter" class="sc-input sc-rep-filter field-select" aria-label="Filter by rep">
                         <option value="">All reps</option>
                     </select>
                 </div>
-                <div class="sc-table-scroll">
-                    <table class="sc-table" id="leads-table">
+                <div class="sc-table-scroll table-wrap" role="region" aria-label="lead scorecard table 2" tabindex="0">
+                    <table class="sc-table data-table" id="leads-table">
                         <thead>
                             <tr>
                                 <th>Company</th>
@@ -137,6 +137,6 @@
     <script src="/config/app.config.js"></script>
     <script src="/shared_components/js/fetch-timeout.js?v=2026.09.06.26"></script>
     <script src="/shared_components/js/dash-page-helpers.js?v=2026.09.07.25"></script>
-    <script src="/dashboards/js/lead-scorecard.js?v=2026.09.05.41"></script>
+    <script src="/dashboards/js/lead-scorecard.js?v=2026.09.09.19"></script>
 </body>
 </html>

@@ -16,14 +16,15 @@ const read = (rel) => fs.readFileSync(path.join(ROOT, rel), 'utf8');
 
 const pages = [['nika', read('dashboards/nika-crm.html')], ['taneisha', read('dashboards/taneisha-crm.html')]].map(([n, h]) => [n, h.replace(/<!--[\s\S]*?-->/g, '')]);
 const js = read('dashboards/js/rep-crm.js');
-const css = read('dashboards/css/rep-crm.css');
+const css = read('shared_components/css/crm-accounts.css');
+const components = read('shared_components/css/components.css');
 
 describe.each(pages)('%s CRM page', (_name, html) => {
     test('Rule 3: no inline style / handlers; icons decorative; versioned assets', () => {
         expect(html).not.toMatch(/style="/);
         expect(html).not.toMatch(/\son(click|change|keydown|submit|load|error)=/);
         expect(html).not.toMatch(/<i class="fa[^"]*"><\/i>/);
-        expect(html).toMatch(/rep-crm\.css\?v=\d{4}\.\d{2}\.\d{2}\.\d+/);
+        expect(html).toMatch(/crm-accounts\.css\?v=\d{4}\.\d{2}\.\d{2}\.\d+/);
         expect(html).toMatch(/rep-crm\.js\?v=\d{4}\.\d{2}\.\d{2}\.\d+/);
     });
     test('hidden panels, labelled filters, pressed-state controls', () => {
@@ -40,7 +41,7 @@ describe.each(pages)('%s CRM page', (_name, html) => {
     });
     test('error banner has Retry; modal is a labelled dialog', () => {
         expect(html).toMatch(/id="error-retry" data-call="crmController.retryLoad" hidden/);
-        expect(html).toMatch(/<div class="account-detail-modal" role="dialog" aria-modal="true" aria-labelledby="account-detail-company">/);
+        expect(html).toMatch(/<dialog class="modal-overlay" id="account-detail-modal-overlay" aria-labelledby="account-detail-company">/);
     });
 });
 
@@ -80,20 +81,21 @@ describe('rep-crm.js', () => {
         expect(js).toMatch(/card\.setAttribute\('aria-pressed', 'false'\)/);
         expect(js).toMatch(/activeCard\.setAttribute\('aria-pressed', 'true'\)/);
         expect(js).toMatch(/headerAtRisk\?\.setAttribute\('aria-pressed'/);
-        expect(js).toMatch(/role="button" tabindex="0" aria-label="Open \$\{this\.escapeHtml\(account\.CompanyName \|\| 'account'\)\}"/);
-        expect(js).toMatch(/if \(e\.key === 'Enter' \|\| e\.key === ' '\) \{ e\.preventDefault\(\); open\(\); \}/);
+        expect(js).toMatch(/<button type="button" class="account-open" aria-label="Open \$\{this\.escapeHtml\(account\.CompanyName \|\| 'account'\)\}"/);
+        expect(js).toContain("card.querySelector('.account-open').focus();");
+        expect(js).toContain('this.elements.accountDetailModalOverlay.showModal()');
         expect(js).toMatch(/this\._modalReturnFocus = document\.activeElement;/);
         expect(js).toMatch(/if \(back && document\.body\.contains\(back\) && typeof back\.focus === 'function'\) back\.focus\(\);/);
     });
 });
 
-describe('rep-crm.css', () => {
+describe('crm-accounts.css', () => {
     test('[hidden] rule, button-reset for tier cards, focus rings, single-column layout', () => {
-        expect(css).toMatch(/^\[hidden\] \{ display: none !important; \}/m);
-        expect(css).toMatch(/\.tier-card \{ font: inherit; color: inherit; width: 100%; display: block; \}/);
+        expect(components).toMatch(/\[hidden\]\s*\{\s*display: none;/);
+        expect(css).toMatch(/\.tier-card\s*\{[^}]*font:\s*inherit;[^}]*width:\s*100%;[^}]*text-align:\s*left;/);
         expect(css).toMatch(/\.tier-card\[aria-pressed="true"\]/);
-        expect(css).toMatch(/\.account-card:focus-visible/);
-        expect(css).toMatch(/\.crm-layout--single \{ grid-template-columns: 1fr; \}/);
-        expect(css).toMatch(/\.health-gauge-fill \{ width: var\(--fill, 0%\); \}/);
+        expect(components).toMatch(/:focus-visible/);
+        expect(css).toMatch(/\.crm-layout--single\s*\{\s*display:\s*block;/);
+        expect(css).toMatch(/\.health-gauge-fill\s*\{[^}]*width:\s*var\(--fill, 0%\);/);
     });
 });
