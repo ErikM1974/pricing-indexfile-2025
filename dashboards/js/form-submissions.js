@@ -103,6 +103,10 @@
     };
 
     var state = {
+        loadSeq: 0,
+        loadState: 'loading',
+        loadError: '',
+        detailSeq: 0,
         submissions: [],
         openItems: [],
         formFilter: '',
@@ -138,30 +142,40 @@
         return (submissions || []).filter(function (s) { return s.Form_ID !== 'jotform-lead'; });
     }
 
+    function renderReadState() {
+        ['submissionsRoot', 'samplesRoot'].forEach(function (id) {
+            var root = document.getElementById(id);
+            root.classList.toggle('dash-loading', state.loadState === 'loading');
+            if (state.loadState === 'loading') {
+                root.textContent = id === 'submissionsRoot' ? 'Loading submissions…' : 'Loading open samples…';
+            } else {
+                root.innerHTML = '<div class="inbox-empty" role="alert">Records unavailable (' + esc(state.loadError) + '). <button type="button" class="btn inbox-retry">Retry</button></div>';
+                root.querySelector('button').addEventListener('click', loadAll);
+            }
+        });
+    }
+
     function loadAll() {
-        var root = document.getElementById('submissionsRoot');
-        var sroot = document.getElementById('samplesRoot');
-        root.classList.add('dash-loading'); root.textContent = 'Loading submissions…';
-        sroot.classList.add('dash-loading'); sroot.textContent = 'Loading open samples…';
-        Promise.all([
-            inboxFetch(''),
-            inboxFetch('/items/open'),
-        ]).then(function (results) {
-            DashPage.hideError();
+        var seq = ++state.loadSeq;
+        state.loadState = 'loading'; state.loadError = '';
+        state.submissions = []; state.openItems = [];
+        DashPage.hideError();
+        ['statNew', 'statOut', 'statOverdue', 'statDueSoon'].forEach(function (id) { document.getElementById(id).textContent = '—'; });
+        renderReadState();
+        return Promise.all([inboxFetch(''), inboxFetch('/items/open')]).then(function (results) {
+            if (seq !== state.loadSeq) return;
+            if (!results[0] || !Array.isArray(results[0].submissions) || !results[1] || !Array.isArray(results[1].items)) throw new Error('Incomplete records response');
             state.submissions = withoutJotformLeads(results[0].submissions);
-            state.openItems = results[1].items || [];
-            renderStats();
-            renderSubmissions();
-            renderSamples();
+            state.openItems = results[1].items;
+            state.loadState = 'ready';
+            renderStats(); renderSubmissions(); renderSamples();
         }).catch(function (err) {
+            if (seq !== state.loadSeq) return;
             console.error('[forms-inbox] load failed:', err);
+            state.loadState = 'error'; state.loadError = err.message;
+            state.submissions = []; state.openItems = [];
             DashPage.showError('Unable to load submissions (' + err.message + ').');
-            var retry = '<button type="button" class="dash-btn dash-btn--sm inbox-retry" data-retry="1">Retry</button>';
-            root.classList.remove('dash-loading');
-            root.innerHTML = '<div class="inbox-empty" role="alert"><i class="fas fa-triangle-exclamation" aria-hidden="true"></i> Submissions unavailable (' + esc(err.message) + '). ' + retry + '</div>';
-            sroot.classList.remove('dash-loading');
-            sroot.innerHTML = '<div class="inbox-empty" role="alert"><i class="fas fa-triangle-exclamation" aria-hidden="true"></i> Samples unavailable (' + esc(err.message) + '). ' + retry + '</div>';
-            document.querySelectorAll('[data-retry]').forEach(function (b) { b.addEventListener('click', loadAll); });
+            renderReadState();
         });
     }
 
@@ -240,6 +254,14 @@
         });
 
         document.getElementById('closeDetailBtn').addEventListener('click', closeDetail);
+        document.getElementById('detailOverlay').addEventListener('cancel', function (e) { e.preventDefault(); closeDetail(); });
+        document.getElementById('detailOverlay').addEventListener('keydown', function (e) {
+            if (e.key !== 'Tab') return;
+            var controls = Array.from(e.currentTarget.querySelectorAll('a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])')).filter(function (el) { return el.getClientRects().length > 0; });
+            var first = controls[0], last = controls[controls.length - 1];
+            if (first && e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+            else if (last && !e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+        });
         document.getElementById('detailOverlay').addEventListener('click', function (e) {
             if (e.target === e.currentTarget) closeDetail();
         });
@@ -326,6 +348,7 @@
     }
 
     function renderSubmissions() {
+        if (state.loadState !== 'ready') { renderReadState(); return; }
         var root = document.getElementById('submissionsRoot');
         root.classList.remove('dash-loading');
         var subs = visibleSubmissions();
@@ -347,12 +370,12 @@
                 '<td class="col-due">' + (s.Due_Date ? esc(fmtDay(s.Due_Date)) : '—') +
                     (overdue ? ' <span class="inbox-late">OVERDUE</span>' : '') + '</td>' +
                 '<td><span class="inbox-status ' + (STATUS_CLS[s.Status] || '') + '">' + esc(s.Status) + '</span></td>' +
-                '<td class="col-view no-print"><button type="button" class="dash-btn dash-btn--sm" data-view-id="' + esc(s.Submission_ID) + '">View</button></td>' +
+                '<td class="col-view no-print"><button type="button" class="dash-btn dash-btn--sm btn" data-view-id="' + esc(s.Submission_ID) + '">View</button></td>' +
             '</tr>';
         }).join('');
 
         root.innerHTML =
-            '<div class="inbox-tablewrap"><table class="inbox-table">' +
+            '<div class="inbox-tablewrap table-wrap" tabindex="0" role="region" aria-label="Scrollable record table"><table class="inbox-table data-table">' +
             '<thead><tr><th>Saved</th><th>Form</th><th>Company</th><th>Summary</th><th>Due</th><th>Status</th><th class="no-print"></th></tr></thead>' +
             '<tbody>' + rows + '</tbody></table></div>';
 
@@ -365,24 +388,33 @@
 
     var detailReturnFocus = null;
     function openDetail(submissionId) {
+        var seq = ++state.detailSeq;
+        state.detail = null;
+        document.getElementById('detailTitle').textContent = 'Submission';
         var body = document.getElementById('detailBody');
         body.innerHTML = '<div class="dash-loading">Loading…</div>';
         detailReturnFocus = document.activeElement;
         document.getElementById('detailOverlay').hidden = false;
+        if (!document.getElementById('detailOverlay').open) document.getElementById('detailOverlay').showModal();
         document.body.classList.add('inbox-modal-open');
         setTimeout(function () { var c = document.getElementById('closeDetailBtn'); if (c) c.focus(); }, 30);
 
         inboxFetch('/' + encodeURIComponent(submissionId))
             .then(function (data) {
+                if (seq !== state.detailSeq) return;
+                if (!data || !data.submission || data.submission.Submission_ID !== submissionId || (data.items != null && !Array.isArray(data.items))) throw new Error('Incomplete submission response');
                 state.detail = data;
                 renderDetail(data.submission, data.items || []);
             })
             .catch(function (err) {
-                body.innerHTML = '<div class="inbox-empty"><i class="fas fa-triangle-exclamation" aria-hidden="true"></i> ' + esc(err.message) + '</div>';
+                if (seq !== state.detailSeq) return;
+                body.innerHTML = '<div class="inbox-empty" role="alert"><i class="fas fa-triangle-exclamation" aria-hidden="true"></i> ' + esc(err.message) + '</div>';
             });
     }
 
     function closeDetail() {
+        state.detailSeq++;
+        if (document.getElementById('detailOverlay').open) document.getElementById('detailOverlay').close();
         var wasOpen = !document.getElementById('detailOverlay').hidden;
         document.getElementById('detailOverlay').hidden = true;
         document.body.classList.remove('inbox-modal-open');
@@ -395,7 +427,7 @@
         var meta = FORM_META[sub.Form_ID] || { label: sub.Form_ID, icon: 'fa-file', cls: '' };
         document.getElementById('detailTitle').innerHTML =
             '<span class="inbox-badge ' + meta.cls + '"><i aria-hidden="true" class="fas ' + meta.icon + '"></i> ' + esc(meta.label) + '</span> ' +
-            '<button type="button" class="copy-id" title="Copy id" aria-label="Copy id ' + esc(sub.Submission_ID) + '" data-copy="' + esc(sub.Submission_ID) + '">' + esc(sub.Submission_ID) + ' <i class="far fa-copy" aria-hidden="true"></i></button>' +
+            '<button type="button" class="copy-id btn" title="Copy id" aria-label="Copy id ' + esc(sub.Submission_ID) + '" data-copy="' + esc(sub.Submission_ID) + '">' + esc(sub.Submission_ID) + ' <i class="far fa-copy" aria-hidden="true"></i></button>' +
             ' <span class="inbox-muted">saved ' + esc(fmtStamp(sub.Submitted_At)) + '</span>';
         var copyBtn = document.querySelector('#detailTitle .copy-id');
         copyBtn.addEventListener('click', function () {
@@ -413,19 +445,19 @@
         // status row + actions
         var choices = STATUS_CHOICES[sub.Form_ID] || ['New', 'Completed'];
         html += '<div class="detail-actionbar no-print">' +
-            '<label>Status <select id="detailStatus">' + choices.map(function (c) {
+            '<label>Status <select id="detailStatus" class="field-select">' + choices.map(function (c) {
                 return '<option' + (c === sub.Status ? ' selected' : '') + '>' + esc(c) + '</option>';
             }).join('') + '</select></label>' +
-            '<button type="button" class="dash-btn dash-btn--primary" id="saveStatusBtn"><i class="fas fa-check" aria-hidden="true"></i> Save Status</button>';
+            '<button type="button" class="dash-btn dash-btn--primary btn" id="saveStatusBtn"><i class="fas fa-check" aria-hidden="true"></i> Save Status</button>';
         if (sub.Form_ID === 'artwork-request') {
             html += sub.Art_Request_ID
                 ? '<span class="inbox-status status--art"><i class="fas fa-palette" aria-hidden="true"></i> Art Request #' + esc(sub.Art_Request_ID) + '</span>'
-                : '<button type="button" class="dash-btn" id="artPushBtn"><i class="fas fa-palette" aria-hidden="true"></i> Create Art Request</button>';
+                : '<button type="button" class="dash-btn btn" id="artPushBtn"><i class="fas fa-palette" aria-hidden="true"></i> Create Art Request</button>';
         }
         if (sub.Form_ID === 'ae-order-intake') {
             html += sub.Pushed_To_ShopWorks === 'Yes'
                 ? '<span class="inbox-status status--done"><i class="fas fa-industry" aria-hidden="true"></i> ShopWorks: ' + esc(sub.ShopWorks_Order_ID || 'pushed') + '</span>'
-                : '<button type="button" class="dash-btn" id="swPushBtn"><i class="fas fa-industry" aria-hidden="true"></i> Push to ShopWorks…</button>';
+                : '<button type="button" class="dash-btn btn" id="swPushBtn"><i class="fas fa-industry" aria-hidden="true"></i> Push to ShopWorks…</button>';
         }
         html += '<span class="inbox-muted" id="detailActionMsg"></span></div>';
 
@@ -448,7 +480,7 @@
         (payload.tables || []).forEach(function (t) {
             if (!t.rows || !t.rows.length) return;
             html += '<h3 class="detail-subhead">' + esc(t.title || 'Details') + '</h3>' +
-                '<div class="inbox-tablewrap"><table class="inbox-table inbox-table--payload"><thead><tr>' +
+                '<div class="inbox-tablewrap table-wrap" tabindex="0" role="region" aria-label="Scrollable record table"><table class="inbox-table inbox-table--payload data-table"><thead><tr>' +
                 (t.columns || []).map(function (c) { return '<th>' + esc(c) + '</th>'; }).join('') +
                 '</tr></thead><tbody>' +
                 t.rows.map(function (r) {
@@ -458,7 +490,7 @@
 
         // sample items with check-in buttons
         if (sub.Form_ID === 'sample-checkout' && items.length) {
-            html += '<h3 class="detail-subhead">Sample Items</h3><div class="inbox-tablewrap"><table class="inbox-table"><thead><tr>' +
+            html += '<h3 class="detail-subhead">Sample Items</h3><div class="inbox-tablewrap table-wrap" tabindex="0" role="region" aria-label="Scrollable record table"><table class="inbox-table data-table"><thead><tr>' +
                 '<th>#</th><th>Brand</th><th>Style</th><th>Description</th><th>Color</th><th>Size</th><th>Qty</th><th>Charge (75%)</th><th>Status</th><th>Returned</th><th class="no-print"></th>' +
                 '</tr></thead><tbody>' +
                 items.map(function (it) {
@@ -468,8 +500,8 @@
                         '<td><span class="inbox-status ' + (it.Item_Status === 'Out' ? 'status--out' : (it.Item_Status === 'Charged' ? 'status--overdue' : 'status--done')) + '">' + esc(it.Item_Status) + '</span></td>' +
                         '<td>' + esc(it.Date_Returned ? fmtDay(it.Date_Returned) + (it.Condition ? ' · ' + it.Condition : '') : '') + '</td>' +
                         '<td class="no-print">' + (it.Item_Status === 'Out'
-                            ? '<button type="button" class="dash-btn dash-btn--sm" data-return-pk="' + esc(String(it.PK_ID)) + '">Mark Returned</button> ' +
-                              '<button type="button" class="dash-btn dash-btn--sm dash-btn--danger" data-charge-pk="' + esc(String(it.PK_ID)) + '">Charged</button>'
+                            ? '<button type="button" class="dash-btn dash-btn--sm btn" data-return-pk="' + esc(String(it.PK_ID)) + '">Mark Returned</button> ' +
+                              '<button type="button" class="dash-btn dash-btn--sm dash-btn--danger btn" data-charge-pk="' + esc(String(it.PK_ID)) + '">Charged</button>'
                             : '') + '</td></tr>';
                 }).join('') + '</tbody></table></div>';
         }
@@ -706,11 +738,11 @@
         html += '<span class="inbox-muted">Tax is NOT pushed (apply the SW tax dropdown). Money summary, decoration and fulfillment ride in Notes On Order. No design is linked.</span><br>';
 
         if (c.verified.length) {
-            html += '<button type="button" class="dash-btn dash-btn--primary" id="swConfirmBtn"><i class="fas fa-check" aria-hidden="true"></i> Confirm push</button> ';
+            html += '<button type="button" class="dash-btn dash-btn--primary btn" id="swConfirmBtn"><i class="fas fa-check" aria-hidden="true"></i> Confirm push</button> ';
         } else {
             html += '<span class="inbox-late">Nothing pushable — every row is unverified. Fix rows or enter by hand.</span> ';
         }
-        html += '<button type="button" class="dash-btn" id="swCancelBtn">Cancel</button></div></div>';
+        html += '<button type="button" class="dash-btn btn" id="swCancelBtn">Cancel</button></div></div>';
 
         body.insertAdjacentHTML('afterbegin', html);
         document.getElementById('swCancelBtn').addEventListener('click', function () {
@@ -739,6 +771,7 @@
     // ---------- samples tracker ----------
 
     function renderSamples() {
+        if (state.loadState !== 'ready') { renderReadState(); return; }
         var root = document.getElementById('samplesRoot');
         root.classList.remove('dash-loading');
 
@@ -783,18 +816,18 @@
                     (g.due ? '<span class="inbox-badge">Due ' + esc(fmtDay(sub.Due_Date)) + '</span> ' : '') +
                     (g.overdue ? '<span class="inbox-late">' + g.daysOut + ' day' + (g.daysOut === 1 ? '' : 's') + ' OVERDUE</span>' :
                         (g.due ? '<span class="inbox-badge badge--ok">' + (-g.daysOut) + ' days left</span>' : '')) +
-                    ' <button type="button" class="dash-btn dash-btn--sm" data-view-id="' + esc(g.id) + '">Open</button></div>' +
+                    ' <button type="button" class="dash-btn dash-btn--sm btn" data-view-id="' + esc(g.id) + '">Open</button></div>' +
                 '</div>';
 
             var rows = g.items.map(function (it) {
                 return '<tr><td>' + esc(it.Brand) + '</td><td>' + esc(it.Style) + '</td><td>' + esc(it.Description) + '</td>' +
                     '<td>' + esc(it.Color) + '</td><td>' + esc(it.Size) + '</td><td>' + esc(it.Qty) + '</td><td>$' + esc(it.Charge_Value || '?') + '</td>' +
-                    '<td class="no-print"><button type="button" class="dash-btn dash-btn--sm" data-return-pk="' + esc(String(it.PK_ID)) + '">Mark Returned</button> ' +
-                    '<button type="button" class="dash-btn dash-btn--sm dash-btn--danger" data-charge-pk="' + esc(String(it.PK_ID)) + '">Charged</button></td></tr>';
+                    '<td class="no-print"><button type="button" class="dash-btn dash-btn--sm btn" data-return-pk="' + esc(String(it.PK_ID)) + '">Mark Returned</button> ' +
+                    '<button type="button" class="dash-btn dash-btn--sm dash-btn--danger btn" data-charge-pk="' + esc(String(it.PK_ID)) + '">Charged</button></td></tr>';
             }).join('');
 
             return '<div class="sample-group">' + head +
-                '<div class="inbox-tablewrap"><table class="inbox-table"><thead><tr>' +
+                '<div class="inbox-tablewrap table-wrap" tabindex="0" role="region" aria-label="Scrollable record table"><table class="inbox-table data-table"><thead><tr>' +
                 '<th>Brand</th><th>Style</th><th>Description</th><th>Color</th><th>Size</th><th>Qty</th><th>Charge if kept</th><th class="no-print"></th>' +
                 '</tr></thead><tbody>' + rows + '</tbody></table></div></div>';
         }).join('');

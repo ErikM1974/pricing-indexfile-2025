@@ -1,0 +1,907 @@
+{
+  "base": "d44f7551fc1d3a251c12599314f8c23b94fadea4",
+  "pages": [
+    {
+      "file": "dashboards/lead.html",
+      "html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <meta name=\"robots\" content=\"noindex, nofollow\">\n    <title>Lead - Northwest Custom Apparel</title>\n    <link rel=\"icon\" href=\"/favicon.png\" type=\"image/png\">\n\n    <!-- Fonts & Icons -->\n    <link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n    <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n    <link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap\" rel=\"stylesheet\">\n    <link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css\">\n\n    <!-- 2026 design tokens (must load before dash-shell.css) -->\n    <link rel=\"stylesheet\" href=\"/shared_components/css/tokens.css?v=2026.09.08.2\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/art-hub.css?v=2026.09.07.19\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/dash-shell.css?v=2026.09.07.10\">\n    <link rel=\"stylesheet\" href=\"/dashboards/css/leads.css?v=2026.09.07.10\">\n    <link rel=\"stylesheet\" href=\"/dashboards/css/lead-workspace.css?v=2026.09.07.10\">\n</head>\n<body>\n    <div class=\"dash-shell\">\n        <header class=\"dash-header\">\n            <div class=\"dash-header-left\">\n                <a href=\"/staff-dashboard.html\" title=\"Back to Staff Dashboard\">\n                    <img src=\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1\"\n                         alt=\"Northwest Custom Apparel\" class=\"dash-header-logo\">\n                </a>\n                <h1 class=\"dash-header-title\" id=\"lw-page-title\">Lead</h1>\n            </div>\n            <div class=\"dash-header-right\">\n                <button type=\"button\" id=\"lw-refresh\" class=\"ld-refresh-btn\" title=\"Reload this lead and its activity\" aria-label=\"Reload this lead\">\n                    <i class=\"fas fa-rotate\" aria-hidden=\"true\"></i>\n                    <span class=\"ld-btn-txt\">Refresh</span>\n                </button>\n                <a href=\"/dashboards/leads.html\" class=\"dash-back-link\">\n                    <i class=\"fas fa-arrow-left\" aria-hidden=\"true\"></i>\n                    Leads board\n                </a>\n            </div>\n        </header>\n\n        <main class=\"dash-content\">\n            <div class=\"dash-error-banner\" role=\"alert\">\n                <i class=\"fas fa-exclamation-triangle\" aria-hidden=\"true\"></i>\n                <span class=\"dash-error-banner-message\"></span>\n                <button type=\"button\" class=\"dash-error-banner-close\" aria-label=\"Dismiss\">\n                    <i class=\"fas fa-times\" aria-hidden=\"true\"></i>\n                </button>\n            </div>\n\n            <!-- Lead header strip: who + source + pipeline controls -->\n            <div class=\"dash-card lw-head\" id=\"lw-head\">\n                <div class=\"lw-head-main\">\n                    <div class=\"lw-title\" id=\"lw-title\" role=\"status\">Loading lead…</div>\n                    <div class=\"lw-sub\" id=\"lw-sub\"></div>\n                    <div class=\"lw-head-chips\" id=\"lw-head-chips\" hidden></div>\n                    <div class=\"lw-head-actions\" id=\"lw-head-actions\" hidden></div>\n                </div>\n                <div class=\"lw-head-controls\" id=\"lw-head-controls\" hidden>\n                    <div class=\"ld-control\">\n                        <label class=\"ld-control-label\" for=\"lw-status\">Status</label>\n                        <select id=\"lw-status\" class=\"ld-select\"></select>\n                    </div>\n                    <div class=\"ld-control\">\n                        <label class=\"ld-control-label\" for=\"lw-rep\">Assigned rep</label>\n                        <select id=\"lw-rep\" class=\"ld-select\"></select>\n                    </div>\n                </div>\n            </div>\n\n            <div class=\"lw-grid\">\n                <!-- Center: composer + activity timeline -->\n                <section class=\"lw-main\">\n                    <div class=\"dash-card lw-composer-card\">\n                        <label class=\"ld-section-title\" for=\"lw-note-input\">Add a note</label>\n                        <textarea id=\"lw-note-input\" class=\"lw-note-input\" rows=\"3\"\n                            placeholder=\"Call notes, next steps, what the customer said… (Ctrl+Enter to save)\"></textarea>\n                        <div class=\"lw-composer-actions\">\n                            <button type=\"button\" id=\"lw-note-save\" class=\"ld-btn ld-btn--primary\">\n                                <i class=\"fas fa-plus\" aria-hidden=\"true\"></i> Add note\n                            </button>\n                            <div class=\"lw-dropzone\" id=\"lw-dropzone\" role=\"button\" tabindex=\"0\"\n                                 aria-label=\"Attach a file — drag and drop, paste, or click to browse\">\n                                <i class=\"fas fa-paperclip\" aria-hidden=\"true\"></i>\n                                <span>Drop, paste, or click to attach a file</span>\n                            </div>\n                            <input type=\"file\" id=\"lw-file-input\" class=\"lw-file-input\" aria-label=\"Attach files to this lead\" multiple\n                                   accept=\".ai,.eps,.pdf,.png,.jpg,.jpeg,.tiff,.tif,.psd,.svg,.webp\" hidden>\n                        </div>\n                        <div class=\"lw-upload-status ld-muted\" id=\"lw-upload-status\" role=\"status\" hidden></div>\n                    </div>\n\n                    <div class=\"dash-card\">\n                        <div class=\"dash-card-header\">\n                            <h2 class=\"dash-card-title\">Activity</h2>\n                        </div>\n                        <div id=\"lw-timeline\" class=\"dash-loading\">Loading activity…</div>\n                    </div>\n                </section>\n\n                <!-- Right rail: panels -->\n                <aside class=\"lw-rail\">\n                    <div class=\"dash-card lw-panel\">\n                        <div class=\"ld-section-title\">Contact</div>\n                        <div id=\"lw-panel-contact\" class=\"ld-muted\">—</div>\n                    </div>\n                    <div class=\"dash-card lw-panel\">\n                        <div class=\"ld-section-title\">Email the lead</div>\n                        <div id=\"lw-panel-outreach\" class=\"ld-muted\">—</div>\n                    </div>\n                    <div class=\"dash-card lw-panel\">\n                        <div class=\"ld-section-title\">Follow-up</div>\n                        <div id=\"lw-panel-followup\"></div>\n                    </div>\n                    <div class=\"dash-card lw-panel\">\n                        <div class=\"ld-section-title\">Estimated value</div>\n                        <div id=\"lw-panel-value\"></div>\n                    </div>\n                    <div class=\"dash-card lw-panel\">\n                        <div class=\"ld-section-title\">ShopWorks customer</div>\n                        <div id=\"match-root\" class=\"ld-muted\">Checking…</div>\n                        <div id=\"lw-panel-intel\"></div>\n                    </div>\n                    <div class=\"dash-card lw-panel\">\n                        <div class=\"ld-section-title\">Quote</div>\n                        <div id=\"lw-panel-quote\"></div>\n                    </div>\n                    <div class=\"dash-card lw-panel\">\n                        <div class=\"ld-section-title\">Order history</div>\n                        <div id=\"orders-root\" class=\"ld-muted\"></div>\n                    </div>\n                    <div class=\"dash-card lw-panel\">\n                        <div class=\"ld-section-title\">Submitted details</div>\n                        <div id=\"lw-panel-details\" class=\"ld-muted\">—</div>\n                    </div>\n                    <div class=\"dash-card lw-panel\">\n                        <div class=\"ld-section-title\">Original artwork</div>\n                        <div id=\"lw-panel-artwork\" class=\"ld-muted\">None attached.</div>\n                    </div>\n                    <div class=\"dash-card lw-panel\">\n                        <div class=\"ld-section-title\">Send to the art team</div>\n                        <div id=\"lw-panel-art\"></div>\n                    </div>\n                </aside>\n            </div>\n        </main>\n    </div>\n\n    <!-- Send to the art team modal — mounts the shared garment art form\n         (GarmentSubmitForm) prefilled from this lead. Deps lazy-load on first open.\n         Cloned from quote-view's Send-to-Steve modal. -->\n    <div id=\"lw-art-modal\" class=\"lw-art-modal\" hidden>\n        <div class=\"lw-art-modal-backdrop\" id=\"lw-art-modal-backdrop\"></div>\n        <div class=\"lw-art-modal-dialog\" role=\"dialog\" aria-modal=\"true\" aria-label=\"Send artwork to the art team\">\n            <button type=\"button\" class=\"lw-art-modal-close\" id=\"lw-art-modal-close\" title=\"Close\" aria-label=\"Close\">&times;</button>\n            <div id=\"lw-art-form-mount\"></div>\n        </div>\n    </div>\n\n    <!-- Load order matters: APP_CONFIG → fetch-timeout → DashPage → shared upload → LeadsCommon → controller -->\n    <script src=\"/config/app.config.js\"></script>\n    <script src=\"/shared_components/js/fetch-timeout.js?v=2026.09.06.26\"></script>\n    <script src=\"/shared_components/js/dash-page-helpers.js?v=2026.09.07.25\"></script>\n    <script src=\"/shared_components/js/artwork-upload.js?v=2026.09.06.37\"></script>\n    <script src=\"/dashboards/js/leads-common.js?v=2026.09.05.33\"></script>\n    <script src=\"/dashboards/js/lead-workspace.js?v=2026.09.07.33\"></script>\n</body>\n</html>\n",
+      "title": "Lead - Northwest Custom Apparel",
+      "bodyText": "Lead Refresh Leads board Loading lead… Status Assigned rep Add a note Add note Drop, paste, or click to attach a file Activity Loading activity… Contact — Email the lead — Follow-up Estimated value ShopWorks customer Checking… Quote Order history Submitted details — Original artwork None attached. Send to the art team ×",
+      "ids": [
+        "lw-page-title",
+        "lw-refresh",
+        "lw-head",
+        "lw-title",
+        "lw-sub",
+        "lw-head-chips",
+        "lw-head-actions",
+        "lw-head-controls",
+        "lw-status",
+        "lw-rep",
+        "lw-note-input",
+        "lw-note-save",
+        "lw-dropzone",
+        "lw-file-input",
+        "lw-upload-status",
+        "lw-timeline",
+        "lw-panel-contact",
+        "lw-panel-outreach",
+        "lw-panel-followup",
+        "lw-panel-value",
+        "match-root",
+        "lw-panel-intel",
+        "lw-panel-quote",
+        "orders-root",
+        "lw-panel-details",
+        "lw-panel-artwork",
+        "lw-panel-art",
+        "lw-art-modal",
+        "lw-art-modal-backdrop",
+        "lw-art-modal-close",
+        "lw-art-form-mount"
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "label": ""
+        },
+        {
+          "href": "/dashboards/leads.html",
+          "label": "Leads board"
+        }
+      ],
+      "fields": [
+        {
+          "id": "lw-status",
+          "type": "select-one",
+          "value": ""
+        },
+        {
+          "id": "lw-rep",
+          "type": "select-one",
+          "value": ""
+        },
+        {
+          "id": "lw-note-input",
+          "type": "textarea",
+          "value": ""
+        },
+        {
+          "id": "lw-file-input",
+          "type": "file",
+          "value": ""
+        }
+      ],
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/art-hub.css",
+        "shared_components/css/dash-shell.css",
+        "dashboards/css/leads.css",
+        "dashboards/css/lead-workspace.css"
+      ],
+      "scripts": [
+        "config/app.config.js",
+        "shared_components/js/fetch-timeout.js",
+        "shared_components/js/dash-page-helpers.js",
+        "shared_components/js/artwork-upload.js",
+        "dashboards/js/leads-common.js",
+        "dashboards/js/lead-workspace.js"
+      ],
+      "cssBytes": 186763,
+      "bodyTextSha": "9f86d80a1620915d48be8751ac920806186fe817329d98984c7668c350f648b5",
+      "tableHashes": [],
+      "detail": null
+    },
+    {
+      "file": "dashboards/form-submissions.html",
+      "html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <meta name=\"robots\" content=\"noindex, nofollow\">\n    <title>Forms Inbox - Northwest Custom Apparel</title>\n    <link rel=\"icon\" href=\"/favicon.png\" type=\"image/png\">\n\n    <!-- Fonts & Icons -->\n    <link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n    <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n    <link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap\" rel=\"stylesheet\">\n    <link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css\">\n\n    <!-- 2026 design tokens (must load before dash-shell.css) -->\n    <link rel=\"stylesheet\" href=\"/shared_components/css/tokens.css?v=2026.09.08.2\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/art-hub.css?v=2026.09.07.19\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/dash-shell.css?v=2026.09.07.10\">\n    <link rel=\"stylesheet\" href=\"/dashboards/css/form-submissions.css?v=2026.09.07.19\">\n</head>\n<body>\n    <div class=\"dash-shell\">\n        <header class=\"dash-header\">\n            <div class=\"dash-header-left\">\n                <a href=\"/staff-dashboard.html\" title=\"Back to Staff Dashboard\">\n                    <img src=\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1\"\n                         alt=\"Northwest Custom Apparel\" class=\"dash-header-logo\">\n                </a>\n                <h1 class=\"dash-header-title\">Forms Inbox</h1>\n            </div>\n            <div class=\"dash-header-right\">\n                <a href=\"/dashboards/forms-library.html\" class=\"dash-back-link\">\n                    <i class=\"fas fa-file-lines\" aria-hidden=\"true\"></i>\n                    Forms Library\n                </a>\n                <a href=\"/staff-dashboard.html\" class=\"dash-back-link\">\n                    <i class=\"fas fa-arrow-left\" aria-hidden=\"true\"></i>\n                    Dashboard\n                </a>\n            </div>\n        </header>\n\n        <main class=\"dash-content\">\n            <div class=\"dash-error-banner\" role=\"alert\">\n                <i class=\"fas fa-exclamation-triangle\" aria-hidden=\"true\"></i>\n                <span class=\"dash-error-banner-message\"></span>\n                <button type=\"button\" class=\"dash-error-banner-close\" aria-label=\"Dismiss\">\n                    <i class=\"fas fa-times\" aria-hidden=\"true\"></i>\n                </button>\n            </div>\n\n            <!-- Tiles act: \"New this week\" filters the list to New; the two sample tiles open the Samples Tracker -->\n            <div class=\"dash-stat-grid\" role=\"group\" aria-label=\"Inbox summary\">\n                <button type=\"button\" class=\"dash-stat-card inbox-stat-btn\" data-tile=\"new\" aria-pressed=\"false\">\n                    <div class=\"dash-stat-value\" id=\"statNew\">—</div>\n                    <div class=\"dash-stat-label\">New this week</div>\n                </button>\n                <button type=\"button\" class=\"dash-stat-card inbox-stat-btn\" data-tile=\"samples\">\n                    <div class=\"dash-stat-value\" id=\"statOut\">—</div>\n                    <div class=\"dash-stat-label\">Sample items out</div>\n                </button>\n                <button type=\"button\" class=\"dash-stat-card inbox-stat--overdue inbox-stat-btn\" data-tile=\"samples\">\n                    <div class=\"dash-stat-value\" id=\"statOverdue\">—</div>\n                    <div class=\"dash-stat-label\">Overdue samples</div>\n                </button>\n                <div class=\"dash-stat-card dash-stat-card--accent\">\n                    <div class=\"dash-stat-value\" id=\"statDueSoon\">—</div>\n                    <div class=\"dash-stat-label\">Due in 7 days</div>\n                </div>\n            </div>\n\n            <div class=\"inbox-tabs no-print\" role=\"tablist\" aria-label=\"Inbox views\">\n                <button type=\"button\" class=\"inbox-tab is-active\" id=\"tab-submissions\" data-view=\"submissions\" role=\"tab\" aria-selected=\"true\" aria-controls=\"viewSubmissions\">\n                    <i class=\"fas fa-inbox\" aria-hidden=\"true\"></i> All Submissions\n                </button>\n                <button type=\"button\" class=\"inbox-tab\" id=\"tab-samples\" data-view=\"samples\" role=\"tab\" aria-selected=\"false\" tabindex=\"-1\" aria-controls=\"viewSamples\">\n                    <i class=\"fas fa-shirt\" aria-hidden=\"true\"></i> Samples Tracker\n                </button>\n            </div>\n\n            <!-- ============ View 1: submissions list ============ -->\n            <section id=\"viewSubmissions\" class=\"dash-card\" role=\"tabpanel\" aria-labelledby=\"tab-submissions\">\n                <div class=\"inbox-filterbar no-print\">\n                    <div class=\"inbox-chips\" id=\"formChips\" role=\"group\" aria-label=\"Filter by form\">\n                        <button type=\"button\" class=\"inbox-chip is-active\" data-form=\"\" aria-pressed=\"true\">All</button>\n                        <button type=\"button\" class=\"inbox-chip\" data-form=\"quote-request,sample-request,manual-lead\" aria-pressed=\"false\">Leads</button>\n                        <button type=\"button\" class=\"inbox-chip\" data-form=\"garment-drop-off\" aria-pressed=\"false\">Drop-Offs</button>\n                        <button type=\"button\" class=\"inbox-chip\" data-form=\"artwork-request\" aria-pressed=\"false\">Artwork</button>\n                        <button type=\"button\" class=\"inbox-chip\" data-form=\"name-personalization\" aria-pressed=\"false\">Name Lists</button>\n                        <button type=\"button\" class=\"inbox-chip\" data-form=\"sample-checkout\" aria-pressed=\"false\">Samples</button>\n                        <button type=\"button\" class=\"inbox-chip\" data-form=\"ae-order-intake\" aria-pressed=\"false\">Order Intake</button>\n                        <button type=\"button\" class=\"inbox-chip\" data-form=\"final-qc-checklist\" aria-pressed=\"false\">Final QC</button>\n                        <button type=\"button\" class=\"inbox-chip\" data-form=\"spoilage-report\" aria-pressed=\"false\">Spoilage</button>\n                        <button type=\"button\" class=\"inbox-chip\" data-form=\"maintenance-log\" aria-pressed=\"false\">Maintenance</button>\n                    </div>\n                    <select id=\"statusFilter\" class=\"inbox-select\" aria-label=\"Filter by status\">\n                        <option value=\"\">Any status</option>\n                        <option>New</option>\n                        <option>In Progress</option>\n                        <option>Sent to Art</option>\n                        <option>Completed</option>\n                        <option>Entered in ShopWorks</option><option>Released</option><option>On Hold</option><option>Rework</option><option>Under Review</option><option>Replacement Ordered</option><option>Logged</option><option>Follow-Up Required</option><option>Resolved</option><option>Checked Out</option>\n                        <option>Partially Returned</option>\n                        <option>Returned</option>\n                        <option>Archived</option>\n                    </select>\n                    <input type=\"search\" id=\"searchBox\" class=\"inbox-search\" placeholder=\"Search company / contact / ID…\" aria-label=\"Search submissions\">\n                </div>\n                <div id=\"submissionsRoot\" class=\"dash-loading\" role=\"status\">Loading submissions…</div>\n            </section>\n\n            <!-- ============ View 2: samples tracker ============ -->\n            <section id=\"viewSamples\" class=\"dash-card\" role=\"tabpanel\" aria-labelledby=\"tab-samples\" hidden>\n                <div class=\"dash-card-header\">\n                    <h2 class=\"dash-card-title\"><i class=\"fas fa-rotate-left\" aria-hidden=\"true\"></i> Checked-Out Samples</h2>\n                    <span class=\"inbox-muted\">75% of retail is charged for items not returned by the grace deadline.</span>\n                    <button type=\"button\" id=\"inboxRefresh\" class=\"dash-btn dash-btn--sm\"><i class=\"fas fa-rotate\" aria-hidden=\"true\"></i> Refresh</button>\n                </div>\n                <div id=\"samplesRoot\" class=\"dash-loading\" role=\"status\">Loading open samples…</div>\n            </section>\n        </main>\n    </div>\n\n    <!-- Detail modal -->\n    <div class=\"inbox-modal-overlay\" id=\"detailOverlay\" hidden>\n        <div class=\"inbox-modal\" role=\"dialog\" aria-modal=\"true\" aria-labelledby=\"detailTitle\">\n            <div class=\"inbox-modal-head no-print\">\n                <h2 id=\"detailTitle\">Submission</h2>\n                <div class=\"inbox-modal-actions\">\n                    <button type=\"button\" id=\"printDetailBtn\" class=\"dash-btn\"><i class=\"fas fa-print\" aria-hidden=\"true\"></i> Print</button>\n                    <button type=\"button\" id=\"closeDetailBtn\" class=\"dash-btn\" aria-label=\"Close\"><i class=\"fas fa-times\" aria-hidden=\"true\"></i></button>\n                </div>\n            </div>\n            <div id=\"detailBody\" class=\"inbox-modal-body\"></div>\n        </div>\n    </div>\n\n    <!-- Load order matters: APP_CONFIG → fetch-timeout → DashPage → page controller -->\n    <script src=\"/config/app.config.js\"></script>\n    <script src=\"/shared_components/js/fetch-timeout.js?v=2026.09.06.26\"></script>\n    <script src=\"/shared_components/js/dash-page-helpers.js?v=2026.09.07.25\"></script>\n    <script src=\"/dashboards/js/form-submissions.js?v=2026.09.05.65\"></script>\n</body>\n</html>\n",
+      "title": "Forms Inbox - Northwest Custom Apparel",
+      "bodyText": "Forms Inbox Forms Library Dashboard — New this week — Sample items out — Overdue samples — Due in 7 days All Submissions Samples Tracker All Leads Drop-Offs Artwork Name Lists Samples Order Intake Final QC Spoilage Maintenance Any status New In Progress Sent to Art Completed Entered in ShopWorksReleasedOn HoldReworkUnder ReviewReplacement OrderedLoggedFollow-Up RequiredResolvedChecked Out Partially Returned Returned Archived Loading submissions… Checked-Out Samples 75% of retail is charged for items not returned by the grace deadline. Refresh Loading open samples… Submission Print",
+      "ids": [
+        "statNew",
+        "statOut",
+        "statOverdue",
+        "statDueSoon",
+        "tab-submissions",
+        "tab-samples",
+        "viewSubmissions",
+        "formChips",
+        "statusFilter",
+        "searchBox",
+        "submissionsRoot",
+        "viewSamples",
+        "inboxRefresh",
+        "samplesRoot",
+        "detailOverlay",
+        "detailTitle",
+        "printDetailBtn",
+        "closeDetailBtn",
+        "detailBody"
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "label": ""
+        },
+        {
+          "href": "/dashboards/forms-library.html",
+          "label": "Forms Library"
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "label": "Dashboard"
+        }
+      ],
+      "fields": [
+        {
+          "id": "statusFilter",
+          "type": "select-one",
+          "value": ""
+        },
+        {
+          "id": "searchBox",
+          "type": "search",
+          "value": ""
+        }
+      ],
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/art-hub.css",
+        "shared_components/css/dash-shell.css",
+        "dashboards/css/form-submissions.css"
+      ],
+      "scripts": [
+        "config/app.config.js",
+        "shared_components/js/fetch-timeout.js",
+        "shared_components/js/dash-page-helpers.js",
+        "dashboards/js/form-submissions.js"
+      ],
+      "cssBytes": 167810,
+      "bodyTextSha": "f2e68d06b480779b46b66726d6c8560980eda85f5dd3f5c5cc1002559ddb40ba",
+      "tableHashes": [
+        "30314bd0dbab13e8dce660697f5e030cfa7c6f32c7f2d4cc9365542f8b98d184",
+        "a7e2ceced2dad61aeb1bbc5249dba6a5a8928e49790fe01b4fc183f08434bf35"
+      ],
+      "detail": "Samples CSS-INBOX-1  saved 9/1 11:00a\nPrint\nStatus \nChecked Out\nPartially Returned\nReturned\nCharged\nArchived\nSave Status\nQUANTITY\n24\nDECORATION\nEmbroidery\nREFERENCE\nSynthetic review only\nREQUESTED APPAREL\nSTYLE\tCOLOR\tQTY\nPC54\tNavy\t24\nSAMPLE ITEMS\n#\tBRAND\tSTYLE\tDESCRIPTION\tCOLOR\tSIZE\tQTY\tCHARGE (75%)\tSTATUS\tRETURNED\t\n1\tPort & Company\tPC54\tSynthetic sample tee\tNavy\tL\t2\t12.75\tOut\t\tMark Returned Charged\nINSTRUCTIONS\n\nSynthetic review only. Keep all submitted details."
+    },
+    {
+      "file": "dashboards/marketing-shipments.html",
+      "html": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <meta name=\"robots\" content=\"noindex, nofollow\">\n    <title>Marketing Shipments - Northwest Custom Apparel</title>\n    <link rel=\"icon\" href=\"/favicon.png\" type=\"image/png\">\n\n    <link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n    <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n    <link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap\" rel=\"stylesheet\">\n    <link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css\">\n\n    <!-- 2026 design tokens (must load before dash-shell.css) -->\n    <link rel=\"stylesheet\" href=\"/shared_components/css/tokens.css?v=2026.09.08.2\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/art-hub.css?v=2026.09.07.19\">\n    <link rel=\"stylesheet\" href=\"/shared_components/css/dash-shell.css?v=2026.09.07.10\">\n    <link rel=\"stylesheet\" href=\"/dashboards/css/leads.css?v=2026.09.07.10\">\n    <link rel=\"stylesheet\" href=\"/dashboards/css/marketing-shipments.css?v=2026.09.07.10\">\n</head>\n<body>\n    <div class=\"dash-shell\">\n        <header class=\"dash-header\">\n            <div class=\"dash-header-left\">\n                <a href=\"/staff-dashboard.html\" title=\"Back to Staff Dashboard\">\n                    <img src=\"https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1\"\n                         alt=\"Northwest Custom Apparel\" class=\"dash-header-logo\">\n                </a>\n                <h1 class=\"dash-header-title\">Marketing Shipments</h1>\n            </div>\n            <div class=\"dash-header-right\">\n                <button type=\"button\" id=\"btn-refresh\" class=\"ld-refresh-btn\" title=\"Reload the queue\">\n                    <i class=\"fas fa-rotate\" aria-hidden=\"true\"></i> Refresh\n                </button>\n                <a href=\"/staff-dashboard.html\" class=\"dash-back-link\">\n                    <i class=\"fas fa-arrow-left\" aria-hidden=\"true\"></i> Dashboard\n                </a>\n            </div>\n        </header>\n\n        <main class=\"dash-content\">\n            <div class=\"dash-error-banner\" role=\"alert\">\n                <i class=\"fas fa-exclamation-triangle\" aria-hidden=\"true\"></i>\n                <span class=\"dash-error-banner-message\"></span>\n                <button class=\"dash-error-banner-close\" aria-label=\"Dismiss\"><i class=\"fas fa-times\" aria-hidden=\"true\"></i></button>\n            </div>\n\n            <div class=\"dash-card\">\n                <div class=\"dash-card-header ld-toolbar-header\">\n                    <h2 class=\"dash-card-title\">Kit queue</h2>\n                    <span class=\"ld-count\" id=\"ms-count\"></span>\n                    <div class=\"ld-view-toggle\" role=\"group\" aria-label=\"Status\">\n                        <button type=\"button\" class=\"ld-toggle-btn ms-tab\" data-status=\"Requested\" aria-pressed=\"true\">Requested</button>\n                        <button type=\"button\" class=\"ld-toggle-btn ms-tab\" data-status=\"Packed\" aria-pressed=\"false\">Packed</button>\n                        <button type=\"button\" class=\"ld-toggle-btn ms-tab\" data-status=\"Shipped\" aria-pressed=\"false\">Shipped</button>\n                    </div>\n                </div>\n                <div class=\"ld-table-scroll\">\n                    <table class=\"ld-table\" id=\"ms-table\">\n                        <thead>\n                            <tr>\n                                <th>Requested</th>\n                                <th>Recipient</th>\n                                <th>Ship to</th>\n                                <th>Contents</th>\n                                <th>AE</th>\n                                <th>Actions</th>\n                            </tr>\n                        </thead>\n                        <tbody id=\"ms-tbody\">\n                            <tr><td colspan=\"6\" class=\"ld-empty dash-loading\">Loading…</td></tr>\n                        </tbody>\n                    </table>\n                </div>\n            </div>\n        </main>\n    </div>\n\n    <script src=\"/config/app.config.js\"></script>\n    <script src=\"/shared_components/js/fetch-timeout.js?v=2026.09.06.26\"></script>\n    <script src=\"/shared_components/js/dash-page-helpers.js?v=2026.09.07.25\"></script>\n    <script src=\"/dashboards/js/marketing-shipments.js?v=2026.09.06.27\"></script>\n</body>\n</html>\n",
+      "title": "Marketing Shipments - Northwest Custom Apparel",
+      "bodyText": "Marketing Shipments Refresh Dashboard Kit queue Requested Packed Shipped Requested Recipient Ship to Contents AE Actions Loading…",
+      "ids": [
+        "btn-refresh",
+        "ms-count",
+        "ms-table",
+        "ms-tbody"
+      ],
+      "links": [
+        {
+          "href": "/staff-dashboard.html",
+          "label": ""
+        },
+        {
+          "href": "/staff-dashboard.html",
+          "label": "Dashboard"
+        }
+      ],
+      "fields": [],
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/art-hub.css",
+        "shared_components/css/dash-shell.css",
+        "dashboards/css/leads.css",
+        "dashboards/css/marketing-shipments.css"
+      ],
+      "scripts": [
+        "config/app.config.js",
+        "shared_components/js/fetch-timeout.js",
+        "shared_components/js/dash-page-helpers.js",
+        "dashboards/js/marketing-shipments.js"
+      ],
+      "cssBytes": 177211,
+      "bodyTextSha": "279bc58e2c0408c135a78544d46bed6957b3c3c7544a0ccc5638282001b71220",
+      "tableHashes": [
+        "9657b60306e15cb6799b40ee5930dce05dfafe6bbab735e3d92507fd8e2d44ef"
+      ],
+      "detail": "USPS\nUPS\nFedEx\nOther\nShip\nCancel"
+    }
+  ],
+  "hashes": {
+    "config/app.config.js": "fe83e4329ce3eee97e48dd68dab81d9d5eb6ec94511d9650e2c9ebbb1528d6ea",
+    "shared_components/js/fetch-timeout.js": "1d9852795f9af3b674a48ad5e719bc970cae867e36b1962f0c3f1a28dd830179",
+    "shared_components/js/dash-page-helpers.js": "4ce7902b8502978835949ecec36a95d27ebc2604f86ef1a9665353cd8c38ccbe",
+    "shared_components/js/artwork-upload.js": "ee355597c3854c7f075a9c9223c26709365b5ad497b8e644d448f191cd37b865",
+    "dashboards/js/leads-common.js": "b5d262b7c82b6544cab07f90e38bcbf3096292965b5780df97d13f40a29d83d6",
+    "dashboards/js/lead-workspace.js": "1183552c68bc31a4ed1595d6cccb0473399c5a0118eb0204b8facace7479dda5",
+    "dashboards/js/form-submissions.js": "b43c72258a1cd7d6ca38536ed29f9e5207627b067f4a2358f8d0a0e79d114952",
+    "dashboards/lead.html": "4f21717c469ceafaf8af25f7f1d2b7845ed5ef92f3dab716ecdd988c8816fd7b",
+    "dashboards/form-submissions.html": "652479603b721f1ff81d86ffa38939c5a5f9dac5fa0ac11cc63cf951cda0c152",
+    "dashboards/css/leads.css": "4aa7a447cd299aabd6bdca16a97c0d735bfddce915356676124d2a4e85509983",
+    "dashboards/css/lead-workspace.css": "53e61c59b2c315f3728f90717fd85bde44b641a02ba332274ecb96979f03e90f",
+    "dashboards/css/form-submissions.css": "e2757ea03401104259d3f98388220994af361de61de64b3d2199ce38d45c6e94",
+    "shared_components/css/garment-submit-form.css": "e377447718644932cebce1e59aab6a1044065768eae0868877a2795421255814",
+    "shared_components/js/garment-submit-form.js": "eecc509073fc1cf52cf780e5811480ea0408bbdf1f8af5604a27891577ebdebf",
+    "dashboards/marketing-shipments.html": "fecb82fbf1e9b3932b56d4e5782ea31fd68d4abb7d2146f3e4deb19e9fc8bce9",
+    "dashboards/js/marketing-shipments.js": "b7e4d0034e6bf7b2879c5f522d9d64a12772ab4909531d1fa1339107c27cd683",
+    "dashboards/css/marketing-shipments.css": "cea2a04e4756dcffce3b5b5dc4dcdc1f933696d4b463ec7280eb8c193c7a8358"
+  },
+  "changes": [
+    {
+      "file": "dashboards/js/lead-workspace.js",
+      "before": "<button type=\"button\" id=\"lw-load-retry\" class=\"ld-btn lw-retry\">",
+      "after": "<button type=\"button\" id=\"lw-load-retry\" class=\"ld-btn lw-retry btn\">",
+      "count": 1,
+      "why": "Canonical generated button"
+    },
+    {
+      "file": "dashboards/js/lead-workspace.js",
+      "before": "<button type=\"button\" id=\"lw-edit\" class=\"ld-btn\">",
+      "after": "<button type=\"button\" id=\"lw-edit\" class=\"ld-btn btn\">",
+      "count": 1,
+      "why": "Canonical generated button"
+    },
+    {
+      "file": "dashboards/js/lead-workspace.js",
+      "before": "<button type=\"button\" id=\"lw-samples\" class=\"ld-btn\">",
+      "after": "<button type=\"button\" id=\"lw-samples\" class=\"ld-btn btn\">",
+      "count": 1,
+      "why": "Canonical generated button"
+    },
+    {
+      "file": "dashboards/js/lead-workspace.js",
+      "before": "<button type=\"button\" id=\"lw-kit\" class=\"ld-btn\">",
+      "after": "<button type=\"button\" id=\"lw-kit\" class=\"ld-btn btn\">",
+      "count": 1,
+      "why": "Canonical generated button"
+    },
+    {
+      "file": "dashboards/js/lead-workspace.js",
+      "before": "<button type=\"button\" id=\"lw-delete\" class=\"ld-btn ld-btn--danger\">",
+      "after": "<button type=\"button\" id=\"lw-delete\" class=\"ld-btn ld-btn--danger btn\">",
+      "count": 1,
+      "why": "Canonical generated button"
+    },
+    {
+      "file": "dashboards/js/lead-workspace.js",
+      "before": "<button type=\"button\" class=\"ld-drawer-close\" id=\"lw-kit-close\" aria-label=\"Close\">",
+      "after": "<button type=\"button\" class=\"ld-drawer-close btn\" id=\"lw-kit-close\" aria-label=\"Close\">",
+      "count": 1,
+      "why": "Canonical generated button"
+    },
+    {
+      "file": "dashboards/js/lead-workspace.js",
+      "before": "<input id=\"lw-kit-recipient\" class=\"ld-select\" type=\"text\">",
+      "after": "<input id=\"lw-kit-recipient\" class=\"ld-select field-input\" type=\"text\">",
+      "count": 1,
+      "why": "Canonical generated input"
+    },
+    {
+      "file": "dashboards/js/lead-workspace.js",
+      "before": "<input id=\"lw-kit-company\" class=\"ld-select\" type=\"text\">",
+      "after": "<input id=\"lw-kit-company\" class=\"ld-select field-input\" type=\"text\">",
+      "count": 1,
+      "why": "Canonical generated input"
+    },
+    {
+      "file": "dashboards/js/lead-workspace.js",
+      "before": "<input id=\"lw-kit-addr1\" class=\"ld-select\" type=\"text\" autocomplete=\"off\">",
+      "after": "<input id=\"lw-kit-addr1\" class=\"ld-select field-input\" type=\"text\" autocomplete=\"off\">",
+      "count": 1,
+      "why": "Canonical generated input"
+    },
+    {
+      "file": "dashboards/js/lead-workspace.js",
+      "before": "<input id=\"lw-kit-addr2\" class=\"ld-select\" type=\"text\" autocomplete=\"off\">",
+      "after": "<input id=\"lw-kit-addr2\" class=\"ld-select field-input\" type=\"text\" autocomplete=\"off\">",
+      "count": 1,
+      "why": "Canonical generated input"
+    },
+    {
+      "file": "dashboards/js/lead-workspace.js",
+      "before": "<input id=\"lw-kit-city\" class=\"ld-select\" type=\"text\">",
+      "after": "<input id=\"lw-kit-city\" class=\"ld-select field-input\" type=\"text\">",
+      "count": 1,
+      "why": "Canonical generated input"
+    },
+    {
+      "file": "dashboards/js/lead-workspace.js",
+      "before": "<input id=\"lw-kit-state\" class=\"ld-select\" type=\"text\" maxlength=\"20\">",
+      "after": "<input id=\"lw-kit-state\" class=\"ld-select field-input\" type=\"text\" maxlength=\"20\">",
+      "count": 1,
+      "why": "Canonical generated input"
+    },
+    {
+      "file": "dashboards/js/lead-workspace.js",
+      "before": "<input id=\"lw-kit-zip\" class=\"ld-select\" type=\"text\" maxlength=\"20\">",
+      "after": "<input id=\"lw-kit-zip\" class=\"ld-select field-input\" type=\"text\" maxlength=\"20\">",
+      "count": 1,
+      "why": "Canonical generated input"
+    },
+    {
+      "file": "dashboards/js/lead-workspace.js",
+      "before": "<input id=\"lw-kit-phone\" class=\"ld-select\" type=\"tel\">",
+      "after": "<input id=\"lw-kit-phone\" class=\"ld-select field-input\" type=\"tel\">",
+      "count": 1,
+      "why": "Canonical generated input"
+    },
+    {
+      "file": "dashboards/js/lead-workspace.js",
+      "before": "<input id=\"lw-kit-email\" class=\"ld-select\" type=\"email\">",
+      "after": "<input id=\"lw-kit-email\" class=\"ld-select field-input\" type=\"email\">",
+      "count": 1,
+      "why": "Canonical generated input"
+    },
+    {
+      "file": "dashboards/js/lead-workspace.js",
+      "before": "<textarea id=\"lw-kit-notes\" class=\"ld-select\" rows=\"2\">",
+      "after": "<textarea id=\"lw-kit-notes\" class=\"ld-select field-textarea\" rows=\"2\">",
+      "count": 1,
+      "why": "Canonical generated textarea"
+    },
+    {
+      "file": "dashboards/js/lead-workspace.js",
+      "before": "<button type=\"button\" id=\"lw-kit-send\" class=\"ld-btn ld-btn--primary\">",
+      "after": "<button type=\"button\" id=\"lw-kit-send\" class=\"ld-btn ld-btn--primary btn\">",
+      "count": 1,
+      "why": "Canonical generated button"
+    },
+    {
+      "file": "dashboards/js/lead-workspace.js",
+      "before": "<input type=\"number\" class=\"lw-kit-qty\" min=\"1\" value=\"1\" aria-label=\"Quantity of ' + esc(it.Label) + '\">",
+      "after": "<input type=\"number\" class=\"lw-kit-qty field-input\" min=\"1\" value=\"1\" aria-label=\"Quantity of ' + esc(it.Label) + '\">",
+      "count": 1,
+      "why": "Canonical generated input"
+    },
+    {
+      "file": "dashboards/js/lead-workspace.js",
+      "before": "<button type=\"button\" id=\"lw-activity-retry\" class=\"lw-chip lw-retry\">",
+      "after": "<button type=\"button\" id=\"lw-activity-retry\" class=\"lw-chip lw-retry btn\">",
+      "count": 1,
+      "why": "Canonical generated button"
+    },
+    {
+      "file": "dashboards/js/lead-workspace.js",
+      "before": "<button type=\"button\" class=\"ld-btn lw-outreach-btn\" data-tpl=\"' + i + '\">",
+      "after": "<button type=\"button\" class=\"ld-btn lw-outreach-btn btn\" data-tpl=\"' + i + '\">",
+      "count": 1,
+      "why": "Canonical generated button"
+    },
+    {
+      "file": "dashboards/js/lead-workspace.js",
+      "before": "<button type=\"button\" id=\"lw-outreach-send\" class=\"ld-btn ld-btn--primary\">",
+      "after": "<button type=\"button\" id=\"lw-outreach-send\" class=\"ld-btn ld-btn--primary btn\">",
+      "count": 1,
+      "why": "Canonical generated button"
+    },
+    {
+      "file": "dashboards/js/lead-workspace.js",
+      "before": "<button type=\"button\" id=\"lw-outreach-cancel\" class=\"lw-chip\">",
+      "after": "<button type=\"button\" id=\"lw-outreach-cancel\" class=\"lw-chip btn\">",
+      "count": 1,
+      "why": "Canonical generated button"
+    },
+    {
+      "file": "dashboards/js/lead-workspace.js",
+      "before": "<input type=\"date\" id=\"lw-due\" class=\"lw-value-input\" aria-label=\"Follow-up date\" value=\"' + esc(lead.Due_Date || '') + '\">",
+      "after": "<input type=\"date\" id=\"lw-due\" class=\"lw-value-input field-input\" aria-label=\"Follow-up date\" value=\"' + esc(lead.Due_Date || '') + '\">",
+      "count": 1,
+      "why": "Canonical generated input"
+    },
+    {
+      "file": "dashboards/js/lead-workspace.js",
+      "before": "<button type=\"button\" class=\"lw-chip\" data-days=\"' + c[1] + '\" aria-label=\"Follow up in ' + c[1] + ' day' + (c[1] === 1 ? '' : 's') + '\">",
+      "after": "<button type=\"button\" class=\"lw-chip btn\" data-days=\"' + c[1] + '\" aria-label=\"Follow up in ' + c[1] + ' day' + (c[1] === 1 ? '' : 's') + '\">",
+      "count": 1,
+      "why": "Canonical generated button"
+    },
+    {
+      "file": "dashboards/js/lead-workspace.js",
+      "before": "<input type=\"number\" id=\"lw-value\" class=\"lw-value-input\" min=\"0\" step=\"50\" placeholder=\"Estimated $\" aria-label=\"Estimated value in dollars\"' +\n            ' value=\"' + esc(lead.Lead_Value || '') + '\">",
+      "after": "<input type=\"number\" id=\"lw-value\" class=\"lw-value-input field-input\" min=\"0\" step=\"50\" placeholder=\"Estimated $\" aria-label=\"Estimated value in dollars\"' +\n            ' value=\"' + esc(lead.Lead_Value || '') + '\">",
+      "count": 1,
+      "why": "Canonical generated input"
+    },
+    {
+      "file": "dashboards/js/lead-workspace.js",
+      "before": "<input type=\"search\" id=\"lw-match-input\" class=\"ld-search\" placeholder=\"Search ShopWorks…\" aria-label=\"Search ShopWorks customers\">",
+      "after": "<input type=\"search\" id=\"lw-match-input\" class=\"ld-search field-input\" placeholder=\"Search ShopWorks…\" aria-label=\"Search ShopWorks customers\">",
+      "count": 1,
+      "why": "Canonical generated input"
+    },
+    {
+      "file": "dashboards/js/lead-workspace.js",
+      "before": "<button type=\"button\" id=\"lw-match-btn\" class=\"ld-btn\" aria-label=\"Search ShopWorks\">",
+      "after": "<button type=\"button\" id=\"lw-match-btn\" class=\"ld-btn btn\" aria-label=\"Search ShopWorks\">",
+      "count": 1,
+      "why": "Canonical generated button"
+    },
+    {
+      "file": "dashboards/js/lead-workspace.js",
+      "before": "<button type=\"button\" class=\"ld-btn\" data-link=\"' + esc(c.id_Customer) + '\">",
+      "after": "<button type=\"button\" class=\"ld-btn btn\" data-link=\"' + esc(c.id_Customer) + '\">",
+      "count": 1,
+      "why": "Canonical generated button"
+    },
+    {
+      "file": "dashboards/js/lead-workspace.js",
+      "before": "<button type=\"button\" class=\"ld-btn\" id=\"lw-link-btn\">",
+      "after": "<button type=\"button\" class=\"ld-btn btn\" id=\"lw-link-btn\">",
+      "count": 1,
+      "why": "Canonical generated button"
+    },
+    {
+      "file": "dashboards/js/lead-workspace.js",
+      "before": "<button type=\"button\" id=\"lw-suggest-refresh\" class=\"lw-chip\">",
+      "after": "<button type=\"button\" id=\"lw-suggest-refresh\" class=\"lw-chip btn\">",
+      "count": 2,
+      "why": "Canonical generated button"
+    },
+    {
+      "file": "dashboards/js/lead-workspace.js",
+      "before": "<button type=\"button\" class=\"ld-btn\" data-quote=\"' + i + '\">",
+      "after": "<button type=\"button\" class=\"ld-btn btn\" data-quote=\"' + i + '\">",
+      "count": 1,
+      "why": "Canonical generated button"
+    },
+    {
+      "file": "dashboards/js/lead-workspace.js",
+      "before": "<input type=\"text\" id=\"lw-quote-id\" class=\"lw-quote-input\" placeholder=\"Quote ID (e.g. EMB0718-1)\" aria-label=\"Quote ID to link\">",
+      "after": "<input type=\"text\" id=\"lw-quote-id\" class=\"lw-quote-input field-input\" placeholder=\"Quote ID (e.g. EMB0718-1)\" aria-label=\"Quote ID to link\">",
+      "count": 1,
+      "why": "Canonical generated input"
+    },
+    {
+      "file": "dashboards/js/lead-workspace.js",
+      "before": "<button type=\"button\" id=\"lw-quote-link\" class=\"ld-btn\" aria-label=\"Link quote\">",
+      "after": "<button type=\"button\" id=\"lw-quote-link\" class=\"ld-btn btn\" aria-label=\"Link quote\">",
+      "count": 1,
+      "why": "Canonical generated button"
+    },
+    {
+      "file": "dashboards/js/lead-workspace.js",
+      "before": "<button type=\"button\" id=\"lw-quote-unlink\" class=\"lw-chip\" title=\"Unlink this quote from the lead\">",
+      "after": "<button type=\"button\" id=\"lw-quote-unlink\" class=\"lw-chip btn\" title=\"Unlink this quote from the lead\">",
+      "count": 1,
+      "why": "Canonical generated button"
+    },
+    {
+      "file": "dashboards/js/lead-workspace.js",
+      "before": "<button type=\"button\" class=\"ld-btn lw-method-btn\" data-builder=\"' + i + '\">",
+      "after": "<button type=\"button\" class=\"ld-btn lw-method-btn btn\" data-builder=\"' + i + '\">",
+      "count": 1,
+      "why": "Canonical generated button"
+    },
+    {
+      "file": "dashboards/js/lead-workspace.js",
+      "before": "<button type=\"button\" id=\"lw-load-orders\" class=\"ld-btn\">",
+      "after": "<button type=\"button\" id=\"lw-load-orders\" class=\"ld-btn btn\">",
+      "count": 1,
+      "why": "Canonical generated button"
+    },
+    {
+      "file": "dashboards/js/lead-workspace.js",
+      "before": "<div class=\"ld-table-scroll\">",
+      "after": "<div class=\"ld-table-scroll table-wrap\" tabindex=\"0\" role=\"region\" aria-label=\"Scrollable record table\">",
+      "count": 1,
+      "why": "Canonical generated div"
+    },
+    {
+      "file": "dashboards/js/lead-workspace.js",
+      "before": "<table class=\"ld-orders-table\">",
+      "after": "<table class=\"ld-orders-table data-table\">",
+      "count": 1,
+      "why": "Canonical generated table"
+    },
+    {
+      "file": "dashboards/js/lead-workspace.js",
+      "before": "<button type=\"button\" id=\"lw-orders-retry\" class=\"lw-chip\">",
+      "after": "<button type=\"button\" id=\"lw-orders-retry\" class=\"lw-chip btn\">",
+      "count": 1,
+      "why": "Canonical generated button"
+    },
+    {
+      "file": "dashboards/js/lead-workspace.js",
+      "before": "<button type=\"button\" id=\"lw-art-again\" class=\"lw-chip lw-mt-8\">",
+      "after": "<button type=\"button\" id=\"lw-art-again\" class=\"lw-chip lw-mt-8 btn\">",
+      "count": 1,
+      "why": "Canonical generated button"
+    },
+    {
+      "file": "dashboards/js/lead-workspace.js",
+      "before": "<button type=\"button\" id=\"lw-art-send\" class=\"ld-btn ld-btn--primary lw-mt-8\">",
+      "after": "<button type=\"button\" id=\"lw-art-send\" class=\"ld-btn ld-btn--primary lw-mt-8 btn\">",
+      "count": 1,
+      "why": "Canonical generated button"
+    },
+    {
+      "file": "dashboards/js/form-submissions.js",
+      "before": "<button type=\"button\" class=\"dash-btn dash-btn--sm inbox-retry\" data-retry=\"1\">",
+      "after": "<button type=\"button\" class=\"dash-btn dash-btn--sm inbox-retry btn\" data-retry=\"1\">",
+      "count": 1,
+      "why": "Canonical generated button"
+    },
+    {
+      "file": "dashboards/js/form-submissions.js",
+      "before": "<button type=\"button\" class=\"dash-btn dash-btn--sm\" data-view-id=\"' + esc(s.Submission_ID) + '\">",
+      "after": "<button type=\"button\" class=\"dash-btn dash-btn--sm btn\" data-view-id=\"' + esc(s.Submission_ID) + '\">",
+      "count": 1,
+      "why": "Canonical generated button"
+    },
+    {
+      "file": "dashboards/js/form-submissions.js",
+      "before": "<div class=\"inbox-tablewrap\">",
+      "after": "<div class=\"inbox-tablewrap table-wrap\" tabindex=\"0\" role=\"region\" aria-label=\"Scrollable record table\">",
+      "count": 4,
+      "why": "Canonical generated div"
+    },
+    {
+      "file": "dashboards/js/form-submissions.js",
+      "before": "<table class=\"inbox-table\">",
+      "after": "<table class=\"inbox-table data-table\">",
+      "count": 3,
+      "why": "Canonical generated table"
+    },
+    {
+      "file": "dashboards/js/form-submissions.js",
+      "before": "<button type=\"button\" class=\"copy-id\" title=\"Copy id\" aria-label=\"Copy id ' + esc(sub.Submission_ID) + '\" data-copy=\"' + esc(sub.Submission_ID) + '\">",
+      "after": "<button type=\"button\" class=\"copy-id btn\" title=\"Copy id\" aria-label=\"Copy id ' + esc(sub.Submission_ID) + '\" data-copy=\"' + esc(sub.Submission_ID) + '\">",
+      "count": 1,
+      "why": "Canonical generated button"
+    },
+    {
+      "file": "dashboards/js/form-submissions.js",
+      "before": "<button type=\"button\" class=\"dash-btn dash-btn--primary\" id=\"saveStatusBtn\">",
+      "after": "<button type=\"button\" class=\"dash-btn dash-btn--primary btn\" id=\"saveStatusBtn\">",
+      "count": 1,
+      "why": "Canonical generated button"
+    },
+    {
+      "file": "dashboards/js/form-submissions.js",
+      "before": "<button type=\"button\" class=\"dash-btn\" id=\"artPushBtn\">",
+      "after": "<button type=\"button\" class=\"dash-btn btn\" id=\"artPushBtn\">",
+      "count": 1,
+      "why": "Canonical generated button"
+    },
+    {
+      "file": "dashboards/js/form-submissions.js",
+      "before": "<button type=\"button\" class=\"dash-btn\" id=\"swPushBtn\">",
+      "after": "<button type=\"button\" class=\"dash-btn btn\" id=\"swPushBtn\">",
+      "count": 1,
+      "why": "Canonical generated button"
+    },
+    {
+      "file": "dashboards/js/form-submissions.js",
+      "before": "<table class=\"inbox-table inbox-table--payload\">",
+      "after": "<table class=\"inbox-table inbox-table--payload data-table\">",
+      "count": 1,
+      "why": "Canonical generated table"
+    },
+    {
+      "file": "dashboards/js/form-submissions.js",
+      "before": "<button type=\"button\" class=\"dash-btn dash-btn--sm\" data-return-pk=\"' + esc(String(it.PK_ID)) + '\">",
+      "after": "<button type=\"button\" class=\"dash-btn dash-btn--sm btn\" data-return-pk=\"' + esc(String(it.PK_ID)) + '\">",
+      "count": 2,
+      "why": "Canonical generated button"
+    },
+    {
+      "file": "dashboards/js/form-submissions.js",
+      "before": "<button type=\"button\" class=\"dash-btn dash-btn--sm dash-btn--danger\" data-charge-pk=\"' + esc(String(it.PK_ID)) + '\">",
+      "after": "<button type=\"button\" class=\"dash-btn dash-btn--sm dash-btn--danger btn\" data-charge-pk=\"' + esc(String(it.PK_ID)) + '\">",
+      "count": 2,
+      "why": "Canonical generated button"
+    },
+    {
+      "file": "dashboards/js/form-submissions.js",
+      "before": "<button type=\"button\" class=\"dash-btn dash-btn--primary\" id=\"swConfirmBtn\">",
+      "after": "<button type=\"button\" class=\"dash-btn dash-btn--primary btn\" id=\"swConfirmBtn\">",
+      "count": 1,
+      "why": "Canonical generated button"
+    },
+    {
+      "file": "dashboards/js/form-submissions.js",
+      "before": "<button type=\"button\" class=\"dash-btn\" id=\"swCancelBtn\">",
+      "after": "<button type=\"button\" class=\"dash-btn btn\" id=\"swCancelBtn\">",
+      "count": 1,
+      "why": "Canonical generated button"
+    },
+    {
+      "file": "dashboards/js/form-submissions.js",
+      "before": "<button type=\"button\" class=\"dash-btn dash-btn--sm\" data-view-id=\"' + esc(g.id) + '\">",
+      "after": "<button type=\"button\" class=\"dash-btn dash-btn--sm btn\" data-view-id=\"' + esc(g.id) + '\">",
+      "count": 1,
+      "why": "Canonical generated button"
+    },
+    {
+      "file": "dashboards/js/marketing-shipments.js",
+      "before": "<button type=\"button\" class=\"lw-chip ms-pack\">",
+      "after": "<button type=\"button\" class=\"lw-chip ms-pack btn\">",
+      "count": 1,
+      "why": "Canonical generated button"
+    },
+    {
+      "file": "dashboards/js/marketing-shipments.js",
+      "before": "<button type=\"button\" class=\"ld-btn ms-ship\">",
+      "after": "<button type=\"button\" class=\"ld-btn ms-ship btn\">",
+      "count": 1,
+      "why": "Canonical generated button"
+    },
+    {
+      "file": "dashboards/js/marketing-shipments.js",
+      "before": "<select class=\"ms-carrier ld-select\">",
+      "after": "<select class=\"ms-carrier ld-select field-select\">",
+      "count": 1,
+      "why": "Canonical generated select"
+    },
+    {
+      "file": "dashboards/js/marketing-shipments.js",
+      "before": "<input type=\"text\" class=\"ms-tracking ld-select\" placeholder=\"Tracking #\" autocomplete=\"off\">",
+      "after": "<input type=\"text\" class=\"ms-tracking ld-select field-input\" placeholder=\"Tracking #\" autocomplete=\"off\">",
+      "count": 1,
+      "why": "Canonical generated input"
+    },
+    {
+      "file": "dashboards/js/marketing-shipments.js",
+      "before": "<button type=\"button\" class=\"ld-btn ld-btn--primary ms-ship-go\">",
+      "after": "<button type=\"button\" class=\"ld-btn ld-btn--primary ms-ship-go btn\">",
+      "count": 1,
+      "why": "Canonical generated button"
+    },
+    {
+      "file": "dashboards/js/marketing-shipments.js",
+      "before": "<button type=\"button\" class=\"lw-chip ms-ship-cancel\">",
+      "after": "<button type=\"button\" class=\"lw-chip ms-ship-cancel btn\">",
+      "count": 1,
+      "why": "Canonical generated button"
+    },
+    {
+      "file": "dashboards/js/form-submissions.js",
+      "before": "        submissions: [],",
+      "after": "        loadSeq: 0,\n        loadState: 'loading',\n        loadError: '',\n        detailSeq: 0,\n        submissions: [],",
+      "count": 1,
+      "why": "Read state and request generations"
+    },
+    {
+      "file": "dashboards/js/form-submissions.js",
+      "before": "    function loadAll() {\n        var root = document.getElementById('submissionsRoot');\n        var sroot = document.getElementById('samplesRoot');\n        root.classList.add('dash-loading'); root.textContent = 'Loading submissions…';\n        sroot.classList.add('dash-loading'); sroot.textContent = 'Loading open samples…';\n        Promise.all([\n            inboxFetch(''),\n            inboxFetch('/items/open'),\n        ]).then(function (results) {\n            DashPage.hideError();\n            state.submissions = withoutJotformLeads(results[0].submissions);\n            state.openItems = results[1].items || [];\n            renderStats();\n            renderSubmissions();\n            renderSamples();\n        }).catch(function (err) {\n            console.error('[forms-inbox] load failed:', err);\n            DashPage.showError('Unable to load submissions (' + err.message + ').');\n            var retry = '<button type=\"button\" class=\"dash-btn dash-btn--sm inbox-retry btn\" data-retry=\"1\">Retry</button>';\n            root.classList.remove('dash-loading');\n            root.innerHTML = '<div class=\"inbox-empty\" role=\"alert\"><i class=\"fas fa-triangle-exclamation\" aria-hidden=\"true\"></i> Submissions unavailable (' + esc(err.message) + '). ' + retry + '</div>';\n            sroot.classList.remove('dash-loading');\n            sroot.innerHTML = '<div class=\"inbox-empty\" role=\"alert\"><i class=\"fas fa-triangle-exclamation\" aria-hidden=\"true\"></i> Samples unavailable (' + esc(err.message) + '). ' + retry + '</div>';\n            document.querySelectorAll('[data-retry]').forEach(function (b) { b.addEventListener('click', loadAll); });\n        });\n    }\n\n",
+      "after": "    function renderReadState() {\n        ['submissionsRoot', 'samplesRoot'].forEach(function (id) {\n            var root = document.getElementById(id);\n            root.classList.toggle('dash-loading', state.loadState === 'loading');\n            if (state.loadState === 'loading') {\n                root.textContent = id === 'submissionsRoot' ? 'Loading submissions…' : 'Loading open samples…';\n            } else {\n                root.innerHTML = '<div class=\"inbox-empty\" role=\"alert\">Records unavailable (' + esc(state.loadError) + '). <button type=\"button\" class=\"btn inbox-retry\">Retry</button></div>';\n                root.querySelector('button').addEventListener('click', loadAll);\n            }\n        });\n    }\n\n    function loadAll() {\n        var seq = ++state.loadSeq;\n        state.loadState = 'loading'; state.loadError = '';\n        state.submissions = []; state.openItems = [];\n        DashPage.hideError();\n        ['statNew', 'statOut', 'statOverdue', 'statDueSoon'].forEach(function (id) { document.getElementById(id).textContent = '—'; });\n        renderReadState();\n        return Promise.all([inboxFetch(''), inboxFetch('/items/open')]).then(function (results) {\n            if (seq !== state.loadSeq) return;\n            if (!results[0] || !Array.isArray(results[0].submissions) || !results[1] || !Array.isArray(results[1].items)) throw new Error('Incomplete records response');\n            state.submissions = withoutJotformLeads(results[0].submissions);\n            state.openItems = results[1].items;\n            state.loadState = 'ready';\n            renderStats(); renderSubmissions(); renderSamples();\n        }).catch(function (err) {\n            if (seq !== state.loadSeq) return;\n            console.error('[forms-inbox] load failed:', err);\n            state.loadState = 'error'; state.loadError = err.message;\n            state.submissions = []; state.openItems = [];\n            DashPage.showError('Unable to load submissions (' + err.message + ').');\n            renderReadState();\n        });\n    }\n\n",
+      "count": 1,
+      "why": "Loading and failed reads cannot look empty or restore stale records"
+    },
+    {
+      "file": "dashboards/js/form-submissions.js",
+      "before": "    function renderSubmissions() {",
+      "after": "    function renderSubmissions() {\n        if (state.loadState !== 'ready') { renderReadState(); return; }",
+      "count": 1,
+      "why": "Filters preserve renderSubmissions read state"
+    },
+    {
+      "file": "dashboards/js/form-submissions.js",
+      "before": "    function renderSamples() {",
+      "after": "    function renderSamples() {\n        if (state.loadState !== 'ready') { renderReadState(); return; }",
+      "count": 1,
+      "why": "Filters preserve renderSamples read state"
+    },
+    {
+      "file": "dashboards/js/form-submissions.js",
+      "before": "        var body = document.getElementById('detailBody');\n        body.innerHTML",
+      "after": "        var seq = ++state.detailSeq;\n        state.detail = null;\n        document.getElementById('detailTitle').textContent = 'Submission';\n        var body = document.getElementById('detailBody');\n        body.innerHTML",
+      "count": 2,
+      "why": "Clear old detail on open"
+    },
+    {
+      "file": "dashboards/js/form-submissions.js",
+      "before": "        document.getElementById('detailOverlay').hidden = false;",
+      "after": "        document.getElementById('detailOverlay').hidden = false;\n        if (!document.getElementById('detailOverlay').open) document.getElementById('detailOverlay').showModal();",
+      "count": 1,
+      "why": "Native detail dialog contains focus"
+    },
+    {
+      "file": "dashboards/js/form-submissions.js",
+      "before": "            .then(function (data) {\n                state.detail = data;",
+      "after": "            .then(function (data) {\n                if (seq !== state.detailSeq) return;\n                if (!data || !data.submission || data.submission.Submission_ID !== submissionId || (data.items != null && !Array.isArray(data.items))) throw new Error('Incomplete submission response');\n                state.detail = data;",
+      "count": 1,
+      "why": "Latest valid detail only"
+    },
+    {
+      "file": "dashboards/js/form-submissions.js",
+      "before": "            .catch(function (err) {\n                body.innerHTML = '<div class=\"inbox-empty\"><i",
+      "after": "            .catch(function (err) {\n                if (seq !== state.detailSeq) return;\n                body.innerHTML = '<div class=\"inbox-empty\" role=\"alert\"><i",
+      "count": 1,
+      "why": "Ignore closed detail failure and announce current failure"
+    },
+    {
+      "file": "dashboards/js/form-submissions.js",
+      "before": "    function closeDetail() {\n        var wasOpen",
+      "after": "    function closeDetail() {\n        state.detailSeq++;\n        if (document.getElementById('detailOverlay').open) document.getElementById('detailOverlay').close();\n        var wasOpen",
+      "count": 1,
+      "why": "Invalidate detail and close native layer"
+    },
+    {
+      "file": "dashboards/js/form-submissions.js",
+      "before": "        document.getElementById('closeDetailBtn').addEventListener('click', closeDetail);",
+      "after": "        document.getElementById('closeDetailBtn').addEventListener('click', closeDetail);\n        document.getElementById('detailOverlay').addEventListener('cancel', function (e) { e.preventDefault(); closeDetail(); });",
+      "count": 1,
+      "why": "Native Escape uses shared close and focus restoration"
+    },
+    {
+      "file": "dashboards/js/lead-workspace.js",
+      "before": "        lead: null,",
+      "after": "        loadSeq: 0,\n        activitySeq: 0,\n        lead: null,",
+      "count": 1,
+      "why": "Lead read generations"
+    },
+    {
+      "file": "dashboards/js/lead-workspace.js",
+      "before": "    function renderFatal(html, retryId) {",
+      "after": "    function renderFatal(html, retryId) {\n        document.querySelector('.lw-grid').hidden = true;\n        ['lw-head-controls', 'lw-head-actions', 'lw-head-chips'].forEach(function (id) { document.getElementById(id).hidden = true; });\n        document.getElementById('lw-title').setAttribute('role', 'alert');",
+      "count": 1,
+      "why": "Failed lead hides stale controls"
+    },
+    {
+      "file": "dashboards/js/lead-workspace.js",
+      "before": "    function loadLead(id) {\n        DashPage.hideError();\n        var t = document.getElementById('lw-title');\n        if (t && !state.lead) t.textContent = 'Loading lead…';\n        L.crmFetch('/' + encodeURIComponent(id)).then(function (body) {\n            state.lead = body.submission;\n            if (!state.lead) throw new Error('empty response');\n            renderHeader();\n            renderRail();\n            loadActivities();\n        }).catch(function (err) {\n            console.error('[lead-ws] load failed:', err);\n            DashPage.showError('Unable to load lead ' + id + ' (' + err.message + ').');\n            renderFatal('Could not load <span class=\"ld-id\">' + esc(id) + '</span> — it may be mistyped or archived. ' +\n                '<a href=\"/dashboards/leads.html\">Back to the Leads board</a>.', id);\n        });\n    }\n\n",
+      "after": "    function loadLead(id) {\n        var seq = ++state.loadSeq;\n        state.activitySeq++;\n        state.lead = null; state.activities = [];\n        DashPage.hideError();\n        document.querySelector('.lw-grid').hidden = true;\n        ['lw-head-controls', 'lw-head-actions', 'lw-head-chips'].forEach(function (key) { document.getElementById(key).hidden = true; });\n        var t = document.getElementById('lw-title');\n        t.setAttribute('role', 'status'); t.textContent = 'Loading lead…';\n        document.getElementById('lw-sub').textContent = '';\n        L.crmFetch('/' + encodeURIComponent(id)).then(function (body) {\n            if (seq !== state.loadSeq) return;\n            if (!body || !body.submission || body.submission.Submission_ID !== id) throw new Error('Incomplete lead response');\n            state.lead = body.submission;\n            document.querySelector('.lw-grid').hidden = false;\n            renderHeader(); renderRail(); loadActivities();\n        }).catch(function (err) {\n            if (seq !== state.loadSeq) return;\n            console.error('[lead-ws] load failed:', err);\n            DashPage.showError('Unable to load lead ' + id + ' (' + err.message + ').');\n            renderFatal('Could not load <span class=\"ld-id\">' + esc(id) + '</span> — it may be mistyped or archived. ' +\n                '<a href=\"/dashboards/leads.html\">Back to the Leads board</a>.', id);\n        });\n    }\n\n",
+      "count": 1,
+      "why": "Latest lead response owns visible record and failure"
+    },
+    {
+      "file": "dashboards/js/lead-workspace.js",
+      "before": "    function loadActivities() {\n        L.activityFetch",
+      "after": "    function loadActivities() {\n        if (!state.lead) return;\n        var seq = ++state.activitySeq, leadSeq = state.loadSeq;\n        L.activityFetch",
+      "count": 1,
+      "why": "Activity tied to current lead generation"
+    },
+    {
+      "file": "dashboards/js/lead-workspace.js",
+      "before": "            state.activities = body.activities || [];",
+      "after": "            if (seq !== state.activitySeq || leadSeq !== state.loadSeq) return;\n            if (!body || !Array.isArray(body.activities)) throw new Error('Incomplete activity response');\n            state.activities = body.activities;",
+      "count": 1,
+      "why": "Reject malformed or outdated activities"
+    },
+    {
+      "file": "dashboards/js/lead-workspace.js",
+      "before": "            console.error('[lead-ws] activity load failed:', err);",
+      "after": "            if (seq !== state.activitySeq || leadSeq !== state.loadSeq) return;\n            console.error('[lead-ws] activity load failed:', err);",
+      "count": 1,
+      "why": "Ignore stale activity failure"
+    },
+    {
+      "file": "dashboards/js/marketing-shipments.js",
+      "before": "        var tbody = document.getElementById('ms-tbody');\n        tbody.innerHTML",
+      "after": "        var tbody = document.getElementById('ms-tbody');\n        state.rows = [];\n        document.getElementById('ms-count').textContent = 'Loading…';\n        tbody.innerHTML",
+      "count": 1,
+      "why": "Clear stale shipment count while loading"
+    },
+    {
+      "file": "dashboards/js/marketing-shipments.js",
+      "before": "            state.rows = body.shipments || [];",
+      "after": "            if (!body || !Array.isArray(body.shipments)) throw new Error('Incomplete shipments response');\n            state.rows = body.shipments;",
+      "count": 1,
+      "why": "Malformed shipments never appear as empty queue"
+    },
+    {
+      "file": "dashboards/js/marketing-shipments.js",
+      "before": "            console.error('[marketing-shipments] load failed:', err);",
+      "after": "            state.rows = [];\n            document.getElementById('ms-count').textContent = 'Unavailable';\n            console.error('[marketing-shipments] load failed:', err);",
+      "count": 1,
+      "why": "Failed shipments clear counts"
+    },
+    {
+      "file": "dashboards/js/marketing-shipments.js",
+      "before": "<select class=\"ms-carrier ld-select field-select\">",
+      "after": "<select class=\"ms-carrier ld-select field-select\" aria-label=\"Shipping carrier\">",
+      "count": 1,
+      "why": "Label shipping carrier"
+    },
+    {
+      "file": "dashboards/js/marketing-shipments.js",
+      "before": "<input type=\"text\" class=\"ms-tracking ld-select field-input\"",
+      "after": "<input type=\"text\" class=\"ms-tracking ld-select field-input\" aria-label=\"Tracking number\"",
+      "count": 1,
+      "why": "Label shipment tracking"
+    },
+    {
+      "file": "dashboards/js/form-submissions.js",
+      "before": "    function renderDetail(sub, items) {\n        var meta = FORM_META[sub.Form_ID] || { label: sub.Form_ID, icon: 'fa-file', cls: '' };\n        document.getElementById('detailTitle').innerHTML =\n            '<span class=\"inbox-badge ' + meta.cls + '\"><i aria-hidden=\"true\" class=\"fas ' + meta.icon + '\"></i> ' + esc(meta.label) + '</span> ' +\n            '<button type=\"button\" class=\"copy-id btn\" title=\"Copy id\" aria-label=\"Copy id ' + esc(sub.Submission_ID) + '\" data-copy=\"' + esc(sub.Submission_ID) + '\">' + esc(sub.Submission_ID) + ' <i class=\"far fa-copy\" aria-hidden=\"true\"></i></button>' +\n            ' <span class=\"inbox-muted\">saved ' + esc(fmtStamp(sub.Submitted_At)) + '</span>';\n        var copyBtn = document.querySelector('#detailTitle .copy-id');\n        copyBtn.addEventListener('click', function () {\n            navigator.clipboard.writeText(copyBtn.dataset.copy).then(function () {\n                copyBtn.querySelector('i').className = 'fas fa-check';\n                setTimeout(function () { copyBtn.querySelector('i').className = 'far fa-copy'; }, 1200);\n            }).catch(function () { /* clipboard blocked — no-op */ });\n        });\n\n        var payload = {};\n        try { payload = JSON.parse(sub.Payload_JSON || '{}'); } catch (e) { /* renders empty */ }\n\n        var html = '';\n\n        // status row + actions\n        var choices = STATUS_CHOICES[sub.Form_ID] || ['New', 'Completed'];\n        html += '<div class=\"detail-actionbar no-print\">' +\n            '<label>Status <select id=\"detailStatus\">' + choices.map(function (c) {\n                return '<option' + (c === sub.Status ? ' selected' : '') + '>' + esc(c) + '</option>';\n            }).join('') + '</select></label>' +\n            '<button type=\"button\" class=\"dash-btn dash-btn--primary btn\" id=\"saveStatusBtn\"><i class=\"fas fa-check\" aria-hidden=\"true\"></i> Save Status</button>';\n        if (sub.Form_ID === 'artwork-request') {\n            html += sub.Art_Request_ID\n                ? '<span class=\"inbox-status status--art\"><i class=\"fas fa-palette\" aria-hidden=\"true\"></i> Art Request #' + esc(sub.Art_Request_ID) + '</span>'\n                : '<button type=\"button\" class=\"dash-btn btn\" id=\"artPushBtn\"><i class=\"fas fa-palette\" aria-hidden=\"true\"></i> Create Art Request</button>';\n        }\n        if (sub.Form_ID === 'ae-order-intake') {\n            html += sub.Pushed_To_ShopWorks === 'Yes'\n                ? '<span class=\"inbox-status status--done\"><i class=\"fas fa-industry\" aria-hidden=\"true\"></i> ShopWorks: ' + esc(sub.ShopWorks_Order_ID || 'pushed') + '</span>'\n                : '<button type=\"button\" class=\"dash-btn btn\" id=\"swPushBtn\"><i class=\"fas fa-industry\" aria-hidden=\"true\"></i> Push to ShopWorks…</button>';\n        }\n        html += '<span class=\"inbox-muted\" id=\"detailActionMsg\"></span></div>';\n\n        // header fields\n        if (payload.fields && payload.fields.length) {\n            html += '<div class=\"detail-fields\">' + payload.fields.map(function (pair) {\n                if (!pair[1]) return '';\n                return '<div class=\"detail-field\"><span>' + esc(pair[0]) + '</span><strong>' + esc(pair[1]) + '</strong></div>';\n            }).join('') + '</div>';\n        }\n\n        // checks\n        if (payload.checks && payload.checks.length) {\n            html += '<div class=\"detail-checks\">' + payload.checks.map(function (c) {\n                return '<span class=\"inbox-badge badge--check\"><i class=\"fas fa-check\" aria-hidden=\"true\"></i> ' + esc(c) + '</span>';\n            }).join('') + '</div>';\n        }\n\n        // tables\n        (payload.tables || []).forEach(function (t) {\n            if (!t.rows || !t.rows.length) return;\n            html += '<h3 class=\"detail-subhead\">' + esc(t.title || 'Details') + '</h3>' +\n                '<div class=\"inbox-tablewrap table-wrap\" tabindex=\"0\" role=\"region\" aria-label=\"Scrollable record table\"><table class=\"inbox-table inbox-table--payload data-table\"><thead><tr>' +\n                (t.columns || []).map(function (c) { return '<th>' + esc(c) + '</th>'; }).join('') +\n                '</tr></thead><tbody>' +\n                t.rows.map(function (r) {\n                    return '<tr>' + r.map(function (c) { return '<td>' + esc(c) + '</td>'; }).join('') + '</tr>';\n                }).join('') + '</tbody></table></div>';\n        });\n\n        // sample items with check-in buttons\n        if (sub.Form_ID === 'sample-checkout' && items.length) {\n            html += '<h3 class=\"detail-subhead\">Sample Items</h3><div class=\"inbox-tablewrap table-wrap\" tabindex=\"0\" role=\"region\" aria-label=\"Scrollable record table\"><table class=\"inbox-table data-table\"><thead><tr>' +\n                '<th>#</th><th>Brand</th><th>Style</th><th>Description</th><th>Color</th><th>Size</th><th>Qty</th><th>Charge (75%)</th><th>Status</th><th>Returned</th><th class=\"no-print\"></th>' +\n                '</tr></thead><tbody>' +\n                items.map(function (it) {\n                    return '<tr><td>' + esc(it.Line_Number) + '</td><td>' + esc(it.Brand) + '</td><td>' + esc(it.Style) + '</td>' +\n                        '<td>' + esc(it.Description) + '</td><td>' + esc(it.Color) + '</td><td>' + esc(it.Size) + '</td><td>' + esc(it.Qty) + '</td>' +\n                        '<td>' + esc(it.Charge_Value) + '</td>' +\n                        '<td><span class=\"inbox-status ' + (it.Item_Status === 'Out' ? 'status--out' : (it.Item_Status === 'Charged' ? 'status--overdue' : 'status--done')) + '\">' + esc(it.Item_Status) + '</span></td>' +\n                        '<td>' + esc(it.Date_Returned ? fmtDay(it.Date_Returned) + (it.Condition ? ' · ' + it.Condition : '') : '') + '</td>' +\n                        '<td class=\"no-print\">' + (it.Item_Status === 'Out'\n                            ? '<button type=\"button\" class=\"dash-btn dash-btn--sm btn\" data-return-pk=\"' + esc(String(it.PK_ID)) + '\">Mark Returned</button> ' +\n                              '<button type=\"button\" class=\"dash-btn dash-btn--sm dash-btn--danger btn\" data-charge-pk=\"' + esc(String(it.PK_ID)) + '\">Charged</button>'\n                            : '') + '</td></tr>';\n                }).join('') + '</tbody></table></div>';\n        }\n\n        // notes\n        (payload.notes || []).forEach(function (pair) {\n            if (!pair[1]) return;\n            html += '<h3 class=\"detail-subhead\">' + esc(pair[0]) + '</h3><p class=\"detail-note\">' + esc(pair[1]) + '</p>';\n        });\n\n        var seq = ++state.detailSeq;\n        state.detail = null;\n        document.getElementById('detailTitle').textContent = 'Submission';\n        var body = document.getElementById('detailBody');\n        body.innerHTML = html;\n\n        document.getElementById('saveStatusBtn').addEventListener('click', function () {\n            updateSubmission(sub.Submission_ID, { Status: document.getElementById('detailStatus').value });\n        });\n        var artBtn = document.getElementById('artPushBtn');\n        if (artBtn) artBtn.addEventListener('click', function () { pushToArtHub(sub, payload, artBtn); });\n        var swBtn = document.getElementById('swPushBtn');\n        if (swBtn) swBtn.addEventListener('click', function () { showShopWorksPreview(sub, payload); });\n        body.querySelectorAll('[data-return-pk]').forEach(function (btn) {\n            btn.addEventListener('click', function () { checkInItem(btn.dataset.returnPk, 'Returned'); });\n        });\n        body.querySelectorAll('[data-charge-pk]').forEach(function (btn) {\n            btn.addEventListener('click', function () { checkInItem(btn.dataset.chargePk, 'Charged'); });\n        });\n    }\n\n",
+      "after": "    function renderDetail(sub, items) {\n        var meta = FORM_META[sub.Form_ID] || { label: sub.Form_ID, icon: 'fa-file', cls: '' };\n        document.getElementById('detailTitle').innerHTML =\n            '<span class=\"inbox-badge ' + meta.cls + '\"><i aria-hidden=\"true\" class=\"fas ' + meta.icon + '\"></i> ' + esc(meta.label) + '</span> ' +\n            '<button type=\"button\" class=\"copy-id btn\" title=\"Copy id\" aria-label=\"Copy id ' + esc(sub.Submission_ID) + '\" data-copy=\"' + esc(sub.Submission_ID) + '\">' + esc(sub.Submission_ID) + ' <i class=\"far fa-copy\" aria-hidden=\"true\"></i></button>' +\n            ' <span class=\"inbox-muted\">saved ' + esc(fmtStamp(sub.Submitted_At)) + '</span>';\n        var copyBtn = document.querySelector('#detailTitle .copy-id');\n        copyBtn.addEventListener('click', function () {\n            navigator.clipboard.writeText(copyBtn.dataset.copy).then(function () {\n                copyBtn.querySelector('i').className = 'fas fa-check';\n                setTimeout(function () { copyBtn.querySelector('i').className = 'far fa-copy'; }, 1200);\n            }).catch(function () { /* clipboard blocked — no-op */ });\n        });\n\n        var payload = {};\n        try { payload = JSON.parse(sub.Payload_JSON || '{}'); } catch (e) { /* renders empty */ }\n\n        var html = '';\n\n        // status row + actions\n        var choices = STATUS_CHOICES[sub.Form_ID] || ['New', 'Completed'];\n        html += '<div class=\"detail-actionbar no-print\">' +\n            '<label>Status <select id=\"detailStatus\" class=\"field-select\">' + choices.map(function (c) {\n                return '<option' + (c === sub.Status ? ' selected' : '') + '>' + esc(c) + '</option>';\n            }).join('') + '</select></label>' +\n            '<button type=\"button\" class=\"dash-btn dash-btn--primary btn\" id=\"saveStatusBtn\"><i class=\"fas fa-check\" aria-hidden=\"true\"></i> Save Status</button>';\n        if (sub.Form_ID === 'artwork-request') {\n            html += sub.Art_Request_ID\n                ? '<span class=\"inbox-status status--art\"><i class=\"fas fa-palette\" aria-hidden=\"true\"></i> Art Request #' + esc(sub.Art_Request_ID) + '</span>'\n                : '<button type=\"button\" class=\"dash-btn btn\" id=\"artPushBtn\"><i class=\"fas fa-palette\" aria-hidden=\"true\"></i> Create Art Request</button>';\n        }\n        if (sub.Form_ID === 'ae-order-intake') {\n            html += sub.Pushed_To_ShopWorks === 'Yes'\n                ? '<span class=\"inbox-status status--done\"><i class=\"fas fa-industry\" aria-hidden=\"true\"></i> ShopWorks: ' + esc(sub.ShopWorks_Order_ID || 'pushed') + '</span>'\n                : '<button type=\"button\" class=\"dash-btn btn\" id=\"swPushBtn\"><i class=\"fas fa-industry\" aria-hidden=\"true\"></i> Push to ShopWorks…</button>';\n        }\n        html += '<span class=\"inbox-muted\" id=\"detailActionMsg\"></span></div>';\n\n        // header fields\n        if (payload.fields && payload.fields.length) {\n            html += '<div class=\"detail-fields\">' + payload.fields.map(function (pair) {\n                if (!pair[1]) return '';\n                return '<div class=\"detail-field\"><span>' + esc(pair[0]) + '</span><strong>' + esc(pair[1]) + '</strong></div>';\n            }).join('') + '</div>';\n        }\n\n        // checks\n        if (payload.checks && payload.checks.length) {\n            html += '<div class=\"detail-checks\">' + payload.checks.map(function (c) {\n                return '<span class=\"inbox-badge badge--check\"><i class=\"fas fa-check\" aria-hidden=\"true\"></i> ' + esc(c) + '</span>';\n            }).join('') + '</div>';\n        }\n\n        // tables\n        (payload.tables || []).forEach(function (t) {\n            if (!t.rows || !t.rows.length) return;\n            html += '<h3 class=\"detail-subhead\">' + esc(t.title || 'Details') + '</h3>' +\n                '<div class=\"inbox-tablewrap table-wrap\" tabindex=\"0\" role=\"region\" aria-label=\"Scrollable record table\"><table class=\"inbox-table inbox-table--payload data-table\"><thead><tr>' +\n                (t.columns || []).map(function (c) { return '<th>' + esc(c) + '</th>'; }).join('') +\n                '</tr></thead><tbody>' +\n                t.rows.map(function (r) {\n                    return '<tr>' + r.map(function (c) { return '<td>' + esc(c) + '</td>'; }).join('') + '</tr>';\n                }).join('') + '</tbody></table></div>';\n        });\n\n        // sample items with check-in buttons\n        if (sub.Form_ID === 'sample-checkout' && items.length) {\n            html += '<h3 class=\"detail-subhead\">Sample Items</h3><div class=\"inbox-tablewrap table-wrap\" tabindex=\"0\" role=\"region\" aria-label=\"Scrollable record table\"><table class=\"inbox-table data-table\"><thead><tr>' +\n                '<th>#</th><th>Brand</th><th>Style</th><th>Description</th><th>Color</th><th>Size</th><th>Qty</th><th>Charge (75%)</th><th>Status</th><th>Returned</th><th class=\"no-print\"></th>' +\n                '</tr></thead><tbody>' +\n                items.map(function (it) {\n                    return '<tr><td>' + esc(it.Line_Number) + '</td><td>' + esc(it.Brand) + '</td><td>' + esc(it.Style) + '</td>' +\n                        '<td>' + esc(it.Description) + '</td><td>' + esc(it.Color) + '</td><td>' + esc(it.Size) + '</td><td>' + esc(it.Qty) + '</td>' +\n                        '<td>' + esc(it.Charge_Value) + '</td>' +\n                        '<td><span class=\"inbox-status ' + (it.Item_Status === 'Out' ? 'status--out' : (it.Item_Status === 'Charged' ? 'status--overdue' : 'status--done')) + '\">' + esc(it.Item_Status) + '</span></td>' +\n                        '<td>' + esc(it.Date_Returned ? fmtDay(it.Date_Returned) + (it.Condition ? ' · ' + it.Condition : '') : '') + '</td>' +\n                        '<td class=\"no-print\">' + (it.Item_Status === 'Out'\n                            ? '<button type=\"button\" class=\"dash-btn dash-btn--sm btn\" data-return-pk=\"' + esc(String(it.PK_ID)) + '\">Mark Returned</button> ' +\n                              '<button type=\"button\" class=\"dash-btn dash-btn--sm dash-btn--danger btn\" data-charge-pk=\"' + esc(String(it.PK_ID)) + '\">Charged</button>'\n                            : '') + '</td></tr>';\n                }).join('') + '</tbody></table></div>';\n        }\n\n        // notes\n        (payload.notes || []).forEach(function (pair) {\n            if (!pair[1]) return;\n            html += '<h3 class=\"detail-subhead\">' + esc(pair[0]) + '</h3><p class=\"detail-note\">' + esc(pair[1]) + '</p>';\n        });\n\n        var body = document.getElementById('detailBody');\n        body.innerHTML = html;\n\n        document.getElementById('saveStatusBtn').addEventListener('click', function () {\n            updateSubmission(sub.Submission_ID, { Status: document.getElementById('detailStatus').value });\n        });\n        var artBtn = document.getElementById('artPushBtn');\n        if (artBtn) artBtn.addEventListener('click', function () { pushToArtHub(sub, payload, artBtn); });\n        var swBtn = document.getElementById('swPushBtn');\n        if (swBtn) swBtn.addEventListener('click', function () { showShopWorksPreview(sub, payload); });\n        body.querySelectorAll('[data-return-pk]').forEach(function (btn) {\n            btn.addEventListener('click', function () { checkInItem(btn.dataset.returnPk, 'Returned'); });\n        });\n        body.querySelectorAll('[data-charge-pk]').forEach(function (btn) {\n            btn.addEventListener('click', function () { checkInItem(btn.dataset.chargePk, 'Charged'); });\n        });\n    }\n\n",
+      "count": 1,
+      "why": "Keep rendered detail title, selected record and generation; canonical status field"
+    },
+    {
+      "file": "dashboards/js/form-submissions.js",
+      "before": "        document.getElementById('detailOverlay').addEventListener('cancel', function (e) { e.preventDefault(); closeDetail(); });",
+      "after": "        document.getElementById('detailOverlay').addEventListener('cancel', function (e) { e.preventDefault(); closeDetail(); });\n        document.getElementById('detailOverlay').addEventListener('keydown', function (e) {\n            if (e.key !== 'Tab') return;\n            var controls = Array.from(e.currentTarget.querySelectorAll('a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex=\"-1\"])')).filter(function (el) { return el.getClientRects().length > 0; });\n            var first = controls[0], last = controls[controls.length - 1];\n            if (first && e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }\n            else if (last && !e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }\n        });",
+      "count": 1,
+      "why": "Cycle native dialog Tab and Shift+Tab through visible controls"
+    },
+    {
+      "file": "dashboards/js/lead-workspace.js",
+      "before": "        kitFetch('/items').then(function (body) {\n            var items = body.items || [];",
+      "after": "        kitFetch('/items').then(function (body) {\n            if (!overlay.isConnected) return;\n            if (!body || !Array.isArray(body.items)) throw new Error('Incomplete kit catalog');\n            var items = body.items;",
+      "count": 1,
+      "why": "Ignore closed kit catalog and reject malformed data"
+    },
+    {
+      "file": "dashboards/js/lead-workspace.js",
+      "before": "        }).catch(function (err) {\n            document.getElementById('lw-kit-items').innerHTML",
+      "after": "        }).catch(function (err) {\n            if (!overlay.isConnected) return;\n            document.getElementById('lw-kit-items').innerHTML",
+      "count": 1,
+      "why": "Closed kit failure cannot touch a new modal"
+    },
+    {
+      "file": "dashboards/js/lead-workspace.js",
+      "before": "    function openArtModal(lead) {",
+      "after": "    function openArtModal(lead) {\n        var leadSeq = state.loadSeq;",
+      "count": 1,
+      "why": "Bind art prefill to the selected lead"
+    },
+    {
+      "file": "dashboards/js/lead-workspace.js",
+      "before": "        ensureArtFormLoaded().then(function () {",
+      "after": "        ensureArtFormLoaded().then(function () {\n            if (leadSeq !== state.loadSeq || state.lead !== lead) return;",
+      "count": 1,
+      "why": "Ignore outdated art form loading"
+    },
+    {
+      "file": "dashboards/js/lead-workspace.js",
+      "before": "            modal.hidden = false;",
+      "after": "            modal.hidden = false;\n            document.querySelector('.dash-shell').inert = true;\n            document.body.classList.add('lead-art-open');",
+      "count": 1,
+      "why": "Keep background controls inert while shared art form is open"
+    },
+    {
+      "file": "dashboards/js/lead-workspace.js",
+      "before": "        m.hidden = true;\n        if (artReturnFocus",
+      "after": "        m.hidden = true;\n        document.querySelector('.dash-shell').inert = false;\n        document.body.classList.remove('lead-art-open');\n        if (artReturnFocus",
+      "count": 1,
+      "why": "Restore host interaction before returning art focus"
+    },
+    {
+      "file": "dashboards/js/lead-workspace.js",
+      "before": "                if (e.key === 'Escape' && m && !m.hidden) closeArtModal();",
+      "after": "                if (!m || m.hidden) return;\n                if (e.key === 'Escape') closeArtModal();\n                if (e.key === 'Tab') {\n                    var controls = Array.from(m.querySelectorAll('a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex=\"-1\"])')).filter(function (el) { return el.getClientRects().length > 0; });\n                    var first = controls[0], last = controls[controls.length - 1];\n                    if (first && e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }\n                    else if (last && !e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }\n                }",
+      "count": 1,
+      "why": "Cycle shared art host focus without changing the form or its toast portal"
+    },
+    {
+      "file": "dashboards/js/lead-workspace.js",
+      "before": "                    if (timedOut) {\n                        DashPage.showError('The send timed out before the server confirmed — the email MAY have gone out. Reload the page to check the timeline before resending, so ' + lead.Email + ' isn\\'t emailed twice.');\n                    } else {\n                        DashPage.showError('Email NOT sent: ' + err.message);\n                    }",
+      "after": "                    var message = timedOut\n                        ? 'The send timed out before the server confirmed — the email MAY have gone out. Reload the page to check the timeline before resending, so ' + lead.Email + ' isn\\'t emailed twice.'\n                        : 'Email NOT sent: ' + err.message;\n                    if (note) { note.textContent = message; note.setAttribute('role', 'alert'); }\n                    DashPage.showError(message);",
+      "count": 1,
+      "why": "Keep existing timeout safety wording visible beside the send action"
+    },
+    {
+      "file": "dashboards/js/lead-workspace.js",
+      "before": "    function renderQuotePanel(lead) {\n        var root = document.getElementById('lw-panel-quote');\n\n        function manualLinkHtml() {\n            return '<div class=\"lw-quote-row\">' +\n                '<input type=\"text\" id=\"lw-quote-id\" class=\"lw-quote-input field-input\" placeholder=\"Quote ID (e.g. EMB0718-1)\" aria-label=\"Quote ID to link\">' +\n                '<button type=\"button\" id=\"lw-quote-link\" class=\"ld-btn btn\" aria-label=\"Link quote\"><i class=\"fas fa-link\" aria-hidden=\"true\"></i></button>' +\n                '</div>';\n        }\n\n        if (lead.Linked_Quote_ID) {\n            root.innerHTML = '<div class=\"lw-quote-linked\">' +\n                '<div class=\"ld-match-head\"><span class=\"ld-id\">' + esc(lead.Linked_Quote_ID) + '</span>' +\n                '<span class=\"lw-quote-linked-actions\">' +\n                '<a class=\"ld-btn\" href=\"/quote/' + encodeURIComponent(lead.Linked_Quote_ID) + '\" target=\"_blank\" rel=\"noopener\">Open</a>' +\n                '<button type=\"button\" id=\"lw-quote-unlink\" class=\"lw-chip btn\" title=\"Unlink this quote from the lead\">Unlink</button>' +\n                '</span></div>' +\n                '<div id=\"lw-quote-live\" class=\"ld-muted\">Loading quote…</div></div>';\n            document.getElementById('lw-quote-unlink').addEventListener('click', function () { unlinkQuote(lead); });\n            sameOriginJson('/api/quote_sessions?quoteID=' + encodeURIComponent(lead.Linked_Quote_ID))\n                .then(function (body) {\n                    var rows = Array.isArray(body) ? body : (body.sessions || body.result || []);\n                    var q = rows[0];\n                    var el = document.getElementById('lw-quote-live');\n                    if (!el) return;\n                    if (!q) {\n                        // Linked to an ID that doesn't exist (e.g. a typo to a valid-\n                        // format but missing quote). Say so AND keep the Unlink button\n                        // visible above so it's recoverable — never re-sync $ from it.\n                        el.innerHTML = '<span class=\"lw-quote-missing\">Quote ' + esc(lead.Linked_Quote_ID) + ' not found — use Unlink to correct it.</span>';\n                        return;\n                    }\n                    el.outerHTML = '<div class=\"lw-quote-amount\">' + (fmtMoney(q.TotalAmount) || '—') + '</div>' +\n                        '<div class=\"ld-muted\">' + esc(q.Status || '') + (q.CustomerName ? ' · ' + esc(q.CustomerName) : '') + '</div>';\n                    // Snapshot re-sync: the quote's real total drives pipeline $.\n                    var total = q.TotalAmount != null ? String(q.TotalAmount) : '';\n                    if (total && String(lead.Lead_Value || '') !== total) {\n                        saveLeadField('Lead_Value', total, null).then(function (ok) { if (ok) renderValuePanel(lead); });\n                    }\n                })\n                .catch(function () {\n                    var el = document.getElementById('lw-quote-live');\n                    if (el) el.textContent = 'Quote lookup unavailable.';\n                });\n            return;\n        }\n\n        root.innerHTML =\n            '<div class=\"lw-intel-title\">Start a quote — prefilled with this lead</div>' +\n            '<div class=\"lw-method-grid\">' + QUOTE_BUILDERS.map(function (b, i) {\n                return '<button type=\"button\" class=\"ld-btn lw-method-btn btn\" data-builder=\"' + i + '\">' +\n                    '<i class=\"fas ' + b.icon + '\" aria-hidden=\"true\"></i> ' + b.label + '</button>';\n            }).join('') + '</div>' +\n            '<div class=\"lw-intel-title\">Recent quotes for this email</div>' +\n            '<div id=\"lw-quote-suggest\"></div>' +\n            manualLinkHtml();\n\n        Array.prototype.forEach.call(root.querySelectorAll('[data-builder]'), function (b) {\n            b.addEventListener('click', function () { startQuote(QUOTE_BUILDERS[parseInt(b.getAttribute('data-builder'), 10)].url); });\n        });\n        loadQuoteSuggestions(lead);\n        document.getElementById('lw-quote-link').addEventListener('click', function () {\n            var id = document.getElementById('lw-quote-id').value.trim();\n            if (!/^[A-Za-z0-9-]{3,40}$/.test(id)) { DashPage.showError('That does not look like a Quote ID.'); return; }\n            // Verify the quote EXISTS before linking — a typo to a valid-format ID\n            // used to save silently and lock the panel to \"Quote not found\" with no\n            // way out (and could clobber Lead_Value from the wrong quote).\n            var linkBtn = document.getElementById('lw-quote-link');\n            linkBtn.disabled = true;\n            sameOriginJson('/api/quote_sessions?quoteID=' + encodeURIComponent(id))\n                .then(function (body) {\n                    var rows = Array.isArray(body) ? body : (body.sessions || body.result || []);\n                    var q = rows[0];\n                    if (!q) { DashPage.showError('Quote ' + id + ' was not found — check the ID and try again.'); linkBtn.disabled = false; return; }\n                    linkQuote(lead, { QuoteID: q.QuoteID || id, TotalAmount: q.TotalAmount != null ? q.TotalAmount : null });\n                })\n                .catch(function (err) {\n                    DashPage.showError('Could not verify quote ' + id + ' (' + err.message + ').');\n                    linkBtn.disabled = false;\n                });\n        });\n    }\n\n",
+      "after": "    function renderQuotePanel(lead) {\n        var viewSeq = state.loadSeq;\n        var root = document.getElementById('lw-panel-quote');\n\n        function manualLinkHtml() {\n            return '<div class=\"lw-quote-row\">' +\n                '<input type=\"text\" id=\"lw-quote-id\" class=\"lw-quote-input field-input\" placeholder=\"Quote ID (e.g. EMB0718-1)\" aria-label=\"Quote ID to link\">' +\n                '<button type=\"button\" id=\"lw-quote-link\" class=\"ld-btn btn\" aria-label=\"Link quote\"><i class=\"fas fa-link\" aria-hidden=\"true\"></i></button>' +\n                '</div>';\n        }\n\n        if (lead.Linked_Quote_ID) {\n            root.innerHTML = '<div class=\"lw-quote-linked\">' +\n                '<div class=\"ld-match-head\"><span class=\"ld-id\">' + esc(lead.Linked_Quote_ID) + '</span>' +\n                '<span class=\"lw-quote-linked-actions\">' +\n                '<a class=\"ld-btn\" href=\"/quote/' + encodeURIComponent(lead.Linked_Quote_ID) + '\" target=\"_blank\" rel=\"noopener\">Open</a>' +\n                '<button type=\"button\" id=\"lw-quote-unlink\" class=\"lw-chip btn\" title=\"Unlink this quote from the lead\">Unlink</button>' +\n                '</span></div>' +\n                '<div id=\"lw-quote-live\" class=\"ld-muted\">Loading quote…</div></div>';\n            document.getElementById('lw-quote-unlink').addEventListener('click', function () { unlinkQuote(lead); });\n            var quoteId = lead.Linked_Quote_ID, quoteEl = document.getElementById('lw-quote-live');\n            var currentQuote = function () { return viewSeq === state.loadSeq && state.lead === lead && lead.Linked_Quote_ID === quoteId && quoteEl.isConnected; };\n            sameOriginJson('/api/quote_sessions?quoteID=' + encodeURIComponent(quoteId))\n                .then(function (body) {\n                    if (!currentQuote()) return;\n                    var rows = Array.isArray(body) ? body : (body && (body.sessions || body.result));\n                    if (!Array.isArray(rows)) throw new Error('Incomplete quote response');\n                    var q = rows[0];\n                    var el = quoteEl;\n                    if (!el) return;\n                    if (!q) {\n                        // Linked to an ID that doesn't exist (e.g. a typo to a valid-\n                        // format but missing quote). Say so AND keep the Unlink button\n                        // visible above so it's recoverable — never re-sync $ from it.\n                        el.innerHTML = '<span class=\"lw-quote-missing\">Quote ' + esc(lead.Linked_Quote_ID) + ' not found — use Unlink to correct it.</span>';\n                        return;\n                    }\n                    el.outerHTML = '<div class=\"lw-quote-amount\">' + (fmtMoney(q.TotalAmount) || '—') + '</div>' +\n                        '<div class=\"ld-muted\">' + esc(q.Status || '') + (q.CustomerName ? ' · ' + esc(q.CustomerName) : '') + '</div>';\n                    // Snapshot re-sync: the quote's real total drives pipeline $.\n                    var total = q.TotalAmount != null ? String(q.TotalAmount) : '';\n                    if (total && String(lead.Lead_Value || '') !== total) {\n                        saveLeadField('Lead_Value', total, null).then(function (ok) { if (ok) renderValuePanel(lead); });\n                    }\n                })\n                .catch(function () {\n                    if (!currentQuote()) return;\n                    var el = quoteEl;\n                    if (el) el.textContent = 'Quote lookup unavailable.';\n                });\n            return;\n        }\n\n        root.innerHTML =\n            '<div class=\"lw-intel-title\">Start a quote — prefilled with this lead</div>' +\n            '<div class=\"lw-method-grid\">' + QUOTE_BUILDERS.map(function (b, i) {\n                return '<button type=\"button\" class=\"ld-btn lw-method-btn btn\" data-builder=\"' + i + '\">' +\n                    '<i class=\"fas ' + b.icon + '\" aria-hidden=\"true\"></i> ' + b.label + '</button>';\n            }).join('') + '</div>' +\n            '<div class=\"lw-intel-title\">Recent quotes for this email</div>' +\n            '<div id=\"lw-quote-suggest\"></div>' +\n            manualLinkHtml();\n\n        Array.prototype.forEach.call(root.querySelectorAll('[data-builder]'), function (b) {\n            b.addEventListener('click', function () { startQuote(QUOTE_BUILDERS[parseInt(b.getAttribute('data-builder'), 10)].url); });\n        });\n        loadQuoteSuggestions(lead);\n        document.getElementById('lw-quote-link').addEventListener('click', function () {\n            var id = document.getElementById('lw-quote-id').value.trim();\n            if (!/^[A-Za-z0-9-]{3,40}$/.test(id)) { DashPage.showError('That does not look like a Quote ID.'); return; }\n            // Verify the quote EXISTS before linking — a typo to a valid-format ID\n            // used to save silently and lock the panel to \"Quote not found\" with no\n            // way out (and could clobber Lead_Value from the wrong quote).\n            var linkBtn = document.getElementById('lw-quote-link');\n            linkBtn.disabled = true;\n            sameOriginJson('/api/quote_sessions?quoteID=' + encodeURIComponent(id))\n                .then(function (body) {\n                    var rows = Array.isArray(body) ? body : (body.sessions || body.result || []);\n                    var q = rows[0];\n                    if (!q) { DashPage.showError('Quote ' + id + ' was not found — check the ID and try again.'); linkBtn.disabled = false; return; }\n                    linkQuote(lead, { QuoteID: q.QuoteID || id, TotalAmount: q.TotalAmount != null ? q.TotalAmount : null });\n                })\n                .catch(function (err) {\n                    DashPage.showError('Could not verify quote ' + id + ' (' + err.message + ').');\n                    linkBtn.disabled = false;\n                });\n        });\n    }\n\n",
+      "count": 1,
+      "why": "Only the current linked quote may render or trigger the existing value resync; malformed lookup remains unavailable"
+    }
+  ],
+  "retiredStyles": [
+    {
+      "file": "dashboards/css/leads.css",
+      "sha256": "4aa7a447cd299aabd6bdca16a97c0d735bfddce915356676124d2a4e85509983",
+      "bytes": 19261,
+      "important": 1
+    },
+    {
+      "file": "dashboards/css/lead-workspace.css",
+      "sha256": "53e61c59b2c315f3728f90717fd85bde44b641a02ba332274ecb96979f03e90f",
+      "bytes": 10662,
+      "important": 0
+    },
+    {
+      "file": "dashboards/css/form-submissions.css",
+      "sha256": "e2757ea03401104259d3f98388220994af361de61de64b3d2199ce38d45c6e94",
+      "bytes": 10970,
+      "important": 2
+    },
+    {
+      "file": "dashboards/css/marketing-shipments.css",
+      "sha256": "cea2a04e4756dcffce3b5b5dc4dcdc1f933696d4b463ec7280eb8c193c7a8358",
+      "bytes": 1110,
+      "important": 1
+    }
+  ]
+}

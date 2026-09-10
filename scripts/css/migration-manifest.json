@@ -4498,6 +4498,120 @@
         "rawCssBytes": 161142,
         "localCssRequests": 4
       }
+    },
+    {
+      "source": "dashboards/lead.html",
+      "family": "crm-records",
+      "status": "pilot",
+      "route": "/dashboards/lead.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/crm-pipeline.css",
+        "shared_components/css/crm-records.css"
+      ],
+      "dynamicStyles": [
+        "shared_components/css/garment-submit-form.css"
+      ],
+      "dynamicTokens": [
+        "--w"
+      ],
+      "states": [
+        "four-width-original-data-and-accessibility",
+        "native-inbox-dialog-focus-and-paper",
+        "lead-art-trigger-prefill-and-inert-focus",
+        "malformed-loading-empty-failure-retry",
+        "latest-lead-inbox-shipment-and-quote-response",
+        "mocked-kit-sample-shipment-and-outreach-failures",
+        "uncertain-outreach-warning",
+        "quote-handoff-and-current-value-sync",
+        "populated-customer-orders-quote-and-paper"
+      ],
+      "test": "tests/e2e/css-unification-lead-records.spec.js",
+      "maxCssBytes": 130493,
+      "measuredRawCssBytes": 129469,
+      "measuredTriggeredCssBytes": 165253,
+      "baseline": {
+        "commit": "d44f7551fc1d3a251c12599314f8c23b94fadea4",
+        "rawCssBytes": 186763,
+        "localCssRequests": 5
+      },
+      "runtimeBoundary": {
+        "status": "shared-module-migration-pending",
+        "note": "Original garment art module retained byte-for-byte; its lead trigger, four-width prefill, keyboard containment and close are reviewed. Shared art-module styling remains on the runtime-owner backlog."
+      }
+    },
+    {
+      "source": "dashboards/form-submissions.html",
+      "family": "crm-records",
+      "status": "pilot",
+      "route": "/dashboards/form-submissions.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/crm-pipeline.css",
+        "shared_components/css/crm-records.css"
+      ],
+      "dynamicStyles": [],
+      "dynamicTokens": [
+        "--w"
+      ],
+      "states": [
+        "four-width-original-data-and-accessibility",
+        "native-inbox-dialog-focus-and-paper",
+        "lead-art-trigger-prefill-and-inert-focus",
+        "malformed-loading-empty-failure-retry",
+        "latest-lead-inbox-shipment-and-quote-response",
+        "mocked-kit-sample-shipment-and-outreach-failures",
+        "uncertain-outreach-warning",
+        "quote-handoff-and-current-value-sync",
+        "populated-customer-orders-quote-and-paper"
+      ],
+      "test": "tests/e2e/css-unification-lead-records.spec.js",
+      "maxCssBytes": 130493,
+      "measuredRawCssBytes": 129469,
+      "measuredTriggeredCssBytes": 129469,
+      "baseline": {
+        "commit": "d44f7551fc1d3a251c12599314f8c23b94fadea4",
+        "rawCssBytes": 167810,
+        "localCssRequests": 4
+      }
+    },
+    {
+      "source": "dashboards/marketing-shipments.html",
+      "family": "crm-records",
+      "status": "pilot",
+      "route": "/dashboards/marketing-shipments.html",
+      "styles": [
+        "shared_components/css/tokens.css",
+        "shared_components/css/components.css",
+        "shared_components/css/crm-pipeline.css",
+        "shared_components/css/crm-records.css"
+      ],
+      "dynamicStyles": [],
+      "dynamicTokens": [
+        "--w"
+      ],
+      "states": [
+        "four-width-original-data-and-accessibility",
+        "native-inbox-dialog-focus-and-paper",
+        "lead-art-trigger-prefill-and-inert-focus",
+        "malformed-loading-empty-failure-retry",
+        "latest-lead-inbox-shipment-and-quote-response",
+        "mocked-kit-sample-shipment-and-outreach-failures",
+        "uncertain-outreach-warning",
+        "quote-handoff-and-current-value-sync",
+        "populated-customer-orders-quote-and-paper"
+      ],
+      "test": "tests/e2e/css-unification-lead-records.spec.js",
+      "maxCssBytes": 130493,
+      "measuredRawCssBytes": 129469,
+      "measuredTriggeredCssBytes": 129469,
+      "baseline": {
+        "commit": "d44f7551fc1d3a251c12599314f8c23b94fadea4",
+        "rawCssBytes": 177211,
+        "localCssRequests": 5
+      }
     }
   ],
   "billingContentSha256": "d85f8530e03a1863d1b8bb2ebe97ba332d5c9e3411887d1eb2d02dcdb14c0863",
@@ -4509,7 +4623,7 @@
         "dashboards/js/lead-workspace.js",
         "pages/js/quote-view.js"
       ],
-      "note": "Record trigger states before migrating their consumers."
+      "note": "Record trigger states before migrating their consumers. The lead workspace trigger is reviewed in crm-records (four widths, prefill, keyboard containment, close); garment-submit-form.css/js remain original and their shared-module modernization is still pending across all consumers."
     },
     {
       "kind": "style-injection",

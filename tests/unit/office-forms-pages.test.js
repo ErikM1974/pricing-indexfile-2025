@@ -38,7 +38,7 @@ describe('payroll', () => {
 describe('forms inbox', () => {
     const html = read('dashboards/form-submissions.html').replace(/<!--[\s\S]*?-->/g, '');
     const js = read('dashboards/js/form-submissions.js');
-    const css = read('dashboards/css/form-submissions.css');
+    const css = read('shared_components/css/crm-records.css');
     test('badges, chips, tiles, tabs', () => {
         expect(js).toMatch(/'manual-lead': \{ label: 'Manual Lead'/);
         expect(html).toMatch(/data-form="quote-request,sample-request,manual-lead" aria-pressed="false">Leads<\/button>/);
@@ -56,16 +56,16 @@ describe('forms inbox', () => {
         expect(noComments(js)).not.toMatch(/toISOString/);
         expect(js).toMatch(/detailReturnFocus = document\.activeElement;/);
         expect(js).toMatch(/if \(e\.key === 'Escape' && !document\.getElementById\('detailOverlay'\)\.hidden\) closeDetail\(\);/);
-        expect(js).toMatch(/class="dash-btn dash-btn--sm inbox-retry" data-retry="1">Retry<\/button>/);
+        expect(js).toMatch(/class="btn inbox-retry">Retry<\/button>/);
         expect(js).not.toMatch(/Refresh to retry/);
         expect(js).not.toMatch(/style="/);
         expect(js).not.toMatch(BARE);
         expect(js).not.toMatch(BARE_DYN);
         expect(html).not.toMatch(BARE);
-        expect(html).toMatch(/<button type="button" class="dash-error-banner-close" aria-label="Dismiss">/);
+        expect(html).toMatch(/<button type="button" class="dash-error-banner-close btn" aria-label="Dismiss">/);
         expect(html).toMatch(/id="inboxRefresh"/);
-        expect(css).toMatch(/^\[hidden\] \{ display: none !important; \}/m);
-        expect(css).toMatch(/\.sw-preview-body \{ width: 100%; \}/);
+        expect(read('shared_components/css/components.css')).toMatch(/\[hidden\]\s*\{\s*display: none;/);
+        expect(css).toMatch(/\.sw-preview-body\s*\{\s*width: 100%;/);
         expect(html).toMatch(/form-submissions\.js\?v=2026\.09\./);
     });
 });

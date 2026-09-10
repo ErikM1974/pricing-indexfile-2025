@@ -9,17 +9,17 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <!-- 2026 design tokens (must load before dash-shell.css) -->
+    <!-- Shared CRM primitives and scoped record layouts. -->
     <link rel="stylesheet" href="/shared_components/css/tokens.css?v=2026.09.08.2">
-    <link rel="stylesheet" href="/shared_components/css/art-hub.css?v=2026.09.07.19">
-    <link rel="stylesheet" href="/shared_components/css/dash-shell.css?v=2026.09.07.10">
-    <link rel="stylesheet" href="/dashboards/css/leads.css?v=2026.09.07.10">
-    <link rel="stylesheet" href="/dashboards/css/marketing-shipments.css?v=2026.09.07.10">
-</head>
-<body>
+    <link rel="stylesheet" href="/shared_components/css/components.css?v=2026.09.09.20">
+    <link rel="stylesheet" href="/shared_components/css/crm-pipeline.css?v=2026.09.09.20">
+    <link rel="stylesheet" href="/shared_components/css/crm-records.css?v=2026.09.09.20">
+                </head>
+<body data-ui="unified" data-crm-workspace="records" data-crm-record="marketing-shipments">
+    <a class="skip-link" href="#main-content">Skip to main content</a>
     <div class="dash-shell">
         <header class="dash-header">
             <div class="dash-header-left">
@@ -30,7 +30,7 @@
                 <h1 class="dash-header-title">Marketing Shipments</h1>
             </div>
             <div class="dash-header-right">
-                <button type="button" id="btn-refresh" class="ld-refresh-btn" title="Reload the queue">
+                <button type="button" id="btn-refresh" class="ld-refresh-btn btn" title="Reload the queue">
                     <i class="fas fa-rotate" aria-hidden="true"></i> Refresh
                 </button>
                 <a href="/staff-dashboard.html" class="dash-back-link">
@@ -39,11 +39,11 @@
             </div>
         </header>
 
-        <main class="dash-content">
+        <main class="dash-content" id="main-content" tabindex="-1">
             <div class="dash-error-banner" role="alert">
                 <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
                 <span class="dash-error-banner-message"></span>
-                <button class="dash-error-banner-close" aria-label="Dismiss"><i class="fas fa-times" aria-hidden="true"></i></button>
+                <button class="dash-error-banner-close btn" aria-label="Dismiss"><i class="fas fa-times" aria-hidden="true"></i></button>
             </div>
 
             <div class="dash-card">
@@ -51,13 +51,13 @@
                     <h2 class="dash-card-title">Kit queue</h2>
                     <span class="ld-count" id="ms-count"></span>
                     <div class="ld-view-toggle" role="group" aria-label="Status">
-                        <button type="button" class="ld-toggle-btn ms-tab" data-status="Requested" aria-pressed="true">Requested</button>
-                        <button type="button" class="ld-toggle-btn ms-tab" data-status="Packed" aria-pressed="false">Packed</button>
-                        <button type="button" class="ld-toggle-btn ms-tab" data-status="Shipped" aria-pressed="false">Shipped</button>
+                        <button type="button" class="ld-toggle-btn ms-tab btn" data-status="Requested" aria-pressed="true">Requested</button>
+                        <button type="button" class="ld-toggle-btn ms-tab btn" data-status="Packed" aria-pressed="false">Packed</button>
+                        <button type="button" class="ld-toggle-btn ms-tab btn" data-status="Shipped" aria-pressed="false">Shipped</button>
                     </div>
                 </div>
-                <div class="ld-table-scroll">
-                    <table class="ld-table" id="ms-table">
+                <div class="ld-table-scroll table-wrap" tabindex="0" role="region" aria-label="Shipment queue table">
+                    <table class="ld-table data-table" id="ms-table">
                         <thead>
                             <tr>
                                 <th>Requested</th>
@@ -80,6 +80,6 @@
     <script src="/config/app.config.js"></script>
     <script src="/shared_components/js/fetch-timeout.js?v=2026.09.06.26"></script>
     <script src="/shared_components/js/dash-page-helpers.js?v=2026.09.07.25"></script>
-    <script src="/dashboards/js/marketing-shipments.js?v=2026.09.06.27"></script>
+    <script src="/dashboards/js/marketing-shipments.js?v=2026.09.09.20"></script>
 </body>
 </html>

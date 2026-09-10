@@ -237,3 +237,15 @@ Six pages: House Accounts, Nika CRM, Taneisha CRM, Leads, Lead Scorecard and Unq
 Account CSS graphs123,166LFbytes versus54,563/59,002/59,002; pipeline97,911 versus176,101/161,043/161,142. This consolidates ownership; account payloads increased while pipeline payloads decreased. Full CSS scope278clean in isolated tree. Runtime census:155reviewed migrations locally/70pending/79excluded, but LIVE REMAINS149/76 on.18 until.19 is deployed and verified. Lessons250lines after archiving three resolved references. No real writes/uploads/emails/notifications; every API, including mutating GET reconcile, was intercepted.
 
 Next: integrate this exact reviewed SHA into clean develop, preserve the .18 live checkpoint, run all full application gates, then require actual browser/money/calculator steps in exact-source CI before one deployment. Verify release/running slug, both raw/versioned and registered hashed assets, prior staff/public access and four retired-sheet404 responses. Backend unchanged.
+
+- `shared_components/css/crm-records.css` — candidate shared lead-detail, Forms Inbox and Marketing Shipments layouts; isolated draft under review.
+
+- `tests/e2e/css-unification-lead-records.spec.js` — lead records original contracts, synthetic browser fixtures and focused preservation/recovery checks.
+
+- `tests/fixtures/lead-records-original-content.json` — lead records original contracts, synthetic browser fixtures and focused preservation/recovery checks.
+
+- `tests/fixtures/lead-records-review-data.json` — lead records original contracts, synthetic browser fixtures and focused preservation/recovery checks.
+
+- `tests/unit/lead-records-content.test.js` — lead records original contracts, synthetic browser fixtures and focused preservation/recovery checks.
+
+CRM records lifecycle review: dashboards/lead.html, dashboards/form-submissions.html and dashboards/marketing-shipments.html now use shared_components/css/crm-records.css with canonical components and the unchanged CRM pipeline owner. Retired dashboards/css/leads.css, dashboards/css/lead-workspace.css, dashboards/css/form-submissions.css, dashboards/css/marketing-shipments.css. The three tests/ui previews (test-lead-workspace, test-form-submissions, test-leads) mirror current production markup and retain API stubs; Inbox stubs now block unknown API traffic. Runtime art-module trigger reviewed; shared garment-submit-form.css/js remain original and pending modernization. The manifest records direct and triggered graph costs separately. Original content and 17 source hashes are retained in tests/fixtures/lead-records-original-content.json with 93 reversible controller edits and explicit retirement provenance. This is reviewed source preparation, not a production completion claim; live remains .19, 155/225 pages, 70 pending until verified deployment.
