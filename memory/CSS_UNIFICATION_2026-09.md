@@ -1,5 +1,17 @@
 # CSS unification — design direction and implementation plan
 
+## NEXT isolated batch — Streich Bros. and WCTTR employee bundles
+
+Source baseline only on codex/employee-bundle-workspaces. Both hosted label workspaces retain their exact Caspio providers, customer logos, approval instruction, three mail-merge steps and related bundle destinations. Five original local source hashes captured; no application edits or migration credit yet.
+
+- [x] Capture immutable HTML/CSS and content contracts before changes.
+- [ ] Capture original four-width provider/loading/failure/login/empty and paper boundaries with all business traffic synthetic.
+- [ ] Replace the two duplicated page sheets and Bootstrap with one scoped employee-bundle owner over tokens/components. Public Sans for legible operational text; retain customer logos and blue/yellow Streich versus graphite/orange WCTTR identities using shared palette tokens. Left-aligned logo/title, clear approval notice, three actual process steps and a generous horizontally contained provider area; related destinations stay intact. The provider controls/data remain provider-owned and explicitly outside wrapper migration credit.
+- [ ] Review responsive/keyboard/axe and full paper content, original source/payload contracts; update manifest/lifecycle and commit exact reviewed branch.
+- [ ] Integrate only after current four-tool release is verified; full app gates and exact-source CI before the next release.
+
+Primary develop a878f826 is validating the four-tool candidate180/225,45pending; live remains .4/2099/031e03aa,176/225. Never merge this advancing branch into that frozen release. Do not overlap browser servers, rerun consumed one-shots, copy.env or recursively delete the node_modules junction. Standing autonomous authorization applies.
+
 ## NEXT batch — all four staff tools reviewed; integrate and release
 
 Live remains v2026.09.10.4 / Heroku 2099 / 031e03aa8ec68ac0951fe95a47871637c0c8e25a: **176/225 reviewed pages, 49 pending**. The four reviewed drafts (Calibration, Records Admin, Box Labels, Staff Dashboard) bring the candidate to **180/225, 45 pending**, but are not yet deployed. Standing authorization continues; no permission questions or shutdown request.

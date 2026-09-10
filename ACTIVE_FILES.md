@@ -1,5 +1,7 @@
 # Active Files Registry
 
+- `tests/fixtures/employee-bundles-original-content.json` and `tests/unit/employee-bundles-content.test.js` — immutable Streich Bros./WCTTR source, provider and content contracts before CSS migration.
+
 - `shared_components/css/staff-home.css` — Scoped dark/green Staff Dashboard owner over shared controls; nine legacy staff-dashboard sheets remain only for historical UI harnesses.
 
 - Added shared_components/css/staff-box-labels.css: repack-station layout and keyboard controls; shared vendor-box-labels.css owns paper. Retired pages/css/box-labels.css; original preserved in the final-tools fixture.
