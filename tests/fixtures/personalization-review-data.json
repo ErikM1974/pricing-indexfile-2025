@@ -1,0 +1,235 @@
+{
+  "fixed": "2026-09-09T20:00:00Z",
+  "items": [
+    {
+      "styleNumber": "PC54",
+      "description": "Synthetic cotton tee",
+      "shirtColor": "Navy",
+      "size": "M",
+      "monogramName": "Avery",
+      "rowThreadColor": "White",
+      "rowLocation": "Left Chest"
+    },
+    {
+      "styleNumber": "L500",
+      "description": "Synthetic polo",
+      "shirtColor": "Red",
+      "size": "L",
+      "monogramName": "Jordan",
+      "rowThreadColor": "Black",
+      "rowLocation": "Right Chest"
+    }
+  ],
+  "monograms": [
+    {
+      "ID_Monogram": 99001,
+      "OrderNumber": 88001,
+      "CompanyName": "Synthetic Cedar Outfitters",
+      "SalesRepEmail": "review@example.test",
+      "TotalItems": 2,
+      "Status": "Submitted",
+      "CreatedAt": "2026-09-08T18:00:00Z",
+      "FontStyle": "Block",
+      "ThreadColors": "White, Black",
+      "Locations": "Left Chest, Right Chest",
+      "NotesToProduction": "Synthetic review only; preserve name spelling.",
+      "CreatedBy": "Review Staff",
+      "ItemsJSON": "[{\"styleNumber\":\"PC54\",\"description\":\"Synthetic cotton tee\",\"shirtColor\":\"Navy\",\"size\":\"M\",\"monogramName\":\"Avery\",\"rowThreadColor\":\"White\",\"rowLocation\":\"Left Chest\"},{\"styleNumber\":\"L500\",\"description\":\"Synthetic polo\",\"shirtColor\":\"Red\",\"size\":\"L\",\"monogramName\":\"Jordan\",\"rowThreadColor\":\"Black\",\"rowLocation\":\"Right Chest\"}]"
+    },
+    {
+      "ID_Monogram": 99002,
+      "OrderNumber": 88002,
+      "CompanyName": "Synthetic Harbor Team",
+      "SalesRepEmail": "review@example.test",
+      "TotalItems": 2,
+      "Status": "Printed",
+      "CreatedAt": "2026-09-07T18:00:00Z",
+      "FontStyle": "Block",
+      "ThreadColors": "White, Black",
+      "Locations": "Left Chest, Right Chest",
+      "NotesToProduction": "Synthetic review only; preserve name spelling.",
+      "CreatedBy": "Review Staff",
+      "ItemsJSON": "[{\"styleNumber\":\"PC54\",\"description\":\"Synthetic cotton tee\",\"shirtColor\":\"Navy\",\"size\":\"M\",\"monogramName\":\"Avery\",\"rowThreadColor\":\"White\",\"rowLocation\":\"Left Chest\"},{\"styleNumber\":\"L500\",\"description\":\"Synthetic polo\",\"shirtColor\":\"Red\",\"size\":\"L\",\"monogramName\":\"Jordan\",\"rowThreadColor\":\"Black\",\"rowLocation\":\"Right Chest\"}]"
+    },
+    {
+      "ID_Monogram": 99003,
+      "OrderNumber": 88003,
+      "CompanyName": "Synthetic Pine Club",
+      "SalesRepEmail": "review@example.test",
+      "TotalItems": 2,
+      "Status": "In Production",
+      "CreatedAt": "2026-09-06T18:00:00Z",
+      "FontStyle": "Block",
+      "ThreadColors": "White, Black",
+      "Locations": "Left Chest, Right Chest",
+      "NotesToProduction": "Synthetic review only; preserve name spelling.",
+      "CreatedBy": "Review Staff",
+      "ItemsJSON": "[{\"styleNumber\":\"PC54\",\"description\":\"Synthetic cotton tee\",\"shirtColor\":\"Navy\",\"size\":\"M\",\"monogramName\":\"Avery\",\"rowThreadColor\":\"White\",\"rowLocation\":\"Left Chest\"},{\"styleNumber\":\"L500\",\"description\":\"Synthetic polo\",\"shirtColor\":\"Red\",\"size\":\"L\",\"monogramName\":\"Jordan\",\"rowThreadColor\":\"Black\",\"rowLocation\":\"Right Chest\"}]"
+    }
+  ],
+  "groups": [
+    {
+      "id": "team-a",
+      "name": "Varsity",
+      "garments": [
+        {
+          "id": "shirt",
+          "label": "Shirt",
+          "style": "PC54",
+          "color": "Navy",
+          "hasBackPrint": true,
+          "hasFrontPrint": false,
+          "hasQty": true,
+          "hasBackLines": false
+        },
+        {
+          "id": "hoodie",
+          "label": "Hoodie",
+          "style": "PC78H",
+          "color": "Athletic Heather",
+          "hasBackPrint": false,
+          "hasFrontPrint": true,
+          "hasQty": true,
+          "hasBackLines": false
+        }
+      ],
+      "personColumns": [
+        "name",
+        "firstName",
+        "number"
+      ],
+      "customColumns": [
+        {
+          "id": "position",
+          "label": "Position"
+        }
+      ],
+      "defaults": {}
+    }
+  ],
+  "rows": [
+    {
+      "groupId": "team-a",
+      "lineNumber": 1,
+      "name": "Example",
+      "firstName": "Avery",
+      "number": "07",
+      "garmentData": {
+        "shirt": {
+          "size": "M",
+          "backPrint": "EXAMPLE",
+          "qty": 2
+        },
+        "hoodie": {
+          "size": "L",
+          "frontPrint": "Cedar",
+          "qty": 1
+        }
+      },
+      "custom": {
+        "position": "Goalkeeper"
+      }
+    },
+    {
+      "groupId": "team-a",
+      "lineNumber": 2,
+      "name": "Sample",
+      "firstName": "Jordan",
+      "number": "12",
+      "garmentData": {
+        "shirt": {
+          "size": "L",
+          "backPrint": "SAMPLE",
+          "qty": 1
+        },
+        "hoodie": {
+          "size": "XL",
+          "frontPrint": "Cedar",
+          "qty": 1
+        }
+      },
+      "custom": {
+        "position": "Defender"
+      }
+    }
+  ],
+  "rosters": [
+    {
+      "ID_Roster": 97001,
+      "RosterName": "Synthetic Cedar Varsity",
+      "CompanyName": "Synthetic Cedar Outfitters",
+      "OrderNumber": 88001,
+      "ContactName": "Review Buyer",
+      "ContactEmail": "buyer@example.test",
+      "SalesRep": "Review Staff",
+      "TotalPersons": 2,
+      "Status": "Draft",
+      "ModifiedAt": "2026-09-08T12:00:00",
+      "Notes": "Synthetic review only; preserve jersey numbers.",
+      "GroupsJSON": "[{\"id\":\"team-a\",\"name\":\"Varsity\",\"garments\":[{\"id\":\"shirt\",\"label\":\"Shirt\",\"style\":\"PC54\",\"color\":\"Navy\",\"hasBackPrint\":true,\"hasFrontPrint\":false,\"hasQty\":true,\"hasBackLines\":false},{\"id\":\"hoodie\",\"label\":\"Hoodie\",\"style\":\"PC78H\",\"color\":\"Athletic Heather\",\"hasBackPrint\":false,\"hasFrontPrint\":true,\"hasQty\":true,\"hasBackLines\":false}],\"personColumns\":[\"name\",\"firstName\",\"number\"],\"customColumns\":[{\"id\":\"position\",\"label\":\"Position\"}],\"defaults\":{}}]",
+      "RosterJSON": "[{\"groupId\":\"team-a\",\"lineNumber\":1,\"name\":\"Example\",\"firstName\":\"Avery\",\"number\":\"07\",\"garmentData\":{\"shirt\":{\"size\":\"M\",\"backPrint\":\"EXAMPLE\",\"qty\":2},\"hoodie\":{\"size\":\"L\",\"frontPrint\":\"Cedar\",\"qty\":1}},\"custom\":{\"position\":\"Goalkeeper\"}},{\"groupId\":\"team-a\",\"lineNumber\":2,\"name\":\"Sample\",\"firstName\":\"Jordan\",\"number\":\"12\",\"garmentData\":{\"shirt\":{\"size\":\"L\",\"backPrint\":\"SAMPLE\",\"qty\":1},\"hoodie\":{\"size\":\"XL\",\"frontPrint\":\"Cedar\",\"qty\":1}},\"custom\":{\"position\":\"Defender\"}}]"
+    },
+    {
+      "ID_Roster": 97002,
+      "RosterName": "Synthetic Harbor Team",
+      "CompanyName": "Synthetic Cedar Outfitters",
+      "OrderNumber": 88002,
+      "ContactName": "Review Buyer",
+      "ContactEmail": "buyer@example.test",
+      "SalesRep": "Review Staff",
+      "TotalPersons": 2,
+      "Status": "Submitted",
+      "ModifiedAt": "2026-09-07T12:00:00",
+      "Notes": "Synthetic review only; preserve jersey numbers.",
+      "GroupsJSON": "[{\"id\":\"team-a\",\"name\":\"Varsity\",\"garments\":[{\"id\":\"shirt\",\"label\":\"Shirt\",\"style\":\"PC54\",\"color\":\"Navy\",\"hasBackPrint\":true,\"hasFrontPrint\":false,\"hasQty\":true,\"hasBackLines\":false},{\"id\":\"hoodie\",\"label\":\"Hoodie\",\"style\":\"PC78H\",\"color\":\"Athletic Heather\",\"hasBackPrint\":false,\"hasFrontPrint\":true,\"hasQty\":true,\"hasBackLines\":false}],\"personColumns\":[\"name\",\"firstName\",\"number\"],\"customColumns\":[{\"id\":\"position\",\"label\":\"Position\"}],\"defaults\":{}}]",
+      "RosterJSON": "[{\"groupId\":\"team-a\",\"lineNumber\":1,\"name\":\"Example\",\"firstName\":\"Avery\",\"number\":\"07\",\"garmentData\":{\"shirt\":{\"size\":\"M\",\"backPrint\":\"EXAMPLE\",\"qty\":2},\"hoodie\":{\"size\":\"L\",\"frontPrint\":\"Cedar\",\"qty\":1}},\"custom\":{\"position\":\"Goalkeeper\"}},{\"groupId\":\"team-a\",\"lineNumber\":2,\"name\":\"Sample\",\"firstName\":\"Jordan\",\"number\":\"12\",\"garmentData\":{\"shirt\":{\"size\":\"L\",\"backPrint\":\"SAMPLE\",\"qty\":1},\"hoodie\":{\"size\":\"XL\",\"frontPrint\":\"Cedar\",\"qty\":1}},\"custom\":{\"position\":\"Defender\"}}]"
+    },
+    {
+      "ID_Roster": 97003,
+      "RosterName": "Synthetic Pine Club",
+      "CompanyName": "Synthetic Cedar Outfitters",
+      "OrderNumber": 88003,
+      "ContactName": "Review Buyer",
+      "ContactEmail": "buyer@example.test",
+      "SalesRep": "Review Staff",
+      "TotalPersons": 2,
+      "Status": "In Production",
+      "ModifiedAt": "2026-09-06T12:00:00",
+      "Notes": "Synthetic review only; preserve jersey numbers.",
+      "GroupsJSON": "[{\"id\":\"team-a\",\"name\":\"Varsity\",\"garments\":[{\"id\":\"shirt\",\"label\":\"Shirt\",\"style\":\"PC54\",\"color\":\"Navy\",\"hasBackPrint\":true,\"hasFrontPrint\":false,\"hasQty\":true,\"hasBackLines\":false},{\"id\":\"hoodie\",\"label\":\"Hoodie\",\"style\":\"PC78H\",\"color\":\"Athletic Heather\",\"hasBackPrint\":false,\"hasFrontPrint\":true,\"hasQty\":true,\"hasBackLines\":false}],\"personColumns\":[\"name\",\"firstName\",\"number\"],\"customColumns\":[{\"id\":\"position\",\"label\":\"Position\"}],\"defaults\":{}}]",
+      "RosterJSON": "[{\"groupId\":\"team-a\",\"lineNumber\":1,\"name\":\"Example\",\"firstName\":\"Avery\",\"number\":\"07\",\"garmentData\":{\"shirt\":{\"size\":\"M\",\"backPrint\":\"EXAMPLE\",\"qty\":2},\"hoodie\":{\"size\":\"L\",\"frontPrint\":\"Cedar\",\"qty\":1}},\"custom\":{\"position\":\"Goalkeeper\"}},{\"groupId\":\"team-a\",\"lineNumber\":2,\"name\":\"Sample\",\"firstName\":\"Jordan\",\"number\":\"12\",\"garmentData\":{\"shirt\":{\"size\":\"L\",\"backPrint\":\"SAMPLE\",\"qty\":1},\"hoodie\":{\"size\":\"XL\",\"frontPrint\":\"Cedar\",\"qty\":1}},\"custom\":{\"position\":\"Defender\"}}]"
+    },
+    {
+      "ID_Roster": 97004,
+      "RosterName": "Synthetic Maple Crew",
+      "CompanyName": "Synthetic Cedar Outfitters",
+      "OrderNumber": 88004,
+      "ContactName": "Review Buyer",
+      "ContactEmail": "buyer@example.test",
+      "SalesRep": "Review Staff",
+      "TotalPersons": 2,
+      "Status": "Completed",
+      "ModifiedAt": "2026-09-05T12:00:00",
+      "Notes": "Synthetic review only; preserve jersey numbers.",
+      "GroupsJSON": "[{\"id\":\"team-a\",\"name\":\"Varsity\",\"garments\":[{\"id\":\"shirt\",\"label\":\"Shirt\",\"style\":\"PC54\",\"color\":\"Navy\",\"hasBackPrint\":true,\"hasFrontPrint\":false,\"hasQty\":true,\"hasBackLines\":false},{\"id\":\"hoodie\",\"label\":\"Hoodie\",\"style\":\"PC78H\",\"color\":\"Athletic Heather\",\"hasBackPrint\":false,\"hasFrontPrint\":true,\"hasQty\":true,\"hasBackLines\":false}],\"personColumns\":[\"name\",\"firstName\",\"number\"],\"customColumns\":[{\"id\":\"position\",\"label\":\"Position\"}],\"defaults\":{}}]",
+      "RosterJSON": "[{\"groupId\":\"team-a\",\"lineNumber\":1,\"name\":\"Example\",\"firstName\":\"Avery\",\"number\":\"07\",\"garmentData\":{\"shirt\":{\"size\":\"M\",\"backPrint\":\"EXAMPLE\",\"qty\":2},\"hoodie\":{\"size\":\"L\",\"frontPrint\":\"Cedar\",\"qty\":1}},\"custom\":{\"position\":\"Goalkeeper\"}},{\"groupId\":\"team-a\",\"lineNumber\":2,\"name\":\"Sample\",\"firstName\":\"Jordan\",\"number\":\"12\",\"garmentData\":{\"shirt\":{\"size\":\"L\",\"backPrint\":\"SAMPLE\",\"qty\":1},\"hoodie\":{\"size\":\"XL\",\"frontPrint\":\"Cedar\",\"qty\":1}},\"custom\":{\"position\":\"Defender\"}}]"
+    }
+  ],
+  "colors": [
+    {
+      "Thead_ID": 1,
+      "Thread_Color": "White",
+      "Hex_Color": "#FFFFFF"
+    },
+    {
+      "Thead_ID": 2,
+      "Thread_Color": "Black",
+      "Hex_Color": "#000000"
+    },
+    {
+      "Thead_ID": 3,
+      "Thread_Color": "Gold",
+      "Hex_Color": "#F2C94C"
+    }
+  ]
+}

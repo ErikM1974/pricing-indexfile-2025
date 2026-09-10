@@ -296,7 +296,7 @@ class MonogramFormService {
 
             const result = await response.json();
 
-            if (result.success) {
+            if (response.ok && result.success === true && Number.isInteger(Number(result.monogram?.ID_Monogram)) && Number(result.monogram.ID_Monogram) > 0) {
                 // Also save to localStorage as backup
                 this.saveToLocalStorage(sessionData.orderNumber, { session: payload, items: validItems });
 
@@ -332,10 +332,10 @@ class MonogramFormService {
             const response = await fetch(`${this.baseURL}/api/monograms?${params}`);
             const data = await response.json();
 
-            if (data.success) {
+            if (response.ok && data.success === true && Array.isArray(data.monograms)) {
                 return {
                     success: true,
-                    sessions: data.monograms || [],
+                    sessions: data.monograms,
                     count: data.count || 0,
                     source: 'database'
                 };
@@ -366,15 +366,14 @@ class MonogramFormService {
             const response = await fetch(`${this.baseURL}/api/monograms/${orderNumber}`);
             const data = await response.json();
 
-            if (data.success && data.monogram) {
+            if (response.ok && data.success === true && data.monogram) {
                 const monogram = data.monogram;
 
-                // Parse ItemsJSON back to array
-                let items = [];
-                try {
-                    items = JSON.parse(monogram.ItemsJSON || '[]');
-                } catch (e) {
-                    console.warn('[MonogramService] Failed to parse ItemsJSON:', e);
+                // Reject malformed production details before replacing any current entries.
+                const items = JSON.parse(monogram.ItemsJSON);
+                if (!Array.isArray(items) || items.some(item => !item || typeof item !== 'object') ||
+                    String(monogram.OrderNumber) !== String(orderNumber)) {
+                    throw new Error('Incomplete monogram details');
                 }
 
                 return {

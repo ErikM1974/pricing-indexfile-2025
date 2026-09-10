@@ -4138,3 +4138,20 @@ These resolved items were already archived in full; redundant active-memory refe
 ### Forms family migration (2026-09-07, archived): verify the served family inventory; formatter fixes can change appearance. Full entry in LESSONS_LEARNED_ARCHIVE.md.
 
 ### Training family migration (2026-09-07, archived): retain flags that override inline styles; verify print and page-specific tokens. Full entry in LESSONS_LEARNED_ARCHIVE.md.
+
+## 2026-09-08 — Node runtime and dependency audit must match CI
+
+**Problem.** Production and CI selected Node 18 while local checks ran Node 22; 17 high audit findings remained.
+**Root cause.** Old lockfile resolutions and exact transitive pins kept vulnerable packages installed.
+**Solution.** Select Node 22 in engines and all CI jobs; Express 4.22.2, Axios 1.20.0, compatible audit fixes,
+and a qs 6.16 override (Express/body-parser pin an older minor). The repository Actions secret is now configured
+with Erik's explicit approval; verify the live-engine step actually runs on the next CI push.
+**Prevention.** Audit the resolved tree after updating: a green install is not a clean audit. Preserve CRLF in
+these two already-CRLF-tracked package files to avoid hiding the dependency diff. Major upgrades stay separate.
+
+## 2026-09-07 — DTF browser checks must await initialization
+
+**Problem:** The money-path test typed before the search listener existed; its trace contained no product lookup.
+**Root cause:** The search box is visible before async pricing initialization binds listeners.
+**Solution:** In the browser test, await the existing end-of-init inline overlay state before typing. Production code and money assertions are unchanged.
+**Prevention:** Wait for functional readiness, not merely static HTML visibility; retain both blocked-save and successful-save coverage.

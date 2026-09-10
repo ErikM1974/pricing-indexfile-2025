@@ -186,6 +186,9 @@ class MonogramFormController {
 
         // Bind toggle button
         toggleBtn.addEventListener('click', () => this.toggleThreadColorDropdown());
+        dropdown.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') { event.preventDefault(); this.closeThreadColorDropdown(); toggleBtn.focus(); }
+        });
 
         // Bind Done button
         if (doneBtn) {
@@ -193,6 +196,7 @@ class MonogramFormController {
                 e.stopPropagation();
                 e.preventDefault();
                 this.closeThreadColorDropdown();
+                toggleBtn.focus();
                 // Auto-fill rows if only one thread color selected
                 this.autoFillThreadColorIfSingle();
             });
@@ -229,6 +233,7 @@ class MonogramFormController {
             // Remembered (not just toasted) so the proof sheet can say its colors
             // are approximations rather than silently printing guessed hexes
             this.threadColorsFailed = true;
+            this.renderThreadColorOptions();
             this.showToast('Failed to load thread colors', 'error');
         }
     }
@@ -244,7 +249,8 @@ class MonogramFormController {
 
         const isHidden = dropdown.hidden;
         dropdown.hidden = !isHidden;
-        toggleBtn.classList.toggle('open', !isHidden);
+        toggleBtn.classList.toggle('open', isHidden);
+        toggleBtn.setAttribute('aria-expanded', String(isHidden));
 
         // Focus search input when opening
         if (!isHidden === false) {
@@ -265,7 +271,7 @@ class MonogramFormController {
         const toggleBtn = document.getElementById('threadColorBtn');
 
         if (dropdown) dropdown.hidden = true;
-        if (toggleBtn) toggleBtn.classList.remove('open');
+        if (toggleBtn) { toggleBtn.classList.remove('open'); toggleBtn.setAttribute('aria-expanded', 'false'); }
     }
 
     /**
@@ -275,13 +281,18 @@ class MonogramFormController {
         const listEl = document.getElementById('threadColorList');
         if (!listEl) return;
 
+        if (this.threadColorsFailed) {
+            listEl.innerHTML = '<p role="alert">Thread colors are unavailable.</p><button type="button" class="btn btn-secondary">Retry thread colors</button>';
+            listEl.querySelector('button').addEventListener('click', () => { this.threadColorsReady = this.loadThreadColors(); });
+            return;
+        }
         const filter = filterText.toLowerCase();
         const filteredColors = this.threadColors.filter(color =>
             color.Thread_Color.toLowerCase().includes(filter)
         );
 
         if (filteredColors.length === 0) {
-            listEl.innerHTML = '<div class="thread-color-option" style="color: var(--text-secondary);">No colors found</div>';
+            listEl.innerHTML = '<div class="thread-color-empty">No colors found</div>';
             return;
         }
 
@@ -299,6 +310,8 @@ class MonogramFormController {
         listEl.querySelectorAll('.thread-color-option').forEach(option => {
             option.addEventListener('click', (e) => {
                 // Don't toggle if clicking directly on checkbox (it handles itself)
+                // A label dispatches its own native checkbox click; do not toggle twice.
+                if (e.target.closest('label')) return;
                 if (e.target.type !== 'checkbox') {
                     const checkbox = option.querySelector('input[type="checkbox"]');
                     checkbox.checked = !checkbox.checked;
@@ -470,6 +483,9 @@ class MonogramFormController {
 
         // Bind toggle button
         toggleBtn.addEventListener('click', () => this.toggleLocationDropdown());
+        dropdown.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') { event.preventDefault(); this.closeLocationDropdown(); toggleBtn.focus(); }
+        });
 
         // Bind Done button
         if (doneBtn) {
@@ -477,6 +493,7 @@ class MonogramFormController {
                 e.stopPropagation();
                 e.preventDefault();
                 this.closeLocationDropdown();
+                toggleBtn.focus();
                 // Auto-fill rows if only one location selected
                 this.autoFillLocationIfSingle();
             });
@@ -513,7 +530,9 @@ class MonogramFormController {
 
         const isHidden = dropdown.hidden;
         dropdown.hidden = !isHidden;
-        toggleBtn.classList.toggle('open', !isHidden);
+        toggleBtn.classList.toggle('open', isHidden);
+        toggleBtn.setAttribute('aria-expanded', String(isHidden));
+        if (isHidden) dropdown.querySelector('input')?.focus();
     }
 
     /**
@@ -524,7 +543,7 @@ class MonogramFormController {
         const toggleBtn = document.getElementById('locationBtn');
 
         if (dropdown) dropdown.hidden = true;
-        if (toggleBtn) toggleBtn.classList.remove('open');
+        if (toggleBtn) { toggleBtn.classList.remove('open'); toggleBtn.setAttribute('aria-expanded', 'false'); }
     }
 
     /**
@@ -548,6 +567,8 @@ class MonogramFormController {
         // Bind click events to options
         listEl.querySelectorAll('.location-option').forEach(option => {
             option.addEventListener('click', (e) => {
+                // A label dispatches its own native checkbox click; do not toggle twice.
+                if (e.target.closest('label')) return;
                 if (e.target.type !== 'checkbox') {
                     const checkbox = option.querySelector('input[type="checkbox"]');
                     checkbox.checked = !checkbox.checked;
@@ -572,7 +593,7 @@ class MonogramFormController {
         // Show/hide Other input based on whether "Other" is selected
         const otherInputContainer = document.getElementById('locationOtherInput');
         if (otherInputContainer) {
-            otherInputContainer.style.display = this.selectedLocations.includes('Other') ? 'block' : 'none';
+            otherInputContainer.hidden = !this.selectedLocations.includes('Other');
         }
 
         this.renderSelectedLocationTags();
@@ -672,7 +693,7 @@ class MonogramFormController {
         const otherInputContainer = document.getElementById('locationOtherInput');
         if (otherInput) otherInput.value = this.otherLocationText;
         if (otherInputContainer) {
-            otherInputContainer.style.display = this.selectedLocations.includes('Other') ? 'block' : 'none';
+            otherInputContainer.hidden = !this.selectedLocations.includes('Other');
         }
 
         this.renderSelectedLocationTags();
@@ -862,11 +883,11 @@ class MonogramFormController {
         const available = this.getAvailableNames();
 
         if (this.importedNames.length === 0) {
-            panel.style.display = 'none';
+            panel.hidden = true;
             return;
         }
 
-        panel.style.display = 'block';
+        panel.hidden = false;
         countEl.textContent = `(${available.length} remaining)`;
 
         if (available.length === 0) {
@@ -905,7 +926,7 @@ class MonogramFormController {
 
             if (dropdown) {
                 // Show/hide dropdown based on whether names are imported
-                dropdown.style.display = hasImportedNames ? 'block' : 'none';
+                dropdown.hidden = !hasImportedNames;
 
                 // Rebuild options (excluding used names)
                 const currentValue = dropdown.value;
@@ -962,12 +983,15 @@ class MonogramFormController {
             return;
         }
 
+        const view = this._viewSeq = (this._viewSeq || 0) + 1;
+        this.setLoadFailure(null);
         this.showOrderStatus('loading', 'Looking up order...');
-        this.showLoading('Looking up order in ShopWorks...');
+        const loading = this.showLoading('Looking up order in ShopWorks...');
 
         try {
             const result = await this.service.lookupOrder(orderNumber);
 
+            if (view !== this._viewSeq) return;
             if (result.success) {
                 this.orderData = result.order;
                 this.products = result.products;
@@ -984,7 +1008,7 @@ class MonogramFormController {
                     );
                     this.showToast('Order loaded successfully', 'success');
                     // Auto-hide order status after brief display
-                    setTimeout(() => this.hideOrderStatus(), 2000);
+                    setTimeout(() => { if (view === this._viewSeq) this.hideOrderStatus(); }, 2000);
                 } else {
                     // Order found but no garments - stay in manual mode
                     this.orderLoaded = false;
@@ -1005,6 +1029,7 @@ class MonogramFormController {
                 this.refreshAllRows();  // Ensure manual mode
             }
         } catch (error) {
+            if (view !== this._viewSeq) return;
             console.error('[MonogramController] Lookup error:', error);
             this.orderLoaded = false;
             this.products = [];
@@ -1012,7 +1037,7 @@ class MonogramFormController {
             this.showToast('Failed to look up order. Please try again.', 'error');
             this.refreshAllRows();  // Ensure manual mode on error
         } finally {
-            this.hideLoading();
+            this.hideLoading(loading);
         }
     }
 
@@ -1023,7 +1048,7 @@ class MonogramFormController {
 
         if (!statusEl || !badgeEl || !textEl) return;
 
-        statusEl.style.display = 'block';
+        statusEl.hidden = false;
         badgeEl.className = `status-badge status-${type}`;
 
         // Set icon based on type
@@ -1040,7 +1065,7 @@ class MonogramFormController {
     hideOrderStatus() {
         const statusEl = document.getElementById('orderStatus');
         if (statusEl) {
-            statusEl.style.display = 'none';
+            statusEl.hidden = true;
         }
     }
 
@@ -1122,35 +1147,35 @@ class MonogramFormController {
         return `
             <td class="row-number">${rowNum}</td>
             <td>
-                <select class="style-input" data-row="${rowNum}">
+                <select aria-label="Row ${rowNum}: Style" class="field-select style-input" data-row="${rowNum}">
                     <option value="">Select...</option>
                     ${styleOptions}
                     <option value="__custom__">Other (type below)</option>
                 </select>
-                <input type="text" class="style-custom" placeholder="Custom style"
-                       style="display:none; margin-top:4px;">
+                <input aria-label="Row ${rowNum}: Custom style" type="text" class="field-input style-custom" placeholder="Custom style"
+                       hidden>
             </td>
             <td>
-                <input type="text" class="description-input input-readonly" readonly
+                <input aria-label="Row ${rowNum}: Description" type="text" class="field-input description-input input-readonly" readonly
                        placeholder="Auto-fills from style">
             </td>
             <td>
-                <input type="text" class="color-input" data-row="${rowNum}"
+                <input aria-label="Row ${rowNum}: Shirt color" type="text" class="field-input color-input" data-row="${rowNum}"
                        placeholder="Shirt color">
             </td>
             <td>
-                <select class="size-input" data-row="${rowNum}">
+                <select aria-label="Row ${rowNum}: Size" class="field-select size-input" data-row="${rowNum}">
                     <option value="">Select...</option>
                     ${sizeOptions}
                 </select>
             </td>
             <td class="cell-thread-location">
                 <div class="cell-content">
-                    <select class="row-thread-color" data-row="${rowNum}">
+                    <select aria-label="Row ${rowNum}: Thread color" class="field-select row-thread-color" data-row="${rowNum}">
                         <option value="">Thread...</option>
                         ${threadColorOptions}
                     </select>
-                    <select class="row-location" data-row="${rowNum}">
+                    <select aria-label="Row ${rowNum}: Location" class="field-select row-location" data-row="${rowNum}">
                         <option value="">Location...</option>
                         ${locationOptions}
                     </select>
@@ -1158,14 +1183,14 @@ class MonogramFormController {
             </td>
             <td class="cell-name">
                 <div class="cell-content">
-                    <select class="name-dropdown" data-row="${rowNum}" style="display: none;">
+                    <select aria-label="Row ${rowNum}: Imported name" class="field-select name-dropdown" data-row="${rowNum}" hidden>
                         <option value="">Select name...</option>
                     </select>
-                    <input type="text" class="name-input" placeholder="Name to embroider">
+                    <input aria-label="Row ${rowNum}: Monogram name" type="text" class="field-input name-input" placeholder="Name to embroider">
                 </div>
             </td>
             <td>
-                <button type="button" class="btn-delete-row" title="Delete row">
+                <button type="button" class="btn btn-secondary btn-delete-row" title="Delete row" aria-label="Delete row ${rowNum}">
                     <i class="fas fa-times" aria-hidden="true"></i>
                 </button>
             </td>
@@ -1183,29 +1208,29 @@ class MonogramFormController {
         return `
             <td class="row-number">${rowNum}</td>
             <td>
-                <input type="text" class="style-input manual-entry" data-row="${rowNum}"
+                <input aria-label="Row ${rowNum}: Style" type="text" class="field-input style-input manual-entry" data-row="${rowNum}"
                        placeholder="Style #">
             </td>
             <td>
-                <input type="text" class="description-input" placeholder="Description">
+                <input aria-label="Row ${rowNum}: Description" type="text" class="field-input description-input" placeholder="Description">
             </td>
             <td>
-                <input type="text" class="color-input" data-row="${rowNum}"
+                <input aria-label="Row ${rowNum}: Shirt color" type="text" class="field-input color-input" data-row="${rowNum}"
                        placeholder="Shirt color">
             </td>
             <td>
-                <select class="size-input" data-row="${rowNum}">
+                <select aria-label="Row ${rowNum}: Size" class="field-select size-input" data-row="${rowNum}">
                     <option value="">Select...</option>
                     ${sizeOptions}
                 </select>
             </td>
             <td class="cell-thread-location">
                 <div class="cell-content">
-                    <select class="row-thread-color" data-row="${rowNum}">
+                    <select aria-label="Row ${rowNum}: Thread color" class="field-select row-thread-color" data-row="${rowNum}">
                         <option value="">Thread...</option>
                         ${threadColorOptions}
                     </select>
-                    <select class="row-location" data-row="${rowNum}">
+                    <select aria-label="Row ${rowNum}: Location" class="field-select row-location" data-row="${rowNum}">
                         <option value="">Location...</option>
                         ${locationOptions}
                     </select>
@@ -1213,14 +1238,14 @@ class MonogramFormController {
             </td>
             <td class="cell-name">
                 <div class="cell-content">
-                    <select class="name-dropdown" data-row="${rowNum}" style="display: none;">
+                    <select aria-label="Row ${rowNum}: Imported name" class="field-select name-dropdown" data-row="${rowNum}" hidden>
                         <option value="">Select name...</option>
                     </select>
-                    <input type="text" class="name-input" placeholder="Name to embroider">
+                    <input aria-label="Row ${rowNum}: Monogram name" type="text" class="field-input name-input" placeholder="Name to embroider">
                 </div>
             </td>
             <td>
-                <button type="button" class="btn-delete-row" title="Delete row">
+                <button type="button" class="btn btn-secondary btn-delete-row" title="Delete row" aria-label="Delete row ${rowNum}">
                     <i class="fas fa-times" aria-hidden="true"></i>
                 </button>
             </td>
@@ -1296,6 +1321,10 @@ class MonogramFormController {
     }
 
     handleStyleChange(row, selectEl) {
+        if (selectEl.tagName !== 'SELECT') {
+            this.isDirty = true;
+            return;
+        }
         const value = selectEl.value;
         const descInput = row.querySelector('.description-input');
         const colorSelect = row.querySelector('.color-input');
@@ -1304,7 +1333,7 @@ class MonogramFormController {
 
         // Handle "Other" option
         if (value === '__custom__') {
-            customInput.style.display = 'block';
+            customInput.hidden = false;
             customInput.focus();
             descInput.value = '';
             descInput.readOnly = false;
@@ -1314,7 +1343,7 @@ class MonogramFormController {
         }
 
         // Hide custom input
-        customInput.style.display = 'none';
+        customInput.hidden = true;
         descInput.readOnly = true;
         descInput.classList.add('input-readonly');
 
@@ -1466,7 +1495,7 @@ class MonogramFormController {
     updateSizeDropdownCounts(row) {
         const styleSelect = row.querySelector('.style-input');
         const sizeSelect = row.querySelector('.size-input');
-        if (!styleSelect || !sizeSelect) return;
+        if (!styleSelect || !sizeSelect || styleSelect.tagName !== 'SELECT') return;
 
         const styleValue = styleSelect.value;
         if (!styleValue) return;  // No style selected yet
@@ -1568,6 +1597,7 @@ class MonogramFormController {
                 style: styleInput?.tagName === 'SELECT'
                     ? (styleInput.value === '__custom__' ? styleCustom?.value : styleInput.value)
                     : styleInput?.value || '',
+                isCustomStyle: styleInput?.value === '__custom__' || styleInput?.dataset.customStyle === 'true',
                 description: descInput?.value || '',
                 color: colorInput?.value || '',
                 size: sizeInput?.value || '',
@@ -1601,6 +1631,7 @@ class MonogramFormController {
             // In manual mode, style is a text input
             if (styleInput.tagName === 'INPUT') {
                 styleInput.value = data.style || '';
+                styleInput.dataset.customStyle = String(Boolean(data.isCustomStyle));
             } else {
                 // In order mode, try to find matching option
                 const matchingOption = Array.from(styleInput.options).find(
@@ -1613,7 +1644,7 @@ class MonogramFormController {
                     styleInput.value = '__custom__';
                     const customInput = row.querySelector('.style-custom');
                     if (customInput) {
-                        customInput.style.display = 'block';
+                        customInput.hidden = false;
                         customInput.value = data.style;
                     }
                 }
@@ -1696,7 +1727,7 @@ class MonogramFormController {
                 rowThreadColor: rowThreadColorSelect?.value?.trim() || '',
                 rowLocation: rowLocationSelect?.value?.trim() || '',
                 monogramName: nameInput.value.trim(),
-                isCustomStyle: styleSelect.value === '__custom__'
+                isCustomStyle: styleSelect.value === '__custom__' || styleSelect.dataset.customStyle === 'true'
             };
 
             items.push(item);
@@ -1710,6 +1741,7 @@ class MonogramFormController {
     // ============================================
 
     async saveDraft() {
+        if (this._saving || this._loadFailure) return;
         const formData = this.collectFormData();
 
         if (!formData.orderNumber) {
@@ -1724,12 +1756,15 @@ class MonogramFormController {
             return;
         }
 
-        this.showLoading('Saving...');
+        this._saving = true;
+        const view = this._viewSeq = (this._viewSeq || 0) + 1;
+        const loading = this.showLoading('Saving...');
 
         try {
             const result = await this.service.saveMonogramSession(formData, formData.items);
 
-            if (result.success) {
+            if (view !== this._viewSeq) return;
+            if (result.success === true && Number.isInteger(Number(result.monogramID)) && Number(result.monogramID) > 0) {
                 this.currentMonogramID = result.monogramID;
                 this.currentOrderNumber = result.orderNumber || formData.orderNumber;
                 this.isDirty = false;
@@ -1744,20 +1779,26 @@ class MonogramFormController {
                 this.showToast(result.error || 'Failed to save', 'error');
             }
         } catch (error) {
+            if (view !== this._viewSeq) return;
             console.error('[MonogramController] Save error:', error);
             this.showToast('Failed to save. Please try again.', 'error');
         } finally {
-            this.hideLoading();
+            this._saving = false;
+            this.hideLoading(loading);
         }
     }
 
     async loadExistingForm(orderNumber) {
-        this.showLoading('Loading form...');
+        const view = this._viewSeq = (this._viewSeq || 0) + 1;
+        this.setLoadFailure(null);
+        const loading = this.showLoading('Loading form...');
 
         try {
             const result = await this.service.loadMonogramSession(orderNumber);
 
-            if (result.success) {
+            if (view !== this._viewSeq) return;
+            if (result.success === true && result.session && String(result.session.orderNumber) === String(orderNumber) &&
+                Array.isArray(result.items) && result.items.every(item => item && typeof item === 'object')) {
                 this.populateForm(result.session, result.items);
                 this.currentOrderNumber = orderNumber;
                 this.currentMonogramID = result.session.id_monogram;
@@ -1772,14 +1813,34 @@ class MonogramFormController {
                     this.showToast('Form loaded', 'success');
                 }
             } else {
+                this.setLoadFailure(orderNumber, result.error || 'Form data is incomplete. Please retry.');
                 this.showToast(result.error || 'Form not found', 'error');
             }
         } catch (error) {
+            if (view !== this._viewSeq) return;
+            this.setLoadFailure(orderNumber, 'Unable to load this form. Your current entries have been kept.');
             console.error('[MonogramController] Load error:', error);
             this.showToast('Failed to load form', 'error');
         } finally {
-            this.hideLoading();
+            this.hideLoading(loading);
         }
+    }
+
+    setLoadFailure(orderNumber, message) {
+        this._loadFailure = orderNumber;
+        document.getElementById('monogramLoadState')?.remove();
+        if (!orderNumber) return;
+        const banner = document.createElement('div');
+        banner.id = 'monogramLoadState';
+        banner.className = 'cache-warning-banner';
+        banner.setAttribute('role', 'alert');
+        const text = document.createElement('span');
+        text.textContent = message;
+        const retry = document.createElement('button');
+        retry.type = 'button'; retry.className = 'btn btn-secondary'; retry.textContent = 'Retry load';
+        retry.addEventListener('click', () => this.loadExistingForm(orderNumber));
+        banner.append(text, retry);
+        document.getElementById('monogramForm').before(banner);
     }
 
     /**
@@ -1794,27 +1855,14 @@ class MonogramFormController {
         // Create warning banner
         const banner = document.createElement('div');
         banner.id = 'cacheWarningBanner';
-        banner.style.cssText = `
-            background: #fef3c7;
-            border: 1px solid #f59e0b;
-            border-radius: 6px;
-            padding: 12px 16px;
-            margin: 16px 0;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            color: #92400e;
-        `;
+        banner.className = 'cache-warning-banner';
+        banner.setAttribute('role', 'alert');
         banner.innerHTML = `
-            <i class="fas fa-exclamation-triangle" aria-hidden="true" style="font-size: 1.25rem;"></i>
-            <div>
-                <strong>Warning:</strong> ${this.escapeHTML(message)}
-                <button onclick="this.parentElement.parentElement.remove()"
-                        style="margin-left: 12px; background: none; border: none; color: #92400e; cursor: pointer; font-weight: bold;">
-                    Dismiss
-                </button>
-            </div>
+            <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
+            <div><strong>Warning:</strong> ${this.escapeHTML(message)}</div>
+            <button type="button" class="btn btn-secondary">Dismiss</button>
         `;
+        banner.querySelector('button').addEventListener('click', () => banner.remove());
 
         // Insert after page header
         const pageHeader = document.querySelector('.page-header');
@@ -1824,6 +1872,10 @@ class MonogramFormController {
     }
 
     populateForm(session, items) {
+        // A saved session owns its garment data; a previous lookup must not constrain it.
+        this.orderLoaded = false;
+        this.products = [];
+        this.hideOrderStatus();
         // Populate header fields (using camelCase from service)
         document.getElementById('orderNumber').value = session.orderNumber || '';
         document.getElementById('companyName').value = session.companyName || '';
@@ -1850,7 +1902,7 @@ class MonogramFormController {
                 const row = tbody.lastElementChild;
 
                 // Populate row fields
-                const customStyle = row.querySelector('.style-custom');
+                const styleInput = row.querySelector('.style-input');
                 const descInput = row.querySelector('.description-input');
                 const colorSelect = row.querySelector('.color-input');
                 const sizeSelect = row.querySelector('.size-input');
@@ -1858,13 +1910,9 @@ class MonogramFormController {
                 const rowLocationSelect = row.querySelector('.row-location');
                 const nameInput = row.querySelector('.name-input');
 
-                if (item.isCustomStyle) {
-                    row.querySelector('.style-input').value = '__custom__';
-                    customStyle.style.display = 'block';
-                    customStyle.value = item.styleNumber || '';
-                    descInput.readOnly = false;
-                    descInput.classList.remove('input-readonly');
-                }
+                // Saved rows reopen in manual mode, including custom garments.
+                styleInput.value = item.styleNumber || '';
+                styleInput.dataset.customStyle = String(Boolean(item.isCustomStyle));
 
                 descInput.value = item.description || '';
                 colorSelect.value = item.shirtColor || '';
@@ -1891,10 +1939,12 @@ class MonogramFormController {
         if (!panel) return;
 
         if (typeof show === 'boolean') {
-            panel.style.display = show ? 'block' : 'none';
+            panel.hidden = !show;
         } else {
-            panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+            panel.hidden = !panel.hidden;
         }
+        if (panel.hidden) { this._searchSeq = (this._searchSeq || 0) + 1; document.getElementById('searchBtn').focus(); }
+        else document.getElementById('searchOrderNumber').focus();
     }
 
     async handleSearch() {
@@ -1906,11 +1956,15 @@ class MonogramFormController {
             return;
         }
 
-        this.showLoading('Searching...');
+        const search = this._searchSeq = (this._searchSeq || 0) + 1;
+        const loading = this.showLoading('Searching...');
+        document.getElementById('searchResults').textContent = 'Searching...';
 
         try {
             const result = await this.service.searchMonogramSessions({ orderNumber, companyName });
 
+            if (search !== this._searchSeq || document.getElementById('searchPanel').hidden) return;
+            if (result.warning || result.success !== true || !Array.isArray(result.sessions)) throw new Error(result.warning || result.error || 'Search is unavailable.');
             const resultsEl = document.getElementById('searchResults');
             if (!resultsEl) return;
 
@@ -1935,7 +1989,7 @@ class MonogramFormController {
                             <span>${totalNames} names</span>
                         </div>
                         <div class="search-result-actions">
-                            <button type="button" class="btn-secondary btn-sm btn-load-result"
+                            <button type="button" class="btn btn-secondary btn-sm btn-load-result"
                                     data-order="${orderNo}">
                                 <i class="fas fa-edit" aria-hidden="true"></i> Edit
                             </button>
@@ -1949,10 +2003,14 @@ class MonogramFormController {
                 });
             }
         } catch (error) {
+            if (search !== this._searchSeq || document.getElementById('searchPanel').hidden) return;
+            const results = document.getElementById('searchResults');
+            results.innerHTML = '<p role="alert">Search is unavailable. Please retry.</p><button type="button" class="btn btn-secondary">Retry search</button>';
+            results.querySelector('button').addEventListener('click', () => this.handleSearch());
             console.error('[MonogramController] Search error:', error);
             this.showToast('Search failed', 'error');
         } finally {
-            this.hideLoading();
+            this.hideLoading(loading);
         }
     }
 
@@ -1967,6 +2025,9 @@ class MonogramFormController {
             }
         }
 
+        this._viewSeq = (this._viewSeq || 0) + 1;
+        this.setLoadFailure(null);
+        this.hideLoading();
         document.getElementById('monogramForm').reset();
 
         // Reset thread colors and locations
@@ -1983,7 +2044,7 @@ class MonogramFormController {
         // Rebuild rows in manual mode
         this.initializeEmptyRows(5);
 
-        document.getElementById('orderStatus').style.display = 'none';
+        document.getElementById('orderStatus').hidden = true;
 
         // Clear URL params
         window.history.replaceState({}, '', window.location.pathname);
@@ -2064,10 +2125,10 @@ class MonogramFormController {
 
         const namedCount = items.filter(it => it.name && it.name.trim()).length;
         if (namedCount === 0) {
-            panel.style.display = 'none';
+            panel.hidden = true;
             return;
         }
-        panel.style.display = 'block';
+        panel.hidden = false;
 
         const { findings, summary } = result;
         if (findings.length === 0) {
@@ -2088,8 +2149,8 @@ class MonogramFormController {
         listEl.innerHTML = findings.map((f, i) => `
             <li class="stitch-finding severity-${f.severity}" data-finding="${i}" title="Click to highlight the row(s)">
                 <span class="finding-icon"><i class="fas ${icons[f.severity] || icons.info}" aria-hidden="true"></i></span>
-                <span class="finding-message">${this.escapeHTML(f.message)}</span>
-                ${f.fixable ? '<button type="button" class="btn-fix-finding">Fix</button>' : ''}
+                <button type="button" class="btn finding-message">${this.escapeHTML(f.message)}</button>
+                ${f.fixable ? '<button type="button" class="btn btn-secondary btn-fix-finding">Fix</button>' : ''}
             </li>
         `).join('');
 
@@ -2215,7 +2276,7 @@ class MonogramFormController {
         const family = m && m[1];
         // Georgia/Inter are system or already-rendered; only the two proof-only
         // web fonts need forcing.
-        if (!family || !/Dancing Script|Archivo Black/.test(family)) return;
+        if (!family || !/Dancing Script|Archivo Black|Inter/.test(family)) return;
         const weight = /font-weight:(\d+)/.exec(fontCSS)?.[1] || '400';
         try {
             await Promise.race([
@@ -2257,6 +2318,9 @@ class MonogramFormController {
         document.getElementById('proofFontStyle').textContent = formData.fontStyle || 'Not specified';
 
         const fontCSS = this.getProofFontCSS(formData.fontStyle);
+        const fontClass = fontCSS.includes('Dancing Script') ? 'proof-font-script' :
+            fontCSS.includes('Archivo Black') ? 'proof-font-block' :
+            fontCSS.includes('Georgia') ? 'proof-font-serif' : 'proof-font-default';
         const proofList = document.getElementById('proofList');
         proofList.innerHTML = filledItems.map(item => {
             // Only fall back to the order-level thread when it is unambiguous.
@@ -2266,10 +2330,8 @@ class MonogramFormController {
             const threadLabel = item.rowThreadColor ||
                 (this.selectedThreadColors.length === 1 ? this.selectedThreadColors[0] : '');
             const hex = this.getThreadHex(threadLabel);
-            // !important: quote-builder-common.css's print block forces
-            // `* { color: black !important }`, which would otherwise flatten
-            // every proof name to black — the one thing this sheet must show.
-            const colorCSS = hex ? `color:${hex} !important;` : '';
+            // Validated authoritative thread hex is the only dynamic color.
+            const colorCSS = hex ? `--proof-thread:${hex};` : '';
             // White/pale thread is invisible on white paper — render on a dark chip
             const lightChip = (hex && typeof MonogramNameQA !== 'undefined' &&
                 MonogramNameQA.isLightHex(hex)) ? ' proof-name-light' : '';
@@ -2277,11 +2339,11 @@ class MonogramFormController {
                 item.styleNumber, item.shirtColor, item.size,
                 item.rowLocation || (this.selectedLocations.length === 1 ? formData.location : '')
             ].filter(Boolean).map(p => this.escapeHTML(p));
-            const swatch = hex ? `<span class="proof-swatch" style="background:${hex};"></span>` : '';
+            const swatch = hex ? `<span class="proof-swatch" style="--proof-thread:${hex};"></span>` : '';
             return `
                 <div class="proof-item">
                     <span class="proof-checkbox"></span>
-                    <div class="proof-name${lightChip}" style="${fontCSS}${colorCSS}">${this.escapeHTML(item.monogramName)}</div>
+                    <div class="proof-name ${fontClass}${lightChip}" style="${colorCSS}">${this.escapeHTML(item.monogramName)}</div>
                     <div class="proof-meta">
                         ${metaParts.join(' · ')}
                         ${threadLabel ? `<br><span class="proof-meta-thread">${swatch}Thread: ${this.escapeHTML(threadLabel)}</span>` : ''}
@@ -2297,9 +2359,9 @@ class MonogramFormController {
             if (this.threadColorsFailed) {
                 noticeEl.textContent = 'Thread colors could not be loaded from the color library — ' +
                     'the colors shown are approximations. Confirm exact thread colors with your sales rep.';
-                noticeEl.style.display = 'block';
+                noticeEl.hidden = false;
             } else {
-                noticeEl.style.display = 'none';
+                noticeEl.hidden = true;
             }
         }
 
@@ -2407,11 +2469,11 @@ class MonogramFormController {
                 planEl.textContent = `Machine run plan: ${runPlan.groups.length} thread colors · ` +
                     `${runPlan.threadChanges} thread change${runPlan.threadChanges !== 1 ? 's' : ''} · ` +
                     `${runPlan.totalNames} hoopings`;
-                planEl.style.display = 'block';
+                planEl.hidden = false;
             }
         } else {
             printTbody.innerHTML = filledItems.map((item, index) => renderPrintRow(item, index + 1)).join('');
-            if (planEl) planEl.style.display = 'none';
+            if (planEl) planEl.hidden = true;
         }
 
         // Trigger print
@@ -2423,20 +2485,23 @@ class MonogramFormController {
     // ============================================
 
     showLoading(message = 'Loading...') {
-        const overlay = document.getElementById('loadingOverlay');
-        const text = document.getElementById('loadingText');
-
-        if (overlay && text) {
-            text.textContent = message;
-            overlay.style.display = 'flex';
-        }
+        const ticket = this._loadingTicket = (this._loadingTicket || 0) + 1;
+        this._loadingFocus = document.activeElement;
+        document.getElementById('loadingText').textContent = message;
+        document.getElementById('loadingOverlay').hidden = false;
+        document.getElementById('monogramForm').inert = true;
+        document.getElementById('monogramForm').setAttribute('aria-busy', 'true');
+        return ticket;
     }
 
-    hideLoading() {
-        const overlay = document.getElementById('loadingOverlay');
-        if (overlay) {
-            overlay.style.display = 'none';
-        }
+    hideLoading(ticket) {
+        if (ticket !== undefined && ticket !== this._loadingTicket) return;
+        this._loadingTicket = (this._loadingTicket || 0) + 1;
+        document.getElementById('loadingOverlay').hidden = true;
+        const form = document.getElementById('monogramForm');
+        form.inert = Boolean(this._loadFailure);
+        form.setAttribute('aria-busy', 'false');
+        if (!form.inert && document.activeElement === document.body && this._loadingFocus?.isConnected) this._loadingFocus.focus();
     }
 
     showToast(message, type = 'info') {
@@ -2458,7 +2523,7 @@ class MonogramFormController {
         toast.innerHTML = `
             <span class="toast-icon"><i class="fas ${icons[type] || icons.info}" aria-hidden="true"></i></span>
             <span class="toast-message">${this.escapeHTML(String(message))}</span>
-            <button type="button" class="toast-close">&times;</button>
+            <button type="button" class="btn btn-secondary toast-close" aria-label="Dismiss notification">&times;</button>
         `;
 
         container.appendChild(toast);

@@ -16,6 +16,8 @@ function getApiBaseUrl() {
 let allMonograms = [];
 let filteredMonograms = [];
 let uniqueSalesReps = [];
+let monogramLoadSeq = 0;
+let monogramLoadState = 'loading';
 
 /**
  * Initialize dashboard on page load
@@ -44,9 +46,14 @@ function localYmd(value) {
  * Load all monograms from API
  */
 async function loadMonograms() {
+    const requestId = ++monogramLoadSeq;
+    monogramLoadState = 'loading';
+    allMonograms = [];
+    filteredMonograms = [];
     const tbody = document.getElementById('monogramsTableBody');
     const resultCount = document.getElementById('resultCount');
     const apiUrl = getApiBaseUrl();
+    resultCount.textContent = 'Loading monograms…';
 
     tbody.innerHTML = `
         <tr>
@@ -60,18 +67,24 @@ async function loadMonograms() {
         const response = await fetch(`${apiUrl}/api/monograms`);
         if (!response.ok) throw new Error('HTTP ' + response.status);
         const data = await response.json();
+        if (requestId !== monogramLoadSeq) return;
 
-        if (data.success && data.monograms) {
+        if (data && data.success && Array.isArray(data.monograms)) {
             allMonograms = data.monograms;
             // Sort by CreatedAt descending (newest first)
             allMonograms.sort((a, b) => new Date(b.CreatedAt) - new Date(a.CreatedAt));
             // Populate sales rep filter dropdown
             populateSalesRepFilter();
+            monogramLoadState = 'ready';
             filterMonograms();
         } else {
             throw new Error(data.error || 'Failed to load monograms');
         }
     } catch (error) {
+        if (requestId !== monogramLoadSeq) return;
+        monogramLoadState = 'error';
+        allMonograms = [];
+        filteredMonograms = [];
         console.error('Error loading monograms:', error);
         tbody.innerHTML = `
             <tr>
@@ -134,6 +147,7 @@ function escapeHTML(str) {
  * Filter monograms based on search and filter inputs
  */
 function filterMonograms() {
+    if (monogramLoadState !== 'ready') return;
     const searchValue = document.getElementById('searchInput').value.toLowerCase().trim();
     const salesRepFilter = document.getElementById('salesRepFilter')?.value || '';
     const statusFilter = document.getElementById('statusFilter')?.value || '';
@@ -214,20 +228,20 @@ function renderTable(data) {
                 <td>${createdDate}</td>
                 <td class="td-center">${statusBadge}</td>
                 <td class="td-actions">
-                    <button type="button" class="action-btn edit" data-call="editMonogram" data-args="[${Number(orderNum)}]" title="Edit" aria-label="Edit order ${orderNum}">
+                    <button type="button" class="action-btn edit btn" data-call="editMonogram" data-args="[${Number(orderNum)}]" title="Edit" aria-label="Edit order ${orderNum}">
                         <i class="fas fa-edit" aria-hidden="true"></i>
                     </button>
-                    <button type="button" class="action-btn print" data-call="printMonogram" data-args="[${Number(orderNum)}]" title="Print" aria-label="Print order ${orderNum}">
+                    <button type="button" class="action-btn print btn" data-call="printMonogram" data-args="[${Number(orderNum)}]" title="Print" aria-label="Print order ${orderNum}">
                         <i class="fas fa-print" aria-hidden="true"></i>
                     </button>
-                    <button type="button" class="action-btn proof" data-call="proofMonogram" data-args="[${Number(orderNum)}]" title="Customer Proof" aria-label="Customer proof for order ${orderNum}">
+                    <button type="button" class="action-btn proof btn" data-call="proofMonogram" data-args="[${Number(orderNum)}]" title="Customer Proof" aria-label="Customer proof for order ${orderNum}">
                         <i class="fas fa-file-signature" aria-hidden="true"></i>
                     </button>
                     ${status !== 'Printed' ? `
-                    <button type="button" class="action-btn done" data-call="markPrinted" data-args="[${Number(idMonogram)}]" title="Mark as Printed" aria-label="Mark order ${orderNum} as printed">
+                    <button type="button" class="action-btn done btn" data-call="markPrinted" data-args="[${Number(idMonogram)}]" title="Mark as Printed" aria-label="Mark order ${orderNum} as printed">
                         <i class="fas fa-check" aria-hidden="true"></i>
                     </button>` : ''}
-                    <button type="button" class="action-btn delete" data-call="deleteMonogram" data-args="[${Number(idMonogram)}, ${Number(orderNum)}]" title="Delete" aria-label="Delete order ${orderNum}">
+                    <button type="button" class="action-btn delete btn" data-call="deleteMonogram" data-args="[${Number(idMonogram)}, ${Number(orderNum)}]" title="Delete" aria-label="Delete order ${orderNum}">
                         <i class="fas fa-trash" aria-hidden="true"></i>
                     </button>
                 </td>
