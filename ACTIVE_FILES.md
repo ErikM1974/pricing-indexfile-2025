@@ -297,3 +297,7 @@ Staff toolkit preservation: tests/unit/staff-toolkit-content.test.js locks the e
 - Added shared_components/css/staff-schedules.css: scoped production schedule draft with canonical tokens/controls and preserved timeline/print geometry. Old production-shifts/styles.css retained until complete browser/paper/consumer review.
 
 - Retired dashboards/production-shifts/styles.css after original/current data, six browser scenarios and four one-page current paper reviews. Replaced its explicit lint entry with staff-schedules.css; updated the production page guard and active-owner documentation. Original 45452 LF bytes / 71 flags preserved in the source fixture.
+
+### Payroll original browser baseline — 2026-09-10
+- Added tests/fixtures/staff-workspaces-payroll-synthetic.json: seven entirely synthetic employees covering carryover, negative and pending eligibility, missing entitlement, stale dates and inconsistent balances; synthetic registers and reviews. No real records or rates.
+- Added tests/fixtures/staff-workspaces-payroll-original-browser.json: original tables, flags, filters, audit CSV, six slip slots, packet/leave review content and four intercepted parse/import requests. One complete browser workflow passed; every write was fulfilled locally.

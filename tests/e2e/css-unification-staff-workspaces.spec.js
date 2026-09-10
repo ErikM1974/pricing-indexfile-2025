@@ -8,6 +8,101 @@ const root = path.resolve(__dirname, '../..'), output = path.join(__dirname, 'sc
 fs.mkdirSync(output, { recursive: true });
 test.use({ reducedMotion: 'reduce', timezoneId: 'America/Los_Angeles' });
 const providerPaths = ['/dp/a0e15000da6b6fa1d16145b4ab86/emb', '/dp/a0e15000848e0baf43604a908d78/emb'];
+const payrollData = require('../fixtures/staff-workspaces-payroll-synthetic.json');
+const payrollPrefix = '/api/crm-proxy/payroll';
+function payrollState(options = {}) {
+    const state = { ...options, mode: 'packet', job: 0, polls: 0 };
+    state.respond = async (req, u) => {
+        if (req.method() !== 'GET' || !['localhost', '127.0.0.1'].includes(u.hostname)) return null;
+        if (options.respond) { const response = await options.respond(req, u); if (response) return response; }
+        if (u.pathname === payrollPrefix + '/employees') return { json: { employees: options.empty ? [] : payrollData.employees } };
+        if (u.pathname === payrollPrefix + '/periods') return { json: { periods: options.empty ? [] : payrollData.periods } };
+        if (u.pathname === payrollPrefix + '/register') return { json: { rows: u.searchParams.get('checkDate') === '2026-09-04' ? payrollData.register : payrollData.register.slice(0, 1) } };
+        if (u.pathname === payrollPrefix + '/parse/synthetic-' + state.job) {
+            state.polls++;
+            return { json: { status: 'done', review: { mode: state.mode, checkDate: '2026-09-04', asOfDate: '2026-09-04', employees: payrollData.reviewEmployees,
+                reconciliation: { passed: options.passed !== false, checks: [{ label: 'Synthetic hours total', printed: 162.25, derived: options.passed === false ? 160 : 162.25, unit: 'hours', ok: options.passed !== false }], rowIssues: options.passed === false ? ['Synthetic mismatch; no records saved.'] : [], notes: ['Synthetic review note.'] } } } };
+        }
+        return null;
+    };
+    state.respondWrite = async (req, u) => {
+        if (req.method() !== 'POST' || !['localhost', '127.0.0.1'].includes(u.hostname)) return null;
+        if (options.respondWrite) { const response = await options.respondWrite(req, u); if (response) return response; }
+        if (u.pathname === payrollPrefix + '/parse') {
+            state.mode = req.postDataJSON().mode; state.job++;
+            return { json: { jobId: 'synthetic-' + state.job } };
+        }
+        if (u.pathname === payrollPrefix + '/import') return { json: { mode: state.mode, imported: 2, total: 2, effectiveDate: '2026-09-04', checkDate: '2026-09-04', failures: [] } };
+        return null;
+    };
+    return state;
+}
+async function payrollTables(page, selector) {
+    return page.locator(selector).evaluateAll(ns => ns.map(n => [...n.rows].map(r => [...r.cells].map(c => c.textContent.replace(/\s+/g, ' ').trim()))));
+}
+async function payrollRead(page, mode) {
+    await page.getByRole('tab', { name: 'Upload Packet' }).click();
+    await page.locator('#packet-mode').selectOption(mode);
+    await page.locator('#packet-file').setInputFiles({ name: 'synthetic-payroll.pdf', mimeType: 'application/pdf', buffer: Buffer.from('%PDF-1.4\nSynthetic browser fixture only.\n%%EOF\n') });
+    await page.locator('#packet-parse').click();
+    await expect(page.locator('#review')).toBeVisible({ timeout: 10000 });
+}
+async function payrollWorkflow(page, originalView) {
+    const state = payrollState({ original: originalView }), events = await open(page, 'payroll', state);
+    await expect(page.locator('#leave-body tr')).toHaveCount(payrollData.employees.length);
+    const leave = await payrollTables(page, '#panel-leave table'), flags = await page.locator('#leave-flags').innerText();
+    const views = [], reviews = [], periods = [], prefix = 'staff-workspaces-payroll-' + (originalView ? 'original-' : '');
+    for (const width of [1440, 768, 390, 320]) {
+        await page.setViewportSize({ width, height: 1000 });
+        for (const name of ['Leave Balances', 'Pay Periods', 'Upload Packet']) {
+            await page.getByRole('tab', { name, exact: true }).click();
+            const panel = page.locator('.pr-panel.is-active');
+            views.push({ width, tab: name, text: await panel.innerText(), scrollWidth: await page.evaluate(() => document.documentElement.scrollWidth) });
+            await page.screenshot({ path: path.join(output, prefix + name.split(' ')[0].toLowerCase() + '-' + width + '.png'), fullPage: true });
+        }
+    }
+    await page.getByRole('tab', { name: 'Pay Periods', exact: true }).click();
+    for (const period of payrollData.periods) {
+        await page.locator('#period-select').selectOption(period.checkDate);
+        await expect(page.locator('#period-body tr')).toHaveCount(period.checkDate === '2026-09-04' ? 3 : 1);
+        periods.push({ date: period.checkDate, table: await payrollTables(page, '#panel-periods table') });
+    }
+    await page.getByRole('tab', { name: 'Leave Balances', exact: true }).click();
+    await page.locator('#leave-search').fill('Sample office');
+    await expect(page.locator('#leave-body tr')).toHaveCount(2);
+    const filtered = await payrollTables(page, '#panel-leave table');
+    await page.locator('#leave-search').fill('');
+    const downloadEvent = page.waitForEvent('download');
+    await page.locator('#print-slips').click();
+    const download = await downloadEvent, csv = fs.readFileSync(await download.path(), 'utf8');
+    const slips = await page.locator('.slip').evaluateAll(ns => ns.map(n => n.textContent.replace(/\s+/g, ' ').trim()));
+    const printStatus = await page.locator('#pr-status').innerText();
+    // The controller's Safari cleanup timer must not hide slips before the PDF capture.
+    await page.evaluate(() => { document.body.classList.add('print-slips'); });
+    await page.pdf({ path: path.join(output, prefix + 'slips.pdf'), preferCSSPageSize: true, printBackground: true });
+    await page.evaluate(() => window.dispatchEvent(new Event('afterprint')));
+    await expect(page.locator('body')).not.toHaveClass(/print-slips/);
+    for (const mode of ['packet', 'leave']) {
+        await payrollRead(page, mode);
+        await expect(page.locator('#packet-commit')).toBeEnabled();
+        reviews.push({ mode, text: await page.locator('#review').innerText(), tables: await payrollTables(page, '#review table'), status: await page.locator('#pr-status').innerText() });
+        await page.setViewportSize({ width: 320, height: 1000 });
+        await page.screenshot({ path: path.join(output, prefix + 'review-' + mode + '-320.png'), fullPage: true });
+        await page.locator('#packet-commit').click();
+        await expect(page.locator('#pr-status')).toContainText(mode === 'leave' ? 'Saved leave balances for 2 of 2' : 'Saved 2 of 2');
+        await expect(page.locator('#review')).toBeHidden();
+    }
+    expect(events.writes.map(w => ({ path: w.path, method: w.method }))).toEqual(['parse', 'import', 'parse', 'import'].map(p => ({ path: payrollPrefix + '/' + p, method: 'POST' })));
+    expect(JSON.parse(events.writes[1].body)).toEqual({ jobId: 'synthetic-1' });
+    expect(JSON.parse(events.writes[3].body)).toEqual({ jobId: 'synthetic-2' });
+    for (const kind of ['errors', 'unknown', 'missing']) expect(events[kind]).toEqual([]);
+    const result = { base: source.base, leave, flags, views, periods, filtered, csv, slips, printStatus, reviews, writes: events.writes };
+    fs.writeFileSync(path.join(output, prefix + 'browser.json'), JSON.stringify(result, null, 2) + '\n');
+    return result;
+}
+test('CSS staff workspaces: original payroll synthetic balances, register, slips, audit and verified import contracts', async ({ page }) => {
+    await payrollWorkflow(page, true);
+});
 const reactPaths = ['/react@18.3.1/umd/react.production.min.js', '/react-dom@18.3.1/umd/react-dom.production.min.js', '/@babel/standalone@7.29.0/babel.min.js'];
 
 async function open(page, name, state = {}) {
@@ -19,9 +114,13 @@ async function open(page, name, state = {}) {
         const req = route.request(), u = new URL(req.url()), p = u.pathname;
         if (!['GET', 'HEAD'].includes(req.method()) || p.startsWith('/api/quote-sequence/') || u.searchParams.get('autoAdd') === 'true') {
             events.writes.push({ path: p, method: req.method(), body: req.postData() });
+            const syntheticWrite = state.respondWrite && await state.respondWrite(req, u);
+            if (syntheticWrite) return route.fulfill(syntheticWrite);
             return route.fulfill({ status: 503, json: { error: 'Synthetic write denied' } });
         }
         if (state.block && state.block(u)) return route.abort();
+        const syntheticRead = state.respond && await state.respond(req, u);
+        if (syntheticRead) return route.fulfill(syntheticRead);
         if (u.hostname === 'c3eku948.caspio.com' && providerPaths.includes(p)) {
             events.providers.push(p);
             const title = p === providerPaths[0] ? 'Synthetic label records' : 'Synthetic bundle records';

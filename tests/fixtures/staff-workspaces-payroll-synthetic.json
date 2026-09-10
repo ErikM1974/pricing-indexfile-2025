@@ -1,0 +1,185 @@
+{
+  "description": "Entirely synthetic payroll records for isolated browser preservation tests. No real personnel, rates, packet extraction or API writes.",
+  "employees": [
+    {
+      "Leave_Balances_As_Of": "2026-09-04",
+      "Department": "Sample production",
+      "Job_Title": "Synthetic fixture",
+      "Vacation_Hours_Available": 112,
+      "Vacation_Hours_Used": 56,
+      "Vacation_Hours_Remaining": 56,
+      "Vacation_Annual_Entitlement": 80,
+      "Sick_Accum_Hours_Available": 57.25,
+      "Sick_Hours_Used": 8,
+      "Sick_Hours_Remaining": 49.25,
+      "Payroll_Employee_ID": 990001,
+      "Employee_Full_Name": "Cedar Example"
+    },
+    {
+      "Leave_Balances_As_Of": "2026-09-04",
+      "Department": "Sample production",
+      "Job_Title": "Synthetic fixture",
+      "Vacation_Hours_Available": 80,
+      "Vacation_Hours_Used": 88,
+      "Vacation_Hours_Remaining": -8,
+      "Vacation_Annual_Entitlement": 80,
+      "Sick_Accum_Hours_Available": 57.25,
+      "Sick_Hours_Used": 8,
+      "Sick_Hours_Remaining": 49.25,
+      "Payroll_Employee_ID": 990002,
+      "Employee_Full_Name": "Maple Example"
+    },
+    {
+      "Leave_Balances_As_Of": "2026-09-04",
+      "Department": "Sample office",
+      "Job_Title": "Synthetic fixture",
+      "Vacation_Hours_Available": 0,
+      "Vacation_Hours_Used": 16,
+      "Vacation_Hours_Remaining": -16,
+      "Vacation_Annual_Entitlement": 40,
+      "Sick_Accum_Hours_Available": 57.25,
+      "Sick_Hours_Used": 8,
+      "Sick_Hours_Remaining": 49.25,
+      "Payroll_Employee_ID": 990003,
+      "Employee_Full_Name": "Aster Example",
+      "Vacation_Eligible_Date": "2026-10-01",
+      "Vacation_Eligible_Hours": 40
+    },
+    {
+      "Leave_Balances_As_Of": "2026-09-04",
+      "Department": "Sample production",
+      "Job_Title": "Synthetic fixture",
+      "Vacation_Hours_Available": 80,
+      "Vacation_Hours_Used": 24,
+      "Vacation_Hours_Remaining": 56,
+      "Vacation_Annual_Entitlement": null,
+      "Sick_Accum_Hours_Available": 57.25,
+      "Sick_Hours_Used": 8,
+      "Sick_Hours_Remaining": 49.25,
+      "Payroll_Employee_ID": 990004,
+      "Employee_Full_Name": "Birch Example"
+    },
+    {
+      "Leave_Balances_As_Of": "2026-08-01",
+      "Department": "Sample production",
+      "Job_Title": "Synthetic fixture",
+      "Vacation_Hours_Available": 80,
+      "Vacation_Hours_Used": 24,
+      "Vacation_Hours_Remaining": 56,
+      "Vacation_Annual_Entitlement": 80,
+      "Sick_Accum_Hours_Available": 57.25,
+      "Sick_Hours_Used": 8,
+      "Sick_Hours_Remaining": 49.25,
+      "Payroll_Employee_ID": 990005,
+      "Employee_Full_Name": "Elm Example"
+    },
+    {
+      "Leave_Balances_As_Of": "2026-09-04",
+      "Department": "Sample production",
+      "Job_Title": "Synthetic fixture",
+      "Vacation_Hours_Available": 80,
+      "Vacation_Hours_Used": 24,
+      "Vacation_Hours_Remaining": 60,
+      "Vacation_Annual_Entitlement": 80,
+      "Sick_Accum_Hours_Available": 57.25,
+      "Sick_Hours_Used": 8,
+      "Sick_Hours_Remaining": 49.25,
+      "Payroll_Employee_ID": 990006,
+      "Employee_Full_Name": "Fern Example"
+    },
+    {
+      "Leave_Balances_As_Of": "2026-09-04",
+      "Department": "Sample office",
+      "Job_Title": "Synthetic fixture",
+      "Vacation_Hours_Available": 80,
+      "Vacation_Hours_Used": 24,
+      "Vacation_Hours_Remaining": 56,
+      "Vacation_Annual_Entitlement": 80,
+      "Sick_Accum_Hours_Available": 57.25,
+      "Sick_Hours_Used": 8,
+      "Sick_Hours_Remaining": 49.25,
+      "Payroll_Employee_ID": 990007,
+      "Employee_Full_Name": "Oak Example"
+    }
+  ],
+  "periods": [
+    {
+      "checkDate": "2026-09-04",
+      "periodStart": "2026-08-17",
+      "periodEnd": "2026-08-30",
+      "paidCount": 2
+    },
+    {
+      "checkDate": "2026-08-21",
+      "periodStart": "2026-08-03",
+      "periodEnd": "2026-08-16",
+      "paidCount": 1
+    }
+  ],
+  "register": [
+    {
+      "Employee_Full_Name": "Cedar Example",
+      "Paid_This_Period": true,
+      "Hours_Regular": 76,
+      "Hours_Overtime": 2.25,
+      "Hours_Sick": 4,
+      "Hours_Vacation_PTO": 0,
+      "Hours_Holiday": 0,
+      "Hours_Total": 82.25
+    },
+    {
+      "Employee_Full_Name": "Maple Example",
+      "Paid_This_Period": true,
+      "Hours_Regular": 76,
+      "Hours_Overtime": 0,
+      "Hours_Sick": 4,
+      "Hours_Vacation_PTO": 0,
+      "Hours_Holiday": 0,
+      "Hours_Total": 80
+    },
+    {
+      "Employee_Full_Name": "Aster Example",
+      "Paid_This_Period": false,
+      "Hours_Regular": 0,
+      "Hours_Overtime": 0,
+      "Hours_Sick": 0,
+      "Hours_Vacation_PTO": 0,
+      "Hours_Holiday": 0,
+      "Hours_Total": 0
+    }
+  ],
+  "reviewEmployees": [
+    {
+      "nameOnPacket": "Cedar Example",
+      "payrollEmployeeId": 990001,
+      "paid": true,
+      "hoursRegular": 76,
+      "hoursOvertime": 2.25,
+      "hoursSick": 4,
+      "hoursVacationPTO": 0,
+      "hoursTotal": 82.25,
+      "vacationAccrued": 112,
+      "vacationUsed": 56,
+      "vacationAvailable": 56,
+      "sickAccrued": 57.25,
+      "sickUsed": 8,
+      "sickAvailable": 49.25
+    },
+    {
+      "nameOnPacket": "Maple Example",
+      "payrollEmployeeId": 990002,
+      "paid": true,
+      "hoursRegular": 76,
+      "hoursOvertime": 0,
+      "hoursSick": 4,
+      "hoursVacationPTO": 0,
+      "hoursTotal": 80,
+      "vacationAccrued": 80,
+      "vacationUsed": 88,
+      "vacationAvailable": -8,
+      "sickAccrued": 57.25,
+      "sickUsed": 8,
+      "sickAvailable": 49.25
+    }
+  ]
+}

@@ -1,0 +1,445 @@
+{
+  "base": "0f151e3899b8517092b1864babd8ea7f579fc95b",
+  "leave": [
+    [
+      [
+        "Employee",
+        "Department",
+        "Vacation",
+        "Sick"
+      ],
+      [
+        "Entitled",
+        "Accrued",
+        "Used",
+        "Remaining",
+        "Carryover",
+        "Accrued",
+        "Used",
+        "Remaining"
+      ],
+      [
+        "Cedar Example",
+        "Sample production",
+        "80.00",
+        "112.00→80.00",
+        "56.00→24.00",
+        "56.00",
+        "32.00",
+        "57.25",
+        "8.00",
+        "49.25"
+      ],
+      [
+        "Maple Example",
+        "Sample production",
+        "80.00",
+        "80.00",
+        "88.00",
+        "-8.00",
+        "—",
+        "57.25",
+        "8.00",
+        "49.25"
+      ],
+      [
+        "Aster Exampleaccrues 2026-10-01",
+        "Sample office",
+        "0.00",
+        "0.00",
+        "16.00",
+        "-16.00",
+        "—",
+        "57.25",
+        "8.00",
+        "49.25"
+      ],
+      [
+        "Birch Exampleno slip",
+        "Sample production",
+        "not set",
+        "80.00",
+        "24.00",
+        "56.00",
+        "—",
+        "57.25",
+        "8.00",
+        "49.25"
+      ],
+      [
+        "Elm Example",
+        "Sample production",
+        "80.00",
+        "80.00",
+        "24.00",
+        "56.00",
+        "—",
+        "57.25",
+        "8.00",
+        "49.25"
+      ],
+      [
+        "Fern Exampleno slip",
+        "Sample production",
+        "80.00",
+        "80.00",
+        "24.00",
+        "60.00",
+        "—",
+        "57.25",
+        "8.00",
+        "49.25"
+      ],
+      [
+        "Oak Example",
+        "Sample office",
+        "80.00",
+        "80.00",
+        "24.00",
+        "56.00",
+        "—",
+        "57.25",
+        "8.00",
+        "49.25"
+      ]
+    ]
+  ],
+  "flags": "Birch Example — No annual vacation entitlement set in Caspio — cannot tell a carryover from a genuine grant. Set Vacation_Annual_Entitlement on this employee. No slip will print for this employee.\nElm Example — Balances are 40 days old (as of 2026-08-01).\nFern Example — accrued − used ≠ remaining (80 − 24 = 56, against 56 from the import, which itself reports remaining as 60). Raw import was 80 / 24 / 60 against an entitlement of 80. No slip will print for this employee.",
+  "views": [
+    {
+      "width": 1440,
+      "tab": "Leave Balances",
+      "text": "Leave Balances\n\nCurrent vacation and sick hours for active employees, refreshed from the last payroll packet. A negative balance is not an error — staff accrue their first 40 vacation hours at their one-year anniversary and can run negative until then.\n\nWhere vacation accrued or used shows 112 → 80, the first figure is what payroll imported and the second is what the slip prints. Payroll books hours to the tax year of the check date, so vacation taken in the last pay period of a year inflates both accrued and used by the same carryover in the following year. They cancel, which is why remaining is always correct as imported. Sick hours are never adjusted — Washington State sick leave legitimately carries over.\n\n🖨️ Print slips to hand out\nBalances as of 2026-09-04\nBirch Example — No annual vacation entitlement set in Caspio — cannot tell a carryover from a genuine grant. Set Vacation_Annual_Entitlement on this employee. No slip will print for this employee.\nElm Example — Balances are 40 days old (as of 2026-08-01).\nFern Example — accrued − used ≠ remaining (80 − 24 = 56, against 56 from the import, which itself reports remaining as 60). Raw import was 80 / 24 / 60 against an entitlement of 80. No slip will print for this employee.\nEmployee\tDepartment\tVACATION\tSICK\nEntitled\tAccrued\tUsed\tRemaining\tCarryover\tAccrued\tUsed\tRemaining\nCedar Example\tSample production\t80.00\t112.00→80.00\t56.00→24.00\t56.00\t32.00\t57.25\t8.00\t49.25\nMaple Example\tSample production\t80.00\t80.00\t88.00\t-8.00\t—\t57.25\t8.00\t49.25\nAster Exampleaccrues 2026-10-01\tSample office\t0.00\t0.00\t16.00\t-16.00\t—\t57.25\t8.00\t49.25\nBirch Exampleno slip\tSample production\tnot set\t80.00\t24.00\t56.00\t—\t57.25\t8.00\t49.25\nElm Example\tSample production\t80.00\t80.00\t24.00\t56.00\t—\t57.25\t8.00\t49.25\nFern Exampleno slip\tSample production\t80.00\t80.00\t24.00\t60.00\t—\t57.25\t8.00\t49.25\nOak Example\tSample office\t80.00\t80.00\t24.00\t56.00\t—\t57.25\t8.00\t49.25",
+      "scrollWidth": 1440
+    },
+    {
+      "width": 1440,
+      "tab": "Pay Periods",
+      "text": "Pay Periods\n\nHours recorded for each pay date. Select a period to see the per-employee breakdown.\n\nPay date\n2026-09-04 (2026-08-17 – 2026-08-30, 2 checks)\n2026-08-21 (2026-08-03 – 2026-08-16, 1 checks)\nEmployee\tPaid\tRegular\tOvertime\tSick\tVacation/PTO\tHoliday\tTotal Hours\nCedar Example\tYes\t76.00\t2.25\t4.00\t0.00\t0.00\t82.25\nMaple Example\tYes\t76.00\t0.00\t4.00\t0.00\t0.00\t80.00\nAster Example\tNo check\t0.00\t0.00\t0.00\t0.00\t0.00\t0.00",
+      "scrollWidth": 1440
+    },
+    {
+      "width": 1440,
+      "tab": "Upload Packet",
+      "text": "Upload from NW Regional Accounting\n\nUpload the PDF. Everything read from it is checked against the document's own printed totals. Nothing is saved until the numbers reconcile and you confirm.\n\nDocument\nFull payroll packet\nVacation & sick page only\nRead packet\n\nThe full monthly packet — Payroll Register, Check Register and the vacation/sick page. Saving writes a pay period and refreshes leave balances.",
+      "scrollWidth": 1440
+    },
+    {
+      "width": 768,
+      "tab": "Leave Balances",
+      "text": "Leave Balances\n\nCurrent vacation and sick hours for active employees, refreshed from the last payroll packet. A negative balance is not an error — staff accrue their first 40 vacation hours at their one-year anniversary and can run negative until then.\n\nWhere vacation accrued or used shows 112 → 80, the first figure is what payroll imported and the second is what the slip prints. Payroll books hours to the tax year of the check date, so vacation taken in the last pay period of a year inflates both accrued and used by the same carryover in the following year. They cancel, which is why remaining is always correct as imported. Sick hours are never adjusted — Washington State sick leave legitimately carries over.\n\n🖨️ Print slips to hand out\nBalances as of 2026-09-04\nBirch Example — No annual vacation entitlement set in Caspio — cannot tell a carryover from a genuine grant. Set Vacation_Annual_Entitlement on this employee. No slip will print for this employee.\nElm Example — Balances are 40 days old (as of 2026-08-01).\nFern Example — accrued − used ≠ remaining (80 − 24 = 56, against 56 from the import, which itself reports remaining as 60). Raw import was 80 / 24 / 60 against an entitlement of 80. No slip will print for this employee.\nEmployee\tDepartment\tVACATION\tSICK\nEntitled\tAccrued\tUsed\tRemaining\tCarryover\tAccrued\tUsed\tRemaining\nCedar Example\tSample production\t80.00\t112.00→80.00\t56.00→24.00\t56.00\t32.00\t57.25\t8.00\t49.25\nMaple Example\tSample production\t80.00\t80.00\t88.00\t-8.00\t—\t57.25\t8.00\t49.25\nAster Exampleaccrues 2026-10-01\tSample office\t0.00\t0.00\t16.00\t-16.00\t—\t57.25\t8.00\t49.25\nBirch Exampleno slip\tSample production\tnot set\t80.00\t24.00\t56.00\t—\t57.25\t8.00\t49.25\nElm Example\tSample production\t80.00\t80.00\t24.00\t56.00\t—\t57.25\t8.00\t49.25\nFern Exampleno slip\tSample production\t80.00\t80.00\t24.00\t60.00\t—\t57.25\t8.00\t49.25\nOak Example\tSample office\t80.00\t80.00\t24.00\t56.00\t—\t57.25\t8.00\t49.25",
+      "scrollWidth": 768
+    },
+    {
+      "width": 768,
+      "tab": "Pay Periods",
+      "text": "Pay Periods\n\nHours recorded for each pay date. Select a period to see the per-employee breakdown.\n\nPay date\n2026-09-04 (2026-08-17 – 2026-08-30, 2 checks)\n2026-08-21 (2026-08-03 – 2026-08-16, 1 checks)\nEmployee\tPaid\tRegular\tOvertime\tSick\tVacation/PTO\tHoliday\tTotal Hours\nCedar Example\tYes\t76.00\t2.25\t4.00\t0.00\t0.00\t82.25\nMaple Example\tYes\t76.00\t0.00\t4.00\t0.00\t0.00\t80.00\nAster Example\tNo check\t0.00\t0.00\t0.00\t0.00\t0.00\t0.00",
+      "scrollWidth": 768
+    },
+    {
+      "width": 768,
+      "tab": "Upload Packet",
+      "text": "Upload from NW Regional Accounting\n\nUpload the PDF. Everything read from it is checked against the document's own printed totals. Nothing is saved until the numbers reconcile and you confirm.\n\nDocument\nFull payroll packet\nVacation & sick page only\nRead packet\n\nThe full monthly packet — Payroll Register, Check Register and the vacation/sick page. Saving writes a pay period and refreshes leave balances.",
+      "scrollWidth": 768
+    },
+    {
+      "width": 390,
+      "tab": "Leave Balances",
+      "text": "Leave Balances\n\nCurrent vacation and sick hours for active employees, refreshed from the last payroll packet. A negative balance is not an error — staff accrue their first 40 vacation hours at their one-year anniversary and can run negative until then.\n\nWhere vacation accrued or used shows 112 → 80, the first figure is what payroll imported and the second is what the slip prints. Payroll books hours to the tax year of the check date, so vacation taken in the last pay period of a year inflates both accrued and used by the same carryover in the following year. They cancel, which is why remaining is always correct as imported. Sick hours are never adjusted — Washington State sick leave legitimately carries over.\n\n🖨️ Print slips to hand out\nBalances as of 2026-09-04\nBirch Example — No annual vacation entitlement set in Caspio — cannot tell a carryover from a genuine grant. Set Vacation_Annual_Entitlement on this employee. No slip will print for this employee.\nElm Example — Balances are 40 days old (as of 2026-08-01).\nFern Example — accrued − used ≠ remaining (80 − 24 = 56, against 56 from the import, which itself reports remaining as 60). Raw import was 80 / 24 / 60 against an entitlement of 80. No slip will print for this employee.\nEmployee\tDepartment\tVACATION\tSICK\nEntitled\tAccrued\tUsed\tRemaining\tCarryover\tAccrued\tUsed\tRemaining\nCedar Example\tSample production\t80.00\t112.00→80.00\t56.00→24.00\t56.00\t32.00\t57.25\t8.00\t49.25\nMaple Example\tSample production\t80.00\t80.00\t88.00\t-8.00\t—\t57.25\t8.00\t49.25\nAster Exampleaccrues 2026-10-01\tSample office\t0.00\t0.00\t16.00\t-16.00\t—\t57.25\t8.00\t49.25\nBirch Exampleno slip\tSample production\tnot set\t80.00\t24.00\t56.00\t—\t57.25\t8.00\t49.25\nElm Example\tSample production\t80.00\t80.00\t24.00\t56.00\t—\t57.25\t8.00\t49.25\nFern Exampleno slip\tSample production\t80.00\t80.00\t24.00\t60.00\t—\t57.25\t8.00\t49.25\nOak Example\tSample office\t80.00\t80.00\t24.00\t56.00\t—\t57.25\t8.00\t49.25",
+      "scrollWidth": 390
+    },
+    {
+      "width": 390,
+      "tab": "Pay Periods",
+      "text": "Pay Periods\n\nHours recorded for each pay date. Select a period to see the per-employee breakdown.\n\nPay date\n2026-09-04 (2026-08-17 – 2026-08-30, 2 checks)\n2026-08-21 (2026-08-03 – 2026-08-16, 1 checks)\nEmployee\tPaid\tRegular\tOvertime\tSick\tVacation/PTO\tHoliday\tTotal Hours\nCedar Example\tYes\t76.00\t2.25\t4.00\t0.00\t0.00\t82.25\nMaple Example\tYes\t76.00\t0.00\t4.00\t0.00\t0.00\t80.00\nAster Example\tNo check\t0.00\t0.00\t0.00\t0.00\t0.00\t0.00",
+      "scrollWidth": 401
+    },
+    {
+      "width": 390,
+      "tab": "Upload Packet",
+      "text": "Upload from NW Regional Accounting\n\nUpload the PDF. Everything read from it is checked against the document's own printed totals. Nothing is saved until the numbers reconcile and you confirm.\n\nDocument\nFull payroll packet\nVacation & sick page only\nRead packet\n\nThe full monthly packet — Payroll Register, Check Register and the vacation/sick page. Saving writes a pay period and refreshes leave balances.",
+      "scrollWidth": 390
+    },
+    {
+      "width": 320,
+      "tab": "Leave Balances",
+      "text": "Leave Balances\n\nCurrent vacation and sick hours for active employees, refreshed from the last payroll packet. A negative balance is not an error — staff accrue their first 40 vacation hours at their one-year anniversary and can run negative until then.\n\nWhere vacation accrued or used shows 112 → 80, the first figure is what payroll imported and the second is what the slip prints. Payroll books hours to the tax year of the check date, so vacation taken in the last pay period of a year inflates both accrued and used by the same carryover in the following year. They cancel, which is why remaining is always correct as imported. Sick hours are never adjusted — Washington State sick leave legitimately carries over.\n\n🖨️ Print slips to hand out\nBalances as of 2026-09-04\nBirch Example — No annual vacation entitlement set in Caspio — cannot tell a carryover from a genuine grant. Set Vacation_Annual_Entitlement on this employee. No slip will print for this employee.\nElm Example — Balances are 40 days old (as of 2026-08-01).\nFern Example — accrued − used ≠ remaining (80 − 24 = 56, against 56 from the import, which itself reports remaining as 60). Raw import was 80 / 24 / 60 against an entitlement of 80. No slip will print for this employee.\nEmployee\tDepartment\tVACATION\tSICK\nEntitled\tAccrued\tUsed\tRemaining\tCarryover\tAccrued\tUsed\tRemaining\nCedar Example\tSample production\t80.00\t112.00→80.00\t56.00→24.00\t56.00\t32.00\t57.25\t8.00\t49.25\nMaple Example\tSample production\t80.00\t80.00\t88.00\t-8.00\t—\t57.25\t8.00\t49.25\nAster Exampleaccrues 2026-10-01\tSample office\t0.00\t0.00\t16.00\t-16.00\t—\t57.25\t8.00\t49.25\nBirch Exampleno slip\tSample production\tnot set\t80.00\t24.00\t56.00\t—\t57.25\t8.00\t49.25\nElm Example\tSample production\t80.00\t80.00\t24.00\t56.00\t—\t57.25\t8.00\t49.25\nFern Exampleno slip\tSample production\t80.00\t80.00\t24.00\t60.00\t—\t57.25\t8.00\t49.25\nOak Example\tSample office\t80.00\t80.00\t24.00\t56.00\t—\t57.25\t8.00\t49.25",
+      "scrollWidth": 320
+    },
+    {
+      "width": 320,
+      "tab": "Pay Periods",
+      "text": "Pay Periods\n\nHours recorded for each pay date. Select a period to see the per-employee breakdown.\n\nPay date\n2026-09-04 (2026-08-17 – 2026-08-30, 2 checks)\n2026-08-21 (2026-08-03 – 2026-08-16, 1 checks)\nEmployee\tPaid\tRegular\tOvertime\tSick\tVacation/PTO\tHoliday\tTotal Hours\nCedar Example\tYes\t76.00\t2.25\t4.00\t0.00\t0.00\t82.25\nMaple Example\tYes\t76.00\t0.00\t4.00\t0.00\t0.00\t80.00\nAster Example\tNo check\t0.00\t0.00\t0.00\t0.00\t0.00\t0.00",
+      "scrollWidth": 401
+    },
+    {
+      "width": 320,
+      "tab": "Upload Packet",
+      "text": "Upload from NW Regional Accounting\n\nUpload the PDF. Everything read from it is checked against the document's own printed totals. Nothing is saved until the numbers reconcile and you confirm.\n\nDocument\nFull payroll packet\nVacation & sick page only\nRead packet\n\nThe full monthly packet — Payroll Register, Check Register and the vacation/sick page. Saving writes a pay period and refreshes leave balances.",
+      "scrollWidth": 321
+    }
+  ],
+  "periods": [
+    {
+      "date": "2026-09-04",
+      "table": [
+        [
+          [
+            "Employee",
+            "Paid",
+            "Regular",
+            "Overtime",
+            "Sick",
+            "Vacation/PTO",
+            "Holiday",
+            "Total Hours"
+          ],
+          [
+            "Cedar Example",
+            "Yes",
+            "76.00",
+            "2.25",
+            "4.00",
+            "0.00",
+            "0.00",
+            "82.25"
+          ],
+          [
+            "Maple Example",
+            "Yes",
+            "76.00",
+            "0.00",
+            "4.00",
+            "0.00",
+            "0.00",
+            "80.00"
+          ],
+          [
+            "Aster Example",
+            "No check",
+            "0.00",
+            "0.00",
+            "0.00",
+            "0.00",
+            "0.00",
+            "0.00"
+          ]
+        ]
+      ]
+    },
+    {
+      "date": "2026-08-21",
+      "table": [
+        [
+          [
+            "Employee",
+            "Paid",
+            "Regular",
+            "Overtime",
+            "Sick",
+            "Vacation/PTO",
+            "Holiday",
+            "Total Hours"
+          ],
+          [
+            "Cedar Example",
+            "Yes",
+            "76.00",
+            "2.25",
+            "4.00",
+            "0.00",
+            "0.00",
+            "82.25"
+          ]
+        ]
+      ]
+    }
+  ],
+  "filtered": [
+    [
+      [
+        "Employee",
+        "Department",
+        "Vacation",
+        "Sick"
+      ],
+      [
+        "Entitled",
+        "Accrued",
+        "Used",
+        "Remaining",
+        "Carryover",
+        "Accrued",
+        "Used",
+        "Remaining"
+      ],
+      [
+        "Aster Exampleaccrues 2026-10-01",
+        "Sample office",
+        "0.00",
+        "0.00",
+        "16.00",
+        "-16.00",
+        "—",
+        "57.25",
+        "8.00",
+        "49.25"
+      ],
+      [
+        "Oak Example",
+        "Sample office",
+        "80.00",
+        "80.00",
+        "24.00",
+        "56.00",
+        "—",
+        "57.25",
+        "8.00",
+        "49.25"
+      ]
+    ]
+  ],
+  "csv": "﻿employee_name,payroll_id,run_date,balances_as_of,raw_available,raw_used,raw_remaining,entitlement,carryover,slip_accrued,slip_used,slip_remaining,sick_accrued,sick_used,sick_remaining,slip_printed,carryover_reason,flags\r\n\"Cedar Example\",\"990001\",\"2026-09-10\",\"2026-09-04\",\"112\",\"56\",\"56\",\"80\",\"32\",\"80\",\"24\",\"56\",\"57.25\",\"8\",\"49.25\",\"yes\",\"prior-year vacation paid on a current-year check date\",\"\"\r\n\"Maple Example\",\"990002\",\"2026-09-10\",\"2026-09-04\",\"80\",\"88\",\"-8\",\"80\",\"0\",\"80\",\"88\",\"-8\",\"57.25\",\"8\",\"49.25\",\"yes\",\"\",\"\"\r\n\"Aster Example\",\"990003\",\"2026-09-10\",\"2026-09-04\",\"0\",\"16\",\"-16\",\"0\",\"0\",\"0\",\"16\",\"-16\",\"57.25\",\"8\",\"49.25\",\"yes\",\"\",\"\"\r\n\"Birch Example\",\"990004\",\"2026-09-10\",\"2026-09-04\",\"80\",\"24\",\"56\",\"\",\"0\",\"\",\"\",\"\",\"57.25\",\"8\",\"49.25\",\"no\",\"\",\"missing-entitlement: No annual vacation entitlement set in Caspio — cannot tell a carryover from a genuine grant. Set Vacation_Annual_Entitlement on this employee.\"\r\n\"Elm Example\",\"990005\",\"2026-09-10\",\"2026-08-01\",\"80\",\"24\",\"56\",\"80\",\"0\",\"80\",\"24\",\"56\",\"57.25\",\"8\",\"49.25\",\"yes\",\"\",\"stale-balances: Balances are 40 days old (as of 2026-08-01).\"\r\n\"Fern Example\",\"990006\",\"2026-09-10\",\"2026-09-04\",\"80\",\"24\",\"60\",\"80\",\"0\",\"80\",\"24\",\"60\",\"57.25\",\"8\",\"49.25\",\"no\",\"\",\"identity-failed: accrued − used ≠ remaining (80 − 24 = 56, against 56 from the import, which itself reports remaining as 60). Raw import was 80 / 24 / 60 against an entitlement of 80.\"\r\n\"Oak Example\",\"990007\",\"2026-09-10\",\"2026-09-04\",\"80\",\"24\",\"56\",\"80\",\"0\",\"80\",\"24\",\"56\",\"57.25\",\"8\",\"49.25\",\"yes\",\"\",\"\"\r\n",
+  "slips": [
+    "Northwest Custom ApparelCedar ExampleBalances as of 2026-09-04VacationHours accrued80.00Hours used24.00Hours remaining56.00SickHours accrued57.25Hours used8.00Hours remaining49.25",
+    "Northwest Custom ApparelMaple ExampleBalances as of 2026-09-04VacationHours accrued80.00Hours used88.00Hours remaining*-8.00SickHours accrued57.25Hours used8.00Hours remaining49.25* You have used more vacation than has accrued so far this year.",
+    "Northwest Custom ApparelAster ExampleBalances as of 2026-09-04VacationHours accrued0.00Hours used16.00Hours remaining*-16.00SickHours accrued57.25Hours used8.00Hours remaining49.25* Your vacation resets on 2026-10-01, your one-year anniversary, when you receive 40 hours. Until then this balance can be negative.",
+    "Northwest Custom ApparelElm ExampleBalances as of 2026-08-01VacationHours accrued80.00Hours used24.00Hours remaining56.00SickHours accrued57.25Hours used8.00Hours remaining49.25These balances are from 2026-08-01 and may not include recent time off.",
+    "Northwest Custom ApparelOak ExampleBalances as of 2026-09-04VacationHours accrued80.00Hours used24.00Hours remaining56.00SickHours accrued57.25Hours used8.00Hours remaining49.25",
+    ""
+  ],
+  "printStatus": "Sent 5 slips to the printer, and saved the audit CSV. 2 employees were skipped: Birch Example, Fern Example. See the flags above.",
+  "reviews": [
+    {
+      "mode": "packet",
+      "text": "Every figure matches the packet's own printed totals — 2 employees read from 2026-09-04. Safe to save.\nReconciled, but worth a look before saving:\nSynthetic review note.\nCheck\tPrinted on the document\tFrom this read\tResult\nSynthetic hours total\t162.25\t162.25\tMatches\nHours and leave to be saved\nEmployee\tPaid\tRegular\tOT\tSick\tVac/PTO\tTotal\tVac Avail\tSick Avail\nCedar Example\tYes\t76.00\t2.25\t4.00\t0.00\t82.25\t56.00\t49.25\nMaple Example\tYes\t76.00\t0.00\t4.00\t0.00\t80.00\t-8.00\t49.25\nSave to payroll records\nDiscard",
+      "tables": [
+        [
+          [
+            "Check",
+            "Printed on the document",
+            "From this read",
+            "Result"
+          ],
+          [
+            "Synthetic hours total",
+            "162.25",
+            "162.25",
+            "Matches"
+          ]
+        ],
+        [
+          [
+            "Employee",
+            "Paid",
+            "Regular",
+            "OT",
+            "Sick",
+            "Vac/PTO",
+            "Total",
+            "Vac Avail",
+            "Sick Avail"
+          ],
+          [
+            "Cedar Example",
+            "Yes",
+            "76.00",
+            "2.25",
+            "4.00",
+            "0.00",
+            "82.25",
+            "56.00",
+            "49.25"
+          ],
+          [
+            "Maple Example",
+            "Yes",
+            "76.00",
+            "0.00",
+            "4.00",
+            "0.00",
+            "80.00",
+            "-8.00",
+            "49.25"
+          ]
+        ]
+      ],
+      "status": "Packet read and verified. Review below, then save."
+    },
+    {
+      "mode": "leave",
+      "text": "All six columns match the report's own Total row — 2 employees, as of 2026-09-04. Saving updates vacation and sick balances only; no pay period is created.\nReconciled, but worth a look before saving:\nSynthetic review note.\nCheck\tPrinted on the document\tFrom this read\tResult\nSynthetic hours total\t162.25\t162.25\tMatches\nLeave balances to be saved\nEmployee\tID\tVac accrued\tVac used\tVac avail\tSick accrued\tSick used\tSick avail\nCedar Example\t990001\t112.00\t56.00\t56.00\t57.25\t8.00\t49.25\nMaple Example\t990002\t80.00\t88.00\t-8.00\t57.25\t8.00\t49.25\nSave leave balances\nDiscard",
+      "tables": [
+        [
+          [
+            "Check",
+            "Printed on the document",
+            "From this read",
+            "Result"
+          ],
+          [
+            "Synthetic hours total",
+            "162.25",
+            "162.25",
+            "Matches"
+          ]
+        ],
+        [
+          [
+            "Employee",
+            "ID",
+            "Vac accrued",
+            "Vac used",
+            "Vac avail",
+            "Sick accrued",
+            "Sick used",
+            "Sick avail"
+          ],
+          [
+            "Cedar Example",
+            "990001",
+            "112.00",
+            "56.00",
+            "56.00",
+            "57.25",
+            "8.00",
+            "49.25"
+          ],
+          [
+            "Maple Example",
+            "990002",
+            "80.00",
+            "88.00",
+            "-8.00",
+            "57.25",
+            "8.00",
+            "49.25"
+          ]
+        ]
+      ],
+      "status": "Page read and verified. Review below, then save."
+    }
+  ],
+  "writes": [
+    {
+      "path": "/api/crm-proxy/payroll/parse",
+      "method": "POST",
+      "body": "{\"filename\":\"synthetic-payroll.pdf\",\"dataBase64\":\"JVBERi0xLjQKU3ludGhldGljIGJyb3dzZXIgZml4dHVyZSBvbmx5LgolJUVPRgo=\",\"mode\":\"packet\"}"
+    },
+    {
+      "path": "/api/crm-proxy/payroll/import",
+      "method": "POST",
+      "body": "{\"jobId\":\"synthetic-1\"}"
+    },
+    {
+      "path": "/api/crm-proxy/payroll/parse",
+      "method": "POST",
+      "body": "{\"filename\":\"synthetic-payroll.pdf\",\"dataBase64\":\"JVBERi0xLjQKU3ludGhldGljIGJyb3dzZXIgZml4dHVyZSBvbmx5LgolJUVPRgo=\",\"mode\":\"leave\"}"
+    },
+    {
+      "path": "/api/crm-proxy/payroll/import",
+      "method": "POST",
+      "body": "{\"jobId\":\"synthetic-2\"}"
+    }
+  ]
+}
