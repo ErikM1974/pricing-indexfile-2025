@@ -1121,3 +1121,7 @@ Isolated branch codex/lead-details starts at reviewed CRM source d44f7551fc1d3a2
 - [ ] Register reviewed owners, lifecycle and evidence; integrate the exact reviewed SHA only after .19 is verified live. Run full gates and actual exact-source CI before the next single rollout.
 
 Original evidence is private under the task artifact directory: lead-details-original-baseline.json and lead-details-original-* source copies. Do not recapture originals after editing. node_modules remains a junction into primary; never recursively delete it and never copy.env.
+
+## Lead records plan expanded to close the shared CSS boundary
+
+Marketing Shipments also consumes leads.css. Include dashboards/marketing-shipments.html with lead detail and Forms Inbox in candidate v2026.09.09.20 (three pages, no reviewed/live credit yet). Original markup, 17 source hashes, four-width screenshots, original tables and print are saved before edits; all calls mocked with zero writes. Retire leads.css only after all production consumers and three preview harnesses are migrated. Preserve shipment recipients, addresses, items, tracking and status payloads; test packed/shipped actions solely against mocks. The original two page captures remain unchanged.
